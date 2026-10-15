@@ -1,4 +1,4 @@
-// Hands provinces to 1444 nations and rolls their development.
+// Hands provinces to 1444 nations and sets their population and wealth.
 
 export interface NationSource {
   id: string;
@@ -6,7 +6,7 @@ export interface NationSource {
   /** [lon, lat] of the capital city. */
   capital: [number, number];
   color?: string;
-  commanders?: { name: string; fire: number; shock: number; maneuver: number; siege: number }[];
+  commanders?: { name: string; might: number; cunning: number; logistics: number }[];
 }
 
 /**
@@ -113,22 +113,29 @@ export function assignOwners(
 
   const outProvinces = provinces.map((p) => {
     const o = owner.get(p.id) ?? null;
-    const zone = config.development.find((z: any) => inBox(p.lon, p.lat, z.bbox));
-    let base = o ? (zone?.base ?? config.defaultDevelopment + 1) : config.defaultDevelopment;
-    if (p.terrain === "mountains" || p.terrain === "desert" || p.terrain === "tundra") base = Math.max(1, base - 2);
-    if (p.terrain === "farmland" || p.terrain === "marsh") base += 1;
-    if (p.coastal && o) base += 1;
-    const roll = (k: string) => Math.max(1, Math.round(base * (0.6 + 0.8 * hash(p.id + k))));
+    const zone = config.settlement.find((z: any) => inBox(p.lon, p.lat, z.bbox));
+    // Land area of the province: each pixel is 1/16 of a degree square.
+    const km2 = p.size * (111.32 / config.pxPerDeg) ** 2 * Math.cos((p.lat * Math.PI) / 180);
+    let density = o ? (zone?.density ?? config.defaultDensity) : Math.min(zone?.density ?? config.defaultDensity, config.defaultDensity * 2);
+    let wealth = o ? (zone?.wealth ?? config.defaultWealth) : config.defaultWealth;
+    if (p.terrain === "mountains" || p.terrain === "desert" || p.terrain === "tundra") density *= 0.35;
+    if (p.terrain === "farmland" || p.terrain === "marsh") density *= 1.3;
+    if (p.coastal && o) wealth += 1;
     const isCapital = o !== null && capitals.get(o) === p.id;
-    const bonus = isCapital ? 3 : 0;
+    if (isCapital) {
+      density *= 2.5;
+      wealth += 2;
+    }
+    // Spread each province a little so neighbours differ.
+    const population = Math.max(1, Math.round((km2 * density * (0.7 + 0.6 * hash(p.id + "pop"))) / 1000));
+    wealth = Math.min(10, Math.max(1, Math.round(wealth * (0.75 + 0.5 * hash(p.id + "w")))));
     return {
       id: p.id,
       name: p.name,
       owner: o,
       terrain: p.terrain,
-      tax: roll("t") + bonus,
-      production: roll("p") + bonus,
-      manpower: roll("m") + bonus,
+      population,
+      wealth,
       x: p.x,
       y: p.y,
       coastal: p.coastal,
@@ -144,7 +151,7 @@ export function assignOwners(
       color: color.get(n.id)!,
       capital: capitals.get(n.id)!,
       // Every nation fields at least one named commander, so every army on the map has a face.
-      commanders: (n.commanders?.length ? n.commanders : [{ name: `General of ${n.name}`, fire: 1, shock: 1, maneuver: 1, siege: 1 }]).map((c, i) => ({
+      commanders: (n.commanders?.length ? n.commanders : [{ name: `General of ${n.name}`, might: 1, cunning: 1, logistics: 1 }]).map((c, i) => ({
         id: `${n.id}_${i + 1}`,
         ...c,
       })),

@@ -15,17 +15,17 @@ describe("rng", () => {
 });
 
 describe("turns", () => {
-  it("starts in November 1444 and rolls over into 1445", () => {
+  it("starts in March 1444 and rolls over into 1445", () => {
     const w = createWorld(rules, 1);
     processTurn(w, [], 0);
-    expect(w.date).toEqual({ year: 1444, month: 12 });
-    processTurn(w, [], 0);
+    expect(w.date).toEqual({ year: 1444, month: 4 });
+    for (let i = 0; i < 9; i++) processTurn(w, [], 0);
     expect(w.date).toEqual({ year: 1445, month: 1 });
   });
 
   it("pays province income into the owner's treasury", () => {
     const w = createWorld(rules, 1);
-    const fra = w.nationIndex.get("FRA")!;
+    const fra = w.nationIndex.get("france")!;
     const before = w.nationTreasury[fra]!;
     processTurn(w, [], fra);
     expect(w.nationMonthlyIncome[fra]).toBeGreaterThan(0);
@@ -34,11 +34,11 @@ describe("turns", () => {
 
   it("moves armies only across borders and only your own", () => {
     const w = createWorld(rules, 1);
-    const fra = w.nationIndex.get("FRA")!;
+    const fra = w.nationIndex.get("france")!;
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
     const paris = w.armies.location[army]!;
     const next = w.adjList[w.adjStart[paris]!]!;
-    const london = w.provinceIndex.get(rules.nations.find((n) => n.id === "ENG")!.capital)!;
+    const london = w.provinceIndex.get(rules.nations.find((n) => n.id === "england")!.capital)!;
     const report = processTurn(
       w,
       [
@@ -50,6 +50,17 @@ describe("turns", () => {
     );
     expect(w.armies.location[army]).toBe(next);
     expect(report.rejectedOrders.map((r) => r.reason)).toEqual(["not your army", "army already moved this turn"]);
+  });
+
+  it("keeps armies off sea zones until they have ships", () => {
+    const w = createWorld(rules, 1);
+    const eng = w.nationIndex.get("england")!;
+    const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(eng);
+    const london = w.armies.location[army]!;
+    const sea = Array.from(w.adjList.subarray(w.adjStart[london]!, w.adjStart[london + 1]!)).find((p) => w.provinceWater[p]);
+    expect(sea).toBeDefined();
+    const report = processTurn(w, [{ type: "move", army, to: sea! }], eng);
+    expect(report.rejectedOrders.map((r) => r.reason)).toEqual(["armies need ships to cross water"]);
   });
 
   it("is deterministic for the same seed and orders", () => {
@@ -65,7 +76,7 @@ describe("turns", () => {
 describe("engine host", () => {
   it("starts a game and ends turns through the message protocol", () => {
     const handle = createEngineHost(() => rules);
-    const start = handle({ id: 1, type: "newGame", seed: 1, playerNation: "CAS" });
+    const start = handle({ id: 1, type: "newGame", seed: 1, playerNation: "castile" });
     expect(start.response.type).toBe("snapshot");
     const next = handle({ id: 2, type: "endTurn", orders: [] });
     if (next.response.type !== "snapshot") throw new Error(next.response.message);

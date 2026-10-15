@@ -1,6 +1,6 @@
 # Pocket Hegemony
 
-A turn-based, 8-bit grand strategy game for phones, desktop and the web, starting in November 1444.
+A turn-based, 8-bit grand strategy game for phones, desktop and the web, starting in spring 1444.
 
 ## Layout
 
@@ -37,9 +37,11 @@ php bin/phpunit
 
 - Modern first-level regions (states, provinces, departments) are drawn onto a 5760 × 2144 pixel grid (16 pixels per degree), then merged or split until provinces are roughly even in size. `config.json` sets the size per part of the world, so Europe, India and China are denser than Siberia or the Sahara.
 - `nations-1444.json` lists the 137 nations with their capitals. `owners-1444.json` hands provinces to them: rules are checked in order and the first match wins, by modern country, region name, or a longitude and latitude box. Borders are an approximation of 1444, not a historical atlas, and province names are modern region names.
-- Outputs: `apps/client/public/map/provinces.png` (province id per pixel) and `packages/rules/data/world/*.json`.
+- Water is split into sea zones (about 4,700): coastal zones about 150 km across, open-ocean zones about 300 km, equal in kilometres at every latitude so the zones a fleet crosses measure travel time. They take real sea names from Natural Earth's marine areas, and `config.json` lists straits (Bosporus, Øresund, Gibraltar…) that join seas the pixel grid closes. Sea zones come after the land provinces in `provinces.json`, with terrain `sea` or `ocean`; armies can't enter them.
+- A second image holds terrain per pixel for the close-zoom art: real geography (mountain ranges, deserts, wetlands) where Natural Earth has it, otherwise the province's terrain broken up with woods and with fields where 1444 was crowded. The simulation still uses one terrain per province.
+- Outputs: `apps/client/public/map/provinces.png` (province or sea zone id per pixel), `apps/client/public/map/terrain.png`, and `packages/rules/data/world/*.json`.
 
-The client draws the map with WebGL2: the id image is uploaded once and every province's colour comes from a small lookup texture, so recolouring the world after a turn costs almost nothing. `/style.html` in the client is the art style sheet.
+The client draws the map with WebGL2: the id image is uploaded once and every province's colour comes from a small lookup texture, so recolouring the world after a turn costs almost nothing. Zoomed in, each map pixel becomes 8 × 8 art pixels drawn from a terrain tile atlas (`src/art/tiles.ts`), with rounded coasts, sand and surf, and nation borders in the owners' colours. The interface art (parchment, wood frames, ribbons, buttons, icons) is painted in code by `src/art/ui.ts`. `/style.html` is the art test page; `?view=x,y,zoom` opens the game at a map spot.
 
 ## The engine worker on each platform
 

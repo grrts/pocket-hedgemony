@@ -25,9 +25,9 @@ async function check(name, expectedMode, setup) {
     { timeout: 15000 },
   ).then((h) => h.jsonValue());
   // Play one turn through the real UI too.
-  await page.click("[data-nation=FRA]");
+  await page.click("[data-nation=france]");
   await page.click(".end-turn");
-  await page.waitForSelector(".turn-label:text('December 1444')");
+  await page.waitForSelector(".turn-label:text('April 1444')");
   const ok = d.engineError === null && d.engineMode === expectedMode;
   failed ||= !ok;
   console.log(`${ok ? "PASS" : "FAIL"} ${name}: ${JSON.stringify(d)}`);

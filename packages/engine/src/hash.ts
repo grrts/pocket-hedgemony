@@ -16,7 +16,7 @@ export function hashWorld(world: World): string {
   feed(world.rng.state);
   feed(world.provinceOwner);
   feed(world.nationTreasury);
-  feed(world.nationManpower);
+  feed(world.nationLevies);
   feed(a.alive.subarray(0, a.count));
   feed(a.owner.subarray(0, a.count));
   feed(a.location.subarray(0, a.count));

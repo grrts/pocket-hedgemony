@@ -20,6 +20,12 @@ importers:
 
   apps/client:
     dependencies:
+      '@fontsource/jacquard-12':
+        specifier: 5.3.0
+        version: 5.3.0
+      '@fontsource/pixelify-sans':
+        specifier: 5.3.0
+        version: 5.3.0
       '@ph/engine':
         specifier: workspace:*
         version: link:../../packages/engine
@@ -91,6 +97,12 @@ packages:
   '@electron/get@5.1.0':
     resolution: {integrity: sha512-3kSBtG8ObcTVfXanm5vVJ6UnBLEVmVsRk1M+vGqCuMBV+XLCbJYuWQful+yIy0GQDsSlK0kHEriEHn7SPk4EnA==}
     engines: {node: '>=22.12.0'}
+
+  '@fontsource/jacquard-12@5.3.0':
+    resolution: {integrity: sha512-P1a2NHci2j/ArWzw1AheOtceKy+78J0s891FLuiGhrq0Nj5tfqCAa+FgcXE9dlWvjrTdC/wlXtahcL5JbOAFDA==}
+
+  '@fontsource/pixelify-sans@5.3.0':
+    resolution: {integrity: sha512-4RCe9nXbi7wUu5+H0FNX1sgPZ2kJ1MmY1uTkEfvQIzzqhoS8zGKJaJfdK8oreE0OU+5gM+NdurFi3H3FJRBvyw==}
 
   '@ionic/cli-framework-output@2.2.8':
     resolution: {integrity: sha512-TshtaFQsovB4NWRBydbNFawql6yul7d5bMiW1WYYf17hd99V6xdDdk3vtF51bw6sLkxON3bDQpWsnUc9/hVo3g==}
@@ -1039,6 +1051,10 @@ snapshots:
       undici: 7.30.1
     transitivePeerDependencies:
       - supports-color
+
+  '@fontsource/jacquard-12@5.3.0': {}
+
+  '@fontsource/pixelify-sans@5.3.0': {}
 
   '@ionic/cli-framework-output@2.2.8':
     dependencies:

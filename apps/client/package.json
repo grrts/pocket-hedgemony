@@ -12,6 +12,8 @@
     "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
+    "@fontsource/jacquard-12": "5.3.0",
+    "@fontsource/pixelify-sans": "5.3.0",
     "@ph/engine": "workspace:*",
     "@ph/rules": "workspace:*"
   },

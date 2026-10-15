@@ -17,9 +17,10 @@ export interface World {
   provinceIds: string[];
   provinceIndex: Map<string, number>;
   provinceOwner: Int16Array; // nation index, -1 = unowned
-  provinceTax: Float32Array;
-  provinceProduction: Float32Array;
-  provinceManpower: Float32Array;
+  provincePopulation: Float32Array; // thousands of people
+  provinceWealth: Float32Array;
+  /** 1 for sea and ocean zones, which only ships can enter. */
+  provinceWater: Uint8Array;
   /** Borders in compressed sparse row form: neighbors of p are adjList[adjStart[p] .. adjStart[p+1]). */
   adjStart: Int32Array;
   adjList: Int32Array;
@@ -28,8 +29,8 @@ export interface World {
   nationIds: string[];
   nationIndex: Map<string, number>;
   nationTreasury: Float64Array;
-  nationManpower: Float64Array;
-  nationMaxManpower: Float64Array;
+  nationLevies: Float64Array;
+  nationMaxLevies: Float64Array;
   nationMonthlyIncome: Float64Array;
 
   commanderIds: string[];
@@ -103,16 +104,15 @@ export function createWorld(rules: Ruleset, seed: number): World {
   const N = nationIds.length;
 
   const provinceOwner = new Int16Array(P);
-  const provinceTax = new Float32Array(P);
-  const provinceProduction = new Float32Array(P);
-  const provinceManpower = new Float32Array(P);
+  const provincePopulation = new Float32Array(P);
+  const provinceWealth = new Float32Array(P);
+  const provinceWater = Uint8Array.from(rules.provinces, (p) => (p.terrain === "sea" || p.terrain === "ocean" ? 1 : 0));
   const adjStart = new Int32Array(P + 1);
   let edges = 0;
   rules.provinces.forEach((p, i) => {
     provinceOwner[i] = p.owner === null ? -1 : nationIndex.get(p.owner)!;
-    provinceTax[i] = p.tax;
-    provinceProduction[i] = p.production;
-    provinceManpower[i] = p.manpower;
+    provincePopulation[i] = p.population;
+    provinceWealth[i] = p.wealth;
     adjStart[i] = edges;
     edges += p.neighbors.length;
   });
@@ -140,25 +140,25 @@ export function createWorld(rules: Ruleset, seed: number): World {
     provinceIds,
     provinceIndex,
     provinceOwner,
-    provinceTax,
-    provinceProduction,
-    provinceManpower,
+    provincePopulation,
+    provinceWealth,
+    provinceWater,
     adjStart,
     adjList,
     nationCount: N,
     nationIds,
     nationIndex,
     nationTreasury: new Float64Array(N).fill(rules.defines.economy.startingTreasury),
-    nationManpower: new Float64Array(N),
-    nationMaxManpower: new Float64Array(N),
+    nationLevies: new Float64Array(N),
+    nationMaxLevies: new Float64Array(N),
     nationMonthlyIncome: new Float64Array(N),
     commanderIds,
     commanderOwner: Int16Array.from(commanderOwnerList),
     armies: createArmyPool(Math.max(16, N * 2)),
   };
 
-  recomputeMaxManpower(world);
-  world.nationManpower.set(world.nationMaxManpower);
+  recomputeMaxLevies(world);
+  world.nationLevies.set(world.nationMaxLevies);
 
   // Every nation starts with one army in its capital, led by its first commander.
   rules.nations.forEach((n, i) => {
@@ -169,13 +169,13 @@ export function createWorld(rules: Ruleset, seed: number): World {
   return world;
 }
 
-export function recomputeMaxManpower(world: World): void {
-  const max = world.nationMaxManpower;
-  const perPoint = world.rules.defines.manpower.menPerBaseManpower;
+export function recomputeMaxLevies(world: World): void {
+  const max = world.nationMaxLevies;
+  const perThousand = world.rules.defines.levies.menPerThousandPeople;
   max.fill(0);
   for (let p = 0; p < world.provinceCount; p++) {
     const owner = world.provinceOwner[p]!;
-    if (owner >= 0) max[owner] = max[owner]! + world.provinceManpower[p]! * perPoint;
+    if (owner >= 0) max[owner] = max[owner]! + world.provincePopulation[p]! * perThousand;
   }
 }
 

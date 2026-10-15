@@ -6,29 +6,67 @@ body.sheet {
   user-select: text;
 }
 
+body.sheet {
+  background: var(--ui-planks) 0 0 / 64px repeat, var(--wood);
+}
+
 #sheet {
   max-width: 900px;
   margin: 0 auto;
-  padding: 16px;
+  padding-block: 16px 48px;
+  padding-left: max(12px, env(safe-area-inset-left, 0px));
+  padding-right: max(12px, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-#sheet h1 {
-  color: var(--accent);
-  letter-spacing: 2px;
+.sheet-title h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font: 400 48px/1 var(--title);
+  color: var(--brass-light);
+  text-shadow: 3px 3px 0 var(--outline);
+  text-wrap: balance;
 }
 
-#sheet h2 {
-  margin-top: 32px;
-  color: var(--accent);
-  font-size: 17px;
-  border-bottom: 3px solid var(--panel);
-  padding-bottom: 4px;
+.sheet-title p {
+  margin: 6px 0 0;
+  color: var(--paper);
+  text-shadow: 2px 2px 0 var(--outline);
 }
 
-#sheet p {
-  color: var(--muted);
-  font-weight: normal;
+.sheet-title a {
+  color: var(--brass-light);
+}
+
+.sheet-section {
+  padding: 4px 8px 12px;
+  min-width: 0;
+}
+
+.sheet-section p {
   max-width: 62ch;
+}
+
+.sheet-section h3 {
+  margin: 16px 0 6px;
+  font: 600 13px/1 var(--body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.sheet-section a {
+  color: var(--cloth);
+}
+
+.demo-hud,
+.demo-panel {
+  position: static;
+  max-width: 420px;
 }
 
 .grid {
@@ -39,13 +77,11 @@ body.sheet {
 
 .chip {
   font-size: 12px;
-  font-weight: normal;
 }
 
 .chip .sw {
-  height: 48px;
-  border: 3px solid var(--ink);
-  box-shadow: 3px 3px 0 #0006;
+  height: 40px;
+  border: 2px solid var(--outline);
   margin-bottom: 4px;
 }
 
@@ -53,34 +89,29 @@ body.sheet {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 18px;
-  margin: 10px 0;
+  gap: 14px;
+  margin: 8px 0;
+}
+
+.row.tiles {
+  gap: 4px;
+  align-items: flex-start;
 }
 
 .row figure {
   margin: 0;
   text-align: center;
-  font-size: 11px;
-  font-weight: normal;
-  color: var(--muted);
+  font-size: 12px;
+  color: var(--ink-soft);
 }
 
-.row canvas {
+.row canvas,
+.row figure img {
   display: block;
   margin: 0 auto 4px;
   image-rendering: pixelated;
 }
 
-.demo-panel {
-  position: static;
-  max-width: 380px;
-}
-
-a {
-  color: var(--accent);
-}
-
-.hint a,
-#sheet a {
-  color: var(--accent);
+.row.tiles canvas {
+  border: 2px solid var(--outline);
 }

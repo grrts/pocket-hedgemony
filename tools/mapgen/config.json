@@ -23,6 +23,9 @@
     { "name": "Australia interior", "bbox": [114, -35, 154, -15], "target": 2800 },
     { "name": "Northern North America", "bbox": [-170, 50, -50, 60], "target": 2200 }
   ],
+  "lowlands": [
+    { "name": "Po valley", "bbox": [7.5, 44.55, 12.6, 45.55] }
+  ],
   "terrainClasses": {
     "Range/mtn": "mountains",
     "Desert": "desert",
@@ -37,25 +40,43 @@
     "Basin": "drylands",
     "Depression": "drylands"
   },
-  "development": [
-    { "name": "Low Countries, Northern Italy, Paris, Rhine", "bbox": [-1, 43, 13, 53], "base": 6 },
-    { "name": "Western Europe", "bbox": [-11, 36, 20, 60], "base": 4 },
-    { "name": "Byzantine and Ottoman core", "bbox": [20, 36, 35, 43], "base": 5 },
-    { "name": "Eastern Europe", "bbox": [20, 43, 60, 62], "base": 3 },
-    { "name": "Egypt and Levant", "bbox": [29, 22, 40, 37], "base": 5 },
-    { "name": "Middle East and Persia", "bbox": [35, 12, 75, 42], "base": 3 },
-    { "name": "India", "bbox": [66, 6, 92, 34], "base": 5 },
-    { "name": "China", "bbox": [100, 18, 125, 42], "base": 6 },
-    { "name": "Korea and Japan", "bbox": [125, 30, 146, 43], "base": 5 },
-    { "name": "Southeast Asia", "bbox": [92, -10, 125, 24], "base": 3 },
-    { "name": "Mesoamerica and Andes", "bbox": [-106, -20, -68, 23], "base": 3 },
-    { "name": "Africa", "bbox": [-20, -35, 52, 37], "base": 2 }
+  "$settlementComment": "Rough 1444 population density (people per km²) and wealth (1-10) by region. First match wins.",
+  "settlement": [
+    { "name": "Low Countries, Northern Italy, Paris basin, Rhine", "bbox": [-1, 43, 13, 53], "density": 30, "wealth": 6 },
+    { "name": "Western Europe", "bbox": [-11, 36, 20, 60], "density": 18, "wealth": 4 },
+    { "name": "Byzantine and Ottoman core", "bbox": [20, 36, 35, 43], "density": 14, "wealth": 5 },
+    { "name": "Eastern Europe", "bbox": [20, 43, 60, 62], "density": 6, "wealth": 2 },
+    { "name": "Egypt and Levant", "bbox": [29, 22, 40, 37], "density": 12, "wealth": 5 },
+    { "name": "Middle East and Persia", "bbox": [35, 12, 75, 42], "density": 6, "wealth": 3 },
+    { "name": "India", "bbox": [66, 6, 92, 34], "density": 30, "wealth": 4 },
+    { "name": "China", "bbox": [100, 18, 125, 42], "density": 32, "wealth": 5 },
+    { "name": "Korea and Japan", "bbox": [125, 30, 146, 43], "density": 25, "wealth": 4 },
+    { "name": "Southeast Asia", "bbox": [92, -10, 125, 24], "density": 8, "wealth": 3 },
+    { "name": "Mesoamerica and Andes", "bbox": [-106, -20, -68, 23], "density": 12, "wealth": 3 },
+    { "name": "Africa", "bbox": [-20, -35, 52, 37], "density": 3, "wealth": 2 }
   ],
-  "defaultDevelopment": 1,
-  "palette": [
-    "#3b5dc9", "#b13e53", "#ffcd75", "#38b764", "#ef7d57", "#41a6f6", "#a7f070", "#5d275d",
-    "#73eff7", "#257179", "#c97d3b", "#8f4fa8", "#d9a066", "#6abe30", "#df7126", "#5b6ee1",
-    "#d95763", "#76428a", "#99e550", "#fbf236", "#847e87", "#8f974a", "#cbdbfc", "#e8a0bf",
-    "#4b692f", "#ac3232", "#306082", "#eec39a", "#639bff", "#bd8d5a", "#9badb7", "#45283c"
+  "defaultDensity": 0.8,
+  "defaultWealth": 1,
+  "palette": ["#3b5dc9", "#b13e53", "#ffcd75", "#38b764", "#ef7d57", "#41a6f6", "#a7f070", "#5d275d", "#73eff7", "#257179", "#c97d3b", "#8f4fa8", "#d9a066", "#6abe30", "#df7126", "#5b6ee1", "#d95763", "#76428a", "#99e550", "#fbf236", "#847e87", "#8f974a", "#cbdbfc", "#e8a0bf", "#4b692f", "#ac3232", "#306082", "#eec39a", "#639bff", "#bd8d5a", "#9badb7", "#45283c"],
+  "seas": {
+    "$comment": "Sea zone seed spacing in pixels (about 7 km each): coastal zones are about 150 km across, ocean zones about 300 km.",
+    "coastSpacing": 22,
+    "oceanSpacing": 44,
+    "coastBand": 20,
+    "minSeaSize": 150
+  },
+  "straits": [
+    { "name": "Bosporus", "a": [29.2, 41.35], "b": [28.95, 40.9] },
+    { "name": "Dardanelles", "a": [27.3, 40.6], "b": [26.0, 40.0] },
+    { "name": "Kerch Strait", "a": [36.6, 45.5], "b": [36.5, 45.0] },
+    { "name": "Oresund", "a": [12.7, 56.2], "b": [12.8, 55.4] },
+    { "name": "Great Belt", "a": [10.9, 56.0], "b": [11.0, 55.0] },
+    { "name": "Strait of Gibraltar", "a": [-6.0, 35.95], "b": [-5.2, 36.05] },
+    { "name": "Strait of Messina", "a": [15.6, 38.35], "b": [15.6, 38.05] },
+    { "name": "Strait of Hormuz", "a": [56.2, 26.8], "b": [56.8, 26.2] },
+    { "name": "Bab-el-Mandeb", "a": [43.2, 12.9], "b": [43.6, 12.4] },
+    { "name": "Strait of Malacca", "a": [100.0, 4.0], "b": [103.8, 1.2] },
+    { "name": "Garabogaz strait", "a": [52.7, 41.0], "b": [53.3, 41.2] },
+    { "name": "Strait of Maracaibo", "a": [-71.4, 11.4], "b": [-71.6, 10.3] }
   ]
 }

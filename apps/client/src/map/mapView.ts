@@ -66,7 +66,7 @@ export class MapView {
     return Math.max(this.root.clientHeight / this.map.height, this.root.clientWidth / this.map.width / 1.2);
   }
 
-  readonly maxZoom = 24;
+  readonly maxZoom = 40;
 
   invalidate(): void {
     this.dirty = true;

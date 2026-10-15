@@ -1,17 +1,17 @@
 {
   "$comment": "Global balance numbers. Every value here can be tuned without touching engine code.",
-  "startDate": { "year": 1444, "month": 11 },
+  "startDate": { "year": 1444, "month": 3 },
   "economy": {
-    "taxPerBaseTaxPerMonth": 0.1,
-    "productionPerBaseProductionPerMonth": 0.08,
+    "goldPerThousandPeoplePerMonth": 0.004,
+    "goldPerWealthPerMonth": 0.06,
     "startingTreasury": 50
   },
-  "manpower": {
-    "menPerBaseManpower": 250,
+  "levies": {
+    "menPerThousandPeople": 4,
     "monthlyRecoveryFraction": 0.0167
   },
   "military": {
-    "maintenancePerThousandMenPerMonth": 0.2,
+    "upkeepPerThousandMenPerMonth": 0.2,
     "movementCostPerProvince": 1
   }
 }

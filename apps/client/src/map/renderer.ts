@@ -1,4 +1,5 @@
 import { hexToRgb, PALETTE, TERRAIN_COLORS, TERRAINS } from "../art/palette.ts";
+import { ATLAS_ROWS, BIG_ROWS, buildTileAtlas, SEA_ROW, SHALLOW_ROW, TILE, VARIANTS } from "../art/tiles.ts";
 import type { MapImage } from "./loadMap.ts";
 
 /**
@@ -6,7 +7,14 @@ import type { MapImage } from "./loadMap.ts";
  * a small per-province lookup texture, so changing owners, selection or map
  * mode only rewrites a few kilobytes instead of millions of pixels.
  * Each map pixel is drawn as a crisp block (nearest filtering) for the 8-bit look.
+ *
+ * Zoomed in past DETAIL_ZOOM, every map pixel becomes 8×8 art pixels: terrain
+ * tiles from the atlas (fields, forests, peaks), coasts with cut corners and
+ * a sand line, two-tone nation borders and dotted province borders.
  */
+
+/** Device pixels per map pixel at which the detailed tiles take over. */
+export const DETAIL_ZOOM = 7;
 
 export type MapMode = "political" | "terrain";
 
@@ -35,27 +43,39 @@ precision highp float;
 precision highp int;
 in vec2 vMap;
 uniform sampler2D uIds;      // this tile's province ids (RGB = id + 1)
+uniform sampler2D uLand;     // this tile's terrain per pixel (R = terrain index)
 uniform ivec2 uTileOrigin;   // tile's top-left in map pixels
 uniform ivec2 uTileSize;     // texels in this tile's texture (includes 1px overlap)
 uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
-uniform sampler2D uOwner;    // per-province: rg = owner index + 1
+uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones
 uniform int uInfoWidth;
 uniform float uZoom;
 uniform float uTime;
 uniform int uMode;           // 0 political, 1 terrain
 uniform vec3 uTerrain[10];
-uniform vec3 uSea, uDeepSea, uFoam, uInk, uHighlight;
+uniform vec3 uSea, uDeepSea, uFoam, uInk, uHighlight, uSand;
+uniform sampler2D uAtlas;    // terrain tiles: ${VARIANTS} variants across, one row per terrain
 out vec4 outColor;
+
+const float ART = ${TILE / 2}.0; // art pixels per map pixel when detailed
 
 int idAt(ivec2 p) {
   ivec2 local = clamp(p - uTileOrigin, ivec2(0), uTileSize - 1);
   vec3 c = texelFetch(uIds, local, 0).rgb * 255.0 + 0.5;
   return (int(c.r) << 16 | int(c.g) << 8 | int(c.b)) - 1;
 }
+int terrainAt(ivec2 p) {
+  ivec2 local = clamp(p - uTileOrigin, ivec2(0), uTileSize - 1);
+  return int(texelFetch(uLand, local, 0).r * 255.0 + 0.5);
+}
 vec4 info(int id) { return texelFetch(uInfo, ivec2(id % uInfoWidth, id / uInfoWidth), 0); }
 int ownerOf(int id) {
   vec2 o = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).rg * 255.0 + 0.5;
   return int(o.r) * 256 + int(o.g) - 1;
+}
+// Land province (not a lake, not a sea zone).
+bool land(int id) {
+  return id >= 0 && texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b < 0.5;
 }
 float hash(ivec2 p) {
   uint h = uint(p.x) * 374761393u + uint(p.y) * 668265263u;
@@ -63,21 +83,133 @@ float hash(ivec2 p) {
   return float(h & 0xffffu) / 65535.0;
 }
 
+vec3 atlas(int row, int variant, ivec2 local) {
+  return texelFetch(uAtlas, ivec2(variant * ${TILE} + local.x, row * ${TILE} + local.y), 0).rgb;
+}
+
+// Province under an art pixel, with stair-stepped corners: where the two
+// pixels beside a corner belong to the same other province, the corner is
+// cut off and given to it, which rounds coasts and borders.
+int effId(vec2 m) {
+  ivec2 p = ivec2(floor(m));
+  int id = idAt(p);
+  vec2 f = fract(m);
+  int sx = f.x < 0.5 ? -1 : 1;
+  int sy = f.y < 0.5 ? -1 : 1;
+  int h = idAt(p + ivec2(sx, 0));
+  if (h == id || h != idAt(p + ivec2(0, sy))) return id;
+  float dx = sx < 0 ? f.x : 1.0 - f.x;
+  float dy = sy < 0 ? f.y : 1.0 - f.y;
+  return dx + dy < 0.5 ? h : id;
+}
+
+vec3 detailed() {
+  vec2 artPos = floor(vMap * ART);
+  vec2 m = (artPos + 0.5) / ART;
+  float e = 1.0 / ART;
+  int id = effId(m);
+  int iR = effId(m + vec2(e, 0.0));
+  int iL = effId(m - vec2(e, 0.0));
+  int iD = effId(m + vec2(0.0, e));
+  int iU = effId(m - vec2(0.0, e));
+  ivec2 a = ivec2(artPos);
+  ivec2 cell = a >> 4;
+  ivec2 local = a & 15;
+  int variant = int(hash(cell) * ${VARIANTS}.0) & ${VARIANTS - 1};
+
+  if (!land(id)) {
+    ivec2 p = ivec2(floor(m));
+    bool nearLand = land(idAt(p + ivec2(1, 0))) || land(idAt(p - ivec2(1, 0))) || land(idAt(p + ivec2(0, 1))) || land(idAt(p - ivec2(0, 1)));
+    // Waves drift sideways, each tile at its own pace.
+    int drift = int(uTime * 2.0 + hash(cell + 7) * 16.0);
+    vec3 c = atlas(nearLand ? ${SHALLOW_ROW} : ${SEA_ROW}, variant, ivec2((local.x + drift) & 15, local.y));
+    if (land(iR) || land(iL) || land(iD) || land(iU)) {
+      c = mix(c, uFoam, 0.55 + 0.2 * step(0.5, fract(uTime * 0.7 + hash(a))));
+    } else if (id >= 0 && ((iR >= 0 && iR != id) || (iD >= 0 && iD != id)) && ((a.x + a.y) / 2 & 1) == 0) {
+      c = mix(c, uFoam, 0.3); // dashed line between sea zones
+    }
+    if (id >= 0) {
+      int flags = int(info(id).a * 255.0 + 0.5) >> 4;
+      if ((flags & 1) != 0) c = mix(c, uHighlight, 0.15 + 0.15 * step(0.5, fract(uTime * 1.5)));
+      if ((flags & 2) != 0) c = mix(c, uHighlight, 0.18);
+    }
+    return c;
+  }
+
+  vec4 inf = info(id);
+  int flags = int(inf.a * 255.0 + 0.5) >> 4;
+  ivec2 p = ivec2(floor(m));
+  int terrain = terrainAt(p);
+  if (idAt(p) != id) terrain = int(inf.a * 255.0 + 0.5) & 15; // a corner borrowed from a neighbour
+  if (terrain == ${BIG_ROWS[0]}) {
+    // One 32×32 picture over four tiles, mirrored at random per block.
+    ivec2 q = a & 31;
+    if (hash(a >> 5) > 0.5) q.x = 31 - q.x;
+    variant = (q.x >> 4) + 2 * (q.y >> 4);
+    local = q & 15;
+  }
+  vec3 art = atlas(terrain, variant, local);
+  int owner = ownerOf(id);
+  vec3 c = art;
+  if (uMode == 0 && owner >= 0) {
+    // Wash the terrain in the owner's colour, keeping its light and shade.
+    float l = dot(art, vec3(0.3, 0.59, 0.11));
+    c = mix(art, inf.rgb * (0.45 + 0.85 * l), 0.3);
+    // A stronger band of the owner's colour along its borders, so the nation
+    // still reads at a glance over the terrain art.
+    bool edge = false;
+    for (int k = 0; k < 4; k++) {
+      ivec2 q = p + ivec2(k == 0 ? 1 : k == 1 ? -1 : 0, k == 2 ? 1 : k == 3 ? -1 : 0);
+      int n = idAt(q);
+      if (land(n) && ownerOf(n) != owner) edge = true;
+    }
+    if (edge) c = mix(c, inf.rgb, 0.4);
+  }
+
+  if (!land(iR) || !land(iL) || !land(iD) || !land(iU)) {
+    c = uSand;
+  } else if (ownerOf(iR) != owner || ownerOf(iL) != owner || ownerOf(iD) != owner || ownerOf(iU) != owner) {
+    c = mix(inf.rgb, uInk, 0.4);
+  } else if ((iR != id || iL != id || iD != id || iU != id) && ((a.x + a.y) & 1) == 0) {
+    c = mix(c, uInk, 0.45);
+  }
+
+  if ((flags & 1) != 0) c = mix(c, uHighlight, 0.18 + 0.17 * step(0.5, fract(uTime * 1.5)));
+  if ((flags & 2) != 0) c = mix(c, uHighlight, 0.22);
+  return c;
+}
+
 void main() {
+  if (uZoom >= ${DETAIL_ZOOM}.0) {
+    outColor = vec4(detailed(), 1.0);
+    return;
+  }
   ivec2 p = ivec2(floor(vMap));
   int id = idAt(p);
-  if (id < 0) {
-    // Sea: dithered deep water, a light line where it meets the coast.
-    bool coast = idAt(p + ivec2(1, 0)) >= 0 || idAt(p - ivec2(1, 0)) >= 0 || idAt(p + ivec2(0, 1)) >= 0 || idAt(p - ivec2(0, 1)) >= 0;
+  if (!land(id)) {
+    // Sea: dithered deep water, a light line where it meets the coast,
+    // and faint dashes between sea zones once zoomed in.
+    bool coast = land(idAt(p + ivec2(1, 0))) || land(idAt(p - ivec2(1, 0))) || land(idAt(p + ivec2(0, 1))) || land(idAt(p - ivec2(0, 1)));
     float wave = hash(ivec2(p.x + int(uTime * 1.5), p.y));
     vec3 c = wave > 0.93 ? uSea : uDeepSea;
-    if (coast && uZoom > 1.5) c = mix(uSea, uFoam, 0.35);
+    if (coast && uZoom > 1.5) {
+      c = mix(uSea, uFoam, 0.35);
+    } else if (id >= 0 && uZoom > 2.5) {
+      int r = idAt(p + ivec2(1, 0));
+      int d = idAt(p + ivec2(0, 1));
+      if (((r >= 0 && r != id) || (d >= 0 && d != id)) && ((p.x + p.y) & 1) == 0) c = mix(c, uSea, 0.8);
+    }
+    if (id >= 0) {
+      int flags = int(info(id).a * 255.0 + 0.5) >> 4;
+      if ((flags & 1) != 0) c = mix(c, uHighlight, 0.2 + 0.2 * step(0.5, fract(uTime * 1.5)));
+      if ((flags & 2) != 0) c = mix(c, uHighlight, 0.2);
+    }
     outColor = vec4(c, 1.0);
     return;
   }
 
   vec4 inf = info(id);
-  int terrain = int(inf.a * 255.0 + 0.5) & 15;
+  int terrain = uMode == 0 ? int(inf.a * 255.0 + 0.5) & 15 : terrainAt(p);
   int flags = int(inf.a * 255.0 + 0.5) >> 4;
   vec3 c = uMode == 0 ? inf.rgb : uTerrain[terrain];
 
@@ -96,8 +228,8 @@ void main() {
   int owner = ownerOf(id);
   int r = idAt(p + ivec2(1, 0));
   int d = idAt(p + ivec2(0, 1));
-  bool nationEdge = (r >= 0 && ownerOf(r) != owner) || (d >= 0 && ownerOf(d) != owner);
-  bool provinceEdge = (r >= 0 && r != id) || (d >= 0 && d != id);
+  bool nationEdge = (land(r) && ownerOf(r) != owner) || (land(d) && ownerOf(d) != owner);
+  bool provinceEdge = (land(r) && r != id) || (land(d) && d != id);
   if (nationEdge) c = mix(c, uInk, uZoom > 2.0 ? 0.85 : 0.6);
   else if (provinceEdge && uZoom > 1.2) c *= 0.7;
 
@@ -109,6 +241,7 @@ void main() {
 
 interface Tile {
   texture: WebGLTexture;
+  land: WebGLTexture;
   x: number;
   y: number;
   w: number;
@@ -124,6 +257,7 @@ export class MapRenderer {
   private tiles: Tile[] = [];
   private infoTex: WebGLTexture;
   private ownerTex: WebGLTexture;
+  private atlasTex: WebGLTexture;
   private infoWidth = 256;
   private infoData: Uint8Array;
   private ownerData: Uint8Array;
@@ -139,7 +273,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uTerrain", "uSea", "uDeepSea", "uFoam", "uInk", "uHighlight"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uTerrain", "uSea", "uDeepSea", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uLand"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -161,6 +295,11 @@ export class MapRenderer {
     this.ownerData = new Uint8Array(this.infoWidth * rows * 4);
     this.infoTex = makeDataTexture(gl, this.infoWidth, rows);
     this.ownerTex = makeDataTexture(gl, this.infoWidth, rows);
+
+    const atlas = buildTileAtlas();
+    this.atlasTex = makeDataTexture(gl, atlas.width, atlas.height);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, atlas.width, atlas.height, gl.RGBA, gl.UNSIGNED_BYTE, atlas.rgba);
+    if (atlas.height !== ATLAS_ROWS * TILE) throw new Error("tile atlas has the wrong size");
   }
 
   private makeTile(x: number, y: number, w: number, h: number, texW: number, texH: number): Tile {
@@ -176,6 +315,16 @@ export class MapRenderer {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, texW, texH, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
     setNearest(gl);
 
+    const terrain = new Uint8Array(texW * texH);
+    for (let row = 0; row < texH; row++) {
+      const start = (y + row) * this.map.width + x;
+      terrain.set(this.map.terrain.subarray(start, start + texW), row * texW);
+    }
+    const land = gl.createTexture()!;
+    gl.bindTexture(gl.TEXTURE_2D, land);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, texW, texH, 0, gl.RED, gl.UNSIGNED_BYTE, terrain);
+    setNearest(gl);
+
     const vao = gl.createVertexArray()!;
     gl.bindVertexArray(vao);
     const buf = gl.createBuffer();
@@ -185,14 +334,14 @@ export class MapRenderer {
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     gl.bindVertexArray(null);
-    return { texture, x, y, w, h, texW, texH, vao };
+    return { texture, land, x, y, w, h, texW, texH, vao };
   }
 
   /**
    * Sets each province's fill colour, owner and flags.
    * flags: 1 = selected, 2 = highlighted (e.g. a move target).
    */
-  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number): void {
+  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false): void {
     const o = i * 4;
     this.infoData[o] = rgb[0]!;
     this.infoData[o + 1] = rgb[1]!;
@@ -201,6 +350,7 @@ export class MapRenderer {
     const ow = owner + 1;
     this.ownerData[o] = (ow >> 8) & 255;
     this.ownerData[o + 1] = ow & 255;
+    this.ownerData[o + 2] = water ? 255 : 0;
   }
 
   uploadProvinceStyles(): void {
@@ -232,6 +382,7 @@ export class MapRenderer {
     col("uFoam", PALETTE.foam);
     col("uInk", PALETTE.ink);
     col("uHighlight", PALETTE.paper);
+    col("uSand", PALETTE.sand);
 
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.infoTex);
@@ -239,6 +390,10 @@ export class MapRenderer {
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, this.ownerTex);
     gl.uniform1i(this.u.uOwner!, 2);
+    gl.activeTexture(gl.TEXTURE3);
+    gl.bindTexture(gl.TEXTURE_2D, this.atlasTex);
+    gl.uniform1i(this.u.uAtlas!, 3);
+    gl.uniform1i(this.u.uLand!, 4);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);
 
@@ -252,6 +407,9 @@ export class MapRenderer {
         gl.uniform2f(this.u.uCenter!, cx, camera.y);
         gl.uniform2i(this.u.uTileOrigin!, t.x, t.y);
         gl.uniform2i(this.u.uTileSize!, t.texW, t.texH);
+        gl.activeTexture(gl.TEXTURE4);
+        gl.bindTexture(gl.TEXTURE_2D, t.land);
+        gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, t.texture);
         gl.bindVertexArray(t.vao);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);

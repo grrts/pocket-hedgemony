@@ -2,6 +2,7 @@ import type { Order, Snapshot } from "@ph/engine";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite } from "./art/sprites.ts";
+import { icon, installUiArt, pennantUrl } from "./art/ui.ts";
 import { EngineClient } from "./engineClient.ts";
 import { loadMapImage } from "./map/loadMap.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
@@ -24,7 +25,7 @@ const diagnostics: Diagnostics = {
 // Read by the wrapper smoke tests.
 (globalThis as { __phDiagnostics?: Diagnostics }).__phDiagnostics = diagnostics;
 
-const FEATURED = ["FRA", "ENG", "CAS", "POR", "TUR", "BYZ", "HAB", "MOS", "MNG", "AZT", "INC", "MAL"];
+const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 const provinces = rules.provinces;
@@ -35,6 +36,7 @@ const nationRgb = nations.map((n) => hexToRgb(n.color));
 const unownedRgb = hexToRgb(PALETTE.unowned);
 const commanders = nations.flatMap((n) => n.commanders);
 const neighborIdx = provinces.map((p) => p.neighbors.map((id) => provinceIndex.get(id)!));
+const isWater = provinces.map((p) => p.terrain === "sea" || p.terrain === "ocean");
 
 // ---- state ----
 let snapshot: Snapshot | null = null;
@@ -45,15 +47,16 @@ let pendingOrders: Order[] = [];
 let busy = false;
 
 // ---- DOM ----
+installUiArt();
 const app = document.querySelector<HTMLElement>("#app")!;
 app.innerHTML = `
   <div class="map" id="map"><div class="loading">Drawing the world…</div></div>
   <header class="hud" id="hud"></header>
   <div class="tools">
-    <button class="icon" id="mode" title="Map mode">🗺</button>
-    <button class="icon" id="home" title="Go to capital">⌂</button>
+    <button class="icon-only" id="mode" title="Switch map mode">${icon("map", 3, "Map mode")}</button>
+    <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
   </div>
-  <section class="panel" id="panel" hidden></section>
+  <section class="panel framed" id="panel" hidden></section>
   <footer class="diag" id="diag"></footer>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const panel = document.querySelector<HTMLElement>("#panel")!;
@@ -70,14 +73,17 @@ async function boot(): Promise<void> {
   view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay });
   restyleProvinces();
   // Start over Europe, zoomed so countries are readable on a phone.
-  const paris = provinces[provinceIndex.get(nations[nationIndex.get("FRA")!]!.capital)!]!;
+  const paris = provinces[provinceIndex.get(nations[nationIndex.get("france")!]!.capital)!]!;
   view.lookAt(paris.x!, paris.y!, 1.4);
+  // ?view=x,y,zoom opens the map at a spot, for screenshots and bug reports.
+  const at = new URLSearchParams(location.search).get("view")?.split(",").map(Number);
+  if (at?.length === 3 && at.every(Number.isFinite)) view.lookAt(at[0]!, at[1]!, at[2]!);
   document.querySelector("#mode")!.addEventListener("click", () => {
     view.renderer.mode = view.renderer.mode === "political" ? "terrain" : "political";
     view.invalidate();
   });
   document.querySelector("#home")!.addEventListener("click", () => {
-    const n = snapshot ? snapshot.playerNation : nationIndex.get("FRA")!;
+    const n = snapshot ? snapshot.playerNation : nationIndex.get("france")!;
     const cap = provinces[provinceIndex.get(nations[n]!.capital)!]!;
     view.lookAt(cap.x!, cap.y!, Math.max(view.camera.zoom, 3));
   });
@@ -90,12 +96,12 @@ function restyleProvinces(): void {
   const targets = new Set<number>();
   if (selectedArmy >= 0 && snapshot) {
     const k = armySlot(selectedArmy);
-    if (k >= 0) for (const n of neighborIdx[snapshot.armies.location[k]!]!) targets.add(n);
+    if (k >= 0) for (const n of neighborIdx[snapshot.armies.location[k]!]!) if (!isWater[n]) targets.add(n);
   }
   for (let i = 0; i < provinces.length; i++) {
     const o = owners[i]!;
     const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0);
-    view.renderer.setProvinceStyle(i, o >= 0 ? nationRgb[o]! : unownedRgb, o, TERRAINS.indexOf(provinces[i]!.terrain as (typeof TERRAINS)[number]), flags);
+    view.renderer.setProvinceStyle(i, o >= 0 ? nationRgb[o]! : unownedRgb, o, TERRAINS.indexOf(provinces[i]!.terrain as (typeof TERRAINS)[number]), flags, isWater[i]);
   }
   view.renderer.uploadProvinceStyles();
   view.invalidate();
@@ -180,9 +186,9 @@ function drawOverlay(o: OverlayContext): void {
   if (zoom >= 6) {
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
-    provinces.forEach((p) => {
+    provinces.forEach((p, i) => {
       const [sx, sy] = o.toScreen(p.x!, p.y!);
-      if (onScreen(sx, sy)) pixelText(ctx, p.name, sx, sy + 6 * spriteScale, 11);
+      if (onScreen(sx, sy)) pixelText(ctx, p.name, sx, isWater[i] ? sy : sy + 6 * spriteScale, 11, isWater[i]);
     });
   }
 
@@ -241,13 +247,13 @@ function drawOverlay(o: OverlayContext): void {
 
 let armyHitBoxes: { id: number; x: number; y: number; w: number; h: number }[] = [];
 
-function pixelText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number): void {
-  ctx.font = `bold ${size}px "Courier New", ui-monospace, monospace`;
+function pixelText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, water = false): void {
+  ctx.font = `${water ? "400" : "600"} ${size + 2}px "Pixelify Sans", "Courier New", monospace`;
   ctx.lineWidth = Math.max(2, size / 5);
   ctx.lineJoin = "miter";
   ctx.strokeStyle = PALETTE.ink;
   ctx.strokeText(text, Math.round(x), Math.round(y));
-  ctx.fillStyle = PALETTE.paper;
+  ctx.fillStyle = water ? PALETTE.mist : PALETTE.paper;
   ctx.fillText(text, Math.round(x), Math.round(y));
 }
 
@@ -258,7 +264,7 @@ function onTap(sx: number, sy: number, province: number): void {
   if (hit && snapshot && snapshot.armies.owner[armySlot(hit.id)] === snapshot.playerNation) {
     selectedArmy = hit.id;
     selectedProvince = snapshot.armies.location[armySlot(hit.id)]!;
-  } else if (selectedArmy >= 0 && snapshot && province >= 0 && neighborIdx[snapshot.armies.location[armySlot(selectedArmy)]!]!.includes(province)) {
+  } else if (selectedArmy >= 0 && snapshot && province >= 0 && !isWater[province] && neighborIdx[snapshot.armies.location[armySlot(selectedArmy)]!]!.includes(province)) {
     pendingOrders = pendingOrders.filter((o) => o.army !== selectedArmy);
     pendingOrders.push({ type: "move", army: selectedArmy, to: province });
     selectedArmy = -1;
@@ -276,9 +282,13 @@ function armySlot(id: number): number {
 }
 
 // ---- HUD and panels ----
+const pennant = (color: string, scale = 2) => `<img class="px-icon" src="${pennantUrl(color, scale)}" alt="">`;
+
 function renderHud(): void {
   if (!snapshot) {
-    hud.innerHTML = `<strong class="title">POCKET HEGEMONY</strong><span>11 November 1444 · tap a country to play it</span>`;
+    hud.innerHTML = `
+      <div class="realm title">${icon("crown", 3)}<b>Pocket Hegemony</b></div>
+      <div class="subtitle">Spring of 1444 · choose a realm to rule</div>`;
     return;
   }
   const s = snapshot;
@@ -286,27 +296,32 @@ function renderHud(): void {
   const n = nations[me]!;
   const inc = s.nationMonthlyIncome[me]!;
   hud.innerHTML = `
-    <span class="swatch" style="background:${n.color}"></span>
-    <strong>${esc(n.name)}</strong>
-    <span class="turn-label">${MONTHS[s.date.month - 1]} ${s.date.year}</span>
-    <span title="Treasury">💰 ${s.nationTreasury[me]!.toFixed(0)} <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></span>
-    <span title="Manpower">⚔ ${fmt(s.nationManpower[me]! / 1000)}k</span>
-    <button class="end-turn" ${busy ? "disabled" : ""}>${busy ? "…" : "End turn ▶"}</button>`;
+    <div class="realm">${pennant(n.color, 3)}<b>${esc(n.name)}</b></div>
+    <span class="plaque turn-label" title="Date">${icon("scroll", 2)}${MONTHS[s.date.month - 1]} ${s.date.year}</span>
+    <div class="stats">
+      <span class="plaque" title="Treasury: gold, and change per month">${icon("coin", 2)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></span>
+      <span class="plaque" title="Levies: men ready to raise">${icon("swords", 2)}${fmt(s.nationLevies[me]! / 1000)}k</span>
+      <button class="wax end-turn" ${busy ? "disabled" : ""}>${icon("hourglass", 2)}${busy ? "Working…" : "End turn"}</button>
+    </div>`;
   hud.querySelector(".end-turn")!.addEventListener("click", () => void endTurn());
+}
+
+function closeButton(): string {
+  return `<button class="close wax" aria-label="Close">${icon("close", 2)}</button>`;
 }
 
 function renderPanel(): void {
   if (!snapshot && selectedProvince < 0) {
     panel.hidden = false;
     panel.innerHTML = `
-      <h2>Choose your nation</h2>
+      <header><h2 class="ribbon">Choose your realm</h2></header>
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
-          return `<button class="nation" data-nation="${n.id}"><span class="swatch" style="background:${n.color}"></span>${esc(n.name)}</button>`;
+          return `<button class="paper nation" data-nation="${n.id}">${pennant(n.color)}${esc(n.name)}</button>`;
         })
         .join("")}</div>
-      <p class="hint">Or tap any coloured country on the map. ${nations.length} nations to choose from. <a href="./style.html">Art style sheet</a></p>`;
+      <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>`;
     bindNationButtons();
     return;
   }
@@ -315,15 +330,29 @@ function renderPanel(): void {
     return;
   }
   const p = provinces[selectedProvince]!;
+  panel.hidden = false;
+  if (isWater[selectedProvince]) {
+    const coasts = neighborIdx[selectedProvince]!.filter((n) => !isWater[n]).length;
+    panel.innerHTML = `
+      <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
+      <p class="owner">${icon("anchor", 2)}<b>${p.terrain === "ocean" ? "Open ocean" : "Coastal sea"}</b> · ships only</p>
+      <dl class="facts">
+        <dt>Coasts</dt><dd>${coasts ? `${coasts} province${coasts > 1 ? "s" : ""}` : "none"}</dd>
+        <dt>Sea lanes</dt><dd>${neighborIdx[selectedProvince]!.length - coasts} zones</dd>
+      </dl>`;
+    bindClose();
+    return;
+  }
   const own = owners[selectedProvince]!;
   const owner = own >= 0 ? nations[own]! : null;
   const armiesHere = snapshot ? [...snapshot.armies.id.keys()].filter((k) => snapshot!.armies.location[k] === selectedProvince) : [];
-  panel.hidden = false;
   panel.innerHTML = `
-    <button class="close" aria-label="Close">✕</button>
-    <h2>${esc(p.name)}</h2>
-    <p class="owner">${owner ? `<span class="swatch" style="background:${owner.color}"></span>${esc(owner.name)}` : "Unclaimed land"} · ${p.terrain}${p.coastal ? " · coast" : ""}</p>
-    <p class="dev">Tax ${p.tax} · Production ${p.production} · Manpower ${p.manpower}</p>
+    <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
+    <p class="owner">${owner ? `${pennant(owner.color)}<b>${esc(owner.name)}</b>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.coastal ? " · coast" : ""}</p>
+    <dl class="facts">
+      <dt>People</dt><dd>${fmt(p.population * 1000)}</dd>
+      <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
+    </dl>
     ${armiesHere
       .map((k) => {
         const s = snapshot!;
@@ -332,20 +361,17 @@ function renderPanel(): void {
         const mine = s.armies.owner[k] === s.playerNation;
         const c = cmd >= 0 ? commanders[cmd]! : null;
         const order = pendingOrders.find((o) => o.army === id);
+        const portrait = sprite(c ? "commander" : "soldier", nations[s.armies.owner[k]!]!.color, 3).toDataURL();
         return `<div class="army">
-          <span>${c ? `<b>${esc(c.name)}</b> <small>fire ${c.fire} · shock ${c.shock} · maneuver ${c.maneuver}</small>` : "<b>Army</b>"}<br>
+          <img class="portrait" src="${portrait}" alt="">
+          <span class="who">${c ? `<b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
           ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}${order ? ` · marching to ${esc(provinces[order.to]!.name)}` : ""}</span>
-          ${mine ? `<button data-army="${id}">${selectedArmy === id ? "Tap a highlighted province" : "Move"}</button>` : ""}
+          ${mine ? `<button data-army="${id}">${selectedArmy === id ? "Pick a target" : "Move"}</button>` : ""}
         </div>`;
       })
       .join("")}
-    ${!snapshot && owner ? `<button class="play" data-nation="${owner.id}">Play as ${esc(owner.name)}</button>` : ""}`;
-  panel.querySelector(".close")!.addEventListener("click", () => {
-    selectedProvince = -1;
-    selectedArmy = -1;
-    restyleProvinces();
-    renderPanel();
-  });
+    ${!snapshot && owner ? `<button class="wax play" data-nation="${owner.id}">${icon("crown", 2)}Rule ${esc(owner.name)}</button>` : ""}`;
+  bindClose();
   panel.querySelectorAll<HTMLButtonElement>("[data-army]").forEach((b) =>
     b.addEventListener("click", () => {
       selectedArmy = Number(b.dataset.army);
@@ -354,6 +380,15 @@ function renderPanel(): void {
     }),
   );
   bindNationButtons();
+}
+
+function bindClose(): void {
+  panel.querySelector(".close")!.addEventListener("click", () => {
+    selectedProvince = -1;
+    selectedArmy = -1;
+    restyleProvinces();
+    renderPanel();
+  });
 }
 
 function bindNationButtons(): void {

@@ -3,5 +3,6 @@
   "height": 2144,
   "pxPerDeg": 16,
   "latTop": 78,
-  "provinceImage": "map/provinces.png"
+  "provinceImage": "map/provinces.png",
+  "terrainImage": "map/terrain.png"
 }

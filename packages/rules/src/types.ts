@@ -6,16 +6,16 @@ export interface GameDate {
 export interface Defines {
   startDate: GameDate;
   economy: {
-    taxPerBaseTaxPerMonth: number;
-    productionPerBaseProductionPerMonth: number;
+    goldPerThousandPeoplePerMonth: number;
+    goldPerWealthPerMonth: number;
     startingTreasury: number;
   };
-  manpower: {
-    menPerBaseManpower: number;
+  levies: {
+    menPerThousandPeople: number;
     monthlyRecoveryFraction: number;
   };
   military: {
-    maintenancePerThousandMenPerMonth: number;
+    upkeepPerThousandMenPerMonth: number;
     movementCostPerProvince: number;
   };
 }
@@ -24,7 +24,7 @@ export interface UnitType {
   id: string;
   name: string;
   cost: number;
-  manpowerPerRegiment: number;
+  menPerCompany: number;
   attack: number;
   defense: number;
   speed: number;
@@ -33,10 +33,12 @@ export interface UnitType {
 export interface CommanderDef {
   id: string;
   name: string;
-  fire: number;
-  shock: number;
-  maneuver: number;
-  siege: number;
+  /** Battle strength. */
+  might: number;
+  /** Outmanoeuvring: faster marches, better retreats. */
+  cunning: number;
+  /** Keeping an army fed and paid on campaign. */
+  logistics: number;
 }
 
 export interface NationDef {
@@ -57,16 +59,20 @@ export type Terrain =
   | "forest"
   | "desert"
   | "tundra"
-  | "jungle";
+  | "jungle"
+  /** Water zones. "sea" lies along a coast; "ocean" is open water far from land. */
+  | "sea"
+  | "ocean";
 
 export interface ProvinceDef {
   id: string;
   name: string;
   owner: string | null;
   terrain: Terrain;
-  tax: number;
-  production: number;
-  manpower: number;
+  /** Thousands of people. Drives taxes and levies. */
+  population: number;
+  /** 1-10: trade, crafts and land value. Drives income. */
+  wealth: number;
   neighbors: string[];
   /** Centre on the world map image, in map pixels. */
   x?: number;
@@ -81,6 +87,8 @@ export interface MapInfo {
   pxPerDeg: number;
   latTop: number;
   provinceImage: string;
+  /** Terrain index per pixel (R channel), only used for the close-zoom art. */
+  terrainImage: string;
 }
 
 /** Everything the engine needs to run a campaign, loaded from JSON config. */

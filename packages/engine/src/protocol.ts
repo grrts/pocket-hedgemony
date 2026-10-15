@@ -28,7 +28,7 @@ export interface Snapshot {
   rejectedOrders: { order: Order; reason: string }[];
   provinceOwner: Int16Array;
   nationTreasury: Float64Array;
-  nationManpower: Float64Array;
+  nationLevies: Float64Array;
   nationMonthlyIncome: Float64Array;
   armies: {
     id: Int32Array;
@@ -71,7 +71,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       rejectedOrders,
       provinceOwner: w.provinceOwner.slice(),
       nationTreasury: w.nationTreasury.slice(),
-      nationManpower: w.nationManpower.slice(),
+      nationLevies: w.nationLevies.slice(),
       nationMonthlyIncome: w.nationMonthlyIncome.slice(),
       armies: {
         id: Int32Array.from(live),
@@ -84,7 +84,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     const transfer = [
       snap.provinceOwner,
       snap.nationTreasury,
-      snap.nationManpower,
+      snap.nationLevies,
       snap.nationMonthlyIncome,
       ...Object.values(snap.armies),
     ].map((arr) => arr.buffer as ArrayBuffer);

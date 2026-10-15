@@ -1,4 +1,4 @@
-import { areNeighbors, recomputeMaxManpower, type World } from "./world.ts";
+import { areNeighbors, recomputeMaxLevies, type World } from "./world.ts";
 
 export type Order = { type: "move"; army: number; to: number };
 
@@ -22,7 +22,7 @@ export function processTurn(world: World, orders: readonly Order[], actingNation
   }
 
   runEconomy(world);
-  runManpower(world);
+  runLevies(world);
   advanceDate(world);
   world.turn++;
 
@@ -37,6 +37,7 @@ function applyOrder(world: World, order: Order, actingNation: number): string | 
       if (a.owner[order.army] !== actingNation) return "not your army";
       if (a.movedThisTurn[order.army]) return "army already moved this turn";
       if (!areNeighbors(world, a.location[order.army]!, order.to)) return "provinces do not border";
+      if (world.provinceWater[order.to]) return "armies need ships to cross water";
       a.location[order.army] = order.to;
       a.movedThisTurn[order.army] = 1;
       return null;
@@ -54,26 +55,26 @@ function runEconomy(world: World): void {
     if (owner < 0) continue;
     income[owner] =
       income[owner]! +
-      world.provinceTax[p]! * economy.taxPerBaseTaxPerMonth +
-      world.provinceProduction[p]! * economy.productionPerBaseProductionPerMonth;
+      world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth +
+      world.provinceWealth[p]! * economy.goldPerWealthPerMonth;
   }
 
   const a = world.armies;
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const owner = a.owner[i]!;
-    income[owner] = income[owner]! - (a.men[i]! / 1000) * military.maintenancePerThousandMenPerMonth;
+    income[owner] = income[owner]! - (a.men[i]! / 1000) * military.upkeepPerThousandMenPerMonth;
   }
 
   const treasury = world.nationTreasury;
   for (let n = 0; n < world.nationCount; n++) treasury[n] = treasury[n]! + income[n]!;
 }
 
-function runManpower(world: World): void {
-  recomputeMaxManpower(world);
-  const frac = world.rules.defines.manpower.monthlyRecoveryFraction;
-  const mp = world.nationManpower;
-  const max = world.nationMaxManpower;
+function runLevies(world: World): void {
+  recomputeMaxLevies(world);
+  const frac = world.rules.defines.levies.monthlyRecoveryFraction;
+  const mp = world.nationLevies;
+  const max = world.nationMaxLevies;
   for (let n = 0; n < world.nationCount; n++) {
     mp[n] = Math.min(max[n]!, mp[n]! + max[n]! * frac);
   }
