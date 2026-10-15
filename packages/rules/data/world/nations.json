@@ -1,0 +1,1105 @@
+[
+  {
+    "id": "ENG",
+    "name": "England",
+    "color": "#b13e53",
+    "capital": "p803",
+    "commanders": [
+      {
+        "id": "ENG_1",
+        "name": "John Talbot",
+        "fire": 2,
+        "shock": 4,
+        "maneuver": 2,
+        "siege": 1
+      }
+    ]
+  },
+  {
+    "id": "SCO",
+    "name": "Scotland",
+    "color": "#d9a066",
+    "capital": "p562",
+    "commanders": []
+  },
+  {
+    "id": "IRE",
+    "name": "Ireland",
+    "color": "#e8a0bf",
+    "capital": "p785",
+    "commanders": []
+  },
+  {
+    "id": "FRA",
+    "name": "France",
+    "color": "#3b5dc9",
+    "capital": "p1063",
+    "commanders": [
+      {
+        "id": "FRA_1",
+        "name": "Jean de Dunois",
+        "fire": 2,
+        "shock": 3,
+        "maneuver": 3,
+        "siege": 1
+      }
+    ]
+  },
+  {
+    "id": "BUR",
+    "name": "Burgundy",
+    "color": "#c97d3b",
+    "capital": "p1077",
+    "commanders": [
+      {
+        "id": "BUR_1",
+        "name": "Charles the Bold",
+        "fire": 1,
+        "shock": 4,
+        "maneuver": 2,
+        "siege": 1
+      }
+    ]
+  },
+  {
+    "id": "BRI",
+    "name": "Brittany",
+    "color": "#b13e53",
+    "capital": "p1046",
+    "commanders": []
+  },
+  {
+    "id": "PRO",
+    "name": "Provence",
+    "color": "#306082",
+    "capital": "p1360",
+    "commanders": []
+  },
+  {
+    "id": "SAV",
+    "name": "Savoy",
+    "color": "#ef7d57",
+    "capital": "p1366",
+    "commanders": []
+  },
+  {
+    "id": "LOR",
+    "name": "Lorraine",
+    "color": "#306082",
+    "capital": "p1083",
+    "commanders": []
+  },
+  {
+    "id": "NAV",
+    "name": "Navarre",
+    "color": "#847e87",
+    "capital": "p1334",
+    "commanders": []
+  },
+  {
+    "id": "CAS",
+    "name": "Castile",
+    "color": "#ffcd75",
+    "capital": "p1601",
+    "commanders": [
+      {
+        "id": "CAS_1",
+        "name": "Álvaro de Luna",
+        "fire": 2,
+        "shock": 3,
+        "maneuver": 3,
+        "siege": 2
+      }
+    ]
+  },
+  {
+    "id": "ARA",
+    "name": "Aragon",
+    "color": "#ef7d57",
+    "capital": "p1611",
+    "commanders": []
+  },
+  {
+    "id": "POR",
+    "name": "Portugal",
+    "color": "#38b764",
+    "capital": "p1585",
+    "commanders": []
+  },
+  {
+    "id": "GRA",
+    "name": "Granada",
+    "color": "#257179",
+    "capital": "p1885",
+    "commanders": []
+  },
+  {
+    "id": "MLN",
+    "name": "Milan",
+    "color": "#df7126",
+    "capital": "p1373",
+    "commanders": []
+  },
+  {
+    "id": "VEN",
+    "name": "Venice",
+    "color": "#41a6f6",
+    "capital": "p1381",
+    "commanders": []
+  },
+  {
+    "id": "GEN",
+    "name": "Genoa",
+    "color": "#847e87",
+    "capital": "p1371",
+    "commanders": []
+  },
+  {
+    "id": "TUS",
+    "name": "Florence",
+    "color": "#ef7d57",
+    "capital": "p1380",
+    "commanders": []
+  },
+  {
+    "id": "FER",
+    "name": "Modena",
+    "color": "#73eff7",
+    "capital": "p1378",
+    "commanders": []
+  },
+  {
+    "id": "PAP",
+    "name": "Papal States",
+    "color": "#eec39a",
+    "capital": "p1624",
+    "commanders": []
+  },
+  {
+    "id": "NAP",
+    "name": "Naples",
+    "color": "#76428a",
+    "capital": "p1626",
+    "commanders": []
+  },
+  {
+    "id": "HAB",
+    "name": "Austria",
+    "color": "#cbdbfc",
+    "capital": "p1120",
+    "commanders": [
+      {
+        "id": "HAB_1",
+        "name": "Ulrich von Cilli",
+        "fire": 2,
+        "shock": 2,
+        "maneuver": 2,
+        "siege": 2
+      }
+    ]
+  },
+  {
+    "id": "BOH",
+    "name": "Bohemia",
+    "color": "#3b5dc9",
+    "capital": "p839",
+    "commanders": []
+  },
+  {
+    "id": "BAV",
+    "name": "Bavaria",
+    "color": "#e8a0bf",
+    "capital": "p1105",
+    "commanders": []
+  },
+  {
+    "id": "WUR",
+    "name": "Württemberg",
+    "color": "#fbf236",
+    "capital": "p1095",
+    "commanders": []
+  },
+  {
+    "id": "PAL",
+    "name": "Palatinate",
+    "color": "#99e550",
+    "capital": "p1089",
+    "commanders": []
+  },
+  {
+    "id": "KOL",
+    "name": "Cologne",
+    "color": "#4b692f",
+    "capital": "p818",
+    "commanders": []
+  },
+  {
+    "id": "HES",
+    "name": "Hesse",
+    "color": "#6abe30",
+    "capital": "p825",
+    "commanders": []
+  },
+  {
+    "id": "SAX",
+    "name": "Saxony",
+    "color": "#ffcd75",
+    "capital": "p835",
+    "commanders": []
+  },
+  {
+    "id": "BRA",
+    "name": "Brandenburg",
+    "color": "#45283c",
+    "capital": "p837",
+    "commanders": []
+  },
+  {
+    "id": "LUN",
+    "name": "Lüneburg",
+    "color": "#fbf236",
+    "capital": "p828",
+    "commanders": []
+  },
+  {
+    "id": "HAM",
+    "name": "Hamburg",
+    "color": "#41a6f6",
+    "capital": "p827",
+    "commanders": []
+  },
+  {
+    "id": "MKL",
+    "name": "Mecklenburg",
+    "color": "#73eff7",
+    "capital": "p831",
+    "commanders": []
+  },
+  {
+    "id": "POM",
+    "name": "Pomerania",
+    "color": "#fbf236",
+    "capital": "p841",
+    "commanders": []
+  },
+  {
+    "id": "SWI",
+    "name": "Switzerland",
+    "color": "#73eff7",
+    "capital": "p1090",
+    "commanders": []
+  },
+  {
+    "id": "TEU",
+    "name": "Teutonic Order",
+    "color": "#ef7d57",
+    "capital": "p585",
+    "commanders": []
+  },
+  {
+    "id": "LIV",
+    "name": "Livonian Order",
+    "color": "#d95763",
+    "capital": "p591",
+    "commanders": []
+  },
+  {
+    "id": "DAN",
+    "name": "Denmark",
+    "color": "#ac3232",
+    "capital": "p575",
+    "commanders": []
+  },
+  {
+    "id": "SWE",
+    "name": "Sweden",
+    "color": "#306082",
+    "capital": "p405",
+    "commanders": []
+  },
+  {
+    "id": "NOR",
+    "name": "Norway",
+    "color": "#fbf236",
+    "capital": "p395",
+    "commanders": []
+  },
+  {
+    "id": "POL",
+    "name": "Poland",
+    "color": "#d95763",
+    "capital": "p1136",
+    "commanders": [
+      {
+        "id": "POL_1",
+        "name": "Jan Tarnowski",
+        "fire": 1,
+        "shock": 3,
+        "maneuver": 2,
+        "siege": 1
+      }
+    ]
+  },
+  {
+    "id": "LIT",
+    "name": "Lithuania",
+    "color": "#a7f070",
+    "capital": "p600",
+    "commanders": []
+  },
+  {
+    "id": "HUN",
+    "name": "Hungary",
+    "color": "#99e550",
+    "capital": "p1128",
+    "commanders": [
+      {
+        "id": "HUN_1",
+        "name": "John Hunyadi",
+        "fire": 3,
+        "shock": 4,
+        "maneuver": 4,
+        "siege": 2
+      }
+    ]
+  },
+  {
+    "id": "MOL",
+    "name": "Moldavia",
+    "color": "#d9a066",
+    "capital": "p1158",
+    "commanders": []
+  },
+  {
+    "id": "WAL",
+    "name": "Wallachia",
+    "color": "#cbdbfc",
+    "capital": "p1433",
+    "commanders": []
+  },
+  {
+    "id": "SER",
+    "name": "Serbia",
+    "color": "#257179",
+    "capital": "p1409",
+    "commanders": []
+  },
+  {
+    "id": "BOS",
+    "name": "Bosnia",
+    "color": "#45283c",
+    "capital": "p1394",
+    "commanders": []
+  },
+  {
+    "id": "ALB",
+    "name": "Albania",
+    "color": "#73eff7",
+    "capital": "p1634",
+    "commanders": [
+      {
+        "id": "ALB_1",
+        "name": "Skanderbeg",
+        "fire": 2,
+        "shock": 5,
+        "maneuver": 4,
+        "siege": 1
+      }
+    ]
+  },
+  {
+    "id": "RAG",
+    "name": "Ragusa",
+    "color": "#99e550",
+    "capital": "p1397",
+    "commanders": []
+  },
+  {
+    "id": "BYZ",
+    "name": "Byzantium",
+    "color": "#73eff7",
+    "capital": "p1662",
+    "commanders": [
+      {
+        "id": "BYZ_1",
+        "name": "Constantine XI",
+        "fire": 2,
+        "shock": 3,
+        "maneuver": 2,
+        "siege": 2
+      }
+    ]
+  },
+  {
+    "id": "TUR",
+    "name": "Ottomans",
+    "color": "#6abe30",
+    "capital": "p1655",
+    "commanders": [
+      {
+        "id": "TUR_1",
+        "name": "Murad II",
+        "fire": 2,
+        "shock": 3,
+        "maneuver": 3,
+        "siege": 2
+      }
+    ]
+  },
+  {
+    "id": "KAR",
+    "name": "Karaman",
+    "color": "#847e87",
+    "capital": "p1933",
+    "commanders": []
+  },
+  {
+    "id": "CND",
+    "name": "Candar",
+    "color": "#76428a",
+    "capital": "p1674",
+    "commanders": []
+  },
+  {
+    "id": "TRE",
+    "name": "Trebizond",
+    "color": "#639bff",
+    "capital": "p1693",
+    "commanders": []
+  },
+  {
+    "id": "DUL",
+    "name": "Dulkadir",
+    "color": "#5b6ee1",
+    "capital": "p1939",
+    "commanders": []
+  },
+  {
+    "id": "AKK",
+    "name": "Aq Qoyunlu",
+    "color": "#8f4fa8",
+    "capital": "p1694",
+    "commanders": []
+  },
+  {
+    "id": "QAR",
+    "name": "Qara Qoyunlu",
+    "color": "#a7f070",
+    "capital": "p1962",
+    "commanders": []
+  },
+  {
+    "id": "CYP",
+    "name": "Cyprus",
+    "color": "#df7126",
+    "capital": "p1934",
+    "commanders": []
+  },
+  {
+    "id": "KNI",
+    "name": "Knights of Rhodes",
+    "color": "#fbf236",
+    "capital": "p1926",
+    "commanders": []
+  },
+  {
+    "id": "GEO",
+    "name": "Georgia",
+    "color": "#847e87",
+    "capital": "p1461",
+    "commanders": []
+  },
+  {
+    "id": "SHI",
+    "name": "Shirvan",
+    "color": "#ef7d57",
+    "capital": "p1721",
+    "commanders": []
+  },
+  {
+    "id": "MOS",
+    "name": "Muscovy",
+    "color": "#8f4fa8",
+    "capital": "p633",
+    "commanders": [
+      {
+        "id": "MOS_1",
+        "name": "Vasily II",
+        "fire": 1,
+        "shock": 2,
+        "maneuver": 2,
+        "siege": 1
+      }
+    ]
+  },
+  {
+    "id": "NOV",
+    "name": "Novgorod",
+    "color": "#847e87",
+    "capital": "p420",
+    "commanders": []
+  },
+  {
+    "id": "PSK",
+    "name": "Pskov",
+    "color": "#e8a0bf",
+    "capital": "p611",
+    "commanders": []
+  },
+  {
+    "id": "TVE",
+    "name": "Tver",
+    "color": "#bd8d5a",
+    "capital": "p628",
+    "commanders": []
+  },
+  {
+    "id": "RYA",
+    "name": "Ryazan",
+    "color": "#6abe30",
+    "capital": "p638",
+    "commanders": []
+  },
+  {
+    "id": "KAZ",
+    "name": "Kazan",
+    "color": "#8f974a",
+    "capital": "p658",
+    "commanders": []
+  },
+  {
+    "id": "GOL",
+    "name": "Great Horde",
+    "color": "#76428a",
+    "capital": "p1199",
+    "commanders": []
+  },
+  {
+    "id": "CRI",
+    "name": "Crimea",
+    "color": "#6abe30",
+    "capital": "p1445",
+    "commanders": []
+  },
+  {
+    "id": "NOG",
+    "name": "Nogai",
+    "color": "#e8a0bf",
+    "capital": "p1211",
+    "commanders": []
+  },
+  {
+    "id": "UZB",
+    "name": "Uzbek Khanate",
+    "color": "#847e87",
+    "capital": "p1489",
+    "commanders": []
+  },
+  {
+    "id": "MAM",
+    "name": "Mamluks",
+    "color": "#d9a066",
+    "capital": "p2493",
+    "commanders": [
+      {
+        "id": "MAM_1",
+        "name": "Sultan Jaqmaq",
+        "fire": 2,
+        "shock": 3,
+        "maneuver": 2,
+        "siege": 2
+      }
+    ]
+  },
+  {
+    "id": "HED",
+    "name": "Hejaz",
+    "color": "#d95763",
+    "capital": "p2932",
+    "commanders": []
+  },
+  {
+    "id": "YEM",
+    "name": "Yemen",
+    "color": "#99e550",
+    "capital": "p3109",
+    "commanders": []
+  },
+  {
+    "id": "OMA",
+    "name": "Oman",
+    "color": "#bd8d5a",
+    "capital": "p2747",
+    "commanders": []
+  },
+  {
+    "id": "TIM",
+    "name": "Timurids",
+    "color": "#5b6ee1",
+    "capital": "p1989",
+    "commanders": [
+      {
+        "id": "TIM_1",
+        "name": "Shah Rukh",
+        "fire": 2,
+        "shock": 2,
+        "maneuver": 3,
+        "siege": 2
+      }
+    ]
+  },
+  {
+    "id": "CHG",
+    "name": "Moghulistan",
+    "color": "#a7f070",
+    "capital": "p1498",
+    "commanders": []
+  },
+  {
+    "id": "OIR",
+    "name": "Oirat",
+    "color": "#9badb7",
+    "capital": "p1248",
+    "commanders": []
+  },
+  {
+    "id": "KHA",
+    "name": "Mongols",
+    "color": "#eec39a",
+    "capital": "p1258",
+    "commanders": []
+  },
+  {
+    "id": "TIB",
+    "name": "Tibet",
+    "color": "#257179",
+    "capital": "p2614",
+    "commanders": []
+  },
+  {
+    "id": "MNG",
+    "name": "Ming",
+    "color": "#fbf236",
+    "capital": "p1807",
+    "commanders": [
+      {
+        "id": "MNG_1",
+        "name": "Wang Zhen",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 2
+      }
+    ]
+  },
+  {
+    "id": "JUR",
+    "name": "Jurchens",
+    "color": "#ffcd75",
+    "capital": "p1528",
+    "commanders": []
+  },
+  {
+    "id": "KOR",
+    "name": "Korea",
+    "color": "#9badb7",
+    "capital": "p2095",
+    "commanders": []
+  },
+  {
+    "id": "JAP",
+    "name": "Japan",
+    "color": "#e8a0bf",
+    "capital": "p2110",
+    "commanders": []
+  },
+  {
+    "id": "DAI",
+    "name": "Dai Viet",
+    "color": "#a7f070",
+    "capital": "p3025",
+    "commanders": []
+  },
+  {
+    "id": "CHA",
+    "name": "Champa",
+    "color": "#73eff7",
+    "capital": "p3167",
+    "commanders": []
+  },
+  {
+    "id": "LXA",
+    "name": "Lan Xang",
+    "color": "#5b6ee1",
+    "capital": "p3016",
+    "commanders": []
+  },
+  {
+    "id": "LAN",
+    "name": "Lan Na",
+    "color": "#fbf236",
+    "capital": "p3004",
+    "commanders": []
+  },
+  {
+    "id": "AYU",
+    "name": "Ayutthaya",
+    "color": "#df7126",
+    "capital": "p3148",
+    "commanders": []
+  },
+  {
+    "id": "KHM",
+    "name": "Khmer",
+    "color": "#eec39a",
+    "capital": "p3300",
+    "commanders": []
+  },
+  {
+    "id": "AVA",
+    "name": "Ava",
+    "color": "#847e87",
+    "capital": "p2997",
+    "commanders": []
+  },
+  {
+    "id": "PEG",
+    "name": "Pegu",
+    "color": "#45283c",
+    "capital": "p2998",
+    "commanders": []
+  },
+  {
+    "id": "MAJ",
+    "name": "Majapahit",
+    "color": "#41a6f6",
+    "capital": "p3876",
+    "commanders": []
+  },
+  {
+    "id": "MLC",
+    "name": "Malacca",
+    "color": "#5b6ee1",
+    "capital": "p3537",
+    "commanders": []
+  },
+  {
+    "id": "BEI",
+    "name": "Brunei",
+    "color": "#fbf236",
+    "capital": "p3545",
+    "commanders": []
+  },
+  {
+    "id": "DEL",
+    "name": "Delhi",
+    "color": "#8f4fa8",
+    "capital": "p2574",
+    "commanders": []
+  },
+  {
+    "id": "JNP",
+    "name": "Jaunpur",
+    "color": "#c97d3b",
+    "capital": "p2786",
+    "commanders": []
+  },
+  {
+    "id": "BNG",
+    "name": "Bengal",
+    "color": "#4b692f",
+    "capital": "p2800",
+    "commanders": []
+  },
+  {
+    "id": "BAH",
+    "name": "Bahmanis",
+    "color": "#76428a",
+    "capital": "p3130",
+    "commanders": []
+  },
+  {
+    "id": "VIJ",
+    "name": "Vijayanagar",
+    "color": "#df7126",
+    "capital": "p3128",
+    "commanders": []
+  },
+  {
+    "id": "GUJ",
+    "name": "Gujarat",
+    "color": "#5b6ee1",
+    "capital": "p2761",
+    "commanders": []
+  },
+  {
+    "id": "MLW",
+    "name": "Malwa",
+    "color": "#d9a066",
+    "capital": "p2970",
+    "commanders": []
+  },
+  {
+    "id": "MEW",
+    "name": "Mewar",
+    "color": "#c97d3b",
+    "capital": "p2766",
+    "commanders": []
+  },
+  {
+    "id": "ORI",
+    "name": "Orissa",
+    "color": "#639bff",
+    "capital": "p2993",
+    "commanders": []
+  },
+  {
+    "id": "GND",
+    "name": "Gondwana",
+    "color": "#bd8d5a",
+    "capital": "p2778",
+    "commanders": []
+  },
+  {
+    "id": "KAS",
+    "name": "Kashmir",
+    "color": "#847e87",
+    "capital": "p2016",
+    "commanders": []
+  },
+  {
+    "id": "MUL",
+    "name": "Multan",
+    "color": "#df7126",
+    "capital": "p2559",
+    "commanders": []
+  },
+  {
+    "id": "SND",
+    "name": "Sindh",
+    "color": "#9badb7",
+    "capital": "p2750",
+    "commanders": []
+  },
+  {
+    "id": "AHO",
+    "name": "Ahom",
+    "color": "#c97d3b",
+    "capital": "p2618",
+    "commanders": []
+  },
+  {
+    "id": "MOR",
+    "name": "Morocco",
+    "color": "#bd8d5a",
+    "capital": "p2168",
+    "commanders": []
+  },
+  {
+    "id": "TLE",
+    "name": "Tlemcen",
+    "color": "#3b5dc9",
+    "capital": "p1888",
+    "commanders": []
+  },
+  {
+    "id": "TUN",
+    "name": "Tunis",
+    "color": "#38b764",
+    "capital": "p1914",
+    "commanders": []
+  },
+  {
+    "id": "MAL",
+    "name": "Mali",
+    "color": "#eec39a",
+    "capital": "p3206",
+    "commanders": []
+  },
+  {
+    "id": "SON",
+    "name": "Songhai",
+    "color": "#41a6f6",
+    "capital": "p3072",
+    "commanders": []
+  },
+  {
+    "id": "JOL",
+    "name": "Jolof",
+    "color": "#41a6f6",
+    "capital": "p3061",
+    "commanders": []
+  },
+  {
+    "id": "MSI",
+    "name": "Mossi",
+    "color": "#ef7d57",
+    "capital": "p3217",
+    "commanders": []
+  },
+  {
+    "id": "KAN",
+    "name": "Kano",
+    "color": "#cbdbfc",
+    "capital": "p3229",
+    "commanders": []
+  },
+  {
+    "id": "KBO",
+    "name": "Kanem-Bornu",
+    "color": "#e8a0bf",
+    "capital": "p3233",
+    "commanders": []
+  },
+  {
+    "id": "BEN",
+    "name": "Benin",
+    "color": "#fbf236",
+    "capital": "p3384",
+    "commanders": []
+  },
+  {
+    "id": "ETH",
+    "name": "Ethiopia",
+    "color": "#8f974a",
+    "capital": "p3418",
+    "commanders": []
+  },
+  {
+    "id": "ADA",
+    "name": "Adal",
+    "color": "#df7126",
+    "capital": "p3266",
+    "commanders": []
+  },
+  {
+    "id": "AJU",
+    "name": "Ajuran",
+    "color": "#847e87",
+    "capital": "p3529",
+    "commanders": []
+  },
+  {
+    "id": "KIL",
+    "name": "Kilwa",
+    "color": "#45283c",
+    "capital": "p3870",
+    "commanders": []
+  },
+  {
+    "id": "ZIM",
+    "name": "Mutapa",
+    "color": "#306082",
+    "capital": "p4128",
+    "commanders": []
+  },
+  {
+    "id": "KON",
+    "name": "Kongo",
+    "color": "#e8a0bf",
+    "capital": "p3847",
+    "commanders": []
+  },
+  {
+    "id": "AZT",
+    "name": "Aztecs",
+    "color": "#6abe30",
+    "capital": "p2877",
+    "commanders": [
+      {
+        "id": "AZT_1",
+        "name": "Moctezuma I",
+        "fire": 1,
+        "shock": 4,
+        "maneuver": 2,
+        "siege": 1
+      }
+    ]
+  },
+  {
+    "id": "PUR",
+    "name": "Purépecha",
+    "color": "#9badb7",
+    "capital": "p2872",
+    "commanders": []
+  },
+  {
+    "id": "ZAP",
+    "name": "Zapotec",
+    "color": "#38b764",
+    "capital": "p3032",
+    "commanders": []
+  },
+  {
+    "id": "MAY",
+    "name": "Maya",
+    "color": "#38b764",
+    "capital": "p2884",
+    "commanders": []
+  },
+  {
+    "id": "INC",
+    "name": "Inca",
+    "color": "#fbf236",
+    "capital": "p3925",
+    "commanders": [
+      {
+        "id": "INC_1",
+        "name": "Pachacuti",
+        "fire": 1,
+        "shock": 4,
+        "maneuver": 4,
+        "siege": 2
+      }
+    ]
+  },
+  {
+    "id": "CHM",
+    "name": "Chimú",
+    "color": "#a7f070",
+    "capital": "p3802",
+    "commanders": []
+  },
+  {
+    "id": "MUI",
+    "name": "Muisca",
+    "color": "#df7126",
+    "capital": "p3461",
+    "commanders": []
+  },
+  {
+    "id": "IRO",
+    "name": "Iroquois",
+    "color": "#e8a0bf",
+    "capital": "p1316",
+    "commanders": []
+  },
+  {
+    "id": "HUR",
+    "name": "Huron",
+    "color": "#a7f070",
+    "capital": "p1315",
+    "commanders": []
+  },
+  {
+    "id": "CHE",
+    "name": "Cherokee",
+    "color": "#5d275d",
+    "capital": "p1869",
+    "commanders": []
+  },
+  {
+    "id": "CRE",
+    "name": "Creek",
+    "color": "#6abe30",
+    "capital": "p2148",
+    "commanders": []
+  },
+  {
+    "id": "PUE",
+    "name": "Pueblo",
+    "color": "#eec39a",
+    "capital": "p1849",
+    "commanders": []
+  }
+]

@@ -1,0 +1,61 @@
+{
+  "$comment": "Map generation settings. pxPerDeg 16 is about 7 km per pixel at the equator.",
+  "pxPerDeg": 16,
+  "latTop": 78,
+  "latBottom": -56,
+  "lakeMaxScalerank": 3,
+  "minIslandSize": 10,
+  "minFactor": 0.4,
+  "maxFactor": 1.7,
+  "defaultTarget": 1100,
+  "density": [
+    { "name": "Western and Central Europe", "bbox": [-11, 36, 30, 60], "target": 380 },
+    { "name": "Mediterranean, Anatolia and Levant", "bbox": [-10, 29, 50, 42], "target": 420 },
+    { "name": "Eastern Europe", "bbox": [30, 42, 60, 62], "target": 520 },
+    { "name": "India", "bbox": [66, 6, 92, 34], "target": 420 },
+    { "name": "China, Korea and Japan", "bbox": [100, 18, 146, 42], "target": 450 },
+    { "name": "Southeast Asia", "bbox": [92, -10, 125, 24], "target": 600 },
+    { "name": "Middle East and Persia", "bbox": [35, 12, 75, 42], "target": 650 },
+    { "name": "Mesoamerica and Andes", "bbox": [-106, -20, -68, 23], "target": 650 },
+    { "name": "Far north", "bbox": [-180, 60, 180, 90], "target": 3200 },
+    { "name": "Sahara and Arabia deserts", "bbox": [-17, 16, 33, 30], "target": 2400 },
+    { "name": "Siberia and Central Asia steppe", "bbox": [60, 42, 180, 60], "target": 1800 },
+    { "name": "Australia interior", "bbox": [114, -35, 154, -15], "target": 2800 },
+    { "name": "Northern North America", "bbox": [-170, 50, -50, 60], "target": 2200 }
+  ],
+  "terrainClasses": {
+    "Range/mtn": "mountains",
+    "Desert": "desert",
+    "Plateau": "hills",
+    "Foothills": "hills",
+    "Tundra": "tundra",
+    "Wetlands": "marsh",
+    "Delta": "marsh",
+    "Plain": "grassland",
+    "Lowland": "farmland",
+    "Valley": "farmland",
+    "Basin": "drylands",
+    "Depression": "drylands"
+  },
+  "development": [
+    { "name": "Low Countries, Northern Italy, Paris, Rhine", "bbox": [-1, 43, 13, 53], "base": 6 },
+    { "name": "Western Europe", "bbox": [-11, 36, 20, 60], "base": 4 },
+    { "name": "Byzantine and Ottoman core", "bbox": [20, 36, 35, 43], "base": 5 },
+    { "name": "Eastern Europe", "bbox": [20, 43, 60, 62], "base": 3 },
+    { "name": "Egypt and Levant", "bbox": [29, 22, 40, 37], "base": 5 },
+    { "name": "Middle East and Persia", "bbox": [35, 12, 75, 42], "base": 3 },
+    { "name": "India", "bbox": [66, 6, 92, 34], "base": 5 },
+    { "name": "China", "bbox": [100, 18, 125, 42], "base": 6 },
+    { "name": "Korea and Japan", "bbox": [125, 30, 146, 43], "base": 5 },
+    { "name": "Southeast Asia", "bbox": [92, -10, 125, 24], "base": 3 },
+    { "name": "Mesoamerica and Andes", "bbox": [-106, -20, -68, 23], "base": 3 },
+    { "name": "Africa", "bbox": [-20, -35, 52, 37], "base": 2 }
+  ],
+  "defaultDevelopment": 1,
+  "palette": [
+    "#3b5dc9", "#b13e53", "#ffcd75", "#38b764", "#ef7d57", "#41a6f6", "#a7f070", "#5d275d",
+    "#73eff7", "#257179", "#c97d3b", "#8f4fa8", "#d9a066", "#6abe30", "#df7126", "#5b6ee1",
+    "#d95763", "#76428a", "#99e550", "#fbf236", "#847e87", "#8f974a", "#cbdbfc", "#e8a0bf",
+    "#4b692f", "#ac3232", "#306082", "#eec39a", "#639bff", "#bd8d5a", "#9badb7", "#45283c"
+  ]
+}

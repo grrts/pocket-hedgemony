@@ -36,17 +36,19 @@ describe("turns", () => {
     const w = createWorld(rules, 1);
     const fra = w.nationIndex.get("FRA")!;
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
-    const champagne = w.provinceIndex.get("champagne")!;
+    const paris = w.armies.location[army]!;
+    const next = w.adjList[w.adjStart[paris]!]!;
+    const london = w.provinceIndex.get(rules.nations.find((n) => n.id === "ENG")!.capital)!;
     const report = processTurn(
       w,
       [
-        { type: "move", army, to: champagne },
-        { type: "move", army: army + 1, to: champagne },
-        { type: "move", army, to: w.provinceIndex.get("london")! },
+        { type: "move", army, to: next },
+        { type: "move", army: army + 1, to: next },
+        { type: "move", army, to: london },
       ],
       fra,
     );
-    expect(w.armies.location[army]).toBe(champagne);
+    expect(w.armies.location[army]).toBe(next);
     expect(report.rejectedOrders.map((r) => r.reason)).toEqual(["not your army", "army already moved this turn"]);
   });
 

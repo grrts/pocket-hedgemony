@@ -47,7 +47,17 @@ export interface NationDef {
   commanders: CommanderDef[];
 }
 
-export type Terrain = "grassland" | "farmland" | "hills" | "mountains" | "drylands" | "marsh" | "forest" | "desert";
+export type Terrain =
+  | "grassland"
+  | "farmland"
+  | "hills"
+  | "mountains"
+  | "drylands"
+  | "marsh"
+  | "forest"
+  | "desert"
+  | "tundra"
+  | "jungle";
 
 export interface ProvinceDef {
   id: string;
@@ -58,6 +68,19 @@ export interface ProvinceDef {
   production: number;
   manpower: number;
   neighbors: string[];
+  /** Centre on the world map image, in map pixels. */
+  x?: number;
+  y?: number;
+  coastal?: boolean;
+}
+
+/** Size and projection of the world map image (equirectangular). */
+export interface MapInfo {
+  width: number;
+  height: number;
+  pxPerDeg: number;
+  latTop: number;
+  provinceImage: string;
 }
 
 /** Everything the engine needs to run a campaign, loaded from JSON config. */
@@ -66,4 +89,5 @@ export interface Ruleset {
   units: UnitType[];
   nations: NationDef[];
   provinces: ProvinceDef[];
+  map?: MapInfo;
 }
