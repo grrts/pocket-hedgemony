@@ -20,14 +20,32 @@
     "name": "Scotland",
     "color": "#d9a066",
     "capital": "p562",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "SCO_1",
+        "name": "General of Scotland",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "IRE",
     "name": "Ireland",
     "color": "#e8a0bf",
     "capital": "p785",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "IRE_1",
+        "name": "General of Ireland",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "FRA",
@@ -66,35 +84,80 @@
     "name": "Brittany",
     "color": "#b13e53",
     "capital": "p1046",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "BRI_1",
+        "name": "General of Brittany",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "PRO",
     "name": "Provence",
     "color": "#306082",
     "capital": "p1360",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "PRO_1",
+        "name": "General of Provence",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "SAV",
     "name": "Savoy",
     "color": "#ef7d57",
     "capital": "p1366",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "SAV_1",
+        "name": "General of Savoy",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "LOR",
     "name": "Lorraine",
     "color": "#306082",
     "capital": "p1083",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "LOR_1",
+        "name": "General of Lorraine",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "NAV",
     "name": "Navarre",
     "color": "#847e87",
     "capital": "p1334",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "NAV_1",
+        "name": "General of Navarre",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "CAS",
@@ -117,70 +180,160 @@
     "name": "Aragon",
     "color": "#ef7d57",
     "capital": "p1611",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "ARA_1",
+        "name": "General of Aragon",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "POR",
     "name": "Portugal",
     "color": "#38b764",
     "capital": "p1585",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "POR_1",
+        "name": "General of Portugal",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "GRA",
     "name": "Granada",
     "color": "#257179",
     "capital": "p1885",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "GRA_1",
+        "name": "General of Granada",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MLN",
     "name": "Milan",
     "color": "#df7126",
     "capital": "p1373",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MLN_1",
+        "name": "General of Milan",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "VEN",
     "name": "Venice",
     "color": "#41a6f6",
     "capital": "p1381",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "VEN_1",
+        "name": "General of Venice",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "GEN",
     "name": "Genoa",
     "color": "#847e87",
     "capital": "p1371",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "GEN_1",
+        "name": "General of Genoa",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "TUS",
     "name": "Florence",
     "color": "#ef7d57",
     "capital": "p1380",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "TUS_1",
+        "name": "General of Florence",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "FER",
     "name": "Modena",
     "color": "#73eff7",
     "capital": "p1378",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "FER_1",
+        "name": "General of Modena",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "PAP",
     "name": "Papal States",
     "color": "#eec39a",
     "capital": "p1624",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "PAP_1",
+        "name": "General of Papal States",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "NAP",
     "name": "Naples",
     "color": "#76428a",
     "capital": "p1626",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "NAP_1",
+        "name": "General of Naples",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "HAB",
@@ -203,126 +356,288 @@
     "name": "Bohemia",
     "color": "#3b5dc9",
     "capital": "p839",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "BOH_1",
+        "name": "General of Bohemia",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "BAV",
     "name": "Bavaria",
     "color": "#e8a0bf",
     "capital": "p1105",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "BAV_1",
+        "name": "General of Bavaria",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "WUR",
     "name": "Württemberg",
     "color": "#fbf236",
     "capital": "p1095",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "WUR_1",
+        "name": "General of Württemberg",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "PAL",
     "name": "Palatinate",
     "color": "#99e550",
     "capital": "p1089",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "PAL_1",
+        "name": "General of Palatinate",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KOL",
     "name": "Cologne",
     "color": "#4b692f",
     "capital": "p818",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KOL_1",
+        "name": "General of Cologne",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "HES",
     "name": "Hesse",
     "color": "#6abe30",
     "capital": "p825",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "HES_1",
+        "name": "General of Hesse",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "SAX",
     "name": "Saxony",
     "color": "#ffcd75",
     "capital": "p835",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "SAX_1",
+        "name": "General of Saxony",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "BRA",
     "name": "Brandenburg",
     "color": "#45283c",
     "capital": "p837",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "BRA_1",
+        "name": "General of Brandenburg",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "LUN",
     "name": "Lüneburg",
     "color": "#fbf236",
     "capital": "p828",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "LUN_1",
+        "name": "General of Lüneburg",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "HAM",
     "name": "Hamburg",
     "color": "#41a6f6",
     "capital": "p827",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "HAM_1",
+        "name": "General of Hamburg",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MKL",
     "name": "Mecklenburg",
     "color": "#73eff7",
     "capital": "p831",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MKL_1",
+        "name": "General of Mecklenburg",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "POM",
     "name": "Pomerania",
     "color": "#fbf236",
     "capital": "p841",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "POM_1",
+        "name": "General of Pomerania",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "SWI",
     "name": "Switzerland",
     "color": "#73eff7",
     "capital": "p1090",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "SWI_1",
+        "name": "General of Switzerland",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "TEU",
     "name": "Teutonic Order",
     "color": "#ef7d57",
     "capital": "p585",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "TEU_1",
+        "name": "General of Teutonic Order",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "LIV",
     "name": "Livonian Order",
     "color": "#d95763",
     "capital": "p591",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "LIV_1",
+        "name": "General of Livonian Order",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "DAN",
     "name": "Denmark",
     "color": "#ac3232",
     "capital": "p575",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "DAN_1",
+        "name": "General of Denmark",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "SWE",
     "name": "Sweden",
     "color": "#306082",
     "capital": "p405",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "SWE_1",
+        "name": "General of Sweden",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "NOR",
     "name": "Norway",
     "color": "#fbf236",
     "capital": "p395",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "NOR_1",
+        "name": "General of Norway",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "POL",
@@ -345,7 +660,16 @@
     "name": "Lithuania",
     "color": "#a7f070",
     "capital": "p600",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "LIT_1",
+        "name": "General of Lithuania",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "HUN",
@@ -368,28 +692,64 @@
     "name": "Moldavia",
     "color": "#d9a066",
     "capital": "p1158",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MOL_1",
+        "name": "General of Moldavia",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "WAL",
     "name": "Wallachia",
     "color": "#cbdbfc",
     "capital": "p1433",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "WAL_1",
+        "name": "General of Wallachia",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "SER",
     "name": "Serbia",
     "color": "#257179",
     "capital": "p1409",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "SER_1",
+        "name": "General of Serbia",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "BOS",
     "name": "Bosnia",
     "color": "#45283c",
     "capital": "p1394",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "BOS_1",
+        "name": "General of Bosnia",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "ALB",
@@ -412,7 +772,16 @@
     "name": "Ragusa",
     "color": "#99e550",
     "capital": "p1397",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "RAG_1",
+        "name": "General of Ragusa",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "BYZ",
@@ -451,70 +820,160 @@
     "name": "Karaman",
     "color": "#847e87",
     "capital": "p1933",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KAR_1",
+        "name": "General of Karaman",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "CND",
     "name": "Candar",
     "color": "#76428a",
     "capital": "p1674",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "CND_1",
+        "name": "General of Candar",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "TRE",
     "name": "Trebizond",
     "color": "#639bff",
     "capital": "p1693",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "TRE_1",
+        "name": "General of Trebizond",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "DUL",
     "name": "Dulkadir",
     "color": "#5b6ee1",
     "capital": "p1939",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "DUL_1",
+        "name": "General of Dulkadir",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "AKK",
     "name": "Aq Qoyunlu",
     "color": "#8f4fa8",
     "capital": "p1694",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "AKK_1",
+        "name": "General of Aq Qoyunlu",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "QAR",
     "name": "Qara Qoyunlu",
     "color": "#a7f070",
     "capital": "p1962",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "QAR_1",
+        "name": "General of Qara Qoyunlu",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "CYP",
     "name": "Cyprus",
     "color": "#df7126",
     "capital": "p1934",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "CYP_1",
+        "name": "General of Cyprus",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KNI",
     "name": "Knights of Rhodes",
     "color": "#fbf236",
     "capital": "p1926",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KNI_1",
+        "name": "General of Knights of Rhodes",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "GEO",
     "name": "Georgia",
     "color": "#847e87",
     "capital": "p1461",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "GEO_1",
+        "name": "General of Georgia",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "SHI",
     "name": "Shirvan",
     "color": "#ef7d57",
     "capital": "p1721",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "SHI_1",
+        "name": "General of Shirvan",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MOS",
@@ -537,63 +996,144 @@
     "name": "Novgorod",
     "color": "#847e87",
     "capital": "p420",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "NOV_1",
+        "name": "General of Novgorod",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "PSK",
     "name": "Pskov",
     "color": "#e8a0bf",
     "capital": "p611",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "PSK_1",
+        "name": "General of Pskov",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "TVE",
     "name": "Tver",
     "color": "#bd8d5a",
     "capital": "p628",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "TVE_1",
+        "name": "General of Tver",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "RYA",
     "name": "Ryazan",
     "color": "#6abe30",
     "capital": "p638",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "RYA_1",
+        "name": "General of Ryazan",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KAZ",
     "name": "Kazan",
     "color": "#8f974a",
     "capital": "p658",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KAZ_1",
+        "name": "General of Kazan",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "GOL",
     "name": "Great Horde",
     "color": "#76428a",
     "capital": "p1199",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "GOL_1",
+        "name": "General of Great Horde",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "CRI",
     "name": "Crimea",
     "color": "#6abe30",
     "capital": "p1445",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "CRI_1",
+        "name": "General of Crimea",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "NOG",
     "name": "Nogai",
     "color": "#e8a0bf",
     "capital": "p1211",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "NOG_1",
+        "name": "General of Nogai",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "UZB",
     "name": "Uzbek Khanate",
     "color": "#847e87",
     "capital": "p1489",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "UZB_1",
+        "name": "General of Uzbek Khanate",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MAM",
@@ -616,21 +1156,48 @@
     "name": "Hejaz",
     "color": "#d95763",
     "capital": "p2932",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "HED_1",
+        "name": "General of Hejaz",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "YEM",
     "name": "Yemen",
     "color": "#99e550",
     "capital": "p3109",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "YEM_1",
+        "name": "General of Yemen",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "OMA",
     "name": "Oman",
     "color": "#bd8d5a",
     "capital": "p2747",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "OMA_1",
+        "name": "General of Oman",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "TIM",
@@ -653,28 +1220,64 @@
     "name": "Moghulistan",
     "color": "#a7f070",
     "capital": "p1498",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "CHG_1",
+        "name": "General of Moghulistan",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "OIR",
     "name": "Oirat",
     "color": "#9badb7",
     "capital": "p1248",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "OIR_1",
+        "name": "General of Oirat",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KHA",
     "name": "Mongols",
     "color": "#eec39a",
     "capital": "p1258",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KHA_1",
+        "name": "General of Mongols",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "TIB",
     "name": "Tibet",
     "color": "#257179",
     "capital": "p2614",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "TIB_1",
+        "name": "General of Tibet",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MNG",
@@ -697,308 +1300,704 @@
     "name": "Jurchens",
     "color": "#ffcd75",
     "capital": "p1528",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "JUR_1",
+        "name": "General of Jurchens",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KOR",
     "name": "Korea",
     "color": "#9badb7",
     "capital": "p2095",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KOR_1",
+        "name": "General of Korea",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "JAP",
     "name": "Japan",
     "color": "#e8a0bf",
     "capital": "p2110",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "JAP_1",
+        "name": "General of Japan",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "DAI",
     "name": "Dai Viet",
     "color": "#a7f070",
     "capital": "p3025",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "DAI_1",
+        "name": "General of Dai Viet",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "CHA",
     "name": "Champa",
     "color": "#73eff7",
     "capital": "p3167",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "CHA_1",
+        "name": "General of Champa",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "LXA",
     "name": "Lan Xang",
     "color": "#5b6ee1",
     "capital": "p3016",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "LXA_1",
+        "name": "General of Lan Xang",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "LAN",
     "name": "Lan Na",
     "color": "#fbf236",
     "capital": "p3004",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "LAN_1",
+        "name": "General of Lan Na",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "AYU",
     "name": "Ayutthaya",
     "color": "#df7126",
     "capital": "p3148",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "AYU_1",
+        "name": "General of Ayutthaya",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KHM",
     "name": "Khmer",
     "color": "#eec39a",
     "capital": "p3300",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KHM_1",
+        "name": "General of Khmer",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "AVA",
     "name": "Ava",
     "color": "#847e87",
     "capital": "p2997",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "AVA_1",
+        "name": "General of Ava",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "PEG",
     "name": "Pegu",
     "color": "#45283c",
     "capital": "p2998",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "PEG_1",
+        "name": "General of Pegu",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MAJ",
     "name": "Majapahit",
     "color": "#41a6f6",
     "capital": "p3876",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MAJ_1",
+        "name": "General of Majapahit",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MLC",
     "name": "Malacca",
     "color": "#5b6ee1",
     "capital": "p3537",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MLC_1",
+        "name": "General of Malacca",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "BEI",
     "name": "Brunei",
     "color": "#fbf236",
     "capital": "p3545",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "BEI_1",
+        "name": "General of Brunei",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "DEL",
     "name": "Delhi",
     "color": "#8f4fa8",
     "capital": "p2574",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "DEL_1",
+        "name": "General of Delhi",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "JNP",
     "name": "Jaunpur",
     "color": "#c97d3b",
     "capital": "p2786",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "JNP_1",
+        "name": "General of Jaunpur",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "BNG",
     "name": "Bengal",
     "color": "#4b692f",
     "capital": "p2800",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "BNG_1",
+        "name": "General of Bengal",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "BAH",
     "name": "Bahmanis",
     "color": "#76428a",
     "capital": "p3130",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "BAH_1",
+        "name": "General of Bahmanis",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "VIJ",
     "name": "Vijayanagar",
     "color": "#df7126",
     "capital": "p3128",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "VIJ_1",
+        "name": "General of Vijayanagar",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "GUJ",
     "name": "Gujarat",
     "color": "#5b6ee1",
     "capital": "p2761",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "GUJ_1",
+        "name": "General of Gujarat",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MLW",
     "name": "Malwa",
     "color": "#d9a066",
     "capital": "p2970",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MLW_1",
+        "name": "General of Malwa",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MEW",
     "name": "Mewar",
     "color": "#c97d3b",
     "capital": "p2766",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MEW_1",
+        "name": "General of Mewar",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "ORI",
     "name": "Orissa",
     "color": "#639bff",
     "capital": "p2993",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "ORI_1",
+        "name": "General of Orissa",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "GND",
     "name": "Gondwana",
     "color": "#bd8d5a",
     "capital": "p2778",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "GND_1",
+        "name": "General of Gondwana",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KAS",
     "name": "Kashmir",
     "color": "#847e87",
     "capital": "p2016",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KAS_1",
+        "name": "General of Kashmir",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MUL",
     "name": "Multan",
     "color": "#df7126",
     "capital": "p2559",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MUL_1",
+        "name": "General of Multan",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "SND",
     "name": "Sindh",
     "color": "#9badb7",
     "capital": "p2750",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "SND_1",
+        "name": "General of Sindh",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "AHO",
     "name": "Ahom",
     "color": "#c97d3b",
     "capital": "p2618",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "AHO_1",
+        "name": "General of Ahom",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MOR",
     "name": "Morocco",
     "color": "#bd8d5a",
     "capital": "p2168",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MOR_1",
+        "name": "General of Morocco",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "TLE",
     "name": "Tlemcen",
     "color": "#3b5dc9",
     "capital": "p1888",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "TLE_1",
+        "name": "General of Tlemcen",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "TUN",
     "name": "Tunis",
     "color": "#38b764",
     "capital": "p1914",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "TUN_1",
+        "name": "General of Tunis",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MAL",
     "name": "Mali",
     "color": "#eec39a",
     "capital": "p3206",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MAL_1",
+        "name": "General of Mali",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "SON",
     "name": "Songhai",
     "color": "#41a6f6",
     "capital": "p3072",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "SON_1",
+        "name": "General of Songhai",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "JOL",
     "name": "Jolof",
     "color": "#41a6f6",
     "capital": "p3061",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "JOL_1",
+        "name": "General of Jolof",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MSI",
     "name": "Mossi",
     "color": "#ef7d57",
     "capital": "p3217",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MSI_1",
+        "name": "General of Mossi",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KAN",
     "name": "Kano",
     "color": "#cbdbfc",
     "capital": "p3229",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KAN_1",
+        "name": "General of Kano",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KBO",
     "name": "Kanem-Bornu",
     "color": "#e8a0bf",
     "capital": "p3233",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KBO_1",
+        "name": "General of Kanem-Bornu",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "BEN",
     "name": "Benin",
     "color": "#fbf236",
     "capital": "p3384",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "BEN_1",
+        "name": "General of Benin",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "ETH",
     "name": "Ethiopia",
     "color": "#8f974a",
     "capital": "p3418",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "ETH_1",
+        "name": "General of Ethiopia",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "ADA",
     "name": "Adal",
     "color": "#df7126",
     "capital": "p3266",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "ADA_1",
+        "name": "General of Adal",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "AJU",
     "name": "Ajuran",
     "color": "#847e87",
     "capital": "p3529",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "AJU_1",
+        "name": "General of Ajuran",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KIL",
     "name": "Kilwa",
     "color": "#45283c",
     "capital": "p3870",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KIL_1",
+        "name": "General of Kilwa",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "ZIM",
     "name": "Mutapa",
     "color": "#306082",
     "capital": "p4128",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "ZIM_1",
+        "name": "General of Mutapa",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "KON",
     "name": "Kongo",
     "color": "#e8a0bf",
     "capital": "p3847",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "KON_1",
+        "name": "General of Kongo",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "AZT",
@@ -1021,21 +2020,48 @@
     "name": "Purépecha",
     "color": "#9badb7",
     "capital": "p2872",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "PUR_1",
+        "name": "General of Purépecha",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "ZAP",
     "name": "Zapotec",
     "color": "#38b764",
     "capital": "p3032",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "ZAP_1",
+        "name": "General of Zapotec",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MAY",
     "name": "Maya",
     "color": "#38b764",
     "capital": "p2884",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MAY_1",
+        "name": "General of Maya",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "INC",
@@ -1058,48 +2084,111 @@
     "name": "Chimú",
     "color": "#a7f070",
     "capital": "p3802",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "CHM_1",
+        "name": "General of Chimú",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "MUI",
     "name": "Muisca",
     "color": "#df7126",
     "capital": "p3461",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "MUI_1",
+        "name": "General of Muisca",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "IRO",
     "name": "Iroquois",
     "color": "#e8a0bf",
     "capital": "p1316",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "IRO_1",
+        "name": "General of Iroquois",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "HUR",
     "name": "Huron",
     "color": "#a7f070",
     "capital": "p1315",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "HUR_1",
+        "name": "General of Huron",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "CHE",
     "name": "Cherokee",
     "color": "#5d275d",
     "capital": "p1869",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "CHE_1",
+        "name": "General of Cherokee",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "CRE",
     "name": "Creek",
     "color": "#6abe30",
     "capital": "p2148",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "CRE_1",
+        "name": "General of Creek",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   },
   {
     "id": "PUE",
     "name": "Pueblo",
     "color": "#eec39a",
     "capital": "p1849",
-    "commanders": []
+    "commanders": [
+      {
+        "id": "PUE_1",
+        "name": "General of Pueblo",
+        "fire": 1,
+        "shock": 1,
+        "maneuver": 1,
+        "siege": 1
+      }
+    ]
   }
 ]

@@ -1,68 +1,189 @@
-/* PICO-8-style palette; pixel art comes in step 2. */
+/* Colours mirror src/art/palette.ts. */
 :root {
-  --bg: #1a1c2c;
-  --panel: #333c57;
+  color-scheme: dark;
+  --ink: #1a1c2c;
+  --panel: #29366f;
+  --panel-edge: #94b0c2;
   --text: #f4f4f4;
   --muted: #94b0c2;
   --accent: #ffcd75;
   --warn: #ef7d57;
+  --font: "Courier New", ui-monospace, Menlo, Consolas, monospace;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  background: var(--bg);
+  height: 100%;
+  overflow: hidden;
+  background: var(--ink);
   color: var(--text);
-  font: 16px/1.4 ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  font: bold 15px/1.35 var(--font);
   -webkit-text-size-adjust: 100%;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 #app {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  position: fixed;
+  inset: 0;
 }
 
-h1 {
+.map {
+  position: absolute;
+  inset: 0;
+}
+
+.map-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.loading,
+.fatal {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  text-align: center;
+  color: var(--accent);
+}
+
+/* Chunky 8-bit frames: hard edges, double border, no rounding. */
+.hud,
+.panel,
+.icon,
+.diag {
+  background: var(--panel);
+  border: 3px solid var(--ink);
+  box-shadow: inset 0 0 0 2px var(--panel-edge), 4px 4px 0 var(--ink);
+}
+
+.hud {
+  position: absolute;
+  top: max(8px, env(safe-area-inset-top));
+  left: 8px;
+  right: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 8px 10px;
+}
+
+.hud .title {
   color: var(--accent);
   letter-spacing: 2px;
 }
 
-h2 {
-  font-size: 16px;
+.hud small {
   color: var(--muted);
-  text-transform: uppercase;
 }
 
-.sub,
-.meta,
-.diag {
+.tools {
+  position: absolute;
+  right: 8px;
+  top: calc(max(8px, env(safe-area-inset-top)) + 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+button {
+  font: inherit;
+  color: var(--text);
+  background: var(--panel);
+  border: 3px solid var(--ink);
+  box-shadow: inset 0 0 0 2px var(--panel-edge);
+  border-radius: 0;
+  min-height: 44px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+button:active {
+  transform: translate(2px, 2px);
+}
+
+button:disabled {
+  opacity: 0.6;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-size: 22px;
+}
+
+.end-turn,
+.play {
+  margin-left: auto;
+  background: var(--accent);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 2px #fff6;
+}
+
+.play {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.panel {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: calc(max(8px, env(safe-area-inset-bottom)) + 26px);
+  max-height: 45vh;
+  overflow: auto;
+  padding: 10px 12px;
+}
+
+@media (min-width: 720px) {
+  .panel {
+    right: auto;
+    width: 380px;
+  }
+}
+
+.panel h2 {
+  margin: 0 40px 4px 0;
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.panel p {
+  margin: 4px 0;
+}
+
+.panel .close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-height: 36px;
+  width: 36px;
+  padding: 0;
+}
+
+.owner,
+.dev,
+.hint {
   color: var(--muted);
-  font-size: 13px;
 }
 
 .nations {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px;
-}
-
-button,
-select {
-  font: inherit;
-  color: var(--text);
-  background: var(--panel);
-  border: 2px solid var(--muted);
-  border-radius: 0;
-  min-height: 44px; /* touch target */
-  padding: 8px 12px;
-}
-
-button:active {
-  border-color: var(--accent);
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 6px;
+  margin: 8px 0;
 }
 
 .nation {
@@ -76,42 +197,37 @@ button:active {
   display: inline-block;
   width: 14px;
   height: 14px;
-  border: 2px solid var(--bg);
+  border: 2px solid var(--ink);
+  margin-right: 4px;
+  vertical-align: -2px;
   flex: none;
 }
 
-.hud {
+.army {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  align-items: center;
-  padding: 8px;
-  background: var(--panel);
-}
-
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 0;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 2px dashed var(--muted);
 }
 
-.end-turn {
-  width: 100%;
-  margin-top: 16px;
-  background: var(--accent);
-  color: var(--bg);
-  font-weight: bold;
-}
-
-.warn {
-  color: var(--warn);
+.army small {
+  color: var(--muted);
 }
 
 .diag {
-  margin-top: 24px;
-  border-top: 2px solid var(--panel);
-  padding-top: 8px;
+  position: absolute;
+  left: 8px;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: normal;
+  color: var(--muted);
+  box-shadow: none;
+  border-width: 1px;
+}
+
+.hint a {
+  color: var(--accent);
 }

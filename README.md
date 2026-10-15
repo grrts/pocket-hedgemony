@@ -12,6 +12,7 @@ A turn-based, 8-bit grand strategy game for phones, desktop and the web, startin
 | `apps/desktop` | Electron wrapper around the client build. |
 | `apps/mobile` | Capacitor wrapper (iOS and Android) around the client build. |
 | `server` | Symfony 7.4 API for accounts and metrics. |
+| `tools/mapgen` | Builds the world map and the 1444 setup from Natural Earth (public domain) data. |
 
 ## Running it
 
@@ -29,6 +30,16 @@ php bin/console doctrine:schema:update --force   # SQLite in var/ for local dev
 php -S localhost:8000 -t public
 php bin/phpunit
 ```
+
+## The world map
+
+`node --experimental-strip-types tools/mapgen/mapgen.ts --preview` rebuilds the map (about 10 seconds; it downloads Natural Earth data on first run).
+
+- Modern first-level regions (states, provinces, departments) are drawn onto a 5760 × 2144 pixel grid (16 pixels per degree), then merged or split until provinces are roughly even in size. `config.json` sets the size per part of the world, so Europe, India and China are denser than Siberia or the Sahara.
+- `nations-1444.json` lists the 137 nations with their capitals. `owners-1444.json` hands provinces to them: rules are checked in order and the first match wins, by modern country, region name, or a longitude and latitude box. Borders are an approximation of 1444, not a historical atlas, and province names are modern region names.
+- Outputs: `apps/client/public/map/provinces.png` (province id per pixel) and `packages/rules/data/world/*.json`.
+
+The client draws the map with WebGL2: the id image is uploaded once and every province's colour comes from a small lookup texture, so recolouring the world after a turn costs almost nothing. `/style.html` in the client is the art style sheet.
 
 ## The engine worker on each platform
 

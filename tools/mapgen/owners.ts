@@ -143,7 +143,11 @@ export function assignOwners(
       name: n.name,
       color: color.get(n.id)!,
       capital: capitals.get(n.id)!,
-      commanders: (n.commanders ?? []).map((c, i) => ({ id: `${n.id}_${i + 1}`, ...c })),
+      // Every nation fields at least one named commander, so every army on the map has a face.
+      commanders: (n.commanders?.length ? n.commanders : [{ name: `General of ${n.name}`, fire: 1, shock: 1, maneuver: 1, siege: 1 }]).map((c, i) => ({
+        id: `${n.id}_${i + 1}`,
+        ...c,
+      })),
     }));
 
   return { provinces: outProvinces, nations: outNations };
