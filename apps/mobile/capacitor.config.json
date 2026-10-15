@@ -1,0 +1,12 @@
+{
+  "appId": "com.pockethegemony.app",
+  "appName": "Pocket Hegemony",
+  "webDir": "../client/dist",
+  "backgroundColor": "#1a1c2c",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "minWebViewVersion": 80
+  }
+}

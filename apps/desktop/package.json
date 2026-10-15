@@ -1,0 +1,14 @@
+{
+  "name": "@ph/desktop",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/main.mjs",
+  "scripts": {
+    "start": "electron .",
+    "smoke": "PH_SMOKE=1 electron . --no-sandbox"
+  },
+  "devDependencies": {
+    "electron": "44.7.2"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@ph/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "pnpm --filter @ph/client build && cap sync",
+    "android": "pnpm sync && cap open android",
+    "ios": "pnpm sync && cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}

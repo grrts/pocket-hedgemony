@@ -1,0 +1,5 @@
+[
+  { "id": "infantry", "name": "Infantry", "cost": 10, "manpowerPerRegiment": 1000, "attack": 1, "defense": 1, "speed": 1 },
+  { "id": "cavalry", "name": "Cavalry", "cost": 25, "manpowerPerRegiment": 1000, "attack": 2, "defense": 1, "speed": 2 },
+  { "id": "artillery", "name": "Artillery", "cost": 30, "manpowerPerRegiment": 1000, "attack": 1, "defense": 2, "speed": 1 }
+]

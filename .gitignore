@@ -1,0 +1,13 @@
+node_modules/
+dist/
+out/
+*.log
+.DS_Store
+.vite/
+apps/mobile/android/
+apps/mobile/ios/
+server/var/
+server/vendor/
+server/.env.local
+server/.env.*.local
+server/.phpunit.cache/
