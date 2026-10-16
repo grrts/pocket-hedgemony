@@ -46,6 +46,7 @@ const marchGraph: MarchMap = (() => {
     adjList: Int32Array.from(neighborIdx.flat()),
     ground: provinces.map((p) => groundOf(p.terrain)),
     population: Float32Array.from(provinces, (p) => p.population),
+    river: Uint8Array.from(provinces, (p) => (p.river ? 1 : 0)),
   };
 })();
 
@@ -515,7 +516,7 @@ function renderPanel(): void {
   const armiesHere = snapshot ? [...snapshot.armies.id.keys()].filter((k) => snapshot!.armies.location[k] === selectedProvince) : [];
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
-    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner.color, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.coastal ? " · coast" : ""}</p>
+    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner.color, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.river ? " · river" : ""}${p.coastal ? " · coast" : ""}</p>
     <dl class="facts">
       <dt>People</dt><dd>${fmt(p.population * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>

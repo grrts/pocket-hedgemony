@@ -36,6 +36,8 @@ export interface MarchDefines {
   horseSpeedBonus: number;
   /** Extra crossing units per province for an army bigger than the forage limit there. */
   bigArmyExtraCrossings: number;
+  /** Real days added for marching into a province a river runs through (no bridges yet). */
+  riverCrossingDays: number;
   rationsPerSoldier: number;
   rationsPerHorse: number;
   /** Food a province can spare each month, in rations per person living there. */
@@ -108,6 +110,8 @@ export interface ProvinceDef {
   x?: number;
   y?: number;
   coastal?: boolean;
+  /** A river runs through it. */
+  river?: boolean;
 }
 
 /** Size and projection of the world map image (equirectangular). */

@@ -76,8 +76,9 @@ describe("turns", () => {
     const d = rules.defines.march;
     const paris = w.provinceIndex.get(rules.nations.find((n) => n.id === "france")!.capital)!;
     const next = Array.from(w.adjList.subarray(w.adjStart[paris]!, w.adjStart[paris + 1]!)).find((p) => !w.provinceWater[p])!;
-    const foot = stepDays(d, map, paris, next, { men: 5000, horse: 0, logistics: 0 });
-    expect(stepDays(d, map, paris, next, { men: 5000, horse: 5000, logistics: 0 })).toBeCloseTo(foot / (1 + d.horseSpeedBonus));
+    const river = map.river[next] ? d.riverCrossingDays : 0;
+    const foot = stepDays(d, map, paris, next, { men: 5000, horse: 0, logistics: 0 }) - river;
+    expect(stepDays(d, map, paris, next, { men: 5000, horse: 5000, logistics: 0 }) - river).toBeCloseTo(foot / (1 + d.horseSpeedBonus));
     expect(stepDays(d, map, paris, next, { men: 10_000_000, horse: 0, logistics: 0 })).toBeGreaterThan(foot);
   });
 

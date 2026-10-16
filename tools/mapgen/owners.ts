@@ -35,6 +35,7 @@ interface ProvinceIn {
   y: number;
   size: number;
   coastal: boolean;
+  river?: boolean;
   terrain: string;
   neighbors: string[];
 }
@@ -139,6 +140,7 @@ export function assignOwners(
       x: p.x,
       y: p.y,
       coastal: p.coastal,
+      ...(p.river ? { river: true } : {}),
       neighbors: p.neighbors,
     };
   });

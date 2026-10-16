@@ -53,7 +53,7 @@ precision highp float;
 precision highp int;
 in vec2 vMap;
 uniform sampler2D uIds;      // this tile's province ids (RGB = id + 1)
-uniform sampler2D uLand;     // this tile's terrain per pixel (R = terrain index, G = water depth band + 1)
+uniform sampler2D uLand;     // per pixel: R terrain index; G water depth band + 1, or 64 + river size on land; B river links
 uniform ivec2 uTileOrigin;   // tile's top-left in map pixels
 uniform ivec2 uTileSize;     // texels in this tile's texture (includes 1px overlap)
 uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
@@ -77,13 +77,22 @@ int idAt(ivec2 p) {
   vec3 c = texelFetch(uIds, local, 0).rgb * 255.0 + 0.5;
   return (int(c.r) << 16 | int(c.g) << 8 | int(c.b)) - 1;
 }
-vec2 landAt(ivec2 p) {
+vec3 land3(ivec2 p) {
   ivec2 local = clamp(p - uTileOrigin, ivec2(0), uTileSize - 1);
-  return texelFetch(uLand, local, 0).rg * 255.0 + 0.5;
+  return texelFetch(uLand, local, 0).rgb * 255.0 + 0.5;
 }
+vec2 landAt(ivec2 p) { return land3(p).rg; }
 int terrainAt(ivec2 p) { return min(int(landAt(p).r), ${TERRAINS.length - 1}); }
 // Depth band of a map pixel; land counts as the shallowest so coasts stay light.
-float depthAt(ivec2 p) { return max(floor(landAt(p).g) - 1.0, 0.0); }
+float depthAt(ivec2 p) {
+  float g = floor(landAt(p).g);
+  return g >= 64.0 ? 0.0 : max(g - 1.0, 0.0);
+}
+// River size on a land pixel: 0 none, 1 river, 2 great river.
+int riverAt(ivec2 p) {
+  int g = int(landAt(p).g);
+  return g >= 64 ? g - 64 : 0;
+}
 vec4 info(int id) { return texelFetch(uInfo, ivec2(id % uInfoWidth, id / uInfoWidth), 0); }
 int ownerOf(int id) {
   vec2 o = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).rg * 255.0 + 0.5;
@@ -92,6 +101,33 @@ int ownerOf(int id) {
 // Land province (not a lake, not a sea zone).
 bool land(int id) {
   return id >= 0 && texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b < 0.5;
+}
+float segDist(vec2 q, vec2 a, vec2 b) {
+  vec2 ab = b - a;
+  float t = clamp(dot(q - a, ab) / dot(ab, ab), 0.0, 1.0);
+  return length(q - a - ab * t);
+}
+// Distance from q (map pixels, relative to pixel p's corner) to the rivers
+// around p, and the size of the nearest one. Each river pixel draws a
+// half-segment toward every neighbour its river flows to.
+vec2 riverDist(ivec2 p, vec2 q) {
+  float best = 9.0;
+  float size = 0.0;
+  for (int cy = -1; cy <= 1; cy++) for (int cx = -1; cx <= 1; cx++) {
+    vec3 l = land3(p + ivec2(cx, cy));
+    int rc = int(l.g) >= 64 ? int(l.g) - 64 : 0;
+    if (rc == 0) continue;
+    int links = int(l.b);
+    vec2 a = vec2(cx, cy) + 0.5;
+    float d = links == 0 ? length(q - a) : 9.0;
+    for (int k = 0; k < 8; k++) {
+      if ((links & (1 << k)) == 0) continue;
+      vec2 dir = vec2(k == 0 || k == 1 || k == 7 ? 1.0 : k == 3 || k == 4 || k == 5 ? -1.0 : 0.0, k >= 1 && k <= 3 ? 1.0 : k >= 5 ? -1.0 : 0.0);
+      d = min(d, segDist(q, a, a + dir * 0.5));
+    }
+    if (d < best) { best = d; size = float(rc); }
+  }
+  return vec2(best, size);
 }
 float hash(ivec2 p) {
   uint h = uint(p.x) * 374761393u + uint(p.y) * 668265263u;
@@ -209,6 +245,18 @@ vec3 tiled(bool mini) {
     if (edge) c = mix(c, inf.rgb, 0.35);
   }
 
+  // Rivers: a winding band of water with dark banks.
+  vec2 rv = riverDist(p, m - vec2(p));
+  if (rv.y > 0.0) {
+    float w = (rv.y > 1.5 ? 0.26 : 0.17) * (mini ? 1.3 : 1.0);
+    if (rv.x < w) {
+      float ripple = step(0.82, hash(a + ivec2(int(uTime * 2.0), 0)));
+      c = mix(mix(uDepth[0], SHALLOW_BASE, 0.5), uFoam, 0.25 * ripple);
+    } else if (rv.x < w + 1.0 / art) {
+      c = mix(c, uInk, 0.45);
+    }
+  }
+
   bool other1 = (land(iR) && ownerOf(iR) != owner) || (land(iL) && ownerOf(iL) != owner) || (land(iD) && ownerOf(iD) != owner) || (land(iU) && ownerOf(iU) != owner);
   if (!land(iR) || !land(iL) || !land(iD) || !land(iU)) {
     c = uSand;
@@ -283,6 +331,9 @@ vec3 far() {
   int owner = ownerOf(id);
   bool political = uMode == 0 && owner >= 0;
   if (political) c = realmWash(c, inf.rgb);
+  // Great rivers always, the rest once zoomed in a little.
+  int rs = riverAt(p);
+  if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, uDepth[0], 0.8);
 
   // Borders: nation borders always, with an inner band of the realm's
   // colour once pixels are big enough; province borders once zoomed in.
@@ -390,14 +441,14 @@ export class MapRenderer {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, texW, texH, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
     setNearest(gl);
 
-    const terrain = new Uint8Array(texW * texH * 2);
+    const terrain = new Uint8Array(texW * texH * 3);
     for (let row = 0; row < texH; row++) {
       const start = (y + row) * this.map.width + x;
-      terrain.set(this.map.terrain.subarray(start * 2, (start + texW) * 2), row * texW * 2);
+      terrain.set(this.map.terrain.subarray(start * 3, (start + texW) * 3), row * texW * 3);
     }
     const land = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, land);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG8, texW, texH, 0, gl.RG, gl.UNSIGNED_BYTE, terrain);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB8, texW, texH, 0, gl.RGB, gl.UNSIGNED_BYTE, terrain);
     setNearest(gl);
 
     const vao = gl.createVertexArray()!;

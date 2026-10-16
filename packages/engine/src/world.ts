@@ -24,6 +24,7 @@ export interface World {
   provinceWater: Uint8Array;
   /** Land ground per province, null for sea and ocean zones. */
   provinceGround: (Ground | null)[];
+  provinceRiver: Uint8Array;
   /** Borders in compressed sparse row form: neighbors of p are adjList[adjStart[p] .. adjStart[p+1]). */
   adjStart: Int32Array;
   adjList: Int32Array;
@@ -178,6 +179,7 @@ export function createWorld(rules: Ruleset, seed: number): World {
     provinceWealth,
     provinceWater,
     provinceGround: rules.provinces.map((p) => groundOf(p.terrain)),
+    provinceRiver: Uint8Array.from(rules.provinces, (p) => (p.river ? 1 : 0)),
     adjStart,
     adjList,
     nationCount: N,
@@ -225,5 +227,5 @@ export function areNeighbors(world: World, a: number, b: number): boolean {
 
 /** The world's province graph as the march planner sees it. */
 export function marchMap(world: World): MarchMap {
-  return { adjStart: world.adjStart, adjList: world.adjList, ground: world.provinceGround, population: world.provincePopulation };
+  return { adjStart: world.adjStart, adjList: world.adjList, ground: world.provinceGround, population: world.provincePopulation, river: world.provinceRiver };
 }

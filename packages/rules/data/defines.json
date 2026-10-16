@@ -48,6 +48,7 @@
     },
     "horseSpeedBonus": 0.5,
     "bigArmyExtraCrossings": 1,
+    "riverCrossingDays": 1,
     "rationsPerSoldier": 2,
     "rationsPerHorse": 3,
     "rationsStoredPerPerson": 0.5,

@@ -7,7 +7,10 @@ export interface MapImage {
   rgba: Uint8ClampedArray;
   /** Province index per pixel, -1 for water. Used for tapping. */
   ids: Int32Array;
-  /** Two bytes per pixel: terrain index (TERRAINS order) on land, and water depth band + 1 (0 on land). */
+  /**
+   * Three bytes per pixel: terrain index (TERRAINS order); water depth band + 1,
+   * or 64 + river size on land; river links (one bit per neighbour).
+   */
   terrain: Uint8Array;
 }
 
@@ -35,10 +38,11 @@ export async function loadMapImage(map: MapInfo, provinceCount: number): Promise
     if (v > provinceCount) throw new Error(`map image decoded wrongly at pixel ${p} (value ${v})`);
     ids[p] = v - 1;
   }
-  const terrain = new Uint8Array(ids.length * 2);
+  const terrain = new Uint8Array(ids.length * 3);
   for (let p = 0; p < ids.length; p++) {
-    terrain[p * 2] = terrainRgba[p * 4]!;
-    terrain[p * 2 + 1] = terrainRgba[p * 4 + 1]!;
+    terrain[p * 3] = terrainRgba[p * 4]!;
+    terrain[p * 3 + 1] = terrainRgba[p * 4 + 1]!;
+    terrain[p * 3 + 2] = terrainRgba[p * 4 + 2]!;
   }
   return { width: map.width, height: map.height, rgba: data, ids, terrain };
 }

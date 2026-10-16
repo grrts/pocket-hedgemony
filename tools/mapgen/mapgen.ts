@@ -60,6 +60,7 @@ const admin1 = await loadNe("ne_10m_admin_1_states_provinces");
 const lakes = await loadNe("ne_10m_lakes");
 const geoRegions = await loadNe("ne_10m_geography_regions_polys");
 const marine = await loadNe("ne_10m_geography_marine_polys");
+const rivers = await loadNe("ne_10m_rivers_lake_centerlines");
 const bathymetry = await Promise.all(DEPTH_LAYERS.map((l) => loadNe(`ne_10m_bathymetry_${l}`)));
 const climate = await loadClimate(cacheDir);
 
@@ -251,6 +252,13 @@ const order = [...Array(P).keys()].sort((a, b) => Math.floor(s.cy[a] / 64) - Mat
 const newIndex = new Int32Array(P);
 order.forEach((old, i) => (newIndex[old] = i));
 
+/** Neighbour directions, in the bit order of the river links. */
+const DIRS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]] as const;
+// Provinces a river runs through (warfare design 5.2: crossing one costs time).
+const riverMap = riverPixels();
+const riverCount = new Int32Array(P);
+for (let p = 0; p < label.length; p++) if (riverMap.size[p] && label[p]! >= 0) riverCount[label[p]!]!++;
+
 const provinces = order.map((old) => {
   const props = features[s.feature[old]].properties;
   const lat = latOf(s.cy[old]);
@@ -270,6 +278,7 @@ const provinces = order.map((old) => {
     y: Math.round(s.cy[old]),
     size: s.size[old] as number,
     coastal: !!coastal[old],
+    ...(riverCount[old]! >= 3 ? { river: true } : {}),
     terrain,
     neighbors: [...neighborSets[old]!].map((n) => `p${newIndex[n]}`).sort(),
   };
@@ -401,16 +410,103 @@ writeFileSync(
 writeFileSync(join(dataDir, "provinces.json"), "[\n" + [...world.provinces, ...seaProvinces].map((p) => JSON.stringify(p)).join(",\n") + "\n]\n");
 writeFileSync(join(dataDir, "nations.json"), JSON.stringify(world.nations, null, 2) + "\n");
 
-/** Close-zoom terrain in R; for water, G is 1 + the depth band (0-4, see DEPTH_LAYERS). */
+/**
+ * Rivers from Natural Earth's centre lines, as thin 8-connected paths on land.
+ * size: 2 for the great rivers (scale rank 0-4), 1 for the rest down to rank 8.
+ * links: one bit per neighbour the river flows to (DIRS order), so the map
+ * draws each river as the line it is instead of joining every river pixel
+ * that happens to touch another.
+ */
+function riverPixels(): { size: Uint8Array; links: Uint8Array } {
+  const size = new Uint8Array(W * H);
+  const links = new Uint8Array(W * H);
+  const isLand = (x: number, y: number) => y >= 0 && y < H && label[y * W + (((x % W) + W) % W)]! >= 0;
+  const at = (x: number, y: number) => y * W + (((x % W) + W) % W);
+  const link = (x0: number, y0: number, x1: number, y1: number) => {
+    const k = DIRS.findIndex(([dx, dy]) => dx === x1 - x0 && dy === y1 - y0);
+    if (k < 0) return;
+    if (isLand(x0, y0)) links[at(x0, y0)]! |= 1 << k;
+    if (isLand(x1, y1)) links[at(x1, y1)]! |= 1 << ((k + 4) % 8);
+  };
+  const line = (coords: number[][], s: number) => {
+    // Drop bends smaller than a couple of pixels: at 7 km a pixel they only tangle.
+    const pts: [number, number][] = [];
+    for (const [lon, lat] of coords) {
+      const x = (lon! + 180) * grid.pxPerDeg;
+      const y = (grid.latTop - lat!) * grid.pxPerDeg;
+      const last = pts.at(-1);
+      if (!last || Math.hypot(x - last[0], y - last[1]) >= 2) pts.push([x, y]);
+    }
+    const end = coords.at(-1)!;
+    pts.push([(end[0]! + 180) * grid.pxPerDeg, (grid.latTop - end[1]!) * grid.pxPerDeg]);
+    let px = Number.NaN;
+    let py = Number.NaN;
+    for (let i = 1; i < pts.length; i++) {
+      let x0 = Math.floor(pts[i - 1]![0]);
+      let y0 = Math.floor(pts[i - 1]![1]);
+      const x1 = Math.floor(pts[i]![0]);
+      const y1 = Math.floor(pts[i]![1]);
+      const dx = Math.abs(x1 - x0);
+      const dy = -Math.abs(y1 - y0);
+      const sx = x0 < x1 ? 1 : -1;
+      const sy = y0 < y1 ? 1 : -1;
+      let err = dx + dy;
+      for (;;) {
+        if (x0 !== px || y0 !== py) {
+          if (isLand(x0, y0)) size[at(x0, y0)] = Math.max(size[at(x0, y0)]!, s);
+          if (!Number.isNaN(px) && (isLand(x0, y0) || isLand(px, py))) link(px, py, x0, y0);
+          px = x0;
+          py = y0;
+        }
+        if (x0 === x1 && y0 === y1) break;
+        const e2 = 2 * err;
+        if (e2 >= dy) ((err += dy), (x0 += sx));
+        if (e2 <= dx) ((err += dx), (y0 += sy));
+      }
+    }
+  };
+  for (const f of rivers.features) {
+    const rank = f.properties.scalerank as number;
+    if (rank > 8) continue;
+    const s = rank <= 4 ? 2 : 1;
+    const g = f.geometry;
+    if (g?.type === "LineString") line(g.coordinates, s);
+    else if (g?.type === "MultiLineString") for (const c of g.coordinates) line(c, s);
+  }
+  // A link into water is a mouth; links between river pixels need both ends.
+  for (let p = 0; p < W * H; p++) {
+    if (!size[p]) links[p] = 0;
+    else {
+      const x = p % W;
+      const y = (p - x) / W;
+      DIRS.forEach(([dx, dy], k) => {
+        if (links[p]! & (1 << k) && isLand(x + dx, y + dy) && !size[at(x + dx, y + dy)]) links[p]! &= ~(1 << k);
+      });
+    }
+  }
+  return { size, links };
+}
+
+/**
+ * Close-zoom terrain in R. G: for water, 1 + the depth band (0-4, see
+ * DEPTH_LAYERS); for land, 0, or 64 + the river size where a river runs.
+ * B: the river's links to its neighbours (see riverPixels).
+ */
 function detailTerrain(): Uint8Array {
   const depth = new Uint8Array(W * H);
   bathymetry.forEach((layer, i) => {
     for (const f of layer.features) rasterize(grid, f.geometry, (x, y) => (depth[y * W + x] = i + 1));
   });
+  const river = riverMap;
   const out = new Uint8Array(W * H * 3);
   for (let p = 0; p < W * H; p++) {
-    if (label[p]! >= 0) out[p * 3] = terrain.detail[p]!;
-    else out[p * 3 + 1] = depth[p]! + 1; // 0 marks land
+    if (label[p]! >= 0) {
+      out[p * 3] = terrain.detail[p]!;
+      if (river.size[p]) {
+        out[p * 3 + 1] = 64 + river.size[p]!;
+        out[p * 3 + 2] = river.links[p]!;
+      }
+    } else out[p * 3 + 1] = depth[p]! + 1;
   }
   return out;
 }

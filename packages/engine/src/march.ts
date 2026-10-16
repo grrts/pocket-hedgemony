@@ -11,6 +11,8 @@ export interface MarchMap {
   ground: (Ground | null)[];
   /** Thousands of people per province. */
   population: ArrayLike<number>;
+  /** 1 where a river runs through the province. */
+  river: ArrayLike<number>;
 }
 
 export interface MarchingArmy {
@@ -43,7 +45,7 @@ export function forageLimit(d: MarchDefines, map: MarchMap, p: number): number {
 /**
  * Days to march from one province into its neighbour: half the crossing of
  * each ground, slower for a column bigger than the land ahead can feed,
- * faster the larger the share of horse.
+ * faster the larger the share of horse, plus a day to cross a river.
  */
 export function stepDays(d: MarchDefines, map: MarchMap, from: number, to: number, a: MarchingArmy): number {
   const gf = map.ground[from];
@@ -52,7 +54,7 @@ export function stepDays(d: MarchDefines, map: MarchMap, from: number, to: numbe
   let crossings = (d.daysToCross[gf] + d.daysToCross[gt]) / 2;
   if (a.men > forageLimit(d, map, to)) crossings += d.bigArmyExtraCrossings;
   const horseShare = a.men > 0 ? Math.min(1, a.horse / a.men) : 0;
-  return (crossings * d.daysPerCrossing) / (1 + d.horseSpeedBonus * horseShare);
+  return (crossings * d.daysPerCrossing) / (1 + d.horseSpeedBonus * horseShare) + (map.river[to] ? d.riverCrossingDays : 0);
 }
 
 export interface Route {
