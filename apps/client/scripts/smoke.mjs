@@ -12,7 +12,7 @@ const browser = await chromium.launch({ args: ["--use-angle=swiftshader", "--ena
 let failed = false;
 
 async function check(name, expectedMode, setup) {
-  const context = await browser.newContext({ ...devices["Pixel 7"] });
+  const context = await browser.newContext({ ...devices["Pixel 7 landscape"] });
   const page = await context.newPage();
   await setup?.(page);
   await page.goto(base);

@@ -24,6 +24,7 @@ pnpm bench          # turn timing on a synthetic 5k and 20k province world
 pnpm desktop        # build the client and open it in Electron
 
 cd apps/mobile && pnpm sync && npx cap add android   # then: npx cap open android (needs Android Studio)
+# phones play in landscape: `pnpm sync` patches the generated Android and iOS projects to lock it
 
 cd server && composer install
 php bin/console doctrine:schema:update --force   # SQLite in var/ for local dev

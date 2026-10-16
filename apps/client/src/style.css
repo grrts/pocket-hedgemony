@@ -474,3 +474,122 @@ button.icon-only {
   margin-top: 8px;
 }
 
+
+/* ---- Realm links: the top bar's realm name and flags in panels ---- */
+
+.hud button.realm,
+button.realm-link {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-image: none;
+  justify-content: flex-start;
+  text-shadow: none;
+}
+
+.hud button.realm b {
+  text-decoration: underline dotted 2px;
+  text-underline-offset: 4px;
+}
+
+button.realm-link {
+  gap: 6px;
+  color: var(--ink);
+}
+
+button.realm-link b {
+  text-decoration: underline dotted 2px;
+  text-underline-offset: 3px;
+}
+
+/* ---- Country overview ---- */
+
+.realm-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+
+.realm-card .banner {
+  flex: none;
+  padding: 4px;
+  background: var(--ui-parchment-dark) 0 0 / 64px;
+  border: 2px solid var(--outline);
+}
+
+.realm-card p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+button.capital {
+  min-height: 32px;
+  padding: 0 4px;
+  border-width: 4px;
+  border-image-width: 4px;
+  font-size: 15px;
+}
+
+.facts small {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.panel .sub {
+  margin: 12px 0 4px;
+  font: 600 15px/1 var(--body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.panel .back {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ---- Landscape only ----
+ * Phones play sideways. The installed apps lock the orientation; in a
+ * browser held upright this notice covers the game until it is turned.
+ */
+
+.rotate {
+  display: none;
+}
+
+@media (orientation: portrait) and (pointer: coarse) {
+  .rotate {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: var(--sea);
+  }
+
+  .rotate .framed {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+
+  .rotate .px-icon {
+    animation: tilt 2.4s steps(2, jump-none) infinite;
+  }
+}
+
+@keyframes tilt {
+  0%,
+  45% {
+    transform: rotate(0deg);
+  }
+  55%,
+  100% {
+    transform: rotate(90deg);
+  }
+}

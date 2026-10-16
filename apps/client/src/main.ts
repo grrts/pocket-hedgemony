@@ -47,6 +47,8 @@ let pendingOrders: Order[] = [];
 let busy = false;
 /** The panel is folded away behind a tool button so the map gets the screen. */
 let panelCollapsed = false;
+/** Nation whose country overview is open, or -1. */
+let realmView = -1;
 
 // ---- DOM ----
 installUiArt();
@@ -60,12 +62,24 @@ app.innerHTML = `
     <button class="icon-only" id="reopen" title="Show the panel" hidden></button>
   </div>
   <section class="panel framed" id="panel" hidden></section>
+  <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
   <button class="wax fab end-turn" id="fab" title="End turn" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const panel = document.querySelector<HTMLElement>("#panel")!;
 const fab = document.querySelector<HTMLButtonElement>("#fab")!;
 const reopen = document.querySelector<HTMLButtonElement>("#reopen")!;
 fab.addEventListener("click", () => void endTurn());
+// Phones play in landscape. Browsers only allow the lock in some cases
+// (an installed app, fullscreen); otherwise the rotate notice asks for it.
+void (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }).lock?.("landscape").catch(() => {});
+// Country overview: any [data-realm] button opens it, wherever it sits.
+document.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-realm]");
+  if (!b) return;
+  realmView = Number(b.dataset.realm);
+  panelCollapsed = false;
+  renderPanel();
+});
 reopen.addEventListener("click", () => {
   panelCollapsed = false;
   renderPanel();
@@ -288,6 +302,7 @@ function onTap(sx: number, sy: number, province: number): void {
     selectedProvince = province;
     panelCollapsed = false;
   }
+  realmView = -1;
   restyleProvinces();
   renderPanel();
   renderActions();
@@ -299,6 +314,7 @@ function pickArmy(id: number): void {
   const loc = snapshot.armies.location[armySlot(id)]!;
   selectedArmy = id;
   selectedProvince = loc;
+  realmView = -1;
   panelCollapsed = true;
   view.lookAt(provinces[loc]!.x!, provinces[loc]!.y!, Math.max(view.camera.zoom, 5));
   restyleProvinces();
@@ -324,7 +340,7 @@ function renderHud(): void {
   const n = nations[me]!;
   const inc = s.nationMonthlyIncome[me]!;
   hud.innerHTML = `
-    <div class="realm">${pennant(n.color, 2)}<b>${esc(n.name)}</b></div>
+    <button class="realm" data-realm="${me}" title="Your realm">${pennant(n.color, 2)}<b>${esc(n.name)}</b></button>
     <span class="plaque turn-label" title="Date">${MONTHS[s.date.month - 1]} ${s.date.year}</span>
     <span class="plaque" title="Treasury: gold, and change per month">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></span>
     <span class="plaque" title="Levies: men ready to raise">${icon("swords", 1)}${fmt(s.nationLevies[me]! / 1000)}k</span>`;
@@ -360,6 +376,10 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
 }
 
 function renderPanel(): void {
+  if (realmView >= 0) {
+    renderRealm(realmView);
+    return;
+  }
   if (!snapshot && selectedProvince < 0) {
     panel.innerHTML = `
       <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button></span></header>
@@ -398,7 +418,7 @@ function renderPanel(): void {
   const armiesHere = snapshot ? [...snapshot.armies.id.keys()].filter((k) => snapshot!.armies.location[k] === selectedProvince) : [];
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
-    <p class="owner">${owner ? `${pennant(owner.color)}<b>${esc(owner.name)}</b>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.coastal ? " · coast" : ""}</p>
+    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner.color, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.coastal ? " · coast" : ""}</p>
     <dl class="facts">
       <dt>People</dt><dd>${fmt(p.population * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
@@ -429,8 +449,68 @@ function renderPanel(): void {
   bindNationButtons();
 }
 
+/** Country overview: the realm's lands, people, purse and commanders. */
+function renderRealm(r: number): void {
+  const n = nations[r]!;
+  const s = snapshot;
+  const own: number[] = [];
+  owners.forEach((o, i) => o === r && own.push(i));
+  const people = own.reduce((t, i) => t + provinces[i]!.population, 0) * 1000;
+  const wealth = own.reduce((t, i) => t + provinces[i]!.wealth, 0);
+  const lands = new Map<string, number>();
+  for (const i of own) lands.set(provinces[i]!.terrain, (lands.get(provinces[i]!.terrain) ?? 0) + 1);
+  const topLands = [...lands].sort((a, b) => b[1] - a[1]).slice(0, 4);
+  const neighbours = new Set<number>();
+  for (const i of own) for (const j of neighborIdx[i]!) if (owners[j]! >= 0 && owners[j] !== r) neighbours.add(owners[j]!);
+  const capIdx = provinceIndex.get(n.capital)!;
+  const armies = s ? [...s.armies.id.keys()].filter((k) => s.armies.owner[k] === r) : [];
+  const men = armies.reduce((t, k) => t + s!.armies.men[k]!, 0);
+  const inc = s ? s.nationMonthlyIncome[r]! : 0;
+  const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
+    <div class="realm-card">
+      <img class="banner" src="${pennantUrl(n.color, 6)}" alt="">
+      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}<br>
+      Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
+    </div>
+    <dl class="facts">
+      <dt>People</dt><dd>${fmt(people)}</dd>
+      <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
+      ${s ? `<dt>Treasury</dt><dd>${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></dd>
+      <dt>Levies</dt><dd>${fmt(s.nationLevies[r]!)} men ready</dd>
+      <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>` : ""}
+      <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
+    </dl>
+    ${n.commanders.length ? `<h3 class="sub">Commanders</h3>${n.commanders
+      .map((c) => `<div class="army"><img class="portrait" src="${sprite("commander", n.color, 2).toDataURL()}" alt=""><span class="who"><b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
+      .join("")}` : ""}
+    ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
+      .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!.color)}${esc(nations[j]!.name)}</button>`)
+      .join("")}</div>` : ""}
+    ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}
+    ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}`;
+  bindClose();
+  showPanel(true);
+  panel.querySelector("[data-go]")?.addEventListener("click", () => {
+    realmView = -1;
+    selectedProvince = capIdx;
+    panelCollapsed = true;
+    const c = provinces[capIdx]!;
+    view.lookAt(c.x!, c.y!, Math.max(view.camera.zoom, 4));
+    restyleProvinces();
+    renderPanel();
+  });
+  panel.querySelector("[data-back]")?.addEventListener("click", () => {
+    realmView = -1;
+    renderPanel();
+  });
+  bindNationButtons();
+}
+
 function bindClose(): void {
   panel.querySelector(".close")!.addEventListener("click", () => {
+    realmView = -1;
     selectedProvince = -1;
     selectedArmy = -1;
     restyleProvinces();

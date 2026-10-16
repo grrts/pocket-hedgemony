@@ -14,7 +14,7 @@ const VIEWS = {
 };
 const server = await preview({ preview: { port: 4174, strictPort: true } });
 const browser = await chromium.launch({ args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
-const page = await browser.newPage({ ...devices["Pixel 7"] });
+const page = await browser.newPage({ ...devices["Pixel 7 landscape"] });
 page.on("console", (m) => m.type() === "error" && console.log("console:", m.text()));
 page.on("pageerror", (e) => console.log("pageerror:", e.message));
 const open = async (query = "") => {
