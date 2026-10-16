@@ -112,6 +112,8 @@ export interface ProvinceDef {
   coastal?: boolean;
   /** A river runs through it. */
   river?: boolean;
+  /** Walls: a stone castle or an earthwork ring fort (warfare design 8.1); none when absent. */
+  castle?: "castle" | "fort";
 }
 
 /** Size and projection of the world map image (equirectangular). */

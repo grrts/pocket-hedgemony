@@ -67,6 +67,54 @@ export const SPRITES = {
     ".keeeebemmek.",
     "EEEEEEEEEEEEE",
   ],
+  /** Village: a single cottage with a smoke-pole, roofed in the realm's colour. */
+  village: [
+    "....k....",
+    "...kLk.t.",
+    "..kLNnkt.",
+    ".kLNNNnk.",
+    "kLNNNNNnk",
+    ".kbbbbbk.",
+    ".kcwbmck.",
+    ".kecbmek.",
+    "EEEEEEEEE",
+  ],
+  /** City: a church spire among houses roofed in the realm's colour. */
+  city: [
+    "..........y..........",
+    ".........kck.........",
+    ".........kck.........",
+    "........kcwck........",
+    "...k....kcmck.....k..",
+    "..kLk...kcmck....kLk.",
+    ".kLNnk.kNNNNnk..kLNnk",
+    "kLNNNnkLNNNNNnkkLNNNn",
+    ".kbbbkkcccccccekkbbbk",
+    ".kcwck.cwcmmcwe.kcwck",
+    ".kcmck.cccmmcce.kcmck",
+    ".kemek.eccmmcee.kemek",
+    "EEEEEEEEEEEEEEEEEEEEE",
+  ],
+  /** Castle: a stone tower standing beside the settlement. */
+  tower: [
+    "c.c.e",
+    "cccce",
+    "ccmce",
+    "ccmce",
+    "cccce",
+    "ccece",
+    "cecce",
+    "ccmce",
+    "ecmee",
+    "EEEEE",
+  ],
+  /** Fort: an earthwork ring with a palisade of stakes in front of the settlement. */
+  palisade: [
+    "t.t.t.t.t.t.t.t.t.t.t",
+    "ttttttttttttttttttttt",
+    "tbtbtbtbtbtbtbtbtbtbt",
+    "ooooooooooooooooooooo",
+  ],
   /** Commander: a knight on a barded horse, lance pennant, plume and caparison in the realm's colour. */
   commander: [
     "..y........NL.........",

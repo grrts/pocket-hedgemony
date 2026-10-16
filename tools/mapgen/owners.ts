@@ -130,6 +130,19 @@ export function assignOwners(
     // Spread each province a little so neighbours differ.
     const population = Math.max(1, Math.round((km2 * density * (0.7 + 0.6 * hash(p.id + "pop"))) / 1000));
     wealth = Math.min(10, Math.max(1, Math.round(wealth * (0.75 + 0.5 * hash(p.id + "w")))));
+    // Walls in 1444 (warfare design 8.1: earthwork ring fort or stone castle).
+    // A placeholder until the province data names real castles: capitals and
+    // big towns are walled in stone, frontiers in stone on high ground or
+    // where many live and in earth elsewhere, and a few quiet inland places
+    // keep an old ring fort.
+    const frontier = o !== null && p.neighbors.some((nb) => owner.has(nb) && owner.get(nb) !== o);
+    const high = p.terrain === "hills" || p.terrain === "mountains";
+    const castle: "castle" | "fort" | null =
+      o === null ? null
+      : isCapital || population >= 400 ? "castle"
+      : frontier ? ((high && population >= 30) || population >= 200 ? "castle" : "fort")
+      : hash(p.id + "fort") < 0.15 ? "fort"
+      : null;
     return {
       id: p.id,
       name: p.name,
@@ -141,6 +154,7 @@ export function assignOwners(
       y: p.y,
       coastal: p.coastal,
       ...(p.river ? { river: true } : {}),
+      ...(castle ? { castle } : {}),
       neighbors: p.neighbors,
     };
   });

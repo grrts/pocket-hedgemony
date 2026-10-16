@@ -184,15 +184,29 @@ function drawOverlay(o: OverlayContext): void {
   const onScreen = (sx: number, sy: number, pad = 40) => sx > -pad && sy > -pad && sx < o.width + pad && sy < o.height + pad;
   const spriteScale = zoom >= 8 ? 4 : zoom >= 4 ? 3 : zoom >= 2 ? 2 : 1;
 
-  // Towns, then capitals.
+  // One settlement per province, sized by its people, with its walls:
+  // a stone tower for a castle, a palisade for a fort. Capitals come after.
   if (zoom >= 3) {
+    const sc = Math.max(1, spriteScale - 2);
     provinces.forEach((p, i) => {
       const own = owners[i]!;
       if (own < 0 || nations[own]!.capital === p.id) return;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) return;
-      const img = sprite("town", nations[own]!.color, Math.max(1, spriteScale - 2));
-      ctx.drawImage(img, Math.round(sx - img.width / 2), Math.round(sy - img.height / 2));
+      const color = nations[own]!.color;
+      const img = sprite(settlementOf(p.population), color, sc);
+      const x = Math.round(sx - img.width / 2);
+      const y = Math.round(sy - img.height / 2);
+      if (p.castle === "castle") {
+        const t = sprite("tower", color, sc);
+        ctx.drawImage(t, x - t.width + 3 * sc, y + img.height - t.height);
+      }
+      ctx.drawImage(img, x, y);
+      if (p.castle === "fort") {
+        const f = sprite("palisade", color, sc);
+        const w = Math.min(f.width, img.width + 2 * sc);
+        ctx.drawImage(f, 0, 0, w, f.height, x - sc, y + img.height - f.height + 2 * sc, w, f.height);
+      }
     });
   }
   if (zoom >= 1.1) {
@@ -322,6 +336,14 @@ function marchPosition(k: number): [number, number] {
 }
 
 let armyHitBoxes: { id: number; x: number; y: number; w: number; h: number }[] = [];
+
+/** Settlement drawn for a province by its people (thousands). */
+function settlementOf(population: number): "village" | "town" | "city" {
+  return population >= 200 ? "city" : population >= 25 ? "town" : "village";
+}
+
+const SETTLEMENT_NAMES = { village: "Village", town: "Town", city: "City" };
+const WALL_NAMES = { castle: "Stone castle", fort: "Earthwork ring fort" };
 
 function pixelText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, water = false): void {
   ctx.font = `600 ${size + 2}px "Pixelify Sans", "Courier New", monospace`;
@@ -520,6 +542,8 @@ function renderPanel(): void {
     <dl class="facts">
       <dt>People</dt><dd>${fmt(p.population * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
+      <dt>Seat</dt><dd>${owner && owner.capital === p.id ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)]}</dd>
+      <dt>Walls</dt><dd>${owner && owner.capital === p.id ? WALL_NAMES.castle : p.castle ? WALL_NAMES[p.castle] : "None"}</dd>
     </dl>
     ${armiesHere
       .map((k) => {
