@@ -70,9 +70,11 @@ export class MapView {
     const frame = (t: number) => {
       // Waves and the selection blink only need a few frames a second.
       if (this.dirty || t - this.lastAnim > 200) {
-        this.render(t);
-        this.lastAnim = t;
+        // Cleared before drawing, so a drawOverlay that is still animating
+        // (marching armies) can ask for the very next frame.
         this.dirty = false;
+        this.lastAnim = t;
+        this.render(t);
       }
       requestAnimationFrame(frame);
     };

@@ -18,6 +18,7 @@ a frame for everything.
 | Overlay a frame (labels, towns, armies, routes) | ≤ 2.5 ms average, ≤ 5 ms p95 | perf |
 | Map shading | 1 pixel per CSS pixel, never device pixels | code (`MAP_PIXEL_RATIO` in mapView.ts) |
 | Longest main-thread task while playing | ≤ 50 ms | perf |
+| Frames redrawn while something animates (marching armies) | ≥ 90 % | perf |
 
 Rules that keep it there:
 
@@ -72,4 +73,6 @@ Dragging an army plans a route each time the target changes.
   every panel render).
 - Worker answer: about 50 ms.
 - Engine turn: 0.2 ms at 5,000 provinces, 0.4 ms at 20,000.
+- Animation: every frame (was one in five, so marching armies moved at
+  5 fps: the redraw request made while drawing was wiped right after).
 - Route: about 4 ms at 5,000 and 20,000 provinces (was about 8 ms).

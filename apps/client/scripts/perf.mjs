@@ -29,8 +29,8 @@ const pan = (zoom) =>
         let n = 0;
         const step = () => {
           if (n === 5) ((map.stats.mapMs.length = 0), (map.stats.overlayMs.length = 0));
-          map.lookAt(start.x + n * (6 / zoom), start.y, zoom);
-          if (++n < 65) requestAnimationFrame(step);
+          map.lookAt(start.x + n * (2 / zoom), start.y, zoom);
+          if (++n < 205) requestAnimationFrame(step);
           else requestAnimationFrame(() => done({ map: [...map.stats.mapMs], overlay: [...map.stats.overlayMs] }));
         };
         requestAnimationFrame(step);
@@ -58,6 +58,25 @@ for (const zoom of [1.2, 2.5, 4, 6, 10]) {
   if (!ok) failed = true;
   console.log(`${ok ? "PASS" : "FAIL"} zoom ${zoom}: overlay ${o.avg.toFixed(2)} ms avg, ${o.p95.toFixed(2)} ms p95 (budget ${OVERLAY_AVG_MS} / ${OVERLAY_P95_MS}) · map ${m.avg.toFixed(1)} ms avg on the software GPU`);
 }
+
+// Animation: an overlay that keeps asking for frames (marching armies) must
+// get every one of them, not the 5 a second the idle map redraws at.
+const animFrames = await page.evaluate(
+  () =>
+    new Promise((done) => {
+      const map = globalThis.__phMap;
+      const draw = map.events.drawOverlay;
+      map.events.drawOverlay = (o) => (draw(o), map.invalidate());
+      map.invalidate();
+      const f0 = map.stats.frames;
+      const r0 = { n: 0 };
+      const count = () => (++r0.n < 60 ? requestAnimationFrame(count) : (map.events.drawOverlay = draw, done((map.stats.frames - f0) / r0.n)));
+      requestAnimationFrame(count);
+    }),
+);
+const ANIM_SHARE = 0.9;
+if (animFrames < ANIM_SHARE) failed = true;
+console.log(`${animFrames >= ANIM_SHARE ? "PASS" : "FAIL"} animating overlay redrawn on ${(animFrames * 100).toFixed(0)}% of frames (budget ${ANIM_SHARE * 100}%)`);
 
 // Ending turns: the engine worker's answer, then applying it on the main thread.
 for (let i = 0; i < 3; i++) {
