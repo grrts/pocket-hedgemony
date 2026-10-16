@@ -235,7 +235,7 @@ vec3 tiled(bool mini) {
 
 // Rough height of a terrain, for hill shading on the far map.
 float height(int t) {
-  return t == ${T.mountains} || t == ${T.badlands} ? 2.0 : t == ${T.highlands} ? 1.6 : t == ${T.hills} ? 0.8 : 0.0;
+  return t == ${T.mountains} || t == ${T.badlands} || t == ${T.snowpeaks} ? 2.0 : t == ${T.highlands} ? 1.6 : t == ${T.hills} ? 0.8 : 0.0;
 }
 
 vec3 far() {
@@ -267,11 +267,11 @@ vec3 far() {
   // Texture: a few darker pixels in fixed patterns, like old tile sets.
   float h = hash(p);
   float shade = h > 0.95 ? 0.92 : 1.0;
-  if (t == ${T.forest} || t == ${T.jungle} || t == ${T.highlands}) shade = (p.x + p.y) % 3 == 0 && h > 0.4 ? 0.82 : 1.0;
-  else if (t == ${T.farmland}) shade = p.y % 2 == 0 ? 0.9 : 1.0;
+  if (t == ${T.forest} || t == ${T.jungle} || t == ${T.highlands} || t == ${T.broadleaf} || t == ${T.swamp}) shade = (p.x + p.y) % 3 == 0 && h > 0.4 ? 0.82 : 1.0;
+  else if (t == ${T.farmland} || t == ${T.paddies}) shade = p.y % 2 == 0 ? 0.9 : 1.0;
   else if (t == ${T.marsh}) shade = p.y % 2 == 0 && h > 0.6 ? 0.82 : 1.0;
   else if (t == ${T.savanna}) shade = h > 0.88 ? 0.8 : 1.0;
-  else if (t == ${T.desert}) shade = (p.x + 2 * p.y) % 5 == 0 && h > 0.5 ? 0.9 : 1.0;
+  else if (t == ${T.desert} || t == ${T.dunes}) shade = (p.x + 2 * p.y) % 5 == 0 && h > 0.5 ? 0.9 : 1.0;
   c *= shade;
 
   // Hill shading, lit from the north-west: slopes rising to the south-east

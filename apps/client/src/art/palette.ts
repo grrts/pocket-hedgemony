@@ -37,6 +37,7 @@ export const PALETTE = {
 export const TERRAINS = [
   "grassland", "farmland", "hills", "mountains", "drylands", "marsh", "forest", "desert", "tundra", "jungle",
   "savanna", "glacier", "badlands", "highlands",
+  "snowpeaks", "broadleaf", "mediterranean", "steppe", "dunes", "colddesert", "swamp", "paddies",
 ] as const;
 
 export const TERRAIN_COLORS: Record<(typeof TERRAINS)[number], string> = {
@@ -54,6 +55,24 @@ export const TERRAIN_COLORS: Record<(typeof TERRAINS)[number], string> = {
   glacier: "#e8f0fc",
   badlands: "#b0583a",
   highlands: "#3f7a44",
+  snowpeaks: "#dfe6f2",
+  broadleaf: "#3a7a3a",
+  mediterranean: "#a8a45a",
+  steppe: "#c4c278",
+  dunes: "#eab060",
+  colddesert: "#a89a84",
+  swamp: "#3e5a3a",
+  paddies: "#6ec060",
+};
+
+/** Tile types by landscape, for the art page and docs/terrain.md. */
+export const TERRAIN_CATEGORIES: Record<string, readonly (typeof TERRAINS)[number][]> = {
+  "Temperate": ["grassland", "farmland", "broadleaf", "mediterranean", "paddies"],
+  "Boreal and polar": ["forest", "tundra", "glacier"],
+  "Dry lands": ["steppe", "drylands", "desert", "dunes", "colddesert"],
+  "Tropical": ["savanna", "jungle"],
+  "Wetlands": ["marsh", "swamp"],
+  "Hills and mountains": ["hills", "mountains", "snowpeaks", "badlands", "highlands"],
 };
 
 /** Ocean colour by depth band: shelf, slope, deep, abyss, trench. */

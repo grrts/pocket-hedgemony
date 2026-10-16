@@ -57,7 +57,7 @@ class Painter {
     for (let y = top; y <= baseY; y++) {
       const t = (y - top) / height;
       const w = Math.round(halfW * t);
-      const snow = t < 0.38 + this.rand() * 0.08;
+      const snow = t < (c.capLine ?? 0.38) + this.rand() * 0.08;
       for (let dx = -w; dx <= w; dx++) {
         const edge = Math.abs(dx) === w || y === baseY;
         const lit = dx < 0 || (dx === 0 && y % 2 === 0);
@@ -99,9 +99,13 @@ interface PeakColors {
   cap: string | null;
   capShade: string | null;
   strata?: string;
+  /** How far down the peak the snow reaches, 0-1. */
+  capLine?: number;
 }
 /** Temperate and alpine ranges: grey rock, snow caps. */
 const GREY_PEAK: PeakColors = { outline: "#4a4552", lit: "#b5aebb", shade: "#77707e", ridge: "#9a94a0", cap: "#f4f4f4", capShade: "#cbdbfc" };
+/** High alpine and polar ranges: snow most of the way down. */
+const SNOW_PEAK: PeakColors = { outline: "#3e4a62", lit: "#9aa4b4", shade: "#5e6878", ridge: "#c4ccd8", cap: "#ffffff", capShade: "#b8c8e8", capLine: 0.72 };
 /** Desert ranges (Atlas, Zagros, the dry Andes): red and ochre rock, banded. */
 const RED_PEAK: PeakColors = { outline: "#5a2a1c", lit: "#d8885a", shade: "#9a4a30", ridge: "#e8a878", cap: null, capShade: null, strata: "#c06a44" };
 /** Tropical ranges: green, forested slopes, no snow. */
@@ -123,9 +127,26 @@ const WAVE = [".ww.", "w..w"];
 const SPARK = ["f"];
 const ACACIA = [".llggg.", "lggggdd", "..t.t..", "...t...", "...t..."];
 const CREVASSE = ["d...", ".dd.", "...d"];
+const OLIVE = [".lg.", "lggd", ".gd.", ".t.."];
+const CYPRESS = [".g.", "lgd", "lgd", "lgd", ".t."];
+const OAK = ["..lgg..", ".llggd.", "lgggggd", "lggggdd", ".gdddd.", "...t...", "...t..."];
+const STONES = ["s.", ".s"];
+const MANGROVE = [".lgg.", "lgggd", ".ddd.", "t.t.t"];
 const MESA = ["..llllll..", ".lllllldd.", ".sssssssd.", "lllllllddd", "ssssssssdd"];
 
 type Paint = (p: Painter) => void;
+
+/**
+ * A range of overlapping peaks covering the whole 32 × 32 picture (it wraps,
+ * so neighbouring blocks join up): no gaps of flat ground inside a range.
+ */
+function rangeOf(p: Painter, c: PeakColors): void {
+  const peaks: [number, number, number, number][] = [
+    [5, 9, 7, 10], [19, 12, 9, 13], [30, 6, 6, 9], [12, 21, 8, 11], [27, 22, 8, 12],
+    [4, 30, 8, 11], [19, 32, 9, 12], [31, 31, 6, 8],
+  ];
+  for (const [x, y, w, h] of peaks) p.peak(x + Math.floor(p.rand() * 3) - 1, y, w, h + Math.floor(p.rand() * 3) - 1, c);
+}
 
 const PAINT: Record<(typeof TERRAINS)[number] | "sea" | "shallow", Paint> = {
   grassland: (p) => {
@@ -176,15 +197,16 @@ const PAINT: Record<(typeof TERRAINS)[number] | "sea" | "shallow", Paint> = {
   // Mountains are one 32×32 picture split over the four variants (see BIG_ROWS),
   // so a range of peaks spans 4 × 4 map pixels instead of repeating every two.
   mountains: (p) => {
-    p.dither("#6f6a74", 0.2);
-    p.dither("#9a94a0", 0.1);
-    p.scatter(ROCKS, 6, { r: "#9a94a0", d: "#4a4552" }, 6);
-    p.peak(20, 17, 9, 15);
-    p.peak(9, 14, 7, 11);
-    p.peak(27, 30, 7, 10);
-    p.peak(11, 31, 9, 13);
-    p.peak(2, 24, 5, 7);
-    p.scatter(TUFT, 3, { d: "#5a5560" }, 8);
+    p.dither("#6f6a74", 0.25);
+    p.dither("#9a94a0", 0.12);
+    p.scatter(ROCKS, 8, { r: "#9a94a0", d: "#4a4552" }, 5);
+    rangeOf(p, GREY_PEAK);
+  },
+  snowpeaks: (p) => {
+    p.dither("#ffffff", 0.3);
+    p.dither("#b8c8e8", 0.18);
+    p.scatter(ROCKS, 5, { r: "#9aa4b4", d: "#5e6878" }, 6);
+    rangeOf(p, SNOW_PEAK);
   },
   drylands: (p) => {
     p.dither("#e2c79a", 0.15);
@@ -246,19 +268,80 @@ const PAINT: Record<(typeof TERRAINS)[number] | "sea" | "shallow", Paint> = {
     p.dither("#9a4a30", 0.18);
     p.dither("#c8784a", 0.12);
     p.scatter(ROCKS, 6, { r: "#d8885a", d: "#5a2a1c" }, 6);
-    p.stamp(MESA, 18, 4, { l: "#e0905e", s: "#b0603c", d: "#7a3a24" });
-    p.peak(9, 15, 8, 12, RED_PEAK);
-    p.peak(24, 30, 8, 12, RED_PEAK);
-    p.peak(8, 31, 6, 9, RED_PEAK);
+    rangeOf(p, RED_PEAK);
+    p.stamp(MESA, 18, 2, { l: "#e0905e", s: "#b0603c", d: "#7a3a24" });
   },
   highlands: (p) => {
     p.dither("#2e6a3a", 0.25);
     p.dither("#4a8a4a", 0.12);
-    p.peak(20, 17, 9, 14, GREEN_PEAK);
-    p.peak(9, 14, 7, 10, GREEN_PEAK);
-    p.peak(27, 30, 7, 10, GREEN_PEAK);
-    p.peak(11, 31, 8, 12, GREEN_PEAK);
-    p.scatter(BROADLEAF, 5, { l: "#7ccf5a", g: "#3f9a45", d: "#1d5a2a", t: "#5a3a2a" }, 7);
+    p.scatter(BROADLEAF, 6, { l: "#7ccf5a", g: "#3f9a45", d: "#1d5a2a", t: "#5a3a2a" }, 7);
+    rangeOf(p, GREEN_PEAK);
+  },
+  broadleaf: (p) => {
+    p.dither("#2e5a26", 0.3);
+    p.dither("#4a7a32", 0.12);
+    const autumn = p.rand() < 0.3;
+    p.scatter(OAK, 5, { l: autumn ? "#d8a040" : "#7ab84a", g: autumn ? "#b0682c" : "#3f8a3a", d: autumn ? "#7a4020" : "#245a28", t: "#5a3a2a" }, 6);
+    p.scatter(BUSH, 2, { l: "#73c25a", g: "#2f8a4a", d: "#1d5e38" }, 5);
+  },
+  mediterranean: (p) => {
+    p.dither("#bcb46a", 0.18);
+    p.dither("#8a8a4a", 0.12);
+    p.scatter(OLIVE, 4, { l: "#b4c49a", g: "#7a9070", d: "#4a5a44", t: "#6a4a32" }, 5);
+    if (p.rand() < 0.6) p.scatter(CYPRESS, 1 + Math.floor(p.rand() * 2), { l: "#4a7a40", g: "#2a5a30", d: "#1a3a22", t: "#5a3a2a" }, 6);
+    p.scatter(STONES, 2, { s: "#d8d0b0" }, 5);
+  },
+  steppe: (p) => {
+    p.dither("#d4d08a", 0.2);
+    p.dither("#a8a85a", 0.14);
+    // Wind-combed grass: short streaks across the tile.
+    for (let i = 0; i < 6; i++) {
+      const x = Math.floor(p.rand() * TILE);
+      const y = Math.floor(p.rand() * TILE);
+      for (let k = 0; k < 4; k++) p.set(x + k, y, k % 2 ? "#9a9a4a" : "#e0dc9a");
+    }
+    p.scatter(TUFT, 4, { d: "#8a8a3a" }, 4);
+  },
+  dunes: (p) => {
+    p.dither("#f0bc6a", 0.15);
+    // Tall crescent dunes: bright windward slope, deep shadow behind the crest.
+    for (let k = 0; k < 3; k++) {
+      const y0 = 2 + k * 5 + Math.floor(p.rand() * 2);
+      const phase = p.rand() * 6.28;
+      for (let x = 0; x < TILE; x++) {
+        const y = y0 + Math.round(Math.sin(x / 2.6 + phase) * 1.8);
+        p.set(x, y - 1, "#fad89a");
+        p.set(x, y, "#ffe8b4");
+        p.set(x, y + 1, "#b8783a");
+        p.set(x, y + 2, "#d09048");
+      }
+    }
+  },
+  colddesert: (p) => {
+    p.dither("#bcae96", 0.2);
+    p.dither("#8a7e6a", 0.16);
+    p.scatter(STONES, 6, { s: "#6a604e" }, 3);
+    p.scatter(ROCKS, 2, { r: "#c8bca4", d: "#5a5040" }, 6);
+    p.scatter(TUFT, 2, { d: "#7a7a4a" }, 6);
+    if (p.rand() < 0.4) p.scatter(SNOW, 1, { w: "#e8ecf4" });
+  },
+  swamp: (p) => {
+    p.dither("#2e4a30", 0.3);
+    p.scatter(POOL, 3, { w: "#2e5a6a" }, 6);
+    p.scatter(MANGROVE, 3, { l: "#6aa84a", g: "#2f7a3a", d: "#1a4a2a", t: "#4a3a2a" }, 6);
+    p.scatter(REEDS, 2, { y: "#a8b46a", d: "#2a4a2a" }, 4);
+  },
+  paddies: (p) => {
+    // Flooded terraces: green rice in water, earth dikes between them.
+    const rows = [0, 5 + Math.floor(p.rand() * 2), 11];
+    for (let y = 0; y < TILE; y++) {
+      for (let x = 0; x < TILE; x++) {
+        const dike = rows.includes(y) || (x === 7 && y > rows[1]!) || (x === 10 && y < rows[1]!);
+        const wet = (x * 7 + y * 3) % 5 === 0;
+        p.set(x, y, dike ? "#8a6a3a" : wet ? "#5a9ab8" : (x + y) % 2 ? "#6ec060" : "#8ad070");
+      }
+    }
+    p.scatter(SPARK, 2, { f: "#b4e8f4" }, 5);
   },
   sea: (p) => {
     p.dither("#1f3462", 0.12);
@@ -286,6 +369,14 @@ const BASE: Record<keyof typeof PAINT, string> = {
   glacier: "#e8f0fc",
   badlands: "#b0583a",
   highlands: "#3f7a44",
+  snowpeaks: "#dfe6f2",
+  broadleaf: "#2e5a26",
+  mediterranean: "#a8a45a",
+  steppe: "#c4c278",
+  dunes: "#eab060",
+  colddesert: "#a89a84",
+  swamp: "#3e5a3a",
+  paddies: "#6ec060",
   sea: "#243a6b",
   shallow: "#2b5a9c",
 };
@@ -313,7 +404,7 @@ export function rowColors(atlas: { width: number; rgba: Uint8Array }): number[] 
  * Rows drawn as one 32×32 picture whose quarters fill the four variants; the
  * shader picks the quarter by position (and mirrors some) instead of at random.
  */
-export const BIG_ROWS = [TERRAINS.indexOf("mountains"), TERRAINS.indexOf("badlands"), TERRAINS.indexOf("highlands")];
+export const BIG_ROWS = ["mountains", "badlands", "highlands", "snowpeaks"].map((t) => TERRAINS.indexOf(t as (typeof TERRAINS)[number]));
 
 /** Builds the atlas as RGBA bytes: VARIANTS tiles across, ATLAS_ROWS down. */
 export function buildTileAtlas(): { width: number; height: number; rgba: Uint8Array } {

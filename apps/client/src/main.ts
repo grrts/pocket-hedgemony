@@ -230,7 +230,7 @@ function drawOverlay(o: OverlayContext): void {
       if (!onScreen(sx, sy)) continue;
       const owner = s.armies.owner[k]!;
       const cmd = s.armies.commander[k]!;
-      const img = sprite(cmd >= 0 ? "commander" : "soldier", nations[owner]!.color, Math.max(1, spriteScale - 1));
+      const img = sprite(cmd >= 0 ? "commander" : "soldier", nations[owner]!.color, Math.max(1, spriteScale - (cmd >= 0 ? 2 : 1)));
       const x = Math.round(sx - img.width / 2);
       const y = Math.round(sy - img.height + 2 * spriteScale);
       if (s.armies.id[k] === selectedArmy) {
@@ -431,7 +431,7 @@ function renderPanel(): void {
         const mine = s.armies.owner[k] === s.playerNation;
         const c = cmd >= 0 ? commanders[cmd]! : null;
         const order = pendingOrders.find((o) => o.army === id);
-        const portrait = sprite(c ? "commander" : "soldier", nations[s.armies.owner[k]!]!.color, 3).toDataURL();
+        const portrait = sprite(c ? "commander" : "soldier", nations[s.armies.owner[k]!]!.color, c ? 2 : 3).toDataURL();
         return `<div class="army">
           <img class="portrait" src="${portrait}" alt="">
           <span class="who">${c ? `<b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>

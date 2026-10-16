@@ -17,6 +17,9 @@ const KEY: Record<string, string> = {
   o: PALETTE.clay,
   r: PALETTE.blood,
   b: "#8b5a3c", // wood, leather, horse
+  a: "#b07a4e", // horse in light
+  H: "#4a2e1e", // horse in shade, hooves
+  z: "#2b2130", // eyes
   t: "#5c3a26", // dark wood: poles, hooves
   h: "#4a2e1e", // hair
   f: "#f2c09c", // skin
@@ -64,24 +67,30 @@ export const SPRITES = {
     ".keeeebemmek.",
     "EEEEEEEEEEEEE",
   ],
-  /** Commander on horseback with a lance pennant and a caparison in the realm's colour. */
+  /** Commander: a knight on a barded horse, lance pennant, plume and caparison in the realm's colour. */
   commander: [
-    ".t......hh......",
-    ".tNNn..hhhh.....",
-    ".tLNNn.sffs.....",
-    ".tNNn..sfFs.....",
-    ".t......ff...bb.",
-    ".t....NLNNn.bbbt",
-    ".t...fNLyNnfbbb.",
-    ".t....NyNNn.bb..",
-    ".t.bbbbbbbbbbb..",
-    ".tbNNNLNNNNnbb..",
-    ".tbNLNNNNNNnb...",
-    ".bbNNNNNNNNnb...",
-    "b..bbb...bbb....",
-    "...b.b...b.b....",
-    "...b.b...b.b....",
-    "...t.t...t.t....",
+    "..y........NL.........",
+    "..tNNNNN..Nn..........",
+    "..tLLLN..ggg..........",
+    "..tnnnnngssd..........",
+    "..t......ffd..........",
+    "..t......Ffs.....Hb...",
+    "..t....sLNNNns...aab..",
+    "..t....gLyyynd..hbbzbb",
+    "..tfssssLNyNn...hbbyHb",
+    "..t.f...LNLNn..hbbbbbH",
+    "..t.....LNNNn.hbbb..bb",
+    "..t.aaaatttttaaabb....",
+    "..thbLLLLLssLLLbb.....",
+    "..tHbNyNNyssyNNb......",
+    "..t.bNNyNNsdNyNb......",
+    ".ht.bnnnnndnnnnb......",
+    ".ht.HnHnHnHnHnHH......",
+    "..h..bH.bH...bH.bH....",
+    ".....bH.bH...bH.bH....",
+    ".....ba.bb...ba.bb....",
+    ".....bb.bb...bb.bb....",
+    ".....HH.HH...HH.HH....",
   ],
   /** Plain army without a named commander: a helmeted spearman. */
   soldier: [

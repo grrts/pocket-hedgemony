@@ -1,8 +1,8 @@
 // Art test page: every visual building block of the game on one page, for review.
 import { loadDefaultRuleset } from "@ph/rules";
-import { DEPTH_COLORS, PALETTE, TERRAIN_COLORS, TERRAINS } from "./art/palette.ts";
+import { DEPTH_COLORS, PALETTE, TERRAIN_CATEGORIES, TERRAIN_COLORS, TERRAINS } from "./art/palette.ts";
 import { sprite, SPRITES, type SpriteName } from "./art/sprites.ts";
-import { SEA_ROW, SHALLOW_ROW, tileCanvas, VARIANTS } from "./art/tiles.ts";
+import { BIG_ROWS, SEA_ROW, SHALLOW_ROW, tileCanvas, VARIANTS } from "./art/tiles.ts";
 import { icon, ICONS, installUiArt, pennantUrl, UI_COLORS, type IconName } from "./art/ui.ts";
 
 installUiArt();
@@ -89,13 +89,26 @@ root.innerHTML = `
 {
   const body = section(
     "Map terrain",
-    `The terrain under each map pixel comes from real data: the Köppen-Geiger climate map (Beck et al. 2018) decides jungle, savanna, steppe, desert, taiga and tundra, and Natural Earth's mountain ranges add hills and peaks whose look follows the climate: grey snowy rock, red desert rock or green tropical highland. Woods and, where 1444 Europe and Asia were most crowded, fields break it up. Zoomed out, each map pixel takes its terrain's colour with hill shading; at middle zoom every map pixel becomes 4 × 4 art pixels from half-size tiles, and close in 8 × 8 from these ${VARIANTS} hand-made 16 × 16 tiles per terrain (mountains are one 32 × 32 range over four tiles, mirrored at random). Under a realm, the land is washed in its colour at every zoom, with an ink border and a bright band of the realm's colour inside it. The sea is shaded by real depth in five bands, from the light continental shelf to the dark ocean trenches, dithered into each other.`,
+    `${TERRAINS.length} tile types drawn from real data, grouped by landscape; docs/terrain.md says where each comes from and what it does in play. The Köppen-Geiger climate map (Beck et al. 2018) decides the climate zone (rainforest, savanna, steppe, desert, Mediterranean, taiga, tundra, ice), and Natural Earth's mountain ranges are filled edge to edge with mountains whose look follows the climate: snowy peaks in alpine and polar climates and on the high core of big ranges, grey rock below, red rock in deserts, green slopes in the tropics. Woods (broadleaf in the temperate south, pine in the north) and fields break the land up, with rice paddies in monsoon Asia. Zoomed out, each map pixel takes its tile type's colour with hill shading; at middle zoom every map pixel becomes 4 × 4 art pixels, and close in 8 × 8 from these hand-made 16 × 16 tiles. Under a realm the land is washed in its colour at every zoom, with an ink border and a bright band of the realm's colour inside it. The sea is shaded by real depth in five bands, dithered into each other.`,
   );
-  const rows: [string, number][] = [...TERRAINS.map((t, i) => [t, i] as [string, number]), ["coastal sea", SHALLOW_ROW], ["open ocean", SEA_ROW]];
-  for (const [name, row] of rows) {
+  // Each tile type as a 2 × 2 block of its four tiles: the ranges then show
+  // their whole 32 × 32 picture, the rest four variants side by side.
+  const block = (row: number) => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 16 * 2 * 3;
+    const ctx = c.getContext("2d")!;
+    for (let v = 0; v < VARIANTS; v++) ctx.drawImage(tileCanvas(row, v, 3), (v & 1) * 48, (v >> 1) * 48);
+    return c;
+  };
+  const groups: [string, [string, number][]][] = [
+    ...Object.entries(TERRAIN_CATEGORIES).map(([cat, list]) => [cat, list.map((t) => [t, TERRAINS.indexOf(t)])] as [string, [string, number][]]),
+    ["Water", [["coastal sea", SHALLOW_ROW], ["open ocean", SEA_ROW]]],
+  ];
+  for (const [cat, list] of groups) {
+    body.insertAdjacentHTML("beforeend", `<h3>${esc(cat)}</h3>`);
     const r = document.createElement("div");
     r.className = "row tiles";
-    for (let v = 0; v < VARIANTS; v++) r.append(figure(tileCanvas(row, v, 4), v === 0 ? name : ""));
+    for (const [name, row] of list) r.append(figure(block(row), BIG_ROWS.includes(row) ? `${name} (one range)` : name));
     body.append(r);
   }
 }

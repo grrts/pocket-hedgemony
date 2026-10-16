@@ -8,36 +8,49 @@
 // The close-zoom art then breaks the base up with woods and fields.
 import type { ClimateMap } from "./climate.ts";
 
-/** Same order as TERRAINS in apps/client/src/art/palette.ts. */
+/**
+ * Close-zoom tile types, same order as TERRAINS in apps/client/src/art/palette.ts.
+ * The first fourteen keep their old numbers; new types are appended.
+ * docs/terrain.md lists each type, where it comes from and what it does.
+ */
 export const DETAIL_TERRAINS = [
   "grassland", "farmland", "hills", "mountains", "drylands", "marsh", "forest", "desert", "tundra", "jungle",
   "savanna", "glacier", "badlands", "highlands",
+  "snowpeaks", "broadleaf", "mediterranean", "steppe", "dunes", "colddesert", "swamp", "paddies",
 ] as const;
 export type DetailTerrain = (typeof DETAIL_TERRAINS)[number];
 const T = Object.fromEntries(DETAIL_TERRAINS.map((t, i) => [t, i])) as Record<DetailTerrain, number>;
 
-/** What the simulation sees: one of its terrains per province. */
+/** What the simulation sees: one ground per province (the grounds in the province design). */
 export const PROVINCE_TERRAIN: Record<DetailTerrain, string> = {
   grassland: "grassland", farmland: "farmland", hills: "hills", mountains: "mountains", drylands: "drylands",
   marsh: "marsh", forest: "forest", desert: "desert", tundra: "tundra", jungle: "jungle", savanna: "savanna",
-  glacier: "tundra", badlands: "mountains", highlands: "mountains",
+  glacier: "tundra", badlands: "mountains", highlands: "mountains", snowpeaks: "mountains", broadleaf: "forest",
+  mediterranean: "grassland", steppe: "grassland", dunes: "desert", colddesert: "desert", swamp: "marsh", paddies: "farmland",
 };
 
 export function climateTerrain(k: string, lat: number): DetailTerrain {
   if (k === "Af" || k === "Am") return "jungle";
   if (k === "Aw" || k === "As") return "savanna";
-  if (k === "BWh" || k === "BWk") return "desert";
-  if (k === "BSh" || k === "BSk") return "drylands";
+  if (k === "BWh") return "desert";
+  if (k === "BWk") return "colddesert";
+  if (k === "BSh") return "drylands";
+  if (k === "BSk") return "steppe";
   if (k === "EF") return "glacier";
   if (k === "ET") return "tundra";
   if (k.startsWith("D") && (k.endsWith("c") || k.endsWith("d"))) return "forest"; // taiga
   if ((k === "Dfb" || k === "Dwb") && Math.abs(lat) >= 55) return "forest"; // southern taiga
   if (k === "Cfc" || k === "Cwc" || k === "Csc") return "forest";
+  if (k === "Csa" || k === "Csb") return "mediterranean";
   if (k) return "grassland";
   // No climate data (a coast the climate grid calls sea): fall back to latitude.
   const a = Math.abs(lat);
   return a > 66 ? "tundra" : a > 55 ? "forest" : a < 10 ? "jungle" : "grassland";
 }
+
+/** Monsoon Asia, where fields are rice paddies. */
+const paddyLand = (lon: number, lat: number, k: string) =>
+  lon > 72 && lon < 150 && lat > -11 && lat < 36 && /^(Cwa|Cfa|Cwb|Aw|Am|Af|As)$/.test(k);
 
 export interface TerrainInput {
   width: number;
@@ -125,40 +138,64 @@ export function buildTerrain(o: TerrainInput): { base: Uint8Array; detail: Uint8
       const n1 = noise(x, y, 1);
       const n2 = noise(x, y, 2);
       let t: DetailTerrain = climateTerrain(k, lat);
+      const lon = o.lonOf(x);
       if (o.lowland[p]) t = "grassland";
-      else if (o.relief[p] === 2 && t !== "glacier") t = "marsh";
+      else if (o.relief[p] === 2 && t !== "glacier") t = k.startsWith("A") ? "swamp" : "marsh";
       else if (isRange(p)) {
-        const depth = edge[p]! + (n2 - 0.5) * 12;
-        const cold = k === "ET" || k === "EF" || k.endsWith("c") || k.endsWith("d");
-        const peak: DetailTerrain = k.startsWith("B") ? "badlands" : k.startsWith("A") ? "highlands" : k === "EF" ? "glacier" : "mountains";
-        // Alpine climate inside a temperate range means real altitude: peaks.
-        if (depth >= 7 || (cold && depth >= 3)) t = peak;
-        else if (depth >= 2) t = k.startsWith("A") ? "highlands" : k.startsWith("B") ? "badlands" : "hills";
+        // The whole range is mountain, edge to edge, with a thin rim of hills.
+        // Its look follows the climate; snow where the climate is alpine or
+        // polar, and on the high core of temperate ranges.
+        const depth = edge[p]! + (n2 - 0.5) * 4;
+        const cold = k === "ET" || k === "EF" || ((k.endsWith("c") || k.endsWith("d")) && edge[p]! >= 4);
+        const peak: DetailTerrain = k.startsWith("B")
+          ? "badlands"
+          : k.startsWith("A")
+            ? "highlands"
+            : cold || edge[p]! + (n1 - 0.5) * 6 >= 9 || (Math.abs(lat) >= 50 && edge[p]! >= 5)
+              ? "snowpeaks"
+              : "mountains";
+        if (depth >= 3) t = peak;
+        else t = k.startsWith("A") ? "highlands" : k.startsWith("B") ? "badlands" : "hills";
       }
       base[p] = T[t];
 
       // Detail: break the base up so a province isn't one flat texture.
       const humid = /^[CD].f/.test(k);
       const woods = Math.min(0.2, Math.max(0, (Math.abs(lat) - 40) / 100)) + (humid ? 0.06 : 0);
+      // Temperate woods are broadleaf; the cold north and the high ground grow pine.
+      const wood: DetailTerrain = Math.abs(lat) >= 55 || k.endsWith("c") || k.endsWith("d") ? "forest" : "broadleaf";
+      const field: DetailTerrain = paddyLand(lon, lat, k) ? "paddies" : "farmland";
+      const share = o.fieldShare(lon, lat);
+      const erg = smooth(x, y, 40, 9);
       let d = t;
       if (t === "grassland" || t === "hills") {
-        if (n1 > 0.64 - woods) d = "forest";
-        else if (t === "grassland" && n2 < o.fieldShare(o.lonOf(x), lat)) d = "farmland";
+        if (n1 > 0.64 - woods) d = wood;
+        else if (t === "grassland" && n2 < share) d = field;
+      } else if (t === "mediterranean") {
+        if (n1 > 0.74) d = "broadleaf";
+        else if (n2 < share * 0.8) d = "farmland";
+      } else if (t === "steppe") {
+        if (n1 > 0.76) d = "grassland";
+        else if (n2 < share * 0.4) d = "farmland";
       } else if (t === "forest") {
         if (n1 < 0.28) d = Math.abs(lat) > 60 ? "tundra" : "grassland";
       } else if (t === "tundra") {
         if (Math.abs(lat) < 68 && n1 > 0.66) d = "forest";
       } else if (t === "desert") {
-        if (n1 > 0.74) d = "drylands";
+        if (erg > 0.56) d = "dunes";
+        else if (n1 > 0.74) d = "drylands";
+      } else if (t === "colddesert") {
+        if (n1 > 0.72) d = "steppe";
       } else if (t === "drylands") {
         if (n1 > 0.72) d = "desert";
         else if (n1 < 0.2) d = "grassland";
-        else if (n2 < o.fieldShare(o.lonOf(x), lat) * 0.5) d = "farmland";
+        else if (n2 < share * 0.5) d = field;
       } else if (t === "savanna") {
         if (n1 > 0.72) d = "jungle";
-        else if (n2 < o.fieldShare(o.lonOf(x), lat) * 0.6) d = "farmland";
+        else if (n2 < share * 0.6) d = field;
       } else if (t === "jungle") {
         if (n1 < 0.2) d = "savanna";
+        else if (n2 < share * 0.4) d = field;
       }
       detail[p] = T[d];
     }
