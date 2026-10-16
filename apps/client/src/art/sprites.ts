@@ -209,3 +209,12 @@ export function sprite(name: SpriteName, nationColor: string, scale: number): HT
   cache.set(key, canvas);
   return canvas;
 }
+
+const urlCache = new Map<string, string>();
+/** The sprite as a data URL for an <img>, cached: encoding a PNG takes far longer than drawing it. */
+export function spriteUrl(name: SpriteName, nationColor: string, scale: number): string {
+  const key = `${name}|${nationColor}|${scale}`;
+  let url = urlCache.get(key);
+  if (!url) urlCache.set(key, (url = sprite(name, nationColor, scale).toDataURL()));
+  return url;
+}

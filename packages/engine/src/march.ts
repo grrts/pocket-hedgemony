@@ -64,49 +64,82 @@ export interface Route {
   arrive: number[];
 }
 
-/** Fastest land route (Dijkstra on days); null when the target can't be reached on foot. */
+/**
+ * Fastest land route (Dijkstra on days); null when the target can't be reached on foot.
+ * Called while the player drags an army, so costs are precomputed per province
+ * and the heap lives in typed arrays: see the route budget in docs/performance.md.
+ */
 export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: number, a: MarchingArmy): Route | null {
-  if (from === to || !map.ground[to]) return null;
+  if (from === to || !map.ground[from] || !map.ground[to]) return null;
   const n = map.ground.length;
+  // stepDays(p, q) = (half[p] + enter[q]) * pace + river[q], split per province.
+  const pace = d.daysPerCrossing / (1 + d.horseSpeedBonus * (a.men > 0 ? Math.min(1, a.horse / a.men) : 0));
+  const half = new Float64Array(n);
+  const enter = new Float64Array(n).fill(Infinity);
+  for (let p = 0; p < n; p++) {
+    const g = map.ground[p];
+    if (!g) continue;
+    half[p] = (d.daysToCross[g] / 2) * pace;
+    enter[p] = half[p]! + (a.men > forageLimit(d, map, p) ? d.bigArmyExtraCrossings * pace : 0) + (map.river[p] ? d.riverCrossingDays : 0);
+  }
   const dist = new Float64Array(n).fill(Infinity);
   const prev = new Int32Array(n).fill(-1);
-  const heap: [number, number][] = [];
+  // Binary heap of (cost, province); a province may sit in it more than once.
+  let cap = 1024;
+  let hCost = new Float64Array(cap);
+  let hNode = new Int32Array(cap);
+  let size = 0;
   const push = (cost: number, p: number) => {
-    heap.push([cost, p]);
-    for (let i = heap.length - 1; i > 0; ) {
+    if (size === cap) {
+      cap *= 2;
+      const c = new Float64Array(cap);
+      c.set(hCost);
+      hCost = c;
+      const v = new Int32Array(cap);
+      v.set(hNode);
+      hNode = v;
+    }
+    let i = size++;
+    while (i > 0) {
       const up = (i - 1) >> 1;
-      if (heap[up]![0] <= heap[i]![0]) break;
-      [heap[up], heap[i]] = [heap[i]!, heap[up]!];
+      if (hCost[up]! <= cost) break;
+      hCost[i] = hCost[up]!;
+      hNode[i] = hNode[up]!;
       i = up;
     }
+    hCost[i] = cost;
+    hNode[i] = p;
   };
   const pop = () => {
-    const top = heap[0]!;
-    const last = heap.pop()!;
-    if (heap.length) {
-      heap[0] = last;
-      for (let i = 0; ; ) {
-        const l = i * 2 + 1;
-        const r = l + 1;
-        let m = i;
-        if (l < heap.length && heap[l]![0] < heap[m]![0]) m = l;
-        if (r < heap.length && heap[r]![0] < heap[m]![0]) m = r;
-        if (m === i) break;
-        [heap[m], heap[i]] = [heap[i]!, heap[m]!];
-        i = m;
-      }
+    const top = hNode[0]!;
+    const cost = hCost[--size]!;
+    const node = hNode[size]!;
+    let i = 0;
+    for (;;) {
+      const l = i * 2 + 1;
+      if (l >= size) break;
+      const m = l + 1 < size && hCost[l + 1]! < hCost[l]! ? l + 1 : l;
+      if (hCost[m]! >= cost) break;
+      hCost[i] = hCost[m]!;
+      hNode[i] = hNode[m]!;
+      i = m;
     }
+    hCost[i] = cost;
+    hNode[i] = node;
     return top;
   };
   dist[from] = 0;
   push(0, from);
-  while (heap.length) {
-    const [cost, p] = pop();
-    if (cost > dist[p]!) continue;
+  const done = new Uint8Array(n);
+  while (size) {
+    const p = pop();
+    if (done[p]) continue;
+    done[p] = 1;
     if (p === to) break;
+    const base = dist[p]! + half[p]!;
     for (let k = map.adjStart[p]!, end = map.adjStart[p + 1]!; k < end; k++) {
       const q = map.adjList[k]!;
-      const c = cost + stepDays(d, map, p, q, a);
+      const c = base + enter[q]!;
       if (c < dist[q]!) {
         dist[q] = c;
         prev[q] = p;

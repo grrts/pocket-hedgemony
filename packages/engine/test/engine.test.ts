@@ -60,6 +60,12 @@ describe("turns", () => {
     const d = rules.defines.march;
     const route = planRoute(d, marchMap(w), w.armies.location[army]!, madrid, { men: 5000, horse: 1000, logistics: 0 })!;
     expect(route.path.at(-1)).toBe(madrid);
+    // The route's days are the same steps the engine walks.
+    let days = 0;
+    route.path.forEach((p, i) => {
+      days += stepDays(d, marchMap(w), i ? route.path[i - 1]! : w.armies.location[army]!, p, { men: 5000, horse: 1000, logistics: 0 });
+      expect(route.arrive[i]).toBeCloseTo(days, 9);
+    });
     const months = Math.ceil(route.arrive.at(-1)! / d.daysPerMonth);
     expect(months).toBeGreaterThan(1);
     processTurn(w, [{ type: "move", army, to: madrid }], fra);

@@ -1,7 +1,7 @@
 import { forageLimit, groundOf, planRoute, type MarchMap, type Order, type Route, type Snapshot } from "@ph/engine";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
-import { sprite } from "./art/sprites.ts";
+import { sprite, spriteUrl } from "./art/sprites.ts";
 import { icon, installUiArt, pennantUrl } from "./art/ui.ts";
 import { EngineClient } from "./engineClient.ts";
 import { loadMapImage } from "./map/loadMap.ts";
@@ -60,6 +60,8 @@ let pendingOrders: Order[] = [];
 const plannedRoutes = new Map<number, Route>();
 /** When the last turn's marches started animating (performance.now), or 0. */
 let marchAnimStart = 0;
+/** Steps in the longest march of the last turn. */
+let marchLongest = 0;
 const MARCH_STEP_MS = 450;
 let busy = false;
 /** The panel is folded away behind a tool button so the map gets the screen. */
@@ -121,6 +123,8 @@ async function boot(): Promise<void> {
   const image = await loadMapImage(rules.map!, provinces.length);
   document.querySelector(".loading")?.remove();
   view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay });
+  // Read by the performance checks (scripts/perf.mjs).
+  (globalThis as { __phMap?: MapView }).__phMap = view;
   restyleProvinces();
   // Start over Europe, zoomed so countries are readable on a phone.
   const paris = provinces[provinceIndex.get(nations[nationIndex.get("france")!]!.capital)!]!;
@@ -401,8 +405,7 @@ function marchPosition(k: number): [number, number] {
   const at = provinces[s.armies.location[k]!]!;
   if (!marchAnimStart || walked.length < 2) return [at.x!, at.y!];
   const t = (performance.now() - marchAnimStart) / MARCH_STEP_MS;
-  const longest = Math.max(...s.armies.marched.map((m) => m.length - 1));
-  if (t >= longest) {
+  if (t >= marchLongest) {
     marchAnimStart = 0;
     return [at.x!, at.y!];
   }
@@ -428,17 +431,73 @@ function settlementOf(population: number): "village" | "town" | "city" {
 const SETTLEMENT_NAMES = { village: "Village", town: "Town", city: "City" };
 const WALL_NAMES = { castle: "Stone castle", fort: "Earthwork ring fort" };
 
+/**
+ * Draws a label with a thick ink outline and a drop shadow, so it reads over
+ * busy terrain. Outlined text is slow to draw, so each label is drawn once
+ * into a small bitmap and reused; ctx.textAlign must be "center", and
+ * ctx.textBaseline picks which edge sits at y.
+ */
 function pixelText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, water = false): void {
-  ctx.font = `600 ${size + 2}px "Pixelify Sans", "Courier New", monospace`;
-  // A thick ink outline plus a drop shadow, so labels read over busy terrain.
-  ctx.lineWidth = Math.max(3, Math.round(size / 3.5));
-  ctx.lineJoin = "round";
-  ctx.strokeStyle = PALETTE.ink;
+  const label = labelBitmap(text, size, water);
+  const baseline = ctx.textBaseline;
+  const top = baseline === "top" ? y - label.pad : baseline === "bottom" ? y - label.h + label.pad : y - label.h / 2;
+  ctx.drawImage(label.canvas, Math.round(x - label.w / 2), Math.round(top), label.w, label.h);
+}
+
+interface LabelBitmap {
+  canvas: HTMLCanvasElement;
+  /** Size in CSS pixels. */
+  w: number;
+  h: number;
+  /** Outline and shadow room around the letters. */
+  pad: number;
+}
+const labelCache = new Map<string, LabelBitmap>();
+// Labels drawn before the pixel font arrived used a fallback; redraw them.
+document.fonts?.addEventListener("loadingdone", () => {
+  labelCache.clear();
+  view?.invalidate();
+});
+/** Most labels on screen at once, with room to pan; older ones are dropped. */
+const LABEL_CACHE_SIZE = 800;
+
+function labelBitmap(text: string, size: number, water: boolean): LabelBitmap {
+  const key = `${size}|${water ? 1 : 0}|${text}`;
+  const hit = labelCache.get(key);
+  if (hit) {
+    // Refresh its place so the most recently drawn labels are kept.
+    labelCache.delete(key);
+    labelCache.set(key, hit);
+    return hit;
+  }
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const font = `600 ${size + 2}px "Pixelify Sans", "Courier New", monospace`;
+  const line = Math.max(3, Math.round(size / 3.5));
   const shadow = Math.max(1, Math.round(size / 9));
-  ctx.strokeText(text, Math.round(x) + shadow, Math.round(y) + shadow);
-  ctx.strokeText(text, Math.round(x), Math.round(y));
-  ctx.fillStyle = water ? PALETTE.mist : PALETTE.paper;
-  ctx.fillText(text, Math.round(x), Math.round(y));
+  const pad = Math.ceil(line / 2) + shadow + 1;
+  const canvas = document.createElement("canvas");
+  const c = canvas.getContext("2d")!;
+  c.font = font;
+  const w = Math.ceil(c.measureText(text).width) + pad * 2;
+  const h = Math.ceil((size + 2) * 1.25) + pad * 2;
+  canvas.width = Math.ceil(w * dpr);
+  canvas.height = Math.ceil(h * dpr);
+  c.scale(dpr, dpr);
+  c.font = font;
+  c.textAlign = "center";
+  c.textBaseline = "top";
+  c.lineWidth = line;
+  c.lineJoin = "round";
+  c.strokeStyle = PALETTE.ink;
+  const cx = Math.round(w / 2);
+  c.strokeText(text, cx + shadow, pad + shadow);
+  c.strokeText(text, cx, pad);
+  c.fillStyle = water ? PALETTE.mist : PALETTE.paper;
+  c.fillText(text, cx, pad);
+  const label = { canvas, w, h, pad };
+  labelCache.set(key, label);
+  if (labelCache.size > LABEL_CACHE_SIZE) labelCache.delete(labelCache.keys().next().value!);
+  return label;
 }
 
 // ---- input ----
@@ -458,6 +517,7 @@ function onTap(sx: number, sy: number, province: number): void {
     // Tapping the army's own province halts it.
     if (route || province === here) pendingOrders.push({ type: "move", army: selectedArmy, to: province });
     if (route) plannedRoutes.set(selectedArmy, route);
+    etaCache.delete(selectedArmy);
     selectedArmy = -1;
     selectedProvince = province;
     // Keep the map in view after giving an order; the panel waits behind its button.
@@ -493,8 +553,17 @@ function armyStats(k: number) {
   return { men: s.armies.men[k]!, horse: s.armies.horse[k]!, logistics: c >= 0 ? commanders[c]!.logistics : 0 };
 }
 
+/** Route lengths, by army id, until the next order or turn (planning a route is too slow to repeat every frame). */
+const etaCache = new Map<number, { to: number; days: number } | null>();
+
 /** Days still to march for army slot k, from its pending order or its standing route. */
 function daysLeft(k: number): { to: number; days: number } | null {
+  const id = snapshot!.armies.id[k]!;
+  if (!etaCache.has(id)) etaCache.set(id, computeDaysLeft(k));
+  return etaCache.get(id)!;
+}
+
+function computeDaysLeft(k: number): { to: number; days: number } | null {
   const s = snapshot!;
   const planned = plannedRoutes.get(s.armies.id[k]!);
   if (planned) return { to: planned.path.at(-1)!, days: Math.ceil(planned.arrive.at(-1)!) };
@@ -637,7 +706,7 @@ function renderPanel(): void {
         const mine = s.armies.owner[k] === s.playerNation;
         const c = cmd >= 0 ? commanders[cmd]! : null;
         const order = pendingOrders.find((o) => o.army === id);
-        const portrait = sprite(c ? "commander" : "soldier", nations[s.armies.owner[k]!]!.color, c ? 2 : 3).toDataURL();
+        const portrait = spriteUrl(c ? "commander" : "soldier", nations[s.armies.owner[k]!]!.color, c ? 2 : 3);
         return `<div class="army">
           <img class="portrait" src="${portrait}" alt="">
           <span class="who">${c ? `<b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
@@ -689,7 +758,7 @@ function renderRealm(r: number): void {
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
     </dl>
     ${n.commanders.length ? `<h3 class="sub">Commanders</h3>${n.commanders
-      .map((c) => `<div class="army"><img class="portrait" src="${sprite("commander", n.color, 2).toDataURL()}" alt=""><span class="who"><b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
+      .map((c) => `<div class="army"><img class="portrait" src="${spriteUrl("commander", n.color, 2)}" alt=""><span class="who"><b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
       .join("")}` : ""}
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
       .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!.color)}${esc(nations[j]!.name)}</button>`)
@@ -730,6 +799,7 @@ function bindNationButtons(): void {
 
 async function startGame(nation: string): Promise<void> {
   snapshot = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation });
+  etaCache.clear();
   owners = snapshot.provinceOwner;
   const cap = provinceIndex.get(nations[nationIndex.get(nation)!]!.capital)!;
   selectedProvince = cap;
@@ -745,18 +815,26 @@ async function endTurn(): Promise<void> {
   if (busy || !snapshot) return;
   busy = true;
   renderActions();
+  // The turn runs in the engine worker; the map stays live meanwhile.
+  performance.mark("turn-sent");
   snapshot = await engine.send({ type: "endTurn", orders: pendingOrders });
+  performance.mark("turn-arrived");
   owners = snapshot.provinceOwner;
   pendingOrders = [];
   plannedRoutes.clear();
+  etaCache.clear();
   selectedArmy = -1;
   busy = false;
-  if (snapshot.armies.marched.some((m) => m.length > 1)) marchAnimStart = performance.now();
+  marchLongest = Math.max(0, ...snapshot.armies.marched.map((m) => m.length - 1));
+  if (marchLongest > 0) marchAnimStart = performance.now();
   restyleProvinces();
   renderHud();
   renderPanel();
   renderActions();
   renderDiagnostics();
+  // Budgets in docs/performance.md, checked by scripts/perf.mjs.
+  performance.measure("turn-wait", "turn-sent", "turn-arrived");
+  performance.measure("turn-apply", "turn-arrived");
 }
 
 function renderDiagnostics(): void {

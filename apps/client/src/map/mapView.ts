@@ -11,6 +11,18 @@ export interface OverlayContext {
   height: number;
 }
 
+/** Map pixels drawn per CSS pixel (see resize). A hard budget in docs/performance.md. */
+export const MAP_PIXEL_RATIO = 1;
+
+/** Rolling frame timings, read by the performance checks (scripts/perf.mjs). */
+export interface FrameStats {
+  frames: number;
+  /** Milliseconds per frame spent drawing the map (GPU work included only with ?perf, which waits for it). */
+  mapMs: number[];
+  /** Milliseconds per frame spent drawing labels, towns and armies. */
+  overlayMs: number[];
+}
+
 export interface MapViewEvents {
   onTap(screenX: number, screenY: number, province: number): void;
   drawOverlay(o: OverlayContext): void;
@@ -32,8 +44,13 @@ export class MapView {
   private gesture: { moved: number; pinchDist: number; startZoom: number } | null = null;
   private lastAnim = 0;
   private root: HTMLElement;
+  /** The view's size in CSS pixels, kept from the last resize: reading it from the page on every call forces layout. */
+  private viewW = 0;
+  private viewH = 0;
   readonly map: MapImage;
   private events: MapViewEvents;
+  readonly stats: FrameStats = { frames: 0, mapMs: [], overlayMs: [] };
+  private readonly waitForGpu = new URLSearchParams(location.search).has("perf");
 
   constructor(root: HTMLElement, map: MapImage, provinceCount: number, events: MapViewEvents) {
     this.root = root;
@@ -63,7 +80,7 @@ export class MapView {
   }
 
   get minZoom(): number {
-    return Math.max(this.root.clientHeight / this.map.height, this.root.clientWidth / this.map.width / 1.2);
+    return Math.max(this.viewH / this.map.height, this.viewW / this.map.width / 1.2);
   }
 
   readonly maxZoom = 40;
@@ -80,12 +97,16 @@ export class MapView {
 
   private resize(): void {
     this.dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = this.root.clientWidth;
-    const h = this.root.clientHeight;
-    for (const c of [this.renderer.canvas, this.overlay]) {
-      c.width = Math.round(w * this.dpr);
-      c.height = Math.round(h * this.dpr);
-    }
+    const w = (this.viewW = this.root.clientWidth);
+    const h = (this.viewH = this.root.clientHeight);
+    // The map is pixel art, so it is drawn at one pixel per CSS pixel and
+    // scaled up crisply (image-rendering: pixelated): on a phone that is 4 to
+    // 7 times fewer pixels for the GPU to shade than drawing at the screen's
+    // own density. Labels and sprites keep the full density so text stays sharp.
+    this.renderer.canvas.width = Math.round(w * MAP_PIXEL_RATIO);
+    this.renderer.canvas.height = Math.round(h * MAP_PIXEL_RATIO);
+    this.overlay.width = Math.round(w * this.dpr);
+    this.overlay.height = Math.round(h * this.dpr);
     this.camera.zoom = Math.max(this.camera.zoom, this.minZoom);
     this.clamp();
     this.invalidate();
@@ -93,25 +114,33 @@ export class MapView {
 
   private clamp(): void {
     const c = this.camera;
-    const halfH = this.root.clientHeight / 2 / c.zoom;
+    const halfH = this.viewH / 2 / c.zoom;
     c.y = Math.min(this.map.height - halfH, Math.max(halfH, c.y));
     c.x = ((c.x % this.map.width) + this.map.width) % this.map.width;
   }
 
   private render(t: number): void {
-    const cam: Camera = { x: this.camera.x, y: this.camera.y, zoom: this.camera.zoom * this.dpr };
+    const cam: Camera = { x: this.camera.x, y: this.camera.y, zoom: this.camera.zoom * MAP_PIXEL_RATIO };
+    const t0 = performance.now();
     this.renderer.draw(cam, t / 1000);
+    if (this.waitForGpu) this.renderer.gl.finish();
+    const t1 = performance.now();
     const ctx = this.octx;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    ctx.clearRect(0, 0, this.root.clientWidth, this.root.clientHeight);
+    ctx.clearRect(0, 0, this.viewW, this.viewH);
     ctx.imageSmoothingEnabled = false;
     this.events.drawOverlay({
       ctx,
       zoom: this.camera.zoom,
-      width: this.root.clientWidth,
-      height: this.root.clientHeight,
+      width: this.viewW,
+      height: this.viewH,
       toScreen: (x, y) => this.toScreen(x, y),
     });
+    const st = this.stats;
+    st.frames++;
+    st.mapMs.push(t1 - t0);
+    st.overlayMs.push(performance.now() - t1);
+    if (st.mapMs.length > 240) (st.mapMs.shift(), st.overlayMs.shift());
   }
 
   toScreen(x: number, y: number): [number, number] {
@@ -119,12 +148,12 @@ export class MapView {
     let dx = x - this.camera.x;
     if (dx > W / 2) dx -= W;
     else if (dx < -W / 2) dx += W;
-    return [this.root.clientWidth / 2 + dx * this.camera.zoom, this.root.clientHeight / 2 + (y - this.camera.y) * this.camera.zoom];
+    return [this.viewW / 2 + dx * this.camera.zoom, this.viewH / 2 + (y - this.camera.y) * this.camera.zoom];
   }
 
   toMap(sx: number, sy: number): [number, number] {
-    const x = this.camera.x + (sx - this.root.clientWidth / 2) / this.camera.zoom;
-    const y = this.camera.y + (sy - this.root.clientHeight / 2) / this.camera.zoom;
+    const x = this.camera.x + (sx - this.viewW / 2) / this.camera.zoom;
+    const y = this.camera.y + (sy - this.viewH / 2) / this.camera.zoom;
     return [((x % this.map.width) + this.map.width) % this.map.width, y];
   }
 
@@ -141,8 +170,8 @@ export class MapView {
     const z = Math.min(this.maxZoom, Math.max(this.minZoom, zoom));
     this.camera.zoom = z;
     // Keep the map point under the finger fixed.
-    this.camera.x = mx - (sx - this.root.clientWidth / 2) / z;
-    this.camera.y = my - (sy - this.root.clientHeight / 2) / z;
+    this.camera.x = mx - (sx - this.viewW / 2) / z;
+    this.camera.y = my - (sy - this.viewH / 2) / z;
     this.clamp();
     this.invalidate();
   }
