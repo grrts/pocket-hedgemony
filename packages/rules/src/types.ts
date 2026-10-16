@@ -60,6 +60,7 @@ export type Terrain =
   | "desert"
   | "tundra"
   | "jungle"
+  | "savanna"
   /** Water zones. "sea" lies along a coast; "ocean" is open water far from land. */
   | "sea"
   | "ocean";

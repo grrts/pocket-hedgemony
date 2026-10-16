@@ -34,7 +34,7 @@ body {
   overflow: hidden;
   background: var(--sea);
   color: var(--ink);
-  font: 400 16px/1.35 var(--body);
+  font: 400 17px/1.4 var(--body);
   -webkit-text-size-adjust: 100%;
   -webkit-user-select: none;
   user-select: none;
@@ -101,7 +101,8 @@ img,
   border-image: var(--ui-ribbon) 3 8 fill / 12px 32px stretch;
   padding: 0 4px;
   min-height: 48px;
-  font: 400 28px/24px var(--title);
+  font: 600 22px/24px var(--body);
+  letter-spacing: 0.5px;
   color: var(--paper-light);
   text-shadow: 2px 2px 0 var(--outline);
   image-rendering: pixelated;
@@ -197,7 +198,7 @@ button.icon-only {
 }
 
 .hud .realm b {
-  font: 400 30px/1 var(--title);
+  font: 600 24px/1 var(--body);
   color: var(--brass-light);
   text-shadow: 2px 2px 0 var(--outline);
   white-space: nowrap;
@@ -206,12 +207,13 @@ button.icon-only {
 }
 
 .hud .title b {
-  font-size: 36px;
+  font: 400 36px/1 var(--title);
 }
 
 .hud .subtitle {
   flex-basis: 100%;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--paper);
   text-shadow: 2px 2px 0 var(--outline);
 }
@@ -334,7 +336,7 @@ button.icon-only {
 
 .hint {
   color: var(--ink-soft);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .hint a {
@@ -388,8 +390,8 @@ button.icon-only {
   left: max(6px, env(safe-area-inset-left));
   bottom: max(6px, env(safe-area-inset-bottom));
   padding: 0 6px;
-  font-size: 11px;
-  line-height: 18px;
+  font-size: 13px;
+  line-height: 20px;
   color: var(--ink);
   background: var(--ui-parchment) 0 0 / 64px;
   border: 2px solid var(--outline);

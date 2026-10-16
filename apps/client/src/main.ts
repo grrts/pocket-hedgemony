@@ -153,7 +153,7 @@ function drawOverlay(o: OverlayContext): void {
       if (own < 0 || nations[own]!.capital === p.id) return;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) return;
-      const img = sprite("town", nations[own]!.color, spriteScale - 1 || 1);
+      const img = sprite("town", nations[own]!.color, Math.max(1, spriteScale - 2));
       ctx.drawImage(img, Math.round(sx - img.width / 2), Math.round(sy - img.height / 2));
     });
   }
@@ -163,7 +163,7 @@ function drawOverlay(o: OverlayContext): void {
       if (owners[provinceIndex.get(n.capital)!] !== i) return;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) return;
-      const img = sprite("capital", n.color, spriteScale);
+      const img = sprite("capital", n.color, Math.max(1, spriteScale - 1));
       ctx.drawImage(img, Math.round(sx - img.width / 2), Math.round(sy - img.height / 2));
     });
   }
@@ -188,7 +188,7 @@ function drawOverlay(o: OverlayContext): void {
     ctx.textBaseline = "top";
     provinces.forEach((p, i) => {
       const [sx, sy] = o.toScreen(p.x!, p.y!);
-      if (onScreen(sx, sy)) pixelText(ctx, p.name, sx, isWater[i] ? sy : sy + 6 * spriteScale, 11, isWater[i]);
+      if (onScreen(sx, sy)) pixelText(ctx, p.name, sx, isWater[i] ? sy : sy + 7 * spriteScale, 12, isWater[i]);
     });
   }
 
@@ -207,7 +207,7 @@ function drawOverlay(o: OverlayContext): void {
       if (!onScreen(sx, sy)) continue;
       const owner = s.armies.owner[k]!;
       const cmd = s.armies.commander[k]!;
-      const img = sprite(cmd >= 0 ? "commander" : "soldier", nations[owner]!.color, spriteScale);
+      const img = sprite(cmd >= 0 ? "commander" : "soldier", nations[owner]!.color, Math.max(1, spriteScale - 1));
       const x = Math.round(sx - img.width / 2);
       const y = Math.round(sy - img.height + 2 * spriteScale);
       if (s.armies.id[k] === selectedArmy) {
@@ -248,10 +248,13 @@ function drawOverlay(o: OverlayContext): void {
 let armyHitBoxes: { id: number; x: number; y: number; w: number; h: number }[] = [];
 
 function pixelText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, water = false): void {
-  ctx.font = `${water ? "400" : "600"} ${size + 2}px "Pixelify Sans", "Courier New", monospace`;
-  ctx.lineWidth = Math.max(2, size / 5);
-  ctx.lineJoin = "miter";
+  ctx.font = `600 ${size + 2}px "Pixelify Sans", "Courier New", monospace`;
+  // A thick ink outline plus a drop shadow, so labels read over busy terrain.
+  ctx.lineWidth = Math.max(3, Math.round(size / 3.5));
+  ctx.lineJoin = "round";
   ctx.strokeStyle = PALETTE.ink;
+  const shadow = Math.max(1, Math.round(size / 9));
+  ctx.strokeText(text, Math.round(x) + shadow, Math.round(y) + shadow);
   ctx.strokeText(text, Math.round(x), Math.round(y));
   ctx.fillStyle = water ? PALETTE.mist : PALETTE.paper;
   ctx.fillText(text, Math.round(x), Math.round(y));

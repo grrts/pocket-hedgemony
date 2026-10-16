@@ -34,7 +34,10 @@ export const PALETTE = {
 } as const;
 
 /** Terrain order is shared with the map shader. */
-export const TERRAINS = ["grassland", "farmland", "hills", "mountains", "drylands", "marsh", "forest", "desert", "tundra", "jungle"] as const;
+export const TERRAINS = [
+  "grassland", "farmland", "hills", "mountains", "drylands", "marsh", "forest", "desert", "tundra", "jungle",
+  "savanna", "glacier", "badlands", "highlands",
+] as const;
 
 export const TERRAIN_COLORS: Record<(typeof TERRAINS)[number], string> = {
   grassland: PALETTE.grass,
@@ -47,7 +50,14 @@ export const TERRAIN_COLORS: Record<(typeof TERRAINS)[number], string> = {
   desert: PALETTE.dune,
   tundra: PALETTE.tundra,
   jungle: PALETTE.jungle,
+  savanna: "#c2b04a",
+  glacier: "#e8f0fc",
+  badlands: "#b0583a",
+  highlands: "#3f7a44",
 };
+
+/** Ocean colour by depth band: shelf, slope, deep, abyss, trench. */
+export const DEPTH_COLORS = ["#3f7fc2", "#2f66aa", "#26518f", "#1e3f74", "#17305c"] as const;
 
 export function hexToRgb(hex: string): [number, number, number] {
   return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];

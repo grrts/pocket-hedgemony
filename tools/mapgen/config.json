@@ -26,20 +26,6 @@
   "lowlands": [
     { "name": "Po valley", "bbox": [7.5, 44.55, 12.6, 45.55] }
   ],
-  "terrainClasses": {
-    "Range/mtn": "mountains",
-    "Desert": "desert",
-    "Plateau": "hills",
-    "Foothills": "hills",
-    "Tundra": "tundra",
-    "Wetlands": "marsh",
-    "Delta": "marsh",
-    "Plain": "grassland",
-    "Lowland": "farmland",
-    "Valley": "farmland",
-    "Basin": "drylands",
-    "Depression": "drylands"
-  },
   "$settlementComment": "Rough 1444 population density (people per km²) and wealth (1-10) by region. First match wins.",
   "settlement": [
     { "name": "Low Countries, Northern Italy, Paris basin, Rhine", "bbox": [-1, 43, 13, 53], "density": 30, "wealth": 6 },

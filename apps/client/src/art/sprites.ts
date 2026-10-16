@@ -3,8 +3,9 @@ import { PALETTE } from "./palette.ts";
 /**
  * Hand-drawn pixel sprites as text so they're easy to edit in a diff.
  * Each character is one pixel: "." is transparent, other letters map to
- * palette colours below; "N" and "n" are the owning nation's colour and a
- * darker shade of it.
+ * the colours below; "N", "L" and "n" are the owning nation's colour, a
+ * lighter and a darker shade of it. An ink outline is added around every
+ * sprite when it is drawn, so the art only needs its inner lines.
  */
 const KEY: Record<string, string> = {
   k: PALETTE.ink,
@@ -15,66 +16,88 @@ const KEY: Record<string, string> = {
   y: PALETTE.gold,
   o: PALETTE.clay,
   r: PALETTE.blood,
-  b: "#8b5a3c", // wood / leather
+  b: "#8b5a3c", // wood, leather, horse
+  t: "#5c3a26", // dark wood: poles, hooves
+  h: "#4a2e1e", // hair
   f: "#f2c09c", // skin
+  F: "#c98f6c", // skin in shade
+  c: "#d8ccb0", // stone, plaster
+  e: "#a39478", // stone in shade
+  E: "#6e6252", // ground shadow
+  m: "#2b2130", // doorways, arrow slits
 };
 
 export const SPRITES = {
-  /** Capital city: a walled keep. */
+  /** Capital city: a keep flying the realm's banner behind a gatehouse wall. */
   capital: [
-    "..k.k.k.k..",
-    "..kwkwkwk..",
-    "..kwwwwwk..",
-    "k.kwgkgwk.k",
-    "kwkwgkgwkwk",
-    "kwwwwwwwwwk",
-    "kwgwwkwwgwk",
-    "kwwwkkkwwwk",
-    "kkkkkkkkkkk",
+    ".........t.........",
+    ".........tNNN......",
+    ".........tLNNn.....",
+    ".........tNNn......",
+    ".........t.........",
+    ".......c.c.e.......",
+    "c.c.e..ccwce..c.c.e",
+    "cccce..ccmce..cccce",
+    "ccmce..cccce..ccmce",
+    "ccmce.ckckckc.ccmce",
+    "ccccekcNcccNckcccce",
+    "ccecekcncecnckcccce",
+    "ceccekcckkkcckcecce",
+    "ccccekckmsmkckccece",
+    "ecccEkckmsmkckeccee",
+    "eeeeEkekmsmkekeeeee",
+    "EEEEEEEEEEEEEEEEEEE",
   ],
-  /** Ordinary town. */
+  /** Ordinary town: a timber-framed house under a roof in the realm's colour. */
   town: [
-    "...k...",
-    "..kNk..",
-    ".kNNNk.",
-    "kwwwwwk",
-    "kwkwkwk",
-    "kwwkwwk",
-    "kkkkkkk",
+    "......k...t..",
+    ".....kLk..t..",
+    "....kLNnk.t..",
+    "...kLNNNnkt..",
+    "..kLNNNNNnk..",
+    ".kLNNNNNNNnk.",
+    "kLNNNNNNNNNnk",
+    ".kbbbbbbbbbk.",
+    ".kcwwcbcccek.",
+    ".kcggcbcmmek.",
+    ".kccccbcmmek.",
+    ".keeeebemmek.",
+    "EEEEEEEEEEEEE",
   ],
-  /** Commander on foot with a banner in the nation's colour. */
+  /** Commander on horseback with a lance pennant and a caparison in the realm's colour. */
   commander: [
-    "....kk......",
-    "...kNNk.....",
-    "...kNnk.....",
-    "...kk.......",
-    "..k.ky......",
-    "..kkyyk.....",
-    "..kfffk.....",
-    "..kfkfk.....",
-    "..kkffk.....",
-    ".kNNNNNk....",
-    "kNnNyNnNk...",
-    "kfkNNNkfk...",
-    "kk.kssk.kk..",
-    "...kssk.....",
-    "...kbkbk....",
-    "...kk.kk....",
+    ".t......hh......",
+    ".tNNn..hhhh.....",
+    ".tLNNn.sffs.....",
+    ".tNNn..sfFs.....",
+    ".t......ff...bb.",
+    ".t....NLNNn.bbbt",
+    ".t...fNLyNnfbbb.",
+    ".t....NyNNn.bb..",
+    ".t.bbbbbbbbbbb..",
+    ".tbNNNLNNNNnbb..",
+    ".tbNLNNNNNNnb...",
+    ".bbNNNNNNNNnb...",
+    "b..bbb...bbb....",
+    "...b.b...b.b....",
+    "...b.b...b.b....",
+    "...t.t...t.t....",
   ],
-  /** Plain army without a named commander. */
+  /** Plain army without a named commander: a helmeted spearman. */
   soldier: [
-    "....k.....",
-    "...kgk....",
-    "..kfffk...",
-    "..kfkfk...",
-    "..kkffk.k.",
-    ".kNNNNNkgk",
-    "kNnNNNnNkk",
-    "kfkNNNkfk.",
-    "kk.kssk.k.",
-    "...kssk...",
-    "...kbkbk..",
-    "...kk.kk..",
+    "....s.....",
+    "...sgs....",
+    "..sgggs.k.",
+    "..sffFs.s.",
+    "...ffF..s.",
+    "..NNLNNfs.",
+    ".NNLNNNNs.",
+    ".fNLNNNns.",
+    "..bbybbbs.",
+    "..NNNNNn..",
+    "..ss.ss...",
+    "..ss.ss...",
+    ".bbb.bbb..",
   ],
   /** Move order arrow head. */
   flag: [
@@ -92,10 +115,20 @@ export type SpriteName = keyof typeof SPRITES;
 
 const cache = new Map<string, HTMLCanvasElement>();
 
-function darker(hex: string): string {
+function shade(hex: string, ch: "n" | "L"): string {
   const n = parseInt(hex.slice(1), 16);
-  const f = (v: number) => Math.round(v * 0.62);
+  const f = (v: number) => Math.round(ch === "n" ? v * 0.62 : v + (255 - v) * 0.35);
   return `rgb(${f((n >> 16) & 255)},${f((n >> 8) & 255)},${f(n & 255)})`;
+}
+
+/** The sprite with a one-pixel ink outline around everything that isn't ink already. */
+function outlined(rows: readonly string[]): string[] {
+  const w = rows[0]!.length + 2;
+  const grid = [".".repeat(w), ...rows.map((r) => `.${r}.`), ".".repeat(w)];
+  const solid = (x: number, y: number) => x >= 0 && y >= 0 && x < w && y < grid.length && !".k".includes(grid[y]![x]!);
+  return grid.map((row, y) =>
+    [...row].map((ch, x) => (ch === "." && (solid(x + 1, y) || solid(x - 1, y) || solid(x, y + 1) || solid(x, y - 1)) ? "k" : ch)).join(""),
+  );
 }
 
 /** Renders a sprite at an integer scale, tinted with a nation colour. Cached. */
@@ -103,7 +136,7 @@ export function sprite(name: SpriteName, nationColor: string, scale: number): HT
   const key = `${name}|${nationColor}|${scale}`;
   const hit = cache.get(key);
   if (hit) return hit;
-  const rows = SPRITES[name];
+  const rows = outlined(SPRITES[name]);
   const canvas = document.createElement("canvas");
   canvas.width = rows[0]!.length * scale;
   canvas.height = rows.length * scale;
@@ -112,7 +145,7 @@ export function sprite(name: SpriteName, nationColor: string, scale: number): HT
     for (let x = 0; x < row.length; x++) {
       const ch = row[x]!;
       if (ch === ".") continue;
-      ctx.fillStyle = ch === "N" ? nationColor : ch === "n" ? darker(nationColor) : KEY[ch]!;
+      ctx.fillStyle = ch === "N" ? nationColor : ch === "n" || ch === "L" ? shade(nationColor, ch) : KEY[ch]!;
       ctx.fillRect(x * scale, y * scale, scale, scale);
     }
   });

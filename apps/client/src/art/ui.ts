@@ -73,12 +73,15 @@ function woodFrame(): string {
     rect(1, 1, 1, 22, C.woodLight);
     rect(1, 22, 22, 1, C.woodDark);
     rect(22, 1, 1, 22, C.woodDark);
-    // Inner lip around the opening.
+    // Inner lip around the opening, on the last row of the 8-pixel slice so
+    // the frame meets the parchment with no see-through seam.
+    rect(7, 7, 10, 1, C.outline);
+    rect(7, 7, 1, 10, C.outline);
     rect(6, 6, 12, 1, C.woodDark);
     rect(6, 6, 1, 12, C.woodDark);
-    rect(6, 17, 12, 1, C.woodLight);
-    rect(17, 6, 1, 12, C.woodLight);
-    rect(7, 7, 10, 10, "clear");
+    rect(7, 16, 10, 1, C.woodLight);
+    rect(16, 7, 1, 10, C.woodLight);
+    rect(8, 8, 8, 8, "clear");
     // Brass corners with a rivet.
     for (const [cx, cy] of [
       [0, 0],

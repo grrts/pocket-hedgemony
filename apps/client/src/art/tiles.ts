@@ -51,8 +51,8 @@ class Painter {
     const n = this.size;
     for (let i = 0; i < n * n; i++) if (this.rand() < amount) this.set(i % n, Math.floor(i / n), hex);
   }
-  /** A mountain: lit west face, shaded east face, snow cap, dark outline. */
-  peak(cx: number, baseY: number, halfW: number, height: number): void {
+  /** A mountain: lit west face, shaded east face, a cap, dark outline. */
+  peak(cx: number, baseY: number, halfW: number, height: number, c: PeakColors = GREY_PEAK): void {
     const top = baseY - height;
     for (let y = top; y <= baseY; y++) {
       const t = (y - top) / height;
@@ -61,10 +61,12 @@ class Painter {
       for (let dx = -w; dx <= w; dx++) {
         const edge = Math.abs(dx) === w || y === baseY;
         const lit = dx < 0 || (dx === 0 && y % 2 === 0);
-        this.set(cx + dx, y, edge ? "#4a4552" : snow ? (lit ? "#f4f4f4" : "#cbdbfc") : lit ? "#b5aebb" : "#77707e");
+        const capped = snow && c.cap !== null;
+        this.set(cx + dx, y, edge ? c.outline : capped ? (lit ? c.cap! : c.capShade!) : lit ? c.lit : c.shade);
       }
-      // A ridge line running down the lit face.
-      if (!snow && t > 0.5 && w > 3) this.set(cx - Math.round(w / 2), y, "#9a94a0");
+      // A ridge line running down the lit face, and strata on desert rock.
+      if (!snow && t > 0.5 && w > 3) this.set(cx - Math.round(w / 2), y, c.ridge);
+      if (c.strata && y % 3 === 0 && w > 1) for (let dx = -w + 1; dx < w; dx++) if (dx % 2 === 0) this.set(cx + dx, y, c.strata);
     }
   }
   /** Draws a text sprite; "." is transparent, other characters look up `key`. */
@@ -89,6 +91,22 @@ class Painter {
   }
 }
 
+interface PeakColors {
+  outline: string;
+  lit: string;
+  shade: string;
+  ridge: string;
+  cap: string | null;
+  capShade: string | null;
+  strata?: string;
+}
+/** Temperate and alpine ranges: grey rock, snow caps. */
+const GREY_PEAK: PeakColors = { outline: "#4a4552", lit: "#b5aebb", shade: "#77707e", ridge: "#9a94a0", cap: "#f4f4f4", capShade: "#cbdbfc" };
+/** Desert ranges (Atlas, Zagros, the dry Andes): red and ochre rock, banded. */
+const RED_PEAK: PeakColors = { outline: "#5a2a1c", lit: "#d8885a", shade: "#9a4a30", ridge: "#e8a878", cap: null, capShade: null, strata: "#c06a44" };
+/** Tropical ranges: green, forested slopes, no snow. */
+const GREEN_PEAK: PeakColors = { outline: "#1d3a24", lit: "#6aa45a", shade: "#356a3e", ridge: "#86bc6a", cap: "#9ac87a", capShade: "#5e9050" };
+
 // ---- stamps ----
 const TUFT = ["d.d", ".d."];
 const FLOWER = [".f.", "fcf", ".d."];
@@ -103,6 +121,9 @@ const ROCKS = ["r.", "rd"];
 const SNOW = [".ww.", "wwww", ".ww."];
 const WAVE = [".ww.", "w..w"];
 const SPARK = ["f"];
+const ACACIA = [".llggg.", "lggggdd", "..t.t..", "...t...", "...t..."];
+const CREVASSE = ["d...", ".dd.", "...d"];
+const MESA = ["..llllll..", ".lllllldd.", ".sssssssd.", "lllllllddd", "ssssssssdd"];
 
 type Paint = (p: Painter) => void;
 
@@ -210,6 +231,35 @@ const PAINT: Record<(typeof TERRAINS)[number] | "sea" | "shallow", Paint> = {
     p.scatter(BROADLEAF, 4, { l: "#7ccf5a", g: "#3f9a45", d: "#1d5a2a", t: "#5a3a2a" }, 5);
     if (p.rand() < 0.6) p.scatter(PALM, 1, { l: "#8ad866", g: "#3f9a45", t: "#7a5a3a" });
   },
+  savanna: (p) => {
+    p.dither("#d4c060", 0.18);
+    p.dither("#a89a3a", 0.12);
+    p.scatter(TUFT, 4, { d: "#8a7a2a" }, 4);
+    if (p.rand() < 0.75) p.scatter(ACACIA, 1 + Math.floor(p.rand() * 2), { l: "#7aa04a", g: "#557a32", d: "#3a5a24", t: "#5a3a2a" }, 8);
+  },
+  glacier: (p) => {
+    p.dither("#ffffff", 0.2);
+    p.dither("#d4e0f4", 0.15);
+    p.scatter(CREVASSE, 3, { d: "#9ab0d8" }, 6);
+  },
+  badlands: (p) => {
+    p.dither("#9a4a30", 0.18);
+    p.dither("#c8784a", 0.12);
+    p.scatter(ROCKS, 6, { r: "#d8885a", d: "#5a2a1c" }, 6);
+    p.stamp(MESA, 18, 4, { l: "#e0905e", s: "#b0603c", d: "#7a3a24" });
+    p.peak(9, 15, 8, 12, RED_PEAK);
+    p.peak(24, 30, 8, 12, RED_PEAK);
+    p.peak(8, 31, 6, 9, RED_PEAK);
+  },
+  highlands: (p) => {
+    p.dither("#2e6a3a", 0.25);
+    p.dither("#4a8a4a", 0.12);
+    p.peak(20, 17, 9, 14, GREEN_PEAK);
+    p.peak(9, 14, 7, 10, GREEN_PEAK);
+    p.peak(27, 30, 7, 10, GREEN_PEAK);
+    p.peak(11, 31, 8, 12, GREEN_PEAK);
+    p.scatter(BROADLEAF, 5, { l: "#7ccf5a", g: "#3f9a45", d: "#1d5a2a", t: "#5a3a2a" }, 7);
+  },
   sea: (p) => {
     p.dither("#1f3462", 0.12);
     p.scatter(WAVE, 2, { w: "#2f5596" }, 7);
@@ -232,15 +282,38 @@ const BASE: Record<keyof typeof PAINT, string> = {
   desert: "#e0b878",
   tundra: "#9badb7",
   jungle: "#2a6b36",
+  savanna: "#c2b04a",
+  glacier: "#e8f0fc",
+  badlands: "#b0583a",
+  highlands: "#3f7a44",
   sea: "#243a6b",
   shallow: "#2b5a9c",
 };
+
+/** Base colours of the two water rows, so the map can shift them by depth. */
+export const WATER_BASE = { sea: BASE.sea, shallow: BASE.shallow };
+
+/** Average colour of each atlas row, for the flat far-zoom map so it matches the close-up art. */
+export function rowColors(atlas: { width: number; rgba: Uint8Array }): number[] {
+  const out: number[] = [];
+  for (let row = 0; row < ATLAS_ROWS; row++) {
+    const sum = [0, 0, 0];
+    for (let y = 0; y < TILE; y++) {
+      for (let x = 0; x < atlas.width; x++) {
+        const o = ((row * TILE + y) * atlas.width + x) * 4;
+        for (let k = 0; k < 3; k++) sum[k]! += atlas.rgba[o + k]!;
+      }
+    }
+    for (let k = 0; k < 3; k++) out.push(sum[k]! / (TILE * atlas.width) / 255);
+  }
+  return out;
+}
 
 /**
  * Rows drawn as one 32×32 picture whose quarters fill the four variants; the
  * shader picks the quarter by position (and mirrors some) instead of at random.
  */
-export const BIG_ROWS = [TERRAINS.indexOf("mountains")];
+export const BIG_ROWS = [TERRAINS.indexOf("mountains"), TERRAINS.indexOf("badlands"), TERRAINS.indexOf("highlands")];
 
 /** Builds the atlas as RGBA bytes: VARIANTS tiles across, ATLAS_ROWS down. */
 export function buildTileAtlas(): { width: number; height: number; rgba: Uint8Array } {
@@ -287,4 +360,36 @@ export function tileCanvas(row: number, variant: number, scale: number): HTMLCan
     }
   }
   return c;
+}
+
+/**
+ * The same atlas at half size (8 × 8 tiles), for middle zoom where a map
+ * pixel is only a few screen pixels: each 2 × 2 block keeps its most common
+ * colour, so trees and peaks stay crisp instead of blurring.
+ */
+export function buildMiniAtlas(): { width: number; height: number; rgba: Uint8Array } {
+  const full = (atlasCache ??= buildTileAtlas());
+  const width = full.width / 2;
+  const height = full.height / 2;
+  const rgba = new Uint8Array(width * height * 4);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const votes = new Map<number, number>();
+      let best = 0;
+      let bestN = 0;
+      for (let k = 0; k < 4; k++) {
+        const o = ((y * 2 + (k >> 1)) * full.width + x * 2 + (k & 1)) * 4;
+        const c = (full.rgba[o]! << 16) | (full.rgba[o + 1]! << 8) | full.rgba[o + 2]!;
+        const n = (votes.get(c) ?? 0) + 1;
+        votes.set(c, n);
+        if (n > bestN) ((best = c), (bestN = n));
+      }
+      const o = (y * width + x) * 4;
+      rgba[o] = best >> 16;
+      rgba[o + 1] = (best >> 8) & 255;
+      rgba[o + 2] = best & 255;
+      rgba[o + 3] = 255;
+    }
+  }
+  return { width, height, rgba };
 }

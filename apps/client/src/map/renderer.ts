@@ -1,5 +1,5 @@
-import { hexToRgb, PALETTE, TERRAIN_COLORS, TERRAINS } from "../art/palette.ts";
-import { ATLAS_ROWS, BIG_ROWS, buildTileAtlas, SEA_ROW, SHALLOW_ROW, TILE, VARIANTS } from "../art/tiles.ts";
+import { DEPTH_COLORS, hexToRgb, PALETTE, TERRAINS } from "../art/palette.ts";
+import { ATLAS_ROWS, BIG_ROWS, buildMiniAtlas, buildTileAtlas, rowColors, SEA_ROW, SHALLOW_ROW, TILE, VARIANTS, WATER_BASE } from "../art/tiles.ts";
 import type { MapImage } from "./loadMap.ts";
 
 /**
@@ -8,13 +8,20 @@ import type { MapImage } from "./loadMap.ts";
  * mode only rewrites a few kilobytes instead of millions of pixels.
  * Each map pixel is drawn as a crisp block (nearest filtering) for the 8-bit look.
  *
- * Zoomed in past DETAIL_ZOOM, every map pixel becomes 8×8 art pixels: terrain
- * tiles from the atlas (fields, forests, peaks), coasts with cut corners and
- * a sand line, two-tone nation borders and dotted province borders.
+ * Three levels of detail:
+ * - far: one colour per map pixel from its terrain, with relief shading,
+ *   the realm's colour washed over it and ocean depth in dithered bands;
+ * - middle (MID_ZOOM): every map pixel becomes 4×4 art pixels from a
+ *   half-size tile atlas;
+ * - close (DETAIL_ZOOM): every map pixel becomes 8×8 art pixels.
+ * Both tiled levels draw coasts with cut corners and a sand line, two-tone
+ * nation borders and dotted province borders.
  */
 
-/** Device pixels per map pixel at which the detailed tiles take over. */
+/** Device pixels per map pixel at which the full-size tiles take over. */
 export const DETAIL_ZOOM = 7;
+/** Device pixels per map pixel at which the half-size tiles take over. */
+export const MID_ZOOM = 4;
 
 export type MapMode = "political" | "terrain";
 
@@ -38,12 +45,15 @@ void main() {
   gl_Position = vec4(screen.x * 2.0 / uView.x, -screen.y * 2.0 / uView.y, 0.0, 1.0);
 }`;
 
+const T = Object.fromEntries(TERRAINS.map((t, i) => [t, i])) as Record<(typeof TERRAINS)[number], number>;
+const glsl = (hex: string) => `vec3(${hexToRgb(hex).map((v) => (v / 255).toFixed(4)).join(", ")})`;
+
 const FRAG = `#version 300 es
 precision highp float;
 precision highp int;
 in vec2 vMap;
 uniform sampler2D uIds;      // this tile's province ids (RGB = id + 1)
-uniform sampler2D uLand;     // this tile's terrain per pixel (R = terrain index)
+uniform sampler2D uLand;     // this tile's terrain per pixel (R = terrain index, G = water depth band + 1)
 uniform ivec2 uTileOrigin;   // tile's top-left in map pixels
 uniform ivec2 uTileSize;     // texels in this tile's texture (includes 1px overlap)
 uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
@@ -52,22 +62,28 @@ uniform int uInfoWidth;
 uniform float uZoom;
 uniform float uTime;
 uniform int uMode;           // 0 political, 1 terrain
-uniform vec3 uTerrain[10];
-uniform vec3 uSea, uDeepSea, uFoam, uInk, uHighlight, uSand;
+uniform vec3 uTerrain[${TERRAINS.length}];  // average colour of each terrain's tiles
+uniform vec3 uDepth[${DEPTH_COLORS.length}];     // ocean colour by depth band
+uniform vec3 uFoam, uInk, uHighlight, uSand;
 uniform sampler2D uAtlas;    // terrain tiles: ${VARIANTS} variants across, one row per terrain
+uniform sampler2D uMini;     // the same at half size
 out vec4 outColor;
 
-const float ART = ${TILE / 2}.0; // art pixels per map pixel when detailed
+const vec3 SEA_BASE = ${glsl(WATER_BASE.sea)};
+const vec3 SHALLOW_BASE = ${glsl(WATER_BASE.shallow)};
 
 int idAt(ivec2 p) {
   ivec2 local = clamp(p - uTileOrigin, ivec2(0), uTileSize - 1);
   vec3 c = texelFetch(uIds, local, 0).rgb * 255.0 + 0.5;
   return (int(c.r) << 16 | int(c.g) << 8 | int(c.b)) - 1;
 }
-int terrainAt(ivec2 p) {
+vec2 landAt(ivec2 p) {
   ivec2 local = clamp(p - uTileOrigin, ivec2(0), uTileSize - 1);
-  return int(texelFetch(uLand, local, 0).r * 255.0 + 0.5);
+  return texelFetch(uLand, local, 0).rg * 255.0 + 0.5;
 }
+int terrainAt(ivec2 p) { return min(int(landAt(p).r), ${TERRAINS.length - 1}); }
+// Depth band of a map pixel; land counts as the shallowest so coasts stay light.
+float depthAt(ivec2 p) { return max(floor(landAt(p).g) - 1.0, 0.0); }
 vec4 info(int id) { return texelFetch(uInfo, ivec2(id % uInfoWidth, id / uInfoWidth), 0); }
 int ownerOf(int id) {
   vec2 o = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).rg * 255.0 + 0.5;
@@ -82,8 +98,35 @@ float hash(ivec2 p) {
   h = (h ^ (h >> 13)) * 1274126177u;
   return float(h & 0xffffu) / 65535.0;
 }
+float lum(vec3 c) { return dot(c, vec3(0.3, 0.59, 0.11)); }
+// 4×4 ordered dither threshold in (0, 1), for crisp pixel-art gradients.
+float bayer(ivec2 a) {
+  int x = a.x & 3, y = a.y & 3;
+  int b2 = ((x ^ y) & 1) * 2 + (y & 1);
+  int b1 = (((x >> 1) ^ (y >> 1)) & 1) * 2 + ((y >> 1) & 1);
+  return (float(b2 * 4 + b1) + 0.5) / 16.0;
+}
+vec3 depthColor(float v, ivec2 a) {
+  int band = clamp(int(floor(v + bayer(a))), 0, ${DEPTH_COLORS.length - 1});
+  return uDepth[band];
+}
+bool isBig(int t) { return ${BIG_ROWS.map((r) => `t == ${r}`).join(" || ")}; }
+float flags(int id) { return float(int(info(id).a * 255.0 + 0.5) >> 4); }
+vec3 highlight(vec3 c, int id, float strength) {
+  int f = int(flags(id));
+  if ((f & 1) != 0) c = mix(c, uHighlight, strength + strength * step(0.5, fract(uTime * 1.5)));
+  if ((f & 2) != 0) c = mix(c, uHighlight, strength * 1.2);
+  return c;
+}
+// How much of the realm's colour to lay over the terrain: more when far out,
+// so realms read at a glance, less up close where the art carries the map.
+float wash() { return mix(0.62, 0.3, smoothstep(1.0, ${DETAIL_ZOOM}.0, uZoom)); }
+vec3 realmWash(vec3 terrain, vec3 realm) {
+  return mix(terrain, realm * (0.45 + 0.85 * lum(terrain)), wash());
+}
 
-vec3 atlas(int row, int variant, ivec2 local) {
+vec3 tileAt(bool mini, int row, int variant, ivec2 local) {
+  if (mini) return texelFetch(uMini, ivec2(variant * ${TILE / 2} + local.x, row * ${TILE / 2} + local.y), 0).rgb;
   return texelFetch(uAtlas, ivec2(variant * ${TILE} + local.x, row * ${TILE} + local.y), 0).rgb;
 }
 
@@ -103,139 +146,165 @@ int effId(vec2 m) {
   return dx + dy < 0.5 ? h : id;
 }
 
-vec3 detailed() {
-  vec2 artPos = floor(vMap * ART);
-  vec2 m = (artPos + 0.5) / ART;
-  float e = 1.0 / ART;
+// Tiled map: each map pixel is ART × ART art pixels; tiles cover 2 × 2 map pixels.
+vec3 tiled(bool mini) {
+  int size = mini ? ${TILE / 2} : ${TILE};
+  int shift = mini ? ${Math.log2(TILE / 2)} : ${Math.log2(TILE)};
+  float art = float(size / 2);
+  vec2 artPos = floor(vMap * art);
+  vec2 m = (artPos + 0.5) / art;
+  float e = 1.0 / art;
   int id = effId(m);
   int iR = effId(m + vec2(e, 0.0));
   int iL = effId(m - vec2(e, 0.0));
   int iD = effId(m + vec2(0.0, e));
   int iU = effId(m - vec2(0.0, e));
   ivec2 a = ivec2(artPos);
-  ivec2 cell = a >> 4;
-  ivec2 local = a & 15;
+  ivec2 cell = a >> shift;
+  ivec2 local = a & (size - 1);
   int variant = int(hash(cell) * ${VARIANTS}.0) & ${VARIANTS - 1};
+  ivec2 p = ivec2(floor(m));
 
   if (!land(id)) {
-    ivec2 p = ivec2(floor(m));
     bool nearLand = land(idAt(p + ivec2(1, 0))) || land(idAt(p - ivec2(1, 0))) || land(idAt(p + ivec2(0, 1))) || land(idAt(p - ivec2(0, 1)));
     // Waves drift sideways, each tile at its own pace.
-    int drift = int(uTime * 2.0 + hash(cell + 7) * 16.0);
-    vec3 c = atlas(nearLand ? ${SHALLOW_ROW} : ${SEA_ROW}, variant, ivec2((local.x + drift) & 15, local.y));
+    int drift = int(uTime * art * 0.25 + hash(cell + 7) * float(size));
+    vec3 c = tileAt(mini, nearLand ? ${SHALLOW_ROW} : ${SEA_ROW}, variant, ivec2((local.x + drift) & (size - 1), local.y));
+    // Shift the tile to the water's depth, blending bands with a dither.
+    vec2 q = m - 0.5;
+    ivec2 b = ivec2(floor(q));
+    vec2 f = fract(q);
+    float v = mix(mix(depthAt(b), depthAt(b + ivec2(1, 0)), f.x), mix(depthAt(b + ivec2(0, 1)), depthAt(b + ivec2(1, 1)), f.x), f.y);
+    c = clamp(c + depthColor(v, a) - (nearLand ? SHALLOW_BASE : SEA_BASE), 0.0, 1.0);
     if (land(iR) || land(iL) || land(iD) || land(iU)) {
       c = mix(c, uFoam, 0.55 + 0.2 * step(0.5, fract(uTime * 0.7 + hash(a))));
     } else if (id >= 0 && ((iR >= 0 && iR != id) || (iD >= 0 && iD != id)) && ((a.x + a.y) / 2 & 1) == 0) {
       c = mix(c, uFoam, 0.3); // dashed line between sea zones
     }
-    if (id >= 0) {
-      int flags = int(info(id).a * 255.0 + 0.5) >> 4;
-      if ((flags & 1) != 0) c = mix(c, uHighlight, 0.15 + 0.15 * step(0.5, fract(uTime * 1.5)));
-      if ((flags & 2) != 0) c = mix(c, uHighlight, 0.18);
-    }
-    return c;
+    return id >= 0 ? highlight(c, id, 0.15) : c;
   }
 
   vec4 inf = info(id);
-  int flags = int(inf.a * 255.0 + 0.5) >> 4;
-  ivec2 p = ivec2(floor(m));
   int terrain = terrainAt(p);
   if (idAt(p) != id) terrain = int(inf.a * 255.0 + 0.5) & 15; // a corner borrowed from a neighbour
-  if (terrain == ${BIG_ROWS[0]}) {
-    // One 32×32 picture over four tiles, mirrored at random per block.
-    ivec2 q = a & 31;
-    if (hash(a >> 5) > 0.5) q.x = 31 - q.x;
-    variant = (q.x >> 4) + 2 * (q.y >> 4);
-    local = q & 15;
+  if (isBig(terrain)) {
+    // One picture over four tiles, mirrored at random per block.
+    int big = size * 2;
+    ivec2 q = a & (big - 1);
+    if (hash(a >> (shift + 1)) > 0.5) q.x = big - 1 - q.x;
+    variant = (q.x >> shift) + 2 * (q.y >> shift);
+    local = q & (size - 1);
   }
-  vec3 art = atlas(terrain, variant, local);
+  vec3 c = tileAt(mini, terrain, variant, local);
   int owner = ownerOf(id);
-  vec3 c = art;
-  if (uMode == 0 && owner >= 0) {
-    // Wash the terrain in the owner's colour, keeping its light and shade.
-    float l = dot(art, vec3(0.3, 0.59, 0.11));
-    c = mix(art, inf.rgb * (0.45 + 0.85 * l), 0.3);
-    // A stronger band of the owner's colour along its borders, so the nation
-    // still reads at a glance over the terrain art.
+  bool political = uMode == 0 && owner >= 0;
+  if (political) {
+    c = realmWash(c, inf.rgb);
+    // A wider band of the owner's colour along its borders.
     bool edge = false;
     for (int k = 0; k < 4; k++) {
-      ivec2 q = p + ivec2(k == 0 ? 1 : k == 1 ? -1 : 0, k == 2 ? 1 : k == 3 ? -1 : 0);
-      int n = idAt(q);
+      int n = idAt(p + ivec2(k == 0 ? 1 : k == 1 ? -1 : 0, k == 2 ? 1 : k == 3 ? -1 : 0));
       if (land(n) && ownerOf(n) != owner) edge = true;
     }
-    if (edge) c = mix(c, inf.rgb, 0.4);
+    if (edge) c = mix(c, inf.rgb, 0.35);
   }
 
+  bool other1 = (land(iR) && ownerOf(iR) != owner) || (land(iL) && ownerOf(iL) != owner) || (land(iD) && ownerOf(iD) != owner) || (land(iU) && ownerOf(iU) != owner);
   if (!land(iR) || !land(iL) || !land(iD) || !land(iU)) {
     c = uSand;
-  } else if (ownerOf(iR) != owner || ownerOf(iL) != owner || ownerOf(iD) != owner || ownerOf(iU) != owner) {
-    c = mix(inf.rgb, uInk, 0.4);
-  } else if ((iR != id || iL != id || iD != id || iU != id) && ((a.x + a.y) & 1) == 0) {
-    c = mix(c, uInk, 0.45);
+  } else if (other1) {
+    // Nation border: a dark ink line ...
+    c = mix(uInk, inf.rgb, 0.18);
+  } else {
+    int jR = effId(m + vec2(2.0 * e, 0.0));
+    int jL = effId(m - vec2(2.0 * e, 0.0));
+    int jD = effId(m + vec2(0.0, 2.0 * e));
+    int jU = effId(m - vec2(0.0, 2.0 * e));
+    bool other2 = (land(jR) && ownerOf(jR) != owner) || (land(jL) && ownerOf(jL) != owner) || (land(jD) && ownerOf(jD) != owner) || (land(jU) && ownerOf(jU) != owner);
+    if (other2 && political) {
+      // ... with a bright band of the realm's own colour just inside it.
+      c = mix(c, min(inf.rgb * 1.15 + 0.06, 1.0), 0.8);
+    } else if (other2) {
+      c = mix(c, uInk, 0.35);
+    } else if ((iR != id || iL != id || iD != id || iU != id) && ((a.x + a.y) & 1) == 0) {
+      c = mix(c, uInk, 0.5); // dotted province border
+    }
   }
-
-  if ((flags & 1) != 0) c = mix(c, uHighlight, 0.18 + 0.17 * step(0.5, fract(uTime * 1.5)));
-  if ((flags & 2) != 0) c = mix(c, uHighlight, 0.22);
-  return c;
+  return highlight(c, id, 0.18);
 }
 
-void main() {
-  if (uZoom >= ${DETAIL_ZOOM}.0) {
-    outColor = vec4(detailed(), 1.0);
-    return;
-  }
+// Rough height of a terrain, for hill shading on the far map.
+float height(int t) {
+  return t == ${T.mountains} || t == ${T.badlands} ? 2.0 : t == ${T.highlands} ? 1.6 : t == ${T.hills} ? 0.8 : 0.0;
+}
+
+vec3 far() {
   ivec2 p = ivec2(floor(vMap));
   int id = idAt(p);
   if (!land(id)) {
-    // Sea: dithered deep water, a light line where it meets the coast,
-    // and faint dashes between sea zones once zoomed in.
+    // Ocean: depth bands dithered into each other, a light line along the
+    // coast, sparse drifting glints, and faint dashes between sea zones.
+    float v = (depthAt(p) * 2.0 + depthAt(p + ivec2(2, 0)) + depthAt(p - ivec2(2, 0)) + depthAt(p + ivec2(0, 2)) + depthAt(p - ivec2(0, 2))) / 6.0;
+    vec3 c = depthColor(v, p);
     bool coast = land(idAt(p + ivec2(1, 0))) || land(idAt(p - ivec2(1, 0))) || land(idAt(p + ivec2(0, 1))) || land(idAt(p - ivec2(0, 1)));
-    float wave = hash(ivec2(p.x + int(uTime * 1.5), p.y));
-    vec3 c = wave > 0.93 ? uSea : uDeepSea;
-    if (coast && uZoom > 1.5) {
-      c = mix(uSea, uFoam, 0.35);
+    float glint = hash(ivec2(p.x + int(uTime * 1.5), p.y));
+    if (coast && uZoom > 1.2) {
+      c = mix(c, uFoam, 0.4);
+    } else if (glint > 0.985 - 0.01 * v) {
+      c = mix(c, uFoam, 0.25);
     } else if (id >= 0 && uZoom > 2.5) {
       int r = idAt(p + ivec2(1, 0));
       int d = idAt(p + ivec2(0, 1));
-      if (((r >= 0 && r != id) || (d >= 0 && d != id)) && ((p.x + p.y) & 1) == 0) c = mix(c, uSea, 0.8);
+      if (((r >= 0 && r != id) || (d >= 0 && d != id)) && ((p.x + p.y) & 1) == 0) c = mix(c, uFoam, 0.15);
     }
-    if (id >= 0) {
-      int flags = int(info(id).a * 255.0 + 0.5) >> 4;
-      if ((flags & 1) != 0) c = mix(c, uHighlight, 0.2 + 0.2 * step(0.5, fract(uTime * 1.5)));
-      if ((flags & 2) != 0) c = mix(c, uHighlight, 0.2);
-    }
-    outColor = vec4(c, 1.0);
-    return;
+    return id >= 0 ? highlight(c, id, 0.2) : c;
   }
 
   vec4 inf = info(id);
-  int terrain = uMode == 0 ? int(inf.a * 255.0 + 0.5) & 15 : terrainAt(p);
-  int flags = int(inf.a * 255.0 + 0.5) >> 4;
-  vec3 c = uMode == 0 ? inf.rgb : uTerrain[terrain];
+  int t = terrainAt(p);
+  vec3 c = uTerrain[t];
 
-  // Terrain texture: a few darker pixels in fixed patterns, like old tile sets.
+  // Texture: a few darker pixels in fixed patterns, like old tile sets.
   float h = hash(p);
-  float shade = 1.0;
-  if (terrain == 3) shade = (p.y % 3 == 0 && (p.x + p.y / 3) % 4 == 0) || h > 0.86 ? 0.72 : 1.0;      // mountains
-  else if (terrain == 6 || terrain == 9) shade = (p.x + p.y) % 3 == 0 && h > 0.4 ? 0.8 : 1.0;          // forest, jungle
-  else if (terrain == 2) shade = p.y % 4 == 0 && h > 0.5 ? 0.86 : 1.0;                                    // hills
-  else if (terrain == 7 || terrain == 4) shade = h > 0.92 ? 0.85 : 1.0;                                   // desert, drylands
-  else if (terrain == 5) shade = p.y % 2 == 0 && h > 0.7 ? 0.84 : 1.0;                                    // marsh
-  else shade = h > 0.95 ? 0.9 : 1.0;
-  c *= mix(1.0, shade, uMode == 0 ? 0.6 : 1.0);
+  float shade = h > 0.95 ? 0.92 : 1.0;
+  if (t == ${T.forest} || t == ${T.jungle} || t == ${T.highlands}) shade = (p.x + p.y) % 3 == 0 && h > 0.4 ? 0.82 : 1.0;
+  else if (t == ${T.farmland}) shade = p.y % 2 == 0 ? 0.9 : 1.0;
+  else if (t == ${T.marsh}) shade = p.y % 2 == 0 && h > 0.6 ? 0.82 : 1.0;
+  else if (t == ${T.savanna}) shade = h > 0.88 ? 0.8 : 1.0;
+  else if (t == ${T.desert}) shade = (p.x + 2 * p.y) % 5 == 0 && h > 0.5 ? 0.9 : 1.0;
+  c *= shade;
 
-  // Borders: nation borders always, province borders once zoomed in.
+  // Hill shading, lit from the north-west: slopes rising to the south-east
+  // catch the light, the far side falls into shadow. Peaks get snow.
+  float rise = height(terrainAt(p + ivec2(1, 1))) + height(terrainAt(p + ivec2(2, 2))) - height(terrainAt(p - ivec2(1, 1))) - height(terrainAt(p - ivec2(2, 2)));
+  c *= clamp(1.0 + 0.09 * rise, 0.7, 1.25);
+  if ((t == ${T.mountains}) && height(terrainAt(p - ivec2(1, 1))) > 1.0 && h > 0.7) c = mix(c, vec3(0.95), 0.6);
+
   int owner = ownerOf(id);
+  bool political = uMode == 0 && owner >= 0;
+  if (political) c = realmWash(c, inf.rgb);
+
+  // Borders: nation borders always, with an inner band of the realm's
+  // colour once pixels are big enough; province borders once zoomed in.
   int r = idAt(p + ivec2(1, 0));
   int d = idAt(p + ivec2(0, 1));
   bool nationEdge = (land(r) && ownerOf(r) != owner) || (land(d) && ownerOf(d) != owner);
   bool provinceEdge = (land(r) && r != id) || (land(d) && d != id);
-  if (nationEdge) c = mix(c, uInk, uZoom > 2.0 ? 0.85 : 0.6);
-  else if (provinceEdge && uZoom > 1.2) c *= 0.7;
+  if (nationEdge) {
+    c = mix(c, uInk, uZoom > 2.0 ? 0.85 : 0.65);
+  } else if (political && uZoom > 2.0) {
+    int l = idAt(p - ivec2(1, 0));
+    int u = idAt(p - ivec2(0, 1));
+    if ((land(l) && ownerOf(l) != owner) || (land(u) && ownerOf(u) != owner)) c = mix(c, inf.rgb, 0.7);
+    else if (provinceEdge) c *= 0.72;
+  } else if (provinceEdge && uZoom > 1.2) {
+    c *= 0.72;
+  }
+  return highlight(c, id, 0.3);
+}
 
-  // Selected province blinks; flagged targets (move orders) get a steady tint.
-  if ((flags & 1) != 0) c = mix(c, uHighlight, 0.35 + 0.25 * step(0.5, fract(uTime * 1.5)));
-  if ((flags & 2) != 0) c = mix(c, uHighlight, 0.25);
+void main() {
+  vec3 c = uZoom >= ${DETAIL_ZOOM}.0 ? tiled(false) : uZoom >= ${MID_ZOOM}.0 ? tiled(true) : far();
   outColor = vec4(c, 1.0);
 }`;
 
@@ -258,6 +327,8 @@ export class MapRenderer {
   private infoTex: WebGLTexture;
   private ownerTex: WebGLTexture;
   private atlasTex: WebGLTexture;
+  private miniTex: WebGLTexture;
+  private terrainColors: number[];
   private infoWidth = 256;
   private infoData: Uint8Array;
   private ownerData: Uint8Array;
@@ -273,7 +344,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uTerrain", "uSea", "uDeepSea", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uLand"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uMini", "uLand"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -300,6 +371,10 @@ export class MapRenderer {
     this.atlasTex = makeDataTexture(gl, atlas.width, atlas.height);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, atlas.width, atlas.height, gl.RGBA, gl.UNSIGNED_BYTE, atlas.rgba);
     if (atlas.height !== ATLAS_ROWS * TILE) throw new Error("tile atlas has the wrong size");
+    const mini = buildMiniAtlas();
+    this.miniTex = makeDataTexture(gl, mini.width, mini.height);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, mini.width, mini.height, gl.RGBA, gl.UNSIGNED_BYTE, mini.rgba);
+    this.terrainColors = rowColors(atlas).slice(0, TERRAINS.length * 3);
   }
 
   private makeTile(x: number, y: number, w: number, h: number, texW: number, texH: number): Tile {
@@ -315,14 +390,14 @@ export class MapRenderer {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, texW, texH, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
     setNearest(gl);
 
-    const terrain = new Uint8Array(texW * texH);
+    const terrain = new Uint8Array(texW * texH * 2);
     for (let row = 0; row < texH; row++) {
       const start = (y + row) * this.map.width + x;
-      terrain.set(this.map.terrain.subarray(start, start + texW), row * texW);
+      terrain.set(this.map.terrain.subarray(start * 2, (start + texW) * 2), row * texW * 2);
     }
     const land = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, land);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, texW, texH, 0, gl.RED, gl.UNSIGNED_BYTE, terrain);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG8, texW, texH, 0, gl.RG, gl.UNSIGNED_BYTE, terrain);
     setNearest(gl);
 
     const vao = gl.createVertexArray()!;
@@ -375,10 +450,9 @@ export class MapRenderer {
     gl.uniform1f(this.u.uTime!, time);
     gl.uniform1i(this.u.uMode!, this.mode === "political" ? 0 : 1);
     gl.uniform1i(this.u.uInfoWidth!, this.infoWidth);
-    gl.uniform3fv(this.u.uTerrain!, TERRAINS.flatMap((t) => hexToRgb(TERRAIN_COLORS[t]).map((v) => v / 255)));
+    gl.uniform3fv(this.u.uTerrain!, this.terrainColors);
+    gl.uniform3fv(this.u.uDepth!, DEPTH_COLORS.flatMap((c) => hexToRgb(c).map((v) => v / 255)));
     const col = (name: string, hex: string) => gl.uniform3f(this.u[name]!, ...(hexToRgb(hex).map((v) => v / 255) as [number, number, number]));
-    col("uSea", PALETTE.sea);
-    col("uDeepSea", PALETTE.deepSea);
     col("uFoam", PALETTE.foam);
     col("uInk", PALETTE.ink);
     col("uHighlight", PALETTE.paper);
@@ -394,6 +468,9 @@ export class MapRenderer {
     gl.bindTexture(gl.TEXTURE_2D, this.atlasTex);
     gl.uniform1i(this.u.uAtlas!, 3);
     gl.uniform1i(this.u.uLand!, 4);
+    gl.activeTexture(gl.TEXTURE5);
+    gl.bindTexture(gl.TEXTURE_2D, this.miniTex);
+    gl.uniform1i(this.u.uMini!, 5);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);
 

@@ -7,7 +7,7 @@ export interface MapImage {
   rgba: Uint8ClampedArray;
   /** Province index per pixel, -1 for water. Used for tapping. */
   ids: Int32Array;
-  /** Terrain index per pixel (TERRAINS order), for the close-zoom art. */
+  /** Two bytes per pixel: terrain index (TERRAINS order) on land, and water depth band + 1 (0 on land). */
   terrain: Uint8Array;
 }
 
@@ -35,7 +35,10 @@ export async function loadMapImage(map: MapInfo, provinceCount: number): Promise
     if (v > provinceCount) throw new Error(`map image decoded wrongly at pixel ${p} (value ${v})`);
     ids[p] = v - 1;
   }
-  const terrain = new Uint8Array(ids.length);
-  for (let p = 0; p < terrain.length; p++) terrain[p] = terrainRgba[p * 4]!;
+  const terrain = new Uint8Array(ids.length * 2);
+  for (let p = 0; p < ids.length; p++) {
+    terrain[p * 2] = terrainRgba[p * 4]!;
+    terrain[p * 2 + 1] = terrainRgba[p * 4 + 1]!;
+  }
   return { width: map.width, height: map.height, rgba: data, ids, terrain };
 }

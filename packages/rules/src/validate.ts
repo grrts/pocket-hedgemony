@@ -10,7 +10,7 @@ export class RulesetError extends Error {
   }
 }
 
-const TERRAINS = new Set(["grassland", "farmland", "hills", "mountains", "drylands", "marsh", "forest", "desert", "tundra", "jungle", "sea", "ocean"]);
+const TERRAINS = new Set(["grassland", "farmland", "hills", "mountains", "drylands", "marsh", "forest", "desert", "tundra", "jungle", "savanna", "sea", "ocean"]);
 
 /**
  * Cross-checks the config files against each other so balancing mistakes

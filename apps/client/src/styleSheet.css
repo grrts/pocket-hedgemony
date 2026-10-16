@@ -53,7 +53,7 @@ body.sheet {
 
 .sheet-section h3 {
   margin: 16px 0 6px;
-  font: 600 13px/1 var(--body);
+  font: 600 15px/1 var(--body);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-soft);

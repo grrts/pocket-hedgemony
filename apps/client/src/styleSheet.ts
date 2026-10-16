@@ -1,6 +1,6 @@
 // Art test page: every visual building block of the game on one page, for review.
 import { loadDefaultRuleset } from "@ph/rules";
-import { PALETTE, TERRAIN_COLORS, TERRAINS } from "./art/palette.ts";
+import { DEPTH_COLORS, PALETTE, TERRAIN_COLORS, TERRAINS } from "./art/palette.ts";
 import { sprite, SPRITES, type SpriteName } from "./art/sprites.ts";
 import { SEA_ROW, SHALLOW_ROW, tileCanvas, VARIANTS } from "./art/tiles.ts";
 import { icon, ICONS, installUiArt, pennantUrl, UI_COLORS, type IconName } from "./art/ui.ts";
@@ -45,7 +45,7 @@ root.innerHTML = `
   const dunois = france.commanders[0]!;
   const body = section(
     "Interface",
-    "Carved wood frames with brass corners hold parchment. Titles sit on cloth ribbons in a blackletter pixel face; everything else uses a rounded pixel face. Buttons are wooden plates, paper cards, or red wax for the one action that matters most. Every piece is pixel art drawn in code and scaled by whole steps.",
+    "Carved wood frames with brass corners hold parchment. Titles sit on cloth ribbons in a bold pixel face; the blackletter face is kept for the game's name only. Buttons are wooden plates, paper cards, or red wax for the one action that matters most. Every piece is pixel art drawn in code and scaled by whole steps.",
   );
   body.innerHTML = `
     <h3>Top bar</h3>
@@ -87,8 +87,8 @@ root.innerHTML = `
 // Map tiles
 {
   const body = section(
-    "Close-zoom map",
-    `Zoom in and every map pixel becomes 8 × 8 art pixels. Each terrain has ${VARIANTS} hand-made 16 × 16 tiles, picked at random per spot; mountains are one 32 × 32 range split over four tiles and mirrored at random. The terrain under each pixel comes from real geography (mountain ranges, deserts, wetlands), broken up with woods, and with fields where 1444 Europe and Asia were most crowded. Under a realm, the tiles are washed in its colour with a stronger band along its borders.`,
+    "Map terrain",
+    `The terrain under each map pixel comes from real data: the Köppen-Geiger climate map (Beck et al. 2018) decides jungle, savanna, steppe, desert, taiga and tundra, and Natural Earth's mountain ranges add hills and peaks whose look follows the climate: grey snowy rock, red desert rock or green tropical highland. Woods and, where 1444 Europe and Asia were most crowded, fields break it up. Zoomed out, each map pixel takes its terrain's colour with hill shading; at middle zoom every map pixel becomes 4 × 4 art pixels from half-size tiles, and close in 8 × 8 from these ${VARIANTS} hand-made 16 × 16 tiles per terrain (mountains are one 32 × 32 range over four tiles, mirrored at random). Under a realm, the land is washed in its colour at every zoom, with an ink border and a bright band of the realm's colour inside it. The sea is shaded by real depth in five bands, from the light continental shelf to the dark ocean trenches, dithered into each other.`,
   );
   const rows: [string, number][] = [...TERRAINS.map((t, i) => [t, i] as [string, number]), ["coastal sea", SHALLOW_ROW], ["open ocean", SEA_ROW]];
   for (const [name, row] of rows) {
@@ -107,7 +107,7 @@ section(
 
 // Sprites
 {
-  const body = section("Sprites", "Drawn pixel by pixel in src/art/sprites.ts. Banners and roofs take the owner's colour. They grow by whole steps as you zoom so pixels never blur.");
+  const body = section("Sprites", "Drawn pixel by pixel in src/art/sprites.ts with an ink outline added around each. Banners, roofs and caparisons take the owner's colour in three shades. They grow by whole steps as you zoom so pixels never blur.");
   const colors = ["france", "england", "ottomans", "ming"].map(nation);
   for (const name of Object.keys(SPRITES) as SpriteName[]) {
     const row = document.createElement("div");
@@ -126,6 +126,7 @@ section(
     ...Object.entries(UI_COLORS),
     ...Object.entries(PALETTE),
     ...TERRAINS.map((t) => [t, TERRAIN_COLORS[t]] as [string, string]),
+    ...DEPTH_COLORS.map((c, i) => [`sea ${["shelf", "slope", "deep", "abyss", "trench"][i]}`, c] as [string, string]),
   ];
   for (const [name, hex] of all) body.insertAdjacentHTML("beforeend", `<div class="chip"><div class="sw" style="background:${hex}"></div>${name}<br>${hex}</div>`);
 }

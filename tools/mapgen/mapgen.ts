@@ -4,7 +4,8 @@
 //
 // Outputs:
 //   apps/client/public/map/provinces.png   province id per pixel (RGB = id + 1, black = water)
-//   apps/client/public/map/terrain.png     terrain per pixel for the close-zoom art (R = terrain index)
+//   apps/client/public/map/terrain.png     terrain per pixel for the close-zoom art (R = terrain index,
+//                                          G = ocean depth band)
 //   packages/rules/data/world/*.json       provinces, nations, map metadata
 //
 // Regions come from modern first-level admin borders (states, provinces,
@@ -18,6 +19,8 @@ import { encodePngRgb } from "./png.ts";
 import { rasterize, type Grid } from "./raster.ts";
 import { connectedComponents, forEachBorder, mergeSmall, splitRegion } from "./regions.ts";
 import { buildSeaZones } from "./seas.ts";
+import { loadClimate } from "./climate.ts";
+import { buildTerrain, DEPTH_LAYERS, DETAIL_TERRAINS, PROVINCE_TERRAIN } from "./terrain.ts";
 import { assignOwners, matchOwner, type NationSource, type OwnerRule } from "./owners.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -57,6 +60,8 @@ const admin1 = await loadNe("ne_10m_admin_1_states_provinces");
 const lakes = await loadNe("ne_10m_lakes");
 const geoRegions = await loadNe("ne_10m_geography_regions_polys");
 const marine = await loadNe("ne_10m_geography_marine_polys");
+const bathymetry = await Promise.all(DEPTH_LAYERS.map((l) => loadNe(`ne_10m_bathymetry_${l}`)));
+const climate = await loadClimate(cacheDir);
 
 // 1. Rasterise admin regions, then punch out large lakes.
 const features = admin1.features.filter((f: any) => f.properties.adm0_a3 !== "ATA");
@@ -167,38 +172,32 @@ for (let y = 0; y < H; y++) {
   }
 }
 
-// Terrain: majority of geography-region classes under the province, else climate by latitude.
-const terrainGrid = new Int8Array(W * H).fill(-1);
-const TERRAIN_CLASSES: Record<string, string> = config.terrainClasses;
-const terrainNames = [...new Set(Object.values(TERRAIN_CLASSES))];
+// Terrain: climate (Köppen-Geiger) per pixel plus Natural Earth's mountain
+// ranges and wetlands; each province takes the terrain covering most of it.
+const relief = new Uint8Array(W * H);
 for (const f of geoRegions.features) {
-  const t = TERRAIN_CLASSES[f.properties.FEATURECLA];
-  if (!t) continue;
-  const ti = terrainNames.indexOf(t);
-  rasterize(grid, f.geometry, (x, y) => {
-    const p = y * W + x;
-    // Mountains beat everything; otherwise the first class painted wins.
-    if (terrainGrid[p] === -1 || t === "mountains") terrainGrid[p] = ti;
-  });
+  const cls = f.properties.FEATURECLA;
+  const v = cls === "Range/mtn" ? 1 : cls === "Wetlands" || cls === "Delta" ? 2 : 0;
+  if (v) rasterize(grid, f.geometry, (x, y) => (relief[y * W + x] = relief[y * W + x] === 1 ? 1 : v));
 }
-// Natural Earth's mountain polygons swallow some big lowlands (the Po valley
-// inside "Alps"); config.json lists boxes that are farmland whatever lies under them.
+// Natural Earth's range outlines swallow some big lowlands (the Po valley
+// inside "Alps"); config.json lists boxes that stay lowland.
+const lowland = new Uint8Array(W * H);
 for (const low of config.lowlands as { bbox: number[] }[]) {
   const [x0, y1, x1, y0] = [(low.bbox[0]! + 180) * grid.pxPerDeg, (grid.latTop - low.bbox[1]!) * grid.pxPerDeg, (low.bbox[2]! + 180) * grid.pxPerDeg, (grid.latTop - low.bbox[3]!) * grid.pxPerDeg];
-  for (let y = Math.floor(y0); y < y1; y++) for (let x = Math.floor(x0); x < x1; x++) terrainGrid[y * W + x] = terrainNames.indexOf("farmland");
+  for (let y = Math.floor(y0); y < y1; y++) for (let x = Math.floor(x0); x < x1; x++) lowland[y * W + x] = 1;
 }
-const terrainVotes = Array.from({ length: P }, () => new Map<number, number>());
+const fieldShare = (lon: number, lat: number) => {
+  const zone = config.settlement.find((z: any) => inBox(lon, lat, z.bbox));
+  return Math.min(0.6, ((zone?.density ?? config.defaultDensity) as number) / 50);
+};
+const terrain = buildTerrain({ width: W, height: H, label, lonOf, latOf, climate, relief, lowland, fieldShare });
+const terrainVotes = Array.from({ length: P }, () => new Map<string, number>());
 for (let p = 0; p < label.length; p++) {
   const l = label[p]!;
-  if (l >= 0 && terrainGrid[p]! >= 0) terrainVotes[l]!.set(terrainGrid[p]!, (terrainVotes[l]!.get(terrainGrid[p]!) ?? 0) + 1);
-}
-function climateTerrain(lat: number, lon: number): string {
-  const a = Math.abs(lat);
-  if (a > 64) return "tundra";
-  if (a > 52) return "forest";
-  if (a < 12 && !inBox(lon, lat, [30, -12, 52, 12])) return "jungle";
-  if (a < 30 && inBox(lon, lat, [-20, 12, 60, 32])) return "desert";
-  return "grassland";
+  if (l < 0) continue;
+  const t = PROVINCE_TERRAIN[DETAIL_TERRAINS[terrain.base[p]!]!];
+  terrainVotes[l]!.set(t, (terrainVotes[l]!.get(t) ?? 0) + 1);
 }
 
 // Names: the admin region, plus a compass point when it was split.
@@ -241,10 +240,11 @@ order.forEach((old, i) => (newIndex[old] = i));
 
 const provinces = order.map((old) => {
   const props = features[s.feature[old]].properties;
-  const votes = [...terrainVotes[old]!.entries()].sort((a, b) => b[1] - a[1]);
   const lat = latOf(s.cy[old]);
   const lon = lonOf(s.cx[old]);
-  const terrain = votes.length && votes[0]![1] > s.size[old] * 0.3 ? terrainNames[votes[0]![0]]! : climateTerrain(lat, lon);
+  let terrain = [...terrainVotes[old]!.entries()].reduce((a, b) => (b[1] > a[1] ? b : a))[0];
+  // Grassland in the most crowded parts of 1444 was mostly under the plough.
+  if (terrain === "grassland" && fieldShare(lon, lat) >= 0.36) terrain = "farmland";
   return {
     id: `p${newIndex[old]}`,
     name: provinceName(old),
@@ -388,104 +388,16 @@ writeFileSync(
 writeFileSync(join(dataDir, "provinces.json"), "[\n" + [...world.provinces, ...seaProvinces].map((p) => JSON.stringify(p)).join(",\n") + "\n]\n");
 writeFileSync(join(dataDir, "nations.json"), JSON.stringify(world.nations, null, 2) + "\n");
 
-/**
- * Terrain per pixel, for the close-zoom art only (the simulation uses one
- * terrain per province). Real geography-region shapes go first, so mountain
- * ranges and deserts sit where they really are inside a province. The rest
- * is the province's terrain broken up by noise: woods, fields around dense
- * settlement, clearings in forests, scrub at desert edges.
- */
+/** Close-zoom terrain in R; for water, G is 1 + the depth band (0-4, see DEPTH_LAYERS). */
 function detailTerrain(): Uint8Array {
-  // Same order as TERRAINS in apps/client/src/art/palette.ts.
-  const ORDER = ["grassland", "farmland", "hills", "mountains", "drylands", "marsh", "forest", "desert", "tundra", "jungle"];
-  const T = Object.fromEntries(ORDER.map((t, i) => [t, i])) as Record<string, number>;
-  const provinceTerrain = new Uint8Array(P);
-  provinces.forEach((p, i) => (provinceTerrain[order[i]!] = T[p.terrain]!));
-  const lattice = (x: number, y: number, seed: number) => {
-    let h = Math.imul(x, 374761393) + Math.imul(y, 668265263) + Math.imul(seed, 982451653);
-    h = Math.imul(h ^ (h >>> 13), 1274126177);
-    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-  };
-  const smooth = (x: number, y: number, size: number, seed: number) => {
-    const fx = x / size;
-    const fy = y / size;
-    const x0 = Math.floor(fx);
-    const y0 = Math.floor(fy);
-    const u = (fx - x0) * (fx - x0) * (3 - 2 * (fx - x0));
-    const v = (fy - y0) * (fy - y0) * (3 - 2 * (fy - y0));
-    const wrap = Math.round(W / size);
-    const at = (i: number, j: number) => lattice(((i % wrap) + wrap) % wrap, j, seed);
-    const a = at(x0, y0) + (at(x0 + 1, y0) - at(x0, y0)) * u;
-    const b = at(x0, y0 + 1) + (at(x0 + 1, y0 + 1) - at(x0, y0 + 1)) * u;
-    return a + (b - a) * v;
-  };
-  const noise = (x: number, y: number, seed: number) => smooth(x, y, 12, seed) * 0.65 + smooth(x, y, 4, seed + 1) * 0.35;
-  const fieldShare = (lon: number, lat: number) => {
-    const zone = config.settlement.find((z: any) => inBox(lon, lat, z.bbox));
-    return Math.min(0.6, ((zone?.density ?? config.defaultDensity) as number) / 50);
-  };
-
-  // Mountain areas are broad polygons; keep peaks in their interior and ring
-  // them with hills and wooded foothills, using the distance to the edge.
-  const mountain = (p: number) => {
-    const geo = terrainGrid[p]!;
-    return label[p]! >= 0 && (geo >= 0 ? terrainNames[geo] === "mountains" : provinceTerrain[label[p]!] === T.mountains);
-  };
-  const edgeDist = new Int16Array(W * H).fill(-1);
-  const queue = new Int32Array(W * H);
-  let head = 0;
-  let tail = 0;
-  for (let p = 0; p < W * H; p++) {
-    if (!mountain(p)) {
-      edgeDist[p] = 0;
-      queue[tail++] = p;
-    }
-  }
-  while (head < tail) {
-    const p = queue[head++]!;
-    const x = p % W;
-    for (const q of [p - W, p + W, p - x + ((x + 1) % W), p - x + ((x - 1 + W) % W)]) {
-      if (q >= 0 && q < W * H && edgeDist[q]! < 0) {
-        edgeDist[q] = edgeDist[p]! + 1;
-        queue[tail++] = q;
-      }
-    }
-  }
-
+  const depth = new Uint8Array(W * H);
+  bathymetry.forEach((layer, i) => {
+    for (const f of layer.features) rasterize(grid, f.geometry, (x, y) => (depth[y * W + x] = i + 1));
+  });
   const out = new Uint8Array(W * H * 3);
-  for (let y = 0; y < H; y++) {
-    const lat = latOf(y);
-    const woods = Math.min(0.2, Math.max(0, (Math.abs(lat) - 40) / 100));
-    for (let x = 0; x < W; x++) {
-      const p = y * W + x;
-      const l = label[p]!;
-      if (l < 0) continue;
-      const geo = terrainGrid[p]!;
-      let t = geo >= 0 ? T[terrainNames[geo]!]! : provinceTerrain[l]!;
-      const n1 = noise(x, y, 1);
-      const n2 = noise(x, y, 2);
-      if (t === T.grassland || t === T.farmland || t === T.hills) {
-        if (n1 > 0.64 - woods) t = T.forest;
-        else if (t !== T.hills && n2 < fieldShare(lonOf(x), lat)) t = T.farmland;
-        else if (t === T.farmland && n2 > 0.75) t = T.grassland;
-      } else if (t === T.forest) {
-        if (n1 < 0.28) t = Math.abs(lat) > 60 ? T.tundra : T.grassland;
-      } else if (t === T.tundra) {
-        if (Math.abs(lat) < 68 && n1 > 0.62) t = T.forest;
-      } else if (t === T.desert) {
-        if (n1 > 0.72) t = T.drylands;
-      } else if (t === T.drylands) {
-        if (n1 > 0.7) t = T.desert;
-        else if (n1 < 0.22) t = T.grassland;
-      } else if (t === T.jungle) {
-        if (n1 < 0.22) t = T.grassland;
-      } else if (t === T.mountains) {
-        const depth = edgeDist[p]! + (n2 - 0.5) * 12;
-        if (depth < 2) t = n1 > 0.5 ? T.forest : T.grassland;
-        else if (depth < 7 || n1 < 0.25) t = T.hills;
-      }
-      out[p * 3] = t;
-    }
+  for (let p = 0; p < W * H; p++) {
+    if (label[p]! >= 0) out[p * 3] = terrain.detail[p]!;
+    else out[p * 3 + 1] = depth[p]! + 1; // 0 marks land
   }
   return out;
 }
