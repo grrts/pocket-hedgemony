@@ -24,10 +24,10 @@ for (const feature of loadFeatures()) {
     row.scenarios++;
     const ids = requirementIds(pickle);
     ids.forEach((id) => row.requirements.add(id));
-    if (!readiness(pickle).automated) continue;
+    if (!readiness(pickle, feature.context).automated) continue;
     row.automated++;
     try {
-      await runPickle(pickle);
+      await runPickle(pickle, feature.context);
       row.passing++;
       ids.forEach((id) => row.passed.add(id));
     } catch (e) {

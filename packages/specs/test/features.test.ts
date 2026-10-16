@@ -11,7 +11,7 @@ import { readiness, runPickle } from "../src/run.ts";
 for (const feature of loadFeatures()) {
   describe(`${feature.path}: ${feature.name}`, () => {
     for (const pickle of feature.pickles) {
-      if (readiness(pickle).automated) it(pickle.name, () => runPickle(pickle).then(() => undefined));
+      if (readiness(pickle, feature.context).automated) it(pickle.name, () => runPickle(pickle, feature.context).then(() => undefined));
       else it.todo(pickle.name);
     }
   });

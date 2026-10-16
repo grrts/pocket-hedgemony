@@ -4,8 +4,8 @@ import { match, type Scenario, type Table } from "./registry.ts";
 export type Readiness = { automated: true } | { automated: false; missing: string[] };
 
 /** A scenario is automated when every one of its steps matches exactly one step definition. */
-export function readiness(pickle: Pickle): Readiness {
-  const missing = pickle.steps.filter((s) => match(s.text).length === 0).map((s) => s.text);
+export function readiness(pickle: Pickle, context: string): Readiness {
+  const missing = pickle.steps.filter((s) => match(s.text, context).length === 0).map((s) => s.text);
   return missing.length ? { automated: false, missing } : { automated: true };
 }
 
@@ -15,10 +15,10 @@ function argument(step: PickleStep): Table | string | undefined {
   return undefined;
 }
 
-export async function runPickle(pickle: Pickle): Promise<Scenario> {
+export async function runPickle(pickle: Pickle, context: string): Promise<Scenario> {
   const scenario: Scenario = {};
   for (const step of pickle.steps) {
-    const found = match(step.text);
+    const found = match(step.text, context);
     if (found.length !== 1) throw new Error(`${found.length ? "Ambiguous" : "Undefined"} step: ${step.text}`);
     const { definition, args } = found[0]!;
     const extra = argument(step);
