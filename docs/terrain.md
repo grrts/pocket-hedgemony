@@ -116,6 +116,10 @@ These shares come from the run with the blended forest belts. Re-running the gen
 | badlands | Ranges in desert and steppe climates (the Atlas, the Zagros, the Hoggar, the dry Andes) | Banded red rock, mesas | Waste (mines) | Mountains ground. *Proposal:* mines +25 % more (copper, silver, salt); heat sickness instead of cold |
 | highlands | Ranges in tropical climates (the Ethiopian Highlands, the wet Andes, New Guinea) | Green forested peaks | Woods, fields (terraces) | Mountains ground. *Proposal:* the forest's ambush bonus too; sickness low (above the fever line). This is why the Ethiopian and Andean highlands held dense populations |
 
+## Rivers
+
+Rivers come from Natural Earth's river centre lines (`ne_10m_rivers_lake_centerlines`, scale ranks 0 to 8). The generator traces each one as a path of map pixels and stores, per pixel, the river's size (great rivers are ranks 0 to 4) and which neighbours it flows to, so the map draws each river as one clean line. A province with three or more river pixels is marked `river` in the province data. Marching into such a province costs a day to cross (warfare design 5.2), until bridges exist.
+
 ## Differences from the province design
 
 - The design has 11 grounds. The map has 22 tile types and folds them onto those grounds (the tables above). A type's *proposal* line is the only place it would play differently from its ground. None of these proposals is built.

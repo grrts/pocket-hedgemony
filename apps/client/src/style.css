@@ -297,6 +297,70 @@ button.icon-only {
   height: 44px;
 }
 
+/* ---- Map lens menu, beside the tools ---- */
+
+.lens-menu {
+  position: absolute;
+  right: calc(max(6px, env(safe-area-inset-right)) + 54px);
+  top: calc(env(safe-area-inset-top) + 52px);
+  width: min(400px, 62vw);
+  max-height: calc(100dvh - env(safe-area-inset-top) - 64px);
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 8px;
+  z-index: 5;
+}
+
+.lens-menu .sub,
+.lens-menu .fog-toggle {
+  grid-column: 1 / -1;
+}
+
+@media (max-height: 500px) {
+  .lens-menu .lens small {
+    display: none;
+  }
+}
+
+.lens-menu .sub {
+  margin: 0 0 2px;
+}
+
+.lens-menu .lens {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  min-height: 36px;
+  padding: 2px 10px;
+  text-align: left;
+}
+
+.lens-menu .lens small {
+  opacity: 0.75;
+}
+
+.lens-menu .lens.on {
+  outline: 3px solid var(--brass, #d0a248);
+}
+
+.fog-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 14px/1.2 var(--body);
+  color: var(--ink);
+}
+
+.fog-toggle input {
+  width: 20px;
+  height: 20px;
+  accent-color: #8a6424;
+}
+
 /* ---- Overview button, lower left ---- */
 
 .open-panel {

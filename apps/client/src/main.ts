@@ -66,6 +66,15 @@ let busy = false;
 let panelCollapsed = false;
 /** Nation whose country overview is open, or -1. */
 let realmView = -1;
+/** Map lens: how provinces are coloured. */
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food";
+let lens: Lens = "realms";
+/** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
+let fogOn = true;
+/** Provinces the player knows, or null before a realm is chosen. */
+let known: Uint8Array | null = null;
+/** How far, in provinces, a realm knows the world around its lands and armies. */
+const KNOWN_REACH = 6;
 
 // ---- DOM ----
 installUiArt();
@@ -74,9 +83,10 @@ app.innerHTML = `
   <div class="map" id="map"><div class="loading">Drawing the world…</div></div>
   <header class="hud" id="hud"></header>
   <div class="tools">
-    <button class="icon-only" id="mode" title="Switch map mode">${icon("map", 3, "Map mode")}</button>
+    <button class="icon-only" id="mode" title="Map lens" aria-expanded="false">${icon("map", 3, "Map lens")}</button>
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
   </div>
+  <div class="lens-menu framed" id="lenses" hidden></div>
   <button class="wax open-panel" id="reopen" title="Open the overview" hidden></button>
   <section class="panel framed" id="panel" hidden></section>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
@@ -118,9 +128,11 @@ async function boot(): Promise<void> {
   // ?view=x,y,zoom opens the map at a spot, for screenshots and bug reports.
   const at = new URLSearchParams(location.search).get("view")?.split(",").map(Number);
   if (at?.length === 3 && at.every(Number.isFinite)) view.lookAt(at[0]!, at[1]!, at[2]!);
-  document.querySelector("#mode")!.addEventListener("click", () => {
-    view.renderer.mode = view.renderer.mode === "political" ? "terrain" : "political";
-    view.invalidate();
+  const modeButton = document.querySelector<HTMLButtonElement>("#mode")!;
+  modeButton.addEventListener("click", () => {
+    lensMenu.hidden = !lensMenu.hidden;
+    modeButton.setAttribute("aria-expanded", String(!lensMenu.hidden));
+    renderLensMenu();
   });
   document.querySelector("#home")!.addEventListener("click", () => {
     const n = snapshot ? snapshot.playerNation : nationIndex.get("france")!;
@@ -132,14 +144,84 @@ async function boot(): Promise<void> {
 }
 
 // ---- map styling ----
+const LENSES: { id: Lens; name: string; note: string }[] = [
+  { id: "realms", name: "Realms", note: "who holds the land" },
+  { id: "terrain", name: "Terrain", note: "the bare land" },
+  { id: "people", name: "People", note: "how many live there" },
+  { id: "wealth", name: "Wealth", note: "trade, crafts and land" },
+  { id: "walls", name: "Walls", note: "castles and forts" },
+  { id: "food", name: "Food", note: "men the land can feed" },
+];
+const RAMP = ["#f3e3b5", "#e8c172", "#d68a3c", "#b14a2e", "#6e1f2c"].map(hexToRgb);
+const WALL_RGB = { none: hexToRgb("#efe2bf"), fort: hexToRgb("#d08a2e"), castle: hexToRgb("#3c4a8e") };
+const FOOD_RAMP = ["#a8323e", "#d08a48", "#e9d79a", "#8cb85a", "#3f7a44"].map(hexToRgb);
+const ramp = (colors: number[][], t: number) => colors[Math.max(0, Math.min(colors.length - 1, Math.floor(t * colors.length)))]!;
+const lensMenu = document.querySelector<HTMLElement>("#lenses")!;
+
+function renderLensMenu(): void {
+  lensMenu.innerHTML = `
+    <h3 class="sub">Map lens</h3>
+    ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.name}</b><small>${l.note}</small></button>`).join("")}
+    <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
+  lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
+    b.addEventListener("click", () => {
+      lens = b.dataset.lens as Lens;
+      view.renderer.mode = lens === "realms" ? "political" : lens === "terrain" ? "terrain" : "lens";
+      restyleProvinces();
+      renderLensMenu();
+    }),
+  );
+  lensMenu.querySelector<HTMLInputElement>("#fog")!.addEventListener("change", (e) => {
+    fogOn = (e.target as HTMLInputElement).checked;
+    restyleProvinces();
+  });
+}
+
+/** Colour for a province under the current lens. */
+function lensColor(i: number): number[] {
+  const o = owners[i]!;
+  const p = provinces[i]!;
+  switch (lens) {
+    case "people":
+      return ramp(RAMP, (Math.log10(Math.max(1, p.population)) - 0.7) / 2.3);
+    case "wealth":
+      return ramp(RAMP, (p.wealth - 1) / 10);
+    case "walls":
+      return WALL_RGB[p.castle ?? "none"];
+    case "food":
+      return ramp(FOOD_RAMP, Math.log10(Math.max(1, forageLimit(march, marchGraph, i))) / 5);
+    default:
+      return o >= 0 ? nationRgb[o]! : unownedRgb;
+  }
+}
+
+/** Provinces within KNOWN_REACH steps (over land or sea) of the player's lands and armies. */
+function computeKnown(): Uint8Array | null {
+  if (!snapshot) return null;
+  const dist = new Int16Array(provinces.length).fill(-1);
+  const queue: number[] = [];
+  owners.forEach((o, i) => o === snapshot!.playerNation && (dist[i] = 0, queue.push(i)));
+  snapshot.armies.location.forEach((loc, k) => {
+    if (snapshot!.armies.owner[k] === snapshot!.playerNation && dist[loc]! < 0) ((dist[loc] = 0), queue.push(loc));
+  });
+  for (let h = 0; h < queue.length; h++) {
+    const p = queue[h]!;
+    if (dist[p]! >= KNOWN_REACH) continue;
+    for (const n of neighborIdx[p]!) if (dist[n]! < 0) ((dist[n] = dist[p]! + 1), queue.push(n));
+  }
+  return Uint8Array.from(dist, (d) => (d >= 0 ? 1 : 0));
+}
+const isKnown = (i: number) => !fogOn || !known || known[i] === 1;
+
 function restyleProvinces(): void {
+  known = computeKnown();
   const targets = new Set<number>();
   // Light up the route of the army being ordered.
   if (selectedArmy >= 0) for (const p of plannedRoutes.get(selectedArmy)?.path ?? []) targets.add(p);
   for (let i = 0; i < provinces.length; i++) {
     const o = owners[i]!;
-    const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0);
-    view.renderer.setProvinceStyle(i, o >= 0 ? nationRgb[o]! : unownedRgb, o, TERRAINS.indexOf(provinces[i]!.terrain as (typeof TERRAINS)[number]), flags, isWater[i]);
+    const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0) | (isKnown(i) ? 0 : 4);
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : lensColor(i), o, TERRAINS.indexOf(provinces[i]!.terrain as (typeof TERRAINS)[number]), flags, isWater[i]);
   }
   view.renderer.uploadProvinceStyles();
   view.invalidate();
@@ -190,7 +272,7 @@ function drawOverlay(o: OverlayContext): void {
     const sc = Math.max(1, spriteScale - 2);
     provinces.forEach((p, i) => {
       const own = owners[i]!;
-      if (own < 0 || nations[own]!.capital === p.id) return;
+      if (own < 0 || nations[own]!.capital === p.id || !isKnown(i)) return;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) return;
       const color = nations[own]!.color;
@@ -212,7 +294,7 @@ function drawOverlay(o: OverlayContext): void {
   if (zoom >= 1.1) {
     nations.forEach((n, i) => {
       const p = provinces[provinceIndex.get(n.capital)!]!;
-      if (owners[provinceIndex.get(n.capital)!] !== i) return;
+      if (owners[provinceIndex.get(n.capital)!] !== i || !isKnown(provinceIndex.get(n.capital)!)) return;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) return;
       const img = sprite("capital", n.color, Math.max(1, spriteScale - 1));
@@ -225,7 +307,7 @@ function drawOverlay(o: OverlayContext): void {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     nationLabels.forEach((l, i) => {
-      if (!l) return;
+      if (!l || !isKnown(provinceIndex.get(nations[i]!.capital)!)) return;
       const px = Math.round(Math.min(28, l.size * zoom * 4.5));
       if (px < 9) return;
       const [sx, sy] = o.toScreen(l.x, l.y);
@@ -240,7 +322,7 @@ function drawOverlay(o: OverlayContext): void {
     ctx.textBaseline = "top";
     provinces.forEach((p, i) => {
       const [sx, sy] = o.toScreen(p.x!, p.y!);
-      if (onScreen(sx, sy)) pixelText(ctx, p.name, sx, isWater[i] ? sy : sy + 7 * spriteScale, 12, isWater[i]);
+      if (onScreen(sx, sy) && isKnown(i)) pixelText(ctx, p.name, sx, isWater[i] ? sy : sy + 7 * spriteScale, 12, isWater[i]);
     });
   }
 
@@ -251,6 +333,7 @@ function drawOverlay(o: OverlayContext): void {
     armyHitBoxes = [];
     for (let k = 0; k < s.armies.id.length; k++) {
       const loc = s.armies.location[k]!;
+      if (!isKnown(loc)) continue;
       const nth = stackCount.get(loc) ?? 0;
       stackCount.set(loc, nth + 1);
       let [sx, sy] = o.toScreen(...marchPosition(k));
@@ -381,8 +464,9 @@ function onTap(sx: number, sy: number, province: number): void {
     panelCollapsed = true;
   } else {
     // A tap only selects; the overview opens from the button in the lower left.
+    // Uncharted land can't be looked at yet.
     selectedArmy = -1;
-    selectedProvince = province;
+    selectedProvince = province >= 0 && isKnown(province) ? province : -1;
   }
   realmView = -1;
   restyleProvinces();

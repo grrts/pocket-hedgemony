@@ -1,5 +1,6 @@
 import { DEPTH_COLORS, hexToRgb, PALETTE, TERRAINS } from "../art/palette.ts";
 import { ATLAS_ROWS, BIG_ROWS, buildMiniAtlas, buildTileAtlas, rowColors, SEA_ROW, SHALLOW_ROW, TILE, VARIANTS, WATER_BASE } from "../art/tiles.ts";
+import { UI_COLORS } from "../art/ui.ts";
 import type { MapImage } from "./loadMap.ts";
 
 /**
@@ -23,7 +24,8 @@ export const DETAIL_ZOOM = 7;
 /** Device pixels per map pixel at which the half-size tiles take over. */
 export const MID_ZOOM = 4;
 
-export type MapMode = "political" | "terrain";
+/** political: realm colours; terrain: bare land; lens: a strong wash of each province's own colour (a data lens). */
+export type MapMode = "political" | "terrain" | "lens";
 
 export interface Camera {
   /** Map pixel at the centre of the screen. */
@@ -61,7 +63,8 @@ uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for 
 uniform int uInfoWidth;
 uniform float uZoom;
 uniform float uTime;
-uniform int uMode;           // 0 political, 1 terrain
+uniform int uMode;           // 0 political, 1 terrain, 2 data lens
+uniform vec3 uParchment, uParchmentDark;
 uniform vec3 uTerrain[${TERRAINS.length}];  // average colour of each terrain's tiles
 uniform vec3 uDepth[${DEPTH_COLORS.length}];     // ocean colour by depth band
 uniform vec3 uFoam, uInk, uHighlight, uSand;
@@ -156,7 +159,7 @@ vec3 highlight(vec3 c, int id, float strength) {
 }
 // How much of the realm's colour to lay over the terrain: more when far out,
 // so realms read at a glance, less up close where the art carries the map.
-float wash() { return mix(0.62, 0.3, smoothstep(1.0, ${DETAIL_ZOOM}.0, uZoom)); }
+float wash() { return uMode == 2 ? 0.78 : mix(0.62, 0.3, smoothstep(1.0, ${DETAIL_ZOOM}.0, uZoom)); }
 vec3 realmWash(vec3 terrain, vec3 realm) {
   return mix(terrain, realm * (0.45 + 0.85 * lum(terrain)), wash());
 }
@@ -233,7 +236,7 @@ vec3 tiled(bool mini) {
   }
   vec3 c = tileAt(mini, terrain, variant, local);
   int owner = ownerOf(id);
-  bool political = uMode == 0 && owner >= 0;
+  bool political = uMode != 1 && owner >= 0;
   if (political) {
     c = realmWash(c, inf.rgb);
     // A wider band of the owner's colour along its borders.
@@ -329,7 +332,7 @@ vec3 far() {
   if ((t == ${T.mountains}) && height(terrainAt(p - ivec2(1, 1))) > 1.0 && h > 0.7) c = mix(c, vec3(0.95), 0.6);
 
   int owner = ownerOf(id);
-  bool political = uMode == 0 && owner >= 0;
+  bool political = uMode != 1 && owner >= 0;
   if (political) c = realmWash(c, inf.rgb);
   // Great rivers always, the rest once zoomed in a little.
   int rs = riverAt(p);
@@ -354,8 +357,33 @@ vec3 far() {
   return highlight(c, id, 0.3);
 }
 
+// Undiscovered land and sea: old parchment with stains and a ruled grid.
+bool unknown(int id) { return id >= 0 && (int(flags(id)) & 4) != 0; }
+vec3 parchment(vec2 m) {
+  float art = uZoom >= ${MID_ZOOM}.0 ? 8.0 : 1.0;
+  ivec2 a = ivec2(floor(m * art));
+  ivec2 big = ivec2(floor(m / 6.0));
+  float stain = hash(big) * 0.5 + hash(ivec2(floor(m / 2.5))) * 0.5;
+  vec3 c = mix(uParchment, uParchmentDark, step(0.72, stain) * 0.6 + step(bayer(a), stain - 0.45) * 0.25);
+  if (hash(a) > 0.97) c = mix(c, uParchmentDark, 0.6);
+  vec2 g = fract(m / 15.0);
+  if ((g.x < 0.012 || g.y < 0.012) && ((a.x + a.y) & 1) == 0) c = mix(c, uInk, 0.25);
+  return c;
+}
+
 void main() {
+  vec2 m = vMap;
+  int id = idAt(ivec2(floor(m)));
+  if (unknown(id)) {
+    outColor = vec4(parchment(m), 1.0);
+    return;
+  }
   vec3 c = uZoom >= ${DETAIL_ZOOM}.0 ? tiled(false) : uZoom >= ${MID_ZOOM}.0 ? tiled(true) : far();
+  // A dark seam where the known world meets the unknown.
+  ivec2 p = ivec2(floor(m));
+  if (unknown(idAt(p + ivec2(1, 0))) || unknown(idAt(p - ivec2(1, 0))) || unknown(idAt(p + ivec2(0, 1))) || unknown(idAt(p - ivec2(0, 1)))) {
+    c = mix(c, uParchmentDark, 0.55);
+  }
   outColor = vec4(c, 1.0);
 }`;
 
@@ -395,7 +423,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uMini", "uLand"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uMini", "uLand"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -465,7 +493,7 @@ export class MapRenderer {
 
   /**
    * Sets each province's fill colour, owner and flags.
-   * flags: 1 = selected, 2 = highlighted (e.g. a move target).
+   * flags: 1 = selected, 2 = highlighted (e.g. a move target), 4 = undiscovered.
    */
   setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false): void {
     const o = i * 4;
@@ -499,7 +527,9 @@ export class MapRenderer {
     gl.uniform2f(this.u.uView!, width, height);
     gl.uniform1f(this.u.uZoom!, camera.zoom);
     gl.uniform1f(this.u.uTime!, time);
-    gl.uniform1i(this.u.uMode!, this.mode === "political" ? 0 : 1);
+    gl.uniform1i(this.u.uMode!, this.mode === "political" ? 0 : this.mode === "terrain" ? 1 : 2);
+    gl.uniform3fv(this.u.uParchment!, hexToRgb(UI_COLORS.parchment).map((v) => v / 255));
+    gl.uniform3fv(this.u.uParchmentDark!, hexToRgb(UI_COLORS.parchmentDark).map((v) => v / 255));
     gl.uniform1i(this.u.uInfoWidth!, this.infoWidth);
     gl.uniform3fv(this.u.uTerrain!, this.terrainColors);
     gl.uniform3fv(this.u.uDepth!, DEPTH_COLORS.flatMap((c) => hexToRgb(c).map((v) => v / 255)));
