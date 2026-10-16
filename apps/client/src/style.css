@@ -297,7 +297,7 @@ button.icon-only {
   height: 44px;
 }
 
-/* ---- Action button and sheet ---- */
+/* ---- End turn ---- */
 
 .fab {
   position: absolute;
@@ -307,10 +307,6 @@ button.icon-only {
   height: 64px;
   padding: 0;
   filter: drop-shadow(0 4px 0 rgb(0 0 0 / 0.45));
-}
-
-.fab.open {
-  border-image-source: var(--ui-btn-wax-down);
 }
 
 .fab .badge {
@@ -326,55 +322,50 @@ button.icon-only {
   border: 2px solid var(--outline);
 }
 
-.actions {
-  position: absolute;
-  right: max(10px, env(safe-area-inset-right));
-  bottom: calc(max(10px, env(safe-area-inset-bottom)) + 72px);
-  width: min(320px, calc(100vw - 20px));
-  padding: 4px 6px;
-}
-
-.actions .orders {
-  margin: 2px 0 8px;
-  color: var(--ink-soft);
-}
-
-.actions .end-turn {
-  width: 100%;
-}
-
-.actions .diag {
-  margin: 8px 0 0;
-  font-size: 13px;
-  line-height: 1.3;
-  color: var(--ink-soft);
-}
-
 /* ---- Panels ---- */
 
+/* The province overview fills the screen under the top bar on phones,
+   leaving room for the End turn button; on desktop it is the left third. */
 .panel {
   position: absolute;
+  top: calc(env(safe-area-inset-top) + 44px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  padding: 4px max(8px, env(safe-area-inset-right)) calc(84px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+}
+
+/* Choosing a realm keeps the map in view: a sheet along the bottom. */
+.panel.chooser {
+  top: auto;
   left: max(6px, env(safe-area-inset-left));
-  right: calc(max(10px, env(safe-area-inset-right)) + 72px);
+  right: max(6px, env(safe-area-inset-right));
   bottom: max(6px, env(safe-area-inset-bottom));
   max-height: 46vh;
-  overflow: auto;
   padding: 2px 6px 6px;
 }
 
-.panel:not(:has(~ .fab:not([hidden]))) {
-  right: max(6px, env(safe-area-inset-right));
-}
-
-/* Wide or short screens (a phone on its side): the panel becomes a column on the left. */
-@media (min-width: 720px), (max-height: 500px) {
-  .panel,
-  .panel:not(:has(~ .fab:not([hidden]))) {
+@media (max-height: 500px) {
+  .panel.chooser {
     top: calc(env(safe-area-inset-top) + 52px);
     right: auto;
-    bottom: auto;
-    width: min(360px, 45vw);
-    max-height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 60px);
+    width: min(380px, 50vw);
+    max-height: none;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 600px) {
+  .panel,
+  .panel.chooser {
+    top: calc(env(safe-area-inset-top) + 44px);
+    left: 0;
+    right: auto;
+    bottom: 0;
+    width: 33.333vw;
+    min-width: 340px;
+    max-height: none;
+    padding: 4px 8px 8px max(8px, env(safe-area-inset-left));
   }
 }
 

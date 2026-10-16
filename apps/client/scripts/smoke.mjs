@@ -26,8 +26,7 @@ async function check(name, expectedMode, setup) {
   ).then((h) => h.jsonValue());
   // Play one turn through the real UI too.
   await page.click("[data-nation=france]");
-  await page.click("#fab");
-  await page.click(".actions .end-turn");
+  await page.click(".end-turn");
   await page.waitForSelector(".turn-label:text('April 1444')");
   const ok = d.engineError === null && d.engineMode === expectedMode;
   failed ||= !ok;

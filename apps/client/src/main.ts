@@ -47,7 +47,6 @@ let pendingOrders: Order[] = [];
 let busy = false;
 /** The panel is folded away behind a tool button so the map gets the screen. */
 let panelCollapsed = false;
-let actionsOpen = false;
 
 // ---- DOM ----
 installUiArt();
@@ -61,21 +60,12 @@ app.innerHTML = `
     <button class="icon-only" id="reopen" title="Show the panel" hidden></button>
   </div>
   <section class="panel framed" id="panel" hidden></section>
-  <section class="actions framed" id="actions" hidden>
-    <div id="action-body"></div>
-    <p class="diag" id="diag"></p>
-  </section>
-  <button class="wax fab" id="fab" title="Actions" aria-expanded="false" hidden>${icon("hourglass", 3, "Actions")}<span class="badge" hidden></span></button>`;
+  <button class="wax fab end-turn" id="fab" title="End turn" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const panel = document.querySelector<HTMLElement>("#panel")!;
-const diag = document.querySelector<HTMLElement>("#diag")!;
-const actions = document.querySelector<HTMLElement>("#actions")!;
 const fab = document.querySelector<HTMLButtonElement>("#fab")!;
 const reopen = document.querySelector<HTMLButtonElement>("#reopen")!;
-fab.addEventListener("click", () => {
-  actionsOpen = !actionsOpen;
-  renderActions();
-});
+fab.addEventListener("click", () => void endTurn());
 reopen.addEventListener("click", () => {
   panelCollapsed = false;
   renderPanel();
@@ -284,22 +274,35 @@ function onTap(sx: number, sy: number, province: number): void {
   // Armies sit on top of provinces, so check them first.
   const hit = armyHitBoxes.find((b) => sx >= b.x && sx <= b.x + b.w && sy >= b.y && sy <= b.y + b.h);
   if (hit && snapshot && snapshot.armies.owner[armySlot(hit.id)] === snapshot.playerNation) {
-    selectedArmy = hit.id;
-    selectedProvince = snapshot.armies.location[armySlot(hit.id)]!;
+    pickArmy(hit.id);
+    return;
   } else if (selectedArmy >= 0 && snapshot && province >= 0 && !isWater[province] && neighborIdx[snapshot.armies.location[armySlot(selectedArmy)]!]!.includes(province)) {
     pendingOrders = pendingOrders.filter((o) => o.army !== selectedArmy);
     pendingOrders.push({ type: "move", army: selectedArmy, to: province });
     selectedArmy = -1;
     selectedProvince = province;
+    // Keep the map in view after giving an order; the panel waits behind its button.
+    panelCollapsed = true;
   } else {
     selectedArmy = -1;
     selectedProvince = province;
+    panelCollapsed = false;
   }
-  panelCollapsed = false;
-  actionsOpen = false;
   restyleProvinces();
   renderPanel();
   renderActions();
+}
+
+/** Picks an army to move: folds the panel away and centres the map on it. */
+function pickArmy(id: number): void {
+  if (!snapshot) return;
+  const loc = snapshot.armies.location[armySlot(id)]!;
+  selectedArmy = id;
+  selectedProvince = loc;
+  panelCollapsed = true;
+  view.lookAt(provinces[loc]!.x!, provinces[loc]!.y!, Math.max(view.camera.zoom, 5));
+  restyleProvinces();
+  renderPanel();
 }
 
 function armySlot(id: number): number {
@@ -327,22 +330,17 @@ function renderHud(): void {
     <span class="plaque" title="Levies: men ready to raise">${icon("swords", 1)}${fmt(s.nationLevies[me]! / 1000)}k</span>`;
 }
 
-/** The action button and its sheet: End turn, the orders waiting, and engine diagnostics. */
+/** The End turn button in the corner, with a count of the orders waiting. */
 function renderActions(): void {
   fab.hidden = !snapshot;
-  actions.hidden = !snapshot || !actionsOpen;
-  fab.setAttribute("aria-expanded", String(actionsOpen));
-  fab.classList.toggle("open", actionsOpen);
+  fab.disabled = busy;
   const badge = fab.querySelector<HTMLElement>(".badge")!;
   badge.hidden = pendingOrders.length === 0;
   badge.textContent = String(pendingOrders.length);
   if (!snapshot) return;
   const next = new Date(Date.UTC(snapshot.date.year, snapshot.date.month, 1));
   const orders = pendingOrders.length;
-  document.querySelector("#action-body")!.innerHTML = `
-    <p class="orders">${orders ? `${orders} arm${orders > 1 ? "ies" : "y"} marching this month` : "No orders given this month"}</p>
-    <button class="wax end-turn" ${busy ? "disabled" : ""}>${icon("hourglass", 2)}${busy ? "Working…" : `End turn · to ${MONTHS[next.getUTCMonth()]} ${next.getUTCFullYear()}`}</button>`;
-  actions.querySelector(".end-turn")!.addEventListener("click", () => void endTurn());
+  fab.title = `End turn: on to ${MONTHS[next.getUTCMonth()]} ${next.getUTCFullYear()}${orders ? `, ${orders} arm${orders > 1 ? "ies" : "y"} marching` : ""}`;
 }
 
 function closeButton(): string {
@@ -351,6 +349,7 @@ function closeButton(): string {
 
 /** Shows or hides the panel, leaving a tool button to bring a folded panel back. */
 function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): void {
+  panel.classList.toggle("chooser", reopenIcon === "crown");
   panel.hidden = !open || panelCollapsed;
   reopen.hidden = !open || !panelCollapsed;
   reopen.innerHTML = icon(reopenIcon, 3, "Show the panel");
@@ -370,7 +369,8 @@ function renderPanel(): void {
           return `<button class="paper nation" data-nation="${n.id}">${pennant(n.color)}${esc(n.name)}</button>`;
         })
         .join("")}</div>
-      <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>`;
+      <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
+      <p class="diag" id="diag">${diagnosticsLine()}</p>`;
     bindNationButtons();
     showPanel(true, "crown");
     return;
@@ -424,11 +424,7 @@ function renderPanel(): void {
   bindClose();
   showPanel(true);
   panel.querySelectorAll<HTMLButtonElement>("[data-army]").forEach((b) =>
-    b.addEventListener("click", () => {
-      selectedArmy = Number(b.dataset.army);
-      restyleProvinces();
-      renderPanel();
-    }),
+    b.addEventListener("click", () => pickArmy(Number(b.dataset.army))),
   );
   bindNationButtons();
 }
@@ -451,6 +447,7 @@ async function startGame(nation: string): Promise<void> {
   owners = snapshot.provinceOwner;
   const cap = provinceIndex.get(nations[nationIndex.get(nation)!]!.capital)!;
   selectedProvince = cap;
+  panelCollapsed = true;
   view.lookAt(provinces[cap]!.x!, provinces[cap]!.y!, 4);
   restyleProvinces();
   renderHud();
@@ -467,7 +464,6 @@ async function endTurn(): Promise<void> {
   pendingOrders = [];
   selectedArmy = -1;
   busy = false;
-  actionsOpen = false;
   restyleProvinces();
   renderHud();
   renderPanel();
@@ -476,6 +472,11 @@ async function endTurn(): Promise<void> {
 }
 
 function renderDiagnostics(): void {
+  const el = document.querySelector("#diag");
+  if (el) el.innerHTML = diagnosticsLine();
+}
+
+function diagnosticsLine(): string {
   const d = diagnostics;
   const engineLine = d.engineError
     ? `engine failed: ${esc(d.engineError)}`
@@ -484,7 +485,7 @@ function renderDiagnostics(): void {
       : d.engineMode === "worker"
         ? `engine in background worker`
         : `engine on main thread`;
-  diag.innerHTML = `${d.runtime} · ${engineLine}${snapshot ? ` · last turn ${snapshot.computeMs.toFixed(1)} ms` : ""}`;
+  return `${d.runtime} · ${engineLine}${snapshot ? ` · last turn ${snapshot.computeMs.toFixed(1)} ms` : ""}`;
 }
 
 // Prove a worker loads and runs a turn in this runtime, using a throwaway

@@ -65,7 +65,6 @@ body.sheet {
 
 .demo-hud,
 .demo-panel,
-.demo-actions .actions,
 .demo-actions .fab {
   position: static;
   max-width: 420px;

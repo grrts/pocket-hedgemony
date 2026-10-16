@@ -45,7 +45,7 @@ root.innerHTML = `
   const dunois = france.commanders[0]!;
   const body = section(
     "Interface",
-    "Carved wood frames with brass corners hold parchment. Titles sit on cloth ribbons in a bold pixel face; the blackletter face is kept for the game's name only. Buttons are wooden plates, paper cards, or red wax for the one action that matters most. On a phone the map comes first: a thin top bar, panels that fold away behind a tool button, and End turn inside the action button's sheet. Every piece is pixel art drawn in code and scaled by whole steps.",
+    "Carved wood frames with brass corners hold parchment. Titles sit on cloth ribbons in a bold pixel face; the blackletter face is kept for the game's name only. Buttons are wooden plates, paper cards, or red wax for the one action that matters most. On a phone the map comes first: a thin top bar, a province overview that fills the screen (the left third on desktop) and folds away behind a tool button, and a one-tap End turn button in the corner showing how many orders are waiting. Every piece is pixel art drawn in code and scaled by whole steps.",
   );
   body.innerHTML = `
     <h3>Top bar</h3>
@@ -55,10 +55,9 @@ root.innerHTML = `
       <span class="plaque">${icon("coin", 1)}64 <small>+4.2</small></span>
       <span class="plaque">${icon("swords", 1)}38k</span>
     </header>
-    <h3>Action button and sheet</h3>
+    <h3>End turn button</h3>
     <div class="row demo-actions">
-      <section class="actions framed"><p class="orders">2 armies marching this month</p><button class="wax end-turn">${icon("hourglass", 2)}End turn · to May 1444</button><p class="diag">web · engine in background worker</p></section>
-      <button class="wax fab open">${icon("hourglass", 3)}<span class="badge">2</span></button>
+      <button class="wax fab">${icon("hourglass", 3)}<span class="badge">2</span></button>
     </div>
     <h3>Buttons</h3>
     <div class="row">
