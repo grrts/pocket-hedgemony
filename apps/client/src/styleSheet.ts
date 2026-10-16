@@ -45,19 +45,21 @@ root.innerHTML = `
   const dunois = france.commanders[0]!;
   const body = section(
     "Interface",
-    "Carved wood frames with brass corners hold parchment. Titles sit on cloth ribbons in a bold pixel face; the blackletter face is kept for the game's name only. Buttons are wooden plates, paper cards, or red wax for the one action that matters most. Every piece is pixel art drawn in code and scaled by whole steps.",
+    "Carved wood frames with brass corners hold parchment. Titles sit on cloth ribbons in a bold pixel face; the blackletter face is kept for the game's name only. Buttons are wooden plates, paper cards, or red wax for the one action that matters most. On a phone the map comes first: a thin top bar, panels that fold away behind a tool button, and End turn inside the action button's sheet. Every piece is pixel art drawn in code and scaled by whole steps.",
   );
   body.innerHTML = `
     <h3>Top bar</h3>
     <header class="hud demo-hud">
-      <div class="realm">${pennant(france.color, 3)}<b>${esc(france.name)}</b></div>
-      <span class="plaque">${icon("scroll", 2)}April 1444</span>
-      <div class="stats">
-        <span class="plaque">${icon("coin", 2)}64 <small>+4.2</small></span>
-        <span class="plaque">${icon("swords", 2)}38k</span>
-        <button class="wax end-turn">${icon("hourglass", 2)}End turn</button>
-      </div>
+      <div class="realm">${pennant(france.color, 2)}<b>${esc(france.name)}</b></div>
+      <span class="plaque">April 1444</span>
+      <span class="plaque">${icon("coin", 1)}64 <small>+4.2</small></span>
+      <span class="plaque">${icon("swords", 1)}38k</span>
     </header>
+    <h3>Action button and sheet</h3>
+    <div class="row demo-actions">
+      <section class="actions framed"><p class="orders">2 armies marching this month</p><button class="wax end-turn">${icon("hourglass", 2)}End turn · to May 1444</button><p class="diag">web · engine in background worker</p></section>
+      <button class="wax fab open">${icon("hourglass", 3)}<span class="badge">2</span></button>
+    </div>
     <h3>Buttons</h3>
     <div class="row">
       <button>Move</button>
@@ -69,7 +71,7 @@ root.innerHTML = `
     </div>
     <h3>Panel</h3>
     <section class="panel framed demo-panel">
-      <header><h2 class="ribbon">Île-de-France</h2><button class="close wax" aria-label="Close">${icon("close", 2)}</button></header>
+      <header><h2 class="ribbon">Île-de-France</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span></header>
       <p class="owner">${pennant(france.color)}<b>France</b> · farmland</p>
       <dl class="facts"><dt>People</dt><dd>412,000</dd><dt>Wealth</dt><dd>${icon("coin", 1).repeat(6)}</dd></dl>
       <div class="army">

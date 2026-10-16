@@ -45,6 +45,9 @@ let selectedProvince = -1;
 let selectedArmy = -1; // army id
 let pendingOrders: Order[] = [];
 let busy = false;
+/** The panel is folded away behind a tool button so the map gets the screen. */
+let panelCollapsed = false;
+let actionsOpen = false;
 
 // ---- DOM ----
 installUiArt();
@@ -55,12 +58,28 @@ app.innerHTML = `
   <div class="tools">
     <button class="icon-only" id="mode" title="Switch map mode">${icon("map", 3, "Map mode")}</button>
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
+    <button class="icon-only" id="reopen" title="Show the panel" hidden></button>
   </div>
   <section class="panel framed" id="panel" hidden></section>
-  <footer class="diag" id="diag"></footer>`;
+  <section class="actions framed" id="actions" hidden>
+    <div id="action-body"></div>
+    <p class="diag" id="diag"></p>
+  </section>
+  <button class="wax fab" id="fab" title="Actions" aria-expanded="false" hidden>${icon("hourglass", 3, "Actions")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const panel = document.querySelector<HTMLElement>("#panel")!;
 const diag = document.querySelector<HTMLElement>("#diag")!;
+const actions = document.querySelector<HTMLElement>("#actions")!;
+const fab = document.querySelector<HTMLButtonElement>("#fab")!;
+const reopen = document.querySelector<HTMLButtonElement>("#reopen")!;
+fab.addEventListener("click", () => {
+  actionsOpen = !actionsOpen;
+  renderActions();
+});
+reopen.addEventListener("click", () => {
+  panelCollapsed = false;
+  renderPanel();
+});
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
@@ -276,8 +295,11 @@ function onTap(sx: number, sy: number, province: number): void {
     selectedArmy = -1;
     selectedProvince = province;
   }
+  panelCollapsed = false;
+  actionsOpen = false;
   restyleProvinces();
   renderPanel();
+  renderActions();
 }
 
 function armySlot(id: number): number {
@@ -290,8 +312,8 @@ const pennant = (color: string, scale = 2) => `<img class="px-icon" src="${penna
 function renderHud(): void {
   if (!snapshot) {
     hud.innerHTML = `
-      <div class="realm title">${icon("crown", 3)}<b>Pocket Hegemony</b></div>
-      <div class="subtitle">Spring of 1444 · choose a realm to rule</div>`;
+      <div class="realm title">${icon("crown", 2)}<b>Pocket Hegemony</b></div>
+      <span class="subtitle">Spring 1444 · choose a realm</span>`;
     return;
   }
   const s = snapshot;
@@ -299,25 +321,49 @@ function renderHud(): void {
   const n = nations[me]!;
   const inc = s.nationMonthlyIncome[me]!;
   hud.innerHTML = `
-    <div class="realm">${pennant(n.color, 3)}<b>${esc(n.name)}</b></div>
-    <span class="plaque turn-label" title="Date">${icon("scroll", 2)}${MONTHS[s.date.month - 1]} ${s.date.year}</span>
-    <div class="stats">
-      <span class="plaque" title="Treasury: gold, and change per month">${icon("coin", 2)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></span>
-      <span class="plaque" title="Levies: men ready to raise">${icon("swords", 2)}${fmt(s.nationLevies[me]! / 1000)}k</span>
-      <button class="wax end-turn" ${busy ? "disabled" : ""}>${icon("hourglass", 2)}${busy ? "Working…" : "End turn"}</button>
-    </div>`;
-  hud.querySelector(".end-turn")!.addEventListener("click", () => void endTurn());
+    <div class="realm">${pennant(n.color, 2)}<b>${esc(n.name)}</b></div>
+    <span class="plaque turn-label" title="Date">${MONTHS[s.date.month - 1]} ${s.date.year}</span>
+    <span class="plaque" title="Treasury: gold, and change per month">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></span>
+    <span class="plaque" title="Levies: men ready to raise">${icon("swords", 1)}${fmt(s.nationLevies[me]! / 1000)}k</span>`;
+}
+
+/** The action button and its sheet: End turn, the orders waiting, and engine diagnostics. */
+function renderActions(): void {
+  fab.hidden = !snapshot;
+  actions.hidden = !snapshot || !actionsOpen;
+  fab.setAttribute("aria-expanded", String(actionsOpen));
+  fab.classList.toggle("open", actionsOpen);
+  const badge = fab.querySelector<HTMLElement>(".badge")!;
+  badge.hidden = pendingOrders.length === 0;
+  badge.textContent = String(pendingOrders.length);
+  if (!snapshot) return;
+  const next = new Date(Date.UTC(snapshot.date.year, snapshot.date.month, 1));
+  const orders = pendingOrders.length;
+  document.querySelector("#action-body")!.innerHTML = `
+    <p class="orders">${orders ? `${orders} arm${orders > 1 ? "ies" : "y"} marching this month` : "No orders given this month"}</p>
+    <button class="wax end-turn" ${busy ? "disabled" : ""}>${icon("hourglass", 2)}${busy ? "Working…" : `End turn · to ${MONTHS[next.getUTCMonth()]} ${next.getUTCFullYear()}`}</button>`;
+  actions.querySelector(".end-turn")!.addEventListener("click", () => void endTurn());
 }
 
 function closeButton(): string {
-  return `<button class="close wax" aria-label="Close">${icon("close", 2)}</button>`;
+  return `<span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span>`;
+}
+
+/** Shows or hides the panel, leaving a tool button to bring a folded panel back. */
+function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): void {
+  panel.hidden = !open || panelCollapsed;
+  reopen.hidden = !open || !panelCollapsed;
+  reopen.innerHTML = icon(reopenIcon, 3, "Show the panel");
+  panel.querySelector(".fold")?.addEventListener("click", () => {
+    panelCollapsed = true;
+    showPanel(true, reopenIcon);
+  });
 }
 
 function renderPanel(): void {
   if (!snapshot && selectedProvince < 0) {
-    panel.hidden = false;
     panel.innerHTML = `
-      <header><h2 class="ribbon">Choose your realm</h2></header>
+      <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button></span></header>
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
@@ -326,14 +372,14 @@ function renderPanel(): void {
         .join("")}</div>
       <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>`;
     bindNationButtons();
+    showPanel(true, "crown");
     return;
   }
   if (selectedProvince < 0) {
-    panel.hidden = true;
+    showPanel(false);
     return;
   }
   const p = provinces[selectedProvince]!;
-  panel.hidden = false;
   if (isWater[selectedProvince]) {
     const coasts = neighborIdx[selectedProvince]!.filter((n) => !isWater[n]).length;
     panel.innerHTML = `
@@ -344,6 +390,7 @@ function renderPanel(): void {
         <dt>Sea lanes</dt><dd>${neighborIdx[selectedProvince]!.length - coasts} zones</dd>
       </dl>`;
     bindClose();
+    showPanel(true);
     return;
   }
   const own = owners[selectedProvince]!;
@@ -375,6 +422,7 @@ function renderPanel(): void {
       .join("")}
     ${!snapshot && owner ? `<button class="wax play" data-nation="${owner.id}">${icon("crown", 2)}Rule ${esc(owner.name)}</button>` : ""}`;
   bindClose();
+  showPanel(true);
   panel.querySelectorAll<HTMLButtonElement>("[data-army]").forEach((b) =>
     b.addEventListener("click", () => {
       selectedArmy = Number(b.dataset.army);
@@ -407,20 +455,23 @@ async function startGame(nation: string): Promise<void> {
   restyleProvinces();
   renderHud();
   renderPanel();
+  renderActions();
 }
 
 async function endTurn(): Promise<void> {
   if (busy || !snapshot) return;
   busy = true;
-  renderHud();
+  renderActions();
   snapshot = await engine.send({ type: "endTurn", orders: pendingOrders });
   owners = snapshot.provinceOwner;
   pendingOrders = [];
   selectedArmy = -1;
   busy = false;
+  actionsOpen = false;
   restyleProvinces();
   renderHud();
   renderPanel();
+  renderActions();
   renderDiagnostics();
 }
 

@@ -33,7 +33,8 @@ for (const [name, view] of Object.entries(VIEWS)) {
 }
 await open();
 await page.click("[data-nation=france]");
-await page.click(".end-turn");
+await page.click("#fab");
+await page.click(".actions .end-turn");
 await page.waitForSelector(".turn-label:text('April 1444')");
 await page.waitForTimeout(500);
 await page.screenshot({ path: `${out}/6-france.png` });
