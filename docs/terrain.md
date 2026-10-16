@@ -22,10 +22,12 @@ The generator is `tools/mapgen/terrain.ts`. It decides each map pixel (about 7 k
    - everywhere else gets grey-rock mountains.
 3. **Wetlands**, from Natural Earth: swamp in the tropics, marsh elsewhere.
 4. **Breaking up** each zone with woods and fields:
-   - Woods are broadleaf in the temperate south and pine in the north and on cold ground.
+   - How wooded the land is, and how much of the wood is pine, comes from the climate's natural forest, after the WWF terrestrial ecoregions (Olson et al. 2001, *BioScience* 51:933): taiga in the subarctic climates (about 90 % wooded, nearly all pine); hemiboreal mixed forest of pine, spruce, oak and lime in the cool continental climates (Dfb: the Baltic, Muscovy, southern Scandinavia); broadleaf forest in the warm temperate ones; thinning out into forest-steppe at the edge of the steppe.
+   - These values are blurred across climate borders by a degree or two and wobbled with noise, so taiga, mixed forest, broadleaf and forest-steppe fade into each other instead of meeting at a line. Pine and broadleaf mingle stand by stand in the mixed belt.
+   - Where 1444 settlement was dense, some of the wood is cleared for fields.
    - Fields are rice paddies in monsoon Asia and ordinary farmland elsewhere.
    - How much land is fields follows how crowded the region was in 1444.
-5. **Province ground**: a province takes the ground of the most common type under it.
+5. **Province ground**: a province is mountains when more than half of it is mountain, hills when a quarter or more of it is hills or mountain, and otherwise takes the most common ground under it. Temperate land that is thickly wooded (over 60 % cover after blurring) is forest ground.
 
 ## Share of the land
 
@@ -33,15 +35,15 @@ Shares are of land pixels. Ocean depth is handled separately: five bands from Na
 
 | Category | Type | Share | Ground |
 |---|---|---|---|
-| **Temperate** | grassland | 9.8 % | grassland |
-| | farmland | 0.8 % | farmland |
-| | broadleaf | 5.0 % | forest |
+| **Temperate** | grassland | 9.5 % | grassland |
+| | farmland | 1.3 % | farmland |
+| | broadleaf | 7.3 % | forest |
 | | mediterranean | 1.3 % | grassland |
-| | paddies | 1.0 % | farmland |
-| **Boreal and polar** | forest (pine, taiga) | 20.1 % | forest |
-| | tundra | 6.9 % | tundra |
+| | paddies | 0.8 % | farmland |
+| **Boreal and polar** | forest (pine, taiga) | 19.3 % | forest |
+| | tundra | 5.9 % | tundra |
 | | glacier | 2.1 % | tundra |
-| **Dry lands** | steppe | 4.5 % | grassland |
+| **Dry lands** | steppe | 4.1 % | grassland |
 | | drylands | 4.8 % | drylands |
 | | desert (stony) | 7.3 % | desert |
 | | dunes (sand sea) | 4.1 % | desert |
@@ -50,13 +52,13 @@ Shares are of land pixels. Ocean depth is handled separately: five bands from Na
 | | jungle | 5.8 % | jungle |
 | **Wetlands** | marsh | 0.2 % | marsh |
 | | swamp | 0.2 % | marsh |
-| **Hills and mountains** | hills | 1.1 % | hills |
+| **Hills and mountains** | hills | 1.0 % | hills |
 | | mountains (grey rock) | 1.9 % | mountains |
 | | snowpeaks | 7.2 % | mountains |
 | | badlands (red rock) | 3.4 % | mountains |
 | | highlands (green) | 2.1 % | mountains |
 
-These shares come from the first run with the new types. Re-running the generator after a rule change moves them a little.
+These shares come from the run with the blended forest belts. Re-running the generator after a rule change moves them a little.
 
 ## The types
 
@@ -66,9 +68,9 @@ These shares come from the first run with the new types. Re-running the generato
 
 | Type | Comes from | Looks like | Starting tiles | Plays as |
 |---|---|---|---|---|
-| grassland | Temperate climates (Cfa, Cfb, Dfa, Dfb below 55°, Cw) with no woods or fields | Meadow, flowers, bushes | Pasture, some fields | Grassland ground |
+| grassland | Temperate climates (Cfa, Cfb, Dfa, Cw, the thinner edges of Dfb) with no woods or fields | Meadow, flowers, bushes | Pasture, some fields | Grassland ground |
 | farmland | Fields where 1444 Europe, the Middle East and India were crowded | Strip fields, hedges, a farmstead | Fields | Farmland ground |
-| broadleaf | Woods in the temperate south (oak, beech); about 1 in 3 tiles drawn in autumn colours | Round-crowned trees | Woods | Forest ground. *Proposal:* half the forest crossing penalty of pine; better for clearing to fields, since the soil under it is good |
+| broadleaf | The broadleaf share of woods in temperate climates (oak, beech, lime), and half the hemiboreal mixed forest; about 1 in 3 tiles drawn in autumn colours | Round-crowned trees | Woods | Forest ground. *Proposal:* half the forest crossing penalty of pine; better for clearing to fields, since the soil under it is good |
 | mediterranean | Mediterranean climates (Csa, Csb): dry summers | Olive groves, cypresses, pale stony soil | Fields (olives, vines), pasture | Grassland ground. *Proposal:* wine and olive oil wares; a drought roll in summer; horse bonus like drylands, not open grassland |
 | paddies | Fields in monsoon Asia (Cwa, Cfa, Aw, Am, Af east of 72°E) | Flooded terraces, earth dikes | Fields with rice paddies | Farmland ground. Rice paddies harvest twice a year (province design, section 5.1). *Proposal:* horse −25 % and +1 day to cross in the wet season |
 
@@ -76,7 +78,7 @@ These shares come from the first run with the new types. Re-running the generato
 
 | Type | Comes from | Looks like | Starting tiles | Plays as |
 |---|---|---|---|---|
-| forest | Taiga climates (Dfc, Dfd, Dwc, Dsc, Cfc), Dfb north of 55°, and woods in the north | Dense pines | Woods | Forest ground. *Proposal:* furs and timber wares; winter attrition on top of the forest numbers |
+| forest | Taiga climates (Dfc, Dfd, Dwc, Dsc, Cfc), the pine half of the hemiboreal mixed forest (Dfb), and pine on hills | Dense pines | Woods | Forest ground. *Proposal:* furs and timber wares; winter attrition on top of the forest numbers |
 | tundra | Tundra climate (ET): treeless, frozen most of the year | Grey-green ground, snow patches, stones | Waste, pasture (reindeer) | Tundra ground |
 | glacier | Ice-cap climate (EF): Greenland, Antarctica, the highest peaks | White ice with crevasses | Waste | Tundra ground. *Proposal:* impassable to armies and unsettleable; then Greenland's interior can't be claimed |
 
@@ -117,9 +119,7 @@ These shares come from the first run with the new types. Re-running the generato
 ## Differences from the province design
 
 - The design has 11 grounds. The map has 22 tile types and folds them onto those grounds (the tables above). A type's *proposal* line is the only place it would play differently from its ground. None of these proposals is built.
-- **Hills are rare as a province ground.** Mountain ranges are now drawn edge to edge with only a thin rim of hills, so only 12 provinces have hills as their most common type, against 687 mountain provinces. If hills should matter in play, there are two options:
-  - a province with any mountain in it could count as hills unless more than half of it is mountain;
-  - hills could also come from an elevation map.
+- **Hills come from the share of high ground.** Mountain ranges are drawn edge to edge with a thin rim of hills, so a province picks hills when a quarter or more of it is hills or mountain (and mountains when more than half of it is mountain). That gives 443 hill provinces and 610 mountain provinces, against 12 and 687 when the most common type decided. The two thresholds are `HILL_SHARE` and `MOUNTAIN_SHARE` in `tools/mapgen/mapgen.ts`.
 - **Steppe and mediterranean are grassland** to the simulation. The design's herding and horse numbers fit steppe well. They fit Mediterranean land less well, which is drier and grows olives and vines.
 
 ## For artists

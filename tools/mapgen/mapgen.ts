@@ -200,6 +200,19 @@ for (let p = 0; p < label.length; p++) {
   terrainVotes[l]!.set(t, (terrainVotes[l]!.get(t) ?? 0) + 1);
 }
 
+// A province's ground: mountains when over half of it is mountain, hills when
+// a quarter or more is hills or mountain, else the most common ground.
+const MOUNTAIN_SHARE = 0.5;
+const HILL_SHARE = 0.25;
+function groundOf(votes: Map<string, number>): string {
+  const total = [...votes.values()].reduce((a, b) => a + b, 0);
+  const mountains = (votes.get("mountains") ?? 0) / total;
+  const hills = (votes.get("hills") ?? 0) / total;
+  if (mountains > MOUNTAIN_SHARE) return "mountains";
+  if (mountains + hills >= HILL_SHARE) return "hills";
+  return [...votes.entries()].filter(([t]) => t !== "mountains" && t !== "hills").reduce((a, b) => (b[1] > a[1] ? b : a), ["grassland", -1])[0];
+}
+
 // Names: the admin region, plus a compass point when it was split.
 const nameCount = new Map<string, number>();
 for (let i = 0; i < P; i++) {
@@ -242,7 +255,7 @@ const provinces = order.map((old) => {
   const props = features[s.feature[old]].properties;
   const lat = latOf(s.cy[old]);
   const lon = lonOf(s.cx[old]);
-  let terrain = [...terrainVotes[old]!.entries()].reduce((a, b) => (b[1] > a[1] ? b : a))[0];
+  let terrain = groundOf(terrainVotes[old]!);
   // Grassland in the most crowded parts of 1444 was mostly under the plough.
   if (terrain === "grassland" && fieldShare(lon, lat) >= 0.36) terrain = "farmland";
   return {

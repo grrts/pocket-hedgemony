@@ -59,8 +59,8 @@ app.innerHTML = `
   <div class="tools">
     <button class="icon-only" id="mode" title="Switch map mode">${icon("map", 3, "Map mode")}</button>
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
-    <button class="icon-only" id="reopen" title="Show the panel" hidden></button>
   </div>
+  <button class="wax open-panel" id="reopen" title="Open the overview" hidden></button>
   <section class="panel framed" id="panel" hidden></section>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
   <button class="wax fab end-turn" id="fab" title="End turn" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
@@ -298,9 +298,9 @@ function onTap(sx: number, sy: number, province: number): void {
     // Keep the map in view after giving an order; the panel waits behind its button.
     panelCollapsed = true;
   } else {
+    // A tap only selects; the overview opens from the button in the lower left.
     selectedArmy = -1;
     selectedProvince = province;
-    panelCollapsed = false;
   }
   realmView = -1;
   restyleProvinces();
@@ -368,7 +368,10 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   panel.classList.toggle("chooser", reopenIcon === "crown");
   panel.hidden = !open || panelCollapsed;
   reopen.hidden = !open || !panelCollapsed;
-  reopen.innerHTML = icon(reopenIcon, 3, "Show the panel");
+  const what =
+    reopenIcon === "crown" ? "Choose a realm" : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
+  reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
+  reopen.title = `Open the overview: ${what}`;
   panel.querySelector(".fold")?.addEventListener("click", () => {
     panelCollapsed = true;
     showPanel(true, reopenIcon);

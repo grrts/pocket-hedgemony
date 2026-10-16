@@ -39,13 +39,66 @@ export function climateTerrain(k: string, lat: number): DetailTerrain {
   if (k === "EF") return "glacier";
   if (k === "ET") return "tundra";
   if (k.startsWith("D") && (k.endsWith("c") || k.endsWith("d"))) return "forest"; // taiga
-  if ((k === "Dfb" || k === "Dwb") && Math.abs(lat) >= 55) return "forest"; // southern taiga
   if (k === "Cfc" || k === "Cwc" || k === "Csc") return "forest";
   if (k === "Csa" || k === "Csb") return "mediterranean";
   if (k) return "grassland";
   // No climate data (a coast the climate grid calls sea): fall back to latitude.
   const a = Math.abs(lat);
   return a > 66 ? "tundra" : a > 55 ? "forest" : a < 10 ? "jungle" : "grassland";
+}
+
+/**
+ * How wooded a climate's land was before people cleared it, and how much of
+ * that wood is conifer. After the WWF terrestrial ecoregions (Olson et al.
+ * 2001, BioScience 51:933): boreal taiga in the subarctic climates;
+ * hemiboreal mixed forest of pine, spruce, oak and lime in the cool-summer
+ * continental ones (Dfb: the Baltic, Muscovy, southern Scandinavia, New
+ * England); broadleaf forest in the warm temperate ones; thinning out into
+ * forest-steppe where the steppe begins. These are blurred across climate
+ * borders, so one belt fades into the next instead of meeting at a line.
+ */
+function forestOf(k: string): [cover: number, pine: number] {
+  if (k === "EF") return [0, 1];
+  if (k === "ET") return [0.03, 1];
+  if (k.startsWith("D") && (k.endsWith("c") || k.endsWith("d"))) return [0.88, 0.92];
+  if (k === "Cfc" || k === "Cwc" || k === "Csc") return [0.75, 0.85];
+  if (k === "Dfb" || k === "Dwb" || k === "Dsb") return [0.74, 0.5];
+  if (k === "Dfa" || k === "Dwa" || k === "Dsa") return [0.45, 0.15];
+  if (k === "Cfb" || k === "Cwb") return [0.42, 0.15];
+  if (k === "Cfa" || k === "Cwa") return [0.42, 0.1];
+  if (k === "Csa" || k === "Csb") return [0.15, 0.3];
+  if (k === "BSk") return [0.03, 0.4];
+  if (k.startsWith("B")) return [0.01, 0.3];
+  if (!k) return [0.3, 0.5];
+  return [0, 0]; // tropical climates break up on their own rules
+}
+
+/** Box blur over land only (weights in w), wrapping east-west; radius r pixels. */
+function blurLand(v: Float32Array, w: Float32Array, W: number, H: number, r: number): Float32Array {
+  const pass = (src: Float32Array, horizontal: boolean) => {
+    const out = new Float32Array(src.length);
+    const [len, lines] = horizontal ? [W, H] : [H, W];
+    const at = (line: number, i: number) => (horizontal ? line * W + ((i % W) + W) % W : i * W + line);
+    for (let line = 0; line < lines; line++) {
+      let sum = 0;
+      for (let i = -r; i <= r; i++) if (horizontal || (i >= 0 && i < len)) sum += src[at(line, i)]!;
+      for (let i = 0; i < len; i++) {
+        out[at(line, i)] = sum;
+        const add = i + r + 1;
+        const drop = i - r;
+        if (horizontal || add < len) sum += src[at(line, add)]!;
+        if (horizontal || drop >= 0) sum -= src[at(line, drop)]!;
+      }
+    }
+    return out;
+  };
+  const blur = (a: Float32Array) => pass(pass(pass(pass(a, true), false), true), false);
+  const num = new Float32Array(v.length);
+  for (let p = 0; p < v.length; p++) num[p] = v[p]! * w[p]!;
+  const a = blur(num);
+  const b = blur(w);
+  for (let p = 0; p < v.length; p++) a[p] = b[p]! > 0 ? a[p]! / b[p]! : v[p]!;
+  return a;
 }
 
 /** Monsoon Asia, where fields are rice paddies. */
@@ -109,6 +162,31 @@ export function buildTerrain(o: TerrainInput): { base: Uint8Array; detail: Uint8
     }
   }
 
+  // Forest cover and conifer share, blurred so the belts fade into each other
+  // over a degree or two (the forest-steppe, the hemiboreal mixed forest).
+  const cover0 = new Float32Array(N);
+  const pine0 = new Float32Array(N);
+  const weight = new Float32Array(N);
+  for (let p = 0; p < N; p++) {
+    if (label[p]! < 0 || koppen[p]!.startsWith("A")) continue;
+    [cover0[p], pine0[p]] = forestOf(koppen[p]!);
+    weight[p] = 1;
+  }
+  const cover = blurLand(cover0, weight, W, H, 10);
+  const pine = blurLand(pine0, weight, W, H, 10);
+  // The noise is bunched around 0.5; rank it so a threshold of c covers c of the land.
+  const samples = Array.from({ length: 4096 }, (_, i) => noise(lattice(i, 0, 7) * W, lattice(i, 1, 7) * H, 1 + (i % 3))).sort((a, b) => a - b);
+  const rank = (v: number) => {
+    let lo = 0;
+    let hi = samples.length;
+    while (lo < hi) {
+      const m = (lo + hi) >> 1;
+      if (samples[m]! < v) lo = m + 1;
+      else hi = m;
+    }
+    return lo / samples.length;
+  };
+
   // Distance from the edge of each mountain range, so peaks sit in the middle.
   const isRange = (p: number) => label[p]! >= 0 && o.relief[p] === 1 && !o.lowland[p];
   const edge = new Int16Array(N).fill(-1);
@@ -157,30 +235,39 @@ export function buildTerrain(o: TerrainInput): { base: Uint8Array; detail: Uint8
         if (depth >= 3) t = peak;
         else t = k.startsWith("A") ? "highlands" : k.startsWith("B") ? "badlands" : "hills";
       }
+
+      // Woods: how much of the land is wooded follows the blurred forest cover,
+      // less where 1444 settlement had cleared it for fields; which trees grow
+      // follows the blurred conifer share, so pine and broadleaf mingle in the
+      // mixed-forest belt. A little noise wobbles every edge.
+      const share = o.fieldShare(lon, lat);
+      const wobble = (smooth(x, y, 30, 5) - 0.5) * 0.24;
+      const wooded = !!k && !k.startsWith("A") && t !== "mediterranean" && t !== "glacier";
+      const c = wooded ? Math.max(0, cover[p]! + wobble) * (1 - share * 0.5) : 0;
+      const isWood = wooded && rank(n1) > 1 - c;
+      const conifer = rank(noise(x * 2, y * 2, 3)) < pine[p]! + wobble + (t === "hills" ? 0.2 : 0);
+      const wood: DetailTerrain = conifer ? "forest" : "broadleaf";
+      // Province ground: thickly wooded temperate land is forest ground.
+      if (t === "grassland" && cover[p]! + wobble >= 0.6) t = "forest";
+      else if (t === "forest" && cover[p]! + wobble < 0.45 && /^D..$/.test(k)) t = "grassland";
       base[p] = T[t];
 
-      // Detail: break the base up so a province isn't one flat texture.
-      const humid = /^[CD].f/.test(k);
-      const woods = Math.min(0.2, Math.max(0, (Math.abs(lat) - 40) / 100)) + (humid ? 0.06 : 0);
-      // Temperate woods are broadleaf; the cold north and the high ground grow pine.
-      const wood: DetailTerrain = Math.abs(lat) >= 55 || k.endsWith("c") || k.endsWith("d") ? "forest" : "broadleaf";
       const field: DetailTerrain = paddyLand(lon, lat, k) ? "paddies" : "farmland";
-      const share = o.fieldShare(lon, lat);
       const erg = smooth(x, y, 40, 9);
       let d = t;
-      if (t === "grassland" || t === "hills") {
-        if (n1 > 0.64 - woods) d = wood;
-        else if (t === "grassland" && n2 < share) d = field;
+      if (t === "grassland" || t === "hills" || t === "forest") {
+        if (isWood) d = wood;
+        else if (t !== "hills" && rank(n2) < share) d = field;
+        else if (t === "forest") d = k.startsWith("E") || (k.endsWith("c") || k.endsWith("d")) && cover[p]! < 0.7 ? "tundra" : "grassland";
+      } else if (t === "tundra") {
+        if (isWood) d = "forest";
       } else if (t === "mediterranean") {
         if (n1 > 0.74) d = "broadleaf";
         else if (n2 < share * 0.8) d = "farmland";
       } else if (t === "steppe") {
-        if (n1 > 0.76) d = "grassland";
+        if (isWood) d = wood;
+        else if (n1 > 0.76) d = "grassland";
         else if (n2 < share * 0.4) d = "farmland";
-      } else if (t === "forest") {
-        if (n1 < 0.28) d = Math.abs(lat) > 60 ? "tundra" : "grassland";
-      } else if (t === "tundra") {
-        if (Math.abs(lat) < 68 && n1 > 0.66) d = "forest";
       } else if (t === "desert") {
         if (erg > 0.56) d = "dunes";
         else if (n1 > 0.74) d = "drylands";
