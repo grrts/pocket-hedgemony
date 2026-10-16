@@ -1,4 +1,4 @@
-import type { Order, Snapshot } from "@ph/engine";
+import { forageLimit, groundOf, planRoute, type MarchMap, type Order, type Route, type Snapshot } from "@ph/engine";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite } from "./art/sprites.ts";
@@ -37,6 +37,17 @@ const unownedRgb = hexToRgb(PALETTE.unowned);
 const commanders = nations.flatMap((n) => n.commanders);
 const neighborIdx = provinces.map((p) => p.neighbors.map((id) => provinceIndex.get(id)!));
 const isWater = provinces.map((p) => p.terrain === "sea" || p.terrain === "ocean");
+const march = rules.defines.march;
+const marchGraph: MarchMap = (() => {
+  const adjStart = new Int32Array(provinces.length + 1);
+  neighborIdx.forEach((n, i) => (adjStart[i + 1] = adjStart[i]! + n.length));
+  return {
+    adjStart,
+    adjList: Int32Array.from(neighborIdx.flat()),
+    ground: provinces.map((p) => groundOf(p.terrain)),
+    population: Float32Array.from(provinces, (p) => p.population),
+  };
+})();
 
 // ---- state ----
 let snapshot: Snapshot | null = null;
@@ -44,6 +55,11 @@ let owners: Int16Array = Int16Array.from(provinces, (p) => (p.owner ? nationInde
 let selectedProvince = -1;
 let selectedArmy = -1; // army id
 let pendingOrders: Order[] = [];
+/** The planned route for each pending order, by army id. */
+const plannedRoutes = new Map<number, Route>();
+/** When the last turn's marches started animating (performance.now), or 0. */
+let marchAnimStart = 0;
+const MARCH_STEP_MS = 450;
 let busy = false;
 /** The panel is folded away behind a tool button so the map gets the screen. */
 let panelCollapsed = false;
@@ -117,10 +133,8 @@ async function boot(): Promise<void> {
 // ---- map styling ----
 function restyleProvinces(): void {
   const targets = new Set<number>();
-  if (selectedArmy >= 0 && snapshot) {
-    const k = armySlot(selectedArmy);
-    if (k >= 0) for (const n of neighborIdx[snapshot.armies.location[k]!]!) if (!isWater[n]) targets.add(n);
-  }
+  // Light up the route of the army being ordered.
+  if (selectedArmy >= 0) for (const p of plannedRoutes.get(selectedArmy)?.path ?? []) targets.add(p);
   for (let i = 0; i < provinces.length; i++) {
     const o = owners[i]!;
     const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0);
@@ -222,10 +236,9 @@ function drawOverlay(o: OverlayContext): void {
     armyHitBoxes = [];
     for (let k = 0; k < s.armies.id.length; k++) {
       const loc = s.armies.location[k]!;
-      const p = provinces[loc]!;
       const nth = stackCount.get(loc) ?? 0;
       stackCount.set(loc, nth + 1);
-      let [sx, sy] = o.toScreen(p.x!, p.y!);
+      let [sx, sy] = o.toScreen(...marchPosition(k));
       sx += 10 * spriteScale + nth * 6 * spriteScale;
       if (!onScreen(sx, sy)) continue;
       const owner = s.armies.owner[k]!;
@@ -246,26 +259,65 @@ function drawOverlay(o: OverlayContext): void {
         pixelText(ctx, label, sx, y + img.height + 2, 10);
       }
     }
-    // Move orders as arrows.
-    ctx.strokeStyle = PALETTE.paper;
+    // Routes: pending orders, and marches still under way from earlier turns.
     ctx.lineWidth = Math.max(2, spriteScale);
-    for (const ord of pendingOrders) {
-      const k = armySlot(ord.army);
-      if (k < 0) continue;
-      const from = provinces[s.armies.location[k]!]!;
-      const to = provinces[ord.to]!;
-      const [ax, ay] = o.toScreen(from.x!, from.y!);
-      const [bx, by] = o.toScreen(to.x!, to.y!);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    for (let k = 0; k < s.armies.id.length; k++) {
+      if (s.armies.owner[k] !== s.playerNation) continue;
+      const id = s.armies.id[k]!;
+      const planned = plannedRoutes.get(id);
+      const path = planned ? planned.path : marchAnimStart ? [] : s.armies.route[k]!;
+      if (!path.length) continue;
+      const pts = [s.armies.location[k]!, ...path].map((p) => o.toScreen(provinces[p]!.x!, provinces[p]!.y!));
+      ctx.strokeStyle = planned ? PALETTE.paper : PALETTE.mist;
       ctx.setLineDash([4 * spriteScale, 3 * spriteScale]);
       ctx.beginPath();
-      ctx.moveTo(ax, ay);
-      ctx.lineTo(bx, by);
+      pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
       ctx.stroke();
       ctx.setLineDash([]);
+      // A dot where each month's march ends.
+      const left = daysLeft(k);
+      if (planned) {
+        ctx.fillStyle = PALETTE.paper;
+        planned.arrive.forEach((d, i) => {
+          if (Math.floor(d / march.daysPerMonth) > Math.floor((planned.arrive[i - 1] ?? 0) / march.daysPerMonth) && i < planned.arrive.length - 1) {
+            const [x, y] = pts[i + 1]!;
+            ctx.fillRect(Math.round(x) - spriteScale, Math.round(y) - spriteScale, 2 * spriteScale + 1, 2 * spriteScale + 1);
+          }
+        });
+      }
+      const [bx, by] = pts.at(-1)!;
       const flag = sprite("flag", nations[s.playerNation]!.color, spriteScale);
       ctx.drawImage(flag, Math.round(bx), Math.round(by - flag.height));
+      if (left && zoom >= 2) pixelText(ctx, duration(left.days), bx + flag.width / 2, by - flag.height - 2, 10);
     }
   }
+  if (marchAnimStart) view.invalidate();
+}
+
+/** Where to draw army slot k: walking its last march for a moment after the turn ends. */
+function marchPosition(k: number): [number, number] {
+  const s = snapshot!;
+  const walked = s.armies.marched[k]!;
+  const at = provinces[s.armies.location[k]!]!;
+  if (!marchAnimStart || walked.length < 2) return [at.x!, at.y!];
+  const t = (performance.now() - marchAnimStart) / MARCH_STEP_MS;
+  const longest = Math.max(...s.armies.marched.map((m) => m.length - 1));
+  if (t >= longest) {
+    marchAnimStart = 0;
+    return [at.x!, at.y!];
+  }
+  const step = Math.min(walked.length - 1, t);
+  const i = Math.min(walked.length - 2, Math.floor(step));
+  const f = step - i;
+  const a = provinces[walked[i]!]!;
+  const b = provinces[walked[i + 1]!]!;
+  let bx = b.x!;
+  // Take the short way round across the date line.
+  if (bx - a.x! > rules.map!.width / 2) bx -= rules.map!.width;
+  if (a.x! - bx > rules.map!.width / 2) bx += rules.map!.width;
+  return [a.x! + (bx - a.x!) * f, a.y! + (b.y! - a.y!) * f];
 }
 
 let armyHitBoxes: { id: number; x: number; y: number; w: number; h: number }[] = [];
@@ -290,9 +342,16 @@ function onTap(sx: number, sy: number, province: number): void {
   if (hit && snapshot && snapshot.armies.owner[armySlot(hit.id)] === snapshot.playerNation) {
     pickArmy(hit.id);
     return;
-  } else if (selectedArmy >= 0 && snapshot && province >= 0 && !isWater[province] && neighborIdx[snapshot.armies.location[armySlot(selectedArmy)]!]!.includes(province)) {
+  } else if (selectedArmy >= 0 && snapshot && province >= 0 && !isWater[province]) {
+    // Any land province is a target; the army takes the fastest road there.
+    const k = armySlot(selectedArmy);
+    const here = snapshot.armies.location[k]!;
     pendingOrders = pendingOrders.filter((o) => o.army !== selectedArmy);
-    pendingOrders.push({ type: "move", army: selectedArmy, to: province });
+    plannedRoutes.delete(selectedArmy);
+    const route = province === here ? null : planRoute(march, marchGraph, here, province, armyStats(k));
+    // Tapping the army's own province halts it.
+    if (route || province === here) pendingOrders.push({ type: "move", army: selectedArmy, to: province });
+    if (route) plannedRoutes.set(selectedArmy, route);
     selectedArmy = -1;
     selectedProvince = province;
     // Keep the map in view after giving an order; the panel waits behind its button.
@@ -319,6 +378,41 @@ function pickArmy(id: number): void {
   view.lookAt(provinces[loc]!.x!, provinces[loc]!.y!, Math.max(view.camera.zoom, 5));
   restyleProvinces();
   renderPanel();
+}
+
+function armyStats(k: number) {
+  const s = snapshot!;
+  const c = s.armies.commander[k]!;
+  return { men: s.armies.men[k]!, horse: s.armies.horse[k]!, logistics: c >= 0 ? commanders[c]!.logistics : 0 };
+}
+
+/** Days still to march for army slot k, from its pending order or its standing route. */
+function daysLeft(k: number): { to: number; days: number } | null {
+  const s = snapshot!;
+  const planned = plannedRoutes.get(s.armies.id[k]!);
+  if (planned) return { to: planned.path.at(-1)!, days: Math.ceil(planned.arrive.at(-1)!) };
+  const route = s.armies.route[k]!;
+  if (!route.length) return null;
+  const r = planRoute(march, marchGraph, s.armies.location[k]!, route.at(-1)!, armyStats(k));
+  return r ? { to: route.at(-1)!, days: Math.max(0, Math.ceil(r.arrive.at(-1)! - s.armies.progress[k]!)) } : null;
+}
+
+const duration = (days: number) => (days <= 30 ? `${days} day${days === 1 ? "" : "s"}` : `${Math.ceil(days / 30)} months`);
+
+/** Food in the wagons, and whether the land here can feed the army. */
+function supplyLine(k: number): string {
+  const s = snapshot!;
+  const st = armyStats(k);
+  const need = (st.men * march.rationsPerSoldier + st.horse * march.rationsPerHorse) * Math.max(0, 1 - st.logistics * march.logisticsRationCut);
+  const months = need > 0 ? s.armies.food[k]! / need : 0;
+  const limit = forageLimit(march, marchGraph, s.armies.location[k]!);
+  return `Food for ${months.toFixed(1)} months · the land here feeds ${fmt(limit)} men`;
+}
+
+function marchLine(k: number, order: Order | undefined): string {
+  if (order && !plannedRoutes.has(order.army)) return " · halting";
+  const left = daysLeft(k);
+  return left ? ` · marching to ${esc(provinces[left.to]!.name)}, ${duration(left.days)}` : "";
 }
 
 function armySlot(id: number): number {
@@ -438,7 +532,7 @@ function renderPanel(): void {
         return `<div class="army">
           <img class="portrait" src="${portrait}" alt="">
           <span class="who">${c ? `<b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
-          ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}${order ? ` · marching to ${esc(provinces[order.to]!.name)}` : ""}</span>
+          ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}, ${fmt(s.armies.horse[k]!)} on horse${mine ? `<br><small>${supplyLine(k)}${marchLine(k, order)}</small>` : ""}</span>
           ${mine ? `<button data-army="${id}">${selectedArmy === id ? "Pick a target" : "Move"}</button>` : ""}
         </div>`;
       })
@@ -545,8 +639,10 @@ async function endTurn(): Promise<void> {
   snapshot = await engine.send({ type: "endTurn", orders: pendingOrders });
   owners = snapshot.provinceOwner;
   pendingOrders = [];
+  plannedRoutes.clear();
   selectedArmy = -1;
   busy = false;
+  if (snapshot.armies.marched.some((m) => m.length > 1)) marchAnimStart = performance.now();
   restyleProvinces();
   renderHud();
   renderPanel();

@@ -16,8 +16,37 @@ export interface Defines {
   };
   military: {
     upkeepPerThousandMenPerMonth: number;
-    movementCostPerProvince: number;
   };
+  march: MarchDefines;
+}
+
+/** Land grounds an army can march over: every Terrain but the water zones. */
+export type Ground = Exclude<Terrain, "sea" | "ocean">;
+
+/** Marching and feeding armies (warfare design sections 5 and 6). */
+export interface MarchDefines {
+  daysPerMonth: number;
+  /** Real days for one unit in the days-to-cross table. */
+  daysPerCrossing: number;
+  /** Province design 3.1: crossing units per ground. */
+  daysToCross: Record<Ground, number>;
+  /** Share of a province's store an army can find there (rich 1, fair 0.6, poor 0.3, almost none 0.1). */
+  foraging: Record<Ground, number>;
+  /** An all-horse army marches this much faster (0.5 = 1.5 times). */
+  horseSpeedBonus: number;
+  /** Extra crossing units per province for an army bigger than the forage limit there. */
+  bigArmyExtraCrossings: number;
+  rationsPerSoldier: number;
+  rationsPerHorse: number;
+  /** Food a province can spare each month, in rations per person living there. */
+  rationsStoredPerPerson: number;
+  /** How many months of food an army's wagons carry. */
+  monthsCarried: number;
+  /** Rations cut per point of the commander's logistics. */
+  logisticsRationCut: number;
+  /** Men (and horses) lost in a month with no food at all. */
+  hungerLossPerMonth: number;
+  startingHorseShare: number;
 }
 
 export interface UnitType {

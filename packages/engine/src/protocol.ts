@@ -36,6 +36,15 @@ export interface Snapshot {
     location: Int32Array;
     men: Int32Array;
     commander: Int32Array;
+    horse: Int32Array;
+    /** Rations in the wagons, rounded. */
+    food: Int32Array;
+    /** Days marched toward the next province on the route. */
+    progress: Int32Array;
+    /** Provinces still to march through. */
+    route: number[][];
+    /** Provinces walked last turn, from where the army set out; empty if it stood still. */
+    marched: number[][];
   };
 }
 
@@ -79,6 +88,11 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         location: pick(a.location, (n) => new Int32Array(n)),
         men: pick(a.men, (n) => new Int32Array(n)),
         commander: pick(a.commander, (n) => new Int32Array(n)),
+        horse: pick(a.horse, (n) => new Int32Array(n)),
+        food: Int32Array.from(live, (slot) => Math.round(a.food[slot]!)),
+        progress: Int32Array.from(live, (slot) => Math.round(a.progress[slot]!)),
+        route: live.map((slot) => a.route[slot]!.slice()),
+        marched: live.map((slot) => a.marched[slot]!.slice()),
       },
     };
     const transfer = [
@@ -86,7 +100,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.nationTreasury,
       snap.nationLevies,
       snap.nationMonthlyIncome,
-      ...Object.values(snap.armies),
+      ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
     ].map((arr) => arr.buffer as ArrayBuffer);
     return { response: { id, type: "snapshot", snapshot: snap }, transfer };
   }

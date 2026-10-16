@@ -21,5 +21,9 @@ export function hashWorld(world: World): string {
   feed(a.owner.subarray(0, a.count));
   feed(a.location.subarray(0, a.count));
   feed(a.men.subarray(0, a.count));
+  feed(a.horse.subarray(0, a.count));
+  feed(a.food.subarray(0, a.count));
+  feed(a.progress.subarray(0, a.count));
+  for (let i = 0; i < a.count; i++) feed(Int32Array.from(a.route[i]!));
   return (h >>> 0).toString(16).padStart(8, "0");
 }
