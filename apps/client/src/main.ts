@@ -1545,7 +1545,10 @@ async function startGame(nation: string): Promise<void> {
 
 /** The map images as the engine takes them, so armies march over the map's own tiles. */
 function mapTiles(image: MapImage): MapTiles {
-  return { width: image.width, height: image.height, province: Uint16Array.from(image.ids, (id) => id + 1), terrain: image.terrain };
+  // A plain loop: Uint16Array.from with a map function takes a second over the map's 12 million tiles.
+  const province = new Uint16Array(image.ids.length);
+  for (let i = 0; i < province.length; i++) province[i] = image.ids[i]! + 1;
+  return { width: image.width, height: image.height, province, terrain: image.terrain };
 }
 
 /**

@@ -14,7 +14,8 @@ function paint(w: number, h: number, draw: (px: Px, rect: (x: number, y: number,
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
-  const ctx = canvas.getContext("2d")!;
+  // A canvas kept off the GPU: reading it back then never waits on the map's drawing.
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   // The colour "clear" punches a transparent hole.
   const rect = (x: number, y: number, rw: number, rh: number, c: string) => {
     if (c === "clear") return ctx.clearRect(x, y, rw, rh);
