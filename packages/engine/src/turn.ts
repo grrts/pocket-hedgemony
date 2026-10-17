@@ -27,6 +27,7 @@ import {
   aiRaise,
   answerAiCalls,
   answerCall,
+  answerPeace,
   atWar,
   controller,
   declareWar,
@@ -48,6 +49,8 @@ export type Order =
   | { type: "declareWar"; target: number }
   | { type: "offerPeace"; target: number; terms: PeaceTerms }
   | { type: "answerCall"; call: string; yes: boolean }
+  /** Take or turn down a peace the AI offers (its id in the snapshot's peaceOffers). */
+  | { type: "answerPeace"; offer: number; yes: boolean }
   /** Call up thousands of men from one province's people; each thousand gathers in two weeks. */
   | { type: "recruit"; province: number; thousands: number }
   /** The army's commander takes in the garrison troops where it stands. */
@@ -162,6 +165,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return declareWar(world, actingNation, order.target, news);
     case "offerPeace":
       return offerPeace(world, actingNation, order.target, order.terms, news);
+    case "answerPeace":
+      return answerPeace(world, order.offer, order.yes, news);
     case "answerCall": {
       const call = world.diplomacy.calls.find((c) => c.id === order.call && c.called === world.nationIds[actingNation] && !c.answer);
       if (!call) return "no such call to arms";

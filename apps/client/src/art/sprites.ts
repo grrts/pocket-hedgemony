@@ -197,7 +197,7 @@ export function sprite(name: SpriteName, nationColor: string, scale: number): HT
   const canvas = document.createElement("canvas");
   canvas.width = rows[0]!.length * scale;
   canvas.height = rows.length * scale;
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   rows.forEach((row, y) => {
     for (let x = 0; x < row.length; x++) {
       const ch = row[x]!;

@@ -4,7 +4,7 @@ import { placeClimate, provinceClimate, type PlaceClimate } from "./climate.ts";
 import { pointTileGrid, type TileGrid } from "./tiles.ts";
 import { Rng } from "./rng.ts";
 import type { Diplomacy } from "./domain/diplomacy/index.ts";
-import { createWarState, maxGarrison, type Battle, type SiegeState } from "./war.ts";
+import { createWarState, maxGarrison, type Battle, type PeaceOffer, type SiegeState } from "./war.ts";
 import { newCommander, type Commander } from "./domain/warfare/index.ts";
 import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type Mercenary, type Muster } from "./recruit.ts";
 
@@ -78,6 +78,8 @@ export interface World {
   /** Battles being fought, round by round. */
   battles: Battle[];
   battleSeq: number;
+  /** Peace the AI offers the player, waiting for an answer until the next month. */
+  peaceOffers: PeaceOffer[];
   /** 1 once a nation has lost all its land. */
   nationGone: Uint8Array;
 
@@ -356,6 +358,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     sieges: new Map(),
     battles: [],
     battleSeq: 0,
+    peaceOffers: [],
     nationGone: new Uint8Array(N),
     ...createRecruitState(P, N),
   };

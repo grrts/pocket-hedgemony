@@ -53,6 +53,8 @@ export interface Snapshot {
   news: News[];
   /** Wars under way, by nation index. */
   wars: { id: string; attackers: number[]; defenders: number[]; start: string }[];
+  /** Peace offered to the player by an AI war leader, until the next month: terms as the AI sends them ("give": it gives up land the player holds). */
+  peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" }[];
   /** Calls to arms waiting for the player's answer. */
   calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
   /** The player's standing with every other nation that has one. */
@@ -169,6 +171,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceOccupier: w.provinceOccupier.slice(),
       news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed"),
       wars,
+      peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
       calls: w.diplomacy.calls
         .filter((c) => !c.answer && c.called === w.nationIds[player])
         .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
