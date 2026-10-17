@@ -28,6 +28,8 @@ import { drawBattle, drawRoute, drawSiegeMark, drawToken, pruneBattles, weekEnds
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
+import { sound } from "./audio/sound.ts";
+import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
@@ -142,24 +144,29 @@ app.innerHTML = `
     <button class="icon-only" id="mode" title="Map lens" aria-expanded="false">${icon("map", 3, "Map lens")}</button>
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
     <button class="icon-only" id="armies" title="Your commanders" aria-expanded="false" hidden>${icon("swords", 3, "Commanders")}</button>
+    <button class="icon-only" id="sound" title="Sound and music" aria-expanded="false">${icon("speaker", 3, "Sound")}</button>
   </div>
+  <div class="lens-menu sound-menu framed" id="sound-menu" hidden></div>
   <div class="lens-menu framed" id="lenses" hidden></div>
   <div class="lens-menu army-list framed" id="army-list" hidden></div>
   <button class="wax open-panel" id="reopen" title="Open the overview" hidden></button>
   <section class="panel framed" id="panel" hidden></section>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
-  <button class="wax fab end-turn" id="fab" title="End turn" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
+  <button class="wax fab end-turn" id="fab" title="End turn" data-sfx="none" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const panel = document.querySelector<HTMLElement>("#panel")!;
 const fab = document.querySelector<HTMLButtonElement>("#fab")!;
 const reopen = document.querySelector<HTMLButtonElement>("#reopen")!;
 const armyList = document.querySelector<HTMLElement>("#army-list")!;
 const armyButton = document.querySelector<HTMLButtonElement>("#armies")!;
+const soundButton = document.querySelector<HTMLButtonElement>("#sound")!;
+const soundMenu = document.querySelector<HTMLElement>("#sound-menu")!;
 /** The commander list is put away. */
 let armyListClosed = true;
 armyButton.addEventListener("click", () => {
   armyListClosed = !armyListClosed;
   lensMenu.hidden = true;
+  soundMenu.hidden = true;
   armyButton.setAttribute("aria-expanded", String(!armyListClosed));
   renderArmyList();
 });
@@ -238,6 +245,86 @@ reopen.addEventListener("click", () => {
   renderPanel();
 });
 
+// ---- sound ----
+// Every button answers a tap with a click; closing goes back down (sound-effects §5.1).
+document.addEventListener(
+  "click",
+  (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button");
+    if (!b || b.disabled || b.dataset.sfx === "none") return;
+    sound.sfx(b.dataset.sfx ?? (b.matches(".close, [data-back], .fold") ? "ui_back" : "ui_tap"));
+  },
+  { capture: true },
+);
+soundButton.addEventListener("click", () => {
+  soundMenu.hidden = !soundMenu.hidden;
+  lensMenu.hidden = true;
+  armyListClosed = true;
+  renderArmyList();
+  soundButton.setAttribute("aria-expanded", String(!soundMenu.hidden));
+  renderSoundMenu();
+});
+sound.onChange = () => {
+  renderSoundButton();
+// Read by scripts/sound-shots.mjs.
+(globalThis as { __phSound?: typeof sound }).__phSound = sound;
+  if (!soundMenu.hidden) renderNowPlaying();
+};
+
+/** The sound button shows when music is off at a glance. */
+function renderSoundButton(): void {
+  const off = !sound.settings.musicOn || sound.settings.master === 0;
+  soundButton.innerHTML = icon(off ? "mute" : "speaker", 3, off ? "Sound (music off)" : "Sound");
+}
+
+/** The Sound menu (domain/audio "How the player uses it"): what plays and why, and the volumes, in one card. */
+function renderSoundMenu(): void {
+  if (soundMenu.hidden) return;
+  const st = sound.settings;
+  const pct = (v: number) => Math.round(v * 100);
+  const toggle = (key: "musicOn" | "uiSounds") =>
+    `<button class="paper toggle${st[key] ? " on" : ""}" data-toggle="${key}" data-sfx="none" aria-pressed="${st[key]}">${st[key] ? "On" : "Off"}</button>`;
+  const slider = (key: "master" | "music" | "effects", label: string, off = false, after = `<output>${pct(st[key])}%</output>`) =>
+    `<label class="sound-row${off ? " off" : ""}"><span>${label}</span><input type="range" min="0" max="100" step="5" value="${pct(st[key])}" data-vol="${key}" aria-label="${label} volume"${off ? " disabled" : ""}>${after}</label>`;
+  soundMenu.innerHTML = `
+    <h3 class="sub">Sound</h3>
+    <p class="now-playing"></p>
+    ${slider("master", "Volume")}
+    <div class="sound-row${st.musicOn ? "" : " off"}"><span>Music</span><input type="range" min="0" max="100" step="5" value="${pct(st.music)}" data-vol="music" aria-label="Music volume"${st.musicOn ? "" : " disabled"}>${toggle("musicOn")}</div>
+    ${slider("effects", "Effects")}
+    <div class="sound-row"><span>Buttons</span><small>A click on every tap</small>${toggle("uiSounds")}</div>`;
+  renderNowPlaying();
+  soundMenu.querySelectorAll<HTMLInputElement>("[data-vol]").forEach((input) =>
+    input.addEventListener("input", () => {
+      sound.set({ [input.dataset.vol!]: Number(input.value) / 100 });
+      const out = input.nextElementSibling;
+      if (out?.tagName === "OUTPUT") out.textContent = `${input.value}%`;
+    }),
+  );
+  soundMenu.querySelectorAll<HTMLInputElement>("[data-vol]").forEach((input) => input.addEventListener("change", () => sound.sfx(input.dataset.vol === "music" ? "ui_tap_soft" : "ui_tap")));
+  soundMenu.querySelectorAll<HTMLButtonElement>("[data-toggle]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const key = b.dataset.toggle as "musicOn" | "uiSounds";
+      const on = !sound.settings[key];
+      sound.set({ [key]: on });
+      sound.sfx(on ? "ui_toggle_on" : "ui_toggle_off");
+      renderSoundMenu();
+    }),
+  );
+}
+
+function renderNowPlaying(): void {
+  const el = soundMenu.querySelector<HTMLElement>(".now-playing");
+  if (!el) return;
+  const np = sound.nowPlaying();
+  el.innerHTML = !sound.running
+    ? "Tap anywhere to start the sound."
+    : np
+      ? `<b>Now playing: ${esc(np.name)}</b><small>${esc(np.why)}</small>`
+      : "Music is off.";
+}
+renderSoundButton();
+
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
@@ -262,6 +349,7 @@ async function boot(): Promise<void> {
   modeButton.addEventListener("click", () => {
     lensMenu.hidden = !lensMenu.hidden;
     armyListClosed = true;
+    soundMenu.hidden = true;
     renderArmyList();
     modeButton.setAttribute("aria-expanded", String(!lensMenu.hidden));
     renderLensMenu();
@@ -274,6 +362,7 @@ async function boot(): Promise<void> {
   renderHud();
   renderPanel();
   hideLoading();
+  sound.title();
 }
 
 // ---- map styling ----
@@ -764,12 +853,13 @@ function onTap(sx: number, sy: number, province: number): void {
     // With armies chosen, another one joins them (or leaves, tapped again); else it is the one chosen.
     if (selected.size && !selected.has(hit.id)) selected.add(hit.id);
     else if (selected.size > 1) selected.delete(hit.id);
-    else return pickArmy(hit.id);
+    else return sound.sfx("army_select"), pickArmy(hit.id);
     selectionChanged();
     return;
   } else if (selected.size && snapshot && province >= 0 && !isWater[province]) {
     // Any land is a target: the armies set off at once, over the fastest tiles to the spot tapped.
     const armies = [...selected];
+    sound.sfx("army_order_move");
     const [mx, my] = view.toMap(sx, sy);
     const tile = snapshot.tileWidth === rules.map!.width ? Math.floor(my) * snapshot.tileWidth + Math.floor(mx) : undefined;
     selected.clear();
@@ -790,6 +880,7 @@ function onTap(sx: number, sy: number, province: number): void {
     selected.clear();
     renderArmyList();
     if (province !== selectedProvince) provinceTab = "overview";
+    if (province >= 0 && isKnown(province)) sound.sfx("map_select_province");
     selectedProvince = province >= 0 && isKnown(province) ? province : -1;
   }
   armyView = -1;
@@ -929,6 +1020,9 @@ async function act(order: Order): Promise<void> {
   takeSnapshot(await engine.send({ type: "act", order }), 0);
   acting = false;
   applySnapshot();
+  hearSnapshot();
+  // War and peace change the music at once, not at the turn's end.
+  if (snapshot.news.some((x) => (x.kind === "war" || x.kind === "peace") && x.nations.includes(snapshot!.playerNation))) musicDecides();
   if (snapshot.rejectedOrders.length || snapshot.news.length) {
     dispatches = [
       ...snapshot.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [snapshot!.playerNation] })),
@@ -1950,6 +2044,10 @@ async function startGame(nation: string): Promise<void> {
   dispatches = [];
   applySnapshot();
   const cap = provinceIndex.get(nations[nationIndex.get(nation)!]!.capital)!;
+  factMem = newFactMemory(snapshot!.date.year);
+  remember(factMem, snapshot!);
+  heldBefore = provincesHeld();
+  sound.startGame(playerPalette(rules.names?.nations[nation], lonOf(provinces[cap]!)), factsNow());
   selectedProvince = cap;
   panelCollapsed = true;
   view.lookAt(provinces[cap]!.x!, provinces[cap]!.y!, 4);
@@ -1966,6 +2064,71 @@ function mapTiles(image: MapImage): MapTiles {
   const province = new Uint16Array(image.ids.length);
   for (let i = 0; i < province.length; i++) province[i] = image.ids[i]! + 1;
   return { width: image.width, height: image.height, province, terrain: image.terrain };
+}
+
+/** What the music director remembers of this campaign, and the player's provinces before the last step (for how a peace ended). */
+let factMem: FactMemory | null = null;
+let heldBefore = 0;
+let ending: "gain" | "loss" | "white" | undefined;
+
+function provincesHeld(): number {
+  let n = 0;
+  for (let p = 0; p < owners.length; p++) if (owners[p] === snapshot!.playerNation) n++;
+  return n;
+}
+
+function factsNow() {
+  const me = snapshot!.playerNation;
+  return musicFacts(snapshot!, provinceIndex.get(nations[me]!.capital) ?? -1, factMem!);
+}
+
+/** The director's turn-end decision (AUD-042), with how the last war ended for its stinger. */
+function musicDecides(): void {
+  if (!snapshot || !factMem) return;
+  sound.turnEnded(factsNow(), ending ? { peace: ending } : {});
+  if (!playerWars(snapshot).length) ending = undefined;
+}
+
+/** Shots in the player's battle, by the century's arms (sound-effects §4.1). */
+function shotSound(year: number): string {
+  if (year < 1500) return "battle_shoot_bow";
+  if (Math.random() < 0.25) return "battle_gun";
+  return year < 1650 ? "battle_shoot_matchlock" : "battle_shoot_volley";
+}
+
+/**
+ * The sounds of a fresh snapshot's news for the player (AUD-103 bindings): one
+ * stinger at most, the most telling, and each effect once.
+ */
+function hearSnapshot(): void {
+  const s = snapshot!;
+  const me = s.playerNation;
+  if (factMem) remember(factMem, s);
+  const held = provincesHeld();
+  const effects = new Set<string>();
+  let stinger: string | null = null;
+  const rank = ["war_declared", "battle_lost", "battle_won"];
+  const sting = (id: string) => (stinger = stinger === null || rank.indexOf(id) < rank.indexOf(stinger) ? id : stinger);
+  if (s.rejectedOrders.length) effects.add("ui_error");
+  for (const x of s.news) {
+    if (!x.nations.includes(me)) continue;
+    if (x.kind === "war") sting("war_declared");
+    else if (x.kind === "battle") {
+      // A battle's end names the winner first.
+      if (x.text.includes(" beat ")) sting(x.nations[0] === me ? "battle_won" : "battle_lost");
+      else effects.add("battle_start");
+    } else if (x.kind === "siege" && x.text.includes("lays siege")) effects.add("siege_begin");
+    else if (x.kind === "occupied") effects.add("siege_fall");
+    else if (x.kind === "freed") effects.add("ui_confirm");
+    else if (x.kind === "famine") effects.add("realm_famine");
+    else if (x.kind === "unrest") effects.add("realm_unrest");
+    else if (x.kind === "raised") effects.add("army_levy_call");
+    else if (x.kind === "peace" && /^(White peace|Peace between)/.test(x.text)) ending = held > heldBefore ? "gain" : held < heldBefore ? "loss" : "white";
+  }
+  heldBefore = held;
+  if (stinger) sound.stinger(stinger);
+  // A stinger marks its moment; effects only lead in to it (AUD-090).
+  for (const id of effects) if (!stinger || !id.startsWith("battle_")) sound.sfx(id);
 }
 
 /**
@@ -1985,6 +2148,8 @@ async function endTurn(): Promise<void> {
   paused = false;
   selected.clear();
   dispatches = [];
+  sound.sfx("turn_end");
+  if (factMem) factMem.battleThisTurn = false;
   renderActions();
   const turn = snapshot.turn;
   while (snapshot.turn === turn) {
@@ -2001,6 +2166,8 @@ async function endTurn(): Promise<void> {
     performance.mark("turn-arrived");
     takeSnapshot(next, ms);
     applySnapshot();
+    hearSnapshot();
+    if (battle) sound.sfx(shotSound(next.date.year), 0.7);
     dispatches.push(...next.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [next.playerNation] })), ...next.news);
     restyleProvinces();
     renderHud();
@@ -2013,7 +2180,9 @@ async function endTurn(): Promise<void> {
   }
   playing = false;
   paused = false;
+  sound.sfx(weekStart && snapshot.date.year > weekStart.year ? "turn_month_new_year" : "turn_ready");
   weekStart = snapshot.date;
+  musicDecides();
   // Open the dispatches when something happened to the player's own realm, or a call waits.
   if (snapshot.calls.length || snapshot.peaceOffers.length || dispatches.some((x) => x.nations.includes(snapshot!.playerNation) && x.kind !== "raised")) {
     newsView = true;

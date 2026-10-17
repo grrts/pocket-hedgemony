@@ -283,6 +283,8 @@ export const ICONS = {
     "kddddddddk",
     "kkkkkkkkkk",
   ],
+  speaker: ["....kk.....", "...kwk...k.", "kkkwwk.k..k", "kwwwwk..k.k", "kwwwwk..k.k", "kwwwwk..k.k", "kkkwwk.k..k", "...kwk...k.", "....kk....."],
+  mute: ["....kk.....", "...kwk.....", "kkkwwkr...r", "kwwwwk.r.r.", "kwwwwk..r..", "kwwwwk.r.r.", "kkkwwkr...r", "...kwk.....", "....kk....."],
   anchor: [
     "...kkk...",
     "...kik...",
