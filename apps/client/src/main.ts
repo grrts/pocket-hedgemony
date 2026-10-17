@@ -1225,7 +1225,7 @@ function renderArmy(id: number): void {
   const rations = s.armies.rations[k]!;
   const food = s.armies.food[k]!;
   const here = s.armies.location[k]!;
-  const atHome = owners[here] === me && occupiers[here]! < 0;
+  const atHome = canTrainAt(here);
   const training = s.armies.training[k];
   const others = [...s.armies.id.keys()].filter((j) => j !== k && s.armies.owner[j] === me && s.armies.location[j] === here && s.armies.kind[j] === s.armies.kind[k] && s.armies.commander[j]! >= 0);
   const garrison = [...s.armies.id.keys()].filter((j) => s.armies.owner[j] === me && s.armies.location[j] === here && s.armies.commander[j]! < 0 && s.armies.kind[j] === s.armies.kind[k]);
@@ -1247,8 +1247,9 @@ function renderArmy(id: number): void {
       <dt>Where</dt><dd><button class="paper capital" data-go="${here}">${icon("map", 1)}${esc(provinces[here]!.name)}</button>${marchLine(k)}</dd>
       <dt>Men</dt><dd>${fmt(s.armies.men[k]!)}, ${fmt(s.armies.horse[k]!)} on horse · ${hired ? "a mercenary company" : "levies"}</dd>
       <dt>Drill</dt><dd>${(s.armies.drill[k]! / 10).toFixed(1)} months trained together</dd>
+      <dt>Breaks</dt><dd>after losing ${Math.round(s.armies.breakPoint[k]! * 100)}% of its men</dd>
       <dt>Pay</dt><dd>${s.armies.pay[k]!.toFixed(2)} gold a month${!hired && monthsOut <= 3 ? ` (free for ${3 - monthsOut} more month${3 - monthsOut === 1 ? "" : "s"})` : ""}</dd>
-      <dt>Food</dt><dd>${fmt(rations)} rations a month · ${fmt(food)} in the wagons (${rations > 0 ? (food / rations).toFixed(1) : "–"} months)<br><small>${supplyLine(k)}</small></dd>
+      <dt>Food</dt><dd>${fmt(rations / RATION_MONTH_DAYS)} rations a day, ${fmt(rations)} a month · ${fmt(food)} in the wagons (${rations > 0 ? (food / rations).toFixed(1) : "–"} months)<br><small>${supplyLine(k)}</small></dd>
     </dl>
     <h3 class="sub">Troops</h3>
     <table class="troops">
@@ -1266,9 +1267,11 @@ function renderArmy(id: number): void {
     </table>
     ${hired ? "" : `<h3 class="sub">Train</h3>
     ${training
-      ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy foot training as ${esc(training.arm)}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand in its own land)"}.</p>`
+      ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy foot training as ${esc(training.arm)}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand at a castle of your own)"}.</p>`
+      : trainMen >= 1 && !atHome
+        ? `<p class="hint">Men train only at a castle of your own. March the army to one (your capital has one) to train its levy foot.</p>`
       : trainMen >= 1
-        ? `<p class="hint">Turn ${fmt(trainMen)} levy foot into another arm. Training goes on while the army stands in its own land, and stops while it marches.</p>
+        ? `<p class="hint">Turn ${fmt(trainMen)} levy foot into another arm. Training goes on while the army stands at a castle of your own, and stops while it is away.</p>
           <div class="choices">${trainable
             .map((a) => {
               const cost = ARM_COST[a]!;
@@ -1333,6 +1336,24 @@ function renderArmy(id: number): void {
 }
 
 /** Country overview: the realm's lands, people, purse and commanders. */
+/** Days in a month of rations, as the engine feeds armies. */
+const RATION_MONTH_DAYS = 30;
+
+/** Where the player's armies may train: a held province of the realm with a stone castle, capitals included (RECR-109). */
+function canTrainAt(p: number): boolean {
+  const me = snapshot!.playerNation;
+  const owner = nations[owners[p]!];
+  const castle = provinces[p]!.castle === "castle" || (owner !== undefined && owner.capital === provinces[p]!.id);
+  return owners[p] === me && occupiers[p]! < 0 && castle && !snapshot!.sieges.some((x) => x.province === p);
+}
+
+/** No company is hired while the capital is besieged or held by the enemy (WAR-210). */
+function capitalBesieged(): boolean {
+  const s = snapshot!;
+  const cap = provinceIndex.get(nations[s.playerNation]!.capital);
+  return cap !== undefined && (occupiers[cap]! >= 0 || s.sieges.some((x) => x.province === cap));
+}
+
 function siegeLine(p: number): string {
   const st = snapshot?.sieges.find((x) => x.province === p);
   if (!st) return "";
@@ -1437,8 +1458,9 @@ function warRoomSection(): string {
     <p class="hint">New commanders are commissioned from a province's official, in its Garrison tab.</p>
     <h3 class="sub">Mercenaries</h3>
     <p class="hint">A company of ${fmt(rules.defines.recruit.hiredCompanyMen)} with its own captain, at your capital in ${weeks(weeksMerc)}. They cost three times a levy's pay, from the first month.</p>
+    ${capitalBesieged() ? `<p class="hint">${icon("castle", 1)} Your capital is under siege: no company will come until it is free.</p>` : ""}
     <div class="choices">${rules.defines.recruit.hiredArms
-      .map((a) => `<button class="paper" data-hire="${a}" ${s.mercPrices[a]! > s.nationTreasury[me]! ? "disabled" : ""}>${ARM_LABEL[a]} · ${s.mercPrices[a]!.toFixed(1)} gold</button>`)
+      .map((a) => `<button class="paper" data-hire="${a}" ${capitalBesieged() || s.mercPrices[a]! > s.nationTreasury[me]! ? "disabled" : ""}>${ARM_LABEL[a]} · ${s.mercPrices[a]!.toFixed(1)} gold</button>`)
       .join("")}</div>
     ${s.mercs.map((m) => `<p class="hint">${icon("hourglass", 1)} ${fmt(m.men)} ${esc(m.arm)} on their way: ${weeks(m.weeksLeft)}.</p>`).join("")}`;
 }
