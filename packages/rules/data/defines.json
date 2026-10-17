@@ -57,5 +57,21 @@
     "logisticsRationCut": 0.05,
     "hungerLossPerMonth": 0.28,
     "startingHorseShare": 0.2
+  },
+  "war": {
+    "$comment": "Milestone 1, war and conquest. Battles, sieges and peace use the warfare and diplomacy contexts' own numbers; these only fit them to the weekly turn.",
+    "holdWeeks": 4,
+    "garrison": {
+      "capital": 1500,
+      "castle": 1000,
+      "fort": 500
+    },
+    "garrisonRecoveryPerMonth": 0.1,
+    "castleStoreMonths": 6,
+    "stormRatio": 4,
+    "disperseBelow": 100,
+    "raiseGoldPerThousand": 5,
+    "aiDeclareChancePerMonth": 0.01,
+    "aiDeclareStrengthRatio": 2
   }
 }

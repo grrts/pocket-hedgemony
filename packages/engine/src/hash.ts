@@ -15,6 +15,8 @@ export function hashWorld(world: World): string {
   feed(new Int32Array([world.turn, world.date.year, world.date.month, world.date.day ?? 1, a.count]));
   feed(world.rng.state);
   feed(world.provinceOwner);
+  feed(world.provinceOccupier);
+  feed(world.provinceGarrison);
   feed(world.nationTreasury);
   feed(world.nationLevies);
   feed(a.alive.subarray(0, a.count));

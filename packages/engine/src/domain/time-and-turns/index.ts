@@ -297,6 +297,16 @@ export function orderShape(order: Order): string {
   switch (order.type) {
     case "move":
       return "move army to province";
+    case "declareWar":
+      return "declare war on country";
+    case "offerPeace":
+      return "offer peace to country";
+    case "answerCall":
+      return "answer call to arms";
+    case "raiseLevies":
+      return "raise levies in capital";
+    case "disband":
+      return "disband army";
   }
 }
 

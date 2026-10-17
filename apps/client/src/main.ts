@@ -1,4 +1,4 @@
-import { addDays, DAYS_PER_TURN, forageLimit, groundOf, planRoute, type MarchMap, type Order, type Route, type Snapshot } from "@ph/engine";
+import { addDays, DAYS_PER_TURN, forageLimit, groundOf, planRoute, type MarchMap, type MoveOrder, type Route, type Snapshot } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { placeClimate, provinceClimate, seasonName, type PlaceClimate } from "./map/seasons.ts";
 import { loadDefaultRuleset } from "@ph/rules";
@@ -62,7 +62,7 @@ let snapshot: Snapshot | null = null;
 let owners: Int16Array = Int16Array.from(provinces, (p) => (p.owner ? nationIndex.get(p.owner)! : -1));
 let selectedProvince = -1;
 let selectedArmy = -1; // army id
-let pendingOrders: Order[] = [];
+let pendingOrders: MoveOrder[] = [];
 /** The planned route for each pending order, by army id. */
 const plannedRoutes = new Map<number, Route>();
 /** When the last turn's marches started animating (performance.now), or 0. */
@@ -611,7 +611,7 @@ function supplyLine(k: number): string {
   return `Food for ${months.toFixed(1)} months · the land here feeds ${fmt(limit)} men`;
 }
 
-function marchLine(k: number, order: Order | undefined): string {
+function marchLine(k: number, order: MoveOrder | undefined): string {
   if (order && !plannedRoutes.has(order.army)) return " · halting";
   const left = daysLeft(k);
   return left ? ` · marching to ${esc(provinces[left.to]!.name)}, ${duration(left.days)}` : "";

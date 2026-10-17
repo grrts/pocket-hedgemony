@@ -20,6 +20,28 @@ export interface Defines {
     upkeepPerThousandMenPerMonth: number;
   };
   march: MarchDefines;
+  war: WarDefines;
+}
+
+/** Wars, sieges and occupation (milestone 1; the warfare context's own numbers stay in domain/warfare.json). */
+export interface WarDefines {
+  /** Weeks an army must hold a province without walls to occupy it (warfare occupation.hold_months, scaled to the weekly turn). */
+  holdWeeks: number;
+  /** Men behind the walls of a capital, a stone castle and an earthwork ring fort. */
+  garrison: { capital: number; castle: number; fort: number };
+  /** Share of a full garrison that returns each month while not besieged. */
+  garrisonRecoveryPerMonth: number;
+  /** Months of food in a castle store when a siege begins. */
+  castleStoreMonths: number;
+  /** Besiegers per garrison man needed to storm a breach. */
+  stormRatio: number;
+  /** A beaten army smaller than this scatters. */
+  disperseBelow: number;
+  raiseGoldPerThousand: number;
+  /** Monthly chance that an AI realm at peace looks for a war. */
+  aiDeclareChancePerMonth: number;
+  /** The AI only attacks a neighbour this many times weaker. */
+  aiDeclareStrengthRatio: number;
 }
 
 /** Land grounds an army can march over: every Terrain but the water zones. */

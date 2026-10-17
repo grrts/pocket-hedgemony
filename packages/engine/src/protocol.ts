@@ -1,12 +1,15 @@
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
-import { processTurn, type Order } from "./turn.ts";
+import { applyNow, processTurn, type Order } from "./turn.ts";
 import { createWorld, type World } from "./world.ts";
+import { relationState, type News } from "./war.ts";
 
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
   | { id: number; type: "newGame"; seed: number; playerNation: string }
-  | { id: number; type: "endTurn"; orders: Order[] };
+  | { id: number; type: "endTurn"; orders: Order[] }
+  /** An order that acts at once (declare war, offer peace, answer a call, raise levies, disband). */
+  | { id: number; type: "act"; order: Order };
 
 /** Messages the engine worker sends back. */
 export type EngineResponse =
@@ -27,6 +30,17 @@ export interface Snapshot {
   computeMs: number;
   rejectedOrders: { order: Order; reason: string }[];
   provinceOwner: Int16Array;
+  /** Nation occupying each province, -1 = none. */
+  provinceOccupier: Int16Array;
+  /** What happened this turn (or from the last order) that concerns the player. */
+  news: News[];
+  /** Wars under way, by nation index. */
+  wars: { id: string; attackers: number[]; defenders: number[]; start: string }[];
+  /** Calls to arms waiting for the player's answer. */
+  calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
+  /** The player's standing with every other nation that has one. */
+  relations: { nation: number; state: "war" | "truce" | "alliance" | "subject" | "overlord"; until?: string }[];
+  sieges: { province: number; by: number; months: number; breaches: number; garrison: number }[];
   nationTreasury: Float64Array;
   nationLevies: Float64Array;
   nationMonthlyIncome: Float64Array;
@@ -61,8 +75,22 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
   let world: World | null = null;
   let player = -1;
 
-  function snapshot(id: number, started: number, rejectedOrders: Snapshot["rejectedOrders"]): HostReply {
+  function snapshot(id: number, started: number, rejectedOrders: Snapshot["rejectedOrders"], news: News[] = []): HostReply {
     const w = world!;
+    const idx = (ids: string[]) => ids.map((x) => w.nationIndex.get(x)!).filter((n) => n !== undefined);
+    const wars = w.diplomacy.wars.map((x) => ({ id: x.id, attackers: idx(x.attackers), defenders: idx(x.defenders), start: x.start }));
+    // The player hears of what involves them, their partners and their neighbours' wars.
+    const close = new Set<number>([player]);
+    for (const x of wars) if (x.attackers.includes(player) || x.defenders.includes(player)) for (const n of [...x.attackers, ...x.defenders]) close.add(n);
+    const relations: Snapshot["relations"] = [];
+    for (let n = 0; n < w.nationCount; n++) {
+      if (n === player) continue;
+      const r = relationState(w, player, n);
+      if (r.state) {
+        relations.push({ nation: n, state: r.state, ...(r.until ? { until: r.until } : {}) });
+        if (r.state === "alliance" || r.state === "overlord" || r.state === "subject") close.add(n);
+      }
+    }
     const a = w.armies;
     const live: number[] = [];
     for (let i = 0; i < a.count; i++) if (a.alive[i]) live.push(i);
@@ -79,6 +107,14 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       computeMs: now() - started,
       rejectedOrders,
       provinceOwner: w.provinceOwner.slice(),
+      provinceOccupier: w.provinceOccupier.slice(),
+      news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed"),
+      wars,
+      calls: w.diplomacy.calls
+        .filter((c) => !c.answer && c.called === w.nationIds[player])
+        .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
+      relations,
+      sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
       nationTreasury: w.nationTreasury.slice(),
       nationLevies: w.nationLevies.slice(),
       nationMonthlyIncome: w.nationMonthlyIncome.slice(),
@@ -97,6 +133,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     };
     const transfer = [
       snap.provinceOwner,
+      snap.provinceOccupier,
       snap.nationTreasury,
       snap.nationLevies,
       snap.nationMonthlyIncome,
@@ -114,12 +151,18 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           const idx = world.nationIndex.get(req.playerNation);
           if (idx === undefined) throw new Error(`unknown nation ${req.playerNation}`);
           player = idx;
+          world.player = idx;
           return snapshot(req.id, started, []);
         }
         case "endTurn": {
           if (!world) throw new Error("no game in progress");
           const report = processTurn(world, req.orders, player);
-          return snapshot(req.id, started, report.rejectedOrders);
+          return snapshot(req.id, started, report.rejectedOrders, report.news);
+        }
+        case "act": {
+          if (!world) throw new Error("no game in progress");
+          const report = applyNow(world, req.order, player);
+          return snapshot(req.id, started, report.rejectedOrders, report.news);
         }
       }
     } catch (e) {
