@@ -1,7 +1,7 @@
 import { giftGold } from "./lords.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
-import { canBorrow, LEDGER, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
+import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
 import { HARVESTS, storeMonths } from "./food.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
@@ -112,6 +112,10 @@ export interface Snapshot {
   ledger: { line: string; gold: number }[];
   debt: number;
   canBorrow: number;
+  /** Most the player may owe (a year's tax and trade), the debt a loan of one gold adds (gold plus interest, REALM-188), and whether a loan now unsettles the lords (REALM-189). */
+  debtLimit: number;
+  loanDebtFactor: number;
+  loanUnsettlesLords: boolean;
   /** Months of eating in each province's store, its last harvest (index into harvests, -1 = none yet) and people starved there this year (thousands). */
   provinceFoodMonths: Float32Array;
   provinceHarvest: Int8Array;
@@ -274,6 +278,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       ledger: player >= 0 ? LEDGER.map((line, k) => ({ line, gold: w.nationLedger[player * LEDGER_LINES + k]! })) : [],
       debt: player >= 0 ? w.nationDebt[player]! : 0,
       canBorrow: player >= 0 ? canBorrow(w, player) : 0,
+      debtLimit: player >= 0 ? w.nationDebt[player]! + canBorrow(w, player) * loanDebt(1) : 0,
+      loanDebtFactor: loanDebt(1),
+      loanUnsettlesLords: player >= 0 && loanUnsettlesLords(w, player),
       provinceFoodMonths: Float32Array.from({ length: w.provinceCount }, (_, p) => storeMonths(w, p)),
       provinceHarvest: w.provinceHarvest.slice(),
       provinceStarved: w.provinceStarved.slice(),

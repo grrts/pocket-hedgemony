@@ -48,11 +48,11 @@ Every province pays at its own tax rate or, until you give it one, at your realm
 
 The treasury keeps a **ledger** for the month: Tax and Trade coming in, Army pay, Officials and Interest going out. Their sum is your change a month, paid in on the 1st. Each official at his post earns 0.1 gold a month; a commissioned official draws no wage while he commands. Wages and interest are paid a twelfth each month.
 
-Lenders give up to **one year's tax and trade**, less what you already owe, at **10 % a year**. You can repay any part at any time.
+Lenders let you owe up to **one year's tax and trade**. A loan costs at once: the gold you borrow **plus 10 % interest** goes onto your debt the moment you take it, and the debt keeps costing **10 % a year** while you owe it. Borrowing also makes the crown look weak: **every lord falls a step in loyalty**, at most once a year. You can repay any part at any time.
 
 AI realms tax at normal in peace and heavy at war, borrow only when their gold falls below zero, and repay once they hold a year's army pay and wages.
 
-Where to find it: the gold plaque at the top of the screen shows your gold and change a month; tap it for the **Treasury** tab of your country card, with the ledger, the realm tax default, your debt and the Borrow and Repay buttons. To tax one province differently, open it: its Overview tab has a Tax line and a row of rate buttons, from *Realm default* to *Crushing*.
+Where to find it: the gold plaque at the top of the screen shows your gold and change a month; tap it for the **Treasury** tab of your country card: your purse with how long the gold lasts, the month's gold in and out as bars, the realm tax default, and your debt as a meter against what lenders allow, with Borrow buttons that say what you will owe before you tap. To tax one province differently, open it: its Overview tab has a Tax line and a row of rate buttons, from *Realm default* to *Crushing*.
 
 ### Food: provinces grow it, castles move it
 

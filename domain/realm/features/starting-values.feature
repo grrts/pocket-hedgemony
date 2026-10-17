@@ -40,3 +40,12 @@ Feature: Starting values rules
     When the campaign starts
     Then each country's allies, rivals, subjects and enemies come from it
     And the lords of major countries come from the catalogue's history text
+
+  @REALM-196 @REALM-197 @placeholder
+  Scenario: Starting men spread over the realm, with commanders for its strength
+    # config: starting_armies
+    Given the game starts with the country "France"
+    Then every man of "France" is in an army under a commander
+    And the armies of "France" stand in different provinces
+    And "France" has one commander for each 8,000 men under arms, at least one
+    And each commander of "France" leads an army, the first in its capital
