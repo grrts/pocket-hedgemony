@@ -333,7 +333,7 @@ Newest decision first.
 - SHELL-125: While a Steam Controller or Steam Deck trackpad is in use, it shall act as a mouse on the map through Steam Input and the game shall show the mouse pointer; otherwise it shall show the stick cursor. [screen-flow §8.3]
 - SHELL-126: The game shell shall show button prompts matching the last device used (no prompts for touch, the controller's own glyphs for Xbox, PlayStation, Steam or Switch-style controllers, keys for a keyboard), switching at once when the device changes. [screen-flow §8.3]
 - SHELL-127: Where a text field exists, it shall use the platform's on-screen keyboard (Steam's on the Deck and in Big Picture, the system keyboard on phones) and shall have a filled-in default so it can be confirmed without typing. [screen-flow §8.3]
-- SHELL-128: With a mouse, the game shell shall work like touch with hover added, hover showing what long press shows; with a keyboard it shall use Esc for Back, Enter to select, Tab and arrows to move focus, and Enter held for 0.5 s for End turn. [screen-flow §8.4; D-SHELL-7]
+- SHELL-128: With a mouse, the game shell shall work like touch with hover added, hover showing what long press shows; with a keyboard it shall use Esc for Back, Enter to select, Tab and arrows to move focus, and Enter held for 0.5 s for End turn. [screen-flow §8.4; D-SHELL-7] *Added to by SHELL-143 (playtest feedback): Space also ends the turn.*
 
 ### 5.15 Decided 17 October
 
@@ -355,6 +355,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - SHELL-140: The game shell shall open the peace table and declare war from the Diplomacy tab of a country card, not from its General tab. [F-11]
 - SHELL-141: When the AI offers peace to the player, the game shell shall show the offer in the turn report, list it in Waiting for you, and mark the country's Diplomacy tab until it is answered or put off (SHELL-092). [F-10]
 - SHELL-142: The game shell shall give army banners tap targets of at least 44 points, select an army when its commander is tapped in the Army list, and let several armies be selected at once (MOVE-127). [F-21]
+- SHELL-143: On a keyboard, the game shell shall end the turn when Space is pressed once on the map, exactly as a tap on End turn does (the confirmation setting and unanswered events still apply); Enter held for 0.5 s keeps working, and Space does nothing while a text field has focus. [F-27]
 
 ## 6. Commands
 
@@ -739,3 +740,4 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-139, 140 | map-and-cards.feature | The country card's tabs |
 | SHELL-141 | in-campaign-screens.feature | An AI peace offer waits for an answer |
 | SHELL-142 | map-and-cards.feature | Picking commanders is easy |
+| SHELL-143 | navigation-by-input.feature | Space ends the turn |

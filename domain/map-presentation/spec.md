@@ -203,6 +203,9 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - VIEW-077 (State-driven): While a battle runs, the map shall show it on its province with each side's men and a progress bar of men and morale left per side, updated every round, and the battle viewer shall show the same. [F-8; X-1]
 - VIEW-078 (State-driven): While a castle is besieged, the map shall show the siege at Region and Local zoom with its progress: time held, breaches, garrison left and food left, updated when the siege updates. [F-9]
 - VIEW-079 (Ubiquitous): The map shall draw no land province names at any zoom except on each country's capital; a province's name shows on its name tab and card when it is selected. Realm names and sea names stay. [F-22]
+- VIEW-080 (Ubiquitous): The edge between open sea and sea ice shall be drawn with no ordered (checkerboard) dither; it shall be a soft, textured edge (VIEW-082). [F-24]
+- VIEW-081 (Ubiquitous): Sea ice shall take its own colour, a grey-blue darker than land snow with faint cracks, so it can be told from snow on land in every colour vision mode. [F-25]
+- VIEW-082 (State-driven): While the sea freezes, the drawn ice shall grow from the coasts and from the pole as the water cools and shrink back as it warms, so its outline crosses sea zones in natural shapes instead of filling whole zones, with a soft, textured edge between open sea and ice; a sea zone closes to fleets (MAP-049) once it is drawn mostly frozen. [F-26; X-17]
 
 ## 6. Commands
 
@@ -399,3 +402,4 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-076, 077 | month-playback.feature | The date ticks during playback; Battles show their progress on the map |
 | VIEW-078 | zoom-content.feature | Sieges show their progress on the map |
 | VIEW-079 | zoom-content.feature | No province names on the map |
+| VIEW-080–082 | seasons.feature | The sea-ice edge is soft; Sea ice is not snow; Sea ice grows in natural shapes |

@@ -111,7 +111,7 @@ A turn is one week. When you end it, the week **plays back** on the map: armies 
 
 ### Seasons
 
-The map shows the season. Lands north of latitude 50 and mountains turn white with snow in winter, wet climates turn green in the rainy months, and northern seas show ice while they are frozen. The season colours stay readable in every colour vision mode, and there is no switch to turn them off.
+The map shows the season. Lands north of latitude 50 and mountains turn white with snow in winter, wet climates turn green in the rainy months, and northern seas show ice while they are frozen. Sea ice is grey-blue with faint cracks, darker than the white snow on land, so you can tell frozen sea from snowy coast. It grows out from the coasts and the pole as the water cools and melts back in spring, in natural shapes with a soft, textured edge, not as whole sea zones turning white at once. A sea zone closes to fleets once most of it is frozen. The season colours stay readable in every colour vision mode, and there is no switch to turn them off.
 
 ### Layout by window shape
 

@@ -183,7 +183,7 @@ Phones play in landscape only, on every screen including menus; a phone held upr
 
 **Prompts and text.** Button prompts match the last device used: none for touch, the controller's own glyphs for Xbox, PlayStation, Steam or Switch-style controllers, keys for a keyboard, switching at once when the device changes. Text fields use the platform's on-screen keyboard and have a filled-in default so you can confirm without typing.
 
-**Mouse and keyboard.** A mouse works like touch with hover added; hover shows what long press shows. A keyboard uses Esc for Back, Enter to select, Tab and arrows to move focus, and Enter held for half a second for End turn (a short Enter selects).
+**Mouse and keyboard.** A mouse works like touch with hover added; hover shows what long press shows. A keyboard uses Esc for Back, Enter to select, Tab and arrows to move focus, and Space or Enter held for half a second for End turn (a short Enter selects). Space ends the turn with one press, just like tapping End turn, except while you are typing in a text field.
 
 ## What you see
 

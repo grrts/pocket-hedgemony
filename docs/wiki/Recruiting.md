@@ -168,7 +168,7 @@ Any official can be **commissioned** to lead an army or stand in one as a captai
 
 At 5 years served the type's highest skill gains +1, and +1 more at 10, and no skill goes past 5. When skills tie, Logistics gains first, then Cunning, then Might, so a Marshal with 5 years served has Logistics 3. You pick the offered trait or keep the one rolled. A commander gets the realm's current style for their era and country; a Marshal may take any style your realm has seen in a battle it fought. Years served count where the official was assigned.
 
-**The costs.** A commission costs 10 gold once. In the field an official earns their wage ×3 as commander or ×2 as captain. They bring a staff of 100 (commander) or 50 (captain) who eat 2 rations each a month from the army's reserve, and their horses (30 for a commander, 15 for a captain) eat 3 each. Staff eat but are not soldiers: they do not count toward foraging or the column size.
+**The costs.** A commission costs 50 gold once (a provisional number, raised from 10 so commanders are not handed out freely). In the field an official earns their wage ×3 as commander or ×2 as captain. They bring a staff of 100 (commander) or 50 (captain) who eat 2 rations each a month from the army's reserve, and their horses (30 for a commander, 15 for a captain) eat 3 each. Staff eat but are not soldiers: they do not count toward foraging or the column size.
 
 **The empty province.** When you commission an official you choose how their province is run:
 
@@ -201,7 +201,7 @@ Other leaders: the ruler and heirs can lead, lords lead only their own retinues 
 
 ### The computer players
 
-The AI uses the same levy and training commands. Its catalogue personality sets how much of its pool it dares to levy and what it trains: a militarist levies deep and trains expensive arms, a merchant republic levies little and hires companies instead, a steppe realm trains horse archers. It avoids levying in harvest months unless an enemy army is in its land, and it commissions stewards and wardens first, keeping tax collectors in their seats.
+The AI uses the same levy and training commands. Its catalogue personality sets how much of its pool it dares to levy and what it trains: a militarist levies deep and trains expensive arms, a merchant republic levies little and hires companies instead, a steppe realm trains horse archers. It avoids levying in harvest months unless an enemy army is in its land, and it commissions stewards and wardens first, keeping tax collectors in their seats. It commissions an official only when at least 1,000 of its men have no commander and no free commander can go to them, so it never keeps more commanders than its armies need.
 
 ### Each month
 
@@ -266,7 +266,7 @@ The numbers live in the recruiting config file. Most are **provisional** and wai
 | Armed veterans | garrison +10 % for 5 years |
 | Sickness brought home | within 3 months; 1 in 4 provinces |
 | Years served bonus | +1 at 5 years, +1 at 10, up to 5 |
-| Commission | 10 gold; wage ×3 commander, ×2 captain |
+| Commission | 50 gold (provisional); wage ×3 commander, ×2 captain |
 | Staff | 100 or 50, 2 rations each; 30 or 15 horses at 3 rations |
 | Victory under an official | every lord one step more loyal; ruler's victories +1 |
 | Deputy | 20 clerks; 1 gold a month |

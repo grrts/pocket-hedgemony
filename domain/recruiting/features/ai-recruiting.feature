@@ -34,3 +34,16 @@ Feature: How the AI recruits
     When it needs a commander
     Then it commissions the steward or the warden first
     And keeps the tax collector in his seat
+
+  @RECR-115 @feedback-28
+  Scenario Outline: The AI commissions only for troops it has
+    # config key: recruiting.ai_commission_min_men
+    Given an AI country has <men> men without a commander and <free> free commanders
+    When its turn is played
+    Then it <result>
+
+    Examples:
+      | men  | free | result                       |
+      | 500  | 0    | commissions no official      |
+      | 1000 | 0    | commissions one official     |
+      | 3000 | 1    | sends its free commander     |

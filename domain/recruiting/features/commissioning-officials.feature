@@ -102,12 +102,12 @@ Feature: Commanders from officials
     When the year ends
     Then the Marshal's best skill is 2
 
-  # config: commission cost, field wage, staff
+  # config: commission cost, field wage, staff (cost 50 gold since F-28)
   @RECR-079 @RECR-080 @RECR-081 @placeholder
   Scenario Outline: What a commission costs
     Given an official with a wage of 2 gold a month
     When the official is commissioned as <role>
-    Then the country pays 10 gold once
+    Then the country pays 50 gold once
     And the field wage is <wage> gold a month
     And a staff of <staff> travels with them eating 2 rations each a month from the army's reserve
 
@@ -165,3 +165,10 @@ Feature: Commanders from officials
     Given the country "France" raises a new army
     Then the army has no commander until the player commissions an official or one already serving takes it
     And no commander is attached to an army by default
+
+  @RECR-114 @feedback-28
+  Scenario: A commission costs 50 gold
+    # config key: recruiting.commission_gold
+    Given the country "France" has 60 gold
+    When the player commissions the steward of "Reims"
+    Then France has 10 gold left

@@ -395,3 +395,11 @@ Feature: Navigation by input
     Given a campaign is loaded
     When the player taps the army "Armée de Dunois" at "Paris" and then the province "Troyes"
     Then the army is ordered to march to "Troyes" with no confirm step
+
+  @SHELL-143 @feedback-27
+  Scenario: Space ends the turn
+    Given a mouse and keyboard are in use
+    And the screen "map" is shown
+    When the player presses Space
+    Then the turn ends as if End turn were tapped
+    But while a text field has focus, Space types a space and the turn does not end

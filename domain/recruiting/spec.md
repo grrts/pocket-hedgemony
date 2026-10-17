@@ -233,7 +233,7 @@ Newest decision first.
 - RECR-076 While a Marshal runs a province, training there shall be 25 % faster and regiments shall leave with drill 4. [recruiting §7.2]
 - RECR-077 The recruiting system shall pay a Marshal twice an official's wage, war or peace. [recruiting §7.2]
 - RECR-078 If a Marshal stays 10 years in a province with no war, then they shall lose 1 from their best skill. [recruiting §7.2]
-- RECR-079 When an official is commissioned, the recruiting system shall charge 10 gold once. [recruiting §7.3]
+- RECR-079 When an official is commissioned, the recruiting system shall charge 10 gold once. [recruiting §7.3] *Replaced in part by RECR-114 (playtest feedback): the commission costs 50 gold.*
 - RECR-080 While commissioned, an official shall be paid their wage ×3 as commander or ×2 as captain. [recruiting §7.3]
 - RECR-081 The recruiting system shall attach a staff of 100 (commander) or 50 (captain) who eat 2 rations each a month from the army's reserve, and the staff horses, 30 for a commander and 15 for a captain, eat 3 each; staff are not soldiers and do not count toward the forage limit or the column size. [recruiting §7.3; D-RECR-18]
 - RECR-082 When an official is commissioned, the recruiting system shall ask how the province is run: Leave it, Move another official in, Name a deputy, or Ask the lord next door. [recruiting §7.4]
@@ -277,6 +277,8 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - RECR-110 The commander screen shall show the army's stats (men by arm and kind, drill, break point, the commander's skills), its companies with split, merge and leave-as-garrison actions, its food reserve and food used a day and a month, its pay a month, and any training under way. [F-14]
 - RECR-111 The recruiting system shall give the player new commanders only by commissioning officials (RECR-069 onward), and shall attach no commander to an army by default; rulers and heirs may still lead, lords lead only their own retinues, and hired companies bring their own commander (WAR-211); a captain risen from the ranks, an academy graduate or an exile first enters service as an official. [F-16; X-7]
 - RECR-113 The recruiting system shall never send trained or untrained levies home on their own; they stay under arms until the player disbands them or leaves them as garrison troops (RECR-112). [F-23]
+- RECR-114 When an official is commissioned, the recruiting system shall charge `recruiting.commission_gold` (50 gold, provisional) once. [F-28]
+- RECR-115 The AI shall commission an official only when it has at least `recruiting.ai_commission_min_men` (1,000, provisional) men without a commander and no free commander to send, and shall never keep more commanders than its armies need. [F-28]
 - RECR-112 When a commander leaves troops in a province of his realm, the recruiting system shall make them that province's garrison troops (RECR-107); an army keeps at least its commander's own company. [F-13]
 
 ## 6. Commands
@@ -381,7 +383,8 @@ still to balance. The `levies` and `military` blocks of `defines.json` are repla
 | sickness brought home | | within 3 months; 1 in 4 provinces | yes | recruiting config |
 | official-to-commander skills and traits | 7.1 table | see commissioning feature | yes | recruiting config |
 | years served bonus | | +1 at 5, +1 at 10, max 5 | yes | recruiting config |
-| commission cost | | 10 gold | yes | recruiting config |
+| commission cost (`recruiting.commission_gold`) | | 50 gold (was 10; F-28, provisional) | yes | recruiting config |
+| AI commission threshold (`recruiting.ai_commission_min_men`) | | 1,000 men without a commander (F-28, provisional) | yes | recruiting config |
 | field wage multiplier | | ×3 commander, ×2 captain | yes | recruiting config |
 | staff | | 100 (50 captain), 2 rations each; 30 horses (15 captain) at 3 rations | yes (captain horses provisional, D-RECR-18) | recruiting config |
 | deputy rules | | 20 clerks needed; 1 gold a month | yes | recruiting config |
@@ -414,7 +417,7 @@ still to balance. The `levies` and `military` blocks of `defines.json` are repla
   and trains expensive arms; a merchant republic levies little and hires companies instead; a steppe realm trains
   horse archers.
 - It avoids levying in harvest months unless an enemy army is in its land (RECR-098).
-- It commissions stewards and wardens first, keeping tax collectors in their seats (RECR-099).
+- It commissions stewards and wardens first, keeping tax collectors in their seats (RECR-099), and only when at least 1,000 of its men have no commander and no free commander can go (RECR-115).
 - Lords train by their traits (RECR-059).
 
 ## 13. Decisions and open questions
@@ -484,3 +487,4 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 | RECR-108–110, 112 | training.feature | A commander picks up garrison troops; Giving a training order; The commander screen; Leaving troops as a garrison |
 | RECR-111 | commissioning-officials.feature | New commanders come from officials |
 | RECR-113 | training.feature | Trained levies stay until sent home |
+| RECR-114, 115 | commissioning-officials.feature; ai-recruiting.feature | A commission costs 50 gold; The AI commissions only for troops it has |

@@ -29,3 +29,22 @@ Feature: Seasons on the map
     When the month turns from November to December
     Then each province's palette is chosen once for December
     And no setting turns the season palettes off
+
+  @VIEW-080 @feedback-24
+  Scenario: The sea-ice edge is soft
+    Given the "Gulf of Bothnia" is partly frozen in "January"
+    When the map is drawn at any zoom
+    Then the edge between open sea and ice shows no checkerboard dither pattern
+
+  @VIEW-081 @feedback-25
+  Scenario: Sea ice is not snow
+    Given the "Gulf of Bothnia" is frozen and the land around it is under snow in "February"
+    When the map is drawn in every colour vision mode
+    Then the sea ice is grey-blue and can be told from the white snow on land
+
+  @VIEW-082 @feedback-26
+  Scenario: Sea ice grows in natural shapes
+    Given the "White Sea" is freezing in "December"
+    When the map is drawn
+    Then the ice reaches out from the coasts in a natural shape that does not follow the sea zone's outline
+    And the edge between open sea and ice is soft and textured
