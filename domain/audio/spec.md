@@ -517,6 +517,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-140 The Sound card shall work on a phone in landscape: one column of 44-point rows (sliders, toggles), inside the safe areas, fitting a 375-point-high screen without scrolling, and nothing that needs hover. [X-19]
 - AUD-141 Until the MML track build (AUD-097) and the AudioWorklet synth (AUD-104) exist, the client shall synthesize the chip's tracks and effects in the page into sample buffers, a track at a time between frames, and stand a written track in for any track id of the list not yet written (palette peace tracks share one tune per half of the eras, played in each palette's tuning, key and wavetable). [D-AUD-13]
 - AUD-142 Sound settings shall be kept on the device (Device group, SET-023), never in a save. [SET-023]
+- AUD-143 The client shall play the music, not the effects, on softened voices: the pulse, bass and wavetable voices band-limited with their upper harmonics rolled off and smooth (not 16-step) envelopes, a pad voice that holds each bar's chord, tuned drums (falling-pitch skins, a woodblock, brushed and breathy noise) in place of raw noise bursts, a low-pass at 6 kHz and a small hall; a loop's hall tail wraps into its start so it repeats without a seam. The effects stay on the chip voices of AUD-057. [D-AUD-14; playtest 17 Oct, feedback 79]
 
 ## 6. Commands
 
@@ -690,6 +691,7 @@ None. Audio reacts to the player's view and nation only; computer players hear n
 - **D-AUD-11** (was OQ-AUD-11) Palettes: there is no blend; Atlantic and creole nations use the single `atlantic_creole` palette. The turkic split by capital longitude 55 (west `mena`, otherwise `steppe`) stays in config. A `narrative_only` major event plays no stinger, so there is no "sombre" variant. Simplest rules that need no new tracks.
 - **D-AUD-12** (was OQ-AUD-12) Catalogue defaults: `ui_tooltip` is never played (no setting turns it on); all five haptic moments are "light" (§15.3 is later); the `final_result` screen plays `campaign_end`. The later decision and the screen list win.
 - **D-AUD-13** (17 Oct, Leroy: pull music and sound forward for playtesting) The music and effects are built ahead of their milestones in a first cut: the director, 16 written tracks (title, two peace tunes per half of the eras, prosperity, diplomacy, the five war and situation tracks with layers, six stingers) and 30 effects, synthesized in the page (AUD-141). The worklet, the MML build, ambience, captions, haptics and the full catalogue follow in their milestones; the palette tunings are drafts awaiting review (OQ-AUD-13).
+- **D-AUD-14** (17 Oct, Leroy: "its not really nice to listen to, it sounds like noise mostly"; the effects are fine) The music leaves the strict PH-5 chip rules of AUD-004 that made it harsh: square and narrow pulses buzzed, the 16-step envelopes and stepped triangle crackled, and the noise voice ticked on most beats. The music keeps the voice roles (P1, P2, T, W, N), the tunes, the motif and the palettes, and plays them soft (AUD-143), with a pad voice holding chords and a small hall where AUD-004 and §2 forbid reverb tails. Measured on the first tracks, spectral flatness (how much of the sound is noise) falls from about 0.36 to under 0.08 and the brightness centre from about 3 kHz to about 1 kHz. The effects keep the chip sound unchanged. The worklet synth (AUD-104) follows this decision when it is built.
 - **OQ-AUD-13** Palette reviewers and listening approval (release task): each palette needs a paid reviewer of its tradition, and every track needs Leroy's listening approval, before release.
 
 ## 14. Traceability
@@ -719,4 +721,4 @@ None. Audio reacts to the player's view and nation only; computer players hear n
 | AUD-135 | music-and-effects-together.feature | Tutorial and Needs attention sounds |
 | AUD-136 | busy-turns-and-mixing.feature | Only the battle on screen is heard |
 | AUD-137 | effects-era-and-region.feature | Weekly turns and the new year chime |
-| AUD-138 … AUD-142 | — | Client screens and synth; checked by apps/client/scripts/sound-shots.mjs and src/audio/audio.test.ts |
+| AUD-138 … AUD-143 | — | Client screens and synth; checked by apps/client/scripts/sound-shots.mjs and src/audio/audio.test.ts |

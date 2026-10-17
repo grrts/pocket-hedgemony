@@ -22,6 +22,8 @@ All music is original: no melody, track name or soundtrack structure from any ot
 
 Chords are faked with arpeggios, never played on one voice. Each track stores a tuning table (cents per scale degree), so neutral intervals, slendro, pelog, seven-equal and other tunings are possible. Allowed: pitch slides, vibrato, duty sweeps, volume envelopes, one short echo (a single tap of 60 to 250 ms, used sparingly) and pan up to 30 % off centre per voice. Not allowed: samples, reverb tails, more voices. Bass lines sit an octave higher than on a console, with the triangle's stepped shape kept, so they are heard on phone speakers that reproduce little below about 200 Hz. A gentle low-pass around 9 kHz smooths the master mix.
 
+**In the game now: the music's soft voices.** The first playtests found the strict chip harsh, "noise mostly" (Leroy, 17 Oct). So the music keeps the voices' roles, its tunes and the motif but plays them soft: the pulses and bass are rounded (their buzzing upper harmonics rolled off), volumes glide instead of stepping, a pad holds each bar's chord under the tune, the drums are tuned skins and a woodblock with only a breath of noise for the snare and cymbal, and a small hall gives the music some room. The effects below keep the chip's sound, which playtesters liked as it is.
+
 **Effect voices** are a separate bank of three, so an effect never takes a music voice:
 
 | Voice | What it is |
