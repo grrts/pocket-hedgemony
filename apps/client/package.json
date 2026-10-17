@@ -10,6 +10,7 @@
     "typecheck": "tsc -p .",
     "test": "vitest run --passWithNoTests",
     "smoke": "node scripts/smoke.mjs",
+    "close-check": "node scripts/close-check.mjs",
     "perf": "node scripts/perf.mjs"
   },
   "dependencies": {
