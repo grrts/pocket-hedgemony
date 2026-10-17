@@ -71,7 +71,6 @@
     "castleStoreMonths": 6,
     "stormRatio": 4,
     "disperseBelow": 100,
-    "raiseGoldPerThousand": 5,
     "aiDeclareChancePerMonth": 0.01,
     "aiDeclareStrengthRatio": 2
   },

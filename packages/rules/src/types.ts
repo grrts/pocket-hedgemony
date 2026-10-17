@@ -38,7 +38,6 @@ export interface WarDefines {
   stormRatio: number;
   /** A beaten army smaller than this scatters. */
   disperseBelow: number;
-  raiseGoldPerThousand: number;
   /** Monthly chance that an AI realm at peace looks for a war. */
   aiDeclareChancePerMonth: number;
   /** The AI only attacks a neighbour this many times weaker. */
