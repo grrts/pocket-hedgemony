@@ -152,11 +152,11 @@ its ratio in about seven months.
 ### 5.1 Traders and trade ships
 - TRADE-001 The trade context shall represent each trader as one map unit with kind, home city, crew, route, purse, hold, position and progress. [trade §2.1]
 - TRADE-002 While a trader has no route, the trade context shall send it to its home city. [trade §2.1]
-- TRADE-003 When a country founds a land trader in one of its cities with a yearly fair or better (or a trading post for overseas posts), the trade context shall charge the kind's founding gold up front and take its crew from the market's job slots, like a levy. [trade §1, §2.2, §2.3] (see OQ-TRADE-2)
+- TRADE-003 When a country founds a land trader in one of its cities with a market of any step (or a trading post once T8 is known), the trade context shall charge the kind's founding gold up front and take its crew from the home province's job slots of the crew's class, like a levy, refusing if they are too few. [trade §1, §2.2, §2.3] (D-TRADE-2, D-TRADE-12)
 - TRADE-004 When a country buys a ship in a port with enough sailors (naval) and sets it to Trade, or turns a cog, junk, dhow or carrack to trade, the trade context shall count it as a trade ship. [trade §2.2, §2.3, §10.2]
 - TRADE-005 The trade context shall also let a trader be gained by capture in war (an army taking a caravan may keep it), a lord's gift, or an event. [trade §2.2]
 - TRADE-006 When a trader is dismissed, the trade context shall remove it and overflow its crew into the emptiest slots of its home. [trade §2.2]
-- TRADE-007 If a trader's upkeep is unpaid for 6 months, then the trade context shall remove it and its crew shall leave. [trade §2.2]
+- TRADE-007 If a trader's or trade ship's upkeep is unpaid for 6 months, then the trade context shall remove it and its crew shall leave. [trade §2.2]
 - TRADE-008 The trade context shall charge each trader's upkeep monthly in gold, even with an empty purse and no route. [trade §2.2]
 - TRADE-009 The trade context shall put no cap on the number of traders a country runs. [trade §2.2]
 - TRADE-010 When a trade ship is pressed into war, the trade context shall stop its trading and keep its purse until it next reaches a port of its own country. [trade §2.2]
@@ -181,7 +181,7 @@ its ratio in about seven months.
 - TRADE-025 The trade context shall compute trade value as goods value × (1 + building weights) / 12, in gold a month. [trade §4.2]
 - TRADE-026 The trade context shall compute goods value from the wares actually made in the province this year times the price per load of their tier; burned and fallow tiles make nothing, and only the food surplus counts. [trade §4.2]
 - TRADE-027 The trade context shall price wares by tier: staples 1, raw materials 2, finished goods 5, luxuries 10, precious 12 gold a load. [trade §4.2]
-- TRADE-028 When the event tree's silver flood happens, the trade context shall lower the price of silver. [trade §4.2]
+- TRADE-028 When the event tree's silver flood happens, the trade context shall lower the price of silver from 12 to 6 gold a load. [trade §4.2]
 - TRADE-029 The trade context shall add building weights: weekly market +25 %, yearly fair +50 %, trading house +100 %, caravanserai +25 % (land traders), warehouse +25 %, harbour +25 % (ships), counting house +10 %, bank +25 %, each working craft building +5 %. [trade §4.2]
 - TRADE-030 The trade context shall let a province with no market have a trade value, get busier and pay traders who walk through it. [trade §4.2]
 
@@ -191,7 +191,7 @@ its ratio in about seven months.
 - TRADE-033 The trade context shall count a trader once in every province it stood in during the month, whether it stopped or walked through. [trade §4.3]
 - TRADE-034 When a trade ship sails through a sea zone, the trade context shall count it as half a trader passing in every port province on that zone's coast. [trade §4.3]
 - TRADE-035 Where a province has a customs officer, the trade context shall raise its ratio gain by 15 %. [trade §4.3]
-- TRADE-036 Where a province's road is one step better than its neighbours', the trade context shall raise its ratio gain by 10 %. [trade §4.3]
+- TRADE-036 Where a province's road is one step better than every neighbour's, the trade context shall raise its ratio gain by 10 %. [trade §4.3]
 - TRADE-037 While a province has been at peace for 10 years, the trade context shall raise its ratio gain by 10 %. [trade §4.3]
 - TRADE-038 While a province has riots, the trade context shall halve its ratio gain. [trade §4.3]
 - TRADE-039 While a province has homeless over 5 %, the trade context shall lower its ratio gain by 5 % for every 5 % of homeless. [trade §4.3]
@@ -237,7 +237,7 @@ its ratio in about seven months.
 - TRADE-071 When a trader passes a toll point, the trade context shall take the toll at the owner's rate (none, low, high) from its purse. [trade §7.2]
 - TRADE-072 While two countries have a trade pact, the trade context shall charge no market fee and no toll between them, both ways. [trade §7.3]
 - TRADE-073 While a country is embargoed by another, the trade context shall let its traders neither enter nor stop in the other's provinces or ports. [trade §7.3]
-- TRADE-074 Where diplomacy has closed borders, the trade context shall apply them as an embargo for land traders only. [trade §7.3] (see OQ-TRADE-8)
+- TRADE-074 The trade context shall shut traders out of another country's land only by an embargo; there are no closed borders. [trade §7.3] (D-TRADE-8)
 - TRADE-075 When war starts, the trade context shall send traders inside the enemy's land to the nearest own or neutral city at once, where they may be caught. [trade §7.3]
 - TRADE-076 While the peace term Open the roads is in force (10 years), the trade context shall charge the winner's traders no tolls in the loser's provinces. [trade §7.3]
 - TRADE-077 The trade context shall charge a tributary's traders no toll in its overlord's cities; a subject's traders shall deposit into the subject's own treasury. [trade §7.4]
@@ -272,14 +272,14 @@ its ratio in about seven months.
 - TRADE-100 The game shall show the trader card with kind, crew, route and loop days, position, purse bar, last collections, fees and tolls, danger and upkeep. [trade §1]
 
 ### 5.12 Research
-- TRADE-101 The trade context shall apply these invention effects: T1 camel caravans and half bandit losses; T2 collections +10 %; T3 deposit abroad; T5 trade ships' Indian Ocean storm losses halved; T6 the yearly fair can be built and every market serves +2 visits a month; T8 overseas trading posts count as cities and can found traders; T9 trade ships cost 25 % less; T11 half a lost ship's purse refunded; T13 every known province's trade value and ratio visible; S2 trade ships' hold +0.5; S13 steamer trade ships; B2, turnpikes and railways faster land traders. [trade §11] (see OQ-TRADE-3)
+- TRADE-101 The trade context shall apply these invention effects: T1 camel caravans and half bandit losses; T2 collections +10 %; T3 deposit abroad; T5 trade ships' Indian Ocean storm losses halved; T6 the yearly fair can be built and every market serves +2 visits a month; T8 overseas trading posts count as cities and can found traders; T9 trade ships cost 25 % less; T11 half a lost ship's purse refunded; T13 every known province's trade value and ratio visible; S2 trade ships' hold +0.5; S13 steamer trade ships; B2, turnpikes and railways faster land traders. [trade §11] (D-TRADE-3: T6 is needed for a new yearly fair; starting fairs stay)
 - TRADE-102 The trade context shall leave T17 Container shipping out (era VIII, out of scope). [trade §11, gap-lists decisions]
 
 ### 5.13 Event-tree trade stats
 - TRADE-103 When an event changes `trade_power` of a country, the trade context shall change that country's traders' collections by the same share for the modifier's duration. [trade §12]
 - TRADE-104 When an event changes `trade_access` of a province, the trade context shall change its ratio gain by that share (−0.2 → −20 %) for the duration. [trade §12]
 - TRADE-105 When an event changes `world_trade_index`, the trade context shall change every province's trade value by that share for the duration. [trade §12]
-- TRADE-106 The trade context shall answer `trade_index` as the country's trade income over the last 12 months as an index against its 1444-scaled reference (config). [trade §12]
+- TRADE-106 The trade context shall answer `trade_index` as the country's trade income over the last 12 months as an index against a reference of 100 gold a year (config, D-TRADE-17). [trade §12]
 - TRADE-107 The trade context shall answer `trade_presence(who, hub, value)` as who's share of all collections in the hub's provinces over the last 12 months. [trade §12]
 - TRADE-108 When an event applies `trade_route(from_hub, to_hub, open)`, the trade context shall make that sea passage's zones known to the country for route planning, or mark the link closed when open is false. [trade §12]
 - TRADE-109 The trade context shall read `trade_good` as wares made, and keep hubs as named sets of provinces and sea zones used only by triggers, never as route targets. [trade §12]
@@ -293,6 +293,20 @@ its ratio in about seven months.
 - TRADE-115 The AI shall reroute once a year, and at once when a route breaks. [trade §13.2]
 - TRADE-116 While at war, the AI shall pull traders off roads near the front and use trade ships as transports if short of carriers. [trade §13.2]
 - TRADE-117 The trade context shall store per province and per sea zone only the trade ratio and traders passing, cache paths per city pair (cleared only when something on the path changes), decay ratios lazily (×0.9ⁿ), and recompute trade value yearly and on change. [trade §13.3]
+
+### Decided 17 October
+
+- TRADE-118 The trade context shall add all ratio-gain modifiers into one share, never below 0. (D-TRADE-9)
+- TRADE-119 The trade context shall not let a caravel be set to trade, and shall take each trade ship's upkeep from the naval ship table. (D-TRADE-5)
+- TRADE-120 When founding fails for want of crew in the home province's job slots, the trade context shall refuse it. (D-TRADE-12)
+- TRADE-121 The trade context shall show a country the trade value and ratio of its own provinces and those its traders entered, of all with T13, and count unseen provinces as 0 in the route preview. (D-TRADE-13)
+- TRADE-122 The trade context shall charge a lord's traders no market fee or toll in the realm and let them deposit in any city of the realm into the lord's wealth. (D-TRADE-14)
+- TRADE-123 The trade context shall add a building's or lever's "+x % traders passing" as x % ratio gain, and count a pilgrimage shrine as 1 more trader passing a month. (D-TRADE-15)
+- TRADE-124 The trade context shall keep no ratio for sea zones and count trade ships sailing through each zone a month for the busiest-sea-lanes lens. (D-TRADE-16)
+- TRADE-125 The trade context shall read hubs from config and answer `trade_index` against 100 gold a year. (D-TRADE-17)
+- TRADE-126 The trade context shall count as food surplus the food made this year minus what the people eat, never below 0. (D-TRADE-19)
+- TRADE-127 When a building buys a material in a province no trade route touches (no route stop, no trader passing in 12 months), the trade context shall charge 25 % more. (D-TRADE-7, X-6)
+- TRADE-128 The trade context shall apply heritage levers: `trade_balance_pct` and `traders_passing_pct` on ratio gain, `trader_gain_pct` on each deposit, `trader_count` as extra starting traders. (D-TRADE-7, D-TRADE-18, X-6)
 
 ## 6. Commands
 
@@ -402,7 +416,7 @@ Yearly: trade value with wares made; AI reroutes and dismissals. The global orde
 | naval | upstream | Customer–Supplier | Ship types, buying and crewing, sailors, ports and the 1444 port list, sea-zone step days, pirates |
 | naval | downstream | Customer–Supplier | Hold and purse per ship type; ships set to Trade; ports as route stops |
 | warfare | upstream | Customer–Supplier | War state, armies, raids, sieges, hunting, escort, blockade, storms, peace term Open the roads, capture |
-| diplomacy | upstream | Customer–Supplier | Trade pact, embargo, closed borders, peace and war |
+| diplomacy | upstream | Customer–Supplier | Trade pact, embargo, peace and war (no closed borders, D-TRADE-8) |
 | subjects | upstream | Customer–Supplier | Tributary tolls, colony cities as deposit points (proposal) |
 | research | upstream | Conformist | T and S invention ids and their trade effects |
 | research | downstream | Published Language | Trade partners for invention spread |
@@ -419,13 +433,13 @@ Changes the design asks of other files (§14), recorded here; not edited:
   Toll unchanged, Trade value and Trade ratio added); card Trade line; 4.3 market text; 6.4 homeless → −5 % ratio gain;
   10.2 customs officer "+15 % ratio gain; tolls and market fees in full"; 13 gold income; 14 lenses; 15 trade_access;
   17 yearly paths replaced; 18 links. **Not adopted** as of reading: province §7 still has market price, trade balance
-  and yearly trader paths (OQ-TRADE-7).
+  and yearly trader paths (D-TRADE-7).
 - country-stats: card "Traders 8"; Gold row; §9 Merchants → Traders and Trade ships; §10–11 trade_access.
 - research-tree: T-branch effect texts. **Not adopted**: T1 still "caravans lose less on long routes", T6 "+1 merchant slot".
 - warfare 11.3: hunt takes purses; blockade closes ports to trade ships.
 - troop-movement 11.4: answered here (may enter 7.1, stops at 8.1, raid takes purse).
-- naval: hold and purse in its ship table (**adopted**, with caravel and steamer differences: OQ-TRADE-5).
-- buildings: trade weights; served visits; deposit in any own city (warehouse stores only) (OQ-TRADE-4).
+- naval: hold and purse in its ship table (**adopted**, with caravel and steamer differences: D-TRADE-5).
+- buildings: trade weights; served visits; deposit in any own city (warehouse stores only) (D-TRADE-4).
 - diplomacy: trade pact, embargo, closed borders (pact and embargo adopted in diplomacy 6.5; closed borders absent).
 - subjects: tributary toll waiver taken in; colony cities as deposit points (proposal).
 
@@ -439,27 +453,27 @@ Changes the design asks of other files (§14), recorded here; not edited:
 - At war: pulls traders off roads near the front; uses trade ships as transports if short of carriers (TRADE-116).
 - Lords run their own traders (TRADE-011). Traders default to waiting a day and going round enemy armies (TRADE-079).
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-TRADE-1: Balancing. 3 points per trader, a tenth decay a month and the 0.2 visit share are placeholders, to be tuned (gap-lists List 1 item 21) so a busy 1444 road like Venice–Alexandria sits near 70 %. [trade §17.1]
-- OQ-TRADE-2: Where a trader may be founded. §1 "a city with a yearly fair"; §2.2 "your city with a market"; §2.3 "market at step 2 or better, or a trading post"; §10.2 "one of your cities with a market"; T8 "overseas trading posts can found traders" while §2.3 already allows trading posts. Which building step is required, and is a trading post enough before T8?
-- OQ-TRADE-3: Yearly fair unlock. Trade §11: T6 lets the yearly fair be built. Buildings: yearly fair from the start with a market charter. Research tree: T6 "+1 merchant slot". If T6 is needed, no country can hire traders in 1444, yet starting traders exist. Which?
-- OQ-TRADE-4: Building roles differ from buildings §7.4. Caravanserai: trade +25 % and stops bandits; buildings "carried value grows while resting", T1 doubles its room. Counting house: trade foreign deposits; buildings traders draw treasury gold, merchant houses lend. Warehouse: trade deposits anywhere (asked buildings to agree). Trade asked; buildings not yet changed.
-- OQ-TRADE-5: Ship trade numbers vs naval. Naval says the caravel is an exploration ship, not a trade ship, and the steamer needs checking against trade 3.2; trade lists caravel ×1 / 20. Is the caravel tradeable?
-- OQ-TRADE-6: 1444 port list. Trade cites `naval/data/ports-1444.json`; buildings cites `start-ports.json` (236 provinces). Both exist. Which sets the sea ends of routes and the starting ports?
-- OQ-TRADE-7: Province §7 not yet replaced: province still has Market price, Trade balance, yearly paths. Trade v2 wins by rule, but buildings §3.3 (material price by market price and few traders) and national-strengths levers `trade_balance_pct` (256 uses) and `traders_passing_pct` (452 uses) still target the dropped stats. What do those map to?
-- OQ-TRADE-8: Closed borders. Trade 7.3 has "Closed borders (if diplomacy has it)"; diplomacy 6.5 has only trade pacts and embargoes. Does it exist?
-- OQ-TRADE-9: How ratio-gain modifiers combine (customs +15 %, road +10 %, peace +10 %, riots ×0.5, homeless −5 % steps, trade_access): added together or multiplied? "Better road than its neighbours": than all, or than the average?
-- OQ-TRADE-10: Customs officer "tolls and market fees collected in full" (trade §14) implies they are not collected in full otherwise, but no rule reduces them. What is the reduction without one?
-- OQ-TRADE-11: Trade ship unpaid upkeep: land traders are lost after 6 months; the design gives no time for trade ships.
-- OQ-TRADE-12: Crew sources. Land crews come "from the market's job slots", but rail freight takes 120 craftsmen. From where? What if the market has fewer than 50 market folk left?
-- OQ-TRADE-13: Visibility. T13 lets a country see every known province's value and ratio "not only those your traders have visited", implying a default visibility rule nowhere stated. The route preview uses ratios of unvisited provinces.
-- OQ-TRADE-14: Lords' traders: do they pay market fees and tolls in the crown's provinces, count as foreign for fees, and can they deposit in royal cities?
-- OQ-TRADE-15: Percent "traders passing" effects elsewhere. Buildings' Djenné (+20 %) and Taj Mahal (+30 % traders passing), pilgrimage shrine pilgrims "count as traders passing", and HER's `traders_passing_pct`: traders passing is now a count driving ratio gain. Do they add to the count, the gain, or collections?
-- OQ-TRADE-16: Sea-zone ratio. 13.3 stores a trade ratio per sea zone, but sea zones have nothing to collect and sea lanes lift port provinces. What is a sea zone's ratio used for?
-- OQ-TRADE-17: Hubs. Config holds Alexandria, Amsterdam, Malacca Strait "and 20 more" with empty province lists; national-strengths asks for more hubs (tabriz, aleppo, volga, bruges/antwerp, seville, genoa, venice). `trade_index` 1444 reference has no value.
-- OQ-TRADE-18: README still describes version 1 ("each month they collect where they stand"). HER lever `trader_gain_pct` also reads "each month on its route". Both conflict with collect-on-enter (decided 16 Oct).
-- OQ-TRADE-19: Defining "food surplus" for goods value (what goes to the local store, province 5.1) when the store is full or the province hungry.
+- **D-TRADE-1** (was OQ-TRADE-1) Balancing: keep 3 ratio points per trader, a tenth decay a month and a 0.2 visit share as provisional numbers in `trade.json` (`_provisional`). Tuning is a balance pass on these numbers, not a rule change.
+- **D-TRADE-2** (was OQ-TRADE-2) Where a trader may be founded: in an own city with a market of any step (weekly market or better), or in an own trading post once T8 is known. The latest and simplest text ("your city with a market") wins, and T8 then has a real effect.
+- **D-TRADE-3** (was OQ-TRADE-3) Yearly fair unlock: T6 is needed to build a new yearly fair; fairs standing at the start stay, and founding needs only a market (D-TRADE-2), so 1444 realms can found traders. X-6 keeps trade's T-branch texts, and this keeps both the start and T6 working.
+- **D-TRADE-4** (was OQ-TRADE-4) Building roles: trade's own roles stand: caravanserai +25 % weight for land traders and stops bandits, counting house and bank take foreign deposits with T3, warehouse only adds weight (deposits happen in any own city anyway). Trade v2 is the latest design and buildings follow it.
+- **D-TRADE-5** (was D-TRADE-5) Ships: the caravel cannot be set to trade; cog, galley, carrack, galleon, fluyt and steamer can, and each ship's upkeep is naval's one upkeep. One ship, one upkeep, and naval names the caravel an exploration ship.
+- **D-TRADE-6** (was OQ-TRADE-6) 1444 ports: `start-ports.json` (236 harbour provinces) sets the sea ends of routes and the starting ports. It is the list buildings and naval already read.
+- **D-TRADE-7** (was OQ-TRADE-7) Dropped province stats: as X-6 says, a material costs its price per load, 25 % more where no trade route touches the province (no route stop and no trader passed in 12 months); `trade_balance_pct` and `traders_passing_pct` add to ratio gain, `trader_gain_pct` to each deposit, `trader_count` to starting traders. X-6 decides it.
+- **D-TRADE-8** (was OQ-TRADE-8) Closed borders: there are none; only an embargo shuts traders out. Diplomacy has no such act.
+- **D-TRADE-9** (was OQ-TRADE-9) Ratio-gain modifiers add together (customs +15 %, better road +10 %, 10 years of peace +10 %, riots −50 %, −5 % for every full 5 % of homeless over 5 %, event trade_access, heritage and building shares), never below 0; an enemy army or siege gives no gain. "Better road" means better than every neighbour's. Adding is the simplest rule to read.
+- **D-TRADE-10** (was OQ-TRADE-10) Customs officer: there is no reduction without one; the officer only adds +15 % ratio gain. "In full" is dropped as it named no rule.
+- **D-TRADE-11** (was OQ-TRADE-11) Trade ships with unpaid upkeep are lost after 6 months, like land traders. Same rule for every trader.
+- **D-TRADE-12** (was OQ-TRADE-12) Crew: a land trader's crew comes from the home province's job slots of the crew's class (market folk, or craftsmen for rail freight); founding is refused if there are too few. Same levy-like rule for all kinds.
+- **D-TRADE-13** (was OQ-TRADE-13) Visibility: a country sees the trade value and ratio of its own provinces and of every province its traders entered; with T13 of every province. The route preview counts provinces it cannot see as 0. This gives T13 its stated effect.
+- **D-TRADE-14** (was OQ-TRADE-14) Lords' traders count as the crown's at home: no market fee or toll in the realm, and they deposit in any city of the realm into the lord's wealth. Lords are part of the realm.
+- **D-TRADE-15** (was OQ-TRADE-15) "+x % traders passing" effects (Djenné +20 %, Taj Mahal +30 %, `traders_passing_pct`) add x % to ratio gain; a pilgrimage shrine counts as 1 more trader passing a month (provisional). Traders passing is a count, so percentages act on the gain it drives.
+- **D-TRADE-16** (was OQ-TRADE-16) Sea zones have no trade ratio; trade counts ships sailing through each zone a month for the busiest-sea-lanes lens only. Sea lanes already lift port provinces.
+- **D-TRADE-17** (was OQ-TRADE-17) Hubs: config names 10 hubs (alexandria, amsterdam, malacca_strait, venice, genoa, seville, bruges_antwerp, tabriz, aleppo, volga) as provisional province and sea-zone sets; `trade_index` = trade income over the last 12 months ÷ 100 gold × 100 for every country (provisional). Simple and readable by triggers.
+- **D-TRADE-18** (was OQ-TRADE-18) The v1 README text is superseded by collect-on-enter; `trader_gain_pct` is a percentage on each deposit (X-6). The latest decision wins.
+- **D-TRADE-19** (was OQ-TRADE-19) Food surplus = food made in the province this year minus what its people eat, never below 0, whatever the store holds. Simplest measurable rule.
 
 ## 14. Traceability
 
@@ -479,3 +493,12 @@ Changes the design asks of other files (§14), recorded here; not edited:
 | TRADE-101, TRADE-102 | trade-research.feature | all scenarios |
 | TRADE-103..109 | event-mapping.feature | all scenarios |
 | TRADE-110..117 | start-ai-performance.feature | all scenarios |
+| TRADE-118, TRADE-123 | trade-ratio.feature | Ratio gain modifiers add together; "Traders passing" effects |
+| TRADE-119 | trader-kinds.feature | Which ships can trade |
+| TRADE-120, TRADE-122 | traders.feature | Crew from the home province's job slots; A lord's traders count as the crown's at home |
+| TRADE-121 | routes.feature | What a country can see of trade; The preview counts provinces it cannot see as nothing |
+| TRADE-124 | trade-screens.feature | Busy sea lanes are counted, not given a ratio |
+| TRADE-125 | event-mapping.feature, trade-screens.feature | trade_index against the reference; Hubs as the event tree reads them |
+| TRADE-126 | trade-value.feature | What the food surplus is |
+| TRADE-127 | trade-effects.feature | Materials cost more where no trade route touches |
+| TRADE-128 | deposits.feature, start-ai-performance.feature | A heritage lever on deposits; The heritage lever trader_count |

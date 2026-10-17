@@ -30,9 +30,8 @@ Feature: Several faiths in one realm
       | Tolerated  | has no  | unserved |
       | Persecuted | has     | unserved |
 
-  @RELG-046 @RELG-047 @placeholder @open-question
+  @RELG-046 @RELG-047 @placeholder
   Scenario Outline: Wrong faith
-    # OQ-RELG-1: a third, not every unserved community
     # config key: communities.wrong_faith_min_share
     Given the country "France" has the state faith "catholic"
     And protestant is <share> of "La Rochelle", <policy>, with <house>
@@ -42,6 +41,8 @@ Feature: Several faiths in one realm
       | share | policy     | house                 | grievance     |
       | 0.40  | Tolerated  | no protestant house   | has           |
       | 0.20  | Tolerated  | no protestant house   | does not have |
+      | 0.33  | Tolerated  | no protestant house   | has           |
+      | 0.32  | Tolerated  | no protestant house   | does not have |
       | 0.40  | Tolerated  | a protestant church   | does not have |
       | 0.60  | Restricted | a protestant church   | has           |
       | 0.40  | Restricted | a protestant church   | does not have |
@@ -150,3 +151,11 @@ Feature: Several faiths in one realm
       | Mewar   | hindu    |              | the ruler builds a temple in his land                      | gains one step       |
       | Mewar   | hindu    |              | the state faith changes away from hindu                    | loses one step       |
       | Mewar   | hindu    |              | the state faith changes to hindu                           | gains one step       |
+
+  @RELG-049 @placeholder
+  Scenario: A Tolerated faith that grows past 10 % moves no lord
+    # config key: policies.tolerated.pious_lords_waver_if_faith_share_of_realm
+    Given the country "France" Tolerates protestant while protestants are 8 % of the realm
+    And the lord "Guise" is Pious and catholic
+    When protestants grow to 12 % of the realm and protestant stays Tolerated at the next New Year
+    Then the lord "Guise" does not waver

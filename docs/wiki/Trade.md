@@ -28,11 +28,11 @@ Each trader is one unit on the map with a kind, a home city, a crew, a route, a 
 
 **Gaining traders:**
 
-- **Found** a land trader in one of your cities with a market (which market step is needed is still open, OQ-TRADE-2). You pay its founding gold up front, and its crew leaves the market's job slots like a levy.
-- **Ships**: buy a ship in a port with enough sailors (see [Naval](Naval)) and set it to Trade, or turn a cog, junk, dhow or carrack to trade.
+- **Found** a land trader in one of your cities with a market, or in a trading post once you know T8. You pay its founding gold up front, and its crew leaves the home province's job slots like a levy.
+- **Ships**: buy a ship in a port with enough sailors (see [Naval](Naval)) and set it to Trade, or turn a cog, junk, dhow, carrack or galleon to trade. Caravels cannot trade.
 - Capture in war (an army taking a caravan may keep it), a lord's gift, or an event.
 
-**Losing traders:** dismissing one removes it and its crew overflow into the emptiest slots of its home. If a land trader's upkeep is unpaid for 6 months, it is lost and its crew leave. A trade ship pressed into war stops trading and keeps its purse until it next reaches one of your ports.
+**Losing traders:** dismissing one removes it and its crew overflow into the emptiest slots of its home. If a trader's or trade ship's upkeep is unpaid for 6 months, it is lost and its crew leave. A trade ship pressed into war stops trading and keeps its purse until it next reaches one of your ports.
 
 Upkeep is charged every month, even with an empty purse and no route. There is **no cap** on how many traders you run.
 
@@ -122,15 +122,15 @@ Steady ratios: 1 trader a month gives about 23 %; 2 about 37 %; 5 about 60 %; 10
 | Condition | Gain |
 |---|---|
 | A customs officer in the province | +15 % |
-| Road one step better than its neighbours' | +10 % |
+| Road one step better than every neighbour's | +10 % |
 | 10 years of peace | +10 % |
-| Riots | halved |
+| Riots | −50 % |
 | Homeless over 5 % | −5 % for every 5 % homeless |
 | Enemy army or siege in the province | no gain that month |
 | Plague quarantine | ratio 0, and no trader enters |
 | Blockaded port | no ship enters, no sea-lane gain |
 
-How the modifiers combine is still open (OQ-TRADE-9).
+The modifiers add together (riots count as −50 %), and the total never drops below no gain.
 
 ### Collecting
 
@@ -163,7 +163,7 @@ collected = trade value × trade ratio × hold × visit share (0.2) × crowding
  Crowding     Geneva: 6 of 8 visits taken this month
 ```
 
-**Expect** is the planned collections over one loop at this month's ratios, minus fees and tolls, divided by the loop's months. Red marks show closed borders, quarantines, enemy armies and passes shut by snow.
+**Expect** is the planned collections over one loop at this month's ratios, minus fees and tolls, divided by the loop's months. Provinces you cannot see count as nothing. Red marks show embargoes, quarantines, enemy armies and passes shut by snow.
 
 **When a route breaks** (war, a closed border, quarantine, a snowed pass, a blockade), the route is checked again. A closed path is replaced by a dashed detour if one exists, otherwise that stop is skipped. A closed stop (war with its owner, an embargo, a quarantine) is skipped, shows red, and the turn report says so once. If every stop is closed, the trader goes to the nearest of your cities, deposits and waits for orders.
 
@@ -185,7 +185,7 @@ collected = trade value × trade ratio × hold × visit share (0.2) × crowding
 - Borders at peace need no passage.
 - **Tolls**: passing a toll point (bridge, ford, pass, river mouth, strait), a trader pays the owner's rate (none, low or high) from its purse. Rates are set on [Provinces](Provinces).
 - **Trade pact**: no market fees and no tolls between the two countries, both ways.
-- **Embargo**: the embargoed country's traders can neither enter nor stop in the other's provinces or ports. Closed borders, if diplomacy has them, act as an embargo for land traders only.
+- **Embargo**: the embargoed country's traders can neither enter nor stop in the other's provinces or ports.
 - **War** sends traders inside enemy land at once to the nearest own or neutral city, where they may be caught.
 - The peace term **Open the roads** (10 years) lets the winner's traders pass the loser's tolls free.
 - A tributary's traders pay no tolls in its overlord's cities; a subject's traders deposit into the subject's own treasury.
@@ -224,14 +224,14 @@ collected = trade value × trade ratio × hold × visit share (0.2) × crowding
 | S13 Steamships | Steamer trade ships |
 | B2, turnpikes, railways | Faster land traders |
 
-T17 *Container shipping* is Era VIII and out of the game. The research tree hasn't yet adopted these texts (OQ-TRADE-3).
+T17 *Container shipping* is Era VIII and out of the game.
 
 ### Events
 
 - `trade_power` of a country changes its traders' collections by the same share for the duration.
 - `trade_access` of a province changes its ratio gain by that share (−0.2 means −20 %).
 - `world_trade_index` changes every province's trade value by that share.
-- `trade_index` reads a country's trade income over the last 12 months as an index against a 1444 reference.
+- `trade_index` reads a country's trade income over the last 12 months as an index against 100 gold a year.
 - `trade_presence(who, hub, value)` reads a country's share of all collections in a hub's provinces over the last 12 months.
 - `trade_route(from_hub, to_hub, open)` makes a sea passage's zones known to a country for routes, or marks the link closed.
 - `trade_good` reads wares made. **Hubs** (Alexandria, Amsterdam, the Malacca Strait and 20 more) are named sets of provinces and sea zones used only by event triggers, never as route targets.
@@ -275,7 +275,7 @@ On a phone, each province and sea zone stores only its ratio and traders passing
 - [Your Realm](Your-Realm): deposits, fees and tolls as trade income; founding gold and upkeep; traders replace merchants.
 - [Naval](Naval): ship types, sailors, ports and the 1444 port list, sea step days, pirates.
 - [Warfare](Warfare): war, armies, raids, sieges, hunting, escorts, blockades, storms, Open the roads, capture.
-- [Diplomacy](Diplomacy): trade pacts, embargoes, closed borders, war and peace.
+- [Diplomacy](Diplomacy): trade pacts, embargoes, war and peace.
 - [Subjects](Subjects): tributary toll waivers, colony cities as deposit points (proposed).
 - [Research](Research): T and S inventions; trade partners for spread.
 - [Historical Events](Historical-Events): trade stats, hubs and the silver flood.
@@ -321,32 +321,32 @@ Every trade number is a placeholder, all in the trade config file.
 | AI reach | `ai.caravan_reach_provinces`, `ai.ship_reach_sea_zones` | 12 / 40 |
 | AI found margin | `ai.found_margin` | 1.25 (config only) |
 | AI reroute and dismiss | `ai.reroute_every_months`, `ai.dismiss_after_losing_months` | 12 / 12 |
-| Event mapping and hubs | `event_mapping.*`, `hubs.*` | lists still empty |
+| Event mapping and hubs | `event_mapping.*`, `hubs.*` | 10 hubs, reference 100 gold a year |
+
+## How the open points were settled
+
+- **Founding**: you found a land trader in one of your cities with any market (a weekly market is enough), or in a trading post once you know T8. Its crew comes from the home province's job slots of its class; if there are too few people, founding is refused.
+- **Yearly fairs**: you need T6 to build a new yearly fair. Fairs that stand in 1444 stay, so everyone can found traders from the start.
+- **Ships**: the caravel explores and cannot trade. Cogs, junks, dhows, galleys, carracks, galleons, fluyts and steamers can, and a trade ship pays its normal naval upkeep. A trade ship whose upkeep goes unpaid for 6 months is lost, like a caravan.
+- **Ratio modifiers add up**: customs officer +15 %, a road better than every neighbour's +10 %, 10 years of peace +10 %, riots −50 %, −5 % for each full 5 % of homeless over 5 %, event and heritage bonuses on top. The total never goes below no gain, and an enemy army or siege still stops gain that month.
+- **Buildings and heritage that add "traders passing"** (Djenné +20 %, Taj Mahal +30 %, heritage bonuses) add that percentage to ratio gain. A pilgrimage shrine counts as one more trader passing each month.
+- **Only an embargo shuts traders out**; there are no closed borders. A customs officer only adds ratio gain; without one you lose nothing.
+- **What you can see**: the trade value and ratio of your own provinces and of every province your traders have entered. T13 shows all of them. The route preview counts provinces you cannot see as earning nothing.
+- **Lords' traders** pay no fees or tolls in your realm and deposit in any of your cities, into the lord's wealth.
+- **Sea zones** have no trade ratio. The world map shows the busiest sea lanes by the ships that sailed through last month.
+- **Materials** for buildings cost 25 % more in a province no trade route touches (not a route stop, and no trader passed in the last 12 months).
+- **Food surplus** in trade value is the food made this year minus what the people eat, never below zero.
+- **Silver** falls from 12 to 6 gold a load after the silver flood.
+- **Heritage**: some realms get a bonus on each deposit, on ratio gain, or extra traders at the start.
+- **Events** read trade_index as your trade income over the last 12 months against 100 gold a year, and 10 named hubs (Alexandria, Amsterdam, the Malacca Strait, Venice, Genoa, Seville, Bruges and Antwerp, Tabriz, Aleppo and the Volga).
+- Many of these numbers (ratio points, decay, visit share, the material markup, hubs, the trade index reference) are first guesses and will be tuned.
 
 ## Still open
 
-- **OQ-TRADE-1**: The 3 points, 10 % decay and 0.2 visit share need tuning so a busy 1444 road like Venice to Alexandria sits near 70 %.
-- **OQ-TRADE-2**: Which market step, or a trading post, is needed to found a trader.
-- **OQ-TRADE-3**: Is the yearly fair available at start or only with T6? If T6, nobody could hire traders in 1444.
-- **OQ-TRADE-4**: The caravanserai, counting house and warehouse roles differ between trade and buildings.
-- **OQ-TRADE-5**: Is the caravel tradeable, and do the steamer numbers match naval?
-- **OQ-TRADE-6**: Which 1444 port file is canonical: `ports-1444.json` or `start-ports.json`?
-- **OQ-TRADE-7**: The province design still has market price, trade balance and yearly paths; what do buildings' material prices and national-strength levers that target them map to?
-- **OQ-TRADE-8**: Do closed borders exist in diplomacy?
-- **OQ-TRADE-9**: Do ratio modifiers add or multiply, and what does "a better road than its neighbours" compare against?
-- **OQ-TRADE-10**: How much of tolls and fees is lost without a customs officer?
-- **OQ-TRADE-11**: How long a trade ship's upkeep can go unpaid.
-- **OQ-TRADE-12**: Where rail freight's craftsmen come from, and what if the market has too few market folk.
-- **OQ-TRADE-13**: What you can see of provinces your traders haven't visited.
-- **OQ-TRADE-14**: Do lords' traders pay fees and tolls in the crown's provinces, and can they deposit in royal cities?
-- **OQ-TRADE-15**: How percentage "traders passing" bonuses (Djenné, Taj Mahal, pilgrims, strength levers) apply now that it is a count.
-- **OQ-TRADE-16**: What a sea zone's own ratio is used for.
-- **OQ-TRADE-17**: Hub province lists and the 1444 trade index reference are empty; more hubs are asked for.
-- **OQ-TRADE-18**: The trade README and one strength lever still describe collecting monthly where traders stand, not on entering.
-- **OQ-TRADE-19**: What "food surplus" means when the store is full or the province hungry.
+Nothing in the rules. Balancing is a tuning pass on the numbers above.
 
 ## For developers
 
-- Spec: [`domain/trade/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/trade/spec.md), requirement code **TRADE** (TRADE-001 to TRADE-117).
+- Spec: [`domain/trade/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/trade/spec.md), requirement code **TRADE** (TRADE-001 to TRADE-128).
 - Features: `domain/trade/features/` (traders, trader-kinds, trade-value, trade-ratio, collecting, routes, deposits, access-tolls-diplomacy, risks, trade-effects, trade-screens, trade-research, event-mapping, start-ai-performance).
 - Code: rules code for this context goes in `packages/engine/src/domain/trade/`, balance numbers in `packages/rules/data/domain/trade.json`. The design's config shape is `trade/trade-config.example.yaml`.

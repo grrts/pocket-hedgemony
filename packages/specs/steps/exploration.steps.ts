@@ -1176,3 +1176,273 @@ Then("they come home", (s) => {
   expect(s.result.zonesWithoutSupply).toBe(0);
   expect(E.coastalZones(s.g, "Canaries")).toContain(s.result.at);
 });
+
+// ---------------------------------------------------------------- decided 17 October (D-EXPL-*)
+
+Given("the region {string} is not in the region list of the age {string}", (s, region: string, age: string) => {
+  expect(E.ageRegions(age)).not.toContain(region);
+  s.region = region;
+  s.gate ??= E.gateAtStart(1444);
+});
+
+Given("the country {string} of the region {string} knows S4 {string}", (s, country: string, region: string, _name: string) => {
+  s.country = country;
+  s.region = region;
+  knows(s).add("S4");
+  s.gate ??= E.gateAtStart(1444);
+});
+
+Given("the age {string} begins in its region", (s, age: string) => {
+  s.gate ??= E.gateAtStart(1444);
+  E.anyAgeBegins(s.gate, age, [s.region]);
+});
+
+Given("the region {string}", (s, region: string) => {
+  s.region = region;
+});
+
+When("the game looks for the age that opens exploration there", (s) => {
+  s.opening = E.gateAgeFor(s.region);
+});
+
+Then("it is {string}", (s, age: string) => {
+  expect(s.opening).toBe(age);
+});
+
+Then("it lacks the exploration unlock until the age {string} begins in its region", (s, age: string) => {
+  s.gate ??= E.gateAtStart(1444);
+  expect(E.hasExplorationUnlock({ knows: knows(s), region: s.region }, s.gate)).toBe(false);
+  expect(E.mayBuyShip({ knows: knows(s), region: s.region }, s.gate, "voyaging_canoe").ok).toBe(false);
+  E.anyAgeBegins(s.gate, age, [s.region]);
+  expect(E.hasExplorationUnlock({ knows: knows(s), region: s.region }, s.gate)).toBe(true);
+  expect(E.mayBuyShip({ knows: knows(s), region: s.region }, s.gate, "voyaging_canoe").ok).toBe(true);
+});
+
+Given("the country {string} knows S5 {string} and has a free colonial governor slot", (s, _c: string, _name: string) => {
+  knows(s).add("S5");
+  expect(E.slotsUsed(office(s))).toBeLessThan(E.governorSlots(knows(s)));
+});
+
+When("the country {string} hires a colonial governor in the port {string}", (s, _c: string, port: string) => {
+  const r = E.hireGovernor(office(s), knows(s), port, "governor");
+  expect(r.ok).toBe(true);
+  s.governor = "governor";
+  s.cost = E.governorCost();
+});
+
+Then("the country {string} pays {int} gold for him and {int} gold a year in wages", (s, _c: string, gold: number, wage: number) => {
+  expect(s.cost).toEqual({ gold, wagePerYear: wage });
+});
+
+Then("the governor waits in the port {string}, aged {int}", (s, port: string, age: number) => {
+  const g = office(s).governors[0]!;
+  expect(g.where).toEqual({ kind: "port", port });
+  expect(g.age).toBe(age);
+});
+
+Then("after a year he is {int}", (s, age: number) => {
+  E.governorsAge(office(s));
+  expect(office(s).governors[0]!.age).toBe(age);
+});
+
+Then("he can die of old age, which frees his slot", (s) => {
+  const r = E.governorDies(office(s), s.governor);
+  expect(r.governor.alive).toBe(false);
+  expect(E.slotsUsed(office(s))).toBe(0);
+});
+
+Given("the country {string} founds a colony {int} zones from its nearest port with a colonial range of {int}", (s, _c: string, zones: number, range: number) => {
+  s.form = formIdFromName("feudal realm");
+  expect(E.colonialRange(s.form, knows(s))).toBe(range);
+  expect(E.colonisable({ province: "Target", coastal: true, owner: null, freeTiles: 2, zonesToNearest: zones, beingFoundedBy: null }, { id: "castile", chart: chartAll(lineMap(zones)), range }).ok).toBe(true);
+  s.zonesAway = zones;
+  colonyOf(s, 30, 200);
+});
+
+When("its government form changes to {string} with colonial range {int}", (s, name: string, range: number) => {
+  s.form = formIdFromName(name);
+  expect(E.colonialRange(s.form, knows(s))).toBe(range);
+  s.outcome = E.colonyMonth(s.colony, 1);
+});
+
+Then("the colony is still being founded", (s) => {
+  expect(s.outcome).toBeNull();
+  expect(s.colony.progress).toBeGreaterThan(0);
+  expect(E.slotsUsed(office(s))).toBe(1);
+});
+
+Then("a new colony {int} zones away is refused", (s, zones: number) => {
+  const r = E.colonisable({ province: "Target", coastal: true, owner: null, freeTiles: 2, zonesToNearest: zones, beingFoundedBy: null }, { id: "castile", chart: chartAll(lineMap(zones)), range: E.colonialRange(s.form, knows(s)) });
+  expect(r).toEqual({ ok: false, reason: "out_of_range" });
+});
+
+Given(/^the country "Castile" has (a port of its own|a port held by one of its lords|a canoe landing of its own|a port of its subject "[^"]+"|a colony it founded|a colony it is still founding) (\d+) zones from an unowned coast$/, (s, place: string, zones: string) => {
+  s.g = lineMap(Number(zones));
+  const anchor = { ownPorts: [] as string[], subjectPorts: [] as string[], foundedColonies: [] as string[], coloniesBeingFounded: [] as string[] };
+  if (place.includes("subject")) anchor.subjectPorts.push("Port");
+  else if (place === "a colony it founded") anchor.foundedColonies.push("Port");
+  else if (place === "a colony it is still founding") anchor.coloniesBeingFounded.push("Port");
+  else anchor.ownPorts.push("Port");
+  s.anchors = E.rangeAnchors(anchor);
+});
+
+Given("no other port or colony of the country {string} is within {int} zones of it", (s, _c: string, zones: number) => {
+  expect(s.g.places.filter((p: ProvinceDef) => !isWater(p)).length).toBe(2);
+  s.farZones = zones;
+});
+
+When("the country {string} with a colonial range of {int} tries to found a colony on that coast", (s, country: string, range: number) => {
+  const zones = s.anchors.length ? E.zonesToNearest(s.g, "Target", s.anchors) : null;
+  s.found = E.colonisable(
+    { province: "Target", coastal: true, owner: null, freeTiles: 2, zonesToNearest: zones ?? s.farZones + 1, beingFoundedBy: null },
+    { id: countryId(country), chart: chartAll(s.g), range },
+  );
+});
+
+Given("an AI colony rolled the local aggression {string}", (s, level: E.AggressionLevel) => {
+  s.level = level;
+});
+
+When("the AI loads colony stores for it", (s) => {
+  s.stores = E.aiColonyStores(s.level);
+});
+
+Then("it loads {int} rations, more than the {int} the level needs on average", (s, stores: number, food: number) => {
+  expect(E.averageFounding(s.level).food).toBe(food);
+  expect(s.stores).toBe(stores);
+  expect(s.stores).toBeGreaterThan(food);
+});
+
+Given("an unowned coastal province where a people with no country work {int} tiles and {int} tiles are free", (s, worked: number, free: number) => {
+  s.site = { province: "Shore", coastal: true, owner: null, freeTiles: free, zonesToNearest: 5, beingFoundedBy: null };
+  s.worked = worked;
+  expect(E.howTaken(null)).toBe("colony");
+});
+
+When("the country {string} founds a colony there", (s, country: string) => {
+  expect(E.colonisable(s.site, { id: countryId(country), chart: chartAll(smallMap([{ id: "Shore" }])), range: 20 }).ok).toBe(true);
+  s.tiles = E.colonyTiles(s.site.freeTiles, s.worked);
+});
+
+Then("the colony takes only the {int} free tiles", (s, n: number) => {
+  expect(s.tiles.colony).toBe(n);
+});
+
+Then("the {int} tiles the people work stay theirs", (s, n: number) => {
+  expect(s.tiles.peoples).toBe(n);
+});
+
+Given("a colony with local aggression {string}", (s, level: E.AggressionLevel) => {
+  s.level = level;
+});
+
+When("the locals' pressure is rolled many times", (s) => {
+  const rng = new Rng(1444);
+  s.rolls = Array.from({ length: 7000 }, () => E.rollPressure(rng, s.level));
+});
+
+Then("every roll is a whole number from 0 to {int}", (s, max: number) => {
+  for (const r of s.rolls as number[]) {
+    expect(Number.isInteger(r)).toBe(true);
+    expect(r).toBeGreaterThanOrEqual(0);
+    expect(r).toBeLessThanOrEqual(max);
+  }
+  expect(Math.max(...s.rolls)).toBe(max);
+});
+
+Then("each number from 0 to {int} comes up about equally often", (s, max: number) => {
+  const counts = new Array<number>(max + 1).fill(0);
+  for (const r of s.rolls as number[]) counts[r]! += 1;
+  const expected = s.rolls.length / (max + 1);
+  for (const c of counts) expect(Math.abs(c - expected) / expected).toBeLessThan(0.1);
+});
+
+When("its colonial governor dies of old age", (s) => {
+  const r = E.governorDies(office(s), s.colony.governor, s.colony);
+  expect(r.event?.type).toBe("ColonyLost");
+  s.lostResult = { governor: r.governor, owner: null };
+});
+
+Then("the colony is lost as at progress 0", (s) => {
+  expect(s.lostResult.governor.alive).toBe(false);
+  expect(s.colony.food).toBe(0);
+});
+
+Given("the colonial governor {string} is aboard a caravel of the country {string}", (s, name: string, _c: string) => {
+  knows(s).add("S5");
+  hire(s, name);
+  E.embarkGovernor(office(s), name, { id: "caravel", at: "Seville" });
+  s.governor = name;
+});
+
+When("the caravel sinks", (s) => {
+  s.lostResult = { governor: E.governorDies(office(s), s.governor).governor, owner: null };
+});
+
+When("an event gives the province to the country {string}", (s, country: string) => {
+  const r = E.provinceTakenDuringFounding(office(s), s.colony, countryId(country));
+  expect(r?.event.type).toBe("ColonyLost");
+  s.lostResult = { governor: { alive: false }, owner: null };
+  expect(E.slotsUsed(office(s))).toBe(0);
+});
+
+Given("a caravel of the country {string} is in its coastal zone", (s) => {
+  s.shipInZone = { id: "caravel" };
+});
+
+Then("the {int} rations of colony food are lost", (s, food: number) => {
+  expect(s.abandon.ok).toBe(true);
+  expect(food).toBeGreaterThan(0);
+  expect(s.colony.food).toBe(0);
+});
+
+Then("the governor may go ashore on another colonisable coast at once with {string}", (s, command: string) => {
+  expect(command).toBe("Found colony");
+  const { colony } = E.goAshore(office(s), s.colony.governor, "Another coast", "Peaceful");
+  expect(colony.progress).toBe(E.explorationConfig.progress_start);
+  expect(E.slotsUsed(office(s))).toBe(1);
+});
+
+Given("the country {string} has founded {int} colonies and holds {int} trading post", (s, country: string, colonies: number, posts: number) => {
+  s.events = Array.from({ length: colonies }, (_, i): E.FoundingEvent => ({ type: "ColonyFounded", province: `c${i}`, country: countryId(country), governor: `g${i}`, leftOverFood: 0 }));
+  s.posts = posts;
+});
+
+Given("it is founding a third colony", (s) => {
+  s.events.push({ type: "ColonyFoundingStarted", province: "c3", country: "castile", governor: "g3" });
+});
+
+When("the event tree counts the colonial presence of the country {string}", (s, country: string) => {
+  s.presence = E.colonialPresence(s.events, countryId(country), s.posts);
+});
+
+Then("it counts {int}", (s, n: number) => {
+  expect(s.presence).toBe(n);
+});
+
+Given("the country {string} has not charted the coast of {string}", (s, country: string, place: string) => {
+  s.other = E.startChartedMap(s.g, countryId(country));
+  expect(E.isCharted(s.other, portProvince(place))).toBe(false);
+});
+
+When(/^(the countries "Castile" and "Portugal" become allies|the country "Castile" takes provinces from "Portugal" far from "Arguin")$/, (s) => {
+  s.happened = true;
+});
+
+Then("the country {string} still has not charted the coast of {string}", (s, _c: string, place: string) => {
+  expect(s.happened).toBe(true);
+  expect(E.isCharted(s.other, portProvince(place))).toBe(false);
+  expect(E.isCharted(s.chart, portProvince(place))).toBe(true);
+});
+
+Given(/^the caravel "([^"]+)" of the country "[^"]+" is (in the port "[^"]+"|at sea)$/, (s, name: string, where: string) => {
+  s.voyageShips = [{ id: name, inPort: where.startsWith("in the port") }];
+});
+
+When("the player gives it a voyage", (s) => {
+  s.given = E.mayGiveVoyage(s.voyageShips);
+});
+
+Then(/^the voyage is (given|not given)$/, (s, result: string) => {
+  expect(s.given).toBe(result === "given");
+});

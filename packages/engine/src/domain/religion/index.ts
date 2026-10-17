@@ -114,7 +114,7 @@ export interface RealmFaith {
   policies: Record<string, Policy>;
   /** Changes waiting for the next New Year (RELG-055). */
   pending: Record<string, Policy>;
-  /** The realm's choice for Persecuted faiths' houses (OQ-RELG-13: one choice per realm). */
+  /** The realm's choice for Persecuted faiths' houses (D-RELG-13: one choice per realm). */
   persecutedHouses: "close" | "take_over";
   inquisition: boolean;
   lastAdoptByDecision: number | null;
@@ -123,7 +123,7 @@ export interface RealmFaith {
   preachers: Preacher[];
   /** Preachers granted by events: amount, faith and the year they lapse (null = permanent). */
   grants: { faith: string; amount: number; until: number | null }[];
-  /** Event-tree government value (monarchy, elective_monarchy …), for the Inquisition. */
+  /** Government form id (government v2: feudal_realm, merchant_republic …), for the Inquisition (D-RELG-8). */
   government: string;
   /** Inside the Empire (cuius regio). */
   empire: boolean;
@@ -146,7 +146,7 @@ export function newRealm(id: string, stateFaith: string, init: Partial<RealmFait
     flags: [],
     preachers: [],
     grants: [],
-    government: "monarchy",
+    government: "feudal_realm",
     empire: false,
     expelled: [],
     modifiers: [],
@@ -507,7 +507,12 @@ export function yearMix(p: ProvinceFaith, r: RealmFaith, ctx: PullContext = {}):
   return { before, pulls: ps, removed };
 }
 
-/** Movers shift the mix by their headcount at once, outside the pulls (RELG-026); a fourth faith enters only if larger than the smallest (RELG-024). */
+/**
+ * Movers shift the mix by their headcount at once, outside the pulls (RELG-026).
+ * A fourth faith enters only if larger than the smallest of the three; whichever
+ * group is the smallest of the four joins the majority faith (RELG-024, D-RELG-17,
+ * the same rule as culture's fourth tongue).
+ */
 export function moversArrive(p: ProvinceFaith, arrivals: Record<string, number>): void {
   const people: Record<string, number> = {};
   for (const [f, sh] of Object.entries(p.mix)) people[f] = sh * p.people;
@@ -515,10 +520,14 @@ export function moversArrive(p: ProvinceFaith, arrivals: Record<string, number>)
   for (const [f, n] of Object.entries(arrivals)) {
     all += n;
     if (people[f] === undefined && Object.keys(people).length >= config.mix.max_faiths_per_province) {
+      const major = Object.entries(people).sort((a, b) => b[1] - a[1])[0]![0];
       const [smallest, k] = Object.entries(people).sort((a, b) => a[1] - b[1])[0]!;
-      if (n <= k) continue;
+      if (n <= k) {
+        people[major] = (people[major] ?? 0) + n;
+        continue;
+      }
       delete people[smallest];
-      all -= k;
+      people[major] = (people[major] ?? 0) + k;
     }
     people[f] = (people[f] ?? 0) + n;
   }
@@ -639,6 +648,8 @@ export interface PolicyChanged {
 /** Applies a policy change now with all its effects (RELG-048 to RELG-058, RELG-088). */
 export function applyPolicy(r: RealmFaith, faith: string, to: Policy, w: PolicyWorld): PolicyChanged {
   const old = policyOf(r, faith);
+  // Pious lords waver once, when the faith is set to Tolerated; a Tolerated faith that later grows past 10 % moves no one (D-RELG-21).
+  const newlyTolerated = r.policies[faith] !== "tolerated";
   r.policies[faith] = to;
   const lives = w.provinces.filter((p) => (p.mix[faith] ?? 0) > 0);
   const ev: PolicyChanged = { faith, old, new: to, sparks: [], lordSteps: {}, defendTheFaith: [], housesClosed: 0, housesTakenOver: 0, purseSeized: false };
@@ -652,7 +663,7 @@ export function applyPolicy(r: RealmFaith, faith: string, to: Policy, w: PolicyW
   for (const l of w.lords) {
     if (l.faith === faith && to === "restricted") step(l, config.policies.restricted.their_lords_loyalty_steps);
     if (l.faith === faith && to === "persecuted") step(l, config.policies.persecuted.their_lords_loyalty_steps);
-    if (to === "tolerated" && l.faith === r.stateFaith && (l.pious || l.clergy) && (w.realmShare[faith] ?? 0) >= config.policies.tolerated.pious_lords_waver_if_faith_share_of_realm) step(l, config.lords.pious_or_clergy_on_toleration);
+    if (to === "tolerated" && newlyTolerated && l.faith === r.stateFaith && (l.pious || l.clergy) && (w.realmShare[faith] ?? 0) >= config.policies.tolerated.pious_lords_waver_if_faith_share_of_realm) step(l, config.lords.pious_or_clergy_on_toleration);
   }
   if (to === "persecuted") {
     r.purses[faith] = 0;
@@ -808,10 +819,10 @@ export function expel(r: RealmFaith, faith: string, provinces: ProvinceFaith[], 
   };
 }
 
-/** The Inquisition: only monarchies whose Established faith is Catholic (RELG-063). */
+/** The Inquisition: only monarchies (the forms of rule by a house, D-RELG-8) whose Established faith is Catholic (RELG-063). */
 export function inquisitionOffered(r: RealmFaith): boolean {
   const a = config.inquisition.allowed_for;
-  return r.stateFaith === a.state_faith && a.government.includes(r.government);
+  return r.stateFaith === a.state_faith && a.forms.includes(r.government);
 }
 
 export function establishInquisition(r: RealmFaith): boolean {
@@ -987,13 +998,30 @@ export interface HolyPlace {
   holderName: string | null;
 }
 
-/** Holy places, as config lists them; Amritsar only once `sikh_panth_founded` has fired (RELG-080, RELG-084). */
-export function holyPlaces(firedEvents: string[] = []): HolyPlace[] {
+/**
+ * Holy places, as config lists them (RELG-080, RELG-084, D-RELG-16): Amritsar only
+ * once `sikh_panth_founded` has fired and not before 1577; a place that follows
+ * a relic (the Temple of the Tooth) sits in its later province from that year.
+ * With no year given, the 1444 places are returned.
+ */
+export function holyPlaces(firedEvents: string[] = [], year = 1444): HolyPlace[] {
   const names = config.holy_place_names as Record<string, string>;
   const holders = config.holder_names as Record<string, string>;
-  return (config.holy_places as { id: string; faiths: string[]; province: string; holder_1444: string | null; appears_with_event?: string }[])
-    .filter((h) => !h.appears_with_event || firedEvents.includes(h.appears_with_event))
-    .map((h) => ({ id: h.id, name: names[h.id] ?? h.id, faiths: h.faiths, province: h.province, holder1444: h.holder_1444, holderName: h.holder_1444 ? (holders[h.holder_1444] ?? h.holder_1444) : null }));
+  type Row = { id: string; faiths: string[]; province: string; holder_1444: string | null; appears_with_event?: string; earliest?: number; moves?: { from_year: number; province: string }[] };
+  return (config.holy_places as Row[])
+    .filter((h) => !h.appears_with_event || (firedEvents.includes(h.appears_with_event) && year >= (h.earliest ?? 0)))
+    .map((h) => {
+      const moved = (h.moves ?? []).filter((m) => year >= m.from_year).at(-1);
+      return { id: h.id, name: names[h.id] ?? h.id, faiths: h.faiths, province: moved?.province ?? h.province, holder1444: h.holder_1444, holderName: h.holder_1444 ? (holders[h.holder_1444] ?? h.holder_1444) : null };
+    });
+}
+
+/** Church heads are only marked at their holy place, with no rules of their own (RELG-085). */
+export function churchHeads(year = 1444): { id: string; name: string; place: string }[] {
+  const heads = config.church_heads as unknown as Record<string, { name: string; place: string; from?: number } | string>;
+  const out: { id: string; name: string; place: string }[] = [];
+  for (const [id, h] of Object.entries(heads)) if (typeof h !== "string" && year >= (h.from ?? 0)) out.push({ id, name: h.name, place: h.place });
+  return out;
 }
 
 export interface HolyPlaceEffect {
@@ -1028,6 +1056,55 @@ export function buildingRules(b: FaithBuilding): { traders?: number; homelessShe
   if (b.kind === "house" && hasRule(b.faith, "monastery_school")) return { studentSeats: r.monastery_school.student_seats_per_house };
   if (hasRule(b.faith, "lama_lords") && (b.kind === "monastery" || (b.kind === "house" && (b.step ?? 1) >= 3))) return { mayBeLordsLand: r.lama_lords.step3_house_or_monastery_can_be_fief };
   return {};
+}
+
+/**
+ * Secular pull (RELG-095, D-RELG-15): after 1850, in a town with a factory, in a
+ * realm with mass schooling, 0.5 pull for each school.
+ */
+export function secularPull(year: number, town: { factory: boolean; schools: number }, innovations: string[]): number {
+  const s = config.faith_rules.secular_state;
+  if (year <= s.town_school_pull_after_year || !town.factory || !innovations.includes(s.needs_innovation)) return 0;
+  return town.schools * s.town_school_pull;
+}
+
+/**
+ * The year Hussites merge (RELG-089, D-RELG-14): the end of the Reformation period
+ * or 1620, whichever comes first.
+ */
+export function hussiteMergeYear(reformationEnds: number | null): number {
+  const m = config.faith_rules.merges_into_protestant;
+  return reformationEnds === null ? m.merge_latest_year : Math.min(reformationEnds, m.merge_latest_year);
+}
+
+/** Merges a province's Hussite share into Protestant, or into Catholic where no Protestant house stands (RELG-089). */
+export function mergeHussites(p: ProvinceFaith): string | null {
+  const sh = p.mix["hussite"];
+  if (sh === undefined) return null;
+  const m = config.faith_rules.merges_into_protestant;
+  const into = p.buildings.some((b) => b.faith === m.kin_of && b.kind !== "school" && standing(b)) ? m.kin_of : m.else_into;
+  delete p.mix["hussite"];
+  p.mix[into] = (p.mix[into] ?? 0) + sh;
+  for (const b of p.buildings) if (b.faith === "hussite") b.faith = into;
+  return into;
+}
+
+/** Does a new state faith count as "the ruler takes a reformed faith" for government's reform (D-RELG-9). */
+export function takesReformedFaith(oldFaith: string, newFaith: string): boolean {
+  const reformed = config.state_faith_change.reformed_faiths;
+  return !reformed.includes(oldFaith) && reformed.includes(newFaith);
+}
+
+/**
+ * Is a court-conversion event offered (D-RELG-5): `court_conversion_islam` when
+ * the capital is a third Sunni, `court_conversion_christian` when the realm is
+ * 15 % Protestant; never to a ruler already of that faith.
+ */
+export function courtConversionOffered(event: "court_conversion_islam" | "court_conversion_christian", r: RealmFaith, shares: { capital: number; realm: number }): boolean {
+  const t = config.event_triggers[event] as { faith: string; capital_share_min?: number; realm_share_min?: number };
+  if (r.stateFaith === t.faith) return false;
+  if (t.capital_share_min !== undefined) return shares.capital >= t.capital_share_min;
+  return shares.realm >= (t.realm_share_min ?? 1);
 }
 
 /** Does a faith have houses of worship at all (`secular` has none, RELG-095). */
@@ -1195,10 +1272,14 @@ export function catalogueRecord(id: string): CatalogueFaith | undefined {
  * at 5 %, the majority the rest; at most three faiths.
  */
 export function startMix(id: string): { stateFaith: string; mix: Record<string, number> } | null {
-  const rec = catalogueRecord(id);
-  if (!rec?.state_faith) return null;
+  const found = catalogueRecord(id);
+  if (!found) return null;
   const s = config.start;
-  const majority = rec.people_majority ?? rec.state_faith;
+  // Records with no faith id of their own take the faith config names for them (D-RELG-12).
+  const override = (s.record_faith_overrides as Record<string, string>)[id];
+  const rec: CatalogueFaith = override ? { ...found, state_faith: override, people_majority: override } : found;
+  if (!rec.state_faith || !isFaith(rec.state_faith)) return null;
+  const majority = rec.people_majority && isFaith(rec.people_majority) ? rec.people_majority : rec.state_faith;
   const mix: Record<string, number> = {};
   if (majority !== rec.state_faith) mix[rec.state_faith] = s.ruler_faith_share_where_people_majority_differs;
   for (const c of rec.communities) {

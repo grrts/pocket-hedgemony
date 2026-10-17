@@ -6,7 +6,7 @@ Culture in Pocket Hegemony is about **tongue**: the people a person belongs to, 
 
 ### Tongues and families
 
-Every person has a tongue, and every tongue belongs to exactly one family. There are only these two levels, family and tongue, with no sub-tongues. The game has about 600 tongues in 42 families. The families are the event tree's culture groups plus four added ones: celtic, baltic, caucasian and hebrew.
+Every person has a tongue, and every tongue belongs to exactly one family. There are only these two levels, family and tongue, with no sub-tongues. The game has about 600 tongues in 43 families. The families are the event tree's 39 culture groups plus four added ones: celtic, baltic, caucasian and hebrew.
 
 | Tongue | Family |
 |---|---|
@@ -49,13 +49,13 @@ For France, French people are kin, Occitans are cousins, and Bretons and Fleming
 
 *Worked example.* France holds 6.9 million French, 1.6 million Occitan, 0.5 million Breton, 0.4 million Flemish, 0.1 million Basque and 0.02 million Jewish people. That is 6.9 kin plus half of 1.6 cousins, so 7.7 out of 9.52 million, and the Tongue % is 81.
 
-A trading people is never a stranger when grievances are worked out: a Jewish community in Paris gives no *Foreign rule*. Before nationalism rises, *Foreign rule* only comes from strangers' homelands, never cousins'. While nationalism in a province is under 0.3, French-ruled Brittany has *Foreign rule* but Toulouse, the Occitan homeland, does not.
+A trading people is never a stranger when grievances are worked out: a Jewish community in Paris gives no *Foreign rule*. They don't count toward Tongue % either. Before nationalism rises, *Foreign rule* only comes from strangers' homelands, never cousins'. While nationalism in a province is under 0.3, French-ruled Brittany has *Foreign rule* but Toulouse, the Occitan homeland, does not.
 
 ### Drift
 
 Once a year, after births and deaths, people in every province drift a little toward one tongue: the province's **pull tongue**.
 
-**Which tongue pulls.** The court tongue pulls if the province has been held 20 years or more and is governed by your official or by a lord of the court tongue. Otherwise the province's majority tongue pulls.
+**Which tongue pulls.** The court tongue pulls if the province has been held 20 years or more and is governed by any of your officials (whatever his own tongue) or by a lord of the court tongue. Otherwise the province's majority tongue pulls.
 
 | Rennes (mostly Breton) held | Governed by | Pull tongue |
 |---|---|---|
@@ -76,17 +76,21 @@ So in a province held only 5 years, like Kent with its English majority, a Norma
 | A Schoolmaster official serving in the province | × 2 |
 | Tongue policy Let be / Teach / Impose | × 0.5 / × 1 / × 2 |
 | The province is the drifting tongue's homeland | × 0.5 |
-| A herding, forest or seafaring tongue in its own kind of land (steppe, deep forest, islands) | × 0.5 |
+| A herding, forest or seafaring tongue in its own kind of land (see below) | × 0.5 |
 | A trading people | × 0.25 |
-| The drifting tongue's nationalism is 0.3 or more | × 0.25 |
+| The province's nationalism is 0.3 or more | × 0.25 |
 | Each of printing, mass schooling, newspapers and railways | × 1.25 |
 | An *Own tongue* charter (drift toward the court tongue) | stops it |
 
-A school of another tongue counts for that tongue instead. So if France has printing and railways, Flemish farmers drift at 0.5 % × 1.25 × 1.25, which is 1.5625 times the base.
+A school of another tongue counts for that tongue instead. A school teaching a learned tongue, Latin or Classical Arabic, speeds no one's drift, because nobody grows up speaking it.
+
+**Own kind of land.** Herding peoples are at home on grassland and drylands (the steppe), forest peoples in forest and jungle, and seafaring peoples in any province on the sea. There they drift at half speed.
+
+So if France has printing and railways, Flemish farmers drift at 0.5 % × 1.25 × 1.25, which is 1.5625 times the base.
 
 *Worked example: Troyes.* France has the court tongue French and the policy Teach. Troyes is 94 % French and 6 % Flemish, has been French for 200 years, is run by a royal official, and has a school teaching in French. At the end of the year French pulls. The Flemish drift at 0.5 % × 1.5 for the school × 1 for Teach = 0.75 %, about 32 people. No French people move. If a Schoolmaster also served there, the rate would double to 1.5 %.
 
-**Small and new tongues.** A province holds at most three tongues. A tongue that falls below 1 % is removed (if Troyes ends a year with 0.9 % Flemish, Flemish is gone). When a fourth tongue arrives, it replaces the smallest of the three, and the smallest joins the majority. If Riga is Latvian 60 %, German 30 % and Russian 10 % and Swedes arrive, Swedish replaces Russian and the Russians join the Latvians.
+**Small and new tongues.** A province holds at most three tongues. A tongue that falls below 1 % is removed (if Troyes ends a year with 0.9 % Flemish, Flemish is gone). When a fourth tongue arrives, it gets in only if it is larger than the smallest of the three; whichever group is smallest then joins the majority. If Riga is Latvian 60 %, German 30 % and Russian 10 % and Swedes as many as 15 % of Riga arrive, Swedish replaces Russian and the Russians join the Latvians. If only 5 % arrive, the Swedes join the Latvians instead. Faiths work the same way.
 
 ### People on the move
 
@@ -103,11 +107,11 @@ Each country has one realm-wide **Tongue policy**: Let be, Teach or Impose. Teac
 
 - **Let be** halves drift toward the court.
 - **Teach** keeps drift at its base and makes schools teaching in the court tongue cost 10 % more upkeep.
-- **Impose** doubles drift. It gives the grievance *Banned tongue* in every province where most people are strangers, and in cousin-majority provinces once nationalism there is 0.3 or more. When you set it, lords of the affected tongues waver one step, stranger lords first.
+- **Impose** doubles drift. It gives the grievance *Banned tongue* in every province where most people are strangers, and in cousin-majority provinces once nationalism there is 0.3 or more. When you switch to it, lords of the affected tongues waver one step, stranger lords first. That happens once: keeping Impose costs no more loyalty.
 
-Impose needs the *Printing* invention, unless your country has the **chancery tradition**. In 1444 that is Ming, Joseon, Castile and the Ottomans, who can Impose from the start.
+Impose needs the *Printing* invention, unless your country has the **chancery tradition**. In 1444 that is Ming, Joseon, Castile and the Ottomans, who can Impose from the start. Your form of government doesn't matter: a confederation can Impose and an absolute monarchy can Let be.
 
-*Worked example.* Castile has the chancery tradition. Granada is mostly Andalusi Arabic (strangers) and Barcelona mostly Catalan (cousins) with nationalism 0.1. When Castile sets Impose, Granada gets *Banned tongue* and Barcelona does not, and the Andalusi lord Zegri wavers a step. If nationalism in Barcelona later reaches 0.3, Barcelona gets *Banned tongue* too.
+*Worked example.* Castile has the chancery tradition. Granada is mostly Andalusi Arabic (strangers) and Barcelona mostly Catalan (cousins) with nationalism 0.1. When Castile sets Impose, Granada gets *Banned tongue* and Barcelona does not, and the Andalusi lord Zegri wavers a step, just this once. If nationalism in Barcelona later reaches 0.3, Barcelona gets *Banned tongue* too.
 
 *Banned tongue* ends in a province when the policy there becomes Let be or Teach, when an *Own tongue* charter is granted, or when the majority becomes kin.
 
@@ -134,11 +138,11 @@ Officials have a tongue too: the tongue of the province where they were hired (a
 | Strangers | 10 |
 | His own tongue | 5 |
 
-A local official in a stranger province keeps *Banned tongue* from making *Foreign rule* worse there.
+An official of the local tongue in a stranger province keeps *Banned tongue* away there, even under Impose; *Foreign rule* stays. A Breton official in Rennes spares it the *Banned tongue*.
 
-The design also proposes that a province whose majority is stranger counts as 1.5 provinces toward what your government can support (kin and cousin provinces count as 1). This is contested and may be dropped.
+A province's tongue doesn't change how many officials and lords your government can support. A stranger province costs you only through the longer time your officials need there.
 
-Lords: kin lords tend one loyalty step up, cousin lords have no effect, and stranger lords start one step lower.
+Lords: a kin lord (or a lord of a house your ruler married into) has "shares your tongue" among his reasons to grow loyal, a stranger lord starts one step lower, and a cousin lord has neither.
 
 ### Order and war
 
@@ -146,7 +150,7 @@ Lords: kin lords tend one loyalty step up, cousin lords have no effect, and stra
 - Defenders of the homeland tongue, rebels included, get +10 % in rough ground: locals know the land.
 - A garrison captain of another tongue than his ruler can be bribed. A Breton captain serving a French king can be bribed; an Occitan one can't until nationalism rises.
 - The war aim **Free a people** opens on a stranger homeland, or on a cousin homeland once nationalism there is 0.3 or more. Rennes (Breton, stranger) is open at nationalism 0; Toulouse (Occitan, cousin) opens only at 0.3.
-- From the age of revolutions, the war aim **Gather our kin** is offered on a province whose majority is your court tongue but held by another country, and taking it gives no *Foreign rule*. In 1820, Piedmont with the court tongue Italian can take Italian Venetia from Austria this way. In 1700 the war aim isn't offered yet.
+- From the age of revolutions, the war aim **Gather our kin** (a diplomacy war aim) is offered on a province whose majority is your court tongue but held by another country, and taking it gives no *Foreign rule*. In 1820, Piedmont with the court tongue Italian can take Italian Venetia from Austria this way. In 1700 the war aim isn't offered yet.
 - From the age of revolutions, the **National levy**: kin provinces with nationalism 0.5 or more refill recruits 25 % faster, and stranger provinces 25 % slower.
 
 ### Trade, research and diplomacy
@@ -169,21 +173,21 @@ Every 5 years the game runs three checks of its own.
 
 France, with French at 72 % of its people, never sees it.
 
-**New tongues abroad.** When settlers of one tongue have been the majority for 100 years in a region separated by sea from their court, their tongue there splits into a new creole tongue, which counts as a cousin to the old court and gets no *Foreign rule* at once.
+**New tongues abroad.** When settlers of one tongue have been the majority for 100 years in a map region on another continent than their court, their tongue there splits into a new creole tongue, which counts as a cousin to the old court and gets no *Foreign rule* at once. Settlers on the court's own continent, or for fewer than 100 years, keep their tongue.
 
 | Settlers | Region | Court | New tongue |
 |---|---|---|---|
-| Castilian | New Spain | Castile | Criollo |
+| Castilian | Mesoamerica | Castile | Criollo |
 | Portuguese | Brazil | Portugal | Brazilian |
-| English | New England | England | Anglo-American |
-| Dutch | the Cape | Holland | Afrikaans |
+| English | North America | England | Anglo-American |
+| Dutch | Southern Africa | Holland | Afrikaans |
 
 **Nationalism.** Culture reads each province's nationalism support from the event tree and never sets it.
 
-- At 0.3 or more, cousins there count as strangers: *Foreign rule* in their homeland, drift toward the court × 0.25, and *Free a people* opens. With Piedmont's Tuscan court, Neapolitans in Naples at 0.3 become strangers.
-- At 0.5 or more, homeland risings demand a new country, and a released country takes the catalogue record for that people (or a generated one if none fits). A winning Breton rising in Rennes releases a country with the catalogue's Breton record.
+- At 0.3 or more, cousins there count as strangers: *Foreign rule* in their homeland, all drift there × 0.25, and *Free a people* opens. With Piedmont's Tuscan court, Neapolitans in Naples at 0.3 become strangers.
+- At 0.5 or more, homeland risings demand a new country, and a released country takes the catalogue record for that people. If none fits, a new country is made, named after the tongue, with that tongue at court and the same form of government as the country it broke from. A winning Breton rising in Rennes releases a country with the catalogue's Breton record.
 
-**Merging tongues.** A nation-building event can merge named tongues into their national tongue. A nation state that has kept Impose for 50 years merges its cousin tongues that have a merge entry, without an event.
+**Merging tongues.** A nation-building event can merge named tongues into their national tongue. A nation state, meaning a country whose court tongue is a national tongue such as Italian or German, that has kept Impose for 50 years merges the regional tongues that belong to its national tongue, without an event. Italy with an Italian court merges Tuscan and Lombard after 50 years; after 45 it hasn't yet, and Savoy with its French court never does.
 
 **For event writers.** Culture provides the event effects `tongue_spread`, `set_court_tongue`, `merge_tongues` and `move_people` (people of the tongue leave as refugees and settle elsewhere), and the triggers `court_tongue`, `tongue_share`, `kin_of`, `cousin_of` and `stranger_to`.
 
@@ -225,20 +229,20 @@ For France the screen reads:
 
 - [Provinces](Provinces): stores the tongue mix, homeland, years held, officials, the *Own tongue* charter and the grievances; moves settlers, refugees and soldiers.
 - [Your-Realm](Your-Realm): Tongue % on the country card, lords' loyalty steps, and dynasty changes.
-- [Government](Government): the proposed 1.5 weight for stranger provinces and proposed limits on Tongue policy by form, neither adopted.
+- [Government](Government): no form limits your Tongue policy, and a province's tongue doesn't weigh on the caps; a released country keeps the form of the country it left.
 - [Religion](Religion): the same shapes (mix, buildings, charter) and the persecution or expulsion of trading peoples.
 - [Buildings](Buildings): schools carry a teaching tongue; Teach raises their upkeep 10 %.
 - [Research](Research): printing for Impose, four inventions speeding drift, family neighbours and scholars.
 - [Historical-Events](Historical-Events): families, spread, nationalism support, the new effects and triggers, migrations.
 - [Rebellions](Rebellions): homeland risings and demands for *Own tongue* charters.
-- [Warfare](Warfare): *Free a people*, garrison bribes, locals know the land, *Gather our kin*.
-- [Diplomacy](Diplomacy): family warmth, natural rivals, marriages, *Gather our kin*.
+- [Warfare](Warfare): garrison bribes and locals know the land.
+- [Diplomacy](Diplomacy): family warmth, natural rivals, marriages, and the war aims *Free a people* and *Gather our kin*.
 - [Recruiting](Recruiting): the National levy refill.
 - [Trade](Trade): trading peoples' trade value and extra trader.
 - [Subjects](Subjects): a subject of your court tongue folds in faster; a stranger subject's independence war draws its people.
 - [National-Strengths](National-Strengths): tongue-based strengths such as the chancery tradition.
 - [Revolutions](Revolutions): creole tongues and nationalism as signs; regimes set the court tongue.
-- [Naval](Naval): seafaring tongues drift slowly on islands; sailors keep their tongue.
+- [Naval](Naval): seafaring tongues drift slowly on the coast; sailors keep their tongue.
 - [Music-and-Sound](Music-and-Sound): the music palette follows the court tongue's family.
 - [Map-and-Lenses](Map-and-Lenses): the Tongue lens, dots and outlines.
 - [The-1444-Start](The-1444-Start): court tongues and each province's starting tongues.
@@ -246,7 +250,7 @@ For France the screen reads:
 
 ## Numbers
 
-All numbers are **placeholders** in `culture.yaml`, except the four added families and the chancery-tradition list, which are decided.
+All numbers are **provisional** and still being balanced, except the four added families, the chancery-tradition list and the learned tongues, which are decided.
 
 | Key | Value |
 |---|---|
@@ -264,42 +268,29 @@ All numbers are **placeholders** in `culture.yaml`, except the four added famili
 | `policy.impose` | *Banned tongue*, stranger lords waver 1, needs printing or chancery tradition |
 | `start_flag_chancery_tradition` | ming, joseon, castile, ottoman (decided) |
 | `officials.years_to_full_effect` | kin 5, cousin 7, stranger 10, local tongue 5 |
-| `officials.capacity_weight` | kin 1.0, cousin 1.0, stranger 1.5 (contested) |
 | `effects.trading_people` | min share 0.02, needs a market, trade value 0.10, 1 extra trader |
 | `effects.family_neighbour_research_weight` | 2.0 |
 | `effects.national_levy` | nationalism 0.5, kin 1.25, stranger 0.75, from the age of revolutions |
 | `nationalism.cousins_become_strangers_at` | 0.3 |
 | `nationalism.homeland_demands_country_at` | 0.5 |
 | `engine_events.court_goes_native` | court share below 0.20 for 50 years, other tongue above 0.5, recheck 25 years |
-| `engine_events.new_tongue_abroad` | 100 years of settler majority, across sea |
-| `engine_events.merge_without_event` | Impose for 50 years |
+| `engine_events.new_tongue_abroad` | 100 years of settler majority, on another continent |
+| `engine_events.merge_without_event` | Impose for 50 years, nation states only |
+| `engine_events.check_every_years` | 5 |
+| `risings.homeland_draw` | 0.08 |
+| `refugees.settle_after_years` | 2 |
+| `drift.way_of_life_lands` | herding: grassland, drylands; forest: forest, jungle; seafaring: on the sea |
+| `schools.learned_tongues` | Latin, Classical Arabic (decided) |
 | `family_default_by_region` | sample: cushitic in the Ethiopian highlands to Oromo; latin in Iberia and the Americas to Castilian |
 | `tongues[]` | a sample of 28 so far; the full list is about 600 |
 
-Three design numbers have no config key yet: the homeland rising draw (8 %), refugees settling after 2 years, and the 5-year check interval.
 
 ## Still open
 
-- **OQ-CULT-1**: the 1.5 weight for stranger provinces has no place in the government caps, which count officials and lords. Drop it or turn it into an officials-cap rule?
-- **OQ-CULT-2**: government has no limits on Tongue policy and no "nation state" form. Which forms count as a nation state?
-- **OQ-CULT-3**: the event tree lists 39 culture groups, so with the four added there would be 43 families, not 42. The four are not in the event tree yet.
-- **OQ-CULT-4**: is the nationalism that slows drift read per tongue or per province?
-- **OQ-CULT-5**: a fourth tongue always replaces the smallest, but a fourth faith only does if it is larger. Same storage, two behaviours.
-- **OQ-CULT-6**: changes the design asks of province stats, country stats, warfare, the event tree and the music palettes are not adopted yet.
-- **OQ-CULT-7**: under Impose, do lords waver once when it is set, or each year while it holds?
-- **OQ-CULT-8**: how the kin and stranger lord effects map onto the loyalty reasons.
-- **OQ-CULT-9**: which tiles or provinces count as steppe, deep forest and islands for way of life.
-- **OQ-CULT-10**: what a "region" is for new tongues abroad, and how sea separation is tested.
-- **OQ-CULT-11**: grievances are counts, so what it means for *Banned tongue* to make *Foreign rule* "worse".
-- **OQ-CULT-12**: whether diplomacy or warfare owns the *Gather our kin* war aim.
-- **OQ-CULT-13**: config keys are missing for the 8 % rising draw, the 2-year refugee rule and the 5-year checks.
-- **OQ-CULT-14**: confirm that trading peoples count 0 toward Tongue %.
-- **OQ-CULT-15**: which tongue a school "of another tongue" carries, since Arabic and Latin aren't in the sample list.
-- **OQ-CULT-16**: how a generated released country is made.
-- **OQ-CULT-17**: whether any official of the country counts for the court pull, whatever his tongue.
+Nothing about culture is waiting on a design decision. The numbers above are still being balanced.
 
 ## For developers
 
-- Spec: `domain/culture/spec.md` in the game repository, requirement code **CULT** (CULT-001 to CULT-091).
-- Features: `domain/culture/features/`: `tongues-and-relations.feature` (families, court tongue, Tongue % for France), `drift.feature` (Troyes, pull tongue, multipliers), `tongue-policy.feature`, `culture-effects.feature`, `culture-history.feature`, `peoples-screen.feature` and `culture-ai.feature`.
-- Code: there is no culture code yet; it would live in `packages/engine/src/domain/culture/`.
+- Spec: `domain/culture/spec.md` in the game repository; its section 13 lists every decision with its reason.
+- Features: `domain/culture/features/`: `tongues-and-relations.feature` (families, court tongue, Tongue % for France), `drift.feature` (Troyes, pull tongue, multipliers, lands, the fourth tongue), `tongue-policy.feature`, `culture-effects.feature`, `culture-history.feature`, `peoples-screen.feature` and `culture-ai.feature`.
+- Code: `packages/engine/src/domain/culture/`, with its numbers in `packages/rules/data/domain/culture.json`.

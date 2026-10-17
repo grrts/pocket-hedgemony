@@ -4,11 +4,10 @@ Feature: Funding a revolution abroad
   I want to fund a revolution brewing in another country
   So that it breaks out sooner, at the risk of being caught (decided 16 Oct 2026)
 
-  @REVO-060 @open-question
+  @REVO-060
   Scenario Outline: Only a brewing revolution seen through a diplomat can be funded
-    # OQ-REVO-1: diplomacy 6.11 designs the same action with other numbers
     Given the country "England" <diplomat> a diplomat in "France"
-    And the revolution "french_revolution" is at the stage "<stage>" for "France"
+    And the card of "french_revolution" for "France" shows the stage "<stage>"
     When "England" tries to fund the revolution "french_revolution" in "France"
     Then the funding is <result>
 
@@ -19,9 +18,8 @@ Feature: Funding a revolution abroad
       | has          | Quiet   | refused |
       | does not have| Brewing | refused |
 
-  @REVO-061 @REVO-062 @placeholder @open-question
+  @REVO-061 @REVO-062
   Scenario: Funding costs gold and speeds the revolution
-    # config: foreign_backing.cost, foreign_backing.mult, foreign_backing.joins_mult; OQ-REVO-1
     Given the yearly income of "France" is 1000 gold
     And "England" funds the revolution "french_revolution" in "France"
     When the month is processed
@@ -30,9 +28,8 @@ Feature: Funding a revolution abroad
     And the spark "Foreign gold backs the movement" multiplies the chance by 2
     And if the revolution becomes a rising its camp's join shares are multiplied by 1.5
 
-  @REVO-063 @REVO-064 @placeholder @open-question
+  @REVO-063 @REVO-064
   Scenario: Being caught
-    # config: foreign_backing.catch_chance; OQ-REVO-1
     Given "England" funds the revolution "french_revolution" in "France"
     When the caught roll of 3 percent succeeds
     Then the funding ends
@@ -41,17 +38,21 @@ Feature: Funding a revolution abroad
     And "France" gains a reason to fight "England"
     And the card of "french_revolution" names "England" as the funder
 
-  @REVO-063
+  @REVO-063 @placeholder
   Scenario Outline: The caught chance rises with officials and peace
-    Given "England" funds a revolution in "France"
-    And "France" <state>
+    # config: foreign_backing.catch_at_peace_add, foreign_backing.catch_officials_add (provisional)
+    Given "England" funds the revolution "french_revolution" in "France"
+    And "France" <peace>
+    And officials run <share> percent of the provinces of "France"
     When the caught chance is computed
-    Then it is higher than the base chance
+    Then it is <chance> percent a month
 
     Examples:
-      | state                         |
-      | has more officials            |
-      | is at peace                   |
+      | peace           | share | chance |
+      | is at war       | 20    | 3      |
+      | is at peace     | 20    | 4      |
+      | is at war       | 50    | 4      |
+      | is at peace     | 80    | 5      |
 
   @REVO-065 @placeholder
   Scenario Outline: A funded revolution that wins remembers its friend

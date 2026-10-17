@@ -4,9 +4,9 @@ Feature: Research effects on trade
   I want trade inventions to change my traders
   So that research pays off on the road and at sea
 
-  @TRADE-101 @placeholder @open-question
-  # OQ-TRADE-3: T6 and the yearly fair
+  @TRADE-101 @placeholder
   Scenario Outline: Invention effects
+    # config: research.*
     Given the country "Venice" knows "<invention>"
     When the trade rules are applied
     Then <effect>
@@ -31,3 +31,11 @@ Feature: Research effects on trade
     Given the trade config of the design
     When the trade rules are applied
     Then "T17 Container shipping" has no effect on trade before 31 August 1939
+
+  @TRADE-101 @TRADE-003
+  Scenario: Founding needs no yearly fair, so 1444 realms can found traders before T6
+    Given the country "France" doesn't know "T6 Merchant fairs and exchanges"
+    And the province "Troyes" of "France" has a weekly market
+    When the trade rules are applied
+    Then "France" may found a pack caravan in "Troyes"
+    But "France" may not build a new yearly fair

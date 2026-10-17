@@ -23,9 +23,8 @@ Feature: Severity and spread
       | 1         | holds           | does not hold   | has          | Great revolt |
       | 3         | does not hold   | holds           | has          | Great revolt |
 
-  @REBL-044 @open-question
+  @REBL-044
   Scenario: A rising next to the capital is a great revolt at once
-    # OQ-REBL-8: "the capital's province" (4.1) against "in or next to the capital" (4.3)
     Given the province "Brie" borders the capital "Paris"
     When a rising starts in the province "Brie"
     Then its severity tier is "Great revolt"

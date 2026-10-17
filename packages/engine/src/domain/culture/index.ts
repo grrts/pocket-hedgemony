@@ -1,6 +1,6 @@
 import config from "../../../../rules/data/domain/culture.json" with { type: "json" };
 import { localsBonus } from "../province/index.ts";
-import type { Ground } from "../world-map/index.ts";
+import { REGIONS, type Ground } from "../world-map/index.ts";
 
 /**
  * Culture (domain/culture/spec.md): tongues and families, the court tongue,
@@ -95,6 +95,8 @@ export function relationTo(court: string, people: string, nationalism = 0): Rela
   const p = mustTongue(people);
   if (c.id === p.id) return "kin";
   if (p.diaspora) return "trading";
+  // A tongue split abroad stays cousin to the court it split from, and the other way round (CULT-072).
+  if (c.splits_to === p.id || p.splits_to === c.id) return nationalism >= COUSINS_BECOME_STRANGERS_AT ? "stranger" : "cousin";
   if (c.family !== null && c.family === p.family) return nationalism >= COUSINS_BECOME_STRANGERS_AT ? "stranger" : "cousin";
   return "stranger";
 }
@@ -220,8 +222,9 @@ export interface ProvinceTongues {
   ownTongueCharter: string | null;
   /** The event tree's nationalism support here, 0..1; culture only reads it (CULT-073). */
   nationalism: number;
-  /** Kind of land, for the way-of-life rule (CULT-027). */
-  land?: "steppe" | "deep forest" | "islands" | null;
+  /** The province's main ground and whether it touches the sea, for the way-of-life rule (CULT-027, CULT-092). */
+  ground?: Ground;
+  coastal?: boolean;
   /** Grievances from culture standing here (*Foreign rule*, *Banned tongue*, *Broken charter*). */
   grievances: string[];
   /** Taken with *Gather our kin*: no *Foreign rule* (CULT-060). */
@@ -275,6 +278,8 @@ export function hasForeignRule(p: ProvinceTongues, cc: CountryCulture): boolean 
  */
 export function hasBannedTongue(p: ProvinceTongues, cc: CountryCulture): boolean {
   if (policyIn(cc, p.id) !== "impose" || p.ownTongueCharter !== null) return false;
+  // An official of the local tongue keeps *Banned tongue* away (CULT-052, D-CULT-11).
+  if (p.governor.kind === "official" && p.governor.tongue !== undefined && mustTongue(p.governor.tongue).id === majorityTongue(p)) return false;
   return relationTo(cc.court, majorityTongue(p), p.nationalism) === "stranger";
 }
 
@@ -330,7 +335,8 @@ export interface DriftCase {
   policy?: TonguePolicy;
   towardCourt?: boolean;
   homeland?: boolean;
-  land?: "steppe" | "deep forest" | "islands" | null;
+  ground?: Ground;
+  coastal?: boolean;
   ownTongueCharter?: boolean;
   nationalism?: number;
   inventions?: string[];
@@ -348,8 +354,7 @@ export function driftMultipliers(c: DriftCase): { name: string; value: number }[
   if (c.schoolmaster) out.push({ name: "Schoolmaster", value: m.schoolmaster_official });
   if (c.towardCourt && c.policy) out.push({ name: `Tongue policy ${c.policy}`, value: policyDriftMultiplier(c.policy) });
   if (c.homeland) out.push({ name: "homeland", value: m.homeland_of_drifting_tongue });
-  const own: Record<string, string> = { herding: "steppe", forest: "deep forest", seafaring: "islands" };
-  if (c.land && own[t.way_of_life] === c.land) out.push({ name: "way of life in its own land", value: m.way_of_life_in_own_land });
+  if (livesInOwnLand(t.way_of_life, c.ground, c.coastal)) out.push({ name: "way of life in its own land", value: m.way_of_life_in_own_land });
   if (t.diaspora) out.push({ name: "trading people", value: m.diaspora });
   if (c.towardCourt && c.ownTongueCharter) out.push({ name: "Own tongue charter", value: m.own_tongue_charter });
   if (nat >= COUSINS_BECOME_STRANGERS_AT) out.push({ name: "nationalism", value: m.nationalism_0_3 });
@@ -358,6 +363,25 @@ export function driftMultipliers(c: DriftCase): { name: string; value: number }[
     if (v !== undefined) out.push({ name: inv, value: v });
   }
   return out;
+}
+
+/**
+ * Does a herding, forest or seafaring tongue live in its own kind of land
+ * (CULT-027, CULT-092)? Steppe is grassland or drylands ground, deep forest is
+ * forest or jungle ground, and islands are any province touching the sea.
+ */
+export function livesInOwnLand(way: WayOfLife, ground?: Ground, coastal?: boolean): boolean {
+  const lands = config.drift.way_of_life_lands as Record<string, string[] | "coastal">;
+  const l = lands[way];
+  if (l === undefined) return false;
+  if (l === "coastal") return coastal === true;
+  return ground !== undefined && l.includes(ground);
+}
+
+/** The tongue a school teaches in, for drift: none for a learned tongue such as Latin (CULT-023, D-CULT-15). */
+export function schoolTongue(school: string): string | null {
+  if (config.schools.learned_tongues.some((l) => norm(l) === norm(school))) return null;
+  return mustTongue(school).id;
 }
 
 /** Yearly drift rate of one group: base 0.5 % times every multiplier (CULT-020). */
@@ -387,12 +411,13 @@ export function driftYear(p: ProvinceTongues, cc: CountryCulture): DriftResult {
     const base: DriftCase = {
       pull,
       drifting: t,
-      school: p.schools.some((s) => mustTongue(s).id === pull),
+      school: p.schools.some((s) => schoolTongue(s) === pull),
       schoolmaster: p.schoolmaster,
       policy: policyIn(cc, p.id),
       towardCourt,
       homeland: p.homelandOf.some((h) => mustTongue(h).id === t),
-      land: p.land ?? null,
+      ...(p.ground !== undefined ? { ground: p.ground } : {}),
+      coastal: p.coastal === true,
       ownTongueCharter: p.ownTongueCharter !== null,
       nationalism: p.nationalism,
       inventions: cc.inventions,
@@ -428,7 +453,7 @@ export function driftExplanation(p: ProvinceTongues, cc: CountryCulture): { pull
   const groups = Object.keys(p.people)
     .filter((t) => t !== pull)
     .map((t) => {
-      const c: DriftCase = { pull, drifting: t, school: p.schools.some((s) => mustTongue(s).id === pull), schoolmaster: p.schoolmaster, policy: policyIn(cc, p.id), towardCourt: pull === cc.court, homeland: p.homelandOf.includes(t), nationalism: p.nationalism, inventions: cc.inventions, ownTongueCharter: p.ownTongueCharter !== null };
+      const c: DriftCase = { pull, drifting: t, school: p.schools.some((s) => schoolTongue(s) === pull), schoolmaster: p.schoolmaster, policy: policyIn(cc, p.id), towardCourt: pull === cc.court, homeland: p.homelandOf.includes(t), nationalism: p.nationalism, inventions: cc.inventions, ownTongueCharter: p.ownTongueCharter !== null };
       return { tongue: t, rate: driftRate(c), multipliers: driftMultipliers(c).map((m) => m.name) };
     });
   return { pull, why, groups };
@@ -455,13 +480,20 @@ export function arrive(p: ProvinceTongues, kind: Movers, t: string, people: numb
   return true;
 }
 
-/** Adds people of a tongue, keeping at most three tongues (CULT-033). */
+/**
+ * Adds people of a tongue, keeping at most three tongues (CULT-033, D-CULT-5):
+ * a fourth tongue enters only if it is larger than the smallest of the three;
+ * whichever group is smallest of the four joins the majority tongue.
+ */
 export function addPeople(p: ProvinceTongues, id: string, people: number): void {
   if (p.people[id] === undefined && Object.keys(p.people).length >= 3) {
-    const sorted = Object.entries(p.people).sort((a, b) => a[1] - b[1]);
-    const [smallest, n] = sorted[0]!;
-    delete p.people[smallest];
     const major = majorityTongue(p);
+    const [smallest, n] = Object.entries(p.people).sort((a, b) => a[1] - b[1])[0]!;
+    if (people <= n) {
+      p.people[major] = (p.people[major] ?? 0) + people;
+      return;
+    }
+    delete p.people[smallest];
     p.people[major] = (p.people[major] ?? 0) + n;
   }
   p.people[id] = (p.people[id] ?? 0) + people;
@@ -472,7 +504,7 @@ export function ageRefugees(p: ProvinceTongues): void {
   const still: NonNullable<ProvinceTongues["refugees"]> = [];
   for (const r of p.refugees ?? []) {
     r.years++;
-    if (r.years >= config.design_numbers.refugees_settle_after_years) addPeople(p, r.tongue, r.people);
+    if (r.years >= config.refugees.settle_after_years) addPeople(p, r.tongue, r.people);
     else still.push(r);
   }
   p.refugees = still;
@@ -498,6 +530,25 @@ export function lordCountsAsKin(cc: CountryCulture, lord: { tongue: string; hous
   return mustTongue(lord.tongue).id === cc.court || (lord.house !== undefined && cc.marriedHouses.includes(lord.house));
 }
 
+/**
+ * How a lord's tongue enters the realm's loyalty (CULT-054, D-CULT-8): a kin lord
+ * (or one of a house the ruler married into) has the rising cause "shares your
+ * tongue", one step a year toward Loyal; a stranger lord starts one step lower;
+ * a cousin lord has neither.
+ */
+export function lordTongueLoyalty(cc: CountryCulture, lord: { tongue: string; house?: string }): { sharesTongue: boolean; startSteps: number } {
+  if (lordCountsAsKin(cc, lord)) return { sharesTongue: true, startSteps: 0 };
+  return { sharesTongue: false, startSteps: relationTo(cc.court, lord.tongue) === "stranger" ? -1 : 0 };
+}
+
+/**
+ * Lords who waver when a Tongue policy is set (CULT-041, D-CULT-7): only when
+ * the policy turns to *Impose* from another, once; keeping *Impose* costs no more.
+ */
+export function wavererOnPolicyChange(cc: CountryCulture, from: TonguePolicy, to: TonguePolicy, lords: { name: string; tongue: string }[]): string[] {
+  return from !== "impose" && to === "impose" ? imposeWaverOrder(cc, lords) : [];
+}
+
 /** Lords of the tongues hit by *Impose* waver one step, strangers first (CULT-041). */
 export function imposeWaverOrder(cc: CountryCulture, lords: { name: string; tongue: string }[]): string[] {
   const hit = lords.filter((l) => relationTo(cc.court, l.tongue) !== "kin");
@@ -508,7 +559,7 @@ export function imposeWaverOrder(cc: CountryCulture, lords: { name: string; tong
 
 /** A homeland rising draws 8 % of everyone of the tongue (CULT-055). */
 export function homelandRisingDraw(peopleOfTongue: number): number {
-  return peopleOfTongue * config.design_numbers.homeland_rising_draw;
+  return peopleOfTongue * config.risings.homeland_draw;
 }
 
 /** A homeland rising's demand: a new country from nationalism 0.5 (CULT-056, CULT-075). */
@@ -668,6 +719,72 @@ export function answerCourtGoesNative(cc: CountryCulture, checks: CultureChecks,
   const changed = setCourtTongue(cc, ev.majority);
   checks.courtSmallSince = null;
   return { changed, wavering: lords.filter((l) => mustTongue(l.tongue).id === old).map((l) => l.name) };
+}
+
+/** Is this a year the 5-yearly culture checks run (CULT-068): every 5 years counted from 1444. */
+export function cultureCheckYear(year: number): boolean {
+  return (year - 1444) % config.engine_events.check_every_years === 0;
+}
+
+/** The continent a map region lies in: its top-level region (D-CULT-10). */
+export function continentOf(regionId: string): string {
+  let r = REGIONS.find((x) => x.id === regionId);
+  if (!r) throw new Error(`unknown region ${regionId}`);
+  while (r.parent !== null) {
+    const up: string = r.parent;
+    r = REGIONS.find((x) => x.id === up);
+    if (!r) throw new Error(`unknown region ${up}`);
+  }
+  return r.id;
+}
+
+/**
+ * New tongue abroad (CULT-072, D-CULT-10): settlers of a tongue with a
+ * `splits_to` entry who have been the majority of a map macro-region for 100
+ * years, where that region lies on another continent than the court's capital
+ * (separated by sea), become the `splits_to` tongue there.
+ */
+export function newTongueAbroad(settlers: string, majorityYears: number, region: string, courtRegion: string): string | null {
+  const t = mustTongue(settlers);
+  if (!t.splits_to || majorityYears < config.engine_events.new_tongue_abroad.settler_majority_years) return null;
+  if (continentOf(region) === continentOf(courtRegion)) return null;
+  return mustTongue(t.splits_to).id;
+}
+
+/** Splits a settler tongue into its new tongue in the region's provinces (CULT-072). */
+export function splitTongue(from: string, to: string, where: ProvinceTongues[]): void {
+  mergeTongues([from], to, where);
+}
+
+/** A nation state: its court tongue is the national tongue some tongue `merges_into` (CULT-077, D-CULT-2). */
+export function isNationState(cc: CountryCulture): boolean {
+  return TONGUES.some((t) => t.merges_into === cc.court);
+}
+
+/**
+ * Merge without an event (CULT-077, D-CULT-2): a nation state that has kept
+ * *Impose* for 50 years merges, in its own provinces, the cousin tongues whose
+ * `merges_into` is its court tongue. Returns the tongues merged.
+ */
+export function mergeWithoutEvent(cc: CountryCulture, imposeYears: number, provinces: ProvinceTongues[]): string[] {
+  const e = config.engine_events.merge_without_event;
+  if (cc.policy !== e.needs_policy || imposeYears < e.years || !isNationState(cc)) return [];
+  const ids = [...new Set(provinces.flatMap((p) => Object.keys(p.people)))].filter((t) => mustTongue(t).merges_into === cc.court);
+  mergeTongues(ids, cc.court, provinces);
+  return ids;
+}
+
+/**
+ * A released people's country (CULT-075, D-CULT-16): the catalogue record whose
+ * first culture maps to the tongue (X-13: a record that owns no province is
+ * reference data events can draw on); if none fits, a generated one named after
+ * the tongue, with that tongue as court tongue and the form of the country it left.
+ */
+export function releasedCountry(t: string, form: string, catalogue: { id: string; cultures: string[] }[]): { id: string; court: string; form: string; generated: boolean } {
+  const id = mustTongue(t).id;
+  const rec = catalogue.find((r) => r.cultures.length > 0 && startCourtTongue([r.cultures[0]!]) === id);
+  if (rec) return { id: rec.id, court: id, form, generated: false };
+  return { id: mustTongue(t).name, court: id, form, generated: true };
 }
 
 /** `merge_tongues`: folds the named tongues into one in the given provinces (CULT-076, CULT-078). */

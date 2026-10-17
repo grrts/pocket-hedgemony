@@ -47,25 +47,37 @@ Feature: How culture moves through the centuries
     When the 5-yearly culture checks run
     Then the event "The court goes native" is not raised for "France"
 
-  @CULT-072 @placeholder @open-question
+  @CULT-072 @placeholder
   Scenario Outline: New tongues abroad
-    # OQ-CULT-10: "region" and sea separation are not defined
     # config key: engine_events.new_tongue_abroad
-    Given settlers of the tongue "<tongue>" have been the majority for 100 years in "<region>", separated by sea from the court of "<court>"
+    Given settlers of the tongue "<tongue>" have been the majority for 100 years in the map region "<region>"
+    And the court of "<court>" sits in the map region "<home>"
     When the 5-yearly culture checks run
     Then the tongue "<tongue>" in "<region>" becomes "<new>" of the family "creole_atlantic"
     And "<new>" people are cousins to "<court>" and get no "Foreign rule" at once
 
     Examples:
-      | tongue     | region      | court    | new           |
-      | Castilian  | New Spain   | Castile  | Criollo       |
-      | Portuguese | Brazil      | Portugal | Brazilian     |
-      | English    | New England | England  | Anglo-American |
-      | Dutch      | the Cape    | Holland  | Afrikaans     |
+      | tongue     | region          | court    | home                     | new            |
+      | Castilian  | Mesoamerica     | Castile  | Iberian heartland        | Criollo        |
+      | Portuguese | Brazil          | Portugal | Iberian heartland        | Brazilian      |
+      | English    | North America   | England  | European Atlantic coast  | Anglo-American |
+      | Dutch      | Southern Africa | Holland  | European Atlantic coast  | Afrikaans      |
 
-  @CULT-073 @open-question
+  @CULT-072 @placeholder
+  Scenario Outline: Settlers who stay on the court's continent, or not long enough, keep their tongue
+    # config key: engine_events.new_tongue_abroad
+    Given settlers of the tongue "Castilian" have been the majority for <years> years in the map region "<region>"
+    And the court of "Castile" sits in the map region "Iberian heartland"
+    When the 5-yearly culture checks run
+    Then the tongue "Castilian" in "<region>" stays "Castilian"
+
+    Examples:
+      | region      | years |
+      | Italy       | 100   |
+      | Mesoamerica | 95    |
+
+  @CULT-073
   Scenario: Nationalism is read from the event tree
-    # OQ-CULT-4: per province or per tongue
     Given the event tree sets nationalism support 0.3 in the province "Naples"
     When the culture rules read nationalism for "Naples"
     Then they use 0.3
@@ -97,13 +109,19 @@ Feature: How culture moves through the centuries
       | italian_unification | "Tuscan", "Lombard" and "Neapolitan" | Italian |
       | german_unification  | "High German" and "Low German"      | German  |
 
-  @CULT-077 @open-question
-  Scenario: Merging without an event
-    # OQ-CULT-2: which forms count as a nation state
-    Given the country "Italy" is a nation state with the Tongue policy "Impose" for 50 years
-    And its cousin tongues "Tuscan" and "Lombard" have the merges_into entry "Italian"
+  @CULT-077 @placeholder
+  Scenario Outline: Merging without an event
+    # config key: engine_events.merge_without_event
+    Given the country "<country>" has the court tongue "<court>" and the Tongue policy "Impose" for <years> years
+    And its provinces hold "Tuscan" and "Lombard" people, whose merges_into entry is "Italian"
     When the 5-yearly culture checks run
-    Then "Tuscan" and "Lombard" merge into "Italian"
+    Then "Tuscan" and "Lombard" <outcome>
+
+    Examples:
+      | country | court   | years | outcome                    |
+      | Italy   | Italian | 50    | merge into "Italian"       |
+      | Italy   | Italian | 45    | stay apart                 |
+      | Savoy   | French  | 50    | stay apart                 |
 
   @CULT-078 @CULT-079 @CULT-010
   Scenario Outline: New event verbs

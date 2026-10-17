@@ -79,7 +79,7 @@ Newest decision first.
   hidden-believer timers; years each traditional faith has shared the province (for layering).
 - INV-RELG-3: at most three faiths; shares sum to 1.
 - INV-RELG-4: a faith under 1 % with no house of its own is removed, except a persecuted faith under its hidden-believer floor.
-- INV-RELG-5: a fourth faith enters only by replacing the smallest, and only if larger.
+- INV-RELG-5: a fourth faith enters only by replacing the smallest, and only if larger; the smallest group of the four joins the majority faith (D-RELG-17).
 
 **RealmFaith** (identity: country id)
 - Holds: state faith, one policy row per faith present (at most about a dozen), preacher list, holy places held,
@@ -133,7 +133,7 @@ Newest decision first.
 - RELG-021 When a year ends, the religion system shall set each faith's target share to (its hold + its pull) ÷ (all holds + all pulls in the province) and move its share 3 % of the way toward the target. [religion §3.2, §19]
 - RELG-022 If no faith in a province has any pull, then the religion system shall keep the province's mix unchanged. [religion §3.2]
 - RELG-023 If a faith falls under 1 % in a province and has no house of its own there, then the religion system shall remove it from the province. [religion §3.2]
-- RELG-024 When a fourth faith arrives in a province, the religion system shall let it replace the smallest of the three only if it is larger. [religion §3.2]
+- RELG-024 When a fourth faith arrives in a province, the religion system shall let it replace the smallest of the three only if it is larger, and shall fold whichever group is the smallest of the four into the majority faith (the same rule as CULT-033). [religion §3.2; D-RELG-17]
 - RELG-025 While fewer than 100 years have passed since a Persecuted faith's houses in a province were closed, the religion system shall keep that faith at 2 % or more there (hidden believers), unless an Inquisition removes the floor. [religion §3.2, §5.4]
 - RELG-026 When refugees, settlers, migrants or soldiers settling at home move, the religion system shall shift the mix by their headcount at once, outside the pulls. [religion §3.2]
 - RELG-027 The religion system shall show every change on the Faith line with a named reason (each pull source listed). [religion §1, §3.2]
@@ -159,10 +159,10 @@ Newest decision first.
 - RELG-043 The religion system shall count a community of a faith other than the ruler's as served when its faith is Tolerated or Restricted and it has a house of its own faith in the province, or of a kin faith if it is under 20 %, or needs none because it is rooted or layered. [religion §5.1]
 - RELG-044 The religion system shall count a community as unserved when it has no such house or its faith is Persecuted. [religion §5.1]
 - RELG-045 The religion system shall keep one policy row per faith present in the realm, with exactly one Established faith (the state faith). [religion §5.2]
-- RELG-046 The religion system shall give *Wrong faith* to a province where a community of a faith other than the ruler's is a third or more of the people and is unserved, or is Restricted where it is the majority (unless protected). [religion §18, §19; config communities.wrong_faith_min_share]
+- RELG-046 The religion system shall give *Wrong faith* to a province where a community of a faith other than the ruler's is a third or more of the people and is unserved, or is Restricted where it is the majority (unless protected); an unserved community from 10 % up to a third takes no grievance. [religion §18, §19; config communities.wrong_faith_min_share; D-RELG-1]
 - RELG-047 When a community's house is built and its faith Tolerated or Restricted, it converts, or a *Faith tolerance* charter is granted, the religion system shall end its *Wrong faith*. [religion §18]
 - RELG-048 While a faith is Tolerated, the religion system shall keep its houses and let its clergy build new ones, at normal tax. [religion §5.2]
-- RELG-049 When the realm tolerates a faith of 10 % or more of the realm, the religion system shall make Pious and clergy lords of the state faith waver once. [religion §5.2, §5.5]
+- RELG-049 When the realm sets a faith that is 10 % or more of the realm to Tolerated, the religion system shall make Pious and clergy lords of the state faith waver once; a Tolerated faith that later grows past 10 % moves no lord. [religion §5.2, §5.5; D-RELG-21]
 - RELG-050 While a faith is Restricted, the religion system shall raise its share of the tax by 25 % (faith tax) and give the state faith +1 pull in every province it lives in. [religion §5.2, §19]
 - RELG-051 When a faith is set to Restricted, the religion system shall make its lords waver one step; when set to Persecuted, two steps (disloyal). [religion §5.2, §5.5; config policies]
 - RELG-052 While a faith is Persecuted, the religion system shall close its houses or hand them to the state faith (the realm's choice), take no tax from it, give the grievance *Persecuted* (counting as two) in every province where it is 10 % or more, double the state faith's pull where it lives, and set the engine flag `religious_persecution_active`. [religion §5.2]
@@ -175,10 +175,10 @@ Newest decision first.
 
 ### 5.5 Expulsion and Inquisition
 - RELG-059 The religion system shall offer *Expel* as a one-off decision only on a Persecuted faith. [religion §5.3]
-- RELG-060 When a faith is expelled, the religion system shall, within a year, send 70 % of its people out as refugees to the nearest realm where it is Established or Tolerated, keeping their class if a slot is free there; the rest convert or hide (hidden-believer floor still applies). [religion §5.3; config expulsion]
+- RELG-060 When a faith is expelled, the religion system shall, within a year, send 70 % of its people out as refugees (an expulsion by event, such as `expulsion_of_the_moriscos`, moves the same 70 %) to the nearest realm where it is Established or Tolerated, keeping their class if a slot is free there; the rest convert or hide (hidden-believer floor still applies). [religion §5.3; config expulsion; D-RELG-4]
 - RELG-061 When a faith is expelled, the religion system shall give the expelling realm its houses and the gold of its property, end that faith's *Persecuted* grievance, and give *Bloodshed* in every province it lived in. [religion §5.3]
 - RELG-062 If an expulsion would leave the expelling realm better off in people or skills, then the religion system shall not allow that gain; the host realm gains both. [religion §5.3]
-- RELG-063 The religion system shall offer the Inquisition decision only to monarchies whose Established faith is Catholic, and set the flag `inquisition_established`. [religion §5.4; config inquisition.allowed_for]
+- RELG-063 The religion system shall offer the Inquisition decision only to realms whose Established faith is Catholic and whose government form is one of rule by a house (feudal realm, diet monarchy, household realm, bureaucratic empire, elective monarchy, absolute monarchy, constitutional monarchy), and set the flag `inquisition_established`. [religion §5.4; config inquisition.allowed_for; D-RELG-8]
 - RELG-064 While an Inquisition runs, the religion system shall charge its gold upkeep each year, remove the hidden-believer floor, add +1 state-faith pull in every province with a Restricted or Persecuted community, and make 1 % of the scholars and craftsmen in those provinces leave each year. [religion §5.4; config inquisition]
 - RELG-065 The religion system shall let an Inquisition be closed again. [religion §5.4]
 
@@ -187,7 +187,7 @@ Newest decision first.
 - RELG-067 The religion system shall make a lord gain one loyalty step when the ruler builds or pays for a house of his faith in his land, when he is Pious or clergy of the state faith and the ruler takes over another faith's houses, or when the state faith changes to his. [religion §5.5]
 
 ### 5.7 Preachers
-- RELG-068 The religion system shall give a realm one preacher of the state faith for each monastery or religious school of the state faith, one for every 5 houses of the state faith, one for each holy place held of its faith, and those granted by events and some inventions. [religion §4, §6, §8; config preachers]
+- RELG-068 The religion system shall give a realm one preacher of the state faith for each monastery or religious school of the state faith, one for every 5 houses of the state faith, one for each holy place held of its faith, and those granted by events; no invention grants preachers. [religion §4, §6, §8; config preachers; D-RELG-22]
 - RELG-069 When a preacher is sent to a province, the religion system shall have him travel like an envoy and, once there, add 2 pull for the state faith each year. [religion §6]
 - RELG-070 The religion system shall let a preacher go to the realm's own provinces, to a subject's provinces without permission, to a foreign realm with its ruler's leave (*Allow preachers*), or to a foreign realm without leave. [religion §6]
 - RELG-071 While a preacher is in a foreign realm without leave, the religion system shall let that ruler expel or execute him each year; when that happens, it shall set `missionary_persecution` and give the sender the *Defend the faith* war aim. [religion §6; config preachers.foreign_without_leave_expel_chance_per_year]
@@ -196,7 +196,7 @@ Newest decision first.
 
 ### 5.8 Changing the state faith
 - RELG-074 The religion system shall offer the decision *Adopt a faith* when that faith is at least 30 % of the capital province's people, or 40 % or more of the realm, or an event offers it. [religion §7; config state_faith_change]
-- RELG-075 When a realm adopts a faith, the religion system shall at once make the old Established faith Tolerated (changeable from the next New Year), remove every preacher of the old faith, start with no preachers of the new faith until its houses exist, and move lords' loyalty as in RELG-066/067. [religion §7]
+- RELG-075 When a realm adopts a faith, the religion system shall at once make the old Established faith Tolerated (changeable from the next New Year), remove every preacher of the old faith, count the new faith's preachers from their usual sources (so none from houses until its houses exist, while holy places of the new faith and event grants for it count at once), and move lords' loyalty as in RELG-066/067. [religion §7]
 - RELG-076 When a realm adopts a faith, the religion system shall let the player keep the old faith's houses (serving it as a community) or take them over (pull flips, property gold paid, twice for Catholic and Orthodox monastic land, an "insult to faith" spark where each is taken). [religion §7]
 - RELG-077 When a realm adopts a new state faith, the religion system shall let it close the other faith's schools or keep them. [religion §11]
 - RELG-078 If a realm adopted a faith by decision less than 30 years ago, then the religion system shall refuse another adoption by decision; events are not limited. [religion §7; config state_faith_change.cooldown_years]
@@ -207,20 +207,20 @@ Newest decision first.
 - RELG-081 While a realm holds a holy place and shares its faith, the religion system shall give it +1 preacher, the pilgrimage shrine there, and 200 more traders passing through it each year. [religion §8; config holy_place_effects.same_faith]
 - RELG-082 While a realm holds a holy place of a faith it does not share, the religion system shall let every ruler of that faith use *Defend the faith* against it with that province as the prize. [religion §8, §11]
 - RELG-083 Where a holder of another faith Tolerates the holy place's faith and has a house of that faith there, the religion system shall still bring the pilgrim traders. [religion §8; config holy_place_effects.pilgrims_still_come_if]
-- RELG-084 The religion system shall make Amritsar appear as a holy place only when `sikh_panth_founded` has fired (from 1577). [religion §8; config]
+- RELG-084 The religion system shall make Amritsar appear as a holy place only when `sikh_panth_founded` has fired, and not before 1577. [religion §8; config holy_places; D-RELG-16]
 - RELG-085 The religion system shall mark the holy place where each church head sits (Pope, Ecumenical Patriarch, a Caliph's claim, Dalai Lama from 1578) for the big-institutions design, and give church heads no rules here. [religion §8]
 
 ### 5.10 What each faith does differently
 - RELG-086 Where the faith is Catholic, the religion system shall make clergy not marry, pay double gold for taking over Catholic monastic land, and offer the Inquisition. [religion §9]
 - RELG-087 Where the faith is Protestant, the religion system shall add 0.5 pull for Protestant for each press and each school in the province, and let clergy marry. [religion §9; config faith_rules.print_and_school_pull]
 - RELG-088 Where the state faith is Anglican, the religion system shall never make clergy lords waver over faith policy. [religion §9]
-- RELG-089 The religion system shall make Hussite kin of Protestant once the Reformation starts, and at the end of the Reformation period (by 1620) merge its shares into Protestant, or into Catholic in provinces with no Protestant house. [religion §9; config faith_rules.merges_into_protestant]
+- RELG-089 The religion system shall make Hussite kin of Protestant once the Reformation starts, and at the end of the Reformation period or in 1620, whichever comes first, merge its shares into Protestant, or into Catholic in provinces with no Protestant house. [religion §9; config faith_rules.merges_into_protestant; D-RELG-14]
 - RELG-090 Where the ruler is Sunni, Shia or Ibadi, the religion system shall give a served Restricted community no *Wrong faith* even where it is the majority (protected communities). [religion §9]
 - RELG-091 The religion system shall make a step-3 Hindu temple draw 150 traders a year. [religion §9]
 - RELG-092 The religion system shall make each Sikh gurdwara shelter 1,000 homeless like an almshouse. [religion §9]
 - RELG-093 The religion system shall make each Theravada house of worship give 20 student seats, like a small temple school. [religion §9]
 - RELG-094 The religion system shall let a Vajrayana step-3 house or monastery be granted as a lord's land, its abbot being the lord. [religion §9]
-- RELG-095 The religion system shall give `secular` no houses, allow a secular state only Tolerated or Restricted policies for other faiths, and after 1850 give `secular` 0.5 pull from each school in towns with factories and mass schooling. [religion §9; config faith_rules.secular_state]
+- RELG-095 The religion system shall give `secular` no houses, allow a secular state only Tolerated or Restricted policies for other faiths, and after 1850 give `secular` 0.5 pull from each school in a town with a factory building, in a realm with the innovation `mass_literacy_schooling`. [religion §9; config faith_rules.secular_state; D-RELG-15]
 - RELG-096 The religion system shall make Orthodox take-overs pay double for monastic land. [religion §7; config faiths.orthodox rules monastic_land]
 
 ### 5.11 Faith waves and events
@@ -233,10 +233,10 @@ Newest decision first.
 - RELG-103 When an event applies `preachers`, the religion system shall give the country that many extra preachers of the faith (default its state faith) for the years given (0 = permanent). [vocabulary-additions]
 - RELG-104 The religion system shall read every `religion` and `religion_share` condition directly from the mix and the state faith, and let `spread` shift a share at once as now. [religion §11]
 - RELG-105 The religion system shall set the engine flags `religious_persecution_active` (Persecuted), `missionary_persecution` (preacher killed or expelled) and `inquisition_established` (Inquisition). [religion §18]
-- RELG-106 The religion system shall supply the ten new events and the six wave patches (protestant_reformation, council_of_trent, safavid_rise, sikh_panth_founded, futa_jallon_jihad, sokoto_jihad) to the event tree as additions in its own format. [religion §10.4, §18; event-tree-additions]
+- RELG-106 The religion system shall supply the ten new events and the six wave patches (protestant_reformation, council_of_trent, safavid_rise, sikh_panth_founded, futa_jallon_jihad, sokoto_jihad) as part of the game's event content, read from religion's data as written (their history dates as the additions give them). [religion §10.4, §18; event-tree-additions; D-RELG-10]
 
 ### 5.12 The start in 1444
-- RELG-107 The religion system shall give each country its ruler's faith from `build/catalogue-faiths.json` (961 of 963 records), and each province the mix of the record that owns it, adjusted by the region overrides in config. [religion §2.3; config start]
+- RELG-107 The religion system shall give each country its ruler's faith from `build/catalogue-faiths.json` (961 of 963 records), and each province the mix of the record that owns it, adjusted by the region overrides in config. [religion §2.3; config start; D-RELG-12]
 - RELG-108 Where the people's majority faith differs from the ruler's, the religion system shall give the ruler's faith a 15 % share (court, garrison and town); a community not otherwise sized starts at 5 %. [config start]
 
 ### 5.13 Other systems' uses
@@ -252,6 +252,12 @@ Newest decision first.
 - RELG-116 The religion system shall show the province card's Faith line with each faith's share and trend, and on tapping, the pulls this year per faith with their sources, each community's state, and how fast the mix is moving. [religion §1]
 - RELG-117 The religion system shall show the country card's Faith row (state faith, %, other faiths, preachers, holy places) and open the Faith policy screen when tapped. [religion §1]
 - RELG-118 The religion system shall colour the Faith lens at world zoom by majority faith, hatched where another faith's community is 30 % or more, with holy place icons; show houses as town sprites, preachers as walking figures and waves as a spreading tint at region zoom; and the Faith line at local zoom. [religion §12]
+
+### 5.14a Decided rules (17 October)
+- RELG-123 When a realm's new state faith is Protestant, Anglican or Hussite and its old one was none of these, the religion system shall tell government that the ruler takes a reformed faith (for the prince-bishopric and military-order reform). [government v2; config state_faith_change.reformed_faiths; D-RELG-9]
+- RELG-124 The religion system shall offer `court_conversion_islam` when the ruler's capital province is a third Sunni or more, and `court_conversion_christian` when the realm is 15 % Protestant or more, never to a ruler already of that faith. [religion §10.3, event-tree-additions; config event_triggers; D-RELG-5]
+- RELG-125 Where a catalogue record names no faith id (Mixed, Unknown, Druze, Yazidism), the religion system shall start it with the faith config names for it: wokou mahayana, guanahatabey indigenous_american, druze_maan and yazidi_communities sunni; "Messianic movements" texts map to shia. [religion §2.3; config start.record_faith_overrides; D-RELG-12]
+- RELG-126 Where a holy place follows a relic, the religion system shall move it to its later province from the year config gives: the Temple of the Tooth sits in Kotte until 1591 and in Kandy from 1592. [religion §8; config holy_places; D-RELG-16]
 
 ### 5.15 AI
 - RELG-119 The religion system shall make the AI build a house of the state faith wherever that faith is below half, if gold allows, and a minority's house when that community has *Wrong faith* and its lords are wavering. [religion §13; config ai]
@@ -307,7 +313,7 @@ Newest decision first.
 
 ## 10. Configuration
 
-All numbers are first-pass placeholders (religion.yaml header) except the four defaults kept on 16 October (still config values).
+All numbers are first-pass placeholders (religion.yaml header) except the four defaults kept on 16 October (still config values); `religion.json` lists them in its `_provisional` array. The config-only numbers (Inquisition upkeep 10 gold a year, preacher upkeep 1 gold a year, a foreign preacher's 0.25 yearly expel chance, take-over gold 20 per step, at most 8 active waves) are kept as provisional values (D-RELG-7).
 
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
@@ -331,7 +337,6 @@ All numbers are first-pass placeholders (religion.yaml header) except the four d
 | `houses.minority_house_needs_share` | 0.10 | | yes | religion.yaml |
 | `houses.preacher_per_monastery_or_religious_school` | 1 | | yes | religion.yaml |
 | `houses.tithe_gold_per_10000_people` | 1 | | yes | religion.yaml |
-| `houses.community_founds_own_house` | min_share 0.20, every_years 20 | not in design (OQ-RELG-6) | yes | religion.yaml |
 | `houses.preacher_founds_house_after_years` | 10 | | yes | religion.yaml |
 | `houses.convert_cost_share_of_build` | 0.5 | | yes | religion.yaml |
 | `houses.take_over_gold` | per_step 20, monastic_land_multiplier 2 | | yes | religion.yaml |
@@ -343,36 +348,38 @@ All numbers are first-pass placeholders (religion.yaml header) except the four d
 | `policies.persecuted` | close_or_take_over, flee 0.02, grievance persecuted weight 2, lords −2, flag, war aim | | yes | religion.yaml |
 | `policies.change_takes_effect` / `harsher_step_is_spark` | next_new_year / true | | yes | religion.yaml |
 | `expulsion` | leave_share 0.70, within_months 12, bloodshed true | | yes | religion.yaml |
-| `inquisition` | allowed_for catholic + [monarchy, elective_monarchy, constitutional_monarchy]; upkeep 10 gold/year; skilled leave 0.01; flag; removes floor | | yes | religion.yaml |
+| `inquisition` | allowed_for catholic + the seven forms of rule by a house (D-RELG-8); upkeep 10 gold/year; skilled leave 0.01; flag; removes floor | | yes | religion.json |
 | `preachers` | per_houses_of_state_faith 5, per_holy_place_held 1, upkeep 1 gold/year, expel chance 0.25/year, flag | | yes | religion.yaml |
-| `state_faith_change` | capital 0.30, realm 0.40, cooldown 30, cuius regio after peace_of_augsburg for catholic/protestant | | yes | religion.yaml |
+| `state_faith_change` | capital 0.30, realm 0.40, cooldown 30, cuius regio after peace_of_augsburg for catholic/protestant; reformed faiths protestant, anglican, hussite (D-RELG-9) | | yes | religion.json |
+| `event_triggers` | court_conversion_islam: capital 0.30 Sunni; court_conversion_christian: realm 0.15 Protestant (D-RELG-5) | | yes | religion.json |
+| `church_heads` | Pope (Rome), Ecumenical Patriarch (Constantinople), a Caliph's claim (Mecca and Medina), Dalai Lama (Lhasa, from 1578): marked only | | no | religion.json |
 | `lords` | +1 / −1 / +1 / −1 / +1 | | yes | religion.yaml |
-| `faith_rules.*` | print_and_school 0.5/0.5; monastic ×2; crown heads church; Hussite merge (latest 1620, else catholic); protected communities; temple town 150; langar 1000; monastery school 20; lama lords; secular (after 1850, 0.5, needs mass_literacy_schooling) | | yes | religion.yaml |
-| `holy_places[]` | 16 places with faiths, province, 1444 holder | | yes | religion.yaml |
+| `faith_rules.*` | print_and_school 0.5/0.5; monastic ×2; crown heads church; Hussite merge (period end or 1620, whichever first; else catholic); protected communities; temple town 150; langar 1000; monastery school 20; lama lords; secular (after 1850, 0.5, needs mass_literacy_schooling and a factory) | | yes | religion.yaml |
+| `holy_places[]` | 16 places with faiths, province, 1444 holder (Mecca and Medina: Hejaz, D-RELG-23); Amritsar earliest 1577; Temple of the Tooth moves to Kandy in 1592 (D-RELG-16) | | yes | religion.json |
 | `holy_place_effects` | same faith: preachers 1, pilgrims 200; other faith: war aim; pilgrims still come if tolerated + house | | yes | religion.yaml |
 | `waves` | carriers list; town_min_size market_town; max_active 8 | | yes | religion.yaml |
 | `ai` | build below 0.5; tolerate above 0.20; zealous restrict; persecute only after event or religious war; adopt above 0.60 | | yes | religion.yaml |
-| `start` | source catalogue-faiths.json; ruler faith share 0.15; community default 0.05; 8 region overrides | | yes | religion.yaml |
+| `start` | source catalogue-faiths.json; ruler faith share 0.15; community default 0.05; 8 region overrides; 4 record faith overrides (D-RELG-12) | | yes | religion.json |
 
 ## 11. Seams
 
 | Other context | Direction | Pattern | What crosses |
 |---|---|---|---|
 | province | partnership | Shared Kernel | Faith mix (top three), clergy class, Chaplain, *Faith tolerance* charter, *Wrong faith* (redefined) and *Persecuted* grievances, refugees and settlers; §18 changes to 4.3, 6.5, 12.1 |
-| buildings | upstream | Customer–Supplier | Faith buildings 7.5 (house of worship steps, minority house, monastery, religious school, pilgrimage shrine), converting (5.4), burning (5.3), who builds (6.1, 6.2), landmarks (8); RELG supplies pull and serving rules |
+| buildings | upstream | Customer–Supplier | Faith buildings 7.5 (house of worship steps, minority house, monastery, religious school, pilgrimage shrine), converting (5.4), burning (5.3), who builds (6.1, 6.2), landmarks (8); the factory building for secular pull; RELG supplies pull and serving rules, and its words win (monks sent out are preachers; pulling a house down is a take-over or a Persecuted closing, D-RELG-18) |
 | realm | downstream | Customer–Supplier | Faith % and Preachers on the country card; lords' faith loyalty steps; tax (faith tax); treasury gold from take-overs |
 | rebellions | downstream | Customer–Supplier | Sparks (harsher policy step, insult to faith), faith risings' demand, preachers as leaders, *Bloodshed* |
 | warfare | downstream | Customer–Supplier | *Defend the faith* openings (persecution on border, preacher killed, holy place held) |
 | diplomacy | downstream | Published Language | *Allow preachers* leave; same faith opinion; preachers travel like envoys |
-| events | partnership | Published Language | Faith ids (+3), `religion`/`religion_share`, new conditions and effects, faith waves, flags, 10 new events, 6 patches, periods |
-| government | downstream | Customer–Supplier | State faith, clergy lords, holy places held as facts; "ruler takes a reformed faith"; Inquisition limited to monarchies |
-| culture | partnership | Partnership | Trading peoples of another faith; persecution/expulsion moves them; separate mixes |
+| events | partnership | Published Language | Faith ids (+3), `religion`/`religion_share`, new conditions and effects, faith waves, flags, 10 new events, 6 patches, periods: religion's additions are part of the game's content (D-RELG-10); their stat effects go through the events context's own stat mapping (D-RELG-11) |
+| government | downstream | Customer–Supplier | State faith, clergy lords, holy places held as facts; "ruler takes a reformed faith" = a change to Protestant, Anglican or Hussite (D-RELG-9); Inquisition limited to the forms of rule by a house (D-RELG-8) |
+| culture | partnership | Partnership | Trading peoples of another faith; persecution/expulsion moves them; separate mixes; one fourth-newcomer rule for both mixes (D-RELG-17, D-CULT-5) |
 | trade | partnership | Customer–Supplier | Traders passing feed Islamic pull; pilgrims count as traders passing (+200); Hindu temple +150 traders; refugees carry crafts |
 | research | downstream | Customer–Supplier | Schools have a faith; persecuted scholars leave; presses for Protestant pull and waves |
 | recruiting | downstream | Conformist | Chaplain commander's "Beloved" trait reads the army's faith share |
 | subjects | downstream | Conformist | Preachers enter subjects without permission |
 | revolutions | upstream | Customer–Supplier | Faith revolutions use `faith_wave`; regimes may lead to religion's church events |
-| scenario-setup | downstream | Published Language | 1444 ruler faith and province mix |
+| scenario-setup | downstream | Published Language | 1444 ruler faith and province mix; holy places bound to map provinces by name (D-RELG-20) |
 | map-presentation | downstream | Published Language | Faith lens, sprites, preachers, wave tint |
 | time-and-turns | upstream | Conformist | Yearly slot with traders and trade balance; New Year policy changes |
 
@@ -383,38 +390,40 @@ RELG-119 to RELG-122: houses where the state faith is below half (gold allowing)
 after an event or a war of religion); preachers first to own provinces under half, then abroad with leave; adopt
 only when an event offers or above 60 % of the realm. Event options carry `ai: {base: n}` weights (event tree).
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- **OQ-RELG-1** *Wrong faith* threshold: §5.2 gives Tolerated faiths *Wrong faith* "where unserved" (communities start at 10 %), while §18 and the 16 Oct defaults say a third. This spec follows the later decision (a third); confirm that unserved communities from 10 % to a third take no grievance.
-- **OQ-RELG-2** Units of hold: "share × 4" only gives the stated speed (half the distance in about 40 years) if shares are fractions (0–1). Confirm. Also the East Bengal example's "target" (Sunni 54 %, Hindu 31 %, traditional 15 %) is the settled point (pulls only), not the yearly formula's target, which includes hold.
-- **OQ-RELG-3** The province card example in §1 does not follow the rules: Protestant pull "Reformation wave (2 presses), 1 church = 4.0" would be 3 + 1.5 = 4.5 (or 5.5 with the Protestant press rule), and "about 1 point a year" is far more than the 3 % move gives (about 0.2 points). Which numbers are right?
-- **OQ-RELG-4** Expulsion: design and config say 70 % leave; the event `expulsion_of_the_moriscos` moves 90 %.
-- **OQ-RELG-5** `court_conversion_islam` tests `religion_share where: $ruler ≥ 0.3` (realm), while its note and the Adopt rule speak of the capital being a third Muslim; `court_conversion_christian` uses 15 % Protestant.
-- **OQ-RELG-6** Config `houses.community_founds_own_house {min_share 0.20, every_years 20}` has no rule in the design.
-- **OQ-RELG-7** Config-only numbers with no design text: Inquisition upkeep 10 gold (design: "as a court with officials"), preacher upkeep 1 gold a year, foreign preacher expel chance 0.25 a year, take-over gold 20 per step, waves max_active 8.
-- **OQ-RELG-8** Inquisition: "monarchies" are given as event-tree values `[monarchy, elective_monarchy, constitutional_monarchy]`; government v2 has 27 forms. Which forms qualify?
-- **OQ-RELG-9** Government's reform "the ruler takes a reformed faith" (prince-bishopric/order → feudal realm) is not a term here. Which faith changes count?
-- **OQ-RELG-10** §18 changes not adopted: province-stats 12.1 still defines *Wrong faith* as "Most people don't share the ruler's faith" and has no *Persecuted*; 4.3 and 6.5 not updated; country-stats 4 and 5.5; rebellions 2.3/5.1; warfare 10.1; event-tree `enums.yaml` lacks hussite, jain, asian_traditional; vocabulary, events, patches and flags not merged.
-- **OQ-RELG-11** The religion events' effects use stats `stability`, `legitimacy`, `unrest`, `income`, `trade_power`, `literacy` (event-tree modifiers), which this design's "count what you can point at" rule and the country stats may not have. How do they map?
-- **OQ-RELG-12** Catalogue mapping: 3 texts unmapped ("Messianic movements (Hurufiyya, Nurbakhshiyya)", "Mixed", "Unknown"), 2 records (wokou, guanahatabey) with no state faith, and 2 records mapped to `minor_other`, which is not a faith id.
-- **OQ-RELG-13** Persecuted houses "closed, or taken over (you choose per realm)": one choice for the realm, or per Persecuted faith?
-- **OQ-RELG-14** Hussite merge: "at the end of the Reformation period (by 1620)" — config `merge_at_end_of: p_protestant_reformation, merge_latest_year: 1620`. If the period ends after 1620, which wins (assumed the earlier)?
-- **OQ-RELG-15** Secular pull: design needs "towns with factories and mass schooling"; config needs innovation `mass_literacy_schooling` and has no factory condition.
-- **OQ-RELG-16** Amritsar: config `earliest: 1577`, buildings 7.5 "from the 1580s". The Temple of the Tooth "follows the relic to Kandy (1590s)": by which event or rule?
-- **OQ-RELG-17** Fourth faith arriving replaces the smallest only if larger; culture's fourth tongue replaces the smallest always. One storage rule, two behaviours.
-- **OQ-RELG-18** Buildings 7.5 says monks "travel out from here as missionaries" and "pulling one [minority house] down is persecution"; religion uses preachers and a policy. Align wording.
-- **OQ-RELG-19** "Adopt a faith … you start with none [preachers] of the new faith until houses of it exist" vs preachers from monasteries, schools and holy places: are holy-place and event preachers also withheld?
-- **OQ-RELG-20** Holy place provinces are names to be bound when the catalogue is mapped onto the map (gap list item 25); not yet bound.
-- **OQ-RELG-21** Tolerated lords waver "once when you tolerate a faith of 10 % or more of the realm": does a faith that grows past 10 % while already Tolerated trigger it?
-- **OQ-RELG-22** "Some inventions" give preachers (§6): which is not stated.
-- **OQ-RELG-23** Holy places held by the Sharifs "under the Mamluks" (config holder mamluk): who holds Mecca when the subject and overlord differ?
+Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rule, no new mechanics, provisional numbers in `religion.json`).
+
+- **D-RELG-1** (was OQ-RELG-1) *Wrong faith* threshold: a third. An unserved community from 10 % up to a third takes no grievance; a Restricted majority still does. The 16 October default is the latest decision.
+- **D-RELG-2** (was OQ-RELG-2) Units of hold: shares are fractions (0 to 1), so hold is share × 4 (× 8 rooted). The East Bengal "54 / 31 / 15 %" is where pulls alone would settle; with the rooted double hold the traditional faith stays at about 28 % and Sunni leads at about 46 % by 1700. The rules give the stated speed only with fractions.
+- **D-RELG-3** (was OQ-RELG-3) The §1 card example: the rules win and the card shows what they give. For Rouen: Catholic 3.5, Protestant 5 (wave 1.5 × 2 presses, 1 church, 2 presses × 0.5), Jewish 1, moving about 0.3 points a year toward Protestant. The example was illustrative; the rules are tested.
+- **D-RELG-4** (was OQ-RELG-4) Expulsion share: 70 % everywhere; the `expulsion_of_the_moriscos` event moves 70 % too. One number for one act.
+- **D-RELG-5** (was OQ-RELG-5) Court conversions: `court_conversion_islam` is offered when the ruler's capital province is a third Sunni (as its note and the Adopt rule say); `court_conversion_christian` keeps 15 % Protestant of the realm, since an event may offer adoption below the decision's thresholds (RELG-074). The event's note states the intent.
+- **D-RELG-6** (was OQ-RELG-6) `houses.community_founds_own_house` is dropped. It has no rule in the design; clergy already build with their tithes (RELG-036).
+- **D-RELG-7** (was OQ-RELG-7) Config-only numbers are kept as provisional values: Inquisition upkeep 10 gold a year, preacher upkeep 1 gold a year, a foreign preacher without leave expelled with chance 0.25 a year, take-over gold 20 per step, at most 8 active waves. Missing numbers get a provisional value.
+- **D-RELG-8** (was OQ-RELG-8) Inquisition: the "monarchies" are government v2's forms of rule by a house: feudal realm, diet monarchy, household realm, bureaucratic empire, elective monarchy, absolute monarchy, constitutional monarchy. Government v2 is the later design and groups its forms by family.
+- **D-RELG-9** (was OQ-RELG-9) "The ruler takes a reformed faith": a change of state faith to Protestant, Anglican or Hussite from a faith that is none of these (RELG-123). The simplest reading of government's reform.
+- **D-RELG-10** (was OQ-RELG-10) Religion §18 is followed: *Wrong faith* as religion defines it, *Persecuted* counting two, hussite, jain and asian_traditional as faith ids, and the vocabulary, ten events and six patches as part of the game's content, read from religion's data as written. Religion's design is the later one.
+- **D-RELG-11** (was OQ-RELG-11) Event stats in the religion events (`stability`, `legitimacy`, `unrest`, `income`, `trade_power`, `literacy`) go through the events context's own stat mapping, like every other event; religion adds no stats. One mapping for all events.
+- **D-RELG-12** (was OQ-RELG-12) Catalogue gaps: "Messianic movements" texts are Shia; records with no faith id start with a faith config names (wokou mahayana, guanahatabey indigenous_american, druze_maan and yazidi_communities sunni), and the named minority stays in the catalogue (RELG-125). A short override list is simpler than a new rule.
+- **D-RELG-13** (was OQ-RELG-13) Persecuted houses: one choice for the realm, close or take over. The simpler rule, and the realm already holds it.
+- **D-RELG-14** (was OQ-RELG-14) Hussite merge: at the end of the Reformation period or in 1620, whichever comes first. "By 1620" is a latest date.
+- **D-RELG-15** (was OQ-RELG-15) Secular pull: 0.5 per school, after 1850, in a town with a factory building, in a realm with `mass_literacy_schooling`. The factory building already exists.
+- **D-RELG-16** (was OQ-RELG-16) Amritsar appears when `sikh_panth_founded` fires, not before 1577 (the event's date wins over "the 1580s"); the Temple of the Tooth moves from Kotte to Kandy in 1592 by date (RELG-126). A date needs no new event.
+- **D-RELG-17** (was OQ-RELG-17) Fourth faith: one rule for faiths and tongues. A newcomer enters only if larger than the smallest of the three; the smallest group of the four joins the majority. Nobody vanishes, and one storage rule has one behaviour.
+- **D-RELG-18** (was OQ-RELG-18) Wording: religion's words win. Monks who "travel out as missionaries" are the preachers a monastery gives (RELG-068); pulling down a minority house happens only as a take-over or a Persecuted closing. No new action.
+- **D-RELG-19** (was OQ-RELG-19) Preachers after adopting: no special withholding. All old-faith preachers go; the new faith's preachers come from their usual sources, so none from houses until its houses exist, while holy places of the new faith and event grants for it count at once. The count already follows its sources.
+- **D-RELG-20** (was OQ-RELG-20) Holy place provinces are bound to map provinces by their names when the 1444 map is set up, through scenario-setup's rename table (X-13); a name with no map province leaves the place inactive until one exists. X-13 makes the map the truth.
+- **D-RELG-21** (was OQ-RELG-21) Tolerated lords waver once, when the faith is set to Tolerated while 10 % or more of the realm; a Tolerated faith growing past 10 % later moves no lord. The design says "when you tolerate".
+- **D-RELG-22** (was OQ-RELG-22) No invention grants preachers; they come from houses, monasteries and religious schools, holy places and events. "Some inventions" names none, and no mechanic is added.
+- **D-RELG-23** (was OQ-RELG-23) A holy place is held by the realm that owns its province: Mecca and Medina by the Sharifs (Hejaz, a map realm), not their Mamluk overlord. The domain model already derives the holder from the owner.
 
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
 |---|---|---|
 | RELG-001 … RELG-008 | faiths.feature | Faith list; families; local names; layered; rooted; kin |
-| RELG-009 … RELG-027 | faith-mix.feature | Pull sources; hold; East Bengal; no pull no change; small shares; fourth faith; hidden believers; movers |
+| RELG-009 … RELG-027 | faith-mix.feature | Pull sources; One year's move; East Bengal; no pull no change; small shares; A fourth faith arrives; hidden believers; movers |
 | RELG-028 … RELG-041 | faith-buildings.feature | Pull per building; minority house; take-over; tithes; preacher founds house; losing pull; clergy |
 | RELG-042 … RELG-058 | communities-and-policy.feature | Communities; served; Wrong faith; policies; timing; sparks; charter |
 | RELG-059 … RELG-065 | expulsion-and-inquisition.feature | Expulsion; Inquisition |
@@ -426,5 +435,9 @@ only when an event offers or above 60 % of the realm. Event options carry `ai: {
 | RELG-097 … RELG-106 | faith-waves-and-events.feature | Waves; carriers; vocabulary; flags; new events |
 | RELG-107, RELG-108 | faiths.feature | Start in 1444 |
 | RELG-109 … RELG-115 | religion-uses.feature | Risings; war aims; schools; diplomacy; Faith %; separation; no meters |
-| RELG-116 … RELG-118 | religion-view.feature | Cards; lens |
+| RELG-116 … RELG-118 | religion-view.feature | Cards; lens; Rouen's Faith line follows the rules |
 | RELG-119 … RELG-122 | religion-ai.feature | AI |
+| RELG-123 | state-faith.feature | Taking a reformed faith |
+| RELG-124 | faith-waves-and-events.feature | What offers a court conversion |
+| RELG-125 | faiths.feature | Records with no faith of their own |
+| RELG-126 | holy-places.feature | The Temple of the Tooth follows the relic |

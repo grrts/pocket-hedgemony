@@ -78,9 +78,8 @@ Feature: Faith waves and the religion events
       | a preacher is killed or expelled abroad       | missionary_persecution         |
       | a Catholic monarchy founds an Inquisition     | inquisition_established        |
 
-  @RELG-106 @open-question
+  @RELG-106
   Scenario Outline: The ten new events
-    # OQ-RELG-10: not yet merged into the event tree
     When the religion additions are read
     Then the religion additions hold the event "<event>" dated <date>
 
@@ -91,19 +90,19 @@ Feature: Faith waves and the religion events
       | altan_khan_and_the_dalai_lama  | 1578        |
       | jizya_reimposed                | 1679        |
       | raskol_old_believers           | 1653–1667   |
-      | revolution_and_the_church      | 1790–1801   |
+      | revolution_and_the_church      | 1790–1802   |
       | separation_of_church_and_state | 1905–1928   |
-      | missionary_societies           | 1792 onward |
-      | court_conversion_islam         | 1444–1750   |
-      | court_conversion_christian     | 1790–1914   |
+      | missionary_societies           | 1792–1914   |
+      | court_conversion_islam         | 1460–1605   |
+      | court_conversion_christian     | 1815–1869   |
 
-  @RELG-106 @open-question
+  @RELG-060 @RELG-106 @placeholder
   Scenario: The Moriscos expelled by event
-    # OQ-RELG-4: 90 % in the event, 70 % in the design
+    # config key: expulsion.leave_share
     Given the crown "Spain" is catholic with the flag "inquisition_established"
     And the Mudejar and Morisco population exists
     When the event "expulsion_of_the_moriscos" fires and "Spain" chooses "expel"
-    Then 90 % of the Morisco population moves to the host
+    Then 70 % of the Morisco population moves to the host, as in any expulsion
     And the flag "religious_persecution_active" is set on "Spain" for 20 years
 
   @RELG-106
@@ -117,3 +116,17 @@ Feature: Faith waves and the religion events
       | adopt_and_take_church_lands | it becomes protestant, dissolves the monasteries and Restricts catholic |
       | adopt_and_keep_church_lands | it becomes protestant and Tolerates catholic                            |
       | stay_with_rome              | it gains 1 catholic preacher for 30 years and Restricts protestant       |
+
+  @RELG-074 @RELG-124 @placeholder
+  Scenario Outline: What offers a court conversion
+    # config key: event_triggers
+    Given the ruler of "<realm>" is "<faith>"
+    And <share> of <where> is <newfaith>
+    Then the event "<event>" is <offered> to "<realm>"
+
+    Examples:
+      | realm   | faith               | share | where           | newfaith   | event                      | offered     |
+      | Ternate | asian_traditional   | 0.35  | its capital     | sunni      | court_conversion_islam     | offered     |
+      | Ternate | asian_traditional   | 0.25  | its capital     | sunni      | court_conversion_islam     | not offered |
+      | Tahiti  | pacific_traditional | 0.15  | the realm       | protestant | court_conversion_christian | offered     |
+      | Tahiti  | pacific_traditional | 0.10  | the realm       | protestant | court_conversion_christian | not offered |

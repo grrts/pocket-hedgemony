@@ -142,11 +142,16 @@ export interface CauseInputs {
   grievances: number;
   /** A pretender has a right to the province. */
   pretenderRight?: boolean;
+  /** The event tree's highest support for a new ideology in the province (0..1). */
+  ideologySupport?: number;
+  /** The age of revolutions has begun. */
+  ageOfRevolutions?: boolean;
 }
 
 /** The cause from the heaviest grievance (REBL-013). A pretender with a right plus any grievance wins. */
 export function causeOf(i: CauseInputs): Cause | null {
   if (i.pretenderRight && i.grievances >= 1) return "Pretender";
+  if (i.ageOfRevolutions && i.grievances >= 1 && (i.ideologySupport ?? 0) >= config.new_ideas.min_support) return "New ideas";
   if (!i.heaviest) return null;
   for (const [c, def] of Object.entries(CAUSES) as [Cause, (typeof CAUSES)[Cause]][]) if (def.grievances.includes(i.heaviest)) return c;
   return null;
@@ -215,8 +220,12 @@ export interface Rising {
   backer: string | null;
   holdsCastle: boolean;
   holdsCapital: boolean;
+  /** The rising is in or next to the capital's province (D-REBL-8). */
+  nearCapital: boolean;
   holdsWholeLordLand: boolean;
   army: boolean;
+  /** The revolution event that raised it, or null (D-REBL-4). */
+  revolution: string | null;
   ended: null | "granted" | "talked" | "melted" | "starved" | "scattered" | "won";
   cardShown: boolean;
 }
@@ -241,8 +250,10 @@ export function newRising(id: string, cause: Cause, province: string, init: Part
     backer: null,
     holdsCastle: false,
     holdsCapital: false,
+    nearCapital: false,
     holdsWholeLordLand: false,
     army: false,
+    revolution: null,
     ended: null,
     cardShown: false,
     ...init,
@@ -436,7 +447,8 @@ export function starve(r: Rising): number {
 // ---------------------------------------------------------------- 5.5 severity and spread
 
 /** Severity tier by size (INV-REBL-4, REBL-034, REBL-044). */
-export function severity(r: Pick<Rising, "provinces" | "holdsCapital" | "holdsWholeLordLand" | "army">): Tier {
+export function severity(r: Pick<Rising, "provinces" | "holdsCapital" | "holdsWholeLordLand" | "army"> & { nearCapital?: boolean }): Tier {
+  if (r.nearCapital && config.great_revolt_near_capital) return "Great revolt";
   const n = r.provinces.length;
   if (n > config.severity.rebellion_max || r.holdsCapital || r.holdsWholeLordLand) return "Great revolt";
   if (n >= config.severity.rebellion_min) return "Rebellion";
@@ -759,4 +771,31 @@ export function rebellionCard(r: Rising, c: CardInputs): RebellionCard {
     spread: c.spreadTo.length ? `May spread to ${c.spreadTo.join(", ")}` : "May spread to nowhere next month",
     answers: [...config.card.answers],
   };
+}
+
+// ---------------------------------------------------------------- revolution events (D-REBL-4)
+
+/** A revolution event raises a tagged rising at once in every province that meets its conditions. */
+export function revolutionRisings(event: string, provinces: { name: string; meets: boolean }[]): Rising[] {
+  return provinces
+    .filter((p) => p.meets)
+    .map((p, i) => newRising(`${event}-${i + 1}`, "New ideas", p.name, { reason: event, revolution: event, army: true, cardShown: true }));
+}
+
+// ---------------------------------------------------------------- leader stats (D-REBL-10)
+
+export interface LeaderStats {
+  might: number;
+  cunning: number;
+  logistics: number;
+}
+
+/** A leader drawn by cause: a local gets a role from the list; stats as a commander's (provisional numbers). */
+export function chooseLeader(cause: Cause, province: string, rng: Rng): Leader & LeaderStats & { brings: string } {
+  const kind = leaderKindFor(cause);
+  const roles = config.leaders.local.roles;
+  const name = kind === "local" ? `the ${roles[rng.int(roles.length)] ?? "village elder"} of ${province}` : kind;
+  const cunning = config.provisional.leader_cunning;
+  const might = config.provisional.leader_might;
+  return { name, kind, might, cunning, logistics: 1, brings: config.leaders[kind].brings };
 }

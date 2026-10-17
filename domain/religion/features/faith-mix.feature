@@ -55,9 +55,8 @@ Feature: The faith mix
       | a Chaplain official serves in "Valencia"           | 4    |
       | sunni is Persecuted and lives in "Valencia"        | 4    |
 
-  @RELG-020 @RELG-021 @placeholder @open-question
+  @RELG-020 @RELG-021 @placeholder
   Scenario: One year's move
-    # OQ-RELG-2: shares as fractions
     # config keys: mix.hold_per_share, mix.drift_per_year
     Given the province "Testshire" is half "catholic" and half "protestant"
     And "catholic" has 3 pull and "protestant" has 1 pull
@@ -65,18 +64,18 @@ Feature: The faith mix
     Then the target share of "catholic" is 0.625
     And the share of "catholic" becomes 0.50375
 
-  @RELG-020 @RELG-021 @placeholder @open-question
+  @RELG-020 @RELG-021 @placeholder
   Scenario: East Bengal, 1444–1700
-    # OQ-RELG-2: the example's target is the settled point
+    # config keys: pull, mix
     Given the date is 1444
     And the province "East Bengal" is 70 % hindu, 25 % asian_traditional and 5 % sunni
     And the province "East Bengal" has 2 hindu temples and a sunni lord
     And the ruler of "East Bengal" is "sunni"
     When the forest is cleared and a mosque is granted on each of 3 new field tiles
     Then "sunni" has 3.5 pull, "hindu" 2 and "asian_traditional" 1
-    And the mix settles toward sunni 54 %, hindu 31 % and asian_traditional 15 %
-    And once "asian_traditional" falls below a quarter it loses its sacred-places pull
-    And by about 1700 "East Bengal" is mostly "sunni"
+    And by pulls alone the mix would settle at sunni 54 %, hindu 31 % and asian_traditional 15 %
+    And the double hold of "asian_traditional" keeps it at about 28 %, above a quarter, so it keeps its sacred-places pull
+    And by about 1700 "sunni" is the largest faith of "East Bengal", at about 46 %
 
   @RELG-021
   Scenario: Hold slows change but never stops it
@@ -104,17 +103,17 @@ Feature: The faith mix
       | 0.009 | has          | stays         |
       | 0.011 | has no       | stays         |
 
-  @RELG-024 @open-question
+  @RELG-024
   Scenario Outline: A fourth faith arrives
-    # OQ-RELG-17: culture's rule differs
     Given the province "Testshire" holds catholic 70 %, protestant 25 % and jewish 5 %
     When <share> of "sunni" people arrive
     Then "sunni" <outcome>
+    And the <smallest> people join the majority faith "catholic"
 
     Examples:
-      | share | outcome                           |
-      | 6 %   | replaces "jewish" among the three |
-      | 4 %   | does not enter the mix            |
+      | share | outcome                           | smallest |
+      | 6 %   | replaces "jewish" among the three | jewish   |
+      | 4 %   | does not enter the mix            | sunni    |
 
   @RELG-025 @placeholder
   Scenario Outline: Hidden believers

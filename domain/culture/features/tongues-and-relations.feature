@@ -22,13 +22,12 @@ Feature: Tongues, families and the court
       | Jewish     | hebrew          |
       | Criollo    | creole_atlantic |
 
-  @CULT-002 @open-question
+  @CULT-002
   Scenario: The four added families
-    # OQ-CULT-3: the event tree currently lists 39 groups, not 38
     Given the event tree's culture groups
     When the culture families are loaded
     Then the families include "celtic", "baltic", "caucasian" and "hebrew"
-    And there are 42 families
+    And there are 43 families
 
   @CULT-004 @CULT-005 @CULT-006
   Scenario Outline: Catalogue culture strings map to tongues
@@ -117,14 +116,15 @@ Feature: Tongues, families and the court
     When the player opens the country card of "France"
     Then the Tongue % of "France" is 81
 
-  @CULT-014 @open-question
+  @CULT-014 @placeholder
   Scenario: A trading people is never a stranger for grievances
-    # OQ-CULT-14: config weight 0 toward Tongue %
+    # config key: relation.trading.tongue_share_weight
     Given the country "France" has the court tongue "French"
     And the province "Paris" has a "Jewish" community
     When grievances are worked out
     Then the "Jewish" people of "Paris" give no "Foreign rule" grievance
     And they count as neither kin nor stranger for grievances
+    And they count 0 toward the Tongue % of "France"
 
   @CULT-015
   Scenario Outline: Foreign rule before nationalism

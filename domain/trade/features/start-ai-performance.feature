@@ -80,3 +80,10 @@ Feature: Starting trade, the AI and speed
     When its ratio is next read
     Then it is 50 × 0.9 × 0.9 × 0.9
     And paths between two cities are cached until something on the path changes
+
+  @TRADE-110 @TRADE-128
+  Scenario: The heritage lever trader_count adds starting traders
+    Given the country "Venice" has catalogue trade_access "very high"
+    And its heritage gives trader_count +2
+    When the campaign starts
+    Then "Venice" has 8 starting traders

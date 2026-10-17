@@ -23,9 +23,8 @@ Feature: Faiths, their relations and the 1444 start
       | siberian_steppe_traditional | traditional |
       | secular                     | none        |
 
-  @RELG-001 @open-question
+  @RELG-001
   Scenario: Three faiths added to the event tree's list
-    # OQ-RELG-10: not yet in event-tree enums.yaml
     Given the event tree's religions list
     When the faith list is loaded
     Then it also holds "hussite", "jain" and "asian_traditional"
@@ -124,3 +123,16 @@ Feature: Faiths, their relations and the 1444 start
       | Persia                                    | sunni 80 %, shia 20 %                                   |
       | Egypt                                     | sunni 88 %, oriental_christian 10 %, jewish 2 %         |
       | Polish towns                              | 5 % more jewish                                         |
+
+  @RELG-107 @RELG-125
+  Scenario Outline: Records with no faith of their own
+    Given the catalogue record "<record>" names its faith "<text>"
+    When the 1444 start is set up
+    Then the record "<record>" starts with the state faith "<faith>"
+
+    Examples:
+      | record             | text      | faith               |
+      | wokou              | Mixed     | mahayana            |
+      | guanahatabey       | Unknown   | indigenous_american |
+      | druze_maan         | Druze     | sunni               |
+      | yazidi_communities | Yazidism  | sunni               |

@@ -3,6 +3,8 @@ import { steps, type Scenario } from "../src/registry.ts";
 import * as G from "@ph/engine/domain/religion";
 import * as R from "@ph/engine/domain/rebellions";
 import { costOf } from "@ph/engine/domain/buildings";
+import { formIdFromName } from "@ph/engine/domain/government";
+import * as C from "@ph/engine/domain/culture";
 
 const { Given, When, Then } = steps("religion");
 
@@ -376,7 +378,7 @@ Then(/^"([^"]+)" gains the people and their skills$/, (s, host: string) => {
 });
 Given("{string} founds an Inquisition", (s, name: string) => {
   const r = realm(s, name, "catholic");
-  r.government = "monarchy";
+  r.government = "feudal_realm";
   expect(G.establishInquisition(r)).toBe(true);
 });
 Given(/^"([^"]+)" has a (Restricted|Persecuted|Tolerated) (\w+) community$/, (s, name: string, p: string, faith: string) => {
@@ -1527,4 +1529,300 @@ Then(/^the (\w+) may adopt "([^"]+)"$/, (s, _n: string, faith: string) => {
 });
 Then(/^it may not adopt "([^"]+)" this way$/, (s, faith: string) => {
   expect(G.adoptOffered(main(s), faith, s.adoptCase)).toBe(false);
+});
+
+// ---------------------------------------------------------------- decided questions (D-RELG-n)
+
+Given(/^(\w+) is ([\d.]+) of "([^"]+)", (Tolerated|Restricted), with (no \w+ house|a \w+ church)$/, (s, faith: string, share: string, name: string, p: string, house: string) => {
+  const r = main(s);
+  r.policies[faith] = pol(p);
+  const sh = Number(share);
+  prov(s, name, { [r.stateFaith]: 1 - sh, [faith]: sh }, { owner: r.id, buildings: house.startsWith("a ") ? [{ faith, kind: "house", step: 1 }] : [] });
+});
+
+Given(/^the country "([^"]+)" Tolerates (\w+) while (\w+)s are (\d+) % of the realm$/, (s, name: string, faith: string, _f: string, share: string) => {
+  const r = realm(s, name, "catholic");
+  r.policies[faith] = "tolerated";
+  s.realmShare = { [faith]: pct(share) };
+});
+When(/^(\w+)s grow to (\d+) % of the realm and (\w+) stays Tolerated at the next New Year$/, (s, faith: string, share: string) => {
+  const r = main(s);
+  s.realmShare[faith] = pct(share);
+  expect(G.setPolicy(r, faith, "tolerated")).toBe(true);
+  s.changes = G.newYear(r, world(s, r));
+  stepsOf(s, s.changes);
+});
+Then(/^the lord "([^"]+)" does not waver$/, (s, name: string) => {
+  expect(s.lordSteps?.[name] ?? 0).toBe(0);
+});
+
+Given(/^the country "([^"]+)" has the state faith "([^"]+)" and the form "([^"]+)"$/, (s, name: string, faith: string, form: string) => {
+  const r = realm(s, name, faith);
+  r.stateFaith = faith;
+  r.government = formIdFromName(form);
+});
+Then(/^the Inquisition decision is (offered|not offered) to "([^"]+)"$/, (s, o: string, name: string) => {
+  expect(G.inquisitionOffered(realm(s, name))).toBe(o === "offered");
+});
+
+Given(/^the province "([^"]+)" is half "(\w+)" and half "(\w+)"$/, (s, name: string, a: string, b: string) => {
+  prov(s, name, { [a]: 0.5, [b]: 0.5 });
+});
+Given(/^"(\w+)" has (\d+) pull and "(\w+)" has (\d+) pull$/, (s, a: string, na: string, b: string, nb: string) => {
+  // Step-1 houses give 1 pull each and nothing else pulls in the province.
+  const p = provinces(s)[0]!;
+  for (let i = 0; i < Number(na); i++) p.buildings.push({ faith: a, kind: "house", step: 1 });
+  for (let i = 0; i < Number(nb); i++) p.buildings.push({ faith: b, kind: "house", step: 1 });
+  expect(G.pullTotals(p, ownerOf(s, p))).toEqual({ [a]: Number(na), [b]: Number(nb) });
+});
+Then(/^the target share of "(\w+)" is ([\d.]+)$/, (s, faith: string, t: string) => {
+  const p = provinces(s)[0]!;
+  expect(G.targets(s.before[p.id], G.pullTotals(p, ownerOf(s, p)))![faith]).toBeCloseTo(Number(t), 10);
+});
+Then(/^the share of "(\w+)" becomes ([\d.]+)$/, (s, faith: string, v: string) => {
+  expect(provinces(s)[0]!.mix[faith]).toBeCloseTo(Number(v), 10);
+});
+
+Given(/^the province "([^"]+)" is (\d+) % (\w+), (\d+) % (\w+) and (\d+) % (\w+)$/, (s, name: string, a: string, fa: string, b: string, fb: string, c: string, fc: string) => {
+  prov(s, name, { [fa]: pct(a), [fb]: pct(b), [fc]: pct(c) });
+});
+Given(/^the province "([^"]+)" has (\d+) (\w+) temples and a (\w+) lord$/, (s, name: string, n: string, faith: string, lord: string) => {
+  const p = prov(s, name);
+  for (let i = 0; i < Number(n); i++) p.buildings.push({ faith, kind: "house", step: 1 });
+  p.lordFaith = lord;
+});
+When(/^the forest is cleared and a mosque is granted on each of (\d+) new field tiles$/, (s, n: string) => {
+  const p = provinces(s)[0]!;
+  p.owner = s.main;
+  for (let i = 0; i < Number(n); i++) p.buildings.push({ faith: "sunni", kind: "house", step: 1 });
+});
+Then(/^"(\w+)" has ([\d.]+) pull, "(\w+)" (\d+) and "(\w+)" (\d+)$/, (s, a: string, na: string, b: string, nb: string, c: string, nc: string) => {
+  const p = provinces(s)[0]!;
+  expect(G.pullTotals(p, ownerOf(s, p))).toEqual({ [a]: Number(na), [b]: Number(nb), [c]: Number(nc) });
+});
+Then(/^by pulls alone the mix would settle at (\w+) (\d+) %, (\w+) (\d+) % and (\w+) (\d+) %$/, (s, a: string, na: string, b: string, nb: string, c: string, nc: string) => {
+  const p = provinces(s)[0]!;
+  const t = G.pullTotals(p, ownerOf(s, p));
+  const all = Object.values(t).reduce((x, y) => x + y, 0);
+  for (const [f, n] of [[a, na], [b, nb], [c, nc]] as [string, string][]) expect(Math.round(((t[f] ?? 0) / all) * 100)).toBe(Number(n));
+});
+function eastBengalBy(s: Scenario, year: number): G.ProvinceFaith {
+  const p = structuredClone(provinces(s)[0]!);
+  const r = ownerOf(s, provinces(s)[0]!);
+  for (let y = s.year ?? 1444; y < year; y++) G.yearMix(p, r);
+  return p;
+}
+Then(/^the double hold of "(\w+)" keeps it at about (\d+) %, above a quarter, so it keeps its sacred-places pull$/, (s, faith: string, share: string) => {
+  const p = eastBengalBy(s, 1900);
+  expect(Math.round(p.mix[faith]! * 100)).toBe(Number(share));
+  expect(G.pulls(p, ownerOf(s, provinces(s)[0]!))[faith]?.map((x) => x.source)).toContain("sacred places");
+});
+Then(/^by about (\d+) "(\w+)" is the largest faith of "([^"]+)", at about (\d+) %$/, (s, year: string, faith: string, _n: string, share: string) => {
+  const p = eastBengalBy(s, Number(year));
+  const top = Object.entries(p.mix).sort((x, y) => y[1] - x[1])[0]!;
+  expect(top[0]).toBe(faith);
+  expect(Math.round(top[1] * 100)).toBe(Number(share));
+});
+
+Given(/^the province "([^"]+)" holds (\w+) (\d+) %, (\w+) (\d+) % and (\w+) (\d+) %$/, (s, name: string, a: string, na: string, b: string, nb: string, c: string, nc: string) => {
+  prov(s, name, { [a]: pct(na), [b]: pct(nb), [c]: pct(nc) }, { people: 100000 });
+  s.before = { ...prov(s, name).mix };
+});
+When(/^(\d+) % of "(\w+)" people arrive$/, (s, share: string, faith: string) => {
+  const p = provinces(s)[0]!;
+  s.arrived = { faith, people: p.people * pct(share) };
+  G.moversArrive(p, { [faith]: s.arrived.people });
+});
+Then(/^"(\w+)" (replaces "\w+" among the three|does not enter the mix)$/, (s, faith: string, how: string) => {
+  const p = provinces(s)[0]!;
+  expect(Object.keys(p.mix).length).toBe(3);
+  const out = /"(\w+)"/.exec(how)?.[1];
+  if (out) {
+    expect(p.mix[faith]).toBeGreaterThan(0);
+    expect(p.mix[out]).toBeUndefined();
+  } else expect(p.mix[faith]).toBeUndefined();
+});
+Then(/^the (\w+) people join the majority faith "(\w+)"$/, (s, faith: string, major: string) => {
+  const p = provinces(s)[0]!;
+  const joined = faith === s.arrived.faith ? s.arrived.people : s.before[faith] * 100000;
+  expect(p.mix[major]! * p.people).toBeCloseTo(s.before[major] * 100000 + joined, 6);
+});
+
+Given("the Reformation period has ended", (s) => {
+  s.reformationEnded = true;
+});
+Given(/^the province "([^"]+)" has hussite people and (a protestant church|no protestant house)$/, (s, name: string, house: string) => {
+  prov(s, name, { hussite: 0.4, catholic: 0.6 }, { buildings: house.startsWith("a ") ? [{ faith: "protestant", kind: "house", step: 1 }] : [{ faith: "catholic", kind: "house", step: 1 }] });
+});
+Then(/^its hussite share merges into "(\w+)"$/, (s, into: string) => {
+  expect(s.reformationEnded).toBe(true);
+  const p = provinces(s)[0]!;
+  expect(G.mergeHussites(p)).toBe(into);
+  expect(p.mix["hussite"]).toBeUndefined();
+  expect(p.mix[into]).toBeCloseTo(into === "catholic" ? 1 : 0.4);
+});
+Given(/^the Reformation period (ends in \d+|has not yet ended)$/, (s, w: string) => {
+  const year = /\d+/.exec(w)?.[0];
+  s.reformationEnds = year ? Number(year) : null;
+});
+Then(/^the Hussites merge in (\d+)$/, (s, year: string) => {
+  expect(G.hussiteMergeYear(s.reformationEnds)).toBe(Number(year));
+});
+
+Given(/^the town "([^"]+)" has (factories|no factory), (mass schooling|no mass schooling) and (\d+) schools$/, (s, name: string, f: string, m: string, n: string) => {
+  const amount = G.secularPull(s.year ?? 1444, { factory: f === "factories", schools: Number(n) }, m === "mass schooling" ? ["mass_literacy_schooling"] : []);
+  s.pulls = { [name]: amount > 0 ? { secular: [{ source: "schools in a factory town", amount }] } : {} };
+});
+Then(/^"(\w+)" gets no pull in "([^"]+)"$/, (s, faith: string, name: string) => {
+  expect(total(s.pulls[name][faith])).toBe(0);
+});
+Then(/^"(\w+)" has no houses$/, (s, faith: string) => {
+  expect(G.hasHouses(faith)).toBe(false);
+});
+
+When("the religion additions are read", (s) => {
+  s.adds = G.additionEvents();
+});
+Then(/^the religion additions hold the event "(\w+)" dated (\d+)(?:–(\d+))?$/, (s, ev: string, from: string, to?: string) => {
+  expect(s.adds[ev]).toEqual(to ? [Number(from), Number(to)] : Number(from));
+});
+
+Given(/^the crown "([^"]+)" is (\w+) with the flag "([^"]+)"$/, (s, name: string, faith: string, flag: string) => {
+  realm(s, name, faith).flags.push(flag);
+});
+Given("the Mudejar and Morisco population exists", (s) => {
+  s.group = "mudejar_morisco_population";
+});
+When(/^the event "([^"]+)" fires and "([^"]+)" chooses "([^"]+)"$/, (s, ev: string, name: string, option: string) => {
+  s.effects = G.optionEffects(ev, option);
+  expect(realm(s, name).flags).toContain(G.FLAGS.inquisition);
+});
+Then(/^(\d+) % of the Morisco population moves to the host, as in any expulsion$/, (s, share: string) => {
+  const mv = (s.effects as Record<string, unknown>[]).find((e) => "move_population" in e)!["move_population"] as { group: string; amount: string };
+  expect(mv.group).toBe(s.group);
+  expect(mv.amount).toBe(`${share}%`);
+  expect(G.religionConfig.expulsion.leave_share).toBeCloseTo(pct(share));
+});
+Then(/^the flag "([^"]+)" is set on "([^"]+)" for (\d+) years$/, (s, flag: string, _n: string, years: string) => {
+  const f = (s.effects as Record<string, unknown>[]).find((e) => "set_flag" in e)!["set_flag"] as { id: string; years: number };
+  expect(f).toMatchObject({ id: flag, years: Number(years) });
+});
+
+Given(/^([\d.]+) of (its capital|the realm) is (\w+)$/, (s, share: string, where: string) => {
+  s.convShares = where === "its capital" ? { capital: Number(share), realm: 0 } : { capital: 0, realm: Number(share) };
+});
+Then(/^the event "(court_conversion_islam|court_conversion_christian)" is (offered|not offered) to "([^"]+)"$/, (s, ev: "court_conversion_islam" | "court_conversion_christian", o: string, name: string) => {
+  expect(G.courtConversionOffered(ev, realm(s, name), s.convShares)).toBe(o === "offered");
+});
+
+Given("the event tree's religions list", (s) => {
+  s.tree = G.religionConfig.event_tree_religions;
+});
+Then(/^it also holds "(\w+)", "(\w+)" and "(\w+)"$/, (s, ...fs: string[]) => {
+  for (const f of fs.slice(0, 3)) {
+    expect(s.tree).not.toContain(f);
+    expect(G.faithIds()).toContain(f);
+    expect(G.isFaith(f)).toBe(true);
+  }
+});
+
+Given(/^the catalogue record "([^"]+)" names its faith "([^"]+)"$/, (s, id: string, text: string) => {
+  const raw = G.catalogueRecord(id) as unknown as { source_texts: string[]; state_faith: string | null };
+  expect(raw.source_texts.some((t) => t.includes(text))).toBe(true);
+  expect(raw.state_faith === null || !G.isFaith(raw.state_faith)).toBe(true);
+  s.startOf = id;
+});
+Then(/^the record "([^"]+)" starts with the state faith "(\w+)"$/, (s, _id: string, faith: string) => {
+  expect(s.start.stateFaith).toBe(faith);
+  expect(s.start.mix[faith]).toBeGreaterThan(0.5);
+});
+
+Given(/^the event "([^"]+)" has not fired$/, (s) => {
+  s.fired ??= [];
+});
+Then(/^"([^"]+)" is (not|now) a holy place$/, (s, name: string, is: string) => {
+  const found = G.holyPlaces(s.fired ?? [], s.year ?? 1444).some((h) => h.name === name);
+  expect(found).toBe(is === "now");
+});
+Then(/^the holy place "([^"]+)" is in the province "([^"]+)"$/, (s, name: string, province: string) => {
+  expect(G.holyPlaces([], s.year ?? 1444).find((h) => h.name === name)!.province).toBe(province);
+});
+
+Given(/^the province "([^"]+)" is (\w+) (\d+) %, (\w+) (\d+) % and (\w+) (\d+) %$/, (s, name: string, a: string, na: string, b: string, nb: string, c: string, nc: string) => {
+  prov(s, name, { [a]: pct(na), [b]: pct(nb), [c]: pct(nc) });
+});
+Given(/^"([^"]+)" has (\d+) catholic churches, a catholic monastery with seats, (\d+) protestant church, (\d+) synagogue and (\d+) presses$/, (s, name: string, c: string, pr: string, j: string, presses: string) => {
+  const p = prov(s, name);
+  for (let i = 0; i < Number(c); i++) p.buildings.push({ faith: "catholic", kind: "house", step: 1 });
+  p.buildings.push({ faith: "catholic", kind: "monastery", seats: true });
+  for (let i = 0; i < Number(pr); i++) p.buildings.push({ faith: "protestant", kind: "house", step: 1 });
+  for (let i = 0; i < Number(j); i++) p.buildings.push({ faith: "jewish", kind: "house", step: 1 });
+  p.presses = Number(presses);
+});
+Given(/^the Reformation wave covers "([^"]+)"$/, (s, name: string) => {
+  s.waves = G.wavesOf("protestant_reformation", "protect_the_reformer", { $reform_centre: "Saxony" }, 1517);
+  prov(s, name).waves.push(s.waves[0].id);
+});
+When(/^the pulls of "([^"]+)" are worked out$/, (s, name: string) => {
+  const p = prov(s, name);
+  s.line = G.faithLine(p, ownerOf(s, p), { waves: s.waves });
+  s.totals = G.pullTotals(p, ownerOf(s, p), { waves: s.waves });
+});
+Then(/^the pulls are (\w+) ([\d.]+), (\w+) ([\d.]+) and (\w+) ([\d.]+)$/, (s, a: string, na: string, b: string, nb: string, c: string, nc: string) => {
+  expect(s.totals).toEqual({ [a]: Number(na), [b]: Number(nb), [c]: Number(nc) });
+});
+Then(/^the Faith line shows the mix moving about ([\d.]+) points a year toward (\w+)$/, (s, pts: string, faith: string) => {
+  expect(s.line.toward).toBe(faith);
+  expect(Math.round(s.line.pointsPerYear * 10) / 10).toBe(Number(pts));
+});
+
+Given(/^an event has granted "([^"]+)" (\d+) (\w+) preachers for (\d+) years$/, (s, name: string, n: string, faith: string, years: string) => {
+  G.grantPreachers(realm(s, name), Number(n), Number(years), 1520, faith);
+});
+Then(/^"([^"]+)" has (\d+) (\w+) preachers before any \w+ house exists$/, (s, name: string, n: string, faith: string) => {
+  const r = realm(s, name);
+  expect(r.stateFaith).toBe(faith);
+  expect(G.preacherCountFrom(r, [], 0, 1527)).toBe(Number(n));
+});
+
+When(/^"([^"]+)" adopts "(\w+)"$/, (s, name: string, faith: string) => {
+  const r = realm(s, name);
+  s.oldFaith = r.stateFaith;
+  G.adoptFaith(r, faith, { houses: "keep", schools: "keep", year: 1600, byDecision: false, provinces: [], lords: [] });
+});
+Then(/^the ruler of "([^"]+)" (takes|does not take) a reformed faith for government's reforms$/, (s, name: string, t: string) => {
+  expect(G.takesReformedFaith(s.oldFaith, realm(s, name).stateFaith)).toBe(t === "takes");
+});
+
+When("the holy places are loaded", (s) => {
+  s.heads1444 = G.churchHeads(1444);
+  s.heads1600 = G.churchHeads(1600);
+});
+Then(/^the holy places of the Pope, the Ecumenical Patriarch, a Caliph's claim and the Dalai Lama \(from (\d+)\) are marked$/, (s, year: string) => {
+  const ids = new Set(G.holyPlaces([]).map((h) => h.id));
+  for (const h of s.heads1600 as { place: string }[]) expect(ids.has(h.place)).toBe(true);
+  expect((s.heads1600 as { name: string }[]).map((h) => h.name)).toEqual(["the Pope", "the Ecumenical Patriarch", "a Caliph's claim", "the Dalai Lama"]);
+  expect((s.heads1444 as { id: string }[]).map((h) => h.id)).not.toContain("dalai_lama");
+  expect(G.churchHeads(Number(year)).map((h) => h.id)).toContain("dalai_lama");
+});
+Then("religion gives church heads no rules of their own", (s) => {
+  for (const h of s.heads1600 as Record<string, unknown>[]) expect(Object.keys(h).sort()).toEqual(["id", "name", "place"]);
+});
+
+Given(/^the people of "([^"]+)" convert to (\w+)$/, (s, name: string, faith: string) => {
+  const p = prov(s, name, { orthodox: 0.6, catholic: 0.4 }, { people: 100000 });
+  s.tongues = C.newProvinceTongues(name, { Bosnian: 100000 });
+  s.tongueBefore = { ...s.tongues.people };
+  p.mix = { [faith]: 1 };
+});
+Then("their tongue does not change", (s) => {
+  expect(s.tongues.people).toEqual(s.tongueBefore);
+});
+Then("the faith grievances and tongue grievances stay separate", (s) => {
+  const p = provinces(s)[0]!;
+  const faith = Object.keys(G.faithGrievances(p, G.newRealm("Hungary", "catholic")));
+  const tongue = C.updateGrievances(s.tongues, C.newCountryCulture("hungary", "Bosnian"));
+  for (const g of faith) expect(tongue).not.toContain(g);
+  expect(faith).toContain("Wrong faith");
+  expect(tongue).not.toContain("Wrong faith");
 });

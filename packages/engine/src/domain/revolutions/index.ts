@@ -11,3 +11,4 @@ export * from "./revolution.ts";
 export * from "./camps.ts";
 export * from "./aftermath.ts";
 export * from "./build.ts";
+export * from "./funding.ts";

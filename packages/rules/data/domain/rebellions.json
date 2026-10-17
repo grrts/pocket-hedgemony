@@ -157,5 +157,25 @@
     "demand": { "Tax": "tax back to normal" },
     "arms": { "Tools": "tools", "Old weapons": "tools and old weapons", "Armed": "armed", "Soldiers": "soldiers" },
     "answers": ["Grant demand", "Talk", "Bribe leader", "Wait", "Attack"]
-  }
+  },
+  "great_revolt_near_capital": true,
+  "new_ideas": { "ideologies": ["liberalism", "socialism", "communism", "nationalism"], "min_support": 0.3, "from_age": "revolutions" },
+  "provisional": {
+    "spread_chance_per_month": 0.1,
+    "talk_gold_per_province": 10,
+    "bribe_gold_per_100_rebels": 1,
+    "grant_points": 5,
+    "grant_months": 12,
+    "pardon_calm_factor": 2,
+    "new_preacher_after_months": 12,
+    "disloyal_lord_revolt_chance": 0.05,
+    "leader_cunning": 3,
+    "leader_might": 1
+  },
+  "_provisional": [
+    "new_ideas.min_support", "provisional.spread_chance_per_month", "provisional.talk_gold_per_province",
+    "provisional.bribe_gold_per_100_rebels", "provisional.grant_points", "provisional.grant_months",
+    "provisional.pardon_calm_factor", "provisional.new_preacher_after_months",
+    "provisional.disloyal_lord_revolt_chance", "provisional.leader_cunning", "provisional.leader_might"
+  ]
 }

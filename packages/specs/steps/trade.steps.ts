@@ -1534,7 +1534,7 @@ Given("the country {string} has catalogue trade_access {string}", (s, c: string,
 });
 
 When("the campaign starts", (s) => {
-  if (s.access) s.startCount = T.startingTraderCount(s.access.access);
+  if (s.access) s.startCount = T.startingTraderCount(s.access.access, s.extraTraders ?? 0);
   if (s.coastal) s.startKinds = Object.fromEntries(Object.entries(s.coastal).map(([c, ports]) => [c, T.startingKinds({ ports: ports as number }, 2)]));
 });
 
@@ -1671,4 +1671,631 @@ Then("the robbery has its own line", (s) => {
   const lines = T.turnReportLines(W(s).events);
   expect(lines.filter((l) => l.includes(s.robbed.id) && l.includes("robbed"))).toHaveLength(1);
   expect(lines.filter((l) => l.startsWith("Traders brought"))).toHaveLength(1);
+});
+
+// ---------------------------------------------------------------- decided 17 October (D-TRADE-*)
+
+const minus = (x: string): number => Number(x.replace("−", "-"));
+
+// Founding (D-TRADE-2, D-TRADE-3, D-TRADE-12)
+
+Given(/^the province "([^"]+)" of "([^"]+)" has (a weekly market|a yearly fair|no market|a trading post)$/, (s, p: string, owner: string, market: string) => {
+  const m: Record<string, Partial<T.ProvinceTrade>> = {
+    "a weekly market": { market: "weekly_market" },
+    "a yearly fair": { market: "yearly_fair" },
+    "no market": { market: null, size: "village" },
+    "a trading post": { market: null, size: "village", tradingPost: true },
+  };
+  city(s, p, owner, m[market]!);
+  s.country = owner;
+});
+
+Then(/^"([^"]+)" (may|may not) found a pack caravan in "([^"]+)"$/, (s, c: string, may: string, p: string) => {
+  expect(T.mayFoundIn(T.province(W(s), p), T.country(W(s), c).inventions)).toBe(may === "may");
+  expect(T.foundMenu(W(s), c, p).includes("pack_caravan")).toBe(may === "may");
+});
+
+Then(/^"([^"]+)" may not build a new yearly fair$/, (s, c: string) => {
+  expect(T.mayBuildYearlyFair(T.country(W(s), c).inventions)).toBe(false);
+  expect(T.mayBuildYearlyFair(new Set(["T6"]))).toBe(true);
+});
+
+Given(/^the province "([^"]+)" of "([^"]+)" has (\d+) market folk in its job slots$/, (s, p: string, owner: string, n: string) => {
+  city(s, p, owner);
+  s.slots = [{ building: "weekly_market", class: "market_folk", slots: Number(n), filled: Number(n) }];
+});
+
+Given(/^the province "([^"]+)" has a yearly fair with (\d+) market folk$/, (s, p: string, n: string) => {
+  city(s, p, "France", { market: "yearly_fair" });
+  s.slots = [{ building: "yearly_fair", class: "market_folk", slots: Number(n), filled: Number(n) }];
+});
+
+Given("the country {string} has {int} gold", (s, c: string, gold: number) => {
+  T.country(W(s), c).treasury = gold;
+});
+
+When(/^"([^"]+)" founds a (pack caravan|camel caravan|wagon train) in "([^"]+)"$/, (s, c: string, kind: string, p: string) => {
+  s.slots ??= [{ building: "weekly_market", class: "market_folk", slots: 1000, filled: 1000 }];
+  s.found = T.foundTrader(W(s), c, "new-trader", kind.replace(/ /g, "_") as T.LandKind, p, s.slots);
+});
+
+Then(/^the founding is (refused for want of crew|done, \d+ market folk left)$/, (s, result: string) => {
+  const left = /(\d+)/.exec(result)?.[1];
+  const filled = (s.slots as T.JobSlots[]).reduce((n, x) => n + x.filled, 0);
+  if (result.startsWith("refused")) {
+    expect(s.found).toEqual({ ok: false, reason: "not enough crew" });
+    expect(T.country(W(s), "France").treasury).toBe(100);
+  } else {
+    expect(s.found.ok).toBe(true);
+    expect(filled).toBe(Number(left));
+  }
+});
+
+Then(/^"([^"]+)" pays (\d+) gold up front$/, (s, c: string, gold: string) => {
+  expect(s.found.ok).toBe(true);
+  expect(T.country(W(s), c).treasury).toBe(100 - Number(gold));
+});
+
+Then("{int} market folk leave the fair's job slots to crew it", (s, n: number) => {
+  expect(s.slots[0].filled).toBe(s.slots[0].slots - n);
+  expect(s.found.trader.crew).toEqual({ class: "market_folk", count: n });
+});
+
+// Unpaid trade ships (D-TRADE-11)
+
+Given(/^the cog "([^"]+)" is a Venetian trade ship whose upkeep has been unpaid for (\d+) months$/, (s, name: string, months: string) => {
+  city(s, "Venice", "Venice", { port: true });
+  s.trader = T.addTrader(W(s), { id: name, name, kind: "cog_junk_dhow", owner: "Venice", home: "Venice", unpaidMonths: Number(months) });
+  later(s, () => T.checkUnpaid(W(s), s.trader));
+});
+
+Then(/^the cog (still exists|is gone)$/, (s, state: string) => {
+  expect(W(s).traders.has(s.trader.id)).toBe(state === "still exists");
+});
+
+Then(/^a "([^"]+)" (can|cannot) be set to trade$/, (_s, ship: string, can: string) => {
+  expect(T.shipCanTrade(ship)).toBe(can === "can");
+});
+
+// Lords' traders (D-TRADE-14)
+
+Given(/^the lord "([^"]+)" of "([^"]+)" runs a caravan with ([\d.]+) gold$/, (s, lord: string, crown: string, gold: string) => {
+  W(s).lords.set(lord, { id: lord, liege: crown, wealth: 0 });
+  s.trader = caravan(s, crown, { lord, purse: Number(gold) });
+  s.lord = lord;
+});
+
+Given(/^it collects ([\d.]+) gold in the royal province "([^"]+)" of "([^"]+)"$/, (s, gold: string, p: string, owner: string) => {
+  // a royal province that is not a city: it collects, but the lord's caravan does not deposit there
+  const ratio = 50;
+  city(s, p, owner, { size: "village", market: null, ratio, value: Number(gold) / ((ratio / 100) * T.kindStats("pack_caravan").hold * T.tradeConfig.collect.visit_share) });
+  s.collects = T.enterProvince(W(s), s.trader, p);
+});
+
+Given(/^it passes the "([^"]+)" bridge, a toll point of "([^"]+)"$/, (s, point: string, owner: string) => {
+  s.toll = T.payToll(W(s), s.trader, { id: point, owner, rate: "high" });
+});
+
+When(/^it enters "([^"]+)", a royal city of "([^"]+)"$/, (s, p: string, owner: string) => {
+  city(s, p, owner, { size: "city" });
+  s.result = T.enterProvince(W(s), s.trader, p);
+});
+
+Then("it pays no market fee and no toll", (s) => {
+  near(s.collects.collected, 0.5, 4);
+  expect(s.collects.fee).toBe(0);
+  expect(s.collects.deposited).toBe(0);
+  expect(s.toll).toBe(0);
+});
+
+Then(/^its ([\d.]+) gold go to the lord's wealth$/, (s, gold: string) => {
+  near(W(s).lords.get(s.lord)!.wealth, Number(gold), 4);
+  expect(T.country(W(s), s.trader.owner).treasury).toBe(0);
+});
+
+// Only an embargo shuts traders out (D-TRADE-8)
+
+Given(/^"([^"]+)" and "([^"]+)" are at peace and "([^"]+)" has no embargo on "([^"]+)"$/, (s, a: string, b: string) => {
+  T.setWar(W(s), a, b, false);
+  city(s, "Ningbo", a, { port: true });
+  s.ming = a;
+  s.japan = b;
+});
+
+Then(/^Japanese (land traders|trade ships) may enter Ming (provinces|ports)$/, (s, kind: string) => {
+  const w = W(s);
+  const t = kind === "land traders" ? caravan(s, s.japan, { home: "Kyoto" }) : T.addTrader(w, { id: "ship-jp", kind: "cog_junk_dhow", owner: s.japan, home: "Hakata" });
+  expect(T.mayEnter(w, t, "Ningbo")).toBe(true);
+  T.embargo(w, s.ming, s.japan);
+  expect(T.mayEnter(w, t, "Ningbo")).toBe(false);
+  w.embargoes.clear();
+});
+
+// Heritage levers (X-6, D-TRADE-18)
+
+const leverField: Record<string, "ratioGainShare" | "depositShare" | "extraTraders"> = {
+  trade_balance_pct: "ratioGainShare",
+  traders_passing_pct: "ratioGainShare",
+  trader_gain_pct: "depositShare",
+  trader_count: "extraTraders",
+};
+
+function setLever(s: Scenario, c: string, lever: string, n: number): void {
+  const field = leverField[lever];
+  if (!field) throw new Error(`Unknown lever ${lever}`);
+  const country = T.country(W(s), c);
+  country.levers = { ...country.levers, [field]: field === "extraTraders" ? n : n / 100 };
+}
+
+Given(/^the country "([^"]+)" has the heritage lever (\w+) \+(\d+)$/, (s, c: string, lever: string, n: string) => {
+  setLever(s, c, lever, Number(n));
+});
+
+Given(/^a (\w+) caravan "([^"]+)" has ([\d.]+) gold in its purse$/, (s, adj: string, name: string, gold: string) => {
+  s.trader = caravan(s, countryOfAdjective(adj), { id: name, name, purse: Number(gold), position: "Treviso" });
+});
+
+Given(/^its heritage gives trader_count \+(\d+)$/, (s, n: string) => {
+  s.extraTraders = Number(n);
+});
+
+// trade_index and hubs (D-TRADE-17)
+
+Given(/^the trade income of "([^"]+)" over the last 12 months is (\d+) gold$/, (s, _c: string, gold: string) => {
+  s.income = Number(gold);
+});
+
+Then(/^its trade_index is (\d+)$/, (s, v: string) => {
+  expect(T.tradeIndex(s.income)).toBe(Number(v));
+});
+
+Then(/^the hub "([^"]+)" is (the provinces? .+)$/, (_s, hub: string, places: string) => {
+  const def = T.configHubs().get(hub);
+  expect(def).toBeDefined();
+  const zones = [...places.matchAll(/the sea zone "([^"]+)"/g)].map((m) => m[1]!);
+  const all = [...places.matchAll(/"([^"]+)"/g)].map((m) => m[1]!);
+  expect(def!.seaZones).toEqual(zones);
+  expect(def!.provinces).toEqual(all.filter((x) => !zones.includes(x)));
+});
+
+// Visibility and the route preview (D-TRADE-13, TRADE-054)
+
+Given(/^the province "([^"]+)" is (a province of|a province one of whose caravans entered, of|a province no trader entered, far from|a province known to T13, far from) "([^"]+)"$/, (s, p: string, how: string, c: string) => {
+  const w = W(s);
+  T.addCountry(w, c);
+  if (how === "a province of") city(s, p, c);
+  else {
+    city(s, p, p === "Geneva" ? "Savoy" : "Milan", { value: 10, ratio: 50 });
+    if (how.includes("caravans entered")) {
+      city(s, "Troyes", c);
+      T.enterProvince(w, caravan(s, c), p);
+    }
+    if (how.includes("T13")) T.country(w, c).inventions.add("T13");
+  }
+  s.province = p;
+});
+
+When(/^"([^"]+)" looks at its trade value and ratio$/, (s, c: string) => {
+  s.sees = T.seesTrade(W(s), c, s.province);
+});
+
+Then(/^"([^"]+)" (sees|doesn't see) them$/, (s, _c: string, sees: string) => {
+  expect(s.sees).toBe(sees === "sees");
+});
+
+function previewWorld(s: Scenario): T.PreviewLeg[] {
+  const w = W(s);
+  const values: Record<string, [string, number]> = {
+    Troyes: ["France", 3.5],
+    "Bar-sur-Aube": ["France", 1],
+    Langres: ["France", 1],
+    Dijon: ["France", 5],
+    Dole: ["Burgundy", 1],
+    Jura: ["Savoy", 1],
+    Gex: ["Savoy", 1],
+    Geneva: ["Savoy", 13],
+  };
+  for (const [id, [owner, value]] of Object.entries(values)) {
+    city(s, id, owner, { value, ratio: 50, market: id === "Geneva" ? "yearly_fair" : "weekly_market" });
+    T.country(w, "France").seen.add(id);
+  }
+  T.province(w, "Geneva").visits = 6;
+  const jura: T.TollPoint = { id: "Jura", owner: "Savoy", rate: "low" };
+  return [
+    { from: "Troyes", to: "Dijon", days: 15, provinces: ["Bar-sur-Aube", "Langres", "Dijon"], tolls: [] },
+    { from: "Dijon", to: "Geneva", days: 4, provinces: ["Dole", "Jura", "Gex", "Geneva"], tolls: [jura] },
+    { from: "Geneva", to: "Dijon", days: 4, provinces: ["Gex", "Jura", "Dole", "Dijon"], tolls: [jura] },
+    { from: "Dijon", to: "Troyes", days: 15, provinces: ["Langres", "Bar-sur-Aube", "Troyes"], tolls: [] },
+  ];
+}
+
+When("the player sets the route {string}", (s, route: string) => {
+  const legs = previewWorld(s);
+  s.trader = caravan(s, "France");
+  expect(T.setRoute(W(s), "France", s.trader.id, stops(route)).ok).toBe(true);
+  s.preview = T.routePreview(W(s), s.trader, legs, (p) => (p === "Dijon" ? T.banditChance({ riots: true }, new Set()) : 0));
+});
+
+Then("the preview shows a loop of {int} days", (s, days: number) => {
+  expect(s.preview.loopDays).toBe(days);
+});
+
+Then(/^it collects in (\d+) provinces a loop, best "([^"]+)", "([^"]+)", "([^"]+)"$/, (s, n: string, a: string, b: string, c: string) => {
+  expect(s.preview.collectedIn).toBe(Number(n));
+  expect(s.preview.best).toEqual([a, b, c]);
+});
+
+Then("it expects about {float} gold a month after fees and tolls", (s, gold: number) => {
+  near(s.preview.expectedPerMonth, gold, 1);
+});
+
+Then("it shows the toll at the {string} pass of {float} a pass", (s, point: string, gold: number) => {
+  expect(s.preview.tolls).toEqual([
+    { point, gold },
+    { point, gold },
+  ]);
+});
+
+Then("it shows danger low with bandits near {string}", (s, p: string) => {
+  expect(s.preview.danger).toBe("low");
+  expect(s.preview.banditsNear).toEqual([p]);
+});
+
+Then("it shows {string}", (s, line: string) => {
+  expect(s.preview.crowding).toContain(line);
+});
+
+Given("a French caravan plans a loop through {string}, which {string} cannot see", (s, p: string, c: string) => {
+  city(s, "Troyes", c, { value: 0, ratio: 0 });
+  city(s, p, "Milan", { value: 10, ratio: 50 });
+  expect(T.seesTrade(W(s), c, p)).toBe(false);
+  s.trader = caravan(s, c);
+  s.legs = [
+    { from: "Troyes", to: p, days: 15, provinces: [p], tolls: [] },
+    { from: p, to: "Troyes", days: 15, provinces: ["Troyes"], tolls: [] },
+  ];
+  s.province = p;
+});
+
+When("the player sets the route", (s) => {
+  s.preview = T.routePreview(W(s), s.trader, s.legs);
+});
+
+Then("the preview expects nothing from {string}", (s, p: string) => {
+  expect(s.preview.expectedPerMonth).toBe(0);
+  T.country(W(s), s.trader.owner).seen.add(p);
+  expect(T.routePreview(W(s), s.trader, s.legs).expectedPerMonth).toBeGreaterThan(0);
+});
+
+// The AI (TRADE-115, TRADE-116)
+
+Given(/^the AI country "([^"]+)" is at war with "([^"]+)"$/, (s, a: string, b: string) => {
+  T.setWar(W(s), a, b);
+  s.aiTraders = [
+    { id: "near", ship: false, provincesFromFront: 1 },
+    { id: "far", ship: false, provincesFromFront: 6 },
+    { id: "cog", ship: true, provincesFromFront: 3 },
+  ];
+});
+
+Then("it pulls its traders off roads near the front", (s) => {
+  expect(T.aiWarOrders(s.aiTraders, false).pulled).toEqual(["near"]);
+});
+
+Then("it uses trade ships as transports if short of carriers", (s) => {
+  expect(T.aiWarOrders(s.aiTraders, true).transports).toEqual(["cog"]);
+  expect(T.aiWarOrders(s.aiTraders, false).transports).toEqual([]);
+});
+
+Then("it reroutes at once when a route breaks and otherwise once a year", () => {
+  expect(T.aiRerouteDue(1, true)).toBe(true);
+  expect(T.aiRerouteDue(11, false)).toBe(false);
+  expect(T.aiRerouteDue(12, false)).toBe(true);
+});
+
+// Food, materials and value (X-6, D-TRADE-7, D-TRADE-19)
+
+Given("the city {string} is hungry", (s, p: string) => {
+  city(s, p, "France", { size: "great_city" });
+  s.province = p;
+});
+
+Then("no trader carries grain to {string}", () => {
+  expect(T.traderCarries("grain")).toBe(false);
+  expect(T.traderCarries("gold")).toBe(true);
+});
+
+Then("it is fed by the castle and food system", (s) => {
+  // trade has no food mechanic: entering the city adds nothing but collections and deposits
+  const t = caravan(s, "France", { purse: 2 });
+  const r = T.enterProvince(W(s), t, s.province);
+  expect(Object.keys(r).sort()).toEqual(["collected", "deposited", "entered", "fee", "metEnemy"]);
+});
+
+Given(/^the province "([^"]+)" (is a stop of a French caravan's route|was passed by a trader \d+ months ago|was last passed by a trader \d+ months ago|has never seen a trader)$/, (s, p: string, how: string) => {
+  const a = /(\d+) months/.exec(how)?.[1];
+  const w = W(s);
+  w.month = 24;
+  city(s, p, "France");
+  if (how.startsWith("is a stop")) {
+    city(s, "Troyes", "France");
+    T.setRoute(w, "France", caravan(s, "France").id, ["Troyes", p]);
+  } else if (a) T.province(w, p).lastPassed = w.month - Number(a);
+  s.province = p;
+});
+
+When("a building there buys a load of {string}", (s, ware: string) => {
+  s.price = T.materialPrice(ware, T.touchedByTrade(W(s), s.province));
+});
+
+Then("it pays {float} gold", (s, gold: number) => {
+  near(s.price, gold, 4);
+});
+
+Given("silver is worth {int} gold a load", (s, gold: number) => {
+  expect(T.pricePerLoad("silver", { silverFlood: !!s.silverFlood })).toBe(gold);
+});
+
+When("the event tree's silver flood happens", (s) => {
+  s.silverFlood = true;
+});
+
+Given(/^the province "([^"]+)" grows (\d+) grain this year and its people eat (\d+)$/, (s, _p: string, made: string, eaten: string) => {
+  s.made = Number(made);
+  s.eaten = Number(eaten);
+});
+
+Given(/^its food store is (half full|full|empty)$/, (s, store: string) => {
+  s.store = store;
+});
+
+Then(/^(\d+) grain counts toward goods value$/, (s, n: string) => {
+  const surplus = T.foodSurplus(s.made, s.eaten);
+  expect(surplus).toBe(Number(n));
+  expect(T.goodsValue([{ ware: "grain", loads: s.made }], { grain: surplus })).toBe(Number(n) * T.pricePerLoad("grain"));
+});
+
+// The ratio (D-TRADE-9, D-TRADE-15)
+
+function gainConditions(text: string): T.GainConditions {
+  const c: { -readonly [K in keyof T.GainConditions]: T.GainConditions[K] } = {};
+  const other: number[] = [];
+  for (const part of text.split(/, | and /)) {
+    const homeless = /^(\d+) % homeless$/.exec(part);
+    const access = /^a trade_access of ([−-][\d.]+)$/.exec(part);
+    const peace = /^peace for (\d+) years$/.exec(part);
+    if (part === "a customs officer") c.customsOfficer = true;
+    else if (part === "a better road" || part === "a road one step better than its neighbours") c.betterRoad = true;
+    else if (part === "riots") c.riots = true;
+    else if (part === "an enemy army") c.enemyArmyOrSiege = true;
+    else if (homeless) c.homelessShare = Number(homeless[1]) / 100;
+    else if (access) other.push(minus(access[1]!));
+    else if (peace) c.peaceYears = Number(peace[1]);
+    else throw new Error(`Unknown ratio condition ${part}`);
+  }
+  if (other.length) c.otherShares = other;
+  return c;
+}
+
+const condition = String.raw`(?:a customs officer|a road one step better than its neighbours|a better road|peace for \d+ years|riots|\d+ % homeless|a trade_access of [−-][\d.]+|an enemy army)`;
+Given(new RegExp(String.raw`^the province "([^"]+)" has (?!(?:riots|\d+ % homeless)$)(${condition}(?:(?:, | and )${condition})*)$`), (s, p: string, text: string) => {
+  s.province = p;
+  s.gainConditions = gainConditions(text);
+});
+
+Then(/^its ratio gain is changed by ([+−-]?\d+) %$/, (s, change: string) => {
+  const conds: T.GainConditions = { ...(s.ground ?? {}), ...(s.gainConditions ?? {}) };
+  const factor = T.ratioGainFactor(conds);
+  expect(Math.round((factor - 1) * 100)).toBe(minus(change.replace("+", "")));
+  // and the same through a province of the world
+  const w = W(s);
+  const p = city(s, s.province ?? "Dijon", "France", {
+    customsOfficer: !!conds.customsOfficer,
+    betterRoad: !!conds.betterRoad,
+    peaceYears: conds.peaceYears ?? 0,
+    riots: !!conds.riots,
+    homelessShare: conds.homelessShare ?? 0,
+    enemyArmy: !!conds.enemyArmyOrSiege,
+  });
+  for (const share of conds.otherShares ?? []) T.applyTradeAccess(w, p.id, share, 12);
+  near(T.gainFactor(w, p), factor, 6);
+});
+
+Given(/^the province "([^"]+)" has a "([^"]+)" and its neighbours have an? (\w+) and an? (\w+)$/, (s, p: string, own: string, a: string, b: string) => {
+  s.province = p;
+  s.betterRoad = T.betterRoadThanNeighbours(own as T.RoadStep, [a as T.RoadStep, b as T.RoadStep]);
+});
+
+Then(/^"([^"]+)" (has|lacks) the better-road bonus$/, (s, _p: string, has: string) => {
+  expect(s.betterRoad).toBe(has === "has");
+});
+
+Given(/^it has (nothing more|a landmark giving \+\d+ % traders passing|a pilgrimage shrine whose pilgrims count as traders passing|an owner whose heritage gives \w+ \+\d+)$/, (s, effect: string) => {
+  const landmark = /^a landmark giving \+(\d+)/.exec(effect)?.[1];
+  const heritage = /heritage gives (\w+) \+(\d+)$/.exec(effect);
+  const lever = heritage?.[1];
+  const n = heritage?.[2];
+  const p = T.province(W(s), s.province);
+  if (landmark) p.gainShare = Number(landmark) / 100;
+  else if (effect.startsWith("a pilgrimage shrine")) p.pilgrimShrine = true;
+  else if (lever) setLever(s, p.owner!, lever, Number(n));
+});
+
+// Research (TRADE-085..090)
+
+Then(
+  /^(camel caravans can be founded and bandits strike half as often|collections are 10 % higher|traders may deposit abroad|trade ships' Indian Ocean storm losses are halved|the yearly fair can be built and every market serves 2 more visits a month|overseas trading posts count as cities and can found traders|trade ships cost 25 % less to buy|half the purse of a lost ship is refunded|every known province's trade value and ratio is visible|trade ships' hold is 0\.5 higher|steamer trade ships can be used|land traders move faster, as armies do)$/,
+  (s, effect: string) => {
+    const w = W(s);
+    const c: string = s.country;
+    const inv = T.country(w, c).inventions;
+    const none = new Set<string>();
+    switch (effect) {
+      case "camel caravans can be founded and bandits strike half as often":
+        expect(T.mayFoundCamelCaravan(inv, "desert")).toBe(true);
+        near(T.banditChance({ riots: true }, inv), T.banditChance({ riots: true }, none) / 2, 6);
+        break;
+      case "collections are 10 % higher":
+        near(T.collectFactor(w, c), 1.1, 6);
+        break;
+      case "traders may deposit abroad": {
+        city(s, "Constantinople", "Ottoman", { size: "city", buildings: ["counting_house"] });
+        const t = caravan(s, c, { purse: 10, home: c });
+        expect(T.enterProvince(w, t, "Constantinople").deposited).toBeGreaterThan(0);
+        break;
+      }
+      case "trade ships' Indian Ocean storm losses are halved":
+        expect(T.tradeShipStormFactor("Arabian Sea", inv)).toBe(0.5);
+        expect(T.tradeShipStormFactor("Adriatic", inv)).toBe(1);
+        expect(T.tradeShipStormFactor("Arabian Sea", none)).toBe(1);
+        break;
+      case "the yearly fair can be built and every market serves 2 more visits a month":
+        expect(T.mayBuildYearlyFair(inv)).toBe(true);
+        expect(T.servedVisits("weekly_market", inv)).toBe(T.servedVisits("weekly_market") + 2);
+        break;
+      case "overseas trading posts count as cities and can found traders":
+        expect(T.mayFoundIn({ market: null, tradingPost: true }, inv)).toBe(true);
+        expect(T.mayFoundIn({ market: null, tradingPost: true }, none)).toBe(false);
+        expect(T.isTradeCity({ size: "village", market: null, tradingPost: true })).toBe(true);
+        break;
+      case "trade ships cost 25 % less to buy":
+        expect(T.tradeShipCostFactor(inv)).toBe(0.75);
+        break;
+      case "half the purse of a lost ship is refunded": {
+        const ship = T.addTrader(w, { id: "lost", kind: "carrack", owner: c, home: c, purse: 10 });
+        expect(T.stormLoss(w, ship)).toBe(5);
+        break;
+      }
+      case "every known province's trade value and ratio is visible":
+        T.addProvince(w, "Milan", { owner: "Milan" });
+        expect(T.seesTrade(w, c, "Milan")).toBe(true);
+        break;
+      case "trade ships' hold is 0.5 higher":
+        near(T.kindStats("carrack", inv).hold, T.kindStats("carrack").hold + 0.5, 6);
+        break;
+      case "steamer trade ships can be used":
+        expect(T.mayUseSteamers(inv)).toBe(true);
+        expect(T.mayUseSteamers(none)).toBe(false);
+        break;
+      case "land traders move faster, as armies do":
+        // B2 makes armies faster; traders' step days follow the army's days
+        expect(T.traderStepDays("pack_caravan", 3, "farmland")).toBeLessThan(T.traderStepDays("pack_caravan", 4, "farmland"));
+        expect(T.tradeEffectOf("B2")).not.toBeNull();
+        break;
+    }
+    expect(inv.size).toBeGreaterThan(0);
+  },
+);
+
+// Screens (TRADE-093..098, D-TRADE-16)
+
+When(/^the map is at (world|region|local) zoom$/, (s, zoom: "world" | "region" | "local") => {
+  s.shown = T.tradeAtZoom(zoom);
+});
+
+Then(/^trade shows (.+)$/, (s, shown: string) => {
+  const list: readonly string[] = s.shown;
+  expect([list.join(", "), list.join(" and ")]).toContain(shown);
+});
+
+Given(/^the player taps "([^"]+)", a (\w+) city with a market$/, (s, p: string, adj: string) => {
+  const c = countryOfAdjective(adj);
+  city(s, p, c);
+  T.country(W(s), c).treasury = 100;
+  s.country = c;
+  s.city = p;
+});
+
+When(/^the player chooses Trade, then Found a trader, then "([^"]+)"$/, (s, kind: string) => {
+  const k = kind.replace(/ /g, "_") as T.LandKind;
+  expect(T.foundMenu(W(s), s.country, s.city)).toContain(k);
+  s.found = T.foundTrader(W(s), s.country, "founded", k, s.city, [{ building: "weekly_market", class: "market_folk", slots: 500, filled: 500 }]);
+});
+
+Then(/^a (pack caravan|camel caravan|wagon train) is founded in "([^"]+)"$/, (s, kind: string, p: string) => {
+  expect(s.found.ok).toBe(true);
+  expect(s.found.trader.kind).toBe(kind.replace(/ /g, "_"));
+  expect(s.found.trader.home).toBe(p);
+});
+
+Given("the player taps a trader and chooses Route", (s) => {
+  for (const p of ["Troyes", "Dijon"]) city(s, p, "France");
+  city(s, "Geneva", "Savoy", { market: "yearly_fair" });
+  s.trader = caravan(s, "France");
+});
+
+When(/^the player taps "([^"]+)", "([^"]+)" and then "([^"]+)" again$/, (s, a: string, b: string, c: string) => {
+  s.taps = T.routeByTaps([a, b, c]);
+});
+
+Then(/^the route has the stops "([^"]+)" and "([^"]+)"$/, (s, a: string, b: string) => {
+  expect(s.taps.stops).toEqual([a, b]);
+});
+
+Then("the preview updated after each tap", (s) => {
+  expect(s.taps.previews).toBe(s.taps.stops.length);
+});
+
+Then("the route is set on Confirm", (s) => {
+  expect(s.taps.finished).toBe(true);
+  expect(T.setRoute(W(s), "France", s.trader.id, s.taps.stops).ok).toBe(true);
+  expect(s.trader.route.stops).toEqual(s.taps.stops);
+});
+
+When("the player opens the Trade screen", (s) => {
+  const w = W(s);
+  city(s, "Troyes", "France");
+  city(s, "Bordeaux", "France", { port: true });
+  caravan(s, "France", { id: "Caravan of Troyes", name: "Caravan of Troyes" });
+  caravan(s, "France", { id: "Caravan of Dijon", name: "Caravan of Dijon", home: "Dijon" });
+  T.addTrader(w, { id: "Saint-Michel", kind: "carrack", owner: "France", home: "Bordeaux" });
+  const expected: Record<string, number> = { "Caravan of Troyes": 1.2, "Caravan of Dijon": 2.4, "Saint-Michel": 3.1 };
+  s.rows = T.tradeScreen(w, "France", (t) => expected[t.id] ?? 0, (t) => (t.route ? [] : ["no route"]));
+});
+
+Then("it lists every trader and trade ship with kind, route, purse, last deposit, expected gold a month and problems", (s) => {
+  const rows: T.TradeScreenRow[] = s.rows;
+  expect(rows.map((r) => r.trader).sort()).toEqual(["Caravan of Dijon", "Caravan of Troyes", "Saint-Michel"]);
+  for (const r of rows) expect(Object.keys(r).sort()).toEqual(["expected", "kind", "lastDeposit", "problems", "purse", "route", "trader"]);
+  expect(T.tradeConfig.screens.trade_screen_columns).toEqual(["kind", "route", "purse", "last deposit", "expected gold a month", "problems"]);
+});
+
+Then("it can be sorted by gold a month", (s) => {
+  expect((s.rows as T.TradeScreenRow[]).map((r) => r.expected)).toEqual([3.1, 2.4, 1.2]);
+});
+
+function seaLane(s: Scenario, zone: string, owner: string, n: number): void {
+  const w = W(s);
+  if (!w.seaZones.has(zone)) w.seaZones.set(zone, { id: zone, enclosed: true, ports: [] });
+  T.country(w, owner).knownSeaZones.add(zone);
+  for (let i = 0; i < n; i++) {
+    const t = T.addTrader(w, { id: `${owner}-cog-${w.traders.size}`, kind: "cog_junk_dhow", owner, home: owner });
+    expect(T.sailThrough(w, t, zone).entered).toBe(true);
+  }
+}
+
+Given(/^(\d+) Venetian cogs and (\d+) Genoese cog sail through the "([^"]+)" this month$/, (s, v: string, g: string, zone: string) => {
+  seaLane(s, zone, "Venice", Number(v));
+  seaLane(s, zone, "Genoa", Number(g));
+});
+
+Given(/^(\d+) Venetian cogs? sails? through the "([^"]+)"$/, (s, n: string, zone: string) => {
+  seaLane(s, zone, "Venice", Number(n));
+});
+
+When("the month ends", (s) => {
+  s.changes = T.endOfMonth(W(s));
+});
+
+Then(/^the busiest sea lanes are the "([^"]+)" with (\d+) ships and the "([^"]+)" with (\d+)$/, (s, a: string, n: string, b: string, m: string) => {
+  expect(T.busiestSeaLanes(W(s))).toEqual([
+    { zone: a, ships: Number(n) },
+    { zone: b, ships: Number(m) },
+  ]);
+});
+
+Then("no sea zone has a trade ratio", (s) => {
+  const zones = [...W(s).seaZones.keys()];
+  expect((s.changes as T.RatioChange[]).filter((c) => zones.includes(c.province))).toEqual([]);
+  for (const z of zones) expect(W(s).provinces.has(z)).toBe(false);
 });

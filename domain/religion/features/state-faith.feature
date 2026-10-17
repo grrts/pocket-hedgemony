@@ -58,3 +58,23 @@ Feature: Changing the state faith
     And catholic is 2 % of its capital and of the realm
     Then the Palatinate may adopt "catholic"
     But it may not adopt "orthodox" this way
+
+  @RELG-068 @RELG-075
+  Scenario: Preachers after adopting a faith follow their sources
+    Given the country "Sweden" has the state faith "catholic" and 3 catholic preachers
+    And an event has granted "Sweden" 2 protestant preachers for 30 years
+    When "Sweden" adopts "protestant" and keeps the catholic houses
+    Then "Sweden" has 2 protestant preachers before any protestant house exists
+
+  @RELG-123
+  Scenario Outline: Taking a reformed faith
+    Given the country "<country>" has the state faith "<old>"
+    When "<country>" adopts "<new>"
+    Then the ruler of "<country>" <takes> a reformed faith for government's reforms
+
+    Examples:
+      | country | old        | new        | takes        |
+      | Prussia | catholic   | protestant | takes        |
+      | England | catholic   | anglican   | takes        |
+      | Sweden  | protestant | catholic   | does not take |
+      | Kazan   | sunni      | orthodox   | does not take |

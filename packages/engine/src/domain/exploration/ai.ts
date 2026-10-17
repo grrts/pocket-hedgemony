@@ -5,8 +5,8 @@
  */
 import { isWater, type MapGraph } from "../world-map/index.ts";
 import { isCharted, type ChartedMap } from "./charts.ts";
-import { zonesToNearest } from "./colonies.ts";
-import { explorationConfig as cfg } from "./config.ts";
+import { averageFounding, zonesToNearest } from "./colonies.ts";
+import { explorationConfig as cfg, type AggressionLevel } from "./config.ts";
 
 /** Favours expansion by sea: its catalogue personality names an expansion mode by sea. */
 export function favoursSea(expansionModes: readonly string[]): boolean {
@@ -44,4 +44,12 @@ export function planExploration(
   }
   colonyTargets.sort((a, b) => a.zones - b.zones || a.province.localeCompare(b.province));
   return { voyageTargets: chartEdge(g, m), colonyTargets };
+}
+
+/**
+ * Colony stores the AI loads for a colony that rolled a level: the average food
+ * the level needs, times the margin (EXPL-062, D-EXPL-13; provisional 1.25).
+ */
+export function aiColonyStores(level: AggressionLevel): number {
+  return Math.ceil(averageFounding(level).food * cfg.ai.stores_margin);
 }

@@ -79,3 +79,22 @@ Feature: Routes
       | the path from "Dijon" to "Geneva" closes and none exists    | skips "Geneva"                                             |
       | "Geneva" is put under quarantine                            | skips "Geneva", which shows red; the turn report says so once |
       | every stop is closed                                        | goes to the nearest own city, deposits and waits for orders |
+
+  @TRADE-121
+  Scenario Outline: What a country can see of trade
+    Given the province "<province>" is <how> "France"
+    When "France" looks at its trade value and ratio
+    Then "France" <sees> them
+
+    Examples:
+      | province | how                                              | sees        |
+      | Troyes   | a province of                                    | sees        |
+      | Geneva   | a province one of whose caravans entered, of     | sees        |
+      | Milan    | a province no trader entered, far from           | doesn't see |
+      | Milan    | a province known to T13, far from                | sees        |
+
+  @TRADE-121 @TRADE-055
+  Scenario: The preview counts provinces it cannot see as nothing
+    Given a French caravan plans a loop through "Milan", which "France" cannot see
+    When the player sets the route
+    Then the preview expects nothing from "Milan"

@@ -15,7 +15,10 @@
         "set_ratio": 0,
         "closed": true
       }
-    }
+    },
+    "modifiers_combine": "add",
+    "better_road_than": "every_neighbour",
+    "shrine_pilgrims_passing": 1
   },
   "value": {
     "months_per_year": 12,
@@ -147,7 +150,9 @@
       "city",
       "great_city"
     ],
-    "trading_post_is_city": true
+    "trading_post_is_city": true,
+    "silver_after_flood": 6,
+    "$comment_food_surplus": "D-TRADE-19: food surplus = food made − food the province's people eat that year, never below 0; a full store does not change it."
   },
   "collect": {
     "when": "on_enter",
@@ -172,7 +177,8 @@
   },
   "tolls": {
     "none": 0,
-    "low": 0.2
+    "low": 0.2,
+    "high": 0.5
   },
   "danger": {
     "bandit_chance_per_month": 0.05,
@@ -186,7 +192,8 @@
     "t11_lost_purse_refund": 0.5
   },
   "upkeep": {
-    "unpaid_months_to_lose": 6
+    "unpaid_months_to_lose": 6,
+    "$comment": "D-TRADE-11: land traders and trade ships alike are lost after 6 unpaid months."
   },
   "land_traders": {
     "pack_caravan": {
@@ -267,40 +274,35 @@
   },
   "sea_traders": {
     "cog_junk_dhow": {
+      "naval_type": "cog",
       "hold": 2.0,
-      "purse": 30,
-      "upkeep": 1
+      "purse": 30
     },
     "galley": {
+      "naval_type": "galley",
       "hold": 2.0,
       "purse": 25,
-      "upkeep": 2,
       "enclosed_seas_only": true
     },
-    "caravel": {
-      "hold": 1.0,
-      "purse": 20,
-      "upkeep": 1
-    },
     "carrack": {
+      "naval_type": "carrack",
       "hold": 3.0,
-      "purse": 50,
-      "upkeep": 1.5
+      "purse": 50
     },
     "galleon": {
+      "naval_type": "galleon",
       "hold": 3.0,
-      "purse": 60,
-      "upkeep": 2
+      "purse": 60
     },
     "fluyt": {
+      "naval_type": "fluyt",
       "hold": 4.0,
-      "purse": 70,
-      "upkeep": 1.5
+      "purse": 70
     },
     "steamer": {
+      "naval_type": "steamer",
       "hold": 6.0,
       "purse": 150,
-      "upkeep": 3,
       "needs_coal_port": true
     }
   },
@@ -309,7 +311,16 @@
     "t2_collect_bonus": 0.1,
     "t6_extra_served_visits": 2,
     "t9_ship_cost_factor": 0.75,
-    "t5_indian_ocean_storm_factor": 0.5
+    "t5_indian_ocean_storm_factor": 0.5,
+    "t6_unlocks_yearly_fair": true,
+    "t5_indian_ocean_zones": [
+      "Arabian Sea",
+      "Bay of Bengal",
+      "Gulf of Aden",
+      "Red Sea",
+      "Persian Gulf",
+      "Indian Ocean"
+    ]
   },
   "peace_terms": {
     "open_the_roads_years": 10
@@ -447,6 +458,161 @@
     "ship_reach_sea_zones": 40,
     "found_margin": 1.25,
     "reroute_every_months": 12,
-    "dismiss_after_losing_months": 12
-  }
+    "dismiss_after_losing_months": 12,
+    "near_front_provinces": 2
+  },
+  "$comment_sea_traders": "D-TRADE-5: a ship trades only if naval gives its type a hold and purse (the caravel does not); its upkeep is naval's ship upkeep.",
+  "found": {
+    "needs": "market_or_trading_post_with_T8",
+    "$comment": "D-TRADE-2: an own city with any market step (weekly market or better), or a trading post once T8 is known."
+  },
+  "visibility": {
+    "$comment": "D-TRADE-13: a country sees the trade value and ratio of its own provinces and of every province its traders entered (last seen values); with T13 every known province, current values. The route preview counts unseen provinces as 0.",
+    "t13_sees_all": true
+  },
+  "hubs": {
+    "$comment": "D-TRADE-17: a hub is the province or sea zone it is named after (two for bruges_antwerp, the lower Volga for volga); labels for event triggers only. Provisional.",
+    "alexandria": {
+      "provinces": [
+        "Alexandria"
+      ],
+      "sea_zones": []
+    },
+    "amsterdam": {
+      "provinces": [
+        "Amsterdam"
+      ],
+      "sea_zones": []
+    },
+    "malacca_strait": {
+      "provinces": [
+        "Malacca"
+      ],
+      "sea_zones": [
+        "Strait of Malacca"
+      ]
+    },
+    "venice": {
+      "provinces": [
+        "Venice"
+      ],
+      "sea_zones": []
+    },
+    "genoa": {
+      "provinces": [
+        "Genoa"
+      ],
+      "sea_zones": []
+    },
+    "seville": {
+      "provinces": [
+        "Seville"
+      ],
+      "sea_zones": []
+    },
+    "bruges_antwerp": {
+      "provinces": [
+        "Bruges",
+        "Antwerp"
+      ],
+      "sea_zones": []
+    },
+    "tabriz": {
+      "provinces": [
+        "Tabriz"
+      ],
+      "sea_zones": []
+    },
+    "aleppo": {
+      "provinces": [
+        "Aleppo"
+      ],
+      "sea_zones": []
+    },
+    "volga": {
+      "provinces": [
+        "Astrakhan",
+        "Kazan"
+      ],
+      "sea_zones": []
+    }
+  },
+  "event_mapping": {
+    "trade_index_reference_per_year": 100,
+    "$comment": "D-TRADE-17: trade_index = trade income over the last 12 months ÷ 100 gold × 100 for every country (provisional).",
+    "hub_window_months": 12
+  },
+  "heritage_levers": {
+    "$comment": "X-6: trade_balance_pct and traders_passing_pct are a percentage on ratio gain in the realm's provinces; trader_gain_pct a percentage on each deposit; trader_count extra starting traders.",
+    "trade_balance_pct": "ratio_gain",
+    "traders_passing_pct": "ratio_gain",
+    "trader_gain_pct": "deposit",
+    "trader_count": "starting_traders"
+  },
+  "materials": {
+    "no_route_markup": 0.25,
+    "route_memory_months": 12,
+    "$comment": "X-6: materials at the ware's price per load, 25 % dearer where no trade route touches the province: no trader route has it as a stop and no trader passed it in the last 12 months."
+  },
+  "screens": {
+    "zoom": {
+      "world": [
+        "provinces coloured by trade ratio",
+        "the busiest roads and sea lanes"
+      ],
+      "region": [
+        "thicker roads with more traders",
+        "trader icons with a purse bar",
+        "a coin on market cities"
+      ],
+      "local": [
+        "caravans on the road tiles",
+        "barges on the river",
+        "ships in the harbour"
+      ]
+    },
+    "trade_screen_columns": [
+      "kind",
+      "route",
+      "purse",
+      "last deposit",
+      "expected gold a month",
+      "problems"
+    ],
+    "danger": {
+      "none": 0,
+      "low": 0.05
+    }
+  },
+  "_provisional": [
+    "ratio.gain_per_trader",
+    "ratio.decay_share",
+    "ratio.sea_lane_trader_weight",
+    "ratio.modifiers",
+    "ratio.shrine_pilgrims_passing",
+    "value.price_per_load",
+    "value.silver_after_flood",
+    "value.building_weights",
+    "value.serves_without_market",
+    "collect.visit_share",
+    "collect.foreign_market_fee",
+    "deposit.bills_of_exchange_fee",
+    "route.toll_counts_as_days",
+    "tolls.low",
+    "tolls.high",
+    "danger",
+    "upkeep.unpaid_months_to_lose",
+    "land_traders",
+    "sea_traders",
+    "s2_hold_bonus",
+    "research",
+    "peace_terms.open_the_roads_years",
+    "effects",
+    "start.traders_by_trade_access",
+    "start.warmup_months",
+    "ai",
+    "hubs",
+    "event_mapping.trade_index_reference_per_year",
+    "materials.no_route_markup"
+  ]
 }

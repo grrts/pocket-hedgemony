@@ -23,6 +23,8 @@ export interface ColonialGovernor {
   name: string;
   where: GovernorWhere;
   alive: boolean;
+  /** Years of age: he is a person who ages and can die (EXPL-025). */
+  age: number;
 }
 
 export interface ColonialOffice {
@@ -42,14 +44,19 @@ export function slotsUsed(o: ColonialOffice): number {
 
 export type HireRefusal = "no_colonial_unlock" | "no_free_slot";
 
+/** What a colonial governor costs: gold once when hired and a yearly wage (EXPL-025, D-EXPL-6; provisional). */
+export function governorCost(): { gold: number; wagePerYear: number } {
+  return { gold: cfg.governor_hire_gold, wagePerYear: cfg.governor_wage_per_year };
+}
+
 /**
  * Hires a colonial governor who waits in a port of the country (EXPL-024,
- * EXPL-027, EXPL-030). His gold and wage are not given (OQ-EXPL-6).
+ * EXPL-027, EXPL-030); he is paid for as `governorCost` says (D-EXPL-6).
  */
 export function hireGovernor(o: ColonialOffice, knows: ReadonlySet<string>, port: string, id: string, name = id): { ok: true; governor: ColonialGovernor } | { ok: false; reason: HireRefusal } {
   if (!hasColonialUnlock(knows)) return { ok: false, reason: "no_colonial_unlock" };
   if (slotsUsed(o) >= governorSlots(knows)) return { ok: false, reason: "no_free_slot" };
-  const governor: ColonialGovernor = { id, name, where: { kind: "port", port }, alive: true };
+  const governor: ColonialGovernor = { id, name, where: { kind: "port", port }, alive: true, age: cfg.governor_age_when_hired };
   o.governors.push(governor);
   return { ok: true, governor };
 }
@@ -68,11 +75,46 @@ export function dismissGovernor(o: ColonialOffice, id: string): boolean {
   return true;
 }
 
-/** He dies of old age: his slot frees (EXPL-028). What becomes of his colony is open (OQ-EXPL-10). */
+/** A year passes: every colonial governor is a year older (EXPL-025). */
+export function governorsAge(o: ColonialOffice): void {
+  for (const g of o.governors) g.age += 1;
+}
+
+/** He dies of old age: his slot frees (EXPL-028). A colony he was founding is lost with him (D-EXPL-10): see `governorDies`. */
 export function governorDiesOfAge(o: ColonialOffice, id: string): ColonialGovernor {
   const g = release(o, id);
   g.alive = false;
   return g;
+}
+
+/**
+ * A colonial governor dies, of old age or at sea when his ship sinks: his slot
+ * frees, and a colony he was founding is lost as at progress 0 (EXPL-059, D-EXPL-10).
+ */
+export function governorDies(o: ColonialOffice, id: string, colony?: Colony): { governor: ColonialGovernor; event?: FoundingEvent } {
+  if (colony && colony.governor === id) {
+    const lost = colonyLost(o, colony);
+    return { governor: lost.governor, event: lost.event };
+  }
+  return { governor: governorDiesOfAge(o, id) };
+}
+
+/**
+ * The province gets an owner other than the founder while the colony is being
+ * founded: the colony is lost as at progress 0 (EXPL-060, D-EXPL-11).
+ */
+export function provinceTakenDuringFounding(o: ColonialOffice, c: Colony, newOwner: string): { event: FoundingEvent } | null {
+  if (newOwner === c.owner) return null;
+  return { event: colonyLost(o, c).event };
+}
+
+/**
+ * The places colonial range is measured from (EXPL-032, EXPL-065, D-EXPL-5): the
+ * country's own ports (lords' included, canoe landings counted), its subjects'
+ * ports and its founded colonies; never a colony still being founded.
+ */
+export function rangeAnchors(o: { ownPorts: readonly string[]; subjectPorts?: readonly string[]; foundedColonies?: readonly string[]; coloniesBeingFounded?: readonly string[] }): string[] {
+  return [...o.ownPorts, ...(o.subjectPorts ?? []), ...(o.foundedColonies ?? [])];
 }
 
 /** Any ship in his port may take him aboard; it carries no stores for him (EXPL-030). */
@@ -201,6 +243,11 @@ export function pressureMax(level: AggressionLevel): number {
   return aggressionRow(level).average_loss * cfg.pressure_roll_max_factor;
 }
 
+/** The locals' pressure this month: a whole number from 0 to the maximum, each equally likely (EXPL-063, D-EXPL-14). */
+export function rollPressure(rng: Rng, level: AggressionLevel): number {
+  return rng.int(pressureMax(level) + 1);
+}
+
 /** Average months from going ashore to 100 progress, and the colony food that needs (design table). */
 export function averageFounding(level: AggressionLevel): { loss: number; gain: number; months: number; food: number } {
   const loss = aggressionRow(level).average_loss;
@@ -235,7 +282,7 @@ export type FoundingEvent =
  */
 export function goAshore(o: ColonialOffice, governorId: string, province: string, aggression: AggressionLevel): { colony: Colony; events: FoundingEvent[] } {
   const g = o.governors.find((x) => x.id === governorId);
-  if (!g || g.where.kind !== "aboard") throw new Error(`${governorId} is not aboard a ship`);
+  if (!g || (g.where.kind !== "aboard" && g.where.kind !== "travelling_home")) throw new Error(`${governorId} is not aboard a ship`);
   g.where = { kind: "ashore", province };
   const colony: Colony = { province, owner: o.country, governor: g.id, progress: cfg.progress_start, aggression, food: 0 };
   return {
@@ -321,17 +368,24 @@ export function colonyLost(o: ColonialOffice, c: Colony): { governor: ColonialGo
 
 /**
  * *Abandon*: a ship of the founder in the colony's zone takes the governor
- * back aboard; his slot stays used until he is home (EXPL-049).
+ * back aboard; his slot stays used until he is home (EXPL-049). The colony food
+ * left ashore is lost, and the governor may go ashore elsewhere at once with
+ * *Found colony* (EXPL-061, D-EXPL-12).
  */
 export function abandonColony(o: ColonialOffice, c: Colony, shipInZone: { id: string } | null): { ok: true; event: FoundingEvent } | { ok: false; reason: "no_ship_in_zone" } {
   if (!shipInZone) return { ok: false, reason: "no_ship_in_zone" };
   const g = o.governors.find((x) => x.id === c.governor);
   if (!g) throw new Error(`no colonial governor ${c.governor}`);
   g.where = { kind: "travelling_home", ship: shipInZone.id };
+  c.food = 0;
   return { ok: true, event: { type: "ColonyAbandoned", province: c.province, country: c.owner } };
 }
 
-/** Colonies founded, as the event tree's `colonial_presence` counts them: one per ColonyFounded (EXPL-051). */
-export function colonialPresence(events: readonly FoundingEvent[], country: string): number {
-  return events.filter((e) => e.type === "ColonyFounded" && e.country === country).length;
+/**
+ * `colonial_presence` as the event tree counts it (EXPL-051, D-EXPL-8): one per
+ * founded colony, plus the trading posts the country holds; a colony still
+ * being founded does not count.
+ */
+export function colonialPresence(events: readonly FoundingEvent[], country: string, tradingPostsHeld = 0): number {
+  return events.filter((e) => e.type === "ColonyFounded" && e.country === country).length + tradingPostsHeld;
 }

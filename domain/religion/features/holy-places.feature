@@ -13,7 +13,7 @@ Feature: Holy places
       | place                   | faiths                                                  | holder        |
       | Rome                    | catholic                                                | Papal States  |
       | Jerusalem               | catholic, orthodox, oriental_christian, jewish, sunni, shia | Mamluk Sultanate |
-      | Mecca and Medina        | sunni, shia, ibadi                                      | Mamluk Sultanate |
+      | Mecca and Medina        | sunni, shia, ibadi                                      | Hejaz         |
       | Karbala and Najaf       | shia                                                    | Qara Qoyunlu  |
       | Constantinople          | orthodox                                                | Byzantium     |
       | Echmiadzin              | oriental_christian                                      | Qara Qoyunlu  |
@@ -53,9 +53,8 @@ Feature: Holy places
       | Tolerated  | has no  | do not come   |
       | Restricted | has     | do not come   |
 
-  @RELG-084 @open-question
+  @RELG-084
   Scenario Outline: Amritsar appears with the Panth
-    # OQ-RELG-16: 1577 or the 1580s
     Given the date is <year>
     And the event "sikh_panth_founded" <fired>
     Then "Amritsar" is <holy> a holy place
@@ -63,6 +62,7 @@ Feature: Holy places
     Examples:
       | year | fired         | holy |
       | 1570 | has fired     | not  |
+      | 1577 | has fired     | now  |
       | 1580 | has not fired | not  |
       | 1580 | has fired     | now  |
 
@@ -71,3 +71,15 @@ Feature: Holy places
     When the holy places are loaded
     Then the holy places of the Pope, the Ecumenical Patriarch, a Caliph's claim and the Dalai Lama (from 1578) are marked
     And religion gives church heads no rules of their own
+
+  @RELG-080 @RELG-126 @placeholder
+  Scenario Outline: The Temple of the Tooth follows the relic
+    # config key: holy_places.temple_of_the_tooth.moves
+    Given the date is <year>
+    Then the holy place "Temple of the Tooth" is in the province "<province>"
+
+    Examples:
+      | year | province |
+      | 1444 | Kotte    |
+      | 1591 | Kotte    |
+      | 1592 | Kandy    |

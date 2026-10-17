@@ -28,6 +28,18 @@ Feature: Event-tree trade stats
     When the trade rules are applied
     Then the trigger "trade_index >= 60" holds for "Venice"
 
+  @TRADE-106 @TRADE-125 @placeholder
+  Scenario Outline: trade_index against the reference of 100 gold a year
+    # config: event_mapping.trade_index_reference_per_year
+    Given the trade income of "<country>" over the last 12 months is <income> gold
+    When the trade rules are applied
+    Then its trade_index is <index>
+
+    Examples:
+      | country | income | index |
+      | Venice  | 240    | 240   |
+      | Hungary | 30     | 30    |
+
   @TRADE-107 @placeholder
   Scenario: trade_presence
     Given traders of "Holland" took 30 % of all collections in the Amsterdam hub's provinces over the last 12 months

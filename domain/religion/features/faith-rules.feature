@@ -29,9 +29,8 @@ Feature: What each faith does differently
     When "England" changes any faith policy
     Then the lord "Bishop of Durham" does not waver over it
 
-  @RELG-089 @placeholder @open-question
+  @RELG-089 @placeholder
   Scenario Outline: Hussites merge after the Reformation
-    # OQ-RELG-14: period end or 1620
     # config key: faith_rules.merges_into_protestant
     Given the Reformation period has ended
     And the province "<province>" has hussite people and <house>
@@ -84,10 +83,35 @@ Feature: What each faith does differently
       | Restricted | allowed |
       | Persecuted | refused |
 
-  @RELG-095 @placeholder @open-question
+  @RELG-095 @placeholder
   Scenario: Secular grows in factory towns
-    # OQ-RELG-15: factories condition missing from config
+    # config key: faith_rules.secular_state
     Given the date is 1860
     And the town "Lille" has factories, mass schooling and 2 schools
     Then "secular" gets 1 pull in "Lille"
     And "secular" has no houses
+
+  @RELG-089 @placeholder
+  Scenario Outline: When the Hussites merge
+    # config key: faith_rules.merges_into_protestant
+    Given the Reformation period <ends>
+    Then the Hussites merge in <year>
+
+    Examples:
+      | ends            | year |
+      | ends in 1610    | 1610 |
+      | ends in 1648    | 1620 |
+      | has not yet ended | 1620 |
+
+  @RELG-095 @placeholder
+  Scenario Outline: No secular pull without factories and mass schooling
+    # config key: faith_rules.secular_state
+    Given the date is <year>
+    And the town "Lille" has <factory>, <schooling> and 2 schools
+    Then "secular" gets no pull in "Lille"
+
+    Examples:
+      | year | factory       | schooling            |
+      | 1860 | no factory    | mass schooling       |
+      | 1860 | factories     | no mass schooling    |
+      | 1840 | factories     | mass schooling       |

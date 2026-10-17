@@ -57,7 +57,7 @@ Hold slows change but never stops it. A province where one faith has three house
 
 *Worked example: East Bengal, 1444 to 1700.* East Bengal is 70 % hindu, 25 % asian_traditional and 5 % sunni, with 2 hindu temples and a sunni lord, under a sunni ruler. The forest is cleared and a mosque is granted on each of 3 new field tiles. Now sunni has 3.5 pull (three mosques and the lord), hindu 2 (two temples) and asian_traditional 1 (its sacred places). The mix settles toward sunni 54 %, hindu 31 % and asian_traditional 15 %. Once asian_traditional falls below a quarter it loses its sacred-places pull, and by about 1700 East Bengal is mostly sunni.
 
-**Small and new faiths.** A faith under 1 % with no house of its own is removed. A fourth faith arriving replaces the smallest of the three, but only if it is larger.
+**Small and new faiths.** A faith under 1 % with no house of its own is removed. A fourth faith arriving gets in only if it is larger than the smallest of the three. Then the smallest of the four joins the province's majority faith, so nobody simply vanishes. Tongues work the same way.
 
 **Hidden believers.** For 100 years after a Persecuted faith's houses in a province are closed, that faith stays at 2 % or more there, unless an Inquisition removes the floor. If catholic is Persecuted in Japan and its houses in Nagasaki were closed 40 years ago, it stays at 2 %; after 100 years, or with an Inquisition, it may fall lower.
 
@@ -124,7 +124,7 @@ A policy change takes effect at the next New Year. Each step toward Persecuted r
 
 *Worked example: the Alhambra decree.* In 1492, with jewish Persecuted in Castile and the Ottomans the nearest realm that tolerates it, Castile expels the jewish faith. Within a year 70 % leave for the Ottomans, Castile takes their houses and property gold, the *Persecuted* grievance ends, and every province where they lived gets *Bloodshed*.
 
-**The Inquisition** is a decision only for monarchies whose Established faith is catholic. While it runs it costs gold upkeep each year, removes the hidden-believer floor, adds +1 state-faith pull in every province with a Restricted or Persecuted community, and makes 1 % of the scholars and craftsmen in those provinces leave each year. It sets the flag `inquisition_established`, and you can close it again.
+**The Inquisition** is a decision only for realms ruled by a house (feudal realm, diet monarchy, household realm, bureaucratic empire, elective monarchy, absolute monarchy or constitutional monarchy) whose Established faith is catholic. While it runs it costs gold upkeep each year, removes the hidden-believer floor, adds +1 state-faith pull in every province with a Restricted or Persecuted community, and makes 1 % of the scholars and craftsmen in those provinces leave each year. It sets the flag `inquisition_established`, and you can close it again.
 
 ### Lords and faith
 
@@ -166,21 +166,21 @@ Holy places are a fixed list of named provinces, each with its faiths and its 14
 |---|---|---|
 | Rome | catholic | Papal States |
 | Jerusalem | catholic, orthodox, oriental_christian, jewish, sunni, shia | Mamluk Sultanate |
-| Mecca and Medina | sunni, shia, ibadi | Mamluk Sultanate |
+| Mecca and Medina | sunni, shia, ibadi | Hejaz (the Sharifs, not their Mamluk overlord) |
 | Karbala and Najaf | shia | Qara Qoyunlu |
 | Constantinople | orthodox | Byzantium |
 | Echmiadzin | oriental_christian | Qara Qoyunlu |
 | Aksum | oriental_christian | Ethiopia |
 | Varanasi | hindu | Jaunpur |
 | Lhasa | vajrayana | Tibet |
-| Temple of the Tooth | theravada | Kotte |
+| Temple of the Tooth | theravada | Kotte, then Kandy from 1592 |
 | Mount Wutai | mahayana | Ming |
 | Qufu | confucian_ritual | Ming |
 | Ise | shinto | Japan |
 | Santiago de Compostela | catholic | Castile |
 | Bodh Gaya | theravada, mahayana, vajrayana | Jaunpur |
 
-Amritsar appears as a holy place only once `sikh_panth_founded` has fired (from 1577).
+Amritsar appears as a holy place only once the founding of the Sikh Panth has happened, not before 1577. A holy place is always held by whoever owns its province.
 
 Holding a holy place of your own faith gives +1 preacher, the pilgrimage shrine there and 200 more traders passing through each year. Holding one of a faith you don't share lets every ruler of that faith use *Defend the faith* against you with that province as the prize. Pilgrims still come if you tolerate their faith and keep a house of it there. The holy places where church heads sit (the Pope, the Ecumenical Patriarch, a Caliph's claim, the Dalai Lama from 1578) are marked, but church heads have no rules here yet.
 
@@ -191,14 +191,14 @@ Holding a holy place of your own faith gives +1 preacher, the pilgrimage shrine 
 | Catholic | Clergy don't marry; taking over monastic land pays double; the Inquisition |
 | Protestant | +0.5 pull for each press and each school in the province; clergy marry |
 | Anglican (state faith) | The crown heads the church: clergy lords never waver over faith policy |
-| Hussite | Kin of protestant once the Reformation starts; at the end of the Reformation period (by 1620) its shares merge into protestant, or into catholic where there is no protestant house |
+| Hussite | Kin of protestant once the Reformation starts; at the end of the Reformation period or in 1620, whichever comes first, its shares merge into protestant, or into catholic where there is no protestant house |
 | Sunni, shia, ibadi (ruler) | Protected communities: a served Restricted community gets no *Wrong faith* even as the majority |
 | Hindu | A step-3 temple draws 150 traders a year |
 | Sikh | Each gurdwara shelters 1,000 homeless, like an almshouse |
 | Theravada | Each house of worship gives 20 student seats, like a small temple school |
 | Vajrayana | A step-3 house or monastery can be granted as a lord's land, its abbot being the lord |
 | Orthodox | Taking over monastic land pays double |
-| Secular | No houses; a secular state may only Tolerate or Restrict other faiths; after 1850, +0.5 pull from each school in towns with factories and mass schooling |
+| Secular | No houses; a secular state may only Tolerate or Restrict other faiths; after 1850, +0.5 pull from each school in a town with a factory, once the realm has mass schooling |
 
 ### Faith waves and events
 
@@ -329,34 +329,26 @@ All numbers are **first-pass placeholders** in `religion.yaml`. Four defaults we
 | `ai` | build below 0.5, tolerate above 0.20, adopt above 0.60 |
 | `start` | ruler's faith 0.15, community 0.05, 8 region overrides |
 
+## Settled details
+
+- A community of another faith only takes the *Wrong faith* grievance once it is a third of the province or more.
+- Expelling a faith moves 70 % of its people, and the expulsion of the Moriscos does the same.
+- Court conversion to Islam is offered when your capital province is a third Sunni. Conversion to a Christian faith is offered when 15 % of the realm is Protestant.
+- The province card shows exactly what the rules give. In Rouen that is Catholic 3.5, Protestant 5 and Jewish 1, moving about 0.3 points a year toward Protestant.
+- Changing to Protestant, Anglican or Hussite from any other faith counts as "the ruler takes a reformed faith".
+- When a faith is Persecuted, you choose once for the whole realm whether its houses are closed or taken over.
+- Lords of a faith you tolerate waver once, when you set Tolerated while the faith is 10 % or more of the realm. Later growth moves no lord.
+- After you adopt a faith, all old-faith preachers leave. New preachers come from the new faith's houses as they appear, while its holy places and events count at once.
+- Preachers come from houses, monasteries, religious schools, holy places and events. No invention gives them.
+- A few records with no faith start with a fixed one: the Wokou are Mahayana, the Guanahatabey follow an indigenous faith, and the Druze of the Maan and the Yazidi communities count as Sunni.
+- Some numbers are provisional and may still be tuned: Inquisition upkeep 10 gold a year, preacher upkeep 1 gold a year, an unwelcome preacher expelled with a 25 % chance a year, take-over cost 20 gold per step, and at most 8 waves at once.
+
 ## Still open
 
-- **OQ-RELG-1**: *Wrong faith* starts at a third; confirm unserved communities from 10 % to a third take no grievance.
-- **OQ-RELG-2**: hold assumes shares as fractions; the East Bengal "target" is the settled point, not the yearly formula's target.
-- **OQ-RELG-3**: the design's own province card example doesn't match the rules. Which numbers are right?
-- **OQ-RELG-4**: expulsion moves 70 %, but the Moriscos event moves 90 %.
-- **OQ-RELG-5**: court conversion to Islam tests the realm's share, while the note and Adopt rule speak of the capital.
-- **OQ-RELG-6**: config has a community-founds-its-own-house rule with no design text.
-- **OQ-RELG-7**: several config-only numbers (Inquisition upkeep, preacher upkeep, expel chance, take-over gold, max waves) have no design text.
-- **OQ-RELG-8**: which of the 27 government forms count as monarchies for the Inquisition.
-- **OQ-RELG-9**: which faith changes count as government's "the ruler takes a reformed faith".
-- **OQ-RELG-10**: changes asked of province stats, country stats, rebellions, warfare and the event tree aren't adopted yet.
-- **OQ-RELG-11**: the religion events use stats such as stability and legitimacy that the game may not have.
-- **OQ-RELG-12**: a few catalogue texts and records don't map to a faith.
-- **OQ-RELG-13**: is the close-or-take-over choice for the whole realm or per Persecuted faith?
-- **OQ-RELG-14**: if the Reformation period ends after 1620, which date wins for the Hussite merge?
-- **OQ-RELG-15**: secular pull needs factories in the design but only mass schooling in config.
-- **OQ-RELG-16**: Amritsar's start date, and how the Temple of the Tooth moves to Kandy.
-- **OQ-RELG-17**: a fourth faith replaces the smallest only if larger, a fourth tongue always does.
-- **OQ-RELG-18**: buildings speaks of monks as missionaries; religion uses preachers and policies.
-- **OQ-RELG-19**: after adopting a faith, are holy-place and event preachers also withheld?
-- **OQ-RELG-20**: holy place provinces aren't yet bound to the map.
-- **OQ-RELG-21**: do lords waver when an already Tolerated faith grows past 10 %?
-- **OQ-RELG-22**: which inventions give preachers.
-- **OQ-RELG-23**: who holds Mecca when subject and overlord differ.
+Nothing. Every question about religion has been decided.
 
 ## For developers
 
-- Spec: `domain/religion/spec.md` in the game repository, requirement code **RELG** (RELG-001 to RELG-122).
+- Spec: `domain/religion/spec.md` in the game repository.
 - Features: `domain/religion/features/`: `faiths.feature`, `faith-mix.feature` (one year's move, East Bengal), `faith-buildings.feature`, `communities-and-policy.feature`, `expulsion-and-inquisition.feature` (the Alhambra decree), `preachers.feature`, `state-faith.feature`, `holy-places.feature`, `faith-rules.feature`, `faith-waves-and-events.feature`, `religion-uses.feature`, `religion-view.feature` and `religion-ai.feature`.
-- Code: there is no religion code yet; it would live in `packages/engine/src/domain/religion/`.
+- Code: `packages/engine/src/domain/religion/`, with its numbers in `packages/rules/data/domain/religion.json`.

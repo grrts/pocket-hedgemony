@@ -30,9 +30,8 @@ Feature: Expulsion and the Inquisition
     Then "Castile" is not better off in people or skills
     And "Ottomans" gains the people and their skills
 
-  @RELG-063 @open-question
+  @RELG-063
   Scenario Outline: Who may found an Inquisition
-    # OQ-RELG-8: which government forms count as monarchies
     Given the country "<country>" has the state faith "<faith>" and the form "<form>"
     Then the Inquisition decision is <offered> to "<country>"
 
@@ -40,7 +39,9 @@ Feature: Expulsion and the Inquisition
       | country  | faith      | form              | offered     |
       | Castile  | catholic   | Feudal realm      | offered     |
       | Poland   | catholic   | Elective monarchy | offered     |
+      | Portugal | catholic   | Absolute monarchy | offered     |
       | Venice   | catholic   | Merchant republic | not offered |
+      | Teutons  | catholic   | Military order    | not offered |
       | England  | anglican   | Diet monarchy     | not offered |
 
   @RELG-063 @RELG-064 @placeholder

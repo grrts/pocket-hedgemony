@@ -19,8 +19,7 @@ Feature: Traders and trade ships
     When the day loop runs
     Then the caravan heads for "Troyes"
 
-  @TRADE-003 @TRADE-012 @placeholder @open-question
-  # OQ-TRADE-2: yearly fair, market, or trading post?
+  @TRADE-003 @TRADE-012 @placeholder
   Scenario: Founding a pack caravan
     Given the province "Troyes" has a yearly fair with 2400 market folk
     And the country "France" has 100 gold
@@ -71,6 +70,18 @@ Feature: Traders and trade ships
       | 5      | still exists                            |
       | 6      | is gone and its crew leave              |
 
+  @TRADE-007 @placeholder
+  Scenario Outline: A trade ship with unpaid upkeep
+    # config: upkeep.unpaid_months_to_lose
+    Given the cog "San Marco" is a Venetian trade ship whose upkeep has been unpaid for <months> months
+    When the trade rules are applied
+    Then the cog <state>
+
+    Examples:
+      | months | state        |
+      | 5      | still exists |
+      | 6      | is gone      |
+
   @TRADE-009
   Scenario: No cap on traders
     Given the country "Venice" has 40 traders
@@ -90,3 +101,39 @@ Feature: Traders and trade ships
     When the caravan deposits
     Then the gold goes to the lord's wealth
     And the crown can see the caravan but cannot steer it
+
+  @TRADE-003
+  Scenario Outline: Where a trader may be founded
+    Given the province "<city>" of "France" has <market>
+    And the country "France" <knows> "T8 Licensed trading companies"
+    When the trade rules are applied
+    Then "France" <may> found a pack caravan in "<city>"
+
+    Examples:
+      | city   | market            | knows        | may     |
+      | Troyes | a weekly market   | doesn't know | may     |
+      | Troyes | a yearly fair     | doesn't know | may     |
+      | Lyon   | no market         | doesn't know | may not |
+      | Gorée  | a trading post    | doesn't know | may not |
+      | Gorée  | a trading post    | knows        | may     |
+
+  @TRADE-012 @TRADE-120
+  Scenario Outline: Crew from the home province's job slots
+    Given the province "<city>" of "France" has <people> in its job slots
+    And the country "France" has 100 gold
+    When "France" founds a <kind> in "<city>"
+    Then the founding is <result>
+
+    Examples:
+      | city       | people              | kind          | result                     |
+      | Troyes     | 40 market folk      | pack caravan  | refused for want of crew   |
+      | Troyes     | 60 market folk      | pack caravan  | done, 10 market folk left  |
+
+  @TRADE-122
+  Scenario: A lord's traders count as the crown's at home
+    Given the lord "Duke of Burgundy" of "France" runs a caravan with 4 gold
+    And it collects 0.5 gold in the royal province "Troyes" of "France"
+    And it passes the "Seine" bridge, a toll point of "France"
+    When it enters "Paris", a royal city of "France"
+    Then it pays no market fee and no toll
+    And its 4.5 gold go to the lord's wealth

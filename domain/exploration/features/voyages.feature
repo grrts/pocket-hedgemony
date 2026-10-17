@@ -63,3 +63,14 @@ Feature: Voyages into the fog
     Then the voyage preview shows enough supply to get there and back
     And they chart the Bahamas and the coast of "Hispaniola"
     And they come home
+
+  @EXPL-066
+  Scenario Outline: A voyage is given only in port
+    Given the caravel "São Gabriel" of the country "Portugal" is <where>
+    When the player gives it a voyage
+    Then the voyage is <result>
+
+    Examples:
+      | where               | result    |
+      | in the port "Lagos" | given     |
+      | at sea              | not given |

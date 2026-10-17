@@ -23,18 +23,20 @@ their slots, colonial range, and founding a colony up to the moment the province
 - What a founded colony becomes as a subject (Outpost, Settled, Self-governing): subjects (2.4).
 - Colonial range numbers per government form, the officials cap: government (3).
 - The ages, their regions and start/end conditions, `colonial_presence`: events.
-- First contact, disease when worlds meet, trade with newly met peoples: not designed (OQ-EXPL-1).
+- First contact, disease when worlds meet, trade with newly met peoples: left out of the game (D-EXPL-1).
 - Drawing the parchment, voyage paths, colony flags and the colony card: map-presentation (this spec lists what
   the exploration design asks it to show).
 
 ## 2. Sources
 
 Newest decision first.
+- `domain/DECISIONS.md` and section 13 below (17 October 2026): the open questions of this spec decided in the
+  spirit of the game so far (D-EXPL-1 to D-EXPL-18); cross-context decisions X-7, X-8 and X-13 apply.
 - `exploration/exploration-design.md` (version 1), section 10 *Open questions*: "Which age?" decided by Leroy
   (Age of Exploration); "Land of stateless peoples" decided by Leroy (land no country owns can be colonised, using
   only its free tiles; land of tribes that are countries can't); "Pacific voyaging" decided (voyaging canoes are
   exploration ships). This file (16 Oct, 22:54) is newer than `planning/gap-lists.md` (16 Oct, 22:34), which still
-  lists colonising land of stateless peoples as open: the exploration decision wins (OQ-EXPL-2).
+  lists colonising land of stateless peoples as open: the exploration decision wins (D-EXPL-2).
 - `planning/gap-lists.md`, "Decisions already made" (16 Oct): exploration opens with the Age of Exploration; one
   month per turn; multiplayer-friendly orders; campaign ends 31 August 1939; gap 14 (exploration and first contact).
 - `exploration/exploration-design.md` (version 1), sections 1 to 9.
@@ -132,11 +134,13 @@ Newest decision first.
   gate open for that country, also after the age ends. [exploration §2]
 - EXPL-003: The exploration system shall read the gating age from one config line `exploration.unlock_age`, set to
   the event tree's `age_of_exploration`. [exploration §2, §10.1; gap-lists decisions 16 Oct]
-- EXPL-004: If a country's region is outside the gating age's region list (central Asia and the Middle East in the
-  current data), then the exploration system shall not give it the exploration unlock until a later age that covers
-  its region begins. [exploration §2]
+- EXPL-004: If a country's region is outside the gating age's region list (north_america, the Middle East and
+  central Asia in the current data), then the exploration system shall not give it the exploration unlock until the
+  first age that starts later than the gating age and covers its region begins there: `age_of_atlantic_empires` for
+  north_america, `age_of_reformations` for middle_east and central_asia (D-EXPL-3). [exploration §2]
 - EXPL-005: If a country lacks the exploration unlock, then the exploration system shall not let it buy
-  exploration ships (the caravel without S4, the voyaging canoe without S3). [exploration §2; naval §3.2, §3.3]
+  exploration ships (the caravel without S4, the voyaging canoe without S3); the age gate applies to S3 realms and
+  their voyaging canoes too (D-EXPL-4, D-EXPL-18). [exploration §2; naval §3.2, §3.3]
 - EXPL-006: The exploration system shall leave where an exploration ship may sail to naval's research rule (with S4
   and S1 within 3 zones of a coast; with S5 the open ocean). [exploration §2; naval §7.2]
 - EXPL-007: Where a country knows S3 *Outrigger voyaging*, the exploration system shall treat the voyaging canoe as
@@ -144,7 +148,8 @@ Newest decision first.
   shore with seafolk. [exploration §2.1; naval §3.3]
 - EXPL-008: The exploration system shall let a voyaging canoe cross open ocean from the start. [exploration §2.1; naval §3.5]
 - EXPL-009: Where a country knows S3 *Outrigger voyaging*, the exploration system shall open colonies for it with 1
-  colonial governor slot and a colonial range of at least 10 zones whatever its government form. [exploration §2.1]
+  colonial governor slot and a colonial range of at least 10 zones whatever its government form; with S5 as well the
+  base is 2 slots, not 3 (D-EXPL-4). [exploration §2.1]
 
 ### The charted map
 
@@ -182,10 +187,12 @@ Newest decision first.
 ### Colonialism
 
 - EXPL-024: When a country knows S5 *ocean_navigation*, the exploration system shall let it hire colonial governors. [exploration §4.1]
-- EXPL-025: The exploration system shall hire a colonial governor like any other official, for gold and a yearly
-  wage, as a person who ages and can die. [exploration §4.2]
-- EXPL-026: The exploration system shall give 2 colonial governor slots with S5, +1 with T8 *Licensed trading
-  companies* and +1 with T9 *joint_stock_finance*, and never take a slot away. [exploration §4.2; research-tree]
+- EXPL-025: The exploration system shall hire a colonial governor like any other official, in any port of the
+  country, for 20 gold and a wage of 5 gold a year (provisional), as a person who ages (30 when hired) and can die
+  (D-EXPL-6). [exploration §4.2]
+- EXPL-026: The exploration system shall give a base of 2 colonial governor slots with S5 (else 1 with S3), +1 with T8
+  *Licensed trading companies* and +1 with T9 *joint_stock_finance* on top of either base, and never take a slot
+  away (D-EXPL-4). [exploration §4.2; research-tree]
 - EXPL-027: If a country has no free colonial governor slot, then the exploration system shall refuse to hire a
   colonial governor. [exploration §4.2]
 - EXPL-028: The exploration system shall remove a colonial governor when his colony is founded (he becomes its
@@ -195,8 +202,8 @@ Newest decision first.
 - EXPL-030: The exploration system shall keep a colonial governor waiting in a port of his country until a ship picks
   him up, and let any ship carry him. [exploration §4.2]
 - EXPL-031: The exploration system shall take a country's colonial range, in sea zones, from its government form. [exploration §4.3; government §3]
-- EXPL-032: If a province's coastal zone is more zones from the country's nearest port or colony than its colonial
-  range, then the exploration system shall not let the country found a colony there. [exploration §4.3]
+- EXPL-032: If a province's coastal zone is more zones from the country's nearest port or colony (as EXPL-065 counts
+  them) than its colonial range, then the exploration system shall not let the country found a colony there. [exploration §4.3]
 - EXPL-033: When a colony is founded, the exploration system shall measure later colonial range from it too, so
   colonies chain across an ocean. [exploration §4.3]
 
@@ -236,10 +243,36 @@ Newest decision first.
   food, free the slot and leave the province unowned. [exploration §5.3]
 - EXPL-049: While a ship of the founder is in the colony's zone, the exploration system shall let the founder
   abandon the colony by taking the governor back aboard, and keep his slot used until he is home in a port. [exploration §5.3]
-- EXPL-050: When a colony is founded, the exploration system shall hand the province to province stats 12.3 and the
-  subjects design for what follows (settlers, local tiles, growing into a Colony subject at *Outpost*). [exploration §5.3, §9]
+- EXPL-050: When a colony is founded, the exploration system shall hand the province to province stats 12.3 as a royal
+  province of the founder (settlers, local tiles); it becomes a Colony subject only when the subjects design charters
+  it, never by itself (D-EXPL-7). [exploration §5.3, §9]
 - EXPL-051: When a colony is founded, the exploration system shall publish it so the event tree's `colonial_presence`
-  counts it. [exploration §9]
+  counts it (EXPL-067). [exploration §9]
+
+### Decided 17 October
+
+- EXPL-058: While a colony is being founded, the exploration system shall not check the colonial range again; a change
+  of government form or a shrinking range affects only colonies founded later (D-EXPL-9). [D-EXPL-9; exploration §4.3]
+- EXPL-059: When a colonial governor dies, of old age or at sea when his ship sinks, the exploration system shall free
+  his slot, and if he was founding a colony, lose it as at progress 0 (EXPL-048) (D-EXPL-10). [D-EXPL-10]
+- EXPL-060: If a province being founded as a colony gets an owner other than the founder, then the exploration system
+  shall lose the colony as at progress 0 (D-EXPL-11). [D-EXPL-11; province §12.3]
+- EXPL-061: When a colony is abandoned, the exploration system shall lose the colony food left ashore, and let the
+  governor aboard go ashore on another colonisable coast at once with *Found colony* (D-EXPL-12). [D-EXPL-12]
+- EXPL-062: When the exploration AI loads colony stores, it shall load the average food the rolled aggression needs
+  times 1.25 (provisional): Peaceful 450, Wary 575, Hostile 750, Fierce 1,125 rations (D-EXPL-13). [D-EXPL-13; exploration §8]
+- EXPL-063: The exploration system shall roll the locals' pressure as a whole number from 0 to twice the aggression's
+  average, each number equally likely (D-EXPL-14). [D-EXPL-14]
+- EXPL-064: The exploration system shall never share a charted map between countries, allies, subjects and overlords
+  included, nor hand one over when land is conquered or inherited (D-EXPL-15). [D-EXPL-15; exploration §3.1]
+- EXPL-065: The exploration system shall measure colonial range from the country's own ports (lords' ports and canoe
+  landings included), its subjects' ports and its founded colonies, never from a colony still being founded (D-EXPL-5). [D-EXPL-5]
+- EXPL-066: The exploration system shall give a voyage only to exploration ships in port; ships at sea must dock first (D-EXPL-17). [D-EXPL-17; exploration §3.2]
+- EXPL-067: The exploration system shall count for the event tree's `colonial_presence` every colony the country has
+  founded plus every trading post it holds, and not a colony still being founded (D-EXPL-8). [D-EXPL-8; event-tree vocabulary]
+- EXPL-068: The exploration system shall treat a province no nation on the map owns as land of a people with no
+  country, whatever the catalogue records there (decentralised polities and non-state actors included); only a map
+  nation's land counts as owned (D-EXPL-2, X-13). [D-EXPL-2; X-13]
 
 ### On screen (owned by map-presentation)
 
@@ -253,7 +286,8 @@ Newest decision first.
 
 - EXPL-053: Where a country's catalogue personality favours expansion by sea (`naval_capability`, preferred
   expansion modes), the exploration AI shall send exploration ships along the edge of its charted map, then found
-  colonies on the nearest unowned coasts, always loading enough stores for the aggression it rolled plus a margin. [exploration §8]
+  colonies on the nearest unowned coasts, always loading enough stores for the aggression it rolled plus a margin
+  (EXPL-062). [exploration §8]
 - EXPL-054: Where a country is a land power, the exploration AI shall never explore. [exploration §8]
 - EXPL-055: The exploration system shall store charted maps as one bit per province and zone per country. [exploration §8]
 - EXPL-056: The exploration system shall update colonies being founded once a month with the province. [exploration §8]
@@ -263,14 +297,14 @@ Newest decision first.
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
-| GiveVoyage(fleet, path, lowSupply) | player / AI | Fleet of exploration ships only, in port; path of zones | Fleet sails with full supply; charts as it goes; turns back or carries on | VoyageStarted, ZoneCharted, VoyageTurnedBack |
-| HireColonialGovernor(port) | player / AI | S5 (or S3); free slot; gold | Governor waits in that port | ColonialGovernorHired |
+| GiveVoyage(fleet, path, lowSupply) | player / AI | Fleet of exploration ships only, in port (EXPL-066); path of zones | Fleet sails with full supply; charts as it goes; turns back or carries on | VoyageStarted, ZoneCharted, VoyageTurnedBack |
+| HireColonialGovernor(port) | player / AI | S5 (or S3); free slot; 20 gold | Governor waits in that port; 5 gold a year | ColonialGovernorHired |
 | DismissColonialGovernor(governor) | player / AI | Governor not ashore founding | Slot frees | ColonialGovernorDismissed |
 | EmbarkGovernor(governor, ship) | player / AI | Ship in the governor's port (any ship) | Governor aboard as cargo | — |
 | LoadColonyStores(ship, rations) | player / AI | Exploration ship docked where it may resupply | Stores loaded at resupply cost | ColonyStoresLoaded |
 | FoundColony(ship, province) | player / AI | Ship carrying a governor in the province's coastal zone; province colonisable (EXPL-034) | Colony at 10 progress; aggression rolled | ColonyFoundingStarted, LocalAggressionRolled |
 | UnloadStores(ship, colony) | player / AI | Exploration ship in the colony's coastal zone | Stores into colony food in one day | ColonyFoodUnloaded |
-| AbandonColony(colony, ship) | player / AI | A ship of the founder in the zone | Governor aboard; colony ends; slot used until he is home | ColonyAbandoned |
+| AbandonColony(colony, ship) | player / AI | A ship of the founder in the zone | Governor aboard; colony food lost; slot used until he is home or ashore elsewhere | ColonyAbandoned |
 
 ## 7. Domain events
 
@@ -283,8 +317,8 @@ Newest decision first.
 | ColonyFoundingStarted | Governor ashore | province, country, governor | map-presentation, events |
 | LocalAggressionRolled | Ashore | province, level | map-presentation |
 | ColonyFoodUnloaded | Unload | province, rations | — |
-| ColonyFounded | Progress 100 | province, country, governor, left-over food | province (owner, *Settlement*, store), subjects (Outpost), events (`colonial_presence`), realm (provinces) |
-| ColonyLost | Progress 0 | province, country | province (unowned), events |
+| ColonyFounded | Progress 100 | province, country, governor, left-over food | province (royal province, *Settlement*, store), subjects (may charter later), events (`colonial_presence`), realm (provinces) |
+| ColonyLost | Progress 0, governor dead, or province taken by another | province, country | province (unowned), events |
 | ColonyAbandoned | Abandon | province, country | — |
 
 ## 8. Policies (reactions to other contexts)
@@ -292,12 +326,13 @@ Newest decision first.
 - When a country learns S3, S4 or S5, T8 or T9 (research), then the unlock check runs and slots are recounted.
 - When an age begins in a region (events), then the unlock check runs for countries of that region.
 - When a country's government form changes (government), then its colonial range is re-read; colonies already
-  being founded are not affected (not stated: OQ-EXPL-9).
+  being founded are not affected (EXPL-058).
 - When a fleet or army moves (naval, troop-movement), then charting runs for the places next to it.
-- When a governor dies of old age (province, people), then his slot frees (EXPL-028); what happens to a colony
-  being founded is not stated (OQ-EXPL-10).
-- When a province becomes owned by a country (war, treaty), then any colony being founded there by another country
-  is not designed (OQ-EXPL-11).
+- When a governor dies of old age (province, people) or his ship sinks (naval), then his slot frees and a colony he
+  was founding is lost (EXPL-028, EXPL-059).
+- When a province becomes owned by a country (war, treaty, event), then any colony being founded there by another
+  country is lost (EXPL-060).
+- When a year passes (time-and-turns), then every colonial governor is a year older.
 
 ## 9. Monthly turn
 
@@ -309,6 +344,8 @@ Each month, with the province update:
    −10 progress if there is none.
 2. Progress ≥ 100: founded (hand over to province and subjects; publish for `colonial_presence`). Progress ≤ 0: lost.
 3. Recount governor slots from research.
+4. In the January turn, every colonial governor ages a year; wages (5 gold a year each) go to the realm's treasury
+   step.
 Reads first: research known, the current ages and regions (events), government form (range), province ownership
 and free tiles.
 
@@ -334,6 +371,13 @@ All in one exploration config file (keys proposed here except `exploration.unloc
 | exploration.no_food_progress_loss | Extra loss with no food | 10 | yes | exploration |
 | exploration.colony_stores | Stores per exploration ship type | caravel 300; voyaging canoe 100 | yes | exploration/naval |
 | exploration.unload_days | Days to unload stores | 1 | yes | exploration |
+| exploration.governor_hire_gold | Gold to hire a colonial governor | 20 (D-EXPL-6) | provisional | exploration |
+| exploration.governor_wage_per_year | His yearly wage | 5 (D-EXPL-6) | provisional | exploration |
+| exploration.governor_age_when_hired | His age when hired | 30 (D-EXPL-6) | provisional | exploration |
+| exploration.ai.stores_margin | AI stores over the level's average need | 1.25 (D-EXPL-13) | provisional | exploration |
+| (later ages) | Age that opens the gate outside `unlock_age`'s regions | first later age covering the region (D-EXPL-3), read from exploration-regions.json | decided | events |
+
+Provisional numbers are listed in the file's `_provisional` array.
 
 Derived from the design's table (averages): months to 100 — Peaceful 18, Wary 23, Hostile 30, Fierce 45; food
 needed — 360, 460, 600, 900 rations.
@@ -345,13 +389,15 @@ needed — 360, 460, 600, 900 rations.
 | naval | upstream | Customer–Supplier | Ship families, the caravel and voyaging canoe rows, 60 supply, colony stores in the hold, docking and resupply, sailing reach (7.2), fleets as movers; EXPL supplies the unlock and the charted map (uncharted may-enter) |
 | research | upstream | Conformist | S3, S4, S5 (*ocean_navigation*, "opens colonies with 2 colonial governor slots"), T8 and T9 (+1 slot each), S1 |
 | events | upstream | Conformist | `age_of_exploration` and its regions (the age gate) |
-| events | downstream | Published Language | Founded colonies counted by `colonial_presence` (used by the Age of Exploration's end) |
+| events | downstream | Published Language | Founded colonies plus trading posts held counted by `colonial_presence` (D-EXPL-8); no first-contact hook (D-EXPL-1) |
+| events | upstream | Conformist | The later ages that open the gate outside the Age of Exploration's regions (D-EXPL-3) |
 | government | upstream | Conformist | Colonial range per form (adopted column), officials cap and the governor exemption |
 | province | downstream | Customer–Supplier | The founded colony as province state: owner, *Settlement* at *settlement*, the governor as official, left-over food to the store, free tiles vs local people's tiles (12.3); colonial governor official type (10.2, upstream) |
-| subjects | downstream | Customer–Supplier | A founded colony enters at *Outpost* (2.4); the Colony subject charter |
+| subjects | downstream | Customer–Supplier | A founded colony is a royal province (D-EXPL-7); subjects may later charter colonial provinces as a Colony subject (subjects 9); subjects' ports count for colonial range (D-EXPL-5) |
 | world-map | upstream | Conformist | Sea zones (~150 km coastal, ~300 km ocean), coastal provinces, adjacency, steps for the start charted reach |
-| scenario-setup | upstream | Conformist | 1444 owners: which land is owned by countries (tribal countries included) and which is unowned with peoples on it |
-| map-presentation | downstream | Published Language | Parchment from the charted map, voyage paths, colony flags and progress rings, range line, colony card |
+| scenario-setup | upstream | Conformist | 1444 owners: land owned by a map nation (tribal countries included) is owned; land no map nation owns is a people's with no country, whatever the catalogue lists (X-13, D-EXPL-2) |
+| map-presentation | downstream | Published Language | Parchment from the charted map, voyage paths, colony flags and progress rings, range line, colony card; the client's reach toggle is replaced by the charted map (D-EXPL-16) |
+| naval | upstream | Customer–Supplier | Ship sinking (a governor aboard dies, EXPL-059); the voyaging canoe needs the full exploration unlock (D-EXPL-18) |
 | realm | downstream | Customer–Supplier | Country card line (governors n of m, range); governor hiring gold and wage from the treasury |
 | troop-movement | upstream | Conformist | Shared planner and day loop the voyage uses through naval |
 | diplomacy | upstream | Conformist | War and rivalry that close ports to a voyage's docking (through naval) |
@@ -362,68 +408,33 @@ needed — 360, 460, 600, 900 rations.
 - Explores when its catalogue personality favours expansion by sea (`naval_capability`, preferred expansion modes).
 - Sends exploration ships along the edge of its charted map.
 - Then founds colonies on the nearest unowned coasts, always loading enough stores for the aggression it rolled plus
-  a margin (the margin is not given: OQ-EXPL-13).
+  a margin: the level's average need × 1.25 (EXPL-062).
 - Land powers never explore.
 - Uses the same commands as the player.
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-EXPL-1: First contact and disease when worlds meet are left out on purpose (exploration 10.3; gap 14 lists
-  them as missing). They may come later as events triggered when a voyage charts a new people. Blocks: nothing in
-  this spec; the event tree's epidemics in the Americas have no trigger from exploration.
-- OQ-EXPL-2: Colonising land of stateless peoples. Gap-lists (16 Oct, 22:34) still lists it as open ("being
-  explained in the planning round"); exploration 10.2 (newer, 22:54) records it decided by Leroy: land no country
-  owns can be colonised using only its free tiles, land of tribes that are countries can't; province 12.3 agrees.
-  This spec follows the decision. Still open underneath: which catalogue records count as "countries" that own land
-  on the map. The catalogue has 214 decentralised polities, many typed `stateless_society` with game representation
-  `decentralized_polity` or `non_state_actor` (Sápmi, Frisia, Samoyedic peoples …). Does a `decentralized_polity`
-  record own its provinces (so they cannot be colonised) or are they "people with no country"? Blocks: EXPL-034/035
-  in every region outside the old states. The gap list should be updated.
-- OQ-EXPL-3: Regions outside the gating age. The age gate is one config line, but `age_of_exploration` covers
-  europe, sub_saharan_africa, south_asia, southeast_asia, east_asia, caribbean, central_america, south_america,
-  north_africa, oceania only. Middle East, central Asia and north_america are left out; the design says they wait
-  "until a later age that covers it begins", but a single `exploration.unlock_age` cannot express "a later age". Which
-  ages open the gate there (e.g. `age_of_atlantic_empires` covers north_america; `age_of_imperialism` central_asia and
-  middle_east)? [exploration §2; event-tree ages.yaml]
-- OQ-EXPL-4: S3 realms. Does the age gate apply to S3 realms too (the unlock is "S4 or S3, and the age")? S3 gives 1
-  governor slot and a range floor of 10: if an S3 realm also learns S5, do the slots add (1 + 2) or take the larger,
-  and do T8/T9 add to the S3 slot without S5 (T8 needs S5)? [exploration §2.1, §4.2]
-- OQ-EXPL-5: "Nearest port or colony" for colonial range: does a colony still being founded count, does a subject's
-  or lord's port count (Castile's example docks in the Canaries, where the 1444 port San Sebastián de La Gomera is
-  held by `canarian_lordship`), and does a canoe landing (no harbour) count as a port? [exploration §4.3, §6;
-  naval data]
-- OQ-EXPL-6: Colonial governor hire cost and yearly wage are not given; where he is hired (which port) is not said
-  beyond "waits in a port of yours". [exploration §4.2]
-- OQ-EXPL-7: The founded colony and subjects: exploration 5.3 says the province becomes the country's with the
-  governor as its official; subjects 2.4 says a founded colony "enters at *Outpost*", while subjects 9 says "a group of
-  your colonial provinces in one distant region is chartered as one Colony" and an Outpost's provinces become royal
-  land when folded in (subjects 7). Is a newly founded colony a royal province, or automatically a Colony subject at Outpost?
-  [exploration §5.3, §9; subjects §2.4, §7, §9]
-- OQ-EXPL-8: `colonial_presence` in the event tree counts "provinces held as colonies, protectorates or trading
-  posts"; exploration says it "counts colonies founded here". Do colonies still being founded count, and do
-  trading posts (province 12.3, founded by envoy and gold, not by this design) count? [exploration §9; event-tree vocabulary]
-- OQ-EXPL-9: If a country's government form changes while a colony is being founded, or its range shrinks, does the
-  colony continue? [exploration §4.3]
-- OQ-EXPL-10: A colonial governor ashore who dies of old age: is the colony lost, or does it go on without him? A
-  governor at sea when his ship sinks? [exploration §4.2, §5.3]
-- OQ-EXPL-11: Interference: what happens when another country attacks or takes a colony being founded, or the
-  province becomes owned by a third party during founding (province 12.3 lists "another power taking it" only for
-  settled colonies)? [exploration §5; province §12.3]
-- OQ-EXPL-12: Abandon: what happens to colony food left in the colony, and can the governor be landed elsewhere
-  directly? [exploration §5.3]
-- OQ-EXPL-13: AI margin of stores "plus a margin" not given. [exploration §8]
-- OQ-EXPL-14: Pressure roll distribution: "a roll from 0 to twice the average" — whole numbers, uniform? The table's
-  averages (months to 100, food) assume the average. [exploration §5.2, §5.3]
-- OQ-EXPL-15: Charts between countries: do allies, subjects or overlords share charted maps, and does conquering or
-  inheriting a country's land bring its charts? The design only says charts are never lost. [exploration §3.1]
-- OQ-EXPL-16: The start charted reach (6 steps of your lands, plus touching sea zones) and the client today
-  ("provinces within KNOWN_REACH steps over land or sea of the player's lands and armies", a toggle) differ: armies are
-  included and steps cross sea in the client. The design asks the client to replace it with the charted map. [exploration §3.1, §9; client main.ts]
-- OQ-EXPL-17: Voyages must "leave port with full supply": can a voyage be given to an exploration ship already at
-  sea, and does giving it imply docking first? [exploration §3.2]
-- OQ-EXPL-18: Naval 3.3 lists the caravel unlock as "S4 plus the exploration unlock" and the voyaging canoe as S3
-  only (no age); exploration 2 makes both exploration ships need the age gate. Can an S3 realm outside the age (none
-  in current data: oceania and southeast_asia are in it) build voyaging canoes? [naval §3.3; exploration §2]
+Decided on 17 October 2026 under `domain/DECISIONS.md` (latest decision wins, simpler rule, no new mechanics,
+provisional numbers in `exploration.json`). None stays open.
+
+- **D-EXPL-1** (was OQ-EXPL-1) First contact and disease: there is no first-contact or disease mechanic; voyages chart land and nothing else happens when worlds meet, and the event tree's epidemics keep their own triggers. The design left them out on purpose and the rules add no mechanic.
+- **D-EXPL-2** (was OQ-EXPL-2) Land of stateless peoples: land owned by a nation on the map (tribal countries included) cannot be colonised; a province no map nation owns is land of a people with no country and can be colonised on its free tiles, whatever the catalogue records there, `decentralized_polity` and `non_state_actor` records included (EXPL-068). X-13 makes the map's nations the realms and catalogue records with no province reference data.
+- **D-EXPL-3** (was OQ-EXPL-3) Regions outside the gating age: a region outside `age_of_exploration`'s list opens with the first age that starts later and covers it, read from the event tree's ages: `age_of_atlantic_empires` (1520) for north_america, `age_of_reformations` (1530) for middle_east and central_asia (EXPL-004). It needs no new config line and follows the design's "a later age that covers it".
+- **D-EXPL-4** (was OQ-EXPL-4) S3 realms: the age gate applies to S3 realms too; the slot base is 2 with S5, else 1 with S3 (the larger, not added), and T8 and T9 each add 1 on top of either base; the range floor of 10 stays for S3 realms (EXPL-005, EXPL-009, EXPL-026). One unlock rule for every realm is the simpler rule.
+- **D-EXPL-5** (was OQ-EXPL-5) Nearest port or colony: colonial range counts from the country's own ports (lords' ports and canoe landings included), its subjects' ports (so Castile reaches from the Canaries) and its founded colonies, never from a colony still being founded (EXPL-065). A colony still being founded is not yet the country's land.
+- **D-EXPL-6** (was OQ-EXPL-6) Governor cost and wage: hiring costs 20 gold and the wage is 5 gold a year (both provisional, `governor_hire_gold`, `governor_wage_per_year`); he is hired in any port of the country, is 30 when hired and ages a year each January (EXPL-025). No official's price exists anywhere yet, so the numbers are provisional.
+- **D-EXPL-7** (was OQ-EXPL-7) The founded colony: it becomes a royal province of the founder at settlement *settlement* with its governor as official; it becomes a Colony subject only when the subjects design charters it, never by itself (EXPL-050). Exploration 5.3 says the province becomes the country's, and no automatic subject is the simpler rule.
+- **D-EXPL-8** (was OQ-EXPL-8) `colonial_presence`: it counts every colony founded plus every trading post held, as the event vocabulary says; a colony still being founded does not count (EXPL-067). The event tree owns the trigger's meaning.
+- **D-EXPL-9** (was OQ-EXPL-9) Form or range changes during founding: the colony goes on; range is checked only when the governor goes ashore (EXPL-058). INV-EXPL-9 already measures range at going ashore.
+- **D-EXPL-10** (was OQ-EXPL-10) The governor dies: a colony whose governor dies of old age is lost as at progress 0; a governor at sea dies when his ship sinks; either way his slot frees (EXPL-059). A colony needs its governor, as progress 0 already shows.
+- **D-EXPL-11** (was OQ-EXPL-11) Interference: if the province gets an owner other than the founder while the colony is being founded, the colony is lost as at progress 0 (EXPL-060); unowned land cannot be attacked, so nothing else applies. One loss rule covers every ending.
+- **D-EXPL-12** (was OQ-EXPL-12) Abandon: the colony food left ashore is lost, and the governor aboard may go ashore on another colonisable coast at once with *Found colony*; otherwise his slot frees when he is home in a port (EXPL-061). It reuses the existing commands.
+- **D-EXPL-13** (was OQ-EXPL-13) AI margin: the AI loads the rolled level's average food need × 1.25 (provisional `ai.stores_margin`): Peaceful 450, Wary 575, Hostile 750, Fierce 1,125 rations (EXPL-062). One multiplier is the smallest rule that gives "plus a margin".
+- **D-EXPL-14** (was OQ-EXPL-14) Pressure roll: a whole number from 0 to twice the level's average, each number equally likely, drawn from the game's Rng (EXPL-063). It keeps the design's table averages.
+- **D-EXPL-15** (was OQ-EXPL-15) Charts between countries: charted maps are never shared, not between allies, subjects or overlords, and never handed over by conquest or inheritance (EXPL-064). The design only says charts are never lost, and sharing would add a mechanic.
+- **D-EXPL-16** (was OQ-EXPL-16) Start reach and the client: the charted map replaces the client's `KNOWN_REACH` toggle: 6 land steps from the country's lands plus the sea zones touching them, and armies and fleets chart only what is next to them (EXPL-011, EXPL-013); a request to the client build. The design asked for the replacement.
+- **D-EXPL-17** (was OQ-EXPL-17) Voyages at sea: a voyage is given only to ships in port, so it always leaves with full supply; ships at sea must dock first by an ordinary order (EXPL-066). No implied docking means no new rule.
+- **D-EXPL-18** (was OQ-EXPL-18) Voyaging canoes outside the age: every exploration ship needs the full exploration unlock, the age gate included; naval's "S3 only" for the voyaging canoe follows exploration (EXPL-005, naval NAVY-045). One unlock rule for both exploration ships.
 
 ## 14. Traceability
 
@@ -503,3 +514,20 @@ needed — 360, 460, 600, 900 rations.
 | EXPL-055 | charted-map.feature | What a country has charted at the start |
 | EXPL-056 | founding-a-colony.feature | Colonies update once a month |
 | EXPL-057 | — | Configuration structure; checked by config loading, no behaviour |
+| EXPL-004 | unlocking-exploration.feature | The first later age that covers a region opens its gate |
+| EXPL-004 | unlocking-exploration.feature | The Mamluks may explore once the later age begins |
+| EXPL-005 | unlocking-exploration.feature | The age gate applies to voyaging canoes too |
+| EXPL-009, EXPL-026 | colonial-governors.feature | T8 and T9 add to the S3 slot too |
+| EXPL-025 | colonial-governors.feature | A colonial governor is hired like any official, and is a person |
+| EXPL-058 | colonial-governors.feature | A colony already being founded keeps going when the range shrinks |
+| EXPL-059 | founding-a-colony.feature | The governor dies of old age while his colony is being founded |
+| EXPL-059 | founding-a-colony.feature | A governor at sea dies when his ship sinks |
+| EXPL-060 | founding-a-colony.feature | Another country gains the province during founding |
+| EXPL-061 | founding-a-colony.feature | Abandoning loses the food left, and the governor may land elsewhere |
+| EXPL-062 | exploration-ai.feature | The AI loads enough stores for the roll plus a margin |
+| EXPL-063 | founding-a-colony.feature | The locals' pressure roll |
+| EXPL-064 | charted-map.feature | Charts are never shared or handed over |
+| EXPL-065 | colonial-governors.feature | What colonial range is measured from |
+| EXPL-066 | voyages.feature | A voyage is given only in port |
+| EXPL-067 | founding-a-colony.feature | What colonial presence counts |
+| EXPL-068 | founding-a-colony.feature | A people with no country keep their tiles |

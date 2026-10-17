@@ -199,7 +199,9 @@ You can secretly fund a revolution in another country when its card there is at 
 
 - you pay gold every month, 1 % of the target's yearly income;
 - the target gets the "Foreign gold backs the movement" spark (×2), and if it becomes a rising, its camp's join shares are multiplied by 1.5;
-- each turn there is a 3 % chance you are caught, higher with more officials in the target and while the target is at peace.
+- each month there is a 3 % chance you are caught, plus 1 % while the target is at peace and 1 % more if officials run at least half of its provinces.
+
+This is the same *Fund rebels* action diplomacy offers; there is only one.
 
 If you are caught, the funding ends, the target gets the opinion reason "Funded a revolution against us" and a reason to fight you, and the card names you. If a funded revolution wins, the new regime starts at +25 opinion of you, unless it is hostile to your form of rule.
 
@@ -324,28 +326,28 @@ Every balance value here is a provisional placeholder.
 | `foreign_backing.win_opinion` | +25 |
 | `reaction.need_reduction` | 1 sign for 20 years |
 
+## Settled details
+
+- A revolution's rising starts as a rising, not a great revolt. Its size comes from the event and the province's recruits, split between the camps.
+- Signs read real numbers: debt in gold, grievance counts, lords' loyalty and school seats. "Integration strain" is the share of your provinces with *Foreign rule*.
+- American-style colony revolutions read whether the colony is disloyal to its overlord.
+- Regimes do not grant or remove national strengths.
+- Counter-revolution: monarchies' opinion falls by 50 and they hold a reason to fight for 25 years, unless the regime sets its own values. It replaces the usual "different form of rule" penalty instead of adding to it.
+- Restorations happen only through their own events: the restoration of the old order (1660 to 1815) and the émigré events.
+- A wave is a one-off change in the realms bordering the revolution's country and in its region. Faith waves use religion's faith wave.
+- When a revolution sets a regime, the regime decides the form of rule. Crown and assembly keeps its form later on.
+- The armistices of 1918 are one-time events with no revolution card.
+- A decree whose cost is part of its effect shows that effect as its cost.
+- Revolutions "from above" are decisions you are offered; nobody rises.
+- The catch-chance additions for peace and officials are provisional and may still be tuned.
+
 ## Still open
 
-- **OQ-REVO-1:** funding a revolution is designed twice, here and in diplomacy, with different costs, catch chances and effects; is it one action or two?
-- **OQ-REVO-2:** some regimes still mention power bases, service grants and forced changes that government v2 removed.
-- **OQ-REVO-3:** rebellions has no *Risen* state, and it is not settled how big a revolution's rising starts or how size combines with camp joins.
-- **OQ-REVO-4:** signs read abstract stats such as debt and integration strain; which concrete number each sign reads is not set.
-- **OQ-REVO-5:** subjects has not added a "colony is Disloyal" condition yet, so American signs read the colony's own grievances for now.
-- **OQ-REVO-6:** which national strengths a regime may grant or shed.
-- **OQ-REVO-7:** seven new sources are not verified.
-- **OQ-REVO-8:** counter-revolution malus and length differ per regime and from diplomacy's −20 row; whether they stack is open.
-- **OQ-REVO-9:** restorations have no frequency rule, and the generic restoration ends in 1815 though émigré courts can form until 1939.
-- **OQ-REVO-10:** whether a wave is one-off or yearly, how far "neighbours" and "region" reach, and how a faith amount maps onto religion's faith wave.
-- **OQ-REVO-11:** merged events keep old effects beside the regime; which sets the form when both do.
-- **OQ-REVO-12:** whether crown and assembly switches to a constitutional monarchy when G14 arrives later.
-- **OQ-REVO-13:** whether the armistices of 1918 show a card and how they re-arm.
-- **OQ-REVO-14:** two decrees list no cost; is the cost in their effect enough?
-- **OQ-REVO-15:** the event tree patch is not merged, so none of the new conditions, effects, tiers or flags exist yet.
-- **OQ-REVO-16:** whether "from above" revolutions are offered as decisions or roll from the pool.
+- Seven new historical sources still need to be checked by a person.
 
 ## For developers
 
-- Spec: [`domain/revolutions/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/revolutions/spec.md), requirement code **REVO** (REVO-001 to REVO-081).
+- Spec: [`domain/revolutions/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/revolutions/spec.md).
 - Features: `domain/revolutions/features/` (revolution-card, stages, signs-and-trigger, stances, camps, rearm, regimes, decrees, aftermath, funding-abroad, catalogue, revolution-ai, revolution-ui, data-build).
-- Code: not written yet. It will live in `packages/engine/src/domain/revolutions/`.
+- Code: `packages/engine/src/domain/revolutions/`, with its numbers in `packages/rules/data/domain/revolutions.json`.
 - Data lives in the revolutions design (`revolutions/data/`: families, reference, decrees, regimes, revolutions, additions). The offline build validates the layer, merges it into a scratch copy of the event tree, runs the event tree validator, and writes the catalogue, runtime JSON and the event tree patch without ever editing the tree itself. Current result: 0 layer errors; the merged tree has 0 errors and the same 21 warnings.

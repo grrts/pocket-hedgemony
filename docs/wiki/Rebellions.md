@@ -56,7 +56,7 @@ A rising's **cause** comes from the province's heaviest grievance. The cause set
 | Town | *Homeless*, *Broken charter* or *Soldiers quartered* | A town law charter, work, the soldiers gone | Homeless, craftsmen, market folk |
 | Lord | *Harsh lord*, or a disloyal lord's own choice | The lord's want (land, an office, lower taxes, independence) | The lord's retinue and officials, plus people of his land who share his faith and tongue |
 | Pretender | A pretender with a right to the province, plus any grievance | The pretender on the throne, or the province handed to them | Lords who back the pretender, plus anyone with a grievance |
-| New ideas | In later eras, any grievance plus the event tree's ideology support | A new kind of government | Townsfolk and scholars first |
+| New ideas | From the age of revolutions, any grievance plus support of 0.3 or more for liberalism, socialism, communism or nationalism | A new kind of government | Townsfolk and scholars first |
 
 **Resistance.** When settlers take local people's tiles in a colony, the local people raise a **resistance** instead of rebels. It works by the same rules, with its own named leaders, and its demand is to get their tiles back. A resistance can win.
 
@@ -113,7 +113,7 @@ Severity is separate from strength. It follows the rising's size:
 | Riot | One province, no rebel army | |
 | Rising | One province with a rebel army | The province sends you no tax, recruits, food or trade, and its official flees |
 | Rebellion | 2 to 5 provinces | Rising effects in each province; neighbouring lords of the same faith or tongue waver; rebels can besiege castles |
-| Great revolt | More than 5 provinces, the capital's province, or a whole lord's land | Civil war: every lord picks a side by loyalty, allies may stay out, and rival AIs may attack |
+| Great revolt | More than 5 provinces, in or next to the capital's province, or a whole lord's land | Civil war: every lord picks a side by loyalty, allies may stay out, and rival AIs may attack |
 
 A rising that starts in or next to the capital is a great revolt at once.
 
@@ -263,26 +263,28 @@ All numbers are **placeholders** in the province config. The key names are the s
 | `rebellions.tax_win_years` | 10 |
 | `rebellions.outcomes` | the "if the rebels win" table |
 
+## Settled details
+
+- A province with 4 or more grievances is plotting and rises on a monthly roll: 5 % at 4 grievances, 15 % at 5 and 30 % at 6 or more. A spark can start a rising at 3. The rebels come from the province's recruits.
+- Faith risings ask for their faith to be tolerated where they hold, or for a house of their own. *Persecuted* counts as two grievances, and persecuting or taking over a house is a spark.
+- Rivals stir trouble only through funding rebels: while funded, sparks count double and more people join. A rival caught doing it gives you a reason to go to war.
+- When a revolution event fires, every province that meets its conditions rises at once, and those risings follow the revolution's camps.
+- Rebels from events start at once, with a size from small (half the province's recruits) to huge (four times as many).
+- The heaviest grievance is the one that counts most. Ties go in the cause table's order.
+- A disloyal lord revolts on a 5 % roll each month.
+- A local leader has Cunning 3 and Might 1, and his Logistics works like any commander's.
+- Below nationalism 0.5, a homeland rising wants its own tongue in the provinces it holds. At 0.5 or more it wants a country of its own.
+- Exploration's local attacks cover new colonies. A resistance covers settled land taken by conquest or treaty.
+- Armed veterans who kept their arms start at *Old weapons*.
+- A riot is just a province state. The rebellion card appears only when a rising starts.
+- Provisional numbers that may still be tuned: risings spread 10 % a month to neighbours with 3 or more grievances; a talk costs 10 gold per province; a bribe costs 1 gold per 100 rebels; a grant raises other plotting provinces' chance by 5 points for 12 months; a pardon calms twice as fast; a faith rising finds a new preacher after 12 months; after a massacre lords waver one step.
+
 ## Still open
 
-- **OQ-REBL-1**: province stats says recruits take up arms each month at 4 grievances; rebellions uses a monthly roll and class shares. Which rule forms rebels?
-- **OQ-REBL-2**: religion's changes (the new faith demand, *Persecuted*, new sparks) aren't adopted yet.
-- **OQ-REBL-3**: diplomacy's grievances *Foreign agitators* and *Foreign meddling* aren't adopted yet.
-- **OQ-REBL-4**: revolutions' tagged risings, camps and win or crush hooks aren't adopted, and "Risen" and "great revolt" are used loosely there.
-- **OQ-REBL-5**: how the event tree's rebel types and sizes become a rising.
-- **OQ-REBL-6**: missing numbers for spread, talk gold, bribe price, how much more likely after a grant, how much faster a pardon calms, and how far lords waver after a massacre.
-- **OQ-REBL-7**: which cause the other grievances give, and how "heaviest" is measured.
-- **OQ-REBL-8**: is a great revolt the capital's province only, or in or next to the capital?
-- **OQ-REBL-9**: when a disloyal lord chooses to revolt.
-- **OQ-REBL-10**: what Logistics does for rebels, and leaders' actual Might and Cunning values.
-- **OQ-REBL-11**: how the two-stage homeland demand works below nationalism 0.5, and what self-rule is as an outcome.
-- **OQ-REBL-12**: which ideology, threshold and era start New ideas risings.
-- **OQ-REBL-13**: whether both exploration's local aggression roll and colonial resistance exist.
-- **OQ-REBL-14**: which arms step armed veterans give.
-- **OQ-REBL-15**: whether a riot province with no rising is a rising at all.
+Nothing. Every question about rebellions has been decided.
 
 ## For developers
 
-- Spec: `domain/rebellions/spec.md` in the game repository, requirement code **REBL** (REBL-001 to REBL-064).
+- Spec: `domain/rebellions/spec.md` in the game repository.
 - Features: `domain/rebellions/features/`: `rising-steps.feature`, `sparks.feature`, `cause-and-leader.feature`, `strength.feature`, `severity-and-spread.feature`, `answering.feature`, `prevention.feature`, `rebels-win.feature` and `other-systems.feature` (the Troyes rebellion card).
-- Code: the folder `packages/engine/src/domain/rebellions/` exists but has no code in it yet.
+- Code: `packages/engine/src/domain/rebellions/`, with its numbers in `packages/rules/data/domain/rebellions.json`.

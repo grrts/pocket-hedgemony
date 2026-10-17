@@ -29,37 +29,36 @@ Feature: What culture does
       | hired in the province "Rennes", which is Breton   | Breton  |
       | graduated from a school teaching in French        | French  |
 
-  @CULT-052 @open-question
-  Scenario: A local official keeps Banned tongue from worsening Foreign rule
-    # OQ-CULT-11: "made worse" is not defined
+  @CULT-052
+  Scenario: A local official keeps Banned tongue away
     Given the province "Rennes" is Breton with "Foreign rule" and "Banned tongue"
-    And a Breton official serves in "Rennes"
-    Then "Banned tongue" does not make "Foreign rule" worse in "Rennes"
+    When a Breton official serves in "Rennes"
+    Then the province "Rennes" has the grievance "Foreign rule"
+    And the province "Rennes" does not have the grievance "Banned tongue"
 
-  @CULT-053 @open-question
-  Scenario Outline: Capacity weight of provinces
-    # OQ-CULT-1: government v2 does not count provinces
+  @CULT-053
+  Scenario Outline: A province's tongue does not weigh on the government caps
     Given a province of "France" whose majority is <majority>
-    Then it counts as <weight> provinces toward what the government of "France" can support
+    Then its tongue adds nothing to the officials cap or the lords cap of "France"
+    And an official sent there from the court needs <years> years to reach full effect
 
     Examples:
-      | majority | weight |
-      | kin      | 1      |
-      | cousin   | 1      |
-      | stranger | 1.5    |
+      | majority | years |
+      | kin      | 5     |
+      | cousin   | 7     |
+      | stranger | 10    |
 
-  @CULT-054 @open-question
+  @CULT-054
   Scenario Outline: Lords and tongue
-    # OQ-CULT-8: mapping to loyalty reasons
     Given the country "France" has the court tongue "French"
     When a lord of the tongue "<tongue>" is weighed for loyalty
     Then his loyalty <effect>
 
     Examples:
       | tongue  | effect                         |
-      | French  | tends one step up              |
-      | Occitan | is not changed by tongue       |
-      | Breton  | starts one step lower          |
+      | French  | has the rising cause "shares your tongue" |
+      | Occitan | is not changed by tongue                  |
+      | Breton  | starts one step lower                     |
 
   @CULT-055 @CULT-056 @CULT-075 @placeholder
   Scenario Outline: Homeland risings

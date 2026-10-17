@@ -30,3 +30,13 @@ Feature: Seeing faith
       | world  | each province in its majority faith's colour, hatched where another faith's community is 30 % or more, with holy place icons |
       | region | houses of worship as town sprites, preachers as walking figures, active waves as a spreading tint |
       | local  | the Faith line on the province card with its pulls                                         |
+
+  @RELG-027 @RELG-116 @placeholder
+  Scenario: Rouen's Faith line follows the rules
+    # config keys: pull, faith_rules.print_and_school_pull, mix.drift_per_year
+    Given the province "Rouen" is catholic 61 %, protestant 37 % and jewish 2 %
+    And "Rouen" has 2 catholic churches, a catholic monastery with seats, 1 protestant church, 1 synagogue and 2 presses
+    And the Reformation wave covers "Rouen"
+    When the pulls of "Rouen" are worked out
+    Then the pulls are catholic 3.5, protestant 5 and jewish 1
+    And the Faith line shows the mix moving about 0.3 points a year toward protestant

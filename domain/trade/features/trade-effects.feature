@@ -52,3 +52,17 @@ Feature: Other effects of trade
     When the trade rules are applied
     Then no trader carries grain to "Paris"
     And it is fed by the castle and food system
+
+  @TRADE-127 @placeholder
+  Scenario Outline: Materials cost more where no trade route touches
+    # config: materials.no_route_markup
+    Given the province "Langres" <touched>
+    When a building there buys a load of "iron"
+    Then it pays <price> gold
+
+    Examples:
+      | touched                                              | price |
+      | is a stop of a French caravan's route                | 2     |
+      | was passed by a trader 3 months ago                  | 2     |
+      | was last passed by a trader 14 months ago            | 2.5   |
+      | has never seen a trader                              | 2.5   |

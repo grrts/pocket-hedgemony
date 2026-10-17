@@ -116,6 +116,7 @@ Given("a rising starts in the province {string}", (s, name: string) => {
   s.r = R.startRising("r1", cause, name);
   s.r.army = true;
   s.r.holdsCapital = s.capital === name;
+  s.r.nearCapital = s.nearCapitalProvince === name;
   act(s);
 });
 Then("rebels muster in the province {string}", (s, name: string) => {
@@ -157,10 +158,12 @@ Then("a rising starts in the province {string} at once", (s, name: string) => {
   expect(rising(s).provinces).toContain(name);
 });
 Then("a rising starts at once in the province {string}", (s, name: string) => {
+  if (s.revRisings) return expect((s.revRisings as R.Rising[]).some((r) => r.provinces.includes(name))).toBe(true);
   expect(s.started).toBe(true);
   expect(rising(s).provinces).toContain(name);
 });
-Then("a rising does not start in the province {string}", (s) => {
+Then("a rising does not start in the province {string}", (s, name: string) => {
+  if (s.revRisings) return expect((s.revRisings as R.Rising[]).some((r) => r.provinces.includes(name))).toBe(false);
   expect(s.started).toBe(false);
 });
 Then("the rebellion card shows {string} as the reason the rising began", (s, spark: string) => {
@@ -984,4 +987,60 @@ Then("the card shows {string} and where it may spread next month", (s, a: string
 });
 Then("the card offers {string}, {string}, {string}, {string} and {string}", (s, ...answers: string[]) => {
   expect(s.card.answers).toEqual(answers.slice(0, 5));
+});
+
+// ---------------------------------------------------------------- decided questions (D-REBL-4, 8, 12)
+
+Given(/^the age of revolutions (has begun|has not begun)$/, (s, a: string) => {
+  (s.ci ??= { grievances: 0 }).ageOfRevolutions = a === "has begun";
+});
+Given("the event tree's support for {string} is {float} in the province {string}", (s, ideology: string, v: number) => {
+  expect(R.rebellionsConfig.new_ideas.ideologies).toContain(ideology);
+  (s.ci ??= { grievances: 0 }).ideologySupport = v;
+});
+Then("the rising does not have the cause {string}", (s, cause: string) => {
+  expect(rising(s).cause).not.toBe(cause);
+});
+Given("the province {string} borders the capital {string}", (s, near: string, capital: string) => {
+  s.capital = capital;
+  s.nearCapitalProvince = near;
+});
+Given("the event {string} fires for the country {string}", (s, ev: string) => {
+  s.revEvent = ev;
+  s.revProvinces = [];
+});
+Given("the provinces {string} and {string} of {string} meet the event's conditions", (s, a: string, b: string) => {
+  s.revProvinces.push({ name: a, meets: true }, { name: b, meets: true });
+});
+Given("the province {string} of {string} does not meet the event's conditions", (s, a: string) => {
+  s.revProvinces.push({ name: a, meets: false });
+});
+When("the event raises rebels", (s) => {
+  s.revRisings = R.revolutionRisings(s.revEvent, s.revProvinces);
+  s.started = s.revRisings.length > 0;
+  act(s);
+});
+Then("each new rising carries the revolution {string}", (s, ev: string) => {
+  for (const r of s.revRisings as R.Rising[]) expect(r.revolution).toBe(ev);
+});
+
+Given("a rising with the cause {string} starts in the province {string}", (s, cause: string, name: string) => {
+  s.r = R.startRising("r1", cause as R.Cause, name);
+});
+When("its leader is chosen", (s) => {
+  s.leader = R.chooseLeader(rising(s).cause, rising(s).provinces[0]!, new Rng(3));
+  act(s);
+});
+Then(/^the leader is a local such as an? (.+)$/, (s) => {
+  expect(s.leader.kind).toBe("local");
+  expect(R.rebellionsConfig.leaders.local.roles.some((r: string) => s.leader.name.startsWith(`the ${r} of`))).toBe(true);
+});
+Then(/^the leader is (a preacher|the lord himself|the pretender)$/, (s, who: string) => {
+  expect(s.leader.kind).toBe(who === "a preacher" ? "preacher" : who);
+});
+Then("the leader brings {string}", (s, brings: string) => {
+  expect(s.leader.brings).toBe(brings);
+});
+Then("the leader has Might, Cunning and Logistics like a commander", (s) => {
+  for (const k of ["might", "cunning", "logistics"]) expect(typeof s.leader[k]).toBe("number");
 });

@@ -57,3 +57,11 @@ Feature: Deposits and trade income
       | knows        | at peace   | 18 gold reach the treasury of "Florence" and 2 go to "Burgundy" |
       | doesn't know | at peace   | nothing is deposited                                       |
       | knows        | at war     | nothing is deposited                                       |
+
+  @TRADE-128 @placeholder
+  Scenario: A heritage lever on deposits
+    # X-6: trader_gain_pct is a percentage on each deposit
+    Given the country "Venice" has the heritage lever trader_gain_pct +10
+    And a Venetian caravan "Caravan of Venice" has 20 gold in its purse
+    When it enters "Venice", a city of "Venice"
+    Then 22 gold goes to the treasury of "Venice"

@@ -1,5 +1,5 @@
 {
- "$comment": "Culture config (domain/culture/spec.md §10), from culture/culture-config.example.yaml version 1. All numbers are placeholders. 'tongues_added' are tongues the design or the feature files name with their family; 'design_numbers' are design values with no config key (OQ-CULT-13).",
+ "$comment": "Culture config (domain/culture/spec.md §10), from culture/culture-config.example.yaml version 1. All numbers are placeholders; '_provisional' lists the keys still being balanced. 'tongues_added' are tongues the design or the feature files name with their family.",
  "families_event_tree": [
   "latin",
   "germanic",
@@ -88,6 +88,17 @@
     "newspapers": 1.25,
     "railways": 1.25
    }
+  },
+  "way_of_life_lands": {
+   "herding": [
+    "grassland",
+    "drylands"
+   ],
+   "forest": [
+    "forest",
+    "jungle"
+   ],
+   "seafaring": "coastal"
   }
  },
  "policy": {
@@ -120,11 +131,6 @@
    "cousin": 7,
    "stranger": 10,
    "local_tongue": 5
-  },
-  "capacity_weight": {
-   "kin": 1.0,
-   "cousin": 1.0,
-   "stranger": 1.5
   }
  },
  "effects": {
@@ -155,12 +161,15 @@
   },
   "new_tongue_abroad": {
    "settler_majority_years": 100,
-   "across_sea": true
+   "region": "map macro-region",
+   "separated_by_sea": "top-level map region differs from the court capital's"
   },
   "merge_without_event": {
    "needs_policy": "impose",
-   "years": 50
-  }
+   "years": 50,
+   "nation_state": "court tongue is the merges_into of some tongue"
+  },
+  "check_every_years": 5
  },
  "family_default_by_region": {
   "cushitic": {
@@ -413,18 +422,18 @@
   {
    "id": "english",
    "name": "English",
-   "family": null,
+   "family": "germanic",
    "way_of_life": "settled",
    "splits_to": "anglo_american",
-   "_from": "culture §6.3; family not given by the design"
+   "_from": "culture §6.3; family germanic (D-CULT-3 data fix)"
   },
   {
    "id": "dutch",
    "name": "Dutch",
-   "family": null,
+   "family": "germanic",
    "way_of_life": "settled",
    "splits_to": "afrikaans",
-   "_from": "culture §6.3; family not given by the design"
+   "_from": "culture §6.3; family germanic (D-CULT-3 data fix)"
   },
   {
    "id": "great_russian",
@@ -481,14 +490,22 @@
    "family": null,
    "way_of_life": "settled",
    "_from": "drift.feature; family not given by the design"
+  },
+  {
+   "id": "swedish",
+   "name": "Swedish",
+   "family": "germanic",
+   "way_of_life": "settled",
+   "_from": "culture-design §3.3 Riga example"
+  },
+  {
+   "id": "bosnian",
+   "name": "Bosnian",
+   "family": "slavic",
+   "way_of_life": "settled",
+   "_from": "religion-design §11 (Bosnia converts, tongue stays)"
   }
  ],
- "design_numbers": {
-  "homeland_rising_draw": 0.08,
-  "locals_know_the_land": 0.1,
-  "refugees_settle_after_years": 2,
-  "engine_check_interval_years": 5
- },
  "merge_events": {
   "italian_unification": {
    "into": "italian"
@@ -566,5 +583,33 @@
     "expulsion of trading peoples of another faith"
    ]
   }
- }
+ },
+ "risings": {
+  "homeland_draw": 0.08
+ },
+ "refugees": {
+  "settle_after_years": 2
+ },
+ "schools": {
+  "learned_tongues": [
+   "Latin",
+   "Classical Arabic"
+  ]
+ },
+ "_provisional": [
+  "relation",
+  "drift.base_rate_per_year",
+  "drift.court_pull_needs_years_held",
+  "drift.drop_below_share",
+  "drift.multipliers",
+  "drift.way_of_life_lands",
+  "policy",
+  "officials.years_to_full_effect",
+  "effects",
+  "nationalism",
+  "engine_events",
+  "risings.homeland_draw",
+  "refugees.settle_after_years",
+  "family_default_by_region"
+ ]
 }

@@ -33,9 +33,8 @@ Feature: Tongue policy, the Own tongue charter and other levers
     When upkeep is paid
     Then the school in "Troyes" costs 10 % more upkeep
 
-  @CULT-040 @CULT-041 @open-question
+  @CULT-040 @CULT-041
   Scenario: Impose bans the tongue in stranger provinces
-    # OQ-CULT-7: whether lords waver once or yearly
     Given the country "Castile" has the court tongue "Castilian" and the chancery tradition
     And the province "Granada" is mostly Andalusi Arabic (strangers)
     And the province "Barcelona" is mostly Catalan (cousins) with nationalism 0.1
@@ -44,6 +43,7 @@ Feature: Tongue policy, the Own tongue charter and other levers
     Then the province "Granada" has the grievance "Banned tongue"
     And the province "Barcelona" does not have the grievance "Banned tongue"
     And the lord "Zegri" wavers one step
+    And the lord "Zegri" does not waver again while "Impose" holds
 
   @CULT-040
   Scenario: Impose bans the tongue of cousins once nationalism is 0.3
@@ -121,3 +121,16 @@ Feature: Tongue policy, the Own tongue charter and other levers
     And the house "Montfort" is of the tongue "Breton"
     When the ruler of "France" marries into the house "Montfort"
     Then the lords of the house "Montfort" count as kin for loyalty
+
+  @CULT-093
+  Scenario Outline: Any form may choose any Tongue policy
+    Given the country "<country>" has the government form "<form>"
+    And the country "<country>" has the invention "Printing"
+    When the country "<country>" sets the Tongue policy "<policy>"
+    Then the policy is set
+
+    Examples:
+      | country | form              | policy |
+      | Kazan   | Confederation     | Impose |
+      | Venice  | Merchant republic | Let be |
+      | France  | Absolute monarchy | Teach  |

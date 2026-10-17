@@ -56,3 +56,24 @@ Feature: Trade on screen
     When the trade rules are applied
     Then the turn report says "Traders brought 23 gold this month"
     And the robbery has its own line
+
+  @TRADE-093 @TRADE-124
+  Scenario: Busy sea lanes are counted, not given a ratio
+    Given 3 Venetian cogs and 1 Genoese cog sail through the "Ionian Sea" this month
+    And 1 Venetian cog sails through the "Adriatic"
+    When the month ends
+    Then the busiest sea lanes are the "Ionian Sea" with 4 ships and the "Adriatic" with 1
+    And no sea zone has a trade ratio
+
+  @TRADE-125 @placeholder
+  Scenario Outline: Hubs as the event tree reads them
+    # config: hubs
+    Given the trade config of the design
+    When the trade rules are applied
+    Then the hub "<hub>" is <places>
+
+    Examples:
+      | hub            | places                                     |
+      | bruges_antwerp | the provinces "Bruges" and "Antwerp"       |
+      | malacca_strait | the province "Malacca" and the sea zone "Strait of Malacca" |
+      | volga          | the provinces "Astrakhan" and "Kazan"      |

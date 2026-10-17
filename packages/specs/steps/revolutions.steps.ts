@@ -685,6 +685,7 @@ Given("the province's homeless are of another faith than the movement", (s) => {
   s.sameFaith = false;
 });
 When("the month is processed", (s) => {
+  if (s.funding) V.fundingMonth(rs(s), s.funding, s.income ?? 0, rng(s), 0);
   if (s.classes) s.joined = V.musterCamp(s.tagged, s.classes, { hungry: s.hungry, ...(s.sameFaith === false ? { sameFaith: false } : {}) });
   act(s);
 });
@@ -1529,4 +1530,104 @@ Given("a regime names the form {string} which is not in the government forms", (
 });
 Then("it reports a layer error for that regime", (s) => {
   expect((s.build as V.LayerBuild).errors).toEqual([`regime commonwealth: unknown form ${s.badForm}`]);
+});
+
+// ---------------------------------------------------------------- funding abroad (D-REVO-1, X-10)
+
+Given(/^the country "([^"]+)" (has|does not have) a diplomat in "([^"]+)"$/, (s, _f: string, has: string) => {
+  s.diplomat = has === "has";
+});
+Given("the card of {string} for {string} shows the stage {string}", (s, _id: string, _c: string, stage: V.Stage) => {
+  s.fundStage = stage;
+});
+When("{string} tries to fund the revolution {string} in {string}", (s) => {
+  s.fundOk = V.canFundRevolution(s.fundStage, s.diplomat);
+  act(s);
+});
+Then(/^the funding is (allowed|refused)$/, (s, r: string) => {
+  expect(s.fundOk).toBe(r === "allowed");
+});
+Given("the yearly income of {string} is {int} gold", (s, _c: string, n: number) => {
+  s.income = n;
+});
+Given("{string} funds the revolution {string} in {string}", (s, funder: string, id: string, target: string) => {
+  realm(s, target);
+  s.funding = V.fundRevolution(rs(s), key(funder), key(target), id);
+});
+Then("{string} pays {int} gold", (s, _f: string, n: number) => {
+  expect(s.funding.paid).toBe(n);
+});
+Then("the spark {string} multiplies the chance by {int}", (s, label: string, n: number) => {
+  expect(V.revolutionsConfig.reference.foreign_backing.label).toBe(label);
+  expect(V.revolutionsConfig.reference.foreign_backing.mult).toBe(n);
+});
+Then("if the revolution becomes a rising its camp's join shares are multiplied by {float}", (s, n: number) => {
+  expect(V.revolutionsConfig.reference.foreign_backing.joins_mult).toBe(n);
+});
+When("the caught roll of {int} percent succeeds", (s, pct: number) => {
+  expect(V.caughtChance()).toBeCloseTo(pct / 100);
+  V.catchFunding(rs(s), s.funding);
+  act(s);
+});
+Then("the funding ends", (s) => {
+  expect(s.funding.active).toBe(false);
+});
+Then("{string} gains the opinion reason {string} toward {string}", (s, from: string, reason: string, to: string) => {
+  expect(rs(s).opinions.some((o) => o.from === key(from) && o.to === key(to) && o.reason === reason)).toBe(true);
+});
+Then("{string} gains a reason to fight {string}", (s, from: string, to: string) => {
+  expect(rs(s).opinions.some((o) => o.from === key(from) && o.to === key(to) && o.reason === "caught_funding_rebels")).toBe(true);
+});
+Then("the card of {string} names {string} as the funder", (s, id: string, funder: string) => {
+  expect(rs(s).log.some((e) => e.type === "FundingCaught" && e["revolution"] === id && e["funder"] === key(funder))).toBe(true);
+});
+Given(/^"([^"]+)" (is at war|is at peace)$/, (s, _c: string, st: string) => {
+  s.atPeace = st === "is at peace";
+});
+Given("officials run {int} percent of the provinces of {string}", (s, pct: number) => {
+  s.officialsShare = pct / 100;
+});
+When("the caught chance is computed", (s) => {
+  s.chance = V.caughtChance({ atPeace: !!s.atPeace, officialsShare: s.officialsShare ?? 0 });
+  act(s);
+});
+Then("it is {int} percent a month", (s, pct: number) => {
+  expect(s.chance).toBeCloseTo(pct / 100);
+});
+
+// ---------------------------------------------------------------- counter-revolution (D-REVO-8)
+
+Given("the countries {string} and {string} are monarchies", (s, a: string, b: string) => {
+  s.monarchies = [monarchy(s, a), monarchy(s, b)];
+  for (const m of s.monarchies) E.country(w(s), m).government = "monarchy";
+});
+Then("every monarchy's opinion of {string} falls by {int}", (s, name: string, n: number) => {
+  for (const m of s.monarchies as string[]) expect(rs(s).opinions.find((o) => o.from === m && o.to === key(name) && o.reason === "counter_revolution")?.value).toBe(-n);
+});
+Then("every monarchy gains a counter-revolution reason to fight {string} for {int} years", (s, name: string, y: number) => {
+  for (const m of s.monarchies as string[]) expect(rs(s).opinions.find((o) => o.from === m && o.to === key(name) && o.reason === "counter_revolution")?.years).toBe(y);
+});
+Then("the counter-revolution row replaces diplomacy's {string} row, so the two do not stack", (s) => {
+  for (const m of s.monarchies as string[]) expect(rs(s).opinions.filter((o) => o.from === m && o.to === key("France")).length).toBe(1);
+});
+
+// ---------------------------------------------------------------- a funded win (REVO-065)
+
+Given("{string} funded the revolution {string} in {string}", (s, funder: string, id: string, target: string) => {
+  monarchy(s, funder);
+  E.country(w(s), key(funder)).government = "monarchy";
+  s.funding = V.fundRevolution(rs(s), key(funder), realm(s, target), id);
+  s.acted = false;
+});
+When("the opinion of {string} toward {string} is computed", (s, name: string, funder: string) => {
+  const regime = V.holding(rs(s), key(name)).regime;
+  expect(regime).toBeDefined();
+  s.winOpinion = V.fundedWinOpinion(rs(s), regime!, E.country(w(s), key(funder)).government);
+  act(s);
+});
+Then("it starts at +{int}", (s, n: number) => {
+  expect(s.winOpinion).toBe(n);
+});
+Then("it gets no +{int}, because the regime is hostile to monarchies", (s) => {
+  expect(s.winOpinion).toBe(0);
 });

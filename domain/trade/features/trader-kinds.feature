@@ -73,6 +73,7 @@ Feature: Kinds of trader
 
   @TRADE-020 @placeholder
   Scenario Outline: Ship trade numbers
+    # config: sea_traders (hold, purse); naval.ships (upkeep)
     Given the trade config of the design
     When the trade rules are applied
     Then a trading "<ship>" has hold <hold>, purse <purse> and upkeep <upkeep> a month
@@ -81,11 +82,23 @@ Feature: Kinds of trader
       | ship               | hold | purse | upkeep |
       | cog / junk / dhow  | 2    | 30    | 1      |
       | galley             | 2    | 25    | 2      |
-      | caravel            | 1    | 20    | 1      |
-      | carrack            | 3    | 50    | 1.5    |
-      | galleon            | 3    | 60    | 2      |
+      | carrack            | 3    | 50    | 3      |
+      | galleon            | 3    | 60    | 8      |
       | fluyt              | 4    | 70    | 1.5    |
       | steamer            | 6    | 150   | 3      |
+
+  @TRADE-004 @TRADE-020
+  Scenario Outline: Which ships can trade
+    Given the trade config of the design
+    When the trade rules are applied
+    Then a "<ship>" <can> be set to trade
+
+    Examples:
+      | ship     | can    |
+      | cog      | can    |
+      | junk     | can    |
+      | galleon  | can    |
+      | caravel  | cannot |
 
   @TRADE-021 @TRADE-022 @TRADE-023
   Scenario Outline: Ship movement limits

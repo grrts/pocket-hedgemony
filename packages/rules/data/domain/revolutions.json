@@ -84,6 +84,10 @@
  "foreign_backing": {
   "cost_share_of_yearly_income": 0.01,
   "catch_chance": 0.03,
+  "catch_at_peace_add": 0.01,
+  "catch_officials_add": 0.01,
+  "catch_officials_share": 0.5,
+  "fundable_stages": ["Brewing", "Ready"],
   "win_opinion": 25
  },
  "counter_revolution": {
@@ -6238,5 +6242,12 @@
    "agrees_below_grievance_share": 0.3333333333333333,
    "needs_not_deep_in_debt": true
   }
- }
+ },
+ "_provisional": [
+  "foreign_backing.catch_at_peace_add",
+  "foreign_backing.catch_officials_add",
+  "foreign_backing.catch_officials_share",
+  "counter_revolution.years",
+  "counter_revolution.opinion"
+ ]
 }

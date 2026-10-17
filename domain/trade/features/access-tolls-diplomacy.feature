@@ -37,6 +37,7 @@ Feature: Who may go where, tolls and diplomacy
 
   @TRADE-071 @placeholder
   Scenario Outline: Tolls from the purse
+    # config: tolls.low, tolls.high
     Given the "Jura" pass has a toll rate "<rate>" set by its owner
     When a caravan passes the "Jura" pass
     Then it pays <toll> from its purse
@@ -45,7 +46,7 @@ Feature: Who may go where, tolls and diplomacy
       | rate | toll              |
       | none | nothing           |
       | low  | 0.2 gold          |
-      | high | more than at low  |
+      | high | 0.5 gold          |
 
   @TRADE-072
   Scenario: Trade pact
@@ -60,13 +61,12 @@ Feature: Who may go where, tolls and diplomacy
     When the trade rules are applied
     Then Portuguese traders may neither enter nor stop in Castilian provinces or ports
 
-  @TRADE-074 @open-question
-  # OQ-TRADE-8: diplomacy may not have closed borders
-  Scenario: Closed borders
-    Given "Ming" has closed its borders to "Japan"
+  @TRADE-074
+  Scenario: Only an embargo shuts traders out
+    Given "Ming" and "Japan" are at peace and "Ming" has no embargo on "Japan"
     When the trade rules are applied
-    Then Japanese land traders may not enter Ming provinces
-    But Japanese trade ships are not stopped by the closed borders
+    Then Japanese land traders may enter Ming provinces
+    And Japanese trade ships may enter Ming ports
 
   @TRADE-075
   Scenario: Traders caught inside when war starts

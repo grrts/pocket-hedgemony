@@ -40,11 +40,12 @@ Feature: Aftermath of a revolution
 
   @REVO-057 @placeholder
   Scenario: Counter-revolution against a revolutionary republic
-    # config: counter_revolution.years, counter_revolution.opinion
+    # config: counter_revolution.years, counter_revolution.opinion (provisional)
+    Given the countries "Austria" and "Prussia" are monarchies
     When the regime "revolutionary_republic" applies to "France"
     Then every monarchy's opinion of "France" falls by 50
     And every monarchy gains a counter-revolution reason to fight "France" for 25 years
-    And diplomacy counts the reason "Different form of rule -20" between "France" and every monarchy
+    And the counter-revolution row replaces diplomacy's "Different form of rule -20" row, so the two do not stack
 
   @REVO-058 @placeholder
   Scenario: Generals grow too big twice as often in a revolutionary republic

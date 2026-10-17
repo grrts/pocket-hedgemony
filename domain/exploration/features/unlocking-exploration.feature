@@ -43,9 +43,8 @@ Feature: Unlocking exploration
     When the game checks the exploration unlock for the country "Denmark"
     Then the country "Denmark" has the exploration unlock
 
-  @EXPL-004 @open-question
+  @EXPL-004
   Scenario: A region outside the age cannot explore yet
-    # depends on OQ-EXPL-3: which later age opens the gate is not set
     Given the region "middle_east" is not in the region list of the age "age_of_exploration"
     And the country "Mamluk Sultanate" of the region "middle_east" knows S4 "Carrack and caravel"
     When the game checks the exploration unlock for the country "Mamluk Sultanate"
@@ -105,3 +104,29 @@ Feature: Unlocking exploration
       | chiefdom           | 0          | 10    |
       | paramount chiefdom | 5          | 10    |
       | merchant republic  | 30         | 30    |
+
+  @EXPL-004
+  Scenario Outline: The first later age that covers a region opens its gate
+    Given the region "<region>"
+    When the game looks for the age that opens exploration there
+    Then it is "<age>"
+
+    Examples:
+      | region        | age                     |
+      | north_america | age_of_atlantic_empires |
+      | middle_east   | age_of_reformations     |
+      | central_asia  | age_of_reformations     |
+      | europe        | age_of_exploration      |
+
+  @EXPL-004
+  Scenario: The Mamluks may explore once the later age begins
+    Given the country "Mamluk Sultanate" of the region "middle_east" knows S4 "Carrack and caravel"
+    And the age "age_of_reformations" begins in its region
+    When the game checks the exploration unlock for the country "Mamluk Sultanate"
+    Then the country "Mamluk Sultanate" has the exploration unlock
+
+  @EXPL-005 @EXPL-001
+  Scenario: The age gate applies to voyaging canoes too
+    Given a country of the region "north_america" knows S3 "Outrigger voyaging" and not S4
+    When the game checks its exploration unlock
+    Then it lacks the exploration unlock until the age "age_of_atlantic_empires" begins in its region

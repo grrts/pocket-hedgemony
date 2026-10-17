@@ -55,3 +55,15 @@ Feature: The charted map
       | carracks                 | goes round through charted zones only |
       | galleons                 | goes round through charted zones only |
       | caravels and one carrack | goes round through charted zones only |
+
+  @EXPL-064
+  Scenario Outline: Charts are never shared or handed over
+    Given the country "Portugal" has charted the coast of "Arguin"
+    And the country "Castile" has not charted the coast of "Arguin"
+    When <happens>
+    Then the country "Castile" still has not charted the coast of "Arguin"
+
+    Examples:
+      | happens                                               |
+      | the countries "Castile" and "Portugal" become allies  |
+      | the country "Castile" takes provinces from "Portugal" far from "Arguin" |

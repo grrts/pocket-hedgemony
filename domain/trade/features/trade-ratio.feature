@@ -48,9 +48,9 @@ Feature: Trade ratio
     When the trade rules are applied
     Then "Corfu" and "Otranto" each count half a trader passing
 
-  @TRADE-035 @TRADE-036 @TRADE-037 @TRADE-038 @TRADE-039 @placeholder @open-question
-  # OQ-TRADE-9: how modifiers combine
+  @TRADE-035 @TRADE-036 @TRADE-037 @TRADE-038 @TRADE-039 @placeholder
   Scenario Outline: Ratio gain modifiers
+    # config: ratio.modifiers
     Given the province "Dijon" has <condition>
     When the trade rules are applied
     Then its ratio gain is changed by <change>
@@ -63,6 +63,7 @@ Feature: Trade ratio
       | riots                                         | −50 %  |
       | 10 % homeless                                 | −5 %   |
       | 15 % homeless                                 | −10 %  |
+      | 4 % homeless                                  | 0 %    |
 
   @TRADE-040
   Scenario: Plague quarantine
@@ -84,3 +85,47 @@ Feature: Trade ratio
     When the trade rules are applied
     Then no trade ship may enter "Lisbon"
     And "Lisbon" gets no sea-lane gain
+
+  @TRADE-118 @placeholder
+  Scenario Outline: Ratio gain modifiers add together
+    # config: ratio.modifiers, ratio.modifiers_combine
+    Given the province "Dijon" has <conditions>
+    When the trade rules are applied
+    Then its ratio gain is changed by <change>
+
+    Examples:
+      | conditions                                          | change |
+      | a customs officer and riots                         | −35 %  |
+      | a customs officer, peace for 10 years and a better road | +35 % |
+      | riots and 30 % homeless                             | −75 %  |
+      | riots, 60 % homeless and a trade_access of −0.2     | −100 % |
+      | a customs officer and an enemy army                 | −100 % |
+
+  @TRADE-036 @TRADE-118
+  Scenario Outline: A road better than every neighbour's
+    Given the province "Dijon" has a "<own>" and its neighbours have <neighbours>
+    When the trade rules are applied
+    Then "Dijon" <has> the better-road bonus
+
+    Examples:
+      | own        | neighbours                 | has      |
+      | paved_road | a road and a track         | has      |
+      | paved_road | a paved_road and a road    | lacks    |
+      | road       | a track and a track        | has      |
+
+  @TRADE-123 @placeholder
+  Scenario Outline: "Traders passing" effects of buildings and heritage
+    # config: ratio.shrine_pilgrims_passing; X-6 heritage levers
+    Given the province "Djenné" has a trade ratio of 40
+    And 2 traders passed it this month
+    And it has <effect>
+    When the month's day loop ends
+    Then the ratio gain is <gain>
+
+    Examples:
+      | effect                                                   | gain |
+      | nothing more                                             | 3.6  |
+      | a landmark giving +20 % traders passing                  | 4.32 |
+      | a pilgrimage shrine whose pilgrims count as traders passing | 5.4 |
+      | an owner whose heritage gives traders_passing_pct +10    | 3.96 |
+      | an owner whose heritage gives trade_balance_pct +10      | 3.96 |

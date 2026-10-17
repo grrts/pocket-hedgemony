@@ -24,7 +24,7 @@ answer it, and what the rebels get if they win.
 - Lords, their loyalty steps, wants, retinues: **realm** (country stats 5).
 - How rebel bands fight (battle rules, *Rebel band* kind, break point, troop level): **warfare**.
 - How a rising is tagged by a revolution, the camps that replace the join table, and the regime applied when
-  a tagged rising wins or is crushed: **revolutions** (the hook is a seam, see 11 and OQ-REBL-4).
+  a tagged rising wins or is crushed: **revolutions** (the hook is a seam, see 11 and D-REBL-4).
 - The secret "fund rebels" action itself, its gold and its chance of being caught: **diplomacy**.
 - Faith policy rows, preachers, houses of worship: **religion**. Tongues and nationalism: **culture**.
 - Independence wars of subjects: **subjects** (8.2), which are ordinary wars, not risings.
@@ -169,7 +169,7 @@ Newest decision first.
   *Hungry* → Hunger; *Heavy taxes* or *Conscription* → Tax; *Wrong faith* or a faith *Broken charter* → Faith;
   *Foreign rule* or *Far from the throne* → Homeland; *Homeless*, *Broken charter* or *Soldiers quartered* →
   Town; *Harsh lord*, or a disloyal lord's own choice → Lord; a pretender with a right to the province plus
-  any grievance → Pretender; in later eras, any grievance plus the event tree's ideology support → New ideas.
+  any grievance → Pretender; from the age of revolutions, any grievance plus event-tree support of 0.3 or more for liberalism, socialism, communism or nationalism → New ideas (D-REBL-12).
   [rebellions §2.3]
 - REBL-014 The game shall set the demand by cause: Hunger – food, the castle granary opened to them; Tax –
   the tax rate back down and the levy ended; Faith – a faith tolerance charter, or a ruler of their faith;
@@ -377,7 +377,7 @@ The secret "fund rebels" order is a diplomacy command (diplomacy 6.11); this con
   (diplomacy, religion, events), then treat it as a spark.
 - When the ruler dies with a child heir or none (realm), then treat it as a spark.
 - When a revolution event fires (events / revolutions), then start a rising in every province meeting its
-  conditions, tagged with the revolution (see OQ-REBL-4).
+  conditions, tagged with the revolution (see D-REBL-4).
 - When a lord's loyalty reaches *In revolt* (realm), then start a lord's revolt.
 - When settlers take local people's tiles (province, exploration), then start a resistance.
 - When a rival funds rebels in a province (diplomacy 6.11), then count the rising's arms as Armed from foreign
@@ -435,18 +435,18 @@ groups.
 | realm | upstream / downstream (partnership) | Partnership | Lords' loyalty, wants, retinues, wealth, officials; *In revolt* country count; lords waver or pick sides |
 | warfare | upstream | Conformist | *Rebel band* kind, battle rules, break point, troop level *Raw*; battle results; sieges |
 | troop-movement | upstream | Customer–Supplier | Armies in or away from the region; attacking rebels |
-| revolutions | downstream | Customer–Supplier | Tagged risings (`revolution: <event>`), camp join shares that replace 5.4 for that rising, `rising_won` / `rising_crushed` hook (proposed, OQ-REBL-4) |
+| revolutions | downstream | Customer–Supplier | Tagged risings (`revolution: <event>`), camp join shares that replace 5.4 for that rising, `rising_won` / `rising_crushed` hook (adopted, D-REBL-4) |
 | events | upstream | Published Language | `rebels` effect, `rebels_active` condition, `unrest` → grievances, sparks from events, `separatism_risk` |
-| diplomacy | upstream | Customer–Supplier | Fund rebels (secret), *Foreign agitators* / *Foreign meddling* (OQ-REBL-3), envoy flees when the host country falls to rebels |
-| religion | upstream | Customer–Supplier | Faith risings' demand, preachers as leaders, sparks from faith policy and houses (OQ-REBL-2) |
+| diplomacy | upstream | Customer–Supplier | Fund rebels (secret), *Foreign agitators* / *Foreign meddling* (D-REBL-3), envoy flees when the host country falls to rebels |
+| religion | upstream | Customer–Supplier | Faith risings' demand, preachers as leaders, sparks from faith policy and houses (D-REBL-2) |
 | culture | upstream | Customer–Supplier | Homeland risings draw 8 % of the tongue; with nationalism 0.5+ they demand a new country; *Banned tongue* grievance |
 | government | downstream | Customer–Supplier | A won New ideas rising sets a form; over-cap lords become disloyal |
 | subjects | downstream | Customer–Supplier | A lord leaving with his land (rebellions 6) |
-| recruiting | upstream | Customer–Supplier | Recruits lost to rebels; armed veterans start a rising armed and drilled (OQ-REBL-14) |
+| recruiting | upstream | Customer–Supplier | Recruits lost to rebels; armed veterans start a rising armed and drilled (D-REBL-14) |
 | buildings | downstream | Customer–Supplier | Looting one town building a season, market first; town walls stop looting without storming |
 | trade | downstream | Customer–Supplier | Riots: traders avoid; bandits where riots or rebels; rebels holding a province act as an enemy army |
 | scenario-setup | downstream | Customer–Supplier | A new country for a won homeland rising (catalogue entity or generated) |
-| exploration | upstream | Customer–Supplier | Colonies and local people's tiles; resistance (OQ-REBL-13) |
+| exploration | upstream | Customer–Supplier | Colonies and local people's tiles; resistance (D-REBL-13) |
 | map-presentation | downstream | Published Language | Steps on the map, rising icons, *Grievances* lens |
 | time-and-turns | upstream | Conformist | Monthly order of steps |
 
@@ -459,55 +459,25 @@ groups.
   grievances, when they have a free envoy seat and gold to spare. [diplomacy §12]
 - AI answers use the same commands as the player.
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-REBL-1: Province stats 12.1 says at 4 or more grievances "a share of the recruits take up arms each
-  month under a named leader"; rebellions 2.1 says a plotting province rises only on a monthly roll (5 / 15 /
-  30 %) or a spark, and men then join by class shares (3.1), not from recruits. Which rule forms rebels?
-  Province stats is the newer file but points to rebellions for "how risings start". Blocks REBL-005, REBL-024.
-- OQ-REBL-2: Religion 18 asks rebellions 2.3 and 5.1 to change the faith demand to "their faith Tolerated, or a
-  house of their faith (accepted in a Talk)", and adds the grievance *Persecuted* and new sparks (a faith
-  policy step toward Persecuted; taking over a house). Rebellions v1 still says "faith tolerance charter, or a
-  ruler of their faith". Not adopted. Blocks REBL-010, REBL-014, REBL-046, REBL-057.
-- OQ-REBL-3: Diplomacy 6.11 and 18 ask rebellions to add the grievances *Foreign agitators* (riots need one
-  grievance fewer while funded) and *Foreign meddling* (a year after funding is caught). Neither rebellions nor
-  province stats 12.1 (nor revolutions' reference list) has them. Not adopted.
-- OQ-REBL-4: Revolutions asks rebellions to carry `revolution: <event id>` on a rising, replace the 3.1 join
-  table with the family's camps for that rising, and apply `rising_won` / `rising_crushed` when it wins, is
-  beaten or melts away. Rebellions v1 has none of this. Revolutions also says a province where the revolution
-  camp holds the castle "counts as Risen (rebellions 5)"; rebellions has no *Risen* state (closest: the
-  *Rising* tier, 4.1). Revolutions' reference.yaml says a Fight "becomes a great revolt"; its design says "a
-  tagged rising". Which is it?
-- OQ-REBL-5: The event tree spawns rebels by `type` (peasant, religious, noble, separatist, revolutionary,
-  independence, anticolonial) and `size` (small 0.5 … huge 4.0 × the province's `manpower_yield`), with
-  `unrest_spawn` 60 and `unrest_guaranteed` 90. No design maps these to the 8 causes, to men drawn by class, or
-  to grievances (province stats 15 maps `unrest` only). How does a `rebels` effect become a rising, and what do
-  `rebels_active {type}` conditions read?
-- OQ-REBL-6: No numbers for: spread chances and each factor; "some gold" for a talk; the bribe price;
-  how much "more likely" other provinces become after a grant; how much faster a pardoned province calms;
-  how fast a faith rising finds a new preacher; how far lords "waver" after a massacre (one step?).
-- OQ-REBL-7: The cause table covers only some grievances. Which cause do *Burned homes*, *Ungoverned*,
-  *Plague*, *Bloodshed*, *Requisitioned*, *Neighbour in revolt* and the newer *Persecuted* (religion),
-  *Banned tongue* (culture), *Grasping officials* (government) give when they are the heaviest? How is
-  "heaviest" measured (counts-as-two, ties)?
-- OQ-REBL-8: 4.1 makes "the capital's province" a great revolt; 4.3 makes a rising "in or next to the capital"
-  a great revolt at once. Next-to is broader; which governs?
-- OQ-REBL-9: When does a disloyal lord choose to revolt (the Lord cause "a disloyal lord's own choice")? Country
-  stats 5.2 says a disloyal lord "can rebel or defect"; no rule or chance is given.
-- OQ-REBL-10: What does a leader's Logistics do for rebels, and what Might and Cunning values do "Cunning,
-  little Might" leaders get?
-- OQ-REBL-11: Culture 5.2/6.4: homeland risings with nationalism 0.5+ demand a new country, "not self-rule".
-  Rebellions says "self-rule, then independence". How does the two-stage demand work below 0.5 (what is
-  self-rule as an outcome)? The won-homeland outcome (6) already breaks away regardless.
-- OQ-REBL-12: The New ideas cause needs "the event tree's ideology support" and "later eras": which ideology
-  and which threshold, and from which era?
-- OQ-REBL-13: Exploration replaces "native uprisings as separate stats and events" with a local aggression roll
-  that lowers colony progress, while rebellions keeps resistance when settlers take local tiles. Province stats
-  12.3 says colonies only take free tiles, so resistance only starts after conquest or treaty. Do both exist?
-- OQ-REBL-14: Recruiting says veterans who keep their arms start any rising "armed and drilled". The arms
-  table has no "armed veterans" source (only a veteran leader → Old weapons). Which step do they give?
-- OQ-REBL-15: Severity *Riot* is "one province, no army"; the step *Riots* is 3 grievances. Is a riot province
-  with no rising a rising object at all (the card appears only on rising)?
+Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rule, no new mechanics, provisional numbers in the context's data JSON).
+
+- **D-REBL-1** (was OQ-REBL-1) How rebels form: X-9. At 4 or more grievances a province is *Plotting* and rises on a monthly roll of 5 %, 15 % or 30 % at 4, 5 or 6+ grievances; a spark can start a rising at 3. When it rises its men come from the province's recruit pool, by the 3.1 class shares. "A share of the recruits each month" is dropped. Cross-context decision X-9.
+- **D-REBL-2** (was OQ-REBL-2) Faith risings follow religion §18: they demand their faith Tolerated where they hold, or a house of their faith (accepted in a Talk); the grievance *Persecuted* (counts as two) exists, and a faith-policy step toward Persecuted and the take-over of a house are sparks. Religion's design is the later one.
+- **D-REBL-3** (was OQ-REBL-3) *Foreign agitators* and *Foreign meddling* are not added. Funding works through the one *Fund rebels* action (X-10): while funded, sparks count double and joins are ×1.5; being caught gives the target the caught war reason. No new grievance is needed.
+- **D-REBL-4** (was OQ-REBL-4) Revolution hook adopted: a rising may carry `revolution: <event id>`; its joiners follow that revolution's camps instead of the 3.1 table; `rising_won` / `rising_crushed` are applied when it wins, is beaten or melts away. "Risen" is the *Rising* tier, and a province whose castle a revolution camp holds counts as Risen (X-9). A Fight starts a tagged rising at the normal tier, not a great revolt. The simpler of the two readings.
+- **D-REBL-5** (was OQ-REBL-5) Event-tree `rebels {type, size}`: it starts a rising in the province at once; type maps to cause (peasant → Hunger, religious → Faith, noble → Lord, separatist, independence and anticolonial → Homeland, revolutionary → New ideas); its men are size (small 0.5 … huge 4.0) × the province's recruit pool, by class shares. `unrest_spawn` and `unrest_guaranteed` are not used (the game has no unrest meter). `rebels_active {type}` is true while a rising of the mapped cause is active.
+- **D-REBL-6** (was OQ-REBL-6) Provisional numbers in `rebellions.json`: spread 10 % a month to each neighbouring province with 3+ grievances; a Talk costs 10 gold per province the rising holds; a bribe costs 1 gold per 100 rebels; a grant raises the monthly rising chance of the realm's other Plotting provinces by 5 points for 12 months; a pardoned province loses its rising grievances twice as fast; a faith rising finds a new preacher-leader after 12 months; after a Massacre lords waver one step.
+- **D-REBL-7** (was OQ-REBL-7) Causes of the other grievances: *Burned homes*, *Plague*, *Requisitioned* → Hunger; *Bloodshed*, *Persecuted* → Faith when the rising's people differ in faith, else Hunger; *Ungoverned*, *Grasping officials* → Tax; *Banned tongue* → Homeland; *Neighbour in revolt* → the neighbour's cause. Heaviest = the grievance with the largest count (counts-as-two counts 2); ties go by the cause table's order (Hunger, Tax, Faith, Homeland, Town, Lord, Pretender, New ideas).
+- **D-REBL-8** (was OQ-REBL-8) Great revolt: a rising in or next to the capital's province is a great revolt at once (4.3); 4.1 is read the same way. One rule.
+- **D-REBL-9** (was OQ-REBL-9) A Disloyal lord revolts on a monthly roll of 5 % (provisional), the same as the lowest Plotting chance. No new mechanic beyond a number.
+- **D-REBL-10** (was OQ-REBL-10) A rebel leader's Logistics works as for any commander (food and moving); a "Cunning, little Might" leader has Cunning 3 and Might 1 (provisional). Warfare's commander rules are reused.
+- **D-REBL-11** (was OQ-REBL-11) Homeland demands: below nationalism 0.5 "self-rule" is granted as an *Own tongue* charter in the provinces they hold (accepted in a Talk); at 0.5 or more they demand a new country (CULT-075, D-CULT-16). A won homeland rising breaks away as before. Culture's lever already exists.
+- **D-REBL-12** (was OQ-REBL-12) New ideas cause: the province's event-tree ideology support for liberalism, socialism, communism or nationalism at 0.3 or more, from the age of revolutions. The same 0.3 threshold culture uses.
+- **D-REBL-13** (was OQ-REBL-13) Both exist and do not overlap: exploration's local aggression roll covers founding a colony; rebellions' resistance covers settled land taken by conquest or treaty. Colonies take only free tiles (province 12.3).
+- **D-REBL-14** (was OQ-REBL-14) Armed veterans who kept their arms give the arms step *Old weapons*, like a veteran leader. No new arms step.
+- **D-REBL-15** (was OQ-REBL-15) A *Riot* is a province state shown on the province card, not a rising object; the rebellion card appears only when a rising starts. The card is for risings.
 
 ## 14. Traceability
 

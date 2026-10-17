@@ -15,12 +15,15 @@ Feature: Colonial governors and colonial range
       | knows         | allowed |
       | does not know | refused |
 
-  @EXPL-025
+  @EXPL-025 @placeholder
   Scenario: A colonial governor is hired like any official, and is a person
+    # config: exploration.governor_hire_gold, exploration.governor_wage_per_year, exploration.governor_age_when_hired
     Given the country "Castile" knows S5 "ocean_navigation" and has a free colonial governor slot
-    When the country "Castile" hires a colonial governor
-    Then the country "Castile" pays gold for him and a yearly wage
-    And the governor ages and can die
+    When the country "Castile" hires a colonial governor in the port "Seville"
+    Then the country "Castile" pays 20 gold for him and 5 gold a year in wages
+    And the governor waits in the port "Seville", aged 30
+    And after a year he is 31
+    And he can die of old age, which frees his slot
 
   @EXPL-026 @placeholder
   Scenario Outline: Colonial governor slots
@@ -116,3 +119,40 @@ Feature: Colonial governors and colonial range
     And the coast of Brazil is about 10 zones from a Portuguese port in the Cape Verde islands
     When the country "Portugal" tries to found a colony on an unowned coast of Brazil
     Then founding is allowed
+
+  @EXPL-026 @EXPL-009 @placeholder
+  Scenario Outline: T8 and T9 add to the S3 slot too
+    # config: exploration.governor_slots
+    Given the country "Hawaii" knows <inventions>
+    When the game counts its colonial governor slots
+    Then the country "Hawaii" has <slots> colonial governor slots
+
+    Examples:
+      | inventions    | slots |
+      | S3            | 1     |
+      | S3 and T8     | 2     |
+      | S3, T8 and T9 | 3     |
+      | S3 and S5     | 2     |
+
+  @EXPL-058
+  Scenario: A colony already being founded keeps going when the range shrinks
+    Given the country "Castile" founds a colony 17 zones from its nearest port with a colonial range of 20
+    When its government form changes to "household realm" with colonial range 10
+    Then the colony is still being founded
+    But a new colony 17 zones away is refused
+
+  @EXPL-065
+  Scenario Outline: What colonial range is measured from
+    Given the country "Castile" has <place> 5 zones from an unowned coast
+    And no other port or colony of the country "Castile" is within 20 zones of it
+    When the country "Castile" with a colonial range of 20 tries to found a colony on that coast
+    Then founding is <result>
+
+    Examples:
+      | place                                         | result  |
+      | a port of its own                             | allowed |
+      | a port held by one of its lords               | allowed |
+      | a canoe landing of its own                    | allowed |
+      | a port of its subject "Canarian lordship"     | allowed |
+      | a colony it founded                           | allowed |
+      | a colony it is still founding                 | refused |

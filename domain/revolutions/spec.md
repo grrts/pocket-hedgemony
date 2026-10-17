@@ -78,7 +78,7 @@ Newest decision first.
 | Re-arm | A stopped revolution coming back after a grace period while its signs stay lit. | |
 | Stopped, not solved | Card label of a re-armed revolution. | |
 | Restoration | The family of revolutions that bring the old dynasty back (`restored_monarchy`). | Reaction regime |
-| Foreign backing | Secret funding of a revolution by a rival; sets `revolution_funded`. | Diplomacy's "fund rebels" (OQ-REVO-1) |
+| Foreign backing | Secret funding of a revolution by a rival; sets `revolution_funded`. | Diplomacy's "fund rebels" (D-REVO-1) |
 
 ## 4. Domain model
 
@@ -308,8 +308,8 @@ Newest decision first.
 - REVO-062 While a revolution is funded, the game shall set `revolution_funded` on the target, apply the spark
   "Foreign gold backs the movement" ×2 (added to every revolution by the build), and multiply its camp's join
   shares by 1.5 if it becomes a rising. [revolutions §7.1; reference.yaml foreign_backing]
-- REVO-063 Each turn while funding runs, the game shall roll a chance of being caught (3 %, higher with more
-  officials in the target and while the target is at peace). [revolutions §7.1]
+- REVO-063 Each turn while funding runs, the game shall roll a chance of being caught (3 %, +1 % while the target is at peace and +1 % with officials in at least half its provinces; the two
+  additions are provisional, D-REVO-1). [revolutions §7.1]
 - REVO-064 When the funding is caught, the game shall end it, give the target the opinion reason "Funded a
   revolution against us" and a reason to fight against the funder, and name the funder on the card.
   [revolutions §7.1]
@@ -398,7 +398,7 @@ Newest decision first.
 - When a tagged rising wins (rebellions), then apply the raising option's `rising_won`.
 - When a tagged rising is beaten or melts away (rebellions), then apply `rising_crushed`.
 - When a country gains G14 Written constitution (research), then a regime held with `form_before_g14` may use its
-  full form (OQ-REVO-12).
+  full form (D-REVO-12).
 - When diplomacy's funding is caught, then end `revolution_funded` and name the funder on the card.
 - When a revolutionary regime applies, religion's `revolution_and_the_church` and
   `separation_of_church_and_state` may follow (owned by religion; their requirements can read
@@ -585,12 +585,12 @@ What each decree does is the `does` line in data/decrees.yaml (REVO-054).
 |---|---|---|---|
 | events | upstream | Conformist | Revolutions are events: availability, roles, selection, options, effect tiers; this context adds conditions `grievance`, `class_share`, `lords`, `war_lost`, effects `regime`, `lock`, param `rebels.revolution`, tiers `rising_won` / `rising_crushed`, event field `revolution` (with `rearm`), flags `revolutionary_regime`, `emigre_court`, `reaction_regime`, `revolution_funded`, areas `hokuriku`, `old_castile`, 6 entities, 7 unverified sources, 26 extended and 10 new events (patch not yet merged) |
 | rebellions | downstream | Customer–Supplier | Tagged risings; camps replace the join table; won / crushed hook; rising causes from families |
-| government | downstream | Customer–Supplier | Regimes set forms from `government.yaml` forms (any era), `old_form`, `form_before_g14`, `power_base_add` (OQ-REVO-2) |
-| diplomacy | downstream / upstream | Partnership | "Different form of rule −20"; counter-revolution war reason; one-off opinion changes; fund-a-revolution action and caught reason (OQ-REVO-1) |
-| subjects | upstream | Customer–Supplier | Settler independence via a Disloyal Settled or Self-governing colony, `release`, `change_subject_kind`; requested condition "a colony of who is Disloyal" (OQ-REVO-5) |
+| government | downstream | Customer–Supplier | Regimes set forms from `government.yaml` forms (any era), `old_form`, `form_before_g14`, `power_base_add` (D-REVO-2) |
+| diplomacy | downstream / upstream | Partnership | "Different form of rule −20"; counter-revolution war reason; one-off opinion changes; fund-a-revolution action and caught reason (D-REVO-1) |
+| subjects | upstream | Customer–Supplier | Settler independence via a Disloyal Settled or Self-governing colony, `release`, `change_subject_kind`; requested condition "a colony of who is Disloyal" (D-REVO-5) |
 | culture | upstream | Customer–Supplier | Nationalism thresholds 0.3 / 0.5 read by liberal and national signs; creole tongues; `set_court_tongue` used by regimes |
 | religion | downstream | Customer–Supplier | Faith family wave uses `faith_wave`; `revolution_and_the_church`, `separation_of_church_and_state` follow regimes and read `revolutionary_regime` |
-| national-strengths | downstream | Customer–Supplier | Hook only: a won revolution can shed a burden or grant a legacy (which ones: OQ-REVO-6) |
+| national-strengths | downstream | Customer–Supplier | Hook only: a won revolution can shed a burden or grant a legacy (which ones: D-REVO-6) |
 | warfare | downstream | Customer–Supplier | Generals too big ×2 in revolutionary republics; a winning general switches regime |
 | province | upstream | Customer–Supplier | Grievances and class shares read by signs; regimes end and add grievances; locks of crushing_taxes and revoke_charter |
 | realm | upstream / downstream | Customer–Supplier | Lords' loyalty and land read by signs; regimes change lords; locks of grant_fief, sell_title, seize_land; stability, debt |
@@ -606,58 +606,26 @@ options ×3, Fight by army strength against the rising's expected size, Lead whe
 cause; funds its pretender abroad from an émigré court; uses the counter-revolution reason when stronger; funds
 revolutions in non-allied rivals whose cards are amber or red.
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-REVO-1: Two designs of the same secret action. Revolutions 7.1: gold each month = 1 % of the target's
-  yearly income; caught 3 % a turn (higher with more officials and at peace); caught gives "Funded a revolution
-  against us" and a reason to fight; effect = flag `revolution_funded`, spark ×2, joins ×1.5; a win gives +25
-  opinion. Diplomacy 6.11 (same date): one province funded at 10, 25 or 50 gold a month; caught 1 in 10 (1 in 5
-  with a Judge, 1 in 20 under a lord); caught gives the envoy held, the wrong "Stirred revolt in our land" −50
-  over 20 years, *Punish* for 5 years and *Foreign meddling*; at 50 gold a month the province "counts as a sign
-  for the revolution camp". Diplomacy says its 6.11 answers revolutions' open question 2. Is it one action or
-  two, and which numbers and effects win? Blocks REVO-060 to REVO-065.
-- OQ-REVO-2: Government v2 removed power bases, service grants and forced changes. Regimes still reference them:
-  `committee_rule` has `power_base_add: [army]`; `reformist_caliphate` cites "service grant (government 3.3)";
-  `qizilbash_order` cites a reform to household_realm "after three reigns (government 6.4)";
-  changes-for-other-designs asks to check "6.3 (forced changes)". None exists in government v2.
-- OQ-REVO-3: Revolutions 4 says a province where the revolution camp holds the castle counts as "Risen
-  (rebellions 5)"; rebellions has no *Risen* state. reference.yaml says a Fight "becomes a great revolt"; the
-  design says "a tagged rising"; merged events use the event tree `rebels` effect with a size (e.g. `huge`).
-  Which severity and size does a revolution's rising start with, and how does `size` combine with camp join
-  shares? Rebellions v1 has not adopted the tag or the hook (OQ-REBL-4).
-- OQ-REVO-4: Signs read event-tree abstract stats (`stability`, `legitimacy`, `literacy`, `debt`,
-  `war_weariness`, `integration_strain`) which country stats 11 and province stats 15 turn into concrete
-  counts; `integration_strain` has no mapping in country stats 11. The card shows e.g. "Debt above 2,000 gold".
-  Which concrete stat does each sign read?
-- OQ-REVO-5: Subjects has not yet added a "colony of who is Disloyal" condition; until then the American and
-  Spanish American signs read the colony's own grievances.
-- OQ-REVO-6: National strengths asked which strengths a regime may grant or shed; revolutions leaves it as a hook.
-- OQ-REVO-7: The seven new sources in additions.yaml are `verified: false`.
-- OQ-REVO-8: Counter-revolution length and malus: the global config proposes 25 years and −50; regimes give
-  their own (commonwealth −40 and 20 years, free republic −60 and 30 years, swarajya −50 and 30 years, mahdiyya
-  −50 and 20 years, soviet −60 and 5 years). Diplomacy's reason row is −20. Is the regime value per regime, does
-  it stack with the −20 row, and is the −50 one-off or a reason?
-- OQ-REVO-9: "Restorations happen as often as revolutions" has no mechanism or number. The generic
-  `restoration_of_the_old_order` window is 1660–1815, but émigré courts can form until 1939 (e.g. 1917). Can no
-  restoration happen after 1815?
-- OQ-REVO-10: Wave amounts: is a family wave a one-off share change or yearly, and over what range is
-  "neighbours" / "region"? The faith family gives `amount: 0.05` but religion's `faith_wave` takes pull per
-  carrier, reach per year and a limit, not an amount.
-- OQ-REVO-11: Merged events keep their old option effects next to `regime` (for example `french_revolution`
-  `radical_republic` keeps `government: republic`; `constitutional_monarchy` keeps `unlock:
-  parliamentary_monarchy`). Which applies the form when both do, and does `parliamentary_monarchy` exist in
-  government v2?
-- OQ-REVO-12: When a country holding `crown_and_assembly` before G14 later gains G14, does its form switch to
-  constitutional monarchy?
-- OQ-REVO-13: `armistice_1918` keeps its existing trigger (no signs). Does it show a card at all, and how is it
-  "re-armed"?
-- OQ-REVO-14: "Every decree has a cost the player feels" but `army_council`, `table_of_ranks` list cost "None";
-  their cost lies in the effect (generals gain influence; old lords must serve or lose a province). Is that
-  enough?
-- OQ-REVO-15: The event tree patch is not merged (event tree still 306 events). Until the event tree's owner
-  applies it, none of the 4 conditions, 2 effects, tiers or flags exist in the event vocabulary.
-- OQ-REVO-16: The `from_above` family says nobody rises: "the ruler starts it as a decision", but its events
-  break out through signs and the normal selection like the others. Is it a decision (offered) or a pool event?
+Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rule, no new mechanics, provisional numbers in the context's data JSON).
+
+- **D-REVO-1** (was OQ-REVO-1) Funding: X-10. One action, *Fund rebels*, owned by diplomacy, with revolutions §7.1's numbers: gold each month = 1 % of the target's yearly income, sparks ×2, joins ×1.5, a win gives +25 opinion; caught 3 % a month; being caught gives the target the caught war reason. Diplomacy 6.11's numbers are dropped.
+- **D-REVO-2** (was OQ-REVO-2) References to power bases, service grants, the "three reigns" reform and forced changes are dropped from the regimes (`committee_rule` loses `power_base_add`; `reformist_caliphate` and `qizilbash_order` keep only their form). Government v2 is the later design.
+- **D-REVO-3** (was OQ-REVO-3) X-9: a province whose castle a revolution camp holds counts as Risen. A revolution's rising starts at the *Rising* tier; its men are the event's `size` × the province's recruit pool, split by the camps' join shares (D-REBL-4, D-REBL-5).
+- **D-REVO-4** (was OQ-REVO-4) Signs read the concrete stats the country-stats §11 and province §15 mappings give (debt in gold, grievance counts, lords' loyalty, literacy as school seats); `integration_strain` reads the share of the realm's provinces with *Foreign rule*. One mapping, no new stat.
+- **D-REVO-5** (was OQ-REVO-5) Colony signs read the colony's loyalty to its overlord from subjects (Disloyal); subjects already has loyalty steps (X-8).
+- **D-REVO-6** (was OQ-REVO-6) Regimes grant or shed no national strengths; the hook is dropped. No new mechanic.
+- **OQ-REVO-7** (release task) The seven new sources in additions.yaml are `verified: false`; checking them is a source review, not code.
+- **D-REVO-8** (was OQ-REVO-8) Counter-revolution: each regime's own length and malus is used, as a one-off reason row that replaces diplomacy's −20 row (no stacking); regimes without their own take the global 25 years and −50. Per-regime values are the later, more specific data.
+- **D-REVO-9** (was OQ-REVO-9) Restorations happen only through the events that exist (`restoration_of_the_old_order` 1660–1815 and the regimes' own émigré events); "as often as revolutions" gives no number and adds nothing.
+- **D-REVO-10** (was OQ-REVO-10) A family wave is a one-off share change of its `amount` in the realms bordering the revolution's country and in its map macro-region; the faith family uses religion's `faith_wave` with pull 1 per carrier and `amount` ignored. One-off is simpler.
+- **D-REVO-11** (was OQ-REVO-11) When an option has `regime`, the regime sets the form and the old `government:` / `unlock:` effects are dropped; `parliamentary_monarchy` maps to constitutional monarchy. One source for the form.
+- **D-REVO-12** (was OQ-REVO-12) No: `crown_and_assembly` keeps its form when G14 is gained later. Nothing changes without a cause.
+- **D-REVO-13** (was OQ-REVO-13) `armistice_1918` keeps its own trigger, shows no revolution card and is not re-armed. It is a one-time event.
+- **D-REVO-14** (was OQ-REVO-14) Yes: a decree whose cost is in its effect (`army_council`, `table_of_ranks`) is enough; the card shows that effect as its cost.
+- **D-REVO-15** (was OQ-REVO-15) The revolutions patch is part of the game's event content, read from revolutions' data as written (as D-RELG-10 for religion).
+- **D-REVO-16** (was OQ-REVO-16) `from_above` is a decision offered to the ruler once its signs are met; nobody rises. The family's own text says so.
 
 ## 14. Traceability
 

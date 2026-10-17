@@ -46,6 +46,11 @@ export interface VoyagePreview {
   defaultChoice: LowSupply;
 }
 
+/** A voyage is given only to ships in port; ships at sea must dock first (EXPL-066, D-EXPL-17). */
+export function mayGiveVoyage(ships: readonly { inPort: boolean }[]): boolean {
+  return ships.length > 0 && ships.every((s) => s.inPort);
+}
+
 /** Whether a port lets ships dock at all: canoe landings have no dock. */
 export function portDockable(tier: string): boolean {
   return !cfg.naval.undockable_port_tiers.includes(tier);

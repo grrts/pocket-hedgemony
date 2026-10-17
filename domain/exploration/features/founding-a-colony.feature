@@ -27,9 +27,9 @@ Feature: Founding a colony
     Then founding is refused
     And the province "Hispaniola" can only be taken by war or treaty
 
-  @EXPL-036 @open-question
+  @EXPL-036 @EXPL-068
   Scenario: A people with no country keep their tiles
-    # depends on OQ-EXPL-2: which catalogue records count as countries owning land
+    # A people with no country: no nation on the map owns the province, whatever the catalogue lists there
     Given an unowned coastal province where a people with no country work 6 tiles and 2 tiles are free
     When the country "Castile" founds a colony there
     Then the colony takes only the 2 free tiles
@@ -91,12 +91,13 @@ Feature: Founding a colony
       | 58     | 0    | 2        | 51    | 0    |
       | 10     | 0    | 6        | 0     | 0    |
 
-  @EXPL-042 @open-question
+  @EXPL-042 @EXPL-063 @placeholder
   Scenario Outline: The locals' pressure roll
-    # depends on OQ-EXPL-14: the roll's distribution is not given
+    # config: exploration.pressure_roll_max_factor
     Given a colony with local aggression "<level>"
-    When the locals' pressure is rolled
-    Then the roll is between 0 and <max>
+    When the locals' pressure is rolled many times
+    Then every roll is a whole number from 0 to <max>
+    And each number from 0 to <max> comes up about equally often
 
     Examples:
       | level    | max |
@@ -169,3 +170,41 @@ Feature: Founding a colony
     And a third caravel brings 300 more rations in year two after a bad run of rolls
     And the colony reaches 100 progress in month 31 and is a Castilian province
     And the governor stays as its official and his slot frees for the next colony
+
+  @EXPL-059
+  Scenario: The governor dies of old age while his colony is being founded
+    Given the country "Castile" founds a colony at 60 progress with 100 rations of colony food
+    When its colonial governor dies of old age
+    Then the colony is lost as at progress 0
+    And the colony food is lost
+    And his slot frees
+    And the province stays unowned
+
+  @EXPL-059
+  Scenario: A governor at sea dies when his ship sinks
+    Given the colonial governor "Diego de Arana" is aboard a caravel of the country "Castile"
+    When the caravel sinks
+    Then the colonial governor dies
+    And his slot frees
+
+  @EXPL-060
+  Scenario: Another country gains the province during founding
+    Given the country "Castile" founds a colony at 60 progress with 100 rations of colony food
+    When an event gives the province to the country "Portugal"
+    Then the colony is lost as at progress 0
+    And the colonial governor dies
+
+  @EXPL-061
+  Scenario: Abandoning loses the food left, and the governor may land elsewhere
+    Given the country "Castile" founds a colony at 40 progress with 200 rations of colony food
+    And a caravel of the country "Castile" is in its coastal zone
+    When the country "Castile" abandons the colony
+    Then the 200 rations of colony food are lost
+    And the governor may go ashore on another colonisable coast at once with "Found colony"
+
+  @EXPL-051 @EXPL-067
+  Scenario: What colonial presence counts
+    Given the country "Castile" has founded 2 colonies and holds 1 trading post
+    And it is founding a third colony
+    When the event tree counts the colonial presence of the country "Castile"
+    Then it counts 3

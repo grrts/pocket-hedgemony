@@ -55,6 +55,26 @@ export function ageBegins(gate: AgeGate, regions: readonly string[] = ageRegions
 /** The age ends: nothing closes (EXPL-002). */
 export function ageEnds(_gate: AgeGate): void {}
 
+/**
+ * The age that opens the exploration gate in a region (D-EXPL-3): the gating
+ * age where it covers the region, otherwise the first age that starts later
+ * and covers it (north_america: age_of_atlantic_empires; middle_east and
+ * central_asia: age_of_reformations). Null when no age ever covers it.
+ */
+export function gateAgeFor(region: string, gating: string = cfg.unlock_age): string | null {
+  if (ageRegions(gating).includes(region)) return gating;
+  const from = regionData.ages[gating]?.force_start ?? 0;
+  const later = Object.entries(regionData.ages)
+    .filter(([id, a]) => id !== gating && (a.force_start ?? Infinity) > from && a.regions.includes(region))
+    .sort((a, b) => (a[1].force_start ?? Infinity) - (b[1].force_start ?? Infinity));
+  return later[0]?.[0] ?? null;
+}
+
+/** Any age begins: the gate opens in each region it covers for which it is the opening age (EXPL-004, D-EXPL-3). */
+export function anyAgeBegins(gate: AgeGate, age: string, regions: readonly string[] = ageRegions(age)): void {
+  for (const r of regions) if (gateAgeFor(r, gate.age) === age) gate.begunIn.add(r);
+}
+
 /** The 1444 start: the Age of Exploration starts in 1444 (its force_start) in all its regions. */
 export function gateAtStart(year: number): AgeGate {
   const gate = newAgeGate();
@@ -136,18 +156,17 @@ export function hasColonialUnlock(knows: ReadonlySet<string>): boolean {
 }
 
 /**
- * Colonial governor slots from research: 2 with S5, +1 with T8, +1 with T9;
- * an S3 realm without S5 has 1 (EXPL-026, EXPL-009). Research is never lost,
- * so slots are never lost.
+ * Colonial governor slots from research: a base of 2 with S5, else 1 with S3;
+ * T8 and T9 each add 1 to any base (EXPL-026, EXPL-009, D-EXPL-4). Research is
+ * never lost, so slots are never lost.
  */
 export function governorSlots(knows: ReadonlySet<string>): number {
   const s = cfg.governor_slots as Record<string, number>;
-  if (knows.has(cfg.colonial_unlock_invention)) {
-    let n = s[cfg.colonial_unlock_invention]!;
-    for (const extra of ["T8", "T9"]) if (knows.has(extra)) n += s[extra]!;
-    return n;
-  }
-  return knows.has(cfg.s3_invention) ? s[cfg.s3_invention]! : 0;
+  const base = knows.has(cfg.colonial_unlock_invention) ? s[cfg.colonial_unlock_invention]! : knows.has(cfg.s3_invention) ? s[cfg.s3_invention]! : 0;
+  if (base === 0) return 0;
+  let n = base;
+  for (const extra of ["T8", "T9"]) if (knows.has(extra)) n += s[extra]!;
+  return n;
 }
 
 /** Colonial range in sea zones: the government form's, at least 10 for S3 realms (EXPL-031, EXPL-009). */

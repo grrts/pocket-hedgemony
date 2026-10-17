@@ -36,11 +36,12 @@ Feature: Trade value
       | pepper  | 10    |
       | silver  | 12    |
 
-  @TRADE-028
+  @TRADE-028 @placeholder
   Scenario: Silver falls after the silver flood
+    # config: value.silver_after_flood
     Given silver is worth 12 gold a load
     When the event tree's silver flood happens
-    Then silver is worth less than 12 gold a load
+    Then silver is worth 6 gold a load
 
   @TRADE-029 @placeholder
   Scenario Outline: Building weights
@@ -68,3 +69,16 @@ Feature: Trade value
     And it gets busier when traders pass
     And it pays traders who walk through it
     But it cannot be a route stop
+
+  @TRADE-026 @TRADE-126
+  Scenario Outline: What the food surplus is
+    Given the province "Champagne" grows <made> grain this year and its people eat <eaten>
+    And its food store is <store>
+    When the trade rules are applied
+    Then <surplus> grain counts toward goods value
+
+    Examples:
+      | made | eaten | store    | surplus |
+      | 900  | 800   | half full | 100    |
+      | 900  | 800   | full     | 100     |
+      | 700  | 800   | empty    | 0       |

@@ -84,13 +84,18 @@ Feature: Drift of tongues
     When the year's drift is finished
     Then the tongue "Flemish" is no longer in "Troyes"
 
-  @CULT-033 @open-question
-  Scenario: A fourth tongue arrives
-    # OQ-CULT-5: religion only replaces the smallest if the newcomer is larger
+  @CULT-033
+  Scenario Outline: A fourth tongue arrives
     Given the province "Riga" holds Latvian 60 %, German 30 % and Russian 10 %
-    When people of the tongue "Swedish" arrive in "Riga"
-    Then the tongue "Swedish" replaces "Russian" among the top three
-    And the Russian people join the majority tongue "Latvian"
+    When Swedish people as many as <share> % of "Riga" arrive there
+    Then the tongue "<in>" is among the top three of "Riga"
+    And the tongue "<out>" is not among the top three of "Riga"
+    And the <out> people join the majority tongue "Latvian"
+
+    Examples:
+      | share | in      | out     |
+      | 15    | Swedish | Russian |
+      | 5     | Russian | Swedish |
 
   @CULT-034 @CULT-035 @CULT-036 @CULT-037
   Scenario Outline: People carry their tongue
@@ -104,3 +109,30 @@ Feature: Drift of tongues
       | Andalusi refugees                          | Fez      | they count in the Tongue mix of Fez after 2 years                           |
       | homeless Galicians drifting next door      | Leon     | they add Galician people to Leon                                            |
       | soldiers coming home to Galicia            | Galicia  | they rejoin the Galician tongue                                             |
+
+  @CULT-027 @CULT-092 @placeholder
+  Scenario Outline: A way of life's own kind of land
+    # config key: drift.way_of_life_lands
+    Given a province whose ground is "<ground>" and which <coast> the sea
+    Then a <way> tongue there <outcome> in its own kind of land
+
+    Examples:
+      | ground    | coast          | way       | outcome       |
+      | grassland | does not touch | herding   | lives         |
+      | drylands  | does not touch | herding   | lives         |
+      | farmland  | does not touch | herding   | does not live |
+      | forest    | does not touch | forest    | lives         |
+      | jungle    | does not touch | forest    | lives         |
+      | hills     | touches        | seafaring | lives         |
+      | hills     | does not touch | seafaring | does not live |
+
+  @CULT-023
+  Scenario Outline: A school in a learned tongue speeds no drift
+    Given the province "Buda" has a school teaching in "<school>"
+    Then the school in "Buda" <counts>
+
+    Examples:
+      | school           | counts                           |
+      | Latin            | counts for no tongue's drift     |
+      | Classical Arabic | counts for no tongue's drift     |
+      | French           | counts for the tongue "French"   |

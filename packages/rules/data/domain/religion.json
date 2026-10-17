@@ -333,10 +333,6 @@
   "minority_house_needs_share": 0.1,
   "preacher_per_monastery_or_religious_school": 1,
   "tithe_gold_per_10000_people": 1,
-  "community_founds_own_house": {
-   "min_share": 0.2,
-   "every_years": 20
-  },
   "preacher_founds_house_after_years": 10,
   "convert_cost_share_of_build": 0.5,
   "take_over_gold": {
@@ -381,11 +377,16 @@
  "inquisition": {
   "allowed_for": {
    "state_faith": "catholic",
-   "government": [
-    "monarchy",
+   "forms": [
+    "feudal_realm",
+    "diet_monarchy",
+    "household_realm",
+    "bureaucratic_empire",
     "elective_monarchy",
+    "absolute_monarchy",
     "constitutional_monarchy"
-   ]
+   ],
+   "$comment": "D-RELG-8: the government forms of the family \"rule by a house\""
   },
   "upkeep_gold_per_year": 10,
   "skilled_leave_per_year": 0.01,
@@ -407,6 +408,11 @@
   "cuius_regio_faiths": [
    "catholic",
    "protestant"
+  ],
+  "reformed_faiths": [
+   "protestant",
+   "anglican",
+   "hussite"
   ]
  },
  "lords": {
@@ -432,7 +438,8 @@
    "from_event": "protestant_reformation",
    "merge_at_end_of": "p_protestant_reformation",
    "merge_latest_year": 1620,
-   "else_into": "catholic"
+   "else_into": "catholic",
+   "merge_when": "the end of p_protestant_reformation or merge_latest_year, whichever comes first (D-RELG-14)"
   },
   "protected_communities": {
    "restricted_served_no_wrong_faith": true
@@ -456,7 +463,8 @@
    ],
    "town_school_pull_after_year": 1850,
    "town_school_pull": 0.5,
-   "needs_innovation": "mass_literacy_schooling"
+   "needs_innovation": "mass_literacy_schooling",
+   "needs_building": "factory"
   }
  },
  "holy_places": [
@@ -489,8 +497,8 @@
     "ibadi"
    ],
    "province": "Hejaz",
-   "holder_1444": "mamluk",
-   "note": "Sharifs of Mecca under Mamluk suzerainty"
+   "holder_1444": "hejaz",
+   "note": "Held by the Sharifs (Hejaz), who own the province; the Mamluk overlord does not hold it (D-RELG-23)"
   },
   {
    "id": "karbala_najaf",
@@ -557,7 +565,13 @@
    ],
    "province": "Kotte",
    "holder_1444": "kotte",
-   "note": "Follows the relic: Kandy from the 1590s"
+   "note": "Follows the relic: Kandy from 1592 (D-RELG-16, provisional year)",
+   "moves": [
+    {
+     "from_year": 1592,
+     "province": "Kandy"
+    }
+   ]
   },
   {
    "id": "mount_wutai",
@@ -702,7 +716,14 @@
      "jewish": 0.02
     }
    }
-  ]
+  ],
+  "record_faith_overrides": {
+   "$comment": "D-RELG-12: records with no faith id of their own; the named minority stays in the catalogue",
+   "wokou": "mahayana",
+   "guanahatabey": "indigenous_american",
+   "yazidi_communities": "sunni",
+   "druze_maan": "sunni"
+  }
  },
  "patches": [
   {
@@ -915,7 +936,7 @@
       "group": "mudejar_morisco_population",
       "from": "$crown",
       "to": "$host",
-      "amount": "90%"
+      "amount": "70%"
      }
     },
     {
@@ -1235,7 +1256,8 @@
   "kotte": "Kotte",
   "ming": "Ming",
   "japan": "Japan",
-  "castile": "Castile"
+  "castile": "Castile",
+  "hejaz": "Hejaz"
  },
  "lens": {
   "$comment": "religion §12",
@@ -1257,5 +1279,63 @@
   "Yazidi",
   "Druze",
   "Zoroastrian"
- ]
+ ],
+ "event_triggers": {
+  "$comment": "D-RELG-5: what offers the court-conversion events",
+  "court_conversion_islam": {
+   "faith": "sunni",
+   "capital_share_min": 0.3
+  },
+  "court_conversion_christian": {
+   "faith": "protestant",
+   "realm_share_min": 0.15
+  }
+ },
+ "_provisional": [
+  "relations.traditional_layers_after_years",
+  "relations.kin_serves_community_below",
+  "mix",
+  "pull",
+  "houses",
+  "communities",
+  "policies",
+  "expulsion",
+  "inquisition.upkeep_gold_per_year",
+  "inquisition.skilled_leave_per_year",
+  "preachers.per_houses_of_state_faith",
+  "preachers.per_holy_place_held",
+  "preachers.upkeep_gold_per_year",
+  "preachers.foreign_without_leave_expel_chance_per_year",
+  "state_faith_change.capital_share_min",
+  "state_faith_change.realm_share_min",
+  "state_faith_change.cooldown_years",
+  "lords",
+  "faith_rules",
+  "holy_places.temple_of_the_tooth.moves",
+  "holy_place_effects",
+  "waves.max_active",
+  "ai",
+  "start",
+  "event_triggers"
+ ],
+ "church_heads": {
+  "$comment": "RELG-085: marked only, no rules (big institutions gap)",
+  "pope": {
+   "name": "the Pope",
+   "place": "rome"
+  },
+  "ecumenical_patriarch": {
+   "name": "the Ecumenical Patriarch",
+   "place": "constantinople"
+  },
+  "caliph": {
+   "name": "a Caliph's claim",
+   "place": "mecca_medina"
+  },
+  "dalai_lama": {
+   "name": "the Dalai Lama",
+   "place": "lhasa",
+   "from": 1578
+  }
+ }
 }

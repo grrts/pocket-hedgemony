@@ -34,16 +34,29 @@ Feature: Cause, demand and leader of a rising
     And the rising demands "the pretender on the throne, or the province handed to them"
     And most joiners are "lords who back the pretender, and anyone with a grievance"
 
-  @REBL-013 @open-question
-  Scenario: New ideas in later eras
-    # OQ-REBL-12: which ideology, threshold and era
-    Given the date is in a later era
-    And the province "Paris" has a grievance
-    And the event tree's ideology support is high in the province "Paris"
+  @REBL-013 @placeholder
+  Scenario Outline: New ideas from the age of revolutions
+    # config: new_ideas.min_support (provisional)
+    Given the age of revolutions <age>
+    And the province "Paris" has 1 grievance
+    And the event tree's support for "liberalism" is <support> in the province "Paris"
     When a rising starts in the province "Paris"
-    Then the rising has the cause "New ideas"
-    And the rising demands "a new kind of government"
-    And townsfolk and scholars join first
+    Then the rising <has> the cause "New ideas"
+
+    Examples:
+      | age           | support | has           |
+      | has begun     | 0.3     | has           |
+      | has begun     | 0.29    | does not have |
+      | has not begun | 0.6     | does not have |
+
+  @REBL-013
+  Scenario: A New ideas rising wants a new government
+    Given the age of revolutions has begun
+    And the province "Paris" has 1 grievance
+    And the event tree's support for "socialism" is 0.4 in the province "Paris"
+    When a rising starts in the province "Paris"
+    Then the rising demands "a new kind of government"
+    And most joiners are "townsfolk and scholars"
 
   @REBL-016
   Scenario: Settlers taking local people's tiles start a resistance

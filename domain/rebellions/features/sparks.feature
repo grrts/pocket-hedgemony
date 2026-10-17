@@ -49,9 +49,8 @@ Feature: Sparks
     When "the tax rate of the province is raised" happens in the province "Troyes"
     Then a rising does not start in the province "Troyes"
 
-  @REBL-012 @open-question
+  @REBL-012
   Scenario: A revolution event starts risings in every province that meets its conditions
-    # OQ-REBL-4: how a rising is tagged and which provinces "meet its conditions"
     Given the event "french_revolution" fires for the country "France"
     And the provinces "Paris" and "Troyes" of "France" meet the event's conditions
     And the province "Rouen" of "France" does not meet the event's conditions
@@ -59,3 +58,4 @@ Feature: Sparks
     Then a rising starts at once in the province "Paris"
     And a rising starts at once in the province "Troyes"
     And a rising does not start in the province "Rouen"
+    And each new rising carries the revolution "french_revolution"
