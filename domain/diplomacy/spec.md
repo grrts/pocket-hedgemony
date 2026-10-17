@@ -662,6 +662,12 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 - DIPL-193 The diplomacy context shall let a country lift its embargo, stop its rebel funding, and mark or unmark a mobilisation pact (era VI, either ally) at once and at no cost; withdrawing a pledge shall give an Oath broken; a Rival may be dropped once it has stood 10 years; a resident may be recalled at any time, an envoy on a mission may not. [D-DIPL-22]
 - DIPL-194 When a funded revolution wins, the diplomacy context shall give the new regime the tie *Backed our revolution* +25 toward each funder, unless the regime is hostile to the funder's form of rule. [revolutions 7.1; X-10]
 
+### Playtest feedback (17 October 2026)
+Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
+
+- DIPL-195 The AI shall offer peace to the player by the same rules it uses to make peace between AI realms (peace voices, exhaustion, WAR-196), sending the player an incoming peace offer to answer (game-shell SHELL-092). [F-10]
+- DIPL-196 The diplomacy context shall put a country's war and peace actions (declare war, offer or ask peace, open the peace table) on the Diplomacy tab of its country card. [F-11]
+
 ## 6. Commands
 
 All commands are data, the same for player and AI.
@@ -1183,3 +1189,5 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-193 | relation-actions.feature | Recalling envoys |
 | DIPL-193 | funding-rebels.feature | Stopping the funding is free and tells nobody |
 | DIPL-194 | funding-rebels.feature | A funded revolution that wins remembers its backer |
+| DIPL-195 | peace-and-truces.feature | The AI offers peace to the player |
+| DIPL-196 | diplomacy-screen.feature | War and peace live on the Diplomacy tab |

@@ -308,6 +308,7 @@ Charters are granted, demanded by lords and towns for loyalty or a loan, or forc
 - **Castle**: none, earthwork ring fort, stone castle, bastion fort or star fort. Gained by building or upgrading (gold × build cost, and years) or conquest; lost by siege, demolition in a peace, or one step per 10 years without upkeep. An enemy must besiege it to take the province; on hills or mountains it is far harder to take; on a shore tile it can be supplied by sea.
 - **Walls**: whole or with 1 to 3 breaches. Repaired with gold and months; breached by siege guns, mining and earthquakes. Each breach shortens a siege and allows an assault.
 - **Garrison**: soldiers inside, counted from the army. A castle with no garrison falls at once.
+- **The Garrison tab**: the province card lists the troops in the province without a commander (by thousand, arm and drill), levies still gathering with the days left, and the commanders here who can pick them up. Freshly raised levies wait here and man the castle until a commander takes them.
 
 See [Warfare](Warfare) for sieges.
 

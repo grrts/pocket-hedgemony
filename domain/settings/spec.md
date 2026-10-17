@@ -328,7 +328,7 @@ Settings commands never touch the simulation (SET-006), so they are not game ord
 - When a controller connects, add prompts and focus outlines; when a Nintendo layout is detected, default Confirm button to Right.
 - When the purchase state changes (free tier to full game), keep all settings.
 
-## 9. Monthly turn
+## 9. Each turn
 
 None. Settings are read when they apply; Battery saver's smaller worker budget and Keep screen awake act during the AI turn but do not take part in its order.
 

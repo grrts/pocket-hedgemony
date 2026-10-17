@@ -58,3 +58,10 @@ Feature: Other in-campaign screens
     Then a small confirmation modal is shown
     When the player cancels it
     Then the screen below is shown unchanged
+
+  @SHELL-141 @feedback-10
+  Scenario: An AI peace offer waits for an answer
+    Given an AI realm at war with the player offers peace
+    When the turn ends
+    Then the offer shows in the turn report and in Waiting for you
+    And the realm's Diplomacy tab is marked until the offer is answered or put off

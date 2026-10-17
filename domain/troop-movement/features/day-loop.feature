@@ -132,3 +132,10 @@ Feature: A turn played out in days
     And the weekly steps run once, at the end of the turn
     And the monthly steps run, because April begins in this turn
     And the next turn starts on 5 April 1451
+
+  @MOVE-123 @MOVE-124 @feedback-2 @feedback-3
+  Scenario: An army moves tile by tile as the days pass
+    Given an army walking from "Troyes" to "Langres" with 7 days to walk
+    When 3 days have passed
+    Then the army stands on a tile 3 days along its route
+    And the army's tile and commander are published for the map

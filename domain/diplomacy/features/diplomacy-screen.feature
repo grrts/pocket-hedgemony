@@ -77,3 +77,9 @@ Feature: Diplomacy screen and lens
     Given the country "Hungary" has 3 seats: one free, one on the road to "Venice" with 14 days left, one resident in "Rome"
     When the game evaluates it
     Then the envoys strip shows "free", "Venice 14 days" and "resident Rome"
+
+  @DIPL-196 @feedback-11
+  Scenario: War and peace live on the Diplomacy tab
+    When the player opens the country card of "Venice"
+    Then declare war, offer peace and ask for peace are on its Diplomacy tab
+    And they are not on its General tab

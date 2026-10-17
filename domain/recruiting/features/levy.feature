@@ -10,6 +10,8 @@ Feature: The levy
     And the region "Champagne" has about 260000 people and 65000 fighting-age men
     And the region "Champagne" has 7900 men who can be called, 65 percent of them farmers
 
+  # Region levies are gone (RECR-104, playtest F-14). The rule this checks still holds per province; the region
+  # wording stays until the province version has its own numbers.
   @RECR-008 @RECR-009 @RECR-038 @placeholder
   Scenario: The levy screen for Champagne
     When the player opens the levy screen for region "Champagne" and sets 5000 men
@@ -20,6 +22,8 @@ Feature: The levy
     And the screen shows a harvest warning for the season
     And every cost line opens its gain and lose list
 
+  # Region levies are gone (RECR-104, playtest F-14). The rule this checks still holds per province; the region
+  # wording stays until the province version has its own numbers.
   @RECR-010 @RECR-011
   Scenario: A levy takes every class by its share
     When the country "France" levies 5000 men from region "Champagne"
@@ -40,30 +44,24 @@ Feature: The levy
     When the country "France" levies 1000 men from province "Troyes"
     Then 200 of the levied men are veterans
 
-  @RECR-013 @placeholder
-  Scenario: Levies gather in 2 weeks and can fight at once
-    When the country "France" levies 5000 men from region "Champagne"
-    Then after 2 weeks the country "France" has 5000 levies of arm "levy foot"
-    And the levies can march and fight at once
+  @RECR-013 @RECR-106 @RECR-107 @feedback-15 @feedback-18 @placeholder
+  Scenario: Levies gather a thousand at a time and wait for a commander
+    When the country "France" levies 5000 men from province "Troyes"
+    Then after 14 days the province "Troyes" has 1000 garrison troops of arm "levy foot"
+    And the garrison troops can march and fight only once a commander picks them up
 
-  @RECR-014 @placeholder
+  @RECR-014 @RECR-106 @placeholder
   # config: gathering.railwayDays 3 (D-RECR-12)
   Scenario: Railway mobilization gathers levies in days
     Given the country "France" knows invention "W18 Railway mobilization"
-    When the country "France" levies 5000 men from region "Champagne"
-    Then the levies gather in 3 days instead of 14
+    When the country "France" levies 5000 men from province "Troyes"
+    Then each thousand gathers in 3 days instead of 14
 
-  @RECR-103
-  Scenario: A region levy gathers where most men come from
-    When the country "France" levies 5000 men from region "Champagne"
-    Then the levy gathers as one army at "Troyes"
-
-  @RECR-103
-  Scenario: Gathered levies march on to the rally point
-    Given new regiments of "France" go to "Reims"
-    When the country "France" levies 5000 men from region "Champagne"
-    Then the levy gathers as one army at "Troyes"
-    And the gathered army is ordered to march to "Reims"
+  @RECR-103 @RECR-104 @RECR-107 @feedback-13 @feedback-14
+  Scenario: A levy gathers in its own province
+    When the country "France" levies 5000 men from province "Troyes"
+    Then the levy gathers as garrison troops at "Troyes"
+    And no army is formed until a commander picks them up
 
   @RECR-015 @RECR-016 @placeholder
   # config: levy money 20 gold per 1,000 men; gathering 1 ration a man a month
@@ -95,3 +93,24 @@ Feature: The levy
     Given the province "Troyes" has a building whose slots are 60 percent filled
     When a levy takes men from its slots and leaves it 40 percent filled
     Then the building goes fallow and pays no tax and makes no wares
+
+  @RECR-104 @RECR-105 @feedback-14 @feedback-18 @placeholder
+  # config: recruiting.levy_unit 1000 (provisional)
+  Scenario: The levy screen for Troyes
+    When the player opens the levy screen from the province card of "Troyes"
+    Then the men are chosen in whole thousands
+    And the screen shows the thousands chosen as a percent of the men who can be called in "Troyes"
+    And there is no levy for a region or the whole country
+
+  @RECR-106 @feedback-18 @placeholder
+  # config: recruiting.gather_days_per_thousand 14 (provisional)
+  Scenario: Levies gather a thousand at a time
+    When the country "France" levies 5000 men from province "Troyes"
+    Then the first 1000 men are gathered after 14 days
+    And all 5000 men are gathered after 70 days
+
+  @RECR-107 @feedback-15 @feedback-17
+  Scenario: Gathered levies wait as garrison troops
+    Given the country "France" has gathered 2000 levies in "Troyes"
+    Then they are garrison troops of "Troyes" on its Garrison tab
+    And they cannot march, fight in the field or train until a commander picks them up

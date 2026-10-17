@@ -104,3 +104,10 @@ Feature: March orders and route settings
     Given the AI country "Burgundy" moves an army
     Then it sends the same order data a player would
     And its standing orders are set by its personality
+
+  @MOVE-125 @feedback-1
+  Scenario: The army walks the route the preview showed
+    Given the route preview for an army shows a path of tiles
+    When the march order is given and the turn plays out
+    Then the army walks exactly the tiles of the preview
+    And no tile of the path is closed, impassable or past a hostile garrisoned castle

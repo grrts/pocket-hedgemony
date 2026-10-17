@@ -61,3 +61,11 @@ Feature: Castle, walls and garrison
     Given the castle of "Troyes" has no garrison
     When an enemy army enters "Troyes"
     Then the castle falls at once
+
+  @PROV-302 @feedback-17
+  Scenario: The Garrison tab
+    Given the province "Troyes" has 2000 garrison troops and 1000 levies still gathering
+    When the player opens the Garrison tab of "Troyes"
+    Then it lists the 2000 troops by arm and drill
+    And it lists the gathering levies with the days left
+    And it lists the commanders present who can pick them up

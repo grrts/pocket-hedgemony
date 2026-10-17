@@ -166,3 +166,22 @@ Feature: Map and cards
     When the player opens a line that opens its gain and lose list
     Then the list folds out inside the card
     And no new screen is put on the stack
+
+  @SHELL-138 @feedback-6
+  Scenario: Selecting an army keeps the camera still
+    Given the camera shows "Champagne"
+    When the player selects an army on the map
+    Then the camera neither moves nor zooms
+
+  @SHELL-139 @SHELL-140 @feedback-11 @feedback-12
+  Scenario: The country card's tabs
+    When the player opens a country card
+    Then it has the tabs General, Diplomacy, Trade and Army in that order
+    And it opens on General
+    And the peace table and declare war open from the Diplomacy tab
+
+  @SHELL-142 @feedback-21
+  Scenario: Picking commanders is easy
+    When the player taps a commander in the Army list
+    Then that commander's army is selected
+    And army banners take taps of at least 44 points

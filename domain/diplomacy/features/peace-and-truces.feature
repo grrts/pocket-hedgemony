@@ -41,3 +41,10 @@ Feature: Peace and truces
       | date    | result                                                             |
       | 1610-01 | each country signs or not by its own peace voices, all at once    |
       | 1550-01 | each pair must make its own peace                                  |
+
+  @DIPL-195 @feedback-10
+  Scenario: The AI offers peace to the player
+    Given the player is at war with an AI realm
+    And over half of the AI realm's peace voices want peace
+    When the month's diplomacy runs
+    Then the AI realm sends the player a peace offer to answer

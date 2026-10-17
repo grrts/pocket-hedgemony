@@ -212,7 +212,7 @@ The map takes no commands during a campaign. One build-time command:
   map is rebuilt with a rename table and naval's port placement is rerun (naval §13).
 - When `saves` loads a save whose `mapHash` differs, then it maps provinces through the rename table.
 
-## 9. Monthly turn
+## 9. Each turn
 
 Nothing. The map does not change during a campaign. Contexts read it every turn (graph, ground, river,
 coastal, passes, strait crossings).
