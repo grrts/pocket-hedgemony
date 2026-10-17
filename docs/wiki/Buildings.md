@@ -384,7 +384,7 @@ The farm, ranch and fishery work the province's land, which is laid out in tiles
 
 **How you use it.** Tap a province, then its **Build** tab. At the top are its sites with the months left, and its queue, where ▲ and ▼ move a build and Drop takes it off (nothing was paid). Below is the build sheet: every work the land suits, at its next step, with what it does, its gold, months and upkeep. Tap **Build**. When the site is busy or the gold isn't there yet, the button says **Queue** and the build waits its turn. Stop on a running site gives half its gold back. A province raises one work on its land and one in its town at a time.
 
-**The overview.** The **Works** tab of your country card shows the works' upkeep a month, every province with a site or a queue and the next work to finish there, and how many of each work stand. Tap a row to open that province's Build tab. The General tab's Works line opens it too. On the map, a hammer marks each of your sites. A finished work is announced over the map with *Go there*.
+**The overview.** A province's Build tab shows its sites, its queue and what stands there; the country card has no Works tab. On the map, a striking hammer marks each of your sites. A finished work is announced over the map with *Go there*.
 
 **Upkeep.** Works cost upkeep each month, as the Works line of the treasury ledger. In a month the treasury is empty, your works give only half.
 

@@ -27,7 +27,7 @@ import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
-import { provinceWorks, realmWorks, worksLine } from "./ui/works.ts";
+import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castlesOpen, foodLine, foodTab } from "./ui/food.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
@@ -139,7 +139,7 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "works" = "general";
+let realmTab: "general" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -670,15 +670,25 @@ function drawOverlay(o: OverlayContext): void {
     });
   }
 
-  // The player's building sites: a hammer over each, so the works can be found on the map.
+  // The player's building sites: a hammer over each, striking, so the works can be found on the map (feedback 91).
   if (snapshot && zoom >= 2 && hammerImage.complete) {
     const sc = Math.max(1, spriteScale - 1);
+    const now = performance.now();
+    let shown = false;
     for (const site of snapshot.sites) {
       const p = provinces[site.province]!;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) continue;
-      ctx.drawImage(hammerImage, Math.round(sx + 6 * sc), Math.round(sy - 14 * sc), 10 * sc, 10 * sc);
+      shown = true;
+      // Swung about the end of its handle: a slow lift, then a quick blow.
+      ctx.save();
+      ctx.translate(Math.round(sx + 11 * sc), Math.round(sy - 4 * sc));
+      ctx.rotate(hammerSwing(now + site.province * 137));
+      ctx.drawImage(hammerImage, -5 * sc, -10 * sc, 10 * sc, 10 * sc);
+      ctx.restore();
     }
+    // About ten frames a second is enough for the swing, and spares the battery.
+    if (shown && !hammerTick) hammerTick = setTimeout(() => ((hammerTick = 0), view.invalidate()), 100);
   }
 
   // Sieges under way: how long the walls have held, and how far into the next siege month.
@@ -864,6 +874,13 @@ function settlementOf(population: number): "village" | "town" | "city" {
 
 const SETTLEMENT_NAMES = { village: "Village", town: "Town", city: "City" };
 const WALL_NAMES = { castle: "Stone castle", fort: "Earthwork ring fort" };
+
+/** The hammer's angle at a time, in radians (its head points left, so lifting it back turns it clockwise): lifted over 0.6 s, brought down in 0.15 s past upright onto the work, resting 0.25 s. */
+function hammerSwing(t: number): number {
+  const f = (t % 1000) / 1000;
+  return f < 0.6 ? 0.7 * (f / 0.6) - 0.25 * (1 - f / 0.6) : f < 0.75 ? 0.7 - 0.95 * ((f - 0.6) / 0.15) : -0.25;
+}
+let hammerTick: ReturnType<typeof setTimeout> | 0 = 0;
 
 /** The hammer marking a building site on the map. */
 const hammerImage = Object.assign(new Image(), { src: iconUrl("hammer", 1) });
@@ -2592,7 +2609,7 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if (!s || ((realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "works") && !mine)) realmTab = "general";
+  if (!s || ((realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning") && !mine)) realmTab = "general";
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
@@ -2608,7 +2625,7 @@ function renderRealm(r: number): void {
       <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
       <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
       ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
-      ${mine ? worksLine(s) + foodLine(s, own) : ""}` : ""}
+      ${mine ? foodLine(s, own) : ""}` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
     </dl>
     ${mine ? "" : (() => {
@@ -2630,12 +2647,11 @@ function renderRealm(r: number): void {
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
-    : realmTab === "works" ? realmWorks(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length)
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("works", "Works") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : ""}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : ""}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();

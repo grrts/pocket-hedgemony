@@ -4,8 +4,8 @@ import { icon } from "../art/ui.ts";
 /**
  * Works on screen (milestone 4, buildings BLD "How the player uses it"): a
  * province's Works tab shows what stands, what is being built and what can be
- * ordered there; the Works tab of the realm card is the overview of every
- * site and the queue; the General tab's line opens it.
+ * ordered there. The country card has no Works tab (feedback 90; Leroy, 17 Oct: works
+ * can be removed from the country's UI); the hammers on the map show the sites.
  */
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -80,55 +80,4 @@ export function provinceWorks(s: Snapshot, p: number): string {
     <h3 class="sub">Standing</h3>
     ${standingList ? `<ul class="works-standing">${standingList}</ul>` : `<p class="hint">Nothing built here yet.</p>`}
     <p class="hint">Every work takes one slot. A province raises one work on its land and one in its town at a time; more wait in its queue and start, oldest first, when a site is free and the gold is there. The gold goes when the site opens.</p>`;
-}
-
-/** The General tab's line: sites and queue, opening the realm's Works tab. */
-export function worksLine(s: Snapshot): string {
-  const building = s.sites.length;
-  const waiting = s.workQueue.length;
-  const text = building || waiting ? `${building} being built${waiting ? `, ${waiting} waiting` : ""}` : "nothing being built";
-  return `<dt>Works</dt><dd><button class="paper" data-realm-open-tab="works" title="Open the works">${icon("castle", 1)}${text}</button></dd>`;
-}
-
-/**
- * The realm's Works tab: the upkeep, every province with a site or a queue
- * (its counts and the next work to finish), and what stands across the
- * realm. Each row opens that province's Build tab (BLD-168).
- */
-export function realmWorks(s: Snapshot, name: (p: number) => string, thumb: (p: number) => string, held: number[]): string {
-  const W = s.works.length;
-  const upkeep = -(s.ledger.find((l) => l.line === "works")?.gold ?? 0);
-  const row = (p: number, title: string, note: string, extra = "") => `<div class="province-row">
-      <button class="place" data-open-build="${p}" title="Open the Build tab of ${esc(name(p))}">
-        <img class="thumb" src="${thumb(p)}" alt="" width="48" height="48">
-        <span class="place-name"><b>${esc(title)}</b><small>${esc(name(p))} · ${note}</small>${extra}</span>
-      </button>
-    </div>`;
-  const busy = [...new Set([...s.sites.map((x) => x.province), ...s.workQueue.map((x) => x.province)])];
-  const next = (p: number) => s.sites.filter((x) => x.province === p).sort((a, b) => a.monthsLeft - b.monthsLeft)[0];
-  busy.sort((a, b) => (next(a)?.monthsLeft ?? 999) - (next(b)?.monthsLeft ?? 999));
-  const sites = busy
-    .map((p) => {
-      const n = next(p);
-      const building = s.sites.filter((x) => x.province === p).length;
-      const queued = s.workQueue.filter((x) => x.province === p).length;
-      const counts = [building ? `${building} being built` : "", queued ? `${queued} queued` : ""].filter(Boolean).join(", ");
-      return n
-        ? row(p, `${cap(stepName(s, n.work, n.step))} in ${months(n.monthsLeft)}`, counts, progress(n.months - n.monthsLeft, n.months))
-        : row(p, name(p), `${counts}: waiting for the gold`);
-    })
-    .join("");
-  const counts = s.works
-    .map((w, k) => {
-      let n = 0;
-      for (const p of held) if (s.provinceWorks[p * W + k]! > 0) n++;
-      return n ? `<li>${esc(cap(w))} <b>${n}</b></li>` : "";
-    })
-    .join("");
-  return `
-    <p>${icon("coin", 1)} Works cost <b>${upkeep.toFixed(1)}</b> gold a month in upkeep.${s.worksNeglected ? " <b>Unpaid: they give only half.</b>" : ""}</p>
-    <h3 class="sub">Being built</h3>
-    ${sites ? `<div class="province-list">${sites}</div>` : `<p class="hint">Nothing is being built. Tap a province, then its Build tab.</p>`}
-    <h3 class="sub">Standing in your provinces</h3>
-    ${counts ? `<ul class="works-counts">${counts}</ul>` : `<p class="hint">Nothing built yet.</p>`}`;
 }
