@@ -1,4 +1,5 @@
 import { giftGold } from "./lords.ts";
+import { stabilityOf, type Stability } from "./stability.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
@@ -125,6 +126,8 @@ export interface Snapshot {
   lords: { name: string; house: string; nation: number; loyalty: string; lands: number }[];
   provinceLord: Int16Array;
   giftGold: number;
+  /** The player's stability: the weakest of its lords, subjects, officials and provinces (REALM-188); null before a realm is chosen. */
+  stability: Stability | null;
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -284,6 +287,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       })(),
       provinceLord: w.provinceLord.slice(),
       giftGold: giftGold(w),
+      stability: player >= 0 ? stabilityOf(w, player) : null,
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],

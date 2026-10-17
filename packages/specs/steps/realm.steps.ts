@@ -2275,3 +2275,47 @@ Then("{string} borrows enough to bring its gold above zero", (s, realm: string) 
   expect(s.game.nationDebt[n]).toBeGreaterThan(0);
   expect(s.game.nationTreasury[n]).toBeGreaterThan(0);
 });
+
+// ------------------------------------------------------------ stability (F-75)
+
+const pillar = (s: S, realm: string, key: string) => G.stabilityOf(s.game, realmOf(s, realm)).pillars.find((p) => p.key === key)!;
+const landedLord = (s: S, n: number) => (s.game as GW).lords.findIndex((l, k) => l.nation === n && (s.game as GW).provinceLord.includes(k));
+Then(/^the stability of "([^"]+)" reads the pillars (.+)$/, (s, realm: string, list: string) => {
+  expect(G.stabilityOf(s.game, realmOf(s, realm)).pillars.map((p) => p.key)).toEqual(list.split(/, | and /));
+});
+Then("the stability of {string} is the step of its weakest pillar", (s, realm: string) => {
+  const st = G.stabilityOf(s.game, realmOf(s, realm));
+  expect(st.step).toBe(Math.max(...st.pillars.map((p) => p.step)));
+});
+Given("every lord of {string} is {string}", (s, realm: string, step: string) => {
+  const n = realmOf(s, realm);
+  for (const l of (s.game as GW).lords) if (l.nation === n) l.loyalty = step as GW["lords"][number]["loyalty"];
+});
+When("a lord of {string} turns {string}", (s, realm: string, step: string) => {
+  (s.game as GW).lords[landedLord(s, realmOf(s, realm))]!.loyalty = step as GW["lords"][number]["loyalty"];
+});
+Then(/^the (lords|subjects|officials|provinces) pillar of "([^"]+)" is "([^"]+)"$/, (s, key: string, realm: string, step: string) => {
+  expect(G.STABILITY[pillar(s, realm, key).step]).toBe(step);
+});
+Then("the stability of {string} is {string}", (s, realm: string, step: string) => {
+  expect(G.STABILITY[G.stabilityOf(s.game, realmOf(s, realm)).step]).toBe(step);
+});
+Then("each subject of {string} counts in the subjects pillar with its starting loyalty", (s, realm: string) => {
+  const n = realmOf(s, realm);
+  const g = (s.game as GW).diplomacy.graph;
+  const counts: Record<string, number> = { Loyal: 0, Wavering: 0, Disloyal: 0, "In revolt": 0 };
+  (s.game as GW).nationIds.forEach((id, k) => {
+    if (g.relations.some((r) => r.type === "subject" && r.source === id && r.target === (s.game as GW).nationIds[n])) counts[G.subjectLoyalty(s.game, k)]!++;
+  });
+  expect(Object.values(counts).reduce((t, c) => t + c, 0)).toBeGreaterThan(0);
+  expect(pillar(s, realm, "subjects").counts).toEqual(counts);
+});
+Given("every royal province of {string} has its official at his post", (s, realm: string) => {
+  const n = realmOf(s, realm);
+  for (let p = 0; p < s.game.provinceCount; p++) if (s.game.provinceOwner[p] === n && s.game.provinceLord[p] < 0 && s.game.provinceOfficial[p] < 0) s.game.provinceOfficial[p] = 0;
+});
+Then(/^the officials pillar of "([^"]+)" counts (\d+) empty posts? and is "([^"]+)"$/, (s, realm: string, empty: string, step: string) => {
+  const p = pillar(s, realm, "officials");
+  expect(p.counts.empty).toBe(Number(empty));
+  expect(G.STABILITY[p.step]).toBe(step);
+});
