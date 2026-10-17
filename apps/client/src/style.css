@@ -861,9 +861,127 @@ button.small {
 
 .news .go {
   flex: none;
-  min-height: 32px;
-  width: 36px;
+  min-height: 44px;
+  width: 44px;
   padding: 0;
+}
+
+.news-day {
+  margin: 10px 0 0;
+}
+
+/* Alerts over the map: a battle or siege of the player's has begun, a call or
+   offer waits (feedback 72). Under the top bar, clear of the side tools. */
+.alerts {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 50px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(440px, calc(100vw - 2 * max(8px, env(safe-area-inset-left), env(safe-area-inset-right)) - 120px));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 8;
+  pointer-events: none;
+}
+
+/* A thinner frame and smaller type than a card, so an alert covers little map. */
+.alert,
+.battle-watch {
+  border-width: 8px;
+  border-image-width: 8px;
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 2px 2px 6px;
+  pointer-events: auto;
+  animation: alert-in 0.2s steps(4);
+}
+
+.alert span {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert button {
+  flex: none;
+  min-height: 44px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.alert .dismiss {
+  width: 44px;
+  padding: 0;
+}
+
+/* The battle being watched (feedback 73): along the bottom, between the
+   overview button and End turn, so the fight on the map stays in view. */
+.battle-watch {
+  position: absolute;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(460px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
+  padding: 2px 4px 4px 6px;
+  z-index: 7;
+}
+
+.battle-watch header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.battle-watch header b {
+  flex: 1;
+}
+
+.battle-watch .dismiss {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+}
+
+.battle-watch .side {
+  display: grid;
+  grid-template-columns: auto minmax(0, 7em) 1fr auto;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.battle-watch .side b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.battle-watch .bar {
+  height: 10px;
+  border: 2px solid var(--outline);
+  background: var(--ui-parchment-dark);
+}
+
+.battle-watch .bar i {
+  display: block;
+  height: 100%;
+  transition: width 0.4s steps(4);
+}
+
+.battle-watch p {
+  margin: 4px 0 0;
+}
+
+@keyframes alert-in {
+  from {
+    transform: translateY(-12px);
+  }
 }
 
 /* Every plaque in the top bar is the same height, type and padding (feedback 74). */

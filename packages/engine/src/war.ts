@@ -26,6 +26,8 @@ export interface News {
   /** Nations it is about, by index. */
   nations: number[];
   province?: number;
+  /** A battle or siege that has just begun: the player is told at once, over the map. */
+  begins?: true;
 }
 
 export interface SiegeState {
@@ -391,7 +393,7 @@ function startBattle(world: World, att: number[], def: number[], news: News[]): 
   resolve(world, b);
   const an = name(world, a.owner[att[0]!]!);
   const dn = name(world, a.owner[def[0]!]!);
-  news.push({ kind: "battle", text: `Battle at ${provinceName(world, b.province)}: ${an} (${fmt(b.attStart)}) attacks ${dn} (${fmt(b.defStart)}).`, nations: [a.owner[att[0]!]!, a.owner[def[0]!]!], province: b.province });
+  news.push({ kind: "battle", text: `Battle at ${provinceName(world, b.province)}: ${an} (${fmt(b.attStart)}) attacks ${dn} (${fmt(b.defStart)}).`, nations: [a.owner[att[0]!]!, a.owner[def[0]!]!], province: b.province, begins: true });
   return b;
 }
 
@@ -623,7 +625,7 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
         const garrison = world.provinceGarrison[p]!;
         st = { by: leader, days: 0, siege: wf.newSiege(walls, { ground: world.provinceGround[p] ?? "farmland", garrison, store: garrison * world.rules.defines.war.castleStoreMonths, townsfolk: 0 }) };
         world.sieges.set(p, st);
-        news.push({ kind: "siege", text: `${name(world, leader)} lays siege to ${provinceName(world, p)} (${walls}, ${fmt(garrison)} men inside).`, nations: [leader, owner], province: p });
+        news.push({ kind: "siege", text: `${name(world, leader)} lays siege to ${provinceName(world, p)} (${walls}, ${fmt(garrison)} men inside).`, nations: [leader, owner], province: p, begins: true });
       }
       st.siege.besiegers = besiegers;
       st.days++;
