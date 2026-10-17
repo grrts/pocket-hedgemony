@@ -56,7 +56,7 @@ Newest decision first.
 
 | Topic | Code today | Design | Agree? |
 |---|---|---|---|
-| Days in a month | the month's real length, 28 to 31 (X-3) | 30 (`daysPerMonth`) | Code to change: real length (X-3) |
+| Days in a month | the month's real length, 28 to 31 (X-3) | the real length | Done (X-3) |
 | Days per crossing | `march.daysPerCrossing` 6 | 6, decided by Leroy | Agree (D-MOVE-1) |
 | Crossing | half leaving + half entering ground, `march.daysToCross` (farmland 1, hills 1.5, forest 2, mountains/jungle/marsh 3 …) | same | Agree |
 | Column | `+bigArmyExtraCrossings` (1 crossing) when men > forage limit of the entered province | +1 crossing | Agree (D-MOVE-2) |

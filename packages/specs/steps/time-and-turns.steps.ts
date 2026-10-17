@@ -1,6 +1,6 @@
 import { expect } from "vitest";
 import { loadDefaultRuleset, type GameDate, type Ruleset } from "@ph/rules";
-import { hashWorld, processTurn, Rng, type Order, type World } from "@ph/engine";
+import { hashWorld, monthBeginning, processTurn, Rng, type Order, type World } from "@ph/engine";
 import {
   AGES,
   worldDateOf,
@@ -93,7 +93,8 @@ import { steps, type Scenario } from "../src/registry.ts";
 const { Given, When, Then } = steps("time-and-turns");
 
 const rules: Ruleset = loadDefaultRuleset();
-const DAYS = rules.defines.march.daysPerMonth;
+/** A 30-day month for day-loop examples that start on no real date (real dates use daysInMonth, X-3). */
+const DAYS = 30;
 const START_CALENDAR: CalendarDay = { year: 1444, month: 11, day: 11 };
 
 /** Places the designs' examples name, on the built map (Paris is France's capital). */
@@ -203,8 +204,7 @@ Given("the turn counter is {int}", (s, n: number) => {
 When("the turn is processed", (s) => processTheTurn(s));
 
 Given("the config value {string} is {int}", (s, key: string, value: number) => {
-  if (key === "march.daysPerMonth") expect(rules.defines.march.daysPerMonth).toBe(value);
-  else if (key === "playback.secondsPer10Days") expect(playbackSeconds(10)).toBe(value);
+  if (key === "playback.secondsPer10Days") expect(playbackSeconds(10)).toBe(value);
   else if (key === "playback.secondsPerBattleStep") expect(playbackSeconds(0, 1)).toBe(value);
   else if (key === "selection.pool_roll_interval_months") {
     expect(POOL_ROLL_INTERVAL_MONTHS).toBe(value);
@@ -1701,7 +1701,9 @@ Then("the phases run in this order:", (s, table: string[][]) => {
   const w = campaign(s).world;
   expect(s.result.report.rejectedOrders).toEqual([]);
   expect(w.armies.marched[s.army]![0]).toBe(s.from);
-  expect(w.nationTreasury[france(s)]).toBeCloseTo(s.before.treasury + w.nationMonthlyIncome[france(s)]!);
+  // Monthly income is paid only in a turn in which a month begins (X-18).
+  const paid = monthBeginning(s.dateBefore) !== null ? w.nationMonthlyIncome[france(s)]! : 0;
+  expect(w.nationTreasury[france(s)]).toBeCloseTo(s.before.treasury + paid);
   expect(campaign(s).calendar).toEqual(addDays(START_CALENDAR, 7));
 });
 

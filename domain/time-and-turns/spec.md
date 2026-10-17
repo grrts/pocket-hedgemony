@@ -52,7 +52,7 @@ Newest decision first.
    (passes, seasons), §6.3, §10.6, §11.2, §13, §15.
 5. `warfare/warfare-design.md` v5 §5.1, §6, §7.1, §7.15, §8.3, §9.2, §11.3, §16, §19.
 6. Repository: `README.md` (Determinism; "starting in spring 1444"), `packages/engine/src/turn.ts`,
-   `packages/engine/src/rng.ts`, `packages/rules/data/defines.json` (`startDate`, `march.daysPerMonth`).
+   `packages/engine/src/rng.ts`, `packages/rules/data/defines.json` (`startDate`).
 7. Event tree: `event-tree/README.md` (ages and periods as situations), `event-tree/data/balance.yaml`
    (`pool_roll_interval_months`), `event-tree/generated/ages_and_periods.md`.
 8. "Each month / season / year" statements in: `province-stats` §6.1, §6.2, §17; `buildings` §2, §15.3–15.4;
@@ -378,7 +378,7 @@ the turn in which a new month, season or year begins (X-18). What each system do
 | `playback.secondsPer10Days` | Month playback speed | 1 | Yes | `time-and-turns.json` |
 | `playback.secondsPerBattleStep` | Playback of one 4-hour step while a player battle runs | 0.5 | Yes | `time-and-turns.json` |
 | `battleStepsPerDay` | Steps a day splits into while a player battle runs | 6 (4 hours each) | No (X-1) | `time-and-turns.json` |
-| month length | Days in the day loop | 28 to 31, Gregorian | No (X-3); `defines.json` `march.daysPerMonth` 30 is a request to the game build | `daysInMonth` |
+| month length | Days in the day loop | 28 to 31, Gregorian | No (X-3); the engine uses the real length | `daysInMonth` |
 | `options.endDate` | Campaign end date | 1939-08-31 (default) | No (decided) | save header / campaign rules |
 | season calendar: winter months | Months that count as winter | Dec–Feb north; Jun–Aug south | No | troop-movement config (`seasonFactor`) |
 | snow-pass closure months | Months snow peaks without pass or road are closed | Dec–Mar north; Jun–Sep south | No | troop-movement config |

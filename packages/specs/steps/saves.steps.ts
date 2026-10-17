@@ -1483,8 +1483,11 @@ Then("the new rules apply from the next turn on with the saved Rng state", (s) =
   expect(Array.from(patched.rng.state)).toEqual(Array.from(world(s).rng.state));
   const old = S.openSave(s.saveBytes, { rules: RULES, fullGame: true });
   if (old.kind !== "opened") throw new Error(old.kind);
-  processTurn(patched, [], 0);
-  processTurn(old.world, [], 0);
+  // Five weekly turns always include one in which a month begins and income is paid (X-18).
+  for (let t = 0; t < 5; t++) {
+    processTurn(patched, [], 0);
+    processTurn(old.world, [], 0);
+  }
   const n = patched.nationIndex.get("castile")!;
   expect(patched.nationTreasury[n]).not.toBe(old.world.nationTreasury[n]);
   expect(patched.rules).toBe(s.buildRules);

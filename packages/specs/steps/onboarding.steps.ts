@@ -686,7 +686,7 @@ When("the player takes the Advance to… ribbon", (s) => {
   s.adv = T.advanceTo(() => w.date, s.target, () => processTurn(w, [], 0));
 });
 Then(/^the turns run in a row until (\w+) (\d+)$/, (s, month: string, year: string) => {
-  expect(s.world.date).toEqual({ year: Number(year), month: monthIndex(month, 0) + 1 });
+  expect({ year: s.world.date.year, month: s.world.date.month }).toEqual({ year: Number(year), month: monthIndex(month, 0) + 1 });
   expect(s.adv.turns).toBe(s.adv.reports.length);
   expect(s.adv.turns).toBeGreaterThan(1);
 });
