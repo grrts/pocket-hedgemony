@@ -51,7 +51,7 @@ root.innerHTML = `
     <h3>Top bar</h3>
     <header class="hud demo-hud">
       <div class="realm">${pennant(france.color, 2)}<b>${esc(france.name)}</b></div>
-      <span class="plaque">April 1444</span>
+      <span class="plaque">18 Nov 1444</span>
       <span class="plaque">${icon("coin", 1)}64 <small>+4.2</small></span>
       <span class="plaque">${icon("swords", 1)}38k</span>
     </header>

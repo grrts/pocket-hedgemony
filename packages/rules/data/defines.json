@@ -2,7 +2,8 @@
   "$comment": "Global balance numbers. Every value here can be tuned without touching engine code.",
   "startDate": {
     "year": 1444,
-    "month": 3
+    "month": 11,
+    "day": 11
   },
   "economy": {
     "goldPerThousandPeoplePerMonth": 0.004,
@@ -18,7 +19,6 @@
   },
   "march": {
     "$comment": "Marching and feeding armies, after the warfare design (sections 5 and 6) and the province design (section 3.1). One crossing unit in the design's days-to-cross table is daysPerCrossing real days here, since a province on this map is about 100 km and a 1444 army marched 15-20 km a day.",
-    "daysPerMonth": 30,
     "daysPerCrossing": 6,
     "daysToCross": {
       "grassland": 1,

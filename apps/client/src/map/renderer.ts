@@ -157,12 +157,39 @@ vec3 highlight(vec3 c, int id, float strength) {
   if ((f & 2) != 0) c = mix(c, uHighlight, strength * 1.2);
   return c;
 }
+// Seasons (decision X-17): a palette swap per province, picked monthly and
+// kept in the owner texture's alpha: 1 snow, 2 spring, 3 autumn, 4 wet season,
+// 5 bare winter south of the snow line.
+int seasonOf(int id) { return int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).a * 255.0 + 0.5); }
+vec3 seasonal(vec3 c, int t, int id) {
+  int s = seasonOf(id);
+  if (s == 0) return c;
+  float l = lum(c);
+  if (s == 1) {
+    // Snow: bright where the ground is light, blue shadow where it is dark;
+    // trees stay a little darker so forests still read.
+    vec3 snow = mix(vec3(0.58, 0.64, 0.78), vec3(0.97, 0.98, 1.0), clamp(l * 1.9 - 0.15, 0.0, 1.0));
+    bool trees = t == ${T.forest} || t == ${T.broadleaf} || t == ${T.jungle} || t == ${T.highlands};
+    return mix(c, snow, trees ? 0.55 : 0.85);
+  }
+  bool green = t == ${T.grassland} || t == ${T.farmland} || t == ${T.broadleaf} || t == ${T.forest} || t == ${T.mediterranean} || t == ${T.paddies} || t == ${T.steppe} || t == ${T.hills} || t == ${T.marsh};
+  if (s == 2 && green) return clamp(c * vec3(0.92, 1.12, 0.86) + vec3(0.0, 0.02, 0.0), 0.0, 1.0);
+  bool gold = t == ${T.grassland} || t == ${T.farmland} || t == ${T.broadleaf} || t == ${T.paddies} || t == ${T.steppe} || t == ${T.hills} || t == ${T.mediterranean};
+  if (s == 3 && gold) return mix(c, vec3(1.4, 0.95, 0.38) * l, t == ${T.broadleaf} ? 0.75 : 0.55);
+  if (s == 3 && t == ${T.forest}) return mix(c, vec3(1.25, 0.9, 0.45) * l, 0.25);
+  if (s == 4) return clamp(mix(c, vec3(0.62, 1.15, 0.5) * l, 0.45), 0.0, 1.0);
+  if (s == 5) return mix(c, vec3(1.02, 0.97, 0.9) * l, 0.45);
+  return c;
+}
+
 // How much of the realm's colour to lay over the terrain: more when far out,
 // so realms read at a glance, less up close where the art carries the map.
 float wash() { return uMode == 2 ? 0.78 : mix(0.62, 0.3, smoothstep(1.0, ${DETAIL_ZOOM}.0, uZoom)); }
 vec3 realmWash(vec3 terrain, vec3 realm) {
   return mix(terrain, realm * (0.45 + 0.85 * lum(terrain)), wash());
 }
+// Snow lies over the realm's colour too, so winter reads from far out.
+vec3 snowOver(vec3 c, int id) { return seasonOf(id) == 1 ? mix(c, vec3(0.94, 0.96, 1.0), 0.32) : c; }
 
 vec3 tileAt(bool mini, int row, int variant, ivec2 local) {
   if (mini) return texelFetch(uMini, ivec2(variant * ${TILE / 2} + local.x, row * ${TILE / 2} + local.y), 0).rgb;
@@ -234,11 +261,11 @@ vec3 tiled(bool mini) {
     variant = (q.x >> shift) + 2 * (q.y >> shift);
     local = q & (size - 1);
   }
-  vec3 c = tileAt(mini, terrain, variant, local);
+  vec3 c = seasonal(tileAt(mini, terrain, variant, local), terrain, id);
   int owner = ownerOf(id);
   bool political = uMode != 1 && owner >= 0;
   if (political) {
-    c = realmWash(c, inf.rgb);
+    c = snowOver(realmWash(c, inf.rgb), id);
     // A wider band of the owner's colour along its borders.
     bool edge = false;
     for (int k = 0; k < 4; k++) {
@@ -313,7 +340,7 @@ vec3 far() {
 
   vec4 inf = info(id);
   int t = terrainAt(p);
-  vec3 c = uTerrain[t];
+  vec3 c = seasonal(uTerrain[t], t, id);
 
   // Texture: a few darker pixels in fixed patterns, like old tile sets.
   float h = hash(p);
@@ -333,7 +360,7 @@ vec3 far() {
 
   int owner = ownerOf(id);
   bool political = uMode != 1 && owner >= 0;
-  if (political) c = realmWash(c, inf.rgb);
+  if (political) c = snowOver(realmWash(c, inf.rgb), id);
   // Great rivers always, the rest once zoomed in a little.
   int rs = riverAt(p);
   if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, uDepth[0], 0.8);
@@ -505,6 +532,11 @@ export class MapRenderer {
     this.ownerData[o] = (ow >> 8) & 255;
     this.ownerData[o + 1] = ow & 255;
     this.ownerData[o + 2] = water ? 255 : 0;
+  }
+
+  /** The season a province's tiles are drawn in (SEASON in seasons.ts). */
+  setProvinceSeason(i: number, season: number): void {
+    this.ownerData[i * 4 + 3] = season;
   }
 
   uploadProvinceStyles(): void {
