@@ -227,11 +227,15 @@ Events and national strengths can grant other aims for a stated time. What each 
 
 ### Declaring war
 
+You declare war, and offer or ask for peace, from the **Diplomacy tab** of the other country's card.
+
 A declaration needs a target and exactly one aim you hold. Any Alliance, Truce or Pledge with the target must be broken first, each an Oath broken. The same turn, offensive calls go to your allies, defensive calls to the target's allies and pledgers, both sides' subjects come in by their kind (a Union joins at once, a Vassal or Protectorate is called and answers by its loyalty, a March joins when the enemy borders it, a Tributary or Colony stays out), and members of a league against you are brought in; answers arrive a month later. The aim is shown to every country, and for a war with no aim every neighbour of yours records *Threatened us*. A Union, Colony or Protectorate can't declare war, and a Vassal can't declare war on its overlord's allies; they join their overlord's wars or start an independence war. A realm under a regency may fight only defensive wars and Raids.
 
 **Hungary prepares to declare war on the Ottomans.** Hungary holds the aim Take land for Nikopol from the Want of its lord John Hunyadi. The declaration sheet shows the aim "Take land: Nikopol" and its source, Wallachia and the Papal States as called on Hungary's side, Serbia as an Ottoman tributary that does not join, and how many of Hungary's voices lean to peace. It does not show how the called countries will answer. It offers *Send a demand first* and *Declare*.
 
 ### Peace and truces
+
+Computer players offer you peace by the same rules they use among themselves: when over half their peace voices want it, or when they are worn out. Their offer arrives in your turn report, waits under Waiting for you and marks their Diplomacy tab until you answer it or put it off.
 
 A signed peace starts a truce of **5 years, plus 5 more** if it moved provinces or made a subject; a white peace gives 5 years. Both sides may agree to extend a truce. From era III, when three or more countries are on each side, one envoy can carry a single **many-sided peace** that every warring country signs at once, each by its own peace voices; before that each pair makes its own peace.
 

@@ -246,3 +246,9 @@ Feature: Sieges
     Given a siege is running
     When the siege is evaluated
     Then its steps run once at the end of each month
+
+  @WAR-208 @feedback-9
+  Scenario: A siege publishes its progress
+    Given a castle is besieged
+    When the siege changes
+    Then its days held, breaches, garrison left and food left are published

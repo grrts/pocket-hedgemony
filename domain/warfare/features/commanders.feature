@@ -218,3 +218,19 @@ Feature: Commanders and captains
     When the commander is evaluated
     Then a woman can be its commander
     And women commanders become more likely in later eras
+
+  @WAR-209 @feedback-13
+  Scenario: No army without a commander
+    Given soldiers stand in a province with no commander
+    Then they are the province's garrison troops, not an army
+
+  @WAR-209 @feedback-13
+  Scenario Outline: An army that loses its commander
+    Given an army whose commander is killed and which has no captain
+    And it stands in <land>
+    Then <result>
+
+    Examples:
+      | land                  | result                                                   |
+      | its own realm's land  | it becomes the garrison troops of that province          |
+      | foreign land          | it halts and waits there until a commander joins it      |

@@ -57,3 +57,16 @@ Feature: Playing the turn back on the map
       | seconds | shown                                                         |
       | 0.4     | no strip is shown                                             |
       | 2       | a parchment strip says "The courts of Europe deliberate…"     |
+
+  @VIEW-076 @feedback-7
+  Scenario: The date ticks during playback
+    When the turn plays back
+    Then the top bar's date ticks one day at a time
+    And it shows the hour of each 4-hour step while a player battle runs
+
+  @VIEW-077 @feedback-8
+  Scenario: Battles show their progress on the map
+    Given a battle runs at "Patay"
+    When a round is fought
+    Then the map shows each side's men and a bar of men and morale left
+    And the battle viewer shows the same

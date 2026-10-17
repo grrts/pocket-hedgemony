@@ -29,13 +29,14 @@ There are three zoom levels: **World**, **Region** and **Local** ("Province" zoo
 **World zoom** shows the big picture:
 
 - Each province's owner colour, with a small icon if it is hungry, rioting or in revolt, and front lines.
-- Armies as a banner with a men count; battles as crossed swords; besieged castles with a ring. Armies on the move are arrows, thick by men and coloured by owner, with no day counts.
+- Armies as a banner with a men count, each standing on its own tile with its commander's banner and moving tile by tile as the week plays; battles as crossed swords with each side's men and a bar of men and morale left; besieged castles with a ring. Armies on the move are arrows, thick by men and coloured by owner, with no day counts.
 - Ports as anchor dots in the owner's colour, larger for great ports; fleets as a single ship sprite with a count.
 - The parchment, voyage paths as dotted lines, and colonies being founded as a small flag with a progress ring.
 - For diplomacy, only the lens colours.
 
 **Region zoom** shows a province's life:
 
+- Sieges with their progress: how long the castle has held, its breaches, and the garrison and food left.
 - Town size, the castle and its reach rings, roads, rivers and the busiest trade paths (thicker means more traders), armies and sieges, burned provinces hatched, and plague.
 - Armies as sprites by arm (foot, horse, guns) with a food bar on the banner showing days of reserve left; rumours as faded banners; the forage limit while you drag an army; and the full route of a selected army with day counts, month marks, food colour and step icons.
 - The harbour tile with an anchor icon showing berths used and free (for example `7/20`), a slipway icon with hulls being built, and fleets with their admiral's banner and course line in days.
@@ -49,6 +50,8 @@ There are three zoom levels: **World**, **Region** and **Local** ("Province" zoo
 - Each tile's building as a sprite, burned tiles in ash, workers moving on busy tiles, ships in the harbour, caravans on the road and barges on the river.
 - Marching armies as columns of foot, horse, guns and wagons in proportion.
 - A battle is shown on the province's own tile row, and a siege as the castle tile with breaches drawn in the walls.
+
+Land provinces have no names on the map at any zoom: a province's name shows on its name tab and card when you select it. Realm names and sea names stay. Route lines are a light dash over a dark outline, so they read on every colour.
 
 Every system added after the province and warfare designs has to state what it shows at each zoom, including its lens.
 
@@ -99,6 +102,8 @@ Land and sea your country has not charted lie under a drawn **parchment**. The p
 You can turn off "Parchment over unknown lands" in the lens menu to see the whole world. That switch is display only. It only changes what you see: it never lets you enter uncharted waters, and it is not the fog of war campaign rule.
 
 ### Watching the week
+
+The date in the top bar ticks one day at a time while the week plays, and shows the hour of each 4-hour step during one of your battles.
 
 While a turn is being worked out, the map stays visible: you can pan and zoom, armies march along their routes, and borders change as results arrive. If the turn takes longer than 1.5 seconds, a small parchment strip says what is being worked out, such as "The courts of Europe deliberate…".
 

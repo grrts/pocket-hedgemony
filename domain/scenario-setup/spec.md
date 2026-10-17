@@ -255,7 +255,7 @@ Newest decision first.
   be unlocked (saves 6.1); the save is never deleted.
 - When `government` changes its form list, then the start-form tool is rerun.
 
-## 9. Monthly turn
+## 9. Each turn
 
 Nothing after the start. Before the first turn: build the starting world, then the 24-month trader warm-up
 (trade §13.1).

@@ -159,3 +159,9 @@ Feature: Commanders from officials
       | a deputy        | Reims    | 8     |
       | a deputy        | Troyes   | 4     |
       | nobody          | Reims    | 4     |
+
+  @RECR-111 @feedback-16
+  Scenario: New commanders come from officials
+    Given the country "France" raises a new army
+    Then the army has no commander until the player commissions an official or one already serving takes it
+    And no commander is attached to an army by default

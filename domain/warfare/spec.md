@@ -427,7 +427,7 @@ Newest decision first.
 - WAR-039 When the war aim is a lord's Want, the warfare system shall bring him even when wavering and keep him to the end. [warfare §3.2]
 - WAR-040 When a lord's lands are occupied by the enemy, the warfare system shall send him and his retinue to defend them. [warfare §3.2]
 - WAR-041 The warfare system shall offer named free companies with a captain in the regions where they historically gathered (config), each showing men, arm, drill, scars and price. [warfare §3.3]
-- WAR-042 When a contract is signed, the warfare system shall add the free company for the contracted months for gold up front plus monthly pay, using no recruits. [warfare §3.3]
+- WAR-042 When a contract is signed, the warfare system shall add the free company for the contracted months for gold up front plus monthly pay, using no recruits. [warfare §3.3] *Replaced in part by WAR-210, WAR-211 (playtest feedback).*
 - WAR-043 When a hire contract ends, its pay is owed as in WAR-019, or an enemy outbids, the warfare system shall remove the free company. [warfare §3.3]
 - WAR-044 Each month, the warfare system shall charge the treasury pay for every company except retinues and levies in their first 3 months. [warfare §3.4]
 - WAR-045 At the weekly step at the end of every turn (X-18), the warfare system shall feed an army a week's share (7 ÷ 30) of its monthly rations (2 per soldier on campaign, 3 per horse and 1 per prisoner a month), from the province at home and from its food reserve abroad. [warfare §3.4, §6.1; X-3, X-18]
@@ -449,7 +449,7 @@ Newest decision first.
 - WAR-058 The warfare system shall apply the traits: Steady +5 % break point for his army; Reckless +10 % strength, −5 % break point, losses ×1.3 for both sides, wounds twice as likely; Careful never ambushed while marching Careful and spots hidden companies as with +1 Cunning; Beloved halves desertion and keeps levies 3 months longer; Cruel makes sacks pay 50 % more, gives *Burned homes* faster where he occupies, and enemy garrisons won't accept his terms; Siege master breaches 25 % faster; Horse lord +10 % Shock and Turn with Shock hits ×2 instead of ×1.5; Old soldier raises his companies' drill 2 a month instead of 1; Greedy keeps a tenth of all loot and takes bribes from garrisons; Ambitious as in WAR-064. [warfare §4.3]
 - WAR-059 When a commander reaches 10 victories, the warfare system may give him a second trait. [warfare §4.3]
 - WAR-060 Where the player has not set an army's standing orders, the warfare system shall set them from the commander's trait (Reckless never retreats; Careful retreats at 3 to 2). [warfare §4.3]
-- WAR-061 The warfare system shall allow commanders from the ruler or an heir, a lord, a hired captain, a captain risen from the ranks after a victory (one offer per won battle), an academy graduate and a foreign exile, with the catches of each origin (succession crisis on the ruler's death or capture; Proud lords refusing a lower-born commander; a hired captain leaving when unpaid; the exile's old ruler insulted). A commissioned official counts as an academy graduate. [warfare §4.4; X-7; D-WAR-6]
+- WAR-061 The warfare system shall allow commanders from the ruler or an heir, a lord, a hired captain, a captain risen from the ranks after a victory (one offer per won battle), an academy graduate and a foreign exile, with the catches of each origin (succession crisis on the ruler's death or capture; Proud lords refusing a lower-born commander; a hired captain leaving when unpaid; the exile's old ruler insulted). A commissioned official counts as an academy graduate. [warfare §4.4; X-7; D-WAR-6] *Replaced in part by RECR-111 (playtest feedback).*
 - WAR-062 The warfare system shall lose commanders by death in battle (1 in 20 for the loser's commander, more under Reckless), capture, old age, dismissal (a dismissed lord wavers), defection, or a grant of land after which he leads only his retinue. [warfare §4.4]
 - WAR-063 The warfare system shall let an army have one commander and up to two captains, each standing in one sector; a captain who wins 3 battles under a commander learns his style. [warfare §4.5]
 - WAR-064 When a commander with 8 or more victories has led the same standing regiments or hired companies for 5 years, the warfare system shall mark those companies as "his men", following him before the crown; if he is Ambitious, pay is owed, or the ruler is a child or newly crowned, it shall let events offer him the throne or a march on the capital. [warfare §4.6]
@@ -646,6 +646,15 @@ Newest decision first.
 - WAR-201 The warfare system shall publish for the army card: name, owner, place, destination, commander and skills, captains, men by foot/horse/guns, companies by kind and levels, food days and reserve size, pay and months owed, break point and flee share, orders, sick and wounded; every line opens its gain and lose list. [warfare §1]
 - WAR-202 The warfare system shall publish the battle as a playback: tile row, companies as blocks with level chevrons, camps, and a one-line commander action per bell ("Dunois commits his knights to the pastures"). [warfare §7.15]
 - WAR-203 The warfare system shall raise notifications for battle won or lost (with the one-line reason), a breach, terms offered, peace voices passing half, pay owed and an army hungry. [warfare §14]
+
+### Playtest feedback (17 October 2026)
+Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
+
+- WAR-207 The warfare system shall fight every battle one round per 4-hour step (X-1) and publish after each round each side's men, morale and losses so far; no battle is resolved in one go. [F-8; X-1]
+- WAR-208 The warfare system shall publish each siege's progress (days held, breaches, garrison left, food left in the castle) whenever it changes, for the map and the siege view. [F-9]
+- WAR-209 The warfare system shall never let an army exist without a commander: soldiers with no commander are their province's garrison troops (recruiting RECR-107), not an army. If an army loses its commander and no captain can take over, then it shall halt; in its own realm's land it becomes the garrison troops of the province it stands in, and abroad it waits there until a commander joins it. [F-13]
+- WAR-210 When a contract with a free company is signed, the warfare system shall take the gold up front and have the company arrive in the province the player names after the days it needs to march there from where it gathers, shown on the hire screen; until it arrives it is not on the map and cannot fight. [F-19]
+- WAR-211 The warfare system shall have every hired company led by its own captain as the commander of its own army, who leaves with the company when the contract ends; a hired company never takes one of the realm's commanders. [F-19]
 
 ## 6. Commands
 
@@ -1170,3 +1179,7 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-202 | features/battle-aftermath.feature | The battle playback says what each commander did |
 | WAR-203 | features/battle-aftermath.feature | Notifications for short sessions |
 | WAR-204 | — | Not testable on its own: an emergent property of styles, arms and ground (covered by those scenarios). |
+| WAR-207 | features/battle-setup.feature | A battle is fought round by round with its state published |
+| WAR-208 | features/sieges.feature | A siege publishes its progress |
+| WAR-209 | features/commanders.feature | No army without a commander |
+| WAR-210, 211 | features/raising-and-keeping.feature | Hiring a free company takes no recruits; A hired company arrives after its march |

@@ -46,3 +46,9 @@ Feature: Drawing the map at each scale
     Given a river traced through the province "Aube"
     When the map is drawn at Region zoom
     Then the river is one line along its traced pixels
+
+  @VIEW-075 @feedback-5
+  Scenario: Route lines stay readable on any colour
+    Given an army's route crosses snow, desert and a white realm's land
+    When the route is drawn
+    Then it is a light dash over a dark outline

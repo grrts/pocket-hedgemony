@@ -43,3 +43,9 @@ Feature: Moving many armies
       | knows         | result                                                                                         |
       | knows         | the armies spread along it, intercept within their stretch and retreat along the front      |
       | does not know | no front can be drawn                                                                          |
+
+  @MOVE-127 @feedback-21
+  Scenario: Several armies selected at once march together
+    Given the player selects 3 armies with a drag-box
+    When the player taps a province
+    Then all 3 armies get one march order to it, each on its own route

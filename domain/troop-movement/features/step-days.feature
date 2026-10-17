@@ -112,3 +112,25 @@ Feature: How fast an army goes
     Given an army whose step takes 6.49 days
     Then the step is shown as 6 days
     And the engine counts 6.49 days
+
+  @MOVE-120 @feedback-4 @placeholder
+  # config: movement.tile_days.<tile type> (provisional)
+  Scenario: Routes are planned over map tiles
+    Given an army at "Troyes" ordered to march to "Langres"
+    When the route is planned
+    Then the route is a path of map tiles of least total tile weight
+    And each tile's weight is its tile type's days to cross times its state factor
+    And the army is in the province that owns the tile it stands on
+
+  @MOVE-121 @feedback-4 @placeholder
+  # config: movement.snow_factor (provisional)
+  Scenario: Snow makes a tile slower
+    Given it is January and a tile at latitude 52 degrees lies under snow
+    When an army's route crosses that tile
+    Then the tile's weight is multiplied by the snow factor
+
+  @MOVE-122 @feedback-4
+  Scenario: Marching keeps its pace
+    Given an army of 5000 foot at "Mexico City"
+    When it is ordered to march to southern Québec
+    Then the route takes more than 2 months

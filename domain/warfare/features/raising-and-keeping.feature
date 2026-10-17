@@ -57,7 +57,7 @@ Feature: Raising and keeping an army
   Scenario: Hiring a free company takes no recruits
     Given the country "Venice" signs a contract for 6 months with a Swiss free company
     When the contract is signed
-    Then the company joins its army
+    Then the company sets out for Venice's land, led by its own captain
     And Venice pays gold up front and monthly pay
     And no recruits are taken from its provinces
 
@@ -117,3 +117,17 @@ Feature: Raising and keeping an army
     Given 2000 men disband into the province "Troyes" whose slots filled while they were away
     When they come home
     Then the province "Troyes" receives them as homeless
+
+  @WAR-210 @feedback-19
+  Scenario: A hired company arrives after its march
+    Given the country "Venice" hires a Swiss free company to come to "Verona"
+    When the contract is signed
+    Then Venice pays the gold up front
+    And the hire screen shows the days the company needs to march to "Verona"
+    And the company is not on the map until it arrives
+
+  @WAR-211 @feedback-19
+  Scenario: A hired company brings its own commander
+    Given the country "Venice" has hired a Swiss free company
+    Then the company is led by its own captain as the commander of its own army
+    And none of Venice's commanders is taken

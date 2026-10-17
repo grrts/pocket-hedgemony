@@ -99,3 +99,11 @@ Feature: Orders and End turn
     And the battle is shown when the turn reaches it
     And the events are shown one at a time in date order
     And the turn report is shown last
+
+  @TIME-076 @feedback-7
+  Scenario: The date ticks day by day after End turn
+    Given the turn starts on 11 November 1444
+    When the player ends the turn
+    Then the shown date moves 12, 13, 14 November and on, one day at a time
+    And during a player battle it moves in steps of 4 hours
+    And it never jumps straight to 18 November

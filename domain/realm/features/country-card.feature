@@ -20,3 +20,9 @@ Feature: The country card
     Given the country "France" ranks 2nd in Economy, 1st in Power and 4th in Technology
     When the player opens the country card of "France"
     Then the card shows those three ranks
+
+  @REALM-176 @feedback-12
+  Scenario: The country card's General tab
+    When the player opens the country card of "France"
+    Then its General tab shows the ruler, gold, food, people and the other summary lines
+    And Allies, Enemies and Oaths broken are on its Diplomacy tab

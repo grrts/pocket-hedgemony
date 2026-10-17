@@ -194,6 +194,16 @@ Newest decision first.
 - VIEW-072 (Ubiquitous): Each province's tiles shall take the palette of its hemisphere's season: in winter, snow on land from latitude 50° toward the pole and on every mountain province (otherwise the base palette); in spring, spring green; in summer, the base palette; in autumn, forests and fields turn gold; a dry land in its wet season shows the wet-season palette, shown alongside the seasonal markers (closed passes, fords, floods). [X-17; X-4] @placeholder
 - VIEW-073 (Ubiquitous): Season palettes shall be swapped per province once a month, never per frame, and no setting shall turn them off. [X-17; X-15]
 
+### Playtest feedback (17 October 2026)
+Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
+
+- VIEW-074 (Ubiquitous): Every army shall be drawn on its current map tile with its commander's banner, and shall move tile by tile along its route as playback runs. [F-3; F-2]
+- VIEW-075 (Ubiquitous): Route lines shall be drawn as a light dash over a dark outline, so they stay readable on every map colour, terrain, season palette and lens. [F-5]
+- VIEW-076 (State-driven): While a turn plays back, the top bar's date shall tick one day at a time, and show the hour of each 4-hour step while a player battle runs. [F-7]
+- VIEW-077 (State-driven): While a battle runs, the map shall show it on its province with each side's men and a progress bar of men and morale left per side, updated every round, and the battle viewer shall show the same. [F-8; X-1]
+- VIEW-078 (State-driven): While a castle is besieged, the map shall show the siege at Region and Local zoom with its progress: time held, breaches, garrison left and food left, updated when the siege updates. [F-9]
+- VIEW-079 (Ubiquitous): The map shall draw no land province names at any zoom; a province's name shows on its name tab and card when it is selected. Realm names and sea names stay. [F-22]
+
 ## 6. Commands
 
 Presentation commands, issued by the player; none reach the engine.
@@ -221,7 +231,7 @@ Presentation commands, issued by the player; none reach the engine.
 - When `settings` changes Sharpness, Frame rate cap, Map detail, Animations, colour vision, patterns or
   borders, then the map applies it at once or at the next redraw.
 
-## 9. Monthly turn
+## 9. Each turn
 
 The map does no simulation. After each turn it applies the results (≤ 16 ms), plays the turn back, and
 re-renders only open panels.
@@ -384,3 +394,8 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-071 | month-playback.feature | The battle bar switches between running battles |
 | VIEW-072 | seasons.feature | Each province takes its season's palette |
 | VIEW-073 | seasons.feature | Palettes swap once a month and cannot be turned off |
+| VIEW-074 | zoom-content.feature | Armies stand on their tile with their commander's banner |
+| VIEW-075 | map-rendering.feature | Route lines stay readable on any colour |
+| VIEW-076, 077 | month-playback.feature | The date ticks during playback; Battles show their progress on the map |
+| VIEW-078 | zoom-content.feature | Sieges show their progress on the map |
+| VIEW-079 | zoom-content.feature | No province names on the map |

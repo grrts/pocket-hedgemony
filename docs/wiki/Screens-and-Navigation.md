@@ -75,7 +75,7 @@ A modal accepts no input to the screens below until it is answered or put off.
 
 ### Cards
 
-A tap on the map only selects; the thing's name appears on a tab in the lower left. Tapping the tab, or tapping the thing again, opens its card. Folding a card away shrinks it back to that tab. When a card opens another card (a province, then its owner's country, then a commander), they stack, and a "Back to <name>" button at the bottom names the card below. Tapping empty map clears the stack. A line that "opens its gain and lose list" opens it inside the card as a fold-out, not as a new screen.
+A tap on the map only selects, and never moves or zooms the map; the thing's name appears on a tab in the lower left. Army banners take big taps, a tap on a commander in the Army list selects his army, and several armies can be selected at once. Tapping the tab, or tapping the thing again, opens its card. Folding a card away shrinks it back to that tab. When a card opens another card (a province, then its owner's country, then a commander), they stack, and a "Back to <name>" button at the bottom names the card below. Tapping empty map clears the stack. A line that "opens its gain and lose list" opens it inside the card as a fold-out, not as a new screen.
 
 How a card sits depends on the shape:
 
@@ -84,6 +84,8 @@ How a card sits depends on the shape:
 | Short wide (phone landscape) | Full height on the left 45 % of the screen; the map stays live on the right, recentred so the selected thing is not hidden |
 | Tall | A bottom sheet at 55 % height, dragged up to full height or down to a peek strip |
 | Large | A side sheet 380 px wide at UI scale 1 |
+
+A **country card** has the tabs General, Diplomacy, Trade and Army, and opens on General. A **province card** has a **Garrison** tab for the troops there without a commander.
 
 ### The Realm book
 
