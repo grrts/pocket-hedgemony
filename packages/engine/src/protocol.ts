@@ -1,4 +1,5 @@
 import { CLASS_NAMES } from "./living.ts";
+import { HARVESTS, storeMonths } from "./food.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
 import { advance, applyNow, HOURS_PER_STEP, processTurn, type Order } from "./turn.ts";
@@ -97,6 +98,11 @@ export interface Snapshot {
   provincePeople: Float32Array;
   provinceClasses: Float32Array;
   classNames: readonly string[];
+  /** Months of eating in each province's store, its last harvest (index into harvests, -1 = none yet) and people starved there this year (thousands). */
+  provinceFoodMonths: Float32Array;
+  provinceHarvest: Int8Array;
+  provinceStarved: Float32Array;
+  harvests: readonly string[];
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -231,6 +237,10 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provincePeople: w.provincePopulation.slice(),
       provinceClasses: w.provinceClasses.slice(),
       classNames: CLASS_NAMES,
+      provinceFoodMonths: Float32Array.from({ length: w.provinceCount }, (_, p) => storeMonths(w, p)),
+      provinceHarvest: w.provinceHarvest.slice(),
+      provinceStarved: w.provinceStarved.slice(),
+      harvests: HARVESTS,
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
@@ -285,6 +295,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceRecruits,
       snap.provincePeople,
       snap.provinceClasses,
+      snap.provinceFoodMonths,
+      snap.provinceHarvest,
+      snap.provinceStarved,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
       ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);

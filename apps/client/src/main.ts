@@ -967,7 +967,7 @@ function renderNews(): void {
   const s = snapshot!;
   const me = s.playerNation;
   const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
-    war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown",
+    war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll",
   };
   const mine = (x: News) => x.nations.includes(me);
   const items = [...dispatches.filter(mine), ...dispatches.filter((x) => !mine(x))];
@@ -1114,6 +1114,7 @@ function renderPanel(): void {
     <dl class="facts">
       <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
+      ${snapshot ? foodFacts(selectedProvince) : ""}
       <dt>Seat</dt><dd>${owner && owner.capital === p.id ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)]}</dd>
       <dt>Walls</dt><dd>${owner && owner.capital === p.id ? WALL_NAMES.castle : p.castle ? WALL_NAMES[p.castle] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
@@ -1200,6 +1201,18 @@ function renderOfficial(pi: number): void {
 function provinceTabs(): string {
   const tab = (key: typeof provinceTab, label: string) => `<button class="tab${provinceTab === key ? " on" : ""}" data-tab="${key}">${label}</button>`;
   return `<nav class="tabs">${tab("overview", "Overview")}${tab("people", "People")}${tab("garrison", "Garrison")}</nav>`;
+}
+
+/** Food lines of a province's overview: months stored, the last harvest and anyone who starved this year. */
+function foodFacts(pi: number): string {
+  const s = snapshot!;
+  const months = s.provinceFoodMonths[pi]!;
+  const h = s.provinceHarvest[pi]!;
+  const starved = Math.round(s.provinceStarved[pi]! * 1000);
+  const warn = months < 1 ? " · hungry" : months < 3 ? " · running low" : "";
+  return `<dt>Food</dt><dd>${months.toFixed(1)} months stored${warn}</dd>
+      <dt>Harvest</dt><dd>${h >= 0 ? s.harvests[h]! : "not in yet"}</dd>
+      ${starved > 0 ? `<dt>Starved</dt><dd>${fmt(starved)} this year</dd>` : ""}`;
 }
 
 /** What each class does, for the People tab. */
