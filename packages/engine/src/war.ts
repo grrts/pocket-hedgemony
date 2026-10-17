@@ -1,3 +1,4 @@
+import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
@@ -18,7 +19,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -382,6 +383,7 @@ function startBattle(world: World, att: number[], def: number[], news: News[]): 
     defLead: -1,
   };
   world.battles.push(b);
+  markBattle(world, b.province);
   for (const s of att) joinBattle(world, b, s, "attackers", false);
   for (const s of def) joinBattle(world, b, s, "defenders", false);
   resolve(world, b);

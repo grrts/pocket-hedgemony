@@ -132,3 +132,25 @@ describe("tax rates and the treasury ledger", () => {
     expect(hashWorld(back)).toBe(hashWorld(w));
   });
 });
+
+describe("heavy taxes stir the province", () => {
+  it("gives the Heavy taxes grievance at heavy, counted twice at crushing", async () => {
+    const { grievanceCount, grievancesOf, monthlyMoods } = await import("../src/moods.ts");
+    const w = createWorld(rules, 1, tiles);
+    const fra = nation(w, "france");
+    const paris = capital(w, fra);
+    monthlyMoods(w, []);
+    const base = grievanceCount(w, paris);
+    expect(grievancesOf(w, paris)).not.toContain("Heavy taxes");
+    applyNow(w, { type: "setTax", province: paris, rate: rate("heavy") }, fra);
+    monthlyMoods(w, []);
+    expect(grievancesOf(w, paris)).toContain("Heavy taxes");
+    expect(grievanceCount(w, paris)).toBe(base + 1);
+    applyNow(w, { type: "setTax", province: paris, rate: rate("crushing") }, fra);
+    monthlyMoods(w, []);
+    expect(grievanceCount(w, paris)).toBe(base + 2);
+    applyNow(w, { type: "setTax", province: paris, rate: rate("normal") }, fra);
+    monthlyMoods(w, []);
+    expect(grievancesOf(w, paris)).not.toContain("Heavy taxes");
+  });
+});

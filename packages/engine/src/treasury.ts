@@ -3,6 +3,7 @@ import { controller, type News } from "./war.ts";
 import { nationPay, ungoverned } from "./recruit.ts";
 import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
 import { interestPct, loanCap, realmConfig } from "./domain/realm/index.ts";
+import { moodShare } from "./moods.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -62,13 +63,14 @@ export function taxFactor(world: World, rate: number): number {
 export function provinceTax(world: World, p: number, holder: number): number {
   const { economy } = world.rules.defines;
   // A province whose official was commissioned pays half (recruiting RECR-083, "Leave it").
-  const share = ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1;
+  // Rioting or plotting provinces pay half (PROV-162).
+  const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p);
   return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share;
 }
 
 /** Trade and market gold a province gives its holder in a month (not taxed by rate). */
 export function provinceTrade(world: World, p: number): number {
-  const share = ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1;
+  const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p);
   return world.provinceWealth[p]! * world.rules.defines.economy.goldPerWealthPerMonth * share;
 }
 

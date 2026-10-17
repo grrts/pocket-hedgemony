@@ -1,6 +1,7 @@
 import { monthlyPeople } from "./living.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
+import { monthlyMoods } from "./moods.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, forageRations, monthlyRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -147,6 +148,7 @@ function startDay(world: World, news: News[]): void {
   if (world.day > 0 && world.date.day === 1) {
     monthlyPeople(world, news);
     monthlyFood(world, news);
+    monthlyMoods(world, news);
     monthlyRecruits(world, news);
     runLedger(world, true);
     aiTreasury(world, news);
