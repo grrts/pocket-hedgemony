@@ -1,3 +1,4 @@
+import { monthlyPeople } from "./living.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, forageRations, monthlyRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -137,6 +138,7 @@ function startDay(world: World, news: News[]): void {
   syncDate(world);
   // The 1st of the month: pools refill, pay, diplomacy, the AI's monthly choices.
   if (world.day > 0 && world.date.day === 1) {
+    monthlyPeople(world, news);
     monthlyRecruits(world, news);
     runEconomy(world, true);
     monthlyDiplomacy(world, news);

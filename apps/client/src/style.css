@@ -1208,3 +1208,19 @@ button.person-tile {
 .mix .arm-3 { background: #5f7f3a; }
 .mix .arm-4 { background: #b5793a; }
 .mix .arm-5 { background: #7a2e2e; }
+
+/* People by class (milestone 3): a share bar per class that fits a phone-width panel. */
+table.classes td.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+table.classes td.bar {
+  width: 45%;
+}
+
+table.classes td.bar span {
+  display: block;
+  height: 8px;
+  background: var(--ink-soft);
+}

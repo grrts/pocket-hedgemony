@@ -22,6 +22,7 @@ export interface Defines {
   march: MarchDefines;
   war: WarDefines;
   recruit: RecruitDefines;
+  living: LivingDefines;
 }
 
 /** Wars, sieges and occupation (milestone 1; the warfare context's own numbers stay in domain/warfare.json). */
@@ -230,4 +231,20 @@ export interface Ruleset {
   map?: MapInfo;
   /** Culture names; without them, names come from defines.recruit.commanderNames. */
   names?: NameBook;
+}
+
+/** People by class at the start (milestone 3); the classes, birth and death rates are the province context's. */
+export interface LivingDefines {
+  /** Share of a province's people living in town: base plus a step per wealth above 1, up to the max. */
+  townShareBase: number;
+  townSharePerWealth: number;
+  townShareMax: number;
+  /** How townsfolk split by class. */
+  townMix: Record<string, number>;
+  /** Share of the people without work or home. */
+  homelessShare: number;
+  /** Share of the countryfolk of a coastal province who fish and sail. */
+  coastalSeafolk: number;
+  /** How countryfolk split by class on each ground. */
+  countryMix: Record<string, Record<string, number>>;
 }

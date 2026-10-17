@@ -1,3 +1,4 @@
+import { CLASS_NAMES } from "./living.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
 import { advance, applyNow, HOURS_PER_STEP, processTurn, type Order } from "./turn.ts";
@@ -92,6 +93,10 @@ export interface Snapshot {
   pay: number;
   /** Men who can be called in each province now. */
   provinceRecruits: Float32Array;
+  /** People of each province in thousands, and by class (CLASS_NAMES, CLASS_COUNT per province). */
+  provincePeople: Float32Array;
+  provinceClasses: Float32Array;
+  classNames: readonly string[];
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -223,6 +228,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       nationCapUsed: w.nationCapUsed.slice(),
       pay: player >= 0 ? nationPay(w, player) : 0,
       provinceRecruits: w.provinceRecruits.slice(),
+      provincePeople: w.provincePopulation.slice(),
+      provinceClasses: w.provinceClasses.slice(),
+      classNames: CLASS_NAMES,
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
@@ -275,6 +283,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.nationTroopCap,
       snap.nationCapUsed,
       snap.provinceRecruits,
+      snap.provincePeople,
+      snap.provinceClasses,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
       ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);
