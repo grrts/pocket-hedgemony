@@ -3,13 +3,14 @@ import { stabilityOf, type Stability } from "./stability.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
-import { HARVESTS, storeMonths } from "./food.ts";
+import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
+import { badWeatherName } from "./domain/realm/index.ts";
 import { foodView, mapNetwork, type FoodView } from "./castleFood.ts";
 import { buildSheets, landSheets, slotsOf, slotsUsed, townSize, workCost, WORKS, workStepName, workEffect, type LandTileRow, type WorkRow } from "./works.ts";
 import { buildingType } from "./domain/buildings/index.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
-import { advance, applyNow, HOURS_PER_STEP, mayMarchInto, processTurn, type Order } from "./turn.ts";
+import { advance, applyNow, campaigning, HOURS_PER_STEP, mayMarchInto, processTurn, refillHere, type Order } from "./turn.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
@@ -128,6 +129,13 @@ export interface Snapshot {
   provinceHarvest: Int8Array;
   provinceStarved: Float32Array;
   harvests: readonly string[];
+  /** The weather of each province's last harvest (-1 bad, 0 normal, 1 good), its harvest climate (index into climates) and the months it harvests. */
+  provinceWeather: Int8Array;
+  provinceClimate: Int8Array;
+  provinceHarvestMonths: number[][];
+  climates: readonly string[];
+  /** What bad weather is called in each climate (drought, floods, bad weather). */
+  badWeather: readonly string[];
   /** The castle feeding each province (-1 = none in reach) and its ring from it (feedback 84). */
   provinceCastle: Int32Array;
   provinceRing: Int8Array;
@@ -191,6 +199,9 @@ export interface Snapshot {
     /** Gold a month and rations a month. */
     pay: number[];
     rations: number[];
+    /** 1 while on campaign (at war or abroad: men eat double), and the rations a month the store where it stands can give it. */
+    campaigning: Uint8Array;
+    refill: number[];
     /** Share of its men an army can lose before it breaks (the player's armies only; 0 for others). */
     breakPoint: number[];
     training: ({ arm: string; men: number; months: number } | null)[];
@@ -334,6 +345,11 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceHarvest: w.provinceHarvest.slice(),
       provinceStarved: w.provinceStarved.slice(),
       harvests: HARVESTS,
+      provinceWeather: w.provinceWeather.slice(),
+      provinceClimate: provinceClimates(w).slice(),
+      provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
+      climates: CLIMATES,
+      badWeather: CLIMATES.map(badWeatherName),
       ...(mapNetwork(w), { provinceCastle: w.provinceCastle.slice(), provinceRing: w.provinceRing.slice() }),
       food: player >= 0 ? foodView(w, player) : null,
       provinceGrievances: w.provinceGrievances.slice(),
@@ -404,6 +420,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         byArm: live.map((slot) => menByArm(w, slot).map(Math.round)),
         pay: live.map((slot) => armyPay(w, slot)),
         rations: live.map((slot) => armyRations(w, slot)),
+        campaigning: Uint8Array.from(live, (slot) => Number(campaigning(w, slot))),
+        refill: live.map((slot) => (a.owner[slot] === player ? refillHere(w, slot) : 0)),
         breakPoint: live.map((slot) => (a.owner[slot] === player ? armyBreak(w, slot) : 0)),
         training: live.map((slot) => (a.trainArm[slot]! >= 0 ? { arm: ARMS[a.trainArm[slot]!]!, men: a.trainMen[slot]!, months: a.trainLeft[slot]! } : null)),
       },
@@ -424,6 +442,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceTaxGold,
       snap.provinceFoodMonths,
       snap.provinceHarvest,
+      snap.provinceWeather,
+      snap.provinceClimate,
       snap.provinceStarved,
       snap.provinceCastle,
       snap.provinceRing,

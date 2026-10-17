@@ -2361,3 +2361,78 @@ Then(/^the officials pillar of "([^"]+)" counts (\d+) empty posts? and is "([^"]
   expect(p.counts.empty).toBe(Number(empty));
   expect(G.STABILITY[p.step]).toBe(step);
 });
+
+// ------------------------------------------------------------ harvests and army supply (REALM-215 to REALM-219, feedback 82, 83)
+
+Given("a province rolls its own harvest many times", (s) => {
+  const rng = new Rng(17);
+  s.base = { failed: 0, poor: 0, normal: 0, good: 0, bumper: 0 };
+  for (let i = 0; i < 10000; i++) s.base[M.rollBaseHarvest(rng)]++;
+});
+Then("about 10 % are poor, 70 % normal, 15 % good and 5 % bumper", (s) => {
+  const want = { poor: 1000, normal: 7000, good: 1500, bumper: 500 } as Record<string, number>;
+  for (const [h, n] of Object.entries(want)) expect(Math.abs(s.base[h] - n)).toBeLessThan(n * 0.15);
+});
+Then("none is failed before weather and war", (s) => {
+  expect(s.base.failed).toBe(0);
+});
+
+Given("a region's weather is rolled many times", (s) => {
+  s.rolls = Array.from({ length: 6000 }, (_, i) => (i + 0.5) / 6000);
+});
+When(/^a (temperate|dry|monsoon) province reads each roll$/, (s, climate: M.HarvestClimate) => {
+  s.climate = climate;
+  s.bad = s.rolls.filter((r: number) => M.weatherFor(r, climate) === "bad").length;
+});
+Then(/^about 1 in (\d+) rolls bring it (bad weather|drought|floods)$/, (s, n: string, name: string) => {
+  expect(Math.abs(s.bad - 6000 / Number(n))).toBeLessThan(60);
+  expect(M.badWeatherName(s.climate)).toBe(name);
+});
+
+Given("a temperate province and a dry province lie in one weather region", () => {});
+When("the region rolls bad weather for the temperate province", (s) => {
+  s.roll = 0.1;
+  expect(M.weatherFor(s.roll, "temperate")).toBe("bad");
+});
+Then("the dry province has a drought in the same year", (s) => {
+  expect(M.weatherFor(s.roll, "dry")).toBe("bad");
+  expect(M.badWeatherName("dry")).toBe("drought");
+});
+
+Given(/^a (\w+) province at (-?\d+) east and latitude (-?\d+)$/, (s, ground: string, lon: string, lat: string) => {
+  s.place = { ground, lon: Number(lon), lat: Number(lat) };
+});
+Given(/^its realm (knows|does not know) wet-rice terracing$/, (s, knows: string) => {
+  s.known = new Set(knows === "knows" ? ["F2"] : []);
+});
+When("its harvests are worked out", (s) => {
+  s.months = M.harvestMonthsAt(s.place.ground, s.place.lon, s.place.lat, s.known);
+});
+Then(/^it harvests (never|in [A-Za-z ]+)$/, (s, when: string) => {
+  const names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  expect(s.months.map((m: number) => names[m - 1])).toEqual(when === "never" ? [] : when.slice(3).split(" and "));
+});
+
+Given(re(`an army of ${NUM} men and ${NUM} horses`), (s, men: string, horses: string) => {
+  s.army = { men: num(men), horse: num(horses), logistics: 0 };
+});
+When("it spends a month at home in peace", (s) => {
+  s.eaten = G.monthlyRations(loadDefaultRuleset().defines.march, s.army);
+});
+When("it spends a month on campaign", (s) => {
+  s.eaten = G.monthlyRations(loadDefaultRuleset().defines.march, { ...s.army, campaigning: true });
+});
+Then(re(`it eats ${NUM} rations`), (s, n: string) => {
+  expect(s.eaten).toBe(num(n));
+});
+
+Given(re(`a farmland province of ${NUM} people holds (\\d+) months of food`), (s, people: string, months: string) => {
+  s.prov = { people: num(people), store: num(people) * Number(months) };
+});
+When(/^an army refills there in (its own|an enemy's) land$/, (s, whose: string) => {
+  const d = loadDefaultRuleset().defines.march;
+  s.refill = G.refillRations(d, "farmland", s.prov.store, whose === "its own" ? s.prov.people * d.homeReserveMonths : 0);
+});
+Then(re(`it can take up to ${NUM} rations a month from the store`), (s, n: string) => {
+  expect(s.refill).toBeCloseTo(num(n));
+});

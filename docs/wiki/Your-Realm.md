@@ -115,6 +115,14 @@ One **Food policy** sets realm-wide defaults, and any castle can have its own va
 - When a province runs out of food, people die, survivors flee to neighbours or abroad, revolts become likely, and the lord of that land turns disloyal. The event tree's famine events read the same stores.
 - You can burn your own fields ahead of an invader (scorched earth) to starve him.
 
+### Harvests and army supply in the game today
+
+- **Each province rolls its own harvest**: 1 in 10 poor, 7 in 10 normal, 15 in 100 good and 1 in 20 bumper. Its region's weather, an enemy in the province and your harvest inventions then move it a step each, so a failed harvest comes from a poor roll in a bad year, or bad weather with an enemy at the gates.
+- **Weather depends on the climate.** A region rolls once, and each province reads it by its climate: temperate land has bad weather 1 year in 6, dry land (desert, drylands, savanna) a drought 1 in 4, and the monsoon lands of Asia floods 1 in 5. Neighbours still suffer together.
+- **When the harvest comes in**: once a year in September in the north and March in the south. Rice lands from India to South China and the Indies harvest in both March and September once their realm knows *Wet-rice terracing*, each harvest bringing half the year's food, so one bad season costs only half. The tundra grows no crops; it lives on herds, hunting and fishing, which bring food every month.
+- **Armies eat from the land.** A man eats a month of food a month at home, double on campaign (while your realm is at war or the army is abroad), and a horse like three men. An army refills its wagons from the store of the province where it stands. In your own or friendly land the locals keep two months for themselves; in enemy land the foragers take what they find on that ground. What an army takes leaves the store, so a long stay or a march through poor land brings hunger to the province, and then to the army.
+- **Where you see it**: the province card's Overview shows the last harvest and why ("poor · drought in the region"), when it comes in, and how many months of the store the armies standing there eat a month. The Provinces tab counts your last harvests and marks poor and failed ones on each row. A failed harvest sends a dispatch. The army's supply line says how long its wagons last, whether it eats double on campaign, and what the land there gives it. The Food lens shows how many men on campaign each province could feed.
+
 ### People and land
 
 | Stat | Gained by | Lost by |
@@ -358,7 +366,7 @@ All realm numbers are placeholders, kept in one realm data file.
 - The throne passes by your government form's succession rule. A lord with 4 to 7 provinces has one *Great lord* reason to waver; one with 8 or more has two.
 - Women can be lords (5 %), commanders (2 %), officials (2 %) or scholars (5 %). These chances grow ×1.5, ×2 and ×3 in the last three ages.
 - Loans cost 10 % a year, less with banking inventions, and are capped at one year's income (three with T10). Each broken oath adds 10 % to the chance a lender refuses.
-- The harvest comes in September in the north and in March in the south. Each region rolls its weather once a harvest: 1 in 6 bad, 1 in 6 good.
+- The harvest comes in September in the north and in March in the south. Each region rolls its weather once a harvest: 1 in 6 bad, 1 in 6 good in temperate land, 1 in 4 drought in dry land and 1 in 5 floods in monsoon land. Each province also rolls its own harvest first (feedback 82).
 - A child ruler, under 16, rules through the queen mother, or else through the most loyal lord.
 - Starting counts come from each country's assessments, with a seeded spread for countries we know less about.
 

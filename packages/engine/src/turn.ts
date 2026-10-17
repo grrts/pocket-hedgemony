@@ -8,7 +8,7 @@ import { monthlyMoods } from "./moods.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
-import { corridor, forageRations, monthlyRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
+import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
 import {
   aiCollect,
@@ -349,6 +349,34 @@ export function marching(world: World, slot: number): MarchingArmy {
   return { men: a.men[slot]!, horse: a.horse[slot]!, logistics: c >= 0 ? world.commanderLogistics[c]! : 0 };
 }
 
+/** Rations a month an army can take from the store where it stands: the locals keep a reserve unless they are the enemy's (feedback 83). */
+export function refillHere(world: World, slot: number, map = marchMap(world)): number {
+  const p = world.armies.location[slot]!;
+  if (world.provinceWater[p]) return 0;
+  const d = world.rules.defines.march;
+  const owner = world.provinceOwner[p]!;
+  const enemy = owner >= 0 && atWar(world, owner, world.armies.owner[slot]!);
+  const reserve = enemy ? 0 : world.provincePopulation[p]! * 1000 * d.homeReserveMonths;
+  return refillRations(d, map.ground[p]!, Math.max(0, world.provinceStore[p]!) * 1000, reserve);
+}
+
+/** An army is on campaign while its realm is at war or it stands outside its own land (REALM-054). */
+export function campaigning(world: World, slot: number): boolean {
+  const owner = world.armies.owner[slot]!;
+  return world.provinceOwner[world.armies.location[slot]!] !== owner || realmsAtWar(world).has(owner);
+}
+
+/** The realms in any war, worked out once a day. */
+const atWarCache = new WeakMap<World, { day: number; set: Set<number> }>();
+function realmsAtWar(world: World): Set<number> {
+  const hit = atWarCache.get(world);
+  if (hit && hit.day === world.day) return hit.set;
+  const set = new Set<number>();
+  for (const w of world.diplomacy.wars) for (const id of [...w.attackers, ...w.defenders]) set.add(world.nationIndex.get(id) ?? -1);
+  atWarCache.set(world, { day: world.day, set });
+  return set;
+}
+
 /** The army stops where it stands. */
 export function halt(world: World, slot: number): void {
   const a = world.armies;
@@ -515,8 +543,10 @@ function stepMarches(world: World, hours: number): void {
 
 /**
  * A day's food. Every army eats a day of rations from its wagons and refills
- * them from the land where it stands; what the land can't make up is hunger:
- * men desert and die, and horses are eaten.
+ * them from the store of the province where it stands (feedback 83): at home
+ * the locals keep a reserve, enemy land is stripped of what foragers find.
+ * What the land can't make up is hunger: men desert and die, and horses are
+ * eaten.
  */
 function feedArmies(world: World): void {
   const d = world.rules.defines.march;
@@ -525,11 +555,15 @@ function feedArmies(world: World): void {
   const day = 1 / DAYS_PER_RATION_MONTH;
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
-    const army = marching(world, i);
+    const army = { ...marching(world, i), campaigning: campaigning(world, i) };
     const need = monthlyRations(d, army) * day;
     a.food[i] = a.food[i]! - need;
-    const room = monthlyRations(d, army) * d.monthsCarried - a.food[i]!;
-    a.food[i] = a.food[i]! + Math.max(0, Math.min(room, forageRations(d, map, a.location[i]!) * day));
+    const room = wagonRations(d, army) - a.food[i]!;
+    if (room > 0) {
+      const take = Math.min(room, refillHere(world, i, map) * day);
+      a.food[i] = a.food[i]! + take;
+      world.provinceStore[a.location[i]!] = world.provinceStore[a.location[i]!]! - take / 1000;
+    }
     if (a.food[i]! < 0) {
       const short = Math.min(1, -a.food[i]! / need);
       const loss = d.hungerLossPerMonth * day * short;

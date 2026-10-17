@@ -82,7 +82,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("provinces", V.provinces, {
       // Sieges under way, by province (occupation and garrisons are arrays below); the ground is the map's, not the save's.
       meta: { sieges: [...world.sieges].map(([p, st]) => [p, { ...st, siege: { ...st.siege, ground: undefined } }]), workNames: WORKS },
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore },
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
@@ -237,6 +237,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         classesFrom[t.index] = old;
         if (prov.food) world.provinceStore[t.index] = prov.food[old]! * t.share;
         if (prov.harvest) world.provinceHarvest[t.index] = prov.harvest[old]!;
+        if (prov.weather) world.provinceWeather[t.index] = prov.weather[old]!;
         if (prov.grievances) world.provinceGrievances[t.index] = prov.grievances[old]!;
         if (prov.armyMonths) world.provinceArmyMonths[t.index] = prov.armyMonths[old]!;
         if (prov.battleYear) world.provinceBattleYear[t.index] = prov.battleYear[old]!;

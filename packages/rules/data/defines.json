@@ -77,10 +77,11 @@
     "riverCrossingDays": 1,
     "tilesPerCrossing": 14,
     "snowSlowdown": 1,
-    "rationsPerSoldier": 2,
+    "rationsPerSoldier": 1,
     "rationsPerHorse": 3,
     "rationsStoredPerPerson": 0.5,
     "monthsCarried": 2,
+    "homeReserveMonths": 2,
     "logisticsRationCut": 0.05,
     "hungerLossPerMonth": 0.28,
     "startingHorseShare": 0.2
