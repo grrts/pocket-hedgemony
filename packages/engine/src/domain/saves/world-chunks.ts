@@ -77,10 +77,10 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
     packChunk("provinces", V.provinces, {
       meta: {},
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord },
     }),
     packChunk("nations", V.nations, {
-      meta: { lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome },
+      meta: { lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
@@ -214,6 +214,13 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         if (prov.wealth) world.provinceWealth[t.index] = prov.wealth[old]!;
         if (prov.recruits) world.provinceRecruits[t.index] = prov.recruits[old]!;
         if (prov.official) world.provinceOfficial[t.index] = prov.official[old]!;
+        // Saves from before officials moved name each one after his own province, with years served from the start.
+        if (prov.officialSeed) {
+          const seed = prov.officialSeed[old]!;
+          const to = seed >= 0 && seed < ids.provinces.length ? world.provinceIndex.get(ids.provinces[seed]!) : undefined;
+          world.provinceOfficialSeed[t.index] = to ?? t.index;
+        }
+        if (prov.officialSince) world.provinceOfficialSince[t.index] = prov.officialSince[old]!;
         if (prov.tax) world.provinceTax[t.index] = prov.tax[old]!;
         classesFrom[t.index] = old;
         if (prov.food) world.provinceStore[t.index] = prov.food[old]! * t.share;
@@ -255,7 +262,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (!name || owner < 0 || nationMap[owner]! < 0) return -1;
     return addCommander(world, nationMap[owner]!, newCommander(name), id);
   });
-  const natMeta = need("nations").meta as { lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[] };
+  const natMeta = need("nations").meta as { lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[] };
   const mapP = (old: number) => world.provinceIndex.get(ids.provinces[old]!) ?? -1;
   const mapN = (old: number) => nationMap[old] ?? -1;
   const mapCompany = (c: FreeCompany): FreeCompany => ({ ...c, home: c.home < 0 ? -1 : mapP(c.home) });
@@ -275,6 +282,11 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   natMeta.commanderHome?.forEach((p, old) => {
     const c = commanderMap[old]!;
     if (c >= 0) world.commanderHome[c] = p < 0 ? -1 : mapP(p);
+  });
+  // A commissioned official's name seed; before it was saved, he was named after his home province.
+  (natMeta.commanderSeed ?? natMeta.commanderHome)?.forEach((p, old) => {
+    const c = commanderMap[old]!;
+    if (c >= 0) world.commanderSeed[c] = p < 0 ? -1 : mapP(p);
   });
   // Lords keep their places in the list (provinces point at them); one of a realm that is gone holds nothing.
   if (natMeta.lords) world.lords = natMeta.lords.map((l) => ({ ...l, nation: mapN(l.nation) }));
