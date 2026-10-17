@@ -22,6 +22,11 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.click("[data-tab=people]");
   await page.waitForTimeout(200);
   await shot("people");
+  await page.click(".hud .realm");
+  await page.waitForTimeout(300);
+  await page.click("[data-realm-tab=lords]");
+  await page.waitForTimeout(200);
+  await shot("lords");
   await page.close();
 }
 await browser.close();

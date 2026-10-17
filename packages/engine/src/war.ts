@@ -1,3 +1,4 @@
+import { lordsLoseWar } from "./lords.ts";
 import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -752,7 +753,12 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
   const d = world.diplomacy;
   const truceMonths = dip.truceMonthsAfterPeace({ landOrSubject: ceded.length > 0, white: ceded.length === 0 });
   const involved = whole ? [...war.attackers, ...war.defenders].map((id) => world.nationIndex.get(id)!) : [a, b];
-  for (const p of ceded) world.provinceOwner[p] = world.provinceOccupier[p]!;
+  // Realms that give up land lost the war in their lords' eyes.
+  for (const n of new Set(ceded.map((p) => world.provinceOwner[p]!))) lordsLoseWar(world, n, news);
+  for (const p of ceded) {
+    world.provinceOwner[p] = world.provinceOccupier[p]!;
+    world.provinceLord[p] = -1;
+  }
   // Every other occupation between the realms making peace ends.
   const set = new Set(involved);
   for (let p = 0; p < world.provinceCount; p++) {

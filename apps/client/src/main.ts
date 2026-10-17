@@ -117,7 +117,7 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "diplomacy" | "military" | "mercenaries" | "officials" = "general";
+let realmTab: "general" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" = "general";
 /** Province whose official's screen is open, or -1. */
 let officialView = -1;
 /** Which tab of the province overview is open. */
@@ -1116,6 +1116,7 @@ function renderPanel(): void {
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       ${snapshot ? foodFacts(selectedProvince) : ""}
       ${snapshot && own >= 0 ? moodFacts(selectedProvince) : ""}
+      ${snapshot && own >= 0 ? lordFacts(selectedProvince, mineHere) : ""}
       <dt>Seat</dt><dd>${owner && owner.capital === p.id ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)]}</dd>
       <dt>Walls</dt><dd>${owner && owner.capital === p.id ? WALL_NAMES.castle : p.castle ? WALL_NAMES[p.castle] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
@@ -1146,6 +1147,7 @@ function renderPanel(): void {
   bindCommand();
   bindProvinceTabs();
   bindNationButtons();
+  bindLords();
   if (siege) animateSiege(siege);
 }
 
@@ -1214,6 +1216,56 @@ function foodFacts(pi: number): string {
   return `<dt>Food</dt><dd>${months.toFixed(1)} months stored${warn}</dd>
       <dt>Harvest</dt><dd>${h >= 0 ? s.harvests[h]! : "not in yet"}</dd>
       ${starved > 0 ? `<dt>Starved</dt><dd>${fmt(starved)} this year</dd>` : ""}`;
+}
+
+/** What each loyalty step means for the crown. */
+const LOYALTY_NOTE: Record<string, string> = {
+  Loyal: "gives half his lands' tax and recruits",
+  Wavering: "gives half, but a step from disloyal",
+  Disloyal: "gives nothing",
+  "In revolt": "has risen against you",
+};
+
+/** A province's lord line: who holds it, and taking it back or granting it as a fief. */
+function lordFacts(pi: number, mine: boolean): string {
+  const s = snapshot!;
+  const l = s.provinceLord[pi]!;
+  if (l >= 0) {
+    const lord = s.lords[l]!;
+    return `<dt>Lord</dt><dd><b>${esc(lord.name)}</b> · ${lord.loyalty.toLowerCase()}${mine ? ` <button class="paper small" data-seize="${pi}" title="Take it back as royal land: he loses a step, and every other lord notices">Seize</button>` : ""}</dd>`;
+  }
+  const isCapital = nations[owners[pi]!]?.capital === provinces[pi]!.id;
+  // Lords holding land next to this province, as the likely takers of a fief.
+  const near = new Set<number>();
+  for (const q of neighborIdx[pi]!) if (owners[q] === owners[pi] && s.provinceLord[q]! >= 0) near.add(s.provinceLord[q]!);
+  const grant = mine && !isCapital ? [...near].slice(0, 3).map((k) => `<button class="paper small" data-grant="${pi}" data-lord="${k}" title="Grant it to ${esc(s.lords[k]!.name)} as a fief: his loyalty rises, the crown gets half">Grant to ${esc(s.lords[k]!.house)}</button>`).join(" ") : "";
+  return `<dt>Lord</dt><dd>Royal land${isCapital ? " (capital)" : ""}${grant ? `<br>${grant}` : ""}</dd>`;
+}
+
+/** The realm's lords: loyalty, lands, and a gift to win one back. */
+function lordsTab(r: number): string {
+  const s = snapshot!;
+  const mine = s.lords.map((l, k) => ({ ...l, k })).filter((l) => l.nation === r && l.lands > 0);
+  let royal = 0;
+  let all = 0;
+  for (let p = 0; p < owners.length; p++) if (owners[p] === r) (all++, s.provinceLord[p]! < 0 && royal++);
+  const order = ["In revolt", "Disloyal", "Wavering", "Loyal"];
+  mine.sort((a, b) => order.indexOf(a.loyalty) - order.indexOf(b.loyalty) || b.lands - a.lands);
+  const gold = s.nationTreasury[r]!;
+  const rows = mine
+    .map((l) => `<tr><td><b>${esc(l.name)}</b><br><small>${esc(l.house)} · ${l.lands} province${l.lands === 1 ? "" : "s"}</small></td><td><b>${esc(l.loyalty)}</b><br><small>${esc(LOYALTY_NOTE[l.loyalty] ?? "")}</small></td>${l.loyalty !== "Loyal" ? `<td class="army-buttons"><button class="paper small" data-gift="${l.k}" ${gold < s.giftGold ? "disabled" : ""} title="A gift of gold raises his loyalty a step">Gift · ${s.giftGold} gold</button></td>` : "<td></td>"}</tr>`)
+    .join("");
+  return `<p>${royal} of ${all} provinces are royal land and give you all their tax. ${mine.length} lord${mine.length === 1 ? " holds" : "s hold"} the rest and give half while loyal.</p>
+    ${mine.length ? `<table class="troops lords"><tbody>${rows}</tbody></table>` : `<p class="hint">No lords: every province is royal land.</p>`}
+    <p class="hint">Gifts, fiefs and quiet years raise loyalty; lost wars and seized land lower it. Open a province to seize it or grant it as a fief.</p>`;
+}
+
+function bindLords(): void {
+  panel.querySelectorAll<HTMLButtonElement>("[data-gift]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "gift", lord: Number(b.dataset.gift) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-seize]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "seizeFief", province: Number(b.dataset.seize) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-grant]").forEach((b) =>
+    b.addEventListener("click", () => void actHere({ type: "grantFief", province: Number(b.dataset.grant), lord: Number(b.dataset.lord) })),
+  );
 }
 
 /** What eases each grievance, for the mood line. */
@@ -1730,7 +1782,7 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if (!s || ((realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials") && !mine)) realmTab = "general";
+  if (!s || ((realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords") && !mine)) realmTab = "general";
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
@@ -1760,11 +1812,12 @@ function renderRealm(r: number): void {
     realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r))
     : realmTab === "military" ? warRoomSection()
     : realmTab === "mercenaries" ? mercenarySection()
+    : realmTab === "lords" ? lordsTab(r)
     : realmTab === "officials" ? officialsTab(rules, own.map((i) => ({ province: i, official: officialOf(rules, i, r, s!.provinceOfficial[i]) })), r)
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("mercenaries", "Mercenaries") : ""}</nav>` : ""}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : ""}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -1795,6 +1848,7 @@ function renderRealm(r: number): void {
       renderPanel();
     }),
   );
+  bindLords();
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-open-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       realmTab = b.dataset.realmOpenTab as typeof realmTab;
