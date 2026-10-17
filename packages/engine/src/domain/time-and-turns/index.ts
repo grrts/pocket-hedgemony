@@ -343,6 +343,14 @@ export function orderShape(order: Order): string {
       return "seize a fief";
     case "swapOfficials":
       return "move an official to another province";
+    case "setStudy":
+      return "choose what to study";
+    case "setSeats":
+      return "set school seats to fill";
+    case "callStudentsToArms":
+      return "call students to arms";
+    case "foundSchool":
+      return "found a school in province";
   }
 }
 
@@ -356,6 +364,7 @@ export function copyWorld(world: World, rules: Ruleset = world.rules): World {
     if (ArrayBuffer.isView(v)) return (v as unknown as { slice(): unknown }).slice();
     if (v instanceof Rng) return new Rng(v.state);
     if (v instanceof Map) return new Map(v);
+    if (v instanceof Set) return new Set(v);
     if (Array.isArray(v)) return v.map(copy);
     if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, copy(x)]));
     return v;

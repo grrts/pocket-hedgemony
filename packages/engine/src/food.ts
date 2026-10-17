@@ -91,7 +91,9 @@ export function monthlyFood(world: World, news: News[]): void {
     }
     // Hostile armies in the province burn or eat the crop: one band worse.
     const war = world.provinceOccupier[p]! >= 0 || world.sieges.has(p) ? -1 : 0;
-    const roll = Math.max(0, Math.min(HARVESTS.length - 1, NORMAL + weather.get(r)! + war));
+    // Inventions give harvest steps, each a band better (PROV-295).
+    const steps = world.provinceOwner[p]! >= 0 ? world.researchHarvest[world.provinceOwner[p]!]! : 0;
+    const roll = Math.max(0, Math.min(HARVESTS.length - 1, NORMAL + weather.get(r)! + war + steps));
     world.provinceHarvest[p] = roll;
     // A steward gets more out of the fields (province officials table: +10 % food).
     const steward = officialBonus(world, p, "Steward", "food");

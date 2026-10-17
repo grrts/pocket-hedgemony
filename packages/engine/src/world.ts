@@ -15,6 +15,7 @@ import { realmConfig } from "./domain/realm/index.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
 import { addCommander, ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 import { seedOfficials } from "./officials.ts";
+import { createResearchState, seedResearch, type ResearchState } from "./research.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -22,7 +23,7 @@ import { seedOfficials } from "./officials.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -387,6 +388,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createFoodState(P),
     ...createMoodState(P),
     ...createLordState(P),
+    ...createResearchState(N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -420,6 +422,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
       world.armies.mix[slot * ARMS.length + armIndex("armoured foot")] = 0.5;
     }
   });
+  seedResearch(world);
   recount(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.

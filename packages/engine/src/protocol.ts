@@ -11,6 +11,7 @@ import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages } from "./tiles.ts";
+import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
 
@@ -188,6 +189,10 @@ export interface Snapshot {
   };
   /** Arm names for armies.byArm. */
   arms: readonly string[];
+  /** The player's research for the Learning tab (null before a realm is chosen). */
+  research: ResearchView | null;
+  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%). */
+  realmResearch: { known: number; study: string | null; pct: number }[];
 }
 
 /** Land nation n's armies may not march into, worked out once per realm holding it. */
@@ -336,6 +341,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         origin: c.origin ?? "",
       })),
       arms: ARMS,
+      research: player >= 0 ? researchView(w, player, ARMS) : null,
+      realmResearch: realmResearch(w),
       armies: {
         id: Int32Array.from(live),
         owner: pick(a.owner, (n) => new Int16Array(n)),

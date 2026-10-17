@@ -8,6 +8,7 @@ import { monthlyRations } from "./march.ts";
 import { halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
 import { atWar, controller, wallsOf, type News } from "./war.ts";
+import { armUnlocked, knownSet } from "./research.ts";
 
 /**
  * Milestone 2, armies that cost something: wires the recruiting context (who
@@ -253,7 +254,8 @@ export function recomputeCap(world: World): void {
   for (let p = 0; p < world.provinceCount; p++) {
     const owner = world.provinceOwner[p]!;
     if (owner < 0) continue;
-    cap[owner] = cap[owner]! + wf.provinceCap({ people: world.provincePopulation[p]! * 1000, royal: true, occupied: world.provinceOccupier[p]! >= 0 });
+    // W12, W15 and W18 raise each province's share (WAR-032).
+    cap[owner] = cap[owner]! + wf.provinceCap({ people: world.provincePopulation[p]! * 1000, royal: true, occupied: world.provinceOccupier[p]! >= 0 }, knownSet(world, owner));
   }
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i]) used[a.owner[i]!] = used[a.owner[i]!]! + a.men[i]!;
@@ -434,7 +436,7 @@ export function trainTroops(world: World, n: number, army: number, arm: string, 
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n) return "no such army of yours";
   if (a.trainArm[army]! >= 0) return `already training ${ARMS[a.trainArm[army]!]}`;
-  if (arm === rc.LEVY_ARM || !world.rules.defines.recruit.armsAtStart.includes(arm)) return `you can't train ${arm} yet`;
+  if (arm === rc.LEVY_ARM || !world.rules.defines.recruit.armsAtStart.includes(arm) || !armUnlocked(world, n, arm)) return `you can't train ${arm} yet`;
   men = Math.round(Math.min(men, menByArm(world, army)[LEVY]!));
   if (men < 1) return "no levy foot to train";
   if (!trainingGround(world, n, a.location[army]!)) return "men train only at a castle of your own: march the army to one";

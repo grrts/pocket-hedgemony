@@ -6,6 +6,7 @@ import { interestPct, loanCap, realmConfig } from "./domain/realm/index.ts";
 import { moodShare } from "./moods.ts";
 import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 import { officialBonus } from "./officials.ts";
+import { schoolUpkeepMonthly } from "./research.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -20,13 +21,14 @@ export const NORMAL_TAX = 2;
 const HEAVY_TAX = 3;
 
 /** Lines of the ledger, in the order the snapshot sends them. */
-export const LEDGER = ["tax", "trade", "army pay", "officials", "interest"] as const;
+export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "schools"] as const;
 export const LEDGER_LINES = LEDGER.length;
 const TAX = 0;
 const TRADE = 1;
 const PAY = 2;
 const WAGES = 3;
 const INTEREST = 4;
+const SCHOOLS = 5;
 
 /** Nothing invented yet: interest and loan caps are the realm context's for a realm without banks. */
 const KNOWN: ReadonlySet<string> = new Set();
@@ -110,6 +112,7 @@ export function runLedger(world: World, pay: boolean): void {
   const armyPay = allNationPay(world);
   for (let n = 0; n < world.nationCount; n++) {
     L[n * LEDGER_LINES + PAY] = -armyPay[n]!;
+    L[n * LEDGER_LINES + SCHOOLS] = -schoolUpkeepMonthly(world, n);
     sumLedger(world, n);
   }
   if (!pay) return;
