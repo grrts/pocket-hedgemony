@@ -6,7 +6,7 @@ Recruiting is how your realm turns the people of its provinces into soldiers. Yo
 
 ### Who can be called
 
-Only fighting-age men can be called, and they are about a quarter of a province's people. Each class gives at most a share of its fighting-age men, its call share:
+Only fighting-age men can be called, and they are a quarter of a province's people, in every realm. The levy calls men only. Each class gives at most a share of its fighting-age men, its call share:
 
 | Class | Call share |
 |---|---|
@@ -19,9 +19,10 @@ Only fighting-age men can be called, and they are about a quarter of a province'
 | Craftsmen | 8 % |
 | Market folk | 6 % |
 | Clerks | 4 % |
+| Students | 4 % |
 | Clergy and scholars | 0 |
 
-Add these up over a province's classes and you get its **men who can be called**, the ceiling. The ceiling is hard: no levy, war or invention ever takes a province past it. In Troyes that works out at about one man in eight of the fighting-age men. Students can be called from the same pool, while clergy and scholars cannot.
+Add these up over a province's classes and you get its **men who can be called**, the ceiling. The ceiling is hard: no levy, war or invention ever takes a province past it. In Troyes that works out at about one man in eight of the fighting-age men. Students can be called from the same pool at the clerks' share (1,000 students give 10 men), while clergy and scholars cannot. Students who are called stop making research.
 
 The class a man comes from does not change the soldier he becomes. Every levied man arrives as **levy foot**, the weakest arm, with farm tools. Classes only matter for how many men you can call and what you lose at home when they leave.
 
@@ -36,13 +37,13 @@ Tap Levy on a province, a region or the country card and you get one slider for 
 - **Pay**: free for the first 3 months, then 0.15 gold per man a month.
 - **Harvest**: how much of the harvest you lose by taking farmers.
 - **Pool left**: how much of each province's recruit pool remains.
-- **Ready in**: where and when the men will be ready.
+- **Ready in**: where and when the men will be ready. A levy gathers as one army in the province that gives the most men. If you have set where new regiments go, the gathered army then marches there on its own.
 
 A warning sign shows when the season is wrong, and every cost line opens its own gain and lose list so you can see where the number comes from.
 
-There are no class or province settings. A levy takes men from every class in proportion to its share of the men who can be called, and from every province of a region by its share of the region's men. Veterans come along by their share of the pool too: if Troyes has 2,000 recruits of whom 400 are veterans, a levy of 1,000 brings 200 veterans.
+There are no class or province settings, and a region or country levy draws only your royal provinces; lords' men come as their retinues. The screen names the bigger classes and sums the small ones as "others". A levy takes men from every class in proportion to its share of the men who can be called, and from every province of a region by its share of the region's men. Veterans come along by their share of the pool too: if Troyes has 2,000 recruits of whom 400 are veterans, a levy of 1,000 brings 200 veterans.
 
-The men gather in 2 weeks (in days once you know W18 Railway mobilization) and can march and fight at once as levy foot. While they are away their job slots stay empty, so a building that falls under half filled goes fallow and pays no tax and makes no wares.
+The men gather in 2 weeks (3 days once you know W18 Railway mobilization) and can march and fight at once as levy foot. While they are away their job slots stay empty, so a building that falls under half filled goes fallow and pays no tax and makes no wares.
 
 **Champagne, late summer 1444.** France is at war with Burgundy. Champagne has 4 royal provinces, about 260,000 people, 65,000 fighting-age men and 7,900 men who can be called, 65 % of them farmers. It is 3 weeks before harvest. A levy of 5,000 costs 100 gold and 2,500 rations, cuts the Champagne harvest by 6 %, and leaves each province 37 % of its pool. The levy takes 3,250 farmers, 550 herders, 500 homeless, 300 woodsmen, 200 craftsmen, 150 seafolk and 50 others. The screen reads "Ready in 2 weeks at Troyes" as 5,000 levies, with a harvest warning. Push the slider to 6,000 and each province keeps only 24 % of its pool, so all four get the Conscription grievance.
 
@@ -54,18 +55,18 @@ Each province keeps three soldier counts:
 - **Fallen from here**: men from this province killed in the last 10 years.
 - **Veterans here**: men home from war who were trained or stood in a battle.
 
-The pool refills each year by a quarter of the gap to the ceiling, or a third with a muster master as official. It grows when disbanded men come home, and a growing population raises the ceiling. It shrinks for levies, students enrolling, famine, plague, men dying in war and rebels drawing from it. While a province riots, what can be called there is halved.
+Every January the pool refills by a quarter of the gap to the ceiling, or a third with a muster master as official: Troyes with a ceiling of 2,200 and 1,000 recruits gets back to 1,300 (1,400 with a muster master). It grows when disbanded men come home, and a growing population raises the ceiling. It shrinks for levies, students enrolling, famine, plague, men dying in war and the men of a rising. While a province riots, only half its recruits can be called; the ceiling stays the same, and the whole pool can be called again when the riot ends.
 
-**Conscription.** If a levy draws a province's pool below a quarter of its ceiling, the province gets the Conscription grievance. If the province has Fallen from here, the line is a third instead. With W15 Mass conscription it is only below a tenth.
+**Conscription.** If a levy leaves a province's recruits below a quarter of its ceiling, the province gets the Conscription grievance. If the province has Fallen from here, the line is a third instead. With W15 Mass conscription it is only below a tenth, fallen or not.
 
-**The fallen.** Each soldier levied in a province who dies adds one to its Fallen from here, which fades by a tenth each year. For each 1 % of a province's people fallen, its births fall by 0.2 % for 10 years.
+**The fallen.** Each soldier levied in a province who dies adds one to its Fallen from here, which fades by a tenth each January. For each 1 % of a province's people fallen, its births fall by 0.2 % for 10 years.
 
-**Veterans.** Disbanded regiments and levies who were trained or stood in a battle come home as Veterans here. They fade by a tenth a year from old age, and also leave by dying or going off as settlers.
+**Veterans.** Disbanded regiments and levies who were trained or stood in a battle come home as Veterans here. They fade by a tenth each January from old age, and also leave by dying or going off as settlers.
 
 ### What a levy costs at home
 
 - **Births**: while fighting-age men are away, births fall by the share of them away.
-- **The harvest**: a levy in the sowing or harvest season cuts the harvest by twice the share of farmers taken, and by 1.5 times that at harvest. Sowing and harvest months come from config per climate, so a winter levy costs almost no harvest. Rice lands count two harvests and two bad seasons. In a pastoral province, taking herders during the spring move cuts herd growth instead.
+- **The harvest**: a levy in the sowing or harvest season cuts the harvest by twice the share of farmers taken, and by 1.5 times that at harvest. In the north, sowing is in March and April and the harvest season is August and September; in the south, sowing is in September and October and the harvest season is February and March. A winter levy costs no harvest. Rice lands have two crops a year: sowing in May–June and November–December, harvest in February–March and August–September. In a pastoral province, taking herders during the spring move (March to May in the north, September to November in the south) cuts herd growth by twice the share of herders taken, and the harvest is untouched.
 - **Food**: men in a training camp eat 1.5 rations a month and horses 3, from the training castle's store first and then its province. A man eats 2 rations on campaign and 1 at home. Before an army marches abroad it fills a reserve of reserve size × 2 rations per man per month, from the castle store first, then the locals.
 
 ### Training
@@ -108,11 +109,19 @@ Some things speed training up or change it:
 - **Retraining** a regiment to a newer arm takes half the months and half the gold, and it keeps its drill and scars.
 - Until the order is done the men are still levies. If you **call them out of training** to fight, they go as levy foot and the months spent are lost.
 - A castle or town **under siege** stops all training in it.
-- If training runs past the **3 free months**, you pay for those months. Pikes and light horse (3 months) finish inside the free months; knights (9 months) cost 6 months of pay.
+- The **3 free months** count from the day the levy has gathered. If training runs past them, you pay for the extra months. Pikes and light horse (3 months) finish inside the free months; musketeers (5 months) cost 2 months of pay and knights (9 months) 6.
 
 When training finishes, the regiment has its arm, drill 3 (drill 4 if trained under a Marshal), pay by its arm and a break point of 30 % plus its troop level. Untrained levies stay at drill 0 and break at 25 %. Training never changes a regiment's kind: a trained levy regiment still goes home like levies, after 6 months at 5 % a month unless paid double.
 
-Pay by arm, per 1,000 men a month: foot 200 gold, gunners 250, horse 400, knights 600, and gun crews 10 gold per crew of 15.
+Pay by arm, per 1,000 men a month: foot 200 gold, gunners 250, horse 400, knights 600, and gun crews 1 gold per crew of 15 (10 gold for 150 men). Each arm belongs to one of these groups:
+
+| Pay group | Arms |
+|---|---|
+| Foot | Armoured foot, pikes, archers |
+| Gunners | Hand gunners, pike and shot, musketeers, line infantry, riflemen |
+| Horse | Light horse, camel riders, horse archers |
+| Knights | Knights and lancers, war elephants |
+| Gun crews | Gun crews |
 
 **Champagne continued.** Of the 5,000 levies, 2,500 train into pikes at the castle of Troyes and 500 into light horse at Reims, while 2,000 march at once as levies. The pikes cost 150 gold and 25 loads of arms and eat 11,250 rations in 3 months. The light horse cost 50 gold and 500 horses and eat 6,750 rations. Training eats 18,000 rations from the castle stores at Troyes and Reims, and no pay is owed. Filling a 2-month reserve then takes 23,000 rations. From the 4th month the army costs 1,000 gold a month in pay and eats 11,500 rations a month on campaign, about 6,500 more than the men would eat at home.
 
@@ -128,12 +137,12 @@ Lords raise their retinues by the same rules, with their own wealth and at their
 - While men serve abroad, their home province has fewer mouths to feed.
 - Each month a fifth of the pay of soldiers training, standing or quartered in one of your provinces is spent there, as trade for its market folk, and its tax owed rises by the same amount.
 - Disbanded men can go as **soldier settlers** to a frontier or colony province with free tiles. They clear tiles twice as fast as other settlers and become farmers, and that province needs one grievance more to riot for 10 years.
-- When an army disbands, a tenth of its loot goes to the provinces its men came from, raising their local store and tax owed for a year.
+- When an army disbands, a tenth of its loot goes to the provinces its men came from, split by how many men each gave, raising their local store and tax owed for a year.
 
 ### What recruiting takes
 
 - Disbanded men go back into the emptiest slots of their province; those with no free slot become homeless.
-- On disbanding you choose **Keep the arms** (they go back to the store) or **Let them keep them**: no carting, the garrison fights 10 % better for 5 years, but veterans start any rising there armed and drilled.
+- On disbanding, the arms always go back to the store. You are not asked.
 - An army that disbands within 3 months of a plague or high-sickness campaign brings a plague rumour home to 1 in 4 of the provinces it disbands into.
 - Students called to arms stop making research.
 
@@ -153,9 +162,9 @@ Any official can be **commissioned** to lead an army or stand in one as a captai
 | Schoolmaster | 0 | 2 | 1 | Old soldier |
 | Marshal | 2 | 2 | 2 | Any |
 
-At 5 years served the type's highest skill gains +1, and +1 more at 10, up to 5. You pick the offered trait or keep the one rolled. A commander gets the realm's current style for their era and country; a Marshal may take any style your realm has seen in a battle it fought. Years served count where the official was assigned.
+At 5 years served the type's highest skill gains +1, and +1 more at 10, and no skill goes past 5. When skills tie, Logistics gains first, then Cunning, then Might, so a Marshal with 5 years served has Logistics 3. You pick the offered trait or keep the one rolled. A commander gets the realm's current style for their era and country; a Marshal may take any style your realm has seen in a battle it fought. Years served count where the official was assigned.
 
-**The costs.** A commission costs 10 gold once. In the field an official earns their wage ×3 as commander or ×2 as captain. They bring a staff of 100 (commander) or 50 (captain) who eat 2 rations each a month from the army's reserve, and a commander's 30 staff horses eat 3 each.
+**The costs.** A commission costs 10 gold once. In the field an official earns their wage ×3 as commander or ×2 as captain. They bring a staff of 100 (commander) or 50 (captain) who eat 2 rations each a month from the army's reserve, and their horses (30 for a commander, 15 for a captain) eat 3 each. Staff eat but are not soldiers: they do not count toward foraging or the column size.
 
 **The empty province.** When you commission an official you choose how their province is run:
 
@@ -177,14 +186,14 @@ The Marshal is an official type trained for war. You get one from an academy, by
 ### What official commanders mean
 
 - They never refuse a command, never go home with their men mid-war, and never defect with land.
-- When their army wins, every lord's loyalty and the ruler's standing rise a little, and no single lord grows from it.
-- An official who returns with 3 or more victories gives 1.5 times their type's effect where they serve.
+- When their army wins a battle, every lord grows one step more loyal (up to Loyal; a lord in revolt stays there), the ruler's victories rise by one, and no single lord grows from it.
+- An official who returns with 3 or more victories gives 1.5 times their type's effect where they serve, for as long as they hold that post.
 - A Proud lord serving as captain under an official wavers a step each season, and refuses to bring his retinue unless the war aim is his Want.
 - An official commander brings no retinue of their own.
 - If one is killed or captured you lose a commander and an official; a ransom brings both back.
-- An official with 8 victories who has led the same regiments for 5 years becomes "their man". At 6 victories they ask for land: refusing makes them Ambitious, granting turns them into a lord with their old soldiers as his retinue.
+- Any commander with 8 victories who has led the same regiments for 5 years becomes "their man". An official at 6 victories asks for land: refusing makes them Ambitious, granting turns them into a lord with their old soldiers as his retinue.
 
-Other leaders: the ruler and heirs can lead, lords lead only their own retinues as captains, hired captains come with their free companies, and exiles who ask to serve become officials of the type closest to their past.
+Other leaders: the ruler and heirs can lead, lords lead only their own retinues (as captains in a royal army), hired captains come with their free companies, and exiles who ask to serve become officials of the type closest to their past.
 
 ### The computer players
 
@@ -192,13 +201,13 @@ The AI uses the same levy and training commands. Its catalogue personality sets 
 
 ### Each month
 
-Each province is updated once a month: the pool refills toward the ceiling, Fallen and Veterans fade, training months tick down and finished regiments come out, births are cut by men away and fallen, pay starts for levies past their free months, a fifth of pay is spent where soldiers are, the empty province's effects apply, and Marshal idleness counts up. A levy itself is worked out in one calculation when you tap it.
+Each province is updated once a month: training months tick down and finished regiments come out, births are cut by men away and fallen, pay starts for levies past their free months, a fifth of pay is spent where soldiers are, the empty province's effects apply, and Marshal idleness counts up. Once a year, in the January turn, the pool refills and Fallen and Veterans fade. A levy itself is worked out in one calculation when you tap it.
 
 ## What you see
 
 - **The levy screen**, opened from a province, a region or the country card: one men slider; Gold now, Food now, Pay, Harvest, Pool left and Ready in; a season and harvest warning sign; a gain and lose list behind every cost line.
 - **The training choice**: arm, number of men and training place (castle or drill yard).
-- **The disbanding choice**: Keep the arms or Let them keep them, and where to settle men.
+- **Where to settle men**: soldier settlers for a frontier or colony province.
 - **The commission choice**: commander or captain, the trait to pick, and the four ways to run the empty province.
 - **Province stats**: Recruits here, Fallen from here and Veterans here.
 
@@ -210,8 +219,8 @@ Each province is updated once a month: the pool refills toward the ceiling, Fall
 - [Buildings](Buildings): castle steps, the drill yard and its barracks step set training room.
 - [Research](Research): W12, W15 and W18 unlock signing on, raise call shares and speed gathering.
 - [Troop-Movement](Troop-Movement): gathered levies and trained regiments become movers, and levies walk to their training place.
-- [Naval](Naval): mustering sailors reuses the levy, and admirals reuse the commission and the empty province.
-- [Rebellions](Rebellions): armed veterans, rebels drawing from the pool, and the Conscription grievance.
+- [Naval](Naval): mustering sailors reuses the levy with its own ceiling for seafolk (sailors at sea are not at home to be levied), and admirals reuse the commission and the empty province.
+- [Rebellions](Rebellions): armed veterans, a rising's men drawn from the pool, and the Conscription grievance.
 - [Historical-Events](Historical-Events): plague rumours brought home and generals who grow too big.
 - [Time-and-Turns](Time-and-Turns): the month tick, the seasons and the order of monthly steps.
 - [Government](Government): the Ungoverned state and lords' fiefs.
@@ -219,24 +228,27 @@ Each province is updated once a month: the pool refills toward the ceiling, Fall
 
 ## Numbers
 
-The design names one recruiting config file but no key names yet (OQ-RECR-19), so the keys below are described. Every value is a **placeholder** waiting for a balancing pass.
+The numbers live in the recruiting config file. Most are **provisional** and waiting for a balancing pass.
 
 | Value | Design number |
 |---|---|
-| Fighting-age share | about a quarter of people |
+| Fighting-age share | a quarter of people, men only |
 | Call shares | see table above; W15 raises them ×1.5 |
-| Pool refill a year | 1/4 of the gap; 1/3 with a muster master |
-| Conscription line | 1/4 of ceiling; 1/3 with Fallen; 1/10 with W15 |
+| Pool refill each January | 1/4 of the gap; 1/3 with a muster master |
+| Riots | half the recruits can be called |
+| Students' call share | 4 % |
+| Conscription line | 1/4 of ceiling; 1/3 with Fallen; 1/10 with W15, fallen or not |
 | Fallen and Veterans fade | a tenth a year each |
 | Births cut per 1 % fallen | 0.2 % for 10 years |
-| Gathering | 2 weeks; days with W18 |
+| Gathering | 2 weeks; 3 days with W18 |
 | Levy money | 20 gold per 1,000 men |
-| Free months | 3 |
+| Free months | 3, from the day the levy has gathered |
 | Levy pay | 0.15 gold per man a month |
 | Pay by arm (per man a month) | foot 0.2, gunners 0.25, horse 0.4, knights 0.6; gun crews 1 per crew of 15 |
 | Standing pay | ×1.5 |
 | Rations | gathering 1, camp 1.5, campaign 2, home 1; horse 3 |
 | Lost harvest | ×2 share of farmers taken, ×1.5 at harvest |
+| Lost herd growth | ×2 share of herders taken in the spring move |
 | Training room, arm table | see tables above |
 | Veterans / retraining | half the time / half months and half gold |
 | Marshal | 25 % faster, drill 4, hired at 3×, paid 2×, −1 skill after 10 idle years |
@@ -248,40 +260,18 @@ The design names one recruiting config file but no key names yet (OQ-RECR-19), s
 | Sickness brought home | within 3 months; 1 in 4 provinces |
 | Years served bonus | +1 at 5 years, +1 at 10, up to 5 |
 | Commission | 10 gold; wage ×3 commander, ×2 captain |
-| Staff | 100 or 50, 2 rations each; 30 horses at 3 rations |
+| Staff | 100 or 50, 2 rations each; 30 or 15 horses at 3 rations |
+| Victory under an official | every lord one step more loyal; ruler's victories +1 |
 | Deputy | 20 clerks; 1 gold a month |
 | Returning official | 3+ victories gives 1.5× effect |
-| Land request / "their man" | 6 victories / 8 victories and 5 years |
-
-The engine today uses simpler realm-wide values in `packages/rules/data/defines.json`: `levies.menPerThousandPeople` 4, `levies.monthlyRecoveryFraction` 0.0167, `military.upkeepPerThousandMenPerMonth` 0.2, `march.rationsPerSoldier` 2, `march.monthsCarried` 2 and `march.logisticsRationCut` 0.05.
+| Land request / "their man" | 6 victories (officials) / 8 victories and 5 years (any commander) |
 
 ## Still open
 
-- **OQ-RECR-1**: the fighting-age share and call shares need balancing against the troop cap.
-- **OQ-RECR-2**: whether women are in the levy is not designed.
-- **OQ-RECR-3**: muster master refill is "a third of the gap" in one place and "25 % faster" in two others.
-- **OQ-RECR-4, 5, 6**: warfare, province stats and country stats have not yet taken in recruiting v3 (muster master, levy then train, commissioned officials, disbanding choice).
-- **OQ-RECR-7**: the engine keeps one realm-wide pool and flat upkeep, unlike the design.
-- **OQ-RECR-8**: when the 3 free months start (at the levy or when gathering ends).
-- **OQ-RECR-9**: which pay group archers, musketeers, horse archers, elephants and other arms belong to.
-- **OQ-RECR-10**: how the Conscription line is measured, and how the Fallen and W15 lines combine.
-- **OQ-RECR-11**: how yearly rules are split across monthly updates.
-- **OQ-RECR-12**: W18 gathering "in days" has no number, and other designs word it differently.
-- **OQ-RECR-13**: how many students a levy takes.
-- **OQ-RECR-14**: rice-land and pastoral harvest losses and season months have no values.
-- **OQ-RECR-15**: where a region or country levy gathers, and how that fits "new regiments go to".
-- **OQ-RECR-16**: whether the land request at 6 victories applies to all commanders or only officials.
-- **OQ-RECR-17**: tie rule for "+1 to the highest skill", and whether 5 is the skill cap.
-- **OQ-RECR-18**: a captain's staff horses, and whether staff count toward forage and column size.
-- **OQ-RECR-19**: the config file and key names are not named.
-- **OQ-RECR-20**: several amounts are missing ("a little" loyalty, loot split, how long the 1.5× effect lasts).
-- **OQ-RECR-21**: whether naval mustering counts against the recruiting ceiling.
-- **OQ-RECR-22**: the gap list still lists the barracks as open though it is now answered.
-- **OQ-RECR-23**: the "others" class in the Champagne example, and whether a region levy draws lords' provinces.
-- **OQ-RECR-24**: whether riots halve the pool or the ceiling, and for how long.
+Nothing in recruiting is waiting on a decision. The numbers above still need their balancing pass.
 
 ## For developers
 
-- Spec: `domain/recruiting/spec.md` in the game repository, requirement code **RECR** (RECR-001 to RECR-100).
+- Spec: `domain/recruiting/spec.md` in the game repository.
 - Features: `domain/recruiting/features/`, including `levy.feature`, `training.feature`, `commissioning-officials.feature` and the worked example `champagne-1444.feature`.
-- Code: there is no `packages/engine/src/domain/recruiting/` yet. Today's levy code is `runLevies` and `runEconomy` in `packages/engine/src/turn.ts` and `recomputeMaxLevies` in `packages/engine/src/world.ts`, with values in `packages/rules/data/defines.json`.
+- Code: `packages/engine/src/domain/recruiting/`, with its numbers in `packages/rules/data/domain/recruiting.json`.

@@ -442,7 +442,7 @@ groups.
 | culture | upstream | Customer–Supplier | Homeland risings draw 8 % of the tongue; with nationalism 0.5+ they demand a new country; *Banned tongue* grievance |
 | government | downstream | Customer–Supplier | A won New ideas rising sets a form; over-cap lords become disloyal |
 | subjects | downstream | Customer–Supplier | A lord leaving with his land (rebellions 6) |
-| recruiting | upstream | Customer–Supplier | Recruits lost to rebels; armed veterans start a rising armed and drilled (D-REBL-14) |
+| recruiting | upstream | Customer–Supplier | Recruits lost to rebels (D-REBL-14) |
 | buildings | downstream | Customer–Supplier | Looting one town building a season, market first; town walls stop looting without storming |
 | trade | downstream | Customer–Supplier | Riots: traders avoid; bandits where riots or rebels; rebels holding a province act as an enemy army |
 | scenario-setup | downstream | Customer–Supplier | A new country for a won homeland rising (catalogue entity or generated) |
@@ -476,7 +476,7 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 - **D-REBL-11** (was OQ-REBL-11) Homeland demands: below nationalism 0.5 "self-rule" is granted as an *Own tongue* charter in the provinces they hold (accepted in a Talk); at 0.5 or more they demand a new country (CULT-075, D-CULT-16). A won homeland rising breaks away as before. Culture's lever already exists.
 - **D-REBL-12** (was OQ-REBL-12) New ideas cause: the province's event-tree ideology support for liberalism, socialism, communism or nationalism at 0.3 or more, from the age of revolutions. The same 0.3 threshold culture uses.
 - **D-REBL-13** (was OQ-REBL-13) Both exist and do not overlap: exploration's local aggression roll covers founding a colony; rebellions' resistance covers settled land taken by conquest or treaty. Colonies take only free tiles (province 12.3).
-- **D-REBL-14** (was OQ-REBL-14) Armed veterans who kept their arms give the arms step *Old weapons*, like a veteran leader. No new arms step.
+- **D-REBL-14** (was OQ-REBL-14) Armed veterans: none. Disbanded men never keep their arms (X-7, Leroy 17 Oct), so a rising never starts armed from veterans and there is no new arms step.
 - **D-REBL-15** (was OQ-REBL-15) A *Riot* is a province state shown on the province card, not a rising object; the rebellion card appears only when a rising starts. The card is for risings.
 
 ## 14. Traceability

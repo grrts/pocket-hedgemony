@@ -230,7 +230,7 @@ AI countries use the same answers as you. Rivals and opportunists pay rebels and
 - [Culture](Culture): homeland risings draw 8 % of the tongue and, with nationalism 0.5 or more, demand a new country; *Banned tongue*.
 - [Government](Government): a won New ideas rising sets a form; over-cap lords become disloyal.
 - [Subjects](Subjects): a lord leaving with his land.
-- [Recruiting](Recruiting): recruits lost to rebels, and armed veterans.
+- [Recruiting](Recruiting): recruits lost to rebels.
 - [Buildings](Buildings): looting one town building a season; town walls stop looting without storming.
 - [Trade](Trade): traders avoid riots, bandits appear, and rebels act as an enemy army for trade.
 - [The-1444-Start](The-1444-Start): a new country for a won homeland rising.

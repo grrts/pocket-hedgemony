@@ -193,7 +193,6 @@ Then("every cost line opens its gain and lose list", (s) => {
 });
 
 When(re('the country "France" levies (\\d+) men from region "Champagne"'), (s, n: string) => {
-  if (known(s).includes("W18")) throw new Error("OQ-RECR-12");
   s.region ??= champagne();
   levy(s, num(n), s.region);
 });
@@ -465,20 +464,13 @@ Then(re("(\\d+) men go into the emptiest slots and (\\d+) become homeless"), (s,
 });
 
 Given('an army from "Troyes" disbands', (s) => {
-  s.year = 1450;
-});
-When(re('the player chooses "(Keep the arms|Let them keep them)"'), (s, c: R.ArmsChoice) => {
-  s.arms = R.disbandArms(c, s.year);
+  s.arms = R.disbandArms();
 });
 Then("the arms go back to the store", (s) => {
   expect(s.arms.armsToStore).toBe(true);
-  expect(s.arms.garrisonBonus).toBe(0);
 });
-Then('the garrison of "Troyes" fights 10 percent better for 5 years and a rising there starts armed and drilled', (s) => {
-  expect(s.arms.armsToStore).toBe(false);
-  near(s.arms.garrisonBonus, 0.1, 1e-9);
-  expect(s.arms.until - s.year).toBe(5);
-  expect(s.arms.risingArmed).toBe(true);
+Then("the player is not asked about the arms", (s) => {
+  expect(s.arms.askPlayer).toBe(false);
 });
 
 Given("an army ends a plague campaign", (s) => {
@@ -607,7 +599,7 @@ When("a month passes", (s) => {
   if (s.where) s.ate = R.rations(1000, s.where);
   if (s.order) {
     s.poolBefore = { ...s.pool };
-    s.regiments = R.monthPasses(s.pool, [s.order]);
+    s.regiments = R.monthPasses(s.pool, [s.order], { month: 3 });
   }
 });
 Then("the staff eat 290 rations from the army's reserve", (s) => {
@@ -843,11 +835,12 @@ Given('the province "Troyes" trains 2500 pikes with 3 months left', (s) => {
 Then("the training has 2 months left", (s) => {
   expect(s.order.monthsLeft).toBe(2);
 });
-Then("the pool refill and the fading of fallen and veterans are applied for the month", (s) => {
-  expect(s.pool.recruits).toBeGreaterThan(s.poolBefore.recruits);
-  expect(s.pool.recruits).toBeLessThan(s.poolBefore.recruits + (2200 - 1000) * 0.25);
-  expect(s.pool.fallen).toBeLessThan(s.poolBefore.fallen);
-  expect(s.pool.veterans).toBeLessThan(s.poolBefore.veterans);
+Then("the pool refill and the fading of fallen and veterans wait for the January turn", (s) => {
+  expect(s.pool).toEqual(s.poolBefore);
+  R.monthPasses(s.pool, [], { month: 1 });
+  near(s.pool.recruits, 1000 + (2200 - 1000) * 0.25, 1e-9);
+  near(s.pool.fallen, 630, 1e-9);
+  near(s.pool.veterans, 1260, 1e-9);
 });
 
 // ---------------------------------------------------------------- food, harvest and births (RECR-030..038)
@@ -898,15 +891,20 @@ When("the harvest is counted", (s) => {
 });
 
 Given("the config gives each climate its sowing and harvest months", (s) => {
-  // The design gives no months (OQ-RECR-14); the scenario's calendar stands in for the config.
-  s.calendar = { temperate: { sowing: [3, 4], harvest: [8, 9] } } satisfies R.SeasonCalendar;
+  s.calendar = R.recruitingConfig.seasonMonthsByClimate satisfies R.SeasonCalendar;
+  expect(Object.keys(s.calendar).sort()).toEqual(["north", "rice", "south"]);
 });
 When("a levy is planned in a sowing or harvest month of its climate", (s) => {
-  s.warnings = [3, 9].map((m) => R.harvestWarning(R.seasonOf(m, "temperate", s.calendar)));
-  s.noWarning = R.harvestWarning(R.seasonOf(1, "temperate", s.calendar));
+  s.warnings = [
+    [3, "north"],
+    [9, "north"],
+    [3, "south"],
+    [9, "south"],
+  ].map(([m, c]) => R.harvestWarning(R.seasonOf(m as number, c as string, s.calendar)));
+  s.noWarning = R.harvestWarning(R.seasonOf(1, "north", s.calendar));
 });
 Then("the levy screen shows a harvest warning", (s) => {
-  expect(s.warnings).toEqual([true, true]);
+  expect(s.warnings).toEqual([true, true, true, true]);
   expect(s.noWarning).toBe(false);
 });
 
@@ -1265,4 +1263,223 @@ Then("it commissions the steward or the warden first", (s) => {
 Then("keeps the tax collector in his seat", (s) => {
   expect(s.picked).not.toBe("tax collector");
   expect(R.aiPicksCommander([{ id: "tax collector", type: "Tax collector" }])).toBeNull();
+});
+
+// ---------------------------------------------------------------- decided questions (D-RECR-*)
+
+// D-RECR-3, D-RECR-11, D-RECR-24: the pool, the January step, riots.
+Given(re('the province "Troyes" has a ceiling of (\\d+) men and (\\d+) recruits here'), (s, c: string, r: string) => {
+  s.pool = { ceiling: num(c), recruits: num(r), fallen: 0, veterans: 0 } satisfies R.ProvincePool;
+});
+Given(re('the official of province "Troyes" is "(a steward|a muster master)"'), (s, o: string) => {
+  s.musterMaster = o === "a muster master";
+});
+When("a year passes", (s) => {
+  R.yearPasses(s.pool, { musterMaster: !!s.musterMaster });
+});
+Then(re('the province "Troyes" has (1300|1400) recruits here'), (s, n: string) => {
+  near(s.pool.recruits, num(n), 1e-9);
+});
+Given('the province "Troyes" has 700 fallen from here and 1400 veterans here', (s) => {
+  s.pool.fallen = 700;
+  s.pool.veterans = 1400;
+});
+When("the January turn passes", (s) => {
+  R.monthPasses(s.pool, [], { month: R.recruitingConfig.yearlyMonth });
+});
+Then('the province "Troyes" has 630 fallen from here and 1260 veterans here', (s) => {
+  near(s.pool.fallen, 630, 1e-9);
+  near(s.pool.veterans, 1260, 1e-9);
+});
+When('the province "Troyes" riots', (s) => {
+  s.rioting = true;
+});
+Then(re('the province "Troyes" can call (\\d+) men'), (s, n: string) => {
+  expect(R.callableNow(s.pool, !!s.rioting)).toBe(num(n));
+});
+Then('the province "Troyes" still has a ceiling of 2200 men', (s) => {
+  expect(s.pool.ceiling).toBe(2200);
+});
+Then('the province "Troyes" can call 2000 men again when the riot ends', (s) => {
+  expect(R.callableNow(s.pool, false)).toBe(2000);
+});
+
+// D-RECR-10: Conscription thresholds.
+Given(
+  re('the province "Troyes" (has no fallen and no W15|has fallen from here|belongs to a realm with W15 Mass conscription|has fallen from here and belongs to a realm with W15 Mass conscription)'),
+  (s, c: string) => {
+    s.conscriptionWhen = { fallen: c.startsWith("has fallen"), massConscription: c.includes("W15 Mass") };
+  },
+);
+When(re("a levy leaves (\\d+) recruits here"), (s, n: string) => {
+  s.gets = R.givesConscription(num(n), R.ceiling(s.people), s.conscriptionWhen);
+});
+Then(re('the province "Troyes" (gets|does not get) the grievance "Conscription"'), (s, g: string) => {
+  expect(s.gets).toBe(g === "gets");
+});
+
+// D-RECR-12, D-RECR-15: gathering and the muster place.
+Then("the levies gather in 3 days instead of 14", (s) => {
+  expect(R.gatheringDays(known(s))).toBe(3);
+  expect(R.gatheringDays([])).toBe(14);
+  expect(R.gatherLevy("L", "France", 5000, known(s)).gatheredOnDay).toBe(3);
+});
+Given('new regiments of "France" go to "Reims"', (s) => {
+  s.rally = "Reims";
+});
+Then('the levy gathers as one army at "Troyes"', (s) => {
+  s.muster = R.musterPlace(s.draw, s.rally);
+  expect(s.muster.gathersAt).toBe("Troyes");
+  if (!s.rally) expect(s.muster.thenMarchesTo).toBeUndefined();
+});
+Then('the gathered army is ordered to march to "Reims"', (s) => {
+  expect(s.muster.thenMarchesTo).toBe("Reims");
+});
+
+// D-RECR-14: rice and pastoral lands.
+Given("a province with rice lands", (s) => {
+  s.climate = "rice";
+});
+When(re("a levy takes 2 percent of its farmers in month (\\d+)"), (s, m: string) => {
+  s.harvest = R.harvestLoss(0.02, R.seasonOf(num(m), s.climate));
+});
+Then(re("its harvest falls by (\\d+) percent"), (s, p: string) => {
+  near(s.harvest * 100, num(p), 1e-9);
+});
+Given(re("a pastoral province in the (north|south)"), (s, h: "north" | "south") => {
+  s.hemisphere = h;
+});
+When(re("a levy takes 2 percent of its herders in month (\\d+)"), (s, m: string) => {
+  s.herd = R.herdGrowthLoss(0.02, num(m), s.hemisphere);
+  s.harvest = R.harvestLoss(0, R.seasonOf(num(m), s.hemisphere));
+});
+Then(re("its herd growth falls by (\\d+) percent"), (s, p: string) => {
+  near(s.herd * 100, num(p), 1e-9);
+});
+Then("its harvest does not fall", (s) => {
+  expect(s.harvest).toBe(0);
+});
+
+// D-RECR-8, D-RECR-9: pay groups and the free months.
+Given(re('a trained regiment of (\\d+) "([^"]+)"'), (s, men: string, arm: string) => {
+  s.regiment = { id: "R", arm, men: num(men), kind: "levy", drill: 3 } satisfies R.Regiment;
+});
+When("the month is paid after its free months", (s) => {
+  s.pay = R.regimentPay(R.payGroupOf(s.regiment.arm), s.regiment.men);
+});
+Then(re("the regiment costs (\\d+) gold"), (s, g: string) => {
+  near(s.pay, num(g), 1e-9);
+});
+Given(re('the arm "([^"]+)"'), (s, arm: string) => {
+  s.arm = arm;
+});
+Then(re('its pay group is "([^"]+)"'), (s, g: string) => {
+  expect(R.payGroupOf(s.arm)).toBe(g);
+});
+Given(re('a levy that gathered and went straight into training as "([^"]+)"'), (s, arm: string) => {
+  s.cost = R.trainingCost(arm, 1000);
+});
+When("its training ends", () => {});
+Then(re("it has owed (\\d+) months of pay"), (s, m: string) => {
+  expect(R.paidMonths(s.cost.months)).toBe(num(m));
+});
+
+// D-RECR-13: students.
+Given('the province "Reims" has 400 clergy, 100 scholars and 1000 students', (s) => {
+  s.people = { clergy: 400, scholars: 100, students: 1000 };
+});
+Then("clergy and scholars add 0 men", (s) => {
+  expect(s.callable.clergy + s.callable.scholars).toBe(0);
+});
+Then("students add 10 men to the same pool", (s) => {
+  near(s.callable.students, 10, 1e-9);
+  near(R.ceiling(s.people), 10, 1e-9);
+});
+Then("a levy that takes students stops their research", (s) => {
+  const draw = R.drawLevy([{ id: "Reims", byClass: { students: s.callable.students } }], 5);
+  expect(draw.byClass["students"]).toBe(5);
+  expect(R.studentsResearch(draw.byClass["students"]! > 0)).toBe("stops");
+});
+
+// D-RECR-17: years served.
+Given(re('an official of type "([^"]+)" with (\\d+) years served in "Reims"'), (s, t: string, y: string) => {
+  s.type = t;
+  s.years = num(y);
+});
+Then(re("the commander has Logistics (\\d+)"), (s, l: string) => {
+  expect(s.commission.skills.logistics).toBe(num(l));
+});
+
+// D-RECR-16, D-RECR-20: official commanders.
+Given('the lord "Count of Foix" is Wavering and the lord "Duke of Bourbon" is Loyal', (s) => {
+  s.lordList = [
+    { name: "Count of Foix", loyalty: "Wavering", lands: 2, retinue: 300 },
+    { name: "Duke of Bourbon", loyalty: "Loyal", lands: 3, retinue: 500 },
+  ];
+  s.before = JSON.parse(JSON.stringify(s.lordList));
+  s.realm = { victories: 0 };
+});
+When("an army commanded by a commissioned official wins a battle", (s) => {
+  R.officialVictory(s.lordList, s.realm);
+});
+Then(re('the lord "([^"]+)" is Loyal'), (s, name: string) => {
+  expect(s.lordList.find((l: { name: string }) => l.name === name).loyalty).toBe("Loyal");
+});
+Then("the ruler's victories rise by 1", (s) => {
+  expect(s.realm.victories).toBe(1);
+});
+Then("no single lord grows from it", (s) => {
+  for (const [i, l] of (s.lordList as { lands: number; retinue: number }[]).entries()) {
+    expect([l.lands, l.retinue]).toEqual([s.before[i].lands, s.before[i].retinue]);
+  }
+});
+Given(re("a commissioned official with (\\d+) victories who led the same regiments (\\d+) years"), (s, v: string, y: string) => {
+  s.big = R.tooBig({ victories: num(v), yearsWithSameRegiments: num(y), official: true });
+  s.soldiers = 3000;
+});
+When(re('the player answers "(refuse land|grant land|none)"'), (s, a: string) => {
+  s.answer = a === "none" ? null : R.answerLandRequest(a as "refuse land" | "grant land", s.soldiers);
+});
+Then("the official becomes Ambitious", (s) => {
+  expect(s.big).toBe("asks for land");
+  expect(s.answer).toEqual({ trait: "Ambitious" });
+});
+Then("the official becomes a lord with his old soldiers as retinue", (s) => {
+  expect(s.big).toBe("asks for land");
+  expect(s.answer).toEqual({ becomes: "lord", retinue: 3000 });
+});
+Then('the official becomes "their man"', (s) => {
+  expect(s.big).toBe("their man");
+});
+Then("the official asks for nothing", (s) => {
+  expect(s.big).toBeNull();
+});
+
+// Champagne, after the war (design §8).
+Given("the army wins twice and comes home in spring", (s) => {
+  const { commission } = R.commission({ official: "steward of Reims", type: "Steward", yearsServed: 8, province: "Reims" });
+  commission.choice = "Name a deputy";
+  commission.victories = 2;
+  s.commission = commission;
+  s.troyesPool = { ceiling: 2200, recruits: 800, fallen: 0, veterans: 0 } satisfies R.ProvincePool;
+});
+Given("700 of the 5000 died", (s) => {
+  R.soldiersFell(s.troyesPool, 700, 72000, 1445);
+});
+When('the steward is released to "Reims"', (s) => {
+  s.released = R.release(s.commission, "Reims");
+});
+Then("the steward returns to full effect at once because a deputy kept the seat", (s) => {
+  expect(s.released).toEqual({ province: "Reims", yearsServed: 8, fullEffectAtOnce: true });
+  expect(R.returnEffect(s.commission.victories)).toBe(1);
+});
+Then('the births of "Troyes" dip for a decade from its fallen', (s) => {
+  expect(s.troyesPool.fallen).toBe(700);
+  expect(R.birthsCutIn(s.troyesPool, 1454)).toBeGreaterThan(0);
+  expect(R.birthsCutIn(s.troyesPool, 1455)).toBe(0);
+});
+Then('1400 veterans return to "Troyes" and will train in half the time', (s) => {
+  R.veteransHome(s.troyesPool, 1400);
+  expect(s.troyesPool.veterans).toBe(1400);
+  expect(R.trainingCost("pikes", 1400, { veteranShare: 1 }).months).toBe(R.trainingCost("pikes", 1400).months / 2);
 });

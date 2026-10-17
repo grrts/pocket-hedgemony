@@ -51,16 +51,11 @@ Feature: What recruiting gives back and takes
       | 400  | 400   | 600      |
       | 0    | 0     | 1000     |
 
-  @RECR-066 @placeholder
-  Scenario Outline: Armed veterans
+  @RECR-066
+  Scenario: The arms go back to the store
     Given an army from "Troyes" disbands
-    When the player chooses "<choice>"
-    Then <result>
-
-    Examples:
-      | choice                | result                                                                                         |
-      | Keep the arms         | the arms go back to the store                                                                  |
-      | Let them keep them    | the garrison of "Troyes" fights 10 percent better for 5 years and a rising there starts armed and drilled |
+    Then the arms go back to the store
+    And the player is not asked about the arms
 
   @RECR-067 @placeholder
   Scenario: Sickness brought home

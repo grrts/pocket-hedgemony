@@ -122,7 +122,7 @@ export function harvestLoss(farmerShareTaken: number, season: Season, cfg: Recru
   return farmerShareTaken * k;
 }
 
-/** Sowing and harvest months per climate (RECR-037); the design gives no values, so the calendar is passed in. */
+/** Sowing and harvest months per climate: north, south and rice lands (RECR-035, RECR-037, D-RECR-14). */
 export type SeasonCalendar = Record<string, { sowing: number[]; harvest: number[] }>;
 
 export function seasonOf(month: number, climate: string, calendar: SeasonCalendar = config.seasonMonthsByClimate as SeasonCalendar): Season {
@@ -147,10 +147,23 @@ export function levyPay(men: number, monthsServed: number, cfg: RecruitingConfig
   return monthsServed > cfg.freeMonths ? men * cfg.levyPay : 0;
 }
 
-/** Days until a levy has gathered: 2 weeks; W18 gathers "in days", a number the design does not give (OQ-RECR-12). */
+/** Days until a levy has gathered: 2 weeks; 3 days with W18 Railway mobilization (RECR-013, RECR-014, D-RECR-12). */
 export function gatheringDays(known?: Known, cfg: RecruitingConfig = config): number {
-  if (knows(known, cfg.railwayMobilizationInvention)) throw new Error("OQ-RECR-12: W18 gathers in days, no number given");
-  return cfg.gathering.days;
+  return knows(known, cfg.railwayMobilizationInvention) ? cfg.gathering.railwayDays : cfg.gathering.days;
+}
+
+/**
+ * Where a levy gathers: as one army in the drawn province that gives the most men (ties: the first id in
+ * order), then on to the realm's "New regiments go to" rally point if one is set (RECR-103, D-RECR-15).
+ */
+export function musterPlace(draw: LevyDraw, rallyPoint?: string): { gathersAt: string; thenMarchesTo?: string } {
+  let best: { id: string; men: number } | null = null;
+  for (const id of Object.keys(draw.byProvince).sort()) {
+    const men = Object.values(draw.byProvince[id]!).reduce((a, b) => a + b, 0);
+    if (!best || men > best.men + 1e-9) best = { id, men };
+  }
+  if (!best) throw new Error("a levy draws from at least one province");
+  return rallyPoint !== undefined && rallyPoint !== best.id ? { gathersAt: best.id, thenMarchesTo: rallyPoint } : { gathersAt: best.id };
 }
 
 export interface Levy {
@@ -244,7 +257,10 @@ export interface ProvincePool {
   birthsCuts?: { share: number; until: number }[];
 }
 
-/** Yearly refill: a quarter of the gap to the ceiling (RECR-019; the muster master's third is OQ-RECR-3). */
+/** Refill rate a year: a quarter of the gap, a third with a muster master (RECR-019, D-RECR-3). */
+export const refillRate = (musterMaster = false, cfg: RecruitingConfig = config): number => (musterMaster ? cfg.refillPerYear.musterMaster : cfg.refillPerYear.base);
+
+/** Yearly refill: a quarter of the gap to the ceiling, a third with a muster master (RECR-019). */
 export function refill(p: ProvincePool, years = 1, rate = config.refillPerYear.base): void {
   p.recruits = holdAtCeiling(p.recruits + (p.ceiling - p.recruits) * rate * years, p.ceiling);
 }
@@ -259,15 +275,14 @@ export function poolCause(p: ProvincePool, cause: string, men: number): void {
   else throw new Error(`recruits here are not changed by ${cause}`);
 }
 
-/** Conscription threshold as a share of the ceiling (RECR-023..025); how they combine is OQ-RECR-10. */
+/** Conscription threshold as a share of the ceiling (RECR-023..025); with W15 the tenth applies even with fallen (D-RECR-10). */
 export function conscriptionThreshold(o: { fallen?: boolean; massConscription?: boolean }, cfg: RecruitingConfig = config): number {
-  if (o.fallen && o.massConscription) throw new Error("OQ-RECR-10: Fallen and W15 thresholds together");
   if (o.massConscription) return cfg.conscription.massConscription;
   if (o.fallen) return cfg.conscription.withFallen;
   return cfg.conscription.base;
 }
 
-/** A levy that leaves the pool below the threshold gives Conscription (RECR-023). */
+/** A levy that leaves Recruits here below the threshold share of the ceiling gives Conscription (RECR-023, D-RECR-10). */
 export function givesConscription(left: number, ceil: number, o: { fallen?: boolean; massConscription?: boolean } = {}): boolean {
   return left < ceil * conscriptionThreshold(o);
 }
@@ -293,12 +308,18 @@ export function veteransLeave(p: ProvincePool, men: number): void {
   p.veterans = Math.max(0, p.veterans - men);
 }
 
-/** A year passes: refill, a tenth of the fallen fades, a tenth of the veterans are lost to old age (RECR-019, RECR-026, RECR-029). */
-export function yearPasses(p: ProvincePool, cfg: RecruitingConfig = config): void {
-  refill(p, 1);
+/**
+ * The yearly step, run in the January turn (RECR-100, D-RECR-11): refill, a tenth of the fallen fades, a
+ * tenth of the veterans are lost to old age (RECR-019, RECR-026, RECR-029).
+ */
+export function yearPasses(p: ProvincePool, o: { musterMaster?: boolean } = {}, cfg: RecruitingConfig = config): void {
+  refill(p, 1, refillRate(!!o.musterMaster, cfg));
   p.fallen *= 1 - cfg.fallenFadePerYear;
   p.veterans *= 1 - cfg.veteransFadePerYear;
 }
+
+/** While a province riots only half its Recruits here can be called; the ceiling is untouched (RECR-022, D-RECR-24). */
+export const callableNow = (p: ProvincePool, rioting: boolean, cfg: RecruitingConfig = config): number => (rioting ? p.recruits * cfg.riotCallableShare : p.recruits);
 
 /** Births cut by the share of fighting-age men away (RECR-030). */
 export const birthsCutForMenAway = (shareAway: number): number => shareAway;
@@ -476,10 +497,10 @@ export function drillAndBreak(state: "untrained" | "trained" | "trained under a 
   return { drill: state === "trained" ? config.trained.drill : config.marshal.drill, breakPoint: config.trained.breakPoint + troopLevel };
 }
 
-/** Pay group of an arm, only where the design names it (OQ-RECR-9). */
+/** Pay group of an arm (RECR-102, D-RECR-9). */
 export function payGroupOf(arm: string): string {
   const g = (config.payGroupOfArm as Record<string, string>)[arm];
-  if (!g) throw new Error(`OQ-RECR-9: no pay group for ${arm}`);
+  if (!g) throw new Error(`no pay group for ${arm}`);
   return g;
 }
 
@@ -547,8 +568,15 @@ export function soldierSettlers(men: number, year: number, cfg: RecruitingConfig
   return { clearingFactor: cfg.settlers.clearingFactor, become: cfg.settlers.becomes, men, extraRiotGrievances: cfg.settlers.extraRiotGrievances, until: year + cfg.settlers.years };
 }
 
-/** A tenth of an army's loot goes home with its men, raising local store and tax owed for a year (RECR-064; the split is OQ-RECR-20). */
+/** A tenth of an army's loot goes home with its men, raising local store and tax owed for a year (RECR-064). */
 export const lootHome = (loot: number, cfg: RecruitingConfig = config): { gold: number; years: number } => ({ gold: loot * cfg.lootHome.share, years: cfg.lootHome.years });
+
+/** The loot sent home is split among the home provinces by the men each gave (D-RECR-20). */
+export function lootHomeSplit(loot: number, menFrom: Readonly<Record<string, number>>, cfg: RecruitingConfig = config): Record<string, number> {
+  const total = Object.values(menFrom).reduce((a, b) => a + b, 0);
+  const gold = lootHome(loot, cfg).gold;
+  return Object.fromEntries(Object.entries(menFrom).map(([p, m]) => [p, total > 0 ? (gold * m) / total : 0]));
+}
 
 /** Disbanded men go back into the emptiest slots; those with no free slot become homeless (RECR-065). */
 export function comingHome(men: number, freeSlots: number): { slots: number; homeless: number } {
@@ -556,12 +584,9 @@ export function comingHome(men: number, freeSlots: number): { slots: number; hom
   return { slots, homeless: men - slots };
 }
 
-export type ArmsChoice = "Keep the arms" | "Let them keep them";
-
-/** The disbanding choice about the arms (RECR-066). */
-export function disbandArms(choice: ArmsChoice, year: number, cfg: RecruitingConfig = config): { armsToStore: boolean; garrisonBonus: number; until?: number; risingArmed: boolean } {
-  if (choice === "Keep the arms") return { armsToStore: true, garrisonBonus: 0, risingArmed: false };
-  return { armsToStore: false, garrisonBonus: cfg.armedVeterans.garrisonBonus, until: year + cfg.armedVeterans.years, risingArmed: true };
+/** When an army disbands its arms always go back to the store; the player is not asked (RECR-066, X-7). */
+export function disbandArms(): { armsToStore: true; askPlayer: false } {
+  return { armsToStore: true, askPlayer: false };
 }
 
 /** Plague rumours brought home: 1 in 4 of the provinces disbanded into, when within 3 months of a plague campaign (RECR-067). */
@@ -601,17 +626,16 @@ const typeRow = (t: string): TypeRow => {
 };
 
 /**
- * Raises the type's highest skill by 1 at each years-served step (5 and 10), up to 5 (RECR-071).
- * A tie for the highest skill is OQ-RECR-17.
+ * Raises the type's highest skill by 1 at each years-served step (5 and 10); the skill never passes 5 (RECR-071).
+ * On a tie the bonus goes to Logistics, then Cunning, then Might (D-RECR-17).
  */
 export function yearsServedBonus(base: CommanderSkills, years: number, steps: readonly number[] = config.yearsServedBonus.atYears, max = config.yearsServedBonus.max): CommanderSkills {
   const bonus = steps.filter((y) => years >= y).length;
   if (!bonus) return { ...base };
-  const keys = ["might", "cunning", "logistics"] as const;
+  const keys = ["logistics", "cunning", "might"] as const;
   const top = Math.max(...keys.map((k) => base[k]));
-  const best = keys.filter((k) => base[k] === top);
-  if (best.length > 1) throw new Error("OQ-RECR-17: tie for the highest skill");
-  return { ...base, [best[0]!]: Math.min(max, top + bonus) };
+  const best = keys.find((k) => base[k] === top)!;
+  return { ...base, [best]: Math.min(max, top + bonus) };
 }
 
 export interface Commission {
@@ -665,7 +689,7 @@ export function commission(o: {
     victories: 0,
     wage: (o.wage ?? 0) * cfg.fieldWageMultiplier[role],
     staff: cfg.staff[role],
-    staffHorses: role === "commander" ? cfg.staff.commanderHorses : 0,
+    staffHorses: role === "commander" ? cfg.staff.commanderHorses : cfg.staff.captainHorses,
   };
   if (skills) c.skills = skills;
   if (o.rolledTrait !== undefined) c.trait = o.rolledTrait;
@@ -757,7 +781,35 @@ export const idleMarshal = (bestSkill: number, yearsWithoutWar: number, cfg: Rec
 /** An official commander never refuses, never goes home mid-war, never defects with land, and brings no retinue (RECR-088, RECR-093). */
 export const officialConduct = { refusesCommand: false, goesHomeMidWar: false, defectsWithLand: false, retinue: 0 } as const;
 
-/** Effect an official gives on return: 1.5 times with 3 or more victories (RECR-090). */
+/**
+ * A battle won under an official commander: every lord's loyalty rises one step (up to Loyal, never out of
+ * revolt) and the ruler's Victories rise by one; no single lord grows from it (RECR-089, D-RECR-20).
+ */
+export function officialVictory<L extends { loyalty: string }>(lords: L[], realm: { victories: number }, cfg: RecruitingConfig = config): void {
+  const steps = ["Loyal", "Wavering", "Disloyal"];
+  for (const l of lords) {
+    const i = steps.indexOf(l.loyalty);
+    if (i > 0) l.loyalty = steps[Math.max(0, i - cfg.officialVictory.lordLoyaltySteps)]!;
+  }
+  realm.victories += cfg.officialVictory.rulerVictories;
+}
+
+/**
+ * Generals who grow too big (RECR-095, D-RECR-16): any commander with 8 victories who led the same regiments
+ * 5 years becomes "their man"; a commissioned official with 6 victories asks for land.
+ */
+export function tooBig(o: { victories: number; yearsWithSameRegiments: number; official: boolean }, cfg: RecruitingConfig = config): "their man" | "asks for land" | null {
+  if (o.victories >= cfg.theirMan.victories && o.yearsWithSameRegiments >= cfg.theirMan.years) return "their man";
+  if (o.official && o.victories >= cfg.landRequestVictories) return "asks for land";
+  return null;
+}
+
+/** The answer to a land request: refused, the official becomes Ambitious; granted, a lord with his old soldiers as retinue (RECR-095). */
+export function answerLandRequest(answer: "refuse land" | "grant land", soldiers: number): { trait: "Ambitious" } | { becomes: "lord"; retinue: number } {
+  return answer === "refuse land" ? { trait: "Ambitious" } : { becomes: "lord", retinue: soldiers };
+}
+
+/** Effect an official gives on return: 1.5 times with 3 or more victories, for as long as they hold that post (RECR-090, D-RECR-20). */
 export const returnEffect = (victories: number, cfg: RecruitingConfig = config): number => (victories >= cfg.returnBonus.victories ? cfg.returnBonus.factor : 1);
 
 /** Does a lord bring his retinue to an army commanded by an official? A Proud lord refuses unless the war aim is his Want (RECR-092). */
@@ -813,15 +865,24 @@ export function aiPicksCommander(officials: readonly { id: string; type: string 
 
 // ---------------------------------------------------------------- monthly update (RECR-100)
 
-/** A month: training ticks down, and a twelfth of the yearly refill and fades is applied (RECR-100; split per OQ-RECR-11). */
-export function monthPasses(p: ProvincePool, orders: TrainingOrder[], besieged = false, cfg: RecruitingConfig = config): Regiment[] {
+/**
+ * A month (RECR-100): training ticks down; in the January turn the yearly step (refill, fallen and veterans
+ * fading) runs once (D-RECR-11).
+ */
+export function monthPasses(p: ProvincePool, orders: TrainingOrder[], o: { besieged?: boolean; month?: number; musterMaster?: boolean } = {}, cfg: RecruitingConfig = config): Regiment[] {
   const done: Regiment[] = [];
-  for (const o of orders) {
-    const r = tickTraining(o, besieged);
+  for (const order of orders) {
+    const r = tickTraining(order, !!o.besieged);
     if (r) done.push(r);
   }
-  refill(p, 1 / 12);
-  p.fallen *= 1 - cfg.fallenFadePerYear / 12;
-  p.veterans *= 1 - cfg.veteransFadePerYear / 12;
+  if (o.month === cfg.yearlyMonth) yearPasses(p, { musterMaster: !!o.musterMaster }, cfg);
   return done;
+}
+
+/** Pay months a levy owes: the 3 free months count from the day it has gathered (RECR-101, D-RECR-8). */
+export const paidMonths = (monthsSinceGathered: number, cfg: RecruitingConfig = config): number => Math.max(0, monthsSinceGathered - cfg.freeMonths);
+
+/** Pastoral lands: herd growth falls by twice the share of herders taken in the spring move (RECR-036, D-RECR-14). */
+export function herdGrowthLoss(herderShareTaken: number, month: number, hemisphere: "north" | "south", cfg: RecruitingConfig = config): number {
+  return cfg.pastoral.springMove[hemisphere].includes(month) ? herderShareTaken * cfg.pastoral.herdShareMultiplier : 0;
 }
