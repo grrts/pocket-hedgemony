@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-543 decided and 8 still open across 29 contexts.
+544 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -46,6 +46,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-AUD-11**: (was OQ-AUD-11) Palettes: there is no blend; Atlantic and creole nations use the single `atlantic_creole` palette. The turkic split by capital longitude 55 (west `mena`, otherwise `steppe`) stays in config. A `narrative_only` major event plays no stinger, so there is no "sombre" variant. Simplest rules that need no new tracks.
 - **D-AUD-12**: (was OQ-AUD-12) Catalogue defaults: `ui_tooltip` is never played (no setting turns it on); all five haptic moments are "light" (§15.3 is later); the `final_result` screen plays `campaign_end`. The later decision and the screen list win.
 - **D-AUD-13**: (17 Oct, Leroy: pull music and sound forward for playtesting) The music and effects are built ahead of their milestones in a first cut: the director, 16 written tracks (title, two peace tunes per half of the eras, prosperity, diplomacy, the five war and situation tracks with layers, six stingers) and 30 effects, synthesized in the page (AUD-141). The worklet, the MML build, ambience, captions, haptics and the full catalogue follow in their milestones; the palette tunings are drafts awaiting review (OQ-AUD-13).
+- **D-AUD-14**: (17 Oct, Leroy: "its not really nice to listen to, it sounds like noise mostly"; the effects are fine) The music leaves the strict PH-5 chip rules of AUD-004 that made it harsh: square and narrow pulses buzzed, the 16-step envelopes and stepped triangle crackled, and the noise voice ticked on most beats. The music keeps the voice roles (P1, P2, T, W, N), the tunes, the motif and the palettes, and plays them soft (AUD-143), with a pad voice holding chords and a small hall where AUD-004 and §2 forbid reverb tails. Measured on the first tracks, spectral flatness (how much of the sound is noise) falls from about 0.36 to under 0.08 and the brightness centre from about 3 kHz to about 1 kHz. The effects keep the chip sound unchanged. The worklet synth (AUD-104) follows this decision when it is built.
 
 ### Buildings (buildings)
 

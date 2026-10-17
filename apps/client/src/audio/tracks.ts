@@ -1,4 +1,5 @@
-import { drum, DRUMS, lowpassState, pulse, SR, triangle, wavetable, type Drum, type Env, type WaveName } from "./chip.ts";
+import { lowpassState, SR, type Env, type WaveName } from "./chip.ts";
+import { drumHit, hall, pad, softBass, softPulse, softWave, type Drum } from "./voices.ts";
 import type { Palette } from "@ph/engine/domain/audio";
 
 /**
@@ -53,7 +54,8 @@ export const PALETTE_VOICES: Record<Palette, PaletteVoice> = {
   atlantic_creole: { root: 60, table: MODES.major, wave: "organ", tempo: 1.1, name: "the Atlantic" },
 };
 
-type Voice = "P1" | "P2" | "T" | "W";
+/** P1 and P2 lead and answer, T is the bass, W the regional wavetable, S the pad that holds the chords (D-AUD-14). */
+type Voice = "P1" | "P2" | "T" | "W" | "S";
 
 interface Part {
   v: Voice;
@@ -135,6 +137,8 @@ const DANCE_MELODY =
 const DANCE_ROOTS = [1, 5, 1, 4, 1, 5, 1, 5, 1, 4, 1, 6, 4, 5, 1, 1];
 const fifthOf = (r: number) => ((r + 3) % 7) + 1;
 const luteLine = (roots: number[]) => roots.map((r) => `${r}:1 ${fifthOf(r)}:.5 ${r + 7}:.5 ${fifthOf(r)}:1`).join(" ");
+/** Held chords for the pad: a triad on each root, lasting a bar. */
+const padLine = (roots: number[], beats: number) => roots.map((r) => `${triad(r)}:${beats}`).join(" ");
 const droneLine = (roots: number[]) => roots.map((r) => `${[1, 3, 4].includes(r) ? 1 : 5}:3`).join(" ");
 
 const MARCH_MELODY =
@@ -161,8 +165,9 @@ export const TRACKS: Record<string, TrackDef> = {
       { v: "P1", oct: 1, seq: "1:1 5:.5 4:.5 5:1 8:1 8:2 7:.5 5:.5 4:1 3:1 4:.5 5:.5 7:1 5:1 1:1 5:.5 4:.5 5:1 8:1 8:4", o: { duty: 0.25, vol: 0.9, vibrato: true, decay: 0.6, sustain: 0.75 } },
       { v: "P2", seq: arp(["1-3-5", "7,-2-4", "3-5-7", "1-3-5", "1-3-5"]), o: { duty: 0.125, vol: 0.5, decay: 0.12, sustain: 0.3 } },
       { v: "T", oct: -1, seq: "1:4 7,:4 3:2 7,:2 1:4 1:4" },
+      { v: "S", seq: "1-3-5:4 7,-2-4:4 3-5-7:2 7,-2-4:2 1-3-5:4 1-3-5:4", o: { vol: 0.28 } },
     ],
-    drums: [{ seq: "crash:4 r:4 r:4 r:3 tick:.25 tick:.25 tick:.25 tick:.25 crash:4" }],
+    drums: [{ seq: "crash:4 r:4 r:4 r:4 boom:4" }],
   },
   peace_early: {
     name: "Peace",
@@ -177,10 +182,12 @@ export const TRACKS: Record<string, TrackDef> = {
       { v: "P1", oct: 1, at: 48, seq: DANCE_MELODY, o: { duty: 0.25, vol: 0.75, vibrato: true, decay: 0.4, sustain: 0.55 } },
       { v: "W", at: 48, seq: luteLine(DANCE_ROOTS), gate: 1, o: { decay: 0.18, sustain: 0.1 } },
       { v: "T", oct: -1, at: 48, seq: droneLine(DANCE_ROOTS) },
+      { v: "S", seq: padLine(ERA_I_ROOTS, 3), o: { vol: 0.28 } },
+      { v: "S", at: 48, seq: padLine(DANCE_ROOTS, 3), o: { vol: 0.28 } },
     ],
     drums: [
-      { seq: [...Array(15).fill("boom:1.5 tick:.5 rim:1"), "boom:1.5 tick:.5 tick:.5 tick:.5"].join(" ") },
-      { at: 48, seq: [...Array(15).fill("boom:1 tick:1 tick:1"), "boom:1 tick:.5 tick:.5 tick:.5 tick:.5"].join(" ") },
+      { seq: [...Array(15).fill("boom:1.5 r:.5 rim:1"), "boom:3"].join(" ") },
+      { at: 48, seq: [...Array(15).fill("boom:1 r:1 rim:1"), "boom:1 rim:1 rim:1"].join(" ") },
     ],
   },
   peace_late: {
@@ -193,8 +200,9 @@ export const TRACKS: Record<string, TrackDef> = {
       { v: "P2", seq: arp(MARCH_ROOTS.map(triad)), o: { duty: 0.125, vol: 0.45, decay: 0.12, sustain: 0.3 } },
       { v: "T", oct: -1, seq: MARCH_ROOTS.map((r) => `${r}:1 ${r + 4}:1 ${r + 7}:1 ${r + 4}:1`).join(" "), gate: 0.8 },
       { v: "W", at: 32, seq: MARCH_ROOTS.slice(8).map((r) => `${r + 2}:2 ${r + 4}:2`).join(" "), o: { wave: "horn", vol: 0.4, decay: 0.8, sustain: 0.7 } },
+      { v: "S", seq: padLine(MARCH_ROOTS, 4), o: { vol: 0.28 } },
     ],
-    drums: [{ seq: rep("kick:1 tick:.5 tick:.5 snare:1 tick:1", 15) + " kick:1 snare:1 snare:.5 snare:.5 snare:.25 snare:.25 snare:.25 snare:.25" }],
+    drums: [{ seq: rep("kick:1 r:1 snare:1 r:1", 15) + " kick:1 snare:1 snare:.5 snare:.5 boom:1" }],
   },
   prosperity: {
     name: "Prosperity",
@@ -207,8 +215,9 @@ export const TRACKS: Record<string, TrackDef> = {
       { v: "P1", oct: 1, seq: "1:1 5:.5 4:.5 5:1 8:1 9:1 8:.5 7:.5 8:2 6:1 5:.5 4:.5 3:1 5:1 4:2 2:2 5:1 6:.5 7:.5 8:1 10:1 9:1.5 8:.5 7:1 5:1 6:1 7:.5 6:.5 5:1 2:1 1:4", o: { duty: 0.25, vol: 0.85, vibrato: true, decay: 0.4, sustain: 0.6 } },
       { v: "P2", seq: arp(["1-3-5", "4-6-8", "6,-1-3", "5,-7,-2", "1-3-5", "4-6-8", "5,-7,-2", "1-3-5"]), o: { duty: 0.125, vol: 0.45, decay: 0.1, sustain: 0.3 } },
       { v: "T", oct: -1, seq: [1, 4, 6, 5, 1, 4, 5, 1].map((r) => `${r}:1 ${r + 4}:1 ${r}:1 ${r + 4}:1`).join(" "), gate: 0.7 },
+      { v: "S", seq: padLine([1, 4, 6, 5, 1, 4, 5, 1], 4), o: { vol: 0.28 } },
     ],
-    drums: [{ seq: rep("kick:1 tick:.5 tick:.5 snare:1 tick:.5 tick:.5", 8) }],
+    drums: [{ seq: rep("kick:1 r:1 snare:1 r:.5 tick:.5", 8) }],
   },
   diplomacy: {
     name: "Diplomacy",
@@ -219,8 +228,9 @@ export const TRACKS: Record<string, TrackDef> = {
     root: 60,
     parts: [
       { v: "W", oct: 1, seq: "5:1.5 4:.5 3:1 2:1 1:2 5,:2 4:1 5:.5 6:.5 5:1 4:1 3:4 1:1 5:.5 4:.5 5:1 8:1 7:2 6:2 5:1 4:1 3:1 2:1 1:4", o: { wave: "organ", vol: 0.5, decay: 0.5, sustain: 0.4 } },
-      { v: "P2", seq: arp(["1-3-5", "6,-1-3", "4,-6,-1", "5,-7,-2", "1-3-5", "3-5-7", "4,-6,-1", "1-3-5"], 0.25), o: { duty: 0.125, vol: 0.4, decay: 0.08, sustain: 0.2 } },
+      { v: "P2", seq: arp(["1-3-5", "6,-1-3", "4,-6,-1", "5,-7,-2", "1-3-5", "3-5-7", "4,-6,-1", "1-3-5"]), o: { duty: 0.25, vol: 0.4, decay: 0.12, sustain: 0.25 } },
       { v: "T", oct: -1, seq: "1:4 6,:4 4,:4 5,:4 1:4 3:4 4,:4 1:4" },
+      { v: "S", seq: "1-3-5:4 6,-1-3:4 4,-6,-1:4 5,-7,-2:4 1-3-5:4 3-5-7:4 4,-6,-1:4 1-3-5:4", o: { vol: 0.28 } },
     ],
   },
   war_mobilize: {
@@ -236,7 +246,7 @@ export const TRACKS: Record<string, TrackDef> = {
       { v: "P1", oct: 1, layer: 2, seq: "1:.5 1:.25 1:.25 5:1 r:2 1:.5 5:.5 8:2 r:1 5:.5 5:.25 5:.25 8:1 r:2 8:.5 7:.5 5:3 1:.5 1:.25 1:.25 5:1 4:1 5:1 8:4 r:4 5:1 4:.5 5:.5 8:2", o: { duty: 0.5, vol: 0.85, decay: 0.3, sustain: 0.6 } },
       { v: "W", layer: 2, seq: rep("1:2 5,:2", 8), o: { wave: "horn", vol: 0.4, decay: 0.6, sustain: 0.6 } },
     ],
-    drums: [{ seq: rep("snare:.25 snare:.25 snare:.5 kick:1 snare:.25 snare:.25 snare:.5 kick:1", 8) }],
+    drums: [{ seq: rep("snare:.5 snare:.5 kick:1 snare:.5 snare:.5 kick:1", 8) }],
   },
   war_campaign: {
     name: "Campaign",
@@ -249,6 +259,7 @@ export const TRACKS: Record<string, TrackDef> = {
     parts: [
       { v: "T", oct: -1, seq: WAR_BASS, gate: 0.8 },
       { v: "P2", layer: 2, seq: arp([...WAR_CHORDS, ...WAR_CHORDS]), o: { duty: 0.25, vol: 0.6, decay: 0.1, sustain: 0.35 } },
+      { v: "S", layer: 2, seq: [...WAR_CHORDS, ...WAR_CHORDS].map((c) => `${c}:4`).join(" "), o: { vol: 0.28 } },
       { v: "P1", oct: 1, layer: 3, seq: "1:1.5 5:.5 4:.5 5:.5 8:1 8:1 7:.5 6:.5 3:2 4:1 5:.5 6:.5 7:1 2:1 5:2 2:1 #7,:1 1:1 3:1 5:1 8:1 10:1.5 9:.5 8:1 6:1 7:1 6:.5 5:.5 4:1 2:1 5:4", o: { duty: 0.5, vol: 0.9, vibrato: true, decay: 0.5, sustain: 0.7 } },
       { v: "W", layer: 3, seq: [...WAR_CHORDS, ...WAR_CHORDS].map((c) => c.split("-")).map((t) => `${t[1]}:2 ${t[2]}:2`).join(" "), o: { wave: "horn", vol: 0.5, decay: 0.8, sustain: 0.7 } },
     ],
@@ -282,6 +293,7 @@ export const TRACKS: Record<string, TrackDef> = {
     layers: 2,
     parts: [
       { v: "T", oct: -1, seq: rep("1:4 6,:4 4,:4 5,:4", 2) },
+      { v: "S", seq: rep("1-3-5:4 6,-1-3:4 4,-6,-1:4 5,-#7,-2:4", 2), o: { vol: 0.28 } },
       { v: "P1", oct: 1, layer: 2, seq: "5:2 4:1 3:1 2:3 1:1 3:2 2:1 1:1 7,:4 1:2 5:1 4:1 5:2 8:2 3:1.5 2:.5 1:1 7,:1 1:4", o: { duty: 0.5, vol: 0.7, vibrato: true, decay: 0.9, sustain: 0.7 } },
       { v: "P2", layer: 2, seq: arp(["1-3-5", "6,-1-3", "4,-6,-1", "5,-#7,-2", "1-3-5", "6,-1-3", "4,-6,-1", "5,-#7,-2"], 1), o: { duty: 0.125, vol: 0.35, decay: 0.3, sustain: 0.3 } },
     ],
@@ -300,7 +312,7 @@ export const TRACKS: Record<string, TrackDef> = {
       { v: "P2", layer: 2, oct: 1, seq: rep("5:.25 b6:.25 5:.25 b6:.25 5:1 r:1 3:.5 4:.5", 4) + " " + rep("5:.25 b6:.25 5:.25 b6:.25 8:1 r:1 7:.5 5:.5", 4), o: { duty: 0.125, vol: 0.5, decay: 0.15, sustain: 0.3 } },
       { v: "P1", layer: 2, oct: 1, at: 16, seq: "1:1 5:.5 4:.5 5:1 8:1 b7:2 5:2 4:1 3:1 2:1 b2:1 1:4", o: { duty: 0.5, vol: 0.7, decay: 0.4, sustain: 0.5 } },
     ],
-    drums: [{ seq: rep("rim:.5 rim:.25 rim:.25 snare:.5 r:.25 rim:.25 kick:.75 rim:.25 snare:1", 8) }],
+    drums: [{ seq: rep("rim:.5 r:.5 snare:.5 r:.5 kick:1 rim:.5 r:.5", 8) }],
   },
   crisis: {
     name: "Crisis",
@@ -311,6 +323,7 @@ export const TRACKS: Record<string, TrackDef> = {
     root: 62,
     parts: [
       { v: "T", oct: -1, seq: rep("1:4", 8) },
+      { v: "S", seq: "1-3-5:8 1-3-5:8 b2-4-b6:8 1-3-5:8", o: { vol: 0.22 } },
       { v: "P1", oct: 1, seq: "b2:2 1:2 r:4 b6:2 5:2 r:4 1:1 5:1 4:1 5:1 8:2 b2:2 1:8", o: { duty: 0.125, vol: 0.6, vibrato: true, decay: 1.2, sustain: 0.6 } },
       { v: "W", seq: rep("1:2 r:2", 4) + " " + rep("b2:2 r:2", 4), o: { wave: "bell", vol: 0.35, decay: 0.6, sustain: 0.1 } },
     ],
@@ -424,8 +437,10 @@ export function writtenTrack(id: string): string | null {
 
 // ---------------------------------------------------------------- rendering
 
-const GAIN: Record<Voice | "N", number> = { P1: 0.3, P2: 0.22, T: 0.55, W: 0.38, N: 0.42 };
-const PAN: Record<Voice | "N", number> = { P1: -0.2, P2: 0.25, T: 0, W: 0.1, N: -0.05 };
+const GAIN: Record<Voice | "N", number> = { P1: 0.3, P2: 0.15, T: 0.5, W: 0.3, S: 0.2, N: 0.32 };
+const PAN: Record<Voice | "N", number> = { P1: -0.15, P2: 0.3, T: 0, W: 0.2, S: -0.05, N: 0 };
+/** How much of the hall is heard against the dry voices. */
+const HALL = 0.3;
 
 export interface Rendered {
   /** Stereo samples of each layer (layer 1 first), all the same length. */
@@ -460,7 +475,7 @@ export async function renderTrack(id: string, palette: Palette, breathe_ = breat
   const seconds = def.beats * spb;
   const length = Math.ceil((seconds + (def.stinger ? 1.2 : 0)) * SR);
   const layerCount = def.layers ?? 1;
-  const voices = Array.from({ length: layerCount }, () => ({ P1: new Float32Array(length), P2: new Float32Array(length), T: new Float32Array(length), W: new Float32Array(length), N: new Float32Array(length) }));
+  const voices = Array.from({ length: layerCount }, () => ({ P1: new Float32Array(length), P2: new Float32Array(length), T: new Float32Array(length), W: new Float32Array(length), S: new Float32Array(length), N: new Float32Array(length) }));
   // A loop's tail wraps round to its start, so notes ringing over the end aren't cut.
   const wrap = !def.stinger;
   for (const part of def.parts) {
@@ -470,12 +485,16 @@ export async function renderTrack(id: string, palette: Palette, breathe_ = breat
       const [note, d] = tok.split(":");
       const beats = Number(d);
       if (note !== "r") {
-        const n = Math.floor(beats * spb * (part.gate ?? 0.92) * SR);
+        const n = Math.floor(beats * spb * (part.gate ?? (part.v === "S" ? 1 : 0.92)) * SR);
         const s = Math.floor(b * spb * SR);
-        const f = degreeHz(note!, table, root, part.oct ?? 0);
         const o = { ...part.o, ...(part.v === "W" && !part.o?.wave ? { wave: pv.wave } : {}) };
-        const write = (dst: Float32Array, at: number) => (part.v === "T" ? triangle(dst, at, n, f) : part.v === "W" ? wavetable(dst, at, n, f, o) : pulse(dst, at, n, f, o));
-        writeWrapped(out, s, n, wrap, write);
+        // A chord like 1-3-5 sounds each of its notes.
+        for (const one of note!.split("-")) {
+          const f = degreeHz(one, table, root, part.oct ?? 0);
+          const write = (dst: Float32Array, at: number) =>
+            part.v === "T" ? softBass(dst, at, n, f) : part.v === "W" ? softWave(dst, at, n, f, o) : part.v === "S" ? pad(dst, at, n, f, o) : softPulse(dst, at, n, f, o);
+          writeWrapped(out, s, n, wrap, write);
+        }
         await slice();
       }
       b += beats;
@@ -509,7 +528,7 @@ export async function renderTrack(id: string, palette: Palette, breathe_ = breat
   for (const v of voices) {
     const L = new Float32Array(length);
     const R = new Float32Array(length);
-    for (const k of ["P1", "P2", "T", "W", "N"] as const) {
+    for (const k of ["P1", "P2", "T", "W", "S", "N"] as const) {
       const g = GAIN[k];
       const l = g * (1 - PAN[k]);
       const r = g * (1 + PAN[k]);
@@ -521,9 +540,21 @@ export async function renderTrack(id: string, palette: Palette, breathe_ = breat
         }
       });
     }
-    const lpL = lowpassState();
-    const lpR = lowpassState();
+    const lpL = lowpassState(6000);
+    const lpR = lowpassState(6000);
     await blocks((a, b) => (lpL(L, a, b), lpR(R, a, b)));
+    // The hall: a loop is fed through once first so its end rings into its start.
+    const room = hall();
+    if (wrap) await blocks((a, b) => {
+      for (let i = a; i < b; i++) room.step((L[i]! + R[i]!) * 0.5);
+    });
+    await blocks((a, b) => {
+      for (let i = a; i < b; i++) {
+        room.step((L[i]! + R[i]!) * 0.5);
+        L[i]! += room.l * HALL;
+        R[i]! += room.r * HALL;
+      }
+    });
     layers.push([L, R]);
   }
   // One level for the whole track, all layers playing.
@@ -541,18 +572,6 @@ export async function renderTrack(id: string, palette: Palette, breathe_ = breat
     for (let i = a; i < b; i++) (L[i]! *= scale), (R[i]! *= scale);
   });
   return { layers, seconds: wrap ? length / SR : seconds, barSeconds: def.bar * spb, stinger: !!def.stinger };
-}
-
-const hits = new Map<Drum, Float32Array>();
-/** A drum hit's samples, made once. */
-function drumHit(k: Drum): Float32Array {
-  let h = hits.get(k);
-  if (!h) {
-    h = new Float32Array(Math.floor(DRUMS[k][3] * 6 * SR));
-    drum(h, 0, k);
-    hits.set(k, h);
-  }
-  return h;
 }
 
 /** Writes a note; in a loop, the part past the end lands at the start. */
