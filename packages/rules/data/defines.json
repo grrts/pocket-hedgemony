@@ -14,6 +14,25 @@
     "$officialWagePerMonth": "Milestone 3: an official's wage, paid monthly while he runs his province (REALM-063 wages). Provisional: the design gives no amount.",
     "officialWagePerMonth": 0.1
   },
+  "works": {
+    "$comment": "Milestone 4, works (first slice of the buildings context). goldScale turns the buildings data's gold into the treasury's gold. The effects are stand-ins for the jobs-and-wares model (BLD-002, BLD-005) on numbers the game already simulates; all provisional.",
+    "goldScale": 0.2,
+    "defaultUpkeepPerYear": 0.25,
+    "materialsAtHandSaving": 0.2,
+    "farmFood": 0.1,
+    "ranchFood": 0.15,
+    "fisheryFood": 0.2,
+    "marketTrade": 0.5,
+    "harbourTrade": 0.25,
+    "roadTrade": 0.05,
+    "campTrade": 0.05,
+    "drillYardRecruits": 0.15,
+    "roadSpeed": 0.15,
+    "aiReserveGold": 10,
+    "$slots": "Leroy, 17 Oct: a province's slots come from its people, one kind of slot for every work. baseSlots plus one for each townPeople step passed (thousands of people), which also sets the town's size: hamlet, village, market town, town, city, great city.",
+    "baseSlots": 2,
+    "townPeople": [10, 30, 100, 300, 1000]
+  },
   "levies": {
     "$comment": "Men who can be called per thousand people: the recruiting context's fighting-age share (0.25) times the farmers' call share (0.12).",
     "menPerThousandPeople": 30,

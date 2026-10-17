@@ -351,6 +351,12 @@ export function orderShape(order: Order): string {
       return "call students to arms";
     case "foundSchool":
       return "found a school in province";
+    case "build":
+      return "build in province";
+    case "cancelBuild":
+      return "cancel a work in province";
+    case "moveBuild":
+      return "move a work in the province's queue";
   }
 }
 

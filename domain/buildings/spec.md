@@ -479,6 +479,16 @@ Works across the province (§7.10)
 - BLD-168 Overview: the realm's Works overview lists every province with a site or a queue, with its counts and the next build to finish; tapping one opens that province's Build tab. [F-39; X-19]
 - BLD-169 Phone: in landscape the queue rows are at least 48 points tall, the move and cancel buttons at least 44 × 44 with 8 points between them, and nothing needs hover. [F-39; X-19]
 
+### 5.24 The first playable slice (milestone 4)
+- BLD-170 Until jobs, wares, materials and labourers are simulated, the game shall build ten works for the crown with gold and months only (farm, ranch, fishery, lumber camp, quarry, market, harbour, drill yard, road, castle), one land and one town site per province with its build queue (BLD-162 to BLD-165), each with a stand-in effect on a number the game already has (food by class, trade, recruits, march speed, walls); upkeep goes on the ledger and a month the treasury is empty leaves the works giving half; the 1444 works come from the map's castles and wealth. [D-BLD-22]
+- BLD-175 Every province shall have slots for works by its people: `works.baseSlots` (2) plus one for each `works.townPeople` step it has passed (10, 30, 100, 300 and 1,000 thousand people, so 2 to 7); the same steps set its town size (hamlet to great city). Every work takes one slot whatever its kind (land, town, ring, shore or castle) and keeps it at every step; a new work needs a free slot, counting those building or queued. [Leroy 17 Oct, D-BLD-23]
+
+#### How the player uses it: works in the first slice
+- BLD-171 Where: the player taps a province, then its Build tab (its first line gives the slots taken of all, and the town's size and people) (beside Overview, People and Garrison; it shows an hourglass while a site is open). The tab lists the sites running (months left with a bar; Stop gives half the gold back), the queue (▲ ▼ to move a build, Drop to take it off), then the build sheet: each work the land suits at its next step, with what it does, its gold, months and upkeep and a Build button (Queue when the gold isn't there yet), or why it can't be built, naming the invention by its name; then what stands there and what each gives. [X-19]
+- BLD-172 Overview: the player's country card has a Works tab with the works upkeep a month (and whether it goes unpaid), every province with a site or a queue (its counts and the next work to finish, with a bar), and how many of each work stand; each row opens that province's Build tab. The General tab's Works line opens it. [X-19, BLD-134, BLD-168]
+- BLD-173 Map and news: a hammer marks each of the player's sites at region zoom; a finished work is said over the map with Go there, with a sound, and goes in the dispatches. [X-19, BLD-132, BLD-138]
+- BLD-174 Phone: in landscape (Wide and Tall layouts, inside the safe areas) rows stack name, effect and cost over two or three lines with the buttons at the right, every button at least 44 points, 8 points between the queue buttons, and nothing needs hover. [X-19, BLD-169]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -678,6 +688,9 @@ Changes the design asks of other files (§18), recorded here; not edited:
 - **D-BLD-20** (was OQ-BLD-20) Village works rate stays 20 % (provisional); faith-building numbers belong to religion. Balancing finds it in the data.
 - **D-BLD-21** (was OQ-BLD-21) Burned tiles: they rebuild by themselves, free, one a year in peace; paying half a farm's cost rebuilds one within a season. The player picks; both rules stay.
 
+- **D-BLD-22** (17 Oct, milestone 4) The first playable slice builds ten works with gold (the data's gold × `works.goldScale` 0.2) and months, and gives each a stand-in effect from `defines.works` until jobs and wares are simulated (BLD-170). Materials at hand are a gold saving (a lumber camp or quarry takes 20 % off works needing timber or stone); town size is read from wealth; known inventions are the realm's 1444 set until research runs in the turn. Provisional; the jobs-and-wares model replaces it.
+- **D-BLD-23** (17 Oct, Leroy: "Provinces should have slots related to their population count", "All buildings fit in the same type of slot") A province's slots come from its people, and every work takes the same kind of slot (BLD-175). This replaces the tile and town-slot places (BLD-006 to BLD-013) for the first slice; town size is read from people (BLD-149).
+
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
@@ -712,6 +725,7 @@ Changes the design asks of other files (§18), recorded here; not edited:
 | BLD-139..144 | event-effects.feature | all scenarios |
 | BLD-145..147 | ai-building.feature | all scenarios |
 | BLD-148..154 | starting-buildings.feature | all scenarios |
+| BLD-170 … BLD-175 | — | Engine works (packages/engine/src/works.ts, test/works.test.ts) and client screens; checked by apps/client/scripts/works-shots.mjs |
 | Troyes 1444–1452 | troyes-1444-1452.feature | worked example (many ids) |
 | BLD-155 | troyes-1444-1452.feature | Troyes in 1444 |
 | BLD-156 | sites.feature | A master of works |

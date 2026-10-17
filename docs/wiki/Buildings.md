@@ -361,6 +361,35 @@ Troyes starts with 12 tiles (4 farms, a burned field, 2 ranches, a lumber camp, 
 5. **1450, Burgundy invades.** The stone castle upgrade site stops; foragers burn 2 fields; the town is besieged and takes honours of war. With only a palisade, plunder would have burned 1 in 3 town buildings; because the town took terms, none burn.
 6. **1452, peace.** Troyes has 2 ruined farms rebuilding by themselves, one a year, its fair intact and a castle site to restart. Its upkeep is 7 gold a year against 13 gold of tax reaching the crown.
 
+## In the game now: works, the first cut
+
+Until jobs, wares and labourers are in the game, you build ten **works** for the crown. Each costs gold, paid when its site opens, and months to raise:
+
+| Work | Where | What it does now |
+|---|---|---|
+| Farm (mill farm, enclosed farm) | worked land | farmers' harvest +10 % a step |
+| Ranch | grassland, steppe, drylands, hills | herders' food +15 % |
+| Fishery | a coast | the catch +20 % |
+| Lumber camp | forest | works needing timber here cost 20 % less; trade +5 % |
+| Quarry | hills, mountains, drylands | works needing stone here cost 20 % less; trade +5 % |
+| Market (weekly market, yearly fair, trading house) | a village or bigger | trade +50 % a step |
+| Harbour (port, great port) | a coast | trade +25 % a step |
+| Drill yard (barracks) | a town | recruits +15 % a step |
+| Road (track, road) | anywhere | armies march 15 % faster a step; trade +5 % a step |
+| Castle (earthwork ring fort, stone castle) | anywhere | walls: armies must besiege it |
+
+**Slots.** Every province has slots by its people: 2, and one more at 10,000, 30,000, 100,000, 300,000 and 1,000,000 people (so 2 to 7). Every work takes one slot, whatever it is, and keeps it as it grows a step. The same steps give the town its size, from hamlet to great city, which some steps need (a market needs a village). The Build tab's first line says how many slots are taken.
+
+These effects are stand-ins, written into the rules (`defines.works`) until the jobs and wares model replaces them. A step needs its invention: the stone castle needs Stone castles, the road needs Roads and post stations.
+
+**How you use it.** Tap a province, then its **Build** tab. At the top are its sites with the months left, and its queue, where ▲ and ▼ move a build and Drop takes it off (nothing was paid). Below is the build sheet: every work the land suits, at its next step, with what it does, its gold, months and upkeep. Tap **Build**. When the site is busy or the gold isn't there yet, the button says **Queue** and the build waits its turn. Stop on a running site gives half its gold back. A province raises one work on its land and one in its town at a time.
+
+**The overview.** The **Works** tab of your country card shows the works' upkeep a month, every province with a site or a queue and the next work to finish there, and how many of each work stand. Tap a row to open that province's Build tab. The General tab's Works line opens it too. On the map, a hammer marks each of your sites. A finished work is announced over the map with *Go there*.
+
+**Upkeep.** Works cost upkeep each month, as the Works line of the treasury ledger. In a month the treasury is empty, your works give only half.
+
+**In 1444** the map's castles and forts stand, every capital has a stone castle, and richer provinces start with farms, ranches, markets, harbours and tracks. Other realms build too. Each month every realm at peace looks at one of its provinces and orders the first of a market, a farm, a harbour, a road, walls on a border or a drill yard that fits there, if it keeps a year of upkeep in hand.
+
 ## What you see
 
 **The building card**, when you tap a building on the tile row:

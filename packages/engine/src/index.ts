@@ -15,3 +15,4 @@ export { createEngineHost, type EngineRequest, type EngineResponse, type MapTile
 export { generateSyntheticRuleset } from "./synthetic.ts";
 export { aiTreasury, canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, runLedger, TAX_RATES, taxRateOf } from "./treasury.ts";
 export { STABILITY, stabilityOf, subjectLoyalty, type Stability, type StabilityPillar, type StabilityStep } from "./stability.ts";
+export { WORKS, WORK_COUNT, workIndex, type WorkRow } from "./works.ts";
