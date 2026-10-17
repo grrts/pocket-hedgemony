@@ -19,13 +19,19 @@ Feature: Frame and turn budgets
       | longest main-thread task while playing       | 50 ms                       |
       | frames redrawn while armies march            | at least 90 %               |
 
-  @VIEW-054 @open-question
-  # OQ-VIEW-1: Sharpness setting against one pixel per CSS pixel
-  Scenario: The map canvas shades per CSS pixel and the overlay per device pixel
+  @VIEW-054
+  Scenario Outline: The map canvas shades per CSS pixel and the overlay per device pixel
     Given a phone with a device pixel ratio of 3
+    And Sharpness is <sharpness>
     When the map is drawn
     Then the map canvas shades 1 pixel per CSS pixel
-    And the overlay canvas uses the device pixel ratio so text stays crisp
+    And the overlay canvas draws <overlay> pixels per CSS pixel
+
+    Examples:
+      | sharpness | overlay |
+      | Battery   | 1       |
+      | Balanced  | 2       |
+      | Native    | 3       |
 
   @VIEW-057
   Scenario: The draw loop does no heavy work
@@ -84,15 +90,14 @@ Feature: Frame and turn budgets
     Then they are measured at Sharpness Balanced, 60 fps cap, Map detail Medium and Animations Full
     And measured once more with Battery saver on
 
-  @VIEW-066 @open-question
-  # OQ-VIEW-9: a smaller AI worker budget must not change the simulation
-  Scenario: Battery saver turns every knob down
+  @VIEW-066
+  Scenario: Battery saver turns the display knobs down and leaves the AI alone
     Given Battery saver is on
     When the map is shown and a turn is processed
     Then the frame rate is capped at 30
     And Sharpness is Battery and animations are reduced
     And the map redraws only on change
-    And the AI turn runs with a smaller worker budget
+    And the AI turn has the same work-step budget as with Battery saver off
 
   @VIEW-067
   Scenario: A still map is not redrawn

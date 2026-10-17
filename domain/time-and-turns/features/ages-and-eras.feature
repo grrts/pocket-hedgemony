@@ -26,8 +26,7 @@ Feature: Ages and eras on the calendar
     When the turn is processed
     Then the ages "Age of Gunpowder Empires" and "Age of Exploration" are both running
 
-  @TIME-065 @open-question
-  # OQ-TIME-9: Era VII still to 1960 in the research tree; calendar or technology
+  @TIME-065
   Scenario Outline: Eras are dated bands ending at the campaign end
     Given the date is "<date>"
     When the era is read from the calendar
@@ -35,10 +34,23 @@ Feature: Ages and eras on the calendar
 
     Examples:
       | date          | era |
-      | March 1444    | I   |
+      | November 1444 | I   |
       | January 1500  | II  |
       | January 1650  | III |
       | January 1750  | IV  |
       | January 1850  | V   |
       | January 1900  | VI  |
       | January 1939  | VII |
+      | August 1939   | VII |
+
+  @TIME-072
+  Scenario: An age is cut at the campaign end
+    Given the age "Age of World Wars" has a window to 1960 and a forced end in 1960
+    When the campaign content is assembled
+    Then the age "Age of World Wars" runs until the end date in 1939
+
+  @TIME-072
+  Scenario: An age that would start on an event after 1939 never starts
+    Given the date is "August 1939"
+    When the turn is processed
+    Then the age "Age of Decolonization" is not running, although its window opened in 1919

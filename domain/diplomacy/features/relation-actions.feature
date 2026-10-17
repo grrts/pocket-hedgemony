@@ -134,13 +134,12 @@ Feature: Relation actions
     And the stance of "Austria" toward "Swiss Confederation" is "rival"
     And the rival stance notes the contested object is still open
 
-  @DIPL-036 @open-question
+  @DIPL-036
   Scenario: An insult sets a Hostile stance and ends friendship
-    # OQ-DIPL-4: whose perspective becomes Hostile
     Given the stance between "A" and "B" is "friendly"
     When the country "A" insults the country "B"
     Then the friendly stance is ended
-    And a "hostile" stance is set between them
+    And the stance of "B" toward "A" is "hostile"
 
   @DIPL-037
   Scenario Outline: Improving relations moves one step
@@ -170,7 +169,7 @@ Feature: Relation actions
     Examples:
       | stance   | months | result                                   |
       | friendly | 240    | the friendly stance may decay            |
-      | rival    | 119    | the rival stance may not change yet      |
+      | rival    | 118    | the rival stance may not change yet      |
       | hostile  | 120    | the hostile stance decays to "rival"     |
 
   @DIPL-043 @placeholder
@@ -198,3 +197,43 @@ Feature: Relation actions
     Given the dataset truce between "England" and "France" expires "1446-04-01"
     When the game starts on "1444-11-11"
     Then the truce expires "1446-04-01" and not after the configured length
+
+  @DIPL-193
+  Scenario Outline: Small commands that cost nothing
+    Given <situation>
+    When <command>
+    Then <result>
+
+    Examples:
+      | situation                                                  | command                                              | result                                        |
+      | the country "A" has an embargo on the country "B"          | the country "A" lifts its embargo on "B"             | trade flows between "A" and "B"               |
+      | the date is "1914-07" and "A" and "B" share a mobilisation pact | the country "B" unmarks the pact with "A"       | "A" and "B" share no mobilisation pact        |
+
+  @DIPL-193
+  Scenario: Withdrawing a pledge is an Oath broken
+    Given the country "A" pledged protection to "B"
+    When the country "A" withdraws its pledge to "B"
+    Then the country "A" gains an Oath broken
+
+  @DIPL-193 @placeholder
+  Scenario Outline: A Rival may be dropped after 10 years
+    # config: types.rival.duration.min_months_before_change
+    Given the stance of "A" toward "B" has been "rival" for <months> months
+    When the country "A" drops "B" as a rival
+    Then the order is <result>
+
+    Examples:
+      | months | result   |
+      | 119    | refused  |
+      | 120    | accepted |
+
+  @DIPL-193
+  Scenario Outline: Recalling envoys
+    Given the country "A" has <envoy> "B"
+    When the country "A" recalls its envoy from "B"
+    Then the order is <result>
+
+    Examples:
+      | envoy                       | result   |
+      | a resident in               | accepted |
+      | an envoy on a mission to    | refused  |

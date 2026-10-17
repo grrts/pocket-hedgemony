@@ -6,7 +6,7 @@ Feature: Tiles and tile uses
 
   @PROV-010 @placeholder
   Scenario Outline: Tile count follows the province's size on the map
-    # config: province.tiles.min, province.tiles.max; size-to-count mapping is OQ-PROV-11
+    # config: province.tiles.min, province.tiles.max
     Given the province "<province>" is the <size> province on the map
     When the province's tiles are laid out
     Then the province "<province>" has <tiles> tiles
@@ -15,6 +15,33 @@ Feature: Tiles and tile uses
       | province | size     | tiles |
       | Smallest | smallest | 4     |
       | Largest  | largest  | 16    |
+
+  @PROV-294 @placeholder
+  Scenario Outline: Tile count by size
+    Given a map of 101 provinces ranked by land area
+    When the province ranked <rank> lays out its tiles
+    Then it has <tiles> tiles
+
+    Examples:
+      | rank | tiles |
+      | 0    | 4     |
+      | 50   | 10    |
+      | 100  | 16    |
+
+  @PROV-294 @placeholder
+  Scenario Outline: Town size follows its townsfolk
+    Given a town with <townsfolk> townsfolk
+    Then the town is a "<size>" covering <tiles> town tiles
+
+    Examples:
+      | townsfolk | size        | tiles |
+      | 600       | hamlet      | 1     |
+      | 1,000     | village     | 1     |
+      | 5,000     | market town | 1     |
+      | 8,000     | town        | 1     |
+      | 25,000    | city        | 1     |
+      | 40,000    | great city  | 2     |
+      | 100,000   | great city  | 3     |
 
   @PROV-011 @PROV-064
   Scenario Outline: Each tile has one use and holds only the buildings its use allows
@@ -119,7 +146,6 @@ Feature: Tiles and tile uses
 
   @PROV-019
   Scenario: A great city takes a third tile
-    # great city threshold not given: OQ-PROV-11
     Given the province "Paris" is a great city
     When the game works out the province's stats
     Then the town of "Paris" covers 3 tiles

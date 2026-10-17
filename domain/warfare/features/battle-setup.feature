@@ -56,7 +56,7 @@ Feature: Battle: field, roles, levels, approaches and skills
       | pasture | 3000  | horse can charge in it and horse gets +10 %                               |
       | woods   | 1000  | no charges are possible and shooting into it is halved                    |
       | marsh   | 500   | no charges are possible and everyone fights at -25 %                      |
-      | shore   | 1000  | attacking across it is -25 % unless the province has a bridge              |
+      | shore   | 1000  | attacking across it is -20 % unless the province has a bridge or its river is frozen |
       | town    | 1500  | the defender gets +50 %, shooting into it is halved and no charges        |
 
   @WAR-091
@@ -153,9 +153,8 @@ Feature: Battle: field, roles, levels, approaches and skills
       | 4     | +20 % | +10 % | as Line it counts as half Brace                           |
       | 5     | +30 % | +15 % | it has one free order of its own each bell                |
 
-  @WAR-098 @placeholder @open-question
-  # OQ-WAR-9: era I thresholds in warfare-eras differ from the main table
-  Scenario Outline: Reaching a level (main table)
+  @WAR-098 @placeholder
+  Scenario Outline: Reaching a level (main table, era II)
     Given a company with drill <drill> and scars <scars>
     When the battle is resolved
     Then its level is <level>

@@ -1,7 +1,7 @@
 @context-diplomacy
 Feature: The reasons count
   As a player
-  I want every yes or no to be a list of reasons with numbers, delivered the turn after
+  I want every yes or no to be a list of reasons with numbers, delivered a month after
   So that I can see why and try again differently
 
   Background:
@@ -11,9 +11,9 @@ Feature: The reasons count
     And the country "Venice" is allied with the country "Florence"
     And the country "Venice" has posture "hegemon seeker" and negotiation "high"
 
-  @DIPL-081 @DIPL-084 @DIPL-086 @DIPL-090 @DIPL-092 @placeholder @open-question
+  @DIPL-081 @DIPL-084 @DIPL-086 @DIPL-090 @DIPL-092 @placeholder
   Scenario: Hungary asks Venice for an alliance and is refused
-    # OQ-DIPL-15: rounding of standing / 4; OQ-DIPL-14: Hungary's seats
+    # config: reasons; standing / 4 rounds toward zero
     Given the standing of "Venice" toward "Hungary" is +10 from "Same faith"
     And the soldiers of "Venice" with half its allies are between 1 and 2 times those of "Hungary"
     And the envoy of "Hungary" is a "Judge" with 7 years served
@@ -52,10 +52,10 @@ Feature: The reasons count
       | -1    | no     |
 
   @DIPL-082
-  Scenario: No preview, the answer arrives the turn after it is given
+  Scenario: No preview, the answer arrives a month after it is given
     Given the date is "1445-02"
     When the country "Venice" gives its answer to "Hungary"
-    Then the country "Hungary" sees no answer this turn
+    Then the country "Hungary" sees no answer yet
     And in "1445-03" the country "Hungary" receives a letter with the answer and every reason and number
 
   @DIPL-082
@@ -160,9 +160,9 @@ Feature: The reasons count
     When the game evaluates it
     Then a count between them holds "We share an enemy" at +25
 
-  @DIPL-091 @placeholder @open-question
+  @DIPL-091 @placeholder
   Scenario: You threaten our frontier
-    # OQ-DIPL-17
+    # config: reasons.frontier_threat_per_province
     Given the Lands taken of "A" include 3 provinces bordering the country "B"
     When the country "A" asks the country "B" for anything
     Then the count holds "You threaten our frontier" at -15

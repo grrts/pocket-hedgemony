@@ -101,6 +101,15 @@ Feature: Meeting the enemy
       | attack | no player route                     | 8000 | 6    | keeps its place        |
       | wait   | no player route                     | 8000 | 4    | keeps its place        |
 
+  @MOVE-064
+  # D-MOVE-17: only an army that is seen can be intercepted
+  Scenario: A rumour is not intercepted
+    Given the army "A" has standing order "attack" and no player route
+    And an enemy army of 6000 is known only as a rumour in a neighbouring province with 5 days left on its step
+    And the army "A" has 8000 men and its step there takes 4 days
+    When the day's standing orders run
+    Then the army "A" keeps its place
+
   @MOVE-066
   Scenario: Chasing an enemy out of sight
     Given the army "A" follows the enemy army "B"

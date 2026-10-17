@@ -1,5 +1,10 @@
 {
-  "$comment": "Map presentation (domain/map-presentation/spec.md). Layout numbers from screen-flow §4.3, §7 (placeholders for the interface config); lens list from province-stats §14 as amended by trade, diplomacy, naval, buildings, subjects and revolutions (OQ-VIEW-2); budgets from performance.md; performance knobs and their phone defaults from settings v2 §3.1, §5.1, §7. Playback speed lives in troop-movement.json (replaySecondsPer10Days).",
+  "$comment": "Map presentation (domain/map-presentation/spec.md). Layout numbers from screen-flow §4.3, §7 (placeholders for the interface config); lens list from province-stats §14 as amended by trade, diplomacy, naval, buildings, subjects and revolutions (D-VIEW-2); budgets from performance.md; performance knobs and their phone defaults from settings v2 §3.1, §5.1, §7. Playback speed lives in troop-movement.json (replaySecondsPer10Days).",
+  "_provisional": [
+    "zoomBoundaries",
+    "playback.battleStepSeconds",
+    "seasonPalettes.snowFromLatitude"
+  ],
   "zoomLevels": [
     "World",
     "Region",
@@ -12,6 +17,10 @@
     "zoomed out": "World",
     "far": "World",
     "regional": "Region"
+  },
+  "zoomBoundaries": {
+    "Region": 2,
+    "Local": 4
   },
   "artPixelsPerMapPixel": {
     "Region": 4,
@@ -195,9 +204,9 @@
   },
   "dayCountMinPoints": 10,
   "playback": {
-    "battlePauseSeconds": 0.5,
     "castleStopRing": "red",
-    "battleMark": "crossed swords"
+    "battleMark": "crossed swords",
+    "battleStepSeconds": 0.5
   },
   "turnStrip": {
     "afterSeconds": 1.5,
@@ -348,7 +357,28 @@
     "Frame rate cap": 30,
     "Sharpness": "Battery",
     "Animations": "Reduced",
-    "redraw": "only on change",
-    "aiWorkerBudget": "smaller"
+    "redraw": "only on change"
+  },
+  "lensPickerScrollsOnPhone": true,
+  "noZoomTableDefault": {
+    "lens": [
+      "World",
+      "Region",
+      "Local"
+    ],
+    "card": [
+      "Local"
+    ]
+  },
+  "seasonPalettes": {
+    "snowFromLatitude": 50,
+    "palettes": [
+      "snow",
+      "spring green",
+      "base",
+      "autumn gold",
+      "wet season"
+    ],
+    "swap": "per province per month"
   }
 }

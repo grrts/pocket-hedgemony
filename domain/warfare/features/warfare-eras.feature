@@ -15,8 +15,7 @@ Feature: Warfare through the eras
     When they fight a battle in 1879
     Then each side fights with the troop types, style forms and skill rules of the inventions it knows
 
-  @WAR-148 @placeholder @open-question
-  # OQ-WAR-10: battles of 10 and 30 days and the monthly day loop
+  @WAR-148 @placeholder
   Scenario Outline: Battle scale by era
     Given a battle fought in era <era> by realms that know <inventions>
     When the rules of its era are applied
@@ -207,8 +206,7 @@ Feature: Warfare through the eras
       | VI  | his companies have 3 bells of ammunition, fight at half without it, and up to 4 sectors rotate for free |
       | VII | his tanks and aircraft have fuel for 3 bells, then stop, and depth replaces 20 % of losses per bell |
 
-  @WAR-158 @placeholder @open-question
-  # OQ-WAR-13: staff college is not a school type anywhere else
+  @WAR-158 @placeholder
   Scenario Outline: How skills grow by era
     Given a commander in era <era>
     When <event>

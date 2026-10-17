@@ -41,6 +41,15 @@ export function why(stat: string, month: Record<string, number>): { gain: { caus
   };
 }
 
+/**
+ * The tooltip as the "Detailed tooltips" setting shapes it: off (the default),
+ * the name and one line; on, the "Why?" list inside the tooltip as well
+ * (TUT-117, D-TUT-13). "Why?" stays one tap away either way.
+ */
+export function detailedTooltip(stat: string, strings: Strings, month: Record<string, number>, detailed: boolean = config.settings.detailed_tooltips.default): { name: string; line: string; why: ReturnType<typeof why> | null } {
+  return { ...tooltip(stat, strings), why: detailed ? why(stat, month) : null };
+}
+
 /** The lint over the UI string tables: every stat key has a tooltip line and an Almanac entry (TUT-087). */
 export function lintStats(stats: string[], strings: Strings, almanacEntries: string[]): string[] {
   const errors: string[] = [];
@@ -123,7 +132,7 @@ export function buildAlmanac(ctx: AlmanacContext): Almanac {
 export function checkEntryNumber(id: string, checks: Check[] = CHECKS): number {
   const c = checks.find((x) => x.id === id);
   if (!c) throw new Error(`no check ${id}`);
-  const n = c.under_days ?? c.under_turns;
+  const n = c.under_days ?? c.under_months;
   if (n === undefined) throw new Error(`${id} has no number`);
   return n;
 }

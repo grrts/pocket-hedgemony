@@ -305,7 +305,8 @@ Newest decision first.
 - When a revolutionary regime seizes church land or ends the state faith (revolutions), then the religion events `revolution_and_the_church` and `separation_of_church_and_state` may follow (their requirements may read `revolutionary_regime`).
 - When diplomacy grants *Allow preachers*, then RELG marks the preacher's leave.
 
-## 9. Monthly turn
+## 9. Monthly step
+- A turn is one week (X-18); the yearly, New Year and monthly steps below run once, in the turn in which a new year or month begins.
 - Yearly (at the same time as traders and trade balance, province stats 17): pulls, hold, the 3 % move, small shares, hidden-believer timers, tithes, persecution flight (2 %), Inquisition flight (1 %), wave growth, preacher founding timers, Hussite merge check.
 - At New Year: pending faith-policy changes take effect.
 - Monthly: preacher travel (as envoys), expulsion progress (within 12 months).

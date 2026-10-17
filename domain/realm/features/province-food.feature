@@ -83,17 +83,26 @@ Feature: Food in the provinces
       | an enemy fleet blockades the coast    | lower     |
       | war at sea reaches the coast          | lower     |
 
-  @REALM-026 @open-question
-  Scenario Outline: The grain price follows harvests, war and trade
-    # OQ-REALM-1: the market mechanism after trade v2
-    Given the grain price on the market nearest "Troyes" is steady
+  @REALM-026 @REALM-157 @placeholder
+  Scenario Outline: The grain price is fixed
+    # config: grain_price_gold_per_food
+    Given the realm's grain price is 0.5 gold a food
     When <cause>
-    Then the grain price there <direction>
+    Then the grain price stays 0.5 gold a food
 
     Examples:
-      | cause                                     | direction |
-      | the harvests across the region are bad    | rises     |
-      | war closes the roads                      | rises     |
-      | a blockade closes the port                | rises     |
-      | the harvests are good                     | falls     |
-      | a trade route opens to the market         | falls     |
+      | cause                                     |
+      | the harvests across the region are bad    |
+      | war closes the roads                      |
+      | a blockade closes the port                |
+      | the harvests are good                     |
+      | a trade route opens to the province       |
+
+  @REALM-157 @placeholder
+  Scenario: Grain is sold to and bought from the treasury
+    # config: grain_price_gold_per_food
+    Given the country "France" has 300 gold
+    When it sells 100 food of surplus grain
+    Then the country "France" has 350 gold
+    When it buys 40 food of grain
+    Then the country "France" has 330 gold

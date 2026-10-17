@@ -6,10 +6,10 @@ Feature: Kinds of save and Continue
 
   @SAVE-001
   Scenario: A save is always a turn boundary
-    Given the campaign as "Castile" is at turn 577, May 1492
+    Given the campaign as "Castile" is at turn 2478, May 1492
     And the player has queued 3 orders
     When any save is written
-    Then the save holds the world at the start of turn 577 and the 3 queued orders
+    Then the save holds the world at the start of turn 2478 and the 3 queued orders
     And it holds nothing from halfway through a turn
 
   @SAVE-006
@@ -55,32 +55,33 @@ Feature: Kinds of save and Continue
     Given the autosave interval is "<interval>"
     And autosaves kept per campaign is <keep>
     And the campaign as "Castile" has <existing> autosaves
-    When a turn starts in <month>
+    When a turn starts on "<turn start>"
     Then <result>
 
     Examples:
-      | interval        | keep | existing | month    | result                                                       |
-      | every 12 turns  | 3    | 3        | January  | a new autosave marked "Auto" is written and the oldest is removed |
-      | every 12 turns  | 3    | 2        | March    | no autosave is written                                       |
-      | every turn      | 1    | 1        | March    | a new autosave marked "Auto" is written and the oldest is removed |
-      | every turn      | 5    | 2        | March    | a new autosave marked "Auto" is written and none is removed  |
-      | every 6 turns   | 3    | 1        | July     | a new autosave marked "Auto" is written and none is removed  |
-      | every 6 turns   | 3    | 1        | January  | a new autosave marked "Auto" is written and none is removed  |
-      | every 6 turns   | 3    | 1        | March    | no autosave is written                                       |
+      | interval        | keep | existing | turn start | result                                                            |
+      | every 12 months | 3    | 3        | 1449-12-29 | a new autosave marked "Auto" is written and the oldest is removed |
+      | every 12 months | 3    | 2        | 1450-03-01 | no autosave is written                                            |
+      | every month     | 1    | 1        | 1450-03-01 | a new autosave marked "Auto" is written and the oldest is removed |
+      | every month     | 5    | 2        | 1450-02-26 | a new autosave marked "Auto" is written and none is removed       |
+      | every month     | 3    | 1        | 1450-03-08 | no autosave is written                                            |
+      | every 6 months  | 3    | 1        | 1450-07-01 | a new autosave marked "Auto" is written and none is removed       |
+      | every 6 months  | 3    | 1        | 1449-12-29 | a new autosave marked "Auto" is written and none is removed       |
+      | every 6 months  | 3    | 1        | 1450-03-01 | no autosave is written                                            |
 
   @SAVE-015
   Scenario: Autosave defaults
     Given the player has never changed the autosave options
     When the autosave options are read
-    Then the interval is "every 12 turns (each January)"
+    Then the interval is "every 12 months (each January)"
     And autosaves kept per campaign is 3
-    And the offered intervals are "every turn, every 6 turns, every 12 turns (each January), off"
+    And the offered intervals are "every month, every 6 months, every 12 months (each January), off"
     And the offered counts are "1, 3, 5"
 
   @SAVE-016
   Scenario: Off stops autosaves but never the Resume save
     Given the autosave interval is "off"
-    When the player ends the turn in January
+    When the player ends the turn in which January begins
     Then no autosave is written
     And the Resume save is written
 

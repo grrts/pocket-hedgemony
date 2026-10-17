@@ -1,6 +1,8 @@
 import { expect } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
-import { createEngineHost, Rng } from "@ph/engine";
+import { createEngineHost, createWorld, Rng } from "@ph/engine";
+import * as T from "@ph/engine/domain/trade";
+import * as TIME from "@ph/engine/domain/time-and-turns";
 import * as S from "@ph/engine/domain/scenario-setup";
 import * as B from "@ph/engine/domain/buildings";
 import { FORM_IDS, type CatalogueRecord, type FormId } from "@ph/engine/domain/government";
@@ -754,4 +756,157 @@ When("the player taps Quick start", (s) => {
 Then("the Begin step shows {string} with the last options used", (s, realm: string) => {
   expect(s.quick).toEqual({ step: "begin", realm: realmId(realm), rules: s.last.options });
   expect(S.quickStart({ tapped: null, options: null }, ["ottomans"], DEFAULT_RULES).realm).toBe("ottomans");
+});
+
+// ---------------------------------------------------------------- decided rules (D-SETUP-1 … D-SETUP-17)
+
+When("it is matched to the catalogue", (s) => {
+  s.matched = S.catalogueIdOf(s.nation);
+});
+
+Then("it is the record {string}", (s, record: string) => {
+  if (record === "none") expect(s.matched).toBeNull();
+  else {
+    expect(s.matched).toBe(record);
+    expect(S.hasRecord(record)).toBe(true);
+  }
+});
+
+Given("the map's {int} nations", (s, n: number) => {
+  s.nations = loadDefaultRuleset().nations;
+  expect(s.nations).toHaveLength(n);
+});
+
+Then("every map nation is a realm with provinces, a capital, a colour and commanders", (s) => {
+  const provinces = loadDefaultRuleset().provinces;
+  for (const n of s.nations) {
+    const owned = provinces.filter((p) => p.owner === n.id).length;
+    expect(S.isRealm(owned)).toBe(true);
+    expect(n.capital).toBeTruthy();
+    expect(n.color).toBeTruthy();
+    expect(n.commanders.length).toBeGreaterThan(0);
+  }
+});
+
+Then("every map nation is playable", (s) => {
+  for (const n of s.nations) expect(S.realmState(n.id, true)).toBe("playable");
+});
+
+Then("{int} of them are catalogue ids and the other {int} go through the rename table", (s, same: number, other: number) => {
+  const ids: string[] = s.nations.map((n: { id: string }) => n.id);
+  expect(ids.filter((id) => S.hasRecord(id))).toHaveLength(same);
+  const renamed = ids.filter((id) => !S.hasRecord(id));
+  expect(renamed).toHaveLength(other);
+  for (const id of renamed) expect(S.catalogueIdOf(id) === null || S.hasRecord(S.catalogueIdOf(id)!)).toBe(true);
+});
+
+Given("a coastal province owned by no country", (s) => {
+  s.owner = null;
+});
+
+Given("a coastal province owned by the realm {string}", (s, realm: string) => {
+  s.owner = realmId(realm);
+});
+
+When("a colonial governor of {string} tries to found a colony there", (s, _who: string) => {
+  s.colony = S.colonisable(s.owner);
+});
+
+Then(/^the colony (can be founded on free tiles|can't be founded)$/, (s, result: string) => {
+  expect(s.colony).toBe(result.startsWith("can be"));
+});
+
+Given("the catalogue record {string} owns no map province", (s, id: string) => {
+  expect(S.hasRecord(id)).toBe(true);
+  s.owned = loadDefaultRuleset().provinces.filter((p) => p.owner === id).length;
+  expect(s.owned).toBe(0);
+});
+
+Then("it is reference data and not a realm", (s) => {
+  expect(S.isRealm(s.owned)).toBe(false);
+});
+
+Given("an assessment at {string}", (s, level: string) => {
+  s.level = level;
+});
+
+When("its factor is read", (s) => {
+  s.factor = S.levelFactor(s.level);
+});
+
+Then(/^the base start value is multiplied by ([\d.]+)$/, (s, text: string) => {
+  const f = Number(text);
+  expect(s.factor).toBe(f);
+  expect(S.startValue(100, s.level, "high", new Rng(1))).toBeCloseTo(100 * f);
+});
+
+Given("the config values {string} {int}, {string} {int} and {string} {float}", (s, _a: string, gold: number, _b: string, men: number, _c: string, horse: number) => {
+  const d = loadDefaultRuleset().defines;
+  expect([d.economy.startingTreasury, d.levies.menPerThousandPeople, d.march.startingHorseShare]).toEqual([gold, men, horse]);
+});
+
+When("a new campaign starts", (s) => {
+  s.world = createWorld(loadDefaultRuleset(), 1);
+});
+
+Then("every nation with no catalogue assessment has {int} gold", (s, gold: number) => {
+  const w = s.world;
+  for (const n of loadDefaultRuleset().nations) if (S.catalogueIdOf(n.id) === null) expect(w.nationTreasury[w.nationIndex.get(n.id)]).toBe(gold);
+});
+
+Then("its levies are {int} men per thousand people", (s, per: number) => {
+  const w = s.world;
+  const total = Array.from(w.nationMaxLevies as Float64Array).reduce((a, b) => a + b, 0);
+  let people = 0;
+  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] >= 0) people += w.provincePopulation[p];
+  expect(total).toBeCloseTo(people * per);
+});
+
+Then("its starting armies are one fifth horse", (s) => {
+  const a = s.world.armies;
+  for (let i = 0; i < a.count; i++) if (a.alive[i]) expect(a.horse[i]).toBe(Math.round(a.men[i] * 0.2));
+});
+
+Given("the record {string} has the assessment {string} at {string}", (s, id: string, dim: string, level: string) => {
+  const r = S.catalogueRecord(id);
+  expect(r.assessments[dim]!.level).toBe(level);
+  s.level = level;
+});
+
+Then("its starting {string} follows that level", (s, _stat: string) => {
+  expect(S.startValue(10, s.level, "high", new Rng(1))).toBeCloseTo(10 * S.levelFactor(s.level));
+});
+
+Given("the starting traders and their routes", (s) => {
+  s.campaign = TIME.newCampaign(loadDefaultRuleset(), 1444);
+  s.trade = T.createTradeWorld();
+  s.rngStart = Array.from(s.campaign.world.rng.state as Uint32Array);
+});
+
+Then("the traders are run for {int} months before the first turn", (s, months: number) => {
+  let ran = 0;
+  TIME.warmUp(s.campaign, months, (rng) => (ran += T.warmUp(s.trade, () => void rng.next(), 1)));
+  expect(ran).toBe(months);
+  expect(s.trade.month).toBeGreaterThanOrEqual(0);
+});
+
+Then("the trade ratios they leave are the starting ratios", (s) => {
+  expect(s.trade.provinces).toBeInstanceOf(Map);
+  expect(s.campaign.world.turn).toBe(0);
+});
+
+Then("the warm-up used the campaign's seed and left the date at 11 November 1444", (s) => {
+  expect(Array.from(s.campaign.world.rng.state as Uint32Array)).not.toEqual(s.rngStart);
+  expect(s.campaign.world.date).toMatchObject({ year: 1444, month: 11 });
+  expect(TIME.START_DAY).toBe(11);
+});
+
+Given("a catalogue risk tolerance of {string}", (s, level: string) => {
+  s.riskLevel = level;
+});
+When("the AI reads it", (s) => {
+  s.risk = S.riskTolerance(s.riskLevel);
+});
+Then("its risk tolerance is {string}", (s, read: string) => {
+  expect(s.risk).toBe(read);
 });

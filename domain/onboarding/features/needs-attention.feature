@@ -1,17 +1,18 @@
 @context-onboarding
 Feature: What needs attention
   As a player in a real campaign
-  I want one list of what needs me, with a way to go there
+  I want one list of what needs me, with a way to see it
   So that nothing important slips by without an advisor nagging me
 
-  # The screen flow's Attention screen has two groups and different wording (OQ-TUT-1).
-  @TUT-071 @TUT-072 @TUT-073 @open-question
-  Scenario: Entries are listed by kind, warnings first
+  @TUT-071 @TUT-072 @TUT-073
+  Scenario: Entries are listed in two groups, warnings first
     Given a real campaign as the country "Ottomans"
     And there is one opportunity, one new system and one warning to list
     When the player opens the Needs attention list
-    Then the warning comes first, then the opportunity, then the new entry
-    And each entry is one line with a Go there button
+    Then the screen is titled "Needs attention"
+    And the group "Warnings" holds the warning
+    And the group "Waiting for you" holds the opportunity, then the new entry
+    And each entry is one line with a Show button
     And no advisor face or voice appears
 
   @TUT-079 @placeholder
@@ -26,12 +27,12 @@ Feature: What needs attention
       | Murad's army has 12 days of food in reserve | warning | Murad's army has twelve days of food left. |
       | the lord "Turahan Bey" turns Wavering | warning | Turahan Bey grows cold toward you. He wants a war on the Morea. |
       | the soldiers have not been paid for two months | warning | Your soldiers have not been paid for two months. |
-      | gold will run out in under three turns at this rate | warning | At this pace the treasury is empty by June. |
+      | gold will run out in under three months at this rate | warning | At this pace the treasury is empty by June. |
       | 5000 farmers are levied with the harvest three weeks away | warning | Five thousand farmers are under arms with the harvest three weeks away. |
       | grievances in "Edirne" pass the rising threshold | warning | Talk of rising in Edirne. |
       | the royal province "Bursa" has no official | warning | Bursa pays half its taxes without an official. |
       | a neighbour's lord is disloyal and borders the realm | opportunity | A lord across the border may be won over. |
-      | grain sells high in "Venice" and the castle of "Edirne" has a surplus | opportunity | Grain sells high in Venice; Edirne has more than it can hold. |
+      | the castle of "Edirne" has more grain than it can hold | opportunity | Edirne has more than it can hold. |
 
   @TUT-007 @TUT-074
   Scenario Outline: Later systems are taught by New entries
@@ -47,9 +48,9 @@ Feature: What needs attention
       | a new age |
 
   @TUT-072
-  Scenario: Go there
+  Scenario: Show
     Given the warning "Talk of rising in Edirne." is listed
-    When the player presses Go there
+    When the player presses Show
     Then the camera moves to "Edirne"
 
   @TUT-075
@@ -70,6 +71,14 @@ Feature: What needs attention
       | a right-click |
       | {btn:info} |
 
+  @TUT-120
+  Scenario: Mute one item
+    Given the warning "Bursa pays half its taxes without an official." is listed
+    When the player picks "Mute this" on the entry
+    Then the warning leaves the list
+    And entries of the kind "no official" for other provinces are still listed
+    And the mute can be undone in Settings
+
   @TUT-077 @TUT-078
   Scenario: One checks file drives the list and the vizier
     Given the tutorial is running
@@ -80,7 +89,8 @@ Feature: What needs attention
   Scenario: End turn count and the turn report
     Given 3 warnings are on the list
     Then the End turn button shows the count 3
-    And the turn report links to the list instead of repeating it
+    And the turn report shows the line "Needs attention (3)" that opens the list
+    And the turn report does not repeat the warnings
 
   @TUT-082 @placeholder
   Scenario: A dismissed famine warning waits out its cooldown

@@ -31,9 +31,11 @@ Feature: Food on the road
     Then a stop at "Troyes" is added to the route
     And the army "A" waits 6 days there to refill
 
-  @MOVE-071 @open-question
-  # OQ-MOVE-6: the code refills only where the army stops at month end
+  @MOVE-071 @MOVE-112
+  # D-MOVE-6: own land refills the reserve at each weekly food step (X-3)
   Scenario: Refilling while passing through own provinces
-    Given the army "A" marches from "Paris" through "Troyes", both French, toward "Langres"
-    When the month is played
-    Then its reserve refills in "Paris" and "Troyes" as the warfare design says
+    Given the army "A" has 10 of its 30 days of reserve left in "Paris"
+    And the army "A" marches from "Paris" through "Troyes", both French, toward "Langres"
+    When the weekly turns of the month are played
+    Then on day 7 its reserve refills to 30 days in "Troyes" without stopping
+    And it arrives in "Langres" on day 14

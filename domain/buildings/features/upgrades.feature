@@ -4,8 +4,7 @@ Feature: Steps and upgrades
   I want to grow buildings step by step on the same place
   So that a market can become a fair and then a trading house
 
-  @BLD-003 @open-question
-  # OQ-BLD-4: the castle has five steps; what is the maximum step?
+  @BLD-003
   Scenario Outline: Steps a building can reach
     Given the buildings config of the design
     When the building rules are applied
@@ -17,6 +16,8 @@ Feature: Steps and upgrades
       | house of worship | 3   |
       | drill yard       | 2   |
       | castle           | 5   |
+      | road             | 5   |
+      | palace           | 3   |
 
   @BLD-047 @BLD-051 @placeholder
   Scenario Outline: Market steps
@@ -44,6 +45,7 @@ Feature: Steps and upgrades
       | missing                                          |
       | the province "Troyes" has no market charter      |
       | the province "Troyes" is a village               |
+      | the country "France" doesn't know "T6 Merchant fairs and exchanges" |
 
   @BLD-048
   Scenario Outline: Buildings keep working while upgraded
@@ -82,3 +84,17 @@ Feature: Steps and upgrades
       | doesn't know | W3 Bombards              | powder mill    | grey with needs  |
       | doesn't know | C16 railways             | rail station   | grey with needs  |
       | knows        | G14 Written constitution | parliament house | offered        |
+
+  @BLD-157 @placeholder
+  Scenario Outline: Road steps
+    Given the buildings config of the design
+    When the building rules are applied
+    Then road step <step> is the "<name>", needing "<unlock>" and <gold> gold
+
+    Examples:
+      | step | name       | unlock | gold |
+      | 1    | track      | start  | 20   |
+      | 2    | road       | B2     | 40   |
+      | 3    | paved road | B2     | 120  |
+      | 4    | turnpike   | B9     | 180  |
+      | 5    | railway    | C16    | 300  |

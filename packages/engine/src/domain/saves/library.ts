@@ -407,7 +407,7 @@ export function trySave(ctx: SaveContext, campaign: Campaign, world: World, kind
 
 // ---------------------------------------------------------------- autosaves
 
-/** The autosave interval as the settings offer it: 1, 6 or 12 turns, or off. */
+/** The autosave interval as the settings offer it: every 1, 6 or 12 months, or off (X-18: monthly at most). */
 export type AutosaveInterval = 1 | 6 | 12 | "off";
 
 export interface AutosaveOptions {
@@ -416,7 +416,7 @@ export interface AutosaveOptions {
 }
 
 export const AUTOSAVE_DEFAULTS: AutosaveOptions = {
-  interval: C.kinds.autosave.interval_turns as AutosaveInterval,
+  interval: C.kinds.autosave.interval_months as AutosaveInterval,
   keep: C.kinds.autosave.keep as 1 | 3 | 5,
 };
 
@@ -427,12 +427,15 @@ export function autosaveChoices(): { intervals: string[]; counts: number[] } {
 }
 
 /**
- * Whether the turn starting in `month` writes an autosave (SAVE-008, SAVE-100).
- * Every 12 turns means each January, every 6 turns January and July (D-SAVE-9).
- * Off and ironman never autosave.
+ * Whether a turn writes an autosave at its start (SAVE-008, SAVE-100):
+ * `monthBegins` is the month that begins in the turn, or null when none does
+ * (X-18: the rotating autosave stays monthly, so a turn that begins no month
+ * writes none). Every 12 months means each January, every 6 months January
+ * and July (D-SAVE-9). Off and ironman never autosave.
  */
-export function autosaveDue(interval: AutosaveInterval, month: number, ironman = false): boolean {
-  if (ironman || interval === "off") return false;
+export function autosaveDue(interval: AutosaveInterval, monthBegins: number | null, ironman = false): boolean {
+  if (ironman || interval === "off" || monthBegins === null) return false;
+  const month = monthBegins;
   if (interval === 1) return true;
   if (interval === 12) return month === C.kinds.autosave.every_12_month;
   return C.kinds.autosave.every_6_months.includes(month);

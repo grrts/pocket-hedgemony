@@ -89,7 +89,7 @@ Newest decision first.
 - INV-MAP-3: Every land province has exactly one ground, one of the 11.
 - INV-MAP-4: Neighbour lists are symmetric: if A lists B, B lists A.
 - INV-MAP-5: A province with a sea-zone neighbour is marked coastal. (78 provinces marked coastal have no
-  sea-zone neighbour, for example lake shores such as Tartu and Põlva: OQ-MAP-12.)
+  sea-zone neighbour, for example lake shores such as Tartu and Põlva: D-MAP-12.)
 - INV-MAP-6: The map is build data: nothing in it changes during a campaign and none of it is saved.
 
 **Place** (entity; identity: `p<n>` for land provinces, `sea<n>` for sea zones, all in `provinces.json`)
@@ -123,7 +123,7 @@ Newest decision first.
 - MAP-001 (Ubiquitous): The map shall be a grid of 5760 × 2144 pixels at 16 pixels per degree, from latitude 78° N to 56° S. [README; config.json `pxPerDeg`, `latTop`, `latBottom`; map.json]
 - MAP-002 (Ubiquitous): Land provinces shall be drawn from modern first-level admin regions, then merged or split until they are roughly even in size. [README]
 - MAP-003 (Ubiquitous): The target province size shall be set per part of the world, so Europe, India and China are denser than Siberia or the Sahara. [README; config.json `density`, `defaultTarget` 1100]
-- MAP-004 (Ubiquitous): Each province's name shall be the name of the modern admin region that covers most of it, plus a compass point when it was split. [mapgen.ts; README] (see OQ-MAP-6)
+- MAP-004 (Ubiquitous): Each province's name shall be the name of the modern admin region that covers most of it, plus a compass point when it was split. [mapgen.ts; README] (D-MAP-6)
 - MAP-005 (Ubiquitous): Large lakes shall be punched out of the land, and connected pieces of an admin region (exclaves, islands) shall become their own pieces. [mapgen.ts; config.json `lakeMaxScalerank`, `minIslandSize`]
 - MAP-006 (Ubiquitous): The map shall have about 4,400 land provinces and about 4,700 sea zones (9,158 places in the current build). [province-stats §17; README; provinces.json; save-system §3.4]
 - MAP-007 (Ubiquitous): Each land province shall carry: id, name, centre, size, ground, coastal, river and its neighbours. [provinces.json; province-stats §16]
@@ -136,7 +136,7 @@ Newest decision first.
 - MAP-011 (Ubiquitous): Sea zones shall take real sea names from Natural Earth's marine areas. [README]
 - MAP-012 (Ubiquitous): Sea zones shall come after the land provinces in `provinces.json`, with terrain `sea` (coastal) or `ocean` (open ocean). [README]
 - MAP-013 (Ubiquitous): The map shall join seas that the pixel grid closes through a config list of straits: Bosporus, Dardanelles, Kerch Strait, Øresund, Great Belt, Strait of Gibraltar, Strait of Messina, Strait of Hormuz, Bab-el-Mandeb, Strait of Malacca, Garabogaz strait, Strait of Maracaibo. [README; config.json `straits`]
-- MAP-014 (Ubiquitous): The map shall provide a config list of strait crossings: land neighbours across a narrow strait (Bosporus, Øresund, Messina, Kerch, Gibraltar …). [troop-movement §4.4] (see OQ-MAP-3)
+- MAP-014 (Ubiquitous): The map shall provide a config list of strait crossings: land neighbours across a narrow strait (Bosporus, Øresund, Messina, Kerch, Gibraltar …). [troop-movement §4.4] (D-MAP-3)
 - MAP-015 (Unwanted): If a mover is an army, then the map shall give it no way into a sea zone except aboard ships. [README; troop-movement §4.4, §11.2]
 
 ### 5.3 Terrain
@@ -153,7 +153,7 @@ Newest decision first.
 - MAP-025 (Ubiquitous): The simulation shall use one ground per province: the most common terrain under it by the rule above. [README; province-stats §3]
 - MAP-026 (Ubiquitous): Ocean depth shall be stored per water pixel in five bands from Natural Earth bathymetry: under 200 m, 1 km, 3 km, 5 km, deeper. [README]
 - MAP-027 (Ubiquitous): Each tile type shall suggest starting tile uses for the province design (for example farmland → fields; steppe → pasture; badlands → waste with mines). [terrain.md "Starting tiles"]
-- MAP-028 (Ubiquitous): The terrain proposals adopted by troop movement shall hold as map facts: snow peaks close passes in winter; dunes need camels for guns and give no foraging; glacier is impassable; paddies are slower in the wet season. [troop-movement §4.2–4.4, §15] (see OQ-MAP-1, OQ-MAP-2)
+- MAP-028 (Ubiquitous): The terrain proposals adopted by troop movement shall hold as map facts: snow peaks close passes in winter; dunes need camels for guns and give no foraging; glacier is impassable; paddies are slower in the wet season. [troop-movement §4.2–4.4, §15] (D-MAP-1, D-MAP-2)
 
 ### 5.4 Rivers
 
@@ -166,7 +166,7 @@ Newest decision first.
 
 - MAP-033 (Ubiquitous): The map shall provide a config list of passes: mountain provinces with a historic road through them (the Great St Bernard, the Khyber, the Brenner, the Pyrenees at Roncesvalles …). [troop-movement §4.2]
 - MAP-034 (Ubiquitous): Each province shall have one road step for the whole province (track, road, paved road, turnpike, railway), read by movement and trade. [province-stats §9; warfare §5.2]
-- MAP-035 (Ubiquitous): Each province shall record whether a navigable river runs through it. [province-stats §9] (see OQ-MAP-4)
+- MAP-035 (Ubiquitous): Each province shall record whether a navigable river runs through it: a great river with 3 or more pixels there, which is also troop movement's great river. [province-stats §9] (D-MAP-4)
 
 ### 5.6 The graph
 
@@ -177,7 +177,7 @@ Newest decision first.
 ### 5.7 Regions
 
 - MAP-039 (Ubiquitous): The map shall use the event tree's 13 macro-regions (Europe, Middle East, North Africa, Sub-Saharan Africa, South Asia, Central and North Asia, East Asia, Southeast Asia, Oceania, North America, Mesoamerica and Central America, the Caribbean, South America) with their sub-regions and areas. [geography.yaml]
-- MAP-040 (Ubiquitous): The map shall resolve each event-tree anchor province (Constantinople, Potosí, Malacca …) to one province of the map. [geography.yaml; province-stats §16] (see OQ-MAP-5)
+- MAP-040 (Ubiquitous): The map shall resolve each event-tree anchor province (Constantinople, Potosí, Malacca …) to one province of the map. [geography.yaml; province-stats §16] (D-MAP-5)
 
 ### 5.8 Versions and data
 
@@ -185,6 +185,11 @@ Newest decision first.
 - MAP-042 (Event-driven): When the map generator splits or merges provinces, it shall write a rename table (`old id → new ids, with shares`) shipped with the map. [save-system §4.4]
 - MAP-043 (Ubiquitous): Each built map shall have a `mapHash` that saves record. [save-system §4.2, §4.4]
 - MAP-044 (Ubiquitous): The map shall credit its sources: Natural Earth (public domain), the Köppen-Geiger climate maps of Beck et al. 2018 (CC BY 4.0, attribution required), and the WWF terrestrial ecoregions of Olson et al. 2001. [README; terrain.md; gap-lists List 2 item 15]
+- MAP-046 (Ubiquitous): Each land province shall record its tile type: the most common tile type among its pixels that play as its ground. [D-MAP-1]
+- MAP-047 (Ubiquitous): A lake shore shall count as coast for shore tiles without giving a sea-zone neighbour, and a large lake the build made a sea zone shall be a water place fleets enter. [D-MAP-12]
+- MAP-048 (Ubiquitous): Terrain proposals troop movement did not adopt shall change nothing in the game. [D-MAP-2]
+- MAP-049 (State-driven): While the month is December to March, the northern sea zones that froze historically (the Gulf of Bothnia, the White Sea and the far north: Arctic Ocean, Kara, Laptev, East Siberian, Chukchi and Beaufort Seas, the North Western Passages, Foxe Basin and Hudson Bay) shall be closed to fleets, and a port whose every sea zone is frozen can neither launch nor take in ships. [X-17] @placeholder
+- MAP-050 (State-driven): While the month is December to March, a river at latitude 55° or more shall be frozen and crossed like a bridge, with no river penalty. [X-17] @placeholder
 - MAP-045 (Ubiquitous): The terrain image shall hold terrain per pixel in its red channel and ocean depth in its green channel (0 on land, else depth band + 1), with river size and links where a river runs. [README; mapgen.ts]
 
 ## 6. Commands
@@ -229,20 +234,22 @@ coastal, passes, strait crossings).
 | tile count range | Tiles per province by size | 4 to 16 | Yes (config) | province config |
 | great river ranks | Scale ranks counting as great | 0 to 4 | No | mapgen |
 | river province threshold | River pixels to mark a province | 3 | No | mapgen |
-| strait crossings, passes, fords | Geographic lists | named examples only | Yes (lists to fill) | troop-movement `march` config |
+| strait crossings, passes, fords, anchors | Geographic lists resolved to provinces | as D-MAP-3, D-MAP-5 | No | `world-map.json` `geoLists` |
+| `navigableRiverPixels` | Great-river pixels for a navigable river | 3 | Yes | `world-map.json` |
+| `provinceFacts` | Size, tile type, great-river pixels per province | from the built images | No | `world-map.json` |
 
 ## 11. Seams
 
 | Other context | Direction | Pattern | What crosses |
 |---|---|---|---|
 | province | downstream | Published Language | Ground, size (tile count), coastal and river (shore tiles), road step |
-| troop-movement | downstream | Open Host Service | The graph; ground; river and great-river flags; passes, fords, strait crossings |
+| troop-movement | downstream | Open Host Service | The graph; ground; tile type per province; river and great-river (= navigable) flags; passes, fords, strait crossings resolved to provinces |
 | naval | downstream | Open Host Service | Sea zones and their kind (`sea`/`ocean`); coasts; straits |
 | trade | downstream | Open Host Service | Graph, roads, rivers, sea zones for routes |
 | warfare | downstream | Published Language | Ground for battles; roads; rivers |
 | exploration | downstream | Customer–Supplier | Graph steps for the charted start; coastal provinces |
 | scenario-setup | downstream | Customer–Supplier | Places to own; size, terrain and coast for 1444 population and wealth; rebuild with splits |
-| events | upstream | Shared Kernel | Region ids, areas, anchor provinces |
+| events | upstream | Shared Kernel | Region ids, areas; world-map resolves anchor provinces to map provinces |
 | map-presentation | downstream | Published Language | Id image, terrain image, depth, rivers |
 | saves | downstream | Customer–Supplier | `mapHash`, rename table; map data never saved |
 | buildings | downstream | Conformist | Ground (build cost), shore tiles, anchors for fixed mines and markets |
@@ -251,49 +258,20 @@ coastal, passes, strait crossings).
 
 The map has no AI. AI movers plan on the same graph as the player (troop-movement §11.2; naval §11).
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- **OQ-MAP-1 Tile type versus ground per province.** A province stores only its ground (11 values). Troop
-  movement adopts effects that need the *tile type* (snow peaks, dunes, glacier, paddies), but glacier
-  plays as tundra, dunes as desert, snowpeaks as mountains and paddies as farmland ground, and nothing in the
-  province data says which provinces are glacier, dunes, snowpeaks or paddies. Does the map store a
-  dominant tile type (or shares) per province? Blocks troop-movement §4.2–4.4.
-- **OQ-MAP-2 Terrain proposals still undecided.** The gap list asks for a yes or no on every proposal.
-  Troop-movement adopted snow passes, dunes, glacier and wet-season paddies (movement parts). Still open:
-  broadleaf half crossing penalty and better clearing; mediterranean wares, drought and horse bonus; pine
-  forest furs, timber and winter attrition; steppe +10 % horse and −25 % fields; colddesert cold sickness;
-  swamp high sickness; badlands mines +25 % and heat sickness; highlands ambush and low sickness; snowpeaks
-  doubled cold sickness; glacier unsettleable; paddies horse −25 %.
-- **OQ-MAP-3 Strait crossings are not in the data.** The map's `straits` join *seas*; troop movement needs a
-  list of *land neighbours* across straits, and Messina, Kerch and Gibraltar are named in both with different
-  meanings. Who builds the land list, and are the two lists one?
-- **OQ-MAP-4 Navigable river against river province.** Province stats 9 has "whether a navigable river runs
-  through (shown as shore tiles)", with canals adding one. The map marks any province with three river
-  pixels of any Natural Earth rank (to 8). Which rivers are navigable, and does every river province get a
-  shore tile?
-- **OQ-MAP-5 Great river per province and regions per province.** Troop movement charges twice the river
-  days for a great river, but the province data only has `river: true`. The event tree's regions, areas
-  and anchors are ids with no province membership in the map data. Who assigns provinces to regions,
-  areas and anchors?
-- **OQ-MAP-6 Province names.** Province names are modern region names (gap item 25). Historical names are
-  part of the catalogue-to-map plan; no design gives them.
-- **OQ-MAP-7 Map too coarse in places.** Several ports fall in one province (Lübeck, Hamburg, Kiel and
-  Flensburg in *Schleswig-Holstein*; Lisbon and Setúbal in *Setúbal*; Genoa, Savona and La Spezia in
-  *Genova*), and Melos and Malé are not land (`minIslandSize` 10). Splits wait on gap item 25.
-- **OQ-MAP-8 Hills and mountains thresholds.** The 25 % / 50 % rule gives 443 hill and 610 mountain
-  provinces (against 12 and 687 by majority). The province design is silent on how many hill provinces it
-  expects; the thresholds are a map choice not reviewed by the province thread.
-- **OQ-MAP-9 Mediterranean and steppe as grassland.** terrain.md notes the grassland numbers fit steppe but
-  fit Mediterranean land less well (drier, olives and vines). Should mediterranean get its own ground or
-  only its proposal?
-- **OQ-MAP-10 River crossing rule source.** terrain.md says "a day to cross … until bridges exist" (warfare
-  5.2); troop movement scales river days with army size and doubles them for great rivers. The map only
-  needs to supply the flags; the movement rule is troop-movement's (latest wins).
-- **OQ-MAP-12 Coastal without sea.** 78 provinces are marked coastal but have no sea-zone neighbour (lake
-  shores such as Tartu, Põlva and West Pskov on Lake Peipus; Antwerp; parts of Alaska and Canada). Do lake
-  coasts give shore tiles and ports, and are large lakes places a fleet can enter?
-- **OQ-MAP-11 Province count growth.** Save-system §3.4 expects the world to grow to hold 963 catalogue
-  records. Is the map going to be re-cut, and does the province count stay near 4,400?
+- **D-MAP-1** (was OQ-MAP-1) Tile type per province: the map stores one tile type per land province, the most common tile type among its pixels that play as its ground, counted from the built images into `world-map.json` `provinceFacts`. One stored fact gives troop movement the tile types it needs without a share table.
+- **D-MAP-2** (was OQ-MAP-2) Terrain proposals: only the four troop movement adopted hold (snow passes, dunes, glacier, wet-season paddies); every other proposal (broadleaf, mediterranean, pine forest, steppe, colddesert, swamp, badlands, highlands, snowpeaks cold sickness, glacier unsettleable, paddies horse) is dropped. No new mechanics.
+- **D-MAP-3** (was OQ-MAP-3) Strait crossings: world-map keeps a land list of strait crossings apart from the sea straits, each joining two land provinces: Bosporus Istanbul–Sakarya (Istanbul holds both shores), Øresund West Hovedstaden–Skåne, Messina Catania–Reggio Calabria, Kerch Crimea–West Krasnodar, Gibraltar Cádiz–Tanger-Tétouan. The two lists mean different things (fleets against armies), so they stay two lists with shared names.
+- **D-MAP-4** (was OQ-MAP-4) Navigable river: a navigable river is a great river (Natural Earth ranks 0–4) with 3 or more pixels in the province (provisional `navigableRiverPixels`); only coasts, lake shores and navigable rivers give shore tiles, not every river province. It reuses the great-river size the map already traces.
+- **D-MAP-5** (was OQ-MAP-5) Great river and regions: the great-river flag is the navigable-river flag of D-MAP-4; world-map owns region membership and resolves the event tree's 25 anchors to map provinces in its data, and areas get member provinces when an event needs them. One owner, one flag.
+- **D-MAP-6** (was OQ-MAP-6) Province names: provinces keep their modern admin region names, with a compass point when split; no historical names are added. No design gives them.
+- **D-MAP-7** (was OQ-MAP-7) Coarse places: the map is not re-cut now; ports that share a province share it, and Melos and Malé stay off the map; any later split goes through the rename table. Simplest, and X-13 needs no new provinces.
+- **D-MAP-8** (was OQ-MAP-8) Hills and mountains thresholds: the 25 % / 50 % rule stays. It is the only rule the designs give.
+- **D-MAP-9** (was OQ-MAP-9) Mediterranean and steppe: both keep playing as grassland, with no ground of their own. Their proposals are dropped (D-MAP-2).
+- **D-MAP-10** (was OQ-MAP-10) River crossing rule: troop movement's rule governs; the map supplies only the river and great-river flags. The latest design wins.
+- **D-MAP-11** (was OQ-MAP-11) Province count: the map stays at 4,411 land provinces; catalogue records that own no map province are reference data, not realms. X-13 settles it.
+- **D-MAP-12** (was OQ-MAP-12) Coastal without sea: a lake shore counts as coast for shore tiles, but a harbour needs a sea-zone neighbour; the large lakes the build made sea zones (Ladoga, the Great Lakes …) are water places fleets enter, and other lakes are not. It follows the data as built.
 
 ## 14. Traceability
 
@@ -346,3 +324,13 @@ The map has no AI. AI movers plan on the same graph as the player (troop-movemen
 | MAP-044 | map-versions.feature | The map credits its data sources |
 | MAP-045 | terrain.feature | Ocean depth is stored in five bands |
 | MAP-045 | terrain.feature | Land pixels carry terrain in red and no depth |
+| MAP-014 | sea-zones-and-straits.feature | Where one province holds both shores, the crossing joins it to the far shore |
+| MAP-035 | rivers-passes-roads.feature | A navigable river is a great river for movement |
+| MAP-040 | graph-and-regions.feature | Every anchor of the event tree is on the map |
+| MAP-046 | grid-and-provinces.feature | A province records its tile type |
+| MAP-047 | grid-and-provinces.feature | A lake shore counts as water for shore tiles but has no sea zone |
+| MAP-047 | sea-zones-and-straits.feature | A large lake the map made a sea zone is a water place for fleets |
+| MAP-048 | terrain.feature | Terrain proposals troop movement did not adopt are dropped |
+| MAP-049 | sea-zones-and-straits.feature | Northern seas freeze from December to March |
+| MAP-049 | sea-zones-and-straits.feature | A port on frozen water launches no ships |
+| MAP-050 | rivers-passes-roads.feature | Northern rivers freeze and are crossed like a bridge |

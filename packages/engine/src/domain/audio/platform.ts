@@ -184,9 +184,17 @@ export interface AppAudio {
 
 export const newAppAudio = (): AppAudio => ({ context: "running", away: [] });
 
-/** Background suspends the AudioContext (AUD-109). */
-export function toBackground(a: AppAudio): void {
+/** Background suspends the AudioContext, except on desktop with "play in background" on (default off) (AUD-109, D-AUD-9). */
+export function toBackground(a: AppAudio, o: { platform?: string; playInBackground?: boolean } = {}): void {
+  const desktop = !!o.platform && o.platform !== "web" && config.platform.desktop_platforms.includes(o.platform);
+  if (desktop && (o.playInBackground ?? config.platform.play_in_background.default)) return;
   a.context = "suspended";
+}
+
+/** iOS uses the native ambient session: it respects the silent switch and mixes with other apps; effects share it (AUD-111, D-AUD-9). */
+export function iosSession(): { category: string; respectsSilentSwitch: boolean; mixWithOtherApps: boolean; effectsFollowMusic: true } {
+  const s = config.platform.ios_session;
+  return { category: s.category, respectsSilentSwitch: s.respects_silent_switch, mixWithOtherApps: s.mix_with_other_apps, effectsFollowMusic: true };
 }
 
 /** A notification while away is kept and plays no sound on return (AUD-110). */

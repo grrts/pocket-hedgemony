@@ -15,7 +15,7 @@ Settings let you shape how Pocket Hegemony looks, sounds and handles on your dev
 
 ### Where Settings opens
 
-The title screen has a way to open Settings. In a campaign, the pause menu opens Settings over the dimmed map and also holds Campaign rules, a read-only list of the rules the campaign started with. `Esc` or the Menu button opens the pause menu. On Steam, the Controller section has a button that opens Steam's own binding panel.
+Settings opens as an overlay, from the cog on the title screen and from More. In a campaign, the game menu opens Settings over the dimmed map; Settings holds Campaign rules as a read-only section listing the rules the campaign started with. There is no separate pause menu. `Esc` or the Menu button opens the game menu. On Steam, the Controller section has a button that opens Steam's own binding panel.
 
 There is no settings wizard. On first launch, only these questions appear, and only when needed, each on one screen: the language (only when the system language is not supported); crash reports and usage statistics (when the privacy design requires consent); and "Is this text easy to read?" with Smaller, Fine and Bigger (Big screen profile only).
 
@@ -25,7 +25,7 @@ In a landscape window (on every device) the section list is on the left, the sec
 
 The nine sections, in order: Gameplay, Graphics, Audio, Controls, Accessibility, Language, Account and cloud saves, Privacy, About.
 
-Each row shows its name, its current value, and a small "changed" dot when the value differs from the profile default. Long-press, right-click or X on a row resets it to its profile default. Each section ends with Reset this section, and About has Reset all settings.
+Each row shows its name, its current value, and a small "changed" dot when the value differs from the profile default. A long press on a row only explains it; right-click or X on a row resets it to its profile default. Each section ends with Reset this section, and About has Reset all settings.
 
 With a controller: LB and RB switch sections, the d-pad moves between rows, A changes or opens, d-pad left and right step a value, B goes back, X resets the row, and Y shows the long description.
 
@@ -74,15 +74,15 @@ The files are kept in the app's user data folder on desktop and Steam, in the mo
 
 ### Campaign rules
 
-These are chosen on the new game screen, saved in the campaign, and shown read-only under Pause → Campaign rules:
+These are chosen on the new game screen, saved in the campaign, and shown read-only in Settings, under Campaign rules:
 
 - difficulty;
-- AI aggression;
+- AI temper;
 - fog of war;
 - historical or free events;
 - ironman (achievements only count in ironman);
 - the campaign end date (default 31 August 1939);
-- whether music eras follow the calendar or technology, if that stays a choice.
+- whether music eras follow the calendar or technology.
 
 The lens menu's "Parchment over unknown lands" stays a display switch, because it only hides unknown lands visually. It would become a campaign rule only if fog ever hid information the computer uses.
 
@@ -103,7 +103,7 @@ The lens menu's "Parchment over unknown lands" stays a display switch, because i
 | Screen margins (desktop, Steam) | 0 to 10 % in 1 % steps | 0 (Big screen 5 %) | A calibration screen of four corner marks pulled in with the stick |
 | Show performance line | Off, FPS, Full diagnostics | Off | The existing diagnostics line moves here |
 
-**Battery saver.** On sets a 30 fps cap, Battery sharpness, reduced animations, map redraws only on change, and a smaller worker budget for the computer players' turn. Auto turns it on when the device reports battery saving (iOS Low Power Mode, Android Battery Saver, or a Steam Deck on battery under 20 %).
+**Battery saver.** On sets a 30 fps cap, Battery sharpness, reduced animations, map redraws only on change, and fewer music voices. It never touches the computer players: their turn has the same budget on every device. Auto turns it on when the device reports battery saving (iOS Low Power Mode, Android Battery Saver, or a Steam Deck on battery under 20 %).
 
 **The four performance knobs** are Sharpness, Frame rate cap, Map detail and Animations. Battery saver moves them all at once.
 
@@ -145,10 +145,10 @@ Some switches appear in two sections but are one setting, so changing one change
 
 | Setting | Options | Default |
 |---|---|---|
-| Autosave | Every turn, Every 6 turns, Every 12 turns (each January), Off | Every 12 turns |
+| Autosave | Every month, Every 6 months, Every 12 months (each January), Off | Every 12 months |
 | Autosaves kept per campaign | 1, 3, 5 | 3 |
 | Confirm End turn | Off, When the Attention screen has lines, Always | Off |
-| Battle playback speed | 1×, 2×, 4× (one bell takes 1 to 2 s at 1×) | 1× |
+| Battle playback speed | 1×, 2×, 4× (one 4-hour battle step takes half a second at 1×) | 1× |
 | Open the turn report | Every turn, When something important happened, Never | When something important happened |
 | Jump to events (the camera glides to the event's province) | On, Off | On |
 | Tooltips (hover after the delay, long press, or Y on a controller) | On, Off | On |
@@ -159,7 +159,7 @@ Some switches appear in two sections but are one setting, so changing one change
 | Place names | Historical, Modern | Historical |
 | Date format | 16 October 1444, 16 Oct 1444, 16.10.1444, 1444-10-16 | follows the language |
 
-Autosave Off stops only the rotating autosaves, never the Resume save (see [Saving](Saving)). In an ironman campaign both autosave rows are hidden. When Confirm End turn asks, the question names the count ("3 warnings, 2 events wait for you · Look · End turn anyway"). Every one of your battles stopping the turn is not a setting. There is no advisor row; muting a kind of warning happens on the Attention screen. Historical place names change with date and owner (Constantinople becomes Istanbul in Ottoman hands); until a historical name list exists both options show today's region names.
+Autosave Off stops only the rotating autosaves, never the Resume save (see [Saving](Saving)). In an ironman campaign both autosave rows are hidden. When Confirm End turn asks, the question names the count ("3 warnings, 2 events wait for you · Look · End turn anyway"). Your battles never stop the turn and can't be skipped; they slow the week to 4-hour steps while they run, and that is not a setting. Turns are weeks, so the autosave goes by the calendar, never more than once a month. When events are still unanswered, End turn opens the first one instead of asking. There is no advisor row; muting a kind of warning happens on the Attention screen. Historical place names change with date and owner (Constantinople becomes Istanbul in Ottoman hands); no historical name list is planned, so both options show today's region names.
 
 ### Controls
 
@@ -167,7 +167,7 @@ Autosave Off stops only the rotating autosaves, never the Resume save (see [Savi
 
 | Setting | Options | Default |
 |---|---|---|
-| Main hand (Left mirrors the action bar and End turn to the left) | Right, Left | Right |
+| Main hand (Left moves the action bar and End turn to the left and the game menu button to the right) | Right, Left | Right |
 | Long-press time | Short 0.3 s, Medium 0.5 s, Long 0.8 s | Medium |
 | Double-tap to zoom | On, Off | On |
 | Pan and zoom speed | Slow, Medium, Fast | Medium |
@@ -181,7 +181,7 @@ Autosave Off stops only the rotating autosaves, never the Resume save (see [Savi
 | Edge scrolling | On, Off, On in fullscreen | per profile |
 | Pan speed for keys and edge | Slow, Medium, Fast | Medium |
 
-With Right-click on, left-click selects an army and right-click on a province marches it; with it off, you use the touch flow (tap army, tap province, confirm). The touch flow always works too. Any action can be rebound, with two keys per action; a conflict asks "Also bound to X, swap?".
+With Right-click on, left-click selects an army and right-click on a province marches it; with it off, you use the touch flow (tap army, tap province; there is no confirm step). The touch flow always works too. Any action can be rebound, with two keys per action; a conflict asks "Also bound to X, swap?".
 
 Default keys:
 
@@ -190,7 +190,7 @@ Default keys:
 | Pan | W A S D or the arrow keys |
 | Zoom | wheel, `+` / `−`, `Q` / `E` |
 | End turn | `Enter` (hold 0.5 s, or press twice when Hold actions is off) |
-| Pause menu | `Esc` |
+| Game menu | `Esc` |
 | Map lenses (realms, terrain, people, wealth, walls, food) | `1` to `6`, `Tab` cycles |
 | Next / previous army | `.` / `,` |
 | Next notification | `N` |
@@ -221,15 +221,15 @@ Default controller layout (Xbox names):
 | Left stick | map cursor | move focus | |
 | Right stick | pan | scroll | pan |
 | LT / RT | zoom out / in | previous / next page | slower / faster |
-| A | select | confirm | pause / play |
-| B | deselect, back | back | skip to result |
-| X | action menu | reset row | replay last bell |
+| A | select | confirm | change standing orders |
+| B | deselect, back | back | leave the battle view |
+| X | action menu | reset row | order a retreat |
 | Y | info card | long description | commander's line |
-| LB / RB | previous / next army | previous / next tab | |
+| LB / RB | previous / next army | previous / next tab | previous / next running battle |
 | D-pad up / down | cycle lenses | move focus | |
 | D-pad left / right | previous / next notification | step a value | |
-| View | turn report; hold 1 s for End turn | | |
-| Menu | pause menu | close the panel | leave battle view |
+| View | turn report; hold 0.5 s for End turn | | |
+| Menu | game menu | close the panel | game menu |
 | Left stick click | jump to capital | | |
 | Right stick click | recentre on the selection | | |
 
@@ -251,7 +251,7 @@ The official Steam Input configuration for the Steam Controller and Steam Deck a
 | Hold actions | On, Off | On |
 | Screen reader support | Follow system | |
 
-- **Colour vision** swaps nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable for that vision type, and each lens's colour ramp to a safe one (blue to orange instead of red to green). No colour uses greys with patterns.
+- **Colour vision** swaps nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable for that vision type, and each lens's colour ramp to a safe one (blue to orange instead of red to green). No colour uses greys with patterns. Every mode keeps the map's season colours (snow, spring green, autumn gold, the wet season) apart: the colour-blind modes shift them with the safe ramp and No colour uses tile patterns. Seasons cannot be switched off.
 - **Patterns on lenses** adds hatching, dots and stripes by band, so a lens reads without colour.
 - **High contrast borders** draw nation borders in black and white ink two art pixels wide.
 - **Text size**: panels reflow and cards grow taller, not smaller.
@@ -281,7 +281,7 @@ When a setting drives others (Battery saver, Reduced motion, Colour vision "No c
 - **Steam Deck:** body text about 19 px at 112 % (17 px at 100 %) at 1280 × 800; starts fullscreen with Deck glyphs; Settings needs no mouse or keyboard anywhere; naming a save calls Steam's floating gamepad keyboard.
 - **Big screen:** 175 % scale and Large text (the same physical size at 4K), a slow cursor, a 5 % margin with the calibration screen, focus outlines always on.
 - **Safe areas** (notch, home bar, camera hole) are always respected; this is not a setting.
-- **Android:** the back gesture behaves like B or `Esc`: it closes the top panel, then opens the pause menu, and never quits the game from the map without asking.
+- **Android:** the back gesture behaves like B or `Esc`: it closes the top panel, then opens the game menu, and never quits the game from the map without asking.
 - **iOS:** the silent switch and "Let other apps' audio play" use the native ambient audio session.
 
 ### The settings file format
@@ -297,7 +297,7 @@ Each entry in `settings.yaml` carries an `id` (`section.name`, also the key in t
 
 ## What you see
 
-The Settings screen with its nine sections, the changed dot, per-row and per-section reset, the "Keep this display?" question, the calibration screen, "Set by …" on driven rows, and the read-only Campaign rules list in the pause menu.
+The Settings screen with its nine sections, the changed dot, per-row and per-section reset, the "Keep this display?" question, the calibration screen, "Set by …" on driven rows, and the read-only Campaign rules section.
 
 ## How it connects
 
@@ -308,7 +308,7 @@ The Settings screen with its nine sections, the changed dot, per-row and per-sec
 - [Tutorial and help](Tutorial-and-Help): tutorial hints and their reset, tooltips and their delay, detailed tooltips.
 - [Achievements](Achievements): the toast switch; achievements only count in ironman.
 - [The 1444 start](The-1444-Start): the campaign rules shown read-only.
-- [How a turn works](Time-and-Turns): Battery saver's smaller worker budget and Keep screen awake during the computer players' turn.
+- [How a turn works](Time-and-Turns): Keep screen awake during the computer players' turn.
 - [Warfare](Warfare): battle playback speed and battle view controls.
 - [Historical events](Historical-Events): Jump to events.
 
@@ -333,7 +333,7 @@ From `settings.yaml`. These are settled values, not placeholders, unless noted.
 | `controls.long_press` | 0.3 / 0.5 / 0.8 s |
 | `controls.keys.end_turn` | Enter, hold 0.5 s |
 | `controls.deadzone` | 5 to 30 %, default 12 |
-| `controls.pad.map.end_turn.hold_seconds` | 1.0 |
+| `controls.pad.map.end_turn.hold_seconds` | 0.5 |
 | `accessibility.text_size.body_px` | 17 / 20 / 24 |
 | `accessibility.touch_targets.points` | 44 / 56 |
 | Interface sounds level (sound effects config) | about 6 dB under the music |
@@ -341,28 +341,10 @@ From `settings.yaml`. These are settled values, not placeholders, unless noted.
 
 ## Still open
 
-- **OQ-SET-1:** Battery saver's smaller worker budget for the computer's turn must only change speed, never results.
-- **OQ-SET-2:** settings says unanswered events can be passed after a question; the screen flow says they block End turn.
-- **OQ-SET-3:** the controller End turn hold is 1 s here and 0.5 s in the screen flow, and the "next" button has no place in this layout.
-- **OQ-SET-4:** the zoom keys `Q` and `E` are the other way round in the table and in the yaml.
-- **OQ-SET-5:** three Steam Input action sets here, six action sets in the screen flow.
-- **OQ-SET-6:** a few platform marks differ between the table and the yaml.
-- **OQ-SET-7:** long press resets a row here, but the screen flow says long press only explains.
-- **OQ-SET-8:** the touch march order has a confirm step here and none in the screen flow.
-- **OQ-SET-9:** the first-launch questions differ between settings, the screen flow and the tutorial.
-- **OQ-SET-10:** Settings from the title as a full screen or an overlay.
-- **OQ-SET-11:** Campaign rules in the pause menu is not in the screen flow's game menu.
-- **OQ-SET-12:** "AI aggression" against "AI temper", the music-era rule, and what the save header stores.
-- **OQ-SET-13:** saves has not yet taken in personal settings sync, which needs per-setting timestamps.
-- **OQ-SET-14:** the Phone profile threshold (600 px) and the Short wide shape (500 px) differ, and "TV-class display" is not defined.
-- **OQ-SET-15:** which way the 360 × 640 box for Auto scale is measured on landscape phones.
-- **OQ-SET-16:** whether Main hand Left moves the game menu button too.
-- **OQ-SET-17:** historical place names need a name list that does not exist yet.
-- **OQ-SET-18:** privacy, store, turn report, input, accessibility and localisation designs are referenced but not written.
-- **OQ-SET-19:** which store holds hint switches, mutes and the "Reset tutorial and hints" state.
+- Privacy and consent rows, the store screens and Restore purchases, and the Big screen and Steam Deck text sizes need a store and Valve Steamworks check before release.
 
 ## For developers
 
-- Spec: [`domain/settings/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/settings/spec.md), requirement code **SET** (SET-001 to SET-129).
+- Spec: [`domain/settings/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/settings/spec.md), requirement code **SET** (SET-001 to SET-130).
 - Features: `domain/settings/features/` (settings-screen, device-profiles, storage-and-sync, campaign-rules, graphics, audio, gameplay, controls, accessibility, language-account-about, platform-notes, settings-data).
-- Code: no domain module yet; it will live in `packages/engine/src/domain/settings/`. The example file is `settings/settings.example.yaml` in the designs. Today's client caps the device-pixel ratio at 2 in `apps/client/src/map/mapView.ts` (to become Sharpness) and shows the diagnostics line (to move behind Show performance line). The smoke test extends `pnpm --filter @ph/client smoke`.
+- Code: `packages/engine/src/domain/settings/`, data in `packages/rules/data/domain/settings.json`. The example file is `settings/settings.example.yaml` in the designs. Today's client caps the device-pixel ratio at 2 in `apps/client/src/map/mapView.ts` (to become Sharpness) and shows the diagnostics line (to move behind Show performance line). The smoke test extends `pnpm --filter @ph/client smoke`.

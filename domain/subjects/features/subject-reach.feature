@@ -33,13 +33,14 @@ Feature: Subject reach
     When its reach is counted
     Then "Ming" uses 6 reach of 9
 
-  @SUBJ-058 @open-question
+  @SUBJ-058 @placeholder
   Scenario: Over reach
-    # OQ-SUBJ-7: whether every subject or only the furthest are hit
+    # config: reasons.stretched_thin
     Given the country "O" has reach 7 and 9 subjects of weight 1
     When the season ends
     Then every subject of "O" has the reason "Stretched thin" at -1
-    And the furthest subject has 2 more down arrows from being over reach
+    And the 2 furthest subjects of "O" have 1 more down arrow from being over reach
+    And the other subjects of "O" have no more down arrows from being over reach
 
   @SUBJ-059 @placeholder
   Scenario: Naples costs the Pope 4 reach

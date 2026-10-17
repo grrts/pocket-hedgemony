@@ -146,7 +146,7 @@ sea 6 (55), order 3 (35), abroad 5 (45), history 12 (165), campaign 8 (100). Tot
 | `first_castle` | Stone upon Stone | first_steps | copper | campaign | `castle_gained` | `{castles_gained: 1}` |  |  | warfare 8.1 |
 | `first_alliance` | A Letter Sealed | first_steps | copper | campaign | `relation_changed` | `{relation_formed: alliance}` |  |  | relation-types Alliance |
 | `first_peace` | Ink on the Treaty | first_steps | copper | campaign | `war_end` | `{war_ended_by: peace_treaty, player_signed: true}` |  |  | warfare 10.4 |
-| `first_year` | A Year in the Ledger | first_steps | copper | campaign | `turn_end` | `{turns_played: 12}` |  |  |  |
+| `first_year` | A Year in the Ledger | first_steps | copper | campaign | `turn_end` | `{months_played: 12}` |  |  |  |
 | `full_granaries` | Full Granaries | realm | silver | campaign | `turn_end` | `{provinces_min: 10, months_no_hungry_province: 60}` | months_no_hungry_province → 60 |  | country-stats 3.1, province-stats 6.2 |
 | `famine_averted` | The Famine Rule | realm | copper | campaign | `year_end` | `{famine_rule_released_to_province: true, famine_deaths_in_that_province: 0}` |  |  | country-stats 3.3, province-stats 6.2 |
 | `seven_good_harvests` | Seven Fat Years | realm | copper | campaign | `harvest` | `{capital_harvest_at_least: good, years_in_a_row: 7}` | capital_good_harvest_streak → 7 |  | country-stats 3.1 |
@@ -366,11 +366,11 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
   over, then stop awarding for that campaign.
 - When saves reports a profile restored on a new device, then run SyncWithStores.
 
-## 9. Monthly turn
+## 9. Each turn
 
-1. Read: the final values of every stat the month's tests read (all other contexts have run).
-2. Run the `turn_end` rows; on January also `year_end`; on the harvest month `harvest`; on the first spring
-   month `spring_start`; on a named date the `date` rows (once).
+1. Read: the final values of every stat the turn's tests read (all other contexts have run).
+2. Run the `turn_end` rows; in the turn in which January begins also `year_end`; in the turn in which the harvest
+   month begins `harvest`; in the turn in which the first spring month begins `spring_start` (X-18); on a named date the `date` rows (once).
 3. Moments raised during the turn (battles, sieges, events, inventions…) are tested after the turn's own
    systems too (§5.1: "Tests run after the turn's own systems").
 4. Write unlocks to the profile; queue store calls; add turn report lines; queue toasts.

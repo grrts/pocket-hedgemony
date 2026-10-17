@@ -59,9 +59,21 @@ Feature: Buildings that raise the caps
       | Ashikaga  | Shogunate         | hostage residence | available     |
       | France    | Feudal realm      | hostage residence | not available |
 
-  @GOV-011 @open-question
-  Scenario: Seats are one per town and add for each
-    # OQ-GOV-10: buildings design says one seat per province
-    Given the country "Ottomans" has 4 seats at step 1 in 4 different towns
+  @GOV-011
+  Scenario: Seats are one per province and add for each
+    # D-GOV-10: one seat per province, as the buildings design places them
+    Given the country "Ottomans" has 4 seats at step 1 in 4 different provinces
     When the caps are worked out
     Then the seats add 8 officials to the officials cap of "Ottomans"
+
+  @GOV-010 @GOV-055 @placeholder
+  Scenario Outline: A landmark palace is palace step 4
+    # config key: buildings.palace.landmark_step_4 (D-GOV-10)
+    Given the country "<country>" has the landmark palace "<landmark>"
+    When the caps are worked out
+    Then the palace adds <officials> officials and 6 lords to the caps of "<country>"
+
+    Examples:
+      | country  | landmark       | officials |
+      | Ming     | Forbidden City | 24        |
+      | Ottomans | Topkapı Palace | 20        |

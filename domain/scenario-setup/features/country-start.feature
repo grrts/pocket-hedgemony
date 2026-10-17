@@ -4,12 +4,12 @@ Feature: Country starting values
   I want each country's starting counts to follow its historical assessments and relations
   So that France starts rich and divided and Venice starts with ships and traders
 
-  @SETUP-020 @open-question
-  # OQ-SETUP-6: no numbers per level are given
+  @SETUP-020 @placeholder
   Scenario Outline: Assessments set starting counts
     Given the record "<record>" has the assessment "<dimension>" at "<level>"
     When the starting world is built
     Then its starting "<stat>" follows that level
+
 
     Examples:
       | record | dimension               | level     | stat                                       |
@@ -23,6 +23,21 @@ Feature: Country starting values
       | venice | trade_access            | very_high | Merchants and grain price access           |
       | france | diplomatic_influence    | very_high | extra officials at court for envoys        |
       | france | political_stability     | moderate  | lords' starting loyalty and provinces in revolt |
+
+  @SETUP-020 @placeholder
+  Scenario Outline: Each assessment level is a factor on the base start value
+    Given an assessment at "<level>"
+    When its factor is read
+    Then the base start value is multiplied by <factor>
+
+    Examples:
+      | level     | factor |
+      | very_low  | 0.5    |
+      | low       | 0.75   |
+      | moderate  | 1      |
+      | high      | 1.25   |
+      | very_high | 1.5    |
+      | unknown   | 1      |
 
   @SETUP-021 @SETUP-020
   Scenario: Low confidence widens the starting range
@@ -74,13 +89,13 @@ Feature: Country starting values
       | Venice  | coastal with ports          | trade ships              |
       | Mali    | inland                      | caravans                 |
 
-  @SETUP-025 @placeholder @open-question
-  # OQ-SETUP-12: does the warm-up use the seed or move the date
+  @SETUP-025 @placeholder
   Scenario: Busy roads start busy
     Given the starting traders and their routes
     When the starting world is built
     Then the traders are run for 24 months before the first turn
     And the trade ratios they leave are the starting ratios
+    And the warm-up used the campaign's seed and left the date at 11 November 1444
 
   @SETUP-026
   Scenario: Faiths come from the catalogue

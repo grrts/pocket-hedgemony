@@ -7,23 +7,23 @@ Feature: Campaign rules are not settings
   @SET-006 @SET-032
   Scenario Outline: Campaign rules are read-only in the campaign
     Given a campaign was begun with "<rule>" set to "<value>"
-    When the player opens Pause → Campaign rules
+    When the player opens Settings → Campaign rules
     Then "<rule>" shows "<value>"
     And it cannot be changed
 
     Examples:
       | rule                         | value             |
       | difficulty                   | normal            |
-      | AI aggression                | chosen at start   |
+      | AI temper                    | chosen at start   |
+      | music eras                   | calendar          |
       | fog of war                   | on                |
       | events                       | historical        |
       | ironman                      | on                |
       | campaign end date            | 31 August 1939    |
 
-  @SET-032 @open-question
-  Scenario: The music era rule, if it stays a choice
-    # OQ-SET-12: music open question still open
-    Given music eras following the calendar or technology stays a choice
+  @SET-032
+  Scenario: The music era rule is a campaign rule
+    Given music eras following the calendar or technology is a choice
     When the player begins a campaign
     Then it is chosen on the new game screen as a campaign rule
     And it is not offered in Settings

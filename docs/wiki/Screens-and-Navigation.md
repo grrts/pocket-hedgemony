@@ -18,9 +18,11 @@ This page covers every screen of Pocket Hegemony, from the boot logo to the fina
 
 **Boot.** A cold start shows the pixel logo on parchment with the hourglass turning while the map, sprites and engine load. No studio logos, no video. On iOS and Android the native launch screen shows the same logo. If loading takes under 0.6 seconds the boot screen still stays 0.6 seconds; otherwise it stays only as long as loading takes. If loading fails (a missing file, or the engine worker will not start and the fallback also fails), you get the failure screen.
 
-**First run.** The first time the game runs, it asks its first-run questions before the title, each as one card with one choice, and never again. If your device language is one the game has, it is used silently (you can change it in [Settings](Settings)); otherwise a card asks. Where something needs consent (crash reports, metrics, the free mobile tier's ad), a consent card appears; where nothing on a store needs consent, it does not. The game never asks you to sign in before play, and it plays offline.
+**First run.** The first time the game runs, it asks its first-run questions before the title, each as one card with one choice, and never again. If your device language is one the game has, it is used silently (you can change it in [Settings](Settings)); otherwise a card asks. Where something needs consent (crash reports, and counting how far players get in the tutorial), one consent card asks for both, with both off until you turn them on; where nothing on a store needs consent, it does not appear. There are only these two first-run questions. The game never asks you to sign in before play, and it plays offline.
 
 **Title.** The real map at world zoom drifts slowly across a region. With a campaign in progress, it drifts over your realm in its current borders, read from the latest save's summary rather than the whole save. Any touch, click, key or button counts as Tap to start and starts the title music. A small cog opens Settings straight away, a ✕ quits (desktop only) and the version number sits in a corner.
+
+**New to Pocket Hegemony?** The very first time you tap to start, with no campaign yet, the game asks once: Play the tutorial (focused), Guided campaign, or I know the way. The tutorial starts at its first chapter; Guided campaign opens New campaign with the goals list for your first year switched on; I know the way opens New campaign without it. See [Tutorial and help](Tutorial-and-Help).
 
 **Main menu.** "Tap to start" folds open into the main menu in the same place; Back returns to "Tap to start".
 
@@ -29,25 +31,25 @@ This page covers every screen of Pocket Hegemony, from the boot logo to the fina
 | Continue | While a campaign exists, labelled with banner, realm and date ("France · May 1503") | Loading with the newest save |
 | New campaign | Always | New campaign |
 | Load | While any save exists | Load |
-| Tutorial | Always; moves under More once the tutorial is finished | The tutorial's start |
-| More | Always | Settings, Achievements, Encyclopedia, Unlock (Buy the full game in the Steam demo), Credits |
+| Tutorial | Always; moves under More once the tutorial is finished | The tutorial's chapter list |
+| More | Always | Settings, Achievements, Almanac, Unlock (Buy the full game in the Steam demo), Credits |
 | Quit | Desktop and Steam only; phones have none | Closes the game |
 
 Focus starts on Continue when it exists, otherwise on New campaign. The first entry is large and wax-red; the rest are paper buttons.
 
-**The free tier.** The free mobile download and the Steam demo show a small "Full game" ribbon on the main menu that leads to Unlock, never as a pop-up. Where the free mobile tier keeps its one ad, it is a single framed card in the corner opposite the menu, only on the main menu. It never covers a button, animates or plays sound; it never appears on the loading screen, in a campaign, in the game menu or on the end screens; it does not appear in the very first session; any purchase removes it for good; and it never appears in the Steam demo. The free countries are the Ottomans and France.
+**The free tier.** The free mobile download and the Steam demo let you play the Ottomans and France, with nothing else held back. They show a small "Full game" ribbon on the main menu that leads to Unlock, never as a pop-up. No version of the game shows ads. The Unlock screen offers one purchase, the full game, which unlocks every realm; it shows the store's price and a Buy button, and on phones also Restore purchases.
 
 ### New campaign
 
 One screen in three steps, with a strip at the top ("Realm · Options · Begin"). Back moves one step back, and from step 1 returns to the main menu without asking. The nation select music plays, its lead voice changing with the highlighted realm.
 
 1. **Realm.** Choose a realm on the map at world zoom, with filters (region, difficulty, free or locked) and a short list of suggested realms. Tapping a realm shows its card with its strengths at a glance. A locked realm shows a padlock and a button to Unlock; coming back from a purchase returns you to step 1 with that realm still chosen. Quick start skips straight to Begin with the last options used and the realm you last tapped (or the first suggested one).
-2. **Options.** Difficulty, AI temper, fog, historical or free events, ironman, and the end date, with presets that fill the whole step.
+2. **Options.** Difficulty, AI aggression, fog, historical or free events, ironman, and the end date, with presets that fill the whole step. The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
 3. **Begin.** A summary card (banner, ruler, capital, start date, options) and one big Begin button.
 
 ### Load and loading
 
-The Load screen lists saves newest first, each with banner, realm, in-game date, the real date saved and an autosave or ironman mark. Tapping one shows its card with Load and Delete. Loading from the main menu needs no confirmation. Loading from the game menu with unsaved turns first asks "Leave <date> unsaved? · Save first · Leave · Cancel".
+The Load screen lists every save in one list, newest first (not grouped by campaign), each with banner, realm, in-game date, the real date saved and an autosave or ironman mark. Tapping one shows its card with Load and Delete. Loading from the main menu needs no confirmation. Loading from the game menu with unsaved turns first asks "Leave <date> unsaved? · Save first · Leave · Cancel".
 
 The loading screen shows a tip from the one tips table, picked to fit your realm and date (tips are tagged by era, region and whether they are for new players). Tap, or press left and right, for another. The bar shows the real loading steps ("Reading the save", "Drawing the borders", "Waking the courts"), not a fake timer. When loading finishes, the game goes straight to the map without asking for a tap, but keeps a tip on screen at least 2 seconds after it appeared. The load-and-resume music plays.
 
@@ -100,33 +102,33 @@ The tabs are a narrow left rail of icons in Short wide, a row of icons along the
 
 ### The game menu
 
-The game menu opens from its button, from Back on an empty map, from Esc, or from the controller's Menu button. It is a modal over the dimmed map: a menu, not a pause screen, because the game is turn-based. In order: Return to the map (focused first), Save, Load, Settings, Encyclopedia, Achievements, Exit to main menu, and Quit (desktop and Steam only). In ironman, Save reads "Save and quit". Settings opens as an overlay and returns to the game menu. Exit and Quit ask only if there are unsaved turns; in ironman they save and exit without asking.
+The game menu opens from its button, from Back on an empty map, from Esc, or from the controller's Menu button. It is a modal over the dimmed map: a menu, not a pause screen, because the game is turn-based. In order: Return to the map (focused first), Save, Load, Settings, Almanac, Achievements, Exit to main menu, and Quit (desktop and Steam only). In ironman, Save reads "Save and quit" and there is no Load. During the tutorial, Skip this chapter, Chapter list and Leave the tutorial come right after Return to the map. Once a campaign can no longer earn achievements, the entry reads "Achievements (off for this campaign)". Campaign rules are shown, read only, inside Settings. Settings opens as an overlay and returns to the game menu. Exit and Quit ask only if there are unsaved turns; in ironman they save and exit without asking.
 
 ### The turn
 
 1. **Orders.** The map is live. End turn ends the turn with one tap, with a confirmation only if Settings turns it on. While any event is unanswered, End turn shows the event's scroll icon with the count instead of the hourglass, and tapping it opens the first unanswered event instead of ending the turn.
-2. **Turn in progress.** A save is taken just before the turn runs, so killing the app mid-turn loses nothing. The map stays visible and can be panned and zoomed, orders are frozen, the hourglass turns, armies march along their routes and borders change as results arrive. If a turn takes longer than 1.5 seconds, a small parchment strip says what is being worked out ("The courts of Europe deliberate…").
-3. **Battles.** When the turn reaches a battle your armies or fleets fight, it stops, the map flies there, and the battle viewer opens on a before-the-battle card showing both armies, their commanders, the ground and this army's standing orders, which you can change there for this battle. Fight plays it bell by bell; Skip to result jumps to the end at any moment. Either way it ends on a result card (who won, men lost, the one-line reason) with Carry on, which resumes the turn until the next of your battles, in the order they happen in the month. Battles between other realms never stop the turn; they appear on the map and, if they matter to you, in the turn report. Every battle can be watched again from the turn report and the Chronicle.
+2. **Turn in progress.** Your orders for the turn are written down before it runs, so together with the last save the world before the turn is kept and killing the app mid-turn loses nothing. The map stays visible and can be panned and zoomed, orders are frozen, the hourglass turns, armies march along their routes and borders change as results arrive. If a turn takes longer than 1.5 seconds, a small parchment strip says what is being worked out ("The courts of Europe deliberate…").
+3. **Battles.** Each turn is one week: End turn plays 7 days, and the top bar shows the date with its day, such as "18 November 1444". The week plays out day by day. When one of your armies or fleets meets an enemy, the map flies there and the battle view opens: both sides, their commanders, the ground, how far the battle has got, and its standing orders. While any of your battles runs, time slows to steps of 4 hours, six a day, and you watch it round by round. At any step you can change the standing orders for that battle or press Retreat. You cannot skip to the result. If several of your battles run at once, a battle switcher lists them with each one's progress, and you can jump between them. When all of them have ended, a result card (who won, men lost, the one-line reason) with Carry on sends time back to whole days until your next battle or the end of the week. Battles between other realms never slow the game; they appear on the map and, if they matter to you, in the turn report. Every battle can be watched again from the turn report and the Chronicle.
 4. **Events** open one at a time as modal cards (picture, text, two or three options, each showing its effects on tap or focus), in date order. Look at the map shrinks the event into the badge on End turn so you can check something first. Nothing ever answers an event for you. See [Historical events](Historical-Events).
 5. **Turn report.** If something worth reporting happened, it slides in from the edge as a card. Each line jumps to its place on the map or its card, and it closes on the first map tap. If nothing happened, only the date changes.
 6. The Attention list and badge refresh, and the next orders phase begins.
 
-If the app goes to the background while the turn is stopped at a battle, it comes back to the same battle. If the app was killed, the pre-turn save replays the month to that battle with the same result.
+If the app goes to the background while one of your battles runs, it comes back to the same battle at the same step. If the app was killed, the last save and the written-down orders replay the month to that battle with the same result.
 
-### The Attention screen
+### The Needs attention screen
 
-The one list of warnings and of things waiting for you. It opens from the bell, the badge, the controller's "next" button and the End turn question, as a card over the map.
+The one list of warnings and of things waiting for you, titled "Needs attention". It opens from the bell, the badge, the controller's "next" button and the End turn question, as a card over the map.
 
 | Group | Examples |
 |---|---|
 | Warnings | Famine in a province within two months, pay owed to an army, an army hungry, a castle breached, a rising brewing, peace voices passing half against you, a ruler without an heir |
-| Waiting for you | Events not yet answered, peace offers, idle armies and fleets, empty research or school slots, unspent levies |
+| Waiting for you | Events not yet answered, peace offers, idle armies and fleets, empty research or school slots, unspent levies, chances worth a look ("A lord across the border may be won over") and New entries for a system you meet for the first time |
 
-Lines are listed most urgent first. Each has an icon, one sentence and a Show button that jumps to its place on the map or its card; Back returns to the Attention screen. You can mute a line, or every line of its kind, by long press or a button on the line; muted kinds are listed at the bottom and can be unmuted. The screen says what is wrong, never what to do. Its warnings and thresholds live in one config table to which each system adds its own lines. If Settings turns on the End turn confirmation, it names the count ("3 warnings wait for you · Look · End turn anyway"). Warnings never block the turn.
+Lines are listed most urgent first. Each has an icon, one sentence and a Show button that jumps to its place on the map or its card; Back returns to the Attention screen. Each line has two mute buttons: "Mute this" for that line and "Don't list this kind again" for every line of its kind. A long press opens the line's explanation with the same two buttons. Muted kinds are listed at the bottom and can be unmuted, and your mutes are kept in the save. The screen says what is wrong, never what to do. Its warnings and thresholds live in one config table to which each system adds its own lines. If Settings turns on the End turn confirmation, it names the count ("3 warnings wait for you · Look · End turn anyway"). Warnings never block the turn. Unanswered events are never in that question, because they always block End turn until you answer them.
 
 ### Other screens in a campaign
 
-- **Battle viewer:** during a stopped turn, Back means Skip to result; in a replay, Back returns to where the replay was opened.
+- **Battle view:** while your battles run, Back takes you to the map and the battles keep running; the switcher brings you back. In a replay, Back returns to where the replay was opened. With a controller: A is pause and play, then Carry on; B goes back to the map (or leaves a replay); X is Retreat; Y shows the commander's line; the bumpers switch battle; Menu does nothing.
 - **Siege view:** a full screen opened from a besieged castle at local zoom or from its card; Back returns to the map at the castle.
 - **Peace table:** a modal opened from the Abroad tab, an enemy's country card or an incoming offer, returning where it was opened. An incoming offer cannot be dismissed, only answered or put off one turn.
 - **Map lens picker:** a small pop-over from the tool column.
@@ -134,47 +136,52 @@ Lines are listed most urgent first. Each has an icon, one sentence and a Show bu
 
 ### How a campaign ends
 
-**Game over.** When your realm no longer exists (annexed, every province lost, or a successor rule ends it), the map zooms out over the old borders while the game over music plays, and a card says how it ended in one line with the date ("Burgundy was divided between France and the Empire · 1477") and your realm's highs: largest size, years lasted, battles won. It offers Look back (the Chronicle, read only), Play on as another realm (any realm on the current map) and Main menu. Play on is allowed in every campaign, ironman included, but it ends achievements for that campaign, says so on the button before you press it ("Achievements end for this campaign"), and cannot be undone.
+**Game over.** When your realm no longer exists (annexed, or every province lost), the map zooms out over the old borders while the game over music plays, and a card says how it ended in one line with the date ("Burgundy was divided between France and the Empire · 1477") and your realm's highs: largest size, years lasted, battles won. It offers Look back (the Chronicle, read only), Play on as another realm (any realm on the current map) and Main menu. Play on is allowed in every campaign, ironman included, but it ends achievements for that campaign, says so on the button before you press it ("Achievements end for this campaign"), and cannot be undone.
 
-**Campaign end.** When the end date is reached (31 August 1939 by default, or the date chosen at the start) or a victory condition fires, the final wrap-up events appear as normal event cards, then a closing sequence steps through your borders era by era at world zoom with the campaign end music, then the final result. A campaign is won by world domination or by leading in the Economy, Power or Technology score. There is no playing on past the end date.
+**Winning.** There are two ways to win.
 
-**Final result.** The ledger comparison and final outcome, the achievements earned in this campaign, and Main menu or Credits.
+- **World domination:** you own, or hold as subjects, at least half of the world's settled land provinces. It is checked every January, and reaching it wins at once: the campaign end sequence plays straight away, and the final result offers Keep playing, which takes you back to the map until the end date.
+- **Best at the end:** when the end date comes, the realm that leads the Economy, Power or Technology score wins in that score. No margin is needed, and a tie shares the win. The scores are worked out every January for the Realm book; see [Your realm](Your-Realm).
+
+**Campaign end.** When the end date is reached (31 August 1939 by default, or the date chosen at the start) or you win by world domination, the final wrap-up events appear as normal event cards, then a closing sequence steps through your borders era by era at world zoom with the campaign end music, then the final result. There is no playing on past the end date.
+
+**Final result.** The scores of your realm and the five leading realms, the outcome (your wins, or with none your place in each score, such as "No victory · Economy 2nd · Power 3rd · Technology 2nd"), the achievements earned in this campaign, and Main menu or Credits. Achievements are earned only in ironman campaigns, so outside ironman the screen says so instead of showing an empty list.
 
 ### Interruptions
 
-- **Going to the background** (home button, a call, the screen locks) saves if anything changed since the last save, and suspends sound.
+- **Going to the background** (home button, a call, the screen locks) writes down your orders if you gave any since the last save, and suspends sound.
 - **Coming back** while still in memory, or a Steam Deck resuming from suspend, returns to the exact screen, scroll and camera without the title, with the load-and-resume music.
 - **Killed in the background:** the next start is a cold start with Continue pointing at that save, and after loading the map shows "Picked up where you left off".
-- **A running turn** pauses with the app and carries on when it returns; if the app was killed, the pre-turn save is used.
+- **A running turn** pauses with the app and carries on when it returns; if the app was killed, the last save and the written-down orders are used.
 - **Purchases:** when the unlock flow ends it returns to where it was opened (the realm picker with the bought realm chosen, or the menu). A failed or cancelled purchase returns to the same place with no extra message beyond the store's. With no connection it says "No connection: try again later" and blocks nothing else.
-- **Failure screen:** when something fails that the game cannot recover from (the engine crashes, a save will not read), one screen says what failed in plain words and offers Restore the last autosave, Main menu and, where a crash reporter is approved, Send a report. Never a stack trace.
+- **Failure screen:** when something fails that the game cannot recover from (the engine crashes, a save will not read), one screen says what failed in plain words and offers Restore the last save, Main menu and, where a crash reporter is approved, Send a report. Never a stack trace.
 
 ### Layout by window shape
 
 | Shape | When | Layout |
 |---|---|---|
-| Short wide | A phone in landscape (height under 500 css px) | Map first, cards as side sheets on the left, Realm book tabs as a left icon rail, top bar one thin row |
+| Short wide | A window under 500 css px tall, such as a phone in landscape | Map first, cards as side sheets on the left, Realm book tabs as a left icon rail, top bar one thin row |
 | Tall | A tablet in portrait, or a desktop window taller than wide (never a phone) | Cards as bottom sheets, Realm book tabs as a bottom row, tool column on the right above End turn |
 | Large | A tablet in landscape, a desktop window, a Steam Deck (1280 × 800) | Side sheets with a fixed width, menus centred with a maximum width, nothing stretched edge to edge |
 | Far | A TV or Steam Machine (chosen in Settings or detected) | Large with UI scale raised so body text is about 1/30 of screen height, thicker focus frames, nothing in the outer 5 % |
 
-Phones play in landscape only, on every screen including menus; a phone held upright shows "Turn your phone sideways". Tablets and desktop windows use whichever shape they are in, including Tall during a campaign. Safe areas (notches, rounded corners, the home indicator) stay clear of buttons. Every tap target is at least 44 × 44 points with 8 points between neighbours. A button that ends the turn or loses something (End turn, Delete save, Exit to main menu) is never next to a frequent button or at the very edge where a case or grip covers it. End turn and the game menu button sit at opposite corners.
+Phones play in landscape only, on every screen including menus; a phone held upright shows "Turn your phone sideways". Tablets and desktop windows use whichever shape they are in, including Tall during a campaign, so a tablet can be turned upright. The shape follows only the window; the device profile in Settings only picks default settings. Safe areas (notches, rounded corners, the home indicator) stay clear of buttons. Every tap target is at least 44 × 44 points with 8 points between neighbours. A button that ends the turn or loses something (End turn, Delete save, Exit to main menu) is never next to a frequent button or at the very edge where a case or grip covers it. End turn and the game menu button sit at opposite corners. With Main hand set to Left in Settings, both move: End turn to the lower left and the game menu button to the upper right.
 
 ### Navigation by input
 
 **Back on each device.** Android: the system back button or gesture. iOS: the on-screen Back or ✕, with an edge swipe on full screens only, never over the map. Keyboard: Esc. Controller: B (the east button). Mouse: the on-screen Back or ✕, or mouse button 4. Back on the map with nothing open opens the game menu; on the main menu it returns to "Tap to start"; on Android, Back on "Tap to start" leaves the app.
 
-**Touch on the map.** Tap selects a province, army or castle and shows its name tab; drag pans; pinch zooms; long press shows what is under your finger without selecting it. Tapping an army and then a province gives a march order; tapping the army's own province halts it.
+**Touch on the map.** Tap selects a province, army or castle and shows its name tab; drag pans; pinch zooms; long press shows what is under your finger without selecting it. Tapping an army and then a province gives a march order at once, with no confirm step; tapping the army's own province halts it.
 
-**Touch on cards, the book and menus.** Tap presses; drag scrolls; pinch does nothing; long press shows the item's explanation (the same text as a desktop tooltip). Long press only explains; it never does anything you cannot also reach by tap.
+**Touch on cards, the book and menus.** Tap presses; drag scrolls; pinch does nothing; long press shows the item's explanation (the same text as a desktop tooltip). Long press only explains; it never does anything you cannot also reach by tap. Where an explanation shows buttons, the same buttons are on the item itself.
 
-**Controller.** There is one action set per layer: Shell (boot to loading, Settings, Achievements), Map, Card, Book, Modal (events, confirmations, game menu) and Battle. In the Map set: a free cursor on the left stick that snaps gently to provinces, armies and castles, pan on the right stick, zoom on the triggers, select, context actions, next army or next waiting item, open the Realm book, open the game menu, and End turn held for half a second. A Steam Controller or Steam Deck trackpad acts as a mouse on the map and shows the pointer; otherwise the stick cursor shows.
+**Controller.** There are three sets of controls: Map on the map, Battle in the battle viewer, and Menu on every other screen (move focus, select, back, the bumpers to switch tabs or step through stacked cards, and Show on map). A text field adds the on-screen keyboard on top. On the map: a free cursor on the left stick that snaps gently to provinces, armies and castles, pan on the right stick, zoom on the triggers, select, next army on the bumpers, and d-pad right for the Needs attention screen and its next line. A short press of Menu opens the game menu; holding Menu for half a second ends the turn. A Steam Controller or Steam Deck trackpad acts as a mouse on the map and shows the pointer; otherwise the stick cursor shows.
 
 **Focus.** While a controller or keyboard is in use, exactly one element has focus, drawn with the gold frame used for the chosen map lens. Every screen has its own first focus, and focus order follows reading order.
 
 **Prompts and text.** Button prompts match the last device used: none for touch, the controller's own glyphs for Xbox, PlayStation, Steam or Switch-style controllers, keys for a keyboard, switching at once when the device changes. Text fields use the platform's on-screen keyboard and have a filled-in default so you can confirm without typing.
 
-**Mouse and keyboard.** A mouse works like touch with hover added; hover shows what long press shows. A keyboard uses Esc for Back, Enter to select, Tab and arrows to move focus, and a key for End turn.
+**Mouse and keyboard.** A mouse works like touch with hover added; hover shows what long press shows. A keyboard uses Esc for Back, Enter to select, Tab and arrows to move focus, and Enter held for half a second for End turn (a short Enter selects).
 
 ## What you see
 
@@ -191,7 +198,7 @@ The screen list is the single catalogue that code, music and sound key on:
 | loading | Full | tip arrows | none | load_resume |
 | settings | Overlay | first setting | where opened | unchanged |
 | achievements | Full | first achievement | where opened | unchanged |
-| encyclopedia | Full | search or first entry | where opened | unchanged |
+| almanac | Full | search or first entry | where opened | unchanged |
 | unlock | Full | Buy | where opened | unchanged |
 | credits | Full | Back | main menu or final result | credits |
 | map | Home | your capital or last army | opens the game menu | game music |
@@ -199,7 +206,7 @@ The screen list is the single catalogue that code, music and sound key on:
 | realm_book | Full | last tab's first item | map | unchanged; diplomacy mood on Abroad |
 | game_menu | Modal | Return to the map | map | unchanged |
 | turn | Overlay | none | none | unchanged |
-| battle | Full | Fight before, Carry on after | Skip to result during a turn; where opened for a replay | war tracks |
+| battle | Full | Retreat while it runs, Carry on after | Back to the map while battles run (they keep running); where opened for a replay | war tracks |
 | siege | Full | Back | map | war_siege |
 | event | Modal | historical option | badge on End turn | stinger only |
 | peace | Modal | first term | where opened | unchanged |
@@ -208,17 +215,17 @@ The screen list is the single catalogue that code, music and sound key on:
 | game_over | Full | Look back | none | game_over |
 | campaign_end | Full | Skip | none | campaign_end |
 | final_result | Full | Main menu | main menu | campaign_end |
-| error | Full | Restore the last autosave | main menu | none |
+| error | Full | Restore the last save | main menu | none |
 
 ## How it connects
 
-- [Saving](Saving): the newest save and its summary, the Load list, pre-turn and background saves, ironman, damaged saves.
+- [Saving](Saving): the newest save and its summary, the Load list, the last save and the written-down orders, ironman, damaged saves, your Needs attention mutes.
 - [Settings](Settings): End turn confirmation, shape and Far layout, UI scale and text size, prompts, hold actions; the Settings overlay.
-- [How a turn works](Time-and-Turns): end of month, pausing at each of your battles and resuming, the end date.
-- [Warfare](Warfare): battle viewer, before-the-battle card, result card, siege view, peace table.
+- [How a turn works](Time-and-Turns): the month day by day, slowing to 4-hour steps while your battles run, the January checks, the end date.
+- [Warfare](Warfare): the battle view, standing orders and Retreat, the result card, siege view, peace table.
 - [Historical events](Historical-Events): event cards in date order and the wrap-up events.
 - [Map and lenses](Map-and-Lenses): map rendering, zoom levels, lenses, the title background, camera moves.
-- [Tutorial and help](Tutorial-and-Help): tips, the encyclopedia, the tutorial start and the Attention list.
+- [Tutorial and help](Tutorial-and-Help): tips, the Almanac, the tutorial and its chapter list, and what goes on the Needs attention list.
 - [Achievements](Achievements): play on ends achievements; the final result shows them.
 - [Music and sound](Music-and-Sound): screen ids and Realm book tabs drive music; sound suspends and resumes.
 - [The 1444 start](The-1444-Start): realms, suggested realms, filters, campaign options and presets.
@@ -228,7 +235,7 @@ The computer players never use these screens.
 
 ## Numbers
 
-All are provisional values for one interface config file that has not been named yet, unless marked.
+All are provisional values, unless marked, kept in the game shell's and the map's data files.
 
 | Key | Value |
 |---|---|
@@ -247,40 +254,20 @@ All are provisional values for one interface config file that has not been named
 | `shell.max_steps_from_map` | 3 (a rule) |
 | `shell.tap_target_min` | 44 × 44 points |
 | `shell.tap_target_gap` | 8 points |
-| `shell.controller_end_turn_hold` | 0.5 s |
+| `shell.controller_end_turn_hold` | 0.5 s (Menu on a controller, Enter on a keyboard) |
+| `shell.end_date_earliest_year` | 1494 |
+| `shell.domination_share` | half of the world's settled land provinces (decided) |
+| `shell.ledger_leaders` | 5 realms beside yours on the final result |
 | `shell.campaign_end_date_default` | 31 August 1939 (decided) |
 | `attention.*` | one table of warnings and thresholds |
 | `tips.*` | the tips table |
 
 ## Still open
 
-- **OQ-SHELL-1:** victory conditions are decided in outline only: how scores are measured, what world domination is, and when they are judged.
-- **OQ-SHELL-2:** the battle stop on a before-the-battle card is not yet adopted by warfare, which still describes a battle report after the month.
-- **OQ-SHELL-3:** the main menu's first focus wording looks like a slip, and the tutorial's "New to Pocket Hegemony?" question has no place in the first run yet.
-- **OQ-SHELL-4:** saves wants the Load screen grouped by campaign; this flow lists saves newest first.
-- **OQ-SHELL-5:** the "save before the turn" this flow relies on needs mapping to the saves design's Resume save and orders journal.
-- **OQ-SHELL-6:** settings says unanswered events can be passed with "End turn anyway"; this flow says they block. This flow's decision is taken here.
-- **OQ-SHELL-7:** the End turn hold time on a controller (0.5 s here, 1 s in settings) and which button is "next".
-- **OQ-SHELL-8:** six controller action sets here, three plus a text layer in settings.
-- **OQ-SHELL-9:** whether a touch march order needs a confirm step.
-- **OQ-SHELL-10:** whether long press only explains, or also opens an action menu and resets a setting.
-- **OQ-SHELL-11:** other designs ask for more game menu entries, and ironman's Load entry is not restricted.
-- **OQ-SHELL-12:** Settings from the title as an overlay or a full screen.
-- **OQ-SHELL-13:** settings adds a third first-run question on the Big screen profile.
-- **OQ-SHELL-14:** "AI temper" against "AI aggression", the allowed end date range, and the music-era option.
-- **OQ-SHELL-15:** the tutorial's "Needs attention" against this Attention screen, and where mutes are stored.
-- **OQ-SHELL-16:** unlock and purchase screens are not designed, and whether the free mobile tier keeps its ad is open.
-- **OQ-SHELL-17:** no design defines the "successor rule" that can end a realm.
-- **OQ-SHELL-18:** whether a left-handed layout moves the game menu button too.
-- **OQ-SHELL-19:** today's build still locks iPads to landscape, so Tall is unreachable on tablets.
-- **OQ-SHELL-20:** the Short wide threshold (500 px) and the settings Phone profile (600 px) do not match.
-- **OQ-SHELL-21:** achievements are ironman-only, so most final results show none; whether the screen says so.
-- **OQ-SHELL-22:** turn report, ledger, new game setup, input scheme, credits and privacy designs are referenced but not written.
-- **OQ-SHELL-23:** the engine runs a whole month in one call today; it must stop at each of your battles and resume.
-- **OQ-SHELL-24:** the battle viewer controls in settings and in this flow do not match.
+Nothing. Every question about the screens has been decided.
 
 ## For developers
 
-- Spec: [`domain/game-shell/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/game-shell/spec.md), requirement code **SHELL** (SHELL-001 to SHELL-128).
+- Spec: [`domain/game-shell/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/game-shell/spec.md), requirement code **SHELL** (SHELL-001 to SHELL-135).
 - Features: `domain/game-shell/features/` (boot-and-first-run, title-and-main-menu, new-campaign, load-and-loading, map-and-cards, realm-book, game-menu, turn-flow, attention, in-campaign-screens, campaign-end, interruptions, layout-by-shape, navigation-by-input, screen-list).
-- Code: no domain module yet; it will live in `packages/engine/src/domain/game-shell/`. Today's client is in `apps/client`, and the phone landscape lock in `apps/mobile/scripts/landscape.mjs`.
+- Code: `packages/engine/src/domain/game-shell/`, numbers in `packages/rules/data/domain/game-shell.json`. Today's client is in `apps/client`, and the phone landscape lock in `apps/mobile/scripts/landscape.mjs` (tablets are to be let free to rotate).

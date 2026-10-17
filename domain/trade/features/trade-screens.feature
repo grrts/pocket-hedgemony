@@ -52,9 +52,9 @@ Feature: Trade on screen
 
   @TRADE-099
   Scenario: The turn report
-    Given traders of "France" deposited 23 gold this month and one caravan was robbed
+    Given traders of "France" deposited 23 gold this week and one caravan was robbed
     When the trade rules are applied
-    Then the turn report says "Traders brought 23 gold this month"
+    Then the turn report says "Traders brought 23 gold this week"
     And the robbery has its own line
 
   @TRADE-093 @TRADE-124

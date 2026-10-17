@@ -99,7 +99,7 @@ All thresholds are provisional placeholders for balancing.
 | Stone upon Stone | copper | You gain your first castle (built, or taken in a siege) |
 | A Letter Sealed | copper | You form an alliance |
 | Ink on the Treaty | copper | A war ends with a peace treaty you signed |
-| A Year in the Ledger | copper | You have played 12 turns |
+| A Year in the Ledger | copper | You have played 12 months |
 
 **Realm** (8, 55 points)
 

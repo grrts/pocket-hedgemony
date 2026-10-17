@@ -7,7 +7,7 @@ Feature: Stages of a revolution
   @REVO-007
   Scenario Outline: Stage follows requirements, signs and the event
     Given the country "France" <situation>
-    When the turn is processed
+    When the monthly step runs
     Then the revolution "french_revolution" is at the stage "<stage>" for "France"
 
     Examples:
@@ -30,10 +30,10 @@ Feature: Stages of a revolution
     Then the chance is based on 4 years and multiplied by 2
 
   @REVO-008
-  Scenario: Never the same turn the last sign lights
+  Scenario: Never the same month the last sign lights
     Given the country "France" has 3 signs of "french_revolution" lit
-    When a fourth sign lights this turn
-    Then the event "french_revolution" does not fire this turn
+    When a fourth sign lights this month
+    Then the event "french_revolution" does not fire this month
     And the card shows "may break out any month" in red
 
   @REVO-009

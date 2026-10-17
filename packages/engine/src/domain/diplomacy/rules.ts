@@ -78,7 +78,8 @@ export interface DiplomacyConfig {
     official_type_bonus: Record<string, { actions: string[]; reason?: number; only_if?: string; gift_multiplier?: number }>;
     years_served_bonus: { at_years: number; reason: number };
     resident_years_bonus: { at_years: number; reason: number };
-    resident: { requires_invention: string; war_warning_turns: number };
+    resident: { requires_invention: string; war_warning_months: number };
+    passage_denied_blocks_months: number;
     held: { refused_demand_by_hostile_chance: number };
   };
   ledger: {
@@ -88,6 +89,7 @@ export interface DiplomacyConfig {
     wrongs: Record<string, EntryRule>;
     standing_words: { min: number; word: string }[];
     merged_entry_name: string;
+    standing_limit: number;
     resident_envoy_season_months: number;
   };
   reasons: {
@@ -123,7 +125,7 @@ export interface DiplomacyConfig {
       separate_peace_when_peace_voices_over: number;
     };
     arrange_marriage: { base: number; their_house_greater: number; per_existing_marriage: number; claim_chance_per_heirless_death: number };
-    demand: { base: number; heartland_province: number; kinds: Record<string, { grants_aim: string }>; on_refusal: { aim_years: number; our_offensive_call_bonus: number } };
+    demand: { base: number; heartland_province: number; kinds: Record<string, { grants_aim: string }>; on_refusal: { aim_years: number; our_offensive_call_bonus: number; lords_not_warlike_waver: boolean } };
     ask_passage: { base: number; months: number; marching_on_our_friend: number; marching_on_our_enemy: number; requires_invention: string };
     trade_pact: { base: number };
     swear_peace: { base: number; truce_months: number; we_fear_you_per_multiple: number; we_want_your_land: number };
@@ -132,10 +134,11 @@ export interface DiplomacyConfig {
     court_lord: { requires_lord_loyalty: string[]; loyalty_steps_per_season: number; defect_after_months: number; defect_needs_border: boolean; discovery_chance_per_season: number };
     make_resident: { requires_invention: string };
     fund_rebels: {
-      gold_per_month_choices: number[];
-      revolution_camp_sign_at_gold: number;
-      caught_chance_per_turn: { default: number; judge_runs_province: number; lord_holds_province: number };
-      on_caught: { aim_years: number; grievance_months: number };
+      gold_share_of_target_yearly_income: number;
+      needs_revolution_signs: number;
+      caught_chance_per_month: number;
+      on_caught: { aim_years: number };
+      flag: string;
     };
   };
   war_aims: { held_province_years: number; refused_demand_years: number; punish_years: number; tribute_by_strength_multiple: number; regency_allows: string[] };
@@ -152,7 +155,7 @@ export interface DiplomacyConfig {
     min_members: number;
     dissolve_below_share_of_threshold: number;
   };
-  eras: Record<string, { unlocks?: string[]; or_event?: string; ties?: Record<string, Partial<EntryRule>>; mobilisation_event?: string }>;
+  eras: Record<string, { unlocks?: string[]; or_event?: string; ties?: Record<string, Partial<EntryRule>>; mobilisation_event?: string; pact_offensive_call_bonus?: number }>;
   ai: {
     candidates_per_free_seat: number;
     gift_first_if_total_at_least: number;
@@ -165,7 +168,7 @@ export interface DiplomacyConfig {
     relation: Record<string, string>;
     new_effects: string[];
   };
-  answers: { delay_turns: number; preview_before_sending: boolean };
+  answers: { delay_months: number; preview_before_sending: boolean };
   eras_by_year: { era: string; from: number }[];
   oaths_broken_years: number;
   lands_taken_years: number;

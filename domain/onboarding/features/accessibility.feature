@@ -21,7 +21,7 @@ Feature: Tutorial accessibility and language
     Given reduced motion is on
     Then the pointing hand doesn't bob
     And the spotlight doesn't pulse
-    And the Varna battle in chapter 5 can be skipped to the result
+    And the border clash in chapter 5 can be skipped to the result
 
   @TUT-112
   Scenario: Reading time

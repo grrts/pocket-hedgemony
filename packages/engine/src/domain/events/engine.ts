@@ -689,8 +689,8 @@ export function nextMonth(w: World): void {
 }
 
 /**
- * The events' part of a monthly turn (spec 9): yearly age and period
- * checks in the first month, eligibility, immediate firing, pool rolls under
+ * The events' monthly work (spec 9), run in the turn in which a new month
+ * begins (X-18): yearly age and period checks in January, eligibility, immediate firing, pool rolls under
  * the pacing cap, decision offers, then the ticks. Stops at the end date.
  */
 export function processMonth(s: EventState, rng: Rng): DomainEvent[] {

@@ -237,13 +237,13 @@
   {
    "id": "first_year",
    "name": "A Year in the Ledger",
-   "text": "Play twelve turns in one campaign.",
+   "text": "Play twelve months in one campaign.",
    "category": "first_steps",
    "tier": "copper",
    "scope": "campaign",
    "moment": "turn_end",
    "test": {
-    "turns_played": 12
+    "months_played": 12
    },
    "refs": []
   },

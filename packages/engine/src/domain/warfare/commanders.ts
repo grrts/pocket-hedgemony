@@ -1,5 +1,5 @@
 import type { Lord } from "../realm/index.ts";
-import { W, clamp, newCommander, type Army, type Commander, type StandingOrders } from "./model.ts";
+import { W, clamp, newCommander, type Army, type Commander, type Era, type StandingOrders } from "./model.ts";
 
 /**
  * Commanders and captains (spec §5.6): skills that grow and fade, traits,
@@ -134,4 +134,37 @@ export const theirMan = (c: Commander, yearsWithCompanies: number): boolean => c
 /** Events may offer "their man" the throne when Ambitious, unpaid, or under a child or new ruler (WAR-064). */
 export function throneOffer(c: Commander, yearsWithCompanies: number, realm: { payOwed?: boolean; childRuler?: boolean; newlyCrowned?: boolean }): boolean {
   return theirMan(c, yearsWithCompanies) && (hasTrait(c, "Ambitious") || !!realm.payOwed || !!realm.childRuler || !!realm.newlyCrowned);
+}
+
+export type CommanderOrigin = keyof typeof W.origins;
+/** The catch that comes with a commander's origin (WAR-061, X-7, D-WAR-6). */
+export function originCatch(origin: string): string {
+  const c = (W.origins as Record<string, string>)[origin];
+  if (c === undefined) throw new Error(`unknown commander origin ${origin}`);
+  return c;
+}
+
+export type SkillName = "Might" | "Cunning" | "Logistics";
+export type GrowthEvent =
+  | { kind: "academy" }
+  | { kind: "captain under"; commanderCunning: number }
+  | { kind: "wargames"; firstThisEra: boolean }
+  | { kind: "peace command year"; gainsSoFar: number }
+  | { kind: "victories"; sinceLastMight: number };
+
+/** The skills an era-III-to-VII event gives a commander: academy (staff college in VI–VII), serving as a captain, wargames, a peace year commanding, victories (WAR-158, D-WAR-13). */
+export function eraSkillGain(era: Era, e: GrowthEvent): SkillName[] {
+  const G = W.skill_growth;
+  switch (e.kind) {
+    case "academy":
+      return ((G.academy as Record<string, string[]>)[era] ?? []) as SkillName[];
+    case "captain under":
+      return G["captain under"].eras.includes(era) && e.commanderCunning >= G["captain under"].min_cunning ? [G["captain under"].skill as SkillName] : [];
+    case "wargames":
+      return G.wargames.eras.includes(era) && e.firstThisEra ? [G.wargames.skill as SkillName] : [];
+    case "peace command year":
+      return G["peace command year"].eras.includes(era) && e.gainsSoFar < G["peace command year"].max ? [G["peace command year"].skill as SkillName] : [];
+    case "victories":
+      return G.victories.eras.includes(era) && e.sinceLastMight >= G.victories.every ? [G.victories.skill as SkillName] : [];
+  }
 }

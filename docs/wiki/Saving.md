@@ -20,12 +20,12 @@ Saves are grouped by **campaign**: one new game is one campaign, with a random i
 | Kind | When it is written | How many are kept | In the Load list |
 |---|---|---|---|
 | Resume | After every End turn, and on pause, quit, exit to the main menu or suspend (backgrounding writes only the orders journal) | 1 per campaign, plus the one before as a backup | No; it is what Continue opens |
-| Autosave | At the start of a turn on your autosave interval | Your choice of 1, 3 or 5 per campaign, oldest rotated out | Yes, marked "Auto" |
+| Autosave | At the start of a turn in which a month on your autosave interval begins | Your choice of 1, 3 or 5 per campaign, oldest rotated out | Yes, marked "Auto" |
 | Manual | When you tap Save, with a name | Up to 20 per campaign and 100 in total | Yes |
 | Ironman | After every End turn and on every exit (Save and quit, Exit to main menu, closing the app), in an ironman campaign | 1 plus a backup | Yes, as the campaign itself |
 | Exported | When you tap Export; the file leaves the game | No limit | Imported files join the Manual saves |
 
-**Autosave options.** The interval can be every turn, every 6 turns (January and July), every 12 turns (each January) or off; the default is every 12 turns. You can keep 1, 3 or 5 autosaves per campaign; the default is 3. Turning autosaves off stops only the rotating autosaves. An ironman campaign writes no rotating autosaves, only its ironman save. If something goes wrong, "Restore the last autosave" on the failure screen opens your Resume save, or your newest autosave if the Resume save is damaged. The Resume save cannot be turned off.
+**Autosave options.** The interval can be every month, every 6 months (January and July), every 12 months (each January) or off; the default is every 12 months. An autosave is written at the start of the turn in which that month begins, so even "every month" writes about once every 4 turns. You can keep 1, 3 or 5 autosaves per campaign; the default is 3. Turning autosaves off stops only the rotating autosaves. An ironman campaign writes no rotating autosaves, only its ironman save. If something goes wrong, "Restore the last autosave" on the failure screen opens your Resume save, or your newest autosave if the Resume save is damaged. The Resume save cannot be turned off.
 
 **Continue** opens the newest Resume or Ironman save across all your campaigns, whether it was made on this device or arrived from the cloud. If it came from another device, the button says so: "Continue: Portugal, March 1512 (from Steam Deck)".
 
@@ -194,7 +194,7 @@ From `save-config.example.yaml`.
 | `format.extension` / `format.magic` | `.phsave` / `PHSV` | fixed |
 | `format.thumbnail` | 96 × 64 | fixed |
 | `kinds.resume.keep` | 2 (newest plus backup) | fixed |
-| `kinds.autosave.interval_turns` | 12 | decided default |
+| `kinds.autosave.interval_months` | 12 | decided default |
 | `kinds.autosave.interval_options` | 1, 6, 12, off | fixed |
 | `kinds.autosave.keep` / `keep_options` | 3 / 1, 3, 5 | default |
 | `kinds.manual.max_per_campaign` | 20 | provisional |

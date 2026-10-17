@@ -10,9 +10,9 @@ Feature: What each country knows in 1444
     When any country is set up
     Then it knows "Settled life" and the four boughs
 
-  @RSCH-051 @open-question
+  @RSCH-051 @RSCH-076 @placeholder
   Scenario Outline: Historical starting inventions
-    # OQ-RSCH-11: mapping from institutional_development and region
+    # config: research.start_region_members, research.start_extra
     Given the date is 1444
     When the country "<country>" is set up
     Then it typically knows "<invention>"
@@ -26,3 +26,11 @@ Feature: What each country knows in 1444
       | Portugal | S4 Carrack and caravel         |
       | Ottomans | W5 gunpowder_infantry          |
       | Inca     | G6 Quipu and knot records      |
+
+  @RSCH-076
+  Scenario: Starting knowledge brings what it needs, but no progress
+    Given the date is 1444
+    When the country "Portugal" is set up
+    Then it knows "S1 Magnetic compass and sea charts" and "S2 Lateen and junk rigging", which "S4 Carrack and caravel" needs
+    And it does not know "L25 computing"
+    And it has no study under way

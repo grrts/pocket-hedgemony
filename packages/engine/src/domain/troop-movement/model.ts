@@ -5,6 +5,7 @@ import config from "../../../../rules/data/domain/troop-movement.json" with { ty
 /** The march block of defines.json, shared with march.ts (days per crossing, days to cross, horse, column). */
 export const MARCH: MarchDefines = defines.march as MarchDefines;
 /** The new troop-movement keys (design section 13). */
+import { daysInMonth } from "../time-and-turns/index.ts";
 export const MOVE = config;
 
 export type Road = keyof typeof config.roadFactor;
@@ -31,6 +32,14 @@ export interface Place {
   road?: Road;
   river?: "river" | "great river";
   bridge?: boolean;
+  /** A named ford from config: a bridge in summer and autumn (D-MOVE-10). */
+  ford?: boolean;
+  /** Month index (year × 12 + month) until which a flood doubles its river days (D-MOVE-10). */
+  floodUntil?: number;
+  /** Latitude in degrees, north positive (X-17 frozen rivers). */
+  latitude?: number;
+  /** Dunes are the province's main tile type (D-MOVE-11). */
+  dunes?: boolean;
   /** A mountain province with a historic road, from the config list of passes. */
   pass?: boolean;
   snowPeak?: boolean;
@@ -105,7 +114,10 @@ export interface Army extends Mover {
   /** Retreating after a lost battle (6.2); `from` is the field it lost. */
   broken?: { refuge: string; fledMen: number; from?: string };
   besieging?: boolean;
-  battleDaysLeft?: number;
+  /** The place of the running battle it is in (X-1). */
+  inBattle?: string;
+  /** Ordered out of its battle; leaves at the start of the next round. */
+  retreating?: boolean;
   follow?: { target: string; lastSeen?: string };
   joinOnArrival?: string;
   /** Reserve in days of food, and its full size. */
@@ -115,6 +127,8 @@ export interface Army extends Mover {
   hungry?: boolean;
   haltReason?: StopReason;
   refill?: { at: string; days: number };
+  /** A front drawn with W14 Army divisions: its provinces and this army's stretch of it (8). */
+  front?: { provinces: string[]; stretch: string[] };
 }
 
 export interface Strait {
@@ -156,7 +170,8 @@ export interface MoverRules {
 }
 
 export interface MoveWorld {
-  date: { year: number; month: number };
+  /** The date the turn starts on; day 1 when absent (X-18: a turn is 7 days). */
+  date: { year: number; month: number; day?: number };
   places: Record<string, Place>;
   /** One graph of land provinces and sea zones (adjStart/adjList in the engine). */
   neighbours: Record<string, string[]>;
@@ -166,7 +181,14 @@ export interface MoveWorld {
   rules?: Partial<Record<Exclude<MoverKind, "army">, MoverRules>>;
   /** What a realm sees of an army (scouting is warfare's): shown men, null when unseen; real size when absent. */
   shown?: Record<string, Record<string, number | null>>;
+  /** Armies a realm knows only as a rumour (D-MOVE-17): they count at their shown size but are never intercepted. */
+  rumoured?: Record<string, string[]>;
+  /** Battles being fought over time (X-1). */
+  battles?: import("./day-loop.ts").RunningBattle[];
 }
+
+/** The month's real length, 28 to 31 days (X-3). */
+export const monthLength = (w: Pick<MoveWorld, "date">): number => daysInMonth(w.date.year, w.date.month);
 
 const pair = (list: [string, string][], a: string, b: string) => list.some(([x, y]) => (x === a && y === b) || (x === b && y === a));
 

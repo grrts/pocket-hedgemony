@@ -85,16 +85,15 @@ Feature: Graphics settings
       | 120          |
       | Display rate |
 
-  @SET-040 @open-question
+  @SET-040
   Scenario: Battery saver On
-    # OQ-SET-1: the smaller worker budget must not change AI results
     Given "Battery saver" is "Off"
     When the player sets "Battery saver" to "On"
     Then "Frame rate cap" is 30 and shows "Set by Battery saver"
     And "Sharpness" is "Battery"
     And "Animations" is "Reduced"
     And the map redraws only on change
-    And the AI turn runs with a smaller worker budget
+    And the AI turn's work-step budget is the same as with Battery saver off
 
   @SET-040
   Scenario Outline: Battery saver Auto

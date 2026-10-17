@@ -85,12 +85,11 @@ Feature: Title and main menu
 
     Examples:
       | edition         | entries                                                              |
-      | the full game   | Settings, Achievements, Encyclopedia, Unlock, Credits, Tutorial      |
-      | the Steam demo  | Settings, Achievements, Encyclopedia, Buy the full game, Credits, Tutorial |
+      | the full game   | Settings, Achievements, Almanac, Unlock, Credits, Tutorial      |
+      | the Steam demo  | Settings, Achievements, Almanac, Buy the full game, Credits, Tutorial |
 
-  @SHELL-026 @open-question
+  @SHELL-026
   Scenario Outline: First focus on the main menu
-    # OQ-SHELL-3: the source text for the no-campaign case is garbled
     Given <state>
     When the main menu opens
     Then focus is on "<focus>"
@@ -107,24 +106,22 @@ Feature: Title and main menu
     Then "Continue" is large and wax-red
     And the other entries are paper buttons
 
-  @SHELL-028 @open-question
-  Scenario Outline: The one ad in the free mobile tier
-    # OQ-SHELL-16: whether the ad stays is gap list 3, item 2
-    Given the game is the free mobile tier and keeps its one ad
-    And <condition>
+  @SHELL-028
+  Scenario Outline: No ads in any edition
+    Given the game is "<edition>"
     When the screen "<screen>" is shown
-    Then the ad card <shown>
+    Then no ad card is shown
 
     Examples:
-      | condition                                   | screen        | shown        |
-      | this is not the player's first session       | main_menu     | is shown in the corner opposite the menu, as one still and silent framed card covering no button |
-      | this is the player's very first session      | main_menu     | is not shown |
-      | the player has made any purchase             | main_menu     | is not shown |
-      | this is not the player's first session       | loading       | is not shown |
-      | this is not the player's first session       | map           | is not shown |
-      | this is not the player's first session       | game_menu     | is not shown |
-      | this is not the player's first session       | final_result  | is not shown |
-      | this is not the player's first session       | game_over     | is not shown |
+      | edition                 | screen        |
+      | the free mobile tier    | main_menu     |
+      | the free mobile tier    | loading       |
+      | the free mobile tier    | map           |
+      | the free mobile tier    | game_menu     |
+      | the free mobile tier    | final_result  |
+      | the free mobile tier    | game_over     |
+      | the Steam demo          | main_menu     |
+      | the full game           | main_menu     |
 
   @SHELL-028
   Scenario: Never an ad in the Steam demo
@@ -139,3 +136,24 @@ Feature: Title and main menu
     Then a small "Full game" ribbon is shown
     And picking it opens the screen "unlock"
     And no pop-up about the full game is ever shown
+
+  @SHELL-131
+  Scenario Outline: The first-launch question
+    Given the game is launched for the first time and no campaign exists
+    When the player taps to start
+    Then the question "New to Pocket Hegemony?" is asked with "Play the tutorial, Guided campaign, I know the way"
+    And focus is on "Play the tutorial"
+    When the player picks "<choice>"
+    Then <result>
+
+    Examples:
+      | choice            | result                                                        |
+      | Play the tutorial | chapter 0 of the tutorial starts                              |
+      | Guided campaign   | the screen "new_campaign" opens with guided first turns on    |
+      | I know the way    | the screen "new_campaign" opens with guided first turns off   |
+
+  @SHELL-131
+  Scenario: The first-launch question is asked only once
+    Given the first-launch question was answered
+    When the game is started again and the player taps to start
+    Then the main menu folds open with no question

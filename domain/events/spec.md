@@ -31,7 +31,7 @@ contexts extend, and the data build that validates all of it.
 - Faith waves and faith policy: **religion**. Tongues and nationalism: **culture**. Heritage: **national-strengths**.
 - How an event card looks and how unanswered events block End turn: **game-shell**. Music tags: **audio**.
 - Tutorial-only scripted events: **onboarding**.
-- Where events run in the monthly turn: **time-and-turns**.
+- Where events run in the turn, and in which turn their monthly work runs: **time-and-turns**.
 
 ## 2. Sources
 
@@ -288,7 +288,7 @@ Newest decision first.
 ### 5.9 Effects
 
 - EVT-045 The game shall apply effects by tier: `immediate`; `delayed` after n years (or a range); `ongoing`
-  while the event runs; `long_term` as permanent structural change. [README; schema Effects]
+  each month while the event runs; `long_term` as permanent structural change. [README; schema Effects]
 - EVT-046 The game shall apply only effect types declared in the vocabulary: modifier, stat, transfer,
   create_country, annex, vassalize, release, war, peace, casus_belli, relation, rebels, spread, population,
   move_population, set_flag, start_period, end_period, unlock, government, religion, trade_route, colony.
@@ -412,11 +412,13 @@ Newest decision first.
 - When the campaign end date arrives (time-and-turns), then cut every running age and fire nothing more; the
   final scores screen (game-shell, X-12) is the wrap-up, not an event (D-EVT-2).
 
-## 9. Monthly turn
+## 9. Each month
+
+The events' monthly work runs in the turn in which a new month begins (X-18), in the events step of that turn.
 
 Reads first: every statistic and flag the triggers name, after the other systems' monthly steps.
 
-1. Each year (the January turn): evaluate age and period start and end conditions inside windows; apply
+1. Each year (the turn in which 1 January falls): evaluate age and period start and end conditions inside windows; apply
    forced dates (D-EVT-15).
 2. Each month: AI decisions unanswered for 10 years lapse into the pool (EVT-032).
 3. Each month: evaluate eligibility (availability, requires, trigger, invalidation) and bind roles.
@@ -428,7 +430,7 @@ Reads first: every statistic and flag the triggers name, after the other systems
    derived values.
 
 Events run as step 6 of the turn (X-2): after the monthly, seasonal and yearly steps of every other system and
-before achievements and the autosave. The age and period checks run in the January turn's events step.
+before achievements and the autosave. The age and period checks run in the events step of the turn in which 1 January falls.
 
 ## 10. Configuration
 
@@ -483,7 +485,7 @@ before achievements and the autosave. The age and period checks run in the Janua
 | audio | downstream | Published Language | `music:` tags |
 | achievements | downstream | Published Language | `event_role`, historical vs non-historical choices, narrative_only excluded |
 | onboarding | downstream | Customer–Supplier | `tutorial_only` scripted events in event format; requested Varna crusade and abdication events |
-| time-and-turns | upstream | Conformist | Events are step 6 of the turn, after every other system and before achievements (X-2); yearly checks in the January turn |
+| time-and-turns | upstream | Conformist | Events are step 6 of the turn, after every other system and before achievements (X-2); monthly work in the turn a new month begins, yearly checks in the turn in which 1 January falls (X-18) |
 | game-shell (new game) | upstream | Customer–Supplier | The "Events" choice sets the alternate history mode; settings never change it during play (X-15) |
 
 ## 12. AI
@@ -551,7 +553,7 @@ before achievements and the autosave. The age and period checks run in the Janua
 - **D-EVT-14** (was OQ-EVT-14) trust and notoriety: they are diplomacy's derived values (DIPL-173, DIPL-174).
   An event may still change them; the change is handed to diplomacy (trust down → an Oath broken, notoriety
   up → a Notorious deed) and the event tree stores no number. Diplomacy was designed later.
-- **D-EVT-15** (was OQ-EVT-15) When ages and periods are checked: in the January turn, in the events step
+- **D-EVT-15** (was OQ-EVT-15) When ages and periods are checked: in the turn in which 1 January falls, in the events step
   (step 6 of X-2), before eligibility. X-2 and X-4 put yearly steps in January.
 - **D-EVT-16** (was OQ-EVT-16) The religion flags: religious_persecution_active, missionary_persecution and
   inquisition_established are set by religion's own rules (`set_by: religion` in the events data). Religion

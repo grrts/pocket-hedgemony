@@ -115,7 +115,7 @@ One **Food policy** sets realm-wide defaults, and any castle can have its own va
 | **Tongue** (% sharing the ruler's culture) | Slow assimilation, settlers, schools | Conquest, migration, separatist movements |
 | **In revolt** (provinces with riots or rebels) | Heavy taxes, famine, foreign faith or tongue, disloyal lords stirring, lost wars | Defeating rebels, giving in, lowering taxes, food |
 
-Each province needs an official or a lord to pay properly. A royal province gives full taxes and recruits, but **without an official it pays half taxes and gives half recruits**. Inventions raise how many provinces one official can run (which conflicts with the province rule of one official per province: OQ-REALM-14). A low Faith share means religious revolts and wavering clergy lords; a low Tongue share means separatist revolts and slower officials. Provinces in revolt lose taxes and recruits and spread trouble to neighbours.
+Each province needs an official or a lord to pay properly. A royal province gives full taxes and recruits, but **without an official it pays half taxes and gives half recruits**. One official runs one province with G1, two with G9 and three with G16, plus one more each for B2, G11 and T14. A low Faith share means religious revolts and wavering clergy lords; a low Tongue share means separatist revolts and slower officials. Provinces in revolt lose taxes and recruits and spread trouble to neighbours.
 
 ### Lords
 
@@ -238,9 +238,11 @@ You win by **world domination** or by **leading one of three scores**, each buil
 - **World domination**: you, your subjects and your allies-by-marriage hold 60 % of the world's settled provinces.
 - **Score victory**: lead a score by 50 % over second place for 25 years, or lead it when the campaign's end date (default 31 August 1939) arrives.
 
-All three thresholds are placeholders, and several details are still open (OQ-REALM-6).
+All three thresholds are placeholders. Army power counts foot as 1, horse as 2, guns as 3, a warship as 100 men and a commander as 1,000. Scores are checked every January. A domination win happens at once and you may play on. At the end date the leader of each score wins, and ties share the win.
 
-### Each turn
+### Each month
+
+A turn is one week. These steps run once a month, in the turn in which a new month begins.
 
 | Cadence | What happens |
 |---|---|
@@ -277,14 +279,14 @@ Things you can do: set food policy, override a castle, apply a food preset; take
 - [The 1444 Start](The-1444-Start): starting counts from assessments and relations.
 - [National Strengths](National-Strengths): levers such as a lord loyalty shield.
 - [Naval](Naval): ship counts.
-- [Time and Turns](Time-and-Turns): the monthly turn, seasons, the end date for judging scores.
+- [Time and Turns](Time-and-Turns): weekly turns with monthly steps, seasons, the end date for judging scores.
 - [Screens and Navigation](Screens-and-Navigation): scores, ranks and the campaign result for the end screens.
 - [Achievements](Achievements): score updates and campaign wins.
 - [Map and Lenses](Map-and-Lenses): country card fields.
 
 ## Numbers
 
-All realm numbers are placeholders. Only `women_in_roles` and `age_multipliers` are named in the design; the other keys are the spec's proposals (OQ-REALM-15).
+All realm numbers are placeholders, kept in one realm data file.
 
 | Value | Config key | Design value | Provisional? |
 |---|---|---|---|
@@ -315,26 +317,22 @@ All realm numbers are placeholders. Only `women_in_roles` and `age_multipliers` 
 | Subjects in Power | `win.subject_province_weight` | ½ | Yes |
 | End date | `campaign.end_date` | 31 August 1939 | No (decided) |
 
+## Decided since the first draft
+
+- Tax has five steps: none, light, normal, heavy and crushing. You set them per province, with a realm default.
+- There is no grain market: surplus grain is sold to your own treasury, and missing grain is bought from it, at a fixed price.
+- Armies refill from castles first by default.
+- The throne passes by your government form's succession rule. A lord with 4 to 7 provinces has one *Great lord* reason to waver; one with 8 or more has two.
+- Women can be lords (5 %), commanders (2 %), officials (2 %) or scholars (5 %). These chances grow ×1.5, ×2 and ×3 in the last three ages.
+- Loans cost 10 % a year, less with banking inventions, and are capped at one year's income (three with T10). Each broken oath adds 10 % to the chance a lender refuses.
+- The harvest comes in September in the north and in March in the south. Each region rolls its weather once a harvest: 1 in 6 bad, 1 in 6 good.
+- A child ruler, under 16, rules through the queen mother, or else through the most loyal lord.
+- Starting counts come from each country's assessments, with a seeded spread for countries we know less about.
+
 ## Still open
 
-- **OQ-REALM-1**: Trade v2's edits (traders on the card, deposits instead of merchants) are not adopted, and which market sets the grain price is unclear.
-- **OQ-REALM-2**: Diplomacy's edits (envoy seats, leagues against you, pretenders at court) are not adopted.
-- **OQ-REALM-3**: Warfare's edits (arms and powder stores, prisoners, victories, troop cap, peace voices) are not adopted; warfare says armies refill from castles first, while the default here is locals only.
-- **OQ-REALM-4**: Government wants succession by government form and a *Great lord* loyalty reason; here succession follows culture and history.
-- **OQ-REALM-5**: Is the inheritance law section the decision the gap list still calls open?
-- **OQ-REALM-6**: How army power is weighted, what counts as allies-by-marriage and settled provinces, whether leading at the end needs the margin, ties, how often scores are judged, and whether the campaign ends on a win.
-- **OQ-REALM-7**: Base chances and age multipliers for women in roles are not given; students are "young men" while scholars can be women.
-- **OQ-REALM-8**: Four tax steps here versus five (with None) in the province design.
-- **OQ-REALM-9**: Edits from religion, culture, subjects, recruiting and buildings are not adopted.
-- **OQ-REALM-10**: No numbers for turning assessments into counts, or for the low-confidence range, which must also be seeded.
-- **OQ-REALM-11**: A world-wide autumn harvest for both hemispheres, weather odds, transfer loss, rot and reach per road step are not given.
-- **OQ-REALM-12**: Are Fallen, Oaths broken and Lands taken hard windows or gradual fades?
-- **OQ-REALM-13**: Interest rates, loan sizes, lenders, and how lords lending or being owed money work.
-- **OQ-REALM-14**: Can one official run several provinces as inventions allow, or only one?
-- **OQ-REALM-15**: The realm config file and most keys are not named.
-- **OQ-REALM-16**: No AI rule for food policy, debt, lords, fiefs or tax.
-- **OQ-REALM-17**: Who becomes regent for a child ruler: a lord or the queen mother?
-- **OQ-REALM-18**: Commander stats should come from the warfare design rather than the repo; gain and lose lists differ.
+Nothing. Every question about the realm has been decided; numbers marked as placeholders are tuned during balancing.
+
 
 ## For developers
 

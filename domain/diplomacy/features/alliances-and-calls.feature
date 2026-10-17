@@ -34,7 +34,7 @@ Feature: Alliances and calls to arms
       | war                                                                    | call                                       |
       | the country "Ottomans" declares war on "Hungary"                       | "Wallachia" gets a defensive call this turn |
       | "Hungary", a subject of "X", starts its independence war               | "Wallachia" gets no defensive call         |
-      | "Ottomans" declares war after refusing a demand of "Hungary"           | "Wallachia" gets no defensive call         |
+      | "Ottomans" declares war after "Hungary" refused its demand            | "Wallachia" gets no defensive call         |
 
   @DIPL-096
   Scenario: Refusing a defensive call breaks the alliance
@@ -45,9 +45,8 @@ Feature: Alliances and calls to arms
     And the country "Wallachia" gains an Oath broken
     And the ledger of "Hungary" toward "Wallachia" holds "Abandoned us" at -30
 
-  @DIPL-097 @open-question
+  @DIPL-097
   Scenario: Refusing an offensive call breaks nothing
-    # OQ-DIPL-2: warfare 10.2 still says any refusal breaks the alliance
     Given the country "Hungary" is allied with the country "Papal States"
     And the country "Hungary" declared war on "Ottomans"
     When the country "Papal States" refuses the offensive call
@@ -73,7 +72,7 @@ Feature: Alliances and calls to arms
       | defensive | not B's concern         | is not at war       | 6        | -60    |
 
   @DIPL-099
-  Scenario: Calls are instant and answered next turn
+  Scenario: Calls are instant and answered a month later
     Given the date is "1445-05"
     When the country "Hungary" calls the country "Wallachia" to arms
     Then the call reaches "Wallachia" in "1445-05"

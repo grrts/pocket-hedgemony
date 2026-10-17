@@ -33,26 +33,63 @@ Feature: Rivers, passes, seasons and ground
     When an army of 10000 men enters "Troyes"
     Then the step gains 1 day for the river
 
-  # OQ-MOVE-10: hemisphere of the summer and autumn rule
-  @MOVE-027 @open-question
+  # config: fordMonths (D-MOVE-10: summer and autumn of the ford's hemisphere)
+  @MOVE-027 @placeholder
   Scenario Outline: A ford counts as a bridge in summer and autumn
-    Given the river province "Tortosa" (not a great river) has the ford "Ebro at Tortosa"
-    And the season is <season>
+    Given the river province "Tortosa" (not a great river) has the ford "Ebro at Tortosa" in the <hemisphere>
+    And the month is <month>
     When an army of 10000 men enters "Tortosa"
     Then the step gains <extra> days
 
     Examples:
-      | season | extra |
-      | summer | 0     |
-      | autumn | 0     |
-      | winter | 1     |
+      | hemisphere | month   | extra |
+      | north      | July    | 0     |
+      | north      | October | 0     |
+      | north      | January | 1     |
+      | south      | January | 0     |
+      | south      | July    | 1     |
 
-  # OQ-MOVE-10: which season a flood lasts
-  @MOVE-028 @open-question
-  Scenario: A flood doubles river days
-    Given a flood is on the river province "Troyes"
+  # config: frozenRivers (X-17: latitude 55° or more, December to March)
+  @MOVE-117 @placeholder
+  Scenario Outline: A frozen river is crossed like a bridge
+    Given the river province "Narva" (not a great river) lies at latitude <latitude>
+    And the month is <month>
+    When an army of 10000 men enters "Narva"
+    Then the step gains <extra> days
+
+    Examples:
+      | latitude | month    | extra |
+      | 59       | January  | 0     |
+      | 59       | December | 0     |
+      | 59       | April    | 1     |
+      | 50       | January  | 1     |
+
+  # config: floodMonths 3 (D-MOVE-10)
+  @MOVE-028 @placeholder
+  Scenario Outline: A flood doubles river days for 3 months
+    Given a flood starts on the river province "Troyes" in April
+    And the month is <month>
     When an army of 10000 men enters "Troyes"
-    Then the step gains 2 days
+    Then the step gains <extra> days
+
+    Examples:
+      | month | extra |
+      | April | 2     |
+      | June  | 2     |
+      | July  | 1     |
+
+  # config: greatRiverScaleRanks (D-MOVE-10)
+  @MOVE-024 @placeholder
+  Scenario Outline: Great rivers by scale rank
+    Given a river of Natural Earth scale rank <rank>
+    Then it is <kind>
+
+    Examples:
+      | rank | kind          |
+      | 0    | a great river |
+      | 1    | a great river |
+      | 2    | a river       |
+      | 4    | a river       |
 
   @MOVE-029 @placeholder
   Scenario: A pass counts as a road
@@ -101,16 +138,18 @@ Feature: Rivers, passes, seasons and ground
       | an ocean zone      | needs ships             |
       | a glacier          | can't enter             |
 
-  @MOVE-034 @open-question
-  # OQ-MOVE-11: dunes are a tile type, steps use province ground
+  @MOVE-034 @placeholder
+  # config: dunesDaysToCross 3 (D-MOVE-11: dunes count when they are the province's main tile type)
   Scenario: Dunes
-    Given an army with guns and no camels
-    When it plans a step into dunes
+    Given the desert province "Erg" has dunes as its main tile type next to the desert province "Oasis"
+    And an army of 10000 foot with 4 bombards and no camels stands in "Oasis"
+    When it plans a step into "Erg"
     Then the step is not allowed for its guns
-    And dunes count 3 crossings instead of 2
-    And the army can't forage there
+    And the same army without guns takes 15 days for the step
+    And the same army with camels may take its guns into "Erg"
+    And no army can forage in "Erg"
 
-  # config: ferryDaysPer10kMen; OQ-MOVE-20
+  # config: ferryDaysPer10kMen; a harbour on one side is enough (D-MOVE-20)
   @MOVE-035 @placeholder
   Scenario Outline: Crossing a strait by ferry
     Given "Thrace" and "Bithynia" are a strait crossing in config

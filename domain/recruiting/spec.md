@@ -33,7 +33,7 @@ defines its ceiling), **Fallen from here** and **Veterans here**.
 - The drill yard, barracks and castle buildings themselves (cost, slot, steps): **buildings**.
 - Inventions W12, W14, W15, W18 as research items: **research**.
 - Mustering sailors and admirals (which reuse the levy and the commission): **naval**.
-- The month's order of systems: **time-and-turns**.
+- The order of systems in a turn and in its monthly steps: **time-and-turns**.
 
 ## 2. Sources
 
@@ -161,17 +161,17 @@ Newest decision first.
 - RECR-018 While levied men are away, the recruiting system shall leave their job slots empty, so a building under half filled goes fallow and pays no tax and makes no wares. [recruiting §3.1, §6.2]
 
 ### Recruit pool and Conscription
-- RECR-019 In the January turn, the recruiting system shall refill each province's Recruits here by a quarter of the gap to the ceiling, or a third with a muster master. [recruiting §2.4; D-RECR-3, D-RECR-11]
+- RECR-019 In the turn in which 1 January falls, the recruiting system shall refill each province's Recruits here by a quarter of the gap to the ceiling, or a third with a muster master. [recruiting §2.4; D-RECR-3, D-RECR-11]
 - RECR-020 The recruiting system shall raise Recruits here when disbanded men come home, and let a growing population raise the ceiling. [recruiting §2.4]
 - RECR-021 The recruiting system shall lower Recruits here for levies, students enrolling, famine, plague, men dying in war, and rebels drawing from it when a rising starts (X-9). [recruiting §2.4]
 - RECR-022 While a province riots, the recruiting system shall let only half its Recruits here be called; the ceiling does not change, and the whole pool can be called again when the riot ends. [recruiting §2.4; D-RECR-24]
 - RECR-023 When a levy leaves a province's Recruits here below a quarter of its ceiling, the recruiting system shall give that province the Conscription grievance. [recruiting §2.4, §6.2, §2.1; D-RECR-10]
 - RECR-024 While a province has Fallen from here, the recruiting system shall give Conscription at a third of the ceiling instead of a quarter. [recruiting §2.4]
 - RECR-025 Where the realm has W15 Mass conscription, the recruiting system shall give Conscription only below a tenth of the ceiling, whether or not the province has Fallen from here. [recruiting §2.5; D-RECR-10]
-- RECR-026 When a soldier levied in a province dies, the recruiting system shall add one to that province's Fallen from here, and shall fade a tenth of it in each January turn. [recruiting §2.4; D-RECR-11]
+- RECR-026 When a soldier levied in a province dies, the recruiting system shall add one to that province's Fallen from here, and shall fade a tenth of it each January. [recruiting §2.4; D-RECR-11]
 - RECR-027 The recruiting system shall cut births in a province by 0.2 % for 10 years for each 1 % of its people fallen. [recruiting §2.4, §3.2]
 - RECR-028 When disbanded regiments and levies who were trained or stood in a battle come home, the recruiting system shall add them to that province's Veterans here. [recruiting §2.4]
-- RECR-029 The recruiting system shall lower Veterans here by old age (a tenth in each January turn), dying and leaving as settlers. [recruiting §2.4; D-RECR-11]
+- RECR-029 The recruiting system shall lower Veterans here by old age (a tenth each January), dying and leaving as settlers. [recruiting §2.4; D-RECR-11]
 - RECR-030 While a province's fighting-age men are away, the recruiting system shall cut its births by the share of fighting-age men away. [recruiting §3.2]
 
 ### Food and the harvest
@@ -258,7 +258,7 @@ Newest decision first.
 - RECR-097 The AI shall use the same levy and training commands, with its catalogue personality setting how much of its pool it levies and what it trains. [recruiting §9]
 - RECR-098 The AI shall avoid levying in harvest months unless an enemy army is in its land. [recruiting §9]
 - RECR-099 The AI shall commission stewards and wardens first, keeping tax collectors in their seats. [recruiting §9]
-- RECR-100 The recruiting system shall update each province once a month (training months ticking down), run the yearly rules (pool refill, Fallen and Veterans fading) once in the January turn, and compute a levy as one calculation when tapped. [recruiting §9; X-2; D-RECR-11]
+- RECR-100 The recruiting system shall update each province once a month (training months ticking down), run the yearly rules (pool refill, Fallen and Veterans fading) once in the turn in which 1 January falls, and compute a levy as one calculation when tapped. [recruiting §9; X-2; D-RECR-11]
 
 ### Decided rules (17 October 2026)
 - RECR-101 The recruiting system shall count a levy's 3 free months from the day it has gathered, so training that ends within 3 months owes no pay and knights (9 months) owe 6 months. [recruiting §4.4; D-RECR-8]
@@ -311,16 +311,19 @@ Newest decision first.
 - When buildings completes a drill yard or its barracks step, or a castle step, then recruiting updates training room.
 - When warfare reports loot taken by an army, then recruiting keeps a tenth for its men's home provinces at disband.
 
-## 9. Monthly turn
+## 9. Monthly steps
+
+A turn is one week (X-18). The monthly steps below keep their size and run once, at the end of the turn in which a new month begins; yearly steps run in the turn in which 1 January falls.
+
 
 Each month, per province: training months ticking down (and finished regiments emitted), births cut by men away
 and fallen, pay for levies past their 3 free months, a fifth of pay spent where soldiers are, the empty province's
-tax and recruit effects, Marshal idleness counting. In the January turn only: pool refill toward the ceiling,
-*Fallen from here* and *Veterans here* fading (D-RECR-11). A levy itself is computed when commanded, not in the turn.
+tax and recruit effects, Marshal idleness counting. In the turn in which 1 January falls only: pool refill toward the ceiling,
+*Fallen from here* and *Veterans here* fading (D-RECR-11). A levy itself is computed when commanded, not in the monthly steps.
 
 Reads first: current population per class (province), store levels (realm), sieges (warfare), season/climate
 (time-and-turns, world-map), inventions known (research), who is official in each province (province).
-Recruiting runs in the monthly steps after buildings and before realm (X-2); the yearly rules run in the January turn.
+Recruiting runs in the monthly steps after buildings and before realm (X-2); the yearly rules run in the turn in which 1 January falls.
 
 ## 10. Configuration
 
@@ -386,7 +389,7 @@ still to balance. The `levies` and `military` blocks of `defines.json` are repla
 | naval | downstream | Shared Kernel | Mustering sailors uses the levy (fighting-age men, shares) but has its own seafolk ceiling; sailors away are not at home, so they leave the levy's seafolk count (D-RECR-21); admirals use the commission and the empty province (7.1, 7.4) |
 | rebellions | downstream | Published Language | Armed veterans, a rising's men drawn from the pool (X-9), Conscription grievance |
 | events | downstream | Published Language | Plague rumour brought home; generals too big events |
-| time-and-turns | upstream | Conformist | Month tick, seasons (X-4), the order of the monthly steps: recruiting after buildings, yearly rules in January (X-2) |
+| time-and-turns | upstream | Conformist | Week turn (X-18), month tick, seasons (X-4), the order of the monthly steps: recruiting after buildings, yearly rules in January (X-2) |
 | government | upstream | Conformist | Ungoverned, lords' fiefs (granting land) |
 | diplomacy | upstream | Conformist | War aim (a lord's Want), exiles asking to serve |
 
@@ -414,7 +417,7 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 - **D-RECR-8** (was OQ-RECR-8) Free months: the 3 free months count from the day the levy has gathered (RECR-101), so pikes and light horse train free and knights owe 6 months. It makes both of the design's examples hold.
 - **D-RECR-9** (was OQ-RECR-9) Pay groups: foot = armoured foot, pikes, archers; gunners = hand gunners, pike and shot, musketeers, line infantry, riflemen; horse = light horse, camel riders, horse archers; knights = knights and lancers, war elephants; gun crews = gun crews (RECR-102). Each arm goes to the group it most resembles, with no new group.
 - **D-RECR-10** (was OQ-RECR-10) Conscription threshold: measured on Recruits here after the levy against the ceiling; with W15 the threshold is a tenth even when the province has fallen, otherwise a third with fallen and a quarter without. The later invention replaces the rule it was made to relax.
-- **D-RECR-11** (was OQ-RECR-11) Yearly rules: refill, Fallen and Veterans fading run once, in the January turn (X-2 yearly steps); training ticks monthly; births stay cut for 10 years from the year men fell. Running a yearly rule once a year needs no monthly split.
+- **D-RECR-11** (was OQ-RECR-11) Yearly rules: refill, Fallen and Veterans fading run once, in the turn in which 1 January falls (X-2 yearly steps, X-18); training ticks monthly; births stay cut for 10 years from the year men fell. Running a yearly rule once a year needs no monthly split.
 - **D-RECR-12** (was OQ-RECR-12) W18 Railway mobilization: levies gather in 3 days instead of 14 (provisional); W18's +1 % troop cap in warfare is a separate effect and also applies. Recruiting is the latest design and only needed a number.
 - **D-RECR-13** (was OQ-RECR-13) Students: students are their own class outside clergy and scholars, called at the clerks' share of 4 % of their fighting-age men (provisional), and research from called students stops. It reuses the existing call-share rule.
 - **D-RECR-14** (was OQ-RECR-14) Seasons by climate: north sows in March–April and harvests in August–September, south sows in September–October and harvests in February–March (X-4's harvest month and the month before); rice lands sow in May–June and November–December and harvest in February–March and August–September, each crop lost by the same formula; pastoral lands lose herd growth of twice the share of herders taken in the spring move (March–May north, September–November south). All provisional. It reuses the harvest formula and X-4's seasons.
@@ -461,5 +464,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 | RECR-069–087 | commissioning-officials.feature | Commission scenarios |
 | RECR-088–096 | official-commanders.feature | Effects of official commanders |
 | RECR-097–099 | ai-recruiting.feature | AI scenarios |
-| RECR-100 | recruit-pool.feature | The monthly update ticks training down / The yearly step runs in the January turn |
+| RECR-100 | recruit-pool.feature | The monthly update ticks training down / The yearly step runs when January begins |
 | Worked example (§5, §8) | champagne-1444.feature | Champagne late summer 1444 |

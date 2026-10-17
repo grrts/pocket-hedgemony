@@ -193,6 +193,8 @@ AI countries use the same answers as you. Rivals and opportunists pay rebels and
 
 ### Each month
 
+A turn is one week, so these steps run once a month, in the turn in which a new month begins.
+
 1. Recount each province's step from its grievances.
 2. Apply this month's sparks.
 3. Roll the rising chance for each plotting province.

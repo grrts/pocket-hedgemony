@@ -74,3 +74,18 @@ Feature: Health and the land's condition
     And the smoke feeds the event tree's climate stats
     When the factories and the coal mine close
     Then the smoke goes
+
+  @PROV-301 @placeholder
+  Scenario Outline: Sickness by land
+    Given an army of 10,000 men in land with <sickness> sickness
+    When a month passes
+    Then it loses <lost> men to sickness
+
+    Examples:
+      | sickness   | lost |
+      | Low        | 0    |
+      | Medium     | 100  |
+      | High       | 200  |
+      | Heat       | 200  |
+      | Cold       | 200  |
+      | fever land | 200  |

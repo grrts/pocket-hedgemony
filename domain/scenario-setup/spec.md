@@ -162,7 +162,7 @@ Newest decision first.
 - SETUP-009 (Ubiquitous): Starting assessments shall use the levels very low, low, moderate, high, very high and unknown, each with a justification and a confidence; there shall be no overall power score. [country-catalogue README §4]
 - SETUP-010 (Ubiquitous): Size-dependent dimensions shall be judged on one global scale, quality dimensions relative to the entity's own size and type, and risk dimensions with higher meaning worse. [country-catalogue README §4]
 - SETUP-011 (Ubiquitous): The catalogue shall hold 963 records in 29 regions, with these representations: 274 playable countries, 218 playable subjects, 214 decentralised polities, 115 background only, 68 non-state actors, 58 internal estates, 16 collective institutions. [build/stats.json; gap-lists item 2]
-- SETUP-012 (Ubiquitous): Each record's `gameplay.ai_personality` shall be historically informed tendencies (priorities, expansion modes, diplomatic style, economic focus, doctrine, risk tolerance, constraints, opportunities, failure conditions, adaptation), not scripts. [country-catalogue README §5]
+- SETUP-012 (Ubiquitous): Each record's `gameplay.ai_personality` shall be historically informed tendencies (priorities, expansion modes, diplomatic style, economic focus, doctrine, risk tolerance, constraints, opportunities, failure conditions, adaptation), not scripts. Risk tolerance is read as low, medium or high: very low and low are low, moderate (and unknown) is medium, high and very high are high. [country-catalogue README §5]
 - SETUP-013 (Ubiquitous): The catalogue shall carry no tags, statistics, values, mechanic names or text from commercial games; `meta.eu4_tag` is always null. [country-catalogue README §3; schema]
 
 ### 5.2 Start forms of government
@@ -176,12 +176,12 @@ Newest decision first.
 
 ### 5.3 Country starting values
 
-- SETUP-020 (Ubiquitous): Each country's starting counts shall be set from the catalogue's assessments: economic strength and fiscal resilience → Gold and Debt; manpower potential → Recruits; military capability → Soldiers, Commanders, Horses; naval capability → Ships; administrative capacity → Officials and how many provinces start as royal land; political stability and unrest risk → lords' starting loyalty and provinces in revolt; territorial cohesion → number of lords, the land they hold, and Tongue; institutional development → Schools, Scholars, starting inventions; trade access → Merchants and grain price access; diplomatic influence → extra officials at court ready to go abroad. [country-stats §10] (see OQ-SETUP-6)
+- SETUP-020 (Ubiquitous): Each country's starting counts shall be set from the catalogue's assessments: economic strength and fiscal resilience → Gold and Debt; manpower potential → Recruits; military capability → Soldiers, Commanders, Horses; naval capability → Ships; administrative capacity → Officials and how many provinces start as royal land; political stability and unrest risk → lords' starting loyalty and provinces in revolt; territorial cohesion → number of lords, the land they hold, and Tongue; institutional development → Schools, Scholars, starting inventions; trade access → Merchants and grain price access; diplomatic influence → extra officials at court ready to go abroad. [country-stats §10] (D-SETUP-6)
 - SETUP-021 (Ubiquitous): A `low` confidence in the catalogue shall give a wider random range for the starting counts, so each campaign starts a little differently. [country-stats §10]
 - SETUP-022 (Ubiquitous): Allies, Rivals, Subjects and Enemies shall come straight from `country-relations/data/relations-1444.json` (280 relations and 19 facts on 11 November 1444). [country-stats §10; country-relations README]
 - SETUP-023 (Ubiquitous): Lords for major countries shall come from the great houses the catalogue's history names; a country with only one province has no lords. [country-stats §10; government §6]
 - SETUP-024 (Ubiquitous): Starting traders shall follow `trade_access`: very high 6, high 4, moderate 2, low 1, very low or unknown 0; trade ships for coastal countries with ports, caravans or barges inland. [trade §13.1] @placeholder
-- SETUP-025 (Ubiquitous): Starting trade ratios shall be set by running the starting traders for 24 months before the first turn. [trade §13.1] (see OQ-SETUP-12)
+- SETUP-025 (Ubiquitous): Starting trade ratios shall be set by running the starting traders for 24 months before the first turn. [trade §13.1; D-SETUP-12] It uses the campaign's one seed and does not move the date.
 - SETUP-026 (Ubiquitous): Each record's ruler's faith, people's majority faith and other communities shall be read from the catalogue (`build/catalogue-faiths.json`). [religion §2.3]
 - SETUP-027 (Ubiquitous): In 1444, Portugal, Castile, Genoa and Venice shall start able to explore (they know S4 and sit in the Age of Exploration); Ming China knows S1 and S2 but not S4. [exploration §2]
 
@@ -209,13 +209,13 @@ Newest decision first.
 - SETUP-044 (Ubiquitous): A province's 1444 population (stored in thousands of people) shall be its land area × the density of the first matching settlement region (default 0.8 people per km²), ×0.35 in mountains, desert and tundra, ×1.3 in farmland and marsh, ×2.5 for a capital, spread by 0.7 to 1.3 per province; unowned land is capped at twice the default density. [owners.ts; config.json `settlement`]
 - SETUP-045 (Ubiquitous): A province's 1444 wealth shall be the first matching settlement region's wealth (default 1; 1 for unowned land), +1 if owned and coastal, +2 for a capital, spread by 0.75 to 1.25 and kept between 1 and 10. [owners.ts; config.json]
 - SETUP-046 (Ubiquitous): Until the province data names real castles, the stand-in rule shall wall capitals and provinces of 400 thousand people or more in stone; frontier provinces in stone on high ground with 30 thousand or more or anywhere with 200 thousand or more, in earth otherwise; about 15 % of other owned provinces with an old ring fort; unowned provinces with none. [owners.ts; warfare §8.1; gap-lists item 25]
-- SETUP-047 (Ubiquitous): The engine shall start every nation with the configured treasury (50 gold), levies of 4 men per thousand people, and 20 % horse in starting armies. [defines.json] @placeholder (see OQ-SETUP-11)
+- SETUP-047 (Ubiquitous): A realm with no catalogue assessment shall start with the engine's configured treasury (50 gold), levies of 4 men per thousand people, and 20 % horse in starting armies; a realm with an assessment starts from it (SETUP-020). [defines.json; D-SETUP-11] @placeholder
 
 ### 5.6 Catalogue to map
 
-- SETUP-048 (Ubiquitous): A mapping plan shall say which catalogue record owns which provinces, with capitals, colours, rulers and commanders. [gap-lists item 25] (see OQ-SETUP-1)
-- SETUP-049 (Ubiquitous): The map setup shall use catalogue ids for countries. [country-relations README; trade §13.1; religion §2.3] (see OQ-SETUP-1)
-- SETUP-050 (Ubiquitous): A colony shall be founded only in a province no country owns; land of a tribe that is a country (a chiefdom or clan council in the 1444 list) can only be taken by war or treaty. [exploration §5.1, §10; province-stats §12.3] (see OQ-SETUP-2)
+- SETUP-048 (Ubiquitous): The map's nations shall be the realms and the playable list; capitals, colours and commanders come from the map nations data, and rulers from the matched catalogue record. [gap-lists item 25; X-13; D-SETUP-1, D-SETUP-3, D-SETUP-13]
+- SETUP-049 (Ubiquitous): The map setup shall use catalogue ids for countries. [country-relations README; trade §13.1; religion §2.3; X-13] The 37 map ids that differ are matched through the rename table in `scenario-setup.json` (D-SETUP-1).
+- SETUP-050 (Ubiquitous): A colony shall be founded only in a province no country owns; land of a tribe that is a country (a chiefdom or clan council in the 1444 list) can only be taken by war or treaty. [exploration §5.1, §10; province-stats §12.3; X-13] Only a representation that owns map provinces is a country (D-SETUP-2).
 
 ### 5.7 Playable realms and campaign rules
 
@@ -315,62 +315,25 @@ Nothing after the start. Before the first turn: build the starting world, then t
   README §5; `build/ai-personalities.md`).
 - Background-only records have no AI; playable subjects have their own AI under an overlord (schema).
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- **OQ-SETUP-1 Catalogue against the map (gap item 25).** The map has 137 nations; the catalogue 963
-  records. Only 100 map ids are catalogue ids (83 playable countries, 17 playable subjects). 37 are not:
-  `ireland`, `modena`, `bavaria`, `wurttemberg`, `pomerania`, `switzerland` (catalogue: `swiss_confederation`,
-  a collective institution), `albania`, `ottomans` (catalogue `ottoman`), `knights_of_rhodes`
-  (`knights_hospitaller`), `mamluks` (`mamluk`), `hejaz`, `yemen`, `oman`, `timurids` (`timurid_empire`),
-  `mongols`, `tibet`, `jurchens`, `korea` (`joseon`), `japan`, `khmer`, `pegu`, `bahmanis` (`bahmani`),
-  `vijayanagar` (`vijayanagara`), `orissa`, `tunis`, `mossi`, `kanem_bornu` (`bornu`), `aztecs`
-  (`tenochtitlan` / `triple_alliance`), `zapotec`, `maya`, `chimu` (`chimor`), `muisca`, `iroquois`
-  (`haudenosaunee`), `huron`, `cherokee`, `creek`, `pueblo`. No plan says which record owns which
-  provinces, with capitals, colours, rulers and commanders. Blocks almost every other start value.
-- **OQ-SETUP-2 What becomes a country on the map.** Which representations own provinces: decentralised
-  polities (214), non-state actors (68), internal estates (58), background only (115), collective
-  institutions (16)? Exploration lets any land "no country owns" be colonised, but "land of a tribe that is
-  a country (a chiefdom or clan council in the 1444 list)" can't be. Today 2,253 of 4,411 land provinces are
-  unowned. Which of them are held by decentralised polities? (Gap list still lists "stateless" land as open;
-  exploration §10 decided it.)
-- **OQ-SETUP-3 Which nations are playable at launch (gap item 2).** 274 playable countries, 218 playable
-  subjects and 214 decentralised polities; only the free tier is decided.
-- **OQ-SETUP-4 Start date against reference day.** Relations and the catalogue describe 11 November 1444
-  (after Varna; Mehmed II on the Ottoman throne; the Poland–Hungary union lapsing). The engine starts in
-  March 1444 and the tutorial in April 1444 with Murad II still to abdicate (tutorial chapter 2). Which
-  rulers, wars and unions apply at start? (OQ-TIME-1.)
-- **OQ-SETUP-5 Province starting values (gap item 26).** The design names sources but not values for every
-  province (people, tiles, buildings, wealth). Today's population and wealth come from rough settlement
-  boxes and hashed spread, castles from a stand-in rule.
-- **OQ-SETUP-6 Assessment levels to numbers.** Country stats 10 maps each assessment to stats but gives no
-  number per level, no range width for low confidence, and nothing for `unknown` (6 records have unknown
-  `trade_access`; the HRE has unknown economic strength).
-- **OQ-SETUP-7 Events option.** New game offers "historical or free events"; the event tree has three
-  presets (`historical`, `plausible`, `divergent`). Which maps to which?
-- **OQ-SETUP-8 Collective institutions.** The 16 collective institution records have no rules (gap item 8
-  "Big institutions"), yet start forms give them forms (the HRE elective monarchy, the Hanse confederation,
-  the Triple Alliance tribute empire, the Council of Basel holy rule). Are they countries, institutions over
-  countries, or both? The map has `switzerland` and `aztecs` where the catalogue has institutions.
-- **OQ-SETUP-9 Group records.** Group records such as `silesia` and `tusi_group` stand for many polities
-  (Silesia is background only, start form confederation). How are their provinces owned and played?
-- **OQ-SETUP-10 Two relationship sets.** The catalogue stores 1,126 relationship edges; the relations dataset
-  has 280 relations and 19 facts. Country stats 10 takes allies, rivals, subjects and enemies from the
-  relations dataset; the relations README lists "disagreements with the catalogue". Which wins at start?
-- **OQ-SETUP-11 Flat engine starts.** The engine gives every nation 50 gold and levies from people, while
-  country stats 10 sets gold, debt and recruits from assessments. Which replaces which?
-- **OQ-SETUP-12 Warm-up and the clock.** The 24-month trader warm-up runs "before the first turn": does it
-  use the campaign's seed, move the date, or change anything other than trade ratios? (OQ-TIME-11.)
-- **OQ-SETUP-13 Map capitals and commanders.** Map nations carry capitals as coordinates and commanders with
-  might, cunning and logistics (for example France's Jean de Dunois at cunning 3); the catalogue has
-  capitals by name and no commander statistics (it holds no numbers). Where do commander numbers come
-  from? Troop movement's worked example gives Dunois Cunning 4.
-- **OQ-SETUP-14 Lords for minor countries.** Lords come from the great houses the catalogue names "for major
-  countries". What do tier B and C countries with several provinces get?
-- **OQ-SETUP-15 Province names.** Province names are still modern region names (gap item 25).
-- **OQ-SETUP-17 Map population against the worked examples.** The map gives Aube (Troyes) 305 thousand
-  people; the province design's Troyes card has 72,000. Which scale is meant for a province's people?
-- **OQ-SETUP-16 Coverage and certainty.** 565 records have low overall confidence, 46 are partial and one is
-  a stub; 169 are included as disputed. Do disputed or stub records enter play?
+- **D-SETUP-1** (was OQ-SETUP-1) Catalogue against the map: the map's 137 nations are the realms; the 37 ids that differ are matched to catalogue records through a rename table in `scenario-setup.json` (`ottomans` → `ottoman`, `korea` → `joseon`, `aztecs` → `triple_alliance` …), and ids with no record keep the map's own data. X-13 settles it.
+- **D-SETUP-2** (was OQ-SETUP-2) What becomes a country: only a representation that owns map provinces is a realm; the map's ownership is kept as built, so unowned land stays unowned and colonisable, and other records are reference data events may draw on. X-13 settles it.
+- **D-SETUP-3** (was OQ-SETUP-3) Playable at launch: every realm on the map is playable, with the free tier as already decided. X-13 makes the map's nations the playable list.
+- **D-SETUP-4** (was OQ-SETUP-4) Start date: every campaign and the tutorial start on 11 November 1444, so the catalogue's and relations' rulers, wars and unions apply as they stand that day (Mehmed II rules the Ottomans, the Poland–Hungary union has lapsed). X-5 settles it.
+- **D-SETUP-5** (was OQ-SETUP-5) Province starting values: the map build's people, wealth and castles are the start values, marked provisional for balancing. They are the only complete set.
+- **D-SETUP-6** (was OQ-SETUP-6) Assessment levels: each level becomes a factor on the base start value (very low 0.5, low 0.75, medium 1, high 1.25, very high 1.5), `unknown` counts as medium, and low confidence widens the random range to ±20 % (all provisional in `scenario-setup.json`). Missing numbers get provisional values.
+- **D-SETUP-7** (was OQ-SETUP-7) Events option: "historical" uses the `historical` preset and "free" the `plausible` preset; `divergent` is not offered. Two options map onto two presets with the least change.
+- **D-SETUP-8** (was OQ-SETUP-8) Collective institutions: they are not realms unless a map nation is matched to them (`switzerland` → `swiss_confederation`, `aztecs` → `triple_alliance`), in which case that realm takes the record's start form; the rest are reference data. X-13 settles it.
+- **D-SETUP-9** (was OQ-SETUP-9) Group records: a group record is reference data; its provinces belong to whatever map nation owns them. X-13 settles it.
+- **D-SETUP-10** (was OQ-SETUP-10) Two relationship sets: the relations dataset wins at start, and the catalogue's edges are reference only. Country stats 10 already reads the relations dataset, and it is the curated, later set.
+- **D-SETUP-11** (was OQ-SETUP-11) Flat engine starts: country stats 10's gold, debt and recruits from assessments replace the flat 50 gold and levies, with the engine's defines kept only for a realm with no assessment. The later design wins.
+- **D-SETUP-12** (was OQ-SETUP-12) Warm-up and the clock: the warm-up uses the campaign's one seed, does not move the date and changes only trade ratios. D-TIME-11 settles it.
+- **D-SETUP-13** (was OQ-SETUP-13) Capitals and commanders: capitals and commander numbers come from the map nations data, the only source with numbers, so Dunois has Cunning 3; troop movement's Cunning 4 is an illustration. Keep what the game already does.
+- **D-SETUP-14** (was OQ-SETUP-14) Lords for minor countries: tier B and C countries start with no great houses; they get lords only through the realm's own rules in play. No new mechanic.
+- **D-SETUP-15** (was OQ-SETUP-15) Province names: modern region names stay. D-MAP-6 settles it.
+- **D-SETUP-16** (was OQ-SETUP-16) Coverage and certainty: a disputed, partial or stub record enters play only if it owns map provinces, and low confidence only widens its start range (D-SETUP-6). X-13 settles it.
+- **D-SETUP-17** (was OQ-SETUP-17) Population scale: the map's figure is the province's people in thousands (Aube 305 thousand); the Troyes card's 72,000 is a town-sized illustration, not data. The map is the only complete set.
 
 ## 14. Traceability
 
@@ -389,6 +352,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-010 | catalogue.feature | Assessments are levels judged on the right scale |
 | SETUP-011 | catalogue.feature | The catalogue holds 963 records by representation |
 | SETUP-012 | catalogue.feature | AI personalities are tendencies, not scripts |
+| SETUP-012 | catalogue.feature | Risk tolerance is read in three steps |
 | SETUP-013 | catalogue.feature | Nothing comes from commercial games |
 | SETUP-014 | start-forms.feature | Hand-set overrides win |
 | SETUP-014 | start-forms.feature | Text rules apply in order on the government form text |
@@ -401,6 +365,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-018 | start-forms.feature | Later forms are never start forms |
 | SETUP-019 | start-forms.feature | The summary is generated from the config |
 | SETUP-020 | country-start.feature | Assessments set starting counts |
+| SETUP-020 | country-start.feature | Each assessment level is a factor on the base start value |
 | SETUP-020 | country-start.feature | Low confidence widens the starting range |
 | SETUP-021 | country-start.feature | Low confidence widens the starting range |
 | SETUP-022 | country-start.feature | Starting allies, rivals, subjects and enemies come from the relations file |
@@ -430,10 +395,11 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-044 | map-setup.feature | Unowned land is sparsely peopled |
 | SETUP-045 | map-setup.feature | Wealth follows the region, the coast and capitals |
 | SETUP-046 | map-setup.feature | Castles follow the stand-in rule |
-| SETUP-047 | map-setup.feature | The engine's flat start values |
-| SETUP-048 | catalogue-to-map.feature | Each owning record has provinces, a capital, a colour, a ruler and commanders |
+| SETUP-047 | map-setup.feature | The engine's flat start values serve only realms with no assessment |
+| SETUP-048 | catalogue-to-map.feature | The map's nations are the realms and the playable list |
 | SETUP-049 | catalogue-to-map.feature | Map nations use catalogue ids |
-| SETUP-050 | catalogue-to-map.feature | Only land no country owns can be colonised |
+| SETUP-050 | catalogue-to-map.feature | Only land no realm on the map owns can be colonised |
+| SETUP-050 | catalogue-to-map.feature | A catalogue record that owns no map province is not a realm |
 | SETUP-051 | new-campaign.feature | The free tier offers the Ottomans and France |
 | SETUP-051 | new-campaign.feature | The tutorial is played as the Ottomans |
 | SETUP-052 | new-campaign.feature | A locked realm leads to Unlock and comes back chosen |

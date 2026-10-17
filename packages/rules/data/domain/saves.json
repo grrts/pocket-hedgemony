@@ -58,7 +58,7 @@
       ]
     },
     "autosave": {
-      "interval_turns": 12,
+      "interval_months": 12,
       "interval_options": [
         1,
         6,
@@ -72,9 +72,9 @@
         5
       ],
       "interval_labels": {
-        "1": "every turn",
-        "6": "every 6 turns",
-        "12": "every 12 turns (each January)",
+        "1": "every month",
+        "6": "every 6 months",
+        "12": "every 12 months (each January)",
         "off": "off"
       },
       "every_12_month": 1,

@@ -113,9 +113,9 @@ Feature: Ledger and standing
       | -99      | Cold   |
       | -100     | Bitter |
 
-  @DIPL-078 @placeholder @open-question
+  @DIPL-078 @placeholder
   Scenario Outline: Oaths broken count against you everywhere
-    # OQ-DIPL-18: which actions rely on your word; config: reasons.per_oath_broken
+    # config: reasons.per_oath_broken, reasons.relies_on_word
     Given the country "A" has broken 2 oaths in the last 30 years
     When the country "A" asks the country "B" for "<action>"
     Then the count holds the reason "Oaths broken" at <reason>
@@ -127,10 +127,10 @@ Feature: Ledger and standing
       | arrange marriage | -20    |
       | trade pact       | -20    |
       | send gift        | 0      |
+      | call to arms     | 0      |
 
-  @DIPL-079 @open-question
+  @DIPL-079
   Scenario: Lands taken weigh in neighbours' alliance counts
-    # OQ-DIPL-17
     Given the country "A" took 2 provinces bordering the country "B" in the last 20 years
     When the country "A" proposes an alliance to the country "B"
     Then the count holds "You threaten our frontier" at -10
@@ -152,3 +152,16 @@ Feature: Ledger and standing
     Given the ledger of "A" toward "B" holds "Gift" at +20 fading over 10 years
     When 11 months pass within the same year
     Then "Gift" still weighs +20
+
+  @DIPL-192 @placeholder
+  Scenario Outline: Standing stays within -200 and +200
+    # config: ledger.standing_limit
+    Given the ledger of "A" toward "B" holds entries totalling <total>
+    When the game evaluates it
+    Then the standing of "A" toward "B" reads <standing>
+
+    Examples:
+      | total | standing |
+      | 260   | 200      |
+      | -230  | -200     |
+      | 120   | 120      |

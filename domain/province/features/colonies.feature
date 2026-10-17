@@ -4,9 +4,8 @@ Feature: Colonies and the people already there
   I want colonies to take only free tiles in unowned land
   So that taking land from the people there always shows its cost
 
-  @PROV-250 @open-question
+  @PROV-250 @PROV-298
   Scenario Outline: Only unowned provinces can be colonised
-    # OQ-PROV-7: whether stateless peoples' land is unowned is still open
     Given the province "<province>" is <owned>
     When the country "Portugal" tries to found a colony there
     Then the founding is <result>
@@ -16,6 +15,7 @@ Feature: Colonies and the people already there
       | Madeira   | owned by no country                  | allowed |
       | Kongo     | owned by the country "Kongo"         | refused |
       | Iroquoia  | owned by a tribal country            | refused |
+      | Virginia  | lived in by a stateless people       | allowed |
 
   @PROV-251
   Scenario: A colony takes only the free tiles
@@ -24,9 +24,8 @@ Feature: Colonies and the people already there
     Then the colony takes the 5 free tiles
     And the local people keep their 3 tiles
 
-  @PROV-252 @open-question
+  @PROV-252
   Scenario Outline: Settlement steps are gained
-    # OQ-PROV-7: mapping to the subjects design's colony stages
     Given the province "<province>" has the settlement "<before>"
     When <cause>
     Then the province "<province>" has the settlement "<after>"
@@ -35,6 +34,17 @@ Feature: Colonies and the people already there
       | province | before | cause                                                      | after          |
       | Madeira  | none   | a colonial governor founds a colony there                  | settlement     |
       | Malindi  | none   | the country founds a post with an envoy and gold           | trading post   |
+
+  @PROV-298
+  Scenario Outline: Settlement steps are the subjects design's colony stages
+    Given the province "Virginia" has the settlement "<step>"
+    Then its colony stage is "<stage>"
+
+    Examples:
+      | step         | stage          |
+      | trading post | Outpost        |
+      | settlement   | Settled        |
+      | colony       | Self-governing |
 
   @PROV-252
   Scenario Outline: Settlements are lost

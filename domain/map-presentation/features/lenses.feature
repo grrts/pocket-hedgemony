@@ -11,8 +11,7 @@ Feature: Map lenses
     Then the map is recoloured by food
     And only one lens is on
 
-  @VIEW-022 @open-question
-  # OQ-VIEW-2: the lens list is not agreed between designs
+  @VIEW-022
   Scenario Outline: The lens list holds every system's lens
     Given the lens picker
     When the lenses are listed
@@ -37,6 +36,19 @@ Feature: Map lenses
       | Jobs             | buildings    |
       | Subjects         | subjects     |
       | Revolution       | revolutions  |
+      | Realms           | world-map    |
+      | Terrain          | world-map    |
+      | People           | province     |
+      | Wealth           | province     |
+      | Walls            | warfare      |
+
+  @VIEW-022
+  Scenario: The lens picker holds 22 lenses and scrolls on a phone
+    Given the lens picker on a phone
+    When the lenses are listed
+    Then 22 lenses are offered
+    And the picker scrolls
+    And the lenses "Traders passing" and "Trade balance" are not offered
 
   @VIEW-023
   Scenario Outline: The Faith lens hatches large minority communities

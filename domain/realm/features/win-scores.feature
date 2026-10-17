@@ -12,13 +12,15 @@ Feature: Winning the campaign
     When the scores are worked out
     Then its Economy score is built from 400 yearly income and a bank of 600
 
-  @REALM-152 @placeholder @open-question
+  @REALM-152 @REALM-160 @placeholder
   Scenario: The Power score counts subjects at half
-    # config: win.subject_province_weight; OQ-REALM-6 on army weights
+    # config: win.subject_province_weight, win.army_weights, win.warship_men, win.commander_men
     Given the country "Ottomans" holds 60 provinces and its subjects hold 20
+    And it has 30,000 foot, 10,000 horse, 2,000 guns, 20 warships and 3 commanders
     When the scores are worked out
     Then its Power score counts 70 provinces
     And adds its army power from soldiers weighted by kind, warships and commanders
+    And its army power is 61
 
   @REALM-153
   Scenario: The Technology score weighs inventions by era cost
@@ -27,24 +29,43 @@ Feature: Winning the campaign
     Then its Technology score weighs each invention by its era cost in the research tree
     And no event removes a known invention from it
 
-  @REALM-154 @placeholder @open-question
-  Scenario: World domination
-    # config: win.domination_share; OQ-REALM-6 on "allies-by-marriage" and "settled provinces"
-    Given the country "Ottomans", its subjects and its allies-by-marriage hold 61 % of the world's settled provinces
+  @REALM-154 @REALM-173 @placeholder
+  Scenario Outline: World domination
+    # config: win.domination_share, win.checked_month
+    Given the country "Ottomans" owns or holds as subjects <share> % of the world's settled land provinces
+    And it is the turn in which 1 <month> falls
     When the scores are worked out
-    Then the country "Ottomans" wins by world domination
+    Then the country "Ottomans" <result>
 
-  @REALM-155 @placeholder
-  Scenario: Leading a score long enough
-    # config: win.score_margin, win.score_years
+    Examples:
+      | share | month   | result                                                       |
+      | 50    | January | wins by world domination and may keep playing to the end date |
+      | 49    | January | does not win yet                                             |
+      | 60    | June    | does not win yet                                             |
+
+  @REALM-155 @REALM-173
+  Scenario: Leading by a wide margin does not end the campaign early
     Given the country "Venice" has led Economy by 50 % over second place for 25 years
     When the scores are worked out
-    Then the country "Venice" wins by the Economy score
+    Then no one wins by a score before the end date
 
-  @REALM-155 @open-question
+  @REALM-155 @REALM-173
   Scenario: Leading a score when the campaign ends
-    # OQ-REALM-6: whether the margin is needed at the end date
     Given the date is 31 August 1939
     And the country "Japan" leads the Technology score
     When the campaign's end date arrives
     Then the country "Japan" wins by the Technology score
+
+  @REALM-173
+  Scenario: Tied leaders share the win
+    Given the date is 31 August 1939
+    And the countries "Japan" and "Germany" share the lead in the Technology score
+    When the campaign's end date arrives
+    Then both "Germany" and "Japan" win by the Technology score
+
+  @REALM-173
+  Scenario: A campaign that ends without a win
+    Given the date is 31 August 1939
+    And the country "Portugal" leads no score and holds no domination
+    When the campaign's end date arrives
+    Then the campaign shows the final scores and the player's rank in each

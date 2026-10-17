@@ -30,9 +30,8 @@ Feature: Where settings are stored and how they sync
     Then "settings-device.json" and "settings-personal.json" are written
     And each holds a version number
 
-  @SET-025 @open-question
+  @SET-025
   Scenario: Signed in, personal settings sync setting by setting
-    # OQ-SET-13: the saves design does not yet carry settings
     Given the player is signed in on a "Steam Deck" and a "Pixel 8"
     And on the "Steam Deck" the player set "Font" to "Plain" at 10:00
     And on the "Pixel 8" the player set "Date format" to "1444-10-16" at 10:05

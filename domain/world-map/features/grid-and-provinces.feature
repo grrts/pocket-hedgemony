@@ -27,8 +27,7 @@ Feature: Map grid and provinces
       | Far north                           | 3200   |
       | anywhere else                       | 1100   |
 
-  @MAP-004 @open-question
-  # OQ-MAP-6: historical names wait for the catalogue-to-map plan
+  @MAP-004
   Scenario Outline: A province is named after its modern admin region
     Given a province cut from the admin region "<admin region>" that was <split>
     When the map is built
@@ -58,6 +57,28 @@ Feature: Map grid and provinces
     Given the province "Aube"
     When its record is read
     Then it has an id, a name, a centre, a size, a ground, a coastal flag, a river flag and a list of neighbours
+
+  @MAP-046
+  Scenario Outline: A province records its tile type
+    Given the province "<province>"
+    When its record is read
+    Then its tile type is "<type>" and its ground is "<ground>"
+
+    Examples:
+      | province                      | type      | ground    |
+      | Bozen                         | snowpeaks | mountains |
+      | East Homs (Hims)              | dunes     | desert    |
+      | North Qaasuitsup Kommunia     | glacier   | tundra    |
+      | Northeast Henan               | paddies   | farmland  |
+      | Aube                          | farmland  | farmland  |
+
+  @MAP-047
+  Scenario: A lake shore counts as water for shore tiles but has no sea zone
+    Given the province "Tartu"
+    When its record is read
+    Then it is marked coastal
+    And it counts as on water for shore tiles
+    But it has no sea-zone neighbour
 
   @MAP-008 @placeholder
   Scenario Outline: A province's tiles follow its size on the map

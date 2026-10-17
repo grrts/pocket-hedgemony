@@ -137,7 +137,7 @@ Then("the campaign can never earn achievements", (s) => {
   expect(c.flags.ironman_unbroken).toBe(false);
   expect(A.eligible(c)).toBe(false);
   // Nothing turns it back on: a later moment still earns nothing.
-  expect(occur(s, "turn_end", { turns_played: 12 }).unlocked).toEqual([]);
+  expect(occur(s, "turn_end", { months_played: 12 }).unlocked).toEqual([]);
 });
 
 When("the player uses a {string} cheat once", (s, cheat: A.Cheat) => {
@@ -170,7 +170,7 @@ When("the player plays on as the country {string}", (s, country: string) => {
   s.lost = A.switchCountry(campaign(s), country);
 });
 Then("no achievement unlocks from that moment on", (s) => {
-  expect(occur(s, "turn_end", { turns_played: 12, gold: 10000 }).unlocked).toEqual([]);
+  expect(occur(s, "turn_end", { months_played: 12, gold: 10000 }).unlocked).toEqual([]);
   expect(occur(s, "regiment_trained", { regiments_trained: 1 }).unlocked).toEqual([]);
 });
 Then("achievements earned before the switch are kept", (s) => {

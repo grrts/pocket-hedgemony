@@ -178,7 +178,7 @@ Sea powers (Venice, Genoa, Portugal, the Hanse towns, Hormuz, Malacca, Ryukyu) k
 
 ### Each day and each month
 
-Each day of the day loop fleets take their step and use supply, and storms, ice, docking and resupply happen on their day; a battle starts on its day and runs in 4-hour steps until one side is beaten or retreats. Each month: pay wages and upkeep and feed sailors (unpaid crews desert and foreign crews leave); sailors waiting over 6 months drift home; hulls advance and finished ships launch; rot, the 10-year wreck and refits apply; a fifth of in-port wages is spent in the port; province effects update. Each season pirate fleets grow or stay. Each year ships age and admirals may gain Logistics.
+Each day of the day loop (7 days a turn) fleets take their step and use supply, and storms, ice, docking and resupply happen on their day; a battle starts on its day and runs in 4-hour steps until one side is beaten or retreats. Each month, in the turn in which the month begins: pay wages and upkeep and feed sailors (unpaid crews desert and foreign crews leave); sailors waiting over 6 months drift home; hulls advance and finished ships launch; rot, the 10-year wreck and refits apply; a fifth of in-port wages is spent in the port; province effects update. Each season pirate fleets grow or stay. Each year ships age and admirals may gain Logistics.
 
 ## What you see
 

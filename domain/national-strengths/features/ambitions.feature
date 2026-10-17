@@ -168,5 +168,5 @@ Feature: Hidden ambitions
   @HER-078
   Scenario: Heritage counts time month by month
     Given the country "Portugal" has a heyday awake in an active age
-    When 300 turns pass with its wakes condition holding
+    When 300 months pass with its wakes condition holding
     Then the heyday has served 25 years

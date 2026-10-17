@@ -19,24 +19,23 @@ Feature: The music director
     Examples:
       | situation | state |
       | the player is at war and losing badly while a plague chain is active | war_losing |
-      | the player besieges a castle with no field battle in the last 3 turns and unrest is high | war_siege |
+      | the player besieges a castle with no field battle in the last 3 months and unrest is high | war_siege |
       | a crisis chain is active and the player is at peace with high stability | crisis |
       | the player is at peace with nothing special | peace rotation |
 
-  # war score and stability are not defined in warfare and realm (OQ-AUD-2).
-  @AUD-040 @placeholder @open-question
+  @AUD-040 @placeholder
   Scenario Outline: State thresholds from music.yaml
     Given <facts>
     Then the music state "<state>" holds
 
     Examples:
       | facts | state |
-      | the war score is -45 | war_losing |
+      | 60 % of the player's peace voices would accept the enemy's terms | war_losing |
       | the capital is occupied | war_losing |
-      | 60 % of the great powers are at war in Era V | world_war |
-      | war was declared 1 turn ago and no battle has been fought | war_mobilize |
-      | 25 % of provinces are above the unrest threshold | unrest |
-      | stability is 2, the treasury is rising and the realm has been at peace for 10 years | prosperity |
+      | 5 of the 8 great powers are at war in Era V | world_war |
+      | war was declared 1 month ago and no battle has been fought | war_mobilize |
+      | 25 % of provinces are Plotting or Risen | unrest |
+      | no lord is Disloyal, half are Loyal, the treasury is rising and the realm has been at peace for 10 years | prosperity |
 
   @AUD-039
   Scenario: Unchanged screens keep the state

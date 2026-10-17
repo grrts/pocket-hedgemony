@@ -11,7 +11,7 @@ import { borders, country, neighbours, oathsBroken, standing, strength, type Ask
 const R = config.reasons;
 const A = config.actions;
 
-/** Divides toward zero (OQ-DIPL-15: the worked example rounds +10 ÷ 4 to +2). */
+/** Divides toward zero (D-DIPL-15: +10 ÷ 4 is +2, −10 ÷ 4 is −2). */
 export const quarter = (n: number, by: number) => Math.trunc(n / by);
 
 export function baseOf(ask: Ask): number {
@@ -235,17 +235,24 @@ function callReasons(d: Diplomacy, ask: Ask): Reason[] {
   out.push({ name: "We are at war already", number: elsewhere.length ? R.strength.already_at_war_new_commitment : 0, own: true });
   const enemy = target ? strength(d, target) : 0;
   out.push({ name: "The enemy is far stronger", number: Math.max(c.enemy_stronger_per_multiple * multiples(enemy, country(d, called).soldiers), c.enemy_stronger_max), own: true });
+  if (ask.callKind === "offensive") {
+    // D-DIPL-5: the target refused a fair demand, so the asker's allies are readier to come.
+    if (d.wars.some((w) => w.declarer === ask.asker && w.target === target && w.provokedBy === target)) out.push({ name: "They refused a fair demand", number: A.demand.on_refusal.our_offensive_call_bonus });
+    // D-DIPL-11: +10 between mobilisation pact partners (pacts exist from era VI).
+    const pact = config.eras.VI?.pact_offensive_call_bonus;
+    if (pact && d.mobilisationPacts.includes([ask.asker, called].sort().join("|"))) out.push({ name: "Our mobilisation pact", number: pact });
+  }
   return out;
 }
 
 /** Makes the count of an ask; yes only when the total is over zero (DIPL-081). */
 export function countAsk(d: Diplomacy, ask: Ask, days?: DaysFn): Count {
-  const reasons: Reason[] = [{ name: `Base (${ask.action.replace(/_/g, " ")})`, number: baseOf(ask), own: true, kind: "base" }];
+  const label = ask.action === "propose_alliance" ? "alliance" : ask.action.replace(/_/g, " ");
+  const reasons: Reason[] = [{ name: `Base (${label})`, number: baseOf(ask), own: true, kind: "base" }];
   if (ask.action === "call_to_arms") {
     reasons.push(...callReasons(d, ask));
     reasons.push({ name: "Standing / 4", number: quarter(standing(d, ask.asked, ask.asker), R.standing_divisor) });
     reasons.push(...personality(d, ask), ...negotiation(d, ask));
-    // Era V's +10 for pact partners has no config key and pacts exist only from era VI (OQ-DIPL-11).
   } else {
     reasons.push(...common(d, ask, days), ...ownReasons(d, ask));
   }

@@ -13,7 +13,8 @@ import { lonLatOf, pixelOf } from "../world-map/index.ts";
  * rules, levers and archetypes live in rules/data/domain/national-strengths.json
  * (copied from national-strengths/config). State is plain data the caller
  * owns; draws use only the Rng the caller hands in. Heritage is evaluated
- * once per turn, after the event tree, and counts time in months (D-HER-9).
+ * once per turn, after the event tree, and counts time in months by the date
+ * (D-HER-9, X-18).
  */
 
 export const nsConfig = config;
@@ -692,14 +693,21 @@ export function serveYears(h: Heritage, years: number): void {
 }
 
 /**
- * One turn of heritage (HER-078, D-HER-9): evaluated once, after the event
- * tree; each awake heyday serves one month (a year is 12 turns).
+ * One turn of heritage (HER-078, D-HER-9, X-18): evaluated once, after the
+ * event tree. Time is measured by the date, not by turns: `monthsBegun` is
+ * the number of new months that began in this turn (0 or 1 in a weekly turn),
+ * and each awake heyday serves that many months (12 to a year).
  */
-export function monthTick(h: Heritage, w: WorldFacts, rng?: Rng): HeritageEvent[] {
+export function turnTick(h: Heritage, w: WorldFacts, rng: Rng | undefined, monthsBegun: number): HeritageEvent[] {
   const out = evaluate(h, w, rng);
   const perYear = RULES.timing.months_per_year;
-  for (const hd of h.heydays) if (hd.state === "awake") hd.yearsAwake = Math.round(hd.yearsAwake * perYear + 1) / perYear;
+  if (monthsBegun > 0) for (const hd of h.heydays) if (hd.state === "awake") hd.yearsAwake = Math.round(hd.yearsAwake * perYear + monthsBegun) / perYear;
   return out;
+}
+
+/** The heritage of a turn in which a new month begins: evaluated, and one month served. */
+export function monthTick(h: Heritage, w: WorldFacts, rng?: Rng): HeritageEvent[] {
+  return turnTick(h, w, rng, 1);
 }
 
 /**

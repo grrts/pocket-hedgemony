@@ -68,9 +68,8 @@ Feature: Treasury
     When the lord "Armagnac" makes demands of the ruler
     Then the lord "Armagnac" is more demanding than if he were not owed money
 
-  @REALM-015 @open-question
+  @REALM-015 @REALM-174
   Scenario: Heavy taxes fill the treasury but stir the realm
-    # OQ-REALM-8: four or five tax steps
     Given the country "France" has the realm tax default "normal"
     When the country "France" raises the realm tax default to "heavy"
     Then more gold reaches the treasury
@@ -82,3 +81,38 @@ Feature: Treasury
     Given the province "Troyes" of "France" is taxed "heavy"
     When rebels in "Troyes" force the tax down
     Then the tax rate of "Troyes" is lower
+
+  @REALM-174
+  Scenario: Five tax steps
+    Given the realm config
+    When the tax steps are read
+    Then they are "none", "light", "normal", "heavy" and "crushing"
+    And a revolt forces "light" down to "none"
+
+  @REALM-164 @placeholder
+  Scenario Outline: Interest and loan size
+    # config: debt
+    Given the country "Castile" knows <inventions>
+    And it has a yearly income of 200 gold
+    When it asks a bank for a loan
+    Then the bank lends at most <cap> gold at <interest> % a year
+
+    Examples:
+      | inventions  | cap | interest |
+      | nothing     | 200 | 10       |
+      | T7          | 200 | 8        |
+      | T7 and T10  | 600 | 8        |
+      | T7 and T12  | 200 | 5.6      |
+
+  @REALM-164 @placeholder
+  Scenario Outline: Broken oaths make others refuse
+    # config: debt.refusal_pct_per_oath
+    Given the country "Castile" has <oaths> oaths broken
+    When it asks for an alliance or a loan
+    Then the chance of a refusal is <pct> %
+
+    Examples:
+      | oaths | pct |
+      | 0     | 0   |
+      | 3     | 30  |
+      | 12    | 100 |

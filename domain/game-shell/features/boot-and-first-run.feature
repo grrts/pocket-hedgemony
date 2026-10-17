@@ -80,7 +80,7 @@ Feature: Boot and first-run questions
 
     Examples:
       | store       | collected                       | shown        |
-      | Google Play | the free mobile tier's ad        | is shown     |
+      | Google Play | tutorial step counts             | is shown     |
       | App Store   | crash reports needing consent    | is shown     |
       | Steam       | nothing that needs consent       | is not shown |
 

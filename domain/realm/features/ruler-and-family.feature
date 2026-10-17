@@ -77,9 +77,8 @@ Feature: Ruler and family
     When the ruler of "Brittany" dies and the marriage gives "France" the strongest claim
     Then the realm of "Brittany" may pass to the ruler of "France"
 
-  @REALM-112 @open-question
+  @REALM-112 @REALM-161
   Scenario: The player cannot choose the inheritance law
-    # OQ-REALM-4 (government asks for succession by form), OQ-REALM-5 (gap-lists still lists it as open)
     Given the country "France" passes the crown only through men
     When the player looks for a way to change it
     Then no command changes the inheritance law
@@ -98,3 +97,43 @@ Feature: Ruler and family
       | Holy Roman Empire     | election by lords            | the candidate the electors choose          |
       | a steppe realm        | strongest claimant           | the strongest claimant among the lords     |
       | a house-ruled realm   | eldest of the house          | a brother or the eldest of the house       |
+
+  @REALM-161
+  Scenario Outline: The government form sets the throne law
+    Given the country "<country>" has a government form whose succession is "<succession>"
+    When its throne law is worked out
+    Then it is "<law>"
+
+    Examples:
+      | country  | succession    | law                |
+      | France   | Eldest heir   | eldest son         |
+      | Castile  | Eldest heir   | eldest child       |
+      | Ottomans | Strongest son | strongest claimant |
+      | Poland   | Lords elect   | election by lords  |
+      | Crimea   | Eldest of the house | eldest of the house |
+
+  @REALM-162
+  Scenario Outline: Great lords are harder to keep loyal
+    Given the lord "<lord>" of "France" holds <provinces> provinces and is "Wavering"
+    When he receives <gifts> gifts of gold
+    Then he is "<loyalty>"
+
+    Examples:
+      | lord     | provinces | gifts | loyalty  |
+      | Armagnac | 3         | 1     | Loyal    |
+      | Brittany | 5         | 1     | Wavering |
+      | Brittany | 5         | 2     | Loyal    |
+      | Burgundy | 9         | 2     | Wavering |
+      | Burgundy | 9         | 3     | Loyal    |
+
+  @REALM-100 @REALM-170
+  Scenario Outline: Who is regent
+    Given the ruler of "France" dies and his heir is 7 years old
+    And <mother>
+    When a regent is chosen
+    Then the regent is <regent>
+
+    Examples:
+      | mother                                   | regent                                       |
+      | the queen mother "Marie of Anjou" lives  | "Marie of Anjou"                             |
+      | there is no queen mother                 | the most loyal lord, "Bourbon"               |

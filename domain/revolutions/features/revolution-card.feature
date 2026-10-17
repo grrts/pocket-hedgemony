@@ -14,7 +14,7 @@ Feature: The revolution card
     And the country "France" has debt above 2000 gold
     And a quarter of the people of "France" want a constitution
     And the crown of "France" is distrusted
-    When the turn's signs are evaluated
+    When the month's signs are evaluated
     Then the country screen of "France" shows the card "FRENCH REVOLUTION" as "brewing"
     And the card says "Breaks out at 4 of 6 signs"
     And the lit signs "Debt above 2,000 gold", "A quarter want a constitution" and "The crown is distrusted" are listed first
@@ -26,14 +26,14 @@ Feature: The revolution card
   Scenario: A republic never sees the card
     Given the country "Venice" is a merchant republic
     And the country "Venice" has debt above 2000 gold
-    When the turn's signs are evaluated
+    When the month's signs are evaluated
     Then no card for "french_revolution" is shown for "Venice"
 
   @REVO-001
   Scenario: No sign lit, no card
     Given the country "France" is a monarchy
     And no sign of "french_revolution" is lit for "France"
-    When the turn's signs are evaluated
+    When the month's signs are evaluated
     Then no card for "french_revolution" is shown for "France"
 
   @REVO-004 @placeholder
@@ -41,7 +41,7 @@ Feature: The revolution card
     # config: revolutions.french_revolution.signs.warn_at, .need
     Given the country "France" is a monarchy
     And <lit> signs of "french_revolution" are lit for "France"
-    When the turn's signs are evaluated
+    When the month's signs are evaluated
     Then the card's bar is "<colour>"
 
     Examples:

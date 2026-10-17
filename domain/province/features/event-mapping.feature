@@ -4,9 +4,8 @@ Feature: Event-tree province stats become concrete changes
   I want event effects on abstract province stats to land as countable changes
   So that the event tree keeps working without abstract meters
 
-  @PROV-270 @open-question
+  @PROV-270
   Scenario Outline: Event effects land as concrete province changes
-    # OQ-PROV-16: several rows leave a choice or have no worked effect; OQ-PROV-1 for trade_access
     Given the province "Troyes" is hit by an event effect "<effect>"
     When the game works out the province's stats
     Then the province "Troyes" gets <result>
@@ -14,16 +13,21 @@ Feature: Event-tree province stats become concrete changes
     Examples:
       | effect                  | result                                             |
       | population −10 %        | people −10 %, townsfolk first in plague events     |
-      | prosperity +2           | two new buildings that fit the province            |
+      | prosperity +2           | two new buildings the owner picks                  |
       | devastation +30         | 30 % of its tiles burned                           |
       | unrest +20              | one named grievance from the event                 |
-      | control −20             | its official fleeing or its road breaking          |
+      | control −20             | its official fleeing, or its road a step down      |
       | fort_level +1           | its castle one step up                             |
       | infrastructure +1       | its road one step up                               |
       | industry +1             | one factory                                        |
-      | trade_access −0.2       | traders passing −20 % for the event's duration     |
+      | trade_access −0.2       | trade ratio gain −20 % for the event's duration    |
       | food_security −0.3      | a harvest two steps worse                          |
       | disease_burden +40      | a plague outbreak                                  |
+      | trade_good              | a new main ware                                    |
+      | urbanization +1         | 5 % of its people moving to town                   |
+      | manpower_yield +1       | its recruit share up by a fifth                    |
+      | environmental_degradation +1 | one tile worn                                 |
+      | colonial_status +1      | its settlement one step up                         |
 
   @PROV-270
   Scenario Outline: Event stats map onto province stats
@@ -42,7 +46,7 @@ Feature: Event-tree province stats become concrete changes
       | infrastructure               | road, harbour and bridge                                |
       | industry                     | factories                                               |
       | trade_good                   | wares made                                              |
-      | trade_access                 | traders passing                                         |
+      | trade_access                 | trade ratio gain                                        |
       | local_supply                 | food from tiles, local store and castle store           |
       | food_security                | food from tiles, local store and castle store           |
       | urbanization                 | townsfolk share                                         |

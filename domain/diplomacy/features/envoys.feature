@@ -28,13 +28,26 @@ Feature: Envoys
       | D       | 11        | G5, G8     | 0        | 4     |
       | E       | 5         | G5, G8     | 1        | 4     |
 
-  @DIPL-049 @open-question
-  Scenario: Shrinking below 10 provinces loses the second seat, not invention seats
-    # OQ-DIPL-13: exactly 10 provinces, and envoys abroad beyond seats
+  @DIPL-049
+  Scenario Outline: Falling to 10 provinces loses the size seat, not invention seats
     Given the country "A" has 12 provinces and knows "G5"
     And the country "A" has 3 envoy seats
-    When the country "A" falls to 9 provinces
+    When the country "A" falls to <provinces> provinces
     Then the country "A" has 2 envoy seats
+
+    Examples:
+      | provinces |
+      | 10        |
+      | 9         |
+
+  @DIPL-049
+  Scenario: Residents beyond the seats are recalled, newest first
+    Given the country "A" has 12 provinces and knows "G8"
+    And the country "A" has residents in "B" since "1440-01" and in "C" since "1443-01" and an envoy on the road to "D"
+    When the country "A" falls to 9 provinces
+    Then the resident in "C" is recalled
+    And the resident in "B" stays
+    And the envoy to "D" finishes its mission
 
   @DIPL-050
   Scenario: No free seat, no envoy
@@ -132,13 +145,14 @@ Feature: Envoys
     Given the countries "Britain" and "France" both know "T14"
     When the country "Britain" sends the action "<action>" to the country "France"
     Then <outcome>
-    And the answer reaches "Britain" the next turn
+    And the answer reaches "Britain" a month later
 
     Examples:
       | action            | outcome                                                  |
       | propose alliance  | it is decided this turn and the envoy never leaves home  |
       | arrange marriage  | the person still travels                                 |
       | make resident     | the person still travels                                 |
+      | courtesy visit    | it is decided this turn and the envoy never leaves home  |
 
   @DIPL-059
   Scenario: An envoy does one task
@@ -191,11 +205,11 @@ Feature: Envoys
     Then the ask arrives this turn with no travel time
 
   @DIPL-064
-  Scenario: A resident warns of war one turn ahead
+  Scenario: A resident warns of war a month ahead
     Given the country "Florence" has a resident at the court of "Milan"
-    And the country "Milan" will declare war on the country "Venice", an ally of "Florence", next turn
+    And the country "Milan" will declare war on the country "Venice", an ally of "Florence", next month
     When the game evaluates it
-    Then the country "Florence" is warned this turn
+    Then the country "Florence" is warned now
 
   @DIPL-065 @placeholder
   Scenario: A courtesy visit

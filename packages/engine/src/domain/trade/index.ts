@@ -1399,11 +1399,11 @@ export function traderCard(t: Trader, extra: { loopDays?: number; progress?: str
 /** Trade lenses on the map. */
 export const tradeLenses = ["Trade ratio", "Trade value", "Traders"] as const;
 
-/** The month's turn-report lines: one line for all deposits, and one per problem. */
+/** The turn's report lines (one week, X-18): one line for all deposits, and one per problem. */
 export function turnReportLines(events: readonly TradeEvent[]): string[] {
   const deposits = events.filter((e) => e.type === "PurseDeposited").reduce((s, e) => s + (e.type === "PurseDeposited" ? e.gold : 0), 0);
   const lines: string[] = [];
-  if (deposits > 0) lines.push(`Traders brought ${fmt(deposits)} gold this month`);
+  if (deposits > 0) lines.push(`Traders brought ${fmt(deposits)} gold this week`);
   for (const e of events) {
     if (e.type === "TraderRobbed") lines.push(`${e.trader} was robbed of ${fmt(e.purse)} gold`);
     else if (e.type === "TraderCaptured") lines.push(`${e.trader} was taken`);

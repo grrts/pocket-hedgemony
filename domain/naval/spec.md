@@ -37,7 +37,7 @@ battles.
 ## 2. Sources
 
 Newest decision first.
-- `planning/gap-lists.md`, "Decisions already made" (16 Oct): one month per turn; multiplayer-friendly orders
+- `planning/gap-lists.md`, "Decisions already made" (16 Oct): one month per turn (since replaced: a turn is one week, X-18); multiplayer-friendly orders
   as data; women can be rulers, lords and commanders; exploration opens with the Age of Exploration; campaign
   ends 31 August 1939.
 - `naval/naval-design.md` (version 1), all sections 1 to 14.
@@ -504,16 +504,17 @@ Newest decision first.
   carried, the fleet holds him as cargo.
 - When an army boards or lands (troop-movement), then the room of men, horses, guns and food is checked.
 
-## 9. Monthly turn
+## 9. Each turn and each month
 
-Each day of the month (troop-movement day loop): fleets take their step; supply is used per zone; storms,
+Each day of the turn's 7 days (troop-movement day loop): fleets take their step; supply is used per zone; storms,
 ice, docking, resupply (one day) and battles start on their day. Sea battles follow X-1: they are fought over
 time in 4-hour rounds, never resolved at once. While a battle with a player fleet runs, the day loop slows to six
 4-hour steps a day (fleets move a sixth of a day per step and may join), with no skip; the player may retreat at any
 step and switch between running battles. Battles between AI realms fight their six rounds each day inside the normal
 day loop and never slow the game.
 
-Each month, after the province's people and food are known and before the treasury closes:
+In the turn in which a new month begins (X-18), after the province's people and food are known and before the
+treasury closes:
 1. Pay wages (0.2 at sea, 0.1 in port, foreign ×2, naval base none), upkeep and feed sailors in port and
    crewed ships (1 ration each) from the province store. Unpaid: desertion and foreign crews leave.
 2. Sailors waiting more than 6 months drift home (1 in 10).
@@ -640,7 +641,7 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | world-map | upstream | Conformist | About 4,700 sea zones (`sea` coastal ~150 km, `ocean` ~300 km), shore tiles, adjacency, provinces for port placement |
 | scenario-setup | downstream | Published Language | `start_ports` (harbour and shipyard per province), canoe landings' extra seafolk and small craft |
 | map-presentation | downstream | Published Language | Port and fleet drawing per zoom, Sea lens, fleet card |
-| time-and-turns | upstream | Conformist | Day loop inside the month, monthly and seasonal steps |
+| time-and-turns | upstream | Conformist | Day loop inside the weekly turn, monthly and seasonal steps (X-18) |
 | events | upstream | Conformist | Ships from events (treasure fleet, gift, wreck) |
 | government | upstream | Conformist | Realms with no officials (chiefdoms, stateless) lead fleets by chiefs or elders |
 

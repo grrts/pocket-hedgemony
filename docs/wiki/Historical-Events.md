@@ -100,7 +100,7 @@ The computer weighs each option by a base weight times named factors:
 
 ### Effects
 
-Effects land in tiers: **immediate**; **delayed** after a number of years (or a range); **ongoing** while the event runs; and **long term** as a permanent change to the world. In the Anglo-Zulu war, the "invade" option starts the war at once and annexes the Zulu kingdom a year later if its war weariness is 10 or more.
+Effects land in tiers: **immediate**; **delayed** after a number of years (or a range); **ongoing** each month while the event runs; and **long term** as a permanent change to the world. In the Anglo-Zulu war, the "invade" option starts the war at once and annexes the Zulu kingdom a year later if its war weariness is 10 or more.
 
 Some events run for a while. They last their duration, apply ongoing effects, end early if their `maintain` condition stops holding, and abort if their cancel condition comes true. Samori Toure's resistance runs for 16 years while the Wassoulou empire exists; if the empire falls in year five, the event ends and its ongoing effects stop. Conditions can ask whether such an event is still running.
 
@@ -186,7 +186,7 @@ An event can carry a music tag (good event, bad event, major event, crisis, revo
 
 ### Each month
 
-Each year, in the January turn, the game checks age and period conditions and applies forced dates. Each month it lets computer decisions older than 10 years lapse, then checks eligibility and binds roles, fires immediate events, rolls pool events under the pacing cap, offers decisions, queues fired events for you in date order (computer choosers answer at once), applies effects, schedules delayed ones, ticks running events and modifiers, fades follow-up boosts and works out derived values again.
+Turns are a week long, so this runs in the turn in which a new month begins. Each year, in the turn in which 1 January falls, the game checks age and period conditions and applies forced dates. Each month it lets computer decisions older than 10 years lapse, then checks eligibility and binds roles, fires immediate events, rolls pool events under the pacing cap, offers decisions, queues fired events for you in date order (computer choosers answer at once), applies effects, schedules delayed ones, ticks running events and modifiers, fades follow-up boosts and works out derived values again.
 
 ## Numbers
 

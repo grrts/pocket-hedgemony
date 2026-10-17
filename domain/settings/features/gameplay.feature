@@ -12,7 +12,7 @@ Feature: Gameplay settings
 
     Examples:
       | setting                      | options                                                       | default        |
-      | Autosave                     | Every turn, Every 6 turns, Every 12 turns (each January), Off | Every 12 turns |
+      | Autosave                     | Every month, Every 6 months, Every 12 months (each January), Off | Every 12 months |
       | Autosaves kept per campaign  | 1, 3, 5                                                       | 3              |
 
   @SET-061
@@ -28,9 +28,8 @@ Feature: Gameplay settings
     When the player opens Gameplay
     Then "Autosave" and "Autosaves kept per campaign" are not shown
 
-  @SET-064 @open-question
+  @SET-064
   Scenario Outline: Confirm End turn
-    # OQ-SET-2: screen flow blocks End turn on unanswered events instead
     Given "Confirm End turn" is "<value>"
     And the Attention screen has <lines> lines
     And <events> events are unanswered
@@ -43,20 +42,21 @@ Feature: Gameplay settings
       | When the Attention screen has lines  | 0     | 0      | the turn ends with one tap                                       |
       | When the Attention screen has lines  | 3     | 0      | the question names the count with "Look" and "End turn anyway"   |
       | Always                               | 0     | 0      | a question is asked                                              |
-      | Off                                  | 3     | 2      | the game asks, because unanswered events always ask              |
+      | Off                                  | 3     | 2      | End turn opens the first unanswered event instead               |
+      | Always                               | 3     | 2      | End turn opens the first unanswered event instead               |
 
   @SET-065
   Scenario Outline: Battle playback speed
     Given "Battle playback speed" is "<speed>"
-    When a player battle is fought
-    Then the turn still stops on its before-the-battle card
-    And each bell plays <pace>
+    When a player battle runs
+    Then the turn does not stop
+    And each 4-hour step plays back in <seconds> seconds
 
     Examples:
-      | speed | pace                          |
-      | 1×    | in 1 to 2 seconds             |
-      | 2×    | twice as fast                 |
-      | 4×    | four times as fast            |
+      | speed | seconds |
+      | 1×    | 0.5     |
+      | 2×    | 0.25    |
+      | 4×    | 0.125   |
 
   @SET-066
   Scenario Outline: Open the turn report

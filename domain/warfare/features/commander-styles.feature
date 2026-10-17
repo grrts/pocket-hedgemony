@@ -22,8 +22,7 @@ Feature: Commander styles
       | Poland-Lithuania | W2       | Szarża husarii | is         |
       | England      | none         | Herse          | is         |
 
-  @WAR-139 @open-question
-  # OQ-WAR-6: recruiting says new commanders take "the realm's current style"
+  @WAR-139
   Scenario Outline: A new commander takes a style by his origin
     Given the country "Castile" has the horse style "Charge en haie" and the foot style "Three battles"
     When it gets a new commander who is <origin>

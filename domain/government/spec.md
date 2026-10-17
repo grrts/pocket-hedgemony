@@ -65,7 +65,7 @@ size no longer affects the cap.
 ### Aggregates
 
 **CountryGovernment** (identity: country id)
-- Holds: current form id; the form held before the last revolutionary regime (needed by revolutions' `old_form`, see OQ-GOV-9);
+- Holds: current form id; the form held before the last revolutionary regime (needed by revolutions' `old_form`, D-GOV-9: the last form not set by a revolution);
   derived officials cap and lords cap with their breakdown (form part, each building's part, national strengths);
   derived subject reach.
 - INV-GOV-1: a country has exactly one government form at any time, from the 27 in config.
@@ -100,15 +100,15 @@ size no longer affects the cap.
 - GOV-002 The government shall set a country's lords cap to its form's lords plus the lords given by its buildings. [government §2]
 - GOV-003 The government shall count each lord as 1 toward the lords cap, whatever his number of provinces. [government §2]
 - GOV-004 While a country is within both caps, the government shall apply no cap consequence. [government §2]
-- GOV-005 If a country has more officials than its officials cap, then the government shall give the province of each official over the cap the grievance *Grasping officials*, taking the newest hires first. [government §2; config over_cap.officials]
+- GOV-005 If a country has more officials than its officials cap, then the government shall give the province of each official over the cap the grievance *Grasping officials*, taking the newest hires first, where "hired" is the date the official entered service in that post, whether hired, a graduate or from a lord's line (D-GOV-17). [government §2; config over_cap.officials]
 - GOV-006 When a country is back within its officials cap, the government shall remove the *Grasping officials* grievance it gave. [government §2]
 - GOV-007 When a New Year begins and a country has more lords than its lords cap, the government shall make one lord lose a loyalty step for each lord over the cap, choosing lowest loyalty first, then the lord with the most provinces. [government §2; config over_cap.lords]
 - GOV-008 The government shall give a lord with 4 to 7 provinces one permanent loyalty down reason *Great lord*, and a lord with 8 or more provinces two. [government §2; config great_lord]
 - GOV-009 Where a national strength adds to a country's caps, the government shall include that addition in the cap. [government §8]
 
 ### 5.2 Buildings that raise the caps
-- GOV-010 The government shall add 6 / 10 / 16 officials and 2 / 4 / 6 lords for a palace at step 1 / 2 / 3. [government §2.1; config buildings.palace]
-- GOV-011 The government shall add 2 officials for each seat at step 1 and 4 for each seat at step 2, one seat per town, step 2 needing G11. [government §2.1]
+- GOV-010 The government shall add 6 / 10 / 16 officials and 2 / 4 / 6 lords for a palace at step 1 / 2 / 3, and for a landmark palace (step 4) the officials GOV-055 gives. [government §2.1; config buildings.palace; D-GOV-10]
+- GOV-011 The government shall add 2 officials for each seat at step 1 and 4 for each seat at step 2, one seat per province, step 2 needing G11. [government §2.1; buildings 7.7; D-GOV-10]
 - GOV-012 The government shall add 4 officials for a chancery, which needs G3 Tax registers. [government §2.1]
 - GOV-013 The government shall add 2 lords for a court of law, which needs G1 Written law codes. [government §2.1]
 - GOV-014 The government shall add 3 lords for a diet hall, which only feudal realm, diet monarchy, elective monarchy and confederation forms may have. [government §2.1; config buildings.diet_hall]
@@ -122,7 +122,7 @@ size no longer affects the cap.
 - GOV-020 If a country's form is colonial government, then the government shall give it no subject reach (it cannot hold subjects). [government §3 "none"; config]
 - GOV-021 The government shall set a country's colonial range, in sea zones from its nearest port or colony, from its form. [government §3]
 - GOV-022 The government shall set how the next ruler is chosen (succession) from the country's form. [government §3]
-- GOV-023 While a country's form is clan council or chiefdom, the government shall mark provinces of its own people as needing no official, so *Ungoverned* never appears there. [government §3; config self_run]
+- GOV-023 While a country's form is clan council or chiefdom, the government shall mark provinces of its own people (the province's largest tongue is the realm's own tongue) as needing no official, so *Ungoverned* never appears there. [government §3; config self_run; D-GOV-13]
 - GOV-024 While a country's form is clan council or chiefdom, the government shall still require an official in provinces of another people. [government §3]
 - GOV-025 While a colonial governor holds a governor slot, the government shall not count him against the officials cap. [government §3; config colonial_governors_count_against_officials_cap]
 - GOV-026 When a governor's colony is founded, the government shall count him as that colony's official against the officials cap. [government §3]
@@ -132,9 +132,9 @@ size no longer affects the cap.
 - GOV-028 If a reform's listed needs are not all met, then the government shall refuse the reform. [government §4]
 - GOV-029 When a reform passes, the government shall take the reform's gold from the treasury. [government §4]
 - GOV-030 If the treasury holds less than the reform's gold, then the government shall refuse the reform. [government §4 "costs gold"]
-- GOV-031 When a reform passes, the government shall make the reform's listed number of lords lose a loyalty step. [government §4; config lords_slip]
+- GOV-031 When a reform passes, the government shall make the reform's listed number of lords lose a loyalty step, choosing lowest loyalty first, then the lord with the most provinces, as at New Year. [government §4; config lords_slip; D-GOV-4]
 - GOV-032 When a reform passes, the government shall set the new form, so that both caps, subject reach, colonial range and succession follow the new form from then on. [government §3, §4]
-- GOV-033 The government shall use the reform rows of config `reforms` (needs, gold, lords slipping) as the full list of reforms. [government §4 "The full list is in the config"]
+- GOV-033 The government shall use the reform rows of config `reforms` (needs, gold, lords slipping) as the full list of reforms; a form reaches a constitutional form by reform only through a listed row. [government §4 "The full list is in the config"; D-GOV-1]
 
 ### 5.5 Form changes without a reform
 - GOV-034 When a revolution or a won *New ideas* rising sets a form, the government shall change the country to that form without a reform. [government §4]
@@ -143,9 +143,19 @@ size no longer affects the cap.
 - GOV-037 When an army coup succeeds, the government shall set the country's form to military junta. [government §4]
 - GOV-038 When a shogunate's shogun loses the capital, the government shall break the shogunate into warlord domains. [government §4; config reform shogunate → warlord_domain]
 - GOV-039 When an event sets an event-tree `government` value, the government shall set the form given in config `event_tree_map`. [government §5]
-- GOV-040 If the event value already fits the current form (the current form is in its `keep_if_in` list), then the government shall leave the form unchanged. [government §5]
+- GOV-040 If the event value already fits the current form (the current form is in its `keep_if_in` list), then the government shall leave the form unchanged; `monarchy` keeps every house form (elective and constitutional monarchy included) and the chiefly and warrior monarchies, and `republic` keeps the merchant republic too. [government §5; D-GOV-8]
 - GOV-041 When an event sets `republic` on a country that does not have G14, the government shall set city commune instead of constitutional republic. [government §5; config before_G14]
-- GOV-042 When an event changes `admin_capacity`, the government shall apply it to the officials cap. [government §5]
+- GOV-042 When an event changes `admin_capacity`, the government shall add the change (1 official per point) to the officials cap for good, shown as an "events" part, and never let the cap fall below 0. [government §5; D-GOV-11]
+
+### 5.5a Decided rules (17 October)
+- GOV-050 When the condition of a condition row holds (the ruling line dies out, no adult heir, the shogun loses the capital, trade in debt 3 years running, the ruler deposed or abdicates, a king invited by parliament, the crown takes over), the government shall change the form by itself in the monthly government step, with the row's gold (0) and its lords slipping; a country cannot order a condition row as a reform. [config reforms; D-GOV-3]
+- GOV-051 If a next form has no reform row (confederation, military junta or party state → constitutional republic), then the government shall refuse it as a reform and the card shall show it as reached "by revolution or event only". [config forms.next; D-GOV-2]
+- GOV-052 When the turn in which 1 January falls comes, the AI shall order the reform to the first of its form's next forms, in their listed order, whose needs it meets and whose gold it holds twice over. [D-GOV-12]
+- GOV-053 When a country's form changes to one that holds no subjects (colonial government), the government shall release all its subjects. [government §3 "none"; D-GOV-16]
+- GOV-054 When a revolution sets a form, the government shall remember the last form not set by a revolution as the country's old form; any other change of form sets the old form to the new form. [revolutions `old_form`; D-GOV-9]
+- GOV-055 The government shall count a landmark palace (palace step 4) as the landmark's officials (Forbidden City 24, Topkapı Palace 20) and 6 lords. [buildings landmarks; D-GOV-10]
+- GOV-056 The government shall count "the ruler takes a reformed faith" as met when a prince-bishopric's or military order's state faith differs from the faith it was founded in. [D-GOV-14]
+- GOV-057 The government shall publish as monarchies, for religion's Inquisition, the forms whose event-tree value is `monarchy`, `elective_monarchy` or `constitutional_monarchy`. [config forms.event_tree; religion config; D-GOV-15]
 
 ### 5.6 The start in 1444
 - GOV-043 The government shall give each catalogue record its start form by the first rule that applies: a hand-set override, then the text rules in order on the catalogue's government form text, then (for entity type kingdom) kingdom by region, then the entity type table, then the default chiefdom. [government §6; start-forms.yaml; assign_start_forms.py]
@@ -163,7 +173,8 @@ size no longer affects the cap.
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
 | `Reform(country, toForm)` | player / AI | `toForm` in current form's next forms; a matching reform row; all needs met; gold ≥ reform gold | Form changes; gold paid; listed lords slip | `GovernmentFormChanged(cause=reform)`, `LordsSlippedOnReform` |
-| `SetFormByRevolution(country, form)` | system (revolutions) | A revolutionary regime or won *New ideas* rising | Form set, era ignored; previous form remembered | `GovernmentFormChanged(cause=revolution)` |
+| `SetFormByRevolution(country, form)` | system (revolutions) | A revolutionary regime or won *New ideas* rising | Form set, era ignored; the last form not set by a revolution remembered (D-GOV-9) | `GovernmentFormChanged(cause=revolution)` |
+| `ApplyConditionChange(country)` | system (monthly step) | A condition row's condition holds (D-GOV-3) | Form changes; row's lords slip | `GovernmentFormChanged(cause=condition)`, `LordsSlippedOnReform` |
 | `SetFormByCoup(country)` | system (warfare / events) | A successful army coup | Form becomes military junta | `GovernmentFormChanged(cause=coup)` |
 | `BreakShogunate(country)` | system | Form is shogunate and the shogun lost the capital | Form becomes warlord domain(s) | `GovernmentFormChanged(cause=capital_lost)` |
 | `ApplyEventGovernment(country, value)` | system (events) | An event effect sets a `government` value | Mapped form, or unchanged if it fits | `GovernmentFormChanged(cause=event)` (only on change) |
@@ -173,11 +184,11 @@ size no longer affects the cap.
 
 | Event | When | Payload | Consumed by |
 |---|---|---|---|
-| `GovernmentFormChanged` | Any change of form | country, old form, new form, cause | subjects, exploration, realm, culture, religion, revolutions, events, map-presentation |
+| `GovernmentFormChanged` | Any change of form | country, old form, new form, cause | subjects (releases all subjects when the new form holds none, D-GOV-16), exploration, realm, culture, religion, revolutions, events, map-presentation |
 | `CapsChanged` | A form, building or strength change alters a cap | country, officials cap, lords cap | province, realm |
 | `OfficialOverCap` / `OfficialBackUnderCap` | Officials exceed / fall back within the cap | country, official, province | province (grievance *Grasping officials*) |
 | `LordsOverCapAtNewYear` | New Year with lords over the cap | country, lords chosen, steps | realm (loyalty) |
-| `LordsSlippedOnReform` | A reform passes | country, number of lords | realm |
+| `LordsSlippedOnReform` | A reform or condition change passes | country, the lords chosen (lowest loyalty, then most provinces) | realm |
 | `GreatLordReasonsChanged` | A lord's province count crosses 4 or 8 | lord, reasons | realm |
 | `StartFormsAssigned` | Setup | record → form, rule used | scenario-setup |
 
@@ -191,10 +202,13 @@ size no longer affects the cap.
 - When an army coup succeeds (warfare / events), then GOV sets military junta.
 - When a shogunate loses its capital (warfare), then GOV breaks it into warlord domains.
 - When an event effect sets a `government` value or changes `admin_capacity` (events), then GOV applies the mapping.
-- When a prince-bishopric's or military order's ruler takes a reformed faith (religion), then the reform to feudal realm becomes possible.
+- When a prince-bishopric's or military order's state faith changes from its founding faith (religion), then the reform to feudal realm becomes possible (D-GOV-14).
+- When a condition of a condition row holds (realm, trade, warfare, events), then GOV changes the form in its monthly step (D-GOV-3).
 
-## 9. Monthly turn
-- Each month: recompute caps after buildings and hiring have resolved; apply or lift *Grasping officials*.
+## 9. Monthly step
+A turn is one week (X-18); the monthly and yearly steps run once, in the turn in which a new month or year begins.
+- Each month (government's place in the monthly steps, X-2): apply any condition change (D-GOV-3); recompute caps after buildings and hiring have resolved; apply or lift *Grasping officials*.
+- In the turn in which 1 January falls: the AI's reform orders (D-GOV-12) are given with the orders of the next turn.
 - At New Year: apply lords-over-cap loyalty slips (after lords and provinces for the year are settled; realm then applies loyalty).
 - On demand: reforms are orders resolved when issued (gold must be available).
 - Depends on: buildings (steps), province (officials), realm (lords and their provinces), research (inventions), exploration (colonies).
@@ -221,6 +235,11 @@ All numbers are placeholders (government.yaml header: "Every number is a placeho
 | `buildings.parliament_house` | officials, needs | 6, G14 | yes | government.yaml |
 | `forms.<id>` | family, officials, lords, subject_reach, colonial_range, succession, event_tree, next, self_run | table below | yes | government.yaml |
 | `reforms[]` | from, to, needs, gold, lords_slip | table below | yes | government.yaml |
+| `buildings.palace.landmark_step_4` | Landmark palace officials / lords | forbidden_city 24, topkapi 20 / 6 | yes (`_provisional`) | government.json |
+| `over_cap.reform.order` | Which lords slip on a reform | lowest loyalty, then most provinces (D-GOV-4) | no (decision) | government.json |
+| `reforms[].automatic` | Condition rows that change by themselves | 7 rows (D-GOV-3) | no (decision) | government.json |
+| `admin_capacity_officials_per_point` | Officials per event `admin_capacity` point | 1 | yes (`_provisional`) | government.json |
+| `ai.reform_month` / `ai.reform_gold_reserve_factor` | When the AI reforms; gold it must hold per gold of the reform | 1 (January) / 2 | yes (`_provisional`) | government.json |
 | `revolution_ignores_era` | Revolution may set a form before its era | true (decided 16 Oct) | no (decision) | government.yaml |
 | `event_tree_map.<value>` | set, keep_if_in, before_G14 | table in §5 of design | yes | government.yaml |
 | `default`, `kingdom_by_region`, `entity_type`, `text_rules`, `overrides` | Start-form rules (75 overrides) | see start-forms.yaml | yes | start-forms.yaml |
@@ -265,16 +284,16 @@ All numbers are placeholders (government.yaml header: "Every number is a placeho
 |---|---|---|---|
 | buildings | upstream | Customer–Supplier | Which cap buildings stand and at what step; GOV supplies the officials/lords per building (buildings 7.7 adopted these) |
 | province | downstream | Customer–Supplier | GOV → *Grasping officials* grievance, self-run provinces need no official; PROV → officials hired (newest first), their provinces |
-| realm | partnership | Partnership | GOV → loyalty slips (New Year, reforms), *Great lord* reasons, succession by form; REALM → lords, their provinces and loyalty, treasury gold |
-| subjects | downstream | Published Language | Subject reach base and the form's change; colonial government holds none |
+| realm | partnership | Partnership | GOV → loyalty slips (New Year, reforms, lowest loyalty first), *Great lord* reasons, succession by form (country stats' inheritance law dropped, D-GOV-7); REALM → lords, their provinces and loyalty, treasury gold |
+| subjects | downstream | Published Language | Subject reach base and the form's change; a change to colonial government releases every subject (D-GOV-16) |
 | exploration | downstream | Published Language | Colonial range per form; governors in a slot don't count, founded colony's governor does |
-| revolutions | upstream | Conformist | Regimes set forms (era ignored); `old_form` restore needs the remembered form |
+| revolutions | upstream | Conformist | Regimes set forms (era ignored); GOV remembers the last form not set by a revolution for `old_form` (D-GOV-9); committee rule only sets its form |
 | rebellions | upstream | Customer–Supplier | A won *New ideas* rising sets a form; disloyal lords rebel (consequence of slips) |
-| events | upstream | Anti-Corruption Layer | 16 event-tree `government` values mapped to forms; `admin_capacity` → officials cap; events read the form's event-tree value |
+| events | upstream | Anti-Corruption Layer | 16 event-tree `government` values mapped to forms; `admin_capacity` adds 1 official per point for good (D-GOV-11); events read the form's event-tree value |
 | research | upstream | Conformist | G1, G2, G3, G4, G6, G9, G11, G14, W12 as reform needs and building needs |
 | national-strengths | upstream | Customer–Supplier | Additions to caps (e.g. +2 officials for Venice) |
-| religion | upstream | Customer–Supplier | "Ruler takes a reformed faith" opens prince-bishopric/order → feudal realm; religion reads forms for the Inquisition |
-| culture | upstream | Customer–Supplier | Proposed 1.5 province weight of stranger provinces (not adopted, OQ-GOV-5); "own people" for self-run |
+| religion | upstream | Customer–Supplier | A change of state faith from the founding faith opens prince-bishopric/order → feudal realm (D-GOV-14); religion reads the forms' event-tree values for the Inquisition (D-GOV-15) |
+| culture | upstream | Customer–Supplier | A province's largest tongue and the realm's tongue, for self-run "own people" (D-GOV-13); the 1.5 stranger weight is dropped (D-GOV-5) and forms set no tongue policy limits (D-GOV-6) |
 | warfare | upstream | Customer–Supplier | Army coup; loss of the shogun's capital |
 | trade | upstream | Conformist | "4 or more traders abroad", "trade in debt 3 years running" as reform needs |
 | diplomacy | upstream | Conformist | "Allied with 2 neighbours of the same people"; subjects count for "3 or more subjects" |
@@ -283,29 +302,32 @@ All numbers are placeholders (government.yaml header: "Every number is a placeho
 
 ## 12. AI
 
-The government design gives no AI rules. The AI uses the same `Reform` command as the player (multiplayer rule:
-no player-only shortcuts). When the AI reforms, which form it prefers and how it handles being over a cap are open
-(OQ-GOV-12).
+The AI uses the same `Reform` command as the player (multiplayer rule: no player-only shortcuts). In the turn in
+which 1 January falls it orders the reform to the first of its form's next forms, in their listed order, whose needs it meets and whose
+gold it holds twice over (D-GOV-12, GOV-052). Building cap buildings is the buildings AI's choice; government adds no
+other AI rule.
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- **OQ-GOV-1** Reform to a constitutional form: the design's table says "Any monarchy or republic → constitutional, 150 to 250 gold, 0 to 4 lords", but config allows constitutional monarchy only from diet, absolute and bureaucratic (200 / 1) and shogunate (250 / 4), and constitutional republic from the three citizen forms (150 / 0). Feudal, elective, household, tribute empire, paramount chiefdom and the faith forms cannot reach it directly. This spec follows config ("the full list is in the config"); confirm.
-- **OQ-GOV-2** Three `next` links have no reform row: confederation → constitutional republic, military junta → constitutional republic, party state → constitutional republic. Are they reachable only by revolution/event, or are reform rows missing?
-- **OQ-GOV-3** Several config reform rows are conditions rather than choices, at 0 gold: feudal → elective ("the ruling line dies out"), horde → confederation ("no adult heir"), shogunate → warlord domain ("the shogun loses the capital"), merchant republic → city commune ("trade in debt 3 years running"), constitutional monarchy ↔ republic ("ruler deposed", "king invited"), company → colonial government ("the crown takes over"). Does the change happen automatically when the condition holds, or must the country choose? The design lists the shogunate case as a change "without a reform", config as a reform.
-- **OQ-GOV-4** Which lords lose a step when a reform passes ("some lords")? Lowest loyalty first like the New Year rule, the biggest, or chosen at random?
-- **OQ-GOV-5** Culture design 5.1 / config `officials.capacity_weight` says a stranger-majority province counts as 1.5 provinces toward how many officials and lords the government can support. Government v2 has no province count in either cap. Not adopted; decide whether it is dropped or how it enters the caps.
-- **OQ-GOV-6** Culture design 10 proposes government types limit Tongue policies ("a nation state can Impose; a confederation is always Let be"). Government v2 has no such rule and no "nation state" form.
-- **OQ-GOV-7** "Changes needed elsewhere" not yet adopted: province-stats 12.1 has no *Grasping officials*; country-stats 5.5 has no *Great lord*; country-stats 8.2 still describes an inheritance law fixed by culture and history (including how a lord's land splits), and gap-lists still lists inheritance law as open, while government says succession by form settles it. Which wins, and who decides how a lord's land passes?
-- **OQ-GOV-8** Event mapping `monarchy` keeps ten forms but not elective monarchy, constitutional monarchy or the faith forms, although the design says "any house … monarchy stays as it is"; an elective or constitutional monarchy hit by `monarchy` would become a feudal realm. Likewise `republic` keeps city commune, peasant commune and constitutional republic but not merchant republic. Intended?
-- **OQ-GOV-9** Revolutions' `restored_monarchy` uses `old_form`: GOV must remember the form held before the last revolutionary regime. Not in the government design. Also revolutions' `committee_rule` "adds the army as a power base", but power bases were removed in v2.
-- **OQ-GOV-10** Seat: government says "one per town", buildings 7.7 says "one per province". Buildings landmarks give a palace step 4 (Forbidden City +24 officials, Topkapı +20 officials) but government lists palace steps 1–3 only.
-- **OQ-GOV-11** "`admin_capacity` in events becomes the officials cap": does an event's `admin_capacity` change add to or replace the officials cap, and for how long?
-- **OQ-GOV-12** No AI behaviour is designed for government (when to reform, building cap buildings, handling over-cap).
-- **OQ-GOV-13** Self-run forms: "their own people run their home provinces". Who counts as "own people" (culture's kin only, or cousins too)? Culture is not referenced.
-- **OQ-GOV-14** "A ruler takes a reformed faith" (prince-bishopric/order → feudal) has no definition in the religion design, which has no "reformed faith" term (Protestant? Anglican? any adopted faith?).
-- **OQ-GOV-15** Religion config restricts the Inquisition to governments `[monarchy, elective_monarchy, constitutional_monarchy]` (event-tree values). Which of the 27 forms count as "monarchies" for it is not stated.
-- **OQ-GOV-16** Where an event sets a form with `none` subject reach (colonial government) on a country that holds subjects, what happens to its subjects?
-- **OQ-GOV-17** Over the officials cap: the order is "newest hires first", but officials can also come as graduates or from a dying lord's line (province 10.2). Is "hired" the date they entered service?
+Decided on 17 October 2026 (DECISIONS.md). No question stays open.
+
+- **D-GOV-1** (was OQ-GOV-1) Reform to a constitutional form: only the config's rows reach a constitutional form by reform: diet, absolute or bureaucratic → constitutional monarchy (200 gold, 1 lord), shogunate → constitutional monarchy (250, 4), and the three citizen forms → constitutional republic (150, 0). A feudal realm reaches one through a diet or absolute monarchy first. The design says "the full list is in the config", and the table line is its summary.
+- **D-GOV-2** (was OQ-GOV-2) Next forms without a reform row: confederation, military junta and party state reach constitutional republic only by revolution or event; the card shows the line "by revolution or event only" (GOV-051). No reform row is invented, and revolutions already set constitutional forms.
+- **D-GOV-3** (was OQ-GOV-3) Condition rows: the seven rows whose need is something that happens (the ruling line dies out, no adult heir, the shogun loses the capital, trade in debt 3 years running, the ruler deposed or abdicates, a king invited by parliament, the crown takes over) change the form by themselves in the monthly government step, at the row's gold (0) and with its lords slipping, and cannot be ordered (GOV-050). The design already treats the shogun's case as a change without a reform, and none of them is a choice.
+- **D-GOV-4** (was OQ-GOV-4) Which lords slip on a reform: the same order as at New Year, lowest loyalty first, then the lord with the most provinces. One order for both slips is simpler than two.
+- **D-GOV-5** (was OQ-GOV-5) Stranger provinces' 1.5 weight: dropped; neither cap counts provinces. Government v2 is the later design and made both caps plain "form + buildings".
+- **D-GOV-6** (was OQ-GOV-6) Forms limiting tongue policies: dropped; no form limits a tongue policy and there is no "nation state" form. It would add a mechanic government v2 does not have.
+- **D-GOV-7** (was OQ-GOV-7) Changes needed elsewhere: government wins. *Grasping officials* is a province grievance and *Great lord* a lord's loyalty reason, as GOV-005 and GOV-008 publish them; succession by form replaces country stats' inheritance law, and a lord's land passes whole to his heir, never split. Government v2 is the later design and says it settles inheritance.
+- **D-GOV-8** (was OQ-GOV-8) Event keep lists: `monarchy` keeps every house form, elective and constitutional monarchy included, plus the chiefly and warrior monarchies already listed; `republic` also keeps the merchant republic. The faith forms do not count as monarchies. The design's own words are "any house … monarchy stays as it is".
+- **D-GOV-9** (was OQ-GOV-9) Old form: government remembers the last form not set by a revolution; any other change of form makes the new form the old form (GOV-054). Committee rule only sets its form, since power bases are gone. Revolutions need `old_form`, and skipping a run of regimes is what "restored" means.
+- **D-GOV-10** (was OQ-GOV-10) Seats and landmark palaces: one seat per province, as the buildings design places it, each adding 2 / 4; a landmark palace is palace step 4 with the landmark's officials (Forbidden City 24, Topkapı Palace 20) and 6 lords, provisional (GOV-055). Buildings owns placement, and the landmark numbers already exist there.
+- **D-GOV-11** (was OQ-GOV-11) Event `admin_capacity`: each point adds 1 official to the officials cap (provisional), for good, shown as "events" on the card; a cap never falls below 0. Adding is simpler than replacing a cap that buildings and form keep changing.
+- **D-GOV-12** (was OQ-GOV-12) Government AI: in the turn in which 1 January falls the AI orders the reform to the first next form, in config order, whose needs it meets and whose gold it holds twice over (factor 2, provisional). It is the smallest rule that makes AI realms change form at all.
+- **D-GOV-13** (was OQ-GOV-13) Own people: a province is of the realm's own people when its largest tongue is the realm's tongue; kin tongues do not count. One comparison is simpler than kin rules.
+- **D-GOV-14** (was OQ-GOV-14) A reformed faith: met when the state faith of a prince-bishopric or military order is no longer the faith it was founded in, whatever the new faith. Religion's state faith change already exists, so no new term is needed.
+- **D-GOV-15** (was OQ-GOV-15) Monarchies for the Inquisition: the forms whose event-tree value is `monarchy`, `elective_monarchy` or `constitutional_monarchy` (GOV-057). Every form already carries its event-tree value.
+- **D-GOV-16** (was OQ-GOV-16) A form that holds no subjects: when a country becomes a colonial government its subjects are all released at once (GOV-053). INV-GOV-6 must hold, and releasing is the existing way a tie ends.
+- **D-GOV-17** (was OQ-GOV-17) "Newest hires first": an official's hire date is the day he entered service in that post, whether hired, a graduate or from a lord's line. One date for every official keeps one order.
 
 ## 14. Traceability
 
@@ -324,8 +346,16 @@ no player-only shortcuts). When the AI reforms, which form it prefers and how it
 | GOV-020 | forms.feature | Colonial government holds no subjects |
 | GOV-023, GOV-024 | forms.feature | Self-run forms need no official for their own people |
 | GOV-025, GOV-026 | forms.feature | Colonial governors and the officials cap |
-| GOV-027 … GOV-033 | reforms.feature | Every reform row; Reform refused; Reform needs a next form; Reform changes the numbers |
+| GOV-027 … GOV-033 | reforms.feature | Every reform row; Reform refused; Reform needs a next form; Reform changes the numbers; The lords with the lowest loyalty lose a step when a reform passes |
 | GOV-034 … GOV-038 | form-changes.feature | Revolution, coup, shogunate |
-| GOV-039 … GOV-042 | form-changes.feature | Event-tree values map to forms; admin_capacity |
-| GOV-043 … GOV-048 | start-forms.feature | Rule order; overrides; kingdom by region; entity types; lords at start; forms no one starts with |
+| GOV-039 … GOV-042 | form-changes.feature | Event-tree values map to forms; A monarchy event on an elective monarchy; An event's admin capacity adds to the officials cap |
+| GOV-043 … GOV-048 | start-forms.feature | Rule order; overrides; kingdom by region; entity types; lords at start; forms no one starts with (GOV-047's scenario waits on the buildings context's 1444 start buildings) |
 | GOV-049 | caps.feature | The government card for France |
+| GOV-050 | reforms.feature | A condition changes the form by itself; A condition change cannot be ordered |
+| GOV-051 | reforms.feature | A reform only goes to a listed next form; A next form with no reform row comes only by revolution or event |
+| GOV-052 | reforms.feature | The AI reforms in January when it meets the needs with gold to spare |
+| GOV-053 | form-changes.feature | A form that holds no subjects releases them all |
+| GOV-054 | form-changes.feature | The form before a run of revolutions is remembered; Another change ends the run of revolutions |
+| GOV-055 | cap-buildings.feature | A landmark palace is palace step 4 |
+| GOV-056 | reforms.feature | A prince-bishop takes a reformed faith |
+| GOV-057 | forms.feature | Which forms count as monarchies for the Inquisition |

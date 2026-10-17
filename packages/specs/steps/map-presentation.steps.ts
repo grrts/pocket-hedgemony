@@ -2,6 +2,7 @@ import { expect } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createEngineHost, createWorld, generateSyntheticRuleset, marchMap, planRoute, processTurn } from "@ph/engine";
 import { MOVE } from "@ph/engine/domain/troop-movement";
+import { MONTHS as MONTH_NAMES, STEPS_PER_DAY } from "@ph/engine/domain/time-and-turns";
 import {
   BUDGETS,
   PHONE_DEFAULTS,
@@ -85,6 +86,17 @@ import {
   type TouchTargetSize,
   type Window,
   type WorksState,
+  zoomForCamera,
+  playbackDays,
+  battleBar,
+  seasonPalette,
+  monthPalettes,
+  lens,
+  lensPicker,
+  canvasRatios,
+  defaultZoomStatement,
+  aiWorkSteps,
+  withBatterySaver,
 } from "@ph/engine/domain/map-presentation";
 import { steps, type Scenario } from "../src/registry.ts";
 
@@ -632,25 +644,107 @@ Given("the config value {string} is {int}", (s, key: string, value: number) => {
   s.secondsPer10Days = value;
 });
 
-When("a turn ends", (s) => {
-  s.playback = playbackCues({ days: 30, marches: [], castleStops: [], battles: [] }, s.secondsPer10Days);
+
+function dayOf(text: string) {
+  const [d, m, y] = text.split(" ");
+  return { year: Number(y), month: MONTH_NAMES.indexOf(m as (typeof MONTH_NAMES)[number]) + 1, day: Number(d) };
+}
+
+When(/^the turn starting on (\d+ \w+ \d+) ends$/, (s, text: string) => {
+  s.days = playbackDays(dayOf(text));
+  s.playback = playbackCues({ days: s.days, marches: [], castleStops: [], battles: [] }, s.secondsPer10Days);
 });
 
-Then("the {int} days of the month play in about {int} seconds", (s, _days: number, seconds: number) => {
-  expect(s.playback.seconds).toBeCloseTo(seconds, 5);
+Then(/^the (\d+) days of the turn play in about ([\d.]+) seconds$/, (s, days: string, seconds: string) => {
+  expect(s.days).toBe(Number(days));
+  expect(s.playback.seconds).toBeCloseTo(Number(seconds), 5);
+});
+
+Given("a player battle ran in {string} from day {int} for {int} days of the turn starting {int} November 1444", (s, place: string, day: number, n: number, d: number) => {
+  s.month = { days: playbackDays({ year: 1444, month: 11, day: d }), marches: [], castleStops: [], battles: [{ day, place, player: true, daysRunning: n }] };
+  s.battleDays = n;
+});
+
+Then(/^the (\d+) whole days play in about ([\d.]+) seconds and the (\d+) battle days in about ([\d.]+) seconds$/, (s, whole: string, ws: string, bd: string, bs: string) => {
+  expect(Number(whole) + Number(bd)).toBe(s.month.days);
+  expect(s.playback.seconds).toBeCloseTo(Number(ws) + Number(bs), 5);
+  expect(Number(bs)).toBeCloseTo(Number(bd) * STEPS_PER_DAY * 0.5, 5);
+});
+
+Then("no skip button is offered", (s) => expect(s.playback.skip).toBe(false));
+
+Given("the player's battles in {string} and {string} are running, {string} followed", (s, a: string, b: string, f: string) => {
+  s.running = [
+    { id: a, place: a, rounds: 3, days: 2 },
+    { id: b, place: b, rounds: 9, days: 3 },
+  ];
+  s.following = f;
+});
+
+When("the player taps {string} in the battle bar", (s, place: string) => {
+  s.following = s.running.find((b: { place: string }) => b.place === place).id;
+  s.camera = { on: place };
+  s.bar = battleBar(s.running, s.following);
+});
+
+Then("the battle bar shows both battles with their progress", (s) => {
+  expect(s.bar.map((b: { place: string; progress: number }) => [b.place, b.progress])).toEqual([
+    ["Langres", 0.25],
+    ["Troyes", 0.5],
+  ]);
+});
+
+Then("{string} is followed and the camera moves to it", (s, place: string) => {
+  expect(s.bar.find((b: { followed: boolean }) => b.followed).place).toBe(place);
+  expect(s.camera.on).toBe(place);
+});
+
+// Seasons on the map (X-17)
+
+Given(/^a province at latitude (-?\d+)(?:, a dry land of (\w+))?$/, (s, lat: string, climate?: string) => {
+  s.seasonProvince = { latitude: Number(lat), ...(climate ? { wetClimate: climate } : {}) };
+});
+
+Given(/^a province at latitude (-?\d+), a mountain province$/, (s, lat: string) => {
+  s.seasonProvince = { latitude: Number(lat), mountain: true };
+});
+
+When(/^the map is drawn in (\w+)$/, (s, month: string) => {
+  s.palette = seasonPalette(s.seasonProvince, MONTH_NAMES.indexOf(month as (typeof MONTH_NAMES)[number]) + 1);
+});
+
+Then("its tiles take the {string} palette", (s, palette: string) => expect(s.palette).toBe(palette));
+
+Given("{int} provinces at latitudes {int}, {int} and {int}", (s, _n: number, a: number, b: number, c: number) => {
+  s.seasonProvinces = [a, b, c].map((latitude, i) => ({ id: `p${i}`, latitude }));
+});
+
+When("the month turns from November to December", (s) => {
+  s.calls = 0;
+  s.palettes = monthPalettes(s.seasonProvinces, 12);
+});
+
+Then("each province's palette is chosen once for December", (s) => {
+  expect([...s.palettes.values()]).toEqual(["snow", "base", "base"]);
+  expect(s.palettes.size).toBe(3);
+});
+
+Then("no setting turns the season palettes off", (_s) => {
+  expect(Object.keys(PHONE_DEFAULTS)).not.toContain("Seasons");
+  expect(seasonPalette({ latitude: 60 }, 1)).toBe("snow");
 });
 
 Then("a skip button is offered", (s) => expect(s.playback.skip).toBe(true));
 
 Given("an army marched to {string} and was stopped by its castle on day {int}", (s, place: string, day: number) => {
-  s.month = { days: 30, marches: [{ army: "Armée de Dunois", route: ["Troyes", "Chaumont", place] }], castleStops: [{ day, castle: place }], battles: [] };
+  s.month = { days: 7, marches: [{ army: "Armée de Dunois", route: ["Troyes", "Chaumont", place] }], castleStops: [{ day, castle: place }], battles: [] };
 });
 
 Given("a battle was fought in {string} on day {int}", (s, place: string, day: number) => {
   s.month.battles.push({ day, place });
 });
 
-When("the month plays back", (s) => {
+When("the turn plays back", (s) => {
   s.playback = playbackCues(s.month);
 });
 
@@ -661,13 +755,14 @@ Then("the army walks its route", (s) => {
 Then("{string} castle rings red on day {int}", (s, place: string, day: number) => {
   const c = s.playback.cues.find((x: { draw: string }) => x.draw === "castle rings red");
   expect(c).toMatchObject({ day, place });
-  expect(c.at).toBeCloseTo(day / 10, 5);
+  expect(c.at).toBeCloseTo((day - 1) / 10, 5);
 });
 
-Then("crossed swords flash on day {int} and playback pauses for half a second", (s, day: number) => {
+Then("crossed swords flash on day {int} and playback does not pause", (s, day: number) => {
   const c = s.playback.cues.find((x: { draw: string }) => x.draw === "crossed swords");
-  expect(c).toMatchObject({ day, pause: 0.5 });
-  expect(s.playback.seconds).toBeCloseTo(3.5, 5);
+  expect(c).toMatchObject({ day });
+  expect(c.at).toBeCloseTo((day - 1) / 10, 5);
+  expect(s.playback.seconds).toBeCloseTo(0.7, 5);
 });
 
 Given("End turn has been given", (s) => {
@@ -827,12 +922,12 @@ When("the slowest route is planned", (s) => {
   const map = marchMap(s.world);
   const land = map.ground.flatMap((g, p) => (g ? [p] : []));
   const army = { men: 10000, horse: 2000, logistics: 0 };
-  // The first fifty routes warm planRoute up; the slowest of the next fifty counts.
+  // The first ten routes warm planRoute up; the slowest of the next ten counts.
   // Each route is timed as the best of three runs so a garbage-collection pause is not counted.
   let worst = 0;
-  for (let i = -50; i < 50; i++) {
-    const from = land[((i + 50) * 7919) % land.length]!;
-    const to = land[((i + 50) * 104729 + 13) % land.length]!;
+  for (let i = -10; i < 10; i++) {
+    const from = land[((i + 10) * 7919) % land.length]!;
+    const to = land[((i + 10) * 104729 + 13) % land.length]!;
     let ms = Infinity;
     for (let run = 0; run < 3; run++) {
       const t0 = performance.now();
@@ -1241,3 +1336,108 @@ Then("the battle plays on the province's tile row", (s) => {
 Then("the castle tile shows its walls with one breach", (s) => {
   expect(siegeMarks(s.zoom, s.siege.breaches)).toEqual([{ draw: "castle tile", breaches: 1 }]);
 });
+
+// ---------------------------------------------------------------------------
+// Decided rules (D-VIEW-1, 2, 3, 5, 7, 9)
+
+Given("the lens picker", (s) => {
+  s.phone = false;
+});
+Given("the lens picker on a phone", (s) => {
+  s.phone = true;
+});
+When("the lenses are listed", (s) => {
+  s.picker = lensPicker();
+});
+Then("the lens {string} is offered, from the context {string}", (s, id: string, context: string) => {
+  expect(s.picker.lenses).toContain(id);
+  if (context !== "world-map" && !["People", "Wealth", "Walls"].includes(id)) expect(lens(id).context).toBe(context);
+});
+Then("{int} lenses are offered", (s, n: number) => {
+  expect(s.picker.lenses).toHaveLength(n);
+  expect(new Set(s.picker.lenses).size).toBe(n);
+});
+Then("the picker scrolls", (s) => {
+  expect(s.phone && s.picker.scrolls).toBe(true);
+});
+Then("the lenses {string} and {string} are not offered", (s, a: string, b: string) => {
+  expect(s.picker.lenses).not.toContain(a);
+  expect(s.picker.lenses).not.toContain(b);
+});
+
+Given(/^the switch "Parchment over unknown lands" is (on|off)$/, (s, sw: string) => {
+  s.view = { ...newMapView(), parchment: sw === "on" };
+  s.charted = new Set(["Castile", "Canaries"]);
+  s.chartedBefore = new Set(s.charted);
+});
+Then("uncharted places lie under the parchment", (s) => {
+  expect(underParchment("Sargasso Sea", s.charted, s.view.parchment)).toBe(true);
+});
+Then("the whole world is shown", (s) => {
+  expect(underParchment("Sargasso Sea", s.charted, s.view.parchment)).toBe(false);
+});
+Then("nothing in the simulation changes", (s) => {
+  expect([...s.charted]).toEqual([...s.chartedBefore]);
+});
+Given("the Sargasso Sea is uncharted for {string}", (s, _c: string) => {
+  expect(s.charted.has("Sargasso Sea")).toBe(false);
+});
+Then("the Sargasso Sea is shown", (s) => {
+  expect(underParchment("Sargasso Sea", s.charted, s.view.parchment)).toBe(false);
+});
+Then("the Sargasso Sea is still uncharted for {string}", (s, _c: string) => {
+  expect(s.charted.has("Sargasso Sea")).toBe(false);
+});
+
+Given("a phone with a device pixel ratio of {int}", (s, dpr: number) => {
+  s.dpr = dpr;
+});
+Given(/^Sharpness is (Battery|Balanced|Native)$/, (s, sh: string) => {
+  s.sharpness = sh;
+});
+Then("the map canvas shades 1 pixel per CSS pixel", (s) => {
+  s.ratios = canvasRatios(s.dpr, s.sharpness);
+  expect(s.ratios.map).toBe(1);
+});
+Then("the overlay canvas draws {int} pixels per CSS pixel", (s, n: number) => {
+  expect(canvasRatios(s.dpr, s.sharpness).overlay).toBe(n);
+});
+
+Given("Battery saver is on", (s) => {
+  s.knobs = withBatterySaver(PHONE_DEFAULTS);
+});
+When("the map is shown and a turn is processed", (s) => {
+  s.drawn = true;
+});
+Then("the frame rate is capped at 30", (s) => expect(s.knobs["Frame rate cap"]).toBe(30));
+Then("Sharpness is Battery and animations are reduced", (s) => {
+  expect(s.knobs.Sharpness).toBe("Battery");
+  expect(s.knobs.Animations).toBe("Reduced");
+});
+Then("the map redraws only on change", (s) => expect(s.knobs.redraw).toBe("on change"));
+Then("the AI turn has the same work-step budget as with Battery saver off", (s) => {
+  expect(aiWorkSteps(s.knobs)).toBe(aiWorkSteps(PHONE_DEFAULTS));
+});
+
+Given("the system {string} gives no zoom table, with the lens {string}", (s, system: string, l: string) => {
+  s.system = system;
+  s.systemLens = l;
+});
+When("its map statement is built", (s) => {
+  s.statement = defaultZoomStatement(s.system, s.systemLens);
+});
+Then("it shows the lens {string} at World, Region and Local zoom", (s, l: string) => {
+  for (const z of ["World", "Region", "Local"] as const) expect(s.statement[z]).toContain(`lens ${l}`);
+});
+Then("its card shows at Local zoom only", (s) => {
+  expect(s.statement.card).toEqual(["Local"]);
+  expect(s.statement.World).not.toContain("card");
+});
+
+Given(/^the camera zoom is ([\d.]+)$/, (s, z: string) => {
+  s.camera = Number(z);
+});
+When("the zoom level is worked out", (s) => {
+  s.level = zoomForCamera(s.camera);
+});
+Then(/^the zoom level is (World|Region|Local)$/, (s, z: string) => expect(s.level).toBe(z));

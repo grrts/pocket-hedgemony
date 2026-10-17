@@ -90,7 +90,9 @@ export function findRefuge(w: MoveWorld, a: Army): { refuge: string; route: stri
       }
       return out;
     };
-    const castle = best(own.filter((p) => p.castle && sameSide(w, p.castle.owner, a.owner)));
+    // An army on a front retreats along it: refuges on the front come first (8).
+    const onFront = a.front ? best(own.filter((p) => a.front!.provinces.includes(p.id) && !armiesIn(w, p.id).some((b) => atWar(w, a.owner, b.owner)))) : null;
+    const castle = onFront ?? best(own.filter((p) => p.castle && sameSide(w, p.castle.owner, a.owner)));
     const r = castle ?? best(own.filter((p) => !armiesIn(w, p.id).some((b) => atWar(w, a.owner, b.owner))));
     return r && { refuge: r.refuge, route: r.route };
   } finally {

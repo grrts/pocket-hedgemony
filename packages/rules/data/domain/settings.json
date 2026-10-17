@@ -34,12 +34,12 @@
         "id": "gameplay.autosave",
         "type": "choice",
         "options": [
-          "every_turn",
-          "every_6",
-          "every_12",
+          "every_month",
+          "every_6_months",
+          "every_12_months",
           "off"
         ],
-        "default": "every_12",
+        "default": "every_12_months",
         "hide_when": "ironman",
         "section": "gameplay"
       },
@@ -284,8 +284,7 @@
         "sets_when_on": {
           "graphics.frame_cap": 30,
           "graphics.sharpness": "battery",
-          "graphics.animations": "reduced",
-          "engine.worker_budget": "low"
+          "graphics.animations": "reduced"
         },
         "section": "graphics"
       },
@@ -814,7 +813,7 @@
             "turn_report": "view",
             "end_turn": {
               "button": "view",
-              "hold_seconds": 1.0
+              "hold_seconds": 0.5
             },
             "pause_menu": "menu",
             "jump_capital": "left_stick_click",
@@ -840,11 +839,13 @@
             "pan": "right_stick",
             "slower": "LT",
             "faster": "RT",
-            "play_pause": "A",
-            "skip": "B",
-            "replay_bell": "X",
+            "change_orders": "A",
+            "leave": "B",
+            "retreat": "X",
             "commander_line": "Y",
-            "leave": "menu"
+            "battle_prev": "LB",
+            "battle_next": "RB",
+            "pause_menu": "menu"
           }
         },
         "section": "controls"
@@ -1087,9 +1088,9 @@
   "strings_en": {
     "settings.gameplay.autosave.name": "Autosave",
     "settings.gameplay.autosave.desc": "How often the game makes a rotating autosave. Off never stops the Resume save.",
-    "settings.gameplay.autosave.option.every_turn": "Every turn",
-    "settings.gameplay.autosave.option.every_6": "Every 6 turns",
-    "settings.gameplay.autosave.option.every_12": "Every 12 turns (each January)",
+    "settings.gameplay.autosave.option.every_month": "Every month",
+    "settings.gameplay.autosave.option.every_6_months": "Every 6 months",
+    "settings.gameplay.autosave.option.every_12_months": "Every 12 months (each January)",
     "settings.gameplay.autosave.option.off": "Off",
     "settings.gameplay.autosaves_kept.name": "Autosaves kept per campaign",
     "settings.gameplay.autosaves_kept.desc": "How many autosaves each campaign keeps.",
@@ -1099,7 +1100,7 @@
     "settings.gameplay.confirm_end_turn.option.when_attention": "When the Attention screen has lines",
     "settings.gameplay.confirm_end_turn.option.always": "Always",
     "settings.gameplay.battle_speed.name": "Battle playback speed",
-    "settings.gameplay.battle_speed.desc": "How fast battles play back. One bell takes 1 to 2 seconds at 1×.",
+    "settings.gameplay.battle_speed.desc": "How fast your battles play back while they run. One 4-hour step takes half a second at 1×.",
     "settings.gameplay.battle_speed.option.1": "1×",
     "settings.gameplay.battle_speed.option.2": "2×",
     "settings.gameplay.battle_speed.option.4": "4×",
@@ -1406,7 +1407,7 @@
     "settings.action.zoom_in": "Zoom in",
     "settings.action.zoom_out": "Zoom out",
     "settings.action.end_turn": "End turn",
-    "settings.action.pause_menu": "Pause menu",
+    "settings.action.pause_menu": "Game menu",
     "settings.action.lens_1": "Lens: realms",
     "settings.action.lens_2": "Lens: terrain",
     "settings.action.lens_3": "Lens: people",
@@ -1509,7 +1510,7 @@
       2
     ],
     "end_turn_key_hold_seconds": 0.5,
-    "pad_end_turn_hold_seconds": 1.0,
+    "pad_end_turn_hold_seconds": 0.5,
     "display_mode_fullscreen": {
       "borderless": true,
       "resolution": "display",
@@ -1688,7 +1689,7 @@
     ],
     "android_back": [
       "close the top panel",
-      "open the pause menu",
+      "open the game menu",
       "ask before quitting"
     ],
     "ios_audio_session": "ambient",
@@ -1707,10 +1708,11 @@
     },
     "campaign_rules": [
       "difficulty",
-      "AI aggression",
+      "AI temper",
       "fog of war",
       "events",
       "ironman",
+      "music eras",
       "campaign end date"
     ],
     "campaign_end_date_default": "31 August 1939",
@@ -1723,6 +1725,45 @@
       "account",
       "privacy"
     ],
-    "deck_glyphs": "steam_deck"
+    "deck_glyphs": "steam_deck",
+    "battle_step_seconds_at_1x": 0.5,
+    "steam_input": {
+      "action_sets": [
+        "Shell",
+        "Map",
+        "Card",
+        "Book",
+        "Modal",
+        "Battle"
+      ],
+      "text_layer": "Text",
+      "official_configurations": [
+        "Steam Controller",
+        "Steam Deck",
+        "Xbox",
+        "PlayStation",
+        "Nintendo"
+      ],
+      "glyphs": "GetGlyphPNGForActionOrigin"
+    },
+    "main_hand_layout": {
+      "right": {
+        "action_bar": "right",
+        "end_turn": "right",
+        "game_menu": "left"
+      },
+      "left": {
+        "action_bar": "left",
+        "end_turn": "left",
+        "game_menu": "right"
+      }
+    },
+    "season_palette_means": {
+      "default": "colour",
+      "protan": "the safe ramp",
+      "deutan": "the safe ramp",
+      "tritan": "the safe ramp",
+      "none": "tile patterns"
+    }
   }
 }

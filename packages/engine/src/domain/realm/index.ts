@@ -1,5 +1,6 @@
 import config from "../../../../rules/data/domain/realm.json" with { type: "json" };
 import { effectsOf, eraCost, invention, tree } from "../research/index.ts";
+import type { Rng } from "../../rng.ts";
 
 const effects = (id: string) => tree().inventions.get(id)?.effects;
 
@@ -63,7 +64,7 @@ export function withinWindow(entries: readonly Dated[], today: Day, window: keyo
 export interface Loan {
   lender: string;
   amount: number;
-  /** Yearly interest in percent, set by the lender (OQ-REALM-13: no rates given). */
+  /** Yearly interest in percent (REALM-164: 10 %, less with T7 and T12; a lord's loan 0 %). */
   interestPct: number;
 }
 
@@ -114,7 +115,7 @@ export function defaultOnDebt(t: Treasury, lender: string, date: Day): void {
   t.oaths.push({ date, count: 1, kind: "debt_default" });
 }
 
-export type TaxRate = "light" | "normal" | "heavy" | "crushing";
+export type TaxRate = "none" | "light" | "normal" | "heavy" | "crushing";
 
 /** A revolt forces a province's tax one step down (REALM-015). */
 export function forceTaxDown(rate: TaxRate): TaxRate {
@@ -272,10 +273,10 @@ export function lordCollection(collectionPct: number, loyalty: Loyalty): number 
 
 /**
  * Divides collected food between castles by the castle-share rule (REALM-042).
- * "Frontier first" and "Capital first" say only that the frontier or the capital
- * gets more; how much more is not given, so they are refused here.
+ * "Frontier first" and "Capital first" count the favoured castles' people
+ * double (REALM-167).
  */
-export function castleShares(rule: ShareRule, castles: { id: string; people: number }[], custom?: Record<string, number>): Record<string, number> {
+export function castleShares(rule: ShareRule, castles: { id: string; people: number; border?: boolean; capital?: boolean }[], custom?: Record<string, number>): Record<string, number> {
   const out: Record<string, number> = {};
   if (rule === "Equal") castles.forEach((c) => (out[c.id] = 1 / castles.length));
   else if (rule === "By people") {
@@ -284,7 +285,13 @@ export function castleShares(rule: ShareRule, castles: { id: string; people: num
   } else if (rule === "Custom") {
     if (!custom) throw new Error("custom shares not set");
     castles.forEach((c) => (out[c.id] = (custom[c.id] ?? 0) / 100));
-  } else throw new Error(`${rule}: how much more is not given`);
+  } else {
+    // Frontier first and Capital first: by people, the favoured castles' people counted double (REALM-167).
+    const favoured = (c: { border?: boolean; capital?: boolean }) => (rule === "Frontier first" ? c.border : c.capital) === true;
+    const weight = (c: { people: number; border?: boolean; capital?: boolean }) => c.people * (favoured(c) ? config.food_year.favoured_weight : 1);
+    const total = castles.reduce((n, c) => n + weight(c), 0);
+    castles.forEach((c) => (out[c.id] = weight(c) / total));
+  }
   return out;
 }
 
@@ -320,7 +327,7 @@ export function fedFirst(storeMonths: number, rule: FoodPolicy["famineRule"]): b
 export function surplusGoes(rule: string): "rots" | "sold" | "capital_castle" | "subjects_or_allies" {
   const map: Record<string, "rots" | "sold" | "capital_castle" | "subjects_or_allies"> = {
     Keep: "rots",
-    "Sell on the market": "sold",
+    "Sell to the treasury": "sold",
     "Send to the capital castle": "capital_castle",
     "Send to subjects or allies": "subjects_or_allies",
   };
@@ -477,6 +484,10 @@ export interface Lord {
   traits: string[];
   want?: string;
   loyalty: Loyalty;
+  /** Up-causes counted toward the next step, for a great lord (REALM-162). */
+  upCredit?: number;
+  /** Gold the ruler owes him (REALM-165). */
+  owed?: number;
   /** Sons in order of birth; daughters inherit only where there are no sons. */
   sons: string[];
   daughters?: string[];
@@ -491,6 +502,13 @@ export function loyaltyCause(lord: Lord, cause: string): Loyalty {
   else if (config.loyalty.down.includes(cause)) dir = 1;
   else throw new Error(`loyalty is not changed by ${cause}`);
   const i = LOYALTY.indexOf(lord.loyalty);
+  // A great lord needs one more up-cause per Great lord reason for each step up (REALM-162).
+  const reasons = greatLordReasons(lord);
+  if (dir < 0 && reasons > 0) {
+    lord.upCredit = (lord.upCredit ?? 0) + 1;
+    if (lord.upCredit <= reasons) return lord.loyalty;
+    lord.upCredit = 0;
+  }
   // Falling stops at Disloyal: going into revolt is a rising (rebellions), not a loyalty step.
   const disloyal = LOYALTY.indexOf("Disloyal");
   const next = dir < 0 ? Math.max(0, i - 1) : i >= disloyal ? i : i + 1;
@@ -872,17 +890,34 @@ export function ranks(scores: Record<string, number>): Record<string, number> {
 }
 
 /**
- * Score victory by lead (REALM-155): leading second place by the margin in
- * every one of the last `score_years` yearly scores.
+ * Score winners at the end date (REALM-155, X-12): every realm that leads the
+ * score wins in it, with no margin; ties share the win.
  */
-export function winsByLead(yearly: readonly Record<string, number>[], country: string): boolean {
-  const years = config.win.score_years;
-  if (yearly.length < years) return false;
-  return yearly.slice(-years).every((s) => {
-    const mine = s[country] ?? 0;
-    const second = Math.max(...Object.entries(s).filter(([c]) => c !== country).map(([, v]) => v));
-    return mine >= second * (1 + config.win.score_margin);
-  });
+export function scoreWinners(scores: Record<string, number>): string[] {
+  const top = Math.max(...Object.values(scores));
+  return Object.entries(scores)
+    .filter(([, v]) => v === top)
+    .map(([c]) => c)
+    .sort();
+}
+
+/** Power (REALM-152, REALM-160): provinces held, subjects' at half, plus army power. */
+export function powerScore(p: { provinces: number; subjectProvinces: number; foot?: number; horse?: number; guns?: number; warships?: number; commanders?: number }): { provinces: number; army: number; score: number } {
+  const w = config.win;
+  const provinces = p.provinces + p.subjectProvinces * w.subject_province_weight;
+  const men = (p.foot ?? 0) * w.army_weights.foot + (p.horse ?? 0) * w.army_weights.horse + (p.guns ?? 0) * w.army_weights.guns + (p.warships ?? 0) * w.warship_men + (p.commanders ?? 0) * w.commander_men;
+  const army = men / w.army_power_per_men;
+  return { provinces, army, score: provinces + army };
+}
+
+/**
+ * World domination (REALM-154, X-12): owning or holding as subjects at least
+ * half of the world's settled land provinces (land provinces with people),
+ * checked once a year, in the turn in which 1 January falls (X-18): `month`
+ * is the month that begins in this turn. The win comes at once.
+ */
+export function dominationWin(ownedOrSubject: number, settledLand: number, month: number): boolean {
+  return month === config.win.checked_month && settledLand > 0 && ownedOrSubject >= settledLand * config.win.domination_share;
 }
 
 // ---------------------------------------------------------------- the card
@@ -949,3 +984,319 @@ export function countryCard(c: CardInput): { text: string; stat: Stat | "schools
 
 /** Re-exported so callers can check an invention's realm effects (e.g. officials per province). */
 export { effectsOf };
+
+// ---------------------------------------------------------------- decided rules (spec §13)
+
+/** The fixed grain price: grain sold to and bought from the realm's own treasury, no market (REALM-157, X-6). */
+export function grainTrade(t: Treasury, food: number, way: "sell" | "buy"): number {
+  const gold = food * config.grain_price_gold_per_food;
+  t.gold = applyCause(t.gold, "gold", way === "sell" ? "grain_sold" : "grain_bought", gold);
+  return gold;
+}
+
+/** The grain price: fixed, whatever the harvests, war, blockades or trade routes (REALM-026, REALM-157). */
+export function grainPrice(_cause?: string): number {
+  return config.grain_price_gold_per_food;
+}
+
+/** The lines the card adds for trade, diplomacy and warfare (REALM-158). */
+export function cardExtraLines(): string[] {
+  return config.card_extra_lines;
+}
+
+/** What an event-tree country stat reads (REALM-140, REALM-159). */
+export function eventStatReads(stat: string): string[] {
+  const out = (config.event_stat_map as Record<string, string[]>)[stat];
+  if (!out) throw new Error(`no mapping for ${stat}`);
+  return out;
+}
+
+/** Great lord reasons: one for 4 to 7 provinces, two for 8 or more (REALM-162). */
+export function greatLordReasons(lord: Pick<Lord, "provinces">): number {
+  const n = lord.provinces.length;
+  return n >= config.great_lord.two_reasons_from ? 2 : n >= config.great_lord.one_reason_from ? 1 : 0;
+}
+
+/**
+ * The throne law a government form gives (REALM-161); a reform or revolution
+ * that changes the form changes it. Where the country's history lets a
+ * daughter inherit the crown, "eldest son" becomes "eldest child".
+ */
+export function throneLawFor(formSuccession: string, country: string): ThroneLaw {
+  const law = (config.succession_by_form as Record<string, ThroneLaw>)[formSuccession];
+  if (!law) throw new Error(`unknown succession ${formSuccession}`);
+  return law === "eldest son" && daughtersInheritCrown(country) ? "eldest child" : law;
+}
+
+export function daughtersInheritCrown(country: string): boolean {
+  return config.daughters_inherit_crown.includes(country.toLowerCase());
+}
+
+/** The commands a player may issue on inheritance: none (REALM-112). */
+export const INHERITANCE_COMMANDS: readonly string[] = [];
+export const INHERITANCE_CHANGED_BY: readonly string[] = ["event", "reform"];
+
+export type Role = "ruler" | "lord" | "commander" | "official" | "scholar";
+
+/**
+ * Chance that a generated character in a role is a woman (REALM-106, REALM-109,
+ * REALM-163): the country's chance (or the default), times the age multiplier,
+ * times the reform multiplier once an event or reform raised it.
+ */
+export function womanChance(country: string, role: Role, age: string | null = null, reformed = false): number {
+  const w = config.women_in_roles as { default: Record<Role, number>; by_country: Record<string, Partial<Record<Role, number>>> };
+  const base = w.by_country[country.toLowerCase()]?.[role] ?? w.default[role];
+  const ageMult = age ? ((config.age_multipliers as Record<string, number>)[age] ?? 1) : 1;
+  return Math.min(1, base * ageMult * (reformed ? config.women_reform_multiplier : 1));
+}
+
+/** Rolls whether a generated character is a woman, with the campaign's Rng. */
+export function rollWoman(rng: Rng, chance: number): boolean {
+  return rng.next() < chance;
+}
+
+export type Level = "very_low" | "low" | "moderate" | "high" | "very_high";
+export type Confidence = "low" | "medium" | "high";
+
+export interface StartingCounts {
+  gold: number;
+  debt: number;
+  recruits: number;
+  soldiers: number;
+  commanders: number;
+  horses: number;
+  ships: number;
+  royalShare: number;
+  officials: number;
+  lordsLoyalShare: number;
+  provincesInRevolt: number;
+  lords: number;
+  schools: number;
+  scholars: number;
+  traders: number;
+  envoysAtCourt: number;
+}
+
+/**
+ * Starting counts from the catalogue's assessments (REALM-130, REALM-166):
+ * each level picks a value from the realm data, scaled by people where the data
+ * says so, then spread by a seeded random factor whose width follows the
+ * catalogue's confidence (REALM-131): ±25 % low, ±10 % medium, ±5 % high.
+ */
+export function startingCounts(
+  levels: Partial<Record<string, Level>>,
+  people: number,
+  provinces: number,
+  confidence: Confidence,
+  rng: Rng,
+): StartingCounts {
+  const st = config.starting;
+  const idx = (dim: string): number => Math.max(0, st.levels.indexOf(levels[dim] ?? "moderate"));
+  const spread = st.spread_by_confidence[confidence];
+  const jitter = (v: number): number => Math.round(v * (1 + (rng.next() * 2 - 1) * spread));
+  const per = (key: keyof typeof st.per_thousand_people, dim: string): number => jitter(people * st.per_thousand_people[key][idx(dim)]!);
+  const gold = per("gold", "economic_strength");
+  const royalShare = st.royal_share[idx("administrative_capacity")]!;
+  const royal = Math.round(provinces * royalShare);
+  return {
+    gold,
+    debt: Math.round(gold * st.debt_share_of_gold[idx("fiscal_resilience")]!),
+    recruits: per("recruits", "manpower_potential"),
+    soldiers: per("soldiers", "military_capability"),
+    commanders: st.commanders[idx("military_capability")]!,
+    horses: per("horses", "military_capability"),
+    ships: per("ships", "naval_capability"),
+    royalShare,
+    officials: Math.round(royal * st.officials_per_royal_province[idx("administrative_capacity")]!),
+    lordsLoyalShare: (st.lords_loyal_share[idx("political_stability")]! + st.lords_loyal_share[4 - idx("unrest_risk")]!) / 2,
+    provincesInRevolt: Math.round(provinces * st.revolt_share[4 - idx("unrest_risk")]!),
+    lords: provinces <= 1 ? 0 : Math.round((provinces - royal) / st.lords_per_provinces[idx("territorial_cohesion")]!),
+    schools: Math.round((people / 1000) * st.schools_per_million[idx("institutional_development")]!),
+    scholars: per("scholars", "institutional_development"),
+    traders: st.traders[idx("trade_access")]!,
+    envoysAtCourt: st.envoys_at_court[idx("diplomatic_influence")]!,
+  };
+}
+
+/** Which counts each assessment sets (REALM-130). */
+export const ASSESSMENT_SETS: Record<string, (keyof StartingCounts)[]> = {
+  "economic_strength and fiscal_resilience": ["gold", "debt"],
+  manpower_potential: ["recruits"],
+  military_capability: ["soldiers", "commanders", "horses"],
+  naval_capability: ["ships"],
+  administrative_capacity: ["officials", "royalShare"],
+  "political_stability and unrest_risk": ["lordsLoyalShare", "provincesInRevolt"],
+  territorial_cohesion: ["lords"],
+  institutional_development: ["schools", "scholars"],
+  trade_access: ["traders"],
+  diplomatic_influence: ["envoysAtCourt"],
+};
+
+/**
+ * Starting lords (REALM-081, REALM-166): a country with catalogue great houses
+ * (lordship records of its region that own no map province) starts with them;
+ * otherwise one generated lord per 4 provinces; a one-province country has none.
+ */
+export function startingLords(provinces: number, greatHouses: readonly string[]): { names: string[]; generated: number } {
+  if (provinces <= 1) return { names: [], generated: 0 };
+  if (greatHouses.length) return { names: [...greatHouses], generated: 0 };
+  return { names: [], generated: Math.max(1, Math.floor(provinces / config.starting_lords.generated_one_per_provinces)) };
+}
+
+export function isGreatHouseType(entityType: string): boolean {
+  return config.starting_lords.great_house_types.includes(entityType);
+}
+
+/** The month a province's harvest comes in: September north, March south (REALM-167, X-4). */
+export function harvestMonth(latitude: number): number {
+  return latitude >= 0 ? config.food_year.harvest_month.north : config.food_year.harvest_month.south;
+}
+
+/**
+ * One weather roll per region per harvest (REALM-167): 1 in 6 bad (every
+ * harvest there one step worse), 1 in 6 good (one step better), else normal.
+ */
+export function rollRegionWeather(rng: Rng): "bad" | "normal" | "good" {
+  const r = rng.next();
+  const bad = 1 / config.food_year.weather.bad_one_in;
+  if (r < bad) return "bad";
+  if (r < bad + 1 / config.food_year.weather.good_one_in) return "good";
+  return "normal";
+}
+
+/** Food moving between castles loses 2 % for every province it travels (REALM-167). */
+export function transferArrives(sent: number, provincesTravelled: number): number {
+  return sent * (1 - config.food_year.transfer_loss_per_province) ** provincesTravelled;
+}
+
+/** Stores rot 5 % a season, 2.5 % with a granary (REALM-167). */
+export function rotSeason(store: number, granary: boolean): number {
+  const r = granary ? config.food_year.rot_per_season_with_granary : config.food_year.rot_per_season;
+  return store * (1 - r);
+}
+
+/** A castle's reach in rings by the road step at the castle (REALM-167). */
+export function reachByRoad(step: string): number {
+  const r = (config.food_year.reach_by_road as Record<string, number>)[step];
+  if (r === undefined) throw new Error(`unknown road step ${step}`);
+  return r;
+}
+
+/** Hard windows (REALM-168): an entry counts while younger than its window, then drops out whole. */
+export const WINDOWS_ARE_HARD = true;
+
+/** Yearly debt interest in percent: 10 %, ×0.8 with T7, ×0.7 with T12 (REALM-164). */
+export function interestPct(known: ReadonlySet<string>): number {
+  let pct = config.debt.interest_pct;
+  for (const id of known) {
+    const e = effects(id)?.debt_interest_pct;
+    if (typeof e === "number") pct *= 1 + e / 100;
+  }
+  return pct;
+}
+
+/** Biggest loan a lender gives: one year's income, three with T10 (REALM-164). */
+export function loanCap(yearlyIncome: number, known: ReadonlySet<string>): number {
+  return yearlyIncome * (known.has("T10") ? config.debt.loan_cap_years_income_with_T10 : config.debt.loan_cap_years_income);
+}
+
+/** Chance in percent that a lender or would-be ally refuses: 10 points per oath broken (REALM-164). */
+export function refusalPct(oathsBroken: number): number {
+  return Math.min(100, oathsBroken * config.debt.refusal_pct_per_oath);
+}
+
+/** A lord lends in exchange for favours: no interest, and he is owed the gold (REALM-165). */
+export function lordLoan(realm: Realm, lord: Lord, amount: number): Loan {
+  lord.owed = (lord.owed ?? 0) + amount;
+  return lordLends(realm, lord, amount, config.debt.lord_loan_interest_pct);
+}
+
+/** While owed money a lord's loyalty counts one step lower than it stands (REALM-165). */
+export function effectiveLoyalty(lord: Lord): Loyalty {
+  if (!lord.owed) return lord.loyalty;
+  const i = LOYALTY.indexOf(lord.loyalty);
+  return LOYALTY[Math.min(LOYALTY.indexOf("Disloyal"), i + 1)]!;
+}
+
+/**
+ * Provinces one official can run (REALM-063, REALM-169): 1 with G1, 2 with G9,
+ * 3 with G16, plus one each for B2, G11 and T14.
+ */
+export function provincesPerOfficial(known: ReadonlySet<string>): number {
+  const c = config.officials_per_province;
+  let base = 1;
+  for (const [id, n] of Object.entries(c.steps)) if (known.has(id)) base = Math.max(base, n);
+  return base + c.plus_one.filter((id) => known.has(id)).length;
+}
+
+/** Officials needed for a number of royal provinces. */
+export function officialsNeeded(royalProvinces: number, known: ReadonlySet<string>): number {
+  return Math.ceil(royalProvinces / provincesPerOfficial(known));
+}
+
+/**
+ * The regent for a child ruler (REALM-170): the queen mother where there is
+ * one, else the most loyal lord, then the one with most provinces, then by name.
+ */
+export function regentFor(realm: Realm, queenMother?: string): string | null {
+  if (queenMother) return queenMother;
+  const lords = [...realm.lords].sort((a, b) => loyaltyRank(a.loyalty) - loyaltyRank(b.loyalty) || b.provinces.length - a.provinces.length || a.name.localeCompare(b.name));
+  return lords[0]?.name ?? null;
+}
+
+/** The ruler is a child under 16 (REALM-100). */
+export const CHILD_UNDER = 16;
+
+/**
+ * The realm's AI (REALM-171): food preset by war or peace, tax default normal
+ * in peace and heavy at war, a loan only to cover a deficit, a gift to a
+ * disloyal lord when it can afford it, and a fief only when royal provinces
+ * outnumber what its officials can run.
+ */
+export function aiRealmPlan(r: { atWar: boolean; gold: number; disloyalLords: string[]; royalProvinces: number; officials: number; known: ReadonlySet<string> }): {
+  foodPreset: PresetName;
+  tax: TaxRate;
+  takeLoan: boolean;
+  giftTo: string | null;
+  grantFiefs: number;
+} {
+  const ai = config.ai;
+  const capacity = r.officials * provincesPerOfficial(r.known);
+  return {
+    foodPreset: (r.atWar ? ai.food_preset_at_war : ai.food_preset_at_peace) as PresetName,
+    tax: (r.atWar ? ai.tax_at_war : ai.tax_at_peace) as TaxRate,
+    takeLoan: r.gold < ai.loan_when_gold_below,
+    giftTo: r.gold >= ai.gift_to_disloyal_lord_gold ? (r.disloyalLords[0] ?? null) : null,
+    grantFiefs: Math.max(0, r.royalProvinces - capacity),
+  };
+}
+
+/**
+ * Raising the realm tax default one step (REALM-015): more gold reaches the
+ * treasury, lords take the heavy-taxes cause at heavy or crushing, and
+ * provinces gain a grievance at heavy or crushing (province).
+ */
+export function raiseTaxDefault(rate: TaxRate): { rate: TaxRate; goldFactor: number; lordsWaver: boolean; revoltLikelier: boolean } {
+  const steps = config.tax_rates as TaxRate[];
+  const next = steps[Math.min(steps.length - 1, steps.indexOf(rate) + 1)]!;
+  return { rate: next, goldFactor: steps.indexOf(next) / Math.max(1, steps.indexOf(rate)), lordsWaver: next === "heavy" || next === "crushing", revoltLikelier: next === "heavy" || next === "crushing" };
+}
+
+/** One relation row of the 1444 relations file (diplomacy owns the file). */
+export interface Relation1444 {
+  type: string;
+  source: string;
+  target: string;
+}
+
+/**
+ * A country's allies, rivals, subjects and enemies at the start come from the
+ * 1444 relations file (REALM-132): alliances, rivalries, subject ties where the
+ * country is the overlord (the target), and wars.
+ */
+export function standingFrom1444(relations: readonly Relation1444[], country: string): { allies: string[]; rivals: string[]; subjects: string[]; enemies: string[] } {
+  const other = (r: Relation1444) => (r.source === country ? r.target : r.source);
+  const mine = relations.filter((r) => r.source === country || r.target === country);
+  const of = (type: string) => mine.filter((r) => r.type === type).map(other).sort();
+  return { allies: of("alliance"), rivals: of("rival"), subjects: mine.filter((r) => r.type === "subject" && r.target === country).map((r) => r.source).sort(), enemies: of("at_war") };
+}

@@ -92,6 +92,9 @@ export function monthRations(a: { soldiers: number; horses?: number; prisoners?:
   return raw * (1 - W.logistics.food_cut * (a.logistics ?? 0));
 }
 
+/** Rations eaten at the weekly step at the end of each turn: a week's share of the month's (WAR-045, X-18). */
+export const weekRations = (a: Parameters<typeof monthRations>[0]): number => (monthRations(a) * W.days_per_week) / W.days_per_month;
+
 /** Where an army's food comes from: the province at home, its reserve abroad (WAR-045). */
 export const foodSource = (atHome: boolean): "the province it stands in" | "its food reserve" => (atHome ? "the province it stands in" : "its food reserve");
 

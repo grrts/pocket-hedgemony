@@ -886,7 +886,7 @@ Then(/^the effect applies (.+)$/, (s, when: string) => {
     expect(tension()).toBe(0);
     months(1);
     expect(tension()).toBe(1);
-  } else if (when === "each turn while the event runs") {
+  } else if (when === "each month while the event runs") {
     expect(tension()).toBe(1);
     months(2);
     expect(tension()).toBe(3);

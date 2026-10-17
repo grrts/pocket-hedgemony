@@ -63,7 +63,7 @@ Feature: Requirements, signs and sparks compile into the event
     Given the event "french_revolution" is available from 1750 to 1880
     And the date is 1890
     And every sign of "french_revolution" is lit for "France"
-    When the turn is processed
+    When the monthly step runs
     Then the revolution "french_revolution" cannot break out
 
   @REVO-017

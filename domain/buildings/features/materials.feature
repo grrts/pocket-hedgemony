@@ -72,9 +72,13 @@ Feature: Building materials
       | VI  | steel    | is        |
       | VI  | concrete | is        |
 
-  @BLD-032 @open-question
-  # OQ-BLD-2: trade v2 drops market price; what sets the bought price?
-  Scenario: Few traders make bought materials dearer
-    Given the province "Troyes" has few traders
-    When a site there buys stone
-    Then it pays more than the config price
+  @BLD-032 @placeholder
+  Scenario Outline: Bought materials cost 25 % more off the trade routes
+    Given the province "Troyes" <route>
+    When a site there buys 30 stone
+    Then it pays <gold> gold
+
+    Examples:
+      | route                              | gold  |
+      | is touched by a trade route        | 15    |
+      | is touched by no trade route       | 18.75 |

@@ -75,7 +75,7 @@ export const PALETTES = Object.keys(M.palettes) as Palette[];
 
 /**
  * The palette of a primary culture group (AUD-018); turkic splits by the
- * capital's longitude (AUD-019). Colonial blends are not designed (OQ-AUD-11).
+ * capital's longitude (AUD-019). There is no colonial blend (D-AUD-11).
  */
 export function paletteOf(group: string, capitalLongitude?: number): Palette | null {
   const split = (M.palette_split as Record<string, { west_of_longitude: number; west: string; otherwise: string }>)[group];
@@ -85,6 +85,11 @@ export function paletteOf(group: string, capitalLongitude?: number): Palette | n
   }
   for (const p of PALETTES) if ((M.palettes[p] as string[]).includes(group)) return p;
   return null;
+}
+
+/** A colonial nation founded after 1500 uses the single Atlantic and creole palette, with no blend (AUD-020, D-AUD-11). */
+export function colonialPalette(foundedYear: number): Palette | null {
+  return foundedYear > 1500 ? ("atlantic_creole" as Palette) : null;
 }
 
 // ---------------------------------------------------------------- track list (AUD-022 … AUD-035)
@@ -157,20 +162,26 @@ export interface MusicFacts {
   screen?: string;
   realmBookTab?: string;
   atWar?: boolean;
-  warScore?: number;
+  /** Share of the player's peace voices that would accept the enemy's terms (warfare's peace voices; D-AUD-2). */
+  enemyTermsVoiceShare?: number;
+  /** Last month's share, for the war trend. */
+  enemyTermsVoiceShareLastMonth?: number;
   capitalOccupied?: boolean;
+  /** Share of the 8 great powers (the countries with most provinces) at war (D-AUD-2). */
   greatPowersAtWarShare?: number;
   navalBattleShareLast5?: number;
   siegeActive?: boolean;
   fieldBattlesLast3?: number;
-  turnsSinceDeclaration?: number;
+  monthsSinceDeclaration?: number;
   battlesFought?: number;
   /** Periods with music tags, e.g. { tag: "revolution", touchesPlayer: true }. */
   periods?: { tag: string; touchesPlayer: boolean }[];
   /** Tags of active event chains (`crisis` for disaster, plague, famine, succession). */
   eventChains?: string[];
+  /** Share of the player's provinces Plotting or Risen (X-9). */
   unrestProvinceShare?: number;
-  stability?: number;
+  /** The player's lords' loyalty (realm), standing in for stability (D-AUD-2). */
+  lords?: { loyalty: "Loyal" | "Wavering" | "Disloyal" | string }[];
   treasuryTrend?: "rising" | "steady" | "falling";
   yearsAtPeace?: number;
   explorersActive?: boolean;
@@ -186,20 +197,48 @@ export type MusicState = string;
 const S = M.states;
 const eraAtLeast = (e: MusicEra, min: string) => eraIndex(e) >= eraIndex(min as MusicEra);
 
+/** Lords in place of stability: none Disloyal and at least the given share Loyal (D-AUD-2). */
+export function lordsSteady(lords: { loyalty: string }[], loyalShare: number): boolean {
+  if (!lords.length) return true;
+  return !lords.some((l) => l.loyalty === "Disloyal") && lords.filter((l) => l.loyalty === "Loyal").length / lords.length >= loyalShare;
+}
+
+/** The war trend: the enemy-terms share's change since last month; falling means winning (D-AUD-2). */
+export function warTrend(f: MusicFacts): "winning" | "losing" | "steady" {
+  const now = f.enemyTermsVoiceShare ?? 0;
+  const before = f.enemyTermsVoiceShareLastMonth ?? now;
+  return now < before ? "winning" : now > before ? "losing" : "steady";
+}
+
+/** realm_stability_up / _down: a lord's loyalty steps up or down (D-AUD-2). */
+export function loyaltyStepSound(from: string, to: string): "realm_stability_up" | "realm_stability_down" | null {
+  const order = ["Disloyal", "Wavering", "Loyal"];
+  const d = order.indexOf(to) - order.indexOf(from);
+  return d > 0 ? "realm_stability_up" : d < 0 ? "realm_stability_down" : null;
+}
+
+/** The great powers: the 8 countries with the most provinces (D-AUD-2, provisional). */
+export function greatPowers(provinces: Record<string, number>): string[] {
+  return Object.entries(provinces)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, S.world_war.great_powers)
+    .map(([c]) => c);
+}
+
 /** Does a state's threshold hold (AUD-040)? */
 export function stateHolds(state: MusicState, f: MusicFacts, states = S): boolean {
   const war = !!f.atWar;
   switch (state) {
     case "war_losing":
-      return war && ((f.warScore !== undefined && f.warScore < states.war_losing.war_score_below) || (states.war_losing.or_capital_occupied && !!f.capitalOccupied));
+      return war && ((f.enemyTermsVoiceShare ?? 0) > states.war_losing.enemy_terms_voice_share_above || (states.war_losing.or_capital_occupied && !!f.capitalOccupied));
     case "world_war":
       return war && (f.greatPowersAtWarShare ?? 0) >= states.world_war.great_powers_at_war_share && eraAtLeast(f.era, states.world_war.min_era);
     case "war_naval":
-      return war && (f.navalBattleShareLast5 ?? 0) >= states.war_naval.naval_battle_share_last_5_turns;
+      return war && (f.navalBattleShareLast5 ?? 0) >= states.war_naval.naval_battle_share_last_5_months;
     case "war_siege":
-      return war && !!f.siegeActive === states.war_siege.siege_active && (f.fieldBattlesLast3 ?? 0) <= states.war_siege.field_battles_last_3_turns;
+      return war && !!f.siegeActive === states.war_siege.siege_active && (f.fieldBattlesLast3 ?? 0) <= states.war_siege.field_battles_last_3_months;
     case "war_mobilize":
-      return war && (f.turnsSinceDeclaration ?? Infinity) <= states.war_mobilize.turns_since_declaration_max && (f.battlesFought ?? 0) <= states.war_mobilize.battles_fought;
+      return war && (f.monthsSinceDeclaration ?? Infinity) <= states.war_mobilize.months_since_declaration_max && (f.battlesFought ?? 0) <= states.war_mobilize.battles_fought;
     case "war_campaign":
       // The main war theme: at war once mobilizing is over.
       return war && !stateHolds("war_mobilize", f, states);
@@ -208,11 +247,11 @@ export function stateHolds(state: MusicState, f: MusicFacts, states = S): boolea
     case "crisis":
       return (f.eventChains ?? []).includes(states.crisis.event_chain_tag);
     case "unrest":
-      return (f.unrestProvinceShare ?? 0) >= states.unrest.unrest_province_share || (f.stability !== undefined && f.stability < states.unrest.or_stability_below);
+      return (f.unrestProvinceShare ?? 0) >= states.unrest.plotting_or_risen_share;
     case "diplomacy":
       return f.screen === "realm_book" && f.realmBookTab === "Abroad";
     case "prosperity":
-      return !war && (f.stability ?? -Infinity) >= states.prosperity.stability_at_least && f.treasuryTrend === states.prosperity.treasury_trend && (f.yearsAtPeace ?? 0) >= states.prosperity.years_at_peace;
+      return !war && lordsSteady(f.lords ?? [], states.prosperity.loyal_lords_share_at_least) && f.treasuryTrend === states.prosperity.treasury_trend && (f.yearsAtPeace ?? 0) >= states.prosperity.years_at_peace;
     case "exploration":
       return !!f.explorersActive === states.exploration.explorers_active && f.cameraOver === states.exploration.camera_over;
     case "peace":
@@ -317,7 +356,7 @@ export type Trigger = "turn_end" | "screen_change" | "mid_turn";
 
 /** The stinger for a war or crisis that ends (AUD-045). */
 export interface Ending {
-  peace?: "gain" | "loss";
+  peace?: "gain" | "loss" | "white";
 }
 
 /**
@@ -331,7 +370,8 @@ export function decide(d: Director, trigger: Trigger, f: MusicFacts, now: number
   const cues: Cue[] = [];
   const target = evaluateState(f, d.state);
   const wasWar = stackLevel(d.state) <= 2 && d.state.startsWith("war");
-  if (wasWar && !f.atWar && ending.peace) cues.push({ kind: "stinger", id: ending.peace === "gain" ? "war_won" : "war_lost" });
+  // A white peace plays no stinger (D-AUD-10).
+  if (wasWar && !f.atWar && ending.peace && ending.peace !== "white") cues.push({ kind: "stinger", id: ending.peace === "gain" ? "war_won" : "war_lost" });
   if (target.state === d.state) {
     delete d.pending;
     return cues;
@@ -386,7 +426,8 @@ export function stingerEnded(d: Director): void {
 
 /** An event popup plays its stinger and ducks the music, without changing state (AUD-047, AUD-102, AUD-125). */
 export function eventOpened(d: Director, e: { music?: string; narrativeOnly?: boolean }): Cue | null {
-  if (e.narrativeOnly) return { ...(playStinger(d, "event_major") as Extract<Cue, { kind: "stinger" }>), form: "sombre" };
+  // narrative_only events play no stinger at all (D-AUD-11).
+  if (e.narrativeOnly) return null;
   if (!e.music) return null;
   if (e.music === "crisis" || e.music === "revolution") return null;
   return playStinger(d, e.music);
@@ -423,7 +464,7 @@ export function peaceSources(d: Director, ctx: RotationContext = {}): { source: 
   const palette = d.nextPalette ?? d.palette;
   const out: { source: Source; track: string; weight: number }[] = [];
   out.push({ source: "own_palette", track: peaceTrackId(palette, d.era), weight: rot.weights.own_palette });
-  if (ctx.variety === "own_palette") return out;
+  if ((ctx.variety ?? M.defaults.variety) === "own_palette") return out;
   out.push({ source: "era_theme", track: eraTheme(d.era), weight: rot.weights.era_theme });
   const cam = d.camera;
   if (cam && cam.seconds >= rot.camera_dwell_seconds && zoomRank(cam.zoom) >= zoomRank(rot.camera_min_zoom as Zoom) && cam.palette !== palette)
@@ -514,12 +555,12 @@ export type Moment = keyof typeof config.moments;
 /** Who owns a moment: the music's stinger and the effects that lead into it. */
 export function momentAudio(
   moment: Moment,
-  o: { won?: boolean; gain?: boolean; died?: boolean; ageId?: string; onScreen?: boolean; tone?: "good" | "bad" | "major" } = {},
+  o: { won?: boolean; gain?: boolean; white?: boolean; died?: boolean; ageId?: string; onScreen?: boolean; tone?: "good" | "bad" | "major" } = {},
 ): { music: string | null; effects: string[]; effectsFirst: boolean } {
   const m = config.moments[moment] as { music: string; effects: string[]; effects_before_music?: boolean; effects_if_died?: string[]; effects_when_on_screen?: string[] };
   let music: string | null = m.music;
   if (moment === "battle_result") music = o.won ? "battle_won" : "battle_lost";
-  if (moment === "peace_signed") music = o.gain ? "war_won" : "war_lost";
+  if (moment === "peace_signed") music = o.white ? null : o.gain ? "war_won" : "war_lost";
   if (moment === "age_begins") music = o.ageId ? ageStinger(o.ageId) : "age_<id>";
   if (moment === "event_popup") music = `event_${o.tone ?? "major"}`;
   let effects = [...m.effects];

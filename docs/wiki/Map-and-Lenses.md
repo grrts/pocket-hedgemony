@@ -24,7 +24,7 @@ The map never unloads during a campaign, and exactly one lens is active at a tim
 
 ### The three zoom levels
 
-There are three zoom levels: **World**, **Region** and **Local** (the [Naval](Naval) and [Exploration and Colonies](Exploration-and-Colonies) designs call the third one **Province**; see OQ-VIEW-4). Local zoom is still the map, not a screen: the province's tile row is part of it.
+There are three zoom levels: **World**, **Region** and **Local** ("Province" zoom in the [Naval](Naval) and [Exploration and Colonies](Exploration-and-Colonies) pages means Local). The map is at World zoom when zoomed out furthest, switches to Region at camera zoom 2 and to Local at 4. Local zoom is still the map, not a screen: the province's tile row is part of it.
 
 **World zoom** shows the big picture:
 
@@ -76,7 +76,7 @@ A **lens** recolours the map by one stat. You pick it from the lens picker, a sm
 | Subjects | Your subjects by loyalty, with a line to each courted subject from the courting country's capital | [Subjects](Subjects) |
 | Revolution | Provinces by how many of the revolution's province-level signs they meet; risen provinces hatched in the revolution's colour | [Revolutions](Revolutions) |
 
-Trade ratio and Trade value replace the older Traders passing and Trade balance lenses. Which lenses finally ship, and how the picker fits about 17 of them on a phone, is still open (OQ-VIEW-2).
+Trade ratio and Trade value replace the older Traders passing and Trade balance lenses. The picker holds 22 lenses: Realms, Terrain, People, Wealth, Walls and Food, plus Tax reaching you, Days to capital, Grievances, Faith, Tongue, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects and Revolution. On a phone the picker scrolls. A system with no zoom plan of its own shows its lens at every zoom and its card only at Local.
 
 **Diplomacy lens colours:**
 
@@ -96,13 +96,17 @@ Trade ratio and Trade value replace the older Traders passing and Trade balance 
 
 Land and sea your country has not charted lie under a drawn **parchment**. The parchment shows your charted map, which only ever grows; it replaces the old rule of showing everything within 6 steps of your lands and armies. Which places you have charted is decided by [Exploration and Colonies](Exploration-and-Colonies).
 
-You can turn off "Parchment over unknown lands" in the lens menu to see the whole world. That switch is display only. How it fits with exploration's rule that only exploration ships may enter uncharted zones is still open (OQ-VIEW-3).
+You can turn off "Parchment over unknown lands" in the lens menu to see the whole world. That switch is display only. It only changes what you see: it never lets you enter uncharted waters, and it is not the fog of war campaign rule.
 
-### Watching the month
+### Watching the week
 
 While a turn is being worked out, the map stays visible: you can pan and zoom, armies march along their routes, and borders change as results arrive. If the turn takes longer than 1.5 seconds, a small parchment strip says what is being worked out, such as "The courts of Europe deliberate…".
 
-When the turn ends, the month **plays back** on the map at about one second per 10 days, with a skip button. Armies walk their routes, battles flash crossed swords and pause for half a second, and castles that stop an army ring red. How this playback fits with the turn stopping at your battles is still open (OQ-VIEW-6). See [Time and Turns](Time-and-Turns).
+A turn is one week. When you end it, the week **plays back** on the map: armies walk their routes, and castles that stop an army ring red. While one of your battles is being fought, the playback slows to six 4-hour steps a day, about half a second each, and a battle bar shows every battle running. From the bar you can switch between battles, change your standing orders or retreat. The game never stops for a battle, and you cannot skip the playback while one of your battles is running; battles between other realms never slow it. See [Time and Turns](Time-and-Turns).
+
+### Seasons
+
+The map shows the season. Lands north of latitude 50 and mountains turn white with snow in winter, wet climates turn green in the rainy months, and northern seas show ice while they are frozen. The season colours stay readable in every colour vision mode, and there is no switch to turn them off.
 
 ### Layout by window shape
 
@@ -165,7 +169,7 @@ To hold these:
 
 - The map itself at World, Region and Local zoom, as described above.
 - The **tool column** with the **lens picker** pop-over, and the lens menu with the parchment switch and the Tongue toggle.
-- **Month playback** with a skip button, and the parchment strip during long turns.
+- **Weekly playback**, slowed to 4-hour steps during your battles, and the parchment strip during long turns.
 - Cards as side sheets or bottom sheets depending on the window shape; "Turn your phone sideways" on an upright phone.
 
 Commands you give here never reach the engine: picking a lens, zooming and panning, toggling the parchment, and skipping playback. Picking a lens and crossing a zoom boundary are passed to [Music and Sound](Music-and-Sound) (the lens sound and the music's zoom mix), and the end of playback tells [Screens and Navigation](Screens-and-Navigation) to show the turn report.
@@ -220,21 +224,18 @@ Commands you give here never reach the engine: picking a lens, zooming and panni
 | Map detail default | settings | Medium on phones | No |
 | Animations default | settings | Full | No |
 
+## Other display rules
+
+- **Sharpness** sharpens the buttons and text over the map, not the map itself.
+- **Battery saver** lowers the frame rate, animations and music, and nothing else: the AI thinks the same on every device.
+- **Map detail Low** draws simpler art at every zoom and is still a full close-up view.
+
 ## Still open
 
-- **OQ-VIEW-1**: Does Sharpness apply to the map canvas, the overlay, or both, given the rule that the map shades 1 pixel per CSS pixel?
-- **OQ-VIEW-2**: Which lenses ship, and how does the picker hold about 17 of them on a phone? Today's build has Realms, Terrain, People, Wealth, Walls and Food, most of which are in no design list.
-- **OQ-VIEW-3**: Is the parchment display, a campaign rule or gameplay, and can the toggle show land the player cannot enter?
-- **OQ-VIEW-4**: Are there three zoom levels, and is "Province" zoom the same as "Local"?
-- **OQ-VIEW-5**: At which camera zoom do World, Region and Local change?
-- **OQ-VIEW-6**: How do month playback and the stops at player battles combine?
-- **OQ-VIEW-7**: Government, recruiting, rebellions, subjects and revolutions give a lens or card but no full zoom table yet.
-- **OQ-VIEW-8**: Budgets are checked only on a CI machine; targets for a low-end Android phone, an older iPhone, Steam Deck and Steam Machine are not set.
-- **OQ-VIEW-9**: Does Battery saver's smaller AI budget only slow the AI, or also change what it decides (which settings must never do)?
-- **OQ-VIEW-10**: Is Map detail Low (no 8 × 8 tiles) still a valid Local zoom for the tile row and battle screen?
+- Speed and memory targets for a low-end Android phone, an older iPhone, the Steam Deck and the Steam Machine wait on tests on real devices before release.
 
 ## For developers
 
-- Spec: [`domain/map-presentation/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/map-presentation/spec.md), requirement code **VIEW** (VIEW-001 to VIEW-069).
+- Spec: [`domain/map-presentation/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/map-presentation/spec.md), requirement code **VIEW**.
 - Features: `domain/map-presentation/features/` (map-rendering, zoom-content, lenses, parchment, month-playback, layout, map-accessibility, performance).
 - Code: the map is drawn in the client, `apps/client/src/map/mapView.ts` (`MAP_PIXEL_RATIO`) and `apps/client/src/main.ts` (today's lenses and fog toggle). Budgets are documented in `docs/performance.md` and checked by `pnpm bench` and `pnpm --filter @ph/client perf`. This context is presentation only and has no engine rules folder.

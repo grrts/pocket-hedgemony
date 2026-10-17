@@ -29,9 +29,9 @@ Feature: Women as rulers, lords, commanders, officials and scholars
     When a regent is chosen
     Then the queen mother can be the regent
 
-  @REALM-109 @placeholder @open-question
+  @REALM-109 @REALM-163 @placeholder
   Scenario Outline: The chance rises with the ages
-    # config: age_multipliers; OQ-REALM-7: values not given, Age of Decolonization out of scope
+    # config: age_multipliers
     Given the event tree's age "<age>" has arrived
     When the game generates a lord for "France"
     Then the chance that she is a woman is multiplied by the factor for "<age>"
@@ -39,11 +39,25 @@ Feature: Women as rulers, lords, commanders, officials and scholars
 
     Examples:
       | age                         | size                       |
-      | Age of Revolutions          | a little above 1           |
-      | Age of Industrialization    | larger than for Revolutions |
-      | Age of World Wars           | larger again               |
+      | Age of Revolutions          | 1.5                        |
+      | Age of Industrialization    | 2                          |
+      | Age of World Wars           | 3                          |
 
-  @REALM-109
+  @REALM-163 @placeholder
+  Scenario Outline: Base chances per role
+    # config: women_in_roles.default
+    Given no age has raised the chances yet
+    When the game generates a <role> for "France"
+    Then the chance that she is a woman is <chance>
+
+    Examples:
+      | role      | chance |
+      | lord      | 0.05   |
+      | commander | 0.02   |
+      | official  | 0.02   |
+      | scholar   | 0.05   |
+
+  @REALM-109 @REALM-163
   Scenario: A reform raises one country's chance early
     Given the country "Sweden" passes a new succession law by an event
     When the game generates a commander for "Sweden"

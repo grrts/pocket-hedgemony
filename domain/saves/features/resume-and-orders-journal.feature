@@ -5,19 +5,19 @@ Feature: Resume save and orders journal
   So that I never lose more than the orders I gave since my last End turn
 
   Background:
-    Given the campaign as "Portugal" is loaded at turn 820, March 1512
+    Given the campaign as "Portugal" is loaded at turn 3513, March 1512
 
   @SAVE-024
   Scenario: The Resume save is written in the worker
     When the player ends the turn
-    Then the engine worker writes the Resume save for turn 821
+    Then the engine worker writes the Resume save for turn 3514
     And the player can already give orders while it writes
 
   @SAVE-025
   Scenario: The journal holds the queued orders
     When the player queues a march order and a levy order
     Then the orders journal holds those 2 orders as the same values End turn would send
-    And the journal records turn 820 and the hash of the Resume save of turn 820
+    And the journal records turn 3513 and the hash of the Resume save of turn 3513
 
   @SAVE-026 @placeholder
   Scenario Outline: When the journal is written
@@ -35,26 +35,26 @@ Feature: Resume save and orders journal
 
   @SAVE-002 @SAVE-027
   Scenario: Killed in the background, nothing lost
-    Given the player has queued 4 orders in turn 820
+    Given the player has queued 4 orders in turn 3513
     And the app was backgrounded and the journal written
     And the system killed the app
     When the player continues
-    Then the Resume save of turn 820 is loaded
+    Then the Resume save of turn 3513 is loaded
     And the 4 orders are back in the queue
     And the state is exactly as the player left it
 
   @SAVE-028
   Scenario Outline: A journal that doesn't match is ignored
     Given the journal records turn <journal turn> and the hash "<journal hash>"
-    And the Resume save is turn 820 with the hash "h820"
+    And the Resume save is turn 3513 with the hash "h3513"
     When the player continues
     Then the journal is <result>
 
     Examples:
       | journal turn | journal hash | result   |
-      | 820          | h820         | applied  |
-      | 819          | h819         | ignored  |
-      | 820          | other        | ignored  |
+      | 3513         | h3513        | applied  |
+      | 3512         | h3512        | ignored  |
+      | 3513         | other        | ignored  |
 
   @SAVE-029
   Scenario Outline: Platform hooks write the journal
@@ -76,12 +76,12 @@ Feature: Resume save and orders journal
 
   @SAVE-030
   Scenario: Backgrounded during a turn
-    Given the player ended turn 820 and the turn is being processed
+    Given the player ended turn 3513 and the turn is being processed
     When the app is backgrounded and later killed
     And the player continues
     Then nothing new was saved
     And the previous Resume save and journal are used
-    And turn 820 is processed again with the same result
+    And turn 3513 is processed again with the same result
 
   @SAVE-031 @placeholder
   Scenario Outline: Desktop quit waits for the write

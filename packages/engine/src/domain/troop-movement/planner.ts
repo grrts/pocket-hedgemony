@@ -1,4 +1,4 @@
-import { rulesFor } from "./army-rules.ts";
+import { arrivalDay, rulesFor } from "./army-rules.ts";
 import { type Army, type Mover, type MoveWorld, blockingCastle, isArmy, neighboursOf, placeOf, sameSide } from "./model.ts";
 
 export type RouteEnd = "arrives" | "castle" | "needs passage" | "needs ships" | "no route";
@@ -97,7 +97,7 @@ function planLeg(w: MoveWorld, m: Mover, from: string, to: string): RoutePlan {
         greyed: through.path.slice(i + 1),
         end: "castle",
         stopsAt: through.path[i]!,
-        message: `stops at ${name(through.path[i]!)} until the castle falls`,
+        message: `stops at ${name(through.path[i]!)} on day ${arrivalDay(through.arrive[i]!)} until the castle falls`,
       };
     }
     const passage = search(w, m, from, to, { throughCastles: true, relax: ["needs passage"] });

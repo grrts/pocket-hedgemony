@@ -61,9 +61,8 @@ Feature: War aims
       | Serbian | an accepted culture        | holds         |
       | Serbian | neither culture nor accepted | does not hold |
 
-  @DIPL-143 @open-question
-  Scenario Outline: Holding Break a subject
-    # OQ-DIPL-8: who is the target of Break a subject
+  @DIPL-143
+  Scenario Outline: Holding Break a subject against the overlord
     Given the country "B" has the subject "S"
     And <reason>
     When the game evaluates it

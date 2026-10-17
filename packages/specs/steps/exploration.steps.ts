@@ -574,8 +574,8 @@ Then("it sends exploration ships along the edge of its charted map", (s) => {
 
 Then("it founds colonies on the nearest unowned coasts", (s) => {
   const g: MapGraph = s.g;
-  // Its ships sail the edge of its charts, turn after turn, until unowned coasts are charted.
-  for (let turn = 0; turn < 60 && s.plan.colonyTargets.length === 0; turn++) {
+  // Its ships sail the edge of its charts, voyage after voyage, until unowned coasts are charted.
+  for (let voyage = 0; voyage < 60 && s.plan.colonyTargets.length === 0; voyage++) {
     expect(s.plan.colonyTargets).toEqual([]);
     for (const edge of s.plan.voyageTargets as string[])
       for (const n of g.byId.get(edge)!.neighbors) if (isWater(g.byId.get(n)!) && !E.isCharted(s.chart, n)) E.chartOnEntering(s.chart, g, n);

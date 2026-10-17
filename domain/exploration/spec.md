@@ -38,7 +38,7 @@ Newest decision first.
   exploration ships). This file (16 Oct, 22:54) is newer than `planning/gap-lists.md` (16 Oct, 22:34), which still
   lists colonising land of stateless peoples as open: the exploration decision wins (D-EXPL-2).
 - `planning/gap-lists.md`, "Decisions already made" (16 Oct): exploration opens with the Age of Exploration; one
-  month per turn; multiplayer-friendly orders; campaign ends 31 August 1939; gap 14 (exploration and first contact).
+  month per turn (since replaced: a turn is one week, X-18); multiplayer-friendly orders; campaign ends 31 August 1939; gap 14 (exploration and first contact).
 - `exploration/exploration-design.md` (version 1), sections 1 to 9.
 - Read for seams and contradictions: `naval/naval-design.md` 3.2, 3.3, 3.5, 6.3, 6.4, 7.2, 13;
   `province-stats/province-stats-design.md` 10.2, 12.3; `government/government-design.md` 3;
@@ -334,17 +334,17 @@ Newest decision first.
   country is lost (EXPL-060).
 - When a year passes (time-and-turns), then every colonial governor is a year older.
 
-## 9. Monthly turn
+## 9. Each turn and each month
 
-Each day (troop-movement day loop): voyages move as naval fleets; charting runs as they enter zones; *Turn back*
+Each day of the turn's 7 days (troop-movement day loop): voyages move as naval fleets; charting runs as they enter zones; *Turn back*
 is checked against supply; unloading takes one day.
 
-Each month, with the province update:
+In the turn in which a new month begins, with the province update:
 1. For each colony being founded: progress +5; minus the locals' pressure roll; eat 20 rations of colony food, or
    −10 progress if there is none.
 2. Progress ≥ 100: founded (hand over to province and subjects; publish for `colonial_presence`). Progress ≤ 0: lost.
 3. Recount governor slots from research.
-4. In the January turn, every colonial governor ages a year; wages (5 gold a year each) go to the realm's treasury
+4. In the turn in which 1 January falls, every colonial governor ages a year; wages (5 gold a year each) go to the realm's treasury
    step.
 Reads first: research known, the current ages and regions (events), government form (range), province ownership
 and free tiles.

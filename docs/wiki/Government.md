@@ -13,7 +13,7 @@ Every country has two caps:
 
 Both show as "x of y". Every lord counts exactly 1 toward the lords cap, however many provinces he holds. While you are within both caps nothing happens.
 
-**Over the officials cap**, the province of each official over the cap gets the grievance *Grasping officials*, newest hires first. It goes away when you are back within the cap.
+**Over the officials cap**, the province of each official over the cap gets the grievance *Grasping officials*, newest hires first. An official's hire date is the day he took up his post, whether he was hired, came from the schools or inherited the post from a lord's line. The grievance goes away when you are back within the cap.
 
 **Over the lords cap**, at each New Year one lord loses a loyalty step for each lord over the cap, lowest loyalty first, then the lord with the most provinces.
 
@@ -24,7 +24,8 @@ Both show as "x of y". Every lord counts exactly 1 toward the lords cap, however
 | Building | Officials | Lords | Needs |
 |---|---|---|---|
 | Palace, step 1 / 2 / 3 | 6 / 10 / 16 | 2 / 4 / 6 | |
-| Seat, step 1 / 2 (one per town) | 2 / 4 each | | step 2 needs G11 |
+| Landmark palace (step 4): Forbidden City / Topkapı Palace | 24 / 20 | 6 | the landmark (provisional) |
+| Seat, step 1 / 2 (one per province) | 2 / 4 each | | step 2 needs G11 |
 | Chancery | 4 | | G3 Tax registers |
 | Court of law | | 2 | G1 Written law codes |
 | Diet hall | | 3 | feudal realm, diet monarchy, elective monarchy or confederation only |
@@ -72,12 +73,15 @@ Each form sets the officials and lords it supports, a change to subject reach, i
 
 - **Subject reach** starts from the catalogue's administrative capacity (very low 2, low 3, moderate 5, high 7, very high 9) and the form adds or takes away. A colonial government has none and can't hold subjects. See [Subjects](Subjects).
 - **Colonial range** is how many sea zones from your nearest port or colony you may found a colony. See [Exploration-and-Colonies](Exploration-and-Colonies).
-- **Self-run forms**: under a clan council or chiefdom, provinces of your own people need no official, so *Ungoverned* never appears there; provinces of another people still need one.
+- **Self-run forms**: under a clan council or chiefdom, provinces of your own people need no official, so *Ungoverned* never appears there; provinces of another people still need one. A province is of your own people when its largest tongue is your realm's tongue. A related tongue doesn't count: under Gowa (Makassarese), Buginese Bone still needs an official.
+- **Monarchies**: the forms that count as monarchies (for example for the Inquisition, see [Religion](Religion)) are every house form plus the chiefly and warrior monarchies: paramount chiefdom, tribute empire, warlord domain, shogunate and soldier emirs.
 - A colonial governor holding a governor slot doesn't count toward the officials cap; once his colony is founded he counts as its official.
 
 ### Reforms
 
-A reform changes your form to one of its next forms. It needs every listed item, costs gold from the treasury, and makes some lords lose a loyalty step. If a need isn't met or the treasury is short, the reform is refused. Once it passes, both caps, subject reach, colonial range and succession follow the new form. This is the full list:
+A reform changes your form to one of its next forms. It needs every listed item, costs gold from the treasury, and makes some lords lose a loyalty step: those with the lowest loyalty first, then the biggest, the same order as at New Year. If a need isn't met or the treasury is short, the reform is refused. Once it passes, both caps, subject reach, colonial range and succession follow the new form. The list below is complete: a feudal realm, for example, cannot jump straight to a constitutional monarchy, but goes through a diet or absolute monarchy first. A prince-bishopric or military order "takes a reformed faith" when its state faith is no longer the faith it was founded in.
+
+These are the reforms you can order:
 
 | From | To | Needs | Gold | Lords slip |
 |---|---|---|---|---|
@@ -90,9 +94,7 @@ A reform changes your form to one of its next forms. It needs every listed item,
 | Tribute empire | Household realm | G3 Tax registers or G6 Quipu | 150 | 2 |
 | Tribute empire | Bureaucratic empire | G4 Examination system | 200 | 3 |
 | Horde | Household realm | a palace in a town | 150 | 2 |
-| Horde | Confederation | no adult heir | 0 | 0 |
 | Feudal realm | Diet monarchy | a diet hall | 100 | 0 |
-| Feudal realm | Elective monarchy | the ruling line dies out | 0 | 0 |
 | Feudal realm or Diet monarchy | Absolute monarchy | G9 Professional bureaucracy and W12 Standing regiments | 300 | 3 |
 | Diet monarchy, Absolute monarchy or Bureaucratic empire | Constitutional monarchy | G14 Written constitution and a parliament house | 200 | 1 |
 | Elective monarchy | Feudal realm | the same house elected 3 times running | 100 | 2 |
@@ -101,32 +103,46 @@ A reform changes your form to one of its next forms. It needs every listed item,
 | Household realm | Bureaucratic empire | G9 and an examination hall | 250 | 2 |
 | City commune | Merchant republic | 4 or more traders abroad | 100 | 1 |
 | City commune or Merchant republic | Feudal realm | one family led the city 3 times running | 150 | 2 |
-| Merchant republic | City commune | trade in debt 3 years running | 0 | 1 |
 | Peasant commune | City commune | a city in the realm | 50 | 0 |
 | City commune, Merchant republic or Peasant commune | Constitutional republic | G14 and a parliament house | 150 | 0 |
 | Prince-bishopric or Military order | Feudal realm | the ruler takes a reformed faith | 100 | 2 |
 | Holy rule | Household realm | one family chose the ruler 3 times running | 150 | 1 |
 | Warlord domain | Shogunate | holds the imperial capital and 8 or more lords | 150 | 1 |
 | Warlord domain | Feudal realm | G1 Written law codes | 100 | 2 |
-| Shogunate | Warlord domain | the shogun loses the capital | 0 | 0 |
 | Shogunate | Constitutional monarchy | G14 and a parliament house | 250 | 4 |
 | Soldier emirs | Household realm | one emir's family held the throne 3 reigns | 150 | 2 |
 | Confederation | Feudal realm | one member holds over half the land | 150 | 3 |
-| Constitutional monarchy | Constitutional republic | the ruler deposed or abdicates | 0 | 0 |
+
+### Changes that happen by themselves
+
+Some changes are not choices. When one of these happens, the form changes in that month's government step, at no gold, and you cannot order it as a reform:
+
+| From | To | When | Lords slip |
+|---|---|---|---|
+| Feudal realm | Elective monarchy | the ruling line dies out | 0 |
+| Horde | Confederation | there is no adult heir | 0 |
+| Shogunate | Warlord domain | the shogun loses the capital | 0 |
+| Merchant republic | City commune | trade is in debt 3 years running | 1 |
+| Constitutional monarchy | Constitutional republic | the ruler is deposed or abdicates | 0 |
+| Constitutional republic | Constitutional monarchy | parliament invites a king | 0 |
+| Company rule | Colonial government | the crown takes over | 1 |
+
+A confederation, a military junta and a party state list the constitutional republic as a next form, but no reform leads there: the card shows it as "by revolution or event only".
 
 ### Changes without a reform
 
-- A **revolution** or a won *New ideas* rising sets a form directly, even one that normally belongs to a later era. A country that reforms still needs the listed items, whatever revolutions have done elsewhere.
+- A **revolution** or a won *New ideas* rising sets a form directly, even one that normally belongs to a later era. A country that reforms still needs the listed items, whatever revolutions have done elsewhere. The game remembers the last form you had before a run of revolutions, so a restoration can bring it back: an absolute monarchy that becomes a republic and then a party state still remembers the absolute monarchy.
 - A successful **army coup** makes the country a military junta.
 - A **shogunate** whose shogun loses the capital breaks into warlord domains.
-- An **event** that sets one of the event tree's 16 `government` values sets the matching form, unless the current form already fits that value, in which case nothing changes. A `republic` event on a country without G14 gives a city commune instead of a constitutional republic. An event changing `admin_capacity` applies to the officials cap.
+- An **event** that sets one of the event tree's 16 `government` values sets the matching form, unless the current form already fits that value, in which case nothing changes. A `republic` event on a country without G14 gives a city commune instead of a constitutional republic. An event changing `admin_capacity` adds 1 official per point to the officials cap for good (or takes it away), shown as "events" on the card; a cap never drops below 0.
+- A country that becomes a **colonial government** can hold no subjects, so all its subjects are released at once.
 
 | Event value | Form set (examples) |
 |---|---|
-| monarchy | a feudal realm; kept as is by fitting house forms such as household realm or paramount chiefdom |
+| monarchy | a feudal realm; kept as is by every house form (elective and constitutional monarchy too) and by the chiefly and warrior monarchies |
 | elective_monarchy | elective monarchy |
 | theocracy | holy rule; kept by a prince-bishopric |
-| republic | city commune (constitutional republic with G14); kept by a peasant commune |
+| republic | city commune (constitutional republic with G14); kept by any city, merchant or peasant commune and the constitutional republic |
 | merchant_republic | merchant republic |
 | tribal | chiefdom; kept by a clan council |
 | confederation | confederation |
@@ -144,11 +160,11 @@ Each catalogue record gets its start form by the first rule that applies: a hand
 
 ### The computer players
 
-No AI rules are designed for government yet. The AI uses the same Reform command as the player.
+The AI uses the same Reform command as the player. Each January it orders the reform to the first of its next forms, in the order the table lists them, whose needs it meets and whose gold it holds twice over.
 
 ### Each month
 
-Each month the caps are recomputed after buildings and hiring, and *Grasping officials* is applied or lifted. At New Year, lords over the cap slip. Reforms resolve when ordered.
+Each month any change that happens by itself is applied, the caps are recomputed after buildings and hiring, and *Grasping officials* is applied or lifted. At New Year, lords over the cap slip. Reforms resolve when ordered.
 
 ## What you see
 
@@ -166,8 +182,8 @@ Each month the caps are recomputed after buildings and hiring, and *Grasping off
 - [Historical-Events](Historical-Events): the 16 event-tree values and `admin_capacity`.
 - [Research](Research): G1, G2, G3, G4, G6, G9, G11, G14 and W12 as needs.
 - [National-Strengths](National-Strengths): additions to caps (for example +2 officials for Venice).
-- [Religion](Religion): a ruler taking a reformed faith opens the faith forms' reform.
-- [Culture](Culture): who counts as "own people" for self-run forms.
+- [Religion](Religion): a change of state faith opens the faith forms' reform; the Inquisition is open to monarchies.
+- [Culture](Culture): a province's largest tongue, which decides "own people" for self-run forms.
 - [Warfare](Warfare): army coups and the shogun's capital.
 - [Trade](Trade): traders abroad and trade debt as reform needs.
 - [Diplomacy](Diplomacy): alliances with neighbours as a need.
@@ -176,7 +192,7 @@ Each month the caps are recomputed after buildings and hiring, and *Grasping off
 
 ## Numbers
 
-All numbers are **placeholders** in `government/config/government.yaml` (and `start-forms.yaml`), except `revolution_ignores_era`, which is decided.
+All numbers are **placeholders** in `government/config/government.yaml` (and `start-forms.yaml`), except `revolution_ignores_era`, which is decided. Numbers added on 17 October to settle open points are marked provisional.
 
 | Key | Value |
 |---|---|
@@ -186,7 +202,10 @@ All numbers are **placeholders** in `government/config/government.yaml` (and `st
 | `great_lord` | 4 to 7 provinces: 1 reason; 8+: 2 |
 | `subject_reach_start` | 2 / 3 / 5 / 7 / 9 |
 | `buildings.palace` | officials 6/10/16, lords 2/4/6 |
-| `buildings.seat` | 2/4 officials, one per town |
+| `buildings.seat` | 2/4 officials, one per province |
+| `buildings.palace.landmark_step_4` | Forbidden City 24, Topkapı 20 officials; 6 lords (provisional) |
+| `admin_capacity_officials_per_point` | 1 (provisional) |
+| `ai.reform_month` / `ai.reform_gold_reserve_factor` | January / 2 (provisional) |
 | `buildings.chancery`, `court_of_law`, `diet_hall`, `hostage_residence`, `examination_hall`, `parliament_house` | 4 officials; 2 lords; 3 lords; 3 lords; 4 officials; 6 officials |
 | `forms.<id>` | the forms table |
 | `reforms[]` | the reforms table |
@@ -196,26 +215,10 @@ All numbers are **placeholders** in `government/config/government.yaml` (and `st
 
 ## Still open
 
-- **OQ-GOV-1**: the design says any monarchy or republic can reform to a constitutional form; the config allows only some.
-- **OQ-GOV-2**: three next-form links have no reform row.
-- **OQ-GOV-3**: whether condition-based reforms (line dies out, no adult heir, capital lost) happen automatically.
-- **OQ-GOV-4**: which lords slip when a reform passes.
-- **OQ-GOV-5**: culture's 1.5 weight for stranger provinces has no place in the caps.
-- **OQ-GOV-6**: culture's proposal that forms limit tongue policies.
-- **OQ-GOV-7**: province, country stats and the gap list haven't taken in *Grasping officials*, *Great lord* and succession by form.
-- **OQ-GOV-8**: some event mappings would turn an elective or constitutional monarchy into a feudal realm.
-- **OQ-GOV-9**: the form before a revolution must be remembered for restorations; power bases no longer exist.
-- **OQ-GOV-10**: seats per town or per province, and landmark palaces at step 4.
-- **OQ-GOV-11**: whether an event's `admin_capacity` adds to or replaces the cap, and for how long.
-- **OQ-GOV-12**: no AI behaviour is designed.
-- **OQ-GOV-13**: who counts as "own people" for self-run forms.
-- **OQ-GOV-14**: what "a reformed faith" means.
-- **OQ-GOV-15**: which forms count as monarchies for the Inquisition.
-- **OQ-GOV-16**: what happens to subjects when an event sets colonial government.
-- **OQ-GOV-17**: what "newest hire" means for graduates and inherited officials.
+Nothing. Every question about government was settled on 17 October 2026; the numbers marked provisional are still being balanced.
 
 ## For developers
 
-- Spec: `domain/government/spec.md` in the game repository, requirement code **GOV** (GOV-001 to GOV-049).
+- Spec: `domain/government/spec.md` in the game repository, requirement code **GOV**.
 - Features: `domain/government/features/`: `caps.feature` (France and the Ottomans in 1444), `cap-buildings.feature`, `forms.feature`, `reforms.feature` (every reform row), `form-changes.feature` and `start-forms.feature`.
 - Code: `packages/engine/src/domain/government/index.ts`, with numbers in `packages/rules/data/domain/government.json` and start records in `packages/rules/data/domain/government-start-records.json`. The start-form tool is `government/tools/assign_start_forms.py` in the designs.

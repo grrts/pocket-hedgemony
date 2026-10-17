@@ -835,7 +835,7 @@ Given('the province "Troyes" trains 2500 pikes with 3 months left', (s) => {
 Then("the training has 2 months left", (s) => {
   expect(s.order.monthsLeft).toBe(2);
 });
-Then("the pool refill and the fading of fallen and veterans wait for the January turn", (s) => {
+Then("the pool refill and the fading of fallen and veterans wait for January", (s) => {
   expect(s.pool).toEqual(s.poolBefore);
   R.monthPasses(s.pool, [], { month: 1 });
   near(s.pool.recruits, 1000 + (2200 - 1000) * 0.25, 1e-9);
@@ -1284,7 +1284,7 @@ Given('the province "Troyes" has 700 fallen from here and 1400 veterans here', (
   s.pool.fallen = 700;
   s.pool.veterans = 1400;
 });
-When("the January turn passes", (s) => {
+When("the turn in which 1 January falls passes", (s) => {
   R.monthPasses(s.pool, [], { month: R.recruitingConfig.yearlyMonth });
 });
 Then('the province "Troyes" has 630 fallen from here and 1260 veterans here', (s) => {

@@ -25,7 +25,6 @@ Feature: Diplomacy AI
       | balancer       | "B" counts a league against a country with 3 times its soldiers  | 30     |
       | balancer       | a country asks "B" for an alliance against its strongest neighbour | 20   |
       | client seeker  | a stronger Warm country offers "B" overlordship                  | 30     |
-      | client seeker  | a stronger Warm country pledges to "B"                           | 30     |
       | hegemon seeker | a stronger country asks "B" for an alliance                      | -20    |
 
   @DIPL-177 @placeholder
@@ -110,13 +109,13 @@ Feature: Diplomacy AI
   @DIPL-182
   Scenario Outline: Who funds rebels
     Given the AI country "A" has posture "<posture>", a free seat and gold to spare
-    And a province of its rival "B" has <grievances> grievances
+    And the revolution card of its rival "B" shows <signs> signs
     When the AI turn runs
     Then the AI country "A" <does> fund rebels there
 
     Examples:
-      | posture        | grievances | does     |
-      | opportunist    | 2          | may      |
-      | hegemon seeker | 3          | may      |
-      | opportunist    | 1          | does not |
-      | balancer       | 3          | does not |
+      | posture        | signs | does     |
+      | opportunist    | 1     | may      |
+      | hegemon seeker | 2     | may      |
+      | opportunist    | 0     | does not |
+      | balancer       | 2     | does not |

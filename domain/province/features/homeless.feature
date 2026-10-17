@@ -13,13 +13,13 @@ Feature: Homeless people
     And they make nothing and pay no tax
     And their death rate is 5 % a year
 
-  @PROV-121 @placeholder @open-question
+  @PROV-121 @placeholder
   Scenario Outline: Theft and begging cut tax and trade
-    # config: province.homeless.thresholds; OQ-PROV-1: trade v2 rewords the trade part as trade ratio gain
+    # config: province.homeless.thresholds
     Given the province "Troyes" has <share> homeless
     When the game works out the province's stats
     Then <tax> less of its tax reaches you
-    And <trade> fewer traders pass through
+    And its trade ratio gain is <trade> lower
 
     Examples:
       | share | tax  | trade |
@@ -49,13 +49,12 @@ Feature: Homeless people
     And town classes die 1 % faster
     And each year a town building may burn
 
-  @PROV-124 @placeholder
-  Scenario: Rebels muster from the homeless first
-    # config: province.homeless.rebel_rate
-    Given the province "Troyes" has rebels mustering
-    And the province "Troyes" has homeless and farmers
-    When the game works out the province's stats
-    Then homeless take up arms first, at twice the rate of other people
+  @PROV-124
+  Scenario: Rebels muster from the recruit pool
+    Given the province "Troyes" has 4 grievances, of which "Heavy taxes" is the biggest
+    And the province "Troyes" has 900 recruits here
+    When it rises with 600 men wanted
+    Then 600 of its recruits take up arms
 
   @PROV-125
   Scenario Outline: Ways people become homeless

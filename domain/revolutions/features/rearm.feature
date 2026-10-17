@@ -22,7 +22,7 @@ Feature: A stopped revolution comes back
     # config: rearm.grace_years
     Given the revolution "french_revolution" re-armed for "France" <years> years ago
     And 4 signs of "french_revolution" are lit for "France"
-    When the turn is processed
+    When the monthly step runs
     Then the revolution "french_revolution" <can> break out through the normal selection with its sparks
 
     Examples:

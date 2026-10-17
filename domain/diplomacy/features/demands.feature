@@ -63,11 +63,12 @@ Feature: Demands
       | Apologise and pay              | Punish             |
       | Expel an envoy or cut an alliance | Punish          |
 
-  @DIPL-115 @open-question
+  @DIPL-115
   Scenario: A war after a refused demand is provoked by the target
-    # OQ-DIPL-5: the +20 the target's allies lose is not defined
-    Given the country "B" refused the demand of the country "A"
+    Given the country "A" is allied with "C"
+    And the country "B" is allied with "D"
+    And the country "B" refused the demand of the country "A"
     When the country "A" declares war on "B" with the aim from the refusal
     Then the lords of "A" who are not Warlike do not waver
-    And offensive calls of "A" to its allies get +20
-    And defensive calls of "B" to its allies lose the +20 bonus to come
+    And offensive calls of "A" to its allies hold "They refused a fair demand" at +20
+    And the allies of "B" get no defensive call

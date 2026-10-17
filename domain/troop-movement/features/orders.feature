@@ -56,11 +56,20 @@ Feature: March orders and route settings
       | horse only         | offered     |
       | foot and horse     | not offered |
 
-  @MOVE-081 @open-question
-  # OQ-MOVE-12: how the week per province combines with raid step days
+  @MOVE-081 @MOVE-114 @placeholder
+  # config: raidDaysPerProvince 7 (D-MOVE-12)
   Scenario: A raid spends a week in each province
-    Given the horse-only army "A" raids along a route
-    Then it spends a week in each province it passes
+    Given the country "France" is at war with the country "Burgundy"
+    And the horse-only army "A" of 10000 horse raids from "Troyes" through "Langres" to "Dijon"
+    When the weekly turns of the month are played
+    Then it enters "Langres" on day 4 and "Dijon" on day 14
+    And it stays 7 days in "Langres" before riding on
+
+  @MOVE-115
+  Scenario: An order to the province it stands in is a Halt
+    Given the army "A" is on a route to "Dijon"
+    When the army "A" is ordered "March to" the province it stands in
+    Then the rest of its route is kept, greyed
 
   @MOVE-082
   Scenario: Besiege holds the army

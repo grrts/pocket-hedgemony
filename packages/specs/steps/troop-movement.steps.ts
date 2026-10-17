@@ -2,6 +2,7 @@ import { expect } from "vitest";
 import type { Terrain } from "@ph/rules";
 import {
   MARCH,
+  MOVE,
   type Army,
 
   type MoverRules,
@@ -10,6 +11,10 @@ import {
   type Place,
   type RoutePlan,
   applyOrder,
+  playTurn,
+  beginBattle,
+  orderRetreat,
+  setAiStandingOrders,
   armyById,
   armyMayEnter,
   breakArmy,
@@ -44,6 +49,13 @@ import {
   shipMayEnterBase,
   shownDayCounts,
   splitArmy,
+  canForage,
+  interceptTarget,
+  roadOf,
+  monthPlayback,
+  newLog,
+  riverKindOfRank,
+  startFlood,
   stepBreakdown,
   withdrawCheck,
   withdrawTo,
@@ -181,23 +193,24 @@ Given(/^the config "march\.(\w+)" is (\d+)$/, (_s, key: string, n: string) => {
 Then(/^the army "(\w+)" stands in "(\w+)"$/, (s, id: string, place: string) => expect(A(s, id).place).toBe(place));
 Then(/^it stands in "(\w+)"$/, (s, place: string) => expect(A(s, s.subject).place).toBe(place));
 
-When("the month is played", (s) => {
+When("the weekly turns of the month are played", (s) => {
   if (s.monthPlayed) return;
   month(s);
 });
-When("a month is played", (s) => {
-  s.counts = { food: 0, sickness: 0, sieges: 0, pay: 0 };
-  hooks(s).monthly = Object.fromEntries(["food", "sickness", "sieges", "pay"].map((k) => [k, () => s.counts[k]++]));
-  month(s);
+When("the weekly turns of a whole month are played", (s) => {
+  s.calls = { weekly: [] as [string, number][], sieges: [] as [number, string][], monthly: [] as string[] };
+  const h = hooks(s);
+  h.weekly = Object.fromEntries(["food", "hunger", "plunder", "raids"].map((k) => [k, (_w: MoveWorld, day: number) => s.calls.weekly.push([k, day])]));
+  h.monthly = Object.fromEntries(["sieges", "sickness", "pay"].map((k) => [k, () => s.calls.monthly.push(k)]));
+  s.log = newLog();
+  runPending(s);
+  playMonth(W(s), h, s.log);
 });
 
 // ---------- day loop ----------
 
 When("a turn ends", (s) => {
   month(s);
-});
-Then("the day loop runs 30 days", (s) => {
-  expect(s.log.days).toEqual(Array.from({ length: 30 }, (_, i) => i + 1));
 });
 When("a day of the month is played", (s) => {
   s.log = playDays(W(s), 1, 1);
@@ -239,16 +252,21 @@ Then(/^the battle rules start in "(\w+)" on day (\d+)$/, (s, place: string, day:
 Given(/^the army "(\w+)" is in a battle that lasts 3 days$/, (s, id: string) => {
   const a = put(s, id, "France", "Troyes");
   walking(a, "Langres", 7.5, 1);
-  a.battleDaysLeft = 3;
+  // A running battle of 3 days: 18 rounds of 4 hours (X-1).
+  beginBattle(W(s), { place: "Troyes", day: 0, sides: [[id], ["X"]], caughtBroken: [] }, { rounds: 3 * MOVE.battleSteps.perDay });
 });
 When("those 3 days are played", (s) => {
   s.log = playDays(W(s), 1, 3);
 });
 Then(/^the army "(\w+)" adds no days to its step$/, (s, id: string) => expect(A(s, id).progress).toBe(1));
 
-Then("food, sickness, sieges and pay are run once, not each day", (s) => {
-  expect(s.counts).toEqual({ food: 1, sickness: 1, sieges: 1, pay: 1 });
-  expect(s.log.days.length).toBe(30);
+Then("army food, hunger, plunder and raids run at the end of each 7-day turn, on days 7, 14, 21 and 28", (s) => {
+  for (const k of ["food", "hunger", "plunder", "raids"])
+    expect(s.calls.weekly.filter(([x]: [string, number]) => x === k).map(([, d]: [string, number]) => d)).toEqual([7, 14, 21, 28]);
+});
+Then("sieges, sickness and pay run once, in the turn in which the month begins", (s) => {
+  expect(s.calls.monthly).toEqual(["sieges", "sickness", "pay"]);
+  expect(s.log.monthly).toEqual(["sieges", "sickness", "pay"]);
 });
 
 Given(/^the army "(\w+)" is walking from "(\w+)" to "(\w+)" with 3 days left$/, (s, id: string, from: string, to: string) => {
@@ -279,16 +297,26 @@ Then(/^the battle is fought in "(\w+)"$/, (s, place: string) => {
   expect(s.log.battles.map((b: { place: string }) => b.place)).toEqual([place]);
 });
 
-Given(/^the army "(\w+)" starts a mountain step of 18 days on day 25$/, (s, id: string) => {
+Given(/^the army "(\w+)" starts a mountain step of 9 days on day 3 of a turn$/, (s, id: string) => {
   const w = W(s);
   w.places["Alps"] = { id: "Alps", terrain: "mountains", owner: "France" };
-  walking(put(s, id, "France", "Troyes"), "Alps", 18);
-  s.log = playDays(w, 26, 30);
+  walking(put(s, id, "France", "Troyes"), "Alps", 9);
+  s.log = playDays(w, 4, 7);
 });
-When("the next month is played", (s) => {
-  s.log = playMonth(W(s));
+When("the next turn is played", (s) => {
+  s.calls = { weekly: [] as [string, number][], monthly: [] as string[] };
+  const h = hooks(s);
+  h.weekly = { food: (_w: MoveWorld, day: number) => s.calls.weekly.push(["food", day]) };
+  h.monthly = { pay: () => s.calls.monthly.push("pay") };
+  s.log = playTurn(W(s), h);
 });
-Then(/^the army "(\w+)" arrives on day (\d+) of the next month$/, (s, id: string, day: string) => {
+Given(/^the date is (\d+) March 1451$/, (s, d: string) => {
+  W(s).date = { year: 1451, month: 3, day: Number(d) };
+});
+Then("the weekly steps run once, at the end of the turn", (s) => expect(s.calls.weekly).toEqual([["food", 7]]));
+Then("the monthly steps run, because April begins in this turn", (s) => expect(s.calls.monthly).toEqual(["pay"]));
+Then("the next turn starts on 5 April 1451", (s) => expect(W(s).date).toEqual({ year: 1451, month: 4, day: 5 }));
+Then(/^the army "(\w+)" arrives on day (\d+) of the next turn$/, (s, id: string, day: string) => {
   expect(s.log.entered.filter((e: { mover: string }) => e.mover === id).map((e: { day: number }) => e.day)).toEqual([Number(day)]);
 });
 
@@ -880,7 +908,7 @@ Given(/^the army "(\w+)" is aboard ships$/, (s, id: string) => {
   w.movers.push(createMover("F", "fleet", "Portugal", "Cape"));
   put(s, id, "Portugal", "Cape", 5000, { cargoOf: "F", reserve: { days: 60, full: 60 } });
 });
-When("a month passes", (s) => {
+When("a month of weekly turns passes", (s) => {
   month(s);
 });
 Then("it eats from its reserve, as abroad", (s) => {
@@ -1166,18 +1194,21 @@ function stepWorld(s: Scenario, from: string, to: string): MoveWorld {
   });
   const w = mkWorld({ From: spec(from, "From"), To: spec(to, "To") }, ["From-To"]);
   w.date.month = s.month ?? 4;
+  s.stepWorld = w;
   s.army.place = "From";
   w.movers.push(s.army);
   return w;
 }
 When(/^it steps from "(\w+)" into "(\w+)"$/, (s, from: string, to: string) => {
   const w = stepWorld(s, from, to);
-  s.days = stepBreakdown(w, s.army, "From", "To").days;
+  s.breakdown = stepBreakdown(w, s.army, "From", "To");
+  s.days = s.breakdown.days;
 });
 When(/^an army of (\d+) foot steps from "(\w+)" (?:to|into) "(\w+)"$/, (s, men: string, from: string, to: string) => {
   s.army = newArmy("A", "France", "From", Number(men));
   const w = stepWorld(s, from, to);
-  s.days = stepBreakdown(w, s.army, "From", "To").days;
+  s.breakdown = stepBreakdown(w, s.army, "From", "To");
+  s.days = s.breakdown.days;
 });
 When(/^it tries to step into "(\w+)" with no road$/, (s, to: string) => {
   const w = stepWorld(s, "farmland", to);
@@ -1303,8 +1334,13 @@ Then(/^the preview shows day counts (\d+), (\d+) and (\d+) and a total of (\d+)$
   expect(shownDayCounts(s.preview)).toEqual([a, b, c].map(Number));
   expect(s.preview.total).toBe(Number(t));
 });
-Then(/^a month mark lies between "(\w+)" and "(\w+)"$/, (s, a: string, b: string) => {
-  expect(s.preview.monthMarks).toEqual([{ turn: 1, after: a, between: b }]);
+Then('turn marks lie between "Paris" and "Troyes", twice between "Troyes" and "Langres", and between "Langres" and "Dijon"', (s) => {
+  expect(s.preview.turnMarks).toEqual([
+    { turn: 1, after: "Paris", between: "Troyes" },
+    { turn: 2, after: "Troyes", between: "Langres" },
+    { turn: 3, after: "Troyes", between: "Langres" },
+    { turn: 4, after: "Langres", between: "Dijon" },
+  ]);
 });
 
 Given(/^a step of the route (enters a river province|crosses a snow pass|ends at a stopping castle|needs passage across a border|has an enemy army seen on it|changes days by season)$/, (s, c: string) => {
@@ -1361,7 +1397,7 @@ Then(/^it is confirmed (when the player taps March|on lift)$/, (s, when: string)
   expect(confirmedBy(s.setBy)).toBe(when === "on lift" ? "lift" : "March");
 });
 
-Given(/^during the month (.+)$/, (s, event: string) => {
+Given(/^during the turn (.+)$/, (s, event: string) => {
   const w = W(s);
   war(s, "France", "Burgundy");
   if (event === "an army stopped short of its destination at a castle") {
@@ -1452,7 +1488,12 @@ Given(/^in "(\w+)" (an enemy army stands|an enemy castle with a garrison stands|
       x.date.month = 12;
     });
   }
-  if (what === "its food runs out") A(s, "A").reserve = { days: 0, full: 30 };
+  if (what === "its food runs out") {
+    // Out of food and already most of the way there, so it reaches Langres before the weekly refill at home (D-MOVE-6).
+    const a = A(s, "A");
+    a.reserve = { days: 0, full: 30 };
+    walking(a, a.route[0]!, 7.5, 5, a.route.slice(1));
+  }
   s.subject = "A";
 });
 Then(/^the army "A" (stops|stops and winters there|marches on)$/, (s, r: string) => {
@@ -1662,7 +1703,8 @@ Then(/^the army "(\w+)" stops in "(\w+)"$/, (s, id: string, place: string) => {
 });
 
 Given(/^the reserve of the army "A" runs out on the step into "(\w+)"$/, (s, place: string) => {
-  put(s, "A", "France", "Troyes", 10000, { reserve: { days: 0, full: 30 } }).route = [place, "Dijon"];
+  // Most of the way there already, so it reaches the province before the weekly refill at home (D-MOVE-6).
+  walking(put(s, "A", "France", "Troyes", 10000, { reserve: { days: 0, full: 30 } }), place, 7.5, 5, ["Dijon"]);
 });
 Then("the army \"A\" keeps marching", (s) => {
   expect(s.log.stops.filter((x: { army: string }) => x.army === "A")).toEqual([]);
@@ -1675,3 +1717,353 @@ Then("the player gets one notice", (s) => {
 
 
 
+
+// ---------- decided questions (D-MOVE-*) ----------
+
+// X-2: the order of movers in a day.
+Given('the trader "T1", the fleet "F1" and the armies "B" and "A" are on the move', (s) => {
+  const w = W(s);
+  w.rules = { fleet: stubRules(() => 1, () => true), trader: stubRules(() => 1, () => true) };
+  const go = (m: ReturnType<typeof createMover>) => {
+    m.route = ["Sens"];
+    w.movers.push(m);
+  };
+  go(createMover("T1", "trader", "France", "Paris"));
+  go(createMover("F1", "fleet", "France", "Paris"));
+  walking(put(s, "B", "France", "Paris"), "Sens", 1);
+  walking(put(s, "A", "France", "Paris"), "Sens", 1);
+});
+Then('they step in the order "A", "B", "F1", "T1"', (s) => {
+  expect(s.log.entered.map((e: { mover: string }) => e.mover)).toEqual(["A", "B", "F1", "T1"]);
+});
+
+// D-MOVE-19: Dunois' route preview.
+Given('"Langres" has a stone castle with 400 garrison', (s) => {
+  expect(W(s).places["Langres"]!.castle).toEqual({ owner: "Burgundy", garrison: 400 });
+});
+Given('every other road to "Dijon" runs through Burgundian castles', (s) => {
+  W(s).places["Beaune"]!.castle = { owner: "Burgundy", garrison: 200 };
+});
+Given("Dunois carries a reserve of 30 days", (s) => {
+  A(s, "Dunois").reserve = { days: 30, full: 30 };
+});
+When("Leroy drags the army's banner to \"Dijon\"", (s) => {
+  s.pending = [];
+  s.plan = planRoute(W(s), A(s, "Dunois"), "Dijon");
+  s.preview = previewRoute(W(s), A(s, "Dunois"), s.plan);
+});
+Then('the leg to "Dijon" stays drawn in grey', (s) => {
+  expect(s.plan.greyed).toEqual(["Dijon"]);
+  expect(s.preview.steps.filter((x: { greyed: boolean }) => x.greyed).map((x: { to: string }) => x.to)).toEqual(["Dijon"]);
+});
+Then('the food line is green to "Troyes" and yellow at "Langres"', (s) => {
+  expect(s.preview.food.map((f: { place: string; colour: string }) => [f.place, f.colour])).toEqual([
+    ["Troyes", "green"],
+    ["Langres", "yellow"],
+  ]);
+});
+
+// D-MOVE-6: refilling at home at the weekly food step.
+Given('the army "A" has 10 of its 30 days of reserve left in "Paris"', (s) => {
+  put(s, "A", "France", "Paris", 10000, { reserve: { days: 10, full: 30 } });
+});
+Given('the army "A" marches from "Paris" through "Troyes", both French, toward "Langres"', (s) => {
+  (s.pending ??= []).push(["France", { kind: "march by", army: "A", via: ["Troyes"], to: "Langres" }]);
+});
+Then('on day 7 its reserve refills to 30 days in "Troyes" without stopping', (s) => {
+  expect(s.log.refills).toContainEqual({ army: "A", place: "Troyes", day: 7 });
+  expect(s.log.stops.filter((x: { army: string }) => x.army === "A")).toEqual([]);
+});
+Then('it arrives in "Langres" on day 14', (s) => {
+  expect(s.log.entered.filter((e: { mover: string }) => e.mover === "A").map((e: { place: string; day: number }) => [e.place, e.day])).toEqual([
+    ["Troyes", 6],
+    ["Langres", 14],
+  ]);
+});
+
+// D-MOVE-12: a raid stays a week in each province.
+Given('the horse-only army "A" of 10000 horse raids from "Troyes" through "Langres" to "Dijon"', (s) => {
+  put(s, "A", "France", "Troyes", 10000, { horse: 10000 });
+  (s.pending ??= []).push(["France", { kind: "raid", army: "A", to: "Dijon" }]);
+});
+Then('it enters "Langres" on day 4 and "Dijon" on day 14', (s) => {
+  expect(s.log.entered.filter((e: { mover: string }) => e.mover === "A").map((e: { place: string; day: number }) => [e.place, e.day])).toEqual([
+    ["Langres", 4],
+    ["Dijon", 14],
+  ]);
+});
+Then('it stays 7 days in "Langres" before riding on', (s) => {
+  // Replay: on days 5 to 11 it stands in Langres without walking; from day 12 it walks the 3.35-day step on.
+  const w = champagne();
+  w.relations.wars.push(["France", "Burgundy"]);
+  const a = newArmy("A", "France", "Troyes", 10000, 10000);
+  w.movers.push(a);
+  expect(applyOrder(w, "France", { kind: "raid", army: "A", to: "Dijon" }).ok).toBe(true);
+  playDays(w, 1, 4);
+  const carried = a.progress;
+  playDays(w, 5, 11);
+  expect([a.place, a.progress, a.waitDays]).toEqual(["Langres", carried, 0]);
+  playDays(w, 12, 12);
+  expect(a.progress).toBeCloseTo(carried + 1, 9);
+});
+
+// D-MOVE-5: March to where it stands is a Halt.
+When('the army "A" is ordered "March to" the province it stands in', (s) => {
+  playUntil(s, "A", "Troyes");
+  expect(applyOrder(W(s), "France", { kind: "march to", army: "A", to: "Troyes" }).ok).toBe(true);
+  playDays(W(s), s.day, s.day + 5);
+  expect(A(s, "A").place).toBe("Troyes");
+});
+
+// D-MOVE-10: fords, floods and great rivers.
+Given(/^the river province "Tortosa" \(not a great river\) has the ford "Ebro at Tortosa" in the (north|south)$/, (s, hemi: string) => {
+  W(s).places["Tortosa"] = { id: "Tortosa", ...land("Aragon"), river: "river", ford: true, hemisphere: hemi as "north" | "south" };
+});
+Given(/^a flood starts on the river province "(\w+)" in April$/, (s, place: string) => {
+  const w = W(s);
+  w.places[place]!.river = "river";
+  w.date.month = 4;
+  startFlood(w, place);
+});
+Given(/^a river of Natural Earth scale rank (\d+)$/, (s, rank: string) => {
+  s.rank = Number(rank);
+});
+Then(/^it is (a great river|a river)$/, (s, kind: string) => {
+  expect(riverKindOfRank(s.rank)).toBe(kind === "a great river" ? "great river" : "river");
+});
+
+// D-MOVE-11: dunes.
+Given('the desert province "Erg" has dunes as its main tile type next to the desert province "Oasis"', (s) => {
+  s.w = mkWorld({ Oasis: land("France", "desert"), Erg: land("France", "desert", { dunes: true }) }, ["Oasis-Erg"]);
+});
+Given('an army of 10000 foot with 4 bombards and no camels stands in "Oasis"', (s) => {
+  put(s, "A", "France", "Oasis", 10000, { bombards: 4 });
+});
+When('it plans a step into "Erg"', (s) => {
+  s.breakdown = stepBreakdown(W(s), A(s, "A"), "Oasis", "Erg");
+  s.may = armyMayEnter(W(s), A(s, "A"), "Erg");
+});
+Then("the step is not allowed for its guns", (s) => {
+  expect([s.breakdown.allowed, s.breakdown.reason]).toEqual([false, "guns"]);
+  expect(s.may).toEqual({ ok: false, reason: "guns" });
+});
+Then("the same army without guns takes 15 days for the step", (s) => {
+  const a = { ...A(s, "A"), bombards: 0 };
+  expect(stepBreakdown(W(s), a, "Oasis", "Erg").days).toBeCloseTo(15, 9);
+});
+Then('the same army with camels may take its guns into "Erg"', (s) => {
+  const a = { ...A(s, "A"), camels: true };
+  expect(armyMayEnter(W(s), a, "Erg").ok).toBe(true);
+  expect(stepBreakdown(W(s), a, "Oasis", "Erg").allowed).toBe(true);
+});
+Then('no army can forage in "Erg"', (s) => {
+  expect(canForage(W(s).places["Erg"]!)).toBe(false);
+  expect(canForage(W(s).places["Oasis"]!)).toBe(true);
+});
+
+// D-MOVE-7: no passage, no entry.
+Then('no order can march the army "A" into "Savoy"', (s) => {
+  const w = W(s);
+  expect(armyMayEnter(w, A(s, "A"), "Savoy").ok).toBe(false);
+  for (const o of [
+    { kind: "march to", army: "A", to: "Savoy" },
+    { kind: "march by", army: "A", via: ["Savoy"], to: "Savoy" },
+  ] as MoveOrder[]) {
+    applyOrder(w, "France", o);
+    expect(A(s, "A").route).not.toContain("Savoy");
+  }
+});
+
+// X-1: watching the month.
+Given('the player\'s army "A" of "France" will meet the enemy army "B" in "Langres" on day 1', (s) => {
+  war(s, "France", "Burgundy");
+  put(s, "A", "France", "Langres");
+  put(s, "B", "Burgundy", "Langres", 5000);
+  hooks(s).player = "France";
+  // Warfare's battle rules stand-in: 6 rounds, then the side without "A" or "C" is destroyed, so each battle is fought once.
+  hooks(s).battle = () => ({ rounds: 6 });
+  hooks(s).round = (w, b) => {
+    if (b.roundsFought < 6) return;
+    const losers = b.sides.find((ids) => !ids.some((id) => ["A", "C"].includes(id)))!;
+    w.movers = w.movers.filter((m) => !losers.includes(m.id));
+    return { ended: true };
+  };
+});
+Given('the AI armies "C" of "Burgundy" and "D" of "Savoy" will fight in "Dijon" on day 1', (s) => {
+  war(s, "Burgundy", "Savoy");
+  put(s, "C", "Burgundy", "Dijon", 5000);
+  put(s, "D", "Savoy", "Dijon", 5000);
+});
+Given('a castle of "Burgundy" will stop the French army "E" in "Beaune"', (s) => {
+  const w = W(s);
+  w.neighbours["Auxerre"]!.push("Beaune");
+  w.neighbours["Beaune"]!.push("Auxerre");
+  w.places["Beaune"]!.castle = { owner: "Burgundy", garrison: 300 };
+  walking(put(s, "E", "France", "Auxerre"), "Beaune", 2, 0, ["Dijon"]);
+});
+Then("the turn plays at about one second per 10 days with a skip button", (s) => {
+  s.playback = monthPlayback(W(s), "France", s.log);
+  expect([s.playback.secondsPer10Days, s.playback.skip]).toEqual([1, true]);
+});
+Then('the battle in "Dijon" flashes crossed swords and pauses half a second without slowing the turn', (s) => {
+  expect(s.playback.flashes).toEqual([{ day: 1, place: "Dijon", pauseSeconds: 0.5 }]);
+  for (const st of s.playback.battleSteps) expect(st.places).not.toContain("Dijon");
+});
+Then('day 1 slows to six 4-hour steps while the battle in "Langres" runs', (s) => {
+  expect(s.playback.battleSteps).toEqual([1, 2, 3, 4, 5, 6].map((step) => ({ day: 1, step, places: ["Langres"] })));
+});
+Then("at each step the player can change standing orders, order a retreat or switch battle, and there is no Skip to result", (s) => {
+  expect(s.playback.choices).toEqual(["change standing orders", "retreat", "switch battle"]);
+});
+Then('the castle of "Beaune" rings red', (s) => {
+  expect(s.playback.redRings.map((r: { place: string }) => r.place)).toEqual(["Beaune"]);
+});
+
+// D-MOVE-17: a rumour is never intercepted.
+Given(/^an enemy army of (\d+) is known only as a rumour in a neighbouring province with (\d+) days left on its step$/, (s, men: string, left: string) => {
+  walking(put(s, "E", "Burgundy", "Langres", Number(men)), "Dijon", 7, 7 - Number(left) - 1);
+  W(s).rumoured = { France: ["E"] };
+  s.subject = "A";
+});
+
+// A front with W14 (MOVE-075).
+Then("the armies spread along it, intercept within their stretch and retreat along the front", (s) => {
+  const w = W(s);
+  war(s, "France", "Burgundy");
+  w.places["Paris"]!.castle = { owner: "France", garrison: 300 };
+  put(s, "B2", "France", "Paris");
+  const f = drawFront(w, "France", ["Troyes", "Sens", "Auxerre"], ["A", "B2"]);
+  if (!f.ok) throw new Error(f.reason);
+  expect(f.front.stretches).toEqual({ A: ["Troyes"], B2: ["Sens", "Auxerre"] });
+  expect(A(s, "B2").route.at(-1)).toBe("Sens");
+  // Interception only within its stretch.
+  const b = A(s, "B2");
+  b.place = "Sens";
+  b.route = [];
+  b.stance = "attack";
+  put(s, "E1", "Burgundy", "Troyes", 3000);
+  expect(interceptTarget(w, b)).toBeNull();
+  put(s, "E2", "Burgundy", "Auxerre", 3000);
+  expect(interceptTarget(w, b)?.id).toBe("E2");
+  // Retreat along the front rather than to the castle at Paris.
+  w.movers = w.movers.filter((m) => m.id !== "E1" && m.id !== "E2");
+  const r = breakArmy(w, b);
+  expect(r.kind === "retreat" && ["Troyes", "Auxerre"].includes(r.refuge)).toBe(true);
+});
+
+// A pass counts as a road (MOVE-029).
+Given('the mountain province "Brenner" is a pass in config and has no road built', (s) => {
+  expect(MOVE.passes).toContain("Brenner");
+  s.custom = { From: { road: "track" }, To: { terrain: "mountains", pass: true, road: "track" } };
+});
+Then("the road factor is 0.75", (s) => {
+  const brenner = s.stepWorld.places["To"];
+  expect(roadOf(brenner)).toBe("road");
+  expect(MOVE.roadFactor[roadOf(brenner)]).toBe(0.75);
+  expect(s.breakdown.allowed).toBe(true);
+});
+
+// D-MOVE-7: a realm that grants no passage is closed.
+Given('the realm "Savoy" is at peace with "France" and grants no passage', (s) => {
+  const w = W(s);
+  w.places["Savoy"] = { id: "Savoy", ...land("Savoy", "hills") };
+  w.places["Bresse"] = { id: "Bresse", ...land(null) };
+  for (const [a, b] of [["Troyes", "Savoy"], ["Savoy", "Bresse"]] as const) {
+    w.neighbours[a]!.push(b);
+    (w.neighbours[b] ??= []).push(a);
+  }
+  expect(w.relations.passage.some(([g]) => g === "Savoy")).toBe(false);
+});
+When('the army "A" of "France" plans a route whose only way runs through "Savoy"', (s) => {
+  s.plan = planRoute(W(s), put(s, "A", "France", "Troyes"), "Bresse");
+});
+Then('the planner says "needs passage from Savoy"', (s) => {
+  expect([s.plan.end, s.plan.message]).toEqual(["needs passage", "needs passage from Savoy"]);
+});
+
+When("the turn ends", (s) => {
+  month(s);
+});
+
+// MOVE-085, MOVE-086, D-WAR-14: the AI sends the same order data; its standing orders come from its personality.
+/** Burgundy's risk tolerance in the 1444 catalogue reading used here: medium. */
+const AI_RISK = { Burgundy: "medium" } as const;
+Given("the AI country {string} moves an army", (s, realm: "Burgundy") => {
+  const a = put(s, "Bastard", realm, "Dijon", 8000);
+  setAiStandingOrders(a, AI_RISK[realm]);
+  s.aiOrder = { kind: "march to", army: "Bastard", to: "Beaune" } satisfies MoveOrder;
+  s.aiResult = applyOrder(W(s), realm, s.aiOrder);
+});
+Then("it sends the same order data a player would", (s) => {
+  expect(s.aiResult.ok).toBe(true);
+  const p = put(s, "Dunois", "France", "Troyes", 8000);
+  expect(applyOrder(W(s), "France", { ...s.aiOrder, army: p.id, to: "Paris" }).ok).toBe(true);
+  expect(Object.keys(s.aiOrder).sort()).toEqual(["army", "kind", "to"]);
+});
+Then("its standing orders are set by its personality", (s) => {
+  expect(A(s, "Bastard").stance).toBe("attack");
+  expect(A(s, "Bastard").retreatIfOutnumbered).toBe(1.5);
+});
+
+// X-17, MOVE-117: frozen rivers.
+Given(/^the river province "Narva" \(not a great river\) lies at latitude (\d+)$/, (s, lat: string) => {
+  W(s).places["Narva"] = { id: "Narva", ...land("Sweden"), river: "river", latitude: Number(lat) };
+});
+
+// X-3, MOVE-120: the month's real length.
+Given(/^the date is (February|April|March) (14[5-9][1-9]|1[5-9]\d\d)$/, (s, m: string, y: string) => {
+  W(s).date = { year: Number(y), month: months[m]! };
+});
+Then("the day loop runs {int} days", (s, n: number) => expect(s.log.days).toHaveLength(n));
+
+// X-1, MOVE-118, MOVE-119: battles fought over time in 4-hour rounds.
+const COMMANDER = (name: string, cunning: number): NonNullable<Army["commander"]> => ({ name, cunning });
+Given(/^the player's army "A" of "France" and the enemy army "B" fight in "Langres" in a battle of (\d+) rounds from day 1$/, (s, n: string) => {
+  war(s, "France", "Burgundy");
+  put(s, "A", "France", "Langres", 10000, { commander: COMMANDER("Dunois", 3) });
+  put(s, "B", "Burgundy", "Langres", 8000, { commander: COMMANDER("the Bastard", 1) });
+  hooks(s).player = "France";
+  // Warfare's stand-in: the battle lasts the rounds given and Burgundy's side breaks.
+  hooks(s).battle = () => ({ rounds: Number(n), loser: 1 });
+});
+Given(/^the AI armies "C" of "Burgundy" and "D" of "Savoy" fight in "Dijon" in a battle of (\d+) rounds from day 1$/, (s, n: string) => {
+  war(s, "Burgundy", "Savoy");
+  put(s, "C", "Burgundy", "Dijon", 5000);
+  put(s, "D", "Savoy", "Dijon", 5000);
+  hooks(s).player = "France";
+  hooks(s).battle = () => ({ rounds: Number(n), loser: 1 });
+});
+Given(/^the (French|Burgundian) army "(\w+)" has 0\.5 days left on its step into "(\w+)" after day 1$/, (s, who: string, id: string, place: string) => {
+  const from = place === "Langres" ? "Troyes" : "Beaune";
+  walking(put(s, id, who === "French" ? "France" : "Burgundy", from, 3000), place, 7, 5.5);
+});
+Given(/^the player orders "(\w+)" to retreat on day (\d+) at step (\d+)$/, (s, id: string, d: string, st: string) => {
+  hooks(s).playerStep = (w, day, step) => {
+    if (day === Number(d) && step === Number(st)) orderRetreat(w, id);
+  };
+});
+When(/^days 1 to (\d+) are played$/, (s, last: string) => {
+  runPending(s);
+  s.log = playDays(W(s), 1, Number(last), hooks(s));
+});
+Then("days 1 and 2 are played in six 4-hour steps and day 3 is not", (s) => {
+  const steps = s.log.steps as { day: number; step: number }[];
+  expect(steps).toEqual([1, 2].flatMap((day) => [1, 2, 3, 4, 5, 6].map((step) => ({ day, step }))));
+});
+Then("no day is played in 4-hour steps", (s) => expect(s.log.steps).toEqual([]));
+Then(/^the army "(\w+)" joins the battle in "(\w+)" on day (\d+) at step (\d+)$/, (s, id: string, place: string, d: string, st: string) => {
+  expect(s.log.joinedBattles).toContainEqual({ army: id, place, day: Number(d), step: Number(st) });
+});
+Then(/^the army "(\w+)" joins the battle in "(\w+)" at the start of day (\d+)$/, (s, id: string, place: string, d: string) => {
+  expect(s.log.joinedBattles).toContainEqual({ army: id, place, day: Number(d), step: 0 });
+});
+Then(/^the battle in "(\w+)" ends on day (\d+) after (\d+) rounds$/, (s, place: string, d: string, n: string) => {
+  const e = (s.log.battleEnds as { place: string; day: number; rounds: number }[]).find((x) => x.place === place);
+  expect([e?.day, e?.rounds]).toEqual([Number(d), Number(n)]);
+});
+Then(/^"(\w+)" withdraws from "(\w+)" on day (\d+) at step (\d+)$/, (s, id: string, place: string, d: string, st: string) => {
+  const r = (s.log.retreats as { army: string; from: string; to: string | null; day: number; step: number }[]).find((x) => x.army === id);
+  expect(r).toMatchObject({ from: place, day: Number(d), step: Number(st) });
+  expect(r?.to).not.toBeNull();
+  expect(A(s, id).place).not.toBe(place);
+});

@@ -29,7 +29,7 @@ Feature: Unlock the catalogue
       | first_castle | Stone upon Stone | castle_gained | {castles_gained: 1} | copper | 5 | campaign |
       | first_alliance | A Letter Sealed | relation_changed | {relation_formed: alliance} | copper | 5 | campaign |
       | first_peace | Ink on the Treaty | war_end | {war_ended_by: peace_treaty, player_signed: true} | copper | 5 | campaign |
-      | first_year | A Year in the Ledger | turn_end | {turns_played: 12} | copper | 5 | campaign |
+      | first_year | A Year in the Ledger | turn_end | {months_played: 12} | copper | 5 | campaign |
 
   @ACH-015 @ACH-017 @placeholder
   Scenario Outline: Realm achievement "<name>" unlocks on its moment

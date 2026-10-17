@@ -55,8 +55,31 @@ export function newRegimentsReady(w: MoveWorld, a: Army): string | null {
   return to;
 }
 
-/** A front (8) can be drawn only by a realm that knows W14 Army divisions. */
-export function drawFront(w: MoveWorld, realm: string, provinces: string[], ids: string[]): { ok: true; front: { provinces: string[]; armies: string[] } } | { ok: false; reason: string } {
+/**
+ * A front (8) can be drawn only by a realm that knows W14 Army divisions. Its armies spread along it:
+ * the provinces are cut into even stretches in the order drawn, one per army in the order given, and each
+ * army marches to the middle of its stretch. It intercepts only within its stretch, and a broken army
+ * retreats to a refuge on the front when one is in range (MOVE-075).
+ */
+export function drawFront(
+  w: MoveWorld,
+  realm: string,
+  provinces: string[],
+  ids: string[],
+): { ok: true; front: { provinces: string[]; armies: string[]; stretches: Record<string, string[]> } } | { ok: false; reason: string } {
   if (!(w.relations.armyDivisions ?? []).includes(realm)) return { ok: false, reason: "needs W14 Army divisions" };
-  return { ok: true, front: { provinces: [...provinces], armies: [...ids] } };
+  const stretches: Record<string, string[]> = {};
+  ids.forEach((id, i) => {
+    const from = Math.floor((i * provinces.length) / ids.length);
+    const to = Math.max(from + 1, Math.floor(((i + 1) * provinces.length) / ids.length));
+    const stretch = provinces.slice(from, to);
+    stretches[id] = stretch;
+    const a = armyById(w, id);
+    a.front = { provinces: [...provinces], stretch };
+    const post = stretch[Math.floor((stretch.length - 1) / 2)]!;
+    const plan = planRoute(w, a, post);
+    a.route = [...plan.path];
+    a.greyed = [...plan.greyed];
+  });
+  return { ok: true, front: { provinces: [...provinces], armies: [...ids], stretches } };
 }

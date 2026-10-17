@@ -54,8 +54,8 @@ Feature: Platform notes
     Examples:
       | state                                  | result                                   |
       | a panel is open over the map           | the top panel closes                     |
-      | nothing is open over the map           | the pause menu opens                     |
-      | the pause menu is open over the map    | the game does not quit without asking    |
+      | nothing is open over the map           | the game menu opens                     |
+      | the game menu is open over the map    | the game does not quit without asking    |
 
   @SET-120
   Scenario: The iPhone silent switch

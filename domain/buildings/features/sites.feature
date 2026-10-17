@@ -64,3 +64,10 @@ Feature: Building sites
     Given the province "Troyes" has a town site running
     When "Troyes" is sacked
     Then the town site is lost
+
+  @BLD-156 @placeholder
+  Scenario: A master of works
+    Given the province "Troyes" has a master of works official
+    When the player starts a market costing 40 gold and 6 months
+    Then it costs 30 gold and takes 3 months
+    And "Troyes" may run 2 land sites and 2 town sites at once

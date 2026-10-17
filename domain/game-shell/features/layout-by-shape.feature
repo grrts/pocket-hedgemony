@@ -109,3 +109,16 @@ Feature: Layout by window shape
     Given a campaign is loaded
     When the screen "map" is shown
     Then the End turn button and the game menu button are in opposite corners
+
+  @SHELL-133
+  Scenario Outline: Left hand mirrors the corners
+    Given the setting "Main hand" is "<hand>"
+    When the screen "map" is shown
+    Then the End turn button is in the <end turn> corner
+    And the game menu button is in the <menu> corner
+    And the two are in opposite corners
+
+    Examples:
+      | hand  | end turn    | menu        |
+      | Right | lower right | upper left  |
+      | Left  | lower left  | upper right |

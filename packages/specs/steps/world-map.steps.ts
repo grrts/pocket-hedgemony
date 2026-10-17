@@ -45,7 +45,32 @@ import {
   type Ground,
   type MapGraph,
   type RoadMap,
+  ANCHORS,
+  anchorProvince,
+  fordProvince,
+  hasGreatRiver,
+  onWater,
+  passProvince,
+  proposalFact,
+  provinceName,
+  provinceRecord,
+  provinceSize,
+  REJECTED_PROPOSALS,
+  renamed,
+  splitProvince,
+  straitCrossing,
+  STRAIT_CROSSINGS,
+  type ProvinceRecord,
+  seaZoneFrozen,
+  seaZoneOpenToFleets,
+  portFrozen,
+  riverFrozen,
+  riverCrossingPenalty,
 } from "@ph/engine/domain/world-map";
+import { tileCountForSize, shoreTileCount } from "@ph/engine/domain/province";
+import { buildSave, chunkArrays, mapHash, memoryStorage, newCampaign as newSaveCampaign, worldChunks } from "@ph/engine/domain/saves";
+import { Rng } from "@ph/engine";
+import movement from "../../rules/data/domain/troop-movement.json" with { type: "json" };
 import { steps } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("world-map");
@@ -505,3 +530,288 @@ Then("{string} is credited under {string}", (s, source: string, licence: string)
   expect(s.listed).toContainEqual([source, licence]);
 });
 
+
+// ---------------------------------------------------------------------------
+// Decided: province facts, geographic lists, versions (D-MAP-1 … D-MAP-12)
+
+const byName = (name: string) => {
+  const p = landProvinces(graph).find((x) => x.name === name);
+  if (!p) throw new Error(`no province ${name}`);
+  return p;
+};
+
+Given("the province {string}", (s, name: string) => {
+  s.provinceId = byName(name).id;
+});
+
+When("its record is read", (s) => {
+  s.record = provinceRecord(graph, s.provinceId);
+});
+
+Then("it has an id, a name, a centre, a size, a ground, a coastal flag, a river flag and a list of neighbours", (s) => {
+  const r: ProvinceRecord = s.record;
+  expect(r.id).toBe("p1073");
+  expect(r.name).toBe("Aube");
+  expect(r.centre.x).toBeGreaterThan(0);
+  expect(r.size).toBeGreaterThan(0);
+  expect(r.ground).toBe("farmland");
+  expect(typeof r.coastal).toBe("boolean");
+  expect(r.river).toBe(true);
+  expect(r.neighbours.length).toBeGreaterThan(0);
+});
+
+Then("its tile type is {string} and its ground is {string}", (s, type: string, ground: string) => {
+  expect(s.record.tileType).toBe(type);
+  expect(s.record.ground).toBe(ground);
+  expect(groundOfTile(type)).toBe(ground);
+});
+
+Then("it is marked coastal", (s) => expect(s.record.coastal).toBe(true));
+Then("it counts as on water for shore tiles", (s) => {
+  expect(onWater(s.record)).toBe(true);
+  expect(shoreTileCount(onWater(s.record))).toBeGreaterThanOrEqual(1);
+});
+Then("it has no sea-zone neighbour", (s) => {
+  expect(s.record.neighbours.some((n: string) => isWater(graph.byId.get(n)!))).toBe(false);
+});
+
+Then("it is a river province", (s) => expect(s.record.river).toBe(true));
+Then(/^it (does|does not) show that a navigable river runs through$/, (s, does: string) => {
+  expect(s.record.navigableRiver).toBe(does === "does");
+});
+Then("its river counts as a great river for movement", (s) => {
+  expect(hasGreatRiver(s.provinceId)).toBe(true);
+  expect(s.record.navigableRiver).toBe(true);
+});
+
+Given(/^a province cut from the admin region "(.+)" that was (not split|split)$/, (s, admin: string, split: string) => {
+  s.admin = admin;
+  s.split = split === "split";
+  s.build = () => {
+    s.cutNames = landProvinces(graph).map((p) => p.name).filter((n) => n === admin || n.endsWith(` ${admin}`) || new RegExp(` ${admin} \\d+$`).test(n));
+  };
+});
+
+Then("the province is named {string}", (s, name: string) => {
+  expect(s.cutNames).toContain(name);
+  if (!s.split) expect(s.cutNames).toEqual([name]);
+  else {
+    expect(s.cutNames.length).toBeGreaterThan(1);
+    expect(name).toBe(provinceName(s.admin, name.slice(0, name.length - s.admin.length - 1)));
+  }
+});
+
+Given(/^a province that is the (smallest|largest) on the map$/, (s, which: string) => {
+  const sizes = landProvinces(graph).map((p) => provinceSize(p.id));
+  s.size = which;
+  s.pixels = which === "smallest" ? Math.min(...sizes) : Math.max(...sizes);
+});
+
+When("its tile row is made", (s) => {
+  if (s.size) s.tiles = tileCountForSize(s.size);
+  if (s.where) s.shore = shoreTileCount(onWater(s.where));
+});
+
+Then(/^it has (\d+) tiles$/, (s, n: string) => {
+  expect(s.tiles).toBe(Number(n));
+  expect(s.pixels).toBeGreaterThan(0);
+});
+
+const WHERE: Record<string, string> = { "on a coast": "Gironde", "on a navigable river": "Aube", "inland with no navigable river": "Loiret" };
+
+Given(/^a province that is (on a coast|on a navigable river|inland with no navigable river)$/, (s, where: string) => {
+  s.where = provinceRecord(graph, byName(WHERE[where]!).id);
+});
+
+Then(/^it has (1 to 3|0) shore tiles$/, (s, shore: string) => {
+  if (shore === "0") expect(s.shore).toBe(0);
+  else {
+    expect(s.shore).toBeGreaterThanOrEqual(1);
+    expect(s.shore).toBeLessThanOrEqual(3);
+  }
+});
+
+Given("the event-tree anchor {string} in the area {string}", (s, anchor: string, area: string) => {
+  s.anchor = anchor;
+  s.area = area;
+});
+
+When("it is resolved on the map", (s) => {
+  const a = anchorProvince(s.anchor);
+  expect(a?.area).toBe(s.area);
+  s.resolved = a ? [a.province] : [];
+});
+
+Then("exactly one province is returned", (s) => {
+  expect(s.resolved).toHaveLength(1);
+  expect(isWater(graph.byId.get(s.resolved[0])!)).toBe(false);
+});
+
+Then("it is the province {string}", (s, name: string) => expect(graph.byId.get(s.resolved[0])!.name).toBe(name));
+
+Given("the event tree's {int} anchor provinces", (s, n: number) => {
+  expect(ANCHORS).toHaveLength(n);
+});
+
+When("they are resolved on the map", (s) => {
+  s.all = ANCHORS.map((a) => graph.byId.get(a.province));
+});
+
+Then("each resolves to one land province", (s) => {
+  for (const p of s.all) expect(p && !isWater(p)).toBe(true);
+});
+
+Given("the ford {string} in the movement config", (s, name: string) => {
+  expect(movement.fords.map((x: string) => `the ${x}`)).toContain(name);
+  s.listed = fordProvince(name);
+});
+
+Given("the pass {string} in the movement config", (s, name: string) => {
+  expect(movement.passes.some((x: string) => name.endsWith(x))).toBe(true);
+  s.listed = passProvince(name.replace(/^the Pyrenees at /, ""));
+});
+
+Then(/^the province of "(.+)" is listed as a (ford|pass)$/, (s, _name: string, kind: string) => {
+  const p = graph.byId.get(s.listed)!;
+  expect(p).toBeDefined();
+  expect(isWater(p)).toBe(false);
+  if (kind === "pass") expect(["mountains", "hills"]).toContain(p.terrain);
+});
+
+Given("the strait crossing {string} in the movement config", (s, name: string) => {
+  expect(movement.straitCrossings.some((x: string) => straitCrossing(x)?.name === straitCrossing(name)?.name)).toBe(true);
+  s.crossing = straitCrossing(name);
+});
+
+Then("the two land provinces on either side of {string} are listed as a strait crossing", (s, _name: string) => {
+  const [a, b] = s.crossing.provinces as [string, string];
+  expect(a).not.toBe(b);
+  for (const id of [a, b]) expect(isWater(graph.byId.get(id)!)).toBe(false);
+  expect(STRAIT_CROSSINGS).toContain(s.crossing);
+});
+
+Then("the strait crossing joins {string} and {string}", (s, a: string, b: string) => {
+  expect(s.crossing.provinces).toEqual([byName(a).id, byName(b).id]);
+});
+
+Given("the sea zone {string}", (s, name: string) => {
+  s.zone = seaZones(graph).find((z) => z.name === name);
+});
+
+Then("it is a water place of kind {string}", (s, kind: string) => {
+  expect(s.zone.terrain).toBe(kind);
+  expect(isWater(s.zone)).toBe(true);
+});
+
+When("the places are listed in order", (s) => {
+  s.listedPlaces = graph.places;
+});
+
+Then("all land provinces come before all sea zones", (s) => {
+  const firstSea = s.listedPlaces.findIndex(isWater);
+  expect(s.listedPlaces.slice(firstSea).every(isWater)).toBe(true);
+});
+
+Then("every sea zone has terrain {string} or {string}", (s, a: string, b: string) => {
+  for (const z of seaZones(graph)) expect([a, b]).toContain(z.terrain);
+});
+
+Then("every sea zone is named from Natural Earth's marine areas", (s) => {
+  for (const z of seaZones(graph)) {
+    expect(z.name).not.toMatch(/^sea\d+$/);
+    expect(z.name).toMatch(/^[\p{L}'.() -]+?( \d+°[NS] \d+°[EW])?( \d+)?$/u);
+  }
+});
+
+Given("a province of the tile type {string}", (s, type: string) => {
+  s.provinceId = landProvinces(graph).find((p) => provinceRecord(graph, p.id).tileType === type)!.id;
+});
+
+When("movement reads it", (s) => {
+  s.fact = proposalFact(provinceRecord(graph, s.provinceId).tileType);
+});
+
+Then("{string} holds", (s, fact: string) => expect(s.fact).toBe(fact));
+
+Given("the terrain proposal {string}", (s, proposal: string) => {
+  s.proposal = proposal;
+});
+
+When("the map's facts are read", () => {});
+
+Then("the proposal changes nothing in the game", (s) => {
+  expect(REJECTED_PROPOSALS).toContain(s.proposal);
+});
+
+// Versions
+
+Given("a campaign in {string}", (s, _when: string) => {
+  s.world = createWorld(rules, 1);
+});
+
+Given("a campaign on the built map", (s) => {
+  s.world = createWorld(rules, 1);
+});
+
+When("it is saved", (s) => {
+  const rng = new Rng(1);
+  const ctx = { storage: memoryStorage(), rules, rng, device: "phone", platform: "android" as const, gameVersion: "1", now: 0 };
+  s.chunks = worldChunks(s.world, { playerNation: "france", options: { difficulty: "normal", events: "historical", endDate: "1939-08-31" } });
+  s.save = buildSave(ctx, newSaveCampaign(rng, { playerNation: "france", nationName: "France" }), s.world, "manual");
+});
+
+Then("the save holds no adjacency, terrain, water, rivers or province shapes", (s) => {
+  const names = s.chunks.flatMap((c: Parameters<typeof chunkArrays>[0]) => chunkArrays(c).map((a) => a.name));
+  for (const n of names) expect(n).not.toMatch(/adj|terrain|water|river|shape|neighbo/i);
+});
+
+Then("the save header records the map's hash", (s) => {
+  expect(s.save.header.mapHash).toBe(mapHash(rules));
+});
+
+Given("the province {string} holds the ports of Lübeck, Hamburg, Kiel and Flensburg", (s, name: string) => {
+  s.old = byName(name).id;
+});
+
+When("the map generator splits it into two provinces", (s) => {
+  const size = provinceSize(s.old);
+  s.table = [splitProvince(s.old, [{ id: "p4411", size: Math.round(size / 2) }, { id: "p4412", size: size - Math.round(size / 2) }])];
+});
+
+Then("a rename table maps the old id to the two new ids with their shares", (s) => {
+  const parts = renamed(s.table, s.old);
+  expect(parts.map((x) => x.id)).toEqual(["p4411", "p4412"]);
+  expect(parts.reduce((a, x) => a + x.share, 0)).toBeCloseTo(1);
+  expect(renamed(s.table, "p1073")).toEqual([{ id: "p1073", share: 1 }]);
+});
+
+// ---------------------------------------------------------------------------
+// Frozen seas and rivers (X-17)
+
+const MONTH_INDEX = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const monthOf = (name: string) => ({ month: MONTH_INDEX.indexOf(name) + 1 });
+
+When(/^it is (January|February|March|April|May|June|July|August|September|October|November|December)$/, (s, month: string) => {
+  s.when = monthOf(month);
+});
+Then(/^the sea zone is (open|closed) to fleets$/, (s, state: string) => {
+  expect(s.zone).toBeDefined();
+  expect(seaZoneOpenToFleets(s.zone.name, s.when)).toBe(state === "open");
+  expect(seaZoneFrozen(s.zone.name, s.when)).toBe(state === "closed");
+});
+Given("a port whose only sea zone is {string}", (s, zone: string) => {
+  s.portZones = [zone];
+});
+Then("the port can neither launch nor take in ships", (s) => {
+  expect(portFrozen(s.portZones, s.when)).toBe(true);
+});
+Then("in May it can", (s) => {
+  expect(portFrozen(s.portZones, monthOf("May"))).toBe(false);
+});
+Given("a river at latitude {int} with a crossing penalty of {int} day", (s, lat: number, penalty: number) => {
+  s.river = { lat, penalty };
+});
+Then(/^the river is (frozen|flowing) and its crossing penalty is (\d+) days$/, (s, state: string, penalty: string) => {
+  expect(riverFrozen(s.river.lat, s.when)).toBe(state === "frozen");
+  expect(riverCrossingPenalty(s.river.lat, s.when, s.river.penalty)).toBe(Number(penalty));
+});

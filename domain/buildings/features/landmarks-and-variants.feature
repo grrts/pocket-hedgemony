@@ -4,8 +4,7 @@ Feature: Landmarks and regional variants
   I want real, named buildings with one effect of their own and buildings that look like their region
   So that the map feels like history
 
-  @BLD-124 @BLD-127 @open-question
-  # OQ-BLD-5: landmark step numbers disagree with "a step above its type"
+  @BLD-124 @BLD-127
   Scenario Outline: Landmark effects
     Given the landmark "<landmark>" stands in "<province>"
     When the building rules are applied
@@ -14,18 +13,18 @@ Feature: Landmarks and regional variants
 
     Examples:
       | landmark               | province       | type                       | effect                                                       |
-      | Hagia Sophia           | Constantinople | house of worship, step 4   | its faith's houses of worship in reach of the capital turn the faith mix twice as fast |
-      | Forbidden City         | Beijing        | palace, step 4             | +24 officials; lords at court never waver                    |
+      | Hagia Sophia           | Constantinople | house of worship, step 3   | its faith's houses of worship in reach of the capital turn the faith mix twice as fast |
+      | Forbidden City         | Beijing        | palace, step 3             | +24 officials; lords at court never waver                    |
       | Alhambra               | Granada        | palace, step 3             | Granada's castle counts one step higher                      |
-      | Great Mosque of Djenné | Djenné         | house of worship, step 4   | no grievance from earth upkeep; traders passing +20 % in the replastering season |
+      | Great Mosque of Djenné | Djenné         | house of worship, step 3   | no grievance from earth upkeep; traders passing +20 % in the replastering season |
       | Sankore Mosque         | Timbuktu       | school, step 3             | scholars from any Muslim realm may settle here               |
-      | Masjid al-Haram        | Mecca          | pilgrimage shrine, step 4  | the largest pilgrims passing in the world                    |
-      | Topkapı Palace         | Constantinople | palace, step 4             | +20 officials; the capital's seat runs two provinces         |
-      | Ulugh Beg Observatory  | Samarkand      | observatory, step 3        | Boats and Counting inventions 20 % cheaper for its owner     |
+      | Masjid al-Haram        | Mecca          | pilgrimage shrine, step 1  | the largest pilgrims passing in the world                    |
+      | Topkapı Palace         | Constantinople | palace, step 3             | +20 officials; the capital's seat runs two provinces         |
+      | Ulugh Beg Observatory  | Samarkand      | observatory, step 1        | Boats and Counting inventions 20 % cheaper for its owner     |
       | Kremlin                | Moscow         | castle, step 3             | the palace and the castle share one tile                     |
-      | Templo Mayor           | Tenochtitlan   | house of worship, step 4   | Triple Alliance lords gain loyalty when the realm wins a war |
-      | Coricancha             | Cusco          | house of worship, step 4   | every province linked to Cusco by road counts one day closer |
-      | Venetian Arsenal       | Venice         | shipyard, step 4           | 3 slipways                                                   |
+      | Templo Mayor           | Tenochtitlan   | house of worship, step 3   | Triple Alliance lords gain loyalty when the realm wins a war |
+      | Coricancha             | Cusco          | house of worship, step 3   | every province linked to Cusco by road counts one day closer |
+      | Venetian Arsenal       | Venice         | shipyard, step 3           | 3 slipways                                                   |
       | Taj Mahal              | Agra           | landmark tomb              | traders passing in Agra +30 %                                |
 
   @BLD-125
@@ -86,12 +85,11 @@ Feature: Landmarks and regional variants
       | palace           | steppe            | ordu         |
       | granary          | Andes             | qollqa       |
 
-  @BLD-130 @open-question
-  # OQ-BLD-16: national strengths has no field for building variants
-  Scenario Outline: Unique variants offered to national strengths
+  @BLD-130
+  Scenario Outline: Unique variants are stored in the buildings data
     Given the buildings config of the design
     When the building rules are applied
-    Then the variant "<variant>" for "<who>" is offered to national strengths, changing "<change>"
+    Then the variant "<variant>" for "<who>" is stored in the buildings data, changing "<change>"
 
     Examples:
       | variant             | who                       | change                                                     |

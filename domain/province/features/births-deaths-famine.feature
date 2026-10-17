@@ -24,29 +24,27 @@ Feature: Births, deaths and famine
       | scholars     | 1.0 %  | 3.0 %  |
       | homeless     | 4.0 %  | 5.0 %  |
 
-  @PROV-100 @placeholder @open-question
-  Scenario: Troyes grows by about 600 a year
-    # OQ-PROV-8: the example matches the base rates without the food and peace modifiers
-    Given the province "Troyes" has 72,000 people, well fed and at peace
+  @PROV-100 @PROV-297 @placeholder
+  Scenario: Troyes grows by 720 a year with no modifiers
+    Given the province "Troyes" has 72,000 farmers and no birth or death modifiers
     When a year of monthly births and deaths passes
-    Then about 2,800 are born and 2,200 die
-    And the province "Troyes" grows by about 600 people
+    Then 2,880 are born and 2,160 die
+    And the province "Troyes" grows by 720 people
 
-  @PROV-101 @placeholder @open-question
-  Scenario Outline: Birth modifiers
-    # OQ-PROV-8: unit of the modifiers
+  @PROV-101 @PROV-297 @placeholder
+  Scenario Outline: Birth modifiers are percentage points
     Given the province "Troyes" <condition>
     When the game works out the province's stats
-    Then the birth rate of its classes changes by <change>
+    Then the yearly birth rate of its farmers is <rate>
 
     Examples:
-      | condition                                   | change |
-      | has more than 6 months of food in store     | +0.5   |
-      | has had 10 years of peace                   | +0.5   |
-      | has less than 3 months of food in store     | −1     |
-      | has the "Hungry" grievance                  | −2     |
-      | has war in the province                     | −1     |
-      | has plague                                  | −1     |
+      | condition                                   | rate  |
+      | has more than 6 months of food in store     | 4.5 % |
+      | has had 10 years of peace                   | 4.5 % |
+      | has less than 3 months of food in store     | 3.0 % |
+      | is short of food with the "Hungry" grievance | 2.0 % |
+      | has war in the province                     | 3.0 % |
+      | has plague                                  | 3.0 % |
 
   @PROV-102 @placeholder
   Scenario Outline: Death modifiers

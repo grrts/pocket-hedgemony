@@ -249,3 +249,23 @@ Feature: Building catalogue effects
     When the building rules are applied
     Then floods can't turn its fields to marsh
     And with "F8" its marsh tiles can be drained
+
+  @BLD-158
+  Scenario: The yearly fair needs T6
+    Given the province "Troyes" is a market town with a weekly market and a market charter
+    And the country "France" doesn't know "T6 Merchant fairs and exchanges"
+    When the player tries to upgrade the market to a yearly fair
+    Then the upgrade is refused
+    When the country "France" learns T6
+    Then a yearly fair may be built in "Troyes"
+
+  @BLD-159
+  Scenario Outline: Trade buildings take trade's roles
+    Given the buildings config of the design
+    When the building rules are applied
+    Then the "<building>" gives "<role>"
+
+    Examples:
+      | building       | role                                             |
+      | caravanserai   | land traders +25 % weight and no bandits         |
+      | counting house | foreign traders deposit with bills of exchange   |

@@ -33,6 +33,8 @@ export interface ReformRule {
   needs: string[];
   gold: number;
   lordsSlip: number;
+  /** A condition row: the change happens by itself when the need holds and cannot be ordered (D-GOV-3). */
+  automatic: boolean;
 }
 
 interface RawForm {
@@ -96,10 +98,11 @@ export function successionName(id: FormId): string {
 // The two caps (design §2, §2.1)
 // ---------------------------------------------------------------------------
 
-/** A cap building the country holds; `step` counts from 1. */
+/** A cap building the country holds; `step` counts from 1. A landmark palace is step 4 (D-GOV-10). */
 export interface CapBuilding {
   id: CapBuildingId;
   step: number;
+  landmark?: string;
 }
 
 interface RawCapBuilding {
@@ -117,10 +120,25 @@ function byStep(v: number | number[] | undefined, step: number): number {
   return v[Math.min(step, v.length) - 1] ?? 0;
 }
 
-/** What one cap building adds to the officials and lords caps at its step. */
-export function buildingContribution(id: CapBuildingId, step = 1): { officials: number; lords: number } {
+const landmarkPalace = config.buildings.palace.landmark_step_4 as { officials: Record<string, number>; lords: number };
+
+/**
+ * What one cap building adds to the officials and lords caps at its step. A
+ * landmark palace is step 4: the landmark's officials and the lords of step 3 (D-GOV-10).
+ */
+export function buildingContribution(id: CapBuildingId, step = 1, landmark?: string): { officials: number; lords: number } {
+  if (id === "palace" && landmark !== undefined) {
+    const officials = landmarkPalace.officials[landmark];
+    if (officials === undefined) throw new Error(`Unknown landmark palace: ${landmark}`);
+    return { officials, lords: landmarkPalace.lords };
+  }
   const b = rawBuildings[id];
   return { officials: byStep(b.officials, step), lords: byStep(b.lords, step) };
+}
+
+/** Landmark palaces by id ("forbidden_city", "topkapi"). */
+export function isLandmarkPalace(id: string): boolean {
+  return Object.hasOwn(landmarkPalace.officials, id);
 }
 
 /** "court of law" → "court_of_law". */
@@ -161,6 +179,8 @@ export interface CapInput {
   buildings: readonly CapBuilding[];
   /** Additions from national strengths (design §8). */
   strengths?: readonly { officials?: number; lords?: number }[];
+  /** The sum of `admin_capacity` changes from events, in event points (D-GOV-11). */
+  eventAdminCapacity?: number;
 }
 
 function buildingLabel(id: CapBuildingId): string {
@@ -175,7 +195,7 @@ export function workOutCaps(input: CapInput): { officials: Cap; lords: Cap } {
   const seats = input.buildings.filter((b) => b.id === "seat");
   for (const b of input.buildings) {
     if (b.id === "seat") continue;
-    const c = buildingContribution(b.id, b.step);
+    const c = buildingContribution(b.id, b.step, b.landmark);
     if (c.officials) officials.push({ source: buildingLabel(b.id), value: c.officials });
     if (c.lords) lords.push({ source: buildingLabel(b.id), value: c.lords });
   }
@@ -187,11 +207,16 @@ export function workOutCaps(input: CapInput): { officials: Cap; lords: Cap } {
     if (s.officials) officials.push({ source: "strength", value: s.officials });
     if (s.lords) lords.push({ source: "strength", value: s.lords });
   }
-  const sum = (parts: CapPart[]): Cap => ({ total: parts.reduce((n, p) => n + p.value, 0), parts });
+  if (input.eventAdminCapacity) officials.push({ source: "events", value: input.eventAdminCapacity * config.admin_capacity_officials_per_point });
+  // A cap never falls below 0, whatever events take away (D-GOV-11).
+  const sum = (parts: CapPart[]): Cap => ({ total: Math.max(0, parts.reduce((n, p) => n + p.value, 0)), parts });
   return { officials: sum(officials), lords: sum(lords) };
 }
 
-/** An official in service: where he serves and when he was hired (larger = newer). */
+/**
+ * An official in service: where he serves and when he entered service in that
+ * post (larger = newer), whether hired, a graduate or from a lord's line (D-GOV-17).
+ */
 export interface Official {
   id: string;
   province: string;
@@ -228,20 +253,32 @@ export interface LordInRealm {
 
 const LOYALTY_ORDER: Loyalty[] = ["loyal", "wavering", "disloyal", "in_revolt"];
 
+/** The first `n` lords in slip order: lowest loyalty first, then most provinces, then by id. */
+export function lordsToSlip(lords: readonly LordInRealm[], n: number): string[] {
+  if (n <= 0) return [];
+  const ordered = [...lords].sort(
+    (a, b) =>
+      LOYALTY_ORDER.indexOf(b.loyalty) - LOYALTY_ORDER.indexOf(a.loyalty) ||
+      b.provinces - a.provinces ||
+      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+  );
+  return ordered.slice(0, n).map((l) => l.id);
+}
+
 /**
  * Lords that lose one loyalty step at New Year: one per lord over the lords
  * cap, lowest loyalty first, then most provinces (GOV-007).
  */
 export function newYearLordSlips(lords: readonly LordInRealm[], cap: number): string[] {
-  const over = (lords.length - cap) * config.over_cap.lords.slips_per_lord_over;
-  if (over <= 0) return [];
-  const ordered = [...lords].sort(
-    (a, b) => LOYALTY_ORDER.indexOf(b.loyalty) - LOYALTY_ORDER.indexOf(a.loyalty) || b.provinces - a.provinces,
-  );
-  return ordered.slice(0, over).map((l) => l.id);
+  return lordsToSlip(lords, (lords.length - cap) * config.over_cap.lords.slips_per_lord_over);
 }
 
-/** Lords-cap slips for the turn that starts month `month` (1–12): only at New Year. */
+/** The lords who lose a step when a reform passes: the same order as at New Year (D-GOV-4). */
+export function reformLordSlips(lords: readonly LordInRealm[], lordsSlip: number): string[] {
+  return lordsToSlip(lords, lordsSlip);
+}
+
+/** Lords-cap slips for the turn in which month `month` (1–12) begins (X-18): only at New Year. */
 export function lordSlipsAtMonthStart(month: number, lords: readonly LordInRealm[], cap: number): string[] {
   return config.over_cap.lords.when === "new_year" && month === 1 ? newYearLordSlips(lords, cap) : [];
 }
@@ -284,6 +321,27 @@ export function needsOfficial(formId: FormId, ownPeople: boolean): boolean {
   return !(form(formId).selfRun && ownPeople);
 }
 
+/**
+ * A province is of the realm's "own people" when its largest tongue is the
+ * realm's own tongue; kin of another tongue do not count (D-GOV-13).
+ */
+export function isOwnPeople(provinceMajorityTongue: string, realmTongue: string): boolean {
+  return provinceMajorityTongue === realmTongue;
+}
+
+/** Forms whose event-tree value is in the list, e.g. the monarchies the Inquisition is open to (D-GOV-15). */
+export function formsWithEventTreeValue(values: readonly string[]): FormId[] {
+  return FORM_IDS.filter((id) => values.includes(form(id).eventTree));
+}
+
+/**
+ * Subjects a country releases when its form changes: all of them when the new
+ * form holds no subjects (colonial government), else none (D-GOV-16).
+ */
+export function subjectsReleasedOnFormChange(newForm: FormId, subjects: readonly string[]): string[] {
+  return form(newForm).subjectReach === null ? [...subjects] : [];
+}
+
 // ---------------------------------------------------------------------------
 // Reforms (design §4)
 // ---------------------------------------------------------------------------
@@ -295,6 +353,7 @@ export const REFORMS: ReformRule[] = config.reforms.map((r) => ({
   needs: r.needs,
   gold: r.gold,
   lordsSlip: r.lords_slip,
+  automatic: r.automatic === true,
 }));
 
 /** The reform from one form to another, if config lists one and `to` is a next form (GOV-027). */
@@ -320,6 +379,14 @@ const COUNT_NEED = /^(\d+) or more (provinces|subjects|lords)$/;
 const INVENTION = /^([GW]\d+)\b/;
 const BUILDING_NEED = /^an? (diet hall|parliament house|examination hall|chancery|court of law|hostage residence)$/;
 
+/** The need of the faith reforms, met when the state faith has changed from the one the realm was founded in (D-GOV-14). */
+export const REFORMED_FAITH_NEED = "the ruler takes a reformed faith (religion design)";
+
+/** Whether a prince-bishopric's or order's ruler has taken a reformed faith: any change of the state faith (D-GOV-14). */
+export function tookReformedFaith(foundingFaith: string, stateFaith: string): boolean {
+  return foundingFaith !== stateFaith;
+}
+
 /** Whether one listed need holds. Inventions by code ("G3 Tax registers or G6 Quipu" takes either). */
 export function needMet(need: string, c: ReformCountry): boolean {
   const count = COUNT_NEED.exec(need);
@@ -341,25 +408,78 @@ export function needLabel(need: string): string {
 
 export type ReformResult =
   | { ok: true; form: FormId; goldPaid: number; lordsSlip: number }
-  | { ok: false; reason: "no_reform" | "need_missing" | "gold"; missing?: string };
+  | { ok: false; reason: "no_reform" | "automatic" | "need_missing" | "gold"; missing?: string };
 
 /**
  * A reform order (GOV-027 … GOV-032): to one of the next forms through a
  * listed reform, every need met, gold in the treasury. The number of lords
- * that slip is returned; which lords is open (OQ-GOV-4).
+ * that slip is returned; `reformLordSlips` picks them (D-GOV-4). A next form
+ * with no reform row (D-GOV-2) and a condition row (D-GOV-3) cannot be ordered.
  */
 export function reform(c: ReformCountry, to: FormId): ReformResult {
   const rule = findReform(c.form, to);
   if (!rule) return { ok: false, reason: "no_reform" };
+  if (rule.automatic) return { ok: false, reason: "automatic" };
   const missing = rule.needs.find((n) => !needMet(n, c));
   if (missing !== undefined) return { ok: false, reason: "need_missing", missing };
   if (c.gold < rule.gold) return { ok: false, reason: "gold" };
   return { ok: true, form: to, goldPaid: rule.gold, lordsSlip: rule.lordsSlip };
 }
 
+/**
+ * The condition row that changes the form by itself this month, if its
+ * condition holds: no order, the row's gold (0) and its lords slip (D-GOV-3).
+ */
+export function automaticFormChange(c: ReformCountry): ReformRule | undefined {
+  return REFORMS.find((r) => r.automatic && r.from.includes(c.form) && r.needs.every((n) => needMet(n, c)));
+}
+
+/**
+ * The AI's reform order: only in the turn in which the reform month (January)
+ * begins (`month` is the month that begins this turn, X-18), the first of the
+ * form's next forms, in their listed order, whose reform it may order, meets every
+ * need of and can pay with the reserve factor to spare (D-GOV-12).
+ */
+export function aiReform(c: ReformCountry, month: number): FormId | null {
+  if (month !== config.ai.reform_month) return null;
+  for (const to of form(c.form).next) {
+    const rule = findReform(c.form, to);
+    if (!rule || rule.automatic) continue;
+    if (!rule.needs.every((n) => needMet(n, c))) continue;
+    if (c.gold < rule.gold * config.ai.reform_gold_reserve_factor) continue;
+    return to;
+  }
+  return null;
+}
+
 // ---------------------------------------------------------------------------
 // Form changes without a reform (design §4, §5)
 // ---------------------------------------------------------------------------
+
+/**
+ * A country's form with the form it held before its last run of revolutionary
+ * regimes, which revolutions' `restored_monarchy` reads as `old_form` (D-GOV-9).
+ */
+export interface GovernmentState {
+  form: FormId;
+  /** The last form not set by a revolution; the current form until a revolution comes. */
+  oldForm: FormId;
+  setByRevolution: boolean;
+}
+
+export function governmentState(f: FormId): GovernmentState {
+  return { form: f, oldForm: f, setByRevolution: false };
+}
+
+/** A revolution sets the form, remembering the last form not set by a revolution (D-GOV-9). */
+export function revolutionChangesForm(state: GovernmentState, to: FormId): GovernmentState {
+  return { form: to, oldForm: state.setByRevolution ? state.oldForm : state.form, setByRevolution: true };
+}
+
+/** Any other change (reform, coup, event, capital lost) ends the run of revolutionary regimes. */
+export function otherChangesForm(state: GovernmentState, to: FormId): GovernmentState {
+  return { form: to, oldForm: to, setByRevolution: false };
+}
 
 /** A revolution or a won *New ideas* rising sets the form; no needs, no gold, era ignored (GOV-034, GOV-035). */
 export function setFormByRevolution(_current: FormId, to: FormId): FormId {
@@ -373,7 +493,7 @@ export function formAfterCoup(): FormId {
 
 /** A shogunate whose shogun loses the capital breaks into warlord domains (GOV-038). */
 export function formAfterCapitalLost(current: FormId): FormId {
-  const rule = REFORMS.find((r) => r.from.includes(current) && r.needs.includes("the shogun loses the capital"));
+  const rule = REFORMS.find((r) => r.automatic && r.from.includes(current) && r.needs.includes("the shogun loses the capital"));
   return rule ? rule.to : current;
 }
 
@@ -474,15 +594,20 @@ export interface NextFormLine {
   met: boolean;
 }
 
-/** Next forms with their needs, as the government card lists them (GOV-049). */
+/**
+ * Next forms with their needs, as the government card lists them (GOV-049).
+ * A next form with no reform row reads "by revolution or event only" (D-GOV-2);
+ * a condition row reads "when <condition>" (D-GOV-3). Neither is ever met.
+ */
 export function nextFormLines(c: ReformCountry): NextFormLine[] {
   return form(c.form).next.map((to) => {
     const rule = findReform(c.form, to);
-    const needs = rule?.needs ?? [];
+    if (!rule) return { form: to, text: `${formName(to)}: by revolution or event only`, met: false };
+    if (rule.automatic) return { form: to, text: `${formName(to)}: when ${rule.needs.join(", ")}`, met: false };
     return {
       form: to,
-      text: `${formName(to)}: needs ${needs.map(needLabel).join(", ")}`,
-      met: rule !== undefined && needs.every((n) => needMet(n, c)),
+      text: `${formName(to)}: needs ${rule.needs.map(needLabel).join(", ")}`,
+      met: rule.needs.every((n) => needMet(n, c)),
     };
   });
 }

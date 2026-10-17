@@ -1,6 +1,15 @@
 {
- "$comment": "Diplomacy context config. 'relations' is copied from country-relations/config/relation-rules.json (relation model, matrix, actions, durations); the rest from diplomacy/diplomacy-rules.json. Every number is a placeholder balancing knob owned by game design.",
+ "$comment": "Diplomacy context config. 'relations' is copied from country-relations/config/relation-rules.json (relation model, matrix, actions, durations); the rest from diplomacy/diplomacy-rules.json. Every number is a placeholder balancing knob owned by game design. Subject kinds: the engine reads relations.subject_kinds only for labels; joining wars and own diplomacy follow the six kinds of subjects.json (X-8, D-DIPL-10).",
  "schema_version": "1.0",
+ "_provisional": [
+  "actions.fund_rebels.gold_share_of_target_yearly_income",
+  "actions.fund_rebels.caught_chance_per_month",
+  "ledger.ties.backed_our_revolution",
+  "ledger.standing_limit",
+  "envoys.passage_denied_blocks_months",
+  "envoys.days_per_crossing_unit",
+  "eras.VI.pact_offensive_call_bonus"
+ ],
  "relations": {
   "layers": {
    "hierarchy": {
@@ -664,8 +673,7 @@
   "instant_if_both_know": "T14",
   "instant_excludes": [
    "arrange_marriage",
-   "make_resident",
-   "courtesy_visit"
+   "make_resident"
   ],
   "official_type_bonus": {
    "judge": {
@@ -750,8 +758,9 @@
     "treasury_rounded_100",
     "lord_loyalty"
    ],
-   "war_warning_turns": 1
+   "war_warning_months": 1
   },
+  "passage_denied_blocks_months": 24,
   "held": {
    "on_war_with_host": true,
    "peace_envoy_never_held": true,
@@ -836,6 +845,11 @@
     "weight": 40,
     "fade_years": 30,
     "name": "Freed us"
+   },
+   "backed_our_revolution": {
+    "weight": 25,
+    "fade_years": 30,
+    "name": "Backed our revolution"
    }
   },
   "wrongs": {
@@ -926,6 +940,7 @@
    }
   ],
   "merged_entry_name": "Old matters",
+  "standing_limit": 200,
   "resident_envoy_season_months": 3
  },
  "reasons": {
@@ -934,7 +949,6 @@
   "relies_on_word": [
    "propose_alliance",
    "swear_peace",
-   "pledge_protection",
    "arrange_marriage",
    "trade_pact",
    "offer_overlordship"
@@ -1132,27 +1146,20 @@
   "fund_rebels": {
    "envoy": true,
    "secret": true,
-   "gold_per_month_choices": [
-    10,
-    25,
-    50
-   ],
-   "grievance_while_funded": "foreign_agitators",
-   "rebels_count_as": "armed",
-   "rebels_dont_shrink_when_waiting": true,
-   "revolution_camp_sign_at_gold": 50,
-   "caught_chance_per_turn": {
-    "default": 0.1,
-    "judge_runs_province": 0.2,
-    "lord_holds_province": 0.05
-   },
+   "target": "a revolution card in the target realm",
+   "needs_revolution_signs": 1,
+   "gold_share_of_target_yearly_income": 0.01,
+   "flag": "revolution_funded",
+   "caught_chance_per_month": 0.03,
    "on_caught": {
     "envoy": "held",
     "wrong": "stirred_revolt_in_our_land",
     "grants_target_aim": "punish",
-    "aim_years": 5,
-    "grievance_to_target_lords_and_provinces": "foreign_meddling",
-    "grievance_months": 12
+    "aim_years": 5
+   },
+   "if_revolution_wins": {
+    "tie": "backed_our_revolution",
+    "unless_regime_hostile_to_funder_form": true
    }
   }
  },
@@ -1220,7 +1227,8 @@
    ],
    "mobilisation_pact_auto_answers_defensive_call": true,
    "mobilisation_pact_delivered_as": "event",
-   "mobilisation_event": "Our pact partner is attacked: we mobilise"
+   "mobilisation_event": "Our pact partner is attacked: we mobilise",
+   "pact_offensive_call_bonus": 10
   },
   "VII": {
    "ties": {
@@ -1322,8 +1330,8 @@
   ]
  },
  "answers": {
-  "$comment": "No preview: the asker learns yes or no, with the full reasons list, the turn after the answer is given.",
-  "delay_turns": 1,
+  "$comment": "No preview: the asker learns yes or no, with the full reasons list, a month after the answer is given.",
+  "delay_months": 1,
   "preview_before_sending": false
  },
  "eras_by_year": [

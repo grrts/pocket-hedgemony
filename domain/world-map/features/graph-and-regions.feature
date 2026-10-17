@@ -39,17 +39,24 @@ Feature: The province graph and regions
       | The Caribbean                        |
       | South America                        |
 
-  @MAP-040 @open-question
-  # OQ-MAP-5: no province membership for regions, areas and anchors
+  @MAP-040
   Scenario Outline: Each anchor province resolves to one map province
     Given the event-tree anchor "<anchor>" in the area "<area>"
     When it is resolved on the map
     Then exactly one province is returned
+    And it is the province "<province>"
 
     Examples:
-      | anchor         | area           |
-      | Constantinople | thrace         |
-      | Potosí         | upper_peru     |
-      | Malacca        | malaya_and_borneo |
-      | Timbuktu       | niger_bend     |
-      | Kyoto          | kinai          |
+      | anchor         | area              | province            |
+      | Constantinople | thrace            | Istanbul            |
+      | Potosí         | upper_peru        | Northeast Potosí    |
+      | Malacca        | malaya_and_borneo | Selangor            |
+      | Timbuktu       | niger_bend        | Southeast Timbuktu  |
+      | Kyoto          | kinai             | Mie                 |
+      | Vienna         | lower_austria     | Wien                |
+
+  @MAP-040
+  Scenario: Every anchor of the event tree is on the map
+    Given the event tree's 25 anchor provinces
+    When they are resolved on the map
+    Then each resolves to one land province

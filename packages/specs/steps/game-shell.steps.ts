@@ -45,7 +45,11 @@ import {
   enterCampaign,
   eventCard,
   failureScreen,
-  fight,
+  stepBattles,
+  dayDate,
+  battleView,
+  battleSwitcher,
+  switchBattle,
   finalResult,
   finalResultChoice,
   firstFocus,
@@ -112,13 +116,44 @@ import {
   raiseEvents,
   replaceAll,
   replayBattle,
-  restoreLastAutosave,
+  restoreLastSave,
+  changeBattleOrders,
+  actionSet,
+  actionSetOffers,
+  answerFirstLaunch,
+  areOpposite,
+  attentionTitle,
+  battleButton,
+  battleViewButtons,
+  checkDomination,
+  endDateChoices,
+  explainLine,
+  firstLaunchQuestion,
+  holdButton,
+  hudCorners,
+  isValidEndDate,
+  ledger,
+  loadList,
+  mainMenuFocus,
+  muteButtons,
+  mutesForSave,
+  outcomeOf,
+  panelButtons,
+  panelLayout,
+  PRE_TURN,
+  realmLocked,
+  saveCard,
+  stoppedOnDay,
+  unlockScreen,
+  type FirstLaunchChoice,
+  type RealmScores,
+  type SaveSummary,
   routeInput,
   runTurn,
   saveAfterKillDuringTurn,
   screen,
   showOnMap,
-  skipToResult,
+  retreat,
   startCampaignEnd,
   stepDone,
   stepStrip,
@@ -217,13 +252,13 @@ function monthLoop(battles: { place: string; day: number; sides?: string[] }[], 
   return loop;
 }
 
-function stopAtTroyes(s: Scenario, card: "before" | "result" = "before"): void {
+function stopAtTroyes(s: Scenario, card: "running" | "result" = "running"): void {
   const shell = ensureCampaign(s);
   s.month = { loop: monthLoop([{ place: "Troyes", day: 5 }]), events: [], report: ["A battle at Troyes"] };
   push(shell, { id: "turn" });
   turnOf(shell).phase = "in progress";
   runTurn(shell, s.month);
-  if (card === "result") skipToResult(shell);
+  if (card === "result") battleEnds(shell);
 }
 
 function expectTop(s: Scenario, id: FrameId): void {
@@ -388,7 +423,7 @@ Given("the game runs for the first time on the store {string}", (s, store: strin
 });
 
 const COLLECTED: Record<string, string[]> = {
-  "the free mobile tier's ad": ["the free mobile tier's ad"],
+  "tutorial step counts": ["tutorial step counts"],
   "crash reports needing consent": ["crash reports"],
   "nothing that needs consent": [],
 };
@@ -536,6 +571,10 @@ Then("the main menu shows {string} labelled {string} with the banner of {string}
 When("the player picks {string}", (s, entry: string) => {
   const shell = sh(s);
   acted(s);
+  if (s.flq && (s.flq.choices as string[]).includes(entry)) {
+    s.flAnswer = answerFirstLaunch(shell, entry as FirstLaunchChoice);
+    return;
+  }
   const t = topId(shell);
   if (t === "main_menu" || (!t && entry === "New campaign")) {
     if (entry === "Continue") continueCampaign(shell, s.summary);
@@ -602,7 +641,8 @@ Then("the main menu shows the entries {string}", (s, entries: string) => {
 });
 
 Given("the game is {string}", (s, edition: string) => {
-  s.sh = newShell({ edition: edition === "the Steam demo" ? "Steam demo" : "full game" });
+  const e: Edition = edition === "the Steam demo" ? "Steam demo" : edition === "the free mobile tier" ? "free mobile" : "full game";
+  s.sh = newShell({ edition: e, platform: e === "free mobile" ? "Android" : "Steam" });
 });
 
 Given("the tutorial is finished", (s) => {
@@ -634,7 +674,7 @@ Given(/^the game is the (free tier|Steam demo)$/, (s, which: string) => {
 });
 
 Then("no ad card is shown", (s) => {
-  expect(adCard({ edition: sh(s).edition, keepsAd: true, firstSession: false, purchased: false, screen: "main_menu" })).toBeNull();
+  expect(adCard({ edition: sh(s).edition, screen: String(topId(sh(s)) ?? "main_menu") })).toBeNull();
 });
 
 Then("a small {string} ribbon is shown", (s, label: string) => {
@@ -716,11 +756,11 @@ When(/^the player moves to step (\d)$/, (s, step: string) => {
   acted(s);
 });
 
-Then("the options offered are difficulty, AI temper, fog, historical or free events, ironman, and the end date", (_s) => {
-  expect(campaignOptions()).toEqual(["difficulty", "AI temper", "fog", "historical or free events", "ironman", "end date"]);
+Then("the options offered are difficulty, AI aggression, fog, historical or free events, ironman, and the end date", (_s) => {
+  expect(campaignOptions()).toEqual(["difficulty", "AI aggression", "fog", "historical or free events", "ironman", "end date"]);
 });
 
-const PRESET = { difficulty: "normal", "AI temper": "calm", fog: "on", "historical or free events": "historical", ironman: "off", "end date": "1939-08-31" };
+const PRESET = { difficulty: "normal", "AI aggression": "calm", fog: "on", "historical or free events": "historical", ironman: "off", "end date": "1939-08-31" };
 
 When("the player picks a preset", (s) => {
   s.filled = applyPreset(s.nc, PRESET);
@@ -827,7 +867,8 @@ Then("the screen {string} opens with no question", (s, id: string) => {
 });
 
 Then("the question {string} is shown", (s, question: string) => {
-  expect(s.loadResult).toEqual({ question });
+  if (s.endTurn) expect(s.endTurn).toMatchObject({ result: "question", question });
+  else expect(s.loadResult).toEqual({ question });
   expectTop(s, "confirmation");
 });
 
@@ -1355,10 +1396,16 @@ Then("the turn is not paused, because nothing runs until End turn", (s) => {
 });
 
 Then("it shows the entries {string} in order", (s, entries: string) => {
-  expect(gameMenuEntries(sh(s).platform, sh(s).campaign!.ironman).join(", ")).toBe(entries);
+  const c = sh(s).campaign!;
+  expect(gameMenuEntries(sh(s).platform, c.ironman, { tutorial: s.tutorialRunning === true, canEarnAchievements: c.canEarnAchievements }).join(", ")).toBe(entries);
 });
 
 Then("focus is on {string}", (s, element: string) => {
+  // The main menu's and the first-launch question's focus depend on the state (SHELL-026, SHELL-131).
+  if (s.focusOverride) {
+    expect(s.focusOverride).toBe(element);
+    return;
+  }
   expect(firstFocus(topId(sh(s))!, "controller")).toEqual({ element, frame: "gold" });
 });
 
@@ -1405,6 +1452,10 @@ Given("no event is unanswered", (s) => {
 });
 
 Given("the setting {string} is {string}", (s, setting: string, value: string) => {
+  if (setting === "Main hand") {
+    s.mainHand = value;
+    return;
+  }
   expect(setting).toBe("Confirm End turn");
   sh(s).settings.confirmEndTurn = value as Shell["settings"]["confirmEndTurn"];
 });
@@ -1484,20 +1535,38 @@ Then(/^the parchment strip "([^"]+)" (is not shown|is shown after 1\.5 seconds)$
   if (strip.shown) expect(strip.after).toBe(1.5);
 });
 
-Given("the turn is stopped on the before-the-battle card at {string}", (s, place: string) => {
+Given("the battle at {string} is running", (s, place: string) => {
   expect(place).toBe("Troyes");
   stopAtTroyes(s);
-  expect(battleFrame(sh(s))).toMatchObject({ subject: "Troyes", battleCard: "before" });
+  expect(battleFrame(sh(s))).toMatchObject({ subject: "Troyes", battleCard: "running" });
+});
+Given(/^(\d+) steps of 4 hours (?:have passed|pass)$/, (s, n: string) => {
+  for (let i = 0; i < Number(n); i++) stepBattles(sh(s));
+});
+When("the player sets the standing orders for this battle to {string}", (s, orders: string) => {
+  changeBattleOrders(sh(s), orders);
+});
+Then("the battle at {string} fights on with {string}", (s, place: string, orders: string) => {
+  expect(battleView(sh(s))).toMatchObject({ place, orders, step: 2 });
+  expect(sh(s).events).toContainEqual({ type: "BattleOrdersChanged", battle: "battle-1", orders });
+  stepBattles(sh(s));
+  expect(battleView(sh(s)).step).toBe(3);
+});
+Then("no other battle's orders change", (s) => {
+  expect(turnOf(sh(s)).running.filter((r) => r.battle.orders && r.battle !== turnOf(sh(s)).battle)).toEqual([]);
+});
+Then(/^the battle at "([^"]+)" ends with a retreat after (\d+) hours$/, (s, place: string, hours: string) => {
+  const r = turnOf(sh(s)).running.find((x) => x.battle.place === place)!;
+  expect(r.outcome).toBe("retreated");
+  expect(r.step * 4).toBe(Number(hours));
 });
 
 When("the player presses {string}", (s, button: string) => {
   const shell = sh(s);
   acted(s);
   switch (button) {
-    case "Fight":
-      return fight(shell);
-    case "Skip to result":
-      return skipToResult(shell);
+    case "Retreat":
+      return retreat(shell);
     case "Carry on":
       return carryOn(shell);
     case "Look at the map":
@@ -1512,13 +1581,10 @@ When("the player presses {string}", (s, button: string) => {
   }
 });
 
-Then("the battle plays bell by bell", (s) => expect(battleFrame(sh(s))?.battleCard).toBe("playing"));
-Then("the battle jumps to its end", (s) => expect(battleFrame(sh(s))?.battleCard).toBe("result"));
-
 Then("the battle ends on its result card showing who won, men lost and the one-line reason", (s) => {
   const f = battleFrame(sh(s))!;
-  if (f.battleCard === "playing") battleEnds(sh(s));
   expect(f.battleCard).toBe("result");
+  expect(turnOf(sh(s)).running[0]!.outcome).toBe("ended");
   expect(turnOf(sh(s)).battle?.result).toMatchObject({ winner: "France", menLost: { France: 605, England: 1405 }, reason: "France held the higher ground" });
 });
 
@@ -1527,17 +1593,11 @@ Then("the result card offers {string}", (s, button: string) => {
   expect(button).toBe("Carry on");
 });
 
-Given("the battle at {string} is playing bell by bell", (s, place: string) => {
-  expect(place).toBe("Troyes");
-  stopAtTroyes(s);
-  fight(sh(s));
-});
-
 Then("the result card is shown", (s) => expect(battleFrame(sh(s))?.battleCard).toBe("result"));
 
-Given("this month {string} fights at {string} on the 5th and at {string} on the 20th", (s, realm: string, a: string, b: string) => {
+Given("this month {string} fights at {string} on the 5th and at {string} on the 7th", (s, realm: string, a: string, b: string) => {
   ensureCampaign(s);
-  s.month = { loop: monthLoop([{ place: a, day: 5 }, { place: b, day: 20 }], realm), events: [], report: ["Two battles"] };
+  s.month = { loop: monthLoop([{ place: a, day: 5 }, { place: b, day: 7 }], realm), events: [], report: ["Two battles"] };
 });
 
 Given("the turn is stopped on the result card at {string}", (s, place: string) => {
@@ -1546,20 +1606,21 @@ Given("the turn is stopped on the result card at {string}", (s, place: string) =
   turnOf(shell).phase = "in progress";
   runTurn(shell, s.month);
   expect(battleFrame(shell)?.subject).toBe(place);
-  skipToResult(shell);
+  battleEnds(shell);
 });
 
-Then("the turn resumes", (s) => expect(sh(s).events).toContainEqual({ type: "TurnResumed", battle: "battle-1" }));
+Then("the turn resumes in whole days", (s) => expect(sh(s).events).toContainEqual({ type: "TurnResumed", battles: ["battle-1"] }));
 
-Then("the turn stops at the before-the-battle card at {string}", (s, place: string) => {
-  expect(battleFrame(sh(s))).toMatchObject({ subject: place, battleCard: "before" });
+Then("the battle at {string} starts on day {int}", (s, place: string, day: number) => {
+  expect(battleFrame(sh(s))).toMatchObject({ subject: place, battleCard: "running" });
   expect(sh(s).camera.on).toBe(place);
   expect(turnOf(sh(s)).phase).toBe("battle");
+  expect(stoppedOnDay(sh(s))).toBe(day);
 });
 
 Given("{string} and {string} fight a battle this month", (s, a: string, b: string) => {
   ensureCampaign(s);
-  s.month = { loop: monthLoop([{ place: "Badajoz", day: 9, sides: [a, b] }]), events: [], report: [] };
+  s.month = { loop: monthLoop([{ place: "Badajoz", day: 3, sides: [a, b] }]), events: [], report: [] };
 });
 
 Given(/^the battle (matters|does not matter) to the player$/, (s, matters: string) => {
@@ -1574,7 +1635,7 @@ When("the turn runs", (s) => {
   acted(s);
 });
 
-Then("the turn does not stop for that battle", (s) => {
+Then("time does not slow for that battle", (s) => {
   expect(battleFrame(sh(s))).toBeUndefined();
   expect(s.month.loop.battles).toHaveLength(1);
   expect(s.month.loop.stoppedAt).toBeNull();
@@ -1616,7 +1677,7 @@ When(/^the app (goes to the background and comes back|is killed and started agai
     s.resumed = appResumed(shell, s.bg);
     return;
   }
-  // Killed: the pre-turn save is loaded again and the same month replays to the same battle.
+  // Killed: the Resume save and the orders journal are loaded again and the same month replays to the same battle.
   s.firstResult = turnOf(shell).battle!.result;
   const again = newShell({ platform: shell.platform });
   enterCampaign(again, { realm: "France", date: MAY_1503 });
@@ -1627,13 +1688,14 @@ When(/^the app (goes to the background and comes back|is killed and started agai
   s.from = saveAfterKillDuringTurn();
 });
 
-Then("the before-the-battle card at {string} is shown again", (s, place: string) => {
-  expect(battleFrame(sh(s))).toMatchObject({ subject: place, battleCard: "before" });
+Then("the running battle at {string} is shown again at the same step", (s, place: string) => {
+  expect(battleFrame(sh(s))).toMatchObject({ subject: place, battleCard: "running" });
+  expect(battleView(sh(s)).step).toBe(0);
 });
 
-Then("the pre-turn save replays the month to {string} with the same result", (s, place: string) => {
-  expect(s.from).toBe("pre-turn save");
-  expect(battleFrame(sh(s))).toMatchObject({ subject: place, battleCard: "before" });
+Then("the Resume save and the orders journal replay the month to {string} with the same result", (s, place: string) => {
+  expect(s.from).toBe("the Resume save and the orders journal");
+  expect(battleFrame(sh(s))).toMatchObject({ subject: place, battleCard: "running" });
   expect(turnOf(sh(s)).battle!.result).toEqual(s.firstResult);
 });
 
@@ -1709,7 +1771,9 @@ Then("the turn report slides in from the edge as a card, each line jumping to it
 
 Then("no turn report opens and only the date in the top bar changes", (s) => {
   expectTop(s, "map");
-  expect(sh(s).campaign!.date).toEqual({ year: 1503, month: 6 });
+  // One week later (X-18): the day moves on by 7.
+  expect(sh(s).campaign!.date).toEqual(MAY_1503);
+  expect(sh(s).campaign!.day).toBe(8);
   expect(s.dateBefore).toEqual(MAY_1503);
 });
 
@@ -1855,8 +1919,8 @@ Then("the line gives no advice on what to do", (s) => {
 // ---------------------------------------------------------------------------
 // Other in-campaign screens
 
-Given(/^the screen "battle" was opened (by the turn stopping for a battle|from the turn report as a replay|from the tab "Chronicle" as a replay)$/, (s, how: string) => {
-  if (how === "by the turn stopping for a battle") return stopAtTroyes(s);
+Given(/^the screen "battle" was opened (by a running player battle|from the turn report as a replay|from the tab "Chronicle" as a replay)$/, (s, how: string) => {
+  if (how === "by a running player battle") return stopAtTroyes(s);
   stopAtTroyes(s, "result");
   carryOn(sh(s));
   const shell = sh(s);
@@ -1866,9 +1930,12 @@ Given(/^the screen "battle" was opened (by the turn stopping for a battle|from t
   replayBattle(shell, "Troyes", how.includes("turn report") ? "turn_report" : "Chronicle");
 });
 
-Then("the battle skips to its result card", (s) => {
-  expect(s.backResult).toBe("skipped to result");
-  expect(battleFrame(sh(s))?.battleCard).toBe("result");
+Then("the map is shown and the battle keeps running", (s) => {
+  expect(s.backResult).toBe("back to the map");
+  expect(battleFrame(sh(s))).toBeUndefined();
+  expect(turnOf(sh(s)).running[0]!.outcome).toBeNull();
+  stepBattles(sh(s));
+  expect(turnOf(sh(s)).running[0]!.step).toBe(1);
 });
 
 Then("the turn report is shown", (s) => expectTop(s, "turn_report"));
@@ -1967,7 +2034,7 @@ Then("the screen below is shown unchanged", (s) => expect(top(sh(s))).toEqual(s.
 
 const HIGHS = { largestSize: 41, yearsLasted: 33, battlesWon: 12 };
 
-When(/^("[^"]+" is annexed|"[^"]+" loses every province|a successor rule ends "[^"]+"|"[^"]+" is divided between "[^"]+" and the Empire) in (\d{4})$/, (s, cause: string, year: string) => {
+When(/^("[^"]+" is annexed|"[^"]+" loses every province|"[^"]+" is divided between "[^"]+" and the Empire) in (\d{4})$/, (s, cause: string, year: string) => {
   const realm = sh(s).campaign!.realm;
   // Only the division line is given word for word (SHELL-094); the other causes are shown as stated.
   const divided = cause.match(/^"([^"]+)" is divided between "([^"]+)" and the Empire$/);
@@ -2176,7 +2243,7 @@ Then("the worker paused with the app and the turn carries on", (s) => {
   expectTop(s, "turn");
 });
 
-Then("the pre-turn save is used", (s) => expect(s.restartFrom).toBe("pre-turn save"));
+Then("the Resume save and the orders journal are used", (s) => expect(s.restartFrom).toBe("the Resume save and the orders journal"));
 
 Given(/^the unlock flow was opened from (the realm picker on "Castile"|the main menu)$/, (s, place: string) => {
   const shell = sh(s);
@@ -2206,9 +2273,11 @@ Then("the realm {string} is chosen", (s, realm: string) => {
   expect(s.nc.realm).toBe(realm);
 });
 
-Then("the free tier's ad is gone", (s) => {
+Then("every realm is unlocked", (s) => {
   expect(s.profile.purchased).toBe(true);
-  expect(adCard({ edition: "free mobile", keepsAd: true, firstSession: false, purchased: s.profile.purchased, screen: "main_menu" })).toBeNull();
+  expect(sh(s).edition).toBe("full game");
+  expect(realmLocked(sh(s).edition, "Castile")).toBe(false);
+  expect(fullGameRibbon(sh(s).edition)).toBeNull();
 });
 
 Then("no message beyond the store's own is shown", (s) => expect(s.purchase.message).toBeNull());
@@ -2244,9 +2313,13 @@ Then("the screen {string} says what failed in plain words", (s, id: string) => {
 });
 
 Then("it offers {string}", (s, options: string) => {
+  if (!s.failureScreen) {
+    expect(s.final.choices.join(", ")).toBe(options);
+    return;
+  }
   expect(s.failureScreen.options.join(", ")).toBe(options);
-  restoreLastAutosave(sh(s));
-  expect(sh(s).events).toContainEqual({ type: "CampaignLoadRequested", save: "last autosave" });
+  restoreLastSave(sh(s));
+  expect(sh(s).events).toContainEqual({ type: "CampaignLoadRequested", save: "Resume save" });
 });
 
 Then("no stack trace is shown", (s) => {
@@ -2623,3 +2696,468 @@ Then("the button is selected", (s) => expect(s.desktop).toBe("select"));
 Then("focus moves to the next element", (s) => expect(s.desktop).toBe("next focus"));
 Then("End turn is pressed", (s) => expect(s.desktop).toBe("End turn"));
 
+
+// ---------------------------------------------------------------------------
+// Decided 17 October (spec §13, D-SHELL-n)
+
+// Needs attention: mutes, explanations and the title (SHELL-083, SHELL-087, SHELL-088)
+
+When("the player presses {string} on one line", (s, label: string) => {
+  const b = muteButtons().find((x) => x.label === label);
+  if (!b) throw new Error(`No mute button ${label}`);
+  s.muted = mute(sh(s).attention, "idle-1", b.scope);
+});
+
+Then("the mutes are kept in the save", (s) => {
+  const saved = mutesForSave(sh(s).attention);
+  expect(saved.items.length + saved.kinds.length).toBe(1);
+  expect(JSON.parse(JSON.stringify(saved))).toEqual(saved);
+});
+
+When("the player long-presses one line", (s) => {
+  s.explained = explainLine(sh(s).attention.lines[0]!);
+  expect(panelTouch("long press")).toBe("explain");
+});
+
+Then("its explanation is shown with the buttons {string} and {string}", (s, a: string, b: string) => {
+  expect(s.explained.buttons).toEqual([a, b]);
+});
+
+Then("the line itself has the same two buttons", (s) => {
+  expect(muteButtons().map((b) => b.label)).toEqual(s.explained.buttons);
+  expect(longPressOrHoverOnly()).toEqual([]);
+});
+
+Then("its title reads {string}", (s, title: string) => {
+  expectTop(s, "attention");
+  expect(attentionTitle()).toBe(title);
+  expect(screen("attention").name).toBe(title);
+});
+
+Given("{string} has {int} open warnings", (s, realm: string, n: number) => {
+  postLines(sh(s), Array.from({ length: n }, () => "a rising brewing" as AttentionKind), realm);
+});
+
+Then("the turn starts", (s) => {
+  expectTop(s, "turn");
+  expect(turnOf(sh(s)).phase).toBe("in progress");
+});
+
+// Winning (SHELL-098, SHELL-099, SHELL-129, SHELL-130)
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+Given("{string} owns or holds as subjects {int} of the world's {int} settled land provinces", (s, realm: string, held: number, settled: number) => {
+  expect(sh(s).campaign!.realm).toBe(realm);
+  s.held = held;
+  s.settled = settled;
+});
+
+When(/^the turn of (\w+) (\d{4}) ends$/, (s, month: string, year: string) => {
+  const m = MONTHS.indexOf(month) + 1;
+  expect(m).toBeGreaterThan(0);
+  sh(s).campaign!.date = { year: Number(year), month: m };
+  s.won = checkDomination(sh(s), m, s.held, s.settled);
+  if (s.won) startCampaignEnd(sh(s), [], "world domination");
+  acted(s);
+});
+
+Then("the win {string} fires and campaign end starts", (s, win: string) => {
+  expect(s.won).toBe(true);
+  expect(sh(s).campaign!.wins).toEqual([win]);
+  expect(sh(s).events).toContainEqual({ type: "VictoryReached", realm: sh(s).campaign!.realm, win });
+  closingSequence(sh(s), ["1444", "1600"]);
+  expectTop(s, "campaign_end");
+});
+
+Then("no win fires", (s) => {
+  expect(s.won).toBe(false);
+  expect(sh(s).campaign!.wins ?? []).toEqual([]);
+  expectTop(s, "map");
+});
+
+Given("a campaign as {string} has won by world domination in January 1700", (s, realm: string) => {
+  const shell = loadCampaign(s, realm, { year: 1700, month: 1 });
+  expect(checkDomination(shell, 1, 1100, 2000)).toBe(true);
+  startCampaignEnd(shell, [], "world domination");
+  closingSequence(shell, ["1444", "1700"]);
+  s.final = finalResult(shell, { ledger: ["Ottomans"], outcome: "Victory: World domination", achievements: [] });
+  acted(s);
+});
+
+Then("the campaign can be played until its end date", (s) => {
+  expect(canPlayOnPastEnd(sh(s))).toBe(true);
+  expect(endDateReached(sh(s), "1700-02-01")).toBe(false);
+  expect(sh(s).events).toContainEqual({ type: "KeptPlaying" });
+  expect(sh(s).campaign!.wins).toEqual(["World domination"]);
+});
+
+Given("at the end date the scores are:", (s, table: string[][]) => {
+  const [head, ...rows] = table;
+  expect(head).toEqual(["realm", "Economy", "Power", "Technology"]);
+  s.scores = rows.map(([realm, e, p, tech]) => ({ realm: realm!, Economy: Number(e), Power: Number(p), Technology: Number(tech) })) satisfies RealmScores[];
+});
+
+When("the end date is reached in a campaign as {string}", (s, realm: string) => {
+  const shell = loadCampaign(s, realm, { year: 1939, month: 8 });
+  expect(endDateReached(shell, "1939-08-31")).toBe(true);
+  startCampaignEnd(shell, [], "end date");
+  s.outcome = outcomeOf(realm, s.scores, { atEndDate: true });
+  s.ledger = ledger(realm, s.scores);
+});
+
+Then("the outcome reads {string}", (s, line: string) => expect(s.outcome.line).toBe(line));
+
+Then("the ledger shows {string}", (s, realms: string) => {
+  expect(s.ledger.map((r: RealmScores) => r.realm).join(", ")).toBe(realms);
+});
+
+Given("a campaign as {string} that is not ironman reaches its end date", (s, realm: string) => {
+  const shell = loadCampaign(s, realm, { year: 1939, month: 8 });
+  shell.campaign!.ironman = false;
+  startCampaignEnd(shell, [], "end date");
+});
+
+Then("instead of a list of achievements it reads {string}", (s, line: string) => {
+  expect(s.final.achievements).toEqual([]);
+  expect(s.final.achievementsLine).toBe(line);
+  expect(s.final.choices).toEqual(["Main menu", "Credits"]);
+});
+
+// Game menu lines (SHELL-132)
+
+Given("the tutorial is running on {string}", (s, name: string) => {
+  const platform = PLATFORMS[name];
+  if (!platform) throw new Error(`platform ${name}`);
+  sh(s).platform = platform;
+  s.tutorialRunning = true;
+});
+
+Given("achievements are off for this campaign", (s) => {
+  ensureCampaign(s).campaign!.canEarnAchievements = false;
+});
+
+// Interruptions (SHELL-101, SHELL-135)
+
+Given("the player has given orders since the last save", (s) => {
+  sh(s).campaign!.changedSinceSave = true;
+});
+
+Then("the orders journal is written", (s) => {
+  expect(s.bg.saved).toBe(true);
+  expect(sh(s).events).toContainEqual({ type: "SaveRequested", reason: "background", what: "orders journal" });
+});
+
+Then("it offers one purchase, the full game, which unlocks every realm", (s) => {
+  expectTop(s, "unlock");
+  s.unlockScreen = unlockScreen(sh(s).platform);
+  expect(s.unlockScreen).toMatchObject({ purchase: "the full game", unlocks: "every realm" });
+});
+
+Then("it shows the store's price and the buttons {string}", (s, buttons: string) => {
+  expect(s.unlockScreen.price).toBe("from the store");
+  expect(s.unlockScreen.buttons.join(", ")).toBe(buttons);
+});
+
+// Load (SHELL-038)
+
+const SAVES: SaveSummary[] = [
+  { id: "march-1490", banner: "France", realm: "France", date: { year: 1490, month: 3 }, savedAt: "2026-10-01T20:00", kind: "ironman" },
+  { id: "may-1503", banner: "France", realm: "France", date: { year: 1503, month: 5 }, savedAt: "2026-10-15T21:30", kind: "manual" },
+  { id: "january-1500", banner: "France", realm: "France", date: { year: 1500, month: 1 }, savedAt: "2026-10-12T19:10", kind: "autosave" },
+];
+
+Given(/^saves exist from May 1503, January 1500 \(autosave\) and March 1490 \(ironman\)$/, (s) => {
+  s.saves = SAVES;
+});
+
+Then("the saves are listed newest first in one list, not grouped by campaign", (s) => {
+  expectTop(s, "load");
+  s.rows = loadList(s.saves);
+  expect(s.rows.map((r: { date: string }) => r.date)).toEqual(["May 1503", "January 1500", "March 1490"]);
+  expect(s.rows.every((r: object) => !("campaign" in r))).toBe(true);
+});
+
+Then("each save shows its banner, realm, in-game date, real date saved, and an autosave or ironman mark", (s) => {
+  expect(s.rows.map((r: { mark: string | null }) => r.mark)).toEqual([null, "autosave", "ironman"]);
+  for (const r of s.rows) expect(r).toMatchObject({ banner: "France", realm: "France", savedAt: expect.any(String) });
+});
+
+When("the player taps the save from May 1503", (s) => {
+  s.card = saveCard(s.rows.find((r: { date: string }) => r.date === "May 1503"));
+});
+
+Then("its card shows {string} and {string}", (s, a: string, b: string) => expect(s.card).toEqual([a, b]));
+
+// Controller sets and buttons (SHELL-121, SHELL-122, SHELL-134)
+
+Given("the screen {string} is on top", (s, id: string) => {
+  const shell = sh(s);
+  if (id === "map") ensureCampaign(s);
+  else if (["card", "realm_book", "event", "game_menu", "battle"].includes(id)) {
+    ensureCampaign(s);
+    openScreen(shell, id as FrameId);
+  } else push(shell, { id: id as FrameId });
+  s.onTop = id;
+});
+
+Then("the action set {string} is active", (s, set: string) => {
+  expect(topId(sh(s))).toBe(s.onTop);
+  expect(actionSet(s.onTop)).toEqual({ set, textLayer: false });
+});
+
+Then("the action set offers {string}", (s, offers: string) => {
+  expect(actionSetOffers(actionSet(s.onTop).set).join(", ")).toBe(offers);
+});
+
+Then("the action set {string} is active with the Text layer on top", (s, set: string) => {
+  expect(s.field.confirmable).toBe(true);
+  expect(actionSet(s.onTop, true)).toEqual({ set, textLayer: true });
+});
+
+Then("the left stick moves a free cursor that snaps gently to provinces, armies and castles", (_s) => {
+  expect(SHELL.mapControls["left stick"]).toBe("free cursor that snaps gently to provinces, armies and castles");
+});
+Then("the right stick pans", (_s) => expect(SHELL.mapControls["right stick"]).toBe("pan"));
+Then("the triggers zoom", (_s) => expect(SHELL.mapControls.triggers).toBe("zoom"));
+Then("d-pad right opens the next waiting item", (s) => {
+  expect(SHELL.mapControls["d-pad right"]).toBe("next waiting item");
+  postLines(sh(s), ["an idle army"]);
+  openAttentionBy(s, "presses the controller's next button");
+  expectTop(s, "attention");
+  pop(sh(s));
+  s.acted = false;
+});
+
+When(/^the player holds (Menu|Enter) for ([\d.]+) seconds$/, (s, button: string, secs: string) => {
+  const device = button === "Menu" ? "controller" : "keyboard";
+  s.hold = holdButton(device, Number(secs));
+  if (s.hold === "End turn") s.endTurn = pressEndTurn(sh(s));
+  else if (s.hold === "game menu") openGameMenu(sh(s));
+  acted(s);
+});
+
+Then("the turn is ended", (s) => {
+  expect(s.hold).toBe("End turn");
+  expect(s.endTurn).toEqual({ result: "turn started" });
+  expectTop(s, "turn");
+});
+
+Then("the game menu opens", (s) => {
+  expect(s.hold).toBe("game menu");
+  expectTop(s, "game_menu");
+});
+
+Then("the focused button is selected", (s) => {
+  expect(s.hold).toBe("select");
+  expectTop(s, "map");
+});
+
+Given(/^the battle viewer shows the (running|result) card (in a running turn|in a replay)$/, (s, card: string, how: string) => {
+  s.battleCard = card;
+  s.replay = how === "in a replay";
+});
+
+When(/^the player presses (A|B|X|Y|LB and RB|Menu)$/, (s, button: string) => {
+  s.battleDoes = battleButton(button as "A" | "B" | "X" | "Y" | "LB and RB" | "Menu", s.battleCard, s.replay);
+});
+
+Then("the battle does {string}", (s, does: string) => expect(s.battleDoes).toBe(does));
+
+When("the player taps the army {string} at {string} and then the province {string}", (s, army: string, at: string, province: string) => {
+  s.gesture = mapTouch({ tapArmy: army, armyAt: at, thenProvince: province });
+});
+
+Then("the army is ordered to march to {string} with no confirm step", (s, province: string) => {
+  expect(s.gesture).toEqual({ does: "march", target: province, selects: false, confirm: false });
+});
+
+// Layout (SHELL-115, SHELL-133)
+
+Given(/^the button "(Delete save|Exit to main menu)" is shown$/, (s, button: string) => {
+  s.panel = button === "Delete save" ? panelButtons("save card") : panelButtons("game_menu", sh(s).platform);
+  expect(s.panel).toContain(button);
+});
+
+When(/^the button "(Delete save|Exit to main menu)" is laid out$/, (s, _button: string) => {
+  s.hud = panelLayout(s.panel, sh(s).window);
+});
+
+Then(/^the End turn button is in the (\w+ \w+) corner$/, (s, corner: string) => {
+  s.corners = hudCorners(s.mainHand ?? "Right");
+  expect(s.corners.endTurn).toBe(corner);
+});
+
+Then(/^the game menu button is in the (\w+ \w+) corner$/, (s, corner: string) => expect(s.corners.gameMenu).toBe(corner));
+
+Then("the two are in opposite corners", (s) => expect(areOpposite(s.corners.endTurn, s.corners.gameMenu)).toBe(true));
+
+// New campaign (SHELL-033)
+
+Then("the end date can be 31 August of any year from {int} to {int}, 31 August {int} by default", (_s, from: number, to: number, def: number) => {
+  const c = endDateChoices();
+  expect(c.dates[0]).toBe(`${from}-08-31`);
+  expect(c.dates.at(-1)).toBe(`${to}-08-31`);
+  expect(c.default).toBe(`${def}-08-31`);
+  expect(isValidEndDate(`${from - 1}-08-31`)).toBe(false);
+  expect(isValidEndDate(`${to + 1}-08-31`)).toBe(false);
+});
+
+// Main menu focus and the first-launch question (SHELL-026, SHELL-131)
+
+Given("no campaign exists", (s) => {
+  s.menuState = { campaign: null, saves: 0, tutorialFinished: false };
+});
+
+When("the main menu opens", (s) => {
+  const shell = sh(s);
+  replaceAll(shell, { id: "title" });
+  tapToStart(shell, "touch");
+  const state = s.menuState ?? { campaign: null, saves: 0, tutorialFinished: false };
+  s.focusOverride = mainMenuFocus({ ...state, platform: shell.platform, edition: shell.edition });
+  acted(s);
+});
+
+Given("the game is launched for the first time and no campaign exists", (s) => {
+  replaceAll(sh(s), { id: "title" });
+  s.firstLaunch = { asked: false, campaignExists: false };
+});
+
+Then("the question {string} is asked with {string}", (s, question: string, choices: string) => {
+  s.flq = firstLaunchQuestion(s.firstLaunch);
+  expect(s.flq).toMatchObject({ question });
+  expect(s.flq.choices.join(", ")).toBe(choices);
+  s.focusOverride = s.flq.focus;
+});
+
+
+Then("chapter 0 of the tutorial starts", (s) => {
+  expect(s.flAnswer).toEqual({ opens: "tutorial chapter 0", guidedTurns: false });
+  expect(sh(s).events).toContainEqual({ type: "FirstLaunchAnswered", choice: "Play the tutorial" });
+});
+
+Then(/^the screen "new_campaign" opens with guided first turns (on|off)$/, (s, on: string) => {
+  expectTop(s, "new_campaign");
+  expect(s.flAnswer).toEqual({ opens: "new_campaign", guidedTurns: on === "on" });
+});
+
+Given("the first-launch question was answered", (s) => {
+  s.firstLaunch = { asked: true, campaignExists: false };
+});
+
+When("the game is started again and the player taps to start", (s) => {
+  replaceAll(sh(s), { id: "title" });
+  tapToStart(sh(s), "touch");
+  s.flq = firstLaunchQuestion(s.firstLaunch);
+  acted(s);
+});
+
+Then("the main menu folds open with no question", (s) => {
+  expect(s.flq).toBeNull();
+  expectTop(s, "main_menu");
+});
+
+// The turn (SHELL-073, SHELL-074)
+
+Then("the orders journal is closed with the turn's orders before the turn runs", (s) => {
+  const types = sh(s).events.map((e) => e.type);
+  expect(types.indexOf("OrdersJournalClosed")).toBeGreaterThanOrEqual(0);
+  expect(types.indexOf("OrdersJournalClosed")).toBeLessThan(types.indexOf("EndTurnPressed"));
+  expect(turnOf(sh(s)).month).toBeNull();
+});
+
+Then("the Resume save and the orders journal together hold the world before the turn", (_s) => {
+  expect(PRE_TURN).toBe("the Resume save and the orders journal");
+  expect(saveAfterKillDuringTurn()).toBe(PRE_TURN);
+});
+
+Given(/^this month (a fleet of )?"([^"]+)" fights at "([^"]+)" on the (\d+)(?:st|nd|rd|th)$/, (s, _fleet: string | undefined, realm: string, place: string, day: string) => {
+  s.month = { loop: monthLoop([{ place, day: Number(day) }], realm), events: [], report: [`A battle at ${place}`] };
+});
+
+Then("the battle starts on day {int}", (s, day: number) => {
+  if (!turnOf(sh(s)).month) runTurn(sh(s), s.month);
+  expect(turnOf(sh(s)).phase).toBe("battle");
+  expect(stoppedOnDay(sh(s))).toBe(day);
+});
+
+Then("the map flies to {string}", (s, place: string) => expect(sh(s).camera.on).toBe(place));
+
+Then('the screen "battle" opens on the running battle', (s) => {
+  expectTop(s, "battle");
+  expect(battleFrame(sh(s))!.battleCard).toBe("running");
+  expect(battleFrame(sh(s))!.replay).not.toBe(true);
+});
+
+Then("time passes in steps of 4 hours, 6 a day, while it runs", (s) => {
+  const v = battleView(sh(s));
+  expect(v.steps).toBe(6);
+  stepBattles(sh(s));
+  expect(battleView(sh(s)).hours).toBe(4);
+  expect(turnOf(sh(s)).hoursPassed).toBe(4);
+});
+Then("the battle view offers {string} and {string}", (s, a: string, b: string) => {
+  expect(battleView(sh(s)).buttons).toEqual([a, b]);
+  expect(battleViewButtons()).toEqual([a, b]);
+});
+Then("the battle view offers no way to skip to the result", (s) => {
+  expect(battleView(sh(s)).skip).toBe(false);
+  expect(battleButton("B", "running", false)).toBe("back to the map");
+});
+Given(/^this month "([^"]+)" fights at "([^"]+)" and at "([^"]+)" on the (\d+)(?:st|nd|rd|th)$/, (s, realm: string, a: string, b: string, day: string) => {
+  ensureCampaign(s);
+  s.month = { loop: monthLoop([{ place: a, day: Number(day) }, { place: b, day: Number(day) }], realm), events: [], report: ["Two battles"] };
+});
+Then("the battle switcher lists {string} and {string}, each with its progress", (s, a: string, b: string) => {
+  if (!turnOf(sh(s)).month) runTurn(sh(s), s.month);
+  const sw = battleSwitcher(sh(s));
+  expect(sw.map((x) => x.place)).toEqual([a, b]);
+  expect(sw.map((x) => x.progress)).toEqual(["0 / 6", "0 / 6"]);
+  expect(battleView(sh(s)).switcher).not.toBeNull();
+});
+Then("both battles show progress {string}", (s, progress: string) => {
+  expect(battleSwitcher(sh(s)).map((x) => x.progress)).toEqual([progress, progress]);
+});
+When("the player switches to the battle at {string}", (s, place: string) => {
+  const b = battleSwitcher(sh(s)).find((x) => x.place === place)!;
+  switchBattle(sh(s), b.id);
+});
+Then("the battle view shows {string}", (s, place: string) => {
+  expect(battleView(sh(s)).place).toBe(place);
+  expect(battleSwitcher(sh(s)).find((x) => x.shown)!.place).toBe(place);
+});
+Then("the battle at {string} is still running", (s, place: string) => {
+  expect(turnOf(sh(s)).running.find((x) => x.battle.place === place)!.outcome).toBeNull();
+  expect(battleFrame(sh(s))!.battleCard).toBe("running");
+});
+
+// A turn is one week (X-18, SHELL-137)
+Given(/^a campaign as "([^"]+)" is loaded on (\d+) (\w+) (\d+)$/, (s, realm: string, day: string, month: string, year: string) => {
+  loadCampaign(s, realm);
+  const c = sh(s).campaign!;
+  c.date = { year: Number(year), month: MONTH_NAMES.indexOf(month) + 1 };
+  c.day = Number(day);
+  expect(dayDate(c.date, c.day)).toBe(`${day} ${month} ${year}`);
+});
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function playWeek(s: Scenario): void {
+  const shell = sh(s);
+  if (!shell.stack.some((f) => f.id === "turn")) push(shell, { id: "turn" });
+  turnOf(shell).phase = "in progress";
+  s.weekLoop = monthLoop([]);
+  const before = s.weekLoop.day;
+  runTurn(shell, { loop: s.weekLoop, events: [], report: [] });
+  s.daysPlayed = s.weekLoop.day - before;
+}
+When("the turn runs to its end", (s) => playWeek(s));
+Then("the day loop has played {int} days", (s, n: number) => expect(s.daysPlayed).toBe(n));
+Then("the top bar shows {string}", (s, text: string) => {
+  const c = sh(s).campaign!;
+  expect(dayDate(c.date, c.day!)).toBe(text);
+});
+When("{int} more turns are played", (s, n: number) => {
+  for (let i = 0; i < n; i++) {
+    while (topId(sh(s)) !== "map") pop(sh(s));
+    playWeek(s);
+  }
+});

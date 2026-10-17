@@ -3,6 +3,7 @@ import { inflateRawSync } from "node:zlib";
 import { loadDefaultRuleset, type Ruleset } from "@ph/rules";
 import { createWorld, generateSyntheticRuleset, hashWorld, processTurn, Rng, type Order, type World } from "@ph/engine";
 import * as S from "@ph/engine/domain/saves";
+import { calendarDayOfIso, turnSpan } from "@ph/engine/domain/time-and-turns";
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("saves");
@@ -60,8 +61,10 @@ function ctx(s: Scenario, over: Partial<S.SaveContext> = {}): S.SaveContext {
 function world(s: Scenario): World {
   return (s.world ??= createWorld(s.rules ?? RULES, 7));
 }
-function setDate(w: World, d: { y: number; m: number }, turn?: number): void {
-  w.date = { year: d.y, month: d.m };
+/** Sets the month, keeping the day of the month when the engine's date has one (X-18 weekly turns). */
+function setDate(w: World, d: { y: number; m: number }, turn?: number, day?: number): void {
+  const old = w.date as { day?: number };
+  w.date = { ...w.date, year: d.y, month: d.m, ...(old.day !== undefined ? { day: day ?? old.day } : {}) } as World["date"];
   if (turn !== undefined) w.turn = turn;
 }
 function campaign(s: Scenario, nation = "Castile", ironman = false): S.Campaign {
@@ -115,7 +118,7 @@ function reheader(bytes: Uint8Array, edit: (h: S.SaveHeader) => void, editChunks
   return S.encodeSave(h, [...d.chunks.values()]);
 }
 
-/** End turn: run the month, write the Resume (or Ironman) save, and the autosave if the new turn is due one. */
+/** End turn: run the turn, write the Resume (or Ironman) save, and the autosave if the new turn is due one. */
 function endTurn(s: Scenario): void {
   const w = world(s);
   const c = campaign(s);
@@ -124,13 +127,19 @@ function endTurn(s: Scenario): void {
   s.endWrite = write(s, c.ironman ? "ironman" : "resume");
   turnStarts(s);
 }
-function turnStarts(s: Scenario): void {
+/** The month that begins in the turn starting on the world's date, or null (X-18); a month-only date begins its month. */
+function monthBeginsAt(w: World): number | null {
+  const d = w.date as { year: number; month: number; day?: number };
+  if (d.day === undefined) return d.month;
+  return turnSpan({ year: d.year, month: d.month, day: d.day }).monthBegins?.month ?? null;
+}
+function turnStarts(s: Scenario, monthBegins: number | null = monthBeginsAt(world(s))): void {
   const w = world(s);
   const c = campaign(s);
   const interval: S.AutosaveInterval = s.interval ?? S.AUTOSAVE_DEFAULTS.interval;
   const before = mine(s, "autosave").map((e) => e.path);
   s.autosaveWrite = undefined;
-  if (S.autosaveDue(interval, w.date.month, c.ironman)) s.autosaveWrite = write(s, "autosave", { keep: s.keep ?? S.AUTOSAVE_DEFAULTS.keep });
+  if (S.autosaveDue(interval, monthBegins, c.ironman)) s.autosaveWrite = write(s, "autosave", { keep: s.keep ?? S.AUTOSAVE_DEFAULTS.keep });
   s.autosaveBefore = before;
 }
 
@@ -318,7 +327,7 @@ function checkNotHeld(s: Scenario, thing: string): void {
 }
 
 Given("the autosave interval is {string}", (s, text: string) => {
-  const map: Record<string, S.AutosaveInterval> = { "every turn": 1, "every 6 turns": 6, "every 12 turns": 12, off: "off" };
+  const map: Record<string, S.AutosaveInterval> = { "every month": 1, "every 6 months": 6, "every 12 months": 12, off: "off" };
   s.interval = map[text];
   expect(s.interval, text).toBeDefined();
 });
@@ -338,11 +347,12 @@ Given("the campaign as {string} has {int} autosaves", (s, nation: string, n: num
   }
   expect(mine(s, "autosave")).toHaveLength(n);
 });
-When("a turn starts in {word}", (s, month: string) => {
+When("a turn starts on {string}", (s, iso: string) => {
   const w = world(s);
+  const span = turnSpan(calendarDayOfIso(iso));
   w.turn = 100;
-  w.date = { year: 1450, month: monthOf(month) };
-  turnStarts(s);
+  w.date = { year: span.first.year, month: span.first.month };
+  turnStarts(s, span.monthBegins?.month ?? null);
 });
 Then("a new autosave marked {string} is written and the oldest is removed", (s, mark: string) => {
   const a: S.Written = s.autosaveWrite;
@@ -377,9 +387,9 @@ Then("the offered counts are {string}", (s, list: string) => {
   expect(s.choices.counts.join(", ")).toBe(list);
 });
 
-When("the player ends the turn in January", (s) => {
+When("the player ends the turn in which January begins", (s) => {
   campaign(s);
-  setDate(world(s), { y: 1450, m: 12 }, 50);
+  setDate(world(s), { y: 1450, m: 12 }, 50, 29);
   endTurn(s);
   expect(world(s).date.month).toBe(1);
 });

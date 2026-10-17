@@ -42,6 +42,31 @@ export function snowClosed(p: Place, month: number): boolean {
   return inMonths(MOVE.snowClosedMonths[hemisphereOf(p)], month);
 }
 
+/** Month index of a date, for floods and other spans. */
+export const monthIndex = (d: { year: number; month: number }): number => d.year * 12 + d.month;
+
+/** A named ford counts as a bridge in summer and autumn of its hemisphere (4.1, D-MOVE-10). */
+export const fordUsable = (p: Place, month: number): boolean => !!p.ford && inMonths(MOVE.fordMonths[hemisphereOf(p)], month);
+
+/** From December to March a river at latitude 55° or more is frozen and crossed like a bridge (X-17, MOVE-117). */
+export const riverFrozen = (p: Place, month: number): boolean =>
+  !!p.river && Math.abs(p.latitude ?? 0) >= MOVE.frozenRivers.minLatitude && MOVE.frozenRivers.months.includes(month);
+
+/** A flood (an event) doubles a province's river days for 3 months from the month it starts (4.1, D-MOVE-10). */
+export function startFlood(w: MoveWorld, place: string): void {
+  placeOf(w, place).floodUntil = monthIndex(w.date) + MOVE.floodMonths;
+}
+export const flooded = (w: MoveWorld, p: Place): boolean => p.floodUntil !== undefined && monthIndex(w.date) < p.floodUntil;
+
+/** A river of Natural Earth scale rank 0 or 1 is a great river (D-MOVE-10). */
+export const riverKindOfRank = (rank: number): "river" | "great river" => (MOVE.greatRiverScaleRanks.includes(rank) ? "great river" : "river");
+
+/** No army forages in dunes (4.4). */
+export const canForage = (p: Place): boolean => !p.dunes;
+
+/** The day an army arrives: the day its walked days reach the step days, so a fraction rounds up (13.5 → day 14, D-MOVE-19). */
+export const arrivalDay = (days: number): number => Math.ceil(days - 1e-9);
+
 // ---- Step days (3.1) ----
 
 /** Road factor of one province: a pass counts as a road (4.2). */
@@ -65,11 +90,11 @@ export function bridgeUsable(w: MoveWorld, a: Army, to: string): boolean {
   return !!placeOf(w, to).bridge && hostileArmies(w, a, to).length === 0;
 }
 
-/** River days for this army entering `to`. */
+/** River days for this army entering `to`: none over a bridge or a ford in season, doubled in a flood. */
 export function riverDaysInto(w: MoveWorld, a: Army, to: string): number {
   const p = placeOf(w, to);
-  if (!p.river || bridgeUsable(w, a, to)) return 0;
-  return riverDays(a.men, p.river);
+  if (!p.river || bridgeUsable(w, a, to) || fordUsable(p, w.date.month) || riverFrozen(p, w.date.month)) return 0;
+  return riverDays(a.men, p.river) * (flooded(w, p) ? 2 : 1);
 }
 
 /** 2 days per 10,000 men or part to cross a strait by ferry (4.4). */
@@ -90,6 +115,9 @@ export function ferryOpen(w: MoveWorld, a: Army, from: string, to: string): Ente
 }
 
 export const gunsSlow = (a: Army): boolean => (a.bombards ?? 0) > 0 || (a.heavyGuns ?? 0) > 0;
+const hasGuns = (a: Army): boolean => gunsSlow(a) || (a.lightGuns ?? 0) > 0;
+/** Guns cross dunes only with camels (4.4). */
+export const dunesBarGuns = (a: Army, p: Place): boolean => !!p.dunes && hasGuns(a) && !a.camels;
 export const horseShareBonus = (a: Army): number => 1 + MARCH.horseSpeedBonus * (a.men > 0 ? Math.min(1, a.horse / a.men) : 0);
 export const cunningFactor = (a: Army): number => 1 + MOVE.cunningSpeed * (a.commander?.cunning ?? 0);
 
@@ -141,8 +169,14 @@ export function stepBreakdown(w: MoveWorld, a: Army, from: string, to: string): 
   if (isWater(pf) || !gt) return { ...none, reason: "needs ships" };
   if (pt.glacier) return { ...none, reason: "can't enter" };
   if ((a.bombards ?? 0) > 0 && gt === "mountains" && roadOf(pt) === "track") return { ...none, reason: "guns" };
+  if (dunesBarGuns(a, pt)) return { ...none, reason: "guns" };
   const horse = horseShareBonus(a);
-  const base = baseStepDays(MARCH, twoPlaceMap(pf, pt), 0, 1, { men: a.men, horse: a.horse, logistics: 0 });
+  // Dunes count 3 crossings instead of the ground's own (D-MOVE-11): half for each end that is dunes.
+  const dunesExtra = [pf, pt].reduce((n, p) => {
+    const g = groundOfPlace(p);
+    return n + (p.dunes && g ? (MOVE.dunesDaysToCross - (MARCH.daysToCross as Record<string, number>)[g]!) / 2 : 0);
+  }, 0);
+  const base = baseStepDays(MARCH, twoPlaceMap(pf, pt), 0, 1, { men: a.men, horse: a.horse, logistics: 0 }) + (dunesExtra * MARCH.daysPerCrossing) / horse;
   const crossing = (base * horse) / MARCH.daysPerCrossing;
   const column = pt.forageLimit !== undefined && a.men > pt.forageLimit ? MARCH.bigArmyExtraCrossings : 0;
   const road = roadFactor(pf, pt);
@@ -210,6 +244,7 @@ export function armyMayEnter(w: MoveWorld, a: Army, place: string): EnterVerdict
   if (!v.ok) return v;
   const gt = groundOfPlace(placeOf(w, place));
   if ((a.bombards ?? 0) > 0 && gt === "mountains" && roadOf(placeOf(w, place)) === "track") return { ok: false, reason: "guns" };
+  if (dunesBarGuns(a, placeOf(w, place))) return { ok: false, reason: "guns" };
   return v;
 }
 

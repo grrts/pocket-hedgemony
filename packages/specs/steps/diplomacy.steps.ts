@@ -393,7 +393,10 @@ Then("they have a {string} and both stances are {string}", (s, t: string, st: st
   expect(rel.has(g(s), t, a, b)).toBe(true);
   expect([rel.stance(g(s), a, b), rel.stance(g(s), b, a)]).toEqual([st, st]);
 });
-When("the country {string} proposes an alliance to the country {string}", (s, a: string, b: string) => attempt(s, () => D.proposeAlliance(w(s), a, b)));
+When("the country {string} proposes an alliance to the country {string}", (s, a: string, b: string) => {
+  s.count = D.countAsk(w(s), { action: "propose_alliance", asker: a, asked: b });
+  attempt(s, () => D.proposeAlliance(w(s), a, b));
+});
 Then("the alliance is refused because a stance is {string}", (s, t: string) => expect(s.error).toContain(t));
 When("relations between them improve until both stances are {string}", (s, t: string) => {
   act(s);
@@ -576,8 +579,8 @@ function causeWrong(s: Scenario, wrong: string, cause: string): void {
       return;
     case "Notorious deed": D.setBorder(d, "A", "B"); D.eventNotoriety(d, "B", num(/notoriety (\d+)/.exec(cause)![1]!)); return;
     case "Stirred revolt in our land": {
-      D.province(d, "pA", "A");
-      D.fundingCaught(d, D.fundRebels(d, "B", "pA", 10));
+      D.country(d, "A").revolutionSigns = 1;
+      D.fundingCaught(d, D.fundRebels(d, "B", "A"));
       return;
     }
   }
@@ -696,7 +699,7 @@ When("the country {string} gives its answer to {string}", (s, asked: string, ask
   w(s).envoys.push({ id: "e1", country: asker, person: "Envoy", personKind: "official", type: "", years: 0, action: "propose_alliance", target: asked, status: "court", sent: w(s).date, arrival: w(s).date, ask });
   s.count = D.decideMission(w(s), w(s).envoys[w(s).envoys.length - 1]!) ?? count;
 });
-Then("the country {string} sees no answer this turn", (s, a: string) => expect(D.lettersReceived(w(s), a)).toEqual([]));
+Then("the country {string} sees no answer yet", (s, a: string) => expect(D.lettersReceived(w(s), a)).toEqual([]));
 Then("in {string} the country {string} receives a letter with the answer and every reason and number", (s, date: string, a: string) => {
   D.advanceTo(w(s), date);
   const l = D.lettersReceived(w(s), a);
@@ -889,7 +892,7 @@ Given("the only land route from {string} to {string} crosses the country {string
   w(s).routes[D.pairKey(a, b)] = { land: [{ kind: "land", units: 10, crosses: [x] }] };
   s.pair = [a, b];
 });
-Given("the country {string} has denied passage to the country {string}", (s, x: string, a: string) => void w(s).passageDenied.push(D.key(x, a)));
+Given("the country {string} has denied passage to the country {string}", (s, x: string, a: string) => void w(s).passageDenied.push({ by: x, to: a, until: D.addMonths(D.monthOf(w(s).date), 24) }));
 Given("the country {string} is at peace with the country {string}", () => {});
 Then(/^the envoy (goes by sea or cannot be sent|goes by land)$/, (s, how: string) => {
   const r = D.envoyRoute(w(s), ...(s.pair as [string, string]));
@@ -920,7 +923,7 @@ Then("the person still travels", (s) => {
   expect((s.envoy as D.Envoy).instant).toBeUndefined();
   expect(D.daysBetween(s.envoy.sent, s.envoy.arrival)).toBeGreaterThan(0);
 });
-Then("the answer reaches {string} the next turn", (s, a: string) => {
+Then("the answer reaches {string} a month later", (s, a: string) => {
   expect(D.lettersReceived(w(s), a)).toEqual([]);
   D.advanceMonth(w(s));
   expect(D.lettersReceived(w(s), a).length).toBe(1);
@@ -990,11 +993,11 @@ Then("the ask arrives this turn with no travel time", (s) => {
   expect(w(s).events.some((e) => e.type === "AnswerGiven" && e.date === w(s).date)).toBe(true);
 });
 
-Given("the country {string} will declare war on the country {string}, an ally of {string}, next turn", (s, by: string, on: string, ally: string) => {
+Given("the country {string} will declare war on the country {string}, an ally of {string}, next month", (s, by: string, on: string, ally: string) => {
   addState(s, "alliance", on, ally);
   w(s).plannedWars.push({ by, on, month: D.addMonths(D.monthOf(w(s).date), 1) });
 });
-Then("the country {string} is warned this turn", (s, a: string) => expect(D.residentWarnings(w(s), a).length).toBe(1));
+Then("the country {string} is warned now", (s, a: string) => expect(D.residentWarnings(w(s), a).length).toBe(1));
 
 When("the country {string} makes a courtesy visit to the country {string}", (s, a: string, b: string) => {
   act(s);
@@ -1087,9 +1090,9 @@ When(/^"([^"]*)", a subject of "([^"]*)", starts its independence war$/, (s, a: 
   rel.makeSubject(g(s), a, ov);
   rel.independenceWar(g(s), a);
 });
-When(/^"([^"]*)" declares war after refusing a demand of "([^"]*)"$/, (s, a: string, b: string) => {
+When(/^"([^"]*)" declares war after "([^"]*)" refused its demand$/, (s, a: string, b: string) => {
   act(s);
-  D.demandRefused(w(s), b, a, "pay_tribute");
+  D.demandRefused(w(s), a, b, "pay_tribute");
   D.declareWar(w(s), a, b);
 });
 const callsTo = (s: Scenario, x: string) => w(s).calls.filter((k) => k.called === x);
@@ -1172,7 +1175,7 @@ Given("the country {string} has courted him for {int} months", (s, a: string, m:
   D.courtLord(w(s), a, s.lord);
   w(s).courtings[0]!.since = D.addMonths(D.monthOf(w(s).date), -m);
 });
-When("the turn ends", (s) => {
+When("the next month begins", (s) => {
   act(s);
   D.advanceMonth(w(s));
 });
@@ -1233,7 +1236,10 @@ Then("{string} gets an offensive call in {string}", (s, x: string, m: string) =>
 Then("{string} and {string} get defensive calls in {string}", (s, x: string, y: string, m: string) => {
   for (const z of [x, y]) expect(callsTo(s, z).some((k) => k.kind === "defensive" && k.issued === m)).toBe(true);
 });
-Then("{string} joins by its kind", (s, v: string) => expect(rel.has(g(s), "at_war", v, "A")).toBe(true));
+Then("{string} joins by its kind", (s, v: string) => {
+  // D-DIPL-10: a Vassal is called and answers by its loyalty (subjects context).
+  expect(rel.has(g(s), "at_war", v, "A") || callsTo(s, v).some((k) => k.via === "subject" && k.against === "A")).toBe(true);
+});
 Then("{string} is called against {string}", (s, l: string, x: string) => expect(callsTo(s, l).some((k) => k.against === x && k.via === "league")).toBe(true));
 Then("the answers arrive in {string}", (s, m: string) => expect(w(s).calls.every((k) => k.answerOn === m || k.answer)).toBe(true));
 
@@ -1291,62 +1297,77 @@ Then("the country {string} holds the war aim {string} against {string} until {st
 
 // ---------------------------------------------------------------- funding rebels
 
+/** A target with a brewing revolution and 1200 gold a year, unless the scenario set it. */
+function brewing(s: Scenario, b: string): void {
+  const k = c(s, b);
+  if (!k.yearlyIncome) k.yearlyIncome = 1200;
+  if (s.signs === undefined && !k.revolutionSigns) k.revolutionSigns = 1;
+}
 Given("the country {string} has a free envoy seat", (s, a: string) => expect(D.freeSeats(w(s), a)).toBeGreaterThan(0));
 Given("the country {string} is a rival of the country {string}", (s, a: string, b: string) => void rel.setRival(g(s), a, b, "trade in Lombardy"));
 Given("the country {string} is an ally of the country {string}", (s, a: string, b: string) => void addState(s, "alliance", a, b));
-When("the country {string} funds rebels in a province of {string} with {int} gold a month", (s, a: string, b: string, gold: number) => {
-  D.province(w(s), "Bergamo", b);
-  attempt(s, () => D.fundRebels(w(s), a, "Bergamo", gold));
+Given("the revolution card of {string} shows {int} signs", (s, b: string, n: number) => {
+  c(s, b).revolutionSigns = n;
+  s.signs = n;
+});
+Given("the country {string} earns {int} gold a year and its revolution card shows {int} sign", (s, b: string, gold: number, n: number) => {
+  c(s, b).yearlyIncome = gold;
+  c(s, b).revolutionSigns = n;
+});
+When("the country {string} funds rebels in {string}", (s, a: string, b: string) => {
+  brewing(s, b);
+  s.eventsBefore = w(s).events.length;
+  s.funder = a;
+  attempt(s, () => D.fundRebels(w(s), a, b));
 });
 Then(/^the funding is (started|refused)$/, (s, r: string) => (r === "refused" ? expect(s.error).toBeDefined() : expect(s.error).toBeUndefined()));
-When("the country {string} funds rebels in the province {string} of {string}", (s, a: string, p: string, b: string) => {
-  act(s);
-  s.eventsBefore = w(s).events.length;
-  D.province(w(s), p, b);
-  D.fundRebels(w(s), a, p, D.config.actions.fund_rebels.gold_per_month_choices[0]!);
+Then("the country {string} pays {int} gold each month", (s, a: string, n: number) => {
+  const before = c(s, a).gold;
+  D.advanceMonth(w(s), rngWhere((x) => x >= D.caughtChance()));
+  expect(before - c(s, a).gold).toBe(n);
 });
 Then("the country {string} is told nothing", (s, b: string) => {
   expect(w(s).events.slice(s.eventsBefore).some((e) => JSON.stringify(e).includes(b))).toBe(false);
   expect(w(s).letters.some((l) => l.to === b)).toBe(false);
 });
-Given("the country {string} funds the province {string} of {string} with {int} gold a month", (s, a: string, p: string, b: string, gold: number) => {
-  D.province(w(s), p, b);
-  D.fundRebels(w(s), a, p, gold);
-  s.prov = p;
+When("the country {string} stops the funding in {string}", (s, a: string, b: string) => {
+  act(s);
+  D.stopFunding(w(s), a, b);
 });
-Then("the province {string} has the grievance {string}", (s, p: string, gr: string) => expect(D.fundedEffects(w(s), p).grievances).toContain(gr));
-Then("riots in {string} need one grievance fewer", (s, p: string) => expect(D.fundedEffects(w(s), p).riotGrievancesFewer).toBe(1));
-Then("rebels in {string} count as Armed and do not shrink while left to wait", (s, p: string) => {
-  const e = D.fundedEffects(w(s), p);
-  expect(e.rebelsArmed && e.rebelsDontShrink).toBe(true);
+Then("the envoy of {string} comes home", (s, a: string) => {
+  expect(w(s).envoys.find((e) => e.country === a && e.action === "fund_rebels")?.status).toBe("home");
+  expect(w(s).fundings).toEqual([]);
 });
-Then(/^the province "([^"]*)" (is|is not) a sign for the revolution camp of "([^"]*)"$/, (s, p: string, is: string) => expect(D.fundedEffects(w(s), p).revolutionSign).toBe(is === "is"));
+Then("{string} carries the flag {string}", (s, b: string, flag: string) => {
+  expect(flag).toBe(D.config.actions.fund_rebels.flag);
+  expect(D.revolutionFunded(w(s), b)).toBe(true);
+});
 Given("an émigré court of the old dynasty of {string} sits in {string}", (s, target: string, host: string) => void (s.emigre = { target, host }));
 When("the country {string} funds it", (s, a: string) => {
   act(s);
-  s.funding = D.fundEmigreCourt(w(s), a, `Émigré court of ${s.emigre.target}`, s.emigre.target, D.config.actions.fund_rebels.gold_per_month_choices[0]!);
+  c(s, s.emigre.target).yearlyIncome = 1200;
+  s.funding = D.fundEmigreCourt(w(s), a, `Émigré court of ${s.emigre.target}`, s.emigre.target);
 });
 Then("it is funded under the same rules as rebels", (s) => {
   expect(w(s).fundings).toContain(s.funding);
-  expect(() => D.fundEmigreCourt(structuredClone(w(s)), "Austria", "x", s.emigre.target, 30)).toThrow();
+  expect(s.funding.gold).toBe(D.fundingGold(w(s), s.emigre.target));
 });
-Given(/^the funded province is (run by a Steward|run by a Judge|held by a lord)$/, (s, how: string) => void (s.runBy = how === "held by a lord" ? "lord" : how === "run by a Judge" ? "judge" : "steward"));
-Then("each turn the chance of being caught is 1 in {int}", (s, n: number) => expect(D.caughtChance(s.runBy)).toBeCloseTo(1 / n));
-When("the funding of {string} in {string} of {string} is caught", (s, a: string, p: string, b: string) => {
+Then("each month the chance of being caught is {int} in {int}", (s, a: number, n: number) => expect(D.caughtChance()).toBeCloseTo(a / n));
+When("the funding of {string} in {string} is caught", (s, a: string, b: string) => {
   act(s);
-  D.province(w(s), p, b);
-  w(s).lords.push({ name: `Lord of ${b}`, country: b, loyalty: "loyal", provinces: [] });
-  D.fundingCaught(w(s), D.fundRebels(w(s), a, p, 25));
+  brewing(s, b);
+  D.fundingCaught(w(s), D.fundRebels(w(s), a, b));
   s.funder = a;
 });
 Then("the envoy of {string} is held and the funding stops", (s, a: string) => {
   expect(w(s).envoys.find((e) => e.country === a && e.action === "fund_rebels")?.status).toBe("held");
   expect(w(s).fundings).toEqual([]);
 });
-Then("every lord and royal province of {string} that hears of it has the grievance {string} until {string}", (s, b: string, gr: string, until: string) => {
-  for (const p of Object.values(w(s).provinces).filter((x) => x.owner === b)) expect(p.grievances).toContainEqual({ name: gr, until });
-  for (const l of w(s).lords.filter((x) => x.country === b)) expect(w(s).events.some((e) => e.type === "Grievance" && e.lord === l.name && e.until === until)).toBe(true);
+When(/^the revolution in "([^"]*)" wins with a regime (not hostile to|hostile to) the form of rule of "([^"]*)"$/, (s, b: string, how: string) => {
+  act(s);
+  D.revolutionWon(w(s), b, () => how === "hostile to");
 });
+Then("the ledger of {string} toward {string} does not hold {string}", (s, a: string, b: string, name: string) => expect(D.ledgerOf(w(s), a, b).some((x) => x.name === name)).toBe(false));
 Then("the country {string} learns it was caught in {string}", (s, a: string, m: string) => {
   expect(D.lettersReceived(w(s), a)).toEqual([]);
   expect(w(s).letters.find((l) => l.to === a)?.deliverOn).toBe(m);
@@ -1391,7 +1412,7 @@ Given("{int} country is already in the league", (s, n: number) => void (s.member
 Given("{string} and {string} share a faith", (s, a: string, b: string) => void (c(s, a).faith = c(s, b).faith = "catholic"));
 const leagueCountOf = (s: Scenario) => D.leagueCount(w(s), s.leagueOf[0], s.leagueOf[1], s.members ?? 0);
 Then("the count of {string} holds these reasons:", (s, _a: string, table: Table) => {
-  s.count = leagueCountOf(s);
+  if (s.leagueOf) s.count = leagueCountOf(s);
   for (const [name, n] of table.slice(1)) expect(D.reasonNumber(s.count, name!), name).toBe(Number(n));
 });
 Then(/^the count of "([^"]*)" holds "([^"]*)" at ([+-]?\d+)$/, (s, _a: string, name: string, n: string) => expect(D.reasonNumber(leagueCountOf(s), name)).toBe(Number(n)));
@@ -1726,8 +1747,8 @@ When("the country {string} refuses the demand {string} of {string}", (s, b: stri
 });
 When(/^"([^"]*)" catches "([^"]*)" funding rebels in its land$/, (s, a: string, b: string) => {
   act(s);
-  D.province(w(s), "Own land", a);
-  D.fundingCaught(w(s), D.fundRebels(w(s), b, "Own land", 10));
+  c(s, a).revolutionSigns = 1;
+  D.fundingCaught(w(s), D.fundRebels(w(s), b, a));
 });
 Given("the country {string} holds no other aim against {string}", (s, a: string, b: string) =>
   expect(D.warAimsOf(w(s), a, b).every((x) => x.aim === "raid" || x.aim === "no_aim")).toBe(true));
@@ -1977,11 +1998,12 @@ Given("the AI country {string} has posture {string}, a free seat and gold to spa
   c(s, a).goldToSpare = true;
   s.fundingAi = a;
 });
-Given("a province of its rival {string} has {int} grievances", (s, b: string, n: number) => {
+Given("the revolution card of its rival {string} shows {int} signs", (s, b: string, n: number) => {
   rel.setRival(g(s), s.fundingAi, b, "a frontier");
-  D.province(w(s), "Restless", b).grievances.push(...Array.from({ length: n }, (_, i) => ({ name: `Grievance ${i}` })));
+  c(s, b).revolutionSigns = n;
+  s.rivalB = b;
 });
-Then(/^the AI country "([^"]*)" (may|does not) fund rebels there$/, (s, _a: string, how: string) => expect((s.fundTargets as string[]).includes("Restless")).toBe(how === "may"));
+Then(/^the AI country "([^"]*)" (may|does not) fund rebels there$/, (s, _a: string, how: string) => expect((s.fundTargets as string[]).includes(s.rivalB)).toBe(how === "may"));
 
 // ---------------------------------------------------------------- lens and strip
 
@@ -2016,3 +2038,452 @@ Given(/^the country "([^"]*)" has 3 seats: one free, one on the road to "([^"]*)
   s.subject = a;
 });
 Then("the envoys strip shows {string}, {string} and {string}", (s, x: string, y: string, z: string) => expect(D.envoysStrip(w(s), s.subject)).toEqual([x, y, z]));
+
+// ---------------------------------------------------------------- decided questions (D-DIPL-*)
+
+// D-DIPL-2: an offensive refusal breaks nothing.
+When("the country {string} refuses the offensive call", (s, x: string) => {
+  act(s);
+  s.oathsBefore = c(s, x).oaths.length;
+  D.answerCall(w(s), D.pendingCall(w(s), x)!, false);
+  s.refuser = x;
+});
+Then("{string} and {string} are still allied", (s, a: string, b: string) => expect(rel.has(g(s), "alliance", a, b)).toBe(true));
+Then("no tie or wrong is added", (s) => {
+  const x = s.refuser as string;
+  expect(c(s, x).oaths.length).toBe(s.oathsBefore);
+  expect(Object.values(w(s).ledgers).flat().some((e) => e.key === "abandoned_us" || e.key === "answered_our_call")).toBe(false);
+});
+
+// DIPL-099, DIPL-100
+When("the country {string} calls the country {string} to arms", (s, a: string, b: string) => {
+  act(s);
+  addState(s, "alliance", a, b);
+  D.declareWar(w(s), a, `the enemy of ${a}`);
+  s.call = D.pendingCall(w(s), b);
+});
+Then("the call reaches {string} in {string}", (s, b: string, m: string) => {
+  expect(s.call.called).toBe(b);
+  expect(s.call.issued).toBe(m);
+});
+Then("{string} learns the answer in {string}", (s, a: string, m: string) => {
+  expect(s.call.caller).toBe(a);
+  expect(s.call.answerOn).toBe(m);
+});
+Given("the country {string} joined the war of {string}", (s, ally: string, caller: string) => {
+  addState(s, "alliance", caller, ally);
+  D.declareWar(w(s), caller, "Ottomans");
+  D.answerCall(w(s), D.pendingCall(w(s), ally)!, true);
+  s.pair = [caller, ally];
+});
+Then("the armies of {string} stay under the command of {string}", (s, a: string, b: string) => {
+  expect(a).toBe(b);
+  const war = D.warOf(w(s), a)!;
+  expect(war.attackers).toContain(a);
+  expect(war.declarer).not.toBe(a);
+});
+Then("{string} counts its own peace voices", (s, a: string) => {
+  c(s, a).peaceVoicesForPeace = 0.6;
+  w(s).era = "III";
+  const war = D.warOf(w(s), a)!;
+  expect(D.manySidedPeace(w(s), [war.attackers, war.defenders]).signs[a]).toBe(true);
+  w(s).era = undefined as unknown as string;
+  delete w(s).era;
+  c(s, a).peaceVoicesForPeace = 0;
+});
+When("{string} makes peace with the country {string}", (s, a: string, _b: string) => {
+  act(s);
+  D.endWar(w(s), D.warOf(w(s), a)!);
+});
+Then("{string} is named in the peace and gets the truce", (s, a: string) => expect(rel.has(g(s), "truce", a, "Ottomans")).toBe(true));
+
+// DIPL-148, DIPL-189, D-DIPL-33
+Given("the country {string} holds the aim {string} for {string} from the Want of its lord John Hunyadi", (s, a: string, _aim: string, p: string) => {
+  D.province(w(s), p, "Ottomans");
+  w(s).lords.push({ name: "John Hunyadi", country: a, loyalty: "loyal", provinces: [], wants: [p] });
+  s.declarer = a;
+});
+Given("the country {string} is allied with {string} and {string}", (s, a: string, b: string, x: string) => {
+  addState(s, "alliance", a, b);
+  addState(s, "alliance", a, x);
+});
+Given("the country {string} is a tributary of {string}", (s, a: string, b: string) => void rel.makeSubject(g(s), a, b, "tributary"));
+When("the player opens the war declaration sheet against {string}", (s, b: string) => {
+  act(s);
+  c(s, s.declarer).peaceVoicesForPeace = 0.25;
+  s.sheet = D.declarationSheet(w(s), s.declarer, b, "take_land");
+});
+Then("the sheet shows the aim {string} and its source", (s, aim: string) => {
+  expect(s.sheet.aim).toBe(aim);
+  expect(s.sheet.source).toBe("a lord's Want");
+});
+Then("the sheet shows {string} and {string} as called on the side of {string}", (s, x: string, y: string, a: string) => {
+  for (const k of [x, y]) expect(s.sheet.sides).toContainEqual(expect.objectContaining({ country: k, side: a, how: "called" }));
+});
+Then("the sheet shows {string} as a tributary of the {string} that does not join", (s, x: string, b: string) =>
+  expect(s.sheet.sides).toContainEqual(expect.objectContaining({ country: x, side: b, how: "tributary, does not join" })));
+Then("the sheet shows how many of the voices of {string} lean to peace", (s, _a: string) => expect(s.sheet.peaceVoices).toBe(0.25));
+Then("the sheet does not show how the called countries will answer", (s) => expect(JSON.stringify(s.sheet)).not.toMatch(/answer"|yes|will join/));
+Then("the sheet offers {string} and {string}", (s, x: string, y: string) => expect(s.sheet.choices).toEqual([x, y]));
+
+// DIPL-151
+Given("the country {string} holds the aim {string} against {string} and borders {string}", (s, a: string, aim: string, b: string, n: string) => {
+  D.setBorder(w(s), a, n);
+  if (aim !== "No aim") D.grantAim(w(s), { holder: a, target: b, aim: D.aimId(aim), source: "test" });
+  s.declarer = a;
+});
+Then("every country sees the aim {string}", (s, aim: string) => {
+  expect(s.error).toBeUndefined();
+  expect(w(s).events.some((e) => e.type === "WarDeclared" && e.aim === aim && e.public === true)).toBe(true);
+});
+Then(/^every neighbour of "([^"]*)" (gains|does not gain) the wrong "([^"]*)" toward "([^"]*)"$/, (s, a: string, how: string, name: string) => {
+  for (const n of D.neighbours(w(s), a)) {
+    if (n === "B") continue;
+    expect(D.ledgerOf(w(s), n, a).some((e) => e.name === name)).toBe(how === "gains");
+  }
+});
+
+// DIPL-150, DIPL-152, D-DIPL-10
+Given("the country {string} is a subject of {string} of the relation kind {string}", (s, a: string, b: string, kind: string) => void rel.makeSubject(g(s), a, b, kind));
+Given(/^the country "([^"]*)" (borders|does not border) the country "([^"]*)"$/, (s, a: string, how: string, b: string) => {
+  if (how === "borders") D.setBorder(w(s), a, b);
+});
+Then(/^"([^"]*)" is at war with "([^"]*)"$/, (s, a: string, b: string) => expect(rel.has(g(s), "at_war", a, b)).toBe(true));
+Then(/^"([^"]*)" gets a call against "([^"]*)"$/, (s, a: string, b: string) => expect(callsTo(s, a).some((k) => k.via === "subject" && k.against === b)).toBe(true));
+Then(/^"([^"]*)" stays out of the war$/, (s, a: string) => {
+  expect(rel.has(g(s), "at_war", a, "A")).toBe(false);
+  expect(callsTo(s, a)).toEqual([]);
+});
+
+// DIPL-115, D-DIPL-5
+Given("the country {string} refused the demand of the country {string}", (s, b: string, a: string) => {
+  w(s).lords.push({ name: "Calm lord", country: a, loyalty: "loyal", provinces: [] });
+  D.demandRefused(w(s), a, b, "pay_tribute");
+  s.pair = [a, b];
+});
+When("the country {string} declares war on {string} with the aim from the refusal", (s, a: string, b: string) => {
+  act(s);
+  s.war = D.declareWar(w(s), a, b, { aim: "tribute" });
+});
+Then("the lords of {string} who are not Warlike do not waver", (s, a: string) => {
+  expect(s.war.provokedBy).toBe(s.pair[1]);
+  expect(D.config.actions.demand.on_refusal.lords_not_warlike_waver).toBe(false);
+  expect(w(s).lords.filter((l) => l.country === a && !l.warlike).every((l) => l.loyalty === "loyal")).toBe(true);
+});
+Then("offensive calls of {string} to its allies hold {string} at +{int}", (s, a: string, name: string, n: number) => {
+  for (const ally of rel.alliesOf(g(s), a)) {
+    const k = callsTo(s, ally)[0]!;
+    expect(k.kind).toBe("offensive");
+    const count = D.countAsk(w(s), { action: "call_to_arms", asker: a, asked: ally, callKind: "offensive", callTarget: k.against });
+    expect(D.reasonNumber(count, name)).toBe(n);
+  }
+});
+Then("the allies of {string} get no defensive call", (s, b: string) => {
+  for (const ally of rel.alliesOf(g(s), b)) expect(callsTo(s, ally).some((k) => k.kind === "defensive")).toBe(false);
+});
+
+// DIPL-049, D-DIPL-13
+Given("the country {string} has {int} provinces and knows {string}", (s, a: string, n: number, inv: string) => {
+  c(s, a).provinces = n;
+  c(s, a).inventions.push(inv);
+});
+When("the country {string} falls to {int} provinces", (s, a: string, n: number) => {
+  act(s);
+  D.setProvinceCount(w(s), a, n);
+});
+Given("the country {string} has residents in {string} since {string} and in {string} since {string} and an envoy on the road to {string}", (s, a: string, b: string, sb: string, x: string, sx: string, dd: string) => {
+  for (const [t, since] of [[b, sb], [x, sx]] as const) {
+    D.sendEnvoy(w(s), { country: a, target: t, action: "make_resident" });
+    const e = w(s).envoys.find((e) => e.target === t)!;
+    e.status = "resident";
+    e.residentSince = since;
+  }
+  w(s).routes[D.pairKey(a, dd)] = { land: [{ kind: "land", units: 40 }] };
+  D.sendEnvoy(w(s), { country: a, target: dd, action: "courtesy_visit" });
+  s.sender = a;
+});
+Then("the resident in {string} is recalled", (s, t: string) => expect(w(s).envoys.find((e) => e.target === t)?.status).toBe("home"));
+Then("the resident in {string} stays", (s, t: string) => expect(w(s).envoys.find((e) => e.target === t)?.status).toBe("resident"));
+Then("the envoy to {string} finishes its mission", (s, t: string) => expect(w(s).envoys.find((e) => e.target === t)?.status).toBe("road"));
+
+// DIPL-165
+Then("only countries that know {string} may make residents", (s, inv: string) => {
+  expect(D.config.envoys.resident.requires_invention).toBe(inv);
+  expect(() => D.sendEnvoy(w(s), { country: "Castile", target: "Venice", action: "make_resident" })).toThrow();
+  c(s, "Milan").inventions.push(inv);
+  expect(() => D.sendEnvoy(w(s), { country: "Milan", target: "Venice", action: "make_resident" })).not.toThrow();
+});
+Then("the Italian states start knowing {string}", (_s, inv: string) => {
+  const research = JSON.parse(readFileSync(new URL("../../rules/data/domain/research.json", import.meta.url), "utf8")) as { inventions: { id: string; start_regions?: string[] }[] };
+  expect(research.inventions.find((x) => x.id === inv)?.start_regions).toContain("Italian states");
+});
+
+// DIPL-168, D-DIPL-11
+Given("the allies {string} and {string} share a mobilisation pact", (s, a: string, b: string) => {
+  addState(s, "alliance", a, b);
+  D.markMobilisationPact(w(s), a, b);
+});
+When("the country {string} sends an offensive call to {string}", (s, a: string, b: string) => {
+  act(s);
+  s.count = D.countAsk(w(s), { action: "call_to_arms", asker: a, asked: b, callKind: "offensive", callTarget: "Serbia" });
+});
+Then("the call holds +{int} for the pact", (s, n: number) => expect(D.reasonNumber(s.count, "Our mobilisation pact")).toBe(n));
+
+// DIPL-174, D-DIPL-26
+Given("the country {string} has {int} Lands taken", (s, a: string, n: number) => void (c(s, a).landsTaken = n));
+When("an event adds notoriety {int} to {string}", (s, n: number, a: string) => {
+  act(s);
+  D.setBorder(w(s), a, "Border");
+  c(s, a).seaZones = ["Adriatic"];
+  c(s, "Seafarer").seaZones = ["Adriatic"];
+  c(s, "Landlocked").seaZones = [];
+  D.tradePactAgreed(w(s), a, "Trader");
+  D.eventNotoriety(w(s), a, n);
+});
+Then("every country that shares a border, a sea zone or a trade pact with {string} gains the wrong {string} at {int} fading over {int} years", (s, a: string, name: string, n: number, y: number) => {
+  for (const k of ["Border", "Seafarer", "Trader"]) {
+    const e = D.ledgerOf(w(s), k, a).find((x) => x.name === name);
+    expect(e?.weight).toBe(n);
+    expect(e?.fadeYears).toBe(y);
+  }
+  expect(D.ledgerOf(w(s), "Landlocked", a).some((x) => x.name === name)).toBe(false);
+});
+Then("the Lands taken of {string} are still {int}", (s, a: string, n: number) => expect(c(s, a).landsTaken).toBe(n));
+Then("the notoriety of {string} is {int}", (s, a: string, n: number) => expect(D.notoriety(w(s), a)).toBe(n));
+Then("the notoriety of {string} never reads above {int}", (s, a: string, n: number) => {
+  D.eventNotoriety(w(s), a, 100);
+  expect(D.notoriety(w(s), a)).toBe(n);
+});
+
+// DIPL-132, D-DIPL-4
+Given("the lord {string} of {string} is Warlike and wants a war with {string}", (s, lord: string, a: string, b: string) =>
+  void w(s).lords.push({ name: lord, country: a, loyalty: "wavering", provinces: [], warlike: true, wantsWarWith: b }));
+Then("the loyalty of {string} rises one step", (s, lord: string) => expect(w(s).lords.find((l) => l.name === lord)?.loyalty).toBe("loyal"));
+Given("the stance between {string} and {string} is {string}", (s, a: string, b: string, t: string) => {
+  rel.setStance(g(s), a, b, t);
+  rel.setStance(g(s), b, a, t);
+});
+
+// DIPL-163, DIPL-164, D-DIPL-25
+When("an event starts a league against {string} with only {string} in it", (s, x: string, m: string) => {
+  act(s);
+  D.eventEffect(w(s), "league", { target: x, holder: m });
+});
+Then("the league against {string} exists with {int} member", (s, x: string, n: number) => expect(D.leagueAgainst(w(s), x)?.members.length).toBe(n));
+Given("the era is {string} and an event started a league against {string} with {string}", (s, era: string, x: string, m: string) => {
+  w(s).era = era;
+  c(s, x).landsTaken = 9;
+  D.formLeague(w(s), x, [m, "Member 1"], "event");
+  s.conqueror = x;
+});
+
+// DIPL-078, DIPL-079, DIPL-091
+Then("the count holds the reason {string} at {int}", (s, name: string, n: number) => expect(D.reasonNumber(s.count, name)).toBe(n));
+Given("the country {string} took {int} provinces bordering the country {string} in the last 20 years", (s, a: string, n: number, b: string) => {
+  for (let i = 0; i < n; i++) D.province(w(s), `Frontier ${i}`, b).borders.push(b);
+  D.provincesTaken(w(s), a, "Third", Array.from({ length: n }, (_, i) => `Frontier ${i}`));
+});
+Given("the Lands taken of {string} include {int} provinces bordering the country {string}", (s, a: string, n: number, b: string) => {
+  for (let i = 0; i < n; i++) D.province(w(s), `Frontier ${i}`, b).borders.push(b);
+  D.provincesTaken(w(s), a, "Third", Array.from({ length: n }, (_, i) => `Frontier ${i}`));
+});
+When("the country {string} asks the country {string} for anything", (s, a: string, b: string) => {
+  act(s);
+  s.counts = ["propose_alliance", "trade_pact", "swear_peace", "ask_passage", "arrange_marriage"].map((action) => D.countAsk(w(s), { action, asker: a, asked: b }));
+  s.count = s.counts[0];
+});
+
+// DIPL-154, X-11
+When(/^the countries "([^"]*)" and "([^"]*)" sign a peace that (is a white peace|pays gold only|moves a province|makes "[^"]*" a subject)$/, (s, a: string, b: string, terms: string) => {
+  act(s);
+  addState(s, "at_war", a, b);
+  const months = D.truceMonthsAfterPeace({ white: terms === "is a white peace", landOrSubject: terms === "moves a province" || terms.startsWith("makes") });
+  rel.makePeace(g(s), a, b, { truceMonths: months });
+  s.pair = [a, b];
+});
+Then("their truce lasts until {string}", (s, m: string) => expect(rel.find(g(s), "truce", ...(s.pair as [string, string]))[0]?.expires_on?.slice(0, 7)).toBe(m));
+
+// DIPL-040 … DIPL-042
+Then("the rival stance may not change yet", (s) => expect(rel.rivalMayChange(g(s), ...(s.pair as [string, string]))).toBe(false));
+
+// DIPL-126, D-DIPL-32
+Given("the country {string} has {int} neighbours Hostile toward it or holding a claim on it", (s, b: string, n: number) => {
+  for (let i = 0; i < n; i++) {
+    D.setBorder(w(s), b, `Threat ${i}`);
+    rel.setStance(g(s), `Threat ${i}`, b, "hostile");
+  }
+});
+Given(/^the country "([^"]*)" (has|has not) pledged protection to "([^"]*)"$/, (s, a: string, how: string, b: string) => {
+  if (how === "has") D.pledgeProtection(w(s), a, b);
+});
+Given("the country {string} has {int} castles", (s, b: string, n: number) => void (c(s, b).castles = n));
+When("the country {string} offers overlordship to the country {string}", (s, a: string, b: string) => {
+  act(s);
+  s.count = D.countAsk(w(s), { action: "offer_overlordship", asker: a, asked: b });
+});
+Then("the offer's own reasons total {int}", (s, n: number) => expect(D.ownTotal(s.count)).toBe(n));
+
+// DIPL-143, D-DIPL-8
+Given("the country {string} has the subject {string}", (s, b: string, sub: string) => void rel.makeSubject(g(s), sub, b, "vassal"));
+Given(/^"([^"]*)" is (Hostile|Friendly) toward "([^"]*)"$/, (s, a: string, t: string, b: string) => void rel.setStance(g(s), a, b, t.toLowerCase()));
+Given(/^"([^"]*)" asked "([^"]*)" for help$/, (s, sub: string, a: string) => void D.askForHelp(w(s), sub, a));
+
+// DIPL-118, D-DIPL-21
+Given(/^the country "([^"]*)" (refused passage to|revoked the passage of|never granted passage to) the country "([^"]*)"$/, (s, b: string, how: string, a: string) => {
+  w(s).routes[D.pairKey(a, "Far")] = { land: [{ kind: "land", units: 5, crosses: [b] }] };
+  if (how === "refused passage to") D.applyAnswer(w(s), { action: "ask_passage", asker: a, asked: b }, false);
+  if (how === "revoked the passage of") {
+    D.grantPassage(w(s), b, a);
+    D.revokePassage(w(s), b, a);
+  }
+  s.pair = [a, b];
+});
+When("{int} months pass", (s, n: number) => {
+  act(s);
+  for (let i = 0; i < n; i++) D.advanceMonth(w(s));
+});
+Then(/^the envoys of "([^"]*)" (may|may not) cross "([^"]*)"$/, (s, a: string, how: string) => expect(D.envoyRoute(w(s), a, "Far").by === "land").toBe(how === "may"));
+
+// DIPL-192, D-DIPL-19
+Given("the ledger of {string} toward {string} holds entries totalling {int}", (s, a: string, b: string, n: number) => {
+  for (let left = n; left !== 0; ) {
+    const step = Math.max(-100, Math.min(100, left));
+    D.addEntry(w(s), a, b, { key: `test${left}`, name: "Test", weight: step });
+    left -= step;
+  }
+  s.pair = [a, b];
+});
+Then("the standing of {string} toward {string} reads {int}", (s, a: string, b: string, n: number) => expect(D.standing(w(s), a, b)).toBe(n));
+
+// DIPL-193, D-DIPL-22
+Given("the country {string} has an embargo on the country {string}", (s, a: string, b: string) => void D.declareEmbargo(w(s), a, b));
+When("the country {string} lifts its embargo on {string}", (s, a: string, b: string) => attempt(s, () => D.liftEmbargo(w(s), a, b)));
+Then("trade flows between {string} and {string}", (s, a: string, b: string) => expect(D.tradeAllowed(w(s), a, b)).toBe(true));
+Given("the date is {string} and {string} and {string} share a mobilisation pact", (s, date: string, a: string, b: string) => {
+  setDate(s, date);
+  addState(s, "alliance", a, b);
+  D.markMobilisationPact(w(s), a, b);
+});
+When("the country {string} unmarks the pact with {string}", (s, b: string, a: string) => attempt(s, () => D.unmarkMobilisationPact(w(s), b, a)));
+Then("{string} and {string} share no mobilisation pact", (s, a: string, b: string) => expect(w(s).mobilisationPacts.includes(D.pairKey(a, b))).toBe(false));
+Given("the country {string} pledged protection to {string}", (s, a: string, b: string) => void D.pledgeProtection(w(s), a, b));
+When("the country {string} withdraws its pledge to {string}", (s, a: string, b: string) => attempt(s, () => D.withdrawPledge(w(s), a, b)));
+When("the country {string} drops {string} as a rival", (s, a: string, b: string) => attempt(s, () => D.dropRival(w(s), a, b)));
+Given(/^the country "([^"]*)" has (a resident in|an envoy on a mission to) "([^"]*)"$/, (s, a: string, how: string, b: string) => {
+  if (how === "a resident in") c(s, a).inventions.push("G8");
+  w(s).routes[D.pairKey(a, b)] = { land: [{ kind: "land", units: 40 }] };
+  const e = D.sendEnvoy(w(s), { country: a, target: b, action: how === "a resident in" ? "make_resident" : "courtesy_visit" });
+  if (how === "a resident in") {
+    e.status = "resident";
+    e.residentSince = D.monthOf(w(s).date);
+  }
+});
+When("the country {string} recalls its envoy from {string}", (s, a: string, b: string) => attempt(s, () => D.recallEnvoy(w(s), a, b)));
+
+// ---------------------------------------------------------------- worked example and card (DIPL-081 … DIPL-093, DIPL-184 … DIPL-187)
+
+Given("the standing of {string} toward {string} is +{int} from {string}", (s, a: string, b: string, n: number, name: string) => {
+  expect(D.standing(w(s), a, b)).toBe(n);
+  expect(D.ledgerOf(w(s), a, b).some((e) => e.name.startsWith(name))).toBe(true);
+});
+Given("the soldiers of {string} with half its allies are between 1 and 2 times those of {string}", (s, a: string, b: string) => {
+  const r = D.strength(w(s), a) / D.strength(w(s), b);
+  expect(r > 1 && r < 2).toBe(true);
+});
+Given("the envoy of {string} is a {string} with {int} years served", (s, a: string, t: string, y: number) => void (s.envoyOf = { country: a, type: t, years: y }));
+When("the envoy asks the country {string} for an alliance", (s, b: string) => {
+  act(s);
+  s.count = D.countAsk(w(s), { action: "propose_alliance", asker: s.envoyOf.country, asked: b, envoy: { type: s.envoyOf.type, years: s.envoyOf.years } });
+});
+When("the player opens the country diplomacy card of {string}", (s, b: string) => {
+  act(s);
+  s.card = D.diplomacyCard(w(s), "Hungary", b);
+});
+Then("no action button shows a predicted answer or total", (s) => expect((s.card as ReturnType<typeof D.diplomacyCard>).buttons.every((x) => x.prediction === undefined)).toBe(true));
+const EVERY_ASK = ["propose_alliance", "arrange_marriage", "demand", "ask_passage", "trade_pact", "swear_peace", "offer_overlordship", "ask_protection", "call_to_arms"];
+When("any count is made", (s) => {
+  act(s);
+  s.counts = [];
+  for (const posture of Object.keys(D.config.ai.posture)) {
+    c(s, "B").posture = posture;
+    c(s, "A").soldiers = 100000;
+    c(s, "B").soldiers = 1000;
+    for (const action of EVERY_ASK) s.counts.push(D.countAsk(w(s), { action, asker: "A", asked: "B", callKind: "defensive", callTarget: "A" }));
+  }
+});
+Then("the personality reason is between -30 and +30", (s) => {
+  for (const k of s.counts as D.Count[]) for (const r of k.reasons.filter((x) => x.kind === "posture")) expect(Math.abs(r.number)).toBeLessThanOrEqual(30);
+});
+When("any action is counted", (s) => {
+  act(s);
+  s.counts = EVERY_ASK.filter((a) => a !== "call_to_arms").map((action) => D.countAsk(w(s), { action, asker: "A", asked: "B" }));
+});
+Then("at most two reasons beyond the common reasons belong to that action", (s) => {
+  // The strength rows of a demand (DIPL-087) are common to the binding asks, not the demand's own.
+  const strengthRows = ["We cannot beat you", "We have strong friends"];
+  for (const k of s.counts as D.Count[]) expect(k.reasons.filter((r) => r.own && r.kind !== "base" && !strengthRows.includes(r.name)).length).toBeLessThanOrEqual(k.ask.action === "offer_overlordship" ? 3 : 2);
+});
+
+Given("an envoy of {string} is on the road to {string}", (s, a: string, b: string) => {
+  w(s).routes[D.pairKey(a, b)] = { land: [{ kind: "land", units: 40 }] };
+  D.sendEnvoy(w(s), { country: a, target: b, action: "courtesy_visit" });
+});
+Given("the country {string} holds a war aim against {string}", (s, a: string, b: string) => void D.grantAim(w(s), { holder: a, target: b, aim: "punish", source: "test" }));
+When(/^the diplomacy lens is at "(world|regional)" zoom$/, (s, zoom: "world" | "regional") => {
+  act(s);
+  s.marks = D.lensMarks(w(s), "Hungary", zoom);
+});
+Then("only the colours show", (s) => expect(s.marks).toEqual([]));
+Then("the envoy rider and its dotted route show, and a crossed sword over {string}", (s, x: string) => {
+  expect(s.marks).toContain("envoy rider to Venice");
+  expect(s.marks).toContain("dotted route to Venice");
+  expect(s.marks).toContain(`crossed sword over ${x}`);
+});
+When("the player taps {string} on the diplomacy lens", (s, b: string) => {
+  act(s);
+  start1444(s);
+  addState(s, "at_war", b, "Ottomans");
+  addState(s, "alliance", b, "Florence");
+  D.letterOf(w(s), { to: "Hungary", from: b, action: "Alliance", answer: "no", reasons: [], total: -13 });
+  D.advanceMonth(w(s));
+  s.card = D.diplomacyCard(w(s), "Hungary", b);
+});
+Then("the card shows {string} and {string}", (s, x: string, y: string) => {
+  expect(`Toward you: ${s.card.toward}`).toBe(x);
+  expect(`You toward them: ${s.card.from}`).toBe(y);
+});
+Then("the card lists the tie {string} at +{int} and no wrongs", (s, name: string, n: number) => {
+  expect(s.card.entries).toContainEqual({ name, weight: n });
+  expect(s.card.entries.every((e: { weight: number }) => e.weight >= 0)).toBe(true);
+});
+Then("the card shows {string}", (s, text: string) => {
+  const card = s.card as ReturnType<typeof D.diplomacyCard>;
+  const lines = [card.status, `Your war aims on them: ${card.aims}`];
+  expect(lines).toContain(text);
+});
+Then("the card shows {string} with a {string} button", (s, text: string, _b: string) => expect(`Last answer: ${s.card.lastAnswer}`).toBe(text));
+Then("the action buttons show no prediction", (s) => expect((s.card as ReturnType<typeof D.diplomacyCard>).buttons.every((x) => x.prediction === undefined)).toBe(true));
+Given("the last answer of {string} was {string} at {int}", (s, b: string, ans: string, n: number) => {
+  s.reasons = [{ name: "Base (alliance)", number: -40 }, { name: "Other reasons", number: n + 40 }];
+  D.letterOf(w(s), { to: "Hungary", from: b, action: "Alliance", answer: ans as "no", reasons: s.reasons, total: n });
+  D.advanceMonth(w(s));
+});
+When("the player taps {string}", (s) => {
+  act(s);
+  s.letter = D.lettersReceived(w(s), "Hungary").at(-1);
+});
+Then("the full reasons list with every number is shown", (s) => expect(s.letter.reasons).toEqual(s.reasons));
+When("the player taps {string} on the card of {string}", (s, _btn: string, b: string) => {
+  act(s);
+  c(s, "Hungary").officials.push({ name: "Judge Pál", type: "Judge", yearsServed: 3, province: "Buda" }, { name: "Steward Ján", type: "Steward", yearsServed: 1, province: "Pest" });
+  s.picker = D.envoyPicker(w(s), "Hungary", b);
+});
+Then("the envoy picker shows each available official, the days on the road, and which province loses its official meanwhile", (s) => {
+  expect(s.picker).toEqual([
+    { official: "Judge Pál", days: 20, leaves: "Buda" },
+    { official: "Steward Ján", days: 20, leaves: "Pest" },
+  ]);
+});
+Given("the screen is in landscape", (s) => void (s.orientation = "landscape"));
+When("the player opens the card of {string}", (s) => void act(s));
+Then("the card sits on the right of the map instead of covering it", (s) => expect(D.cardPlacement(s.orientation)).toBe("right of the map"));

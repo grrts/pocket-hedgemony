@@ -170,20 +170,40 @@ export function mainMenu(m: MenuContext): MenuEntry[] {
   return out.map((e, i) => ({ ...e, style: i === 0 ? "large wax-red" : "paper" }));
 }
 
-/** More: Settings, Achievements, Encyclopedia, Unlock (Buy the full game in the Steam demo), Credits, then Tutorial once finished (SHELL-023, SHELL-024). */
+/** More: Settings, Achievements, Almanac, Unlock (Buy the full game in the Steam demo), Credits, then Tutorial once finished (SHELL-023, SHELL-024). */
 export function moreMenu(edition: Edition, tutorialFinished: boolean): string[] {
   const out = SHELL.moreMenu.map((e) => (e === "Unlock" && edition === "Steam demo" ? "Buy the full game" : e));
   if (tutorialFinished) out.push("Tutorial");
   return out;
 }
 
-/** Where focus starts on the main menu: Continue when it exists (SHELL-026; the other case is OQ-SHELL-3). */
+/** Where focus starts on the main menu: Continue when it exists, otherwise New campaign (SHELL-026, D-SHELL-3). */
 export const mainMenuFocus = (m: MenuContext): string => mainMenu(m)[0]!.label;
 
-/** The free mobile tier's one ad: main menu only, never the first session, gone after any purchase, never in the Steam demo (SHELL-028). */
-export function adCard(o: { edition: Edition; keepsAd: boolean; firstSession: boolean; purchased: boolean; screen: string }): { place: string; still: true; silent: true; coversButton: false } | null {
-  if (o.edition !== "free mobile" || !o.keepsAd || o.firstSession || o.purchased || o.screen !== "main_menu") return null;
-  return { place: "corner opposite the menu", still: true, silent: true, coversButton: false };
+/** No edition shows an ad, on any screen (SHELL-028, D-SHELL-16). */
+export function adCard(_o: { edition: Edition; screen: string }): null {
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// The first-launch question (SHELL-131, D-SHELL-3)
+
+export type FirstLaunchChoice = keyof typeof SHELL.firstLaunchChoices;
+export const FIRST_LAUNCH_CHOICES = Object.keys(SHELL.firstLaunchChoices) as FirstLaunchChoice[];
+
+/** Asked once, after the first Tap to start when no campaign exists, before the main menu. */
+export function firstLaunchQuestion(o: { asked: boolean; campaignExists: boolean }): { question: string; choices: FirstLaunchChoice[]; focus: FirstLaunchChoice } | null {
+  if (o.asked || o.campaignExists) return null;
+  return { question: SHELL.strings.firstLaunch, choices: [...FIRST_LAUNCH_CHOICES], focus: FIRST_LAUNCH_CHOICES[0]! };
+}
+
+/** AnswerFirstLaunch: chapter 0 of the tutorial, or New campaign with or without guided first turns. */
+export function answerFirstLaunch(sh: Shell, choice: FirstLaunchChoice): { opens: string; guidedTurns: boolean } {
+  const c = SHELL.firstLaunchChoices[choice];
+  if (!c) throw new Error(`No first-launch choice ${choice}`);
+  sh.events.push({ type: "FirstLaunchAnswered", choice });
+  if (c.opens === "new_campaign") push(sh, { id: "new_campaign", step: 1 });
+  return { opens: c.opens, guidedTurns: c.guidedTurns };
 }
 
 /** The Full game ribbon in the free tier leads to Unlock; never a pop-up (SHELL-029). */
@@ -269,6 +289,16 @@ function syncStep(sh: Shell, nc: NewCampaign): void {
 
 /** Step 2: the options and their presets (SHELL-033). */
 export const campaignOptions = (): string[] => [...SHELL.campaignOptions];
+
+/** The end dates offered: 31 August of each year from the earliest (provisional 1494) to 1939, 1939 by default (SHELL-033, D-SHELL-14). */
+export function endDateChoices(): { dates: string[]; default: string } {
+  const last = Number(SHELL.campaignEndDateDefault.slice(0, 4));
+  const dates: string[] = [];
+  for (let y = SHELL.endDateEarliestYear; y <= last; y++) dates.push(`${y}-08-31`);
+  return { dates, default: SHELL.campaignEndDateDefault };
+}
+
+export const isValidEndDate = (date: string): boolean => endDateChoices().dates.includes(date);
 
 /** A preset fills the whole step: one value for every option. */
 export function applyPreset(nc: NewCampaign, preset: Record<string, string>): string[] {
@@ -366,7 +396,13 @@ export function openUnlock(sh: Shell, o: { realm?: string; online: boolean }): {
   return { flow: { from, realm: o.realm ?? null }, message: null };
 }
 
-/** The unlock flow returns where it was opened; success unlocks and removes the ad; failure adds no message of its own. */
+/** The Unlock screen: one purchase, the full game, unlocking every realm; Buy, and Restore purchases on phones (SHELL-135). */
+export function unlockScreen(platform: Platform): { purchase: string; unlocks: string; price: string; buttons: string[] } {
+  const phone = platform === "iOS" || platform === "Android";
+  return { purchase: SHELL.unlock.purchase, unlocks: SHELL.unlock.unlocks, price: SHELL.unlock.price, buttons: [...SHELL.unlock.buttons, ...(phone ? SHELL.unlock.phoneButtons : [])] };
+}
+
+/** The unlock flow returns where it was opened; success unlocks every realm and removes the Full game ribbon; failure adds no message of its own. */
 export function purchaseResult(sh: Shell, flow: UnlockFlow, outcome: "succeeds" | "is cancelled" | "fails", profile: Profile): { at: string; chosen: string | null; message: null } {
   if (topId(sh) === "unlock") pop(sh);
   if (outcome === "succeeds") {
@@ -375,3 +411,35 @@ export function purchaseResult(sh: Shell, flow: UnlockFlow, outcome: "succeeds" 
   }
   return { at: top(sh)!.id, chosen: flow.realm, message: null };
 }
+
+// ---------------------------------------------------------------------------
+// The Load list (SHELL-038, D-SHELL-4)
+
+export interface SaveSummary {
+  id: string;
+  banner: string;
+  realm: string;
+  date: GameDate;
+  /** Real date and time saved, ISO. */
+  savedAt: string;
+  kind: "manual" | "autosave" | "ironman";
+}
+
+export interface LoadRow {
+  id: string;
+  banner: string;
+  realm: string;
+  date: string;
+  savedAt: string;
+  mark: "autosave" | "ironman" | null;
+}
+
+/** One flat list, newest first, not grouped by campaign. */
+export function loadList(saves: readonly SaveSummary[]): LoadRow[] {
+  return [...saves]
+    .sort((a, b) => b.savedAt.localeCompare(a.savedAt))
+    .map((s) => ({ id: s.id, banner: s.banner, realm: s.realm, date: formatMonthYear(s.date), savedAt: s.savedAt, mark: s.kind === "manual" ? null : s.kind }));
+}
+
+/** Tapping a save shows its card with Load and Delete. */
+export const saveCard = (_row: LoadRow): string[] => ["Load", "Delete"];

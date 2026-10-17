@@ -4,16 +4,15 @@ Feature: Provinces add up to the country card
   I want the country card to be the sum of its provinces
   So that every country number can be traced to the land
 
-  @PROV-260 @open-question
+  @PROV-260
   Scenario Outline: Country stats are sums over provinces
-    # OQ-PROV-1: trade v2 replaces "trade balances" with trade income
     Given the country "France" holds its provinces
     When the game works out the province's stats
     Then the country stat "<stat>" is the sum of <sum>
 
     Examples:
       | stat                        | sum                                                                  |
-      | Gold income                 | tax reaching you plus trade balances over all provinces              |
+      | Gold income                 | tax reaching you plus trade income over all provinces                |
       | People                      | people plus refugees                                                 |
       | Recruits                    | recruits here in royal provinces only                                |
       | Food                        | local stores and castle stores                                       |

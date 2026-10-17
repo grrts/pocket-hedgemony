@@ -247,12 +247,12 @@ Each country starts with traders by its catalogue trade access: very high 6, hig
 - Reroutes once a year, and at once when a route breaks.
 - At war, pulls traders off roads near the front and uses trade ships as transports if short of carriers.
 
-### Each turn, and keeping it fast
+### Each turn, each month, and keeping it fast
 
-1. **During the day loop**: traders move; on entering a province they count as passing, collect (with crowding), pay fees and tolls, meet risks, and deposit in your cities.
-2. **After the day loop**: every touched province's and sea zone's ratio updates.
+1. **During the day loop** (the 7 days of each weekly turn): traders move; on entering a province they count as passing, collect (with crowding), pay fees and tolls, meet risks, and deposit in your cities.
+2. **After the day loop, in the turn a new month begins**: every touched province's and sea zone's ratio updates.
 3. Trader upkeep is charged and unpaid months counted.
-4. The turn report gets one deposits line and lines for problems.
+4. Every turn, the turn report gets one deposits line for the week and lines for problems.
 
 Yearly: trade value is worked out again with the year's wares (and also on events or burned tiles); the AI reroutes and dismisses.
 
@@ -264,7 +264,7 @@ On a phone, each province and sea zone stores only its ratio and traders passing
 - **Found a trader**: Trade, Found a trader, choose a kind, from a city with a market. Ships are bought on the port screen and switched to Trade.
 - **Setting a route**: tap cities in order and tap the last stop again to finish; the preview updates as you add stops; then Confirm. You can copy another trader's route.
 - **The Trade screen**: every trader and trade ship with kind, route, purse, last deposit, expected gold a month and problems, sortable by gold a month.
-- **Turn report**: deposits summed into one line ("Traders brought 23 gold this month"); only problems (robbed, route broken, ship taken) get their own line.
+- **Turn report**: deposits summed into one line ("Traders brought 23 gold this week"); only problems (robbed, route broken, ship taken) get their own line.
 - **On the map**: at world zoom the Trade lens coloured by trade ratio and the busiest roads and sea lanes; at region zoom thicker roads with more traders, trader icons (caravan, barge, ship) with a purse bar, and a coin on market cities; at local zoom caravans, barges and ships moving. Lenses: **Trade ratio**, **Trade value** and **Traders** (your traders and routes). See [Map and Lenses](Map-and-Lenses).
 
 ## How it connects

@@ -17,7 +17,6 @@ Feature: How a campaign ends
       | cause                                                   |
       | "Burgundy" is annexed                                   |
       | "Burgundy" loses every province                         |
-      | a successor rule ends "Burgundy"                        |
 
   @SHELL-094
   Scenario: The game over line names what happened
@@ -67,20 +66,55 @@ Feature: How a campaign ends
     When the campaign is loaded later
     Then its end date is the one chosen when it started
 
-  @SHELL-098 @open-question
-  Scenario Outline: A victory condition ends the campaign
-    # OQ-SHELL-1: how each score is measured and when it is judged is not designed
+  @SHELL-098 @SHELL-129
+  Scenario Outline: World domination wins at once
     Given a campaign as "Ottomans" is loaded
-    When "Ottomans" <wins>
-    Then a victory condition fires
-    And the campaign end sequence starts
+    And "Ottomans" owns or holds as subjects <held> of the world's 2000 settled land provinces
+    When the turn of <month> 1700 ends
+    Then <result>
 
     Examples:
-      | wins                                    |
-      | achieves world domination               |
-      | leads the Economy score when judged     |
-      | leads the Power score when judged       |
-      | leads the Technology score when judged  |
+      | held | month    | result                                                       |
+      | 1000 | January  | the win "World domination" fires and campaign end starts     |
+      | 1200 | January  | the win "World domination" fires and campaign end starts     |
+      | 999  | January  | no win fires                                                 |
+      | 1200 | June     | no win fires                                                 |
+
+  @SHELL-129
+  Scenario: Keep playing after world domination
+    Given a campaign as "Ottomans" has won by world domination in January 1700
+    When the screen "final_result" is shown
+    Then it offers "Keep playing, Main menu, Credits"
+    When the player picks "Keep playing"
+    Then the screen "map" is shown
+    And the campaign can be played until its end date
+
+  @SHELL-098 @SHELL-130
+  Scenario Outline: Score winners at the end date
+    Given at the end date the scores are:
+      | realm    | Economy | Power | Technology |
+      | Ottomans | 900     | 700   | 400        |
+      | France   | 800     | 950   | 400        |
+      | England  | 600     | 500   | 380        |
+    When the end date is reached in a campaign as "<player>"
+    Then the outcome reads "<outcome>"
+
+    Examples:
+      | player   | outcome                                    |
+      | Ottomans | Victory: Economy, Technology (shared: Technology) |
+      | France   | Victory: Power, Technology (shared: Technology)   |
+      | England  | No victory · Economy 3rd · Power 3rd · Technology 3rd |
+
+  @SHELL-130
+  Scenario: No win shows the player's rank
+    Given at the end date the scores are:
+      | realm    | Economy | Power | Technology |
+      | Ottomans | 900     | 700   | 500        |
+      | France   | 800     | 950   | 400        |
+      | Portugal | 850     | 300   | 450        |
+    When the end date is reached in a campaign as "Portugal"
+    Then the outcome reads "No victory · Economy 2nd · Power 3rd · Technology 2nd"
+    And the ledger shows "Ottomans, France, Portugal"
 
   @SHELL-099
   Scenario Outline: Final result
@@ -94,3 +128,9 @@ Feature: How a campaign ends
       | choice    | next      |
       | Main menu | main_menu |
       | Credits   | credits   |
+
+  @SHELL-099
+  Scenario: Final result outside ironman
+    Given a campaign as "France" that is not ironman reaches its end date
+    When the screen "final_result" is shown
+    Then instead of a list of achievements it reads "Achievements are earned only in ironman campaigns"

@@ -8,7 +8,7 @@
 import config from "../../../../rules/data/domain/game-shell.json" with { type: "json" };
 import type { GameDate } from "@ph/rules";
 import { formatMonthYear } from "../time-and-turns/index.ts";
-import { classifyShape, layoutFor, topBarMaxPlaques, type Shape, type Window } from "../map-presentation/index.ts";
+import { classifyShape, layoutFor, tapTargetMin, topBarMaxPlaques, type Rect, type Shape, type Window } from "../map-presentation/index.ts";
 import { newAttention, type AttentionList } from "./attention.ts";
 
 export const SHELL = config;
@@ -108,9 +108,9 @@ export interface Frame {
   decideLater?: boolean;
   /** A battle replayed from the turn report or the Chronicle, not stopped in a turn. */
   replay?: boolean;
-  /** The battle viewer's card: before, playing or result. */
-  battleCard?: "before" | "playing" | "result";
-  /** The before-the-battle standing orders, changeable for this one battle. */
+  /** The battle view: running (4-hour steps, X-1) or result. */
+  battleCard?: "running" | "result";
+  /** The standing orders for this one battle, changeable at any step. */
   orders?: string;
   /** New campaign step (1–3). */
   step?: number;
@@ -128,6 +128,8 @@ export interface Camera {
 export interface CampaignOnScreen {
   realm: string;
   date: GameDate;
+  /** Day of the month the next turn starts on; turns are one week (X-18). */
+  day?: number;
   ironman: boolean;
   unsavedTurns: number;
   endDate: string;
@@ -135,6 +137,8 @@ export interface CampaignOnScreen {
   /** Orders or answers given since the last save. */
   changedSinceSave: boolean;
   options: string[];
+  /** Wins so far ("World domination" before the end date, X-12). */
+  wins?: string[];
 }
 
 export type DomainEvent = { type: string; [k: string]: unknown };
@@ -230,7 +234,7 @@ export type BackResult =
   | "previous step"
   | "put off"
   | "stays open"
-  | "skipped to result"
+  | "back to the map"
   | "card below"
   | "returned"
   | "nothing";
@@ -281,8 +285,9 @@ export function back(sh: Shell): BackResult {
     }
     case "battle":
       if (!f.replay) {
-        f.battleCard = "result";
-        return "skipped to result";
+        // The battles keep running in 4-hour steps; the switcher on the map reopens the view (X-1).
+        pop(sh);
+        return "back to the map";
       }
       pop(sh);
       return "popped";
@@ -452,7 +457,10 @@ export function topBar(sh: Shell, extraPlaques: string[] = []): { shown: string[
 export const toolColumn = (): string[] => [...config.toolColumn];
 
 /** Continue's label: "France · May 1503". */
-export const campaignLabel = (realm: string, date: GameDate): string => `${realm} · ${formatMonthYear(date)}`;
+export const campaignLabel = (realm: string, date: GameDate, day?: number): string => `${realm} · ${day ? dayDate(date, day) : formatMonthYear(date)}`;
+
+/** The date with its day, as the top bar shows it each weekly turn: "11 November 1444" (X-18). */
+export const dayDate = (date: GameDate, day: number): string => `${day} ${formatMonthYear(date)}`;
 
 /** How a card is laid out for the current shape (SHELL-053..055). */
 export const cardLayout = (sh: Shell) => layoutFor(sh.shape).card;
@@ -517,8 +525,22 @@ export function openGameMenu(sh: Shell): Frame {
   return push(sh, { id: "game_menu", decideLater: true });
 }
 
-export function gameMenuEntries(platform: Platform, ironman: boolean): string[] {
-  return config.gameMenu.filter((e) => e !== "Quit" || hasQuit(platform)).map((e) => (e === "Save" && ironman ? "Save and quit" : e));
+export interface GameMenuContext {
+  /** The tutorial is running: its three lines follow Return to the map (SHELL-132). */
+  tutorial?: boolean;
+  /** The campaign can still earn achievements; once not, the entry says so (SHELL-132). */
+  canEarnAchievements?: boolean;
+}
+
+/** The game menu's entries: Quit only on desktop and Steam; ironman reads "Save and quit" and has no Load (SHELL-065, SHELL-066, SHELL-132). */
+export function gameMenuEntries(platform: Platform, ironman: boolean, o: GameMenuContext = {}): string[] {
+  const out = config.gameMenu
+    .filter((e) => e !== "Quit" || hasQuit(platform))
+    .filter((e) => e !== "Load" || !ironman)
+    .map((e) => (e === "Save" && ironman ? "Save and quit" : e))
+    .map((e) => (e === "Achievements" && o.canEarnAchievements === false ? config.strings.achievementsOff : e));
+  if (o.tutorial) out.splice(1, 0, ...config.tutorialMenuLines);
+  return out;
 }
 
 export type LeaveResult = { asked: string } | { left: true; saved: boolean };
@@ -559,9 +581,10 @@ export function pickGameMenu(sh: Shell, entry: string): LeaveResult | Frame | nu
     case "Settings":
       return push(sh, { id: "settings", openedFrom: "game_menu" });
     case "Load":
+      if (sh.campaign?.ironman) throw new Error("Ironman has no Load");
       return push(sh, { id: "load", openedFrom: "game_menu" });
-    case "Encyclopedia":
-      return push(sh, { id: "encyclopedia", openedFrom: "game_menu" });
+    case "Almanac":
+      return push(sh, { id: "almanac", openedFrom: "game_menu" });
     case "Achievements":
       return push(sh, { id: "achievements", openedFrom: "game_menu" });
     case "Exit to main menu":
@@ -600,3 +623,57 @@ export function confirmDestructive(sh: Shell, action: string): Frame {
 }
 
 export const shapeOf = (sh: Shell): Shape => sh.shape;
+
+// ---------------------------------------------------------------------------
+// Main hand (SHELL-116, SHELL-133)
+
+export type HudCorner = "upper left" | "upper right" | "lower left" | "lower right";
+
+/** End turn and the game menu button stay at opposite corners; Main hand Left mirrors both. */
+export function hudCorners(mainHand: "Right" | "Left"): { endTurn: HudCorner; gameMenu: HudCorner } {
+  return mainHand === "Left" ? { endTurn: "lower left", gameMenu: "upper right" } : { endTurn: "lower right", gameMenu: "upper left" };
+}
+
+export function areOpposite(a: HudCorner, b: HudCorner): boolean {
+  const [av, ah] = a.split(" ");
+  const [bv, bh] = b.split(" ");
+  return av !== bv && ah !== bh;
+}
+
+// ---------------------------------------------------------------------------
+// Panels with a button that loses something (SHELL-115)
+
+/** Buttons that end the turn or lose something. */
+export const RISKY_BUTTONS = ["End turn", "Delete save", "Exit to main menu"];
+
+/** The buttons of a panel: the game menu, or a save's card on the Load screen. */
+export function panelButtons(panel: "game_menu" | "save card", platform: Platform = "desktop"): string[] {
+  return panel === "save card" ? ["Load", "Delete save"] : gameMenuEntries(platform, false);
+}
+
+/**
+ * Lays a panel out as a centred column of tap targets: risky buttons go last, below a
+ * spacer of one tap target, so none sits next to a frequent button or at the screen edge.
+ */
+export function panelLayout(buttons: readonly string[], window: { width: number; height: number }): Rect[] {
+  const s = tapTargetMin();
+  const gap = 12;
+  const w = Math.min(320, window.width - 4 * s);
+  const x = Math.round((window.width - w) / 2);
+  const safe = buttons.filter((b) => !RISKY_BUTTONS.includes(b));
+  const risky = buttons.filter((b) => RISKY_BUTTONS.includes(b));
+  const rows = safe.length + risky.length;
+  const height = rows * s + (rows - 1) * gap + (risky.length ? s : 0);
+  let y = Math.max(s, Math.round((window.height - height) / 2));
+  const out: Rect[] = [];
+  for (const name of safe) {
+    out.push({ name, x, y, w, h: s, frequent: true });
+    y += s + gap;
+  }
+  if (risky.length) y += s;
+  for (const name of risky) {
+    out.push({ name, x, y, w, h: s, risky: true });
+    y += s + gap;
+  }
+  return out;
+}

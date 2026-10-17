@@ -142,9 +142,24 @@ Feature: What each zoom shows
       | Troyes   | a battle is being watched there         | the battle plays on the province's tile row        |
       | Langres  | its castle is besieged with one breach  | the castle tile shows its walls with one breach    |
 
-  @VIEW-020 @open-question
-  # OQ-VIEW-7: several new systems give no full zoom table
-  Scenario: Each new system states its zoom content and lens
-    Given a system designed after the province and warfare designs
-    When its design is reviewed for the map
-    Then it states what it shows at World, Region and Local zoom and its map lens
+  @VIEW-020
+  Scenario: A new system with no zoom table falls back to its lens and a Local card
+    Given the system "Subjects" gives no zoom table, with the lens "Subjects"
+    When its map statement is built
+    Then it shows the lens "Subjects" at World, Region and Local zoom
+    And its card shows at Local zoom only
+
+  @VIEW-070 @placeholder
+  Scenario Outline: The camera zoom picks the zoom level
+    Given the camera zoom is <camera>
+    When the zoom level is worked out
+    Then the zoom level is <level>
+
+    Examples:
+      | camera | level  |
+      | 1      | World  |
+      | 1.99   | World  |
+      | 2      | Region |
+      | 3.5    | Region |
+      | 4      | Local  |
+      | 8      | Local  |

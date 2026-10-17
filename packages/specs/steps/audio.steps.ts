@@ -6,6 +6,7 @@ import { createWorld, hashWorld, processTurn, Rng } from "@ph/engine";
 import * as A from "@ph/engine/domain/audio";
 import { steps, type Scenario } from "../src/registry.ts";
 
+const ALL: A.RotationContext = { variety: "all_palettes" };
 const { Given, When, Then } = steps("audio");
 
 // ---------------------------------------------------------------- helpers
@@ -229,14 +230,14 @@ When("the rotation weights in {string} change", (s, file: string) => {
 });
 Then("the director uses the new weights without a code change", (s) => {
   const d = A.newDirector("mena", "II");
-  const w = Object.fromEntries(A.peaceSources(d, { rotation: s.rotation }).map((o) => [o.source, o.weight]));
+  const w = Object.fromEntries(A.peaceSources(d, { rotation: s.rotation, variety: "all_palettes" }).map((o) => [o.source, o.weight]));
   expect(w.own_palette).toBe(0.3);
   expect(w.era_theme).toBe(0.5);
   // The pick follows them: over many picks the era theme now wins most often.
   let theme = 0;
   for (let i = 0; i < 200; i++) {
     const dd = A.newDirector("mena", "II");
-    const cue = A.nextPeaceTrack(dd, "II", rng(i + 1), { rotation: s.rotation })[0]!;
+    const cue = A.nextPeaceTrack(dd, "II", rng(i + 1), { rotation: s.rotation, variety: "all_palettes" })[0]!;
     if (cue.kind === "track" && cue.id === "era_2") theme++;
   }
   expect(theme).toBeGreaterThan(100);
@@ -271,7 +272,7 @@ When("the game event {string} happens", (s, event: string) => {
 });
 Given("the director debug overlay is on", (s) => {
   const d = director(s);
-  A.decide(d, "turn_end", { era: "I", atWar: true, turnsSinceDeclaration: 1, battlesFought: 0 }, 60, rng());
+  A.decide(d, "turn_end", { era: "I", atWar: true, monthsSinceDeclaration: 1, battlesFought: 0 }, 60, rng());
   const m = A.newMixer();
   for (let i = 0; i < 6; i++) A.play(m, "ui_tap", i * 100);
   A.play(m, "ui_tap", 520);
@@ -427,10 +428,10 @@ When("an event marked {string} fires", (s, mark: string) => {
   s.cue = A.eventOpened(director(s), { music: "event_good", narrativeOnly: true });
 });
 Then("no triumphant stinger plays", (s) => {
-  expect(["event_good", "battle_won", "war_won"]).not.toContain(s.cue.id);
+  expect(["event_good", "battle_won", "war_won"]).not.toContain(s.cue?.id);
 });
-Then("only {string} plays, in a sombre form", (s, id: string) => {
-  expect(s.cue).toMatchObject({ kind: "stinger", id, form: "sombre" });
+Then("no stinger plays at all", (s) => {
+  expect(s.cue).toBeNull();
 });
 When(/^(a razing|a massacre event|an enslavement event) happens$/, (s, harm: string) => {
   const kind = harm === "a razing" ? "razing" : harm === "a massacre event" ? "massacre_event" : "enslavement_event";
@@ -571,6 +572,7 @@ When("the next turn the same army still has {int} days of food", (s, days: numbe
   s.hungerResult = A.armyHungry(s.mixer, "murad", days, 30_000);
 });
 Then("{string} does not play", (s, id: string) => {
+  if (s.hungerResult === undefined) return expect(s.played).not.toContain(id);
   expect(id).toBe("army_hungry");
   expect(s.hungerResult).toBe(false);
 });
@@ -603,7 +605,7 @@ Then("other sectors' sounds play only if a voice is free", (s) => {
   expect(s.heardSectors).toEqual(["centre:battle_shoot_crossbow", "left:battle_shoot_bow"]);
   expect(s.busyHeard).toEqual([]);
 });
-When("the player skips ahead in a battle", (s) => {
+When("the player skips ahead in a battle replay", (s) => {
   s.skip = A.battleSkipSounds();
   s.stinger = A.momentAudio("battle_result", { won: true }).music;
 });
@@ -753,7 +755,7 @@ Then(/^"turn_ready" answers with motif notes 4 – 5 – 1↑$/, (s) => {
 When("war is declared on the player", (s) => {
   s.moment = A.momentAudio("war_declared");
   if (s.dir) {
-    s.cues = A.decide(s.dir, "turn_end", { era: s.dir.era, atWar: true, turnsSinceDeclaration: 0, battlesFought: 0 }, 1000, rng());
+    s.cues = A.decide(s.dir, "turn_end", { era: s.dir.era, atWar: true, monthsSinceDeclaration: 0, battlesFought: 0 }, 1000, rng());
     played(s, ...s.cues.map((c: A.Cue) => ("id" in c ? c.id : null)));
   }
 });
@@ -770,6 +772,7 @@ When("an age begins", (s) => {
   s.moment = A.momentAudio("age_begins", { ageId: "age_of_exploration" });
 });
 Then("the music plays {string}", (s, music: string) => {
+  if (music === "nothing") return expect(s.moment.music).toBeNull();
   if (music.includes("<")) expect(s.moment.music).toMatch(new RegExp(`^${music.replace(/<[^>]+>/, ".+")}$`));
   else expect(s.moment.music).toBe(music);
 });
@@ -781,6 +784,7 @@ Then(/^the effects play (.+)$/, (s, what: string) => {
     return expect(m.effectsFirst).toBe(true);
   }
   const first = /^(\w+) first$/.exec(what);
+  if (!first && /^\w+$/.test(what)) return expect(m.effects).toEqual([what]);
   if (!first) throw new Error(what);
   expect(m.effects[0]).toBe(first[1]);
   expect(m.effectsFirst).toBe(true);
@@ -860,13 +864,13 @@ Then("the engine gives the same result", (s) => {
   expect(s.on.report).toEqual(s.off.report);
 });
 Given("the player is at war and losing badly while a plague chain is active", (s) => {
-  s.facts = { era: "I", atWar: true, warScore: cfg.music.states.war_losing.war_score_below - 5, eventChains: ["crisis"] };
+  s.facts = { era: "I", atWar: true, enemyTermsVoiceShare: cfg.music.states.war_losing.enemy_terms_voice_share_above + 0.1, eventChains: ["crisis"] };
 });
-Given("the player besieges a castle with no field battle in the last 3 turns and unrest is high", (s) => {
-  s.facts = { era: "I", atWar: true, siegeActive: true, fieldBattlesLast3: 0, turnsSinceDeclaration: 6, unrestProvinceShare: cfg.music.states.unrest.unrest_province_share };
+Given("the player besieges a castle with no field battle in the last 3 months and unrest is high", (s) => {
+  s.facts = { era: "I", atWar: true, siegeActive: true, fieldBattlesLast3: 0, monthsSinceDeclaration: 6, unrestProvinceShare: cfg.music.states.unrest.plotting_or_risen_share };
 });
 Given("a crisis chain is active and the player is at peace with high stability", (s) => {
-  s.facts = { era: "I", atWar: false, eventChains: ["crisis"], stability: cfg.music.states.prosperity.stability_at_least, treasuryTrend: "rising", yearsAtPeace: 12 };
+  s.facts = { era: "I", atWar: false, eventChains: ["crisis"], lords: [{ loyalty: "Loyal" }], treasuryTrend: "rising", yearsAtPeace: 12 };
 });
 Given("the player is at peace with nothing special", (s) => {
   s.facts = { era: "I", atWar: false };
@@ -899,7 +903,7 @@ Then("the music ducks by {int} dB under it", (s, db: number) => {
   expect(s.cue.duckDb).toBe(-db);
 });
 When("a war starts during the player's turn without a screen change", (s) => {
-  s.war = { era: "I", atWar: true, turnsSinceDeclaration: 0, battlesFought: 0 };
+  s.war = { era: "I", atWar: true, monthsSinceDeclaration: 0, battlesFought: 0 };
   s.cues = A.decide(s.dir, "mid_turn", s.war, 1000, rng());
 });
 Then("the state does not change until the turn ends or the screen changes", (s) => {
@@ -975,7 +979,7 @@ Then("the state stays peace rotation", (s) => {
 Given("the music is in peace rotation", (s) => {
   const d = (s.dir = A.newDirector("mena", "I"));
   A.lookAt(d, "west_africa", "regional", 20);
-  s.sources = A.peaceSources(d, { neighbours: ["europe_east"] });
+  s.sources = A.peaceSources(d, { neighbours: ["europe_east"], variety: "all_palettes" });
 });
 const SOURCES: Record<string, A.Source> = {
   "the player's own palette": "own_palette",
@@ -999,13 +1003,13 @@ Then("the current track plays on unchanged", (s) => {
   expect(s.dir.track).toBe("peace_mena_early");
 });
 Then("the next pick may come from the {string} palette", (s, p: A.Palette) => {
-  expect(A.peaceSources(s.dir).some((o) => o.source === "camera_palette" && o.track === A.peaceTrackId(p, "I"))).toBe(true);
+  expect(A.peaceSources(s.dir, ALL).some((o) => o.source === "camera_palette" && o.track === A.peaceTrackId(p, "I"))).toBe(true);
   const short = A.newDirector("mena", "I");
   A.lookAt(short, p, "regional", 10);
-  expect(A.peaceSources(short).some((o) => o.source === "camera_palette")).toBe(false);
+  expect(A.peaceSources(short, ALL).some((o) => o.source === "camera_palette")).toBe(false);
   const far = A.newDirector("mena", "I");
   A.lookAt(far, p, "world", 30);
-  expect(A.peaceSources(far).some((o) => o.source === "camera_palette")).toBe(false);
+  expect(A.peaceSources(far, ALL).some((o) => o.source === "camera_palette")).toBe(false);
 });
 Given("the last three tracks were {string}, {string} and {string}", (s, a: string, b: string, c: string) => {
   s.last = [a, b, c];
@@ -1019,8 +1023,8 @@ Given("the last three tracks were {string}, {string} and {string}", (s, a: strin
 When("the next peace track is picked", (s) => {
   s.picks = Array.from({ length: 50 }, (_, i) => {
     const d = s.mk ? s.mk() : A.newDirector("mena", "II");
-    const ctx: A.RotationContext = { neighbours: ["west_africa"] };
-    if (s.variety) ctx.variety = s.variety;
+    // "All palettes" is the setting's other value; own palette is the default (D-AUD-3).
+    const ctx: A.RotationContext = { neighbours: ["west_africa"], variety: s.variety ?? "all_palettes" };
     const cue = A.nextPeaceTrack(d, "II", rng(i + 1), ctx)[0]!;
     return cue.kind === "track" ? cue.id : "";
   });
@@ -1079,7 +1083,7 @@ Then("percussion drops {int} dB and the lead comes forward {int} dB", (s, p: num
 });
 Given("zoom mix is on and the player is at war", (s) => {
   s.zoomMix = true;
-  s.facts = { era: "I", atWar: true, turnsSinceDeclaration: 5 };
+  s.facts = { era: "I", atWar: true, monthsSinceDeclaration: 5 };
 });
 When("the camera is over a battle province at local zoom between battles", (s) => {
   s.layers = A.layersFor("war_campaign", s.facts, { zoomMix: true, zoom: "local", overBattleProvince: true });
@@ -1159,7 +1163,7 @@ When("a battle starts", (s) => {
   s.buzz = A.haptic(A.boundSound("battle.begin")!, s.device);
 });
 Then("the phone vibrates", (s) => {
-  expect(s.buzz).toBe("medium");
+  expect(s.buzz).toBe("light");
 });
 Given("the game runs on desktop", (s) => {
   s.device = { phone: false, hapticsOn: true };
@@ -1343,14 +1347,14 @@ Then("the era theme {string} is the same for every nation", (s, id: string) => {
   expect(A.eraTheme(s.era)).toBe(id);
   for (const p of A.PALETTES) {
     const d = A.newDirector(p, s.era);
-    expect(A.peaceSources(d).find((o) => o.source === "era_theme")!.track).toBe(id);
+    expect(A.peaceSources(d, ALL).find((o) => o.source === "era_theme")!.track).toBe(id);
   }
 });
 Given("the realm book is open on its Abroad tab in peace", (s) => {
   s.track = A.evaluateState({ era: "I", atWar: false, screen: "realm_book", realmBookTab: "Abroad" }, "peace").state;
   // Other tabs keep the state; war still outranks the mood.
   expect(A.evaluateState({ era: "I", atWar: false, screen: "realm_book", realmBookTab: "Realm" }, "peace").state).toBe("peace");
-  expect(A.evaluateState({ era: "I", atWar: true, turnsSinceDeclaration: 5, screen: "realm_book", realmBookTab: "Abroad" }, "peace").state).toBe("war_campaign");
+  expect(A.evaluateState({ era: "I", atWar: true, monthsSinceDeclaration: 5, screen: "realm_book", realmBookTab: "Abroad" }, "peace").state).toBe("war_campaign");
 });
 Given("a plague event chain is active", (s) => {
   s.track = A.evaluateState({ era: "I", eventChains: ["crisis"] }).state;
@@ -1374,7 +1378,7 @@ Then("the second layer of {string} comes in", (s, track: string) => {
   expect(A.layersFor(track, s.facts)).toEqual([1, 2]);
 });
 Given(/^the player is at war and "war_campaign" plays$/, (s) => {
-  s.facts = { era: "I", atWar: true, turnsSinceDeclaration: 5 };
+  s.facts = { era: "I", atWar: true, monthsSinceDeclaration: 5 };
   expect(A.evaluateState(s.facts).state).toBe("war_campaign");
 });
 Given("no army is within 2 provinces of an enemy", (s) => {
@@ -1418,4 +1422,146 @@ When("an alliance is signed", (s) => {
 Then("the first release has {int} loops and {int} stingers", (s, loops: number, stingers: number) => {
   expect(s.tracks.filter((t: A.Track) => t.kind === "loop")).toHaveLength(loops);
   expect(s.tracks.filter((t: A.Track) => t.kind === "stinger")).toHaveLength(stingers);
+});
+
+// ---------------------------------------------------------------- decisions of this pass (D-AUD-1 … D-AUD-12, X-1)
+
+When("a white peace is signed", (s) => {
+  s.moment = A.momentAudio("peace_signed", { white: true });
+  const d = A.newDirector("europe_west", "I");
+  d.state = "war_campaign";
+  expect(A.decide(d, "turn_end", { era: "I", atWar: false }, 1000, rng(), { peace: "white" }).filter((c) => c.kind === "stinger")).toEqual([]);
+});
+Then(/^the music (ducks by 4 dB for its length|does not duck)$/, (s, how: string) => {
+  expect(A.ducksMusic(s.playing)).toBe(how === "does not duck" ? 0 : -4);
+});
+When("the pause menu opens", (s) => {
+  s.acted = true;
+  s.played = ["frame_pause"];
+  s.menuDb = A.gameMenuMusicDb();
+});
+Then("the music is unchanged while the menu is open", (s) => {
+  expect(s.menuDb).toBe(0);
+  expect("pause_music_db" in cfg.sfx.ducking).toBe(false);
+});
+When("onboarding reports {string}", (s, moment: "step shown" | "step finished" | "new warning") => {
+  s.ob = A.onboardingSound(moment);
+});
+Then("the effect {string} plays", (s, id: string) => {
+  expect(s.ob.sound).toBe(id);
+});
+Then("the music is not ducked", (s) => {
+  expect(s.ob.ducksMusic).toBe(false);
+  expect(A.ducksMusic(s.ob.sound)).toBe(0);
+  expect(A.onboardingSound("vizier note").sound).toBeNull();
+});
+Given("the player's battles at {string} and {string} run at once", (s, a: string, b: string) => {
+  s.battles = [a, b];
+});
+Given("the battle view shows {string}", (s, place: string) => {
+  s.shown = place;
+});
+Then(/^the bell-step effects of "([^"]+)" (play|do not play)$/, (s, place: string, how: string) => {
+  expect(A.battleStepAudible(place, s.shown)).toBe(how === "play");
+});
+When("the player switches to {string}", (s, place: string) => {
+  expect(s.battles).toContain(place);
+  s.shown = place;
+});
+When("a tooltip opens", (s) => {
+  s.acted = true;
+  s.played = A.neverPlayed("ui_tooltip") ? [] : ["ui_tooltip"];
+  expect(A.neverPlayed("ui_tap")).toBe(false);
+});
+
+Then(/^"turn_end" adds a short sustained swell on S3 under the chime$/, (s) => {
+  expect(s.chime.s3Swell).toBe(true);
+  expect(A.turnChime("turn_end", "IV").s3Swell).toBe(false);
+});
+Then("no music voice is taken", (s) => {
+  expect(s.chime.w2Swell).toBe(false);
+  expect(cfg.sfx.era_v_swell).toEqual({ voice: "S3", music_voice: false });
+});
+Given("a colonial nation founded in {int}", (s, year: number) => {
+  s.founded = year;
+});
+Then("it uses the single palette {string}, with no blend", (s, palette: string) => {
+  expect(s.founded).toBeGreaterThan(1500);
+  expect(A.colonialPalette(s.founded)).toBe(palette);
+  expect(A.colonialPalette(1490)).toBeNull();
+});
+Given("the iPhone's silent switch is on", (s) => {
+  s.session = A.iosSession();
+});
+Then(/^the game uses the native "ambient" audio session, which respects the silent switch$/, (s) => {
+  expect(s.session).toMatchObject({ category: "ambient", respectsSilentSwitch: true });
+});
+Then("it mixes with the player's other audio apps", (s) => {
+  expect(s.session.mixWithOtherApps).toBe(true);
+});
+Then("music and effects follow the same audio session setting", (s) => {
+  expect((s.session ?? A.iosSession()).effectsFollowMusic).toBe(true);
+});
+Given(/^the game runs on "(\w+)" with "play in background" (on|off)$/, (s, platform: string, v: string) => {
+  s.bgPlatform = platform;
+  s.bgOn = v === "on";
+});
+When("the window is hidden", (s) => {
+  s.app = A.newAppAudio();
+  A.toBackground(s.app, { platform: s.bgPlatform, playInBackground: s.bgOn });
+});
+Then(/^the audio (is suspended|keeps playing)$/, (s, how: string) => {
+  expect(s.app.context).toBe(how === "is suspended" ? "suspended" : "running");
+});
+Given("a fresh install on a phone", (s) => {
+  s.settings = A.defaultSettings();
+});
+Then("master volume is {float}", (s, v: number) => {
+  expect(s.settings.master).toBe(v);
+});
+Then(/^music volume is ([\d.]+), effects volume ([\d.]+) and ambience volume ([\d.]+)$/, (s, m: string, e: string, a: string) => {
+  expect([s.settings.music, s.settings.effects, s.settings.ambience]).toEqual([Number(m), Number(e), Number(a)]);
+});
+Then(/^the variety is "own palette only"$/, () => {
+  expect(cfg.music.defaults.variety).toBe("own_palette");
+});
+Then("interface sounds are on, haptics are on, ambience is off", (s) => {
+  expect([s.settings.uiSounds, s.settings.haptics, s.settings.ambienceOn]).toEqual([true, true, false]);
+});
+Then("mono, sound captions and reduced intensity are off", (s) => {
+  expect([s.settings.mono, A.captionsOn(s.settings), s.settings.reducedIntensity]).toEqual([false, false, false]);
+});
+When("the player turns music off", (s) => {
+  s.settings.musicOn = false;
+});
+Then("the synth's music is fully suspended", (s) => {
+  expect(A.musicSuspended(s.settings)).toBe(true);
+});
+const mf = (f: Partial<A.MusicFacts>): A.MusicFacts => ({ era: "I", atWar: true, ...f });
+const STATE_FACTS: [RegExp, () => A.MusicFacts][] = [
+  [/^60 % of the player's peace voices would accept the enemy's terms$/, () => mf({ enemyTermsVoiceShare: 0.6 })],
+  [/^the capital is occupied$/, () => mf({ capitalOccupied: true })],
+  [/^5 of the 8 great powers are at war in Era V$/, () => mf({ era: "V", greatPowersAtWarShare: 5 / 8 })],
+  [/^war was declared 1 month ago and no battle has been fought$/, () => mf({ monthsSinceDeclaration: 1, battlesFought: 0 })],
+  [/^25 % of provinces are Plotting or Risen$/, () => mf({ atWar: false, unrestProvinceShare: 0.25 })],
+  [/^no lord is Disloyal, half are Loyal, the treasury is rising and the realm has been at peace for 10 years$/, () => mf({ atWar: false, lords: [{ loyalty: "Loyal" }, { loyalty: "Wavering" }], treasuryTrend: "rising", yearsAtPeace: 10 })],
+];
+for (const [re, f] of STATE_FACTS)
+  Given(re, (s) => {
+    s.stateFacts = f();
+  });
+Then("the music state {string} holds", (s, state: string) => {
+  expect(A.stateHolds(state, s.stateFacts)).toBe(true);
+  if (state === "war_losing" && s.stateFacts.enemyTermsVoiceShare) expect(A.stateHolds(state, { ...s.stateFacts, enemyTermsVoiceShare: 0.5 })).toBe(false);
+  if (state === "prosperity") expect(A.stateHolds(state, { ...s.stateFacts, lords: [{ loyalty: "Disloyal" }, { loyalty: "Loyal" }] })).toBe(false);
+});
+Given(/^a weekly turn in which (no new month|\w+) begins$/, (s, what: string) => {
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  s.monthBegan = what === "no new month" ? null : months.indexOf(what) + 1;
+});
+When("the turn is ready", (s) => {
+  s.readyChime = A.turnReadyChime({ monthBegan: s.monthBegan });
+});
+Then("the chime is {string}", (s, id: string) => {
+  expect(s.readyChime).toBe(id);
 });

@@ -8,7 +8,7 @@ Warfare is everything that happens once your soldiers are under arms: how they a
 
 Every army is made of **companies** of usually 500 to 1,000 men. Each company has exactly one **arm** (how it fights, such as pikes or knights) and one **kind** (where its men come from). A company keeps its own men, drill, scars, loads of arms, pay owed and months out.
 
-- **Drill** is months spent training together, from 0 to 12. A company in camp, garrison or winter quarters and not marching gains 1 drill a month; standing regiments drill all year. A hungry month takes 1 drill away. When new men join, drill and scars are diluted: drill becomes drill × old men ÷ all men. Disbanding resets drill and scars.
+- **Drill** is months spent training together, from 0 to 24. A company in camp, garrison or winter quarters and not marching gains 1 drill a month; standing regiments drill all year. A hungry month takes 1 drill away. When new men join, drill and scars are diluted: drill becomes drill × old men ÷ all men. Disbanding resets drill and scars.
 - **Scars** are battles stood through without breaking, from 0 to 5. A company gains 1 scar for standing through a battle and 1 more if its side won. Five years without a battle takes one away.
 - **Loads of arms** come from the store at raising and from won fields, and are lost with killed and fled men, on a lost field, or sold at disbanding. A company short of the loads its arm needs fights as the next arm down (armoured foot as levy foot).
 - Men join by raising, refilling from recruits, wounded coming back and enlisted prisoners, and leave by being killed, wounded, fleeing, deserting, falling sick, going hungry or being disbanded.
@@ -46,7 +46,7 @@ Later arms (machine guns, tanks, aircraft) follow the same shape in config. Elep
 | Levy | 25 % | free for 3 months, then normal pay |
 | Retinue | 35 % | paid by the lord |
 | Hired company | 35 % | three times normal pay |
-| Standing regiment | 40 % | 1.5 times normal pay, all year (needs W12) |
+| Standing regiment | 30 % | 1.5 times normal pay, all year (needs W12) |
 | Garrison | 40 % on the walls | normal pay |
 | Rebel band | 20 % | loot |
 
@@ -92,7 +92,7 @@ How skills move:
 | Cunning | +1 for a win where he gave more orders than the enemy, or a clean withdrawal from a lost battle | −1 every 5 years past 65; −1 when ambushed and beaten |
 | Logistics | +1 for a full year in the field without a hungry month; years as a steward or warden before command | with age past 65; −1 when an army starves under him |
 
-Academy graduates start with +1 Cunning or Logistics and no victories. A commander takes a serious wound with a 1 in 10 chance per lost battle and 1 in 20 per won one (twice as likely if Reckless), and wounds never heal.
+Academy graduates, and officials you commission as commanders, start with +1 Cunning or Logistics and no victories. A commander takes a serious wound with a 1 in 10 chance per lost battle and 1 in 20 per won one (twice as likely if Reckless), and wounds never heal.
 
 **Traits:**
 
@@ -111,7 +111,7 @@ Academy graduates start with +1 Cunning or Logistics and no victories. A command
 
 At 10 victories a commander may gain a second trait. If you have not set an army's standing orders, the commander's trait sets them.
 
-**Where commanders come from**: the ruler or an heir, a lord, a hired captain, a captain risen from the ranks after a victory (one offer per won battle), an academy graduate, or a foreign exile, each with its catch (a succession crisis if the ruler dies or is captured, Proud lords refusing a lower-born commander, a hired captain leaving when unpaid, the exile's old ruler insulted). Women can be commanders where the country's history supports it, more often in later eras. [Recruiting](Recruiting) adds commissioned officials.
+**Where commanders come from**: the ruler or an heir, a lord, a hired captain, a captain risen from the ranks after a victory (one offer per won battle), an academy graduate, a foreign exile, or one of your officials commissioned as a commander (who counts as an academy graduate), each with its catch (a succession crisis if the ruler dies or is captured, Proud lords refusing a lower-born commander, a hired captain leaving when unpaid, the exile's old ruler insulted). Women can be commanders where the country's history supports it, more often in later eras. [Recruiting](Recruiting) adds commissioned officials.
 
 Commanders are lost to death in battle (1 in 20 for the loser's commander, more if Reckless), capture, old age, dismissal (a dismissed lord wavers), defection, or a grant of land after which he leads only his retinue.
 
@@ -123,7 +123,7 @@ An army has one commander and up to two **captains**, each standing in one secto
 
 You see enemy armies in your own provinces, next to your armies and castles, and as far as your scouts ride: every 500 light horse, horse archers or camel riders see one province further. Armies further away show as rumours of size and place that can be wrong by up to a third. Scouting and rumours are only worked out near the player.
 
-A **forced march** doubles sickness, makes levies desert 2 % a week, and gives −10 % strength for the first day of a battle the army arrives into. A **Careful** march can't be ambushed and its scouts see two provinces ahead. The march itself belongs to [Troop-Movement](Troop-Movement).
+A **forced march** doubles sickness, makes levies desert 2 % a week, and gives −10 % strength for the first day of a battle the army arrives into. A **Careful** march can't be ambushed and its scouts see two provinces ahead. An army with guns heavier than light field guns marches ×1.25 slower into rough ground (once for the whole army), and an army too big for a province's forage limit takes one extra crossing (6 days) to enter it. The march itself belongs to [Troop-Movement](Troop-Movement).
 
 ### Supply
 
@@ -154,7 +154,7 @@ A battle starts when two hostile armies end a day in the same province, unless o
 | Woods | 1,000 | no charges; shooting into it halved; companies can hide |
 | Marsh | 500 | no charges; everyone −25 % |
 | Waste (rock, sand) | 1,500 | open in drylands and desert; rough on hills and mountains |
-| Shore (river bank) | 1,000 | attacking across it −25 % without a bridge |
+| Shore (river bank) | 1,000 | attacking across it −20 % without a bridge, none when the river is frozen |
 | Town | 1,500 | defender +50 %, shooting into it halved, no charges; fighting burns town buildings |
 | Castle | its garrison | the garrison joins from the walls |
 
@@ -214,7 +214,7 @@ War elephants whose sector loses a bell badly panic and trample their own side f
 - Victories and defeats are added to the commanders and countries, scars are awarded, and all killed count as Fallen.
 - **Prisoners** can be ransomed (gold by rank), exchanged, released (a gift that wins goodwill), enlisted as a hired company at level 1, or held (they eat). Realms with capture warfare (Mesoamerica and some forest-zone realms at the start) take half the enemy's killed as prisoners instead.
 
-**Standing orders** apply to every battle: retreat if outnumbered 2 to 1, 3 to 2, or never (checked before battle and each night), and attack or wait. At month end every battle of that month is resolved one at a time, in order, before any report shows. A battle involving you stops the turn on a battle report with a Watch button; battles between others go to the log.
+**Standing orders** apply to every battle: retreat if outnumbered 2 to 1, 3 to 2, or never (checked before battle and each night), and attack or wait. Battles start on the day two hostile armies meet and are fought over time: each bell is one round of 4 hours on the map, six a day. While one of your battles runs, the map slows to those 4-hour steps; at every step you can change standing orders, order a retreat (it takes effect at once, cleanly if your commander's Cunning is at least the enemy's) or switch between your battles, and the result can't be skipped. Armies that march in join their side's reserve. Afterwards the battle report shows, and any battle can be replayed later from its notice. Battles between other realms never slow the game: they fight their six rounds a day at once and go to the log.
 
 ### Commander styles
 
@@ -284,6 +284,8 @@ Each realm fights by the inventions it knows, with no world clock, so armies of 
 | VI | 1870 to 1914 | half a day | 10 days | halved | 6 % (8 % with W19) |
 | VII | 1914 to 1939 | a day | 30 days | a quarter | 8 % |
 
+A battle of 10 or 30 days keeps its armies in place while it lasts and simply carries on into the next turn. An invention belongs to the era the research tree gives it. Styles first seen after 31 August 1939 are not in the game.
+
 **Obsolete arms.** When the enemy knows the invention that replaced an arm, that arm fights at half strength against him, and once your own realm learns it you can no longer raise that arm. Plate armour on foot falls to W5; knights and gendarmes, bows and crossbows to W9; pikes and horse archers to W11 (horse archers keep scouting and raiding); bombards in the field to W8; close-order line infantry to W17; cavalry as Shock and foot without cover to W19 (horse stays Light until W21); tanks without air cover to W22 on the enemy side. Re-arming costs loads of arms and powder and drops the company a level; an invention that changes a company's arm or role drops it a level until it has drilled the new era's Drilled months.
 
 **Levels by era** (drill months for Drilled / Seasoned / Elite; hits at levels 1 to 5; break point at levels 3 to 5):
@@ -300,7 +302,7 @@ Each realm fights by the inventions it knows, with no world clock, so armies of 
 
 Era notes: in era I knights and men-at-arms start at level 3 and levies can't pass level 3 without becoming standing troops; in era II pike and shot below level 2 fight as levy foot; in era III musketeers below level 2 shoot at half with W9; in era IV linear tactics need level 2 to change sector in a bell; in era VI a realm with W18 can call up former soldiers at level 2 as reservists; in era VII level 4 and 5 companies can infiltrate.
 
-**Skills by era.** Might gives +8 % hits and +3 % break point per point in era I (with a 1 in 5 risk to the leader if his sector is lost), +7 % and +3 % in II, +5 % and +2 % in III and IV, +4 % and +2 % in V (1 in 10 risk); in era VI there is no sector and it gives +3 % hits and +1 % break point to the whole army, and in VII +2 % and +1 % plus +10 % per point to Drive orders. Orders at Cunning 0 to 1 / 2 to 3 / 4 to 5 are 1/2/2 in era I (orders to other sectors arrive next bell), 1/2/3 in II (orders 3+ sectors away arrive next bell), 1/2/3 in III and IV, 1/2/3 in V (+1 with W14), 2/2/3 in VI (captains give their own orders), and 2/3/4 in VII (+1 with W23). Logistics sets ammunition bells: bows 4 + Logistics in era I, Shot 3 + Logistics in II to IV, Shot and guns 2 + Logistics in V with guns needing powder wagons, 1 + Logistics in VI (a company without ammunition fights at half, rotation up to Logistics × 2 sectors), and in VII ammunition and fuel for tanks and aircraft, with losses replaced from depth at 10 % per point per bell. From era III skills also grow from academy training and serving under a Cunning 4+ commander; in eras VI and VII Might comes mostly from academy and staff college, victories give +1 only every 4, and Cunning can grow from wargames (a peacetime year of training, once per era).
+**Skills by era.** Might gives +8 % hits and +3 % break point per point in era I (with a 1 in 5 risk to the leader if his sector is lost), +7 % and +3 % in II, +5 % and +2 % in III and IV, +4 % and +2 % in V (1 in 10 risk); in era VI there is no sector and it gives +3 % hits and +1 % break point to the whole army, and in VII +2 % and +1 % plus +10 % per point to Drive orders. Orders at Cunning 0 to 1 / 2 to 3 / 4 to 5 are 1/2/2 in era I (orders to other sectors arrive next bell), 1/2/3 in II (orders 3+ sectors away arrive next bell), 1/2/3 in III and IV, 1/2/3 in V (+1 with W14), 2/2/3 in VI (captains give their own orders), and 2/3/4 in VII (+1 with W23). Logistics sets ammunition bells: bows 4 + Logistics in era I, Shot 3 + Logistics in II to IV, Shot and guns 2 + Logistics in V with guns needing powder wagons, 1 + Logistics in VI (a company without ammunition fights at half, rotation up to Logistics × 2 sectors), and in VII ammunition for tanks and aircraft, drawn from the powder store, with losses replaced from depth at 10 % per point per bell. From era III skills also grow from academy training and serving under a Cunning 4+ commander; in eras VI and VII the academy becomes the staff college (+1 Might, Cunning and Logistics on graduating), victories give +1 Might only every 4, Cunning can grow from wargames (a peacetime year of training, once per era), and each peacetime year commanding a standing army gives +1 Logistics, up to 3. In every era W14 and W23 each add an order per bell. Drill counts up to 24 months, enough for Elite in every era.
 
 ### Sieges
 
@@ -354,16 +356,17 @@ With over half saying peace, the ruler must accept a peace asking only for provi
 
 ### The computer players
 
-The AI's catalogue military doctrine and risk tolerance set its standing orders and its commanders' starting styles, which kinds it raises (Castile noble retinues and frontier light horse, a city republic hired companies), whether it besieges or raids, and how many peace voices it needs before talking peace (a low-risk AI offers at a third, a hegemon seeker only when forced). It sees only the forage limits, food reserves and peace voices the player sees, and doesn't cheat on food.
+The AI's risk tolerance sets its standing orders: a careful realm waits and retreats when outnumbered at all, a middling one attacks and retreats at 3 to 2, and a bold one attacks and retreats only at 2 to 1. Only a bold realm sends horse-only armies raiding instead of besieging. Its commanders start with its country's styles from the style catalogue. Its personality also sets which kinds it raises (Castile noble retinues and frontier light horse, a city republic hired companies) and how many peace voices it needs before talking peace (a low-risk AI offers at a third, a hegemon seeker only when forced). It sees only the forage limits, food reserves and peace voices the player sees, and doesn't cheat on food.
 
-### Each month
+### Each turn and each month
 
-During the month, inside the day loop: contacts, the withdraw check and battles; raids burn a tile a week; forced marches and hunger cost men weekly; weekly meals and refills. At month end, in order: resolve battles one at a time; pay and pay owed; supply (rot, quarters, Requisitioned and Hungry); sickness and wounded returning; sieges; occupation by holding a season; drill, months out, levies and lords going home; the troop cap; peace voices. Yearly: arms rust, powder damp, scars fade, ageing, and victories older than 20 years drop off.
+During the turn, inside the day loop: contacts, the withdraw check and battles; raids burn a tile a week; forced marches and hunger cost men weekly; weekly meals and refills at the end of every turn (a turn is one week; each meal is 7/30 of the month's rations). Monthly rules keep their size and run at the end of the turn in which a new month begins, in order: pay and pay owed; supply (rot, quarters, Requisitioned and Hungry); sickness and wounded returning; sieges; occupation by holding a season; drill, months out, levies and lords going home; the troop cap; peace voices. Yearly: arms rust, powder damp, scars fade, ageing, and victories older than 20 years drop off.
 
 ## What you see
 
 - **The army card**: name, owner, place, destination, commander and skills, captains, men by foot, horse and guns, companies by kind and level, food days and reserve size, pay and months owed, break point and flee share, orders, sick and wounded. Every line opens its gain and lose list.
-- **The battle report**: who fought, where, the result, the losses and a one-line reason, with a Watch button. You can watch, skip or replay later.
+- **Your running battles**: shown step by step every 4 hours, with standing orders, retreat and a switch between battles.
+- **The battle report**: who fought, where, the result, the losses and a one-line reason. Any battle can be replayed later from its notice.
 - **The battle playback**: the tile row, companies as blocks with level chevrons, the camps, and a one-line action per bell ("Dunois commits his knights to the pastures").
 - **The forage limit**, shown when you drag an army over a province.
 - **Rumours** of unseen armies.
@@ -374,7 +377,7 @@ During the month, inside the day loop: contacts, the withdraw check and battles;
 
 - [Troop-Movement](Troop-Movement): supplies daily positions and contacts; warfare supplies march effects, scouting, standing orders, the battle-start rule, forage limit and the broken army.
 - [Recruiting](Recruiting): delivers levies, trained regiments and commissioned commanders; gets back disbanded men, deserters and Fallen.
-- [Naval](Naval): uses warfare's bell rules for sea battles on 3 sectors, and its commanders' skills for admirals.
+- [Naval](Naval): uses warfare's bell rules for sea battles on 3 sectors, and its commanders' skills for admirals; naval decides ship damage (a ship hit and still afloat loses one hull step, hits equal to its strength sink or take it) and storms.
 - [Diplomacy](Diplomacy): declares wars with aims and sides, carries peace and sets the truce; receives peace voices, occupation and oaths broken.
 - [Provinces](Provinces): supplies ground, tile rows, stores, sickness and grievances; receives Requisitioned, Hungry, Soldiers quartered, Burned homes, burned tiles and sacks.
 - [World-Map](World-Map): tile rows, ground, shore tiles and bridges.
@@ -390,17 +393,17 @@ During the month, inside the day loop: contacts, the withdraw check and battles;
 - [The-1444-Start](The-1444-Start): starting styles, capture warfare realms, starting castles and inventions.
 - [Map-and-Lenses](Map-and-Lenses) and [Screens-and-Navigation](Screens-and-Navigation): army cards, battle playback, reports and notifications.
 - [Trade](Trade): occupiers take trade; the Open the roads term.
-- [Time-and-Turns](Time-and-Turns): the month, the day loop and the order battles resolve in.
+- [Time-and-Turns](Time-and-Turns): the weekly turn, the day loop and the order battles resolve in.
 
 ## Numbers
 
-All warfare values are **placeholders** in one warfare config file whose name is not given yet (OQ-WAR-17). Key values:
+All warfare values live in `packages/rules/data/domain/warfare.json`; most are provisional and tuned in balancing. Amounts the designs left out are set as: a wagon costs 10 gold, a hired company costs twice standing pay, a season is 3 months, a ransom is 100 gold for a commander and 25 for a captain, and fever land doubles sickness. Key values:
 
 | Key | Value |
 |---|---|
 | `warfare.company_size_min` / `max` | 500 / 1,000 |
 | `warfare.drill_max`, `warfare.scars_max`, `warfare.scar_fade_years` | 12, 5, 5 |
-| `warfare.kinds.<kind>.break_point` | levy 25 %, retinue 35 %, hired 35 %, standing 40 %, garrison 40 %, rebel 20 % |
+| `warfare.kinds.<kind>.break_point` | levy 25 %, retinue 35 %, hired 35 %, standing 30 %, garrison 40 %, rebel 20 % |
 | `warfare.kinds.levy.free_months`, `go_home_after` / `rate` | 3; 6 months / 5 % a month |
 | `warfare.kinds.hired.pay_multiplier`, `warfare.kinds.standing.pay_multiplier` | 3, 1.5 |
 | `warfare.break.homeland` / `hungry` / `pay_owed` | +5 % / −10 % / −5 % a month |
@@ -438,30 +441,10 @@ All warfare values are **placeholders** in one warfare config file whose name is
 
 ## Still open
 
-- **OQ-WAR-1**: hits per bell, break points, the flee share and troop cap shares need a balancing pass.
-- **OQ-WAR-2**: whether a battle pauses the turn; three designs disagree.
-- **OQ-WAR-3**: guns slow an army +25 % per gun (warfare) or one ×1.25 per army (troop-movement, newer).
-- **OQ-WAR-4**: big armies are one day slower per province, or one extra crossing.
-- **OQ-WAR-5**: the river crossing penalty is −25 % on the shore sector or −20 % on the ground, or both.
-- **OQ-WAR-6**: commander origins and starting styles differ between warfare and recruiting v3.
-- **OQ-WAR-7**: country stats has none of the rows warfare asked for (stores, prisoners, troop cap, peace voices).
-- **OQ-WAR-8**: whether steppe, dunes and paddies change battles.
-- **OQ-WAR-9**: level thresholds disagree between the main text and the eras table, and drill caps at 12.
-- **OQ-WAR-10**: how 10 and 30 day battles fit a month-long day loop.
-- **OQ-WAR-11**: W20's effect, and which era several inventions belong to.
-- **OQ-WAR-12**: several era VII styles are historically after 31 August 1939.
-- **OQ-WAR-13**: staff college and wargames have no school type.
-- **OQ-WAR-14**: the catalogue has no starting styles, so how AI orders and styles are derived is unclear.
-- **OQ-WAR-15**: break point by kind or by training.
-- **OQ-WAR-16**: naval's Close order and new ship types are not in warfare's lists.
-- **OQ-WAR-17**: missing amounts (normal pay, wagon cost, company prices, a "season", ransom by rank, config file name).
-- **OQ-WAR-18**: who owns the war-aim effects table and peace terms, warfare or diplomacy.
-- **OQ-WAR-19**: how storming an earthwork ring fort without a breach stacks with the stormers' penalty.
-- **OQ-WAR-20**: what fuel is in era VII.
-- **OQ-WAR-21**: era I order counts differ, and when W14 and W23 apply.
+Nothing in warfare is waiting on a decision; the provisional numbers are tuned in balancing. War at sea, including the Close order, belongs to [Naval](Naval).
 
 ## For developers
 
-- Spec: `domain/warfare/spec.md` in the game repository, requirement code **WAR** (WAR-001 to WAR-204).
+- Spec: `domain/warfare/spec.md` in the game repository.
 - Features: `domain/warfare/features/`, 17 files including `battle-bells.feature` (Troyes 1450), `sieges.feature` (the castle of Troyes), `troop-cap-and-soldier-stats.feature` (France 1444), `commander-styles.feature` and `warfare-eras.feature`.
-- Code: there is no `packages/engine/src/domain/warfare/` yet. Marching and feeding live in `packages/engine/src/march.ts`; today's code commander has only might, cunning and logistics.
+- Code: `packages/engine/src/domain/warfare/` (companies, commanders, styles, battle, resolver, sieges, supply, war, ai), with all values in `packages/rules/data/domain/warfare.json`.

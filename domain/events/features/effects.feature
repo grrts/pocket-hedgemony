@@ -14,7 +14,7 @@ Feature: Effects and execution
       | tier      | when                                         |
       | immediate | at once                                      |
       | delayed   | after its years                              |
-      | ongoing   | each turn while the event runs               |
+      | ongoing   | each month while the event runs              |
       | long_term | as a permanent structural change             |
 
   @EVT-045

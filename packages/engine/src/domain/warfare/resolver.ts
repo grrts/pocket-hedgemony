@@ -224,8 +224,64 @@ const short = (name: string): string => name.split(" ").slice(-1)[0]!;
 const plural = (use: string): string => (/(s|Town|Marsh)$/.test(use) ? use.toLowerCase() : `${use.toLowerCase()}s`);
 const armWord = (arm: string): string => (arm === "knights and lancers" ? "knights" : arm);
 
-/** Fight one battle to its end (WAR-089 … WAR-133). Same input, same result. */
+/** Orders that reach a running battle between rounds (X-1): a retreat, or armies marching in to join. */
+interface RoundControl {
+  retreat: 0 | 1 | undefined;
+  joins: { side: 0 | 1; companies: Company[] }[];
+}
+
+/** A battle fought over time, one round (one bell) per 4-hour step (X-1, WAR-136, WAR-205, WAR-206). */
+export interface RunningFight {
+  /** Fights the next round; returns the result once the battle has ended, otherwise null. */
+  round(): BattleResult | null;
+  /** The side orders a retreat; it takes effect at the start of the next round. */
+  retreat(side: 0 | 1): void;
+  /** Companies of an army that marched in join a side's reserve from the next round. */
+  join(side: 0 | 1, companies: Company[]): void;
+  /** Rounds fought so far. */
+  rounds: number;
+  /** Men each side has brought into the battle, joiners included. */
+  men: [number, number];
+  result: BattleResult | null;
+}
+
+/** Starts a battle that is then fought round by round (X-1). */
+export function startBattle(input: BattleInput): RunningFight {
+  const ctl: RoundControl = { retreat: undefined, joins: [] };
+  const men = [input.attacker, input.defender].map((s) => s.army.companies.reduce((t, c) => t + c.men, 0)) as [number, number];
+  const gen = fightRounds(input, ctl);
+  const f: RunningFight = {
+    rounds: 0,
+    men,
+    result: null,
+    round() {
+      if (f.result) return f.result;
+      const r = gen.next();
+      f.rounds += 1;
+      if (r.done) f.result = r.value;
+      return f.result;
+    },
+    retreat(side) {
+      ctl.retreat = side;
+    },
+    join(side, companies) {
+      ctl.joins.push({ side, companies });
+      f.men[side] += companies.reduce((t, c) => t + c.men, 0);
+    },
+  };
+  return f;
+}
+
+/** Fight one battle to its end (WAR-089 … WAR-133), round after round. Same input, same result. */
 export function fightBattle(input: BattleInput): BattleResult {
+  const f = startBattle(input);
+  for (;;) {
+    const r = f.round();
+    if (r) return r;
+  }
+}
+
+function* fightRounds(input: BattleInput, ctl: RoundControl): Generator<void, BattleResult> {
   const { sectors, era } = input;
   const sides = [input.attacker, input.defender] as const;
   const n = sectors.length;
@@ -291,6 +347,17 @@ export function fightBattle(input: BattleInput): BattleResult {
 
   for (;;) {
     for (let b = 1; b <= W.battle.bells_per_day; b++) {
+      // Between rounds: a retreat ordered by a side (X-1, WAR-205), and armies that marched in (WAR-206).
+      if (ctl.retreat !== undefined) {
+        const i = ctl.retreat;
+        const w = nightWithdrawal(sides[i]!.army.commander?.cunning ?? 0, sides[1 - i]!.army.commander?.cunning ?? 0);
+        return finish(i, w.clean ? "withdrew clean" : "withdrew", w.pursuit);
+      }
+      for (const j of ctl.joins.splice(0))
+        for (const c of j.companies.filter((x) => x.men > 0)) {
+          units.push({ c, side: j.side, start: c.men, killed: 0, wounded: 0, fled: 0, broken: false, sector: null, hidden: false, behind: false, bellsInRow: 0, ammoUsed: 0, refilling: false, contact: 0 });
+          menAtStart[j.side] = menAtStart[j.side]! + c.men;
+        }
       bells += 1;
       const firstBell = bells === 1;
       const assault = approaches.some((a) => a.approach === "Assault");
@@ -420,6 +487,7 @@ export function fightBattle(input: BattleInput): BattleResult {
         brokenAt[loser] = bells;
         return finish(loser, "broke", 1);
       }
+      yield;
     }
     // Night (WAR-123, WAR-124): fled men who come back return, ammunition refills, standing orders are checked.
     for (const u of units) {
@@ -508,12 +576,12 @@ export interface BattleReport {
 }
 
 /**
- * The month's battles, resolved one at a time in order: each result is ready
+ * The turn's battles, resolved one at a time in order: each result is ready
  * before its report is made (WAR-135). Battles with no player go to the log
- * and never stop the turn (WAR-137); whether a player battle stops the turn
- * is OQ-WAR-2, so those reports are only handed back.
+ * and never slow the game (WAR-137); a player battle (WAR-136) is fought
+ * round by round in 4-hour steps (X-1, D-WAR-2); its report is handed back.
  */
-export function resolveMonth(battles: (BattleInput & { where: string })[], player?: string): { order: string[]; log: BattleReport[]; playerReports: BattleReport[] } {
+export function resolveTurn(battles: (BattleInput & { where: string })[], player?: string): { order: string[]; log: BattleReport[]; playerReports: BattleReport[] } {
   const order: string[] = [];
   const log: BattleReport[] = [];
   const playerReports: BattleReport[] = [];

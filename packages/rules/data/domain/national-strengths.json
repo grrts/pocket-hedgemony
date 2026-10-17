@@ -124,7 +124,7 @@
    "$comment_choices": "D-HER-12: the AI sleeps the awake heyday, and lets go the legacy, with the fewest lever points; ties go to the one held longest."
   },
   "timing": {
-   "$comment": "D-HER-9: heritage is evaluated once per turn, in the events step after the event tree, and counts time in months.",
+   "$comment": "D-HER-9, X-18: heritage is evaluated once per turn (one week), in the events step after the event tree, and counts time in months by the date: a month is added only in the turn in which a new month begins.",
    "months_per_year": 12
   }
  },

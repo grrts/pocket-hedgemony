@@ -59,3 +59,14 @@ Feature: Guided first turns
   Scenario: Closed for good
     When the player closes the goals list for good from its menu
     Then the goals list does not appear again in that campaign
+
+  @TUT-118
+  Scenario Outline: Tutorial hints switch the goals list
+    Given a player who skipped the tutorial starts a campaign
+    And the setting "Tutorial hints" is <setting>
+    Then the goals list is <shown>
+
+    Examples:
+      | setting | shown |
+      | on | shown |
+      | off | not shown |

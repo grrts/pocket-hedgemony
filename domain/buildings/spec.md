@@ -16,7 +16,7 @@ other context that needs a building finds it here, and asks for a new one here.
 - Owners (crown, lord, clergy, town, merchant house or company, the people) and how non-crown builders choose.
 - Buildings the people put up themselves (village works, craft buildings appearing).
 - The full building catalogue (sections 7.1–7.10 of the design), landmarks, regional names and sprites, the unique
-  variants offered to national strengths.
+  variants (stored in the buildings data, D-BLD-16).
 - The build sheet, the building card, the Works screen, the Works and Jobs lenses, building notifications.
 - The five event-tree building effects and the old province-stat mapping onto buildings.
 - The AI's building choices, starting buildings, and the per-building data kept for speed on a phone.
@@ -73,7 +73,7 @@ Newest decision first.
 | Slighting | Pulling a castle down to a ruin so no rebel or rival can use it | Demolishing |
 | Landmark | A real, named building that stood in or after 1444, a step above its type, with one effect of its own | Unique variant |
 | Variant (look) | A building's regional or faith name and sprite; effect unchanged | Unique variant |
-| Unique variant | A country's or people's version of one building that changes one number or adds one line; offered to national strengths | Look variant |
+| Unique variant | A country's or people's version of one building that changes one number or adds one line; stored in the buildings data | Look variant |
 | Works screen | The realm-wide list of sites, needs and advice | Province card |
 | Advice | Up to five yearly building suggestions on the Works screen | AI building rule |
 | Batch order | An order to build one thing everywhere it fits | Build all advised |
@@ -265,7 +265,7 @@ Works across the province (§7.10)
 ### 5.1 What a building is
 - BLD-001 The buildings context shall give every building a type, place, step, owner, jobs (slots and filled), makes, needs, condition and upkeep. [buildings §1]
 - BLD-002 The buildings context shall give each building one class of job slots; filled slots make wares and empty slots make nothing. [buildings §0, §1]
-- BLD-003 The buildings context shall let a building have steps 1 to 3, and castles and a few other types more. [buildings §1] (see OQ-BLD-4)
+- BLD-003 The buildings context shall let a building have steps 1 to 3, and castles and roads 5. [buildings §1, D-BLD-4]
 - BLD-004 When the player taps a building, the game shall open its card showing every field with its gain and lose list, the next step's gain and cost, and Upgrade, Demolish and Close actions. [buildings §1]
 - BLD-005 The buildings context shall give each building one effect at most besides jobs and wares, and shall never give a flat percentage to a country. [buildings intro, §17]
 
@@ -300,7 +300,7 @@ Works across the province (§7.10)
 - BLD-029 The buildings context shall accept bricks in place of stone, one for one. [buildings §3.3]
 - BLD-030 Where a province is drylands, desert or savanna, the buildings context shall allow earth, free and made on site, in place of stone, and shall double that building's upkeep. [buildings §3.3]
 - BLD-031 The buildings context shall make iron available as a material from era IV and steel and concrete from era VI. [buildings §3.3]
-- BLD-032 If a province has few traders, then the buildings context shall make bought materials dearer there. [buildings §3.3] (see OQ-BLD-2)
+- BLD-032 If no trade route touches a province, then the buildings context shall make bought materials 25 % dearer there than their base price. [buildings §3.3, X-6, D-BLD-2]
 
 ### 5.5 Labourers
 - BLD-033 The buildings context shall give every site a crew size from config (for example 500 for a farm, 3,000 for a stone castle, 6,000 for a canal). [buildings §3.4]
@@ -348,7 +348,7 @@ Works across the province (§7.10)
 ### 5.11 How buildings are lost or damaged
 - BLD-064 When foraging or looting armies pass, the buildings context shall burn land buildings tile by tile. [buildings §5.3]
 - BLD-065 When a raid hits a province, the buildings context shall damage one building, or ruin it if the raid is big; town walls shall stop raids reaching town buildings. [buildings §5.3, §7.8]
-- BLD-066 When a town is plundered, the buildings context shall ruin 1 in 3 of its town buildings, or 1 in 6 with town walls. [buildings §5.3, §7.8] (see OQ-BLD-12)
+- BLD-066 When a town is plundered, the buildings context shall ruin 1 in 3 of its town buildings, or 1 in 6 with town walls at any step, the palisade included. [buildings §5.3, §7.8, D-BLD-12]
 - BLD-067 While rebels hold a province, the buildings context shall let them loot one town building a season, the market first. [buildings §5.3]
 - BLD-068 The buildings context shall roll a town fire each year in towns of timber, more likely in big towns and shanty camps and less where most buildings are stone or brick, damaging one to three town buildings. [buildings §5.3]
 - BLD-069 When a flood hits a river or marsh province, the buildings context shall damage land buildings on shore and marsh tiles; a dyke broken in war shall turn fields to marsh. [buildings §5.3]
@@ -379,7 +379,7 @@ Works across the province (§7.10)
 
 ### 5.14 What the people build
 - BLD-090 When a year ends in a province at peace for 5 years, with more than 3 months of food in store and homeless or full slots, the buildings context shall roll a chance (config, 20 %) to place a step-1 farm, ranch, fishery or lumber camp on an empty matching tile, owned by the commons. [buildings §6.3]
-- BLD-091 The buildings context shall now and then let a loom house, tannery, kiln or brewery appear in a town with a market, homeless people and the raw ware nearby, owned by the town or the commons; craftsmen fleeing persecution abroad can found one. [buildings §6.3] (trade adds a trade-ratio floor; see OQ-BLD-15)
+- BLD-091 When a town has a market, homeless people, the raw ware nearby and a trade ratio of at least 30 %, the buildings context shall each year give a 1 in 10 chance that a loom house, tannery, kiln or brewery appears, owned by the town or the commons; craftsmen fleeing persecution abroad can found one. [buildings §6.3, trade §9, D-BLD-15]
 
 ### 5.15 Building catalogue rules
 - BLD-092 The buildings config shall define every building in the catalogue of section 4 with its place, jobs, makes, needs, unlocks and cost by step. [buildings §7]
@@ -416,13 +416,13 @@ Works across the province (§7.10)
 - BLD-123 The buildings context shall have dykes stop floods turning fields to marsh, and with F8 let marsh tiles be drained. [buildings §7.10]
 
 ### 5.16 Landmarks and variants
-- BLD-124 The buildings context shall treat a landmark as a step above its building type with one effect of its own, written as a count. [buildings §8] (see OQ-BLD-5)
+- BLD-124 The buildings context shall treat a landmark as its building type at the top step, marked as a landmark, with one effect of its own, written as a count. [buildings §8, D-BLD-5]
 - BLD-125 The buildings context shall never offer a landmark on the build sheet; landmarks are on the map at the start or founded by an event when its historical requirements are met. [buildings §8]
 - BLD-126 The buildings context shall include only real historical landmarks that stood or were built between 1444 and 1939; an event may found one elsewhere or not at all, but no invented landmark. [buildings §19.4]
 - BLD-127 The buildings context shall apply each landmark's own effect as listed in the landmark table. [buildings §8]
 - BLD-128 The game shall show landmarks as a small icon on their province at world zoom, each with its own sprite at local zoom. [buildings §8, §11.1]
 - BLD-129 The buildings context shall give a building the same effect everywhere, with its name and sprite chosen by the province's region and faith (config `variants`). [buildings §9.1]
-- BLD-130 The buildings context shall offer the unique variants (Külliye, Kontor, Qollqa line, Polder mill, Ever-normal granary, Funduq quarter) to national strengths, each changing one number or adding one line, without deciding them. [buildings §9.2]
+- BLD-130 The buildings context shall store the unique variants (Külliye, Kontor, Qollqa line, Polder mill, Ever-normal granary, Funduq quarter) in its data by country or culture, each changing one number or adding one line. [buildings §9.2, D-BLD-16]
 
 ### 5.17 Eras
 - BLD-131 The buildings context shall offer on the build sheet only buildings and steps whose unlock (start, invention, government form, region) the realm has. [buildings §7, §10]
@@ -453,10 +453,19 @@ Works across the province (§7.10)
 - BLD-148 When a campaign starts, the buildings context shall place buildings from the map's wealth (1: a farm or ranch on a third of tiles; 10: every tile built and town buildings at step 2). [buildings §15.2]
 - BLD-149 When a campaign starts, the buildings context shall set town size from population and fill town slots by a regional template. [buildings §15.2]
 - BLD-150 When a campaign starts, the buildings context shall set houses of worship's faith, lords' buildings and landmarks from the country catalogue, and allowed buildings and steps from start inventions. [buildings §15.2]
-- BLD-151 When a campaign starts, the buildings context shall place harbours and shipyards with their steps from the naval context's start-ports list (236 provinces). [buildings §7.9, §15.2] (see OQ-BLD-8)
+- BLD-151 When a campaign starts, the buildings context shall place harbours and shipyards with their steps from the naval context's start-ports list (236 provinces). [buildings §7.9, §15.2] (D-BLD-8)
 - BLD-152 When a campaign starts, the buildings context shall place fixed mines, named markets and landmarks from the event-tree geography anchors (Potosí from 1545 by event, Kutná Hora, Falun; Bruges, Champagne fairs, Malacca). [buildings §15.2]
 - BLD-153 The buildings context shall store five small numbers per building (type, step, owner, condition, filled jobs), keep sites in one realm-level list, and work out output and upkeep monthly and advice yearly. [buildings §15.3]
 - BLD-154 The buildings config shall hold every building as one entry, so adding a building is adding an entry and adding a step is adding a row. [buildings §15.1]
+
+### 5.22 Decided rules (17 October 2026)
+- BLD-155 Troyes shall start in 1444 as a town with 6 town slots. [D-BLD-1]
+- BLD-156 A master of works shall add one more of each, halve the months and make the gold 25 % less. [province §10.2, D-BLD-3]
+- BLD-157 Roads shall have five steps: track (known at the start, half a road's cost), road and paved road (B2), turnpike (B9, 1.5 × paved road), railway (C16). [D-BLD-13]
+- BLD-158 Building market step 2 (yearly fair) shall need T6 and a market charter; yearly fairs standing in 1444 stay. [trade §11, D-TRADE-3, D-BLD-6]
+- BLD-159 The caravanserai shall give land traders +25 % weight and stop bandits; the counting house shall let foreign traders deposit with bills of exchange. [trade §14, D-BLD-7]
+- BLD-160 A burned tile shall rebuild itself free, one a year in peace; paying half a farm's cost rebuilds one within a season. [D-BLD-21]
+- BLD-161 A town shall burn with a chance of 1 % a year (+0.5 % per size above town); a raid of 2,000 men or more is big. [D-BLD-17]
 
 ## 6. Commands
 
@@ -509,7 +518,9 @@ Works across the province (§7.10)
 - When **religion** converts a house of worship (Hagia Sophia 1453), then change its faith (BLD-076).
 - When **research** grants an invention, then new buildings or steps appear on the build sheet (BLD-131).
 
-## 9. Monthly turn
+## 9. Monthly step
+
+A turn is one week (X-18). The steps below are monthly: they run once, in the turn in which a new month begins.
 
 Each month (reads first: treasury gold from realm; homeless and classes from province; armies and occupation from warfare;
 season and climate from time-and-turns):
@@ -607,7 +618,7 @@ Changes the design asks of other files (§18), recorded here; not edited:
   neglect; 5.2 add wares stone, grapes, dates, guns, steel, cement (marble a kind of stone); 6.3 classes for the new
   buildings; 6.4 crews don't count toward homeless trouble; 9 and 2.1 dykes as ring works; 4.3 wells and drains as ring
   works and hospital known at start; 14 lenses Works and Jobs. **Not adopted** as of reading (province still lists
-  hospital, wells and drains under "later inventions", miners as mines and saltworks only): OQ-BLD-10.
+  hospital, wells and drains under "later inventions", miners as mines and saltworks only): D-BLD-10.
 - recruiting 4.1: drill yard answers open question 2.
 - warfare 8.5 (town walls cut plunder share), 2.4 (arsenal), 3.4 or 6.6 (barracks), 11.3 (lighthouses).
 - country-stats 2: building upkeep and costs in the Gold row; Treasury card shows upkeep.
@@ -628,29 +639,29 @@ Changes the design asks of other files (§18), recorded here; not edited:
 - Lords, clergy, towns and companies choose as in BLD-086..089.
 - Cost on a phone: about 400 small checks a month in a 400-country world.
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-BLD-1: Troyes' town size. Province 1 calls Troyes a market town (4 slots) but lists six town buildings; the worked example reads it as a town (6 slots). Which is the 1444 value? Blocks the Troyes scenarios' starting state.
-- OQ-BLD-2: Price of bought materials. Buildings §3.3 buys materials "at the province's market price" and makes them dearer "with few traders (province 7.2)". Trade v2 drops Market price and trade balance (trade §14). What price applies, and does trade ratio replace "few traders"? Blocks BLD-025, BLD-032.
-- OQ-BLD-3: Master of works gold. Config gives `gold_multiplier: 0.75` (matching province 10.2 "cost 25 % less") but buildings §3.5 says only "adds one more of each, and halves the months". Is the gold discount part of the rule?
-- OQ-BLD-4: Step counts. §1 says steps 1 to 3, "castles and a few others have 4", but the castle has five steps (earthwork, stone, bastion, star, concrete fortress) and roads five (track, road, paved, turnpike, railway). What is the maximum step, and which step numbers do castles use?
-- OQ-BLD-5: Landmark steps. A landmark is "a step above its building type", yet Alhambra is palace step 3 (palace's top step), Sankore school step 3 (school's top), Kremlin castle step 3, Ulugh Beg an observatory step 3 (observatory has one step), and Taj Mahal "own type". What step does each landmark stand at?
-- OQ-BLD-6: Yearly fair unlock. Buildings: step 2 unlocked at start, needs a market charter. Trade §11: T6 Merchant fairs and exchanges lets the yearly fair be built. Research tree T6 still says "+1 merchant slot". Which applies? Blocks traders being hired at the start.
-- OQ-BLD-7: Caravanserai and counting house roles. Buildings: caravanserai makes carried value grow while traders rest and T1 doubles its "room"; counting house lets traders draw treasury gold and a merchant house lend. Trade v2: caravanserai +25 % weight for land traders and stops bandits; T1 gives camel caravans and halves bandit losses; counting house lets foreign traders deposit with bills of exchange. Trade asks buildings to take its roles in (trade §14). Which roles stand? "Room" is undefined.
-- OQ-BLD-8: 1444 port list. Buildings names `naval/data/start-ports.json` (236 provinces); trade names `naval/data/ports-1444.json`; the naval design names ports-1444.json as route ends. Both files exist. Which is canonical for starting harbours?
-- OQ-BLD-9: Palace step 3. Design table: palace "Start" for all steps; config: step 3 `royal_city` unlocked by G9. Government ties G9 to the bureaucratic empire reform. Which?
-- OQ-BLD-10: Province adoption of §18 changes. Province-stats still lists hospital, wells and drains as later inventions (buildings: hospital at start, wells and drains ring works with B11), miners only in mines and saltworks (no quarry), no dykes ring works, no Works and Jobs lenses. Until adopted, the two designs disagree.
-- OQ-BLD-11: Lords' provinces and material reach. Troyes example buys stone from a quarry "one ring away but in a lord's province". Is a lord's province "a province of yours" for reach (BLD-026)? Trade treats a lord's city as the crown's for deposits.
-- OQ-BLD-12: Town walls step and plunder. §7.8 gives the 1-in-6 share for town walls at any step; the Troyes example says a palisade still loses 1 in 3. Does the palisade count as town walls for plunder?
-- OQ-BLD-13: Road step unlocks and costs. Five road steps but three unlock ids (B2; B9; C16) and costs only for road, paved road and railway; the track's status (start? free?) and turnpike cost are missing.
-- OQ-BLD-14: Castle step unlocks. Earthwork is unlocked by B4 and stone castle by B1, yet era I says the start set has "castle (earthwork or stone)". Which castle steps are known in 1444?
-- OQ-BLD-15: Crafts appearing. Buildings §6.3 has no trade threshold; trade §9 requires trade ratio ≥ 30 %. Rate "now and then" has no number.
-- OQ-BLD-16: Unique variants have no home in national strengths. HER levers include only `building_cost_pct` and `building_unlock`; no lever or field carries a building variant (Külliye, Kontor ...). Who decides and stores them?
-- OQ-BLD-17: Undefined numbers: town fire chance and size scaling, quake regions, "big" raid threshold, the AI's "busy path", "now and then" for craft buildings, the regional slot templates, which tiles get buildings for map wealth 2–9.
-- OQ-BLD-18: Seat limit wording. Buildings: one seat per province; government 2.1: "one per town". Same thing only if every province has one town. Confirm.
-- OQ-BLD-19: Angkor "restoring it is a decision". No design defines decisions; which context owns it?
-- OQ-BLD-20: Village works rate (20 %) needs a balancing pass with start values (design OQ 2). Faith-building numbers belong to religion and the list may change to match it (design OQ 3).
-- OQ-BLD-21: Burned tiles. Ruined buildings rebuild at half cost (BLD-062); burned tiles rebuild by themselves one a year in peace. When both apply, which wins, and is the self-rebuild free? (Troyes paid 15 g = half a farm to have it done in a season.)
+- **D-BLD-1** (was OQ-BLD-1) Troyes is a town with 6 slots in 1444. The worked example is the more detailed text.
+- **D-BLD-2** (was OQ-BLD-2) Material price: each good has a fixed base price in the rules data; it is 25 % dearer when no trade route touches the province. X-6 settles it.
+- **D-BLD-3** (was OQ-BLD-3) Master of works: adds one more of each, halves the months and costs 25 % less gold (0.75). Province 10.2 and the config agree.
+- **D-BLD-4** (was OQ-BLD-4) Steps: most buildings have 1 to 3 steps; castles and roads have 5 (earthwork, stone, bastion, star, concrete fortress; track, road, paved road, turnpike, railway). The tables are the detailed text.
+- **D-BLD-5** (was OQ-BLD-5) Landmarks stand at their building's top step and are marked as landmarks (Alhambra palace 3, Sankore school 3, Kremlin castle 3, Ulugh Beg observatory 1; Taj Mahal its own type at step 1). No step above the top is needed.
+- **D-BLD-6** (was OQ-BLD-6) Yearly fair: building a new one (market step 2) needs T6 and a market charter; fairs standing in 1444 stay; traders can be hired at the start without it. Trade v2 settles T6 (D-TRADE-3, D-RSCH-4).
+- **D-BLD-7** (was OQ-BLD-7) Caravanserai and counting house take trade v2's roles: the caravanserai gives land traders +25 % weight and stops bandits; the counting house lets foreign traders deposit with bills of exchange; "room" is dropped. Trade is the later design.
+- **D-BLD-8** (was OQ-BLD-8) Ports: `naval/data/ports-1444.json` (the rules' naval-ports-1444 data) is canonical for starting harbours. Trade and naval both use it.
+- **D-BLD-9** (was OQ-BLD-9) Palace step 3 (royal city) needs G9, as the config says. Government's reform can require it too.
+- **D-BLD-10** (was OQ-BLD-10) Province adopts buildings §18 (D-PROV-9, D-PROV-12): hospital at start, wells, drains and dykes as ring works, miners in quarries, Works and Jobs lenses. The later design.
+- **D-BLD-11** (was OQ-BLD-11) A lord's province of yours counts as yours for material reach. Trade treats it the same way.
+- **D-BLD-12** (was OQ-BLD-12) A palisade is town walls step 1, so plunder takes 1 in 6 at any town walls step; the example's 1 in 3 is dropped. One rule for all steps.
+- **D-BLD-13** (was OQ-BLD-13) Roads: the track is known at the start and costs half a road; road and paved road need B2, turnpike B9 (cost 1.5 × paved road), railway C16. Provisional costs.
+- **D-BLD-14** (was OQ-BLD-14) 1444 castles: a realm has the earthwork with B4 and the stone castle with B1, as its research start set gives (D-RSCH-11). The start set decides.
+- **D-BLD-15** (was OQ-BLD-15) Crafts appearing: needs trade ratio ≥ 30 % and then has a 1 in 10 chance a year. Trade's threshold plus one provisional number.
+- **D-BLD-16** (was OQ-BLD-16) Unique variants are stored in the buildings data (`variants`, by country or culture); national strengths needs no lever. Buildings already holds the list.
+- **D-BLD-17** (was OQ-BLD-17) Numbers: town fire 1 % a year (+0.5 % per size above town); quakes 0.2 % a year in the data's quake regions; a raid of 2,000 men or more is big; the AI's busy path is 3 sites under way; the regional slot templates are those in the data; map wealth 2–9 gives one land building per point above 1. Provisional values.
+- **D-BLD-18** (was OQ-BLD-18) One seat per province is one per town, since every province has one town. They are the same.
+- **D-BLD-19** (was OQ-BLD-19) Restoring Angkor is an event choice owned by events. Events already offers choices.
+- **D-BLD-20** (was OQ-BLD-20) Village works rate stays 20 % (provisional); faith-building numbers belong to religion. Balancing finds it in the data.
+- **D-BLD-21** (was OQ-BLD-21) Burned tiles: they rebuild by themselves, free, one a year in peace; paying half a farm's cost rebuilds one within a season. The player picks; both rules stay.
 
 ## 14. Traceability
 
@@ -687,3 +698,12 @@ Changes the design asks of other files (§18), recorded here; not edited:
 | BLD-145..147 | ai-building.feature | all scenarios |
 | BLD-148..154 | starting-buildings.feature | all scenarios |
 | Troyes 1444–1452 | troyes-1444-1452.feature | worked example (many ids) |
+| BLD-155 | troyes-1444-1452.feature | Troyes in 1444 |
+| BLD-156 | sites.feature | A master of works |
+| BLD-157 | upgrades.feature | Road steps |
+| BLD-158 | building-catalogue.feature | The yearly fair needs T6 |
+| BLD-159 | building-catalogue.feature | Trade buildings take trade's roles |
+| BLD-160 | damage-and-loss.feature | Burned tiles rebuild |
+| BLD-161 | damage-and-loss.feature | Town fires |
+| BLD-161 | damage-and-loss.feature | Big raids |
+| BLD-155 | troyes-1444-1452.feature | 1444, the burned field |

@@ -28,8 +28,7 @@ Feature: One lesson on every input
     Given the game runs on Steam with Steam Input
     Then the prompts use Steam Input's own glyphs
 
-  # The controller column is a proposal for the input scheme thread (OQ-TUT-12).
-  @TUT-100 @open-question
+  @TUT-100
   Scenario Outline: The tutorial's actions per device
     When the player does "<action>" on "<input>"
     Then the game takes it as <how>

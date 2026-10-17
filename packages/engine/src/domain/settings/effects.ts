@@ -18,9 +18,9 @@ export function interfaceScale(st: SettingsState, screen?: { width: number; heig
 }
 
 /**
- * Auto scale: the largest step at which the 360 × 640 CSS-px safe layout still
- * fits. The box is fitted short side to short side (OQ-SET-15 leaves the
- * orientation open; phones are landscape only).
+ * Auto scale: the largest step at which the 640 × 360 CSS-px safe layout,
+ * measured landscape, still fits; short side to short side, as phones are
+ * landscape only (D-SET-15).
  */
 export function autoInterfaceScale(st: SettingsState, screen: { width: number; height: number }): number {
   const [a, b] = st.cat.constants.interface_scale_auto_min_layout as [number, number];
@@ -290,7 +290,7 @@ export function effectiveValue(st: SettingsState, id: string, atLaunch: Record<s
 /** The autosave interval the saves context runs with (SET-061; saves §2.3). */
 export function autosaveInterval(st: SettingsState): 1 | 6 | 12 | "off" {
   const v = valueOf(st, "gameplay.autosave");
-  return ({ every_turn: 1, every_6: 6, every_12: 12, off: "off" } as const)[v as "every_turn" | "every_6" | "every_12" | "off"];
+  return ({ every_month: 1, every_6_months: 6, every_12_months: 12, off: "off" } as const)[v as "every_month" | "every_6_months" | "every_12_months" | "off"];
 }
 
 /** One bell's playback time in seconds at the chosen speed (SET-065). */
@@ -333,7 +333,7 @@ export function achievementToast(st: SettingsState): boolean {
   return valueOf(st, "gameplay.achievement_toasts") === true;
 }
 
-/** A place's name: Historical uses the name list by owner when one exists, else today's name (SET-073, OQ-SET-17). */
+/** A place's name: Historical uses the name list by owner when one exists, else today's name (SET-073, D-SET-17: no list exists, so today's name). */
 export function placeName(st: SettingsState, todayName: string, owner: string, historical?: (owner: string) => string | undefined): string {
   if (valueOf(st, "gameplay.place_names") !== "historical" || !historical) return todayName;
   return historical(owner) ?? todayName;
@@ -659,7 +659,7 @@ export function rowView(st: SettingsState, id: string): { name: string; value: s
   return by ? { ...base, setBy: by } : base;
 }
 
-/** Where Settings opens from (SET-007, SET-009): the title's Settings button and the pause menu, which Esc and Menu open. */
+/** Where Settings opens from (SET-007, SET-009): the title's Settings button and the game menu, which Esc and Menu open. */
 export function openPauseMenu(input: string): { pauseMenu: boolean; offers: string[] } {
   const opens = input === "Esc" || input === "Escape" || input === "Menu button" || input === "Menu";
   return { pauseMenu: opens, offers: opens ? ["Settings"] : [] };
@@ -710,4 +710,77 @@ export function actionOf(id: string): { opens: string; confirm: boolean } {
 /** Copy diagnostics: the diagnostics line and the settings, as put on the clipboard (SET-115). */
 export function copyDiagnostics(st: SettingsState, diagnosticsLine: string): string {
   return `${diagnosticsLine}\n${JSON.stringify({ profile: st.profile, values: st.values })}`;
+}
+
+// ---------------------------------------------------------------- decided rules (D-SET-*, X-1, X-17)
+
+/** One 4-hour battle step's playback time at the chosen speed; battles never stop the turn (SET-065, X-1). */
+export function battleStepSeconds(st: SettingsState): number {
+  return (DESIGN.battle_step_seconds_at_1x as number) / num(valueOf(st, "gameplay.battle_speed"));
+}
+
+/** The pad binding of an action in a set: a button name, or a button held for some seconds (SET-092, D-SET-3). */
+export function padBinding(set: "map" | "menu" | "battle", action: string): string | { button: string; hold_seconds: number } | string[] | undefined {
+  const pad = resolve(CATALOGUE, "controls.pad") as SettingDef & { action_sets: Record<string, Record<string, string | string[] | { button: string; hold_seconds: number }>> };
+  return pad.action_sets[set]?.[action];
+}
+
+/** Steam Input: six action sets plus the Text layer, official configurations and glyphs (SET-094, D-SET-5). */
+export function steamInput(): { action_sets: string[]; text_layer: string; official_configurations: string[]; glyphs: string } {
+  return DESIGN.steam_input as { action_sets: string[]; text_layer: string; official_configurations: string[]; glyphs: string };
+}
+
+/** Where the action bar, End turn and the game menu button sit for a main hand (SET-075, D-SET-16). */
+export function mainHandLayout(st: SettingsState): { action_bar: string; end_turn: string; game_menu: string } {
+  return (DESIGN.main_hand_layout as Record<string, { action_bar: string; end_turn: string; game_menu: string }>)[String(valueOf(st, "controls.main_hand"))]!;
+}
+
+/** How a colour vision mode keeps the season palettes apart; seasons cannot be turned off (SET-130, X-17). */
+export function seasonPaletteMeans(st: SettingsState): string {
+  return (DESIGN.season_palette_means as Record<string, string>)[String(valueOf(st, "accessibility.colour_vision"))]!;
+}
+
+/** What End turn does: unanswered events always open the first one; otherwise the question follows Confirm End turn and names only warnings (SET-064, D-SET-2). */
+export function endTurnPress(st: SettingsState, attentionLines: number, unansweredEvents: number): { opens: "the first unanswered event" } | { asks: true; names: number } | { ends: true } {
+  if (unansweredEvents > 0) return { opens: "the first unanswered event" };
+  const v = String(valueOf(st, "gameplay.confirm_end_turn"));
+  if (v === "always" || (v === "when_attention" && attentionLines > 0)) return { asks: true, names: attentionLines };
+  return { ends: true };
+}
+
+/** The first-launch questions, each only when needed: language when the system's is not supported, consent when the privacy design requires it, readability on the Big screen (SET-010, D-SET-9). */
+export function firstLaunchQuestions(profile: Profile, f: { languageSupported: boolean; consentRequired: boolean }): string[] {
+  const q = DESIGN.first_launch_questions as { language: string; consent: string; readability: string };
+  const out: string[] = [];
+  if (!f.languageSupported) out.push(q.language);
+  if (f.consentRequired) out.push(q.consent);
+  if (profile === "big_screen") out.push(q.readability);
+  return out;
+}
+
+/** One device's personal settings with the time each was last changed (SET-025, D-SET-13). */
+export interface PersonalFile {
+  values: Record<string, Value>;
+  changedAt: Record<string, number>;
+}
+
+/** Sync of `settings-personal.json`: the newest change wins, setting by setting (D-SET-13). */
+export function syncPersonal(files: readonly PersonalFile[]): PersonalFile {
+  const out: PersonalFile = { values: {}, changedAt: {} };
+  for (const f of files) {
+    for (const [id, at] of Object.entries(f.changedAt)) {
+      if (out.changedAt[id] === undefined || at > out.changedAt[id]!) {
+        out.changedAt[id] = at;
+        out.values[id] = f.values[id]!;
+      }
+    }
+  }
+  return out;
+}
+
+/** A march order by mouse: with Right-click gives orders on, left-click the army then right-click the province; tap the army then the province always works, with no confirm (SET-078, D-SET-8). */
+export function marchOrderBy(st: SettingsState, clicks: readonly ("left" | "right")[]): boolean {
+  if (clicks.length !== 2) return false;
+  if (clicks[1] === "right") return valueOf(st, "controls.right_click_orders") === true;
+  return clicks[0] === "left" && clicks[1] === "left";
 }

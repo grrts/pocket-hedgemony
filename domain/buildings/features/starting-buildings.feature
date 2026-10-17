@@ -34,13 +34,12 @@ Feature: Starting buildings and data
     And lords' provinces hold the lords' buildings
     And only buildings and steps of known start inventions exist
 
-  @BLD-151 @open-question
-  # OQ-BLD-8: start-ports.json or ports-1444.json?
+  @BLD-151
   Scenario: Ports in 1444
     Given the buildings config of the design
     When the campaign starts
-    Then 236 provinces from the naval start-ports list have a harbour with its step
-    And the great ports of the time have a higher harbour step and a shipyard
+    Then 236 provinces from the naval ports-1444 list have a harbour with its step
+    And the 31 provinces with a great port of the time have harbour step 3
 
   @BLD-152
   Scenario Outline: Geography anchors

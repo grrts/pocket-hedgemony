@@ -1,7 +1,7 @@
 import { bridgeUsable, displayDays, stepBreakdown } from "./army-rules.ts";
 import type { MonthLog } from "./day-loop.ts";
 import { routeFood, type FoodStep } from "./food.ts";
-import { MARCH, type Army, type MoveWorld, atWar, hostileArmies, moverById, placeOf, shownMen } from "./model.ts";
+import { MARCH, MOVE, type Army, type MoveWorld, atWar, hostileArmies, moverById, placeOf, shownMen } from "./model.ts";
 import type { RoutePlan } from "./planner.ts";
 
 export type StepIcon = "river" | "snow pass" | "castle" | "border" | "enemy army" | "snowflake" | "rain";
@@ -22,18 +22,18 @@ export interface RoutePreview {
   steps: PreviewStep[];
   total: number;
   /** Where the army stands at the end of this and each later turn: after `afterIndex` places of the path, mid-step when `between`. */
-  monthMarks: { turn: number; after: string; between?: string }[];
+  turnMarks: { turn: number; after: string; between?: string }[];
   food: FoodStep[];
   pointOfNoReturn?: string;
   message?: string;
 }
 
 /**
- * The route preview (10.3): day counts at each province and the total, month marks,
+ * The route preview (10.3): day counts at each province and the total, turn marks (a turn is a week, X-18),
  * icons on the steps that cost extra, food colour and the point of no return.
- * `dayOfMonth` is the day already gone this month (0 at the start of a turn).
+ * `dayOfTurn` is the day already gone this turn (0 at the start of a turn).
  */
-export function previewRoute(w: MoveWorld, a: Army, plan: RoutePlan, dayOfMonth = 0): RoutePreview {
+export function previewRoute(w: MoveWorld, a: Army, plan: RoutePlan, dayOfTurn = 0): RoutePreview {
   const steps: PreviewStep[] = [];
   const all = [...plan.path, ...plan.greyed];
   let from = a.place;
@@ -64,20 +64,49 @@ export function previewRoute(w: MoveWorld, a: Army, plan: RoutePlan, dayOfMonth 
   });
   const active = steps.filter((s) => !s.greyed);
   const total = active.length ? active[active.length - 1]!.dayCount : 0;
-  const monthMarks: RoutePreview["monthMarks"] = [];
+  const turnMarks: RoutePreview["turnMarks"] = [];
   for (let turn = 1; ; turn++) {
-    const end = turn * MARCH.daysPerMonth - dayOfMonth;
+    const end = turn * MOVE.turnDays - dayOfTurn;
     if (end >= total) break;
     const i = active.findIndex((s) => s.dayCount > end);
     const at = active[i]!;
-    if (i > 0 && active[i - 1]!.dayCount === end) monthMarks.push({ turn, after: at.from });
-    else monthMarks.push({ turn, after: at.from, between: at.to });
+    if (i > 0 && active[i - 1]!.dayCount === end) turnMarks.push({ turn, after: at.from });
+    else turnMarks.push({ turn, after: at.from, between: at.to });
   }
   const food = routeFood(w, a, plan);
-  const out: RoutePreview = { steps, total, monthMarks, food: food.steps };
+  const out: RoutePreview = { steps, total, turnMarks, food: food.steps };
   if (food.pointOfNoReturn !== undefined) out.pointOfNoReturn = food.pointOfNoReturn;
   if (plan.message !== undefined) out.message = plan.message;
   return out;
+}
+
+export interface Playback {
+  secondsPer10Days: number;
+  skip: boolean;
+  /** The 4-hour steps the month slows to while the player's battles run, and what the player may do at each (X-1). */
+  battleSteps: { day: number; step: number; places: string[] }[];
+  choices: string[];
+  /** Battles between AI realms: crossed swords and a half-second pause, never a stop. */
+  flashes: { day: number; place: string; pauseSeconds: number }[];
+  /** Castles that stopped an army, ringed red. */
+  redRings: { day: number; place: string }[];
+}
+
+/** The month played back as the day loop ran (10.6, X-1): the player's battles slow it to 4-hour steps; AI battles only flash. */
+export function monthPlayback(w: MoveWorld, realm: string, log: MonthLog): Playback {
+  const ours = (ids: string[]) => ids.some((id) => moverById(w, id)?.owner === realm);
+  return {
+    secondsPer10Days: MOVE.replaySecondsPer10Days,
+    skip: true,
+    battleSteps: log.steps.map((st) => ({
+      day: st.day,
+      step: st.step,
+      places: log.battles.filter((b) => ours([...b.sides[0], ...b.sides[1]]) && b.day <= st.day && !log.battleEnds.some((e) => e.place === b.place && (e.day < st.day || (e.day === st.day && e.step < st.step)))).map((b) => b.place),
+    })),
+    choices: [...MOVE.battleStepChoices],
+    flashes: log.battles.filter((b) => !ours([...b.sides[0], ...b.sides[1]])).map((b) => ({ day: b.day, place: b.place, pauseSeconds: 0.5 })),
+    redRings: log.stops.filter((s) => s.reason === "castle").map((s) => ({ day: s.day, place: s.place })),
+  };
 }
 
 /** Day counts as the player sees them: whole days. */

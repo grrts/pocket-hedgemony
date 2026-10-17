@@ -1,7 +1,28 @@
 {
  "$comment": "Warfare (domain/warfare/spec.md). One warfare config file (WAR-199). Every value is a placeholder from warfare-design v5, warfare-eras and warfare-styles (spec §10); key names follow spec §10. Era VIII and the part of era VII after 31 August 1939 are out of scope.",
+ "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "amounts", "later_arms", "levels_by_era", "era_scale"],
+ "$decisions": "D-WAR-1..21 (spec §13). Standing regiments break at 30 % (D-WAR-15), the Shore sector costs -20 % across a river (D-WAR-5), drill runs to 24 (D-WAR-9).",
+ "skill_growth": {
+  "$comment": "WAR-158, D-WAR-13: the staff college is the academy of eras VI-VII.",
+  "academy": { "III": ["Might", "Cunning"], "IV": ["Might", "Cunning"], "V": ["Might", "Cunning"], "VI": ["Might", "Cunning", "Logistics"], "VII": ["Might", "Cunning", "Logistics"] },
+  "captain under": { "eras": ["III", "IV", "V"], "min_cunning": 4, "skill": "Cunning" },
+  "wargames": { "eras": ["VI", "VII"], "skill": "Cunning" },
+  "peace command year": { "eras": ["VI", "VII"], "max": 3, "skill": "Logistics" },
+  "victories": { "eras": ["VI", "VII"], "every": 4, "skill": "Might" }
+ },
+ "battle_step_choices": ["change standing orders", "retreat", "switch battle"],
+ "origins": {
+  "the ruler or an heir": "his death or capture can start a succession crisis",
+  "a lord": "he may refuse to serve under a lower-born commander",
+  "a hired captain": "he leaves when unpaid, like his company",
+  "risen from the ranks": "Proud lords waver when he commands them",
+  "an academy graduate": "he starts with +1 Cunning or Logistics and no victories",
+  "an exile": "his old ruler sees it as an insult",
+  "a commissioned official": "he counts as an academy graduate: +1 Cunning or Logistics and no victories"
+ },
+ "amounts": { "wagon_gold": 10, "hired_pay_multiplier": 2, "season_months": 3, "ransom": { "commander": 100, "captain": 25 }, "fever_sickness": 2, "levy_gold_per_1000": 20 },
  "company_size": { "min": 500, "max": 1000 },
- "drill_max": 12,
+ "drill_max": 24,
  "scars_max": 5,
  "scar_fade_years": 5,
  "days_per_week": 7,
@@ -26,10 +47,10 @@
   "light field guns": { "strength": 25, "unit": "gun", "needs": { "crew": 10, "horses": 4, "powder": 2, "powder_per": "battle" }, "roles": ["Guns"], "unlock": "W13", "no_march_penalty": true }
  },
  "later_arms": {
-  "$comment": "Machine guns, tanks and aircraft: the design says they follow the same table in config, but gives no strength or needs (OQ-WAR-17). Roles and inventions only.",
-  "machine guns": { "roles": ["Brace", "Shot"], "unlock": "W19" },
-  "tanks": { "roles": ["Shock"], "unlock": "W21" },
-  "aircraft": { "roles": ["Air"], "unlock": "W22" }
+  "$comment": "Machine guns, tanks and aircraft follow the arms table; their strength and needs are provisional (D-WAR-17), and tanks and aircraft draw on the powder store (D-WAR-20).",
+  "machine guns": { "strength": 30, "unit": "gun", "needs": { "crew": 6, "powder": 4, "powder_per": "battle" }, "roles": ["Brace", "Shot"], "unlock": "W19" },
+  "tanks": { "strength": 60, "unit": "tank", "needs": { "crew": 6, "arms": 10, "powder": 10, "powder_per": "battle" }, "roles": ["Shock"], "unlock": "W21" },
+  "aircraft": { "strength": 40, "unit": "plane", "needs": { "crew": 4, "arms": 10, "powder": 10, "powder_per": "battle" }, "roles": ["Air"], "unlock": "W22" }
  },
  "obsolete": [
   { "arm": "armoured foot", "by": "W5", "what": "Plate armour (Heavy role on foot)" },
@@ -47,7 +68,7 @@
   "levy": { "break_point": 0.25, "pay": { "by": "treasury", "multiplier": 1, "free_months": 3 }, "counts_toward_cap": "yes" },
   "retinue": { "break_point": 0.35, "pay": { "by": "lord", "multiplier": 0 }, "counts_toward_cap": "no" },
   "hired company": { "break_point": 0.35, "pay": { "by": "treasury", "multiplier": 3 }, "counts_toward_cap": "yes" },
-  "standing regiment": { "break_point": 0.40, "pay": { "by": "treasury", "multiplier": 1.5, "all_year": true }, "needs": "W12", "counts_toward_cap": "yes", "min_level": 2 },
+  "standing regiment": { "break_point": 0.30, "pay": { "by": "treasury", "multiplier": 1.5, "all_year": true }, "needs": "W12", "counts_toward_cap": "yes", "min_level": 2 },
   "garrison": { "break_point": 0.40, "pay": { "by": "treasury", "multiplier": 1 }, "on_walls": true, "counts_toward_cap": "above room" },
   "rebel band": { "break_point": 0.20, "pay": { "by": "loot", "multiplier": 0 }, "counts_toward_cap": "no" }
  },
@@ -107,7 +128,7 @@
   "Woods": { "room": 1000, "charge": false, "cover": 0.5, "hide": true },
   "Marsh": { "room": 500, "charge": false, "all": -0.25, "hide": true },
   "Waste": { "room": 1500, "charge": "by ground", "open_grounds": ["drylands", "desert"], "rough_grounds": ["hills", "mountains"] },
-  "Shore": { "room": 1000, "charge": true, "attack_across": -0.25 },
+  "Shore": { "room": 1000, "charge": true, "attack_across": -0.20 },
   "Town": { "room": 1500, "charge": false, "cover": 0.5, "defender": 0.50, "burns_town": true, "hide": true },
   "Castle": { "room": "garrison", "charge": false, "walls": true }
  },
@@ -289,7 +310,9 @@
  },
  "ai": {
   "kinds_raised": { "Castile": ["noble retinues", "frontier light horse"], "city republic": ["hired companies"] },
-  "peace_at": { "low risk": 0.3333333333333333, "hegemon seeker": "forced" }
+  "peace_at": { "low risk": 0.3333333333333333, "hegemon seeker": "forced" },
+  "standing_orders": { "low": { "order": "wait", "retreat": "1 to 1" }, "medium": { "order": "attack", "retreat": "3 to 2" }, "high": { "order": "attack", "retreat": "2 to 1" } },
+  "raids_at": ["high"]
  },
  "style_region_fallback": { "Sahel": "Furusiyya", "Andes": "Three battles" },
  "adoption": { "officers": 3, "years": 5, "lessons": 3, "lessons_years": 10, "alliance_battles": 3, "first_battle_strength": 0.5 },

@@ -106,7 +106,7 @@ The specs found that many seams were agreed by one side only: a design asked ano
 These appear as seams or open questions but have no design document and so no context of their own yet:
 
 - **The AI as a whole** (gap list item 18). Each spec has an AI section with what its design says; there is no shared AI design, difficulty levels or per-turn computing budget.
-- **Big institutions**: the Empire, the Church, leagues and the tributary system (gap list item 8). Scenario-setup has 16 collective institution records with no rules (OQ-SETUP-8).
+- **Big institutions**: the Empire, the Church, leagues and the tributary system (gap list item 8). Scenario-setup keeps its 16 collective institution records as reference data unless a map nation matches one (D-SETUP-8).
 - **Modern politics and industry, 1789–1939** (gap list items 12–13), beyond what revolutions and the research tree cover.
 - **Disasters and epidemics** (gap list item 19), beyond plague as a province stat.
 - **Store, purchases and the free tier** beyond what game-shell and saves say.

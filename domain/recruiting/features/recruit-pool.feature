@@ -4,7 +4,7 @@ Feature: The recruit pool
   I want each province to keep its own pool of recruits, fallen and veterans
   So that a realm recovers from war at the pace of its people
 
-  # config: refillPerYear (a quarter of the gap, a third with a muster master: D-RECR-3), run in the January turn (D-RECR-11)
+  # config: refillPerYear (a quarter of the gap, a third with a muster master: D-RECR-3), run in the turn in which 1 January falls (D-RECR-11)
   @RECR-019 @placeholder
   Scenario Outline: The pool refills a share of the gap each year
     Given the province "Troyes" has a ceiling of 2200 men and 1000 recruits here
@@ -93,12 +93,12 @@ Feature: The recruit pool
     Given the province "Troyes" trains 2500 pikes with 3 months left
     When a month passes
     Then the training has 2 months left
-    And the pool refill and the fading of fallen and veterans wait for the January turn
+    And the pool refill and the fading of fallen and veterans wait for January
 
   @RECR-100 @RECR-019 @placeholder
-  Scenario: The yearly step runs in the January turn
+  Scenario: The yearly step runs when January begins
     Given the province "Troyes" has a ceiling of 2200 men and 1000 recruits here
     And the province "Troyes" has 700 fallen from here and 1400 veterans here
-    When the January turn passes
+    When the turn in which 1 January falls passes
     Then the province "Troyes" has 1300 recruits here
     And the province "Troyes" has 630 fallen from here and 1260 veterans here

@@ -81,7 +81,7 @@ There is **one tree**, from the root **Settled life**, which everyone knows. It 
 
 Inventions branch era by era, and many need an invention from another bough. The letter in an invention's id only says what it is about (F food, C crafts and industry, T trade, S sea, W war, B building, G government, L learning); it is not a separate tree. Each invention is one config row (`id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions`), so new inventions such as Andean terrace farming, Ethiopian church schools or Javanese irrigation can be hung on any branch without code.
 
-The tree holds **174 inventions**. Twenty of them keep ids the event tree uses (marked "event id" below) so events keep working; the event tree's technology and innovation stats read them from the tree. Where another system gives an invention's effect in numbers ([Warfare](Warfare), [Trade](Trade), [Exploration and Colonies](Exploration-and-Colonies)), that system owns the numbers. Era VII inventions are marked "(to 1939?)" because which of them stay in play is still open (OQ-RSCH-1).
+The tree holds **174 inventions**. Twenty of them keep ids the event tree uses (marked "event id" below) so events keep working; the event tree's technology and innovation stats read them from the tree. Where another system gives an invention's effect in numbers ([Warfare](Warfare), [Trade](Trade), [Exploration and Colonies](Exploration-and-Colonies)), that system owns the numbers. Nuclear physics and Rocketry are never studied, and the other Era VII inventions stay in play until August 1939 with what they did by then.
 
 #### Tilling and building (R1)
 
@@ -279,7 +279,9 @@ Every country starts knowing the root and the four boughs. It also knows the inv
 - The event tree's literacy stat reads your scholars and schools per thousand people.
 - Your inventions known, each weighted by its era cost, make up the **Technology** win score on [Your Realm](Your-Realm).
 
-### Each turn
+### Each month
+
+A turn is one week. These steps run once a month, in the turn in which a new month begins.
 
 | Cadence | What happens |
 |---|---|
@@ -287,7 +289,7 @@ Every country starts knowing the root and the four boughs. It also knows the inv
 | Yearly | Student cohorts age and 5-year cohorts graduate; scholars age; spread discounts are worked out again with trade partners |
 | At each era boundary | The cost of studying ahead changes |
 
-How the yearly rate is split across months is still open (OQ-RSCH-6).
+Progress moves every month by a twelfth of the yearly rate, and an invention is known in the month it is paid for. With two studies, each gets half.
 
 ### The AI
 
@@ -336,25 +338,22 @@ All research numbers except the era dates are placeholders. The design names no 
 | Seats per school | `research.school_seats` | 20 / 30 / 60 / 100 | Yes |
 | The tree | `inventions[]` | 174 rows | Era costs are placeholders |
 
+## Decided since the first draft
+
+- Research moves monthly; two studies split it evenly, and one academy anywhere is enough for both.
+- Ironclads grow from Steamships.
+- The trade inventions take the trade design's effects; T8 and T9 also give a colonial governor slot.
+- L18 gives 10 village-school seats in each province without a school. Schools cost 2, 4 or 6 gold a year by step.
+- Occupying an enemy province with an open school steals 10 % of a study the enemy knows. A battle there sacks the school with a 25 % chance, and half its scholars flee.
+- Spread inventions raise the discount per neighbour from 10 % to 12 %, 14 % and 16 %, still capped at 60 %.
+- Your starting inventions come from your region; Ming and Korea also start with printing.
+- Guano's harvest bonus lasts 30 years, then ends.
+- With the Examination system, any working scholar can be made an official of any kind.
+
 ## Still open
 
-- **OQ-RSCH-1**: Which of the 18 Era VII inventions stay in play before 31 August 1939, when some point to nuclear power, missiles and satellites?
-- **OQ-RSCH-2**: Three event-tree inventions are Era VIII (computing, internet, green revolution); confirm they and their events are dropped.
-- **OQ-RSCH-3**: S14 *Ironclads* is Era V but grows from an Era VI invention. Wrong parent or wrong era?
-- **OQ-RSCH-4**: Trade v2 rewrites the T-branch effects (and S2) and the tree hasn't adopted them; do T8 and T9 keep their colonial governor slot?
-- **OQ-RSCH-5**: Other proposed tree edits (passage with G8, chancery for G3 and G10, new buildings, a staff college, warfare's numbers) are not adopted.
-- **OQ-RSCH-6**: Does progress accrue monthly (a twelfth) or yearly?
-- **OQ-RSCH-7**: With two studies, how are scholars and students divided, and does one academy anywhere suffice?
-- **OQ-RSCH-8**: What "spread +20 %" raises, whether same-tongue neighbours count double, and what counts as a neighbour.
-- **OQ-RSCH-9**: Seats from village schools, colleges and a staff college, and school upkeep in gold, have no numbers.
-- **OQ-RSCH-10**: Stealing inventions in war, sacking schools, fleeing and poached scholars have no rules or numbers.
-- **OQ-RSCH-11**: How institutional development and region map to start inventions, and whether some countries start with progress under way.
-- **OQ-RSCH-12**: Most effects are unquantified ("+research", "schools cost less") and need a balancing pass.
-- **OQ-RSCH-13**: Which contact events open F9, and who owns them.
-- **OQ-RSCH-14**: No AI rule for choosing studies, filling seats or calling students to arms.
-- **OQ-RSCH-15**: Students are young men from recruits, but women can be scholars; how do they enter?
-- **OQ-RSCH-16**: What happens after F16 *Guano*'s 30 years without F19.
-- **OQ-RSCH-17**: What G4 *Examination system* adds beyond the general rule for graduates as officials.
+Nothing. Every question about research has been decided; numbers marked as placeholders are tuned during balancing.
+
 
 ## For developers
 

@@ -46,3 +46,15 @@ Feature: Tooltips, "Why?" and linked words
     Given the glossary file maps "lord" and "lords" in English
     When a tooltip uses "lords"
     Then "lords" links to the Almanac entry for "lord"
+
+  @TUT-117
+  Scenario Outline: Detailed tooltips put the Why? list in the tooltip
+    Given the setting "Detailed tooltips" is <setting>
+    When the player opens the tooltip of the gold number on the country card
+    Then the tooltip shows the stat's name and one line
+    And the tooltip <why> the "Why?" list
+
+    Examples:
+      | setting | why |
+      | off | does not show |
+      | on | also shows |

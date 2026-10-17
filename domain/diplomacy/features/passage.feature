@@ -60,3 +60,18 @@ Feature: Passage
     When an army of "A" enters the country "B"
     Then the country "B" may declare war on "A" with the aim "Punish" this turn
     And the defensive calls of "B" count as answered to a war started by "A"
+
+  @DIPL-118 @placeholder
+  Scenario Outline: A refused or revoked passage blocks envoys for 2 years
+    # config: envoys.passage_denied_blocks_months
+    Given the date is "1450-01"
+    And the country "B" <denial> the country "A"
+    When <months> months pass
+    Then the envoys of "A" <blocked> cross "B"
+
+    Examples:
+      | denial                     | months | blocked    |
+      | refused passage to         | 23     | may not    |
+      | revoked the passage of     | 23     | may not    |
+      | refused passage to         | 24     | may        |
+      | never granted passage to   | 0      | may        |

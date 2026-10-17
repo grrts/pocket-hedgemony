@@ -72,9 +72,8 @@ Feature: Food from tiles
       | bare woods tile | nothing named in the design         |
       | bare pasture    | nothing named in the design         |
 
-  @PROV-084 @open-question
+  @PROV-084 @PROV-295
   Scenario Outline: Rotation inventions improve the harvest one step each
-    # OQ-PROV-14: what a step does above bumper and how steps stack
     Given the country "France" knows the invention "<invention>"
     When the province "Troyes" rolls a "poor" harvest
     Then the harvest counts as "normal"
@@ -85,6 +84,18 @@ Feature: Food from tiles
       | F12 Fodder crops (clover, turnips) |
       | F14 Seed drill                  |
       | F15 Four-field rotation         |
+
+  @PROV-295
+  Scenario Outline: Harvest steps add up and stop at bumper
+    Given the province "Troyes" has <steps> harvest steps
+    When the province "Troyes" rolls a "<roll>" harvest
+    Then the harvest counts as "<counts>"
+
+    Examples:
+      | steps | roll   | counts |
+      | 2     | failed | normal |
+      | 3     | poor   | bumper |
+      | 1     | bumper | bumper |
 
   @PROV-085
   Scenario: New crops turn a failed harvest into a poor one

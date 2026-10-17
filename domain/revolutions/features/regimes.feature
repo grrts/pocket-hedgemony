@@ -104,7 +104,7 @@ Feature: Regimes
   Scenario: Under the reaction the revolution needs one sign fewer for 20 years
     Given the country "France" took the regime "reaction" 5 years ago
     And the revolution "french_revolution" needs 4 signs
-    When the turn's signs are evaluated
+    When the month's signs are evaluated
     Then the revolution "french_revolution" breaks out at 3 signs for "France"
 
   @REVO-047

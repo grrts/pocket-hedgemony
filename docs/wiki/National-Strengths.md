@@ -219,7 +219,7 @@ The computer always knows its own ambitions and treats them as goals with weight
 
 ### Each turn
 
-Heritage is checked once a turn, right after historical events, and counts time in months (12 turns make a year, so a heyday needs 300 awake turns to leave its mark). In order, heritage checks dormant claims and birthright needs; heydays, counting a month awake, granting marks and resolving a third waking; ambitions, warmth, deadlines and draws, with digest lines; the burden's shed condition and a sixth legacy; then publishes its active levers to the systems that own them for the next month.
+Heritage is checked once a turn (a week), right after historical events, and counts time in months by the date: a month is counted in the turn in which a new month begins, 12 months make a year, so a heyday needs 300 awake months (25 years) to leave its mark. In order, heritage checks dormant claims and birthright needs; heydays, counting a month awake, granting marks and resolving a third waking; ambitions, warmth, deadlines and draws, with digest lines; the burden's shed condition and a sixth legacy; then publishes its active levers to the systems that own them for the next month.
 
 ## Numbers
 

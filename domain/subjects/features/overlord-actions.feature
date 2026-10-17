@@ -33,12 +33,13 @@ Feature: What the overlord can do
       | Vassal    | Disloyal | refuses                              |
       | Tributary | Loyal    | is not called                        |
 
-  @SUBJ-039 @placeholder @open-question
+  @SUBJ-039 @placeholder
   Scenario: A gift
-    # OQ-SUBJ-10: how the gift scales with income; config: reasons.gift
-    Given the subject rules are in force
-    When the overlord sends the subject "S" a gift scaled to its income
-    Then "S" has the reason "Gift" at 1 for 5 years
+    # config: gift.months_of_income, reasons.gift
+    Given the subject "S" earns 20 gold a month
+    When the overlord sends the subject "S" a gift
+    Then the gift costs 120 gold
+    And "S" has the reason "Gift" at 1 for 5 years
 
   @SUBJ-040
   Scenario: A resident at a subject's court
@@ -108,9 +109,8 @@ Feature: What the overlord can do
       | Vassal       |
       | Protectorate |
 
-  @SUBJ-046 @open-question
+  @SUBJ-046
   Scenario: Releasing a subject
-    # OQ-SUBJ-12: the Courted reason for neighbours
     Given the subject "S" is a Vassal of "O"
     When "O" releases "S"
     Then "S" is independent

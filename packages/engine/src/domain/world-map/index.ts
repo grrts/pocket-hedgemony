@@ -484,3 +484,193 @@ export function areasIn(id: string): Area[] {
 
 /** The map's data sources and their licences (MAP-044). */
 export const CREDITS = config.credits as { source: string; licence: string }[];
+
+// ---------------------------------------------------------------------------
+// Province facts read from the built images (D-MAP-1, D-MAP-4)
+
+const FACTS = config.provinceFacts;
+
+function landIndex(id: string): number {
+  const i = /^p(\d+)$/.exec(id) ? Number(id.slice(1)) : -1;
+  if (i < 0 || i >= FACTS.size.length) throw new Error(`not a land province: ${id}`);
+  return i;
+}
+
+/** A province's size in map pixels: its tile count follows it (MAP-008). */
+export function provinceSize(id: string): number {
+  return FACTS.size[landIndex(id)]!;
+}
+
+/** The province's tile type: the most common tile type among its pixels that play as its ground (D-MAP-1). */
+export function provinceTileType(id: string): string {
+  return TILE_TYPES[FACTS.tileType[landIndex(id)]!]!.type;
+}
+
+/** A navigable river is a great river (Natural Earth ranks 0–4) with enough pixels in the province (D-MAP-4). */
+export function hasNavigableRiver(id: string): boolean {
+  return FACTS.greatRiverPixels[landIndex(id)]! >= config.navigableRiverPixels;
+}
+
+/** Troop movement's great river (twice the river days) is the same flag (D-MAP-5). */
+export const hasGreatRiver = hasNavigableRiver;
+
+export interface ProvinceRecord {
+  id: string;
+  name: string;
+  centre: { x: number; y: number };
+  size: number;
+  ground: Ground;
+  tileType: string;
+  coastal: boolean;
+  river: boolean;
+  navigableRiver: boolean;
+  neighbours: string[];
+}
+
+/** Everything the map knows about a land province (MAP-007, MAP-035). */
+export function provinceRecord(g: MapGraph, id: string): ProvinceRecord {
+  const p = g.byId.get(id);
+  if (!p || isWater(p)) throw new Error(`no land province ${id}`);
+  const q = p as ProvinceDef & { coastal?: boolean; river?: boolean };
+  return {
+    id,
+    name: p.name,
+    centre: { x: p.x ?? 0, y: p.y ?? 0 },
+    size: provinceSize(id),
+    ground: p.terrain as Ground,
+    tileType: provinceTileType(id),
+    coastal: !!q.coastal,
+    river: !!q.river,
+    navigableRiver: hasNavigableRiver(id),
+    neighbours: p.neighbors,
+  };
+}
+
+/** On water for shore tiles: a coast (sea or lake shore) or a navigable river (MAP-009, D-MAP-12). */
+export function onWater(r: Pick<ProvinceRecord, "coastal" | "navigableRiver">): boolean {
+  return r.coastal || r.navigableRiver;
+}
+
+/** A province's name: its modern admin region, with a compass point when split (MAP-004, D-MAP-6). */
+export function provinceName(adminRegion: string, compass?: string): string {
+  return compass ? `${compass} ${adminRegion}` : adminRegion;
+}
+
+// ---------------------------------------------------------------------------
+// Terrain proposals (D-MAP-2)
+
+/** Only the proposals troop movement adopted hold; every other proposal is dropped. */
+export const ADOPTED_PROPOSALS = config.adoptedProposals as Record<string, string>;
+export const REJECTED_PROPOSALS: readonly string[] = config.rejectedProposals;
+
+export function proposalFact(tileTypeName: string): string | undefined {
+  return ADOPTED_PROPOSALS[tileTypeName];
+}
+
+// ---------------------------------------------------------------------------
+// Geographic lists: passes, fords, strait crossings, anchors (D-MAP-3, D-MAP-5)
+
+export interface Located {
+  name: string;
+  at: number[];
+  province: string;
+}
+
+export interface Anchor extends Located {
+  id: string;
+  area: string;
+}
+
+export interface StraitCrossing {
+  name: string;
+  provinces: [string, string];
+}
+
+export const PASSES = config.geoLists.passes as Located[];
+export const FORDS = config.geoLists.fords as Located[];
+export const STRAIT_CROSSINGS = config.geoLists.straitCrossings as unknown as StraitCrossing[];
+export const ANCHORS = config.geoLists.anchors as Anchor[];
+
+/** Names compared without accents or case: "Oresund" is "Øresund". */
+export function sameName(a: string, b: string): boolean {
+  const n = (x: string) => x.normalize("NFD").replace(/\p{M}/gu, "").replace(/ø/gi, "o").replace(/^the /i, "").toLowerCase();
+  return n(a) === n(b);
+}
+
+function named<T extends { name: string }>(list: readonly T[], name: string): T | undefined {
+  return list.find((x) => sameName(x.name, name));
+}
+
+export function passProvince(name: string): string | undefined {
+  return named(PASSES, name)?.province;
+}
+
+export function fordProvince(name: string): string | undefined {
+  return named(FORDS, name)?.province;
+}
+
+/** The two land provinces a strait crossing joins for armies; one list, apart from the sea straits (D-MAP-3). */
+export function straitCrossing(name: string): StraitCrossing | undefined {
+  return named(STRAIT_CROSSINGS, name);
+}
+
+export function isStraitCrossing(a: string, b: string): boolean {
+  return STRAIT_CROSSINGS.some((c) => (c.provinces[0] === a && c.provinces[1] === b) || (c.provinces[0] === b && c.provinces[1] === a));
+}
+
+/** The map province of an event-tree anchor (MAP-040). */
+export function anchorProvince(name: string): Anchor | undefined {
+  return ANCHORS.find((a) => a.id === name || sameName(a.name, name));
+}
+
+// ---------------------------------------------------------------------------
+// The rename table (MAP-042)
+
+export interface RenameEntry {
+  old: string;
+  new: { id: string; share: number }[];
+}
+
+/** Splitting a province: the old id maps to the new ids, each with its share of the old province's size. */
+export function splitProvince(old: string, parts: { id: string; size: number }[]): RenameEntry {
+  const total = parts.reduce((a, p) => a + p.size, 0);
+  return { old, new: parts.map((p) => ({ id: p.id, share: p.size / total })) };
+}
+
+/** Where an old id lives now: itself when nothing renamed it. */
+export function renamed(table: readonly RenameEntry[], id: string): { id: string; share: number }[] {
+  return table.find((e) => e.old === id)?.new ?? [{ id, share: 1 }];
+}
+
+// ---------------------------------------------------------------------------
+// Frozen seas and rivers (X-17, MAP-049, MAP-050)
+
+/** True in the months the northern seas and rivers freeze: December to March (provisional). */
+function freezeMonth(months: readonly number[], date: { month: number }): boolean {
+  return months.includes(date.month);
+}
+
+/** A sea zone is frozen when its name is on the frozen list and the month is a frozen month (MAP-049). */
+export function seaZoneFrozen(zoneName: string, date: { month: number }): boolean {
+  const f = config.frozenSeas;
+  return freezeMonth(f.months, date) && f.zonesNamed.some((n) => zoneName.toLowerCase().includes(n.toLowerCase()));
+}
+
+/** A frozen zone is closed to fleets (MAP-049). */
+export const seaZoneOpenToFleets = (zoneName: string, date: { month: number }): boolean => !seaZoneFrozen(zoneName, date);
+
+/** A port whose every sea zone is frozen can neither launch nor take in ships (MAP-049). */
+export function portFrozen(seaZoneNames: readonly string[], date: { month: number }): boolean {
+  return seaZoneNames.length > 0 && seaZoneNames.every((z) => seaZoneFrozen(z, date));
+}
+
+/** A river at latitude 55° or more is frozen in the frozen months (MAP-050). */
+export function riverFrozen(latitude: number, date: { month: number }): boolean {
+  const f = config.frozenRivers;
+  return latitude >= f.fromLatitude && freezeMonth(f.months, date);
+}
+
+/** A frozen river is crossed like a bridge: no river penalty (MAP-050). */
+export function riverCrossingPenalty(latitude: number, date: { month: number }, penalty: number): number {
+  return riverFrozen(latitude, date) ? 0 : penalty;
+}

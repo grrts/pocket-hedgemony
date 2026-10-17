@@ -38,9 +38,8 @@ Feature: Buildings in the province
       | an event founds one                                                          |
       | one appears by itself in a town with a market, homeless and wool nearby       |
 
-  @PROV-063 @open-question
+  @PROV-063
   Scenario Outline: Ways to lose a building
-    # OQ-PROV-3: buildings design replaces the 10-year unpaid upkeep rule with neglect
     Given the province "Troyes" has a <building>
     When <cause>
     Then the <building> <result>
@@ -48,11 +47,17 @@ Feature: Buildings in the province
     Examples:
       | building   | cause                                       | result                    |
       | farm       | its tile burns                              | is lost                   |
-      | loom house | the town is sacked                          | is lost                   |
-      | forge      | upkeep goes unpaid for 10 years             | falls one step or closes  |
+      | market     | the town is sacked                          | is lost                   |
+      | forge      | it stays neglected for 10 years             | falls one step            |
       | market     | the player demolishes it                    | is lost                   |
       | castle     | a peace treaty demolishes it                | is lost                   |
       | ranch      | its pasture tile is ploughed to fields      | is lost                   |
+
+  @PROV-063
+  Scenario: One unpaid month leaves a building neglected at half output
+    Given the province "Troyes" has a forge
+    When its upkeep goes unpaid for a month
+    Then the forge is neglected and works at half
 
   @PROV-064 @placeholder
   Scenario Outline: Land buildings, their tiles and slots

@@ -89,3 +89,12 @@ Feature: Many sounds at once
       | world | none of them play from the map, only notifications |
       | regional | the army order and the battle start play, the melee does not |
       | local | all three play |
+
+  @AUD-136
+  Scenario: Only the battle on screen is heard
+    Given the player's battles at "Troyes" and "Reims" run at once
+    And the battle view shows "Troyes"
+    Then the bell-step effects of "Troyes" play
+    And the bell-step effects of "Reims" do not play
+    When the player switches to "Reims"
+    Then the bell-step effects of "Reims" play

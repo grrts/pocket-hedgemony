@@ -108,9 +108,19 @@ Feature: Leagues against a conqueror
       | the Lands taken of "Venice" fall to 4                         | stays        |
       | "Venice" makes a peace giving provinces back to a member      | dissolves    |
 
-  @DIPL-164 @open-question
+  @DIPL-164
   Scenario: An event starts a league regardless of the threshold
-    # OQ-DIPL-25: how event leagues end
     Given the country "France" has taken 2 provinces in the last 20 years
-    When an event starts a league against "France"
-    Then the league against "France" exists
+    When an event starts a league against "France" with only "Burgundy" in it
+    Then the league against "France" exists with 1 member
+
+  @DIPL-163 @DIPL-164
+  Scenario Outline: An event league ends only by event or by a peace
+    Given the era is "I" and an event started a league against "France" with "Burgundy"
+    When <event>
+    Then the league <result>
+
+    Examples:
+      | event                                                         | result       |
+      | the Lands taken of "France" fall to 0                         | stays        |
+      | "France" makes a peace giving provinces back to a member      | dissolves    |

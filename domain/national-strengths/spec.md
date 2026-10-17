@@ -271,7 +271,7 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 - HER-077 The heritage context shall read the country catalogue, event tree, country stats, province stats and warfare read-only and change nothing outside its own folder. [README]
 
 ### 5.15 Timing
-- HER-078 Each turn, after the event tree's step and before achievements, the heritage context shall evaluate every heritage once (needs, claims, heydays, ambitions, burden), and count heyday years awake and claim years held in months, 12 turns to a year. [X-2; D-HER-9]
+- HER-078 Each turn, after the event tree's step and before achievements, the heritage context shall evaluate every heritage once (needs, claims, heydays, ambitions, burden), and count heyday years awake and claim years held in months by the date: a month is added in the turn in which a new month begins, 12 months to a year. [X-2; X-18; D-HER-9]
 
 ## 6. Commands
 
@@ -311,16 +311,16 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 - When **government** or **revolutions** apply a reform event, then a burden may be shed or a legacy granted (HER-034, HER-067).
 - When any owning context changes state named in a condition, then needs, wakes, stir, goal, fail and shed are re-evaluated.
 
-## 9. Monthly turn
+## 9. Each turn
 
-Heritage is evaluated once per turn, in the events step (X-2 step 6) right after the event tree, so a new age is seen the
-same turn; its levers apply from the next month's steps. Time is counted in months (HER-078). Steps, in order:
+A turn is one week (X-18). Heritage is evaluated once per turn, in the events step (X-2 step 6) right after the event tree, so a new age is seen the
+same turn; its levers apply from the next month's steps. Time is counted in months by the date, not in turns (HER-078). Steps, in order:
 1. Evaluate dormant claims (wake after 30 years held) and birthright needs (dormant or awake).
-2. Evaluate heydays: age active, wakes, ends; add a month to each awake heyday; grant marks on end; resolve a third
+2. Evaluate heydays: age active, wakes, ends; in the turn in which a new month begins, add a month to each awake heyday; grant marks on end; resolve a third
    waking (the AI by HER-079).
 3. Evaluate ambitions: stir, warmth, goal, fail, deadline; draw replacements; digest lines for seal and warmth moments.
 4. Evaluate burden shed; grant turned legacy; resolve a sixth legacy (the AI by HER-079).
-5. Publish active levers to their owning contexts for the next turn's monthly steps.
+5. Publish active levers to their owning contexts for the next monthly steps.
 Reads first: ages (events), the condition inputs from every context, catalogue data (start only).
 
 ## 10. Configuration
@@ -346,7 +346,7 @@ Reads first: ages (events), the condition inputs from every context, catalogue d
 | `inheritance.*`, `inheritance.claim_years` | Claims, releases, formed, subjects; 30 years; max 2 birthrights | as §5.10 | claim_years provisional | national-strengths.json rules |
 | `ai.ambition_goal_weight` | AI weight | 1.5 | yes | heritage-rules.json |
 | `ai.sleep_heyday` / `ai.let_go_legacy` | AI choice | fewest points | provisional | national-strengths.json rules |
-| `timing.months_per_year` | Turns in a year of heritage time | 12 | no | national-strengths.json rules |
+| `timing.months_per_year` | Months in a year of heritage time | 12 | no | national-strengths.json rules |
 | `levers.*` | 64 levers (D-HER-2): group, unit, points, params, owner, meaning, better | §4 | yes | levers.json |
 | `scope_cost.*`, `where_values` | Scope multipliers, floor 0.25 | §4 | yes | levers.json |
 | archetypes | 27 archetypes, detection rules, templates; one may go unused (D-HER-15) | — | yes | archetypes.json |
@@ -426,8 +426,8 @@ Requests to other designs (`requests-to-other-designs.md`), worked around, nothi
   Índia", 5 birthright effects, "Goa or Calicut"); example-portugal.json is an illustration only. `colonial_presence` is
   in the event-tree vocabulary, so heritage may use it (HER-040). The authored data is the later and fuller one.
 - **D-HER-9** (was OQ-HER-9) Evaluation timing: every heritage is evaluated once per turn, right after the event tree in
-  the events step, and time (heyday years awake, claim years held) is counted in months, 12 turns a year (HER-078). One
-  check a turn matches the monthly turn.
+  the events step, and time (heyday years awake, claim years held) is counted in months, 12 months a year (HER-078). Since turns became a week (X-18), the check still runs every
+  turn, but a month is counted only in the turn in which a new month begins, measured by the date.
 - **D-HER-10** (was OQ-HER-10) Pool maximum: 7 is a cap for every pool, generated or authored; age ambitions join on top
   and do not count. The design's "4 to 7" is the rule.
 - **D-HER-11** (was OQ-HER-11) Envoy reading: diplomacy's resident envoy (an envoy who stays at one court) is the envoy

@@ -1559,7 +1559,7 @@ Then("it changes {string}", (s, meaning: string) => {
   expect(s.lever.meaning).toBe(meaning);
 });
 
-// D-HER-9: one evaluation a turn, time in months
+// D-HER-9, X-18: one evaluation a turn, time in months by the date
 Given("the country {string} has a heyday awake in an active age", (s, name: string) => {
   const d = { ...madeUp(idOf(name)), heydays: [{ id: "long_heyday", name: "Long", age: "age_of_exploration", text: "", wakes: { event: { id: "go" } }, effects: tax(2) }] };
   heritage(s, name, d);
@@ -1567,9 +1567,13 @@ Given("the country {string} has a heyday awake in an active age", (s, name: stri
   world(s).ages.active.push("age_of_exploration");
   world(s).events.push("go");
 });
-When("{int} turns pass with its wakes condition holding", (s, turns: number) => {
+When("{int} months pass with its wakes condition holding", (s, months: number) => {
   const h = heritage(s, s.who);
-  for (let i = 0; i < turns; i++) N.monthTick(h, world(s), rng(s));
+  // Weekly turns (X-18): a month is served only in the turn in which a new month begins.
+  for (let i = 0; i < months; i++) {
+    for (let week = 0; week < 3; week++) N.turnTick(h, world(s), rng(s), 0);
+    N.monthTick(h, world(s), rng(s));
+  }
 });
 Then("the heyday has served {int} years", (s, years: number) => {
   const hd = heritage(s, s.who).heydays[0]!;

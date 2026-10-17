@@ -14,7 +14,8 @@ rule of the system that owns the stat.
 - Map lenses: the list, what each colours, lens patterns and colour-blind ramps.
 - Parchment (fog) as a display layer over what a country has not charted; its display toggle.
 - Overlays: labels, towns, armies, routes as drawn things.
-- Month playback on the map (speed, battle flashes, castle rings).
+- Turn playback on the map (speed, battle flashes, castle rings, slowing for player battles).
+- Seasons on the map: per-province season palettes (X-17).
 - Layout by window shape (Short wide, Tall, Large, Far), landscape-only phones, touch sizes, safe areas.
 - Performance budgets: frame, overlay, main-thread, turn, worker answer, route planning; the performance
   knobs (Sharpness, Frame rate cap, Map detail, Animations, Battery saver).
@@ -120,12 +121,12 @@ Newest decision first.
 - VIEW-017 (State-driven): While at Region zoom, colonial range shall show as a faint line on the sea and colonisable provinces with a pale flag. [exploration §7]
 - VIEW-018 (State-driven): While at Local zoom, the province's tile row shall show as pixel art: each tile's building as a sprite, burned tiles in ash, workers moving on busy tiles, ships in the harbour, caravans on the road, barges on the river; marching armies as columns of foot, horse, guns and wagons in proportion. [province-stats §14; trade §10.1; troop-movement §10.5]
 - VIEW-019 (State-driven): While at Local zoom, a battle shall be shown on the province's tile row, and a siege as the castle tile with breaches drawn in the walls. [warfare §14, §7.15]
-- VIEW-020 (Ubiquitous): Each system added after the province and warfare designs shall state what it shows at each zoom, including its map lens. [gap-lists List 1 item 29]
+- VIEW-020 (Ubiquitous): Each system added after the province and warfare designs shall state what it shows at each zoom, including its map lens; a system that gives no zoom table shows its lens at every zoom and its card at Local only. [gap-lists List 1 item 29; D-VIEW-7]
 
 ### 5.3 Lenses
 
 - VIEW-021 (Ubiquitous): A map lens shall recolour the map by one stat, chosen from the lens picker in the tool column. [province-stats §14; screen-flow §4.2, §4.7]
-- VIEW-022 (Ubiquitous): The lens list shall hold the province lenses Food, Tax reaching you, Days to capital, Grievances, Faith, Tongue, Ground, Recruits; the trade lenses Trade ratio, Trade value and Traders (Trade ratio and Trade value replace Traders passing and Trade balance); and the lenses Diplomacy, Sea, Works, Jobs, Subjects and Revolution. [province-stats §14; trade §10.1; diplomacy §13.1; naval §10; buildings §11.1; subjects §10.3; revolutions §13] (see OQ-VIEW-2)
+- VIEW-022 (Ubiquitous): The lens list shall hold the province lenses Food, Tax reaching you, Days to capital, Grievances, Faith, Tongue, Ground, Recruits; the trade lenses Trade ratio, Trade value and Traders (Trade ratio and Trade value replace Traders passing and Trade balance); and the lenses Diplomacy, Sea, Works, Jobs, Subjects and Revolution. [province-stats §14; trade §10.1; diplomacy §13.1; naval §10; buildings §11.1; subjects §10.3; revolutions §13] The picker also keeps the build's Realms, Terrain, People, Wealth and Walls, 22 lenses in all, and scrolls on a phone (D-VIEW-2).
 - VIEW-023 (Ubiquitous): The Faith lens shall colour each province by its majority faith, hatched where a community of another faith is 30 % or more; holy places carry a small icon. [religion §12]
 - VIEW-024 (Ubiquitous): The Tongue lens shall colour by tongue family at far zoom and by tongue at regional zoom, with a toggle to kin / cousin / stranger colours for the player's realm, and outline homelands of peoples without a country. [culture §7.3]
 - VIEW-025 (Ubiquitous): The Diplomacy lens shall colour every country by the player's relation to it: own colour for you and your subjects; blue for allies (light blue pledged); green and pale green for Close and Warm; grey for Cool or nothing recorded; orange for Cold or Rival; red for Hostile, Bitter or at war (hatched at war); a red border for a league against you. [diplomacy §13.1]
@@ -140,12 +141,12 @@ Newest decision first.
 
 - VIEW-032 (Ubiquitous): Land and sea a country has not charted shall lie under the parchment. [exploration §3.1]
 - VIEW-033 (Ubiquitous): The parchment shall show the charted map, which only grows; it replaces today's "6 steps from your lands and armies". [exploration §3.1, §9]
-- VIEW-034 (Optional): Where the player turns off "Parchment over unknown lands" in the lens menu, the map shall show the whole world; the switch is display only. [settings §4.3; main.ts] (see OQ-VIEW-3)
+- VIEW-034 (Optional): Where the player turns off "Parchment over unknown lands" in the lens menu, the map shall show the whole world; the switch is display only and never lets anything enter uncharted zones. [settings §4.3; main.ts; D-VIEW-3]
 
 ### 5.5 Month playback
 
-- VIEW-035 (Event-driven): When a turn ends, the month shall play on the map at about one second per 10 days (config), with a skip button. [troop-movement §10.6]
-- VIEW-036 (Ubiquitous): During playback armies shall walk their routes, battles flash crossed swords and pause for half a second, and castles that stop an army ring red. [troop-movement §10.6]
+- VIEW-035 (Event-driven): When a turn ends, its 7 days (fewer for the last turn) shall play on the map at about one second per 10 days (config); while a player battle runs, each day plays as six 4-hour steps at about half a second each (`playback.battleStepSeconds`); a skip button is offered only for a month with no player battle. [troop-movement §10.6; X-1; X-18; D-VIEW-6]
+- VIEW-036 (Ubiquitous): During playback armies shall walk their routes, battles flash crossed swords, and castles that stop an army ring red; playback never pauses. [troop-movement §10.6; X-1]
 - VIEW-037 (State-driven): While a turn is processed, the map shall stay visible and can be panned and zoomed, armies march along their routes and borders change as the worker's results arrive. [screen-flow G5]
 - VIEW-038 (Unwanted): If a turn takes longer than 1.5 s, then a small parchment strip shall say what is being worked out ("The courts of Europe deliberate…"). [screen-flow G5]
 
@@ -172,7 +173,7 @@ Newest decision first.
 
 - VIEW-052 (Ubiquitous): The map shall hold 60 fps while panning and zooming (16.7 ms a frame). [performance.md]
 - VIEW-053 (Ubiquitous): Drawing the overlay (labels, towns, armies, routes) shall take at most 2.5 ms a frame on average and 5 ms at the 95th percentile. [performance.md]
-- VIEW-054 (Ubiquitous): The map canvas shall shade 1 pixel per CSS pixel, never device pixels; the overlay canvas shall use the device pixel ratio so text stays crisp; close-up tile detail switches in by CSS zoom. [performance.md; mapView.ts] (see OQ-VIEW-1)
+- VIEW-054 (Ubiquitous): The map canvas shall shade 1 pixel per CSS pixel, never device pixels; the overlay canvas shall use the device pixel ratio so text stays crisp; close-up tile detail switches in by CSS zoom. Sharpness sets only the overlay's cap (Balanced 2, Native 3). [performance.md; mapView.ts; D-VIEW-1]
 - VIEW-055 (Ubiquitous): The longest main-thread task while playing shall be at most 50 ms. [performance.md]
 - VIEW-056 (State-driven): While something animates (marching armies), at least 90 % of frames shall be redrawn. [performance.md]
 - VIEW-057 (Ubiquitous): The draw loop shall never read layout; text and sprites shall come from cached bitmaps; nothing per frame shall plan routes or walk the province graph. [performance.md]
@@ -184,10 +185,14 @@ Newest decision first.
 - VIEW-063 (Ubiquitous): The slowest route plan shall take at most 8 ms on 5,000 provinces and 32 ms on 20,000. [performance.md]
 - VIEW-064 (Ubiquitous): A change that breaks a budget shall fail CI (`pnpm bench`; `pnpm --filter @ph/client perf`). [performance.md]
 - VIEW-065 (Ubiquitous): Performance targets shall be measured at the phone defaults and checked once with Battery saver on. [settings §7]
-- VIEW-066 (Optional): Where Battery saver is on, the frame rate shall be capped at 30, Sharpness set to Battery, animations reduced, the map redrawn only on change and the AI turn run with a smaller worker budget. [settings §5.1]
+- VIEW-066 (Optional): Where Battery saver is on, the frame rate shall be capped at 30, Sharpness set to Battery, animations reduced and the map redrawn only on change; the AI turn's budget is counted in work steps and is the same with Battery saver on or off. [settings §5.1; X-15; D-VIEW-9]
 - VIEW-067 (State-driven): While nothing moves, the map shall not redraw, whatever the frame cap. [settings §5.1]
 - VIEW-068 (Ubiquitous): Map detail shall have three steps: Low (no 8 × 8 close-in tiles, no surf, no forest blending), Medium (8 × 8 tiles, still water), High (everything). [settings §5.1]
 - VIEW-069 (Ubiquitous): Animations shall have three steps: Full, Reduced, Off; Off shows battle results as still frames; Reduced motion sets Reduced or lower. [settings §5.1, §5.5]
+- VIEW-070 (Ubiquitous): The zoom level shall follow the camera zoom: World below 2, Region from 2 to under 4, Local from 4. [D-VIEW-4, D-VIEW-5] @placeholder
+- VIEW-071 (State-driven): While several player battles run, the map shall show a battle bar with each running battle and its progress; tapping one follows it and moves the camera to it. [X-1]
+- VIEW-072 (Ubiquitous): Each province's tiles shall take the palette of its hemisphere's season: in winter, snow on land from latitude 50° toward the pole and on every mountain province (otherwise the base palette); in spring, spring green; in summer, the base palette; in autumn, forests and fields turn gold; a dry land in its wet season shows the wet-season palette, shown alongside the seasonal markers (closed passes, fords, floods). [X-17; X-4] @placeholder
+- VIEW-073 (Ubiquitous): Season palettes shall be swapped per province once a month, never per frame, and no setting shall turn them off. [X-17; X-15]
 
 ## 6. Commands
 
@@ -198,7 +203,7 @@ Presentation commands, issued by the player; none reach the engine.
 | `SetLens(lens)` | Player | Lens exists | Map recoloured | `LensChanged` |
 | `SetZoom(zoom)` / `Pan(dx, dy)` | Player | — | Camera moved; zoom level may change | `ZoomLevelChanged` |
 | `ToggleParchment(on)` | Player | — | Parchment shown or hidden (display only) | — |
-| `SkipPlayback()` | Player | Month playback running | Map jumps to the end of the month | — |
+| `SkipPlayback()` | Player | Turn playback running and no player battle in the turn | Map jumps to the end of the month | — |
 
 ## 7. Domain events
 
@@ -211,14 +216,14 @@ Presentation commands, issued by the player; none reach the engine.
 ## 8. Policies (reactions to other contexts)
 
 - When `time-and-turns` emits `TurnEnded`, then the map applies the worker's arrays (textures updated, one
-  redraw) and plays the month back.
+  redraw) and plays the turn back.
 - When `exploration` charts new places, then the parchment shrinks over them.
 - When `settings` changes Sharpness, Frame rate cap, Map detail, Animations, colour vision, patterns or
   borders, then the map applies it at once or at the next redraw.
 
 ## 9. Monthly turn
 
-The map does no simulation. After each turn it applies the results (≤ 16 ms), plays the month back, and
+The map does no simulation. After each turn it applies the results (≤ 16 ms), plays the turn back, and
 re-renders only open panels.
 
 ## 10. Configuration
@@ -237,7 +242,8 @@ re-renders only open panels.
 | route planning | 5k and 20k provinces | ≤ 8 ms, ≤ 32 ms | No | performance.md |
 | `replaySecondsPer10Days` | Playback speed | about 1 | Yes | `defines.json` (march) |
 | turn strip delay | Show "what is being worked out" | 1.5 s | Yes (interface config) | interface config |
-| battle flash pause | Pause on a battle during playback | 0.5 s | Yes | interface config |
+| `playback.battleStepSeconds` | Playback of one 4-hour step while a player battle runs | 0.5 s | Yes | `map-presentation.json` |
+| `seasonPalettes.snowFromLatitude` | Latitude from which winter snow covers land | 50° | Yes | `map-presentation.json` |
 | Short wide threshold | Phone landscape height | under 500 CSS px | Yes | interface config |
 | side sheet width | Large layout | 380 px at UI scale 1 | Yes | interface config |
 | card width on phone | Short wide | 45 % | Yes | interface config |
@@ -278,43 +284,18 @@ re-renders only open panels.
 
 None. AI nations run in the same worker turn, which the turn budgets cover (VIEW-062).
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- **OQ-VIEW-1 Sharpness against the shading rule.** Settings §5.1 says Sharpness Balanced is "up to 2
-  (today's code)" and Native "up to 3", and §8 says the device-pixel-ratio cap of 2 in `mapView.ts` becomes
-  Sharpness. performance.md says the map shades "1 pixel per CSS pixel, never device pixels", and the code
-  has `MAP_PIXEL_RATIO = 1` (the cap of 2 is on the overlay in `main.ts`). Does Sharpness apply to the map
-  canvas, the overlay, or both?
-- **OQ-VIEW-2 Lens list not agreed.** Province stats 14 lists ten lenses including Traders passing and Trade
-  balance; trade asked to rename them (Trade ratio, Trade value) and add Traders; buildings asks for Works and
-  Jobs ("14 lenses"); naval adds Sea, diplomacy Diplomacy, subjects Subjects, revolutions Revolution. The
-  province design has not adopted these changes. Today's build has Realms, Terrain, People, Wealth, Walls
-  and Food, of which Realms, Terrain, People, Wealth and Walls are in no design list. Which lenses ship,
-  and how does the picker hold about 17 of them on a phone?
-- **OQ-VIEW-3 Parchment: display, rule or gameplay?** Settings §4.3 keeps "Parchment over unknown lands" as
-  a display toggle and makes fog a campaign rule only if it ever hides information the AI uses. Exploration
-  makes the charted map gameplay (only exploration ships enter uncharted zones; trade and military fleets
-  plan only through charted zones). Fog is also listed among the new-game options. Can the toggle show
-  uncharted land the player can't enter, and is "fog" in the options this toggle or something else?
-- **OQ-VIEW-4 Zoom names.** Province, warfare and troop-movement use World, Region, Local; naval and
-  exploration use World, Region, **Province** (naval also lists **Lens** as a row). The perf script pans "at
-  five zooms". Are there three zoom levels, and is "Province" the same as "Local"?
-- **OQ-VIEW-5 Zoom boundaries.** No design gives the camera zoom at which World, Region and Local change;
-  today's code uses several thresholds (labels below 3.5, sprites from 1.1, 2, 3, 4, 6, 8).
-- **OQ-VIEW-6 Playback and battle stops.** Troop-movement §10.6 plays the month back with half-second
-  battle pauses; screen-flow G6 stops the turn at each player battle. How do playback and the stops combine
-  (see OQ-TIME-3, OQ-TIME-15)?
-- **OQ-VIEW-7 New systems' zoom content.** Gap item 29 asks every new system for its zoom table and lens.
-  Government, recruiting, rebellions, subjects and revolutions give a lens or a card but no full zoom table.
-- **OQ-VIEW-8 Budgets on real devices.** Budgets are checked on a CI machine in mobile Chromium with a
-  software GPU (GPU time not measured). Gap List 2 item 14 asks for targets on a low-end Android phone, an
-  older iPhone, Steam Deck and Steam Machine; none are set yet.
-- **OQ-VIEW-9 Battery saver's AI budget.** Settings says Battery saver runs the AI turn "with a smaller
-  worker budget (slower turns)". If that changes what the AI decides, it changes the simulation, which
-  settings §1.6 forbids. Is it only slower, or also different?
-- **OQ-VIEW-10 Map pixel art scale versus Map detail.** README describes 4 × 4 at middle zoom and 8 × 8 close
-  in; Map detail Low stays at 4 × 4. Is Low still a valid reading of "close in" for the Local zoom's tile
-  row and battle screen?
+- **D-VIEW-1** (was OQ-VIEW-1) Sharpness: Sharpness applies to the overlay only (Balanced up to 2, Native up to 3 device pixels per CSS pixel); the map canvas always shades 1 pixel per CSS pixel. It keeps the performance rule and the code.
+- **D-VIEW-2** (was OQ-VIEW-2) Lenses: the lens picker holds the build's six (Realms, Terrain, People, Wealth, Walls, Food) and every lens the designs add (Tax reaching you, Days to capital, Grievances, Faith, Tongue, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects, Revolution), 22 in all, in a scrolling picker on a phone; Trade ratio and Trade value replace Traders passing and Trade balance. Keep what the game does and follow trade v2 (X-6).
+- **D-VIEW-3** (was OQ-VIEW-3) Parchment: "Parchment over unknown lands" is a display toggle only; it never lets the player enter uncharted zones, which stays exploration's rule, and "fog" in the new-game options is the fog-of-war campaign rule, a different thing. X-15: settings never change results.
+- **D-VIEW-4** (was OQ-VIEW-4) Zoom names: there are three zoom levels, World, Region and Local; "Province" in naval and exploration means Local. The simpler set.
+- **D-VIEW-5** (was OQ-VIEW-5) Zoom boundaries: World below camera zoom 2, Region from 2 to under 4, Local from 4 (provisional in `map-presentation.json`). Missing numbers get provisional values.
+- **D-VIEW-6** (was OQ-VIEW-6) Playback and battles: the turn plays back as the day loop runs over its 7 days (X-18); while a player battle runs, playback slows to six 4-hour steps a day (provisional 0.5 s each) and never stops or skips; a battle bar lets the player switch between running battles; there are no half-second pauses. X-1 and X-18 (Leroy, 17 Oct) settle it.
+- **D-VIEW-7** (was OQ-VIEW-7) New systems' zoom content: a system with no zoom table shows its lens at every zoom and its card at Local only. Simplest default with no new content.
+- **OQ-VIEW-8** (release task) Budgets on real devices: targets on a low-end Android phone, an older iPhone, Steam Deck and Steam Machine need device tests.
+- **D-VIEW-9** (was OQ-VIEW-9) Battery saver: it only lowers the frame rate, animation and music voices; the AI's budget is counted in work steps, the same on every device, and `engine.worker_budget` is dropped. X-15 settles it.
+- **D-VIEW-10** (was OQ-VIEW-10) Map detail Low: Low keeps 4 × 4 art at every zoom, Local included, and that is a valid close-in view. It only lowers detail and changes nothing else.
 
 ## 14. Traceability
 
@@ -341,9 +322,10 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-018 | zoom-content.feature | Local zoom shows the tile row as pixel art |
 | VIEW-018 | zoom-content.feature | Local zoom shows marching columns in proportion |
 | VIEW-019 | zoom-content.feature | Battles and sieges are shown on the province's own tiles |
-| VIEW-020 | zoom-content.feature | Each new system states its zoom content and lens |
+| VIEW-020 | zoom-content.feature | A new system with no zoom table falls back to its lens and a Local card |
 | VIEW-021 | lenses.feature | Picking a lens recolours the map |
 | VIEW-022 | lenses.feature | The lens list holds every system's lens |
+| VIEW-022 | lenses.feature | The lens picker holds 22 lenses and scrolls on a phone |
 | VIEW-023 | lenses.feature | The Faith lens hatches large minority communities |
 | VIEW-024 | lenses.feature | The Tongue lens changes with zoom and a toggle |
 | VIEW-024 | lenses.feature | Homelands of peoples without a country are outlined |
@@ -358,7 +340,9 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-032 | parchment.feature | Uncharted land and sea lie under the parchment |
 | VIEW-033 | parchment.feature | The parchment only shrinks |
 | VIEW-034 | parchment.feature | The parchment can be switched off for viewing |
-| VIEW-035 | month-playback.feature | The month plays at about a second per ten days |
+| VIEW-034 | parchment.feature | Switching the parchment off charts nothing |
+| VIEW-035 | month-playback.feature | The turn's days play at about a second per ten days |
+| VIEW-035 | month-playback.feature | Playback slows to 4-hour steps while a player battle runs |
 | VIEW-036 | month-playback.feature | Playback shows marches, battles and castles that stop armies |
 | VIEW-037 | month-playback.feature | The map stays live while the turn is worked out |
 | VIEW-038 | month-playback.feature | A long turn shows what is being worked out |
@@ -392,7 +376,11 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-064 | performance.feature | Frame budgets hold while panning and zooming |
 | VIEW-064 | performance.feature | Engine turns stay within budget as the world grows |
 | VIEW-065 | performance.feature | Targets are measured at phone defaults and once with Battery saver |
-| VIEW-066 | performance.feature | Battery saver turns every knob down |
+| VIEW-066 | performance.feature | Battery saver turns the display knobs down and leaves the AI alone |
 | VIEW-067 | performance.feature | A still map is not redrawn |
 | VIEW-068 | performance.feature | Map detail steps |
 | VIEW-069 | performance.feature | Animation steps |
+| VIEW-070 | zoom-content.feature | The camera zoom picks the zoom level |
+| VIEW-071 | month-playback.feature | The battle bar switches between running battles |
+| VIEW-072 | seasons.feature | Each province takes its season's palette |
+| VIEW-073 | seasons.feature | Palettes swap once a month and cannot be turned off |

@@ -45,16 +45,75 @@ Feature: One invention tree
     When a row "Andean terrace farming" is added with id, parent, also_needs, era, unlocks and start_regions
     Then it hangs on its parent's branch without code changes
 
-  @RSCH-045 @open-question
+  @RSCH-045 @RSCH-062 @RSCH-063
   Scenario Outline: Scope of eras
-    # OQ-RSCH-1: which Era VII inventions fit before 31 August 1939; OQ-RSCH-2: Era VIII event-tree ids
     Given the date is 1938
-    When the country "Germany" tries to study "<invention>"
+    And the country "Germany" knows everything "<invention>" needs
+    When it tries to study "<invention>"
     Then the study is <result>
 
     Examples:
-      | invention                         | result                        |
-      | C19 electrification               | allowed if its needs are known |
-      | L25 computing                     | refused: Era VIII is out of scope |
-      | T17 Container shipping            | refused: Era VIII is out of scope |
-      | W21 Tanks                         | allowed only if Era VII inventions before 1939 are kept |
+      | invention                         | result                     |
+      | C19 electrification               | allowed                    |
+      | W21 Tanks                         | allowed                    |
+      | L21 Radio                         | allowed                    |
+      | L23 Nuclear physics               | refused as out of scope    |
+      | L24 Rocketry                      | refused as out of scope    |
+      | L25 computing                     | refused as out of scope    |
+      | T17 Container shipping            | refused as out of scope    |
+
+  @RSCH-062
+  Scenario: Nothing is studied after the campaign ends
+    Given the date is 1 September 1939
+    And the country "Germany" knows everything "W21 Tanks" needs
+    When it tries to study "W21 Tanks"
+    Then the study is refused as out of scope
+
+  @RSCH-063
+  Scenario: Era VIII rows stay in the tree but are never studied
+    Given the invention tree config
+    When the tree is loaded
+    Then the 3 event-tree inventions of era VIII keep their ids
+    And no country may ever study an invention of era VIII
+
+  @RSCH-064
+  Scenario: Ironclads grow from steamships
+    Given the invention tree config
+    When the tree is loaded
+    Then "S14 Ironclads" has the parent "S13 Steamships" and needs nothing else
+    And a country of 1850 that knows "S13 Steamships" may study "S14 Ironclads" for 250 scholar-years
+
+  @RSCH-065
+  Scenario Outline: The T-branch does what trade says
+    Given the country "Venice" learns "<invention>"
+    When its effect applies
+    Then its row reads "<unlock>"
+
+    Examples:
+      | invention                         | unlock                                                                                       |
+      | T2 Double-entry bookkeeping       | Collections +10 %                                                                            |
+      | T6 Merchant fairs and exchanges   | Market step 2 (yearly fair) can be built; every market serves +2 visits a month              |
+      | T8 Licensed trading companies     | Trading posts overseas count as cities and can found traders; +1 colonial governor slot      |
+      | T9 joint_stock_finance            | Trade ships cost 25 % less to buy; +1 colonial governor slot                                 |
+      | T11 Marine insurance              | Half the purse of a lost ship is refunded                                                    |
+      | T13 Commodity exchanges           | See every known province's trade value and ratio                                             |
+      | S2 Lateen and junk rigging        | Better trade ships: trade ships' hold +0.5                                                   |
+
+  @RSCH-066
+  Scenario Outline: Other designs' edits to the tree
+    Given the country "France" learns "<invention>"
+    When its effect applies
+    Then its row reads "<unlock>"
+
+    Examples:
+      | invention                  | unlock                                                                     |
+      | G8 Resident ambassadors    | Envoys +1; see others' armies; may ask for passage                         |
+      | G3 Tax registers           | Royal provinces pay +10 % (only with a chancery)                           |
+      | W15 Mass conscription      | +50 % recruits from all provinces                                          |
+      | W12 Standing regiments     | Soldiers who stay: no losses from disbanding; troop cap +0.5 % of people   |
+
+  @RSCH-066
+  Scenario: Tax registers need a chancery
+    Given the country "France" learns "G3 Tax registers"
+    When its effect applies
+    Then the effect works only while the realm has a "chancery"

@@ -43,9 +43,9 @@ Feature: Grievances and rebels
       | hostile to the people's faith      |
       | hostile to the people's tongue     |
 
-  @PROV-231 @placeholder @open-question
+  @PROV-231 @placeholder
   Scenario Outline: The number of grievances sets the province's mood
-    # config: province.grievances.levels; OQ-PROV-2 rebellions design uses a monthly chance at 4+
+    # config: province.grievances.levels
     Given the province "Troyes" has <count> grievances
     When the game works out the province's stats
     Then the province "Troyes" is <state>
@@ -56,8 +56,8 @@ Feature: Grievances and rebels
       | 1     | calm       |
       | 2     | grumbling  |
       | 3     | rioting    |
-      | 4     | in rebels  |
-      | 6     | in rebels  |
+      | 4     | plotting   |
+      | 6     | plotting   |
 
   @PROV-231
   Scenario: Grumbling slows growth and drives out scholars and craftsmen
@@ -74,14 +74,33 @@ Feature: Grievances and rebels
     And traders avoid "Dijon"
     And the lord "Philip of Burgundy" wavers
 
-  @PROV-232 @open-question
-  Scenario: Rebels take up arms under a named leader with a demand
-    # OQ-PROV-2 and OQ-PROV-18
+  @PROV-232
+  Scenario Outline: A plotting province rises with a monthly chance
+    Given the province "Troyes" has <count> grievances
+    When the game works out the province's stats
+    Then its monthly chance to rise is <chance>
+
+    Examples:
+      | count | chance |
+      | 3     | 0 %    |
+      | 4     | 5 %    |
+      | 5     | 15 %   |
+      | 6     | 30 %   |
+      | 8     | 30 %   |
+
+  @PROV-232
+  Scenario: Rebels rise from the recruit pool under a named leader with a demand
     Given the province "Troyes" has 4 grievances, of which "Heavy taxes" is the biggest
-    When the month ends
-    Then a share of its recruits take up arms
+    And the province "Troyes" has 900 recruits here
+    When it rises with 1,500 men wanted
+    Then 900 of its recruits take up arms
     And they follow a named leader
     And they demand the tax rate back down
+
+  @PROV-232
+  Scenario: A spark can start a rising at 3 grievances
+    Given the province "Troyes" has 3 grievances
+    Then a spark can start a rising there
 
   @PROV-233
   Scenario Outline: Rebels come from more than grievances
@@ -121,12 +140,11 @@ Feature: Grievances and rebels
     When the game works out the province's stats
     Then the country "France" has 2 provinces in revolt
 
-  @PROV-236 @open-question
-  Scenario: A judge raises the bar for riots and rebels
-    # OQ-PROV-2: rebels at 5 has no counterpart in the rebellions design
+  @PROV-236
+  Scenario: A judge raises the bar for riots
     Given the province "Troyes" has a "judge" official at full effect
     When the province "Troyes" has 3 grievances
     Then it is grumbling, not rioting
     When it has 4 grievances
-    Then it is rioting, not in rebels
+    Then it is rioting and plotting
     And "Broken charter" fades twice as fast there

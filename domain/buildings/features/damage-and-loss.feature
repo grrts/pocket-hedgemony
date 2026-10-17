@@ -32,6 +32,7 @@ Feature: How buildings are damaged or lost
       | walls              | ruined |
       | no town walls      | 4      |
       | stone town walls   | 2      |
+      | a palisade         | 2      |
 
   @BLD-067
   Scenario: Rebels loot the market first
@@ -90,3 +91,32 @@ Feature: How buildings are damaged or lost
     Given the province "Kutná Hora" has a silver mine
     When its seam runs out
     Then the mine closes
+
+  @BLD-161 @placeholder
+  Scenario Outline: Town fires
+    Given a town of size "<size>"
+    Then its chance of a fire this year is <chance>
+
+    Examples:
+      | size        | chance |
+      | market_town | 1 %    |
+      | town        | 1 %    |
+      | city        | 1.5 %  |
+      | great_city  | 2 %    |
+
+  @BLD-161 @placeholder
+  Scenario Outline: Big raids
+    Given a raid of <men> men
+    Then the raid is <size>
+
+    Examples:
+      | men   | size  |
+      | 1,999 | small |
+      | 2,000 | big   |
+
+  @BLD-160 @placeholder
+  Scenario: Burned tiles rebuild
+    Given the province "Troyes" has 2 burned farm tiles
+    When a year of peace passes
+    Then 1 farm rebuilds by itself for free
+    And paying 15 gold rebuilds the other within 3 months

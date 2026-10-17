@@ -253,7 +253,7 @@ Newest decision first.
 ### 5.4 Ties
 
 - SUBJ-017 While a subject's ruler is of the overlord's ruling house (*Kin*), the subjects context shall give it +1 loyalty reason, and if the overlord's line dies out, give its ruler a claim to the overlord's throne. [subjects 2.3]
-- SUBJ-018 While a subject is *Held of the Church*, the subjects context shall have it pay only a token and never fight for its overlord, and breaking the tie shall be a *Defend the faith* matter for others of that faith. [subjects 2.3; config `ties.held_of_the_church`]
+- SUBJ-018 While a subject is *Held of the Church*, the subjects context shall have it pay only a token and never fight for its overlord. [subjects 2.3; config `ties.held_of_the_church`; D-SUBJ-13]
 - SUBJ-019 While a subject is *Held in fief*, the subjects context shall have it pay only a token, never call it to war, and count it ½ for reach. [subjects 2.3]
 - SUBJ-020 While a subject has a *Second master*, the subjects context shall give the second master a small tribute (5 %) and no other rights, and when the two masters go to war, the subject leans to the stronger. [subjects 2.3; config `ties.second_master`]
 - SUBJ-021 While the overlord holds a subject's heir (*Hostage at court*), the subjects context shall give +1 loyalty reason, and −2 if the hostage is mistreated or lost. [subjects 2.3, 4]
@@ -261,7 +261,7 @@ Newest decision first.
 ### 5.5 Colony stages
 
 - SUBJ-022 When a colony is founded, the subjects context shall make it an Outpost: it pays 25 %, has no army of its own, and the overlord's governor (an official) runs it. [subjects 2.4]
-- SUBJ-023 When a colony has 5 or more provinces, mostly of settler people, the subjects context shall make it Settled: it raises its own militia and its settlers become a voice that can be Wavering. [subjects 2.4]
+- SUBJ-023 When a colony has 5 or more provinces and more than half of its people are settlers, the subjects context shall make it Settled: it raises its own militia and its settlers become a peace voice that can be Wavering; an Outpost stays Loyal and has no seasonal count. [subjects 2.4; D-SUBJ-23]
 - SUBJ-024 When a colony has 10 or more provinces and 50 years, or an event (`create_country … subject_of`, dominion) says so, the subjects context shall make it Self-governing: it pays 10 %, keeps its own lords, and can only be released or kept. [subjects 2.4]
 - SUBJ-025 When a Settled or Self-governing colony turns Disloyal, the subjects context shall report the settler-independence trigger to the revolutions context. [subjects 2.4, 12]
 
@@ -283,14 +283,14 @@ Newest decision first.
 
 - SUBJ-037 When the overlord sets tribute to none, light, normal, heavy or crushing, the subjects context shall pay ×0, ×0.5, ×1, ×1.5 or ×2 of the kind's share, giving light an up reason and heavy (−1) and crushing (−2) down reasons. [subjects 4, 3.1; config `tribute_levels`]
 - SUBJ-038 When the overlord calls a subject to war, the subjects context shall answer as a lord would (warfare 3.2) by its loyalty and kind; tributaries are never called. [subjects 4]
-- SUBJ-039 When the overlord sends a gift (gold scaled to the subject's income), the subjects context shall add +1 for 5 years. [subjects 4; config `reasons.gift`]
+- SUBJ-039 When the overlord sends a gift (6 months of the subject's income, provisional), the subjects context shall add +1 for 5 years. [subjects 4; config `reasons.gift`, `actions.gift_months_of_income`; D-SUBJ-10]
 - SUBJ-040 While the overlord has a resident at a subject's court (one envoy), the subjects context shall add +1, reveal any foreign envoy courting it, and show its true army even when Disloyal. [subjects 4]
 - SUBJ-041 When the overlord lends an official to a subject (paying the official's wages), the subjects context shall add +1 and apply the official's type effect in the subject's land. [subjects 4]
 - SUBJ-042 When the overlord takes a hostage, the subjects context shall require the subject Loyal or Wavering (or a peace term), add *Hostage at court*, return the heir when the subject's ruler dies, and give −2 if he is harmed. [subjects 4, 2.3]
 - SUBJ-043 When a marriage binds the overlord's and the subject's houses, the subjects context shall add the *Marriage* reason and allow a path to a Union when a ruler dies without heirs. [subjects 4]
 - SUBJ-044 When the overlord tightens a subject, the subjects context shall allow only Tributary → Vassal, take one envoy for 6 months, and require the subject Loyal; a Wavering subject refuses and drops a step; Vassal → Union is not possible. [subjects 4; config `tighten`]
-- SUBJ-045 When the overlord loosens a subject (Vassal → Tributary, Protectorate → Tributary), the subjects context shall change the kind at no cost and add +2 for 10 years. [subjects 4; config `loosen`, `reasons.loosened`]
-- SUBJ-046 When the overlord releases a subject, the subjects context shall make it independent and Friendly toward the overlord (`release_subject`); its other subjects see no reason change, and its neighbours gain a *Courted* reason only if the overlord's enemies want them. [subjects 4]
+- SUBJ-045 When the overlord loosens a Vassal or Protectorate, the subjects context shall make it a Tributary at no cost and add +2 for 10 years; Colony, March and Union cannot be loosened or tightened. [subjects 4; config `loosen`, `reasons.loosened`; D-SUBJ-15]
+- SUBJ-046 When the overlord releases a subject, the subjects context shall make it independent and Friendly toward the overlord (`release_subject`); no reasons change for anyone. [subjects 4; D-SUBJ-12]
 - SUBJ-047 When the overlord deposes a subject's ruler, the subjects context shall require a pretender of the overlord to its throne or its ruler Disloyal (and, if In revolt, a won war first), seat the candidate starting Loyal, and give every other subject −1 for 5 years. [subjects 4; config `reasons.deposed_other_subject`]
 - SUBJ-048 The subjects context shall show each overlord action as a button on the subject's card; a locked button names its first missing requirement. [subjects 4, 10.2]
 
@@ -311,7 +311,7 @@ Newest decision first.
 
 - SUBJ-056 The subjects context shall read subject reach from the government context, starting from the catalogue's `administrative_capacity` (very low 2, low 3, moderate 5, high 7, very high 9), as a number separate from lord capacity. [subjects 6, 16 decided; config `reach_by_administrative_capacity`]
 - SUBJ-057 The subjects context shall count each direct subject by its kind's weight (Tributary and March ½, Held in fief ½, others 1). [subjects 2.1, 2.3, 6]
-- SUBJ-058 While reach used exceeds subject reach, the subjects context shall give every subject *Stretched thin*, and −1 more to the furthest subject for each subject beyond reach. [subjects 6; config `reasons.stretched_thin`]
+- SUBJ-058 While reach used exceeds subject reach, the subjects context shall give every subject *Stretched thin* −1, and −1 more to each of the N furthest subjects, N being reach used beyond reach rounded up. [subjects 6; config `reasons.stretched_thin`; D-SUBJ-7]
 - SUBJ-059 The subjects context shall count a subject that holds subjects at 3 times its kind's weight plus 1 for each of its own subjects. [subjects 6.1; config `subjects_with_subjects`]
 - SUBJ-060 While a subject holds subjects of its own, the subjects context shall give it *Master of others* −3. [subjects 6.1]
 - SUBJ-061 The subjects context shall let only the direct overlord act on a subject; a subject's subjects count nothing in the overlord's reach and pay it nothing. [subjects 6.1]
@@ -339,7 +339,7 @@ Newest decision first.
 - SUBJ-077 When a subject rises, the subjects context shall start the independence war (`independence_war`) with the subject's war aim fixed as *Independence* and its backer joining. [subjects 8.2]
 - SUBJ-078 When the overlord wins an independence war, the subjects context shall let the peace restore the subject one kind tighter, or fold it in at once if it shares a border, ignoring the year requirements. [subjects 8.2]
 - SUBJ-079 When the subject wins an independence war, the subjects context shall make it independent with a Hostile stance toward the old overlord. [subjects 8.2]
-- SUBJ-080 When a Disloyal subject that borders a rival of its overlord asks to change masters and the rival accepts, the subjects context shall make it the rival's subject of the same kind and turn the old overlord's stance with both Hostile. [subjects 8.3]
+- SUBJ-080 When a Disloyal subject that borders a rival of its overlord asks to change masters and it fits within the rival's reach, the subjects context shall make it the rival's subject of the same kind, and the old overlord and the rival turn Hostile toward each other. [subjects 8.3; D-SUBJ-11]
 - SUBJ-081 When a country declares *Break a subject* on a subject, the subjects context shall call the subject as defender and its overlord to defend it; if the attacker wins, the attacker chooses in the peace whether the subject goes free or becomes its subject. [subjects 8.4]
 - SUBJ-082 When an overlord is destroyed or becomes someone else's subject, the subjects context shall free its Tributaries and Marches, and give its Vassals, Unions and Colonies to whoever took its capital if that country wants them, otherwise free them. [subjects 8.5]
 
@@ -348,7 +348,7 @@ Newest decision first.
 - SUBJ-083 When a peace term *Become a subject* is taken (over three quarters peace voices), the subjects context shall let the winner pick Vassal or Tributary, or Protectorate from era VI (era IV for an overseas trade empire); a distant loser with no land path can only become a Tributary. [subjects 9]
 - SUBJ-084 When a 20-year tribute peace term has run, the subjects context shall let the receiver offer the payer Tributary by envoy, which the payer accepts if it is weaker. [subjects 9]
 - SUBJ-085 When a war to seat a pretender is won, the subjects context shall let the winner make the realm its Vassal or its ally, the new ruler starting Loyal. [subjects 9]
-- SUBJ-086 When a small country threatened by a much stronger Hostile neighbour is offered protection (diplomacy), the subjects context shall make it a Tributary, or a Vassal if it asked for that. [subjects 9]
+- SUBJ-086 When diplomacy's count accepts *Offer overlordship* or *Ask for protection*, the subjects context shall make the smaller country a Tributary, or a Vassal if it asked. [subjects 9; diplomacy 6.7; D-SUBJ-4]
 - SUBJ-087 When a ruler of a realm inherits another crown after a marriage, the subjects context shall receive the result as a Union. [subjects 9]
 - SUBJ-088 When the overlord makes a frontier grant to a frontier chief who is nobody's subject, sharing a border, with a gift, the subjects context shall make the chief a March. [subjects 9]
 - SUBJ-089 When a group of the overlord's colonial provinces in one distant region is chartered, the subjects context shall make it one Colony. [subjects 9]
@@ -384,6 +384,10 @@ Newest decision first.
 ### 5.18 Configuration
 
 - SUBJ-106 The subjects context shall read every number from `config/subject-rules.json` (placeholders), and changing balance shall never touch the rules or the 1444 data. [subjects 15]
+- SUBJ-107 When the overlord folds in or deposes a subject by force, or restores a subject after winning its independence war, the subjects context shall give every other subject *Force used* −1 for 5 years. [subjects 14 example; config `reasons.force_used_on_other_subject`; D-SUBJ-9]
+- SUBJ-108 When a lord is raised, the subjects context shall let the overlord pick Vassal, or March if the lord's land borders a foreign realm. [subjects 4.1; D-SUBJ-14]
+- SUBJ-109 When a subject's ruler dies without an heir, the subjects context shall apply SUBJ-071 and SUBJ-072 and ignore foreign marriage claims (diplomacy 6.2). [subjects 7.1; D-SUBJ-22]
+- SUBJ-110 The subjects context shall stop the seasonal count at Disloyal; a subject goes In revolt only by SUBJ-076. [subjects 3.1, 8.2; D-SUBJ-24]
 
 ## 6. Commands
 
@@ -447,7 +451,10 @@ Newest decision first.
 - When **events** use the subject keys, then SUBJ-035, SUBJ-090, SUBJ-097 apply.
 - When **province** / **exploration** add colonial provinces, then colony stages are re-checked.
 
-## 9. Monthly turn
+## 9. Monthly steps
+
+A turn is one week (X-18). The steps below run in the turn in which a new month begins; season-end steps in the
+turn in which a new season begins, yearly steps in the turn in which 1 January falls.
 
 Reads first: relations (diplomacy), soldiers (realm/recruiting), treasury (realm), era (time-and-turns), reach
 and lord capacity (government).
@@ -456,7 +463,7 @@ and lord capacity (government).
 3. Each month: check rising conditions for Disloyal subjects (SUBJ-076) and joint risings.
 4. Each season end: recompute reasons and move loyalty (SUBJ-030, SUBJ-031).
 5. Each year: march stipend due (SUBJ-053); colony stage checks.
-Order relative to warfare and diplomacy belongs to time-and-turns (OQ-SUBJ-20).
+Order relative to warfare and diplomacy follows X-2: subjects, then government, then diplomacy (D-SUBJ-20).
 
 ## 10. Configuration
 
@@ -494,8 +501,9 @@ All in `subjects/config/subject-rules.json`; all placeholders.
 | Other context | Direction | Pattern | What crosses |
 |---|---|---|---|
 | diplomacy | upstream | Customer–Supplier | Subject relation records, kinds, `make_subject`, `release_subject`, `independence_war`, envoys, marriages, protection asks, courting, crowns inherited |
+| diplomacy (decided) | partnership | Customer–Supplier | Diplomacy maps relation kinds onto the six kinds through `mapping_1444` and reads `fights` / `own_diplomacy` from here (X-8); its counts decide asks by agreement and this context picks the kind (D-SUBJ-4); Break a subject targets the overlord (D-SUBJ-6) |
 | realm | upstream | Partnership | Lords and loyalty steps (same four steps), lord card frame, ruler, heirs, soldiers, treasury, Oaths broken, Food from grain tribute, raised lords and folded-in rulers as lords |
-| government | upstream | Customer–Supplier | Subject reach (base + form), lord capacity, which kinds a government may hold |
+| government | upstream | Customer–Supplier | Subject reach (base + form), lord capacity; government sets no limits on kinds (D-SUBJ-19) |
 | warfare | upstream | Partnership | Calls to war by loyalty, *Break a subject* and *Independence* aims, peace terms *Become a subject* / *Tribute* / *Seat a pretender*, peace voices of unions, overlord losing |
 | province | downstream | Customer–Supplier | Royal land from folded colonies, charters from merged crowns, subject ruler as governance, lent officials |
 | rebellions | downstream | Customer–Supplier | *Foreign rule* grievance, lord rising with land as counterpart |
@@ -510,7 +518,7 @@ All in `subjects/config/subject-rules.json`; all placeholders.
 | scenario-setup | upstream | Published Language | 1444 subject records, autonomy, start dates, which catalogue subjects are map nations, `administrative_capacity`, playable subjects |
 | map-presentation | downstream | Published Language | Hatch, dotted border, kind icon and loyalty tint, subjects lens |
 | game-shell | downstream | Published Language | Subjects list tab, subject card, long-press / controller |
-| time-and-turns | upstream | Conformist | Month, season, year, era |
+| time-and-turns | upstream | Conformist | Week turn (X-18), month, season, year, era; X-2 order: subjects before government and diplomacy (D-SUBJ-20) |
 
 ## 12. AI
 
@@ -524,77 +532,33 @@ All in `subjects/config/subject-rules.json`; all placeholders.
 - Answers a Loyal subject's polite ask to loosen when cautious or over reach (SUBJ-103).
 - Loyalty once a season from cached reasons (SUBJ-101).
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-SUBJ-1: Kinds joining wars and own diplomacy disagree with relation-rules `subject_kinds`, which diplomacy
-  7.2 / 7.3 read: relations vassal "joins defensive" vs subjects Vassal "when called, by loyalty"; relations
-  frontier_commandery "never" vs March "own frontier only"; relations personal_union "always" vs Union "always if
-  Loyal or Wavering"; relations has no protectorate. Subjects 12 asks relations to map its eight kinds onto six;
-  not adopted. Blocks war joining and who may declare war.
-- OQ-SUBJ-2: The relations config still holds subject income and manpower shares by its eight kinds (for example
-  vassal 0.1 income, 0.2 manpower; tributary 0.15; colony 0.25; estate 0.2) and percentage restlessness keys that
-  subjects 12 asks to rename to loyalty reasons. Not adopted. Which shares win (subjects pays no manpower share
-  at all)?
-- OQ-SUBJ-3: Estates: relations stores 32 estates as subjects that "always" join wars; subjects turns them into
-  lords. The relations dataset and validator still treat them as Subject records (for example the Prussian
-  Confederation, Croatia and Transylvania under Hungary). Who changes the data?
-- OQ-SUBJ-4: Diplomacy's ask names and acceptance: subjects 9 has "Offer protection (diplomacy design)" with a
-  fixed rule (a small threatened country accepts; Tributary, or Vassal if it asks), while diplomacy 6.7 has *Offer
-  overlordship* (base −80) and *Ask for protection* (−10) decided by a reasons count. Which decides, and who
-  chooses the kind?
-- OQ-SUBJ-5: Subjects 12 expects envoys to carry Tighten, Fold in, Station a resident and Offer protection, and
-  the *Courted* reason to be a foreign envoy mission. Diplomacy's action list has no Tighten, Fold in or "court a
-  subject" mission (*Court a lord* targets lords). A subject asking to loosen (13) and a 20-year tributary offer
-  (9) are envoy asks diplomacy does not list either.
-- OQ-SUBJ-6: *Break a subject*: subjects 8.4 declares it "on your subject" (subject as target, warfare 10.1
-  agrees), diplomacy 7.1 holds it against the overlord. Who is the war's target, and who is the "defender"?
-- OQ-SUBJ-7: Stretched thin in the France example: rule 6 gives *Stretched thin* to every subject and −1 more to
-  the furthest per subject beyond reach; the example says it "hits the four furthest away". Which is right?
-- OQ-SUBJ-8: France example step 2: folding in the Dauphiné takes "one envoy for 3 months" (so 3 provinces), and
-  reach "drops to 10 of 7"; step 3 folding in two small vassals reaches "8 of 7" (11 − 1 − 2 = 8, consistent).
-  Brittany in the example sits at ▲3 ▼3, but the list shows ▲2 ▼3 and the card shows three up, two down.
-  Confirm the Brittany numbers.
-- OQ-SUBJ-9: Armagnac in the example goes from Loyal to Disloyal and then rises; the rising rule (8.2) needs a
-  backer or the overlord losing; the example names neither ("the count rises"). Also "Every other subject takes −1
-  for the force used" is the config `force_used_on_other_subject` reason, which the design text lists nowhere else.
-  When exactly does it apply?
-- OQ-SUBJ-10: Gift "scaled to its income": the scale is not given; *Common enemy* "same rival" — Rival stance only
-  or also Hostile? *Far away* "your sea route" is not defined (naval).
-- OQ-SUBJ-11: Change masters (8.3): how the rival "accepts" (a reasons count? automatic?) is not given; and the
-  overlord's stance with both "turns Hostile" — both directions?
-- OQ-SUBJ-12: Release (4): "its neighbours gain a Courted reason only if your enemies want them" — whose
-  neighbours, what is "want", and for how long?
-- OQ-SUBJ-13: Held of the Church: "breaking the tie is a *Defend the faith* matter for others of that faith" —
-  diplomacy 7.1 gives *Defend the faith* only from the persecution flag. Which action "breaks the tie"?
-- OQ-SUBJ-14: Raised lord counts against reach, but a raised Wavering lord's *Given a crown* is listed as +1 for 10
-  years (4.1, config 120 months); a Loyal raised lord gets nothing — confirm. What kind does a raised lord on a
-  frontier become when both Vassal and March fit?
-- OQ-SUBJ-15: Tighten "Vassal → Union is not possible"; config `tighten.order` has only tributary → vassal.
-  Can a Colony or March be tightened? Can a Protectorate be loosened only to Tributary?
-- OQ-SUBJ-16: Event-tree `vocabulary.yaml` does not yet have `subject_loyalty`, `add_subject_reason`,
-  `remove_subject_reason` or `change_subject_kind`; its `vassalize` lists vassal, tributary, protectorate, colony,
-  dominion, puppet. Not adopted.
-- OQ-SUBJ-17: Country stats 9 still reads *Subjects* as "Vassal and tributary countries"; warfare 10.4
-  *Become a subject* does not say the winner picks the kind. Proposed changes (subjects 12) not adopted.
-- OQ-SUBJ-18: Overseas trade empire (for era IV protectorates) is left to trade and naval to define (proposal:
-  trade posts or colonies in two or more distant regions).
-- OQ-SUBJ-19: Government's optional limits on kinds (a tribal confederation holds only tributaries and marches;
-  protectorates need era VI and a bureaucracy) are proposals; adopted or not?
-- OQ-SUBJ-20: Place of the season count, tribute and risings in the month order (time-and-turns).
-- OQ-SUBJ-21: Kalmar Union: Sweden's union "is Wavering in 1444 and should fall to Disloyal through events by
-  1448"; the relations data gives Sweden autonomy very_high (→ Wavering), consistent, but the uncertainty report
-  says "subject" overstates Danish control. Confirm the Union kind for Sweden.
-- OQ-SUBJ-22: Diplomacy's *Married houses* and claims to inherit a crown (diplomacy 6.2: the house with the most
-  marriages) versus subjects 7.1 (a Loyal Vassal or Union with a heirless ruler is inherited by its overlord):
-  when a subject's ruler dies heirless and a foreign house holds a stronger marriage claim, who inherits?
-- OQ-SUBJ-23: Colonies and the colony stage "mostly settler people" — the share is not given; Settled settlers
-  "become a voice" — a peace voice (warfare 10.3) or a loyalty voice?
-- OQ-SUBJ-24: Does the seasonal count move a Disloyal subject to In revolt (one step down on −2), or does a subject
-  only rise by the conditions of 8.2 (backer, overlord losing, event)? Section 3.1 treats In revolt as a step;
-  section 8.2 gives separate conditions.
-- OQ-SUBJ-25: Names of some reasons are not given: the +1 for a lent official, the −2 for a harmed hostage, the
-  −1 for force used on another subject; and "Kin or Hostage at court" appear both as ties (+1 each) and as one up
-  reason in 3.1. Do Kin and Hostage stack (+2) or count once?
+- **D-SUBJ-1** (was OQ-SUBJ-1) Kinds in wars and diplomacy: the six kinds are the only kinds. A Vassal or Protectorate comes when called, by loyalty. A March fights only on its own frontier. A Union always comes if Loyal or Wavering. A Tributary never comes and a Colony only defends itself. Union, Colony and Protectorate have no own diplomacy. The eight relation kinds are mapped onto the six in `mapping_1444`. X-8 decides it.
+- **D-SUBJ-2** (was OQ-SUBJ-2) Shares: this design's shares win (pays_share by kind and tie), with no manpower share; the old restlessness keys become loyalty reasons. X-8 decides it.
+- **D-SUBJ-3** (was OQ-SUBJ-3) Estates: estates are lords of the realm, not subjects; the mapping turns `estate` into a lord when the game loads, and the relations dataset itself is left as it is. X-8 decides it.
+- **D-SUBJ-4** (was OQ-SUBJ-4) Making a subject by agreement: diplomacy's counts decide (*Offer overlordship* base −80, *Ask for protection* base −10). On a yes this context makes a Tributary, or a Vassal when the small country asked. One count for every ask.
+- **D-SUBJ-5** (was OQ-SUBJ-5) Envoy work: Tighten, Fold in and Station a resident take an envoy's time; *Courted* comes from a foreign envoy stationed at the subject's court. A subject's ask to loosen and the 20-year tributary offer are decided by this design's own rules, without a count. They reuse envoys and need no new action.
+- **D-SUBJ-6** (was OQ-SUBJ-6) *Break a subject*: the war is declared on the overlord, who is the defender; the subject answers by its kind and loyalty, and the winner chooses to free or take it. It agrees with D-DIPL-8.
+- **D-SUBJ-7** (was OQ-SUBJ-7) Stretched thin: every subject takes −1, and the N furthest subjects take −1 more each, where N is the reach used beyond reach, rounded up. It matches the example ("hits the four furthest away").
+- **D-SUBJ-8** (was OQ-SUBJ-8) France example: the Dauphiné has 3 provinces (one envoy for 3 months); Brittany is ▲3 ▼3 in step 4 and the list and card follow it. The example's own step wins.
+- **D-SUBJ-9** (was OQ-SUBJ-9) Armagnac and force used: Armagnac rises by an event (an event may start a rising). *Force used* (−1 for 5 years) goes to every other subject when the overlord folds in or deposes a subject by force, or restores one after winning its independence war. It is the config reason, used where force is used.
+- **D-SUBJ-10** (was OQ-SUBJ-10) Gift and reasons: a gift costs 6 months of the subject's income (provisional). *Common enemy* is a shared Rival stance only. *Far away* means no land border and no sea route, where a sea route is both holding coastal provinces on a linked sea. These are the simplest readings.
+- **D-SUBJ-11** (was OQ-SUBJ-11) Changing masters: the rival accepts when the subject fits within its reach (the player chooses for the player's realm). The old overlord and the new master both turn Hostile toward each other. No new count is needed.
+- **D-SUBJ-12** (was OQ-SUBJ-12) Release: the released country becomes independent and Friendly; no reasons change for anyone, and the *Courted* clause is dropped. It was undefined and adds nothing.
+- **D-SUBJ-13** (was OQ-SUBJ-13) Held of the Church: the "Defend the faith matter" clause is dropped; Defend the faith comes only from persecution (diplomacy 7.1). One source for the aim.
+- **D-SUBJ-14** (was OQ-SUBJ-14) Raised lords: a Loyal raised lord gets no extra reason, and a Wavering one gets *Given a crown* +1 for 10 years. The overlord picks the kind: Vassal, or March when the lord's land borders a foreign realm. It is the design's text.
+- **D-SUBJ-15** (was OQ-SUBJ-15) Tighten and loosen: only Tributary → Vassal can be tightened. A Vassal or Protectorate loosens only to Tributary, and Colony, March and Union cannot change by tightening. It matches config `tighten.order`.
+- **D-SUBJ-16** (was OQ-SUBJ-16) Event keys: `subject_loyalty`, `add_subject_reason`, `remove_subject_reason` and `change_subject_kind` are adopted here, and `vassalize` maps dominion → Self-governing colony and puppet → Protectorate. The events context adds the words to its vocabulary.
+- **D-SUBJ-17** (was OQ-SUBJ-17) *Become a subject*: the winner picks the kind, and *Subjects* in country stats means all six kinds. It follows from X-8.
+- **D-SUBJ-18** (was OQ-SUBJ-18) Overseas trade empire: colonies or trade posts in 2 or more regions other than the capital's (provisional, `protectorate.overseas_trade_empire_min_regions`). It is the design's own proposal.
+- **D-SUBJ-19** (was OQ-SUBJ-19) Government limits on kinds: not adopted; any form may hold any kind its era allows. That is the simpler rule.
+- **D-SUBJ-20** (was OQ-SUBJ-20) Month order: X-2 decides it. Subjects runs before government and diplomacy; seasons end in March, June, September and December.
+- **D-SUBJ-21** (was OQ-SUBJ-21) Kalmar: Sweden is a Union of Denmark, Wavering in 1444; events carry it to Disloyal. The data agrees.
+- **D-SUBJ-22** (was OQ-SUBJ-22) Heirless subject rulers: the overlord's rule wins for its own subjects (a Loyal Vassal or Union is inherited by the overlord); foreign marriage claims don't apply to a subject. A subject's crown is its overlord's matter.
+- **D-SUBJ-23** (was OQ-SUBJ-23) Colonies: "mostly settlers" means more than 50 % settler people; settlers in a Settled colony become a peace voice. Outposts stay Loyal and have no count; the seasonal count starts at Settled. These are the simplest readings.
+- **D-SUBJ-24** (was OQ-SUBJ-24) In revolt: the seasonal count stops at Disloyal; a subject goes In revolt only by the conditions of 8.2 (a backer, the overlord losing, or an event). It keeps risings deliberate.
+- **D-SUBJ-25** (was OQ-SUBJ-25) Reason names: "Official lent" (+1), "Hostage harmed" (−2) and "Force used" (−1). Kin and Hostage at court are separate ties and stack (+2). Each reason is named once.
 
 ## 14. Traceability
 
@@ -704,7 +668,7 @@ All in `subjects/config/subject-rules.json`; all placeholders.
 | SUBJ-083 | making-subjects.feature | Peace term Become a subject |
 | SUBJ-084 | making-subjects.feature | After twenty years of tribute |
 | SUBJ-085 | making-subjects.feature | Seating a pretender |
-| SUBJ-086 | making-subjects.feature | Offered protection |
+| SUBJ-086 | making-subjects.feature | A subject by agreement |
 | SUBJ-087 | making-subjects.feature | Inheritance makes a Union |
 | SUBJ-088 | making-subjects.feature | Frontier grant |
 | SUBJ-089 | making-subjects.feature | Chartering a colony |
@@ -729,3 +693,7 @@ All in `subjects/config/subject-rules.json`; all placeholders.
 | SUBJ-104 | playing-as-subject.feature | The subject becomes the master |
 | SUBJ-105 | playing-as-subject.feature | Every playable subject is playable from the start |
 | SUBJ-106 | data-mapping.feature | Balance lives in config |
+| SUBJ-107 | france-1444-1453.feature | Armagnac is folded in by force |
+| SUBJ-108 | raising-lords.feature | What a raised lord becomes |
+| SUBJ-109 | folding-in.feature | Inheriting a subject |
+| SUBJ-110 | loyalty.feature | The seasonal count |

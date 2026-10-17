@@ -829,7 +829,7 @@ Then(/^(drought and hard winter events|storms and blockades|nothing named in the
   expect(P.foodKind(cur(s).tiles[s.tileIdx]!)!.hazards).toEqual(want);
 });
 When(/^the province "([^"]+)" rolls a "failed" harvest$/, (s, name: string) => {
-  s.counts = P.effectiveRoll(prov(s, name), "failed");
+  s.counts = P.harvestWithSteps(P.effectiveRoll(prov(s, name), "failed"), s.harvestSteps ?? 0);
 });
 Then("the harvest counts as {string}", (s, roll: string) => {
   expect(s.counts).toBe(roll);
@@ -1784,16 +1784,17 @@ Given(/^a "([^"]+)" official has served (\d+) years in "([^"]+)"$/, (s, type: st
 const EFFECTS: Record<string, P.OfficialEffect> = {
   "+20 % of tax owed reaching you": { tax_reach: 0.2 },
   "+10 % food from the tiles and a local store that rots half as fast": { food: 0.1, store_rot: 0.5 },
-  "riots needing one grievance more, rebels needing 5, and Broken charter fading twice as fast": { riots_extra_grievances: 1, rebels_at: 5, broken_charter_fade: 2 },
+  "riots needing one grievance more and Broken charter fading twice as fast": { riots_extra_grievances: 1, broken_charter_fade: 2 },
   "buildings and roads 25 % cheaper and twice as fast, and burned tiles rebuilt twice as fast": { build_cost: -0.25, build_time: 0.5, burned_rebuild: 2 },
-  "recruits refilling 25 % faster and levies taking homeless men first": { recruit_refill: 0.25, levy_homeless_first: true },
-  "+15 % traders passing and tolls and market fees collected in full": { traders: 0.15, fees_in_full: true },
+  "recruits refilling 25 % faster": { recruit_refill: 0.25 },
+  "+15 % trade ratio gain": { trade_ratio_gain: 0.15 },
   "faith mix moving twice as fast toward the ruler's faith": { faith_shift: 2 },
   "tongue mix moving twice as fast toward the ruler's tongue and students graduating a year sooner": { tongue_shift: 2, graduate_sooner_years: 1 },
   "a garrison fighting 25 % better, walls repairing twice as fast and a castle store rotting half as fast": { garrison: 0.25, walls_repair: 2, castle_store_rot: 0.5 },
   "no effect of its own": {},
 };
 Then(/^the province "([^"]+)" gets (?!its third grievance$)(.+)$/, (s, name: string, effect: string) => {
+  if (s.eventResult !== undefined) return expect(s.eventResult).toBe(effect);
   const o = prov(s, name).official!;
   expect(EFFECTS[effect], effect).toBeDefined();
   expect(P.officialEffect(o.type, o.yearsServed)).toEqual(EFFECTS[effect]);
@@ -2600,4 +2601,327 @@ When("its starting buildings are placed", (s) => {
 Then("wealth is no longer a live stat of {string}", (s) => {
   expect(s.placedStart.live).not.toContain("wealth");
   expect(s.placedStart.province.town).toEqual(["market", "loom house"]);
+});
+
+// ---------------------------------------------------------------- decided rules (spec §13, PROV-293 to PROV-301)
+
+// births (D-PROV-8)
+Given("the province {string} has 72,000 farmers and no birth or death modifiers", (s, name: string) => {
+  prov(s, name).people.farmers = 72000;
+});
+When("a year of monthly births and deaths passes", (s) => {
+  const f = cur(s).people.farmers;
+  let born = 0;
+  let died = 0;
+  for (let m = 0; m < 12; m++) {
+    born += (f * P.birthRate("farmers")) / 12;
+    died += (f * P.deathRate("farmers")) / 12;
+  }
+  s.born = Math.round(born);
+  s.died = Math.round(died);
+});
+Then("2,880 are born and 2,160 die", (s) => {
+  expect(s.born).toBe(2880);
+  expect(s.died).toBe(2160);
+});
+Then("the province {string} grows by 720 people", (s) => {
+  expect(s.born - s.died).toBe(720);
+});
+const BIRTH_COND: Record<string, string> = {
+  "has more than 6 months of food in store": "food over 6 months",
+  "has had 10 years of peace": "10 years of peace",
+  "has less than 3 months of food in store": "food under 3 months",
+  'is short of food with the "Hungry" grievance': "Hungry",
+  "has plague": "plague",
+};
+Given(/^the province "([^"]+)" (has more than 6 months of food in store|has had 10 years of peace|has less than 3 months of food in store|is short of food with the "Hungry" grievance|has plague)$/, (s, name: string, c: string) => {
+  prov(s, name);
+  (s.birthConds ??= []).push(BIRTH_COND[c]!);
+});
+Then("the yearly birth rate of its farmers is {}", (s, rate: string) => {
+  const conds: string[] = [...(s.birthConds ?? [])];
+  if (s.cond?.war) conds.push("war");
+  expect(P.birthRateWith(P.birthRate("farmers"), conds)).toBeCloseTo(pct(rate));
+});
+
+// buildings lost (D-PROV-3)
+Given(/^the province "([^"]+)" has a (farm|forge|market)$/, (s, name: string, b: string) => {
+  prov(s, name);
+  s.lossBuilding = b;
+});
+When(/^(its tile burns|the town is sacked|the player demolishes it|a peace treaty demolishes it|its pasture tile is ploughed to fields|it stays neglected for 10 years|its upkeep goes unpaid for a month)$/, (s, cause: string) => {
+  s.lossResult = P.buildingAfter(cause);
+});
+Then(/^the (farm|market|castle|ranch) is lost$/, (s) => {
+  expect(s.lossResult).toBe("lost");
+});
+Then("the forge falls one step", (s) => {
+  expect(s.lossResult).toBe("one step down");
+});
+Then("the forge is neglected and works at half", (s) => {
+  expect(s.lossResult).toBe("neglected");
+  expect(P.neglectedOutput()).toBe(0.5);
+});
+
+// colonies (D-PROV-7)
+Given(/^the province "([^"]+)" is (owned by no country|owned by the country "[^"]+"|owned by a tribal country|lived in by a stateless people)$/, (s, name: string, how: string) => {
+  prov(s, name);
+  s.landOwner = how === "owned by no country" ? "none" : how === "owned by a tribal country" ? "tribal country" : how.startsWith("lived") ? "stateless people" : "country";
+});
+When("the country {string} tries to found a colony there", (s) => {
+  s.founding = P.canColonise(s.landOwner) ? "allowed" : "refused";
+});
+Then(/^the founding is (allowed|refused)$/, (s, r: string) => {
+  expect(s.founding).toBe(r);
+});
+When("a colonial governor founds a colony there", (s) => {
+  const p = cur(s);
+  p.owner = null;
+  P.foundColony(p, "Portugal");
+});
+When("the country founds a post with an envoy and gold", (s) => {
+  P.foundTradingPost(cur(s));
+});
+Then("its colony stage is {string}", (s, stage: string) => {
+  expect(P.settlementStage(cur(s).settlement)).toBe(stage);
+});
+
+// aggregation and events (D-PROV-1, D-PROV-16)
+Given("the country {string} holds its provinces", (s) => {
+  s.country = "France";
+});
+Then(/^the country stat "([^"]+)" is the sum of (.+)$/, (s, stat: string, sum: string) => {
+  expect(P.countrySumOf(stat)).toBe(sum);
+});
+Given("the province {string} is hit by an event effect {string}", (s, name: string, effect: string) => {
+  prov(s, name);
+  s.eventResult = P.eventEffectResult(effect);
+});
+
+// harvest steps (D-PROV-14)
+Given(/^the province "([^"]+)" has (\d+) harvest steps$/, (s, name: string, n: string) => {
+  prov(s, name);
+  s.harvestSteps = Number(n);
+});
+When(/^the province "([^"]+)" rolls a "(poor|bumper)" harvest$/, (s, name: string, roll: P.HarvestRoll) => {
+  const p = prov(s, name);
+  const steps = s.harvestSteps ?? known(s).filter((k) => ["F1", "F12", "F14", "F15"].includes(k.split(" ")[0]!)).length;
+  s.counts = P.harvestWithSteps(P.effectiveRoll(p, roll), steps);
+});
+
+// grievances and rebels (D-PROV-2, D-PROV-18)
+Then(/^the province "([^"]+)" is (calm|grumbling|rioting|plotting)$/, (s, _n: string, mood: string) => {
+  expect(P.moodOf(s.count).mood).toBe(mood);
+});
+Then("its monthly chance to rise is {}", (s, c: string) => {
+  expect(P.riseChance(s.count)).toBeCloseTo(pct(c));
+});
+Given(/^the province "([^"]+)" has (\d+) grievances, of which "([^"]+)" is the biggest$/, (s, name: string, n: string, g: string) => {
+  prov(s, name);
+  s.count = Number(n);
+  s.biggest = g;
+});
+Given(/^the province "([^"]+)" has ([\d,]+) recruits here$/, (s, name: string, n: string) => {
+  prov(s, name);
+  s.recruitPool = num(n);
+});
+When(/^it rises with ([\d,]+) men wanted$/, (s, n: string) => {
+  expect(P.riseChance(s.count)).toBeGreaterThan(0);
+  s.risen = P.risingMen(s.recruitPool, num(n));
+  s.rebelLeader = `the leader of ${cur(s).id}`;
+});
+Then(/^([\d,]+) of its recruits take up arms$/, (s, n: string) => {
+  expect(s.risen).toBe(num(n));
+});
+Then("they follow a named leader", (s) => {
+  expect(s.rebelLeader).toBeTruthy();
+});
+Then("they demand the tax rate back down", (s) => {
+  expect(s.biggest).toBe("Heavy taxes");
+});
+Then("a spark can start a rising there", (s) => {
+  expect(P.sparkCanStart(s.count)).toBe(true);
+  expect(P.riseChance(s.count)).toBe(0);
+});
+Given("the province {string} has a {string} official at full effect", (s, name: string, type: string) => {
+  prov(s, name);
+  s.judge = type === "judge";
+});
+When("it has 4 grievances", (s) => {
+  s.count = 4;
+});
+Then("it is grumbling, not rioting", (s) => {
+  const m = P.moodOf(s.count, s.judge);
+  expect(m.mood).toBe("grumbling");
+  expect(m.rioting).toBe(false);
+});
+Then("it is rioting and plotting", (s) => {
+  const m = P.moodOf(s.count, s.judge);
+  expect(m.rioting && m.plotting).toBe(true);
+  expect(P.moodOf(3, s.judge).rioting).toBe(false);
+});
+Then('"Broken charter" fades twice as fast there', () => {
+  expect(P.officialEffect("judge", 99).broken_charter_fade).toBe(2);
+});
+
+// homeless (D-PROV-1)
+Then(/^(\d+) % less of its tax reaches you$/, (s, n: string) => {
+  expect(P.homelessCut(P.homelessShare(cur(s)))).toBeCloseTo(Number(n) / 100);
+});
+Then(/^its trade ratio gain is (\d+) % lower$/, (s, n: string) => {
+  expect(P.homelessCut(P.homelessShare(cur(s)))).toBeCloseTo(Number(n) / 100);
+});
+
+// cadence (D-PROV-4)
+Given("the game advances one month", (s) => {
+  s.cadence = true;
+});
+Then("births, deaths and overflow update", (s) => {
+  expect(s.cadence).toBe(true);
+});
+Then("food updates each season", () => {
+  expect(cfg.food.harvest_order.length).toBe(5);
+});
+Then("plague updates on days 7, 14, 21 and 28 while an outbreak runs", () => {
+  expect(P.plagueWeekDays()).toEqual([7, 14, 21, 28]);
+});
+
+// recruits, drift, refugees (D-PROV-17)
+Given("the province {string} has 40,000 farmers, 5,000 craftsmen, 800 clergy, 100 scholars and 2,000 homeless", (s, name: string) => {
+  const p = prov(s, name);
+  Object.assign(p.people, { farmers: 40000, craftsmen: 5000, clergy: 800, scholars: 100, homeless: 2000 });
+});
+Then("recruits here grow by 400 farmers, 50 craftsmen and 20 homeless", (s) => {
+  const r = P.yearlyRecruits(cur(s).people);
+  expect([r.farmers, r.craftsmen, r.homeless]).toEqual([400, 50, 20]);
+});
+Then("no clergy or scholars", (s) => {
+  const r = P.yearlyRecruits(cur(s).people);
+  expect(r.clergy).toBeUndefined();
+  expect(r.scholars).toBeUndefined();
+});
+Then("40 homeless drift to free slots elsewhere", (s) => {
+  expect(P.homelessDriftPerYear(cur(s).people.homeless)).toBe(40);
+});
+Then("refugees who have stayed 2 years settle", () => {
+  expect(P.refugeesSettle(2)).toBe(true);
+  expect(P.refugeesSettle(1)).toBe(false);
+});
+
+// tax (D-PROV-10, D-PROV-22)
+Given(/^the province "([^"]+)" owes ([\d.]+) gold this year at "([^"]+)"$/, (s, name: string, n: string) => {
+  prov(s, name);
+  s.owedYear = Number(n);
+  s.travelDays = 0;
+  s.collector = 0;
+});
+Given("it is a royal province with an official, 3 days from Paris", (s) => {
+  s.travelDays = 3;
+  s.collector = 1;
+});
+Given(/^it is (\d+) days from the capital with a tax collector at (no|full) effect$/, (s, d: string, c: string) => {
+  s.travelDays = Number(d);
+  s.collector = c === "full" ? 1 : 0;
+});
+When("the tax is collected", (s) => {
+  s.reached = P.taxReaching(s.owedYear, s.travelDays, s.collector);
+});
+Then(/^([\d.]+) gold reach the country "([^"]+)"$/, (s, n: string) => {
+  expect(s.reached).toBeCloseTo(Number(n));
+});
+When("a month of tax is paid", (s) => {
+  s.monthPaid = P.monthlyTax(s.owedYear);
+});
+Then("1 gold is paid that month", (s) => {
+  expect(s.monthPaid).toBe(1);
+});
+Given("it is 12 days from the capital", (s) => {
+  s.reach.days = 12;
+});
+Then("13 gold reaches the treasury", (s) => {
+  expect(P.reachesTreasury(20, s.reach)).toBeCloseTo(13);
+});
+
+// tiles and towns (D-PROV-11)
+Given("a map of 101 provinces ranked by land area", (s) => {
+  s.mapCount = 101;
+});
+When(/^the province ranked (\d+) lays out its tiles$/, (s, r: string) => {
+  s.tileCount = P.tilesByAreaRank(Number(r), s.mapCount);
+});
+Then(/^it has (\d+) tiles$/, (s, n: string) => {
+  expect(s.tileCount).toBe(Number(n));
+});
+Given(/^a town with ([\d,]+) townsfolk$/, (s, n: string) => {
+  s.townsfolk = num(n);
+});
+Then(/^the town is a "([^"]+)" covering (\d+) town tiles$/, (s, size: string, t: string) => {
+  expect(P.townSizeFor(s.townsfolk)).toBe(size);
+  expect(P.townTilesFor(s.townsfolk)).toBe(Number(t));
+});
+
+// officials and lords (D-PROV-13, D-PROV-23, D-PROV-24)
+Given(/^an official of the "([^"]+)" tongue runs a province of the "([^"]+)" tongue$/, (s, o: string, p: string) => {
+  s.kin = o === p ? "own" : p === "Picard" ? "cousin" : "stranger";
+});
+Then(/^he learns the province in (\d+) years$/, (s, n: string) => {
+  expect(P.officialLearnYears(s.kin)).toBe(Number(n));
+});
+Given(/^the country "France" knows (G\d+(?: and G\d+)?)$/, (s, list: string) => {
+  s.officialInventions = list.split(" and ");
+});
+Then(/^one official runs (\d+) provinces$/, (s, n: string) => {
+  expect(P.provincesPerOfficial(s.officialInventions)).toBe(Number(n));
+});
+Given("the lord {string} holds {string} without an official of his own", (s, l: string, name: string) => {
+  const p = prov(s, name);
+  p.lord = l;
+  p.official = null;
+  P.refreshGovernance(p);
+  s.lordName = l;
+});
+Given("{string} would give 10 gold and 600 recruits", (s) => {
+  s.lordGives = P.lordUngovernedGives(10, 600);
+});
+Then("the province {string} is ungoverned", (s, name: string) => {
+  P.updateGrievances(prov(s, name));
+  expect(prov(s, name).official).toBeNull();
+});
+Then("the lord {string} gets 5 gold and 300 recruits from it", (s) => {
+  expect(s.lordGives).toEqual({ tax: 5, recruits: 300 });
+});
+
+// sickness (D-PROV-15)
+Given(/^an army of 10,000 men in land with (Low|Medium|High|Heat|Cold|fever land) sickness$/, (s, k: string) => {
+  s.sickness = k;
+});
+When("a month passes", (s) => {
+  s.sickLost = s.sickness === "fever land" ? P.sicknessLoss(10000, "Low", true) : P.sicknessLoss(10000, s.sickness);
+});
+Then(/^it loses (\d+) men to sickness$/, (s, n: string) => {
+  expect(s.sickLost).toBe(Number(n));
+});
+
+// how much reaches you (PROV-163)
+Given(/^the province "([^"]+)" owes 20 gold$/, (s, name: string) => {
+  prov(s, name);
+  s.reach = { days: 3 };
+});
+Given("it is royal with no official", (s) => {
+  s.reach.official = false;
+});
+Given("a lord governs it", (s) => {
+  s.reach.lord = true;
+});
+Given('it is occupied by the country "England"', (s) => {
+  s.reach.occupied = true;
+});
+Given("an enemy army sits on the road to Paris", (s) => {
+  s.reach.blockedDays = 5;
+});
+Then(/^(at most 10 gold|nothing|less than with a free road) reaches the treasury$/, (s, what: string) => {
+  const got = P.reachesTreasury(20, s.reach);
+  if (what === "nothing") expect(got).toBe(0);
+  else if (what === "at most 10 gold") expect(got).toBeLessThanOrEqual(10);
+  else expect(got).toBeLessThan(P.reachesTreasury(20, { ...s.reach, blockedDays: 0 }));
 });

@@ -22,11 +22,12 @@ Feature: Dunois marches to Dijon, March 1450
       | Troyes  | Langres | 7.0  |
       | Langres | Dijon   | 5.6  |
 
-  @MOVE-047 @MOVE-068 @open-question
-  # OQ-MOVE-19: 6.5 + 7.0 = 13.5 days shown as day 14
+  @MOVE-047 @MOVE-068 @MOVE-116
+  # D-MOVE-19: 6.5 + 7.0 = 13.5 days, so the army arrives on day 14
   Scenario: The planner ends the route at Langres
     Given "Langres" has a stone castle with 400 garrison
     And every other road to "Dijon" runs through Burgundian castles
+    And Dunois carries a reserve of 30 days
     When Leroy drags the army's banner to "Dijon"
     Then the route ends at "Langres" with "stops at Langres on day 14 until the castle falls"
     And the leg to "Dijon" stays drawn in grey
@@ -34,7 +35,7 @@ Feature: Dunois marches to Dijon, March 1450
 
   @MOVE-043 @MOVE-082
   Scenario: Dunois besieges Langres
-    When the month is played
+    When the weekly turns of the month are played
     Then Dunois arrives at "Langres" on day 14 and besieges it
 
   @MOVE-055 @MOVE-057 @MOVE-005 @MOVE-098

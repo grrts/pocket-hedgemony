@@ -9,6 +9,7 @@
  */
 import config from "../../../../rules/data/domain/map-presentation.json" with { type: "json" };
 import { MOVE, foodColour, type FoodColour } from "../troop-movement/index.ts";
+import { STEPS_PER_DAY, hemisphereOf, isWetSeason, seasonOf, turnSpan, type CalendarDay, type WetClimate } from "../time-and-turns/index.ts";
 
 export * from "./layout.ts";
 
@@ -466,10 +467,12 @@ export function playbackSeconds(days: number, secondsPer10Days: number = MOVE.re
 }
 
 export interface PlaybackInput {
+  /** Days in the turn: 7, fewer for the last turn (X-18). */
   days: number;
   marches: { army: string; route: string[] }[];
   castleStops: { day: number; castle: string }[];
-  battles: { day: number; place: string }[];
+  /** Battles; a player battle slows each day it runs to six 4-hour steps (X-1). */
+  battles: { day: number; place: string; player?: boolean; daysRunning?: number }[];
 }
 
 export interface PlaybackCue {
@@ -478,27 +481,38 @@ export interface PlaybackCue {
   draw: string;
   place?: string;
   army?: string;
-  pause?: number;
 }
+
+/** Days a turn plays back over: its 7 days, fewer for the last turn (X-18). */
+export const playbackDays = (first: CalendarDay): number => turnSpan(first).days;
 
 /**
  * The month as timed cues: armies walk their routes, a castle that stops an army rings red
- * on its day, a battle flashes crossed swords and holds playback for the battle pause (VIEW-036).
+ * on its day, a battle flashes crossed swords (VIEW-036). Each day a player battle runs plays
+ * as six 4-hour steps at `playback.battleStepSeconds` each instead of a tenth of a second;
+ * there is no pause (X-1). Skip is offered only for a turn with no player battle (VIEW-035).
  */
-export function playbackCues(m: PlaybackInput, secondsPer10Days: number = MOVE.replaySecondsPer10Days): { cues: PlaybackCue[]; seconds: number; skip: true } {
-  const pause = config.playback.battlePauseSeconds;
+export function playbackCues(m: PlaybackInput, secondsPer10Days: number = MOVE.replaySecondsPer10Days): { cues: PlaybackCue[]; seconds: number; skip: boolean } {
+  const slowed = new Set<number>();
+  for (const b of m.battles) if (b.player) for (let d = b.day; d < b.day + (b.daysRunning ?? 1); d++) slowed.add(d);
+  const dayLength = (d: number) => (slowed.has(d) ? STEPS_PER_DAY * config.playback.battleStepSeconds : playbackSeconds(1, secondsPer10Days));
+  const startOf = (day: number) => {
+    let t = 0;
+    for (let d = 1; d < day; d++) t += dayLength(d);
+    return t;
+  };
   const raw: Omit<PlaybackCue, "at">[] = [
     ...m.marches.map((x) => ({ day: 0, draw: "walk route", army: x.army, place: x.route.join(" → ") })),
     ...m.castleStops.map((c) => ({ day: c.day, draw: `castle rings ${config.playback.castleStopRing}`, place: c.castle })),
-    ...m.battles.map((b) => ({ day: b.day, draw: config.playback.battleMark, place: b.place, pause })),
+    ...m.battles.map((b) => ({ day: b.day, draw: config.playback.battleMark, place: b.place })),
   ].sort((a, b) => a.day - b.day);
-  let held = 0;
-  const cues = raw.map((c) => {
-    const at = playbackSeconds(c.day, secondsPer10Days) + held;
-    held += c.pause ?? 0;
-    return { ...c, at };
-  });
-  return { cues, seconds: playbackSeconds(m.days, secondsPer10Days) + held, skip: true };
+  const cues = raw.map((c) => ({ ...c, at: c.day ? startOf(c.day) : 0 }));
+  return { cues, seconds: startOf(m.days + 1), skip: slowed.size === 0 };
+}
+
+/** The battle bar while several player battles run: each with its progress; tapping one follows it (VIEW-071, X-1). */
+export function battleBar(running: readonly { id: string; place: string; rounds: number; days: number }[], following: string | null): { id: string; place: string; progress: number; followed: boolean }[] {
+  return running.map((b) => ({ id: b.id, place: b.place, progress: Math.min(1, b.rounds / (b.days * STEPS_PER_DAY)), followed: b.id === following }));
 }
 
 /** The "what is being worked out" strip for a turn that runs past 1.5 s (VIEW-038, SHELL-072). */
@@ -625,7 +639,7 @@ export interface Knobs {
 
 export const PHONE_DEFAULTS: Knobs = { ...(config.phoneDefaults as Omit<Knobs, "redraw">), redraw: "every frame while moving" };
 
-/** Battery saver moves every knob down at once (VIEW-066); the AI budget is left out of the model (OQ-VIEW-9). */
+/** Battery saver moves every knob down at once (VIEW-066); the AI budget is not a display knob (D-VIEW-9). */
 export function withBatterySaver(k: Knobs): Knobs {
   const b = config.batterySaver;
   return { ...k, "Frame rate cap": b["Frame rate cap"] as FrameCap, Sharpness: b.Sharpness as Sharpness, Animations: b.Animations as Animations, redraw: "on change" };
@@ -649,4 +663,72 @@ export function framesRedrawn(o: { seconds: number; cap: FrameCap; displayRate?:
 /** How a battle result is shown for an Animations step: Off shows still frames (VIEW-069). */
 export function battleResultMotion(a: Animations): string {
   return config.knobs.Animations[a];
+}
+
+// ---------------------------------------------------------------------------
+// Decided rules (D-VIEW-1, 2, 5, 7, 9)
+
+/** The AI turn's work-step budget, one per AI realm per turn, the same on every device. */
+const AI_WORK_STEPS = 1;
+
+/** The zoom level for a camera zoom: World below 2, Region from 2 to under 4, Local from 4 (VIEW-070, provisional). */
+export function zoomForCamera(camera: number): Zoom {
+  const b = config.zoomBoundaries;
+  if (camera >= b.Local) return "Local";
+  if (camera >= b.Region) return "Region";
+  return "World";
+}
+
+/** Every lens in the picker: the build's six first, then each designed lens once (VIEW-022, D-VIEW-2). */
+export function lensPicker(): { lenses: string[]; scrolls: boolean } {
+  const out = [...(config.todaysLenses as string[])];
+  for (const l of LENSES) if (!out.includes(l.id)) out.push(l.id);
+  return { lenses: out, scrolls: config.lensPickerScrollsOnPhone };
+}
+
+/** Pixels per CSS pixel: the map canvas always 1, the overlay up to Sharpness's cap (VIEW-054, D-VIEW-1). */
+export function canvasRatios(devicePixelRatio: number, s: Sharpness): { map: number; overlay: number } {
+  return { map: 1, overlay: Math.min(devicePixelRatio, sharpnessRatio(s)) };
+}
+
+/** The map statement of a system that gives no zoom table: its lens at every zoom, its card at Local only (VIEW-020, D-VIEW-7). */
+export function defaultZoomStatement(system: string, lensId: string | null): ZoomStatement & { card: Zoom[] } {
+  const d = config.noZoomTableDefault;
+  const at = (z: Zoom): string[] => (lensId && d.lens.includes(z) ? [`lens ${lensId}`] : []).concat(d.card.includes(z) ? ["card"] : []);
+  return { system, World: at("World"), Region: at("Region"), Local: at("Local"), lens: lensId, card: d.card as Zoom[] };
+}
+
+/** The AI's turn budget in work steps; no display knob changes it (VIEW-066, D-VIEW-9, X-15). */
+export const aiWorkSteps = (_k: Knobs): number => AI_WORK_STEPS;
+
+// ---------------------------------------------------------------------------
+// Seasons on the map (X-17)
+
+export type SeasonPalette = "snow" | "spring green" | "base" | "autumn gold" | "wet season";
+
+export interface SeasonProvince {
+  latitude: number;
+  mountain?: boolean;
+  /** The wet-season climate of a dry land, if any. */
+  wetClimate?: WetClimate;
+}
+
+/**
+ * The palette a province's tiles take in a month (VIEW-072): its hemisphere's season;
+ * winter snow from 50° toward the pole and on every mountain; spring green; summer the
+ * base; autumn gold; a dry land in its wet season shows the wet palette.
+ */
+export function seasonPalette(p: SeasonProvince, month: number): SeasonPalette {
+  if (p.wetClimate && isWetSeason(p.wetClimate, month)) return "wet season";
+  const season = seasonOf(hemisphereOf(p.latitude), month);
+  const sp = config.seasonPalettes;
+  if (season === "winter") return Math.abs(p.latitude) >= sp.snowFromLatitude || p.mountain ? "snow" : "base";
+  if (season === "spring") return "spring green";
+  if (season === "autumn") return "autumn gold";
+  return "base";
+}
+
+/** Palettes are swapped once a month per province, never per frame (VIEW-073). */
+export function monthPalettes(provinces: readonly (SeasonProvince & { id: string })[], month: number): Map<string, SeasonPalette> {
+  return new Map(provinces.map((p) => [p.id, seasonPalette(p, month)]));
 }

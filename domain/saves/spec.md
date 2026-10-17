@@ -26,7 +26,7 @@ Not in scope (owned by …):
   (this context defines the values the rows can take).
 - Whether achievements need ironman, and the flags they read → `achievements`.
 - The unlock screen shown for a locked nation → store and unlock screens (no design yet).
-- The order of a month and the determinism of `processTurn` → `time-and-turns`.
+- The order of a turn and the determinism of `processTurn` → `time-and-turns`.
 - Each system's own state (diplomacy, religion …) → its context; here only that it gets its own chunk.
 - What the privacy policy allows to be sent → privacy (no design yet).
 - Performance budgets as hard limits → performance (these are targets for it to confirm).
@@ -36,7 +36,7 @@ Not in scope (owned by …):
 Newest decision first.
 
 1. `save-system/README.md`, second draft 2026-10-16, §8 Decisions (settled by Leroy on 16 Oct: Export and
-   Import yes; cloud saves on our Symfony server with optional accounts; default autosave every 12 turns plus
+   Import yes; cloud saves on our Symfony server with optional accounts; default autosave every 12 months plus
    the Resume save every turn; cross-store cloud saves at launch, purchases stay per store), and all of §1–§7, §9.
 2. `save-system/save-config.example.yaml` (the configuration the rules describe).
 3. `planning/gap-lists.md` "Decisions already made" (campaign to 31 August 1939; business model: paid full
@@ -54,7 +54,7 @@ Newest decision first.
 | Campaign | One new game, with a random `campaignId`; saves are grouped by it | A save |
 | Save | One write-once `.phsave` file holding the world at the start of a turn plus queued orders | A setting; tutorial progress |
 | Resume save | The save written after every End turn and on pause, quit, suspend or backgrounding; what Continue opens; 1 per campaign plus a backup | Autosave |
-| Autosave | A rotating save at the start of a turn on the player's interval, marked "Auto" | Resume save |
+| Autosave | A rotating save at the start of a turn in which a month on the player's interval begins, marked "Auto" | Resume save |
 | Manual save | A save the player makes with Save, with a name | Exported save |
 | Ironman save | The single save line of an ironman campaign, written after every End turn and on every exit | Resume save |
 | Exported save | A `.phsave` file sent out of the game with Export | Imported save (joins Manual) |
@@ -129,7 +129,7 @@ Newest decision first.
 - **Chunk** (value): id, version, offset, length, CRC-32, deflate bytes. Ids: `core`, `ids`, `provinces`,
   `nations`, `armies`, `events`, `history`, `orders`, later `diplomacy`, `subjects`, `religion`, `culture`,
   `government`, `trade`, `ai` ….
-- **AutosaveOptions** (value): interval ∈ {every turn, every 6 turns, every 12 turns (each January), off};
+- **AutosaveOptions** (value): interval ∈ {every month, every 6 months, every 12 months (each January), off}, written only in a turn in which a new month begins (X-18);
   keep ∈ {1, 3, 5}.
 - **SaveMessage** (value): the plain lines of §2.5 of the design.
 - **Tombstone** (value): save id, deleted at; bytes purged 30 days later.
@@ -155,14 +155,14 @@ Newest decision first.
 ### 5.2 Kinds of save and Continue
 
 - SAVE-007: When the player ends a turn, pauses, quits or exits to the main menu, or the app is suspended, the save system shall keep the campaign's Resume save current, keeping 1 per campaign plus the one before it as a backup, and shall not list it in Load; when the app is only backgrounded, it shall write the orders journal and no Resume save. [save-system §2.1; config `kinds.resume`; D-SAVE-2]
-- SAVE-008: When a turn starts on the player's autosave interval, the save system shall write an autosave, keep the chosen number per campaign rotating out the oldest, and list them in Load marked "Auto". [save-system §2.1]
+- SAVE-008: When a turn starts in which a new month on the player's autosave interval begins (X-18), the save system shall write an autosave, keep the chosen number per campaign rotating out the oldest, and list them in Load marked "Auto". [save-system §2.1]
 - SAVE-009: When the player taps Save, the save system shall write a manual save with the player's name for it, allowing up to 20 per campaign and 100 in total, listed in Load. [save-system §2.1; config `kinds.manual`]
 - SAVE-010: While a campaign is ironman, the save system shall write its ironman save after every End turn and on every exit (Save and quit, Exit to main menu, the app being closed; D-SAVE-16), keep 1 per campaign plus a backup, and list it in Load as the campaign itself. [save-system §2.1, §6.2]
 - SAVE-011: When the player taps Export, the save system shall write an exported file that leaves the game, with no limit on how many; imported files shall join the Manual saves. [save-system §2.1, §5.4]
 - SAVE-012: The save system shall group saves by campaign, one new game being one campaign with a random id. [save-system §2.1]
 - SAVE-013: The Load screen shall list campaigns first, each with nation banner, nation name, in-game date, turn, play time and a small map crop, and opening a campaign shall list its saves newest first, each marked autosave or ironman and with the device it came from. [save-system §2.1; screen flow S6; D-SAVE-4]
 - SAVE-014: Continue shall open the newest Resume or Ironman save across all campaigns, on this device or arrived from the cloud; if that save came from another device, the button shall say so ("Continue: Portugal, March 1512 (from Steam Deck)"). [save-system §2.2]
-- SAVE-015: The save system shall offer the autosave interval values every turn, every 6 turns, every 12 turns (each January) and off, default every 12 turns, and the autosaves kept per campaign values 1, 3 and 5, default 3. [save-system §2.3, §8.3; config `kinds.autosave`]
+- SAVE-015: The save system shall offer the autosave interval values every month, every 6 months, every 12 months (each January) and off, default every 12 months, and the autosaves kept per campaign values 1, 3 and 5, default 3. [save-system §2.3, §8.3; config `kinds.autosave`]
 - SAVE-016: Where the autosave interval is off, the save system shall stop only the rotating autosaves; the Resume save cannot be turned off. [save-system §2.3]
 
 ### 5.3 Saving by hand and messages
@@ -280,7 +280,7 @@ Newest decision first.
 - SAVE-097: When the player chooses Send a report, the report shall attach the Resume save and the orders journal, and sending shall always be the player's choice under the privacy design. [save-system §7]
 - SAVE-098: Before release, the save code shall pass: every save in `test/saves/` loads, migrates and plays a turn; save, load and save again gives byte-identical chunks and the same `worldHash`; a file cut short at any byte is rejected cleanly and the previous save offered; the app killed during a write leaves the old save intact (desktop and both phones); backgrounding, killing and relaunching on a real iPhone and Android phone resumes with the queued orders; two devices with cloud on, played offline and reconnected, show both lines of play, and for ironman the one prompt. [save-system §7]
 - SAVE-099: The engine worker shall produce and read the save bytes (a `save` request returning file bytes, a `load` request that migrates, validates and returns a snapshot, `newGame` carrying the game options, and `endTurn` also returning the serialised Resume save); each platform's storage layer shall only store and list them, and the sync queue shall upload them. [save-system §9 Engine]
-- SAVE-100: Where the autosave interval is every 6 turns, the save system shall write the autosave at the start of the January and July turns, and while a campaign is ironman it shall write no rotating autosaves. [save-system §2.3; config `kinds.autosave.every_6_months`; D-SAVE-9]
+- SAVE-100: Where the autosave interval is every 6 months, the save system shall write the autosave at the start of the turns in which January and July begin, and while a campaign is ironman it shall write no rotating autosaves. [save-system §2.3; config `kinds.autosave.every_6_months`; D-SAVE-9]
 - SAVE-101: When the player picks "Restore the last autosave" on the failure screen, the save system shall open the campaign's Resume save, or its newest rotating autosave when every Resume save is damaged. [screen flow X1; D-SAVE-3]
 - SAVE-102: If an ironman save is imported while the device is offline, then the save system shall refuse it with "Connect to import an ironman save." so the ironman head check always runs. [save-system §6.2; D-SAVE-15]
 - SAVE-103: When the player makes a choice at a before-the-battle stop, the save system shall append it to the orders journal with its day, so a replay reaches the same result. [X-1; D-SAVE-10]
@@ -291,7 +291,7 @@ Newest decision first.
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
 | WriteResumeSave | system (after End turn, pause, quit, suspend) | Campaign loaded; not mid-turn | New Resume save; older beyond backup removed | `SaveWritten(resume)` |
-| WriteAutosave | system (turn start on interval) | Interval not off; not ironman | New autosave; oldest beyond keep removed | `SaveWritten(autosave)` |
+| WriteAutosave | system (start of a turn in which a month on the interval begins) | Interval not off; not ironman | New autosave; oldest beyond keep removed | `SaveWritten(autosave)` |
 | SaveManual | player | Not ironman; slot free or replace chosen | New manual save | `SaveWritten(manual)` |
 | ReplaceManual | player | Existing manual save picked; "Replace?" yes | New file written, old removed | `SaveWritten(manual)`, `SaveRemoved` |
 | WriteIronmanSave | system (after End turn, every exit) | Ironman campaign | New ironman save naming its parent | `SaveWritten(ironman)` |
@@ -334,14 +334,14 @@ Save commands are local to one player's device and never change the simulation; 
 - When the store reports a purchase, refund or revoke, update which saves need the full game (saves stay).
 - When `game-shell` reports `PlayedOnAsAnotherRealm`, record it in the campaign; the next save's header sets `switched_country` (D-SAVE-1).
 
-## 9. Monthly turn
+## 9. Each turn
 
 Per turn:
-1. At turn start, if the interval says so (and not ironman): write an autosave.
+1. At turn start, if a new month begins in the turn and the interval says so (and not ironman): write an autosave.
 2. During orders: keep the orders journal; write it on lifecycle events and every 30 s while orders change.
 3. Pre-turn: the current Resume save plus journal describe the world before the turn (used if the app dies mid-turn).
 4. After the turn: the worker writes the Resume (or Ironman) save for the new turn; the journal is cleared for the new turn; the upload is queued.
-Depends on: `time-and-turns` finishing the month deterministically (`processTurn` with a seeded `Rng`).
+Depends on: `time-and-turns` finishing the turn deterministically (`processTurn` with a seeded `Rng`).
 
 ## 10. Configuration
 
@@ -355,7 +355,7 @@ From `save-system/save-config.example.yaml` ("numbers here are the defaults the 
 | `format.thumbnail` | Thumbnail size | 96 × 64 | no | save-config.yaml |
 | `kinds.resume.keep` | Resume saves kept | 2 (newest plus backup) | no | save-config.yaml |
 | `kinds.resume.write_on` | Resume write triggers | end_turn, pause, quit, suspend, background | no | save-config.yaml |
-| `kinds.autosave.interval_turns` | Autosave interval | 12 | default (decided) | save-config.yaml |
+| `kinds.autosave.interval_months` | Autosave interval, in months | 12 | default (decided) | save-config.yaml |
 | `kinds.autosave.interval_options` | Offered intervals | 1, 6, 12, off | no | save-config.yaml |
 | `kinds.autosave.keep` | Autosaves kept | 3 | default | save-config.yaml |
 | `kinds.autosave.keep_options` | Offered counts | 1, 3, 5 | no | save-config.yaml |
@@ -393,7 +393,7 @@ From `save-system/save-config.example.yaml` ("numbers here are the defaults the 
 | `integrity.verify_world_hash` | Hash check | true | no | save-config.yaml |
 | `integrity.modified_saves` | Hash-fail policy | allowed_outside_ironman_with_warning | no | save-config.yaml |
 | `desktop_quit_wait_seconds` | Desktop quit wait | 2 s | yes | D-SAVE-12 |
-| `kinds.autosave.every_6_months` | Months of "every 6 turns" | January, July | yes | D-SAVE-9 |
+| `kinds.autosave.every_6_months` | Months of "every 6 months" | January, July | yes | D-SAVE-9 |
 | `cloud.synced_files` | Files beside saves in the account sync | `settings-personal.json` | no | D-SAVE-6 |
 | `messages.ironman_import_offline` | Offline ironman import | "Connect to import an ironman save." | no | D-SAVE-15 |
 
@@ -438,7 +438,7 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 - **D-SAVE-6** (was OQ-SAVE-6) Tutorial progress and mutes live in the player profile (X-16); personal settings sync as one more file, `settings-personal.json`, in the account's synced set with the same rules as a save. No new endpoint.
 - **D-SAVE-7** (was OQ-SAVE-7) Cheats: the game ships no cheats or console; `cheat_marked` is the existing "modified" mark (a save edited outside the game or written by a debug build). No new mechanic.
 - **D-SAVE-8** (was OQ-SAVE-8) Header options hold every campaign rule from the new-game screen: difficulty, events, end date, AI temper, fog of war and the music-era rule. One place for all of them.
-- **D-SAVE-9** (was OQ-SAVE-9) "Every 6 turns" writes in January and July; an ironman campaign writes no rotating autosaves, only its ironman save. Simplest fixed months.
+- **D-SAVE-9** (was OQ-SAVE-9) "Every 6 months" writes in January and July (in the turns in which they begin, X-18); an ironman campaign writes no rotating autosaves, only its ironman save. Simplest fixed months.
 - **D-SAVE-10** (was OQ-SAVE-10) A choice made at a before-the-battle stop (X-1) is appended to the orders journal with its day, so a replay reaches the same result; the engine protocol's `save`, `load`, `newGame` and the Resume save in `endTurn` are a request to the engine build. Replays stay deterministic.
 - **D-SAVE-11** (was OQ-SAVE-11) The save budgets live in saves.json and performance.md should list them (a request to that document). The config is the source.
 - **D-SAVE-12** (was OQ-SAVE-12) The desktop quit wait of 2 s lives in saves.json as `desktop_quit_wait_seconds` (provisional). Numbers belong in config.

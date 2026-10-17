@@ -41,7 +41,7 @@ Feature: The Settings screen
   Scenario: Settings mid-campaign loses nothing
     Given a campaign as "France" is loaded with the camera on "Champagne"
     And the player has queued 2 orders
-    When the player opens Settings from the pause menu and closes it
+    When the player opens Settings from the game menu and closes it
     Then the camera is on "Champagne" at the same spot
     And the 2 orders are still queued
 
@@ -51,19 +51,18 @@ Feature: The Settings screen
     When the player opens Settings
     Then the Settings screen opens
 
-  @SET-008 @open-question
-  Scenario: Settings and Campaign rules from the pause menu
-    # OQ-SET-11: the game menu in screen flow has no Campaign rules entry
+  @SET-008
+  Scenario: Settings from the game menu, with Campaign rules inside
     Given a campaign as "France" is loaded
-    When the player opens the pause menu
+    When the player opens the game menu
     Then it offers Settings, opening over the dimmed map
-    And it offers Campaign rules, a read-only list
+    And Settings holds Campaign rules, a read-only section
 
   @SET-009
   Scenario Outline: Shortcuts into Settings
     Given a campaign is loaded on "<platform>"
     When the player presses "<button>"
-    Then the pause menu opens, from which Settings opens
+    Then the game menu opens, from which Settings opens
 
     Examples:
       | platform | button      |
@@ -76,9 +75,8 @@ Feature: The Settings screen
     When the player opens the Controller part of the Controls section
     Then a button opens Steam's own binding panel
 
-  @SET-010 @open-question
+  @SET-010
   Scenario Outline: First-launch questions only when needed
-    # OQ-SET-9: screen flow lists two questions
     Given the game launches for the first time on the profile "<profile>"
     And the system language <supported>
     And the privacy design <consent> consent

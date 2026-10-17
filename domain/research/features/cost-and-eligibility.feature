@@ -74,22 +74,38 @@ Feature: What can be studied and what it costs
     When the Atlantic crossing contact event happens for "Castile"
     Then it may study "F9 Maize, potato and cassava"
 
-  @RSCH-036 @open-question
+  @RSCH-036 @RSCH-074 @RSCH-069 @placeholder
   Scenario Outline: Inventions that change research itself
-    # OQ-RSCH-8 and OQ-RSCH-12: effects are unquantified or their target is unclear
+    # config: inventions[].effects (research_pct, spread_pct, school_upkeep_pct, old_age_one_in)
     Given the country "Venice" learns "<invention>"
     When research is next worked out
     Then <effect>
 
     Examples:
-      | invention                       | effect                                                 |
-      | C1 Paper making                 | schools cost less                                      |
-      | L4 Metal movable type           | students cost less                                     |
-      | L5 printing                     | inventions spread 20 % more and schools cost less      |
-      | L6 humanist_learning            | scholars give more research                            |
-      | L3 Observatories                | Learning and Sea inventions get more research          |
-      | L10 Spectacles and telescopes   | scholars work into old age                             |
-      | L11 experimental_science        | scholars give more research                            |
-      | L14 Encyclopedias               | inventions spread 20 % more                            |
-      | L20 Research laboratories       | research is 50 % higher                                |
-      | L21 Radio                       | news and inventions spread faster                      |
+      | invention                       | effect                                                         |
+      | C1 Paper making                 | school upkeep is 10 % lower                                    |
+      | L4 Metal movable type           | school upkeep is 10 % lower                                    |
+      | L5 printing                     | each partner takes 12 % off and school upkeep is 10 % lower    |
+      | L6 humanist_learning            | research is 10 % higher                                        |
+      | L3 Observatories                | Learning and Sea inventions get 20 % more research             |
+      | L10 Spectacles and telescopes   | 1 in 60 scholars is lost to old age each year instead of 1 in 30 |
+      | L11 experimental_science        | research is 10 % higher                                        |
+      | L14 Encyclopedias               | each partner takes 12 % off                                    |
+      | L20 Research laboratories       | research is 50 % higher                                        |
+      | L21 Radio                       | each partner takes 12 % off                                    |
+
+  @RSCH-069 @placeholder
+  Scenario: Spread inventions add up but the cap stays
+    # config: research.spread_per_partner_pct, inventions[].effects.spread_pct
+    Given the country "Venice" knows L5 printing, L14 Encyclopedias and L21 Radio
+    When 3 neighbours or trade partners of "Venice" know an invention of its own era
+    Then each partner takes 16 % off
+    And the invention costs 52 % of its era cost
+    And with 5 such partners it costs 40 % of its era cost
+
+  @RSCH-077
+  Scenario: The Atlantic crossing comes from exploration
+    Given the invention tree config
+    When the tree is loaded
+    Then "F9 Maize, potato and cassava" opens on the contact event "atlantic_crossing"
+    And the country "Aztecs" knows "F9 Maize, potato and cassava" from the start

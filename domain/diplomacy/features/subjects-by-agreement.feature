@@ -4,9 +4,9 @@ Feature: Subjects by agreement
   I want to offer overlordship or ask for protection by envoy
   So that a subject can be made without war
 
-  @DIPL-126 @placeholder @open-question
+  @DIPL-126 @placeholder
   Scenario Outline: Offering overlordship
-    # config: actions.offer_overlordship; OQ-DIPL-32 on the subjects design's fixed acceptance rule
+    # config: actions.offer_overlordship; the count decides, the subjects context picks the kind
     Given the country "B" has <threats> neighbours Hostile toward it or holding a claim on it
     And the country "A" <pledge> pledged protection to "B"
     And the country "B" has <castles> castles

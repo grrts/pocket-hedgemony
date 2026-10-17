@@ -117,3 +117,18 @@ Feature: Accessibility settings
     When the player selects the province "Champagne"
     Then the province card of "Champagne" is read out with its labels
     And the map itself is not narrated
+
+  @SET-130
+  Scenario Outline: Season palettes stay readable in every colour vision mode
+    Given "Colour vision" is "<mode>"
+    When the map is drawn in January and in October
+    Then the snow and autumn gold palettes are told apart by <means>
+    And no setting turns the seasons off
+
+    Examples:
+      | mode                  | means                  |
+      | Default               | colour                 |
+      | Red-weak (protan)     | the safe ramp          |
+      | Green-weak (deutan)   | the safe ramp          |
+      | Blue-weak (tritan)    | the safe ramp          |
+      | No colour             | tile patterns          |
