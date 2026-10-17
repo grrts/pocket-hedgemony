@@ -72,6 +72,8 @@ export interface World {
   provinceOccupier: Int16Array;
   /** Days a hostile army has held a province without walls. */
   provinceHold: Uint8Array;
+  /** Realm that began holding each province (the first to arrive takes it, Leroy F-45), -1 = none. */
+  provinceHoldBy: Int16Array;
   /** Men behind each province's walls. */
   provinceGarrison: Float32Array;
   sieges: Map<number, SiegeState>;
@@ -354,6 +356,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     diplomacy: null!,
     provinceOccupier: new Int16Array(P).fill(-1),
     provinceHold: new Uint8Array(P),
+    provinceHoldBy: new Int16Array(P).fill(-1),
     provinceGarrison: new Float32Array(P),
     sieges: new Map(),
     battles: [],

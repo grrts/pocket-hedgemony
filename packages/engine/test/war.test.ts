@@ -3,7 +3,7 @@ import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { advance, applyNow, createWorld, marchMap, processTurn, relationState, spawnArmy, type World } from "../src/index.ts";
 import { blockingCastle, routeBars } from "../src/turn.ts";
-import { wallsOf } from "../src/war.ts";
+import { runOccupation, wallsOf, type News } from "../src/war.ts";
 import { planRoute } from "../src/march.ts";
 
 const rules = loadDefaultRuleset();
@@ -155,6 +155,29 @@ describe("war and conquest", () => {
     expect(applyNow(w, { type: "move", army, to: lisbon }, me).rejectedOrders[0]?.reason).toMatch(/passage/);
     w.diplomacy.passages.push({ granter: "portugal", grantee: "castile", until: "9999-12" });
     expect(applyNow(w, { type: "move", army, to: lisbon }, me).rejectedOrders).toEqual([]);
+  });
+
+  it("gives a province to the first realm to besiege or hold it, not the strongest (feedback 45)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const a = n(w, "castile");
+    const b = n(w, "aragon");
+    const foe = n(w, "portugal");
+    expect(applyNow(w, { type: "declareWar", target: foe }, a).rejectedOrders).toEqual([]);
+    expect(applyNow(w, { type: "declareWar", target: foe }, b).rejectedOrders).toEqual([]);
+    const lands = Array.from({ length: w.provinceCount }, (_, p) => p).filter((p) => w.provinceOwner[p] === foe);
+    const open = lands.find((p) => !wallsOf(w, p))!;
+    const walled = lands.find((p) => wallsOf(w, p))!;
+    const news: News[] = [];
+    for (const p of [open, walled]) {
+      for (let i = 0; i < w.armies.count; i++) if (w.armies.location[i] === p) w.armies.alive[i] = 0;
+      if (p === walled) w.provinceGarrison[p] = 50;
+      spawnArmy(w, a, p, 1000);
+      runOccupation(w, false, news);
+      // A bigger army of another realm arrives the next day.
+      spawnArmy(w, b, p, 20000);
+      for (let d = 0; d < 400 && w.provinceOccupier[p]! < 0; d++) runOccupation(w, false, news);
+      expect(w.provinceOccupier[p]).toBe(a);
+    }
   });
 
   it("runs decades of AI wars deterministically and quickly", () => {
