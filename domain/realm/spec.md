@@ -304,6 +304,14 @@ The game's first working treasury, built to the milestone 3 plan (slice 2). It r
 - REALM-185: The gold plaque at the top of the screen is the treasury's overview: it shows gold and its change a month, and tapping it opens the Treasury tab; the General tab's Treasury line opens it too. [X-19]
 - REALM-186: On a phone in landscape the Treasury tab and the Tax line fit the side panel in the Wide and Tall layouts: the tab row scrolls sideways, the rate buttons wrap onto two rows of three, every button is at least 44 points high, and nothing needs hover (each button names what it does). [X-19]
 
+#### How the player uses it: lords and who governs a province
+- REALM-190: Who governs a province comes first on its Overview, above the siege view and the facts: a "Governed by" card with the lord who holds it (portrait, house, loyalty, and buttons to his screen and to seize the land) or "Royal land" (with a Grant as fief button that opens the realm's lords, neighbours first), and the province's official. A lord's official is shown as serving the lord, with no button to the official's screen, so he cannot be commissioned. [F-60, F-62, F-70, X-19]
+- REALM-191: The Lords tab of the country card is the lords' overview: a bar of royal land against the lords' land, the count by loyalty, and a row per lord (portrait, name, house, provinces, people, loyalty as a coloured tag, gold a month to the crown), the least loyal first; tapping a row opens the lord's screen. [F-64, F-65, X-19]
+- REALM-192: A lord's screen shows his portrait, house, loyalty and what it means, his lands (people, gold to the crown), a Gift button while he is not loyal, his provinces as rows with a picture of each (tap to open it on the map, Seize beside it), and the realm's royal provinces to grant him, nearest his lands first (six, with Show all). A button lights his lands on the map: the rest of the land fades to grey, the map frames his provinces, and a chip over the map names him with buttons to reopen his screen and to stop; on a phone the panel folds away so the map shows. [F-67, F-70, X-19]
+- REALM-193: On the map, a lord's land carries a fine pattern of small crosses and a dashed border where it meets royal land or another lord's land; the Lords lens colours the player's royal land gold and each lord's land in his own colour, other realms faded. [F-68, X-19]
+- REALM-194: The Provinces tab lists every province as a row with a picture of the province, its mood, who governs it (lord's house, or royal with the official's post or "no official"), people, food and tax a month, sortable by trouble, people, food or tax; tapping a row opens the province and centres the map on it, and its Map button shows it on the map with the panel folded away. [F-63, X-19]
+- REALM-195: On a phone in landscape these screens fit the side panel in the Wide and Tall layouts: rows and their buttons are at least 44 points high, the lord's grants and lands wrap to one column, and nothing needs hover. [X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -646,3 +654,9 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-185 | treasury-ledger.feature | The gold plaque opens the Treasury tab |
 | REALM-187 | — | Covered by engine test (packages/engine/test/treasury.test.ts: tax and the lords) |
 | REALM-186 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/treasury-shots.mjs) |
+| REALM-190 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-191 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-192 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-193 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-194 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-195 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |

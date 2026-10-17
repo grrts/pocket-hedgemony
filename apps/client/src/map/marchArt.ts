@@ -1,9 +1,10 @@
 import { PALETTE } from "../art/palette.ts";
+import { commanderSprite, type CommanderLook } from "../art/commanders.ts";
 import { sprite, type SpriteName } from "../art/sprites.ts";
 
 /**
- * The map's moving pieces, drawn as pixel art on the overlay: army tokens (a
- * rider under the realm's standard, or a ship), the march route as a trail of
+ * The map's moving pieces, drawn as pixel art on the overlay: army tokens (the
+ * commander on foot in the realm's colours, or a ship), the march route as a trail of
  * stones with a marker for each week's end, and battles playing out. Every
  * shape is whole art pixels of `u` CSS pixels, snapped to the screen grid.
  */
@@ -131,6 +132,8 @@ export interface TokenStyle {
   color: string;
   men: number;
   naval?: boolean;
+  /** Who leads the army, for the figure; without it, a rider in the realm's colour. */
+  commander?: CommanderLook;
   /** 1 faces east, -1 west. */
   dir: 1 | -1;
   moving: boolean;
@@ -145,7 +148,7 @@ export function drawToken(ctx: Ctx, s: TokenStyle): { x: number; y: number; w: n
   // Two frames: legs (or waves) step while marching, the standard flutters at rest.
   const frame = Math.floor(s.t / (s.moving ? 160 : 520)) % 2;
   const name: SpriteName = s.naval ? (frame ? "ship1" : "ship0") : frame ? "rider1" : "rider0";
-  const img = facing(name, s.color, u, s.dir);
+  const img = s.commander && !s.naval ? commanderSprite(s.commander, u, frame as 0 | 1, s.dir, s.moving) : facing(name, s.color, u, s.dir);
   const bob = s.moving && !s.naval ? (frame ? -u : 0) : s.naval && frame ? u : 0;
   const x = Math.round(s.x - img.width / 2);
   // The sprite's last row is its feet (or keel): put them on the tile's centre.
