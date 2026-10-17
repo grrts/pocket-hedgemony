@@ -18,6 +18,9 @@ export interface StepDefinition {
 
 const parameterTypes = new ParameterTypeRegistry();
 const definitions: StepDefinition[] = [];
+/** Definitions per context, and matches already worked out: 8,000+ patterns against 7,000+ scenarios. */
+const byContext = new Map<string, StepDefinition[]>();
+const matched = new Map<string, Match[]>();
 
 type Define = (pattern: string | RegExp, fn: StepFn) => void;
 
@@ -32,7 +35,10 @@ type Define = (pattern: string | RegExp, fn: StepFn) => void;
 export function steps(context: string): { Given: Define; When: Define; Then: Define } {
   const define: Define = (pattern, fn) => {
     const expression = typeof pattern === "string" ? new CucumberExpression(pattern, parameterTypes) : new RegularExpression(pattern, parameterTypes);
-    definitions.push({ expression, fn, pattern: String(pattern), context });
+    const definition = { expression, fn, pattern: String(pattern), context };
+    definitions.push(definition);
+    byContext.set(context, [...(byContext.get(context) ?? []), definition]);
+    matched.clear();
   };
   return { Given: define, When: define, Then: define };
 }
@@ -43,9 +49,12 @@ export interface Match {
 }
 
 export function match(text: string, context: string): Match[] {
+  const key = `${context}\u0000${text}`;
+  const cached = matched.get(key);
+  if (cached) return cached;
   const found: Match[] = [];
-  for (const definition of definitions) {
-    if (definition.context !== context && definition.context !== "common") continue;
+  matched.set(key, found);
+  for (const definition of [...(byContext.get(context) ?? []), ...(context === "common" ? [] : (byContext.get("common") ?? []))]) {
     const args = definition.expression.match(text);
     if (args) found.push({ definition, args: args.map((a) => a.getValue(null)) });
   }

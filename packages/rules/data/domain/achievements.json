@@ -1,0 +1,1358 @@
+{
+ "$comment": "Achievements (domain/achievements/spec.md). tiers and achievements copied from achievements/achievements.yaml (config v1; the YAML key 'on' kept as 'on', OQ-ACH-6; every test number is a placeholder). limits, moments, progress, stores, icons and toast from achievements-design.md sections 2, 5, 6, 7, 8 and 9. narrative_only_events: event ids marked depiction narrative_only in event-tree/data/events (read for ACH-005).",
+ "limits": {
+  "max_achievements": 100,
+  "max_points_each": 40,
+  "points_multiple": 5,
+  "max_points_total": 1000,
+  "reserve_slots_min": 10,
+  "reserve_points_min": 100,
+  "name_max": 24,
+  "text_max": 100,
+  "launch_count": 71,
+  "launch_points": 680
+ },
+ "moments": [
+  "turn_end",
+  "year_end",
+  "harvest",
+  "spring_start",
+  "date",
+  "battle_end",
+  "sea_battle_end",
+  "siege_end",
+  "war_end",
+  "rebellion_end",
+  "relation_changed",
+  "province_gained",
+  "invention_done",
+  "regiment_trained",
+  "lord_created",
+  "charter_granted",
+  "loan_closed",
+  "style_adopted",
+  "colony_founded",
+  "contact_made",
+  "fleet_home",
+  "food_policy_changed",
+  "event_choice",
+  "event_end",
+  "succession_plus_12_months",
+  "campaign_end"
+ ],
+ "eligibility_flags": [
+  "ironman_unbroken",
+  "cheat_marked",
+  "switched_country"
+ ],
+ "cheats": [
+  "debug",
+  "editor",
+  "free play"
+ ],
+ "progress": {
+  "google_steps_above": 10000,
+  "google_step_size": {
+   "people": 10000,
+   "gold": 10
+  },
+  "steam_popups_pct": [
+   25,
+   50,
+   75
+  ]
+ },
+ "stores": {
+  "steam_prefix": "ACH_",
+  "game_center_infix": ".ach.",
+  "bundle_id": "com.pockethegemony",
+  "google_mapping_file": "achievements.google.json",
+  "upload_files": {
+   "steam": "Steam VDF or web form",
+   "game_center": "App Store Connect list",
+   "google_play": "Google achievements CSV"
+  }
+ },
+ "icons": {
+  "size": 32,
+  "frame": 2,
+  "frame_colours": {
+   "copper": "copper",
+   "silver": "silver",
+   "gold": "gold",
+   "crown": "crown purple-gold"
+  },
+  "scale": {
+   "Steam": 2,
+   "Game Center": 16,
+   "Google Play": 16
+  },
+  "steam_locked": "grey \"unknown land\" parchment tones"
+ },
+ "toast": {
+  "seconds": 3,
+  "shows": [
+   "icon",
+   "name",
+   "tier"
+  ],
+  "sound": "ui_achievement",
+  "waits_for": [
+   "battle",
+   "event"
+  ]
+ },
+ "harvest_ladder": [
+  "failed",
+  "poor",
+  "normal",
+  "good",
+  "bumper"
+ ],
+ "era_ladder": [
+  "I",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "VII",
+  "VIII"
+ ],
+ "tiers": {
+  "copper": 5,
+  "silver": 10,
+  "gold": 20,
+  "crown": 40
+ },
+ "achievements": [
+  {
+   "id": "first_harvest",
+   "name": "First Harvest",
+   "text": "Bring in your first autumn harvest.",
+   "category": "first_steps",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "harvest",
+   "test": {
+    "harvests_seen": 1
+   },
+   "refs": [
+    "country-stats 3.1"
+   ]
+  },
+  {
+   "id": "food_policy_set",
+   "name": "Set the Table",
+   "text": "Pick a Food policy preset or set your own.",
+   "category": "first_steps",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "food_policy_changed",
+   "test": {
+    "food_policy_changed": true
+   },
+   "refs": [
+    "country-stats 3.3"
+   ]
+  },
+  {
+   "id": "first_regiment",
+   "name": "Mustered",
+   "text": "Call the levy and train your first regiment.",
+   "category": "first_steps",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "regiment_trained",
+   "test": {
+    "regiments_trained": 1
+   },
+   "refs": [
+    "recruiting 1",
+    "recruiting 4"
+   ]
+  },
+  {
+   "id": "first_invention",
+   "name": "Ink and Candle",
+   "text": "Finish your first invention.",
+   "category": "first_steps",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "invention_done",
+   "test": {
+    "inventions_done": 1
+   },
+   "refs": [
+    "country-stats 7.3"
+   ]
+  },
+  {
+   "id": "first_castle",
+   "name": "Stone upon Stone",
+   "text": "Build or take a castle.",
+   "category": "first_steps",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "castle_gained",
+   "test": {
+    "castles_gained": 1
+   },
+   "refs": [
+    "warfare 8.1"
+   ]
+  },
+  {
+   "id": "first_alliance",
+   "name": "A Letter Sealed",
+   "text": "Make an alliance with another realm.",
+   "category": "first_steps",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "relation_changed",
+   "test": {
+    "relation_formed": "alliance"
+   },
+   "refs": [
+    "relation-types Alliance"
+   ]
+  },
+  {
+   "id": "first_peace",
+   "name": "Ink on the Treaty",
+   "text": "End a war with a peace you signed.",
+   "category": "first_steps",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "war_end",
+   "test": {
+    "war_ended_by": "peace_treaty",
+    "player_signed": true
+   },
+   "refs": [
+    "warfare 10.4"
+   ]
+  },
+  {
+   "id": "first_year",
+   "name": "A Year in the Ledger",
+   "text": "Play twelve turns in one campaign.",
+   "category": "first_steps",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "turns_played": 12
+   },
+   "refs": []
+  },
+  {
+   "id": "full_granaries",
+   "name": "Full Granaries",
+   "text": "Rule 10+ provinces for five years without one going hungry.",
+   "category": "realm",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "provinces_min": 10,
+    "months_no_hungry_province": 60
+   },
+   "progress": {
+    "stat": "months_no_hungry_province",
+    "target": 60
+   },
+   "refs": [
+    "country-stats 3.1",
+    "province-stats 6.2"
+   ]
+  },
+  {
+   "id": "famine_averted",
+   "name": "The Famine Rule",
+   "text": "Let your famine rule save a starving province from any famine deaths that year.",
+   "category": "realm",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "year_end",
+   "test": {
+    "famine_rule_released_to_province": true,
+    "famine_deaths_in_that_province": 0
+   },
+   "refs": [
+    "country-stats 3.3",
+    "province-stats 6.2"
+   ]
+  },
+  {
+   "id": "seven_good_harvests",
+   "name": "Seven Fat Years",
+   "text": "Have a good or bumper harvest in your capital seven years running.",
+   "category": "realm",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "harvest",
+   "test": {
+    "capital_harvest_at_least": "good",
+    "years_in_a_row": 7
+   },
+   "progress": {
+    "stat": "capital_good_harvest_streak",
+    "target": 7
+   },
+   "refs": [
+    "country-stats 3.1"
+   ]
+  },
+  {
+   "id": "debt_repaid",
+   "name": "Clean Books",
+   "text": "Pay back a loan of 1,000 gold or more in full.",
+   "category": "realm",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "loan_closed",
+   "test": {
+    "loan_size_min": 1000,
+    "closed_by": "repaid"
+   },
+   "refs": [
+    "country-stats 2"
+   ]
+  },
+  {
+   "id": "treasury_10000",
+   "name": "Counting House",
+   "text": "Hold 10,000 gold in your treasury at once.",
+   "category": "realm",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "gold_min": 10000
+   },
+   "progress": {
+    "stat": "gold",
+    "target": 10000
+   },
+   "refs": [
+    "country-stats 2"
+   ]
+  },
+  {
+   "id": "people_10m",
+   "name": "Many Hearths",
+   "text": "Rule 10 million people.",
+   "category": "realm",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "people_min": 10000000
+   },
+   "progress": {
+    "stat": "people",
+    "target": 10000000
+   },
+   "refs": [
+    "country-stats 4"
+   ]
+  },
+  {
+   "id": "trade_hub_held",
+   "name": "Where Roads Meet",
+   "text": "Own a province with a trade hub.",
+   "category": "realm",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "province_gained",
+   "test": {
+    "owns_trade_hub": 1
+   },
+   "refs": [
+    "province-stats 7",
+    "event-tree geography trade_hubs"
+   ]
+  },
+  {
+   "id": "castle_reach_3",
+   "name": "Long Reach",
+   "text": "Have one castle feed three rings of provinces.",
+   "category": "realm",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "any_castle_reach_min": 3
+   },
+   "refs": [
+    "country-stats 3.2"
+   ]
+  },
+  {
+   "id": "lord_raised",
+   "name": "Raised Up",
+   "text": "Make a new lord.",
+   "category": "lords",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "lord_created",
+   "test": {
+    "lords_created": 1
+   },
+   "refs": [
+    "country-stats 5.3"
+   ]
+  },
+  {
+   "id": "all_lords_loyal",
+   "name": "Not One Waverer",
+   "text": "Have 10 or more named lords, every one of them loyal.",
+   "category": "lords",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "lords_min": 10,
+    "lords_wavering": 0,
+    "lords_disloyal": 0
+   },
+   "refs": [
+    "country-stats 5.5"
+   ]
+  },
+  {
+   "id": "officials_30",
+   "name": "A Clerk in Every Town",
+   "text": "Run 30 royal provinces through your officials.",
+   "category": "lords",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "royal_provinces_with_official_min": 30
+   },
+   "progress": {
+    "stat": "royal_provinces_with_official",
+    "target": 30
+   },
+   "refs": [
+    "province-stats 10.2"
+   ]
+  },
+  {
+   "id": "charters_5",
+   "name": "Chartered Towns",
+   "text": "Grant charters to five provinces.",
+   "category": "lords",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "charter_granted",
+   "test": {
+    "charters_in_force_min": 5
+   },
+   "progress": {
+    "stat": "charters_in_force",
+    "target": 5
+   },
+   "refs": [
+    "province-stats 10.4"
+   ]
+  },
+  {
+   "id": "long_reign",
+   "name": "Long Live the Ruler",
+   "text": "Keep one ruler on the throne for 40 years.",
+   "category": "lords",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "year_end",
+   "test": {
+    "ruler_years_min": 40
+   },
+   "refs": [
+    "country-stats 8"
+   ]
+  },
+  {
+   "id": "peaceful_succession",
+   "name": "The Crown Passes",
+   "text": "See an heir take the throne with no revolt in the year after.",
+   "category": "lords",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "succession_plus_12_months",
+   "test": {
+    "new_rebellions_since_succession": 0
+   },
+   "refs": [
+    "country-stats 8",
+    "rebellions 2.2"
+   ]
+  },
+  {
+   "id": "schools_5",
+   "name": "Halls of Learning",
+   "text": "Run five schools at once.",
+   "category": "learning",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "schools_min": 5
+   },
+   "refs": [
+    "country-stats 7.1"
+   ]
+  },
+  {
+   "id": "scholars_100",
+   "name": "A Hundred Pens",
+   "text": "Have 100 scholars at work.",
+   "category": "learning",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "scholars_min": 100
+   },
+   "progress": {
+    "stat": "scholars",
+    "target": 100
+   },
+   "refs": [
+    "country-stats 7.1"
+   ]
+  },
+  {
+   "id": "quiet_years",
+   "name": "Quiet Years",
+   "text": "Finish 10 inventions in a row without going to war.",
+   "category": "learning",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "invention_done",
+   "test": {
+    "inventions_since_last_war_min": 10
+   },
+   "progress": {
+    "stat": "inventions_since_last_war",
+    "target": 10
+   },
+   "refs": [
+    "country-stats 7.2"
+   ]
+  },
+  {
+   "id": "first_in_world",
+   "name": "First in the World",
+   "text": "Be the first realm anywhere to finish an invention of Era III or later.",
+   "category": "learning",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "invention_done",
+   "test": {
+    "invention_era_min": "III",
+    "first_in_world": true
+   },
+   "refs": [
+    "research-tree Rules"
+   ]
+  },
+  {
+   "id": "era_iv_invention",
+   "name": "Age of Reason's Tools",
+   "text": "Finish an invention of Era IV.",
+   "category": "learning",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "invention_done",
+   "test": {
+    "invention_era_min": "IV"
+   },
+   "refs": [
+    "research-tree Rules"
+   ]
+  },
+  {
+   "id": "era_vi_invention",
+   "name": "Steam and Wire",
+   "text": "Finish an invention of Era VI.",
+   "category": "learning",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "invention_done",
+   "test": {
+    "invention_era_min": "VI"
+   },
+   "refs": [
+    "research-tree Rules"
+   ]
+  },
+  {
+   "id": "whole_tree",
+   "name": "The Whole Tree",
+   "text": "Know every invention that can be learned before 1939.",
+   "category": "learning",
+   "tier": "crown",
+   "scope": "campaign",
+   "on": "invention_done",
+   "test": {
+    "inventions_known_all_in_scope": true
+   },
+   "progress": {
+    "stat": "inventions_known_in_scope",
+    "target": "in_scope_count"
+   },
+   "refs": [
+    "research-tree",
+    "gap-lists 22"
+   ]
+  },
+  {
+   "id": "outnumbered_win",
+   "name": "Fewer, Better",
+   "text": "Win a battle when the enemy has twice your men.",
+   "category": "war",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "battle_end",
+   "test": {
+    "player_won": true,
+    "enemy_to_player_men_ratio_min": 2.0
+   },
+   "refs": [
+    "warfare 7"
+   ]
+  },
+  {
+   "id": "castle_by_terms",
+   "name": "Open the Gates",
+   "text": "Take a castle by terms, without storming it.",
+   "category": "war",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "siege_end",
+   "test": {
+    "siege_result": "terms"
+   },
+   "refs": [
+    "warfare 8.5"
+   ]
+  },
+  {
+   "id": "castle_by_storm",
+   "name": "Over the Walls",
+   "text": "Take a castle by storm.",
+   "category": "war",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "siege_end",
+   "test": {
+    "siege_result": "stormed"
+   },
+   "refs": [
+    "warfare 8.4"
+   ]
+  },
+  {
+   "id": "castle_by_gold",
+   "name": "A Purse at the Gate",
+   "text": "Take a castle with gold instead of steel.",
+   "category": "war",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "siege_end",
+   "test": {
+    "siege_result": "bought"
+   },
+   "refs": [
+    "warfare 8.6"
+   ]
+  },
+  {
+   "id": "wintered_well",
+   "name": "Wintered Well",
+   "text": "Keep an army of 10,000 in winter quarters and lose under 5% of it.",
+   "category": "war",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "spring_start",
+   "test": {
+    "army_men_min": 10000,
+    "winter_quarters": true,
+    "winter_loss_share_max": 0.05
+   },
+   "refs": [
+    "warfare 6.6"
+   ]
+  },
+  {
+   "id": "marshal_victory",
+   "name": "The Marshal",
+   "text": "Win a battle led by a Marshal you commissioned.",
+   "category": "war",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "battle_end",
+   "test": {
+    "player_won": true,
+    "commander_kind": "marshal"
+   },
+   "refs": [
+    "recruiting 7.2"
+   ]
+  },
+  {
+   "id": "style_adopted",
+   "name": "A New Way of War",
+   "text": "Adopt a commander style from another people.",
+   "category": "war",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "style_adopted",
+   "test": {
+    "styles_adopted": 1
+   },
+   "refs": [
+    "warfare-styles 2.2"
+   ]
+  },
+  {
+   "id": "defend_every_province",
+   "name": "Not One Field",
+   "text": "Win a defensive war against a realm twice your size and lose no province.",
+   "category": "war",
+   "tier": "gold",
+   "scope": "campaign",
+   "on": "war_end",
+   "test": {
+    "player_role": "defender",
+    "player_won": true,
+    "enemy_to_player_people_ratio_min": 2.0,
+    "provinces_lost": 0
+   },
+   "refs": [
+    "warfare 10.5"
+   ]
+  },
+  {
+   "id": "sea_battle_won",
+   "name": "Master of the Swell",
+   "text": "Win a sea battle.",
+   "category": "sea",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "sea_battle_end",
+   "test": {
+    "player_won": true
+   },
+   "refs": [
+    "warfare 11.2"
+   ]
+  },
+  {
+   "id": "trade_ships_100",
+   "name": "Merchant Fleet",
+   "text": "Have 100 trade ships.",
+   "category": "sea",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "trade_ships_min": 100
+   },
+   "progress": {
+    "stat": "trade_ships",
+    "target": 100
+   },
+   "refs": [
+    "country-stats 6"
+   ]
+  },
+  {
+   "id": "ocean_crossed",
+   "name": "Beyond the Horizon",
+   "text": "Sail a fleet across an ocean and bring it home.",
+   "category": "sea",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "fleet_home",
+   "test": {
+    "fleet_crossed_ocean_and_returned": true
+   },
+   "refs": [
+    "gap-lists 14",
+    "gap-lists 15"
+   ]
+  },
+  {
+   "id": "first_contact",
+   "name": "Strangers on the Shore",
+   "text": "Meet a realm from another macro-region by sea.",
+   "category": "sea",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "contact_made",
+   "test": {
+    "contact_by": "sea",
+    "other_macro_region": true
+   },
+   "refs": [
+    "gap-lists 14",
+    "event-tree geography"
+   ]
+  },
+  {
+   "id": "colony_by_treaty",
+   "name": "Treaty on the Shore",
+   "text": "Found a colony by agreement with the people already living there.",
+   "category": "sea",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "colony_founded",
+   "test": {
+    "founded_with_consent_of_local_people": true
+   },
+   "refs": [
+    "province-stats 12.3"
+   ]
+  },
+  {
+   "id": "around_the_world",
+   "name": "All the Way Round",
+   "text": "Sail one fleet around the whole world.",
+   "category": "sea",
+   "tier": "gold",
+   "scope": "campaign",
+   "on": "fleet_home",
+   "test": {
+    "fleet_circumnavigated": true
+   },
+   "refs": [
+    "gap-lists 14"
+   ]
+  },
+  {
+   "id": "demand_granted",
+   "name": "Heard Them Out",
+   "text": "End a rebellion by granting what the rebels asked for.",
+   "category": "order",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "rebellion_end",
+   "test": {
+    "ended_by": "demand_granted"
+   },
+   "refs": [
+    "rebellions 5.1"
+   ]
+  },
+  {
+   "id": "great_revolt_beaten",
+   "name": "The Realm Holds",
+   "text": "Survive a great revolt and keep your throne.",
+   "category": "order",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "rebellion_end",
+   "test": {
+    "severity": "great_revolt",
+    "rebels_won": false
+   },
+   "refs": [
+    "rebellions 4.1",
+    "rebellions 6"
+   ]
+  },
+  {
+   "id": "quiet_land",
+   "name": "A Quiet Land",
+   "text": "Rule 20+ provinces for 25 years with no riot or revolt anywhere.",
+   "category": "order",
+   "tier": "gold",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "provinces_min": 20,
+    "months_no_unrest_tier": 300
+   },
+   "progress": {
+    "stat": "months_no_unrest_tier",
+    "target": 300
+   },
+   "refs": [
+    "rebellions 4.1"
+   ]
+  },
+  {
+   "id": "allies_3",
+   "name": "Friends in Many Courts",
+   "text": "Hold three alliances at once.",
+   "category": "abroad",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "relation_changed",
+   "test": {
+    "alliances_min": 3
+   },
+   "refs": [
+    "relation-types Alliance"
+   ]
+  },
+  {
+   "id": "rival_to_ally",
+   "name": "Old Grudges Buried",
+   "text": "Turn a rival into an ally.",
+   "category": "abroad",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "relation_changed",
+   "test": {
+    "relation_from": "rival",
+    "relation_to": "alliance",
+    "same_partner": true
+   },
+   "refs": [
+    "relation-types"
+   ]
+  },
+  {
+   "id": "oath_kept_century",
+   "name": "My Word Is Iron",
+   "text": "Play 100 years without breaking an oath.",
+   "category": "abroad",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "year_end",
+   "test": {
+    "years_played_min": 100,
+    "oaths_broken": 0
+   },
+   "progress": {
+    "stat": "years_without_broken_oath",
+    "target": 100
+   },
+   "refs": [
+    "country-stats 9"
+   ]
+  },
+  {
+   "id": "independence_won",
+   "name": "Our Own Banner",
+   "text": "Start as a subject and win your freedom.",
+   "category": "abroad",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "relation_changed",
+   "test": {
+    "started_as_subject": true,
+    "subject_of_anyone": false
+   },
+   "refs": [
+    "relation-types Subject",
+    "gap-lists 7"
+   ]
+  },
+  {
+   "id": "tribute_5",
+   "name": "Tribute Roads",
+   "text": "Have five subjects paying you tribute.",
+   "category": "abroad",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "turn_end",
+   "test": {
+    "tributaries_min": 5
+   },
+   "refs": [
+    "country-stats 9",
+    "gap-lists 7"
+   ]
+  },
+  {
+   "id": "history_kept",
+   "name": "As It Was Written",
+   "text": "Choose the historical option in 25 events in one campaign.",
+   "category": "history",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "event_choice",
+   "test": {
+    "historical_choices_min": 25
+   },
+   "progress": {
+    "stat": "historical_choices",
+    "target": 25
+   },
+   "refs": [
+    "event-tree trigger model"
+   ]
+  },
+  {
+   "id": "history_rewritten",
+   "name": "Another Ending",
+   "text": "Choose a non-historical option in 10 major events in one campaign.",
+   "category": "history",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "event_choice",
+   "test": {
+    "nonhistorical_choices_in_major_events_min": 10
+   },
+   "progress": {
+    "stat": "nonhistorical_major_choices",
+    "target": 10
+   },
+   "refs": [
+    "event-tree importance",
+    "event-tree choices"
+   ]
+  },
+  {
+   "id": "paths_not_taken",
+   "name": "Paths Not Taken",
+   "text": "Across all your games, pick 50 different non-historical event options.",
+   "category": "history",
+   "tier": "gold",
+   "scope": "lifetime",
+   "on": "event_choice",
+   "test": {
+    "distinct_nonhistorical_options_min": 50
+   },
+   "progress": {
+    "stat": "distinct_nonhistorical_options",
+    "target": 50
+   },
+   "refs": [
+    "event-tree choices"
+   ]
+  },
+  {
+   "id": "walls_held_1453",
+   "name": "The Walls Held",
+   "text": "Hold Constantinople through 1460 as the realm that defends it.",
+   "category": "history",
+   "tier": "gold",
+   "scope": "campaign",
+   "on": "date",
+   "test": {
+    "date": "1460-12-31",
+    "event_role": {
+     "event": "fall_of_constantinople",
+     "role": "defender"
+    },
+    "owns": "city:constantinople"
+   },
+   "refs": [
+    "event-tree fall_of_constantinople"
+   ]
+  },
+  {
+   "id": "four_quarters_hold",
+   "name": "The Four Quarters Hold",
+   "text": "As the Andean empire, keep Cusco and stay free through 1600.",
+   "category": "history",
+   "tier": "gold",
+   "scope": "campaign",
+   "on": "date",
+   "test": {
+    "date": "1600-12-31",
+    "event_role": {
+     "event": "inca_expansion",
+     "role": "any"
+    },
+    "owns": "city:cusco",
+    "subject_of_anyone": false
+   },
+   "refs": [
+    "event-tree inca_expansion",
+    "event-tree spanish_conquest_of_the_inca"
+   ]
+  },
+  {
+   "id": "never_colonised",
+   "name": "Unconquered",
+   "text": "In Africa, Asia, the Americas or Oceania, reach 1914 with your capital never taken from outside.",
+   "category": "history",
+   "tier": "gold",
+   "scope": "campaign",
+   "on": "date",
+   "test": {
+    "date": "1914-01-01",
+    "start_macro_region_not": "europe",
+    "capital_never_occupied_by_other_macro_region": true
+   },
+   "refs": [
+    "event-tree geography",
+    "event-tree agency"
+   ]
+  },
+  {
+   "id": "printing_early",
+   "name": "The Presses Roll",
+   "text": "Bring printing to your realm before 1470.",
+   "category": "history",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "invention_done",
+   "test": {
+    "invention": "printing",
+    "before": "1470-01-01"
+   },
+   "refs": [
+    "event-tree printing_press_spreads",
+    "research-tree"
+   ]
+  },
+  {
+   "id": "abolition_early",
+   "name": "Chains Broken",
+   "text": "Abolish slavery in your realm before 1800.",
+   "category": "history",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "event_choice",
+   "test": {
+    "realm_flag_set": "slavery_abolished",
+    "before": "1800-01-01"
+   },
+   "refs": [
+    "event-tree british_emancipation",
+    "event-tree brazilian_abolition",
+    "event-tree principle 4"
+   ]
+  },
+  {
+   "id": "kept_out_great_war",
+   "name": "Stayed Home",
+   "text": "Rule 50+ provinces and stay out of the First World War.",
+   "category": "history",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "event_end",
+   "test": {
+    "event": "world_war_i",
+    "provinces_min": 50,
+    "at_war_during_event": false
+   },
+   "refs": [
+    "event-tree world_war_i"
+   ]
+  },
+  {
+   "id": "crash_weathered",
+   "name": "Weathered the Crash",
+   "text": "Get through the Great Depression without defaulting.",
+   "category": "history",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "event_end",
+   "test": {
+    "event": "great_depression",
+    "affected": true,
+    "defaulted_during_event": false
+   },
+   "refs": [
+    "event-tree great_depression",
+    "country-stats 2"
+   ]
+  },
+  {
+   "id": "japan_whole_1600",
+   "name": "One Island Realm",
+   "text": "Own every province of Japan before 1600.",
+   "category": "history",
+   "tier": "gold",
+   "scope": "campaign",
+   "on": "province_gained",
+   "test": {
+    "owns_all": "region:japan",
+    "before": "1600-01-01"
+   },
+   "refs": [
+    "event-tree p_sengoku_and_unification"
+   ]
+  },
+  {
+   "id": "sahel_whole_1600",
+   "name": "Lord of the River Bend",
+   "text": "Own every province of the Niger Bend before 1600.",
+   "category": "history",
+   "tier": "gold",
+   "scope": "campaign",
+   "on": "province_gained",
+   "test": {
+    "owns_all": "area:niger_bend",
+    "before": "1600-01-01"
+   },
+   "refs": [
+    "event-tree p_songhai_and_sahel"
+   ]
+  },
+  {
+   "id": "reach_1500",
+   "name": "New Century",
+   "text": "Reach the year 1500.",
+   "category": "campaign",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "date",
+   "test": {
+    "date": "1500-01-01"
+   },
+   "refs": []
+  },
+  {
+   "id": "reach_1700",
+   "name": "Halfway Through Time",
+   "text": "Reach the year 1700.",
+   "category": "campaign",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "date",
+   "test": {
+    "date": "1700-01-01"
+   },
+   "refs": []
+  },
+  {
+   "id": "reach_1900",
+   "name": "The New Machine Age",
+   "text": "Reach the year 1900.",
+   "category": "campaign",
+   "tier": "silver",
+   "scope": "campaign",
+   "on": "date",
+   "test": {
+    "date": "1900-01-01"
+   },
+   "refs": []
+  },
+  {
+   "id": "campaign_complete",
+   "name": "The Long Road",
+   "text": "Play a campaign to its last day.",
+   "category": "campaign",
+   "tier": "crown",
+   "scope": "campaign",
+   "on": "campaign_end",
+   "test": {
+    "reached_end_date": true
+   },
+   "refs": [
+    "gap-lists decisions campaign span"
+   ]
+  },
+  {
+   "id": "from_one_hall",
+   "name": "From One Hall",
+   "text": "Start with a single province and come to own 50.",
+   "category": "campaign",
+   "tier": "gold",
+   "scope": "campaign",
+   "on": "province_gained",
+   "test": {
+    "start_provinces_max": 1,
+    "provinces_min": 50
+   },
+   "progress": {
+    "stat": "provinces",
+    "target": 50
+   },
+   "refs": []
+  },
+  {
+   "id": "decentralised_1500",
+   "name": "Many Tents, One People",
+   "text": "Play a decentralised people until 1500.",
+   "category": "campaign",
+   "tier": "copper",
+   "scope": "campaign",
+   "on": "date",
+   "test": {
+    "date": "1500-01-01",
+    "start_polity_kind": "decentralised"
+   },
+   "refs": [
+    "country-catalogue playable kinds"
+   ]
+  },
+  {
+   "id": "many_crowns",
+   "name": "Many Crowns",
+   "text": "Across your games, play 10 different realms for 10 years each.",
+   "category": "campaign",
+   "tier": "copper",
+   "scope": "lifetime",
+   "on": "year_end",
+   "test": {
+    "distinct_realms_played_10_years_min": 10
+   },
+   "progress": {
+    "stat": "distinct_realms_played_10_years",
+    "target": 10
+   },
+   "full_game": true,
+   "refs": []
+  },
+  {
+   "id": "every_macro_region",
+   "name": "Crowns of the World",
+   "text": "Across your games, play 10 years in each of six world regions.",
+   "category": "campaign",
+   "tier": "silver",
+   "scope": "lifetime",
+   "on": "year_end",
+   "test": {
+    "distinct_world_regions_played_10_years_min": 6
+   },
+   "progress": {
+    "stat": "distinct_world_regions_played_10_years",
+    "target": 6
+   },
+   "full_game": true,
+   "refs": [
+    "event-tree geography"
+   ]
+  }
+ ],
+ "narrative_only_events": [
+  "algerian_civil_war",
+  "algerian_war",
+  "angolan_war_of_independence",
+  "apartheid_established",
+  "armenian_genocide",
+  "atomic_bombings",
+  "banda_conquest",
+  "bangladesh_liberation_war",
+  "baptist_war",
+  "bengal_famine_1943",
+  "brazilian_abolition",
+  "brazilian_end_of_slave_trade",
+  "british_emancipation",
+  "chilean_coup_1973",
+  "dzungar_genocide",
+  "end_of_cuban_slave_trade",
+  "fall_of_saigon",
+  "first_cholera_pandemic",
+  "founding_of_israel_and_nakba",
+  "guatemalan_genocide",
+  "haitian_revolution",
+  "herero_and_nama_genocide",
+  "holocaust",
+  "huaynaputina_eruption",
+  "indian_independence_and_partition",
+  "indian_removal_act",
+  "laki_eruption",
+  "mau_mau_uprising",
+  "mendana_voyages",
+  "palmares_quilombo",
+  "rwandan_genocide",
+  "september_11_attacks",
+  "sugar_revolution_barbados",
+  "tambora_eruption",
+  "tupac_amaru_rebellion",
+  "wounded_knee"
+ ]
+}

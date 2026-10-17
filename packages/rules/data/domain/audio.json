@@ -1,0 +1,1783 @@
+{
+ "$comment": "Audio (domain/audio/spec.md): music-design/music-config.example.yaml (music), sound-effects/sfx-config.example.yaml (sfx), the effects catalogue of sound-effects README section 5 and the track list of music README section 4. Design values for a first pass; the spec marks which are decided.",
+ "music": {
+  "eras": {
+   "basis": "calendar",
+   "bands": [
+    {
+     "id": "I",
+     "from": 1444
+    },
+    {
+     "id": "II",
+     "from": 1520
+    },
+    {
+     "id": "III",
+     "from": 1650
+    },
+    {
+     "id": "IV",
+     "from": 1790
+    },
+    {
+     "id": "V",
+     "from": 1870,
+     "extra_voice": "W2"
+    }
+   ],
+   "campaign_end": "1939-08-31",
+   "ages_opening": {
+    "I": [
+     "age_of_gunpowder_empires",
+     "age_of_exploration"
+    ],
+    "II": [
+     "age_of_reformations",
+     "age_of_atlantic_empires"
+    ],
+    "III": [
+     "age_of_crisis_and_absolutism"
+    ],
+    "IV": [
+     "age_of_revolutions",
+     "age_of_industrialization"
+    ],
+    "V": [
+     "age_of_imperialism",
+     "age_of_world_wars"
+    ]
+   },
+   "ages_after_campaign": [
+    "age_of_decolonization",
+    "cold_war",
+    "age_of_globalization"
+   ]
+  },
+  "palettes": {
+   "europe_west": [
+    "latin",
+    "germanic"
+   ],
+   "europe_east": [
+    "slavic",
+    "hellenic",
+    "uralic"
+   ],
+   "mena": [
+    "arab",
+    "iranian",
+    "berber",
+    "semitic"
+   ],
+   "steppe": [
+    "mongolic",
+    "tungusic"
+   ],
+   "south_asia": [
+    "indo_aryan",
+    "dravidian",
+    "tibeto_burman"
+   ],
+   "east_asia": [
+    "sinitic",
+    "japonic",
+    "koreanic"
+   ],
+   "southeast_asia": [
+    "tai",
+    "austroasiatic",
+    "austronesian"
+   ],
+   "west_africa": [
+    "mande",
+    "akan",
+    "yoruba_edo",
+    "hausa_fulani"
+   ],
+   "africa_east_south": [
+    "bantu",
+    "nilotic",
+    "cushitic",
+    "semitic_ethiopian",
+    "khoisan"
+   ],
+   "americas": [
+    "nahua",
+    "maya",
+    "andean",
+    "tupi_guarani",
+    "algonquian",
+    "iroquoian"
+   ],
+   "oceania": [
+    "polynesian",
+    "melanesian",
+    "aboriginal_australian"
+   ],
+   "atlantic_creole": [
+    "creole_atlantic"
+   ]
+  },
+  "palette_split": {
+   "turkic": {
+    "west_of_longitude": 55,
+    "west": "mena",
+    "otherwise": "steppe"
+   }
+  },
+  "peace_track_names": {
+   "europe_west": "europe",
+   "europe_east": "europeeast",
+   "mena": "mena",
+   "steppe": "steppe",
+   "south_asia": "southasia",
+   "east_asia": "eastasia",
+   "southeast_asia": "southeastasia",
+   "west_africa": "westafrica",
+   "africa_east_south": "africaeastsouth",
+   "americas": "americas",
+   "oceania": "oceania",
+   "atlantic_creole": "atlanticcreole"
+  },
+  "peace_variants": {
+   "early": [
+    "I",
+    "II",
+    "III"
+   ],
+   "late": [
+    "IV",
+    "V"
+   ]
+  },
+  "states": {
+   "war_losing": {
+    "war_score_below": -40,
+    "or_capital_occupied": true
+   },
+   "world_war": {
+    "great_powers_at_war_share": 0.6,
+    "min_era": "V"
+   },
+   "war_naval": {
+    "naval_battle_share_last_5_turns": 0.6
+   },
+   "war_siege": {
+    "siege_active": true,
+    "field_battles_last_3_turns": 0
+   },
+   "war_mobilize": {
+    "turns_since_declaration_max": 2,
+    "battles_fought": 0
+   },
+   "revolution": {
+    "period_tag": "revolution",
+    "touches_player": true,
+    "min_era": "IV"
+   },
+   "crisis": {
+    "event_chain_tag": "crisis"
+   },
+   "unrest": {
+    "unrest_province_share": 0.25,
+    "or_stability_below": -1
+   },
+   "prosperity": {
+    "stability_at_least": 2,
+    "treasury_trend": "rising",
+    "years_at_peace": 10
+   },
+   "exploration": {
+    "explorers_active": true,
+    "camera_over": "ocean"
+   }
+  },
+  "stack": [
+   [
+    "screen"
+   ],
+   [
+    "war_losing"
+   ],
+   [
+    "world_war",
+    "war_naval",
+    "war_siege",
+    "war_campaign",
+    "war_mobilize"
+   ],
+   [
+    "revolution",
+    "crisis",
+    "unrest"
+   ],
+   [
+    "diplomacy"
+   ],
+   [
+    "prosperity",
+    "exploration"
+   ],
+   [
+    "peace"
+   ]
+  ],
+  "transitions": {
+   "min_seconds_in_state": 45,
+   "boundary": {
+    "up": "bar",
+    "down": "phrase"
+   },
+   "max_phrase_wait_bars": 8,
+   "crossfade_bars": 1,
+   "silence_after_stinger_seconds": [
+    3,
+    6
+   ],
+   "stinger_duck_db": -6
+  },
+  "rotation": {
+   "weights": {
+    "own_palette": 0.6,
+    "era_theme": 0.2,
+    "camera_palette": 0.15,
+    "neighbour_palette": 0.05
+   },
+   "camera_dwell_seconds": 20,
+   "camera_min_zoom": "regional",
+   "no_repeat_last": 3,
+   "loops_per_track": [
+    1,
+    2
+   ],
+   "silence_between_seconds": [
+    10,
+    40
+   ],
+   "era_change_plays_theme": true
+  },
+  "war_layers": {
+   "war_campaign": {
+    "layer2_when": {
+     "player_army_within_provinces_of_enemy": 2
+    },
+    "layer3_when": {
+     "battle_this_turn": true
+    }
+   },
+   "layer_fade_bars": 1
+  },
+  "zoom_mix": {
+   "enabled": true,
+   "local": {
+    "percussion_db": -3,
+    "lead_db": 1,
+    "battle_province_forces_layer3": true
+   }
+  },
+  "mix": {
+   "master_lowpass_hz": 9000,
+   "max_pan": 0.3,
+   "target_loudness_lufs": -16,
+   "ui_tap_below_music_db": 6,
+   "priority1_peak_above_music_db": 3
+  },
+  "defaults": {
+   "music_volume": 0.7,
+   "sfx_volume": 0.8,
+   "variety": "all_palettes",
+   "ambience": false
+  },
+  "lengths": {
+   "loop_seconds": [
+    60,
+    150
+   ],
+   "intro_seconds": [
+    2,
+    8
+   ],
+   "stinger_seconds": [
+    3,
+    10
+   ],
+   "load_resume_intro_seconds": 6
+  },
+  "war_percussion": {
+   "I": "frame drum",
+   "II": "frame drum",
+   "III": "field drum",
+   "IV": "snare and bass drum",
+   "V": "mechanized, noise-heavy patterns"
+  }
+ },
+ "chip": {
+  "music_voices": [
+   "P1",
+   "P2",
+   "T",
+   "W",
+   "N"
+  ],
+  "extra_voice": "W2",
+  "effect_voices": [
+   "S1",
+   "S2",
+   "S3"
+  ],
+  "pulse_duties": [
+   0.125,
+   0.25,
+   0.5,
+   0.75
+  ],
+  "volume_steps": 16,
+  "triangle_steps": 16,
+  "wavetable_samples": 32,
+  "echo_ms": [
+   60,
+   250
+  ],
+  "refused": [
+   "sample",
+   "reverb",
+   "chord on one voice"
+  ],
+  "bass_octave_up": 1,
+  "audio_block_samples": 128,
+  "sample_rate": 44100,
+  "lookahead_ms": 100
+ },
+ "motif": {
+  "degrees": [
+   "1",
+   "5",
+   "4",
+   "5",
+   "1↑"
+  ],
+  "rhythm": [
+   "long",
+   "short",
+   "short",
+   "long",
+   "long"
+  ]
+ },
+ "tracks": {
+  "interface": [
+   "title",
+   "nation_select",
+   "load_resume",
+   "game_over",
+   "campaign_end",
+   "credits"
+  ],
+  "era_themes": [
+   "era_1",
+   "era_2",
+   "era_3",
+   "era_4",
+   "era_5"
+  ],
+  "situations": [
+   "diplomacy",
+   "prosperity",
+   "unrest",
+   "crisis",
+   "revolution",
+   "exploration",
+   "world_war"
+  ],
+  "war": [
+   "war_mobilize",
+   "war_campaign",
+   "war_siege",
+   "war_naval",
+   "war_losing"
+  ],
+  "layers": {
+   "war_mobilize": 2,
+   "war_campaign": 3,
+   "war_siege": 2,
+   "war_naval": 3,
+   "war_losing": 2,
+   "unrest": 2
+  },
+  "stingers": [
+   "war_declared",
+   "battle_won",
+   "battle_lost",
+   "war_won",
+   "war_lost",
+   "discovery",
+   "innovation",
+   "ruler_new",
+   "alliance",
+   "event_good",
+   "event_bad",
+   "event_major"
+  ],
+  "situation_min_era": {
+   "revolution": "IV",
+   "world_war": "V"
+  }
+ },
+ "screens": {
+  "boot": "none",
+  "first_run": "none",
+  "title": "title",
+  "main_menu": "title",
+  "new_campaign": "nation_select",
+  "load": "unchanged",
+  "loading": "load_resume",
+  "settings": "unchanged",
+  "achievements": "unchanged",
+  "encyclopedia": "unchanged",
+  "unlock": "unchanged",
+  "credits": "credits",
+  "map": "game",
+  "card": "unchanged",
+  "realm_book": "unchanged",
+  "game_menu": "unchanged",
+  "turn": "unchanged",
+  "battle": "war",
+  "siege": "war_siege",
+  "event": "unchanged",
+  "peace": "unchanged",
+  "turn_report": "unchanged",
+  "attention": "unchanged",
+  "game_over": "game_over",
+  "campaign_end": "campaign_end",
+  "final_result": "campaign_end",
+  "error": "none"
+ },
+ "moments": {
+  "war_declared": {
+   "music": "war_declared",
+   "effects": []
+  },
+  "battle_result": {
+   "music": "battle_won|battle_lost",
+   "effects": [
+    "battle_rout"
+   ],
+   "effects_before_music": true
+  },
+  "peace_signed": {
+   "music": "war_won|war_lost",
+   "effects": [
+    "diplo_peace_signed"
+   ],
+   "effects_before_music": true
+  },
+  "invention_adopted": {
+   "music": "innovation",
+   "effects": []
+  },
+  "discovery": {
+   "music": "discovery",
+   "effects_when_on_screen": [
+    "map_fog_reveal"
+   ],
+   "effects": []
+  },
+  "new_ruler": {
+   "music": "ruler_new",
+   "effects_if_died": [
+    "realm_ruler_dies"
+   ],
+   "effects": []
+  },
+  "event_popup": {
+   "music": "event_good|event_bad|event_major",
+   "effects": [
+    "event_open"
+   ]
+  },
+  "age_begins": {
+   "music": "age_<id>",
+   "effects": []
+  },
+  "alliance": {
+   "music": "alliance",
+   "effects": []
+  }
+ },
+ "sfx": {
+  "bank": {
+   "voices": [
+    "S1",
+    "S2",
+    "S3"
+   ],
+   "tick_hz": 60,
+   "max_length_ms": 2000,
+   "lowpass_hz": 9000,
+   "max_pan": 0.3,
+   "ui_min_length_ms": 10
+  },
+  "buses": {
+   "master": 1.0,
+   "music": 0.7,
+   "effects": 0.8,
+   "ambience": 0.5,
+   "ui_sounds": true,
+   "ambience_on": false,
+   "haptics": true,
+   "mono": false,
+   "captions": "auto",
+   "reduced_intensity": false
+  },
+  "era": {
+   "ui": "fixed",
+   "turn_chimes": "music_era",
+   "military": "army_inventions",
+   "military_bands": {
+    "bow": [
+     "I",
+     "II"
+    ],
+    "crossbow": [
+     "I",
+     "II"
+    ],
+    "matchlock": [
+     "II",
+     "III"
+    ],
+    "volley": [
+     "IV",
+     "V"
+    ],
+    "rifle": [
+     "V",
+     "VI"
+    ],
+    "mg": [
+     "VI",
+     "VII"
+    ]
+   },
+   "warfare_eras": [
+    "I",
+    "II",
+    "III",
+    "IV",
+    "V",
+    "VI",
+    "VII"
+   ],
+   "fixed_groups": [
+    "ui",
+    "map"
+   ],
+   "game_year_sounds": [
+    "turn_end",
+    "turn_ready",
+    "turn_month_new_year",
+    "notify_ping",
+    "event_open"
+   ],
+   "army_sounds": [
+    "army_march_loop",
+    "battle_shoot",
+    "battle_gun",
+    "battle_charge_horse",
+    "battle_charge_foot",
+    "siege_bombard",
+    "sea_broadside"
+   ]
+  },
+  "turn_chimes": {
+   "turn_end": [
+    "1",
+    "5"
+   ],
+   "turn_ready": [
+    "4",
+    "5",
+    "1↑"
+   ],
+   "I": {
+    "duty_doubling": 0.125,
+    "bell": false,
+    "arpeggio_steps": 0
+   },
+   "II": {
+    "arpeggio_steps": 1
+   },
+   "III": {
+    "arpeggio_steps": 2
+   },
+   "IV": {
+    "arpeggio_steps": 3
+   },
+   "V": {
+    "arpeggio_steps": 4
+   }
+  },
+  "marching": {
+   "I": "a frame drum and loose steps",
+   "II": "a frame drum and loose steps",
+   "III": "a field drum and measured steps",
+   "IV": "a field drum and measured steps",
+   "V": "a snare and boots",
+   "VI": "a snare and boots",
+   "VII": "an engine drone when the army has motor transport"
+  },
+  "palette_sounds": [
+   "turn_end",
+   "turn_ready",
+   "turn_month_new_year",
+   "army_levy_call",
+   "diplo_accepted",
+   "diplo_refused",
+   "notify_diplo",
+   "frame_nation_pick"
+  ],
+  "palette_parts": {
+   "turn_end": "wavetable and tuning table on S3",
+   "turn_ready": "wavetable and tuning table on S3",
+   "turn_month_new_year": "wavetable and tuning table on S3",
+   "army_levy_call": "lead wavetable for the horn",
+   "diplo_accepted": "lead wavetable for the court horn",
+   "diplo_refused": "lead wavetable for the court horn"
+  },
+  "priority": {
+   "defaults_by_group": {
+    "ui": 3,
+    "frame": 1,
+    "turn": 1,
+    "map": 3,
+    "army": 2,
+    "fleet": 2,
+    "battle": 3,
+    "siege": 3,
+    "sea": 3,
+    "econ": 3,
+    "realm": 2,
+    "diplo": 2,
+    "event": 2,
+    "notify": 3
+   },
+   "steal_only_if_lower": true
+  },
+  "cooldown_ms": {
+   "default": 50,
+   "ui_scroll_tick": 40,
+   "ui_slider": 20,
+   "notify_alert": 2000,
+   "army_hungry": "once_per_worsening",
+   "realm_unrest": 5000
+  },
+  "variation": {
+   "pitch_semitones": 1,
+   "reseed_noise": true,
+   "never_vary": [
+    "ui_confirm",
+    "ui_back",
+    "ui_cancel",
+    "turn_end",
+    "turn_ready",
+    "turn_month_new_year",
+    "ui_achievement",
+    "ui_hint",
+    "battle_sector_lost",
+    "map_border_change"
+   ]
+  },
+  "turn_results": {
+   "max_sounds": 5,
+   "spacing_ms": 150,
+   "order": [
+    "player_assets",
+    "in_view"
+   ],
+   "batch_threshold": 5
+  },
+  "turn_working": {
+   "start_after_ms": 600,
+   "tick_every_ms": 500
+  },
+  "zoom": {
+   "world": [
+    "notify"
+   ],
+   "regional": [
+    "notify",
+    "army_orders",
+    "battle_start",
+    "siege_breach",
+    "sea_battle_start",
+    "map"
+   ],
+   "local": "all"
+  },
+  "distance": {
+   "falloff": "linear",
+   "edge_volume": 0.4,
+   "offscreen": "mute"
+  },
+  "ducking": {
+   "during_stinger": {
+    "drop_priority_at_or_below": 3,
+    "duck_others_db": -4
+   },
+   "effects_duck_music": {
+    "priority": 1,
+    "min_length_ms": 600,
+    "db": -4
+   },
+   "ambience_under_effects": {
+    "priority_at_least": 2,
+    "db": -6
+   },
+   "ambience_fade_on_track_start_s": 2,
+   "pause_music_db": -6
+  },
+  "battle_screen": {
+   "sounds_per_bell_step": 1,
+   "pick_sector": "nearest_centre",
+   "extra_sectors_if_voice_free": true,
+   "on_skip": [
+    "battle_start",
+    "battle_rout"
+   ]
+  },
+  "haptics": {
+   "ui_error": "light",
+   "turn_ready": "light",
+   "battle_start": "medium",
+   "siege_breach": "medium",
+   "realm_ruler_dies": "heavy"
+  },
+  "latency": {
+   "ui_path": "direct",
+   "map_path": "scheduled"
+  },
+  "reduced_intensity": {
+   "priority1_db": -4,
+   "echo": false,
+   "mg_stutter": false,
+   "sharp_attacks": false
+  },
+  "bindings": {
+   "turn.end_pressed": "turn_end",
+   "turn.ready": "turn_ready",
+   "turn.ready_january": "turn_month_new_year",
+   "treasury.income": "econ_income",
+   "treasury.income_record": "econ_income_big",
+   "treasury.spend": "econ_spend",
+   "treasury.negative": "econ_debt",
+   "building.ordered": "econ_build_start",
+   "building.finished": "econ_build_done",
+   "army.selected": "army_select",
+   "army.order_move": "army_order_move",
+   "army.arrived": "army_arrive",
+   "army.food_low": "army_hungry",
+   "levy.called": "army_levy_call",
+   "lords.called": "army_lords_call",
+   "battle.begin": "battle_start",
+   "battle.bell": "battle_bell",
+   "battle.company_broke": "battle_rout",
+   "siege.laid": "siege_begin",
+   "siege.breach": "siege_breach",
+   "siege.storm": "siege_storm",
+   "siege.terms": "siege_terms",
+   "siege.fell": "siege_fall",
+   "ruler.died": "realm_ruler_dies",
+   "rebellion.rising": "realm_rising",
+   "event.opened": "event_open",
+   "event.choice": "event_choice",
+   "achievement.unlocked": "ui_achievement",
+   "hint.shown": "ui_hint"
+  },
+  "count_groups": {
+   "ui": "ui",
+   "frame": "frame",
+   "turn": "turn",
+   "map": "map",
+   "army": "army/fleet",
+   "fleet": "army/fleet",
+   "battle": "battle",
+   "siege": "siege",
+   "sea": "sea",
+   "econ": "econ",
+   "realm": "realm/diplo",
+   "diplo": "realm/diplo",
+   "event": "event/notify",
+   "notify": "event/notify",
+   "amb": "amb"
+  },
+  "catalogue_columns": [
+   "priority",
+   "voices",
+   "length_ms",
+   "when"
+  ],
+  "catalogue": {
+   "ui_tap": [
+    3,
+    "S1",
+    40,
+    "Any button, card, list row"
+   ],
+   "ui_tap_soft": [
+    4,
+    "S1",
+    25,
+    "Tabs, chips, slider steps"
+   ],
+   "ui_back": [
+    3,
+    "S1",
+    60,
+    "Back, close a panel"
+   ],
+   "ui_confirm": [
+    2,
+    "S1",
+    120,
+    "Confirm a choice that costs something (motif 1-5)"
+   ],
+   "ui_cancel": [
+    3,
+    "S1",
+    80,
+    "Cancel in a dialog"
+   ],
+   "ui_error": [
+    2,
+    "S1+S2",
+    150,
+    "Tap that can't be done"
+   ],
+   "ui_toggle_on": [
+    4,
+    "S1",
+    50,
+    "Switches, lens on"
+   ],
+   "ui_toggle_off": [
+    4,
+    "S1",
+    50,
+    "Switches, lens off"
+   ],
+   "ui_panel_open": [
+    4,
+    "S2",
+    90,
+    "Cards and sheets slide in"
+   ],
+   "ui_panel_close": [
+    4,
+    "S2",
+    90,
+    "Cards and sheets slide out"
+   ],
+   "ui_tab": [
+    4,
+    "S1",
+    30,
+    "Tab change inside a card"
+   ],
+   "ui_scroll_tick": [
+    5,
+    "S3",
+    15,
+    "Each scroll wheel or picker step"
+   ],
+   "ui_slider": [
+    5,
+    "S1",
+    20,
+    "Dragging a slider; pitch rises with value"
+   ],
+   "ui_drag_pick": [
+    3,
+    "S3",
+    60,
+    "Picking up"
+   ],
+   "ui_drag_drop": [
+    3,
+    "S3",
+    60,
+    "Dropping"
+   ],
+   "ui_text_key": [
+    5,
+    "S2",
+    10,
+    "On-screen keyboard"
+   ],
+   "ui_tooltip": [
+    5,
+    "S1",
+    30,
+    "Long-press tooltip opens (off by default)"
+   ],
+   "ui_hint": [
+    2,
+    "S1+S3",
+    300,
+    "A tutorial or advisor hint appears"
+   ],
+   "ui_achievement": [
+    2,
+    "S1+S3",
+    900,
+    "An achievement unlocks (motif on bells)"
+   ],
+   "ui_save": [
+    4,
+    "S3",
+    200,
+    "Manual save"
+   ],
+   "ui_purchase": [
+    1,
+    "S1+S3",
+    700,
+    "A store unlock completes"
+   ],
+   "frame_logo": [
+    1,
+    "S1+S2+S3",
+    1200,
+    "Splash logo"
+   ],
+   "frame_start": [
+    1,
+    "S1+S3",
+    400,
+    "Tap to start"
+   ],
+   "frame_nation_pick": [
+    3,
+    "S3",
+    150,
+    "Nation highlighted on the picker (its palette)"
+   ],
+   "frame_campaign_begin": [
+    1,
+    "S1+S2+S3",
+    1000,
+    "Confirm nation and start"
+   ],
+   "frame_pause": [
+    3,
+    "S1",
+    80,
+    "Pause menu opens"
+   ],
+   "frame_resume": [
+    3,
+    "S1",
+    80,
+    "Pause menu closes"
+   ],
+   "turn_end": [
+    1,
+    "S1+S3",
+    350,
+    "Player taps End turn (motif 1-5, palette wavetable)"
+   ],
+   "turn_working": [
+    4,
+    "S2",
+    0,
+    "Engine still computing after 600 ms; 1 tick per 500 ms"
+   ],
+   "turn_ready": [
+    1,
+    "S1+S3",
+    500,
+    "New turn ready (motif 4-5-1 up)"
+   ],
+   "turn_month_new_year": [
+    2,
+    "S3",
+    600,
+    "The turn that starts January"
+   ],
+   "turn_report_open": [
+    4,
+    "S2",
+    120,
+    "Turn report opens"
+   ],
+   "map_select_province": [
+    3,
+    "S3",
+    50,
+    "Tap a province; knock pitch by terrain group"
+   ],
+   "map_select_own": [
+    3,
+    "S3",
+    60,
+    "Tap an own province"
+   ],
+   "map_zoom_step": [
+    5,
+    "S1",
+    40,
+    "Crossing a zoom level"
+   ],
+   "map_lens": [
+    4,
+    "S1+S2",
+    120,
+    "A lens is picked"
+   ],
+   "map_overview": [
+    4,
+    "S2",
+    150,
+    "Overview button opens the world view"
+   ],
+   "map_fog_reveal": [
+    3,
+    "S2",
+    400,
+    "Parchment lifts over newly known land"
+   ],
+   "map_ping": [
+    3,
+    "S1",
+    100,
+    "Camera jumps to a notification's place"
+   ],
+   "map_border_change": [
+    3,
+    "S3",
+    200,
+    "Province changes hands on screen"
+   ],
+   "army_select": [
+    2,
+    "S2+S3",
+    150,
+    "Select an army"
+   ],
+   "army_order_move": [
+    2,
+    "S2+S3",
+    300,
+    "Confirm a march order"
+   ],
+   "army_march_loop": [
+    4,
+    "S2+S3",
+    0,
+    "Camera follows a marching army at local zoom"
+   ],
+   "army_arrive": [
+    3,
+    "S3",
+    150,
+    "Army ends its march"
+   ],
+   "army_split": [
+    3,
+    "S3",
+    120,
+    "Split"
+   ],
+   "army_merge": [
+    3,
+    "S3",
+    120,
+    "Merge"
+   ],
+   "army_levy_call": [
+    2,
+    "S1+S2",
+    600,
+    "Calling the levy (horn on palette lead wavetable)"
+   ],
+   "army_lords_call": [
+    2,
+    "S1+S3",
+    600,
+    "Calling the lords"
+   ],
+   "army_hire": [
+    2,
+    "S1+S3",
+    400,
+    "Hiring companies"
+   ],
+   "army_trained": [
+    3,
+    "S3",
+    300,
+    "Regiment finishes training"
+   ],
+   "army_disband": [
+    3,
+    "S2",
+    300,
+    "Disband"
+   ],
+   "army_hungry": [
+    2,
+    "S1",
+    300,
+    "Army food reserve low; repeats only when worse"
+   ],
+   "army_winter_quarters": [
+    4,
+    "S2",
+    400,
+    "Army goes into winter quarters"
+   ],
+   "fleet_select": [
+    2,
+    "S2+S3",
+    200,
+    "Select a fleet"
+   ],
+   "fleet_order_move": [
+    2,
+    "S2+S3",
+    200,
+    "Move a fleet"
+   ],
+   "battle_start": [
+    1,
+    "S1+S2+S3",
+    1000,
+    "Battle begins and screen opens"
+   ],
+   "battle_bell": [
+    2,
+    "S3",
+    200,
+    "Each bell begins"
+   ],
+   "battle_order": [
+    4,
+    "S1",
+    80,
+    "Commander's order line appears"
+   ],
+   "battle_shoot_bow": [
+    3,
+    "S2",
+    400,
+    "Archers"
+   ],
+   "battle_shoot_crossbow": [
+    3,
+    "S2+S3",
+    300,
+    "Crossbows"
+   ],
+   "battle_shoot_matchlock": [
+    3,
+    "S2",
+    500,
+    "Hand guns, arquebuses"
+   ],
+   "battle_shoot_volley": [
+    3,
+    "S2",
+    400,
+    "Flintlock line volley"
+   ],
+   "battle_shoot_rifle": [
+    3,
+    "S2",
+    500,
+    "Breech-loaders and rifles"
+   ],
+   "battle_shoot_mg": [
+    3,
+    "S2",
+    600,
+    "Machine guns"
+   ],
+   "battle_gun": [
+    2,
+    "S2+S3",
+    600,
+    "Field guns and bombards fire"
+   ],
+   "battle_shell": [
+    2,
+    "S2+S3",
+    800,
+    "Era VI-VII bombardment lands"
+   ],
+   "battle_charge_horse": [
+    2,
+    "S2+S3",
+    700,
+    "Shock horse charge"
+   ],
+   "battle_charge_foot": [
+    2,
+    "S2+S1",
+    600,
+    "Foot charges, pikes, bayonets"
+   ],
+   "battle_melee": [
+    3,
+    "S2+S3",
+    500,
+    "Melee in a sector"
+   ],
+   "battle_brace": [
+    3,
+    "S3",
+    300,
+    "Sector braces, charge fails"
+   ],
+   "battle_sector_lost": [
+    2,
+    "S1",
+    300,
+    "Sector won by one side"
+   ],
+   "battle_rout": [
+    1,
+    "S2+S1",
+    800,
+    "Company or army breaks"
+   ],
+   "battle_air": [
+    3,
+    "S2",
+    800,
+    "Era VII aircraft"
+   ],
+   "siege_begin": [
+    2,
+    "S2+S3",
+    600,
+    "Siege laid"
+   ],
+   "siege_closed": [
+    3,
+    "S3",
+    300,
+    "Castle closed"
+   ],
+   "siege_bombard": [
+    3,
+    "S2+S3",
+    600,
+    "Guns add shot this month"
+   ],
+   "siege_mining": [
+    4,
+    "S3",
+    500,
+    "Mining this month"
+   ],
+   "siege_breach": [
+    1,
+    "S2+S3",
+    900,
+    "A breach opens"
+   ],
+   "siege_repair": [
+    3,
+    "S3",
+    400,
+    "Garrison closes a breach"
+   ],
+   "siege_sally": [
+    2,
+    "S2+S3",
+    600,
+    "Garrison sallies"
+   ],
+   "siege_storm": [
+    1,
+    "S1+S2+S3",
+    1000,
+    "Storming begins"
+   ],
+   "siege_terms": [
+    2,
+    "S1",
+    600,
+    "Terms offered or asked"
+   ],
+   "siege_fall": [
+    2,
+    "S3",
+    600,
+    "Castle taken"
+   ],
+   "sea_battle_start": [
+    1,
+    "S1+S2+S3",
+    1000,
+    "Sea battle"
+   ],
+   "sea_broadside": [
+    2,
+    "S2+S3",
+    700,
+    "Ships fire"
+   ],
+   "sea_sink": [
+    2,
+    "S2+S3",
+    900,
+    "A ship sinks"
+   ],
+   "sea_blockade": [
+    3,
+    "S1",
+    300,
+    "Blockade set or broken"
+   ],
+   "sea_landing": [
+    3,
+    "S2+S3",
+    500,
+    "Troops land from ships"
+   ],
+   "econ_income": [
+    3,
+    "S1",
+    150,
+    "Turn report shows income (once per turn)"
+   ],
+   "econ_income_big": [
+    2,
+    "S1+S3",
+    400,
+    "Record income or windfall event"
+   ],
+   "econ_spend": [
+    3,
+    "S1",
+    120,
+    "Gold spent"
+   ],
+   "econ_debt": [
+    2,
+    "S1",
+    400,
+    "Treasury below zero or loan taken"
+   ],
+   "econ_build_start": [
+    3,
+    "S3",
+    300,
+    "Building ordered"
+   ],
+   "econ_build_done": [
+    3,
+    "S3",
+    400,
+    "Building finishes"
+   ],
+   "econ_trade": [
+    3,
+    "S1+S2",
+    300,
+    "Trader sets out or route opens"
+   ],
+   "econ_harvest": [
+    3,
+    "S1",
+    300,
+    "Harvest month report"
+   ],
+   "realm_research_pick": [
+    3,
+    "S1+S3",
+    200,
+    "Choosing what scholars study"
+   ],
+   "realm_law": [
+    2,
+    "S3",
+    400,
+    "Law, policy or reform set"
+   ],
+   "realm_ruler_dies": [
+    1,
+    "S3",
+    1200,
+    "Ruler dies; then ruler_new stinger"
+   ],
+   "realm_heir_born": [
+    3,
+    "S3",
+    500,
+    "Heir born"
+   ],
+   "realm_stability_up": [
+    3,
+    "S1",
+    200,
+    "Stability rises"
+   ],
+   "realm_stability_down": [
+    3,
+    "S1",
+    200,
+    "Stability falls"
+   ],
+   "realm_unrest": [
+    2,
+    "S2+S1",
+    400,
+    "Province unrest crosses a threshold"
+   ],
+   "realm_rising": [
+    1,
+    "S2+S3",
+    900,
+    "Rebels rise"
+   ],
+   "realm_fire": [
+    3,
+    "S2",
+    600,
+    "Burned homes, plunder, scorched earth (quiet, sombre)"
+   ],
+   "realm_plague": [
+    2,
+    "S3",
+    800,
+    "Outbreak reaches a player province"
+   ],
+   "diplo_envoy_sent": [
+    3,
+    "S2+S1",
+    300,
+    "Envoy or offer sent"
+   ],
+   "diplo_accepted": [
+    2,
+    "S1",
+    300,
+    "Answer comes back: accepted (court horn, palette lead)"
+   ],
+   "diplo_refused": [
+    2,
+    "S1",
+    300,
+    "Answer comes back: refused (court horn, palette lead)"
+   ],
+   "diplo_peace_signed": [
+    2,
+    "S3+S2",
+    500,
+    "Peace signed (before the music stinger)"
+   ],
+   "event_open": [
+    2,
+    "S2",
+    250,
+    "Event card opens"
+   ],
+   "event_choice": [
+    2,
+    "S1+S3",
+    200,
+    "Option picked"
+   ],
+   "event_chain_next": [
+    2,
+    "S2",
+    250,
+    "Event follows an earlier choice"
+   ],
+   "notify_ping": [
+    4,
+    "S1",
+    80,
+    "Routine notification"
+   ],
+   "notify_alert": [
+    2,
+    "S1",
+    200,
+    "Urgent (army in danger, castle closed, pay owed)"
+   ],
+   "notify_war": [
+    2,
+    "S1+S2",
+    300,
+    "War notification away from the front"
+   ],
+   "notify_battle_far": [
+    2,
+    "S2+S3",
+    400,
+    "Player's battle starts off screen"
+   ],
+   "notify_diplo": [
+    3,
+    "S1",
+    200,
+    "Diplomatic message"
+   ],
+   "notify_batch": [
+    3,
+    "S1",
+    300,
+    "More than four notifications in one turn"
+   ],
+   "amb_sea_coast": [
+    null,
+    "noise+wave",
+    0,
+    "Coastal sea"
+   ],
+   "amb_sea_ocean": [
+    null,
+    "noise+wave",
+    0,
+    "Open ocean"
+   ],
+   "amb_wind_plain": [
+    null,
+    "noise+wave",
+    0,
+    "Plains, steppe, drylands"
+   ],
+   "amb_forest": [
+    null,
+    "noise+wave",
+    0,
+    "Forest, taiga"
+   ],
+   "amb_jungle": [
+    null,
+    "noise+wave",
+    0,
+    "Jungle, rainforest"
+   ],
+   "amb_desert": [
+    null,
+    "noise+wave",
+    0,
+    "Desert"
+   ],
+   "amb_mountain": [
+    null,
+    "noise+wave",
+    0,
+    "Hills and mountains"
+   ],
+   "amb_marsh": [
+    null,
+    "noise+wave",
+    0,
+    "Marsh"
+   ],
+   "amb_town": [
+    null,
+    "noise+wave",
+    0,
+    "Big settlement at local zoom"
+   ],
+   "amb_war_front": [
+    null,
+    "noise+wave",
+    0,
+    "Province with active siege or battle at local zoom"
+   ]
+  },
+  "aliases": {
+   "army_order_invalid": "ui_error",
+   "econ_cant_afford": "ui_error"
+  },
+  "silent": [
+   "turn_autosave"
+  ],
+  "sound_examples": {
+   "ui_tap": {
+    "priority": 3,
+    "vary": "pitch 1",
+    "S1": {
+     "duty": 0.5,
+     "ticks": [
+      {
+       "note": "G6",
+       "v": 10
+      },
+      {
+       "note": "G6",
+       "v": 4
+      }
+     ]
+    }
+   },
+   "ui_confirm": {
+    "priority": 2,
+    "vary": "none",
+    "S1": {
+     "duty": 0.5,
+     "ticks": [
+      {
+       "note": "C6",
+       "v": 12,
+       "len": 3
+      },
+      {
+       "note": "G6",
+       "v": 12,
+       "len": 5,
+       "v_to": 0
+      }
+     ]
+    }
+   },
+   "turn_end": {
+    "priority": 1,
+    "vary": "none",
+    "S1": {
+     "duty": 0.125,
+     "ticks": [
+      {
+       "degree": 1,
+       "v": 9,
+       "len": 10
+      },
+      {
+       "degree": 5,
+       "v": 9,
+       "len": 12,
+       "v_to": 0
+      }
+     ]
+    },
+    "S3": {
+     "wave": "palette_lead",
+     "ticks": [
+      {
+       "degree": 1,
+       "v": 12,
+       "len": 10
+      },
+      {
+       "degree": 5,
+       "v": 12,
+       "len": 12,
+       "v_to": 0
+      }
+     ]
+    }
+   }
+  },
+  "ambience": {
+   "beds": {
+    "coastal sea": "amb_sea_coast",
+    "open ocean": "amb_sea_ocean",
+    "plains": "amb_wind_plain",
+    "steppe": "amb_wind_plain",
+    "drylands": "amb_wind_plain",
+    "forest": "amb_forest",
+    "taiga": "amb_forest",
+    "jungle": "amb_jungle",
+    "rainforest": "amb_jungle",
+    "desert": "amb_desert",
+    "hills": "amb_mountain",
+    "mountains": "amb_mountain",
+    "marsh": "amb_marsh"
+   },
+   "local_only": {
+    "big settlement": "amb_town",
+    "war front": "amb_war_front"
+   },
+   "zooms": [
+    "regional",
+    "local"
+   ],
+   "windier_in_winter": [
+    "amb_wind_plain",
+    "amb_forest"
+   ],
+   "loop_seconds": [
+    4,
+    12
+   ]
+  },
+  "moment_sounds": {
+   "button_tap": "ui_tap",
+   "confirm_costly": "ui_confirm",
+   "store_unlock": "ui_purchase",
+   "end_turn_pressed": "turn_end",
+   "january_turn_ready": "turn_month_new_year",
+   "own_province_tapped": "map_select_own",
+   "levy_called": "army_levy_call",
+   "regiment_trained": "army_trained",
+   "battle_begins": "battle_start",
+   "siege_breach": "siege_breach",
+   "ship_sinks": "sea_sink",
+   "building_finished": "econ_build_done",
+   "plague_reaches_player": "realm_plague",
+   "event_chain_next": "event_chain_next",
+   "player_battle_off_screen": "notify_battle_far",
+   "route_impossible": "army_order_invalid",
+   "cant_afford": "econ_cant_afford",
+   "autosave_finished": "turn_autosave"
+  },
+  "harm": {
+   "razing": [
+    "realm_fire"
+   ],
+   "plunder": [
+    "realm_fire"
+   ],
+   "massacre_event": [],
+   "enslavement_event": [],
+   "quiet": [
+    "realm_fire"
+   ]
+  },
+  "coin_sounds": [
+   "econ_income",
+   "econ_income_big",
+   "econ_spend",
+   "econ_debt",
+   "econ_trade"
+  ],
+  "partners": {
+   "notify_battle_far": "toast"
+  }
+ },
+ "platform": {
+  "first_tap": {
+   "mobile": {
+    "splash": null
+   },
+   "desktop": {
+    "splash": "frame_logo"
+   },
+   "tap_to_start": "frame_start"
+  },
+  "phone_platforms": [
+   "iOS",
+   "Android"
+  ],
+  "desktop_platforms": [
+   "Steam",
+   "desktop",
+   "web"
+  ]
+ },
+ "captions": {
+  "kinds": {
+   "battle": {
+    "text": "Battle at {place}",
+    "icon": "crossed swords"
+   }
+  }
+ }
+}

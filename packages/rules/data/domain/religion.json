@@ -1,0 +1,1261 @@
+{
+ "$comment": "Religion config (domain/religion/spec.md §10), from religion/config/religion.yaml version 1; every number is a first-pass placeholder. 'patches' and 'event_options' are copied from religion/event-tree-additions (patches.yaml, religion-events.yaml). 'holy_place_names' and 'holder_names' are the display names the feature files use.",
+ "event_tree_religions": [
+  "catholic",
+  "protestant",
+  "anglican",
+  "orthodox",
+  "oriental_christian",
+  "sunni",
+  "shia",
+  "ibadi",
+  "jewish",
+  "hindu",
+  "sikh",
+  "theravada",
+  "mahayana",
+  "vajrayana",
+  "shinto",
+  "confucian_ritual",
+  "daoist",
+  "indigenous_american",
+  "african_traditional",
+  "pacific_traditional",
+  "siberian_steppe_traditional",
+  "secular"
+ ],
+ "added_faiths": {
+  "religions": [
+   "hussite",
+   "jain",
+   "asian_traditional"
+  ]
+ },
+ "faiths": {
+  "catholic": {
+   "family": "christian",
+   "house": [
+    "church",
+    "cathedral"
+   ],
+   "clergy_marry": false,
+   "rules": [
+    "monastic_land",
+    "inquisition"
+   ]
+  },
+  "protestant": {
+   "family": "christian",
+   "house": [
+    "church",
+    "minster"
+   ],
+   "clergy_marry": true,
+   "rules": [
+    "print_and_school_pull"
+   ]
+  },
+  "anglican": {
+   "family": "christian",
+   "house": [
+    "church",
+    "cathedral"
+   ],
+   "clergy_marry": true,
+   "rules": [
+    "crown_heads_church"
+   ]
+  },
+  "hussite": {
+   "family": "christian",
+   "house": [
+    "church",
+    "cathedral"
+   ],
+   "clergy_marry": false,
+   "rules": [
+    "merges_into_protestant"
+   ]
+  },
+  "orthodox": {
+   "family": "christian",
+   "house": [
+    "church",
+    "cathedral"
+   ],
+   "clergy_marry": true,
+   "rules": [
+    "monastic_land"
+   ]
+  },
+  "oriental_christian": {
+   "family": "christian",
+   "house": [
+    "church",
+    "cathedral"
+   ],
+   "clergy_marry": true
+  },
+  "sunni": {
+   "family": "islamic",
+   "house": [
+    "mosque",
+    "great mosque"
+   ],
+   "clergy_marry": true,
+   "carried_by_trade": true,
+   "rules": [
+    "protected_communities"
+   ]
+  },
+  "shia": {
+   "family": "islamic",
+   "house": [
+    "mosque",
+    "great mosque"
+   ],
+   "clergy_marry": true,
+   "carried_by_trade": true,
+   "rules": [
+    "protected_communities"
+   ]
+  },
+  "ibadi": {
+   "family": "islamic",
+   "house": [
+    "mosque",
+    "great mosque"
+   ],
+   "clergy_marry": true,
+   "carried_by_trade": true,
+   "rules": [
+    "protected_communities"
+   ]
+  },
+  "jewish": {
+   "family": "jewish",
+   "house": [
+    "synagogue",
+    "great synagogue"
+   ],
+   "clergy_marry": true
+  },
+  "hindu": {
+   "family": "indic",
+   "house": [
+    "temple",
+    "great temple"
+   ],
+   "clergy_marry": true,
+   "rules": [
+    "temple_town"
+   ]
+  },
+  "sikh": {
+   "family": "indic",
+   "house": [
+    "gurdwara",
+    "great gurdwara"
+   ],
+   "clergy_marry": true,
+   "rules": [
+    "langar"
+   ]
+  },
+  "jain": {
+   "family": "indic",
+   "house": [
+    "temple",
+    "great temple"
+   ],
+   "clergy_marry": false
+  },
+  "theravada": {
+   "family": "buddhist",
+   "house": [
+    "monastery",
+    "great stupa"
+   ],
+   "clergy_marry": false,
+   "rules": [
+    "monastery_school"
+   ]
+  },
+  "mahayana": {
+   "family": "buddhist",
+   "house": [
+    "temple",
+    "great temple"
+   ],
+   "clergy_marry": false,
+   "layered": true
+  },
+  "vajrayana": {
+   "family": "buddhist",
+   "house": [
+    "monastery",
+    "great monastery"
+   ],
+   "clergy_marry": false,
+   "rules": [
+    "lama_lords"
+   ]
+  },
+  "shinto": {
+   "family": "east_asian",
+   "house": [
+    "shrine",
+    "grand shrine"
+   ],
+   "clergy_marry": true,
+   "layered": true
+  },
+  "confucian_ritual": {
+   "family": "east_asian",
+   "house": [
+    "ancestral hall",
+    "temple of Confucius"
+   ],
+   "clergy_marry": true,
+   "layered": true
+  },
+  "daoist": {
+   "family": "east_asian",
+   "house": [
+    "temple",
+    "great temple"
+   ],
+   "clergy_marry": true,
+   "layered": true
+  },
+  "indigenous_american": {
+   "family": "traditional",
+   "house": [
+    "shrine",
+    "great temple"
+   ],
+   "clergy_marry": true,
+   "rooted": true
+  },
+  "african_traditional": {
+   "family": "traditional",
+   "house": [
+    "shrine",
+    "great shrine"
+   ],
+   "clergy_marry": true,
+   "rooted": true
+  },
+  "pacific_traditional": {
+   "family": "traditional",
+   "house": [
+    "marae",
+    "great marae"
+   ],
+   "clergy_marry": true,
+   "rooted": true
+  },
+  "siberian_steppe_traditional": {
+   "family": "traditional",
+   "house": [
+    "shrine",
+    "great shrine"
+   ],
+   "clergy_marry": true,
+   "rooted": true
+  },
+  "asian_traditional": {
+   "family": "traditional",
+   "house": [
+    "shrine",
+    "great shrine"
+   ],
+   "clergy_marry": true,
+   "rooted": true
+  },
+  "secular": {
+   "family": "none",
+   "house": null,
+   "rules": [
+    "secular_state"
+   ]
+  }
+ },
+ "relations": {
+  "layered_group": [
+   "shinto",
+   "mahayana",
+   "confucian_ritual",
+   "daoist"
+  ],
+  "traditional_layers_after_years": 100,
+  "kin_serves_community_below": 0.2
+ },
+ "mix": {
+  "max_faiths_per_province": 3,
+  "drift_per_year": 0.03,
+  "hold_per_share": 4,
+  "rooted_hold_per_share": 8,
+  "rooted_sacred_places_pull": 1,
+  "rooted_sacred_places_min_share": 0.25,
+  "vanish_below": 0.01,
+  "hidden_believers_floor": 0.02,
+  "hidden_believers_years": 100,
+  "update": "yearly"
+ },
+ "pull": {
+  "house_steps": [
+   1,
+   1.5,
+   2
+  ],
+  "landmark_house": {
+   "here": 3,
+   "realm_within_rings": 3,
+   "there": 0.5
+  },
+  "minority_house": 0.5,
+  "monastery": 1,
+  "pilgrimage_shrine": 1,
+  "fallow_multiplier": 0.5,
+  "preacher": 2,
+  "school_of_faith": 0.5,
+  "capital": 1,
+  "lord_of_faith": 0.5,
+  "traders_per_100": 0.5,
+  "traders_max": 2,
+  "restricted_escape_tax": 1,
+  "chaplain_multiplier": 2,
+  "persecution_multiplier": 2,
+  "inquisition": 1
+ },
+ "houses": {
+  "minority_house_needs_share": 0.1,
+  "preacher_per_monastery_or_religious_school": 1,
+  "tithe_gold_per_10000_people": 1,
+  "community_founds_own_house": {
+   "min_share": 0.2,
+   "every_years": 20
+  },
+  "preacher_founds_house_after_years": 10,
+  "convert_cost_share_of_build": 0.5,
+  "take_over_gold": {
+   "per_step": 20,
+   "monastic_land_multiplier": 2
+  },
+  "take_over_spark": "insult_to_faith",
+  "take_over_old_faith_lords": -1
+ },
+ "communities": {
+  "min_share": 0.1,
+  "wrong_faith_min_share": 0.33
+ },
+ "policies": {
+  "established": {},
+  "tolerated": {
+   "pious_lords_waver_if_faith_share_of_realm": 0.1
+  },
+  "restricted": {
+   "faith_tax": 0.25,
+   "new_houses": false,
+   "wrong_faith_where_majority": true,
+   "their_lords_loyalty_steps": -1
+  },
+  "persecuted": {
+   "houses": "close_or_take_over",
+   "flee_per_year": 0.02,
+   "grievance": "persecuted",
+   "grievance_weight": 2,
+   "their_lords_loyalty_steps": -2,
+   "sets_flag": "religious_persecution_active",
+   "gives_war_aim_to_bordering_rulers_of_faith": "defend_the_faith"
+  },
+  "change_takes_effect": "next_new_year",
+  "harsher_step_is_spark": true
+ },
+ "expulsion": {
+  "leave_share": 0.7,
+  "within_months": 12,
+  "bloodshed_grievance": true
+ },
+ "inquisition": {
+  "allowed_for": {
+   "state_faith": "catholic",
+   "government": [
+    "monarchy",
+    "elective_monarchy",
+    "constitutional_monarchy"
+   ]
+  },
+  "upkeep_gold_per_year": 10,
+  "skilled_leave_per_year": 0.01,
+  "sets_flag": "inquisition_established",
+  "removes_hidden_believers_floor": true
+ },
+ "preachers": {
+  "per_houses_of_state_faith": 5,
+  "per_holy_place_held": 1,
+  "upkeep_gold_per_year": 1,
+  "foreign_without_leave_expel_chance_per_year": 0.25,
+  "sets_flag_when_expelled": "missionary_persecution"
+ },
+ "state_faith_change": {
+  "capital_share_min": 0.3,
+  "realm_share_min": 0.4,
+  "cooldown_years": 30,
+  "cuius_regio_after_event": "peace_of_augsburg",
+  "cuius_regio_faiths": [
+   "catholic",
+   "protestant"
+  ]
+ },
+ "lords": {
+  "build_or_pay_house_of_his_faith": 1,
+  "pious_or_clergy_on_toleration": -1,
+  "pious_or_clergy_on_take_over": 1,
+  "state_faith_changes_away": -1,
+  "state_faith_changes_to_his": 1
+ },
+ "faith_rules": {
+  "print_and_school_pull": {
+   "per_press": 0.5,
+   "per_school": 0.5
+  },
+  "monastic_land": {
+   "take_over_gold_multiplier": 2
+  },
+  "crown_heads_church": {
+   "clergy_lords_ignore_faith_policy": true
+  },
+  "merges_into_protestant": {
+   "kin_of": "protestant",
+   "from_event": "protestant_reformation",
+   "merge_at_end_of": "p_protestant_reformation",
+   "merge_latest_year": 1620,
+   "else_into": "catholic"
+  },
+  "protected_communities": {
+   "restricted_served_no_wrong_faith": true
+  },
+  "temple_town": {
+   "step3_temple_traders_per_year": 150
+  },
+  "langar": {
+   "homeless_sheltered_per_house": 1000
+  },
+  "monastery_school": {
+   "student_seats_per_house": 20
+  },
+  "lama_lords": {
+   "step3_house_or_monastery_can_be_fief": true
+  },
+  "secular_state": {
+   "allowed_policies": [
+    "tolerated",
+    "restricted"
+   ],
+   "town_school_pull_after_year": 1850,
+   "town_school_pull": 0.5,
+   "needs_innovation": "mass_literacy_schooling"
+  }
+ },
+ "holy_places": [
+  {
+   "id": "rome",
+   "faiths": [
+    "catholic"
+   ],
+   "province": "Rome",
+   "holder_1444": "papal_states"
+  },
+  {
+   "id": "jerusalem",
+   "faiths": [
+    "catholic",
+    "orthodox",
+    "oriental_christian",
+    "jewish",
+    "sunni",
+    "shia"
+   ],
+   "province": "Jerusalem",
+   "holder_1444": "mamluk"
+  },
+  {
+   "id": "mecca_medina",
+   "faiths": [
+    "sunni",
+    "shia",
+    "ibadi"
+   ],
+   "province": "Hejaz",
+   "holder_1444": "mamluk",
+   "note": "Sharifs of Mecca under Mamluk suzerainty"
+  },
+  {
+   "id": "karbala_najaf",
+   "faiths": [
+    "shia"
+   ],
+   "province": "Karbala",
+   "holder_1444": "qara_qoyunlu"
+  },
+  {
+   "id": "constantinople",
+   "faiths": [
+    "orthodox"
+   ],
+   "province": "Constantinople",
+   "holder_1444": "byzantium"
+  },
+  {
+   "id": "echmiadzin",
+   "faiths": [
+    "oriental_christian"
+   ],
+   "province": "Yerevan",
+   "holder_1444": "qara_qoyunlu"
+  },
+  {
+   "id": "aksum",
+   "faiths": [
+    "oriental_christian"
+   ],
+   "province": "Aksum",
+   "holder_1444": "ethiopia"
+  },
+  {
+   "id": "varanasi",
+   "faiths": [
+    "hindu"
+   ],
+   "province": "Varanasi",
+   "holder_1444": "jaunpur"
+  },
+  {
+   "id": "amritsar",
+   "faiths": [
+    "sikh"
+   ],
+   "province": "Amritsar",
+   "holder_1444": null,
+   "appears_with_event": "sikh_panth_founded",
+   "earliest": 1577
+  },
+  {
+   "id": "lhasa",
+   "faiths": [
+    "vajrayana"
+   ],
+   "province": "Lhasa",
+   "holder_1444": "tibet"
+  },
+  {
+   "id": "temple_of_the_tooth",
+   "faiths": [
+    "theravada"
+   ],
+   "province": "Kotte",
+   "holder_1444": "kotte",
+   "note": "Follows the relic: Kandy from the 1590s"
+  },
+  {
+   "id": "mount_wutai",
+   "faiths": [
+    "mahayana"
+   ],
+   "province": "Shanxi",
+   "holder_1444": "ming"
+  },
+  {
+   "id": "qufu",
+   "faiths": [
+    "confucian_ritual"
+   ],
+   "province": "Shandong",
+   "holder_1444": "ming"
+  },
+  {
+   "id": "santiago",
+   "faiths": [
+    "catholic"
+   ],
+   "province": "Galicia",
+   "holder_1444": "castile"
+  },
+  {
+   "id": "bodh_gaya",
+   "faiths": [
+    "theravada",
+    "mahayana",
+    "vajrayana"
+   ],
+   "province": "Gaya",
+   "holder_1444": "jaunpur",
+   "note": "Contested with Bengal in 1444; in decline until restoration from 1880"
+  },
+  {
+   "id": "ise",
+   "faiths": [
+    "shinto"
+   ],
+   "province": "Ise",
+   "holder_1444": "japan"
+  }
+ ],
+ "holy_place_effects": {
+  "same_faith": {
+   "preachers": 1,
+   "pilgrim_traders_per_year": 200
+  },
+  "other_faith": {
+   "war_aim_for_rulers_of_faith": "defend_the_faith"
+  },
+  "pilgrims_still_come_if": {
+   "policy": "tolerated",
+   "house_of_faith_in_province": true
+  }
+ },
+ "waves": {
+  "carriers": [
+   "presses",
+   "schools",
+   "towns",
+   "traders",
+   "rule",
+   "army",
+   "preachers"
+  ],
+  "town_min_size": "market_town",
+  "max_active": 8
+ },
+ "ai": {
+  "build_state_house_where_state_share_below": 0.5,
+  "tolerate_faith_above_realm_share": 0.2,
+  "zealous_personalities_restrict": true,
+  "persecute_only_after_event_or_religious_war": true,
+  "adopt_faith_without_event_above_realm_share": 0.6
+ },
+ "start": {
+  "source": "../build/catalogue-faiths.json",
+  "ruler_faith_share_where_people_majority_differs": 0.15,
+  "community_default_share": 0.05,
+  "overrides": [
+   {
+    "where": "region:balkans",
+    "owner": "ottoman",
+    "mix": {
+     "orthodox": 0.85,
+     "sunni": 0.15
+    }
+   },
+   {
+    "where": "area:bohemia",
+    "mix": {
+     "hussite": 0.7,
+     "catholic": 0.27,
+     "jewish": 0.03
+    }
+   },
+   {
+    "where": "area:granada",
+    "mix": {
+     "sunni": 0.95,
+     "jewish": 0.03,
+     "catholic": 0.02
+    }
+   },
+   {
+    "where": "area:poland",
+    "towns_only": true,
+    "mix_add": {
+     "jewish": 0.05
+    }
+   },
+   {
+    "where": "area:north_java_coast",
+    "mix": {
+     "hindu": 0.55,
+     "sunni": 0.25,
+     "asian_traditional": 0.2
+    }
+   },
+   {
+    "where": "area:punjab",
+    "mix": {
+     "hindu": 0.55,
+     "sunni": 0.45
+    }
+   },
+   {
+    "where": "region:persia",
+    "mix": {
+     "sunni": 0.8,
+     "shia": 0.2
+    }
+   },
+   {
+    "where": "area:egypt",
+    "mix": {
+     "sunni": 0.88,
+     "oriental_christian": 0.1,
+     "jewish": 0.02
+    }
+   }
+  ]
+ },
+ "patches": [
+  {
+   "event": "protestant_reformation",
+   "option": "protect_the_reformer",
+   "tier": "immediate",
+   "add": [
+    {
+     "faith_wave": {
+      "id": "reformation",
+      "faith": "protestant",
+      "from": "$reform_centre",
+      "carriers": [
+       "presses",
+       "schools",
+       "towns"
+      ],
+      "pull": 1.5,
+      "reach_per_year": 0.5,
+      "limit": "region:europe",
+      "until_period": "p_protestant_reformation"
+     }
+    }
+   ]
+  },
+  {
+   "event": "council_of_trent",
+   "option": "confessional_reform",
+   "tier": "immediate",
+   "add": [
+    {
+     "preachers": {
+      "on": "$catholic_powers",
+      "faith": "catholic",
+      "amount": 2,
+      "years": 80
+     }
+    },
+    {
+     "faith_wave": {
+      "id": "catholic_renewal",
+      "faith": "catholic",
+      "from": "$papacy",
+      "carriers": [
+       "schools",
+       "preachers"
+      ],
+      "pull": 1.0,
+      "reach_per_year": 1.0,
+      "limit": "region:europe",
+      "until_period": "p_catholic_reformation"
+     }
+    }
+   ]
+  },
+  {
+   "event": "safavid_rise",
+   "option": "impose_twelver_shiism",
+   "tier": "immediate",
+   "add": [
+    {
+     "faith_wave": {
+      "id": "safavid_shiism",
+      "faith": "shia",
+      "from": "$order",
+      "carriers": [
+       "rule",
+       "preachers"
+      ],
+      "pull": 2.0,
+      "reach_per_year": 1.0,
+      "limit": "region:middle_east",
+      "years": 150
+     }
+    }
+   ]
+  },
+  {
+   "event": "sikh_panth_founded",
+   "option": "new_panth",
+   "tier": "immediate",
+   "add": [
+    {
+     "faith_wave": {
+      "id": "sikh_panth",
+      "faith": "sikh",
+      "from": "area:punjab",
+      "carriers": [
+       "preachers",
+       "towns"
+      ],
+      "pull": 0.5,
+      "reach_per_year": 0.2,
+      "limit": "region:north_india",
+      "years": 200
+     }
+    }
+   ]
+  },
+  {
+   "event": "futa_jallon_jihad",
+   "option": "almamate",
+   "tier": "immediate",
+   "add": [
+    {
+     "faith_wave": {
+      "id": "futa_jallon",
+      "faith": "sunni",
+      "from": "$movement",
+      "carriers": [
+       "rule",
+       "army"
+      ],
+      "pull": 1.5,
+      "reach_per_year": 0.5,
+      "limit": "region:west_africa",
+      "years": 80
+     }
+    }
+   ]
+  },
+  {
+   "event": "sokoto_jihad",
+   "option": "caliphate",
+   "tier": "immediate",
+   "add": [
+    {
+     "faith_wave": {
+      "id": "sokoto",
+      "faith": "sunni",
+      "from": "$reformers",
+      "carriers": [
+       "rule",
+       "army",
+       "preachers"
+      ],
+      "pull": 1.5,
+      "reach_per_year": 0.5,
+      "limit": "region:sub_saharan_africa",
+      "years": 100
+     }
+    }
+   ]
+  }
+ ],
+ "event_options": {
+  "princes_adopt_the_reformation": {
+   "adopt_and_take_church_lands": [
+    {
+     "religion": {
+      "on": "$prince",
+      "set": "protestant"
+     }
+    },
+    {
+     "on": "$prince",
+     "modifier": "dissolution_of_monasteries"
+    },
+    {
+     "faith_policy": {
+      "on": "$prince",
+      "faith": "catholic",
+      "set": "restricted"
+     }
+    }
+   ],
+   "adopt_and_keep_church_lands": [
+    {
+     "religion": {
+      "on": "$prince",
+      "set": "protestant"
+     }
+    },
+    {
+     "faith_policy": {
+      "on": "$prince",
+      "faith": "catholic",
+      "set": "tolerated"
+     }
+    },
+    {
+     "on": "$prince",
+     "stat": {
+      "stability": -1
+     }
+    }
+   ],
+   "stay_with_rome": [
+    {
+     "preachers": {
+      "on": "$prince",
+      "faith": "catholic",
+      "amount": 1,
+      "years": 30
+     }
+    },
+    {
+     "faith_policy": {
+      "on": "$prince",
+      "faith": "protestant",
+      "set": "restricted"
+     }
+    }
+   ]
+  },
+  "expulsion_of_the_moriscos": {
+   "expel": [
+    {
+     "move_population": {
+      "group": "mudejar_morisco_population",
+      "from": "$crown",
+      "to": "$host",
+      "amount": "90%"
+     }
+    },
+    {
+     "on": "$crown",
+     "modifier": "loss_of_skilled_minority"
+    },
+    {
+     "on": "$host",
+     "modifier": "skilled_refugees"
+    },
+    {
+     "set_flag": {
+      "on": "$crown",
+      "id": "religious_persecution_active",
+      "years": 20
+     }
+    }
+   ],
+   "leave_them_be": [
+    {
+     "on": "$crown",
+     "stat": {
+      "stability": -1
+     }
+    }
+   ]
+  },
+  "altan_khan_and_the_dalai_lama": {
+   "patron_of_the_gelug": [
+    {
+     "religion": {
+      "on": "$khan",
+      "set": "vajrayana"
+     }
+    },
+    {
+     "on": "$khan",
+     "modifier": "lama_patronage"
+    },
+    {
+     "faith_wave": {
+      "id": "mongol_conversion",
+      "faith": "vajrayana",
+      "from": "$khan",
+      "carriers": [
+       "rule",
+       "preachers"
+      ],
+      "pull": 1.5,
+      "reach_per_year": 0.5,
+      "limit": "region:central_asia",
+      "years": 70
+     }
+    }
+   ],
+   "keep_the_old_rites": [
+    {
+     "on": "$khan",
+     "stat": {
+      "stability": 1
+     }
+    }
+   ]
+  },
+  "jizya_reimposed": {
+   "reimpose_the_tax": [
+    {
+     "faith_policy": {
+      "on": "$emperor",
+      "faith": "hindu",
+      "set": "restricted"
+     }
+    },
+    {
+     "on": "$emperor",
+     "modifier": "faith_tax_revenue"
+    }
+   ],
+   "keep_akbars_settlement": [
+    {
+     "on": "$emperor",
+     "modifier": "religious_tolerance_policy"
+    }
+   ]
+  },
+  "raskol_old_believers": {
+   "enforce_the_new_rites": [
+    {
+     "on": "$state",
+     "modifier": "church_schism"
+    },
+    {
+     "rebels": {
+      "on": "$state",
+      "type": "religious",
+      "size": "medium"
+     }
+    },
+    {
+     "move_population": {
+      "group": "old_believers",
+      "from": "$state",
+      "to": "region:siberia",
+      "amount": "5%"
+     }
+    }
+   ],
+   "allow_both_rites": [
+    {
+     "on": "$state",
+     "stat": {
+      "legitimacy": -5
+     }
+    }
+   ]
+  },
+  "revolution_and_the_church": {
+   "concordat": [
+    {
+     "on": "$realm",
+     "modifier": "concordat_settlement"
+    },
+    {
+     "faith_policy": {
+      "on": "$realm",
+      "faith": "protestant",
+      "set": "tolerated"
+     }
+    },
+    {
+     "faith_policy": {
+      "on": "$realm",
+      "faith": "jewish",
+      "set": "tolerated"
+     }
+    }
+   ],
+   "civic_religion": [
+    {
+     "religion": {
+      "on": "$realm",
+      "set": "secular"
+     }
+    },
+    {
+     "faith_policy": {
+      "on": "$realm",
+      "faith": "catholic",
+      "set": "restricted"
+     }
+    },
+    {
+     "rebels": {
+      "on": "$realm",
+      "type": "religious",
+      "size": "large"
+     }
+    }
+   ]
+  },
+  "separation_of_church_and_state": {
+   "separate": [
+    {
+     "religion": {
+      "on": "$state",
+      "set": "secular"
+     }
+    },
+    {
+     "on": "$state",
+     "modifier": "secular_state"
+    }
+   ],
+   "keep_the_established_church": [
+    {
+     "on": "$state",
+     "stat": {
+      "stability": 1
+     }
+    }
+   ]
+  },
+  "missionary_societies": {
+   "found_societies": [
+    {
+     "preachers": {
+      "on": "$sender",
+      "amount": 3,
+      "years": 60
+     }
+    }
+   ],
+   "no_state_support": [
+    {
+     "preachers": {
+      "on": "$sender",
+      "amount": 1,
+      "years": 60
+     }
+    }
+   ]
+  },
+  "court_conversion_islam": {
+   "embrace_islam": [
+    {
+     "religion": {
+      "on": "$ruler",
+      "set": "sunni"
+     }
+    },
+    {
+     "on": "$ruler",
+     "modifier": "muslim_trade_network"
+    }
+   ],
+   "keep_the_old_faith": [
+    {
+     "on": "$ruler",
+     "stat": {
+      "legitimacy": 5
+     }
+    }
+   ]
+  },
+  "court_conversion_christian": {
+   "embrace_christianity": [
+    {
+     "religion": {
+      "on": "$ruler",
+      "set": "protestant"
+     }
+    },
+    {
+     "on": "$ruler",
+     "modifier": "mission_schools"
+    }
+   ],
+   "expel_the_missionaries": [
+    {
+     "set_flag": {
+      "on": "$ruler",
+      "id": "missionary_persecution",
+      "years": 20
+     }
+    },
+    {
+     "on": "$ruler",
+     "stat": {
+      "legitimacy": 5
+     }
+    }
+   ]
+  }
+ },
+ "event_dates": {
+  "princes_adopt_the_reformation": [
+   1525,
+   1563
+  ],
+  "expulsion_of_the_moriscos": [
+   1609,
+   1614
+  ],
+  "altan_khan_and_the_dalai_lama": 1578,
+  "jizya_reimposed": 1679,
+  "raskol_old_believers": [
+   1653,
+   1667
+  ],
+  "revolution_and_the_church": [
+   1790,
+   1802
+  ],
+  "separation_of_church_and_state": [
+   1905,
+   1928
+  ],
+  "missionary_societies": [
+   1792,
+   1914
+  ],
+  "court_conversion_islam": [
+   1460,
+   1605
+  ],
+  "court_conversion_christian": [
+   1815,
+   1869
+  ]
+ },
+ "holy_place_names": {
+  "rome": "Rome",
+  "jerusalem": "Jerusalem",
+  "mecca_medina": "Mecca and Medina",
+  "karbala_najaf": "Karbala and Najaf",
+  "constantinople": "Constantinople",
+  "echmiadzin": "Echmiadzin",
+  "aksum": "Aksum",
+  "varanasi": "Varanasi",
+  "amritsar": "Amritsar",
+  "lhasa": "Lhasa",
+  "temple_of_the_tooth": "Temple of the Tooth",
+  "mount_wutai": "Mount Wutai",
+  "qufu": "Qufu",
+  "santiago": "Santiago de Compostela",
+  "bodh_gaya": "Bodh Gaya",
+  "ise": "Ise"
+ },
+ "holder_names": {
+  "papal_states": "Papal States",
+  "mamluk": "Mamluk Sultanate",
+  "qara_qoyunlu": "Qara Qoyunlu",
+  "byzantium": "Byzantium",
+  "ethiopia": "Ethiopia",
+  "jaunpur": "Jaunpur",
+  "tibet": "Tibet",
+  "kotte": "Kotte",
+  "ming": "Ming",
+  "japan": "Japan",
+  "castile": "Castile"
+ },
+ "lens": {
+  "$comment": "religion §12",
+  "world": {
+   "colour_by": "majority faith",
+   "hatched_at_community_share": 0.3,
+   "holy_place_icons": true
+  },
+  "region": {
+   "houses": "town sprites",
+   "preachers": "walking figures",
+   "waves": "spreading tint"
+  },
+  "local": {
+   "faith_line_with_pulls": true
+  }
+ },
+ "catalogue_minorities_not_faiths": [
+  "Yazidi",
+  "Druze",
+  "Zoroastrian"
+ ]
+}

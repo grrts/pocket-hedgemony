@@ -1,0 +1,354 @@
+{
+  "$comment": "Map presentation (domain/map-presentation/spec.md). Layout numbers from screen-flow §4.3, §7 (placeholders for the interface config); lens list from province-stats §14 as amended by trade, diplomacy, naval, buildings, subjects and revolutions (OQ-VIEW-2); budgets from performance.md; performance knobs and their phone defaults from settings v2 §3.1, §5.1, §7. Playback speed lives in troop-movement.json (replaySecondsPer10Days).",
+  "zoomLevels": [
+    "World",
+    "Region",
+    "Local"
+  ],
+  "zoomAliases": {
+    "Province": "Local",
+    "middle": "Region",
+    "close": "Local",
+    "zoomed out": "World",
+    "far": "World",
+    "regional": "Region"
+  },
+  "artPixelsPerMapPixel": {
+    "Region": 4,
+    "Local": 8
+  },
+  "worldZoomShading": {
+    "land": "terrain colour with hill shading, owner colour washed over",
+    "sea": "shaded by depth with dithered band edges"
+  },
+  "border": {
+    "line": "ink",
+    "inside": "band of the owner's colour"
+  },
+  "highContrastBorder": {
+    "colours": [
+      "black",
+      "white"
+    ],
+    "widthArtPixels": 2
+  },
+  "worshipSprites": {
+    "church": "spire",
+    "mosque": "dome",
+    "gurdwara": "gurdwara dome"
+  },
+  "traderIcons": {
+    "land": "caravan",
+    "river": "barge",
+    "sea": "ship"
+  },
+  "lenses": [
+    {
+      "id": "Food",
+      "context": "province",
+      "stat": "food"
+    },
+    {
+      "id": "Tax reaching you",
+      "context": "province",
+      "stat": "tax reaching you"
+    },
+    {
+      "id": "Days to capital",
+      "context": "province",
+      "stat": "days to capital"
+    },
+    {
+      "id": "Grievances",
+      "context": "province",
+      "stat": "grievances"
+    },
+    {
+      "id": "Faith",
+      "context": "religion",
+      "stat": "majority faith"
+    },
+    {
+      "id": "Tongue",
+      "context": "culture",
+      "stat": "tongue"
+    },
+    {
+      "id": "Ground",
+      "context": "province",
+      "stat": "ground"
+    },
+    {
+      "id": "Recruits",
+      "context": "province",
+      "stat": "recruits"
+    },
+    {
+      "id": "Trade ratio",
+      "context": "trade",
+      "stat": "trade ratio"
+    },
+    {
+      "id": "Trade value",
+      "context": "trade",
+      "stat": "trade value"
+    },
+    {
+      "id": "Traders",
+      "context": "trade",
+      "stat": "your traders"
+    },
+    {
+      "id": "Diplomacy",
+      "context": "diplomacy",
+      "stat": "relation to you"
+    },
+    {
+      "id": "Sea",
+      "context": "naval",
+      "stat": "sailors who can still be called"
+    },
+    {
+      "id": "Works",
+      "context": "buildings",
+      "stat": "building trouble"
+    },
+    {
+      "id": "Jobs",
+      "context": "buildings",
+      "stat": "empty job slots against homeless"
+    },
+    {
+      "id": "Subjects",
+      "context": "subjects",
+      "stat": "subject loyalty"
+    },
+    {
+      "id": "Revolution",
+      "context": "revolutions",
+      "stat": "revolution signs met"
+    }
+  ],
+  "todaysLenses": [
+    "Realms",
+    "Terrain",
+    "People",
+    "Wealth",
+    "Walls",
+    "Food"
+  ],
+  "faithHatchShare": 0.3,
+  "diplomacyColours": {
+    "you": "own colour",
+    "subject": "own colour",
+    "ally": "blue",
+    "pledged": "light blue",
+    "Close": "green",
+    "Warm": "pale green",
+    "Cool": "grey",
+    "nothing recorded": "grey",
+    "Cold": "orange",
+    "Rival": "orange",
+    "Hostile": "red",
+    "Bitter": "red",
+    "at war": "red"
+  },
+  "leagueAgainstYouBorder": "red",
+  "worksColours": {
+    "building site": "green",
+    "neglected": "amber",
+    "damaged": "amber",
+    "ruined": "red"
+  },
+  "lensPatterns": [
+    "hatching",
+    "dots",
+    "stripes"
+  ],
+  "colourVision": {
+    "Default": {
+      "nationColours": "normal assignment",
+      "ramp": "normal"
+    },
+    "Red-weak": {
+      "nationColours": "second assignment",
+      "ramp": "blue to orange"
+    },
+    "Green-weak": {
+      "nationColours": "second assignment",
+      "ramp": "blue to orange"
+    },
+    "Blue-weak": {
+      "nationColours": "second assignment",
+      "ramp": "blue to orange"
+    },
+    "No colour": {
+      "nationColours": "greys",
+      "ramp": "greys with patterns"
+    }
+  },
+  "nationPaletteSize": 32,
+  "routeFoodPatterns": {
+    "green": "solid",
+    "yellow": "dashed",
+    "red": "dotted"
+  },
+  "dayCountMinPoints": 10,
+  "playback": {
+    "battlePauseSeconds": 0.5,
+    "castleStopRing": "red",
+    "battleMark": "crossed swords"
+  },
+  "turnStrip": {
+    "afterSeconds": 1.5,
+    "text": "The courts of Europe deliberate…"
+  },
+  "layout": {
+    "shortWideMaxHeight": 500,
+    "cardPhoneWidthShare": 0.45,
+    "cardTallHeightShare": 0.55,
+    "cardLargeWidth": 380,
+    "steamDeck": {
+      "width": 1280,
+      "height": 800
+    },
+    "farBodyTextShare": 0.0333333333,
+    "farOverscanShare": 0.05,
+    "tapTarget": {
+      "Normal": 44,
+      "Large": 56
+    },
+    "tapGap": 8,
+    "portraitNotice": "Turn your phone sideways",
+    "topBarMaxPlaquesPhone": 5
+  },
+  "budgets": [
+    {
+      "measure": "frame rate while panning and zooming",
+      "limit": 60,
+      "unit": "fps",
+      "bound": "min",
+      "checkedBy": "perf"
+    },
+    {
+      "measure": "overlay time per frame, average",
+      "limit": 2.5,
+      "unit": "ms",
+      "bound": "max",
+      "checkedBy": "perf"
+    },
+    {
+      "measure": "overlay time per frame, 95th percentile",
+      "limit": 5,
+      "unit": "ms",
+      "bound": "max",
+      "checkedBy": "perf"
+    },
+    {
+      "measure": "longest main-thread task while playing",
+      "limit": 50,
+      "unit": "ms",
+      "bound": "max",
+      "checkedBy": "perf"
+    },
+    {
+      "measure": "frames redrawn while armies march",
+      "limit": 90,
+      "unit": "%",
+      "bound": "min",
+      "checkedBy": "perf"
+    },
+    {
+      "measure": "engine turn, 5000 provinces and 500 nations",
+      "limit": 25,
+      "unit": "ms",
+      "bound": "max",
+      "checkedBy": "bench"
+    },
+    {
+      "measure": "engine turn, 20000 provinces and 2000 nations",
+      "limit": 100,
+      "unit": "ms",
+      "bound": "max",
+      "checkedBy": "bench"
+    },
+    {
+      "measure": "worker answer after End turn",
+      "limit": 250,
+      "unit": "ms",
+      "bound": "max",
+      "checkedBy": "perf"
+    },
+    {
+      "measure": "applying the answer on the main thread",
+      "limit": 16,
+      "unit": "ms",
+      "bound": "max",
+      "checkedBy": "perf"
+    },
+    {
+      "measure": "slowest route plan, 5000 provinces",
+      "limit": 8,
+      "unit": "ms",
+      "bound": "max",
+      "checkedBy": "bench"
+    },
+    {
+      "measure": "slowest route plan, 20000 provinces",
+      "limit": 32,
+      "unit": "ms",
+      "bound": "max",
+      "checkedBy": "bench"
+    }
+  ],
+  "frameMs": 16.7,
+  "knobs": {
+    "Sharpness": {
+      "Battery": 1,
+      "Balanced": 2,
+      "Native": 3
+    },
+    "Frame rate cap": [
+      30,
+      60,
+      120,
+      "Display rate"
+    ],
+    "Map detail": {
+      "Low": {
+        "closeInArtPixels": 4,
+        "without": [
+          "8 × 8 close-in tiles",
+          "surf",
+          "forest blending"
+        ]
+      },
+      "Medium": {
+        "closeInArtPixels": 8,
+        "water": "still"
+      },
+      "High": {
+        "closeInArtPixels": 8,
+        "everything": true
+      }
+    },
+    "Animations": {
+      "Full": "full motion",
+      "Reduced": "reduced motion",
+      "Off": "still frames"
+    }
+  },
+  "phoneDefaults": {
+    "Sharpness": "Balanced",
+    "Frame rate cap": 60,
+    "Map detail": "Medium",
+    "Animations": "Full"
+  },
+  "batterySaver": {
+    "Frame rate cap": 30,
+    "Sharpness": "Battery",
+    "Animations": "Reduced",
+    "redraw": "only on change",
+    "aiWorkerBudget": "smaller"
+  }
+}

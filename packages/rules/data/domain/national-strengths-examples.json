@@ -1,0 +1,7147 @@
+{
+ "$comment": "Small extracts for examples and scenarios: heritage of a few countries from national-strengths/build/heritage-all.json (authored merged over generated), trimmed catalogue records (only the fields archetype generation reads) from country-catalogue/build/catalogue.json, and the event links they use.",
+ "heritage": {
+  "portugal": {
+   "id": "portugal",
+   "authored": true,
+   "archetype": "maritime_realm",
+   "secondary_archetype": "mountain_folk",
+   "birthright": {
+    "id": "portugal_sagres_pilots",
+    "name": "Sagres pilots",
+    "text": "Ships build 15 % faster, storms sink a third fewer, sea crossings take 10 % fewer days; ports raise 20 % more sailors and fisheries feed 20 % more.",
+    "why": "Under Prince Henry, pilots from Lagos near Sagres charted Madeira, the Azores and the coast past Bojador (1434) and Arguin (1443); the kingdom lived from fishing, salt and the sea.",
+    "needs": {
+     "coastal": {
+      "who": "this",
+      "sea": "atlantic"
+     }
+    },
+    "effects": [
+     {
+      "lever": "ship_build_pct",
+      "value": -15
+     },
+     {
+      "lever": "storm_loss_pct",
+      "value": -30
+     },
+     {
+      "lever": "sea_days_pct",
+      "value": -10
+     },
+     {
+      "lever": "crew_pct",
+      "value": 20
+     },
+     {
+      "lever": "fish_pct",
+      "value": 20
+     }
+    ]
+   },
+   "heydays": [
+    {
+     "id": "portugal_carreira_da_india",
+     "name": "Carreira da Índia",
+     "age": "age_of_exploration",
+     "text": "Traders on sea routes gather 30 % more; harbours cost a quarter less; customs officers on the coast are 20 % stronger.",
+     "why": "The catalogue's 'route to India' path: the Cape rounded in 1488 and India reached in 1498, after which Lisbon's crown fleets ran the yearly India voyage.",
+     "wakes": {
+      "all": [
+       {
+        "coastal": {
+         "who": "this",
+         "sea": "atlantic"
+        }
+       },
+       {
+        "knows": {
+         "who": "this",
+         "invention": "S4"
+        }
+       }
+      ]
+     },
+     "effects": [
+      {
+       "lever": "trader_gain_pct",
+       "value": 30,
+       "route_kind": "sea"
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -25,
+       "building": "harbour"
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 20,
+       "type": "customs_officer",
+       "where": "coast"
+      }
+     ],
+     "mark": {
+      "name": "Cape charts",
+      "text": "Sea crossings take 10 % fewer days and sea traders gather 5 % more.",
+      "effects": [
+       {
+        "lever": "sea_days_pct",
+        "value": -10
+       },
+       {
+        "lever": "trader_gain_pct",
+        "value": 5,
+        "route_kind": "sea"
+       }
+      ]
+     }
+    },
+    {
+     "id": "portugal_engenhos_of_brazil",
+     "name": "Engenhos of Brazil",
+     "age": "age_of_atlantic_empires",
+     "text": "Sugar output +30 %, plantations cost a quarter less, ports offer 20 % more seafolk jobs, and the coast grows 10 % faster.",
+     "why": "Madeira sugar (from the 1440s) was the model for the Brazilian captaincies and engenhos of the 1500s; inferred from the catalogue's Atlantic-island economy.",
+     "wakes": {
+      "colonial_presence": {
+       "who": "this",
+       "where": "region:brazil",
+       "op": ">=",
+       "value": 2
+      }
+     },
+     "effects": [
+      {
+       "lever": "ware_output_pct",
+       "value": 30,
+       "ware": "sugar"
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -25,
+       "building": "plantation"
+      },
+      {
+       "lever": "class_slots_pct",
+       "value": 20,
+       "class": "seafolk"
+      },
+      {
+       "lever": "growth_pct",
+       "value": 10,
+       "where": "coast"
+      }
+     ]
+    },
+    {
+     "id": "portugal_gold_of_the_gerais",
+     "name": "Gold of the Gerais",
+     "age": "age_of_crisis_and_absolutism",
+     "text": "Gold output +40 %, loans cost 20 % less interest, and masters of works are 20 % stronger.",
+     "why": "The Brazilian gold strikes of the 1690s financed Lisbon's court and building programme into the 1750s (inferred from the catalogue's Atlantic path).",
+     "wakes": {
+      "colonial_presence": {
+       "who": "this",
+       "where": "region:brazil",
+       "op": ">=",
+       "value": 5
+      }
+     },
+     "effects": [
+      {
+       "lever": "ware_output_pct",
+       "value": 40,
+       "ware": "gold"
+      },
+      {
+       "lever": "loan_interest_pct",
+       "value": -20
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 20,
+       "type": "master_of_works"
+      }
+     ]
+    }
+   ],
+   "burden": {
+    "id": "portugal_bread_from_abroad",
+    "name": "Bread from abroad",
+    "text": "Harvests roll one step worse and people grow 5 % slower.",
+    "why": "The catalogue lists a small population and a grain deficit as Portugal's constraints; the kingdom bought wheat from abroad and from Madeira.",
+    "effects": [
+     {
+      "lever": "harvest_steps",
+      "value": -1
+     },
+     {
+      "lever": "growth_pct",
+      "value": -5
+     }
+    ],
+    "shed": {
+     "any": [
+      {
+       "knows": {
+        "who": "this",
+        "invention": "F9"
+       }
+      },
+      {
+       "count": {
+        "who": "this",
+        "thing": "building:granary",
+        "op": ">=",
+        "value": "start+5"
+       }
+      }
+     ]
+    },
+    "shed_text": "Learn Maize, potato and cassava, or build 5 more granaries than you began with.",
+    "turned": {
+     "id": "portugal_island_wheat",
+     "name": "Island wheat",
+     "text": "Stores rot 30 % less; coastal harvests roll one step better; fisheries feed 20 % more.",
+     "effects": [
+      {
+       "lever": "store_rot_pct",
+       "value": -30
+      },
+      {
+       "lever": "harvest_steps",
+       "value": 1,
+       "where": "coast"
+      },
+      {
+       "lever": "fish_pct",
+       "value": 20
+      }
+     ]
+    }
+   },
+   "ambitions": [
+    {
+     "id": "portugal_beyond_the_cape",
+     "name": "Beyond the Cape of Storms",
+     "theme": "sea",
+     "hint": "Where the storms guard the turning of the world.",
+     "text": "Hold Goa or Calicut on the Malabar coast.",
+     "historical": true,
+     "window": [
+      1444,
+      1560
+     ],
+     "stir": {
+      "colonial_presence": {
+       "who": "this",
+       "where": "area:gulf_of_guinea_islands",
+       "op": ">=",
+       "value": 1
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "owns": {
+         "who": "this",
+         "where": "province:goa"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Calicut"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "portugal_estado_da_india",
+      "name": "Estado da Índia",
+      "great": true,
+      "text": "One more trader; customs officers on the coast 20 % stronger; carracks hit 15 % harder; sea traders gather 5 % more.",
+      "effects": [
+       {
+        "lever": "trader_count",
+        "value": 1
+       },
+       {
+        "lever": "official_type_pct",
+        "value": 20,
+        "type": "customs_officer",
+        "where": "coast"
+       },
+       {
+        "lever": "ship_hits_pct",
+        "value": 15,
+        "ship": "carrack"
+       },
+       {
+        "lever": "trader_gain_pct",
+        "value": 5,
+        "route_kind": "sea"
+       }
+      ]
+     }
+    },
+    {
+     "id": "portugal_gold_of_mina",
+     "name": "The gold of Mina",
+     "theme": "wealth",
+     "hint": "Past the river of gold, a castle on the shore.",
+     "text": "Hold Elmina on the Gold Coast.",
+     "historical": true,
+     "window": [
+      1444,
+      1520
+     ],
+     "stir": {
+      "any": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Arguin bank"
+        }
+       },
+       {
+        "colonial_presence": {
+         "who": "this",
+         "where": "region:west_africa",
+         "op": ">=",
+         "value": 1
+        }
+       }
+      ]
+     },
+     "goal": {
+      "owns": {
+       "who": "this",
+       "where": "province:elmina"
+      }
+     },
+     "legacy": {
+      "id": "portugal_casa_da_mina",
+      "name": "Casa da Mina",
+      "text": "Gold output +25 %; tax reaching you from the coast +10 %.",
+      "effects": [
+       {
+        "lever": "ware_output_pct",
+        "value": 25,
+        "ware": "gold"
+       },
+       {
+        "lever": "tax_reach_pct",
+        "value": 10,
+        "where": "coast"
+       }
+      ]
+     }
+    },
+    {
+     "id": "portugal_over_the_strait",
+     "name": "Over the Strait",
+     "theme": "land",
+     "hint": "Ceuta was the first stone; the wall needs three more.",
+     "text": "Hold Ceuta, Tangier and Arzila in Morocco.",
+     "historical": true,
+     "window": [
+      1444,
+      1550
+     ],
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "morocco"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Ceuta"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Tangier"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Arzila"
+        }
+       }
+      ]
+     },
+     "fail": {
+      "event": {
+       "id": "battle_of_alcacer_quibir"
+      }
+     },
+     "legacy": {
+      "id": "portugal_pracas_de_africa",
+      "name": "Praças de África",
+      "text": "Garrisons 20 % stronger; commanders may fight à la jineta.",
+      "effects": [
+       {
+        "lever": "garrison_pct",
+        "value": 20
+       },
+       {
+        "lever": "commander_style",
+        "value": true,
+        "style": "a_la_jineta"
+       }
+      ]
+     }
+    },
+    {
+     "id": "portugal_crown_of_two_seas",
+     "name": "Crown of the two seas",
+     "theme": "crown",
+     "hint": "Aljubarrota's victors may yet sit in Toledo.",
+     "text": "Join Castile to the Portuguese crown in personal union, with Lisbon still independent.",
+     "historical": false,
+     "stir": {
+      "relation": {
+       "who": "this",
+       "other": "castile",
+       "type": "alliance"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "castile",
+         "type": "personal_union"
+        }
+       },
+       {
+        "independent": {
+         "who": "this"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "portugal_two_seas_crown",
+      "name": "Lisbon and Toledo",
+      "text": "Two more lords can be kept without strain; Latin-group subjects take your tongue 30 % faster.",
+      "effects": [
+       {
+        "lever": "lord_capacity",
+        "value": 2
+       },
+       {
+        "lever": "tongue_shift_pct",
+        "value": 30,
+        "where": "culture:latin"
+       }
+      ]
+     }
+    },
+    {
+     "id": "portugal_land_of_the_true_cross",
+     "name": "Land of the True Cross",
+     "theme": "land",
+     "hint": "A red wood on a western shore no one meant to find.",
+     "text": "Hold eight colonies or posts in Brazil.",
+     "historical": true,
+     "window": [
+      1490,
+      1700
+     ],
+     "stir": {
+      "colonial_presence": {
+       "who": "this",
+       "where": "region:brazil",
+       "op": ">=",
+       "value": 1
+      }
+     },
+     "goal": {
+      "colonial_presence": {
+       "who": "this",
+       "where": "region:brazil",
+       "op": ">=",
+       "value": 8
+      }
+     },
+     "legacy": {
+      "id": "portugal_captaincies",
+      "name": "The captaincies",
+      "text": "Coast grows 10 % faster, sugar output +15 %, and 20 % more fleeing farmers choose you.",
+      "effects": [
+       {
+        "lever": "growth_pct",
+        "value": 10,
+        "where": "coast"
+       },
+       {
+        "lever": "ware_output_pct",
+        "value": 15,
+        "ware": "sugar"
+       },
+       {
+        "lever": "migrants_pct",
+        "value": 20,
+        "class": "farmers"
+       }
+      ]
+     }
+    },
+    {
+     "id": "portugal_acclamation",
+     "name": "The acclamation",
+     "theme": "survival",
+     "hint": "Sixty years under another's crown, then a balcony in Lisbon.",
+     "text": "After a union with Spain, win independence again and keep it.",
+     "historical": true,
+     "stir": {
+      "event": {
+       "id": "iberian_union"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "event": {
+         "id": "portuguese_restoration"
+        }
+       },
+       {
+        "independent": {
+         "who": "this"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Lisbon"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "portugal_house_of_braganza",
+      "name": "House of Braganza",
+      "text": "Foreign bribes no longer sway your lords; your homeland resists conquerors 30 % longer.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "foreign_bribes"
+       },
+       {
+        "lever": "homeland_resistance_pct",
+        "value": 30
+       }
+      ]
+     }
+    }
+   ],
+   "source": "west_europe_italy.json"
+  },
+  "venice": {
+   "id": "venice",
+   "authored": true,
+   "archetype": "sea_trading_city",
+   "secondary_archetype": "maritime_realm",
+   "birthright": {
+    "id": "venice_lagoon_and_arsenal",
+    "name": "Lagoon and Arsenal",
+    "text": "Galleys build 30 % faster, the capital's garrison is 40 % stronger, and ports raise 15 % more sailors.",
+    "why": "The Arsenal was the state shipyard producing galleys, and the catalogue notes that the lagoon made the capital nearly impregnable.",
+    "needs": {
+     "holds_place": {
+      "who": "this",
+      "place": "Venice"
+     }
+    },
+    "effects": [
+     {
+      "lever": "ship_build_pct",
+      "value": -30,
+      "ship": "galley"
+     },
+     {
+      "lever": "garrison_pct",
+      "value": 40,
+      "where": "capital"
+     },
+     {
+      "lever": "crew_pct",
+      "value": 15
+     }
+    ]
+   },
+   "heydays": [
+    {
+     "id": "venice_mude_to_alexandria",
+     "name": "The mude to Alexandria",
+     "age": "age_of_gunpowder_empires",
+     "text": "Sea traders gather 25 % more and customs officers are 30 % stronger.",
+     "why": "State galley convoys (mude) sailed to Alexandria, Beirut, Constantinople, Flanders and England, giving Venice the spice trade.",
+     "wakes": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Venice"
+        }
+       },
+       {
+        "not": {
+         "at_war": {
+          "who": "this",
+          "other": "mamluk"
+         }
+        }
+       }
+      ]
+     },
+     "effects": [
+      {
+       "lever": "trader_gain_pct",
+       "value": 25,
+       "route_kind": "sea"
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 30,
+       "type": "customs_officer"
+      }
+     ],
+     "mark": {
+      "name": "Fondaco dei Tedeschi",
+      "text": "Sea traders gather 5 % more.",
+      "effects": [
+       {
+        "lever": "trader_gain_pct",
+        "value": 5,
+        "route_kind": "sea"
+       }
+      ]
+     }
+    },
+    {
+     "id": "venice_aldine_presses",
+     "name": "Aldine presses",
+     "age": "age_of_exploration",
+     "text": "Book output +40 % and presses cost a quarter less.",
+     "why": "Inferred: Venice's capital, paper trade and scholars from Padua made it Europe's largest printing centre around 1500.",
+     "wakes": {
+      "knows": {
+       "who": "this",
+       "invention": "L5"
+      }
+     },
+     "effects": [
+      {
+       "lever": "ware_output_pct",
+       "value": 40,
+       "ware": "books"
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -25,
+       "building": "press"
+      }
+     ]
+    },
+    {
+     "id": "venice_morosini_galleys",
+     "name": "Morosini's galleys",
+     "age": "age_of_crisis_and_absolutism",
+     "text": "At war with the Ottomans: galleys hit 20 % harder, sieges 15 % faster, prizes and ransoms bring 30 % more gold.",
+     "why": "Inferred from the catalogue's Ottoman-Venetian war path: Venice fought the Ottomans for its Levant holdings for two centuries.",
+     "wakes": {
+      "at_war": {
+       "who": "this",
+       "other": "ottoman"
+      }
+     },
+     "effects": [
+      {
+       "lever": "ship_hits_pct",
+       "value": 20,
+       "ship": "galley"
+      },
+      {
+       "lever": "siege_pct",
+       "value": 15
+      },
+      {
+       "lever": "loot_pct",
+       "value": 30
+      }
+     ]
+    }
+   ],
+   "burden": {
+    "id": "venice_feared_lion",
+    "name": "The feared lion",
+    "text": "Each province you seize counts 25 % more toward Lands taken, and hired companies cost 20 % more.",
+    "why": "The catalogue lists coalitions fearing Venetian hegemony and dependence on mercenary commanders as Venice's constraints.",
+    "effects": [
+     {
+      "lever": "lands_taken_pct",
+      "value": 25
+     },
+     {
+      "lever": "hired_company_cost_pct",
+      "value": 20
+     }
+    ],
+    "shed": {
+     "all": [
+      {
+       "count": {
+        "who": "this",
+        "thing": "allies",
+        "op": ">=",
+        "value": 3
+       }
+      },
+      {
+       "stat": {
+        "who": "this",
+        "stat": "stability",
+        "op": ">=",
+        "value": 2
+       }
+      }
+     ]
+    },
+    "shed_text": "Have at least 3 allies and stability of at least 2.",
+    "turned": {
+     "id": "venice_serene_republic",
+     "name": "The Serene Republic",
+     "text": "Broken oaths fade 30 % faster; neighbours think one step better of you.",
+     "effects": [
+      {
+       "lever": "oath_fade_pct",
+       "value": -30
+      },
+      {
+       "lever": "opinion_steps",
+       "value": 1,
+       "of": "neighbours"
+      }
+     ]
+    }
+   },
+   "ambitions": [
+    {
+     "id": "venice_queen_caterinas_gift",
+     "name": "Queen Caterina's gift",
+     "theme": "sea",
+     "hint": "A patrician's daughter marries a king of an island of sugar.",
+     "text": "Hold Cyprus.",
+     "historical": true,
+     "window": [
+      1444,
+      1570
+     ],
+     "stir": {
+      "any": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "cyprus",
+         "type": "alliance"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "cyprus",
+         "type": "trade_pact"
+        }
+       }
+      ]
+     },
+     "goal": {
+      "holds_place": {
+       "who": "this",
+       "place": "Cyprus"
+      }
+     },
+     "legacy": {
+      "id": "venice_kingdom_of_cyprus",
+      "name": "Kingdom of Cyprus",
+      "text": "Sugar output +20 %; trade profit on Cyprus +40 %.",
+      "effects": [
+       {
+        "lever": "ware_output_pct",
+        "value": 20,
+        "ware": "sugar"
+       },
+       {
+        "lever": "trade_balance_pct",
+        "value": 40,
+        "where": "place:Cyprus"
+       }
+      ]
+     }
+    },
+    {
+     "id": "venice_lion_on_the_adda",
+     "name": "A lion on the Adda",
+     "theme": "land",
+     "hint": "The Visconti line is ending; the river is a border only by habit.",
+     "text": "Hold Bergamo, Brescia and Crema.",
+     "historical": true,
+     "window": [
+      1444,
+      1520
+     ],
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "milan"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Bergamo"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Brescia"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Crema"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "venice_provveditori",
+      "name": "Provveditori in the field",
+      "text": "Wardens 30 % stronger; garrisons 10 % stronger.",
+      "effects": [
+       {
+        "lever": "official_type_pct",
+        "value": 30,
+        "type": "warden"
+       },
+       {
+        "lever": "garrison_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    {
+     "id": "venice_doges_oldest_debt",
+     "name": "The doge's oldest debt",
+     "theme": "sea",
+     "hint": "Chioggia was a lifetime ago, but the lagoon remembers.",
+     "text": "Make Genoa your subject, or see it gone from the map.",
+     "historical": false,
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "genoa"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "genoa",
+         "type": "overlord"
+        }
+       },
+       {
+        "not": {
+         "exists": {
+          "who": "genoa"
+         }
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "venice_queen_of_the_seas",
+      "name": "Queen of the seas",
+      "great": true,
+      "text": "One more trader, ships hit 15 % harder, ports raise 10 % more sailors, and sea crossings take 10 % fewer days.",
+      "effects": [
+       {
+        "lever": "trader_count",
+        "value": 1
+       },
+       {
+        "lever": "ship_hits_pct",
+        "value": 15
+       },
+       {
+        "lever": "crew_pct",
+        "value": 10
+       },
+       {
+        "lever": "sea_days_pct",
+        "value": -10
+       }
+      ]
+     }
+    },
+    {
+     "id": "venice_kingdom_of_the_morea",
+     "name": "Kingdom of the Morea",
+     "theme": "land",
+     "hint": "Coron and Modon were the eyes of the Republic.",
+     "text": "Own the Morea.",
+     "historical": true,
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "ottoman"
+      }
+     },
+     "goal": {
+      "owns": {
+       "who": "this",
+       "where": "area:morea"
+      }
+     },
+     "legacy": {
+      "id": "venice_morean_fortresses",
+      "name": "Morean fortresses",
+      "text": "Each castle feeds one more ring of provinces; Foreign rule fades 20 % faster.",
+      "effects": [
+       {
+        "lever": "castle_reach_rings",
+        "value": 1
+       },
+       {
+        "lever": "integration_years_pct",
+        "value": -20
+       }
+      ]
+     }
+    },
+    {
+     "id": "venice_pepper_another_road",
+     "name": "Pepper by another road",
+     "theme": "trade",
+     "hint": "Portuguese sails round Africa; the Senate looks at a map of Suez.",
+     "text": "Hold a fifth of the trade power in the Red Sea.",
+     "historical": false,
+     "stir": {
+      "event": {
+       "id": "portuguese_cape_route"
+      }
+     },
+     "goal": {
+      "trade_presence": {
+       "who": "this",
+       "hub": "red_sea",
+       "op": ">=",
+       "value": 0.2
+      }
+     },
+     "legacy": {
+      "id": "venice_cut_at_suez",
+      "name": "Cut at Suez",
+      "text": "Sea traders gather 10 % more, sea crossings 10 % shorter, and 20 % more traders pass your coast.",
+      "effects": [
+       {
+        "lever": "trader_gain_pct",
+        "value": 10,
+        "route_kind": "sea"
+       },
+       {
+        "lever": "sea_days_pct",
+        "value": -10
+       },
+       {
+        "lever": "traders_passing_pct",
+        "value": 20,
+        "where": "coast"
+       }
+      ]
+     }
+    },
+    {
+     "id": "venice_after_cambrai",
+     "name": "After Cambrai",
+     "theme": "survival",
+     "hint": "Pope, emperor and king have signed a league to share you.",
+     "text": "Be independent in 1520 or later, owning half of Lombardy and the Veneto.",
+     "historical": true,
+     "window": [
+      1444,
+      1540
+     ],
+     "stir": {
+      "event": {
+       "id": "italian_wars"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "date": {
+         "min": 1520
+        }
+       },
+       {
+        "independent": {
+         "who": "this"
+        }
+       },
+       {
+        "owns": {
+         "who": "this",
+         "where": "area:lombardy_venetia",
+         "min_share": 0.5
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "venice_cernide",
+      "name": "Cernide",
+      "text": "Recruits refill 15 % faster; your homeland resists conquerors 30 % longer.",
+      "effects": [
+       {
+        "lever": "recruit_refill_pct",
+        "value": 15
+       },
+       {
+        "lever": "homeland_resistance_pct",
+        "value": 30
+       }
+      ]
+     }
+    }
+   ],
+   "source": "west_europe_italy.json"
+  },
+  "kongo": {
+   "id": "kongo",
+   "authored": true,
+   "archetype": "river_kingdom",
+   "secondary_archetype": "mountain_folk",
+   "birthright": {
+    "id": "kongo_nzimbu_shell_money",
+    "name": "Nzimbu shell money",
+    "text": "Tax reaching you +15 %, tribute +30 %, and raffia cloth output +20 %.",
+    "why": "The king's governors collected tribute in raffia cloth, food and nzimbu shells from Luanda island (royal control attested from the 16th century, probably older).",
+    "needs": {
+     "holds_place": {
+      "who": "this",
+      "place": "Mbanza Kongo"
+     }
+    },
+    "effects": [
+     {
+      "lever": "tax_reach_pct",
+      "value": 15
+     },
+     {
+      "lever": "tribute_pct",
+      "value": 30
+     },
+     {
+      "lever": "ware_output_pct",
+      "value": 20,
+      "ware": "cloth"
+     }
+    ]
+   },
+   "heydays": [
+    {
+     "id": "kongo_afonsos_church",
+     "name": "Afonso's church",
+     "age": "age_of_exploration",
+     "text": "School seats +30 %, faith spreads 25 % faster, one more envoy, legitimacy +5.",
+     "why": "Nzinga a Nkuwu was baptised in 1491 and Afonso I built a Kongolese Catholic church, schools and embassies to Lisbon and Rome (event-tree kongo_christianization).",
+     "wakes": {
+      "all": [
+       {
+        "event": {
+         "id": "kongo_christianization"
+        }
+       },
+       {
+        "religion": {
+         "who": "this",
+         "is": "catholic"
+        }
+       }
+      ]
+     },
+     "effects": [
+      {
+       "lever": "school_seats_pct",
+       "value": 30
+      },
+      {
+       "lever": "faith_shift_pct",
+       "value": 25
+      },
+      {
+       "lever": "envoy_count",
+       "value": 1
+      },
+      {
+       "lever": "stat",
+       "value": 5,
+       "stat": "legitimacy"
+      }
+     ],
+     "mark": {
+      "name": "Letters to Rome",
+      "text": "School seats +15 %.",
+      "effects": [
+       {
+        "lever": "school_seats_pct",
+        "value": 15
+       }
+      ]
+     }
+    },
+    {
+     "id": "kongo_garcias_dutch_league",
+     "name": "Garcia II's Dutch league",
+     "age": "age_of_crisis_and_absolutism",
+     "text": "Musketeers hit 25 % harder, homeland resists conquerors 30 % longer, sea traders gather 15 % more.",
+     "why": "The catalogue's adaptation is to seek an alliance with a maritime partner; in the 1640s Kongo allied with the Dutch against Portuguese Luanda (inferred from regional history).",
+     "wakes": {
+      "any": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "dutch_republic",
+         "type": "alliance"
+        }
+       },
+       {
+        "at_war": {
+         "who": "this",
+         "other": "portugal"
+        }
+       }
+      ]
+     },
+     "effects": [
+      {
+       "lever": "hits_pct",
+       "value": 25,
+       "arm": "musketeers"
+      },
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 30
+      },
+      {
+       "lever": "trader_gain_pct",
+       "value": 15,
+       "route_kind": "sea"
+      }
+     ]
+    }
+   ],
+   "burden": {
+    "id": "kongo_contested_succession",
+    "name": "Contested succession",
+    "text": "Lords start one step less loyal, and legitimacy -10.",
+    "why": "Kingship passed among descendants of the founder chosen by electors; the catalogue lists contested successions as the first constraint and succession civil war as a failure condition.",
+    "effects": [
+     {
+      "lever": "lord_loyalty_start_steps",
+      "value": -1
+     },
+     {
+      "lever": "stat",
+      "value": -10,
+      "stat": "legitimacy"
+     }
+    ],
+    "shed": {
+     "all": [
+      {
+       "count": {
+        "who": "this",
+        "thing": "loyal_lords",
+        "op": ">=",
+        "value": "start+2"
+       }
+      },
+      {
+       "not": {
+        "rebels_active": {
+         "who": "this",
+         "type": "noble"
+        }
+       }
+      },
+      {
+       "knows": {
+        "who": "this",
+        "invention": "G1"
+       }
+      }
+     ]
+    },
+    "shed_text": "Have 2 more loyal lords than you began with, no noble revolt, and learn Written law codes.",
+    "turned": {
+     "id": "kongo_settled_succession",
+     "name": "Settled succession",
+     "text": "A new ruler or a disputed heir no longer lowers lords' loyalty.",
+     "effects": [
+      {
+       "lever": "lord_loyalty_shield",
+       "value": true,
+       "cause": "new_ruler"
+      },
+      {
+       "lever": "lord_loyalty_shield",
+       "value": true,
+       "cause": "disputed_heir"
+      }
+     ]
+    }
+   },
+   "ambitions": [
+    {
+     "id": "kongo_strangers_from_the_sea",
+     "name": "Strangers from the sea",
+     "theme": "crown",
+     "hint": "White sails at the mouth of the Nzadi bring gifts and a new god.",
+     "text": "Ally with Portugal.",
+     "historical": true,
+     "window": [
+      1470,
+      1560
+     ],
+     "stir": {
+      "event": {
+       "id": "portuguese_elmina"
+      }
+     },
+     "goal": {
+      "relation": {
+       "who": "this",
+       "other": "portugal",
+       "type": "alliance"
+      }
+     },
+     "legacy": {
+      "id": "kongo_sao_salvador",
+      "name": "São Salvador",
+      "text": "Legitimacy +10; Catholic lands think one step better of you.",
+      "effects": [
+       {
+        "lever": "stat",
+        "value": 10,
+        "stat": "legitimacy"
+       },
+       {
+        "lever": "opinion_steps",
+        "value": 1,
+        "of": "faith:catholic"
+       }
+      ]
+     }
+    },
+    {
+     "id": "kongo_lord_of_angola",
+     "name": "Lord of the Mbundu",
+     "theme": "land",
+     "hint": "South of the Dande the chiefs pay when they must.",
+     "text": "Hold half of northern Angola.",
+     "historical": true,
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "mbundu_chiefdoms"
+      }
+     },
+     "goal": {
+      "owns": {
+       "who": "this",
+       "where": "area:northern_angola",
+       "min_share": 0.5
+      }
+     },
+     "legacy": {
+      "id": "kongo_mbundu_tribute",
+      "name": "Mbundu tribute",
+      "text": "Tribute +25 %; seized land alarms 15 % less.",
+      "effects": [
+       {
+        "lever": "tribute_pct",
+        "value": 25
+       },
+       {
+        "lever": "lands_taken_pct",
+        "value": -15
+       }
+      ]
+     }
+    },
+    {
+     "id": "kongo_masters_of_the_pool",
+     "name": "Masters of the Pool",
+     "theme": "trade",
+     "hint": "Where the great river widens into a lake, the Tio take the tolls.",
+     "text": "Make the Tio your subject, or end them.",
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "tio"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "relation": {
+         "who": "tio",
+         "other": "this",
+         "type": "subject"
+        }
+       },
+       {
+        "not": {
+         "exists": {
+          "who": "tio"
+         }
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "kongo_canoes_of_the_pool",
+      "name": "Canoes of the Pool",
+      "text": "River traders gather 20 % more; copper output +10 %.",
+      "effects": [
+       {
+        "lever": "trader_gain_pct",
+        "value": 20,
+        "route_kind": "river"
+       },
+       {
+        "lever": "ware_output_pct",
+        "value": 10,
+        "ware": "copper"
+       }
+      ]
+     },
+     "historical": false
+    },
+    {
+     "id": "kongo_mbwila_never_comes",
+     "name": "Mbwila never comes",
+     "theme": "survival",
+     "hint": "The governor in Luanda counts his soldiers and your provinces.",
+     "text": "Hold Mbanza Kongo, independent, in 1680.",
+     "stir": {
+      "event": {
+       "id": "portuguese_luanda_founded"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "date": {
+         "min": 1680
+        }
+       },
+       {
+        "independent": {
+         "who": "this"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Mbanza Kongo"
+        }
+       }
+      ]
+     },
+     "fail": {
+      "event": {
+       "id": "battle_of_mbwila"
+      }
+     },
+     "legacy": {
+      "id": "kongo_kingdom_unbroken",
+      "name": "The kingdom unbroken",
+      "great": true,
+      "text": "Homeland resists 40 % longer; lost wars no longer shake lords; garrisons +15 %.",
+      "effects": [
+       {
+        "lever": "homeland_resistance_pct",
+        "value": 40
+       },
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "lost_wars"
+       },
+       {
+        "lever": "garrison_pct",
+        "value": 15
+       }
+      ]
+     },
+     "historical": false
+    },
+    {
+     "id": "kongo_island_of_shells",
+     "name": "The island of shells",
+     "theme": "wealth",
+     "hint": "Our money grows on an island; strangers want to build a fort there.",
+     "text": "Own Luanda in 1600.",
+     "historical": true,
+     "stir": {
+      "event": {
+       "id": "portuguese_luanda_founded"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "owns": {
+         "who": "this",
+         "where": "province:luanda"
+        }
+       },
+       {
+        "date": {
+         "min": 1600
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "kongo_royal_fishery",
+      "name": "Royal shell fishery",
+      "text": "Tax reaching you +10 %; fisheries +20 %; trade profit +5 %.",
+      "effects": [
+       {
+        "lever": "tax_reach_pct",
+        "value": 10
+       },
+       {
+        "lever": "fish_pct",
+        "value": 20
+       },
+       {
+        "lever": "trade_balance_pct",
+        "value": 5
+       }
+      ]
+     }
+    },
+    {
+     "id": "kongo_return_to_vungu",
+     "name": "Return to Vungu",
+     "theme": "crown",
+     "hint": "The founder crossed the river from the north; his heirs could cross back.",
+     "text": "Make Loango and Kakongo your subjects.",
+     "stir": {
+      "any": [
+       {
+        "at_war": {
+         "who": "this",
+         "other": "loango"
+        }
+       },
+       {
+        "at_war": {
+         "who": "this",
+         "other": "kakongo"
+        }
+       },
+       {
+        "relation": {
+         "who": "kakongo",
+         "other": "this",
+         "type": "subject"
+        }
+       }
+      ]
+     },
+     "goal": {
+      "all": [
+       {
+        "relation": {
+         "who": "loango",
+         "other": "this",
+         "type": "subject"
+        }
+       },
+       {
+        "relation": {
+         "who": "kakongo",
+         "other": "this",
+         "type": "subject"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "kongo_house_of_both_banks",
+      "name": "House of both banks",
+      "text": "Bantu lands think one step better of you; sea traders gather 10 % more.",
+      "effects": [
+       {
+        "lever": "opinion_steps",
+        "value": 1,
+        "of": "culture:bantu"
+       },
+       {
+        "lever": "trader_gain_pct",
+        "value": 10,
+        "route_kind": "sea"
+       }
+      ]
+     },
+     "historical": false
+    },
+    {
+     "id": "kongo_royal_schools",
+     "name": "Royal schools",
+     "theme": "learning",
+     "hint": "Noble sons learn letters, and letters reach Lisbon and Rome.",
+     "text": "Keep 3 schools.",
+     "historical": true,
+     "stir": {
+      "event": {
+       "id": "kongo_christianization"
+      }
+     },
+     "goal": {
+      "count": {
+       "who": "this",
+       "thing": "schools",
+       "op": ">=",
+       "value": 3
+      }
+     },
+     "legacy": {
+      "id": "kongo_lettered_nobility",
+      "name": "Lettered nobility",
+      "text": "Schoolmasters +30 %; +1 official supported.",
+      "effects": [
+       {
+        "lever": "official_type_pct",
+        "value": 30,
+        "type": "schoolmaster"
+       },
+       {
+        "lever": "official_capacity",
+        "value": 1
+       }
+      ]
+     }
+    }
+   ],
+   "source": "south_asia_africa.json"
+  },
+  "poland": {
+   "id": "poland",
+   "authored": true,
+   "archetype": "feudal_realm",
+   "secondary_archetype": null,
+   "birthright": {
+    "id": "poland_wieliczka_salt",
+    "name": "Salt of Wieliczka, grain of the Vistula",
+    "text": "Salt output +40 % and grain output +25 %.",
+    "why": "The royal salt mines of Wieliczka and Bochnia were a main source of crown revenue, and Poland's farmland fed a growing grain export down the Vistula.",
+    "effects": [
+     {
+      "lever": "ware_output_pct",
+      "value": 40,
+      "ware": "salt"
+     },
+     {
+      "lever": "ware_output_pct",
+      "value": 25,
+      "ware": "grain"
+     }
+    ]
+   },
+   "heydays": [
+    {
+     "id": "poland_vistula_grain_boom",
+     "name": "Rafts to Danzig",
+     "age": "age_of_exploration",
+     "text": "River traders gather a quarter more, granaries cost 30 % less, and farmers' job slots +15 %.",
+     "why": "The catalogue names the Vistula grain and timber route to Danzig as Poland's chief trade, held back only by the Order's control of the river mouth.",
+     "wakes": {
+      "holds_place": {
+       "who": "this",
+       "place": "Danzig"
+      }
+     },
+     "effects": [
+      {
+       "lever": "trader_gain_pct",
+       "value": 25,
+       "route_kind": "river"
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -30,
+       "building": "granary"
+      },
+      {
+       "lever": "class_slots_pct",
+       "value": 15,
+       "class": "farmers"
+      }
+     ]
+    },
+    {
+     "id": "poland_confederation_of_warsaw",
+     "name": "A state without stakes",
+     "age": "age_of_reformations",
+     "text": "Wrong faith angers no province, 40 % more fleeing scholars choose you, and schools seat a quarter more.",
+     "why": "Inferred: the 16th-century noble republic guaranteed peace between faiths, building on the catalogue's protected Jewish, Armenian and Orthodox communities and the Kraków university.",
+     "wakes": {
+      "count": {
+       "who": "this",
+       "thing": "loyal_lords",
+       "op": ">=",
+       "value": 4
+      }
+     },
+     "effects": [
+      {
+       "lever": "grievance_shield",
+       "value": true,
+       "grievance": "wrong_faith"
+      },
+      {
+       "lever": "migrants_pct",
+       "value": 40,
+       "class": "scholars"
+      },
+      {
+       "lever": "school_seats_pct",
+       "value": 25
+      }
+     ]
+    },
+    {
+     "id": "poland_winged_hussars",
+     "name": "Winged hussars",
+     "age": "age_of_crisis_and_absolutism",
+     "text": "Commanders may lead the hussar charge, lancers hold 10 points longer, horses bred +25 %.",
+     "why": "Inferred from the catalogue's mass noble cavalry: in the 17th century the Commonwealth's hussars were its decisive arm (Kircholm, Vienna 1683).",
+     "wakes": {
+      "independent": {
+       "who": "this"
+      }
+     },
+     "effects": [
+      {
+       "lever": "commander_style",
+       "value": true,
+       "style": "szarza_husarii"
+      },
+      {
+       "lever": "break_point_pct",
+       "value": 10,
+       "arm": "knights_and_lancers"
+      },
+      {
+       "lever": "horses_pct",
+       "value": 25
+      }
+     ],
+     "mark": {
+      "name": "Hussar studs",
+      "text": "Horses bred +8 %.",
+      "effects": [
+       {
+        "lever": "horses_pct",
+        "value": 8
+       }
+      ]
+     }
+    }
+   ],
+   "burden": {
+    "id": "poland_elected_crown",
+    "name": "The elected crown",
+    "text": "Nothing is granted without the nobles: a tenth of taxes never arrives, and levies serve two months less before pay is due.",
+    "why": "The catalogue names noble consent for taxes and war as Poland's main constraint; the levy was reluctant to serve abroad.",
+    "effects": [
+     {
+      "lever": "tax_reach_pct",
+      "value": -10
+     },
+     {
+      "lever": "levy_free_months",
+      "value": -2
+     }
+    ],
+    "shed": {
+     "all": [
+      {
+       "knows": {
+        "who": "this",
+        "invention": "G14"
+       }
+      },
+      {
+       "independent": {
+        "who": "this"
+       }
+      }
+     ]
+    },
+    "shed_text": "Learn Written constitution while staying independent.",
+    "turned": {
+     "id": "poland_government_law",
+     "name": "Government law",
+     "text": "A tenth more tax reaches you and half a point more troop cap share.",
+     "effects": [
+      {
+       "lever": "tax_reach_pct",
+       "value": 10
+      },
+      {
+       "lever": "troop_cap_share",
+       "value": 0.5
+      }
+     ]
+    }
+   },
+   "ambitions": [
+    {
+     "id": "poland_restore_the_union",
+     "name": "One king for Kraków and Vilnius",
+     "theme": "crown",
+     "hint": "The brother sits in Vilnius; the throne in Kraków is empty.",
+     "text": "Rule Lithuania in personal union.",
+     "historical": true,
+     "window": [
+      1444,
+      1480
+     ],
+     "stir": {
+      "relation": {
+       "who": "this",
+       "other": "lithuania",
+       "type": "alliance"
+      }
+     },
+     "goal": {
+      "relation": {
+       "who": "this",
+       "other": "lithuania",
+       "type": "personal_union"
+      }
+     },
+     "legacy": {
+      "id": "poland_house_of_jagiello",
+      "name": "House of Jagiełło",
+      "text": "A new ruler no longer costs lords' loyalty, and one more envoy.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "new_ruler"
+       },
+       {
+        "lever": "envoy_count",
+        "value": 1
+       }
+      ]
+     }
+    },
+    {
+     "id": "poland_baltic_outlet",
+     "name": "The river's mouth",
+     "theme": "trade",
+     "hint": "The grain is ours; the harbour is theirs.",
+     "text": "Hold Danzig and Marienburg.",
+     "historical": true,
+     "window": [
+      1444,
+      1520
+     ],
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "teutonic_order"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Danzig"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Marienburg"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "poland_royal_prussia",
+      "name": "Royal Prussia",
+      "great": true,
+      "text": "Customs officers 30 % stronger, one more trader, tolls +10 %.",
+      "effects": [
+       {
+        "lever": "official_type_pct",
+        "value": 30,
+        "type": "customs_officer"
+       },
+       {
+        "lever": "trader_count",
+        "value": 1
+       },
+       {
+        "lever": "toll_gold_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    {
+     "id": "poland_union_of_lublin",
+     "name": "One commonwealth",
+     "theme": "land",
+     "hint": "Two crowns, one sejm, one coin.",
+     "text": "Bind Lithuania into one commonwealth, or hold most of its lands.",
+     "historical": true,
+     "age": "age_of_reformations",
+     "stir": {
+      "relation": {
+       "who": "this",
+       "other": "lithuania",
+       "type": "personal_union"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "event": {
+         "id": "union_of_lublin"
+        }
+       },
+       {
+        "owns": {
+         "who": "this",
+         "where": "area:lithuania",
+         "min_share": 0.8
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "poland_sejm_of_two_nations",
+      "name": "Sejm of two nations",
+      "text": "Two more lords before strain, and Foreign rule fades a quarter faster.",
+      "effects": [
+       {
+        "lever": "lord_capacity",
+        "value": 2
+       },
+       {
+        "lever": "integration_years_pct",
+        "value": -25
+       }
+      ]
+     }
+    },
+    {
+     "id": "poland_black_sea_port",
+     "name": "A port on the Black Sea",
+     "theme": "trade",
+     "hint": "From Lwów the road runs down to Akkerman.",
+     "text": "Hold Lwów and a harbour on the Black Sea.",
+     "historical": false,
+     "stir": {
+      "any": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "moldavia",
+         "type": "overlord"
+        }
+       },
+       {
+        "at_war": {
+         "who": "this",
+         "other": "ottoman"
+        }
+       }
+      ]
+     },
+     "goal": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Lwów"
+        }
+       },
+       {
+        "coastal": {
+         "who": "this",
+         "sea": "black_sea"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "poland_port_of_akkerman",
+      "name": "Road to Akkerman",
+      "text": "Sea traders gather 15 % more and 15 % more traders pass your lands.",
+      "effects": [
+       {
+        "lever": "trader_gain_pct",
+        "value": 15,
+        "route_kind": "sea"
+       },
+       {
+        "lever": "traders_passing_pct",
+        "value": 15
+       }
+      ]
+     }
+    },
+    {
+     "id": "poland_jagiellonian_europe",
+     "name": "Crowns of the house",
+     "theme": "crown",
+     "hint": "Three thrones south of the mountains want a Jagiellon.",
+     "text": "Rule Bohemia and Hungary in personal union.",
+     "historical": false,
+     "stir": {
+      "any": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "bohemia",
+         "type": "personal_union"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "hungary",
+         "type": "personal_union"
+        }
+       }
+      ]
+     },
+     "goal": {
+      "all": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "bohemia",
+         "type": "personal_union"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "hungary",
+         "type": "personal_union"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "poland_crowns_of_the_house",
+      "name": "Crowns of the house",
+      "text": "Prestige +1 and countries of your faith one step friendlier.",
+      "effects": [
+       {
+        "lever": "stat",
+        "value": 1,
+        "stat": "prestige"
+       },
+       {
+        "lever": "opinion_steps",
+        "value": 1,
+        "of": "same_faith"
+       }
+      ]
+     }
+    },
+    {
+     "id": "poland_copernicus_tables",
+     "name": "The sun stands still",
+     "theme": "learning",
+     "hint": "A canon of Frombork moves the earth.",
+     "text": "Know Observatories and have at least ten scholars.",
+     "historical": true,
+     "stir": {
+      "knows": {
+       "who": "this",
+       "invention": "L7"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "knows": {
+         "who": "this",
+         "invention": "L3"
+        }
+       },
+       {
+        "count": {
+         "who": "this",
+         "thing": "scholars",
+         "op": ">=",
+         "value": 10
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "poland_revolutions_of_the_spheres",
+      "name": "Revolutions of the spheres",
+      "text": "Observatories, ocean navigation and the chronometer cost a fifth less; schools seat 10 % more.",
+      "effects": [
+       {
+        "lever": "invention_cost_pct",
+        "value": -20,
+        "inventions": [
+         "L3",
+         "S5",
+         "S11"
+        ]
+       },
+       {
+        "lever": "school_seats_pct",
+        "value": 10
+       }
+      ]
+     }
+    }
+   ],
+   "source": "central_east_europe.json"
+  },
+  "castile": {
+   "id": "castile",
+   "authored": true,
+   "archetype": "maritime_realm",
+   "secondary_archetype": "mountain_folk",
+   "birthright": {
+    "id": "castile_mesta_and_jinetes",
+    "name": "Mesta and jinetes",
+    "text": "Herds grow 25 % faster and wool output is 25 % higher; commanders may fight à la jineta.",
+    "why": "Transhumant Mesta flocks and merino wool via Burgos were Castile's wealth, and the Granadan frontier bred light horse (jinetes) that won La Higueruela in 1431.",
+    "effects": [
+     {
+      "lever": "herd_growth_pct",
+      "value": 25
+     },
+     {
+      "lever": "ware_output_pct",
+      "value": 25,
+      "ware": "wool"
+     },
+     {
+      "lever": "commander_style",
+      "value": true,
+      "style": "a_la_jineta"
+     }
+    ]
+   },
+   "heydays": [
+    {
+     "id": "castile_war_of_granada",
+     "name": "The war of Granada",
+     "age": "age_of_gunpowder_empires",
+     "text": "While fighting Granada: sieges 20 % faster, bombards hit 10 % harder, armies forage 20 % more, levies serve 2 months free.",
+     "why": "The catalogue's conquest-of-Granada path: a ten-year war of sieges and frontier raids (1482-1492) fought with royal artillery and town levies.",
+     "wakes": {
+      "at_war": {
+       "who": "this",
+       "other": "granada"
+      }
+     },
+     "ends": {
+      "event": {
+       "id": "fall_of_granada"
+      }
+     },
+     "effects": [
+      {
+       "lever": "siege_pct",
+       "value": 20
+      },
+      {
+       "lever": "hits_pct",
+       "value": 10,
+       "arm": "bombards"
+      },
+      {
+       "lever": "forage_pct",
+       "value": 20
+      },
+      {
+       "lever": "levy_free_months",
+       "value": 2
+      }
+     ],
+     "mark": {
+      "name": "Guns of the vega",
+      "text": "Sieges 10 % faster.",
+      "effects": [
+       {
+        "lever": "siege_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    {
+     "id": "castile_spanish_tercios",
+     "name": "Tercios",
+     "age": "age_of_reformations",
+     "text": "Commanders may form tercios; standing regiments break 10 points later; recruits refill 10 % faster; hired companies cost 10 % less.",
+     "why": "Inferred: the Castilian infantry that grew from the Granada and Italian wars dominated European battlefields in the 1500s.",
+     "wakes": {
+      "knows": {
+       "who": "this",
+       "invention": "W7"
+      }
+     },
+     "effects": [
+      {
+       "lever": "commander_style",
+       "value": true,
+       "style": "tercio"
+      },
+      {
+       "lever": "break_point_pct",
+       "value": 10,
+       "kind": "standing_regiment"
+      },
+      {
+       "lever": "recruit_refill_pct",
+       "value": 10
+      },
+      {
+       "lever": "hired_company_cost_pct",
+       "value": -10
+      }
+     ]
+    },
+    {
+     "id": "castile_casa_de_contratacion",
+     "name": "Casa de Contratación",
+     "age": "age_of_atlantic_empires",
+     "text": "Silver output +30 %, customs officers 30 % stronger, and storms sink a fifth fewer ships.",
+     "why": "The catalogue's Atlantic path: Seville became the licensed port of the Indies trade, with silver fleets sailing in convoy.",
+     "wakes": {
+      "colonial_presence": {
+       "who": "this",
+       "where": "region:americas",
+       "op": ">=",
+       "value": 3
+      }
+     },
+     "effects": [
+      {
+       "lever": "ware_output_pct",
+       "value": 30,
+       "ware": "silver"
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 30,
+       "type": "customs_officer"
+      },
+      {
+       "lever": "storm_loss_pct",
+       "value": -20
+      }
+     ]
+    }
+   ],
+   "burden": {
+    "id": "castile_kings_and_favourites",
+    "name": "Kings and favourites",
+    "text": "Lords start one step less loyal, the court supports one lord fewer, and lords' lands send 10 % less tax.",
+    "why": "In 1444 the king was a prize fought over by Álvaro de Luna, the Infantes of Aragon and noble leagues, and crown revenue had been granted away to magnates.",
+    "effects": [
+     {
+      "lever": "lord_loyalty_start_steps",
+      "value": -1
+     },
+     {
+      "lever": "lord_capacity",
+      "value": -1
+     },
+     {
+      "lever": "tax_reach_pct",
+      "value": -10,
+      "where": "lords"
+     }
+    ],
+    "shed": {
+     "all": [
+      {
+       "count": {
+        "who": "this",
+        "thing": "loyal_lords",
+        "op": ">=",
+        "value": 6
+       }
+      },
+      {
+       "stat": {
+        "who": "this",
+        "stat": "stability",
+        "op": ">=",
+        "value": 2
+       }
+      }
+     ]
+    },
+    "shed_text": "Keep at least 6 loyal lords and stability of at least 2.",
+    "turned": {
+     "id": "castile_corregidores",
+     "name": "Royal corregidores",
+     "text": "Seized land no longer angers your lords; officials cost 10 % less; one more official without strain.",
+     "effects": [
+      {
+       "lever": "lord_loyalty_shield",
+       "value": true,
+       "cause": "seized_land"
+      },
+      {
+       "lever": "official_wage_pct",
+       "value": -10
+      },
+      {
+       "lever": "official_capacity",
+       "value": 1
+      }
+     ]
+    }
+   },
+   "ambitions": [
+    {
+     "id": "castile_the_pomegranate",
+     "name": "The pomegranate",
+     "theme": "faith",
+     "hint": "The last fruit of the long reconquest hangs ripe in the south.",
+     "text": "Own the area of Granada.",
+     "historical": true,
+     "window": [
+      1444,
+      1520
+     ],
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "granada"
+      }
+     },
+     "goal": {
+      "owns": {
+       "who": "this",
+       "where": "area:granada"
+      }
+     },
+     "legacy": {
+      "id": "castile_keys_of_the_alhambra",
+      "name": "Keys of the Alhambra",
+      "text": "Granada changes faith 50 % faster; clergy lords start one step more loyal; garrisons 10 % stronger.",
+      "effects": [
+       {
+        "lever": "faith_shift_pct",
+        "value": 50,
+        "where": "area:granada"
+       },
+       {
+        "lever": "lord_loyalty_start_steps",
+        "value": 1,
+        "lord_kind": "clergy"
+       },
+       {
+        "lever": "garrison_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    {
+     "id": "castile_tanto_monta",
+     "name": "Tanto monta",
+     "theme": "crown",
+     "hint": "A bride, a groom and two crowns that weigh the same.",
+     "text": "Bind Aragon to your crown in a personal union.",
+     "historical": true,
+     "window": [
+      1444,
+      1550
+     ],
+     "stir": {
+      "relation": {
+       "who": "this",
+       "other": "aragon",
+       "type": "alliance"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "aragon",
+         "type": "personal_union"
+        }
+       },
+       {
+        "event": {
+         "id": "union_of_castile_and_aragon"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "castile_catholic_monarchs",
+      "name": "The Catholic Monarchs",
+      "text": "Two more lords without strain; Foreign rule fades 25 % faster.",
+      "effects": [
+       {
+        "lever": "lord_capacity",
+        "value": 2
+       },
+       {
+        "lever": "integration_years_pct",
+        "value": -25
+       }
+      ]
+     }
+    },
+    {
+     "id": "castile_beyond_hierro",
+     "name": "Beyond Hierro",
+     "theme": "sea",
+     "hint": "West of the last island, the sea has another shore.",
+     "text": "Hold six colonies or posts in the Americas.",
+     "historical": true,
+     "window": [
+      1470,
+      1600
+     ],
+     "stir": {
+      "any": [
+       {
+        "event": {
+         "id": "columbus_first_voyage"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Canary Islands"
+        }
+       }
+      ]
+     },
+     "goal": {
+      "colonial_presence": {
+       "who": "this",
+       "where": "region:americas",
+       "op": ">=",
+       "value": 6
+      }
+     },
+     "legacy": {
+      "id": "castile_council_of_the_indies",
+      "name": "Council of the Indies",
+      "great": true,
+      "text": "One more trader; stewards 30 % stronger; Foreign rule fades 10 % faster.",
+      "effects": [
+       {
+        "lever": "trader_count",
+        "value": 1
+       },
+       {
+        "lever": "official_type_pct",
+        "value": 30,
+        "type": "steward"
+       },
+       {
+        "lever": "integration_years_pct",
+        "value": -10
+       }
+      ]
+     }
+    },
+    {
+     "id": "castile_hispania_whole",
+     "name": "Hispania whole",
+     "theme": "crown",
+     "hint": "Aljubarrota's debt can be repaid with a wedding.",
+     "text": "Hold Portugal in personal union under your crown.",
+     "historical": false,
+     "stir": {
+      "relation": {
+       "who": "this",
+       "other": "portugal",
+       "type": "alliance"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "portugal",
+         "type": "personal_union"
+        }
+       },
+       {
+        "independent": {
+         "who": "this"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "castile_one_peninsula",
+      "name": "One peninsula",
+      "text": "Coastal trade profit +10 %, ports raise 20 % more sailors, and seizures alarm neighbours 15 % less.",
+      "effects": [
+       {
+        "lever": "trade_balance_pct",
+        "value": 10,
+        "where": "coast"
+       },
+       {
+        "lever": "crew_pct",
+        "value": 20
+       },
+       {
+        "lever": "lands_taken_pct",
+        "value": -15
+       }
+      ]
+     }
+    },
+    {
+     "id": "castile_santa_hermandad",
+     "name": "Santa Hermandad",
+     "theme": "crown",
+     "hint": "Bandits on the roads, a brotherhood with bows.",
+     "text": "Triple your officials and hold stability at +1 or better.",
+     "historical": true,
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "officials",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "count": {
+         "who": "this",
+         "thing": "officials",
+         "op": ">=",
+         "value": "start*3"
+        }
+       },
+       {
+        "stat": {
+         "who": "this",
+         "stat": "stability",
+         "op": ">=",
+         "value": 1
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "castile_brotherhood_of_the_roads",
+      "name": "Brotherhood of the roads",
+      "text": "Wardens are 40 % stronger.",
+      "effects": [
+       {
+        "lever": "official_type_pct",
+        "value": 40,
+        "type": "warden"
+       }
+      ]
+     }
+    },
+    {
+     "id": "castile_wool_for_bruges",
+     "name": "Wool for Bruges",
+     "theme": "trade",
+     "hint": "The fleece goes north from Burgos; let the gold come back.",
+     "text": "Keep a trade pact with Burgundy and field four traders.",
+     "historical": true,
+     "window": [
+      1444,
+      1560
+     ],
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "traders",
+       "op": ">=",
+       "value": 2
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "burgundy",
+         "type": "trade_pact"
+        }
+       },
+       {
+        "count": {
+         "who": "this",
+         "thing": "traders",
+         "op": ">=",
+         "value": 4
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "castile_consulado_of_burgos",
+      "name": "Consulado of Burgos",
+      "text": "Sea traders gather 15 % more; tolls bring 20 % more gold.",
+      "effects": [
+       {
+        "lever": "trader_gain_pct",
+        "value": 15,
+        "route_kind": "sea"
+       },
+       {
+        "lever": "toll_gold_pct",
+        "value": 20
+       }
+      ]
+     }
+    }
+   ],
+   "source": "west_europe_italy.json"
+  },
+  "aragon": {
+   "id": "aragon",
+   "authored": true,
+   "archetype": "river_kingdom",
+   "secondary_archetype": "maritime_realm",
+   "birthright": {
+    "id": "aragon_consulate_of_the_sea",
+    "name": "Consulate of the Sea",
+    "text": "Sea traders gather 20 % more, galleys build 20 % faster, and loans cost a quarter less interest.",
+    "why": "Barcelona's and Valencia's sea trade ran under the Consolat de Mar, Catalan galleys sailed to Sicily and the Levant, and Valencian censals made the Crown's credit cheap.",
+    "needs": {
+     "coastal": {
+      "who": "this",
+      "sea": "mediterranean"
+     }
+    },
+    "effects": [
+     {
+      "lever": "trader_gain_pct",
+      "value": 20,
+      "route_kind": "sea"
+     },
+     {
+      "lever": "ship_build_pct",
+      "value": -20,
+      "ship": "galley"
+     },
+     {
+      "lever": "loan_interest_pct",
+      "value": -25
+     }
+    ]
+   },
+   "heydays": [
+    {
+     "id": "aragon_magnanimous_court",
+     "name": "The Magnanimous",
+     "age": "age_of_gunpowder_empires",
+     "text": "While Naples is yours: galleys hit 20 % harder, sieges 15 % faster, and one more envoy.",
+     "why": "Alfonso V conquered Naples in 1442, kept his court and fleet there and ran the Crown's Italian diplomacy from it.",
+     "wakes": {
+      "holds_place": {
+       "who": "this",
+       "place": "Naples"
+      }
+     },
+     "effects": [
+      {
+       "lever": "ship_hits_pct",
+       "value": 20,
+       "ship": "galley"
+      },
+      {
+       "lever": "siege_pct",
+       "value": 15
+      },
+      {
+       "lever": "envoy_count",
+       "value": 1
+      }
+     ],
+     "mark": {
+      "name": "Castel Nuovo",
+      "text": "Sieges 10 % faster.",
+      "effects": [
+       {
+        "lever": "siege_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    {
+     "id": "aragon_valencian_century",
+     "name": "Valencia's golden century",
+     "age": "age_of_exploration",
+     "text": "Pottery output +40 %, Valencia's trade profit +40 %, and loans cost 20 % less interest.",
+     "why": "The catalogue calls Valencia a booming port and financial centre, the source of loans to Alfonso, famous for Manises ceramics.",
+     "wakes": {
+      "holds_place": {
+       "who": "this",
+       "place": "Valencia"
+      }
+     },
+     "effects": [
+      {
+       "lever": "ware_output_pct",
+       "value": 40,
+       "ware": "pottery"
+      },
+      {
+       "lever": "trade_balance_pct",
+       "value": 40,
+       "where": "place:Valencia"
+      },
+      {
+       "lever": "loan_interest_pct",
+       "value": -20
+      }
+     ]
+    }
+   ],
+   "burden": {
+    "id": "aragon_pactist_corts",
+    "name": "Pactist Corts",
+    "text": "Tax reaching you -10 %; levies serve one month less before pay; one official fewer without strain.",
+    "why": "Each realm's Corts voted taxes and could refuse them, and the king lived in Naples; the catalogue lists pactist estates and an absent king as constraints.",
+    "effects": [
+     {
+      "lever": "tax_reach_pct",
+      "value": -10
+     },
+     {
+      "lever": "levy_free_months",
+      "value": -1
+     },
+     {
+      "lever": "official_capacity",
+      "value": -1
+     }
+    ],
+    "shed": {
+     "all": [
+      {
+       "knows": {
+        "who": "this",
+        "invention": "G9"
+       }
+      },
+      {
+       "stat": {
+        "who": "this",
+        "stat": "stability",
+        "op": ">=",
+        "value": 2
+       }
+      }
+     ]
+    },
+    "shed_text": "Learn Professional bureaucracy and reach stability of at least 2.",
+    "turned": {
+     "id": "aragon_generalitat_credit",
+     "name": "Generalitat's credit",
+     "text": "Loans cost 30 % less interest; tax reaching you +5 %; tax collectors 10 % stronger.",
+     "effects": [
+      {
+       "lever": "loan_interest_pct",
+       "value": -30
+      },
+      {
+       "lever": "tax_reach_pct",
+       "value": 5
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 10,
+       "type": "tax_collector"
+      }
+     ]
+    }
+   },
+   "ambitions": [
+    {
+     "id": "aragon_kingdom_across_the_sea",
+     "name": "The kingdom across the sea",
+     "theme": "land",
+     "hint": "A crown won at Ponza's price must not pass to a bastard line.",
+     "text": "Own the area of Naples, or hold Naples as your subject or in union.",
+     "historical": true,
+     "window": [
+      1444,
+      1520
+     ],
+     "stir": {
+      "any": [
+       {
+        "at_war": {
+         "who": "this",
+         "other": "anjou"
+        }
+       },
+       {
+        "at_war": {
+         "who": "this",
+         "other": "france"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "naples",
+         "type": "alliance"
+        }
+       }
+      ]
+     },
+     "goal": {
+      "any": [
+       {
+        "owns": {
+         "who": "this",
+         "where": "area:naples"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "naples",
+         "type": "overlord"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "naples",
+         "type": "personal_union"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "aragon_regia_sommaria",
+      "name": "Regia Camera della Sommaria",
+      "text": "Subjects send 25 % more tribute; tax collectors 20 % stronger.",
+      "effects": [
+       {
+        "lever": "tribute_pct",
+        "value": 25
+       },
+       {
+        "lever": "official_type_pct",
+        "value": 20,
+        "type": "tax_collector"
+       }
+      ]
+     }
+    },
+    {
+     "id": "aragon_isabellas_groom",
+     "name": "The heir's marriage",
+     "theme": "crown",
+     "hint": "Your heir rides to Valladolid in disguise.",
+     "text": "Bind Castile to Aragon in a personal union.",
+     "historical": true,
+     "window": [
+      1444,
+      1550
+     ],
+     "stir": {
+      "relation": {
+       "who": "this",
+       "other": "castile",
+       "type": "alliance"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "castile",
+         "type": "personal_union"
+        }
+       },
+       {
+        "event": {
+         "id": "union_of_castile_and_aragon"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "aragon_two_crowns",
+      "name": "Two crowns, one court",
+      "text": "One more envoy, one more lord without strain, and Castile's opinion of you one step better.",
+      "effects": [
+       {
+        "lever": "envoy_count",
+        "value": 1
+       },
+       {
+        "lever": "lord_capacity",
+        "value": 1
+       },
+       {
+        "lever": "opinion_steps",
+        "value": 1,
+        "of": "castile"
+       }
+      ]
+     }
+    },
+    {
+     "id": "aragon_roussillon_road",
+     "name": "The Roussillon road",
+     "theme": "land",
+     "hint": "What is pawned to the lilies can be redeemed with steel.",
+     "text": "Hold Perpignan in 1500 or later.",
+     "historical": true,
+     "window": [
+      1444,
+      1550
+     ],
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "france"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "date": {
+         "min": 1500
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Perpignan"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "aragon_salses_wall",
+      "name": "Salses wall",
+      "text": "Garrisons 25 % stronger; castles cost a quarter less.",
+      "effects": [
+       {
+        "lever": "garrison_pct",
+        "value": 25
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -25,
+        "building": "castle"
+       }
+      ]
+     }
+    },
+    {
+     "id": "aragon_corsica_claim",
+     "name": "Corsica's old claim",
+     "theme": "sea",
+     "hint": "The pope gave it two centuries ago; the Genoese never noticed.",
+     "text": "Hold Corsica and Sardinia.",
+     "historical": false,
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "genoa"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Corsica"
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Sardinia"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "aragon_tyrrhenian_masters",
+      "name": "Masters of the Tyrrhenian",
+      "text": "Galleys hit 15 % harder; ports raise 15 % more sailors.",
+      "effects": [
+       {
+        "lever": "ship_hits_pct",
+        "value": 15,
+        "ship": "galley"
+       },
+       {
+        "lever": "crew_pct",
+        "value": 15
+       }
+      ]
+     }
+    },
+    {
+     "id": "aragon_evil_customs",
+     "name": "The evil customs",
+     "theme": "survival",
+     "hint": "Peasants with remença dues gather at night.",
+     "text": "End any peasant revolt and hold stability at +2.",
+     "historical": true,
+     "stir": {
+      "any": [
+       {
+        "rebels_active": {
+         "who": "this",
+         "type": "peasant"
+        }
+       },
+       {
+        "stat": {
+         "who": "this",
+         "stat": "stability",
+         "op": "<",
+         "value": 0
+        }
+       }
+      ]
+     },
+     "goal": {
+      "all": [
+       {
+        "not": {
+         "rebels_active": {
+          "who": "this",
+          "type": "peasant"
+         }
+        }
+       },
+       {
+        "stat": {
+         "who": "this",
+         "stat": "stability",
+         "op": ">=",
+         "value": 2
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "aragon_sentence_of_guadalupe",
+      "name": "Sentence of Guadalupe",
+      "text": "Harsh lords stop counting as a grievance on lords' land; it grows 10 % faster; farm jobs +10 %.",
+      "effects": [
+       {
+        "lever": "grievance_shield",
+        "value": true,
+        "grievance": "harsh_lord",
+        "where": "lords"
+       },
+       {
+        "lever": "growth_pct",
+        "value": 10,
+        "where": "lords"
+       },
+       {
+        "lever": "class_slots_pct",
+        "value": 10,
+        "class": "farmers"
+       }
+      ]
+     }
+    },
+    {
+     "id": "aragon_alexandria_fondaco",
+     "name": "A fondaco at Alexandria",
+     "theme": "trade",
+     "hint": "Pepper still comes to Barcelona, if Venice would only let it.",
+     "text": "Hold a quarter of the trade power at Alexandria.",
+     "historical": false,
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "traders",
+       "op": ">=",
+       "value": 3
+      }
+     },
+     "goal": {
+      "trade_presence": {
+       "who": "this",
+       "hub": "alexandria",
+       "op": ">=",
+       "value": 0.25
+      }
+     },
+     "legacy": {
+      "id": "aragon_catalan_consuls",
+      "name": "Catalan consuls",
+      "text": "One more trader; 20 % more traders pass your coast.",
+      "effects": [
+       {
+        "lever": "trader_count",
+        "value": 1
+       },
+       {
+        "lever": "traders_passing_pct",
+        "value": 20,
+        "where": "coast"
+       }
+      ]
+     }
+    }
+   ],
+   "source": "west_europe_italy.json"
+  },
+  "byzantium": {
+   "id": "byzantium",
+   "authored": false,
+   "archetype": "island_realm",
+   "secondary_archetype": null,
+   "birthright": {
+    "name": "Sea-girt Byzantine Empire",
+    "text": "Conquerors' Foreign rule lasts 55 % longer here; garrisons 40 % stronger; fisheries feed 30 % more.",
+    "why": "Byzantine Empire's core lay on islands: the sea was its wall and its larder.",
+    "effects": [
+     {
+      "lever": "homeland_resistance_pct",
+      "value": 55
+     },
+     {
+      "lever": "garrison_pct",
+      "value": 30
+     },
+     {
+      "lever": "fish_pct",
+      "value": 40
+     }
+    ],
+    "needs": {
+     "coastal": {
+      "who": "this"
+     }
+    },
+    "id": "byzantium_sea_girt_byzantine_empire"
+   },
+   "heydays": [
+    {
+     "name": "Harbour of the seas",
+     "text": "35 % more traders pass the coast, harbours cost a quarter less, ports raise 35 % more sailors.",
+     "why": "Inferred: island harbours became waypoints once ocean routes grew.",
+     "wakes": {
+      "coastal": {
+       "who": "this"
+      }
+     },
+     "effects": [
+      {
+       "lever": "traders_passing_pct",
+       "value": 35,
+       "where": "coast"
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -40,
+       "building": "harbour"
+      },
+      {
+       "lever": "crew_pct",
+       "value": 35
+      }
+     ],
+     "age": "age_of_exploration",
+     "id": "byzantium_harbour_of_the_seas"
+    }
+   ],
+   "burden": {
+    "name": "Far from the mainland",
+    "text": "Inventions cost 10 % more and 15 % fewer traders pass.",
+    "why": "Inferred: distance slowed the spread of new techniques.",
+    "effects": [
+     {
+      "lever": "invention_cost_pct",
+      "value": 10
+     },
+     {
+      "lever": "traders_passing_pct",
+      "value": -15
+     }
+    ],
+    "shed": {
+     "knows": {
+      "who": "this",
+      "invention": "S4"
+     }
+    },
+    "shed_text": "Learn Carrack and caravel.",
+    "turned": {
+     "name": "Island roads",
+     "text": "Sea crossings 20 % shorter, 15 % more traders on the coast, 10 % more sailors.",
+     "effects": [
+      {
+       "lever": "sea_days_pct",
+       "value": -20
+      },
+      {
+       "lever": "traders_passing_pct",
+       "value": 15,
+       "where": "coast"
+      },
+      {
+       "lever": "crew_pct",
+       "value": 10
+      }
+     ],
+     "id": "byzantium_island_roads"
+    },
+    "id": "byzantium_far_from_the_mainland"
+   },
+   "ambitions": [
+    {
+     "name": "Outlast Ottoman Empire",
+     "hint": "An old enemy at the gate.",
+     "text": "See Ottoman Empire fall, or make it your subject.",
+     "historical": true,
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "ottoman"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "not": {
+         "exists": {
+          "who": "ottoman"
+         }
+        }
+       },
+       {
+        "relation": {
+         "who": "ottoman",
+         "other": "this",
+         "type": "subject"
+        }
+       }
+      ]
+     },
+     "id": "byzantium_outlast_ottoman_empire",
+     "theme": "land",
+     "legacy": {
+      "name": "Veteran captains",
+      "text": "New commanders start with one more Might; break point +5 points.",
+      "effects": [
+       {
+        "lever": "commander_skill",
+        "value": 1,
+        "skill": "might"
+       },
+       {
+        "lever": "break_point_pct",
+        "value": 5
+       }
+      ],
+      "id": "byzantium_veteran_captains"
+     }
+    },
+    {
+     "name": "One crown with Venice",
+     "hint": "A friend who could be family.",
+     "text": "Bring Venice under your crown, as a subject or in a union.",
+     "historical": false,
+     "stir": {
+      "at_war": {
+       "who": "venice"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "relation": {
+         "who": "venice",
+         "other": "this",
+         "type": "subject"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "venice",
+         "type": "personal_union"
+        }
+       }
+      ]
+     },
+     "id": "byzantium_one_crown_with_venice",
+     "theme": "crown",
+     "legacy": {
+      "name": "Royal clerks",
+      "text": "Officials cost 15 % less, settle a year sooner; tax reaching you +5 %.",
+      "effects": [
+       {
+        "lever": "official_wage_pct",
+        "value": -15
+       },
+       {
+        "lever": "official_years_to_full",
+        "value": -1
+       },
+       {
+        "lever": "tax_reach_pct",
+        "value": 5
+       }
+      ],
+      "id": "byzantium_royal_clerks"
+     }
+    },
+    {
+     "name": "Masters of the harbour",
+     "hint": "Sails beyond counting.",
+     "text": "Have three times the trade ships you began with.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "trade_ships",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "goal": {
+      "count": {
+       "who": "this",
+       "thing": "trade_ships",
+       "op": ">=",
+       "value": "start*3"
+      }
+     },
+     "id": "byzantium_masters_of_the_harbour",
+     "theme": "sea",
+     "legacy": {
+      "name": "Charted coasts",
+      "text": "Sea crossings 15 % shorter and storms sink 30 % fewer ships.",
+      "effects": [
+       {
+        "lever": "sea_days_pct",
+        "value": -15
+       },
+       {
+        "lever": "storm_loss_pct",
+        "value": -30
+       }
+      ],
+      "id": "byzantium_charted_coasts"
+     },
+     "historical": false
+    },
+    {
+     "name": "Endure",
+     "hint": "Still standing when the world has changed.",
+     "text": "Be independent in 1600.",
+     "stir": {
+      "at_war": {
+       "who": "this"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "independent": {
+         "who": "this"
+        }
+       },
+       {
+        "date": {
+         "min": 1600
+        }
+       }
+      ]
+     },
+     "fail": {
+      "not": {
+       "independent": {
+        "who": "this"
+       }
+      }
+     },
+     "window": [
+      1444,
+      1600
+     ],
+     "id": "byzantium_endure",
+     "theme": "survival",
+     "legacy": {
+      "name": "Hard people",
+      "text": "Recruits refill 15 % faster; armies forage 25 % more.",
+      "effects": [
+       {
+        "lever": "recruit_refill_pct",
+        "value": 15
+       },
+       {
+        "lever": "forage_pct",
+        "value": 25
+       }
+      ],
+      "id": "byzantium_hard_people"
+     },
+     "historical": false
+    },
+    {
+     "name": "Market of the region",
+     "hint": "Where every road ends.",
+     "text": "Have three more markets than at the start.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "building:market",
+       "op": ">=",
+       "value": "start+1"
+      }
+     },
+     "goal": {
+      "count": {
+       "who": "this",
+       "thing": "building:market",
+       "op": ">=",
+       "value": "start+3"
+      }
+     },
+     "id": "byzantium_market_of_the_region",
+     "theme": "trade",
+     "legacy": {
+      "name": "Fair towns",
+      "text": "20 % more traders pass; markets cost 20 % less.",
+      "effects": [
+       {
+        "lever": "traders_passing_pct",
+        "value": 20
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -20,
+        "building": "market"
+       }
+      ],
+      "id": "byzantium_fair_towns"
+     },
+     "historical": false
+    }
+   ]
+  },
+  "brittany": {
+   "id": "brittany",
+   "authored": false,
+   "archetype": "maritime_realm",
+   "secondary_archetype": "feudal_realm",
+   "birthright": {
+    "name": "Sailors of the Atlantic",
+    "text": "Ships build 40 % faster, ports raise 20 % more sailors, and fisheries feed 30 % more.",
+    "why": "Brittany faced the Atlantic; its coasts lived from fishing and shipping.",
+    "effects": [
+     {
+      "lever": "ship_build_pct",
+      "value": -20
+     },
+     {
+      "lever": "crew_pct",
+      "value": 30
+     },
+     {
+      "lever": "fish_pct",
+      "value": 40
+     }
+    ],
+    "needs": {
+     "coastal": {
+      "who": "this"
+     }
+    },
+    "id": "brittany_sailors_of_the_atlantic"
+   },
+   "heydays": [
+    {
+     "name": "Open ocean",
+     "text": "Sea crossings 20 % shorter, ships build 20 % faster, traders at sea gather 20 % more.",
+     "why": "Inferred: seafaring realms gained most when ocean sailing spread.",
+     "wakes": {
+      "all": [
+       {
+        "coastal": {
+         "who": "this"
+        }
+       },
+       {
+        "knows": {
+         "who": "this",
+         "invention": "S4"
+        }
+       }
+      ]
+     },
+     "effects": [
+      {
+       "lever": "sea_days_pct",
+       "value": -20
+      },
+      {
+       "lever": "ship_build_pct",
+       "value": -20
+      },
+      {
+       "lever": "trader_gain_pct",
+       "value": 20,
+       "route_kind": "sea"
+      }
+     ],
+     "age": "age_of_exploration",
+     "id": "brittany_open_ocean"
+    },
+    {
+     "name": "Royal government",
+     "text": "Officials settle a year sooner and cost 25 % less, tax reaching you +10 %, and seizing land no longer shakes the lords.",
+     "why": "Inferred: crowns that paid their own officials outgrew their lords.",
+     "wakes": {
+      "count": {
+       "who": "this",
+       "thing": "officials",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "effects": [
+      {
+       "lever": "official_years_to_full",
+       "value": -1
+      },
+      {
+       "lever": "official_wage_pct",
+       "value": -25
+      },
+      {
+       "lever": "tax_reach_pct",
+       "value": 10
+      },
+      {
+       "lever": "lord_loyalty_shield",
+       "value": true,
+       "cause": "seized_land"
+      }
+     ],
+     "age": "age_of_crisis_and_absolutism",
+     "id": "brittany_royal_government"
+    }
+   ],
+   "burden": {
+    "name": "Thin soil",
+    "text": "Harvests roll a step worse at home and the people grow 10 % slower.",
+    "why": "Inferred from the catalogue's reliance on the sea over farmland.",
+    "effects": [
+     {
+      "lever": "harvest_steps",
+      "value": -1,
+      "where": "core"
+     },
+     {
+      "lever": "growth_pct",
+      "value": -10
+     }
+    ],
+    "shed": {
+     "knows": {
+      "who": "this",
+      "invention": "F12"
+     }
+    },
+    "shed_text": "Learn Fodder crops.",
+    "turned": {
+     "name": "Improved fields",
+     "text": "Harvests a step better at home, stores rot 30 % less, growth +5 %.",
+     "effects": [
+      {
+       "lever": "harvest_steps",
+       "value": 1,
+       "where": "core"
+      },
+      {
+       "lever": "store_rot_pct",
+       "value": -30
+      },
+      {
+       "lever": "growth_pct",
+       "value": 5
+      }
+     ],
+     "id": "brittany_improved_fields"
+    },
+    "id": "brittany_thin_soil"
+   },
+   "ambitions": [
+    {
+     "name": "One crown with France",
+     "hint": "A friend who could be family.",
+     "text": "Bring France under your crown, as a subject or in a union.",
+     "historical": false,
+     "stir": {
+      "at_war": {
+       "who": "france"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "relation": {
+         "who": "france",
+         "other": "this",
+         "type": "subject"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "france",
+         "type": "personal_union"
+        }
+       }
+      ]
+     },
+     "id": "brittany_one_crown_with_france",
+     "theme": "crown",
+     "legacy": {
+      "name": "Loyal houses",
+      "text": "Lords start a step more loyal; retinues 20 % larger.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_start_steps",
+        "value": 1
+       },
+       {
+        "lever": "retinue_pct",
+        "value": 20
+       }
+      ],
+      "id": "brittany_loyal_houses"
+     }
+    },
+    {
+     "name": "Masters of the harbour",
+     "hint": "Sails beyond counting.",
+     "text": "Have three times the trade ships you began with.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "trade_ships",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "goal": {
+      "count": {
+       "who": "this",
+       "thing": "trade_ships",
+       "op": ">=",
+       "value": "start*3"
+      }
+     },
+     "id": "brittany_masters_of_the_harbour",
+     "theme": "sea",
+     "legacy": {
+      "name": "Dockyard tradition",
+      "text": "Ships build 15 % faster and ports raise 20 % more sailors.",
+      "effects": [
+       {
+        "lever": "ship_build_pct",
+        "value": -15
+       },
+       {
+        "lever": "crew_pct",
+        "value": 20
+       }
+      ],
+      "id": "brittany_dockyard_tradition"
+     },
+     "historical": true
+    },
+    {
+     "name": "Market of the region",
+     "hint": "Where every road ends.",
+     "text": "Have three more markets than at the start.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "building:market",
+       "op": ">=",
+       "value": "start+1"
+      }
+     },
+     "goal": {
+      "count": {
+       "who": "this",
+       "thing": "building:market",
+       "op": ">=",
+       "value": "start+3"
+      }
+     },
+     "id": "brittany_market_of_the_region",
+     "theme": "trade",
+     "legacy": {
+      "name": "Merchant houses",
+      "text": "One more trader and trade profit +10 %.",
+      "effects": [
+       {
+        "lever": "trader_count",
+        "value": 1
+       },
+       {
+        "lever": "trade_balance_pct",
+        "value": 10
+       }
+      ],
+      "id": "brittany_merchant_houses"
+     },
+     "historical": false
+    },
+    {
+     "name": "Wider borders",
+     "hint": "More land than your fathers knew.",
+     "text": "Hold twice the provinces you began with.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "provinces",
+       "op": ">=",
+       "value": "start*1.5"
+      }
+     },
+     "goal": {
+      "count": {
+       "who": "this",
+       "thing": "provinces",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "id": "brittany_wider_borders",
+     "theme": "land",
+     "legacy": {
+      "name": "Veteran captains",
+      "text": "New commanders start with one more Might; break point +5 points.",
+      "effects": [
+       {
+        "lever": "commander_skill",
+        "value": 1,
+        "skill": "might"
+       },
+       {
+        "lever": "break_point_pct",
+        "value": 5
+       }
+      ],
+      "id": "brittany_veteran_captains"
+     },
+     "historical": false
+    },
+    {
+     "name": "A full treasury",
+     "hint": "Coin that counts itself.",
+     "text": "Hold five times the gold you began with and owe nothing.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "gold",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "count": {
+         "who": "this",
+         "thing": "gold",
+         "op": ">=",
+         "value": "start*5"
+        }
+       },
+       {
+        "count": {
+         "who": "this",
+         "thing": "debt",
+         "op": "==",
+         "value": 0
+        }
+       }
+      ]
+     },
+     "id": "brittany_a_full_treasury",
+     "theme": "wealth",
+     "legacy": {
+      "name": "Sound coin",
+      "text": "Debt interest −30 %; tax reaching you +10 %.",
+      "effects": [
+       {
+        "lever": "loan_interest_pct",
+        "value": -30
+       },
+       {
+        "lever": "tax_reach_pct",
+        "value": 10
+       }
+      ],
+      "id": "brittany_sound_coin"
+     },
+     "historical": false
+    }
+   ]
+  },
+  "igbo_societies": {
+   "id": "igbo_societies",
+   "authored": false,
+   "archetype": "forest_chiefdom",
+   "secondary_archetype": null,
+   "birthright": {
+    "name": "Paths of the forest",
+    "text": "Foot fights 30 % harder and marches 30 % faster in forest; conquerors' Foreign rule lasts 60 % longer; foraging +15 %.",
+    "why": "Igbo village-group societies lived in forest country.",
+    "effects": [
+     {
+      "lever": "hits_pct",
+      "value": 30,
+      "arm": "foot",
+      "terrain": "forest"
+     },
+     {
+      "lever": "march_days_pct",
+      "value": -30,
+      "terrain": "forest"
+     },
+     {
+      "lever": "homeland_resistance_pct",
+      "value": 60
+     },
+     {
+      "lever": "forage_pct",
+      "value": 15
+     }
+    ],
+    "id": "igbo_societies_paths_of_the_forest"
+   },
+   "heydays": [
+    {
+     "name": "Forest refuge",
+     "text": "Conquerors' Foreign rule lasts 75 % longer, foot fights 30 % harder and marches 30 % faster in forest, while at war.",
+     "why": "Inferred: forest peoples resisted larger powers by retreat and ambush.",
+     "wakes": {
+      "at_war": {
+       "who": "this"
+      }
+     },
+     "effects": [
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 75
+      },
+      {
+       "lever": "hits_pct",
+       "value": 30,
+       "arm": "foot",
+       "terrain": "forest"
+      },
+      {
+       "lever": "march_days_pct",
+       "value": -30,
+       "terrain": "forest"
+      }
+     ],
+     "age": "age_of_atlantic_empires",
+     "id": "igbo_societies_forest_refuge"
+    }
+   ],
+   "burden": {
+    "name": "Small villages",
+    "text": "Recruits refill 15 % slower and tax reaching you −10 %.",
+    "why": "Settlements were small and scattered (inferred).",
+    "effects": [
+     {
+      "lever": "recruit_refill_pct",
+      "value": -15
+     },
+     {
+      "lever": "tax_reach_pct",
+      "value": -10
+     }
+    ],
+    "shed": {
+     "count": {
+      "who": "this",
+      "thing": "building:market",
+      "op": ">=",
+      "value": 2
+     }
+    },
+    "shed_text": "Build two markets.",
+    "turned": {
+     "name": "Market villages",
+     "text": "20 % more traders and tax reaching you +5 %.",
+     "effects": [
+      {
+       "lever": "traders_passing_pct",
+       "value": 20
+      },
+      {
+       "lever": "tax_reach_pct",
+       "value": 5
+      }
+     ],
+     "id": "igbo_societies_market_villages"
+    },
+    "id": "igbo_societies_small_villages"
+   },
+   "ambitions": [
+    {
+     "name": "Outlast Benin",
+     "hint": "An old enemy at the gate.",
+     "text": "See Benin fall, or make it your subject.",
+     "historical": true,
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "benin"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "not": {
+         "exists": {
+          "who": "benin"
+         }
+        }
+       },
+       {
+        "relation": {
+         "who": "benin",
+         "other": "this",
+         "type": "subject"
+        }
+       }
+      ]
+     },
+     "id": "igbo_societies_outlast_benin",
+     "theme": "land",
+     "legacy": {
+      "name": "Marcher lords",
+      "text": "Each province taken counts 20 % less toward Lands taken; conquered land settles 25 % faster.",
+      "effects": [
+       {
+        "lever": "lands_taken_pct",
+        "value": -20
+       },
+       {
+        "lever": "integration_years_pct",
+        "value": -25
+       }
+      ],
+      "id": "igbo_societies_marcher_lords"
+     }
+    },
+    {
+     "name": "Endure",
+     "hint": "Still standing when the world has changed.",
+     "text": "Be independent in 1600.",
+     "stir": {
+      "at_war": {
+       "who": "this"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "independent": {
+         "who": "this"
+        }
+       },
+       {
+        "date": {
+         "min": 1600
+        }
+       }
+      ]
+     },
+     "fail": {
+      "not": {
+       "independent": {
+        "who": "this"
+       }
+      }
+     },
+     "window": [
+      1444,
+      1600
+     ],
+     "id": "igbo_societies_endure",
+     "theme": "survival",
+     "legacy": {
+      "name": "Unbowed",
+      "text": "Conquerors' Foreign rule lasts 40 % longer; garrisons 15 % stronger.",
+      "effects": [
+       {
+        "lever": "homeland_resistance_pct",
+        "value": 40
+       },
+       {
+        "lever": "garrison_pct",
+        "value": 15
+       }
+      ],
+      "id": "igbo_societies_unbowed"
+     },
+     "historical": false
+    },
+    {
+     "name": "Market of the region",
+     "hint": "Where every road ends.",
+     "text": "Have three more markets than at the start.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "building:market",
+       "op": ">=",
+       "value": "start+1"
+      }
+     },
+     "goal": {
+      "count": {
+       "who": "this",
+       "thing": "building:market",
+       "op": ">=",
+       "value": "start+3"
+      }
+     },
+     "id": "igbo_societies_market_of_the_region",
+     "theme": "trade",
+     "legacy": {
+      "name": "Merchant houses",
+      "text": "One more trader and trade profit +10 %.",
+      "effects": [
+       {
+        "lever": "trader_count",
+        "value": 1
+       },
+       {
+        "lever": "trade_balance_pct",
+        "value": 10
+       }
+      ],
+      "id": "igbo_societies_merchant_houses"
+     },
+     "historical": false
+    },
+    {
+     "name": "Wider borders",
+     "hint": "More land than your fathers knew.",
+     "text": "Hold twice the provinces you began with.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "provinces",
+       "op": ">=",
+       "value": "start*1.5"
+      }
+     },
+     "goal": {
+      "count": {
+       "who": "this",
+       "thing": "provinces",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "id": "igbo_societies_wider_borders",
+     "theme": "land",
+     "legacy": {
+      "name": "Veteran captains",
+      "text": "New commanders start with one more Might; break point +5 points.",
+      "effects": [
+       {
+        "lever": "commander_skill",
+        "value": 1,
+        "skill": "might"
+       },
+       {
+        "lever": "break_point_pct",
+        "value": 5
+       }
+      ],
+      "id": "igbo_societies_veteran_captains"
+     },
+     "historical": false
+    },
+    {
+     "name": "A full treasury",
+     "hint": "Coin that counts itself.",
+     "text": "Hold five times the gold you began with and owe nothing.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "gold",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "count": {
+         "who": "this",
+         "thing": "gold",
+         "op": ">=",
+         "value": "start*5"
+        }
+       },
+       {
+        "count": {
+         "who": "this",
+         "thing": "debt",
+         "op": "==",
+         "value": 0
+        }
+       }
+      ]
+     },
+     "id": "igbo_societies_a_full_treasury",
+     "theme": "wealth",
+     "legacy": {
+      "name": "Thrifty court",
+      "text": "Officials cost 15 % less; buildings cost 20 % less.",
+      "effects": [
+       {
+        "lever": "official_wage_pct",
+        "value": -15
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -20
+       }
+      ],
+      "id": "igbo_societies_thrifty_court"
+     },
+     "historical": false
+    }
+   ]
+  },
+  "hungary": {
+   "id": "hungary",
+   "authored": true,
+   "archetype": "river_kingdom",
+   "secondary_archetype": "mountain_folk",
+   "birthright": {
+    "id": "hungary_kremnica_gold_and_banderia",
+    "name": "Kremnica gold and the banderia",
+    "text": "Gold output +30 %, horses bred +20 %, and lords bring a quarter more men.",
+    "why": "Hungary was Europe's leading gold producer, raised its armies from the banderia of barons and prelates, and had extensive grazing for horses and cattle.",
+    "effects": [
+     {
+      "lever": "ware_output_pct",
+      "value": 30,
+      "ware": "gold"
+     },
+     {
+      "lever": "horses_pct",
+      "value": 20
+     },
+     {
+      "lever": "retinue_pct",
+      "value": 25
+     }
+    ]
+   },
+   "heydays": [
+    {
+     "id": "hungary_hunyadi_captains",
+     "name": "Hunyadi's captains",
+     "age": "age_of_gunpowder_empires",
+     "text": "Commanders may fight as hussar raiders; garrisons +25 %, hired companies cost a quarter less, sieges 10 % faster.",
+     "why": "The catalogue's Hungary fights aggressive frontier wars under capable captains like Hunyadi and hires Hussite-trained companies; the paid army under Matthias is inferred.",
+     "wakes": {
+      "all": [
+       {
+        "independent": {
+         "who": "this"
+        }
+       },
+       {
+        "any": [
+         {
+          "at_war": {
+           "who": "this",
+           "other": "ottoman"
+          }
+         },
+         {
+          "at_war": {
+           "who": "this",
+           "other": "austria"
+          }
+         }
+        ]
+       }
+      ]
+     },
+     "effects": [
+      {
+       "lever": "commander_style",
+       "value": true,
+       "style": "hussar_raiding"
+      },
+      {
+       "lever": "garrison_pct",
+       "value": 25
+      },
+      {
+       "lever": "hired_company_cost_pct",
+       "value": -25
+      },
+      {
+       "lever": "siege_pct",
+       "value": 10
+      }
+     ],
+     "mark": {
+      "name": "Black companies",
+      "text": "Garrisons 8 % stronger.",
+      "effects": [
+       {
+        "lever": "garrison_pct",
+        "value": 8
+       }
+      ]
+     }
+    },
+    {
+     "id": "hungary_mills_of_pest",
+     "name": "Mills of Pest",
+     "age": "age_of_imperialism",
+     "text": "Grain output +40 %, mills cost 30 % less and rail stations 10 % less.",
+     "why": "Inferred: the fertile plains and Danube trade in the catalogue made Buda-Pest a great milling centre once railways came.",
+     "wakes": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Buda"
+        }
+       },
+       {
+        "knows": {
+         "who": "this",
+         "invention": "C16"
+        }
+       }
+      ]
+     },
+     "effects": [
+      {
+       "lever": "ware_output_pct",
+       "value": 40,
+       "ware": "grain"
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -30,
+       "building": "mill"
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -10,
+       "building": "rail_station"
+      }
+     ]
+    }
+   ],
+   "burden": {
+    "id": "hungary_barons_leagues",
+    "name": "Barons' leagues",
+    "text": "A tenth of taxes stays with the barons who hold royal pledges, and lords start one step less loyal.",
+    "why": "The catalogue lists baronial fragmentation and limited royal revenue, much of it pledged or seized during the civil war, as Hungary's constraints.",
+    "effects": [
+     {
+      "lever": "tax_reach_pct",
+      "value": -10
+     },
+     {
+      "lever": "lord_loyalty_start_steps",
+      "value": -1
+     }
+    ],
+    "shed": {
+     "all": [
+      {
+       "count": {
+        "who": "this",
+        "thing": "royal_provinces",
+        "op": ">=",
+        "value": "start+4"
+       }
+      },
+      {
+       "count": {
+        "who": "this",
+        "thing": "loyal_lords",
+        "op": ">=",
+        "value": 5
+       }
+      }
+     ]
+    },
+    "shed_text": "Hold 4 more royal provinces than you began with and keep at least 5 loyal lords.",
+    "turned": {
+     "id": "hungary_royal_treasury_restored",
+     "name": "Royal treasury restored",
+     "text": "12 % more tax reaches you, and tax collectors are 16 % stronger.",
+     "effects": [
+      {
+       "lever": "tax_reach_pct",
+       "value": 12
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 16,
+       "type": "tax_collector"
+      }
+     ]
+    }
+   },
+   "ambitions": [
+    {
+     "id": "hungary_hold_belgrade",
+     "name": "The noon bell",
+     "theme": "survival",
+     "hint": "Whoever holds the white castle holds the Danube.",
+     "text": "Still hold Belgrade in 1500.",
+     "historical": true,
+     "window": [
+      1444,
+      1500
+     ],
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "ottoman"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "date": {
+         "min": 1500
+        }
+       },
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Belgrade (Nándorfehérvár)"
+        }
+       }
+      ]
+     },
+     "fail": {
+      "not": {
+       "holds_place": {
+        "who": "this",
+        "place": "Belgrade (Nándorfehérvár)"
+       }
+      }
+     },
+     "legacy": {
+      "id": "hungary_bell_of_belgrade",
+      "name": "The noon bell",
+      "text": "Garrisons 20 % stronger and castles cost a quarter less.",
+      "effects": [
+       {
+        "lever": "garrison_pct",
+        "value": 20
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -25,
+        "building": "castle"
+       }
+      ]
+     }
+    },
+    {
+     "id": "hungary_holy_crown_home",
+     "name": "The crown comes home",
+     "theme": "crown",
+     "hint": "A queen's maid carried it off in a cushion.",
+     "text": "Hold Székesfehérvár, be independent and have at least five loyal lords.",
+     "historical": true,
+     "window": [
+      1444,
+      1480
+     ],
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "loyal_lords",
+       "op": ">=",
+       "value": 3
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Székesfehérvár"
+        }
+       },
+       {
+        "independent": {
+         "who": "this"
+        }
+       },
+       {
+        "count": {
+         "who": "this",
+         "thing": "loyal_lords",
+         "op": ">=",
+         "value": 5
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "hungary_doctrine_of_the_holy_crown",
+      "name": "Doctrine of the Holy Crown",
+      "text": "Legitimacy +10, and a disputed heir no longer costs lords' loyalty.",
+      "effects": [
+       {
+        "lever": "stat",
+        "value": 10,
+        "stat": "legitimacy"
+       },
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "disputed_heir"
+       }
+      ]
+     }
+    },
+    {
+     "id": "hungary_raven_in_vienna",
+     "name": "The raven in Vienna",
+     "theme": "land",
+     "hint": "The emperor's city has walls, but no money for its soldiers.",
+     "text": "Hold Vienna.",
+     "historical": true,
+     "window": [
+      1444,
+      1500
+     ],
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "austria"
+      }
+     },
+     "goal": {
+      "holds_place": {
+       "who": "this",
+       "place": "Vienna"
+      }
+     },
+     "legacy": {
+      "id": "hungary_corvinus_in_the_hofburg",
+      "name": "Raven over the Hofburg",
+      "text": "New land alarms neighbours a fifth less and Foreign rule fades a quarter faster.",
+      "effects": [
+       {
+        "lever": "lands_taken_pct",
+        "value": -20
+       },
+       {
+        "lever": "integration_years_pct",
+        "value": -25
+       }
+      ]
+     }
+    },
+    {
+     "id": "hungary_corvina_library",
+     "name": "A library of kings",
+     "theme": "learning",
+     "hint": "Florentine scribes copy for a Danube king.",
+     "text": "Have at least eight scholars and two presses.",
+     "historical": false,
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "scholars",
+       "op": ">=",
+       "value": 4
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "count": {
+         "who": "this",
+         "thing": "scholars",
+         "op": ">=",
+         "value": 8
+        }
+       },
+       {
+        "count": {
+         "who": "this",
+         "thing": "building:press",
+         "op": ">=",
+         "value": 2
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "hungary_bibliotheca_corviniana",
+      "name": "Bibliotheca Corviniana",
+      "text": "Scholars research 10 % more and 30 % more fleeing scholars choose you.",
+      "effects": [
+       {
+        "lever": "scholar_output_pct",
+        "value": 10
+       },
+       {
+        "lever": "migrants_pct",
+        "value": 30,
+        "class": "scholars"
+       }
+      ]
+     }
+    },
+    {
+     "id": "hungary_banates_of_the_south",
+     "name": "Banates to the sea",
+     "theme": "land",
+     "hint": "Wallachia, Serbia and Bosnia, three shields before the crown.",
+     "text": "Have at least three subjects, Wallachia and Serbia among them.",
+     "historical": false,
+     "window": [
+      1444,
+      1600
+     ],
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "subjects",
+       "op": ">=",
+       "value": 1
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "subject_count": {
+         "who": "this",
+         "op": ">=",
+         "value": 3
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "wallachia",
+         "type": "overlord"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "serbia",
+         "type": "overlord"
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "hungary_southern_banates",
+      "name": "Southern banates",
+      "great": true,
+      "text": "Tribute +30 %, tolls +20 % and horses bred +10 %.",
+      "effects": [
+       {
+        "lever": "tribute_pct",
+        "value": 30
+       },
+       {
+        "lever": "toll_gold_pct",
+        "value": 20
+       },
+       {
+        "lever": "horses_pct",
+        "value": 10
+       }
+      ]
+     }
+    }
+   ],
+   "source": "central_east_europe.json"
+  },
+  "wallachia": {
+   "id": "wallachia",
+   "authored": false,
+   "archetype": "pastoral_people",
+   "secondary_archetype": null,
+   "birthright": {
+    "name": "Herds of Wallachia",
+    "text": "Herds grow 40 % faster, herder slots +30 %, armies forage 30 % more.",
+    "why": "Wallachia's wealth was counted in animals.",
+    "effects": [
+     {
+      "lever": "herd_growth_pct",
+      "value": 40
+     },
+     {
+      "lever": "class_slots_pct",
+      "value": 30,
+      "class": "herders"
+     },
+     {
+      "lever": "forage_pct",
+      "value": 30
+     }
+    ],
+    "id": "wallachia_herds_of_wallachia"
+   },
+   "heydays": [
+    {
+     "name": "Cattle wealth",
+     "text": "Herds grow 40 % faster, horses 30 % faster, recruits refill 25 % faster.",
+     "why": "Inferred: herding peoples grew strong in good grazing years.",
+     "wakes": {
+      "independent": {
+       "who": "this"
+      }
+     },
+     "effects": [
+      {
+       "lever": "herd_growth_pct",
+       "value": 40
+      },
+      {
+       "lever": "horses_pct",
+       "value": 30
+      },
+      {
+       "lever": "recruit_refill_pct",
+       "value": 25
+      }
+     ],
+     "age": "age_of_crisis_and_absolutism",
+     "id": "wallachia_cattle_wealth"
+    }
+   ],
+   "burden": {
+    "name": "Drought years",
+    "text": "Herds grow 20 % slower and people 5 % slower.",
+    "why": "Inferred: drought struck herds first.",
+    "effects": [
+     {
+      "lever": "herd_growth_pct",
+      "value": -20
+     },
+     {
+      "lever": "growth_pct",
+      "value": -5
+     }
+    ],
+    "shed": {
+     "count": {
+      "who": "this",
+      "thing": "building:ranch",
+      "op": ">=",
+      "value": "start+3"
+     }
+    },
+    "shed_text": "Build three more ranches.",
+    "turned": {
+     "name": "Wells and grazing law",
+     "text": "Herds grow 25 % faster and stores rot 25 % less.",
+     "effects": [
+      {
+       "lever": "herd_growth_pct",
+       "value": 25
+      },
+      {
+       "lever": "store_rot_pct",
+       "value": -25
+      }
+     ],
+     "id": "wallachia_wells_and_grazing_law"
+    },
+    "id": "wallachia_drought_years"
+   },
+   "ambitions": [
+    {
+     "name": "Outlast Ottoman Empire",
+     "hint": "An old enemy at the gate.",
+     "text": "See Ottoman Empire fall, or make it your subject.",
+     "historical": true,
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "ottoman"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "not": {
+         "exists": {
+          "who": "ottoman"
+         }
+        }
+       },
+       {
+        "relation": {
+         "who": "ottoman",
+         "other": "this",
+         "type": "subject"
+        }
+       }
+      ]
+     },
+     "id": "wallachia_outlast_ottoman_empire",
+     "theme": "land",
+     "legacy": {
+      "name": "Marcher lords",
+      "text": "Each province taken counts 20 % less toward Lands taken; conquered land settles 25 % faster.",
+      "effects": [
+       {
+        "lever": "lands_taken_pct",
+        "value": -20
+       },
+       {
+        "lever": "integration_years_pct",
+        "value": -25
+       }
+      ],
+      "id": "wallachia_marcher_lords"
+     }
+    },
+    {
+     "name": "Take Suceava",
+     "hint": "A rival's hearth.",
+     "text": "Hold Suceava, the seat of Moldavia.",
+     "historical": false,
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "moldavia"
+      }
+     },
+     "goal": {
+      "holds_place": {
+       "who": "this",
+       "place": "Suceava"
+      }
+     },
+     "id": "wallachia_take_suceava",
+     "theme": "land",
+     "legacy": {
+      "name": "Veteran captains",
+      "text": "New commanders start with one more Might; break point +5 points.",
+      "effects": [
+       {
+        "lever": "commander_skill",
+        "value": 1,
+        "skill": "might"
+       },
+       {
+        "lever": "break_point_pct",
+        "value": 5
+       }
+      ],
+      "id": "wallachia_veteran_captains"
+     }
+    },
+    {
+     "name": "One crown with Hungary",
+     "hint": "A friend who could be family.",
+     "text": "Bring Hungary under your crown, as a subject or in a union.",
+     "historical": false,
+     "stir": {
+      "at_war": {
+       "who": "hungary"
+      }
+     },
+     "goal": {
+      "any": [
+       {
+        "relation": {
+         "who": "hungary",
+         "other": "this",
+         "type": "subject"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "hungary",
+         "type": "personal_union"
+        }
+       }
+      ]
+     },
+     "id": "wallachia_one_crown_with_hungary",
+     "theme": "crown",
+     "legacy": {
+      "name": "Loyal houses",
+      "text": "Lords start a step more loyal; retinues 20 % larger.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_start_steps",
+        "value": 1
+       },
+       {
+        "lever": "retinue_pct",
+        "value": 20
+       }
+      ],
+      "id": "wallachia_loyal_houses"
+     }
+    },
+    {
+     "name": "A full treasury",
+     "hint": "Coin that counts itself.",
+     "text": "Hold five times the gold you began with and owe nothing.",
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "gold",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "count": {
+         "who": "this",
+         "thing": "gold",
+         "op": ">=",
+         "value": "start*5"
+        }
+       },
+       {
+        "count": {
+         "who": "this",
+         "thing": "debt",
+         "op": "==",
+         "value": 0
+        }
+       }
+      ]
+     },
+     "id": "wallachia_a_full_treasury",
+     "theme": "wealth",
+     "legacy": {
+      "name": "Thrifty court",
+      "text": "Officials cost 15 % less; buildings cost 20 % less.",
+      "effects": [
+       {
+        "lever": "official_wage_pct",
+        "value": -15
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -20
+       }
+      ],
+      "id": "wallachia_thrifty_court"
+     },
+     "historical": false
+    },
+    {
+     "name": "Endure",
+     "hint": "Still standing when the world has changed.",
+     "text": "Be independent in 1600.",
+     "stir": {
+      "at_war": {
+       "who": "this"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "independent": {
+         "who": "this"
+        }
+       },
+       {
+        "date": {
+         "min": 1600
+        }
+       }
+      ]
+     },
+     "fail": {
+      "not": {
+       "independent": {
+        "who": "this"
+       }
+      }
+     },
+     "window": [
+      1444,
+      1600
+     ],
+     "id": "wallachia_endure",
+     "theme": "survival",
+     "legacy": {
+      "name": "Unbowed",
+      "text": "Conquerors' Foreign rule lasts 40 % longer; garrisons 15 % stronger.",
+      "effects": [
+       {
+        "lever": "homeland_resistance_pct",
+        "value": 40
+       },
+       {
+        "lever": "garrison_pct",
+        "value": 15
+       }
+      ],
+      "id": "wallachia_unbowed"
+     },
+     "historical": false
+    }
+   ]
+  },
+  "austria": {
+   "id": "austria",
+   "authored": true,
+   "archetype": "river_kingdom",
+   "secondary_archetype": "feudal_realm",
+   "birthright": {
+    "id": "austria_erzberg_and_the_staple",
+    "name": "Erzberg iron, Vienna staple",
+    "text": "Iron output +30 %, salt output +20 %, and Vienna's trade profit +40 %.",
+    "why": "The catalogue names the Styrian Erzberg iron trade, salt at Aussee and Hallstatt, and Vienna's Danube staple right as Austria's resources.",
+    "effects": [
+     {
+      "lever": "ware_output_pct",
+      "value": 30,
+      "ware": "iron"
+     },
+     {
+      "lever": "ware_output_pct",
+      "value": 20,
+      "ware": "salt"
+     },
+     {
+      "lever": "trade_balance_pct",
+      "value": 40,
+      "where": "place:Vienna"
+     }
+    ]
+   },
+   "heydays": [
+    {
+     "id": "austria_marriages_not_wars",
+     "name": "Marriages, not wars",
+     "age": "age_of_exploration",
+     "text": "One more envoy, countries of your faith one step friendlier, Foreign rule fades 30 % faster, legitimacy +5.",
+     "why": "The catalogue's Austria expands through inheritance treaties, guardianships and marriages rather than conquest.",
+     "wakes": {
+      "count": {
+       "who": "this",
+       "thing": "allies",
+       "op": ">=",
+       "value": 2
+      }
+     },
+     "effects": [
+      {
+       "lever": "envoy_count",
+       "value": 1
+      },
+      {
+       "lever": "opinion_steps",
+       "value": 1,
+       "of": "same_faith"
+      },
+      {
+       "lever": "integration_years_pct",
+       "value": -30
+      },
+      {
+       "lever": "stat",
+       "value": 5,
+       "stat": "legitimacy"
+      }
+     ]
+    },
+    {
+     "id": "austria_frontier_against_the_crescent",
+     "name": "The border against the crescent",
+     "age": "age_of_gunpowder_empires",
+     "text": "Garrisons 30 % stronger, castles cost 30 % less, and quartered soldiers no longer anger the frontier.",
+     "why": "The catalogue records Ottoman raids into Carniola and Styria and a path of repeated raids from the 1470s; Mohács (1526) brought the frontier to Austria.",
+     "wakes": {
+      "all": [
+       {
+        "event": {
+         "id": "battle_of_mohacs"
+        }
+       },
+       {
+        "borders": {
+         "who": "this",
+         "other": "ottoman"
+        }
+       }
+      ]
+     },
+     "effects": [
+      {
+       "lever": "garrison_pct",
+       "value": 30
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -30,
+       "building": "castle"
+      },
+      {
+       "lever": "grievance_shield",
+       "value": true,
+       "grievance": "soldiers_quartered",
+       "where": "frontier"
+      }
+     ],
+     "mark": {
+      "name": "Frontier captaincies",
+      "text": "Garrisons 10 % stronger.",
+      "effects": [
+       {
+        "lever": "garrison_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    {
+     "id": "austria_after_the_second_siege",
+     "name": "After the second siege",
+     "age": "age_of_crisis_and_absolutism",
+     "text": "New land alarms neighbours a quarter less, Foreign rule fades 30 % faster, standing regiments hold 10 points longer.",
+     "why": "Inferred from the event tree: after the siege of Vienna in 1683 the Habsburgs reconquered Hungary up to the Treaty of Karlowitz.",
+     "wakes": {
+      "any": [
+       {
+        "event": {
+         "id": "siege_of_vienna_1683"
+        }
+       },
+       {
+        "event": {
+         "id": "treaty_of_karlowitz"
+        }
+       }
+      ]
+     },
+     "effects": [
+      {
+       "lever": "lands_taken_pct",
+       "value": -25
+      },
+      {
+       "lever": "integration_years_pct",
+       "value": -30
+      },
+      {
+       "lever": "break_point_pct",
+       "value": 10,
+       "kind": "standing_regiment"
+      }
+     ]
+    }
+   ],
+   "burden": {
+    "id": "austria_pledged_domains",
+    "name": "Pledged domains",
+    "text": "Debt interest 40 % higher, and 8 % of taxes never reach you while the estates hold the purse.",
+    "why": "The catalogue's first constraint is a chronic shortage of money, with domains pledged widely and estates controlling taxation.",
+    "effects": [
+     {
+      "lever": "loan_interest_pct",
+      "value": 40
+     },
+     {
+      "lever": "tax_reach_pct",
+      "value": -8
+     }
+    ],
+    "shed": {
+     "all": [
+      {
+       "count": {
+        "who": "this",
+        "thing": "debt",
+        "op": "<=",
+        "value": 0
+       }
+      },
+      {
+       "knows": {
+        "who": "this",
+        "invention": "G3"
+       }
+      }
+     ]
+    },
+    "shed_text": "Pay off all your debt and learn Tax registers.",
+    "turned": {
+     "id": "austria_chamber_in_order",
+     "name": "Chamber in order",
+     "text": "Debt interest 30 % lower and a tenth more tax reaches you.",
+     "effects": [
+      {
+       "lever": "loan_interest_pct",
+       "value": -30
+      },
+      {
+       "lever": "tax_reach_pct",
+       "value": 10
+      }
+     ]
+    }
+   },
+   "ambitions": [
+    {
+     "id": "austria_three_crowns",
+     "name": "Three crowns, one house",
+     "theme": "crown",
+     "hint": "A boy, a stolen crown and two empty thrones.",
+     "text": "Rule Hungary and Bohemia, in personal union or by holding half their heartlands.",
+     "historical": true,
+     "window": [
+      1444,
+      1600
+     ],
+     "stir": {
+      "any": [
+       {
+        "relation": {
+         "who": "this",
+         "other": "hungary",
+         "type": "personal_union"
+        }
+       },
+       {
+        "relation": {
+         "who": "this",
+         "other": "bohemia",
+         "type": "personal_union"
+        }
+       },
+       {
+        "event": {
+         "id": "battle_of_mohacs"
+        }
+       }
+      ]
+     },
+     "goal": {
+      "all": [
+       {
+        "any": [
+         {
+          "relation": {
+           "who": "this",
+           "other": "hungary",
+           "type": "personal_union"
+          }
+         },
+         {
+          "owns": {
+           "who": "this",
+           "where": "area:central_hungary",
+           "min_share": 0.5
+          }
+         }
+        ]
+       },
+       {
+        "any": [
+         {
+          "relation": {
+           "who": "this",
+           "other": "bohemia",
+           "type": "personal_union"
+          }
+         },
+         {
+          "owns": {
+           "who": "this",
+           "where": "area:bohemia",
+           "min_share": 0.5
+          }
+         }
+        ]
+       }
+      ]
+     },
+     "legacy": {
+      "id": "austria_danubian_monarchy",
+      "name": "Danubian monarchy",
+      "great": true,
+      "text": "Two more lords before strain, Foreign rule fades a quarter faster, prestige +1.",
+      "effects": [
+       {
+        "lever": "lord_capacity",
+        "value": 2
+       },
+       {
+        "lever": "integration_years_pct",
+        "value": -25
+       },
+       {
+        "lever": "stat",
+        "value": 1,
+        "stat": "prestige"
+       }
+      ]
+     }
+    },
+    {
+     "id": "austria_redeem_the_pledges",
+     "name": "The empty pockets filled",
+     "theme": "wealth",
+     "hint": "Every castle pawned is a castle lost.",
+     "text": "Have five more royal provinces than at the start.",
+     "historical": true,
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "royal_provinces",
+       "op": ">=",
+       "value": "start+2"
+      }
+     },
+     "goal": {
+      "count": {
+       "who": "this",
+       "thing": "royal_provinces",
+       "op": ">=",
+       "value": "start+5"
+      }
+     },
+     "legacy": {
+      "id": "austria_redeemed_domains",
+      "name": "Redeemed domains",
+      "text": "Royal provinces pay 15 % more tax, debt interest 30 % lower, tax collectors 10 % stronger.",
+      "effects": [
+       {
+        "lever": "tax_reach_pct",
+        "value": 15,
+        "where": "royal"
+       },
+       {
+        "lever": "loan_interest_pct",
+        "value": -30
+       },
+       {
+        "lever": "official_type_pct",
+        "value": 10,
+        "type": "tax_collector"
+       }
+      ]
+     }
+    },
+    {
+     "id": "austria_hold_vienna",
+     "name": "The walls hold",
+     "theme": "survival",
+     "hint": "Twice the tents will ring the city.",
+     "text": "Hold Vienna and half of central Hungary.",
+     "historical": true,
+     "window": [
+      1444,
+      1720
+     ],
+     "stir": {
+      "any": [
+       {
+        "event": {
+         "id": "siege_of_vienna_1529"
+        }
+       },
+       {
+        "at_war": {
+         "who": "this",
+         "other": "ottoman"
+        }
+       }
+      ]
+     },
+     "goal": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Vienna"
+        }
+       },
+       {
+        "owns": {
+         "who": "this",
+         "where": "area:central_hungary",
+         "min_share": 0.5
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "austria_bells_of_st_stephen",
+      "name": "Bells of St Stephen",
+      "text": "Garrisons 20 % stronger and bloodshed no longer angers the frontier.",
+      "effects": [
+       {
+        "lever": "garrison_pct",
+        "value": 20
+       },
+       {
+        "lever": "grievance_shield",
+        "value": true,
+        "grievance": "bloodshed",
+        "where": "frontier"
+       }
+      ]
+     }
+    },
+    {
+     "id": "austria_adriatic_squadron",
+     "name": "Lions of Trieste",
+     "theme": "sea",
+     "hint": "A small port that Venice would rather see empty.",
+     "text": "Hold Trieste and keep at least ten war ships.",
+     "historical": false,
+     "stir": {
+      "count": {
+       "who": "this",
+       "thing": "ships",
+       "op": ">=",
+       "value": 3
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "holds_place": {
+         "who": "this",
+         "place": "Trieste"
+        }
+       },
+       {
+        "count": {
+         "who": "this",
+         "thing": "war_ships",
+         "op": ">=",
+         "value": 10
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "austria_trieste_arsenal",
+      "name": "Trieste arsenal",
+      "text": "Ships build 20 % faster and port provinces raise 20 % more sailors.",
+      "effects": [
+       {
+        "lever": "ship_build_pct",
+        "value": -20
+       },
+       {
+        "lever": "crew_pct",
+        "value": 20
+       }
+      ]
+     }
+    },
+    {
+     "id": "austria_habsburg_cradle",
+     "name": "The hawk's castle",
+     "theme": "land",
+     "hint": "The house is named for a castle its heirs no longer hold.",
+     "text": "Win back Habsburg castle in the Aargau from the Swiss.",
+     "historical": false,
+     "stir": {
+      "at_war": {
+       "who": "this",
+       "other": "swiss_confederation"
+      }
+     },
+     "goal": {
+      "holds_place": {
+       "who": "this",
+       "place": "Habsburg"
+      }
+     },
+     "legacy": {
+      "id": "austria_swabian_pikes",
+      "name": "Pikes of the hawk",
+      "text": "Commanders may fight in Gewalthaufen, and hired companies cost a fifth less.",
+      "effects": [
+       {
+        "lever": "commander_style",
+        "value": true,
+        "style": "gewalthaufen"
+       },
+       {
+        "lever": "hired_company_cost_pct",
+        "value": -20
+       }
+      ]
+     }
+    },
+    {
+     "id": "austria_theresian_chancery",
+     "name": "The chancery reformed",
+     "theme": "learning",
+     "hint": "Estates grant; ministers count.",
+     "text": "Know Professional bureaucracy and keep at least ten schools.",
+     "historical": false,
+     "age": "age_of_crisis_and_absolutism",
+     "stir": {
+      "knows": {
+       "who": "this",
+       "invention": "G3"
+      }
+     },
+     "goal": {
+      "all": [
+       {
+        "knows": {
+         "who": "this",
+         "invention": "G9"
+        }
+       },
+       {
+        "count": {
+         "who": "this",
+         "thing": "schools",
+         "op": ">=",
+         "value": 10
+        }
+       }
+      ]
+     },
+     "legacy": {
+      "id": "austria_united_chancery",
+      "name": "United chancery",
+      "text": "Two more officials before strain, officials reach full effect a year sooner, tax reach +4 %.",
+      "effects": [
+       {
+        "lever": "official_capacity",
+        "value": 2
+       },
+       {
+        "lever": "official_years_to_full",
+        "value": -1
+       },
+       {
+        "lever": "tax_reach_pct",
+        "value": 4
+       }
+      ]
+     }
+    }
+   ],
+   "source": "central_east_europe.json"
+  }
+ },
+ "catalogue": {
+  "igbo_societies": {
+   "id": "igbo_societies",
+   "names": {
+    "common_en": "Igbo village-group societies"
+   },
+   "meta": {
+    "region": "af_west",
+    "detail_tier": "C"
+   },
+   "classification": {
+    "entity_type": "segmentary_lineage_society",
+    "entity_type_notes": "Group record for autonomous Igbo village groups governed by elders, title societies and assemblies."
+   },
+   "historical": {
+    "geography": {
+     "extent_1444": "Igboland east and west of the Niger.",
+     "core_region": "Southeastern Nigeria",
+     "climate_terrain_resources": "Forest.",
+     "advantages": [
+      "Familiar terrain and dispersed settlement hard to conquer"
+     ],
+     "capital": {
+      "name": "None",
+      "certainty": "confirmed"
+     },
+     "access": {
+      "seas": [],
+      "rivers": [
+       "Niger",
+       "Imo"
+      ],
+      "passes_and_corridors": [],
+      "trade_routes": [
+       "Regional markets"
+      ]
+     }
+    },
+    "economy": {
+     "main_activities": [
+      "Yam farming",
+      "Crafts",
+      "Markets"
+     ],
+     "resource_base": "Local agriculture and resources.",
+     "goods": [
+      "Yams",
+      "Iron",
+      "Cloth"
+     ]
+    },
+    "society": {
+     "settlement_pattern": "Dense villages.",
+     "religions": [
+      {
+       "tradition": "Odinani"
+      }
+     ]
+    },
+    "identity": {
+     "background": "Densely settled village groups with assemblies, age grades and title societies; Nri ritual influence and Aro networks (later)."
+    }
+   },
+   "gameplay": {
+    "ai_personality": {
+     "economic_priorities": {
+      "focus": [
+       "agriculture",
+       "subsistence"
+      ]
+     },
+     "expansion": {
+      "modes": [
+       "defensive_only"
+      ]
+     },
+     "diplomacy": {
+      "likely_rivals": [
+       "benin"
+      ],
+      "preferred_partners": [
+       "nri"
+      ]
+     }
+    },
+    "starting_assessment": {
+     "economic_strength": {
+      "level": "moderate"
+     },
+     "manpower_potential": {
+      "level": "moderate"
+     },
+     "military_capability": {
+      "level": "low"
+     },
+     "naval_capability": {
+      "level": "very_low"
+     },
+     "diplomatic_influence": {
+      "level": "very_low"
+     },
+     "trade_access": {
+      "level": "low"
+     }
+    },
+    "representation": {
+     "mode": "decentralized_polity"
+    }
+   },
+   "event_connections": {
+    "possible_future_paths": []
+   }
+  },
+  "benin": {
+   "id": "benin",
+   "names": {
+    "common_en": "Benin"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Benin City (Edo)",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "nri": {
+   "id": "nri",
+   "names": {
+    "common_en": "Nri"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Agukwu Nri",
+      "certainty": "probable"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "non_state_actor"
+    }
+   },
+   "stub": true
+  },
+  "genoa": {
+   "id": "genoa",
+   "names": {
+    "common_en": "Genoa"
+   },
+   "meta": {
+    "region": "eu_italy",
+    "detail_tier": "B"
+   },
+   "classification": {
+    "entity_type": "merchant_republic",
+    "entity_type_notes": ""
+   },
+   "historical": {
+    "geography": {
+     "extent_1444": "City of Genoa and the Ligurian Riviere (di Ponente and di Levante), from near Ventimiglia to near Sarzana; claims on Corsica; overseas colonies separately catalogued.",
+     "core_region": "Liguria",
+     "climate_terrain_resources": "Narrow coastal strip backed by mountains; little arable land.",
+     "advantages": [
+      "Maritime and financial expertise",
+      "Natural harbour"
+     ],
+     "capital": {
+      "name": "Genoa",
+      "certainty": "confirmed"
+     },
+     "access": {
+      "seas": [
+       "Ligurian Sea",
+       "Tyrrhenian Sea"
+      ],
+      "rivers": [],
+      "passes_and_corridors": [
+       "Apennine passes (Giovi, Bocchetta) to Lombardy"
+      ],
+      "trade_routes": [
+       "Western Mediterranean to Iberia, Flanders, England",
+       "Levant and Black Sea via colonies",
+       "Lombard hinterland"
+      ]
+     }
+    },
+    "economy": {
+     "main_activities": [
+      "Shipping",
+      "Banking",
+      "Trade",
+      "Alum and mastic trade (Chios, Phocaea)"
+     ],
+     "resource_base": "Capital and shipping; Ligurian olive oil and wine.",
+     "goods": [
+      "Alum",
+      "Mastic",
+      "Silk",
+      "Cloth",
+      "Coral"
+     ]
+    },
+    "society": {
+     "settlement_pattern": "Dense port city; small coastal towns.",
+     "religions": [
+      {
+       "tradition": "Latin Christianity"
+      }
+     ]
+    },
+    "identity": {
+     "background": "Genoa was Venice's great maritime rival with colonies in the Aegean and Black Sea, but was politically unstable: the \"popular\" doges came from rival clans (Adorno, Campofregoso/Fregoso) supported by noble alberghi (Doria, Spinola, Fieschi, Grimaldi) and outside powers. The 1435 victory over Alfonso at Ponza was followed by revolt against Milan. In 1444 the Adorno held the dogeship and made peace with Alfonso."
+    }
+   },
+   "gameplay": {
+    "ai_personality": {
+     "economic_priorities": {
+      "focus": [
+       "maritime_commerce",
+       "banking_and_finance",
+       "trade"
+      ]
+     },
+     "expansion": {
+      "modes": [
+       "commercial_expansion",
+       "defensive_only"
+      ]
+     },
+     "diplomacy": {
+      "likely_rivals": [
+       "aragon",
+       "naples",
+       "venice"
+      ],
+      "preferred_partners": [
+       "milan",
+       "france"
+      ]
+     }
+    },
+    "starting_assessment": {
+     "economic_strength": {
+      "level": "moderate"
+     },
+     "manpower_potential": {
+      "level": "low"
+     },
+     "military_capability": {
+      "level": "low"
+     },
+     "naval_capability": {
+      "level": "high"
+     },
+     "diplomatic_influence": {
+      "level": "moderate"
+     },
+     "trade_access": {
+      "level": "very_high"
+     }
+    },
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "event_connections": {
+    "possible_future_paths": [
+     {
+      "path": "French lordship",
+      "chain_type": "independence",
+      "event_keys": [
+       "french_lordship_of_genoa_1458"
+      ],
+      "prerequisites": [
+       "Fregoso call in France"
+      ],
+      "blockers_or_alterations": [
+       "Strong doge"
+      ],
+      "historical_outcome": "Charles VII took lordship 1458; Milanese lordship 1464.",
+      "earliest_plausible": "1458"
+     },
+     {
+      "path": "Loss of eastern colonies",
+      "chain_type": "conquest_by_neighbor",
+      "event_keys": [
+       "fall_of_constantinople",
+       "fall_of_caffa_1475"
+      ],
+      "prerequisites": [
+       "Ottoman expansion"
+      ],
+      "blockers_or_alterations": [
+       "Christian league"
+      ],
+      "historical_outcome": "Pera 1453, Caffa 1475, Chios 1566.",
+      "earliest_plausible": "1453"
+     },
+     {
+      "path": "Corsica to San Giorgio",
+      "chain_type": "political_reform",
+      "event_keys": [
+       "corsica_to_san_giorgio"
+      ],
+      "prerequisites": [
+       "Genoese debt"
+      ],
+      "blockers_or_alterations": [
+       "Aragonese conquest"
+      ],
+      "historical_outcome": "Bank of San Giorgio took Corsica 1453.",
+      "earliest_plausible": "1450"
+     }
+    ]
+   }
+  },
+  "aragon": {
+   "id": "aragon",
+   "names": {
+    "common_en": "Crown of Aragon"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "No single capital; Barcelona, Zaragoza and Valencia are the realm capitals, and the king resided in Naples",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "naples": {
+   "id": "naples",
+   "names": {
+    "common_en": "Naples"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Naples",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "venice": {
+   "id": "venice",
+   "names": {
+    "common_en": "Venice"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Venice",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "milan": {
+   "id": "milan",
+   "names": {
+    "common_en": "Milan"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Milan",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "france": {
+   "id": "france",
+   "names": {
+    "common_en": "France"
+   },
+   "meta": {
+    "region": "eu_france",
+    "detail_tier": "A"
+   },
+   "classification": {
+    "entity_type": "kingdom",
+    "entity_type_notes": ""
+   },
+   "historical": {
+    "geography": {
+     "extent_1444": "The royal domain (Île-de-France, Champagne, Berry, Touraine, Poitou, Languedoc, Lyonnais, Auvergne under Bourbon, Picardy south of the Somme towns) and the great fiefs. English hold Normandy, Maine and Guyenne (Bordeaux-Bayonne) plus Calais.",
+     "core_region": "Loire valley and Paris basin (court mostly in Touraine and Berry)",
+     "climate_terrain_resources": "Temperate fertile plains, vineyards, salt marshes; very large agricultural base.",
+     "advantages": [
+      "Largest population in Latin Europe",
+      "Regular taxation",
+      "Rising royal army",
+      "Legitimacy restored since 1429"
+     ],
+     "capital": {
+      "name": "Paris (Parlement and administration); royal court at Tours, Bourges, Chinon, Loches",
+      "certainty": "confirmed"
+     },
+     "access": {
+      "seas": [
+       "English Channel",
+       "Atlantic",
+       "Mediterranean (Languedoc)"
+      ],
+      "rivers": [
+       "Seine",
+       "Loire",
+       "Rhône",
+       "Garonne (upper)"
+      ],
+      "passes_and_corridors": [
+       "Loire valley",
+       "Rhône corridor",
+       "Champagne routes to the Empire"
+      ],
+      "trade_routes": [
+       "Mediterranean trade via Montpellier and Aigues-Mortes (Levant galleys of Jacques Cœur)",
+       "Lyon fairs",
+       "Atlantic salt and wine"
+      ]
+     }
+    },
+    "economy": {
+     "main_activities": [
+      "Agriculture",
+      "Wine",
+      "Salt",
+      "Textiles",
+      "Mediterranean trade"
+     ],
+     "resource_base": "Large fertile base recovering from war.",
+     "goods": [
+      "Grain",
+      "Wine",
+      "Salt",
+      "Cloth",
+      "Woad"
+     ]
+    },
+    "society": {
+     "settlement_pattern": "Mostly rural with large cities.",
+     "religions": [
+      {
+       "tradition": "Latin (Catholic) Christianity"
+      }
+     ]
+    },
+    "identity": {
+     "background": "The most populous kingdom of western Europe, devastated by the Hundred Years War and the Armagnac-Burgundian civil war, was recovering under Charles VII. Since the Treaty of Arras (1435) with Burgundy and the recovery of Paris (1436), the crown had suppressed the princes' revolt of 1440 (Praguerie), gained regular taxation (taille, aides) without consulting the Estates General, and in 1444 secured a truce with England. The écorcheurs, unemployed soldiery, were the chief domestic problem; the king sent them east in 1444 against the Swiss and Metz."
+    }
+   },
+   "gameplay": {
+    "ai_personality": {
+     "economic_priorities": {
+      "focus": [
+       "taxation",
+       "agriculture"
+      ]
+     },
+     "expansion": {
+      "modes": [
+       "conquest",
+       "consolidation",
+       "dynastic_union"
+      ]
+     },
+     "diplomacy": {
+      "likely_rivals": [
+       "england",
+       "burgundy"
+      ],
+      "preferred_partners": [
+       "scotland",
+       "castile"
+      ]
+     }
+    },
+    "starting_assessment": {
+     "economic_strength": {
+      "level": "very_high"
+     },
+     "manpower_potential": {
+      "level": "very_high"
+     },
+     "military_capability": {
+      "level": "high"
+     },
+     "naval_capability": {
+      "level": "low"
+     },
+     "diplomatic_influence": {
+      "level": "very_high"
+     },
+     "trade_access": {
+      "level": "high"
+     }
+    },
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "event_connections": {
+    "possible_future_paths": [
+     {
+      "path": "Reconquest of Normandy and Guyenne",
+      "chain_type": "territorial_expansion",
+      "event_keys": [
+       "french_reconquest_of_normandy",
+       "battle_of_castillon"
+      ],
+      "prerequisites": [
+       "Army reform",
+       "English weakness"
+      ],
+      "blockers_or_alterations": [
+       "English revival"
+      ],
+      "historical_outcome": "Normandy 1449-1450, Guyenne 1453.",
+      "earliest_plausible": "1449"
+     },
+     {
+      "path": "Absorption of great fiefs",
+      "chain_type": "consolidation",
+      "event_keys": [
+       "league_of_the_public_weal",
+       "burgundian_succession_crisis"
+      ],
+      "prerequisites": [
+       "Royal power"
+      ],
+      "blockers_or_alterations": [
+       "Princely leagues"
+      ],
+      "historical_outcome": "Burgundian duchy 1477, Anjou/Provence 1481, Brittany 1491/1532.",
+      "earliest_plausible": "1460s"
+     },
+     {
+      "path": "Italian Wars",
+      "chain_type": "other",
+      "event_keys": [
+       "italian_wars"
+      ],
+      "prerequisites": [
+       "Angevin claim"
+      ],
+      "blockers_or_alterations": [
+       "Peace"
+      ],
+      "historical_outcome": "From 1494.",
+      "earliest_plausible": "1490s"
+     }
+    ]
+   }
+  },
+  "zanzibar": {
+   "id": "zanzibar",
+   "names": {
+    "common_en": "Zanzibar and Pemba"
+   },
+   "meta": {
+    "region": "af_northeast_east",
+    "detail_tier": "C"
+   },
+   "classification": {
+    "entity_type": "city_state",
+    "entity_type_notes": "Group of towns."
+   },
+   "historical": {
+    "geography": {
+     "extent_1444": "Unguja and Pemba islands.",
+     "core_region": "Unguja and Pemba",
+     "climate_terrain_resources": "Coral coast and islands.",
+     "advantages": [
+      "Sea access"
+     ],
+     "capital": {
+      "name": "None (group)",
+      "certainty": "confirmed"
+     },
+     "access": {
+      "seas": [
+       "Indian Ocean"
+      ],
+      "rivers": [],
+      "passes_and_corridors": [],
+      "trade_routes": [
+       "Coastal trade",
+       "Kilwa",
+       "Mombasa"
+      ]
+     }
+    },
+    "economy": {
+     "main_activities": [
+      "Trade",
+      "Agriculture",
+      "Fishing"
+     ],
+     "resource_base": "Commerce and coastal farming.",
+     "goods": [
+      "Grain",
+      "Ivory (transit)"
+     ]
+    },
+    "society": {
+     "settlement_pattern": "Stone and wattle towns.",
+     "religions": [
+      {
+       "tradition": "Sunni Islam"
+      }
+     ]
+    },
+    "identity": {
+     "background": "Island towns with mosques and small ruling houses (Mwinyi Mkuu tradition in Unguja is later formalised)."
+    }
+   },
+   "gameplay": {
+    "ai_personality": {
+     "economic_priorities": {
+      "focus": [
+       "trade",
+       "maritime_commerce"
+      ]
+     },
+     "expansion": {
+      "modes": [
+       "limited_growth",
+       "commercial_expansion"
+      ]
+     },
+     "diplomacy": {
+      "likely_rivals": [],
+      "preferred_partners": []
+     }
+    },
+    "starting_assessment": {
+     "economic_strength": {
+      "level": "very_low"
+     },
+     "manpower_potential": {
+      "level": "very_low"
+     },
+     "military_capability": {
+      "level": "very_low"
+     },
+     "naval_capability": {
+      "level": "very_low"
+     },
+     "diplomatic_influence": {
+      "level": "very_low"
+     },
+     "trade_access": {
+      "level": "moderate"
+     }
+    },
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "event_connections": {
+    "possible_future_paths": [
+     {
+      "path": "Omani Zanzibar",
+      "chain_type": "other",
+      "event_keys": [
+       "p_omani_indian_ocean"
+      ],
+      "prerequisites": [],
+      "blockers_or_alterations": [],
+      "historical_outcome": "Omani capital from 1832-1840."
+     }
+    ]
+   }
+  },
+  "portugal": {
+   "id": "portugal",
+   "names": {
+    "common_en": "Portugal"
+   },
+   "meta": {
+    "region": "eu_iberia",
+    "detail_tier": "A"
+   },
+   "classification": {
+    "entity_type": "kingdom",
+    "entity_type_notes": ""
+   },
+   "historical": {
+    "geography": {
+     "extent_1444": "Mainland Portugal and the Algarve; Ceuta in Morocco (recorded as portuguese_ceuta in af_north_sahara); Madeira and Porto Santo; Azores in early settlement; seasonal presence on the Saharan coast (Arguin).",
+     "core_region": "Lisbon and the Tagus estuary, Coimbra, Porto and the Entre-Douro-e-Minho",
+     "climate_terrain_resources": "Atlantic coastline with good harbours; mountainous north, Mediterranean-type south; salt, wine, olive oil, fish, cork; limited grain.",
+     "advantages": [
+      "Long Atlantic coastline and maritime expertise",
+      "Compact, defensible territory",
+      "Early lead in African navigation"
+     ],
+     "capital": {
+      "name": "Lisbon",
+      "certainty": "confirmed"
+     },
+     "access": {
+      "seas": [
+       "Atlantic Ocean",
+       "Strait of Gibraltar approaches"
+      ],
+      "rivers": [
+       "Tagus",
+       "Douro",
+       "Mondego",
+       "Guadiana"
+      ],
+      "passes_and_corridors": [
+       "Land frontier with Castile (Minho, Beira, Alentejo)"
+      ],
+      "trade_routes": [
+       "Atlantic coastal trade to Flanders and England",
+       "Mediterranean via Italian merchants",
+       "Atlantic islands",
+       "Saharan-Guinea coast (gold, slaves, gum)"
+      ]
+     }
+    },
+    "economy": {
+     "main_activities": [
+      "Maritime trade",
+      "Fishing",
+      "Salt production",
+      "Wine and olive oil",
+      "Atlantic island colonisation",
+      "Early African trade and slaving"
+     ],
+     "resource_base": "Coastline, salt pans, vineyards, cork oak; Madeira timber and later sugar.",
+     "goods": [
+      "Salt",
+      "Wine",
+      "Olive oil",
+      "Cork",
+      "Fish",
+      "Madeira wheat and sugar (beginning)",
+      "Gold dust and enslaved people from the African coast (from the 1440s)"
+     ]
+    },
+    "society": {
+     "settlement_pattern": "Coastal towns and dense rural north; thinly settled Alentejo.",
+     "religions": [
+      {
+       "tradition": "Latin (Catholic) Christianity"
+      }
+     ]
+    },
+    "identity": {
+     "background": "A compact Atlantic kingdom whose Avis dynasty, founded in the 1383-1385 crisis with English support, turned to overseas expansion: Ceuta (1415), the colonisation of Madeira and the Azores, and voyages down the African coast sponsored by Prince Henry. The failed attack on Tangier (1437) and the regency struggle after King Duarte's death made the 1440s politically delicate, but the regent Pedro, an internationally travelled prince, governed effectively and allowed Henry's ventures to accelerate."
+    }
+   },
+   "gameplay": {
+    "ai_personality": {
+     "economic_priorities": {
+      "focus": [
+       "maritime_commerce",
+       "trade",
+       "taxation"
+      ]
+     },
+     "expansion": {
+      "modes": [
+       "colonization",
+       "commercial_expansion",
+       "conquest"
+      ]
+     },
+     "diplomacy": {
+      "likely_rivals": [
+       "morocco",
+       "castile"
+      ],
+      "preferred_partners": [
+       "england",
+       "castile",
+       "burgundy"
+      ]
+     }
+    },
+    "starting_assessment": {
+     "economic_strength": {
+      "level": "moderate"
+     },
+     "manpower_potential": {
+      "level": "low"
+     },
+     "military_capability": {
+      "level": "moderate"
+     },
+     "naval_capability": {
+      "level": "high"
+     },
+     "diplomatic_influence": {
+      "level": "moderate"
+     },
+     "trade_access": {
+      "level": "moderate"
+     }
+    },
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "event_connections": {
+    "possible_future_paths": [
+     {
+      "path": "Civil war between regent and nobility",
+      "chain_type": "rebellion",
+      "event_keys": [
+       "battle_of_alfarrobeira"
+      ],
+      "prerequisites": [
+       "Afonso V comes of age under Braganza influence"
+      ],
+      "blockers_or_alterations": [
+       "Peaceful handover"
+      ],
+      "historical_outcome": "Pedro killed at Alfarrobeira, 1449.",
+      "earliest_plausible": "1448"
+     },
+     {
+      "path": "Atlantic slave trade and Guinea trade",
+      "chain_type": "colonization",
+      "event_keys": [
+       "arguin_trading_post",
+       "atlantic_slave_trade"
+      ],
+      "prerequisites": [
+       "Continued voyages"
+      ],
+      "blockers_or_alterations": [
+       "Saharan resistance; Castilian competition"
+      ],
+      "historical_outcome": "Arguin post built in the late 1440s-1450s; slave trade grew; transatlantic trade later.",
+      "earliest_plausible": "1445"
+     },
+     {
+      "path": "Moroccan conquests",
+      "chain_type": "territorial_expansion",
+      "event_keys": [
+       "capture_of_alcacer_ceguer",
+       "capture_of_arzila_and_tangier"
+      ],
+      "prerequisites": [
+       "Royal resources and noble desire for war"
+      ],
+      "blockers_or_alterations": [
+       "Moroccan recovery"
+      ],
+      "historical_outcome": "Alcácer Ceguer 1458, Arzila and Tangier 1471.",
+      "earliest_plausible": "1450s"
+     },
+     {
+      "path": "Route to India",
+      "chain_type": "exploration",
+      "event_keys": [
+       "rounding_of_the_cape",
+       "da_gama_voyage"
+      ],
+      "prerequisites": [
+       "Sustained exploration"
+      ],
+      "blockers_or_alterations": [
+       "Loss of royal interest"
+      ],
+      "historical_outcome": "Cape rounded 1488, India 1498.",
+      "earliest_plausible": "1480s"
+     },
+     {
+      "path": "Iberian Union",
+      "chain_type": "union_or_merger",
+      "event_keys": [
+       "iberian_union"
+      ],
+      "prerequisites": [
+       "Dynastic failure"
+      ],
+      "blockers_or_alterations": [
+       "Healthy succession"
+      ],
+      "historical_outcome": "Union with Spain 1580-1640.",
+      "earliest_plausible": "1570s"
+     }
+    ]
+   }
+  },
+  "morocco": {
+   "id": "morocco",
+   "names": {
+    "common_en": "Morocco (Marinid sultanate under the Wattasid regency)"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Fez (Fas al-Jadid palace-city and Fas al-Bali)",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "castile": {
+   "id": "castile",
+   "names": {
+    "common_en": "Castile"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "No fixed capital; itinerant court (Valladolid, Madrigal, Tordesillas, Medina del Campo most frequent)",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "england": {
+   "id": "england",
+   "names": {
+    "common_en": "England"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "London / Westminster",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "burgundy": {
+   "id": "burgundy",
+   "names": {
+    "common_en": "Valois Burgundy"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Dijon (ducal capital of the duchy); the court resided mostly at Brussels, Lille, Bruges and Hesdin",
+      "certainty": "confirmed",
+      "notes": "There was no single capital; the itinerant court increasingly favoured Brussels in the 1440s."
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "scotland": {
+   "id": "scotland",
+   "names": {
+    "common_en": "Scotland"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "No fixed capital; Edinburgh, Stirling and Perth",
+      "notes": "Edinburgh Castle and Stirling were key to controlling the king.",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "ming": {
+   "id": "ming",
+   "names": {
+    "common_en": "Ming China"
+   },
+   "meta": {
+    "region": "as_china_inner_asia",
+    "detail_tier": "A"
+   },
+   "classification": {
+    "entity_type": "empire",
+    "entity_type_notes": "Centralised bureaucratic monarchy under an emperor claiming the Mandate of Heaven, governing through civil-service ministries, provinces and a hereditary military-household (weisuo) system."
+   },
+   "historical": {
+    "geography": {
+     "extent_1444": "China proper (the two metropolitan areas and thirteen provinces) from Liaodong to Yunnan and from Gansu to the coast, including Hainan. Guard-system outposts and nominal guards beyond the frontier in Manchuria and west of Jiayu Pass; the steppe north of the garrison line was not held.",
+     "core_region": "North China plain (Beijing) and the lower Yangzi (Jiangnan) economic heartland, linked by the Grand Canal.",
+     "climate_terrain_resources": "Temperate north China plain (wheat, millet) and humid subtropical south (rice); mountainous southwest with silver and copper mines in Yunnan; silk, cotton and porcelain production in Jiangnan and Jiangxi.",
+     "advantages": [
+      "Enormous agrarian base and population",
+      "Integrated canal and river transport",
+      "Long-established bureaucratic and literate elite"
+     ],
+     "capital": {
+      "name": "Beijing (Shuntian)",
+      "notes": "Nanjing retained as auxiliary capital with a parallel ministry structure.",
+      "certainty": "confirmed"
+     },
+     "access": {
+      "seas": [
+       "Bohai Sea",
+       "Yellow Sea",
+       "East China Sea",
+       "South China Sea"
+      ],
+      "rivers": [
+       "Yangzi",
+       "Yellow River",
+       "Grand Canal",
+       "Pearl River (West River)"
+      ],
+      "passes_and_corridors": [
+       "Juyong Pass and the Beijing northern passes",
+       "Hexi Corridor to Jiayu Pass",
+       "Shanhai Pass to Liaodong",
+       "Yunnan-Burma routes via Tengchong"
+      ],
+      "trade_routes": [
+       "Grand Canal internal trade",
+       "Tribute-horse trade at frontier markets with Mongols and Jurchens",
+       "Tea-horse trade with Tibet via Sichuan and Shaanxi",
+       "Tribute missions from Central Asia via Hami",
+       "Official maritime tribute routes to Ryukyu, Southeast Asia and Japan"
+      ]
+     }
+    },
+    "economy": {
+     "main_activities": [
+      "Rice and wheat agriculture",
+      "Silk and cotton textiles",
+      "Porcelain",
+      "Salt production (state monopoly)",
+      "Mining (silver, copper in Yunnan)"
+     ],
+     "resource_base": "The largest agrarian economy of its time, with highly productive rice agriculture in the south.",
+     "goods": [
+      "Silk",
+      "Porcelain",
+      "Tea",
+      "Cotton cloth",
+      "Salt",
+      "Iron"
+     ]
+    },
+    "society": {
+     "settlement_pattern": "Dense rural settlement with large cities (Beijing, Nanjing, Suzhou, Hangzhou); military garrisons along frontiers; sparse Han settlement in the southwest.",
+     "religions": [
+      {
+       "tradition": "State ritual and Confucian orthodoxy (Cheng-Zhu)"
+      }
+     ]
+    },
+    "identity": {
+     "background": "Founded on the ruins of Yuan rule by Zhu Yuanzhang, the Ming built a strongly centralised state with the capital moved to Beijing by the Yongle Emperor (r.1402-1424), who also campaigned in Mongolia, occupied Annam and sent Zheng He's fleets across the Indian Ocean. Under the Hongxi and Xuande emperors (1424-1435) policy turned to retrenchment: Annam was abandoned (1427), the last great voyage sailed in 1431-1433, and frontier defence shifted towards a defensive garrison line. The Zhengtong Emperor came to the throne aged eight in 1435."
+    }
+   },
+   "gameplay": {
+    "ai_personality": {
+     "economic_priorities": {
+      "focus": [
+       "agriculture",
+       "taxation",
+       "tribute"
+      ]
+     },
+     "expansion": {
+      "modes": [
+       "consolidation",
+       "tributary_expansion",
+       "defensive_only"
+      ]
+     },
+     "diplomacy": {
+      "likely_rivals": [
+       "oirat",
+       "luchuan",
+       "jianzhou"
+      ],
+      "preferred_partners": [
+       "joseon",
+       "ryukyu",
+       "uriankhai"
+      ]
+     }
+    },
+    "starting_assessment": {
+     "economic_strength": {
+      "level": "very_high"
+     },
+     "manpower_potential": {
+      "level": "very_high"
+     },
+     "military_capability": {
+      "level": "high"
+     },
+     "naval_capability": {
+      "level": "high"
+     },
+     "diplomatic_influence": {
+      "level": "very_high"
+     },
+     "trade_access": {
+      "level": "high"
+     }
+    },
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "event_connections": {
+    "possible_future_paths": [
+     {
+      "path": "Tumu crisis: an imperial campaign against the Oirat ends in disaster and capture of the emperor",
+      "chain_type": "dynastic_crisis",
+      "event_keys": [
+       "tumu_crisis",
+       "defence_of_beijing_1449"
+      ],
+      "prerequisites": [
+       "Breakdown of Oirat tribute relations",
+       "Favourite-led decision to campaign in person"
+      ],
+      "blockers_or_alterations": [
+       "A capable military leadership or avoiding a personal imperial campaign",
+       "Oirat internal division"
+      ],
+      "historical_outcome": "August/September 1449 the Zhengtong Emperor was captured at Tumu; Yu Qian defended Beijing; the Jingtai Emperor was enthroned and the captive returned in 1450.",
+      "earliest_plausible": "1449"
+     },
+     {
+      "path": "Resume maritime expeditions or open private maritime trade",
+      "chain_type": "economic_transformation",
+      "event_keys": [
+       "ming_maritime_reopening"
+      ],
+      "prerequisites": [
+       "Fiscal need and court support"
+      ],
+      "blockers_or_alterations": [
+       "Civil-official opposition to costly expeditions"
+      ],
+      "historical_outcome": "Voyages were not resumed; private trade was legalised only in 1567 at Yuegang.",
+      "earliest_plausible": "1450s"
+     },
+     {
+      "path": "Consolidate the southwest by turning tusi into regular administration",
+      "chain_type": "consolidation",
+      "event_keys": [
+       "gaitu_guiliu"
+      ],
+      "prerequisites": [
+       "Victory over Luchuan; stable court"
+      ],
+      "blockers_or_alterations": [
+       "Tusi resistance (Bozhou, Shuixi)"
+      ],
+      "historical_outcome": "Gradual and partial; large-scale conversion came under the Qing.",
+      "earliest_plausible": "1450s"
+     }
+    ]
+   }
+  },
+  "oirat": {
+   "id": "oirat",
+   "names": {
+    "common_en": "Oirat (Esen Taishi)"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "No fixed capital (mobile ordo)",
+      "notes": "Seasonal camps in western and central Mongolia.",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "luchuan": {
+   "id": "luchuan",
+   "names": {
+    "common_en": "Luchuan-Pingmian (Möng Mao)"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Möng Mao (near modern Ruili)",
+      "certainty": "probable"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "jianzhou": {
+   "id": "jianzhou",
+   "names": {
+    "common_en": "Jianzhou Jurchens"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "No fixed capital",
+      "certainty": "probable"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_subject"
+    }
+   },
+   "stub": true
+  },
+  "joseon": {
+   "id": "joseon",
+   "names": {
+    "common_en": "Joseon"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Hanseong (Hanyang, modern Seoul)",
+      "notes": "Capital since 1394 (with a brief return to Gaegyeong 1399-1405).",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "ryukyu": {
+   "id": "ryukyu",
+   "names": {
+    "common_en": "Ryukyu"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Shuri",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "uriankhai": {
+   "id": "uriankhai",
+   "names": {
+    "common_en": "Three Guards (Uriankhai)"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "None",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_subject"
+    }
+   },
+   "stub": true
+  },
+  "kongo": {
+   "id": "kongo",
+   "names": {
+    "common_en": "Kongo"
+   },
+   "meta": {
+    "region": "af_central_south",
+    "detail_tier": "A"
+   },
+   "classification": {
+    "entity_type": "kingdom",
+    "entity_type_notes": "Elective-within-a-royal-lineage kingship over appointed and hereditary provincial lords, centred on a royal town."
+   },
+   "historical": {
+    "geography": {
+     "extent_1444": "Roughly the plateau and valleys between the lower Congo river and the Loje/Dande in the south, and from the Atlantic coast (Soyo) east towards the Kwango; exact limits in the 1440s are unknown.",
+     "core_region": "Mbanza Kongo plateau (northern Angola)",
+     "climate_terrain_resources": "Savanna plateau with gallery forest, two rainy seasons; millet, sorghum, yams, bananas and palm products; raffia cloth, salt on the coast, copper deposits to the north and south.",
+     "advantages": [
+      "Defensible plateau capital",
+      "Control of shell currency and salt",
+      "Densest population in the region around the capital"
+     ],
+     "capital": {
+      "name": "Mbanza Kongo (later São Salvador)",
+      "certainty": "probable"
+     },
+     "access": {
+      "seas": [
+       "Atlantic Ocean (coast of Soyo)"
+      ],
+      "rivers": [
+       "Lower Congo (Nzadi)",
+       "Mbridge (Mbrize)",
+       "Loje",
+       "Inkisi"
+      ],
+      "passes_and_corridors": [
+       "Routes east to Malebo Pool and the Kwango"
+      ],
+      "trade_routes": [
+       "Salt and shells from the coast inland",
+       "Copper from the north (Mindouli) and the Bembe area",
+       "Cloth (raffia) exchange with the Kwango and Tio"
+      ]
+     }
+    },
+    "economy": {
+     "main_activities": [
+      "Agriculture",
+      "Raffia cloth weaving",
+      "Salt production",
+      "Copper and iron working",
+      "Tribute collection"
+     ],
+     "resource_base": "Plateau agriculture, palm and raffia, coastal salt, nearby copper.",
+     "goods": [
+      "Raffia cloth",
+      "Salt",
+      "Nzimbu shells",
+      "Copper",
+      "Ivory"
+     ]
+    },
+    "society": {
+     "settlement_pattern": "Royal and provincial towns (mbanza) surrounded by dispersed villages.",
+     "religions": [
+      {
+       "tradition": "Kongo religion (ancestors, territorial spirits, nkisi)"
+      }
+     ]
+    },
+    "identity": {
+     "background": "Kikongo-speaking kingdom founded, according to traditions recorded from the 16th century, when Lukeni lua Nimi crossed from Vungu north of the Congo and conquered the Mpemba Kasi/Mbanza Kongo area, allying with the Nsaku Lau lineage of Mbata. Kingship passed among descendants of the founder chosen by electors, and the king appointed provincial governors who collected tribute in cloth, food and nzimbu shell currency."
+    }
+   },
+   "gameplay": {
+    "ai_personality": {
+     "economic_priorities": {
+      "focus": [
+       "tribute",
+       "agriculture",
+       "trade"
+      ]
+     },
+     "expansion": {
+      "modes": [
+       "tributary_expansion",
+       "consolidation"
+      ]
+     },
+     "diplomacy": {
+      "likely_rivals": [
+       "tio",
+       "mbundu_chiefdoms"
+      ],
+      "preferred_partners": [
+       "loango",
+       "kakongo",
+       "ngoyo"
+      ]
+     }
+    },
+    "starting_assessment": {
+     "economic_strength": {
+      "level": "moderate"
+     },
+     "manpower_potential": {
+      "level": "moderate"
+     },
+     "military_capability": {
+      "level": "low"
+     },
+     "naval_capability": {
+      "level": "very_low"
+     },
+     "diplomatic_influence": {
+      "level": "moderate"
+     },
+     "trade_access": {
+      "level": "low"
+     }
+    },
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "event_connections": {
+    "possible_future_paths": [
+     {
+      "path": "Contact with Portuguese navigators and royal conversion",
+      "chain_type": "religious_transformation",
+      "event_keys": [
+       "portuguese_arrival_congo_mouth",
+       "kongo_christianization"
+      ],
+      "prerequisites": [
+       "Portuguese voyages reach the Congo mouth",
+       "King sees advantage in alliance"
+      ],
+      "blockers_or_alterations": [
+       "No maritime contact",
+       "Strong traditional ritual opposition"
+      ],
+      "historical_outcome": "Diogo Cão reached the Congo in 1483; Nzinga a Nkuwu was baptised in 1491 and Afonso I built a Kongolese Catholic church.",
+      "earliest_plausible": "1480s"
+     },
+     {
+      "path": "Southward expansion over the Mbundu",
+      "chain_type": "territorial_expansion",
+      "event_keys": [
+       "kongo_mbundu_tribute"
+      ],
+      "prerequisites": [
+       "Stable succession",
+       "Military success in Mbamba"
+      ],
+      "blockers_or_alterations": [
+       "Rise of a strong Ndongo"
+      ],
+      "historical_outcome": "Kongo claimed \"Angola\" in royal titles by 1535, but Ndongo became independent and hostile in the 16th century.",
+      "earliest_plausible": "1480s"
+     },
+     {
+      "path": "Succession wars and fragmentation",
+      "chain_type": "fragmentation",
+      "event_keys": [
+       "kongo_succession_war",
+       "battle_of_mbwila"
+      ],
+      "prerequisites": [
+       "Contested succession",
+       "Provincial lords backing rival candidates"
+      ],
+      "blockers_or_alterations": [
+       "Strong central army"
+      ],
+      "historical_outcome": "Disputed successions recurred (1506-1509, 1560s-1570s) and after Mbwila (1665) the kingdom split for decades.",
+      "earliest_plausible": "1450s"
+     }
+    ]
+   }
+  },
+  "tio": {
+   "id": "tio",
+   "names": {
+    "common_en": "Tio Kingdom"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Royal residence on the plateaux (Mbe in later times)",
+      "certainty": "uncertain"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "mbundu_chiefdoms": {
+   "id": "mbundu_chiefdoms",
+   "names": {
+    "common_en": "Mbundu chiefdoms"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "None: no single capital (group record)",
+      "certainty": "confirmed"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "decentralized_polity"
+    }
+   },
+   "stub": true
+  },
+  "loango": {
+   "id": "loango",
+   "names": {
+    "common_en": "Loango"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Bwali (Mbanza Loango)",
+      "certainty": "probable"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "kakongo": {
+   "id": "kakongo",
+   "names": {
+    "common_en": "Kakongo"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Kinguele (later capital; 1440s seat unknown)",
+      "certainty": "uncertain"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  },
+  "ngoyo": {
+   "id": "ngoyo",
+   "names": {
+    "common_en": "Ngoyo"
+   },
+   "historical": {
+    "geography": {
+     "capital": {
+      "name": "Mbanza Ngoyo (later; 1440s seat unknown)",
+      "certainty": "uncertain"
+     }
+    }
+   },
+   "gameplay": {
+    "representation": {
+     "mode": "playable_country"
+    }
+   },
+   "stub": true
+  }
+ },
+ "event_links": {
+  "battle_of_castillon": {
+   "match": "equivalent",
+   "event_tree_ids": [
+    "end_of_hundred_years_war"
+   ]
+  },
+  "defence_of_beijing_1449": {
+   "match": "part_of",
+   "event_tree_ids": [
+    "tumu_crisis"
+   ]
+  },
+  "french_reconquest_of_normandy": {
+   "match": "part_of",
+   "event_tree_ids": [
+    "end_of_hundred_years_war"
+   ]
+  },
+  "fall_of_constantinople": {
+   "match": "exact",
+   "event_tree_ids": [
+    "fall_of_constantinople"
+   ]
+  },
+  "portuguese_arrival_congo_mouth": {
+   "match": "part_of",
+   "event_tree_ids": []
+  },
+  "fall_of_caffa_1475": {
+   "match": "part_of",
+   "event_tree_ids": []
+  },
+  "rounding_of_the_cape": {
+   "match": "part_of",
+   "event_tree_ids": [
+    "portuguese_cape_route"
+   ]
+  },
+  "da_gama_voyage": {
+   "match": "part_of",
+   "event_tree_ids": [
+    "portuguese_cape_route"
+   ]
+  },
+  "italian_wars": {
+   "match": "exact",
+   "event_tree_ids": [
+    "italian_wars"
+   ]
+  },
+  "kongo_christianization": {
+   "match": "exact",
+   "event_tree_ids": [
+    "kongo_christianization"
+   ]
+  },
+  "tumu_crisis": {
+   "match": "exact",
+   "event_tree_ids": [
+    "tumu_crisis"
+   ]
+  },
+  "battle_of_mbwila": {
+   "match": "exact",
+   "event_tree_ids": [
+    "battle_of_mbwila"
+   ]
+  },
+  "arguin_trading_post": {
+   "match": "part_of",
+   "event_tree_ids": []
+  },
+  "atlantic_slave_trade": {
+   "match": "equivalent",
+   "event_tree_ids": []
+  },
+  "p_omani_indian_ocean": {
+   "match": "exact",
+   "event_tree_ids": []
+  },
+  "iberian_union": {
+   "match": "exact",
+   "event_tree_ids": [
+    "iberian_union"
+   ]
+  }
+ }
+}
