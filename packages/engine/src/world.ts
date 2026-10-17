@@ -101,7 +101,7 @@ export interface ArmyPool {
   cameFrom: Int32Array;
   /** Company kind: levy or hired (see KIND). */
   kind: Uint8Array;
-  /** Months since the men were raised (levies go home after 6). */
+  /** Months since the men were raised (a levy's pay begins in the fourth). */
   monthsOut: Uint16Array;
   /** Months drilled together (0 untrained, 3 trained). */
   drill: Float32Array;

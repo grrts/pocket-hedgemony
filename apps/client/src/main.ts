@@ -1074,7 +1074,6 @@ function renderArmy(id: number): void {
   const by = s.armies.byArm[k]!;
   const hired = s.armies.kind[k] === 1;
   const monthsOut = s.armies.monthsOut[k]!;
-  const goHome = rules.defines.recruit && !hired ? Math.max(0, 6 - monthsOut) : 0;
   const rations = s.armies.rations[k]!;
   const food = s.armies.food[k]!;
   const here = s.armies.location[k]!;
@@ -1102,7 +1101,6 @@ function renderArmy(id: number): void {
       <dt>Men</dt><dd>${fmt(s.armies.men[k]!)}, ${fmt(s.armies.horse[k]!)} on horse · ${hired ? "a mercenary company" : "levies"}</dd>
       <dt>Drill</dt><dd>${(s.armies.drill[k]! / 10).toFixed(1)} months trained together</dd>
       <dt>Pay</dt><dd>${s.armies.pay[k]!.toFixed(2)} gold a month${!hired && monthsOut <= 3 ? ` (free for ${3 - monthsOut} more month${3 - monthsOut === 1 ? "" : "s"})` : ""}</dd>
-      ${hired ? "" : `<dt>Service</dt><dd>${monthsOut} month${monthsOut === 1 ? "" : "s"} out · ${goHome > 0 ? `men start going home in ${goHome} month${goHome === 1 ? "" : "s"}` : "5% go home each month"}</dd>`}
       <dt>Food</dt><dd>${fmt(rations)} rations a month · ${fmt(food)} in the wagons (${rations > 0 ? (food / rations).toFixed(1) : "–"} months)<br><small>${supplyLine(k)}</small></dd>
     </dl>
     <h3 class="sub">Troops</h3>

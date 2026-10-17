@@ -81,7 +81,7 @@ describe("armies that cost something", () => {
     expect(garrisonTroops(w, me, p)).toEqual([]);
   });
 
-  it("pays levies from their fourth month and sends them home after six", () => {
+  it("pays levies from their fourth month and keeps them under arms until sent home", () => {
     const w = createWorld(rules, 1);
     const me = n(w, "castile");
     w.player = me;
@@ -90,9 +90,8 @@ describe("armies that cost something", () => {
     months(w, me, 4);
     expect(armyPay(w, army!)).toBeGreaterThan(0);
     const men = w.armies.men[army!]!;
-    months(w, me, 3);
-    expect(w.armies.men[army!]).toBeLessThan(men);
-    expect(w.armies.men[army!]).toBeGreaterThan(men * 0.85);
+    months(w, me, 8);
+    expect(w.armies.men[army!]).toBe(men);
   });
 
   it("trains levy foot as archers in the army while it stands at home", () => {

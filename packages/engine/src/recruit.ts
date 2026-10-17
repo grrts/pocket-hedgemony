@@ -561,9 +561,9 @@ export function weeklyMusters(world: World, news: News[]): void {
 }
 
 /**
- * Each month: pools refill, levies count their months and go home after six,
- * men over the troop cap or unpaid desert, and training moves on
- * (RECR-019, RECR-050, RECR-053, WAR-035).
+ * Each month: pools refill, levies count their months (pay begins in the
+ * fourth), men over the troop cap or unpaid desert, and training moves on
+ * (RECR-019, RECR-050, WAR-035).
  */
 export function monthlyRecruits(world: World, news: News[]): void {
   const rate = rc.refillRate() / 12;
@@ -576,31 +576,27 @@ export function monthlyRecruits(world: World, news: News[]): void {
   recomputeCap(world);
 
   const a = world.armies;
-  const gone = new Float64Array(world.nationCount);
   const deserted = new Float64Array(world.nationCount);
   const broke = world.nationTreasury.map((t) => (t < 0 ? 1 : 0));
-  const homeShare = (monthsOut: number) => rc.goingHome({ id: "", arm: rc.LEVY_ARM, kind: "levy", drill: 0, men: 1, monthsOut });
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
     a.monthsOut[i] = Math.min(65535, a.monthsOut[i]! + 1);
     const kind = a.kind[i]!;
-    const home = kind === KIND.levy ? homeShare(a.monthsOut[i]!) : 0;
+    // Levies don't go home on their own: once raised, the player decides (Leroy's design, over RECR-053).
     const desert = (kind === KIND.levy ? wf.overCap(world.nationCapUsed[n]!, world.nationTroopCap[n]!).levyDesertion : 0) + (broke[n] ? world.rules.defines.recruit.unpaidDesertion : 0);
-    const share = Math.min(1, home + desert);
+    const share = Math.min(1, desert);
     if (share > 0) {
       const lost = Math.round(a.men[i]! * share);
       setByArm(world, i, menByArm(world, i).map((v) => v * (1 - share)));
       holdTraining(world, i);
       if (kind === KIND.levy) sendHome(world, n, lost);
-      deserted[n] = deserted[n]! + lost * (desert / share);
-      gone[n] = gone[n]! + lost * (home / share);
+      deserted[n] = deserted[n]! + lost;
       if (a.men[i]! < 1) a.alive[i] = 0;
     }
     if (a.alive[i]) trainMonth(world, i, news);
   }
   const p = world.player;
-  if (p >= 0 && gone[p]! >= 1) news.push({ kind: "refused", text: `${fmt(gone[p]!)} levies who have served six months go home to their fields and families.`, nations: [p] });
   if (p >= 0 && deserted[p]! >= 1) news.push({ kind: "refused", text: `${fmt(deserted[p]!)} men desert: ${broke[p] ? "the treasury can't pay them" : "you keep more men than your troop cap"}.`, nations: [p] });
   recount(world);
 }
