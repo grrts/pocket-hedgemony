@@ -33,7 +33,7 @@ export function lookOf(rules: Ruleset, nation: number): Look {
 
 /** A commander's portrait. */
 export function commanderPortrait(rules: Ruleset, name: string, nation: number, scale = 3): string {
-  return portrait({ name, color: rules.nations[nation]!.color, kind: "commander", look: lookOf(rules, nation) }, scale);
+  return portrait({ name, color: rules.nations[nation]!.color, kind: "commander", look: lookOf(rules, nation), nation: rules.nations[nation]!.id }, scale);
 }
 
 export interface Official {
@@ -50,7 +50,7 @@ export function officialOf(rules: Ruleset, p: number, owner: number, post: strin
 }
 
 export function officialPortrait(rules: Ruleset, o: Official, nation: number, scale = 3): string {
-  return portrait({ name: o.name, color: rules.nations[nation]!.color, kind: "official", look: lookOf(rules, nation) }, scale);
+  return portrait({ name: o.name, color: rules.nations[nation]!.color, kind: "official", look: lookOf(rules, nation), nation: rules.nations[nation]!.id, post: o.post }, scale);
 }
 
 /** The official as a card on the province's overview: portrait, name and post, and a button to their screen. */
