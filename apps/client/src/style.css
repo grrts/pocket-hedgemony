@@ -676,3 +676,100 @@ button.capital {
     transform: rotate(90deg);
   }
 }
+
+/* ---- War and peace ---- */
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.choices button {
+  flex: 1 1 auto;
+}
+
+.army-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+button.small {
+  min-height: 32px;
+  font-size: 14px;
+}
+
+.hud .at-war {
+  color: var(--paper, #f8ecc8);
+  background: var(--cloth);
+  cursor: pointer;
+}
+
+.hud .dispatches {
+  cursor: pointer;
+}
+
+.hud .dispatches.urgent {
+  animation: blink 1s steps(2, jump-none) infinite;
+}
+
+@keyframes blink {
+  50% {
+    background: var(--cloth);
+    color: #f8ecc8;
+  }
+}
+
+.call {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border: 2px solid var(--outline);
+  background: var(--ui-parchment-dark) 0 0 / 64px;
+}
+
+.call p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.news {
+  list-style: none;
+  margin: 6px 0;
+  padding: 0;
+}
+
+.news li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 2px dashed var(--ink-soft);
+  color: var(--ink-soft);
+}
+
+.news li.mine {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.news li span {
+  flex: 1;
+}
+
+.news .go {
+  flex: none;
+  min-height: 32px;
+  width: 36px;
+  padding: 0;
+}
+
+.hud button.plaque {
+  min-height: 28px;
+  padding: 0 4px;
+  font: 600 15px var(--body);
+  text-shadow: none;
+}

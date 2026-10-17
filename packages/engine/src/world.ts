@@ -1,6 +1,8 @@
 import type { GameDate, Ground, Ruleset } from "@ph/rules";
 import { groundOf, monthlyRations, type MarchMap } from "./march.ts";
 import { Rng } from "./rng.ts";
+import type { Diplomacy } from "./domain/diplomacy/index.ts";
+import { createWarState, maxGarrison, type SiegeState } from "./war.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -42,6 +44,20 @@ export interface World {
   commanderLogistics: Int8Array;
 
   armies: ArmyPool;
+
+  /** The nation the player rules, or -1; the AI leaves it alone. */
+  player: number;
+  /** Who is at war, allied, under truce or subject: the diplomacy context's state. */
+  diplomacy: Diplomacy;
+  /** Nation occupying each province in a war, -1 = none. */
+  provinceOccupier: Int16Array;
+  /** Weeks a hostile army has held a province without walls. */
+  provinceHold: Uint8Array;
+  /** Men behind each province's walls. */
+  provinceGarrison: Float32Array;
+  sieges: Map<number, SiegeState>;
+  /** 1 once a nation has lost all its land. */
+  nationGone: Uint8Array;
 }
 
 export interface ArmyPool {
@@ -193,7 +209,16 @@ export function createWorld(rules: Ruleset, seed: number): World {
     commanderOwner: Int16Array.from(commanderOwnerList),
     commanderLogistics: Int8Array.from(commanderLogisticsList),
     armies: createArmyPool(Math.max(16, N * 2)),
+    player: -1,
+    diplomacy: null!,
+    provinceOccupier: new Int16Array(P).fill(-1),
+    provinceHold: new Uint8Array(P),
+    provinceGarrison: new Float32Array(P),
+    sieges: new Map(),
+    nationGone: new Uint8Array(N),
   };
+  world.diplomacy = createWarState(world);
+  for (let p = 0; p < P; p++) world.provinceGarrison[p] = maxGarrison(world, p);
 
   recomputeMaxLevies(world);
   world.nationLevies.set(world.nationMaxLevies);

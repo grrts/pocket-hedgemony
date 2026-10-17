@@ -152,6 +152,11 @@ vec3 depthColor(float v, ivec2 a) {
 }
 bool isBig(int t) { return ${BIG_ROWS.map((r) => `t == ${r}`).join(" || ")}; }
 float flags(int id) { return float(int(info(id).a * 255.0 + 0.5) >> 4); }
+// Occupied land (flag 8): diagonal hatching over the occupier's wash.
+vec3 hatch(vec3 c, int id, ivec2 q, int width) {
+  if (uMode != 0 || (int(flags(id)) & 8) == 0) return c;
+  return ((q.x + q.y) / width) % 2 == 0 ? mix(c, uInk, 0.35) : c;
+}
 vec3 highlight(vec3 c, int id, float strength) {
   int f = int(flags(id));
   if ((f & 1) != 0) c = mix(c, uHighlight, strength + strength * step(0.5, fract(uTime * 1.5)));
@@ -324,7 +329,7 @@ vec3 tiled(bool mini) {
       c = mix(c, uInk, 0.5); // dotted province border
     }
   }
-  return highlight(c, id, 0.18);
+  return highlight(hatch(c, id, a, max(2, size / 2)), id, 0.18);
 }
 
 // Rough height of a terrain, for hill shading on the far map.
@@ -397,7 +402,7 @@ vec3 far() {
   } else if (provinceEdge && uZoom > 1.2) {
     c *= 0.72;
   }
-  return highlight(c, id, 0.3);
+  return highlight(hatch(c, id, p, 2), id, 0.3);
 }
 
 // Undiscovered land and sea: old parchment with stains and a ruled grid.

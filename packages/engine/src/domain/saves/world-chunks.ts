@@ -98,7 +98,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
   ];
   if (game.orders) {
     // Province targets go by id, so a later build can still place them (INV-SAVE-9).
-    const orders = game.orders.map((o) => ({ ...o, to: world.provinceIds[o.to] ?? null }));
+    const orders = game.orders.map((o) => (o.type === "move" ? { ...o, to: world.provinceIds[o.to] ?? null } : o));
     chunks.push(packChunk("orders", V.orders, { meta: { orders }, arrays: {} }));
   }
   return chunks;

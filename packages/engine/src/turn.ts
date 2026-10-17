@@ -1,12 +1,46 @@
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN, monthBeginning } from "./calendar.ts";
 import { forageRations, monthlyRations, planRoute, stepDays, type MarchingArmy } from "./march.ts";
 import { marchMap, recomputeMaxLevies, type World } from "./world.ts";
+import {
+  aiDeclarations,
+  aiMarches,
+  aiRaise,
+  answerAiCalls,
+  answerCall,
+  atWar,
+  controller,
+  declareWar,
+  monthlyDiplomacy,
+  offerPeace,
+  raiseLevies,
+  runBattles,
+  runOccupation,
+  syncDate,
+  type News,
+  type PeaceTerms,
+} from "./war.ts";
 
-export type Order = { type: "move"; army: number; to: number };
+export type Order =
+  | { type: "move"; army: number; to: number }
+  | { type: "declareWar"; target: number }
+  | { type: "offerPeace"; target: number; terms: PeaceTerms }
+  | { type: "answerCall"; call: string; yes: boolean }
+  | { type: "raiseLevies"; men: number }
+  | { type: "disband"; army: number };
+
+export type MoveOrder = Extract<Order, { type: "move" }>;
 
 export interface TurnReport {
   turn: number;
   rejectedOrders: { order: Order; reason: string }[];
+  news: News[];
+}
+
+/** Orders that act at once, between turns (declaring war, peace, raising levies); moves wait for the turn. */
+export function applyNow(world: World, order: Order, actingNation: number): TurnReport {
+  const news: News[] = [];
+  const reason = applyOrder(world, order, actingNation, news);
+  return { turn: world.turn, rejectedOrders: reason ? [{ order, reason }] : [], news };
 }
 
 /**
@@ -16,28 +50,63 @@ export interface TurnReport {
  */
 export function processTurn(world: World, orders: readonly Order[], actingNation: number): TurnReport {
   const rejectedOrders: TurnReport["rejectedOrders"] = [];
+  const news: News[] = [];
   world.armies.movedThisTurn.fill(0);
+  syncDate(world);
 
   for (const order of orders) {
-    const reason = applyOrder(world, order, actingNation);
+    const reason = applyOrder(world, order, actingNation, news);
     if (reason) rejectedOrders.push({ order, reason });
   }
+  aiMarches(world);
 
-  // The day loop and the weekly steps, then the monthly steps in the turn a
-  // new month begins (decision X-18).
-  runMarches(world);
+  // Orders, the day loop and its battles, the weekly steps, then the monthly
+  // steps in the turn a new month begins (decisions X-1, X-2, X-18).
+  const moved = runMarches(world);
+  runBattles(world, moved, news);
+  for (let i = 0; i < world.armies.count; i++) if (world.armies.alive[i] && world.armies.men[i]! < 1) world.armies.alive[i] = 0;
   const newMonth = monthBeginning(world.date) !== null;
+  runOccupation(world, newMonth, news);
   runEconomy(world, newMonth);
-  if (newMonth) runLevies(world);
+  if (newMonth) {
+    runLevies(world);
+    monthlyDiplomacy(world, news);
+    aiDeclarations(world, news);
+    aiRaise(world, news);
+  }
+  answerAiCalls(world, news);
   world.date = addDays(world.date, DAYS_PER_TURN);
   world.turn++;
+  syncDate(world);
 
-  return { turn: world.turn, rejectedOrders };
+  return { turn: world.turn, rejectedOrders, news };
 }
 
-function applyOrder(world: World, order: Order, actingNation: number): string | null {
+function applyOrder(world: World, order: Order, actingNation: number, news: News[]): string | null {
   const a = world.armies;
   switch (order.type) {
+    case "declareWar":
+      return declareWar(world, actingNation, order.target, news);
+    case "offerPeace":
+      return offerPeace(world, actingNation, order.target, order.terms, news);
+    case "answerCall": {
+      const call = world.diplomacy.calls.find((c) => c.id === order.call && c.called === world.nationIds[actingNation] && !c.answer);
+      if (!call) return "no such call to arms";
+      answerCall(world, call, order.yes, news);
+      return null;
+    }
+    case "raiseLevies":
+      return raiseLevies(world, actingNation, order.men, news);
+    case "disband": {
+      if (order.army < 0 || order.army >= a.count || !a.alive[order.army]) return "no such army";
+      if (a.owner[order.army] !== actingNation) return "not your army";
+      const n = actingNation;
+      // Men sent home return to the levy pool.
+      world.nationLevies[n] = Math.min(world.nationMaxLevies[n]!, world.nationLevies[n]! + a.men[order.army]!);
+      a.alive[order.army] = 0;
+      a.route[order.army] = [];
+      return null;
+    }
     case "move": {
       if (order.army < 0 || order.army >= a.count || !a.alive[order.army]) return "no such army";
       if (a.owner[order.army] !== actingNation) return "not your army";
@@ -74,10 +143,15 @@ export function marching(world: World, slot: number): MarchingArmy {
  * allow, then refills its wagons from the land where it stops. What the land
  * can't make up is hunger: men desert and die, and horses are eaten.
  */
-function runMarches(world: World): void {
+function runMarches(world: World): Set<number> {
   const d = world.rules.defines.march;
   const map = marchMap(world);
   const a = world.armies;
+  const moved = new Set<number>();
+  // Where armies stood when the week began: a march halts on meeting an enemy there.
+  const standing = new Map<number, number[]>();
+  for (let i = 0; i < a.count; i++) if (a.alive[i]) standing.set(a.location[i]!, [...(standing.get(a.location[i]!) ?? []), a.owner[i]!]);
+  const enemyAt = (p: number, owner: number) => (standing.get(p) ?? []).some((o) => atWar(world, owner, o));
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const army = marching(world, i);
@@ -95,7 +169,12 @@ function runMarches(world: World): void {
       days -= cost;
       a.location[i] = route.shift()!;
       walked.push(a.location[i]!);
+      if (enemyAt(a.location[i]!, a.owner[i]!)) {
+        route.length = 0;
+        days = 0;
+      }
     }
+    if (walked.length > 1) moved.add(i);
     a.progress[i] = route.length ? days : 0;
     a.marched[i] = walked.length > 1 ? walked : [];
 
@@ -109,6 +188,7 @@ function runMarches(world: World): void {
       a.food[i] = 0;
     }
   }
+  return moved;
 }
 
 /** Works out each realm's monthly income, and pays it when a new month begins. */
@@ -118,7 +198,8 @@ function runEconomy(world: World, pay: boolean): void {
   income.fill(0);
 
   for (let p = 0; p < world.provinceCount; p++) {
-    const owner = world.provinceOwner[p]!;
+    // An occupier collects the tax (WAR occupation: tax, recruits, food, trade).
+    const owner = controller(world, p);
     if (owner < 0) continue;
     income[owner] =
       income[owner]! +
