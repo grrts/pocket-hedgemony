@@ -237,6 +237,11 @@ function battleArmy(world: World, slots: number[], id: string): [wf.Army, number
   return [wf.newArmy(id, id, companies, best >= 0 ? { commander: world.commanders[best]! } : {}), best];
 }
 
+/** An army's break point: the share of its men it can lose before it breaks, by its companies' drill (WAR-120). */
+export function armyBreak(world: World, slot: number): number {
+  return wf.armyBreakPoint(battleArmy(world, [slot], "")[0].companies);
+}
+
 /** A battle fought over time, a round each 4-hour step, between two sides' armies (by slot). */
 export interface Battle {
   id: number;

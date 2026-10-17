@@ -126,6 +126,12 @@ Feature: Raising and keeping an army
     And the hire screen shows the days the company needs to march to the capital "Venezia"
     And the company is not on the map until it arrives
 
+  @WAR-210 @feedback-19
+  Scenario: No company comes to a besieged capital
+    Given the capital "Venezia" is under siege
+    When the country "Venice" tries to hire a Swiss free company
+    Then the order is refused
+
   @WAR-211 @feedback-19
   Scenario: A hired company brings its own commander
     Given the country "Venice" has hired a Swiss free company

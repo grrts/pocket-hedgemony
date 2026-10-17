@@ -2,7 +2,7 @@ import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
 import { advance, applyNow, HOURS_PER_STEP, processTurn, type Order } from "./turn.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
-import { relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
+import { armyBreak, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages } from "./tiles.ts";
 import { armyPay, armyRations, ARMS, menByArm, mercenaryPrice, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
@@ -116,6 +116,8 @@ export interface Snapshot {
     /** Gold a month and rations a month. */
     pay: number[];
     rations: number[];
+    /** Share of its men an army can lose before it breaks (the player's armies only; 0 for others). */
+    breakPoint: number[];
     training: ({ arm: string; men: number; months: number } | null)[];
   };
   /** Arm names for armies.byArm. */
@@ -240,6 +242,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         byArm: live.map((slot) => menByArm(w, slot).map(Math.round)),
         pay: live.map((slot) => armyPay(w, slot)),
         rations: live.map((slot) => armyRations(w, slot)),
+        breakPoint: live.map((slot) => (a.owner[slot] === player ? armyBreak(w, slot) : 0)),
         training: live.map((slot) => (a.trainArm[slot]! >= 0 ? { arm: ARMS[a.trainArm[slot]!]!, men: a.trainMen[slot]!, months: a.trainLeft[slot]! } : null)),
       },
     };

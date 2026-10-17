@@ -3,6 +3,7 @@ import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { applyNow, ARMS, createWorld, monthBeginning, processTurn, type Order, type World } from "../src/index.ts";
 import { armyPay, garrisonTroops, idleCommanders, menByArm } from "../src/recruit.ts";
+import { wallsOf } from "../src/war.ts";
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
@@ -55,6 +56,7 @@ describe("armies that cost something", () => {
     weeks(w, me, 2);
     const [troop] = garrisonTroops(w, me, p);
     const income = w.nationMonthlyIncome[me]!;
+    w.nationTreasury[me] = 500;
     ok(w, { type: "commission", province: p }, me);
     expect(w.provinceOfficial[p]).toBe(-1);
     const [c] = idleCommanders(w, me);
@@ -106,6 +108,24 @@ describe("armies that cost something", () => {
     expect(arm(w, army!, "archers")).toBeCloseTo(1000, -1);
     expect(w.armies.trainArm[army!]).toBe(-1);
     expect(w.armies.drill[army!]).toBeGreaterThan(1.5);
+  });
+
+  it("trains only at a castle of the realm's own (RECR-109)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = n(w, "castile");
+    const [army] = armiesOf(w, me);
+    const open = Array.from({ length: w.provinceCount }, (_, p) => p).find((p) => w.provinceOwner[p] === me && !wallsOf(w, p))!;
+    w.armies.location[army!] = open;
+    expect(refused(w, { type: "train", army: army!, arm: "archers", men: 1000 }, me)).toMatch(/castle/);
+    w.armies.location[army!] = capital(w, me);
+    ok(w, { type: "train", army: army!, arm: "archers", men: 1000 }, me);
+  });
+
+  it("sells no companies while the capital is under siege (WAR-210)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = n(w, "castile");
+    w.provinceOccupier[capital(w, me)] = n(w, "portugal");
+    expect(refused(w, { type: "hire", arm: "pikes" }, me)).toMatch(/siege/);
   });
 
   it("splits, merges and sends home troops", () => {

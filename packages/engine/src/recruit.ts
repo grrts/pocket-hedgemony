@@ -3,7 +3,7 @@ import * as wf from "./domain/warfare/index.ts";
 import { monthlyRations } from "./march.ts";
 import { halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
-import { atWar, controller, type News } from "./war.ts";
+import { atWar, controller, wallsOf, type News } from "./war.ts";
 
 /**
  * Milestone 2, armies that cost something: wires the recruiting context (who
@@ -350,10 +350,15 @@ export function pickUp(world: World, n: number, army: number): string | null {
   return null;
 }
 
+/** Where an army may train: a province of its own realm, held, not besieged, with a stone castle (capitals have one) (RECR-109). */
+export function trainingGround(world: World, n: number, p: number): boolean {
+  return controller(world, p) === n && world.provinceOwner[p] === n && !world.sieges.has(p) && wallsOf(world, p) === "stone castle";
+}
+
 /**
  * Train levy foot of an army as another arm: gold now, then months in which
- * the army must stand in its own land (RECR-043..051). Training stops while it
- * marches, besieges or stands in enemy land, and goes on when it stops.
+ * the army must stand at a castle of its own (RECR-043..051, RECR-109).
+ * Training stops while it marches or stands elsewhere, and goes on when it is back.
  */
 export function trainTroops(world: World, n: number, army: number, arm: string, men: number, news: News[]): string | null {
   const a = world.armies;
@@ -362,6 +367,7 @@ export function trainTroops(world: World, n: number, army: number, arm: string, 
   if (arm === rc.LEVY_ARM || !world.rules.defines.recruit.armsAtStart.includes(arm)) return `you can't train ${arm} yet`;
   men = Math.round(Math.min(men, menByArm(world, army)[LEVY]!));
   if (men < 1) return "no levy foot to train";
+  if (!trainingGround(world, n, a.location[army]!)) return "men train only at a castle of your own: march the army to one";
   const cost = rc.trainingCost(arm, men);
   const g = gold(world, cost.gold);
   if (g > world.nationTreasury[n]!) return "not enough gold";
@@ -433,6 +439,8 @@ export function hireCompany(world: World, n: number, arm: string, news: News[]):
   const d = world.rules.defines.recruit;
   if (!d.hiredArms.includes(arm)) return `no companies of ${arm} for hire`;
   const men = d.hiredCompanyMen;
+  const cap = capitalOf(world, n);
+  if (controller(world, cap) !== n || world.sieges.has(cap)) return "your capital is under siege: no company will come";
   if (!wf.overCap(world.nationCapUsed[n]! + men, world.nationTroopCap[n]!).canRaise) return "that would go over your troop cap";
   const cost = mercenaryPrice(world, arm);
   if (cost > world.nationTreasury[n]!) return "not enough gold";
@@ -607,13 +615,13 @@ export function ungoverned(world: World, p: number): boolean {
   return world.provinceOwner[p]! >= 0 && world.provinceOfficial[p]! < 0;
 }
 
-/** A month of training: on in the army's own land with no march under way, else held (RECR-050, RECR-100). */
+/** A month of training: on at a castle of its own with no march under way, else held (RECR-050, RECR-100, RECR-109). */
 function trainMonth(world: World, i: number, news: News[]): void {
   const a = world.armies;
   const k = a.trainArm[i]!;
   if (k < 0) return;
   const p = a.location[i]!;
-  if (isMarching(world, i) || controller(world, p) !== a.owner[i] || world.sieges.has(p)) return;
+  if (isMarching(world, i) || !trainingGround(world, a.owner[i]!, p)) return;
   a.trainLeft[i] = a.trainLeft[i]! - 1;
   if (a.trainLeft[i]! > 0) return;
   const arm = ARMS[k]!;
@@ -662,6 +670,10 @@ export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => 
   }
 }
 
+const AI_COMMAND_MIN_MEN = 3000;
+const AI_MEN_PER_COMMANDER = 8000;
+const commandersOf = (world: World, n: number) => world.commanderOwner.reduce((t, o) => t + (o === n ? 1 : 0), 0);
+
 /** Each week, AI commanders take in the troops that have gathered, or a free (or newly commissioned) one leads them out. */
 export function aiCollect(world: World, news: News[]): void {
   const a = world.armies;
@@ -675,6 +687,9 @@ export function aiCollect(world: World, news: News[]): void {
       continue;
     }
     if (!idleCommanders(world, n).length) {
+      // Commissions cost and empty a post, so the AI makes one only for a stack worth leading,
+      // and keeps about one commander to each 8,000 men it has under arms (feedback 28).
+      if (a.men[i]! < AI_COMMAND_MIN_MEN || commandersOf(world, n) >= 1 + world.nationCapUsed[n]! / AI_MEN_PER_COMMANDER) continue;
       let post = -1;
       for (let p = 0; p < world.provinceCount && post < 0; p++) if (world.provinceOwner[p] === n && world.provinceOfficial[p]! >= 0) post = p;
       if (post < 0 || commissionOfficial(world, n, post, news)) continue;
