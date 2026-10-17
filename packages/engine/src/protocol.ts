@@ -1,7 +1,7 @@
 import { giftGold } from "./lords.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
-import { canBorrow, LEDGER, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
+import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
 import { HARVESTS, storeMonths } from "./food.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
@@ -10,6 +10,7 @@ import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages } from "./tiles.ts";
+import { officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
@@ -113,6 +114,10 @@ export interface Snapshot {
   ledger: { line: string; gold: number }[];
   debt: number;
   canBorrow: number;
+  /** Most the player may owe (a year's tax and trade), the debt a loan of one gold adds (gold plus interest, REALM-188), and whether a loan now unsettles the lords (REALM-189). */
+  debtLimit: number;
+  loanDebtFactor: number;
+  loanUnsettlesLords: boolean;
   /** Months of eating in each province's store, its last harvest (index into harvests, -1 = none yet) and people starved there this year (thousands). */
   provinceFoodMonths: Float32Array;
   provinceHarvest: Int8Array;
@@ -135,6 +140,10 @@ export interface Snapshot {
   freeCompanies: (CompanyView & { id: number; pay: number; weeks: number })[];
   /** Official of each province (a name from OFFICIALS), or null when the post stands empty. */
   provinceOfficial: (string | null)[];
+  /** Name of the official at each province's post, or null when it stands empty (or no realm owns it). */
+  provinceOfficialName: (string | null)[];
+  /** Years the official at each post has served there, to one decimal (0 when empty); his effect grows to full at 5 (see officialEffect). */
+  provinceOfficialYears: number[];
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
   commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string }[];
   armies: {
@@ -286,6 +295,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       ledger: player >= 0 ? LEDGER.map((line, k) => ({ line, gold: w.nationLedger[player * LEDGER_LINES + k]! })) : [],
       debt: player >= 0 ? w.nationDebt[player]! : 0,
       canBorrow: player >= 0 ? canBorrow(w, player) : 0,
+      debtLimit: player >= 0 ? w.nationDebt[player]! + canBorrow(w, player) * loanDebt(1) : 0,
+      loanDebtFactor: loanDebt(1),
+      loanUnsettlesLords: player >= 0 && loanUnsettlesLords(w, player),
       provinceFoodMonths: Float32Array.from({ length: w.provinceCount }, (_, p) => storeMonths(w, p)),
       provinceHarvest: w.provinceHarvest.slice(),
       provinceStarved: w.provinceStarved.slice(),
@@ -305,6 +317,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
+      provinceOfficialName: Array.from({ length: w.provinceCount }, (_, p) => officialAt(w, p)),
+      provinceOfficialYears: Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
       commanders: w.commanders.map((c, k) => ({
         name: c.name,
         owner: w.commanderOwner[k]!,

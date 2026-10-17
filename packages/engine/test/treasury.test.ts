@@ -72,22 +72,24 @@ describe("tax rates and the treasury ledger", () => {
     expect(applyNow(w, { type: "setTax", province: paris, rate: 5 }, fra).rejectedOrders[0]?.reason).toBe("no such tax rate");
   });
 
-  it("lends up to a year's income at 10 % a year, and takes repayment", () => {
+  it("lends so the realm owes at most a year's income, adds the interest to the debt at once, and takes repayment", () => {
     const w = createWorld(rules, 1, tiles);
     const cas = nation(w, "castile");
     w.player = cas;
     runLedger(w, false);
     const year = 12 * (line(w, cas, "tax") + line(w, cas, "trade"));
-    expect(canBorrow(w, cas)).toBeCloseTo(year);
-    expect(applyNow(w, { type: "borrow", gold: year + 1 }, cas).rejectedOrders).toHaveLength(1);
+    expect(canBorrow(w, cas)).toBeCloseTo(year / 1.1);
+    expect(applyNow(w, { type: "borrow", gold: year / 1.1 + 1 }, cas).rejectedOrders).toHaveLength(1);
     const gold = w.nationTreasury[cas]!;
     expect(applyNow(w, { type: "borrow", gold: 100 }, cas).rejectedOrders).toEqual([]);
     expect(w.nationTreasury[cas]).toBeCloseTo(gold + 100);
-    expect(canBorrow(w, cas)).toBeCloseTo(year - 100);
+    // The debt is the loan and a year's interest, at once.
+    expect(w.nationDebt[cas]).toBeCloseTo(110);
+    expect(canBorrow(w, cas)).toBeCloseTo((year - 110) / 1.1);
     runLedger(w, false);
-    expect(line(w, cas, "interest")).toBeCloseTo(-100 * 0.1 / 12);
+    expect(line(w, cas, "interest")).toBeCloseTo(-110 * 0.1 / 12);
     expect(applyNow(w, { type: "repay", gold: 40 }, cas).rejectedOrders).toEqual([]);
-    expect(w.nationDebt[cas]).toBeCloseTo(60);
+    expect(w.nationDebt[cas]).toBeCloseTo(70);
     // Repaying more than is owed pays off the debt.
     applyNow(w, { type: "repay", gold: 1000 }, cas);
     expect(w.nationDebt[cas]).toBe(0);
@@ -105,7 +107,7 @@ describe("tax rates and the treasury ledger", () => {
     expect(w.nationDebt[hun]).toBe(0);
     w.nationTreasury[hun] = -30;
     aiTreasury(w, []);
-    expect(w.nationDebt[hun]).toBeCloseTo(31);
+    expect(w.nationDebt[hun]).toBeCloseTo(31 * 1.1);
     expect(w.nationTreasury[hun]).toBeCloseTo(1);
     // The player's realm is left alone.
     const fra = nation(w, "france");
@@ -113,6 +115,23 @@ describe("tax rates and the treasury ledger", () => {
     w.nationTreasury[fra] = -30;
     aiTreasury(w, []);
     expect(w.nationDebt[fra]).toBe(0);
+  });
+
+  it("unsettles the realm's lords when it borrows, at most once a year", () => {
+    const w = createWorld(rules, 1, tiles);
+    const fra = nation(w, "france");
+    w.player = fra;
+    runLedger(w, false);
+    const lords = w.lords.flatMap((l, k) => (l.nation === fra ? [k] : []));
+    expect(lords.length).toBeGreaterThan(0);
+    const before = lords.map((k) => w.lords[k]!.loyalty);
+    const report = applyNow(w, { type: "borrow", gold: 10 }, fra);
+    expect(report.rejectedOrders).toEqual([]);
+    // Every lord of the realm falls a step (none lower than disloyal).
+    lords.forEach((k, i) => expect(w.lords[k]!.loyalty).toBe(before[i] === "Loyal" ? "Wavering" : "Disloyal"));
+    const after = lords.map((k) => w.lords[k]!.loyalty);
+    applyNow(w, { type: "borrow", gold: 10 }, fra);
+    expect(lords.map((k) => w.lords[k]!.loyalty)).toEqual(after);
   });
 
   it("keeps tax rates, debt and the ledger in a save", () => {
@@ -127,7 +146,8 @@ describe("tax rates and the treasury ledger", () => {
     const back = restoreWorld(new Map(chunks.map((c) => [c.id, c])), rules, {}, tiles).world;
     expect(back.provinceTax[capital(w, cas)]).toBe(rate("crushing"));
     expect(back.nationTaxDefault[cas]).toBe(rate("light"));
-    expect(back.nationDebt[cas]).toBe(50);
+    expect(back.nationDebt[cas]).toBe(w.nationDebt[cas]);
+    expect(back.nationLoanMonth[cas]).toBe(w.nationLoanMonth[cas]);
     expect(Array.from(back.nationLedger)).toEqual(Array.from(w.nationLedger));
     expect(hashWorld(back)).toBe(hashWorld(w));
   });

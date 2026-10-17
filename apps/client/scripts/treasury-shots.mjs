@@ -24,10 +24,16 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await shot("province-tax");
   await page.click(".hud [data-realm-open=treasury]");
   await page.waitForTimeout(300);
+  await page.locator(".purse").scrollIntoViewIfNeeded();
   await shot("treasury");
-  await page.click("[data-borrow='50']");
+  await page.locator(".ledger-bars").scrollIntoViewIfNeeded();
+  await shot("treasury-ledger");
+  await page.locator("[data-borrow]").first().scrollIntoViewIfNeeded();
+  await shot("treasury-loan");
+  await page.evaluate(() => document.querySelector("[data-borrow]").click());
   await page.waitForTimeout(300);
-  await page.locator("[data-borrow]").last().scrollIntoViewIfNeeded();
+  await shot("treasury-after-loan");
+  await page.locator(".debt-meter").scrollIntoViewIfNeeded({ timeout: 5000 });
   await shot("treasury-debt");
   await page.close();
 }

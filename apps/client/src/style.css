@@ -375,6 +375,68 @@ button.icon-only {
   accent-color: #8a6424;
 }
 
+/* ---- Sound menu: one column of rows, each a 44-point control ---- */
+
+.sound-menu {
+  grid-template-columns: 1fr;
+  gap: 0;
+  width: min(340px, 52vw);
+}
+
+.sound-menu .now-playing {
+  margin: 0 0 4px;
+  font: 600 16px/1.25 var(--body);
+  color: var(--ink);
+}
+
+.sound-menu .now-playing small {
+  display: block;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.sound-row {
+  display: grid;
+  grid-template-columns: 4.6em 1fr 64px;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font: 600 17px/1.2 var(--body);
+  color: var(--ink);
+}
+
+.sound-row.off input {
+  opacity: 0.5;
+}
+
+.sound-row small {
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.sound-row input[type="range"] {
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  accent-color: #8a6424;
+}
+
+.sound-row output {
+  min-width: 3em;
+  text-align: right;
+}
+
+.sound-row .toggle {
+  grid-column: 3;
+  width: 64px;
+  min-height: 44px;
+  padding: 0;
+}
+
+.sound-row .toggle.on {
+  outline: 3px solid var(--brass, #d0a248);
+}
+
 /* ---- Overview button, lower left ---- */
 
 .open-panel {
@@ -515,6 +577,13 @@ button.icon-only {
 }
 
 .owner b {
+  color: var(--ink);
+}
+
+/* Ruler and kind of province come first on its overview (feedback 78). */
+.owner + .province-kind {
+  margin: -4px 0 8px;
+  font-size: 1.05em;
   color: var(--ink);
 }
 
@@ -1246,6 +1315,152 @@ table.ledger td.num {
   text-align: right;
 }
 
+/* The Treasury tab: the purse, gold in and out as bars, and the debt meter (REALM-192). */
+.purse {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  margin: 4px 0 8px;
+  background: var(--paper-light);
+  border: 2px solid var(--outline);
+  box-shadow: inset 0 -4px 0 rgb(0 0 0 / 0.12);
+}
+
+.purse-coin {
+  flex: none;
+  filter: drop-shadow(0 3px 0 var(--wood-dark));
+}
+
+.purse-gold {
+  font-size: 1.6em;
+  line-height: 1;
+}
+
+.purse-gold b {
+  color: var(--wood-dark);
+}
+
+.purse-net.up,
+.ledger-bars .in b.num {
+  color: #2f6b2a;
+}
+
+.purse-net.down,
+.ledger-bars .out b.num {
+  color: var(--cloth);
+}
+
+.purse-note {
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+
+.flow {
+  display: flex;
+  height: 28px;
+  border: 2px solid var(--outline);
+  font-size: 0.8em;
+  line-height: 24px;
+  color: var(--paper-light);
+  overflow: hidden;
+}
+
+.flow span {
+  min-width: 4.5em;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+
+.flow .in {
+  background: #3f7d37;
+}
+
+.flow .out {
+  background: var(--cloth);
+  text-align: right;
+}
+
+.ledger-bars {
+  list-style: none;
+  margin: 6px 0;
+  padding: 0;
+}
+
+.ledger-bars li {
+  display: grid;
+  grid-template-columns: minmax(7em, 1fr) 2fr auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+}
+
+.ledger-bars .bar {
+  height: 12px;
+  background: rgb(0 0 0 / 0.08);
+}
+
+.ledger-bars .bar i {
+  display: block;
+  height: 100%;
+}
+
+.ledger-bars .in .bar i {
+  background: #3f7d37;
+}
+
+.ledger-bars .out .bar i {
+  background: var(--cloth);
+}
+
+.ledger-bars b.num {
+  min-width: 4em;
+  text-align: right;
+}
+
+.ledger-bars li.total {
+  border-top: 2px solid var(--ink);
+  margin-top: 4px;
+}
+
+.ledger-bars li.total .bar {
+  background: none;
+}
+
+.debt-meter {
+  height: 16px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+
+.debt-meter i {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--cloth) 0 6px, #8b1e2b 6px 8px);
+}
+
+.meter-caption {
+  margin-top: 4px;
+}
+
+.loan-cost {
+  color: var(--ink-soft);
+}
+
+.choices.loans button {
+  min-height: 44px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+}
+
+.choices.loans button small {
+  font-size: 0.75em;
+  opacity: 0.8;
+}
+
 table.ledger td.down,
 b.down {
   color: var(--cloth);
@@ -1278,4 +1493,219 @@ table.provinces {
 
 table.provinces td:first-child {
   padding-right: 24px;
+}
+
+/* A phone held sideways: the rows fit without scrolling. */
+@media (max-height: 500px) {
+  .sound-menu .sub,
+  .sound-row small {
+    display: none;
+  }
+}
+
+/* ---- Lords and the province lists (feedback 60, 63-68, 70) ---- */
+
+/* Loyalty as a coloured tag: green loyal, amber wavering, red disloyal, dark red in revolt. */
+.loyalty {
+  display: inline-block;
+  padding: 0 6px;
+  border: 2px solid var(--outline);
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--paper-light);
+  text-shadow: 1px 1px 0 var(--outline);
+  white-space: nowrap;
+}
+.loyalty-loyal { background: #3f7a44; }
+.loyalty-wavering { background: #c08a2e; }
+.loyalty-disloyal { background: #a8323e; }
+.loyalty-in-revolt { background: #5a1420; }
+
+/* Who governs the province, first on its overview. */
+.governance {
+  margin: 2px 0 8px;
+  padding: 2px 8px 4px;
+  border: 3px solid var(--ink-soft);
+  background: rgb(255 248 220 / 0.35);
+}
+.governance h3.sub {
+  margin-top: 2px;
+}
+.governance .army:first-of-type {
+  border-top: 0;
+}
+.governance .army-buttons button.small {
+  min-height: 44px;
+}
+.governance .crest {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 66px;
+  font-size: 40px;
+  color: var(--brass);
+  text-shadow: 2px 2px 0 var(--outline);
+}
+.grant-pick {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px;
+  padding-bottom: 6px;
+}
+
+/* The royal share of the realm's land, as a gold bar against the lords' part. */
+.share-bar {
+  height: 14px;
+  margin: 6px 0 2px;
+  border: 2px solid var(--outline);
+  background: repeating-linear-gradient(45deg, var(--wood) 0 4px, var(--wood-dark) 4px 8px);
+}
+.share-bar i {
+  display: block;
+  height: 100%;
+  background: #e9c35a;
+}
+
+/* Lords as rows: portrait, name and house, loyalty and gold; each opens his screen. */
+.lord-list,
+.place-list,
+.province-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0 8px;
+}
+button.lord-row {
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 60px;
+  padding: 2px 6px;
+  text-align: left;
+}
+.lord-row .lord-who,
+.lord-row .lord-state,
+.place > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.1;
+}
+.lord-row .lord-who {
+  flex: 1;
+}
+.lord-row .lord-state {
+  align-items: flex-end;
+  gap: 2px;
+}
+.lord-row small,
+.place small {
+  color: var(--ink-soft);
+  font-weight: 400;
+  font-size: 18px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* A province as a row: its picture, name and note; a button beside it acts on it. */
+.place-row,
+.province-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+button.place {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 56px;
+  padding: 2px 4px;
+  border-image-source: var(--ui-btn-paper);
+  color: var(--ink);
+  text-shadow: none;
+  text-align: left;
+}
+button.place:active:not(:disabled) {
+  border-image-source: var(--ui-btn-paper-down);
+}
+.place-row > button.small,
+.province-row > button.small {
+  min-height: 44px;
+  align-self: center;
+}
+img.thumb {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--outline);
+}
+.place .place-name {
+  flex: 1;
+}
+.place .place-stats {
+  flex: none;
+  align-items: flex-end;
+  text-align: right;
+}
+.province-row.bad .place-name small {
+  color: var(--cloth);
+}
+button.more {
+  width: 100%;
+  min-height: 44px;
+}
+
+/* While a lord's lands are lit on the map: whose, and a button to stop. */
+.lit-chip {
+  position: absolute;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 5;
+  gap: 6px;
+  padding: 2px 4px;
+  max-width: calc(100vw - 180px);
+}
+.lit-chip button {
+  min-height: 44px;
+  padding: 0 6px;
+}
+.lit-chip .lit-open {
+  border: 0;
+  border-image: none;
+  color: var(--ink);
+  text-shadow: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 700px) {
+  .place .place-stats small:nth-child(2) {
+    display: none;
+  }
+}
+
+/* ---- Officials: years served as pips and the effect of their type (feedback 66, 69) ---- */
+
+.pips {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+}
+.pips i {
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.pips i.on {
+  background: var(--brass);
+}
+small.effect {
+  color: #3f6a34;
+}
+.lord-row .lord-who small + small {
+  color: #3f6a34;
 }

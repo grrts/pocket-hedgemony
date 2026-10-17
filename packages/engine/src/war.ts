@@ -8,6 +8,7 @@ import { GROUNDS } from "./tiles.ts";
 import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
+import { officialBonus } from "./officials.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -589,9 +590,16 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
   const holdDays = world.rules.defines.war.holdWeeks * 7;
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p] || world.provinceOwner[p]! < 0) continue;
-    const ctl = controller(world, p);
     const owner = world.provinceOwner[p]!;
-    const slots = present.get(p) ?? [];
+    const slots = present.get(p);
+    // No army there: nothing is held or besieged, and the walls fill again (most provinces, most days).
+    if (!slots) {
+      world.provinceHold[p] = 0;
+      if (world.sieges.delete(p)) news.push({ kind: "siege", text: `The siege of ${provinceName(world, p)} is lifted.`, nations: [owner], province: p });
+      if (newMonth && world.provinceOccupier[p]! < 0) world.provinceGarrison[p] = Math.min(maxGarrison(world, p), world.provinceGarrison[p]! + maxGarrison(world, p) * world.rules.defines.war.garrisonRecoveryPerMonth);
+      continue;
+    }
+    const ctl = controller(world, p);
     // The rightful owner (or a partner at war with the occupier) frees occupied land; anyone at war with the holder takes it.
     const hostile = slots.filter((s) => enemies[ctl]!.has(a.owner[s]!));
     const defended = slots.some((s) => a.owner[s] === ctl || (!enemies[ctl]!.has(a.owner[s]!) && hostile.some((h) => enemies[a.owner[s]!]!.has(a.owner[h]!))));
@@ -625,13 +633,15 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
         wf.siegeMonth(st.siege);
         if (!wf.isClosed(st.siege)) st.siege.store = store;
         world.provinceGarrison[p] = st.siege.garrison;
+        // A warden's garrison fights a storm as if a quarter stronger (province officials table).
+        const warden = officialBonus(world, p, "Warden", "garrison");
         const foodMonths = wf.foodMonths(st.siege);
         if (st.siege.garrison < 1 || wf.aiAcceptsHonours({ breaches: st.siege.breaches, foodMonths, reliefDays: null, cruel: false })) {
           wf.endSiege(st.siege, st.siege.starving ? "surrender" : "honours of war");
           occupy(world, p, leader, `${provinceName(world, p)} surrenders to ${name(world, leader)} after ${months(st.siege.months)}.`, news);
-        } else if (wf.stormable(st.siege).can && besiegers >= st.siege.garrison * world.rules.defines.war.stormRatio) {
+        } else if (wf.stormable(st.siege).can && besiegers >= st.siege.garrison * warden * world.rules.defines.war.stormRatio) {
           const terms = wf.storm(st.siege);
-          shareLosses(world, hostile, Math.round(st.siege.garrison * terms.stormerLosses * (1 + terms.walls)));
+          shareLosses(world, hostile, Math.round(st.siege.garrison * warden * terms.stormerLosses * (1 + terms.walls)));
           wf.endSiege(st.siege, "storm");
           occupy(world, p, leader, `${name(world, leader)} storms ${provinceName(world, p)} after ${months(st.siege.months)}.`, news);
         }

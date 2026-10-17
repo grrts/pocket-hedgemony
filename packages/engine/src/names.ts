@@ -9,7 +9,7 @@ import type { CultureNames, Ruleset } from "@ph/rules";
  */
 
 /** A well-mixed 32-bit hash of two numbers. */
-function mix(a: number, b: number): number {
+export function mix(a: number, b: number): number {
   let h = Math.imul(a ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(b + 0x6a09e667, 0xc2b2ae35);
   h ^= h >>> 15;
   h = Math.imul(h, 0x2c1b3c6d);

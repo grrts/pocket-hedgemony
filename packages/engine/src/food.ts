@@ -3,6 +3,7 @@ import type { News } from "./war.ts";
 import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
 import { harvestMultiplier, type HarvestRoll } from "./domain/province/land.ts";
 import { harvestMonth, rollRegionWeather, rotSeason } from "./domain/realm/index.ts";
+import { officialBonus } from "./officials.ts";
 
 /**
  * Food (milestone 3): each province keeps a local store, counted in months of
@@ -92,7 +93,9 @@ export function monthlyFood(world: World, news: News[]): void {
     const war = world.provinceOccupier[p]! >= 0 || world.sieges.has(p) ? -1 : 0;
     const roll = Math.max(0, Math.min(HARVESTS.length - 1, NORMAL + weather.get(r)! + war));
     world.provinceHarvest[p] = roll;
-    store[p] = store[p]! + world.provinceClasses[p * CLASS_COUNT + farmersAt]! * (per.farmers ?? 0) * harvestMultiplier(HARVESTS[roll]!) * 12;
+    // A steward gets more out of the fields (province officials table: +10 % food).
+    const steward = officialBonus(world, p, "Steward", "food");
+    store[p] = store[p]! + world.provinceClasses[p * CLASS_COUNT + farmersAt]! * (per.farmers ?? 0) * harvestMultiplier(HARVESTS[roll]!) * 12 * steward;
   }
 
   const season = month % 3 === 0;

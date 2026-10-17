@@ -122,3 +122,60 @@ Feature: Officials and their types
       | G1 and G9     | 2     |
       | G9 and G16    | 3     |
       | G9 and G11    | 3     |
+
+  @PROV-303
+  Scenario: Two officials swap provinces
+    Given the province "Troyes" is royal
+    And the province "Rouen" is royal
+    And a "tax collector" official has served 6 years in "Troyes"
+    And a "steward" official has served 3 years in "Rouen"
+    When the country "France" moves the official of "Troyes" to "Rouen"
+    Then the "tax collector" runs "Rouen" under his own name, at half his effect
+    And the "steward" runs "Troyes" under his own name, at half his effect
+
+  @PROV-303
+  Scenario: Moving an official into an empty post
+    Given the province "Troyes" is royal
+    And the province "Rouen" is royal with its post empty
+    And a "tax collector" official has served 6 years in "Troyes"
+    When the country "France" moves the official of "Troyes" to "Rouen"
+    Then the "tax collector" runs "Rouen" at half his effect
+    And the post in "Troyes" stands empty
+
+  @PROV-303
+  Scenario: A lord's official stays with the lord
+    Given the lord "Anjou" holds "Angers" with an official of his own
+    When the country "France" tries to move the official of "Angers"
+    Then it is refused because he serves the lord, not the crown
+    When the country "France" tries to commission the official of "Angers"
+    Then it is refused because he serves the lord, not the crown
+
+  @PROV-304
+  Scenario: Officials start with years served
+    When a new campaign starts
+    Then each official has served between 0 and 10 years in his province
+    And not every official has served the same number of years
+
+  @PROV-305
+  Scenario Outline: Effects that wait for their system
+    Given a "<type>" official has served 5 years in "Troyes"
+    Then his effect shows as waiting until <system> are in the game
+
+    Examples:
+      | type            | system    |
+      | master of works | buildings |
+      | schoolmaster    | schools   |
+
+  @PROV-306 @PROV-307
+  Scenario: Moving an official from his screen
+    Given the player opens the official of "Troyes" from the governance card of its province panel
+    When the player taps "Move to another province"
+    Then a list of the realm's royal provinces shows each one's official, his type and what the move changes
+    When the player taps "Rouen"
+    Then the two officials swap posts
+
+  @PROV-308
+  Scenario: The Officials tab lists every official
+    When the player opens the Officials tab of the country card
+    Then it lists every official of the realm with his type, province, years served and effect
+    And it lists the empty posts
