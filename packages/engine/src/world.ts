@@ -14,6 +14,7 @@ import { mix, personName } from "./names.ts";
 import { realmConfig } from "./domain/realm/index.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
 import { addCommander, ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
+import { seedOfficials } from "./officials.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -108,8 +109,14 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   freeCompanySeq: number;
   /** Official of each province (index into OFFICIALS), -1 = his post stands empty. */
   provinceOfficial: Int8Array;
+  /** Province each official's name comes from: it goes with him when he moves (officials.ts). */
+  provinceOfficialSeed: Int16Array;
+  /** Day (world.day) the official at each post took it up; his years served count from it. */
+  provinceOfficialSince: Int32Array;
   /** Province each commander was commissioned from, -1 = none. */
   commanderHome: number[];
+  /** Name seed of each commander commissioned from an official, -1 = none. */
+  commanderSeed: number[];
 }
 
 export interface ArmyPool {
@@ -396,6 +403,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     if (provinceOwner[p]! >= 0) world.provinceOfficial[p] = p % OFFICIALS.length;
   }
   world.commanderHome = commanderIds.map(() => -1);
+  world.commanderSeed = commanderIds.map(() => -1);
+  seedOfficials(world);
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where

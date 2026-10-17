@@ -5,6 +5,7 @@ import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
 import { interestPct, loanCap, realmConfig } from "./domain/realm/index.ts";
 import { moodShare } from "./moods.ts";
 import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
+import { officialBonus } from "./officials.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -70,13 +71,17 @@ export function provinceTax(world: World, p: number, holder: number): number {
   // A province whose official was commissioned pays half (recruiting RECR-083, "Leave it").
   // Rioting or plotting provinces pay half (PROV-162); a lord keeps his share (REALM-072).
   const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
-  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share;
+  // A tax collector brings more of it in (province officials table: +20 % reaching you).
+  const collector = officialBonus(world, p, "Tax collector", "tax_reach");
+  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector;
 }
 
 /** Trade and market gold a province gives its holder in a month (not taxed by rate). */
 export function provinceTrade(world: World, p: number): number {
   const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
-  return world.provinceWealth[p]! * world.rules.defines.economy.goldPerWealthPerMonth * share;
+  // A customs officer raises what trade brings (province officials table: +15 %).
+  const customs = officialBonus(world, p, "Customs officer", "trade_ratio_gain");
+  return world.provinceWealth[p]! * world.rules.defines.economy.goldPerWealthPerMonth * share * customs;
 }
 
 /** Monthly interest on a realm's debt (REALM-164: 10 % a year). */

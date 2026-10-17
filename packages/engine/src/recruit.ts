@@ -3,6 +3,7 @@ import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { officialName, personName } from "./names.ts";
+import { OFFICIALS, officialBonus } from "./officials.ts";
 import { monthlyRations } from "./march.ts";
 import { halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
@@ -68,8 +69,7 @@ export interface Mercenary {
   weeksLeft: number;
 }
 
-/** Officials a province can have (recruiting: commanders from officials), dealt out to provinces at start. */
-export const OFFICIALS = ["Warden", "Steward", "Muster master", "Master of works", "Tax collector", "Customs officer", "Judge", "Schoolmaster"] as const;
+export { OFFICIALS };
 
 export function createRecruitState(P: number, N: number) {
   return {
@@ -84,8 +84,14 @@ export function createRecruitState(P: number, N: number) {
     freeCompanySeq: 0,
     /** Official of each province (index into OFFICIALS), -1 = none: his post is empty. */
     provinceOfficial: new Int8Array(P).fill(-1),
+    /** Province each official's name comes from (names.ts officialName): it goes with him from post to post. */
+    provinceOfficialSeed: new Int16Array(P),
+    /** Day the official at each post took it up (world.day): his years served count from it. */
+    provinceOfficialSince: new Int32Array(P),
     /** Province each commander was commissioned from, -1 = none. */
     commanderHome: [] as number[],
+    /** Name seed of each commander commissioned from an official (-1 = none), so he goes back to a post as himself. */
+    commanderSeed: [] as number[],
   };
 }
 
@@ -110,6 +116,7 @@ export function addCommander(world: World, owner: number, c: wf.Commander, id = 
   world.commanderLogistics = grow(world.commanderLogistics, (n) => new Int8Array(n), c.logistics);
   world.commanders.push({ ...c, country: world.nationIds[owner]! });
   world.commanderHome.push(-1);
+  world.commanderSeed.push(-1);
   return k;
 }
 
@@ -138,6 +145,7 @@ export function idleCommanders(world: World, n: number): number[] {
  */
 export function commissionOfficial(world: World, n: number, p: number, news: News[]): string | null {
   if (p < 0 || p >= world.provinceCount || world.provinceOwner[p] !== n) return "not your province";
+  if (world.provinceLord[p]! >= 0) return `${provinceName(world, p)} is a lord's: his official serves the lord, not the crown`;
   const type = world.provinceOfficial[p]!;
   if (type < 0) return `${provinceName(world, p)} has no official to spare`;
   const cost = world.rules.defines.recruit.commanderGold;
@@ -145,10 +153,12 @@ export function commissionOfficial(world: World, n: number, p: number, news: New
   const { commission } = rc.commission({ official: OFFICIALS[type]!, type: OFFICIALS[type]!, province: world.provinceIds[p]! });
   const skills = commission.skills ?? { might: 1, cunning: 1, logistics: 1 };
   // The official himself takes the command, under his own name.
-  const name = officialName(world.rules, p, n);
+  const seed = world.provinceOfficialSeed[p]!;
+  const name = officialName(world.rules, seed, n);
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
   const c = addCommander(world, n, wf.newCommander(name, { ...skills, origin: OFFICIALS[type]! }));
   world.commanderHome[c] = p;
+  world.commanderSeed[c] = seed;
   world.provinceOfficial[p] = -1;
   if (n === world.player) news.push({ kind: "raised", text: `${name}, ${OFFICIALS[type]!.toLowerCase()} of ${provinceName(world, p)}, takes a commission as commander. The post stands empty until he returns.`, nations: [n], province: p });
   return null;
@@ -160,8 +170,13 @@ export function releaseCommander(world: World, n: number, c: number): string | n
   if (armyOf(world, c) >= 0) return "he leads an army: give it to another commander or leave it as a garrison first";
   const home = world.commanderHome[c]!;
   if (home < 0 || world.provinceOwner[home] !== n) return "he has no post in your lands to go back to";
+  if (world.provinceOfficial[home]! >= 0) return `another official holds his post at ${provinceName(world, home)} now`;
   const type = OFFICIALS.indexOf(world.commanders[c]!.origin as (typeof OFFICIALS)[number]);
+  const seed = world.commanderSeed[c]! >= 0 ? world.commanderSeed[c]! : home;
+  // Back at his own post he keeps his years there; if someone else held it meanwhile he starts again.
+  if (world.provinceOfficialSeed[home] !== seed) world.provinceOfficialSince[home] = world.day;
   world.provinceOfficial[home] = Math.max(0, type);
+  world.provinceOfficialSeed[home] = seed;
   world.commanderOwner[c] = -1;
   return null;
 }
@@ -711,7 +726,9 @@ export function monthlyRecruits(world: World, news: News[]): void {
   const empty = rc.emptyProvinceEffect("Leave it").recruits;
   for (let p = 0; p < world.provinceCount; p++) {
     const pool = { recruits: world.provinceRecruits[p]!, ceiling: world.provinceRecruitCeiling[p]! };
-    rc.refill(pool as rc.ProvincePool, 1, rate * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * crownShare(world, p));
+    // A muster master refills the pool faster (province officials table: +25 %).
+    const muster = officialBonus(world, p, "Muster master", "recruit_refill");
+    rc.refill(pool as rc.ProvincePool, 1, rate * muster * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * crownShare(world, p));
     world.provinceRecruits[p] = pool.recruits;
   }
   recomputeCap(world);
@@ -849,7 +866,8 @@ export function aiCollect(world: World, news: News[]): void {
       // and keeps about one commander to each 8,000 men it has under arms (feedback 28).
       if (a.men[i]! < AI_COMMAND_MIN_MEN || commandersOf(world, n) >= 1 + world.nationCapUsed[n]! / AI_MEN_PER_COMMANDER) continue;
       let post = -1;
-      for (let p = 0; p < world.provinceCount && post < 0; p++) if (world.provinceOwner[p] === n && world.provinceOfficial[p]! >= 0) post = p;
+      // A lord's official serves the lord, so only royal posts can give a commander.
+      for (let p = 0; p < world.provinceCount && post < 0; p++) if (world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && world.provinceOfficial[p]! >= 0) post = p;
       if (post < 0 || commissionOfficial(world, n, post, news)) continue;
       free = idleCommanders(world, n);
     }

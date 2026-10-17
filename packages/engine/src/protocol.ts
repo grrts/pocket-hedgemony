@@ -10,6 +10,7 @@ import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages } from "./tiles.ts";
+import { officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
@@ -137,6 +138,10 @@ export interface Snapshot {
   freeCompanies: (CompanyView & { id: number; pay: number; weeks: number })[];
   /** Official of each province (a name from OFFICIALS), or null when the post stands empty. */
   provinceOfficial: (string | null)[];
+  /** Name of the official at each province's post, or null when it stands empty (or no realm owns it). */
+  provinceOfficialName: (string | null)[];
+  /** Years the official at each post has served there, to one decimal (0 when empty); his effect grows to full at 5 (see officialEffect). */
+  provinceOfficialYears: number[];
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
   commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string }[];
   armies: {
@@ -295,6 +300,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
+      provinceOfficialName: Array.from({ length: w.provinceCount }, (_, p) => officialAt(w, p)),
+      provinceOfficialYears: Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
       commanders: w.commanders.map((c, k) => ({
         name: c.name,
         owner: w.commanderOwner[k]!,
