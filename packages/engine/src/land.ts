@@ -90,14 +90,24 @@ export function seedLand(world: World): void {
   const squares = new Float64Array(P);
   const mix = new Float64Array(P * USES.length);
   if (!grid.coarse) {
+    // Count each province's squares by ground first (twelve million squares), then share them out by use.
+    const G = GROUNDS.length;
+    const byGround = new Uint32Array(P * G);
     for (let t = 0; t < grid.province.length; t++) {
       const id = grid.province[t]!;
+      if (!id) continue;
       const g = groundOfCell(grid.cell[t]!);
-      if (!id || g === WATER) continue;
-      const p = id - 1;
-      squares[p]!++;
-      for (const [use, w] of Object.entries(GROUND_USES[GROUNDS[g]!]!)) mix[p * USES.length + U[use as UseName]]! += w!;
+      if (g === WATER || g >= G) continue;
+      byGround[(id - 1) * G + g]!++;
     }
+    const weights = GROUNDS.map((name) => Object.entries(GROUND_USES[name] ?? {}).map(([use, w]) => [U[use as UseName], w!] as const));
+    for (let p = 0; p < P; p++)
+      for (let g = 0; g < G; g++) {
+        const n = byGround[p * G + g]!;
+        if (!n) continue;
+        squares[p]! += n;
+        for (const [u, w] of weights[g]!) mix[p * USES.length + u]! += w * n;
+      }
   }
   // The size scale: from a small province (5th percentile) to a large one (95th), on a log scale.
   const sizes = Array.from(squares).filter((s, p) => s > 0 && !world.provinceWater[p]).sort((a, b) => a - b);
