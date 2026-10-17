@@ -58,10 +58,11 @@ Feature: Who can be called
       | farmers  | 18    |
       | clerks   | 6     |
 
-  @RECR-007 @open-question
-  # OQ-RECR-13: how many students a levy may take is not given
+  @RECR-007 @RECR-068 @placeholder
+  # config: callShares.students 0.04, the clerks' share (D-RECR-13)
   Scenario: Clergy and scholars can't be levied but students can
-    Given the province "Reims" has clergy, scholars and students
+    Given the province "Reims" has 400 clergy, 100 scholars and 1000 students
     When the men who can be called are counted
     Then clergy and scholars add 0 men
-    And students can be called from the same pool
+    And students add 10 men to the same pool
+    And a levy that takes students stops their research
