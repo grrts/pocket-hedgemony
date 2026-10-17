@@ -459,6 +459,16 @@ interface Tile {
   vao: WebGLVertexArrayObject;
 }
 
+/** Packs province `i`'s season into `out`: sea-level °C, and autumn, spring and wet season 0..1 (seasons.ts). */
+export function seasonBytes(out: Uint8Array, i: number, temperature: number, autumn: number, spring: number, wet: number): void {
+  const o = i * 4;
+  const byte = (v: number) => Math.max(0, Math.min(255, Math.round(v * 255)));
+  out[o] = byte((temperature + 60) / 127.5);
+  out[o + 1] = byte(autumn);
+  out[o + 2] = byte(spring);
+  out[o + 3] = byte(wet);
+}
+
 export class MapRenderer {
   readonly gl: WebGL2RenderingContext;
   private program: WebGLProgram;
@@ -571,14 +581,9 @@ export class MapRenderer {
     this.ownerData[o + 2] = water ? 255 : 0;
   }
 
-  /** A province's season for this turn: sea-level °C, and autumn, spring and wet season 0..1 (seasons.ts). */
-  setProvinceSeason(i: number, temperature: number, autumn: number, spring: number, wet: number): void {
-    const o = i * 4;
-    const byte = (v: number) => Math.max(0, Math.min(255, Math.round(v * 255)));
-    this.seasonData[o] = byte((temperature + 60) / 127.5);
-    this.seasonData[o + 1] = byte(autumn);
-    this.seasonData[o + 2] = byte(spring);
-    this.seasonData[o + 3] = byte(wet);
+  /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
+  setProvinceSeasons(bytes: Uint8Array): void {
+    this.seasonData.set(bytes);
     this.seasonDirty = true;
   }
   private seasonDirty = false;

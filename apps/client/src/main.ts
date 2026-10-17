@@ -8,6 +8,7 @@ import { icon, installUiArt, pennantUrl } from "./art/ui.ts";
 import { EngineClient } from "./engineClient.ts";
 import { loadMapImage } from "./map/loadMap.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
+import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 
 const rules = loadDefaultRuleset();
@@ -44,6 +45,11 @@ const unownedRgb = hexToRgb(PALETTE.unowned);
 /** A commander by index, as the engine last reported him. */
 const cmdOf = (c: number) => snapshot!.commanders[c]!;
 const neighborIdx = provinces.map((p) => p.neighbors.map((id) => provinceIndex.get(id)!));
+// The same, flat, for walks over the whole map each turn.
+const neighborStart = new Int32Array(provinces.length + 1);
+neighborIdx.forEach((n, i) => (neighborStart[i + 1] = neighborStart[i]! + n.length));
+const neighborList = Int32Array.from(neighborIdx.flat());
+const terrainIdx = Int8Array.from(provinces, (p) => TERRAINS.indexOf(p.terrain as (typeof TERRAINS)[number]));
 const isWater = provinces.map((p) => p.terrain === "sea" || p.terrain === "ocean");
 const march = rules.defines.march;
 const marchGraph: MarchMap = (() => {
@@ -227,18 +233,24 @@ function lensColor(i: number): number[] {
 /** Provinces within KNOWN_REACH steps (over land or sea) of the player's lands and armies. */
 function computeKnown(): Uint8Array | null {
   if (!snapshot) return null;
+  const me = snapshot.playerNation;
   const dist = new Int16Array(provinces.length).fill(-1);
-  const queue: number[] = [];
-  owners.forEach((o, i) => o === snapshot!.playerNation && (dist[i] = 0, queue.push(i)));
-  snapshot.armies.location.forEach((loc, k) => {
-    if (snapshot!.armies.owner[k] === snapshot!.playerNation && dist[loc]! < 0) ((dist[loc] = 0), queue.push(loc));
-  });
-  for (let h = 0; h < queue.length; h++) {
+  const queue = new Int32Array(provinces.length);
+  let tail = 0;
+  for (let i = 0; i < provinces.length; i++) if (owners[i] === me) ((dist[i] = 0), (queue[tail++] = i));
+  const { location, owner } = snapshot.armies;
+  for (let k = 0; k < location.length; k++) if (owner[k] === me && dist[location[k]!]! < 0) ((dist[location[k]!] = 0), (queue[tail++] = location[k]!));
+  for (let h = 0; h < tail; h++) {
     const p = queue[h]!;
     if (dist[p]! >= KNOWN_REACH) continue;
-    for (const n of neighborIdx[p]!) if (dist[n]! < 0) ((dist[n] = dist[p]! + 1), queue.push(n));
+    for (let e = neighborStart[p]!; e < neighborStart[p + 1]!; e++) {
+      const n = neighborList[e]!;
+      if (dist[n]! < 0) ((dist[n] = dist[p]! + 1), (queue[tail++] = n));
+    }
   }
-  return Uint8Array.from(dist, (d) => (d >= 0 ? 1 : 0));
+  const out = new Uint8Array(provinces.length);
+  for (let i = 0; i < out.length; i++) out[i] = dist[i]! >= 0 ? 1 : 0;
+  return out;
 }
 const isKnown = (i: number) => !fogOn || !known || known[i] === 1;
 
@@ -250,14 +262,15 @@ let seasonKey = "";
 let places: PlaceClimate[] | null = null;
 // Next week's seasons, worked out while the player looks at this one, so
 // ending a turn only has to copy them (docs/performance.md: one frame).
-let nextSeason: { key: string; data: Float32Array } | null = null;
+let nextSeason: { key: string; data: Uint8Array } | null = null;
 const dateKey = (d: GameDate) => `${d.year}-${d.month}-${d.day ?? 1}`;
-function seasonsFor(date: GameDate): Float32Array {
+/** Each province's season on a date, packed as the map's season texture holds it. */
+function seasonsFor(date: GameDate): Uint8Array {
   places ??= provinces.map((p) => placeClimate(lonOf(p), latOf(p), !!p.coastal, p.terrain ?? ""));
-  const out = new Float32Array(provinces.length * 4);
+  const out = new Uint8Array(provinces.length * 4);
   for (let i = 0; i < provinces.length; i++) {
     const c = provinceClimate(places[i]!, date);
-    out.set([c.temperature, c.autumn, c.spring, c.wet], i * 4);
+    seasonBytes(out, i, c.temperature, c.autumn, c.spring, c.wet);
   }
   return out;
 }
@@ -273,7 +286,7 @@ function restyleProvinces(): void {
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
     const hatched = occ >= 0 && lens === "realms";
     const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
-    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, TERRAINS.indexOf(provinces[i]!.terrain as (typeof TERRAINS)[number]), flags, isWater[i]);
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i]);
   }
   // Seasons move on a week a turn, so they are only worked out when the date changes.
   const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (snapshot?.date ?? rules.defines.startDate);
@@ -281,7 +294,7 @@ function restyleProvinces(): void {
   if (key !== seasonKey) {
     seasonKey = key;
     const s = nextSeason?.key === key ? nextSeason.data : seasonsFor(date);
-    for (let i = 0; i < provinces.length; i++) view.renderer.setProvinceSeason(i, s[i * 4]!, s[i * 4 + 1]!, s[i * 4 + 2]!, s[i * 4 + 3]!);
+    view.renderer.setProvinceSeasons(s);
     if (!previewMonth) {
       const next = addDays(date, DAYS_PER_TURN);
       setTimeout(() => (nextSeason = { key: dateKey(next), data: seasonsFor(next) }), 50);
