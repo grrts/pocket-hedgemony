@@ -243,6 +243,19 @@ const lonOf = (p: { x?: number }) => (p.x ?? 0) / rules.map!.pxPerDeg - 180;
 /** The date the map's seasons were last worked out for, and each province's fixed climate. */
 let seasonKey = "";
 let places: PlaceClimate[] | null = null;
+// Next week's seasons, worked out while the player looks at this one, so
+// ending a turn only has to copy them (docs/performance.md: one frame).
+let nextSeason: { key: string; data: Float32Array } | null = null;
+const dateKey = (d: GameDate) => `${d.year}-${d.month}-${d.day ?? 1}`;
+function seasonsFor(date: GameDate): Float32Array {
+  places ??= provinces.map((p) => placeClimate(lonOf(p), latOf(p), !!p.coastal, p.terrain ?? ""));
+  const out = new Float32Array(provinces.length * 4);
+  for (let i = 0; i < provinces.length; i++) {
+    const c = provinceClimate(places[i]!, date);
+    out.set([c.temperature, c.autumn, c.spring, c.wet], i * 4);
+  }
+  return out;
+}
 
 function restyleProvinces(): void {
   known = computeKnown();
@@ -259,14 +272,14 @@ function restyleProvinces(): void {
   }
   // Seasons move on a week a turn, so they are only worked out when the date changes.
   const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (snapshot?.date ?? rules.defines.startDate);
-  const key = `${date.year}-${date.month}-${date.day ?? 1}`;
+  const key = dateKey(date);
   if (key !== seasonKey) {
     seasonKey = key;
-    places ??= provinces.map((p) => placeClimate(lonOf(p), latOf(p), !!p.coastal, p.terrain ?? ""));
-    for (let i = 0; i < provinces.length; i++) {
-      if (isWater[i]) continue; // seas keep no seasons yet
-      const c = provinceClimate(places[i]!, date);
-      view.renderer.setProvinceSeason(i, c.temperature, c.autumn, c.spring, c.wet);
+    const s = nextSeason?.key === key ? nextSeason.data : seasonsFor(date);
+    for (let i = 0; i < provinces.length; i++) view.renderer.setProvinceSeason(i, s[i * 4]!, s[i * 4 + 1]!, s[i * 4 + 2]!, s[i * 4 + 3]!);
+    if (!previewMonth) {
+      const next = addDays(date, DAYS_PER_TURN);
+      setTimeout(() => (nextSeason = { key: dateKey(next), data: seasonsFor(next) }), 50);
     }
   }
   view.renderer.uploadProvinceStyles();
@@ -277,11 +290,12 @@ function restyleProvinces(): void {
 let nationLabels = computeNationLabels();
 
 function computeNationLabels() {
-  const acc = nations.map(() => ({ x: 0, y: 0, n: 0, ref: -1 }));
+  const acc = nations.map(() => ({ x: 0, y: 0, n: 0, ref: -1, owned: [] as number[] }));
   provinces.forEach((p, i) => {
     const o = owners[i]!;
     if (o < 0) return;
     const a = acc[o]!;
+    a.owned.push(i);
     if (a.ref < 0) a.ref = p.x!;
     // Unwrap around the first province so nations across the date line average correctly.
     let x = p.x!;
@@ -291,18 +305,18 @@ function computeNationLabels() {
     a.y += p.y!;
     a.n++;
   });
-  return acc.map((a, i) => {
+  return acc.map((a) => {
     if (!a.n) return null;
     const cx = a.x / a.n;
     const cy = a.y / a.n;
     // Snap to the nearest owned province so the label sits on the nation itself.
     let best = -1;
     let bestD = Infinity;
-    provinces.forEach((p, j) => {
-      if (owners[j] !== i) return;
+    for (const j of a.owned) {
+      const p = provinces[j]!;
       const d = (p.x! - cx) ** 2 + (p.y! - cy) ** 2;
       if (d < bestD) ((bestD = d), (best = j));
-    });
+    }
     return { x: provinces[best]!.x!, y: provinces[best]!.y!, size: Math.sqrt(a.n) };
   });
 }
