@@ -4,7 +4,7 @@ Feature: Harvests and army supply
   I want every province to roll a real harvest by its climate, and armies to eat from the land
   So that bad years and long wars bring hunger
 
-  @REALM-206 @placeholder
+  @REALM-215 @placeholder
   Scenario: Each province rolls its own harvest
     # config: food_year.base_harvest
     Given a province rolls its own harvest many times
@@ -12,7 +12,7 @@ Feature: Harvests and army supply
     Then about 10 % are poor, 70 % normal, 15 % good and 5 % bumper
     And none is failed before weather and war
 
-  @REALM-207 @placeholder
+  @REALM-216 @placeholder
   Scenario Outline: The region's weather is read by climate
     # config: food_year.weather, food_year.climate_weather
     Given a region's weather is rolled many times
@@ -25,13 +25,13 @@ Feature: Harvests and army supply
       | dry       | 4   | drought     |
       | monsoon   | 5   | floods      |
 
-  @REALM-207
+  @REALM-216
   Scenario: Neighbours of different climates suffer together
     Given a temperate province and a dry province lie in one weather region
     When the region rolls bad weather for the temperate province
     Then the dry province has a drought in the same year
 
-  @REALM-208
+  @REALM-217
   Scenario Outline: When a province harvests
     Given a <ground> province at <longitude> east and latitude <latitude>
     And its realm <knows> wet-rice terracing
@@ -46,7 +46,7 @@ Feature: Harvests and army supply
       | farmland | 115       | 23       | does not know | in September           |
       | tundra   | 60        | 68       | does not know | never                  |
 
-  @REALM-209 @placeholder
+  @REALM-218 @placeholder
   Scenario: Armies eat more on campaign
     # config: food.campaign_eat, march.rationsPerSoldier, march.rationsPerHorse
     Given an army of 1,000 men and 200 horses
@@ -55,7 +55,7 @@ Feature: Harvests and army supply
     When it spends a month on campaign
     Then it eats 2,600 rations
 
-  @REALM-210 @placeholder
+  @REALM-219 @placeholder
   Scenario Outline: Armies refill from the province's store
     # config: march.homeReserveMonths, march.foraging
     Given a farmland province of 10,000 people holds 5 months of food
@@ -67,7 +67,7 @@ Feature: Harvests and army supply
       | its own      | 30,000  |
       | an enemy's   | 50,000  |
 
-  @REALM-211
+  @REALM-220
   Scenario: Failed harvests are reported
     Given the harvests of "Toledo" and "Cuenca" of "Castile" fail
     When the harvest month ends

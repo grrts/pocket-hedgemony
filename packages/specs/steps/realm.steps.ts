@@ -2362,7 +2362,7 @@ Then(/^the officials pillar of "([^"]+)" counts (\d+) empty posts? and is "([^"]
   expect(G.STABILITY[p.step]).toBe(step);
 });
 
-// ------------------------------------------------------------ harvests and army supply (REALM-206 to REALM-210, feedback 82, 83)
+// ------------------------------------------------------------ harvests and army supply (REALM-215 to REALM-219, feedback 82, 83)
 
 Given("a province rolls its own harvest many times", (s) => {
   const rng = new Rng(17);

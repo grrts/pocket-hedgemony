@@ -5,6 +5,7 @@ import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
 import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
 import { badWeatherName } from "./domain/realm/index.ts";
+import { foodView, mapNetwork, type FoodView } from "./castleFood.ts";
 import { buildSheets, slotsOf, slotsUsed, townSize, workCost, WORKS, workStepName, workEffect, type WorkRow } from "./works.ts";
 import { buildingType } from "./domain/buildings/index.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
@@ -135,6 +136,11 @@ export interface Snapshot {
   climates: readonly string[];
   /** What bad weather is called in each climate (drought, floods, bad weather). */
   badWeather: readonly string[];
+  /** The castle feeding each province (-1 = none in reach) and its ring from it (feedback 84). */
+  provinceCastle: Int32Array;
+  provinceRing: Int8Array;
+  /** The player's Food tab (null before a realm is chosen). */
+  food: FoodView | null;
   /** Each province's grievances (bits of grievanceNames) and mood (index into moods). */
   provinceGrievances: Uint16Array;
   provinceMood: Int8Array;
@@ -342,6 +348,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
       climates: CLIMATES,
       badWeather: CLIMATES.map(badWeatherName),
+      ...(mapNetwork(w), { provinceCastle: w.provinceCastle.slice(), provinceRing: w.provinceRing.slice() }),
+      food: player >= 0 ? foodView(w, player) : null,
       provinceGrievances: w.provinceGrievances.slice(),
       provinceMood: Int8Array.from({ length: w.provinceCount }, (_, p) => moodIndex(w, p)),
       grievanceNames: GRIEVANCES,
@@ -434,6 +442,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceWeather,
       snap.provinceClimate,
       snap.provinceStarved,
+      snap.provinceCastle,
+      snap.provinceRing,
       snap.provinceGrievances,
       snap.provinceMood,
       snap.provinceLord,

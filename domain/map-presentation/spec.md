@@ -208,12 +208,12 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - VIEW-082 (State-driven): While the sea freezes, the drawn ice shall grow from the coasts and from the pole as the water cools and shrink back as it warms, so its outline crosses sea zones in natural shapes instead of filling whole zones, with a soft, textured edge between open sea and ice; a sea zone closes to fleets (MAP-049) once it is drawn mostly frozen. [F-26; X-17]
 
 ### Milestone 3 playtest (17 October 2026)
-Leroy's playtest feedback, items 55 to 58, 65 and 77 of the feedback log.
+Leroy's playtest feedback, items 55 to 58, 65, 77 and 89 of the feedback log.
 
 - VIEW-083 (Ubiquitous): Every realm shall show its own national flag, without a pole, wherever its flag appears (the top bar, realm and nation buttons, the province card, the realm book's banner): the flag a player knows the country by today where it still stands, otherwise its banner of the age; a realm without one shows a cloth in its map colour. [feedback 55; feedback 37]
 - VIEW-084 (Ubiquitous): A commander on the map shall be drawn as a figure on foot dressed in their realm's flag colours, with the headwear of where the realm lies in the early eras and the kit of the current era (plate and sword, halberd, pistol, tricorne, sabre, revolver, rifle, field glasses), their hair greying with age. [feedback 56]
 - VIEW-085 (Ubiquitous): Army figures shall be drawn at one size at every zoom from Local in, so they never cover the province they stand in. [feedback 57]
-- VIEW-086 (Ubiquitous): Where a commander's name shows on the map, their realm's flag shall show before it. [feedback 77]
+- VIEW-086 (Ubiquitous): Every army figure on the map shall show its realm's flag before its men count, on the same row and centred on it, so you can tell whose army it is; the commander's name, where it shows, goes below. [feedback 77; feedback 89]
 - VIEW-087 (Ubiquitous): Portraits of commanders, officials and lords shall show who they are and what they do: their realm's flag dimmed behind them and its colours on them; a commander in the armour or uniform of the era, an official in the dress and with the tool of their post (a judge's red robe and gavel, a steward's keys, a tax collector's purse, a schoolmaster's book), a lord in a fur mantle and coronet; their hair greying with age. [feedback 58; feedback 65]
 
 #### How the player uses it: flags, commanders and portraits
@@ -421,5 +421,5 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-083 | zoom-content.feature | Realms show their national flags |
 | VIEW-084 | zoom-content.feature | Commanders look like their realm, era and age |
 | VIEW-085 | zoom-content.feature | Army figures keep one size as you zoom in |
-| VIEW-086 | zoom-content.feature | A commander's name carries their realm's flag |
+| VIEW-086 | zoom-content.feature | An army's men count carries their realm's flag |
 | VIEW-087 | zoom-content.feature | Portraits show who people are and what they do |

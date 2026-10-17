@@ -43,6 +43,8 @@ describe("a living realm: food", () => {
     w.provinceStore[p] = 0;
     // No relief from the realm's other provinces: they have nothing to spare either.
     for (let q = 0; q < w.provinceCount; q++) if (q !== p && w.provinceOwner[q] === w.provinceOwner[p]) w.provinceStore[q] = 0;
+    // Nor from its castles: their stores are empty too.
+    w.castleStore.fill(0);
     untilDate(w, 1444, 12);
     processTurn(w, [], -1);
     expect(w.provinceStarved[p]).toBeGreaterThan(0);

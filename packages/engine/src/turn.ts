@@ -1,4 +1,5 @@
 import { monthlyPeople } from "./living.ts";
+import { setFood, setFoodPreset } from "./castleFood.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
@@ -101,7 +102,10 @@ export type Order =
   | { type: "build"; province: number; work: number }
   | { type: "cancelBuild"; province: number; work: number }
   /** Move a queued work one place earlier (-1) or later (1) in its province's queue. */
-  | { type: "moveBuild"; province: number; work: number; by: number };
+  | { type: "moveBuild"; province: number; work: number; by: number }
+  /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
+  | { type: "setFood"; castle: number; key: string; value: string | number | null }
+  | { type: "foodPreset"; name: string };
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -278,6 +282,10 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
+    case "setFood":
+      return setFood(world, actingNation, order.castle, order.key, order.value);
+    case "foodPreset":
+      return setFoodPreset(world, actingNation, order.name);
     case "moveBuild":
       return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":

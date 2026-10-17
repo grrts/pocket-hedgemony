@@ -357,6 +357,10 @@ export function orderShape(order: Order): string {
       return "cancel a work in province";
     case "moveBuild":
       return "move a work in the province's queue";
+    case "setFood":
+      return "set the food policy";
+    case "foodPreset":
+      return "fill the food policy from a preset";
   }
 }
 
