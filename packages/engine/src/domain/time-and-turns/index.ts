@@ -341,6 +341,8 @@ export function orderShape(order: Order): string {
       return "grant a fief";
     case "seizeFief":
       return "seize a fief";
+    case "swapOfficials":
+      return "move an official to another province";
   }
 }
 
