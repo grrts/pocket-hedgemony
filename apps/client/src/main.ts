@@ -1,4 +1,6 @@
-import { forageLimit, groundOf, planRoute, type MarchMap, type Order, type Route, type Snapshot } from "@ph/engine";
+import { addDays, DAYS_PER_TURN, forageLimit, groundOf, planRoute, type MarchMap, type Order, type Route, type Snapshot } from "@ph/engine";
+import type { GameDate } from "@ph/rules";
+import { provinceSeason, seasonName } from "./map/seasons.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite, spriteUrl } from "./art/sprites.ts";
@@ -11,6 +13,8 @@ import { detectRuntime, type Diagnostics } from "./platform.ts";
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
 const forceMainThread = new URLSearchParams(location.search).get("engine") === "main-thread";
+/** ?month=1..12 draws the map's seasons for that month, for reviewing the art. */
+const previewMonth = Number(new URLSearchParams(location.search).get("month")) || 0;
 const engine = new EngineClient({ forceMainThread });
 
 const diagnostics: Diagnostics = {
@@ -27,6 +31,8 @@ const diagnostics: Diagnostics = {
 
 const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+/** "11 November 1444", or "11 Nov 1444" short. */
+const dateText = (d: GameDate, short = false) => `${d.day ?? 1} ${short ? MONTHS[d.month - 1]!.slice(0, 3) : MONTHS[d.month - 1]} ${d.year}`;
 
 const provinces = rules.provinces;
 const nations = rules.nations;
@@ -217,6 +223,12 @@ function computeKnown(): Uint8Array | null {
 }
 const isKnown = (i: number) => !fogOn || !known || known[i] === 1;
 
+/** Latitude and longitude of a province's centre. */
+const latOf = (p: { y?: number }) => rules.map!.latTop - (p.y ?? 0) / rules.map!.pxPerDeg;
+const lonOf = (p: { x?: number }) => (p.x ?? 0) / rules.map!.pxPerDeg - 180;
+/** The month the map's seasons were last drawn for. */
+let seasonMonth = 0;
+
 function restyleProvinces(): void {
   known = computeKnown();
   const targets = new Set<number>();
@@ -226,6 +238,15 @@ function restyleProvinces(): void {
     const o = owners[i]!;
     const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0) | (isKnown(i) ? 0 : 4);
     view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : lensColor(i), o, TERRAINS.indexOf(provinces[i]!.terrain as (typeof TERRAINS)[number]), flags, isWater[i]);
+  }
+  // Seasons change once a month, so they are only worked out then.
+  const month = previewMonth || (snapshot?.date.month ?? rules.defines.startDate.month);
+  if (month !== seasonMonth) {
+    seasonMonth = month;
+    for (let i = 0; i < provinces.length; i++) {
+      const p = provinces[i]!;
+      view.renderer.setProvinceSeason(i, isWater[i] ? 0 : provinceSeason(lonOf(p), latOf(p), p.terrain ?? "", month));
+    }
   }
   view.renderer.uploadProvinceStyles();
   view.invalidate();
@@ -378,12 +399,12 @@ function drawOverlay(o: OverlayContext): void {
       pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
       ctx.stroke();
       ctx.setLineDash([]);
-      // A dot where each month's march ends.
+      // A dot where each turn's march ends.
       const left = daysLeft(k);
       if (planned) {
         ctx.fillStyle = PALETTE.paper;
         planned.arrive.forEach((d, i) => {
-          if (Math.floor(d / march.daysPerMonth) > Math.floor((planned.arrive[i - 1] ?? 0) / march.daysPerMonth) && i < planned.arrive.length - 1) {
+          if (Math.floor(d / DAYS_PER_TURN) > Math.floor((planned.arrive[i - 1] ?? 0) / DAYS_PER_TURN) && i < planned.arrive.length - 1) {
             const [x, y] = pts[i + 1]!;
             ctx.fillRect(Math.round(x) - spriteScale, Math.round(y) - spriteScale, 2 * spriteScale + 1, 2 * spriteScale + 1);
           }
@@ -573,7 +594,7 @@ function computeDaysLeft(k: number): { to: number; days: number } | null {
   return r ? { to: route.at(-1)!, days: Math.max(0, Math.ceil(r.arrive.at(-1)! - s.armies.progress[k]!)) } : null;
 }
 
-const duration = (days: number) => (days <= 30 ? `${days} day${days === 1 ? "" : "s"}` : `${Math.ceil(days / 30)} months`);
+const duration = (days: number) => (days < 14 ? `${days} day${days === 1 ? "" : "s"}` : `${Math.round(days / 7)} weeks`);
 
 /** Food in the wagons, and whether the land here can feed the army. */
 function supplyLine(k: number): string {
@@ -602,7 +623,7 @@ function renderHud(): void {
   if (!snapshot) {
     hud.innerHTML = `
       <div class="realm title">${icon("crown", 2)}<b>Pocket Hegemony</b></div>
-      <span class="subtitle">Spring 1444 · choose a realm</span>`;
+      <span class="subtitle">Autumn 1444 · choose a realm</span>`;
     return;
   }
   const s = snapshot;
@@ -611,7 +632,7 @@ function renderHud(): void {
   const inc = s.nationMonthlyIncome[me]!;
   hud.innerHTML = `
     <button class="realm" data-realm="${me}" title="Your realm">${pennant(n.color, 2)}<b>${esc(n.name)}</b></button>
-    <span class="plaque turn-label" title="Date">${MONTHS[s.date.month - 1]} ${s.date.year}</span>
+    <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}</span>
     <span class="plaque" title="Treasury: gold, and change per month">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></span>
     <span class="plaque" title="Levies: men ready to raise">${icon("swords", 1)}${fmt(s.nationLevies[me]! / 1000)}k</span>`;
 }
@@ -624,9 +645,9 @@ function renderActions(): void {
   badge.hidden = pendingOrders.length === 0;
   badge.textContent = String(pendingOrders.length);
   if (!snapshot) return;
-  const next = new Date(Date.UTC(snapshot.date.year, snapshot.date.month, 1));
+  const next = addDays(snapshot.date, DAYS_PER_TURN);
   const orders = pendingOrders.length;
-  fab.title = `End turn: on to ${MONTHS[next.getUTCMonth()]} ${next.getUTCFullYear()}${orders ? `, ${orders} arm${orders > 1 ? "ies" : "y"} marching` : ""}`;
+  fab.title = `End turn: on to ${dateText(next)}${orders ? `, ${orders} arm${orders > 1 ? "ies" : "y"} marching` : ""}`;
 }
 
 function closeButton(): string {

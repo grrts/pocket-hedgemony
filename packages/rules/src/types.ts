@@ -1,6 +1,8 @@
 export interface GameDate {
   year: number;
   month: number;
+  /** Day of the month the turn starts on; absent means the 1st. Only the first turn starts mid-month (X-5). */
+  day?: number;
 }
 
 export interface Defines {
@@ -25,7 +27,6 @@ export type Ground = Exclude<Terrain, "sea" | "ocean">;
 
 /** Marching and feeding armies (warfare design sections 5 and 6). */
 export interface MarchDefines {
-  daysPerMonth: number;
   /** Real days for one unit in the days-to-cross table. */
   daysPerCrossing: number;
   /** Province design 3.1: crossing units per ground. */

@@ -4,7 +4,7 @@ import { loadDefaultRuleset, validateRuleset, RulesetError } from "../src/index.
 describe("rules", () => {
   it("loads the bundled 1444 scenario", () => {
     const rules = loadDefaultRuleset();
-    expect(rules.defines.startDate).toEqual({ year: 1444, month: 3 });
+    expect(rules.defines.startDate).toEqual({ year: 1444, month: 11, day: 11 });
     expect(rules.nations.length).toBeGreaterThan(100);
     expect(rules.provinces.length).toBeGreaterThan(3000);
     const fra = rules.nations.find((n) => n.id === "france")!;

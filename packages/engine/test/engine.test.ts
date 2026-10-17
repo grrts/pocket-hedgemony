@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
-import { createEngineHost, createWorld, generateSyntheticRuleset, hashWorld, marchMap, planRoute, processTurn, Rng, stepDays } from "../src/index.ts";
+import { addDays, createEngineHost, daysInMonth, monthBeginning, turnOfDay, createWorld, generateSyntheticRuleset, hashWorld, marchMap, planRoute, processTurn, Rng, stepDays } from "../src/index.ts";
 
 const rules = loadDefaultRuleset();
 
@@ -15,20 +15,40 @@ describe("rng", () => {
 });
 
 describe("turns", () => {
-  it("starts in March 1444 and rolls over into 1445", () => {
+  it("starts on 11 November 1444 and moves on a week a turn into 1445", () => {
     const w = createWorld(rules, 1);
+    expect(w.date).toEqual({ year: 1444, month: 11, day: 11 });
     processTurn(w, [], 0);
-    expect(w.date).toEqual({ year: 1444, month: 4 });
-    for (let i = 0; i < 9; i++) processTurn(w, [], 0);
-    expect(w.date).toEqual({ year: 1445, month: 1 });
+    expect(w.date).toEqual({ year: 1444, month: 11, day: 18 });
+    for (let i = 0; i < 7; i++) processTurn(w, [], 0);
+    expect(w.date).toEqual({ year: 1445, month: 1, day: 6 });
   });
 
-  it("pays province income into the owner's treasury", () => {
+  it("follows the real calendar", () => {
+    expect([1, 2, 4, 12].map((m) => daysInMonth(1445, m))).toEqual([31, 28, 30, 31]);
+    expect(daysInMonth(1448, 2)).toBe(29);
+    expect(daysInMonth(1500, 2)).toBe(28);
+    expect(daysInMonth(1600, 2)).toBe(29);
+    expect(addDays({ year: 1444, month: 12, day: 30 }, 7)).toEqual({ year: 1445, month: 1, day: 6 });
+    // A new month begins in the turn from 25 November, not in the one from 18 November.
+    expect(monthBeginning({ year: 1444, month: 11, day: 18 })).toBeNull();
+    expect(monthBeginning({ year: 1444, month: 11, day: 25 })).toBe(12);
+    expect(monthBeginning({ year: 1445, month: 3, day: 1 })).toBe(3);
+    // 25 days from 11 November: four turns, ending on 5 December.
+    expect(turnOfDay({ year: 1444, month: 11, day: 11 }, 25)).toEqual({ turns: 4, date: { year: 1444, month: 12, day: 5 } });
+  });
+
+  it("pays province income into the owner's treasury once a month", () => {
     const w = createWorld(rules, 1);
     const fra = w.nationIndex.get("france")!;
-    const before = w.nationTreasury[fra]!;
     processTurn(w, [], fra);
+    processTurn(w, [], fra);
+    // 11 and 18 November: no new month yet.
     expect(w.nationMonthlyIncome[fra]).toBeGreaterThan(0);
+    const before = w.nationTreasury[fra]!;
+    expect(before).toBe(rules.defines.economy.startingTreasury);
+    // 25 November: December begins in this turn.
+    processTurn(w, [], fra);
     expect(w.nationTreasury[fra]).toBeCloseTo(before + w.nationMonthlyIncome[fra]!);
   });
 
@@ -66,7 +86,7 @@ describe("turns", () => {
       days += stepDays(d, marchMap(w), i ? route.path[i - 1]! : w.armies.location[army]!, p, { men: 5000, horse: 1000, logistics: 0 });
       expect(route.arrive[i]).toBeCloseTo(days, 9);
     });
-    const months = Math.ceil(route.arrive.at(-1)! / d.daysPerMonth);
+    const months = turnOfDay(w.date, route.arrive.at(-1)!).turns;
     expect(months).toBeGreaterThan(1);
     processTurn(w, [{ type: "move", army, to: madrid }], fra);
     expect(w.armies.marched[army]!.length).toBeGreaterThan(1);
