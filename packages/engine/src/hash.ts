@@ -22,6 +22,7 @@ export function hashWorld(world: World): string {
   feed(a.alive.subarray(0, a.count));
   feed(a.owner.subarray(0, a.count));
   feed(a.location.subarray(0, a.count));
+  feed(a.cameFrom.subarray(0, a.count));
   feed(a.men.subarray(0, a.count));
   feed(a.horse.subarray(0, a.count));
   feed(a.food.subarray(0, a.count));

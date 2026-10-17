@@ -78,6 +78,8 @@ export interface ArmyPool {
   route: number[][];
   /** Provinces walked last turn, starting where the army set out (for drawing the march). */
   marched: number[][];
+  /** The province the army last marched in from (-1 = none): the way back past an enemy castle. */
+  cameFrom: Int32Array;
 }
 
 export function createArmyPool(capacity: number): ArmyPool {
@@ -94,6 +96,7 @@ export function createArmyPool(capacity: number): ArmyPool {
     movedThisTurn: new Uint8Array(capacity),
     route: Array.from({ length: capacity }, () => []),
     marched: Array.from({ length: capacity }, () => []),
+    cameFrom: new Int32Array(capacity).fill(-1),
   };
 }
 
@@ -120,6 +123,7 @@ export function spawnArmy(world: World, owner: number, location: number, men: nu
   pool.movedThisTurn[slot] = 0;
   pool.route[slot] = [];
   pool.marched[slot] = [];
+  pool.cameFrom[slot] = -1;
   // Wagons start full.
   const d = world.rules.defines.march;
   const logistics = commander >= 0 ? world.commanderLogistics[commander]! : 0;
@@ -141,6 +145,7 @@ function growArmyPool(old: ArmyPool): ArmyPool {
   next.movedThisTurn.set(old.movedThisTurn);
   old.route.forEach((r, i) => (next.route[i] = r));
   old.marched.forEach((r, i) => (next.marched[i] = r));
+  next.cameFrom.set(old.cameFrom);
   return next;
 }
 

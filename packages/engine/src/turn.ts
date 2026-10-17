@@ -13,9 +13,11 @@ import {
   monthlyDiplomacy,
   offerPeace,
   raiseLevies,
+  relationState,
   runBattles,
   runOccupation,
   syncDate,
+  wallsOf,
   type News,
   type PeaceTerms,
 } from "./war.ts";
@@ -124,11 +126,34 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
         a.movedThisTurn[order.army] = 0;
         return "no road there over land";
       }
+      if (castleBars(world, order.army, route.path[0]!)) {
+        a.movedThisTurn[order.army] = 0;
+        return "an enemy castle bars the road: go back, or take it first";
+      }
       a.route[order.army] = route.path;
       a.progress[order.army] = 0;
       return null;
     }
   }
+}
+
+/** An enemy castle with men inside stands in province p and stops nation n's armies (warfare 5.5). */
+export function blockingCastle(world: World, p: number, n: number): boolean {
+  return world.provinceGarrison[p]! > 0 && wallsOf(world, p) !== null && atWar(world, controller(world, p), n);
+}
+
+/**
+ * Whether a blocking castle where the army stands keeps it from stepping to
+ * `to`: it may only go back the way it came, or into land its own side holds.
+ */
+export function castleBars(world: World, slot: number, to: number): boolean {
+  const a = world.armies;
+  const n = a.owner[slot]!;
+  if (!blockingCastle(world, a.location[slot]!, n) || to === a.cameFrom[slot]) return false;
+  const holder = controller(world, to);
+  if (holder === n) return false;
+  const tie = relationState(world, n, holder).state;
+  return tie !== "alliance" && tie !== "subject" && tie !== "overlord";
 }
 
 export function marching(world: World, slot: number): MarchingArmy {
@@ -164,12 +189,19 @@ function runMarches(world: World): Set<number> {
     const route = a.route[i]!;
     let days = a.progress[i]! + (route.length ? DAYS_PER_TURN : 0);
     while (route.length) {
+      if (castleBars(world, i, route[0]!)) {
+        route.length = 0;
+        days = 0;
+        break;
+      }
       const cost = stepDays(d, map, a.location[i]!, route[0]!, army);
       if (days < cost) break;
       days -= cost;
+      a.cameFrom[i] = a.location[i]!;
       a.location[i] = route.shift()!;
       walked.push(a.location[i]!);
-      if (enemyAt(a.location[i]!, a.owner[i]!)) {
+      // An enemy army, or a garrisoned enemy castle, ends the march (warfare 5.5).
+      if (enemyAt(a.location[i]!, a.owner[i]!) || blockingCastle(world, a.location[i]!, a.owner[i]!)) {
         route.length = 0;
         days = 0;
       }

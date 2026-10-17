@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
-import { applyNow, createWorld, processTurn, relationState, type World } from "../src/index.ts";
+import { applyNow, createWorld, marchMap, processTurn, relationState, spawnArmy, type World } from "../src/index.ts";
+import { blockingCastle } from "../src/turn.ts";
 
 const rules = loadDefaultRuleset();
 const n = (w: World, id: string) => w.nationIndex.get(id)!;
@@ -43,6 +44,33 @@ describe("war and conquest", () => {
     expect(peace).toBe(true);
     expect(w.provinceOwner[target]).toBe(me);
     expect(relationState(w, me, foe).state).toBe("truce");
+  });
+
+  it("stops armies at a garrisoned enemy castle until it falls (warfare 5.5)", () => {
+    const w = createWorld(rules, 7);
+    const me = n(w, "castile");
+    const foe = n(w, "portugal");
+    applyNow(w, { type: "declareWar", target: foe }, me);
+    const castle = w.provinceIndex.get(rules.nations[foe]!.capital)!;
+    expect(blockingCastle(w, castle, me)).toBe(true);
+    const map = marchMap(w);
+    const around = Array.from(map.adjList.subarray(map.adjStart[castle]!, map.adjStart[castle + 1]!)).filter((p) => map.ground[p]);
+    const [back, onward] = around.filter((p) => w.provinceOwner[p] === foe);
+    expect(back !== undefined && onward !== undefined).toBe(true);
+    // An army marching from one side to the other halts at the castle.
+    const army = spawnArmy(w, me, back!, 20000);
+    w.armies.route[army] = [castle, onward!];
+    for (let t = 0; t < 8 && w.armies.location[army] !== castle; t++) processTurn(w, [], me);
+    expect(w.armies.location[army]).toBe(castle);
+    expect(w.armies.route[army]).toEqual([]);
+    // It may not go on past the castle, but it may go back.
+    const on = applyNow(w, { type: "move", army, to: onward! }, me);
+    expect(on.rejectedOrders.length).toBe(1);
+    expect(applyNow(w, { type: "move", army, to: back! }, me).rejectedOrders).toEqual([]);
+    // Once the castle has no men in it, the road is open.
+    w.armies.movedThisTurn[army] = 0;
+    w.provinceGarrison[castle] = 0;
+    expect(applyNow(w, { type: "move", army, to: onward! }, me).rejectedOrders).toEqual([]);
   });
 
   it("runs decades of AI wars deterministically and quickly", () => {
