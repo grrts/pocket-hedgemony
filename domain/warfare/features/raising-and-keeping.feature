@@ -120,10 +120,10 @@ Feature: Raising and keeping an army
 
   @WAR-210 @feedback-19
   Scenario: A hired company arrives after its march
-    Given the country "Venice" hires a Swiss free company to come to "Verona"
+    Given the country "Venice" hires a Swiss free company
     When the contract is signed
     Then Venice pays the gold up front
-    And the hire screen shows the days the company needs to march to "Verona"
+    And the hire screen shows the days the company needs to march to the capital "Venezia"
     And the company is not on the map until it arrives
 
   @WAR-211 @feedback-19
