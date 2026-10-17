@@ -1463,3 +1463,26 @@ button.more {
     display: none;
   }
 }
+
+/* ---- Officials: years served as pips and the effect of their type (feedback 66, 69) ---- */
+
+.pips {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+}
+.pips i {
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.pips i.on {
+  background: var(--brass);
+}
+small.effect {
+  color: #3f6a34;
+}
+.lord-row .lord-who small + small {
+  color: #3f6a34;
+}

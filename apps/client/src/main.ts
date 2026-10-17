@@ -213,6 +213,8 @@ document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLElement>("[data-official]");
   if (!b) return;
   officialView = Number(b.dataset.official);
+  movesAll = false;
+  panel.scrollTop = 0;
   realmView = -1;
   lordView = -1;
   newsView = false;
@@ -1161,7 +1163,7 @@ function renderPanel(): void {
     return;
   }
   const armiesHere = snapshot ? [...snapshot.armies.id.keys()].filter((k) => snapshot!.armies.location[k] === selectedProvince && snapshot!.armies.commander[k]! >= 0) : [];
-  const official = snapshot && own >= 0 ? officialOf(rules, selectedProvince, own, snapshot.provinceOfficial[selectedProvince]) : undefined;
+  const official = snapshot && own >= 0 ? officialOf(snapshot, selectedProvince, own) : undefined;
   const siege = siegeInfo(selectedProvince);
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
@@ -1237,21 +1239,81 @@ function animateSiege(st: SiegeInfo): void {
 }
 
 /** An official's screen: who they are, the post, and commissioning them as a commander. */
+/** How well a province suits an official's type, highest first, and the fact that shows it. */
+function moveFit(post: string, p: number): [number, string] {
+  const s = snapshot!;
+  const pr = provinces[p]!;
+  switch (post) {
+    case "Tax collector":
+      return [s.provinceTaxGold[p]!, `${gold2(s.provinceTaxGold[p]!)} gold tax a month`];
+    case "Customs officer":
+      return [pr.wealth, `wealth ${pr.wealth}`];
+    case "Steward":
+      return [-s.provinceFoodMonths[p]!, `${s.provinceFoodMonths[p]!.toFixed(1)} months of food`];
+    case "Muster master":
+      return [s.provinceRecruits[p]!, `${fmt(s.provinceRecruits[p]!)} men to call`];
+    case "Judge":
+      return [s.provinceMood[p]! * 10 + (s.provinceGrievances[p] ? 1 : 0), ["calm", "grumbling", "rioting", "plotting"][s.provinceMood[p]!]!];
+    case "Warden": {
+      const border = neighborIdx[p]!.some((q) => owners[q]! >= 0 && owners[q] !== owners[p]);
+      return [(pr.castle ? 2 : 0) + (border ? 1 : 0), `${pr.castle ? WALL_NAMES[pr.castle].toLowerCase() : "no walls"}${border ? ", on the border" : ""}`];
+    }
+    default:
+      return [s.provincePeople[p]!, `${fmt(Math.round(s.provincePeople[p]! * 1000))} people`];
+  }
+}
+
+/** The official's screen shows every province to move him to, not just the best few. */
+let movesAll = false;
+
+/** An official's screen: who they are, their effect, moving them to another province, and commissioning them as a commander. */
 function renderOfficial(pi: number): void {
   const s = snapshot!;
-  const o = officialOf(rules, pi, owners[pi]!, s.provinceOfficial[pi]);
+  const o = officialOf(s, pi, owners[pi]!);
   // A lord's official serves the lord: his screen (and its commission) is not the crown's (feedback 62).
   if (!o || owners[pi] !== s.playerNation || s.provinceLord[pi]! >= 0) {
     officialView = -1;
     renderPanel();
     return;
   }
+  const me = s.playerNation;
+  const options: { p: number; score: number; fit: string }[] = [];
+  for (let p = 0; p < owners.length; p++) {
+    if (p === pi || owners[p] !== me || s.provinceLord[p]! >= 0) continue;
+    const [score, fit] = moveFit(o.post, p);
+    options.push({ p, score, fit });
+  }
+  options.sort((a, b) => b.score - a.score || a.p - b.p);
+  const moves = (movesAll ? options : options.slice(0, 6)).map(({ p, fit }) => ({
+    province: p,
+    thumb: mapImage ? provinceThumb(mapImage, provinces.length, p, nations[me]!.color) : "",
+    other: officialOf(s, p, me),
+    fit,
+  }));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
-    ${officialScreen(rules, o, s.playerNation, rules.defines.recruit.commanderGold, s.nationTreasury[s.playerNation]!)}
+    ${officialScreen(rules, o, me, rules.defines.recruit.commanderGold, s.nationTreasury[me]!, moves, movesAll || options.length <= 6)}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
+  panel.querySelector("[data-moves-all]")?.addEventListener("click", () => {
+    movesAll = true;
+    renderPanel();
+  });
+  // After a move, his screen follows him to his new post.
+  panel.querySelectorAll<HTMLButtonElement>("[data-swap]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const to = Number(b.dataset.swapTo);
+      void act({ type: "swapOfficials", a: Number(b.dataset.swap), b: to }).then(() => {
+        if (!snapshot || snapshot.rejectedOrders.length) return;
+        officialView = to;
+        newsView = false;
+        movesAll = false;
+        panel.scrollTop = 0;
+        renderPanel();
+      });
+    }),
+  );
   panel.querySelector("[data-back]")?.addEventListener("click", () => {
     officialView = -1;
     realmView = s.playerNation;
@@ -1318,7 +1380,7 @@ function governanceSection(pi: number, own: number, mine: boolean, official: Ret
     .sort((a, b) => Number(near.has(b.k)) - Number(near.has(a.k)) || LOYALTY_ORDER.indexOf(a.loyalty) - LOYALTY_ORDER.indexOf(b.loyalty));
   // A lord's official serves him: no button to the screen that would commission him (feedback 62).
   const officialHtml = lord && official
-    ? officialCard(rules, official, own, false).replace("</small>", ". He serves the lord.</small>")
+    ? officialCard(rules, official, own, false, true)
     : officialCard(rules, official, own, mine);
   return governanceCard(rules, { lord, mine, isCapital, province: pi, official: officialHtml, grantOpen, takers });
 }
@@ -2131,7 +2193,7 @@ function renderRealm(r: number): void {
     : realmTab === "mercenaries" ? mercenarySection()
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
-    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(rules, i, r, s!.provinceOfficial[i]) })), r)
+    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length)
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
