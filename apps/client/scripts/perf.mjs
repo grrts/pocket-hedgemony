@@ -12,6 +12,8 @@ page.on("pageerror", (e) => console.log("pageerror:", e.message));
 await page.goto("http://localhost:4176/?perf");
 await page.waitForFunction(() => globalThis.__phMap, null, { timeout: 30000 });
 await page.click("[data-nation=france]");
+// Playing starts once the first turn is on screen; loading the map before that is not play.
+await page.waitForSelector(".end-turn", { timeout: 60000 });
 await page.waitForTimeout(1000);
 // Main-thread tasks over 50 ms, from here on: each one is a visible stutter.
 await page.evaluate(() => {

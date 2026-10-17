@@ -328,6 +328,20 @@ button.icon-only {
   margin: 0 0 2px;
 }
 
+/* The commander list: one column, the small lines always shown, hints across. */
+.army-list {
+  grid-template-columns: 1fr;
+  width: min(300px, 42vw);
+}
+
+.army-list .lens small {
+  display: block !important;
+}
+
+.army-list .hint {
+  margin: 4px 0 0;
+}
+
 .lens-menu .lens {
   display: flex;
   flex-direction: column;

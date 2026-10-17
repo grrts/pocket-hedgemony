@@ -303,6 +303,8 @@ export function orderShape(order: Order): string {
       return "offer peace to country";
     case "answerCall":
       return "answer call to arms";
+    case "answerPeace":
+      return "answer peace offer";
     case "recruit":
       return "recruit in province";
     case "cancelRecruit":

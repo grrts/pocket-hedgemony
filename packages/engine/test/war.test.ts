@@ -48,6 +48,26 @@ describe("war and conquest", () => {
     expect(relationState(w, me, foe).state).toBe("truce");
   }, 60000);
 
+  it("lets the AI offer the player peace, which the player may take (feedback 10)", () => {
+    const w = createWorld(rules, 7, tiles);
+    const me = n(w, "castile");
+    w.player = me;
+    const foe = n(w, "portugal");
+    applyNow(w, { type: "declareWar", target: foe }, me);
+    // Castile holds all of Portugal: Portugal's people want peace, and it gives the land up.
+    for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === foe) w.provinceOccupier[p] = me;
+    let offer;
+    for (let t = 0; t < 8 && !offer; t++) {
+      processTurn(w, [], me);
+      offer = w.peaceOffers.find((o) => o.from === foe);
+    }
+    expect(offer?.terms).toBe("give");
+    expect(applyNow(w, { type: "answerPeace", offer: offer!.id, yes: true }, me).rejectedOrders).toEqual([]);
+    expect(w.nationGone[foe] || relationState(w, me, foe).state === "truce").toBeTruthy();
+    expect(w.provinceOwner[w.provinceIndex.get(rules.nations[foe]!.capital)!]).toBe(me);
+    expect(w.peaceOffers).toEqual([]);
+  }, 60000);
+
   it("stops armies at a garrisoned enemy castle until it falls (warfare 5.5)", () => {
     const w = createWorld(rules, 7, tiles);
     const me = n(w, "castile");
