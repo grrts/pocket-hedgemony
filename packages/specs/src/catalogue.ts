@@ -25,6 +25,8 @@ export interface Spec {
   requirements: string[];
   seams: Seam[];
   openQuestions: OpenQuestion[];
+  /** Questions answered in section 13, as D-<CODE>-n entries. */
+  decisions: OpenQuestion[];
 }
 
 function section(md: string, n: number): string {
@@ -48,8 +50,9 @@ export function readSpec(context: string, root = domainRoot): Spec {
     .filter((c) => c.length >= 4)
     .map(([to, direction, pattern, ...crosses]) => ({ from: context, to: to!.replace(/`/g, ""), direction: direction!, pattern: pattern!, crosses: crosses.join(" | ") }));
   const openQuestions = [...section(md, 13).matchAll(/^[-*]?\s*\**(OQ-[A-Z]+-\d+)\**[:.]?\s*(.+)$/gm)].map((m) => ({ context, id: m[1]!, text: m[2]!.trim() }));
+  const decisions = [...section(md, 13).matchAll(/^[-*]?\s*\**(D-[A-Z]+-\d+)\**[:.]?\s*(.+)$/gm)].map((m) => ({ context, id: m[1]!, text: m[2]!.trim() }));
   const requirements = [...new Set([...md.matchAll(/\b([A-Z]{2,6}-\d{3})\b/g)].map((m) => m[1]!))];
-  return { context, title: heading?.[1] ?? context, code: heading?.[2] ?? "", purpose, requirements, seams, openQuestions };
+  return { context, title: heading?.[1] ?? context, code: heading?.[2] ?? "", purpose, requirements, seams, openQuestions, decisions };
 }
 
 export function readSpecs(root = domainRoot): Spec[] {

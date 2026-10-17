@@ -3,7 +3,8 @@
 Pocket Hegemony is split into 29 bounded contexts. Each one owns a part of the game's rules and its own words for them. This page shows how the contexts fit together and where the seams between them sit. The full detail is in two generated files:
 
 - [context-map-seams.md](context-map-seams.md): every pair of contexts, with what each side says crosses between them (303 pairs).
-- [open-questions.md](open-questions.md): every gap and contradiction the specs found (about 550).
+- [open-questions.md](open-questions.md): every gap and contradiction the specs found, and how each was decided.
+- [DECISIONS.md](DECISIONS.md): the decisions that cross several contexts, and the rules used to decide.
 
 The rules for writing a spec and a feature file are in [CONVENTIONS.md](CONVENTIONS.md).
 
@@ -59,13 +60,13 @@ Three things are shared by several contexts and must be built once.
 
 | Flow | Path through the contexts |
 |---|---|
-| A month passes | time-and-turns opens the turn, applies orders, runs the day loop (troop-movement, naval, trade, warfare battles), then monthly steps (province, buildings, recruiting, realm, research, subjects, rebellions, revolutions), seasonal and yearly steps (culture, religion, diplomacy fades), then events, then achievements last. The exact global order is not designed yet (OQ-TIME-2). |
+| A month passes | time-and-turns opens the turn, applies orders, runs the day loop (troop-movement, naval, trade, warfare battles), then monthly steps (province, buildings, recruiting, realm, research, subjects, rebellions, revolutions), seasonal and yearly steps (culture, religion, diplomacy fades), then events, then achievements last. The full order is decision X-2 in [DECISIONS.md](DECISIONS.md). |
 | Gold | province (tax) and trade (deposits, fees, tolls) → realm treasury → spent by buildings, recruiting, research, diplomacy (gifts), naval (ships), exploration (colonies). |
 | Food | province tiles and harvests → realm stores and food policy → recruiting and warfare (rations, foraging along troop-movement's routes). |
 | People | province classes → recruiting (levy by class shares) → warfare (Fallen go back to province) ; culture and religion change who the people are; rebellions draw rebels from them. |
 | War | diplomacy (war aims, declaration, calls to arms) → warfare (battles, sieges, occupation) → diplomacy (peace terms, truce) → subjects or province (land changes hands). |
 | Rule | government (forms, caps on officials and lords) → realm (lords, loyalty) and province (officials) ; subjects (reach) ; revolutions (regimes set forms). |
-| History | events read stats from every context through an anti-corruption mapping (province §15, country stats §11, trade §12, government's 16 values) and act through a fixed list of effects. Religion, revolutions, culture, subjects, diplomacy and national strengths have asked for new effects; none are merged yet (OQ-EVT-11). |
+| History | events read stats from every context through an anti-corruption mapping (province §15, country stats §11, trade §12, government's 16 values) and act through a fixed list of effects. Religion, revolutions, culture, subjects, diplomacy and national strengths asked for new effects; events §13 records which were adopted. |
 | Feedback to the player | every context publishes domain events → game-shell (turn report, Needs attention), audio (stingers and music mood), achievements (tests run last), map-presentation (lenses). |
 
 ## 4. Seam patterns used
@@ -79,24 +80,26 @@ Three things are shared by several contexts and must be built once.
 | Anti-Corruption Layer | events ↔ province, realm, trade, government; national-strengths ↔ scenario-setup | The event tree's own stat names (prosperity, unrest, trade_power …) are translated into each context's model rather than leaking in. |
 | Open Host Service | world-map → movement, naval, trade; buildings → religion, national strengths | One stable interface many contexts call. |
 
-## 5. Seams that need a decision first
+## 5. Seams that needed a decision first
 
-The specs found that many seams are agreed by one side only: a design asked another to change, and the other design has not taken the change in yet. These are the seams with the most impact. Each line names the open questions that hold it.
+The specs found that many seams were agreed by one side only: a design asked another to change, and the other design had not taken the change in yet. On 17 October these were decided in the spirit of the gameplay built so far. The full text is in [DECISIONS.md](DECISIONS.md).
 
-1. **When a battle stops the turn** (time-and-turns, warfare, troop-movement, game-shell): three designs disagree. OQ-TIME-3, OQ-WAR-2, OQ-SHELL-2, OQ-MOVE-8.
-2. **The order systems run in a turn** (time-and-turns and everyone): no design exists. OQ-TIME-2, OQ-TIME-4 (weekly vs monthly food), OQ-TIME-5 (seasons, harvest month).
-3. **The start date** (time-and-turns, scenario-setup, onboarding): March 1444 in the engine, April in the tutorial, 11 November 1444 in the catalogue and relations. OQ-TIME-1, OQ-SETUP-4.
-4. **Trade v2 replacing province §7** (trade, province, realm, buildings, national-strengths, research): the old market, merchants and trade balance are still used by four other designs. OQ-TRADE-7, OQ-PROV-1, OQ-REALM-1, OQ-BLD-2, OQ-HER-4, OQ-RSCH-4.
-5. **Recruiting v3 not adopted by warfare, province and realm** (commander origins, levy then train, the muster master). OQ-RECR-4/5/6, OQ-WAR-6, OQ-PROV-5.
-6. **Subject kinds** (subjects, diplomacy, country-relations data): six kinds in the subjects design, eight in relation-rules.json, with different war rules. OQ-SUBJ-1/2/3, OQ-DIPL-10, OQ-DIPL-33.
-7. **How rebels form** (province, rebellions, revolutions): "a share of recruits each month" vs "a 5/15/30 % monthly roll". OQ-REBL-1, OQ-PROV-2, OQ-REVO-3.
-8. **Funding rebels and revolutions** (diplomacy, revolutions): designed twice with different numbers. OQ-REVO-1, OQ-DIPL-23.
-9. **Truce length** (diplomacy, warfare, relations data, engine): 5 (+5) years, 10 years, 60 months. OQ-DIPL-3.
-10. **How a campaign is won** (realm, game-shell, achievements): decided in outline, not designed. OQ-SHELL-1, OQ-REALM-6.
-11. **Catalogue against the map** (scenario-setup, every country-level context): 137 map nations vs 963 catalogue records, 37 ids that differ. OQ-SETUP-1, OQ-SETUP-2.
-12. **Out-of-scope content after 1939** (events, research, warfare): still present in the data. OQ-EVT-1, OQ-RSCH-1, OQ-WAR-12.
-13. **Settings that might change the simulation** (settings, time-and-turns): battery saver's smaller AI budget. OQ-SET-1, OQ-VIEW-9.
-14. **Save header flags** (saves, achievements, onboarding): ironman_unbroken, cheat_marked, switched_country and "began as the tutorial" are asked for but not designed. OQ-SAVE-1, OQ-ACH-4, OQ-TUT-6.
+| Seam | Contexts | Decision |
+|---|---|---|
+| When a battle stops the turn | time-and-turns, warfare, troop-movement, game-shell | X-1: battles happen on their day; a player battle stops the turn on the before-the-battle card |
+| The order systems run in a turn | time-and-turns and everyone | X-2, X-3, X-4: orders, day loop, monthly, seasonal, yearly, events, achievements, autosave |
+| The start date | time-and-turns, scenario-setup, onboarding | X-5: 11 November 1444 for every campaign |
+| Trade v2 replacing province §7 | trade, province, realm, buildings, national-strengths, research | X-6: province §7 dropped; levers mapped onto trade ratio gain |
+| Recruiting v3 | recruiting, warfare, province, realm | X-7: recruiting v3 everywhere |
+| Subject kinds | subjects, diplomacy, scenario-setup | X-8: the subjects design's six kinds |
+| How rebels form | province, rebellions, revolutions | X-9: the rebellions design's monthly chance to rise |
+| Funding rebels and revolutions | diplomacy, revolutions | X-10: one action with revolutions' numbers |
+| Truce length | diplomacy, warfare | X-11: 5 years, +5 if land moved or a subject was made |
+| How a campaign is won | realm, game-shell, achievements | X-12: world domination, or best score at the end date |
+| Catalogue against the map | scenario-setup and every country-level context | X-13: the map's nations are the realms |
+| Content after 1939 | events, research, warfare | X-14: nothing after 31 August 1939 |
+| Settings that might change the simulation | settings, time-and-turns | X-15: settings never change results |
+| Save header flags | saves, achievements, onboarding | X-16: four new header flags |
 
 ## 6. Contexts the designs do not cover yet
 
