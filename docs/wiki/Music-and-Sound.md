@@ -185,6 +185,12 @@ Ambience is off by default. When on, it plays a bed chosen by what is under the 
 - Interface sounds start within one audio block of the tap (about 3 ms) by a direct message to the worklet; map and battle sounds go through the scheduler so they line up with animation.
 - **Haptics** on phones (on by default, never on desktop, working with sound off): all light: `ui_error`, `turn_ready`, `battle_start`, `siege_breach`, and `realm_ruler_dies` once.
 
+### The Sound card
+
+The speaker button in the side tools, under the map lens and your commanders, opens the Sound card: what is playing now and why (for example "Mobilizing: war has been declared, the armies gather"), the volume, music on or off with its volume, the effects volume, and button sounds on or off. The speaker shows struck through while music is off, so you can tell without opening it. Sound starts with your first tap, as browsers and phones require, and your choices stay on the device.
+
+In this first cut the game plays the title theme, two peace tunes for each half of the eras in your palette's own tuning and timbre, prosperity, diplomacy, mobilizing, campaign (whose layers join as your armies close on the enemy and fight), siege, a losing war, unrest and crisis, with stingers for war declared, battles won and lost, and wars won and lost. Turns chime at their end and start (the full motif at a new year), taps click, and marches, levies, battles, sieges, famine and unrest each have a sound.
+
 ### Settings
 
 Master, music, effects and ambience volumes; music on or off (off fully suspends the synth); variety; zoom mix; ambience on or off; interface sounds on or off; haptics; mono; sound captions; reduced intensity. Defaults: master 0.8, music 0.7, effects 0.8, ambience 0.5 when on, variety "My palette only", interface sounds on, haptics on (phones). The tooltip sound is never played. The rows themselves live in [Settings](Settings).

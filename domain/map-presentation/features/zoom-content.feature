@@ -182,3 +182,41 @@ Feature: What each zoom shows
     When the map is drawn at any zoom
     Then no land province names are drawn except on each country's capital
     And a selected province shows its name on its name tab and card
+
+  @VIEW-083 @feedback-55
+  Scenario: Realms show their national flags
+    When the player looks at the top bar as "France"
+    Then France's flag shows blue, white and red bands with no pole
+    And "England" shows a red cross on white
+
+  @VIEW-084 @feedback-56
+  Scenario Outline: Commanders look like their realm, era and age
+    Given "Jean de Dunois" commands France's army in <year>
+    When the map is drawn at Local zoom
+    Then he stands on foot in France's blue and white with <kit>
+
+    Examples:
+      | year | kit                         |
+      | 1444 | plate armour and a sword    |
+      | 1520 | a morion and a halberd      |
+      | 1720 | a tricorne and a small sword |
+
+  @VIEW-085 @feedback-57
+  Scenario: Army figures keep one size as you zoom in
+    Given France's army stands in "Yvelines"
+    When the camera zooms from 4 to 16
+    Then the army's figure stays the same size on screen
+
+  @VIEW-086 @feedback-77
+  Scenario: A commander's name carries their realm's flag
+    Given France's army led by "Jean de Dunois" is selected
+    When the map is drawn
+    Then the name "Jean de Dunois" shows with France's flag before it
+
+  @VIEW-087 @feedback-58 @feedback-65
+  Scenario: Portraits show who people are and what they do
+    Given France has a judge, a steward and a lord
+    When the player opens the realm book's Officials and Lords tabs
+    Then the judge wears a red robe and holds a gavel, the steward holds keys
+    And the lord wears a fur mantle and a coronet
+    And each stands before France's flag

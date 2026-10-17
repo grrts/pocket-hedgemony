@@ -7,7 +7,7 @@ import { realmConfig } from "./domain/realm/index.ts";
 const cfg = realmConfig.stability;
 
 /**
- * Stability (realm REALM-188 to REALM-192, F-75): not a stored number but a
+ * Stability (realm REALM-199 to REALM-202, F-75): not a stored number but a
  * reading of the realm's four pillars, lords, subjects, officials and
  * provinces. Each pillar takes one of four steps, and the realm stands as
  * steady as its weakest pillar.
@@ -32,7 +32,7 @@ export interface Stability {
 
 const LOYALTY = ["Loyal", "Wavering", "Disloyal", "In revolt"];
 
-/** Lords or subjects by loyalty: In revolt crumbling, Disloyal troubled, under half Loyal uneasy (REALM-189). */
+/** Lords or subjects by loyalty: In revolt crumbling, Disloyal troubled, under half Loyal uneasy (REALM-200). */
 function loyaltyStep(c: Record<string, number>): number {
   const all = LOYALTY.reduce((t, l) => t + c[l]!, 0);
   if (c["In revolt"]) return 3;
@@ -54,7 +54,7 @@ export function subjectLoyalty(world: World, subject: number): string {
   return stepName(startLoyalty1444(autonomy, dip.relations.stance(g, x, r.target) === "hostile"));
 }
 
-/** The realm's stability from its lords, subjects, officials and provinces (REALM-188). */
+/** The realm's stability from its lords, subjects, officials and provinces (REALM-199). */
 export function stabilityOf(world: World, n: number): Stability {
   const landed = new Set(world.provinceLord);
   const lords = byLoyalty(world.lords.filter((l, k) => l.nation === n && landed.has(k)).map((l) => l.loyalty));
@@ -77,10 +77,10 @@ export function stabilityOf(world: World, n: number): Stability {
     posts++;
     if (world.provinceOfficial[p]! < 0) empty++;
   }
-  // Empty posts: none steady, up to a quarter uneasy, up to half troubled, more crumbling (REALM-190).
+  // Empty posts: none steady, up to a quarter uneasy, up to half troubled, more crumbling (REALM-201).
   const e = cfg.empty_posts_share;
   const officialsStep = !empty ? 0 : empty <= posts * e.uneasy_up_to ? 1 : empty <= posts * e.troubled_up_to ? 2 : 3;
-  // Rioting or plotting: none steady, any rioting uneasy, any plotting or a tenth troubled, a quarter crumbling (REALM-191).
+  // Rioting or plotting: none steady, any rioting uneasy, any plotting or a tenth troubled, a quarter crumbling (REALM-202).
   const restless = moods[2]! + moods[3]!;
   const r = cfg.restless_share;
   const provincesStep = !restless ? 0 : restless >= all * r.crumbling_from ? 3 : moods[3]! || restless >= all * r.troubled_from ? 2 : 1;

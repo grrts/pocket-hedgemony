@@ -2225,9 +2225,10 @@ Then("the officials line of {string} is one wage smaller", (s, realm: string) =>
   expect(ledger(s, realm, "officials")).toBeCloseTo(-(s.officials - 1) * GAME_RULES.defines.economy.officialWagePerMonth);
 });
 const yearsIncome = (s: S, realm: string) => 12 * (ledger(s, realm, "tax") + ledger(s, realm, "trade"));
-Then("lenders would give {string} a year's tax and trade", (s, realm: string) => {
+Then("lenders would let {string} owe a year's tax and trade", (s, realm: string) => {
   s.cap = yearsIncome(s, realm);
-  expect(G.canBorrow(s.game, realmOf(s, realm))).toBeCloseTo(s.cap);
+  // The most it can borrow leaves room for the new loan's interest (REALM-188).
+  expect(G.canBorrow(s.game, realmOf(s, realm)) * G.loanDebt(1)).toBeCloseTo(s.cap);
 });
 When(re(`"([^"]+)" borrows ${NUM} gold`), (s, realm: string, gold: string) => {
   s.goldBefore = s.game.nationTreasury[realmOf(s, realm)];
@@ -2242,8 +2243,49 @@ Then(re(`"([^"]+)" has ${NUM} gold more and owes ${NUM} gold`), (s, realm: strin
 Then(re(`the interest line of "([^"]+)" is ${NUM} % of ${NUM} gold a year, paid monthly`), (s, realm: string, pct: string, gold: string) => {
   expect(ledger(s, realm, "interest")).toBeCloseTo(-(num(gold) * num(pct)) / 100 / 12);
 });
-Then(re(`lenders would give "([^"]+)" ${NUM} gold less`), (s, realm: string, less: string) => {
-  expect(G.canBorrow(s.game, realmOf(s, realm))).toBeCloseTo(s.cap - num(less));
+Then(re(`lenders would let "([^"]+)" owe ${NUM} gold less`), (s, realm: string, less: string) => {
+  expect(G.canBorrow(s.game, realmOf(s, realm)) * G.loanDebt(1)).toBeCloseTo(s.cap - num(less));
+});
+const lordsOf = (s: S, realm: string): number[] => (s.game as GW).lords.flatMap((l, k) => (l.nation === realmOf(s, realm) ? [k] : []));
+const loyaltyOf = (s: S, realm: string): string[] => lordsOf(s, realm).map((k) => (s.game as GW).lords[k]!.loyalty);
+Then("every lord of {string} is a step less loyal", (s, realm: string) => {
+  expect(s.refused).toBe(null);
+  const steps = ["Loyal", "Wavering", "Disloyal"];
+  expect(lordsOf(s, realm).length).toBeGreaterThan(0);
+  // The game starts them loyal; one loan, one step.
+  expect(loyaltyOf(s, realm)).toEqual(loyaltyOf(s, realm).map(() => steps[1]));
+  s.loyalty = loyaltyOf(s, realm);
+});
+Then("the lords of {string} are as loyal as before that loan", (s, realm: string) => {
+  expect(s.refused).toBe(null);
+  expect(loyaltyOf(s, realm)).toEqual(s.loyalty);
+});
+const armiesOf = (s: S, realm: string): number[] => {
+  const a = (s.game as GW).armies;
+  return Array.from({ length: a.count }, (_, i) => i).filter((i) => a.alive[i] && a.owner[i] === realmOf(s, realm));
+};
+Then("every man of {string} is in an army under a commander", (s, realm: string) => {
+  expect(armiesOf(s, realm).every((i) => (s.game as GW).armies.commander[i]! >= 0)).toBe(true);
+});
+Then("the armies of {string} stand in different provinces", (s, realm: string) => {
+  const armies = armiesOf(s, realm);
+  expect(armies.length).toBeGreaterThan(1);
+  expect(new Set(armies.map((i) => (s.game as GW).armies.location[i]!)).size).toBe(armies.length);
+});
+Then(re(`"([^"]+)" has one commander for each ${NUM} men under arms, at least one`), (s, realm: string, per: string) => {
+  const g = s.game as GW;
+  const men = armiesOf(s, realm).reduce((t, i) => t + g.armies.men[i]!, 0);
+  const commanders = g.commanderOwner.reduce((t, o) => t + (o === realmOf(s, realm) ? 1 : 0), 0);
+  expect(commanders).toBe(Math.max(1, Math.round(men / num(per))));
+});
+Then("each commander of {string} leads an army, the first in its capital", (s, realm: string) => {
+  const g = s.game as GW;
+  const n = realmOf(s, realm);
+  const led = armiesOf(s, realm).filter((i) => g.armies.commander[i]! >= 0);
+  expect(led.length).toBe(g.commanderOwner.reduce((t, o) => t + (o === n ? 1 : 0), 0));
+  const capital = g.provinceIndex.get(GAME_RULES.nations[n]!.capital)!;
+  const first = led.find((i) => g.armies.location[i] === capital)!;
+  expect(g.commanderIds[g.armies.commander[first]!]).toBe(GAME_RULES.nations[n]!.commanders[0]!.id);
 });
 When("{string} borrows more than lenders would give", (s, realm: string) => {
   order(s, realm, { type: "borrow", gold: G.canBorrow(s.game, realmOf(s, realm)) + 1 });

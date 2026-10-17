@@ -2,7 +2,7 @@ import { STABILITY, type Stability, type StabilityPillar } from "@ph/engine";
 import { icon } from "../art/ui.ts";
 
 /**
- * Stability on screen (realm REALM-188 to REALM-192, F-75): a plaque in the
+ * Stability on screen (realm REALM-203 to REALM-205, F-75): a plaque in the
  * top bar shows the realm's step, and the General tab of the player's country
  * card shows its four pillars, each opening the tab that can mend it.
  */

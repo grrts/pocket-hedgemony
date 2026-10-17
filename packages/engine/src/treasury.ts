@@ -1,10 +1,11 @@
 import type { World } from "./world.ts";
 import { controller, type News } from "./war.ts";
-import { nationPay, ungoverned } from "./recruit.ts";
+import { allNationPay, ungoverned } from "./recruit.ts";
 import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
 import { interestPct, loanCap, realmConfig } from "./domain/realm/index.ts";
 import { moodShare } from "./moods.ts";
 import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
+import { officialBonus } from "./officials.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -39,6 +40,8 @@ export interface TreasuryState {
   nationDebt: Float64Array;
   /** This month's ledger: LEDGER_LINES per realm, gold in (+) and out (−). */
   nationLedger: Float64Array;
+  /** Month (year × 12 + month) of each realm's last loan that unsettled its lords, or a long time ago. */
+  nationLoanMonth: Int32Array;
 }
 
 export function createTreasuryState(P: number, N: number): TreasuryState {
@@ -47,6 +50,7 @@ export function createTreasuryState(P: number, N: number): TreasuryState {
     nationTaxDefault: new Uint8Array(N).fill(NORMAL_TAX),
     nationDebt: new Float64Array(N),
     nationLedger: new Float64Array(N * LEDGER_LINES),
+    nationLoanMonth: new Int32Array(N).fill(-1e6),
   };
 }
 
@@ -67,13 +71,17 @@ export function provinceTax(world: World, p: number, holder: number): number {
   // A province whose official was commissioned pays half (recruiting RECR-083, "Leave it").
   // Rioting or plotting provinces pay half (PROV-162); a lord keeps his share (REALM-072).
   const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
-  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share;
+  // A tax collector brings more of it in (province officials table: +20 % reaching you).
+  const collector = officialBonus(world, p, "Tax collector", "tax_reach");
+  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector;
 }
 
 /** Trade and market gold a province gives its holder in a month (not taxed by rate). */
 export function provinceTrade(world: World, p: number): number {
   const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
-  return world.provinceWealth[p]! * world.rules.defines.economy.goldPerWealthPerMonth * share;
+  // A customs officer raises what trade brings (province officials table: +15 %).
+  const customs = officialBonus(world, p, "Customs officer", "trade_ratio_gain");
+  return world.provinceWealth[p]! * world.rules.defines.economy.goldPerWealthPerMonth * share * customs;
 }
 
 /** Monthly interest on a realm's debt (REALM-164: 10 % a year). */
@@ -87,7 +95,6 @@ export function monthlyInterest(world: World, n: number): number {
  */
 export function runLedger(world: World, pay: boolean): void {
   const L = world.nationLedger;
-  const income = world.nationMonthlyIncome;
   const wage = world.rules.defines.economy.officialWagePerMonth;
   L.fill(0);
   for (let p = 0; p < world.provinceCount; p++) {
@@ -100,21 +107,39 @@ export function runLedger(world: World, pay: boolean): void {
     L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + provinceTax(world, p, holder);
     L[holder * LEDGER_LINES + TRADE] = L[holder * LEDGER_LINES + TRADE]! + provinceTrade(world, p);
   }
+  const armyPay = allNationPay(world);
   for (let n = 0; n < world.nationCount; n++) {
-    L[n * LEDGER_LINES + PAY] = -nationPay(world, n);
-    L[n * LEDGER_LINES + INTEREST] = -monthlyInterest(world, n);
-    let sum = 0;
-    for (let k = 0; k < LEDGER_LINES; k++) sum += L[n * LEDGER_LINES + k]!;
-    income[n] = sum;
+    L[n * LEDGER_LINES + PAY] = -armyPay[n]!;
+    sumLedger(world, n);
   }
   if (!pay) return;
-  for (let n = 0; n < world.nationCount; n++) world.nationTreasury[n] = world.nationTreasury[n]! + income[n]!;
+  for (let n = 0; n < world.nationCount; n++) world.nationTreasury[n] = world.nationTreasury[n]! + world.nationMonthlyIncome[n]!;
 }
 
-/** Gold a realm could borrow now: up to a year's tax and trade (REALM-164), less what it owes. */
+/** Debt a loan of this much gold adds: the gold plus its interest, all at once (REALM-188). */
+export function loanDebt(gold: number): number {
+  return gold * (1 + (interestPct(KNOWN) * realmConfig.debt.interest_added_at_once_years) / 100);
+}
+
+/** Puts a realm's interest line up to date and sums its ledger into its income. */
+function sumLedger(world: World, n: number): void {
+  const L = world.nationLedger;
+  L[n * LEDGER_LINES + INTEREST] = -monthlyInterest(world, n);
+  let sum = 0;
+  for (let k = 0; k < LEDGER_LINES; k++) sum += L[n * LEDGER_LINES + k]!;
+  world.nationMonthlyIncome[n] = sum;
+}
+
+/** Gold a realm could borrow now: lenders let it owe up to a year's tax and trade (REALM-164), so what it owes and the new loan's interest come off. */
 export function canBorrow(world: World, n: number): number {
   const year = 12 * (world.nationLedger[n * LEDGER_LINES + TAX]! + world.nationLedger[n * LEDGER_LINES + TRADE]!);
-  return Math.max(0, loanCap(year, KNOWN) - world.nationDebt[n]!);
+  return Math.max(0, loanCap(year, KNOWN) - world.nationDebt[n]!) / loanDebt(1);
+}
+
+/** Whether a loan now would unsettle the realm's lords: at most once in `debt.lords_waver_once_per_months` (REALM-189). */
+export function loanUnsettlesLords(world: World, n: number): boolean {
+  const month = world.date.year * 12 + world.date.month;
+  return month - world.nationLoanMonth[n]! >= realmConfig.debt.lords_waver_once_per_months && world.lords.some((l) => l.nation === n);
 }
 
 /** Sets a province's rate (-1 = back to the default), or the realm's default when province is -1. */
@@ -146,12 +171,23 @@ function applyRate(world: World, n: number, province: number, rate: number, news
   for (const lord of stirred) loyaltyStep(world, lord, "heavy_taxes", news);
 }
 
-export function takeLoan(world: World, n: number, gold: number): string | null {
+/**
+ * Takes a loan: the gold comes at once, and so does the debt, the gold plus
+ * its interest (REALM-188). A crown that borrows looks weak to its lords:
+ * each of them takes the *crown borrowed* loyalty cause, at most once a year
+ * (REALM-189).
+ */
+export function takeLoan(world: World, n: number, gold: number, news: News[] = []): string | null {
   if (!(gold > 0)) return "borrow some gold";
   if (gold > canBorrow(world, n) + 1e-9) return `lenders give at most ${canBorrow(world, n).toFixed(1)} gold more`;
-  world.nationDebt[n] = world.nationDebt[n]! + gold;
+  if (loanUnsettlesLords(world, n)) {
+    world.nationLoanMonth[n] = world.date.year * 12 + world.date.month;
+    world.lords.forEach((l, k) => l.nation === n && loyaltyStep(world, k, "crown_borrowed", news));
+  }
+  world.nationDebt[n] = world.nationDebt[n]! + loanDebt(gold);
   world.nationTreasury[n] = world.nationTreasury[n]! + gold;
-  runLedger(world, false);
+  // Only the interest line changes.
+  sumLedger(world, n);
   return null;
 }
 
@@ -161,7 +197,7 @@ export function repayLoan(world: World, n: number, gold: number): string | null 
   if (amount > world.nationTreasury[n]!) return "not enough gold";
   world.nationDebt[n] = world.nationDebt[n]! - amount;
   world.nationTreasury[n] = world.nationTreasury[n]! - amount;
-  runLedger(world, false);
+  sumLedger(world, n);
   return null;
 }
 
@@ -179,9 +215,9 @@ export function aiTreasury(world: World, news: News[]): void {
     const gold = world.nationTreasury[n]!;
     if (gold < ai.loan_when_gold_below) {
       const want = Math.min(canBorrow(world, n), -gold + 1);
-      if (want > 0) takeLoan(world, n, want);
+      if (want > 0) takeLoan(world, n, want, news);
     } else if (world.nationDebt[n]! > 0) {
-      const upkeep = 12 * (nationPay(world, n) - world.nationLedger[n * LEDGER_LINES + WAGES]!) * ai.repay_when_gold_above_years_upkeep;
+      const upkeep = -12 * (world.nationLedger[n * LEDGER_LINES + PAY]! + world.nationLedger[n * LEDGER_LINES + WAGES]!) * ai.repay_when_gold_above_years_upkeep;
       if (gold > upkeep) repayLoan(world, n, Math.min(world.nationDebt[n]!, gold - upkeep));
     }
   }

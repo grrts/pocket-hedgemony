@@ -8,9 +8,10 @@ export { processTurn, applyNow, advance, STEPS_PER_DAY, STEPS_PER_TURN, HOURS_PE
 export { atWar, controller, engageRange, offerPeace, peaceShare, relationState, wallsOf, warBetween, SIEGE_MONTH_DAYS, type Battle, type News, type PeaceTerms } from "./war.ts";
 export { hashWorld } from "./hash.ts";
 export { cultureOf, officialName, personName } from "./names.ts";
+export { officialEffect, OFFICIALS, type OfficialEffectView } from "./officials.ts";
 export { ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply } from "./protocol.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";
-export { aiTreasury, canBorrow, LEDGER, LEDGER_LINES, NORMAL_TAX, provinceTax, runLedger, TAX_RATES, taxRateOf } from "./treasury.ts";
+export { aiTreasury, canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, runLedger, TAX_RATES, taxRateOf } from "./treasury.ts";
 export { STABILITY, stabilityOf, subjectLoyalty, type Stability, type StabilityPillar, type StabilityStep } from "./stability.ts";
