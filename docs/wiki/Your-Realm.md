@@ -42,6 +42,18 @@ People, recruits, food, horses, ships, castles, faith, tongue, in revolt, school
 
 **Tax** is set per province, with a realm default (see [Provinces](Provinces)). A revolt can force it down. Heavy taxes fill the treasury but make lords waver and provinces revolt.
 
+#### Tax and the treasury in play
+
+Every province pays at its own tax rate or, until you give it one, at your realm's default, which starts at normal. Against normal, **none** pays nothing, **light** half, **heavy** one and a half times and **crushing** double. A province whose official has been made a commander pays half, and so does one that riots or plots. Heavy tax gives the province the *Heavy taxes* grievance, and crushing counts as two. A lord's province gives you only your share, and raising its rate to heavy or crushing makes its lord waver. Trade from the province's wealth comes in whatever the rate.
+
+The treasury keeps a **ledger** for the month: Tax and Trade coming in, Army pay, Officials and Interest going out. Their sum is your change a month, paid in on the 1st. Each official at his post earns 0.1 gold a month; a commissioned official draws no wage while he commands. Wages and interest are paid a twelfth each month.
+
+Lenders give up to **one year's tax and trade**, less what you already owe, at **10 % a year**. You can repay any part at any time.
+
+AI realms tax at normal in peace and heavy at war, borrow only when their gold falls below zero, and repay once they hold a year's army pay and wages.
+
+Where to find it: the gold plaque at the top of the screen shows your gold and change a month; tap it for the **Treasury** tab of your country card, with the ledger, the realm tax default, your debt and the Borrow and Repay buttons. To tax one province differently, open it: its Overview tab has a Tax line and a row of rate buttons, from *Realm default* to *Crushing*.
+
 ### Food: provinces grow it, castles move it
 
 Food lives in provinces: each grows, stores and eats its own. **Castles are the hubs** that collect it and spread it.
@@ -303,7 +315,10 @@ All realm numbers are placeholders, kept in one realm data file.
 | A horse eats like | `food.horse_eats` | 3 men | Yes |
 | Loss moving food between castles | `food.transfer_loss_per_province` | not given | Yes |
 | Store rot | `food.rot_per_season` | "a little" | Yes |
-| Tax steps | `tax.rates` | light / normal / heavy / crushing | Yes |
+| Tax steps | `tax.rates` | none / light / normal / heavy / crushing | No |
+| Gold at each tax step | `economy.taxRateFactor` | not given; 0, ½, 1, 1½, 2 times normal | Yes |
+| An official's wage | `economy.officialWagePerMonth` | not given; 0.1 gold a month | Yes |
+| Loans | `debt` | 10 % a year; up to a year's income | Yes |
 | Royal province without official | `officials.no_official_share` | half tax, half recruits | Yes |
 | Lord keeps | `lords.tax_share` | half | Yes |
 | Fallen window | `fallen.window_years` | 10 years | Yes |

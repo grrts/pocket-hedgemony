@@ -1225,6 +1225,36 @@ table.classes td.bar span {
   background: var(--ink-soft);
 }
 
+/* ---- Tax and the treasury (milestone 3) ---- */
+
+/* Rate buttons wrap three to a row on a narrow panel; the chosen rate is marked. */
+.tax-rates button {
+  flex: 1 1 30%;
+  min-height: 44px;
+}
+
+/* The chosen rate stays pressed in, marked with a dot. */
+.tax-rates button.paper.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+
+.tax-rates button.on::before {
+  content: "● ";
+}
+
+table.ledger td.num {
+  text-align: right;
+}
+
+table.ledger td.down,
+b.down {
+  color: var(--cloth);
+}
+
+table.ledger tr.total td {
+  border-top: 2px solid currentColor;
+}
+
 /* The realm's Provinces overview: rows open their province; troubled rows stand out. */
 table.provinces tr.go {
   cursor: pointer;

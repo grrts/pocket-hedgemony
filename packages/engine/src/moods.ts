@@ -14,7 +14,7 @@ import { OFFICIALS } from "./recruit.ts";
  */
 
 /** The grievances this game tracks so far, one bit each (province §5.22). */
-export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed"] as const;
+export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes"] as const;
 export type GrievanceName = (typeof GRIEVANCES)[number];
 const bit = (g: GrievanceName) => 1 << GRIEVANCES.indexOf(g);
 
@@ -43,7 +43,18 @@ export function grievanceCount(world: World, p: number): number {
   let g = world.provinceGrievances[p]!;
   let n = 0;
   for (; g; g &= g - 1) n++;
+  // Heavy taxes count once at heavy and twice at crushing (PROV-167).
+  if (world.provinceGrievances[p]! & bit("Heavy taxes")) n += Math.max(0, taxWeight(world, p) - 1);
   return n;
+}
+
+/** How heavily a province's tax weighs on it: heavy 1, crushing 2, else 0 (province tax.heavy_weight). */
+export function taxWeight(world: World, p: number): number {
+  const owner = world.provinceOwner[p]!;
+  if (owner < 0) return 0;
+  const own = world.provinceTax[p]!;
+  const rate = provinceConfig.tax.rates[own >= 0 ? own : world.nationTaxDefault[owner]!]!;
+  return (provinceConfig.tax.heavy_weight as Record<string, number>)[rate] ?? 0;
 }
 
 const JUDGE = OFFICIALS.indexOf("Judge");
@@ -103,6 +114,7 @@ export function monthlyMoods(world: World, news: News[]): void {
     if (first && cultureKey(world, first) !== cultureKey(world, world.nationIds[owner]!)) now |= bit("Foreign rule");
     const battle = world.provinceBattleYear[p]!;
     if (battle >= 0 && world.date.year - battle < g.bloodshed_years) now |= bit("Bloodshed");
+    if (taxWeight(world, p) > 0) now |= bit("Heavy taxes");
     const before = MOODS.indexOf(moodOf(grievanceCount(world, p), world.provinceOfficial[p] === JUDGE).mood);
     world.provinceGrievances[p] = now;
     const after = moodIndex(world, p);

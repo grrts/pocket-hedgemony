@@ -23,6 +23,9 @@ export function hashWorld(world: World): string {
   feed(world.provinceRecruits);
   feed(world.provincePopulation);
   feed(world.provinceClasses);
+  feed(world.provinceTax);
+  feed(world.nationTaxDefault);
+  feed(world.nationDebt);
   feed(world.provinceStore);
   feed(world.provinceHarvest);
   feed(world.provinceStarved);

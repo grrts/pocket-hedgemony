@@ -329,6 +329,12 @@ export function orderShape(order: Order): string {
       return "appoint commander";
     case "disband":
       return "disband army";
+    case "setTax":
+      return "set tax rate";
+    case "borrow":
+      return "take a loan";
+    case "repay":
+      return "repay a loan";
     case "gift":
       return "give a lord gold";
     case "grantFief":

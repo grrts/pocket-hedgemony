@@ -1,7 +1,8 @@
 import { monthlyPeople } from "./living.ts";
+import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
-import { moodShare, monthlyMoods } from "./moods.ts";
-import { crownShare, giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
+import { monthlyMoods } from "./moods.ts";
+import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, forageRations, monthlyRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -77,6 +78,11 @@ export type Order =
   /** Put a commander at the head of an army or garrison troops (swapping with the army he led); -1 leaves the men as a garrison. */
   | { type: "appoint"; army: number; commander: number }
   | { type: "disband"; army: number }
+  /** Set a province's tax rate (index into TAX_RATES, -1 = the realm default), or the realm default when province is -1. */
+  | { type: "setTax"; province: number; rate: number }
+  /** Borrow gold from lenders, or pay some of it back. */
+  | { type: "borrow"; gold: number }
+  | { type: "repay"; gold: number }
   /** Give a lord gold, grant him a royal province, or take a province back from its lord. */
   | { type: "gift"; lord: number }
   | { type: "grantFief"; province: number; lord: number }
@@ -150,7 +156,8 @@ function startDay(world: World, news: News[]): void {
     monthlyMoods(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
-    runEconomy(world, true);
+    runLedger(world, true);
+    aiTreasury(world, news);
     monthlyDiplomacy(world, news);
     aiDeclarations(world, news);
     aiRaise(world, news);
@@ -169,7 +176,7 @@ function endDay(world: World, news: News[]): void {
     weeklyMusters(world, news);
     aiCollect(world, news);
     recount(world);
-    runEconomy(world, false);
+    runLedger(world, false);
     answerAiCalls(world, news);
     world.turn++;
   }
@@ -213,6 +220,12 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return appointCommander(world, actingNation, order.army, order.commander);
     case "disband":
       return disbandArmy(world, actingNation, order.army);
+    case "setTax":
+      return setTax(world, actingNation, order.province, order.rate, news);
+    case "borrow":
+      return takeLoan(world, actingNation, order.gold);
+    case "repay":
+      return repayLoan(world, actingNation, order.gold);
     case "gift":
       return giveGift(world, actingNation, order.lord);
     case "grantFief":
@@ -471,28 +484,3 @@ function feedArmies(world: World): void {
   }
 }
 
-/** Works out each realm's monthly income, and pays it when a new month begins. */
-function runEconomy(world: World, pay: boolean): void {
-  const { economy } = world.rules.defines;
-  const income = world.nationMonthlyIncome;
-  const emptyTax = emptyProvinceEffect("Leave it").tax;
-  income.fill(0);
-
-  for (let p = 0; p < world.provinceCount; p++) {
-    // An occupier collects the tax (WAR occupation: tax, recruits, food, trade).
-    const owner = controller(world, p);
-    if (owner < 0) continue;
-    // A province whose official was commissioned pays half (recruiting RECR-083, "Leave it").
-    const share = (ungoverned(world, p) ? emptyTax : 1) * moodShare(world, p) * crownShare(world, p);
-    income[owner] =
-      income[owner]! +
-      (world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth + world.provinceWealth[p]! * economy.goldPerWealthPerMonth) * share;
-  }
-
-  // Pay for levies and mercenaries (milestone 2, recruit.ts).
-  for (let n = 0; n < world.nationCount; n++) income[n] = income[n]! - nationPay(world, n);
-
-  if (!pay) return;
-  const treasury = world.nationTreasury;
-  for (let n = 0; n < world.nationCount; n++) treasury[n] = treasury[n]! + income[n]!;
-}
