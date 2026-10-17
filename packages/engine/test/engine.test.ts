@@ -1,10 +1,25 @@
 import { describe, expect, it } from "vitest";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
-import { addDays, advance, applyNow, GROUNDS, tileMarch, tileStepHours, createEngineHost, daysInMonth, monthBeginning, turnOfDay, createWorld, generateSyntheticRuleset, hashWorld, marchMap, planRoute, processTurn, Rng, stepDays } from "../src/index.ts";
+import { addDays, advance, applyNow, GROUNDS, tileMarch, tileStepHours, createEngineHost, daysInMonth, monthBeginning, turnOfDay, createWorld, generateSyntheticRuleset, hashWorld, marchMap, planRoute, processTurn, Rng, stepDays, type World } from "../src/index.ts";
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
+
+/** France's province farthest from where the army stands: a long march inside its own land. */
+function farFrench(w: World, fra: number, army: number): number {
+  const at = w.tiles.centre[w.armies.location[army]!]!;
+  const W = w.tiles.width;
+  let best = -1;
+  let far = -1;
+  for (let p = 0; p < w.provinceCount; p++) {
+    if (w.provinceOwner[p] !== fra || w.provinceWater[p]) continue;
+    const c = w.tiles.centre[p]!;
+    const d = Math.hypot((c % W) - (at % W), Math.floor(c / W) - Math.floor(at / W));
+    if (d > far) ((far = d), (best = p));
+  }
+  return best;
+}
 
 describe("rng", () => {
   it("is reproducible from a seed", () => {
@@ -61,12 +76,12 @@ describe("turns", () => {
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
     const paris = w.armies.location[army]!;
     const next = Array.from(w.adjList.subarray(w.adjStart[paris]!, w.adjStart[paris + 1]!)).find((p) => !w.provinceWater[p])!;
-    const madrid = w.provinceIndex.get(rules.nations.find((n) => n.id === "castile")!.capital)!;
+    const madrid = farFrench(w, fra, army);
     const report = processTurn(
       w,
       [
         { type: "move", army, to: madrid },
-        { type: "move", army: army + 1, to: next },
+        { type: "move", army: Array.from(w.armies.owner.subarray(0, w.armies.count)).findIndex((o) => o !== fra), to: next },
         { type: "move", army, to: next },
       ],
       fra,
@@ -82,7 +97,7 @@ describe("turns", () => {
     const fra = w.nationIndex.get("france")!;
     w.player = fra;
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
-    const madrid = w.provinceIndex.get(rules.nations.find((n) => n.id === "castile")!.capital)!;
+    const madrid = farFrench(w, fra, army);
     expect(applyNow(w, { type: "move", army, to: madrid }, fra).rejectedOrders).toEqual([]);
     const path = w.armies.path[army]!;
     expect(path.at(-1)).toBe(w.tiles.centre[madrid]);
@@ -146,9 +161,10 @@ describe("turns", () => {
     const fra = w.nationIndex.get("france")!;
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
     const full = w.armies.food[army]!;
+    const men = w.armies.men[army]!;
     processTurn(w, [], fra);
     expect(w.armies.food[army]).toBeCloseTo(full);
-    expect(w.armies.men[army]).toBe(5000);
+    expect(w.armies.men[army]).toBe(men);
     // A huge host in an empty province eats its wagons bare and then goes hungry.
     const empty = w.provinceGround.findIndex((g, p) => g === "tundra" && w.provincePopulation[p]! < 1);
     w.armies.location[army] = empty;

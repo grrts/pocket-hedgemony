@@ -22,6 +22,7 @@ import {
   weeklyMusters,
 } from "./recruit.ts";
 import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
+import { mayEnter } from "./domain/diplomacy/actions.ts";
 import {
   aiDeclarations,
   aiMarches,
@@ -218,10 +219,41 @@ export function castleBars(world: World, slot: number, to: number): boolean {
   const a = world.armies;
   const n = a.owner[slot]!;
   if (!blockingCastle(world, a.location[slot]!, n) || to === a.cameFrom[slot]) return false;
+  return !ownSide(world, n, to);
+}
+
+/** Land nation n's armies may always step into: its own side's. */
+function ownSide(world: World, n: number, to: number): boolean {
   const holder = controller(world, to);
-  if (holder === n) return false;
+  if (holder === n) return true;
   const tie = relationState(world, n, holder).state;
-  return tie !== "alliance" && tie !== "subject" && tie !== "overlord";
+  return tie === "alliance" || tie === "subject" || tie === "overlord";
+}
+
+/**
+ * Whether nation n's armies may march into province q: unclaimed land, its own
+ * side's, an enemy's, or a realm that gave it passage (DIPL-116).
+ */
+export function mayMarchInto(world: World, n: number, q: number): boolean {
+  const holder = controller(world, q);
+  if (holder < 0 || ownSide(world, n, q)) return true;
+  return mayEnter(world.diplomacy, world.nationIds[n]!, world.nationIds[holder]!);
+}
+
+/**
+ * Steps an army of `slot` may not take when planning: into land it has no
+ * right to enter, and (with `castles`) out of an enemy castle's province,
+ * but back the way it came from where it stands.
+ */
+export function routeBars(world: World, slot: number, castles = true): (p: number, q: number) => boolean {
+  const here = world.armies.location[slot]!;
+  const n = world.armies.owner[slot]!;
+  return (p, q) => !mayMarchInto(world, n, q) || (castles && (p === here ? castleBars(world, slot, q) : blockingCastle(world, p, n) && !ownSide(world, n, q)));
+}
+
+/** Leaves out of a march's corridor the land nation n may not enter, but where the army stands. */
+function keepToRights(world: World, n: number, here: number, allowed: Uint8Array): void {
+  for (let p = 0; p < allowed.length; p++) if (allowed[p] && p !== here && !mayMarchInto(world, n, p)) allowed[p] = 0;
 }
 
 export function marching(world: World, slot: number): MarchingArmy {
@@ -275,12 +307,19 @@ export function marchTo(world: World, slot: number, to: number, target: number =
   const a = world.armies;
   const here = a.location[slot]!;
   const army = marching(world, slot);
-  const route = to === here ? { path: [] as number[] } : planRoute(world.rules.defines.march, marchMap(world), here, to, army);
+  if (to !== here && !mayMarchInto(world, a.owner[slot]!, to)) {
+    if (!planRoute(world.rules.defines.march, marchMap(world), here, to, army)) return "no road there over land";
+    return `you have no right to march into ${world.rules.nations[controller(world, to)]?.name ?? "that land"}: you need war or passage`;
+  }
+  // The best road no enemy castle bars; failing that, the road up to the first castle in the way, where the army stops.
+  // Either way only through land the army may enter.
+  const route = to === here ? { path: [] as number[] } : (planRoute(world.rules.defines.march, marchMap(world), here, to, army, routeBars(world, slot)) ?? planRoute(world.rules.defines.march, marchMap(world), here, to, army, routeBars(world, slot, false)));
   if (!route) return "no road there over land";
   if (route.path.length && castleBars(world, slot, route.path[0]!)) return "an enemy castle bars the road: go back, or take it first";
   let allowed = corridorScratch.get(world);
   if (!allowed) corridorScratch.set(world, (allowed = new Uint8Array(world.provinceCount)));
   corridor(marchMap(world), [here, ...route.path], allowed);
+  keepToRights(world, a.owner[slot]!, here, allowed);
   const walk = world.tiles.coarse
     ? { tiles: Int32Array.from(route.path, (p) => world.tiles.centre[p]!) }
     : planTilePath(tileMarch(world), a.tile[slot]!, target, allowed, army);
@@ -314,7 +353,11 @@ function planLeg(world: World, slot: number): boolean {
   const m = tileMarch(world);
   const army = marching(world, slot);
   let walk = planTilePath(m, a.tile[slot]!, world.tiles.centre[next]!, allowed, army, LEG_GREED);
-  if (!walk) walk = planTilePath(m, a.tile[slot]!, world.tiles.centre[next]!, corridor(marchMap(world), [a.location[slot]!, next], allowed), army, LEG_GREED);
+  if (!walk) {
+    corridor(marchMap(world), [a.location[slot]!, next], allowed);
+    keepToRights(world, a.owner[slot]!, a.location[slot]!, allowed);
+    walk = planTilePath(m, a.tile[slot]!, world.tiles.centre[next]!, allowed, army, LEG_GREED);
+  }
   a.path[slot] = walk ? walk.tiles : NO_PATH;
   a.pathAt[slot] = 0;
   return !!walk;
@@ -349,7 +392,8 @@ function stepMarches(world: World, hours: number): void {
       const next = a.path[i]![a.pathAt[i]!]!;
       const into = tiles.province[next]! - 1;
       const owner = a.owner[i]!;
-      if (into !== a.location[i] && castleBars(world, i, into)) {
+      // Inside a province with an enemy castle the army goes where it likes, but leaves only the way it came.
+      if (into !== a.location[i] && (castleBars(world, i, into) || !mayMarchInto(world, owner, into))) {
         halt(world, i);
         have = 0;
         break;
@@ -365,11 +409,6 @@ function stepMarches(world: World, hours: number): void {
         a.location[i] = into;
         const k = a.route[i]!.indexOf(into);
         if (k >= 0) a.route[i]!.splice(0, k + 1);
-        if (blockingCastle(world, into, owner)) {
-          halt(world, i);
-          have = 0;
-          break;
-        }
       }
       if (a.pathAt[i]! >= a.path[i]!.length && a.route[i]!.length && !planLeg(world, i)) {
         halt(world, i);

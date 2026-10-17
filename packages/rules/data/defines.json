@@ -90,7 +90,7 @@
     "hiredArms": ["pikes", "armoured foot", "light horse"],
     "unpaidDesertion": 0.05,
     "mercenaryWeeks": 4,
-    "commanderGold": 10,
+    "commanderGold": 50,
     "commanderNames": ["Juan", "Pedro", "Rodrigo", "Jean", "Guillaume", "Louis", "Henry", "Richard", "Thomas", "Heinrich", "Konrad", "Albrecht", "Giovanni", "Niccolò", "Mehmed", "Ali", "Ivan", "Dmitri", "Jan", "Erik", "Olaf", "Andrzej", "János", "Duarte"]
   }
 }

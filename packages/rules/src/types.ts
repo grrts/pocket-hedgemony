@@ -135,6 +135,8 @@ export interface NationDef {
   color: string;
   capital: string;
   commanders: CommanderDef[];
+  /** Men under arms at the start (1444), a rough historical estimate; realms without one start with a quarter of their troop cap. */
+  army?: number;
 }
 
 export type Terrain =
