@@ -21,6 +21,7 @@ export interface Defines {
   };
   march: MarchDefines;
   war: WarDefines;
+  recruit: RecruitDefines;
 }
 
 /** Wars, sieges and occupation (milestone 1; the warfare context's own numbers stay in domain/warfare.json). */
@@ -42,6 +43,26 @@ export interface WarDefines {
   aiDeclareChancePerMonth: number;
   /** The AI only attacks a neighbour this many times weaker. */
   aiDeclareStrengthRatio: number;
+}
+
+/** Raising, paying and training armies (milestone 2; the domain's own numbers stay in domain/recruiting.json and domain/warfare.json). */
+export interface RecruitDefines {
+  /** Treasury gold per domain gold. */
+  goldScale: number;
+  /** Weekly turns a levy spends gathering before it takes the field (recruiting: 2 weeks). */
+  gatherWeeks: number;
+  /** Arms a realm can train in 1444, before any invention. */
+  armsAtStart: string[];
+  hiredCompanyMen: number;
+  hiredArms: string[];
+  /** Share of levies and hired men who leave each month the treasury can't pay them. */
+  unpaidDesertion: number;
+  /** Weekly turns a mercenary company takes to arrive. */
+  mercenaryWeeks: number;
+  /** Gold to commission an official as a commander. */
+  commanderGold: number;
+  /** First names for commanders the realm hires. */
+  commanderNames: string[];
 }
 
 /** Land grounds an army can march over: every Terrain but the water zones. */

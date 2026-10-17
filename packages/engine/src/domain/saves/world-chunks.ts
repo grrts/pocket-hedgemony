@@ -3,6 +3,8 @@ import { hashWorld } from "../../hash.ts";
 import { Rng } from "../../rng.ts";
 import type { Order } from "../../turn.ts";
 import { createArmyPool, createWorld, type World } from "../../world.ts";
+import { addCommander, ARMS, type Mercenary, type Muster } from "../../recruit.ts";
+import { newCommander } from "../warfare/index.ts";
 import { base64, encodePng, fnv1a } from "./bytes.ts";
 import { packChunk, savesConfig, unpackChunk, type CampaignOptions, type RawChunk } from "./format.ts";
 
@@ -37,6 +39,8 @@ export interface EventsState {
 const EMPTY_EVENTS: EventsState = { fired: [], flags: [], pending: [], cooldowns: {} };
 
 /** Chunks for the world plus what goes with it. `orders` is added only when given. */
+const MIX = ARMS.length;
+
 export function worldChunks(world: World, game: SavedGame): RawChunk[] {
   const a = world.armies;
   const live: number[] = [];
@@ -61,19 +65,21 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
       meta: { turn: world.turn, date: world.date, options: game.options, playerNation: game.playerNation },
       arrays: { rng: new Uint32Array(world.rng.state) },
     }),
-    packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds }, arrays: {} }),
+    packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
     packChunk("provinces", V.provinces, {
       meta: {},
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial },
     }),
     packChunk("nations", V.nations, {
-      meta: {},
+      meta: { musters: world.musters, mercs: world.mercs, commanderHome: world.commanderHome },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
         maxLevies: world.nationMaxLevies,
         monthlyIncome: world.nationMonthlyIncome,
         commanderOwner: world.commanderOwner,
+        // Skills, victories, defeats and wounds of each commander, as they grow in battle.
+        commanderRecord: Int32Array.from(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats, c.wounds])),
       },
     }),
     packChunk("armies", V.armies, {
@@ -87,6 +93,13 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         horse: pick(a.horse, (n) => new Int32Array(n)),
         food: pick(a.food, (n) => new Float64Array(n)),
         progress: pick(a.progress, (n) => new Float32Array(n)),
+        kind: Uint8Array.from(live, (s) => a.kind[s]!),
+        monthsOut: Int32Array.from(live, (s) => a.monthsOut[s]!),
+        drill: Float32Array.from(live, (s) => a.drill[s]!),
+        trainArm: Int8Array.from(live, (s) => a.trainArm[s]!),
+        trainMen: Int32Array.from(live, (s) => a.trainMen[s]!),
+        trainLeft: Float32Array.from(live, (s) => a.trainLeft[s]!),
+        mix: Float32Array.from(live.flatMap((s) => Array.from(a.mix.subarray(s * MIX, (s + 1) * MIX)))),
         routeLen: Int32Array.from(routeLen),
         route: Int32Array.from(routes),
         marchedLen: Int32Array.from(marchedLen),
@@ -133,7 +146,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     return unpackChunk(c);
   };
   const core = need("core");
-  const ids = need("ids").meta as { provinces: string[]; nations: string[]; commanders: string[] };
+  const ids = need("ids").meta as { provinces: string[]; nations: string[]; commanders: string[]; commanderNames?: string[] };
   const prov = need("provinces").arrays;
   const nat = need("nations").arrays;
   const arm = need("armies");
@@ -178,6 +191,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
           world.provinceOwner[t.index] = o < 0 ? -1 : nationMap[o]!;
         }
         if (prov.wealth) world.provinceWealth[t.index] = prov.wealth[old]!;
+        if (prov.recruits) world.provinceRecruits[t.index] = prov.recruits[old]!;
+        if (prov.official) world.provinceOfficial[t.index] = prov.official[old]!;
       }
     }
   });
@@ -196,7 +211,33 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (nat.maxLevies) world.nationMaxLevies[n] = nat.maxLevies[old]!;
     if (nat.monthlyIncome) world.nationMonthlyIncome[n] = nat.monthlyIncome[old]!;
   });
-  const commanderMap = ids.commanders.map((id) => world.commanderIds.indexOf(id));
+  // Commanders by id; ones the realm hired during the game come back by name and owner.
+  const commanderMap = ids.commanders.map((id, old) => {
+    const found = world.commanderIds.indexOf(id);
+    if (found >= 0) return found;
+    const owner = nat.commanderOwner ? nat.commanderOwner[old]! : -1;
+    const name = ids.commanderNames?.[old];
+    if (!name || owner < 0 || nationMap[owner]! < 0) return -1;
+    return addCommander(world, nationMap[owner]!, newCommander(name), id);
+  });
+  const natMeta = need("nations").meta as { musters?: Muster[]; mercs?: Mercenary[]; commanderHome?: number[] };
+  const mapP = (old: number) => world.provinceIndex.get(ids.provinces[old]!) ?? -1;
+  const mapN = (old: number) => nationMap[old] ?? -1;
+  if (natMeta.mercs) world.mercs = natMeta.mercs.map((m) => ({ ...m, nation: mapN(m.nation) })).filter((m) => m.nation >= 0);
+  natMeta.commanderHome?.forEach((p, old) => {
+    const c = commanderMap[old]!;
+    if (c >= 0) world.commanderHome[c] = p < 0 ? -1 : mapP(p);
+  });
+  if (natMeta.musters) world.musters = natMeta.musters.map((m) => ({ ...m, nation: mapN(m.nation), province: mapP(m.province) })).filter((m) => m.nation >= 0 && m.province >= 0);
+  const rec = nat.commanderRecord;
+  if (rec) {
+    commanderMap.forEach((now, old) => {
+      if (now < 0) return;
+      const [might, cunning, logistics, victories, defeats, wounds] = rec.subarray(old * 6, old * 6 + 6);
+      Object.assign(world.commanders[now]!, { might, cunning, logistics, victories, defeats, wounds });
+      world.commanderLogistics[now] = logistics!;
+    });
+  }
   if (nat.commanderOwner) {
     ids.commanders.forEach((_, old) => {
       const c = commanderMap[old]!;
@@ -239,6 +280,13 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     pool.horse[slot] = A.horse![k]!;
     pool.food[slot] = A.food![k]!;
     pool.progress[slot] = A.progress![k]!;
+    if (A.kind) pool.kind[slot] = A.kind[k]!;
+    if (A.monthsOut) pool.monthsOut[slot] = A.monthsOut[k]!;
+    if (A.drill) pool.drill[slot] = A.drill[k]!;
+    if (A.trainArm) pool.trainArm[slot] = A.trainArm[k]!;
+    if (A.trainMen) pool.trainMen[slot] = A.trainMen[k]!;
+    if (A.trainLeft) pool.trainLeft[slot] = A.trainLeft[k]!;
+    if (A.mix) pool.mix.set(A.mix.subarray(k * MIX, (k + 1) * MIX), slot * MIX);
     pool.route[slot] = route;
     pool.marched[slot] = marched;
   }

@@ -3,12 +3,13 @@ import { hashWorld } from "./hash.ts";
 import { applyNow, processTurn, type Order } from "./turn.ts";
 import { createWorld, type World } from "./world.ts";
 import { relationState, type News } from "./war.ts";
+import { armyPay, armyRations, ARMS, menByArm, mercenaryPrice, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
 
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
   | { id: number; type: "newGame"; seed: number; playerNation: string }
   | { id: number; type: "endTurn"; orders: Order[] }
-  /** An order that acts at once (declare war, offer peace, answer a call, raise levies, disband). */
+  /** An order that acts at once (everything but moves: war and peace, recruiting, training, commanders). */
   | { id: number; type: "act"; order: Order };
 
 /** Messages the engine worker sends back. */
@@ -44,6 +45,23 @@ export interface Snapshot {
   nationTreasury: Float64Array;
   nationLevies: Float64Array;
   nationMonthlyIncome: Float64Array;
+  /** Troop cap and the men counting toward it, by nation. */
+  nationTroopCap: Float64Array;
+  nationCapUsed: Float64Array;
+  /** Gold the player pays their men this month. */
+  pay: number;
+  /** Men who can be called in each province now. */
+  provinceRecruits: Float32Array;
+  /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
+  musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
+  /** The player's mercenary companies on their way. */
+  mercs: { arm: string; men: number; weeksLeft: number }[];
+  /** Price of a mercenary company by arm. */
+  mercPrices: Record<string, number>;
+  /** Official of each province (a name from OFFICIALS), or null when the post stands empty. */
+  provinceOfficial: (string | null)[];
+  /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
+  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string }[];
   armies: {
     id: Int32Array;
     owner: Int16Array;
@@ -59,7 +77,20 @@ export interface Snapshot {
     route: number[][];
     /** Provinces walked last turn, from where the army set out; empty if it stood still. */
     marched: number[][];
+    /** 0 levy, 1 hired company. */
+    kind: Int16Array;
+    monthsOut: Int32Array;
+    /** Months drilled, ×10. */
+    drill: Int32Array;
+    /** Men by arm, in the order of `arms`. */
+    byArm: number[][];
+    /** Gold a month and rations a month. */
+    pay: number[];
+    rations: number[];
+    training: ({ arm: string; men: number; months: number } | null)[];
   };
+  /** Arm names for armies.byArm. */
+  arms: readonly string[];
 }
 
 export interface HostReply {
@@ -118,6 +149,27 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       nationTreasury: w.nationTreasury.slice(),
       nationLevies: w.nationLevies.slice(),
       nationMonthlyIncome: w.nationMonthlyIncome.slice(),
+      nationTroopCap: w.nationTroopCap.slice(),
+      nationCapUsed: w.nationCapUsed.slice(),
+      pay: player >= 0 ? nationPay(w, player) : 0,
+      provinceRecruits: w.provinceRecruits.slice(),
+      musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
+      mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ arm: m.arm, men: m.men, weeksLeft: m.weeksLeft })),
+      mercPrices: Object.fromEntries(w.rules.defines.recruit.hiredArms.map((arm) => [arm, mercenaryPrice(w, arm)])),
+      provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
+      commanders: w.commanders.map((c, k) => ({
+        name: c.name,
+        owner: w.commanderOwner[k]!,
+        might: c.might,
+        cunning: c.cunning,
+        logistics: c.logistics,
+        victories: c.victories,
+        defeats: c.defeats,
+        army: live.findIndex((slot) => a.commander[slot] === k),
+        home: w.commanderHome[k]!,
+        origin: c.origin ?? "",
+      })),
+      arms: ARMS,
       armies: {
         id: Int32Array.from(live),
         owner: pick(a.owner, (n) => new Int16Array(n)),
@@ -129,6 +181,13 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         progress: Int32Array.from(live, (slot) => Math.round(a.progress[slot]!)),
         route: live.map((slot) => a.route[slot]!.slice()),
         marched: live.map((slot) => a.marched[slot]!.slice()),
+        kind: Int16Array.from(live, (slot) => a.kind[slot]!),
+        monthsOut: Int32Array.from(live, (slot) => a.monthsOut[slot]!),
+        drill: Int32Array.from(live, (slot) => Math.round(a.drill[slot]! * 10)),
+        byArm: live.map((slot) => menByArm(w, slot).map(Math.round)),
+        pay: live.map((slot) => armyPay(w, slot)),
+        rations: live.map((slot) => armyRations(w, slot)),
+        training: live.map((slot) => (a.trainArm[slot]! >= 0 ? { arm: ARMS[a.trainArm[slot]!]!, men: a.trainMen[slot]!, months: a.trainLeft[slot]! } : null)),
       },
     };
     const transfer = [
@@ -137,6 +196,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.nationTreasury,
       snap.nationLevies,
       snap.nationMonthlyIncome,
+      snap.nationTroopCap,
+      snap.nationCapUsed,
+      snap.provinceRecruits,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
     ].map((arr) => arr.buffer as ArrayBuffer);
     return { response: { id, type: "snapshot", snapshot: snap }, transfer };
