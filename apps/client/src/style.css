@@ -900,3 +900,71 @@ table.troops td.army-buttons {
   min-width: 44px;
   min-height: 44px;
 }
+
+/* ---- Mercenaries tab: one card per free company (feedback 52, 53) ---- */
+
+.tabs {
+  flex-wrap: wrap;
+}
+
+.companies {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.company {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 4px;
+  border-top: 2px dashed var(--ink-soft);
+}
+
+.company.coming {
+  background: var(--ui-parchment-dark);
+}
+
+.company small {
+  color: var(--ink-soft);
+}
+
+.company-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 8px;
+}
+
+.company-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.company-foot button {
+  flex: none;
+  min-width: 88px;
+  min-height: 44px;
+}
+
+/* A company's arms as one bar, each arm a share of its width. */
+.mix {
+  display: flex;
+  height: 10px;
+  border: 2px solid var(--outline);
+  background: var(--paper);
+}
+
+.mix span {
+  flex-basis: 0;
+}
+
+.mix .arm-0 { background: #b8a27a; }
+.mix .arm-1 { background: #6e7a86; }
+.mix .arm-2 { background: #8a5a2b; }
+.mix .arm-3 { background: #5f7f3a; }
+.mix .arm-4 { background: #b5793a; }
+.mix .arm-5 { background: #7a2e2e; }
