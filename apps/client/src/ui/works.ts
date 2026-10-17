@@ -70,14 +70,16 @@ export function provinceWorks(s: Snapshot, p: number): string {
       </div>`;
     })
     .join("");
+  const slots = s.buildSlots[p];
   return `
+    ${slots ? `<p class="slots">Slots <b>${slots.used} of ${slots.total}</b> taken · ${esc(cap(slots.town))} of ${Math.round(s.provincePeople[p]! * 1000).toLocaleString("en-US")} people. More people bring more slots; a higher step takes none.</p>` : ""}
     ${s.worksNeglected ? `<p class="warn">${icon("coin", 1)} The treasury is empty: your works give only half until their upkeep is paid.</p>` : ""}
     ${siteRows || queueRows ? `<h3 class="sub">Being built</h3><div class="work-sheet">${siteRows}${queueRows}</div>` : ""}
     <h3 class="sub">Build</h3>
     <div class="work-sheet">${sheetRows}</div>
     <h3 class="sub">Standing</h3>
     ${standingList ? `<ul class="works-standing">${standingList}</ul>` : `<p class="hint">Nothing built here yet.</p>`}
-    <p class="hint">A province raises one work on its land and one in its town at a time; more wait in its queue and start, oldest first, when a site is free and the gold is there. The gold goes when the site opens.</p>`;
+    <p class="hint">Every work takes one slot. A province raises one work on its land and one in its town at a time; more wait in its queue and start, oldest first, when a site is free and the gold is there. The gold goes when the site opens.</p>`;
 }
 
 /** The General tab's line: sites and queue, opening the realm's Works tab. */

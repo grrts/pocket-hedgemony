@@ -80,15 +80,30 @@ export function workStepName(work: number, step: number): string {
   return /^step\d/.test(s) ? name : s;
 }
 
-/** A town's size from the province's wealth and people, a stand-in until towns are simulated. */
-export function townSize(world: World, p: number): TownSize {
-  const wealth = world.provinceWealth[p]!;
-  if (wealth >= 10) return "great_city";
-  if (wealth >= 8) return "city";
-  if (wealth >= 6) return "town";
-  if (wealth >= 4) return "market_town";
-  if (wealth >= 2 || world.provincePopulation[p]! >= 100) return "village";
-  return "hamlet";
+const TOWN_SIZES: readonly TownSize[] = ["hamlet", "village", "market_town", "town", "city", "great_city"];
+
+/** Steps of the province's people passed (defines.works.townPeople, thousands): 0 for a hamlet up to 5 for a great city. */
+function peopleStep(world: World, p: number): number {
+  const people = world.provincePopulation[p]!;
+  let k = 0;
+  for (const at of world.rules.defines.works.townPeople) if (people >= at) k++;
+  return Math.min(k, TOWN_SIZES.length - 1);
+}
+
+/** A town's size from the province's people (BLD-149). */
+export const townSize = (world: World, p: number): TownSize => TOWN_SIZES[peopleStep(world, p)]!;
+
+/** Slots a province has for works, one kind for every work, more with more people (Leroy, D-BLD-23). */
+export const slotsOf = (world: World, p: number): number => world.rules.defines.works.baseSlots + peopleStep(world, p);
+
+/** Slots taken: every work standing, building or queued from scratch takes one; a higher step takes none more. */
+export function slotsUsed(world: World, p: number, pend?: Pending): number {
+  let used = 0;
+  for (let k = 0; k < WORK_COUNT; k++) {
+    if (worksAt(world, p, k) > 0) used++;
+    else if (pend ? pend.step[p * WORK_COUNT + k]! > 0 : world.sites.some((x) => x.province === p && x.work === k) || world.workQueue.some((x) => x.province === p && x.work === k)) used++;
+  }
+  return used;
 }
 
 /** Inventions each realm knows: its 1444 knowledge, until research is wired into the turn. */
@@ -197,6 +212,7 @@ export function whyNot(world: World, n: number, p: number, work: number, pend?: 
   if (needs.min_town && !townAtLeast(townSize(world, p), needs.min_town)) return `needs a ${needs.min_town.replace("_", " ")} or bigger`;
   if (needs.charter) return `needs a ${needs.charter}`;
   if (needs.any_of?.includes("river") && !world.provinceRiver[p]) return "needs a river";
+  if (step === 1 && slotsUsed(world, p, pend) >= slotsOf(world, p)) return `no free slot: all ${slotsOf(world, p)} are taken`;
   if (pend ? pend.step[p * WORK_COUNT + work]! > 0 : siteOf(world, p, work) || world.workQueue.some((q) => q.province === p && q.work === work)) return "already ordered";
   return null;
 }
@@ -390,14 +406,22 @@ export function seedWorks(world: World): void {
     if (world.provinceWater[p]) continue;
     const def = world.rules.provinces[p]!;
     const wealth = def.wealth;
+    // Walls first, then the rest while the province has slots for them.
     if (capitals.has(p) || def.castle === "castle") set(p, "castle", 2);
     else if (def.castle === "fort") set(p, "castle", 1);
-    if (wealth >= 3 && placeFits(world, p, "farm")) set(p, "farm", 1);
-    if (wealth >= 3 && placeFits(world, p, "ranch")) set(p, "ranch", 1);
-    if (wealth >= 4) set(p, "market", wealth >= 8 ? 2 : 1);
-    if (wealth >= 5 && def.coastal) set(p, "harbour", 1);
-    if (wealth >= 6) set(p, "road", 1);
-    if (wealth >= 2 && def.coastal) set(p, "fishery", 1);
+    let free = slotsOf(world, p) - slotsUsed(world, p);
+    const put = (w: WorkName, step: number, when: boolean) => {
+      if (when && free > 0) {
+        set(p, w, step);
+        free--;
+      }
+    };
+    put("market", wealth >= 8 ? 2 : 1, wealth >= 4);
+    put("farm", 1, wealth >= 3 && placeFits(world, p, "farm"));
+    put("fishery", 1, wealth >= 2 && !!def.coastal);
+    put("harbour", 1, wealth >= 5 && !!def.coastal);
+    put("ranch", 1, wealth >= 3 && placeFits(world, p, "ranch"));
+    put("road", 1, wealth >= 6);
   }
   refreshWorks(world);
 }

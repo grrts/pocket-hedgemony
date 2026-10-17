@@ -7,12 +7,14 @@ import { wallsOf } from "../src/war.ts";
 import { LEDGER, LEDGER_LINES, provinceTrade } from "../src/treasury.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { hashWorld } from "../src/hash.ts";
-import { buildSheet, knowsInvention, nextStep, whyNot, WORK_COUNT, workCost, workIndex, worksAt } from "../src/works.ts";
+import { buildSheet, knowsInvention, nextStep, slotsOf, slotsUsed, whyNot, WORK_COUNT, workCost, workIndex, worksAt } from "../src/works.ts";
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
 const nation = (w: World, id: string) => w.nationIndex.get(id)!;
 const work = (name: string) => workIndex(name);
+let fresh: World | null = null;
+const createWorldOnce = () => (fresh ??= createWorld(rules, 1, tiles));
 
 function untilNewMonth(w: World, n: number): void {
   while (monthBeginning(w.date) === null) processTurn(w, [], n);
@@ -101,6 +103,27 @@ describe("works (milestone 4)", () => {
     expect(w.workQueue.map((q) => q.work)).toEqual(ok.slice(0, 2));
     applyNow(w, { type: "moveBuild", province: p, work: ok[1]!, by: -1 }, fra);
     expect(w.workQueue.map((q) => q.work)).toEqual([ok[1], ok[0]]);
+  });
+
+  it("gives a province slots by its people, one for each work, and none left means no new work", () => {
+    const w = createWorld(rules, 1, tiles);
+    const fra = nation(w, "france");
+    const d = rules.defines.works;
+    const p = w.provinceIndex.get(rules.nations[fra]!.capital)!;
+    w.provincePopulation[p] = d.townPeople[1]! - 1;
+    expect(slotsOf(w, p)).toBe(d.baseSlots + 1);
+    w.provincePopulation[p] = d.townPeople.at(-1)! + 1;
+    expect(slotsOf(w, p)).toBe(d.baseSlots + d.townPeople.length);
+    // Fill every slot: a new work is refused, a next step of one standing is not.
+    w.provincePopulation[p] = 1;
+    w.provinceWorks.fill(0, p * WORK_COUNT, (p + 1) * WORK_COUNT);
+    w.provinceWorks[p * WORK_COUNT + work("castle")] = 1;
+    w.provinceWorks[p * WORK_COUNT + work("road")] = 1;
+    expect(slotsUsed(w, p)).toBe(slotsOf(w, p));
+    expect(whyNot(w, fra, p, work("farm"))).toMatch(/^no free slot/);
+    expect(whyNot(w, fra, p, work("road"))).not.toMatch(/^no free slot/);
+    // Every province starts within its slots.
+    for (let q = 0; q < w.provinceCount; q++) if (!w.provinceWater[q]) expect(slotsUsed(createWorldOnce(), q)).toBeLessThanOrEqual(slotsOf(createWorldOnce(), q));
   });
 
   it("pays works upkeep on the ledger, and empty coffers leave the works giving half", () => {

@@ -378,6 +378,8 @@ Until jobs, wares and labourers are in the game, you build ten **works** for the
 | Road (track, road) | anywhere | armies march 15 % faster a step; trade +5 % a step |
 | Castle (earthwork ring fort, stone castle) | anywhere | walls: armies must besiege it |
 
+**Slots.** Every province has slots by its people: 2, and one more at 10,000, 30,000, 100,000, 300,000 and 1,000,000 people (so 2 to 7). Every work takes one slot, whatever it is, and keeps it as it grows a step. The same steps give the town its size, from hamlet to great city, which some steps need (a market needs a village). The Build tab's first line says how many slots are taken.
+
 These effects are stand-ins, written into the rules (`defines.works`) until the jobs and wares model replaces them. A step needs its invention: the stone castle needs Stone castles, the road needs Roads and post stations.
 
 **How you use it.** Tap a province, then its **Build** tab. At the top are its sites with the months left, and its queue, where ▲ and ▼ move a build and Drop takes it off (nothing was paid). Below is the build sheet: every work the land suits, at its next step, with what it does, its gold, months and upkeep. Tap **Build**. When the site is busy or the gold isn't there yet, the button says **Queue** and the build waits its turn. Stop on a running site gives half its gold back. A province raises one work on its land and one in its town at a time.

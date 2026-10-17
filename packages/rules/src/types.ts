@@ -53,6 +53,9 @@ export interface WorksDefines {
   roadSpeed: number;
   /** Gold the AI keeps in hand beyond a work's cost (or a year of works upkeep, whichever is more). */
   aiReserveGold: number;
+  /** Slots every province has for works, and the thousands of people at which it gains one more and its town grows a size. */
+  baseSlots: number;
+  townPeople: number[];
 }
 
 /** Wars, sieges and occupation (milestone 1; the warfare context's own numbers stay in domain/warfare.json). */

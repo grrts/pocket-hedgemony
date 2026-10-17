@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-540 decided and 8 still open across 29 contexts.
+541 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -71,6 +71,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-BLD-20**: (was OQ-BLD-20) Village works rate stays 20 % (provisional); faith-building numbers belong to religion. Balancing finds it in the data.
 - **D-BLD-21**: (was OQ-BLD-21) Burned tiles: they rebuild by themselves, free, one a year in peace; paying half a farm's cost rebuilds one within a season. The player picks; both rules stay.
 - **D-BLD-22**: (17 Oct, milestone 4) The first playable slice builds ten works with gold (the data's gold × `works.goldScale` 0.2) and months, and gives each a stand-in effect from `defines.works` until jobs and wares are simulated (BLD-170). Materials at hand are a gold saving (a lumber camp or quarry takes 20 % off works needing timber or stone); town size is read from wealth; known inventions are the realm's 1444 set until research runs in the turn. Provisional; the jobs-and-wares model replaces it.
+- **D-BLD-23**: (17 Oct, Leroy: "Provinces should have slots related to their population count", "All buildings fit in the same type of slot") A province's slots come from its people, and every work takes the same kind of slot (BLD-175). This replaces the tile and town-slot places (BLD-006 to BLD-013) for the first slice; town size is read from people (BLD-149).
 
 ### Culture (culture)
 

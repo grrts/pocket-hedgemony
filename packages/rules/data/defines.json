@@ -28,7 +28,10 @@
     "campTrade": 0.05,
     "drillYardRecruits": 0.15,
     "roadSpeed": 0.15,
-    "aiReserveGold": 10
+    "aiReserveGold": 10,
+    "$slots": "Leroy, 17 Oct: a province's slots come from its people, one kind of slot for every work. baseSlots plus one for each townPeople step passed (thousands of people), which also sets the town's size: hamlet, village, market town, town, city, great city.",
+    "baseSlots": 2,
+    "townPeople": [10, 30, 100, 300, 1000]
   },
   "levies": {
     "$comment": "Men who can be called per thousand people: the recruiting context's fighting-age share (0.25) times the farmers' call share (0.12).",
