@@ -45,6 +45,7 @@ Feature: Starting values rules
   Scenario: Starting men spread over the realm, with commanders for its strength
     # config: starting_armies
     Given the game starts with the country "France"
-    Then the men of "France" stand in more than two provinces
+    Then every man of "France" is in an army under a commander
+    And the armies of "France" stand in different provinces
     And "France" has one commander for each 8,000 men under arms, at least one
     And each commander of "France" leads an army, the first in its capital

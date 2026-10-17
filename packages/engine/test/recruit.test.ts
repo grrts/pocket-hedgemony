@@ -42,12 +42,16 @@ describe("armies that cost something", () => {
     const ming = count("ming");
     const france = count("france");
     const england = count("england");
-    // Not one stack: every realm with more than one province spreads its men.
-    for (const r of [ming, france, england]) expect(r.places).toBeGreaterThan(2);
-    // Commanders follow the men under arms in 1444, each leading an army.
+    // Not one stack: each army stands in its own province, and every man is under a commander.
+    for (const r of [ming, france, england]) {
+      expect(r.places).toBe(r.mine);
+      expect(r.led).toBe(r.mine);
+      expect(r.led).toBe(r.commanders);
+    }
+    // Commanders follow the men under arms in 1444.
     expect(ming.commanders).toBeGreaterThan(france.commanders);
     expect(france.commanders).toBeGreaterThan(england.commanders);
-    expect(france.led).toBe(france.commanders);
+    expect(england.mine).toBeGreaterThan(1);
     expect(france.men).toBe(rules.nations[n(w, "france")]!.army);
     // The first army stands in the capital under the realm's own commander.
     const fra = n(w, "france");

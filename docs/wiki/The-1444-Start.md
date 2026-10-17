@@ -159,7 +159,7 @@ Settlement regions range from dense, rich ones (the Low Countries at 30 people p
 | About 15 % of other owned provinces | An old ring fort |
 | Unowned provinces | None |
 
-The engine starts every nation with 50 gold, levies of 4 men per thousand people, and 20 % horse in starting armies (all placeholders). A realm's men under arms are spread over its land: about 60 % in field armies, one per commander, the first in the capital, and the rest as garrisons of 2,000 in the provinces between. It gets one commander for every 8,000 men, at least one and at most eight.
+The engine starts every nation with 50 gold, levies of 4 men per thousand people, and 20 % horse in starting armies (all placeholders). A realm's men under arms all start in armies under a commander, spread over its land: one army per commander, the first in the capital. It gets one commander for every 8,000 men, at least one and at most eight (more only if an army would pass 30,000).
 
 ### From catalogue to map
 
@@ -231,7 +231,7 @@ The screens themselves are on [Screens and Navigation](Screens-and-Navigation).
 | Starting gold | `economy.startingTreasury` | 50 | Yes |
 | Levies | `levies.menPerThousandPeople` | 4 | Yes |
 | Horse in starting armies | `march.startingHorseShare` | 0.2 | Yes |
-| Men per starting commander, most commanders, field share, garrison size | `starting_armies` (realm.json) | 8,000; 8; 60 %; 2,000 | Yes |
+| Men per starting commander, most commanders | `starting_armies` (realm.json) | 8,000; 8 | Yes |
 | Low-confidence range | `scenario-setup.json` | ±20 % | Yes |
 | Free realms | store config | the Ottomans, France | No |
 

@@ -2264,8 +2264,13 @@ const armiesOf = (s: S, realm: string): number[] => {
   const a = (s.game as GW).armies;
   return Array.from({ length: a.count }, (_, i) => i).filter((i) => a.alive[i] && a.owner[i] === realmOf(s, realm));
 };
-Then("the men of {string} stand in more than two provinces", (s, realm: string) => {
-  expect(new Set(armiesOf(s, realm).map((i) => (s.game as GW).armies.location[i]!)).size).toBeGreaterThan(2);
+Then("every man of {string} is in an army under a commander", (s, realm: string) => {
+  expect(armiesOf(s, realm).every((i) => (s.game as GW).armies.commander[i]! >= 0)).toBe(true);
+});
+Then("the armies of {string} stand in different provinces", (s, realm: string) => {
+  const armies = armiesOf(s, realm);
+  expect(armies.length).toBeGreaterThan(1);
+  expect(new Set(armies.map((i) => (s.game as GW).armies.location[i]!)).size).toBe(armies.length);
 });
 Then(re(`"([^"]+)" has one commander for each ${NUM} men under arms, at least one`), (s, realm: string, per: string) => {
   const g = s.game as GW;

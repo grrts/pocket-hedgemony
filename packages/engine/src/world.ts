@@ -419,54 +419,47 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   return world;
 }
 
-/** The most men one army starts with. */
+/** The most men one army starts with: a realm with more gets more commanders. */
 const START_ARMY_MAX = 30000;
 
-/** Commanders a realm starts with for its men under arms: one per `starting_armies.men_per_commander`, at least one (REALM-197). */
+/**
+ * Commanders a realm starts with for its men under arms: one per
+ * `starting_armies.men_per_commander`, at least one and at most
+ * `most_commanders`, but always enough that no army is above START_ARMY_MAX (REALM-197).
+ */
 export function startingCommanderCount(men: number): number {
   const c = realmConfig.starting_armies;
-  return Math.max(1, Math.min(c.most_commanders, Math.round(men / c.men_per_commander)));
+  return Math.max(1, Math.min(c.most_commanders, Math.round(men / c.men_per_commander)), Math.ceil(men / START_ARMY_MAX));
 }
 
 /**
- * Where a realm's starting men stand (REALM-196, REALM-197): a field share in
- * one army per commander, the first in the capital and the others spread
- * evenly over its land from the capital outward; the rest as garrison troops
- * of `garrison_men` each in the provinces between them (small enough that an
- * AI leaves them as garrisons), the last post taking what is left.
- * The data's commanders lead first; the realm gets more to match its men.
+ * Where a realm's starting men stand (REALM-196, REALM-197): every man in an
+ * army under a commander, one army per commander, of thousands as even as
+ * they come; the first in the capital and the others spread evenly over its
+ * land from the capital outward (a small realm may have fewer armies than the
+ * count, at least a thousand men each). The data's commanders lead first; the
+ * realm gets more of its own culture to match its men.
  */
 function startingArmies(world: World, n: number, capital: number, total: number): { province: number; men: number; commander: number }[] {
-  const cfg = realmConfig.starting_armies;
   const land = byDistance(world, n, capital).filter((p) => !world.provinceWater[p]);
-  const wanted = startingCommanderCount(total);
+  const armies = Math.max(1, Math.min(startingCommanderCount(total), Math.floor(total / 1000)));
   const commanders: number[] = [];
-  for (let c = 0; c < world.commanderIds.length; c++) if (world.commanderOwner[c] === n && commanders.length < wanted) commanders.push(c);
+  for (let c = 0; c < world.commanderIds.length; c++) if (world.commanderOwner[c] === n && commanders.length < armies) commanders.push(c);
   const capitalName = world.rules.provinces[capital]!.name;
-  for (let k = commanders.length; k < wanted; k++) {
+  for (let k = commanders.length; k < armies; k++) {
     const seed = mix(n + 1, k + 101);
     const skill = (salt: number) => 1 + (mix(seed, salt) % 3);
     const name = personName(world.rules, n, seed, capitalName);
     commanders.push(addCommander(world, n, newCommander(name, { might: skill(1), cunning: skill(2), logistics: skill(3) }), `${world.nationIds[n]}_start_${k + 1}`));
   }
-  // Each army a thousand or more, so a small realm may field fewer armies than it has commanders.
-  const armies = Math.max(1, Math.min(commanders.length, Math.floor((total * cfg.field_share) / 1000)));
-  const each = Math.min(START_ARMY_MAX, Math.max(1000, Math.floor((total * cfg.field_share) / armies / 1000) * 1000));
-  const out: { province: number; men: number; commander: number }[] = [];
-  const spread = (count: number, from: number[]) => Array.from({ length: count }, (_, k) => from[Math.floor((k * from.length) / count)]!);
-  spread(armies, land).forEach((province, k) => out.push({ province, men: each, commander: commanders[k]! }));
-  let rest = total - armies * each;
-  if (rest <= 0) return out;
-  const posts = land.filter((p) => !out.some((a) => a.province === p));
-  const garrisons = Math.max(1, Math.min(Math.ceil(rest / cfg.garrison_men), posts.length || 1));
-  const where = posts.length ? spread(garrisons, posts) : [capital];
-  const share = Math.min(cfg.garrison_men, Math.floor(rest / garrisons / 1000) * 1000);
-  where.forEach((province, k) => {
-    const men = k === where.length - 1 ? rest : share;
-    rest -= men;
-    if (men > 0) out.push({ province, men, commander: -1 });
-  });
-  return out;
+  // Thousands dealt out in turn, so the armies differ by a thousand at most; the capital's takes what is left over.
+  const thousands = Math.floor(total / 1000);
+  const where = Array.from({ length: armies }, (_, k) => land[Math.floor((k * land.length) / armies)] ?? capital);
+  return where.map((province, k) => ({
+    province,
+    men: (Math.floor(thousands / armies) + (k < thousands % armies ? 1 : 0)) * 1000 + (k === 0 ? total - thousands * 1000 : 0),
+    commander: commanders[k]!,
+  }));
 }
 
 export function areNeighbors(world: World, a: number, b: number): boolean {
