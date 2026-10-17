@@ -280,7 +280,13 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - RECR-114 When an official is commissioned, the recruiting system shall charge `recruiting.commission_gold` (50 gold, provisional) once. [F-28]
 - RECR-115 The AI shall commission an official only when it has at least `recruiting.ai_commission_min_men` (1,000, provisional) men without a commander and no free commander to send, and shall never keep more commanders than its armies need. [F-28]
 - RECR-112 When a commander leaves troops in a province of his realm, the recruiting system shall make them that province's garrison troops (RECR-107); an army keeps at least its commander's own company. [F-13]
-- RECR-116 The province's Garrison tab shall offer one "Recruit 1,000 men" button; each press joins the province's recruit queue, shown one row per thousand with the weeks until it has gathered, at most `recruit.queueMax` (10) per province; the last row can be cancelled for its levy money and men back. [F-38]
+- RECR-116 The province's Garrison tab shall offer one "Recruit 1,000 men" button; each press joins the province's recruit queue, at most `recruit.queueMax` (10) per province; the last thousand queued can be cancelled for its levy money and men back. [F-38]
+
+#### How the player uses it: the recruit queue
+- RECR-117 Where: the player taps a province, then its Garrison tab, then "Recruit 1,000 men" once per thousand; the button says why when it can't be pressed (queue full, too few men, over the troop cap, not enough gold). [F-38; X-19]
+- RECR-118 Grouping: the queue sits under the button in the same tab, one row per thousand with "gathering" or "waiting" and the weeks until it has gathered, and a × on the last row; troops that have gathered show just below, under "Troops without a commander". [F-38; X-19]
+- RECR-119 Overview: the realm's Military tab lists every province with a recruit queue, its count and when all will have gathered; tapping one opens that province's Garrison tab. [F-38; X-19]
+- RECR-120 Phone: in landscape the button spans the panel, each row is at least 48 points tall and the × at least 44 × 44, and nothing needs hover. [F-38; X-19]
 
 ## 6. Commands
 

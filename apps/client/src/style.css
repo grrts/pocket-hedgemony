@@ -872,7 +872,7 @@ table.troops td.army-buttons {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 40px;
+  min-height: 48px;
   padding: 2px 4px;
   border-top: 2px dashed var(--ink-soft);
 }
@@ -897,5 +897,6 @@ table.troops td.army-buttons {
 
 .queue button {
   flex: none;
-  min-width: 40px;
+  min-width: 44px;
+  min-height: 44px;
 }
