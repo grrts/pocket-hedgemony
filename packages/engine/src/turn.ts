@@ -68,7 +68,7 @@ export type Order =
   | { type: "dismiss"; army: number; arm: string; men: number }
   /** Split men of one arm off, under a commander at court or left as the province's garrison. */
   | { type: "split"; army: number; arm: string; men: number; commander?: number }
-  | { type: "hire"; arm: string }
+  | { type: "hire"; company: number }
   | { type: "merge"; army: number; into: number }
   /** Put a commander at the head of an army or garrison troops (swapping with the army he led); -1 leaves the men as a garrison. */
   | { type: "appoint"; army: number; commander: number }
@@ -194,7 +194,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "split":
       return splitTroops(world, actingNation, order.army, order.arm, order.men, order.commander);
     case "hire":
-      return hireCompany(world, actingNation, order.arm, news);
+      return hireCompany(world, actingNation, order.company, news);
     case "merge":
       return mergeArmies(world, actingNation, order.army, order.into);
     case "appoint":

@@ -6,7 +6,7 @@ import { Rng } from "./rng.ts";
 import type { Diplomacy } from "./domain/diplomacy/index.ts";
 import { createWarState, maxGarrison, type Battle, type PeaceOffer, type SiegeState } from "./war.ts";
 import { newCommander, type Commander } from "./domain/warfare/index.ts";
-import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type Mercenary, type Muster } from "./recruit.ts";
+import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -93,6 +93,10 @@ export interface World {
   musters: Muster[];
   /** Mercenary companies on their way. */
   mercs: Mercenary[];
+  /** Free companies for hire, shared by every realm that can reach them. */
+  freeCompanies: FreeCompany[];
+  /** Number of the last free company drawn. */
+  freeCompanySeq: number;
   /** Official of each province (index into OFFICIALS), -1 = his post stands empty. */
   provinceOfficial: Int8Array;
   /** Province each commander was commissioned from, -1 = none. */
@@ -394,6 +398,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     }
   });
   recount(world);
+  refreshFreeCompanies(world);
 
   return world;
 }

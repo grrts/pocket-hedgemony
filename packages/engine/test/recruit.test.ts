@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { applyNow, ARMS, createWorld, monthBeginning, processTurn, type Order, type World } from "../src/index.ts";
-import { armyPay, garrisonTroops, idleCommanders, menByArm } from "../src/recruit.ts";
+import { armyPay, companyMen, companyWeeks, freeCompaniesFor, garrisonTroops, idleCommanders, menByArm, refreshFreeCompanies } from "../src/recruit.ts";
 import { wallsOf } from "../src/war.ts";
 
 const rules = loadDefaultRuleset();
@@ -143,7 +143,8 @@ describe("armies that cost something", () => {
     const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     w.provinceOccupier[capital(w, me)] = n(w, "portugal");
-    expect(refused(w, { type: "hire", arm: "pikes" }, me)).toMatch(/siege/);
+    const [company] = freeCompaniesFor(w, me);
+    expect(refused(w, { type: "hire", company: company!.id }, me)).toMatch(/siege/);
   });
 
   it("splits, merges and sends home troops", () => {
@@ -173,17 +174,50 @@ describe("armies that cost something", () => {
     expect(refused(w, { type: "recruit", province: p, thousands: 1 }, me)).toMatch(/troop cap/);
   });
 
-  it("buys mercenaries who arrive weeks later under their own captain", () => {
+  it("buys free companies who arrive weeks later under their own captain", () => {
     const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
-    ok(w, { type: "hire", arm: "pikes" }, me);
-    expect(armiesOf(w, me).length).toBe(1);
-    weeks(w, me, rules.defines.recruit.mercenaryWeeks);
+    w.player = me;
+    const c = freeCompaniesFor(w, me)[0]!;
+    const weeksToCome = companyWeeks(w, c, me);
+    const before = armiesOf(w, me).length;
+    w.nationTreasury[me] = 10000;
+    ok(w, { type: "hire", company: c.id }, me);
+    expect(w.freeCompanies).not.toContain(c);
+    expect(refused(w, { type: "hire", company: c.id }, me)).toMatch(/not for hire/);
+    weeks(w, me, weeksToCome);
     const company = armiesOf(w, me).find((i) => w.armies.kind[i] === 1)!;
+    expect(armiesOf(w, me).length).toBe(before + 1);
     expect(w.armies.commander[company]).toBeGreaterThanOrEqual(0);
-    expect(arm(w, company, "pikes")).toBe(1000);
-    expect(armyPay(w, company)).toBeCloseTo(1000 * 0.2 * 3 * rules.defines.recruit.goldScale);
+    expect(w.commanders[w.armies.commander[company]!]!.name).toBe(`Captain ${c.captain}`);
+    ARMS.forEach((a, k) => expect(arm(w, company, a)).toBeCloseTo(c.byArm[k]!));
+    expect(w.armies.men[company]).toBeCloseTo(companyMen(c));
     expect(refused(w, { type: "appoint", army: company, commander: -1 }, me)).toMatch(/captain/);
+  });
+
+  it("free companies are of the age: a group's arms, a size up to the largest company, and always some for hire", () => {
+    const w = createWorld(rules, 1, tiles);
+    const d = rules.defines.recruit;
+    expect(w.freeCompanies.length).toBe(d.freeCompaniesForHire);
+    const sizes = new Set<number>();
+    for (let month = 0; month < 24; month++) {
+      for (const c of w.freeCompanies) {
+        const def = d.freeCompanies.find((f) => f.group === c.group)!;
+        expect(companyMen(c)).toBeGreaterThanOrEqual(d.freeCompanyMen.min);
+        expect(companyMen(c)).toBeLessThanOrEqual(d.freeCompanyMen.max);
+        expect(def.names).toContain(c.name);
+        ARMS.forEach((a, k) => {
+          if (c.byArm[k]! > 0) expect(def.mix[a], `${c.group} has no ${a}`).toBeDefined();
+        });
+        sizes.add(companyMen(c));
+      }
+      w.turn += 4;
+      refreshFreeCompanies(w);
+      expect(w.freeCompanies.length).toBe(d.freeCompaniesForHire);
+      expect(new Set(w.freeCompanies.map((c) => c.name)).size).toBe(w.freeCompanies.length);
+    }
+    // Not every company the same size (Leroy: no fixed 1,000 men).
+    expect(sizes.size).toBeGreaterThan(5);
   });
 
   it("AI realms at war recruit and send commanders out to their troops", () => {

@@ -5,7 +5,24 @@ import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages } from "./tiles.ts";
-import { armyPay, armyRations, ARMS, menByArm, mercenaryPrice, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
+import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
+
+/** A free company as the UI shows it: men by arm, only the arms it has. */
+export interface CompanyView {
+  name: string;
+  group: string;
+  captain: string;
+  men: number;
+  byArm: Record<string, number>;
+}
+
+const companyView = (c: FreeCompany): CompanyView => ({
+  name: c.name,
+  group: c.group,
+  captain: c.captain,
+  men: companyMen(c),
+  byArm: Object.fromEntries(ARMS.flatMap((arm, k) => (c.byArm[k]! > 0 ? [[arm, c.byArm[k]!]] : []))),
+});
 
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
@@ -77,10 +94,10 @@ export interface Snapshot {
   provinceRecruits: Float32Array;
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
-  /** The player's mercenary companies on their way. */
-  mercs: { arm: string; men: number; weeksLeft: number }[];
-  /** Price of a mercenary company by arm. */
-  mercPrices: Record<string, number>;
+  /** The player's free companies on their way to the capital. */
+  mercs: (CompanyView & { weeksLeft: number })[];
+  /** Free companies the player can hire: their pay a month (paid at once on hiring) and weeks to reach the capital. */
+  freeCompanies: (CompanyView & { id: number; pay: number; weeks: number })[];
   /** Official of each province (a name from OFFICIALS), or null when the post stands empty. */
   provinceOfficial: (string | null)[];
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
@@ -205,8 +222,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       pay: player >= 0 ? nationPay(w, player) : 0,
       provinceRecruits: w.provinceRecruits.slice(),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
-      mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ arm: m.arm, men: m.men, weeksLeft: m.weeksLeft })),
-      mercPrices: Object.fromEntries(w.rules.defines.recruit.hiredArms.map((arm) => [arm, mercenaryPrice(w, arm)])),
+      mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
+      freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
       commanders: w.commanders.map((c, k) => ({
         name: c.name,
