@@ -5,7 +5,7 @@ import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_T
 import { HARVESTS, storeMonths } from "./food.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
-import { advance, applyNow, HOURS_PER_STEP, processTurn, type Order } from "./turn.ts";
+import { advance, applyNow, HOURS_PER_STEP, mayMarchInto, processTurn, type Order } from "./turn.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
@@ -72,6 +72,8 @@ export interface Snapshot {
   provinceOwner: Int16Array;
   /** Nation occupying each province, -1 = none. */
   provinceOccupier: Int16Array;
+  /** 1 for land the player's armies have no right to enter (no war, alliance or passage, MOVE-128), so the map can mark its borders. */
+  provinceClosed: Uint8Array;
   /** What happened this turn (or from the last order) that concerns the player. */
   news: News[];
   /** Wars under way, by nation index. */
@@ -185,6 +187,20 @@ export interface Snapshot {
   arms: readonly string[];
 }
 
+/** Land nation n's armies may not march into, worked out once per realm holding it. */
+function closedTo(w: World, n: number): Uint8Array {
+  const out = new Uint8Array(w.provinceCount);
+  const byHolder = new Map<number, boolean>();
+  for (let p = 0; p < w.provinceCount; p++) {
+    if (w.provinceWater[p]) continue;
+    const holder = controller(w, p);
+    let shut = byHolder.get(holder);
+    if (shut === undefined) byHolder.set(holder, (shut = !mayMarchInto(w, n, p)));
+    if (shut) out[p] = 1;
+  }
+  return out;
+}
+
 export interface HostReply {
   response: EngineResponse;
   transfer: ArrayBuffer[];
@@ -232,6 +248,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       rejectedOrders,
       provinceOwner: w.provinceOwner.slice(),
       provinceOccupier: w.provinceOccupier.slice(),
+      provinceClosed: closedTo(w, player),
       news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed"),
       wars,
       peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
@@ -344,6 +361,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     const transfer = [
       snap.provinceOwner,
       snap.provinceOccupier,
+      snap.provinceClosed,
       snap.nationTreasury,
       snap.nationLevies,
       snap.nationMonthlyIncome,

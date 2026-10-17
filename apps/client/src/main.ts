@@ -515,8 +515,10 @@ function restyleProvinces(): void {
     const lord = snapshot ? snapshot.provinceLord[i]! : -1;
     const lit = litLord >= 0 && lord === litLord;
     const flags = (i === selectedProvince ? 1 : 0) | (lit ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
+    // While armies are chosen to march, land they may not enter gets red borders (feedback 76).
+    const closed = selected.size > 0 && !!snapshot?.provinceClosed[i];
     // While a lord's lands are lit, the rest of the land fades to grey so they stand out.
-    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit);
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
   const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
@@ -923,6 +925,7 @@ function onTap(sx: number, sy: number, province: number): void {
     realmView = -1;
     newsView = false;
     renderArmyList();
+    restyleProvinces();
     void (async () => {
       for (const army of armies) await act({ type: "move", army, to: province, ...(tile !== undefined ? { tile } : {}) });
     })();
