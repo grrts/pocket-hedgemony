@@ -344,6 +344,7 @@ function stepMarches(world: World, hours: number): void {
       const next = a.path[i]![a.pathAt[i]!]!;
       const into = tiles.province[next]! - 1;
       const owner = a.owner[i]!;
+      // Inside a province with an enemy castle the army goes where it likes, but leaves only the way it came.
       if (into !== a.location[i] && castleBars(world, i, into)) {
         halt(world, i);
         have = 0;
@@ -360,11 +361,6 @@ function stepMarches(world: World, hours: number): void {
         a.location[i] = into;
         const k = a.route[i]!.indexOf(into);
         if (k >= 0) a.route[i]!.splice(0, k + 1);
-        if (blockingCastle(world, into, owner)) {
-          halt(world, i);
-          have = 0;
-          break;
-        }
       }
       if (a.pathAt[i]! >= a.path[i]!.length && a.route[i]!.length && !planLeg(world, i)) {
         halt(world, i);
