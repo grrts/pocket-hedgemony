@@ -757,7 +757,7 @@ function drawOverlay(o: OverlayContext): void {
       // The commander in their realm's colours, kit of the era and age (feedback 56), at one size at every zoom (feedback 57).
       const box = drawToken(ctx, {
         x: sx, y: sy, u: 2, color: realm.color, men: s.armies.men[k]!,
-        dir: armyFacing(k), moving, selected: selected.has(id), t: now,
+        dir: armyFacing(k), moving, selected: selected.has(id), t: now, flag: flagCanvas(realm, 1),
         commander: { name, nation: realm.id, color: realm.color, look: lookOfCulture(rules.names?.nations[realm.id]), era: eraOfYear(s.date.year), age: apparentAge(name, s.date.year) },
       });
       armyHitBoxes.push({ id, ...box });
@@ -765,12 +765,7 @@ function drawOverlay(o: OverlayContext): void {
       if (selected.has(id) || zoom >= 8) {
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        // The realm's flag before the name, so you can tell whose commander it is.
-        const flag = flagCanvas(realm, 1);
-        const label = labelBitmap(name, 10, false);
-        const left = sx - (flag.width + 2 + label.w) / 2;
-        ctx.drawImage(flag, Math.round(left), Math.round(box.y + box.h + 2));
-        pixelText(ctx, name, left + flag.width + 2 + label.w / 2, box.y + box.h + 2, 10);
+        pixelText(ctx, name, sx, box.y + box.h + 2, 10);
       }
     }
   }
