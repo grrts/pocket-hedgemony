@@ -1,4 +1,4 @@
-// Recruits, commissions a commander, trains and buys mercenaries as Castile, and screenshots it.
+// Recruits, commissions a commander, trains and hires a free company as Castile, and screenshots it.
 // Usage: pnpm build && node scripts/recruit-shots.mjs <outDir>
 import { chromium, devices } from "playwright-core";
 import { preview } from "vite";
@@ -25,8 +25,11 @@ await page.evaluate(() => window.__phSelect("p1594"));
 await page.click("[data-tab=garrison]");
 await page.waitForTimeout(200);
 await shot("1-garrison");
-await page.click("[data-recruit='3']");
-await page.waitForTimeout(300);
+for (let i = 0; i < 3; i++) {
+  await page.click("[data-recruit]");
+  await page.waitForTimeout(300);
+}
+await shot("1b-queue");
 await page.click(".panel .close").catch(() => {});
 await endTurn();
 await endTurn();
@@ -50,14 +53,21 @@ await page.waitForTimeout(200);
 await page.click("[data-train='archers']");
 await page.waitForTimeout(300);
 await shot("5-commander");
-// The realm's war room: troops, commanders, mercenaries.
+// The realm's Military tab, then its Mercenaries tab: hire the first company for hire.
 await page.click(".hud .realm");
 await page.waitForTimeout(300);
-await page.click("[data-hire='pikes']");
+await page.click("[data-realm-tab=military]");
+await page.waitForTimeout(200);
+await shot("6-military");
+await page.click("[data-realm-open-tab=mercenaries]");
+await page.waitForTimeout(200);
+await shot("7-mercenaries");
+await page.click("[data-hire]:not([disabled])");
 await page.waitForTimeout(300);
-await page.click(".hud .realm");
+await page.click(".hud .realm").catch(() => {});
 await page.waitForTimeout(300);
-await page.evaluate(() => document.querySelector(".panel h3.sub:nth-of-type(2)")?.scrollIntoView());
-await shot("6-realm");
+await page.click("[data-realm-tab=mercenaries]").catch(() => {});
+await page.waitForTimeout(200);
+await shot("8-hired");
 await browser.close();
 server.httpServer.close();

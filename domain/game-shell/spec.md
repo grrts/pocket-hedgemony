@@ -174,6 +174,9 @@ Newest decision first.
 - SHELL-005: The game shell shall show first-run questions only once, and shall show confirmations only where something is lost (leaving without saving, overwriting a save). [screen-flow §1.4]
 - SHELL-006: The game shell shall lay out screens by the shape of the window, not by the kind of device. [screen-flow §1.5]
 - SHELL-007: The game shell shall make every screen usable with only a controller and with only touch, and no action shall exist only as a hover or only as a long press. [screen-flow §1.6, §8.2]
+- SHELL-144: The game shell shall give each subject one home, a card, a tab or a screen, and shall place every action and figure of a feature in the home of its subject, never spread across unrelated panels. [X-19]
+- SHELL-145: For each thing the player must keep track of (armies, garrisons, wars, warnings, anything waiting for an answer), the game shell shall offer an overview that shows its state at a glance and leads to the detail in one tap. [X-19]
+- SHELL-146: The game shell shall make every screen and card fit a phone held in landscape as well as a desktop window, in both the Wide and Tall layouts, keeping the map visible where the card allows. [X-19; SHELL-006]
 
 ### 5.2 Boot and first run
 
@@ -741,3 +744,4 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-141 | in-campaign-screens.feature | An AI peace offer waits for an answer |
 | SHELL-142 | map-and-cards.feature | Picking commanders is easy |
 | SHELL-143 | navigation-by-input.feature | Space ends the turn |
+| SHELL-144–146 | layout-by-shape.feature | Each subject has one home; Important things have an overview; Every screen fits a phone in landscape |

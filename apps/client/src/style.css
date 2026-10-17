@@ -1087,3 +1087,121 @@ button.person-tile {
   inset: 0 auto 0 0;
   background: repeating-linear-gradient(90deg, var(--cloth) 0 4px, #d4545c 4px 6px);
 }
+
+/* ---- Province queues: recruits gathering, one row per thousand ---- */
+
+.queue-head {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0 2px;
+  color: var(--ink-soft);
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.queue {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.queue li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 2px 4px;
+  border-top: 2px dashed var(--ink-soft);
+}
+
+.queue li.now {
+  background: var(--ui-parchment-dark);
+}
+
+.queue .what {
+  flex: 1;
+  min-width: 0;
+}
+
+.queue small {
+  color: var(--ink-soft);
+}
+
+.queue .when {
+  white-space: nowrap;
+  font-size: 20px;
+}
+
+.queue button {
+  flex: none;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* ---- Mercenaries tab: one card per free company (feedback 52, 53) ---- */
+
+.tabs {
+  flex-wrap: wrap;
+}
+
+.companies {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.company {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 4px;
+  border-top: 2px dashed var(--ink-soft);
+}
+
+.company.coming {
+  background: var(--ui-parchment-dark);
+}
+
+.company small {
+  color: var(--ink-soft);
+}
+
+.company-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 8px;
+}
+
+.company-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.company-foot button {
+  flex: none;
+  min-width: 88px;
+  min-height: 44px;
+}
+
+/* A company's arms as one bar, each arm a share of its width. */
+.mix {
+  display: flex;
+  height: 10px;
+  border: 2px solid var(--outline);
+  background: var(--paper);
+}
+
+.mix span {
+  flex-basis: 0;
+}
+
+.mix .arm-0 { background: #b8a27a; }
+.mix .arm-1 { background: #6e7a86; }
+.mix .arm-2 { background: #8a5a2b; }
+.mix .arm-3 { background: #5f7f3a; }
+.mix .arm-4 { background: #b5793a; }
+.mix .arm-5 { background: #7a2e2e; }

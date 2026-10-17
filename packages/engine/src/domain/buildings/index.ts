@@ -114,6 +114,8 @@ export interface BuildingsConfig {
     master_of_works: { extra_sites: number; months_multiplier: number; gold_multiplier: number };
     half_crew_months_multiplier: number;
     cancel_refund: number;
+    /** Builds a province's queue holds at most (Leroy, 17 Oct). */
+    queue_max: number;
     stop_months_by_climate: Record<string, number[]>;
   };
   condition: {
@@ -334,6 +336,8 @@ export interface Realm {
   month: number;
   provinces: Map<string, Province>;
   sites: Site[];
+  /** Builds waiting for a free site, oldest first; each province has its own queue. */
+  queue: QueuedBuild[];
   lords: Map<string, Lord>;
   purses: Map<Owner, number>;
   report: string[];
@@ -353,6 +357,7 @@ export function createRealm(country: string, init: Partial<Realm> = {}): Realm {
     month: 11,
     provinces: new Map(),
     sites: [],
+    queue: [],
     lords: new Map(),
     purses: new Map(),
     report: [],
@@ -745,6 +750,110 @@ export function startSite(r: Realm, provinceId: string, type: string, opts: { pl
   return { ok: true, site };
 }
 
+/** A build ordered in a province while its sites are busy: nothing is paid until it starts. */
+export interface QueuedBuild {
+  id: number;
+  province: string;
+  type: string;
+  step: number;
+  owner: Owner;
+  place?: string;
+  faith?: string;
+}
+
+export type QueueResult = { ok: true; started: Site } | { ok: true; queued: QueuedBuild } | { ok: false; reason: string };
+
+type QueueOpts = { place?: string; owner?: Owner; step?: number; faith?: string };
+
+/** Builds waiting in a province's queue, oldest first. */
+export function queuedIn(r: Realm, provinceId: string): QueuedBuild[] {
+  return r.queue.filter((q) => q.province === provinceId);
+}
+
+/** Why a build can't start here even once the sites running now are done (unlock, needs, limits, no place), or null. */
+function blocked(r: Realm, provinceId: string, type: string, step: number, opts: QueueOpts, self?: QueuedBuild): string | null {
+  const p = prov(r, provinceId);
+  const t = buildingType(type);
+  if (step > 1) return p.buildings.some((b) => b.type === t.id && b.step === step - 1) ? missingFor(r, provinceId, type, step) : `needs a ${t.id} at step ${step - 1}`;
+  if ((t.limit === "per_province" || t.limit === "per_realm") && r.queue.some((q) => q !== self && q.type === t.id && q.step === 1 && (t.limit === "per_realm" || q.province === p.id))) return `a ${t.id} is already queued`;
+  const check = canBuild(r, provinceId, type, opts.place, opts.faith !== undefined ? { faith: opts.faith } : {});
+  if (check.ok) return null;
+  if (check.reason !== "no free place" && check.reason !== "a site is already running there") return check.reason;
+  // A place held by a running site frees up when it is done.
+  const sites = r.sites;
+  r.sites = sites.filter((x) => x.province !== p.id || x.upgrade);
+  try {
+    const later = canBuild(r, provinceId, type, opts.place, opts.faith !== undefined ? { faith: opts.faith } : {});
+    return later.ok ? null : check.reason;
+  } finally {
+    r.sites = sites;
+  }
+}
+
+/**
+ * Orders a build in a province: it starts at once when a site is free and the
+ * queue is empty, else it waits its turn in the province's queue (at most
+ * `sites.queue_max`). A build that can never start here is refused.
+ */
+export function queueBuild(r: Realm, provinceId: string, type: string, opts: QueueOpts = {}): QueueResult {
+  const step = opts.step ?? 1;
+  const why = blocked(r, provinceId, type, step, opts);
+  if (why) return { ok: false, reason: why };
+  const waiting = queuedIn(r, provinceId);
+  if (!waiting.length) {
+    const res = startSite(r, provinceId, type, opts);
+    if (res.ok) return { ok: true, started: res.site };
+  }
+  if (waiting.length >= cfg.sites.queue_max) return { ok: false, reason: `the build queue is full: at most ${cfg.sites.queue_max} wait` };
+  const q: QueuedBuild = { id: r.nextId++, province: prov(r, provinceId).id, type: buildingType(type).id, step, owner: opts.owner ?? "crown" };
+  if (opts.place !== undefined) q.place = opts.place;
+  if (opts.faith !== undefined) q.faith = opts.faith;
+  r.queue.push(q);
+  return { ok: true, queued: q };
+}
+
+/** Takes a build off the queue; nothing was paid, so nothing comes back. */
+export function cancelQueued(r: Realm, id: number): boolean {
+  const n = r.queue.length;
+  r.queue = r.queue.filter((q) => q.id !== id);
+  return r.queue.length < n;
+}
+
+/** Moves a queued build one place earlier (-1) or later (+1) in its province's queue. */
+export function moveQueued(r: Realm, id: number, by: -1 | 1): boolean {
+  const i = r.queue.findIndex((q) => q.id === id);
+  if (i < 0) return false;
+  let j = i + by;
+  while (j >= 0 && j < r.queue.length && r.queue[j]!.province !== r.queue[i]!.province) j += by;
+  if (j < 0 || j >= r.queue.length) return false;
+  [r.queue[i], r.queue[j]] = [r.queue[j]!, r.queue[i]!];
+  return true;
+}
+
+/**
+ * Starts what the queues can: in each province the oldest build first; one
+ * that has to wait (no free site of its kind, not enough gold) keeps its place
+ * while later builds of another kind may start; one that can no longer be
+ * built there is dropped with a report line.
+ */
+export function startQueued(r: Realm): Site[] {
+  const started: Site[] = [];
+  for (const q of [...r.queue]) {
+    const opts: QueueOpts = { step: q.step, owner: q.owner, ...(q.place !== undefined ? { place: q.place } : {}), ...(q.faith !== undefined ? { faith: q.faith } : {}) };
+    const why = blocked(r, q.province, q.type, q.step, opts, q);
+    if (why) {
+      r.queue = r.queue.filter((x) => x !== q);
+      r.report.push(`${q.province}: ${stepDef(q.type, q.step).name} taken off the queue: ${why}.`);
+      continue;
+    }
+    const res = startSite(r, q.province, q.type, opts);
+    if (!res.ok) continue;
+    r.queue = r.queue.filter((x) => x !== q);
+    started.push(res.site);
+  }
+  return started;
+}
+
 /** Takes a site's crew: the homeless first, then every class by its share; their slots stay empty while they build. */
 export function takeCrew(p: Province, site: Site): void {
   const fromHomeless = Math.min(p.homeless, site.crewNeeded);
@@ -796,6 +905,7 @@ export function advanceSites(r: Realm, month = r.month): Building[] {
     site.monthsDone += site.crewNeeded ? site.crew / site.crewNeeded : 1;
     if (site.monthsDone >= site.monthsTotal - 1e-9) done.push(completeSite(r, site).building);
   }
+  if (done.length) startQueued(r);
   return done;
 }
 

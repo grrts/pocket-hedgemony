@@ -600,6 +600,7 @@ Newest decision first.
 ### 5.18 Occupation and raids
 
 - WAR-175 When an army takes a province's castle, or holds a province with no castle for a season, the warfare system shall mark the province occupied: the occupier gets its tax, recruits, food and trade, and its lord wavers toward the side holding his land. [warfare §9.1]
+- WAR-220 When armies of more than one realm besiege or hold the same province, the warfare system shall give it to the realm that began the siege or the hold, not to the strongest; the strongest takes over only when several arrive on the same day or the first realm's armies leave. How the player uses it: the dispatch "X lays siege to Y" names who will take the province, and the province's siege view (F-32) shows the same realm as the besieger. [F-45]
 - WAR-176 While an army is a horse-only army with orders Raid, the warfare system shall not let it besiege or occupy; each week in a province it burns one tile and takes loot (gold from market and town, herds and horses from pasture) up to 1 load per 50 riders, then moves on; castles there may sally. [warfare §9.2, §5.1]
 
 ### 5.19 War state and peace
@@ -653,9 +654,16 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - WAR-207 The warfare system shall fight every battle one round per 4-hour step (X-1) and publish after each round each side's men, morale and losses so far; no battle is resolved in one go. [F-8; X-1]
 - WAR-208 The warfare system shall publish each siege's progress (days held, breaches, garrison left, food left in the castle) whenever it changes, for the map and the siege view. [F-9]
 - WAR-209 The warfare system shall never let an army exist without a commander: soldiers with no commander are their province's garrison troops (recruiting RECR-107), not an army. If an army loses its commander and no captain can take over, then it shall halt; in its own realm's land it becomes the garrison troops of the province it stands in, and abroad it waits there until a commander joins it. [F-13]
-- WAR-210 When a contract with a free company is signed, the warfare system shall take the gold up front and have the company arrive at the realm's capital after the days it needs to march there from where it gathers, shown on the hire screen; until it arrives it is not on the map and cannot fight. [F-19]
+- WAR-210 When a contract with a free company is signed, the warfare system shall take the gold up front and have the company arrive at the realm's capital after the days it needs to march there from where it gathers, shown on the hire screen; until it arrives it is not on the map and cannot fight. While the capital is besieged or occupied, no company can be hired. [F-19; playtest feedback]
 - WAR-212 The warfare system shall give levies no service term: a levy company, trained or not, never goes home on its own and stays until its realm disbands it or leaves it as a garrison; lords' retinues and hired companies keep their own rules. [F-23]
 - WAR-211 The warfare system shall have every hired company led by its own captain as the commander of its own army, who leaves with the company when the contract ends; a hired company never takes one of the realm's commanders. [F-19]
+- WAR-213 The warfare system shall offer free companies of the age's groups, each gathered where its group historically gathered, with a random size between the age's smallest and largest company (300 to 3,000 men, config) and a random mix of arms within its group's ranges; about six are for hire at once, some move on each month and new ones gather, and a realm may hire those that reach its capital within 16 weeks. A hired company arrives with exactly the men and arms it was offered with. [F-53; replaces the fixed 1,000-man company of milestone 2]
+
+#### How the player uses it: free companies
+- WAR-214 Where: the player opens their country card and taps the Mercenaries tab; each company for hire is a card with a Hire button, which is greyed with the reason when the capital is besieged or the treasury is short. [F-52; X-19]
+- WAR-215 Grouping: the tab holds everything about free companies and nothing else: "Your companies" (in service, with a Command button, and on the way, with the weeks left) above "For hire". Each card shows the company's name and group, a bar of its arms with the men of each, its men and captain, the weeks to the capital and its pay a month. [F-52; X-19]
+- WAR-216 Overview: the top of the tab gives the companies in service, their men and their pay a month; the Military tab keeps one line ("Free companies: 2 in service, 1 on the way, 5 for hire") that opens the Mercenaries tab. [F-52; X-19]
+- WAR-217 Phone: in landscape the cards are one column across the panel, the Hire and Command buttons are at least 44 × 44 points, the tabs wrap rather than scroll, and nothing needs hover. [F-52; X-19]
 
 ## 6. Commands
 
@@ -1185,3 +1193,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-209 | features/commanders.feature | No army without a commander |
 | WAR-210, 211 | features/raising-and-keeping.feature | Hiring a free company takes no recruits; A hired company arrives after its march |
 | WAR-212 | features/kinds-and-break-points.feature | Levies stay until the realm sends them home |
+| WAR-213 | features/raising-and-keeping.feature | Free companies of the age, each its own size and mix |
+| WAR-214 to 217 | features/raising-and-keeping.feature | The Mercenaries tab |

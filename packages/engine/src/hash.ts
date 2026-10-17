@@ -20,31 +20,38 @@ export function hashWorld(world: World): string {
   feed(world.nationTreasury);
   feed(world.nationLevies);
   feed(world.provinceRecruits);
+  // Army fields of live slots only: a dead slot keeps whatever it held, and a save drops it.
+  const live = <T extends ArrayBufferView & ArrayLike<number> & { slice(a?: number, b?: number): T; fill(v: number, a?: number, b?: number): T }>(arr: T, stride = 1): T => {
+    const out = arr.slice(0, a.count * stride);
+    for (let i = 0; i < a.count; i++) if (!a.alive[i]) out.fill(0, i * stride, (i + 1) * stride);
+    return out;
+  };
   feed(a.alive.subarray(0, a.count));
-  feed(a.owner.subarray(0, a.count));
-  feed(a.location.subarray(0, a.count));
-  feed(a.tile.subarray(0, a.count));
-  feed(a.battle.subarray(0, a.count));
-  feed(a.retreating.subarray(0, a.count));
-  feed(a.cameFrom.subarray(0, a.count));
-  feed(a.men.subarray(0, a.count));
-  feed(a.horse.subarray(0, a.count));
-  feed(a.food.subarray(0, a.count));
-  feed(a.progress.subarray(0, a.count));
-  feed(a.kind.subarray(0, a.count));
-  feed(a.monthsOut.subarray(0, a.count));
-  feed(a.drill.subarray(0, a.count));
-  feed(a.mix.subarray(0, a.count * (a.mix.length / a.alive.length)));
+  feed(live(a.owner));
+  feed(live(a.location));
+  feed(live(a.tile));
+  feed(live(a.battle));
+  feed(live(a.retreating));
+  feed(live(a.cameFrom));
+  feed(live(a.men));
+  feed(live(a.horse));
+  feed(live(a.food));
+  feed(live(a.progress));
+  feed(live(a.kind));
+  feed(live(a.monthsOut));
+  feed(live(a.drill));
+  feed(live(a.mix, a.mix.length / a.alive.length));
   feed(new Int32Array(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats])));
   feed(new Float64Array(world.musters.flatMap((m) => [m.nation, m.province, m.men, m.weeksLeft])));
-  feed(new Float64Array(world.mercs.flatMap((m) => [m.nation, m.men, m.weeksLeft])));
+  feed(new Float64Array(world.mercs.flatMap((m) => [m.nation, m.company.id, m.weeksLeft])));
+  feed(new Float64Array(world.freeCompanies.flatMap((c) => [c.id, c.home, ...c.byArm])));
   feed(world.provinceOfficial);
-  feed(a.trainArm.subarray(0, a.count));
-  feed(a.trainMen.subarray(0, a.count));
-  feed(a.trainLeft.subarray(0, a.count));
-  for (let i = 0; i < a.count; i++) feed(Int32Array.from(a.route[i]!));
+  feed(live(a.trainArm));
+  feed(live(a.trainMen));
+  feed(live(a.trainLeft));
+  for (let i = 0; i < a.count; i++) if (a.alive[i]) feed(Int32Array.from(a.route[i]!));
   // Only the path still to walk: a save keeps no more.
-  for (let i = 0; i < a.count; i++) feed(a.path[i]!.subarray(a.pathAt[i]!));
+  for (let i = 0; i < a.count; i++) if (a.alive[i]) feed(a.path[i]!.subarray(a.pathAt[i]!));
   for (const b of world.battles) feed(new Float64Array([b.id, b.tile, b.round, b.rounds, b.attDealt, b.defDealt, ...b.attackers, -1, ...b.defenders]));
   return (h >>> 0).toString(16).padStart(8, "0");
 }

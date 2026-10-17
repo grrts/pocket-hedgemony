@@ -30,6 +30,13 @@ domain/
 4. **Numbers.** Write a number only if the design gives it. Mark numbers the design calls placeholders with
    `@placeholder` on the scenario and name the config key they come from (for example `trade.ratio_per_trader`).
 5. **Plain language**, the same words the designs use. Each term is defined once in the spec's glossary.
+6. **How the player uses it** (X-19, Leroy). Every player-facing feature, new or changed, gets a short
+   "How the player uses it" heading in section 5 that answers four questions, as requirements like any other:
+   where the player finds it and what they do (most play is in the screens and cards over the map); how it is
+   grouped with related things (one card, tab or screen per subject); which overview shows its state at a
+   glance, for anything important; and how it looks and works on a phone in landscape (Wide and Tall layouts,
+   safe areas, 44-point tap targets, nothing that needs hover). If an answer gives a poor experience, fix the
+   design before it is built.
 
 ## spec.md template
 
@@ -58,7 +65,8 @@ Numbered <CODE>-001 … in EARS form, one rule each:
 - State-driven: "While <state>, the <system> shall …"
 - Unwanted: "If <condition>, then the <system> shall …"
 - Optional: "Where <feature/setting>, the <system> shall …"
-Each line ends with its source in brackets: [country-stats §2.1]. Group under short headings.
+Each line ends with its source in brackets: [country-stats §2.1]. Group under short headings. A player-facing
+feature has a "How the player uses it" heading (rule 6).
 
 ## 6. Commands
 | Command | Who issues it (player / AI / system) | Preconditions | Result | Events emitted |

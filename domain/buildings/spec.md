@@ -467,6 +467,18 @@ Works across the province (§7.10)
 - BLD-160 A burned tile shall rebuild itself free, one a year in peace; paying half a farm's cost rebuilds one within a season. [D-BLD-21]
 - BLD-161 A town shall burn with a chance of 1 % a year (+0.5 % per size above town); a raid of 2,000 men or more is big. [D-BLD-17]
 
+### 5.23 The build queue (Leroy, 17 October 2026)
+- BLD-162 When the player orders a build in a province whose sites of that kind are all busy, or whose queue already holds builds, the buildings context shall put it at the back of that province's build queue instead of refusing it. [F-39]
+- BLD-163 The buildings context shall hold at most `sites.queue_max` (10) builds in a province's queue, and shall refuse a build that could not start there even once the running sites are done (an unlock, a need, a limit, no place). [F-39]
+- BLD-164 When a site finishes, the buildings context shall start the oldest queued builds of that province that now have a free site and the gold, paying for each only as it starts; a build that has to wait keeps its place, and one that can no longer be built there is taken off with a line in the turn report. [F-39]
+- BLD-165 The buildings context shall let the player cancel a queued build, with nothing to refund, and move it earlier or later in its province's queue. [F-39]
+
+#### How the player uses it: the build queue
+- BLD-166 Where: the player taps a province, then its Build tab, and taps a building on the build sheet; with a site free it starts, otherwise the row says "Queued" and the build joins the queue, and the sheet says why a build can't be queued at all. [F-39; X-19]
+- BLD-167 Grouping: the Build tab shows the sites running with their months left, and under them the queue, one row per build with its cost and months and buttons to move it up or down or cancel it. [F-39; X-19]
+- BLD-168 Overview: the realm's Works overview lists every province with a site or a queue, with its counts and the next build to finish; tapping one opens that province's Build tab. [F-39; X-19]
+- BLD-169 Phone: in landscape the queue rows are at least 48 points tall, the move and cancel buttons at least 44 × 44 with 8 points between them, and nothing needs hover. [F-39; X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -474,6 +486,8 @@ Works across the province (§7.10)
 | StartBuilding(province, place, type, crop/product?) | player / AI / lord / clergy / town / company | Place empty and fitting; unlock known; needs met; limit not reached; a free site of that kind; owner can pay gold | Gold paid; site created; crew assigned; materials sourced | SiteStarted |
 | UpgradeBuilding(building) | owner | Next step exists and unlocked; needs met; free site | Site for the next step; building works at old step (castle one lower) | SiteStarted |
 | CancelSite(site) | owner | Site running | Half gold and unused materials refunded; crew returned | SiteCancelled |
+| QueueBuilding(province, type, place?) | player | Could start once running sites are done; queue under 10 | Starts now if a site is free and the queue is empty, else waits in the province's queue | SiteStarted or BuildQueued |
+| CancelQueued(build) / MoveQueued(build, earlier or later) | player | Build is queued | Taken off, nothing paid; or moved within its province's queue | — |
 | RepairBuilding(building) | owner | Damaged | Half gold, materials, months | SiteStarted |
 | RebuildBuilding(building) | owner | Ruined | Half cost site | SiteStarted |
 | ClearRuin(building) | owner | Ruined | Place empty | BuildingRemoved |
@@ -493,6 +507,7 @@ Works across the province (§7.10)
 | SiteStarted | A site begins | province, place, type, step, owner, crew, months | game-shell (Works), province (crew leaves homeless/slots) |
 | SiteStopped / SiteResumed | Season, enemy army, occupation, no crew | site, reason | game-shell |
 | SiteCancelled | Cancel | site, refund | realm |
+| BuildQueued / BuildLeftQueue | A build waits for a site; a queued build can no longer be built | province, type, step, reason | game-shell (Build tab, turn report) |
 | BuildingCompleted | Site finishes | building, step, job slots | province (slots open before overflow), game-shell (turn report), achievements |
 | BuildingStepChanged | Up or down a step | building, from, to | government, warfare, naval, trade |
 | BuildingNeglected | Upkeep unpaid or town shrank | building | game-shell (turn report line), map-presentation |
@@ -707,3 +722,9 @@ Changes the design asks of other files (§18), recorded here; not edited:
 | BLD-161 | damage-and-loss.feature | Town fires |
 | BLD-161 | damage-and-loss.feature | Big raids |
 | BLD-155 | troyes-1444-1452.feature | 1444, the burned field |
+| BLD-162 | build-queue.feature | A build waits for a busy site |
+| BLD-163 | build-queue.feature | At most ten builds wait in a province |
+| BLD-163 | build-queue.feature | A build that could never start is refused |
+| BLD-164 | build-queue.feature | The next build starts when a site is done |
+| BLD-164 | build-queue.feature | A build that can no longer be built leaves the queue |
+| BLD-165 | build-queue.feature | Cancelling and reordering queued builds |
