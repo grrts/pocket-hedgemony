@@ -518,6 +518,13 @@ button.icon-only {
   color: var(--ink);
 }
 
+/* Ruler and kind of province come first on its overview (feedback 78). */
+.owner + .province-kind {
+  margin: -4px 0 8px;
+  font-size: 1.05em;
+  color: var(--ink);
+}
+
 .facts {
   display: grid;
   grid-template-columns: auto 1fr;
