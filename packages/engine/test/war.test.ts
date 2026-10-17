@@ -146,6 +146,17 @@ describe("war and conquest", () => {
     expect(detours).toBeGreaterThan(0);
   });
 
+  it("keeps armies out of land they have no war with or passage through (playtest feedback)", () => {
+    const w = createWorld(rules, 7, tiles);
+    const me = n(w, "castile");
+    const foe = n(w, "portugal");
+    const army = armyOf(w, me);
+    const lisbon = w.provinceIndex.get(rules.nations[foe]!.capital)!;
+    expect(applyNow(w, { type: "move", army, to: lisbon }, me).rejectedOrders[0]?.reason).toMatch(/passage/);
+    w.diplomacy.passages.push({ granter: "portugal", grantee: "castile", until: "9999-12" });
+    expect(applyNow(w, { type: "move", army, to: lisbon }, me).rejectedOrders).toEqual([]);
+  });
+
   it("runs decades of AI wars deterministically and quickly", () => {
     const a = createWorld(rules, 3, tiles);
     const b = createWorld(rules, 3, tiles);

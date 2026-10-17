@@ -133,15 +133,16 @@ describe("armies that cost something", () => {
     const me = n(w, "castile");
     w.player = me;
     const [army] = armiesOf(w, me);
+    const men = w.armies.men[army!]!;
     ok(w, { type: "split", army: army!, arm: "light horse", men: 600 }, me);
     const other = armiesOf(w, me).find((i) => i !== army)!;
     expect(w.armies.horse[other]).toBe(600);
     expect(w.armies.commander[other]).toBe(-1);
-    expect(w.armies.men[army!]).toBe(4400);
+    expect(w.armies.men[army!]).toBe(men - 600);
     ok(w, { type: "dismiss", army: army!, arm: "levy foot", men: 400 }, me);
-    expect(w.armies.men[army!]).toBe(4000);
+    expect(w.armies.men[army!]).toBe(men - 1000);
     ok(w, { type: "pickUp", army: army! }, me);
-    expect(w.armies.men[army!]).toBe(4600);
+    expect(w.armies.men[army!]).toBe(men - 400);
     expect(w.armies.alive[other]).toBe(0);
   });
 
