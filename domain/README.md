@@ -30,9 +30,9 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Subjects and overlords](subjects/spec.md) | SUBJ | 110 | 17 | 298 | 25 | 0 |
 | [Time and turns](time-and-turns/spec.md) | TIME | 76 | 7 | 181 | 15 | 0 |
 | [Trade](trade/spec.md) | TRADE | 128 | 14 | 266 | 19 | 0 |
-| [Troop movement](troop-movement/spec.md) | MOVE | 128 | 12 | 245 | 20 | 0 |
+| [Troop movement](troop-movement/spec.md) | MOVE | 133 | 12 | 246 | 20 | 0 |
 | [Warfare](warfare/spec.md) | WAR | 218 | 17 | 654 | 21 | 0 |
 | [World map](world-map/spec.md) | MAP | 50 | 6 | 175 | 12 | 0 |
-| **All 29 contexts** | | 3188 | 355 | 7874 | 538 | 8 |
+| **All 29 contexts** | | 3193 | 355 | 7875 | 538 | 8 |
 
 Scenarios count each row of a Scenario Outline's examples.

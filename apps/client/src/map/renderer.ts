@@ -68,7 +68,7 @@ uniform int uMode;           // 0 political, 1 terrain, 2 data lens
 uniform vec3 uParchment, uParchmentDark;
 uniform vec3 uTerrain[${TERRAINS.length}];  // average colour of each terrain's tiles
 uniform vec3 uDepth[${DEPTH_COLORS.length}];     // ocean colour by depth band
-uniform vec3 uFoam, uInk, uHighlight, uSand;
+uniform vec3 uFoam, uInk, uHighlight, uSand, uForbid;
 uniform sampler2D uAtlas;    // terrain tiles: ${VARIANTS} variants across, one row per terrain
 uniform sampler2D uMini;     // the same at half size
 out vec4 outColor;
@@ -160,7 +160,6 @@ vec3 hatch(vec3 c, int id, ivec2 q, int width) {
 vec3 highlight(vec3 c, int id, float strength) {
   int f = int(flags(id));
   if ((f & 1) != 0) c = mix(c, uHighlight, strength + strength * step(0.5, fract(uTime * 1.5)));
-  if ((f & 2) != 0) c = mix(c, uHighlight, strength * 1.2);
   return c;
 }
 // Seasons (decision X-17), from the engine's climate.ts once a turn: uSeason per province
@@ -467,6 +466,29 @@ vec3 parchment(vec2 m) {
   return c;
 }
 
+// Land the chosen armies may not enter (flag 2, MOVE-129): a faint red wash,
+// and a red line on its side of every border with land they may enter.
+bool shut(int id) { return id >= 0 && (int(flags(id)) & 2) != 0; }
+vec3 forbidden(vec3 c, vec2 m) {
+  bool tiles = uZoom >= ${MID_ZOOM}.0;
+  float art = uZoom >= ${DETAIL_ZOOM}.0 ? ${TILE / 2}.0 : ${TILE / 4}.0;
+  // Art pixel or map pixel centre, and a line about three screen pixels wide.
+  vec2 q = tiles ? (floor(m * art) + 0.5) / art : floor(m) + 0.5;
+  float d = tiles ? 2.0 / art : max(1.0, floor(3.0 / uZoom));
+  int id = tiles ? effId(q) : idAt(ivec2(q));
+  if (!land(id) || !shut(id)) return c;
+  bool edge = false;
+  for (int k = 0; k < 4; k++) {
+    vec2 dir = vec2(k == 0 ? 1.0 : k == 1 ? -1.0 : 0.0, k == 2 ? 1.0 : k == 3 ? -1.0 : 0.0);
+    for (int j = 1; j <= 2; j++) {
+      vec2 at = q + dir * d * float(j) * 0.5;
+      int n = tiles ? effId(at) : idAt(ivec2(floor(at)));
+      if (land(n) && !shut(n) && !unknown(n)) edge = true;
+    }
+  }
+  return edge ? mix(c, uForbid, 0.85) : mix(c, uForbid, 0.16);
+}
+
 void main() {
   vec2 m = vMap;
   int id = idAt(ivec2(floor(m)));
@@ -475,6 +497,7 @@ void main() {
     return;
   }
   vec3 c = uZoom >= ${DETAIL_ZOOM}.0 ? tiled(false) : uZoom >= ${MID_ZOOM}.0 ? tiled(true) : far();
+  c = forbidden(c, m);
   // A dark seam where the known world meets the unknown.
   ivec2 p = ivec2(floor(m));
   if (unknown(idAt(p + ivec2(1, 0))) || unknown(idAt(p - ivec2(1, 0))) || unknown(idAt(p + ivec2(0, 1))) || unknown(idAt(p - ivec2(0, 1)))) {
@@ -531,7 +554,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uMini", "uLand", "uSeason"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -603,7 +626,7 @@ export class MapRenderer {
 
   /**
    * Sets each province's fill colour, owner and flags.
-   * flags: 1 = selected, 2 = highlighted (e.g. a move target), 4 = undiscovered.
+   * flags: 1 = selected, 2 = closed to the armies being moved (red borders), 4 = undiscovered, 8 = occupied.
    */
   setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false): void {
     const o = i * 4;
@@ -660,6 +683,7 @@ export class MapRenderer {
     col("uInk", PALETTE.ink);
     col("uHighlight", PALETTE.paper);
     col("uSand", PALETTE.sand);
+    col("uForbid", PALETTE.blood);
 
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.infoTex);

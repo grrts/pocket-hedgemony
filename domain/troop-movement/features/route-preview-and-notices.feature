@@ -66,3 +66,10 @@ Feature: What the route preview and the turn replay carry
       | an army's route turned red                                   | gets         |
       | an enemy army was first seen marching into the realm's land  | gets         |
       | an army walked where it was told                             | does not get |
+
+  @MOVE-129 @feedback-76
+  Scenario: The map marks land the chosen armies may not enter
+    Given a new game on the real map as the realm "France"
+    Then the engine reports which provinces the realm's armies may not enter
+    And the realm's own land and the sea are never marked closed
+    And the land of a realm at peace with it that grants no passage is marked closed

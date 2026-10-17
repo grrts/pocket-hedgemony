@@ -382,7 +382,9 @@ function restyleProvinces(): void {
     const occ = occupiers[i]!;
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
     const hatched = occ >= 0 && lens === "realms";
-    const flags = (i === selectedProvince ? 1 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
+    // While armies are chosen to march, land they may not enter gets red borders (feedback 76).
+    const closed = selected.size > 0 && !!snapshot?.provinceClosed[i];
+    const flags = (i === selectedProvince ? 1 : 0) | (closed ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
     view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i]);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
@@ -780,6 +782,7 @@ function onTap(sx: number, sy: number, province: number): void {
     realmView = -1;
     newsView = false;
     renderArmyList();
+    restyleProvinces();
     void (async () => {
       for (const army of armies) await act({ type: "move", army, to: province, ...(tile !== undefined ? { tile } : {}) });
     })();
