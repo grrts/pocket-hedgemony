@@ -1,6 +1,6 @@
 import { addDays, DAYS_PER_TURN, forageLimit, groundOf, planRoute, type MarchMap, type Order, type Route, type Snapshot } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
-import { provinceSeason, seasonName } from "./map/seasons.ts";
+import { placeClimate, provinceClimate, seasonName, type PlaceClimate } from "./map/seasons.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite, spriteUrl } from "./art/sprites.ts";
@@ -13,8 +13,9 @@ import { detectRuntime, type Diagnostics } from "./platform.ts";
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
 const forceMainThread = new URLSearchParams(location.search).get("engine") === "main-thread";
-/** ?month=1..12 draws the map's seasons for that month, for reviewing the art. */
+/** ?month=1..12 (and &day=) draws the map's seasons for that date, for reviewing the art. */
 const previewMonth = Number(new URLSearchParams(location.search).get("month")) || 0;
+const previewDay = Number(new URLSearchParams(location.search).get("day")) || 15;
 const engine = new EngineClient({ forceMainThread });
 
 const diagnostics: Diagnostics = {
@@ -226,8 +227,9 @@ const isKnown = (i: number) => !fogOn || !known || known[i] === 1;
 /** Latitude and longitude of a province's centre. */
 const latOf = (p: { y?: number }) => rules.map!.latTop - (p.y ?? 0) / rules.map!.pxPerDeg;
 const lonOf = (p: { x?: number }) => (p.x ?? 0) / rules.map!.pxPerDeg - 180;
-/** The month the map's seasons were last drawn for. */
-let seasonMonth = 0;
+/** The date the map's seasons were last worked out for, and each province's fixed climate. */
+let seasonKey = "";
+let places: PlaceClimate[] | null = null;
 
 function restyleProvinces(): void {
   known = computeKnown();
@@ -239,13 +241,16 @@ function restyleProvinces(): void {
     const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0) | (isKnown(i) ? 0 : 4);
     view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : lensColor(i), o, TERRAINS.indexOf(provinces[i]!.terrain as (typeof TERRAINS)[number]), flags, isWater[i]);
   }
-  // Seasons change once a month, so they are only worked out then.
-  const month = previewMonth || (snapshot?.date.month ?? rules.defines.startDate.month);
-  if (month !== seasonMonth) {
-    seasonMonth = month;
+  // Seasons move on a week a turn, so they are only worked out when the date changes.
+  const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (snapshot?.date ?? rules.defines.startDate);
+  const key = `${date.year}-${date.month}-${date.day ?? 1}`;
+  if (key !== seasonKey) {
+    seasonKey = key;
+    places ??= provinces.map((p) => placeClimate(lonOf(p), latOf(p), !!p.coastal, p.terrain ?? ""));
     for (let i = 0; i < provinces.length; i++) {
-      const p = provinces[i]!;
-      view.renderer.setProvinceSeason(i, isWater[i] ? 0 : provinceSeason(lonOf(p), latOf(p), p.terrain ?? "", month));
+      if (isWater[i]) continue; // seas keep no seasons yet
+      const c = provinceClimate(places[i]!, date);
+      view.renderer.setProvinceSeason(i, c.temperature, c.autumn, c.spring, c.wet);
     }
   }
   view.renderer.uploadProvinceStyles();

@@ -60,6 +60,7 @@ uniform ivec2 uTileOrigin;   // tile's top-left in map pixels
 uniform ivec2 uTileSize;     // texels in this tile's texture (includes 1px overlap)
 uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
 uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones
+uniform sampler2D uSeason;   // per-province season, see seasonal()
 uniform int uInfoWidth;
 uniform float uZoom;
 uniform float uTime;
@@ -157,29 +158,44 @@ vec3 highlight(vec3 c, int id, float strength) {
   if ((f & 2) != 0) c = mix(c, uHighlight, strength * 1.2);
   return c;
 }
-// Seasons (decision X-17): a palette swap per province, picked monthly and
-// kept in the owner texture's alpha: 1 snow, 2 spring, 3 autumn, 4 wet season,
-// 5 bare winter south of the snow line.
-int seasonOf(int id) { return int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).a * 255.0 + 0.5); }
-vec3 seasonal(vec3 c, int t, int id) {
-  int s = seasonOf(id);
-  if (s == 0) return c;
+// Seasons (decision X-17), from seasons.ts once a turn: uSeason per province
+// holds r = sea-level temperature ((C + 60) / 127.5), g = autumn, b = spring,
+// a = wet season. Each tile is cooled by its height, so snow lies where it
+// is below freezing there: first on the peaks, then down into the valleys.
+vec4 seasonAt(int id) { return texelFetch(uSeason, ivec2(id % uInfoWidth, id / uInfoWidth), 0); }
+float heightKm(int t) {
+  return t == ${T.snowpeaks} ? 3.6 : t == ${T.glacier} ? 3.0 : t == ${T.mountains} ? 2.1 : t == ${T.highlands} ? 1.3 : t == ${T.badlands} ? 0.7 : t == ${T.hills} ? 0.5 : 0.1;
+}
+float tempAt(int id, int t) { return seasonAt(id).r * 127.5 - 60.0 - 6.5 * heightKm(t); }
+// Snow cover 0..1: none above +1 C, full by -5 C. grain in 0..1 breaks
+// light cover into patches of art pixels.
+float snowAt(int id, int t, float grain) {
+  float cover = smoothstep(1.0, -5.0, tempAt(id, t));
+  return clamp((cover - grain * 0.8) / 0.2, 0.0, 1.0) * step(0.02, cover);
+}
+vec3 seasonal(vec3 c, int t, int id, float grain) {
+  vec4 s = seasonAt(id);
+  float temp = tempAt(id, t);
   float l = lum(c);
-  if (s == 1) {
-    // Snow: bright where the ground is light, blue shadow where it is dark;
-    // trees stay a little darker so forests still read.
-    vec3 snow = mix(vec3(0.58, 0.64, 0.78), vec3(0.97, 0.98, 1.0), clamp(l * 1.9 - 0.15, 0.0, 1.0));
-    bool trees = t == ${T.forest} || t == ${T.broadleaf} || t == ${T.jungle} || t == ${T.highlands};
-    return mix(c, snow, trees ? 0.55 : 0.85);
-  }
+  bool trees = t == ${T.forest} || t == ${T.broadleaf} || t == ${T.jungle} || t == ${T.highlands};
   bool green = t == ${T.grassland} || t == ${T.farmland} || t == ${T.broadleaf} || t == ${T.forest} || t == ${T.mediterranean} || t == ${T.paddies} || t == ${T.steppe} || t == ${T.hills} || t == ${T.marsh};
-  if (s == 2 && green) return clamp(c * vec3(0.92, 1.12, 0.86) + vec3(0.0, 0.02, 0.0), 0.0, 1.0);
   bool gold = t == ${T.grassland} || t == ${T.farmland} || t == ${T.broadleaf} || t == ${T.paddies} || t == ${T.steppe} || t == ${T.hills} || t == ${T.mediterranean};
-  if (s == 3 && gold) return mix(c, vec3(1.4, 0.95, 0.38) * l, t == ${T.broadleaf} ? 0.75 : 0.55);
-  if (s == 3 && t == ${T.forest}) return mix(c, vec3(1.25, 0.9, 0.45) * l, 0.25);
-  if (s == 4) return clamp(mix(c, vec3(0.62, 1.15, 0.5) * l, 0.45), 0.0, 1.0);
-  if (s == 5) return mix(c, vec3(1.02, 0.97, 0.9) * l, 0.45);
-  return c;
+  // Wet season on tropical dry lands, fresh spring green, autumn gold.
+  c = mix(c, clamp(vec3(0.62, 1.15, 0.5) * l, 0.0, 1.0), 0.45 * s.a);
+  if (green) c = mix(c, clamp(c * vec3(0.92, 1.12, 0.86) + vec3(0.0, 0.02, 0.0), 0.0, 1.0), s.b);
+  if (gold) c = mix(c, vec3(1.4, 0.95, 0.38) * l, (t == ${T.broadleaf} ? 0.75 : 0.55) * s.g);
+  else if (t == ${T.forest}) c = mix(c, vec3(1.25, 0.9, 0.45) * l, 0.25 * s.g);
+  // The small white caps of the mountain tiles are snow too: where it is warm
+  // up there (the tropics, or any summer low enough) they turn to bare rock.
+  if (t == ${T.mountains} && l > 0.72) c = mix(c, vec3(0.56, 0.54, 0.52), smoothstep(-1.0, 5.0, temp - 6.5));
+  // Cold without snow leaves the land bare and dull.
+  float cold = smoothstep(9.0, 2.0, temp);
+  c = mix(c, vec3(1.02, 0.97, 0.9) * l, 0.45 * cold);
+  // Snow: bright where the ground is light, blue shadow where it is dark;
+  // trees stay a little darker so forests still read.
+  float snow = snowAt(id, t, grain);
+  vec3 white = mix(vec3(0.58, 0.64, 0.78), vec3(0.97, 0.98, 1.0), clamp(l * 1.9 - 0.15, 0.0, 1.0));
+  return mix(c, white, snow * (trees ? 0.55 : 0.85));
 }
 
 // How much of the realm's colour to lay over the terrain: more when far out,
@@ -189,7 +205,7 @@ vec3 realmWash(vec3 terrain, vec3 realm) {
   return mix(terrain, realm * (0.45 + 0.85 * lum(terrain)), wash());
 }
 // Snow lies over the realm's colour too, so winter reads from far out.
-vec3 snowOver(vec3 c, int id) { return seasonOf(id) == 1 ? mix(c, vec3(0.94, 0.96, 1.0), 0.32) : c; }
+vec3 snowOver(vec3 c, int id, int t, float grain) { return mix(c, vec3(0.94, 0.96, 1.0), 0.32 * snowAt(id, t, grain)); }
 
 vec3 tileAt(bool mini, int row, int variant, ivec2 local) {
   if (mini) return texelFetch(uMini, ivec2(variant * ${TILE / 2} + local.x, row * ${TILE / 2} + local.y), 0).rgb;
@@ -261,11 +277,11 @@ vec3 tiled(bool mini) {
     variant = (q.x >> shift) + 2 * (q.y >> shift);
     local = q & (size - 1);
   }
-  vec3 c = seasonal(tileAt(mini, terrain, variant, local), terrain, id);
+  vec3 c = seasonal(tileAt(mini, terrain, variant, local), terrain, id, hash(a));
   int owner = ownerOf(id);
   bool political = uMode != 1 && owner >= 0;
   if (political) {
-    c = snowOver(realmWash(c, inf.rgb), id);
+    c = snowOver(realmWash(c, inf.rgb), id, terrain, hash(a));
     // A wider band of the owner's colour along its borders.
     bool edge = false;
     for (int k = 0; k < 4; k++) {
@@ -340,7 +356,7 @@ vec3 far() {
 
   vec4 inf = info(id);
   int t = terrainAt(p);
-  vec3 c = seasonal(uTerrain[t], t, id);
+  vec3 c = seasonal(uTerrain[t], t, id, bayer(p));
 
   // Texture: a few darker pixels in fixed patterns, like old tile sets.
   float h = hash(p);
@@ -360,7 +376,7 @@ vec3 far() {
 
   int owner = ownerOf(id);
   bool political = uMode != 1 && owner >= 0;
-  if (political) c = snowOver(realmWash(c, inf.rgb), id);
+  if (political) c = snowOver(realmWash(c, inf.rgb), id, t, bayer(p));
   // Great rivers always, the rest once zoomed in a little.
   int rs = riverAt(p);
   if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, uDepth[0], 0.8);
@@ -432,6 +448,8 @@ export class MapRenderer {
   private tiles: Tile[] = [];
   private infoTex: WebGLTexture;
   private ownerTex: WebGLTexture;
+  private seasonTex: WebGLTexture;
+  private seasonData: Uint8Array;
   private atlasTex: WebGLTexture;
   private miniTex: WebGLTexture;
   private terrainColors: number[];
@@ -450,7 +468,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uMini", "uLand"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uMini", "uLand", "uSeason"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -472,6 +490,8 @@ export class MapRenderer {
     this.ownerData = new Uint8Array(this.infoWidth * rows * 4);
     this.infoTex = makeDataTexture(gl, this.infoWidth, rows);
     this.ownerTex = makeDataTexture(gl, this.infoWidth, rows);
+    this.seasonData = new Uint8Array(this.infoWidth * rows * 4);
+    this.seasonTex = makeDataTexture(gl, this.infoWidth, rows);
 
     const atlas = buildTileAtlas();
     this.atlasTex = makeDataTexture(gl, atlas.width, atlas.height);
@@ -534,10 +554,17 @@ export class MapRenderer {
     this.ownerData[o + 2] = water ? 255 : 0;
   }
 
-  /** The season a province's tiles are drawn in (SEASON in seasons.ts). */
-  setProvinceSeason(i: number, season: number): void {
-    this.ownerData[i * 4 + 3] = season;
+  /** A province's season for this turn: sea-level °C, and autumn, spring and wet season 0..1 (seasons.ts). */
+  setProvinceSeason(i: number, temperature: number, autumn: number, spring: number, wet: number): void {
+    const o = i * 4;
+    const byte = (v: number) => Math.max(0, Math.min(255, Math.round(v * 255)));
+    this.seasonData[o] = byte((temperature + 60) / 127.5);
+    this.seasonData[o + 1] = byte(autumn);
+    this.seasonData[o + 2] = byte(spring);
+    this.seasonData[o + 3] = byte(wet);
+    this.seasonDirty = true;
   }
+  private seasonDirty = false;
 
   uploadProvinceStyles(): void {
     const gl = this.gl;
@@ -546,6 +573,11 @@ export class MapRenderer {
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.infoData);
     gl.bindTexture(gl.TEXTURE_2D, this.ownerTex);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.ownerData);
+    if (this.seasonDirty) {
+      gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.seasonData);
+      this.seasonDirty = false;
+    }
   }
 
   draw(camera: Camera, time: number): void {
@@ -584,6 +616,9 @@ export class MapRenderer {
     gl.activeTexture(gl.TEXTURE5);
     gl.bindTexture(gl.TEXTURE_2D, this.miniTex);
     gl.uniform1i(this.u.uMini!, 5);
+    gl.activeTexture(gl.TEXTURE6);
+    gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
+    gl.uniform1i(this.u.uSeason!, 6);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);
 
