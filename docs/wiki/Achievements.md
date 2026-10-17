@@ -54,7 +54,7 @@ A campaign earns achievements only while all three hold:
 | `cheat_marked` | false: no debug, editor or "free play" cheat was used, even once |
 | `switched_country` | false: you still play the realm you started with |
 
-A campaign that is not ironman earns nothing, for good. A cheat marks the save for good, and nothing from it is awarded, in-game or on any store. Playing on as another country after game over stops achievements from that moment. Any difficulty counts, with historical or free events. The tutorial earns none. Lifetime counters only count campaigns that pass all three flags. The pause menu and the new game screen show whether the campaign can earn achievements, and you are warned once before an action that would end eligibility (turning on a cheat, switching country after game over).
+A campaign that is not ironman earns nothing, for good. A cheat marks the save for good, and nothing from it is awarded, in-game or on any store. Playing on as another country after game over stops achievements from that moment. Any difficulty counts, with historical or free events. The tutorial earns none, and its last card tells you achievements start in a real campaign. Lifetime counters only count campaigns that pass all three flags. The pause menu and the new game screen show whether the campaign can earn achievements, and you are warned once before an action that would end eligibility (turning on a cheat, switching country after game over).
 
 ### Progress bars
 
@@ -74,7 +74,7 @@ An unlock is written to your profile and shown in-game at once, whether or not a
 
 ### Free tier and Steam demo
 
-The free iOS and Android download awards achievements as the full game does, and you keep them when you buy. A row marked full game cannot be earned with the free tier's countries alone; at launch these are *Many Crowns* and *Crowns of the World*. If the free countries include no single-province start, *From One Hall* becomes full game too. The Steam demo awards nothing to Steam directly; it keeps a local list from its ironman games, and when you buy the full game it reads the demo's profile and awards what you earned there.
+The free iOS and Android download awards achievements as the full game does, and you keep them when you buy. A row marked full game cannot be earned with the free tier's countries alone; the free countries are the Ottomans and France, so at launch these are *Our Own Banner*, *The Walls Held*, *The Four Quarters Hold*, *From One Hall*, *Many Tents, One People*, *Many Crowns* and *Crowns of the World*. The Steam demo awards nothing to Steam directly; it keeps a local list from its ironman games, and when you buy the full game it reads the demo's profile and awards what you earned there.
 
 ### Store ids and retiring
 
@@ -96,7 +96,7 @@ All thresholds are provisional placeholders for balancing.
 | Set the Table | copper | You change your food policy |
 | Mustered | copper | You train your first regiment |
 | Ink and Candle | copper | You finish your first invention |
-| Stone upon Stone | copper | You gain your first castle |
+| Stone upon Stone | copper | You gain your first castle (built, or taken in a siege) |
 | A Letter Sealed | copper | You form an alliance |
 | Ink on the Treaty | copper | A war ends with a peace treaty you signed |
 | A Year in the Ledger | copper | You have played 12 turns |
@@ -188,7 +188,7 @@ All thresholds are provisional placeholders for balancing.
 | Paths Not Taken | gold | Across your games, 50 different non-historical options (lifetime, progress) |
 | The Walls Held | gold | On 31 December 1460, as the defender in the fall of Constantinople, you own Constantinople |
 | The Four Quarters Hold | gold | On 31 December 1600, holding a role in the Inca expansion, you own Cusco and are nobody's subject |
-| Unconquered | gold | On 1 January 1914, having started outside Europe, your capital was never occupied from another macro-region |
+| Unconquered | gold | On 1 January 1914, having started outside Europe, your capital was never occupied by a realm whose capital lies in another of the 13 macro-regions (the Middle East counts as Asia) |
 | The Presses Roll | copper | You know printing before 1470 |
 | Chains Broken | silver | Your realm abolishes slavery before 1800 |
 | Stayed Home | silver | With at least 50 provinces, you stay out of the First World War |
@@ -212,7 +212,7 @@ All thresholds are provisional placeholders for balancing.
 ## What you see
 
 - **The toast:** slides in at the top for three seconds with the icon, name and tier, and a short chip-tune sting. While a battle or event screen is open, it waits until the screen closes. With "Achievement toasts" off in [Settings](Settings), there is no toast but the achievement still unlocks.
-- **The achievements screen:** reached from the title screen and the pause menu, a grid of icons grouped by category. Selecting one shows its text, progress and the date earned. An "earnable in this campaign" filter shows achievements not yet earned and not already ruled out (for example a date that has passed).
+- **The achievements screen:** reached from More on the main menu, a grid of icons grouped by category. Selecting one shows its text, progress and the date earned. An "earnable in this campaign" filter shows achievements not yet earned and not already ruled out (for example a date that has passed).
 - **The turn report** gets one line per unlock, with a jump to where it happened when there is a place (the castle, the battlefield).
 - **Eligibility** shows on the pause menu and the new game screen, with a one-time warning before you lose it.
 
@@ -253,29 +253,18 @@ Computer players have no part here; achievements are only for your realm.
 | Google step threshold | 10,000 | store limit |
 | Steam progress popups | 25, 50, 75 % | fixed |
 | Toast duration | 3 seconds | |
-| Store retry interval | "every few minutes", no number yet | open |
+| Store retry interval | 5 minutes | provisional |
 | Icon | 32 × 32, 2-pixel frame | fixed |
 
 ## Still open
 
-- **OQ-ACH-1:** *Stone upon Stone* uses a "castle gained" moment that is not in the moment list.
-- **OQ-ACH-2:** a stale comment says first steps can be earned in the tutorial; they cannot.
-- **OQ-ACH-3:** the free countries are the Ottomans and France, so *From One Hall* and several more look unearnable without the full game but are not marked.
-- **OQ-ACH-4:** saves must adopt the three flags and the profile storage for lifetime counters and the demo list.
-- **OQ-ACH-5:** six rows written before the subjects, diplomacy and exploration designs need checking against them.
-- **OQ-ACH-6:** the config key `on` is read as `true` by some YAML parsers.
-- **OQ-ACH-7:** whether *Counting House*'s target of exactly 10,000 is reported in steps on Google Play.
-- **OQ-ACH-8:** store figures disagree between sources and must be checked in each console.
-- **OQ-ACH-9:** names pointing at real history need a sensitivity review.
-- **OQ-ACH-10:** a final check that nothing matches another game's list; the retry interval and toast sting have no numbers.
-- **OQ-ACH-11:** which macro-regions exist and what "outside" means for *Unconquered*.
-- **OQ-ACH-12:** the tutorial has no line saying achievements start in a real campaign.
-- **OQ-ACH-13:** where the achievements screen opens differs from the screen flow.
-- **OQ-ACH-14:** how a campaign is won is not designed, so victory achievements wait.
+- Store figures (points and counts) are checked again in each store's console before upload.
+- *The Walls Held* and *The Four Quarters Hold* get a sensitivity review of their names.
+- A last check before release that no achievement copies another game's list.
 
 ## For developers
 
 - Spec: [`domain/achievements/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/achievements/spec.md), requirement code **ACH** (ACH-001 to ACH-075).
 - Features: `domain/achievements/features/` (list-rules, unlock-catalogue, scope-and-progress, test-timing, eligibility, store-sync, free-tier-and-demo, icons, in-game-presentation).
-- Code: not written yet. It will live in `packages/engine/src/domain/achievements/`.
+- Code: `packages/engine/src/domain/achievements/`.
 - The catalogue is `achievements.yaml` in the achievements design; its row ids (`first_harvest`, `walls_held_1453` …) are the stable ids every store id comes from.

@@ -138,13 +138,14 @@ Feature: Ports
     Then the province has harbour step 1
 
   @NAVY-013
+  @placeholder
   Scenario: A canoe landing starts with no harbour and extra seafolk
-    # depends on OQ-NAVY-10: the amount of extra seafolk is not given
+    # config: naval.canoeLanding (D-NAVY-10)
     Given the date is 1444
     And the province "Arguin" holds a 1444 port town of tier "landing"
     When the campaign starts
     Then the province "Arguin" has no harbour
-    And the province "Arguin" has extra seafolk and small craft only
+    And the province "Arguin" has 100 extra seafolk and 5 small craft only
 
   @NAVY-015
   Scenario: The 1444 ports data adds up

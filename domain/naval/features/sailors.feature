@@ -35,12 +35,12 @@ Feature: Sailors
       | homeless | 600    | 50       |
       | farmers  | 2000   | 25       |
 
-  @NAVY-026 @open-question
-  Scenario: Seafolk are taken first
-    # depends on OQ-NAVY-29: the design's preview shows "seafolk 280 · homeless 15 · others 5" for 300
-    Given the province "Lagos" has 830 men who can be called, of whom 770 are seafolk
+  @NAVY-026
+  Scenario: Sailors are taken by share
+    # D-NAVY-29, X-7: every class by its share, whole men by largest remainder
+    Given the province "Lagos" has 830 men who can be called: 770 seafolk, 45 homeless and 15 others
     When the country "Portugal" musters 300 sailors in the province "Lagos"
-    Then seafolk are taken before men of any other class
+    Then 278 seafolk, 16 homeless and 6 others are taken
 
   @NAVY-027
   Scenario: A man at sea cannot be levied
@@ -49,15 +49,15 @@ Feature: Sailors
     Then the levy pool of the province "Lagos" shows 75 sailors already gone
     And those 75 men cannot be levied
 
-  @NAVY-028 @placeholder @open-question
+  @NAVY-028 @placeholder
   Scenario: The Lagos muster
-    # depends on OQ-NAVY-14: bounty rate, muster time and fish-lost formula are only given by example
+    # config: naval.muster (D-NAVY-14): 0.05 gold a sailor, 14 days, fish lost = seafolk away ÷ a third of the seafolk
     Given the province "Lagos" has 4600 seafolk
     And the province "Lagos" has 1150 fighting-age men, of whom about 770 can go to sea
     When the country "Portugal" musters 75 sailors in the province "Lagos"
     Then the country "Portugal" pays 4 gold of bounty
     And the province "Lagos" loses 5 percent of its fish while they serve
-    And the 75 sailors are sailors in port at Lagos when the muster is ready
+    And the 75 sailors are sailors in port at Lagos after 14 days
 
   @NAVY-029 @placeholder
   Scenario: Sailors in port eat and are paid
@@ -181,3 +181,16 @@ Feature: Sailors
     When the game checks the province "Lagos"
     Then the province "Lagos" has fewer births for 10 years
     And the province "Lagos" has the grievance "Lost at sea" for 2 years
+
+  @NAVY-121 @placeholder
+  Scenario Outline: Foreign crews per port and year
+    # config: naval.foreignCrewsPerPortPerYear (D-NAVY-22)
+    Given Genoese trade ships call at the port "Lisbon"
+    And the port "Lisbon" has hired <hired> Genoese sailors this year
+    When the country "Portugal" hires <more> more
+    Then the hire is <result>
+
+    Examples:
+      | hired | more | result  |
+      | 0     | 100  | done    |
+      | 60    | 50   | over the year's limit |

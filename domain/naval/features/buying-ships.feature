@@ -187,3 +187,15 @@ Feature: Buying ships
       | a loyal lord with a port is called                   | the lord's ships until his service ends                 |
       | it hires a privateer                                 | a ship, crew and commander for a season                 |
       | an event gives a treasure fleet                      | the ships the event names                               |
+
+  @NAVY-123
+  Scenario Outline: Which ships can trade
+    # D-NAVY-8: one upkeep, naval's; the caravel explores
+    Given a "<ship>"
+    Then it <can> be set to trade
+
+    Examples:
+      | ship    | can    |
+      | cog     | can    |
+      | galleon | can    |
+      | caravel | cannot |

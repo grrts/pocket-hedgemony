@@ -123,8 +123,9 @@ Newest decision first.
 - **SaveKind** (value): `resume`, `autosave`, `manual`, `ironman`, exported (outside the game).
 - **Header** (value): `saveId`, `campaignId`, `kind`, `name`, `savedAt`, `device`, `platform`, `gameVersion`,
   `formatVersion`, `rulesHash`, `mapHash`, `turn`, `date {y, m}`, `playerNation`, `ironman`, `playSeconds`,
-  `options {difficulty, events, endDate}`, `tier {nation, needsFullGame}`, `worldHash`, `thumbnail` (base64 PNG
-  96 × 64), and a modified mark (§6.3).
+  `options {difficulty, events, endDate, aiTemper, fogOfWar, musicEra}` (D-SAVE-8), `tier {nation, needsFullGame, app}`
+  (D-SAVE-13), `flags {ironman_unbroken, cheat_marked, switched_country, began_as_tutorial}` (D-SAVE-1), `worldHash`,
+  `thumbnail` (base64 PNG 96 × 64), and a modified mark (§6.3).
 - **Chunk** (value): id, version, offset, length, CRC-32, deflate bytes. Ids: `core`, `ids`, `provinces`,
   `nations`, `armies`, `events`, `history`, `orders`, later `diplomacy`, `subjects`, `religion`, `culture`,
   `government`, `trade`, `ai` ….
@@ -153,13 +154,13 @@ Newest decision first.
 
 ### 5.2 Kinds of save and Continue
 
-- SAVE-007: When the player ends a turn, pauses, quits, or the app is suspended or backgrounded, the save system shall keep the campaign's Resume save current, keeping 1 per campaign plus the one before it as a backup, and shall not list it in Load. [save-system §2.1; config `kinds.resume`; see OQ-SAVE-2]
+- SAVE-007: When the player ends a turn, pauses, quits or exits to the main menu, or the app is suspended, the save system shall keep the campaign's Resume save current, keeping 1 per campaign plus the one before it as a backup, and shall not list it in Load; when the app is only backgrounded, it shall write the orders journal and no Resume save. [save-system §2.1; config `kinds.resume`; D-SAVE-2]
 - SAVE-008: When a turn starts on the player's autosave interval, the save system shall write an autosave, keep the chosen number per campaign rotating out the oldest, and list them in Load marked "Auto". [save-system §2.1]
 - SAVE-009: When the player taps Save, the save system shall write a manual save with the player's name for it, allowing up to 20 per campaign and 100 in total, listed in Load. [save-system §2.1; config `kinds.manual`]
-- SAVE-010: While a campaign is ironman, the save system shall write its ironman save after every End turn and on every exit, keep 1 per campaign plus a backup, and list it in Load as the campaign itself. [save-system §2.1, §6.2]
+- SAVE-010: While a campaign is ironman, the save system shall write its ironman save after every End turn and on every exit (Save and quit, Exit to main menu, the app being closed; D-SAVE-16), keep 1 per campaign plus a backup, and list it in Load as the campaign itself. [save-system §2.1, §6.2]
 - SAVE-011: When the player taps Export, the save system shall write an exported file that leaves the game, with no limit on how many; imported files shall join the Manual saves. [save-system §2.1, §5.4]
 - SAVE-012: The save system shall group saves by campaign, one new game being one campaign with a random id. [save-system §2.1]
-- SAVE-013: The Load screen shall list campaigns first, each with nation banner, nation name, in-game date, turn, play time and a small map crop, and opening a campaign shall list its saves newest first. [save-system §2.1]
+- SAVE-013: The Load screen shall list campaigns first, each with nation banner, nation name, in-game date, turn, play time and a small map crop, and opening a campaign shall list its saves newest first, each marked autosave or ironman and with the device it came from. [save-system §2.1; screen flow S6; D-SAVE-4]
 - SAVE-014: Continue shall open the newest Resume or Ironman save across all campaigns, on this device or arrived from the cloud; if that save came from another device, the button shall say so ("Continue: Portugal, March 1512 (from Steam Deck)"). [save-system §2.2]
 - SAVE-015: The save system shall offer the autosave interval values every turn, every 6 turns, every 12 turns (each January) and off, default every 12 turns, and the autosaves kept per campaign values 1, 3 and 5, default 3. [save-system §2.3, §8.3; config `kinds.autosave`]
 - SAVE-016: Where the autosave interval is off, the save system shall stop only the rotating autosaves; the Resume save cannot be turned off. [save-system §2.3]
@@ -183,7 +184,7 @@ Newest decision first.
 - SAVE-028: If the journal's turn number or Resume save hash does not match the Resume save, then the save system shall ignore the journal. [save-system §3.1]
 - SAVE-029: The save system shall write the journal on these platform events: iOS `App` plugin `pause` / `appStateChange` (inactive); Android `App` plugin `pause`; desktop window `close`, `before-quit` and `powerMonitor` `suspend` (Steam Deck and Steam Machine suspend this way); web `visibilitychange` (hidden) and `pagehide`. [save-system §3.2]
 - SAVE-030: If a turn is being processed when the app backgrounds, then the save system shall save nothing new, keep the previous Resume save and journal, and process the turn again on resume. [save-system §3.2]
-- SAVE-031: When the player quits on desktop, the game shall wait for the write, up to 2 s. [save-system §3.2; placeholder]
+- SAVE-031: When the player quits on desktop, the game shall wait for the write, up to 2 s. [save-system §3.2; config `desktop_quit_wait_seconds`; placeholder; D-SAVE-12]
 
 ### 5.5 Writing safely and budgets
 
@@ -255,7 +256,7 @@ Newest decision first.
 - SAVE-082: If a purchase is refunded or revoked, then the saves shall stay and those nations shall ask to be unlocked again. [save-system §6.1]
 - SAVE-083: Where the player has the Steam demo and the full game on the same computer, the full game shall find the demo's saves (same save folder name on disk) on first launch and copy them into its own folder, and Steam Cloud shall keep them from then on. [save-system §6.1]
 - SAVE-084: Where a demo player is signed in, their saves shall sync through our server to the full game on any computer or phone; without an account, Export and Import shall do the same. [save-system §6.1]
-- SAVE-085: The save system shall store the demo's limits in the header, and the full game shall drop them on load. [save-system §6.1]
+- SAVE-085: The save system shall store in the header's `tier` the app that wrote the save (`free`, `demo` or `full`) and no list of limits, and the full game shall open such a save with no limits. [save-system §6.1; D-SAVE-13]
 
 ### 5.11 Ironman
 
@@ -271,7 +272,7 @@ Newest decision first.
 - SAVE-092: The save system shall catch damaged or edited files with the CRC on every chunk and the recomputed `worldHash`. [save-system §6.3; config `integrity`]
 - SAVE-093: The save system shall not encrypt saves. [save-system §6.3]
 - SAVE-094: If a save fails the hash check, then it shall open only outside ironman, after a warning, and be marked as modified. [save-system §6.3; config `integrity.modified_saves`]
-- SAVE-095: The header shall carry the `ironman` flag and the modified mark so the achievements context can check them. [save-system §6.3, §8.5; see OQ-SAVE-1]
+- SAVE-095: The header shall carry the `ironman` flag, the modified mark and the flags `ironman_unbroken`, `cheat_marked`, `switched_country` and `began_as_tutorial` so the achievements context can check them. [save-system §6.3, §8.5; X-16; D-SAVE-1]
 - SAVE-096: If a save is damaged or cut short, then the save system shall reject it cleanly and open or offer the previous save ("This save is damaged. The previous save from Dec 1511 was opened instead."). [save-system §2.5, §3.3, §7]
 
 ### 5.13 Bug reports, tests and the engine
@@ -279,6 +280,11 @@ Newest decision first.
 - SAVE-097: When the player chooses Send a report, the report shall attach the Resume save and the orders journal, and sending shall always be the player's choice under the privacy design. [save-system §7]
 - SAVE-098: Before release, the save code shall pass: every save in `test/saves/` loads, migrates and plays a turn; save, load and save again gives byte-identical chunks and the same `worldHash`; a file cut short at any byte is rejected cleanly and the previous save offered; the app killed during a write leaves the old save intact (desktop and both phones); backgrounding, killing and relaunching on a real iPhone and Android phone resumes with the queued orders; two devices with cloud on, played offline and reconnected, show both lines of play, and for ironman the one prompt. [save-system §7]
 - SAVE-099: The engine worker shall produce and read the save bytes (a `save` request returning file bytes, a `load` request that migrates, validates and returns a snapshot, `newGame` carrying the game options, and `endTurn` also returning the serialised Resume save); each platform's storage layer shall only store and list them, and the sync queue shall upload them. [save-system §9 Engine]
+- SAVE-100: Where the autosave interval is every 6 turns, the save system shall write the autosave at the start of the January and July turns, and while a campaign is ironman it shall write no rotating autosaves. [save-system §2.3; config `kinds.autosave.every_6_months`; D-SAVE-9]
+- SAVE-101: When the player picks "Restore the last autosave" on the failure screen, the save system shall open the campaign's Resume save, or its newest rotating autosave when every Resume save is damaged. [screen flow X1; D-SAVE-3]
+- SAVE-102: If an ironman save is imported while the device is offline, then the save system shall refuse it with "Connect to import an ironman save." so the ironman head check always runs. [save-system §6.2; D-SAVE-15]
+- SAVE-103: When the player makes a choice at a before-the-battle stop, the save system shall append it to the orders journal with its day, so a replay reaches the same result. [X-1; D-SAVE-10]
+- SAVE-104: The save system shall sync the personal settings file `settings-personal.json` with the account's saves, under the same rules as a save. [settings §8; D-SAVE-6]
 
 ## 6. Commands
 
@@ -326,7 +332,7 @@ Save commands are local to one player's device and never change the simulation; 
 - When `settings` changes the autosave interval or the number kept, apply it from the next autosave.
 - When `settings` changes "Sync on Wi-Fi only" or Cloud saves on/off, adjust syncing.
 - When the store reports a purchase, refund or revoke, update which saves need the full game (saves stay).
-- When `game-shell` reports `PlayedOnAsAnotherRealm`, record it in the campaign (achievements needs a `switched_country` flag; OQ-SAVE-1).
+- When `game-shell` reports `PlayedOnAsAnotherRealm`, record it in the campaign; the next save's header sets `switched_country` (D-SAVE-1).
 
 ## 9. Monthly turn
 
@@ -386,7 +392,10 @@ From `save-system/save-config.example.yaml` ("numbers here are the defaults the 
 | `integrity.chunk_crc` | Chunk check | crc32 | no | save-config.yaml |
 | `integrity.verify_world_hash` | Hash check | true | no | save-config.yaml |
 | `integrity.modified_saves` | Hash-fail policy | allowed_outside_ironman_with_warning | no | save-config.yaml |
-| (none) | Desktop quit wait | 2 s | yes | not in config file (OQ-SAVE-12) |
+| `desktop_quit_wait_seconds` | Desktop quit wait | 2 s | yes | D-SAVE-12 |
+| `kinds.autosave.every_6_months` | Months of "every 6 turns" | January, July | yes | D-SAVE-9 |
+| `cloud.synced_files` | Files beside saves in the account sync | `settings-personal.json` | no | D-SAVE-6 |
+| `messages.ironman_import_offline` | Offline ironman import | "Connect to import an ironman save." | no | D-SAVE-15 |
 
 ## 11. Seams
 
@@ -395,48 +404,48 @@ From `save-system/save-config.example.yaml` ("numbers here are the defaults the 
 | time-and-turns | upstream | Conformist | Deterministic `processTurn`, `Rng` state, turn number and date, `Order` values, the turn boundary |
 | game-shell | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt |
 | settings | partnership | Partnership | Autosave interval and count values, Cloud saves row, Wi-Fi only, account sign-in; personal settings ride the same account sync and store backups |
-| achievements | downstream | Customer–Supplier | `ironman` flag, modified mark; achievements asks for `ironman_unbroken`, `cheat_marked`, `switched_country`; demo profile carry-over |
-| onboarding | downstream | Customer–Supplier | Tutorial progress and Attention mutes stored apart from saves and synced; chapter saves shipped read-only; "began as the tutorial" mark |
+| achievements | downstream | Customer–Supplier | `ironman` flag, modified mark and the header flags `ironman_unbroken`, `cheat_marked`, `switched_country`, `began_as_tutorial` (X-16, D-SAVE-1); lifetime counters and the demo list live in the player profile |
+| onboarding | downstream | Customer–Supplier | Tutorial progress and Needs attention mutes live in the player profile and sync with it, not in the save (X-16, D-SAVE-1); chapter saves shipped read-only; the `began_as_tutorial` flag |
 | scenario-setup | upstream | Customer–Supplier | Campaign options, ironman choice and player nation at new game |
 | world-map | upstream | Conformist | `mapHash`, province ids, the rename table from `tools/mapgen` |
 | events | upstream | Conformist | Events fired, flags, pending choices and cooldowns (the `events` chunk) |
 | every system context (province, realm, warfare, diplomacy, …) | upstream | Published Language | Each owns a chunk with its own version and migrations |
 
 Changes the saves design asks of other documents (§9), and whether they were taken in:
-- Screen flow: Continue (adopted), Save and Load in the pause menu (adopted), Load screen grouped by campaign (not adopted, OQ-SAVE-4), ironman on new game (adopted).
+- Screen flow: Continue (adopted), Save and Load in the pause menu (adopted), Load screen: campaigns first with S6's marks on each save (D-SAVE-4), ironman on new game (adopted).
 - Settings: autosave options (adopted, settings §5.3), Cloud saves row (adopted, settings §5.7).
 - Store and unlock screens: locked save leads to unlock screen (no design yet).
-- Steam platform plan, Android release plan, iOS release plan, privacy, server, performance targets: no designs yet, except performance.md, which does not list the save budgets (OQ-SAVE-11).
-- Engine: `endTurn` returning the Resume save, `load`, `save`, migration list — not in today's code (`protocol.ts` has only `newGame` without options and `endTurn`) (OQ-SAVE-10).
+- Steam platform plan, Android release plan, iOS release plan, privacy, server, performance targets: no designs yet, except performance.md, which should list the save budgets; saves.json is their source (D-SAVE-11).
+- Engine: `endTurn` returning the Resume save, `load`, `save`, migration list — not in today's code (`protocol.ts` has only `newGame` without options and `endTurn`); a request to the engine build (D-SAVE-10).
 
 Changes other designs ask of saves, and whether they were taken in:
-- Settings §8: personal settings ride the account sync and store backups; Auto-Cloud adds `settings-personal.json` — not in the saves design (OQ-SAVE-6).
-- Tutorial §12: tutorial progress and Attention mutes stored apart and synced; chapter saves read-only; tutorial save turned into a campaign save marked "began as the tutorial" — not in the saves design (OQ-SAVE-6, OQ-SAVE-1).
-- Achievements: three save flags; demo profile carry-over — not in the saves design (OQ-SAVE-1).
-- Screen flow: a save just before the turn runs, and on backgrounding "autosave if anything changed" (OQ-SAVE-3).
+- Settings §8: personal settings ride the account sync and store backups; Auto-Cloud adds `settings-personal.json` — adopted: `settings-personal.json` is in the synced set (D-SAVE-6).
+- Tutorial §12: tutorial progress and Attention mutes stored apart and synced; chapter saves read-only; tutorial save turned into a campaign save marked "began as the tutorial" — adopted: progress and mutes live in the player profile, chapter saves are read-only, `began_as_tutorial` is a header flag (D-SAVE-6, D-SAVE-1).
+- Achievements: the save flags (adopted, D-SAVE-1); demo profile carry-over lives in the player profile.
+- Screen flow: a save just before the turn runs, and on backgrounding "autosave if anything changed" — mapped to the Resume save plus the journal; X1's "Restore the last autosave" restores the Resume save (D-SAVE-3).
 
 ## 12. AI
 
 None. AI countries' state is saved like any other (later an `ai` chunk); no AI decision touches saving.
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-SAVE-1: **Achievement flags.** Achievements v1.1 (16 Oct) makes every achievement ironman-only and asks for three save flags (`ironman_unbroken`, `cheat_marked`, `switched_country`); this supersedes the saves design's recommendation ("no"). The header only has `ironman` and a "modified" mark. The tutorial also asks for a "began as the tutorial" mark. Blocks SAVE-038, SAVE-095.
-- OQ-SAVE-2: **What is written on backgrounding.** §2.1 and the config write the Resume save (and ironman save) on pause, quit, suspend and background; §3.1 and §5.2 say that on backgrounding only the orders journal is written, because serialising the whole world might not fit in the seconds the OS gives. Both can't be the rule for a mid-turn background.
-- OQ-SAVE-3: **Screen flow's "autosave".** Screen flow says an autosave is taken just before the turn runs (G5), on backgrounding "if anything changed" (R1), and X1 offers "Restore the last autosave". In this design autosaves are only the rotating interval saves; the pre-turn state is the Resume save plus journal. The wording needs one mapping.
-- OQ-SAVE-4: **Load screen.** Saves: campaigns first, then their saves, each marked with device. Screen flow S6: a flat list of saves newest first with an autosave or ironman mark. Not reconciled.
-- OQ-SAVE-5: **Server quota and social sign-in.** 300 saves / 200 MB is a starting point to set once real sizes are measured (§8.6); Sign in with Apple, Google and Steam at launch or after (§8.7).
-- OQ-SAVE-6: **Settings and tutorial progress storage.** Settings §4.2 says personal settings sync through the same account and store backups and that Steam Auto-Cloud covers `settings-personal.json`; tutorial §9/§12 asks saves to store tutorial progress and Attention mutes apart from saves and sync them. The saves design has no endpoint, file or synced-set entry for either (principle 6 only says they "live elsewhere").
-- OQ-SAVE-7: **Cheats.** Ironman forbids "console or debug tools"; achievements mention "turning on a cheat" and a `cheat_marked` flag. No design says what cheats or a console exist outside ironman.
-- OQ-SAVE-8: **Header options.** The header's `options` has difficulty, events and end date; the campaign rules (settings §4.3, screen flow S5) also include AI aggression / AI temper, fog of war and possibly the music-era rule. Not said where those are saved.
-- OQ-SAVE-9: **Autosave timing.** "Every 12 turns (each January)" fixes the month; for "every 6 turns" the months are not said. Whether an autosave is written in an ironman campaign is implied (settings hide the rows) but not stated by the saves design.
-- OQ-SAVE-10: **Mid-turn choices and the engine protocol.** Screen flow now stops the month at each player battle, where standing orders can be changed for that battle; the journal holds only orders queued before End turn, so after a kill the replay to the battle is deterministic but choices made at earlier stops in the same month are not recorded. Today's `protocol.ts` also lacks `save`, `load`, `newGame` options and the Resume save in the `endTurn` reply.
-- OQ-SAVE-11: **Budgets not taken in.** `performance/performance.md` does not list the save budgets of §3.4.
-- OQ-SAVE-12: **Desktop quit wait (2 s)** is a number in the design but not in the config file.
-- OQ-SAVE-13: **Steam demo limits.** What limits the demo has (List 3, item 2) and how the header stores them are not designed; the free mobile tier's free nations (the Ottomans and France) are decided.
-- OQ-SAVE-14: **"Send a report" location.** Saves §7 puts it in the pause menu; screen flow puts it only on the failure screen X1.
-- OQ-SAVE-15: **Import of an ironman save while offline.** "Import starts it on this device" but the ironman-head check only runs on upload; an import offline followed by play on the old device recreates the split. The design only covers the split prompt.
-- OQ-SAVE-16: **Ironman exits.** Ironman saves are written "on every exit"; the game menu's "Save and quit" (screen flow) is the only manual path. Whether "Exit to main menu" in ironman and the app being killed mid-turn count as exits is implied, not stated.
+- **D-SAVE-1** (was OQ-SAVE-1) Achievement flags: X-16 decides it. The header gains `ironman_unbroken`, `cheat_marked`, `switched_country` and `began_as_tutorial`; tutorial progress, Needs attention mutes and lifetime counters live in the player profile and sync with it, never in the save; tutorial chapter saves are read-only.
+- **D-SAVE-2** (was OQ-SAVE-2) Backgrounding writes only the orders journal; pause, quit and suspend from a menu write the Resume save (and the ironman save). The journal fits in the seconds the OS gives.
+- **D-SAVE-3** (was OQ-SAVE-3) Screen flow's "autosave before the turn" is the Resume save plus the journal; "Restore the last autosave" on X1 restores the Resume save, or the newest rotating autosave if the Resume save is damaged. One mapping, no new save kind.
+- **D-SAVE-4** (was OQ-SAVE-4) Load screen: campaigns first, then each campaign's saves newest first (SAVE-013), and every save carries screen flow S6's marks: autosave, ironman and the device it came from. The saves design owns the list and grouping keeps one campaign's saves together; screen flow's marks fit inside it.
+- OQ-SAVE-5 (release task) The server quota (300 saves / 200 MB) is set once real sizes are measured, and which social sign-ins ship at launch is a store decision.
+- **D-SAVE-6** (was OQ-SAVE-6) Tutorial progress and mutes live in the player profile (X-16); personal settings sync as one more file, `settings-personal.json`, in the account's synced set with the same rules as a save. No new endpoint.
+- **D-SAVE-7** (was OQ-SAVE-7) Cheats: the game ships no cheats or console; `cheat_marked` is the existing "modified" mark (a save edited outside the game or written by a debug build). No new mechanic.
+- **D-SAVE-8** (was OQ-SAVE-8) Header options hold every campaign rule from the new-game screen: difficulty, events, end date, AI temper, fog of war and the music-era rule. One place for all of them.
+- **D-SAVE-9** (was OQ-SAVE-9) "Every 6 turns" writes in January and July; an ironman campaign writes no rotating autosaves, only its ironman save. Simplest fixed months.
+- **D-SAVE-10** (was OQ-SAVE-10) A choice made at a before-the-battle stop (X-1) is appended to the orders journal with its day, so a replay reaches the same result; the engine protocol's `save`, `load`, `newGame` and the Resume save in `endTurn` are a request to the engine build. Replays stay deterministic.
+- **D-SAVE-11** (was OQ-SAVE-11) The save budgets live in saves.json and performance.md should list them (a request to that document). The config is the source.
+- **D-SAVE-12** (was OQ-SAVE-12) The desktop quit wait of 2 s lives in saves.json as `desktop_quit_wait_seconds` (provisional). Numbers belong in config.
+- **D-SAVE-13** (was OQ-SAVE-13) The header's `tier` holds the nation, whether it needs the full game, and the app that wrote it (`free`, `demo` or `full`), and no list of limits; the full game opens a demo or free save with no limits at all. What the demo limits are is a store decision, not a save-format one.
+- **D-SAVE-14** (was OQ-SAVE-14) "Send a report" sits on the failure screen X1 only, as screen flow says. Latest design wins.
+- **D-SAVE-15** (was OQ-SAVE-15) Importing an ironman save needs a connection: offline, the import is refused with "Connect to import an ironman save", so the head check always runs. It closes the split with no new state.
+- **D-SAVE-16** (was OQ-SAVE-16) Every way out of an ironman campaign is an exit: "Save and quit", "Exit to main menu" and the app being closed write the ironman save; a kill mid-turn resumes from the Resume save and journal like any campaign. One rule for all exits.
 
 ## 14. Traceability
 
@@ -451,7 +460,7 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-005 | migrations.feature | Migrations run in order |
 | SAVE-005 | migrations.feature | Test saves gate every release |
 | SAVE-006 | save-kinds-and-continue.feature | Only game state goes in a save |
-| SAVE-007 | save-kinds-and-continue.feature | The Resume save follows every lifecycle point |
+| SAVE-007 | save-kinds-and-continue.feature | The Resume save follows every lifecycle point; Backgrounding writes only the orders journal |
 | SAVE-008 | save-kinds-and-continue.feature | Autosaves rotate on the chosen interval |
 | SAVE-009 | save-kinds-and-continue.feature | Manual saves have limits |
 | SAVE-010 | ironman.feature | Ironman writes on every exit |
@@ -544,7 +553,7 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-082 | free-tier-saves.feature | Refunds keep saves |
 | SAVE-083 | free-tier-saves.feature | Steam demo saves on the same computer |
 | SAVE-084 | free-tier-saves.feature | Demo saves on another device |
-| SAVE-085 | free-tier-saves.feature | Demo limits are dropped by the full game |
+| SAVE-085 | free-tier-saves.feature | The full game opens a demo save with no limits |
 | SAVE-086 | ironman.feature | Ironman is chosen at the start and kept |
 | SAVE-087 | ironman.feature | What ironman forbids |
 | SAVE-088 | ironman.feature | Export and Import of an ironman save |
@@ -560,4 +569,9 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-096 | safe-writing.feature | A damaged Resume save falls back |
 | SAVE-097 | integrity-and-testing.feature | Send a report |
 | SAVE-098 | integrity-and-testing.feature | Release tests |
-| SAVE-099 | integrity-and-testing.feature | The engine worker reads and writes the bytes |
+| SAVE-099 | integrity-and-testing.feature | The engine worker reads and writes the bytes (todo: engine core protocol, D-SAVE-10) |
+| SAVE-100 | save-kinds-and-continue.feature | Autosaves rotate on the chosen interval |
+| SAVE-101 | save-kinds-and-continue.feature | Restore the last autosave |
+| SAVE-102 | ironman.feature | An ironman save is not imported offline |
+| SAVE-103 | resume-and-orders-journal.feature | A choice at a before-the-battle stop goes into the journal |
+| SAVE-104 | cloud-sync.feature | Personal settings ride the account sync |

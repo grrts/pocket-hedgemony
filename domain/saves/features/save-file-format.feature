@@ -47,7 +47,8 @@ Feature: The save file
     Then the header holds saveId, campaignId, kind "manual", name "Castile, May 1492", savedAt, device "Pixel 8", platform "android"
     And it holds gameVersion, formatVersion, rulesHash, mapHash, turn 577, date 1492-05 and playerNation "castile"
     And it holds ironman false, playSeconds, options with difficulty "normal", events "historical" and endDate "1939-08-31"
-    And it holds tier with nation "castile" and needsFullGame false
+    And its tier is nation "castile", needsFullGame true and app "full"
+    And its flags read ironman_unbroken false, cheat_marked false, switched_country false and began_as_tutorial false
     And it holds worldHash and a 96 × 64 PNG thumbnail
 
   @SAVE-039

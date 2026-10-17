@@ -42,6 +42,13 @@ export function isDerived(stat: string): boolean {
   return Object.values(s).some((scope) => scope[stat]?.kind === "derived");
 }
 
+/** The context a derived statistic's change is handed to instead of being written (trust, notoriety: diplomacy). */
+export function routedTo(stat: string): string | undefined {
+  const s = eventsConfig.statistics as Record<string, Record<string, { owner?: string }>>;
+  for (const scope of Object.values(s)) if (scope[stat]?.owner) return scope[stat].owner;
+  return undefined;
+}
+
 /** The range of a statistic (EVT-055), if the catalogue gives one. */
 export function statRange(stat: string): [number, number] | undefined {
   const s = eventsConfig.statistics as Record<string, Record<string, { range?: number[] | null }>>;
@@ -101,6 +108,12 @@ export const EFFECTS: Record<string, EffectEval> = {
     for (const t of resolve(p.on, ctx)) {
       const stats = statsOf(w, t);
       for (const [stat, change] of Object.entries(p.changes as Record<string, number | string>)) {
+        const routed = routedTo(stat);
+        if (routed) {
+          // trust and notoriety are diplomacy's derived values: the change lands there (D-EVT-14)
+          out.push({ type: "stat", target: t, values: { stat, change, routed } });
+          continue;
+        }
         if (isDerived(stat)) throw new Error(`An event never writes the derived statistic ${stat}; change its inputs or apply a modifier (EVT-054)`);
         const before = Number(stats[stat] ?? 0);
         stats[stat] = clamp(stat, changeStat(before, change));
@@ -200,9 +213,14 @@ export const EFFECTS: Record<string, EffectEval> = {
       }
   },
   rebels: (p, w, ctx, out) => {
+    // a spark: a rising starts at once, its men taken from the province's recruit pool (X-9, D-EVT-5)
     for (const on of resolve(p.on, ctx)) {
-      w.rebels.push({ on, type: String(p.type), size: String(p.size), ...(p.revolution ? { revolution: String(p.revolution) } : {}) });
-      out.push({ type: "rebels", target: on, values: { type: p.type, size: p.size, revolution: p.revolution } });
+      const stats = place(w, on).stats;
+      const pool = Number(stats[eventsConfig.rebel_size_stat] ?? 0);
+      const men = rebelMen(String(p.size), pool);
+      stats[eventsConfig.rebel_size_stat] = pool - men;
+      w.rebels.push({ on, type: String(p.type), size: String(p.size), men, ...(p.revolution ? { revolution: String(p.revolution) } : {}) });
+      out.push({ type: "rebels", target: on, values: { type: p.type, size: p.size, men, revolution: p.revolution } });
     }
   },
   spread: (p, w, ctx, out) => {
@@ -304,11 +322,11 @@ export function applyEffects(list: Effect[] | undefined, w: World, ctx: EffectCt
   return out;
 }
 
-/** Rebels raised by a `rebels` effect: size × the province's manpower yield (balance rebel_sizes). */
-export function rebelMen(size: string, manpowerYield: number): number {
-  const mult = (balance.rebel_sizes as Record<string, number>)[size];
-  if (mult === undefined) throw new Error(`Unknown rebel size: ${size}`);
-  return mult * manpowerYield;
+/** Men a `rebels` effect raises: the size's share of the province's recruit pool (balance rebel_sizes, D-EVT-5). */
+export function rebelMen(size: string, recruitPool: number): number {
+  const share = (balance.rebel_sizes as unknown as Record<string, number>)[size];
+  if (typeof share !== "number") throw new Error(`Unknown rebel size: ${size}`);
+  return Math.floor(share * recruitPool);
 }
 
 /** Declared effect types (vocabulary.yaml). */

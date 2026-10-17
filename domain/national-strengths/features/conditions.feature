@@ -38,9 +38,15 @@ Feature: Heritage conditions
       | 11      | does not hold  |
       | 12      | holds          |
 
-  @HER-044 @open-question
-  # OQ-HER-16: 273 place names still to bind
+  @HER-044
   Scenario: Place names are bound to provinces
     Given a heritage condition uses the place "Kilwa"
-    When heritage is built
-    Then "Kilwa" is bound to one map province in places-to-bind.md
+    When its place names are bound to the map
+    Then "Kilwa" is bound to the one land province nearest the place
+
+  @HER-044
+  Scenario: A place the map does not hold stays unbound
+    Given a heritage condition uses the place "Atlantis"
+    When its place names are bound to the map
+    Then "Atlantis" stays on the list of places to bind
+    And a holds_place condition on it does not hold

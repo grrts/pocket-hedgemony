@@ -155,7 +155,6 @@ export function validate(input: BuildInput): BuildReport {
     for (const { where, c } of [...conditionsOf(ev), ...((ev.selection.modifiers ?? []).map((m) => ({ where: "selection", c: m.if ?? m.condition })))]) {
       leaves(c, (type, p) => {
         if (!conds.has(type)) errors.push(`${ctx}.${where}: undeclared condition type ${type}`);
-        if (type === "is_human" && where !== "selection") errors.push(`${ctx}.${where}: is_human may only appear in selection weights`);
         if (type === "flag") flagsRead.push({ flag: String(p.id), ctx: `${ctx}.${where}` });
         const en = ENUM_PARAMS[type];
         if (en && enums[en[1]] && p[en[0]] !== undefined && !enums[en[1]]!.includes(String(p[en[0]]))) errors.push(`${ctx}.${where}: unknown ${type} ${String(p[en[0]])}`);
@@ -169,7 +168,9 @@ export function validate(input: BuildInput): BuildReport {
       if (type === "religion" && enums.religions && !enums.religions.includes(String(p.set))) errors.push(`${ctx}: unknown religion ${String(p.set)}`);
     }
     // options
-    if (ev.options.length < 2) (ev.importance === "major" ? warnings : errors).push(`${ctx}: ${ev.options.length} option(s); 2 or more expected`);
+    const { min, max } = eventsConfig.balance.options;
+    if (ev.options.length < min) (ev.importance === "major" ? warnings : errors).push(`${ctx}: ${ev.options.length} option(s); ${min} to ${max} expected`);
+    if (ev.options.length > max) errors.push(`${ctx}: ${ev.options.length} options; at most ${max} (D-EVT-7)`);
     const hist = ev.options.filter((o) => o.historical).length;
     if (hist !== 1) errors.push(`${ctx}: ${hist} historical options; exactly one expected`);
     const ids = ev.options.map((o) => o.id);

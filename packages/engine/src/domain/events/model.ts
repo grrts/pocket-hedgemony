@@ -285,6 +285,8 @@ export interface Rebels {
   on: string;
   type: string;
   size: string;
+  /** Men who rose, taken from the province's recruit pool (D-EVT-5). */
+  men?: number;
   /** Revolutions: the event a tagged rising belongs to. */
   revolution?: string;
 }

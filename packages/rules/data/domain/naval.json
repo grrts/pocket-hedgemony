@@ -107,5 +107,24 @@
   "smallCraft": { "crew": 6, "carriesMen": 10, "carriesLoads": 1 },
   "room": { "horse": 4, "gun": 20 },
   "seaBattleMaxSectors": 3,
-  "ai": { "fleetAiRadiusZones": 10 }
+  "ai": { "fleetAiRadiusZones": 10, "seaPowerSeafolkAtSea": 0.25 },
+  "$decided": "17 October: D-NAVY-1..29. Numbers below are provisional where listed in _provisional.",
+  "muster": { "bountyPerSailor": 0.05, "days": 14, "fishingShareOfSeafolk": 0.3333333333333333, "byShare": true },
+  "admiralCommission": { "gold": 10, "wageAtSeaMultiplier": 3, "notCommissioned": ["colonial governor"] },
+  "battleHullStepsLost": 1,
+  "storm": { "chancePerMonth": 0.05, "hullStepsLost": 1 },
+  "canoeLanding": { "extraSeafolk": 100, "smallCraft": 5 },
+  "monsoon": { "needs": "T5", "ships": ["junk", "dhow"], "seas": ["Arabian Sea", "Bay of Bengal", "Gulf of Aden", "Red Sea", "Persian Gulf", "Indian Ocean", "South China Sea", "Java Sea"] },
+  "foreignCrewsPerPortPerYear": 100,
+  "pirates": { "seasonMonths": 3, "startShips": 2, "bases": { "wokou": "Tsushima", "Barbary corsairs": "Algiers", "Aegean corsairs": "Mani", "Orang Laut": "Riau" } },
+  "laterShips": {
+    "ironclad": { "family": "military", "crew": 300, "gold": 300, "iron": 80, "months": 12, "upkeep": 6 },
+    "dreadnought": { "family": "military", "crew": 800, "gold": 1200, "iron": 300, "months": 24, "upkeep": 20 },
+    "submarine": { "family": "military", "crew": 40, "gold": 250, "iron": 40, "months": 12, "upkeep": 4 },
+    "aircraft carrier": { "family": "military", "crew": 1500, "gold": 1500, "iron": 300, "months": 30, "upkeep": 25 }
+  },
+  "frozenSeas": { "$comment": "X-17: provisional until world-map's frozen lookup exists", "months": [12, 1, 2, 3], "zones": ["Gulf of Bothnia", "Bay of Bothnia", "Gulf of Finland", "White Sea", "Barents Sea", "Kara Sea"] },
+  "coalPerMonthAtSea": 1,
+  "powderPerVoyage": 1,
+  "_provisional": ["berthsByHarbourStep", "slipwaysByShipyardStep", "musterShare", "ai.seaPowerSeafolkAtSea", "muster.bountyPerSailor", "muster.days", "muster.fishingShareOfSeafolk", "storm.chancePerMonth", "canoeLanding", "foreignCrewsPerPortPerYear", "pirates", "laterShips", "coalPerMonthAtSea", "powderPerVoyage", "frozenSeas"]
 }

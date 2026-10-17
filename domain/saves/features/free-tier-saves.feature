@@ -58,9 +58,9 @@ Feature: Free tier and full game saves
       | signed in            | through our server          |
       | without an account   | by Export and Import        |
 
-  @SAVE-085 @open-question
-  Scenario: Demo limits are dropped by the full game
-    # OQ-SAVE-13: the demo's limits are not yet designed
-    Given a save made in the Steam demo with the demo's limits in its header
+  @SAVE-085
+  Scenario: The full game opens a demo save with no limits
+    Given a save made in the Steam demo
+    Then its header's tier names the app "demo" and lists no limits
     When the full game loads it
-    Then the demo's limits are dropped
+    Then the save opens

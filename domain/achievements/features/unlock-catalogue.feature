@@ -11,8 +11,7 @@ Feature: Unlock the catalogue
     And the campaign is not cheat-marked
     And the player still plays the realm they started with
 
-  # first_castle uses the moment castle_gained, which is not in the design's moment list (OQ-ACH-1).
-  @ACH-015 @ACH-016 @placeholder @open-question
+  @ACH-015 @ACH-016 @placeholder
   Scenario Outline: First steps achievement "<name>" unlocks on its moment
     Given the achievement "<id>" is locked
     And its test <test> holds
@@ -109,8 +108,7 @@ Feature: Unlock the catalogue
       | style_adopted | A New Way of War | style_adopted | {styles_adopted: 1} | silver | 10 | campaign |
       | defend_every_province | Not One Field | war_end | {player_role: defender, player_won: true, enemy_to_player_people_ratio_min: 2.0, provinces_lost: 0} | gold | 20 | campaign |
 
-  # Several sea rows wait on the exploration and naval designs (OQ-ACH-5).
-  @ACH-015 @ACH-021 @placeholder @open-question
+  @ACH-015 @ACH-021 @placeholder
   Scenario Outline: Sea and the wider world achievement "<name>" unlocks on its moment
     Given the achievement "<id>" is locked
     And its test <test> holds
@@ -143,8 +141,7 @@ Feature: Unlock the catalogue
       | great_revolt_beaten | The Realm Holds | rebellion_end | {severity: great_revolt, rebels_won: false} | silver | 10 | campaign |
       | quiet_land | A Quiet Land | turn_end | {provinces_min: 20, months_no_unrest_tier: 300} | gold | 20 | campaign |
 
-  # Our Own Banner and Tribute Roads wait on the subjects design (OQ-ACH-5).
-  @ACH-015 @ACH-023 @placeholder @open-question
+  @ACH-015 @ACH-023 @placeholder
   Scenario Outline: Abroad achievement "<name>" unlocks on its moment
     Given the achievement "<id>" is locked
     And its test <test> holds

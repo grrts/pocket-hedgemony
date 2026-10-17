@@ -33,12 +33,19 @@ Feature: Integrity, bug reports and release tests
       | is not ironman | a warning is shown, then it opens and is marked as modified in its header |
       | is ironman     | it does not open                                                    |
 
-  @SAVE-095 @open-question
+  @SAVE-095
   Scenario: Achievements can read the flags
-    # OQ-SAVE-1: achievements asks for ironman_unbroken, cheat_marked and switched_country
     Given a save is written
     When the achievements context reads its header
     Then it finds the ironman flag and the modified mark
+    And it finds the flags ironman_unbroken, cheat_marked, switched_country and began_as_tutorial
+
+  @SAVE-095
+  Scenario: Playing on as another realm marks the save
+    Given the campaign as "Castile" is ironman
+    And the player played on as another realm after game over
+    When the player ends the turn
+    Then the save's flags read ironman_unbroken true, cheat_marked false, switched_country true and began_as_tutorial false
 
   @SAVE-096
   Scenario: A file cut short
@@ -71,9 +78,9 @@ Feature: Integrity, bug reports and release tests
       | two devices with cloud on, played offline and reconnected, show both lines of play         |
       | two devices with one ironman campaign, played offline and reconnected, show the one prompt |
 
-  @SAVE-099 @open-question
+  # D-SAVE-10: the protocol requests are a request to the engine build (protocol.ts is engine core).
+  @SAVE-099
   Scenario Outline: The engine worker reads and writes the bytes
-    # OQ-SAVE-10: today's protocol has only newGame without options and endTurn
     Given the engine worker runs
     When the client sends the request "<request>"
     Then the worker <reply>

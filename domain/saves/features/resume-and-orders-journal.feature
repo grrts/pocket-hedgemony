@@ -94,3 +94,9 @@ Feature: Resume save and orders journal
       | write | close |
       | 0.3   | 0.3   |
       | 5     | 2     |
+
+  @SAVE-103
+  Scenario: A choice at a before-the-battle stop goes into the journal
+    Given the player has queued orders since the turn began
+    When the player chooses "withdraw" at a before-the-battle stop on day 12
+    Then the orders journal holds "withdraw" on day 12

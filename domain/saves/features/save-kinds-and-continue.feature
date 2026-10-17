@@ -27,24 +27,30 @@ Feature: Kinds of save and Continue
       | purchases                   |
       | achievement progress        |
 
-  @SAVE-007 @open-question
+  @SAVE-007
   Scenario Outline: The Resume save follows every lifecycle point
-    # OQ-SAVE-2: on backgrounding the design also says only the journal is written
     Given the campaign as "Castile" is loaded and is not ironman
-    When <trigger>
+    When the lifecycle moment "<moment>" comes
     Then the Resume save of the campaign is current
     And the campaign keeps 1 Resume save and 1 backup
     And the Resume save is not listed in Load
 
     Examples:
-      | trigger                        |
-      | the player ends the turn       |
-      | the player pauses              |
-      | the player quits               |
-      | the app is suspended           |
-      | the app is backgrounded        |
+      | moment                 |
+      | End turn               |
+      | pause                  |
+      | quit                   |
+      | exit to the main menu  |
+      | suspend                |
 
-  @SAVE-008 @SAVE-015
+  @SAVE-007 @SAVE-026
+  Scenario: Backgrounding writes only the orders journal
+    Given the campaign as "Castile" is loaded and is not ironman
+    When the lifecycle moment "background" comes
+    Then the orders journal is written
+    And no Resume save is written
+
+  @SAVE-008 @SAVE-015 @SAVE-100
   Scenario Outline: Autosaves rotate on the chosen interval
     Given the autosave interval is "<interval>"
     And autosaves kept per campaign is <keep>
@@ -58,6 +64,9 @@ Feature: Kinds of save and Continue
       | every 12 turns  | 3    | 2        | March    | no autosave is written                                       |
       | every turn      | 1    | 1        | March    | a new autosave marked "Auto" is written and the oldest is removed |
       | every turn      | 5    | 2        | March    | a new autosave marked "Auto" is written and none is removed  |
+      | every 6 turns   | 3    | 1        | July     | a new autosave marked "Auto" is written and none is removed  |
+      | every 6 turns   | 3    | 1        | January  | a new autosave marked "Auto" is written and none is removed  |
+      | every 6 turns   | 3    | 1        | March    | no autosave is written                                       |
 
   @SAVE-015
   Scenario: Autosave defaults
@@ -131,3 +140,15 @@ Feature: Kinds of save and Continue
       | nation   | date       | device     | this device | label                                         |
       | Portugal | March 1512 | Steam Deck | Pixel 8     | Continue: Portugal, March 1512 (from Steam Deck) |
       | Castile  | May 1492   | Pixel 8    | Pixel 8     | Continue: Castile, May 1492                   |
+
+  @SAVE-101
+  Scenario Outline: Restore the last autosave
+    Given the campaign as "Castile" has a Resume save and 2 autosaves
+    And its Resume saves are <state>
+    When the player picks "Restore the last autosave" on the failure screen
+    Then the <opened> is opened
+
+    Examples:
+      | state   | opened          |
+      | sound   | Resume save     |
+      | damaged | newest autosave |

@@ -31,7 +31,7 @@ A harbour burned in a raid or sacked with the town falls a step, and one whose s
 
 Sailors are people, counted one by one. Mustering turns people of a port province into sailors; each leaves their class and their home slot stays empty until released. Every sailor counts the same toward a crew.
 
-**Mustering.** *Muster sailors* is offered on a port, or on the country card for several ports at once, with one slider, only for provinces with a harbour. Of a province's fighting-age men (a quarter of its people), a muster can call 2 in 3 of the seafolk, 1 in 3 of the homeless and 1 in 20 of every other class, seafolk first. Sailors come from the same people as the levy, so a man at sea can't be levied and the levy pool shows the sailors already gone. A muster pays a gold bounty for signing on, lowers the province's fish for the seafolk away, and has the sailors ready in that port after a muster time.
+**Mustering.** *Muster sailors* is offered on a port, or on the country card for several ports at once, with one slider, only for provinces with a harbour. Of a province's fighting-age men (a quarter of its people), a muster can call 2 in 3 of the seafolk, 1 in 3 of the homeless and 1 in 20 of every other class, each class by its share. Sailors come from the same people as the levy, so a man at sea can't be levied and the levy pool shows the sailors already gone. A muster pays a bounty of 0.05 gold a sailor, lowers the province's fish for the seafolk away, and has the sailors ready in that port after 14 days.
 
 **Waiting in port.** Each sailor in port eats 1 ration a month from the province store and is paid 0.1 gold. After 6 months with no ship being built for them, 1 in 10 drift back to their slots each month.
 
@@ -76,7 +76,7 @@ Every type belongs to one **family**, which sets its supply: trade and military 
 | Turtle ship | Military | S8 | shipyard 2 | 120 | 150 | 12 | 8 | 6 | | |
 | Ship of the line | Military | S9 | shipyard 3 | 600 | 600 | 60 | 18 | 25 | | |
 | Steamer | Trade | S13 | shipyard 3 | 40 | 200 | 20 + 40 iron | 8 | 3 + coal | ×6 | 150 |
-| Ironclads, dreadnoughts, submarines, carriers | Military | S14 to S18 | shipyard 3 | not given | | steel and coal or oil | | | | |
+| Ironclads, dreadnoughts, submarines, carriers | Military | S14 to S18 | shipyard 3 | first guesses in config | | steel and coal or oil | | | | |
 
 Hold and purse are the [Trade](Trade) design's numbers.
 
@@ -162,7 +162,7 @@ Fleets are movers on the same map and clock as armies (see [Troop-Movement](Troo
 
 ### Against an enemy at sea
 
-Sea battles follow warfare's bell rules on at most 3 sectors. On top of them:
+Sea battles are fought over time, in rounds of 4 hours. While one of your fleets is in a battle, time slows to six 4-hour steps a day, so other fleets can sail in and join. You can't skip a battle, but you can watch it, change its orders or retreat at any step, and switch between battles running at once. Battles between computer players never slow the game. Each round follows warfare's bell rules on at most 3 sectors. On top of them:
 
 - Each ship fights with the share of its crew aboard.
 - When an admiral gives a **Close** order or a galley rams, its soldiers aboard fight the enemy ship's crew and soldiers by the land bell rules on a single sector, and the ship whose defenders break is taken.
@@ -174,11 +174,11 @@ Sea battles follow warfare's bell rules on at most 3 sectors. On top of them:
 
 ### The computer players
 
-Sea powers (Venice, Genoa, Portugal, the Hanse towns, Hormuz, Malacca, Ryukyu) keep a share of their seafolk at sea, buy trade ships first and warships when a rival's fleet grows. Land powers lay up their few ships in peace and fit them out when a war starts across water. Every AI keeps a customs officer in each great port it holds, so it has admirals to commission. AI fleets plan with the same zone graph and wind calendar. A peaceful AI fleet more than 10 zones from the player's realm and ports runs no fleet AI; its voyage is resolved as a day count. Fleets move once a day using a cached shortest path per ship class, research step and month, recomputed only when research or a port changes.
+Sea powers (Venice, Genoa, Portugal, the Hanse towns, Hormuz, Malacca, Ryukyu) keep a quarter of their seafolk at sea, buy trade ships first and warships when a rival's fleet grows. Land powers lay up their few ships in peace and fit them out when a war starts across water. Every AI keeps a customs officer in each great port it holds, so it has admirals to commission. AI fleets plan with the same zone graph and wind calendar. A peaceful AI fleet more than 10 zones from the player's realm and ports runs no fleet AI; its voyage is resolved as a day count. Fleets move once a day using a cached shortest path per ship class, research step and month, recomputed only when research or a port changes.
 
 ### Each day and each month
 
-Each day of the day loop fleets take their step and use supply, and storms, ice, docking, resupply and battles happen on their day. Each month: pay wages and upkeep and feed sailors (unpaid crews desert and foreign crews leave); sailors waiting over 6 months drift home; hulls advance and finished ships launch; rot, the 10-year wreck and refits apply; a fifth of in-port wages is spent in the port; province effects update. Each season pirate fleets grow or stay. Each year ships age and admirals may gain Logistics.
+Each day of the day loop fleets take their step and use supply, and storms, ice, docking and resupply happen on their day; a battle starts on its day and runs in 4-hour steps until one side is beaten or retreats. Each month: pay wages and upkeep and feed sailors (unpaid crews desert and foreign crews leave); sailors waiting over 6 months drift home; hulls advance and finished ships launch; rot, the 10-year wreck and refits apply; a fifth of in-port wages is spent in the port; province effects update. Each season pirate fleets grow or stay. Each year ships age and admirals may gain Logistics.
 
 ## What you see
 
@@ -218,7 +218,7 @@ All values are **placeholders** in one naval config file (keys proposed by the s
 | `naval.slipways_by_shipyard_step` | 1 / 2 / 2 (Arsenal 3) |
 | `naval.berths_per_large_ship` | 2 |
 | `naval.muster_share` | seafolk 2/3, homeless 1/3, others 1/20 |
-| `naval.bounty_per_sailor`, `naval.muster_time` | not given (examples: 4 gold for 75; 2 weeks) |
+| `naval.bounty_per_sailor`, `naval.muster_time` | 0.05 gold a sailor; 14 days |
 | `naval.wage_in_port` / `wage_at_sea` | 0.1 / 0.2 gold a month |
 | `naval.ration_in_port` | 1 |
 | `naval.foreign_wage_multiplier` | 2 |
@@ -251,37 +251,27 @@ All values are **placeholders** in one naval config file (keys proposed by the s
 
 Ports data: `naval/data/ports-1444.tsv` (hand-edited) and the generated `ports-1444.json` and `start-ports.json`, made by `naval/tools/place_ports.py`.
 
+## How the open points were settled
+
+- **Mustering** takes every class by its share, not seafolk first: from 770 seafolk, 45 homeless and 15 others, 300 sailors are 278 seafolk, 16 homeless and 6 others. The bounty is 0.05 gold a sailor (75 sailors cost 4 gold), the sailors are ready after 14 days, and the province loses fish in proportion to the seafolk away out of the third of its seafolk who fish.
+- **Admirals**: commissioning costs 10 gold and the admiral is paid three times his wage at sea. Years an official served in a port province count double, with the usual +1 at 5 and 10 years. A colonial governor cannot be made an admiral. Women can be admirals where the country's history allows women commanders.
+- **Battle damage**: a ship that takes hits and stays afloat loses one hull step; hits equal to its strength sink it. Repairs happen at harbour step 2 or a shipyard.
+- **Storms**: in storm season each ship at sea has a 1 in 20 chance a month to be struck, less with a good admiral's Logistics and halved next to a lighthouse. A struck ship loses a hull step, and a wrecked one sinks.
+- **Trade ships**: the caravel cannot trade; trading ships pay their normal upkeep.
+- **Ships of the line** need S9 and a step 3 shipyard (which needs S10), or the Arsenal.
+- **Harbour step 3** only adds coaling and berths; ocean ships don't need it. A naval base saves wages only while ships are in port. A half-crewed ship takes twice the days.
+- **Small craft** count as trade ships with 15 days of supply and can be built on any shore with seafolk. Canoe landings start with 100 extra seafolk and 5 small craft.
+- **Junks and dhows** may cross their own monsoon seas (the Indian Ocean seas, the South China Sea and the Java Sea) once their realm knows T5, which its home regions know in 1444.
+- **Foreign crews**: a port can hire up to 100 sailors a year from realms whose trade ships call there.
+- **Pirates**: each pirate fleet starts with 2 ships, a season lasts 3 months, and each pirate coast has one base province (Algiers for the Barbary corsairs). Burning it ends the fleet until trade brings it back.
+- **Sea-power AIs** keep a quarter of the seafolk they can call at sea.
+- **Frozen seas**: from December to March the Gulf of Bothnia, the White Sea and the far northern seas freeze. No fleet can enter them, and their ports can neither launch nor take in ships until spring.
+- **Docking** works in ports of realms at peace and not rivals. In a subject's or lord's port, food comes from that province's store and nothing is owed.
+- **Later ships** (ironclads, dreadnoughts, submarines and aircraft carriers) have first-guess numbers. Many naval numbers are first guesses and will be tuned.
+
 ## Still open
 
-- **OQ-NAVY-1**: berths and slipways per step need balancing with trade's ship numbers.
-- **OQ-NAVY-2**: the seafolk share (2 in 3) may make small coastal realms' fleets too big.
-- **OQ-NAVY-3**: whether women can be admirals and sailors.
-- **OQ-NAVY-4**: ships of the line need S9, but shipyard step 3 needs S10.
-- **OQ-NAVY-5**: warfare has not taken in naval's ship rows, families, crews and admirals.
-- **OQ-NAVY-6**: how battle hits turn into hull steps, and where repairs happen.
-- **OQ-NAVY-7**: how the different storm rules combine, and what a lighthouse covers.
-- **OQ-NAVY-8**: trade and naval disagree on which ships can trade and their upkeep.
-- **OQ-NAVY-9**: Pressed and Lost at sea are not in the province grievance list.
-- **OQ-NAVY-10**: canoe landings' extra seafolk have no amount.
-- **OQ-NAVY-11**: recruiting has not adopted sailors in the levy pool or the admiral commission.
-- **OQ-NAVY-12**: country stats lacks Sailors and Admirals rows.
-- **OQ-NAVY-13**: diplomacy doesn't cover docking, selling hulls or privateers.
-- **OQ-NAVY-14**: the bounty, muster time and fish-lost rules are given only by example.
-- **OQ-NAVY-15**: the admiral's commission cost and pay are only in an example.
-- **OQ-NAVY-16**: whether ocean ships need harbour 3.
-- **OQ-NAVY-17**: what a naval base saves (wages in port or at sea).
-- **OQ-NAVY-18**: whether under-crewing slows a ship proportionally or by a flat ×2.
-- **OQ-NAVY-19**: small craft's family, supply and where they can be built.
-- **OQ-NAVY-20**: what "their own monsoon seas" are for junks and dhows.
-- **OQ-NAVY-21**: later ships have no numbers, and S18 carriers may be after 1939.
-- **OQ-NAVY-22**: which foreign crews call where, and how many.
-- **OQ-NAVY-23**: pirate season length, starting size, zones and base rule.
-- **OQ-NAVY-24**: whether a colonial governor can be an admiral.
-- **OQ-NAVY-25**: the share of seafolk sea-power AIs keep at sea.
-- **OQ-NAVY-26**: subjects' asks ("your sea route", a colony's defence, an overseas trade empire).
-- **OQ-NAVY-27**: some ports share a province and need the placer rerun when provinces split.
-- **OQ-NAVY-28**: whose store pays for docking in a subject's or lord's port.
-- **OQ-NAVY-29**: whether seafolk are taken first or by share.
+Nothing in the rules. Balancing is a tuning pass on the numbers.
 
 ## For developers
 

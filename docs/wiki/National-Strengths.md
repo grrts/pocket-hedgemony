@@ -33,7 +33,7 @@ A heyday belongs to one age of the [historical events](Historical-Events) system
 
 Portugal's heyday "Carreira da Índia" belongs to the Age of Exploration and wakes when Portugal has an Atlantic harbour and knows invention S4. If Portugal loses its Atlantic harbours it falls asleep, keeping its years. Because heydays follow the ages as they actually happen in your campaign, an early Atlantic crossing that starts the Age of Atlantic Empires early lets Atlantic heydays wake early too.
 
-**Marks.** A heyday that was awake for 25 years in total leaves a mark when it ends: a permanent legacy worth a third of the heyday. Carreira da Índia awake for 24 years leaves nothing; at 25 years it leaves the mark "Cape charts". A heyday with no mark written for it leaves its first lever at a third of its value, so a heyday with +15 tax reach leaves a legacy of +5.
+**Marks.** A heyday that was awake for 25 years in total leaves a mark when it ends: a permanent legacy worth a third of the heyday, which counts toward the 5 legacies. Carreira da Índia awake for 24 years leaves nothing; at 25 years it leaves the mark "Cape charts". A heyday with no mark written for it leaves its first lever at a third of its value, so a heyday with +15 tax reach leaves a legacy of +5.
 
 At most 2 heydays can be awake at once. If a third would wake, you are asked which one sleeps.
 
@@ -52,7 +52,7 @@ Ambitions stay hidden. While an ambition is open, its plain goal is never shown.
 
 When Portugal holds Calicut, its ambition "Beyond the Cape of Storms" is done and grants the legacy "Estado da Índia". If its window ends in 1560, the ambition is lost when 1561 begins.
 
-**Warmth** is the share of the goal's conditions that currently hold, shown in three bands: cold (under a third), warm (under two thirds) and hot (above). A count condition counts as partly met by how far it has come: a goal of 12 markets with 8 built is two thirds met. A goal that is a single yes-or-no condition goes from cold straight to done.
+**Warmth** is the share of the goal's conditions that currently hold, shown in three bands: cold (under a third), warm (from a third to under two thirds) and hot (two thirds or more). A count condition counts as partly met by how far it has come: a goal of 12 markets with 8 built is two thirds met. A goal that is a single yes-or-no condition goes from cold straight to done.
 
 | Goal conditions | Holding | Warmth |
 |---|---|---|
@@ -68,7 +68,7 @@ When Portugal holds Calicut, its ambition "Beyond the Cape of Storms" is done an
 |---|---|---|---|---|---|---|---|
 | Gold | 30 | 50 | 80 | 120 | 180 | 260 | 380 |
 
-**Envoys.** A country that keeps an envoy at a foreign court for 2 years learns the hint and warmth of one of that country's active ambitions, never its plain goal. Milan with an envoy at Venice's court learns one of Venice's. The computer can do the same to you.
+**Envoys.** A country that keeps a resident envoy at a foreign court for 2 years learns the hint and warmth of one of that country's active ambitions, never its plain goal. Milan with an envoy at Venice's court learns one of Venice's. The computer can do the same to you.
 
 **Age ambitions.** Some pool entries name an age; they join the pool when that age begins.
 
@@ -113,7 +113,7 @@ There are 64 levers in 13 groups:
 | Building (2) | building cost, building unlock | building unlock 1.5 (flag) |
 | Events (3) | event weight, event option, stat | stat: by the stat's points |
 
-Twelve levers are provisional because the design that owns their rule is still being written: tribute, official capacity, lord capacity, ship build, crew, sea days, trader count, trader gain, faith shift, tongue shift, envoy count and opinion steps. Their owner may rename them or point them at a rule; only the key changes in heritage data.
+Ten levers are provisional because the design that owns their rule is still being written: tribute, official capacity, lord capacity, ship build, crew, sea days, faith shift, tongue shift, envoy count and opinion steps. The trade levers follow the trade design: trade balance and traders passing raise the trade ratio gain, trader gain raises each deposit, and trader count gives extra traders at the start. Building levers use the buildings design's buildings, and a unique building variant is unlocked the same way. Their owner may rename them or point them at a rule; only the key changes in heritage data.
 
 A lever can be limited to a scope with `where`: realm, capital, coast, core, royal, lords, frontier, a terrain, a culture group, a faith, an area or a region. A limited lever costs less.
 
@@ -167,11 +167,11 @@ A scoped lever's cost is multiplied by its scope factor: a single `where` limit 
 
 Generated heritage comes from 27 archetypes. Each has detection rules on catalogue fields and templates for the birthright, heyday and burden, written in the country's own words. The game scores every generated country against all archetypes: the best gives the birthright and burden, the second best may add a heyday. A generated heyday gets the first allowed age whose regions cover the country, with percentages scaled to the budget. Ambitions are filled from the catalogue record: likely rivals become "outlast" goals, preferred partners "bind or ally", disputed territories and key locations "hold a place", possible future paths a historical path, and trade routes "win a trade hub". Decentralised polities only take the crownless archetypes (forest, hill, herding, steppe, desert, island, mountain, ocean, chiefdom, commune, raiders, segmentary). A hand-written file overrides whatever generated parts it defines.
 
-The current build has 706 countries with heritage (58 hand-written, 648 generated), 3,551 ambitions, 945 heydays and 706 burdens, with 0 errors, 0 warnings, 273 place names still to bind, and every lever in use.
+The current build has 706 countries with heritage (58 hand-written, 648 generated), 3,551 ambitions, 945 heydays and 706 burdens, with 0 errors, 0 warnings, 273 place names to bind (most bind to the map's nearest land province by their name; the rest are bound by hand), and all 64 levers in use.
 
 ### When countries change hands
 
-- **Annexation.** The annexed country's birthright becomes a dormant claim of the annexer. Once the annexer has owned its old capital and held most of its homeland for 30 years, and its primary culture is accepted or the annexer's own, the claim wakes as a second birthright. A country holds at most 2 birthrights.
+- **Annexation.** The annexed country's birthright becomes a dormant claim of the annexer. Once the annexer has owned its old capital and held most of its homeland for 30 years, the claim wakes as a second birthright. A country holds at most 2 birthrights.
 - **Subjects** keep their whole heritage, and an overlord's legacies never apply to its subjects.
 - **Released countries** get their catalogue heritage, or their archetype's generated heritage if they are not in the catalogue.
 - **Formed countries** (a union, or a new state made by an event) keep the forming country's birthright and legacies, add the formed country's own heritage if any, and draw ambitions from both pools.
@@ -182,7 +182,7 @@ Heritage proposes four effects and one condition to the event tree. `grant_legac
 
 ### The computer
 
-The computer always knows its own ambitions and treats them as goals with weight 1.5 next to its personality priorities. When it completes one, it gets the legacy just as you would. Heydays give it a reason to change course across the centuries. It can read your ambitions through an envoy kept 2 years at your court.
+The computer always knows its own ambitions and treats them as goals with weight 1.5 next to its personality priorities. When it completes one, it gets the legacy just as you would. Heydays give it a reason to change course across the centuries. It can read your ambitions through a resident envoy kept 2 years at your court. When a third heyday would wake or a sixth legacy arrives, it lets the weakest one go (the one worth the fewest points).
 
 ## What you see
 
@@ -206,7 +206,7 @@ The computer always knows its own ambitions and treats them as goals with weight
 - [Naval](Naval): ship build, crew and sea days (provisional).
 - [Buildings](Buildings): building cost and unlock levers; unique variants and landmarks offered as hooks.
 - [Government](Government): official and lord capacity; reforms that shed burdens.
-- [Religion](Religion) and [Culture](Culture): faith and tongue shift; accepted cultures for dormant claims.
+- [Religion](Religion) and [Culture](Culture): faith and tongue shift.
 - [Diplomacy](Diplomacy): envoys, annexation and release; envoy and opinion levers.
 - [Subjects](Subjects): tribute; subjects keep their heritage.
 - [Revolutions](Revolutions): reforms and revolutions can shed burdens or grant legacies.
@@ -219,7 +219,7 @@ The computer always knows its own ambitions and treats them as goals with weight
 
 ### Each turn
 
-The design does not yet say how often conditions are checked. In order, heritage needs to: check birthright needs and dormant claims; check heydays, count years awake, grant marks and resolve a third waking; check ambitions, warmth, deadlines and draws, with digest lines; check the burden's shed condition and resolve a sixth legacy; then publish its active levers to the systems that own them before they compute their own monthly numbers.
+Heritage is checked once a turn, right after historical events, and counts time in months (12 turns make a year, so a heyday needs 300 awake turns to leave its mark). In order, heritage checks dormant claims and birthright needs; heydays, counting a month awake, granting marks and resolving a third waking; ambitions, warmth, deadlines and draws, with digest lines; the burden's shed condition and a sixth legacy; then publishes its active levers to the systems that own them for the next month.
 
 ## Numbers
 
@@ -233,14 +233,16 @@ From `heritage-rules.json` and `levers.json`. All are provisional placeholders e
 | `stat_points.*` | legitimacy 0.1, stability 1, prestige 1, notoriety 0.5, admin capacity 0.1, literacy 0.2, cohesion 0.1 |
 | `birthright.per_country` | 1 (fixed) |
 | `heydays.max_per_country` / `max_active` | 3 / 2 |
-| `heydays.mark_after_years` / `mark_share` | 25 / 0.33 |
+| `heydays.mark_after_years` / `mark_share` | 25 / a third |
 | `ambitions.active` / `guaranteed_historical` | 3 / 1 |
 | `ambitions.pool_min_authored` / `pool_min_generated` | 5 / 4 |
 | `ambitions.counsel.cooldown_years` / `gold_by_era` | 10 / 30, 50, 80, 120, 180, 260, 380 |
 | `ambitions.envoy_reveal_years` | 2 |
 | `ambitions.history_mode_setting` | drawn (default), historical only |
 | `ambitions.max_legacies` | 5 (decided) |
-| `ambitions.warmth_bands` | cold 0, warm 0.34, hot 0.67 |
+| `ambitions.warmth_bands` | cold under a third, warm from a third, hot from two thirds |
+| `ambitions.pool_max` | 7 (age ambitions join on top) |
+| `inheritance.claim_years` | 30 |
 | `burden.per_country_max` / `turned_legacy` | 1 / true |
 | `inheritance.*` | 30 years, at most 2 birthrights (a proposal) |
 | `ai.ambition_goal_weight` | 1.5 |
@@ -249,23 +251,7 @@ From `heritage-rules.json` and `levers.json`. All are provisional placeholders e
 
 ## Still open
 
-- **OQ-HER-1:** the 30-year and accepted-culture rule for inherited birthrights is a proposal; culture may set a better one.
-- **OQ-HER-2:** the design says 63 levers, the lever file has 64.
-- **OQ-HER-3:** France's size class is 4.2, which gives it a 0.5 bonus, though the design says France gets none.
-- **OQ-HER-4:** several trade levers aim at rules that trade v2 dropped or changed; what they change now is open.
-- **OQ-HER-5:** building levers still point at the old province design; the buildings design owns the list now.
-- **OQ-HER-6:** the `stat` lever uses event tree terms; whether they are acceptable and who owns them.
-- **OQ-HER-7:** buildings offers unique building variants as a hook, but heritage has no lever to carry one.
-- **OQ-HER-8:** the Portugal example file and the hand-written Portugal disagree, and the example uses a condition heritage does not list.
-- **OQ-HER-9:** how often heritage conditions are checked, and what unit counts heyday and claim years.
-- **OQ-HER-10:** whether 7 is a hard cap on pools and how age ambitions count.
-- **OQ-HER-11:** envoy reading needs diplomacy to station envoys at courts.
-- **OQ-HER-12:** how the computer picks which heyday sleeps or which legacy to let go.
-- **OQ-HER-13:** warmth band edges at exactly a third and two thirds differ between the design and the config.
-- **OQ-HER-14:** a third against 0.33 for marks, and whether a mark counts toward the 5-legacy cap.
-- **OQ-HER-15:** 27 archetypes in the design, 26 in use in the build.
-- **OQ-HER-16:** 273 place names and several requested ids are still unbound.
-- **OQ-HER-17:** what a formed country loses if it ends up over 5 legacies or 2 birthrights.
+Nothing about heritage itself is open. Binding the last place names the map does not hold is data work.
 
 ## For developers
 

@@ -8,7 +8,7 @@ Google Play Games), how achievements look (icons, toast, screen), and how the li
 
 **In scope**
 - The achievement list (71 at launch), its tiers and points, categories, scope (campaign / lifetime),
-  hidden flag, `full_game` flag, test moment (`on`), test and progress counter.
+  hidden flag, `full_game` flag, test moment (`moment`), test and progress counter.
 - The store limits adopted, store ids, the build step that writes store upload files, retiring achievements.
 - Eligibility: ironman-only, cheat marking, switching country after game over, tutorial, demo.
 - Running tests at the end of a turn or at named moments.
@@ -27,7 +27,7 @@ Google Play Games), how achievements look (icons, toast, screen), and how the li
 - The stats and moments each test reads (realm, province, research, warfare, naval, exploration, diplomacy,
   subjects, rebellions, events, recruiting, trade, scenario-setup, time-and-turns).
 - How a campaign is won and its scores (gap list 1, item 1; not designed yet).
-- Which countries are in the free tier (gap list 1, item 2; see OQ-ACH-3).
+- The free tier's countries are the Ottomans and France (game-shell `freeRealms`); the rows they cannot earn are marked `full_game` (D-ACH-3).
 
 ## 2. Sources
 
@@ -54,7 +54,7 @@ Newest decision first.
 | Tier | Copper (5 points), Silver (10), Gold (20), Crown (40) | Category |
 | Points | The store score of an achievement, set by its tier; shown by Game Center and Google Play, not Steam | Gold in the treasury |
 | Scope | `campaign`: the whole condition is met inside one game. `lifetime`: counts across games, kept in the player profile | Campaign rules |
-| Moment (`on`) | The game moment whose occurrence runs an achievement's test | A turn phase of another context |
+| Moment (`moment`) | The game moment whose occurrence runs an achievement's test | A turn phase of another context |
 | Test | The condition, written in the event tree's trigger style | Moment |
 | Progress row | A row with `progress: {stat, target}`: a game counter reported to stores as a progress bar | The test itself |
 | Hidden achievement | `hidden: true`: name and text secret until earned; shown as "Hidden achievement" with its tier | A locked (not yet earned) achievement |
@@ -84,7 +84,7 @@ Newest decision first.
 - INV-ACH-4: every name is at most 24 characters and every text at most 100 characters.
 - INV-ACH-5: no test names a country; only `japan_whole_1600` and `sahel_whole_1600` name a region.
 - INV-ACH-6: no test is tied to an event marked `narrative_only`, to conquering a named people, or to sacking or scorching land.
-- INV-ACH-7: every `on` value is one of the moments in §4 "Moments" (see OQ-ACH-1 for `castle_gained`).
+- INV-ACH-7: every `moment` value is one of the moments in §4 "Moments", `castle_gained` included (D-ACH-1).
 - INV-ACH-8: after each update at least 10 slots and 100 points stay in reserve.
 - INV-ACH-9: no achievement grants anything inside the game (no bonus, no unlocked nation, no cosmetic).
 
@@ -104,7 +104,7 @@ Newest decision first.
 ### Entities and value objects
 
 - **AchievementDefinition** (entity, id): `id`, `name`, `text`, `category`, `tier`, `hidden` (default false),
-  `scope`, `on`, `test`, optional `progress {stat, target}`, optional `full_game`, `refs`.
+  `scope`, `moment`, `test`, optional `progress {stat, target}`, optional `full_game`, `refs`.
 - **Tier** (value): copper | silver | gold | crown, with points 5 | 10 | 20 | 40. Launch counts: copper 38,
   silver 21, gold 10, crown 2. Meant for: copper = one action or a goal most players reach in their first
   campaign; silver = a goal you aim for; gold = a whole campaign shaped around it; crown = the hardest.
@@ -112,7 +112,7 @@ Newest decision first.
   `battle_end`, `sea_battle_end`, `siege_end`, `war_end`, `rebellion_end`, `relation_changed`,
   `province_gained`, `invention_done`, `regiment_trained`, `lord_created`, `charter_granted`, `loan_closed`,
   `style_adopted`, `colony_founded`, `contact_made`, `fleet_home`, `food_policy_changed`, `event_choice`,
-  `event_end`, `succession_plus_12_months`, `campaign_end`. The YAML also uses `castle_gained` (OQ-ACH-1).
+  `event_end`, `succession_plus_12_months`, `campaign_end`. `castle_gained` fires when a realm's castle is built or taken in a siege (D-ACH-1).
 - **StoreIds** (value): Steam `ACH_` + id in capitals; Game Center bundle id + `.ach.` + id; Google Play id
   from the console, kept in `achievements.google.json`.
 - **Icon** (value): 32 × 32 pixel art, 2-pixel tier-colour frame (copper, silver, gold, crown purple-gold),
@@ -215,7 +215,7 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 
 ### Domain services
 
-- **AchievementEvaluator**: on a moment, runs only the rows whose `on` names that moment, only for an eligible
+- **AchievementEvaluator**: on a moment, runs only the rows whose `moment` names that moment, only for an eligible
   campaign, after the turn's own systems have run.
 - **StoreReporter**: turns unlocks and progress into each store's call (incremental, percent, stat), keeps the
   best reported value, and drains the unlock queue.
@@ -265,7 +265,7 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 - ACH-030 While a hidden achievement is not earned, the achievements context shall show it as "Hidden achievement" with its tier, keeping its name and text secret. [achievements §4.4; yaml fields]
 
 ### When tests run
-- ACH-031 When a moment occurs, the achievements context shall run only the tests of rows whose `on` names that moment. [achievements §5.1]
+- ACH-031 When a moment occurs, the achievements context shall run only the tests of rows whose `moment` names that moment. [achievements §5.1]
 - ACH-032 Where a row's moment is `date`, the achievements context shall check it once, on that day. [achievements §5.1]
 - ACH-033 The achievements context shall run its tests after the turn's own systems, at the very end of the turn order, so tests read final values. [achievements §5.1, §10]
 
@@ -297,8 +297,8 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 
 ### Free tier and Steam demo
 - ACH-054 Where the game is the iOS or Android free download, the achievements context shall award achievements as in the full game and keep them when the player buys. [achievements §5.5]
-- ACH-055 Where a row is marked `full_game`, the achievements context shall not let it be earned with the free tier's countries alone (launch: *Many Crowns*, *Crowns of the World*). [achievements §5.5; yaml]
-- ACH-056 If the free country set has no single-province start, then the achievements context shall mark *From One Hall* `full_game` too. [achievements §5.5, §10]
+- ACH-055 Where a row is marked `full_game`, the achievements context shall not let it be earned with the free tier's countries alone (launch: *Our Own Banner*, *The Walls Held*, *The Four Quarters Hold*, *From One Hall*, *Many Tents, One People*, *Many Crowns*, *Crowns of the World*; D-ACH-3). [achievements §5.5; yaml]
+- ACH-056 Because neither free country (Ottomans, France) has a single-province start, the achievements context shall mark *From One Hall* `full_game` (D-ACH-3). [achievements §5.5, §10]
 - ACH-057 Where the game is the Steam demo, the achievements context shall award nothing to Steam directly and keep a local list from the demo's ironman games. [achievements §5.2, §5.5]
 - ACH-058 When a demo player buys the full game, the achievements context shall read the demo's profile and award what was earned there. [achievements §5.5]
 
@@ -320,7 +320,7 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 - ACH-069 When an achievement unlocks, the achievements context shall show a toast that slides in at the top for three seconds with icon, name and tier, with a short chip-tune sting. [achievements §8]
 - ACH-070 While a battle or event screen is open, the achievements context shall hold the toast until the screen closes. [achievements §8]
 - ACH-071 Where the "Achievement toasts" setting is off, the achievements context shall show no toast and still unlock the achievement. [achievements §8; settings]
-- ACH-072 The achievements context shall offer an achievements screen, reached from the title screen and the pause menu, as a grid of icons grouped by category; selecting one shows its text, progress and the date earned. [achievements §8]
+- ACH-072 The achievements context shall offer an achievements screen, reached from the main menu's More (D-ACH-13), as a grid of icons grouped by category; selecting one shows its text, progress and the date earned. [achievements §8]
 - ACH-073 The achievements screen shall offer an "earnable in this campaign" filter that shows achievements not yet earned and not already ruled out (such as a date that has passed). [achievements §8]
 - ACH-074 When an achievement unlocks, the achievements context shall add one line to that turn's report, with a jump to where it happened when there is a place (the castle, the battlefield). [achievements §8]
 
@@ -357,7 +357,7 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 - When naval reports `sea_battle_end` or a fleet returns home (`fleet_home`), then evaluate those rows.
 - When exploration reports `contact_made` or `colony_founded`, then evaluate those rows.
 - When diplomacy or subjects report `relation_changed`, then evaluate those rows.
-- When province or warfare report `province_gained` (and `castle_gained`, OQ-ACH-1), then evaluate those rows.
+- When province or warfare report `province_gained` (and `castle_gained`, D-ACH-1), then evaluate those rows.
 - When research reports `invention_done`, when recruiting reports `regiment_trained`, when realm reports
   `lord_created`, `charter_granted`, `loan_closed`, `food_policy_changed`, `succession_plus_12_months`, when
   rebellions report `rebellion_end`, when events report `event_choice` or `event_end`, then evaluate those rows.
@@ -395,7 +395,7 @@ Dependency: last in the global order (gap list 1, item 20; time-and-turns).
 | Google step threshold | Targets above this reported in steps | 10,000 | no (store limit) | design §5.3 |
 | Steam progress popups | Percent steps | 25, 50, 75 | no | design §5.3 |
 | toast duration | Seconds on screen | 3 | not stated | design §8 |
-| store retry interval | Retry period | "every few minutes" | not given (OQ-ACH-10) | design §5.4 |
+| store retry interval | Retry period | "every few minutes" | 5 minutes, provisional (`store_retry_minutes`, OQ-ACH-10) | design §5.4 |
 | icon size | Source pixels | 32 × 32, 2-pixel frame | no | design §7 |
 | `achievements.google.json` | Google id mapping | generated | — | build output |
 
@@ -427,22 +427,22 @@ Dependency: last in the global order (gap list 1, item 20; time-and-turns).
 
 None. Achievements are only for the human player's realm; the designs give computer players no part here.
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- **OQ-ACH-1** `first_castle` uses `on: castle_gained`, which is not in the design's list of moments (§5.1). Add the moment, or test it on `siege_end` + building finished? Blocks: INV-ACH-7, the evaluator's moment list.
-- **OQ-ACH-2** The YAML comment says First steps "each can be earned in the tutorial", but design §1/§5.2 and the tutorial design say the tutorial earns none. The comment looks stale (pre-ironman decision). Blocks: nothing in rules; fix the comment.
-- **OQ-ACH-3** Free tier: design §5.5 says the free countries are "still open", but gap list 1, item 2 decided them: the Ottomans and France. Neither has a single-province start, so by ACH-056 *From One Hall* needs `full_game`, which the YAML lacks. Several more rows also look unearnable with only the Ottomans and France: *Our Own Banner* (start as subject), *Many Tents, One People* (decentralised start), *The Walls Held* (defender of Constantinople), *The Four Quarters Hold* (Andean empire role), possibly *Unconquered* (start macro-region not Europe). This contradicts "every achievement except the two marked `full_game` can be earned with the free countries". Blocks: `full_game` flags, store copy for the free tier.
-- **OQ-ACH-4** Save flags: achievements needs `ironman_unbroken`, `cheat_marked`, `switched_country`; the save design offers `ironman` and a "modified" mark, and recommended "no" to ironman-only (superseded by Leroy's 16 Oct decision). The saves context must adopt the three flags and the player-profile storage for lifetime counters and the demo's local list. Blocks: ACH-034 to ACH-041, ACH-057/058.
-- **OQ-ACH-5** Subjects, diplomacy and exploration now have designs, but the rows written "against stats those designs will define" (*Our Own Banner*, *Tribute Roads*, *Beyond the Horizon*, *Strangers on the Shore*, *All the Way Round*, *Treaty on the Shore*) still point at gap-list items. Their tests (`tributaries_min`, `fleet_home`, `contact_by: sea`, `founded_with_consent_of_local_people`, "macro-region") need checking against those designs. Blocks: those six rows.
-- **OQ-ACH-6** The config key `on` is read as the boolean `true` by YAML 1.1 parsers (for example PyYAML), so the moment field is lost unless quoted or renamed. Blocks: the build step and the evaluator's loader.
-- **OQ-ACH-7** Google Play steps: "targets larger than 10,000 are reported in steps (… gold in tens)", but *Counting House*'s target is exactly 10,000, not larger. Is gold reported in tens or as is? Blocks: ACH-045 for `treasury_10000`.
-- **OQ-ACH-8** Store figures disagree in the sources (Google 1,000 vs 2,000 total points; 200 vs 400 count; Steam's "confidence" check). The design asks to check them again in each console before entering the list. Blocks: final upload, not the rules (we adopt the strictest).
-- **OQ-ACH-9** Names that point at real history (*The Walls Held*, *The Four Quarters Hold*) need a check by whoever reviews the event tree's sensitive content. (design §12.1)
-- **OQ-ACH-10** Compare the list once against EU4's published achievement list before release so nothing is accidentally the same. (design §12.2) Also: the retry interval "every few minutes" and toast sting are not given as numbers.
-- **OQ-ACH-11** *Unconquered*: the text says "In Africa, Asia, the Americas or Oceania … never taken from outside", the test says `start_macro_region_not: europe` and `capital_never_occupied_by_other_macro_region`. Which macro-regions exist (is the Middle East "Asia"?), and does "outside" mean another macro-region or any foreign realm? Blocks: `never_colonised`.
-- **OQ-ACH-12** Tutorial message: the design asks the tutorial to "say that achievements start in a real campaign"; the tutorial design does not include such a line. Blocks: onboarding copy.
-- **OQ-ACH-13** Where the achievements screen opens: design §8 says the title screen and the pause menu; the screen flow places Achievements under the main menu's More and lists the game menu as "Save · Load · Settings · …" without naming Achievements. Blocks: ACH-072.
-- **OQ-ACH-14** How a campaign is won (gap list 1, item 1) is decided but not designed; victory or score achievements wait for it. *The Long Road* only needs the end date.
+- **D-ACH-1** (was OQ-ACH-1) `castle_gained`: added to the moment list; it fires when a realm's castle is built or a castle is taken in a siege. A moment is cheaper than a compound test.
+- **D-ACH-2** (was OQ-ACH-2) The YAML comment is stale: the tutorial earns no achievement, First steps included. The design and the tutorial design agree.
+- **D-ACH-3** (was OQ-ACH-3) Free tier: the free countries are the Ottomans and France, so *From One Hall*, *Our Own Banner*, *Many Tents, One People*, *The Walls Held* and *The Four Quarters Hold* are marked `full_game`; every other row stays earnable with the free countries. Marking is simpler than changing the rows.
+- **D-ACH-4** (was OQ-ACH-4) Save flags: X-16 decides it. The header carries `ironman_unbroken`, `cheat_marked`, `switched_country` and `began_as_tutorial`; lifetime counters and the demo's local list live in the player profile.
+- **D-ACH-5** (was OQ-ACH-5) The six rows read the later designs: `started_as_subject` and `subject_of_anyone` from subjects; `tributaries_min: 5` counts subjects of the tributary kind (X-8); `contact_by: sea` is a first contact made by a fleet or an exploration ship; `founded_with_consent_of_local_people` is a colony founded by agreement (exploration); `fleet_crossed_ocean_and_returned` and `fleet_circumnavigated` read the voyage record of naval and exploration; macro-regions are the event tree's 13. The tests stay; only their sources are named.
+- **D-ACH-6** (was OQ-ACH-6) The config key `on` is renamed `moment`. A plain name avoids the YAML trap.
+- **D-ACH-7** (was OQ-ACH-7) Google Play steps: only targets above 10,000 are reported in steps, so *Counting House* (exactly 10,000) reports gold as is. The rule says "larger than".
+- OQ-ACH-8 (release task) Store figures (Google points and counts, Steam's check) are checked again in each console before upload; the rules adopt the strictest.
+- OQ-ACH-9 (release task) The names *The Walls Held* and *The Four Quarters Hold* need the sensitive-content review.
+- OQ-ACH-10 (release task) The list is compared once against EU4's published list before release. The store retry interval is 5 minutes (provisional) and the toast uses audio's achievement stinger.
+- **D-ACH-11** (was OQ-ACH-11) *Unconquered*: the macro-regions are the event tree's 13, with the Middle East counted as Asia; "outside" means a realm whose capital lies in another macro-region. It reuses existing regions.
+- **D-ACH-12** (was OQ-ACH-12) The tutorial's last card says that achievements start in a real campaign; onboarding adds the line. One line of copy, no rule.
+- **D-ACH-13** (was OQ-ACH-13) The achievements screen opens from the main menu's More, as screen flow places it (the latest design); the game menu does not list it. Latest decision wins.
+- **D-ACH-14** (was OQ-ACH-14) Victory: X-12 decides how a campaign is won; no new achievement is added, and *The Long Road* still needs only reaching 31 August 1939. No new rows beyond the list.
 
 ## 14. Traceability
 
@@ -450,7 +450,7 @@ None. Achievements are only for the human player's realm; the designs give compu
 |---|---|---|
 | ACH-001 | list-rules.feature | Achievements give nothing inside the game |
 | ACH-002 | list-rules.feature | One list for every store |
-| ACH-003 | list-rules.feature | Presentation and review rule (checked by review against EU4's list, OQ-ACH-10); scenario: Every achievement is original |
+| ACH-003 | list-rules.feature | Presentation and review rule (checked by review against EU4's list, OQ-ACH-10, release task); scenario: Every achievement is original |
 | ACH-004 | list-rules.feature | No test names a country |
 | ACH-005 | list-rules.feature | Harm is never rewarded |
 | ACH-006 | list-rules.feature | Every test names its source |
@@ -459,7 +459,7 @@ None. Achievements are only for the human player's realm; the designs give compu
 | ACH-009 | list-rules.feature | Tier gives points |
 | ACH-012 | list-rules.feature | An update keeps a reserve |
 | ACH-013 | list-rules.feature | Names and texts fit a phone toast |
-| ACH-014 | — | Waits on gap list 1, item 1 (OQ-ACH-14) |
+| ACH-014 | — | No score or victory row is added (D-ACH-14); nothing to test |
 | ACH-015, ACH-016 … ACH-025 | unlock-catalogue.feature | One outline per category |
 | ACH-026 | unlock-catalogue.feature | A test that is not met leaves the achievement locked |
 | ACH-027, ACH-028 | scope-and-progress.feature | Campaign and lifetime scope |

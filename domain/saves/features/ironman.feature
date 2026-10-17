@@ -33,6 +33,12 @@ Feature: Ironman
     When the player exits to the main menu
     Then the ironman save is written
 
+  @SAVE-102
+  Scenario: An ironman save is not imported offline
+    Given the ironman campaign as "Castile" is on the "Steam Deck"
+    When the player exports it and imports it on the "Pixel 8" while offline
+    Then the import is refused with "Connect to import an ironman save."
+
   @SAVE-088
   Scenario: Export and Import of an ironman save
     Given the ironman campaign as "Castile" is on the "Steam Deck"

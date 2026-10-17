@@ -19,17 +19,17 @@ Saves are grouped by **campaign**: one new game is one campaign, with a random i
 
 | Kind | When it is written | How many are kept | In the Load list |
 |---|---|---|---|
-| Resume | After every End turn, and on pause, quit, suspend or backgrounding | 1 per campaign, plus the one before as a backup | No; it is what Continue opens |
+| Resume | After every End turn, and on pause, quit, exit to the main menu or suspend (backgrounding writes only the orders journal) | 1 per campaign, plus the one before as a backup | No; it is what Continue opens |
 | Autosave | At the start of a turn on your autosave interval | Your choice of 1, 3 or 5 per campaign, oldest rotated out | Yes, marked "Auto" |
 | Manual | When you tap Save, with a name | Up to 20 per campaign and 100 in total | Yes |
-| Ironman | After every End turn and on every exit, in an ironman campaign | 1 plus a backup | Yes, as the campaign itself |
+| Ironman | After every End turn and on every exit (Save and quit, Exit to main menu, closing the app), in an ironman campaign | 1 plus a backup | Yes, as the campaign itself |
 | Exported | When you tap Export; the file leaves the game | No limit | Imported files join the Manual saves |
 
-**Autosave options.** The interval can be every turn, every 6 turns, every 12 turns (each January) or off; the default is every 12 turns. You can keep 1, 3 or 5 autosaves per campaign; the default is 3. Turning autosaves off stops only the rotating autosaves. The Resume save cannot be turned off.
+**Autosave options.** The interval can be every turn, every 6 turns (January and July), every 12 turns (each January) or off; the default is every 12 turns. You can keep 1, 3 or 5 autosaves per campaign; the default is 3. Turning autosaves off stops only the rotating autosaves. An ironman campaign writes no rotating autosaves, only its ironman save. If something goes wrong, "Restore the last autosave" on the failure screen opens your Resume save, or your newest autosave if the Resume save is damaged. The Resume save cannot be turned off.
 
 **Continue** opens the newest Resume or Ironman save across all your campaigns, whether it was made on this device or arrived from the cloud. If it came from another device, the button says so: "Continue: Portugal, March 1512 (from Steam Deck)".
 
-**The Load screen** lists campaigns first, each with its nation banner, nation name, in-game date, turn, play time and a small map crop. Opening a campaign lists its saves newest first. The list reads only each file's header, so it fills quickly without unpacking whole saves.
+**The Load screen** lists campaigns first, each with its nation banner, nation name, in-game date, turn, play time and a small map crop. Opening a campaign lists its saves newest first, each marked autosave or ironman and with the device that made it. The list reads only each file's header, so it fills quickly without unpacking whole saves.
 
 ### Saving by hand
 
@@ -47,7 +47,7 @@ The game keeps its messages short and plain:
 
 ### The Resume save and the orders journal
 
-When you end a turn, the engine writes the Resume save for the new turn in the background, and you can give orders while it writes. While you give orders, the game keeps an **orders journal**: the orders queued since the turn began, in the same form End turn sends them. It is written whenever the app is backgrounded, suspended or closed, and every 30 seconds while orders are changing. When you come back, the game loads the Resume save and puts the journal's orders back in the queue, giving you exactly the state you left. If the journal's turn number or Resume save hash does not match, it is ignored. The journal is never synced.
+When you end a turn, the engine writes the Resume save for the new turn in the background, and you can give orders while it writes. While you give orders, the game keeps an **orders journal**: the orders queued since the turn began, in the same form End turn sends them. It is written whenever the app is backgrounded, suspended or closed, and every 30 seconds while orders are changing. When you come back, the game loads the Resume save and puts the journal's orders back in the queue, giving you exactly the state you left. If the journal's turn number or Resume save hash does not match, it is ignored. The journal is never synced. A choice you make at a before-the-battle stop also goes into the journal with its day, so the turn plays out the same way when it is replayed.
 
 The journal is written on these platform events:
 
@@ -142,24 +142,24 @@ Play Games saved games and an iCloud Documents container are not used.
 
 On phones the free download and the full game are the same app, so saves carry over with nothing to do; buying the unlock removes the lock. Each header records your nation and whether it needs the full game. Loading a locked nation's save without the full game shows the unlock screen instead of failing, and never deletes the save. If a purchase is refunded or revoked, the saves stay and those nations ask to be unlocked again.
 
-With the Steam demo and the full game on the same computer, the full game finds the demo's saves on first launch and copies them into its own folder, and Steam Cloud keeps them from then on. A signed-in demo player's saves sync to the full game on any computer or phone; without an account, Export and Import do the same. The demo's limits are stored in the header, and the full game drops them on load.
+With the Steam demo and the full game on the same computer, the full game finds the demo's saves on first launch and copies them into its own folder, and Steam Cloud keeps them from then on. A signed-in demo player's saves sync to the full game on any computer or phone; without an account, Export and Import do the same. Each save records which app wrote it (free, demo or full game) but no list of limits, so the full game simply opens a demo save with no limits.
 
 ### Ironman
 
 - Chosen only when a campaign starts, and it cannot be turned off.
 - No manual Save, no Load of earlier points, no console or debug tools.
-- Export is allowed as a backup. Importing an ironman save starts it on this device; the copy on the old device is then no longer the newest.
+- Export is allowed as a backup. Importing an ironman save starts it on this device; the copy on the old device is then no longer the newest. Importing an ironman save needs a connection: offline you see "Connect to import an ironman save."
 - The server accepts an ironman upload only if the save it names as its parent is still the campaign's newest ironman save. Otherwise the second device is told to load the newer game first.
 - If two devices played the same ironman campaign offline and the line has split, the game asks once: "Keep the game from Steam Deck (June 1530) or from this phone (Feb 1528)?", recommends the one further along, and removes the other line.
 - If an ironman save is damaged, its backup opens and you are told; you roll back at most one turn.
 
 ### Integrity
 
-Every chunk has a CRC, and loading recomputes the world hash, so damaged or edited files are caught. Saves are not encrypted. A save that fails the hash check opens only outside ironman, after a warning, and is marked as modified. The header carries the ironman flag and the modified mark so [Achievements](Achievements) can check them. A damaged or cut-short save is rejected cleanly and the previous save is opened or offered.
+Every chunk has a CRC, and loading recomputes the world hash, so damaged or edited files are caught. Saves are not encrypted. A save that fails the hash check opens only outside ironman, after a warning, and is marked as modified. The header carries the ironman flag, the modified mark and four flags for [Achievements](Achievements): ironman unbroken, cheat marked (the game has no cheats or console, so this is the modified mark), switched country, and began as the tutorial. Your campaign options (difficulty, events, end date, AI temper, fog of war and the music-era rule) are saved with the campaign; tutorial progress and Needs attention mutes belong to your player profile and sync with it, not with any save. A damaged or cut-short save is rejected cleanly and the previous save is opened or offered.
 
 ### Bug reports and tests
 
-Send a report attaches the Resume save and the orders journal, and sending is always your choice. Before release the save code must pass: every test save loads, migrates and plays a turn; save, load and save again gives identical chunks and the same world hash; a file cut short at any byte is rejected cleanly with the previous save offered; killing the app during a write leaves the old save intact (desktop and both phone platforms); backgrounding, killing and relaunching on a real iPhone and Android phone resumes with the queued orders; and two devices with cloud on, played offline and reconnected, show both lines of play, with the one prompt for ironman.
+Send a report, on the failure screen, attaches the Resume save and the orders journal, and sending is always your choice. Before release the save code must pass: every test save loads, migrates and plays a turn; save, load and save again gives identical chunks and the same world hash; a file cut short at any byte is rejected cleanly with the previous save offered; killing the app during a write leaves the old save intact (desktop and both phone platforms); backgrounding, killing and relaunching on a real iPhone and Android phone resumes with the queued orders; and two devices with cloud on, played offline and reconnected, show both lines of play, with the one prompt for ironman.
 
 ## What you see
 
@@ -177,7 +177,7 @@ Send a report attaches the Resume save and the orders journal, and sending is al
 - [Screens and navigation](Screens-and-Navigation): Continue, Load, Save, toasts and messages, the app lifecycle, the unlock screen and the split prompt.
 - [Settings](Settings): the autosave values, the Cloud saves row, Wi-Fi only and sign-in; personal settings ride the same account.
 - [Achievements](Achievements): reads the ironman flag and the modified mark, and asks for more flags.
-- [Tutorial and help](Tutorial-and-Help): tutorial progress and Attention mutes are stored apart from saves.
+- [Tutorial and help](Tutorial-and-Help): tutorial progress and Needs attention mutes live in your player profile, apart from saves.
 - [The 1444 start](The-1444-Start): campaign options, ironman and the player's nation at a new game.
 - [Map and lenses](Map-and-Lenses): the map hash, province ids and the rename table.
 - [Historical events](Historical-Events): the events chunk.
@@ -211,31 +211,17 @@ From `save-config.example.yaml`.
 | `cloud.store_backups.steam` | 500 MB, 2,000 files | platform |
 | `ironman.conflict` / `recommended_choice` | ask once / furthest turn | fixed |
 | `integrity.modified_saves` | allowed outside ironman with a warning | fixed |
-| Desktop quit wait | 2 s | provisional, not in the config file |
+| `desktop_quit_wait_seconds` | 2 s | provisional |
+| `kinds.autosave.every_6_months` | January, July | provisional |
 
 The budgets are targets for a low-end Android phone, still to be confirmed by the performance design.
 
 ## Still open
 
-- **OQ-SAVE-1:** achievements now asks for three header flags (ironman unbroken, cheat marked, switched country) and the tutorial for a "began as the tutorial" mark; the header has only the ironman flag and the modified mark.
-- **OQ-SAVE-2:** whether backgrounding writes a full Resume save or only the orders journal.
-- **OQ-SAVE-3:** the screen flow's "autosave before the turn" needs mapping to the Resume save and journal.
-- **OQ-SAVE-4:** the Load screen grouped by campaign here, a flat list in the screen flow.
-- **OQ-SAVE-5:** the server quota is a starting point, and the timing of social sign-in is open.
-- **OQ-SAVE-6:** where personal settings, tutorial progress and Attention mutes are stored and synced.
-- **OQ-SAVE-7:** what cheats or console exist outside ironman.
-- **OQ-SAVE-8:** where AI temper, fog of war and the music-era rule are saved.
-- **OQ-SAVE-9:** which months an every-6-turns autosave uses, and whether ironman ever autosaves.
-- **OQ-SAVE-10:** choices made at a battle stop mid-month are not in the journal, and today's engine protocol lacks save, load and game options.
-- **OQ-SAVE-11:** the performance design does not list the save budgets yet.
-- **OQ-SAVE-12:** the 2-second desktop quit wait is not in the config file.
-- **OQ-SAVE-13:** what limits the Steam demo has and how the header stores them.
-- **OQ-SAVE-14:** whether Send a report sits in the game menu or only on the failure screen.
-- **OQ-SAVE-15:** importing an ironman save offline can recreate a split the server only catches on upload.
-- **OQ-SAVE-16:** which exits count as ironman exits.
+- The cloud quota (300 saves, 200 MB per account) is a starting point until real save sizes are measured, and which social sign-ins ship at launch is a store decision.
 
 ## For developers
 
-- Spec: [`domain/saves/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/saves/spec.md), requirement code **SAVE** (SAVE-001 to SAVE-099).
+- Spec: [`domain/saves/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/saves/spec.md), requirement code **SAVE** (SAVE-001 to SAVE-104).
 - Features: `domain/saves/features/` (save-kinds-and-continue, saving-by-hand, resume-and-orders-journal, safe-writing, save-file-format, migrations, cloud-sync, backups-export-import, free-tier-saves, ironman, integrity-and-testing).
-- Code: no domain module yet; it will live in `packages/engine/src/domain/saves/`. Today the engine has `packages/engine/src/protocol.ts` (`newGame` with seed and nation only, `endTurn` with orders) and `hashWorld` in `packages/engine/src/hash.ts`; the save and load requests are still to be added. Test saves go in `packages/engine/test/saves/`.
+- Code: `packages/engine/src/domain/saves/`. The engine core has `packages/engine/src/protocol.ts` (`newGame` with seed and nation only, `endTurn` with orders) and `hashWorld` in `packages/engine/src/hash.ts`; the save and load requests are still to be added. Test saves go in `packages/engine/test/saves/`.

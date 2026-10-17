@@ -12,12 +12,11 @@ Feature: The campaign span of the event tree
     Then the campaign ends
     And no event fires after that date
 
-  @EVT-002 @open-question
-  Scenario Outline: Events after the end date are out of scope
-    # OQ-EVT-1: how out-of-scope events are cut
+  @EVT-002
+  Scenario Outline: Events after the end date are dropped from a campaign
     Given the event "<event>" starts in history on <date>
-    When eligibility is evaluated in a campaign
-    Then the event "<event>" never fires
+    When a campaign loads its events
+    Then the event "<event>" is dropped and never fires
 
     Examples:
       | event                | date       |
@@ -39,9 +38,8 @@ Feature: The campaign span of the event tree
       | italian_invasion_of_ethiopia |
       | second_sino_japanese_war  |
 
-  @EVT-003 @open-question
+  @EVT-003
   Scenario Outline: Later ages never start
-    # OQ-EVT-1: the Age of Decolonization's window opens in 1919
     Given the date is 1935
     And the start condition of the age "<age>" holds
     When the yearly age check runs
@@ -52,3 +50,10 @@ Feature: The campaign span of the event tree
       | age_of_decolonization |
       | cold_war              |
       | age_of_globalization  |
+
+  @EVT-003
+  Scenario: An age that names a dropped event can only end another way
+    Given the end condition of the age "age_of_world_wars" names the event "world_war_ii"
+    When a campaign loads its events
+    Then that part of the end condition never holds
+    And the age "age_of_world_wars" is cut at the end date

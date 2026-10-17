@@ -6,7 +6,7 @@ Historical events are the game's history layer: the turning points of five centu
 
 ### The campaign span
 
-Events run from the 1444 start to the campaign's end date, which is 31 August 1939 by default (it is one setting). Anything that history places after that date is out of scope and never fires. That covers the Second World War events, the Holocaust, the 1943 Bengal famine, the atomic bombings and everything in the Cold War and decolonization chains: 59 events in the current data. The ages Age of Decolonization, Cold War and Age of Globalization never start.
+Events run from the 1444 start to the campaign's end date, which is 31 August 1939 by default (it is one setting). When a campaign loads, every event that history places after that date is dropped and never fires. That covers the Second World War events, the Holocaust, the 1943 Bengal famine, the atomic bombings and everything in the Cold War and decolonization chains: 59 events in the current data. The ages Age of Decolonization, Cold War and Age of Globalization never start, and any age still running on the last day is cut there. An age that would end on a dropped event (the World Wars age ends on the Second World War) simply runs until its other end condition or the end date.
 
 The interwar years stay in: the Wilsonian moment, the 1918 armistice, the 1918 influenza, Versailles, the May Fourth movement, the founding of the Soviet Union, Lausanne, the Great Depression, the Italian invasion of Ethiopia and the Second Sino-Japanese War.
 
@@ -48,7 +48,7 @@ A period is a regional or thematic situation inside one or more ages, such as a 
 An event has to pass several gates before it can fire.
 
 - **Years.** It never fires outside its earliest and latest year.
-- **How strongly the date binds.** `mandatory` fires inside the window whenever the trigger holds. `approximate` is weighted toward the historical date. `reference` uses the date only as a guide.
+- **How strongly the date binds.** `mandatory` fires inside the window whenever the trigger holds: in the window's last year it is certain. `approximate` is weighted toward the historical date: its monthly chance is doubled in the history year and the extra fades away over 10 years either side, so the death of Suleiman is twice as likely in 1566 and half again as likely in 1561 or 1571. `reference` uses the date only as a guide.
 - **Repeating.** `one_time` fires once. `recurring` can fire again after a cooldown: the Bengal famine of 1770 has a 30-year cooldown, so if Bengal's food security falls below 0.4 again in 1790 it cannot fire yet, but in 1801 it can. `process` diffuses and can fire for several countries.
 - **Prerequisites.** Event chains use `all` (mandatory), `any` (alternative paths), `not` (exclusive) and `at_least` (n of m). A prerequisite can name an outcome: the French revolutionary wars need the French Revolution to have ended as a radical republic, so a constitutional monarchy outcome closes that branch.
 - **Optional events** only raise the weight. If the American Revolution has happened, the French Revolution's weight is multiplied by 1.5, but it was never needed for eligibility.
@@ -56,7 +56,7 @@ An event has to pass several gates before it can fire.
 - **Invalidation.** When an event's invalidation condition holds, it is removed for good. If France becomes a republic by some other path, the French Revolution event is gone. A branch closed because its entity vanished can re-open if a later event creates that entity again.
 - **Trigger.** A condition tree over the state of the world. For example, the French Revolution needs `$realm` to be a monarchy with debt of 2000 or more and liberalism of 0.25 or more, plus any of stability -1 or lower, legitimacy under 40, or the Laki eruption having happened. A France with debt 2100, liberalism 0.3, stability 0 and legitimacy 35 qualifies.
 
-Triggers may only use condition types declared in the vocabulary: date, exists, controls, owns, borders, at war, war ongoing, relation, opinion, stat, rank, government, religion, religion share, culture group, innovation, ideology, tech, colonial presence, trade presence, rebels active, subject count, event, event active, period active, age active, flag, any country, all countries, count countries and is human. Logic is all, any, not and at least. The `event` condition means "this event has happened", optionally with a given outcome, within n years, with a role bound to someone. `is_human` is only allowed to change selection weights, never eligibility.
+Triggers may only use condition types declared in the vocabulary: date, exists, controls, owns, borders, at war, war ongoing, relation, opinion, stat, rank, government, religion, religion share, culture group, innovation, ideology, tech, colonial presence, trade presence, rebels active, subject count, event, event active, period active, age active, flag, any country, all countries and count countries. Logic is all, any, not and at least. The `event` condition means "this event has happened", optionally with a given outcome, within n years, with a role bound to someone. No condition can ask whether a country is played by a person: you and the computer face the same history.
 
 Targets can be a role, an entity id, a province, an area, a region, the whole world, or "this" inside the any, all and count country tests.
 
@@ -68,25 +68,23 @@ Targets can be a role, an entity id, a province, an area, a region, the whole wo
 | Pool | Rolled every month against its mean years (the expected wait once eligible), multiplied by its selection modifiers and any follow-up boost. An event with a mean wait of 4 years, modifiers of ×2 and a boost of ×1.5 rolls with all three applied. |
 | Decision | Offered to its chooser. Napoleon's invasion of Iberia, with the invader role bound to France, is offered to whoever controls France. |
 
-To keep the pace sane, no country gets more than 2 pool events a year. An AI decision left unanswered for 10 years lapses and goes back into the pool if it is still eligible (but see OQ-EVT-8 below).
+To keep the pace sane, no country gets more than 2 pool events a year. A decision a computer country leaves unanswered for 10 years lapses and goes back into the pool if it is still eligible. A decision offered to you never lapses: it waits for you like every other event.
 
 **Follow-ups.** When an event fires, each of its follow-ups gets a weight boost during its delay window. Boosts are capped at ×5, fade out linearly over 10 years after the window closes, and never make an ineligible event fire.
 
-**Alternate history.** A game rule picks how closely history is followed.
+**Alternate history.** When you start a new game, the "Events" choice picks how closely history is followed. Plausible is the default.
 
-| Preset | Follow-up boost | Historical option weight | Mean years |
+| Events choice | Follow-up boost | Historical option weight | Mean years |
 |---|---|---|---|
 | Historical | ×1.5 | ×2.0 | ×0.8 |
 | Plausible | ×1.0 | ×1.0 | ×1.0 |
-| Divergent | ×0.6 | ×0.5 | ×1.3 |
-
-A separate "historical lean" rule multiplies the AI's weight on historical options by 1.25.
+| Free | ×0.6 | ×0.5 | ×1.3 |
 
 ### Options and choices
 
-Every event offers two or more options (two or three in the design), and exactly one is marked historical, the one that matches the record. An option's chooser is a role: its controller, player or computer, picks. If an option has no chooser, the game rolls between options by weight. An option whose `allowed` condition is false is hidden. An option's effects add to the event's own effects.
+Every event offers two to four options, and exactly one is marked historical, the one that matches the record. An option's chooser is a role: its controller, player or computer, picks. If an option has no chooser, the game rolls between options by weight. An option whose `allowed` condition is false is hidden. An option's effects add to the event's own effects.
 
-When an event is offered to you, the game waits for your answer. Nothing ever answers an event for you.
+When an event is offered to you, the game waits for your answer. Nothing ever answers an event for you: while one is waiting, End turn opens the oldest unanswered event instead.
 
 The computer weighs each option by a base weight times named factors:
 
@@ -94,7 +92,7 @@ The computer weighs each option by a base weight times named factors:
 |---|---|
 | at_war | The country is at war |
 | low_treasury | Treasury is below one year of expenses |
-| high_unrest | Average unrest is above 50 |
+| high_unrest | More than half its provinces have 4 or more grievances |
 | same_religion | The other party shares the state religion |
 | rival | The other party is a rival |
 | great_power | The country is in the top 8 by great power score |
@@ -108,14 +106,16 @@ Some events run for a while. They last their duration, apply ongoing effects, en
 
 The effect types are: modifier, stat, transfer, create country, annex, vassalize, release, war, peace, reason for war, relation, rebels, spread, population, move population, set flag, start period, end period, unlock, government, religion, trade route and colony. A stat change is a one-off delta, either a flat amount or a percentage. A war started by an event gets a stable id that later events can test. Adding a new condition or effect type takes one engine evaluator and nothing else; everything else is data.
 
-Rebels from an event are sized against the province's manpower yield:
+A rebels effect is a spark: a rising starts at once in the province, and its men come out of the province's recruit pool. Rebellions then runs it like any other rising.
 
-| Size | Multiplier |
-|---|---|
-| Small | 0.5 |
-| Medium | 1.0 |
-| Large | 2.0 |
-| Huge | 4.0 |
+| Size | Share of the recruit pool | From a pool of 1000 |
+|---|---|---|
+| Small | one eighth | 125 |
+| Medium | a quarter | 250 |
+| Large | half | 500 |
+| Huge | all of it | 1000 |
+
+When a revolution's rising ends, the option you chose applies its "if the rising won" or "if the rising was crushed" effects.
 
 ### Modifiers
 
@@ -125,17 +125,34 @@ How a change applies depends on the stat: a plain number holds on a level stat w
 
 ### The event tree's statistics
 
-The tree has its own abstract statistics (prosperity 1 to 60, unrest 0 to 100, stability -3 to +3, opinion -200 to 200, trust 0 to 100 and so on), split into stored values that are kept as state and derived values recomputed every tick. An event never writes a derived value directly, only its inputs or a modifier the formula reads. Each abstract statistic lands on the concrete numbers of the system that owns it: province, realm, trade, government and diplomacy each have a mapping section.
+The tree has its own abstract statistics (prosperity 1 to 60, unrest 0 to 100, stability -3 to +3, opinion -200 to 200, trust 0 to 100 and so on), split into stored values that are kept as state and derived values recomputed every tick. An event never writes a derived value directly, only its inputs or a modifier the formula reads; when a province's devastation rises, its local supply and output are worked out again the next tick.
+
+The tree's abstract words never reach your cards. Each change lands as something concrete in the system that owns it:
+
+| An event changes… | …and you see |
+|---|---|
+| prosperity +2 | two new buildings that fit the province |
+| devastation +30 | 30 % of the province's tiles burned |
+| unrest up | one named grievance from the event |
+| fort level +1 | the castle one step up |
+| infrastructure +1 | the road one step up |
+| industry +1 | one factory |
+| disease burden up | a plague outbreak |
+| trade access | the trade ratio gain, for the event's duration |
+| notoriety up | a notorious deed in every country that knows you |
+| trust down | an oath broken |
+
+Integration strain is only read by events, as the share of your provinces with a grievance.
 
 ### Flags, lists and entities
 
-Triggers may only read flags that some effect sets or that are declared system flags set by the engine or the scenario (ruler died, succession crisis, succession dispute, regency, female succession, ruler led campaign, Atlantic island bases, potato blight, commercial crisis and the world-state flags). Religions, governments, innovations, ideologies, culture groups, rebel types, relation types, period kinds and entity kinds come from closed lists; adding a value needs no engine change. The 625 entities (polities, companies, movements, population groups, organizations) have real existence spans. A population group is never owned and an organization holds no provinces.
+Triggers may only read flags that some effect sets or that are declared system flags set by the engine or the scenario (ruler died, succession crisis, succession dispute, regency, female succession, ruler led campaign, Atlantic island bases, potato blight, commercial crisis and the world-state flags). Religion sets its own three: persecution, missionary persecution and an inquisition. Religions, governments, innovations, ideologies, culture groups, rebel types, relation types, period kinds and entity kinds come from closed lists; adding a value needs no engine change. The lists hold nothing first seen after 1939, and there are 43 culture groups. The 625 entities (polities, companies, movements, population groups, organizations) have real existence spans. A population group is never owned and an organization holds no provinces.
 
 ### The data build
 
 The event data is checked offline before it ships. The build splits it into runtime layers (history reference, ages, periods, event definitions, triggers, selection, execution, choices, AI, effects, modifiers, statistics, balance and English localization). All player-facing text comes from the localization layer, keyed by id and ready for translation.
 
-The build checks that every id exists, every condition and effect type is declared, every event has its roles, two or more options with one historical, that narrative-only events pay no perpetrator, that there are no mandatory prerequisite cycles, impossible triggers or jointly required exclusive pairs, that entities exist at the event's date, that flags read are set or declared, and that ages and periods have start and end conditions. It also reports coverage: any region with fewer than 2 events in an age that lists it, and an agency share (initiator, beneficiary and resister slots over all slots in a region) below 0.35. An error fails the build; warnings do not. The current result is 0 errors and 21 warnings.
+The build checks that every id exists, every condition and effect type is declared, every event has its roles, two to four options with one historical, that narrative-only events pay no perpetrator, that there are no mandatory prerequisite cycles, impossible triggers or jointly required exclusive pairs, that entities exist at the event's date, that flags read are set or declared, and that ages and periods have start and end conditions. It also reports coverage: any region with fewer than 2 events in an age that lists it, and an agency share (initiator, beneficiary and resister slots over all slots in a region) below 0.35. An error fails the build; warnings do not. The current result is 0 errors and 21 warnings; the anachronism warnings are corrected when a historian checks the sources before release.
 
 ### Hooks for other systems
 
@@ -145,83 +162,67 @@ An event can carry a music tag (good event, bad event, major event, crisis, revo
 
 - **The event card.** A fired event opens as a modal card with its options. Events open one at a time, queued in date order.
 - **End turn waits for you.** Unanswered events block End turn until you choose.
-- **Historical or free events** is offered among the new game options.
+- **The "Events" choice** (Historical, Plausible or Free) is offered among the new game options.
 - **The chronicle** records events that were invalidated.
-- **The end of the campaign** brings a wrap-up, which is not designed yet.
+- **The end of the campaign** shows the final scores; there is no separate wrap-up event.
 
 ## How it connects
 
 - [Provinces](Provinces): event statistics such as prosperity, devastation and unrest land on province numbers.
 - [Your realm](Your-Realm): legitimacy, stability, war weariness, prestige, treasury and the engine flags such as ruler died.
-- [Research](Research): the 20 innovations are research-tree inventions with the same ids.
-- [Trade](Trade): trade power, trade access, trade presence and trade route effects.
+- [Research](Research): the 17 innovations are research-tree inventions with the same ids.
+- [Trade](Trade): trade access lands on the trade ratio gain; trade presence and trade route effects.
 - [Government](Government): 16 government values map to forms of rule.
-- [Rebellions](Rebellions): the rebels effect and "rebels active" condition.
-- [Revolutions](Revolutions): built on events, adding a revolution block and new effect tiers.
-- [Religion](Religion), [Culture](Culture), [Subjects](Subjects), [Diplomacy](Diplomacy), [National strengths](National-Strengths), [Buildings](Buildings): each has proposed new conditions and effects.
+- [Rebellions](Rebellions): the rebels effect starts a rising; "rebels active" reads it.
+- [Revolutions](Revolutions): built on events, adding a revolution block and the "rising won" and "rising crushed" effects.
+- [Religion](Religion), [Culture](Culture), [Subjects](Subjects), [Diplomacy](Diplomacy), [National strengths](National-Strengths), [Buildings](Buildings): each adds its own conditions and effects to the events.
 - [Exploration and colonies](Exploration-and-Colonies): the Age of Exploration gates exploration per region.
 - [Warfare](Warfare): war, peace and reasons for war; prestige from victories.
 - [Screens and navigation](Screens-and-Navigation): the event card, the queue and blocking End turn.
 - [Music and sound](Music-and-Sound): music tags on events.
 - [Achievements](Achievements): your roles and historical or non-historical choices.
 - [Tutorial and help](Tutorial-and-Help): tutorial-only scripted events such as the Varna crusade.
-- [How a turn works](Time-and-Turns): monthly and yearly ticks; events run late in the turn.
-- [Settings](Settings): the campaign end date and the alternate history mode.
+- [How a turn works](Time-and-Turns): events run after every other system's monthly, seasonal and yearly steps, just before achievements and the autosave.
 
 ### Each month
 
-Each year (in its first month) the game checks age and period conditions and applies forced dates. Each month it then checks eligibility and binds roles, fires immediate events, rolls pool events under the pacing cap, offers decisions, queues fired events for you in date order (computer choosers answer at once), applies effects, schedules delayed ones, ticks running events and modifiers, and fades follow-up boosts.
+Each year, in the January turn, the game checks age and period conditions and applies forced dates. Each month it lets computer decisions older than 10 years lapse, then checks eligibility and binds roles, fires immediate events, rolls pool events under the pacing cap, offers decisions, queues fired events for you in date order (computer choosers answer at once), applies effects, schedules delayed ones, ticks running events and modifiers, fades follow-up boosts and works out derived values again.
 
 ## Numbers
 
-All of these are provisional placeholders from `data/balance.yaml` unless noted.
+All of these are provisional values still being balanced, unless noted.
 
 | Key | Value |
 |---|---|
 | `selection.pool_roll_interval_months` | 1 |
 | `selection.max_pool_events_per_country_year` | 2 |
 | `selection.decision_expiry_years` | 10 |
-| `selection.historical_weight_bonus` | 1.25 |
+| `date_binding` (approximate events) | ×2.0 in the history year, fading over 10 years |
 | `selection.alternate_history_mode.historical` | 1.5, 2.0, 0.8 |
 | `selection.alternate_history_mode.plausible` | 1.0, 1.0, 1.0 |
 | `selection.alternate_history_mode.divergent` | 0.6, 0.5, 1.3 |
 | `follow_ups.max_boost` | 5.0 |
 | `follow_ups.boost_decay_years` | 10 |
 | `ai_factors` | the 7 factors above |
-| `rebel_sizes` | 0.5, 1.0, 2.0, 4.0 |
-| `rebel_thresholds` | unrest 60 to spawn, 90 guaranteed |
+| `rebel_sizes` (share of the recruit pool) | 1/8, 1/4, 1/2, all |
+| `options.max` | 4 options per event |
 | `modifier_rules.default_stacking` | refresh |
 | `modifier_rules.max_stacks` | 3 |
 | `modifier_rules.exponential_half_life_share` | 0.5 |
 | `coverage.min_events_per_region_age` | 2 |
 | `coverage.min_agency_share` | 0.35 |
-| Statistic formula coefficients `k_*` | not given yet |
+| Supply and output formula coefficients | 1, with no tech bonus |
 | Per-event mean years, modifiers and AI base weights | per event, in `data/events/*.yaml` |
 | Per-modifier changes and years | design values, in `data/modifiers.yaml` |
 | Campaign end date | 31 August 1939 (a setting, not a placeholder) |
 
 ## Still open
 
-- **OQ-EVT-1:** the data still holds 59 post-1939 events and three later ages; how they are cut (deleted, flagged or ignored) is not settled.
-- **OQ-EVT-2:** interwar coverage is thin, some regions are thin in some ages, and there is no end-of-campaign wrap-up event.
-- **OQ-EVT-3:** validator warnings about anachronisms (Johor 1511, Poland 1917 and others) are not fixed yet.
-- **OQ-EVT-4:** the tree's abstract stats still need a rename pass onto the concrete province and country numbers; integration strain and part of legitimacy have no mapping.
-- **OQ-EVT-5:** rebel sizes and unrest thresholds assume an unrest meter that the province and rebellion designs do not have.
-- **OQ-EVT-6:** the schema and the data disagree on where several fields live; which one is the contract?
-- **OQ-EVT-7:** how many options an event may have: two or three, two or more, up to four for revolutions, and one event has only one.
-- **OQ-EVT-8:** decisions lapse after 10 years, but nothing may ever answer an event for the player; does lapsing apply only to the computer?
-- **OQ-EVT-9:** how the three alternate history presets and "historical lean" map onto the "historical or free events" new game option.
-- **OQ-EVT-10:** whether `is_human` changing selection weights breaks the "no player-only shortcuts" rule.
-- **OQ-EVT-11:** none of the additions proposed by religion, revolutions, culture, subjects, diplomacy, national strengths, buildings or the tutorial is merged.
-- **OQ-EVT-12:** culture counts 38 culture groups in the tree, the enums list 39.
-- **OQ-EVT-13:** post-1939 values (computing, the internet, some ideologies, CO2) remain in the closed lists.
-- **OQ-EVT-14:** diplomacy wants trust and notoriety derived; the statistics file stores them.
-- **OQ-EVT-15:** when in the month the yearly age and period checks run.
-- **OQ-EVT-16:** religion takes over three world-state flags the enums still say the engine sets.
+- A historian's check of the sources and the dated anachronisms before release.
 
 ## For developers
 
-- Spec: [`domain/events/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/events/spec.md), requirement code **EVT** (EVT-001 to EVT-067).
+- Spec: [`domain/events/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/events/spec.md), requirement code **EVT** (EVT-001 to EVT-068).
 - Features: `domain/events/features/` (campaign-scope, principles, ages-and-periods, eligibility, selection, options, effects, modifiers, statistics, data-validation).
-- Code: not written yet. It will live in `packages/engine/src/domain/events/`.
+- Code: `packages/engine/src/domain/events/`; numbers in `packages/rules/data/domain/events.json`.
 - Event data lives in the event tree design (`event-tree/data/`), with the schema in `event-tree/schema/event-tree.d.ts`.

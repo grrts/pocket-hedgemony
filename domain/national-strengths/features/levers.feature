@@ -17,7 +17,21 @@ Feature: Levers
       | grievance_shield    | rule     | flag  | 1.5    | province-stats 12.1 |
       | troop_cap_share     | army     | count | 2.0    | warfare 2.5         |
       | storm_loss_pct      | navy     | pct   | 0.03   | warfare 11.3        |
-      | building_unlock     | building | flag  | 1.5    | province-stats 4    |
+      | building_unlock     | building | flag  | 1.5    | buildings design    |
+
+  @HER-035 @HER-036
+  Scenario Outline: Trade levers act on trade v2
+    Given the lever "<lever>" in levers.json
+    When it is read
+    Then it is in group "<group>" with unit "<unit>", costs <points> points per unit and is owned by "trade v2 (X-6)"
+    And it changes "<meaning>"
+
+    Examples:
+      | lever               | group    | unit  | points | meaning                                                      |
+      | trade_balance_pct   | treasury | pct   | 0.1    | Percent on the trade ratio gain in the affected provinces.   |
+      | traders_passing_pct | trade    | pct   | 0.06   | Percent on the trade ratio gain in the affected provinces.   |
+      | trader_gain_pct     | trade    | pct   | 0.08   | Percent on each deposit a trader makes (land, river or sea). |
+      | trader_count        | trade    | count | 1.0    | Extra traders at the campaign start.                         |
 
   @HER-037
   Scenario: Scoped levers

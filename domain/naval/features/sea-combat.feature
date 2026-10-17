@@ -52,7 +52,7 @@ Feature: At sea against an enemy
 
   @NAVY-102 @NAVY-103 @placeholder
   Scenario Outline: A pirate fleet grows where trade passes unhunted
-    # config: naval.pirate_coasts; depends on OQ-NAVY-23 for the season length
+    # config: naval.pirateCoasts, naval.pirates.seasonMonths (D-NAVY-23: a season is 3 months)
     Given the pirate fleet of the "<coast>" has 4 ships
     And this season trade ships <trade> its home zones
     And <hunt> warship hunted there
@@ -78,12 +78,19 @@ Feature: At sea against an enemy
     When a Ming fleet sinks 2 of them
     Then the pirate fleet has 3 ships
 
-  @NAVY-104 @open-question
+  @NAVY-104 @placeholder
   Scenario: Burning a pirate base ends the pirate fleet
-    # depends on OQ-NAVY-23: the base rule is unclear
-    Given the pirate base of the "Barbary corsairs" is a port province on that coast with no harbour of a realm that hunts it
+    # config: naval.pirates.bases (D-NAVY-23)
+    Given the pirate base of the "Barbary corsairs" is the province "Algiers"
     When the base is burned
     Then the pirate fleet ends until trade brings it back
+
+  @NAVY-122 @placeholder
+  Scenario: Pirate fleets at the start
+    # config: naval.pirates (D-NAVY-23)
+    Given the pirate config of the design
+    Then the pirate fleet of the "wokou" starts with 2 ships
+    And a pirate season lasts 3 months
 
   @NAVY-105
   Scenario: A pirate people with its own catalogue record

@@ -18,8 +18,8 @@ Feature: Budgets
       | great legacy | 3      |
       | burden       | -2     |
 
-  @HER-046 @HER-047 @placeholder @open-question
-  # OQ-HER-3: the design says France gets no size bonus
+  @HER-046 @HER-047 @placeholder
+  # config: budget.size_bonus
   Scenario Outline: Size bonus
     Given the country "<country>" has size class <size>
     When its birthright budget is set

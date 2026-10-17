@@ -71,19 +71,38 @@ Feature: Effects and execution
       | stability +1  | stability 1 |
       | debt -30%     | debt 2100   |
 
-  @EVT-048 @placeholder @open-question
-  Scenario Outline: Rebel sizes
-    # config: rebel_sizes; OQ-EVT-5: how a rebels effect becomes a rising
-    Given the province "Paris" has a manpower yield of 1000
+  @EVT-048 @placeholder
+  Scenario Outline: A rebels effect is a spark that starts a rising
+    # config: rebel_sizes
+    Given the province "Paris" has a recruit pool of 1000
     When the effect "rebels on Paris type revolutionary size <size>" applies
-    Then rebels of <men> men appear
+    Then a rising of <men> men starts in "Paris"
+    And the recruit pool of "Paris" is <left>
 
     Examples:
-      | size   | men  |
-      | small  | 500  |
-      | medium | 1000 |
-      | large  | 2000 |
-      | huge   | 4000 |
+      | size   | men  | left |
+      | small  | 125  | 875  |
+      | medium | 250  | 750  |
+      | large  | 500  | 500  |
+      | huge   | 1000 | 0    |
+
+  @EVT-048
+  Scenario: rebels_active reads anticolonial risings
+    Given a rising of the type "anticolonial" is under way in "Algeria"
+    When the condition "rebels_active who Algeria type anticolonial" is evaluated
+    Then it is true
+
+  @EVT-068
+  Scenario Outline: The end of a tagged rising applies its tier
+    Given "France" answered a revolution event whose option has the rising_won effect "stability -2" and the rising_crushed effect "stability +1"
+    And the stability of "France" is 0
+    When the rising tagged with that event is <outcome>
+    Then "France" has stability <stability>
+
+    Examples:
+      | outcome | stability |
+      | won     | -2        |
+      | crushed | 1         |
 
   @EVT-049
   Scenario: A war started by an event can be tested by id

@@ -30,6 +30,21 @@ Feature: When an event can happen
       | approximate | its chance is weighted toward the historical date           |
       | reference   | the date is only a guide                                    |
 
+  @EVT-019 @placeholder
+  Scenario Outline: An approximate event leans toward its history year
+    # config: date_binding.approximate_peak_mult, date_binding.approximate_spread_years
+    Given the event "death_of_suleiman" has the availability mode "approximate" and the history year 1566
+    When its pool chance is weighed in <year>
+    Then its date factor is <factor>
+
+    Examples:
+      | year | factor |
+      | 1566 | 2.0    |
+      | 1561 | 1.5    |
+      | 1571 | 1.5    |
+      | 1576 | 1.0    |
+      | 1600 | 1.0    |
+
   @EVT-020
   Scenario Outline: Repeating events
     Given an event with repeat "<repeat>"
@@ -109,10 +124,10 @@ Feature: When an event can happen
     Then the build reports an error
 
   @EVT-027
-  Scenario: is_human never decides eligibility
-    Given an event's trigger uses "is_human"
+  Scenario: No condition reads whether a country is played by a person
+    Given an event's selection weights use "is_human"
     When the event tree is built
-    Then the build reports that "is_human" may only appear in selection weights
+    Then the build reports that "is_human" is not a declared condition type
 
   @EVT-028
   Scenario Outline: The event condition

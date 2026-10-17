@@ -19,13 +19,17 @@ Feature: Achievements in the free tier and the Steam demo
 
     Examples:
       | id |
+      | independence_won |
+      | walls_held_1453 |
+      | four_quarters_hold |
+      | from_one_hall |
+      | decentralised_1500 |
       | many_crowns |
       | every_macro_region |
 
-  # The free set is decided (Ottomans, France) but the design still calls it open (OQ-ACH-3).
-  @ACH-056 @open-question
-  Scenario: From One Hall needs the full game when no free country starts with one province
-    Given no free country starts with a single province
+  @ACH-056
+  Scenario: From One Hall needs the full game because no free country starts with one province
+    Given the free countries are "Ottomans" and "France"
     Then the achievement "from_one_hall" is marked full_game
 
   @ACH-057

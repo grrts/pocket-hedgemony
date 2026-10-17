@@ -26,9 +26,9 @@ Feature: Selection and pacing
     When the event becomes eligible
     Then the event is offered to the controller of "France"
 
-  @EVT-032 @placeholder @open-question
+  @EVT-032 @placeholder
   Scenario: An unanswered decision lapses and re-enters the pool
-    # config: selection.decision_expiry_years; OQ-EVT-8: the player never has events answered for them
+    # config: selection.decision_expiry_years
     Given a decision event was offered to an AI country 10 years ago and left unanswered
     And the event is still eligible
     When the month is processed
@@ -80,10 +80,26 @@ Feature: Selection and pacing
       | plausible  | 1.0   | 1.0        | 1.0  |
       | divergent  | 0.6   | 0.5        | 1.3  |
 
-  @EVT-036 @placeholder
-  Scenario: The historical lean rule
-    # config: selection.historical_weight_bonus
-    Given the game rule "historical lean" is on
-    And an option marked historical has an AI weight of 40
-    When the AI weighs its options
-    Then the historical option's weight is 50
+  @EVT-032
+  Scenario: A decision offered to the player never lapses
+    Given a decision event was offered to the player's country 10 years ago and is still waiting
+    When the month is processed
+    Then the decision is still waiting for the player
+
+  @EVT-036
+  Scenario Outline: The new game's events choice
+    Given the new game's events choice is "<choice>"
+    When the campaign's game rules are set
+    Then the alternate history mode is "<mode>"
+
+    Examples:
+      | choice     | mode       |
+      | Historical | historical |
+      | Plausible  | plausible  |
+      | Free       | divergent  |
+
+  @EVT-036
+  Scenario: Plausible is the default events choice
+    Given a new game whose events choice is left alone
+    When the campaign's game rules are set
+    Then the alternate history mode is "plausible"

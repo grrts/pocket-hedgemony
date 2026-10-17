@@ -239,3 +239,7 @@ Feature: Cloud saves on the Pocket Hegemony server
     When the player opens it on the phone
     Then the phone asks for the unlock
     And the server does not unlock "Portugal" on the phone
+
+  @SAVE-104
+  Scenario: Personal settings ride the account sync
+    Then the account's synced files include "settings-personal.json"

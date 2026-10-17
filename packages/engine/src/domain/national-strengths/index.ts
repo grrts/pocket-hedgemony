@@ -1,7 +1,9 @@
 import config from "../../../../rules/data/domain/national-strengths.json" with { type: "json" };
 import examples from "../../../../rules/data/domain/national-strengths-examples.json" with { type: "json" };
 import type { Rng } from "../../rng.ts";
+import mapSetup from "../../../../rules/data/domain/scenario-setup-map.json" with { type: "json" };
 import { ERAS, eraIndex, type Era } from "../research/index.ts";
+import { lonLatOf, pixelOf } from "../world-map/index.ts";
 
 /**
  * National strengths (domain/national-strengths/spec.md): a country's
@@ -10,9 +12,8 @@ import { ERAS, eraIndex, type Era } from "../research/index.ts";
  * archetype generation; and what happens when countries change hands. The
  * rules, levers and archetypes live in rules/data/domain/national-strengths.json
  * (copied from national-strengths/config). State is plain data the caller
- * owns; draws use only the Rng the caller hands in. How often conditions are
- * checked is open (OQ-HER-9): the caller decides when to evaluate and how
- * many years an awake heyday has served.
+ * owns; draws use only the Rng the caller hands in. Heritage is evaluated
+ * once per turn, after the event tree, and counts time in months (D-HER-9).
  */
 
 export const nsConfig = config;
@@ -251,6 +252,8 @@ export interface CountryFacts {
   rebels?: string[];
   /** Share (0-1) of trade power held in each trade hub (trade_presence). */
   trade?: Record<string, number>;
+  /** Years it has owned an annexed country's capital and held a majority of its homeland, by that country (HER-060). */
+  homelandHeldYears?: Record<string, number>;
 }
 
 export interface WorldFacts {
@@ -620,6 +623,9 @@ function finish(h: Heritage, a: Heritage["ambitions"][number], state: "done" | "
 export function evaluate(h: Heritage, w: WorldFacts, rng?: Rng): HeritageEvent[] {
   const from = h.log.length;
   const self = h.country;
+  // 0. Dormant claims wake after claim_years holding the capital and most of the homeland (HER-060, D-HER-1).
+  const held = country(w, self).homelandHeldYears ?? {};
+  for (const c of [...h.claims]) if ((held[c.from] ?? 0) >= RULES.inheritance.claim_years) wakeClaim(h, c.from);
   // 1. Birthright needs: dormant or awake (HER-005, HER-006).
   for (const b of h.birthrights) {
     const dormant = b.item.needs ? !holds(b.item.needs, w, self) : false;
@@ -680,9 +686,45 @@ export function evaluate(h: Heritage, w: WorldFacts, rng?: Rng): HeritageEvent[]
   return h.log.slice(from);
 }
 
-/** The years an awake heyday has served, as counted by the caller (OQ-HER-9). */
+/** Adds years served to every awake heyday. */
 export function serveYears(h: Heritage, years: number): void {
   for (const hd of h.heydays) if (hd.state === "awake") hd.yearsAwake += years;
+}
+
+/**
+ * One turn of heritage (HER-078, D-HER-9): evaluated once, after the event
+ * tree; each awake heyday serves one month (a year is 12 turns).
+ */
+export function monthTick(h: Heritage, w: WorldFacts, rng?: Rng): HeritageEvent[] {
+  const out = evaluate(h, w, rng);
+  const perYear = RULES.timing.months_per_year;
+  for (const hd of h.heydays) if (hd.state === "awake") hd.yearsAwake = Math.round(hd.yearsAwake * perYear + 1) / perYear;
+  return out;
+}
+
+/**
+ * The AI's answer when a third heyday would wake or a sixth legacy is earned
+ * (HER-079, D-HER-12): the one with the fewest lever points goes; on a tie,
+ * the one held longest.
+ */
+export function aiAnswer(h: Heritage): string | null {
+  const ask = h.ask;
+  if (!ask) return null;
+  if (ask.kind === "sleep_heyday") {
+    const ids = [...ask.awake, ask.waking];
+    const hds = ids.map((id) => h.heydays.find((x) => x.item.id === id)!);
+    const pick = hds.reduce((a, b) => {
+      const pa = effectsPoints(a.item.effects);
+      const pb = effectsPoints(b.item.effects);
+      return pb < pa - 1e-9 || (Math.abs(pa - pb) < 1e-9 && b.yearsAwake > a.yearsAwake) ? b : a;
+    });
+    chooseSleepingHeyday(h, pick.item.id);
+    return pick.item.id;
+  }
+  const all = [...h.legacies, ask.legacy];
+  const pick = all.reduce((a, b) => (effectsPoints(b.effects) < effectsPoints(a.effects) - 1e-9 ? b : a));
+  letGoLegacy(h, pick.id);
+  return pick.id;
 }
 
 /** The player's answer when a third heyday would wake: the chosen one sleeps (HER-013). */
@@ -710,6 +752,31 @@ export function shedBurden(h: Heritage): Legacy | null {
   h.log.push({ type: "BurdenShed", id: h.burden.item.id });
   grantLegacy(h, h.burden.item.turned);
   return h.burden.item.turned;
+}
+
+/**
+ * What a resident envoy learns (HER-025, D-HER-11): after envoy_reveal_years
+ * at the court, the hint and warmth of one of the host's open ambitions,
+ * never its plain goal.
+ */
+export function envoyReading(host: Heritage, yearsResident: number, rng: Rng): { hint: string; theme: Theme; band: Band } | null {
+  if (yearsResident < RULES.ambitions.envoy_reveal_years) return null;
+  const open = openAmbitions(host);
+  if (!open.length) return null;
+  const a = open[rng.int(open.length)]!;
+  host.log.push({ type: "AmbitionRead", id: a.item.id });
+  return { hint: a.item.hint, theme: a.item.theme, band: a.band };
+}
+
+/**
+ * Whether a pool's size is within the rules (HER-014, D-HER-10): at least
+ * pool_min_authored or pool_min_generated, at most pool_max; age ambitions
+ * join on top and do not count.
+ */
+export function poolWithinLimits(d: HeritageData, kind: "authored" | "generated"): boolean {
+  const n = d.ambitions.filter((a) => !a.age).length;
+  const min = kind === "authored" ? RULES.ambitions.pool_min_authored : RULES.ambitions.pool_min_generated;
+  return n >= min && n <= RULES.ambitions.pool_max;
 }
 
 /** Gold never buys a burden off (HER-034). */
@@ -877,6 +944,25 @@ export function heritageRow(h: Heritage): { birthright: string; heyday: string |
   };
 }
 
+/**
+ * What the map shimmers over (HER-072): the places and areas named by each
+ * hot open ambition. The map draws a faint shimmer only: no outline, no name.
+ */
+export function shimmer(h: Heritage): { places: string[]; outline: false; named: false }[] {
+  const out: { places: string[]; outline: false; named: false }[] = [];
+  for (const a of openAmbitions(h)) {
+    if (a.band !== "hot") continue;
+    const places = leaves(a.item.goal).flatMap((l) => {
+      const [type, v] = Object.entries(l)[0]!;
+      if (type === "holds_place") return [String(v.place)];
+      if (type === "owns") return [String(v.where)];
+      return [];
+    });
+    if (places.length) out.push({ places, outline: false, named: false });
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------- AI (HER-069)
 
 /** The AI sees its own ambitions' goals and weighs them at ai.ambition_goal_weight. */
@@ -892,7 +978,7 @@ export function annex(annexer: Heritage, annexed: Heritage): void {
   annexer.log.push({ type: "DormantClaimCreated", id: annexed.birthrights[0]!.item.id });
 }
 
-/** A claim wakes as another birthright, never beyond 2 (HER-060). When it may wake is OQ-HER-1. */
+/** A claim wakes as another birthright, never beyond 2 (HER-060); evaluate wakes it after claim_years (D-HER-1). */
 export function wakeClaim(h: Heritage, from: string): boolean {
   const claim = h.claims.find((c) => c.from === from);
   if (!claim || h.birthrights.length >= RULES.inheritance.max_birthrights) return false;
@@ -916,7 +1002,12 @@ export function releasedHeritage(id: string, known: Record<string, HeritageData>
  */
 export function formCountry(id: string, forming: Heritage, formed: HeritageData | null, rng: Rng): Heritage {
   const h = newHeritage(id, formed ?? { id, birthright: forming.birthrights[0]!.item, heydays: [], ambitions: [] });
-  h.birthrights = [...forming.birthrights.map((b) => ({ ...b })), ...(formed ? [{ item: formed.birthright, dormant: false }] : [])].slice(0, RULES.inheritance.max_birthrights);
+  // the forming country's own birthright first, then the formed country's own;
+  // any other birthright (an inherited one) goes back to a dormant claim (D-HER-17)
+  const own = forming.birthrights.find((b) => !b.from) ?? forming.birthrights[0]!;
+  const keep = formed ? [{ ...own }, { item: formed.birthright, dormant: false }] : forming.birthrights.map((b) => ({ ...b }));
+  h.birthrights = keep.slice(0, RULES.inheritance.max_birthrights);
+  h.claims = [...forming.claims, ...forming.birthrights.filter((b) => !h.birthrights.some((k) => k.item.id === b.item.id)).map((b) => ({ from: b.from ?? forming.country, item: b.item }))];
   h.legacies = [...forming.legacies];
   h.pool = [...forming.pool, ...(formed ? formed.ambitions.filter((a) => !a.age) : [])];
   h.burden = formed?.burden ? { item: formed.burden, state: "held" } : forming.burden;
@@ -955,6 +1046,14 @@ export type Group = keyof typeof config.groups;
 /** Who gets what (HER-051, HER-052). */
 export function heritageKindOf(group: Group): HeritageKind {
   return config.groups[group].heritage as HeritageKind;
+}
+
+/** The group of a catalogue record from its tier and representation: tier A playables are hand-written (HER-051, HER-052). */
+export function groupOfRecord(tier: string, representation: string): Group {
+  const g = config.groups;
+  if (g.decentralised.modes.includes(representation)) return "decentralised";
+  if (g.tier_a.modes.includes(representation)) return tier === "A" ? "tier_a" : "tier_b_c";
+  return "background";
 }
 
 interface Archetype {
@@ -1316,4 +1415,37 @@ export function mergeAuthored(generated: HeritageData, authored: Partial<Heritag
   if (authored.burden) out.burden = authored.burden;
   if (Object.keys(authored).some((k) => ["birthright", "heydays", "ambitions", "burden"].includes(k))) out.authored = true;
   return out;
+}
+
+// ---------------------------------------------------------------- place names (HER-044, D-HER-16)
+
+/** Where a place name sits: a scenario-map capital or port of that name. */
+export function placeLonLat(name: string, provinces: readonly { id: string; x?: number; y?: number }[] = []): { lon: number; lat: number } | null {
+  const n = mapSetup.nations.find((x) => x.name === name);
+  if (n) return { lon: n.capital[0]!, lat: n.capital[1]! };
+  const port = (mapSetup.ports as unknown as [string, string, string][]).find((p) => p[0] === name);
+  const prov = port ? provinces.find((p) => p.id === port[2]) : undefined;
+  return prov && prov.x !== undefined && prov.y !== undefined ? lonLatOf(prov.x, prov.y) : null;
+}
+
+/**
+ * Binds a heritage place name to one map province (D-HER-16): the land
+ * province whose centre lies nearest the place. A name the map does not hold
+ * stays listed in places-to-bind.md, and its condition is false until bound.
+ */
+export function bindPlace(name: string, provinces: readonly { id: string; x?: number; y?: number; terrain: string }[]): string | null {
+  const at = placeLonLat(name, provinces);
+  if (!at) return null;
+  const { x, y } = pixelOf(at.lon, at.lat);
+  let best: string | null = null;
+  let dist = Infinity;
+  for (const p of provinces) {
+    if (p.terrain === "sea" || p.terrain === "ocean" || p.x === undefined || p.y === undefined) continue;
+    const d = (p.x - x) ** 2 + (p.y - y) ** 2;
+    if (d < dist) {
+      dist = d;
+      best = p.id;
+    }
+  }
+  return best;
 }

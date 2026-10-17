@@ -31,12 +31,19 @@ Feature: Fleets and hulls
       | worn   | 6      | leaking |
       | sound  | 5      | sound   |
 
-  @NAVY-060
-  Scenario: Battle hits lower a hull
-    # depends on OQ-NAVY-6: how many hits make a hull step is not given
-    Given a galleon with a hull "sound"
-    When it takes hits in a sea battle without sinking
-    Then its hull falls one or more steps
+  @NAVY-060 @NAVY-118
+  Scenario Outline: Battle hits lower a hull
+    # D-NAVY-6: one hull step per battle with hits; hits equal to strength sink it
+    Given a galleon with a hull "<before>" and a strength of 10
+    When it takes <hits> hits in a sea battle
+    Then its hull is "<after>"
+
+    Examples:
+      | before  | hits | after   |
+      | sound   | 0    | sound   |
+      | sound   | 3    | worn    |
+      | worn    | 9    | leaking |
+      | leaking | 10   | sunk    |
 
   @NAVY-061 @placeholder
   Scenario Outline: Refit in a berth
