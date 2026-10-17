@@ -1,3 +1,4 @@
+import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { officialName, personName } from "./names.ts";
@@ -690,7 +691,7 @@ export function monthlyRecruits(world: World, news: News[]): void {
   const empty = rc.emptyProvinceEffect("Leave it").recruits;
   for (let p = 0; p < world.provinceCount; p++) {
     const pool = { recruits: world.provinceRecruits[p]!, ceiling: world.provinceRecruitCeiling[p]! };
-    rc.refill(pool as rc.ProvincePool, 1, rate * (ungoverned(world, p) ? empty : 1));
+    rc.refill(pool as rc.ProvincePool, 1, rate * (ungoverned(world, p) ? empty : 1) * moodShare(world, p));
     world.provinceRecruits[p] = pool.recruits;
   }
   recomputeCap(world);

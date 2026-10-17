@@ -25,6 +25,9 @@ export function hashWorld(world: World): string {
   feed(world.provinceStore);
   feed(world.provinceHarvest);
   feed(world.provinceStarved);
+  feed(world.provinceGrievances);
+  feed(world.provinceArmyMonths);
+  feed(world.provinceBattleYear);
   // Army fields of live slots only: a dead slot keeps whatever it held, and a save drops it.
   const live = <T extends ArrayBufferView & ArrayLike<number> & { slice(a?: number, b?: number): T; fill(v: number, a?: number, b?: number): T }>(arr: T, stride = 1): T => {
     const out = arr.slice(0, a.count * stride);

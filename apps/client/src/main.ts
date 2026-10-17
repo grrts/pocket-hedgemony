@@ -967,7 +967,7 @@ function renderNews(): void {
   const s = snapshot!;
   const me = s.playerNation;
   const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
-    war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll",
+    war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
   };
   const mine = (x: News) => x.nations.includes(me);
   const items = [...dispatches.filter(mine), ...dispatches.filter((x) => !mine(x))];
@@ -1115,6 +1115,7 @@ function renderPanel(): void {
       <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       ${snapshot ? foodFacts(selectedProvince) : ""}
+      ${snapshot && own >= 0 ? moodFacts(selectedProvince) : ""}
       <dt>Seat</dt><dd>${owner && owner.capital === p.id ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)]}</dd>
       <dt>Walls</dt><dd>${owner && owner.capital === p.id ? WALL_NAMES.castle : p.castle ? WALL_NAMES[p.castle] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
@@ -1213,6 +1214,27 @@ function foodFacts(pi: number): string {
   return `<dt>Food</dt><dd>${months.toFixed(1)} months stored${warn}</dd>
       <dt>Harvest</dt><dd>${h >= 0 ? s.harvests[h]! : "not in yet"}</dd>
       ${starved > 0 ? `<dt>Starved</dt><dd>${fmt(starved)} this year</dd>` : ""}`;
+}
+
+/** What eases each grievance, for the mood line. */
+const GRIEVANCE_FIX: Record<string, string> = {
+  Hungry: "ends above three months of food",
+  Conscription: "ends when half the recruits are back",
+  "Soldiers quartered": "ends when the armies move on",
+  Ungoverned: "ends when the official returns to his post",
+  "Foreign rule": "the people were not yours in 1444",
+  Bloodshed: "a battle was fought here; it fades after 20 years",
+};
+
+/** A province's mood and its grievances, with what each needs to end. */
+function moodFacts(pi: number): string {
+  const s = snapshot!;
+  const mood = s.moods[s.provinceMood[pi]!]!;
+  const g = s.provinceGrievances[pi]!;
+  const names = s.grievanceNames.filter((_, k) => g & (1 << k));
+  const effect = mood === "rioting" || mood === "plotting" ? " · half tax and recruits" : "";
+  return `<dt>Mood</dt><dd><b>${mood[0]!.toUpperCase() + mood.slice(1)}</b>${effect}</dd>
+      ${names.length ? `<dt>Grievances</dt><dd>${names.map((n) => `<span title="${esc(GRIEVANCE_FIX[n] ?? "")}">${esc(n)}</span>`).join(", ")}</dd>` : ""}`;
 }
 
 /** What each class does, for the People tab. */

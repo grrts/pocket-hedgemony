@@ -1,5 +1,6 @@
 import { monthlyPeople } from "./living.ts";
 import { monthlyFood } from "./food.ts";
+import { moodShare, monthlyMoods } from "./moods.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, forageRations, monthlyRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -141,6 +142,7 @@ function startDay(world: World, news: News[]): void {
   if (world.day > 0 && world.date.day === 1) {
     monthlyPeople(world, news);
     monthlyFood(world, news);
+    monthlyMoods(world, news);
     monthlyRecruits(world, news);
     runEconomy(world, true);
     monthlyDiplomacy(world, news);
@@ -469,7 +471,7 @@ function runEconomy(world: World, pay: boolean): void {
     const owner = controller(world, p);
     if (owner < 0) continue;
     // A province whose official was commissioned pays half (recruiting RECR-083, "Leave it").
-    const share = ungoverned(world, p) ? emptyTax : 1;
+    const share = (ungoverned(world, p) ? emptyTax : 1) * moodShare(world, p);
     income[owner] =
       income[owner]! +
       (world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth + world.provinceWealth[p]! * economy.goldPerWealthPerMonth) * share;
