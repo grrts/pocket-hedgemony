@@ -2565,6 +2565,15 @@ Object.assign(globalThis, {
     const k = [...snapshot.armies.id.keys()].find((j) => snapshot!.armies.owner[j] === snapshot!.playerNation && snapshot!.armies.commander[j]! >= 0);
     if (k !== undefined) await act({ type: "move", army: snapshot.armies.id[k]!, to: provinceIndex.get(id)! });
   },
+  /** Sends every army of the player with a commander onto the first army of a realm, to bring on a battle. */
+  __phAttack: async (id: string) => {
+    if (!snapshot) return;
+    const a = snapshot.armies;
+    const foe = [...a.id.keys()].find((j) => a.owner[j] === nationIndex.get(id));
+    if (foe === undefined) return;
+    const mine = [...a.id.keys()].filter((j) => a.owner[j] === snapshot!.playerNation && a.commander[j]! >= 0);
+    for (const k of mine) await act({ type: "move", army: a.id[k]!, to: a.location[foe]! });
+  },
   /** Centres the map on the player's first army with a commander, at a zoom, and selects it. */
   __phLookAtArmy: (zoom = 6) => {
     if (!snapshot) return;

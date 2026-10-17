@@ -31,7 +31,7 @@ await page.click(".panel .close").catch(() => {});
 let watched = false;
 let sieged = false;
 for (let t = 0; t < 60 && !watched; t++) {
-  await page.evaluate((t) => window.__phMarchOn(t), TARGET);
+  await page.evaluate((t) => window.__phAttack(t), TARGET);
   const turn = await page.evaluate(() => window.__phTurn());
   await page.click(".end-turn");
   console.log("turn", turn, await page.evaluate(() => document.querySelector("#alerts").innerText.replace(/\n/g, " | ")));
@@ -41,10 +41,12 @@ for (let t = 0; t < 60 && !watched; t++) {
     if ((await page.evaluate(() => window.__phTurn())) > turn) break;
     if (!sieged && (await page.locator(".alert", { hasText: "siege" }).count())) {
       sieged = true;
+      await page.waitForTimeout(400);
       await page.screenshot({ path: `${out}/0-siege-alert.png` });
     }
     const watch = page.locator(".alert .go-there", { hasText: "Watch" });
     if (await watch.count()) {
+      await page.waitForTimeout(400);
       await page.screenshot({ path: `${out}/1-battle-alert.png` });
       await watch.first().click();
       await page.waitForTimeout(2500);
