@@ -1,7 +1,7 @@
 import { provinceConfig, type ClassName, type ProvinceConfig } from "./model.ts";
 import { type HarvestRoll } from "./land.ts";
 
-/** Rules settled in spec §13 (D-PROV-1 to D-PROV-25). Numbers live in province.json "decided". */
+/** Rules settled in spec §13 (D-PROV-1 to D-PROV-24). Numbers live in province.json "decided". */
 
 // ---------------------------------------------------------------- tax (D-PROV-10, D-PROV-22)
 
@@ -125,7 +125,7 @@ export function settlementStage(step: string, cfg: ProvinceConfig = provinceConf
   return (cfg.decided.settlement_stages as Record<string, string>)[step] ?? null;
 }
 
-// ---------------------------------------------------------------- officials, lords (D-PROV-13, D-PROV-23, D-PROV-25)
+// ---------------------------------------------------------------- officials, lords (D-PROV-13, D-PROV-23, D-PROV-24)
 
 export type Kinship = "own" | "cousin" | "stranger";
 
@@ -140,7 +140,7 @@ export function lordUngovernedGives(tax: number, recruits: number, cfg: Province
   return { tax: tax * s, recruits: Math.floor(recruits * s) };
 }
 
-/** Provinces one official runs: 1 with G1, 2 with G9, 3 with G16, plus one each for B2, G11, T14 (D-PROV-25). */
+/** Provinces one official runs: 1 with G1, 2 with G9, 3 with G16, plus one each for B2, G11, T14 (D-PROV-24). */
 export function provincesPerOfficial(known: string[], cfg: ProvinceConfig = provinceConfig): number {
   const o = cfg.decided.officials_per_province;
   let base = 1;
