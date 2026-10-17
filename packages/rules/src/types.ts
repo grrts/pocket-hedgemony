@@ -144,12 +144,16 @@ export interface MarchDefines {
   tilesPerCrossing: number;
   /** How much slower deep snow makes a march (1 = twice as slow). */
   snowSlowdown: number;
+  /** Rations a soldier eats in a month at home (one man's month of food); on campaign he eats realm food.campaign_eat times as much. */
   rationsPerSoldier: number;
+  /** Rations a horse eats in a month, like three men (REALM-054). */
   rationsPerHorse: number;
-  /** Food a province can spare each month, in rations per person living there. */
+  /** Food a province can spare each month, in rations per person living there (only sets how big a column slows down). */
   rationsStoredPerPerson: number;
-  /** How many months of food an army's wagons carry. */
+  /** How many months of food on campaign an army's wagons carry. */
   monthsCarried: number;
+  /** Months of eating the locals of a friendly province keep back when an army refills there; an enemy's foragers keep nothing back (feedback 83). */
+  homeReserveMonths: number;
   /** Rations cut per point of the commander's logistics. */
   logisticsRationCut: number;
   /** Men (and horses) lost in a month with no food at all. */

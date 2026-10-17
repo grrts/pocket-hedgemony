@@ -336,6 +336,20 @@ Leroy's feedback F-75: stability is a meaningful reading of the state of lords, 
 - REALM-204: The General tab of the player's country card shall open with a Stability section: the step, one line on what it means, and one row per pillar (Lords and Subjects by loyalty, Officials as royal posts filled or standing empty, Provinces by mood) with that pillar's step; tapping a row opens the tab that mends it: Lords, Diplomacy, Officials or Provinces. [F-75, X-19]
 - REALM-205: The top bar shall show, in this order, the realm's flag and name, the date, gold with its change a month, stability, the war plaque while at war, and dispatches; every plaque is the same height (36 px drawn, 44 px to tap) and type, and the troop count moves off the bar to the Military tab, where it is already shown. On a phone the game plays in landscape (the turn-your-phone notice covers portrait), and the bar fits the width of a landscape phone. [F-74, X-19]
 
+### 5.20 Harvests and army supply (feedback 82, 83)
+Leroy's feedback 82 and 83 (17 October), after the food research found that harvests almost never failed and armies never ate from the land. It is the latest decision, so it adds to REALM-021, REALM-050, REALM-054 and REALM-057.
+
+- REALM-206: Each province shall roll its own harvest at each of its harvests, before weather and war: poor 10 %, normal 70 %, good 15 %, bumper 5 % (`food_year.base_harvest`, provisional). Its region's weather, an enemy in the province and the realm's harvest inventions then move it a band each, so a failed harvest comes from a poor roll in a bad year, or bad weather with an enemy in the province. [REALM-021, REALM-050, feedback 82]
+- REALM-207: A region shall roll its weather once per harvest, and each province shall read that roll by its harvest climate: temperate lands 1 in 6 bad weather and 1 in 6 good; dry lands (desert, drylands, savanna) 1 in 4 drought and 1 in 8 good; monsoon lands (the rice lands and the tropical monsoon of Asia) 1 in 5 floods and 1 in 6 good (`food_year.weather`, `food_year.climate_weather`, provisional). The roll is shared, so where the temperate land suffers, the dry land beside it suffers too. [REALM-050, REALM-167, feedback 82]
+- REALM-208: A province shall harvest once a year in its harvest month (REALM-167). Rice lands, the wet lowlands from India to South China and the Indies (68° to 146° east, 11° south to 30° north, not desert, drylands, mountains or tundra; `food_year.rice_lands`, provisional), harvest in March and in September once their realm knows *F2 Wet-rice terracing*, each harvest bringing half the year's food. The tundra grows no crops, so its farmers bring in nothing. Herders, woodsmen and seafolk bring food every month whatever the season. [REALM-057, D-TIME-5, feedback 82]
+- REALM-209: An army shall eat from its wagons every day: a man eats a month of food a month at home and double on campaign, and a horse eats like three men (REALM-054). An army is on campaign while its realm is at war or while it stands outside its own land. The wagons carry `march.monthsCarried` (2) months of food on campaign. [REALM-054, feedback 83]
+- REALM-210: An army shall refill its wagons from the local store of the province where it stands (REALM-022): in a month it can take what its foragers find on that ground (`march.foraging`) of the store above a reserve. In its own or any province not at war with it, the locals keep `march.homeReserveMonths` (2, provisional) months of eating; in an enemy's province nothing is kept back. What it takes leaves the province's store, so a long stay or a march through poor land brings hunger to the province and, when the store runs dry, to the army. Until castles hold food, every refill comes from the locals (REALM-045). [REALM-022, REALM-045, feedback 83]
+- REALM-211: A realm shall hear of failed harvests in its provinces: one dispatch for each harvest month, naming them. [feedback 82]
+
+#### How the player uses it: harvests and army supply
+- REALM-212: The Overview tab of the province card shows the food lines: months stored; the last harvest in words with its cause (drought, floods or bad weather in the region, or good weather) and when it comes in (each September, twice a year in March and September, or none in the tundra); and, while armies stand there, how many months of the store they eat a month. The Provinces tab of the country card is the overview: its top line counts the last harvests (good or bumper, normal, poor or failed) and each row marks a poor or failed harvest beside its months of food. The Food lens of the map shows how many men on campaign each province's store could feed. On a phone in landscape these are lines of the side panel in the Wide and Tall layouts, nothing needs hover, and opening a row or a province is a tap of at least 44 points. [feedback 82, X-19]
+- REALM-213: An army's supply line, on the army rows of the province card and on the commander's screen, shows the months of food in its wagons, "on campaign, men eat double" while it is, and what the land where it stands gives it a month: what the locals can spare above their reserve, or what foragers can take in enemy land, with a warning when that is less than the army eats. [feedback 83, X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -441,6 +455,9 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 | campaign.end_date | End date (one setting) | 31 August 1939 | no (decided) | time-and-turns / settings |
 | grain_price_gold_per_food | Fixed grain price | 0.5 gold a food | yes | realm.json |
 | food_year.weather, harvest_month, reach_by_road, favoured_weight | Weather odds, harvest month, castle reach, favoured castles | 1 in 6 bad and good; Sep / Mar; 1–4 rings; ×2 | yes | realm.json |
+| food_year.base_harvest | A province's own harvest roll (REALM-206) | poor 10 %, normal 70 %, good 15 %, bumper 5 % (feedback 82) | yes | realm.json |
+| food_year.climate_weather, dry_terrains, no_harvest_terrains, rice_lands | Weather by climate, which grounds are dry, which grow no crops, where rice lands lie (REALM-207, REALM-208) | dry 1 in 4 drought, 1 in 8 good; monsoon 1 in 5 floods, 1 in 6 good; desert, drylands, savanna; tundra; 68°–146° E, 11° S–30° N (feedback 82) | yes | realm.json |
+| march.homeReserveMonths | Months of eating the locals keep back when an army refills (REALM-210) | 2 (feedback 83) | yes | defines.json |
 | debt | Interest, loan cap, refusal per oath, interest added at once, months between the lords' grumbling | 10 %; 1 year's income (3 with T10); 10 points; 1 year; 12 months | yes | realm.json |
 | starting_armies | Men per starting commander, most commanders | 8,000; 8 | yes | realm.json |
 | economy.taxRateFactor | Gold at each tax step against normal | 0, ½, 1, 1½, 2 (not in the design) | yes | defines.json |
@@ -690,3 +707,11 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-196 | starting-values.feature | Starting men spread over the realm, with commanders for its strength |
 | REALM-197 | starting-values.feature | Starting men spread over the realm, with commanders for its strength |
 | REALM-198 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/treasury-shots.mjs) |
+| REALM-206 | harvests-and-supply.feature | Each province rolls its own harvest |
+| REALM-207 | harvests-and-supply.feature | The region's weather is read by climate |
+| REALM-208 | harvests-and-supply.feature | When a province harvests |
+| REALM-209 | harvests-and-supply.feature | Armies eat more on campaign |
+| REALM-210 | harvests-and-supply.feature | Armies refill from the province's store |
+| REALM-211 | harvests-and-supply.feature | Failed harvests are reported |
+| REALM-212 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/food-shots.mjs) |
+| REALM-213 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/food-shots.mjs) |

@@ -1,5 +1,5 @@
 import type { GameDate, Ground, Ruleset } from "@ph/rules";
-import { groundOf, monthlyRations, rowWidths, type MarchMap, type TileMarch } from "./march.ts";
+import { groundOf, rowWidths, wagonRations, type MarchMap, type TileMarch } from "./march.ts";
 import { placeClimate, provinceClimate, type PlaceClimate } from "./climate.ts";
 import { pointTileGrid, type TileGrid } from "./tiles.ts";
 import { Rng } from "./rng.ts";
@@ -256,7 +256,7 @@ export function spawnArmy(world: World, owner: number, location: number, men: nu
   // Wagons start full.
   const d = world.rules.defines.march;
   const logistics = commander >= 0 ? world.commanderLogistics[commander]! : 0;
-  pool.food[slot] = monthlyRations(d, { men, horse, logistics }) * d.monthsCarried;
+  pool.food[slot] = wagonRations(d, { men, horse, logistics });
   return slot;
 }
 
