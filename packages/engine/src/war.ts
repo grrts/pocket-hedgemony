@@ -324,9 +324,10 @@ export function engage(world: World, news: News[]): void {
       const n = a.owner[j]!;
       const foeOfAtt = sideOwners[0]!.some((o) => enemies[n]!.has(o));
       const foeOfDef = sideOwners[1]!.some((o) => enemies[n]!.has(o));
-      if (foeOfAtt === foeOfDef || tileDistance(world, a.tile[j]!, b.tile) > engageRange(world, j)) return;
+      if (foeOfAtt === foeOfDef || a.commander[j]! < 0 || tileDistance(world, a.tile[j]!, b.tile) > engageRange(world, j)) return;
       joinBattle(world, b, j, foeOfAtt ? "defenders" : "attackers");
     });
+    joinGarrisons(world, b, enemies);
   }
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.commander[i]! < 0) continue;
@@ -340,11 +341,24 @@ export function engage(world: World, news: News[]): void {
       const d = tileDistance(world, a.tile[i]!, a.tile[j]!);
       if (d <= range && d < best) ((best = d), (foe = j));
     });
-    if (foe >= 0) startBattle(world, [i], [foe], news);
+    if (foe >= 0) joinGarrisons(world, startBattle(world, [i], [foe], news), enemies);
   }
 }
 
-function startBattle(world: World, att: number[], def: number[], news: News[]): void {
+/** Garrison troops fight in any battle in their own province, wherever in it they stand (RECR-107). */
+function joinGarrisons(world: World, b: Battle, enemies: Set<number>[]): void {
+  const a = world.armies;
+  const sideOwners = [b.attackers.map((s) => a.owner[s]!), b.defenders.map((s) => a.owner[s]!)];
+  for (let j = 0; j < a.count; j++) {
+    if (!a.alive[j] || a.commander[j]! >= 0 || a.battle[j]! >= 0 || a.location[j] !== b.province || !enemies[a.owner[j]!]!.size) continue;
+    const n = a.owner[j]!;
+    const foeOfAtt = sideOwners[0]!.some((o) => enemies[n]!.has(o));
+    const foeOfDef = sideOwners[1]!.some((o) => enemies[n]!.has(o));
+    if (foeOfAtt !== foeOfDef) joinBattle(world, b, j, foeOfAtt ? "defenders" : "attackers");
+  }
+}
+
+function startBattle(world: World, att: number[], def: number[], news: News[]): Battle {
   const a = world.armies;
   const tile = a.tile[def[0]!]!;
   const b: Battle = {
@@ -373,6 +387,7 @@ function startBattle(world: World, att: number[], def: number[], news: News[]): 
   const an = name(world, a.owner[att[0]!]!);
   const dn = name(world, a.owner[def[0]!]!);
   news.push({ kind: "battle", text: `Battle at ${provinceName(world, b.province)}: ${an} (${fmt(b.attStart)}) attacks ${dn} (${fmt(b.defStart)}).`, nations: [a.owner[att[0]!]!, a.owner[def[0]!]!], province: b.province });
+  return b;
 }
 
 /** An army joins a side of a battle: it stops marching and its men count from the next round. */

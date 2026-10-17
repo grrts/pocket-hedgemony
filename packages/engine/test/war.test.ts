@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
-import { applyNow, createWorld, marchMap, processTurn, relationState, spawnArmy, type World } from "../src/index.ts";
+import { advance, applyNow, createWorld, marchMap, processTurn, relationState, spawnArmy, type World } from "../src/index.ts";
 import { blockingCastle } from "../src/turn.ts";
 
 const rules = loadDefaultRuleset();
@@ -67,6 +67,21 @@ describe("war and conquest", () => {
     expect(w.provinceOwner[w.provinceIndex.get(rules.nations[foe]!.capital)!]).toBe(me);
     expect(w.peaceOffers).toEqual([]);
   }, 60000);
+
+  it("sends a province's garrison troops into a battle fought in it (RECR-107)", () => {
+    const w = createWorld(rules, 7, tiles);
+    const me = n(w, "castile");
+    const foe = n(w, "portugal");
+    applyNow(w, { type: "declareWar", target: foe }, me);
+    const p = Array.from({ length: w.provinceCount }, (_, i) => i).find((i) => w.provinceOwner[i] === me && w.provinceIndex.get(rules.nations[me]!.capital) !== i)!;
+    const army = spawnArmy(w, me, p, 5000, w.commanderOwner.indexOf(me));
+    const troops = spawnArmy(w, me, p, 2000);
+    const enemy = spawnArmy(w, foe, p, 6000, w.commanderOwner.indexOf(foe));
+    advance(w, 1);
+    expect(w.armies.battle[army]).toBeGreaterThanOrEqual(0);
+    expect(w.armies.battle[enemy]).toBe(w.armies.battle[army]);
+    expect(w.armies.battle[troops]).toBe(w.armies.battle[army]);
+  });
 
   it("stops armies at a garrisoned enemy castle until it falls (warfare 5.5)", () => {
     const w = createWorld(rules, 7, tiles);
