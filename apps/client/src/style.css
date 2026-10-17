@@ -375,6 +375,68 @@ button.icon-only {
   accent-color: #8a6424;
 }
 
+/* ---- Sound menu: one column of rows, each a 44-point control ---- */
+
+.sound-menu {
+  grid-template-columns: 1fr;
+  gap: 0;
+  width: min(340px, 52vw);
+}
+
+.sound-menu .now-playing {
+  margin: 0 0 4px;
+  font: 600 16px/1.25 var(--body);
+  color: var(--ink);
+}
+
+.sound-menu .now-playing small {
+  display: block;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.sound-row {
+  display: grid;
+  grid-template-columns: 4.6em 1fr 64px;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font: 600 17px/1.2 var(--body);
+  color: var(--ink);
+}
+
+.sound-row.off input {
+  opacity: 0.5;
+}
+
+.sound-row small {
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.sound-row input[type="range"] {
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  accent-color: #8a6424;
+}
+
+.sound-row output {
+  min-width: 3em;
+  text-align: right;
+}
+
+.sound-row .toggle {
+  grid-column: 3;
+  width: 64px;
+  min-height: 44px;
+  padding: 0;
+}
+
+.sound-row .toggle.on {
+  outline: 3px solid var(--brass, #d0a248);
+}
+
 /* ---- Overview button, lower left ---- */
 
 .open-panel {
@@ -1278,6 +1340,14 @@ table.provinces {
 
 table.provinces td:first-child {
   padding-right: 24px;
+}
+
+/* A phone held sideways: the rows fit without scrolling. */
+@media (max-height: 500px) {
+  .sound-menu .sub,
+  .sound-row small {
+    display: none;
+  }
 }
 
 /* ---- Lords and the province lists (feedback 60, 63-68, 70) ---- */
