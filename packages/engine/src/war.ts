@@ -598,11 +598,16 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
       if (newMonth && world.provinceOccupier[p]! < 0) world.provinceGarrison[p] = Math.min(maxGarrison(world, p), world.provinceGarrison[p]! + maxGarrison(world, p) * world.rules.defines.war.garrisonRecoveryPerMonth);
       continue;
     }
-    const leader = a.owner[hostile.reduce((b, s) => (a.men[s]! > a.men[b]! ? s : b), hostile[0]!)]!;
+    // The first realm to besiege or hold a province is the one that takes it (Leroy, F-45); the
+    // strongest only when several arrive on the same day or the first one leaves.
+    const strongest = a.owner[hostile.reduce((b, s) => (a.men[s]! > a.men[b]! ? s : b), hostile[0]!)]!;
+    const here = (n: number) => n >= 0 && hostile.some((s) => a.owner[s] === n);
     const besiegers = sum(hostile, a.men);
     const walls = world.provinceOccupier[p]! < 0 ? wallsOf(world, p) : null;
     if (walls && world.provinceGarrison[p]! > 0) {
       let st = world.sieges.get(p);
+      if (st && !here(st.by)) st.by = strongest;
+      const leader = st ? st.by : strongest;
       if (!st) {
         const garrison = world.provinceGarrison[p]!;
         st = { by: leader, days: 0, siege: wf.newSiege(walls, { ground: world.provinceGround[p] ?? "farmland", garrison, store: garrison * world.rules.defines.war.castleStoreMonths, townsfolk: 0 }) };
@@ -630,6 +635,8 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
       }
       continue;
     }
+    if (world.provinceHold[p] === 0 || !here(world.provinceHoldBy[p]!)) world.provinceHoldBy[p] = strongest;
+    const leader = world.provinceHoldBy[p]!;
     world.provinceHold[p] = world.provinceHold[p]! + 1;
     if (world.provinceHold[p]! >= holdDays) {
       const freed = world.provinceOccupier[p]! >= 0 && (leader === owner || !enemies[owner]!.has(leader));

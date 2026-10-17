@@ -600,6 +600,7 @@ Newest decision first.
 ### 5.18 Occupation and raids
 
 - WAR-175 When an army takes a province's castle, or holds a province with no castle for a season, the warfare system shall mark the province occupied: the occupier gets its tax, recruits, food and trade, and its lord wavers toward the side holding his land. [warfare §9.1]
+- WAR-220 When armies of more than one realm besiege or hold the same province, the warfare system shall give it to the realm that began the siege or the hold, not to the strongest; the strongest takes over only when several arrive on the same day or the first realm's armies leave. How the player uses it: the dispatch "X lays siege to Y" names who will take the province, and the province's siege view (F-32) shows the same realm as the besieger. [F-45]
 - WAR-176 While an army is a horse-only army with orders Raid, the warfare system shall not let it besiege or occupy; each week in a province it burns one tile and takes loot (gold from market and town, herds and horses from pasture) up to 1 load per 50 riders, then moves on; castles there may sally. [warfare §9.2, §5.1]
 
 ### 5.19 War state and peace
