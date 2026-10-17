@@ -786,16 +786,61 @@ function checkDestroyed(world: World, news: News[]): void {
   }
 }
 
+/** Peace an AI war leader offers the player: `terms` as the AI would send them (offerPeace's a = from). */
+export interface PeaceOffer {
+  id: number;
+  from: number;
+  terms: PeaceTerms;
+}
+
+/**
+ * Once a month the AI leader of a war against the player may offer peace
+ * (feedback 10), by the counts it uses between AI realms: when it is losing,
+ * it gives up what the player holds; when the player's people want peace
+ * and it holds the player's land, it asks for that; after a long war, or
+ * when its own people want peace, a white peace. An offer lasts a month.
+ */
+function aiOffersPeace(world: World, war: dip.War, ai: number, news: News[]): void {
+  const sa = sidesOf(world, war, ai);
+  const shareAi = peaceShare(world, sa.ours, sa.theirs);
+  const sharePlayer = peaceShare(world, sa.theirs, sa.ours);
+  const months = dip.monthsBetween(war.start, dip.monthOf(world.diplomacy.date));
+  const lost = occupiedBy(world, sa.ours, sa.theirs).length;
+  const won = occupiedBy(world, sa.theirs, sa.ours).length;
+  const terms: PeaceTerms | null =
+    shareAi > wf.W.peace.half && lost ? "give" : sharePlayer > wf.W.peace.half && won ? "take" : shareAi > wf.W.peace.half || rel.aiMustAcceptPeace(months) ? "white" : null;
+  if (!terms) return;
+  world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, terms });
+  const what = terms === "give" ? `and gives up the ${lost} province${lost === 1 ? "" : "s"} you hold` : terms === "take" ? `if you give up the ${won} province${won === 1 ? "" : "s"} it holds` : "with no land changing hands";
+  news.push({ kind: "peace", text: `${name(world, ai)} offers peace ${what}.`, nations: [ai, world.player] });
+}
+
+/** The player takes or turns down a peace offer. */
+export function answerPeace(world: World, id: number, yes: boolean, news: News[]): string | null {
+  const offer = world.peaceOffers.find((o) => o.id === id);
+  if (!offer) return "that offer has lapsed";
+  world.peaceOffers = world.peaceOffers.filter((o) => o !== offer);
+  if (!warBetween(world, offer.from, world.player)) return "you are no longer at war with them";
+  if (yes) return offerPeace(world, offer.from, world.player, offer.terms, news, true);
+  news.push({ kind: "refused", text: `You turn down ${name(world, offer.from)}'s offer of peace.`, nations: [offer.from, world.player] });
+  return null;
+}
+
 /** Wars where a side has lost every war leader's land or army end; truces run out (DIPL-031). */
 export function monthlyDiplomacy(world: World, news: News[]): void {
   const d = world.diplomacy;
   rel.expireTruces(d.graph);
   d.calls = d.calls.filter((c) => d.wars.some((w) => w.id === c.war));
+  world.peaceOffers = [];
   // AI wars end by the same counts: the losing leader gives up what it has lost, or both tire of it.
   for (const war of [...d.wars]) {
     const att = world.nationIndex.get(war.declarer)!;
     const def = world.nationIndex.get(war.target)!;
-    if (att === world.player || def === world.player || !d.wars.includes(war)) continue;
+    if (!d.wars.includes(war)) continue;
+    if (att === world.player || def === world.player) {
+      aiOffersPeace(world, war, att === world.player ? def : att, news);
+      continue;
+    }
     const sa = sidesOf(world, war, att);
     const shareDef = peaceShare(world, sa.theirs, sa.ours);
     const shareAtt = peaceShare(world, sa.ours, sa.theirs);
