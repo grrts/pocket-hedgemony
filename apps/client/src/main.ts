@@ -22,8 +22,9 @@ import { sprite, spriteUrl } from "./art/sprites.ts";
 import { icon, installUiArt, flagUrl } from "./art/ui.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
+import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
-import { drawBattle, drawRoute, drawToken, pruneBattles, weekEnds } from "./map/marchArt.ts";
+import { drawBattle, drawRoute, drawSiegeMark, drawToken, pruneBattles, weekEnds } from "./map/marchArt.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
@@ -116,7 +117,9 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "diplomacy" | "military" = "general";
+let realmTab: "general" | "diplomacy" | "military" | "officials" = "general";
+/** Province whose official's screen is open, or -1. */
+let officialView = -1;
 /** Which tab of the province overview is open. */
 let provinceTab: "overview" | "garrison" = "overview";
 /** Map lens: how provinces are coloured. */
@@ -179,6 +182,7 @@ document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLElement>("[data-realm]");
   if (!b) return;
   realmView = Number(b.dataset.realm);
+  officialView = -1;
   realmTab = (b.dataset.realmOpen as typeof realmTab | undefined) ?? "general";
   newsView = false;
   panelCollapsed = false;
@@ -189,6 +193,44 @@ document.addEventListener("click", (e) => {
   newsView = true;
   realmView = -1;
   panelCollapsed = false;
+  renderPanel();
+});
+// An official's screen opens from their card or the Officials tab (feedback 40).
+document.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-official]");
+  if (!b) return;
+  officialView = Number(b.dataset.official);
+  realmView = -1;
+  newsView = false;
+  panelCollapsed = false;
+  renderPanel();
+});
+// Commissioning an official as a commander, from their screen.
+document.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-commission]");
+  if (!b || b.disabled) return;
+  const province = Number(b.dataset.commission);
+  void act({ type: "commission", province }).then(() => {
+    if (!snapshot || snapshot.rejectedOrders.length) return;
+    officialView = -1;
+    newsView = false;
+    realmView = snapshot.playerNation;
+    realmTab = "military";
+    renderPanel();
+  });
+});
+// A province button in the people screens shows it on the map and opens its overview.
+document.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-show-province]");
+  if (!b) return;
+  const i = Number(b.dataset.showProvince);
+  officialView = -1;
+  realmView = -1;
+  newsView = false;
+  selectedProvince = i;
+  provinceTab = "overview";
+  view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
+  restyleProvinces();
   renderPanel();
 });
 reopen.addEventListener("click", () => {
@@ -463,16 +505,12 @@ function drawOverlay(o: OverlayContext): void {
 
   // Sieges under way: how long the walls have held, and how far into the next siege month.
   if (snapshot && zoom >= 2) {
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
     for (const st of snapshot.sieges) {
       if (!isKnown(st.province)) continue;
       const p = provinces[st.province]!;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) continue;
-      const top = sy - 8 * spriteScale;
-      pixelText(ctx, st.months ? `Siege · ${st.months} mo` : "Siege", sx, top - 6, 10);
-      bar(ctx, sx, top - 5, 32, st.progress, nations[st.by]!.color);
+      drawSiegeMark(ctx, sx, sy - 10 * tokenUnit(zoom), tokenUnit(zoom), nations[st.by]!.color, st.months, st.progress);
     }
   }
 
@@ -616,17 +654,6 @@ function armyPosition(k: number): [number, number] {
   return [ax + (bx - ax) * (f - i), ay + (by - ay) * (f - i)];
 }
 
-/** A small bar, centred on x: the share filled in a realm's colour. */
-function bar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, share: number, color: string): void {
-  const left = Math.round(x - w / 2);
-  ctx.fillStyle = PALETTE.ink;
-  ctx.fillRect(left - 1, Math.round(y) - 1, w + 2, 6);
-  ctx.fillStyle = PALETTE.paper;
-  ctx.fillRect(left, Math.round(y), w, 4);
-  ctx.fillStyle = color;
-  ctx.fillRect(left, Math.round(y), Math.round(w * Math.max(0, Math.min(1, share))), 4);
-}
-
 /** Two crossed swords, r pixels from the middle to each tip. */
 function swords(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
   ctx.lineCap = "round";
@@ -729,6 +756,7 @@ function labelBitmap(text: string, size: number, water: boolean): LabelBitmap {
 
 // ---- input ----
 function onTap(sx: number, sy: number, province: number): void {
+  officialView = -1;
   // Armies sit on top of provinces, so check them first, with some room around each for fingers.
   const PAD = 8;
   const hit = armyHitBoxes.find((b) => sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
@@ -1021,6 +1049,10 @@ function renderPanel(): void {
     renderRealm(realmView);
     return;
   }
+  if (officialView >= 0 && snapshot) {
+    renderOfficial(officialView);
+    return;
+  }
   if (armyView >= 0 && snapshot && armySlot(armyView) >= 0) {
     renderArmy(armyView);
     return;
@@ -1068,20 +1100,22 @@ function renderPanel(): void {
     return;
   }
   const armiesHere = snapshot ? [...snapshot.armies.id.keys()].filter((k) => snapshot!.armies.location[k] === selectedProvince && snapshot!.armies.commander[k]! >= 0) : [];
-  const official = snapshot && own >= 0 ? snapshot.provinceOfficial[selectedProvince] : undefined;
+  const official = snapshot && own >= 0 ? officialOf(rules, selectedProvince, own, snapshot.provinceOfficial[selectedProvince]) : undefined;
+  const siege = siegeInfo(selectedProvince);
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
+    ${siege ? siegeView(rules, siege) : ""}
     <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner.color, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.river ? " · river" : ""}${p.coastal ? " · coast" : ""}</p>
     <dl class="facts">
       <dt>People</dt><dd>${fmt(p.population * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       <dt>Seat</dt><dd>${owner && owner.capital === p.id ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)]}</dd>
       <dt>Walls</dt><dd>${owner && owner.capital === p.id ? WALL_NAMES.castle : p.castle ? WALL_NAMES[p.castle] : "None"}</dd>
-      ${official !== undefined ? `<dt>Official</dt><dd>${official ? esc(official) : "None: the post stands empty, half tax and recruits"}</dd>` : ""}
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
-      ${siegeLine(selectedProvince)}
     </dl>
+    ${official !== undefined ? `<h3 class="sub">Official</h3>${officialCard(rules, official, own, mineHere)}` : ""}
+    ${armiesHere.length ? `<h3 class="sub">Armies</h3>` : ""}
     ${armiesHere
       .map((k) => {
         const s = snapshot!;
@@ -1089,9 +1123,8 @@ function renderPanel(): void {
         const cmd = s.armies.commander[k]!;
         const mine = s.armies.owner[k] === s.playerNation;
         const c = cmd >= 0 ? cmdOf(cmd) : null;
-        const portrait = spriteUrl(c ? "commander" : "soldier", nations[s.armies.owner[k]!]!.color, c ? 2 : 3);
         return `<div class="army">
-          <img class="portrait" src="${portrait}" alt="">
+          ${c ? commanderPortrait(rules, c.name, s.armies.owner[k]!) : `<img class="portrait" src="${spriteUrl("soldier", nations[s.armies.owner[k]!]!.color, 3)}" alt="">`}
           <span class="who">${c ? `<b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
           ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}, ${fmt(s.armies.horse[k]!)} on horse${mine ? `<br><small>${supplyLine(k)}${marchLine(k)}</small>` : ""}</span>
           ${mine ? `<span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button><button class="paper small" data-command="${id}" title="The commander's screen: troops, food, pay, training">Command</button></span>` : ""}
@@ -1107,6 +1140,56 @@ function renderPanel(): void {
   bindCommand();
   bindProvinceTabs();
   bindNationButtons();
+  if (siege) animateSiege(siege);
+}
+
+/** The siege of province p as the siege view shows it, or null when there is none. */
+function siegeInfo(p: number): SiegeInfo | null {
+  const s = snapshot;
+  const st = s?.sieges.find((x) => x.province === p);
+  if (!s || !st) return null;
+  const besiegers = [...s.armies.id.keys()]
+    .filter((k) => s.armies.location[k] === p && s.armies.owner[k] === st.by && s.armies.commander[k]! >= 0)
+    .map((k) => ({ name: cmdOf(s.armies.commander[k]!).name, men: s.armies.men[k]! }));
+  const pr = provinces[p]!;
+  const holder = owners[p]!;
+  const isCapital = holder >= 0 && nations[holder]!.capital === pr.id;
+  return { ...st, besiegers, holder, walls: isCapital ? "castle" : (pr.castle ?? null) };
+}
+
+/** Keeps the siege view's picture moving while it is on screen. */
+function animateSiege(st: SiegeInfo): void {
+  const canvas = panel.querySelector<HTMLCanvasElement>(`canvas[data-siege="${st.province}"]`);
+  if (!canvas) return;
+  const step = (t: number) => {
+    if (!canvas.isConnected) return;
+    paintSiege(canvas, rules, st, t);
+    requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+/** An official's screen: who they are, the post, and commissioning them as a commander. */
+function renderOfficial(pi: number): void {
+  const s = snapshot!;
+  const o = officialOf(rules, pi, owners[pi]!, s.provinceOfficial[pi]);
+  if (!o || owners[pi] !== s.playerNation) {
+    officialView = -1;
+    renderPanel();
+    return;
+  }
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
+    ${officialScreen(rules, o, s.playerNation, rules.defines.recruit.commanderGold, s.nationTreasury[s.playerNation]!)}
+    <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
+  bindClose();
+  showPanel(true);
+  panel.querySelector("[data-back]")?.addEventListener("click", () => {
+    officialView = -1;
+    realmView = s.playerNation;
+    realmTab = "officials";
+    renderPanel();
+  });
 }
 
 /** Tabs of the overview of one of the player's provinces. */
@@ -1223,13 +1306,7 @@ function renderGarrison(pi: number): void {
           })
           .join("")
       : `<p class="hint">None. Men you call here wait in the garrison until a commander leads them or picks them up.</p>`}
-    ${troops.length && !idle.length && !led.length ? `<p class="hint">No commander is free: commission an official, below or in another province.</p>` : ""}
-    <h3 class="sub">Official</h3>
-    ${official
-      ? `<p>${esc(official)} of ${esc(p.name)}.</p>
-        <div class="choices"><button class="paper" data-commission ${rules.defines.recruit.commanderGold > s.nationTreasury[me]! ? "disabled" : ""}>Commission as commander · ${rules.defines.recruit.commanderGold} gold</button></div>
-        <p class="hint">His post stands empty while he serves: the province pays half its tax and gives half its recruits.</p>`
-      : `<p>The post stands empty: half tax and recruits until its official comes back.</p>`}`;
+    ${troops.length && !idle.length && !led.length ? `<p class="hint">No commander is free: commission an official, below or in another province.</p>` : ""}`;
   bindClose();
   bindProvinceTabs();
   showPanel(true);
@@ -1241,7 +1318,6 @@ function renderGarrison(pi: number): void {
     b.addEventListener("click", () => void actHere({ type: "appoint", army: Number(b.dataset.lead), commander: Number(b.dataset.by) })),
   );
   panel.querySelectorAll<HTMLButtonElement>("[data-disband]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "disband", army: Number(b.dataset.disband) })));
-  panel.querySelector("[data-commission]")?.addEventListener("click", () => void actHere({ type: "commission", province: pi }));
 }
 
 /**
@@ -1273,7 +1349,7 @@ function renderArmy(id: number): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(c.name)}</h2>${closeButton()}</header>
     <div class="army">
-      <img class="portrait" src="${spriteUrl("commander", nations[me]!.color, 2)}" alt="">
+      ${commanderPortrait(rules, c.name, me)}
       <span class="who"><b>${esc(c.name)}</b>${c.origin ? ` <small>(${esc(c.origin.toLowerCase())})</small>` : ""}<br><small>${skills(c)}</small><br><small>${c.victories} victor${c.victories === 1 ? "y" : "ies"}, ${c.defeats} defeat${c.defeats === 1 ? "" : "s"}</small></span>
       <span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button></span>
     </div>
@@ -1366,13 +1442,6 @@ function renderArmy(id: number): void {
   });
 }
 
-/** Country overview: the realm's lands, people, purse and commanders. */
-function siegeLine(p: number): string {
-  const st = snapshot?.sieges.find((x) => x.province === p);
-  if (!st) return "";
-  return `<dt>Siege</dt><dd>by ${esc(nations[st.by]!.name)}, ${st.months} month${st.months === 1 ? "" : "s"}, ${st.breaches} breach${st.breaches === 1 ? "" : "es"}, ${fmt(st.garrison)} men inside</dd>`;
-}
-
 /** War and peace with another realm, from its overview. */
 function relationsSection(r: number): string {
   const s = snapshot!;
@@ -1460,7 +1529,7 @@ function warRoomSection(): string {
       .map(({ c, i }) => {
         const k = c.army;
         const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : "waits at court";
-        return `<div class="army"><img class="portrait" src="${spriteUrl("commander", nations[me]!.color, 2)}" alt=""><span class="who"><b>${esc(c.name)}</b><br><small>${skills(c)} · ${c.victories} won, ${c.defeats} lost</small><br><small>${where}</small></span>
+        return `<div class="army">${commanderPortrait(rules, c.name, me)}<span class="who"><b>${esc(c.name)}</b><br><small>${skills(c)} · ${c.victories} won, ${c.defeats} lost</small><br><small>${where}</small></span>
           <span class="army-buttons">${k >= 0 ? `<button class="paper small" data-command="${s.armies.id[k]!}">Command</button>` : c.home >= 0 ? `<button class="paper small" data-release="${i}" title="Back to his post in ${esc(provinces[c.home]!.name)}">Release</button>` : ""}</span></div>`;
       })
       .join("")}
@@ -1491,7 +1560,7 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if (!s || (realmTab === "military" && !mine)) realmTab = "general";
+  if (!s || ((realmTab === "military" || realmTab === "officials") && !mine)) realmTab = "general";
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
@@ -1510,17 +1579,21 @@ function renderRealm(r: number): void {
     ${mine ? "" : (() => {
       const list = s ? s.commanders.filter((c) => c.owner === r) : n.commanders;
       return list.length ? `<h3 class="sub">Commanders</h3>${list
-        .map((c) => `<div class="army"><img class="portrait" src="${spriteUrl("commander", n.color, 2)}" alt=""><span class="who"><b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
+        .map((c) => `<div class="army">${commanderPortrait(rules, c.name, r)}<span class="who"><b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
         .join("")}` : "";
     })()}
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
       .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!.color)}${esc(nations[j]!.name)}</button>`)
       .join("")}</div>` : ""}
     ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}`;
-  const content = realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r)) : realmTab === "military" ? warRoomSection() : general;
+  const content =
+    realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r))
+    : realmTab === "military" ? warRoomSection()
+    : realmTab === "officials" ? officialsTab(rules, own.map((i) => ({ province: i, official: officialOf(rules, i, r, s!.provinceOfficial[i]) })), r)
+    : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") : ""}</nav>` : ""}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") : ""}</nav>` : ""}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -1557,6 +1630,7 @@ function renderRealm(r: number): void {
 
 function bindClose(): void {
   panel.querySelector(".close")!.addEventListener("click", () => {
+    officialView = -1;
     newsView = false;
     realmView = -1;
     selectedProvince = -1;

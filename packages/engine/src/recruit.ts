@@ -1,5 +1,6 @@
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
+import { officialName, personName } from "./names.ts";
 import { monthlyRations } from "./march.ts";
 import { halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
@@ -128,8 +129,8 @@ export function commissionOfficial(world: World, n: number, p: number, news: New
   if (cost > world.nationTreasury[n]!) return "not enough gold";
   const { commission } = rc.commission({ official: OFFICIALS[type]!, type: OFFICIALS[type]!, province: world.provinceIds[p]! });
   const skills = commission.skills ?? { might: 1, cunning: 1, logistics: 1 };
-  const names = world.rules.defines.recruit.commanderNames;
-  const name = `${names[world.rng.int(names.length)]} of ${provinceName(world, p)}`;
+  // The official himself takes the command, under his own name.
+  const name = officialName(world.rules, p, n);
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
   const c = addCommander(world, n, wf.newCommander(name, { ...skills, origin: OFFICIALS[type]! }));
   world.commanderHome[c] = p;
@@ -152,9 +153,9 @@ export function releaseCommander(world: World, n: number, c: number): string | n
 
 /** A captain who comes with a mercenary company: skills of 1 to 3. */
 function newCaptain(world: World, n: number): number {
-  const names = world.rules.defines.recruit.commanderNames;
   const skill = () => 1 + world.rng.int(3);
-  return addCommander(world, n, wf.newCommander(`Captain ${names[world.rng.int(names.length)]}`, { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
+  const capital = world.rules.provinces.find((p) => p.id === world.rules.nations[n]!.capital)?.name ?? "";
+  return addCommander(world, n, wf.newCommander(`Captain ${personName(world.rules, n, world.rng.int(1 << 30), capital)}`, { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
 }
 
 /** Battles teach commanders: victories grow Might, defeats are counted (WAR-050, WAR-052). */

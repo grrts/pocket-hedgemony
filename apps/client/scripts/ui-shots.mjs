@@ -22,6 +22,9 @@ await page.waitForTimeout(600);
 await page.evaluate(() => window.__phSelect("p1601"));
 await page.waitForTimeout(400);
 await page.screenshot({ path: `${out}/u3-province.png` });
+await page.evaluate(() => document.querySelector("#panel").scrollTo(0, 9999));
+await page.waitForTimeout(200);
+await page.screenshot({ path: `${out}/u3b-province-bottom.png` });
 await page.click("[data-tab=garrison]").catch(() => {});
 await page.waitForTimeout(400);
 await page.screenshot({ path: `${out}/u4-garrison.png` });
@@ -34,5 +37,13 @@ for (const tab of ["diplomacy", "military", "officials"]) {
   await page.waitForTimeout(400);
   await page.screenshot({ path: `${out}/u6-realm-${tab}.png` });
 }
+if (await page.$("[data-official]")) {
+  await page.click("[data-official]");
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: `${out}/u7-official.png` });
+}
+await page.goto("http://localhost:4178/style.html");
+await page.waitForTimeout(800);
+await page.locator("section", { hasText: "Portraits" }).first().screenshot({ path: `${out}/u8-portraits.png` });
 await browser.close();
 server.httpServer.close();

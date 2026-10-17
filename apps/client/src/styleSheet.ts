@@ -3,6 +3,7 @@ import { loadDefaultRuleset } from "@ph/rules";
 import { DEPTH_COLORS, PALETTE, TERRAIN_CATEGORIES, TERRAIN_COLORS, TERRAINS } from "./art/palette.ts";
 import { sprite, SPRITES, type SpriteName } from "./art/sprites.ts";
 import { BIG_ROWS, SEA_ROW, SHALLOW_ROW, tileCanvas, VARIANTS } from "./art/tiles.ts";
+import { portrait, type Look } from "./art/portraits.ts";
 import { icon, ICONS, installUiArt, flagUrl, UI_COLORS, type IconName } from "./art/ui.ts";
 
 installUiArt();
@@ -128,6 +129,25 @@ section(
     row.className = "row";
     for (const scale of [2, 3, 4]) row.append(figure(sprite(name, colors[0]!.color, scale), `${name} ${scale}×`));
     for (const n of colors.slice(1)) row.append(figure(sprite(name, n.color, 3), n.name));
+    body.append(row);
+  }
+}
+
+// Portraits
+{
+  const body = section(
+    "Portraits",
+    "Commanders and officials get a face from their name: skin, hair, beard and headwear picked by a hash of it, dress by where their realm lies, and the realm's colour in the clothes and backdrop. The same person always looks the same.",
+  );
+  const looks: [Look, string, string][] = [
+    ["europe", "castile", "Álvaro de Luna"], ["levant", "ottomans", "Zaganos Pasha"], ["steppe", "great_horde", "Ahmad Khan"], ["eastAsia", "ming", "Yu Qian"],
+    ["southAsia", "vijayanagar", "Deva Raya Nayaka"], ["africa", "mali", "Mansa Uli"], ["americas", "aztecs", "Tlacaelel"],
+  ];
+  for (const kind of ["commander", "official"] as const) {
+    const row = document.createElement("div");
+    row.className = "row";
+    for (const [look, id, name] of looks)
+      for (const k of [0, 1]) row.append(figure(portrait({ name: `${name}${k ? " II" : ""}`, color: nation(id).color, kind, look }, 3), `${kind} · ${look}`));
     body.append(row);
   }
 }

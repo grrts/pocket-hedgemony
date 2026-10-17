@@ -21,6 +21,17 @@ export function validateRuleset(rules: Ruleset): Ruleset {
   const nationIds = new Set<string>();
   const provinceIds = new Set<string>();
 
+  if (rules.names) {
+    const { cultures, nations, fallback } = rules.names;
+    if (!cultures[fallback]) problems.push(`names: fallback culture "${fallback}" is not listed`);
+    for (const [n, c] of Object.entries(nations)) if (!cultures[c]) problems.push(`names: realm ${n} has unknown culture "${c}"`);
+    for (const [id, c] of Object.entries(cultures)) {
+      if (!c.given?.length) problems.push(`names: culture ${id} has no given names`);
+      if ((c.style === "family" || c.style === "family_first") && !c.family?.length) problems.push(`names: culture ${id} needs family names`);
+      if (c.style === "title" && !c.title?.length) problems.push(`names: culture ${id} needs titles`);
+    }
+  }
+
   for (const n of rules.nations) {
     if (nationIds.has(n.id)) problems.push(`duplicate nation id "${n.id}"`);
     nationIds.add(n.id);
