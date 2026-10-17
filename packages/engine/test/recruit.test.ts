@@ -47,6 +47,24 @@ describe("armies that cost something", () => {
     expect(refused(w, { type: "move", army: troop!, to: capital(w, me) }, me)).toMatch(/commander/);
   });
 
+  it("queues recruits a thousand at a time, at most ten per province, and cancels the last with its gold back", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = n(w, "castile");
+    w.player = me;
+    w.nationTreasury[me] = 1000;
+    w.nationTroopCap[me] = 1e6;
+    const p = capital(w, me);
+    w.provinceRecruits[p] = w.provinceRecruitCeiling[p] = 20000;
+    for (let i = 0; i < 10; i++) ok(w, { type: "recruit", province: p, thousands: 1 }, me);
+    expect(refused(w, { type: "recruit", province: p, thousands: 1 }, me)).toMatch(/queue .* full/);
+    const gold = w.nationTreasury[me]!;
+    ok(w, { type: "cancelRecruit", province: p }, me);
+    expect(w.musters.find((m) => m.province === p)!.men).toBe(9000);
+    expect(w.provinceRecruits[p]).toBeCloseTo(11000, 0);
+    expect(w.nationTreasury[me]).toBeGreaterThan(gold);
+    ok(w, { type: "recruit", province: p, thousands: 1 }, me);
+  });
+
   it("commissions a province's official as commander, leaving the post empty for half tax", () => {
     const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
