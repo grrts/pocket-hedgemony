@@ -1846,13 +1846,28 @@ function rateButtons(current: number, scope: "province" | "realm"): string {
 /** Binds the rate buttons (province -1: the realm default) and the borrow and repay buttons. */
 function bindTax(province: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-tax]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "setTax", province, rate: Number(b.dataset.tax) })));
-  panel.querySelectorAll<HTMLButtonElement>("[data-borrow]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "borrow", gold: Number(b.dataset.borrow) })));
-  panel.querySelectorAll<HTMLButtonElement>("[data-repay]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "repay", gold: Number(b.dataset.repay) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-borrow]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "borrow", gold: Number(b.dataset.borrow) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-repay]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "repay", gold: Number(b.dataset.repay) })));
+}
+
+/** Borrowing and repaying keep the Treasury tab open: what a loan did to the lords goes to the news, and the tab shows the new debt. */
+async function actInTreasury(order: Order): Promise<void> {
+  const realm = realmView;
+  await act(order);
+  if (!snapshot || snapshot.rejectedOrders.length) return;
+  realmView = realm;
+  newsView = false;
+  renderPanel();
 }
 
 const LEDGER_LABEL: Record<string, string> = { tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest" };
 
-/** The Treasury tab: gold, the month's ledger, the realm tax default, and debt with borrowing and repaying. */
+/**
+ * The Treasury tab: the purse (gold, its change a month and how long it
+ * lasts), the month's ledger as bars of gold in and out, the realm tax
+ * default, and the debt as a meter against what lenders allow, with what a
+ * loan costs said before the borrow buttons (REALM-184, REALM-192).
+ */
 function treasurySection(): string {
   const s = snapshot!;
   const me = s.playerNation;
@@ -1862,23 +1877,44 @@ function treasurySection(): string {
   const interest = -(s.ledger.find((l) => l.line === "interest")?.gold ?? 0);
   const borrow = [10, 50].filter((g) => g < s.canBorrow);
   const signed = (g: number) => (Math.abs(g) < 0.005 ? "0" : `${g > 0 ? "+" : "−"}${gold2(Math.abs(g))}`);
+  const income = s.ledger.reduce((t, l) => t + Math.max(0, l.gold), 0);
+  const spending = s.ledger.reduce((t, l) => t - Math.min(0, l.gold), 0);
+  const largest = Math.max(income, spending, 0.01);
+  const lasts = net < 0 && gold > 0 ? `Gold runs out in about <b>${Math.max(1, Math.floor(gold / -net))} month${Math.floor(gold / -net) === 1 ? "" : "s"}</b>.` : net < 0 ? "<b>The treasury is empty.</b>" : "The treasury grows.";
+  const bar = (label: string, g: number) => `<li class="${g < 0 ? "out" : "in"}"><span class="what">${label}</span><span class="bar"><i style="width:${Math.max(2, (Math.abs(g) / largest) * 100).toFixed(1)}%"></i></span><b class="num">${signed(g)}</b></li>`;
+  const owed = s.debtLimit > 0 ? Math.min(100, (s.debt / s.debtLimit) * 100) : s.debt > 0 ? 100 : 0;
+  const pct = Math.round((s.loanDebtFactor - 1) * 100);
+  const cost = (g: number) => `you owe ${fmt(Math.round(g * s.loanDebtFactor))}`;
   return `
-    <p><b>${fmt(gold)} gold</b> in the treasury, <b class="${net < 0 ? "down" : ""}">${signed(net)}</b> a month.</p>
+    <div class="purse">
+      <span class="purse-coin">${icon("coin", 4)}</span>
+      <div>
+        <div class="purse-gold"><b>${fmt(gold)}</b> gold</div>
+        <div class="purse-net ${net < 0 ? "down" : "up"}">${signed(net)} a month</div>
+        <div class="purse-note">${lasts}</div>
+      </div>
+    </div>
     <h3 class="sub">This month</h3>
-    <table class="troops ledger"><tbody>
-      ${s.ledger.map((l) => `<tr><td>${LEDGER_LABEL[l.line] ?? l.line}</td><td class="num${l.gold < 0 ? " down" : ""}">${signed(l.gold)}</td></tr>`).join("")}
-      <tr class="total"><td><b>Change a month</b></td><td class="num${net < 0 ? " down" : ""}"><b>${signed(net)}</b></td></tr>
-    </tbody></table>
+    <div class="flow" role="img" aria-label="Gold in ${gold2(income)}, gold out ${gold2(spending)} a month">
+      <span class="in" style="flex:${income.toFixed(3)}">In ${gold2(income)}</span><span class="out" style="flex:${spending.toFixed(3)}">Out ${gold2(spending)}</span>
+    </div>
+    <ul class="ledger-bars">
+      ${s.ledger.filter((l) => l.gold > 0).map((l) => bar(LEDGER_LABEL[l.line] ?? l.line, l.gold)).join("")}
+      ${s.ledger.filter((l) => l.gold < 0).map((l) => bar(LEDGER_LABEL[l.line] ?? l.line, l.gold)).join("")}
+      <li class="total ${net < 0 ? "out" : "in"}"><span class="what">Change a month</span><span class="bar"></span><b class="num">${signed(net)}</b></li>
+    </ul>
     <h3 class="sub">Realm tax</h3>
     <p>Provinces pay at <b>${RATE_LABEL[s.taxDefault]!.toLowerCase()}</b> unless you set their own rate on their card${own ? ` (${own} province${own === 1 ? " has" : "s have"} one)` : ""}.</p>
     ${rateButtons(s.taxDefault, "realm")}
     <h3 class="sub">Debt</h3>
-    <p>${s.debt > 0 ? `You owe <b>${fmt(s.debt)} gold</b> at 10 % a year: ${gold2(interest)} gold a month.` : "You owe nothing."} Lenders would give up to <b>${fmt(Math.floor(s.canBorrow))} gold</b> more: a year's tax and trade, less what you owe.</p>
-    <div class="choices">
-      ${borrow.map((g) => `<button class="paper" data-borrow="${g}">Borrow ${g}</button>`).join("")}
-      <button class="paper" data-borrow="${Math.floor(s.canBorrow)}" ${s.canBorrow < 1 ? "disabled" : ""}>Borrow ${fmt(Math.floor(s.canBorrow))}</button>
+    <div class="debt-meter" role="img" aria-label="Owed ${fmt(s.debt)} of ${fmt(s.debtLimit)} gold lenders allow"><i style="width:${owed.toFixed(1)}%"></i></div>
+    <p class="meter-caption">${s.debt > 0 ? `You owe <b>${fmt(s.debt)} gold</b>, costing ${gold2(interest)} gold a month in interest.` : "You owe nothing."} Lenders let you owe up to ${fmt(s.debtLimit)} gold, a year's tax and trade.</p>
+    <p class="loan-cost">A loan adds the gold <b>plus ${pct} % interest</b> to the debt at once${s.loanUnsettlesLords ? ", and <b>your lords think less of you</b>: each falls a step in loyalty (once a year)" : ""}.</p>
+    <div class="choices loans">
+      ${borrow.map((g) => `<button class="paper" data-borrow="${g}">Borrow ${g}<small>${cost(g)}</small></button>`).join("")}
+      <button class="paper" data-borrow="${Math.floor(s.canBorrow)}" ${s.canBorrow < 1 ? "disabled" : ""}>Borrow ${fmt(Math.floor(s.canBorrow))}<small>${s.canBorrow < 1 ? "lenders refuse" : cost(Math.floor(s.canBorrow))}</small></button>
     </div>
-    ${s.debt > 0 ? `<div class="choices">
+    ${s.debt > 0 ? `<div class="choices loans">
       ${s.debt > 10 ? `<button class="paper" data-repay="10" ${gold < 10 ? "disabled" : ""}>Repay 10</button>` : ""}
       <button class="paper" data-repay="${s.debt}" ${gold < s.debt ? 'disabled title="Not enough gold"' : ""}>Repay all ${fmt(s.debt)}</button>
     </div>` : ""}`;

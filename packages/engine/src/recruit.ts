@@ -256,9 +256,28 @@ export function nationPay(world: World, n: number): number {
     pay += armyPay(world, i);
     men += a.men[i]!;
   }
-  const over = wf.overCap(world.nationCapUsed[n]!, world.nationTroopCap[n]!).doublePayFor;
-  if (over > 0 && men > 0) pay += (pay / men) * Math.min(over, men);
+  return withOverCap(world, n, pay, men);
+}
+
+/** Every realm's army pay a month in one pass over the armies (the same sums as nationPay). */
+export function allNationPay(world: World): Float64Array {
+  const a = world.armies;
+  const pay = new Float64Array(world.nationCount);
+  const men = new Float64Array(world.nationCount);
+  for (let i = 0; i < a.count; i++) {
+    if (!a.alive[i]) continue;
+    const n = a.owner[i]!;
+    pay[n] = pay[n]! + armyPay(world, i);
+    men[n] = men[n]! + a.men[i]!;
+  }
+  for (let n = 0; n < world.nationCount; n++) pay[n] = withOverCap(world, n, pay[n]!, men[n]!);
   return pay;
+}
+
+/** Men over the troop cap are paid twice. */
+function withOverCap(world: World, n: number, pay: number, men: number): number {
+  const over = wf.overCap(world.nationCapUsed[n]!, world.nationTroopCap[n]!).doublePayFor;
+  return over > 0 && men > 0 ? pay + (pay / men) * Math.min(over, men) : pay;
 }
 
 /** Rations a month for an army, by the march rules (men, horses, its commander's logistics). */
@@ -764,12 +783,14 @@ function trainMonth(world: World, i: number, news: News[]): void {
 export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => boolean): void {
   const a = world.armies;
   const levyPer1000 = gold(world, rc.levyPay(1000, 99));
+  const atWar = Uint8Array.from({ length: world.nationCount }, (_, n) => (atWarNow(n) ? 1 : 0));
+  // At peace, levies go home before their pay begins (one pass over the armies for every realm).
+  for (let i = 0; i < a.count; i++) {
+    const n = a.owner[i]!;
+    if (a.alive[i] && n !== world.player && !world.nationGone[n] && !atWar[n] && a.kind[i] === KIND.levy && a.monthsOut[i]! >= wf.W.levy.free_months) disbandArmy(world, n, i);
+  }
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n]) continue;
-    if (!atWarNow(n)) {
-      for (let i = 0; i < a.count; i++) if (a.alive[i] && a.owner[i] === n && a.kind[i] === KIND.levy && a.monthsOut[i]! >= wf.W.levy.free_months) disbandArmy(world, n, i);
-      continue;
-    }
+    if (n === world.player || world.nationGone[n] || !atWar[n]) continue;
     if (world.nationTreasury[n]! < 0) continue;
     const cap = capitalOf(world, n);
     if (callingPlace(world, n, cap)) continue;
@@ -791,24 +812,51 @@ const commandersOf = (world: World, n: number) => world.commanderOwner.reduce((t
 /** Each week, AI commanders take in the troops that have gathered, or a free (or newly commissioned) one leads them out. */
 export function aiCollect(world: World, news: News[]): void {
   const a = world.armies;
+  // Led armies by realm, place and kind, and each realm's idle commanders, worked out once for the week
+  // (a realm's many garrisons would otherwise each search every army).
+  const key = (n: number, p: number, kind: number) => (p * world.nationCount + n) * KIND_NAMES.length + kind;
+  const led = new Map<number, number>();
+  const busy = new Set<number>();
+  for (let i = 0; i < a.count; i++) {
+    if (!a.alive[i] || a.commander[i]! < 0) continue;
+    busy.add(a.commander[i]!);
+    const k = key(a.owner[i]!, a.location[i]!, a.kind[i]!);
+    if (!led.has(k)) led.set(k, i);
+  }
+  const idle = new Map<number, number[]>();
+  for (let c = 0; c < world.commanderIds.length; c++) {
+    const n = world.commanderOwner[c]!;
+    if (n < 0 || busy.has(c)) continue;
+    const list = idle.get(n);
+    if (list) list.push(c);
+    else idle.set(n, [c]);
+  }
+  const score = (c: number) => world.commanders[c]!.might + world.commanders[c]!.cunning + world.commanders[c]!.logistics;
+  for (const list of idle.values()) list.sort((x, y) => score(y) - score(x) || x - y);
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i] || a.commander[i]! >= 0) continue;
     const n = a.owner[i]!;
     if (n === world.player || world.nationGone[n]) continue;
-    const here = findArmyAt(world, n, a.location[i]!, a.kind[i]!);
-    if (here >= 0) {
+    const k = key(n, a.location[i]!, a.kind[i]!);
+    const here = led.get(k);
+    if (here !== undefined && a.alive[here] && a.commander[here]! >= 0) {
       mergeArmies(world, n, i, here);
       continue;
     }
-    if (!idleCommanders(world, n).length) {
+    let free = idle.get(n) ?? [];
+    if (!free.length) {
       // Commissions cost and empty a post, so the AI makes one only for a stack worth leading,
       // and keeps about one commander to each 8,000 men it has under arms (feedback 28).
       if (a.men[i]! < AI_COMMAND_MIN_MEN || commandersOf(world, n) >= 1 + world.nationCapUsed[n]! / AI_MEN_PER_COMMANDER) continue;
       let post = -1;
       for (let p = 0; p < world.provinceCount && post < 0; p++) if (world.provinceOwner[p] === n && world.provinceOfficial[p]! >= 0) post = p;
       if (post < 0 || commissionOfficial(world, n, post, news)) continue;
+      free = idleCommanders(world, n);
     }
-    appointCommander(world, n, i, idleCommanders(world, n)[0]!);
+    const c = free[0]!;
+    if (appointCommander(world, n, i, c)) continue;
+    idle.set(n, free.slice(1));
+    led.set(k, i);
   }
 }
 

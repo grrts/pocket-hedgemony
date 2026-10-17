@@ -9,9 +9,11 @@ import { newCommander, type Commander } from "./domain/warfare/index.ts";
 import { createTreasuryState, runLedger, type TreasuryState } from "./treasury.ts";
 import { createFoodState, seedStores, type FoodState } from "./food.ts";
 import { createMoodState, type MoodState } from "./moods.ts";
-import { createLordState, seedLords, type LordState } from "./lords.ts";
+import { byDistance, createLordState, seedLords, type LordState } from "./lords.ts";
+import { mix, personName } from "./names.ts";
+import { realmConfig } from "./domain/realm/index.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
-import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
+import { addCommander, ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -397,18 +399,14 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where
-  // the data has no figure), within its cap: one army in the capital led by its first commander,
-  // the rest as the capital's garrison troops. Levies already called, half of the foot armoured
-  // men-at-arms, the horse light horse.
+  // the data has no figure), within its cap, spread over its land (REALM-190, REALM-191).
   rules.nations.forEach((n, i) => {
-    const firstCommander = commanderOwnerList.indexOf(i);
     const cap = world.nationTroopCap[i]!;
     const total = Math.max(1000, Math.min(Math.floor(cap / 1000) * 1000, n.army ?? Math.round(cap / 4000) * 1000));
-    const field = Math.min(total, START_ARMY_MAX);
     const capital = provinceIndex.get(n.capital)!;
-    for (const [men, commander] of [[field, firstCommander], [total - field, -1]] as const) {
-      if (men <= 0) continue;
-      const slot = spawnArmy(world, i, capital, men, commander, Math.round(men * rules.defines.march.startingHorseShare), { kind: KIND.levy, drill: 1.5 });
+    for (const { province, men, commander } of startingArmies(world, i, capital, total)) {
+      // Levies already called, half of the foot armoured men-at-arms, the horse light horse.
+      const slot = spawnArmy(world, i, province, men, commander, Math.round(men * rules.defines.march.startingHorseShare), { kind: KIND.levy, drill: 1.5 });
       world.armies.mix[slot * ARMS.length + armIndex("levy foot")] = 0.5;
       world.armies.mix[slot * ARMS.length + armIndex("armoured foot")] = 0.5;
     }
@@ -421,8 +419,55 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   return world;
 }
 
-/** The most men one army starts with; a realm's other men start as its capital's garrison troops. */
+/** The most men one army starts with. */
 const START_ARMY_MAX = 30000;
+
+/** Commanders a realm starts with for its men under arms: one per `starting_armies.men_per_commander`, at least one (REALM-191). */
+export function startingCommanderCount(men: number): number {
+  const c = realmConfig.starting_armies;
+  return Math.max(1, Math.min(c.most_commanders, Math.round(men / c.men_per_commander)));
+}
+
+/**
+ * Where a realm's starting men stand (REALM-190, REALM-191): a field share in
+ * one army per commander, the first in the capital and the others spread
+ * evenly over its land from the capital outward; the rest as garrison troops
+ * of `garrison_men` each in the provinces between them (small enough that an
+ * AI leaves them as garrisons), the last post taking what is left.
+ * The data's commanders lead first; the realm gets more to match its men.
+ */
+function startingArmies(world: World, n: number, capital: number, total: number): { province: number; men: number; commander: number }[] {
+  const cfg = realmConfig.starting_armies;
+  const land = byDistance(world, n, capital).filter((p) => !world.provinceWater[p]);
+  const wanted = startingCommanderCount(total);
+  const commanders: number[] = [];
+  for (let c = 0; c < world.commanderIds.length; c++) if (world.commanderOwner[c] === n && commanders.length < wanted) commanders.push(c);
+  const capitalName = world.rules.provinces[capital]!.name;
+  for (let k = commanders.length; k < wanted; k++) {
+    const seed = mix(n + 1, k + 101);
+    const skill = (salt: number) => 1 + (mix(seed, salt) % 3);
+    const name = personName(world.rules, n, seed, capitalName);
+    commanders.push(addCommander(world, n, newCommander(name, { might: skill(1), cunning: skill(2), logistics: skill(3) }), `${world.nationIds[n]}_start_${k + 1}`));
+  }
+  // Each army a thousand or more, so a small realm may field fewer armies than it has commanders.
+  const armies = Math.max(1, Math.min(commanders.length, Math.floor((total * cfg.field_share) / 1000)));
+  const each = Math.min(START_ARMY_MAX, Math.max(1000, Math.floor((total * cfg.field_share) / armies / 1000) * 1000));
+  const out: { province: number; men: number; commander: number }[] = [];
+  const spread = (count: number, from: number[]) => Array.from({ length: count }, (_, k) => from[Math.floor((k * from.length) / count)]!);
+  spread(armies, land).forEach((province, k) => out.push({ province, men: each, commander: commanders[k]! }));
+  let rest = total - armies * each;
+  if (rest <= 0) return out;
+  const posts = land.filter((p) => !out.some((a) => a.province === p));
+  const garrisons = Math.max(1, Math.min(Math.ceil(rest / cfg.garrison_men), posts.length || 1));
+  const where = posts.length ? spread(garrisons, posts) : [capital];
+  const share = Math.min(cfg.garrison_men, Math.floor(rest / garrisons / 1000) * 1000);
+  where.forEach((province, k) => {
+    const men = k === where.length - 1 ? rest : share;
+    rest -= men;
+    if (men > 0) out.push({ province, men, commander: -1 });
+  });
+  return out;
+}
 
 export function areNeighbors(world: World, a: number, b: number): boolean {
   for (let k = world.adjStart[a]!, end = world.adjStart[a + 1]!; k < end; k++) {
