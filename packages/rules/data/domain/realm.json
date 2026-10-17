@@ -1,0 +1,184 @@
+{
+  "$comment": "Realm (domain/realm/spec.md), from country stats v3. Every number is a placeholder for config. Each stat lists the causes that gain it and the causes that lose it (REALM-001); amounts come from the context that owns the cause.",
+  "stats": {
+    "gold": {
+      "gain": ["royal_taxes", "lords_tax_share", "trade", "tribute", "grain_sold", "loot_and_ransoms", "titles_sold", "loan"],
+      "lose": ["soldiers_pay", "officials_wages", "school_upkeep", "building", "debt_interest", "gifts_and_bribes", "grain_bought", "repayment"]
+    },
+    "debt": {
+      "gain": ["loan_taken", "lord_lends"],
+      "lose": ["repaid", "lender_died", "lender_conquered", "default"]
+    },
+    "harvest": {
+      "gain": ["farmland", "farmers", "inventions", "peace"],
+      "lose": ["weather", "army_marching", "devastation", "plague", "cold_period"]
+    },
+    "local_store": {
+      "gain": ["harvest_surplus", "castle_delivery"],
+      "lose": ["eating", "army_refill", "rot", "raid"]
+    },
+    "herds": {
+      "gain": ["good_pasture", "raiding", "tribute"],
+      "lose": ["drought", "hard_winter", "raided", "disease", "famine_slaughter"]
+    },
+    "fish": {
+      "gain": ["fishing_boats", "salting_invention"],
+      "lose": ["blockade", "war_at_sea"]
+    },
+    "grain_price": {
+      "gain": ["bad_harvests", "war", "blockade"],
+      "lose": ["good_harvests", "trade_route"]
+    },
+    "castle_store": {
+      "gain": ["collection", "castle_delivery", "grain_bought"],
+      "lose": ["garrison", "spread", "army_refill", "rot", "capture"]
+    },
+    "granary": {
+      "gain": ["granary_built", "invention"],
+      "lose": ["siege_damage", "neglect"]
+    },
+    "reach": {
+      "gain": ["road", "river", "canal", "wagons", "research"],
+      "lose": ["enemy_on_road", "winter", "devastation"]
+    },
+    "people": {
+      "gain": ["growth", "migrants", "conquest"],
+      "lose": ["famine", "plague", "war_deaths", "refugees", "forced_migration"]
+    },
+    "provinces": {
+      "gain": ["conquest", "inheritance", "purchase", "lord_joins", "colony"],
+      "lose": ["lost_war", "ceded", "lord_defects", "breakaway"]
+    },
+    "royal_provinces": {
+      "gain": ["line_dies_out", "seized_from_lord", "conquest_kept"],
+      "lose": ["fief_granted"]
+    },
+    "officials": {
+      "gain": ["hired", "graduated"],
+      "lose": ["dismissed", "wages_unpaid", "war_in_province"]
+    },
+    "faith": {
+      "gain": ["missionaries_and_clergy", "schools", "migrants", "conversion_event"],
+      "lose": ["conquest", "reformation", "foreign_missionaries"]
+    },
+    "tongue": {
+      "gain": ["assimilation", "settlers", "schools"],
+      "lose": ["conquest", "migration", "separatists"]
+    },
+    "in_revolt": {
+      "gain": ["heavy_taxes", "famine", "foreign_faith_or_tongue", "disloyal_lords", "lost_war"],
+      "lose": ["rebels_defeated", "demands_given", "taxes_lowered", "food"]
+    },
+    "lords": {
+      "gain": ["fief_granted", "local_ruler_kept", "title_sold", "marriage", "land_split", "defector"],
+      "lose": ["line_dies_out", "land_seized", "trial", "revolt_defeated", "defected", "merged"]
+    },
+    "soldiers": {
+      "gain": ["raised", "paid_company", "retinue"],
+      "lose": ["battle", "disease_and_hunger", "desertion", "disbanded"]
+    },
+    "recruits": {
+      "gain": ["yearly_refill", "students_leave_school"],
+      "lose": ["soldiers_raised", "sent_to_school", "famine", "plague"]
+    },
+    "horses": {
+      "gain": ["breeding", "bought", "herds", "captured"],
+      "lose": ["battle", "fodder_shortage", "disease"]
+    },
+    "ships": {
+      "gain": ["built", "captured", "hired"],
+      "lose": ["battle", "storm", "rot", "blockade"]
+    },
+    "castles": {
+      "gain": ["built", "conquered"],
+      "lose": ["siege", "neglect", "demolished_in_peace"]
+    },
+    "commanders": {
+      "gain": ["hired", "lord_or_heir_commands", "promoted"],
+      "lose": ["battle_death", "old_age", "captured"]
+    },
+    "fallen": {
+      "gain": ["battle_deaths", "siege_deaths"],
+      "lose": ["time"]
+    },
+    "heirs": {
+      "gain": ["birth", "marriage", "named"],
+      "lose": ["death", "married_abroad", "joined_rebel"]
+    },
+    "allies": {
+      "gain": ["alliance_mission", "marriage", "peace_term"],
+      "lose": ["alliance_broken", "war_between", "bribed_away"]
+    },
+    "enemies": {
+      "gain": ["war_declared", "attacked"],
+      "lose": ["peace"]
+    },
+    "rivals": {
+      "gain": ["contested_claim", "border_dispute"],
+      "lose": ["settled", "destroyed"]
+    },
+    "subjects": {
+      "gain": ["forced_in_peace", "asked_for_protection"],
+      "lose": ["independence_war", "released", "annexed"]
+    },
+    "oaths_broken": {
+      "gain": ["truce_broken", "ally_abandoned", "debt_default"],
+      "lose": ["time"]
+    },
+    "lands_taken": {
+      "gain": ["conquest"],
+      "lose": ["time", "land_given_back"]
+    },
+    "envoys": {
+      "gain": ["sent"],
+      "lose": ["mission_ended", "killed", "held"]
+    }
+  },
+  "loyalty": {
+    "steps": ["Loyal", "Wavering", "Disloyal", "In revolt"],
+    "up": ["want_granted", "gift_of_gold", "office_at_court", "marriage_into_ruling_house", "victory_taken_part", "long_secure_reign", "fed_in_famine", "shared_faith_and_tongue", "war_against_rival"],
+    "down": ["heavy_taxes", "land_seized_from_him", "land_seized_from_another", "war_lost", "battle_lost", "child_ruler", "disputed_heir", "new_ruler", "grain_requisitioned", "foreign_bribes"]
+  },
+  "harvest_steps": ["failed", "poor", "normal", "good", "bumper"],
+  "tax_rates": ["light", "normal", "heavy", "crushing"],
+  "food": {
+    "collection_options": [0, 25, 50, 75],
+    "castle_share_rules": ["By people", "Frontier first", "Capital first", "Equal", "Custom"],
+    "spread_patterns": { "50/30/20": [50, 30, 20], "Tight": [80, 20, 0], "Wide": [30, 35, 35] },
+    "spread_default": "50/30/20",
+    "siege_reserve_options": [0, 3, 6, 12],
+    "army_refill_options": ["Locals only", "Castles hand out first", "No refill in lords' lands"],
+    "army_refill_default": "Locals only",
+    "famine_rule_options": { "Off": null, "1 month": 1, "3 months": 3 },
+    "surplus_options": ["Keep", "Sell on the market", "Send to the capital castle", "Send to subjects or allies"],
+    "surplus_default": "Keep",
+    "lords_castles": { "Loyal": 1, "Wavering": 0.5, "Disloyal": 0, "In revolt": 0 },
+    "presets": {
+      "Feed the people": { "collection": 25, "castleShares": "By people", "spread": "Wide", "siegeReserve": 3, "armyRefill": "Castles hand out first" },
+      "Fortress realm": { "collection": 50, "castleShares": "Frontier first", "spread": "Tight", "siegeReserve": 12, "armyRefill": "Locals only" },
+      "War footing": { "collection": 75, "castleShares": "Frontier first", "spread": "50/30/20", "siegeReserve": 6, "armyRefill": "Castles hand out first" },
+      "Merchant": { "collection": 50, "castleShares": "Capital first", "spread": "50/30/20", "siegeReserve": 3, "armyRefill": "No refill in lords' lands", "surplus": "Sell on the market" }
+    },
+    "campaign_eat": 2,
+    "horse_eats": 3,
+    "months_per_year": 12
+  },
+  "officials": { "no_official_share": 0.5 },
+  "lords": {
+    "tax_share": 0.5,
+    "labels": {
+      "feudal kingdom": "noble",
+      "city republic": "merchant house",
+      "theocracy": "bishop or abbot",
+      "steppe realm": "clan chief",
+      "chiefdom or stateless society": "elder or lineage head"
+    }
+  },
+  "windows": { "fallen": 10, "oaths_broken": 30, "lands_taken": 20 },
+  "inheritance": {
+    "throne_laws": ["eldest son", "eldest child", "eldest of the house", "strongest claimant", "election by lords"],
+    "land_laws": ["to one heir", "split among the sons"]
+  },
+  "win": { "domination_share": 0.6, "score_margin": 0.5, "score_years": 25, "subject_province_weight": 0.5 },
+  "campaign_end": { "year": 1939, "month": 8, "day": 31 }
+}

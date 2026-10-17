@@ -1,0 +1,452 @@
+{
+  "ratio": {
+    "gain_per_trader": 3,
+    "decay_share": 0.1,
+    "max": 100,
+    "sea_lane_trader_weight": 0.5,
+    "modifiers": {
+      "customs_officer": 0.15,
+      "better_road_than_neighbours": 0.1,
+      "peace_10_years": 0.1,
+      "riots": -0.5,
+      "homeless_per_5pct_over_5pct": -0.05,
+      "enemy_army_or_siege": -1.0,
+      "quarantine": {
+        "set_ratio": 0,
+        "closed": true
+      }
+    }
+  },
+  "value": {
+    "months_per_year": 12,
+    "traded_food": "surplus_only",
+    "food_wares": [
+      "grain",
+      "rice",
+      "fish"
+    ],
+    "price_per_load": {
+      "staples": {
+        "price": 1,
+        "wares": [
+          "grain",
+          "rice",
+          "fish",
+          "salt",
+          "timber",
+          "hides",
+          "pottery"
+        ]
+      },
+      "raw": {
+        "price": 2,
+        "wares": [
+          "wool",
+          "flax",
+          "cotton",
+          "iron",
+          "copper",
+          "tin",
+          "horses",
+          "saltpetre",
+          "dyes"
+        ]
+      },
+      "finished": {
+        "price": 5,
+        "wares": [
+          "cloth",
+          "linen",
+          "leather",
+          "tools",
+          "arms",
+          "beer_wine",
+          "paper",
+          "powder"
+        ]
+      },
+      "luxury": {
+        "price": 10,
+        "wares": [
+          "silk",
+          "silk_cloth",
+          "spices",
+          "pepper",
+          "sugar",
+          "tea",
+          "coffee",
+          "cocoa",
+          "tobacco",
+          "incense",
+          "ivory",
+          "porcelain",
+          "furs",
+          "gems",
+          "books"
+        ]
+      },
+      "precious": {
+        "price": 12,
+        "wares": [
+          "silver",
+          "gold"
+        ]
+      }
+    },
+    "building_weights": {
+      "weekly_market": {
+        "weight": 0.25,
+        "serves": 4,
+        "is_city": true
+      },
+      "yearly_fair": {
+        "weight": 0.5,
+        "serves": 8,
+        "is_city": true
+      },
+      "trading_house": {
+        "weight": 1.0,
+        "serves": 16,
+        "is_city": true
+      },
+      "caravanserai": {
+        "weight": 0.25,
+        "applies_to": "land",
+        "stops_bandits": true
+      },
+      "warehouse": {
+        "weight": 0.25
+      },
+      "harbour": {
+        "weight": 0.25,
+        "applies_to": "sea"
+      },
+      "counting_house": {
+        "weight": 0.1,
+        "foreign_deposits": true
+      },
+      "bank": {
+        "weight": 0.25,
+        "foreign_deposits": true
+      },
+      "craft_building": {
+        "weight": 0.05,
+        "each": true
+      }
+    },
+    "craft_buildings": [
+      "loom_house",
+      "forge",
+      "kiln",
+      "tannery",
+      "press",
+      "brewery"
+    ],
+    "serves_without_market": 2,
+    "city_size_is_city": [
+      "city",
+      "great_city"
+    ],
+    "trading_post_is_city": true
+  },
+  "collect": {
+    "when": "on_enter",
+    "visit_share": 0.2,
+    "ships_collect_at_sea": false,
+    "foreign_market_fee": 0.1,
+    "trade_pact_fee": 0
+  },
+  "deposit": {
+    "own_royal_city": 1.0,
+    "lord_city": {
+      "to_treasury": 1.0
+    },
+    "bills_of_exchange_fee": 0.1,
+    "needs_invention_for_abroad": "T3"
+  },
+  "route": {
+    "min_stops": 2,
+    "max_stops": 8,
+    "default_mode": "loop",
+    "toll_counts_as_days": 2
+  },
+  "tolls": {
+    "none": 0,
+    "low": 0.2
+  },
+  "danger": {
+    "bandit_chance_per_month": 0.05,
+    "bandit_when": {
+      "riots": true,
+      "rebels": true,
+      "homeless_share_over": 0.2
+    },
+    "raid_trader_escapes": 0.5,
+    "t1_bandit_chance_factor": 0.5,
+    "t11_lost_purse_refund": 0.5
+  },
+  "upkeep": {
+    "unpaid_months_to_lose": 6
+  },
+  "land_traders": {
+    "pack_caravan": {
+      "era": 1,
+      "step_factor": 0.75,
+      "hold": 1.0,
+      "purse": 10,
+      "crew": {
+        "class": "market_folk",
+        "count": 50
+      },
+      "found": 15,
+      "upkeep": 0.5
+    },
+    "camel_caravan": {
+      "era": 1,
+      "step_factor": 0.75,
+      "desert_step_factor": 0.5,
+      "desert_grounds": [
+        "desert",
+        "drylands"
+      ],
+      "hold": 1.5,
+      "purse": 15,
+      "crew": {
+        "class": "market_folk",
+        "count": 50
+      },
+      "found": 20,
+      "upkeep": 0.6,
+      "needs": [
+        "T1_or_desert_home"
+      ]
+    },
+    "river_barge": {
+      "era": 1,
+      "step_factor": 0.4,
+      "river_only": true,
+      "hold": 1.5,
+      "purse": 15,
+      "crew": {
+        "class": "market_folk",
+        "count": 50
+      },
+      "found": 15,
+      "upkeep": 0.4
+    },
+    "wagon_train": {
+      "era": 4,
+      "step_factor": 0.6,
+      "hold": 2.0,
+      "purse": 25,
+      "crew": {
+        "class": "market_folk",
+        "count": 80
+      },
+      "found": 30,
+      "upkeep": 0.8,
+      "needs": [
+        "B9"
+      ]
+    },
+    "rail_freight": {
+      "era": 5,
+      "step": "rail",
+      "hold": 6.0,
+      "purse": 80,
+      "crew": {
+        "class": "craftsmen",
+        "count": 120
+      },
+      "found": 80,
+      "upkeep": 2,
+      "needs": [
+        "rail_station_both_ends"
+      ]
+    }
+  },
+  "sea_traders": {
+    "cog_junk_dhow": {
+      "hold": 2.0,
+      "purse": 30,
+      "upkeep": 1
+    },
+    "galley": {
+      "hold": 2.0,
+      "purse": 25,
+      "upkeep": 2,
+      "enclosed_seas_only": true
+    },
+    "caravel": {
+      "hold": 1.0,
+      "purse": 20,
+      "upkeep": 1
+    },
+    "carrack": {
+      "hold": 3.0,
+      "purse": 50,
+      "upkeep": 1.5
+    },
+    "galleon": {
+      "hold": 3.0,
+      "purse": 60,
+      "upkeep": 2
+    },
+    "fluyt": {
+      "hold": 4.0,
+      "purse": 70,
+      "upkeep": 1.5
+    },
+    "steamer": {
+      "hold": 6.0,
+      "purse": 150,
+      "upkeep": 3,
+      "needs_coal_port": true
+    }
+  },
+  "s2_hold_bonus": 0.5,
+  "research": {
+    "t2_collect_bonus": 0.1,
+    "t6_extra_served_visits": 2,
+    "t9_ship_cost_factor": 0.75,
+    "t5_indian_ocean_storm_factor": 0.5
+  },
+  "peace_terms": {
+    "open_the_roads_years": 10
+  },
+  "effects": {
+    "tax_per_ratio_points": {
+      "points": 4,
+      "tax": 0.01
+    },
+    "crafts_appear_min_ratio": 30,
+    "missing_input_output": 0.5
+  },
+  "start": {
+    "traders_by_trade_access": {
+      "very_high": 6,
+      "high": 4,
+      "moderate": 2,
+      "low": 1,
+      "very_low": 0,
+      "unknown": 0
+    },
+    "warmup_months": 24,
+    "routes": [
+      {
+        "country": "Venice",
+        "label": "galley line",
+        "stops": [
+          "Venice",
+          "Corfu",
+          "Candia",
+          "Alexandria"
+        ]
+      },
+      {
+        "country": "Venice",
+        "stops": [
+          "Constantinople",
+          "Tana"
+        ]
+      },
+      {
+        "country": "Genoa",
+        "stops": [
+          "Genoa",
+          "Chios",
+          "Pera",
+          "Caffa"
+        ]
+      },
+      {
+        "country": "Lübeck",
+        "stops": [
+          "Lübeck",
+          "Bergen",
+          "Lübeck",
+          "Bruges"
+        ]
+      },
+      {
+        "country": "Lübeck",
+        "label": "caravan",
+        "stops": [
+          "Lübeck",
+          "Novgorod"
+        ]
+      },
+      {
+        "country": "Florence",
+        "label": "caravan",
+        "stops": [
+          "Florence",
+          "Bologna",
+          "Venice"
+        ]
+      },
+      {
+        "country": "Mali",
+        "label": "camel caravan",
+        "stops": [
+          "Timbuktu",
+          "Taghaza",
+          "Sijilmasa"
+        ]
+      },
+      {
+        "country": "Kilwa",
+        "label": "dhow",
+        "stops": [
+          "Kilwa",
+          "Sofala",
+          "Kilwa",
+          "Mombasa",
+          "Malindi"
+        ]
+      },
+      {
+        "country": "Calicut",
+        "label": "dhow",
+        "stops": [
+          "Calicut",
+          "Hormuz",
+          "Aden"
+        ]
+      },
+      {
+        "country": "Malacca",
+        "label": "junk",
+        "stops": [
+          "Malacca",
+          "Ayutthaya"
+        ]
+      },
+      {
+        "country": "Malacca",
+        "stops": [
+          "Malacca",
+          "Pasai",
+          "Calicut"
+        ]
+      },
+      {
+        "country": "Ryukyu",
+        "label": "junk",
+        "stops": [
+          "Naha",
+          "Fuzhou",
+          "Naha",
+          "Hakata"
+        ]
+      }
+    ]
+  },
+  "ai": {
+    "caravan_reach_provinces": 12,
+    "ship_reach_sea_zones": 40,
+    "found_margin": 1.25,
+    "reroute_every_months": 12,
+    "dismiss_after_losing_months": 12
+  }
+}

@@ -1,0 +1,5024 @@
+{
+ "schema_version": "1.0",
+ "reference_date": "1444-11-11",
+ "description": "Historically supported relations between 1444 entities, keyed by country-catalogue ids. A missing pair means nothing is recorded, not Neutral.",
+ "rules_file": "../config/relation-rules.json",
+ "relations": [
+  {
+   "id": "r_england__france__truce",
+   "type": "truce",
+   "source": "england",
+   "target": "france",
+   "direction": "mutual",
+   "start_date": "1444-05-28",
+   "expires_on": "1446-04-01",
+   "expiration_condition": "Original term; history extended it to 1449.",
+   "historical_end": {
+    "date": "1449-07-31",
+    "how": "France resumed war after the English sack of Fougères (March 1449)."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Truce of Tours ended open war in the Hundred Years' War and was tied to the betrothal of Henry VI to Margaret of Anjou. Extended several times; fighting resumed in 1449.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_bi_griffiths_henryvi",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "r_england__france__rival",
+   "type": "rival",
+   "source": "england",
+   "target": "france",
+   "direction": "mutual",
+   "start_date": "1337",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The English king claims the French crown and holds Normandy, Maine and Guyenne; both sides contest the same lands.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "r_france__scotland__alliance",
+   "type": "alliance",
+   "source": "france",
+   "target": "scotland",
+   "direction": "mutual",
+   "start_date": "1295",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Franco-Scottish alliance, renewed in 1428 and sealed by the 1436 marriage of Margaret Stewart to the dauphin Louis.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_mcgladdery_jamesii",
+    "src_fr_vale_charles_vii",
+    "src_ncmh7"
+   ]
+  },
+  {
+   "id": "r_france__castile__alliance",
+   "type": "alliance",
+   "source": "france",
+   "target": "castile",
+   "direction": "mutual",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Long-standing Trastámara-Valois alliance, renewed under Juan II and Charles VII; Castilian fleets had served France.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_ib_ocallaghan",
+    "src_fr_vale_charles_vii"
+   ]
+  },
+  {
+   "id": "r_england__scotland__truce",
+   "type": "truce",
+   "source": "england",
+   "target": "scotland",
+   "direction": "mutual",
+   "start_date": "1438",
+   "expires_on": "1447",
+   "expiration_condition": "Nine-year term from 1438.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Nine-year Anglo-Scottish truce concluded during James II's minority; border raiding continued underneath it.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_griffiths_henryvi",
+    "src_bi_mcgladdery_jamesii"
+   ]
+  },
+  {
+   "id": "r_england__scotland__rival",
+   "type": "rival",
+   "source": "england",
+   "target": "scotland",
+   "direction": "mutual",
+   "start_date": "1296",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Scotland seeks to recover Roxburgh and Berwick; England claims overlordship. Contested border fortresses.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_mcgladdery_jamesii",
+    "src_bi_griffiths_henryvi"
+   ]
+  },
+  {
+   "id": "r_england__portugal__alliance",
+   "type": "alliance",
+   "source": "england",
+   "target": "portugal",
+   "direction": "mutual",
+   "start_date": "1386-05-09",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Treaty of Windsor: perpetual alliance, still observed in the 1440s.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_russell_henry",
+    "src_ib_disney"
+   ]
+  },
+  {
+   "id": "r_burgundy__england__truce",
+   "type": "truce",
+   "source": "burgundy",
+   "target": "england",
+   "direction": "mutual",
+   "start_date": "1439-09-29",
+   "expiration_condition": "Renewed periodically; trade-driven.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "After Burgundy left the English alliance (Arras, 1435) and besieged Calais (1436), a commercial truce covering Flanders was agreed at Gravelines and renewed.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_lr_vaughan_philip",
+    "src_bi_griffiths_henryvi"
+   ]
+  },
+  {
+   "id": "r_burgundy__france__rival",
+   "type": "rival",
+   "source": "burgundy",
+   "target": "france",
+   "direction": "mutual",
+   "start_date": "1407",
+   "note": "Burgundy's legal vassalage for its French fiefs is suspended in 1444; see uncertainty report.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Valois Burgundy and the French crown compete for power after the Armagnac-Burgundian civil war; Philip the Good was exempted from homage for life by the Treaty of Arras, so no subject relation is stored.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vaughan_philip",
+    "src_fr_vale_charles_vii"
+   ]
+  },
+  {
+   "id": "r_brittany__france__subject",
+   "type": "subject",
+   "source": "brittany",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Montfort dukes owe homage to the French king; whether it was liege homage was disputed.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_anjou__france__subject",
+   "type": "subject",
+   "source": "anjou",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "René of Anjou holds Anjou as a royal apanage and sits in Charles VII's council.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_orleans__france__subject",
+   "type": "subject",
+   "source": "orleans",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Charles of Orléans, released from English captivity in 1440, holds his duchy as a prince of the blood.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_bourbon__france__subject",
+   "type": "subject",
+   "source": "bourbon",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Charles I of Bourbon, a prince of the blood; submitted after the Praguerie (1440).",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_alencon__france__subject",
+   "type": "subject",
+   "source": "alencon",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "John II of Alençon, royal vassal and former Praguerie rebel.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_armagnac__france__subject",
+   "type": "subject",
+   "source": "armagnac",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "low",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Count Jean IV was captured by royal forces in 1443 and his lands put under royal control until 1445.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_foix__france__subject",
+   "type": "subject",
+   "source": "foix",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Gaston IV holds Foix from the French crown and serves Charles VII; Béarn is held separately in full sovereignty.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_albret__france__subject",
+   "type": "subject",
+   "source": "albret",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Lords of Albret, royal vassals in Gascony fighting the English.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_nevers__france__subject",
+   "type": "subject",
+   "source": "nevers",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "County held by a Burgundian cadet line as a French fief.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_french_minor_lordships__france__subject",
+   "type": "subject",
+   "source": "french_minor_lordships",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Group record of lesser royal vassals.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_fr_vale_charles_vii",
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_dauphine__france__subject",
+   "type": "subject",
+   "source": "dauphine",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "low",
+   "start_date": "1349",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Apanage of the heir, the dauphin Louis.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_kendall_louis"
+   ]
+  },
+  {
+   "id": "r_france__provence__friendly",
+   "type": "friendly",
+   "source": "france",
+   "target": "provence",
+   "direction": "mutual",
+   "start_date": "1422",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "René of Anjou, count of Provence, is Charles VII's brother-in-law and campaigned with him at Metz in 1444.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_kekewich_rene",
+    "src_fr_vale_charles_vii"
+   ]
+  },
+  {
+   "id": "r_aragon__provence__rival",
+   "type": "rival",
+   "source": "aragon",
+   "target": "provence",
+   "direction": "mutual",
+   "start_date": "1435",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Angevins and Alfonso V fought for Naples; René lost Naples in 1442 and kept the claim.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_kekewich_rene",
+    "src_it_ryder_alfonso"
+   ]
+  },
+  {
+   "id": "r_france__swiss_confederation__truce",
+   "type": "truce",
+   "source": "france",
+   "target": "swiss_confederation",
+   "direction": "mutual",
+   "start_date": "1444-10-28",
+   "expiration_condition": "Peace treaty; superseded by Franco-Swiss agreements of 1452-53.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Treaty of Ensisheim after the battle of St. Jakob an der Birs (26 Aug 1444) ended the dauphin's campaign against the Confederates.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_niederstatter_zurichkrieg",
+    "src_hs_hls",
+    "src_fr_kendall_louis"
+   ]
+  },
+  {
+   "id": "r_france__metz__at_war",
+   "type": "at_war",
+   "source": "france",
+   "target": "metz",
+   "direction": "mutual",
+   "start_date": "1444-09",
+   "historical_end": {
+    "date": "1445-03",
+    "how": "Metz paid an indemnity and the siege was lifted."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Charles VII and René of Anjou besieged Metz from September 1444; the city bought peace in 1445.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_schneider_metz",
+    "src_lr_saulcy_siege_metz"
+   ]
+  },
+  {
+   "id": "r_lorraine__metz__at_war",
+   "type": "at_war",
+   "source": "lorraine",
+   "target": "metz",
+   "direction": "mutual",
+   "start_date": "1444-09",
+   "historical_end": {
+    "date": "1445-03",
+    "how": "Peace with Metz."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The siege of Metz arose from René's claims as duke of Lorraine against the city.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_schneider_metz",
+    "src_lr_parisse_lorraine"
+   ]
+  },
+  {
+   "id": "r_bar__lorraine__subject",
+   "type": "subject",
+   "source": "bar",
+   "target": "lorraine",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "moderate",
+   "start_date": "1431",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bar and Lorraine both held by René of Anjou and Isabella of Lorraine.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_parisse_lorraine"
+   ]
+  },
+  {
+   "id": "r_vaudemont__lorraine__subject",
+   "type": "subject",
+   "source": "vaudemont",
+   "target": "lorraine",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Counts of Vaudemont, René's former rivals (1431), reconciled by marriage in 1444-45 but holding Vaudemont from the duke.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_lr_parisse_lorraine"
+   ]
+  },
+  {
+   "id": "r_english_france__england__subject",
+   "type": "subject",
+   "source": "english_france",
+   "target": "england",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "low",
+   "start_date": "1415",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "English-held Normandy, Maine and Guyenne, governed by the king's lieutenants.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_allmand_normandy",
+    "src_fr_vale_gascony"
+   ]
+  },
+  {
+   "id": "r_lordship_of_ireland__england__subject",
+   "type": "subject",
+   "source": "lordship_of_ireland",
+   "target": "england",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "moderate",
+   "start_date": "1171",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The English king is Lord of Ireland; the lordship has its own parliament and administration.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nhi2"
+   ]
+  },
+  {
+   "id": "r_isle_of_man__england__subject",
+   "type": "subject",
+   "source": "isle_of_man",
+   "target": "england",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1405",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Stanleys hold Man from the English crown.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_duffy_man"
+   ]
+  },
+  {
+   "id": "r_ormond__lordship_of_ireland__subject",
+   "type": "subject",
+   "source": "ormond",
+   "target": "lordship_of_ireland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Butler earls of Ormond, magnates and sometime lieutenants of the lordship.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_lydon_lordship"
+   ]
+  },
+  {
+   "id": "r_desmond__lordship_of_ireland__subject",
+   "type": "subject",
+   "source": "desmond",
+   "target": "lordship_of_ireland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "FitzGerald earls of Desmond: Anglo-Irish earls, largely gaelicised and only loosely bound.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_nhi2",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_lordship_of_the_isles__scotland__subject",
+   "type": "subject",
+   "source": "lordship_of_the_isles",
+   "target": "scotland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Alexander MacDonald, Lord of the Isles and earl of Ross, holds from the Scottish crown and served as justiciar north of the Forth.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_munro_isles",
+    "src_bi_mcgladdery_jamesii"
+   ]
+  },
+  {
+   "id": "r_douglas_earldom__scotland__subject",
+   "type": "subject",
+   "source": "douglas_earldom",
+   "target": "scotland",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Black Douglas earldom dominates southern Scotland during James II's minority.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_brown_douglases"
+   ]
+  },
+  {
+   "id": "r_orkney__norway__subject",
+   "type": "subject",
+   "source": "orkney",
+   "target": "norway",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1379",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "William Sinclair holds the earldom of Orkney from the Norwegian crown.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_crawford_earldoms",
+    "src_bi_grohse_orkney"
+   ]
+  },
+  {
+   "id": "r_leinster_kavanagh__lordship_of_ireland__hostile",
+   "type": "hostile",
+   "source": "leinster_kavanagh",
+   "target": "lordship_of_ireland",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "MacMurrough Kavanagh raids the Pale borders and extracts protection payments.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_nicholls_gaelic",
+    "src_bi_lydon_lordship"
+   ]
+  },
+  {
+   "id": "r_tyrone__lordship_of_ireland__hostile",
+   "type": "hostile",
+   "source": "tyrone",
+   "target": "lordship_of_ireland",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "O'Neill of Tyrone presses the Ulster earldom lands and the Pale with raids and black rent.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_nicholls_gaelic",
+    "src_bi_irish_annals"
+   ]
+  },
+  {
+   "id": "r_tyrconnell__tyrone__rival",
+   "type": "rival",
+   "source": "tyrconnell",
+   "target": "tyrone",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "O'Donnell and O'Neill compete for dominance in Ulster and over the lesser lords between them.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_irish_annals",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_desmond__thomond__rival",
+   "type": "rival",
+   "source": "desmond",
+   "target": "thomond",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Desmond and the O'Briens of Thomond contend for Munster.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_flanders__burgundy__subject",
+   "type": "subject",
+   "source": "flanders",
+   "target": "burgundy",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "County held by Philip the Good since 1419. Each keeps its estates and privileges inside the Burgundian composite state.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_blockmans_prevenier_promised",
+    "src_lr_vaughan_philip"
+   ]
+  },
+  {
+   "id": "r_brabant__burgundy__subject",
+   "type": "subject",
+   "source": "brabant",
+   "target": "burgundy",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Duchy inherited by Philip in 1430. Each keeps its estates and privileges inside the Burgundian composite state.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_blockmans_prevenier_promised",
+    "src_lr_vaughan_philip"
+   ]
+  },
+  {
+   "id": "r_holland__burgundy__subject",
+   "type": "subject",
+   "source": "holland",
+   "target": "burgundy",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Holland and Zeeland ceded by Jacqueline of Bavaria in 1433. Each keeps its estates and privileges inside the Burgundian composite state.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_blockmans_prevenier_promised",
+    "src_lr_vaughan_philip"
+   ]
+  },
+  {
+   "id": "r_hainaut__burgundy__subject",
+   "type": "subject",
+   "source": "hainaut",
+   "target": "burgundy",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "County ceded with Holland in 1433. Each keeps its estates and privileges inside the Burgundian composite state.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_blockmans_prevenier_promised",
+    "src_lr_vaughan_philip"
+   ]
+  },
+  {
+   "id": "r_luxembourg__burgundy__subject",
+   "type": "subject",
+   "source": "luxembourg",
+   "target": "burgundy",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": "1443-11-22",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Philip took Luxembourg by surprise in November 1443 under an agreement with Elisabeth of Görlitz; the Saxon and Habsburg claims stayed open.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_lr_vaughan_philip"
+   ]
+  },
+  {
+   "id": "r_ghent__flanders__subject",
+   "type": "subject",
+   "source": "ghent",
+   "target": "flanders",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The great Flemish city, privileged and restive inside the county (revolt of 1449-53).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_lr_boone_ghent"
+   ]
+  },
+  {
+   "id": "r_burgundy__cleves__friendly",
+   "type": "friendly",
+   "source": "burgundy",
+   "target": "cleves",
+   "direction": "mutual",
+   "start_date": "1406",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Adolf I of Cleves married Mary of Burgundy; John of Cleves was raised at Philip's court.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_vaughan_philip"
+   ]
+  },
+  {
+   "id": "r_cleves__cologne__at_war",
+   "type": "at_war",
+   "source": "cleves",
+   "target": "cologne",
+   "direction": "mutual",
+   "start_date": "1444",
+   "historical_end": {
+    "date": "1449-04",
+    "how": "Papal mediation; Soest stayed with Cleves."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Soest Feud: Cleves took Soest under its lordship and Archbishop Dietrich of Moers went to war.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_hansen_soester_fehde",
+    "src_lr_janssen_koeln"
+   ]
+  },
+  {
+   "id": "r_cologne__soest__at_war",
+   "type": "at_war",
+   "source": "cologne",
+   "target": "soest",
+   "direction": "mutual",
+   "start_date": "1444",
+   "historical_end": {
+    "date": "1449-04",
+    "how": "Peace of Maastricht."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Soest renounced the archbishop's lordship and was attacked in the Soest Feud.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_hansen_soester_fehde"
+   ]
+  },
+  {
+   "id": "r_soest__cleves__subject",
+   "type": "subject",
+   "source": "soest",
+   "target": "cleves",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1444-06-05",
+   "note": "The catalogue lists Soest's overlord as Cologne (contested); see uncertainty report.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Soest accepted John of Cleves as its lord on 5 June 1444.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_hansen_soester_fehde"
+   ]
+  },
+  {
+   "id": "r_mark__cleves__subject",
+   "type": "subject",
+   "source": "mark",
+   "target": "cleves",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "moderate",
+   "start_date": "1398",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "County of Mark joined to Cleves under one house; contested by Gerhard of Cleves-Mark.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_lr_kohl_westfaelische"
+   ]
+  },
+  {
+   "id": "r_paderborn__cologne__subject",
+   "type": "subject",
+   "source": "paderborn",
+   "target": "cologne",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "moderate",
+   "start_date": "1415",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Dietrich of Moers, archbishop of Cologne, also administers Paderborn.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_janssen_koeln"
+   ]
+  },
+  {
+   "id": "r_osnabruck__munster__subject",
+   "type": "subject",
+   "source": "osnabruck",
+   "target": "munster",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "moderate",
+   "start_date": "1442",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Heinrich of Moers, bishop of Münster, administers Osnabrück.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_lr_kohl_westfaelische"
+   ]
+  },
+  {
+   "id": "r_cologne__munster__friendly",
+   "type": "friendly",
+   "source": "cologne",
+   "target": "munster",
+   "direction": "mutual",
+   "start_date": "1424",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The sees are held by the brothers Dietrich and Heinrich of Moers.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_janssen_koeln",
+    "src_lr_kohl_westfaelische"
+   ]
+  },
+  {
+   "id": "r_holland__lubeck__truce",
+   "type": "truce",
+   "source": "holland",
+   "target": "lubeck",
+   "direction": "mutual",
+   "start_date": "1441-08-23",
+   "expires_on": "1451-08-23",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Peace of Copenhagen ended the Dutch-Wendish war with a ten-year truce between Holland-Zeeland and the Wendish towns led by Lübeck.",
+   "confidence": "high",
+   "source_ids": [
+    "src_lr_dollinger_hansa",
+    "src_hn_dollinger"
+   ]
+  },
+  {
+   "id": "r_granada__castile__subject",
+   "type": "subject",
+   "source": "granada",
+   "target": "castile",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1439",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Truces with Castile carried parias in gold, paid irregularly amid Nasrid succession strife; frontier raiding continued.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_ib_harvey",
+    "src_ib_hillgarth"
+   ]
+  },
+  {
+   "id": "r_castile__navarre__hostile",
+   "type": "hostile",
+   "source": "castile",
+   "target": "navarre",
+   "direction": "mutual",
+   "start_date": "1444-03-29",
+   "note": "Whether fighting or a truce held on 11 Nov 1444 is unresolved; see uncertainty report.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Prince Henry and Álvaro de Luna declared war on Juan of Navarre and the Infantes of Aragon in March 1444; Navarre invaded in 1445 and lost at Olmedo.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_cronica_juan_ii",
+    "src_ib_mackay",
+    "src_wikipedia"
+   ]
+  },
+  {
+   "id": "r_aragon__castile__rival",
+   "type": "rival",
+   "source": "aragon",
+   "target": "castile",
+   "direction": "mutual",
+   "start_date": "1420",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Infantes of Aragon contest power in Castile with Alfonso V's backing.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_ryder_alfonso",
+    "src_ib_mackay"
+   ]
+  },
+  {
+   "id": "r_castile__portugal__friendly",
+   "type": "friendly",
+   "source": "castile",
+   "target": "portugal",
+   "direction": "mutual",
+   "start_date": "1431-10-30",
+   "note": "The catalogue records an alliance; no binding war treaty is attested, so it is stored as Friendly.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Treaty of Medina del Campo ended the war of 1383-1411; regent Pedro sent troops to aid Juan II in 1445.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_ib_disney",
+    "src_ib_russell_henry"
+   ]
+  },
+  {
+   "id": "r_morocco__portugal__at_war",
+   "type": "at_war",
+   "source": "morocco",
+   "target": "portugal",
+   "direction": "mutual",
+   "start_date": "1415-08-21",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "State of war since Portugal took Ceuta; the 1437 Tangier capitulation (Ceuta for Prince Fernando) was never carried out.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_ib_russell_henry",
+    "src_rel_abun_nasr"
+   ]
+  },
+  {
+   "id": "r_portuguese_ceuta__portugal__subject",
+   "type": "subject",
+   "source": "portuguese_ceuta",
+   "target": "portugal",
+   "direction": "directed",
+   "subject_kind": "colony",
+   "autonomy": "low",
+   "start_date": "1415-08-21",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ceuta held by a Portuguese captain since 1415.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_russell_henry"
+   ]
+  },
+  {
+   "id": "r_braganza__portugal__subject",
+   "type": "subject",
+   "source": "braganza",
+   "target": "portugal",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": "1442",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Afonso, duke of Braganza, leads the noble opposition to regent Pedro.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_disney"
+   ]
+  },
+  {
+   "id": "r_castilian_military_orders__castile__subject",
+   "type": "subject",
+   "source": "castilian_military_orders",
+   "target": "castile",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Santiago, Calatrava and Alcántara under royal patronage; masterships fought over.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_ocallaghan_orders"
+   ]
+  },
+  {
+   "id": "r_castilian_magnates__castile__subject",
+   "type": "subject",
+   "source": "castilian_magnates",
+   "target": "castile",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Great noble lineages holding seigneurial jurisdictions.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_suarez_nobleza"
+   ]
+  },
+  {
+   "id": "r_canarian_lordship__castile__subject",
+   "type": "subject",
+   "source": "canarian_lordship",
+   "target": "castile",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1418",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The seigneurs of the conquered Canaries hold them as a Castilian fief.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_fernandez_armesto_before_columbus"
+   ]
+  },
+  {
+   "id": "r_canarian_lordship__gran_canaria__hostile",
+   "type": "hostile",
+   "source": "canarian_lordship",
+   "target": "gran_canaria",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Raids and failed conquest attempts against the guanarteme polities of Gran Canaria.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_fernandez_armesto_before_columbus"
+   ]
+  },
+  {
+   "id": "r_canarian_lordship__tenerife_menceyatos__hostile",
+   "type": "hostile",
+   "source": "canarian_lordship",
+   "target": "tenerife_menceyatos",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Slave raids from the seigneurial islands on Tenerife.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_fernandez_armesto_before_columbus"
+   ]
+  },
+  {
+   "id": "r_canarian_lordship__la_palma__hostile",
+   "type": "hostile",
+   "source": "canarian_lordship",
+   "target": "la_palma",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Slave raids from the seigneurial islands on La Palma.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_fernandez_armesto_before_columbus"
+   ]
+  },
+  {
+   "id": "r_aragon_kingdom__aragon__subject",
+   "type": "subject",
+   "source": "aragon_kingdom",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Constituent kingdom with its own Cortes and Justicia.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_bisson"
+   ]
+  },
+  {
+   "id": "r_catalonia__aragon__subject",
+   "type": "subject",
+   "source": "catalonia",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Constituent principality with Corts and Generalitat.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_bisson"
+   ]
+  },
+  {
+   "id": "r_valencia__aragon__subject",
+   "type": "subject",
+   "source": "valencia",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Constituent kingdom with Corts and Generalitat.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_bisson"
+   ]
+  },
+  {
+   "id": "r_sicily__aragon__subject",
+   "type": "subject",
+   "source": "sicily",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "low",
+   "start_date": "1412",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sicily ruled by Aragonese viceroys.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_epstein_sicily"
+   ]
+  },
+  {
+   "id": "r_sardinia__aragon__subject",
+   "type": "subject",
+   "source": "sardinia",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "low",
+   "start_date": "1420",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Kingdom of Sardinia under the Crown of Aragon.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_casula_sardegna"
+   ]
+  },
+  {
+   "id": "r_oristano__sardinia__subject",
+   "type": "subject",
+   "source": "oristano",
+   "target": "sardinia",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1410",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Marquisate of Oristano, the Arborean heirs' fief under the Aragonese crown.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_casula_sardegna"
+   ]
+  },
+  {
+   "id": "r_naples__papal_states__subject",
+   "type": "subject",
+   "source": "naples",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "fief",
+   "autonomy": "very_high",
+   "start_date": "1443-06-14",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Treaty of Terracina: Eugenius IV invested Alfonso with Naples, a papal fief owing census, and Alfonso undertook to help recover the Marche for the Church.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_ryder_alfonso",
+    "src_it_stieber_eugenius"
+   ]
+  },
+  {
+   "id": "r_taranto__naples__subject",
+   "type": "subject",
+   "source": "taranto",
+   "target": "naples",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Giovanni Antonio Orsini del Balzo, the realm's greatest baron.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_ryder_naples"
+   ]
+  },
+  {
+   "id": "r_herzegovina__aragon__subject",
+   "type": "subject",
+   "source": "herzegovina",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1444-02-19",
+   "note": "Treaty date given as 15 or 19 February 1444.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Stjepan Vukčić Kosača became Alfonso V's vassal by treaty in exchange for help against his enemies.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_peco_1444",
+    "src_be_fine_lmb"
+   ]
+  },
+  {
+   "id": "r_aragon__genoa__truce",
+   "type": "truce",
+   "source": "aragon",
+   "target": "genoa",
+   "direction": "mutual",
+   "start_date": "1444",
+   "historical_end": {
+    "date": "1447",
+    "how": "Renewed conflict under Giano Campofregoso."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Doge Raffaele Adorno accepted peace with Alfonso, recognising him as king of Naples with an annual symbolic gift.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_aem_genoa_1444",
+    "src_it_epstein_genoa"
+   ]
+  },
+  {
+   "id": "r_aragon__genoa__rival",
+   "type": "rival",
+   "source": "aragon",
+   "target": "genoa",
+   "direction": "mutual",
+   "start_date": "1420",
+   "note": "Rivalry outlasts the 1444 peace.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Competition over Corsica, Sardinia and western Mediterranean trade.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_epstein_genoa",
+    "src_it_ryder_alfonso"
+   ]
+  },
+  {
+   "id": "r_aragon__navarre__friendly",
+   "type": "friendly",
+   "source": "aragon",
+   "target": "navarre",
+   "direction": "mutual",
+   "start_date": "1425",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Juan of Navarre is Alfonso's brother and his lieutenant-general in Aragon.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ib_vicens_juan_ii"
+   ]
+  },
+  {
+   "id": "r_andorra__foix__subject",
+   "type": "subject",
+   "source": "andorra",
+   "target": "foix",
+   "direction": "directed",
+   "subject_kind": "fief",
+   "autonomy": "high",
+   "start_date": "1278",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Co-principality shared by the counts of Foix and the bishops of Urgell under the paréages.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_ib_dbe"
+   ]
+  },
+  {
+   "id": "r_ferrara__papal_states__subject",
+   "type": "subject",
+   "source": "ferrara",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Este papal vicars for Ferrara (Modena and Reggio are imperial fiefs).",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_partner_lands"
+   ]
+  },
+  {
+   "id": "r_urbino__papal_states__subject",
+   "type": "subject",
+   "source": "urbino",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Montefeltro papal vicars; Oddantonio was made duke in 1443 and murdered in July 1444.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_partner_lands"
+   ]
+  },
+  {
+   "id": "r_rimini__papal_states__subject",
+   "type": "subject",
+   "source": "rimini",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sigismondo Malatesta, papal vicar and condottiere.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_partner_lands",
+    "src_it_jones_malatesta"
+   ]
+  },
+  {
+   "id": "r_pesaro__papal_states__subject",
+   "type": "subject",
+   "source": "pesaro",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Galeazzo Malatesta, papal vicar (sold Pesaro to the Sforza in 1445).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_partner_lands",
+    "src_it_jones_malatesta"
+   ]
+  },
+  {
+   "id": "r_camerino__papal_states__subject",
+   "type": "subject",
+   "source": "camerino",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Varano lords, restored in the 1440s as papal vicars.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_partner_lands"
+   ]
+  },
+  {
+   "id": "r_faenza__papal_states__subject",
+   "type": "subject",
+   "source": "faenza",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Manfredi papal vicars.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_partner_lands"
+   ]
+  },
+  {
+   "id": "r_forli__papal_states__subject",
+   "type": "subject",
+   "source": "forli",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ordelaffi papal vicars.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_partner_lands"
+   ]
+  },
+  {
+   "id": "r_romagna_minor_signorie__papal_states__subject",
+   "type": "subject",
+   "source": "romagna_minor_signorie",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Group of minor papal vicariates in Romagna.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_partner_lands"
+   ]
+  },
+  {
+   "id": "r_bologna__papal_states__subject",
+   "type": "subject",
+   "source": "bologna",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bologna under the Bentivoglio, papal in law but ruling itself and allied with Venice and Florence.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_partner_lands"
+   ]
+  },
+  {
+   "id": "r_ancona__papal_states__subject",
+   "type": "subject",
+   "source": "ancona",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Maritime commune under papal sovereignty paying a census.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_partner_lands"
+   ]
+  },
+  {
+   "id": "r_roman_baronial_houses__papal_states__subject",
+   "type": "subject",
+   "source": "roman_baronial_houses",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Colonna, Orsini and other baronial houses of Lazio.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_partner_lands"
+   ]
+  },
+  {
+   "id": "r_comtat_venaissin__papal_states__subject",
+   "type": "subject",
+   "source": "comtat_venaissin",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "low",
+   "start_date": "1274",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Papal enclave around Avignon.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_lewis_polity"
+   ]
+  },
+  {
+   "id": "r_papal_states__sforza_marche__truce",
+   "type": "truce",
+   "source": "papal_states",
+   "target": "sforza_marche",
+   "direction": "mutual",
+   "start_date": "1444-10-10",
+   "historical_end": {
+    "date": "1445",
+    "how": "War renewed; Sforza lost most of the Marche by 1446."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "After Sforza beat the Church's and Visconti's captains in 1444, Eugenius IV made peace confirming most of his hold on the Marche; the pope renewed the war in 1445.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_gregorovius",
+    "src_it_mallett_mercenaries"
+   ]
+  },
+  {
+   "id": "r_florence__venice__alliance",
+   "type": "alliance",
+   "source": "florence",
+   "target": "venice",
+   "direction": "mutual",
+   "start_date": "1425-12",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "League of Venice and Florence against Milan, repeatedly renewed.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_lane_venice",
+    "src_it_najemy_florence"
+   ]
+  },
+  {
+   "id": "r_florence__sforza_marche__friendly",
+   "type": "friendly",
+   "source": "florence",
+   "target": "sforza_marche",
+   "direction": "mutual",
+   "start_date": "1441",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Florence and Cosimo de' Medici subsidised Sforza.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_kent_medici",
+    "src_it_mallett_mercenaries"
+   ]
+  },
+  {
+   "id": "r_venice__sforza_marche__friendly",
+   "type": "friendly",
+   "source": "venice",
+   "target": "sforza_marche",
+   "direction": "mutual",
+   "start_date": "1441",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Venice backed Sforza against the Visconti-papal coalition in the Marche.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_mallett_mercenaries",
+    "src_it_lane_venice"
+   ]
+  },
+  {
+   "id": "r_milan__venice__rival",
+   "type": "rival",
+   "source": "milan",
+   "target": "venice",
+   "direction": "mutual",
+   "start_date": "1423",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Lombard wars over Brescia, Bergamo and the Adda frontier; peace of Cavriana (1441) did not settle them.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_lane_venice",
+    "src_it_black_milan"
+   ]
+  },
+  {
+   "id": "r_florence__milan__rival",
+   "type": "rival",
+   "source": "florence",
+   "target": "milan",
+   "direction": "mutual",
+   "start_date": "1423",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Florence opposes Visconti hegemony in central and northern Italy.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_najemy_florence",
+    "src_it_black_milan"
+   ]
+  },
+  {
+   "id": "r_milan__sforza_marche__hostile",
+   "type": "hostile",
+   "source": "milan",
+   "target": "sforza_marche",
+   "direction": "mutual",
+   "start_date": "1443",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Filippo Maria Visconti turned against his son-in-law and sent Piccinino against him in the Marche.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_mallett_mercenaries",
+    "src_it_black_milan"
+   ]
+  },
+  {
+   "id": "r_council_of_basel__papal_states__hostile",
+   "type": "hostile",
+   "source": "council_of_basel",
+   "target": "papal_states",
+   "direction": "mutual",
+   "start_date": "1439",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The rump Council of Basel deposed Eugenius IV and elected Felix V.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_stieber_basel",
+    "src_it_stieber_eugenius"
+   ]
+  },
+  {
+   "id": "r_papal_states__savoy__hostile",
+   "type": "hostile",
+   "source": "papal_states",
+   "target": "savoy",
+   "direction": "mutual",
+   "start_date": "1439-11",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Amadeus VIII of Savoy is the anti-pope Felix V; his son Duke Louis upholds his obedience.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hs_stieber_basel"
+   ]
+  },
+  {
+   "id": "r_asti__orleans__subject",
+   "type": "subject",
+   "source": "asti",
+   "target": "orleans",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": "1387",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Asti came to the Orléans line as Valentina Visconti's dowry and is ruled by Orléans governors.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_black_milan"
+   ]
+  },
+  {
+   "id": "r_florence__lucca__rival",
+   "type": "rival",
+   "source": "florence",
+   "target": "lucca",
+   "direction": "mutual",
+   "start_date": "1429",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Florence's failed war of conquest (1429-38) left Lucca guarding its independence.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_najemy_florence"
+   ]
+  },
+  {
+   "id": "r_hungary__ottoman__at_war",
+   "type": "at_war",
+   "source": "hungary",
+   "target": "ottoman",
+   "direction": "mutual",
+   "start_date": "1444-09",
+   "historical_end": {
+    "date": "1447",
+    "how": "Truce after Varna; war resumed with the 1448 Kosovo campaign."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Crusade of Varna: the peace of Edirne-Szeged was repudiated and the crusading army was destroyed at Varna on 10 November 1444; war continued.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_imber_varna",
+    "src_be_engel_realm",
+    "src_rel_hist_crusades6"
+   ]
+  },
+  {
+   "id": "r_ottoman__wallachia__at_war",
+   "type": "at_war",
+   "source": "ottoman",
+   "target": "wallachia",
+   "direction": "mutual",
+   "start_date": "1444-09",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Vlad II Dracul sent troops under his son Mircea to join the crusade.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_imber_varna",
+    "src_rel_hist_crusades6"
+   ]
+  },
+  {
+   "id": "r_hungary__wallachia__alliance",
+   "type": "alliance",
+   "source": "hungary",
+   "target": "wallachia",
+   "direction": "mutual",
+   "start_date": "1444",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Joint crusade campaign of 1444 (and the Danube expedition of 1445).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_imber_varna"
+   ]
+  },
+  {
+   "id": "r_hungary__papal_states__alliance",
+   "type": "alliance",
+   "source": "hungary",
+   "target": "papal_states",
+   "direction": "mutual",
+   "start_date": "1443",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The papacy financed and its legate Cesarini led the crusade alongside the Hungarian king.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_imber_varna",
+    "src_rel_setton2"
+   ]
+  },
+  {
+   "id": "r_ottoman__papal_states__at_war",
+   "type": "at_war",
+   "source": "ottoman",
+   "target": "papal_states",
+   "direction": "mutual",
+   "start_date": "1444",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Papal galleys formed the core of the crusading fleet at the Straits.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_setton2",
+    "src_rel_hist_crusades6"
+   ]
+  },
+  {
+   "id": "r_ottoman__venice__at_war",
+   "type": "at_war",
+   "source": "ottoman",
+   "target": "venice",
+   "direction": "mutual",
+   "start_date": "1444-06-15",
+   "historical_end": {
+    "date": "1446",
+    "how": "Venetian-Ottoman peace."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Venetian fleet sent to the Straits to cut Ottoman crossings; separate peace in 1446.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_setton2",
+    "src_it_lane_venice"
+   ]
+  },
+  {
+   "id": "r_burgundy__ottoman__at_war",
+   "type": "at_war",
+   "source": "burgundy",
+   "target": "ottoman",
+   "direction": "mutual",
+   "start_date": "1444",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Burgundian galleys under Waleran de Wavrin sailed with the crusade fleet and campaigned on the Danube in 1445.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_setton2",
+    "src_lr_vaughan_philip"
+   ]
+  },
+  {
+   "id": "r_byzantium__ottoman__subject",
+   "type": "subject",
+   "source": "byzantium",
+   "target": "ottoman",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1424-02",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Byzantium paid annual tribute to the Ottomans under the 1424 treaty.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_nicol_last",
+    "src_cho2"
+   ]
+  },
+  {
+   "id": "r_morea__byzantium__subject",
+   "type": "subject",
+   "source": "morea",
+   "target": "byzantium",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": "1349",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Despotate of the Morea held by the emperor's brothers Constantine and Thomas.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_nicol_last"
+   ]
+  },
+  {
+   "id": "r_athens__morea__subject",
+   "type": "subject",
+   "source": "athens",
+   "target": "morea",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1444",
+   "historical_end": {
+    "date": "1446",
+    "how": "Murad II's Morea campaign."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Constantine forced Nerio II Acciaioli to pay him tribute in 1444; the Ottomans restored their suzerainty in 1446.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_nicol_last",
+    "src_rel_setton2"
+   ]
+  },
+  {
+   "id": "r_morea__ottoman__at_war",
+   "type": "at_war",
+   "source": "morea",
+   "target": "ottoman",
+   "direction": "mutual",
+   "start_date": "1444",
+   "historical_end": {
+    "date": "1446-12",
+    "how": "Murad stormed the Hexamilion; the despots paid tribute."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Constantine rebuilt the Hexamilion and pushed into Ottoman-held central Greece while the crusade was under way.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_nicol_last"
+   ]
+  },
+  {
+   "id": "r_serbia__ottoman__subject",
+   "type": "subject",
+   "source": "serbia",
+   "target": "ottoman",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1444-08",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The peace of 1444 restored Đurađ Branković's despotate as an Ottoman tributary owing troops and tribute.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_fine_lmb",
+    "src_be_imber_varna"
+   ]
+  },
+  {
+   "id": "r_bosnia__ottoman__subject",
+   "type": "subject",
+   "source": "bosnia",
+   "target": "ottoman",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1430s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bosnian kings paid tribute to the sultan from the 1430s.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_fine_lmb"
+   ]
+  },
+  {
+   "id": "r_bosnia__herzegovina__at_war",
+   "type": "at_war",
+   "source": "bosnia",
+   "target": "herzegovina",
+   "direction": "mutual",
+   "start_date": "1443",
+   "historical_end": {
+    "date": "1446",
+    "how": "Stephen Thomas married Kosača's daughter Katarina."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Civil war between King Stephen Thomas and Stjepan Vukčić Kosača, ended by a marriage settlement in 1446.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_fine_lmb"
+   ]
+  },
+  {
+   "id": "r_league_of_lezhe__ottoman__at_war",
+   "type": "at_war",
+   "source": "league_of_lezhe",
+   "target": "ottoman",
+   "direction": "mutual",
+   "start_date": "1444-03-02",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Albanian lords leagued under Skanderbeg defeated an Ottoman army at Torvioll on 29 June 1444.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_schmitt_skanderbeg",
+    "src_be_fine_lmb"
+   ]
+  },
+  {
+   "id": "r_ragusa__hungary__subject",
+   "type": "subject",
+   "source": "ragusa",
+   "target": "hungary",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1358",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ragusa owes the Hungarian crown tribute and recognition since the peace of Zadar.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_fine_lmb"
+   ]
+  },
+  {
+   "id": "r_cyprus__mamluk__subject",
+   "type": "subject",
+   "source": "cyprus",
+   "target": "mamluk",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1426",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Cyprus became a Mamluk tributary after the defeat at Khirokitia.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_hill_cyprus",
+    "src_rel_petry_egypt"
+   ]
+  },
+  {
+   "id": "r_knights_hospitaller__mamluk__at_war",
+   "type": "at_war",
+   "source": "knights_hospitaller",
+   "target": "mamluk",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Mamluk expeditions against Rhodes in 1440 and 1444; the 1444 siege was lifted in September with no peace yet.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_hist_crusades6",
+    "src_rel_petry_egypt",
+    "src_wikipedia"
+   ]
+  },
+  {
+   "id": "r_chios__genoa__subject",
+   "type": "subject",
+   "source": "chios",
+   "target": "genoa",
+   "direction": "directed",
+   "subject_kind": "colony",
+   "autonomy": "high",
+   "start_date": "1346",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Maona company governs Chios under Genoese sovereignty.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_epstein_genoa"
+   ]
+  },
+  {
+   "id": "r_gazaria__genoa__subject",
+   "type": "subject",
+   "source": "gazaria",
+   "target": "genoa",
+   "direction": "directed",
+   "subject_kind": "colony",
+   "autonomy": "low",
+   "start_date": "1266",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Caffa and the Genoese Black Sea towns, ruled by a consul sent from Genoa.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_epstein_genoa"
+   ]
+  },
+  {
+   "id": "r_genoese_aegean__genoa__subject",
+   "type": "subject",
+   "source": "genoese_aegean",
+   "target": "genoa",
+   "direction": "directed",
+   "subject_kind": "colony",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Pera and other Genoese Aegean holdings.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_it_epstein_genoa"
+   ]
+  },
+  {
+   "id": "r_gazaria__theodoro__rival",
+   "type": "rival",
+   "source": "gazaria",
+   "target": "theodoro",
+   "direction": "mutual",
+   "start_date": "1433",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Theodoro and Genoese Caffa fought over Cembalo in 1433-34.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_vasiliev_goths"
+   ]
+  },
+  {
+   "id": "r_crimea__theodoro__friendly",
+   "type": "friendly",
+   "source": "crimea",
+   "target": "theodoro",
+   "direction": "mutual",
+   "start_date": "1434",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Hacı Giray and Theodoro acted together against the Genoese in 1434.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_vasiliev_goths",
+    "src_chia"
+   ]
+  },
+  {
+   "id": "r_crimea__lithuania__friendly",
+   "type": "friendly",
+   "source": "crimea",
+   "target": "lithuania",
+   "direction": "mutual",
+   "start_date": "1441",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Hacı Giray came to power from Lithuanian exile with Casimir's consent.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chia",
+    "src_be_kiaupa_lithuania",
+    "src_wikipedia"
+   ]
+  },
+  {
+   "id": "r_karaman__ottoman__rival",
+   "type": "rival",
+   "source": "karaman",
+   "target": "ottoman",
+   "direction": "mutual",
+   "start_date": "1390s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Karaman contests Ottoman primacy in Anatolia; Ibrahim Bey attacked in 1444 in step with the crusade.",
+   "confidence": "high",
+   "source_ids": [
+    "src_cho2"
+   ]
+  },
+  {
+   "id": "r_karaman__ottoman__truce",
+   "type": "truce",
+   "source": "karaman",
+   "target": "ottoman",
+   "direction": "mutual",
+   "start_date": "1444",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Murad II's 1444 campaign forced Ibrahim Bey of Karaman to make peace before the sultan turned to the crusade.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_cho2",
+    "src_be_imber_varna"
+   ]
+  },
+  {
+   "id": "r_byzantium__papal_states__friendly",
+   "type": "friendly",
+   "source": "byzantium",
+   "target": "papal_states",
+   "direction": "mutual",
+   "start_date": "1439-07-06",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Union of Florence: the papacy organised the crusade to relieve Constantinople.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_nicol_last",
+    "src_it_gill_florence"
+   ]
+  },
+  {
+   "id": "r_croatia__hungary__subject",
+   "type": "subject",
+   "source": "croatia",
+   "target": "hungary",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Kingdom of Croatia-Slavonia under the Hungarian crown.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_engel_realm"
+   ]
+  },
+  {
+   "id": "r_transylvania__hungary__subject",
+   "type": "subject",
+   "source": "transylvania",
+   "target": "hungary",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Voivodeship held by John Hunyadi.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_engel_realm"
+   ]
+  },
+  {
+   "id": "r_hungary__upper_hungary_giskra__hostile",
+   "type": "hostile",
+   "source": "hungary",
+   "target": "upper_hungary_giskra",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Jan Jiskra holds Upper Hungary for the infant Ladislaus V against Władysław's party.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_engel_realm",
+    "src_be_hist_olomucensia_jiskra"
+   ]
+  },
+  {
+   "id": "r_austria__upper_hungary_giskra__friendly",
+   "type": "friendly",
+   "source": "austria",
+   "target": "upper_hungary_giskra",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Jiskra serves the Habsburg claimant held by Frederick III.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_engel_realm"
+   ]
+  },
+  {
+   "id": "r_austria__hungary__hostile",
+   "type": "hostile",
+   "source": "austria",
+   "target": "hungary",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Frederick III holds the Holy Crown, the child Ladislaus V and pledged western Hungarian towns against Władysław's regime.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_engel_realm",
+    "src_hs_heinig_friedrich3"
+   ]
+  },
+  {
+   "id": "r_austria__cilli__friendly",
+   "type": "friendly",
+   "source": "austria",
+   "target": "cilli",
+   "direction": "mutual",
+   "start_date": "1443-08",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Frederick III and the counts of Cilli concluded a mutual succession treaty.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_heinig_friedrich3"
+   ]
+  },
+  {
+   "id": "r_austria__zurich__alliance",
+   "type": "alliance",
+   "source": "austria",
+   "target": "zurich",
+   "direction": "mutual",
+   "start_date": "1442-06-17",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Zurich allied with Frederick III against the other Confederates.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_niederstatter_zurichkrieg",
+    "src_hs_hls"
+   ]
+  },
+  {
+   "id": "r_austria__swiss_confederation__at_war",
+   "type": "at_war",
+   "source": "austria",
+   "target": "swiss_confederation",
+   "direction": "mutual",
+   "start_date": "1442",
+   "historical_end": {
+    "date": "1446",
+    "how": "Truce, then the 1450 arbitration."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Old Zurich War: Habsburg fought the Confederates on Zurich's side.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_niederstatter_zurichkrieg"
+   ]
+  },
+  {
+   "id": "r_swiss_confederation__zurich__at_war",
+   "type": "at_war",
+   "source": "swiss_confederation",
+   "target": "zurich",
+   "direction": "mutual",
+   "start_date": "1440",
+   "historical_end": {
+    "date": "1450",
+    "how": "Arbitrated peace; Zurich rejoined."
+   },
+   "note": "Zurich remains a catalogue member of the Confederation; membership is not a relation here.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Old Zurich War over the Toggenburg inheritance; Zurich besieged in 1444.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_niederstatter_zurichkrieg",
+    "src_hs_hls"
+   ]
+  },
+  {
+   "id": "r_mazovia_warsaw__poland__subject",
+   "type": "subject",
+   "source": "mazovia_warsaw",
+   "target": "poland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1351",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Mazovian Piast duchy held as a fief of the Polish crown.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_davies_gp"
+   ]
+  },
+  {
+   "id": "r_mazovia_plock__poland__subject",
+   "type": "subject",
+   "source": "mazovia_plock",
+   "target": "poland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1351",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Mazovian Piast duchy held as a fief of the Polish crown.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_davies_gp"
+   ]
+  },
+  {
+   "id": "r_moldavia__poland__subject",
+   "type": "subject",
+   "source": "moldavia",
+   "target": "poland",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1387",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Moldavian voivodes did homage to the Polish king; Stephen II ruled after blinding his brother Ilie in 1443.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_davies_gp"
+   ]
+  },
+  {
+   "id": "r_volhynia__lithuania__subject",
+   "type": "subject",
+   "source": "volhynia",
+   "target": "lithuania",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Švitrigaila holds Volhynia for life after reconciling with Casimir.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_kiaupa_lithuania"
+   ]
+  },
+  {
+   "id": "r_lithuania__poland__rival",
+   "type": "rival",
+   "source": "lithuania",
+   "target": "poland",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "After Lithuania raised Casimir unilaterally (1440) the union lapsed; Podolia and Volhynia were disputed until 1447.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_kiaupa_lithuania",
+    "src_be_frost_oxford"
+   ]
+  },
+  {
+   "id": "r_poland__teutonic_order__rival",
+   "type": "rival",
+   "source": "poland",
+   "target": "teutonic_order",
+   "direction": "mutual",
+   "start_date": "1410",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Unsettled frontier disputes after the eternal peace of Brześć Kujawski (1435).",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_burleigh_prussia",
+    "src_be_boockmann_do"
+   ]
+  },
+  {
+   "id": "r_livonian_order__teutonic_order__subject",
+   "type": "subject",
+   "source": "livonian_order",
+   "target": "teutonic_order",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "very_high",
+   "start_date": "1237",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Livonian branch of the Teutonic Order with its own master.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_urban_livonian"
+   ]
+  },
+  {
+   "id": "r_ermland__teutonic_order__subject",
+   "type": "subject",
+   "source": "ermland",
+   "target": "teutonic_order",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Prince-bishopric under the Order's protection.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_boockmann_do"
+   ]
+  },
+  {
+   "id": "r_neumark__teutonic_order__subject",
+   "type": "subject",
+   "source": "neumark",
+   "target": "teutonic_order",
+   "direction": "directed",
+   "subject_kind": "colony",
+   "autonomy": "low",
+   "start_date": "1402",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Neumark pledged to the Order by the Luxembourgs.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_burleigh_prussia"
+   ]
+  },
+  {
+   "id": "r_prussian_confederation__teutonic_order__subject",
+   "type": "subject",
+   "source": "prussian_confederation",
+   "target": "teutonic_order",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": "1440-03-14",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "League of Prussian towns and knights formed at Marienwerder to defend its rights against the Order.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_burleigh_prussia"
+   ]
+  },
+  {
+   "id": "r_prussian_confederation__teutonic_order__hostile",
+   "type": "hostile",
+   "source": "prussian_confederation",
+   "target": "teutonic_order",
+   "direction": "one_way",
+   "start_date": "1440-03-14",
+   "note": "Disloyal subject.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The estates' league resists the Order's taxation and justice; it rose in 1454.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_burleigh_prussia"
+   ]
+  },
+  {
+   "id": "r_riga_city__livonian_order__subject",
+   "type": "subject",
+   "source": "riga_city",
+   "target": "livonian_order",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1330",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Riga city submitted to the Order in 1330.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_urban_livonian"
+   ]
+  },
+  {
+   "id": "r_courland_bishopric__livonian_order__subject",
+   "type": "subject",
+   "source": "courland_bishopric",
+   "target": "livonian_order",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bishopric of Courland incorporated with the Order.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_urban_livonian"
+   ]
+  },
+  {
+   "id": "r_livonian_order__riga__rival",
+   "type": "rival",
+   "source": "livonian_order",
+   "target": "riga",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The archbishops of Riga dispute lordship over Riga and Livonia with the Order.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_urban_livonian"
+   ]
+  },
+  {
+   "id": "r_livonian_order__novgorod__at_war",
+   "type": "at_war",
+   "source": "livonian_order",
+   "target": "novgorod",
+   "direction": "mutual",
+   "start_date": "1443",
+   "historical_end": {
+    "date": "1448",
+    "how": "Peace concluded."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Livonian-Novgorodian war over the Narva frontier.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_urban_livonian",
+    "src_rel_martin_medieval_russia"
+   ]
+  },
+  {
+   "id": "r_moravia__bohemia__subject",
+   "type": "subject",
+   "source": "moravia",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Land or estate of the Bohemian crown during the interregnum of 1439-53.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_smahel_hussite",
+    "src_hs_bosl_bohmen"
+   ]
+  },
+  {
+   "id": "r_silesia__bohemia__subject",
+   "type": "subject",
+   "source": "silesia",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Land or estate of the Bohemian crown during the interregnum of 1439-53.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_smahel_hussite",
+    "src_hs_bosl_bohmen"
+   ]
+  },
+  {
+   "id": "r_upper_lusatia__bohemia__subject",
+   "type": "subject",
+   "source": "upper_lusatia",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Land or estate of the Bohemian crown during the interregnum of 1439-53.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_smahel_hussite",
+    "src_hs_bosl_bohmen"
+   ]
+  },
+  {
+   "id": "r_lower_lusatia__bohemia__subject",
+   "type": "subject",
+   "source": "lower_lusatia",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Land or estate of the Bohemian crown during the interregnum of 1439-53.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hs_smahel_hussite",
+    "src_hs_bosl_bohmen"
+   ]
+  },
+  {
+   "id": "r_breslau__bohemia__subject",
+   "type": "subject",
+   "source": "breslau",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Land or estate of the Bohemian crown during the interregnum of 1439-53.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hs_smahel_hussite",
+    "src_hs_bosl_bohmen"
+   ]
+  },
+  {
+   "id": "r_podebrady_landfriede__bohemia__subject",
+   "type": "subject",
+   "source": "podebrady_landfriede",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Land or estate of the Bohemian crown during the interregnum of 1439-53.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hs_smahel_hussite",
+    "src_hs_bosl_bohmen"
+   ]
+  },
+  {
+   "id": "r_rosenberg__bohemia__subject",
+   "type": "subject",
+   "source": "rosenberg",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Land or estate of the Bohemian crown during the interregnum of 1439-53.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hs_smahel_hussite",
+    "src_hs_bosl_bohmen"
+   ]
+  },
+  {
+   "id": "r_tabor__bohemia__subject",
+   "type": "subject",
+   "source": "tabor",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Land or estate of the Bohemian crown during the interregnum of 1439-53.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hs_smahel_hussite",
+    "src_hs_bosl_bohmen"
+   ]
+  },
+  {
+   "id": "r_podebrady_landfriede__rosenberg__rival",
+   "type": "rival",
+   "source": "podebrady_landfriede",
+   "target": "rosenberg",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Utraquist and Catholic regional leagues contest control of Bohemia.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hs_heymann_george"
+   ]
+  },
+  {
+   "id": "r_podebrady_landfriede__tabor__hostile",
+   "type": "hostile",
+   "source": "podebrady_landfriede",
+   "target": "tabor",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Poděbrady's Utraquists oppose radical Tábor, taken in 1452.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hs_heymann_george"
+   ]
+  },
+  {
+   "id": "r_brandenburg__pomerania_stettin__hostile",
+   "type": "hostile",
+   "source": "brandenburg",
+   "target": "pomerania_stettin",
+   "direction": "mutual",
+   "start_date": "1444",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Dispute over the Uckermark, fought 1444/45-1448 and settled at Prenzlau.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hn_schultze",
+    "src_hn_buchholz_pommern",
+    "src_wikipedia"
+   ]
+  },
+  {
+   "id": "r_ansbach__nuremberg__rival",
+   "type": "rival",
+   "source": "ansbach",
+   "target": "nuremberg",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Albrecht Achilles and Nuremberg contest rights in Franconia (war of 1449).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hs_spindler_bayern"
+   ]
+  },
+  {
+   "id": "r_schleswig__denmark__subject",
+   "type": "subject",
+   "source": "schleswig",
+   "target": "denmark",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Adolf VIII of Holstein enfeoffed with Schleswig as a hereditary fief by Christopher of Bavaria.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hn_lange_sh",
+    "src_no_chs1"
+   ]
+  },
+  {
+   "id": "r_sweden__denmark__subject",
+   "type": "subject",
+   "source": "sweden",
+   "target": "denmark",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "very_high",
+   "start_date": "1441",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Christopher of Bavaria, Danish king, accepted as Swedish king by the riksråd.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_no_chs1",
+    "src_no_harrison_karl"
+   ]
+  },
+  {
+   "id": "r_norway__denmark__subject",
+   "type": "subject",
+   "source": "norway",
+   "target": "denmark",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "high",
+   "start_date": "1442",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Christopher crowned king of Norway; the union king resides in Denmark.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_no_chs1"
+   ]
+  },
+  {
+   "id": "r_iceland__norway__subject",
+   "type": "subject",
+   "source": "iceland",
+   "target": "norway",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": "1264",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Iceland under the Norwegian crown since the Old Covenant.",
+   "confidence": "high",
+   "source_ids": [
+    "src_no_karlsson_iceland"
+   ]
+  },
+  {
+   "id": "r_faroes__norway__subject",
+   "type": "subject",
+   "source": "faroes",
+   "target": "norway",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Faroes under the Norwegian crown.",
+   "confidence": "high",
+   "source_ids": [
+    "src_no_wylie_faroes"
+   ]
+  },
+  {
+   "id": "r_denmark__gotland__hostile",
+   "type": "hostile",
+   "source": "denmark",
+   "target": "gotland",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Deposed king Eric of Pomerania holds Visby and preys on Baltic shipping.",
+   "confidence": "high",
+   "source_ids": [
+    "src_no_mirator_gotland",
+    "src_no_chs1"
+   ]
+  },
+  {
+   "id": "r_gotland__hanseatic_league__hostile",
+   "type": "hostile",
+   "source": "gotland",
+   "target": "hanseatic_league",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Eric's Gotland privateers attack Hanseatic shipping.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_no_mirator_gotland",
+    "src_hn_dollinger"
+   ]
+  },
+  {
+   "id": "r_kazan__muscovy__at_war",
+   "type": "at_war",
+   "source": "kazan",
+   "target": "muscovy",
+   "direction": "mutual",
+   "start_date": "1437",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "First Russo-Kazan war; Ulugh Muhammad's forces took Nizhny Novgorod in 1444-45 and captured Vasily II at Suzdal in 1445.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_martin_medieval_russia",
+    "src_chia",
+    "src_wikipedia"
+   ]
+  },
+  {
+   "id": "r_galich_shemyaka__muscovy__rival",
+   "type": "rival",
+   "source": "galich_shemyaka",
+   "target": "muscovy",
+   "direction": "mutual",
+   "start_date": "1433",
+   "note": "An appanage prince competing with the grand prince for the throne.",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Dynastic war for the Muscovite throne; Shemyaka seized Moscow in 1446.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_martin_medieval_russia",
+    "src_rel_crummey"
+   ]
+  },
+  {
+   "id": "r_mozhaysk__muscovy__subject",
+   "type": "subject",
+   "source": "mozhaysk",
+   "target": "muscovy",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ivan Andreyevich of Mozhaysk holds an appanage of the Moscow house.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_crummey"
+   ]
+  },
+  {
+   "id": "r_vereya_beloozero__muscovy__subject",
+   "type": "subject",
+   "source": "vereya_beloozero",
+   "target": "muscovy",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Mikhail Andreyevich holds Vereya and Beloozero as an appanage.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_crummey"
+   ]
+  },
+  {
+   "id": "r_muscovy__novgorod__rival",
+   "type": "rival",
+   "source": "muscovy",
+   "target": "novgorod",
+   "direction": "mutual",
+   "start_date": "1441",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Vasily II campaigned against Novgorod in 1441 and extracted a payment.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_martin_medieval_russia"
+   ]
+  },
+  {
+   "id": "r_mecca__mamluk__subject",
+   "type": "subject",
+   "source": "mecca",
+   "target": "mamluk",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sharifs of Mecca appointed and confirmed by the Mamluk sultan.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_petry_egypt",
+    "src_bosworth_nid"
+   ]
+  },
+  {
+   "id": "r_medina_amirs__mamluk__subject",
+   "type": "subject",
+   "source": "medina_amirs",
+   "target": "mamluk",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Amirs of Medina under Mamluk authority.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_petry_egypt",
+    "src_bosworth_nid"
+   ]
+  },
+  {
+   "id": "r_dulkadir__mamluk__subject",
+   "type": "subject",
+   "source": "dulkadir",
+   "target": "mamluk",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Dulkadir beys of Elbistan hold their beylik as Mamluk clients.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_petry_egypt",
+    "src_bosworth_nid"
+   ]
+  },
+  {
+   "id": "r_ramadanids__mamluk__subject",
+   "type": "subject",
+   "source": "ramadanids",
+   "target": "mamluk",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ramadanid emirs of Adana under Mamluk suzerainty.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_petry_egypt",
+    "src_bosworth_nid"
+   ]
+  },
+  {
+   "id": "r_aq_qoyunlu__qara_qoyunlu__hostile",
+   "type": "hostile",
+   "source": "aq_qoyunlu",
+   "target": "qara_qoyunlu",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Turkmen confederations fight over eastern Anatolia and Azerbaijan.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_woods_aqquyunlu",
+    "src_chi6"
+   ]
+  },
+  {
+   "id": "r_qara_qoyunlu__timurid_empire__subject",
+   "type": "subject",
+   "source": "qara_qoyunlu",
+   "target": "timurid_empire",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1436",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Jahan Shah held Azerbaijan by Shah Rukh's grant and acknowledged him until 1447.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_manz_shahrukh",
+    "src_chi6"
+   ]
+  },
+  {
+   "id": "r_georgia__qara_qoyunlu__hostile",
+   "type": "hostile",
+   "source": "georgia",
+   "target": "qara_qoyunlu",
+   "direction": "mutual",
+   "start_date": "1440",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Jahan Shah invaded Georgia in 1440 and sacked Samshvilde.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chi6",
+    "src_iranica"
+   ]
+  },
+  {
+   "id": "r_shirvan__timurid_empire__subject",
+   "type": "subject",
+   "source": "shirvan",
+   "target": "timurid_empire",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shirvanshah Khalilullah I acknowledged Shah Rukh.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_iranica",
+    "src_rel_manz_shahrukh"
+   ]
+  },
+  {
+   "id": "r_timurid_samarkand__timurid_empire__subject",
+   "type": "subject",
+   "source": "timurid_samarkand",
+   "target": "timurid_empire",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": "1409",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ulugh Beg governs Transoxiana for his father Shah Rukh.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_manz_shahrukh",
+    "src_chi6"
+   ]
+  },
+  {
+   "id": "r_timurid_fars__timurid_empire__subject",
+   "type": "subject",
+   "source": "timurid_fars",
+   "target": "timurid_empire",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Fars held by a Timurid prince under Shah Rukh.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_manz_shahrukh"
+   ]
+  },
+  {
+   "id": "r_moghulistan__timurid_samarkand__hostile",
+   "type": "hostile",
+   "source": "moghulistan",
+   "target": "timurid_samarkand",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Moghul raids on Transoxiana and Ulugh Beg's punitive expeditions.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chia",
+    "src_chi6"
+   ]
+  },
+  {
+   "id": "r_moghulistan__oirat__hostile",
+   "type": "hostile",
+   "source": "moghulistan",
+   "target": "oirat",
+   "direction": "mutual",
+   "start_date": "1440s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Esen Taishi's Oirat campaigned against Moghulistan.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chia"
+   ]
+  },
+  {
+   "id": "r_rasulid_yemen__tahirid__rival",
+   "type": "rival",
+   "source": "rasulid_yemen",
+   "target": "tahirid",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Tahirids rose in the Rasulid lowlands and replaced them by 1454.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bosworth_nid",
+    "src_ei2"
+   ]
+  },
+  {
+   "id": "r_delhi__jaunpur__rival",
+   "type": "rival",
+   "source": "delhi",
+   "target": "jaunpur",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Sharqis of Jaunpur aim at Delhi itself; Mahmud Sharqi attacked in 1452.",
+   "confidence": "high",
+   "source_ids": [
+    "src_nchi"
+   ]
+  },
+  {
+   "id": "r_gujarat__malwa__rival",
+   "type": "rival",
+   "source": "gujarat",
+   "target": "malwa",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Gujarat and Malwa sultans fought repeatedly over Malwa's succession and frontier.",
+   "confidence": "high",
+   "source_ids": [
+    "src_nchi"
+   ]
+  },
+  {
+   "id": "r_malwa__mewar__at_war",
+   "type": "at_war",
+   "source": "malwa",
+   "target": "mewar",
+   "direction": "mutual",
+   "start_date": "1442",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Mahmud Khalji's campaigns against Rana Kumbha (Kumbhalgarh 1443, Mandalgarh 1446).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_nchi"
+   ]
+  },
+  {
+   "id": "r_marwar__mewar__hostile",
+   "type": "hostile",
+   "source": "marwar",
+   "target": "mewar",
+   "direction": "mutual",
+   "start_date": "1438",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Rana Kumbha seized Mandore; Rao Jodha fought from exile to recover it (1453).",
+   "confidence": "high",
+   "source_ids": [
+    "src_nchi"
+   ]
+  },
+  {
+   "id": "r_bahmani__vijayanagara__rival",
+   "type": "rival",
+   "source": "bahmani",
+   "target": "vijayanagara",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Recurring wars over the Raichur doab.",
+   "confidence": "high",
+   "source_ids": [
+    "src_nchi",
+    "src_rel_sherwani"
+   ]
+  },
+  {
+   "id": "r_bahmani__vijayanagara__truce",
+   "type": "truce",
+   "source": "bahmani",
+   "target": "vijayanagara",
+   "direction": "mutual",
+   "start_date": "1443",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ala-ud-din Ahmad II's war with Deva Raya II ended in a settlement in 1443.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_sherwani"
+   ]
+  },
+  {
+   "id": "r_calicut__cochin__rival",
+   "type": "rival",
+   "source": "calicut",
+   "target": "cochin",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Zamorins of Calicut and the rulers of Cochin compete on the Malabar coast.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_nchi"
+   ]
+  },
+  {
+   "id": "r_ming__oirat__rival",
+   "type": "rival",
+   "source": "ming",
+   "target": "oirat",
+   "direction": "mutual",
+   "start_date": "1439",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Esen Taishi's growing power and disputes over the tribute trade led to the Tumu crisis of 1449.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chc7",
+    "src_chia"
+   ]
+  },
+  {
+   "id": "r_northern_yuan__oirat__friendly",
+   "type": "friendly",
+   "source": "northern_yuan",
+   "target": "oirat",
+   "direction": "mutual",
+   "start_date": "1433",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Taisun Khan reigns with the Oirat taishi Esen holding real power.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chia"
+   ]
+  },
+  {
+   "id": "r_joseon__ming__subject",
+   "type": "subject",
+   "source": "joseon",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Joseon kings received Ming investiture and sent regular embassies.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "r_ryukyu__ming__subject",
+   "type": "subject",
+   "source": "ryukyu",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Shō kings received Ming investiture and traded under the tribute system.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "r_dai_viet__ming__subject",
+   "type": "subject",
+   "source": "dai_viet",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Lê kings were invested as kings of Annam by the Ming after 1431.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chc8",
+    "src_chsea1"
+   ]
+  },
+  {
+   "id": "r_malacca__ming__subject",
+   "type": "subject",
+   "source": "malacca",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Malacca's rulers were invested by the Ming and sent missions.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chc8",
+    "src_chsea1"
+   ]
+  },
+  {
+   "id": "r_champa__ming__subject",
+   "type": "subject",
+   "source": "champa",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Champa sent tribute and sought Ming support against Dai Viet.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chc8",
+    "src_chsea1"
+   ]
+  },
+  {
+   "id": "r_jianzhou__ming__subject",
+   "type": "subject",
+   "source": "jianzhou",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Jianzhou Jurchen guards under Ming titles.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chc7",
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "r_haixi__ming__subject",
+   "type": "subject",
+   "source": "haixi",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Haixi Jurchen guards under Ming titles.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chc7",
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "r_hami__ming__subject",
+   "type": "subject",
+   "source": "hami",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Hami guard under Ming titles, pressed by the Oirat.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chc7",
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "r_tusi_group__ming__subject",
+   "type": "subject",
+   "source": "tusi_group",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Group record: native chieftaincies holding hereditary Ming offices.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chc7",
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "r_bozhou__ming__subject",
+   "type": "subject",
+   "source": "bozhou",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Yang family pacification commission of Bozhou.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chc7",
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "r_shuixi__ming__subject",
+   "type": "subject",
+   "source": "shuixi",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "An family pacification commission of Shuixi.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chc7",
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "r_lijiang__ming__subject",
+   "type": "subject",
+   "source": "lijiang",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Mu family native prefecture of Lijiang.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chc7",
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "r_luchuan__ming__at_war",
+   "type": "at_war",
+   "source": "luchuan",
+   "target": "ming",
+   "direction": "mutual",
+   "start_date": "1436",
+   "historical_end": {
+    "date": "1449",
+    "how": "Final Ming campaign."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Luchuan-Pingmian campaigns against Si Renfa and his sons.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chc7"
+   ]
+  },
+  {
+   "id": "r_ava__luchuan__hostile",
+   "type": "hostile",
+   "source": "ava",
+   "target": "luchuan",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ava fought Si Renfa and handed him to the Ming in 1445-46.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_aung_thwin",
+    "src_chc7"
+   ]
+  },
+  {
+   "id": "r_rinpungpa__phagmodrupa__subject",
+   "type": "subject",
+   "source": "rinpungpa",
+   "target": "phagmodrupa",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Rinpung lords hold Tsang as Phagmodrupa ministers while gaining real power.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chia"
+   ]
+  },
+  {
+   "id": "r_hosokawa__ashikaga__subject",
+   "type": "subject",
+   "source": "hosokawa",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_hatakeyama__ashikaga__subject",
+   "type": "subject",
+   "source": "hatakeyama",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_shiba__ashikaga__subject",
+   "type": "subject",
+   "source": "shiba",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_yamana__ashikaga__subject",
+   "type": "subject",
+   "source": "yamana",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_ouchi__ashikaga__subject",
+   "type": "subject",
+   "source": "ouchi",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_uesugi__ashikaga__subject",
+   "type": "subject",
+   "source": "uesugi",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_imagawa__ashikaga__subject",
+   "type": "subject",
+   "source": "imagawa",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_toki__ashikaga__subject",
+   "type": "subject",
+   "source": "toki",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_kyogoku__ashikaga__subject",
+   "type": "subject",
+   "source": "kyogoku",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_rokkaku__ashikaga__subject",
+   "type": "subject",
+   "source": "rokkaku",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_isshiki__ashikaga__subject",
+   "type": "subject",
+   "source": "isshiki",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_togashi__ashikaga__subject",
+   "type": "subject",
+   "source": "togashi",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_otomo__ashikaga__subject",
+   "type": "subject",
+   "source": "otomo",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_shimazu__ashikaga__subject",
+   "type": "subject",
+   "source": "shimazu",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo house holding provincial governorships from the Ashikaga shogunate.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_ouchi__shoni__hostile",
+   "type": "hostile",
+   "source": "ouchi",
+   "target": "shoni",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ōuchi and Shōni fight over northern Kyushu and Hakata.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_joseon__so__friendly",
+   "type": "friendly",
+   "source": "joseon",
+   "target": "so",
+   "direction": "mutual",
+   "start_date": "1443",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Treaty of Gyehae regulated Tsushima's trade with Korea.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_lee_korea",
+    "src_chj3"
+   ]
+  },
+  {
+   "id": "r_jianzhou__joseon__hostile",
+   "type": "hostile",
+   "source": "jianzhou",
+   "target": "joseon",
+   "direction": "mutual",
+   "start_date": "1433",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Joseon campaigns against the Jurchen and the northern garrisons of the 1430s-40s.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_lee_korea"
+   ]
+  },
+  {
+   "id": "r_sukhothai__ayutthaya__subject",
+   "type": "subject",
+   "source": "sukhothai",
+   "target": "ayutthaya",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "low",
+   "start_date": "1438",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sukhothai absorbed into Ayutthaya under a royal viceroy at Phitsanulok.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_wyatt_thailand",
+    "src_lieberman"
+   ]
+  },
+  {
+   "id": "r_ayutthaya__cambodia__hostile",
+   "type": "hostile",
+   "source": "ayutthaya",
+   "target": "cambodia",
+   "direction": "mutual",
+   "start_date": "1431",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ayutthaya sacked Angkor in 1431; border wars continued.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_wyatt_thailand",
+    "src_chsea1"
+   ]
+  },
+  {
+   "id": "r_ayutthaya__lan_na__hostile",
+   "type": "hostile",
+   "source": "ayutthaya",
+   "target": "lan_na",
+   "direction": "mutual",
+   "start_date": "1442",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ayutthaya's attack on Lan Na in 1442 opened a long war.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_wyatt_thailand"
+   ]
+  },
+  {
+   "id": "r_champa__dai_viet__hostile",
+   "type": "hostile",
+   "source": "champa",
+   "target": "dai_viet",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Border wars; Dai Viet took Vijaya in 1446.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_taylor_vietnam",
+    "src_chsea1"
+   ]
+  },
+  {
+   "id": "r_prome__ava__subject",
+   "type": "subject",
+   "source": "prome",
+   "target": "ava",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Prome under an Ava-appointed governor of the royal house.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_aung_thwin"
+   ]
+  },
+  {
+   "id": "r_ternate__tidore__rival",
+   "type": "rival",
+   "source": "ternate",
+   "target": "tidore",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Rival sultanates of the clove islands.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chsea1"
+   ]
+  },
+  {
+   "id": "r_bornu__bulala__hostile",
+   "type": "hostile",
+   "source": "bornu",
+   "target": "bulala",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Bulala drove the Sayfawa from Kanem; the struggle continued until c.1500.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chaf3",
+    "src_unesco_gha4"
+   ]
+  },
+  {
+   "id": "r_kano__bornu__subject",
+   "type": "subject",
+   "source": "kano",
+   "target": "bornu",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1438",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Kano Chronicle names Abdullahi Burja as the first Kano ruler to pay tribute to Bornu.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_kano_chronicle",
+    "src_unesco_gha4"
+   ]
+  },
+  {
+   "id": "r_kaabu__mali__subject",
+   "type": "subject",
+   "source": "kaabu",
+   "target": "mali",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Kaabu was a western province of Mali until the 16th century.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_unesco_gha4"
+   ]
+  },
+  {
+   "id": "r_sine__jolof__subject",
+   "type": "subject",
+   "source": "sine",
+   "target": "jolof",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sine among the Wolof-Serer states tributary to the Jolof burba.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_unesco_gha4"
+   ]
+  },
+  {
+   "id": "r_adal__ethiopia__hostile",
+   "type": "hostile",
+   "source": "adal",
+   "target": "ethiopia",
+   "direction": "mutual",
+   "start_date": "1443",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sultan Badlay raided Dawaro in 1443 and was killed at Gomit in December 1445.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_tamrat",
+    "src_unesco_gha4",
+    "src_wikipedia"
+   ]
+  },
+  {
+   "id": "r_hadiya__ethiopia__subject",
+   "type": "subject",
+   "source": "hadiya",
+   "target": "ethiopia",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Province or tributary under Zara Yaqob.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_tamrat"
+   ]
+  },
+  {
+   "id": "r_bale__ethiopia__subject",
+   "type": "subject",
+   "source": "bale",
+   "target": "ethiopia",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Province or tributary under Zara Yaqob.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_tamrat"
+   ]
+  },
+  {
+   "id": "r_dawaro__ethiopia__subject",
+   "type": "subject",
+   "source": "dawaro",
+   "target": "ethiopia",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Province or tributary under Zara Yaqob.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_tamrat"
+   ]
+  },
+  {
+   "id": "r_fatagar__ethiopia__subject",
+   "type": "subject",
+   "source": "fatagar",
+   "target": "ethiopia",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Province or tributary under Zara Yaqob.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_tamrat"
+   ]
+  },
+  {
+   "id": "r_medri_bahri__ethiopia__subject",
+   "type": "subject",
+   "source": "medri_bahri",
+   "target": "ethiopia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Province or tributary under Zara Yaqob.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_tamrat"
+   ]
+  },
+  {
+   "id": "r_beta_israel__ethiopia__hostile",
+   "type": "hostile",
+   "source": "beta_israel",
+   "target": "ethiopia",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Solomonic campaigns against the Beta Israel of the north-west highlands.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_tamrat"
+   ]
+  },
+  {
+   "id": "r_sofala__kilwa__subject",
+   "type": "subject",
+   "source": "sofala",
+   "target": "kilwa",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sofala's gold trade ran through Kilwa-appointed rulers.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chaf3"
+   ]
+  },
+  {
+   "id": "r_mafia__kilwa__subject",
+   "type": "subject",
+   "source": "mafia",
+   "target": "kilwa",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Mafia island under Kilwa.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chaf3"
+   ]
+  },
+  {
+   "id": "r_tlemcen__hafsid__subject",
+   "type": "subject",
+   "source": "tlemcen",
+   "target": "hafsid",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1431",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Hafsid suzerainty over the Zayyanids since Abu Faris's intervention.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_abun_nasr"
+   ]
+  },
+  {
+   "id": "r_tenochtitlan__texcoco__alliance",
+   "type": "alliance",
+   "source": "tenochtitlan",
+   "target": "texcoco",
+   "direction": "mutual",
+   "start_date": "1428",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Triple Alliance formed after the defeat of Azcapotzalco.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_smith_aztecs",
+    "src_rel_hassig"
+   ]
+  },
+  {
+   "id": "r_tenochtitlan__tlacopan__alliance",
+   "type": "alliance",
+   "source": "tenochtitlan",
+   "target": "tlacopan",
+   "direction": "mutual",
+   "start_date": "1428",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Triple Alliance formed after the defeat of Azcapotzalco.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_smith_aztecs",
+    "src_rel_hassig"
+   ]
+  },
+  {
+   "id": "r_texcoco__tlacopan__alliance",
+   "type": "alliance",
+   "source": "texcoco",
+   "target": "tlacopan",
+   "direction": "mutual",
+   "start_date": "1428",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Triple Alliance formed after the defeat of Azcapotzalco.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_smith_aztecs",
+    "src_rel_hassig"
+   ]
+  },
+  {
+   "id": "r_chalco__tenochtitlan__hostile",
+   "type": "hostile",
+   "source": "chalco",
+   "target": "tenochtitlan",
+   "direction": "mutual",
+   "start_date": "1440s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Chalco wars ending in conquest in 1465.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_hassig"
+   ]
+  },
+  {
+   "id": "r_maya_mani_xiu__maya_sotuta_cocom__hostile",
+   "type": "hostile",
+   "source": "maya_mani_xiu",
+   "target": "maya_sotuta_cocom",
+   "direction": "mutual",
+   "start_date": "1441",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Xiu destroyed Mayapan and killed the Cocom lords around 1441.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_roys"
+   ]
+  },
+  {
+   "id": "r_muscovy__great_horde__subject",
+   "type": "subject",
+   "source": "muscovy",
+   "target": "great_horde",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Vasily II held his throne by the khan's patent (1432) and owed the Horde tribute, paid irregularly.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_martin_medieval_russia",
+    "src_chia"
+   ]
+  },
+  {
+   "id": "r_tver__great_horde__subject",
+   "type": "subject",
+   "source": "tver",
+   "target": "great_horde",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Tver's grand princes still owed tribute to the Horde.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_martin_medieval_russia",
+    "src_chia"
+   ]
+  },
+  {
+   "id": "r_ryazan__great_horde__subject",
+   "type": "subject",
+   "source": "ryazan",
+   "target": "great_horde",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ryazan's grand princes still owed tribute to the Horde.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_martin_medieval_russia",
+    "src_chia"
+   ]
+  },
+  {
+   "id": "r_galich_shemyaka__muscovy__subject",
+   "type": "subject",
+   "source": "galich_shemyaka",
+   "target": "muscovy",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Dmitry Shemyaka holds Galich as an appanage of the Moscow house while contesting the throne.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_crummey"
+   ]
+  },
+  {
+   "id": "r_crimea__sayyid_ahmad_horde__hostile",
+   "type": "hostile",
+   "source": "crimea",
+   "target": "sayyid_ahmad_horde",
+   "direction": "mutual",
+   "start_date": "1441",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Hacı Giray and Sayyid Ahmad fought for the Crimean steppe in the early 1440s.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chia",
+    "src_wikipedia"
+   ]
+  },
+  {
+   "id": "r_candar__ottoman__subject",
+   "type": "subject",
+   "source": "candar",
+   "target": "ottoman",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Candarid beys of Kastamonu held their beylik as Ottoman tributaries after 1439-40.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_cho2",
+    "src_bosworth_nid"
+   ]
+  },
+  {
+   "id": "r_epirus__ottoman__subject",
+   "type": "subject",
+   "source": "epirus",
+   "target": "ottoman",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1430",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Carlo II Tocco kept southern Epirus as an Ottoman tributary after Ioannina fell in 1430.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_nicol_last",
+    "src_be_fine_lmb"
+   ]
+  },
+  {
+   "id": "r_lesbos__ottoman__subject",
+   "type": "subject",
+   "source": "lesbos",
+   "target": "ottoman",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Gattilusio lords of Lesbos paid tribute to the sultan.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_nicol_last"
+   ]
+  },
+  {
+   "id": "r_gilan__timurid_empire__subject",
+   "type": "subject",
+   "source": "gilan",
+   "target": "timurid_empire",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Local dynasty acknowledging Shah Rukh and paying tribute.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_manz_shahrukh",
+    "src_chi6"
+   ]
+  },
+  {
+   "id": "r_mazandaran__timurid_empire__subject",
+   "type": "subject",
+   "source": "mazandaran",
+   "target": "timurid_empire",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Local dynasty acknowledging Shah Rukh and paying tribute.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_manz_shahrukh",
+    "src_chi6"
+   ]
+  },
+  {
+   "id": "r_sistan__timurid_empire__subject",
+   "type": "subject",
+   "source": "sistan",
+   "target": "timurid_empire",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Local dynasty acknowledging Shah Rukh and paying tribute.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_manz_shahrukh",
+    "src_chi6"
+   ]
+  },
+  {
+   "id": "r_badakhshan__timurid_empire__subject",
+   "type": "subject",
+   "source": "badakhshan",
+   "target": "timurid_empire",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Local dynasty acknowledging Shah Rukh and paying tribute.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_manz_shahrukh",
+    "src_chi6"
+   ]
+  },
+  {
+   "id": "r_kandy__kotte__subject",
+   "type": "subject",
+   "source": "kandy",
+   "target": "kotte",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The hill country acknowledged Parakramabahu VI of Kotte.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_nchi"
+   ]
+  },
+  {
+   "id": "r_samtskhe__georgia__subject",
+   "type": "subject",
+   "source": "samtskhe",
+   "target": "georgia",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Great fief of the Georgian crown, drifting towards independence as the kingdom fragmented.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_iranica",
+    "src_cho2"
+   ]
+  },
+  {
+   "id": "r_imereti_odishi__georgia__subject",
+   "type": "subject",
+   "source": "imereti_odishi",
+   "target": "georgia",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Great fief of the Georgian crown, drifting towards independence as the kingdom fragmented.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_iranica",
+    "src_cho2"
+   ]
+  },
+  {
+   "id": "r_yaroslavl__muscovy__subject",
+   "type": "subject",
+   "source": "yaroslavl",
+   "target": "muscovy",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Princely line holding its lands under the Moscow grand prince.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_crummey"
+   ]
+  },
+  {
+   "id": "r_rostov__muscovy__subject",
+   "type": "subject",
+   "source": "rostov",
+   "target": "muscovy",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Princely line holding its lands under the Moscow grand prince.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_crummey"
+   ]
+  },
+  {
+   "id": "r_serpukhov_borovsk__muscovy__subject",
+   "type": "subject",
+   "source": "serpukhov_borovsk",
+   "target": "muscovy",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Princely line holding its lands under the Moscow grand prince.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_crummey"
+   ]
+  },
+  {
+   "id": "r_pronsk__ryazan__subject",
+   "type": "subject",
+   "source": "pronsk",
+   "target": "ryazan",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Pronsk princes subordinate to the grand princes of Ryazan.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_rel_crummey"
+   ]
+  },
+  {
+   "id": "r_upper_oka__lithuania__subject",
+   "type": "subject",
+   "source": "upper_oka",
+   "target": "lithuania",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Upper Oka princes served the grand duke of Lithuania.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_be_kiaupa_lithuania"
+   ]
+  },
+  {
+   "id": "r_sirhind_lodi__delhi__subject",
+   "type": "subject",
+   "source": "sirhind_lodi",
+   "target": "delhi",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bahlul Lodi held Sirhind and Lahore as a Sayyid governor but acted independently.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_nchi"
+   ]
+  },
+  {
+   "id": "r_idar__gujarat__subject",
+   "type": "subject",
+   "source": "idar",
+   "target": "gujarat",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Rajput chiefdom paying tribute to the Gujarat sultans.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_nchi"
+   ]
+  },
+  {
+   "id": "r_junagadh__gujarat__subject",
+   "type": "subject",
+   "source": "junagadh",
+   "target": "gujarat",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Rajput chiefdom paying tribute to the Gujarat sultans.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_nchi"
+   ]
+  }
+ ],
+ "facts": [
+  {
+   "id": "f_england__france__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "england",
+   "target": "france",
+   "direction": "directed",
+   "start_date": "1340",
+   "explanation": "English kings claim the French crown.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_vale_charles_vii"
+   ]
+  },
+  {
+   "id": "f_england__provence__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "england",
+   "target": "provence",
+   "direction": "mutual",
+   "start_date": "1444-05-24",
+   "explanation": "Henry VI betrothed to Margaret of Anjou, René's daughter, at Tours; married 1445.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_griffiths_henryvi"
+   ]
+  },
+  {
+   "id": "f_france__scotland__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "france",
+   "target": "scotland",
+   "direction": "mutual",
+   "start_date": "1436-06-25",
+   "explanation": "Margaret Stewart married the dauphin Louis.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_kendall_louis"
+   ]
+  },
+  {
+   "id": "f_brittany__scotland__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "brittany",
+   "target": "scotland",
+   "direction": "mutual",
+   "start_date": "1442-10-30",
+   "explanation": "Isabella Stewart married Francis I of Brittany.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_jones_brittany"
+   ]
+  },
+  {
+   "id": "f_foix__navarre__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "foix",
+   "target": "navarre",
+   "direction": "mutual",
+   "start_date": "1436",
+   "explanation": "Gaston IV married Eleanor of Navarre.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_courteault_gaston"
+   ]
+  },
+  {
+   "id": "f_milan__sforza_marche__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "milan",
+   "target": "sforza_marche",
+   "direction": "mutual",
+   "start_date": "1441-10-25",
+   "explanation": "Francesco Sforza married Bianca Maria Visconti.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_black_milan"
+   ]
+  },
+  {
+   "id": "f_provence__naples__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "provence",
+   "target": "naples",
+   "direction": "directed",
+   "start_date": "1435",
+   "explanation": "René keeps his claim to Naples after 1442.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_kekewich_rene"
+   ]
+  },
+  {
+   "id": "f_orleans__milan__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "orleans",
+   "target": "milan",
+   "direction": "directed",
+   "start_date": "1387",
+   "explanation": "Orléans claim to Milan through Valentina Visconti.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_black_milan"
+   ]
+  },
+  {
+   "id": "f_austria__hungary__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "austria",
+   "target": "hungary",
+   "direction": "directed",
+   "start_date": "1440-05-15",
+   "explanation": "Ladislaus V, crowned as an infant and held by Frederick III, claims Hungary.",
+   "confidence": "high",
+   "source_ids": [
+    "src_be_engel_realm"
+   ]
+  },
+  {
+   "id": "f_saxony__luxembourg__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "saxony",
+   "target": "luxembourg",
+   "direction": "directed",
+   "start_date": "1439",
+   "explanation": "William III of Saxony claims Luxembourg through his wife Anne of Austria.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_lr_vaughan_philip"
+   ]
+  },
+  {
+   "id": "f_aragon__naples__shared_ruler",
+   "fact": "shared_ruler",
+   "source": "aragon",
+   "target": "naples",
+   "direction": "mutual",
+   "start_date": "1442-06",
+   "explanation": "Alfonso V rules Aragon and Naples; Naples' own suzerain is the pope.",
+   "confidence": "high",
+   "source_ids": [
+    "src_it_ryder_alfonso"
+   ]
+  },
+  {
+   "id": "f_anjou__provence__shared_ruler",
+   "fact": "shared_ruler",
+   "source": "anjou",
+   "target": "provence",
+   "direction": "mutual",
+   "start_date": "1434",
+   "explanation": "René of Anjou holds Anjou and Provence.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_kekewich_rene"
+   ]
+  },
+  {
+   "id": "f_holstein__schleswig__shared_ruler",
+   "fact": "shared_ruler",
+   "source": "holstein",
+   "target": "schleswig",
+   "direction": "mutual",
+   "start_date": "1440",
+   "explanation": "Adolf VIII rules Holstein and Schleswig.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hn_lange_sh"
+   ]
+  },
+  {
+   "id": "f_lordship_of_ireland__leinster_kavanagh__secondary_tribute",
+   "fact": "secondary_tribute",
+   "source": "lordship_of_ireland",
+   "target": "leinster_kavanagh",
+   "direction": "directed",
+   "start_date": null,
+   "explanation": "The lordship paid black rent to MacMurrough Kavanagh for protection.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_lydon_lordship"
+   ]
+  },
+  {
+   "id": "f_oirat__ming__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "oirat",
+   "target": "ming",
+   "direction": "mutual",
+   "start_date": null,
+   "explanation": "Oirat embassies traded horses under the tribute system.",
+   "confidence": "high",
+   "source_ids": [
+    "src_chc7"
+   ]
+  },
+  {
+   "id": "f_ashikaga__ming__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "ashikaga",
+   "target": "ming",
+   "direction": "mutual",
+   "start_date": "1432",
+   "explanation": "Tally-trade missions resumed under Yoshinori; the Ashikaga shogun styled King of Japan.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_chj3",
+    "src_chc8"
+   ]
+  },
+  {
+   "id": "f_joseon__so__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "joseon",
+   "target": "so",
+   "direction": "mutual",
+   "start_date": "1443",
+   "explanation": "Gyehae treaty fixed the number of Tsushima ships and rice grants.",
+   "confidence": "high",
+   "source_ids": [
+    "src_rel_lee_korea"
+   ]
+  },
+  {
+   "id": "f_england__hanseatic_league__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "england",
+   "target": "hanseatic_league",
+   "direction": "mutual",
+   "start_date": "1437",
+   "explanation": "Hanseatic privileges in England confirmed in 1437.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hn_dollinger"
+   ]
+  },
+  {
+   "id": "f_savoy__council_of_basel__religious_authority",
+   "fact": "religious_authority",
+   "source": "savoy",
+   "target": "council_of_basel",
+   "direction": "directed",
+   "start_date": "1439",
+   "explanation": "Savoy follows the Basel obedience of Felix V.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_hs_stieber_basel"
+   ]
+  }
+ ]
+}

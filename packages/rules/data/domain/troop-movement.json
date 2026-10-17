@@ -1,0 +1,36 @@
+{
+  "$comment": "Troop movement (domain/troop-movement/spec.md, troop-movement design v1). The march block of defines.json keeps daysPerMonth, daysPerCrossing, daysToCross, horseSpeedBonus and bigArmyExtraCrossings; this file holds the new keys of the design's section 13. All numbers are the design's placeholders unless the spec marks them decided.",
+  "roadFactor": { "track": 1, "road": 0.75, "paved road": 0.5, "turnpike": 0.4, "railway": 0.1 },
+  "passRoad": "road",
+  "seasonFactor": {
+    "winter": { "factor": 2, "grounds": ["tundra", "mountains", "forest"] },
+    "wet": { "factor": 1.25, "grounds": ["paddies", "marsh", "jungle"] }
+  },
+  "orderFactor": { "Normal": 1, "Forced": 0.67, "Careful": 1.33, "Raid": 0.67 },
+  "gunsFactor": 1.25,
+  "gunsGrounds": ["hills", "mountains", "forest", "jungle", "marsh"],
+  "cunningSpeed": 0.05,
+  "riverDaysPer10kMen": 1,
+  "greatRiverDaysPer10kMen": 2,
+  "ferryDaysPer10kMen": 2,
+  "retreatMaxProvinces": 3,
+  "splitDays": 2,
+  "joinDays": 1,
+  "refillDaysPer10Pct": 1,
+  "replaySecondsPer10Days": 1,
+  "menPerBoardingDay": 5000,
+  "landingNoPortFactor": 2,
+  "escapeCunning": 4,
+  "foodYellowUnder": 0.5,
+  "winterMonths": { "north": [12, 1, 2], "south": [6, 7, 8] },
+  "snowClosedMonths": { "north": [12, 1, 2, 3], "south": [6, 7, 8, 9] },
+  "wetSeasonMonths": {
+    "monsoon Asia": [6, 7, 8, 9],
+    "Sahel": [7, 8, 9],
+    "savanna": [7, 8, 9],
+    "Amazon": [12, 1, 2, 3, 4, 5]
+  },
+  "passes": ["Great St Bernard", "Khyber", "Brenner", "Roncesvalles"],
+  "fords": ["Ebro at Tortosa", "Danube at Vidin"],
+  "straitCrossings": ["Bosporus", "Øresund", "Messina", "Kerch", "Gibraltar"]
+}

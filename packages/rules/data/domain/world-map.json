@@ -1,0 +1,2255 @@
+{
+ "$comment": "World map facts (domain/world-map/spec.md). Grid, density, seas, straits, lowlands, settlement and the ground thresholds mirror tools/mapgen (config.json, mapgen.ts, terrain.ts, seas.ts); tile types and starting tiles from docs/terrain.md; regions and areas from event-tree/data/geography.yaml.",
+ "grid": {
+  "pxPerDeg": 16,
+  "latTop": 78,
+  "latBottom": -56
+ },
+ "kmPerDegree": 111.32,
+ "cutting": {
+  "lakeMaxScalerank": 3,
+  "minIslandSize": 10,
+  "minFactor": 0.4,
+  "maxFactor": 1.7,
+  "defaultTarget": 1100,
+  "density": [
+   {
+    "name": "Western and Central Europe",
+    "bbox": [
+     -11,
+     36,
+     30,
+     60
+    ],
+    "target": 380
+   },
+   {
+    "name": "Mediterranean, Anatolia and Levant",
+    "bbox": [
+     -10,
+     29,
+     50,
+     42
+    ],
+    "target": 420
+   },
+   {
+    "name": "Eastern Europe",
+    "bbox": [
+     30,
+     42,
+     60,
+     62
+    ],
+    "target": 520
+   },
+   {
+    "name": "India",
+    "bbox": [
+     66,
+     6,
+     92,
+     34
+    ],
+    "target": 420
+   },
+   {
+    "name": "China, Korea and Japan",
+    "bbox": [
+     100,
+     18,
+     146,
+     42
+    ],
+    "target": 450
+   },
+   {
+    "name": "Southeast Asia",
+    "bbox": [
+     92,
+     -10,
+     125,
+     24
+    ],
+    "target": 600
+   },
+   {
+    "name": "Middle East and Persia",
+    "bbox": [
+     35,
+     12,
+     75,
+     42
+    ],
+    "target": 650
+   },
+   {
+    "name": "Mesoamerica and Andes",
+    "bbox": [
+     -106,
+     -20,
+     -68,
+     23
+    ],
+    "target": 650
+   },
+   {
+    "name": "Far north",
+    "bbox": [
+     -180,
+     60,
+     180,
+     90
+    ],
+    "target": 3200
+   },
+   {
+    "name": "Sahara and Arabia deserts",
+    "bbox": [
+     -17,
+     16,
+     33,
+     30
+    ],
+    "target": 2400
+   },
+   {
+    "name": "Siberia and Central Asia steppe",
+    "bbox": [
+     60,
+     42,
+     180,
+     60
+    ],
+    "target": 1800
+   },
+   {
+    "name": "Australia interior",
+    "bbox": [
+     114,
+     -35,
+     154,
+     -15
+    ],
+    "target": 2800
+   },
+   {
+    "name": "Northern North America",
+    "bbox": [
+     -170,
+     50,
+     -50,
+     60
+    ],
+    "target": 2200
+   }
+  ]
+ },
+ "lowlands": [
+  {
+   "name": "Po valley",
+   "bbox": [
+    7.5,
+    44.55,
+    12.6,
+    45.55
+   ]
+  }
+ ],
+ "settlement": {
+  "zones": [
+   {
+    "name": "Low Countries, Northern Italy, Paris basin, Rhine",
+    "bbox": [
+     -1,
+     43,
+     13,
+     53
+    ],
+    "density": 30
+   },
+   {
+    "name": "Western Europe",
+    "bbox": [
+     -11,
+     36,
+     20,
+     60
+    ],
+    "density": 18
+   },
+   {
+    "name": "Byzantine and Ottoman core",
+    "bbox": [
+     20,
+     36,
+     35,
+     43
+    ],
+    "density": 14
+   },
+   {
+    "name": "Eastern Europe",
+    "bbox": [
+     20,
+     43,
+     60,
+     62
+    ],
+    "density": 6
+   },
+   {
+    "name": "Egypt and Levant",
+    "bbox": [
+     29,
+     22,
+     40,
+     37
+    ],
+    "density": 12
+   },
+   {
+    "name": "Middle East and Persia",
+    "bbox": [
+     35,
+     12,
+     75,
+     42
+    ],
+    "density": 6
+   },
+   {
+    "name": "India",
+    "bbox": [
+     66,
+     6,
+     92,
+     34
+    ],
+    "density": 30
+   },
+   {
+    "name": "China",
+    "bbox": [
+     100,
+     18,
+     125,
+     42
+    ],
+    "density": 32
+   },
+   {
+    "name": "Korea and Japan",
+    "bbox": [
+     125,
+     30,
+     146,
+     43
+    ],
+    "density": 25
+   },
+   {
+    "name": "Southeast Asia",
+    "bbox": [
+     92,
+     -10,
+     125,
+     24
+    ],
+    "density": 8
+   },
+   {
+    "name": "Mesoamerica and Andes",
+    "bbox": [
+     -106,
+     -20,
+     -68,
+     23
+    ],
+    "density": 12
+   },
+   {
+    "name": "Africa",
+    "bbox": [
+     -20,
+     -35,
+     52,
+     37
+    ],
+    "density": 3
+   }
+  ],
+  "defaultDensity": 0.8,
+  "densityForFullFields": 50,
+  "maxFieldShare": 0.6,
+  "farmlandFieldShare": 0.36
+ },
+ "seas": {
+  "coastSpacing": 22,
+  "oceanSpacing": 44,
+  "coastBand": 20,
+  "minSeaSize": 150,
+  "minCos": 0.25
+ },
+ "straits": [
+  {
+   "name": "Bosporus",
+   "a": [
+    29.2,
+    41.35
+   ],
+   "b": [
+    28.95,
+    40.9
+   ]
+  },
+  {
+   "name": "Dardanelles",
+   "a": [
+    27.3,
+    40.6
+   ],
+   "b": [
+    26.0,
+    40.0
+   ]
+  },
+  {
+   "name": "Kerch Strait",
+   "a": [
+    36.6,
+    45.5
+   ],
+   "b": [
+    36.5,
+    45.0
+   ]
+  },
+  {
+   "name": "Oresund",
+   "a": [
+    12.7,
+    56.2
+   ],
+   "b": [
+    12.8,
+    55.4
+   ]
+  },
+  {
+   "name": "Great Belt",
+   "a": [
+    10.9,
+    56.0
+   ],
+   "b": [
+    11.0,
+    55.0
+   ]
+  },
+  {
+   "name": "Strait of Gibraltar",
+   "a": [
+    -6.0,
+    35.95
+   ],
+   "b": [
+    -5.2,
+    36.05
+   ]
+  },
+  {
+   "name": "Strait of Messina",
+   "a": [
+    15.6,
+    38.35
+   ],
+   "b": [
+    15.6,
+    38.05
+   ]
+  },
+  {
+   "name": "Strait of Hormuz",
+   "a": [
+    56.2,
+    26.8
+   ],
+   "b": [
+    56.8,
+    26.2
+   ]
+  },
+  {
+   "name": "Bab-el-Mandeb",
+   "a": [
+    43.2,
+    12.9
+   ],
+   "b": [
+    43.6,
+    12.4
+   ]
+  },
+  {
+   "name": "Strait of Malacca",
+   "a": [
+    100.0,
+    4.0
+   ],
+   "b": [
+    103.8,
+    1.2
+   ]
+  },
+  {
+   "name": "Garabogaz strait",
+   "a": [
+    52.7,
+    41.0
+   ],
+   "b": [
+    53.3,
+    41.2
+   ]
+  },
+  {
+   "name": "Strait of Maracaibo",
+   "a": [
+    -71.4,
+    11.4
+   ],
+   "b": [
+    -71.6,
+    10.3
+   ]
+  }
+ ],
+ "tileTypes": [
+  {
+   "type": "grassland",
+   "category": "temperate",
+   "ground": "grassland",
+   "startingTiles": "pasture, some fields"
+  },
+  {
+   "type": "farmland",
+   "category": "temperate",
+   "ground": "farmland",
+   "startingTiles": "fields"
+  },
+  {
+   "type": "hills",
+   "category": "hills and mountains",
+   "ground": "hills",
+   "startingTiles": "fields, pasture"
+  },
+  {
+   "type": "mountains",
+   "category": "hills and mountains",
+   "ground": "mountains",
+   "startingTiles": "waste, pasture"
+  },
+  {
+   "type": "drylands",
+   "category": "dry lands",
+   "ground": "drylands",
+   "startingTiles": "pasture, waste"
+  },
+  {
+   "type": "marsh",
+   "category": "wetlands",
+   "ground": "marsh",
+   "startingTiles": "marsh"
+  },
+  {
+   "type": "forest",
+   "category": "boreal and polar",
+   "ground": "forest",
+   "startingTiles": "woods"
+  },
+  {
+   "type": "desert",
+   "category": "dry lands",
+   "ground": "desert",
+   "startingTiles": "waste"
+  },
+  {
+   "type": "tundra",
+   "category": "boreal and polar",
+   "ground": "tundra",
+   "startingTiles": "waste, pasture (reindeer)"
+  },
+  {
+   "type": "jungle",
+   "category": "tropical",
+   "ground": "jungle",
+   "startingTiles": "woods"
+  },
+  {
+   "type": "savanna",
+   "category": "tropical",
+   "ground": "savanna",
+   "startingTiles": "pasture, some fields"
+  },
+  {
+   "type": "glacier",
+   "category": "boreal and polar",
+   "ground": "tundra",
+   "startingTiles": "waste"
+  },
+  {
+   "type": "badlands",
+   "category": "hills and mountains",
+   "ground": "mountains",
+   "startingTiles": "waste (mines)"
+  },
+  {
+   "type": "highlands",
+   "category": "hills and mountains",
+   "ground": "mountains",
+   "startingTiles": "woods, fields (terraces)"
+  },
+  {
+   "type": "snowpeaks",
+   "category": "hills and mountains",
+   "ground": "mountains",
+   "startingTiles": "waste"
+  },
+  {
+   "type": "broadleaf",
+   "category": "temperate",
+   "ground": "forest",
+   "startingTiles": "woods"
+  },
+  {
+   "type": "mediterranean",
+   "category": "temperate",
+   "ground": "grassland",
+   "startingTiles": "fields (olives, vines), pasture"
+  },
+  {
+   "type": "steppe",
+   "category": "dry lands",
+   "ground": "grassland",
+   "startingTiles": "pasture"
+  },
+  {
+   "type": "dunes",
+   "category": "dry lands",
+   "ground": "desert",
+   "startingTiles": "waste"
+  },
+  {
+   "type": "colddesert",
+   "category": "dry lands",
+   "ground": "desert",
+   "startingTiles": "waste, some pasture"
+  },
+  {
+   "type": "swamp",
+   "category": "wetlands",
+   "ground": "marsh",
+   "startingTiles": "marsh"
+  },
+  {
+   "type": "paddies",
+   "category": "temperate",
+   "ground": "farmland",
+   "startingTiles": "fields with rice paddies"
+  }
+ ],
+ "groundRule": {
+  "mountainShare": 0.5,
+  "hillShare": 0.25,
+  "forestCover": 0.6
+ },
+ "ranges": {
+  "hillRimPixels": {
+   "min": 1,
+   "max": 3
+  },
+  "snowLatitude": 50
+ },
+ "paddyLand": {
+  "lonMin": 72,
+  "lonMax": 150,
+  "latMin": -11,
+  "latMax": 36,
+  "climates": [
+   "Cwa",
+   "Cfa",
+   "Cwb",
+   "Aw",
+   "Am",
+   "Af",
+   "As"
+  ]
+ },
+ "rivers": {
+  "greatMaxRank": 4,
+  "maxRank": 8,
+  "greatSize": 2,
+  "otherSize": 1,
+  "riverProvincePixels": 3,
+  "landRiverGreenBase": 64
+ },
+ "depthBandsMeters": [
+  200,
+  1000,
+  3000,
+  5000
+ ],
+ "roadSteps": [
+  "track",
+  "road",
+  "paved road",
+  "turnpike",
+  "railway"
+ ],
+ "credits": [
+  {
+   "source": "Natural Earth",
+   "licence": "public domain"
+  },
+  {
+   "source": "Köppen-Geiger maps (Beck et al. 2018)",
+   "licence": "CC BY 4.0"
+  },
+  {
+   "source": "WWF terrestrial ecoregions (Olson et al. 2001)",
+   "licence": "cited source"
+  }
+ ],
+ "regions": [
+  {
+   "id": "africa",
+   "name": "Africa",
+   "parent": null,
+   "macro": false
+  },
+  {
+   "id": "americas",
+   "name": "The Americas",
+   "parent": null,
+   "macro": false
+  },
+  {
+   "id": "asia",
+   "name": "Asia",
+   "parent": null,
+   "macro": false
+  },
+  {
+   "id": "europe",
+   "name": "Europe",
+   "parent": null,
+   "macro": true
+  },
+  {
+   "id": "middle_east",
+   "name": "Middle East (Anatolia, Levant, Mesopotamia, Arabia, Iran, Caucasus)",
+   "parent": "asia",
+   "macro": true
+  },
+  {
+   "id": "north_africa",
+   "name": "North Africa (Maghreb, Egypt, Sahara)",
+   "parent": "africa",
+   "macro": true
+  },
+  {
+   "id": "sub_saharan_africa",
+   "name": "Sub-Saharan Africa",
+   "parent": "africa",
+   "macro": true
+  },
+  {
+   "id": "south_asia",
+   "name": "South Asia",
+   "parent": "asia",
+   "macro": true
+  },
+  {
+   "id": "central_asia",
+   "name": "Central and North Asia (steppe, Transoxiana, Siberia)",
+   "parent": "asia",
+   "macro": true
+  },
+  {
+   "id": "east_asia",
+   "name": "East Asia",
+   "parent": "asia",
+   "macro": true
+  },
+  {
+   "id": "southeast_asia",
+   "name": "Southeast Asia",
+   "parent": "asia",
+   "macro": true
+  },
+  {
+   "id": "oceania",
+   "name": "Oceania (Australia, Melanesia, Micronesia, Polynesia)",
+   "parent": null,
+   "macro": true
+  },
+  {
+   "id": "north_america",
+   "name": "North America",
+   "parent": "americas",
+   "macro": true
+  },
+  {
+   "id": "central_america",
+   "name": "Mesoamerica and Central America",
+   "parent": "americas",
+   "macro": true
+  },
+  {
+   "id": "caribbean",
+   "name": "The Caribbean",
+   "parent": "americas",
+   "macro": true
+  },
+  {
+   "id": "south_america",
+   "name": "South America",
+   "parent": "americas",
+   "macro": true
+  },
+  {
+   "id": "eastern_europe",
+   "name": "Eastern Europe",
+   "parent": "europe",
+   "macro": false
+  },
+  {
+   "id": "russia",
+   "name": "Russia (European)",
+   "parent": "eastern_europe",
+   "macro": false
+  },
+  {
+   "id": "balkans",
+   "name": "Balkans",
+   "parent": "europe",
+   "macro": false
+  },
+  {
+   "id": "germany",
+   "name": "German lands",
+   "parent": "europe",
+   "macro": false
+  },
+  {
+   "id": "italy",
+   "name": "Italy",
+   "parent": "europe",
+   "macro": false
+  },
+  {
+   "id": "spain_core",
+   "name": "Iberian heartland",
+   "parent": "europe",
+   "macro": false
+  },
+  {
+   "id": "denmark",
+   "name": "Denmark-Norway and Iceland",
+   "parent": "europe",
+   "macro": false
+  },
+  {
+   "id": "atlantic_coast",
+   "name": "European Atlantic coast",
+   "parent": "europe",
+   "macro": false
+  },
+  {
+   "id": "anatolia",
+   "name": "Anatolia",
+   "parent": "middle_east",
+   "macro": false
+  },
+  {
+   "id": "levant",
+   "name": "Levant",
+   "parent": "middle_east",
+   "macro": false
+  },
+  {
+   "id": "mesopotamia",
+   "name": "Mesopotamia",
+   "parent": "middle_east",
+   "macro": false
+  },
+  {
+   "id": "arabia",
+   "name": "Arabia",
+   "parent": "middle_east",
+   "macro": false
+  },
+  {
+   "id": "persia",
+   "name": "Iran",
+   "parent": "middle_east",
+   "macro": false
+  },
+  {
+   "id": "caucasus",
+   "name": "Caucasus",
+   "parent": "middle_east",
+   "macro": false
+  },
+  {
+   "id": "sahara",
+   "name": "Sahara",
+   "parent": "north_africa",
+   "macro": false
+  },
+  {
+   "id": "sahel",
+   "name": "Sahel",
+   "parent": "sub_saharan_africa",
+   "macro": false
+  },
+  {
+   "id": "west_africa",
+   "name": "West Africa",
+   "parent": "sub_saharan_africa",
+   "macro": false
+  },
+  {
+   "id": "central_africa",
+   "name": "Central Africa",
+   "parent": "sub_saharan_africa",
+   "macro": false
+  },
+  {
+   "id": "east_africa",
+   "name": "East Africa and the Horn",
+   "parent": "sub_saharan_africa",
+   "macro": false
+  },
+  {
+   "id": "ethiopia",
+   "name": "Ethiopian highlands",
+   "parent": "east_africa",
+   "macro": false
+  },
+  {
+   "id": "southern_africa",
+   "name": "Southern Africa",
+   "parent": "sub_saharan_africa",
+   "macro": false
+  },
+  {
+   "id": "north_india",
+   "name": "North India",
+   "parent": "south_asia",
+   "macro": false
+  },
+  {
+   "id": "deccan",
+   "name": "Deccan and South India",
+   "parent": "south_asia",
+   "macro": false
+  },
+  {
+   "id": "siberia",
+   "name": "Siberia",
+   "parent": "central_asia",
+   "macro": false
+  },
+  {
+   "id": "china",
+   "name": "China",
+   "parent": "east_asia",
+   "macro": false
+  },
+  {
+   "id": "south_china",
+   "name": "South China",
+   "parent": "china",
+   "macro": false
+  },
+  {
+   "id": "manchuria",
+   "name": "Manchuria",
+   "parent": "east_asia",
+   "macro": false
+  },
+  {
+   "id": "korea",
+   "name": "Korea",
+   "parent": "east_asia",
+   "macro": false
+  },
+  {
+   "id": "japan",
+   "name": "Japan",
+   "parent": "east_asia",
+   "macro": false
+  },
+  {
+   "id": "burma",
+   "name": "Burma",
+   "parent": "southeast_asia",
+   "macro": false
+  },
+  {
+   "id": "indochina",
+   "name": "Mainland Southeast Asia (Indochina)",
+   "parent": "southeast_asia",
+   "macro": false
+  },
+  {
+   "id": "java",
+   "name": "Java",
+   "parent": "southeast_asia",
+   "macro": false
+  },
+  {
+   "id": "philippines",
+   "name": "Philippines",
+   "parent": "southeast_asia",
+   "macro": false
+  },
+  {
+   "id": "australia",
+   "name": "Australia",
+   "parent": "oceania",
+   "macro": false
+  },
+  {
+   "id": "new_zealand",
+   "name": "Aotearoa New Zealand",
+   "parent": "oceania",
+   "macro": false
+  },
+  {
+   "id": "melanesia",
+   "name": "Melanesia",
+   "parent": "oceania",
+   "macro": false
+  },
+  {
+   "id": "polynesia",
+   "name": "Polynesia",
+   "parent": "oceania",
+   "macro": false
+  },
+  {
+   "id": "hawaii_islands",
+   "name": "Hawaiian Islands",
+   "parent": "polynesia",
+   "macro": false
+  },
+  {
+   "id": "mesoamerica",
+   "name": "Mesoamerica",
+   "parent": "central_america",
+   "macro": false
+  },
+  {
+   "id": "andes",
+   "name": "Andes",
+   "parent": "south_america",
+   "macro": false
+  },
+  {
+   "id": "brazil",
+   "name": "Brazil",
+   "parent": "south_america",
+   "macro": false
+  }
+ ],
+ "areas": [
+  {
+   "id": "abkhazia",
+   "name": "Abkhazia",
+   "region": "caucasus"
+  },
+  {
+   "id": "aceh",
+   "name": "Aceh",
+   "region": "southeast_asia"
+  },
+  {
+   "id": "afghanistan",
+   "name": "Afghanistan",
+   "region": "south_asia"
+  },
+  {
+   "id": "akan_forest",
+   "name": "Akan Forest Zone",
+   "region": "west_africa"
+  },
+  {
+   "id": "algeria",
+   "name": "Algeria",
+   "region": "north_africa"
+  },
+  {
+   "id": "alsace",
+   "name": "Alsace",
+   "region": "germany"
+  },
+  {
+   "id": "alsace_lorraine",
+   "name": "Alsace-Lorraine",
+   "region": "germany"
+  },
+  {
+   "id": "amur",
+   "name": "Amur Region (Outer Manchuria)",
+   "region": "manchuria"
+  },
+  {
+   "id": "angola",
+   "name": "Angola",
+   "region": "central_africa"
+  },
+  {
+   "id": "apa_frontier",
+   "name": "Apache Frontier (Apachería)",
+   "region": "north_america"
+  },
+  {
+   "id": "arakan",
+   "name": "Arakan",
+   "region": "burma"
+  },
+  {
+   "id": "arequipa",
+   "name": "Arequipa",
+   "region": "andes"
+  },
+  {
+   "id": "armenia",
+   "name": "Armenia",
+   "region": "caucasus"
+  },
+  {
+   "id": "assam",
+   "name": "Assam",
+   "region": "south_asia"
+  },
+  {
+   "id": "atacama_litoral",
+   "name": "Atacama Littoral",
+   "region": "andes"
+  },
+  {
+   "id": "azad_kashmir",
+   "name": "Azad Kashmir",
+   "region": "north_india"
+  },
+  {
+   "id": "azerbaijan",
+   "name": "Azerbaijan",
+   "region": "caucasus"
+  },
+  {
+   "id": "baltic_provinces",
+   "name": "Baltic Provinces (Livonia, Estonia, Courland)",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "banda_islands",
+   "name": "Banda Islands",
+   "region": "southeast_asia"
+  },
+  {
+   "id": "bangkok",
+   "name": "Bangkok",
+   "region": "indochina"
+  },
+  {
+   "id": "bantustans",
+   "name": "South African Bantustans",
+   "region": "southern_africa"
+  },
+  {
+   "id": "barbados",
+   "name": "Barbados",
+   "region": "caribbean"
+  },
+  {
+   "id": "belarus",
+   "name": "Belarus",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "belgian_congo",
+   "name": "Belgian Congo",
+   "region": "central_africa"
+  },
+  {
+   "id": "bengal",
+   "name": "Bengal",
+   "region": "north_india"
+  },
+  {
+   "id": "bohemia",
+   "name": "Bohemia",
+   "region": "europe"
+  },
+  {
+   "id": "british_somaliland",
+   "name": "British Somaliland",
+   "region": "east_africa"
+  },
+  {
+   "id": "cambodia",
+   "name": "Cambodia",
+   "region": "indochina"
+  },
+  {
+   "id": "cameroon",
+   "name": "Cameroon",
+   "region": "central_africa"
+  },
+  {
+   "id": "canal_zone",
+   "name": "Panama Canal Zone",
+   "region": "central_america"
+  },
+  {
+   "id": "cape",
+   "name": "Cape Colony",
+   "region": "southern_africa"
+  },
+  {
+   "id": "cape_verde",
+   "name": "Cape Verde Islands",
+   "region": "west_africa"
+  },
+  {
+   "id": "carnatic",
+   "name": "Carnatic",
+   "region": "deccan"
+  },
+  {
+   "id": "central_american_isthmus",
+   "name": "Central American Isthmus",
+   "region": "central_america"
+  },
+  {
+   "id": "central_anatolia",
+   "name": "Central Anatolia",
+   "region": "anatolia"
+  },
+  {
+   "id": "central_hungary",
+   "name": "Central Hungary",
+   "region": "europe"
+  },
+  {
+   "id": "central_kenya",
+   "name": "Central Kenya",
+   "region": "east_africa"
+  },
+  {
+   "id": "chao_phraya",
+   "name": "Chao Phraya Basin",
+   "region": "indochina"
+  },
+  {
+   "id": "chile",
+   "name": "Chile",
+   "region": "andes"
+  },
+  {
+   "id": "cochinchina",
+   "name": "Cochinchina",
+   "region": "indochina"
+  },
+  {
+   "id": "congo_basin",
+   "name": "Congo Basin",
+   "region": "central_africa"
+  },
+  {
+   "id": "congress_poland",
+   "name": "Congress Poland",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "cotton_belt",
+   "name": "Cotton Belt",
+   "region": "north_america"
+  },
+  {
+   "id": "crimea",
+   "name": "Crimea",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "croatia",
+   "name": "Croatia",
+   "region": "balkans"
+  },
+  {
+   "id": "cuba",
+   "name": "Cuba",
+   "region": "caribbean"
+  },
+  {
+   "id": "cusco",
+   "name": "Cusco",
+   "region": "andes"
+  },
+  {
+   "id": "cyrenaica",
+   "name": "Cyrenaica",
+   "region": "north_africa"
+  },
+  {
+   "id": "danubian_principalities",
+   "name": "Danubian Principalities (Wallachia and Moldavia)",
+   "region": "balkans"
+  },
+  {
+   "id": "danzig",
+   "name": "Danzig",
+   "region": "germany"
+  },
+  {
+   "id": "delhi_doab",
+   "name": "Delhi and the Doab",
+   "region": "north_india"
+  },
+  {
+   "id": "donbas",
+   "name": "Donbas",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "dutch_east_indies",
+   "name": "Dutch East Indies",
+   "region": "southeast_asia"
+  },
+  {
+   "id": "dzungaria",
+   "name": "Dzungaria",
+   "region": "central_asia"
+  },
+  {
+   "id": "east_bengal",
+   "name": "East Bengal (East Pakistan)",
+   "region": "north_india"
+  },
+  {
+   "id": "east_punjab",
+   "name": "East Punjab",
+   "region": "north_india"
+  },
+  {
+   "id": "eastern_anatolia",
+   "name": "Eastern Anatolia",
+   "region": "anatolia"
+  },
+  {
+   "id": "eastern_yucatan",
+   "name": "Eastern Yucatán",
+   "region": "mesoamerica"
+  },
+  {
+   "id": "egypt",
+   "name": "Egypt",
+   "region": "north_africa"
+  },
+  {
+   "id": "emergency_villages",
+   "name": "Kenyan Emergency Villages",
+   "region": "east_africa"
+  },
+  {
+   "id": "england",
+   "name": "England",
+   "region": "atlantic_coast"
+  },
+  {
+   "id": "eritrea",
+   "name": "Eritrea",
+   "region": "east_africa"
+  },
+  {
+   "id": "estonia",
+   "name": "Estonia",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "ethiopian_highlands",
+   "name": "Ethiopian Highlands",
+   "region": "ethiopia"
+  },
+  {
+   "id": "fergana",
+   "name": "Fergana Valley",
+   "region": "central_asia"
+  },
+  {
+   "id": "fezzan",
+   "name": "Fezzan",
+   "region": "sahara"
+  },
+  {
+   "id": "finland",
+   "name": "Finland",
+   "region": "europe"
+  },
+  {
+   "id": "florida",
+   "name": "Florida",
+   "region": "north_america"
+  },
+  {
+   "id": "french_sudan",
+   "name": "French Sudan",
+   "region": "sahel"
+  },
+  {
+   "id": "french_west_and_equatorial_africa",
+   "name": "French West and Equatorial Africa",
+   "region": "sub_saharan_africa"
+  },
+  {
+   "id": "futa_jallon",
+   "name": "Futa Jallon",
+   "region": "west_africa"
+  },
+  {
+   "id": "galicia",
+   "name": "Galicia (Austrian Poland)",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "gaza",
+   "name": "Gaza",
+   "region": "levant"
+  },
+  {
+   "id": "georgia",
+   "name": "Georgia (Caucasus)",
+   "region": "caucasus"
+  },
+  {
+   "id": "german_east_africa",
+   "name": "German East Africa",
+   "region": "east_africa"
+  },
+  {
+   "id": "german_new_guinea",
+   "name": "German New Guinea",
+   "region": "melanesia"
+  },
+  {
+   "id": "gold_coast",
+   "name": "Gold Coast",
+   "region": "west_africa"
+  },
+  {
+   "id": "gran_chaco",
+   "name": "Gran Chaco",
+   "region": "south_america"
+  },
+  {
+   "id": "granada",
+   "name": "Granada",
+   "region": "spain_core"
+  },
+  {
+   "id": "greece",
+   "name": "Greece",
+   "region": "balkans"
+  },
+  {
+   "id": "guatemala",
+   "name": "Guatemala",
+   "region": "mesoamerica"
+  },
+  {
+   "id": "gulf_of_guinea_islands",
+   "name": "Gulf of Guinea Islands",
+   "region": "central_africa"
+  },
+  {
+   "id": "guyenne",
+   "name": "Guyenne",
+   "region": "atlantic_coast"
+  },
+  {
+   "id": "han_river_highlands",
+   "name": "Han River Highlands",
+   "region": "china"
+  },
+  {
+   "id": "hausaland",
+   "name": "Hausaland",
+   "region": "sahel"
+  },
+  {
+   "id": "hawaii_island",
+   "name": "Hawaiʻi Island",
+   "region": "hawaii_islands"
+  },
+  {
+   "id": "hejaz",
+   "name": "Hejaz",
+   "region": "arabia"
+  },
+  {
+   "id": "highveld",
+   "name": "Highveld",
+   "region": "southern_africa"
+  },
+  {
+   "id": "hispaniola",
+   "name": "Hispaniola",
+   "region": "caribbean"
+  },
+  {
+   "id": "holland",
+   "name": "Holland",
+   "region": "atlantic_coast"
+  },
+  {
+   "id": "hungary",
+   "name": "Hungary",
+   "region": "europe"
+  },
+  {
+   "id": "hyderabad",
+   "name": "Hyderabad",
+   "region": "deccan"
+  },
+  {
+   "id": "iceland",
+   "name": "Iceland",
+   "region": "denmark"
+  },
+  {
+   "id": "indian_territory",
+   "name": "Indian Territory",
+   "region": "north_america"
+  },
+  {
+   "id": "indochina",
+   "name": "French Indochina",
+   "region": "indochina"
+  },
+  {
+   "id": "iraq",
+   "name": "Iraq",
+   "region": "mesopotamia"
+  },
+  {
+   "id": "ireland",
+   "name": "Ireland",
+   "region": "atlantic_coast"
+  },
+  {
+   "id": "iroquoia",
+   "name": "Iroquoia",
+   "region": "north_america"
+  },
+  {
+   "id": "israel_armistice_lines",
+   "name": "Israel (1949 Armistice Lines)",
+   "region": "levant"
+  },
+  {
+   "id": "ivory_coast",
+   "name": "Ivory Coast",
+   "region": "west_africa"
+  },
+  {
+   "id": "jamaica",
+   "name": "Jamaica",
+   "region": "caribbean"
+  },
+  {
+   "id": "jamaica_interior",
+   "name": "Jamaican Interior (Cockpit Country)",
+   "region": "caribbean"
+  },
+  {
+   "id": "johor",
+   "name": "Johor",
+   "region": "southeast_asia"
+  },
+  {
+   "id": "kabul",
+   "name": "Kabul",
+   "region": "south_asia"
+  },
+  {
+   "id": "kamerun",
+   "name": "Kamerun (German Cameroon)",
+   "region": "central_africa"
+  },
+  {
+   "id": "kandahar",
+   "name": "Kandahar",
+   "region": "south_asia"
+  },
+  {
+   "id": "kazakhstan",
+   "name": "Kazakhstan (Kazakh Steppe)",
+   "region": "central_asia"
+  },
+  {
+   "id": "kenya",
+   "name": "Kenya",
+   "region": "east_africa"
+  },
+  {
+   "id": "konkan",
+   "name": "Konkan",
+   "region": "deccan"
+  },
+  {
+   "id": "kurdistan",
+   "name": "Kurdistan",
+   "region": "middle_east"
+  },
+  {
+   "id": "kwazulu_natal",
+   "name": "KwaZulu-Natal",
+   "region": "southern_africa"
+  },
+  {
+   "id": "kyrgyzstan",
+   "name": "Kyrgyzstan",
+   "region": "central_asia"
+  },
+  {
+   "id": "lacandon_forest",
+   "name": "Lacandon Forest",
+   "region": "mesoamerica"
+  },
+  {
+   "id": "lakota_reservations",
+   "name": "Lakota Reservations",
+   "region": "north_america"
+  },
+  {
+   "id": "laos",
+   "name": "Laos",
+   "region": "indochina"
+  },
+  {
+   "id": "latvia",
+   "name": "Latvia",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "liaodong",
+   "name": "Liaodong",
+   "region": "manchuria"
+  },
+  {
+   "id": "libya",
+   "name": "Libya",
+   "region": "north_africa"
+  },
+  {
+   "id": "lima",
+   "name": "Lima",
+   "region": "andes"
+  },
+  {
+   "id": "lithuania",
+   "name": "Lithuania",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "lombardy_venetia",
+   "name": "Lombardy-Venetia",
+   "region": "italy"
+  },
+  {
+   "id": "lombok",
+   "name": "Lombok",
+   "region": "southeast_asia"
+  },
+  {
+   "id": "louisiana",
+   "name": "Louisiana",
+   "region": "north_america"
+  },
+  {
+   "id": "low_countries",
+   "name": "Low Countries",
+   "region": "atlantic_coast"
+  },
+  {
+   "id": "lower_burma",
+   "name": "Lower Burma",
+   "region": "burma"
+  },
+  {
+   "id": "lower_congo",
+   "name": "Lower Congo",
+   "region": "central_africa"
+  },
+  {
+   "id": "lower_yangzi",
+   "name": "Lower Yangzi (Jiangnan)",
+   "region": "china"
+  },
+  {
+   "id": "luzon",
+   "name": "Luzon",
+   "region": "philippines"
+  },
+  {
+   "id": "macedonia",
+   "name": "Macedonia",
+   "region": "balkans"
+  },
+  {
+   "id": "madagascar",
+   "name": "Madagascar",
+   "region": "east_africa"
+  },
+  {
+   "id": "malaya_and_borneo",
+   "name": "Malaya and Borneo",
+   "region": "southeast_asia"
+  },
+  {
+   "id": "matamba",
+   "name": "Matamba",
+   "region": "central_africa"
+  },
+  {
+   "id": "mexican_cession",
+   "name": "Mexican Cession",
+   "region": "north_america"
+  },
+  {
+   "id": "micronesia",
+   "name": "Micronesia",
+   "region": "oceania"
+  },
+  {
+   "id": "mita_catchment",
+   "name": "Potosí Mita Catchment",
+   "region": "andes"
+  },
+  {
+   "id": "moldova",
+   "name": "Moldova (Bessarabia)",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "morea",
+   "name": "Morea",
+   "region": "balkans"
+  },
+  {
+   "id": "morelos",
+   "name": "Morelos",
+   "region": "mesoamerica"
+  },
+  {
+   "id": "moscow",
+   "name": "Moscow",
+   "region": "russia"
+  },
+  {
+   "id": "mozambique",
+   "name": "Mozambique",
+   "region": "southern_africa"
+  },
+  {
+   "id": "najd",
+   "name": "Najd",
+   "region": "arabia"
+  },
+  {
+   "id": "nanjing",
+   "name": "Nanjing",
+   "region": "china"
+  },
+  {
+   "id": "naples",
+   "name": "Naples",
+   "region": "italy"
+  },
+  {
+   "id": "natal",
+   "name": "Natal",
+   "region": "southern_africa"
+  },
+  {
+   "id": "new_england",
+   "name": "New England",
+   "region": "north_america"
+  },
+  {
+   "id": "new_france",
+   "name": "New France",
+   "region": "north_america"
+  },
+  {
+   "id": "new_granada",
+   "name": "New Granada",
+   "region": "andes"
+  },
+  {
+   "id": "new_south_wales",
+   "name": "New South Wales",
+   "region": "australia"
+  },
+  {
+   "id": "new_york",
+   "name": "New York",
+   "region": "north_america"
+  },
+  {
+   "id": "nicaragua",
+   "name": "Nicaragua",
+   "region": "central_america"
+  },
+  {
+   "id": "niger_bend",
+   "name": "Niger Bend",
+   "region": "sahel"
+  },
+  {
+   "id": "nigeria",
+   "name": "Nigeria",
+   "region": "west_africa"
+  },
+  {
+   "id": "north_china",
+   "name": "North China",
+   "region": "china"
+  },
+  {
+   "id": "north_china_plain",
+   "name": "North China Plain",
+   "region": "china"
+  },
+  {
+   "id": "north_java_coast",
+   "name": "North Java Coast (Pasisir)",
+   "region": "java"
+  },
+  {
+   "id": "north_vietnam",
+   "name": "North Vietnam",
+   "region": "indochina"
+  },
+  {
+   "id": "northern_angola",
+   "name": "Northern Angola",
+   "region": "central_africa"
+  },
+  {
+   "id": "northern_morocco",
+   "name": "Northern Morocco",
+   "region": "north_africa"
+  },
+  {
+   "id": "nova_scotia",
+   "name": "Nova Scotia",
+   "region": "north_america"
+  },
+  {
+   "id": "ogaden",
+   "name": "Ogaden",
+   "region": "east_africa"
+  },
+  {
+   "id": "ohio_valley",
+   "name": "Ohio Valley",
+   "region": "north_america"
+  },
+  {
+   "id": "palestine",
+   "name": "Palestine",
+   "region": "levant"
+  },
+  {
+   "id": "panama_isthmus",
+   "name": "Isthmus of Panama",
+   "region": "central_america"
+  },
+  {
+   "id": "partition_plan_arab_state",
+   "name": "Arab State (1947 UN Partition Plan)",
+   "region": "levant"
+  },
+  {
+   "id": "partition_plan_jewish_state",
+   "name": "Jewish State (1947 UN Partition Plan)",
+   "region": "levant"
+  },
+  {
+   "id": "pernambuco",
+   "name": "Pernambuco",
+   "region": "brazil"
+  },
+  {
+   "id": "peten",
+   "name": "Petén",
+   "region": "mesoamerica"
+  },
+  {
+   "id": "poland",
+   "name": "Poland",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "portuguese_guinea",
+   "name": "Portuguese Guinea",
+   "region": "west_africa"
+  },
+  {
+   "id": "puerto_rico",
+   "name": "Puerto Rico",
+   "region": "caribbean"
+  },
+  {
+   "id": "punjab",
+   "name": "Punjab",
+   "region": "north_india"
+  },
+  {
+   "id": "queensland",
+   "name": "Queensland",
+   "region": "australia"
+  },
+  {
+   "id": "quito",
+   "name": "Quito",
+   "region": "andes"
+  },
+  {
+   "id": "rhineland",
+   "name": "Rhineland",
+   "region": "germany"
+  },
+  {
+   "id": "rio_de_la_plata",
+   "name": "Río de la Plata",
+   "region": "south_america"
+  },
+  {
+   "id": "russia",
+   "name": "Russia",
+   "region": "russia"
+  },
+  {
+   "id": "rwanda",
+   "name": "Rwanda",
+   "region": "east_africa"
+  },
+  {
+   "id": "saint_domingue",
+   "name": "Saint-Domingue",
+   "region": "caribbean"
+  },
+  {
+   "id": "santos_quilombos",
+   "name": "Santos Quilombos",
+   "region": "brazil"
+  },
+  {
+   "id": "sao_paulo",
+   "name": "São Paulo",
+   "region": "brazil"
+  },
+  {
+   "id": "sao_tome",
+   "name": "São Tomé",
+   "region": "central_africa"
+  },
+  {
+   "id": "scotland",
+   "name": "Scotland",
+   "region": "atlantic_coast"
+  },
+  {
+   "id": "semirechye",
+   "name": "Semirechye (Zhetysu)",
+   "region": "central_asia"
+  },
+  {
+   "id": "senegal",
+   "name": "Senegal",
+   "region": "west_africa"
+  },
+  {
+   "id": "serra_da_barriga",
+   "name": "Serra da Barriga (Palmares)",
+   "region": "brazil"
+  },
+  {
+   "id": "shandong",
+   "name": "Shandong",
+   "region": "china"
+  },
+  {
+   "id": "sichuan",
+   "name": "Sichuan",
+   "region": "china"
+  },
+  {
+   "id": "singapore",
+   "name": "Singapore",
+   "region": "southeast_asia"
+  },
+  {
+   "id": "smyrna",
+   "name": "Smyrna",
+   "region": "anatolia"
+  },
+  {
+   "id": "somalia",
+   "name": "Somalia",
+   "region": "east_africa"
+  },
+  {
+   "id": "south_africa_urban",
+   "name": "Urban South Africa",
+   "region": "southern_africa"
+  },
+  {
+   "id": "south_china",
+   "name": "South China",
+   "region": "south_china"
+  },
+  {
+   "id": "south_ossetia",
+   "name": "South Ossetia",
+   "region": "caucasus"
+  },
+  {
+   "id": "south_vietnam",
+   "name": "South Vietnam",
+   "region": "indochina"
+  },
+  {
+   "id": "south_west_africa",
+   "name": "South West Africa",
+   "region": "southern_africa"
+  },
+  {
+   "id": "southeastern_woodlands",
+   "name": "Southeastern Woodlands",
+   "region": "north_america"
+  },
+  {
+   "id": "southern_italy",
+   "name": "Southern Italy",
+   "region": "italy"
+  },
+  {
+   "id": "southern_rhodesia",
+   "name": "Southern Rhodesia",
+   "region": "southern_africa"
+  },
+  {
+   "id": "st_lawrence",
+   "name": "St. Lawrence Valley",
+   "region": "north_america"
+  },
+  {
+   "id": "sudan",
+   "name": "Sudan",
+   "region": "sahel"
+  },
+  {
+   "id": "suez",
+   "name": "Suez",
+   "region": "north_africa"
+  },
+  {
+   "id": "sumatra",
+   "name": "Sumatra",
+   "region": "southeast_asia"
+  },
+  {
+   "id": "sumbawa",
+   "name": "Sumbawa",
+   "region": "southeast_asia"
+  },
+  {
+   "id": "swahili_coast",
+   "name": "Swahili Coast",
+   "region": "east_africa"
+  },
+  {
+   "id": "switzerland",
+   "name": "Switzerland",
+   "region": "europe"
+  },
+  {
+   "id": "syria",
+   "name": "Syria",
+   "region": "levant"
+  },
+  {
+   "id": "taiwan",
+   "name": "Taiwan",
+   "region": "china"
+  },
+  {
+   "id": "tajikistan",
+   "name": "Tajikistan",
+   "region": "central_asia"
+  },
+  {
+   "id": "tarapaca",
+   "name": "Tarapacá",
+   "region": "andes"
+  },
+  {
+   "id": "texas",
+   "name": "Texas",
+   "region": "north_america"
+  },
+  {
+   "id": "thirteen_colonies",
+   "name": "Thirteen Colonies",
+   "region": "north_america"
+  },
+  {
+   "id": "tidewater_virginia",
+   "name": "Tidewater Virginia",
+   "region": "north_america"
+  },
+  {
+   "id": "tigray",
+   "name": "Tigray",
+   "region": "ethiopia"
+  },
+  {
+   "id": "tonkin",
+   "name": "Tonkin",
+   "region": "indochina"
+  },
+  {
+   "id": "transylvania",
+   "name": "Transylvania",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "turkmenistan",
+   "name": "Turkmenistan",
+   "region": "central_asia"
+  },
+  {
+   "id": "ukraine",
+   "name": "Ukraine",
+   "region": "eastern_europe"
+  },
+  {
+   "id": "upper_peru",
+   "name": "Upper Peru",
+   "region": "andes"
+  },
+  {
+   "id": "upper_south",
+   "name": "Upper South",
+   "region": "north_america"
+  },
+  {
+   "id": "us_south",
+   "name": "American South",
+   "region": "north_america"
+  },
+  {
+   "id": "uzbekistan",
+   "name": "Uzbekistan (Transoxiana)",
+   "region": "central_asia"
+  },
+  {
+   "id": "van",
+   "name": "Van",
+   "region": "anatolia"
+  },
+  {
+   "id": "vietnam",
+   "name": "Vietnam",
+   "region": "indochina"
+  },
+  {
+   "id": "vilcabamba",
+   "name": "Vilcabamba",
+   "region": "andes"
+  },
+  {
+   "id": "wendake",
+   "name": "Wendake (Huronia)",
+   "region": "north_america"
+  },
+  {
+   "id": "west_bank",
+   "name": "West Bank",
+   "region": "levant"
+  },
+  {
+   "id": "west_bengal",
+   "name": "West Bengal",
+   "region": "north_india"
+  },
+  {
+   "id": "west_pakistan",
+   "name": "West Pakistan",
+   "region": "south_asia"
+  },
+  {
+   "id": "west_prussia",
+   "name": "West Prussia",
+   "region": "germany"
+  },
+  {
+   "id": "western_algeria",
+   "name": "Western Algeria (Oran)",
+   "region": "north_africa"
+  },
+  {
+   "id": "western_pomerania",
+   "name": "Western Pomerania",
+   "region": "germany"
+  },
+  {
+   "id": "western_samoa",
+   "name": "Western Samoa",
+   "region": "polynesia"
+  },
+  {
+   "id": "white_highlands",
+   "name": "White Highlands",
+   "region": "east_africa"
+  },
+  {
+   "id": "yellow_river_floodplain",
+   "name": "Yellow River Floodplain",
+   "region": "china"
+  },
+  {
+   "id": "yucatan",
+   "name": "Yucatán",
+   "region": "mesoamerica"
+  },
+  {
+   "id": "yunnan",
+   "name": "Yunnan",
+   "region": "south_china"
+  },
+  {
+   "id": "zululand",
+   "name": "Zululand",
+   "region": "southern_africa"
+  },
+  {
+   "id": "thrace",
+   "name": "Thrace",
+   "region": "balkans"
+  },
+  {
+   "id": "lower_austria",
+   "name": "Lower Austria",
+   "region": "germany"
+  },
+  {
+   "id": "andalusia",
+   "name": "Andalusia",
+   "region": "spain_core"
+  },
+  {
+   "id": "isfahan_region",
+   "name": "Isfahan (Persian Iraq)",
+   "region": "persia"
+  },
+  {
+   "id": "oman",
+   "name": "Oman",
+   "region": "arabia"
+  },
+  {
+   "id": "chugoku",
+   "name": "Chūgoku",
+   "region": "japan"
+  },
+  {
+   "id": "kinai",
+   "name": "Kinai",
+   "region": "japan"
+  },
+  {
+   "id": "kyushu",
+   "name": "Kyushu",
+   "region": "japan"
+  },
+  {
+   "id": "tungabhadra",
+   "name": "Tungabhadra Basin",
+   "region": "deccan"
+  },
+  {
+   "id": "middle_volga",
+   "name": "Middle Volga",
+   "region": "russia"
+  },
+  {
+   "id": "te_tau_ihu",
+   "name": "Te Tau Ihu (Mohua / Golden Bay and Nelson)",
+   "region": "new_zealand"
+  },
+  {
+   "id": "solomon_islands",
+   "name": "Solomon Islands",
+   "region": "melanesia"
+  },
+  {
+   "id": "marquesas",
+   "name": "Marquesas Islands (Te Henua Enana)",
+   "region": "polynesia"
+  },
+  {
+   "id": "altishahr",
+   "name": "Altishahr (Tarim Basin)",
+   "region": "central_asia"
+  },
+  {
+   "id": "trinidad",
+   "name": "Trinidad and Tobago",
+   "region": "caribbean"
+  },
+  {
+   "id": "fiji_islands",
+   "name": "Fiji Islands",
+   "region": "melanesia"
+  },
+  {
+   "id": "papua_new_guinea",
+   "name": "Papua New Guinea",
+   "region": "melanesia"
+  },
+  {
+   "id": "new_hebrides",
+   "name": "New Hebrides (Vanuatu)",
+   "region": "melanesia"
+  },
+  {
+   "id": "haiti",
+   "name": "Haiti",
+   "region": "caribbean"
+  },
+  {
+   "id": "chiapas",
+   "name": "Chiapas",
+   "region": "mesoamerica"
+  }
+ ]
+}

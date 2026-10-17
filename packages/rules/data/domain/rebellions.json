@@ -1,0 +1,161 @@
+{
+  "steps": { "grumbling": 2, "riots": 3, "plotting": 4 },
+  "judge_raises_bars_by": 1,
+  "rising_chance": [
+    { "grievances": 4, "percent": 5 },
+    { "grievances": 5, "percent": 15 },
+    { "grievances": 6, "percent": 30 }
+  ],
+  "step_effects": {
+    "calm": [],
+    "grumbling": ["growth slows", "scholars and craftsmen start to leave"],
+    "riots": ["tax halved", "recruits halved", "traders avoid it", "the lord wavers"],
+    "plotting": ["tax halved", "recruits halved", "traders avoid it", "the lord wavers", "may rise"]
+  },
+  "riots_factor": 0.5,
+  "sparks": {
+    "new burden": [
+      "the tax rate of the province is raised",
+      "a levy is called at harvest time",
+      "an army is quartered for the winter",
+      "an army requisitions food"
+    ],
+    "failed harvest": ["the harvest roll comes up failed"],
+    "insult to faith": ["a house of worship of the majority faith is demolished", "a faith tolerance charter is revoked"],
+    "death or execution": ["the province's lord is executed", "the province's lord dies without an accepted heir", "a popular official is dismissed"],
+    "defeat": ["the owner's army loses a battle in or next to the province", "the capital falls"],
+    "outsider": ["a pretender lands with men", "a rival's envoy arrives with gold", "a preacher of a new faith arrives"],
+    "the ruler": ["the ruler dies with a child heir", "the ruler dies with no heir"]
+  },
+  "sparks_needing_hungry": ["an army requisitions food", "the harvest roll comes up failed"],
+  "causes": {
+    "Hunger": {
+      "grievances": ["Hungry"],
+      "demand": "the castle granary opened to them",
+      "joiners": "farmers, homeless",
+      "classes": ["farmers", "homeless"],
+      "leader": "local"
+    },
+    "Tax": {
+      "grievances": ["Heavy taxes", "Conscription"],
+      "demand": "the tax rate back down; the levy ended",
+      "joiners": "farmers, craftsmen, market folk",
+      "classes": ["farmers", "craftsmen", "market folk"],
+      "leader": "local"
+    },
+    "Faith": {
+      "grievances": ["Wrong faith", "Broken charter (faith)"],
+      "demand": "a faith tolerance charter, or a ruler of their faith",
+      "joiners": "everyone of that faith",
+      "classes": [],
+      "leader": "preacher"
+    },
+    "Homeland": {
+      "grievances": ["Foreign rule", "Far from the throne"],
+      "demand": "self-rule, then independence",
+      "joiners": "everyone of the homeland's tongue",
+      "classes": [],
+      "leader": "local"
+    },
+    "Town": {
+      "grievances": ["Homeless", "Broken charter", "Soldiers quartered"],
+      "demand": "a town law charter; work; the soldiers gone",
+      "joiners": "homeless, craftsmen, market folk",
+      "classes": ["homeless", "craftsmen", "market folk"],
+      "leader": "local"
+    },
+    "Lord": {
+      "grievances": ["Harsh lord"],
+      "demand": "the lord's want",
+      "joiners": "the lord's retinue and officials, and his people of his faith and tongue",
+      "classes": [],
+      "leader": "the lord himself"
+    },
+    "Pretender": {
+      "grievances": [],
+      "demand": "the pretender on the throne, or the province handed to them",
+      "joiners": "lords who back the pretender, and anyone with a grievance",
+      "classes": [],
+      "leader": "the pretender"
+    },
+    "New ideas": {
+      "grievances": [],
+      "demand": "a new kind of government",
+      "joiners": "townsfolk and scholars",
+      "classes": ["craftsmen", "market folk", "clergy", "clerks", "scholars"],
+      "leader": "local"
+    }
+  },
+  "faith_or_tongue_causes": ["Faith", "Homeland"],
+  "clergy_scholars_causes": ["Faith", "New ideas"],
+  "clergy_scholars": ["clergy", "scholars"],
+  "join_share": { "homeless": 0.3, "cause_class": 0.1, "faith_or_tongue": 0.08, "other": 0.02 },
+  "leaders": {
+    "local": { "roles": ["dyer", "miller", "village elder"], "brings": "Cunning, little Might" },
+    "preacher": { "brings": "faith spreads to neighbours twice as fast" },
+    "veteran": { "brings": "Might" },
+    "the lord himself": { "brings": "his retinue, his wealth and his officials" },
+    "the pretender": { "brings": "the lords who back them; foreign help" }
+  },
+  "preacher_faith_spread": 2,
+  "veteran_arms_steps": 1,
+  "arms": {
+    "steps": ["Tools", "Old weapons", "Armed", "Soldiers"],
+    "multiplier": { "Tools": 0.4, "Old weapons": 0.6, "Armed": 0.8, "Soldiers": 1.0 },
+    "sources": {
+      "Old weapons": [["forge"], ["veteran leader"]],
+      "Armed": [["forge", "market"], ["captured castle store"], ["foreign gold"]],
+      "Soldiers": [["lord's retinue"], ["deserters"], ["rival's troops"], ["pretender's army"]]
+    }
+  },
+  "battle_kind": "Rebel band",
+  "locals_bonus_name": "Locals know the land",
+  "starving_loss": 0.1,
+  "severity": { "rebellion_min": 2, "rebellion_max": 5 },
+  "spread": {
+    "higher": [
+      "same grievance",
+      "shares faith or tongue",
+      "roads, rivers and traders",
+      "many homeless",
+      "owner's army away at war",
+      "owner massacred last rising",
+      "rival pays the rebels"
+    ],
+    "lower": [
+      "no shared grievance",
+      "garrisoned castle on the road",
+      "judge",
+      "owner's army in the region",
+      "owner pardoned last rising",
+      "almshouse"
+    ]
+  },
+  "loot_first": ["market"],
+  "talk": { "share": 0.5, "usually_works": ["Hunger", "Tax", "Town"], "rarely_works": ["Faith", "Homeland"] },
+  "bribe_costs_more": ["the lord himself", "the pretender"],
+  "scatter": { "die": 0.3333333333333333, "flee": 0.3333333333333333, "homeless": 0.3333333333333333 },
+  "punish_lock_years": 10,
+  "massacre_lock_years": 20,
+  "bloodshed_years": 20,
+  "win_hold_months": 12,
+  "tax_win_years": 10,
+  "tax_win_rate": "light",
+  "outcomes": {
+    "Hunger": ["the castle's food is handed out", "Hungry ends", "the lord turns disloyal"],
+    "Tax": ["tax fixed at light"],
+    "Faith": ["faith tolerance charter in every held province"],
+    "Faith great revolt": ["a ruler of their faith"],
+    "Homeland": ["their provinces break away as a new country"],
+    "Town": ["town law charter", "the quartered army leaves"],
+    "Lord": ["the lord gets his want", "he leaves the realm with his land as his own country or under a neighbour"],
+    "Pretender": ["the pretender takes the throne in a great revolt", "the province passes to the pretender"],
+    "New ideas": ["the government changes through the event tree's revolution events"]
+  },
+  "unrest_grievances_per_effect": 1,
+  "card": {
+    "demand": { "Tax": "tax back to normal" },
+    "arms": { "Tools": "tools", "Old weapons": "tools and old weapons", "Armed": "armed", "Soldiers": "soldiers" },
+    "answers": ["Grant demand", "Talk", "Bribe leader", "Wait", "Attack"]
+  }
+}
