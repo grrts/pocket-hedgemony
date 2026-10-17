@@ -28,6 +28,7 @@ export interface Defines {
   war: WarDefines;
   recruit: RecruitDefines;
   living: LivingDefines;
+  castleFood: CastleFoodDefines;
 }
 
 /** Works, the first slice of the buildings context (milestone 4): gold scale and the stand-in effects. */
@@ -267,6 +268,19 @@ export interface Ruleset {
 }
 
 /** People by class at the start (milestone 3); the classes, birth and death rates are the province context's. */
+/** Castles share food (feedback 84, 85): stand-in sizes for the castle network until the buildings' jobs and wares run. */
+export interface CastleFoodDefines {
+  /** Months of eating a province's own store holds at most; above it the surplus rule takes the rest. */
+  localStoreCapMonths: number;
+  /** Months of its own province's eating a castle store holds without a granary, and with one. */
+  castleStoreMonths: number;
+  granaryStoreMonths: number;
+  /** Months of eating a province keeps through the year before the collection share of the rest goes to its castle. */
+  keepMonths: number;
+  /** Treasury gold per food sold (a food = a thousand people fed for a month): the realm's grain price × this scale. */
+  grainGoldScale: number;
+}
+
 export interface LivingDefines {
   /** Share of a province's people living in town: base plus a step per wealth above 1, up to the max. */
   townShareBase: number;
