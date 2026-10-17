@@ -117,6 +117,8 @@ export interface Snapshot {
     route: number[][];
     /** The player's armies: tiles still to walk, and hours to the end. Empty for others. */
     path: Int32Array[];
+    /** Hours from now to reach each tile of path (for marking where the army stands at each week's end). */
+    pathHours: Float32Array[];
     etaHours: number[];
     /** Tiles stepped onto since the last snapshot, in order (for drawing the march). */
     trail: number[][];
@@ -249,6 +251,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         food: Int32Array.from(live, (slot) => Math.round(a.food[slot]!)),
         route: live.map((slot) => a.route[slot]!.slice()),
         path: live.map((slot) => (a.owner[slot] === player ? a.path[slot]!.slice(a.pathAt[slot]!) : new Int32Array(0))),
+        pathHours: live.map((slot) => (a.owner[slot] === player ? pathHours(w, slot) : new Float32Array(0))),
         etaHours: live.map((slot) => (a.owner[slot] === player ? hoursLeft(w, slot) : 0)),
         trail: live.map((slot) => a.trail[slot]!.slice()),
         battle: pick(a.battle, (n) => new Int32Array(n)),
@@ -318,16 +321,25 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
 
 /** Hours an army still has to march along the tiles it has planned (left of a march planned a province at a time: none). */
 function hoursLeft(world: World, slot: number): number {
+  const h = pathHours(world, slot);
+  return h.length ? h[h.length - 1]! : 0;
+}
+
+/** Hours from now until army slot steps onto each tile still on its path. */
+function pathHours(world: World, slot: number): Float32Array {
   const a = world.armies;
   const path = a.path[slot]!;
-  if (a.pathAt[slot]! >= path.length) return 0;
+  const from = a.pathAt[slot]!;
+  const out = new Float32Array(Math.max(0, path.length - from));
+  if (!out.length) return out;
   const m = tileMarch(world);
   const army = { men: a.men[slot]!, horse: a.horse[slot]!, logistics: 0 };
   let hours = -a.progress[slot]!;
   let at = a.tile[slot]!;
-  for (let k = a.pathAt[slot]!; k < path.length; k++) {
+  for (let k = from; k < path.length; k++) {
     hours += tileStepHours(m, at, path[k]!, army);
     at = path[k]!;
+    out[k - from] = Math.max(0, hours);
   }
-  return Math.max(0, hours);
+  return out;
 }

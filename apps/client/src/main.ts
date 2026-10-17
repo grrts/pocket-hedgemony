@@ -19,9 +19,11 @@ import type { GameDate } from "@ph/rules";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite, spriteUrl } from "./art/sprites.ts";
-import { icon, installUiArt, pennantUrl } from "./art/ui.ts";
+import { icon, installUiArt, flagUrl } from "./art/ui.ts";
 import { EngineClient } from "./engineClient.ts";
+import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
+import { drawBattle, drawRoute, drawToken, pruneBattles, weekEnds } from "./map/marchArt.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
@@ -131,7 +133,7 @@ const KNOWN_REACH = 6;
 installUiArt();
 const app = document.querySelector<HTMLElement>("#app")!;
 app.innerHTML = `
-  <div class="map" id="map"><div class="loading">Drawing the world…</div></div>
+  <div class="map" id="map"></div>
   <header class="hud" id="hud"></header>
   <div class="tools">
     <button class="icon-only" id="mode" title="Map lens" aria-expanded="false">${icon("map", 3, "Map lens")}</button>
@@ -200,8 +202,10 @@ const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 let view: MapView;
 
 async function boot(): Promise<void> {
+  loadingStage("Charting coasts and rivers…", 0.3);
   const image = (mapImage = await loadMapImage(rules.map!, provinces.length));
-  document.querySelector(".loading")?.remove();
+  loadingStage("Raising the realms…", 0.75);
+  await painted();
   view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay });
   // Read by the performance checks (scripts/perf.mjs).
   (globalThis as { __phMap?: MapView }).__phMap = view;
@@ -227,6 +231,7 @@ async function boot(): Promise<void> {
   });
   renderHud();
   renderPanel();
+  hideLoading();
 }
 
 // ---- map styling ----
@@ -471,79 +476,114 @@ function drawOverlay(o: OverlayContext): void {
     }
   }
 
-  // Armies and their commanders. Troops without a commander stay off the map, in their province's garrison (RECR-107).
+  // Battles: the two hosts fighting it out on their tile; zoomed out, crossed swords mark where.
+  let animating = false;
   if (snapshot && zoom >= 1.6) {
+    const now = performance.now();
+    for (const b of snapshot.battles) {
+      if (!isKnown(b.province)) continue;
+      const [sx, sy] = o.toScreen(...tileXY(b.tile));
+      if (!onScreen(sx, sy, 80)) continue;
+      if (zoom < ARMY_ZOOM) swords(ctx, sx, sy, 3 * spriteScale);
+      else
+        animating = drawBattle(ctx, {
+          id: b.id, x: sx, y: sy, u: tokenUnit(zoom), t: now,
+          attColor: nations[b.attacker]!.color, defColor: nations[b.defender]!.color,
+          attMen: b.attMen, defMen: b.defMen, attStart: b.attStart, defStart: b.defStart,
+        }) || animating;
+    }
+    pruneBattles(snapshot.battles.map((b) => b.id));
+  }
+
+  // Armies and their commanders, once zoomed in past the realm names (feedback 31).
+  // Troops without a commander stay off the map, in their province's garrison (RECR-107).
+  if (snapshot && zoom >= ARMY_ZOOM) {
     const s = snapshot;
+    const u = tokenUnit(zoom);
+    const now = performance.now();
+    const inBattle = new Set(s.battles.map((b) => b.tile));
+    // The player's marches first, so the tokens stand on their lines.
+    for (let k = 0; k < s.armies.id.length; k++) {
+      const path = s.armies.path[k]!;
+      if (s.armies.owner[k] !== s.playerNation || !path.length) continue;
+      const pts = [o.toScreen(...armyPosition(k))];
+      for (const t of path) pts.push(o.toScreen(...tileXY(t)));
+      // Where the army will stand as each week ends: this week's end, then every week after.
+      const elapsed = weekStart ? hoursBetween(weekStart, s.date) + s.hour : 0;
+      const week = DAYS_PER_TURN * 24;
+      const marks = weekEnds(s.armies.pathHours[k]!, week - (elapsed % week), week).map((i) => pts[i + 1]!);
+      drawRoute(ctx, { pts, u, color: nations[s.playerNation]!.color, weeks: marks, t: now, viewWidth: o.width });
+      const hours = s.armies.etaHours[k]!;
+      if (hours > 0) {
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        const [bx, by] = pts.at(-1)!;
+        pixelText(ctx, hoursText(hours), bx, by - 13 * u, 10);
+      }
+    }
     const stackCount = new Map<number, number>();
     armyHitBoxes = [];
     for (let k = 0; k < s.armies.id.length; k++) {
       const cmd = s.armies.commander[k]!;
       if (cmd < 0 || !isKnown(s.armies.location[k]!)) continue;
       const tile = s.armies.tile[k]!;
+      // Fighting armies are drawn in their battle.
+      if (s.armies.battle[k]! >= 0 && inBattle.has(tile)) continue;
       const nth = stackCount.get(tile) ?? 0;
       stackCount.set(tile, nth + 1);
-      let [sx, sy] = o.toScreen(...armyPosition(k));
-      sx += 10 * spriteScale + nth * 6 * spriteScale;
+      const [px, py] = armyPosition(k);
+      let [sx, sy] = o.toScreen(px, py);
+      // The first army on a tile stands dead centre; others fan out behind it.
+      sx += nth * 8 * u;
+      sy -= nth * 3 * u;
       if (!onScreen(sx, sy)) continue;
-      const owner = s.armies.owner[k]!;
-      const img = sprite("commander", nations[owner]!.color, Math.max(1, spriteScale - 2));
-      const x = Math.round(sx - img.width / 2);
-      const y = Math.round(sy - img.height + 2 * spriteScale);
-      if (selected.has(s.armies.id[k]!)) {
-        ctx.fillStyle = PALETTE.paper;
-        ctx.fillRect(x - spriteScale, y + img.height - spriteScale, img.width + 2 * spriteScale, 2 * spriteScale);
-      }
-      ctx.drawImage(img, x, y);
-      armyHitBoxes.push({ id: s.armies.id[k]!, x, y, w: img.width, h: img.height });
-      if (zoom >= 3) {
+      const id = s.armies.id[k]!;
+      const moving = performance.now() - stepStart < stepMs && s.armies.trail[k]!.length > 0;
+      const box = drawToken(ctx, {
+        x: sx, y: sy, u, color: nations[s.armies.owner[k]!]!.color, men: s.armies.men[k]!,
+        dir: armyFacing(k), moving, selected: selected.has(id), t: now,
+      });
+      armyHitBoxes.push({ id, ...box });
+      animating ||= moving;
+      if (selected.has(id) || zoom >= 8) {
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        pixelText(ctx, `${cmdOf(cmd).name} · ${fmt(s.armies.men[k]! / 1000)}k`, sx, y + img.height + 2, 10);
+        pixelText(ctx, cmdOf(cmd).name, sx, box.y + box.h + 2, 10);
       }
     }
-    // The player's marches: the tiles still to walk, a dark line under a light dash so it shows on snow and sand.
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    const width = Math.max(2, spriteScale);
-    for (let k = 0; k < s.armies.id.length; k++) {
-      const path = s.armies.path[k]!;
-      if (s.armies.owner[k] !== s.playerNation || !path.length) continue;
-      const pts = [o.toScreen(...armyPosition(k))];
-      // Every few tiles is enough for the eye when zoomed out.
-      const every = Math.max(1, Math.floor(3 / zoom));
-      for (let i = every - 1; i < path.length; i += every) pts.push(o.toScreen(...tileXY(path[i]!)));
-      if ((path.length - 1) % every) pts.push(o.toScreen(...tileXY(path.at(-1)!)));
-      const line = () => {
-        ctx.beginPath();
-        pts.forEach(([x, y], i) => (i && Math.abs(x - pts[i - 1]![0]) < o.width / 2 ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
-        ctx.stroke();
-      };
-      ctx.strokeStyle = PALETTE.ink;
-      ctx.lineWidth = width + 2;
-      ctx.lineJoin = "round";
-      line();
-      ctx.strokeStyle = PALETTE.paper;
-      ctx.lineWidth = width;
-      ctx.setLineDash([4 * spriteScale, 3 * spriteScale]);
-      line();
-      ctx.setLineDash([]);
-      const [bx, by] = pts.at(-1)!;
-      const flag = sprite("flag", nations[s.playerNation]!.color, spriteScale);
-      ctx.drawImage(flag, Math.round(bx), Math.round(by - flag.height));
-      const hours = s.armies.etaHours[k]!;
-      if (hours > 0 && zoom >= 2) pixelText(ctx, hoursText(hours), bx + flag.width / 2, by - flag.height - 2, 10);
-    }
-    // Battles: crossed swords, and each side's men left of those it brought.
-    for (const b of s.battles) {
-      if (!isKnown(b.province)) continue;
-      const [sx, sy] = o.toScreen(...tileXY(b.tile));
-      if (!onScreen(sx, sy)) continue;
-      swords(ctx, sx, sy - 4 * spriteScale, 5 * spriteScale);
-      bar(ctx, sx, sy + 3 * spriteScale, 36, b.attMen / Math.max(1, b.attStart), nations[b.attacker]!.color);
-      bar(ctx, sx, sy + 3 * spriteScale + 6, 36, b.defMen / Math.max(1, b.defStart), nations[b.defender]!.color);
-    }
   }
+  if (animating) view.invalidate();
   if (performance.now() - stepStart < stepMs) view.invalidate();
+}
+
+/** Armies show once the realm names are gone (feedback 31). */
+const ARMY_ZOOM = 3.5;
+/** CSS pixels per art pixel of the army tokens, routes and battles. */
+const tokenUnit = (zoom: number) => (zoom >= 12 ? 3 : 2);
+
+/** Whole hours from one date to a later one (within a few weeks). */
+function hoursBetween(from: GameDate, to: GameDate): number {
+  const key = dateKey(to);
+  for (let d = 0; d < 60; d++) if (dateKey(addDays(from, d)) === key) return d * 24;
+  return 0;
+}
+
+/** The way each army last faced (by id), so it keeps facing that way when it halts. */
+const facingOf = new Map<number, 1 | -1>();
+/** East (1) or west (-1): the way army slot k marches, toward the next tile of its path. */
+function armyFacing(k: number): 1 | -1 {
+  const s = snapshot!;
+  const id = s.armies.id[k]!;
+  const w = s.tileWidth;
+  const at = s.armies.tile[k]!;
+  const trail = s.armies.trail[k]!;
+  const next = s.armies.path[k]![0] ?? -1;
+  const from = trail.length > 1 ? trail.at(-2)! : -1;
+  let dx = next >= 0 ? (next % w) - (at % w) : from >= 0 ? (at % w) - (from % w) : 0;
+  if (Math.abs(dx) > w / 2) dx = -dx;
+  const dir = dx > 0 ? 1 : dx < 0 ? -1 : (facingOf.get(id) ?? 1);
+  facingOf.set(id, dir);
+  return dir;
 }
 
 /** A map point at the middle of a tile (tiles are the map image's pixels). */
@@ -656,7 +696,9 @@ function labelBitmap(text: string, size: number, water: boolean): LabelBitmap {
     return hit;
   }
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const font = `600 ${size + 2}px "Pixelify Sans", "Courier New", monospace`;
+  // Jersey 10 draws small on its em: 1.3 times the size matches the old face's letters.
+  const fontPx = Math.round((size + 2) * 1.3);
+  const font = `${fontPx}px "Jersey 10", "Courier New", monospace`;
   const line = Math.max(3, Math.round(size / 3.5));
   const shadow = Math.max(1, Math.round(size / 9));
   const pad = Math.ceil(line / 2) + shadow + 1;
@@ -664,7 +706,7 @@ function labelBitmap(text: string, size: number, water: boolean): LabelBitmap {
   const c = canvas.getContext("2d")!;
   c.font = font;
   const w = Math.ceil(c.measureText(text).width) + pad * 2;
-  const h = Math.ceil((size + 2) * 1.25) + pad * 2;
+  const h = Math.ceil(fontPx * 1.05) + pad * 2;
   canvas.width = Math.ceil(w * dpr);
   canvas.height = Math.ceil(h * dpr);
   c.scale(dpr, dpr);
@@ -813,7 +855,7 @@ function armySlot(id: number): number {
 }
 
 // ---- HUD and panels ----
-const pennant = (color: string, scale = 2) => `<img class="px-icon" src="${pennantUrl(color, scale)}" alt="">`;
+const pennant = (color: string, scale = 2) => `<img class="px-icon" src="${flagUrl(color, scale)}" alt="">`;
 
 function renderHud(): void {
   if (!snapshot) {
@@ -1540,7 +1582,7 @@ function renderRealm(r: number): void {
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
-      <img class="banner" src="${pennantUrl(n.color, 6)}" alt="">
+      <img class="banner" src="${flagUrl(n.color, 6)}" alt="">
       <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
@@ -1633,6 +1675,9 @@ function bindNationButtons(): void {
 }
 
 async function startGame(nation: string): Promise<void> {
+  showLoading(`Gathering the court of ${nations[nationIndex.get(nation)!]!.name}…`, 0.15);
+  await painted();
+  loadingStage(`Mustering the armies of ${nations[nationIndex.get(nation)!]!.name}…`, 0.6);
   takeSnapshot(await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}) }), 0);
   weekStart = snapshot!.date;
   dispatches = [];
@@ -1645,6 +1690,7 @@ async function startGame(nation: string): Promise<void> {
   renderHud();
   renderPanel();
   renderActions();
+  hideLoading();
 }
 
 /** The map images as the engine takes them, so armies march over the map's own tiles. */
@@ -1752,13 +1798,13 @@ async function selfTest(): Promise<void> {
 Object.assign(globalThis, {
   __phNation: (id: string) => nationIndex.get(id),
   __phTurn: () => snapshot?.turn ?? -1,
-  /** Sends every idle army of the player with a commander toward a realm's capital. */
+  /** Sends every army of the player with a commander toward a realm's capital, unless it is already on its way. */
   __phMarchOn: async (id: string) => {
     if (!snapshot) return;
     const to = provinceIndex.get(nations[nationIndex.get(id)!]!.capital)!;
     const idle = [...snapshot.armies.id.keys()].filter((k) => {
       const a = snapshot!.armies;
-      return a.owner[k] === snapshot!.playerNation && a.commander[k]! >= 0 && !a.route[k]!.length && a.location[k] !== to;
+      return a.owner[k] === snapshot!.playerNation && a.commander[k]! >= 0 && a.route[k]!.at(-1) !== to && a.location[k] !== to;
     });
     for (const army of idle.map((k) => snapshot!.armies.id[k]!)) await act({ type: "move", army, to });
   },
@@ -1772,6 +1818,27 @@ Object.assign(globalThis, {
     panelCollapsed = false;
     renderPanel();
   },
+  /** Sends the player's first army with a commander to a province by id. */
+  __phMoveTo: async (id: string) => {
+    if (!snapshot) return;
+    const k = [...snapshot.armies.id.keys()].find((j) => snapshot!.armies.owner[j] === snapshot!.playerNation && snapshot!.armies.commander[j]! >= 0);
+    if (k !== undefined) await act({ type: "move", army: snapshot.armies.id[k]!, to: provinceIndex.get(id)! });
+  },
+  /** Centres the map on the player's first army with a commander, at a zoom, and selects it. */
+  __phLookAtArmy: (zoom = 6) => {
+    if (!snapshot) return;
+    const k = [...snapshot.armies.id.keys()].find((j) => snapshot!.armies.owner[j] === snapshot!.playerNation && snapshot!.armies.commander[j]! >= 0);
+    if (k === undefined) return;
+    selected.clear();
+    selected.add(snapshot.armies.id[k]!);
+    view.lookAt(...armyPosition(k), zoom);
+  },
+  /** Centres the map on the first battle, if any. */
+  __phLookAtBattle: (zoom = 8) => {
+    const b = snapshot?.battles[0];
+    if (b) view.lookAt(...tileXY(b.tile), zoom);
+    return !!b;
+  },
   __phLookAtWar: () => {
     const p = snapshot?.sieges[0]?.province ?? occupiers.findIndex((o) => o >= 0);
     if (p >= 0) view.lookAt(provinces[p]!.x!, provinces[p]!.y!, 4);
@@ -1781,5 +1848,6 @@ Object.assign(globalThis, {
 renderDiagnostics();
 void selfTest();
 boot().catch((e) => {
+  hideLoading();
   app.innerHTML = `<p class="fatal">Could not draw the map: ${esc(e instanceof Error ? e.message : String(e))}</p>`;
 });

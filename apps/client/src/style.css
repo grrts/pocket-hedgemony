@@ -3,8 +3,7 @@
  * pixel art painted by src/art/ui.ts and passed in as --ui-* variables; every
  * piece is scaled by whole steps (2× or 4×) so pixels stay square.
  */
-@import "@fontsource/pixelify-sans/400.css";
-@import "@fontsource/pixelify-sans/600.css";
+@import "@fontsource/jersey-10/400.css";
 @import "@fontsource/jacquard-12/400.css";
 
 :root {
@@ -20,8 +19,8 @@
   --brass-light: #f6dc8a;
   --cloth: #a8323e;
   --sea: #1f3462;
-  --body: "Pixelify Sans", "Courier New", ui-monospace, monospace;
-  --title: "Jacquard 12", "Pixelify Sans", serif;
+  --body: "Jersey 10", "Courier New", ui-monospace, monospace;
+  --title: "Jacquard 12", "Jersey 10", serif;
 }
 
 * {
@@ -39,7 +38,8 @@ body {
   overflow: hidden;
   background: var(--sea);
   color: var(--ink);
-  font: 400 17px/1.4 var(--body);
+  font: 400 22px/1.4 var(--body);
+  font-synthesis: none;
   -webkit-text-size-adjust: 100%;
   -webkit-user-select: none;
   user-select: none;
@@ -106,7 +106,7 @@ img,
   border-image: var(--ui-ribbon) 3 8 fill / 12px 32px stretch;
   padding: 0 4px;
   min-height: 48px;
-  font: 600 22px/24px var(--body);
+  font: 600 29px/31px var(--body);
   letter-spacing: 0.5px;
   color: var(--paper-light);
   text-shadow: 2px 2px 0 var(--outline);
@@ -129,13 +129,13 @@ img,
     border-width: 6px 16px;
     border-image-width: 6px 16px;
     min-height: 32px;
-    font-size: 18px;
+    font-size: 23px;
     line-height: 20px;
   }
 
   html,
   body {
-    font-size: 16px;
+    font-size: 21px;
   }
 }
 
@@ -153,7 +153,7 @@ button {
   border-image: var(--ui-btn) 4 fill / 8px stretch;
   background: none;
   border-radius: 0;
-  font: 600 16px/1 var(--body);
+  font: 600 21px/1 var(--body);
   color: var(--paper-light);
   text-shadow: 2px 2px 0 var(--outline);
   image-rendering: pixelated;
@@ -230,7 +230,7 @@ button.icon-only {
 }
 
 .hud .realm b {
-  font: 600 19px/1 var(--body);
+  font: 600 25px/1 var(--body);
   color: var(--brass-light);
   text-shadow: 2px 2px 0 var(--outline);
   overflow: hidden;
@@ -243,7 +243,7 @@ button.icon-only {
 
 .hud .subtitle {
   flex: none;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--paper);
   text-shadow: 2px 2px 0 var(--outline);
@@ -260,7 +260,7 @@ button.icon-only {
   border-width: 4px;
   border-image: var(--ui-btn-paper) 4 fill / 4px stretch;
   color: var(--ink);
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -365,7 +365,7 @@ button.icon-only {
   display: flex;
   align-items: center;
   gap: 8px;
-  font: 600 14px/1.2 var(--body);
+  font: 600 18px/1.2 var(--body);
   color: var(--ink);
 }
 
@@ -429,7 +429,7 @@ button.icon-only {
   min-width: 24px;
   height: 24px;
   padding: 0 4px;
-  font: 600 15px/20px var(--body);
+  font: 600 20px/26px var(--body);
   color: var(--ink);
   background: var(--brass-light);
   border: 2px solid var(--outline);
@@ -540,7 +540,7 @@ button.icon-only {
 
 .hint {
   color: var(--ink-soft);
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .hint a {
@@ -641,7 +641,7 @@ button.capital {
   padding: 0 4px;
   border-width: 4px;
   border-image-width: 4px;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .facts small {
@@ -651,7 +651,7 @@ button.capital {
 
 .panel .sub {
   margin: 12px 0 4px;
-  font: 600 15px/1 var(--body);
+  font: 600 20px/1 var(--body);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-soft);
@@ -728,7 +728,7 @@ button.capital {
 
 button.small {
   min-height: 32px;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .hud .at-war {
@@ -800,33 +800,51 @@ button.small {
 .hud button.plaque {
   min-height: 28px;
   padding: 0 4px;
-  font: 600 15px var(--body);
+  font: 600 20px var(--body);
   text-shadow: none;
 }
 
-/* Province overview tabs (Overview, Garrison) */
+/*
+ * Panel tabs: parchment index cards on a wooden rail. The open card is the
+ * light parchment of the page, joined to it, with a brass strip along its top;
+ * the others sit back in darker parchment. Ink text, no shadow (feedback 43).
+ */
 .tabs {
   display: flex;
   gap: 4px;
-  margin: 2px 0 8px;
-  border-bottom: 2px solid var(--wood);
+  margin: 4px 0 10px;
+  padding: 0 2px;
+  border-bottom: 4px solid var(--wood-dark);
+  box-shadow: 0 2px 0 var(--wood);
 }
 
 .tabs .tab {
-  min-height: 32px;
-  padding: 2px 12px;
-  font-size: 15px;
-  background: var(--paper);
+  flex: 1 1 0;
+  max-width: 180px;
+  min-height: 40px;
+  margin-bottom: -4px;
+  padding: 6px 10px 2px;
+  border: 4px solid var(--wood-dark);
+  border-bottom-width: 4px;
+  border-image: none;
+  background: var(--ui-parchment-dark) 0 0 / 64px;
   color: var(--ink-soft);
-  border: 2px solid var(--wood);
-  border-bottom: none;
-  box-shadow: none;
+  font: 400 21px/1 var(--body);
+  text-shadow: none;
+  /* Square-cut top corners, a pixel step in from the frame. */
+  clip-path: polygon(4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% 100%, 0 100%, 0 4px, 4px 4px);
+  box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.18);
+}
+
+.tabs .tab:active:not(:disabled) {
+  transform: none;
 }
 
 .tabs .tab.on {
-  background: var(--paper-light);
+  background: var(--ui-parchment) 0 0 / 64px;
+  border-bottom-color: transparent;
   color: var(--ink);
-  font-weight: bold;
+  box-shadow: inset 0 4px 0 var(--brass), inset 0 6px 0 var(--brass-light);
 }
 
 /* The commander's screen: troops by arm */
@@ -851,6 +869,105 @@ table.troops td.army-buttons {
   flex-wrap: wrap;
 }
 
+/*
+ * Loading screen (feedback 47). Plain CSS, no painted --ui-* art, so it
+ * shows from the first paint before any script runs: a parchment card with
+ * a stepped pixel rim over a dithered sea.
+ */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background:
+    repeating-conic-gradient(#1f3462 0 25%, #243a6b 0 50%) 0 0 / 8px 8px;
+  transition: opacity 0.4s steps(4);
+}
+
+.loader.done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader-card {
+  width: min(600px, 100%);
+  padding: 20px 24px 16px;
+  background: #efdcae;
+  color: var(--ink);
+  text-align: center;
+  /* A stepped rim: ink, wood, brass, wood, ink, square pixels all round. */
+  box-shadow:
+    0 0 0 4px #4e2f18,
+    0 0 0 8px #d0a248,
+    0 0 0 12px #7a4c2a,
+    0 0 0 16px #24150c,
+    0 12px 0 16px rgb(0 0 0 / 0.4);
+}
+
+.loader-card h1 {
+  margin: 0;
+  font: 400 56px/1 var(--title);
+  color: var(--ink);
+}
+
+.loader-sub {
+  margin: 2px 0 10px;
+  font: 400 22px/1 var(--body);
+  color: var(--ink-soft);
+}
+
+.loader-art {
+  display: block;
+  width: 100%;
+  max-width: 540px;
+  height: auto;
+  margin: 0 auto;
+  image-rendering: pixelated;
+}
+
+.loader-bar {
+  height: 16px;
+  margin: 6px 0 10px;
+  background: #d8be86;
+  box-shadow: 0 0 0 4px #24150c;
+}
+
+.loader-bar i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, #a8323e 0 12px, #d4545c 12px 16px);
+  box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.25), inset 0 -4px 0 rgb(0 0 0 / 0.2);
+}
+
+.loader-stage {
+  margin: 0;
+  font: 400 26px/1.2 var(--body);
+}
+
+.loader-tip {
+  min-height: 2.5em;
+  margin: 8px 0 0;
+  font: 400 20px/1.25 var(--body);
+  color: var(--ink-soft);
+}
+
+@media (max-height: 420px) {
+  .loader-card {
+    padding: 10px 16px 8px;
+  }
+
+  .loader-card h1 {
+    font-size: 40px;
+  }
+
+  .loader-art {
+    max-width: 360px;
+  }
+}
+
 /* ---- Province queues: recruits gathering, one row per thousand ---- */
 
 .queue-head {
@@ -858,7 +975,7 @@ table.troops td.army-buttons {
   justify-content: space-between;
   margin: 10px 0 2px;
   color: var(--ink-soft);
-  font-size: 14px;
+  font-size: 18px;
   text-transform: uppercase;
 }
 
@@ -892,7 +1009,7 @@ table.troops td.army-buttons {
 
 .queue .when {
   white-space: nowrap;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .queue button {

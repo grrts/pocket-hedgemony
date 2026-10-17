@@ -325,23 +325,35 @@ export function icon(name: IconName, scale = 2, label = ""): string {
   return `<img class="px-icon" src="${iconUrl(name, scale)}" alt="${label}" ${label ? "" : 'aria-hidden="true"'}>`;
 }
 
-/** A pennant in a nation's colour, as a data URL. */
-export function pennantUrl(color: string, scale = 2): string {
-  const key = `pennant|${color}|${scale}`;
+/**
+ * A realm's flag, as a data URL: a field of cloth in its colour with no pole
+ * (feedback 37), rippling in the wind with its folds shaded light and dark,
+ * inside an ink rim. Pixel rows are drawn at a whole-number scale.
+ */
+export function flagUrl(color: string, scale = 2): string {
+  const key = `flag|${color}|${scale}`;
   const hit = iconCache.get(key);
   if (hit) return hit;
-  const rows = ["kk.......", "kNNNNNkk.", "kNnNNNNNk", "kNNNNNNk.", "kNnNNNk..", "kNNNkk...", "kkk......", "kg.......", "kg.......", "kg.......", "kd.......", "kk......."];
-  const dark = (() => {
-    const n = parseInt(color.slice(1), 16);
-    const f = (v: number) => Math.round(v * 0.62);
-    return `rgb(${f((n >> 16) & 255)},${f((n >> 8) & 255)},${f(n & 255)})`;
-  })();
-  const url = paint(9 * scale, rows.length * scale, (_, rect) => {
+  const rows = [
+    ".kkkk....kkk.",
+    "kLLNNkkkkLNNk",
+    "kLNNNNNNNNNNk",
+    "kNNNNnNNNNNnk",
+    "kNNNnnNNNNnnk",
+    "kNNnnkkkkNnnk",
+    "knnk....knnk.",
+    ".kk......kk..",
+  ];
+  const n = parseInt(color.slice(1), 16);
+  const tone = (f: (v: number) => number) => `rgb(${f((n >> 16) & 255)},${f((n >> 8) & 255)},${f(n & 255)})`;
+  const dark = tone((v) => Math.round(v * 0.68));
+  const light = tone((v) => Math.round(v + (255 - v) * 0.3));
+  const url = paint(rows[0]!.length * scale, rows.length * scale, (_, rect) => {
     rows.forEach((row, y) => {
       for (let x = 0; x < row.length; x++) {
         const ch = row[x]!;
         if (ch === ".") continue;
-        rect(x * scale, y * scale, scale, scale, ch === "N" ? color : ch === "n" ? dark : ICON_KEY[ch]!);
+        rect(x * scale, y * scale, scale, scale, ch === "N" ? color : ch === "n" ? dark : ch === "L" ? light : ICON_KEY[ch]!);
       }
     });
   });

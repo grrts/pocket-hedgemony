@@ -3,14 +3,14 @@ import { loadDefaultRuleset } from "@ph/rules";
 import { DEPTH_COLORS, PALETTE, TERRAIN_CATEGORIES, TERRAIN_COLORS, TERRAINS } from "./art/palette.ts";
 import { sprite, SPRITES, type SpriteName } from "./art/sprites.ts";
 import { BIG_ROWS, SEA_ROW, SHALLOW_ROW, tileCanvas, VARIANTS } from "./art/tiles.ts";
-import { icon, ICONS, installUiArt, pennantUrl, UI_COLORS, type IconName } from "./art/ui.ts";
+import { icon, ICONS, installUiArt, flagUrl, UI_COLORS, type IconName } from "./art/ui.ts";
 
 installUiArt();
 const rules = loadDefaultRuleset();
 const root = document.querySelector<HTMLElement>("#sheet")!;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const nation = (id: string) => rules.nations.find((n) => n.id === id)!;
-const pennant = (color: string, scale = 2) => `<img class="px-icon" src="${pennantUrl(color, scale)}" alt="">`;
+const pennant = (color: string, scale = 2) => `<img class="px-icon" src="${flagUrl(color, scale)}" alt="">`;
 
 const figure = (el: HTMLElement | string, caption: string) => {
   const f = document.createElement("figure");
