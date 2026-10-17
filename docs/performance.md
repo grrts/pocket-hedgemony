@@ -31,8 +31,10 @@ Rules that keep it there:
   map canvas does not, because shading 4 to 7 times the pixels is what
   overheats phones. Close-up tile detail switches in by CSS zoom.
 
-GPU time is not measured in CI (it runs on a software GPU); the map's frame
-time is reported only.
+GPU time is not measured in CI (it runs on a software GPU, about 120 ms a
+frame); the map's frame time is reported only. So perf turns the map's
+shading off while it pans and animates, which keeps the check under a
+minute, and back on before it ends turns.
 
 ## Ending a turn
 
