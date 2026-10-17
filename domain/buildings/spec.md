@@ -507,6 +507,7 @@ Works across the province (§7.10)
 | SiteStarted | A site begins | province, place, type, step, owner, crew, months | game-shell (Works), province (crew leaves homeless/slots) |
 | SiteStopped / SiteResumed | Season, enemy army, occupation, no crew | site, reason | game-shell |
 | SiteCancelled | Cancel | site, refund | realm |
+| BuildQueued / BuildLeftQueue | A build waits for a site; a queued build can no longer be built | province, type, step, reason | game-shell (Build tab, turn report) |
 | BuildingCompleted | Site finishes | building, step, job slots | province (slots open before overflow), game-shell (turn report), achievements |
 | BuildingStepChanged | Up or down a step | building, from, to | government, warfare, naval, trade |
 | BuildingNeglected | Upkeep unpaid or town shrank | building | game-shell (turn report line), map-presentation |
