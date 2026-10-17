@@ -1719,6 +1719,9 @@ function renderRealm(r: number): void {
       renderPanel();
     }),
   );
+  // On a phone the tab row scrolls sideways: keep the open tab in view.
+  const onTab = panel.querySelector<HTMLElement>(".tabs .tab.on");
+  if (onTab) onTab.parentElement!.scrollLeft = onTab.offsetLeft - onTab.parentElement!.offsetLeft + onTab.offsetWidth / 2 - onTab.parentElement!.clientWidth / 2;
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       realmTab = b.dataset.realmTab as typeof realmTab;

@@ -814,15 +814,22 @@ button.small {
   gap: 4px;
   margin: 4px 0 10px;
   padding: 0 2px;
-  border-bottom: 4px solid var(--wood-dark);
+  /* The rail is painted, not a border, so a narrow panel can scroll the
+     cards sideways (five tabs on a phone) without clipping where they meet it. */
+  background: linear-gradient(0deg, var(--wood-dark) 4px, transparent 4px);
   box-shadow: 0 2px 0 var(--wood);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tabs .tab {
-  flex: 1 1 0;
+  flex: 1 0 auto;
   max-width: 180px;
   min-height: 40px;
-  margin-bottom: -4px;
   padding: 6px 10px 2px;
   border: 4px solid var(--wood-dark);
   border-bottom-width: 4px;
@@ -1139,10 +1146,6 @@ button.person-tile {
 }
 
 /* ---- Mercenaries tab: one card per free company (feedback 52, 53) ---- */
-
-.tabs {
-  flex-wrap: wrap;
-}
 
 .companies {
   list-style: none;
