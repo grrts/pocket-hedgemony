@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "sync": "pnpm --filter @ph/client build && cap sync",
+    "sync": "pnpm --filter @ph/client build && cap sync && node scripts/landscape.mjs",
     "android": "pnpm sync && cap open android",
     "ios": "pnpm sync && cap open ios"
   },

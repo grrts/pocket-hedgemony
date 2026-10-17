@@ -1,4 +1,5 @@
-import type { GameDate, Ruleset } from "@ph/rules";
+import type { GameDate, Ground, Ruleset } from "@ph/rules";
+import { groundOf, monthlyRations, type MarchMap } from "./march.ts";
 import { Rng } from "./rng.ts";
 
 /**
@@ -17,9 +18,13 @@ export interface World {
   provinceIds: string[];
   provinceIndex: Map<string, number>;
   provinceOwner: Int16Array; // nation index, -1 = unowned
-  provinceTax: Float32Array;
-  provinceProduction: Float32Array;
-  provinceManpower: Float32Array;
+  provincePopulation: Float32Array; // thousands of people
+  provinceWealth: Float32Array;
+  /** 1 for sea and ocean zones, which only ships can enter. */
+  provinceWater: Uint8Array;
+  /** Land ground per province, null for sea and ocean zones. */
+  provinceGround: (Ground | null)[];
+  provinceRiver: Uint8Array;
   /** Borders in compressed sparse row form: neighbors of p are adjList[adjStart[p] .. adjStart[p+1]). */
   adjStart: Int32Array;
   adjList: Int32Array;
@@ -28,12 +33,13 @@ export interface World {
   nationIds: string[];
   nationIndex: Map<string, number>;
   nationTreasury: Float64Array;
-  nationManpower: Float64Array;
-  nationMaxManpower: Float64Array;
+  nationLevies: Float64Array;
+  nationMaxLevies: Float64Array;
   nationMonthlyIncome: Float64Array;
 
   commanderIds: string[];
   commanderOwner: Int16Array;
+  commanderLogistics: Int8Array;
 
   armies: ArmyPool;
 }
@@ -45,7 +51,17 @@ export interface ArmyPool {
   location: Int32Array;
   men: Int32Array;
   commander: Int32Array; // -1 = none
+  /** Men on horseback, counted within men. */
+  horse: Int32Array;
+  /** Rations in the army's wagons. */
+  food: Float64Array;
+  /** Days already marched toward the next province on the route. */
+  progress: Float32Array;
   movedThisTurn: Uint8Array;
+  /** Provinces still to march through, in order. */
+  route: number[][];
+  /** Provinces walked last turn, starting where the army set out (for drawing the march). */
+  marched: number[][];
 }
 
 export function createArmyPool(capacity: number): ArmyPool {
@@ -56,11 +72,16 @@ export function createArmyPool(capacity: number): ArmyPool {
     location: new Int32Array(capacity),
     men: new Int32Array(capacity),
     commander: new Int32Array(capacity).fill(-1),
+    horse: new Int32Array(capacity),
+    food: new Float64Array(capacity),
+    progress: new Float32Array(capacity),
     movedThisTurn: new Uint8Array(capacity),
+    route: Array.from({ length: capacity }, () => []),
+    marched: Array.from({ length: capacity }, () => []),
   };
 }
 
-export function spawnArmy(world: World, owner: number, location: number, men: number, commander = -1): number {
+export function spawnArmy(world: World, owner: number, location: number, men: number, commander = -1, horse = 0): number {
   let pool = world.armies;
   let slot = -1;
   for (let i = 0; i < pool.count; i++) {
@@ -78,7 +99,15 @@ export function spawnArmy(world: World, owner: number, location: number, men: nu
   pool.location[slot] = location;
   pool.men[slot] = men;
   pool.commander[slot] = commander;
+  pool.horse[slot] = horse;
+  pool.progress[slot] = 0;
   pool.movedThisTurn[slot] = 0;
+  pool.route[slot] = [];
+  pool.marched[slot] = [];
+  // Wagons start full.
+  const d = world.rules.defines.march;
+  const logistics = commander >= 0 ? world.commanderLogistics[commander]! : 0;
+  pool.food[slot] = monthlyRations(d, { men, horse, logistics }) * d.monthsCarried;
   return slot;
 }
 
@@ -90,7 +119,12 @@ function growArmyPool(old: ArmyPool): ArmyPool {
   next.location.set(old.location);
   next.men.set(old.men);
   next.commander.set(old.commander);
+  next.horse.set(old.horse);
+  next.food.set(old.food);
+  next.progress.set(old.progress);
   next.movedThisTurn.set(old.movedThisTurn);
+  old.route.forEach((r, i) => (next.route[i] = r));
+  old.marched.forEach((r, i) => (next.marched[i] = r));
   return next;
 }
 
@@ -103,16 +137,15 @@ export function createWorld(rules: Ruleset, seed: number): World {
   const N = nationIds.length;
 
   const provinceOwner = new Int16Array(P);
-  const provinceTax = new Float32Array(P);
-  const provinceProduction = new Float32Array(P);
-  const provinceManpower = new Float32Array(P);
+  const provincePopulation = new Float32Array(P);
+  const provinceWealth = new Float32Array(P);
+  const provinceWater = Uint8Array.from(rules.provinces, (p) => (p.terrain === "sea" || p.terrain === "ocean" ? 1 : 0));
   const adjStart = new Int32Array(P + 1);
   let edges = 0;
   rules.provinces.forEach((p, i) => {
     provinceOwner[i] = p.owner === null ? -1 : nationIndex.get(p.owner)!;
-    provinceTax[i] = p.tax;
-    provinceProduction[i] = p.production;
-    provinceManpower[i] = p.manpower;
+    provincePopulation[i] = p.population;
+    provinceWealth[i] = p.wealth;
     adjStart[i] = edges;
     edges += p.neighbors.length;
   });
@@ -124,10 +157,12 @@ export function createWorld(rules: Ruleset, seed: number): World {
 
   const commanderIds: string[] = [];
   const commanderOwnerList: number[] = [];
+  const commanderLogisticsList: number[] = [];
   rules.nations.forEach((n, i) => {
     for (const c of n.commanders) {
       commanderIds.push(c.id);
       commanderOwnerList.push(i);
+      commanderLogisticsList.push(c.logistics);
     }
   });
 
@@ -140,42 +175,46 @@ export function createWorld(rules: Ruleset, seed: number): World {
     provinceIds,
     provinceIndex,
     provinceOwner,
-    provinceTax,
-    provinceProduction,
-    provinceManpower,
+    provincePopulation,
+    provinceWealth,
+    provinceWater,
+    provinceGround: rules.provinces.map((p) => groundOf(p.terrain)),
+    provinceRiver: Uint8Array.from(rules.provinces, (p) => (p.river ? 1 : 0)),
     adjStart,
     adjList,
     nationCount: N,
     nationIds,
     nationIndex,
     nationTreasury: new Float64Array(N).fill(rules.defines.economy.startingTreasury),
-    nationManpower: new Float64Array(N),
-    nationMaxManpower: new Float64Array(N),
+    nationLevies: new Float64Array(N),
+    nationMaxLevies: new Float64Array(N),
     nationMonthlyIncome: new Float64Array(N),
     commanderIds,
     commanderOwner: Int16Array.from(commanderOwnerList),
+    commanderLogistics: Int8Array.from(commanderLogisticsList),
     armies: createArmyPool(Math.max(16, N * 2)),
   };
 
-  recomputeMaxManpower(world);
-  world.nationManpower.set(world.nationMaxManpower);
+  recomputeMaxLevies(world);
+  world.nationLevies.set(world.nationMaxLevies);
 
   // Every nation starts with one army in its capital, led by its first commander.
   rules.nations.forEach((n, i) => {
     const firstCommander = commanderOwnerList.indexOf(i);
-    spawnArmy(world, i, provinceIndex.get(n.capital)!, 5000, firstCommander);
+    const men = 5000;
+    spawnArmy(world, i, provinceIndex.get(n.capital)!, men, firstCommander, Math.round(men * rules.defines.march.startingHorseShare));
   });
 
   return world;
 }
 
-export function recomputeMaxManpower(world: World): void {
-  const max = world.nationMaxManpower;
-  const perPoint = world.rules.defines.manpower.menPerBaseManpower;
+export function recomputeMaxLevies(world: World): void {
+  const max = world.nationMaxLevies;
+  const perThousand = world.rules.defines.levies.menPerThousandPeople;
   max.fill(0);
   for (let p = 0; p < world.provinceCount; p++) {
     const owner = world.provinceOwner[p]!;
-    if (owner >= 0) max[owner] = max[owner]! + world.provinceManpower[p]! * perPoint;
+    if (owner >= 0) max[owner] = max[owner]! + world.provincePopulation[p]! * perThousand;
   }
 }
 
@@ -184,4 +223,9 @@ export function areNeighbors(world: World, a: number, b: number): boolean {
     if (world.adjList[k] === b) return true;
   }
   return false;
+}
+
+/** The world's province graph as the march planner sees it. */
+export function marchMap(world: World): MarchMap {
+  return { adjStart: world.adjStart, adjList: world.adjList, ground: world.provinceGround, population: world.provincePopulation, river: world.provinceRiver };
 }

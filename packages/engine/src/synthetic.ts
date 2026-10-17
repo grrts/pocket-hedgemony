@@ -22,9 +22,8 @@ export function generateSyntheticRuleset(base: Ruleset, opts: { provinces: numbe
       name: `Province ${i}`,
       owner: `N${Math.floor((i * opts.nations) / opts.provinces)}`,
       terrain: "grassland",
-      tax: 1 + rng.int(8),
-      production: 1 + rng.int(8),
-      manpower: 1 + rng.int(6),
+      population: 20 + rng.int(400),
+      wealth: 1 + rng.int(8),
       neighbors,
     });
   }

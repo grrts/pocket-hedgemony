@@ -8,11 +8,11 @@ import { preview } from "vite";
 
 const server = await preview({ preview: { port: 4173, strictPort: true } });
 const base = "http://localhost:4173/";
-const browser = await chromium.launch();
+const browser = await chromium.launch({ args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 let failed = false;
 
 async function check(name, expectedMode, setup) {
-  const context = await browser.newContext({ ...devices["Pixel 7"] });
+  const context = await browser.newContext({ ...devices["Pixel 7 landscape"] });
   const page = await context.newPage();
   await setup?.(page);
   await page.goto(base);
@@ -25,9 +25,9 @@ async function check(name, expectedMode, setup) {
     { timeout: 15000 },
   ).then((h) => h.jsonValue());
   // Play one turn through the real UI too.
-  await page.click("[data-nation=FRA]");
+  await page.click("[data-nation=france]");
   await page.click(".end-turn");
-  await page.waitForSelector("text=Turn 1");
+  await page.waitForSelector(".turn-label:text('April 1444')");
   const ok = d.engineError === null && d.engineMode === expectedMode;
   failed ||= !ok;
   console.log(`${ok ? "PASS" : "FAIL"} ${name}: ${JSON.stringify(d)}`);

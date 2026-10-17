@@ -1,17 +1,60 @@
 {
   "$comment": "Global balance numbers. Every value here can be tuned without touching engine code.",
-  "startDate": { "year": 1444, "month": 11 },
+  "startDate": {
+    "year": 1444,
+    "month": 3
+  },
   "economy": {
-    "taxPerBaseTaxPerMonth": 0.1,
-    "productionPerBaseProductionPerMonth": 0.08,
+    "goldPerThousandPeoplePerMonth": 0.004,
+    "goldPerWealthPerMonth": 0.06,
     "startingTreasury": 50
   },
-  "manpower": {
-    "menPerBaseManpower": 250,
+  "levies": {
+    "menPerThousandPeople": 4,
     "monthlyRecoveryFraction": 0.0167
   },
   "military": {
-    "maintenancePerThousandMenPerMonth": 0.2,
-    "movementCostPerProvince": 1
+    "upkeepPerThousandMenPerMonth": 0.2
+  },
+  "march": {
+    "$comment": "Marching and feeding armies, after the warfare design (sections 5 and 6) and the province design (section 3.1). One crossing unit in the design's days-to-cross table is daysPerCrossing real days here, since a province on this map is about 100 km and a 1444 army marched 15-20 km a day.",
+    "daysPerMonth": 30,
+    "daysPerCrossing": 6,
+    "daysToCross": {
+      "grassland": 1,
+      "farmland": 1,
+      "savanna": 1,
+      "drylands": 1.5,
+      "hills": 1.5,
+      "desert": 2,
+      "forest": 2,
+      "tundra": 2,
+      "mountains": 3,
+      "jungle": 3,
+      "marsh": 3
+    },
+    "foraging": {
+      "grassland": 0.6,
+      "farmland": 1,
+      "savanna": 0.6,
+      "drylands": 0.3,
+      "hills": 0.6,
+      "desert": 0.1,
+      "forest": 0.6,
+      "tundra": 0.1,
+      "mountains": 0.3,
+      "jungle": 0.3,
+      "marsh": 0.3
+    },
+    "horseSpeedBonus": 0.5,
+    "bigArmyExtraCrossings": 1,
+    "riverCrossingDays": 1,
+    "rationsPerSoldier": 2,
+    "rationsPerHorse": 3,
+    "rationsStoredPerPerson": 0.5,
+    "monthsCarried": 2,
+    "logisticsRationCut": 0.05,
+    "hungerLossPerMonth": 0.28,
+    "startingHorseShare": 0.2
   }
 }

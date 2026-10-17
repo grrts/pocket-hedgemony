@@ -10,7 +10,7 @@ export class RulesetError extends Error {
   }
 }
 
-const TERRAINS = new Set(["grassland", "farmland", "hills", "mountains", "drylands", "marsh", "forest", "desert"]);
+const TERRAINS = new Set(["grassland", "farmland", "hills", "mountains", "drylands", "marsh", "forest", "desert", "tundra", "jungle", "savanna", "sea", "ocean"]);
 
 /**
  * Cross-checks the config files against each other so balancing mistakes
@@ -36,7 +36,7 @@ export function validateRuleset(rules: Ruleset): Ruleset {
   for (const p of rules.provinces) {
     if (p.owner !== null && !nationIds.has(p.owner)) problems.push(`province ${p.id}: unknown owner "${p.owner}"`);
     if (!TERRAINS.has(p.terrain)) problems.push(`province ${p.id}: unknown terrain "${p.terrain}"`);
-    for (const field of ["tax", "production", "manpower"] as const) {
+    for (const field of ["population", "wealth"] as const) {
       if (!Number.isFinite(p[field]) || p[field] < 0) problems.push(`province ${p.id}: ${field} must be >= 0`);
     }
     for (const nb of p.neighbors) {
@@ -49,6 +49,7 @@ export function validateRuleset(rules: Ruleset): Ruleset {
   for (const n of rules.nations) {
     const capital = byId.get(n.capital);
     if (!capital) problems.push(`nation ${n.id}: unknown capital "${n.capital}"`);
+    else if (capital.terrain === "sea" || capital.terrain === "ocean") problems.push(`nation ${n.id}: capital ${n.capital} is at sea`);
     else if (capital.owner !== n.id) problems.push(`nation ${n.id}: capital ${n.capital} is owned by ${capital.owner}`);
   }
 
