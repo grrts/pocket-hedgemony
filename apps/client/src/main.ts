@@ -19,7 +19,9 @@ import type { GameDate } from "@ph/rules";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite, spriteUrl } from "./art/sprites.ts";
-import { icon, installUiArt, flagUrl } from "./art/ui.ts";
+import { icon, installUiArt, flagCanvas, flagUrl, type FlagOf } from "./art/ui.ts";
+import { apparentAge, eraOfYear } from "./art/commanders.ts";
+import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
@@ -577,16 +579,25 @@ function drawOverlay(o: OverlayContext): void {
       if (!onScreen(sx, sy)) continue;
       const id = s.armies.id[k]!;
       const moving = performance.now() - stepStart < stepMs && s.armies.trail[k]!.length > 0;
+      const realm = nations[s.armies.owner[k]!]!;
+      const name = cmdOf(cmd).name;
+      // The commander in their realm's colours, kit of the era and age (feedback 56), at one size at every zoom (feedback 57).
       const box = drawToken(ctx, {
-        x: sx, y: sy, u, color: nations[s.armies.owner[k]!]!.color, men: s.armies.men[k]!,
+        x: sx, y: sy, u: 2, color: realm.color, men: s.armies.men[k]!,
         dir: armyFacing(k), moving, selected: selected.has(id), t: now,
+        commander: { name, nation: realm.id, color: realm.color, look: lookOfCulture(rules.names?.nations[realm.id]), era: eraOfYear(s.date.year), age: apparentAge(name, s.date.year) },
       });
       armyHitBoxes.push({ id, ...box });
       animating ||= moving;
       if (selected.has(id) || zoom >= 8) {
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        pixelText(ctx, cmdOf(cmd).name, sx, box.y + box.h + 2, 10);
+        // The realm's flag before the name, so you can tell whose commander it is.
+        const flag = flagCanvas(realm, 1);
+        const label = labelBitmap(name, 10, false);
+        const left = sx - (flag.width + 2 + label.w) / 2;
+        ctx.drawImage(flag, Math.round(left), Math.round(box.y + box.h + 2));
+        pixelText(ctx, name, left + flag.width + 2 + label.w / 2, box.y + box.h + 2, 10);
       }
     }
   }
@@ -883,7 +894,7 @@ function armySlot(id: number): number {
 }
 
 // ---- HUD and panels ----
-const pennant = (color: string, scale = 2) => `<img class="px-icon" src="${flagUrl(color, scale)}" alt="">`;
+const pennant = (nation: FlagOf, scale = 2) => `<img class="px-icon flag" src="${flagUrl(nation, scale)}" alt="">`;
 
 function renderHud(): void {
   if (!snapshot) {
@@ -897,7 +908,7 @@ function renderHud(): void {
   const n = nations[me]!;
   const inc = s.nationMonthlyIncome[me]!;
   hud.innerHTML = `
-    <button class="realm" data-realm="${me}" title="Your realm">${pennant(n.color, 2)}<b>${esc(n.name)}</b></button>
+    <button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>
     <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${s.battles.some((b) => b.player) ? ` <small>${String(s.hour).padStart(2, "0")}:00</small>` : ""}</span>
     <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
     <span class="plaque" title="Troops against your troop cap (men under arms and gathering)">${icon("swords", 1)}${fmt(s.nationCapUsed[me]! / 1000)}k<small>/${fmt(s.nationTroopCap[me]! / 1000)}k</small></span>
@@ -920,7 +931,7 @@ const monthText = (iso: string) => {
   const [y, m] = iso.split("-").map(Number);
   return `${m ? MONTHS[m - 1] + " " : ""}${y}`;
 };
-const realmButton = (n: number, tab?: "diplomacy") => `<button class="realm-link" data-realm="${n}"${tab ? ` data-realm-open="${tab}"` : ""}>${pennant(nations[n]!.color)}<b>${esc(nations[n]!.name)}</b></button>`;
+const realmButton = (n: number, tab?: "diplomacy") => `<button class="realm-link" data-realm="${n}"${tab ? ` data-realm-open="${tab}"` : ""}>${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b></button>`;
 
 /** Sends an order that acts at once (war, peace, levies), then shows what came of it. */
 async function act(order: Order): Promise<void> {
@@ -950,6 +961,7 @@ function takeSnapshot(next: Snapshot, ms: number): void {
   const at = new Map<number, [number, number]>();
   if (snapshot) for (let k = 0; k < snapshot.armies.id.length; k++) at.set(snapshot.armies.id[k]!, armyPosition(k));
   snapshot = next;
+  setPortraitYear(next.date.year);
   drawnAt = at;
   stepStart = performance.now();
   stepMs = ms;
@@ -1064,7 +1076,7 @@ function renderPanel(): void {
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
-          return `<button class="paper nation" data-nation="${n.id}">${pennant(n.color)}${esc(n.name)}</button>`;
+          return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}${esc(n.name)}</button>`;
         })
         .join("")}</div>
       <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
@@ -1110,7 +1122,7 @@ function renderPanel(): void {
     <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
     ${siege ? siegeView(rules, siege) : ""}
-    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner.color, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.river ? " · river" : ""}${p.coastal ? " · coast" : ""}</p>
+    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.river ? " · river" : ""}${p.coastal ? " · coast" : ""}</p>
     <dl class="facts">
       <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
@@ -1906,7 +1918,7 @@ function renderRealm(r: number): void {
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
-      <img class="banner" src="${flagUrl(n.color, 6)}" alt="">
+      <img class="banner" src="${flagUrl(n, 6)}" alt="">
       <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
@@ -1925,7 +1937,7 @@ function renderRealm(r: number): void {
         .join("")}` : "";
     })()}
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
-      .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!.color)}${esc(nations[j]!.name)}</button>`)
+      .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!)}${esc(nations[j]!.name)}</button>`)
       .join("")}</div>` : ""}
     ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}`;
   const content =
