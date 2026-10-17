@@ -1,3 +1,4 @@
+import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { HARVESTS, storeMonths } from "./food.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
@@ -103,6 +104,11 @@ export interface Snapshot {
   provinceHarvest: Int8Array;
   provinceStarved: Float32Array;
   harvests: readonly string[];
+  /** Each province's grievances (bits of grievanceNames) and mood (index into moods). */
+  provinceGrievances: Uint16Array;
+  provinceMood: Int8Array;
+  grievanceNames: readonly string[];
+  moods: readonly string[];
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -241,6 +247,10 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceHarvest: w.provinceHarvest.slice(),
       provinceStarved: w.provinceStarved.slice(),
       harvests: HARVESTS,
+      provinceGrievances: w.provinceGrievances.slice(),
+      provinceMood: Int8Array.from({ length: w.provinceCount }, (_, p) => moodIndex(w, p)),
+      grievanceNames: GRIEVANCES,
+      moods: MOODS,
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
@@ -298,6 +308,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceFoodMonths,
       snap.provinceHarvest,
       snap.provinceStarved,
+      snap.provinceGrievances,
+      snap.provinceMood,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
       ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);

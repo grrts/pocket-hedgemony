@@ -75,7 +75,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
     packChunk("provinces", V.provinces, {
       meta: {},
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, classes: world.provinceClasses, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, classes: world.provinceClasses, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear },
     }),
     packChunk("nations", V.nations, {
       meta: { musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome },
@@ -212,6 +212,9 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         classesFrom[t.index] = old;
         if (prov.food) world.provinceStore[t.index] = prov.food[old]! * t.share;
         if (prov.harvest) world.provinceHarvest[t.index] = prov.harvest[old]!;
+        if (prov.grievances) world.provinceGrievances[t.index] = prov.grievances[old]!;
+        if (prov.armyMonths) world.provinceArmyMonths[t.index] = prov.armyMonths[old]!;
+        if (prov.battleYear) world.provinceBattleYear[t.index] = prov.battleYear[old]!;
         if (prov.starved) world.provinceStarved[t.index] = prov.starved[old]! * t.share;
       }
     }

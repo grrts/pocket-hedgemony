@@ -7,6 +7,7 @@ import type { Diplomacy } from "./domain/diplomacy/index.ts";
 import { createWarState, maxGarrison, type Battle, type PeaceOffer, type SiegeState } from "./war.ts";
 import { newCommander, type Commander } from "./domain/warfare/index.ts";
 import { createFoodState, seedStores, type FoodState } from "./food.ts";
+import { createMoodState, type MoodState } from "./moods.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
 import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 
@@ -16,7 +17,7 @@ import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIN
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, FoodState {
+export interface World extends LivingState, FoodState, MoodState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -372,6 +373,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createRecruitState(P, N),
     ...createLivingState(P),
     ...createFoodState(P),
+    ...createMoodState(P),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
