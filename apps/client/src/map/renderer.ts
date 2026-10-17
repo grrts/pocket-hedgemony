@@ -209,6 +209,16 @@ float wash() { return uMode == 2 ? 0.78 : mix(0.62, 0.3, smoothstep(1.0, ${DETAI
 vec3 realmWash(vec3 terrain, vec3 realm) {
   return mix(terrain, realm * (0.45 + 0.85 * lum(terrain)), wash());
 }
+// Sea ice 0..1 for a sea zone, whose temperature runs a month behind the
+// land's: open water above -8 C, frozen over by -14 C, patchy between.
+float iceAt(int id, float grain) {
+  if (id < 0) return 0.0;
+  float cover = smoothstep(-8.0, -14.0, seasonAt(id).r * 127.5 - 60.0);
+  return clamp((cover - grain * 0.8) / 0.2, 0.0, 1.0) * step(0.02, cover);
+}
+vec3 iceColor(float h) { return h > 0.9 ? vec3(0.72, 0.82, 0.92) : vec3(0.88, 0.94, 0.99); }
+// Rivers freeze a few degrees below zero, the small ones first.
+bool riverFrozen(int id, int t, float grain) { return smoothstep(-3.0, -8.0, tempAt(id, t)) > grain * 0.9 + 0.05; }
 // Snow lies over the realm's colour too, so winter reads from far out.
 vec3 snowOver(vec3 c, int id, int t, float grain) { return mix(c, vec3(0.94, 0.96, 1.0), 0.32 * snowAt(id, t, grain)); }
 
@@ -268,6 +278,7 @@ vec3 tiled(bool mini) {
     } else if (id >= 0 && ((iR >= 0 && iR != id) || (iD >= 0 && iD != id)) && ((a.x + a.y) / 2 & 1) == 0) {
       c = mix(c, uFoam, 0.3); // dashed line between sea zones
     }
+    c = mix(c, iceColor(hash(a + 3)), iceAt(id, hash(a)));
     return id >= 0 ? highlight(c, id, 0.15) : c;
   }
 
@@ -302,7 +313,7 @@ vec3 tiled(bool mini) {
     float w = (rv.y > 1.5 ? 0.26 : 0.17) * (mini ? 1.3 : 1.0);
     if (rv.x < w) {
       float ripple = step(0.82, hash(a + ivec2(int(uTime * 2.0), 0)));
-      c = mix(mix(uDepth[0], SHALLOW_BASE, 0.5), uFoam, 0.25 * ripple);
+      c = riverFrozen(id, terrain, hash(a)) ? iceColor(hash(a + 3)) : mix(mix(uDepth[0], SHALLOW_BASE, 0.5), uFoam, 0.25 * ripple);
     } else if (rv.x < w + 1.0 / art) {
       c = mix(c, uInk, 0.45);
     }
@@ -356,6 +367,7 @@ vec3 far() {
       int d = idAt(p + ivec2(0, 1));
       if (((r >= 0 && r != id) || (d >= 0 && d != id)) && ((p.x + p.y) & 1) == 0) c = mix(c, uFoam, 0.15);
     }
+    c = mix(c, iceColor(hash(p + 3)), iceAt(id, bayer(p)));
     return id >= 0 ? highlight(c, id, 0.2) : c;
   }
 
@@ -384,7 +396,7 @@ vec3 far() {
   if (political) c = snowOver(realmWash(c, inf.rgb), id, t, bayer(p));
   // Great rivers always, the rest once zoomed in a little.
   int rs = riverAt(p);
-  if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, uDepth[0], 0.8);
+  if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, riverFrozen(id, t, bayer(p)) ? iceColor(0.0) : uDepth[0], 0.8);
 
   // Borders: nation borders always, with an inner band of the realm's
   // colour once pixels are big enough; province borders once zoomed in.
