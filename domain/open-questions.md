@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-544 decided and 8 still open across 29 contexts.
+545 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -440,6 +440,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-RSCH-17**: (was OQ-RSCH-17) Examination system: without G4 only a new graduate may be made an official, of his school's types; with G4 a working scholar may be made an official of any type at any time. That is the one thing G4 adds to the general rule.
 - **D-RSCH-18**: (17 Oct, milestone 4) Starting schools and scholars: the designs give none, so every realm starts with one school in its capital (a madrasa with L2, else a temple or monastery school, founded by the clergy where it knows neither L1 nor L2), half its seats filled with cohorts of the last five years, and 5 scholars (2 without L1 or L2). Research then moves from 1444 for every realm and graduations come every January, while no realm begins ahead of what it knows.
 - **D-RSCH-19**: (17 Oct, milestone 4, first slice) Founding schools and switching studies: a school is founded from the Learning tab in a town (25,000 people, the map's town size, or the capital) for buildings' temple-school step (60 gold, 12 months, taken as treasury gold), a madrasa where the realm knows L2 since buildings gives that step no cost; choosing another study drops the progress on the old one. One study at a time; the academy's second study, stealing, sacking, poaching, foreign scholars and contact events wait for later slices. The simplest rules that let the player act now; the buildings context will take schools into its build list.
+- **D-RSCH-20**: (17 Oct, Leroy's feedback 88) The Learning tab shows the tree: the first tab listed the inventions open to study by era, which hid the tree and read as if any invention could be picked, among too many controls. Now the tab is an overview plus two parts, Tree (drawn bough by bough; Study only on an invention whose needs are known, a locked one saying what to learn first) and Schools (seats, students to arms, schools, founding). The rules of what may be studied are unchanged (RSCH-031, RSCH-033).
 
 ### Revolutions (revolutions)
 
