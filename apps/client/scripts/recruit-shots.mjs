@@ -25,8 +25,11 @@ await page.evaluate(() => window.__phSelect("p1594"));
 await page.click("[data-tab=garrison]");
 await page.waitForTimeout(200);
 await shot("1-garrison");
-await page.click("[data-recruit='3']");
-await page.waitForTimeout(300);
+for (let i = 0; i < 3; i++) {
+  await page.click("[data-recruit]");
+  await page.waitForTimeout(300);
+}
+await shot("1b-queue");
 await page.click(".panel .close").catch(() => {});
 await endTurn();
 await endTurn();

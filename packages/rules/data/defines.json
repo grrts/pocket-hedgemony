@@ -84,6 +84,7 @@
     "$comment": "Milestone 2, armies that cost something. Pay, training costs, the levy and the troop cap come from domain/recruiting.json and domain/warfare.json; these fit them to this game's economy and weekly turn. goldScale turns the domain's gold into the treasury's gold (one domain gold is 0.004 here).",
     "goldScale": 0.004,
     "gatherWeeks": 2,
+    "queueMax": 10,
     "armsAtStart": ["levy foot", "armoured foot", "pikes", "archers", "light horse", "knights and lancers"],
     "hiredCompanyMen": 1000,
     "hiredArms": ["pikes", "armoured foot", "light horse"],

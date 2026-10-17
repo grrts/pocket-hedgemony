@@ -1148,22 +1148,29 @@ function renderGarrison(pi: number): void {
   const official = s.provinceOfficial[pi];
   const capLeft = Math.max(0, s.nationTroopCap[me]! - s.nationCapUsed[me]!);
   const queued = gather ? Math.ceil(gather.men / 1000) : 0;
-  const options = [1, 3, 5].filter((k) => k * 1000 <= left);
+  const max = rules.defines.recruit.queueMax;
+  const gw = rules.defines.recruit.gatherWeeks;
+  const why =
+    queued >= max ? `The queue is full: at most ${max} thousands wait here`
+    : left < 1000 ? "Fewer than a thousand men left to call: the pool refills a quarter of the way each year"
+    : capLeft < 1000 ? "Over your troop cap"
+    : levyMoney > s.nationTreasury[me]! ? "Not enough gold"
+    : "";
+  // Each queued thousand, oldest first: the first is gathering, the rest wait their turn.
+  const rows = Array.from({ length: queued }, (_, i) => {
+    const men = i === queued - 1 ? gather!.men - (queued - 1) * 1000 : 1000;
+    const ready = gather!.weeksLeft + i * gw;
+    return `<li class="${i === 0 ? "now" : ""}">${icon("hourglass", 1)}<span class="what"><b>${fmt(men)} men</b> <small>${i === 0 ? "gathering" : "waiting"}</small></span><span class="when">${ready <= 1 ? "next week" : `in ${weeks(ready)}`}</span>${i === queued - 1 ? `<button class="paper small" data-cancel-recruit title="Cancel: the levy money comes back">×</button>` : ""}</li>`;
+  }).join("");
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
     ${provinceTabs()}
     <h3 class="sub">Recruit</h3>
-    <p>${fmt(left)} of ${fmt(ceiling)} men here can be called. Each thousand takes ${weeks(rules.defines.recruit.gatherWeeks)} to gather, one after another.</p>
-    <div class="choices">${options.length
-      ? options
-          .map((k) => {
-            const done = (queued + k) * rules.defines.recruit.gatherWeeks - (gather ? rules.defines.recruit.gatherWeeks - gather.weeksLeft : 0);
-            const tooMany = k * 1000 > capLeft;
-            return `<button class="paper" data-recruit="${k}" ${k * levyMoney > s.nationTreasury[me]! || tooMany ? "disabled" : ""} title="${tooMany ? "Over your troop cap" : `All gathered in ${weeks(done)}`}">${fmt(k * 1000)} men · ${(k * levyMoney).toFixed(2)} gold</button>`;
-          })
-          .join("")
-      : `<span class="hint">Fewer than a thousand men left to call: the pool refills a quarter of the way each year.</span>`}</div>
-    ${gather ? `<p class="hint">${icon("hourglass", 1)} ${fmt(gather.men)} men gathering: the next thousand in ${weeks(gather.weeksLeft)}, all in ${weeks(gather.weeksAll)}.</p>` : ""}
+    <p>${fmt(left)} of ${fmt(ceiling)} men here can be called. Each thousand takes ${weeks(gw)} to gather, one after another.</p>
+    <div class="choices"><button class="paper" data-recruit="1" ${why ? "disabled" : ""} title="${why || `Gathered in ${weeks(queued ? gather!.weeksAll + gw : gw)}`}">Recruit ${fmt(1000)} men · ${levyMoney.toFixed(2)} gold</button></div>
+    ${why ? `<p class="hint">${why}.</p>` : ""}
+    <div class="queue-head"><span>Queue</span><span>${queued} / ${max}</span></div>
+    ${queued ? `<ol class="queue">${rows}</ol>` : `<p class="hint">Nobody is gathering here.</p>`}
     <h3 class="sub">Troops without a commander</h3>
     ${troops.length
       ? troops
@@ -1194,6 +1201,7 @@ function renderGarrison(pi: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-recruit]").forEach((b) =>
     b.addEventListener("click", () => void actHere({ type: "recruit", province: pi, thousands: Number(b.dataset.recruit) })),
   );
+  panel.querySelector<HTMLButtonElement>("[data-cancel-recruit]")?.addEventListener("click", () => void actHere({ type: "cancelRecruit", province: pi }));
   panel.querySelectorAll<HTMLButtonElement>("[data-pickup]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "pickUp", army: Number(b.dataset.pickup) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-lead]").forEach((b) =>
     b.addEventListener("click", () => void actHere({ type: "appoint", army: Number(b.dataset.lead), commander: Number(b.dataset.by) })),
@@ -1413,6 +1421,10 @@ function warRoomSection(): string {
   return `<h3 class="sub">Troops</h3>
     <p>${fmt(s.nationCapUsed[me]!)} men under arms or gathering, of a troop cap of ${fmt(s.nationTroopCap[me]!)}. Pay: ${s.pay.toFixed(1)} gold a month.</p>
     <p class="hint">Call men up from a province's Garrison tab, a thousand at a time.${gathering ? ` ${fmt(gathering)} men are gathering now.` : ""} Over the cap, pay doubles and levies desert.</p>
+    ${s.musters.length ? `<div class="queue-head"><span>Recruiting</span><span>${fmt(gathering)} men</span></div>
+    <ol class="queue">${s.musters
+      .map((m) => `<li><button class="paper small" data-garrison="${m.province}">${esc(provinces[m.province]!.name)}</button><span class="what"><small>${Math.ceil(m.men / 1000)} / ${rules.defines.recruit.queueMax} queued</small></span><span class="when">all in ${weeks(m.weeksAll)}</span></li>`)
+      .join("")}</ol>` : ""}
     <h3 class="sub">Commanders</h3>
     ${mine
       .map(({ c, i }) => {
@@ -1498,6 +1510,17 @@ function renderRealm(r: number): void {
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-hire]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "hire", arm: b.dataset.hire! })));
   panel.querySelectorAll<HTMLButtonElement>("[data-release]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "release", commander: Number(b.dataset.release) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-garrison]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const i = Number(b.dataset.garrison);
+      realmView = -1;
+      selectedProvince = i;
+      provinceTab = "garrison";
+      view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
+      restyleProvinces();
+      renderPanel();
+    }),
+  );
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       realmTab = b.dataset.realmTab as typeof realmTab;

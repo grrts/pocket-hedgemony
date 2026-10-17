@@ -13,6 +13,7 @@ import {
   nationPay,
   pickUp,
   recount,
+  cancelRecruit,
   recruit,
   releaseCommander,
   splitTroops,
@@ -53,6 +54,8 @@ export type Order =
   | { type: "answerPeace"; offer: number; yes: boolean }
   /** Call up thousands of men from one province's people; each thousand gathers in two weeks. */
   | { type: "recruit"; province: number; thousands: number }
+  /** Take the last thousand off a province's recruit queue, with its levy money back. */
+  | { type: "cancelRecruit"; province: number }
   /** The army's commander takes in the garrison troops where it stands. */
   | { type: "pickUp"; army: number }
   /** Commission a province's official as a commander; release one back to his post. */
@@ -175,6 +178,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "recruit":
       return recruit(world, actingNation, order.province, order.thousands, news);
+    case "cancelRecruit":
+      return cancelRecruit(world, actingNation, order.province);
     case "pickUp":
       return pickUp(world, actingNation, order.army);
     case "commission":
