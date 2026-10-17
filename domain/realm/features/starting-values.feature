@@ -41,7 +41,7 @@ Feature: Starting values rules
     Then each country's allies, rivals, subjects and enemies come from it
     And the lords of major countries come from the catalogue's history text
 
-  @REALM-190 @REALM-191 @placeholder
+  @REALM-196 @REALM-197 @placeholder
   Scenario: Starting men spread over the realm, with commanders for its strength
     # config: starting_armies
     Given the game starts with the country "France"

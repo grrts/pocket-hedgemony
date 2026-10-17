@@ -399,7 +399,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where
-  // the data has no figure), within its cap, spread over its land (REALM-190, REALM-191).
+  // the data has no figure), within its cap, spread over its land (REALM-196, REALM-197).
   rules.nations.forEach((n, i) => {
     const cap = world.nationTroopCap[i]!;
     const total = Math.max(1000, Math.min(Math.floor(cap / 1000) * 1000, n.army ?? Math.round(cap / 4000) * 1000));
@@ -422,14 +422,14 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
 /** The most men one army starts with. */
 const START_ARMY_MAX = 30000;
 
-/** Commanders a realm starts with for its men under arms: one per `starting_armies.men_per_commander`, at least one (REALM-191). */
+/** Commanders a realm starts with for its men under arms: one per `starting_armies.men_per_commander`, at least one (REALM-197). */
 export function startingCommanderCount(men: number): number {
   const c = realmConfig.starting_armies;
   return Math.max(1, Math.min(c.most_commanders, Math.round(men / c.men_per_commander)));
 }
 
 /**
- * Where a realm's starting men stand (REALM-190, REALM-191): a field share in
+ * Where a realm's starting men stand (REALM-196, REALM-197): a field share in
  * one army per commander, the first in the capital and the others spread
  * evenly over its land from the capital outward; the rest as garrison troops
  * of `garrison_men` each in the provinces between them (small enough that an

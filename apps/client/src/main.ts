@@ -19,11 +19,15 @@ import type { GameDate } from "@ph/rules";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite, spriteUrl } from "./art/sprites.ts";
-import { icon, installUiArt, flagUrl } from "./art/ui.ts";
+import { icon, installUiArt, flagCanvas, flagUrl, type FlagOf } from "./art/ui.ts";
+import { apparentAge, eraOfYear } from "./art/commanders.ts";
+import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
+import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
+import { provinceThumb } from "./map/provinceThumb.ts";
 import { drawBattle, drawRoute, drawSiegeMark, drawToken, pruneBattles, weekEnds } from "./map/marchArt.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { seasonBytes } from "./map/renderer.ts";
@@ -120,10 +124,18 @@ let armyView = -1;
 let realmTab: "general" | "treasury" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" = "general";
 /** Province whose official's screen is open, or -1. */
 let officialView = -1;
+/** Lord whose screen is open (index into the snapshot's lords), or -1 (feedback 67). */
+let lordView = -1;
+/** Lord whose lands are lit up on the map, or -1. */
+let litLord = -1;
+/** The province overview's list of lords to grant it to is open. */
+let grantOpen = false;
+/** The lord's screen lists every royal province to grant, not just the nearest. */
+let grantAll = false;
 /** Which tab of the province overview is open. */
 let provinceTab: "overview" | "people" | "garrison" = "overview";
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords";
 let lens: Lens = "realms";
 /** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
 let fogOn = true;
@@ -183,6 +195,7 @@ document.addEventListener("click", (e) => {
   if (!b) return;
   realmView = Number(b.dataset.realm);
   officialView = -1;
+  lordView = -1;
   realmTab = (b.dataset.realmOpen as typeof realmTab | undefined) ?? "general";
   newsView = false;
   panelCollapsed = false;
@@ -201,6 +214,7 @@ document.addEventListener("click", (e) => {
   if (!b) return;
   officialView = Number(b.dataset.official);
   realmView = -1;
+  lordView = -1;
   newsView = false;
   panelCollapsed = false;
   renderPanel();
@@ -225,6 +239,9 @@ document.addEventListener("click", (e) => {
   if (!b) return;
   const i = Number(b.dataset.showProvince);
   officialView = -1;
+  lordView = -1;
+  grantOpen = false;
+  panel.scrollTop = 0;
   realmView = -1;
   newsView = false;
   selectedProvince = i;
@@ -284,7 +301,23 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "wealth", name: "Wealth", note: "trade, crafts and land" },
   { id: "walls", name: "Walls", note: "castles and forts" },
   { id: "food", name: "Food", note: "men the land can feed" },
+  { id: "lords", name: "Lords", note: "who holds your land" },
 ];
+const ROYAL_RGB = hexToRgb("#e9c35a");
+/** A colour per lord for the Lords lens: hues spread by the golden angle, kept clear of the crown's gold. */
+function lordRgb(k: number): number[] {
+  const h = (80 + ((k * 137.508) % 260)) / 360;
+  const l = k % 2 ? 0.42 : 0.55;
+  const sat = 0.5;
+  const q = l < 0.5 ? l * (1 + sat) : l + sat - l * sat;
+  const p = 2 * l - q;
+  const ch = (t: number) => {
+    t = (t + 1) % 1;
+    const v = t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p;
+    return Math.round(v * 255);
+  };
+  return [ch(h + 1 / 3), ch(h), ch(h - 1 / 3)];
+}
 const RAMP = ["#f3e3b5", "#e8c172", "#d68a3c", "#b14a2e", "#6e1f2c"].map(hexToRgb);
 const WALL_RGB = { none: hexToRgb("#efe2bf"), fort: hexToRgb("#d08a2e"), castle: hexToRgb("#3c4a8e") };
 const FOOD_RAMP = ["#a8323e", "#d08a48", "#e9d79a", "#8cb85a", "#3f7a44"].map(hexToRgb);
@@ -323,6 +356,12 @@ function lensColor(i: number): number[] {
       return WALL_RGB[p.castle ?? "none"];
     case "food":
       return ramp(FOOD_RAMP, Math.log10(Math.max(1, forageLimit(march, marchGraph, i))) / 5);
+    case "lords": {
+      // The player's realm: royal land in gold, each lord's land in his own colour; other realms faded.
+      if (!snapshot || o !== snapshot.playerNation) return o >= 0 ? nationRgb[o]!.map((v) => Math.round(v * 0.35 + 150)) : unownedRgb;
+      const l = snapshot.provinceLord[i]!;
+      return l >= 0 ? lordRgb(l) : ROYAL_RGB;
+    }
     default:
       return o >= 0 ? nationRgb[o]! : unownedRgb;
   }
@@ -382,8 +421,11 @@ function restyleProvinces(): void {
     const occ = occupiers[i]!;
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
     const hatched = occ >= 0 && lens === "realms";
-    const flags = (i === selectedProvince ? 1 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
-    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i]);
+    const lord = snapshot ? snapshot.provinceLord[i]! : -1;
+    const lit = litLord >= 0 && lord === litLord;
+    const flags = (i === selectedProvince ? 1 : 0) | (lit ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
+    // While a lord's lands are lit, the rest of the land fades to grey so they stand out.
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
   const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
@@ -577,16 +619,25 @@ function drawOverlay(o: OverlayContext): void {
       if (!onScreen(sx, sy)) continue;
       const id = s.armies.id[k]!;
       const moving = performance.now() - stepStart < stepMs && s.armies.trail[k]!.length > 0;
+      const realm = nations[s.armies.owner[k]!]!;
+      const name = cmdOf(cmd).name;
+      // The commander in their realm's colours, kit of the era and age (feedback 56), at one size at every zoom (feedback 57).
       const box = drawToken(ctx, {
-        x: sx, y: sy, u, color: nations[s.armies.owner[k]!]!.color, men: s.armies.men[k]!,
+        x: sx, y: sy, u: 2, color: realm.color, men: s.armies.men[k]!,
         dir: armyFacing(k), moving, selected: selected.has(id), t: now,
+        commander: { name, nation: realm.id, color: realm.color, look: lookOfCulture(rules.names?.nations[realm.id]), era: eraOfYear(s.date.year), age: apparentAge(name, s.date.year) },
       });
       armyHitBoxes.push({ id, ...box });
       animating ||= moving;
       if (selected.has(id) || zoom >= 8) {
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        pixelText(ctx, cmdOf(cmd).name, sx, box.y + box.h + 2, 10);
+        // The realm's flag before the name, so you can tell whose commander it is.
+        const flag = flagCanvas(realm, 1);
+        const label = labelBitmap(name, 10, false);
+        const left = sx - (flag.width + 2 + label.w) / 2;
+        ctx.drawImage(flag, Math.round(left), Math.round(box.y + box.h + 2));
+        pixelText(ctx, name, left + flag.width + 2 + label.w / 2, box.y + box.h + 2, 10);
       }
     }
   }
@@ -883,7 +934,7 @@ function armySlot(id: number): number {
 }
 
 // ---- HUD and panels ----
-const pennant = (color: string, scale = 2) => `<img class="px-icon" src="${flagUrl(color, scale)}" alt="">`;
+const pennant = (nation: FlagOf, scale = 2) => `<img class="px-icon flag" src="${flagUrl(nation, scale)}" alt="">`;
 
 function renderHud(): void {
   if (!snapshot) {
@@ -897,7 +948,7 @@ function renderHud(): void {
   const n = nations[me]!;
   const inc = s.nationMonthlyIncome[me]!;
   hud.innerHTML = `
-    <button class="realm" data-realm="${me}" title="Your realm">${pennant(n.color, 2)}<b>${esc(n.name)}</b></button>
+    <button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>
     <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${s.battles.some((b) => b.player) ? ` <small>${String(s.hour).padStart(2, "0")}:00</small>` : ""}</span>
     <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
     <span class="plaque" title="Troops against your troop cap (men under arms and gathering)">${icon("swords", 1)}${fmt(s.nationCapUsed[me]! / 1000)}k<small>/${fmt(s.nationTroopCap[me]! / 1000)}k</small></span>
@@ -920,7 +971,7 @@ const monthText = (iso: string) => {
   const [y, m] = iso.split("-").map(Number);
   return `${m ? MONTHS[m - 1] + " " : ""}${y}`;
 };
-const realmButton = (n: number, tab?: "diplomacy") => `<button class="realm-link" data-realm="${n}"${tab ? ` data-realm-open="${tab}"` : ""}>${pennant(nations[n]!.color)}<b>${esc(nations[n]!.name)}</b></button>`;
+const realmButton = (n: number, tab?: "diplomacy") => `<button class="realm-link" data-realm="${n}"${tab ? ` data-realm-open="${tab}"` : ""}>${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b></button>`;
 
 /** Sends an order that acts at once (war, peace, levies), then shows what came of it. */
 async function act(order: Order): Promise<void> {
@@ -950,6 +1001,7 @@ function takeSnapshot(next: Snapshot, ms: number): void {
   const at = new Map<number, [number, number]>();
   if (snapshot) for (let k = 0; k < snapshot.armies.id.length; k++) at.set(snapshot.armies.id[k]!, armyPosition(k));
   snapshot = next;
+  setPortraitYear(next.date.year);
   drawnAt = at;
   stepStart = performance.now();
   stepMs = ms;
@@ -960,6 +1012,7 @@ function applySnapshot(): void {
   owners = snapshot!.provinceOwner;
   occupiers = snapshot!.provinceOccupier;
   nationLabels = computeNationLabels();
+  renderLitChip();
 }
 
 /** The dispatches: news of the turn, and calls to arms to answer. */
@@ -1053,6 +1106,10 @@ function renderPanel(): void {
     renderOfficial(officialView);
     return;
   }
+  if (lordView >= 0 && snapshot) {
+    renderLord(lordView);
+    return;
+  }
   if (armyView >= 0 && snapshot && armySlot(armyView) >= 0) {
     renderArmy(armyView);
     return;
@@ -1064,7 +1121,7 @@ function renderPanel(): void {
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
-          return `<button class="paper nation" data-nation="${n.id}">${pennant(n.color)}${esc(n.name)}</button>`;
+          return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}${esc(n.name)}</button>`;
         })
         .join("")}</div>
       <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
@@ -1109,21 +1166,20 @@ function renderPanel(): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
+    ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
     ${siege ? siegeView(rules, siege) : ""}
-    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner.color, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.river ? " · river" : ""}${p.coastal ? " · coast" : ""}</p>
+    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.river ? " · river" : ""}${p.coastal ? " · coast" : ""}</p>
     <dl class="facts">
       <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       ${snapshot ? foodFacts(selectedProvince) : ""}
       ${snapshot && own >= 0 ? moodFacts(selectedProvince) : ""}
-      ${snapshot && own >= 0 ? lordFacts(selectedProvince, mineHere) : ""}
       <dt>Seat</dt><dd>${owner && owner.capital === p.id ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)]}</dd>
       <dt>Walls</dt><dd>${owner && owner.capital === p.id ? WALL_NAMES.castle : p.castle ? WALL_NAMES[p.castle] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
       ${mineHere ? taxLine(selectedProvince) : ""}
     </dl>
     ${mineHere ? rateButtons(snapshot!.provinceTax[selectedProvince]!, "province") : ""}
-    ${official !== undefined ? `<h3 class="sub">Official</h3>${officialCard(rules, official, own, mineHere)}` : ""}
     ${armiesHere.length ? `<h3 class="sub">Armies</h3>` : ""}
     ${armiesHere
       .map((k) => {
@@ -1184,7 +1240,8 @@ function animateSiege(st: SiegeInfo): void {
 function renderOfficial(pi: number): void {
   const s = snapshot!;
   const o = officialOf(rules, pi, owners[pi]!, s.provinceOfficial[pi]);
-  if (!o || owners[pi] !== s.playerNation) {
+  // A lord's official serves the lord: his screen (and its commission) is not the crown's (feedback 62).
+  if (!o || owners[pi] !== s.playerNation || s.provinceLord[pi]! >= 0) {
     officialView = -1;
     renderPanel();
     return;
@@ -1221,80 +1278,219 @@ function foodFacts(pi: number): string {
       ${starved > 0 ? `<dt>Starved</dt><dd>${fmt(starved)} this year</dd>` : ""}`;
 }
 
-/** What each loyalty step means for the crown. */
-const LOYALTY_NOTE: Record<string, string> = {
-  Loyal: "gives half his lands' tax and recruits",
-  Wavering: "gives half, but a step from disloyal",
-  Disloyal: "gives nothing",
-  "In revolt": "has risen against you",
-};
+/** The snapshot's lords as the panels show them. */
+const lordViews = (): LordView[] => snapshot!.lords.map((l, k) => ({ ...l, k }));
 
-/** A province's lord line: who holds it, and taking it back or granting it as a fief. */
-function lordFacts(pi: number, mine: boolean): string {
+/** Every lord's lands: provinces, people and the gold that reaches the crown. */
+function lordLands(): Map<number, LordLands> {
   const s = snapshot!;
-  const l = s.provinceLord[pi]!;
-  if (l >= 0) {
-    const lord = s.lords[l]!;
-    return `<dt>Lord</dt><dd><b>${esc(lord.name)}</b> · ${lord.loyalty.toLowerCase()}${mine ? ` <button class="paper small" data-seize="${pi}" title="Take it back as royal land: he loses a step, and every other lord notices">Seize</button>` : ""}</dd>`;
+  const out = new Map<number, LordLands>(s.lords.map((_, k) => [k, { provinces: [], people: 0, crownGold: 0 }]));
+  for (let p = 0; p < owners.length; p++) {
+    const l = s.provinceLord[p]!;
+    if (l < 0) continue;
+    const ll = out.get(l)!;
+    ll.provinces.push(p);
+    ll.people += s.provincePeople[p]!;
+    ll.crownGold += s.provinceTaxGold[p]!;
   }
-  const isCapital = nations[owners[pi]!]?.capital === provinces[pi]!.id;
-  // Lords holding land next to this province, as the likely takers of a fief.
-  const near = new Set<number>();
-  for (const q of neighborIdx[pi]!) if (owners[q] === owners[pi] && s.provinceLord[q]! >= 0) near.add(s.provinceLord[q]!);
-  const grant = mine && !isCapital ? [...near].slice(0, 3).map((k) => `<button class="paper small" data-grant="${pi}" data-lord="${k}" title="Grant it to ${esc(s.lords[k]!.name)} as a fief: his loyalty rises, the crown gets half">Grant to ${esc(s.lords[k]!.house)}</button>`).join(" ") : "";
-  return `<dt>Lord</dt><dd>Royal land${isCapital ? " (capital)" : ""}${grant ? `<br>${grant}` : ""}</dd>`;
+  return out;
 }
 
-/** The realm's lords: loyalty, lands, and a gift to win one back. */
-function lordsTab(r: number): string {
+const MOOD_LABEL = ["Calm", "Grumbling", "Rioting", "Plotting"];
+
+/** A province as a row in the lord's screen: its picture and a short note. */
+function provinceRow(p: number, note: string): ProvinceRow {
+  const o = owners[p]!;
+  return { province: p, name: provinces[p]!.name, thumb: mapImage ? provinceThumb(mapImage, provinces.length, p, o >= 0 ? nations[o]!.color : PALETTE.unowned) : "", note };
+}
+
+/** The governance card at the top of a province's overview: its lord (or royal land) and its official. */
+function governanceSection(pi: number, own: number, mine: boolean, official: ReturnType<typeof officialOf>): string {
   const s = snapshot!;
-  const mine = s.lords.map((l, k) => ({ ...l, k })).filter((l) => l.nation === r && l.lands > 0);
+  const l = s.provinceLord[pi]!;
+  const lord = l >= 0 ? lordViews()[l]! : null;
+  const isCapital = nations[own]!.capital === provinces[pi]!.id;
+  // Lords of the realm who could take it as a fief: those holding land next to it first.
+  const near = new Set<number>();
+  for (const q of neighborIdx[pi]!) if (owners[q] === own && s.provinceLord[q]! >= 0) near.add(s.provinceLord[q]!);
+  const takers = lord || !mine ? [] : lordViews()
+    .filter((t) => t.nation === own && t.lands > 0)
+    .sort((a, b) => Number(near.has(b.k)) - Number(near.has(a.k)) || LOYALTY_ORDER.indexOf(a.loyalty) - LOYALTY_ORDER.indexOf(b.loyalty));
+  // A lord's official serves him: no button to the screen that would commission him (feedback 62).
+  const officialHtml = lord && official
+    ? officialCard(rules, official, own, false).replace("</small>", ". He serves the lord.</small>")
+    : officialCard(rules, official, own, mine);
+  return governanceCard(rules, { lord, mine, isCapital, province: pi, official: officialHtml, grantOpen, takers });
+}
+
+/** A lord's screen (feedback 67): who he is, his lands and lighting them on the map, gifts, seizing and granting. */
+function renderLord(k: number): void {
+  const s = snapshot!;
+  const l = lordViews()[k];
+  if (!l) {
+    lordView = -1;
+    renderPanel();
+    return;
+  }
+  const lands = lordLands().get(k)!;
+  const mine = l.nation === s.playerNation;
+  // Royal provinces to grant, nearest to his lands first (steps over the realm's own land).
+  const dist = new Map<number, number>(lands.provinces.map((p) => [p, 0]));
+  const queue = [...lands.provinces];
+  for (let i = 0; i < queue.length; i++) {
+    const p = queue[i]!;
+    for (const q of neighborIdx[p]!) if (owners[q] === l.nation && !dist.has(q)) (dist.set(q, dist.get(p)! + 1), queue.push(q));
+  }
+  const royal: number[] = [];
+  for (let p = 0; p < owners.length; p++) if (owners[p] === l.nation && s.provinceLord[p]! < 0 && nations[l.nation]!.capital !== provinces[p]!.id) royal.push(p);
+  royal.sort((a, b) => (dist.get(a) ?? 999) - (dist.get(b) ?? 999) || a - b);
+  const grants = (grantAll ? royal : royal.slice(0, 6)).map((p) => provinceRow(p, `${dist.get(p) === 1 ? "next to his lands" : dist.has(p) ? `${dist.get(p)} provinces away` : "across the sea"} · ${gold2(s.provinceTaxGold[p]!)} gold a month`));
+  const holdings = lands.provinces.map((p) => provinceRow(p, `${MOOD_LABEL[s.provinceMood[p]!]} · ${fmt(Math.round(s.provincePeople[p]! * 1000))} people`));
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(l.name)}</h2>${closeButton()}</header>
+    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6 })}`;
+  bindClose();
+  showPanel(true);
+  bindLords();
+  panel.querySelector("[data-grant-all]")?.addEventListener("click", () => {
+    grantAll = true;
+    renderPanel();
+  });
+  panel.querySelector("[data-back-lords]")?.addEventListener("click", () => {
+    lordView = -1;
+    realmView = l.nation;
+    realmTab = "lords";
+    renderPanel();
+  });
+}
+
+/** Lights a lord's lands on the map and frames them, or puts them out again. */
+function lightLord(k: number): void {
+  litLord = litLord === k ? -1 : k;
+  if (litLord >= 0) {
+    const lands = lordLands().get(k)!.provinces;
+    if (lands.length) {
+      const xs = lands.map((p) => provinces[p]!.x!);
+      const ys = lands.map((p) => provinces[p]!.y!);
+      const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+      // Close enough to see the provinces, far enough to take in all of them.
+      const fit = Math.min(app.clientWidth / Math.max(40, (x1 - x0) * 1.6), app.clientHeight / Math.max(40, (y1 - y0) * 1.6));
+      const zoom = Math.max(2.5, Math.min(8, fit));
+      // A side panel covers the map's left: centre his lands in the part that shows.
+      const wide = matchMedia("(min-width: 900px) and (min-height: 600px)").matches;
+      view.lookAt((x0 + x1) / 2 - (wide ? panel.offsetWidth / 2 / zoom : 0), (y0 + y1) / 2, zoom);
+    }
+    // On a phone the panel covers the map: fold it away; the chip over the map opens the lord again.
+    if (!matchMedia("(min-width: 900px) and (min-height: 600px)").matches) panelCollapsed = true;
+  }
+  restyleProvinces();
+  renderLitChip();
+  renderPanel();
+}
+
+/** The chip over the map while a lord's lands are lit: whose they are, and a button to stop. */
+const litChip = document.createElement("div");
+litChip.className = "lit-chip plaque";
+litChip.hidden = true;
+app.append(litChip);
+function renderLitChip(): void {
+  const l = litLord >= 0 && snapshot ? snapshot.lords[litLord] : null;
+  litChip.hidden = !l;
+  if (!l) return;
+  litChip.innerHTML = `<button class="lit-open" data-lord-open="${litLord}">Lands of <b>${esc(l.name)}</b></button><button class="paper small" data-lord-light="${litLord}" aria-label="Stop showing his lands">✕</button>`;
+}
+litChip.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-lord-light], [data-lord-open]");
+  if (!b) return;
+  if (b.dataset.lordLight !== undefined) lightLord(Number(b.dataset.lordLight));
+  else openLord(Number(b.dataset.lordOpen));
+});
+
+function openLord(k: number): void {
+  panel.scrollTop = 0;
+  lordView = k;
+  grantAll = false;
+  realmView = -1;
+  officialView = -1;
+  newsView = false;
+  panelCollapsed = false;
+  renderPanel();
+}
+
+/** The Lords tab of realm r: its lords with what their lands give, and how much is royal land. */
+function realmLords(r: number): string {
+  const s = snapshot!;
   let royal = 0;
   let all = 0;
   for (let p = 0; p < owners.length; p++) if (owners[p] === r) (all++, s.provinceLord[p]! < 0 && royal++);
-  const order = ["In revolt", "Disloyal", "Wavering", "Loyal"];
-  mine.sort((a, b) => order.indexOf(a.loyalty) - order.indexOf(b.loyalty) || b.lands - a.lands);
-  const gold = s.nationTreasury[r]!;
-  const rows = mine
-    .map((l) => `<tr><td><b>${esc(l.name)}</b><br><small>${esc(l.house)} · ${l.lands} province${l.lands === 1 ? "" : "s"}</small></td><td><b>${esc(l.loyalty)}</b><br><small>${esc(LOYALTY_NOTE[l.loyalty] ?? "")}</small></td>${l.loyalty !== "Loyal" ? `<td class="army-buttons"><button class="paper small" data-gift="${l.k}" ${gold < s.giftGold ? "disabled" : ""} title="A gift of gold raises his loyalty a step">Gift · ${s.giftGold} gold</button></td>` : "<td></td>"}</tr>`)
-    .join("");
-  return `<p>${royal} of ${all} provinces are royal land and give you all their tax. ${mine.length} lord${mine.length === 1 ? " holds" : "s hold"} the rest and give half while loyal.</p>
-    ${mine.length ? `<table class="troops lords"><tbody>${rows}</tbody></table>` : `<p class="hint">No lords: every province is royal land.</p>`}
-    <p class="hint">Gifts, fiefs and quiet years raise loyalty; lost wars and seized land lower it. Open a province to seize it or grant it as a fief.</p>`;
+  return lordsTab(rules, lordViews().filter((l) => l.nation === r && l.lands > 0), lordLands(), royal, all);
 }
 
 /** Sort orders of the Provinces overview. */
-let provinceSort: "trouble" | "people" | "food" = "trouble";
+let provinceSort: "trouble" | "people" | "food" | "tax" = "trouble";
 
 /**
- * The realm's provinces at a glance (milestone 3 overview): people, food,
- * mood and lord of each, the troubled ones first, with counts of the hungry
- * and the restless on top. Tapping a row opens the province.
+ * The realm's provinces at a glance (milestone 3 overview, richer for
+ * feedback 63): each row a picture of the province, its mood, who governs it,
+ * people, food and tax, troubled ones first, with counts of the hungry and
+ * the restless on top. Tapping a row opens the province; the map button
+ * shows it on the map with the panel folded away.
  */
 function provincesTab(r: number): string {
   const s = snapshot!;
   const list: number[] = [];
   for (let p = 0; p < owners.length; p++) if (owners[p] === r) list.push(p);
   const trouble = (p: number) => s.provinceMood[p]! * 10 + (s.provinceFoodMonths[p]! < 1 ? 15 : s.provinceFoodMonths[p]! < 3 ? 5 : 0) + (s.provinceGrievances[p]! ? 1 : 0);
-  const by = { trouble: (a: number, b: number) => trouble(b) - trouble(a), people: (a: number, b: number) => s.provincePeople[b]! - s.provincePeople[a]!, food: (a: number, b: number) => s.provinceFoodMonths[a]! - s.provinceFoodMonths[b]! }[provinceSort];
+  const by = {
+    trouble: (a: number, b: number) => trouble(b) - trouble(a),
+    people: (a: number, b: number) => s.provincePeople[b]! - s.provincePeople[a]!,
+    food: (a: number, b: number) => s.provinceFoodMonths[a]! - s.provinceFoodMonths[b]!,
+    tax: (a: number, b: number) => s.provinceTaxGold[b]! - s.provinceTaxGold[a]!,
+  }[provinceSort];
   list.sort((a, b) => by(a, b) || a - b);
   const people = list.reduce((t, p) => t + s.provincePeople[p]!, 0);
+  const tax = list.reduce((t, p) => t + s.provinceTaxGold[p]!, 0);
   const hungry = list.filter((p) => s.provinceFoodMonths[p]! < 1).length;
   const low = list.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length;
   const restless = list.filter((p) => s.provinceMood[p]! >= 2).length;
   const grumbling = list.filter((p) => s.provinceMood[p]! === 1).length;
-  const MOOD_LABEL = ["Calm", "Grumbling", "Rioting", "Plotting"];
+  const color = nations[r]!.color;
   const rows = list
     .map((p) => {
       const months = s.provinceFoodMonths[p]!;
       const l = s.provinceLord[p]!;
-      return `<tr class="go${s.provinceMood[p]! >= 2 || months < 1 ? " bad" : ""}" data-open-province="${p}"><td><b>${esc(provinces[p]!.name)}</b><br><small>${MOOD_LABEL[s.provinceMood[p]!]} · ${l >= 0 ? esc(s.lords[l]!.house) : "royal land"}</small></td><td class="num">${fmt(Math.round(s.provincePeople[p]! * 1000))}</td><td class="num">${months.toFixed(1)} mo</td></tr>`;
+      const post = s.provinceOfficial[p];
+      const bad = s.provinceMood[p]! >= 2 || months < 1;
+      const gov = l >= 0 ? `Lord ${esc(s.lords[l]!.house)}` : post ? `Royal · ${esc(post.toLowerCase())}` : "Royal · <b>no official</b>";
+      return `<div class="province-row${bad ? " bad" : ""}">
+        <button class="place" data-open-province="${p}" title="Open ${esc(provinces[p]!.name)}">
+          <img class="thumb" src="${mapImage ? provinceThumb(mapImage, provinces.length, p, color) : ""}" alt="" width="48" height="48">
+          <span class="place-name"><b>${esc(provinces[p]!.name)}</b><small>${MOOD_LABEL[s.provinceMood[p]!]} · ${gov}</small></span>
+          <span class="place-stats"><small>${fmt(Math.round(s.provincePeople[p]! * 1000))} people</small><small>${months.toFixed(1)} months food</small><small>${gold2(s.provinceTaxGold[p]!)} gold</small></span>
+        </button>
+        <button class="paper small map-go" data-map-province="${p}" title="Show ${esc(provinces[p]!.name)} on the map" aria-label="Show on the map">${icon("scroll", 1)}Map</button>
+      </div>`;
     })
     .join("");
   const sortButton = (key: typeof provinceSort, label: string) => `<button class="tab${provinceSort === key ? " on" : ""}" data-province-sort="${key}">${label}</button>`;
-  return `<p><b>${fmt(Math.round(people * 1000))}</b> people in ${list.length} provinces. ${hungry ? `<b>${hungry} hungry</b>, ` : ""}${low ? `${low} low on food, ` : ""}${restless ? `<b>${restless} rioting or plotting</b>, ` : ""}${grumbling ? `${grumbling} grumbling.` : hungry || low || restless ? "the rest content." : "All fed and calm."}</p>
-    <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}</nav>
-    <table class="troops provinces"><thead><tr><th>Province · mood · lord</th><th class="num">People</th><th class="num">Food</th></tr></thead><tbody>${rows}</tbody></table>`;
+  return `<p><b>${fmt(Math.round(people * 1000))}</b> people in ${list.length} provinces paying <b>${gold2(tax)}</b> gold a month. ${hungry ? `<b>${hungry} hungry</b>, ` : ""}${low ? `${low} low on food, ` : ""}${restless ? `<b>${restless} rioting or plotting</b>, ` : ""}${grumbling ? `${grumbling} grumbling.` : hungry || low || restless ? "the rest content." : "All fed and calm."}</p>
+    <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}${sortButton("tax", "Most tax")}</nav>
+    <div class="province-list">${rows}</div>`;
+}
+
+/** Opens province i's overview and centres the map on it; folded, the panel leaves the map clear. */
+function goToProvince(i: number, fold: boolean): void {
+  realmView = -1;
+  lordView = -1;
+  officialView = -1;
+  selectedProvince = i;
+  provinceTab = "overview";
+  grantOpen = false;
+  panel.scrollTop = 0;
+  if (fold) panelCollapsed = true;
+  view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
+  restyleProvinces();
+  renderPanel();
 }
 
 function bindLords(): void {
@@ -1304,21 +1500,21 @@ function bindLords(): void {
       renderPanel();
     }),
   );
-  panel.querySelectorAll<HTMLElement>("[data-open-province]").forEach((row) =>
-    row.addEventListener("click", () => {
-      const i = Number(row.dataset.openProvince);
-      realmView = -1;
-      selectedProvince = i;
-      provinceTab = "overview";
-      view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
-      restyleProvinces();
-      renderPanel();
-    }),
-  );
+  panel.querySelectorAll<HTMLElement>("[data-open-province]").forEach((row) => row.addEventListener("click", () => goToProvince(Number(row.dataset.openProvince), false)));
+  panel.querySelectorAll<HTMLElement>("[data-map-province]").forEach((b) => b.addEventListener("click", () => goToProvince(Number(b.dataset.mapProvince), true)));
+  panel.querySelectorAll<HTMLButtonElement>("[data-lord-open]").forEach((b) => b.addEventListener("click", () => openLord(Number(b.dataset.lordOpen))));
+  panel.querySelectorAll<HTMLButtonElement>("[data-lord-light]").forEach((b) => b.addEventListener("click", () => lightLord(Number(b.dataset.lordLight))));
+  panel.querySelector<HTMLButtonElement>("[data-grant-open]")?.addEventListener("click", () => {
+    grantOpen = !grantOpen;
+    renderPanel();
+  });
   panel.querySelectorAll<HTMLButtonElement>("[data-gift]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "gift", lord: Number(b.dataset.gift) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-seize]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "seizeFief", province: Number(b.dataset.seize) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-grant]").forEach((b) =>
-    b.addEventListener("click", () => void actHere({ type: "grantFief", province: Number(b.dataset.grant), lord: Number(b.dataset.lord) })),
+    b.addEventListener("click", () => {
+      grantOpen = false;
+      void actHere({ type: "grantFief", province: Number(b.dataset.grant), lord: Number(b.dataset.lord) });
+    }),
   );
 }
 
@@ -1866,7 +2062,7 @@ const LEDGER_LABEL: Record<string, string> = { tax: "Tax", trade: "Trade", "army
  * The Treasury tab: the purse (gold, its change a month and how long it
  * lasts), the month's ledger as bars of gold in and out, the realm tax
  * default, and the debt as a meter against what lenders allow, with what a
- * loan costs said before the borrow buttons (REALM-184, REALM-192).
+ * loan costs said before the borrow buttons (REALM-184, REALM-198).
  */
 function treasurySection(): string {
   const s = snapshot!;
@@ -1942,7 +2138,7 @@ function renderRealm(r: number): void {
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
-      <img class="banner" src="${flagUrl(n.color, 6)}" alt="">
+      <img class="banner" src="${flagUrl(n, 6)}" alt="">
       <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
@@ -1961,7 +2157,7 @@ function renderRealm(r: number): void {
         .join("")}` : "";
     })()}
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
-      .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!.color)}${esc(nations[j]!.name)}</button>`)
+      .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!)}${esc(nations[j]!.name)}</button>`)
       .join("")}</div>` : ""}
     ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}`;
   const content =
@@ -1969,9 +2165,9 @@ function renderRealm(r: number): void {
     : realmTab === "treasury" ? treasurySection()
     : realmTab === "military" ? warRoomSection()
     : realmTab === "mercenaries" ? mercenarySection()
-    : realmTab === "lords" ? lordsTab(r)
+    : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
-    : realmTab === "officials" ? officialsTab(rules, own.map((i) => ({ province: i, official: officialOf(rules, i, r, s!.provinceOfficial[i]) })), r)
+    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(rules, i, r, s!.provinceOfficial[i]) })), r)
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
@@ -2035,6 +2231,8 @@ function renderRealm(r: number): void {
 function bindClose(): void {
   panel.querySelector(".close")!.addEventListener("click", () => {
     officialView = -1;
+    lordView = -1;
+    grantOpen = false;
     newsView = false;
     realmView = -1;
     selectedProvince = -1;
