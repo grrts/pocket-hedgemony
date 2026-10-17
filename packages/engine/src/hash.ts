@@ -1,5 +1,6 @@
 import { LOYALTY } from "./lords.ts";
 import { researchHashData } from "./research.ts";
+import { castleFoodHashData } from "./castleFood.ts";
 import type { World } from "./world.ts";
 
 /**
@@ -41,6 +42,7 @@ export function hashWorld(world: World): string {
   feed(Int32Array.from(world.workQueue.flatMap((q) => [q.nation, q.province, q.work, q.step])));
   feed(Int32Array.from(world.lords.flatMap((l) => [l.nation, LOYALTY.indexOf(l.loyalty), l.upCredit])));
   feed(researchHashData(world));
+  feed(castleFoodHashData(world));
   // Army fields of live slots only: a dead slot keeps whatever it held, and a save drops it.
   const live = <T extends ArrayBufferView & ArrayLike<number> & { slice(a?: number, b?: number): T; fill(v: number, a?: number, b?: number): T }>(arr: T, stride = 1): T => {
     const out = arr.slice(0, a.count * stride);

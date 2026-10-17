@@ -16,6 +16,7 @@ import { addCommander, ARMS, type FreeCompany, type Mercenary, type Muster } fro
 /** A mercenary as saved: before free companies it held one arm and its men instead of a company. */
 type OldMercenary = { nation: number; weeksLeft: number; company?: FreeCompany; arm?: string; men?: number };
 import { newCommander } from "../warfare/index.ts";
+import type { FoodPolicyScreen } from "../realm/index.ts";
 import { base64, encodePng, fnv1a } from "./bytes.ts";
 import { packChunk, savesConfig, unpackChunk, type CampaignOptions, type RawChunk } from "./format.ts";
 
@@ -81,11 +82,11 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("provinces", V.provinces, {
       // Sieges under way, by province (occupation and garrisons are arrays below); the ground is the map's, not the save's.
       meta: { sieges: [...world.sieges].map(([p, st]) => [p, { ...st, siege: { ...st.siege, ground: undefined } }]), workNames: WORKS },
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore },
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
-      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed },
+      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed, foodPolicy: world.foodPolicy },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
@@ -96,6 +97,9 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         loanMonth: world.nationLoanMonth,
         ledger: world.nationLedger,
         neglect: world.nationNeglect,
+        grainGold: world.nationGrainGold,
+        foodSold: world.nationFoodSold,
+        foodSpoiled: world.nationFoodSpoiled,
         commanderOwner: world.commanderOwner,
         // Skills, victories, defeats and wounds of each commander, as they grow in battle.
         commanderRecord: Int32Array.from(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats, c.wounds])),
@@ -255,6 +259,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         // Tiles as saved; saves from before land keep the ones laid out from the map.
         if (prov.tiles) world.provinceTiles.set(prov.tiles.subarray(old * MAX_TILES, (old + 1) * MAX_TILES), t.index * MAX_TILES);
         if (prov.starved) world.provinceStarved[t.index] = prov.starved[old]! * t.share;
+        // Castle stores; saves from before them keep each castle's starting reserve.
+        if (prov.castleStore) world.castleStore[t.index] = prov.castleStore[old]! * t.share;
       }
     }
   });
@@ -281,6 +287,9 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     const lines = nat.ledger ? Math.min(LEDGER_LINES, nat.ledger.length / ids.nations.length) : 0;
     if (nat.ledger) world.nationLedger.set(nat.ledger.subarray(old * lines, old * lines + lines), n * LEDGER_LINES);
     if (nat.neglect) world.nationNeglect[n] = nat.neglect[old]!;
+    if (nat.grainGold) world.nationGrainGold[n] = nat.grainGold[old]!;
+    if (nat.foodSold) world.nationFoodSold[n] = nat.foodSold[old]!;
+    if (nat.foodSpoiled) world.nationFoodSpoiled[n] = nat.foodSpoiled[old]!;
   });
   // Commanders by id; ones the realm hired during the game come back by name and owner.
   const commanderMap = ids.commanders.map((id, old) => {
@@ -291,7 +300,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (!name || owner < 0 || nationMap[owner]! < 0) return -1;
     return addCommander(world, nationMap[owner]!, newCommander(name), id);
   });
-  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[] };
+  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[]; foodPolicy?: FoodPolicyScreen[] };
   const mapP = (old: number) => world.provinceIndex.get(ids.provinces[old]!) ?? -1;
   const mapN = (old: number) => nationMap[old] ?? -1;
   const mapCompany = (c: FreeCompany): FreeCompany => ({ ...c, home: c.home < 0 ? -1 : mapP(c.home) });
@@ -316,6 +325,11 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   (natMeta.commanderSeed ?? natMeta.commanderHome)?.forEach((p, old) => {
     const c = commanderMap[old]!;
     if (c >= 0) world.commanderSeed[c] = p < 0 ? -1 : mapP(p);
+  });
+  // Food policies by realm (castles' own values are keyed by province id); saves from before them keep the starting policy.
+  natMeta.foodPolicy?.forEach((screen, old) => {
+    const n = mapN(old);
+    if (n >= 0 && screen) world.foodPolicy[n] = { realm: { ...screen.realm }, overrides: { ...screen.overrides }, ...(screen.custom ? { custom: { ...screen.custom } } : {}) };
   });
   // Research by realm; a save from before research keeps the 1444 start.
   if (natMeta.research) restoreResearch(world, natMeta.research, mapN, mapP);

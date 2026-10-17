@@ -18,6 +18,7 @@ import { seedOfficials } from "./officials.ts";
 import { createResearchState, seedResearch, type ResearchState } from "./research.ts";
 import { createWorksState, seedWorks, type WorksState } from "./works.ts";
 import { createLandState, seedLand, type LandState } from "./land.ts";
+import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -25,7 +26,7 @@ import { createLandState, seedLand, type LandState } from "./land.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -393,6 +394,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createResearchState(N),
     ...createWorksState(P, N),
     ...createLandState(P),
+    ...createCastleFoodState(P, N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -400,6 +402,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedLords(world);
   seedLand(world);
   seedWorks(world);
+  seedCastleStores(world);
   updateWeather(world);
   for (let p = 0; p < P; p++) world.provinceGarrison[p] = maxGarrison(world, p);
 

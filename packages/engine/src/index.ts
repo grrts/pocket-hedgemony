@@ -17,3 +17,4 @@ export { aiTreasury, canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LIN
 export { STABILITY, stabilityOf, subjectLoyalty, type Stability, type StabilityPillar, type StabilityStep } from "./stability.ts";
 export { WORKS, WORK_COUNT, workIndex, type LandTileRow, type WorkRow } from "./works.ts";
 export { USES, type UseName } from "./land.ts";
+export { castleCap, FOOD_SETTINGS, foodView, mapNetwork, reachOf, setFood, setFoodPreset, shareFood, SURPLUS_RULES, type CastleView, type FoodView } from "./castleFood.ts";
