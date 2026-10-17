@@ -11,6 +11,10 @@ export interface Defines {
     goldPerThousandPeoplePerMonth: number;
     goldPerWealthPerMonth: number;
     startingTreasury: number;
+    /** Gold at each tax step against normal (none, light, normal, heavy, crushing). */
+    taxRateFactor: number[];
+    /** Gold a month each official running a province is paid. */
+    officialWagePerMonth: number;
   };
   levies: {
     menPerThousandPeople: number;

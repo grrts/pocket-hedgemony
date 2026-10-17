@@ -4,6 +4,7 @@ import * as M from "@ph/engine/domain/realm";
 import * as R from "@ph/engine/domain/research";
 import { loadDefaultRuleset } from "@ph/rules";
 import { Rng } from "@ph/engine";
+import * as G from "@ph/engine";
 import diplomacyConfig from "../../rules/data/domain/diplomacy.json" with { type: "json" };
 import relations1444 from "../../rules/data/domain/diplomacy-relations-1444.json" with { type: "json" };
 
@@ -2122,4 +2123,155 @@ When("it gives land back", (s) => {
 });
 Then("its lands taken fall", (s) => {
   expect(s.after).toBeLessThan(s.takenCount);
+});
+
+// ------------------------------------------------------------ tax rates and the treasury ledger (milestone 3)
+// These run against the game itself: a fresh 1444 world, orders as the player gives them.
+
+type GW = G.World;
+const GAME_RULES = loadDefaultRuleset();
+const realmOf = (s: S, name: string): number => (s.game as GW).nationIndex.get(GAME_RULES.nations.find((n) => n.name === name)!.id)!;
+const provinceOf = (name: string): number => GAME_RULES.provinces.findIndex((p) => p.name === name);
+const rateOf = (name: string): number => G.TAX_RATES.indexOf(name as (typeof G.TAX_RATES)[number]);
+const ledger = (s: S, realm: string, line: string): number => (s.game as GW).nationLedger[realmOf(s, realm) * G.LEDGER_LINES + G.LEDGER.indexOf(line as (typeof G.LEDGER)[number])]!;
+function order(s: S, realm: string, o: G.Order): void {
+  s.refused = G.applyNow(s.game, o, realmOf(s, realm)).rejectedOrders[0]?.reason ?? null;
+  G.runLedger(s.game, false);
+}
+
+Given("the game starts with the country {string}", (s, realm: string) => {
+  s.game = G.createWorld(GAME_RULES, 1);
+  s.game.player = realmOf(s, realm);
+});
+Given("the game starts with the AI country {string}", (s) => {
+  s.game = G.createWorld(GAME_RULES, 1);
+});
+Then("the realm tax default of {string} is {string}", (s, realm: string, rate: string) => {
+  expect(s.game.nationTaxDefault[realmOf(s, realm)]).toBe(rateOf(rate));
+});
+Then("the province {string} follows the realm default", (s, p: string) => {
+  expect(s.game.provinceTax[provinceOf(p)]).toBe(-1);
+});
+When("{string} taxes the province {string} {string}", (s, realm: string, p: string, rate: string) => {
+  s.normalTax ??= G.provinceTax(s.game, provinceOf(p), realmOf(s, realm));
+  order(s, realm, { type: "setTax", province: provinceOf(p), rate: rateOf(rate) });
+});
+When("{string} sets the realm tax default to {string}", (s, realm: string, rate: string) => {
+  order(s, realm, { type: "setTax", province: -1, rate: rateOf(rate) });
+});
+When("{string} puts the province {string} back on the realm default", (s, realm: string, p: string) => {
+  order(s, realm, { type: "setTax", province: provinceOf(p), rate: -1 });
+});
+Then("the province {string} pays at {string}", (s, p: string, rate: string) => {
+  const i = provinceOf(p);
+  expect(G.taxRateOf(s.game, i, s.game.provinceOwner[i])).toBe(rateOf(rate));
+});
+Then("a province of {string} without its own rate pays at {string}", (s, realm: string, rate: string) => {
+  const n = realmOf(s, realm);
+  const p = Array.from(s.game.provinceOwner as Int16Array).findIndex((o, i) => o === n && s.game.provinceTax[i] === -1);
+  expect(G.taxRateOf(s.game, p, n)).toBe(rateOf(rate));
+});
+Then(re(`the province "([^"]+)" pays ([\\d.]+) times its tax at "normal"`), (s, p: string, factor: string) => {
+  const i = provinceOf(p);
+  expect(G.provinceTax(s.game, i, s.game.provinceOwner[i])).toBeCloseTo(s.normalTax * Number(factor));
+});
+Then("the order is refused with {string}", (s, why: string) => {
+  expect(s.refused).toBe(why);
+});
+Then("the order is refused", (s) => {
+  expect(s.refused).toBeTruthy();
+});
+Then("the ledger of {string} shows no tax", (s, realm: string) => {
+  expect(ledger(s, realm, "tax")).toBe(0);
+});
+Then("the ledger of {string} shows trade", (s, realm: string) => {
+  expect(ledger(s, realm, "trade")).toBeGreaterThan(0);
+});
+Then(/^the ledger of "([^"]+)" has the lines (.+)$/, (s, _realm: string, lines: string) => {
+  expect([...G.LEDGER]).toEqual([...lines.matchAll(/"([^"]+)"/g)].map((m) => m[1]));
+});
+Then("the monthly income of {string} is the sum of its ledger", (s, realm: string) => {
+  expect(s.game.nationMonthlyIncome[realmOf(s, realm)]).toBeCloseTo(G.LEDGER.reduce((t, l) => t + ledger(s, realm, l), 0));
+});
+When("a new month begins", (s) => {
+  const n = s.game.player;
+  s.goldBefore = s.game.nationTreasury[n];
+  while (G.monthBeginning(s.game.date) === null) {
+    G.processTurn(s.game, [], n);
+    s.goldBefore = s.game.nationTreasury[n];
+  }
+  G.processTurn(s.game, [], n);
+});
+Then("the month's income is paid into the treasury of {string}", (s, realm: string) => {
+  const n = realmOf(s, realm);
+  expect(s.game.nationTreasury[n]).toBeCloseTo(s.goldBefore + s.game.nationMonthlyIncome[n]);
+});
+const officialsAtPost = (s: S, n: number): number => {
+  let k = 0;
+  for (let p = 0; p < s.game.provinceCount; p++) if (s.game.provinceOwner[p] === n && s.game.provinceOfficial[p] >= 0) k++;
+  return k;
+};
+Then("the officials line of {string} is one wage for each official at his post", (s, realm: string) => {
+  const n = realmOf(s, realm);
+  s.officials = officialsAtPost(s, n);
+  expect(s.officials).toBeGreaterThan(0);
+  expect(ledger(s, realm, "officials")).toBeCloseTo(-s.officials * GAME_RULES.defines.economy.officialWagePerMonth);
+});
+When("{string} commissions the official of {string}", (s, realm: string, p: string) => {
+  order(s, realm, { type: "commission", province: provinceOf(p) });
+  expect(s.refused).toBe(null);
+});
+Then("the officials line of {string} is one wage smaller", (s, realm: string) => {
+  expect(ledger(s, realm, "officials")).toBeCloseTo(-(s.officials - 1) * GAME_RULES.defines.economy.officialWagePerMonth);
+});
+const yearsIncome = (s: S, realm: string) => 12 * (ledger(s, realm, "tax") + ledger(s, realm, "trade"));
+Then("lenders would give {string} a year's tax and trade", (s, realm: string) => {
+  s.cap = yearsIncome(s, realm);
+  expect(G.canBorrow(s.game, realmOf(s, realm))).toBeCloseTo(s.cap);
+});
+When(re(`"([^"]+)" borrows ${NUM} gold`), (s, realm: string, gold: string) => {
+  s.goldBefore = s.game.nationTreasury[realmOf(s, realm)];
+  order(s, realm, { type: "borrow", gold: num(gold) });
+});
+Then(re(`"([^"]+)" has ${NUM} gold more and owes ${NUM} gold`), (s, realm: string, more: string, owed: string) => {
+  const n = realmOf(s, realm);
+  expect(s.refused).toBe(null);
+  expect(s.game.nationTreasury[n]).toBeCloseTo(s.goldBefore + num(more));
+  expect(s.game.nationDebt[n]).toBeCloseTo(num(owed));
+});
+Then(re(`the interest line of "([^"]+)" is ${NUM} % of ${NUM} gold a year, paid monthly`), (s, realm: string, pct: string, gold: string) => {
+  expect(ledger(s, realm, "interest")).toBeCloseTo(-(num(gold) * num(pct)) / 100 / 12);
+});
+Then(re(`lenders would give "([^"]+)" ${NUM} gold less`), (s, realm: string, less: string) => {
+  expect(G.canBorrow(s.game, realmOf(s, realm))).toBeCloseTo(s.cap - num(less));
+});
+When("{string} borrows more than lenders would give", (s, realm: string) => {
+  order(s, realm, { type: "borrow", gold: G.canBorrow(s.game, realmOf(s, realm)) + 1 });
+});
+When(re(`"([^"]+)" repays ${NUM} gold`), (s, realm: string, gold: string) => {
+  order(s, realm, { type: "repay", gold: num(gold) });
+});
+Then(re(`"([^"]+)" owes ${NUM} gold`), (s, realm: string, gold: string) => {
+  expect(s.game.nationDebt[realmOf(s, realm)]).toBeCloseTo(num(gold));
+});
+Then("{string} owes nothing", (s, realm: string) => {
+  expect(s.game.nationDebt[realmOf(s, realm)]).toBe(0);
+});
+Given(re(`"([^"]+)" is (at peace|at war) with (-?[\\d,]+) gold`), (s, realm: string, state: string, gold: string) => {
+  const n = realmOf(s, realm);
+  const id = s.game.nationIds[n];
+  s.game.diplomacy.wars = s.game.diplomacy.wars.filter((w: { attackers: string[]; defenders: string[] }) => !w.attackers.includes(id) && !w.defenders.includes(id));
+  if (state === "at war") {
+    const foe = s.game.nationIds[realmOf(s, "Austria")];
+    s.game.diplomacy.wars.push({ ...structuredClone(s.game.diplomacy.wars[0] ?? {}), id: "test-war", attackers: [foe], defenders: [id] });
+  }
+  s.game.nationTreasury[n] = Number(gold.replace(/,/g, ""));
+});
+When("the AI plans its treasury", (s) => {
+  G.aiTreasury(s.game, []);
+});
+Then("{string} borrows enough to bring its gold above zero", (s, realm: string) => {
+  const n = realmOf(s, realm);
+  expect(s.game.nationDebt[n]).toBeGreaterThan(0);
+  expect(s.game.nationTreasury[n]).toBeGreaterThan(0);
 });

@@ -1,9 +1,10 @@
 import { CLASS_NAMES } from "./living.ts";
+import { canBorrow, LEDGER, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
 import { advance, applyNow, HOURS_PER_STEP, processTurn, type Order } from "./turn.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
-import { armyBreak, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
+import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages } from "./tiles.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
@@ -97,6 +98,16 @@ export interface Snapshot {
   provincePeople: Float32Array;
   provinceClasses: Float32Array;
   classNames: readonly string[];
+  /** Tax rate names, each province's own rate (-1 = the realm default) and the player's default. */
+  taxRates: readonly string[];
+  provinceTax: Int8Array;
+  /** Tax gold each province pays its holder a month. */
+  provinceTaxGold: Float32Array;
+  taxDefault: number;
+  /** The player's ledger this month (gold by line, + in and − out), debt, interest a month and what lenders would still give. */
+  ledger: { line: string; gold: number }[];
+  debt: number;
+  canBorrow: number;
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -231,6 +242,16 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provincePeople: w.provincePopulation.slice(),
       provinceClasses: w.provinceClasses.slice(),
       classNames: CLASS_NAMES,
+      taxRates: TAX_RATES,
+      provinceTax: w.provinceTax.slice(),
+      provinceTaxGold: Float32Array.from({ length: w.provinceCount }, (_, p) => {
+        const holder = controller(w, p);
+        return holder >= 0 ? provinceTax(w, p, holder) : 0;
+      }),
+      taxDefault: player >= 0 ? w.nationTaxDefault[player]! : NORMAL_TAX,
+      ledger: player >= 0 ? LEDGER.map((line, k) => ({ line, gold: w.nationLedger[player * LEDGER_LINES + k]! })) : [],
+      debt: player >= 0 ? w.nationDebt[player]! : 0,
+      canBorrow: player >= 0 ? canBorrow(w, player) : 0,
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
@@ -285,6 +306,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceRecruits,
       snap.provincePeople,
       snap.provinceClasses,
+      snap.provinceTax,
+      snap.provinceTaxGold,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
       ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);

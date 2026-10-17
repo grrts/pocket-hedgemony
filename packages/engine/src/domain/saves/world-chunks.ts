@@ -1,4 +1,5 @@
 import { CLASS_COUNT, rescaleClasses } from "../../living.ts";
+import { LEDGER_LINES } from "../../treasury.ts";
 import type { Ruleset } from "@ph/rules";
 import { hashWorld } from "../../hash.ts";
 import { Rng } from "../../rng.ts";
@@ -75,7 +76,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
     packChunk("provinces", V.provinces, {
       meta: {},
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, classes: world.provinceClasses },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, classes: world.provinceClasses, tax: world.provinceTax },
     }),
     packChunk("nations", V.nations, {
       meta: { musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome },
@@ -84,6 +85,9 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         levies: world.nationLevies,
         maxLevies: world.nationMaxLevies,
         monthlyIncome: world.nationMonthlyIncome,
+        taxDefault: world.nationTaxDefault,
+        debt: world.nationDebt,
+        ledger: world.nationLedger,
         commanderOwner: world.commanderOwner,
         // Skills, victories, defeats and wounds of each commander, as they grow in battle.
         commanderRecord: Int32Array.from(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats, c.wounds])),
@@ -209,6 +213,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         if (prov.wealth) world.provinceWealth[t.index] = prov.wealth[old]!;
         if (prov.recruits) world.provinceRecruits[t.index] = prov.recruits[old]!;
         if (prov.official) world.provinceOfficial[t.index] = prov.official[old]!;
+        if (prov.tax) world.provinceTax[t.index] = prov.tax[old]!;
         classesFrom[t.index] = old;
       }
     }
@@ -229,6 +234,9 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (nat.levies) world.nationLevies[n] = nat.levies[old]!;
     if (nat.maxLevies) world.nationMaxLevies[n] = nat.maxLevies[old]!;
     if (nat.monthlyIncome) world.nationMonthlyIncome[n] = nat.monthlyIncome[old]!;
+    if (nat.taxDefault) world.nationTaxDefault[n] = nat.taxDefault[old]!;
+    if (nat.debt) world.nationDebt[n] = nat.debt[old]!;
+    if (nat.ledger) world.nationLedger.set(nat.ledger.subarray(old * LEDGER_LINES, (old + 1) * LEDGER_LINES), n * LEDGER_LINES);
   });
   // Commanders by id; ones the realm hired during the game come back by name and owner.
   const commanderMap = ids.commanders.map((id, old) => {
