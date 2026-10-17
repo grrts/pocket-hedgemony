@@ -5,8 +5,11 @@ that breaks one fails CI. Two scripts check them:
 
 - `pnpm bench` (packages/engine/bench/turn.bench.ts) times the engine itself.
 - `pnpm --filter @ph/client perf` (apps/client/scripts/perf.mjs) runs the
-  built game in mobile Chromium, pans the map at five zooms and ends three
-  turns. `--report` prints the numbers without failing.
+  built game in mobile Chromium, pans the map at five zooms, plays one
+  warm-up turn and then ends three turns. CI runners share their CPUs, so
+  when those turns break a budget it plays three more, up to three attempts;
+  one attempt must meet every budget. `--report` prints the numbers without
+  failing.
 
 ## Frame rate
 
