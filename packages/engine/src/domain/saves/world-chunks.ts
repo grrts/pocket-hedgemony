@@ -3,6 +3,8 @@ import { hashWorld } from "../../hash.ts";
 import { Rng } from "../../rng.ts";
 import type { Order } from "../../turn.ts";
 import { createArmyPool, createWorld, type World } from "../../world.ts";
+import type { TileGrid } from "../../tiles.ts";
+import type { Battle } from "../../war.ts";
 import { addCommander, ARMS, type Mercenary, type Muster } from "../../recruit.ts";
 import { newCommander } from "../warfare/index.ts";
 import { base64, encodePng, fnv1a } from "./bytes.ts";
@@ -47,13 +49,14 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
   for (let i = 0; i < a.count; i++) if (a.alive[i]) live.push(i);
   const routes: number[] = [];
   const routeLen: number[] = [];
-  const marched: number[] = [];
-  const marchedLen: number[] = [];
+  const paths: number[] = [];
+  const pathLen: number[] = [];
   for (const s of live) {
     routes.push(...a.route[s]!);
     routeLen.push(a.route[s]!.length);
-    marched.push(...a.marched[s]!);
-    marchedLen.push(a.marched[s]!.length);
+    const left = a.path[s]!.subarray(a.pathAt[s]!);
+    paths.push(...left);
+    pathLen.push(left.length);
   }
   const pick = <T extends Int16Array | Int32Array | Float32Array | Float64Array>(src: T, make: (n: number) => T): T => {
     const out = make(live.length);
@@ -62,7 +65,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
   };
   const chunks = [
     packChunk("core", V.core, {
-      meta: { turn: world.turn, date: world.date, options: game.options, playerNation: game.playerNation },
+      meta: { turn: world.turn, date: world.date, day: world.day, step: world.step, options: game.options, playerNation: game.playerNation },
       arrays: { rng: new Uint32Array(world.rng.state) },
     }),
     packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
@@ -83,11 +86,13 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
       },
     }),
     packChunk("armies", V.armies, {
-      meta: { count: a.count },
+      // Battles still being fought when the week ended go on with the same armies.
+      meta: { count: a.count, battles: world.battles, battleSeq: world.battleSeq },
       arrays: {
         slot: Int32Array.from(live),
         owner: pick(a.owner, (n) => new Int16Array(n)),
         location: pick(a.location, (n) => new Int32Array(n)),
+        tile: pick(a.tile, (n) => new Int32Array(n)),
         men: pick(a.men, (n) => new Int32Array(n)),
         commander: pick(a.commander, (n) => new Int32Array(n)),
         horse: pick(a.horse, (n) => new Int32Array(n)),
@@ -102,8 +107,11 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         mix: Float32Array.from(live.flatMap((s) => Array.from(a.mix.subarray(s * MIX, (s + 1) * MIX)))),
         routeLen: Int32Array.from(routeLen),
         route: Int32Array.from(routes),
-        marchedLen: Int32Array.from(marchedLen),
-        marched: Int32Array.from(marched),
+        pathLen: Int32Array.from(pathLen),
+        path: Int32Array.from(paths),
+        retreating: Uint8Array.from(live, (s) => a.retreating[s]!),
+        // The province it came from: the way back past an enemy castle.
+        cameFrom: pick(a.cameFrom, (n) => new Int32Array(n)),
       },
     }),
     packChunk("events", V.events, { meta: { ...(game.events ?? EMPTY_EVENTS) }, arrays: {} }),
@@ -139,7 +147,8 @@ export interface RestoredGame {
  * commanders are matched by id through the `ids` chunk; fields missing from an
  * older chunk keep the value the rules give.
  */
-export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tables: MappingTables = {}): RestoredGame {
+/** `tiles` is the map's tile grid, as for createWorld; tiles saved under another map fall back to the province's centre. */
+export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tables: MappingTables = {}, tiles?: TileGrid): RestoredGame {
   const need = (id: string) => {
     const c = chunks.get(id);
     if (!c) throw new Error(`save has no ${id} chunk`);
@@ -152,9 +161,11 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   const arm = need("armies");
   const warnings: string[] = [];
 
-  const world = createWorld(rules, 0);
-  const meta = core.meta as { turn: number; date: { year: number; month: number; day?: number }; options: CampaignOptions; playerNation: string };
+  const world = createWorld(rules, 0, tiles);
+  const meta = core.meta as { turn: number; day?: number; step?: number; date: { year: number; month: number; day?: number }; options: CampaignOptions; playerNation: string };
   world.turn = meta.turn;
+  world.day = meta.day ?? meta.turn * 7;
+  world.step = meta.step ?? 0;
   // The whole date, with its day when the engine keeps one (X-18 weekly turns).
   world.date = { ...meta.date } as typeof world.date;
   world.rng = new Rng(core.arrays.rng as Uint32Array);
@@ -255,16 +266,16 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   pool.count = count;
   const mapProvince = (old: number) => provinceTargets[old]?.[0]?.index ?? -1;
   let ro = 0;
-  let mo = 0;
+  let po = 0;
   const slots = A.slot!;
   for (let k = 0; k < slots.length; k++) {
     const slot = slots[k]!;
     const routeLen = A.routeLen![k]!;
-    const marchedLen = A.marchedLen![k]!;
+    const pathLen = A.pathLen?.[k] ?? 0;
     const route = Array.from(A.route!.subarray(ro, ro + routeLen), mapProvince).filter((p) => p >= 0);
-    const marched = Array.from(A.marched!.subarray(mo, mo + marchedLen), mapProvince).filter((p) => p >= 0);
+    const path = A.path ? Int32Array.from(A.path.subarray(po, po + pathLen)) : new Int32Array(0);
     ro += routeLen;
-    mo += marchedLen;
+    po += pathLen;
     const owner = nationMap[A.owner![k]!]!;
     const location = mapProvince(A.location![k]!);
     if (owner < 0 || location < 0) {
@@ -274,6 +285,9 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     pool.alive[slot] = 1;
     pool.owner[slot] = owner;
     pool.location[slot] = location;
+    const tile = A.tile?.[k] ?? -1;
+    const sameMap = tile >= 0 && world.tiles.province[tile]! - 1 === location;
+    pool.tile[slot] = sameMap ? tile : world.tiles.centre[location]!;
     pool.men[slot] = A.men![k]!;
     const cmd = A.commander![k]!;
     pool.commander[slot] = cmd < 0 ? -1 : commanderMap[cmd]!;
@@ -288,9 +302,21 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (A.trainLeft) pool.trainLeft[slot] = A.trainLeft[k]!;
     if (A.mix) pool.mix.set(A.mix.subarray(k * MIX, (k + 1) * MIX), slot * MIX);
     pool.route[slot] = route;
-    pool.marched[slot] = marched;
+    // A path walked over another map's tiles is planned again from the route.
+    pool.path[slot] = sameMap && path.every((t) => world.tiles.province[t]! > 0) ? path : new Int32Array(0);
+    if (A.retreating) pool.retreating[slot] = A.retreating[k]!;
+    if (A.cameFrom) pool.cameFrom[slot] = A.cameFrom[k]! < 0 ? -1 : mapProvince(A.cameFrom[k]!);
   }
   world.armies = pool;
+  const armMeta = arm.meta as { battles?: Battle[]; battleSeq?: number };
+  for (const b of armMeta.battles ?? []) {
+    const attackers = b.attackers.filter((x) => pool.alive[x]);
+    const defenders = b.defenders.filter((x) => pool.alive[x]);
+    if (!attackers.length || !defenders.length) continue;
+    world.battles.push({ ...b, attackers, defenders, province: mapProvince(b.province) });
+    for (const x of [...attackers, ...defenders]) pool.battle[x] = b.id;
+  }
+  world.battleSeq = armMeta.battleSeq ?? 0;
 
   const events = chunks.has("events") ? (unpackChunk(chunks.get("events")!).meta as unknown as EventsState) : { ...EMPTY_EVENTS };
   const history = chunks.has("history") ? ((unpackChunk(chunks.get("history")!).meta.timeline as unknown[]) ?? []) : [];
@@ -337,8 +363,8 @@ export function mapHash(rules: Ruleset): string {
 }
 
 /** `hashWorld()` of the state exactly as a save holds it (SAVE-039). */
-export function savedWorldHash(chunks: readonly RawChunk[], rules: Ruleset): string {
-  return hashWorld(restoreWorld(new Map(chunks.map((c) => [c.id, c])), rules).world);
+export function savedWorldHash(chunks: readonly RawChunk[], rules: Ruleset, tiles?: TileGrid): string {
+  return hashWorld(restoreWorld(new Map(chunks.map((c) => [c.id, c])), rules, {}, tiles).world);
 }
 
 // ---------------------------------------------------------------- the thumbnail

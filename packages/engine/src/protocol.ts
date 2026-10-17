@@ -1,16 +1,30 @@
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
-import { applyNow, processTurn, type Order } from "./turn.ts";
-import { createWorld, type World } from "./world.ts";
-import { relationState, type News } from "./war.ts";
+import { advance, applyNow, HOURS_PER_STEP, processTurn, type Order } from "./turn.ts";
+import { createWorld, tileMarch, type World } from "./world.ts";
+import { relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
+import { tileStepHours } from "./march.ts";
+import { tileGridFromImages } from "./tiles.ts";
 import { armyPay, armyRations, ARMS, menByArm, mercenaryPrice, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
 
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
-  | { id: number; type: "newGame"; seed: number; playerNation: string }
+  /** `map` is the map's images as the UI decoded them, so armies march over its tiles; without it they stand still. */
+  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles }
+  /** Plays a whole week at once (the start-up probe and the benchmarks). */
   | { id: number; type: "endTurn"; orders: Order[] }
+  /** Plays the clock on by some 4-hour steps (six a day). */
+  | { id: number; type: "advance"; steps: number }
   /** An order that acts at once (everything but moves: war and peace, recruiting, training, commanders). */
   | { id: number; type: "act"; order: Order };
+
+/** The decoded map images: province id + 1 per pixel (0 = water), and the terrain image's RGB. */
+export interface MapTiles {
+  width: number;
+  height: number;
+  province: Uint16Array;
+  terrain: Uint8Array;
+}
 
 /** Messages the engine worker sends back. */
 export type EngineResponse =
@@ -26,6 +40,8 @@ export type EngineResponse =
 export interface Snapshot {
   turn: number;
   date: GameDate;
+  /** Hour of the day (0, 4, 8 … 20). */
+  hour: number;
   playerNation: number;
   hash: string;
   computeMs: number;
@@ -41,7 +57,12 @@ export interface Snapshot {
   calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
   /** The player's standing with every other nation that has one. */
   relations: { nation: number; state: "war" | "truce" | "alliance" | "subject" | "overlord"; until?: string }[];
-  sieges: { province: number; by: number; months: number; breaches: number; garrison: number }[];
+  /** Sieges under way: months gone, how far into the next siege month (0..1), breaches and men inside. */
+  sieges: { province: number; by: number; months: number; progress: number; breaches: number; garrison: number }[];
+  /** Battles being fought: where, each side's leading realm with its men now and at the start, and rounds fought of all. */
+  battles: { id: number; tile: number; province: number; attacker: number; defender: number; attMen: number; defMen: number; attStart: number; defStart: number; round: number; rounds: number; player: boolean }[];
+  /** Width of the tile grid (tile = y * width + x, in map pixels). */
+  tileWidth: number;
   nationTreasury: Float64Array;
   nationLevies: Float64Array;
   nationMonthlyIncome: Float64Array;
@@ -66,17 +87,23 @@ export interface Snapshot {
     id: Int32Array;
     owner: Int16Array;
     location: Int32Array;
+    /** Tile the army stands on. */
+    tile: Int32Array;
     men: Int32Array;
     commander: Int32Array;
     horse: Int32Array;
     /** Rations in the wagons, rounded. */
     food: Int32Array;
-    /** Days marched toward the next province on the route. */
-    progress: Int32Array;
     /** Provinces still to march through. */
     route: number[][];
-    /** Provinces walked last turn, from where the army set out; empty if it stood still. */
-    marched: number[][];
+    /** The player's armies: tiles still to walk, and hours to the end. Empty for others. */
+    path: Int32Array[];
+    etaHours: number[];
+    /** Tiles stepped onto since the last snapshot, in order (for drawing the march). */
+    trail: number[][];
+    /** Battle being fought (its id), or -1; 1 while falling back after a defeat. */
+    battle: Int32Array;
+    retreating: Int16Array;
     /** 0 levy, 1 hired company. */
     kind: Int16Array;
     monthsOut: Int32Array;
@@ -133,6 +160,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     const snap: Snapshot = {
       turn: w.turn,
       date: { ...w.date },
+      hour: w.step * HOURS_PER_STEP,
       playerNation: player,
       hash: hashWorld(w),
       computeMs: now() - started,
@@ -145,7 +173,25 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         .filter((c) => !c.answer && c.called === w.nationIds[player])
         .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
       relations,
-      sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
+      sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
+      battles: w.battles.map((b) => {
+        const men = (slots: number[]) => slots.reduce((t, s) => t + (a.alive[s] ? a.men[s]! : 0), 0);
+        return {
+          id: b.id,
+          tile: b.tile,
+          province: b.province,
+          attacker: a.owner[b.attackers[0]!]!,
+          defender: a.owner[b.defenders[0]!]!,
+          attMen: men(b.attackers),
+          defMen: men(b.defenders),
+          attStart: b.attStart,
+          defStart: b.defStart,
+          round: b.round,
+          rounds: b.rounds,
+          player: [...b.attackers, ...b.defenders].some((s) => a.owner[s] === player),
+        };
+      }),
+      tileWidth: w.tiles.width,
       nationTreasury: w.nationTreasury.slice(),
       nationLevies: w.nationLevies.slice(),
       nationMonthlyIncome: w.nationMonthlyIncome.slice(),
@@ -174,13 +220,17 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         id: Int32Array.from(live),
         owner: pick(a.owner, (n) => new Int16Array(n)),
         location: pick(a.location, (n) => new Int32Array(n)),
+        tile: pick(a.tile, (n) => new Int32Array(n)),
         men: pick(a.men, (n) => new Int32Array(n)),
         commander: pick(a.commander, (n) => new Int32Array(n)),
         horse: pick(a.horse, (n) => new Int32Array(n)),
         food: Int32Array.from(live, (slot) => Math.round(a.food[slot]!)),
-        progress: Int32Array.from(live, (slot) => Math.round(a.progress[slot]!)),
         route: live.map((slot) => a.route[slot]!.slice()),
-        marched: live.map((slot) => a.marched[slot]!.slice()),
+        path: live.map((slot) => (a.owner[slot] === player ? a.path[slot]!.slice(a.pathAt[slot]!) : new Int32Array(0))),
+        etaHours: live.map((slot) => (a.owner[slot] === player ? hoursLeft(w, slot) : 0)),
+        trail: live.map((slot) => a.trail[slot]!.slice()),
+        battle: pick(a.battle, (n) => new Int32Array(n)),
+        retreating: Int16Array.from(live, (slot) => a.retreating[slot]!),
         kind: Int16Array.from(live, (slot) => a.kind[slot]!),
         monthsOut: Int32Array.from(live, (slot) => a.monthsOut[slot]!),
         drill: Int32Array.from(live, (slot) => Math.round(a.drill[slot]! * 10)),
@@ -200,7 +250,10 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.nationCapUsed,
       snap.provinceRecruits,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
+      ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);
+    // The trail is for one look only.
+    for (const slot of live) a.trail[slot] = [];
     return { response: { id, type: "snapshot", snapshot: snap }, transfer };
   }
 
@@ -209,7 +262,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     try {
       switch (req.type) {
         case "newGame": {
-          world = createWorld(loadRules(), req.seed);
+          const rules = loadRules();
+          const grid = req.map ? tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain) : undefined;
+          world = createWorld(rules, req.seed, grid);
           const idx = world.nationIndex.get(req.playerNation);
           if (idx === undefined) throw new Error(`unknown nation ${req.playerNation}`);
           player = idx;
@@ -221,6 +276,11 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           const report = processTurn(world, req.orders, player);
           return snapshot(req.id, started, report.rejectedOrders, report.news);
         }
+        case "advance": {
+          if (!world) throw new Error("no game in progress");
+          const news = advance(world, Math.max(1, Math.min(req.steps, 42)));
+          return snapshot(req.id, started, [], news);
+        }
         case "act": {
           if (!world) throw new Error("no game in progress");
           const report = applyNow(world, req.order, player);
@@ -231,4 +291,20 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e) }, transfer: [] };
     }
   };
+}
+
+/** Hours an army still has to march along the tiles it has planned (left of a march planned a province at a time: none). */
+function hoursLeft(world: World, slot: number): number {
+  const a = world.armies;
+  const path = a.path[slot]!;
+  if (a.pathAt[slot]! >= path.length) return 0;
+  const m = tileMarch(world);
+  const army = { men: a.men[slot]!, horse: a.horse[slot]!, logistics: 0 };
+  let hours = -a.progress[slot]!;
+  let at = a.tile[slot]!;
+  for (let k = a.pathAt[slot]!; k < path.length; k++) {
+    hours += tileStepHours(m, at, path[k]!, army);
+    at = path[k]!;
+  }
+  return Math.max(0, hours);
 }

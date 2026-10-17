@@ -3,6 +3,7 @@ import { hashWorld } from "../../hash.ts";
 import type { Rng } from "../../rng.ts";
 import type { Order } from "../../turn.ts";
 import type { World } from "../../world.ts";
+import type { TileGrid } from "../../tiles.ts";
 import { crc32, hex32 } from "./bytes.ts";
 import {
   FORMAT_VERSION,
@@ -355,7 +356,7 @@ export function buildSave(ctx: SaveContext, campaign: Campaign, world: World, ki
     options: campaign.options,
     tier: { nation: campaign.playerNation, needsFullGame: needsFullGame(campaign.playerNation), app: campaign.app ?? "full" },
     flags: saveFlags(campaign),
-    worldHash: hashWorld(restoreWorld(new Map(chunks.map((c) => [c.id, c])), world.rules).world),
+    worldHash: hashWorld(restoreWorld(new Map(chunks.map((c) => [c.id, c])), world.rules, {}, world.tiles).world),
     thumbnail: thumbnail(world, campaign.playerNation),
     modified: campaign.modified,
   };
@@ -610,6 +611,8 @@ export interface OpenOptions {
   buildFormatVersion?: number;
   migrations?: readonly Migration[];
   tables?: MappingTables;
+  /** The map's tiles, as the world was made with (createWorld). */
+  tiles?: TileGrid;
 }
 
 export type Opened = {
@@ -656,7 +659,7 @@ export function openSave(bytes: Uint8Array, opts: OpenOptions, nationName: (id: 
   const problems = validateChunks(chunks);
   if (problems.length) return { kind: "rejected", problem: "damaged", message: "This save is damaged." };
   const mapped = header.rulesHash !== rulesHash(opts.rules) || header.mapHash !== mapHash(opts.rules);
-  const restored = restoreWorld(chunks, opts.rules, mapped ? (opts.tables ?? {}) : {});
+  const restored = restoreWorld(chunks, opts.rules, mapped ? (opts.tables ?? {}) : {}, opts.tiles);
   const loadedHash = hashWorld(restored.world);
   if (!mapped && C.integrity.verify_world_hash && loadedHash !== header.worldHash) {
     if (header.ironman) return { kind: "refused", reason: "ironman save failed the hash check" };

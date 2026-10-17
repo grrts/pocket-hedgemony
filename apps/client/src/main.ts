@@ -1,12 +1,27 @@
-import { addDays, DAYS_PER_TURN, forageLimit, groundOf, planRoute, type MarchMap, type MoveOrder, type News, type Order, type PeaceTerms, type Route, type Snapshot } from "@ph/engine";
+import {
+  addDays,
+  DAYS_PER_TURN,
+  forageLimit,
+  groundOf,
+  placeClimate,
+  provinceClimate,
+  seasonName,
+  STEPS_PER_DAY,
+  type MapTiles,
+  type MarchMap,
+  type News,
+  type Order,
+  type PeaceTerms,
+  type PlaceClimate,
+  type Snapshot,
+} from "@ph/engine";
 import type { GameDate } from "@ph/rules";
-import { placeClimate, provinceClimate, seasonName, type PlaceClimate } from "./map/seasons.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite, spriteUrl } from "./art/sprites.ts";
 import { icon, installUiArt, pennantUrl } from "./art/ui.ts";
 import { EngineClient } from "./engineClient.ts";
-import { loadMapImage } from "./map/loadMap.ts";
+import { loadMapImage, type MapImage } from "./map/loadMap.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
@@ -74,15 +89,23 @@ let dispatches: News[] = [];
 let newsView = false;
 let selectedProvince = -1;
 let selectedArmy = -1; // army id
-let pendingOrders: MoveOrder[] = [];
-/** The planned route for each pending order, by army id. */
-const plannedRoutes = new Map<number, Route>();
-/** When the last turn's marches started animating (performance.now), or 0. */
-let marchAnimStart = 0;
-/** Steps in the longest march of the last turn. */
-let marchLongest = 0;
-const MARCH_STEP_MS = 450;
-let busy = false;
+/** When the latest snapshot arrived (performance.now): armies walk its trail from there. */
+let stepStart = 0;
+/** How long the latest step is shown for, in ms: armies walk their trail over it. */
+let stepMs = 0;
+/** Where each army was drawn when the latest snapshot arrived, by army id, for walking on from there. */
+let drawnAt = new Map<number, [number, number]>();
+/** End turn plays the week a day at a time (TIME-076), and a 4-hour step at a time while the player fights. */
+const DAY_MS = 300;
+const BATTLE_STEP_MS = 500;
+let playing = false;
+let paused = false;
+/** Resumes a paused playback. */
+let resume: (() => void) | null = null;
+/** An order is on its way to the engine. */
+let acting = false;
+/** The map images, for the engine's tiles (sent with a new game). */
+let mapImage: MapImage | null = null;
 /** The panel is folded away behind a tool button so the map gets the screen. */
 let panelCollapsed = false;
 /** Nation whose country overview is open, or -1. */
@@ -121,6 +144,16 @@ const panel = document.querySelector<HTMLElement>("#panel")!;
 const fab = document.querySelector<HTMLButtonElement>("#fab")!;
 const reopen = document.querySelector<HTMLButtonElement>("#reopen")!;
 fab.addEventListener("click", () => void endTurn());
+// Space ends the turn, and pauses or resumes it while it plays (feedback 27).
+document.addEventListener("keydown", (e) => {
+  if (e.code !== "Space" || (e.target as HTMLElement).closest("input, textarea, select")) return;
+  e.preventDefault();
+  if (!e.repeat) void endTurn();
+});
+// A focused button would also take the Space as a click.
+document.addEventListener("keyup", (e) => {
+  if (e.code === "Space" && !(e.target as HTMLElement).closest("input, textarea, select")) e.preventDefault();
+});
 // Phones play in landscape. Browsers only allow the lock in some cases
 // (an installed app, fullscreen); otherwise the rotate notice asks for it.
 void (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }).lock?.("landscape").catch(() => {});
@@ -151,7 +184,7 @@ const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 let view: MapView;
 
 async function boot(): Promise<void> {
-  const image = await loadMapImage(rules.map!, provinces.length);
+  const image = (mapImage = await loadMapImage(rules.map!, provinces.length));
   document.querySelector(".loading")?.remove();
   view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay });
   // Read by the performance checks (scripts/perf.mjs).
@@ -263,6 +296,8 @@ let places: PlaceClimate[] | null = null;
 // Next week's seasons, worked out while the player looks at this one, so
 // ending a turn only has to copy them (docs/performance.md: one frame).
 let nextSeason: { key: string; data: Uint8Array } | null = null;
+/** The date the week on show started (seasons stay put while it plays). */
+let weekStart: GameDate | null = null;
 const dateKey = (d: GameDate) => `${d.year}-${d.month}-${d.day ?? 1}`;
 /** Each province's season on a date, packed as the map's season texture holds it. */
 function seasonsFor(date: GameDate): Uint8Array {
@@ -277,19 +312,16 @@ function seasonsFor(date: GameDate): Uint8Array {
 
 function restyleProvinces(): void {
   known = computeKnown();
-  const targets = new Set<number>();
-  // Light up the route of the army being ordered.
-  if (selectedArmy >= 0) for (const p of plannedRoutes.get(selectedArmy)?.path ?? []) targets.add(p);
   for (let i = 0; i < provinces.length; i++) {
     const o = owners[i]!;
     const occ = occupiers[i]!;
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
     const hatched = occ >= 0 && lens === "realms";
-    const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
+    const flags = (i === selectedProvince ? 1 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
     view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i]);
   }
-  // Seasons move on a week a turn, so they are only worked out when the date changes.
-  const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (snapshot?.date ?? rules.defines.startDate);
+  // Seasons move on a week a turn, so they are only worked out when a week starts.
+  const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
   const key = dateKey(date);
   if (key !== seasonKey) {
     seasonKey = key;
@@ -404,7 +436,7 @@ function drawOverlay(o: OverlayContext): void {
     });
   }
 
-  // Sieges under way: a tower and how long the walls have held.
+  // Sieges under way: how long the walls have held, and how far into the next siege month.
   if (snapshot && zoom >= 2) {
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
@@ -413,26 +445,28 @@ function drawOverlay(o: OverlayContext): void {
       const p = provinces[st.province]!;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) continue;
-      pixelText(ctx, st.months ? `Siege · ${st.months} mo` : "Siege", sx, sy - 8 * spriteScale, 10);
+      const top = sy - 8 * spriteScale;
+      pixelText(ctx, st.months ? `Siege · ${st.months} mo` : "Siege", sx, top - 6, 10);
+      bar(ctx, sx, top - 5, 32, st.progress, nations[st.by]!.color);
     }
   }
 
-  // Armies and their commanders.
+  // Armies and their commanders. Troops without a commander stay off the map, in their province's garrison (RECR-107).
   if (snapshot && zoom >= 1.6) {
     const s = snapshot;
     const stackCount = new Map<number, number>();
     armyHitBoxes = [];
     for (let k = 0; k < s.armies.id.length; k++) {
-      const loc = s.armies.location[k]!;
-      if (!isKnown(loc)) continue;
-      const nth = stackCount.get(loc) ?? 0;
-      stackCount.set(loc, nth + 1);
-      let [sx, sy] = o.toScreen(...marchPosition(k));
+      const cmd = s.armies.commander[k]!;
+      if (cmd < 0 || !isKnown(s.armies.location[k]!)) continue;
+      const tile = s.armies.tile[k]!;
+      const nth = stackCount.get(tile) ?? 0;
+      stackCount.set(tile, nth + 1);
+      let [sx, sy] = o.toScreen(...armyPosition(k));
       sx += 10 * spriteScale + nth * 6 * spriteScale;
       if (!onScreen(sx, sy)) continue;
       const owner = s.armies.owner[k]!;
-      const cmd = s.armies.commander[k]!;
-      const img = sprite(cmd >= 0 ? "commander" : "soldier", nations[owner]!.color, Math.max(1, spriteScale - (cmd >= 0 ? 2 : 1)));
+      const img = sprite("commander", nations[owner]!.color, Math.max(1, spriteScale - 2));
       const x = Math.round(sx - img.width / 2);
       const y = Math.round(sy - img.height + 2 * spriteScale);
       if (s.armies.id[k] === selectedArmy) {
@@ -444,68 +478,112 @@ function drawOverlay(o: OverlayContext): void {
       if (zoom >= 3) {
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        const label = `${cmd >= 0 ? cmdOf(cmd).name : "Garrison"} · ${fmt(s.armies.men[k]! / 1000)}k`;
-        pixelText(ctx, label, sx, y + img.height + 2, 10);
+        pixelText(ctx, `${cmdOf(cmd).name} · ${fmt(s.armies.men[k]! / 1000)}k`, sx, y + img.height + 2, 10);
       }
     }
-    // Routes: pending orders, and marches still under way from earlier turns.
-    ctx.lineWidth = Math.max(2, spriteScale);
+    // The player's marches: the tiles still to walk, a dark line under a light dash so it shows on snow and sand.
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
+    const width = Math.max(2, spriteScale);
     for (let k = 0; k < s.armies.id.length; k++) {
-      if (s.armies.owner[k] !== s.playerNation) continue;
-      const id = s.armies.id[k]!;
-      const planned = plannedRoutes.get(id);
-      const path = planned ? planned.path : marchAnimStart ? [] : s.armies.route[k]!;
-      if (!path.length) continue;
-      const pts = [s.armies.location[k]!, ...path].map((p) => o.toScreen(provinces[p]!.x!, provinces[p]!.y!));
-      ctx.strokeStyle = planned ? PALETTE.paper : PALETTE.mist;
+      const path = s.armies.path[k]!;
+      if (s.armies.owner[k] !== s.playerNation || !path.length) continue;
+      const pts = [o.toScreen(...armyPosition(k))];
+      // Every few tiles is enough for the eye when zoomed out.
+      const every = Math.max(1, Math.floor(3 / zoom));
+      for (let i = every - 1; i < path.length; i += every) pts.push(o.toScreen(...tileXY(path[i]!)));
+      if ((path.length - 1) % every) pts.push(o.toScreen(...tileXY(path.at(-1)!)));
+      const line = () => {
+        ctx.beginPath();
+        pts.forEach(([x, y], i) => (i && Math.abs(x - pts[i - 1]![0]) < o.width / 2 ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+        ctx.stroke();
+      };
+      ctx.strokeStyle = PALETTE.ink;
+      ctx.lineWidth = width + 2;
+      ctx.lineJoin = "round";
+      line();
+      ctx.strokeStyle = PALETTE.paper;
+      ctx.lineWidth = width;
       ctx.setLineDash([4 * spriteScale, 3 * spriteScale]);
-      ctx.beginPath();
-      pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
-      ctx.stroke();
+      line();
       ctx.setLineDash([]);
-      // A dot where each turn's march ends.
-      const left = daysLeft(k);
-      if (planned) {
-        ctx.fillStyle = PALETTE.paper;
-        planned.arrive.forEach((d, i) => {
-          if (Math.floor(d / DAYS_PER_TURN) > Math.floor((planned.arrive[i - 1] ?? 0) / DAYS_PER_TURN) && i < planned.arrive.length - 1) {
-            const [x, y] = pts[i + 1]!;
-            ctx.fillRect(Math.round(x) - spriteScale, Math.round(y) - spriteScale, 2 * spriteScale + 1, 2 * spriteScale + 1);
-          }
-        });
-      }
       const [bx, by] = pts.at(-1)!;
       const flag = sprite("flag", nations[s.playerNation]!.color, spriteScale);
       ctx.drawImage(flag, Math.round(bx), Math.round(by - flag.height));
-      if (left && zoom >= 2) pixelText(ctx, duration(left.days), bx + flag.width / 2, by - flag.height - 2, 10);
+      const hours = s.armies.etaHours[k]!;
+      if (hours > 0 && zoom >= 2) pixelText(ctx, hoursText(hours), bx + flag.width / 2, by - flag.height - 2, 10);
+    }
+    // Battles: crossed swords, and each side's men left of those it brought.
+    for (const b of s.battles) {
+      if (!isKnown(b.province)) continue;
+      const [sx, sy] = o.toScreen(...tileXY(b.tile));
+      if (!onScreen(sx, sy)) continue;
+      swords(ctx, sx, sy - 4 * spriteScale, 5 * spriteScale);
+      bar(ctx, sx, sy + 3 * spriteScale, 36, b.attMen / Math.max(1, b.attStart), nations[b.attacker]!.color);
+      bar(ctx, sx, sy + 3 * spriteScale + 6, 36, b.defMen / Math.max(1, b.defStart), nations[b.defender]!.color);
     }
   }
-  if (marchAnimStart) view.invalidate();
+  if (performance.now() - stepStart < stepMs) view.invalidate();
 }
 
-/** Where to draw army slot k: walking its last march for a moment after the turn ends. */
-function marchPosition(k: number): [number, number] {
+/** A map point at the middle of a tile (tiles are the map image's pixels). */
+function tileXY(t: number): [number, number] {
+  const w = snapshot!.tileWidth;
+  return [(t % w) + 0.5, Math.floor(t / w) + 0.5];
+}
+
+/** Where to draw army slot k: walking the tiles of the latest step, over the time that step is shown. */
+function armyPosition(k: number): [number, number] {
   const s = snapshot!;
-  const walked = s.armies.marched[k]!;
-  const at = provinces[s.armies.location[k]!]!;
-  if (!marchAnimStart || walked.length < 2) return [at.x!, at.y!];
-  const t = (performance.now() - marchAnimStart) / MARCH_STEP_MS;
-  if (t >= marchLongest) {
-    marchAnimStart = 0;
-    return [at.x!, at.y!];
+  if (s.tileWidth !== rules.map!.width) {
+    // A world without the map's tiles: armies stand at their province's centre.
+    const p = provinces[s.armies.location[k]!]!;
+    return [p.x!, p.y!];
   }
-  const step = Math.min(walked.length - 1, t);
-  const i = Math.min(walked.length - 2, Math.floor(step));
-  const f = step - i;
-  const a = provinces[walked[i]!]!;
-  const b = provinces[walked[i + 1]!]!;
-  let bx = b.x!;
+  const end = tileXY(s.armies.tile[k]!);
+  const from = drawnAt.get(s.armies.id[k]!);
+  const trail = s.armies.trail[k]!;
+  const t = stepMs ? (performance.now() - stepStart) / stepMs : 1;
+  if (!from || !trail.length || t >= 1) return end;
+  const pts = [from, ...trail.map(tileXY)];
+  const f = t * (pts.length - 1);
+  const i = Math.floor(f);
+  const [ax, ay] = pts[i]!;
+  let [bx, by] = pts[i + 1]!;
   // Take the short way round across the date line.
-  if (bx - a.x! > rules.map!.width / 2) bx -= rules.map!.width;
-  if (a.x! - bx > rules.map!.width / 2) bx += rules.map!.width;
-  return [a.x! + (bx - a.x!) * f, a.y! + (b.y! - a.y!) * f];
+  if (bx - ax > rules.map!.width / 2) bx -= rules.map!.width;
+  if (ax - bx > rules.map!.width / 2) bx += rules.map!.width;
+  return [ax + (bx - ax) * (f - i), ay + (by - ay) * (f - i)];
+}
+
+/** A small bar, centred on x: the share filled in a realm's colour. */
+function bar(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, share: number, color: string): void {
+  const left = Math.round(x - w / 2);
+  ctx.fillStyle = PALETTE.ink;
+  ctx.fillRect(left - 1, Math.round(y) - 1, w + 2, 6);
+  ctx.fillStyle = PALETTE.paper;
+  ctx.fillRect(left, Math.round(y), w, 4);
+  ctx.fillStyle = color;
+  ctx.fillRect(left, Math.round(y), Math.round(w * Math.max(0, Math.min(1, share))), 4);
+}
+
+/** Two crossed swords, r pixels from the middle to each tip. */
+function swords(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
+  ctx.lineCap = "round";
+  for (const [color, width] of [[PALETTE.ink, 5], [PALETTE.paper, 2]] as const) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    for (const d of [-1, 1]) {
+      // Blade, then the cross guard near the hilt.
+      ctx.moveTo(x - d * r, y - r);
+      ctx.lineTo(x + d * r, y + r);
+      ctx.moveTo(x + d * r * 0.35, y + r * 0.85);
+      ctx.lineTo(x + d * r * 0.85, y + r * 0.35);
+    }
+    ctx.stroke();
+  }
+  ctx.lineCap = "butt";
 }
 
 let armyHitBoxes: { id: number; x: number; y: number; w: number; h: number }[] = [];
@@ -609,20 +687,19 @@ function onTap(sx: number, sy: number, province: number): void {
     pickArmy(hit.id);
     return;
   } else if (selectedArmy >= 0 && snapshot && province >= 0 && !isWater[province]) {
-    // Any land province is a target; the army takes the fastest road there.
-    const k = armySlot(selectedArmy);
-    const here = snapshot.armies.location[k]!;
-    pendingOrders = pendingOrders.filter((o) => o.army !== selectedArmy);
-    plannedRoutes.delete(selectedArmy);
-    const route = province === here ? null : planRoute(march, marchGraph, here, province, armyStats(k));
-    // Tapping the army's own province halts it.
-    if (route || province === here) pendingOrders.push({ type: "move", army: selectedArmy, to: province });
-    if (route) plannedRoutes.set(selectedArmy, route);
-    etaCache.delete(selectedArmy);
+    // Any land is a target: the army sets off at once, over the fastest tiles to the spot tapped.
+    const army = selectedArmy;
+    const [mx, my] = view.toMap(sx, sy);
+    const onTiles = snapshot.tileWidth === rules.map!.width;
     selectedArmy = -1;
     selectedProvince = province;
     // Keep the map in view after giving an order; the panel waits behind its button.
     panelCollapsed = true;
+    armyView = -1;
+    realmView = -1;
+    newsView = false;
+    void act({ type: "move", army, to: province, ...(onTiles ? { tile: Math.floor(my) * snapshot.tileWidth + Math.floor(mx) } : {}) });
+    return;
   } else {
     // A tap only selects; the overview opens from the button in the lower left.
     // Uncharted land can't be looked at yet.
@@ -638,15 +715,13 @@ function onTap(sx: number, sy: number, province: number): void {
   renderActions();
 }
 
-/** Picks an army to move: folds the panel away and centres the map on it. */
+/** Picks an army to move and folds the panel away; the map stays where it is (feedback 6). */
 function pickArmy(id: number): void {
   if (!snapshot) return;
-  const loc = snapshot.armies.location[armySlot(id)]!;
   selectedArmy = id;
-  selectedProvince = loc;
+  selectedProvince = snapshot.armies.location[armySlot(id)]!;
   realmView = -1;
   panelCollapsed = true;
-  view.lookAt(provinces[loc]!.x!, provinces[loc]!.y!, Math.max(view.camera.zoom, 5));
   restyleProvinces();
   renderPanel();
 }
@@ -657,27 +732,8 @@ function armyStats(k: number) {
   return { men: s.armies.men[k]!, horse: s.armies.horse[k]!, logistics: c >= 0 ? cmdOf(c).logistics : 0 };
 }
 
-/** Route lengths, by army id, until the next order or turn (planning a route is too slow to repeat every frame). */
-const etaCache = new Map<number, { to: number; days: number } | null>();
-
-/** Days still to march for army slot k, from its pending order or its standing route. */
-function daysLeft(k: number): { to: number; days: number } | null {
-  const id = snapshot!.armies.id[k]!;
-  if (!etaCache.has(id)) etaCache.set(id, computeDaysLeft(k));
-  return etaCache.get(id)!;
-}
-
-function computeDaysLeft(k: number): { to: number; days: number } | null {
-  const s = snapshot!;
-  const planned = plannedRoutes.get(s.armies.id[k]!);
-  if (planned) return { to: planned.path.at(-1)!, days: Math.ceil(planned.arrive.at(-1)!) };
-  const route = s.armies.route[k]!;
-  if (!route.length) return null;
-  const r = planRoute(march, marchGraph, s.armies.location[k]!, route.at(-1)!, armyStats(k));
-  return r ? { to: route.at(-1)!, days: Math.max(0, Math.ceil(r.arrive.at(-1)! - s.armies.progress[k]!)) } : null;
-}
-
 const duration = (days: number) => (days < 14 ? `${days} day${days === 1 ? "" : "s"}` : `${Math.round(days / 7)} weeks`);
+const hoursText = (hours: number) => (hours < 24 ? `${Math.ceil(hours)} hours` : duration(Math.ceil(hours / 24)));
 
 /** Food in the wagons, and whether the land here can feed the army. */
 function supplyLine(k: number): string {
@@ -689,10 +745,14 @@ function supplyLine(k: number): string {
   return `Food for ${months.toFixed(1)} months · the land here feeds ${fmt(limit)} men`;
 }
 
-function marchLine(k: number, order: MoveOrder | undefined): string {
-  if (order && !plannedRoutes.has(order.army)) return " · halting";
-  const left = daysLeft(k);
-  return left ? ` · marching to ${esc(provinces[left.to]!.name)}, ${duration(left.days)}` : "";
+function marchLine(k: number): string {
+  const a = snapshot!.armies;
+  if (a.battle[k]! >= 0) return " · in battle";
+  if (a.retreating[k]) return " · falling back";
+  const route = a.route[k]!;
+  if (!route.length && !a.path[k]!.length) return "";
+  const to = route.length ? route.at(-1)! : a.location[k]!;
+  return ` · marching to ${esc(provinces[to]!.name)}${a.etaHours[k]! > 0 ? `, ${hoursText(a.etaHours[k]!)}` : ""}`;
 }
 
 function armySlot(id: number): number {
@@ -715,7 +775,7 @@ function renderHud(): void {
   const inc = s.nationMonthlyIncome[me]!;
   hud.innerHTML = `
     <button class="realm" data-realm="${me}" title="Your realm">${pennant(n.color, 2)}<b>${esc(n.name)}</b></button>
-    <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}</span>
+    <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${s.battles.some((b) => b.player) ? ` <small>${String(s.hour).padStart(2, "0")}:00</small>` : ""}</span>
     <span class="plaque" title="Treasury: gold, and change per month">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></span>
     <span class="plaque" title="Troops against your troop cap (men under arms and gathering)">${icon("swords", 1)}${fmt(s.nationCapUsed[me]! / 1000)}k<small>/${fmt(s.nationTroopCap[me]! / 1000)}k</small></span>
     ${myWars().length ? `<button class="plaque at-war" data-realm="${me}" title="Your wars">${icon("swords", 1)}At war</button>` : ""}
@@ -741,10 +801,10 @@ const realmButton = (n: number) => `<button class="realm-link" data-realm="${n}"
 
 /** Sends an order that acts at once (war, peace, levies), then shows what came of it. */
 async function act(order: Order): Promise<void> {
-  if (busy || !snapshot) return;
-  busy = true;
-  snapshot = await engine.send({ type: "act", order });
-  busy = false;
+  if (acting || !snapshot) return;
+  acting = true;
+  takeSnapshot(await engine.send({ type: "act", order }), 0);
+  acting = false;
   applySnapshot();
   if (snapshot.rejectedOrders.length || snapshot.news.length) {
     dispatches = [
@@ -760,6 +820,16 @@ async function act(order: Order): Promise<void> {
   renderHud();
   renderPanel();
   renderActions();
+}
+
+/** Takes in a fresh snapshot; armies walk its trail over the next `ms` from where they are drawn now. */
+function takeSnapshot(next: Snapshot, ms: number): void {
+  const at = new Map<number, [number, number]>();
+  if (snapshot) for (let k = 0; k < snapshot.armies.id.length; k++) at.set(snapshot.armies.id[k]!, armyPosition(k));
+  snapshot = next;
+  drawnAt = at;
+  stepStart = performance.now();
+  stepMs = ms;
 }
 
 /** Takes in a fresh snapshot's map state. */
@@ -810,17 +880,14 @@ function renderNews(): void {
   );
 }
 
-/** The End turn button in the corner, with a count of the orders waiting. */
+/** The End turn button in the corner; while the week plays, it pauses and resumes. */
 function renderActions(): void {
   fab.hidden = !snapshot;
-  fab.disabled = busy;
-  const badge = fab.querySelector<HTMLElement>(".badge")!;
-  badge.hidden = pendingOrders.length === 0;
-  badge.textContent = String(pendingOrders.length);
+  fab.classList.toggle("playing", playing);
+  fab.classList.toggle("paused", paused);
+  fab.querySelector<HTMLElement>(".badge")!.hidden = true;
   if (!snapshot) return;
-  const next = addDays(snapshot.date, DAYS_PER_TURN);
-  const orders = pendingOrders.length;
-  fab.title = `End turn: on to ${dateText(next)}${orders ? `, ${orders} arm${orders > 1 ? "ies" : "y"} marching` : ""}`;
+  fab.title = playing ? (paused ? "Play on (Space)" : "Pause (Space)") : `End turn (Space): on to ${dateText(addDays(snapshot.date, DAYS_PER_TURN))}`;
 }
 
 function closeButton(): string {
@@ -919,12 +986,11 @@ function renderPanel(): void {
         const cmd = s.armies.commander[k]!;
         const mine = s.armies.owner[k] === s.playerNation;
         const c = cmd >= 0 ? cmdOf(cmd) : null;
-        const order = pendingOrders.find((o) => o.army === id);
         const portrait = spriteUrl(c ? "commander" : "soldier", nations[s.armies.owner[k]!]!.color, c ? 2 : 3);
         return `<div class="army">
           <img class="portrait" src="${portrait}" alt="">
           <span class="who">${c ? `<b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
-          ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}, ${fmt(s.armies.horse[k]!)} on horse${mine ? `<br><small>${supplyLine(k)}${marchLine(k, order)}</small>` : ""}</span>
+          ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}, ${fmt(s.armies.horse[k]!)} on horse${mine ? `<br><small>${supplyLine(k)}${marchLine(k)}</small>` : ""}</span>
           ${mine ? `<span class="army-buttons"><button data-army="${id}">${selectedArmy === id ? "Pick a target" : "Move"}</button><button class="paper small" data-command="${id}" title="The commander's screen: troops, food, pay, training">Command</button></span>` : ""}
         </div>`;
       })
@@ -1101,7 +1167,6 @@ function renderArmy(id: number): void {
     "armoured foot": { months: 2, gold: 80 }, pikes: { months: 3, gold: 60 }, archers: { months: 4, gold: 60 }, "light horse": { months: 3, gold: 100 }, "knights and lancers": { months: 9, gold: 300 },
   };
   const trainMen = Math.min(1000, Math.floor(levyFoot));
-  const order = pendingOrders.find((o) => o.army === id);
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(c.name)}</h2>${closeButton()}</header>
     <div class="army">
@@ -1110,7 +1175,7 @@ function renderArmy(id: number): void {
       <span class="army-buttons"><button data-army="${id}">${selectedArmy === id ? "Pick a target" : "Move"}</button></span>
     </div>
     <dl class="facts">
-      <dt>Where</dt><dd><button class="paper capital" data-go="${here}">${icon("map", 1)}${esc(provinces[here]!.name)}</button>${marchLine(k, order)}</dd>
+      <dt>Where</dt><dd><button class="paper capital" data-go="${here}">${icon("map", 1)}${esc(provinces[here]!.name)}</button>${marchLine(k)}</dd>
       <dt>Men</dt><dd>${fmt(s.armies.men[k]!)}, ${fmt(s.armies.horse[k]!)} on horse · ${hired ? "a mercenary company" : "levies"}</dd>
       <dt>Drill</dt><dd>${(s.armies.drill[k]! / 10).toFixed(1)} months trained together</dd>
       <dt>Pay</dt><dd>${s.armies.pay[k]!.toFixed(2)} gold a month${!hired && monthsOut <= 3 ? ` (free for ${3 - monthsOut} more month${3 - monthsOut === 1 ? "" : "s"})` : ""}</dd>
@@ -1180,8 +1245,6 @@ function renderArmy(id: number): void {
   );
   panel.querySelectorAll<HTMLButtonElement>("[data-hand]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "appoint", army: id, commander: Number(b.dataset.hand) })));
   panel.querySelector("[data-leave]")?.addEventListener("click", () => {
-    pendingOrders = pendingOrders.filter((o) => o.army !== id);
-    plannedRoutes.delete(id);
     void act({ type: "appoint", army: id, commander: -1 }).then(() => {
       if (snapshot?.rejectedOrders.length) return;
       armyView = -1;
@@ -1192,8 +1255,6 @@ function renderArmy(id: number): void {
     });
   });
   panel.querySelector("[data-disband]")?.addEventListener("click", () => {
-    pendingOrders = pendingOrders.filter((o) => o.army !== id);
-    plannedRoutes.delete(id);
     void act({ type: "disband", army: id }).then(() => {
       armyView = -1;
       newsView = false;
@@ -1363,8 +1424,8 @@ function bindNationButtons(): void {
 }
 
 async function startGame(nation: string): Promise<void> {
-  snapshot = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation });
-  etaCache.clear();
+  takeSnapshot(await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}) }), 0);
+  weekStart = snapshot!.date;
   dispatches = [];
   applySnapshot();
   const cap = provinceIndex.get(nations[nationIndex.get(nation)!]!.capital)!;
@@ -1377,37 +1438,68 @@ async function startGame(nation: string): Promise<void> {
   renderActions();
 }
 
+/** The map images as the engine takes them, so armies march over the map's own tiles. */
+function mapTiles(image: MapImage): MapTiles {
+  return { width: image.width, height: image.height, province: Uint16Array.from(image.ids, (id) => id + 1), terrain: image.terrain };
+}
+
+/**
+ * End turn: the week plays a day at a time, and a 4-hour step at a time while
+ * the player's men fight, so marches, battles and sieges are seen as they go
+ * (TIME-076). Ending the turn again while it plays pauses it, and again goes on.
+ */
 async function endTurn(): Promise<void> {
-  if (busy || !snapshot) return;
-  busy = true;
+  if (!snapshot) return;
+  if (playing) {
+    paused = !paused;
+    if (!paused) resume?.();
+    renderActions();
+    return;
+  }
+  playing = true;
+  paused = false;
+  selectedArmy = -1;
+  dispatches = [];
   renderActions();
-  // The turn runs in the engine worker; the map stays live meanwhile.
-  performance.mark("turn-sent");
-  snapshot = await engine.send({ type: "endTurn", orders: pendingOrders });
-  performance.mark("turn-arrived");
-  applySnapshot();
-  dispatches = [...snapshot.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [snapshot!.playerNation] })), ...snapshot.news];
+  const turn = snapshot.turn;
+  while (snapshot.turn === turn) {
+    if (paused) {
+      await new Promise<void>((r) => (resume = r));
+      continue;
+    }
+    const battle = snapshot.battles.some((b) => b.player);
+    const ms = battle ? BATTLE_STEP_MS : DAY_MS;
+    const t0 = performance.now();
+    // The steps run in the engine worker; the map stays live meanwhile.
+    performance.mark("turn-sent");
+    const next = await engine.send({ type: "advance", steps: battle ? 1 : STEPS_PER_DAY - snapshot.hour / (24 / STEPS_PER_DAY) });
+    performance.mark("turn-arrived");
+    takeSnapshot(next, ms);
+    applySnapshot();
+    dispatches.push(...next.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [next.playerNation] })), ...next.news);
+    restyleProvinces();
+    renderHud();
+    if (!panel.hidden) renderPanel();
+    renderActions();
+    // Budgets in docs/performance.md, checked by scripts/perf.mjs: each step's answer, and taking it in.
+    performance.measure("turn-wait", "turn-sent", "turn-arrived");
+    performance.measure("turn-apply", "turn-arrived");
+    await new Promise((r) => setTimeout(r, Math.max(0, ms - (performance.now() - t0))));
+  }
+  playing = false;
+  paused = false;
+  weekStart = snapshot.date;
   // Open the dispatches when something happened to the player's own realm, or a call waits.
   if (snapshot.calls.length || dispatches.some((x) => x.nations.includes(snapshot!.playerNation) && x.kind !== "raised")) {
     newsView = true;
     realmView = -1;
     panelCollapsed = false;
   }
-  pendingOrders = [];
-  plannedRoutes.clear();
-  etaCache.clear();
-  selectedArmy = -1;
-  busy = false;
-  marchLongest = Math.max(0, ...snapshot.armies.marched.map((m) => m.length - 1));
-  if (marchLongest > 0) marchAnimStart = performance.now();
   restyleProvinces();
   renderHud();
   renderPanel();
   renderActions();
   renderDiagnostics();
-  // Budgets in docs/performance.md, checked by scripts/perf.mjs.
-  performance.measure("turn-wait", "turn-sent", "turn-arrived");
-  performance.measure("turn-apply", "turn-arrived");
 }
 
 function renderDiagnostics(): void {
@@ -1448,18 +1540,15 @@ async function selfTest(): Promise<void> {
 Object.assign(globalThis, {
   __phNation: (id: string) => nationIndex.get(id),
   __phTurn: () => snapshot?.turn ?? -1,
-  /** Sends every idle army of the player toward a realm's capital. */
-  __phMarchOn: (id: string) => {
+  /** Sends every idle army of the player with a commander toward a realm's capital. */
+  __phMarchOn: async (id: string) => {
     if (!snapshot) return;
     const to = provinceIndex.get(nations[nationIndex.get(id)!]!.capital)!;
-    snapshot.armies.id.forEach((army, k) => {
-      if (snapshot!.armies.owner[k] !== snapshot!.playerNation || snapshot!.armies.route[k]!.length || snapshot!.armies.location[k] === to) return;
-      const route = planRoute(march, marchGraph, snapshot!.armies.location[k]!, to, armyStats(k));
-      if (!route) return;
-      pendingOrders = pendingOrders.filter((o) => o.army !== army);
-      pendingOrders.push({ type: "move", army, to });
-      plannedRoutes.set(army, route);
+    const idle = [...snapshot.armies.id.keys()].filter((k) => {
+      const a = snapshot!.armies;
+      return a.owner[k] === snapshot!.playerNation && a.commander[k]! >= 0 && !a.route[k]!.length && a.location[k] !== to;
     });
+    for (const army of idle.map((k) => snapshot!.armies.id[k]!)) await act({ type: "move", army, to });
   },
   /** Opens a province's overview by id. */
   __phSelect: (id: string) => {

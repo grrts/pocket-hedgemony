@@ -259,8 +259,8 @@ Then("the save holds the world at the start of turn {int} and the {int} queued o
 Then("it holds nothing from halfway through a turn", (s) => {
   const r = S.openSave(s.anySave.bytes, opener(s));
   if (r.kind !== "opened") throw new Error(r.kind);
-  // Mid-turn bookkeeping (who already moved this turn) is never in a save.
-  expect(Array.from(r.world.armies.movedThisTurn).every((v) => v === 0)).toBe(true);
+  // The week's four-hour steps all ran: the save starts the next week at its first step.
+  expect(r.world.step).toBe(0);
   const chunks = [...S.decodeSave(s.anySave.bytes).chunks.keys()];
   expect(chunks.every((id) => C.format.chunks.includes(id))).toBe(true);
 });

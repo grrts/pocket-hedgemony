@@ -1,10 +1,12 @@
 export { Rng } from "./rng.ts";
 export { addDays, daysInMonth, DAYS_PER_TURN, isLeapYear, monthBeginning, turnOfDay } from "./calendar.ts";
-export { createWorld, spawnArmy, areNeighbors, marchMap, type World, type ArmyPool } from "./world.ts";
-export { planRoute, stepDays, forageLimit, forageRations, monthlyRations, groundOf, type MarchMap, type MarchingArmy, type Route } from "./march.ts";
-export { processTurn, applyNow, type Order, type MoveOrder, type TurnReport } from "./turn.ts";
-export { atWar, controller, offerPeace, peaceShare, relationState, wallsOf, warBetween, type News, type PeaceTerms } from "./war.ts";
+export { createWorld, spawnArmy, areNeighbors, marchMap, tileMarch, type World, type ArmyPool } from "./world.ts";
+export { planRoute, stepDays, forageLimit, forageRations, monthlyRations, groundOf, planTilePath, tileStepHours, corridor, rowWidths, type MarchMap, type MarchingArmy, type Route, type TileMarch, type TilePath } from "./march.ts";
+export { tileGridFromImages, blockTileGrid, pointTileGrid, TILE_TERRAINS, GROUNDS, type TileGrid } from "./tiles.ts";
+export { placeClimate, provinceClimate, seasonName, dayOfYear, snowCover, type PlaceClimate, type ProvinceClimate } from "./climate.ts";
+export { processTurn, applyNow, advance, STEPS_PER_DAY, STEPS_PER_TURN, HOURS_PER_STEP, type Order, type MoveOrder, type TurnReport } from "./turn.ts";
+export { atWar, controller, engageRange, offerPeace, peaceShare, relationState, wallsOf, warBetween, SIEGE_MONTH_DAYS, type Battle, type News, type PeaceTerms } from "./war.ts";
 export { hashWorld } from "./hash.ts";
 export { ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
-export { createEngineHost, type EngineRequest, type EngineResponse, type Snapshot, type HostReply } from "./protocol.ts";
+export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply } from "./protocol.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";

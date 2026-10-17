@@ -28,6 +28,12 @@ export interface Defines {
 export interface WarDefines {
   /** Weeks an army must hold a province without walls to occupy it (warfare occupation.hold_months, scaled to the weekly turn). */
   holdWeeks: number;
+  /** Tiles within which a commander finds an enemy army and a battle begins: this plus his cunning, between the two bounds (10 to 15). */
+  engageBase: number;
+  engageMin: number;
+  engageMax: number;
+  /** Men a side fields for each 4-hour round a battle lasts. */
+  menPerBattleRound: number;
   /** Men behind the walls of a capital, a stone castle and an earthwork ring fort. */
   garrison: { capital: number; castle: number; fort: number };
   /** Share of a full garrison that returns each month while not besieged. */
@@ -81,8 +87,12 @@ export interface MarchDefines {
   horseSpeedBonus: number;
   /** Extra crossing units per province for an army bigger than the forage limit there. */
   bigArmyExtraCrossings: number;
-  /** Real days added for marching into a province a river runs through (no bridges yet). */
+  /** Real days added for stepping onto a river tile (no bridges yet). */
   riverCrossingDays: number;
+  /** Map tiles in one crossing unit's distance (a province of about 100 km, at about 7 km a tile). */
+  tilesPerCrossing: number;
+  /** How much slower deep snow makes a march (1 = twice as slow). */
+  snowSlowdown: number;
   rationsPerSoldier: number;
   rationsPerHorse: number;
   /** Food a province can spare each month, in rations per person living there. */

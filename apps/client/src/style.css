@@ -392,6 +392,22 @@ button.icon-only {
   filter: drop-shadow(0 4px 0 rgb(0 0 0 / 0.45));
 }
 
+/* While the week plays the hourglass turns; paused, it stands still. */
+.fab.playing .px-icon {
+  animation: hourglass 1.2s steps(2) infinite;
+}
+
+.fab.paused .px-icon {
+  animation: none;
+  opacity: 0.6;
+}
+
+@keyframes hourglass {
+  to {
+    transform: rotate(180deg);
+  }
+}
+
 .fab .badge {
   position: absolute;
   top: -8px;

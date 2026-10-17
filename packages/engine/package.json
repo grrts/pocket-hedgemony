@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./domain/*": "./src/domain/*/index.ts"
+    "./domain/*": "./src/domain/*/index.ts",
+    "./node": "./src/node/mapTiles.ts"
   },
   "scripts": {
     "typecheck": "tsc -p .",

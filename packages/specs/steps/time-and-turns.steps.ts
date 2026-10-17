@@ -400,7 +400,7 @@ Then("both are applied by the same End turn pipeline", (s) => {
     const result = endTurn(r.c, r.n);
     expect(result.ended).toBe(true);
     if (result.ended) expect(result.report.rejectedOrders).toEqual([]);
-    expect(r.c.world.armies.marched[r.army]![0]).toBe(r.from);
+    expect(r.c.world.armies.location[r.army]).not.toBe(r.from);
   }
 });
 
@@ -459,8 +459,7 @@ Then("the order is applied first", (s) => {
   const w = campaign(s).world;
   expect(s.result.report.rejectedOrders).toEqual([]);
   // The march of this same turn already follows the order's route from where it was given.
-  expect(w.armies.marched[s.army]![0]).toBe(s.from);
-  expect(w.armies.marched[s.army]!.length).toBeGreaterThan(1);
+  expect(w.armies.location[s.army]).not.toBe(s.from);
 });
 
 Then("then the marches run, and the economy and the levies run because a new month begins in the turn", (s) => {
@@ -513,8 +512,12 @@ Then("the first order is applied", (s) => {
   expect(s.result.report.rejectedOrders.map((r: { order: Order }) => r.order)).not.toContain(s.orders[0]);
 });
 
-Then("the second is rejected with the reason {string}", (s, reason: string) => {
-  expect(s.result.report.rejectedOrders).toEqual([{ order: s.orders[1], reason }]);
+Then("the second replaces it, so the army marches where the second sends it", (s) => {
+  const w = campaign(s).world;
+  expect(s.result.report.rejectedOrders).toEqual([]);
+  // The second order sends it back where it stood: it never set off for the first.
+  expect(w.armies.location[s.orders[1].army]).toBe(s.orders[1].to);
+  expect(w.armies.route[s.orders[1].army]).toEqual([]);
 });
 
 Given("End turn has been given", (s) => {
@@ -1700,7 +1703,7 @@ Then("the phases run in this order:", (s, table: string[][]) => {
   expect(at.every((x, i) => x >= 0 && (i === 0 || x >= at[i - 1]!))).toBe(true);
   const w = campaign(s).world;
   expect(s.result.report.rejectedOrders).toEqual([]);
-  expect(w.armies.marched[s.army]![0]).toBe(s.from);
+  expect(w.armies.location[s.army]).not.toBe(s.from);
   // Monthly income is paid only in a turn in which a month begins (X-18).
   const paid = monthBeginning(s.dateBefore) !== null ? w.nationMonthlyIncome[france(s)]! : 0;
   expect(w.nationTreasury[france(s)]).toBeCloseTo(s.before.treasury + paid);

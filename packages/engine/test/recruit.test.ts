@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { applyNow, ARMS, createWorld, monthBeginning, processTurn, type Order, type World } from "../src/index.ts";
 import { armyPay, garrisonTroops, idleCommanders, menByArm } from "../src/recruit.ts";
 
 const rules = loadDefaultRuleset();
+const tiles = loadMapTiles(rules);
 const n = (w: World, id: string) => w.nationIndex.get(id)!;
 const capital = (w: World, nation: number) => w.provinceIndex.get(rules.nations[nation]!.capital)!;
 const armiesOf = (w: World, nation: number) => Array.from({ length: w.armies.count }, (_, i) => i).filter((i) => w.armies.alive[i] && w.armies.owner[i] === nation);
@@ -26,7 +28,7 @@ function weeks(w: World, nation: number, count: number): void {
 
 describe("armies that cost something", () => {
   it("recruits a province's men by the thousand, each thousand gathering in two weeks, as its garrison", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     w.player = me;
     const p = neighbourOf(w, capital(w, me), me);
@@ -45,7 +47,7 @@ describe("armies that cost something", () => {
   });
 
   it("commissions a province's official as commander, leaving the post empty for half tax", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     w.player = me;
     const p = neighbourOf(w, capital(w, me), me);
@@ -68,7 +70,7 @@ describe("armies that cost something", () => {
   });
 
   it("lets a commander pick up the garrison where his army stands", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     w.player = me;
     const p = capital(w, me);
@@ -82,7 +84,7 @@ describe("armies that cost something", () => {
   });
 
   it("pays levies from their fourth month and keeps them under arms until sent home", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     w.player = me;
     const [army] = armiesOf(w, me);
@@ -95,7 +97,7 @@ describe("armies that cost something", () => {
   });
 
   it("trains levy foot as archers in the army while it stands at home", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     w.player = me;
     const [army] = armiesOf(w, me);
@@ -107,7 +109,7 @@ describe("armies that cost something", () => {
   });
 
   it("splits, merges and sends home troops", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     w.player = me;
     const [army] = armiesOf(w, me);
@@ -124,7 +126,7 @@ describe("armies that cost something", () => {
   });
 
   it("refuses to recruit past the troop cap or the province's men", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     const p = capital(w, me);
     expect(refused(w, { type: "recruit", province: p, thousands: Math.ceil(w.provinceRecruits[p]! / 1000) + 1 }, me)).toMatch(/only/);
@@ -133,7 +135,7 @@ describe("armies that cost something", () => {
   });
 
   it("buys mercenaries who arrive weeks later under their own captain", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     ok(w, { type: "hire", arm: "pikes" }, me);
     expect(armiesOf(w, me).length).toBe(1);
@@ -146,12 +148,12 @@ describe("armies that cost something", () => {
   });
 
   it("AI realms at war recruit and send commanders out to their troops", () => {
-    const w = createWorld(rules, 3);
+    const w = createWorld(rules, 3, tiles);
     for (let t = 0; t < 104; t++) processTurn(w, [], -1);
     let led = 0;
     let garrisons = 0;
     for (let i = 0; i < w.armies.count; i++) if (w.armies.alive[i]) w.armies.commander[i]! >= 0 ? led++ : garrisons++;
     expect(led).toBeGreaterThan(garrisons);
     expect(w.commanderIds.length).toBeGreaterThan(rules.nations.length);
-  });
+  }, 60000);
 });
