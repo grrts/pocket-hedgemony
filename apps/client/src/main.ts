@@ -28,6 +28,7 @@ import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
 import { provinceWorks, realmWorks, worksLine } from "./ui/works.ts";
+import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castlesOpen, foodLine, foodTab } from "./ui/food.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
@@ -154,7 +155,9 @@ let grantOpen = false;
 /** The lord's screen lists every royal province to grant, not just the nearest. */
 let grantAll = false;
 /** Which tab of the province overview is open. */
-let provinceTab: "overview" | "people" | "garrison" | "build" = "overview";
+let provinceTab: "overview" | "people" | "garrison" | "land" | "build" = "overview";
+/** The tile tapped on the Land tab, or -1. */
+let landTile = -1;
 /** Map lens: how provinces are coloured. */
 type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords";
 let lens: Lens = "realms";
@@ -1469,6 +1472,10 @@ function renderPanel(): void {
     renderWorks(selectedProvince);
     return;
   }
+  if (provinceTab === "land") {
+    renderLand(selectedProvince);
+    return;
+  }
   const armiesHere = snapshot ? [...snapshot.armies.id.keys()].filter((k) => snapshot!.armies.location[k] === selectedProvince && snapshot!.armies.commander[k]! >= 0) : [];
   const official = snapshot && own >= 0 ? officialOf(snapshot, selectedProvince, own) : undefined;
   const siege = siegeInfo(selectedProvince);
@@ -1645,7 +1652,7 @@ function renderOfficial(pi: number): void {
 function provinceTabs(): string {
   const tab = (key: typeof provinceTab, label: string) => `<button class="tab${provinceTab === key ? " on" : ""}" data-tab="${key}">${label}</button>`;
   const building = snapshot?.sites.some((x) => x.province === selectedProvince) ? ` ${icon("hourglass", 1)}` : "";
-  return `<nav class="tabs">${tab("overview", "Overview")}${tab("people", "People")}${tab("garrison", "Garrison")}${tab("build", `Build${building}`)}</nav>`;
+  return `<nav class="tabs">${tab("overview", "Overview")}${tab("people", "People")}${tab("garrison", "Garrison")}${tab("land", "Land")}${tab("build", `Build${building}`)}</nav>`;
 }
 
 /** Food lines of a province's overview: months stored, the last harvest and anyone who starved this year. */
@@ -1986,10 +1993,36 @@ function renderWorks(pi: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-cancel-work]").forEach((b) => b.addEventListener("click", () => void act({ type: "cancelBuild", province: pi, work: Number(b.dataset.cancelWork) })));
 }
 
+/** The province's Land tab: its tiles, and the sheet of the one tapped (feedback 80, 87). */
+function renderLand(pi: number): void {
+  const p = provinces[pi]!;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
+    ${provinceTabs()}
+    ${provinceLand(snapshot!, pi, landTile)}`;
+  bindClose();
+  showPanel(true);
+  bindProvinceTabs();
+  panel.querySelectorAll<HTMLButtonElement>("[data-land-tile]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const i = Number(b.dataset.landTile);
+      landTile = landTile === i ? -1 : i;
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-build]").forEach((b) =>
+    b.addEventListener("click", async () => {
+      await act({ type: "build", province: pi, work: Number(b.dataset.build) });
+      if (snapshot && !snapshot.rejectedOrders.length) sound.sfx("econ_spend");
+    }),
+  );
+}
+
 function bindProvinceTabs(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       provinceTab = b.dataset.tab as typeof provinceTab;
+      landTile = -1;
       renderPanel();
     }),
   );
