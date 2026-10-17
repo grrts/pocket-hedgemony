@@ -17,6 +17,8 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.evaluate(() => window.__phSelect("p1601"));
+  await page.waitForTimeout(200);
+  await shot("overview");
   await page.click("[data-tab=people]");
   await page.waitForTimeout(200);
   await shot("people");

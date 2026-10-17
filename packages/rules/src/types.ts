@@ -251,4 +251,10 @@ export interface LivingDefines {
   coastalSeafolk: number;
   /** How countryfolk split by class on each ground. */
   countryMix: Record<string, Record<string, number>>;
+  /** People one worker of a food class feeds a year (province: farm 1.5, bare tiles 0.67); farmers' food comes at the harvest, the rest month by month. */
+  foodPerWorker: Record<string, number>;
+  /** Months of eating each province holds beyond its first harvest at the start. */
+  startingStoreMonths: number;
+  /** A province of the same realm with more than this many months stored feeds a hungry neighbour. */
+  reliefAboveMonths: number;
 }
