@@ -1,4 +1,4 @@
-import { addDays, DAYS_PER_TURN, forageLimit, groundOf, planRoute, type MarchMap, type MoveOrder, type Route, type Snapshot } from "@ph/engine";
+import { addDays, DAYS_PER_TURN, forageLimit, groundOf, planRoute, type MarchMap, type MoveOrder, type News, type Order, type PeaceTerms, type Route, type Snapshot } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { placeClimate, provinceClimate, seasonName, type PlaceClimate } from "./map/seasons.ts";
 import { loadDefaultRuleset } from "@ph/rules";
@@ -60,6 +60,11 @@ const marchGraph: MarchMap = (() => {
 // ---- state ----
 let snapshot: Snapshot | null = null;
 let owners: Int16Array = Int16Array.from(provinces, (p) => (p.owner ? nationIndex.get(p.owner)! : -1));
+let occupiers: Int16Array = new Int16Array(provinces.length).fill(-1);
+/** Dispatches: what happened last turn (or from the last order) that concerns the player. */
+let dispatches: News[] = [];
+/** The dispatches are open in the panel. */
+let newsView = false;
 let selectedProvince = -1;
 let selectedArmy = -1; // army id
 let pendingOrders: MoveOrder[] = [];
@@ -113,6 +118,14 @@ document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLElement>("[data-realm]");
   if (!b) return;
   realmView = Number(b.dataset.realm);
+  newsView = false;
+  panelCollapsed = false;
+  renderPanel();
+});
+document.addEventListener("click", (e) => {
+  if (!(e.target as HTMLElement).closest("[data-news]")) return;
+  newsView = true;
+  realmView = -1;
   panelCollapsed = false;
   renderPanel();
 });
@@ -238,8 +251,11 @@ function restyleProvinces(): void {
   if (selectedArmy >= 0) for (const p of plannedRoutes.get(selectedArmy)?.path ?? []) targets.add(p);
   for (let i = 0; i < provinces.length; i++) {
     const o = owners[i]!;
-    const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0) | (isKnown(i) ? 0 : 4);
-    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : lensColor(i), o, TERRAINS.indexOf(provinces[i]!.terrain as (typeof TERRAINS)[number]), flags, isWater[i]);
+    const occ = occupiers[i]!;
+    // Occupied land is hatched in the occupier's colour; borders stay the owner's.
+    const hatched = occ >= 0 && lens === "realms";
+    const flags = (i === selectedProvince ? 1 : 0) | (targets.has(i) ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, TERRAINS.indexOf(provinces[i]!.terrain as (typeof TERRAINS)[number]), flags, isWater[i]);
   }
   // Seasons move on a week a turn, so they are only worked out when the date changes.
   const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (snapshot?.date ?? rules.defines.startDate);
@@ -258,7 +274,7 @@ function restyleProvinces(): void {
 }
 
 // ---- overlay: nation names, cities, armies ----
-const nationLabels = computeNationLabels();
+let nationLabels = computeNationLabels();
 
 function computeNationLabels() {
   const acc = nations.map(() => ({ x: 0, y: 0, n: 0, ref: -1 }));
@@ -354,6 +370,19 @@ function drawOverlay(o: OverlayContext): void {
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (onScreen(sx, sy) && isKnown(i)) pixelText(ctx, p.name, sx, isWater[i] ? sy : sy + 7 * spriteScale, 12, isWater[i]);
     });
+  }
+
+  // Sieges under way: a tower and how long the walls have held.
+  if (snapshot && zoom >= 2) {
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    for (const st of snapshot.sieges) {
+      if (!isKnown(st.province)) continue;
+      const p = provinces[st.province]!;
+      const [sx, sy] = o.toScreen(p.x!, p.y!);
+      if (!onScreen(sx, sy)) continue;
+      pixelText(ctx, st.months ? `Siege · ${st.months} mo` : "Siege", sx, sy - 8 * spriteScale, 10);
+    }
   }
 
   // Armies and their commanders.
@@ -555,6 +584,7 @@ function onTap(sx: number, sy: number, province: number): void {
     selectedProvince = province >= 0 && isKnown(province) ? province : -1;
   }
   realmView = -1;
+  newsView = false;
   restyleProvinces();
   renderPanel();
   renderActions();
@@ -639,7 +669,97 @@ function renderHud(): void {
     <button class="realm" data-realm="${me}" title="Your realm">${pennant(n.color, 2)}<b>${esc(n.name)}</b></button>
     <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}</span>
     <span class="plaque" title="Treasury: gold, and change per month">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></span>
-    <span class="plaque" title="Levies: men ready to raise">${icon("swords", 1)}${fmt(s.nationLevies[me]! / 1000)}k</span>`;
+    <span class="plaque" title="Levies: men ready to raise">${icon("swords", 1)}${fmt(s.nationLevies[me]! / 1000)}k</span>
+    ${myWars().length ? `<button class="plaque at-war" data-realm="${me}" title="Your wars">${icon("swords", 1)}At war</button>` : ""}
+    <button class="plaque dispatches${s.calls.length ? " urgent" : ""}" data-news title="Dispatches: what happened this turn">${icon("scroll", 1)}${dispatches.length + s.calls.length}</button>`;
+}
+
+/** Wars the player fights, with the player's side first. */
+function myWars(): { id: string; ours: number[]; theirs: number[]; start: string }[] {
+  if (!snapshot) return [];
+  const me = snapshot.playerNation;
+  return snapshot.wars
+    .filter((w) => w.attackers.includes(me) || w.defenders.includes(me))
+    .map((w) => (w.attackers.includes(me) ? { id: w.id, ours: w.attackers, theirs: w.defenders, start: w.start } : { id: w.id, ours: w.defenders, theirs: w.attackers, start: w.start }));
+}
+
+const relationOf = (n: number) => snapshot?.relations.find((r) => r.nation === n) ?? null;
+/** "1450-03" → "March 1450". */
+const monthText = (iso: string) => {
+  const [y, m] = iso.split("-").map(Number);
+  return `${m ? MONTHS[m - 1] + " " : ""}${y}`;
+};
+const realmButton = (n: number) => `<button class="realm-link" data-realm="${n}">${pennant(nations[n]!.color)}<b>${esc(nations[n]!.name)}</b></button>`;
+
+/** Sends an order that acts at once (war, peace, levies), then shows what came of it. */
+async function act(order: Order): Promise<void> {
+  if (busy || !snapshot) return;
+  busy = true;
+  snapshot = await engine.send({ type: "act", order });
+  busy = false;
+  applySnapshot();
+  if (snapshot.rejectedOrders.length || snapshot.news.length) {
+    dispatches = [
+      ...snapshot.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [snapshot!.playerNation] })),
+      ...snapshot.news,
+      ...dispatches,
+    ];
+    newsView = true;
+    realmView = -1;
+    panelCollapsed = false;
+  }
+  restyleProvinces();
+  renderHud();
+  renderPanel();
+  renderActions();
+}
+
+/** Takes in a fresh snapshot's map state. */
+function applySnapshot(): void {
+  owners = snapshot!.provinceOwner;
+  occupiers = snapshot!.provinceOccupier;
+  nationLabels = computeNationLabels();
+}
+
+/** The dispatches: news of the turn, and calls to arms to answer. */
+function renderNews(): void {
+  const s = snapshot!;
+  const me = s.playerNation;
+  const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
+    war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown",
+  };
+  const mine = (x: News) => x.nations.includes(me);
+  const items = [...dispatches.filter(mine), ...dispatches.filter((x) => !mine(x))];
+  panel.innerHTML = `
+    <header><h2 class="ribbon">Dispatches</h2>${closeButton()}</header>
+    <p class="hint">${dateText(s.date)}</p>
+    ${s.calls
+      .map(
+        (c) => `<div class="call framed-soft">
+          <p>${icon("swords", 2)} ${realmButton(c.caller)} calls you to arms against ${realmButton(c.against)}${c.kind === "defensive" ? " (a defensive call: refusing breaks the alliance)" : ""}.</p>
+          <div class="choices"><button class="wax" data-call="${c.id}" data-yes="1">Join the war</button><button class="paper" data-call="${c.id}" data-yes="0">Refuse</button></div>
+        </div>`,
+      )
+      .join("")}
+    ${items.length ? `<ul class="news">${items
+      .map((x) => `<li class="${mine(x) ? "mine" : ""}">${icon(NEWS_ICON[x.kind], 1)}<span>${esc(x.text)}</span>${x.province !== undefined ? `<button class="paper go" data-go-province="${x.province}" title="Show on the map">${icon("map", 1)}</button>` : ""}</li>`)
+      .join("")}</ul>` : s.calls.length ? "" : `<p class="hint">Nothing of note this week.</p>`}`;
+  bindClose();
+  showPanel(true);
+  panel.querySelectorAll<HTMLButtonElement>("[data-call]").forEach((b) =>
+    b.addEventListener("click", () => void act({ type: "answerCall", call: b.dataset.call!, yes: b.dataset.yes === "1" })),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-go-province]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const i = Number(b.dataset.goProvince);
+      newsView = false;
+      selectedProvince = i;
+      panelCollapsed = true;
+      view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
+      restyleProvinces();
+      renderPanel();
+    }),
+  );
 }
 
 /** The End turn button in the corner, with a count of the orders waiting. */
@@ -665,7 +785,7 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   panel.hidden = !open || panelCollapsed;
   reopen.hidden = !open || !panelCollapsed;
   const what =
-    reopenIcon === "crown" ? "Choose a realm" : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
+    reopenIcon === "crown" ? "Choose a realm" : newsView ? "Dispatches" : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
   reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
   reopen.title = `Open the overview: ${what}`;
   panel.querySelector(".fold")?.addEventListener("click", () => {
@@ -675,6 +795,10 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
 }
 
 function renderPanel(): void {
+  if (newsView && snapshot) {
+    renderNews();
+    return;
+  }
   if (realmView >= 0) {
     renderRealm(realmView);
     return;
@@ -723,6 +847,8 @@ function renderPanel(): void {
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       <dt>Seat</dt><dd>${owner && owner.capital === p.id ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)]}</dd>
       <dt>Walls</dt><dd>${owner && owner.capital === p.id ? WALL_NAMES.castle : p.castle ? WALL_NAMES[p.castle] : "None"}</dd>
+      ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
+      ${siegeLine(selectedProvince)}
     </dl>
     ${armiesHere
       .map((k) => {
@@ -737,7 +863,7 @@ function renderPanel(): void {
           <img class="portrait" src="${portrait}" alt="">
           <span class="who">${c ? `<b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
           ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}, ${fmt(s.armies.horse[k]!)} on horse${mine ? `<br><small>${supplyLine(k)}${marchLine(k, order)}</small>` : ""}</span>
-          ${mine ? `<button data-army="${id}">${selectedArmy === id ? "Pick a target" : "Move"}</button>` : ""}
+          ${mine ? `<span class="army-buttons"><button data-army="${id}">${selectedArmy === id ? "Pick a target" : "Move"}</button><button class="paper small" data-disband="${id}" title="Send the men home to the levies">Disband</button></span>` : ""}
         </div>`;
       })
       .join("")}
@@ -747,10 +873,79 @@ function renderPanel(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-army]").forEach((b) =>
     b.addEventListener("click", () => pickArmy(Number(b.dataset.army))),
   );
+  panel.querySelectorAll<HTMLButtonElement>("[data-disband]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const id = Number(b.dataset.disband);
+      pendingOrders = pendingOrders.filter((o) => o.army !== id);
+      plannedRoutes.delete(id);
+      void act({ type: "disband", army: id }).then(() => {
+        newsView = false;
+        renderPanel();
+      });
+    }),
+  );
   bindNationButtons();
 }
 
 /** Country overview: the realm's lands, people, purse and commanders. */
+function siegeLine(p: number): string {
+  const st = snapshot?.sieges.find((x) => x.province === p);
+  if (!st) return "";
+  return `<dt>Siege</dt><dd>by ${esc(nations[st.by]!.name)}, ${st.months} month${st.months === 1 ? "" : "s"}, ${st.breaches} breach${st.breaches === 1 ? "" : "es"}, ${fmt(st.garrison)} men inside</dd>`;
+}
+
+/** War and peace with another realm, from its overview. */
+function relationsSection(r: number): string {
+  const s = snapshot!;
+  const me = s.playerNation;
+  const rel = relationOf(r);
+  const war = myWars().find((w) => w.theirs.includes(r));
+  if (war) {
+    // Land each side holds of the other's, for the peace terms.
+    const ours = new Set(war.ours);
+    const theirs = new Set(war.theirs);
+    let taken = 0;
+    let lost = 0;
+    for (let i = 0; i < provinces.length; i++) {
+      if (theirs.has(owners[i]!) && ours.has(occupiers[i]!)) taken++;
+      if (ours.has(owners[i]!) && theirs.has(occupiers[i]!)) lost++;
+    }
+    const leaders = s.wars.find((w) => w.id === war.id)!;
+    const whole = [leaders.attackers[0], leaders.defenders[0]].includes(me) && [leaders.attackers[0], leaders.defenders[0]].includes(r);
+    return `<h3 class="sub">At war</h3>
+      <p>Since ${monthText(war.start)}. With you: ${war.ours.map((n) => esc(nations[n]!.name)).join(", ")}. Against you: ${war.theirs.map((n) => esc(nations[n]!.name)).join(", ")}.</p>
+      <p class="hint">${whole ? "Peace with them ends the whole war." : "A separate peace: the rest of the war goes on."} Your side holds ${taken} of their provinces; they hold ${lost} of yours.</p>
+      <div class="choices">
+        <button class="wax" data-peace="take" ${taken ? "" : "disabled"}>${icon("crown", 2)}Peace: take ${taken} province${taken === 1 ? "" : "s"}</button>
+        <button class="paper" data-peace="white">White peace</button>
+        ${lost ? `<button class="paper" data-peace="give">Give up ${lost} province${lost === 1 ? "" : "s"}</button>` : ""}
+      </div>`;
+  }
+  const line =
+    rel?.state === "truce" ? `A truce holds${rel.until ? ` until ${monthText(rel.until)}` : ""}: no war before then.`
+    : rel?.state === "alliance" ? "Your ally: they answer your calls to arms."
+    : rel?.state === "subject" ? "Your overlord."
+    : rel?.state === "overlord" ? "Your subject: they join your wars."
+    : "No ties between you. Declaring war calls their allies to arms against you, and yours to your side.";
+  return `<h3 class="sub">Relations</h3><p>${line}</p>
+    ${rel ? "" : `<div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 2)}Declare war</button></div>`}`;
+}
+
+/** The player's own wars and levies, from their realm's overview. */
+function warRoomSection(): string {
+  const s = snapshot!;
+  const me = s.playerNation;
+  const cost = rules.defines.war.raiseGoldPerThousand;
+  const levies = s.nationLevies[me]!;
+  const sizes = [...new Set([5000, 10000, Math.floor(levies / 1000) * 1000])].filter((m) => m >= 1000 && m <= levies).sort((a, b) => a - b);
+  return `${myWars().length ? `<h3 class="sub">Wars</h3>${myWars()
+      .map((w) => `<p>${icon("swords", 1)} Against ${w.theirs.map(realmButton).join(" ")} <small>since ${monthText(w.start)}</small></p>`)
+      .join("")}` : ""}
+    <h3 class="sub">Raise levies</h3>
+    <p class="hint">${fmt(levies)} men ready. They gather at your capital for ${cost} gold a thousand.</p>
+    <div class="choices">${sizes.length ? sizes.map((m) => `<button class="paper" data-raise="${m}" ${(m / 1000) * cost > s.nationTreasury[me]! ? "disabled" : ""}>${fmt(m)} men · ${fmt((m / 1000) * cost)} gold</button>`).join("") : `<span class="hint">Not enough men yet.</span>`}</div>`;
+}
+
 function renderRealm(r: number): void {
   const n = nations[r]!;
   const s = snapshot;
@@ -775,6 +970,7 @@ function renderRealm(r: number): void {
       <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
+    ${s && s.playerNation !== r ? relationsSection(r) : ""}
     <dl class="facts">
       <dt>People</dt><dd>${fmt(people)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
@@ -783,6 +979,7 @@ function renderRealm(r: number): void {
       <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
     </dl>
+    ${s && s.playerNation === r ? warRoomSection() : ""}
     ${n.commanders.length ? `<h3 class="sub">Commanders</h3>${n.commanders
       .map((c) => `<div class="army"><img class="portrait" src="${spriteUrl("commander", n.color, 2)}" alt=""><span class="who"><b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
       .join("")}` : ""}
@@ -802,6 +999,13 @@ function renderRealm(r: number): void {
     restyleProvinces();
     renderPanel();
   });
+  panel.querySelectorAll<HTMLButtonElement>("[data-peace]").forEach((b) =>
+    b.addEventListener("click", () => void act({ type: "offerPeace", target: r, terms: b.dataset.peace as PeaceTerms })),
+  );
+  panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-raise]").forEach((b) =>
+    b.addEventListener("click", () => void act({ type: "raiseLevies", men: Number(b.dataset.raise) })),
+  );
   panel.querySelector("[data-back]")?.addEventListener("click", () => {
     realmView = -1;
     renderPanel();
@@ -811,6 +1015,7 @@ function renderRealm(r: number): void {
 
 function bindClose(): void {
   panel.querySelector(".close")!.addEventListener("click", () => {
+    newsView = false;
     realmView = -1;
     selectedProvince = -1;
     selectedArmy = -1;
@@ -826,7 +1031,8 @@ function bindNationButtons(): void {
 async function startGame(nation: string): Promise<void> {
   snapshot = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation });
   etaCache.clear();
-  owners = snapshot.provinceOwner;
+  dispatches = [];
+  applySnapshot();
   const cap = provinceIndex.get(nations[nationIndex.get(nation)!]!.capital)!;
   selectedProvince = cap;
   panelCollapsed = true;
@@ -845,7 +1051,14 @@ async function endTurn(): Promise<void> {
   performance.mark("turn-sent");
   snapshot = await engine.send({ type: "endTurn", orders: pendingOrders });
   performance.mark("turn-arrived");
-  owners = snapshot.provinceOwner;
+  applySnapshot();
+  dispatches = [...snapshot.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [snapshot!.playerNation] })), ...snapshot.news];
+  // Open the dispatches when something happened to the player's own realm, or a call waits.
+  if (snapshot.calls.length || dispatches.some((x) => x.nations.includes(snapshot!.playerNation) && x.kind !== "raised")) {
+    newsView = true;
+    realmView = -1;
+    panelCollapsed = false;
+  }
   pendingOrders = [];
   plannedRoutes.clear();
   etaCache.clear();
@@ -896,6 +1109,29 @@ async function selfTest(): Promise<void> {
   probe.terminate();
   renderDiagnostics();
 }
+
+// Hooks for the scripted play-throughs (scripts/war-shots.mjs).
+Object.assign(globalThis, {
+  __phNation: (id: string) => nationIndex.get(id),
+  __phTurn: () => snapshot?.turn ?? -1,
+  /** Sends every idle army of the player toward a realm's capital. */
+  __phMarchOn: (id: string) => {
+    if (!snapshot) return;
+    const to = provinceIndex.get(nations[nationIndex.get(id)!]!.capital)!;
+    snapshot.armies.id.forEach((army, k) => {
+      if (snapshot!.armies.owner[k] !== snapshot!.playerNation || snapshot!.armies.route[k]!.length || snapshot!.armies.location[k] === to) return;
+      const route = planRoute(march, marchGraph, snapshot!.armies.location[k]!, to, armyStats(k));
+      if (!route) return;
+      pendingOrders = pendingOrders.filter((o) => o.army !== army);
+      pendingOrders.push({ type: "move", army, to });
+      plannedRoutes.set(army, route);
+    });
+  },
+  __phLookAtWar: () => {
+    const p = snapshot?.sieges[0]?.province ?? occupiers.findIndex((o) => o >= 0);
+    if (p >= 0) view.lookAt(provinces[p]!.x!, provinces[p]!.y!, 4);
+  },
+});
 
 renderDiagnostics();
 void selfTest();
