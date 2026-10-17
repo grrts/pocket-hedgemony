@@ -1224,3 +1224,28 @@ table.classes td.bar span {
   height: 8px;
   background: var(--ink-soft);
 }
+
+/* The realm's Provinces overview: rows open their province; troubled rows stand out. */
+table.provinces tr.go {
+  cursor: pointer;
+}
+
+table.provinces tr.bad td {
+  color: var(--wax, #8b1e1e);
+}
+
+table.provinces th.num,
+table.provinces td.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Kept clear of the end-turn button, which stands over the panel's right edge. */
+table.provinces {
+  width: auto;
+  min-width: 60%;
+}
+
+table.provinces td:first-child {
+  padding-right: 24px;
+}

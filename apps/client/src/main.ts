@@ -117,7 +117,7 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" = "general";
+let realmTab: "general" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" = "general";
 /** Province whose official's screen is open, or -1. */
 let officialView = -1;
 /** Which tab of the province overview is open. */
@@ -1260,7 +1260,58 @@ function lordsTab(r: number): string {
     <p class="hint">Gifts, fiefs and quiet years raise loyalty; lost wars and seized land lower it. Open a province to seize it or grant it as a fief.</p>`;
 }
 
+/** Sort orders of the Provinces overview. */
+let provinceSort: "trouble" | "people" | "food" = "trouble";
+
+/**
+ * The realm's provinces at a glance (milestone 3 overview): people, food,
+ * mood and lord of each, the troubled ones first, with counts of the hungry
+ * and the restless on top. Tapping a row opens the province.
+ */
+function provincesTab(r: number): string {
+  const s = snapshot!;
+  const list: number[] = [];
+  for (let p = 0; p < owners.length; p++) if (owners[p] === r) list.push(p);
+  const trouble = (p: number) => s.provinceMood[p]! * 10 + (s.provinceFoodMonths[p]! < 1 ? 15 : s.provinceFoodMonths[p]! < 3 ? 5 : 0) + (s.provinceGrievances[p]! ? 1 : 0);
+  const by = { trouble: (a: number, b: number) => trouble(b) - trouble(a), people: (a: number, b: number) => s.provincePeople[b]! - s.provincePeople[a]!, food: (a: number, b: number) => s.provinceFoodMonths[a]! - s.provinceFoodMonths[b]! }[provinceSort];
+  list.sort((a, b) => by(a, b) || a - b);
+  const people = list.reduce((t, p) => t + s.provincePeople[p]!, 0);
+  const hungry = list.filter((p) => s.provinceFoodMonths[p]! < 1).length;
+  const low = list.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length;
+  const restless = list.filter((p) => s.provinceMood[p]! >= 2).length;
+  const grumbling = list.filter((p) => s.provinceMood[p]! === 1).length;
+  const MOOD_LABEL = ["Calm", "Grumbling", "Rioting", "Plotting"];
+  const rows = list
+    .map((p) => {
+      const months = s.provinceFoodMonths[p]!;
+      const l = s.provinceLord[p]!;
+      return `<tr class="go${s.provinceMood[p]! >= 2 || months < 1 ? " bad" : ""}" data-open-province="${p}"><td><b>${esc(provinces[p]!.name)}</b><br><small>${MOOD_LABEL[s.provinceMood[p]!]} · ${l >= 0 ? esc(s.lords[l]!.house) : "royal land"}</small></td><td class="num">${fmt(Math.round(s.provincePeople[p]! * 1000))}</td><td class="num">${months.toFixed(1)} mo</td></tr>`;
+    })
+    .join("");
+  const sortButton = (key: typeof provinceSort, label: string) => `<button class="tab${provinceSort === key ? " on" : ""}" data-province-sort="${key}">${label}</button>`;
+  return `<p><b>${fmt(Math.round(people * 1000))}</b> people in ${list.length} provinces. ${hungry ? `<b>${hungry} hungry</b>, ` : ""}${low ? `${low} low on food, ` : ""}${restless ? `<b>${restless} rioting or plotting</b>, ` : ""}${grumbling ? `${grumbling} grumbling.` : hungry || low || restless ? "the rest content." : "All fed and calm."}</p>
+    <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}</nav>
+    <table class="troops provinces"><thead><tr><th>Province · mood · lord</th><th class="num">People</th><th class="num">Food</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
 function bindLords(): void {
+  panel.querySelectorAll<HTMLButtonElement>("[data-province-sort]").forEach((b) =>
+    b.addEventListener("click", () => {
+      provinceSort = b.dataset.provinceSort as typeof provinceSort;
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLElement>("[data-open-province]").forEach((row) =>
+    row.addEventListener("click", () => {
+      const i = Number(row.dataset.openProvince);
+      realmView = -1;
+      selectedProvince = i;
+      provinceTab = "overview";
+      view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
+      restyleProvinces();
+      renderPanel();
+    }),
+  );
   panel.querySelectorAll<HTMLButtonElement>("[data-gift]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "gift", lord: Number(b.dataset.gift) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-seize]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "seizeFief", province: Number(b.dataset.seize) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-grant]").forEach((b) =>
@@ -1782,7 +1833,7 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if (!s || ((realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords") && !mine)) realmTab = "general";
+  if (!s || ((realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces") && !mine)) realmTab = "general";
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
@@ -1813,11 +1864,12 @@ function renderRealm(r: number): void {
     : realmTab === "military" ? warRoomSection()
     : realmTab === "mercenaries" ? mercenarySection()
     : realmTab === "lords" ? lordsTab(r)
+    : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "officials" ? officialsTab(rules, own.map((i) => ({ province: i, official: officialOf(rules, i, r, s!.provinceOfficial[i]) })), r)
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : ""}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("provinces", "Provinces") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : ""}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
