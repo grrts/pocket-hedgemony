@@ -30,18 +30,18 @@ Feature: Kinds of soldiers and their break points
     When the company is evaluated
     Then the country "France" cannot keep a company of kind "standing regiment"
 
-  @WAR-016 @placeholder
-  Scenario Outline: Levies go home after 6 months unless paid double
+  @WAR-016 @WAR-212 @feedback-23
+  Scenario Outline: Levies stay until the realm sends them home
     Given a levy company of 1000 men that has been out <months> months
-    And it is <paid>
+    And it is paid normally
     When the month ends
-    Then the company has <men> men
+    Then the levy company still has 1000 men
 
     Examples:
-      | months | paid             | men  |
-      | 5      | paid normally    | 1000 |
-      | 6      | paid normally    | 950  |
-      | 6      | paid double      | 1000 |
+      | months |
+      | 5      |
+      | 6      |
+      | 24     |
 
   @WAR-017
   Scenario: Levies away at harvest cost the harvest

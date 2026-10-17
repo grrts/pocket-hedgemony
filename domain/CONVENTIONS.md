@@ -70,8 +70,8 @@ Commands are orders that can be sent as data (multiplayer-friendly, same for pla
 ## 8. Policies (reactions to other contexts)
 "When <event from context X>, then <what this context does>."
 
-## 9. Monthly turn
-What this context does each turn (month), and what it must read first. The global order lives in
+## 9. Each turn
+What this context does each turn (a week, X-18) and in the turns where a new month, season or year begins, and what it must read first. The global order lives in
 time-and-turns; here list the steps and their dependencies.
 
 ## 10. Configuration

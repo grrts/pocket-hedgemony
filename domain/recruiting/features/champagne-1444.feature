@@ -1,5 +1,7 @@
 @context-recruiting
 Feature: Champagne, late summer 1444
+  # Worked example from the recruiting design, drawn as a region levy. Since the playtest feedback (F-14, F-18)
+  # a levy is raised one province at a time, by the thousand; the example's sums still hold per province.
   As a player of France
   I want the worked example of the recruiting design to come out as written
   So that the levy, training, food, pay and command rules fit together

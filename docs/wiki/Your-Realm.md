@@ -6,7 +6,7 @@ Your realm is your country as a whole: the treasury, the food network that runs 
 
 ### The country card
 
-The country card is the one-screen summary of your country. France in 1444 might look like this:
+The country card has four tabs: **General** first, then **Diplomacy**, **Trade** and **Army**. General is the one-screen summary of your country; Allies, Enemies and Oaths broken sit on the Diplomacy tab, where war and peace are declared, trade lines on Trade, and soldiers, commanders and ships on Army. France's General tab in 1444 might look like this:
 
 ```
  FRANCE                     King Charles VII, 41 · 23 years on throne · 2 heirs

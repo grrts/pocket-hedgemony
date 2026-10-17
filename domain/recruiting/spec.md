@@ -148,13 +148,13 @@ Newest decision first.
 - RECR-007 Students shall be callable from the same pool as levies, as a class with the clerks' call share of 4 % of their fighting-age men, while clergy and scholars shall not. [recruiting §2.2, §6.2; D-RECR-13]
 
 ### The levy
-- RECR-008 When the player taps Levy on a province, a region or the country card, the recruiting system shall show one slider for men and the costs: gold now, food now, pay, harvest, pool left, ready in, with the season and a harvest warning. [recruiting §2.1]
+- RECR-008 When the player taps Levy on a province, a region or the country card, the recruiting system shall show one slider for men and the costs: gold now, food now, pay, harvest, pool left, ready in, with the season and a harvest warning. [recruiting §2.1] *Replaced in part by RECR-104, RECR-105 (playtest feedback).*
 - RECR-009 The recruiting system shall show, for every cost line on the levy screen, its gain and lose list. [recruiting §2.1]
 - RECR-010 When a levy is made, the recruiting system shall take men from every class in proportion to that class's share of the men who can be called, with no player setting. [recruiting §2.3]
-- RECR-011 When a levy is drawn from a region, the recruiting system shall take men from every province in the region by its share of the region's men. [recruiting §2.3]
+- RECR-011 When a levy is drawn from a region, the recruiting system shall take men from every province in the region by its share of the region's men. [recruiting §2.3] *Replaced in part by RECR-104 (playtest feedback).*
 - RECR-012 When a levy is made, the recruiting system shall include veterans by their share of the pool. [recruiting §2.4]
-- RECR-013 When a levy is made, the recruiting system shall have the men gather in 2 weeks as levies who can march and fight at once as levy foot. [recruiting §1, §2.1]
-- RECR-014 Where the realm has W18 Railway mobilization, the recruiting system shall have levies gather in 3 days instead of 2 weeks. [recruiting §2.5; D-RECR-12]
+- RECR-013 When a levy is made, the recruiting system shall have the men gather in 2 weeks as levies who can march and fight at once as levy foot. [recruiting §1, §2.1] *Replaced in part by RECR-106, RECR-107 (playtest feedback).*
+- RECR-014 Where the realm has W18 Railway mobilization, the recruiting system shall have levies gather in 3 days instead of 2 weeks. [recruiting §2.5; D-RECR-12] *Replaced in part by RECR-106 (playtest feedback).*
 - RECR-015 When a levy is made, the recruiting system shall charge levy money of 20 gold per 1,000 men up front. [recruiting §3.1]
 - RECR-016 While a levy gathers, the recruiting system shall have it eat 1 ration per man a month from the province's local store. [recruiting §3.2]
 - RECR-017 The recruiting system shall pay no wage for a levy's first 3 months and 0.15 gold per man a month from the 4th month, counted as RECR-101 says. [recruiting §3.1, §4.3]
@@ -189,7 +189,7 @@ Newest decision first.
 - RECR-040 The recruiting system shall give each training place its training room: earthwork ring fort 1,000, stone castle 3,000, bastion fort 5,000, star fort 8,000, drill yard 1,500 of any arm, barracks 4,000 of any arm. [recruiting §4.1]
 - RECR-041 Where a province has both a castle and a drill yard, the recruiting system shall add their training rooms together. [recruiting §4.1]
 - RECR-042 If levies are ordered to train from a town with neither castle nor drill yard, then they shall march to the nearest place that can train. [recruiting §4.1]
-- RECR-043 When the player trains levies, the recruiting system shall let them pick the arm, how many men and the castle or drill yard, and the men walk there and start. [recruiting §4.1]
+- RECR-043 When the player trains levies, the recruiting system shall let them pick the arm, how many men and the castle or drill yard, and the men walk there and start. [recruiting §4.1] *Replaced in part by RECR-109 (playtest feedback).*
 - RECR-044 The recruiting system shall allow training only into arms the realm has unlocked. [recruiting §4.2]
 - RECR-045 When training starts, the recruiting system shall take the months, gold, loads of arms, powder and animals per 1,000 men in the arm table (4.2) from the stores. [recruiting §4.2]
 - RECR-046 Where a Marshal is the official in a province, the recruiting system shall make training there 25 % faster. [recruiting §4.1, §7.2]
@@ -199,7 +199,7 @@ Newest decision first.
 - RECR-050 While a castle or town is under siege, the recruiting system shall stop all training in it. [recruiting §4.2]
 - RECR-051 When training finishes, the regiment shall have its arm, drill 3 (4 if trained under a Marshal), pay by its arm's pay group (RECR-102), and break point 30 % plus troop level, keeping its kind. [recruiting §4.3, §7.2, §1]
 - RECR-052 The recruiting system shall leave untrained levies at drill 0 and break point 25 %. [recruiting §4.3]
-- RECR-053 The recruiting system shall send trained levy regiments home like levies: after 6 months, 5 % a month unless paid double. [recruiting §4.3]
+- RECR-053 The recruiting system shall send trained levy regiments home like levies: after 6 months, 5 % a month unless paid double. [recruiting §4.3] *Replaced by RECR-113 (playtest feedback).*
 - RECR-054 If training runs past the 3 free months, then the recruiting system shall charge pay for those months. [recruiting §4.4]
 
 ### Standing regiments and retinues
@@ -233,7 +233,7 @@ Newest decision first.
 - RECR-076 While a Marshal runs a province, training there shall be 25 % faster and regiments shall leave with drill 4. [recruiting §7.2]
 - RECR-077 The recruiting system shall pay a Marshal twice an official's wage, war or peace. [recruiting §7.2]
 - RECR-078 If a Marshal stays 10 years in a province with no war, then they shall lose 1 from their best skill. [recruiting §7.2]
-- RECR-079 When an official is commissioned, the recruiting system shall charge 10 gold once. [recruiting §7.3]
+- RECR-079 When an official is commissioned, the recruiting system shall charge 10 gold once. [recruiting §7.3] *Replaced in part by RECR-114 (playtest feedback): the commission costs 50 gold.*
 - RECR-080 While commissioned, an official shall be paid their wage ×3 as commander or ×2 as captain. [recruiting §7.3]
 - RECR-081 The recruiting system shall attach a staff of 100 (commander) or 50 (captain) who eat 2 rations each a month from the army's reserve, and the staff horses, 30 for a commander and 15 for a captain, eat 3 each; staff are not soldiers and do not count toward the forage limit or the column size. [recruiting §7.3; D-RECR-18]
 - RECR-082 When an official is commissioned, the recruiting system shall ask how the province is run: Leave it, Move another official in, Name a deputy, or Ask the lord next door. [recruiting §7.4]
@@ -263,7 +263,23 @@ Newest decision first.
 ### Decided rules (17 October 2026)
 - RECR-101 The recruiting system shall count a levy's 3 free months from the day it has gathered, so training that ends within 3 months owes no pay and knights (9 months) owe 6 months. [recruiting §4.4; D-RECR-8]
 - RECR-102 The recruiting system shall pay each arm by its pay group: foot (armoured foot, pikes, archers) 0.2, gunners (hand gunners, pike and shot, musketeers, line infantry, riflemen) 0.25, horse (light horse, camel riders, horse archers) 0.4, knights (knights and lancers, war elephants) 0.6 gold a man a month, gun crews 1 gold per crew of 15. [recruiting §4.3; D-RECR-9]
-- RECR-103 When a levy is made, the recruiting system shall gather it as one army in the drawn province that gives the most men (ties: the first by id), and, where the realm has set "New regiments go to", order the gathered army to march there. [recruiting §2.1; warfare 3.1; troop-movement §8; D-RECR-15]
+- RECR-103 When a levy is made, the recruiting system shall gather it as one army in the drawn province that gives the most men (ties: the first by id), and, where the realm has set "New regiments go to", order the gathered army to march there. [recruiting §2.1; warfare 3.1; troop-movement §8; D-RECR-15] *Replaced in part by RECR-104, RECR-107 (playtest feedback).*
+
+### Playtest feedback (17 October 2026)
+Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
+
+- RECR-104 The recruiting system shall raise a levy from one province at a time, opened from that province's card, taking the chosen number of men from that province's people by class share (RECR-010); there is no region or country levy. [F-14]
+- RECR-105 The recruiting system shall call a levy in whole thousands (`recruiting.levy_unit` 1,000, provisional), and the levy screen shall show the thousands chosen as a percent of the province's men who can be called. [F-18]
+- RECR-106 When a levy is made, the recruiting system shall gather it one thousand at a time, `recruiting.gather_days_per_thousand` days each (14, provisional; 3 with W18 Railway mobilization), each gathered thousand joining the province's garrison troops, so 10,000 men cannot be ready at once. [F-18]
+- RECR-107 The recruiting system shall keep gathered recruits in their province as its garrison troops, shown on the province card's Garrison tab (province PROV-302); they man the province's castle if it has one, and cannot march, fight in the field or train until a commander picks them up. [F-15; F-17]
+- RECR-108 When a commander in a province picks up garrison troops, the recruiting system shall move the thousands chosen into his army, taking 1 day as joining does (MOVE-039). [F-15]
+- RECR-109 The recruiting system shall order training from the commander screen, for the levies in that commander's army: the player picks the arm, how many thousand and the castle or drill yard, and the army marches there (RECR-039 to RECR-043). [F-14]
+- RECR-110 The commander screen shall show the army's stats (men by arm and kind, drill, break point, the commander's skills), its companies with split, merge and leave-as-garrison actions, its food reserve and food used a day and a month, its pay a month, and any training under way. [F-14]
+- RECR-111 The recruiting system shall give the player new commanders only by commissioning officials (RECR-069 onward), and shall attach no commander to an army by default; rulers and heirs may still lead, lords lead only their own retinues, and hired companies bring their own commander (WAR-211); a captain risen from the ranks, an academy graduate or an exile first enters service as an official. [F-16; X-7]
+- RECR-113 The recruiting system shall never send trained or untrained levies home on their own; they stay under arms until the player disbands them or leaves them as garrison troops (RECR-112). [F-23]
+- RECR-114 When an official is commissioned, the recruiting system shall charge `recruiting.commission_gold` (50 gold, provisional) once. [F-28]
+- RECR-115 The AI shall commission an official only when it has at least `recruiting.ai_commission_min_men` (1,000, provisional) men without a commander and no free commander to send, and shall never keep more commanders than its armies need. [F-28]
+- RECR-112 When a commander leaves troops in a province of his realm, the recruiting system shall make them that province's garrison troops (RECR-107); an army keeps at least its commander's own company. [F-13]
 
 ## 6. Commands
 
@@ -359,7 +375,7 @@ still to balance. The `levies` and `military` blocks of `defines.json` are repla
 | retraining factor | | half months, half gold | yes | recruiting config |
 | Marshal training speed / drill | | 25 % faster; drill 4 | yes | recruiting config |
 | trained drill / break point | | drill 3; 30 % + troop level (levies 25 %) | yes | recruiting config |
-| goes home | | after 6 months, 5 % a month unless paid double | yes (warfare 2.3) | recruiting config |
+| goes home | | dropped: levies stay until disbanded (F-23) | — | recruiting config |
 | pay spent at home | share of pay | a fifth | yes | recruiting config |
 | soldier settler clearing / riot threshold | | ×2; +1 grievance for 10 years | yes | recruiting config |
 | loot home | share of loot | a tenth, for a year | yes | recruiting config |
@@ -367,7 +383,8 @@ still to balance. The `levies` and `military` blocks of `defines.json` are repla
 | sickness brought home | | within 3 months; 1 in 4 provinces | yes | recruiting config |
 | official-to-commander skills and traits | 7.1 table | see commissioning feature | yes | recruiting config |
 | years served bonus | | +1 at 5, +1 at 10, max 5 | yes | recruiting config |
-| commission cost | | 10 gold | yes | recruiting config |
+| commission cost (`recruiting.commission_gold`) | | 50 gold (was 10; F-28, provisional) | yes | recruiting config |
+| AI commission threshold (`recruiting.ai_commission_min_men`) | | 1,000 men without a commander (F-28, provisional) | yes | recruiting config |
 | field wage multiplier | | ×3 commander, ×2 captain | yes | recruiting config |
 | staff | | 100 (50 captain), 2 rations each; 30 horses (15 captain) at 3 rations | yes (captain horses provisional, D-RECR-18) | recruiting config |
 | deputy rules | | 20 clerks needed; 1 gold a month | yes | recruiting config |
@@ -400,7 +417,7 @@ still to balance. The `levies` and `military` blocks of `defines.json` are repla
   and trains expensive arms; a merchant republic levies little and hires companies instead; a steppe realm trains
   horse archers.
 - It avoids levying in harvest months unless an enemy army is in its land (RECR-098).
-- It commissions stewards and wardens first, keeping tax collectors in their seats (RECR-099).
+- It commissions stewards and wardens first, keeping tax collectors in their seats (RECR-099), and only when at least 1,000 of its men have no commander and no free commander can go (RECR-115).
 - Lords train by their traits (RECR-059).
 
 ## 13. Decisions and open questions
@@ -466,3 +483,8 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 | RECR-097–099 | ai-recruiting.feature | AI scenarios |
 | RECR-100 | recruit-pool.feature | The monthly update ticks training down / The yearly step runs when January begins |
 | Worked example (§5, §8) | champagne-1444.feature | Champagne late summer 1444 |
+| RECR-104–107 | levy.feature | The levy screen for Troyes; Levies gather a thousand at a time; Gathered levies wait as garrison troops |
+| RECR-108–110, 112 | training.feature | A commander picks up garrison troops; Giving a training order; The commander screen; Leaving troops as a garrison |
+| RECR-111 | commissioning-officials.feature | New commanders come from officials |
+| RECR-113 | training.feature | Trained levies stay until sent home |
+| RECR-114, 115 | commissioning-officials.feature; ai-recruiting.feature | A commission costs 50 gold; The AI commissions only for troops it has |

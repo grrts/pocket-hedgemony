@@ -64,6 +64,10 @@ Inside one turn you see, in this order:
 
 Events and the report are skipped when there is nothing in them.
 
+### Watching time pass
+
+When you end a turn, the date doesn't jump a week. It ticks day by day while the week plays on the map, armies walking their routes, battles fighting and sieges going on as the days pass. While one of your battles runs, the clock slows to 4-hour steps and shows the hour.
+
 ### The day loop: the days inside a turn
 
 The turn is played out day by day, all 7 of them, for every mover at once: armies, fleets, traders and trade ships, and exploration ships. They all share one clock, so a trader and an army can meet on the same day, and a fleet that closes a strait on day 12 matters to an army trying to cross on day 13.

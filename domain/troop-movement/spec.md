@@ -152,18 +152,18 @@ Newest decision first.
 ### Time: the day loop
 - MOVE-001 The movement system shall play out each turn as 7 days (`turnDays`, X-18), the calendar running through months of their real length, 28 to 31 days, with Gregorian leap years (time-and-turns `daysInMonth`, X-3); the monthly steps run at the end of the turn in which a new month begins. [movement §2.1; X-3, X-18]
 - MOVE-002 On each day, the movement system shall run, in order: move, stop checks, contact, standing orders. [movement §2.1]
-- MOVE-003 On each day, the movement system shall add one day to the step of every marching army, and move an army that has walked enough days into the next province. [movement §2.1]
+- MOVE-003 On each day, the movement system shall add one day to the step of every marching army, and move an army that has walked enough days into the next province. [movement §2.1] *Replaced in part by MOVE-123 (playtest feedback).*
 - MOVE-004 When an army arrives in a province, the movement system shall run the stop checks of section 5. [movement §2.1, §5]
-- MOVE-005 When hostile armies stand in the same province at the end of a day (or of a 4-hour step, MOVE-118), the movement system shall start the battle rules (warfare 7.1) then, letting a side withdraw first if allowed (MOVE-055 to MOVE-057); the battle runs over time (MOVE-118). [movement §2.1, §6.1; X-1]
+- MOVE-005 When hostile armies stand in the same province at the end of a day (or of a 4-hour step, MOVE-118), the movement system shall start the battle rules (warfare 7.1) then, letting a side withdraw first if allowed (MOVE-055 to MOVE-057); the battle runs over time (MOVE-118). [movement §2.1, §6.1; X-1] *Replaced in part by MOVE-126 (playtest feedback).*
 - MOVE-006 While a battle runs, the movement system shall not move the armies in it. [movement §2.1; X-1]
 - MOVE-007 The movement system shall run army food, hunger, plunder and raids as the weekly steps once at the end of every turn (every 7th day of the loop), and sieges, sickness and pay once in the turn in which a new month begins. [movement §2.1, §7; X-2, X-3, X-18; D-MOVE-6]
-- MOVE-008 While an army walks a step, the movement system shall keep it in the province it is leaving, where it eats, is seen and can be attacked, until the day it arrives. [movement §2.2]
+- MOVE-008 While an army walks a step, the movement system shall keep it in the province it is leaving, where it eats, is seen and can be attacked, until the day it arrives. [movement §2.2] *Replaced in part by MOVE-120, MOVE-123 (playtest feedback).*
 - MOVE-009 When two hostile armies walk the same border in opposite directions and meet, the movement system shall fight the battle in the province of the army with more days still to walk. [movement §2.2]
 - MOVE-010 The movement system shall carry days walked toward the next province into the next turn. [movement §2.1, §2.3; X-18]
 
 ### Step days
 - MOVE-011 The movement system shall compute step days as crossing × days per crossing × road × season × march order × guns × column ÷ horse share bonus ÷ Cunning factor + river days. [movement §3.1]
-- MOVE-012 The movement system shall take crossing as half the leaving ground's days to cross plus half the entering ground's (province 3.1). [movement §3.1]
+- MOVE-012 The movement system shall take crossing as half the leaving ground's days to cross plus half the entering ground's (province 3.1). [movement §3.1] *Replaced in part by MOVE-120 (playtest feedback).*
 - MOVE-013 The movement system shall use 6 days per crossing unit (`daysPerCrossing`). [movement §3.1, §15]
 - MOVE-014 The movement system shall apply the road factor of the worse road of the two provinces: track 1, road 0.75, paved road 0.5, turnpike 0.4, railway 0.1. [movement §3.1; warfare 5.2]
 - MOVE-015 While it is winter (December–February north, June–August south), the movement system shall double step days in tundra, mountains and forest. [movement §3.1, §4.3]
@@ -187,13 +187,13 @@ Newest decision first.
 - MOVE-031 The movement system shall read seasons by hemisphere, and wet seasons by climate from config (monsoon Asia June–September, Sahel and savanna July–September, Amazon December–May). [movement §4.3]
 - MOVE-032 The movement system shall let an army enter sea and ocean zones only aboard ships. [movement §4.4, §11.3]
 - MOVE-033 The movement system shall make a province whose main tile type is glacier impassable. [movement §4.4; D-MOVE-11]
-- MOVE-034 Where an army crosses a province whose main tile type is dunes, the movement system shall count that province's days to cross as 3 instead of desert's 2, allow no foraging there, and let guns in only with camels. [movement §4.4; D-MOVE-11]
+- MOVE-034 Where an army crosses a province whose main tile type is dunes, the movement system shall count that province's days to cross as 3 instead of desert's 2, allow no foraging there, and let guns in only with camels. [movement §4.4; D-MOVE-11] *Replaced in part by MOVE-120 (playtest feedback).*
 - MOVE-035 Where two land provinces are a strait crossing in config with a ferry (a harbour on at least one side owned by the army's realm, an ally or a realm granting passage), the movement system shall let an army cross without its own ships in 2 days per 10,000 men or part of it. [movement §4.4; D-MOVE-20]
 - MOVE-036 While an enemy fleet is in a strait, the movement system shall close its strait crossing. [movement §4.4]
 
 ### Splitting and joining
 - MOVE-037 When an army is split in two, the movement system shall take 2 days before W14 Army divisions and no days after, giving each half its share of food, wagons and companies. [movement §3.3]
-- MOVE-038 When an army is split, the commander shall stay with the half the player picks; the other half needs a captain or new commander, or is led by its senior company captain with Cunning 0. [movement §3.3]
+- MOVE-038 When an army is split, the commander shall stay with the half the player picks; the other half needs a captain or new commander, or is led by its senior company captain with Cunning 0. [movement §3.3] *Replaced in part by WAR-209 (playtest feedback).*
 - MOVE-039 When two armies in the same province join, the movement system shall take 1 day, add up food and wagons, and let the commander with more victories lead, the other becoming a captain if there is room. [movement §3.3; warfare 4.5]
 
 ### What stops an army
@@ -237,7 +237,7 @@ Newest decision first.
 ### Moving many armies
 - MOVE-072 When several armies get one destination with March together, the movement system shall give each its own route and, with arrive together on (default on), start the faster ones later so all arrive the same day, showing that day. [movement §8]
 - MOVE-073 When armies are sent to a rally point, each shall march there and join on arrival, in the order they come. [movement §8]
-- MOVE-074 Where the realm has set "New regiments go to" a province (or one per front), newly raised levies (once gathered, recruiting RECR-103) and trained regiments shall march there on their own when ready, with no order needed, and join the army standing there. [movement §8; D-MOVE-16]
+- MOVE-074 Where the realm has set "New regiments go to" a province (or one per front), newly raised levies (once gathered, recruiting RECR-103) and trained regiments shall march there on their own when ready, with no order needed, and join the army standing there. [movement §8; D-MOVE-16] *Replaced in part by RECR-107 (playtest feedback).*
 - MOVE-075 Where the realm has W14 Army divisions, the movement system shall let the player draw a front and give it armies, which spread along it (the provinces cut into even stretches in the order drawn, each army marching to the middle of its own), intercept only within their stretch and retreat to a refuge on the front when one is in range. [movement §8]
 
 ### Orders
@@ -291,6 +291,18 @@ Newest decision first.
 - MOVE-117 From December to March, the movement system shall treat a river in a province at latitude 55° or more as frozen and crossed like a bridge, with no river days (`frozenRivers`); warfare's −20 % for attacking across it does not apply. [X-17]
 - MOVE-118 While a battle the player's army or fleet is in runs, the movement system shall play each day as six 4-hour steps (`battleSteps`): each step moves every other mover a sixth of a day, runs stop checks and contact, and fights one round of every running battle; a retreat the player orders leaves the battle at that step's round (to a neighbour when its commander's Cunning is higher than the enemy's and it isn't trapped, otherwise broken); when no player battle runs, battles fight their six rounds a day at once. [X-1]
 - MOVE-119 When an army enters a province where a battle runs, the movement system shall add it to the side it belongs to: at any 4-hour step for a player battle, at the start of a day for a battle between AI realms. [X-1]
+
+### Playtest feedback (17 October 2026)
+Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
+
+- MOVE-120 The route planner shall plan routes over map tiles (the map-grid pixels of world-map), choosing the path of least total tile weight, where a tile's weight is the days to cross its tile type (`movement.tile_days.<tile type>`, provisional) times its state factor; the province an army is in is the province that owns its tile, and the road, season, march order, guns, column, horse and Cunning factors of MOVE-011 apply to the tile weights. [F-4]
+- MOVE-121 While a tile lies under snow (winter cover from latitude 50° toward the pole and on mountains, X-17), the movement system shall multiply its weight by `movement.snow_factor` (provisional); closed tiles (snow passes MOVE-030, glacier MOVE-033) stay closed. [F-4; X-17]
+- MOVE-122 The movement system shall keep tile weights tuned so that marching keeps today's pace: an army on foot cannot march from Mexico City to southern Québec in 2 months (about 172 days on foot and 126 all on horseback today). [F-4; Leroy 17 Oct]
+- MOVE-123 On each day, or each 4-hour step while a player battle runs, the movement system shall advance every marching army along its tile path by the tiles its walked days pay for, so its position changes as the days pass and never jumps at the end of the turn. [F-2]
+- MOVE-124 The movement system shall publish every army's current tile, route tiles and commander, so the map can draw the commander where the army stands. [F-3]
+- MOVE-125 The movement system shall make an army walk exactly the tile path the route preview showed, and the planner shall never return a path through a closed or impassable tile or through a province with a hostile garrisoned castle (INV-MOVE-4, INV-MOVE-5). [F-1]
+- MOVE-126 When the tiles of two hostile armies come within engagement range, 10 tiles plus one per 2 points of the better commander's Cunning, at most 15 (`movement.engage_tiles_base` 10, `movement.engage_tiles_max` 15, provisional), the movement system shall make contact and start the battle rules where the defender stands. [F-20]
+- MOVE-127 The movement system shall let several armies be selected at once (multi-tap or a drag-box on the map, or from the Army list) and given one march order together, each walking its own route (MOVE-072). [F-21]
 
 ## 6. Commands
 
@@ -467,3 +479,8 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of troop-movement's quest
 | MOVE-118 | day-loop.feature | A player battle slows the day to 4-hour steps and others march in; The player orders a retreat at any step |
 | MOVE-119 | day-loop.feature | AI battles never slow the turn and are joined at the start of a day; A player battle slows the day to 4-hour steps and others march in |
 | Worked example §12 | dunois-1450.feature | all |
+| MOVE-120–122 | step-days.feature | Routes are planned over map tiles; Snow makes a tile slower; Marching keeps its pace |
+| MOVE-123, 124 | day-loop.feature | An army moves tile by tile as the days pass |
+| MOVE-125 | orders.feature | The army walks the route the preview showed |
+| MOVE-126 | meeting-the-enemy.feature | Armies make contact within engagement range |
+| MOVE-127 | moving-many-armies.feature | Several armies selected at once march together |

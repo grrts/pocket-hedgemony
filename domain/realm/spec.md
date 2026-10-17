@@ -282,6 +282,11 @@ Holds: castle store, granary size, reach, overrides of food policy.
 - REALM-174: The tax steps shall be none, light, normal, heavy and crushing; a revolt forces light down to none. [province §8, D-REALM-8]
 - REALM-175: Commanders shall come from the origins warfare §4 gives (ruler or heir, lord, hired captain, risen from the ranks, academy graduate, exile, commissioned official), each with Might, Cunning and Logistics. [warfare §4, X-7, D-REALM-18]
 
+### Playtest feedback (17 October 2026)
+Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
+
+- REALM-176: The country card's General tab shall hold REALM-005's lines except Allies, Enemies and Oaths broken, which move to its Diplomacy tab; trade lines go to the Trade tab and soldiers, commanders and ships to the Army tab (game-shell SHELL-139). [F-12]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -609,3 +614,4 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-173 | win-scores.feature | World domination; Leading by a wide margin does not end the campaign early; Tied leaders share the win; A campaign that ends without a win |
 | REALM-174 | treasury.feature | Five tax steps |
 | REALM-175 | army-and-navy.feature | Commanders |
+| REALM-176 | country-card.feature | The country card's General tab |

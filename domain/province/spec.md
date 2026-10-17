@@ -392,6 +392,11 @@ settlement, settlers, local people's tiles.
 - PROV-300: A lord's province without his official shall give him half its tax and half its recruits. [D-PROV-23]
 - PROV-301: Armies shall lose a share of men a month to sickness: Low 0 %, Medium 1 %, High 2 %, Heat 2 %, Cold 2 %; fever land counts as High. [D-PROV-15]
 
+### Playtest feedback (17 October 2026)
+Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
+
+- PROV-302: The province card shall have a Garrison tab listing the troops in the province without a commander (by thousand, arm and drill), the levies still gathering with the days left, and the commanders present who can pick them up. [F-17; recruiting RECR-107]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -843,3 +848,4 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-299 | officials.feature | Officials learn by tongue |
 | PROV-300 | lords-in-province.feature | A lord's province without his official |
 | PROV-301 | health.feature | Sickness by land |
+| PROV-302 | defence.feature | The Garrison tab |

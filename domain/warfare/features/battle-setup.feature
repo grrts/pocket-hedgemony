@@ -311,3 +311,10 @@ Feature: Battle: field, roles, levels, approaches and skills
     Given a company of level 1
     When it is given the order "Fall back"
     Then it breaks
+
+  @WAR-207 @feedback-8
+  Scenario: A battle is fought round by round with its state published
+    Given a battle starts between two armies
+    When each 4-hour step passes
+    Then one round is fought
+    And each side's men, morale and losses so far are published

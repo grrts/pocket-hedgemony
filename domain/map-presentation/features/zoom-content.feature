@@ -163,3 +163,22 @@ Feature: What each zoom shows
       | 3.5    | Region |
       | 4      | Local  |
       | 8      | Local  |
+
+  @VIEW-074 @feedback-3
+  Scenario: Armies stand on their tile with their commander's banner
+    Given an army led by "Jean de Dunois" is marching
+    When the map is drawn during playback
+    Then the army is drawn on its current tile with the banner of "Jean de Dunois"
+    And it moves tile by tile along its route
+
+  @VIEW-078 @feedback-9
+  Scenario: Sieges show their progress on the map
+    Given the castle of "Orléans" is besieged
+    When the map is at Region zoom
+    Then the siege shows how long it has held, its breaches, its garrison and its food left
+
+  @VIEW-079 @feedback-22
+  Scenario: No province names on the map
+    When the map is drawn at any zoom
+    Then no land province names are drawn except on each country's capital
+    And a selected province shows its name on its name tab and card

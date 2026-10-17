@@ -33,12 +33,12 @@ Feature: Training levies into regiments
     When the player trains levies standing in "Bar"
     Then the levies march to "Troyes" to train
 
-  @RECR-043
+  @RECR-043 @RECR-109 @feedback-14
   Scenario: Giving a training order
-    Given the country "France" has 5000 levies at "Troyes"
-    When the player trains 2500 of them into "pikes" at the castle of "Troyes"
-    Then 2500 levies walk to the castle of "Troyes" and start training
-    And the other 2500 stay levies
+    Given the commander "La Hire" leads 5000 levies at "Troyes"
+    When the player trains 2000 of them into "pikes" at the castle of "Troyes" from his commander screen
+    Then 2000 levies walk to the castle of "Troyes" and start training
+    And the other 3000 stay levies
 
   @RECR-044
   Scenario: Only unlocked arms can be trained
@@ -172,11 +172,11 @@ Feature: Training levies into regiments
     When they finish training into "pikes"
     Then the regiment is still of kind "levy"
 
-  @RECR-053 @placeholder
-  Scenario: Trained levies go home like levies
-    Given a trained regiment of kind "levy" that has been out 7 months unpaid double
+  @RECR-053 @RECR-113 @feedback-23
+  Scenario: Trained levies stay until sent home
+    Given a trained regiment of kind "levy" that has been out 7 months
     When the month ends
-    Then 5 percent of its men go home
+    Then none of its men go home on their own
 
   @RECR-054
   Scenario Outline: Pay owed when training runs past the free months
@@ -188,3 +188,25 @@ Feature: Training levies into regiments
       | pikes               | 0          |
       | light horse         | 0          |
       | knights and lancers | 6          |
+
+  @RECR-108 @feedback-15
+  Scenario: A commander picks up garrison troops
+    Given the province "Troyes" has 3000 garrison troops
+    And the commander "La Hire" stands in "Troyes"
+    When "La Hire" picks up 2000 of them
+    Then after 1 day his army has 2000 more men
+    And 1000 garrison troops stay in "Troyes"
+
+  @RECR-109 @RECR-110 @feedback-14
+  Scenario: The commander screen
+    When the player opens the commander screen of "La Hire"
+    Then it shows the army's men by arm and kind, drill, break point and his skills
+    And it shows the companies with split, merge and leave-as-garrison
+    And it shows the food reserve, the food used a day and a month, and the pay a month
+    And training is ordered from it
+
+  @RECR-112 @feedback-13
+  Scenario: Leaving troops as a garrison
+    Given the commander "La Hire" stands with his army in "Troyes"
+    When he leaves 1000 men there
+    Then they become garrison troops of "Troyes"

@@ -30,22 +30,22 @@ With the invention W15 Mass conscription every class's call share rises by half 
 
 ### The levy
 
-Tap Levy on a province, a region or the country card and you get one slider for how many men, with the costs underneath:
+Tap Levy on a province's card and you get one slider for how many men, in whole thousands, shown also as the share of that province's men who can be called, with the costs underneath. There is no levy for a whole region or the country: you recruit one province at a time.
 
 - **Gold now**: levy money of 20 gold per 1,000 men, paid up front for food on the road.
 - **Food now**: while they gather, levies eat 1 ration a man a month from the province's local store.
 - **Pay**: free for the first 3 months, then 0.15 gold per man a month.
 - **Harvest**: how much of the harvest you lose by taking farmers.
 - **Pool left**: how much of each province's recruit pool remains.
-- **Ready in**: where and when the men will be ready. A levy gathers as one army in the province that gives the most men. If you have set where new regiments go, the gathered army then marches there on its own.
+- **Ready in**: when each thousand will be ready. The men gather a thousand at a time, about 2 weeks for each thousand (provisional), so 10,000 men take months to assemble.
 
 A warning sign shows when the season is wrong, and every cost line opens its own gain and lose list so you can see where the number comes from.
 
 There are no class or province settings, and a region or country levy draws only your royal provinces; lords' men come as their retinues. The screen names the bigger classes and sums the small ones as "others". A levy takes men from every class in proportion to its share of the men who can be called, and from every province of a region by its share of the region's men. Veterans come along by their share of the pool too: if Troyes has 2,000 recruits of whom 400 are veterans, a levy of 1,000 brings 200 veterans.
 
-The men gather in 2 weeks (3 days once you know W18 Railway mobilization) and can march and fight at once as levy foot. While they are away their job slots stay empty, so a building that falls under half filled goes fallow and pays no tax and makes no wares.
+Each thousand gathers in about 2 weeks (3 days once you know W18 Railway mobilization) and joins the province's **garrison**: troops without a commander. They man the province's castle if it has one, and wait on the province card's Garrison tab. They can't march, fight in the field or train until a commander comes to the province and picks them up into his army, which takes a day. A commander can also leave men behind as a province's garrison. While they are away their job slots stay empty, so a building that falls under half filled goes fallow and pays no tax and makes no wares.
 
-**Champagne, late summer 1444.** France is at war with Burgundy. Champagne has 4 royal provinces, about 260,000 people, 65,000 fighting-age men and 7,900 men who can be called, 65 % of them farmers. It is 3 weeks before harvest. A levy of 5,000 costs 100 gold and 2,500 rations, cuts the Champagne harvest by 6 %, and leaves each province 37 % of its pool. The levy takes 3,250 farmers, 550 herders, 500 homeless, 300 woodsmen, 200 craftsmen, 150 seafolk and 50 others. The screen reads "Ready in 2 weeks at Troyes" as 5,000 levies, with a harvest warning. Push the slider to 6,000 and each province keeps only 24 % of its pool, so all four get the Conscription grievance.
+*This worked example comes from the design and is drawn as a region levy; today the same levy is raised province by province.* **Champagne, late summer 1444.** France is at war with Burgundy. Champagne has 4 royal provinces, about 260,000 people, 65,000 fighting-age men and 7,900 men who can be called, 65 % of them farmers. It is 3 weeks before harvest. A levy of 5,000 costs 100 gold and 2,500 rations, cuts the Champagne harvest by 6 %, and leaves each province 37 % of its pool. The levy takes 3,250 farmers, 550 herders, 500 homeless, 300 woodsmen, 200 craftsmen, 150 seafolk and 50 others. The screen reads "Ready in 2 weeks at Troyes" as 5,000 levies, with a harvest warning. Push the slider to 6,000 and each province keeps only 24 % of its pool, so all four get the Conscription grievance.
 
 ### The recruit pool
 
@@ -70,6 +70,8 @@ Every January the pool refills by a quarter of the gap to the ceiling, or a thir
 - **Food**: men in a training camp eat 1.5 rations a month and horses 3, from the training castle's store first and then its province. A man eats 2 rations on campaign and 1 at home. Before an army marches abroad it fills a reserve of reserve size × 2 rations per man per month, from the castle store first, then the locals.
 
 ### Training
+
+Training is ordered from the **commander screen**, for the levies in that commander's army: pick the arm, how many thousand and the training place, and the army marches there. The commander screen also shows the army's men by arm, drill and break point, the commander's skills, its companies to split, merge or leave as garrison, its food reserve and food used a day and a month, and its pay.
 
 Levies can only be trained at a **training place**: a castle or a drill yard of yours. Each has a training room, the number of men it trains at once:
 
@@ -111,7 +113,7 @@ Some things speed training up or change it:
 - A castle or town **under siege** stops all training in it.
 - The **3 free months** count from the day the levy has gathered. If training runs past them, you pay for the extra months. Pikes and light horse (3 months) finish inside the free months; musketeers (5 months) cost 2 months of pay and knights (9 months) 6.
 
-When training finishes, the regiment has its arm, drill 3 (drill 4 if trained under a Marshal), pay by its arm and a break point of 30 % plus its troop level. Untrained levies stay at drill 0 and break at 25 %. Training never changes a regiment's kind: a trained levy regiment still goes home like levies, after 6 months at 5 % a month unless paid double.
+When training finishes, the regiment has its arm, drill 3 (drill 4 if trained under a Marshal), pay by its arm and a break point of 30 % plus its troop level. Untrained levies stay at drill 0 and break at 25 %. Training never changes a regiment's kind: a trained levy regiment is still a levy. No levy, trained or not, goes home on its own: it stays until you disband it or leave it as a garrison.
 
 Pay by arm, per 1,000 men a month: foot 200 gold, gunners 250, horse 400, knights 600, and gun crews 1 gold per crew of 15 (10 gold for 150 men). Each arm belongs to one of these groups:
 
@@ -148,6 +150,8 @@ Lords raise their retinues by the same rules, with their own wealth and at their
 
 ### Commanders from officials
 
+Every army has a commander, and no army gets one by default. Your way to new commanders is to commission officials; your ruler and heirs may also lead, lords lead only their own retinues, and hired companies bring their own commander. A captain who rises from the ranks, an academy graduate or an exile first joins your service as an official.
+
 Any official can be **commissioned** to lead an army or stand in one as a captain. They leave the province they ran and start with the skills and trait offer of their type:
 
 | Official type | Might | Cunning | Logistics | Trait offered |
@@ -164,7 +168,7 @@ Any official can be **commissioned** to lead an army or stand in one as a captai
 
 At 5 years served the type's highest skill gains +1, and +1 more at 10, and no skill goes past 5. When skills tie, Logistics gains first, then Cunning, then Might, so a Marshal with 5 years served has Logistics 3. You pick the offered trait or keep the one rolled. A commander gets the realm's current style for their era and country; a Marshal may take any style your realm has seen in a battle it fought. Years served count where the official was assigned.
 
-**The costs.** A commission costs 10 gold once. In the field an official earns their wage ×3 as commander or ×2 as captain. They bring a staff of 100 (commander) or 50 (captain) who eat 2 rations each a month from the army's reserve, and their horses (30 for a commander, 15 for a captain) eat 3 each. Staff eat but are not soldiers: they do not count toward foraging or the column size.
+**The costs.** A commission costs 50 gold once (a provisional number, raised from 10 so commanders are not handed out freely). In the field an official earns their wage ×3 as commander or ×2 as captain. They bring a staff of 100 (commander) or 50 (captain) who eat 2 rations each a month from the army's reserve, and their horses (30 for a commander, 15 for a captain) eat 3 each. Staff eat but are not soldiers: they do not count toward foraging or the column size.
 
 **The empty province.** When you commission an official you choose how their province is run:
 
@@ -197,7 +201,7 @@ Other leaders: the ruler and heirs can lead, lords lead only their own retinues 
 
 ### The computer players
 
-The AI uses the same levy and training commands. Its catalogue personality sets how much of its pool it dares to levy and what it trains: a militarist levies deep and trains expensive arms, a merchant republic levies little and hires companies instead, a steppe realm trains horse archers. It avoids levying in harvest months unless an enemy army is in its land, and it commissions stewards and wardens first, keeping tax collectors in their seats.
+The AI uses the same levy and training commands. Its catalogue personality sets how much of its pool it dares to levy and what it trains: a militarist levies deep and trains expensive arms, a merchant republic levies little and hires companies instead, a steppe realm trains horse archers. It avoids levying in harvest months unless an enemy army is in its land, and it commissions stewards and wardens first, keeping tax collectors in their seats. It commissions an official only when at least 1,000 of its men have no commander and no free commander can go to them, so it never keeps more commanders than its armies need.
 
 ### Each month
 
@@ -207,8 +211,9 @@ Each province is updated once a month: training months tick down and finished re
 
 ## What you see
 
-- **The levy screen**, opened from a province, a region or the country card: one men slider; Gold now, Food now, Pay, Harvest, Pool left and Ready in; a season and harvest warning sign; a gain and lose list behind every cost line.
-- **The training choice**: arm, number of men and training place (castle or drill yard).
+- **The levy screen**, opened from a province card: one men slider in thousands; Gold now, Food now, Pay, Harvest, Pool left and Ready in; a season and harvest warning sign; a gain and lose list behind every cost line.
+- **The commander screen**: the army's stats, troops, food and pay, and the training choice (arm, thousands of men, castle or drill yard).
+- **The Garrison tab** of the province card: troops without a commander, levies still gathering and the commanders who can pick them up.
 - **Where to settle men**: soldier settlers for a frontier or colony province.
 - **The commission choice**: commander or captain, the trait to pick, and the four ways to run the empty province.
 - **Province stats**: Recruits here, Fallen from here and Veterans here.
@@ -261,7 +266,7 @@ The numbers live in the recruiting config file. Most are **provisional** and wai
 | Armed veterans | garrison +10 % for 5 years |
 | Sickness brought home | within 3 months; 1 in 4 provinces |
 | Years served bonus | +1 at 5 years, +1 at 10, up to 5 |
-| Commission | 10 gold; wage ×3 commander, ×2 captain |
+| Commission | 50 gold (provisional); wage ×3 commander, ×2 captain |
 | Staff | 100 or 50, 2 rations each; 30 or 15 horses at 3 rations |
 | Victory under an official | every lord one step more loyal; ruler's victories +1 |
 | Deputy | 20 clerks; 1 gold a month |

@@ -50,7 +50,7 @@ Later arms (machine guns, tanks, aircraft) follow the same shape in config. Elep
 | Garrison | 40 % on the walls | normal pay |
 | Rebel band | 20 % | loot |
 
-Levies out 6 months send 5 % of their men home each month unless paid double, and levies away at harvest cost their province that share of its harvest. A wavering lord may take his retinue home mid-war. A hired company owed 1 month of pay won't fight; owed 2 months, it loots the province it stands in or takes the enemy's offer if higher. Standing regiments keep drill and scars through peace. Garrisons count against their castle's room. Rebel bands fight by the same battle rules whatever the rebellion rules decide about how they form.
+Levies have no service term: once raised they stay until you disband them or leave them as a garrison. Levies away at harvest cost their province that share of its harvest. A wavering lord may take his retinue home mid-war. A hired company owed 1 month of pay won't fight; owed 2 months, it loots the province it stands in or takes the enemy's offer if higher. Standing regiments keep drill and scars through peace. Garrisons count against their castle's room. Rebel bands fight by the same battle rules whatever the rebellion rules decide about how they form.
 
 A company's break point is changed by its troop level, the Might of the leader in its sector, +5 % defending its own homeland, −10 % if hungry, −5 % per month of pay owed, and commander traits.
 
@@ -72,11 +72,11 @@ Lords' retinues don't count: each lord has his own cap by the same rule on his l
 
 ### Raising and keeping an army
 
-Levies come from [Recruiting](Recruiting) as levy-kind companies of levy foot, gathered at the province's castle or town after 2 weeks (days with W18 along railways).
+Levies come from [Recruiting](Recruiting) as levy-kind companies of levy foot, gathered a thousand at a time in their province, where they wait as its garrison until a commander picks them up. **No army exists without a commander**: soldiers without one are a province's garrison. An army that loses its commander with no captain to step up halts; in your own land it becomes that province's garrison, abroad it waits for a commander to join it.
 
 **Calling the lords.** Each lord answers by his loyalty. A loyal lord brings his whole retinue in 3 weeks and may lead it as a captain. A wavering lord brings half, after 6 weeks, and goes home after 6 months unless the war aim is his Want. A disloyal lord refuses, and calling him again makes him angrier. A lord in revolt's retinue is a rebel army. When the war aim is his Want, a lord comes even when wavering and stays to the end, and a lord whose lands are occupied leaves to defend them.
 
-**Free companies.** Named companies with a captain are offered in the regions where they historically gathered (Swiss and German foot, Italian condottieri, Scottish and Irish gallowglass, Turkic and Afghan horse, Javanese and Japanese sword bands and others). Each shows men, arm, drill, scars and price. A contract brings the company for the agreed months for gold up front plus monthly pay, using no recruits. It leaves when the contract ends, when pay is owed as above, or when an enemy outbids you.
+**Free companies.** Named companies with a captain are offered in the regions where they historically gathered (Swiss and German foot, Italian condottieri, Scottish and Irish gallowglass, Turkic and Afghan horse, Javanese and Japanese sword bands and others). Each shows men, arm, drill, scars and price. A contract brings the company for the agreed months for gold up front plus monthly pay, using no recruits. The company isn't there at once: it marches from where it gathers to your capital, and the hire screen shows how many days that takes. It always comes led by its own captain as its commander, and he leaves with it. It leaves when the contract ends, when pay is owed as above, or when an enemy outbids you.
 
 **Keeping.** Each month the treasury pays every company except retinues and levies in their first 3 months. An army eats 2 rations per soldier on campaign, 3 per horse and 1 per prisoner, from the province at home and from its reserve abroad. Disbanded men go back to their home province's recruit pool and their arms to the store; a disbanded standing regiment loses all its drill and scars; soldiers home from a long war with no free slot become homeless, a source of rebels.
 
@@ -203,6 +203,8 @@ War elephants whose sector loses a bell badly panic and trample their own side f
 **Night.** After 6 bells without a break, night falls. Either side may withdraw by its standing orders; the withdrawal is clean if its commander's Cunning is at least the enemy's, otherwise it counts as breaking with half the pursuit. Overnight, fled men who will come back return and ammunition refills.
 
 **Troyes, 1450.** Troyes' sectors are Fields, Fields, Fields, Pasture, Pasture, Woods, Town. Dunois defends for France in Three battles (Might 3, Cunning 4, Logistics 2) with 4,000 levy foot, 2,000 archers and 1,000 knights. The Bastard of Burgundy attacks in Charge en haie (Might 3, Cunning 2, Logistics 1) with 5,000 hired armoured foot and 2,000 knights. With 70 % of the French living in calm provinces, the French flee share is 29 %. In bell 2 the Burgundian knights charge the pastures and both pasture sectors break. In bell 3 Burgundy gives 2 orders first and France 3 after. After bell 6 neither army has broken; at night the Burgundian withdrawal counts as breaking with half the pursuit because his Cunning is lower, and France holds the field.
+
+Battles play out over time, a round every 4 hours. On the map and in the battle viewer you see each side's men and a bar of men and morale left, updated every round, so you can follow the fight and decide when to retreat.
 
 ### After the battle
 
@@ -331,6 +333,8 @@ An AI garrison accepts honours when it has a breach or under a month of food and
 
 **The castle of Troyes.** A stone castle with a garrison of 300 and 6 months of store is besieged by Burgundy with 6,000 men and 4 bombards. It is closed, and the besiegers add 8 shot a month. After 3 months it has 1 breach and a walls bonus of about +67 %. Burgundy offers honours, no French relief army is within 10 days, so the garrison accepts and marches to Reims, and Burgundy takes the castle whole with its store and control of food spread in Champagne.
 
+A siege shows its progress on the map: how long the castle has held, its breaches, and the garrison and food left inside.
+
 ### Occupation and raids
 
 Taking a province's castle, or holding a province with no castle for a season, **occupies** it: you get its tax, recruits, food and trade, and its lord wavers toward the side holding his land. A horse-only army set to **Raid** can't besiege or occupy; each week it burns one tile and takes loot (gold from market and town, herds and horses from pasture) up to 1 load per 50 riders, then moves on, and castles there may sally.
@@ -404,7 +408,7 @@ All warfare values live in `packages/rules/data/domain/warfare.json`; most are p
 | `warfare.company_size_min` / `max` | 500 / 1,000 |
 | `warfare.drill_max`, `warfare.scars_max`, `warfare.scar_fade_years` | 12, 5, 5 |
 | `warfare.kinds.<kind>.break_point` | levy 25 %, retinue 35 %, hired 35 %, standing 30 %, garrison 40 %, rebel 20 % |
-| `warfare.kinds.levy.free_months`, `go_home_after` / `rate` | 3; 6 months / 5 % a month |
+| `warfare.kinds.levy.free_months` | 3 (levies no longer go home on their own) |
 | `warfare.kinds.hired.pay_multiplier`, `warfare.kinds.standing.pay_multiplier` | 3, 1.5 |
 | `warfare.break.homeland` / `hungry` / `pay_owed` | +5 % / −10 % / −5 % a month |
 | `warfare.arms_rust` / `powder_damp` | 2 % / 5 % a year |

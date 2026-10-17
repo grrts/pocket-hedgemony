@@ -8,9 +8,9 @@ Troop movement is where your armies stand on every day of the turn. You draw a r
 
 A turn is **one week**: each turn plays out **7 days**, and the calendar runs through months of their real length, 28 to 31 days (February has 29 in leap years). On each day, for every army at once, the game runs four steps in order:
 
-1. **Move**: every marching army adds a day to its current step, and an army that has walked enough days enters the next province.
+1. **Move**: every marching army walks a day further along its route, tile by tile, and enters the next province on the day it reaches that province's first tile.
 2. **Stop checks**: an army that arrives somewhere is checked against the list below.
-3. **Contact**: hostile armies standing in the same province at the end of the day start the battle rules from [Warfare](Warfare), with a chance to withdraw first.
+3. **Contact**: hostile armies that come within engagement range of each other, 10 tiles plus one for every 2 points of the better commander's Cunning, at most 15, start the battle rules from [Warfare](Warfare) where the defender stands, with a chance to withdraw first.
 4. **Standing orders**: armies set to attack may turn to intercept.
 
 Every mover steps in a fixed order each day: armies first, then fleets, then traders, then exploration ships, each in the order they were raised. After the moves come arrivals, then battles. Battles are fought over time, in rounds of 4 hours, six a day, and while a battle runs its armies don't move. Other armies that march into the province join the side they belong to.
@@ -19,15 +19,15 @@ While one of your battles runs, the whole map slows down: each day is played as 
 
 At the end of every turn the weekly steps run: armies eat (and go hungry when the food is gone), plunder, raids and plague. An army standing in your own land refills its food there at each weekly step, from the castle store first and then from the locals, without having to stop. Sieges, sickness and pay run once a month, at the end of the turn in which a new month begins.
 
-A mover is always in exactly one place, never between two. While an army walks a step it stays in the province it is leaving, where it eats, is seen and can be attacked, until the day it arrives. If two hostile armies walk the same border in opposite directions, they fight in the province of the army with more days still to walk. Days already walked toward the next province carry over into the next turn.
+A mover always stands on exactly one map tile, and so in the province that owns that tile. You can follow every army across the map tile by tile as the days pass: its commander's banner stands where the army is. If two hostile armies walk the same border in opposite directions, they fight in the province of the army with more days still to walk. Days already walked toward the next province carry over into the next turn.
 
 ### How long a step takes
 
-A step is one move from a province into its neighbour. Its days are:
+Routes run over the map's tiles, not from province to province. Each tile has a **weight**, the days it takes to cross its kind of land (grassland is quick, mountains, jungle and marsh are slow), and the route planner picks the path of least total weight. **Snow** makes a tile slower still: in winter, land from latitude 50° toward the pole and every mountain lies under snow and costs more to cross. The tile weights are provisional, tuned so marching keeps its pace: an army on foot can't walk from Mexico to Canada in 2 months (it takes about 4 to 6). The factors below still apply on top of the tiles:
 
-**step days = crossing × 6 × road × season × march order × guns × column ÷ horse bonus ÷ Cunning bonus + river days**
+**days = tile weights walked × road × season × march order × guns × column ÷ horse bonus ÷ Cunning bonus + river days**
 
-- **Crossing** is half the leaving ground's days to cross plus half the entering ground's: farmland, grassland and savanna 1; drylands and hills 1.5; desert, forest and tundra 2; mountains, jungle and marsh 3.
+- **Crossing** used to be counted per province by its ground (farmland, grassland and savanna 1; drylands and hills 1.5; desert, forest and tundra 2; mountains, jungle and marsh 3); these are now the starting weights of the tiles of those grounds.
 - **6 days per crossing unit**, so a step across farmland takes 6 days.
 - **Road**: the worse road of the two provinces counts: track 1, road 0.75, paved road 0.5, turnpike 0.4, railway 0.1.
 - **Season**: in winter (December to February in the north, June to August in the south) step days double in tundra, mountains and forest. In the wet season of the climate they are ×1.25 in paddies, marsh and jungle (monsoon Asia June to September, Sahel and savanna July to September, Amazon December to May).
@@ -86,7 +86,7 @@ Splitting an army takes 2 days before W14 Army divisions and no time after, and 
 
 - **March together**: several armies get one destination, each with its own route. With "arrive together" on (the default), the faster ones start later so all arrive the same day, and that day is shown.
 - **Rally point**: armies march there and join on arrival in the order they come.
-- **New regiments go to**: set a province (or one per front) and newly raised levies, once gathered, and trained regiments march there on their own when ready and join the army standing there.
+- **New regiments go to**: set a province (or one per front) and trained regiments march there on their own when ready and join the army standing there. Newly raised levies don't: they wait in their province as its garrison until a commander picks them up (see [Recruiting](Recruiting)).
 - **Fronts** (W14): draw a line of provinces and give it armies, which split it into even stretches, march to the middle of their own stretch, intercept only within it and retreat to a castle on the front.
 
 ### Orders
@@ -120,13 +120,13 @@ The Bastard of Burgundy (Cunning 2) leads 8,000 men, seen by France only as a ru
 
 ## What you see
 
-- **Selecting an army**: tap it and its card slides up halfway; provinces it could reach this turn are lightly shaded, those next turn lighter still.
+- **Selecting an army**: tap it (banners take big taps) or tap its commander in the Army list, and its card slides up halfway; provinces it could reach this turn are lightly shaded, those next turn lighter still. Selecting never moves or zooms the map. Select several armies at once with more taps or a drag-box and give them one march order together.
 - **Drawing a route**: drag from the army's banner and the route is drawn live with days and food on arrival, set when you lift, cancelled by dragging back onto the army. A drag that doesn't start on the banner pans the map. Tapping a province draws the same route and waits for confirmation. Drag the middle of a route to add a waypoint; drag a waypoint off to remove it. A two-finger tap deselects.
 - **The order pill**: at least 44 points high, at the route's end, with March and its days, pace, on the way and cancel. Changing a setting redraws the route and its days at once.
-- **The route preview**: a dashed line; turn marks (every 7 days) where the army will stand at the end of this and each later turn; day counts at each province and the total; food colour and the point-of-no-return flag; icons for river, snow pass, stopping castle, border needing passage and enemy seen (with shown size); other selected armies' routes thinner in the same colour.
+- **The route preview**: a light dashed line over a dark outline, so it shows on every map colour; turn marks (every 7 days) where the army will stand at the end of this and each later turn; day counts at each province and the total; food colour and the point-of-no-return flag; icons for river, snow pass, stopping castle, border needing passage and enemy seen (with shown size); other selected armies' routes thinner in the same colour.
 - **Stacked armies**: one banner with total men and number of armies; tapping opens a picker (name, men, food, commander) with Select all here and, at region zoom, Select all in sight.
 - **Zoom**: at world zoom, arrows thick by men and coloured by owner, long routes in weeks; at region zoom, the full preview; at local zoom, marching columns as sprites sized to the army.
-- **Watching the turn**: when the turn ends its week plays at about one second per 10 days with a skip button. While one of your battles runs, the playback slows to 4-hour steps where you can change standing orders, retreat or switch battles. Battles between other realms only flash for half a second, and stopping castles ring red. Any battle can be replayed from its notice.
+- **Watching the turn**: when the turn ends its week plays at about one second per 10 days with a skip button, the date ticking one day at a time while armies walk their routes. The army walks exactly the route the preview showed. While one of your battles runs, the playback slows to 4-hour steps where you can change standing orders, retreat or switch battles. Battles between other realms only flash for half a second, and stopping castles ring red. Any battle can be replayed from its notice.
 - **Notices**, only for: an army stopped short (enemy, castle, border or snow), a battle fought (with its reason), a route that turned red, and an enemy first seen marching into your land. Nothing for an army that walked where it was told.
 - **Accessibility**: every gesture has a tap-only version (tap army, tap province, tap March; Go by… for waypoints); food colours also carry a pattern (solid, dashed, dotted); day counts stay at least 10 points tall at region zoom and hide rather than shrink.
 

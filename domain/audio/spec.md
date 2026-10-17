@@ -553,7 +553,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - When saves completes a manual save, then play `ui_save`; an autosave plays nothing.
 - When settings change an audio setting, then apply it live.
 
-## 9. Monthly turn
+## 9. Each turn
 
 1. Read (after every simulation step and the turn report are ready): the player's war state, war trend,
    battles and sieges this turn, capital occupied, unrest share, lords' loyalty, treasury trend, active ages,

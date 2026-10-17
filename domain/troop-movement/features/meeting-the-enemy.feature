@@ -121,3 +121,16 @@ Feature: Meeting the enemy
     Given the allied armies "A" with 6000 men and "C" with 2000 men stand in "Troyes"
     Then they don't fight or block each other
     And "A" gets three quarters of the forage of "Troyes" and "C" one quarter
+
+  @MOVE-126 @feedback-20 @placeholder
+  # config: movement.engage_tiles_base 10, movement.engage_tiles_max 15 (provisional)
+  Scenario Outline: Armies make contact within engagement range
+    Given two hostile armies whose better commander has Cunning <cunning>
+    When their tiles come within <tiles> tiles of each other
+    Then they make contact and a battle starts where the defender stands
+
+    Examples:
+      | cunning | tiles |
+      | 0       | 10    |
+      | 4       | 12    |
+      | 10      | 15    |

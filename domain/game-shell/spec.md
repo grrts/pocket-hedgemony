@@ -285,7 +285,7 @@ Newest decision first.
 
 - SHELL-090: When the player presses Back in the battle view while player battles run, the game shell shall return to the map while they keep running in 4-hour steps (the switcher reopens the view); in a replay, Back shall return where the replay was opened. [X-1] [screen-flow §4.7, §9]
 - SHELL-091: The siege view shall be a full screen opened from a besieged castle at local zoom or from its card, and Back shall return to the map at the castle. [screen-flow §4.7]
-- SHELL-092: The peace table shall be a modal opened from the Abroad tab, an enemy's country card, or an incoming offer, returning where it was opened; an incoming offer shall not be dismissable, only answered or put off one turn. [screen-flow §4.7]
+- SHELL-092: The peace table shall be a modal opened from the Abroad tab, an enemy's country card, or an incoming offer, returning where it was opened; an incoming offer shall not be dismissable, only answered or put off one turn. [screen-flow §4.7] *Replaced in part by SHELL-140 (the enemy's country card means its Diplomacy tab) (playtest feedback).*
 - SHELL-093: The map lens picker shall be a small pop-over from the tool column returning to the map, and a confirmation shall be a small modal for destructive actions only, returning to the screen below unchanged. [screen-flow §4.7]
 
 ### 5.11 How a campaign ends
@@ -333,7 +333,7 @@ Newest decision first.
 - SHELL-125: While a Steam Controller or Steam Deck trackpad is in use, it shall act as a mouse on the map through Steam Input and the game shall show the mouse pointer; otherwise it shall show the stick cursor. [screen-flow §8.3]
 - SHELL-126: The game shell shall show button prompts matching the last device used (no prompts for touch, the controller's own glyphs for Xbox, PlayStation, Steam or Switch-style controllers, keys for a keyboard), switching at once when the device changes. [screen-flow §8.3]
 - SHELL-127: Where a text field exists, it shall use the platform's on-screen keyboard (Steam's on the Deck and in Big Picture, the system keyboard on phones) and shall have a filled-in default so it can be confirmed without typing. [screen-flow §8.3]
-- SHELL-128: With a mouse, the game shell shall work like touch with hover added, hover showing what long press shows; with a keyboard it shall use Esc for Back, Enter to select, Tab and arrows to move focus, and Enter held for 0.5 s for End turn. [screen-flow §8.4; D-SHELL-7]
+- SHELL-128: With a mouse, the game shell shall work like touch with hover added, hover showing what long press shows; with a keyboard it shall use Esc for Back, Enter to select, Tab and arrows to move focus, and Enter held for 0.5 s for End turn. [screen-flow §8.4; D-SHELL-7] *Added to by SHELL-143 (playtest feedback): Space also ends the turn.*
 
 ### 5.15 Decided 17 October
 
@@ -346,6 +346,16 @@ Newest decision first.
 - SHELL-135: The Unlock screen shall offer one purchase, the full game, which unlocks every realm and removes the Full game ribbon; it shows the store's price and Buy, and on phones also Restore purchases. [screen-flow §6 Purchases; gap-lists List 1 item 2; D-SHELL-16]
 - SHELL-136: While several of the player's battles run at once, the battle view shall show a battle switcher listing each running battle with its progress (rounds fought of rounds it lasts); picking one shows that battle and flies the map there, and Retreat and Standing orders apply to the battle shown. [X-1 (17 Oct); D-SHELL-2]
 - SHELL-137: The game shell shall treat each turn as one week: End turn plays 7 days of the day loop, the turn report covers that week, and the top bar shows the date with its day ("11 November 1444"). [X-18 (17 Oct)]
+
+### Playtest feedback (17 October 2026)
+Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
+
+- SHELL-138: When the player selects an army or commander on the map, the game shell shall not move or zoom the camera; only panning, zooming and Show on map (SHELL-062) move it. [F-6]
+- SHELL-139: The country card shall have tabs, in this order: General (the summary lines of realm REALM-005), Diplomacy, Trade and Army; it opens on General. [F-12]
+- SHELL-140: The game shell shall open the peace table and declare war from the Diplomacy tab of a country card, not from its General tab. [F-11]
+- SHELL-141: When the AI offers peace to the player, the game shell shall show the offer in the turn report, list it in Waiting for you, and mark the country's Diplomacy tab until it is answered or put off (SHELL-092). [F-10]
+- SHELL-142: The game shell shall give army banners tap targets of at least 44 points, select an army when its commander is tapped in the Army list, and let several armies be selected at once (MOVE-127). [F-21]
+- SHELL-143: On a keyboard, the game shell shall end the turn when Space is pressed once on the map, exactly as a tap on End turn does (the confirmation setting and unanswered events still apply); Enter held for 0.5 s keeps working, and Space does nothing while a text field has focus. [F-27]
 
 ## 6. Commands
 
@@ -429,7 +439,7 @@ sent as data.
 - When `settings` changes the shape (Far layout / device profile), text size or UI scale, the shell relays out
   without restart.
 
-## 9. Monthly turn
+## 9. Each turn
 
 The shell does no simulation. Per turn, on screen:
 1. Orders phase: map live; End turn blocked while events are unanswered.
@@ -726,3 +736,8 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-133 | layout-by-shape.feature | Left hand mirrors the corners |
 | SHELL-134 | navigation-by-input.feature | The battle viewer with a controller |
 | SHELL-135 | interruptions.feature | The Unlock screen |
+| SHELL-138 | map-and-cards.feature | Selecting an army keeps the camera still |
+| SHELL-139, 140 | map-and-cards.feature | The country card's tabs |
+| SHELL-141 | in-campaign-screens.feature | An AI peace offer waits for an answer |
+| SHELL-142 | map-and-cards.feature | Picking commanders is easy |
+| SHELL-143 | navigation-by-input.feature | Space ends the turn |

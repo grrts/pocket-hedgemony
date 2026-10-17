@@ -78,7 +78,7 @@ Newest decision first.
 | Week | One turn: 7 days of the day loop (X-18) | A calendar week from Monday |
 | Season | Three months. North: spring March–May, summer June–August, autumn September–November, winter December–February; the south the other way round, by the province's latitude (X-4) | Wet season (defined per climate) |
 | Harvest month | September in the north, March in the south; rice paddies harvest in both (D-TIME-5) | — |
-| Before-the-battle card | Where the turn stops at a battle the player's army or fleet is in: change standing orders, then Fight or Skip to result (X-1) | The battle report |
+| Battle step | A 4-hour step while a battle the player's army or fleet is in runs: time keeps passing, the player may change standing orders, retreat or switch battle; there is no skip (X-1) | The battle report |
 | World domination | Owning or holding as subjects half of the world's settled land provinces; checked each January turn (X-12) | Best at the end |
 | Best at the end | On 31 August 1939 the realm leading the Economy, Power or Technology score wins in that score; ties share (X-12) | — |
 | Winter | December to February in the north, June to August in the south | Snow-pass closure (December to March / June to September) |
@@ -182,7 +182,7 @@ Newest decision first.
 - TIME-023 (Ubiquitous): The day loop shall decide where movers are, who meets whom, and which battles are fought; army food and hunger run weekly (TIME-044), and sickness, the siege month and pay run once a month. [troop-movement §2.1; warfare §16; X-2; X-3]
 - TIME-024 (Ubiquitous): Days walked toward the next place shall carry over into the next turn. [troop-movement §2.3]
 - TIME-025 (State-driven): While a battle lasts, the armies in it shall not move. [troop-movement §2.1; warfare §7.1]
-- TIME-026 (Ubiquitous): Every mover shall be in exactly one place at the end of every day, never between two. [troop-movement §2.2, §11.1]
+- TIME-026 (Ubiquitous): Every mover shall be in exactly one place at the end of every day, never between two. [troop-movement §2.2, §11.1] *Replaced in part by MOVE-123 (one tile, so one province) (playtest feedback).*
 
 ### 5.4 Battles inside the turn
 
@@ -256,6 +256,11 @@ Newest decision first.
 - TIME-073 (Optional): Where several player battles run at once, the player shall be able to switch between them to follow each one and decide when to retreat; every running battle fights a round each step whichever is followed. [X-1]
 - TIME-074 (Ubiquitous): Monthly, seasonal and yearly steps shall run once, at the end of the turn in which a new month, season or year begins, and no rule shall count in turns: every duration, delay or cadence is a span of time measured by the date; only orders, End turn and the turn report are per turn. [X-18]
 - TIME-075 (Ubiquitous): The day loop shall let a caller play a turn one step at a time, a step being a day, or a 4-hour step while a player battle runs, and pause between steps; playing the whole turn at once gives the same result. [X-1; game-shell §11 request]
+
+### Playtest feedback (17 October 2026)
+Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
+
+- TIME-076 (Event-driven): When End turn is given, the game shall show the date advancing day by day as the day loop plays (by 4-hour steps while a player battle runs), with movers, battles and sieges updated at each step; the date shall never jump to the end of the turn at once. [F-7; F-2]
 
 ## 6. Commands
 
@@ -369,7 +374,7 @@ the turn in which a new month, season or year begins (X-18). What each system do
 
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
-| `startDate` | First date of every campaign | 11 November 1444 | No (X-5); `defines.json` still says March 1444, a request to the game build | `time-and-turns.json` |
+| `startDate` | First date of every campaign | 11 November 1444 | No (X-5); `defines.json` matches | `time-and-turns.json` |
 | `turnDays` | Days in a turn | 7 | No (X-18) | `time-and-turns.json` |
 | `seasons.startMonths`, `seasons.harvestMonth`, `seasons.paddyHarvestMonths` | Seasonal and harvest months | 3, 6, 9, 12; north 9, south 3; 3 and 9 | No (X-4) | `time-and-turns.json` |
 | `yearlyMonth`, `fiveYearlyEvery` | Yearly and five-yearly steps | January; years divisible by 5 | No (D-TIME-6) | `time-and-turns.json` |
@@ -539,3 +544,4 @@ the turn in which a new month, season or year begins (X-18). What each system do
 | TIME-074 | calendar.feature | Monthly, seasonal and yearly steps run in the turn a new month, season or year begins |
 | TIME-074 | calendar.feature | The last turn ends on 31 August 1939 and may be shorter |
 | TIME-075 | battles-in-turn.feature | The game shell can play a turn one step at a time |
+| TIME-076 | end-turn.feature | The date ticks day by day after End turn |

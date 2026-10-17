@@ -29,13 +29,14 @@ There are three zoom levels: **World**, **Region** and **Local** ("Province" zoo
 **World zoom** shows the big picture:
 
 - Each province's owner colour, with a small icon if it is hungry, rioting or in revolt, and front lines.
-- Armies as a banner with a men count; battles as crossed swords; besieged castles with a ring. Armies on the move are arrows, thick by men and coloured by owner, with no day counts.
+- Armies as a banner with a men count, each standing on its own tile with its commander's banner and moving tile by tile as the week plays; battles as crossed swords with each side's men and a bar of men and morale left; besieged castles with a ring. Armies on the move are arrows, thick by men and coloured by owner, with no day counts.
 - Ports as anchor dots in the owner's colour, larger for great ports; fleets as a single ship sprite with a count.
 - The parchment, voyage paths as dotted lines, and colonies being founded as a small flag with a progress ring.
 - For diplomacy, only the lens colours.
 
 **Region zoom** shows a province's life:
 
+- Sieges with their progress: how long the castle has held, its breaches, and the garrison and food left.
 - Town size, the castle and its reach rings, roads, rivers and the busiest trade paths (thicker means more traders), armies and sieges, burned provinces hatched, and plague.
 - Armies as sprites by arm (foot, horse, guns) with a food bar on the banner showing days of reserve left; rumours as faded banners; the forage limit while you drag an army; and the full route of a selected army with day counts, month marks, food colour and step icons.
 - The harbour tile with an anchor icon showing berths used and free (for example `7/20`), a slipway icon with hulls being built, and fleets with their admiral's banner and course line in days.
@@ -49,6 +50,8 @@ There are three zoom levels: **World**, **Region** and **Local** ("Province" zoo
 - Each tile's building as a sprite, burned tiles in ash, workers moving on busy tiles, ships in the harbour, caravans on the road and barges on the river.
 - Marching armies as columns of foot, horse, guns and wagons in proportion.
 - A battle is shown on the province's own tile row, and a siege as the castle tile with breaches drawn in the walls.
+
+Land provinces have no names on the map at any zoom, except each country's capital, so you can see whose capital it is. Every province's name shows on its name tab and card when you select it. Realm names and sea names stay. Route lines are a light dash over a dark outline, so they read on every colour.
 
 Every system added after the province and warfare designs has to state what it shows at each zoom, including its lens.
 
@@ -100,13 +103,15 @@ You can turn off "Parchment over unknown lands" in the lens menu to see the whol
 
 ### Watching the week
 
+The date in the top bar ticks one day at a time while the week plays, and shows the hour of each 4-hour step during one of your battles.
+
 While a turn is being worked out, the map stays visible: you can pan and zoom, armies march along their routes, and borders change as results arrive. If the turn takes longer than 1.5 seconds, a small parchment strip says what is being worked out, such as "The courts of Europe deliberate…".
 
 A turn is one week. When you end it, the week **plays back** on the map: armies walk their routes, and castles that stop an army ring red. While one of your battles is being fought, the playback slows to six 4-hour steps a day, about half a second each, and a battle bar shows every battle running. From the bar you can switch between battles, change your standing orders or retreat. The game never stops for a battle, and you cannot skip the playback while one of your battles is running; battles between other realms never slow it. See [Time and Turns](Time-and-Turns).
 
 ### Seasons
 
-The map shows the season. Lands north of latitude 50 and mountains turn white with snow in winter, wet climates turn green in the rainy months, and northern seas show ice while they are frozen. The season colours stay readable in every colour vision mode, and there is no switch to turn them off.
+The map shows the season. Lands north of latitude 50 and mountains turn white with snow in winter, wet climates turn green in the rainy months, and northern seas show ice while they are frozen. Sea ice is grey-blue with faint cracks, darker than the white snow on land, so you can tell frozen sea from snowy coast. It grows out from the coasts and the pole as the water cools and melts back in spring, in natural shapes with a soft, textured edge, not as whole sea zones turning white at once. A sea zone closes to fleets once most of it is frozen. The season colours stay readable in every colour vision mode, and there is no switch to turn them off.
 
 ### Layout by window shape
 

@@ -441,7 +441,7 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 - When events fires a scripted `tutorial_only` event in the tutorial, then show its step(s).
 - When saves reports "Reset tutorial and hints" (from settings), then clear progress, mutes and seen entries.
 
-## 9. Monthly turn
+## 9. Each turn
 
 1. Read: the end-of-turn state of every context the checks read (after the simulation).
 2. Run every check in the config; add, keep or remove entries; apply cooldowns and muted kinds.
