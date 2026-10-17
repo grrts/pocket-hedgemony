@@ -168,7 +168,7 @@ Newest decision first.
 - TIME-012 (Ubiquitous): The game shall apply orders only at End turn; orders given during a turn are queued, not applied. [save-system §3.1; turn.ts]
 - TIME-013 (Event-driven): When End turn is given, the turn processor shall apply the queued orders before any other stage runs. [turn.ts `processTurn`; X-2]
 - TIME-014 (Unwanted): If an order cannot be applied, then the turn processor shall reject it with a plain reason and report it in the turn's result, and the rest of the turn shall still run. [turn.ts `rejectedOrders`]
-- TIME-015 (Unwanted): If an army already received a move order this turn, then a second move order for it in the same turn shall be rejected ("army already moved this turn"). [turn.ts `movedThisTurn`]
+- TIME-015 (Event-driven): When an army that is already marching gets a new move order, the new order shall replace the old one, from the tile the army stands on. [playtest feedback F-1; turn.ts `orderMarch`]
 - TIME-016 (State-driven): While a turn is being processed, the game shall keep orders frozen while the map can still be panned and zoomed. [screen-flow G5]
 - TIME-017 (Unwanted): If any event is unanswered, then End turn shall not end the turn but open the first unanswered event instead; nothing answers an event for the player. [screen-flow §4.6, decided 16 Oct]
 - TIME-018 (Optional): Where the End turn confirmation setting is on, the game shall ask before ending the turn and name the count of open warnings; warnings shall never block the turn. [screen-flow §4.6, G9; settings §5.3]
@@ -469,7 +469,7 @@ the turn in which a new month, season or year begins (X-18). What each system do
 | TIME-012 | end-turn.feature | Orders given during the turn are queued, not applied |
 | TIME-013 | end-turn.feature | Queued orders are applied before any phase runs |
 | TIME-014 | end-turn.feature | An order that can't be applied is rejected with a reason and the turn still runs |
-| TIME-015 | end-turn.feature | An army takes one move order per turn |
+| TIME-015 | end-turn.feature | A later move order replaces the earlier one |
 | TIME-016 | end-turn.feature | Orders are frozen while the turn runs |
 | TIME-017 | end-turn.feature | Unanswered events block End turn |
 | TIME-018 | end-turn.feature | The End turn confirmation names open warnings but never blocks |

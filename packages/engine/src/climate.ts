@@ -1,4 +1,4 @@
-import { isWetSeason, type WetClimate } from "@ph/engine/domain/time-and-turns";
+import { isWetSeason, type WetClimate } from "./domain/time-and-turns/index.ts";
 import type { GameDate } from "@ph/rules";
 
 /**
@@ -119,4 +119,10 @@ export function provinceClimate(place: PlaceClimate, date: GameDate): ProvinceCl
 export function seasonName(lat: number, month: number): string {
   const m = lat >= 0 ? month : ((month + 5) % 12) + 1;
   return m === 12 || m <= 2 ? "Winter" : m <= 5 ? "Spring" : m <= 8 ? "Summer" : "Autumn";
+}
+
+/** Snow cover 0..1 at a temperature, as the map lays it: none above +1 °C, full by -5 °C. */
+export function snowCover(temperature: number): number {
+  const t = Math.min(1, Math.max(0, (1 - temperature) / 6));
+  return t * t * (3 - 2 * t);
 }

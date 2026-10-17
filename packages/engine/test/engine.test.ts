@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
-import { addDays, createEngineHost, daysInMonth, monthBeginning, turnOfDay, createWorld, generateSyntheticRuleset, hashWorld, marchMap, planRoute, processTurn, Rng, stepDays } from "../src/index.ts";
+import { addDays, advance, applyNow, GROUNDS, tileMarch, tileStepHours, createEngineHost, daysInMonth, monthBeginning, turnOfDay, createWorld, generateSyntheticRuleset, hashWorld, marchMap, planRoute, processTurn, Rng, stepDays } from "../src/index.ts";
 
 const rules = loadDefaultRuleset();
+const tiles = loadMapTiles(rules);
 
 describe("rng", () => {
   it("is reproducible from a seed", () => {
@@ -16,7 +18,7 @@ describe("rng", () => {
 
 describe("turns", () => {
   it("starts on 11 November 1444 and moves on a week a turn into 1445", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     expect(w.date).toEqual({ year: 1444, month: 11, day: 11 });
     processTurn(w, [], 0);
     expect(w.date).toEqual({ year: 1444, month: 11, day: 18 });
@@ -39,7 +41,7 @@ describe("turns", () => {
   });
 
   it("pays province income into the owner's treasury once a month", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const fra = w.nationIndex.get("france")!;
     processTurn(w, [], fra);
     processTurn(w, [], fra);
@@ -52,52 +54,83 @@ describe("turns", () => {
     expect(w.nationTreasury[fra]).toBeCloseTo(before + w.nationMonthlyIncome[fra]!);
   });
 
-  it("moves only your own armies, once per turn", () => {
-    const w = createWorld(rules, 1);
+  it("moves only your own armies, and a new order replaces the old one", () => {
+    const w = createWorld(rules, 1, tiles);
     const fra = w.nationIndex.get("france")!;
+    w.player = fra;
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
     const paris = w.armies.location[army]!;
     const next = Array.from(w.adjList.subarray(w.adjStart[paris]!, w.adjStart[paris + 1]!)).find((p) => !w.provinceWater[p])!;
-    const london = w.provinceIndex.get(rules.nations.find((n) => n.id === "england")!.capital)!;
+    const madrid = w.provinceIndex.get(rules.nations.find((n) => n.id === "castile")!.capital)!;
     const report = processTurn(
       w,
       [
-        { type: "move", army, to: next },
+        { type: "move", army, to: madrid },
         { type: "move", army: army + 1, to: next },
-        { type: "move", army, to: london },
+        { type: "move", army, to: next },
       ],
       fra,
     );
+    expect(report.rejectedOrders.map((r) => r.reason)).toEqual(["not your army"]);
     expect(w.armies.location[army]).toBe(next);
-    expect(report.rejectedOrders.map((r) => r.reason)).toEqual(["not your army", "army already moved this turn"]);
+    processTurn(w, [], fra);
+    expect(w.armies.tile[army]).toBe(w.tiles.centre[next]);
   });
 
-  it("marches along a route over several turns, slower through rough ground", () => {
-    const w = createWorld(rules, 1);
+  it("marches over tiles a step at a time, along a road the province planner found", () => {
+    const w = createWorld(rules, 1, tiles);
     const fra = w.nationIndex.get("france")!;
+    w.player = fra;
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
     const madrid = w.provinceIndex.get(rules.nations.find((n) => n.id === "castile")!.capital)!;
-    const d = rules.defines.march;
-    const route = planRoute(d, marchMap(w), w.armies.location[army]!, madrid, { men: 5000, horse: 1000, logistics: 0 })!;
-    expect(route.path.at(-1)).toBe(madrid);
-    // The route's days are the same steps the engine walks.
-    let days = 0;
-    route.path.forEach((p, i) => {
-      days += stepDays(d, marchMap(w), i ? route.path[i - 1]! : w.armies.location[army]!, p, { men: 5000, horse: 1000, logistics: 0 });
-      expect(route.arrive[i]).toBeCloseTo(days, 9);
-    });
-    const months = turnOfDay(w.date, route.arrive.at(-1)!).turns;
-    expect(months).toBeGreaterThan(1);
-    processTurn(w, [{ type: "move", army, to: madrid }], fra);
-    expect(w.armies.marched[army]!.length).toBeGreaterThan(1);
-    expect(w.armies.location[army]).not.toBe(madrid);
-    for (let i = 1; i < months + 1; i++) processTurn(w, [], fra);
+    expect(applyNow(w, { type: "move", army, to: madrid }, fra).rejectedOrders).toEqual([]);
+    const path = w.armies.path[army]!;
+    expect(path.at(-1)).toBe(w.tiles.centre[madrid]);
+    // Each tile is a neighbour of the one before, and on land.
+    let at = w.armies.tile[army]!;
+    for (const t of path) {
+      expect(Math.abs((t % w.tiles.width) - (at % w.tiles.width))).toBeLessThanOrEqual(1);
+      expect(Math.abs(Math.floor(t / w.tiles.width) - Math.floor(at / w.tiles.width))).toBeLessThanOrEqual(1);
+      expect(w.tiles.province[t]).toBeGreaterThan(0);
+      at = t;
+    }
+    // A day is six steps; the march goes on step by step, and the army stands on its path.
+    advance(w, 6);
+    const walked = w.armies.pathAt[army]!;
+    expect(walked).toBeGreaterThan(0);
+    expect(w.armies.tile[army]).toBe(path[walked - 1]);
+    expect(w.tiles.province[w.armies.tile[army]!]! - 1).toBe(w.armies.location[army]);
+    let weeks = 0;
+    while (w.armies.location[army] !== madrid && weeks++ < 30) processTurn(w, [], fra);
     expect(w.armies.location[army]).toBe(madrid);
+    for (let i = 0; i < 4; i++) processTurn(w, [], fra);
+    expect(w.armies.tile[army]).toBe(w.tiles.centre[madrid]);
     expect(w.armies.route[army]).toEqual([]);
   });
 
+  it("marches slower over rough ground and through snow", () => {
+    const w = createWorld(rules, 1, tiles);
+    const m = tileMarch(w);
+    const grid = w.tiles;
+    const army = { men: 100, horse: 0, logistics: 0 };
+    const find = (ground: string) => {
+      for (let t = grid.width; t < grid.province.length; t++) {
+        const c = grid.cell[t]!;
+        if (c !== 15 && GROUNDS[c & 15] === ground && !(c & 16) && c >> 5 === 0 && grid.cell[t - grid.width] === c) return t;
+      }
+      return -1;
+    };
+    const step = (t: number) => tileStepHours(m, t - grid.width, t, army);
+    const grass = find("grassland");
+    const forest = find("forest");
+    w.provinceTemperature.fill(20);
+    expect(step(forest)).toBeCloseTo(step(grass) * 2);
+    w.provinceTemperature.fill(-20);
+    expect(step(grass)).toBeGreaterThan(tileStepHours({ ...m, temperature: new Float32Array(w.provinceCount).fill(20) }, grass - grid.width, grass, army) * 1.9);
+  });
+
   it("is faster with horse and slower for a big army", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const map = marchMap(w);
     const d = rules.defines.march;
     const paris = w.provinceIndex.get(rules.nations.find((n) => n.id === "france")!.capital)!;
@@ -109,7 +142,7 @@ describe("turns", () => {
   });
 
   it("feeds armies from the land and starves them where it is bare", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const fra = w.nationIndex.get("france")!;
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
     const full = w.armies.food[army]!;
@@ -126,7 +159,7 @@ describe("turns", () => {
   });
 
   it("keeps armies off sea zones until they have ships", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     const eng = w.nationIndex.get("england")!;
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(eng);
     const london = w.armies.location[army]!;
@@ -138,7 +171,7 @@ describe("turns", () => {
 
   it("is deterministic for the same seed and orders", () => {
     const run = () => {
-      const w = createWorld(rules, 7);
+      const w = createWorld(rules, 7, tiles);
       for (let i = 0; i < 24; i++) processTurn(w, [], 0);
       return hashWorld(w);
     };

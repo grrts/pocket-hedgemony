@@ -1,21 +1,23 @@
 import { describe, expect, it } from "vitest";
+import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { applyNow, createWorld, marchMap, processTurn, relationState, spawnArmy, type World } from "../src/index.ts";
 import { blockingCastle } from "../src/turn.ts";
 
 const rules = loadDefaultRuleset();
+const tiles = loadMapTiles(rules);
 const n = (w: World, id: string) => w.nationIndex.get(id)!;
 const armyOf = (w: World, nation: number) => Array.from(w.armies.owner.subarray(0, w.armies.count)).findIndex((o, i) => o === nation && w.armies.alive[i]);
 
 describe("war and conquest", () => {
   it("starts from the 1444 relations between the map's realms", () => {
-    const w = createWorld(rules, 1);
+    const w = createWorld(rules, 1, tiles);
     expect(relationState(w, n(w, "england"), n(w, "france")).state).toBe("truce");
     expect(w.diplomacy.wars.length).toBeGreaterThan(0);
   });
 
   it("declares war, fights, occupies and makes peace for the land", () => {
-    const w = createWorld(rules, 7);
+    const w = createWorld(rules, 7, tiles);
     const me = n(w, "castile");
     w.player = me;
     const foe = n(w, "portugal");
@@ -44,10 +46,10 @@ describe("war and conquest", () => {
     expect(peace).toBe(true);
     expect(w.provinceOwner[target]).toBe(me);
     expect(relationState(w, me, foe).state).toBe("truce");
-  });
+  }, 60000);
 
   it("stops armies at a garrisoned enemy castle until it falls (warfare 5.5)", () => {
-    const w = createWorld(rules, 7);
+    const w = createWorld(rules, 7, tiles);
     const me = n(w, "castile");
     const foe = n(w, "portugal");
     applyNow(w, { type: "declareWar", target: foe }, me);
@@ -58,24 +60,24 @@ describe("war and conquest", () => {
     const [back, onward] = around.filter((p) => w.provinceOwner[p] === foe);
     expect(back !== undefined && onward !== undefined).toBe(true);
     // An army marching from one side to the other halts at the castle.
-    const army = spawnArmy(w, me, back!, 20000);
+    const army = spawnArmy(w, me, back!, 20000, w.commanderOwner.indexOf(me));
     w.armies.route[army] = [castle, onward!];
     for (let t = 0; t < 8 && w.armies.location[army] !== castle; t++) processTurn(w, [], me);
     expect(w.armies.location[army]).toBe(castle);
     expect(w.armies.route[army]).toEqual([]);
+    expect(w.armies.path[army]!.length).toBe(0);
     // It may not go on past the castle, but it may go back.
     const on = applyNow(w, { type: "move", army, to: onward! }, me);
     expect(on.rejectedOrders.length).toBe(1);
     expect(applyNow(w, { type: "move", army, to: back! }, me).rejectedOrders).toEqual([]);
     // Once the castle has no men in it, the road is open.
-    w.armies.movedThisTurn[army] = 0;
     w.provinceGarrison[castle] = 0;
     expect(applyNow(w, { type: "move", army, to: onward! }, me).rejectedOrders).toEqual([]);
   });
 
   it("runs decades of AI wars deterministically and quickly", () => {
-    const a = createWorld(rules, 3);
-    const b = createWorld(rules, 3);
+    const a = createWorld(rules, 3, tiles);
+    const b = createWorld(rules, 3, tiles);
     const t0 = performance.now();
     let wars = 0;
     let taken = 0;
@@ -89,6 +91,7 @@ describe("war and conquest", () => {
     console.log(`10 years: ${wars} wars, ${taken} peaces with land, ${ms.toFixed(2)} ms a turn, ${a.diplomacy.wars.length} wars still on`);
     expect(Array.from(a.provinceOwner)).toEqual(Array.from(b.provinceOwner));
     expect(wars).toBeGreaterThan(0);
-    expect(ms).toBeLessThan(40);
+    // A week is 42 four-hour steps; the game plays it a day or a step at a time.
+    expect(ms).toBeLessThan(120);
   }, 120000);
 });

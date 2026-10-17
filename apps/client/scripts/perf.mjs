@@ -78,10 +78,11 @@ const ANIM_SHARE = 0.9;
 if (animFrames < ANIM_SHARE) failed = true;
 console.log(`${animFrames >= ANIM_SHARE ? "PASS" : "FAIL"} animating overlay redrawn on ${(animFrames * 100).toFixed(0)}% of frames (budget ${ANIM_SHARE * 100}%)`);
 
-// Ending turns: the engine worker's answer, then applying it on the main thread.
+// Ending turns: each day (or battle step) of the week as it plays, the engine
+// worker's answer, then taking it in on the main thread.
 for (let i = 0; i < 3; i++) {
   await page.click(".end-turn");
-  await page.waitForFunction((n) => performance.getEntriesByName("turn-apply").length > n, i);
+  await page.waitForFunction(() => !document.querySelector(".end-turn").classList.contains("playing"), null, { timeout: 60000 });
 }
 const turns = await page.evaluate(() => ({
   wait: performance.getEntriesByName("turn-wait").map((e) => e.duration),
@@ -94,8 +95,8 @@ const check = (name, values, budget) => {
   if (!ok) failed = true;
   console.log(`${ok ? "PASS" : "FAIL"} ${name}: worst ${worst.toFixed(1)} ms of ${values.length} (budget ${budget})`);
 };
-check("turn answer from the worker", turns.wait, TURN_WAIT_MS);
-check("turn applied on the main thread", turns.apply, TURN_APPLY_MS);
+check("day of the turn answered by the worker", turns.wait, TURN_WAIT_MS);
+check("day of the turn applied on the main thread", turns.apply, TURN_APPLY_MS);
 check("longest main-thread task", turns.longTasks, LONG_TASK_MS);
 await browser.close();
 server.httpServer.close();

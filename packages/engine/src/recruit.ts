@@ -1,6 +1,7 @@
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { monthlyRations } from "./march.ts";
+import { halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
 import { atWar, controller, type News } from "./war.ts";
 
@@ -407,7 +408,7 @@ export function splitTroops(world: World, n: number, army: number, arm: string, 
   setByArm(world, army, by);
   holdTraining(world, army);
   const horse = isHorseArm(arm);
-  const slot = spawnArmy(world, n, a.location[army]!, men, c, horse ? men : 0, { kind: a.kind[army]!, drill: a.drill[army]!, ...(horse ? { horseArm: arm } : { foot: arm }) });
+  const slot = spawnArmy(world, n, a.location[army]!, men, c, horse ? men : 0, { kind: a.kind[army]!, drill: a.drill[army]!, tile: a.tile[army]!, ...(horse ? { horseArm: arm } : { foot: arm }) });
   a.monthsOut[slot] = a.monthsOut[army]!;
   // The new army takes its share of the wagons, not a full set.
   a.food[slot] = a.food[army]! * share;
@@ -467,7 +468,7 @@ export function mergeArmies(world: World, n: number, from: number, into: number)
     a.trainLeft[into] = a.trainLeft[from]!;
   }
   a.alive[from] = 0;
-  a.route[from] = [];
+  halt(world, from);
   return null;
 }
 
@@ -482,7 +483,7 @@ export function appointCommander(world: World, n: number, army: number, commande
   if (commander < 0) {
     if (a.kind[army] === KIND.hired) return "a mercenary company keeps its own captain";
     a.commander[army] = -1;
-    a.route[army] = [];
+    halt(world, army);
     return null;
   }
   if (commander >= world.commanderIds.length || world.commanderOwner[commander] !== n) return "no such commander of yours";
@@ -490,7 +491,7 @@ export function appointCommander(world: World, n: number, army: number, commande
   if (other >= 0) {
     if (a.kind[other] === KIND.hired) return "a mercenary captain stays with his company";
     a.commander[other] = a.commander[army]!;
-    if (a.commander[other]! < 0) a.route[other] = [];
+    if (a.commander[other]! < 0) halt(world, other);
   }
   a.commander[army] = commander;
   return null;
@@ -506,7 +507,7 @@ export function disbandArmy(world: World, n: number, army: number): string | nul
     if (c >= 0) world.commanderOwner[c] = -1;
   } else sendHome(world, n, a.men[army]!);
   a.alive[army] = 0;
-  a.route[army] = [];
+  halt(world, army);
   recount(world);
   return null;
 }
@@ -612,7 +613,7 @@ function trainMonth(world: World, i: number, news: News[]): void {
   const k = a.trainArm[i]!;
   if (k < 0) return;
   const p = a.location[i]!;
-  if (a.route[i]!.length || controller(world, p) !== a.owner[i] || world.sieges.has(p)) return;
+  if (isMarching(world, i) || controller(world, p) !== a.owner[i] || world.sieges.has(p)) return;
   a.trainLeft[i] = a.trainLeft[i]! - 1;
   if (a.trainLeft[i]! > 0) return;
   const arm = ARMS[k]!;

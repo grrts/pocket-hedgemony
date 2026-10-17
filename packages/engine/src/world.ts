@@ -1,8 +1,10 @@
 import type { GameDate, Ground, Ruleset } from "@ph/rules";
-import { groundOf, monthlyRations, type MarchMap } from "./march.ts";
+import { groundOf, monthlyRations, rowWidths, type MarchMap, type TileMarch } from "./march.ts";
+import { placeClimate, provinceClimate, type PlaceClimate } from "./climate.ts";
+import { pointTileGrid, type TileGrid } from "./tiles.ts";
 import { Rng } from "./rng.ts";
 import type { Diplomacy } from "./domain/diplomacy/index.ts";
-import { createWarState, maxGarrison, type SiegeState } from "./war.ts";
+import { createWarState, maxGarrison, type Battle, type SiegeState } from "./war.ts";
 import { newCommander, type Commander } from "./domain/warfare/index.ts";
 import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type Mercenary, type Muster } from "./recruit.ts";
 
@@ -14,9 +16,22 @@ import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIN
  */
 export interface World {
   rules: Ruleset;
+  /** Weeks played. */
   turn: number;
   date: GameDate;
+  /** 4-hour step of the day, 0 to 5 (STEPS_PER_DAY). */
+  step: number;
+  /** Days played. */
+  day: number;
   rng: Rng;
+
+  /** The map's tiles, which armies stand and march on. */
+  tiles: TileGrid;
+  /** East-west size of a tile on each row of the map. */
+  rowWidth: Float32Array;
+  /** What each province's weather depends on, and its sea-level temperature today (°C). */
+  provincePlace: PlaceClimate[];
+  provinceTemperature: Float32Array;
 
   provinceCount: number;
   provinceIds: string[];
@@ -55,11 +70,14 @@ export interface World {
   diplomacy: Diplomacy;
   /** Nation occupying each province in a war, -1 = none. */
   provinceOccupier: Int16Array;
-  /** Weeks a hostile army has held a province without walls. */
+  /** Days a hostile army has held a province without walls. */
   provinceHold: Uint8Array;
   /** Men behind each province's walls. */
   provinceGarrison: Float32Array;
   sieges: Map<number, SiegeState>;
+  /** Battles being fought, round by round. */
+  battles: Battle[];
+  battleSeq: number;
   /** 1 once a nation has lost all its land. */
   nationGone: Uint8Array;
 
@@ -83,20 +101,29 @@ export interface ArmyPool {
   count: number; // high-water mark; slots below it may be dead
   alive: Uint8Array;
   owner: Int16Array;
+  /** Province the army stands in (the province of its tile). */
   location: Int32Array;
+  /** Tile the army stands on. */
+  tile: Int32Array;
   men: Int32Array;
   commander: Int32Array; // -1 = none
   /** Men on horseback, counted within men. */
   horse: Int32Array;
   /** Rations in the army's wagons. */
   food: Float64Array;
-  /** Days already marched toward the next province on the route. */
-  progress: Float32Array;
-  movedThisTurn: Uint8Array;
   /** Provinces still to march through, in order. */
   route: number[][];
-  /** Provinces walked last turn, starting where the army set out (for drawing the march). */
-  marched: number[][];
+  /** Tiles planned ahead, walked from pathAt on (a route is walked a province at a time when it isn't planned through). */
+  path: Int32Array[];
+  pathAt: Int32Array;
+  /** Hours already walked toward the next tile. */
+  progress: Float32Array;
+  /** Tiles stepped onto since the UI last looked, for drawing the march. */
+  trail: number[][];
+  /** 1 while a beaten army falls back: it can't be caught or given orders until it gets there. */
+  retreating: Uint8Array;
+  /** Battle the army is fighting in (its id), or -1. */
+  battle: Int32Array;
   /** The province the army last marched in from (-1 = none): the way back past an enemy castle. */
   cameFrom: Int32Array;
   /** Company kind: levy or hired (see KIND). */
@@ -116,6 +143,8 @@ export interface ArmyPool {
 /** How an army's men split by arm and what kind of company they are. */
 export interface ArmyMake {
   kind?: number;
+  /** Tile to stand on, in the province (else its centre). */
+  tile?: number;
   drill?: number;
   /** Arm of the foot and of the horse. */
   foot?: string;
@@ -128,14 +157,18 @@ export function createArmyPool(capacity: number): ArmyPool {
     alive: new Uint8Array(capacity),
     owner: new Int16Array(capacity),
     location: new Int32Array(capacity),
+    tile: new Int32Array(capacity),
     men: new Int32Array(capacity),
     commander: new Int32Array(capacity).fill(-1),
     horse: new Int32Array(capacity),
     food: new Float64Array(capacity),
-    progress: new Float32Array(capacity),
-    movedThisTurn: new Uint8Array(capacity),
     route: Array.from({ length: capacity }, () => []),
-    marched: Array.from({ length: capacity }, () => []),
+    path: Array.from({ length: capacity }, () => NO_PATH),
+    pathAt: new Int32Array(capacity),
+    progress: new Float32Array(capacity),
+    trail: Array.from({ length: capacity }, () => []),
+    retreating: new Uint8Array(capacity),
+    battle: new Int32Array(capacity).fill(-1),
     cameFrom: new Int32Array(capacity).fill(-1),
     kind: new Uint8Array(capacity),
     monthsOut: new Uint16Array(capacity),
@@ -146,6 +179,8 @@ export function createArmyPool(capacity: number): ArmyPool {
     trainLeft: new Float32Array(capacity),
   };
 }
+
+export const NO_PATH = new Int32Array(0);
 
 function defaultMix(capacity: number): Float32Array {
   const mix = new Float32Array(capacity * ARMS.length);
@@ -172,13 +207,17 @@ export function spawnArmy(world: World, owner: number, location: number, men: nu
   pool.alive[slot] = 1;
   pool.owner[slot] = owner;
   pool.location[slot] = location;
+  pool.tile[slot] = make.tile ?? world.tiles.centre[location]!;
   pool.men[slot] = men;
   pool.commander[slot] = commander;
   pool.horse[slot] = horse;
-  pool.progress[slot] = 0;
-  pool.movedThisTurn[slot] = 0;
   pool.route[slot] = [];
-  pool.marched[slot] = [];
+  pool.path[slot] = NO_PATH;
+  pool.pathAt[slot] = 0;
+  pool.progress[slot] = 0;
+  pool.trail[slot] = [];
+  pool.retreating[slot] = 0;
+  pool.battle[slot] = -1;
   pool.cameFrom[slot] = -1;
   pool.kind[slot] = make.kind ?? KIND.levy;
   pool.monthsOut[slot] = 0;
@@ -203,14 +242,18 @@ function growArmyPool(old: ArmyPool): ArmyPool {
   next.alive.set(old.alive);
   next.owner.set(old.owner);
   next.location.set(old.location);
+  next.tile.set(old.tile);
   next.men.set(old.men);
   next.commander.set(old.commander);
   next.horse.set(old.horse);
   next.food.set(old.food);
-  next.progress.set(old.progress);
-  next.movedThisTurn.set(old.movedThisTurn);
   old.route.forEach((r, i) => (next.route[i] = r));
-  old.marched.forEach((r, i) => (next.marched[i] = r));
+  old.path.forEach((r, i) => (next.path[i] = r));
+  next.pathAt.set(old.pathAt);
+  next.progress.set(old.progress);
+  old.trail.forEach((r, i) => (next.trail[i] = r));
+  next.retreating.set(old.retreating);
+  next.battle.set(old.battle);
   next.kind.set(old.kind);
   next.monthsOut.set(old.monthsOut);
   next.drill.set(old.drill);
@@ -222,7 +265,12 @@ function growArmyPool(old: ArmyPool): ArmyPool {
   return next;
 }
 
-export function createWorld(rules: Ruleset, seed: number): World {
+/**
+ * A new campaign. `tiles` is the map's tile grid (tileGridFromImages); without
+ * one the world gets a stand-in with one tile per province, where armies
+ * can't march (enough for a probe that only runs a turn).
+ */
+export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = pointTileGrid(rules)): World {
   const provinceIds = rules.provinces.map((p) => p.id);
   const provinceIndex = new Map(provinceIds.map((id, i) => [id, i]));
   const nationIds = rules.nations.map((n) => n.id);
@@ -262,11 +310,21 @@ export function createWorld(rules: Ruleset, seed: number): World {
     }
   });
 
+  const map = rules.map;
+  const lonLat = (x: number | undefined, y: number | undefined): [number, number] =>
+    map ? [(x ?? 0) / map.pxPerDeg - 180, map.latTop - (y ?? 0) / map.pxPerDeg] : [0, 45];
+  const provincePlace = rules.provinces.map((p) => placeClimate(...lonLat(p.x, p.y), !!p.coastal, p.terrain));
   const world: World = {
     rules,
     turn: 0,
     date: { ...rules.defines.startDate },
+    step: 0,
+    day: 0,
     rng: new Rng(seed),
+    tiles,
+    rowWidth: map && map.height === tiles.height ? rowWidths(tiles.height, map.latTop, map.pxPerDeg) : new Float32Array(tiles.height).fill(1),
+    provincePlace,
+    provinceTemperature: new Float32Array(P),
     provinceCount: P,
     provinceIds,
     provinceIndex,
@@ -296,10 +354,13 @@ export function createWorld(rules: Ruleset, seed: number): World {
     provinceHold: new Uint8Array(P),
     provinceGarrison: new Float32Array(P),
     sieges: new Map(),
+    battles: [],
+    battleSeq: 0,
     nationGone: new Uint8Array(N),
     ...createRecruitState(P, N),
   };
   world.diplomacy = createWarState(world);
+  updateWeather(world);
   for (let p = 0; p < P; p++) world.provinceGarrison[p] = maxGarrison(world, p);
 
   for (let p = 0; p < P; p++) {
@@ -335,4 +396,14 @@ export function areNeighbors(world: World, a: number, b: number): boolean {
 /** The world's province graph as the march planner sees it. */
 export function marchMap(world: World): MarchMap {
   return { adjStart: world.adjStart, adjList: world.adjList, ground: world.provinceGround, population: world.provincePopulation, river: world.provinceRiver };
+}
+
+/** Each province's sea-level temperature for today (the snow on its tiles slows marches). */
+export function updateWeather(world: World): void {
+  for (let p = 0; p < world.provinceCount; p++) if (!world.provinceWater[p]) world.provinceTemperature[p] = provinceClimate(world.provincePlace[p]!, world.date).temperature;
+}
+
+/** The world's tiles as a march over them sees them today. */
+export function tileMarch(world: World): TileMarch {
+  return { d: world.rules.defines.march, grid: world.tiles, population: world.provincePopulation, temperature: world.provinceTemperature, rowWidth: world.rowWidth };
 }

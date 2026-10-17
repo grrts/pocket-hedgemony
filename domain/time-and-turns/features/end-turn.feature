@@ -56,11 +56,11 @@ Feature: Orders and End turn
     Then the orders are taken in the order 2, 4, then the AI realms' orders by ascending nation index, each realm's in the order given
 
   @TIME-015
-  Scenario: An army takes one move order per turn
+  Scenario: A later move order replaces the earlier one
     Given the player has queued two move orders for the same army in one turn
     When End turn is given
     Then the first order is applied
-    And the second is rejected with the reason "army already moved this turn"
+    And the second replaces it, so the army marches where the second sends it
 
   @TIME-016
   Scenario: Orders are frozen while the turn runs

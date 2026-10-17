@@ -51,6 +51,8 @@
     "horseSpeedBonus": 0.5,
     "bigArmyExtraCrossings": 1,
     "riverCrossingDays": 1,
+    "tilesPerCrossing": 14,
+    "snowSlowdown": 1,
     "rationsPerSoldier": 2,
     "rationsPerHorse": 3,
     "rationsStoredPerPerson": 0.5,
@@ -62,6 +64,10 @@
   "war": {
     "$comment": "Milestone 1, war and conquest. Battles, sieges and peace use the warfare and diplomacy contexts' own numbers; these only fit them to the weekly turn.",
     "holdWeeks": 4,
+    "engageBase": 9,
+    "engageMin": 10,
+    "engageMax": 15,
+    "menPerBattleRound": 6000,
     "garrison": {
       "capital": 1500,
       "castle": 1000,

@@ -1,6 +1,6 @@
-import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN, monthBeginning } from "./calendar.ts";
-import { forageRations, monthlyRations, planRoute, stepDays, type MarchingArmy } from "./march.ts";
-import { marchMap, type World } from "./world.ts";
+import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
+import { corridor, forageRations, monthlyRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
+import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
 import {
   aiCollect,
   appointCommander,
@@ -33,7 +33,8 @@ import {
   monthlyDiplomacy,
   offerPeace,
   relationState,
-  runBattles,
+  engage,
+  fightRound,
   runOccupation,
   syncDate,
   wallsOf,
@@ -42,7 +43,8 @@ import {
 } from "./war.ts";
 
 export type Order =
-  | { type: "move"; army: number; to: number }
+  /** March to a province, to the given tile in it if any (else its centre). */
+  | { type: "move"; army: number; to: number; tile?: number }
   | { type: "declareWar"; target: number }
   | { type: "offerPeace"; target: number; terms: PeaceTerms }
   | { type: "answerCall"; call: string; yes: boolean }
@@ -73,7 +75,12 @@ export interface TurnReport {
   news: News[];
 }
 
-/** Orders that act at once, between turns (declaring war, peace, raising levies); moves wait for the turn. */
+/** A day is played as six 4-hour steps: armies march a step at a time and battles fight a round a step (TIME-027). */
+export const STEPS_PER_DAY = 6;
+export const HOURS_PER_STEP = 24 / STEPS_PER_DAY;
+export const STEPS_PER_TURN = STEPS_PER_DAY * DAYS_PER_TURN;
+
+/** Orders act at once, whenever they are given: a march sets off with the next step of the clock. */
 export function applyNow(world: World, order: Order, actingNation: number): TurnReport {
   const news: News[] = [];
   const reason = applyOrder(world, order, actingNation, news);
@@ -81,49 +88,75 @@ export function applyNow(world: World, order: Order, actingNation: number): Turn
 }
 
 /**
- * Advances the world by one turn (one month). Phases run in a fixed order and
- * only use seeded randomness, so the same world plus the same orders always
- * produces the same result.
+ * Plays the world on by a number of 4-hour steps. Each step marches every
+ * army, finds the enemies that come within reach of each other and fights a
+ * round of every battle; each day ends with food, sieges and occupation, each
+ * week with musters and the AI's plans, and the 1st of each month brings the
+ * monthly steps. Only seeded randomness is used, so the same world played the
+ * same way always gives the same result.
+ */
+export function advance(world: World, steps: number): News[] {
+  const news: News[] = [];
+  for (let s = 0; s < steps; s++) {
+    if (world.step === 0) startDay(world, news);
+    stepMarches(world, HOURS_PER_STEP);
+    engage(world, news);
+    fightRound(world, news);
+    for (let i = 0; i < world.armies.count; i++) if (world.armies.alive[i] && world.armies.men[i]! < 1) world.armies.alive[i] = 0;
+    if (++world.step === STEPS_PER_DAY) {
+      world.step = 0;
+      endDay(world, news);
+    }
+  }
+  return news;
+}
+
+/**
+ * Applies orders, then plays a whole turn (one week). Kept for tests and the
+ * benchmark; the game plays the week a day or a step at a time (advance).
  */
 export function processTurn(world: World, orders: readonly Order[], actingNation: number): TurnReport {
   const rejectedOrders: TurnReport["rejectedOrders"] = [];
   const news: News[] = [];
-  world.armies.movedThisTurn.fill(0);
-  syncDate(world);
-
   for (const order of orders) {
     const reason = applyOrder(world, order, actingNation, news);
     if (reason) rejectedOrders.push({ order, reason });
   }
-  aiMarches(world);
+  news.push(...advance(world, STEPS_PER_TURN - world.step));
+  return { turn: world.turn, rejectedOrders, news };
+}
 
-  // Orders, the day loop and its battles, the weekly steps, then the monthly
-  // steps in the turn a new month begins (decisions X-1, X-2, X-18).
-  const moved = runMarches(world);
-  runBattles(world, moved, news);
-  for (let i = 0; i < world.armies.count; i++) if (world.armies.alive[i] && world.armies.men[i]! < 1) world.armies.alive[i] = 0;
-  const newMonth = monthBeginning(world.date) !== null;
-  runOccupation(world, newMonth, news);
-  weeklyMusters(world, news);
-  aiCollect(world, news);
-  if (newMonth) monthlyRecruits(world, news);
-  else recount(world);
-  runEconomy(world, newMonth);
-  if (newMonth) {
+function startDay(world: World, news: News[]): void {
+  syncDate(world);
+  // The 1st of the month: pools refill, pay, diplomacy, the AI's monthly choices.
+  if (world.day > 0 && world.date.day === 1) {
+    monthlyRecruits(world, news);
+    runEconomy(world, true);
     monthlyDiplomacy(world, news);
     aiDeclarations(world, news);
     aiRaise(world, news);
   }
-  answerAiCalls(world, news);
-  world.date = addDays(world.date, DAYS_PER_TURN);
-  world.turn++;
-  syncDate(world);
+  if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
+}
 
-  return { turn: world.turn, rejectedOrders, news };
+function endDay(world: World, news: News[]): void {
+  feedArmies(world);
+  runOccupation(world, world.date.day === 1, news);
+  world.date = addDays(world.date, 1);
+  world.day++;
+  updateWeather(world);
+  syncDate(world);
+  if (world.day % DAYS_PER_TURN === 0) {
+    weeklyMusters(world, news);
+    aiCollect(world, news);
+    recount(world);
+    runEconomy(world, false);
+    answerAiCalls(world, news);
+    world.turn++;
+  }
 }
 
 function applyOrder(world: World, order: Order, actingNation: number, news: News[]): string | null {
-  const a = world.armies;
   switch (order.type) {
     case "declareWar":
       return declareWar(world, actingNation, order.target, news);
@@ -157,32 +190,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return appointCommander(world, actingNation, order.army, order.commander);
     case "disband":
       return disbandArmy(world, actingNation, order.army);
-    case "move": {
-      if (order.army < 0 || order.army >= a.count || !a.alive[order.army]) return "no such army";
-      if (a.owner[order.army] !== actingNation) return "not your army";
-      if (a.movedThisTurn[order.army]) return "army already moved this turn";
-      if (world.provinceWater[order.to]) return "armies need ships to cross water";
-      if (a.commander[order.army]! < 0) return "troops without a commander can't march: give them one";
-      a.movedThisTurn[order.army] = 1;
-      if (order.to === a.location[order.army]) {
-        // Marching to where it stands is a halt.
-        a.route[order.army] = [];
-        a.progress[order.army] = 0;
-        return null;
-      }
-      const route = planRoute(world.rules.defines.march, marchMap(world), a.location[order.army]!, order.to, marching(world, order.army));
-      if (!route) {
-        a.movedThisTurn[order.army] = 0;
-        return "no road there over land";
-      }
-      if (castleBars(world, order.army, route.path[0]!)) {
-        a.movedThisTurn[order.army] = 0;
-        return "an enemy castle bars the road: go back, or take it first";
-      }
-      a.route[order.army] = route.path;
-      a.progress[order.army] = 0;
-      return null;
-    }
+    case "move":
+      return orderMarch(world, order, actingNation);
   }
 }
 
@@ -211,65 +220,188 @@ export function marching(world: World, slot: number): MarchingArmy {
   return { men: a.men[slot]!, horse: a.horse[slot]!, logistics: c >= 0 ? world.commanderLogistics[c]! : 0 };
 }
 
+/** The army stops where it stands. */
+export function halt(world: World, slot: number): void {
+  const a = world.armies;
+  a.route[slot] = [];
+  a.path[slot] = NO_PATH;
+  a.pathAt[slot] = 0;
+  a.progress[slot] = 0;
+}
+
+/** Whether the army has a march under way. */
+export function isMarching(world: World, slot: number): boolean {
+  const a = world.armies;
+  return a.route[slot]!.length > 0 || a.pathAt[slot]! < a.path[slot]!.length;
+}
+
+/** A march to a province, to a chosen tile in it when given, else to its centre. */
+function orderMarch(world: World, order: MoveOrder, n: number): string | null {
+  const a = world.armies;
+  const i = order.army;
+  if (i < 0 || i >= a.count || !a.alive[i]) return "no such army";
+  if (a.owner[i] !== n) return "not your army";
+  if (a.commander[i]! < 0) return "troops without a commander can't march: give them one";
+  if (a.battle[i]! >= 0) return "the army is fighting a battle";
+  if (a.retreating[i]) return "the army is falling back and won't take orders until it gets there";
+  if (order.to < 0 || order.to >= world.provinceCount || world.provinceWater[order.to]) return "armies need ships to cross water";
+  const target = order.tile !== undefined && world.tiles.province[order.tile]! - 1 === order.to ? order.tile : world.tiles.centre[order.to]!;
+  if (target === a.tile[i]) {
+    // Marching to where it stands is a halt.
+    halt(world, i);
+    return null;
+  }
+  return marchTo(world, i, order.to, target);
+}
+
+const corridorScratch = new WeakMap<World, Uint8Array>();
+
 /**
- * A month on the march. Every army eats its month of rations from its wagons
- * when it sets out (or sits still), walks as far along its route as the days
- * allow, then refills its wagons from the land where it stops. What the land
- * can't make up is hunger: men desert and die, and horses are eaten.
+ * Plans a march for army `slot` to a tile in province `to`: the fastest road
+ * over the provinces, then the walk over the tiles of that road and the land
+ * beside it. Returns why it can't go, or null.
  */
-function runMarches(world: World): Set<number> {
+export function marchTo(world: World, slot: number, to: number, target: number = world.tiles.centre[to]!): string | null {
+  const a = world.armies;
+  const here = a.location[slot]!;
+  const army = marching(world, slot);
+  const route = to === here ? { path: [] as number[] } : planRoute(world.rules.defines.march, marchMap(world), here, to, army);
+  if (!route) return "no road there over land";
+  if (route.path.length && castleBars(world, slot, route.path[0]!)) return "an enemy castle bars the road: go back, or take it first";
+  let allowed = corridorScratch.get(world);
+  if (!allowed) corridorScratch.set(world, (allowed = new Uint8Array(world.provinceCount)));
+  corridor(marchMap(world), [here, ...route.path], allowed);
+  const walk = world.tiles.coarse
+    ? { tiles: Int32Array.from(route.path, (p) => world.tiles.centre[p]!) }
+    : planTilePath(tileMarch(world), a.tile[slot]!, target, allowed, army);
+  a.route[slot] = route.path.slice();
+  a.progress[slot] = 0;
+  a.pathAt[slot] = 0;
+  // Without a walk through the corridor, the army goes province by province.
+  a.path[slot] = walk ? walk.tiles : NO_PATH;
+  if (!walk && !route.path.length) return "no way over the land there";
+  return null;
+}
+
+/** Stretches walked a province at a time take a nearly fastest way (the AI plans many each day). */
+const LEG_GREED = 1.6;
+
+/** The next stretch of a march planned province by province: to the centre of the next province on the route. */
+function planLeg(world: World, slot: number): boolean {
+  const a = world.armies;
+  const next = a.route[slot]![0]!;
+  if (world.tiles.coarse) {
+    a.path[slot] = Int32Array.of(world.tiles.centre[next]!);
+    a.pathAt[slot] = 0;
+    return true;
+  }
+  let allowed = corridorScratch.get(world);
+  if (!allowed) corridorScratch.set(world, (allowed = new Uint8Array(world.provinceCount)));
+  // Through the two provinces alone first, the land beside them too if that finds no way.
+  allowed.fill(0);
+  allowed[a.location[slot]!] = 1;
+  allowed[next] = 1;
+  const m = tileMarch(world);
+  const army = marching(world, slot);
+  let walk = planTilePath(m, a.tile[slot]!, world.tiles.centre[next]!, allowed, army, LEG_GREED);
+  if (!walk) walk = planTilePath(m, a.tile[slot]!, world.tiles.centre[next]!, corridor(marchMap(world), [a.location[slot]!, next], allowed), army, LEG_GREED);
+  a.path[slot] = walk ? walk.tiles : NO_PATH;
+  a.pathAt[slot] = 0;
+  return !!walk;
+}
+
+/**
+ * Every army that isn't fighting walks its hours along its tiles. Stepping
+ * into another province it checks the walls there: an enemy castle with men
+ * inside bars the way on (warfare 5.5) and stops an army that comes in.
+ */
+function stepMarches(world: World, hours: number): void {
+  const m = tileMarch(world);
+  const a = world.armies;
+  const tiles = world.tiles;
+  for (let i = 0; i < a.count; i++) {
+    if (!a.alive[i] || a.battle[i]! >= 0) continue;
+    if (a.pathAt[i]! >= a.path[i]!.length) {
+      if (!a.route[i]!.length) {
+        a.progress[i] = 0;
+        a.retreating[i] = 0;
+        continue;
+      }
+      if (!planLeg(world, i)) {
+        halt(world, i);
+        a.retreating[i] = 0;
+        continue;
+      }
+    }
+    const army = marching(world, i);
+    let have = a.progress[i]! + hours;
+    while (a.pathAt[i]! < a.path[i]!.length) {
+      const next = a.path[i]![a.pathAt[i]!]!;
+      const into = tiles.province[next]! - 1;
+      const owner = a.owner[i]!;
+      if (into !== a.location[i] && castleBars(world, i, into)) {
+        halt(world, i);
+        have = 0;
+        break;
+      }
+      const cost = tileStepHours(m, a.tile[i]!, next, army);
+      if (have < cost) break;
+      have -= cost;
+      a.tile[i] = next;
+      a.pathAt[i] = a.pathAt[i]! + 1;
+      a.trail[i]!.push(next);
+      if (into !== a.location[i]) {
+        a.cameFrom[i] = a.location[i]!;
+        a.location[i] = into;
+        const k = a.route[i]!.indexOf(into);
+        if (k >= 0) a.route[i]!.splice(0, k + 1);
+        if (blockingCastle(world, into, owner)) {
+          halt(world, i);
+          have = 0;
+          break;
+        }
+      }
+      if (a.pathAt[i]! >= a.path[i]!.length && a.route[i]!.length && !planLeg(world, i)) {
+        halt(world, i);
+        have = 0;
+        break;
+      }
+    }
+    if (a.pathAt[i]! >= a.path[i]!.length && !a.route[i]!.length) {
+      a.path[i] = NO_PATH;
+      a.pathAt[i] = 0;
+      a.retreating[i] = 0;
+      have = 0;
+    }
+    a.progress[i] = have;
+  }
+}
+
+/**
+ * A day's food. Every army eats a day of rations from its wagons and refills
+ * them from the land where it stands; what the land can't make up is hunger:
+ * men desert and die, and horses are eaten.
+ */
+function feedArmies(world: World): void {
   const d = world.rules.defines.march;
   const map = marchMap(world);
   const a = world.armies;
-  const moved = new Set<number>();
-  // Where armies stood when the week began: a march halts on meeting an enemy there.
-  const standing = new Map<number, number[]>();
-  for (let i = 0; i < a.count; i++) if (a.alive[i]) standing.set(a.location[i]!, [...(standing.get(a.location[i]!) ?? []), a.owner[i]!]);
-  const enemyAt = (p: number, owner: number) => (standing.get(p) ?? []).some((o) => atWar(world, owner, o));
+  const day = 1 / DAYS_PER_RATION_MONTH;
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const army = marching(world, i);
-    // A week's rations, at a month's rations over 30 days.
-    const week = DAYS_PER_TURN / DAYS_PER_RATION_MONTH;
-    const need = monthlyRations(d, army) * week;
+    const need = monthlyRations(d, army) * day;
     a.food[i] = a.food[i]! - need;
-
-    const walked = [a.location[i]!];
-    const route = a.route[i]!;
-    let days = a.progress[i]! + (route.length ? DAYS_PER_TURN : 0);
-    while (route.length) {
-      if (castleBars(world, i, route[0]!)) {
-        route.length = 0;
-        days = 0;
-        break;
-      }
-      const cost = stepDays(d, map, a.location[i]!, route[0]!, army);
-      if (days < cost) break;
-      days -= cost;
-      a.cameFrom[i] = a.location[i]!;
-      a.location[i] = route.shift()!;
-      walked.push(a.location[i]!);
-      // An enemy army, or a garrisoned enemy castle, ends the march (warfare 5.5).
-      if (enemyAt(a.location[i]!, a.owner[i]!) || blockingCastle(world, a.location[i]!, a.owner[i]!)) {
-        route.length = 0;
-        days = 0;
-      }
-    }
-    if (walked.length > 1) moved.add(i);
-    a.progress[i] = route.length ? days : 0;
-    a.marched[i] = walked.length > 1 ? walked : [];
-
     const room = monthlyRations(d, army) * d.monthsCarried - a.food[i]!;
-    a.food[i] = a.food[i]! + Math.max(0, Math.min(room, forageRations(d, map, a.location[i]!) * week));
+    a.food[i] = a.food[i]! + Math.max(0, Math.min(room, forageRations(d, map, a.location[i]!) * day));
     if (a.food[i]! < 0) {
       const short = Math.min(1, -a.food[i]! / need);
-      const loss = d.hungerLossPerMonth * week * short;
+      const loss = d.hungerLossPerMonth * day * short;
       a.men[i] = Math.round(a.men[i]! * (1 - loss));
       a.horse[i] = Math.round(a.horse[i]! * (1 - loss));
       a.food[i] = 0;
     }
   }
-  return moved;
 }
 
 /** Works out each realm's monthly income, and pays it when a new month begins. */

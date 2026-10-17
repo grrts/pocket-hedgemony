@@ -2,7 +2,9 @@ import type { Ground } from "@ph/rules";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { planRoute } from "./march.ts";
-import { marchMap, type World } from "./world.ts";
+import { GROUNDS } from "./tiles.ts";
+import { halt, marchTo } from "./turn.ts";
+import { marchMap, NO_PATH, type World } from "./world.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 
 /**
@@ -27,9 +29,12 @@ export interface SiegeState {
   /** Nation leading the siege. */
   by: number;
   siege: wf.Siege;
-  /** Weeks since the siege began; a siege month passes every 4. */
-  weeks: number;
+  /** Days since the siege began; a siege month passes every SIEGE_MONTH_DAYS. */
+  days: number;
 }
+
+/** Days in a siege month (four weeks). */
+export const SIEGE_MONTH_DAYS = 28;
 
 /** Walls by the map's castle field; every capital has a stone castle. */
 export function wallsOf(world: World, p: number): string | null {
@@ -83,8 +88,19 @@ export function atWar(world: World, a: number, b: number): boolean {
   return a !== b && rel.has(world.diplomacy.graph, "at_war", world.nationIds[a]!, world.nationIds[b]!);
 }
 
-/** Enemies of each nation, by index, for the phases that test many pairs. */
+/** Enemies of each nation, by index, for the phases that test many pairs; worked out again when the wars change. */
+const enemyCache = new WeakMap<World, { key: string; table: Set<number>[] }>();
 function enemyTable(world: World): Set<number>[] {
+  const g = world.diplomacy.graph;
+  const key = `${g.relations.length}|${world.diplomacy.wars.length}|${world.diplomacy.seq}|${world.day}`;
+  const hit = enemyCache.get(world);
+  if (hit && hit.key === key) return hit.table;
+  const table = buildEnemyTable(world);
+  enemyCache.set(world, { key, table });
+  return table;
+}
+
+function buildEnemyTable(world: World): Set<number>[] {
   const t = world.nationIds.map(() => new Set<number>());
   for (const r of world.diplomacy.graph.relations) {
     if (r.type !== "at_war") continue;
@@ -221,79 +237,242 @@ function battleArmy(world: World, slots: number[], id: string): [wf.Army, number
   return [wf.newArmy(id, id, companies, best >= 0 ? { commander: world.commanders[best]! } : {}), best];
 }
 
-/** Sides in a province: a realm and its partners against the realms at war with it. */
-function sidesIn(world: World, slots: number[], enemies: Set<number>[], attackers: Set<number>): [number[], number[]] | null {
-  const a = world.armies;
-  for (const s of slots) {
-    const x = a.owner[s]!;
-    const foe = slots.find((t) => enemies[x]!.has(a.owner[t]!));
-    if (foe === undefined) continue;
-    const y = a.owner[foe]!;
-    const sideX = slots.filter((t) => enemies[y]!.has(a.owner[t]!) && !enemies[x]!.has(a.owner[t]!));
-    const sideY = slots.filter((t) => enemies[x]!.has(a.owner[t]!) && !enemies[y]!.has(a.owner[t]!));
-    // The side that marched in attacks.
-    return sideX.some((t) => attackers.has(t)) || !sideY.some((t) => attackers.has(t)) ? [sideX, sideY] : [sideY, sideX];
-  }
-  return null;
+/** A battle fought over time, a round each 4-hour step, between two sides' armies (by slot). */
+export interface Battle {
+  id: number;
+  /** Where it is fought: the defenders' tile, and its province. */
+  tile: number;
+  province: number;
+  attackers: number[];
+  defenders: number[];
+  /** Men each side brought (with any who joined), and how many each will have lost by the end. */
+  attStart: number;
+  defStart: number;
+  attLoss: number;
+  defLoss: number;
+  /** Losses dealt so far. */
+  attDealt: number;
+  defDealt: number;
+  rounds: number;
+  round: number;
+  /** The worked-out result: the winning side, the reason and the two sides' leading commanders. */
+  attackerWins: boolean;
+  reason: string;
+  attLead: number;
+  defLead: number;
 }
 
-/** Battles wherever armies of realms at war stand in one province after the week's marches (WAR-089, X-1). */
-export function runBattles(world: World, moved: Set<number>, news: News[]): void {
+/** How far, in tiles, an army looks for enemies to fight: its commander's cunning over a base, within bounds. */
+export function engageRange(world: World, slot: number): number {
+  const w = world.rules.defines.war;
+  const c = world.armies.commander[slot]!;
+  if (world.tiles.coarse) return 0;
+  return c < 0 ? w.engageMin : Math.max(w.engageMin, Math.min(w.engageMax, w.engageBase + world.commanders[c]!.cunning));
+}
+
+/** Tiles between two tiles, counting the map's east-west squeeze. */
+export function tileDistance(world: World, s: number, t: number): number {
+  const W = world.tiles.width;
+  const sx = s % W;
+  const tx = t % W;
+  const sy = (s - sx) / W;
+  const ty = (t - tx) / W;
+  const dx = Math.abs(sx - tx) * world.rowWidth[(sy + ty) >> 1]!;
+  return Math.hypot(dx, sy - ty);
+}
+
+/**
+ * Armies of realms at war that come within reach of each other start a
+ * battle: the one whose commander found the other attacks. An army that
+ * comes within reach of a battle where its enemies fight joins it (TIME-028).
+ * Falling-back armies slip past.
+ */
+export function engage(world: World, news: News[]): void {
   const a = world.armies;
   const enemies = enemyTable(world);
-  const byProvince = new Map<number, number[]>();
+  if (enemies.every((e) => !e.size)) return;
+  const W = world.tiles.width;
+  const CELL = 16;
+  const cols = Math.ceil(W / CELL);
+  const cells = new Map<number, number[]>();
+  const cellOf = (t: number) => Math.floor((t % W) / CELL) + Math.floor(t / W / CELL) * cols;
   for (let i = 0; i < a.count; i++) {
-    if (!a.alive[i]) continue;
-    const list = byProvince.get(a.location[i]!) ?? [];
-    list.push(i);
-    byProvince.set(a.location[i]!, list);
+    if (!a.alive[i] || a.retreating[i] || !enemies[a.owner[i]!]!.size) continue;
+    const k = cellOf(a.tile[i]!);
+    const list = cells.get(k);
+    if (list) list.push(i);
+    else cells.set(k, [i]);
   }
-  const era = wf.eraOfYear(world.date.year);
-  for (const [p, slots] of byProvince) {
-    if (slots.length < 2) continue;
-    const sides = sidesIn(world, slots, enemies, moved);
-    if (!sides) continue;
-    const [att, def] = sides;
-    const attOwner = a.owner[att[0]!]!;
-    const defOwner = a.owner[def[0]!]!;
-    const ground = world.provinceGround[p] ?? "grassland";
-    // The resolver names sides in its reason line, so they go by the realms' names.
-    const an = name(world, attOwner);
-    const dn = name(world, defOwner);
-    const [attArmy, attLead] = battleArmy(world, att, an);
-    const [defArmy, defLead] = battleArmy(world, def, dn);
-    const r = wf.fightBattle({
-      attacker: { country: an, army: attArmy, known: new Set(), homeland: world.provinceOwner[p] === attOwner },
-      defender: { country: dn, army: defArmy, known: new Set(), homeland: world.provinceOwner[p] === defOwner },
-      sectors: wf.battlefield(battleRow(ground), { ground, era }),
-      ground,
-      era,
-    });
-    const before: Record<string, number> = { [an]: sum(att, a.men), [dn]: sum(def, a.men) };
-    const lost: Record<string, number> = {};
-    for (const [side, slotsOf] of [[an, att], [dn, def]] as const) {
-      const l = r.losses[side]!;
-      const held = r.winner === side;
-      const w = wf.woundedAfter(l.wounded, held);
-      const f = wf.fledAfter(l.fled, held);
-      lost[side] = Math.min(before[side]!, Math.round(l.killed + w.die + w.prisoners + f.home));
-      shareLosses(world, slotsOf, lost[side]!);
+  const near = (t: number, range: number, visit: (j: number) => void) => {
+    const x = Math.floor((t % W) / CELL);
+    const y = Math.floor(t / W / CELL);
+    const r = Math.ceil(range / (CELL * 0.3));
+    for (let dy = -Math.min(r, 1); dy <= Math.min(r, 1); dy++) {
+      for (let dx = -r; dx <= r; dx++) for (const j of cells.get(((x + dx + cols) % cols) + (y + dy) * cols) ?? []) visit(j);
     }
-    const winSlots = r.winner === an ? att : def;
-    const loseSlots = r.winner === an ? def : att;
+  };
+  // Join running battles first, then start new ones.
+  for (const b of world.battles) {
+    const sideOwners = [b.attackers.map((s) => a.owner[s]!), b.defenders.map((s) => a.owner[s]!)];
+    near(b.tile, world.rules.defines.war.engageMax, (j) => {
+      if (a.battle[j]! >= 0 || a.retreating[j]) return;
+      const n = a.owner[j]!;
+      const foeOfAtt = sideOwners[0]!.some((o) => enemies[n]!.has(o));
+      const foeOfDef = sideOwners[1]!.some((o) => enemies[n]!.has(o));
+      if (foeOfAtt === foeOfDef || tileDistance(world, a.tile[j]!, b.tile) > engageRange(world, j)) return;
+      joinBattle(world, b, j, foeOfAtt ? "defenders" : "attackers");
+    });
+  }
+  for (let i = 0; i < a.count; i++) {
+    if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.commander[i]! < 0) continue;
+    const n = a.owner[i]!;
+    if (!enemies[n]!.size) continue;
+    const range = engageRange(world, i);
+    let foe = -1;
+    let best = Infinity;
+    near(a.tile[i]!, range, (j) => {
+      if (j === i || a.battle[j]! >= 0 || a.retreating[j] || !enemies[n]!.has(a.owner[j]!)) return;
+      const d = tileDistance(world, a.tile[i]!, a.tile[j]!);
+      if (d <= range && d < best) ((best = d), (foe = j));
+    });
+    if (foe >= 0) startBattle(world, [i], [foe], news);
+  }
+}
+
+function startBattle(world: World, att: number[], def: number[], news: News[]): void {
+  const a = world.armies;
+  const tile = a.tile[def[0]!]!;
+  const b: Battle = {
+    id: ++world.battleSeq,
+    tile,
+    province: world.tiles.province[tile]! - 1,
+    attackers: [],
+    defenders: [],
+    attStart: 0,
+    defStart: 0,
+    attLoss: 0,
+    defLoss: 0,
+    attDealt: 0,
+    defDealt: 0,
+    rounds: 1,
+    round: 0,
+    attackerWins: false,
+    reason: "",
+    attLead: -1,
+    defLead: -1,
+  };
+  world.battles.push(b);
+  for (const s of att) joinBattle(world, b, s, "attackers", false);
+  for (const s of def) joinBattle(world, b, s, "defenders", false);
+  resolve(world, b);
+  const an = name(world, a.owner[att[0]!]!);
+  const dn = name(world, a.owner[def[0]!]!);
+  news.push({ kind: "battle", text: `Battle at ${provinceName(world, b.province)}: ${an} (${fmt(b.attStart)}) attacks ${dn} (${fmt(b.defStart)}).`, nations: [a.owner[att[0]!]!, a.owner[def[0]!]!], province: b.province });
+}
+
+/** An army joins a side of a battle: it stops marching and its men count from the next round. */
+function joinBattle(world: World, b: Battle, s: number, side: "attackers" | "defenders", rework = true): void {
+  const a = world.armies;
+  b[side].push(s);
+  a.battle[s] = b.id;
+  a.route[s] = [];
+  a.path[s] = NO_PATH;
+  a.pathAt[s] = 0;
+  a.progress[s] = 0;
+  if (side === "attackers") b.attStart += a.men[s]!;
+  else b.defStart += a.men[s]!;
+  if (rework) resolve(world, b);
+}
+
+/**
+ * Works out a battle's result with the warfare context, from the men each side
+ * has now; the rounds left then deal the losses out a step at a time. A
+ * battle lasts a round for every so many men in it, at least one.
+ */
+function resolve(world: World, b: Battle): void {
+  const a = world.armies;
+  const att = b.attackers.filter((s) => a.alive[s]);
+  const def = b.defenders.filter((s) => a.alive[s]);
+  if (!att.length || !def.length) return;
+  const era = wf.eraOfYear(world.date.year);
+  const c = world.tiles.cell[b.tile]!;
+  const ground = (GROUNDS[c & 15] ?? world.provinceGround[b.province] ?? "grassland") as Ground;
+  const attOwner = a.owner[att[0]!]!;
+  const defOwner = a.owner[def[0]!]!;
+  // The resolver names sides in its reason line, so they go by the realms' names.
+  const an = name(world, attOwner);
+  const dn = name(world, defOwner);
+  const [attArmy, attLead] = battleArmy(world, att, an);
+  const [defArmy, defLead] = battleArmy(world, def, dn);
+  const r = wf.fightBattle({
+    attacker: { country: an, army: attArmy, known: new Set(), homeland: world.provinceOwner[b.province] === attOwner },
+    defender: { country: dn, army: defArmy, known: new Set(), homeland: world.provinceOwner[b.province] === defOwner },
+    sectors: wf.battlefield(battleRow(ground), { ground, era }),
+    ground,
+    era,
+  });
+  const attMen = sum(att, a.men);
+  const defMen = sum(def, a.men);
+  const lostOf = (side: string, men: number) => {
+    const l = r.losses[side]!;
+    const held = r.winner === side;
+    const w = wf.woundedAfter(l.wounded, held);
+    const f = wf.fledAfter(l.fled, held);
+    return Math.min(men, Math.round(l.killed + w.die + w.prisoners + f.home));
+  };
+  // What is still to be lost is what this result costs on top of what has been dealt.
+  b.attLoss = b.attDealt + lostOf(an, attMen);
+  b.defLoss = b.defDealt + lostOf(dn, defMen);
+  b.attackerWins = r.winner === an;
+  b.reason = r.reason;
+  b.attLead = attLead;
+  b.defLead = defLead;
+  b.rounds = b.round + Math.max(1, Math.ceil((attMen + defMen) / world.rules.defines.war.menPerBattleRound));
+}
+
+/** A round of every battle: each side loses its share of the result's losses; the last round ends it. */
+export function fightRound(world: World, news: News[]): void {
+  if (!world.battles.length) return;
+  const a = world.armies;
+  const enemies = enemyTable(world);
+  for (const b of [...world.battles]) {
+    b.attackers = b.attackers.filter((s) => a.alive[s]);
+    b.defenders = b.defenders.filter((s) => a.alive[s]);
+    if (!b.attackers.length || !b.defenders.length) {
+      endBattle(world, b);
+      continue;
+    }
+    b.round++;
+    const share = Math.min(1, b.round / b.rounds);
+    const attNow = Math.round(b.attLoss * share) - b.attDealt;
+    const defNow = Math.round(b.defLoss * share) - b.defDealt;
+    shareLosses(world, b.attackers, attNow);
+    shareLosses(world, b.defenders, defNow);
+    b.attDealt += attNow;
+    b.defDealt += defNow;
+    if (b.round < b.rounds) continue;
+    const winSlots = b.attackerWins ? b.attackers : b.defenders;
+    const loseSlots = b.attackerWins ? b.defenders : b.attackers;
     const winner = a.owner[winSlots[0]!]!;
     const loser = a.owner[loseSlots[0]!]!;
-    const outnumbered = before[r.winner]! < before[r.loser]!;
-    commanderBattle(world, r.winner === an ? attLead : defLead, true, outnumbered);
-    commanderBattle(world, r.winner === an ? defLead : attLead, false, false);
+    const winStart = b.attackerWins ? b.attStart : b.defStart;
+    const loseStart = b.attackerWins ? b.defStart : b.attStart;
+    commanderBattle(world, b.attackerWins ? b.attLead : b.defLead, true, winStart < loseStart);
+    commanderBattle(world, b.attackerWins ? b.defLead : b.attLead, false, false);
+    endBattle(world, b);
     for (const s of loseSlots) fallBack(world, s, enemies, news);
     news.push({
       kind: "battle",
-      text: `Battle of ${provinceName(world, p)}: ${name(world, winner)} (${fmt(before[r.winner]!)}) beat ${name(world, loser)} (${fmt(before[r.loser]!)}). ${capitalise(r.reason)}. Losses ${fmt(lost[r.winner]!)} and ${fmt(lost[r.loser]!)}.`,
+      text: `Battle of ${provinceName(world, b.province)}: ${name(world, winner)} (${fmt(winStart)}) beat ${name(world, loser)} (${fmt(loseStart)}). ${capitalise(b.reason)}. Losses ${fmt(b.attackerWins ? b.attDealt : b.defDealt)} and ${fmt(b.attackerWins ? b.defDealt : b.attDealt)}.`,
       nations: [...new Set([...winSlots, ...loseSlots].map((s) => a.owner[s]!))],
-      province: p,
+      province: b.province,
     });
   }
+}
+
+function endBattle(world: World, b: Battle): void {
+  for (const s of [...b.attackers, ...b.defenders]) if (world.armies.battle[s] === b.id) world.armies.battle[s] = -1;
+  world.battles = world.battles.filter((x) => x !== b);
 }
 
 const capitalise = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
@@ -314,12 +493,15 @@ function shareLosses(world: World, slots: number[], lost: number): void {
   }
 }
 
-/** The beaten army falls back to the nearest province its realm holds with no enemy in it, or scatters. */
+/**
+ * The beaten army falls back to the nearest province its realm holds with no
+ * enemy in it, or scatters. It marches there and can't be caught or ordered
+ * on the way.
+ */
 function fallBack(world: World, s: number, enemies: Set<number>[], news: News[]): void {
   const a = world.armies;
   const owner = a.owner[s]!;
-  a.route[s] = [];
-  a.progress[s] = 0;
+  halt(world, s);
   if (a.men[s]! < world.rules.defines.war.disperseBelow) {
     disperse(world, s, `The remnant of ${name(world, owner)}'s army scatters.`, news);
     return;
@@ -327,11 +509,11 @@ function fallBack(world: World, s: number, enemies: Set<number>[], news: News[])
   const enemyAt = new Set<number>();
   for (let i = 0; i < a.count; i++) if (a.alive[i] && enemies[owner]!.has(a.owner[i]!)) enemyAt.add(a.location[i]!);
   const target = nearest(world, a.location[s]!, (p) => controller(world, p) === owner && !enemyAt.has(p) && p !== a.location[s], 12);
-  if (target < 0) {
+  if (target < 0 || marchTo(world, s, target)) {
     disperse(world, s, `${name(world, owner)}'s beaten army has nowhere to go and scatters.`, news);
     return;
   }
-  a.location[s] = target;
+  a.retreating[s] = 1;
 }
 
 function disperse(world: World, s: number, text: string, news: News[]): void {
@@ -339,7 +521,7 @@ function disperse(world: World, s: number, text: string, news: News[]): void {
   // Half the men who survive find their way home to the pools; hired men just leave.
   if (a.kind[s] !== KIND.hired) sendHome(world, a.owner[s]!, a.men[s]! * 0.5);
   a.alive[s] = 0;
-  a.route[s] = [];
+  halt(world, s);
   news.push({ kind: "battle", text, nations: [a.owner[s]!], province: a.location[s]! });
 }
 
@@ -365,21 +547,22 @@ export function nearest(world: World, from: number, test: (p: number) => boolean
 // ---------------------------------------------------------------- sieges and occupation
 
 /**
- * Each week, an army standing in a province held by a realm it is at war with,
- * with no defender there, besieges its walls (WAR-160 … WAR-170) or, where
- * there are none, holds it until it is occupied (hold_months, in weeks).
+ * Each day, an army standing still in a province held by a realm it is at
+ * war with, with no defender there, besieges its walls (WAR-160 … WAR-170) or,
+ * where there are none, holds it until it is occupied (hold_months, in days).
  */
 export function runOccupation(world: World, newMonth: boolean, news: News[]): void {
   const a = world.armies;
   const enemies = enemyTable(world);
   const present = new Map<number, number[]>();
   for (let i = 0; i < a.count; i++) {
-    if (!a.alive[i]) continue;
+    // Armies marching through or fighting a battle don't hold the land.
+    if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.pathAt[i]! < a.path[i]!.length) continue;
     const list = present.get(a.location[i]!) ?? [];
     list.push(i);
     present.set(a.location[i]!, list);
   }
-  const holdWeeks = world.rules.defines.war.holdWeeks;
+  const holdDays = world.rules.defines.war.holdWeeks * 7;
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p] || world.provinceOwner[p]! < 0) continue;
     const ctl = controller(world, p);
@@ -401,13 +584,13 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
       let st = world.sieges.get(p);
       if (!st) {
         const garrison = world.provinceGarrison[p]!;
-        st = { by: leader, weeks: 0, siege: wf.newSiege(walls, { ground: world.provinceGround[p] ?? "farmland", garrison, store: garrison * world.rules.defines.war.castleStoreMonths, townsfolk: 0 }) };
+        st = { by: leader, days: 0, siege: wf.newSiege(walls, { ground: world.provinceGround[p] ?? "farmland", garrison, store: garrison * world.rules.defines.war.castleStoreMonths, townsfolk: 0 }) };
         world.sieges.set(p, st);
         news.push({ kind: "siege", text: `${name(world, leader)} lays siege to ${provinceName(world, p)} (${walls}, ${fmt(garrison)} men inside).`, nations: [leader, owner], province: p });
       }
       st.siege.besiegers = besiegers;
-      st.weeks++;
-      if (st.weeks % 4 === 0) {
+      st.days++;
+      if (st.days % SIEGE_MONTH_DAYS === 0) {
         // A siege that is not closed lets food in (WAR-161).
         const store = st.siege.store;
         wf.siegeMonth(st.siege);
@@ -427,7 +610,7 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
       continue;
     }
     world.provinceHold[p] = world.provinceHold[p]! + 1;
-    if (world.provinceHold[p]! >= holdWeeks) {
+    if (world.provinceHold[p]! >= holdDays) {
       const freed = world.provinceOccupier[p]! >= 0 && (leader === owner || !enemies[owner]!.has(leader));
       if (freed) {
         world.provinceOccupier[p] = -1;
@@ -663,7 +846,7 @@ export function aiMarches(world: World): void {
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
-    if (n === world.player || !enemies[n]!.size || a.commander[i]! < 0) continue;
+    if (n === world.player || !enemies[n]!.size || a.commander[i]! < 0 || a.battle[i]! >= 0 || a.retreating[i]) continue;
     if (a.route[i]!.length && world.rng.int(4) !== 0) continue;
     const here = a.location[i]!;
     const foes = enemies[n]!;
@@ -685,13 +868,15 @@ export function aiMarches(world: World): void {
         30,
       );
     if (target < 0 || target === here) {
-      a.route[i] = [];
+      halt(world, i);
       continue;
     }
     const route = planRoute(world.rules.defines.march, marchMap(world), here, target, { men, horse: a.horse[i]!, logistics: 0 });
     if (route) {
+      // Walked a province at a time: each stretch is planned over the tiles as the army gets there.
       a.route[i] = route.path;
-      a.progress[i] = 0;
+      a.path[i] = NO_PATH;
+      a.pathAt[i] = 0;
     }
   }
 }

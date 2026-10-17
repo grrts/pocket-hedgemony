@@ -163,7 +163,7 @@ vec3 highlight(vec3 c, int id, float strength) {
   if ((f & 2) != 0) c = mix(c, uHighlight, strength * 1.2);
   return c;
 }
-// Seasons (decision X-17), from seasons.ts once a turn: uSeason per province
+// Seasons (decision X-17), from the engine's climate.ts once a turn: uSeason per province
 // holds r = sea-level temperature ((C + 60) / 127.5), g = autumn, b = spring,
 // a = wet season. Each tile is cooled by its height, so snow lies where it
 // is below freezing there: first on the peaks, then down into the valleys.
@@ -459,7 +459,7 @@ interface Tile {
   vao: WebGLVertexArrayObject;
 }
 
-/** Packs province `i`'s season into `out`: sea-level °C, and autumn, spring and wet season 0..1 (seasons.ts). */
+/** Packs province `i`'s season into `out`: sea-level °C, and autumn, spring and wet season 0..1 (the engine's climate.ts). */
 export function seasonBytes(out: Uint8Array, i: number, temperature: number, autumn: number, spring: number, wet: number): void {
   const o = i * 4;
   const byte = (v: number) => Math.max(0, Math.min(255, Math.round(v * 255)));
