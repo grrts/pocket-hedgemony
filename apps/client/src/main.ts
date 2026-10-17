@@ -1131,7 +1131,7 @@ function renderBattleWatch(): void {
   const b = watching && snapshot?.battles.find((x) => x.province === watching!.province);
   battleWatch.hidden = !watching;
   if (!watching) return;
-  const side = (n: number, men: number, start: number) => `<div class="side">${pennant(nations[n]!.color)}<b>${esc(nations[n]!.name)}</b>
+  const side = (n: number, men: number, start: number) => `<div class="side">${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b>
     <span class="bar"><i style="width:${start ? Math.max(0, Math.min(100, (men / start) * 100)) : 0}%;background:${nations[n]!.color}"></i></span><span class="men">${fmt(men)}</span></div>`;
   battleWatch.innerHTML = `
     <header><b>${icon("swords", 1)} Battle of ${esc(provinces[watching.province]!.name)}</b>${b ? `<small>Round ${Math.min(b.round + 1, b.rounds)} of ${b.rounds}</small>` : ""}
