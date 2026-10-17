@@ -65,7 +65,7 @@ export interface PortraitSpec {
   name: string;
   /** The realm's colour. */
   color: string;
-  kind: "commander" | "official";
+  kind: "commander" | "official" | "lord";
   look: Look;
 }
 
@@ -128,6 +128,16 @@ function draw(ctx: CanvasRenderingContext2D, p: PortraitSpec, s: number): void {
     px(7, 17, 6, 4, realm.base);
     px(7, 17, 6, 1, realm.light);
     px(9, 18, 2, 2, PALETTE.gold);
+  } else if (p.kind === "lord") {
+    // A fur-trimmed mantle over a coat in the realm's colour, and a gold chain.
+    px(2, 16, 16, 5, PALETTE.ink);
+    px(3, 17, 14, 4, realm.base);
+    px(3, 17, 14, 1, realm.light);
+    px(3, 17, 3, 4, "#efe2bf");
+    px(14, 17, 3, 4, "#efe2bf");
+    for (const x of [4, 15]) px(x, 18, 1, 1, PALETTE.ink), px(x, 20, 1, 1, PALETTE.ink);
+    px(8, 18, 4, 1, PALETTE.gold);
+    px(9, 19, 2, 2, PALETTE.gold);
   } else {
     const robe = p.look === "europe" ? realm.dark : p.look === "africa" ? PALETTE.paper : realm.dark;
     px(2, 16, 16, 5, PALETTE.ink);
@@ -238,6 +248,17 @@ function headwear(px: Px, p: PortraitSpec, hx: number, hw: number, realm: { base
       px(hx + hw - 2, 0, 2, 3, realm.base);
       px(hx + hw - 2, 0, 1, 1, realm.light);
     }
+    return;
+  }
+  if (p.kind === "lord") {
+    // A noble's coronet over a cap of the realm's colour, or a gold circlet on bare hair.
+    if (v !== 2) {
+      px(hx - 1, 2, hw + 2, 4, k);
+      px(hx, 3, hw, 2, realm.dark);
+    }
+    px(hx - 1, 4, hw + 2, 2, k);
+    px(hx, 4, hw, 1, PALETTE.gold);
+    for (let i = 0; i < hw; i += 3) px(hx + i, 2 + (v === 2 ? 1 : 0), 1, 2, PALETTE.gold);
     return;
   }
   // Officials.

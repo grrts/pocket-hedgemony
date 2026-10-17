@@ -59,7 +59,7 @@ uniform sampler2D uLand;     // per pixel: R terrain index; G water depth band +
 uniform ivec2 uTileOrigin;   // tile's top-left in map pixels
 uniform ivec2 uTileSize;     // texels in this tile's texture (includes 1px overlap)
 uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
-uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones
+uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones, a = lord tag (0 = royal land)
 uniform sampler2D uSeason;   // per-province season, see seasonal()
 uniform int uInfoWidth;
 uniform float uZoom;
@@ -101,6 +101,13 @@ vec4 info(int id) { return texelFetch(uInfo, ivec2(id % uInfoWidth, id / uInfoWi
 int ownerOf(int id) {
   vec2 o = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).rg * 255.0 + 0.5;
   return int(o.r) * 256 + int(o.g) - 1;
+}
+// Which lord holds a province, as a tag (0 = royal land); neighbours with different tags have a fief border.
+int lordTag(int id) { return int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).a * 255.0 + 0.5); }
+// Land faded back while other provinces are picked out (owner b = 64), e.g. while a lord's lands are lit.
+vec3 faded(vec3 c, int id) {
+  float b = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b;
+  return b > 0.2 && b < 0.4 ? mix(vec3(dot(c, vec3(0.3, 0.55, 0.15))), uParchmentDark, 0.25) * 0.75 : c;
 }
 // Land province (not a lake, not a sea zone).
 bool land(int id) {
@@ -341,6 +348,11 @@ vec3 tiled(bool mini) {
       if (land(n) && ownerOf(n) != owner) edge = true;
     }
     if (edge) c = mix(c, inf.rgb, 0.35);
+    // A lord's land (feedback 68): a sparse diaper of small dark crosses, like a fief's mantle.
+    if (lordTag(id) > 0 && uMode == 0) {
+      ivec2 d = ivec2(a.x + ((a.y >> 3) & 1) * 4, a.y) & 7;
+      if ((d.x == 2 && d.y >= 1 && d.y <= 3) || (d.y == 2 && d.x >= 1 && d.x <= 3)) c = mix(c, uInk, 0.28);
+    }
   }
 
   // Rivers: a winding band of water with dark banks.
@@ -372,11 +384,13 @@ vec3 tiled(bool mini) {
       c = mix(c, min(inf.rgb * 1.15 + 0.06, 1.0), 0.8);
     } else if (other2) {
       c = mix(c, uInk, 0.35);
+    } else if (political && uMode == 0 && ((iR != id && lordTag(iR) != lordTag(id)) || (iL != id && lordTag(iL) != lordTag(id)) || (iD != id && lordTag(iD) != lordTag(id)) || (iU != id && lordTag(iU) != lordTag(id)))) {
+      if (((a.x + a.y) >> 1 & 1) == 0) c = mix(c, uInk, 0.7); // dashed border between fiefs and royal land
     } else if ((iR != id || iL != id || iD != id || iU != id) && ((a.x + a.y) & 1) == 0) {
       c = mix(c, uInk, 0.5); // dotted province border
     }
   }
-  return highlight(hatch(c, id, a, max(2, size / 2)), id, 0.18);
+  return highlight(hatch(faded(c, id), id, a, max(2, size / 2)), id, 0.18);
 }
 
 // Rough height of a terrain, for hill shading on the far map.
@@ -446,11 +460,12 @@ vec3 far() {
     int l = idAt(p - ivec2(1, 0));
     int u = idAt(p - ivec2(0, 1));
     if ((land(l) && ownerOf(l) != owner) || (land(u) && ownerOf(u) != owner)) c = mix(c, inf.rgb, 0.7);
-    else if (provinceEdge) c *= 0.72;
+    else if (provinceEdge) c *= (land(r) && lordTag(r) != lordTag(id)) || (land(d) && lordTag(d) != lordTag(id)) ? 0.5 : 0.72;
+    else if (uMode == 0 && lordTag(id) > 0 && uZoom > 3.0 && (p.x & 3) == 1 && (p.y & 3) == 1) c *= 0.8;
   } else if (provinceEdge && uZoom > 1.2) {
     c *= 0.72;
   }
-  return highlight(hatch(c, id, p, 2), id, 0.3);
+  return highlight(hatch(faded(c, id), id, p, 2), id, 0.3);
 }
 
 // Undiscovered land and sea: old parchment with stains and a ruled grid.
@@ -603,9 +618,11 @@ export class MapRenderer {
 
   /**
    * Sets each province's fill colour, owner and flags.
-   * flags: 1 = selected, 2 = highlighted (e.g. a move target), 4 = undiscovered.
+   * flags: 1 = selected, 2 = highlighted (e.g. a move target, a lord's lands), 4 = undiscovered.
+   * lord: the lord holding it, -1 for royal land (drawn as a fief border and a pattern).
+   * fade: land drawn faded to grey, so the provinces that are not stand out.
    */
-  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false): void {
+  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false, lord = -1, fade = false): void {
     const o = i * 4;
     this.infoData[o] = rgb[0]!;
     this.infoData[o + 1] = rgb[1]!;
@@ -614,7 +631,8 @@ export class MapRenderer {
     const ow = owner + 1;
     this.ownerData[o] = (ow >> 8) & 255;
     this.ownerData[o + 1] = ow & 255;
-    this.ownerData[o + 2] = water ? 255 : 0;
+    this.ownerData[o + 2] = water ? 255 : fade ? 64 : 0;
+    this.ownerData[o + 3] = lord >= 0 ? (lord % 255) + 1 : 0;
   }
 
   /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
