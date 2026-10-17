@@ -32,6 +32,8 @@ import { drawBattle, drawRoute, drawSiegeMark, drawToken, pruneBattles, weekEnds
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
+import { sound } from "./audio/sound.ts";
+import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
@@ -164,7 +166,9 @@ app.innerHTML = `
     <button class="icon-only" id="mode" title="Map lens" aria-expanded="false">${icon("map", 3, "Map lens")}</button>
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
     <button class="icon-only" id="armies" title="Your commanders" aria-expanded="false" hidden>${icon("swords", 3, "Commanders")}</button>
+    <button class="icon-only" id="sound" title="Sound and music" aria-expanded="false">${icon("speaker", 3, "Sound")}</button>
   </div>
+  <div class="lens-menu sound-menu framed" id="sound-menu" hidden></div>
   <div class="lens-menu framed" id="lenses" hidden></div>
   <div class="lens-menu army-list framed" id="army-list" hidden></div>
   <button class="wax open-panel" id="reopen" title="Open the overview" hidden></button>
@@ -172,7 +176,7 @@ app.innerHTML = `
   <div class="alerts" id="alerts" aria-live="polite"></div>
   <div class="battle-watch framed" id="battle-watch" hidden></div>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
-  <button class="wax fab end-turn" id="fab" title="End turn" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
+  <button class="wax fab end-turn" id="fab" title="End turn" data-sfx="none" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const panel = document.querySelector<HTMLElement>("#panel")!;
 const fab = document.querySelector<HTMLButtonElement>("#fab")!;
@@ -183,11 +187,14 @@ const alerts = document.querySelector<HTMLElement>("#alerts")!;
 const battleWatch = document.querySelector<HTMLElement>("#battle-watch")!;
 /** The battle the player is watching (its province), and how it ended once it has. */
 let watching: { province: number; result?: string } | null = null;
+const soundButton = document.querySelector<HTMLButtonElement>("#sound")!;
+const soundMenu = document.querySelector<HTMLElement>("#sound-menu")!;
 /** The commander list is put away. */
 let armyListClosed = true;
 armyButton.addEventListener("click", () => {
   armyListClosed = !armyListClosed;
   lensMenu.hidden = true;
+  soundMenu.hidden = true;
   armyButton.setAttribute("aria-expanded", String(!armyListClosed));
   renderArmyList();
 });
@@ -276,6 +283,86 @@ reopen.addEventListener("click", () => {
   renderPanel();
 });
 
+// ---- sound ----
+// Every button answers a tap with a click; closing goes back down (sound-effects §5.1).
+document.addEventListener(
+  "click",
+  (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button");
+    if (!b || b.disabled || b.dataset.sfx === "none") return;
+    sound.sfx(b.dataset.sfx ?? (b.matches(".close, [data-back], .fold") ? "ui_back" : "ui_tap"));
+  },
+  { capture: true },
+);
+soundButton.addEventListener("click", () => {
+  soundMenu.hidden = !soundMenu.hidden;
+  lensMenu.hidden = true;
+  armyListClosed = true;
+  renderArmyList();
+  soundButton.setAttribute("aria-expanded", String(!soundMenu.hidden));
+  renderSoundMenu();
+});
+sound.onChange = () => {
+  renderSoundButton();
+// Read by scripts/sound-shots.mjs.
+(globalThis as { __phSound?: typeof sound }).__phSound = sound;
+  if (!soundMenu.hidden) renderNowPlaying();
+};
+
+/** The sound button shows when music is off at a glance. */
+function renderSoundButton(): void {
+  const off = !sound.settings.musicOn || sound.settings.master === 0;
+  soundButton.innerHTML = icon(off ? "mute" : "speaker", 3, off ? "Sound (music off)" : "Sound");
+}
+
+/** The Sound menu (domain/audio "How the player uses it"): what plays and why, and the volumes, in one card. */
+function renderSoundMenu(): void {
+  if (soundMenu.hidden) return;
+  const st = sound.settings;
+  const pct = (v: number) => Math.round(v * 100);
+  const toggle = (key: "musicOn" | "uiSounds") =>
+    `<button class="paper toggle${st[key] ? " on" : ""}" data-toggle="${key}" data-sfx="none" aria-pressed="${st[key]}">${st[key] ? "On" : "Off"}</button>`;
+  const slider = (key: "master" | "music" | "effects", label: string, off = false, after = `<output>${pct(st[key])}%</output>`) =>
+    `<label class="sound-row${off ? " off" : ""}"><span>${label}</span><input type="range" min="0" max="100" step="5" value="${pct(st[key])}" data-vol="${key}" aria-label="${label} volume"${off ? " disabled" : ""}>${after}</label>`;
+  soundMenu.innerHTML = `
+    <h3 class="sub">Sound</h3>
+    <p class="now-playing"></p>
+    ${slider("master", "Volume")}
+    <div class="sound-row${st.musicOn ? "" : " off"}"><span>Music</span><input type="range" min="0" max="100" step="5" value="${pct(st.music)}" data-vol="music" aria-label="Music volume"${st.musicOn ? "" : " disabled"}>${toggle("musicOn")}</div>
+    ${slider("effects", "Effects")}
+    <div class="sound-row"><span>Buttons</span><small>A click on every tap</small>${toggle("uiSounds")}</div>`;
+  renderNowPlaying();
+  soundMenu.querySelectorAll<HTMLInputElement>("[data-vol]").forEach((input) =>
+    input.addEventListener("input", () => {
+      sound.set({ [input.dataset.vol!]: Number(input.value) / 100 });
+      const out = input.nextElementSibling;
+      if (out?.tagName === "OUTPUT") out.textContent = `${input.value}%`;
+    }),
+  );
+  soundMenu.querySelectorAll<HTMLInputElement>("[data-vol]").forEach((input) => input.addEventListener("change", () => sound.sfx(input.dataset.vol === "music" ? "ui_tap_soft" : "ui_tap")));
+  soundMenu.querySelectorAll<HTMLButtonElement>("[data-toggle]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const key = b.dataset.toggle as "musicOn" | "uiSounds";
+      const on = !sound.settings[key];
+      sound.set({ [key]: on });
+      sound.sfx(on ? "ui_toggle_on" : "ui_toggle_off");
+      renderSoundMenu();
+    }),
+  );
+}
+
+function renderNowPlaying(): void {
+  const el = soundMenu.querySelector<HTMLElement>(".now-playing");
+  if (!el) return;
+  const np = sound.nowPlaying();
+  el.innerHTML = !sound.running
+    ? "Tap anywhere to start the sound."
+    : np
+      ? `<b>Now playing: ${esc(np.name)}</b><small>${esc(np.why)}</small>`
+      : "Music is off.";
+}
+renderSoundButton();
+
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
@@ -300,6 +387,7 @@ async function boot(): Promise<void> {
   modeButton.addEventListener("click", () => {
     lensMenu.hidden = !lensMenu.hidden;
     armyListClosed = true;
+    soundMenu.hidden = true;
     renderArmyList();
     modeButton.setAttribute("aria-expanded", String(!lensMenu.hidden));
     renderLensMenu();
@@ -312,6 +400,7 @@ async function boot(): Promise<void> {
   renderHud();
   renderPanel();
   hideLoading();
+  sound.title();
 }
 
 // ---- map styling ----
@@ -445,8 +534,10 @@ function restyleProvinces(): void {
     const lord = snapshot ? snapshot.provinceLord[i]! : -1;
     const lit = litLord >= 0 && lord === litLord;
     const flags = (i === selectedProvince ? 1 : 0) | (lit ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
+    // While armies are chosen to march, land they may not enter gets red borders (feedback 76).
+    const closed = selected.size > 0 && !!snapshot?.provinceClosed[i];
     // While a lord's lands are lit, the rest of the land fades to grey so they stand out.
-    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit);
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
   const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
@@ -836,12 +927,13 @@ function onTap(sx: number, sy: number, province: number): void {
     // With armies chosen, another one joins them (or leaves, tapped again); else it is the one chosen.
     if (selected.size && !selected.has(hit.id)) selected.add(hit.id);
     else if (selected.size > 1) selected.delete(hit.id);
-    else return pickArmy(hit.id);
+    else return sound.sfx("army_select"), pickArmy(hit.id);
     selectionChanged();
     return;
   } else if (selected.size && snapshot && province >= 0 && !isWater[province]) {
     // Any land is a target: the armies set off at once, over the fastest tiles to the spot tapped.
     const armies = [...selected];
+    sound.sfx("army_order_move");
     const [mx, my] = view.toMap(sx, sy);
     const tile = snapshot.tileWidth === rules.map!.width ? Math.floor(my) * snapshot.tileWidth + Math.floor(mx) : undefined;
     selected.clear();
@@ -852,6 +944,7 @@ function onTap(sx: number, sy: number, province: number): void {
     realmView = -1;
     newsView = false;
     renderArmyList();
+    restyleProvinces();
     void (async () => {
       for (const army of armies) await act({ type: "move", army, to: province, ...(tile !== undefined ? { tile } : {}) });
     })();
@@ -862,6 +955,7 @@ function onTap(sx: number, sy: number, province: number): void {
     selected.clear();
     renderArmyList();
     if (province !== selectedProvince) provinceTab = "overview";
+    if (province >= 0 && isKnown(province)) sound.sfx("map_select_province");
     selectedProvince = province >= 0 && isKnown(province) ? province : -1;
   }
   armyView = -1;
@@ -1001,6 +1095,9 @@ async function act(order: Order): Promise<void> {
   takeSnapshot(await engine.send({ type: "act", order }), 0);
   acting = false;
   applySnapshot();
+  hearSnapshot();
+  // War and peace change the music at once, not at the turn's end.
+  if (snapshot.news.some((x) => (x.kind === "war" || x.kind === "peace") && x.nations.includes(snapshot!.playerNation))) musicDecides();
   // What came of it goes in the log; a refusal is also said over the map, where the order was given.
   logNews(snapshot);
   for (const r of snapshot.rejectedOrders) alertPlayer(`Not done: ${r.reason}.`, "scroll");
@@ -1322,15 +1419,15 @@ function renderPanel(): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
+    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"}</p>
+    <p class="province-kind">${esc(provinceKind(p, !!owner && owner.capital === p.id))}</p>
     ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
     ${siege ? siegeView(rules, siege) : ""}
-    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.river ? " · river" : ""}${p.coastal ? " · coast" : ""}</p>
     <dl class="facts">
       <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       ${snapshot ? foodFacts(selectedProvince) : ""}
       ${snapshot && own >= 0 ? moodFacts(selectedProvince) : ""}
-      <dt>Seat</dt><dd>${owner && owner.capital === p.id ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)]}</dd>
       <dt>Walls</dt><dd>${owner && owner.capital === p.id ? WALL_NAMES.castle : p.castle ? WALL_NAMES[p.castle] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
       ${mineHere ? taxLine(selectedProvince) : ""}
@@ -1364,6 +1461,12 @@ function renderPanel(): void {
   bindTax(selectedProvince);
   bindLords();
   if (siege) animateSiege(siege);
+}
+
+/** What kind of province p is, after the realm that rules it (feedback 78): its seat and land, then river and coast. */
+function provinceKind(p: (typeof provinces)[number], capital: boolean): string {
+  const seat = capital ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)];
+  return [`${seat} in ${p.terrain}`, p.river ? "river" : "", p.coastal ? "coast" : ""].filter(Boolean).join(" · ");
 }
 
 /** The siege of province p as the siege view shows it, or null when there is none. */
@@ -2258,13 +2361,28 @@ function rateButtons(current: number, scope: "province" | "realm"): string {
 /** Binds the rate buttons (province -1: the realm default) and the borrow and repay buttons. */
 function bindTax(province: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-tax]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "setTax", province, rate: Number(b.dataset.tax) })));
-  panel.querySelectorAll<HTMLButtonElement>("[data-borrow]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "borrow", gold: Number(b.dataset.borrow) })));
-  panel.querySelectorAll<HTMLButtonElement>("[data-repay]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "repay", gold: Number(b.dataset.repay) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-borrow]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "borrow", gold: Number(b.dataset.borrow) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-repay]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "repay", gold: Number(b.dataset.repay) })));
+}
+
+/** Borrowing and repaying keep the Treasury tab open: what a loan did to the lords goes to the news, and the tab shows the new debt. */
+async function actInTreasury(order: Order): Promise<void> {
+  const realm = realmView;
+  await act(order);
+  if (!snapshot || snapshot.rejectedOrders.length) return;
+  realmView = realm;
+  newsView = false;
+  renderPanel();
 }
 
 const LEDGER_LABEL: Record<string, string> = { tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest" };
 
-/** The Treasury tab: gold, the month's ledger, the realm tax default, and debt with borrowing and repaying. */
+/**
+ * The Treasury tab: the purse (gold, its change a month and how long it
+ * lasts), the month's ledger as bars of gold in and out, the realm tax
+ * default, and the debt as a meter against what lenders allow, with what a
+ * loan costs said before the borrow buttons (REALM-184, REALM-198).
+ */
 function treasurySection(): string {
   const s = snapshot!;
   const me = s.playerNation;
@@ -2274,23 +2392,44 @@ function treasurySection(): string {
   const interest = -(s.ledger.find((l) => l.line === "interest")?.gold ?? 0);
   const borrow = [10, 50].filter((g) => g < s.canBorrow);
   const signed = (g: number) => (Math.abs(g) < 0.005 ? "0" : `${g > 0 ? "+" : "−"}${gold2(Math.abs(g))}`);
+  const income = s.ledger.reduce((t, l) => t + Math.max(0, l.gold), 0);
+  const spending = s.ledger.reduce((t, l) => t - Math.min(0, l.gold), 0);
+  const largest = Math.max(income, spending, 0.01);
+  const lasts = net < 0 && gold > 0 ? `Gold runs out in about <b>${Math.max(1, Math.floor(gold / -net))} month${Math.floor(gold / -net) === 1 ? "" : "s"}</b>.` : net < 0 ? "<b>The treasury is empty.</b>" : "The treasury grows.";
+  const bar = (label: string, g: number) => `<li class="${g < 0 ? "out" : "in"}"><span class="what">${label}</span><span class="bar"><i style="width:${Math.max(2, (Math.abs(g) / largest) * 100).toFixed(1)}%"></i></span><b class="num">${signed(g)}</b></li>`;
+  const owed = s.debtLimit > 0 ? Math.min(100, (s.debt / s.debtLimit) * 100) : s.debt > 0 ? 100 : 0;
+  const pct = Math.round((s.loanDebtFactor - 1) * 100);
+  const cost = (g: number) => `you owe ${fmt(Math.round(g * s.loanDebtFactor))}`;
   return `
-    <p><b>${fmt(gold)} gold</b> in the treasury, <b class="${net < 0 ? "down" : ""}">${signed(net)}</b> a month.</p>
+    <div class="purse">
+      <span class="purse-coin">${icon("coin", 4)}</span>
+      <div>
+        <div class="purse-gold"><b>${fmt(gold)}</b> gold</div>
+        <div class="purse-net ${net < 0 ? "down" : "up"}">${signed(net)} a month</div>
+        <div class="purse-note">${lasts}</div>
+      </div>
+    </div>
     <h3 class="sub">This month</h3>
-    <table class="troops ledger"><tbody>
-      ${s.ledger.map((l) => `<tr><td>${LEDGER_LABEL[l.line] ?? l.line}</td><td class="num${l.gold < 0 ? " down" : ""}">${signed(l.gold)}</td></tr>`).join("")}
-      <tr class="total"><td><b>Change a month</b></td><td class="num${net < 0 ? " down" : ""}"><b>${signed(net)}</b></td></tr>
-    </tbody></table>
+    <div class="flow" role="img" aria-label="Gold in ${gold2(income)}, gold out ${gold2(spending)} a month">
+      <span class="in" style="flex:${income.toFixed(3)}">In ${gold2(income)}</span><span class="out" style="flex:${spending.toFixed(3)}">Out ${gold2(spending)}</span>
+    </div>
+    <ul class="ledger-bars">
+      ${s.ledger.filter((l) => l.gold > 0).map((l) => bar(LEDGER_LABEL[l.line] ?? l.line, l.gold)).join("")}
+      ${s.ledger.filter((l) => l.gold < 0).map((l) => bar(LEDGER_LABEL[l.line] ?? l.line, l.gold)).join("")}
+      <li class="total ${net < 0 ? "out" : "in"}"><span class="what">Change a month</span><span class="bar"></span><b class="num">${signed(net)}</b></li>
+    </ul>
     <h3 class="sub">Realm tax</h3>
     <p>Provinces pay at <b>${RATE_LABEL[s.taxDefault]!.toLowerCase()}</b> unless you set their own rate on their card${own ? ` (${own} province${own === 1 ? " has" : "s have"} one)` : ""}.</p>
     ${rateButtons(s.taxDefault, "realm")}
     <h3 class="sub">Debt</h3>
-    <p>${s.debt > 0 ? `You owe <b>${fmt(s.debt)} gold</b> at 10 % a year: ${gold2(interest)} gold a month.` : "You owe nothing."} Lenders would give up to <b>${fmt(Math.floor(s.canBorrow))} gold</b> more: a year's tax and trade, less what you owe.</p>
-    <div class="choices">
-      ${borrow.map((g) => `<button class="paper" data-borrow="${g}">Borrow ${g}</button>`).join("")}
-      <button class="paper" data-borrow="${Math.floor(s.canBorrow)}" ${s.canBorrow < 1 ? "disabled" : ""}>Borrow ${fmt(Math.floor(s.canBorrow))}</button>
+    <div class="debt-meter" role="img" aria-label="Owed ${fmt(s.debt)} of ${fmt(s.debtLimit)} gold lenders allow"><i style="width:${owed.toFixed(1)}%"></i></div>
+    <p class="meter-caption">${s.debt > 0 ? `You owe <b>${fmt(s.debt)} gold</b>, costing ${gold2(interest)} gold a month in interest.` : "You owe nothing."} Lenders let you owe up to ${fmt(s.debtLimit)} gold, a year's tax and trade.</p>
+    <p class="loan-cost">A loan adds the gold <b>plus ${pct} % interest</b> to the debt at once${s.loanUnsettlesLords ? ", and <b>your lords think less of you</b>: each falls a step in loyalty (once a year)" : ""}.</p>
+    <div class="choices loans">
+      ${borrow.map((g) => `<button class="paper" data-borrow="${g}">Borrow ${g}<small>${cost(g)}</small></button>`).join("")}
+      <button class="paper" data-borrow="${Math.floor(s.canBorrow)}" ${s.canBorrow < 1 ? "disabled" : ""}>Borrow ${fmt(Math.floor(s.canBorrow))}<small>${s.canBorrow < 1 ? "lenders refuse" : cost(Math.floor(s.canBorrow))}</small></button>
     </div>
-    ${s.debt > 0 ? `<div class="choices">
+    ${s.debt > 0 ? `<div class="choices loans">
       ${s.debt > 10 ? `<button class="paper" data-repay="10" ${gold < 10 ? "disabled" : ""}>Repay 10</button>` : ""}
       <button class="paper" data-repay="${s.debt}" ${gold < s.debt ? 'disabled title="Not enough gold"' : ""}>Repay all ${fmt(s.debt)}</button>
     </div>` : ""}`;
@@ -2440,6 +2579,10 @@ async function startGame(nation: string): Promise<void> {
   renderBattleWatch();
   applySnapshot();
   const cap = provinceIndex.get(nations[nationIndex.get(nation)!]!.capital)!;
+  factMem = newFactMemory(snapshot!.date.year);
+  remember(factMem, snapshot!);
+  heldBefore = provincesHeld();
+  sound.startGame(playerPalette(rules.names?.nations[nation], lonOf(provinces[cap]!)), factsNow());
   selectedProvince = cap;
   panelCollapsed = true;
   view.lookAt(provinces[cap]!.x!, provinces[cap]!.y!, 4);
@@ -2458,6 +2601,71 @@ function mapTiles(image: MapImage): MapTiles {
   return { width: image.width, height: image.height, province, terrain: image.terrain };
 }
 
+/** What the music director remembers of this campaign, and the player's provinces before the last step (for how a peace ended). */
+let factMem: FactMemory | null = null;
+let heldBefore = 0;
+let ending: "gain" | "loss" | "white" | undefined;
+
+function provincesHeld(): number {
+  let n = 0;
+  for (let p = 0; p < owners.length; p++) if (owners[p] === snapshot!.playerNation) n++;
+  return n;
+}
+
+function factsNow() {
+  const me = snapshot!.playerNation;
+  return musicFacts(snapshot!, provinceIndex.get(nations[me]!.capital) ?? -1, factMem!);
+}
+
+/** The director's turn-end decision (AUD-042), with how the last war ended for its stinger. */
+function musicDecides(): void {
+  if (!snapshot || !factMem) return;
+  sound.turnEnded(factsNow(), ending ? { peace: ending } : {});
+  if (!playerWars(snapshot).length) ending = undefined;
+}
+
+/** Shots in the player's battle, by the century's arms (sound-effects §4.1). */
+function shotSound(year: number): string {
+  if (year < 1500) return "battle_shoot_bow";
+  if (Math.random() < 0.25) return "battle_gun";
+  return year < 1650 ? "battle_shoot_matchlock" : "battle_shoot_volley";
+}
+
+/**
+ * The sounds of a fresh snapshot's news for the player (AUD-103 bindings): one
+ * stinger at most, the most telling, and each effect once.
+ */
+function hearSnapshot(): void {
+  const s = snapshot!;
+  const me = s.playerNation;
+  if (factMem) remember(factMem, s);
+  const held = provincesHeld();
+  const effects = new Set<string>();
+  let stinger: string | null = null;
+  const rank = ["war_declared", "battle_lost", "battle_won"];
+  const sting = (id: string) => (stinger = stinger === null || rank.indexOf(id) < rank.indexOf(stinger) ? id : stinger);
+  if (s.rejectedOrders.length) effects.add("ui_error");
+  for (const x of s.news) {
+    if (!x.nations.includes(me)) continue;
+    if (x.kind === "war") sting("war_declared");
+    else if (x.kind === "battle") {
+      // A battle's end names the winner first.
+      if (x.text.includes(" beat ")) sting(x.nations[0] === me ? "battle_won" : "battle_lost");
+      else effects.add("battle_start");
+    } else if (x.kind === "siege" && x.text.includes("lays siege")) effects.add("siege_begin");
+    else if (x.kind === "occupied") effects.add("siege_fall");
+    else if (x.kind === "freed") effects.add("ui_confirm");
+    else if (x.kind === "famine") effects.add("realm_famine");
+    else if (x.kind === "unrest") effects.add("realm_unrest");
+    else if (x.kind === "raised") effects.add("army_levy_call");
+    else if (x.kind === "peace" && /^(White peace|Peace between)/.test(x.text)) ending = held > heldBefore ? "gain" : held < heldBefore ? "loss" : "white";
+  }
+  heldBefore = held;
+  if (stinger) sound.stinger(stinger);
+  // A stinger marks its moment; effects only lead in to it (AUD-090).
+  for (const id of effects) if (!stinger || !id.startsWith("battle_")) sound.sfx(id);
+}
+
 /**
  * End turn: the week plays a day at a time, and a 4-hour step at a time while
  * the player's men fight, so marches, battles and sieges are seen as they go
@@ -2474,6 +2682,8 @@ async function endTurn(): Promise<void> {
   playing = true;
   paused = false;
   selected.clear();
+  sound.sfx("turn_end");
+  if (factMem) factMem.battleThisTurn = false;
   renderActions();
   const turn = snapshot.turn;
   while (snapshot.turn === turn) {
@@ -2490,6 +2700,8 @@ async function endTurn(): Promise<void> {
     performance.mark("turn-arrived");
     takeSnapshot(next, ms);
     applySnapshot();
+    hearSnapshot();
+    if (battle) sound.sfx(shotSound(next.date.year), 0.7);
     logNews(next);
     restyleProvinces();
     renderHud();
@@ -2502,7 +2714,9 @@ async function endTurn(): Promise<void> {
   }
   playing = false;
   paused = false;
+  sound.sfx(weekStart && snapshot.date.year > weekStart.year ? "turn_month_new_year" : "turn_ready");
   weekStart = snapshot.date;
+  musicDecides();
   restyleProvinces();
   renderHud();
   renderPanel();

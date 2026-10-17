@@ -28,11 +28,44 @@ function weeks(w: World, nation: number, count: number): void {
 }
 
 describe("armies that cost something", () => {
+  it("starts each realm's men spread over its land, with commanders for its military power", () => {
+    const w = createWorld(rules, 1, tiles);
+    const count = (nation: string) => {
+      const me = n(w, nation);
+      const mine = armiesOf(w, me);
+      const led = mine.filter((i) => w.armies.commander[i]! >= 0);
+      const places = new Set(mine.map((i) => w.armies.location[i]!));
+      const commanders = w.commanderOwner.reduce((t, o) => t + (o === me ? 1 : 0), 0);
+      const men = mine.reduce((t, i) => t + w.armies.men[i]!, 0);
+      return { mine: mine.length, led: led.length, places: places.size, commanders, men };
+    };
+    const ming = count("ming");
+    const france = count("france");
+    const england = count("england");
+    // Not one stack: each army stands in its own province, and every man is under a commander.
+    for (const r of [ming, france, england]) {
+      expect(r.places).toBe(r.mine);
+      expect(r.led).toBe(r.mine);
+      expect(r.led).toBe(r.commanders);
+    }
+    // Commanders follow the men under arms in 1444.
+    expect(ming.commanders).toBeGreaterThan(france.commanders);
+    expect(france.commanders).toBeGreaterThan(england.commanders);
+    expect(england.mine).toBeGreaterThan(1);
+    expect(france.men).toBe(rules.nations[n(w, "france")]!.army);
+    // The first army stands in the capital under the realm's own commander.
+    const fra = n(w, "france");
+    const first = armiesOf(w, fra).find((i) => w.armies.location[i] === capital(w, fra))!;
+    expect(w.commanderIds[w.armies.commander[first]!]).toBe(rules.nations[fra]!.commanders[0]!.id);
+  });
+
   it("recruits a province's men by the thousand, each thousand gathering in two weeks, as its garrison", () => {
     const w = createWorld(rules, 1, tiles);
     const me = n(w, "castile");
     w.player = me;
     const p = neighbourOf(w, capital(w, me), me);
+    // Without the troops the realm started with there.
+    for (const i of garrisonTroops(w, me, p)) w.armies.alive[i] = 0;
     const pool = w.provinceRecruits[p]!;
     const gold = w.nationTreasury[me]!;
     ok(w, { type: "recruit", province: p, thousands: 2 }, me);
@@ -153,8 +186,9 @@ describe("armies that cost something", () => {
     w.player = me;
     const [army] = armiesOf(w, me);
     const men = w.armies.men[army!]!;
+    const before = armiesOf(w, me);
     ok(w, { type: "split", army: army!, arm: "light horse", men: 600 }, me);
-    const other = armiesOf(w, me).find((i) => i !== army)!;
+    const other = armiesOf(w, me).find((i) => !before.includes(i))!;
     expect(w.armies.horse[other]).toBe(600);
     expect(w.armies.commander[other]).toBe(-1);
     expect(w.armies.men[army!]).toBe(men - 600);

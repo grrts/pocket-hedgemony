@@ -61,28 +61,37 @@ Feature: Tax rates and the treasury ledger
     When "France" commissions the official of "Yvelines"
     Then the officials line of "France" is one wage smaller
 
-  @REALM-181 @placeholder
-  Scenario: Borrowing up to a year's income
-    # config: debt.interest_pct, debt.loan_cap_years_income
+  @REALM-181 @REALM-188 @placeholder
+  Scenario: Borrowing adds the interest to the debt at once
+    # config: debt.interest_pct, debt.loan_cap_years_income, debt.interest_added_at_once_years
     Given the game starts with the country "Castile"
-    Then lenders would give "Castile" a year's tax and trade
+    Then lenders would let "Castile" owe a year's tax and trade
     When "Castile" borrows 100 gold
-    Then "Castile" has 100 gold more and owes 100 gold
-    And the interest line of "Castile" is 10 % of 100 gold a year, paid monthly
-    And lenders would give "Castile" 100 gold less
+    Then "Castile" has 100 gold more and owes 110 gold
+    And the interest line of "Castile" is 10 % of 110 gold a year, paid monthly
+    And lenders would let "Castile" owe 110 gold less
     When "Castile" borrows more than lenders would give
     Then the order is refused
 
-  @REALM-181
+  @REALM-181 @REALM-188
   Scenario: Repaying
     Given the game starts with the country "Castile"
     And "Castile" borrows 100 gold
     When "Castile" repays 40 gold
-    Then "Castile" owes 60 gold
+    Then "Castile" owes 70 gold
     When "Castile" repays 1000 gold
     Then "Castile" owes nothing
     When "Castile" repays 10 gold
     Then the order is refused with "nothing owed"
+
+  @REALM-189 @placeholder
+  Scenario: Borrowing unsettles the lords, once a year
+    # config: debt.lords_waver_once_per_months
+    Given the game starts with the country "France"
+    When "France" borrows 10 gold
+    Then every lord of "France" is a step less loyal
+    When "France" borrows 10 gold
+    Then the lords of "France" are as loyal as before that loan
 
   @REALM-182 @REALM-171
   Scenario Outline: The AI's treasury

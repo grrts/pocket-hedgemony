@@ -226,7 +226,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "setTax":
       return setTax(world, actingNation, order.province, order.rate, news);
     case "borrow":
-      return takeLoan(world, actingNation, order.gold);
+      return takeLoan(world, actingNation, order.gold, news);
     case "repay":
       return repayLoan(world, actingNation, order.gold);
     case "gift":

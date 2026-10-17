@@ -205,7 +205,7 @@ Holds: castle store, granary size, reach, overrides of food policy.
 - REALM-086: A disloyal lord shall be able to defect to a neighbour with his provinces, or rebel. [§5.2, §5.4]
 - REALM-087: When two lords' houses join by marriage, they shall merge into one bigger lord. [§5.4]
 - REALM-088: Loyalty shall rise with granting his want, gifts of gold, offices at court, marriages into the ruling house, victories he took part in, a long secure reign with a clear heir, feeding his lands in famine, and sharing your faith and tongue. [§5.5]
-- REALM-089: Loyalty shall fall with heavy or crushing taxes, seizing land from him or another lord, lost wars and battles, a child ruler, a disputed heir or a new ruler, requisitioning his grain, and a foreign rival's bribes and promises. [§5.5]
+- REALM-089: Loyalty shall fall with heavy or crushing taxes, seizing land from him or another lord, lost wars and battles, a child ruler, a disputed heir or a new ruler, requisitioning his grain, a foreign rival's bribes and promises, and the crown borrowing (REALM-189). [§5.5, feedback 61]
 
 ### 5.10 Army and navy summary
 - REALM-090: Soldiers (foot, horse and later guns) shall be gained by raising recruits (gold), hiring paid companies, and lords bringing retinues; lost by battle deaths, disease and hunger on campaign, desertion when unpaid or unfed, and disbanding; they cost gold every month and eat grain. [§6]
@@ -305,12 +305,23 @@ The game's first working treasury, built to the milestone 3 plan (slice 2). It r
 - REALM-186: On a phone in landscape the Treasury tab and the Tax line fit the side panel in the Wide and Tall layouts: the tab row scrolls sideways, the rate buttons wrap onto two rows of three, every button is at least 44 points high, and nothing needs hover (each button names what it does). [X-19]
 
 #### How the player uses it: lords and who governs a province
-- REALM-190: Who governs a province comes first on its Overview, above the siege view and the facts: a "Governed by" card with the lord who holds it (portrait, house, loyalty, and buttons to his screen and to seize the land) or "Royal land" (with a Grant as fief button that opens the realm's lords, neighbours first), and the province's official. A lord's official is shown as serving the lord, with no button to the official's screen, so he cannot be commissioned. [F-60, F-62, F-70, X-19]
+- REALM-190: A province's Overview opens with the realm that rules it (its flag, opening the realm) and what kind of province it is (seat and land, then river and coast, such as "Town in farmland · river"). Who governs it comes next, above the siege view and the facts: a "Governed by" card with the lord who holds it (portrait, house, loyalty, and buttons to his screen and to seize the land) or "Royal land", saying outright that it is not granted to any lord (with a Grant as fief button that opens the realm's lords, neighbours first), and the province's official. A lord's official is shown as serving the lord, with no button to the official's screen, so he cannot be commissioned. [F-60, F-62, F-70, F-78, X-19]
 - REALM-191: The Lords tab of the country card is the lords' overview: a bar of royal land against the lords' land, the count by loyalty, and a row per lord (portrait, name, house, provinces, people, loyalty as a coloured tag, gold a month to the crown), the least loyal first; tapping a row opens the lord's screen. [F-64, F-65, X-19]
 - REALM-192: A lord's screen shows his portrait, house, loyalty and what it means, his lands (people, gold to the crown), a Gift button while he is not loyal, his provinces as rows with a picture of each (tap to open it on the map, Seize beside it), and the realm's royal provinces to grant him, nearest his lands first (six, with Show all). A button lights his lands on the map: the rest of the land fades to grey, the map frames his provinces, and a chip over the map names him with buttons to reopen his screen and to stop; on a phone the panel folds away so the map shows. [F-67, F-70, X-19]
 - REALM-193: On the map, a lord's land carries a fine pattern of small crosses and a dashed border where it meets royal land or another lord's land; the Lords lens colours the player's royal land gold and each lord's land in his own colour, other realms faded. [F-68, X-19]
 - REALM-194: The Provinces tab lists every province as a row with a picture of the province, its mood, who governs it (lord's house, or royal with the official's post or "no official"), people, food and tax a month, sortable by trouble, people, food or tax; tapping a row opens the province and centres the map on it, and its Map button shows it on the map with the panel folded away. [F-63, X-19]
 - REALM-195: On a phone in landscape these screens fit the side panel in the Wide and Tall layouts: rows and their buttons are at least 44 points high, the lord's grants and lands wrap to one column, and nothing needs hover. [X-19]
+
+### 5.18 Starting armies and borrowing (milestone 3 playtest)
+Leroy's milestone 3 playtest (feedback 59, 61, 71). It is the latest decision, so it replaces what REALM-181 says a loan owes.
+
+- REALM-188: A loan shall add to the debt at once the gold borrowed plus a year's interest on it (10 %, `debt.interest_added_at_once_years`), and the debt keeps costing 10 % a year paid monthly while it is owed. Lenders let a realm owe up to a year's tax and trade, so the most it can borrow is what is left under that, less the new loan's interest. [REALM-164, REALM-181, feedback 61]
+- REALM-189: Borrowing beyond repayment and interest shall cost the crown its lords' trust: when a realm takes a loan, each of its lords takes the *crown borrowed* loyalty cause and falls a step (none below Disloyal), at most once in twelve months (`debt.lords_waver_once_per_months`); further loans inside that time cost only their interest. The AI's loans count the same. [REALM-089, feedback 61; default chosen: the lords' loyalty, the realm's existing measure of how the crown is seen]
+- REALM-196: A realm's men under arms at the start (REALM-130: its 1444 figure, else a quarter of its troop cap) shall all stand in armies under a commander, never as garrison troops without one and never in one stack: one army per starting commander, the thousands dealt out as evenly as they go, the first in the capital and the others spread evenly over its land outward from the capital. A small realm has as many armies as it has thousands of men, at most, and a one-province realm keeps them in its capital. [feedback 59; Leroy, 17 October: starting troops are always under a commander]
+- REALM-197: A realm shall start with one commander for each `starting_armies.men_per_commander` (8,000) men under arms, rounded, at least one and at most `starting_armies.most_commanders` (8), yet enough that no starting army holds more than 30,000: the commanders the data names first, then new ones of its own culture with skills of 1 to 3 picked by the campaign's data. Each leads one of the starting armies. [REALM-130, REALM-175, feedback 59]
+
+#### How the player uses it: the Treasury tab
+- REALM-198: The Treasury tab (REALM-184) reads at a glance from top to bottom: (1) the purse, a card with the coin, gold in large type, its change a month in green or red, and how many months the gold lasts while it falls; (2) the month as one bar split into gold in and gold out, then each ledger line as a labelled bar, income first, with the change a month as the total; (3) the realm tax row; (4) the debt as a meter of what is owed against what lenders allow, with the interest a month, then one line saying what a loan costs before you tap (the gold plus 10 % added to the debt at once, and, when it applies, that every lord falls a step), and Borrow buttons that each name the gold and what you will owe. Borrowing or repaying keeps the tab open; the lords' loyalty news goes to the news list. On a phone in landscape it fits the side panel in the Wide and Tall layouts with every button at least 44 points high and nothing that needs hover; the gold plaque stays the overview (REALM-185). Starting armies need no screen of their own: they show on the map and in the Military tab as before. [X-19, feedback 71]
 
 ## 6. Commands
 
@@ -320,7 +331,7 @@ The game's first working treasury, built to the milestone 3 plan (slice 2). It r
 | OverrideCastlePolicy(castle, setting, value) | player / AI | Own castle | Castle override | FoodPolicyChanged |
 | ApplyFoodPreset(preset) | player / AI | — | All settings filled | FoodPolicyChanged |
 | SetTaxDefault(rate) | player / AI | One of the five steps | Every province without its own rate pays at it | TaxRateChanged |
-| TakeLoan(lender, amount) | player / AI | Lender willing (oaths broken lowers it); within the loan cap (REALM-181) | Gold up, debt up | LoanTaken |
+| TakeLoan(lender, amount) | player / AI | Lender willing (oaths broken lowers it); within the loan cap (REALM-181, REALM-188) | Gold up; debt up by the gold plus a year's interest; lords fall a step, once a year (REALM-189) | LoanTaken |
 | RepayDebt(loan, amount) | player / AI | Gold | Debt down | DebtRepaid |
 | DefaultOnDebt(loan) | player / AI | Debt | Debt wiped; oath broken | DebtDefaulted, OathBroken |
 | HireOfficial(type) / DismissOfficial | player / AI | Gold | Official count changes | OfficialHired / OfficialDismissed |
@@ -417,7 +428,8 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 | campaign.end_date | End date (one setting) | 31 August 1939 | no (decided) | time-and-turns / settings |
 | grain_price_gold_per_food | Fixed grain price | 0.5 gold a food | yes | realm.json |
 | food_year.weather, harvest_month, reach_by_road, favoured_weight | Weather odds, harvest month, castle reach, favoured castles | 1 in 6 bad and good; Sep / Mar; 1–4 rings; ×2 | yes | realm.json |
-| debt | Interest, loan cap, refusal per oath | 10 %; 1 year's income (3 with T10); 10 points | yes | realm.json |
+| debt | Interest, loan cap, refusal per oath, interest added at once, months between the lords' grumbling | 10 %; 1 year's income (3 with T10); 10 points; 1 year; 12 months | yes | realm.json |
+| starting_armies | Men per starting commander, most commanders | 8,000; 8 | yes | realm.json |
 | economy.taxRateFactor | Gold at each tax step against normal | 0, ½, 1, 1½, 2 (not in the design) | yes | defines.json |
 | economy.officialWagePerMonth | An official's wage a month | 0.1 gold (not in the design) | yes | defines.json |
 | starting | Assessment level tables and confidence spread | tables; ±25 / 10 / 5 % | yes | realm.json |
@@ -660,3 +672,8 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-193 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
 | REALM-194 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
 | REALM-195 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-188 | treasury-ledger.feature | Borrowing adds the interest to the debt at once; Repaying |
+| REALM-189 | treasury-ledger.feature | Borrowing unsettles the lords, once a year |
+| REALM-196 | starting-values.feature | Starting men spread over the realm, with commanders for its strength |
+| REALM-197 | starting-values.feature | Starting men spread over the realm, with commanders for its strength |
+| REALM-198 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/treasury-shots.mjs) |

@@ -59,7 +59,7 @@ uniform sampler2D uLand;     // per pixel: R terrain index; G water depth band +
 uniform ivec2 uTileOrigin;   // tile's top-left in map pixels
 uniform ivec2 uTileSize;     // texels in this tile's texture (includes 1px overlap)
 uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
-uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones, a = lord tag (0 = royal land)
+uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones (else +64 faded, +16 closed to the moving armies), a = lord tag (0 = royal land)
 uniform sampler2D uSeason;   // per-province season, see seasonal()
 uniform int uInfoWidth;
 uniform float uZoom;
@@ -68,7 +68,7 @@ uniform int uMode;           // 0 political, 1 terrain, 2 data lens
 uniform vec3 uParchment, uParchmentDark;
 uniform vec3 uTerrain[${TERRAINS.length}];  // average colour of each terrain's tiles
 uniform vec3 uDepth[${DEPTH_COLORS.length}];     // ocean colour by depth band
-uniform vec3 uFoam, uInk, uHighlight, uSand;
+uniform vec3 uFoam, uInk, uHighlight, uSand, uForbid;
 uniform sampler2D uAtlas;    // terrain tiles: ${VARIANTS} variants across, one row per terrain
 uniform sampler2D uMini;     // the same at half size
 out vec4 outColor;
@@ -482,6 +482,29 @@ vec3 parchment(vec2 m) {
   return c;
 }
 
+// Land the chosen armies may not enter (owner b bit 16, MOVE-129): a faint red
+// wash, and a red line on its side of every border with land they may enter.
+bool shut(int id) { return id >= 0 && (int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b * 255.0 + 0.5) & 16) != 0; }
+vec3 forbidden(vec3 c, vec2 m) {
+  bool tiles = uZoom >= ${MID_ZOOM}.0;
+  float art = uZoom >= ${DETAIL_ZOOM}.0 ? ${TILE / 2}.0 : ${TILE / 4}.0;
+  // Art pixel or map pixel centre, and a line about three screen pixels wide.
+  vec2 q = tiles ? (floor(m * art) + 0.5) / art : floor(m) + 0.5;
+  float d = tiles ? 2.0 / art : max(1.0, floor(3.0 / uZoom));
+  int id = tiles ? effId(q) : idAt(ivec2(q));
+  if (!land(id) || !shut(id)) return c;
+  bool edge = false;
+  for (int k = 0; k < 4; k++) {
+    vec2 dir = vec2(k == 0 ? 1.0 : k == 1 ? -1.0 : 0.0, k == 2 ? 1.0 : k == 3 ? -1.0 : 0.0);
+    for (int j = 1; j <= 2; j++) {
+      vec2 at = q + dir * d * float(j) * 0.5;
+      int n = tiles ? effId(at) : idAt(ivec2(floor(at)));
+      if (land(n) && !shut(n) && !unknown(n)) edge = true;
+    }
+  }
+  return edge ? mix(c, uForbid, 0.85) : mix(c, uForbid, 0.16);
+}
+
 void main() {
   vec2 m = vMap;
   int id = idAt(ivec2(floor(m)));
@@ -490,6 +513,7 @@ void main() {
     return;
   }
   vec3 c = uZoom >= ${DETAIL_ZOOM}.0 ? tiled(false) : uZoom >= ${MID_ZOOM}.0 ? tiled(true) : far();
+  c = forbidden(c, m);
   // A dark seam where the known world meets the unknown.
   ivec2 p = ivec2(floor(m));
   if (unknown(idAt(p + ivec2(1, 0))) || unknown(idAt(p - ivec2(1, 0))) || unknown(idAt(p + ivec2(0, 1))) || unknown(idAt(p - ivec2(0, 1)))) {
@@ -546,7 +570,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uMini", "uLand", "uSeason"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -621,8 +645,9 @@ export class MapRenderer {
    * flags: 1 = selected, 2 = highlighted (e.g. a move target, a lord's lands), 4 = undiscovered.
    * lord: the lord holding it, -1 for royal land (drawn as a fief border and a pattern).
    * fade: land drawn faded to grey, so the provinces that are not stand out.
+   * closed: land the armies being moved may not enter, drawn with red borders.
    */
-  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false, lord = -1, fade = false): void {
+  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false, lord = -1, fade = false, closed = false): void {
     const o = i * 4;
     this.infoData[o] = rgb[0]!;
     this.infoData[o + 1] = rgb[1]!;
@@ -631,7 +656,7 @@ export class MapRenderer {
     const ow = owner + 1;
     this.ownerData[o] = (ow >> 8) & 255;
     this.ownerData[o + 1] = ow & 255;
-    this.ownerData[o + 2] = water ? 255 : fade ? 64 : 0;
+    this.ownerData[o + 2] = water ? 255 : (fade ? 64 : 0) | (closed ? 16 : 0);
     this.ownerData[o + 3] = lord >= 0 ? (lord % 255) + 1 : 0;
   }
 
@@ -678,6 +703,7 @@ export class MapRenderer {
     col("uInk", PALETTE.ink);
     col("uHighlight", PALETTE.paper);
     col("uSand", PALETTE.sand);
+    col("uForbid", PALETTE.blood);
 
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.infoTex);

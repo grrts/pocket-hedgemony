@@ -304,6 +304,12 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - MOVE-125 The movement system shall make an army walk exactly the tile path the route preview showed, and the planner shall never return a path through a closed or impassable tile or through a province with a hostile garrisoned castle (INV-MOVE-4, INV-MOVE-5). [F-1]
 - MOVE-126 When two hostile armies stand in the same province and their tiles come within engagement range, 10 tiles plus one per 2 points of the better commander's Cunning, at most 15 (`movement.engage_tiles_base` 10, `movement.engage_tiles_max` 15, provisional), the movement system shall make contact and start the battle rules where the defender stands; armies in different provinces never meet, however close. [F-20; playtest feedback]
 - MOVE-127 The movement system shall let several armies be selected at once (multi-tap or a drag-box on the map, or from the Army list) and given one march order together, each walking its own route (MOVE-072). [F-21]
+#### How the player uses it: borders an army may not cross
+- MOVE-129 While the player has one or more armies chosen to march, the map shall mark every province those armies may not enter (MOVE-128) with a faint red wash and a red line on its side of each border it shares with land they may enter, at every zoom, and drop the marks once the order is given or the choice cleared; the engine publishes the closed provinces with each report. [F-76]
+- MOVE-130 Where: the marks appear the moment the player taps a commander on the map, Move on its card or a name in the commander list, so the player sees before tapping a target where the road ends; the army standing in closed land (passage withdrawn) sees the borders around it too. [F-76; X-19]
+- MOVE-131 Grouping: the marks belong to choosing a march, with the commander list's "tap the map to send" hint and the refusal "you need war or passage"; they draw on the map itself, not in a panel. [F-76; X-19]
+- MOVE-132 Overview: the closed borders are the overview of where the player's armies may go; the realm's diplomacy screen, where passage is asked for, says why. [F-76; X-19]
+- MOVE-133 Phone: the game plays in landscape (Wide and Tall); the line is about three screen pixels wide whatever the zoom and the wash leaves the terrain readable; nothing needs hover, and a tap on closed land is refused with the reason as before. [F-76; X-19]
 
 ## 6. Commands
 
@@ -485,3 +491,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of troop-movement's quest
 | MOVE-125 | orders.feature | The army walks the route the preview showed |
 | MOVE-126 | meeting-the-enemy.feature | Armies make contact within engagement range |
 | MOVE-127 | moving-many-armies.feature | Several armies selected at once march together |
+| MOVE-129 | route-preview-and-notices.feature | The map marks land the chosen armies may not enter |
+| MOVE-130–133 | — | presentation only (how the marks are reached and drawn) |

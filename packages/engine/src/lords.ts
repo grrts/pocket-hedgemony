@@ -37,7 +37,7 @@ export function createLordState(P: number): LordState {
 const capitalize = (s: string) => s.replace(/(^|[\s-])\S/g, (c) => c.toUpperCase());
 
 /** Provinces of a realm by distance from its capital over its own land, nearest first. */
-function byDistance(world: World, n: number, capital: number): number[] {
+export function byDistance(world: World, n: number, capital: number): number[] {
   const seen = new Set([capital]);
   const order = [capital];
   for (let i = 0; i < order.length; i++) {

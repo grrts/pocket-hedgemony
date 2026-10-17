@@ -135,7 +135,7 @@ export function governanceCard(
         <span class="army-buttons">${o.mine ? `<button class="paper small" data-lord-open="${o.lord.k}">Lord</button><button class="paper small" data-seize="${o.province}" title="Take it back as royal land: he loses a step, and every other lord notices">Seize</button>` : ""}</span>
       </div>`
     : `<div class="army person royal"><span class="crest">♛</span>
-        <span class="who"><b>Royal land</b><br><small>${o.isCapital ? "The capital stays royal." : "All its tax and recruits reach you."}</small></span>
+        <span class="who"><b>Royal land</b><br><small>Not granted to any lord. ${o.isCapital ? "The capital stays royal." : o.mine ? "All its tax and recruits reach you." : "Its tax and recruits go to the crown."}</small></span>
         ${o.mine && !o.isCapital && o.takers.length ? `<span class="army-buttons"><button class="paper small" data-grant-open aria-expanded="${o.grantOpen}">Grant as fief</button></span>` : ""}
       </div>
       ${o.grantOpen ? `<div class="grant-pick">${o.takers
