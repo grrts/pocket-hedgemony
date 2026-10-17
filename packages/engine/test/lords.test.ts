@@ -26,7 +26,7 @@ describe("a living realm: lords", () => {
     const w = createWorld(rules, 1, tiles);
     const me = w.nationIndex.get("castile")!;
     w.player = me;
-    const [[lord, k]] = lordsOf(w, "castile") as [readonly [{ loyalty: string }, number]];
+    const [lord, k] = lordsOf(w, "castile")[0]!;
     const p = lordLands(w, k)[0]!;
     expect(crownShare(w, p)).toBe(0.5);
     // Seizing two of his provinces: he drops twice.
@@ -45,7 +45,7 @@ describe("a living realm: lords", () => {
 
   it("lets AI realms win back wavering lords with gifts", () => {
     const w = createWorld(rules, 1, tiles);
-    const [[lord]] = lordsOf(w, "france") as [readonly [{ loyalty: string }, number]];
+    const [lord] = lordsOf(w, "france")[0]!;
     lord.loyalty = "Disloyal";
     while (w.date.month !== 1) processTurn(w, [], -1);
     processTurn(w, [], -1);
