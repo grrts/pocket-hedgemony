@@ -1,5 +1,6 @@
 import { expect } from "vitest";
-import type { Terrain } from "@ph/rules";
+import { loadDefaultRuleset, type Terrain } from "@ph/rules";
+import { createEngineHost } from "@ph/engine";
 import {
   MARCH,
   MOVE,
@@ -2066,4 +2067,35 @@ Then(/^"(\w+)" withdraws from "(\w+)" on day (\d+) at step (\d+)$/, (s, id: stri
   expect(r).toMatchObject({ from: place, day: Number(d), step: Number(st) });
   expect(r?.to).not.toBeNull();
   expect(A(s, id).place).not.toBe(place);
+});
+
+// MOVE-129: the engine reports the land the player's armies may not enter, for the map's red borders.
+Given("a new game on the real map as the realm {string}", (s, realm: string) => {
+  const rules = loadDefaultRuleset();
+  const nation = rules.nations.find((n) => n.name === realm)!;
+  const host = createEngineHost(loadDefaultRuleset);
+  const reply = host({ id: 1, type: "newGame", seed: 1, playerNation: nation.id });
+  expect(reply.response.type).toBe("snapshot");
+  s.snap = (reply.response as { snapshot: unknown }).snapshot;
+  s.rules = rules;
+});
+Then("the engine reports which provinces the realm's armies may not enter", (s) => {
+  expect(s.snap.provinceClosed).toBeInstanceOf(Uint8Array);
+  expect(s.snap.provinceClosed.length).toBe(s.snap.provinceOwner.length);
+});
+Then("the realm's own land and the sea are never marked closed", (s) => {
+  const { provinceClosed: closed, provinceOwner: owner, playerNation: me } = s.snap;
+  const water = new Set(s.rules.provinces.flatMap((p: { terrain: string }, i: number) => (p.terrain === "sea" || p.terrain === "ocean" ? [i] : [])));
+  for (let p = 0; p < closed.length; p++) {
+    if (owner[p] === me || water.has(p)) expect(closed[p], `province ${p}`).toBe(0);
+  }
+});
+Then("the land of a realm at peace with it that grants no passage is marked closed", (s) => {
+  const { provinceClosed: closed, provinceOwner: owner, playerNation: me, relations } = s.snap;
+  const tied = new Set<number>(relations.map((r: { nation: number }) => r.nation));
+  const stranger = [...new Set<number>(owner)].find((n) => n >= 0 && n !== me && !tied.has(n));
+  expect(stranger).toBeDefined();
+  const theirs = [...owner.keys()].filter((p) => owner[p] === stranger);
+  expect(theirs.length).toBeGreaterThan(0);
+  for (const p of theirs) expect(closed[p], `province ${p}`).toBe(1);
 });
