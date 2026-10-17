@@ -26,7 +26,8 @@ await page.waitForTimeout(300);
 await page.evaluate(() => document.querySelector("[data-declare]")?.click());
 await page.waitForTimeout(300);
 // Into the autumn of 1445: past the September harvest. A battle that pauses the week plays on at another End turn.
-while ((await page.evaluate(() => window.__phTurn())) < 46) {
+const turns = Number(process.env.TURNS ?? 46);
+while ((await page.evaluate(() => window.__phTurn())) < turns) {
   const t = await page.evaluate(() => window.__phTurn());
   await page.evaluate(() => window.__phMarchOn("portugal"));
   await page.evaluate(() => document.querySelector(".end-turn")?.click());
@@ -43,7 +44,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(200);
   await shot("province");
   // The province the first army stands in, at its food and army lines.
-  await page.evaluate(() => window.__phSelect(window.__phArmyProvince()));
+  await page.evaluate(() => window.__phArmyProvince() && window.__phSelect(window.__phArmyProvince()));
   await page.waitForTimeout(300);
   await scrollTo(".panel dl.facts");
   await page.waitForTimeout(200);

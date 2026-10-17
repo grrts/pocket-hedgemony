@@ -1686,7 +1686,7 @@ function harvestText(pi: number): string {
   const w = s.provinceWeather[pi]!;
   const why = w < 0 ? ` · ${s.badWeather[s.provinceClimate[pi]!]!} in the region` : w > 0 ? " · good weather in the region" : "";
   const when = months.map((m) => MONTH_NAMES[m - 1]!).join(" and ");
-  return `${h >= 0 ? `<b>${s.harvests[h]!}</b>${why}` : "not in yet"}<br><small>${months.length > 1 ? `Two harvests a year, in ${when}` : `Comes in each ${when}`}</small>`;
+  return `${h >= 0 ? `${s.harvests[h]!}${why}` : "not in yet"} · <small>${months.length > 1 ? `two harvests a year, in ${when}` : `comes in each ${when}`}</small>`;
 }
 
 /** The snapshot's lords as the panels show them. */
@@ -2930,7 +2930,8 @@ Object.assign(globalThis, {
   /** Id of the province the player's first army with a commander stands in. */
   __phArmyProvince: () => {
     if (!snapshot) return null;
-    const k = [...snapshot.armies.id.keys()].find((j) => snapshot!.armies.owner[j] === snapshot!.playerNation && snapshot!.armies.commander[j]! >= 0);
+    const mine = [...snapshot.armies.id.keys()].filter((j) => snapshot!.armies.owner[j] === snapshot!.playerNation);
+    const k = mine.find((j) => snapshot!.armies.commander[j]! >= 0) ?? mine[0];
     return k === undefined ? null : provinces[snapshot.armies.location[k]!]!.id;
   },
   /** Opens a province's overview by id. */
