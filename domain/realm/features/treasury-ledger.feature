@@ -48,7 +48,7 @@ Feature: Tax rates and the treasury ledger
   @REALM-179
   Scenario: The month's ledger
     Given the game starts with the country "France"
-    Then the ledger of "France" has the lines "tax", "trade", "army pay", "officials" and "interest"
+    Then the ledger of "France" has the lines "tax", "trade", "army pay", "officials", "interest" and "schools"
     And the monthly income of "France" is the sum of its ledger
     When a new month begins
     Then the month's income is paid into the treasury of "France"
