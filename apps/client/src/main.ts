@@ -1809,6 +1809,14 @@ Object.assign(globalThis, {
     if (b) view.lookAt(...tileXY(b.tile), zoom);
     return !!b;
   },
+  /** Centres the map on the first siege and returns its province's id, or null. */
+  __phLookAtSiege: () => {
+    const st = snapshot?.sieges[0];
+    if (!st) return null;
+    const p = provinces[st.province]!;
+    view.lookAt(p.x!, p.y!, 8);
+    return p.id;
+  },
   __phLookAtWar: () => {
     const p = snapshot?.sieges[0]?.province ?? occupiers.findIndex((o) => o >= 0);
     if (p >= 0) view.lookAt(provinces[p]!.x!, provinces[p]!.y!, 4);
