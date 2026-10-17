@@ -237,7 +237,7 @@ settlement, settlers, local people's tiles.
 - PROV-103: Clergy birth rate shall be 0.5 % where the faith's clergy don't marry, otherwise as townsfolk. [§6.1]
 - PROV-104: Each season, the province shall compare the food it has (its share of the harvest, its local store and castle deliveries) with the people who must eat. [§6.2]
 - PROV-105: When there is enough food, everyone shall eat and what is left goes to the store. [§6.2]
-- PROV-106: If there is not enough food, then the people the food cannot feed shall die that season, spread over the classes by size, except that a quarter of them flee as refugees if a neighbouring province has food. [§6.2]
+- PROV-106: If there is not enough food, then the people the food cannot feed shall die that season, spread over the classes by size, except that a quarter of them flee as refugees if a neighbouring province has food. The turn engine eats month by month, and a month without food is a third of a season, so a third of each month's unfed are lost that month and the rest go hungry into the next. [§6.2, feedback 93]
 
 ### 5.10 Classes and job slots
 - PROV-110: The province shall place every person in one class and give each class its slots in the buildings and tiles listed in the class table. [§6.3]

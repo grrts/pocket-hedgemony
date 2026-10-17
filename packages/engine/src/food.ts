@@ -179,10 +179,11 @@ export function monthlyFood(world: World, news: News[]): void {
   }
 
   // Famine: the unfed leave the classes by size; a quarter flee to a neighbour with food (province PROV-104 to PROV-106).
+  // The rule counts a season's unfed; a month without food is a third of one, so a third of the month's unfed are lost and the rest go hungry.
   const flee = 0.25;
   for (let p = 0; p < P; p++) {
     if (world.provinceWater[p] || store[p]! >= 0) continue;
-    const unfed = Math.min(-store[p]!, world.provincePopulation[p]!);
+    const unfed = Math.min(-store[p]!, world.provincePopulation[p]!) / 3;
     store[p] = 0;
     const people = world.provincePopulation[p]!;
     if (people <= 0) continue;

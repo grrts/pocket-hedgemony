@@ -49,6 +49,8 @@ describe("a living realm: food", () => {
     processTurn(w, [], -1);
     expect(w.provinceStarved[p]).toBeGreaterThan(0);
     expect(w.provincePopulation[p]).toBeLessThan(people);
+    // A month without food is a third of a season: a third of the unfed are lost, the rest go hungry.
+    expect(w.provincePopulation[p]).toBeGreaterThan(people * 0.6);
   });
 
   it("keeps the world fed: over three years famines touch few provinces", () => {
