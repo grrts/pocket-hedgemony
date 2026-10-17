@@ -3,7 +3,7 @@ import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { planRoute } from "./march.ts";
 import { GROUNDS } from "./tiles.ts";
-import { halt, marchTo } from "./turn.ts";
+import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 
@@ -237,6 +237,11 @@ function battleArmy(world: World, slots: number[], id: string): [wf.Army, number
   return [wf.newArmy(id, id, companies, best >= 0 ? { commander: world.commanders[best]! } : {}), best];
 }
 
+/** An army's break point: the share of its men it can lose before it breaks, by its companies' drill (WAR-120). */
+export function armyBreak(world: World, slot: number): number {
+  return wf.armyBreakPoint(battleArmy(world, [slot], "")[0].companies);
+}
+
 /** A battle fought over time, a round each 4-hour step, between two sides' armies (by slot). */
 export interface Battle {
   id: number;
@@ -319,9 +324,10 @@ export function engage(world: World, news: News[]): void {
       const n = a.owner[j]!;
       const foeOfAtt = sideOwners[0]!.some((o) => enemies[n]!.has(o));
       const foeOfDef = sideOwners[1]!.some((o) => enemies[n]!.has(o));
-      if (foeOfAtt === foeOfDef || tileDistance(world, a.tile[j]!, b.tile) > engageRange(world, j)) return;
+      if (foeOfAtt === foeOfDef || a.commander[j]! < 0 || a.location[j] !== b.province || tileDistance(world, a.tile[j]!, b.tile) > engageRange(world, j)) return;
       joinBattle(world, b, j, foeOfAtt ? "defenders" : "attackers");
     });
+    joinGarrisons(world, b, enemies);
   }
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.commander[i]! < 0) continue;
@@ -331,15 +337,29 @@ export function engage(world: World, news: News[]): void {
     let foe = -1;
     let best = Infinity;
     near(a.tile[i]!, range, (j) => {
-      if (j === i || a.battle[j]! >= 0 || a.retreating[j] || !enemies[n]!.has(a.owner[j]!)) return;
+      // Only armies in the same province meet, however close they pass (playtest feedback).
+      if (j === i || a.battle[j]! >= 0 || a.retreating[j] || a.location[j] !== a.location[i] || !enemies[n]!.has(a.owner[j]!)) return;
       const d = tileDistance(world, a.tile[i]!, a.tile[j]!);
       if (d <= range && d < best) ((best = d), (foe = j));
     });
-    if (foe >= 0) startBattle(world, [i], [foe], news);
+    if (foe >= 0) joinGarrisons(world, startBattle(world, [i], [foe], news), enemies);
   }
 }
 
-function startBattle(world: World, att: number[], def: number[], news: News[]): void {
+/** Garrison troops fight in any battle in their own province, wherever in it they stand (RECR-107). */
+function joinGarrisons(world: World, b: Battle, enemies: Set<number>[]): void {
+  const a = world.armies;
+  const sideOwners = [b.attackers.map((s) => a.owner[s]!), b.defenders.map((s) => a.owner[s]!)];
+  for (let j = 0; j < a.count; j++) {
+    if (!a.alive[j] || a.commander[j]! >= 0 || a.battle[j]! >= 0 || a.location[j] !== b.province || !enemies[a.owner[j]!]!.size) continue;
+    const n = a.owner[j]!;
+    const foeOfAtt = sideOwners[0]!.some((o) => enemies[n]!.has(o));
+    const foeOfDef = sideOwners[1]!.some((o) => enemies[n]!.has(o));
+    if (foeOfAtt !== foeOfDef) joinBattle(world, b, j, foeOfAtt ? "defenders" : "attackers");
+  }
+}
+
+function startBattle(world: World, att: number[], def: number[], news: News[]): Battle {
   const a = world.armies;
   const tile = a.tile[def[0]!]!;
   const b: Battle = {
@@ -368,6 +388,7 @@ function startBattle(world: World, att: number[], def: number[], news: News[]): 
   const an = name(world, a.owner[att[0]!]!);
   const dn = name(world, a.owner[def[0]!]!);
   news.push({ kind: "battle", text: `Battle at ${provinceName(world, b.province)}: ${an} (${fmt(b.attStart)}) attacks ${dn} (${fmt(b.defStart)}).`, nations: [a.owner[att[0]!]!, a.owner[def[0]!]!], province: b.province });
+  return b;
 }
 
 /** An army joins a side of a battle: it stops marching and its men count from the next round. */
@@ -577,11 +598,16 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
       if (newMonth && world.provinceOccupier[p]! < 0) world.provinceGarrison[p] = Math.min(maxGarrison(world, p), world.provinceGarrison[p]! + maxGarrison(world, p) * world.rules.defines.war.garrisonRecoveryPerMonth);
       continue;
     }
-    const leader = a.owner[hostile.reduce((b, s) => (a.men[s]! > a.men[b]! ? s : b), hostile[0]!)]!;
+    // The first realm to besiege or hold a province is the one that takes it (Leroy, F-45); the
+    // strongest only when several arrive on the same day or the first one leaves.
+    const strongest = a.owner[hostile.reduce((b, s) => (a.men[s]! > a.men[b]! ? s : b), hostile[0]!)]!;
+    const here = (n: number) => n >= 0 && hostile.some((s) => a.owner[s] === n);
     const besiegers = sum(hostile, a.men);
     const walls = world.provinceOccupier[p]! < 0 ? wallsOf(world, p) : null;
     if (walls && world.provinceGarrison[p]! > 0) {
       let st = world.sieges.get(p);
+      if (st && !here(st.by)) st.by = strongest;
+      const leader = st ? st.by : strongest;
       if (!st) {
         const garrison = world.provinceGarrison[p]!;
         st = { by: leader, days: 0, siege: wf.newSiege(walls, { ground: world.provinceGround[p] ?? "farmland", garrison, store: garrison * world.rules.defines.war.castleStoreMonths, townsfolk: 0 }) };
@@ -609,6 +635,8 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
       }
       continue;
     }
+    if (world.provinceHold[p] === 0 || !here(world.provinceHoldBy[p]!)) world.provinceHoldBy[p] = strongest;
+    const leader = world.provinceHoldBy[p]!;
     world.provinceHold[p] = world.provinceHold[p]! + 1;
     if (world.provinceHold[p]! >= holdDays) {
       const freed = world.provinceOccupier[p]! >= 0 && (leader === owner || !enemies[owner]!.has(leader));
@@ -916,7 +944,7 @@ export function aiMarches(world: World): void {
       halt(world, i);
       continue;
     }
-    const route = planRoute(world.rules.defines.march, marchMap(world), here, target, { men, horse: a.horse[i]!, logistics: 0 });
+    const route = planRoute(world.rules.defines.march, marchMap(world), here, target, { men, horse: a.horse[i]!, logistics: 0 }, routeBars(world, i));
     if (route) {
       // Walked a province at a time: each stretch is planned over the tiles as the army gets there.
       a.route[i] = route.path;

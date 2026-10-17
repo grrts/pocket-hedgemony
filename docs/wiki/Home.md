@@ -1,12 +1,12 @@
 # Pocket Hegemony wiki
 
-Pocket Hegemony is an 8-bit grand strategy game for phones, desktop and the web. You lead one of hundreds of realms from 1444 to the end of August 1939, one month per turn, on a pixel-art map of the whole world that you can zoom from the globe down to a single town.
+Pocket Hegemony is an 8-bit grand strategy game for phones, desktop and the web. You lead one of hundreds of realms from 1444 to the end of August 1939, one week per turn, on a pixel-art map of the whole world that you can zoom from the globe down to a single town.
 
 This wiki explains every system in the game and how it works. Each page is written from the game's domain specs, the precise rules the code is checked against, so the wiki and the game say the same thing. Numbers marked provisional are still being balanced, and every page ends with what is not decided yet.
 
 ## Start here
 
-- [How a turn works](Time-and-Turns): one month per turn, the days inside it, and when the campaign ends.
+- [How a turn works](Time-and-Turns): one week per turn, the days inside it, and when the campaign ends.
 - [The 1444 start](The-1444-Start): which realms exist and which you can play.
 - [Your realm](Your-Realm) and [Provinces](Provinces): the two cards everything else feeds.
 - [Map and lenses](Map-and-Lenses): what the map shows at each zoom.
@@ -66,6 +66,8 @@ This wiki explains every system in the game and how it works. Each page is writt
 The game is built as 29 systems, each owning its own rules. The [context map](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/context-map.md) shows how they depend on each other. In short: the clock, the map and the 1444 start sit underneath everything; provinces and the realm make the gold, food and people; armies, fleets and traders spend and move them; diplomacy, government, culture and religion shape who rules and who obeys; events, revolutions and heritage give history its shape; and the screens, saves, sound and achievements sit on top without ever changing the simulation.
 
 ## For developers
+
+- [Design principles](Design-Principles): how every feature is designed around the player, grouped logically, given an overview and checked on a phone.
 
 - Domain specs and feature files: `domain/` in the [game repository](https://github.com/grrts/pocket-hedgemony). Each system has `spec.md` (requirements with ids such as `TRADE-004`) and `features/*.feature` (Gherkin).
 - `pnpm specs` prints how many scenarios each system has, how many are automated and how many pass.

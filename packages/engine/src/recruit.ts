@@ -3,7 +3,7 @@ import * as wf from "./domain/warfare/index.ts";
 import { monthlyRations } from "./march.ts";
 import { halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
-import { atWar, controller, type News } from "./war.ts";
+import { atWar, controller, wallsOf, type News } from "./war.ts";
 
 /**
  * Milestone 2, armies that cost something: wires the recruiting context (who
@@ -47,11 +47,21 @@ export interface Muster {
   weeksLeft: number;
 }
 
-/** A mercenary company on its way to the capital with its captain. */
+/** A free company: a named band under its captain, gathered at a home capital, with its men by arm (in ARMS order). */
+export interface FreeCompany {
+  id: number;
+  group: string;
+  name: string;
+  captain: string;
+  /** Province it gathers at, -1 = unknown. */
+  home: number;
+  byArm: number[];
+}
+
+/** A free company hired and on its way to the capital. */
 export interface Mercenary {
   nation: number;
-  arm: string;
-  men: number;
+  company: FreeCompany;
   weeksLeft: number;
 }
 
@@ -66,6 +76,9 @@ export function createRecruitState(P: number, N: number) {
     nationCapUsed: new Float64Array(N),
     musters: [] as Muster[],
     mercs: [] as Mercenary[],
+    /** Free companies for hire, shared by every realm that can reach them. */
+    freeCompanies: [] as FreeCompany[],
+    freeCompanySeq: 0,
     /** Official of each province (index into OFFICIALS), -1 = none: his post is empty. */
     provinceOfficial: new Int8Array(P).fill(-1),
     /** Province each commander was commissioned from, -1 = none. */
@@ -151,10 +164,10 @@ export function releaseCommander(world: World, n: number, c: number): string | n
 }
 
 /** A captain who comes with a mercenary company: skills of 1 to 3. */
-function newCaptain(world: World, n: number): number {
+function newCaptain(world: World, n: number, name?: string): number {
   const names = world.rules.defines.recruit.commanderNames;
   const skill = () => 1 + world.rng.int(3);
-  return addCommander(world, n, wf.newCommander(`Captain ${names[world.rng.int(names.length)]}`, { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
+  return addCommander(world, n, wf.newCommander(`Captain ${name ?? names[world.rng.int(names.length)]}`, { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
 }
 
 /** Battles teach commanders: victories grow Might, defeats are counted (WAR-050, WAR-052). */
@@ -227,7 +240,7 @@ export function recomputeCap(world: World): void {
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i]) used[a.owner[i]!] = used[a.owner[i]!]! + a.men[i]!;
   for (const m of world.musters) used[m.nation] = used[m.nation]! + m.men;
-  for (const m of world.mercs) used[m.nation] = used[m.nation]! + m.men;
+  for (const m of world.mercs) used[m.nation] = used[m.nation]! + companyMen(m.company);
 }
 
 /** Gold a nation pays its men this month, with double pay for the men over its troop cap (WAR-035). */
@@ -294,18 +307,38 @@ export function recruit(world: World, n: number, p: number, thousands: number, n
   if (where) return where;
   const men = Math.round(thousands) * 1000;
   if (men <= 0) return "no men asked for";
+  const queued = world.musters.find((m) => m.nation === n && m.province === p);
+  const max = world.rules.defines.recruit.queueMax;
   if (men > world.provinceRecruits[p]! + 0.5) return `${provinceName(world, p)} has only ${fmt(world.provinceRecruits[p]!)} men left to call`;
+  if ((queued ? Math.ceil(queued.men / 1000) : 0) + men / 1000 > max) return `the recruit queue at ${provinceName(world, p)} is full: at most ${max} thousands wait to gather`;
   if (!wf.overCap(world.nationCapUsed[n]! + men, world.nationTroopCap[n]!).canRaise) return "that would go over your troop cap";
   const cost = gold(world, rc.levyMoney(men));
   if (cost > world.nationTreasury[n]!) return "not enough gold";
   world.provinceRecruits[p] = Math.max(0, world.provinceRecruits[p]! - men);
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
   const weeks = world.rules.defines.recruit.gatherWeeks;
-  const queue = world.musters.find((m) => m.nation === n && m.province === p);
-  if (queue) queue.men += men;
+  if (queued) queued.men += men;
   else world.musters.push({ nation: n, province: p, men, weeksLeft: weeks });
   recount(world);
   if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} men of ${provinceName(world, p)} are called up; they gather a thousand every ${weeks} weeks.`, nations: [n], province: p });
+  return null;
+}
+
+/**
+ * Take the last thousand off a province's recruit queue: its levy money comes
+ * back and the men go back to the province's pool. The thousand already
+ * gathering can be cancelled too, losing its weeks.
+ */
+export function cancelRecruit(world: World, n: number, p: number): string | null {
+  const i = world.musters.findIndex((m) => m.nation === n && m.province === p);
+  if (i < 0) return `no men are gathering at ${provinceName(world, p)}`;
+  const m = world.musters[i]!;
+  const men = m.men - Math.floor((m.men - 1) / 1000) * 1000;
+  m.men -= men;
+  if (m.men < 1) world.musters.splice(i, 1);
+  world.provinceRecruits[p] = Math.min(world.provinceRecruitCeiling[p]!, world.provinceRecruits[p]! + men);
+  world.nationTreasury[n] = world.nationTreasury[n]! + gold(world, rc.levyMoney(men));
+  recount(world);
   return null;
 }
 
@@ -350,10 +383,15 @@ export function pickUp(world: World, n: number, army: number): string | null {
   return null;
 }
 
+/** Where an army may train: a province of its own realm, held, not besieged, with a stone castle (capitals have one) (RECR-109). */
+export function trainingGround(world: World, n: number, p: number): boolean {
+  return controller(world, p) === n && world.provinceOwner[p] === n && !world.sieges.has(p) && wallsOf(world, p) === "stone castle";
+}
+
 /**
  * Train levy foot of an army as another arm: gold now, then months in which
- * the army must stand in its own land (RECR-043..051). Training stops while it
- * marches, besieges or stands in enemy land, and goes on when it stops.
+ * the army must stand at a castle of its own (RECR-043..051, RECR-109).
+ * Training stops while it marches or stands elsewhere, and goes on when it is back.
  */
 export function trainTroops(world: World, n: number, army: number, arm: string, men: number, news: News[]): string | null {
   const a = world.armies;
@@ -362,6 +400,7 @@ export function trainTroops(world: World, n: number, army: number, arm: string, 
   if (arm === rc.LEVY_ARM || !world.rules.defines.recruit.armsAtStart.includes(arm)) return `you can't train ${arm} yet`;
   men = Math.round(Math.min(men, menByArm(world, army)[LEVY]!));
   if (men < 1) return "no levy foot to train";
+  if (!trainingGround(world, n, a.location[army]!)) return "men train only at a castle of your own: march the army to one";
   const cost = rc.trainingCost(arm, men);
   const g = gold(world, cost.gold);
   if (g > world.nationTreasury[n]!) return "not enough gold";
@@ -424,28 +463,106 @@ function holdTraining(world: World, army: number): void {
   if (a.trainMen[army]! < 1) a.trainArm[army] = -1;
 }
 
-/**
- * Buy a mercenary company: its first month's pay now; it marches in to the
- * capital over some weeks, always under its own captain (warfare kinds: hired
- * companies cost three times a levy's pay).
- */
-export function hireCompany(world: World, n: number, arm: string, news: News[]): string | null {
-  const d = world.rules.defines.recruit;
-  if (!d.hiredArms.includes(arm)) return `no companies of ${arm} for hire`;
-  const men = d.hiredCompanyMen;
-  if (!wf.overCap(world.nationCapUsed[n]! + men, world.nationTroopCap[n]!).canRaise) return "that would go over your troop cap";
-  const cost = mercenaryPrice(world, arm);
-  if (cost > world.nationTreasury[n]!) return "not enough gold";
-  world.nationTreasury[n] = world.nationTreasury[n]! - cost;
-  world.mercs.push({ nation: n, arm, men, weeksLeft: d.mercenaryWeeks });
-  recount(world);
-  if (n === world.player) news.push({ kind: "raised", text: `A company of ${fmt(men)} ${arm} is bought for ${cost.toFixed(1)} gold; it reaches ${provinceName(world, capitalOf(world, n))} in ${d.mercenaryWeeks} weeks.`, nations: [n] });
-  return null;
+// ---------------------------------------------------------------- free companies
+
+export const companyMen = (c: FreeCompany) => c.byArm.reduce((t, m) => t + m, 0);
+
+/** A company's own dice: a seed from the world's and the company's number, so drawing one leaves the world's rng alone. */
+function companyDice(world: World, id: number): () => number {
+  let t = (world.rng.state[0]! ^ Math.imul(id, 0x9e3779b1)) >>> 0;
+  return () => {
+    t = (t + 0x6d2b79f5) >>> 0;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
-/** Gold to buy a mercenary company: its first month's pay. */
-export function mercenaryPrice(world: World, arm: string): number {
-  return gold(world, armPay(arm, world.rules.defines.recruit.hiredCompanyMen) * kindMultiplier(KIND.hired));
+/** A new free company of one of the age's groups: a size up to the age's largest and a mix of arms within the group's ranges. */
+function newFreeCompany(world: World): FreeCompany | null {
+  const d = world.rules.defines.recruit;
+  const homesOf = (f: (typeof d.freeCompanies)[number]) => f.homes.map((h) => world.nationIndex.get(h)).filter((n): n is number => n !== undefined && !world.nationGone[n]);
+  // One company of a name at a time: those for hire and those hired and still on the way.
+  const taken = new Set([...world.freeCompanies, ...world.mercs.map((m) => m.company)].map((c) => c.name));
+  const free = (f: (typeof d.freeCompanies)[number]) => f.names.filter((x) => !taken.has(x));
+  const defs = d.freeCompanies.filter((f) => homesOf(f).length && free(f).length);
+  if (!defs.length) return null;
+  const id = ++world.freeCompanySeq;
+  const roll = companyDice(world, id);
+  const pick = <T,>(xs: readonly T[]) => xs[Math.floor(roll() * xs.length)]!;
+  const def = pick(defs);
+  const step = 50;
+  const men = Math.round((d.freeCompanyMen.min + roll() * (d.freeCompanyMen.max - d.freeCompanyMen.min)) / step) * step;
+  const share = ARMS.map((arm) => {
+    const range = def.mix[arm];
+    return range ? range[0]! + roll() * (range[1]! - range[0]!) : 0;
+  });
+  const total = share.reduce((t, x) => t + x, 0) || 1;
+  const byArm = share.map((x) => Math.round((men * x) / total / step) * step);
+  // Rounding: the largest arm takes up the difference, so the company has exactly its men.
+  const big = byArm.indexOf(Math.max(...byArm));
+  byArm[big] = byArm[big]! + men - byArm.reduce((t, m) => t + m, 0);
+  return { id, group: def.group, name: pick(free(def)), captain: pick(def.captains), home: capitalOf(world, pick(homesOf(def))), byArm };
+}
+
+/** Each month a free company may move on, and new ones gather until the age's number are for hire (warfare free_companies). */
+export function refreshFreeCompanies(world: World): void {
+  const want = world.rules.defines.recruit.freeCompaniesForHire;
+  const roll = companyDice(world, world.freeCompanySeq * 7919 + world.turn);
+  world.freeCompanies = world.freeCompanies.filter(() => roll() >= 1 / 6);
+  while (world.freeCompanies.length < want) {
+    const c = newFreeCompany(world);
+    if (!c) break;
+    world.freeCompanies.push(c);
+  }
+}
+
+/** Weeks a free company takes to reach nation n's capital: gathering, then the march from its home (WAR-210). */
+export function companyWeeks(world: World, c: FreeCompany, n: number): number {
+  const d = world.rules.defines.recruit;
+  if (c.home < 0) return d.mercenaryWeeks;
+  const a = world.rules.provinces[c.home]!;
+  const b = world.rules.provinces[capitalOf(world, n)]!;
+  const px = Math.hypot((a.x ?? 0) - (b.x ?? 0), (a.y ?? 0) - (b.y ?? 0));
+  return d.mercenaryWeeks + Math.round(px / MAP_PX_PER_WEEK);
+}
+
+/** Map pixels a company marches in a week (about 175 km). */
+const MAP_PX_PER_WEEK = 25;
+/** Companies farther than this won't come. */
+export const FREE_COMPANY_REACH_WEEKS = 16;
+
+/** Free companies nation n can hire: those that would reach its capital in time. */
+export function freeCompaniesFor(world: World, n: number): FreeCompany[] {
+  return world.freeCompanies.filter((c) => companyWeeks(world, c, n) <= FREE_COMPANY_REACH_WEEKS);
+}
+
+/** Treasury gold a free company costs a month: its arms' pay times the hired multiplier. */
+export function companyPay(world: World, c: FreeCompany): number {
+  return gold(world, ARMS.reduce((t, arm, k) => t + armPay(arm, c.byArm[k]!), 0) * kindMultiplier(KIND.hired));
+}
+
+/**
+ * Hire a free company: its first month's pay now; it marches in to the
+ * capital over some weeks, always under its own captain (warfare kinds: hired
+ * companies cost three times a levy's pay; WAR-210).
+ */
+export function hireCompany(world: World, n: number, id: number, news: News[]): string | null {
+  const c = freeCompaniesFor(world, n).find((x) => x.id === id);
+  if (!c) return "that company is not for hire to you";
+  const men = companyMen(c);
+  const cap = capitalOf(world, n);
+  if (controller(world, cap) !== n || world.sieges.has(cap)) return "your capital is under siege: no company will come";
+  if (!wf.overCap(world.nationCapUsed[n]! + men, world.nationTroopCap[n]!).canRaise) return "that would go over your troop cap";
+  const cost = companyPay(world, c);
+  if (cost > world.nationTreasury[n]!) return "not enough gold";
+  world.nationTreasury[n] = world.nationTreasury[n]! - cost;
+  const weeks = companyWeeks(world, c, n);
+  world.freeCompanies = world.freeCompanies.filter((x) => x !== c);
+  world.mercs.push({ nation: n, company: c, weeksLeft: weeks });
+  recount(world);
+  if (n === world.player) news.push({ kind: "raised", text: `${c.name} (${fmt(men)} men under ${c.captain}) is hired for ${cost.toFixed(1)} gold; it reaches ${provinceName(world, cap)} in ${weeks} weeks.`, nations: [n] });
+  return null;
 }
 
 /** Two armies of one kind in one province become one; the other's commander goes back to court. */
@@ -553,10 +670,11 @@ export function weeklyMusters(world: World, news: News[]): void {
     let at = controller(world, cap) === m.nation ? cap : -1;
     for (let p = 0; at < 0 && p < world.provinceCount; p++) if (world.provinceOwner[p] === m.nation && controller(world, p) === m.nation) at = p;
     if (at < 0) return false;
-    const captain = newCaptain(world, m.nation);
-    const horse = isHorseArm(m.arm);
-    spawnArmy(world, m.nation, at, m.men, captain, horse ? m.men : 0, { kind: KIND.hired, drill: rc.drillAndBreak("trained").drill, ...(horse ? { horseArm: m.arm } : { foot: m.arm }) });
-    if (m.nation === world.player) news.push({ kind: "raised", text: `${world.commanders[captain]!.name} arrives at ${provinceName(world, at)} with ${fmt(m.men)} ${m.arm}.`, nations: [m.nation], province: at });
+    const c = m.company;
+    const captain = newCaptain(world, m.nation, c.captain || undefined);
+    const slot = spawnArmy(world, m.nation, at, companyMen(c), captain, 0, { kind: KIND.hired, drill: rc.drillAndBreak("trained").drill });
+    setByArm(world, slot, c.byArm);
+    if (m.nation === world.player) news.push({ kind: "raised", text: `${world.commanders[captain]!.name} arrives at ${provinceName(world, at)} with ${c.name}, ${fmt(companyMen(c))} men.`, nations: [m.nation], province: at });
     return false;
   });
 }
@@ -597,6 +715,7 @@ export function monthlyRecruits(world: World, news: News[]): void {
     }
     if (a.alive[i]) trainMonth(world, i, news);
   }
+  refreshFreeCompanies(world);
   const p = world.player;
   if (p >= 0 && deserted[p]! >= 1) news.push({ kind: "refused", text: `${fmt(deserted[p]!)} men desert: ${broke[p] ? "the treasury can't pay them" : "you keep more men than your troop cap"}.`, nations: [p] });
   recount(world);
@@ -607,13 +726,13 @@ export function ungoverned(world: World, p: number): boolean {
   return world.provinceOwner[p]! >= 0 && world.provinceOfficial[p]! < 0;
 }
 
-/** A month of training: on in the army's own land with no march under way, else held (RECR-050, RECR-100). */
+/** A month of training: on at a castle of its own with no march under way, else held (RECR-050, RECR-100, RECR-109). */
 function trainMonth(world: World, i: number, news: News[]): void {
   const a = world.armies;
   const k = a.trainArm[i]!;
   if (k < 0) return;
   const p = a.location[i]!;
-  if (isMarching(world, i) || controller(world, p) !== a.owner[i] || world.sieges.has(p)) return;
+  if (isMarching(world, i) || !trainingGround(world, a.owner[i]!, p)) return;
   a.trainLeft[i] = a.trainLeft[i]! - 1;
   if (a.trainLeft[i]! > 0) return;
   const arm = ARMS[k]!;
@@ -662,6 +781,10 @@ export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => 
   }
 }
 
+const AI_COMMAND_MIN_MEN = 3000;
+const AI_MEN_PER_COMMANDER = 8000;
+const commandersOf = (world: World, n: number) => world.commanderOwner.reduce((t, o) => t + (o === n ? 1 : 0), 0);
+
 /** Each week, AI commanders take in the troops that have gathered, or a free (or newly commissioned) one leads them out. */
 export function aiCollect(world: World, news: News[]): void {
   const a = world.armies;
@@ -675,6 +798,9 @@ export function aiCollect(world: World, news: News[]): void {
       continue;
     }
     if (!idleCommanders(world, n).length) {
+      // Commissions cost and empty a post, so the AI makes one only for a stack worth leading,
+      // and keeps about one commander to each 8,000 men it has under arms (feedback 28).
+      if (a.men[i]! < AI_COMMAND_MIN_MEN || commandersOf(world, n) >= 1 + world.nationCapUsed[n]! / AI_MEN_PER_COMMANDER) continue;
       let post = -1;
       for (let p = 0; p < world.provinceCount && post < 0; p++) if (world.provinceOwner[p] === n && world.provinceOfficial[p]! >= 0) post = p;
       if (post < 0 || commissionOfficial(world, n, post, news)) continue;

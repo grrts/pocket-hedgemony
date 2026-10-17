@@ -194,8 +194,14 @@ Feature: Training levies into regiments
     Given the province "Troyes" has 3000 garrison troops
     And the commander "La Hire" stands in "Troyes"
     When "La Hire" picks up 2000 of them
-    Then after 1 day his army has 2000 more men
+    Then at once his army has 2000 more men
     And 1000 garrison troops stay in "Troyes"
+
+  @RECR-109 @feedback-14
+  Scenario: Training only at a castle
+    Given the commander "La Hire" stands with his army in a province of France with no castle
+    When the player orders 1000 of his levies trained as pikes
+    Then the order is refused until the army stands at a castle or drill yard of France
 
   @RECR-109 @RECR-110 @feedback-14
   Scenario: The commander screen

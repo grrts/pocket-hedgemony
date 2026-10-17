@@ -71,7 +71,11 @@ export interface Route {
  * Called while the player drags an army, so costs are precomputed per province
  * and the heap lives in typed arrays: see the route budget in docs/performance.md.
  */
-export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: number, a: MarchingArmy): Route | null {
+/**
+ * The fastest road over the provinces. `barred(p, q)`, when given, says the
+ * army may not step from p to q (an enemy castle it can enter but not pass).
+ */
+export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: number, a: MarchingArmy, barred?: (p: number, q: number) => boolean): Route | null {
   if (from === to || !map.ground[from] || !map.ground[to]) return null;
   const n = map.ground.length;
   // stepDays(p, q) = (half[p] + enter[q]) * pace + river[q], split per province.
@@ -141,6 +145,7 @@ export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: numb
     const base = dist[p]! + half[p]!;
     for (let k = map.adjStart[p]!, end = map.adjStart[p + 1]!; k < end; k++) {
       const q = map.adjList[k]!;
+      if (barred?.(p, q)) continue;
       const c = base + enter[q]!;
       if (c < dist[q]!) {
         dist[q] = c;

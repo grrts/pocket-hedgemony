@@ -2553,3 +2553,62 @@ Then("when the fair opens it takes 900 more market folk", () => {
 Then("traders can be hired in {string}", () => {
   expect(B.stepFlags("market", 2)).toContain("hires_traders");
 });
+
+// ---------------------------------------------------------------- the build queue
+
+When("the player queues a {string} in {string}", (s, type: string, p: string) => {
+  s.gold = R(s).treasury;
+  s.check = B.queueBuild(R(s), p, type);
+});
+
+Given("the player has queued a {string} in {string}", (s, type: string, p: string) => {
+  const res = B.queueBuild(R(s), p, type);
+  expect(res.ok && "queued" in res).toBe(true);
+});
+
+Given("{int} builds wait in the queue of {string}", (s, n: number, p: string) => {
+  for (let i = 0; i < n; i++) expect(B.queueBuild(R(s), p, i % 2 ? "kiln" : "tannery").ok).toBe(true);
+  expect(B.queuedIn(R(s), p)).toHaveLength(n);
+});
+
+Given("an event founds a market in {string}", (s, p: string) => {
+  place(s, p, "market");
+});
+
+Then(/^the (\w[\w ]*) waits first in the queue of "([^"]+)"$/, (s, type: string, p: string) => {
+  expect(s.check.ok && "queued" in s.check).toBe(true);
+  expect(B.queuedIn(R(s), p)[0]!.type).toBe(type);
+});
+
+Then("no gold is paid for it yet", (s) => {
+  expect(R(s).treasury).toBe(s.gold);
+});
+
+When("the town site is done", (s) => {
+  s.townSite.monthsDone = s.townSite.monthsTotal;
+  B.advanceSites(R(s), 3);
+});
+
+Then(/^an? (\w[\w ]*) site is running in "([^"]+)"$/, (s, type: string, p: string) => {
+  expect(R(s).sites.some((x) => x.province === p && x.type === type)).toBe(true);
+});
+
+Then("the queue of {string} is empty", (s, p: string) => {
+  expect(B.queuedIn(R(s), p)).toEqual([]);
+});
+
+Then("the turn report says the {word} left the queue", (s, type: string) => {
+  expect(R(s).report.some((line) => line.includes("taken off the queue") && line.toLowerCase().includes(type))).toBe(true);
+});
+
+When(/^the player moves the queued (\w[\w ]*) earlier$/, (s, type: string) => {
+  expect(B.moveQueued(R(s), R(s).queue.find((q) => q.type === type)!.id, -1)).toBe(true);
+});
+
+When(/^the player cancels the queued (\w[\w ]*)$/, (s, type: string) => {
+  expect(B.cancelQueued(R(s), R(s).queue.find((q) => q.type === type)!.id)).toBe(true);
+});
+
+Then(/^the queue of "([^"]+)" holds the (\w[\w ]*?)(?: and then the (\w[\w ]*))?$/, (s, p: string, first: string, second?: string) => {
+  expect(B.queuedIn(R(s), p).map((q) => q.type)).toEqual(second ? [first, second] : [first]);
+});

@@ -6,7 +6,7 @@ import { Rng } from "./rng.ts";
 import type { Diplomacy } from "./domain/diplomacy/index.ts";
 import { createWarState, maxGarrison, type Battle, type PeaceOffer, type SiegeState } from "./war.ts";
 import { newCommander, type Commander } from "./domain/warfare/index.ts";
-import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type Mercenary, type Muster } from "./recruit.ts";
+import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -72,6 +72,8 @@ export interface World {
   provinceOccupier: Int16Array;
   /** Days a hostile army has held a province without walls. */
   provinceHold: Uint8Array;
+  /** Realm that began holding each province (the first to arrive takes it, Leroy F-45), -1 = none. */
+  provinceHoldBy: Int16Array;
   /** Men behind each province's walls. */
   provinceGarrison: Float32Array;
   sieges: Map<number, SiegeState>;
@@ -93,6 +95,10 @@ export interface World {
   musters: Muster[];
   /** Mercenary companies on their way. */
   mercs: Mercenary[];
+  /** Free companies for hire, shared by every realm that can reach them. */
+  freeCompanies: FreeCompany[];
+  /** Number of the last free company drawn. */
+  freeCompanySeq: number;
   /** Official of each province (index into OFFICIALS), -1 = his post stands empty. */
   provinceOfficial: Int8Array;
   /** Province each commander was commissioned from, -1 = none. */
@@ -354,6 +360,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     diplomacy: null!,
     provinceOccupier: new Int16Array(P).fill(-1),
     provinceHold: new Uint8Array(P),
+    provinceHoldBy: new Int16Array(P).fill(-1),
     provinceGarrison: new Float32Array(P),
     sieges: new Map(),
     battles: [],
@@ -376,18 +383,31 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   world.commanderHome = commanderIds.map(() => -1);
   recount(world);
 
-  // Every nation starts with one army in its capital, led by its first commander: levies already
-  // called, half of the foot armoured men-at-arms, the horse light horse.
+  // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where
+  // the data has no figure), within its cap: one army in the capital led by its first commander,
+  // the rest as the capital's garrison troops. Levies already called, half of the foot armoured
+  // men-at-arms, the horse light horse.
   rules.nations.forEach((n, i) => {
     const firstCommander = commanderOwnerList.indexOf(i);
-    const men = 5000;
-    const slot = spawnArmy(world, i, provinceIndex.get(n.capital)!, men, firstCommander, Math.round(men * rules.defines.march.startingHorseShare), { kind: KIND.levy, drill: 1.5 });
-    world.armies.mix[slot * ARMS.length + armIndex("levy foot")] = 0.5;
-    world.armies.mix[slot * ARMS.length + armIndex("armoured foot")] = 0.5;
+    const cap = world.nationTroopCap[i]!;
+    const total = Math.max(1000, Math.min(Math.floor(cap / 1000) * 1000, n.army ?? Math.round(cap / 4000) * 1000));
+    const field = Math.min(total, START_ARMY_MAX);
+    const capital = provinceIndex.get(n.capital)!;
+    for (const [men, commander] of [[field, firstCommander], [total - field, -1]] as const) {
+      if (men <= 0) continue;
+      const slot = spawnArmy(world, i, capital, men, commander, Math.round(men * rules.defines.march.startingHorseShare), { kind: KIND.levy, drill: 1.5 });
+      world.armies.mix[slot * ARMS.length + armIndex("levy foot")] = 0.5;
+      world.armies.mix[slot * ARMS.length + armIndex("armoured foot")] = 0.5;
+    }
   });
+  recount(world);
+  refreshFreeCompanies(world);
 
   return world;
 }
+
+/** The most men one army starts with; a realm's other men start as its capital's garrison troops. */
+const START_ARMY_MAX = 30000;
 
 export function areNeighbors(world: World, a: number, b: number): boolean {
   for (let k = world.adjStart[a]!, end = world.adjStart[a + 1]!; k < end; k++) {
