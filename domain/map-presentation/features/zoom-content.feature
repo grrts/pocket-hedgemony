@@ -180,5 +180,5 @@ Feature: What each zoom shows
   @VIEW-079 @feedback-22
   Scenario: No province names on the map
     When the map is drawn at any zoom
-    Then no land province names are drawn
+    Then no land province names are drawn except on each country's capital
     And a selected province shows its name on its name tab and card

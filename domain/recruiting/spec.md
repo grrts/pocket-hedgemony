@@ -199,7 +199,7 @@ Newest decision first.
 - RECR-050 While a castle or town is under siege, the recruiting system shall stop all training in it. [recruiting §4.2]
 - RECR-051 When training finishes, the regiment shall have its arm, drill 3 (4 if trained under a Marshal), pay by its arm's pay group (RECR-102), and break point 30 % plus troop level, keeping its kind. [recruiting §4.3, §7.2, §1]
 - RECR-052 The recruiting system shall leave untrained levies at drill 0 and break point 25 %. [recruiting §4.3]
-- RECR-053 The recruiting system shall send trained levy regiments home like levies: after 6 months, 5 % a month unless paid double. [recruiting §4.3]
+- RECR-053 The recruiting system shall send trained levy regiments home like levies: after 6 months, 5 % a month unless paid double. [recruiting §4.3] *Replaced by RECR-113 (playtest feedback).*
 - RECR-054 If training runs past the 3 free months, then the recruiting system shall charge pay for those months. [recruiting §4.4]
 
 ### Standing regiments and retinues
@@ -276,6 +276,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - RECR-109 The recruiting system shall order training from the commander screen, for the levies in that commander's army: the player picks the arm, how many thousand and the castle or drill yard, and the army marches there (RECR-039 to RECR-043). [F-14]
 - RECR-110 The commander screen shall show the army's stats (men by arm and kind, drill, break point, the commander's skills), its companies with split, merge and leave-as-garrison actions, its food reserve and food used a day and a month, its pay a month, and any training under way. [F-14]
 - RECR-111 The recruiting system shall give the player new commanders only by commissioning officials (RECR-069 onward), and shall attach no commander to an army by default; rulers and heirs may still lead, lords lead only their own retinues, and hired companies bring their own commander (WAR-211); a captain risen from the ranks, an academy graduate or an exile first enters service as an official. [F-16; X-7]
+- RECR-113 The recruiting system shall never send trained or untrained levies home on their own; they stay under arms until the player disbands them or leaves them as garrison troops (RECR-112). [F-23]
 - RECR-112 When a commander leaves troops in a province of his realm, the recruiting system shall make them that province's garrison troops (RECR-107); an army keeps at least its commander's own company. [F-13]
 
 ## 6. Commands
@@ -372,7 +373,7 @@ still to balance. The `levies` and `military` blocks of `defines.json` are repla
 | retraining factor | | half months, half gold | yes | recruiting config |
 | Marshal training speed / drill | | 25 % faster; drill 4 | yes | recruiting config |
 | trained drill / break point | | drill 3; 30 % + troop level (levies 25 %) | yes | recruiting config |
-| goes home | | after 6 months, 5 % a month unless paid double | yes (warfare 2.3) | recruiting config |
+| goes home | | dropped: levies stay until disbanded (F-23) | — | recruiting config |
 | pay spent at home | share of pay | a fifth | yes | recruiting config |
 | soldier settler clearing / riot threshold | | ×2; +1 grievance for 10 years | yes | recruiting config |
 | loot home | share of loot | a tenth, for a year | yes | recruiting config |
@@ -482,3 +483,4 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 | RECR-104–107 | levy.feature | The levy screen for Troyes; Levies gather a thousand at a time; Gathered levies wait as garrison troops |
 | RECR-108–110, 112 | training.feature | A commander picks up garrison troops; Giving a training order; The commander screen; Leaving troops as a garrison |
 | RECR-111 | commissioning-officials.feature | New commanders come from officials |
+| RECR-113 | training.feature | Trained levies stay until sent home |

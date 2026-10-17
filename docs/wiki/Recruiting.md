@@ -113,7 +113,7 @@ Some things speed training up or change it:
 - A castle or town **under siege** stops all training in it.
 - The **3 free months** count from the day the levy has gathered. If training runs past them, you pay for the extra months. Pikes and light horse (3 months) finish inside the free months; musketeers (5 months) cost 2 months of pay and knights (9 months) 6.
 
-When training finishes, the regiment has its arm, drill 3 (drill 4 if trained under a Marshal), pay by its arm and a break point of 30 % plus its troop level. Untrained levies stay at drill 0 and break at 25 %. Training never changes a regiment's kind: a trained levy regiment still goes home like levies, after 6 months at 5 % a month unless paid double.
+When training finishes, the regiment has its arm, drill 3 (drill 4 if trained under a Marshal), pay by its arm and a break point of 30 % plus its troop level. Untrained levies stay at drill 0 and break at 25 %. Training never changes a regiment's kind: a trained levy regiment is still a levy. No levy, trained or not, goes home on its own: it stays until you disband it or leave it as a garrison.
 
 Pay by arm, per 1,000 men a month: foot 200 gold, gunners 250, horse 400, knights 600, and gun crews 1 gold per crew of 15 (10 gold for 150 men). Each arm belongs to one of these groups:
 

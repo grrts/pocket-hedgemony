@@ -392,7 +392,7 @@ Newest decision first.
 ### 5.2 Kinds and break points
 
 - WAR-015 The warfare system shall give each kind its pay rule and base break point: levy 25 % (free for the first 3 months, then normal pay); retinue 35 % (paid by the lord); hired company 35 % (three times normal pay); standing regiment 30 % (1.5 times normal pay, all year, needs W12); garrison 40 % on the walls (normal pay); rebel band 20 % (loot). [warfare §2.3]
-- WAR-016 When a levy company has been out 6 months, the warfare system shall send 5 % of its men home each month unless it is paid double. [warfare §2.3]
+- WAR-016 When a levy company has been out 6 months, the warfare system shall send 5 % of its men home each month unless it is paid double. [warfare §2.3] *Replaced by WAR-212 (playtest feedback).*
 - WAR-017 While levies are away at harvest, the warfare system shall report that share of farmers away to the province so its harvest falls by that share. [warfare §2.3]
 - WAR-018 While a lord is wavering, the warfare system shall allow him to take his retinue home mid-war. [warfare §2.3, §3.2]
 - WAR-019 If a hired company is owed 1 month of pay, then it shall not fight; if owed 2 months, then it shall loot the province it stands in or take the enemy's offer if it is higher. [warfare §2.3]
@@ -654,6 +654,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - WAR-208 The warfare system shall publish each siege's progress (days held, breaches, garrison left, food left in the castle) whenever it changes, for the map and the siege view. [F-9]
 - WAR-209 The warfare system shall never let an army exist without a commander: soldiers with no commander are their province's garrison troops (recruiting RECR-107), not an army. If an army loses its commander and no captain can take over, then it shall halt; in its own realm's land it becomes the garrison troops of the province it stands in, and abroad it waits there until a commander joins it. [F-13]
 - WAR-210 When a contract with a free company is signed, the warfare system shall take the gold up front and have the company arrive in the province the player names after the days it needs to march there from where it gathers, shown on the hire screen; until it arrives it is not on the map and cannot fight. [F-19]
+- WAR-212 The warfare system shall give levies no service term: a levy company, trained or not, never goes home on its own and stays until its realm disbands it or leaves it as a garrison; lords' retinues and hired companies keep their own rules. [F-23]
 - WAR-211 The warfare system shall have every hired company led by its own captain as the commander of its own army, who leaves with the company when the contract ends; a hired company never takes one of the realm's commanders. [F-19]
 
 ## 6. Commands
@@ -773,7 +774,7 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | warfare.guns_march_penalty | Guns slow an army | +25 % per gun (warfare 2.2) / ×1.25 per army (troop-movement, decided) | yes | march (troop-movement) |
 | warfare.kinds.<kind>.break_point | Base break point | levy 25 %, retinue 35 %, hired 35 %, standing 30 %, garrison 40 %, rebel 20 % | yes | warfare |
 | warfare.kinds.levy.free_months | Free service | 3 | yes | warfare |
-| warfare.kinds.levy.go_home_after / rate | Levies going home | 6 months / 5 % a month unless paid double | yes | warfare |
+| warfare.kinds.levy.go_home_after / rate | Levies going home | dropped (F-23: no service term) | — | warfare |
 | warfare.kinds.hired.pay_multiplier | Hired pay | 3 | yes | warfare |
 | warfare.kinds.standing.pay_multiplier | Standing pay | 1.5 | yes | warfare |
 | warfare.break.homeland / hungry / pay_owed | Break point modifiers | +5 % / −10 % / −5 % a month | yes | warfare |
@@ -1183,3 +1184,4 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-208 | features/sieges.feature | A siege publishes its progress |
 | WAR-209 | features/commanders.feature | No army without a commander |
 | WAR-210, 211 | features/raising-and-keeping.feature | Hiring a free company takes no recruits; A hired company arrives after its march |
+| WAR-212 | features/kinds-and-break-points.feature | Levies stay until the realm sends them home |

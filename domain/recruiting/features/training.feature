@@ -172,11 +172,11 @@ Feature: Training levies into regiments
     When they finish training into "pikes"
     Then the regiment is still of kind "levy"
 
-  @RECR-053 @placeholder
-  Scenario: Trained levies go home like levies
-    Given a trained regiment of kind "levy" that has been out 7 months unpaid double
+  @RECR-053 @RECR-113 @feedback-23
+  Scenario: Trained levies stay until sent home
+    Given a trained regiment of kind "levy" that has been out 7 months
     When the month ends
-    Then 5 percent of its men go home
+    Then none of its men go home on their own
 
   @RECR-054
   Scenario Outline: Pay owed when training runs past the free months

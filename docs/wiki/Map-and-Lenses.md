@@ -51,7 +51,7 @@ There are three zoom levels: **World**, **Region** and **Local** ("Province" zoo
 - Marching armies as columns of foot, horse, guns and wagons in proportion.
 - A battle is shown on the province's own tile row, and a siege as the castle tile with breaches drawn in the walls.
 
-Land provinces have no names on the map at any zoom: a province's name shows on its name tab and card when you select it. Realm names and sea names stay. Route lines are a light dash over a dark outline, so they read on every colour.
+Land provinces have no names on the map at any zoom, except each country's capital, so you can see whose capital it is. Every province's name shows on its name tab and card when you select it. Realm names and sea names stay. Route lines are a light dash over a dark outline, so they read on every colour.
 
 Every system added after the province and warfare designs has to state what it shows at each zoom, including its lens.
 

@@ -20,7 +20,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Province](province/spec.md) | PROV | 186 | 26 | 604 | 24 | 0 |
 | [Realm](realm/spec.md) | REALM | 129 | 15 | 401 | 18 | 0 |
 | [Rebellions](rebellions/spec.md) | REBL | 64 | 9 | 165 | 15 | 0 |
-| [Recruiting](recruiting/spec.md) | RECR | 112 | 11 | 229 | 24 | 0 |
+| [Recruiting](recruiting/spec.md) | RECR | 113 | 11 | 229 | 24 | 0 |
 | [Religion](religion/spec.md) | RELG | 126 | 13 | 286 | 23 | 0 |
 | [Research](research/spec.md) | RSCH | 54 | 7 | 133 | 17 | 0 |
 | [Revolutions](revolutions/spec.md) | REVO | 81 | 14 | 235 | 15 | 1 |
@@ -31,8 +31,8 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Time and turns](time-and-turns/spec.md) | TIME | 76 | 7 | 181 | 15 | 0 |
 | [Trade](trade/spec.md) | TRADE | 128 | 14 | 266 | 19 | 0 |
 | [Troop movement](troop-movement/spec.md) | MOVE | 127 | 12 | 245 | 20 | 0 |
-| [Warfare](warfare/spec.md) | WAR | 211 | 17 | 650 | 21 | 0 |
+| [Warfare](warfare/spec.md) | WAR | 212 | 17 | 650 | 21 | 0 |
 | [World map](world-map/spec.md) | MAP | 50 | 6 | 175 | 12 | 0 |
-| **All 29 contexts** | | 3146 | 353 | 7835 | 538 | 8 |
+| **All 29 contexts** | | 3148 | 353 | 7835 | 538 | 8 |
 
 Scenarios count each row of a Scenario Outline's examples.

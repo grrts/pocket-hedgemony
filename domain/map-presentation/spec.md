@@ -202,7 +202,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - VIEW-076 (State-driven): While a turn plays back, the top bar's date shall tick one day at a time, and show the hour of each 4-hour step while a player battle runs. [F-7]
 - VIEW-077 (State-driven): While a battle runs, the map shall show it on its province with each side's men and a progress bar of men and morale left per side, updated every round, and the battle viewer shall show the same. [F-8; X-1]
 - VIEW-078 (State-driven): While a castle is besieged, the map shall show the siege at Region and Local zoom with its progress: time held, breaches, garrison left and food left, updated when the siege updates. [F-9]
-- VIEW-079 (Ubiquitous): The map shall draw no land province names at any zoom; a province's name shows on its name tab and card when it is selected. Realm names and sea names stay. [F-22]
+- VIEW-079 (Ubiquitous): The map shall draw no land province names at any zoom except on each country's capital; a province's name shows on its name tab and card when it is selected. Realm names and sea names stay. [F-22]
 
 ## 6. Commands
 

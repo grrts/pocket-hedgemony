@@ -50,7 +50,7 @@ Later arms (machine guns, tanks, aircraft) follow the same shape in config. Elep
 | Garrison | 40 % on the walls | normal pay |
 | Rebel band | 20 % | loot |
 
-Levies out 6 months send 5 % of their men home each month unless paid double, and levies away at harvest cost their province that share of its harvest. A wavering lord may take his retinue home mid-war. A hired company owed 1 month of pay won't fight; owed 2 months, it loots the province it stands in or takes the enemy's offer if higher. Standing regiments keep drill and scars through peace. Garrisons count against their castle's room. Rebel bands fight by the same battle rules whatever the rebellion rules decide about how they form.
+Levies have no service term: once raised they stay until you disband them or leave them as a garrison. Levies away at harvest cost their province that share of its harvest. A wavering lord may take his retinue home mid-war. A hired company owed 1 month of pay won't fight; owed 2 months, it loots the province it stands in or takes the enemy's offer if higher. Standing regiments keep drill and scars through peace. Garrisons count against their castle's room. Rebel bands fight by the same battle rules whatever the rebellion rules decide about how they form.
 
 A company's break point is changed by its troop level, the Might of the leader in its sector, +5 % defending its own homeland, −10 % if hungry, −5 % per month of pay owed, and commander traits.
 
@@ -408,7 +408,7 @@ All warfare values live in `packages/rules/data/domain/warfare.json`; most are p
 | `warfare.company_size_min` / `max` | 500 / 1,000 |
 | `warfare.drill_max`, `warfare.scars_max`, `warfare.scar_fade_years` | 12, 5, 5 |
 | `warfare.kinds.<kind>.break_point` | levy 25 %, retinue 35 %, hired 35 %, standing 30 %, garrison 40 %, rebel 20 % |
-| `warfare.kinds.levy.free_months`, `go_home_after` / `rate` | 3; 6 months / 5 % a month |
+| `warfare.kinds.levy.free_months` | 3 (levies no longer go home on their own) |
 | `warfare.kinds.hired.pay_multiplier`, `warfare.kinds.standing.pay_multiplier` | 3, 1.5 |
 | `warfare.break.homeland` / `hungry` / `pay_owed` | +5 % / −10 % / −5 % a month |
 | `warfare.arms_rust` / `powder_damp` | 2 % / 5 % a year |
