@@ -816,11 +816,20 @@ button.small {
   pointer-events: none;
 }
 
+/* A thinner frame and smaller type than a card, so an alert covers little map. */
+.alert,
+.battle-watch {
+  border-width: 8px;
+  border-image-width: 8px;
+  font-size: 18px;
+  line-height: 1.15;
+}
+
 .alert {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 6px 6px 10px;
+  padding: 2px 2px 2px 6px;
   pointer-events: auto;
   animation: alert-in 0.2s steps(4);
 }
@@ -850,7 +859,7 @@ button.small {
   bottom: max(8px, env(safe-area-inset-bottom));
   transform: translateX(-50%);
   width: min(460px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
-  padding: 4px 6px 6px 10px;
+  padding: 2px 4px 4px 6px;
   z-index: 7;
 }
 

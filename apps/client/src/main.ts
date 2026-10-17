@@ -223,6 +223,7 @@ document.addEventListener("click", (e) => {
   realmView = -1;
   panelCollapsed = false;
   unread = 0;
+  clearAlerts();
   renderHud();
   renderPanel();
 });
@@ -1048,6 +1049,8 @@ function logNews(s: Snapshot): void {
       alertPlayer(x.text, "castle", { province: x.province });
       continue;
     }
+    // A battle over as soon as it began (one side swept away) is only in the log.
+    if (!s.battles.some((b) => b.province === x.province)) continue;
     // The week waits at a battle of the player's until they go and watch it, or play on (feedback 73).
     alertPlayer(`A battle has begun at ${provinces[x.province]!.name}. The week waits.`, "swords", { province: x.province, battle: true });
     if (playing && !paused && watching?.province !== x.province) {
@@ -1103,6 +1106,7 @@ function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll
       officialView = -1;
       panelCollapsed = false;
       unread = 0;
+      clearAlerts();
       renderHud();
       renderPanel();
     }
@@ -1112,6 +1116,11 @@ function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll
   while (alerts.children.length > ALERTS_SHOWN) ([...alerts.children].find((x) => !(x as HTMLElement).dataset.battle) ?? alerts.firstElementChild!).remove();
   // A battle's alert stays while the week waits on it.
   if (!to.battle) setTimeout(remove, ALERT_MS);
+}
+
+/** Clears the alerts the log now shows, keeping those for a battle the week waits on. */
+function clearAlerts(): void {
+  alerts.querySelectorAll<HTMLElement>(".alert:not([data-battle])").forEach((el) => el.remove());
 }
 
 /** Goes to a battle of the player's, shows its progress over the map and plays the week on at a pace to follow it. */

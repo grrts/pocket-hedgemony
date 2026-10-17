@@ -49,7 +49,7 @@ for (let t = 0; t < 60 && !watched; t++) {
       await page.waitForTimeout(400);
       await page.screenshot({ path: `${out}/1-battle-alert.png` });
       await watch.first().click();
-      await page.waitForTimeout(2500);
+      await page.waitForTimeout(700);
       await page.screenshot({ path: `${out}/2-battle-watch.png` });
       watched = true;
       await page.waitForFunction((n) => window.__phTurn() > n, turn, { timeout: 120000 });
