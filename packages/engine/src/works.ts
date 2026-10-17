@@ -106,10 +106,12 @@ export function slotsUsed(world: World, p: number, pend?: Pending): number {
   return used;
 }
 
-/** Inventions each realm knows: its 1444 knowledge, until research is wired into the turn. */
+/** Whether realm n knows an invention: what its research has learned, or its 1444 knowledge while the world is being seeded. */
 const knownCache = new Map<string, Set<string>>();
 export function knowsInvention(world: World, n: number, id: string): boolean {
   if (id === "start") return true;
+  const learned = world.research[n];
+  if (learned) return learned.known.has(id);
   const nation = world.nationIds[n]!;
   let known = knownCache.get(nation);
   if (!known) knownCache.set(nation, (known = startingKnowledgeFor(nation)));

@@ -1888,6 +1888,176 @@ small.effect {
   color: #3f6a34;
 }
 
+/* ---- Learning (research RSCH-084 to RSCH-090) ----
+ * One tab holds research and schools. Every control is a 44-point row or
+ * button, nothing needs hover, and rows wrap rather than scroll sideways.
+ */
+button.learning-line {
+  justify-content: flex-start;
+  text-align: left;
+  line-height: 1.1;
+  padding: 2px 6px;
+  white-space: normal;
+}
+button.learning-line.idle {
+  color: var(--cloth);
+}
+.study-card {
+  margin: 4px 0 8px;
+  padding: 6px 8px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.study-card.idle {
+  border-color: var(--cloth);
+}
+.study-card p {
+  margin: 2px 0;
+}
+.study-card .study-does {
+  color: var(--ink-soft);
+}
+.study-meter {
+  height: 18px;
+  margin: 6px 0 2px;
+  border: 2px solid var(--outline);
+  background: var(--paper);
+}
+.study-meter i {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--brass) 0 6px, #a77a2c 6px 8px);
+}
+.panel .warn {
+  color: var(--cloth);
+  font-weight: 600;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 4px 0 8px;
+}
+.stepper button {
+  min-width: 52px;
+}
+.stepper output {
+  flex: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+button.wide {
+  width: 100%;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1.1;
+  padding: 2px 8px;
+}
+button.wide small {
+  font-size: 0.75em;
+  font-weight: 400;
+  opacity: 0.8;
+}
+.school-list,
+.inventions,
+.known {
+  list-style: none;
+  margin: 4px 0 8px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.school-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.found-school,
+.known-list {
+  margin: 8px 0;
+}
+.found-school summary,
+.known-list summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+.found-school summary::-webkit-details-marker,
+.known-list summary::-webkit-details-marker {
+  display: none;
+}
+.found-school summary::after,
+.known-list summary::after {
+  content: "+";
+  margin-left: auto;
+}
+.found-school[open] summary::after,
+.known-list[open] summary::after {
+  content: "−";
+}
+.choices.found-in button {
+  flex: 0 1 auto;
+}
+.panel h4.era {
+  margin: 10px 0 2px;
+  font: 600 20px/1.1 var(--body);
+  color: var(--ink);
+  border-bottom: 2px solid var(--wood);
+}
+li.invention {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgb(58 36 20 / 0.3);
+}
+li.invention.on {
+  background: rgb(208 162 72 / 0.18);
+}
+.inv-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.inv-text small {
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+li.invention button {
+  flex: 0 0 auto;
+  min-width: 96px;
+}
+.inv-state {
+  min-width: 96px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+ul.known li {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+ul.known li span {
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+.learn-facts dd small {
+  margin-left: 6px;
+}
+
+
 /* ---- Works (milestone 4): a province's Works tab and the realm's overview ---- */
 
 .work-sheet {
