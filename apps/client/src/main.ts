@@ -24,6 +24,7 @@ import { apparentAge, eraOfYear } from "./art/commanders.ts";
 import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
+import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
@@ -1047,7 +1048,7 @@ function renderHud(): void {
     <button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>
     <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${s.battles.some((b) => b.player) ? ` <small>${String(s.hour).padStart(2, "0")}:00</small>` : ""}</span>
     <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
-    <span class="plaque" title="Troops against your troop cap (men under arms and gathering)">${icon("swords", 1)}${fmt(s.nationCapUsed[me]! / 1000)}k<small>/${fmt(s.nationTroopCap[me]! / 1000)}k</small></span>
+    ${s.stability ? stabilityPlaque(s.stability, me) : ""}
     ${myWars().length ? `<button class="plaque at-war" data-realm="${me}" data-realm-open="diplomacy" title="Your wars">${icon("swords", 1)}At war</button>` : ""}
     <button class="plaque dispatches${s.calls.length || s.peaceOffers.length ? " urgent" : ""}" data-news title="Dispatches: what happened this turn">${icon("scroll", 1)}${dispatches.length + s.calls.length + s.peaceOffers.length}</button>`;
 }
@@ -2307,6 +2308,7 @@ function renderRealm(r: number): void {
       <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
+    ${mine && s?.stability ? stabilitySection(s.stability) : ""}
     <dl class="facts">
       <dt>People</dt><dd>${fmt(people)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>

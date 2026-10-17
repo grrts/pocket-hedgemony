@@ -14,3 +14,4 @@ export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply } from "./protocol.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";
 export { aiTreasury, canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, runLedger, TAX_RATES, taxRateOf } from "./treasury.ts";
+export { STABILITY, stabilityOf, subjectLoyalty, type Stability, type StabilityPillar, type StabilityStep } from "./stability.ts";
