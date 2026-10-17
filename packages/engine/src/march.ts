@@ -165,6 +165,8 @@ export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: numb
 
 /** What a march over tiles depends on: the grid, the map's projection and each province's sea-level temperature today. */
 export interface TileMarch {
+  /** Marching hours in each province against none (roads); absent = no roads. */
+  roadHours?: Float32Array;
   d: MarchDefines;
   grid: TileGrid;
   /** Thousands of people per province, for the forage limit. */
@@ -203,7 +205,7 @@ export function tileStepHours(m: TileMarch, from: number, to: number, a: Marchin
   const p = grid.province[to]! - 1;
   if (grid.coarse) {
     const units = d.daysToCross[ground] + (a.men > forageLimitOf(d, ground, m.population[p]!) ? d.bigArmyExtraCrossings : 0);
-    return tilePace(d, a) * d.tilesPerCrossing * units + (riverOfCell(c) ? d.riverCrossingDays * 24 : 0);
+    return tilePace(d, a) * d.tilesPerCrossing * units * (m.roadHours?.[p] ?? 1) + (riverOfCell(c) ? d.riverCrossingDays * 24 : 0);
   }
   const dx = (to % grid.width) - (from % grid.width);
   const dy = to - from - dx;
@@ -211,7 +213,7 @@ export function tileStepHours(m: TileMarch, from: number, to: number, a: Marchin
   let units = d.daysToCross[ground];
   if (a.men > forageLimitOf(d, ground, m.population[p]!)) units += d.bigArmyExtraCrossings;
   const snow = snowCover(m.temperature[p]! - 6.5 * heightOfCell(c));
-  let hours = tilePace(d, a) * units * across * (1 + d.snowSlowdown * snow);
+  let hours = tilePace(d, a) * units * across * (1 + d.snowSlowdown * snow) * (m.roadHours?.[p] ?? 1);
   if (riverOfCell(c) && !riverOfCell(m.grid.cell[from]!)) hours += d.riverCrossingDays * 24;
   return hours;
 }

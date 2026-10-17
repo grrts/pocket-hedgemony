@@ -343,6 +343,12 @@ export function orderShape(order: Order): string {
       return "seize a fief";
     case "swapOfficials":
       return "move an official to another province";
+    case "build":
+      return "build in province";
+    case "cancelBuild":
+      return "cancel a work in province";
+    case "moveBuild":
+      return "move a work in the province's queue";
   }
 }
 

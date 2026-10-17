@@ -4,6 +4,8 @@ import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
 import { HARVESTS, storeMonths } from "./food.ts";
+import { buildSheets, slotsOf, slotsUsed, townSize, workCost, WORKS, workStepName, workEffect, type WorkRow } from "./works.ts";
+import { buildingType } from "./domain/buildings/index.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
 import { advance, applyNow, HOURS_PER_STEP, mayMarchInto, processTurn, type Order } from "./turn.ts";
@@ -188,6 +190,20 @@ export interface Snapshot {
   };
   /** Arm names for armies.byArm. */
   arms: readonly string[];
+  /** Works (milestone 4): their names, each step's name and what it does, and the step built of each in each province (works.length per province, 0 = none). */
+  works: readonly string[];
+  workSteps: { name: string; effect: string }[][];
+  provinceWorks: Uint8Array;
+  /** The player's building sites: months left of all. */
+  sites: { province: number; work: number; step: number; monthsLeft: number; months: number }[];
+  /** The player's works waiting to start, in order, with their gold. */
+  workQueue: { province: number; work: number; step: number; gold: number }[];
+  /** Build sheet of each of the player's provinces, by province index. */
+  buildSheets: Record<number, WorkRow[]>;
+  /** Slots of each of the player's provinces: taken, all, and the town's size that goes with its people. */
+  buildSlots: Record<number, { used: number; total: number; town: string }>;
+  /** The player's works go unpaid (treasury empty): they give half. */
+  worksNeglected: boolean;
 }
 
 /** Land nation n's armies may not march into, worked out once per realm holding it. */
@@ -336,6 +352,18 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         origin: c.origin ?? "",
       })),
       arms: ARMS,
+      works: WORKS,
+      workSteps: WORKS.map((name, k) => buildingType(name).steps.map((_, i) => ({ name: workStepName(k, i + 1), effect: workEffect(w, k, i + 1) }))),
+      provinceWorks: w.provinceWorks.slice(),
+      sites: w.sites.filter((s) => s.nation === player).map((s) => ({ province: s.province, work: s.work, step: s.step, monthsLeft: s.monthsLeft, months: s.months })),
+      workQueue: w.workQueue.filter((q) => q.nation === player).map((q) => ({ province: q.province, work: q.work, step: q.step, gold: workCost(w, q.province, q.work, q.step).gold })),
+      buildSheets: buildSheets(w, player),
+      buildSlots: (() => {
+        const out: Snapshot["buildSlots"] = {};
+        if (player >= 0) for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === player && !w.provinceWater[p]) out[p] = { used: slotsUsed(w, p), total: slotsOf(w, p), town: townSize(w, p).replace("_", " ") };
+        return out;
+      })(),
+      worksNeglected: player >= 0 && !!w.nationNeglect[player],
       armies: {
         id: Int32Array.from(live),
         owner: pick(a.owner, (n) => new Int16Array(n)),
@@ -382,6 +410,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceGrievances,
       snap.provinceMood,
       snap.provinceLord,
+      snap.provinceWorks,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
       ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);

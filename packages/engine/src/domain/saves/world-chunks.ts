@@ -1,6 +1,7 @@
 import type { RealmLord } from "../../lords.ts";
 import { CLASS_COUNT, rescaleClasses } from "../../living.ts";
 import { LEDGER_LINES } from "../../treasury.ts";
+import { refreshWorks, WORK_COUNT, workIndex, WORKS, type QueuedWork, type Site } from "../../works.ts";
 import type { Ruleset } from "@ph/rules";
 import { hashWorld } from "../../hash.ts";
 import { Rng } from "../../rng.ts";
@@ -77,11 +78,12 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
     packChunk("provinces", V.provinces, {
       // Sieges under way, by province (occupation and garrisons are arrays below); the ground is the map's, not the save's.
-      meta: { sieges: [...world.sieges].map(([p, st]) => [p, { ...st, siege: { ...st.siege, ground: undefined } }]) },
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison },
+      meta: { sieges: [...world.sieges].map(([p, st]) => [p, { ...st, siege: { ...st.siege, ground: undefined } }]), workNames: WORKS },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks },
     }),
     packChunk("nations", V.nations, {
-      meta: { lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed },
+      // Works being built and waiting, with works by name so a build with other works still reads them.
+      meta: { sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
@@ -91,6 +93,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         debt: world.nationDebt,
         loanMonth: world.nationLoanMonth,
         ledger: world.nationLedger,
+        neglect: world.nationNeglect,
         commanderOwner: world.commanderOwner,
         // Skills, victories, defeats and wounds of each commander, as they grow in battle.
         commanderRecord: Int32Array.from(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats, c.wounds])),
@@ -238,6 +241,15 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         if (prov.hold) world.provinceHold[t.index] = prov.hold[old]!;
         if (prov.holdBy) world.provinceHoldBy[t.index] = nationAt(prov.holdBy[old]!);
         if (prov.garrison) world.provinceGarrison[t.index] = prov.garrison[old]!;
+        // Works by name; saves from before works keep the 1444 ones.
+        if (prov.works) {
+          const names = (provChunk.meta as { workNames?: string[] }).workNames ?? [];
+          world.provinceWorks.fill(0, t.index * WORK_COUNT, (t.index + 1) * WORK_COUNT);
+          names.forEach((name, k) => {
+            const now = workIndex(name);
+            if (now >= 0) world.provinceWorks[t.index * WORK_COUNT + now] = prov.works![old * names.length + k]!;
+          });
+        }
         if (prov.starved) world.provinceStarved[t.index] = prov.starved[old]! * t.share;
       }
     }
@@ -261,7 +273,10 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (nat.taxDefault) world.nationTaxDefault[n] = nat.taxDefault[old]!;
     if (nat.debt) world.nationDebt[n] = nat.debt[old]!;
     if (nat.loanMonth) world.nationLoanMonth[n] = nat.loanMonth[old]!;
-    if (nat.ledger) world.nationLedger.set(nat.ledger.subarray(old * LEDGER_LINES, (old + 1) * LEDGER_LINES), n * LEDGER_LINES);
+    // Saves from before a ledger line was added hold fewer lines a realm; the ledger is worked out again each week.
+    const lines = nat.ledger ? Math.min(LEDGER_LINES, nat.ledger.length / ids.nations.length) : 0;
+    if (nat.ledger) world.nationLedger.set(nat.ledger.subarray(old * lines, old * lines + lines), n * LEDGER_LINES);
+    if (nat.neglect) world.nationNeglect[n] = nat.neglect[old]!;
   });
   // Commanders by id; ones the realm hired during the game come back by name and owner.
   const commanderMap = ids.commanders.map((id, old) => {
@@ -299,6 +314,13 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (c >= 0) world.commanderSeed[c] = p < 0 ? -1 : mapP(p);
   });
   // Lords keep their places in the list (provinces point at them); one of a realm that is gone holds nothing.
+  type SavedWork<T> = Omit<T, "work"> & { work: string };
+  const worksMeta = need("nations").meta as { sites?: SavedWork<Site>[]; workQueue?: SavedWork<QueuedWork>[] };
+  const mapWork = <T extends { nation: number; province: number }>(x: Omit<T, "work"> & { work: string }) => ({ ...x, nation: mapN(x.nation), province: mapP(x.province), work: workIndex(x.work) }) as unknown as T;
+  const placed = (x: { nation: number; province: number; work: number }) => x.nation >= 0 && x.province >= 0 && x.work >= 0;
+  if (worksMeta.sites) world.sites = worksMeta.sites.map((s) => mapWork<Site>(s)).filter(placed);
+  if (worksMeta.workQueue) world.workQueue = worksMeta.workQueue.map((q) => mapWork<QueuedWork>(q)).filter(placed);
+  refreshWorks(world);
   if (natMeta.lords) world.lords = natMeta.lords.map((l) => ({ ...l, nation: mapN(l.nation) }));
   if (natMeta.musters) world.musters = natMeta.musters.map((m) => ({ ...m, nation: mapN(m.nation), province: mapP(m.province) })).filter((m) => m.nation >= 0 && m.province >= 0);
   const rec = nat.commanderRecord;

@@ -58,6 +58,8 @@ describe("turns", () => {
   it("pays province income into the owner's treasury once a month", () => {
     const w = createWorld(rules, 1, tiles);
     const fra = w.nationIndex.get("france")!;
+    // The player's realm: the AI would order works with its gold.
+    w.player = fra;
     processTurn(w, [], fra);
     processTurn(w, [], fra);
     // 11 and 18 November: no new month yet.

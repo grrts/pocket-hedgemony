@@ -511,6 +511,13 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-136 While several of the player's battles run at once (X-1), the audio context shall play battle bell-step effects only for the battle shown in the battle view, and switch them when the player switches battles. [X-1]
 - AUD-137 With turns one week long (X-18), the audio context shall play `turn_end` and `turn_ready` every turn, and shall play the month, season and year cues (`turn_month_new_year`, the era theme, the yearly checks' sounds) once, in the turn in which that month, season or year begins. [X-18]
 
+### How the player uses it
+- AUD-138 The audio context shall put every sound setting the player needs while playing in one Sound card, opened from the speaker button in the side tools beside the map lens and the commanders: what is playing now and why the director chose it, master volume, music on/off with its volume, effects volume, and button sounds on/off; the full list of AUD-114 stays in Settings → Audio. [X-19; playtest 17 Oct "pull music and sounds forward"]
+- AUD-139 The speaker button shall show at a glance whether music is off (a struck speaker) or on, so the state needs no card opened. [X-19]
+- AUD-140 The Sound card shall work on a phone in landscape: one column of 44-point rows (sliders, toggles), inside the safe areas, fitting a 375-point-high screen without scrolling, and nothing that needs hover. [X-19]
+- AUD-141 Until the MML track build (AUD-097) and the AudioWorklet synth (AUD-104) exist, the client shall synthesize the chip's tracks and effects in the page into sample buffers, a track at a time between frames, and stand a written track in for any track id of the list not yet written (palette peace tracks share one tune per half of the eras, played in each palette's tuning, key and wavetable). [D-AUD-13]
+- AUD-142 Sound settings shall be kept on the device (Device group, SET-023), never in a save. [SET-023]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -682,6 +689,7 @@ None. Audio reacts to the player's view and nation only; computer players hear n
 - **D-AUD-10** (was OQ-AUD-10) White peace: a peace with no gain and no loss plays no stinger. Nothing new is added.
 - **D-AUD-11** (was OQ-AUD-11) Palettes: there is no blend; Atlantic and creole nations use the single `atlantic_creole` palette. The turkic split by capital longitude 55 (west `mena`, otherwise `steppe`) stays in config. A `narrative_only` major event plays no stinger, so there is no "sombre" variant. Simplest rules that need no new tracks.
 - **D-AUD-12** (was OQ-AUD-12) Catalogue defaults: `ui_tooltip` is never played (no setting turns it on); all five haptic moments are "light" (§15.3 is later); the `final_result` screen plays `campaign_end`. The later decision and the screen list win.
+- **D-AUD-13** (17 Oct, Leroy: pull music and sound forward for playtesting) The music and effects are built ahead of their milestones in a first cut: the director, 16 written tracks (title, two peace tunes per half of the eras, prosperity, diplomacy, the five war and situation tracks with layers, six stingers) and 30 effects, synthesized in the page (AUD-141). The worklet, the MML build, ambience, captions, haptics and the full catalogue follow in their milestones; the palette tunings are drafts awaiting review (OQ-AUD-13).
 - **OQ-AUD-13** Palette reviewers and listening approval (release task): each palette needs a paid reviewer of its tradition, and every track needs Leroy's listening approval, before release.
 
 ## 14. Traceability
@@ -711,3 +719,4 @@ None. Audio reacts to the player's view and nation only; computer players hear n
 | AUD-135 | music-and-effects-together.feature | Tutorial and Needs attention sounds |
 | AUD-136 | busy-turns-and-mixing.feature | Only the battle on screen is heard |
 | AUD-137 | effects-era-and-region.feature | Weekly turns and the new year chime |
+| AUD-138 … AUD-142 | — | Client screens and synth; checked by apps/client/scripts/sound-shots.mjs and src/audio/audio.test.ts |

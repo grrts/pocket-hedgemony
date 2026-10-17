@@ -96,10 +96,17 @@ describe("war and conquest", () => {
     const around = Array.from(map.adjList.subarray(map.adjStart[castle]!, map.adjStart[castle + 1]!)).filter((p) => map.ground[p]);
     const [back, onward] = around.filter((p) => w.provinceOwner[p] === foe);
     expect(back !== undefined && onward !== undefined).toBe(true);
-    // An army marching from one side to the other halts at the castle.
+    // An army marching from one side to the other halts at the castle (Portugal's own armies kept out of its way).
+    const keepOut = () => {
+      for (let i = 0; i < w.armies.count; i++) if (w.armies.owner[i] === foe && w.armies.battle[i]! < 0) w.armies.alive[i] = 0;
+    };
+    keepOut();
     const army = spawnArmy(w, me, back!, 20000, w.commanderOwner.indexOf(me));
     w.armies.route[army] = [castle, onward!];
-    for (let t = 0; t < 8 && w.armies.location[army] !== castle; t++) processTurn(w, [], me);
+    for (let t = 0; t < 8 && w.armies.location[army] !== castle; t++) {
+      processTurn(w, [], me);
+      keepOut();
+    }
     expect(w.armies.location[army]).toBe(castle);
     expect(w.armies.route[army]).toEqual([]);
     expect(w.armies.path[army]!.length).toBe(0);

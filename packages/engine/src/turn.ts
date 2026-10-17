@@ -1,6 +1,7 @@
 import { monthlyPeople } from "./living.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
+import { aiWorks, cancelWork, judgeNeglect, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
@@ -89,7 +90,12 @@ export type Order =
   | { type: "grantFief"; province: number; lord: number }
   | { type: "seizeFief"; province: number }
   /** Move officials between two royal provinces: they swap posts, or one takes the other's empty post (AssignOfficial). */
-  | { type: "swapOfficials"; a: number; b: number };
+  | { type: "swapOfficials"; a: number; b: number }
+  /** Order the next step of a work (index into WORKS) in a province, or take it off the queue or give up its site. */
+  | { type: "build"; province: number; work: number }
+  | { type: "cancelBuild"; province: number; work: number }
+  /** Move a queued work one place earlier (-1) or later (1) in its province's queue. */
+  | { type: "moveBuild"; province: number; work: number; by: number };
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -160,6 +166,9 @@ function startDay(world: World, news: News[]): void {
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
     runLedger(world, true);
+    judgeNeglect(world);
+    monthlyWorks(world, news);
+    aiWorks(world, news);
     aiTreasury(world, news);
     monthlyDiplomacy(world, news);
     aiDeclarations(world, news);
@@ -241,6 +250,18 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
+    case "build": {
+      const reason = orderWork(world, actingNation, order.province, order.work, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "cancelBuild": {
+      const reason = cancelWork(world, actingNation, order.province, order.work);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "moveBuild":
+      return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":
       return orderMarch(world, order, actingNation);
   }
