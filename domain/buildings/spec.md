@@ -472,7 +472,12 @@ Works across the province (§7.10)
 - BLD-163 The buildings context shall hold at most `sites.queue_max` (10) builds in a province's queue, and shall refuse a build that could not start there even once the running sites are done (an unlock, a need, a limit, no place). [F-39]
 - BLD-164 When a site finishes, the buildings context shall start the oldest queued builds of that province that now have a free site and the gold, paying for each only as it starts; a build that has to wait keeps its place, and one that can no longer be built there is taken off with a line in the turn report. [F-39]
 - BLD-165 The buildings context shall let the player cancel a queued build, with nothing to refund, and move it earlier or later in its province's queue. [F-39]
-- BLD-166 The province panel's Build tab shall show the sites running and, under them, the queue as one row per build with its months and a cancel and move button (touch targets of 40 px or more); the realm's Works overview shall list every province with a site or a queue and its count, so the player sees all works in one place. [F-39; Leroy, 17 Oct: group things logically, an overview for the important things, mobile first]
+
+#### How the player uses it: the build queue
+- BLD-166 Where: the player taps a province, then its Build tab, and taps a building on the build sheet; with a site free it starts, otherwise the row says "Queued" and the build joins the queue, and the sheet says why a build can't be queued at all. [F-39; X-19]
+- BLD-167 Grouping: the Build tab shows the sites running with their months left, and under them the queue, one row per build with its cost and months and buttons to move it up or down or cancel it. [F-39; X-19]
+- BLD-168 Overview: the realm's Works overview lists every province with a site or a queue, with its counts and the next build to finish; tapping one opens that province's Build tab. [F-39; X-19]
+- BLD-169 Phone: in landscape the queue rows are at least 48 points tall, the move and cancel buttons at least 44 × 44 with 8 points between them, and nothing needs hover. [F-39; X-19]
 
 ## 6. Commands
 

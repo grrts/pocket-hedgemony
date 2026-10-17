@@ -6,7 +6,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 |---|---|---:|---:|---:|---:|---:|
 | [Achievements](achievements/spec.md) | ACH | 75 | 9 | 160 | 11 | 3 |
 | [Audio](audio/spec.md) | AUD | 137 | 15 | 290 | 12 | 1 |
-| [Buildings](buildings/spec.md) | BLD | 161 | 19 | 338 | 21 | 0 |
+| [Buildings](buildings/spec.md) | BLD | 169 | 20 | 344 | 21 | 0 |
 | [Culture](culture/spec.md) | CULT | 93 | 7 | 191 | 17 | 0 |
 | [Diplomacy](diplomacy/spec.md) | DIPL | 196 | 23 | 519 | 34 | 0 |
 | [Events](events/spec.md) | EVT | 68 | 10 | 191 | 16 | 0 |
@@ -33,6 +33,6 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Troop movement](troop-movement/spec.md) | MOVE | 127 | 12 | 245 | 20 | 0 |
 | [Warfare](warfare/spec.md) | WAR | 212 | 17 | 650 | 21 | 0 |
 | [World map](world-map/spec.md) | MAP | 50 | 6 | 175 | 12 | 0 |
-| **All 29 contexts** | | 3162 | 353 | 7846 | 538 | 8 |
+| **All 29 contexts** | | 3170 | 354 | 7852 | 538 | 8 |
 
 Scenarios count each row of a Scenario Outline's examples.
