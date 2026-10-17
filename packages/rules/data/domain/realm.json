@@ -198,5 +198,12 @@
   "debt": {"interest_pct": 10, "loan_cap_years_income": 1, "loan_cap_years_income_with_T10": 3, "refusal_pct_per_oath": 10, "lord_loan_interest_pct": 0, "interest_added_at_once_years": 1, "lords_waver_once_per_months": 12},
   "officials_per_province": {"steps": {"G1": 1, "G9": 2, "G16": 3}, "plus_one": ["B2", "G11", "T14"]},
   "ai": {"food_preset_at_peace": "Feed the people", "food_preset_at_war": "War footing", "tax_at_peace": "normal", "tax_at_war": "heavy", "loan_when_gold_below": 0, "repay_when_gold_above_years_upkeep": 1, "gift_to_disloyal_lord_gold": 20},
-  "_provisional": ["grain_price_gold_per_food", "daughters_inherit_crown", "great_lord", "women_in_roles", "age_multipliers", "women_reform_multiplier", "starting", "starting_armies", "starting_lords", "food_year", "debt", "win.army_weights", "win.warship_men", "win.commander_men", "win.army_power_per_men", "ai"]
+  "stability": {
+    "$comment": "REALM-199 to REALM-202 (F-75): stability is read from four pillars, lords, subjects, officials and provinces, each Steady, Uneasy, Troubled or Crumbling; the realm stands at its weakest pillar.",
+    "steps": ["Steady", "Uneasy", "Troubled", "Crumbling"],
+    "loyal_share_for_steady": 0.5,
+    "empty_posts_share": { "uneasy_up_to": 0.25, "troubled_up_to": 0.5 },
+    "restless_share": { "troubled_from": 0.1, "crumbling_from": 0.25 }
+  },
+  "_provisional": ["grain_price_gold_per_food", "daughters_inherit_crown", "great_lord", "women_in_roles", "age_multipliers", "women_reform_multiplier", "starting", "starting_armies", "starting_lords", "food_year", "debt", "win.army_weights", "win.warship_men", "win.commander_men", "win.army_power_per_men", "ai", "stability.empty_posts_share", "stability.restless_share"]
 }

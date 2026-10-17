@@ -189,6 +189,21 @@ The lord card is the same in every society; only the label changes: nobles, merc
 
 Paying for a building in a lord's province raises his loyalty one step. A famine in his land turns him disloyal; riots or a heavy demand on his province make him waver. At New Year, each lord over the government's cap drops one loyalty step (see [Government](Government)).
 
+### Stability
+
+Stability tells you at a glance how well your realm holds together. It is not a hidden number: it reads four pillars, and your realm is only as steady as the weakest of them.
+
+| Pillar | What it reads | Steady | Uneasy | Troubled | Crumbling |
+|---|---|---|---|---|---|
+| Lords | Your landed lords by loyalty | Half or more Loyal, none Disloyal | Fewer than half Loyal | Any Disloyal | Any In revolt |
+| Subjects | Your subjects by loyalty (their 1444 standing for now) | Half or more Loyal, none Disloyal | Fewer than half Loyal | Any Disloyal | Any In revolt |
+| Officials | Royal provinces whose official's post stands empty | None | Up to a quarter | Up to a half | More |
+| Provinces | Provinces rioting or plotting | None | Any rioting | Any plotting, or a tenth | A quarter |
+
+Officials matter twice: an empty post shows in the officials pillar, and the *Ungoverned* grievance it brings (and *Grasping officials* over the cap) pushes provinces toward riots. A judge holds riots off one grievance longer. Lords' own provinces are run by their own officials and do not count.
+
+The stability plaque in the top bar shows the step (amber when Uneasy, red when Troubled, blinking when Crumbling). Tap it to open your country card's General tab, where each pillar has a row; tap a row to open the Lords, Diplomacy, Officials or Provinces tab and mend it.
+
 ### Army and navy at a glance
 
 | Stat | Gained by | Lost by |
@@ -272,6 +287,7 @@ A turn is one week. These steps run once a month, in the turn in which a new mon
 - **The lord card** for each named lord.
 - **The Food policy screen**, with realm defaults, per-castle overrides and the four presets.
 - **The treasury**: gold, debt and lenders.
+- **The top bar**: your realm, the date, gold and its change a month, stability, the war plaque while at war, and dispatches.
 
 Things you can do: set food policy, override a castle, apply a food preset; take a loan, repay or default; hire and dismiss officials; grant a fief, keep a local ruler, sell a title; seize a lord's land, put a disloyal lord on trial; give a lord gold, an office or a marriage, or grant his want; call a loyal lord's retinue; name an heir; burn your own fields.
 

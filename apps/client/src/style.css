@@ -208,7 +208,7 @@ button.icon-only {
   display: flex;
   align-items: center;
   gap: 6px;
-  min-height: calc(40px + env(safe-area-inset-top));
+  min-height: calc(44px + env(safe-area-inset-top));
   padding: env(safe-area-inset-top) max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
   background: var(--ui-planks) 0 0 / 64px repeat;
   border-bottom: 4px solid var(--outline);
@@ -230,7 +230,7 @@ button.icon-only {
 }
 
 .hud .realm b {
-  font: 600 25px/1 var(--body);
+  font: 600 22px/1 var(--body);
   color: var(--brass-light);
   text-shadow: 2px 2px 0 var(--outline);
   overflow: hidden;
@@ -984,11 +984,71 @@ button.small {
   }
 }
 
-.hud button.plaque {
-  min-height: 28px;
-  padding: 0 4px;
-  font: 600 20px var(--body);
+/* Every plaque in the top bar is the same height, type and padding (feedback 74). */
+.hud .plaque {
+  position: relative;
+  box-sizing: border-box;
+  height: 36px;
+  min-height: 0;
+  padding: 0 6px;
+  border-width: 4px;
+  font: 600 20px/1 var(--body);
   text-shadow: none;
+}
+
+/* The plaques draw 36 px high but take taps over the bar's full 44 px. */
+.hud button.plaque::after {
+  content: "";
+  position: absolute;
+  inset: -8px -3px;
+}
+
+.hud .stability.step-1 {
+  color: #7a4a00;
+}
+
+.hud .stability.step-2,
+.hud .stability.step-3 {
+  color: var(--paper-light);
+  background: var(--cloth);
+}
+
+.hud .stability.step-3 {
+  animation: blink 1s steps(2, jump-none) infinite;
+}
+
+/* The General tab's stability pillars: one row each, opening the tab that mends it. */
+.pillars {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0 10px;
+}
+
+.pillars .pillar {
+  display: grid;
+  grid-template-columns: 5.5em 1fr auto;
+  align-items: center;
+  gap: 8px;
+  justify-content: stretch;
+  text-align: left;
+  font-size: 18px;
+}
+
+.pillars .pillar span {
+  font-weight: 400;
+}
+
+.pillars .pillar em {
+  font-style: normal;
+}
+
+.pillars .pillar.step-1 em {
+  color: #7a4a00;
+}
+
+.pillars .pillar.step-2 em,
+.pillars .pillar.step-3 em {
+  color: var(--cloth);
 }
 
 /*
