@@ -7,6 +7,7 @@ import { buildingType, siteKind, townAtLeast, type TownSize } from "./domain/bui
 import { invention, startingKnowledgeFor } from "./domain/research/index.ts";
 import { classFood, FOOD_CLASSES, jobSlots, tileCount, tilesOf, tileWares, USES, type FoodClass, type UseName } from "./land.ts";
 import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
+import { yearlyFood } from "./food.ts";
 
 /**
  * Works (milestone 4, first slice of the buildings context): the crown builds
@@ -436,7 +437,8 @@ export function seedWorks(world: World): void {
     };
     // Food first: a farm, a ranch and a fishery where the land is worked, as the province's wealth allows (feedback 80).
     const target = world.provincePopulation[p]! * world.rules.defines.works.seedFoodShare;
-    const food = () => FOOD_CLASSES.reduce((a, c) => a + worksFood(world, p, c), 0);
+    // A normal year's food, as the tundra grows no crops (feedback 82).
+    const food = () => yearlyFood(world, p);
     put("farm", 1, wealth >= 3 && placeFits(world, p, "farm"));
     put("ranch", 1, wealth >= 3 && placeFits(world, p, "ranch"));
     put("fishery", 1, wealth >= 2 && placeFits(world, p, "fishery"));
@@ -490,7 +492,7 @@ export function aiWorks(world: World, news: News[]): void {
       const work = W[name];
       if (name === "castle" && !borders(world, p, n)) continue;
       // Farms where the province does not feed itself.
-      if ((name === "farm" || name === "hunting lodge") && FOOD_CLASSES.reduce((a, c) => a + worksFood(world, p, c), 0) >= world.provincePopulation[p]! * world.rules.defines.works.seedFoodShare) continue;
+      if ((name === "farm" || name === "hunting lodge") && yearlyFood(world, p) >= world.provincePopulation[p]! * world.rules.defines.works.seedFoodShare) continue;
       if (whyNot(world, n, p, work, pend)) continue;
       if (world.nationTreasury[n]! - workCost(world, p, work, nextStep(world, p, work, pend)).gold < reserve) continue;
       orderWork(world, n, p, work, news, pend);

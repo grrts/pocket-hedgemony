@@ -1156,12 +1156,71 @@ export function harvestMonth(latitude: number): number {
  * One weather roll per region per harvest (REALM-167): 1 in 6 bad (every
  * harvest there one step worse), 1 in 6 good (one step better), else normal.
  */
-export function rollRegionWeather(rng: Rng): "bad" | "normal" | "good" {
-  const r = rng.next();
-  const bad = 1 / config.food_year.weather.bad_one_in;
-  if (r < bad) return "bad";
-  if (r < bad + 1 / config.food_year.weather.good_one_in) return "good";
+export function rollRegionWeather(rng: Rng): Weather {
+  return weatherFor(rng.next(), "temperate");
+}
+
+export type Weather = "bad" | "normal" | "good";
+/** How a province's harvest weather behaves (feedback 82): drylands fear drought, monsoon lands floods; tundra grows no crops. */
+export type HarvestClimate = "temperate" | "dry" | "monsoon" | "tundra";
+
+function climateWeather(climate: HarvestClimate): { bad_one_in: number; good_one_in: number; bad_name: string } {
+  return climate === "dry" || climate === "monsoon" ? config.food_year.climate_weather[climate] : config.food_year.weather;
+}
+
+/**
+ * A province's weather from its region's roll r (0..1): the region rolls once,
+ * so neighbours suffer together, and each climate reads the roll with its own
+ * odds: bad at the low end, good at the high end (REALM-050, feedback 82).
+ */
+export function weatherFor(r: number, climate: HarvestClimate): Weather {
+  const w = climateWeather(climate);
+  if (r < 1 / w.bad_one_in) return "bad";
+  if (r >= 1 - 1 / w.good_one_in) return "good";
   return "normal";
+}
+
+/** What bad weather is called in a climate: drought, floods or bad weather. */
+export function badWeatherName(climate: HarvestClimate): string {
+  return climateWeather(climate).bad_name;
+}
+
+/** A province's own harvest before weather and war (feedback 82): mostly normal, sometimes poor, good or bumper. */
+export function rollBaseHarvest(rng: Rng): Harvest {
+  let r = rng.next();
+  const odds = config.food_year.base_harvest as Record<string, number>;
+  for (const h of Object.keys(odds)) {
+    r -= odds[h]!;
+    if (r < 0) return h as Harvest;
+  }
+  return "normal";
+}
+
+/** A place's harvest climate from its ground, longitude and latitude (feedback 82); rice lands are monsoon lands. */
+export function harvestClimate(terrain: string, lon: number, lat: number, monsoonRains: boolean): HarvestClimate {
+  const fy = config.food_year;
+  if (fy.no_harvest_terrains.includes(terrain)) return "tundra";
+  if (isRiceLand(terrain, lon, lat)) return "monsoon";
+  if (fy.dry_terrains.includes(terrain)) return "dry";
+  return monsoonRains ? "monsoon" : "temperate";
+}
+
+/**
+ * The months a place brings in a harvest (REALM-208): none in the tundra,
+ * March and September on rice land once its realm knows wet-rice terracing,
+ * else its hemisphere's harvest month.
+ */
+export function harvestMonthsAt(terrain: string, lon: number, lat: number, known: ReadonlySet<string>): number[] {
+  const fy = config.food_year;
+  if (fy.no_harvest_terrains.includes(terrain)) return [];
+  if (isRiceLand(terrain, lon, lat) && harvestsPerYear({ irrigatedRice: true, canalsWrecked: false }, known) > 1) return [fy.harvest_month.south, fy.harvest_month.north];
+  return [harvestMonth(lat)];
+}
+
+/** Rice lands: the wet lowlands of South, Southeast and South China, which can harvest twice (REALM-057). */
+export function isRiceLand(terrain: string, lon: number, lat: number): boolean {
+  const r = config.food_year.rice_lands;
+  return lon >= r.lon[0]! && lon <= r.lon[1]! && lat >= r.lat[0]! && lat <= r.lat[1]! && !r.not_on.includes(terrain);
 }
 
 /** Food moving between castles loses 2 % for every province it travels (REALM-167). */

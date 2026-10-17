@@ -129,6 +129,8 @@ A **forced march** doubles sickness, makes levies desert 2 % a week, and gives â
 
 Food is counted in rations (food for one person for a month). A commander cuts what his army eats by 5 % per point of Logistics.
 
+**In the game today** (feedback 83): men eat 1 ration a month at home and 2 on campaign (at war or abroad), and a horse eats 3. Every day an army eats from its wagons, which hold two months of campaign food, and refills them from the store of the province where it stands: in friendly land the locals keep two months for themselves, in enemy land the foragers take what they find on that ground. The food leaves the province's store. Castle stores, plunder of the standing crop and the Requisitioned and Hungry marks below are still to come. See [Your-Realm](Your-Realm) for what the province and army cards show.
+
 - **At home** an army takes only what it needs (each week's meals plus what its reserve is missing), from its own castle store first, down to the castle's siege reserve, then from the local store.
 - **Anywhere else** (enemy, neutral or allied land, or at sea) it eats from its **food reserve**, which shrinks every week.
 - **Plunder**: abroad with an empty reserve, an army takes from the local store at the ground's foraging rating (rich 100 %, fair 60 %, poor 30 %, almost none 10 %), then from the standing crop, one tile a week turning burned and giving one season of that tile's food at once. Plunder never refills the reserve.

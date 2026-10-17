@@ -422,7 +422,7 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "people", name: "People", note: "how many live there" },
   { id: "wealth", name: "Wealth", note: "trade, crafts and land" },
   { id: "walls", name: "Walls", note: "castles and forts" },
-  { id: "food", name: "Food", note: "men the land can feed" },
+  { id: "food", name: "Food", note: "men on campaign the store can feed" },
   { id: "lords", name: "Lords", note: "who holds your land" },
 ];
 const ROYAL_RGB = hexToRgb("#e9c35a");
@@ -477,7 +477,7 @@ function lensColor(i: number): number[] {
     case "walls":
       return WALL_RGB[wallsAt(i) ?? "none"];
     case "food":
-      return ramp(FOOD_RAMP, Math.log10(Math.max(1, forageLimit(march, marchGraph, i))) / 5);
+      return ramp(FOOD_RAMP, Math.log10(Math.max(1, landFeeds(i))) / 5);
     case "lords": {
       // The player's realm: royal land in gold, each lord's land in his own colour; other realms faded.
       if (!snapshot || o !== snapshot.playerNation) return o >= 0 ? nationRgb[o]!.map((v) => Math.round(v * 0.35 + 150)) : unownedRgb;
@@ -1064,23 +1064,33 @@ function renderArmyList(): void {
   });
 }
 
-function armyStats(k: number) {
-  const s = snapshot!;
-  const c = s.armies.commander[k]!;
-  return { men: s.armies.men[k]!, horse: s.armies.horse[k]!, logistics: c >= 0 ? cmdOf(c).logistics : 0 };
-}
-
 const duration = (days: number) => (days < 14 ? `${days} day${days === 1 ? "" : "s"}` : `${Math.round(days / 7)} weeks`);
 const hoursText = (hours: number) => (hours < 24 ? `${Math.ceil(hours)} hours` : duration(Math.ceil(hours / 24)));
 
-/** Food in the wagons, and whether the land here can feed the army. */
+/**
+ * Men on campaign a province's store could feed for a month, by what foragers
+ * find on its ground (feedback 83); before a game starts, the map's guess.
+ */
+function landFeeds(p: number): number {
+  const s = snapshot;
+  const g = marchGraph.ground[p];
+  if (!g) return 0;
+  if (!s) return forageLimit(march, marchGraph, p);
+  return (s.provinceFoodMonths[p]! * s.provincePeople[p]! * 1000 * march.foraging[g]) / (march.rationsPerSoldier * 2);
+}
+
+/** Food in the wagons, whether the army eats as on campaign, and what the store where it stands can give it (feedback 83). */
 function supplyLine(k: number): string {
   const s = snapshot!;
-  const st = armyStats(k);
-  const need = (st.men * march.rationsPerSoldier + st.horse * march.rationsPerHorse) * Math.max(0, 1 - st.logistics * march.logisticsRationCut);
+  const need = s.armies.rations[k]!;
   const months = need > 0 ? s.armies.food[k]! / need : 0;
-  const limit = forageLimit(march, marchGraph, s.armies.location[k]!);
-  return `Food for ${months.toFixed(1)} months · the land here feeds ${fmt(limit)} men`;
+  const refill = s.armies.refill[k]!;
+  const here = s.armies.location[k]!;
+  const enemy = owners[here]! >= 0 && s.wars.some((w) => (w.attackers.includes(s.playerNation) && w.defenders.includes(owners[here]!)) || (w.defenders.includes(s.playerNation) && w.attackers.includes(owners[here]!)));
+  const land = refill <= 0
+    ? enemy ? "foragers find nothing here" : `the locals here have nothing to spare above their ${march.homeReserveMonths} months`
+    : `${enemy ? "foragers can take" : "the locals can give"} ${fmt(refill)} rations a month here${refill < need ? ", less than it eats" : ""}`;
+  return `Food for ${months.toFixed(1)} months${s.armies.campaigning[k] ? " · on campaign, men eat double" : ""} · ${land}`;
 }
 
 function marchLine(k: number): string {
@@ -1676,13 +1686,40 @@ function provinceTabs(): string {
 function foodFacts(pi: number): string {
   const s = snapshot!;
   const months = s.provinceFoodMonths[pi]!;
-  const h = s.provinceHarvest[pi]!;
   const starved = Math.round(s.provinceStarved[pi]! * 1000);
   const warn = months < 1 ? " · hungry" : months < 3 ? " · running low" : "";
+  // Armies standing here refill from this store (feedback 83).
+  let eaten = 0;
+  let men = 0;
+  s.armies.location.forEach((loc, k) => {
+    if (loc !== pi) return;
+    eaten += s.armies.rations[k]!;
+    men += s.armies.men[k]!;
+  });
+  const people = s.provincePeople[pi]! * 1000;
   return `<dt>Food</dt><dd>${months.toFixed(1)} months stored${warn}</dd>
-      <dt>Harvest</dt><dd>${h >= 0 ? s.harvests[h]! : "not in yet"}</dd>
+      <dt>Harvest</dt><dd>${harvestText(pi)}</dd>
+      ${men > 0 && people > 0 ? `<dt>Armies</dt><dd>${fmt(men)} men here eat ${(eaten / people).toFixed(1)} months of this store a month</dd>` : ""}
       ${castleFoodLine(s, pi, (p) => provinces[p]!.name)}
       ${starved > 0 ? `<dt>Starved</dt><dd>${fmt(starved)} this year</dd>` : ""}`;
+}
+
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/**
+ * A province's last harvest and why (feedback 82): the roll, the weather its
+ * region had as its climate reads it, and when it harvests, twice a year on
+ * rice land and never in the tundra.
+ */
+function harvestText(pi: number): string {
+  const s = snapshot!;
+  const months = s.provinceHarvestMonths[pi]!;
+  if (!months.length) return "none · the tundra grows no crops";
+  const h = s.provinceHarvest[pi]!;
+  const w = s.provinceWeather[pi]!;
+  const why = w < 0 ? ` · ${s.badWeather[s.provinceClimate[pi]!]!} in the region` : w > 0 ? " · good weather in the region" : "";
+  const when = months.map((m) => MONTH_NAMES[m - 1]!).join(" and ");
+  return `${h >= 0 ? `${s.harvests[h]!}${why}` : "not in yet"} · <small>${months.length > 1 ? `two harvests a year, in ${when}` : `comes in each ${when}`}</small>`;
 }
 
 /** The snapshot's lords as the panels show them. */
@@ -1861,6 +1898,11 @@ function provincesTab(r: number): string {
   const low = list.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length;
   const restless = list.filter((p) => s.provinceMood[p]! >= 2).length;
   const grumbling = list.filter((p) => s.provinceMood[p]! === 1).length;
+  // The last harvests at a glance (feedback 82).
+  const harvested = list.filter((p) => s.provinceHarvest[p]! >= 0);
+  const band = (lo: number, hi: number) => harvested.filter((p) => s.provinceHarvest[p]! >= lo && s.provinceHarvest[p]! <= hi).length;
+  const [bad, fair, rich] = [band(0, 1), band(2, 2), band(3, 4)];
+  const harvests = harvested.length ? `<p>Last harvests: ${rich ? `${rich} good or bumper, ` : ""}${fair} normal${bad ? `, <b>${bad} poor or failed</b>` : ""}.</p>` : "";
   const color = nations[r]!.color;
   const rows = list
     .map((p) => {
@@ -1873,7 +1915,7 @@ function provincesTab(r: number): string {
         <button class="place" data-open-province="${p}" title="Open ${esc(provinces[p]!.name)}">
           <img class="thumb" src="${mapImage ? provinceThumb(mapImage, provinces.length, p, color) : ""}" alt="" width="48" height="48">
           <span class="place-name"><b>${esc(provinces[p]!.name)}</b><small>${MOOD_LABEL[s.provinceMood[p]!]} · ${gov}</small></span>
-          <span class="place-stats"><small>${fmt(Math.round(s.provincePeople[p]! * 1000))} people</small><small>${months.toFixed(1)} months food</small><small>${gold2(s.provinceTaxGold[p]!)} gold</small></span>
+          <span class="place-stats"><small>${fmt(Math.round(s.provincePeople[p]! * 1000))} people</small><small>${months.toFixed(1)} months food${s.provinceHarvest[p]! >= 0 && s.provinceHarvest[p]! <= 1 ? ` · ${s.harvests[s.provinceHarvest[p]!]!} harvest` : ""}</small><small>${gold2(s.provinceTaxGold[p]!)} gold</small></span>
         </button>
         <button class="paper small map-go" data-map-province="${p}" title="Show ${esc(provinces[p]!.name)} on the map" aria-label="Show on the map">${icon("scroll", 1)}Map</button>
       </div>`;
@@ -1881,6 +1923,7 @@ function provincesTab(r: number): string {
     .join("");
   const sortButton = (key: typeof provinceSort, label: string) => `<button class="tab${provinceSort === key ? " on" : ""}" data-province-sort="${key}">${label}</button>`;
   return `<p><b>${fmt(Math.round(people * 1000))}</b> people in ${list.length} provinces paying <b>${gold2(tax)}</b> gold a month. ${hungry ? `<b>${hungry} hungry</b>, ` : ""}${low ? `${low} low on food, ` : ""}${restless ? `<b>${restless} rioting or plotting</b>, ` : ""}${grumbling ? `${grumbling} grumbling.` : hungry || low || restless ? "the rest content." : "All fed and calm."}</p>
+    ${harvests}
     <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}${sortButton("tax", "Most tax")}</nav>
     <div class="province-list">${rows}</div>`;
 }
@@ -3011,6 +3054,13 @@ Object.assign(globalThis, {
       return a.owner[k] === snapshot!.playerNation && a.commander[k]! >= 0 && a.route[k]!.at(-1) !== to && a.location[k] !== to;
     });
     for (const army of idle.map((k) => snapshot!.armies.id[k]!)) await act({ type: "move", army, to });
+  },
+  /** Id of the province the player's first army with a commander stands in. */
+  __phArmyProvince: () => {
+    if (!snapshot) return null;
+    const mine = [...snapshot.armies.id.keys()].filter((j) => snapshot!.armies.owner[j] === snapshot!.playerNation);
+    const k = mine.find((j) => snapshot!.armies.commander[j]! >= 0) ?? mine[0];
+    return k === undefined ? null : provinces[snapshot.armies.location[k]!]!.id;
   },
   /** Opens a province's overview by id. */
   __phSelect: (id: string) => {

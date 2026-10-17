@@ -4,8 +4,8 @@ import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { officialName, personName } from "./names.ts";
 import { OFFICIALS, officialBonus } from "./officials.ts";
-import { monthlyRations } from "./march.ts";
-import { halt, isMarching } from "./turn.ts";
+import { monthlyRations, wagonRations } from "./march.ts";
+import { campaigning, halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
 import { atWar, controller, wallsOf, type News } from "./war.ts";
 import { armUnlocked, knownSet } from "./research.ts";
@@ -301,7 +301,7 @@ function withOverCap(world: World, n: number, pay: number, men: number): number 
 export function armyRations(world: World, slot: number): number {
   const a = world.armies;
   const c = a.commander[slot]!;
-  return monthlyRations(world.rules.defines.march, { men: a.men[slot]!, horse: a.horse[slot]!, logistics: c >= 0 ? world.commanderLogistics[c]! : 0 });
+  return monthlyRations(world.rules.defines.march, { men: a.men[slot]!, horse: a.horse[slot]!, logistics: c >= 0 ? world.commanderLogistics[c]! : 0, campaigning: campaigning(world, slot) });
 }
 
 // ---------------------------------------------------------------- the pools
@@ -408,7 +408,7 @@ function addToGarrison(world: World, n: number, p: number, men: number): void {
   a.drill[troop] = (a.drill[troop]! * before) / (before + men);
   a.monthsOut[troop] = Math.round((a.monthsOut[troop]! * before) / (before + men));
   setByArm(world, troop, by);
-  a.food[troop] = a.food[troop]! + monthlyRations(world.rules.defines.march, { men, horse: 0, logistics: 0 }) * world.rules.defines.march.monthsCarried;
+  a.food[troop] = a.food[troop]! + wagonRations(world.rules.defines.march, { men, horse: 0, logistics: 0 });
 }
 
 /** An army's commander takes in the province's garrison troops of its own kind where it stands. */

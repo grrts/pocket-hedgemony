@@ -1,5 +1,6 @@
 import type { Ground, MarchDefines, Terrain } from "@ph/rules";
 import { snowCover } from "./climate.ts";
+import { realmConfig } from "./domain/realm/index.ts";
 import { GROUNDS, groundOfCell, heightOfCell, riverOfCell, WATER, type TileGrid } from "./tiles.ts";
 
 /**
@@ -22,15 +23,35 @@ export interface MarchingArmy {
   horse: number;
   /** Commander's logistics points, 0 without a commander. */
   logistics: number;
+  /** On campaign (at war, or abroad) men eat double (REALM-054); left out, the army eats as it would at home. */
+  campaigning?: boolean;
 }
 
 export function groundOf(terrain: Terrain): Ground | null {
   return terrain === "sea" || terrain === "ocean" ? null : terrain;
 }
 
-/** Rations an army eats in a month. */
+/**
+ * Rations an army eats in a month. A ration is one man's food for a month, so
+ * a thousand rations are one unit of a province's store (feedback 83).
+ */
 export function monthlyRations(d: MarchDefines, a: MarchingArmy): number {
-  return (a.men * d.rationsPerSoldier + a.horse * d.rationsPerHorse) * Math.max(0, 1 - a.logistics * d.logisticsRationCut);
+  const men = a.men * d.rationsPerSoldier * (a.campaigning ? realmConfig.food.campaign_eat : 1);
+  return (men + a.horse * d.rationsPerHorse) * Math.max(0, 1 - a.logistics * d.logisticsRationCut);
+}
+
+/** Rations an army's wagons hold: its months carried of eating on campaign. */
+export function wagonRations(d: MarchDefines, a: MarchingArmy): number {
+  return monthlyRations(d, { ...a, campaigning: true }) * d.monthsCarried;
+}
+
+/**
+ * Rations an army can take from a province's store in a month (feedback 83):
+ * what its foragers find on that ground of the food above the reserve. At
+ * home the locals keep a reserve for themselves; abroad nothing is kept back.
+ */
+export function refillRations(d: MarchDefines, ground: Ground | null, storeRations: number, reserveRations: number): number {
+  return ground ? Math.max(0, storeRations - reserveRations) * d.foraging[ground] : 0;
 }
 
 /** Rations the province can spare an army in a month: its store times how much of it foragers find. */
