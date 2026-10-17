@@ -153,5 +153,13 @@
     "startingStoreMonths": 4,
     "reliefAboveMonths": 3,
     "lordGiftGold": 5
+  },
+  "castleFood": {
+    "$comment": "Feedback 84 and 85: castles collect a share of each province's surplus at the harvest, keep a siege reserve and spread the rest by rings; stores are capped (a province's own at localStoreCapMonths, a castle's at castleStoreMonths, granaryStoreMonths with a granary) and the surplus rule decides what happens to the rest. The realm data gives the grain price (0.5 gold a food); grainGoldScale turns it into the treasury's gold for the engine's food (a thousand people fed for a month), so a month's food sells for about what its eaters pay in tax a month. All provisional.",
+    "localStoreCapMonths": 18,
+    "castleStoreMonths": 6,
+    "granaryStoreMonths": 18,
+    "keepMonths": 12,
+    "grainGoldScale": 0.008
   }
 }

@@ -5,6 +5,7 @@ import { harvestMultiplier, type HarvestRoll } from "./domain/province/land.ts";
 import { harvestMonth, rollRegionWeather, rotSeason } from "./domain/realm/index.ts";
 import { officialBonus } from "./officials.ts";
 import { worksFood } from "./works.ts";
+import { shareFood } from "./castleFood.ts";
 
 /**
  * Food (milestone 3): each province keeps a local store, counted in months of
@@ -111,6 +112,9 @@ export function monthlyFood(world: World, news: News[]): void {
     store[p] = store[p]! + other - world.provincePopulation[p]!;
     if (season && store[p]! > 0) store[p] = rotSeason(store[p]!, false);
   }
+
+  // Castles collect, hand out and feed the hungry first; stores over their caps go by the surplus rule (castleFood.ts).
+  shareFood(world);
 
   // Relief: a hungry province draws on neighbours of the same realm with food to spare.
   const relief = world.rules.defines.living.reliefAboveMonths;
