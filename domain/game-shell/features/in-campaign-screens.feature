@@ -65,3 +65,38 @@ Feature: Other in-campaign screens
     When the turn ends
     Then the offer shows in the turn report and in Waiting for you
     And the realm's Diplomacy tab is marked until the offer is answered or put off
+
+  @SHELL-147 @feedback-72
+  Scenario: The Dispatches log keeps past weeks
+    Given the player's realm fought a battle last week
+    When the player ends the turn and the week plays out
+    Then the Dispatches do not open by themselves
+    And the Dispatches button counts the new dispatches about the player's realm
+    When the player taps the Dispatches button
+    Then this week's dispatches are listed first under their day
+    And last week's battle is still listed under its day
+
+  @SHELL-147 @feedback-72
+  Scenario Outline: A battle or siege begins
+    Given the turn is playing
+    When <what> begins in a province
+    Then an alert over the map says so with Go there
+    When the player taps Go there
+    Then the map is centred on that province and the province is selected
+
+    Examples:
+      | what                                         |
+      | a battle between the player's army and an enemy |
+      | an enemy's siege of the player's castle         |
+      | the player's siege of an enemy castle           |
+
+  @SHELL-148 @feedback-73
+  Scenario: The week waits at a battle
+    Given the turn is playing
+    When a battle between the player's army and an enemy begins
+    Then the week pauses and an alert over the map says so with Watch
+    When the player taps Watch
+    Then the map is centred on the battle and the week plays on more slowly
+    And a strip over the map shows both realms' men left and the round of the battle
+    When the battle ends
+    Then the strip says who won

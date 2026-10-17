@@ -86,8 +86,16 @@ const marchGraph: MarchMap = (() => {
 let snapshot: Snapshot | null = null;
 let owners: Int16Array = Int16Array.from(provinces, (p) => (p.owner ? nationIndex.get(p.owner)! : -1));
 let occupiers: Int16Array = new Int16Array(provinces.length).fill(-1);
-/** Dispatches: what happened last turn (or from the last order) that concerns the player. */
-let dispatches: News[] = [];
+/** The dispatches log: what concerned the player, newest first, kept from turn to turn (feedback 72). */
+let dispatches: { date: GameDate; news: News }[] = [];
+/** How many dispatches the log keeps; the oldest drop off. */
+const DISPATCHES_KEPT = 400;
+/** Dispatches about the player's own realm since the log was last opened. */
+let unread = 0;
+/** The log shows only what concerns the player's realm. */
+let dispatchesMine = false;
+/** Calls to arms and peace offers the player was already alerted to. */
+const alerted = new Set<string>();
 /** The dispatches are open in the panel. */
 let newsView = false;
 let selectedProvince = -1;
@@ -102,6 +110,8 @@ let drawnAt = new Map<number, [number, number]>();
 /** End turn plays the week a day at a time (TIME-076), and a 4-hour step at a time while the player fights. */
 const DAY_MS = 300;
 const BATTLE_STEP_MS = 500;
+/** How long each 4-hour step shows while the player watches a battle, so its rounds can be followed (feedback 73). */
+const WATCH_STEP_MS = 1200;
 let playing = false;
 let paused = false;
 /** Resumes a paused playback. */
@@ -147,6 +157,8 @@ app.innerHTML = `
   <div class="lens-menu army-list framed" id="army-list" hidden></div>
   <button class="wax open-panel" id="reopen" title="Open the overview" hidden></button>
   <section class="panel framed" id="panel" hidden></section>
+  <div class="alerts" id="alerts" aria-live="polite"></div>
+  <div class="battle-watch framed" id="battle-watch" hidden></div>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
   <button class="wax fab end-turn" id="fab" title="End turn" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
@@ -155,6 +167,10 @@ const fab = document.querySelector<HTMLButtonElement>("#fab")!;
 const reopen = document.querySelector<HTMLButtonElement>("#reopen")!;
 const armyList = document.querySelector<HTMLElement>("#army-list")!;
 const armyButton = document.querySelector<HTMLButtonElement>("#armies")!;
+const alerts = document.querySelector<HTMLElement>("#alerts")!;
+const battleWatch = document.querySelector<HTMLElement>("#battle-watch")!;
+/** The battle the player is watching (its province), and how it ended once it has. */
+let watching: { province: number; result?: string } | null = null;
 /** The commander list is put away. */
 let armyListClosed = true;
 armyButton.addEventListener("click", () => {
@@ -193,6 +209,8 @@ document.addEventListener("click", (e) => {
   newsView = true;
   realmView = -1;
   panelCollapsed = false;
+  unread = 0;
+  renderHud();
   renderPanel();
 });
 // An official's screen opens from their card or the Officials tab (feedback 40).
@@ -902,7 +920,7 @@ function renderHud(): void {
     <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
     <span class="plaque" title="Troops against your troop cap (men under arms and gathering)">${icon("swords", 1)}${fmt(s.nationCapUsed[me]! / 1000)}k<small>/${fmt(s.nationTroopCap[me]! / 1000)}k</small></span>
     ${myWars().length ? `<button class="plaque at-war" data-realm="${me}" data-realm-open="diplomacy" title="Your wars">${icon("swords", 1)}At war</button>` : ""}
-    <button class="plaque dispatches${s.calls.length || s.peaceOffers.length ? " urgent" : ""}" data-news title="Dispatches: what happened this turn">${icon("scroll", 1)}${dispatches.length + s.calls.length + s.peaceOffers.length}</button>`;
+    <button class="plaque dispatches${s.calls.length || s.peaceOffers.length ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${unread + s.calls.length + s.peaceOffers.length || ""}</button>`;
 }
 
 /** Wars the player fights, with the player's side first. */
@@ -929,16 +947,9 @@ async function act(order: Order): Promise<void> {
   takeSnapshot(await engine.send({ type: "act", order }), 0);
   acting = false;
   applySnapshot();
-  if (snapshot.rejectedOrders.length || snapshot.news.length) {
-    dispatches = [
-      ...snapshot.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [snapshot!.playerNation] })),
-      ...snapshot.news,
-      ...dispatches,
-    ];
-    newsView = true;
-    realmView = -1;
-    panelCollapsed = false;
-  }
+  // What came of it goes in the log; a refusal is also said over the map, where the order was given.
+  logNews(snapshot);
+  for (const r of snapshot.rejectedOrders) alertPlayer(`Not done: ${r.reason}.`, "scroll");
   restyleProvinces();
   renderHud();
   renderPanel();
@@ -962,18 +973,151 @@ function applySnapshot(): void {
   nationLabels = computeNationLabels();
 }
 
-/** The dispatches: news of the turn, and calls to arms to answer. */
+const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
+  war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
+};
+
+/**
+ * Takes a snapshot's news into the dispatches log, newest first, without
+ * opening it (feedback 72). A battle or siege of the player's that has just
+ * begun, and a new call to arms or peace offer, are said over the map instead.
+ */
+function logNews(s: Snapshot): void {
+  const me = s.playerNation;
+  const news = [...s.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [me] })), ...s.news];
+  dispatches = [...news.reverse().map((n) => ({ date: { ...s.date }, news: n })), ...dispatches].slice(0, DISPATCHES_KEPT);
+  unread += news.filter((x) => x.nations.includes(me) && x.kind !== "raised").length;
+  for (const x of news) {
+    if (!x.begins || x.province === undefined || !x.nations.includes(me)) continue;
+    if (x.kind !== "battle") {
+      alertPlayer(x.text, "castle", { province: x.province });
+      continue;
+    }
+    // The week waits at a battle of the player's until they go and watch it, or play on (feedback 73).
+    alertPlayer(`A battle has begun at ${provinces[x.province]!.name}. The week waits.`, "swords", { province: x.province, battle: true });
+    if (playing && !paused && watching?.province !== x.province) {
+      paused = true;
+      renderActions();
+    }
+  }
+  // A battle's alert goes once the battle is over.
+  alerts.querySelectorAll<HTMLElement>("[data-battle]").forEach((el) => {
+    if (!s.battles.some((b) => b.province === Number(el.dataset.battle))) el.remove();
+  });
+  // The battle being watched has ended: its last dispatch says how.
+  if (watching && !watching.result && !s.battles.some((b) => b.province === watching!.province)) {
+    watching.result = news.find((x) => x.kind === "battle" && !x.begins && x.province === watching!.province)?.text ?? "The battle is over.";
+  }
+  renderBattleWatch();
+  for (const c of s.calls) {
+    if (alerted.has(`call ${c.id}`)) continue;
+    alerted.add(`call ${c.id}`);
+    alertPlayer(`${nations[c.caller]!.name} calls you to arms against ${nations[c.against]!.name}.`, "swords", { answer: true });
+  }
+  for (const o of s.peaceOffers) {
+    if (alerted.has(`peace ${o.id}`)) continue;
+    alerted.add(`peace ${o.id}`);
+    alertPlayer(`${nations[o.from]!.name} offers peace.`, "crown", { answer: true });
+  }
+}
+
+/** Alerts shown at once, at most this many; the oldest gives way. */
+const ALERTS_SHOWN = 3;
+/** How long an alert stays, in ms; everything it says is also in the log. */
+const ALERT_MS = 12000;
+
+/** A short alert over the map, with Go there (to a province) or Answer (opens the dispatches). */
+function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true } = {}): void {
+  if ([...alerts.children].some((el) => el.querySelector("span")?.textContent === text)) return;
+  const el = document.createElement("div");
+  el.className = "alert framed";
+  el.setAttribute("role", "status");
+  if (to.battle) el.dataset.battle = String(to.province);
+  el.innerHTML = `${icon(what, 2)}<span>${esc(text)}</span>${
+    to.battle ? `<button class="wax go-there">${icon("swords", 1)}Watch</button>` : to.province !== undefined ? `<button class="wax go-there">${icon("map", 1)}Go there</button>` : to.answer ? `<button class="wax go-there">Answer</button>` : ""
+  }<button class="paper dismiss" aria-label="Dismiss">${icon("close", 1)}</button>`;
+  const remove = () => el.remove();
+  el.querySelector(".dismiss")!.addEventListener("click", remove);
+  el.querySelector(".go-there")?.addEventListener("click", () => {
+    remove();
+    if (to.battle && to.province !== undefined) watchBattle(to.province);
+    else if (to.province !== undefined) goThere(to.province);
+    else {
+      newsView = true;
+      realmView = -1;
+      officialView = -1;
+      panelCollapsed = false;
+      unread = 0;
+      renderHud();
+      renderPanel();
+    }
+  });
+  alerts.append(el);
+  // The oldest alert gives way, but never one for a battle the week waits on.
+  while (alerts.children.length > ALERTS_SHOWN) ([...alerts.children].find((x) => !(x as HTMLElement).dataset.battle) ?? alerts.firstElementChild!).remove();
+  // A battle's alert stays while the week waits on it.
+  if (!to.battle) setTimeout(remove, ALERT_MS);
+}
+
+/** Goes to a battle of the player's, shows its progress over the map and plays the week on at a pace to follow it. */
+function watchBattle(province: number): void {
+  watching = { province };
+  goThere(province, ARMY_ZOOM + 1);
+  renderBattleWatch();
+  if (playing && paused) {
+    paused = false;
+    resume?.();
+    renderActions();
+  }
+}
+
+/** The battle being watched: both hosts, men left of men at the start, and the round; then how it ended. */
+function renderBattleWatch(): void {
+  const b = watching && snapshot?.battles.find((x) => x.province === watching!.province);
+  battleWatch.hidden = !watching;
+  if (!watching) return;
+  const side = (n: number, men: number, start: number) => `<div class="side">${pennant(nations[n]!.color)}<b>${esc(nations[n]!.name)}</b>
+    <span class="bar"><i style="width:${start ? Math.max(0, Math.min(100, (men / start) * 100)) : 0}%;background:${nations[n]!.color}"></i></span><span class="men">${fmt(men)}</span></div>`;
+  battleWatch.innerHTML = `
+    <header><b>${icon("swords", 1)} Battle of ${esc(provinces[watching.province]!.name)}</b>${b ? `<small>Round ${Math.min(b.round + 1, b.rounds)} of ${b.rounds}</small>` : ""}
+      <button class="paper dismiss" aria-label="Stop watching">${icon("close", 1)}</button></header>
+    ${b ? side(b.attacker, b.attMen, b.attStart) + side(b.defender, b.defMen, b.defStart) : `<p>${esc(watching.result ?? "The battle is over.")}</p>`}`;
+  battleWatch.querySelector(".dismiss")!.addEventListener("click", () => {
+    watching = null;
+    renderBattleWatch();
+  });
+}
+
+/** Centres the map on a province and selects it; on a phone its card waits folded so the map stays in view. */
+function goThere(i: number, zoom = 4): void {
+  officialView = -1;
+  realmView = -1;
+  armyView = -1;
+  newsView = false;
+  selectedProvince = i;
+  provinceTab = "overview";
+  panelCollapsed = !matchMedia("(min-width: 900px) and (min-height: 600px)").matches;
+  view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, zoom));
+  restyleProvinces();
+  renderPanel();
+}
+
+/** The dispatches: calls to arms and offers to answer, then the log of everything that happened, newest first. */
 function renderNews(): void {
   const s = snapshot!;
   const me = s.playerNation;
-  const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
-    war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  };
   const mine = (x: News) => x.nations.includes(me);
-  const items = [...dispatches.filter(mine), ...dispatches.filter((x) => !mine(x))];
+  const items = dispatchesMine ? dispatches.filter((x) => mine(x.news)) : dispatches;
+  // One heading per day, newest day first.
+  const days: { date: GameDate; news: News[] }[] = [];
+  for (const x of items) {
+    const last = days.at(-1);
+    if (last && dateKey(last.date) === dateKey(x.date)) last.news.push(x.news);
+    else days.push({ date: x.date, news: [x.news] });
+  }
   panel.innerHTML = `
     <header><h2 class="ribbon">Dispatches</h2>${closeButton()}</header>
-    <p class="hint">${dateText(s.date)}</p>
+    <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
     ${s.peaceOffers.map(offerHtml).join("")}
     ${s.calls
       .map(
@@ -983,24 +1127,25 @@ function renderNews(): void {
         </div>`,
       )
       .join("")}
-    ${items.length ? `<ul class="news">${items
-      .map((x) => `<li class="${mine(x) ? "mine" : ""}">${icon(NEWS_ICON[x.kind], 1)}<span>${esc(x.text)}</span>${x.province !== undefined ? `<button class="paper go" data-go-province="${x.province}" title="Show on the map">${icon("map", 1)}</button>` : ""}</li>`)
-      .join("")}</ul>` : s.calls.length || s.peaceOffers.length ? "" : `<p class="hint">Nothing of note this week.</p>`}`;
+    ${days
+      .map(
+        (d) => `<h3 class="sub news-day">${dateText(d.date)}</h3><ul class="news">${d.news
+          .map((x) => `<li class="${mine(x) ? "mine" : ""}">${icon(NEWS_ICON[x.kind], 1)}<span>${esc(x.text)}</span>${x.province !== undefined ? `<button class="paper go" data-go-province="${x.province}" title="Show on the map" aria-label="Show on the map">${icon("map", 1)}</button>` : ""}</li>`)
+          .join("")}</ul>`,
+      )
+      .join("")}
+    ${days.length ? "" : `<p class="hint">Nothing of note yet.</p>`}`;
   bindClose();
   showPanel(true);
   bindOffers();
   panel.querySelectorAll<HTMLButtonElement>("[data-call]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "answerCall", call: b.dataset.call!, yes: b.dataset.yes === "1" })),
   );
-  panel.querySelectorAll<HTMLButtonElement>("[data-go-province]").forEach((b) =>
+  panel.querySelectorAll<HTMLButtonElement>("[data-go-province]").forEach((b) => b.addEventListener("click", () => goThere(Number(b.dataset.goProvince))));
+  panel.querySelectorAll<HTMLButtonElement>("[data-news-mine]").forEach((b) =>
     b.addEventListener("click", () => {
-      const i = Number(b.dataset.goProvince);
-      newsView = false;
-      selectedProvince = i;
-      panelCollapsed = true;
-      view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
-      restyleProvinces();
-      renderPanel();
+      dispatchesMine = b.dataset.newsMine === "1";
+      renderNews();
     }),
   );
 }
@@ -2019,6 +2164,11 @@ async function startGame(nation: string): Promise<void> {
   takeSnapshot(await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}) }), 0);
   weekStart = snapshot!.date;
   dispatches = [];
+  unread = 0;
+  alerted.clear();
+  alerts.replaceChildren();
+  watching = null;
+  renderBattleWatch();
   applySnapshot();
   const cap = provinceIndex.get(nations[nationIndex.get(nation)!]!.capital)!;
   selectedProvince = cap;
@@ -2055,7 +2205,6 @@ async function endTurn(): Promise<void> {
   playing = true;
   paused = false;
   selected.clear();
-  dispatches = [];
   renderActions();
   const turn = snapshot.turn;
   while (snapshot.turn === turn) {
@@ -2064,7 +2213,7 @@ async function endTurn(): Promise<void> {
       continue;
     }
     const battle = snapshot.battles.some((b) => b.player);
-    const ms = battle ? BATTLE_STEP_MS : DAY_MS;
+    const ms = battle ? (watching && !watching.result ? WATCH_STEP_MS : BATTLE_STEP_MS) : DAY_MS;
     const t0 = performance.now();
     // The steps run in the engine worker; the map stays live meanwhile.
     performance.mark("turn-sent");
@@ -2072,7 +2221,7 @@ async function endTurn(): Promise<void> {
     performance.mark("turn-arrived");
     takeSnapshot(next, ms);
     applySnapshot();
-    dispatches.push(...next.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [next.playerNation] })), ...next.news);
+    logNews(next);
     restyleProvinces();
     renderHud();
     if (!panel.hidden) renderPanel();
@@ -2085,12 +2234,6 @@ async function endTurn(): Promise<void> {
   playing = false;
   paused = false;
   weekStart = snapshot.date;
-  // Open the dispatches when something happened to the player's own realm, or a call waits.
-  if (snapshot.calls.length || snapshot.peaceOffers.length || dispatches.some((x) => x.nations.includes(snapshot!.playerNation) && x.kind !== "raised")) {
-    newsView = true;
-    realmView = -1;
-    panelCollapsed = false;
-  }
   restyleProvinces();
   renderHud();
   renderPanel();
