@@ -2,7 +2,8 @@ import type { Ground } from "@ph/rules";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { planRoute } from "./march.ts";
-import { marchMap, spawnArmy, type World } from "./world.ts";
+import { marchMap, type World } from "./world.ts";
+import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -165,7 +166,7 @@ export function answerCall(world: World, call: dip.Call, yes: boolean, news: New
 
 /** Men in the field plus levies at home: how strong a realm looks to others. */
 export function strength(world: World, n: number): number {
-  let men = world.nationLevies[n]!;
+  let men = canCall(world, n);
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i] && a.owner[i] === n) men += a.men[i]!;
   return men;
@@ -196,28 +197,28 @@ function battleRow(g: Ground): string[] {
   }
 }
 
-/** One side's armies as a warfare army: companies of levy foot and light horse, led by the best commander among them. */
-function battleArmy(world: World, slots: number[], id: string): wf.Army {
+/**
+ * One side's armies as a warfare army: companies by arm, kind and drill, led by
+ * the best commander among them (returned too, by index, or -1).
+ */
+function battleArmy(world: World, slots: number[], id: string): [wf.Army, number] {
   const a = world.armies;
   const size = wf.W.company_size.max;
   const companies: wf.Company[] = [];
-  const add = (arm: string, men: number) => {
-    for (let left = men; left > 0; left -= size) {
-      const m = Math.min(size, left);
-      companies.push(wf.newCompany({ kind: "levy", arm, men: m, arms: wf.armsNeeded(arm, m) }));
-    }
-  };
-  let best: wf.Commander | undefined;
+  let best = -1;
   for (const s of slots) {
-    add("levy foot", a.men[s]! - a.horse[s]!);
-    add("light horse", a.horse[s]!);
+    const by = menByArm(world, s);
+    const kind = KIND_NAMES[a.kind[s]!]! as wf.Company["kind"];
+    ARMS.forEach((arm, k) => {
+      for (let left = Math.round(by[k]!); left > 0; left -= size) {
+        const m = Math.min(size, left);
+        companies.push(wf.newCompany({ kind, arm, men: m, arms: wf.armsNeeded(arm, m), drill: a.drill[s]! }));
+      }
+    });
     const c = a.commander[s]!;
-    if (c >= 0) {
-      const def = world.rules.nations[world.commanderOwner[c]!]!.commanders.find((x) => x.id === world.commanderIds[c])!;
-      if (!best || def.might > best.might) best = wf.newCommander(def.name, { might: def.might, cunning: def.cunning, logistics: def.logistics });
-    }
+    if (c >= 0 && (best < 0 || world.commanders[c]!.might > world.commanders[best]!.might)) best = c;
   }
-  return wf.newArmy(id, id, companies, best ? { commander: best } : {});
+  return [wf.newArmy(id, id, companies, best >= 0 ? { commander: world.commanders[best]! } : {}), best];
 }
 
 /** Sides in a province: a realm and its partners against the realms at war with it. */
@@ -259,9 +260,11 @@ export function runBattles(world: World, moved: Set<number>, news: News[]): void
     // The resolver names sides in its reason line, so they go by the realms' names.
     const an = name(world, attOwner);
     const dn = name(world, defOwner);
+    const [attArmy, attLead] = battleArmy(world, att, an);
+    const [defArmy, defLead] = battleArmy(world, def, dn);
     const r = wf.fightBattle({
-      attacker: { country: an, army: battleArmy(world, att, an), known: new Set(), homeland: world.provinceOwner[p] === attOwner },
-      defender: { country: dn, army: battleArmy(world, def, dn), known: new Set(), homeland: world.provinceOwner[p] === defOwner },
+      attacker: { country: an, army: attArmy, known: new Set(), homeland: world.provinceOwner[p] === attOwner },
+      defender: { country: dn, army: defArmy, known: new Set(), homeland: world.provinceOwner[p] === defOwner },
       sectors: wf.battlefield(battleRow(ground), { ground, era }),
       ground,
       era,
@@ -280,6 +283,9 @@ export function runBattles(world: World, moved: Set<number>, news: News[]): void
     const loseSlots = r.winner === an ? def : att;
     const winner = a.owner[winSlots[0]!]!;
     const loser = a.owner[loseSlots[0]!]!;
+    const outnumbered = before[r.winner]! < before[r.loser]!;
+    commanderBattle(world, r.winner === an ? attLead : defLead, true, outnumbered);
+    commanderBattle(world, r.winner === an ? defLead : attLead, false, false);
     for (const s of loseSlots) fallBack(world, s, enemies, news);
     news.push({
       kind: "battle",
@@ -330,8 +336,8 @@ function fallBack(world: World, s: number, enemies: Set<number>[], news: News[])
 
 function disperse(world: World, s: number, text: string, news: News[]): void {
   const a = world.armies;
-  // Men who survive go home to the levy pool.
-  world.nationLevies[a.owner[s]!] = Math.min(world.nationMaxLevies[a.owner[s]!]!, world.nationLevies[a.owner[s]!]! + a.men[s]! * 0.5);
+  // Half the men who survive find their way home to the pools; hired men just leave.
+  if (a.kind[s] !== KIND.hired) sendHome(world, a.owner[s]!, a.men[s]! * 0.5);
   a.alive[s] = 0;
   a.route[s] = [];
   news.push({ kind: "battle", text, nations: [a.owner[s]!], province: a.location[s]! });
@@ -639,32 +645,9 @@ export function aiDeclarations(world: World, news: News[]): void {
   }
 }
 
-/** AI realms at war raise levies when they can afford them. */
+/** AI realms at war raise levies they can pay for; at peace they send levies home before their pay begins. */
 export function aiRaise(world: World, news: News[]): void {
-  const d = world.diplomacy;
-  for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n] || !dip.warOf(d, world.nationIds[n]!)) continue;
-    const men = Math.floor(Math.min(world.nationLevies[n]!, 10000) / 1000) * 1000;
-    if (men >= 2000) raiseLevies(world, n, men, news);
-  }
-}
-
-/** Raise levies as a new army in the capital, at a gold cost per thousand men. */
-export function raiseLevies(world: World, n: number, men: number, news: News[]): string | null {
-  const cap = world.provinceIndex.get(world.rules.nations[n]!.capital)!;
-  const cost = (men / 1000) * world.rules.defines.war.raiseGoldPerThousand;
-  if (men <= 0) return "no men asked for";
-  if (men > world.nationLevies[n]!) return "not enough levies";
-  if (cost > world.nationTreasury[n]!) return "not enough gold";
-  if (world.provinceOwner[cap] !== n || world.provinceOccupier[cap]! >= 0) return "your capital is not in your hands";
-  if (world.sieges.has(cap)) return "your capital is under siege";
-  const a = world.armies;
-  for (let i = 0; i < a.count; i++) if (a.alive[i] && a.location[i] === cap && atWar(world, n, a.owner[i]!)) return "an enemy army stands at your capital";
-  world.nationLevies[n] = world.nationLevies[n]! - men;
-  world.nationTreasury[n] = world.nationTreasury[n]! - cost;
-  spawnArmy(world, n, cap, men, -1, Math.round(men * world.rules.defines.march.startingHorseShare));
-  if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} levies gather at ${provinceName(world, cap)} for ${fmt(cost)} gold.`, nations: [n], province: cap });
-  return null;
+  aiRecruits(world, news, (n) => !!dip.warOf(world.diplomacy, world.nationIds[n]!));
 }
 
 /**
@@ -680,7 +663,7 @@ export function aiMarches(world: World): void {
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
-    if (n === world.player || !enemies[n]!.size) continue;
+    if (n === world.player || !enemies[n]!.size || a.commander[i]! < 0) continue;
     if (a.route[i]!.length && world.rng.int(4) !== 0) continue;
     const here = a.location[i]!;
     const foes = enemies[n]!;

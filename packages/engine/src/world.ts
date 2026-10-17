@@ -3,6 +3,8 @@ import { groundOf, monthlyRations, type MarchMap } from "./march.ts";
 import { Rng } from "./rng.ts";
 import type { Diplomacy } from "./domain/diplomacy/index.ts";
 import { createWarState, maxGarrison, type SiegeState } from "./war.ts";
+import { newCommander, type Commander } from "./domain/warfare/index.ts";
+import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type Mercenary, type Muster } from "./recruit.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -42,6 +44,8 @@ export interface World {
   commanderIds: string[];
   commanderOwner: Int16Array;
   commanderLogistics: Int8Array;
+  /** Each commander as the warfare context sees him: skills, victories and defeats grow with his battles. */
+  commanders: Commander[];
 
   armies: ArmyPool;
 
@@ -58,6 +62,21 @@ export interface World {
   sieges: Map<number, SiegeState>;
   /** 1 once a nation has lost all its land. */
   nationGone: Uint8Array;
+
+  /** Men who can be called in each province now (recruiting: Recruits here), and the most there can be. */
+  provinceRecruits: Float32Array;
+  provinceRecruitCeiling: Float32Array;
+  /** Troop cap per nation (warfare WAR-029) and the men counting toward it. */
+  nationTroopCap: Float64Array;
+  nationCapUsed: Float64Array;
+  /** Men called up in provinces, gathering a thousand at a time. */
+  musters: Muster[];
+  /** Mercenary companies on their way. */
+  mercs: Mercenary[];
+  /** Official of each province (index into OFFICIALS), -1 = his post stands empty. */
+  provinceOfficial: Int8Array;
+  /** Province each commander was commissioned from, -1 = none. */
+  commanderHome: number[];
 }
 
 export interface ArmyPool {
@@ -80,6 +99,27 @@ export interface ArmyPool {
   marched: number[][];
   /** The province the army last marched in from (-1 = none): the way back past an enemy castle. */
   cameFrom: Int32Array;
+  /** Company kind: levy or hired (see KIND). */
+  kind: Uint8Array;
+  /** Months since the men were raised (a levy's pay begins in the fourth). */
+  monthsOut: Uint16Array;
+  /** Months drilled together (0 untrained, 3 trained). */
+  drill: Float32Array;
+  /** Shares of the foot by arm (FOOT_ARMS) and of the horse by arm (HORSE_ARMS), ARMS.length per army. */
+  mix: Float32Array;
+  /** Arm being trained (index into ARMS, -1 = none), men in training and months left. */
+  trainArm: Int8Array;
+  trainMen: Int32Array;
+  trainLeft: Float32Array;
+}
+
+/** How an army's men split by arm and what kind of company they are. */
+export interface ArmyMake {
+  kind?: number;
+  drill?: number;
+  /** Arm of the foot and of the horse. */
+  foot?: string;
+  horseArm?: string;
 }
 
 export function createArmyPool(capacity: number): ArmyPool {
@@ -97,10 +137,26 @@ export function createArmyPool(capacity: number): ArmyPool {
     route: Array.from({ length: capacity }, () => []),
     marched: Array.from({ length: capacity }, () => []),
     cameFrom: new Int32Array(capacity).fill(-1),
+    kind: new Uint8Array(capacity),
+    monthsOut: new Uint16Array(capacity),
+    drill: new Float32Array(capacity),
+    mix: defaultMix(capacity),
+    trainArm: new Int8Array(capacity).fill(-1),
+    trainMen: new Int32Array(capacity),
+    trainLeft: new Float32Array(capacity),
   };
 }
 
-export function spawnArmy(world: World, owner: number, location: number, men: number, commander = -1, horse = 0): number {
+function defaultMix(capacity: number): Float32Array {
+  const mix = new Float32Array(capacity * ARMS.length);
+  for (let i = 0; i < capacity; i++) {
+    mix[i * ARMS.length + armIndex(FOOT_ARMS[0])] = 1;
+    mix[i * ARMS.length + armIndex(HORSE_ARMS[0])] = 1;
+  }
+  return mix;
+}
+
+export function spawnArmy(world: World, owner: number, location: number, men: number, commander = -1, horse = 0, make: ArmyMake = {}): number {
   let pool = world.armies;
   let slot = -1;
   for (let i = 0; i < pool.count; i++) {
@@ -124,6 +180,16 @@ export function spawnArmy(world: World, owner: number, location: number, men: nu
   pool.route[slot] = [];
   pool.marched[slot] = [];
   pool.cameFrom[slot] = -1;
+  pool.kind[slot] = make.kind ?? KIND.levy;
+  pool.monthsOut[slot] = 0;
+  pool.drill[slot] = make.drill ?? 0;
+  const base = slot * ARMS.length;
+  pool.mix.fill(0, base, base + ARMS.length);
+  pool.mix[base + armIndex(make.foot ?? FOOT_ARMS[0])] = 1;
+  pool.mix[base + armIndex(make.horseArm ?? HORSE_ARMS[0])] = 1;
+  pool.trainArm[slot] = -1;
+  pool.trainMen[slot] = 0;
+  pool.trainLeft[slot] = 0;
   // Wagons start full.
   const d = world.rules.defines.march;
   const logistics = commander >= 0 ? world.commanderLogistics[commander]! : 0;
@@ -145,6 +211,13 @@ function growArmyPool(old: ArmyPool): ArmyPool {
   next.movedThisTurn.set(old.movedThisTurn);
   old.route.forEach((r, i) => (next.route[i] = r));
   old.marched.forEach((r, i) => (next.marched[i] = r));
+  next.kind.set(old.kind);
+  next.monthsOut.set(old.monthsOut);
+  next.drill.set(old.drill);
+  next.mix.set(old.mix);
+  next.trainArm.set(old.trainArm);
+  next.trainMen.set(old.trainMen);
+  next.trainLeft.set(old.trainLeft);
   next.cameFrom.set(old.cameFrom);
   return next;
 }
@@ -179,11 +252,13 @@ export function createWorld(rules: Ruleset, seed: number): World {
   const commanderIds: string[] = [];
   const commanderOwnerList: number[] = [];
   const commanderLogisticsList: number[] = [];
+  const commanders: Commander[] = [];
   rules.nations.forEach((n, i) => {
     for (const c of n.commanders) {
       commanderIds.push(c.id);
       commanderOwnerList.push(i);
       commanderLogisticsList.push(c.logistics);
+      commanders.push(newCommander(c.name, { country: n.id, might: c.might, cunning: c.cunning, logistics: c.logistics }));
     }
   });
 
@@ -213,6 +288,7 @@ export function createWorld(rules: Ruleset, seed: number): World {
     commanderIds,
     commanderOwner: Int16Array.from(commanderOwnerList),
     commanderLogistics: Int8Array.from(commanderLogisticsList),
+    commanders,
     armies: createArmyPool(Math.max(16, N * 2)),
     player: -1,
     diplomacy: null!,
@@ -221,31 +297,32 @@ export function createWorld(rules: Ruleset, seed: number): World {
     provinceGarrison: new Float32Array(P),
     sieges: new Map(),
     nationGone: new Uint8Array(N),
+    ...createRecruitState(P, N),
   };
   world.diplomacy = createWarState(world);
   for (let p = 0; p < P; p++) world.provinceGarrison[p] = maxGarrison(world, p);
 
-  recomputeMaxLevies(world);
-  world.nationLevies.set(world.nationMaxLevies);
+  for (let p = 0; p < P; p++) {
+    if (provinceWater[p]) continue;
+    world.provinceRecruitCeiling[p] = provincePopulation[p]! * rules.defines.levies.menPerThousandPeople;
+    world.provinceRecruits[p] = world.provinceRecruitCeiling[p]!;
+    // Every province of a realm starts with an official, of a type dealt out in turn.
+    if (provinceOwner[p]! >= 0) world.provinceOfficial[p] = p % OFFICIALS.length;
+  }
+  world.commanderHome = commanderIds.map(() => -1);
+  recount(world);
 
-  // Every nation starts with one army in its capital, led by its first commander.
+  // Every nation starts with one army in its capital, led by its first commander: levies already
+  // called, half of the foot armoured men-at-arms, the horse light horse.
   rules.nations.forEach((n, i) => {
     const firstCommander = commanderOwnerList.indexOf(i);
     const men = 5000;
-    spawnArmy(world, i, provinceIndex.get(n.capital)!, men, firstCommander, Math.round(men * rules.defines.march.startingHorseShare));
+    const slot = spawnArmy(world, i, provinceIndex.get(n.capital)!, men, firstCommander, Math.round(men * rules.defines.march.startingHorseShare), { kind: KIND.levy, drill: 1.5 });
+    world.armies.mix[slot * ARMS.length + armIndex("levy foot")] = 0.5;
+    world.armies.mix[slot * ARMS.length + armIndex("armoured foot")] = 0.5;
   });
 
   return world;
-}
-
-export function recomputeMaxLevies(world: World): void {
-  const max = world.nationMaxLevies;
-  const perThousand = world.rules.defines.levies.menPerThousandPeople;
-  max.fill(0);
-  for (let p = 0; p < world.provinceCount; p++) {
-    const owner = world.provinceOwner[p]!;
-    if (owner >= 0) max[owner] = max[owner]! + world.provincePopulation[p]! * perThousand;
-  }
 }
 
 export function areNeighbors(world: World, a: number, b: number): boolean {

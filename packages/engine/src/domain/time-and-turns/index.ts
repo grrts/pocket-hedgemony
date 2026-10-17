@@ -303,8 +303,26 @@ export function orderShape(order: Order): string {
       return "offer peace to country";
     case "answerCall":
       return "answer call to arms";
-    case "raiseLevies":
-      return "raise levies in capital";
+    case "recruit":
+      return "recruit in province";
+    case "pickUp":
+      return "pick up recruits";
+    case "commission":
+      return "commission official as commander";
+    case "release":
+      return "release commander";
+    case "train":
+      return "train troops";
+    case "dismiss":
+      return "send troops home";
+    case "split":
+      return "split army";
+    case "hire":
+      return "hire company";
+    case "merge":
+      return "merge armies";
+    case "appoint":
+      return "appoint commander";
     case "disband":
       return "disband army";
   }

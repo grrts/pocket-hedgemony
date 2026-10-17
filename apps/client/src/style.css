@@ -773,3 +773,50 @@ button.small {
   font: 600 15px var(--body);
   text-shadow: none;
 }
+
+/* Province overview tabs (Overview, Garrison) */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 2px 0 8px;
+  border-bottom: 2px solid var(--wood);
+}
+
+.tabs .tab {
+  min-height: 32px;
+  padding: 2px 12px;
+  font-size: 15px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  border: 2px solid var(--wood);
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.tabs .tab.on {
+  background: var(--paper-light);
+  color: var(--ink);
+  font-weight: bold;
+}
+
+/* The commander's screen: troops by arm */
+table.troops {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0 8px;
+}
+
+table.troops th,
+table.troops td {
+  padding: 3px 4px;
+  text-align: left;
+  border-bottom: 1px solid var(--ink-soft);
+  vertical-align: middle;
+}
+
+table.troops td.army-buttons {
+  flex-direction: row;
+  justify-content: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+}

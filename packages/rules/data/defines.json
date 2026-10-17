@@ -11,7 +11,8 @@
     "startingTreasury": 50
   },
   "levies": {
-    "menPerThousandPeople": 4,
+    "$comment": "Men who can be called per thousand people: the recruiting context's fighting-age share (0.25) times the farmers' call share (0.12).",
+    "menPerThousandPeople": 30,
     "monthlyRecoveryFraction": 0.0167
   },
   "military": {
@@ -70,8 +71,19 @@
     "castleStoreMonths": 6,
     "stormRatio": 4,
     "disperseBelow": 100,
-    "raiseGoldPerThousand": 5,
     "aiDeclareChancePerMonth": 0.01,
     "aiDeclareStrengthRatio": 2
+  },
+  "recruit": {
+    "$comment": "Milestone 2, armies that cost something. Pay, training costs, the levy and the troop cap come from domain/recruiting.json and domain/warfare.json; these fit them to this game's economy and weekly turn. goldScale turns the domain's gold into the treasury's gold (one domain gold is 0.004 here).",
+    "goldScale": 0.004,
+    "gatherWeeks": 2,
+    "armsAtStart": ["levy foot", "armoured foot", "pikes", "archers", "light horse", "knights and lancers"],
+    "hiredCompanyMen": 1000,
+    "hiredArms": ["pikes", "armoured foot", "light horse"],
+    "unpaidDesertion": 0.05,
+    "mercenaryWeeks": 4,
+    "commanderGold": 10,
+    "commanderNames": ["Juan", "Pedro", "Rodrigo", "Jean", "Guillaume", "Louis", "Henry", "Richard", "Thomas", "Heinrich", "Konrad", "Albrecht", "Giovanni", "Niccolò", "Mehmed", "Ali", "Ivan", "Dmitri", "Jan", "Erik", "Olaf", "Andrzej", "János", "Duarte"]
   }
 }

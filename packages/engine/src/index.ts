@@ -5,5 +5,6 @@ export { planRoute, stepDays, forageLimit, forageRations, monthlyRations, ground
 export { processTurn, applyNow, type Order, type MoveOrder, type TurnReport } from "./turn.ts";
 export { atWar, controller, offerPeace, peaceShare, relationState, wallsOf, warBetween, type News, type PeaceTerms } from "./war.ts";
 export { hashWorld } from "./hash.ts";
+export { ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type Snapshot, type HostReply } from "./protocol.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";
