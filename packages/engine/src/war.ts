@@ -324,7 +324,7 @@ export function engage(world: World, news: News[]): void {
       const n = a.owner[j]!;
       const foeOfAtt = sideOwners[0]!.some((o) => enemies[n]!.has(o));
       const foeOfDef = sideOwners[1]!.some((o) => enemies[n]!.has(o));
-      if (foeOfAtt === foeOfDef || a.commander[j]! < 0 || tileDistance(world, a.tile[j]!, b.tile) > engageRange(world, j)) return;
+      if (foeOfAtt === foeOfDef || a.commander[j]! < 0 || a.location[j] !== b.province || tileDistance(world, a.tile[j]!, b.tile) > engageRange(world, j)) return;
       joinBattle(world, b, j, foeOfAtt ? "defenders" : "attackers");
     });
     joinGarrisons(world, b, enemies);
@@ -337,7 +337,8 @@ export function engage(world: World, news: News[]): void {
     let foe = -1;
     let best = Infinity;
     near(a.tile[i]!, range, (j) => {
-      if (j === i || a.battle[j]! >= 0 || a.retreating[j] || !enemies[n]!.has(a.owner[j]!)) return;
+      // Only armies in the same province meet, however close they pass (playtest feedback).
+      if (j === i || a.battle[j]! >= 0 || a.retreating[j] || a.location[j] !== a.location[i] || !enemies[n]!.has(a.owner[j]!)) return;
       const d = tileDistance(world, a.tile[i]!, a.tile[j]!);
       if (d <= range && d < best) ((best = d), (foe = j));
     });
