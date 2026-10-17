@@ -20,7 +20,8 @@ describe("culture names (feedback 33)", () => {
     const me = nation("castile");
     w.player = me;
     w.nationTreasury[me] = 1000;
-    const p = w.provinceOwner.findIndex((o, i) => o === me && w.provinceOfficial[i]! >= 0);
+    // A royal province: a lord's official serves the lord and is not commissioned.
+    const p = w.provinceOwner.findIndex((o, i) => o === me && w.provinceLord[i]! < 0 && w.provinceOfficial[i]! >= 0);
     const name = officialName(rules, p, me);
     expect(officialName(rules, p, me)).toBe(name);
     const r = applyNow(w, { type: "commission", province: p }, me);

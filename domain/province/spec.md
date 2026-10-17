@@ -315,6 +315,15 @@ settlement, settlers, local people's tiles.
 - PROV-193: A colonial governor shall have no effect of his own; he founds a colony and then becomes its ordinary official; he needs a colonial governor slot and does not count against the officials cap while holding one. [§10.2, exploration §4.2]
 - PROV-194: Officials shall be gained by hiring one of a chosen type (gold up front, wages yearly; a foreign specialist costs more), by school graduates (madrasa: judges and chaplains; university: judges and stewards; academy: masters of works and wardens), and by a lord's line dying out; and lost by old age and death, dismissal, unpaid wages, being killed when rebels or an enemy take their province, and a richer neighbour hiring them. [§10.2]
 - PROV-195: The country card's Officials count shall be the sum of the realm's officials. [§10.2, §13]
+- PROV-303: The ruler may move an official from one royal province of his realm to another: the two officials swap posts, or he takes the other's empty post and leaves his own empty; each official who moves keeps his name and type and starts again at half his effect (PROV-192). A lord's province takes no part, and its official cannot be commissioned: he serves the lord, not the crown (PROV-202). [F-54; PROV-192, PROV-202]
+- PROV-304: At the start of the campaign each official shall have served 0 to 10 years in his province, spread over the provinces, so that their effects differ (default chosen). [F-54; PROV-192]
+- PROV-305: The type effects that work so far shall be: tax collector on tax reaching the holder, steward on food from the harvest, judge on riots, muster master on recruits refilling, customs officer on trade gold, and warden on the garrison's strength against a storm; a master of works and a schoolmaster take effect when buildings and schools are in the game. An effect works on the province's own output, before a lord takes his share. [F-54; PROV-190, PROV-202]
+
+#### How the player uses it: moving officials
+- PROV-306: Where: the player opens an official's screen from the realm's Officials tab or from the governance card at the top of the province panel, and taps "Move to another province"; a list of the realm's royal provinces follows, each row showing its official (or an empty post), his type, and what the move changes (the two effects before and after, both starting at half). Tapping a row moves him; the button says why when it can't (a lord's province, both posts empty). [F-54; X-19]
+- PROV-307: Grouping: everything about an official sits on his screen: name, type, province, years served, his effect now and at full, and the Move and Commission buttons. [F-54; X-19]
+- PROV-308: Overview: the Officials tab of the player's country card lists every official of the realm with his type, province, years served and effect, and the empty posts; tapping one opens his screen. [F-54; X-19]
+- PROV-309: Phone: in landscape the official's screen and the province list fit the side panel in the Wide and Tall layouts, every row and button is at least 44 points high, and nothing needs hover (each row spells out what the move changes). [F-54; X-19]
 
 ### 5.19 Lords in the province
 - PROV-200: A lord shall always hold at least one province; someone with no land is a courtier. [§10.3]
@@ -408,7 +417,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 | ChangeTileUse(tile, newUse) | player / AI | Allowed transition (clear woods, fields↔pasture, drain marsh, irrigate waste) and unlock known | Use changes after its time | TileUseChanged |
 | BurnOwnFields(province) | player / AI | Owner | Tiles Burned (scorched earth) | TileBurned |
 | RebuildBurnedTile(tile, gold) | player / AI | Tile Burned | Faster rebuild | TileRebuilt |
-| AssignOfficial(official, province) | player / AI | Official free; province royal or seat | Governed by official; years served 0 | OfficialAssigned, GrievanceEnded |
+| AssignOfficial(official, province) | player / AI | Official free, or serving in another royal province of the realm; province royal or seat, not a lord's | Governed by official; years served 0; an official already there takes the mover's old post (both start at half), else the old post stands empty (PROV-303) | OfficialAssigned, GrievanceEnded |
 | DismissOfficial(official) | player / AI | — | Province ungoverned | OfficialDismissed, GrievanceStarted |
 | HireOfficial(type) | player / AI | Gold; colonial governor needs a slot | New official | OfficialHired |
 | LendOfficialToLord(official, lord) / RecallLentOfficial | player / AI | Official free / lent | Works for the lord; loyalty up | OfficialLent / OfficialRecalled |
@@ -770,6 +779,12 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-194 | officials.feature | Officials are gained and lost |
 | PROV-194 | officials.feature | A foreign specialist costs more |
 | PROV-195 | officials.feature | The country card's officials count is the sum of the realm's officials |
+| PROV-303 | officials.feature | Two officials swap provinces; Moving an official into an empty post; A lord's official stays with the lord |
+| PROV-304 | officials.feature | Officials start with years served |
+| PROV-305 | officials.feature | Each type has its own effect in the province it runs; Effects that wait for their system |
+| PROV-306, 307 | officials.feature | Moving an official from his screen |
+| PROV-308 | officials.feature | The Officials tab lists every official |
+| PROV-309 | — | Presentation only: checked on phone screenshots in landscape |
 | PROV-200 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A courtier can be granted land again |
