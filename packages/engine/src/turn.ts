@@ -1,6 +1,26 @@
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN, monthBeginning } from "./calendar.ts";
 import { forageRations, monthlyRations, planRoute, stepDays, type MarchingArmy } from "./march.ts";
-import { marchMap, recomputeMaxLevies, type World } from "./world.ts";
+import { marchMap, type World } from "./world.ts";
+import {
+  aiCollect,
+  appointCommander,
+  disbandArmy,
+  dismissTroops,
+  commissionOfficial,
+  hireCompany,
+  mergeArmies,
+  monthlyRecruits,
+  nationPay,
+  pickUp,
+  recount,
+  recruit,
+  releaseCommander,
+  splitTroops,
+  trainTroops,
+  ungoverned,
+  weeklyMusters,
+} from "./recruit.ts";
+import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
 import {
   aiDeclarations,
   aiMarches,
@@ -12,7 +32,6 @@ import {
   declareWar,
   monthlyDiplomacy,
   offerPeace,
-  raiseLevies,
   relationState,
   runBattles,
   runOccupation,
@@ -27,7 +46,23 @@ export type Order =
   | { type: "declareWar"; target: number }
   | { type: "offerPeace"; target: number; terms: PeaceTerms }
   | { type: "answerCall"; call: string; yes: boolean }
-  | { type: "raiseLevies"; men: number }
+  /** Call up thousands of men from one province's people; each thousand gathers in two weeks. */
+  | { type: "recruit"; province: number; thousands: number }
+  /** The army's commander takes in the garrison troops where it stands. */
+  | { type: "pickUp"; army: number }
+  /** Commission a province's official as a commander; release one back to his post. */
+  | { type: "commission"; province: number }
+  | { type: "release"; commander: number }
+  /** Train levy foot of an army as another arm. */
+  | { type: "train"; army: number; arm: string; men: number }
+  /** Send home men of one arm. */
+  | { type: "dismiss"; army: number; arm: string; men: number }
+  /** Split men of one arm off, under a commander at court or left as the province's garrison. */
+  | { type: "split"; army: number; arm: string; men: number; commander?: number }
+  | { type: "hire"; arm: string }
+  | { type: "merge"; army: number; into: number }
+  /** Put a commander at the head of an army or garrison troops (swapping with the army he led); -1 leaves the men as a garrison. */
+  | { type: "appoint"; army: number; commander: number }
   | { type: "disband"; army: number };
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
@@ -69,9 +104,12 @@ export function processTurn(world: World, orders: readonly Order[], actingNation
   for (let i = 0; i < world.armies.count; i++) if (world.armies.alive[i] && world.armies.men[i]! < 1) world.armies.alive[i] = 0;
   const newMonth = monthBeginning(world.date) !== null;
   runOccupation(world, newMonth, news);
+  weeklyMusters(world, news);
+  aiCollect(world, news);
+  if (newMonth) monthlyRecruits(world, news);
+  else recount(world);
   runEconomy(world, newMonth);
   if (newMonth) {
-    runLevies(world);
     monthlyDiplomacy(world, news);
     aiDeclarations(world, news);
     aiRaise(world, news);
@@ -97,23 +135,34 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       answerCall(world, call, order.yes, news);
       return null;
     }
-    case "raiseLevies":
-      return raiseLevies(world, actingNation, order.men, news);
-    case "disband": {
-      if (order.army < 0 || order.army >= a.count || !a.alive[order.army]) return "no such army";
-      if (a.owner[order.army] !== actingNation) return "not your army";
-      const n = actingNation;
-      // Men sent home return to the levy pool.
-      world.nationLevies[n] = Math.min(world.nationMaxLevies[n]!, world.nationLevies[n]! + a.men[order.army]!);
-      a.alive[order.army] = 0;
-      a.route[order.army] = [];
-      return null;
-    }
+    case "recruit":
+      return recruit(world, actingNation, order.province, order.thousands, news);
+    case "pickUp":
+      return pickUp(world, actingNation, order.army);
+    case "commission":
+      return commissionOfficial(world, actingNation, order.province, news);
+    case "release":
+      return releaseCommander(world, actingNation, order.commander);
+    case "train":
+      return trainTroops(world, actingNation, order.army, order.arm, order.men, news);
+    case "dismiss":
+      return dismissTroops(world, actingNation, order.army, order.arm, order.men);
+    case "split":
+      return splitTroops(world, actingNation, order.army, order.arm, order.men, order.commander);
+    case "hire":
+      return hireCompany(world, actingNation, order.arm, news);
+    case "merge":
+      return mergeArmies(world, actingNation, order.army, order.into);
+    case "appoint":
+      return appointCommander(world, actingNation, order.army, order.commander);
+    case "disband":
+      return disbandArmy(world, actingNation, order.army);
     case "move": {
       if (order.army < 0 || order.army >= a.count || !a.alive[order.army]) return "no such army";
       if (a.owner[order.army] !== actingNation) return "not your army";
       if (a.movedThisTurn[order.army]) return "army already moved this turn";
       if (world.provinceWater[order.to]) return "armies need ships to cross water";
+      if (a.commander[order.army]! < 0) return "troops without a commander can't march: give them one";
       a.movedThisTurn[order.army] = 1;
       if (order.to === a.location[order.army]) {
         // Marching to where it stands is a halt.
@@ -225,39 +274,26 @@ function runMarches(world: World): Set<number> {
 
 /** Works out each realm's monthly income, and pays it when a new month begins. */
 function runEconomy(world: World, pay: boolean): void {
-  const { economy, military } = world.rules.defines;
+  const { economy } = world.rules.defines;
   const income = world.nationMonthlyIncome;
+  const emptyTax = emptyProvinceEffect("Leave it").tax;
   income.fill(0);
 
   for (let p = 0; p < world.provinceCount; p++) {
     // An occupier collects the tax (WAR occupation: tax, recruits, food, trade).
     const owner = controller(world, p);
     if (owner < 0) continue;
+    // A province whose official was commissioned pays half (recruiting RECR-083, "Leave it").
+    const share = ungoverned(world, p) ? emptyTax : 1;
     income[owner] =
       income[owner]! +
-      world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth +
-      world.provinceWealth[p]! * economy.goldPerWealthPerMonth;
+      (world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth + world.provinceWealth[p]! * economy.goldPerWealthPerMonth) * share;
   }
 
-  const a = world.armies;
-  for (let i = 0; i < a.count; i++) {
-    if (!a.alive[i]) continue;
-    const owner = a.owner[i]!;
-    income[owner] = income[owner]! - (a.men[i]! / 1000) * military.upkeepPerThousandMenPerMonth;
-  }
+  // Pay for levies and mercenaries (milestone 2, recruit.ts).
+  for (let n = 0; n < world.nationCount; n++) income[n] = income[n]! - nationPay(world, n);
 
   if (!pay) return;
   const treasury = world.nationTreasury;
   for (let n = 0; n < world.nationCount; n++) treasury[n] = treasury[n]! + income[n]!;
 }
-
-function runLevies(world: World): void {
-  recomputeMaxLevies(world);
-  const frac = world.rules.defines.levies.monthlyRecoveryFraction;
-  const mp = world.nationLevies;
-  const max = world.nationMaxLevies;
-  for (let n = 0; n < world.nationCount; n++) {
-    mp[n] = Math.min(max[n]!, mp[n]! + max[n]! * frac);
-  }
-}
-

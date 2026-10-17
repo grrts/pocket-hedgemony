@@ -8,7 +8,8 @@ import type { GameDate } from "@ph/rules";
  * and how strongly autumn, spring and the wet season show. The renderer
  * lowers the temperature by each tile's height (6.5 °C a kilometre) and lays
  * snow where it is below freezing, so snow climbs down the mountains first
- * and only the highest peaks near the equator keep any.
+ * and only the highest peaks near the equator keep any. Seas and rivers
+ * freeze in hard winters, the sea a month behind the land.
  */
 export interface ProvinceClimate {
   /** Sea-level temperature for the day, °C. */
@@ -74,13 +75,22 @@ export interface PlaceClimate {
   lat: number;
   mean: number;
   swing: number;
+  /** Days the coldest and warmest days come after the land's (the sea's heat lags). */
+  lag: number;
   /** Wet-season calendar, for tropical dry lands only. */
   wet: WetClimate | null;
 }
 
 export function placeClimate(lon: number, lat: number, coastal: boolean, terrain: string): PlaceClimate {
   const { mean, swing } = climateAt(lon, lat, coastal);
-  return { lat, mean, swing, wet: Math.abs(lat) < 23.5 && DRY_GROUND.has(terrain) ? wetClimate(lon) : null };
+  if (terrain === "sea" || terrain === "ocean") {
+    // For a sea the temperature only decides its ice. The North Atlantic
+    // Drift keeps the Norwegian Sea and the south of the Barents Sea open
+    // while the Baltic's gulfs, the White Sea and Hudson Bay freeze over.
+    const drift = Math.max(inBox(lon, lat, -30, 50, 12, 80, 4), inBox(lon, lat, 12, 68.5, 45, 80, 2), inBox(lon, lat, 4, 60, 15.5, 70, 1));
+    return { lat, mean: mean + 12 * drift, swing, lag: 30, wet: null };
+  }
+  return { lat, mean, swing, lag: 0, wet: Math.abs(lat) < 23.5 && DRY_GROUND.has(terrain) ? wetClimate(lon) : null };
 }
 
 /** The months each day of the year falls in, for the wet-season window. */
@@ -92,7 +102,7 @@ export function provinceClimate(place: PlaceClimate, date: GameDate): ProvinceCl
   // The year as the northern hemisphere sees it: the south runs half a year behind.
   const day = (dayOfYear(date) + (south ? 182 : 0)) % 365;
   // Warmest around 20 July, coldest around 20 January, the land lagging the sun.
-  const temperature = mean + swing * Math.cos((2 * Math.PI * (day - 201)) / 365);
+  const temperature = mean + swing * Math.cos((2 * Math.PI * (day - 201 - place.lag)) / 365);
   // Leaves turn earlier further north; the tropics have no autumn or spring to speak of.
   const a = Math.abs(lat);
   const temperate = Math.min(1, Math.max(0, (a - 22) / 10));

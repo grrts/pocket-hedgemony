@@ -78,8 +78,8 @@ Feature: The 1444 map setup in today's build
 
   @SETUP-047 @placeholder
   Scenario: The engine's flat start values serve only realms with no assessment
-    Given the config values "economy.startingTreasury" 50, "levies.menPerThousandPeople" 4 and "march.startingHorseShare" 0.2
+    Given the config values "economy.startingTreasury" 50, "levies.menPerThousandPeople" 30 and "march.startingHorseShare" 0.2
     When a new campaign starts
     Then every nation with no catalogue assessment has 50 gold
-    And its levies are 4 men per thousand people
+    And its levies are 30 men per thousand people
     And its starting armies are one fifth horse
