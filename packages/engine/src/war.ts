@@ -3,7 +3,7 @@ import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { planRoute } from "./march.ts";
 import { GROUNDS } from "./tiles.ts";
-import { halt, marchTo } from "./turn.ts";
+import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 
@@ -937,7 +937,7 @@ export function aiMarches(world: World): void {
       halt(world, i);
       continue;
     }
-    const route = planRoute(world.rules.defines.march, marchMap(world), here, target, { men, horse: a.horse[i]!, logistics: 0 });
+    const route = planRoute(world.rules.defines.march, marchMap(world), here, target, { men, horse: a.horse[i]!, logistics: 0 }, routeBars(world, i));
     if (route) {
       // Walked a province at a time: each stretch is planned over the tiles as the army gets there.
       a.route[i] = route.path;

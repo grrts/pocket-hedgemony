@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { advance, applyNow, createWorld, marchMap, processTurn, relationState, spawnArmy, type World } from "../src/index.ts";
-import { blockingCastle } from "../src/turn.ts";
+import { blockingCastle, routeBars } from "../src/turn.ts";
+import { wallsOf } from "../src/war.ts";
+import { planRoute } from "../src/march.ts";
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
@@ -108,6 +110,40 @@ describe("war and conquest", () => {
     // Once the castle has no men in it, the road is open.
     w.provinceGarrison[castle] = 0;
     expect(applyNow(w, { type: "move", army, to: onward! }, me).rejectedOrders).toEqual([]);
+  });
+
+  it("plans marches around enemy castles when there is a way (playtest feedback)", () => {
+    const w = createWorld(rules, 7, tiles);
+    const me = n(w, "castile");
+    const foe = n(w, "portugal");
+    applyNow(w, { type: "declareWar", target: foe }, me);
+    const map = marchMap(w);
+    const a = { men: 20000, horse: 0, logistics: 0 };
+    const from = w.provinceIndex.get(rules.nations[me]!.capital)!;
+    const army = spawnArmy(w, me, from, 20000, w.commanderOwner.indexOf(me));
+    // Portugal takes a Castilian castle on the fastest road somewhere; the march now goes round it.
+    let detours = 0;
+    for (let to = 0; to < w.provinceCount && !detours; to++) {
+      if (w.provinceOwner[to] !== me || !map.ground[to] || to === from) continue;
+      const fast = planRoute(rules.defines.march, map, from, to, a);
+      const k = fast ? fast.path.slice(0, -1).findIndex((p) => wallsOf(w, p) && w.provinceGarrison[p]! > 0) : -1;
+      if (k < 0) continue;
+      // The castle and the land beyond it are Portugal's for now.
+      const castle = fast!.path[k]!;
+      const beyond = fast!.path[k + 1]!;
+      w.provinceOccupier[castle] = foe;
+      w.provinceOccupier[beyond] = foe;
+      const round = planRoute(rules.defines.march, map, from, to, a, routeBars(w, army));
+      if (round) {
+        expect(round.path).not.toContain(castle);
+        expect(applyNow(w, { type: "move", army, to }, me).rejectedOrders).toEqual([]);
+        expect(w.armies.route[army]).toEqual(round.path);
+        detours++;
+      }
+      w.provinceOccupier[castle] = -1;
+      w.provinceOccupier[beyond] = -1;
+    }
+    expect(detours).toBeGreaterThan(0);
   });
 
   it("runs decades of AI wars deterministically and quickly", () => {

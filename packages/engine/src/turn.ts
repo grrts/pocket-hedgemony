@@ -213,10 +213,22 @@ export function castleBars(world: World, slot: number, to: number): boolean {
   const a = world.armies;
   const n = a.owner[slot]!;
   if (!blockingCastle(world, a.location[slot]!, n) || to === a.cameFrom[slot]) return false;
+  return !ownSide(world, n, to);
+}
+
+/** Land nation n's armies may always step into: its own side's. */
+function ownSide(world: World, n: number, to: number): boolean {
   const holder = controller(world, to);
-  if (holder === n) return false;
+  if (holder === n) return true;
   const tie = relationState(world, n, holder).state;
-  return tie !== "alliance" && tie !== "subject" && tie !== "overlord";
+  return tie === "alliance" || tie === "subject" || tie === "overlord";
+}
+
+/** Steps an army of `slot` may not take when planning: out of an enemy castle's province, but back the way it came from where it stands. */
+export function routeBars(world: World, slot: number): (p: number, q: number) => boolean {
+  const here = world.armies.location[slot]!;
+  const n = world.armies.owner[slot]!;
+  return (p, q) => (p === here ? castleBars(world, slot, q) : blockingCastle(world, p, n) && !ownSide(world, n, q));
 }
 
 export function marching(world: World, slot: number): MarchingArmy {
@@ -270,7 +282,8 @@ export function marchTo(world: World, slot: number, to: number, target: number =
   const a = world.armies;
   const here = a.location[slot]!;
   const army = marching(world, slot);
-  const route = to === here ? { path: [] as number[] } : planRoute(world.rules.defines.march, marchMap(world), here, to, army);
+  // The best road no enemy castle bars; failing that, the road up to the first castle in the way, where the army stops.
+  const route = to === here ? { path: [] as number[] } : (planRoute(world.rules.defines.march, marchMap(world), here, to, army, routeBars(world, slot)) ?? planRoute(world.rules.defines.march, marchMap(world), here, to, army));
   if (!route) return "no road there over land";
   if (route.path.length && castleBars(world, slot, route.path[0]!)) return "an enemy castle bars the road: go back, or take it first";
   let allowed = corridorScratch.get(world);
