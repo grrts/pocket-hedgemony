@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-547 decided and 8 still open across 29 contexts.
+548 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -328,6 +328,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-PROV-24**: (was OQ-PROV-24) Officials per province: one official runs 1 province with G1, 2 with G9, 3 with G16, plus one for each of B2, G11 and T14. Same as D-REALM-14.
 - **D-PROV-25**: (17 Oct, Leroy: "Buildings are build in the province but effect tiles, not on tiles"; the food plan, feedback 80 and 87) Land buildings stand in the province, take one building slot and work all its tiles of their use; the tile rules of §2 decide how many people they employ. The map's provinces hold far more people than the design's (median 46,000, a tenth over 300,000), so a tile holds 2.5 times the design's job slots. The 1444 land is laid out from the map's ground, and a province's own ways (terraces, ditches, herding on the move) make up its food to 110 % in 1444. A 15-year run then shows famine touching about 4 % of provinces a year by 1459 against under 1 % before. Tile conversion (feedback 86), hunting (81) and mines with seams (87) build on this next.
 - **D-PROV-26**: (17 Oct, feedback 81) Hunting gets its own room in the woods, a lodge, game that thins and hard winters, not the bare rate everywhere. Game starts at the level the 1444 hunting leaves, so the first years don't crash; at that start a tenth of provinces (crowded woods in the steppe and India) sit near the floor and the median at plenty. The province's own ways (PROV-313) are worked out after, so the 1444 food stays at 110 %. Hard winters touch 200 to 300 provinces a year.
+- **D-PROV-27**: (17 Oct, feedback 86) Tile changes are few and slow: only the five changes the tile rules (§2.1) name, one per province at a time, for gold and years, and the ground never changes. The tile a change takes is the last of its use, so the player chooses the change, not the square. Lords and the AI act by a plain rule (feed the province first: drain, irrigate, then clear woods), so the AI's land changes slowly and only where it is short.
 
 ### Realm (realm)
 

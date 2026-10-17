@@ -39,6 +39,8 @@ export function hashWorld(world: World): string {
   feed(world.provinceTiles);
   feed(world.provinceGame);
   feed(world.provinceHardWinter);
+  feed(world.provinceChangeTile);
+  feed(world.provinceChangeLeft);
   feed(world.nationNeglect);
   feed(Float64Array.from(world.sites.flatMap((s) => [s.nation, s.province, s.work, s.step, s.monthsLeft])));
   feed(Int32Array.from(world.workQueue.flatMap((q) => [q.nation, q.province, q.work, q.step])));

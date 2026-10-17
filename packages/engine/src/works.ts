@@ -5,6 +5,7 @@ import { inAnyWar } from "./lords.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { buildingType, siteKind, townAtLeast, type TownSize } from "./domain/buildings/index.ts";
 import { invention, startingKnowledgeFor } from "./domain/research/index.ts";
+import { CHANGES, changeRows, changeTitle, changeUses, changing, type ChangeRow } from "./conversion.ts";
 import { classFood, FOOD_CLASSES, jobSlots, tileCount, tilesOf, tileWares, USES, type FoodClass, type UseName } from "./land.ts";
 import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
 import { yearlyFood } from "./food.ts";
@@ -597,6 +598,10 @@ export interface LandTileRow {
   ware: { name: string; amount: number } | null;
   /** Woods only: the game left (1 plenty, down to 0.3 where hunters crowd them), and whether this year's winter is hard (feedback 81). */
   game?: { left: number; hardWinter: boolean };
+  /** The changes a tile of this use offers (feedback 86): clear woods, to pasture, plough, drain, irrigate. */
+  changes: ChangeRow[];
+  /** The change under way on this tile, if any. */
+  changing?: { title: string; to: UseName; monthsLeft: number; months: number };
 }
 
 /** The work that works each tile use, and the class on it. */
@@ -629,7 +634,14 @@ export function landSheet(world: World, p: number): LandTileRow[] {
     // Timber and furs from a lumber camp and a lodge both in the north read as one ware line.
     const ware = wares.length ? { name: [...new Set(wares.flatMap((w) => w.ware.split(" and ")))].join(" and "), amount: wares.reduce((a, w) => a + w.amount, 0) } : null;
     const game = use === "woods" ? { left: world.provinceGame[p]!, hardWinter: world.provinceHardWinter[p] === 1 } : undefined;
-    for (let i = 0; i < count; i++) rows.push({ use, building, workers: workers / count, feeds: fed / count, ware, ...(game ? { game } : {}) });
+    const changes = changeRows(world, world.provinceOwner[p]!, p, use);
+    // A change takes the last tile of its use, so it shows on the last of the use's row.
+    const under = changing(world, p) && changeUses(CHANGES[world.provinceChange[p]!]!)[0] === use;
+    for (let i = 0; i < count; i++) {
+      const row: LandTileRow = { use, building, workers: workers / count, feeds: fed / count, ware, changes, ...(game ? { game } : {}) };
+      if (under && i === count - 1) row.changing = { title: changeTitle(CHANGES[world.provinceChange[p]!]!), to: changeUses(CHANGES[world.provinceChange[p]!]!)[1], monthsLeft: world.provinceChangeLeft[p]!, months: world.provinceChangeMonths[p]! };
+      rows.push(row);
+    }
   }
   return rows.slice(0, n);
 }

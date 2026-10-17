@@ -6,6 +6,14 @@
   "clear_woods": { "years": 3, "timber_loads": 1 },
   "fields_to_woods": { "years": 10 },
   "fields_to_pasture": { "seasons": 1 },
+  "tile_changes": {
+    "$comment": "Feedback 86: what the player (or a lord, or the AI) pays to change a tile's use, in the buildings data's gold, and the time for the changes clear_woods and fields_to_pasture don't already set. One change at a time per province.",
+    "clear woods": { "gold": 30 },
+    "to pasture": { "gold": 5 },
+    "plough": { "gold": 10, "seasons": 1 },
+    "drain": { "gold": 60, "years": 3, "needs": "F8" },
+    "irrigate": { "gold": 60, "years": 2, "needs": "F3", "grounds": ["drylands", "desert", "savanna"] }
+  },
   "castle_ruin": { "waste_years": 5 },
   "town": {
     "second_tile_townsfolk": 40000,

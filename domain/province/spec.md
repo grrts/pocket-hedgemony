@@ -342,6 +342,13 @@ settlement, settlers, local people's tiles.
 - PROV-321: Where: the woods tile's sheet on the province's Land tab shows the game left (plenty, thinning or scarce, with the reason) and a hard winter when there is one, and offers both a hunting lodge and a lumber camp, each with its Build button or why not; the Build tab lists the lodge with the other works. [X-19]
 - PROV-322: Grouping and overview: hunting sits with the other food on the Land tab and counts in its food line; the realm's Provinces list stays the overview of food across the realm. Phone: as PROV-316, with one 44-point button per building on the sheet. [X-19]
 
+### Changing a tile's use in the game (feedback 86, 17 October 2026)
+- PROV-323: The crown shall change a tile of a royal province: clear woods into fields (3 years), turn fields to pasture (a season), plough pasture into fields (a season), drain marsh into fields (3 years, *Polder drainage*) and irrigate waste into fields on drylands, desert or savanna (2 years, *Qanat and canal irrigation*). The gold is the data's (30, 5, 10, 60, 60) times the gold scale and the ground's build cost, paid at the start; stopping gives half back. The ground never changes. [PROV-012, PROV-015 to PROV-017, feedback 86, D-PROV-27]
+- PROV-324: A province shall change one tile at a time, the last tile of the use; a change stops if the province is lost or the tile's use changes otherwise. [feedback 86]
+- PROV-325: Lords and the AI shall change tiles by rule: each January a province that does not feed its people in a normal year, and changes nothing yet, starts the first of drain, irrigate, then clear woods (keeping one woods tile) it can, the AI keeping its gold reserve, a lord at his own cost. The player decides only for royal provinces. [feedback 86, D-PROV-27]
+- PROV-326: Where: tapping a tile on the province's Land tab shows under its sheet the one to three changes that fit it, each a 44-point button with what it becomes, its gold and time, or why not (another change under way, the invention it needs by name, its lord, the gold); a tile being changed shows "→ Fields" on the grid and in its sheet the time left with a bar and Stop. [X-19]
+- PROV-327: Overview: the realm's Provinces list has a "Short of food" view listing only the provinces whose land feeds under all their people in a normal year, each with its share and the fix the Land tab offers first (build or improve the farm, clear the woods, drain, irrigate, or bring food in from a castle); a row opens that province's Land tab. Phone: as PROV-316. [X-19, feedback 86]
+
 ### 5.19 Lords in the province
 - PROV-200: A lord shall always hold at least one province; someone with no land is a courtier. [§10.3]
 - PROV-201: When a lord loses his last province, he shall stop being a lord: he stays at court as a courtier who can be granted land again, or, if he lost it to you by force, he flees abroad and becomes a pretender to it. [§10.3]
@@ -624,6 +631,7 @@ province config file but no file name or keys; keys below are proposed by this s
 - **D-PROV-24** (was OQ-PROV-24) Officials per province: one official runs 1 province with G1, 2 with G9, 3 with G16, plus one for each of B2, G11 and T14. Same as D-REALM-14.
 - **D-PROV-25** (17 Oct, Leroy: "Buildings are build in the province but effect tiles, not on tiles"; the food plan, feedback 80 and 87) Land buildings stand in the province, take one building slot and work all its tiles of their use; the tile rules of §2 decide how many people they employ. The map's provinces hold far more people than the design's (median 46,000, a tenth over 300,000), so a tile holds 2.5 times the design's job slots. The 1444 land is laid out from the map's ground, and a province's own ways (terraces, ditches, herding on the move) make up its food to 110 % in 1444. A 15-year run then shows famine touching about 4 % of provinces a year by 1459 against under 1 % before. Tile conversion (feedback 86), hunting (81) and mines with seams (87) build on this next.
 - **D-PROV-26** (17 Oct, feedback 81) Hunting gets its own room in the woods, a lodge, game that thins and hard winters, not the bare rate everywhere. Game starts at the level the 1444 hunting leaves, so the first years don't crash; at that start a tenth of provinces (crowded woods in the steppe and India) sit near the floor and the median at plenty. The province's own ways (PROV-313) are worked out after, so the 1444 food stays at 110 %. Hard winters touch 200 to 300 provinces a year.
+- **D-PROV-27** (17 Oct, feedback 86) Tile changes are few and slow: only the five changes the tile rules (§2.1) name, one per province at a time, for gold and years, and the ground never changes. The tile a change takes is the last of its use, so the player chooses the change, not the square. Lords and the AI act by a plain rule (feed the province first: drain, irrigate, then clear woods), so the AI's land changes slowly and only where it is short.
 
 ## 14. Traceability
 
@@ -808,6 +816,8 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-314 … PROV-316 | — | Presentation: apps/client/scripts/land-shots.mjs on phones in landscape |
 | PROV-317 … PROV-320 | — | Engine: packages/engine/test/works.test.ts (hunting: lodge, thinning, hard winter, save) |
 | PROV-321 … PROV-322 | — | Presentation: apps/client/src/ui/land.ts woods sheet |
+| PROV-323 … PROV-325 | — | Engine: packages/engine/test/works.test.ts (tile changes, the AI's rule, save) |
+| PROV-326 … PROV-327 | — | Presentation: apps/client/src/ui/land.ts change block; main.ts Short of food view |
 | PROV-200 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A courtier can be granted land again |

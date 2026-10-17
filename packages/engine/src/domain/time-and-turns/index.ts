@@ -355,6 +355,10 @@ export function orderShape(order: Order): string {
       return "build in province";
     case "cancelBuild":
       return "cancel a work in province";
+    case "changeTile":
+      return "change a tile's use in province";
+    case "stopChange":
+      return "stop a tile change in province";
     case "moveBuild":
       return "move a work in the province's queue";
     case "setFood":
