@@ -1,0 +1,140 @@
+{
+  "$comment": "Exploration (EXPL) config, from exploration/exploration-design.md v1 sections 2-8 and its section 10 decisions. Every number is a placeholder of the design except unlock_age (decided). Numbers that belong to naval (supply, reach, out-of-supply loss, docking, the exploration ship rows) are repeated under 'naval' as this context reads them (naval-design 3.3, 6.3, 6.4, 7.2). Colonial range per government form is government's (government.json forms.*.colonial_range).",
+  "unlock_age": "age_of_exploration",
+  "$comment_unlock_later_ages": "D-EXPL-3: a region outside unlock_age's region list opens with the first age that starts later than unlock_age and covers it (age_of_atlantic_empires for north_america, age_of_reformations for middle_east and central_asia), read from exploration-regions.json.",
+  "unlock_inventions": [
+    "S4",
+    "S3"
+  ],
+  "colonial_unlock_invention": "S5",
+  "governor_slots": {
+    "S5": 2,
+    "T8": 1,
+    "T9": 1,
+    "S3": 1
+  },
+  "$comment_governor_slots": "D-EXPL-4: the base is 2 with S5, else 1 with S3; T8 and T9 each add 1 to any base.",
+  "s3_invention": "S3",
+  "s3_min_range": 10,
+  "start_charted_reach": 6,
+  "progress_start": 10,
+  "progress_founded": 100,
+  "progress_lost": 0,
+  "progress_gain": 5,
+  "aggression": [
+    {
+      "level": "Peaceful",
+      "chance_pct": 30,
+      "average_loss": 0
+    },
+    {
+      "level": "Wary",
+      "chance_pct": 30,
+      "average_loss": 1
+    },
+    {
+      "level": "Hostile",
+      "chance_pct": 25,
+      "average_loss": 2
+    },
+    {
+      "level": "Fierce",
+      "chance_pct": 15,
+      "average_loss": 3
+    }
+  ],
+  "pressure_roll_max_factor": 2,
+  "food_per_month": 20,
+  "no_food_progress_loss": 10,
+  "colony_stores": {
+    "caravel": 300,
+    "voyaging_canoe": 100
+  },
+  "governor_hire_gold": 20,
+  "governor_wage_per_year": 5,
+  "governor_age_when_hired": 30,
+  "unload_days": 1,
+  "founded_settlement": "settlement",
+  "low_supply_choices": [
+    "Turn back",
+    "Carry on"
+  ],
+  "default_low_supply": "Turn back",
+  "ai": {
+    "$comment": "Exploration design 8: a country explores when its catalogue personality favours expansion by sea; the catalogue's only expansion mode by sea is 'colonization'.",
+    "sea_expansion_modes": [
+      "colonization"
+    ],
+    "stores_margin": 1.25
+  },
+  "naval": {
+    "exploration_ships": {
+      "caravel": {
+        "supply": 60,
+        "invention": "S4"
+      },
+      "voyaging_canoe": {
+        "supply": 60,
+        "invention": "S3",
+        "crew": 20,
+        "gold": 5,
+        "timber": 1,
+        "months": 1,
+        "needs_harbour": false,
+        "built_on": "any shore with seafolk",
+        "open_ocean_from_start": true
+      }
+    },
+    "other_ships": {
+      "carrack": {
+        "family": "military",
+        "supply": 15
+      },
+      "galleon": {
+        "family": "military",
+        "supply": 15
+      },
+      "cog": {
+        "family": "trade",
+        "supply": 15
+      }
+    },
+    "supply_per_zone": 1,
+    "out_of_supply_crew_loss": 0.1,
+    "reach": {
+      "coast_only_before": "S1",
+      "ocean_within_zones_of_coast": 3,
+      "ocean_with": "S1",
+      "any_ocean_with": "S5"
+    },
+    "docking": {
+      "realm": "food",
+      "lord": "food",
+      "subject": "food",
+      "ally": "food",
+      "peace": "gold",
+      "war": null,
+      "rival": null
+    },
+    "undockable_port_tiers": [
+      "landing"
+    ]
+  },
+  "_provisional": [
+    "governor_slots",
+    "s3_min_range",
+    "start_charted_reach",
+    "progress_start",
+    "progress_gain",
+    "aggression",
+    "pressure_roll_max_factor",
+    "food_per_month",
+    "no_food_progress_loss",
+    "colony_stores",
+    "unload_days",
+    "governor_hire_gold",
+    "governor_wage_per_year",
+    "governor_age_when_hired",
+    "ai.stores_margin"
+  ]
+}

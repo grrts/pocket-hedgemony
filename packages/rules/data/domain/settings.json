@@ -1,0 +1,1728 @@
+{
+  "_source": "settings/settings.example.yaml as JSON (YAML 1.2 is a superset of JSON, so this file is valid settings.yaml), with each entry's section and the profile n/a marks of settings-design §3.1",
+  "catalogue": {
+    "defaults": {
+      "applies": "live",
+      "sync": "personal",
+      "platforms": [
+        "desktop",
+        "mobile",
+        "web"
+      ]
+    },
+    "sections": [
+      "gameplay",
+      "graphics",
+      "audio",
+      "controls",
+      "accessibility",
+      "language",
+      "account",
+      "privacy",
+      "about"
+    ],
+    "constants": {
+      "battery_auto_threshold": 0.2,
+      "display_revert_seconds": 15,
+      "interface_scale_auto_min_layout": [
+        360,
+        640
+      ]
+    },
+    "settings": [
+      {
+        "id": "gameplay.autosave",
+        "type": "choice",
+        "options": [
+          "every_turn",
+          "every_6",
+          "every_12",
+          "off"
+        ],
+        "default": "every_12",
+        "hide_when": "ironman",
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.autosaves_kept",
+        "type": "choice",
+        "options": [
+          1,
+          3,
+          5
+        ],
+        "default": 3,
+        "hide_when": "ironman",
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.confirm_end_turn",
+        "type": "choice",
+        "options": [
+          "off",
+          "when_attention",
+          "always"
+        ],
+        "default": "off",
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.battle_speed",
+        "type": "choice",
+        "options": [
+          1,
+          2,
+          4
+        ],
+        "default": 1,
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.turn_report",
+        "type": "choice",
+        "options": [
+          "every_turn",
+          "important",
+          "never"
+        ],
+        "default": "important",
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.jump_to_events",
+        "type": "toggle",
+        "default": true,
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.tooltips",
+        "type": "toggle",
+        "default": true,
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.tooltip_delay",
+        "type": "choice",
+        "options": [
+          "instant",
+          "short",
+          "long"
+        ],
+        "default": "short",
+        "platforms": [
+          "desktop",
+          "web"
+        ],
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.detailed_tooltips",
+        "type": "toggle",
+        "default": false,
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.tutorial_hints",
+        "type": "toggle",
+        "default": true,
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.reset_tutorial_hints",
+        "type": "action",
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.achievement_toasts",
+        "type": "toggle",
+        "default": true,
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.place_names",
+        "type": "choice",
+        "options": [
+          "historical",
+          "modern"
+        ],
+        "default": "historical",
+        "applies": "view",
+        "section": "gameplay"
+      },
+      {
+        "id": "gameplay.date_format",
+        "type": "choice",
+        "options": [
+          "language",
+          "long",
+          "short",
+          "dotted",
+          "iso"
+        ],
+        "default": "language",
+        "section": "gameplay"
+      },
+      {
+        "id": "graphics.profile",
+        "type": "choice",
+        "options": [
+          "phone",
+          "tablet",
+          "desktop",
+          "steam_deck",
+          "big_screen"
+        ],
+        "default": "detected",
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.display_mode",
+        "type": "choice",
+        "options": [
+          "windowed",
+          "fullscreen"
+        ],
+        "default": "windowed",
+        "default_by_profile": {
+          "steam_deck": "fullscreen",
+          "big_screen": "fullscreen"
+        },
+        "platforms": [
+          "desktop"
+        ],
+        "confirm_revert": true,
+        "sync": "device",
+        "section": "graphics",
+        "not_on_profiles": [
+          "phone",
+          "tablet"
+        ]
+      },
+      {
+        "id": "graphics.interface_scale",
+        "type": "choice",
+        "options": [
+          "auto",
+          75,
+          88,
+          100,
+          112,
+          125,
+          150,
+          175,
+          200
+        ],
+        "default": "auto",
+        "default_by_profile": {
+          "desktop": 100,
+          "steam_deck": 112,
+          "big_screen": 175
+        },
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.pixel_scaling",
+        "type": "choice",
+        "options": [
+          "crisp",
+          "smooth"
+        ],
+        "default": "crisp",
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.sharpness",
+        "type": "choice",
+        "options": [
+          "native",
+          "balanced",
+          "battery"
+        ],
+        "default": "native",
+        "default_by_profile": {
+          "phone": "balanced",
+          "tablet": "balanced"
+        },
+        "applies": "view",
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.frame_cap",
+        "type": "choice",
+        "options": [
+          30,
+          60,
+          120,
+          "display"
+        ],
+        "default": 60,
+        "default_by_profile": {
+          "desktop": "display"
+        },
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.battery_saver",
+        "type": "choice",
+        "options": [
+          "off",
+          "auto",
+          "on"
+        ],
+        "default": "off",
+        "default_by_profile": {
+          "phone": "auto",
+          "tablet": "auto",
+          "steam_deck": "auto"
+        },
+        "sync": "device",
+        "sets_when_on": {
+          "graphics.frame_cap": 30,
+          "graphics.sharpness": "battery",
+          "graphics.animations": "reduced",
+          "engine.worker_budget": "low"
+        },
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.map_detail",
+        "type": "choice",
+        "options": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "default": "high",
+        "default_by_profile": {
+          "phone": "medium"
+        },
+        "applies": "view",
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.animations",
+        "type": "choice",
+        "options": [
+          "full",
+          "reduced",
+          "off"
+        ],
+        "default": "full",
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.keep_awake",
+        "type": "toggle",
+        "default": true,
+        "platforms": [
+          "mobile"
+        ],
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.screen_margins",
+        "type": "slider",
+        "min": 0,
+        "max": 10,
+        "step": 1,
+        "unit": "percent",
+        "default": 0,
+        "default_by_profile": {
+          "big_screen": 5
+        },
+        "platforms": [
+          "desktop"
+        ],
+        "offer_calibration_on": [
+          "big_screen"
+        ],
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "graphics.performance_line",
+        "type": "choice",
+        "options": [
+          "off",
+          "fps",
+          "full"
+        ],
+        "default": "off",
+        "sync": "device",
+        "section": "graphics"
+      },
+      {
+        "id": "audio.master",
+        "type": "slider",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "default": 80,
+        "sync": "device",
+        "section": "audio"
+      },
+      {
+        "id": "audio.music_volume",
+        "type": "slider",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "default": 70,
+        "sync": "device",
+        "section": "audio"
+      },
+      {
+        "id": "audio.music",
+        "type": "toggle",
+        "default": true,
+        "sync": "device",
+        "section": "audio"
+      },
+      {
+        "id": "audio.music_variety",
+        "type": "choice",
+        "options": [
+          "own_palette",
+          "all_palettes"
+        ],
+        "default": "own_palette",
+        "section": "audio"
+      },
+      {
+        "id": "audio.zoom_mix",
+        "type": "toggle",
+        "default": true,
+        "section": "audio"
+      },
+      {
+        "id": "audio.effects_volume",
+        "type": "slider",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "default": 80,
+        "sync": "device",
+        "section": "audio"
+      },
+      {
+        "id": "audio.interface_sounds",
+        "type": "toggle",
+        "default": true,
+        "section": "audio"
+      },
+      {
+        "id": "audio.ambience",
+        "type": "toggle",
+        "default": false,
+        "section": "audio"
+      },
+      {
+        "id": "audio.ambience_volume",
+        "type": "slider",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "default": 50,
+        "sync": "device",
+        "enabled_when": "audio.ambience",
+        "section": "audio"
+      },
+      {
+        "id": "audio.haptics",
+        "type": "toggle",
+        "default": true,
+        "platforms": [
+          "mobile"
+        ],
+        "section": "audio"
+      },
+      {
+        "id": "audio.play_in_background",
+        "type": "toggle",
+        "default": false,
+        "platforms": [
+          "desktop",
+          "web"
+        ],
+        "sync": "device",
+        "section": "audio"
+      },
+      {
+        "id": "audio.mix_with_other_apps",
+        "type": "toggle",
+        "default": true,
+        "platforms": [
+          "mobile"
+        ],
+        "applies": "restart",
+        "sync": "device",
+        "section": "audio"
+      },
+      {
+        "id": "audio.captions",
+        "type": "toggle",
+        "default": false,
+        "auto_on_when": "sound_silenced",
+        "section": "audio"
+      },
+      {
+        "id": "audio.reduced_intensity",
+        "type": "toggle",
+        "default": false,
+        "section": "audio"
+      },
+      {
+        "id": "audio.mono",
+        "type": "toggle",
+        "default": false,
+        "sync": "device",
+        "section": "audio"
+      },
+      {
+        "id": "controls.main_hand",
+        "type": "choice",
+        "options": [
+          "right",
+          "left"
+        ],
+        "default": "right",
+        "section": "controls"
+      },
+      {
+        "id": "controls.long_press",
+        "type": "choice",
+        "options": [
+          "short",
+          "medium",
+          "long"
+        ],
+        "default": "medium",
+        "section": "controls"
+      },
+      {
+        "id": "controls.double_tap_zoom",
+        "type": "toggle",
+        "default": true,
+        "section": "controls"
+      },
+      {
+        "id": "controls.touch_speed",
+        "type": "choice",
+        "options": [
+          "slow",
+          "medium",
+          "fast"
+        ],
+        "default": "medium",
+        "section": "controls"
+      },
+      {
+        "id": "controls.haptics",
+        "alias_of": "audio.haptics",
+        "section": "controls"
+      },
+      {
+        "id": "controls.right_click_orders",
+        "type": "toggle",
+        "default": true,
+        "platforms": [
+          "desktop",
+          "web"
+        ],
+        "section": "controls"
+      },
+      {
+        "id": "controls.wheel_zoom",
+        "type": "choice",
+        "options": [
+          "cursor",
+          "centre"
+        ],
+        "default": "cursor",
+        "platforms": [
+          "desktop",
+          "web"
+        ],
+        "section": "controls"
+      },
+      {
+        "id": "controls.edge_scroll",
+        "type": "choice",
+        "options": [
+          "on",
+          "off",
+          "fullscreen_only"
+        ],
+        "default": "fullscreen_only",
+        "default_by_profile": {
+          "steam_deck": "off",
+          "big_screen": "off"
+        },
+        "platforms": [
+          "desktop",
+          "web"
+        ],
+        "section": "controls",
+        "not_on_profiles": [
+          "phone",
+          "tablet"
+        ]
+      },
+      {
+        "id": "controls.key_pan_speed",
+        "type": "choice",
+        "options": [
+          "slow",
+          "medium",
+          "fast"
+        ],
+        "default": "medium",
+        "platforms": [
+          "desktop",
+          "web"
+        ],
+        "section": "controls"
+      },
+      {
+        "id": "controls.keys",
+        "type": "binding",
+        "platforms": [
+          "desktop",
+          "web"
+        ],
+        "slots_per_action": 2,
+        "default": {
+          "pan_up": [
+            "W",
+            "ArrowUp"
+          ],
+          "pan_left": [
+            "A",
+            "ArrowLeft"
+          ],
+          "pan_down": [
+            "S",
+            "ArrowDown"
+          ],
+          "pan_right": [
+            "D",
+            "ArrowRight"
+          ],
+          "zoom_in": [
+            "+",
+            "E"
+          ],
+          "zoom_out": [
+            "-",
+            "Q"
+          ],
+          "end_turn": [
+            "Enter"
+          ],
+          "pause_menu": [
+            "Escape"
+          ],
+          "lens_1": [
+            "1"
+          ],
+          "lens_2": [
+            "2"
+          ],
+          "lens_3": [
+            "3"
+          ],
+          "lens_4": [
+            "4"
+          ],
+          "lens_5": [
+            "5"
+          ],
+          "lens_6": [
+            "6"
+          ],
+          "lens_next": [
+            "Tab"
+          ],
+          "army_next": [
+            "."
+          ],
+          "army_prev": [
+            ","
+          ],
+          "notification_next": [
+            "N"
+          ],
+          "turn_report": [
+            "R"
+          ],
+          "jump_capital": [
+            "Home"
+          ],
+          "ledger": [
+            "L"
+          ]
+        },
+        "section": "controls"
+      },
+      {
+        "id": "controls.prompts",
+        "type": "choice",
+        "options": [
+          "auto",
+          "xbox",
+          "playstation",
+          "nintendo",
+          "steam_controller",
+          "steam_deck"
+        ],
+        "default": "auto",
+        "section": "controls"
+      },
+      {
+        "id": "controls.confirm_button",
+        "type": "choice",
+        "options": [
+          "bottom",
+          "right"
+        ],
+        "default": "bottom",
+        "default_if_nintendo": "right",
+        "section": "controls"
+      },
+      {
+        "id": "controls.cursor_speed",
+        "type": "choice",
+        "options": [
+          "slow",
+          "medium",
+          "fast"
+        ],
+        "default": "medium",
+        "default_by_profile": {
+          "big_screen": "slow"
+        },
+        "section": "controls",
+        "not_on_profiles": [
+          "phone",
+          "tablet"
+        ]
+      },
+      {
+        "id": "controls.cursor_acceleration",
+        "type": "toggle",
+        "default": true,
+        "section": "controls"
+      },
+      {
+        "id": "controls.snap_to_provinces",
+        "type": "choice",
+        "options": [
+          "off",
+          "light",
+          "strong"
+        ],
+        "default": "light",
+        "section": "controls"
+      },
+      {
+        "id": "controls.deadzone",
+        "type": "slider",
+        "min": 5,
+        "max": 30,
+        "step": 1,
+        "unit": "percent",
+        "default": 12,
+        "hide_on": [
+          "steam"
+        ],
+        "sync": "device",
+        "section": "controls"
+      },
+      {
+        "id": "controls.vibration",
+        "type": "choice",
+        "options": [
+          "off",
+          "light",
+          "full"
+        ],
+        "default": "light",
+        "section": "controls"
+      },
+      {
+        "id": "controls.gyro_cursor",
+        "type": "choice",
+        "options": [
+          "off",
+          "while_touching",
+          "always"
+        ],
+        "default": "off",
+        "hide_on": [
+          "steam"
+        ],
+        "section": "controls"
+      },
+      {
+        "id": "controls.action_menu",
+        "type": "choice",
+        "options": [
+          "hold",
+          "tap"
+        ],
+        "default": "hold",
+        "section": "controls"
+      },
+      {
+        "id": "controls.open_steam_bindings",
+        "type": "action",
+        "only_on": [
+          "steam"
+        ],
+        "section": "controls"
+      },
+      {
+        "id": "controls.pad",
+        "type": "binding",
+        "hide_on": [
+          "steam"
+        ],
+        "action_sets": {
+          "map": {
+            "cursor": "left_stick",
+            "pan": "right_stick",
+            "zoom_out": "LT",
+            "zoom_in": "RT",
+            "select": "A",
+            "back": "B",
+            "action_menu": "X",
+            "info": "Y",
+            "army_prev": "LB",
+            "army_next": "RB",
+            "lens_prev": "dpad_up",
+            "lens_next": "dpad_down",
+            "notification_prev": "dpad_left",
+            "notification_next": "dpad_right",
+            "turn_report": "view",
+            "end_turn": {
+              "button": "view",
+              "hold_seconds": 1.0
+            },
+            "pause_menu": "menu",
+            "jump_capital": "left_stick_click",
+            "recentre": "right_stick_click"
+          },
+          "menu": {
+            "focus": [
+              "left_stick",
+              "dpad"
+            ],
+            "scroll": "right_stick",
+            "page_prev": "LT",
+            "page_next": "RT",
+            "confirm": "A",
+            "back": "B",
+            "reset_row": "X",
+            "describe": "Y",
+            "tab_prev": "LB",
+            "tab_next": "RB",
+            "close": "menu"
+          },
+          "battle": {
+            "pan": "right_stick",
+            "slower": "LT",
+            "faster": "RT",
+            "play_pause": "A",
+            "skip": "B",
+            "replay_bell": "X",
+            "commander_line": "Y",
+            "leave": "menu"
+          }
+        },
+        "section": "controls"
+      },
+      {
+        "id": "accessibility.colour_vision",
+        "type": "choice",
+        "options": [
+          "default",
+          "protan",
+          "deutan",
+          "tritan",
+          "none"
+        ],
+        "default": "default",
+        "sets_when": {
+          "none": {
+            "accessibility.lens_patterns": true
+          }
+        },
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.lens_patterns",
+        "type": "toggle",
+        "default": false,
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.borders",
+        "type": "choice",
+        "options": [
+          "normal",
+          "thick",
+          "high_contrast"
+        ],
+        "default": "normal",
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.text_size",
+        "type": "choice",
+        "options": [
+          "normal",
+          "large",
+          "larger"
+        ],
+        "default": "normal",
+        "default_by_profile": {
+          "big_screen": "large"
+        },
+        "body_px": {
+          "normal": 17,
+          "large": 20,
+          "larger": 24
+        },
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.font",
+        "type": "choice",
+        "options": [
+          "pixel",
+          "plain"
+        ],
+        "default": "pixel",
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.high_contrast_panels",
+        "type": "toggle",
+        "default": false,
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.touch_targets",
+        "type": "choice",
+        "options": [
+          "normal",
+          "large"
+        ],
+        "default": "normal",
+        "default_by_profile": {
+          "phone": "large"
+        },
+        "points": {
+          "normal": 44,
+          "large": 56
+        },
+        "platforms": [
+          "mobile",
+          "desktop"
+        ],
+        "section": "accessibility",
+        "not_on_profiles": [
+          "desktop",
+          "big_screen"
+        ]
+      },
+      {
+        "id": "accessibility.reduced_motion",
+        "type": "choice",
+        "options": [
+          "system",
+          "on",
+          "off"
+        ],
+        "default": "system",
+        "sets_when_on": {
+          "graphics.animations": "reduced"
+        },
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.no_flashes",
+        "type": "toggle",
+        "default": false,
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.hold_actions",
+        "type": "toggle",
+        "default": true,
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.captions",
+        "alias_of": "audio.captions",
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.reduced_intensity",
+        "alias_of": "audio.reduced_intensity",
+        "section": "accessibility"
+      },
+      {
+        "id": "accessibility.mono_audio",
+        "alias_of": "audio.mono",
+        "section": "accessibility"
+      },
+      {
+        "id": "language.language",
+        "type": "choice",
+        "options": "from_string_tables",
+        "default": "system_or_en",
+        "section": "language"
+      },
+      {
+        "id": "language.number_format",
+        "type": "choice",
+        "options": [
+          "language",
+          "comma_point",
+          "point_comma",
+          "space_comma"
+        ],
+        "default": "language",
+        "section": "language"
+      },
+      {
+        "id": "account.sign_in",
+        "type": "action",
+        "section": "account"
+      },
+      {
+        "id": "account.cloud_saves",
+        "type": "toggle",
+        "default": true,
+        "shown_when": "signed_in",
+        "section": "account"
+      },
+      {
+        "id": "account.wifi_only",
+        "type": "toggle",
+        "default": false,
+        "shown_when": "signed_in",
+        "sync": "device",
+        "section": "account"
+      },
+      {
+        "id": "account.devices",
+        "type": "action",
+        "shown_when": "signed_in",
+        "section": "account"
+      },
+      {
+        "id": "account.delete",
+        "type": "action",
+        "confirm": true,
+        "shown_when": "signed_in",
+        "section": "account"
+      },
+      {
+        "id": "privacy.crash_reports",
+        "type": "toggle",
+        "default": "ask",
+        "section": "privacy"
+      },
+      {
+        "id": "privacy.usage_stats",
+        "type": "toggle",
+        "default": "ask",
+        "section": "privacy"
+      },
+      {
+        "id": "privacy.ad_consent",
+        "type": "action",
+        "platforms": [
+          "mobile"
+        ],
+        "only_if": "free_tier_ad",
+        "section": "privacy"
+      },
+      {
+        "id": "about.restore_purchases",
+        "type": "action",
+        "platforms": [
+          "mobile",
+          "desktop"
+        ],
+        "section": "about"
+      },
+      {
+        "id": "about.credits",
+        "type": "action",
+        "section": "about"
+      },
+      {
+        "id": "about.copy_diagnostics",
+        "type": "action",
+        "section": "about"
+      },
+      {
+        "id": "about.reset_all",
+        "type": "action",
+        "section": "about"
+      }
+    ]
+  },
+  "strings_en": {
+    "settings.gameplay.autosave.name": "Autosave",
+    "settings.gameplay.autosave.desc": "How often the game makes a rotating autosave. Off never stops the Resume save.",
+    "settings.gameplay.autosave.option.every_turn": "Every turn",
+    "settings.gameplay.autosave.option.every_6": "Every 6 turns",
+    "settings.gameplay.autosave.option.every_12": "Every 12 turns (each January)",
+    "settings.gameplay.autosave.option.off": "Off",
+    "settings.gameplay.autosaves_kept.name": "Autosaves kept per campaign",
+    "settings.gameplay.autosaves_kept.desc": "How many autosaves each campaign keeps.",
+    "settings.gameplay.confirm_end_turn.name": "Confirm End turn",
+    "settings.gameplay.confirm_end_turn.desc": "Ask before ending the turn. Unanswered events always ask.",
+    "settings.gameplay.confirm_end_turn.option.off": "Off",
+    "settings.gameplay.confirm_end_turn.option.when_attention": "When the Attention screen has lines",
+    "settings.gameplay.confirm_end_turn.option.always": "Always",
+    "settings.gameplay.battle_speed.name": "Battle playback speed",
+    "settings.gameplay.battle_speed.desc": "How fast battles play back. One bell takes 1 to 2 seconds at 1×.",
+    "settings.gameplay.battle_speed.option.1": "1×",
+    "settings.gameplay.battle_speed.option.2": "2×",
+    "settings.gameplay.battle_speed.option.4": "4×",
+    "settings.gameplay.turn_report.name": "Open the turn report",
+    "settings.gameplay.turn_report.desc": "When the turn report opens by itself.",
+    "settings.gameplay.turn_report.option.every_turn": "Every turn",
+    "settings.gameplay.turn_report.option.important": "When something important happened",
+    "settings.gameplay.turn_report.option.never": "Never",
+    "settings.gameplay.jump_to_events.name": "Jump to events",
+    "settings.gameplay.jump_to_events.desc": "The camera glides to an event's province when its card opens.",
+    "settings.gameplay.tooltips.name": "Tooltips",
+    "settings.gameplay.tooltips.desc": "Explanations on hover, long-press or Y.",
+    "settings.gameplay.tooltip_delay.name": "Tooltip delay",
+    "settings.gameplay.tooltip_delay.desc": "How long the mouse rests before a tooltip shows.",
+    "settings.gameplay.tooltip_delay.option.instant": "Instant",
+    "settings.gameplay.tooltip_delay.option.short": "Short (0.3 s)",
+    "settings.gameplay.tooltip_delay.option.long": "Long (0.8 s)",
+    "settings.gameplay.detailed_tooltips.name": "Detailed tooltips",
+    "settings.gameplay.detailed_tooltips.desc": "Show the full breakdown of each number.",
+    "settings.gameplay.tutorial_hints.name": "Tutorial hints",
+    "settings.gameplay.tutorial_hints.desc": "Show tutorial hints.",
+    "settings.gameplay.reset_tutorial_hints.name": "Reset tutorial and hints",
+    "settings.gameplay.reset_tutorial_hints.desc": "Show every tutorial hint again.",
+    "settings.gameplay.achievement_toasts.name": "Achievement toasts",
+    "settings.gameplay.achievement_toasts.desc": "Show a toast when an achievement unlocks. Achievements still unlock when off.",
+    "settings.gameplay.place_names.name": "Place names",
+    "settings.gameplay.place_names.desc": "Historical names change with date and owner; modern names are today's.",
+    "settings.gameplay.place_names.option.historical": "Historical",
+    "settings.gameplay.place_names.option.modern": "Modern",
+    "settings.gameplay.date_format.name": "Date format",
+    "settings.gameplay.date_format.desc": "How dates are written.",
+    "settings.gameplay.date_format.option.language": "Follows the language",
+    "settings.gameplay.date_format.option.long": "16 October 1444",
+    "settings.gameplay.date_format.option.short": "16 Oct 1444",
+    "settings.gameplay.date_format.option.dotted": "16.10.1444",
+    "settings.gameplay.date_format.option.iso": "1444-10-16",
+    "settings.graphics.profile.name": "Device profile",
+    "settings.graphics.profile.desc": "The kind of device; it gives every default.",
+    "settings.graphics.profile.option.phone": "Phone",
+    "settings.graphics.profile.option.tablet": "Tablet",
+    "settings.graphics.profile.option.desktop": "Desktop",
+    "settings.graphics.profile.option.steam_deck": "Steam Deck",
+    "settings.graphics.profile.option.big_screen": "Big screen",
+    "settings.graphics.display_mode.name": "Display mode",
+    "settings.graphics.display_mode.desc": "Windowed, or borderless fullscreen at the display's own resolution.",
+    "settings.graphics.display_mode.option.windowed": "Windowed",
+    "settings.graphics.display_mode.option.fullscreen": "Fullscreen",
+    "settings.graphics.interface_scale.name": "Interface scale",
+    "settings.graphics.interface_scale.desc": "Panels, cards, icons and text scale together.",
+    "settings.graphics.interface_scale.option.auto": "Auto",
+    "settings.graphics.interface_scale.option.75": "75 %",
+    "settings.graphics.interface_scale.option.88": "88 %",
+    "settings.graphics.interface_scale.option.100": "100 %",
+    "settings.graphics.interface_scale.option.112": "112 %",
+    "settings.graphics.interface_scale.option.125": "125 %",
+    "settings.graphics.interface_scale.option.150": "150 %",
+    "settings.graphics.interface_scale.option.175": "175 %",
+    "settings.graphics.interface_scale.option.200": "200 %",
+    "settings.graphics.pixel_scaling.name": "Pixel scaling",
+    "settings.graphics.pixel_scaling.desc": "Crisp keeps whole pixel multiples; Smooth fills the space exactly.",
+    "settings.graphics.pixel_scaling.option.crisp": "Crisp",
+    "settings.graphics.pixel_scaling.option.smooth": "Smooth",
+    "settings.graphics.sharpness.name": "Sharpness",
+    "settings.graphics.sharpness.desc": "Screen pixels the map draws per CSS pixel.",
+    "settings.graphics.sharpness.option.native": "Native",
+    "settings.graphics.sharpness.option.balanced": "Balanced",
+    "settings.graphics.sharpness.option.battery": "Battery",
+    "settings.graphics.frame_cap.name": "Frame rate cap",
+    "settings.graphics.frame_cap.desc": "The most frames per second. A still map does not redraw.",
+    "settings.graphics.frame_cap.option.30": "30",
+    "settings.graphics.frame_cap.option.60": "60",
+    "settings.graphics.frame_cap.option.120": "120",
+    "settings.graphics.frame_cap.option.display": "Display rate",
+    "settings.graphics.battery_saver.name": "Battery saver",
+    "settings.graphics.battery_saver.desc": "Moves the performance settings to their cheapest values at once.",
+    "settings.graphics.battery_saver.option.off": "Off",
+    "settings.graphics.battery_saver.option.auto": "Auto",
+    "settings.graphics.battery_saver.option.on": "On",
+    "settings.graphics.map_detail.name": "Map detail",
+    "settings.graphics.map_detail.desc": "Close-in tiles, surf and forest blending.",
+    "settings.graphics.map_detail.option.low": "Low",
+    "settings.graphics.map_detail.option.medium": "Medium",
+    "settings.graphics.map_detail.option.high": "High",
+    "settings.graphics.animations.name": "Animations",
+    "settings.graphics.animations.desc": "Water, marching columns, flags, smoke and battle playback.",
+    "settings.graphics.animations.option.full": "Full",
+    "settings.graphics.animations.option.reduced": "Reduced",
+    "settings.graphics.animations.option.off": "Off",
+    "settings.graphics.keep_awake.name": "Keep screen awake during the AI turn",
+    "settings.graphics.keep_awake.desc": "Keep the screen on while the AI turn runs.",
+    "settings.graphics.screen_margins.name": "Screen margins",
+    "settings.graphics.screen_margins.desc": "Keep everything away from the edges of a TV that crops the picture.",
+    "settings.graphics.performance_line.name": "Show performance line",
+    "settings.graphics.performance_line.desc": "Show the frame rate or the full diagnostics line.",
+    "settings.graphics.performance_line.option.off": "Off",
+    "settings.graphics.performance_line.option.fps": "FPS",
+    "settings.graphics.performance_line.option.full": "Full diagnostics",
+    "settings.audio.master.name": "Master volume",
+    "settings.audio.master.desc": "The volume of everything.",
+    "settings.audio.music_volume.name": "Music volume",
+    "settings.audio.music_volume.desc": "Music tracks and stingers.",
+    "settings.audio.music.name": "Music",
+    "settings.audio.music.desc": "Off fully suspends the music.",
+    "settings.audio.music_variety.name": "Music variety",
+    "settings.audio.music_variety.desc": "Play your own palette only, or all palettes.",
+    "settings.audio.music_variety.option.own_palette": "My palette only",
+    "settings.audio.music_variety.option.all_palettes": "All palettes",
+    "settings.audio.zoom_mix.name": "Zoom mix",
+    "settings.audio.zoom_mix.desc": "The mix follows the zoom level.",
+    "settings.audio.effects_volume.name": "Effects volume",
+    "settings.audio.effects_volume.desc": "World and interface sounds.",
+    "settings.audio.interface_sounds.name": "Interface sounds",
+    "settings.audio.interface_sounds.desc": "Taps and panel sounds; world effects stay.",
+    "settings.audio.ambience.name": "Ambience",
+    "settings.audio.ambience.desc": "The ambience bed under the map.",
+    "settings.audio.ambience_volume.name": "Ambience volume",
+    "settings.audio.ambience_volume.desc": "The ambience bed's volume.",
+    "settings.audio.haptics.name": "Haptics",
+    "settings.audio.haptics.desc": "Light vibrations at key moments.",
+    "settings.audio.play_in_background.name": "Play sound in the background",
+    "settings.audio.play_in_background.desc": "Keep playing sound when the game is in the background.",
+    "settings.audio.mix_with_other_apps.name": "Let other apps' audio play",
+    "settings.audio.mix_with_other_apps.desc": "Let other apps' audio play over the game. Applies on restart.",
+    "settings.audio.captions.name": "Sound captions",
+    "settings.audio.captions.desc": "Captions for off-screen sounds.",
+    "settings.audio.reduced_intensity.name": "Reduced intensity",
+    "settings.audio.reduced_intensity.desc": "No echo, softer loud sounds, no sharp attacks.",
+    "settings.audio.mono.name": "Mono audio",
+    "settings.audio.mono.desc": "Play all sound in mono.",
+    "settings.controls.main_hand.name": "Main hand",
+    "settings.controls.main_hand.desc": "Left mirrors the action bar and the End turn button.",
+    "settings.controls.main_hand.option.right": "Right",
+    "settings.controls.main_hand.option.left": "Left",
+    "settings.controls.long_press.name": "Long-press time",
+    "settings.controls.long_press.desc": "How long a long-press takes.",
+    "settings.controls.long_press.option.short": "Short (0.3 s)",
+    "settings.controls.long_press.option.medium": "Medium (0.5 s)",
+    "settings.controls.long_press.option.long": "Long (0.8 s)",
+    "settings.controls.double_tap_zoom.name": "Double-tap to zoom",
+    "settings.controls.double_tap_zoom.desc": "Double-tap the map to zoom.",
+    "settings.controls.touch_speed.name": "Pan and zoom speed",
+    "settings.controls.touch_speed.desc": "Speed of panning and zooming by touch.",
+    "settings.controls.touch_speed.option.slow": "Slow",
+    "settings.controls.touch_speed.option.medium": "Medium",
+    "settings.controls.touch_speed.option.fast": "Fast",
+    "settings.controls.haptics.name": "Haptics",
+    "settings.controls.haptics.desc": "Light vibrations at key moments.",
+    "settings.controls.right_click_orders.name": "Right-click gives orders",
+    "settings.controls.right_click_orders.desc": "Left-click selects, right-click marches. The touch flow always works too.",
+    "settings.controls.wheel_zoom.name": "Wheel zoom",
+    "settings.controls.wheel_zoom.desc": "Zoom toward the cursor or the centre.",
+    "settings.controls.wheel_zoom.option.cursor": "Toward the cursor",
+    "settings.controls.wheel_zoom.option.centre": "Toward the centre",
+    "settings.controls.edge_scroll.name": "Edge scrolling",
+    "settings.controls.edge_scroll.desc": "Pan when the mouse touches the screen edge.",
+    "settings.controls.edge_scroll.option.on": "On",
+    "settings.controls.edge_scroll.option.off": "Off",
+    "settings.controls.edge_scroll.option.fullscreen_only": "On in fullscreen",
+    "settings.controls.key_pan_speed.name": "Pan speed (keys and edge)",
+    "settings.controls.key_pan_speed.desc": "Speed of panning with keys and the screen edge.",
+    "settings.controls.key_pan_speed.option.slow": "Slow",
+    "settings.controls.key_pan_speed.option.medium": "Medium",
+    "settings.controls.key_pan_speed.option.fast": "Fast",
+    "settings.controls.keys.name": "Key bindings",
+    "settings.controls.keys.desc": "Two keys per action.",
+    "settings.controls.prompts.name": "Button prompts",
+    "settings.controls.prompts.desc": "Which button glyphs to show.",
+    "settings.controls.prompts.option.auto": "Auto",
+    "settings.controls.prompts.option.xbox": "Xbox",
+    "settings.controls.prompts.option.playstation": "PlayStation",
+    "settings.controls.prompts.option.nintendo": "Nintendo",
+    "settings.controls.prompts.option.steam_controller": "Steam Controller",
+    "settings.controls.prompts.option.steam_deck": "Steam Deck",
+    "settings.controls.confirm_button.name": "Confirm button",
+    "settings.controls.confirm_button.desc": "Swap confirm and back.",
+    "settings.controls.confirm_button.option.bottom": "Bottom (A / ✕)",
+    "settings.controls.confirm_button.option.right": "Right (B / ○)",
+    "settings.controls.cursor_speed.name": "Cursor speed",
+    "settings.controls.cursor_speed.desc": "Speed of the map cursor on the left stick.",
+    "settings.controls.cursor_speed.option.slow": "Slow",
+    "settings.controls.cursor_speed.option.medium": "Medium",
+    "settings.controls.cursor_speed.option.fast": "Fast",
+    "settings.controls.cursor_acceleration.name": "Cursor acceleration",
+    "settings.controls.cursor_acceleration.desc": "The cursor speeds up as the stick is held.",
+    "settings.controls.snap_to_provinces.name": "Snap to provinces",
+    "settings.controls.snap_to_provinces.desc": "The cursor slows over a province's centre and its armies.",
+    "settings.controls.snap_to_provinces.option.off": "Off",
+    "settings.controls.snap_to_provinces.option.light": "Light",
+    "settings.controls.snap_to_provinces.option.strong": "Strong",
+    "settings.controls.deadzone.name": "Stick deadzone",
+    "settings.controls.deadzone.desc": "How far the stick moves before it counts.",
+    "settings.controls.vibration.name": "Vibration",
+    "settings.controls.vibration.desc": "Controller vibration.",
+    "settings.controls.vibration.option.off": "Off",
+    "settings.controls.vibration.option.light": "Light",
+    "settings.controls.vibration.option.full": "Full",
+    "settings.controls.gyro_cursor.name": "Gyro cursor",
+    "settings.controls.gyro_cursor.desc": "Aim the cursor by tilting the controller.",
+    "settings.controls.gyro_cursor.option.off": "Off",
+    "settings.controls.gyro_cursor.option.while_touching": "While touching the right trackpad / stick",
+    "settings.controls.gyro_cursor.option.always": "Always",
+    "settings.controls.action_menu.name": "Hold to open the action menu",
+    "settings.controls.action_menu.desc": "Hold or tap to open the action menu.",
+    "settings.controls.action_menu.option.hold": "Hold",
+    "settings.controls.action_menu.option.tap": "Tap",
+    "settings.controls.open_steam_bindings.name": "Open Steam controller settings",
+    "settings.controls.open_steam_bindings.desc": "Rebind the controller in Steam's own panel.",
+    "settings.controls.pad.name": "Controller bindings",
+    "settings.controls.pad.desc": "Rebind the controller.",
+    "settings.accessibility.colour_vision.name": "Colour vision",
+    "settings.accessibility.colour_vision.desc": "Nation colours and lens ramps that read for your colour vision.",
+    "settings.accessibility.colour_vision.option.default": "Default",
+    "settings.accessibility.colour_vision.option.protan": "Red-weak (protan)",
+    "settings.accessibility.colour_vision.option.deutan": "Green-weak (deutan)",
+    "settings.accessibility.colour_vision.option.tritan": "Blue-weak (tritan)",
+    "settings.accessibility.colour_vision.option.none": "No colour",
+    "settings.accessibility.lens_patterns.name": "Patterns on lenses",
+    "settings.accessibility.lens_patterns.desc": "Hatching, dots and stripes so a lens reads without colour.",
+    "settings.accessibility.borders.name": "Borders",
+    "settings.accessibility.borders.desc": "High contrast draws borders in black and white ink.",
+    "settings.accessibility.borders.option.normal": "Normal",
+    "settings.accessibility.borders.option.thick": "Thick",
+    "settings.accessibility.borders.option.high_contrast": "High contrast",
+    "settings.accessibility.text_size.name": "Text size",
+    "settings.accessibility.text_size.desc": "Body text size; panels reflow.",
+    "settings.accessibility.text_size.option.normal": "Normal",
+    "settings.accessibility.text_size.option.large": "Large",
+    "settings.accessibility.text_size.option.larger": "Larger",
+    "settings.accessibility.font.name": "Font",
+    "settings.accessibility.font.desc": "Plain replaces the pixel and blackletter fonts with a clear sans.",
+    "settings.accessibility.font.option.pixel": "Pixel",
+    "settings.accessibility.font.option.plain": "Plain",
+    "settings.accessibility.high_contrast_panels.name": "High contrast panels",
+    "settings.accessibility.high_contrast_panels.desc": "Solid panels, stronger outlines, no text over patterns.",
+    "settings.accessibility.touch_targets.name": "Touch target size",
+    "settings.accessibility.touch_targets.desc": "Large raises every tap target from 44 to 56 points.",
+    "settings.accessibility.touch_targets.option.normal": "Normal",
+    "settings.accessibility.touch_targets.option.large": "Large",
+    "settings.accessibility.reduced_motion.name": "Reduced motion",
+    "settings.accessibility.reduced_motion.desc": "Camera cuts instead of glides, no screen shake, reduced animations.",
+    "settings.accessibility.reduced_motion.option.system": "Follow system",
+    "settings.accessibility.reduced_motion.option.on": "On",
+    "settings.accessibility.reduced_motion.option.off": "Off",
+    "settings.accessibility.no_flashes.name": "No flashes",
+    "settings.accessibility.no_flashes.desc": "No cannon flashes, lightning or white flashes.",
+    "settings.accessibility.hold_actions.name": "Hold actions",
+    "settings.accessibility.hold_actions.desc": "Off replaces every hold with a double press.",
+    "settings.accessibility.captions.name": "Sound captions",
+    "settings.accessibility.captions.desc": "Captions for off-screen sounds.",
+    "settings.accessibility.reduced_intensity.name": "Reduced intensity",
+    "settings.accessibility.reduced_intensity.desc": "No echo, softer loud sounds, no sharp attacks.",
+    "settings.accessibility.mono_audio.name": "Mono audio",
+    "settings.accessibility.mono_audio.desc": "Play all sound in mono.",
+    "settings.language.language.name": "Language",
+    "settings.language.language.desc": "The language of the game.",
+    "settings.language.number_format.name": "Number format",
+    "settings.language.number_format.desc": "How numbers are written.",
+    "settings.language.number_format.option.language": "Follows the language",
+    "settings.language.number_format.option.comma_point": "1,000.5",
+    "settings.language.number_format.option.point_comma": "1.000,5",
+    "settings.language.number_format.option.space_comma": "1 000,5",
+    "settings.account.sign_in.name": "Account",
+    "settings.account.sign_in.desc": "Sign in to sync saves and settings between devices.",
+    "settings.account.cloud_saves.name": "Cloud saves",
+    "settings.account.cloud_saves.desc": "Sync saves and personal settings.",
+    "settings.account.wifi_only.name": "Sync on Wi-Fi only",
+    "settings.account.wifi_only.desc": "Do not sync on metered connections.",
+    "settings.account.devices.name": "Devices",
+    "settings.account.devices.desc": "Devices signed in to this account.",
+    "settings.account.delete.name": "Delete account and saves",
+    "settings.account.delete.desc": "Delete the account and every save.",
+    "settings.privacy.crash_reports.name": "Send crash reports",
+    "settings.privacy.crash_reports.desc": "Send crash reports.",
+    "settings.privacy.usage_stats.name": "Send anonymous usage statistics",
+    "settings.privacy.usage_stats.desc": "Send anonymous usage statistics.",
+    "settings.privacy.ad_consent.name": "Ad consent",
+    "settings.privacy.ad_consent.desc": "Open the ad consent form again.",
+    "settings.about.restore_purchases.name": "Restore purchases",
+    "settings.about.restore_purchases.desc": "Restore purchases from the store.",
+    "settings.about.credits.name": "Credits and licences",
+    "settings.about.credits.desc": "Credits and licences.",
+    "settings.about.copy_diagnostics.name": "Copy diagnostics",
+    "settings.about.copy_diagnostics.desc": "Copy the diagnostics line and settings for support.",
+    "settings.about.reset_all.name": "Reset all settings",
+    "settings.about.reset_all.desc": "Every setting back to its profile default.",
+    "settings.section.gameplay": "Gameplay",
+    "settings.section.graphics": "Graphics",
+    "settings.section.audio": "Audio",
+    "settings.section.controls": "Controls",
+    "settings.section.accessibility": "Accessibility",
+    "settings.section.language": "Language",
+    "settings.section.account": "Account and cloud saves",
+    "settings.section.privacy": "Privacy",
+    "settings.section.about": "About",
+    "settings.toggle.on": "On",
+    "settings.toggle.off": "Off",
+    "settings.set_by": "Set by {setting}",
+    "settings.display_keep": "Keep this display?",
+    "settings.key_conflict": "Also bound to {action}, swap?",
+    "settings.action.pan_up": "Pan up",
+    "settings.action.pan_left": "Pan left",
+    "settings.action.pan_down": "Pan down",
+    "settings.action.pan_right": "Pan right",
+    "settings.action.zoom_in": "Zoom in",
+    "settings.action.zoom_out": "Zoom out",
+    "settings.action.end_turn": "End turn",
+    "settings.action.pause_menu": "Pause menu",
+    "settings.action.lens_1": "Lens: realms",
+    "settings.action.lens_2": "Lens: terrain",
+    "settings.action.lens_3": "Lens: people",
+    "settings.action.lens_4": "Lens: wealth",
+    "settings.action.lens_5": "Lens: walls",
+    "settings.action.lens_6": "Lens: food",
+    "settings.action.lens_next": "Next lens",
+    "settings.action.army_next": "Next army",
+    "settings.action.army_prev": "Previous army",
+    "settings.action.notification_next": "Next notification",
+    "settings.action.turn_report": "Turn report",
+    "settings.action.jump_capital": "Jump to capital",
+    "settings.action.ledger": "Ledger"
+  },
+  "design": {
+    "_source": "settings-design.md v2 (numbers in the rows that settings.yaml does not carry)",
+    "file_version": 1,
+    "files": {
+      "device": "settings-device.json",
+      "personal": "settings-personal.json"
+    },
+    "storage_by_platform": {
+      "steam": "app.getPath(\"userData\")",
+      "desktop": "app.getPath(\"userData\")",
+      "ios": "Capacitor Preferences",
+      "android": "Capacitor Preferences",
+      "web": "localStorage"
+    },
+    "store_backup_by_platform": {
+      "steam": {
+        "method": "Steam Auto-Cloud",
+        "files": [
+          "settings-personal.json"
+        ],
+        "live_sync": true
+      },
+      "ios": {
+        "method": "iCloud device backup",
+        "files": [
+          "settings-device.json",
+          "settings-personal.json"
+        ],
+        "live_sync": false
+      },
+      "android": {
+        "method": "Android Auto Backup",
+        "files": [
+          "settings-device.json",
+          "settings-personal.json"
+        ],
+        "live_sync": false
+      },
+      "web": null
+    },
+    "profile_detection": {
+      "tablet_short_side_css_px": 600
+    },
+    "profile_platform": {
+      "phone": "mobile",
+      "tablet": "mobile",
+      "desktop": "desktop",
+      "steam_deck": "desktop",
+      "big_screen": "desktop"
+    },
+    "profile_steam": {
+      "steam_deck": true,
+      "big_screen": true
+    },
+    "profile_touch": {
+      "phone": true,
+      "tablet": true,
+      "steam_deck": true,
+      "desktop": false,
+      "big_screen": false
+    },
+    "touch_rows": [
+      "controls.main_hand",
+      "controls.long_press",
+      "controls.double_tap_zoom",
+      "controls.touch_speed",
+      "accessibility.touch_targets"
+    ],
+    "sharpness_max_ratio": {
+      "native": 3,
+      "balanced": 2,
+      "battery": 1
+    },
+    "tooltip_delay_seconds": {
+      "instant": 0,
+      "short": 0.3,
+      "long": 0.8
+    },
+    "long_press_seconds": {
+      "short": 0.3,
+      "medium": 0.5,
+      "long": 0.8
+    },
+    "bell_seconds_at_1x": [
+      1,
+      2
+    ],
+    "end_turn_key_hold_seconds": 0.5,
+    "pad_end_turn_hold_seconds": 1.0,
+    "display_mode_fullscreen": {
+      "borderless": true,
+      "resolution": "display",
+      "resolution_list": false
+    },
+    "map_detail": {
+      "low": {
+        "close_in_tiles": "4x4",
+        "surf": false,
+        "forest_blending": false,
+        "still_water": false
+      },
+      "medium": {
+        "close_in_tiles": "8x8",
+        "surf": false,
+        "forest_blending": false,
+        "still_water": true
+      },
+      "high": {
+        "close_in_tiles": "8x8",
+        "surf": true,
+        "forest_blending": true,
+        "still_water": true
+      }
+    },
+    "animations": {
+      "full": [
+        "water",
+        "marching columns",
+        "flags",
+        "smoke",
+        "battle playback"
+      ],
+      "reduced": "reduced",
+      "off": "still frames"
+    },
+    "performance_line": {
+      "off": [],
+      "fps": [
+        "frame rate"
+      ],
+      "full": [
+        "engine mode",
+        "round trip"
+      ]
+    },
+    "buses": {
+      "music": [
+        "a music track",
+        "a stinger"
+      ],
+      "effects": [
+        "the End turn chime",
+        "marching",
+        "battle",
+        "siege",
+        "coins",
+        "a tap",
+        "a panel sound"
+      ],
+      "ambience": [
+        "the ambience bed"
+      ]
+    },
+    "interface_sounds": [
+      "a tap",
+      "a panel sound"
+    ],
+    "reduced_intensity": {
+      "priority_1_softer_db": 4,
+      "echo": false,
+      "sharp_attacks": false
+    },
+    "colour_vision": {
+      "default": {
+        "assignment": "first",
+        "ramp": "default",
+        "greys_with_patterns": false
+      },
+      "protan": {
+        "assignment": "second",
+        "ramp": "blue to orange",
+        "greys_with_patterns": false
+      },
+      "deutan": {
+        "assignment": "second",
+        "ramp": "blue to orange",
+        "greys_with_patterns": false
+      },
+      "tritan": {
+        "assignment": "second",
+        "ramp": "safe",
+        "greys_with_patterns": false
+      },
+      "none": {
+        "assignment": "none",
+        "ramp": "greys",
+        "greys_with_patterns": true
+      }
+    },
+    "palette_size": 32,
+    "lens_patterns": [
+      "hatching",
+      "dots",
+      "stripes"
+    ],
+    "borders": {
+      "normal": "normal",
+      "thick": "thick",
+      "high_contrast": "black and white ink, two art pixels wide"
+    },
+    "fonts": {
+      "pixel": {
+        "body": "Pixelify Sans",
+        "titles": "Jacquard 12"
+      },
+      "plain": {
+        "body": "Atkinson Hyperlegible",
+        "titles": "Atkinson Hyperlegible",
+        "licence": "OFL"
+      }
+    },
+    "high_contrast_panels": {
+      "background": "solid",
+      "outlines": "stronger",
+      "text_over_patterns": false
+    },
+    "no_flashes_removes": [
+      "cannon flashes",
+      "lightning",
+      "white flashes on battle results"
+    ],
+    "reduced_motion_on": {
+      "camera": "cut",
+      "screen_shake": false,
+      "animations_at_most": "reduced"
+    },
+    "number_formats": {
+      "comma_point": [
+        ",",
+        "."
+      ],
+      "point_comma": [
+        ".",
+        ","
+      ],
+      "space_comma": [
+        " ",
+        ","
+      ]
+    },
+    "month_names": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "far_layout_profile": "big_screen",
+    "first_launch_questions": {
+      "language": "Language",
+      "consent": "Crash reports and usage statistics",
+      "readability": "Is this text easy to read?"
+    },
+    "readability_answers": [
+      "Smaller",
+      "Fine",
+      "Bigger"
+    ],
+    "android_back": [
+      "close the top panel",
+      "open the pause menu",
+      "ask before quitting"
+    ],
+    "ios_audio_session": "ambient",
+    "deck_text_input": "ShowFloatingGamepadTextInput",
+    "controller_navigation": {
+      "LB": "previous section",
+      "RB": "next section",
+      "d-pad up": "previous row",
+      "d-pad down": "next row",
+      "A": "change or open",
+      "d-pad left": "step down",
+      "d-pad right": "step up",
+      "B": "back",
+      "X": "reset row",
+      "Y": "long description"
+    },
+    "campaign_rules": [
+      "difficulty",
+      "AI aggression",
+      "fog of war",
+      "events",
+      "ironman",
+      "campaign end date"
+    ],
+    "campaign_end_date_default": "31 August 1939",
+    "privacy_rows": [
+      "privacy.crash_reports",
+      "privacy.usage_stats",
+      "privacy.ad_consent"
+    ],
+    "delete_account_from": [
+      "account",
+      "privacy"
+    ],
+    "deck_glyphs": "steam_deck"
+  }
+}

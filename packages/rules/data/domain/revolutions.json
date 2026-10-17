@@ -1,0 +1,6253 @@
+{
+ "$comment": "Revolutions (domain/revolutions/spec.md): revolutions/generated/runtime/*.json plus reference.yaml and the balance values of revolutions-design.md section 7 and 12. All numbers are placeholders.",
+ "reference": {
+  "classes": [
+   "farmers",
+   "herders",
+   "woodsmen",
+   "miners",
+   "seafolk",
+   "craftsmen",
+   "market_folk",
+   "clergy",
+   "clerks",
+   "scholars",
+   "homeless"
+  ],
+  "grievances": [
+   "heavy_taxes",
+   "hungry",
+   "homeless",
+   "soldiers_quartered",
+   "burned_homes",
+   "conscription",
+   "foreign_rule",
+   "wrong_faith",
+   "ungoverned",
+   "harsh_lord",
+   "broken_charter",
+   "far_from_throne",
+   "plague",
+   "bloodshed",
+   "requisitioned",
+   "neighbour_in_revolt"
+  ],
+  "rising_causes": [
+   "hunger",
+   "tax",
+   "faith",
+   "homeland",
+   "town",
+   "lord",
+   "pretender",
+   "new_ideas"
+  ],
+  "lord_loyalty": [
+   "loyal",
+   "wavering",
+   "disloyal",
+   "in_revolt"
+  ],
+  "lord_measures": {
+   "land_share": "Share (0-1) of the realm's provinces held by lords rather than run by your officials.",
+   "wavering_or_worse": "Number of lords whose loyalty is Wavering, Disloyal or In revolt.",
+   "disloyal_or_worse": "Number of lords whose loyalty is Disloyal or In revolt.",
+   "count": "Number of named lords."
+  },
+  "stances": {
+   "lead": "Lead it: apply the revolution's regime yourself, now. The old order may rise against you instead.",
+   "bend": "Bend: grant part of it. A smaller regime, and the signs ease; it can come back if they return.",
+   "fight": "Fight it: the revolution becomes a great revolt. Its result decides the regime.",
+   "path": "Not the ruler's choice: which way the revolution itself goes (chosen by its own leaders, or rolled)."
+  },
+  "actions": {
+   "grant_fief": "Grant royal provinces to a new lord (country stats 5.3).",
+   "sell_title": "Sell a province to a rich merchant as a fief (country stats 5.3).",
+   "seize_land": "Take a lord's land by decree (country stats 5.4).",
+   "call_the_lords": "Call lords and their retinues to war (warfare 3.2).",
+   "hire_companies": "Hire paid companies (warfare 3.3).",
+   "crushing_taxes": "Set a province's tax rate to crushing (province stats 8).",
+   "revoke_charter": "Revoke a charter (province stats 10.4).",
+   "massacre": "Massacre after beating a rising (rebellions 5.1).",
+   "persecute": "Apply a persecution policy to a faith (religion design)."
+  },
+  "foreign_backing": {
+   "label": "Foreign gold backs the movement",
+   "mult": 2,
+   "flag": "revolution_funded",
+   "joins_mult": 1.5
+  },
+  "rearm": {
+   "grace_years": 3
+  }
+ },
+ "foreign_backing": {
+  "cost_share_of_yearly_income": 0.01,
+  "catch_chance": 0.03,
+  "catch_at_peace_add": 0.01,
+  "catch_officials_add": 0.01,
+  "catch_officials_share": 0.5,
+  "fundable_stages": ["Brewing", "Ready"],
+  "win_opinion": 25
+ },
+ "counter_revolution": {
+  "years": 25,
+  "opinion": -50
+ },
+ "generals_too_big_mult": 2,
+ "reaction": {
+  "need_reduction": 1,
+  "years": 20
+ },
+ "ai": {
+  "historical_mult": 3
+ },
+ "generals_switch_to": {
+  "$comment": "revolutions-design 7: a winning general can switch the regime (changes-for-other-designs Warfare).",
+  "regimes": [
+   "court_absolutism",
+   "military_kingdom"
+  ]
+ },
+ "card": {
+  "$comment": "revolutions-design 1: the card fits a phone width of about 40 characters.",
+  "width": 40,
+  "locked_label": "Locked by the revolution",
+  "stopped_label": "Stopped, not solved",
+  "ready_line": "may break out any month"
+ },
+ "camp_rules": {
+  "$comment": "families.yaml camps.*.lords and camps.*.army lines, transcribed as rules. Loyalty steps: loyal < wavering < disloyal < in_revolt.",
+  "faith": {
+   "revolution_lords": [
+    {
+     "same_faith": true,
+     "loyalty_at_least": "wavering"
+    }
+   ],
+   "old_order_lords": [
+    {
+     "other_faith": true
+    },
+    {
+     "loyalty": "loyal"
+    }
+   ],
+   "desertion": {
+    "rate": 0.05,
+    "same_faith": true
+   }
+  },
+  "estates": {
+   "revolution_lords": [
+    {
+     "loyalty_at_least": "disloyal",
+     "with_retinue": true
+    }
+   ],
+   "old_order_lords": [
+    {
+     "loyalty": "loyal"
+    }
+   ],
+   "desertion": {
+    "rate": 0.05,
+    "unpaid": true
+   }
+  },
+  "liberal_national": {
+   "revolution_lords": [
+    {
+     "loyalty_at_least": "disloyal",
+     "trait": "Ambitious"
+    }
+   ],
+   "old_order_lords": [
+    {
+     "loyalty": "loyal"
+    },
+    {
+     "loyalty": "wavering"
+    }
+   ],
+   "desertion": {
+    "rate": 0.05,
+    "conscripted": true,
+    "war_weary": true
+   }
+  },
+  "freedom": {
+   "revolution_lords": [],
+   "old_order_lords": [
+    {
+     "planter_or_settler": true
+    }
+   ],
+   "desertion": {
+    "rate": 0.1,
+    "colonial_same_people": true
+   }
+  },
+  "agrarian": {
+   "revolution_lords": [
+    {
+     "loyalty_at_least": "in_revolt"
+    }
+   ],
+   "old_order_lords": [
+    {
+     "any": true
+    }
+   ],
+   "desertion": {
+    "rate": 0.05,
+    "from_farming_province": true,
+    "hungry": true
+   }
+  },
+  "from_above": {
+   "revolution_lords": [],
+   "old_order_lords": [
+    {
+     "loyalty_at_least": "disloyal"
+    },
+    {
+     "loyalty": "wavering",
+     "traits": [
+      "Pious",
+      "Proud"
+     ]
+    }
+   ]
+  },
+  "homeland": {
+   "revolution_lords": [
+    {
+     "same_culture": true,
+     "loyalty_at_least": "wavering"
+    }
+   ],
+   "old_order_lords": [
+    {
+     "other_culture": true
+    },
+    {
+     "loyalty": "loyal"
+    }
+   ],
+   "desertion": {
+    "rate": 0.05,
+    "from_region": true
+   }
+  },
+  "socialist_defeat": {
+   "revolution_lords": [],
+   "old_order_lords": [
+    {
+     "any": true
+    }
+   ],
+   "mutiny": {
+    "rate": 0.1,
+    "war_weariness_above": 14
+   }
+  },
+  "restoration": {
+   "revolution_lords": [
+    {
+     "emigre": true
+    },
+    {
+     "loyalty": "loyal",
+     "old_house": true
+    }
+   ],
+   "old_order_lords": [
+    {
+     "gained_under_revolution": true
+    }
+   ]
+  }
+ },
+ "regime_on_apply": {
+  "$comment": "regimes.yaml risk lines that act at once.",
+  "emancipation": {
+   "lords_waver_steps": 1
+  }
+ },
+ "families": {
+  "faith": {
+   "id": "faith",
+   "name": "Faith revolutions",
+   "idea": "A religious movement takes power and turns its community into the state.",
+   "cause": "faith",
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.1,
+      "clergy": 0.3,
+      "craftsmen": 0.08,
+      "market_folk": 0.08
+     },
+     "only_of_faith": true,
+     "lords": "Lords of the movement's faith who are Wavering or worse",
+     "army": "Soldiers of the movement's faith desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other faiths, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "stance_labels": {
+    "lead": "Take up the new teaching",
+    "bend": "Tolerate the movement",
+    "fight": "Suppress it"
+   },
+   "wave": {
+    "kind": "religion",
+    "amount": 0.05,
+    "where": "neighbours"
+   }
+  },
+  "estates": {
+   "id": "estates",
+   "name": "Estates and town revolutions",
+   "idea": "Towns, assemblies or great lords force the crown to share power, or lose it.",
+   "cause": "town",
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.2,
+      "market_folk": 0.15,
+      "craftsmen": 0.12,
+      "clerks": 0.1,
+      "scholars": 0.05,
+      "farmers": 0.03
+     },
+     "lords": "Disloyal lords join with their retinues",
+     "army": "Unpaid soldiers desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Loyal lords",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "stance_labels": {
+    "lead": "Share power",
+    "bend": "Grant charters",
+    "fight": "Break them"
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "parliamentarism",
+    "amount": 0.03,
+    "where": "neighbours"
+   }
+  },
+  "liberal_national": {
+   "id": "liberal_national",
+   "name": "Liberal and national revolutions",
+   "idea": "Townsfolk and scholars demand a constitution, a nation, or a republic.",
+   "cause": "new_ideas",
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "scholars": 0.25,
+      "clerks": 0.15,
+      "craftsmen": 0.12,
+      "market_folk": 0.1,
+      "farmers": 0.04
+     },
+     "farmers_if_hungry": 0.1,
+     "lords": "Few: only Disloyal lords with the Ambitious trait",
+     "army": "Conscripted soldiers desert at 5 % a month while war weariness is high"
+    },
+    "old_order": {
+     "lords": "Every Loyal and Wavering lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "stance_labels": {
+    "lead": "Proclaim the new order",
+    "bend": "Grant a constitution",
+    "fight": "Restore order"
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "liberalism",
+    "amount": 0.05,
+    "where": "neighbours"
+   }
+  },
+  "freedom": {
+   "id": "freedom",
+   "name": "Freedom revolutions",
+   "idea": "Enslaved and colonised people overthrow those who hold them.",
+   "cause": "homeland",
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.3,
+      "craftsmen": 0.1,
+      "market_folk": 0.1
+     },
+     "note": "On plantation tiles the farmers are the enslaved workers (event tree population group enslaved_africans); they join at 30 %.",
+     "lords": "None",
+     "army": "Colonial troops of the same people desert at 10 % a month"
+    },
+    "old_order": {
+     "lords": "Planters and settler lords",
+     "clergy": "Colonial clergy"
+    }
+   },
+   "stance_labels": {
+    "lead": "Abolish and free",
+    "bend": "Grant autonomy",
+    "fight": "Send an army"
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "abolitionism",
+    "amount": 0.1,
+    "where": "region"
+   }
+  },
+  "agrarian": {
+   "id": "agrarian",
+   "name": "Peasant and agrarian revolutions",
+   "idea": "Farmers rise against lords, tax collectors or a dynasty that has lost the right to rule.",
+   "cause": "hunger",
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.15,
+      "herders": 0.1,
+      "woodsmen": 0.08,
+      "miners": 0.08,
+      "craftsmen": 0.04
+     },
+     "lords": "Only lords in revolt",
+     "army": "Soldiers from farming provinces desert at 5 % a month while Hungry"
+    },
+    "old_order": {
+     "lords": "Every lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "stance_labels": {
+    "lead": "Divide the land",
+    "bend": "Cut taxes and open the granaries",
+    "fight": "Crush the bands"
+   },
+   "wave": {
+    "kind": "none",
+    "where": "neighbours",
+    "note": "Spreads as Neighbour in revolt grievances (rebellions 4.2), not as an ideology."
+   }
+  },
+  "from_above": {
+   "id": "from_above",
+   "name": "Revolutions from above",
+   "idea": "The ruler turns the realm over from the top, and the old order fights back.",
+   "cause": "lord",
+   "camps": {
+    "revolution": {
+     "joins": {},
+     "note": "Nobody rises for it: the ruler starts it as a decision."
+    },
+    "old_order": {
+     "joins": {
+      "clergy": 0.1,
+      "farmers": 0.02
+     },
+     "lords": "Every Disloyal lord, and Wavering lords with the Pious or Proud trait",
+     "army": "Old-style units (retinues, guards) may mutiny"
+    }
+   },
+   "stance_labels": {
+    "lead": "Start the reforms",
+    "bend": "Reform the army only",
+    "fight": "Keep the old ways"
+   },
+   "wave": {
+    "kind": "ideology",
+    "amount": 0.0,
+    "where": "none"
+   }
+  },
+  "homeland": {
+   "id": "homeland",
+   "name": "Homeland revolutions",
+   "idea": "A region's own warriors throw off a distant empire and crown their own ruler.",
+   "cause": "homeland",
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.2,
+      "herders": 0.1,
+      "woodsmen": 0.08,
+      "farmers": 0.06
+     },
+     "only_of_culture": true,
+     "lords": "Lords of the region's culture who are Wavering or worse",
+     "army": "Soldiers from the region desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other cultures, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "stance_labels": {
+    "lead": "Grant the region its own crown",
+    "bend": "Give its leader high rank",
+    "fight": "Send the imperial army"
+   },
+   "wave": {
+    "kind": "none",
+    "where": "neighbours",
+    "note": "Spreads as Foreign rule grievances in neighbouring provinces held by distant empires."
+   }
+  },
+  "socialist_defeat": {
+   "id": "socialist_defeat",
+   "name": "Revolutions of war and want",
+   "idea": "A lost war, hunger in the towns and new socialist ideas bring down the old regime.",
+   "cause": "new_ideas",
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "craftsmen": 0.2,
+      "seafolk": 0.1,
+      "miners": 0.15,
+      "farmers": 0.08,
+      "scholars": 0.1,
+      "clerks": 0.05
+     },
+     "lords": "None",
+     "army": "Soldiers mutiny at 10 % a month while war weariness is above 14"
+    },
+    "old_order": {
+     "lords": "Every lord",
+     "clergy": "Clergy of the state faith",
+     "army": "Officers"
+    }
+   },
+   "stance_labels": {
+    "lead": "Hand power to the councils",
+    "bend": "Promise an assembly",
+    "fight": "Send in the troops"
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "socialism",
+    "amount": 0.05,
+    "where": "region"
+   }
+  },
+  "restoration": {
+   "id": "restoration",
+   "name": "Restorations",
+   "idea": "The old dynasty comes back after a revolution, but cannot undo all of it.",
+   "cause": "pretender",
+   "camps": {
+    "revolution": {
+     "joins": {},
+     "lords": "Émigré lords and Loyal lords of the old house",
+     "note": "The returning pretender's backers."
+    },
+    "old_order": {
+     "lords": "Lords and officials who gained land or office under the revolution"
+    }
+   },
+   "stance_labels": {
+    "lead": "Recall the dynasty",
+    "bend": "Restore with a charter",
+    "fight": "Defend the revolution"
+   },
+   "wave": {
+    "kind": "none",
+    "where": "none"
+   }
+  }
+ },
+ "regimes": {
+  "league_of_the_faithful": {
+   "id": "league_of_the_faithful",
+   "name": "League of the faithful",
+   "form": "holy_rule",
+   "ruler": "replaced",
+   "lords": "Temple elders replace the lords. Each lord's province passes to the nearest temple of the movement; the elder runs it like a lord but never defects to another country.",
+   "church": "Temples of the movement own one farm tile in each province they run.",
+   "faith": "The movement's faith becomes the state faith. Chaplain effects are doubled.",
+   "levy": "The faithful answer a call to arms: every class of the state faith can be levied, at the farmers' share.",
+   "land": "Tax from temple provinces is light and cannot be raised.",
+   "decrees": [
+    "call_the_faithful"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title",
+    "crushing_taxes"
+   ],
+   "grievances_end": [
+    "harsh_lord"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Lords of neighbouring countries fear the example: their opinion of you -30.",
+   "risk": "With no single ruler, wars of conquest need half the temple elders to agree.",
+   "loop": "You govern through temples, not lords: cheap, loyal provinces that pay little and fight hard for the faith."
+  },
+  "qizilbash_order": {
+   "id": "qizilbash_order",
+   "name": "Order state",
+   "form": "holy_rule",
+   "form_note": "After three reigns of one family the form may reform to household_realm (government 6.4).",
+   "ruler": "replaced",
+   "lords": "Clan chiefs of the order become lords with large retinues. Their loyalty rests on faith in the ruler, not gifts: it drops a step each time the ruler loses a battle they lead.",
+   "faith": "The order's faith becomes the state faith; conversion by decree is open (religion design).",
+   "levy": "Chiefs' retinues are horse archers and count double in the lords' call.",
+   "decrees": [
+    "convert_by_decree"
+   ],
+   "grievances_add": [
+    "wrong_faith"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Countries of the other branch of the faith get a holy-war reason against you (diplomacy design).",
+   "risk": "A defeat in a battle the ruler leads makes every chief waver.",
+   "loop": "Holy-warrior chiefs give you a strong army early, but their faith in the ruler is your stability."
+  },
+  "reformist_caliphate": {
+   "id": "reformist_caliphate",
+   "name": "Reformist caliphate",
+   "form": "holy_rule",
+   "form_note": "Every governor holds a service grant (government 3.3): the land returns at his death.",
+   "ruler": "replaced",
+   "lords": "Lords become appointed governors (emirs). When one dies, the land does not pass to an heir: it returns to you and you appoint a new governor.",
+   "church": "Mosque schools train judges: judges cost half.",
+   "faith": "Wrong faith counts as two grievances outside the state faith's provinces until they convert.",
+   "decrees": [
+    "appoint_emir",
+    "call_the_faithful"
+   ],
+   "locks": [
+    "sell_title"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Rulers of the same faith who did not join get a reason to resist; reformers abroad gain 0.05 support.",
+   "risk": "Appointed governors far from the capital drift toward independence after 30 years.",
+   "loop": "Lords never found dynasties, so a large realm stays yours, but each death means a new appointment."
+  },
+  "heavenly_kingdom": {
+   "id": "heavenly_kingdom",
+   "name": "Heavenly kingdom",
+   "form": "holy_rule",
+   "ruler": "replaced",
+   "lords": "Abolished. Their land goes to a common treasury.",
+   "faith": "The movement's faith is imposed; other houses of worship are closed (their clergy become homeless).",
+   "land": "Food above each family's need goes to the sacred treasury each harvest, so castle stores fill fast.",
+   "towns": "Market folk slots halve: private trade is restricted.",
+   "decrees": [
+    "sacred_treasury",
+    "open_the_granaries"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title"
+   ],
+   "grievances_end": [
+    "harsh_lord",
+    "hungry"
+   ],
+   "grievances_add": [
+    "wrong_faith"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Every neighbour of another faith: opinion -50.",
+   "risk": "Leaders quarrel: each decade a roll may split the realm between two leaders (a pretender rising).",
+   "loop": "Food is no longer your limit, but trade and faith become your weak points."
+  },
+  "mahdiyya": {
+   "id": "mahdiyya",
+   "name": "The Mahdist state",
+   "form": "holy_rule",
+   "ruler": "replaced",
+   "lords": "Tribal chiefs become emirs of the Ansar banners. The ruler may move whole tribes to the capital to keep them close.",
+   "church": "The old law books are burned: the Mahdi's rulings replace the law schools.",
+   "faith": "Wrong faith for every other teaching, Sufi orders of other paths included.",
+   "levy": "Every believer can be called to the banners.",
+   "trade": "Trade with the old ruler's lands is closed; caravans pay the treasury only.",
+   "decrees": [
+    "call_the_faithful",
+    "sacred_treasury",
+    "gather_the_tribes"
+   ],
+   "locks": [
+    "hire_companies"
+   ],
+   "grievances_end": [
+    "heavy_taxes",
+    "foreign_rule"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "The old ruler and its overlord: opinion -50 and a reason to fight for 20 years.",
+   "risk": "The Mahdi may die within a few years (a roll each year); a successor must face the Mahdi's kinsmen as pretenders. Moving tribes empties farmland: famine risk doubles.",
+   "loop": "A holy army without equal in numbers but with old weapons: you win by masses and faith, and lose to guns."
+  },
+  "town_league": {
+   "id": "town_league",
+   "name": "League of towns",
+   "form": "diet_monarchy",
+   "ruler": "kept",
+   "lords": "Kept, but they cannot take a town's land.",
+   "towns": "Every town gets a town law charter. Towns lend money cheaply.",
+   "land": "Raising a tax rate needs the towns' consent (an assembly vote).",
+   "decrees": [
+    "ask_the_towns",
+    "call_the_assembly"
+   ],
+   "locks": [
+    "revoke_charter",
+    "crushing_taxes"
+   ],
+   "grievances_end": [
+    "broken_charter"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Other crowns with restless towns: opinion -20.",
+   "risk": "Towns refuse wars far from home.",
+   "loop": "Your gold comes from loans and consent, not decree; towns grow fast."
+  },
+  "estates_republic": {
+   "id": "estates_republic",
+   "name": "Republic of the estates",
+   "form": "merchant_republic",
+   "ruler": "elected",
+   "lords": "Become merchant houses: same card, but their wants are trade cities, ships and monopolies, and they lend you money.",
+   "trade": "Merchants +2; a chartered company can be founded (company design).",
+   "levy": "Small levy; paid companies are cheaper by a quarter.",
+   "decrees": [
+    "sell_bonds",
+    "charter_a_company",
+    "ask_the_towns"
+   ],
+   "locks": [
+    "crushing_taxes"
+   ],
+   "grievances_end": [
+    "broken_charter"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Trade cities and other republics: opinion +20.",
+   "risk": "A war commander from the leading house may try to make the office hereditary (a stadholder event).",
+   "loop": "You fight with money: loans, paid companies and fleets instead of levies."
+  },
+  "commonwealth": {
+   "id": "commonwealth",
+   "name": "Commonwealth of the army",
+   "form": "constitutional_republic",
+   "ruler": "deposed",
+   "lords": "Lords who fought for the king lose their land to the state; the rest keep it but lose any office.",
+   "church": "Bishops' lands are sold; the minority sects of the state faith get tolerance.",
+   "levy": "A standing army trained to one model: standing regiments cost a third less and train faster (recruiting 4.5).",
+   "decrees": [
+    "army_council",
+    "sell_church_lands"
+   ],
+   "locks": [
+    "call_the_lords"
+   ],
+   "flags": [
+    "revolutionary_regime",
+    "emigre_court"
+   ],
+   "abroad": "Monarchies: opinion -40; a counter-revolution reason to fight you for 20 years.",
+   "risk": "Generals who grow too big (warfare 4.6) are twice as likely; a successful one becomes Protector and the regime becomes court_absolutism or restored_monarchy.",
+   "loop": "The army is your government: strong and cheap to keep, but it can take power."
+  },
+  "crown_and_assembly": {
+   "id": "crown_and_assembly",
+   "name": "Crown and assembly",
+   "form": "constitutional_monarchy",
+   "form_before_g14": "diet_monarchy",
+   "ruler": "kept",
+   "lords": "Kept. Seizing a lord's land needs a trial before the assembly.",
+   "trade": "Public debt: interest halved, the loan limit doubled.",
+   "land": "Raising any tax rate, and declaring a war of conquest, need an assembly vote.",
+   "decrees": [
+    "call_the_assembly",
+    "sell_bonds"
+   ],
+   "locks": [
+    "crushing_taxes"
+   ],
+   "grievances_end": [
+    "broken_charter"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Countries that hold the same regime: opinion +15.",
+   "risk": "If the assembly refuses three votes in ten years, the ruler may try a coup (a reaction spark).",
+   "loop": "Every big decision needs consent, and in return money is cheap and the realm is steady."
+  },
+  "court_absolutism": {
+   "id": "court_absolutism",
+   "name": "Absolute monarchy at court",
+   "form": "absolute_monarchy",
+   "ruler": "kept",
+   "lords": "Lords are drawn to court: their retinues halve, their loyalty falls half as fast, and seizing land makes the others waver one step less.",
+   "land": "Intendants: your officials may be sent into lords' provinces as overseers.",
+   "decrees": [
+    "summon_to_court",
+    "intendants"
+   ],
+   "flags": [
+    "reaction_regime"
+   ],
+   "abroad": "None.",
+   "risk": "A child ruler or a long regency undoes it: lords leave court (a lords' rising spark).",
+   "loop": "You win the long game against the lords: fewer retinues, more officials, a richer court."
+  },
+  "princes_compact": {
+   "id": "princes_compact",
+   "name": "Compact of the princes",
+   "form": "elective_monarchy",
+   "ruler": "kept",
+   "lords": "The great lords win: each gets his want, and none can be tried or seized from for 30 years.",
+   "decrees": [],
+   "locks": [
+    "seize_land"
+   ],
+   "flags": [],
+   "abroad": "Rivals may bribe your lords at half price.",
+   "risk": "Lords' retinues outgrow yours; any new crisis is a lords' rising.",
+   "loop": "The realm is run for the lords: you rule by bargaining with them."
+  },
+  "federal_republic": {
+   "id": "federal_republic",
+   "name": "Federal republic",
+   "form": "constitutional_republic",
+   "ruler": "elected",
+   "lords": "There are none: land belongs to farming families and market folk.",
+   "land": "Each province elects its own official, free of wages, with a random type.",
+   "levy": "Militia: farmers can be levied for defence at no gold cost; a standing army needs an assembly vote.",
+   "decrees": [
+    "call_the_assembly",
+    "settle_the_frontier"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title",
+    "crushing_taxes"
+   ],
+   "grievances_end": [
+    "harsh_lord",
+    "ungoverned"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Old colonial powers: opinion -20 for 20 years.",
+   "risk": "Provinces with different trade goods can quarrel: a separatist sign if one region's wares make up most of the income.",
+   "loop": "Cheap, self-run provinces and fast settlement, but a weak centre in war."
+  },
+  "revolutionary_republic": {
+   "id": "revolutionary_republic",
+   "name": "Revolutionary republic",
+   "form": "constitutional_republic",
+   "ruler": "deposed",
+   "lords": "Abolished. Their land returns to the state; the lords go abroad as pretenders (province stats 10.1) and pay rivals to fight you.",
+   "church": "Church land is seized and sold; house-of-worship slots halve, and the clergy who lose their slots become homeless.",
+   "faith": "No state faith for faith grievances: Wrong faith ends everywhere; Pious lords and clergy everywhere waver.",
+   "tongue": "Schools teach in the state tongue (culture design): tongue mix moves twice as fast toward it.",
+   "levy": "The mass levy is open: every class can be called.",
+   "decrees": [
+    "levy_en_masse",
+    "sell_church_lands",
+    "revolutionary_tribunal"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title",
+    "call_the_lords"
+   ],
+   "grievances_end": [
+    "harsh_lord",
+    "wrong_faith"
+   ],
+   "grievances_add": [
+    "broken_charter"
+   ],
+   "flags": [
+    "revolutionary_regime",
+    "emigre_court"
+   ],
+   "abroad": "Every monarchy: opinion -50; they gain a counter-revolution reason to fight you for 25 years.",
+   "risk": "Generals who grow too big (warfare 4.6) are twice as likely, and a winning one can end the republic.",
+   "loop": "You must run every province with officials and can arm the whole nation, while every king wants you gone."
+  },
+  "free_republic": {
+   "id": "free_republic",
+   "name": "Free republic",
+   "form": "constitutional_republic",
+   "ruler": "replaced",
+   "lords": "Planters' land is taken by the state and given out as family farms.",
+   "land": "Everyone held in slavery is free. Plantation tiles stay state estates worked for wages, or are split into family farms (divide_the_estates): split tiles lose two thirds of their export wares and grow half again as much food.",
+   "levy": "The whole people defend the land: every farmer is a recruit for defensive wars.",
+   "decrees": [
+    "arm_the_people",
+    "divide_the_estates"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title"
+   ],
+   "grievances_end": [
+    "harsh_lord"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Slave-holding countries: opinion -60 and no trade pacts for 30 years; they may demand payment for recognition (an indemnity event).",
+   "risk": "Isolation: trade income halves while the old powers refuse to recognise you.",
+   "loop": "Freedom is defended with every farmer; the old export economy is gone and the world shuns you."
+  },
+  "creole_republic": {
+   "id": "creole_republic",
+   "name": "Republic of the landowners",
+   "form": "constitutional_republic",
+   "ruler": "elected",
+   "lords": "Big landowners stay as lords; commanders who win battles can become lords too.",
+   "decrees": [
+    "caudillos_pact",
+    "call_the_assembly"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "The old crown: a reconquest reason for 15 years.",
+   "risk": "A commander with a big army may seize the presidency (a pretender rising led by a general).",
+   "loop": "The republic is held together by pacts with landowners and generals."
+  },
+  "parliamentary_republic": {
+   "id": "parliamentary_republic",
+   "name": "Parliamentary republic",
+   "form": "constitutional_republic",
+   "ruler": "deposed",
+   "lords": "Titles lose their legal privileges; lords keep their land as private owners but no longer govern it (it needs your officials).",
+   "land": "Tax rates and war need an assembly vote; elections every few years can change the ruling party's priorities (AI personality shifts).",
+   "trade": "Public debt at the regime's low interest.",
+   "decrees": [
+    "call_the_assembly",
+    "sell_bonds"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title"
+   ],
+   "grievances_end": [
+    "harsh_lord"
+   ],
+   "flags": [
+    "revolutionary_regime",
+    "emigre_court"
+   ],
+   "abroad": "Other parliamentary countries: opinion +15.",
+   "risk": "In a crisis (war lost, mass unemployment among craftsmen) extremist risings of left and right both grow.",
+   "loop": "Officials run the land the lords used to govern, and every big decision goes through the assembly."
+  },
+  "committee_rule": {
+   "id": "committee_rule",
+   "name": "Rule of the committee",
+   "form": "constitutional_monarchy",
+   "power_base_add": [
+    "army"
+   ],
+   "ruler": "kept",
+   "lords": "Kept, but army officers sit beside them.",
+   "tongue": "The state tongue is pushed in schools and offices: tongue mix moves faster toward it, Foreign rule grows in other homelands.",
+   "decrees": [
+    "officers_to_the_provinces",
+    "call_the_assembly"
+   ],
+   "grievances_add": [
+    "foreign_rule"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "None.",
+   "risk": "Homelands of other tongues raise separatist signs faster.",
+   "loop": "Officers run the provinces and push one nation's tongue: strong in war, hard on minorities."
+  },
+  "warlord_republic": {
+   "id": "warlord_republic",
+   "name": "Republic of the generals",
+   "form": "constitutional_republic",
+   "form_note": "The form holds no lord weight, so every warlord is over the limit and slips (government 2.3): reunification is a fight against that drift.",
+   "ruler": "elected",
+   "lords": "Commanders holding armies in a province become lords of it (warlords). They keep its tax and recruits.",
+   "decrees": [
+    "buy_a_warlord",
+    "caudillos_pact"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Foreign powers may back a warlord (a hostile act).",
+   "risk": "Warlords make war on each other; a strong one may declare himself ruler.",
+   "loop": "The country is a map of generals: you reunite it by buying, beating or outlasting them."
+  },
+  "secular_republic": {
+   "id": "secular_republic",
+   "name": "Secular national republic",
+   "form": "party_state",
+   "ruler": "elected",
+   "lords": "Abolished; old titles have no legal force.",
+   "church": "Religious courts and schools close; their judges and teachers become state officials or leave.",
+   "tongue": "Script and school reform: literacy grows twice as fast for 20 years (culture design).",
+   "research": "Schools cost a quarter less.",
+   "decrees": [
+    "script_and_schools",
+    "sell_church_lands"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title"
+   ],
+   "grievances_add": [
+    "wrong_faith"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "None.",
+   "risk": "Pious provinces resist: a faith rising sign for 20 years.",
+   "loop": "A fast-modernising state built on schools and officials, with the devout provinces against you."
+  },
+  "agrarian_reform": {
+   "id": "agrarian_reform",
+   "name": "Land to the villages",
+   "form": "keep",
+   "ruler": "kept",
+   "lords": "Lords lose their farm tiles; those go to the villages, which pay light tax and need no lord.",
+   "land": "Village tiles: light tax that cannot be raised, Harsh lord ends, food +10 %. Export wares from estate tiles fall by a third.",
+   "decrees": [
+    "divide_the_estates"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title"
+   ],
+   "grievances_end": [
+    "harsh_lord"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "Foreign owners of estates or mines: opinion -30.",
+   "risk": "Landowners still holding estates fund risings for 20 years.",
+   "loop": "Farmers are calm and fed, lords are weak, but the export money shrinks."
+  },
+  "new_dynasty": {
+   "id": "new_dynasty",
+   "name": "New dynasty from the rising",
+   "form": "keep",
+   "ruler": "replaced",
+   "lords": "Every lord starts Wavering. Lords who fought the rising lose their land.",
+   "land": "Tax is light everywhere for 10 years.",
+   "decrees": [
+    "open_the_granaries"
+   ],
+   "grievances_end": [
+    "heavy_taxes",
+    "hungry"
+   ],
+   "flags": [
+    "emigre_court"
+   ],
+   "abroad": "Tributary overlords may demand recognition (subjects design).",
+   "risk": "The old dynasty's heirs are pretenders for 50 years.",
+   "loop": "You start again with a clean slate of grievances, but every lord and the old dynasty test you."
+  },
+  "peasant_directorates": {
+   "id": "peasant_directorates",
+   "name": "Peasant directorates",
+   "form": "keep",
+   "form_note": "Directorate provinces are self-run (government 3.3) even though the form is not a kin or commune form.",
+   "ruler": "kept",
+   "lords": "Kept elsewhere; in the risen provinces local directorates run affairs.",
+   "land": "Risen provinces are run by a directorate: free, acts as a judge, tax light.",
+   "decrees": [
+    "local_directorates"
+   ],
+   "grievances_end": [
+    "heavy_taxes",
+    "harsh_lord"
+   ],
+   "flags": [],
+   "abroad": "Neighbours who fear the movement get a reason to send troops 'to restore order' (an intervention hook).",
+   "risk": "If the directorates are dissolved, every risen province gets Broken charter.",
+   "loop": "Part of the realm runs itself: calm and cheap, outside your control."
+  },
+  "emancipation": {
+   "id": "emancipation",
+   "name": "End of bondage",
+   "add_on": true,
+   "lords": "Lords' farm tiles lose a third of their workers' dues: lords' wealth -30 %.",
+   "land": "Farmers may leave for towns: overflow can move to neighbouring provinces' town slots.",
+   "levy": "Levy share of farmers +25 %.",
+   "grievances_end": [
+    "harsh_lord"
+   ],
+   "flags": [],
+   "abroad": "None.",
+   "risk": "Lords waver one step at once.",
+   "loop": "Towns and armies gain people; lords lose their hold on the land."
+  },
+  "swarajya": {
+   "id": "swarajya",
+   "name": "Swarajya (self-rule)",
+   "form": "household_realm",
+   "ruler": "replaced",
+   "lords": "No new land grants: ministers, officials and fort commanders are paid in gold, not land. A council of eight ministers are your officials.",
+   "levy": "Light horse and hill infantry; a fleet on the home coast.",
+   "decrees": [
+    "protection_tribute",
+    "garrison_hill_forts"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title"
+   ],
+   "flags": [],
+   "abroad": "The empire it broke from: opinion -50 and a reason to fight for 30 years.",
+   "risk": "When the founder's line weakens, the chief minister's office turns hereditary and the generals' houses drift apart: the realm can become a confederation (form confederation).",
+   "loop": "Raid, don't hold: horsemen collect tribute from neighbours' provinces while hill forts keep your own, and paid officials keep the land the crown's."
+  },
+  "khalsa_raj": {
+   "id": "khalsa_raj",
+   "name": "Rule of the Khalsa",
+   "form": "absolute_monarchy",
+   "ruler": "replaced",
+   "lords": "Band chiefs keep land only while they and their horsemen serve in the army.",
+   "faith": "Ministers and soldiers of every faith: no Wrong faith grievance anywhere, and persecution is locked.",
+   "levy": "A standing army of drilled regiments and guns, trained by hired foreign officers, in place of band horsemen.",
+   "decrees": [
+    "hire_drill_masters",
+    "summon_to_court"
+   ],
+   "locks": [
+    "persecute"
+   ],
+   "grievances_end": [
+    "wrong_faith"
+   ],
+   "flags": [],
+   "abroad": "None at first; the company and empires on its borders watch its army.",
+   "risk": "Everything rests on the ruler: at the ruler's death the army's regimental councils may rule and raise pretenders.",
+   "loop": "A small realm with a modern army: drilled regiments cost far more than horsemen, and you pay for them by keeping every faith at peace."
+  },
+  "misl_confederacy": {
+   "id": "misl_confederacy",
+   "name": "Confederacy of the bands",
+   "form": "confederation",
+   "ruler": "elected",
+   "lords": "Each band's chief holds the land its horsemen won. The chiefs meet twice a year at the holy city and choose a war leader.",
+   "levy": "Fast horsemen only; no siege trains.",
+   "decrees": [
+    "protection_tribute"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title"
+   ],
+   "flags": [],
+   "abroad": "None.",
+   "risk": "Bands fight each other when there is no common enemy: every 10 years without a war, a roll may make a chief Disloyal.",
+   "loop": "Many chiefs and fast horsemen: cheap to run and hard to conquer, but no one can make them build or march far."
+  },
+  "service_state": {
+   "id": "service_state",
+   "name": "Service state",
+   "form": "absolute_monarchy",
+   "ruler": "kept",
+   "lords": "Lords must serve: each gives a son as an official or a commander, or loses a province.",
+   "levy": "Recruits are drawn by quota from every province (a fixed share), even lords' lands.",
+   "research": "Foreign specialists cost half; one research branch of your choice is a third cheaper for 30 years.",
+   "decrees": [
+    "table_of_ranks",
+    "missions_abroad"
+   ],
+   "grievances_add": [
+    "conscription"
+   ],
+   "flags": [],
+   "abroad": "None.",
+   "risk": "Old guards and clergy rise once (an old-order rising) within 10 years.",
+   "loop": "Lords become your officers and officials; you catch up fast and the old guard resents it."
+  },
+  "restoration_state": {
+   "id": "restoration_state",
+   "name": "Restored central rule",
+   "form": "constitutional_monarchy",
+   "ruler": "kept",
+   "lords": "Lords' domains are abolished: their land becomes royal provinces and the lords get a pension (gold each year for 20 years).",
+   "levy": "Conscription: every class can be levied; standing regiments are the norm.",
+   "research": "Foreign specialists cost half; research one era behind the leader costs half.",
+   "decrees": [
+    "abolish_domains",
+    "missions_abroad"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title",
+    "call_the_lords"
+   ],
+   "grievances_add": [
+    "conscription"
+   ],
+   "flags": [
+    "revolutionary_regime"
+   ],
+   "abroad": "None.",
+   "risk": "Former retainers of the lords rise once within 10 years (an old-order rising).",
+   "loop": "You buy out the lords and run everything with officials, conscripts and borrowed knowledge."
+  },
+  "military_kingdom": {
+   "id": "military_kingdom",
+   "name": "Age-regiment kingdom",
+   "form": "keep",
+   "ruler": "kept",
+   "lords": "Chiefs keep their land but their young men serve the king in age regiments.",
+   "levy": "Age regiments: a fixed share of young men serve for years; they may not marry while serving (births -10 %).",
+   "decrees": [
+    "call_the_age_regiment"
+   ],
+   "flags": [],
+   "abroad": "Neighbours: opinion -20.",
+   "risk": "Long service with no war breeds discontent among the regiments.",
+   "loop": "A permanent, drilled army from the people, paid for in births."
+  },
+  "regional_armies": {
+   "id": "regional_armies",
+   "name": "Provincial armies",
+   "form": "keep",
+   "ruler": "kept",
+   "lords": "Your governors (officials) may raise their own armies; each that does becomes a lord with a retinue.",
+   "decrees": [
+    "raise_provincial_army"
+   ],
+   "flags": [],
+   "abroad": "None.",
+   "risk": "Strong governors grow into warlords if the centre weakens (warlord_republic follows a dynasty's fall).",
+   "loop": "The dynasty survives by letting its governors arm, and slowly loses the provinces to them."
+  },
+  "soviet_state": {
+   "id": "soviet_state",
+   "name": "Council state",
+   "form": "party_state",
+   "ruler": "deposed",
+   "lords": "Abolished, with their land: it goes to the farmers, later to collective farms.",
+   "church": "Church land seized; houses of worship close one a year.",
+   "land": "Farms belong to villages, then collectives: for 10 years food -20 %, then +10 %.",
+   "trade": "Market folk slots halve; factories belong to the state.",
+   "levy": "Every class can be levied; commissars sit beside commanders (desertion halved).",
+   "decrees": [
+    "requisition_grain",
+    "revolutionary_tribunal",
+    "levy_en_masse",
+    "divide_the_estates"
+   ],
+   "locks": [
+    "grant_fief",
+    "sell_title",
+    "call_the_lords",
+    "hire_companies"
+   ],
+   "grievances_end": [
+    "harsh_lord"
+   ],
+   "grievances_add": [
+    "requisitioned"
+   ],
+   "flags": [
+    "revolutionary_regime",
+    "emigre_court"
+   ],
+   "abroad": "Every non-communist country: opinion -60; intervention reason for 5 years.",
+   "risk": "Civil war against the old order for the first years; famine if grain is requisitioned in a failed harvest.",
+   "loop": "Everything is run by the state through officials and councils; you can mobilise all of it, at the cost of hunger and isolation."
+  },
+  "reaction": {
+   "id": "reaction",
+   "name": "Reaction",
+   "form": "keep",
+   "ruler": "kept",
+   "lords": "Loyal lords who fought for you gain one province each from the rebels' land.",
+   "decrees": [
+    "censorship"
+   ],
+   "grievances_add": [
+    "bloodshed"
+   ],
+   "flags": [
+    "reaction_regime"
+   ],
+   "abroad": "Other crowns: opinion +20.",
+   "risk": "The signs come back: the revolution's need is one sign lower for 20 years.",
+   "loop": "Order is back and the lords are pleased, but the ideas are only underground."
+  },
+  "restored_monarchy": {
+   "id": "restored_monarchy",
+   "name": "Restored monarchy",
+   "form": "old_form",
+   "ruler": "replaced",
+   "lords": "Émigré lords return and get back half their old land; the rest stays with its new holders.",
+   "land": "Church land that was sold stays sold.",
+   "decrees": [],
+   "flags": [
+    "reaction_regime"
+   ],
+   "flags_clear": [
+    "revolutionary_regime",
+    "emigre_court"
+   ],
+   "abroad": "Monarchies: opinion +30; the counter-revolution reason ends.",
+   "risk": "If the restored ruler revokes the revolution's charters, the revolution can fire again.",
+   "loop": "The crown is back, but the revolution's land sales and officials remain: a mixed realm."
+  }
+ },
+ "decrees": {
+  "call_the_faithful": {
+   "id": "call_the_faithful",
+   "name": "Call the faithful",
+   "card": "country",
+   "cost": "No gold; 1 stability",
+   "limit": "Once every 5 years",
+   "does": "Raise a levy of every class of the state faith at twice the farmers' share, at once. They go home after one campaign season."
+  },
+  "convert_by_decree": {
+   "id": "convert_by_decree",
+   "name": "Convert by decree",
+   "card": "province",
+   "cost": "Gold by the province's people",
+   "limit": "One province at a time",
+   "does": "Chaplains in the province work three times as fast for 10 years. Provinces of another faith get Wrong faith twice over while it runs."
+  },
+  "appoint_emir": {
+   "id": "appoint_emir",
+   "name": "Appoint a governor",
+   "card": "province",
+   "cost": "Gold gift",
+   "limit": "When a governor dies or is removed",
+   "does": "Choose a new governor (lord) for a returned province from your officials, commanders or a local family. The appointee starts Loyal."
+  },
+  "sacred_treasury": {
+   "id": "sacred_treasury",
+   "name": "Fill the sacred treasury",
+   "card": "country",
+   "cost": "Each province's surplus food",
+   "limit": "Each harvest",
+   "does": "Every province sends its food above the people's need to the castle stores. No province can go Hungry while stores hold, but market folk lose work."
+  },
+  "open_the_granaries": {
+   "id": "open_the_granaries",
+   "name": "Open the granaries",
+   "card": "province",
+   "cost": "Castle store food",
+   "limit": "Any time",
+   "does": "Hand castle food to a province: Hungry ends there, and the province calms one step."
+  },
+  "ask_the_towns": {
+   "id": "ask_the_towns",
+   "name": "Ask the towns",
+   "card": "country",
+   "cost": "A town charter promise",
+   "limit": "Once every 3 years",
+   "does": "Borrow from the towns at half the usual interest. Refusing their next request costs Broken charter in every town."
+  },
+  "call_the_assembly": {
+   "id": "call_the_assembly",
+   "name": "Call the assembly",
+   "card": "country",
+   "cost": "One season",
+   "limit": "Any time",
+   "does": "Put a tax rise or a war of conquest to the assembly. It agrees when fewer than a third of provinces have grievances and the realm is not deep in debt; a yes gives the act without grievance penalties."
+  },
+  "sell_bonds": {
+   "id": "sell_bonds",
+   "name": "Sell bonds",
+   "card": "country",
+   "cost": "Interest each year",
+   "limit": "Up to the loan limit",
+   "does": "Borrow from the public at the regime's low interest rate."
+  },
+  "charter_a_company": {
+   "id": "charter_a_company",
+   "name": "Charter a company",
+   "card": "country",
+   "cost": "Gold and two merchants",
+   "limit": "One per ocean",
+   "does": "Found a trading company that buys ships and trading posts with merchant houses' money (company and trade designs)."
+  },
+  "army_council": {
+   "id": "army_council",
+   "name": "Army council",
+   "card": "country",
+   "cost": "None",
+   "limit": "Any time",
+   "does": "Let the army decide a policy (war, peace, a purge): the act costs no stability, but generals gain influence and a coup grows more likely."
+  },
+  "sell_church_lands": {
+   "id": "sell_church_lands",
+   "name": "Sell church lands",
+   "card": "country",
+   "cost": "Clergy and Pious lords waver",
+   "limit": "Once",
+   "does": "Gold equal to ten years of the state church's tile income; church tiles pass to buyers (market folk and lords)."
+  },
+  "levy_en_masse": {
+   "id": "levy_en_masse",
+   "name": "Levy of the whole nation",
+   "card": "country",
+   "cost": "Conscription grievance everywhere for 3 years",
+   "limit": "While at war",
+   "does": "Every class can be levied at the farmers' share; the levy screen's caps double for one war."
+  },
+  "revolutionary_tribunal": {
+   "id": "revolutionary_tribunal",
+   "name": "Revolutionary tribunal",
+   "card": "country",
+   "cost": "Bloodshed in the provinces of those tried",
+   "limit": "Any time",
+   "does": "Try disloyal lords, officers or pretenders' backers: they are removed at once. Scholars may flee abroad."
+  },
+  "arm_the_people": {
+   "id": "arm_the_people",
+   "name": "Arm the people",
+   "card": "country",
+   "cost": "Tools and old weapons only",
+   "limit": "Defensive wars",
+   "does": "Every farmer becomes a recruit for this war; they fight with locals-know-the-land bonuses in their own provinces."
+  },
+  "divide_the_estates": {
+   "id": "divide_the_estates",
+   "name": "Divide the estates",
+   "card": "province",
+   "cost": "The lord or owner of the tiles turns Disloyal",
+   "limit": "One province a season",
+   "does": "Split estate and plantation tiles into family farms: Harsh lord ends, food +, export wares -."
+  },
+  "settle_the_frontier": {
+   "id": "settle_the_frontier",
+   "name": "Open the frontier",
+   "card": "country",
+   "cost": "Indigenous homelands get Foreign rule and a resistance (province stats 12.3)",
+   "limit": "Any time",
+   "does": "Homeless and farmers may move to free tiles on the frontier as settlers at no cost. Shown with the harm it does to the people already there."
+  },
+  "caudillos_pact": {
+   "id": "caudillos_pact",
+   "name": "General's pact",
+   "card": "country",
+   "cost": "Provinces granted",
+   "limit": "Any time",
+   "does": "Make a commander a lord over the provinces his army holds, in return for loyalty and his retinue in your wars."
+  },
+  "summon_to_court": {
+   "id": "summon_to_court",
+   "name": "Summon to court",
+   "card": "country",
+   "cost": "Gold for the court each year",
+   "limit": "Any time",
+   "does": "Call a lord to live at court: his retinue halves, his loyalty is fixed at Wavering or better while he stays."
+  },
+  "intendants": {
+   "id": "intendants",
+   "name": "Send an intendant",
+   "card": "province",
+   "cost": "An official's wage",
+   "limit": "One per lord",
+   "does": "Place one of your officials in a lord's province as overseer: you get a quarter of its tax and the official's type effect."
+  },
+  "censorship": {
+   "id": "censorship",
+   "name": "Censorship",
+   "card": "country",
+   "cost": "Scholars -10 % a year while on",
+   "limit": "Toggle",
+   "does": "New ideas spread half as fast in your realm; presses and schools slow."
+  },
+  "local_directorates": {
+   "id": "local_directorates",
+   "name": "Recognise the directorates",
+   "card": "province",
+   "cost": "No tax rise there",
+   "limit": "Risen provinces only",
+   "does": "Keep a directorate as the province's government: it acts as a free judge and keeps the province calm."
+  },
+  "abolish_domains": {
+   "id": "abolish_domains",
+   "name": "Abolish the domains",
+   "card": "country",
+   "cost": "Pensions: each lord's yearly income, for 20 years",
+   "limit": "Once",
+   "does": "Every lord's land becomes royal land at once; lords become pensioners. Needs officials for every province."
+  },
+  "missions_abroad": {
+   "id": "missions_abroad",
+   "name": "Missions abroad",
+   "card": "country",
+   "cost": "Gold and two scholars",
+   "limit": "Once every 10 years",
+   "does": "Send scholars to a leading country: the next three inventions you research that it already has cost half."
+  },
+  "table_of_ranks": {
+   "id": "table_of_ranks",
+   "name": "Ranks for service",
+   "card": "country",
+   "cost": "None",
+   "limit": "Toggle",
+   "does": "Officials and commanders can earn a lordship by service; old lords must serve or lose a province."
+  },
+  "call_the_age_regiment": {
+   "id": "call_the_age_regiment",
+   "name": "Call an age regiment",
+   "card": "country",
+   "cost": "Births -10 % while serving",
+   "limit": "One age set at a time",
+   "does": "Every young man of one age set joins a standing regiment, already trained."
+  },
+  "officers_to_the_provinces": {
+   "id": "officers_to_the_provinces",
+   "name": "Officers to the provinces",
+   "card": "country",
+   "cost": "Commanders taken from the army",
+   "limit": "Any time",
+   "does": "Make commanders officials: they run provinces as wardens or muster masters, at no wage."
+  },
+  "buy_a_warlord": {
+   "id": "buy_a_warlord",
+   "name": "Buy a warlord",
+   "card": "country",
+   "cost": "Gold, by the warlord's army",
+   "limit": "Any time",
+   "does": "A warlord accepts your rule: his provinces become royal and his men join your army."
+  },
+  "requisition_grain": {
+   "id": "requisition_grain",
+   "name": "Requisition grain",
+   "card": "country",
+   "cost": "Requisitioned grievance in every farming province",
+   "limit": "Each harvest",
+   "does": "Take a share of every village's harvest for the towns and the army."
+  },
+  "script_and_schools": {
+   "id": "script_and_schools",
+   "name": "New script and schools",
+   "card": "country",
+   "cost": "Scholars retrain: research -25 % for 5 years",
+   "limit": "Once",
+   "does": "Literacy grows twice as fast for 20 years; old religious schools close."
+  },
+  "raise_provincial_army": {
+   "id": "raise_provincial_army",
+   "name": "Let a governor raise an army",
+   "card": "province",
+   "cost": "The official becomes a lord with a retinue",
+   "limit": "Any time",
+   "does": "A governor raises troops from his province at his own cost to fight a rising or an invader."
+  },
+  "gather_the_tribes": {
+   "id": "gather_the_tribes",
+   "name": "Gather a tribe at the capital",
+   "card": "province",
+   "cost": "The province loses a third of its people; its lord's retinue moves with them",
+   "limit": "Once every 5 years",
+   "does": "Move a tribe's people to the capital: the capital grows and the tribe's lord serves at court, but the province empties and can go Hungry."
+  },
+  "protection_tribute": {
+   "id": "protection_tribute",
+   "name": "Demand protection tribute",
+   "card": "province",
+   "cost": "The province's owner: opinion -20",
+   "limit": "Neighbouring provinces only",
+   "does": "Demand a share of a neighbour's province tax each year (a quarter for Maratha chauth, a fifth for Sikh rakhi) in return for not raiding it. If refused, your horsemen raid it: Burned homes there, loot for you."
+  },
+  "garrison_hill_forts": {
+   "id": "garrison_hill_forts",
+   "name": "Garrison the hill forts",
+   "card": "province",
+   "cost": "Gold for each fort's three officers",
+   "limit": "Hill and mountain provinces",
+   "does": "Forts in hill and mountain provinces build at half cost and hold sieges twice as long; each counts as a free judge for that province."
+  },
+  "hire_drill_masters": {
+   "id": "hire_drill_masters",
+   "name": "Hire foreign drill masters",
+   "card": "country",
+   "cost": "Gold each year; Proud lords waver",
+   "limit": "Up to 3 at once",
+   "does": "Foreign officers train your regiments: new infantry and guns get the drill of the most advanced neighbour you trade with."
+  }
+ },
+ "revolutions": {
+  "kaga_ikko_ikki": {
+   "family": "faith",
+   "country": "$governor",
+   "cause": "faith",
+   "requirements": [
+    {
+     "period_active": "p_sengoku_and_unification"
+    },
+    {
+     "owns": {
+      "who": "$governor",
+      "where": "area:hokuriku",
+      "min_share": 0.5
+     }
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "The Pure Land teaching has a fifth of Japan",
+      "ease": "Give the temples land, or make their abbots your lords",
+      "if": {
+       "ideology": {
+        "who": "region:japan",
+        "id": "devotional_reform",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "Kaga is restless",
+      "ease": "Lower taxes there; send a judge",
+      "if": {
+       "stat": {
+        "who": "area:hokuriku",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 35
+       }
+      }
+     },
+     {
+      "label": "Heavy taxes in a third of Kaga",
+      "ease": "Lower the tax rate",
+      "if": {
+       "grievance": {
+        "who": "area:hokuriku",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Two or more lords waver",
+      "ease": "Win back your lords before the temples do",
+      "if": {
+       "lords": {
+        "who": "$governor",
+        "measure": "wavering_or_worse",
+        "op": ">=",
+        "value": 2
+       }
+      }
+     },
+     {
+      "label": "The governor's house is weak",
+      "ease": "Raise stability",
+      "if": {
+       "stat": {
+        "who": "$governor",
+        "stat": "stability",
+        "op": "<=",
+        "value": -1
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "The governor takes men away to fight elsewhere",
+     "mult": 3,
+     "if": {
+      "at_war": {
+       "who": "$governor"
+      }
+     }
+    },
+    {
+     "label": "A quarrel over the governor's succession",
+     "mult": 2,
+     "if": {
+      "flag": {
+       "who": "$governor",
+       "id": "succession_dispute"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$governor",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "league_rule": "path",
+    "suppress_the_league": "fight",
+    "tolerate_the_temples": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.1,
+      "clergy": 0.3,
+      "craftsmen": 0.08,
+      "market_folk": 0.08
+     },
+     "only_of_faith": true,
+     "lords": "Lords of the movement's faith who are Wavering or worse",
+     "army": "Soldiers of the movement's faith desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other faiths, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "religion",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "suppress_the_league": "rising_crushed",
+     "tolerate_the_temples": "chosen"
+    }
+   }
+  },
+  "safavid_rise": {
+   "family": "faith",
+   "country": "$host_state",
+   "cause": "faith",
+   "requirements": [
+    {
+     "exists": "$host_state"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "Qizilbash devotion in Azerbaijan",
+      "ease": "Patronise the order's rivals; keep its sheikh at court",
+      "if": {
+       "ideology": {
+        "who": "area:azerbaijan",
+        "id": "qizilbash_messianism",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "The realm is unstable",
+      "ease": "Raise stability",
+      "if": {
+       "stat": {
+        "who": "$host_state",
+        "stat": "stability",
+        "op": "<=",
+        "value": -1
+       }
+      }
+     },
+     {
+      "label": "The ruling house is split over the succession",
+      "ease": "Settle the succession",
+      "if": {
+       "flag": {
+        "who": "$host_state",
+        "id": "succession_crisis"
+       }
+      }
+     },
+     {
+      "label": "Two or more lords are disloyal",
+      "ease": "Win back the clan chiefs",
+      "if": {
+       "lords": {
+        "who": "$host_state",
+        "measure": "disloyal_or_worse",
+        "op": ">=",
+        "value": 2
+       }
+      }
+     },
+     {
+      "label": "Azerbaijan is restless",
+      "ease": "Lower taxes there",
+      "if": {
+       "stat": {
+        "who": "area:azerbaijan",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 30
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "The ruler has just died",
+     "mult": 3,
+     "if": {
+      "flag": {
+       "who": "$host_state",
+       "id": "ruler_died"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$host_state",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "impose_twelver_shiism": "path",
+    "sufi_ecumenical_state": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.1,
+      "clergy": 0.3,
+      "craftsmen": 0.08,
+      "market_folk": 0.08
+     },
+     "only_of_faith": true,
+     "lords": "Lords of the movement's faith who are Wavering or worse",
+     "army": "Soldiers of the movement's faith desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other faiths, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "religion",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "sufi_ecumenical_state": "chosen"
+    }
+   }
+  },
+  "khalsa_founded": {
+   "family": "faith",
+   "country": "$empire",
+   "cause": "faith",
+   "requirements": [
+    {
+     "religion_share": {
+      "where": "area:punjab",
+      "religion": "sikh",
+      "op": ">=",
+      "value": 0.05
+     }
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "Other faiths are persecuted in Punjab",
+      "ease": "End the persecution",
+      "if": {
+       "flag": {
+        "who": "area:punjab",
+        "id": "religious_persecution_active"
+       }
+      }
+     },
+     {
+      "label": "Religious zeal grips the court",
+      "ease": "Favour tolerant advisers",
+      "if": {
+       "ideology": {
+        "who": "$empire",
+        "id": "religious_zeal",
+        "op": ">=",
+        "value": 0.5
+       }
+      }
+     },
+     {
+      "label": "Wrong faith in a fifth of Punjab",
+      "ease": "Tolerate Sikh worship; lift the pilgrim taxes",
+      "if": {
+       "grievance": {
+        "who": "area:punjab",
+        "id": "wrong_faith",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "Hill chiefs and landholders squeeze the villages",
+      "ease": "Curb the landholders' dues",
+      "if": {
+       "grievance": {
+        "who": "area:punjab",
+        "id": "harsh_lord",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Punjab is restless",
+      "ease": "Lower taxes there; send a judge",
+      "if": {
+       "stat": {
+        "who": "area:punjab",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 30
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Your armies are worn out by a long war elsewhere",
+     "mult": 1.5,
+     "if": {
+      "stat": {
+       "who": "$empire",
+       "stat": "war_weariness",
+       "op": ">=",
+       "value": 10
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$empire",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "khalsa": "path",
+    "quietism": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.1,
+      "clergy": 0.3,
+      "craftsmen": 0.08,
+      "market_folk": 0.08
+     },
+     "only_of_faith": true,
+     "lords": "Lords of the movement's faith who are Wavering or worse",
+     "army": "Soldiers of the movement's faith desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other faiths, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "religion",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "khalsa": "chosen",
+     "quietism": "chosen"
+    }
+   }
+  },
+  "futa_jallon_jihad": {
+   "family": "faith",
+   "country": "$movement",
+   "cause": "faith",
+   "requirements": [
+    {
+     "religion_share": {
+      "where": "area:futa_jallon",
+      "religion": "sunni",
+      "op": ">=",
+      "value": 0.3
+     }
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "Reformist scholars have a following across West Africa",
+      "ease": "Invite the scholars into your council",
+      "if": {
+       "ideology": {
+        "who": "region:west_africa",
+        "id": "islamic_reformism",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "The highlands are restless",
+      "ease": "Lower taxes; stop raiding the herders",
+      "if": {
+       "stat": {
+        "who": "area:futa_jallon",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 25
+       }
+      }
+     },
+     {
+      "label": "Muslims ruled by rulers of another faith",
+      "ease": "A faith tolerance charter",
+      "if": {
+       "grievance": {
+        "who": "area:futa_jallon",
+        "id": "wrong_faith",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Reformist teaching is at its height",
+     "mult": 2,
+     "if": {
+      "ideology": {
+       "who": "region:west_africa",
+       "id": "islamic_reformism",
+       "op": ">=",
+       "value": 0.3
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$movement",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "almamate": "path",
+    "clerical_network": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.1,
+      "clergy": 0.3,
+      "craftsmen": 0.08,
+      "market_folk": 0.08
+     },
+     "only_of_faith": true,
+     "lords": "Lords of the movement's faith who are Wavering or worse",
+     "army": "Soldiers of the movement's faith desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other faiths, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "religion",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "clerical_network": "chosen"
+    }
+   }
+  },
+  "sokoto_jihad": {
+   "family": "faith",
+   "country": "$hausa_kings",
+   "cause": "faith",
+   "requirements": [
+    {
+     "exists": "hausa_states"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "Reformist teaching is strong in Hausaland",
+      "ease": "Bring the reformers into your court",
+      "if": {
+       "ideology": {
+        "who": "area:hausaland",
+        "id": "islamic_reformism",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Hausaland is restless",
+      "ease": "Lower taxes",
+      "if": {
+       "stat": {
+        "who": "area:hausaland",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 30
+       }
+      }
+     },
+     {
+      "label": "Taxes on herders and markets the reformers call unjust",
+      "ease": "Cut the cattle and market taxes",
+      "if": {
+       "grievance": {
+        "who": "area:hausaland",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Forced service in the kings' wars",
+      "ease": "End the levy",
+      "if": {
+       "grievance": {
+        "who": "area:hausaland",
+        "id": "conscription",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "A reform state already stands in Futa Jallon",
+      "ease": "Nothing: it is an example",
+      "if": {
+       "event": "futa_jallon_jihad"
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "The king moves against the reformers' community",
+     "mult": 3,
+     "if": {
+      "flag": {
+       "who": "$hausa_kings",
+       "id": "religious_persecution_active"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$hausa_kings",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "caliphate": "path",
+    "reformed_hausa_kingdoms": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.1,
+      "clergy": 0.3,
+      "craftsmen": 0.08,
+      "market_folk": 0.08
+     },
+     "only_of_faith": true,
+     "lords": "Lords of the movement's faith who are Wavering or worse",
+     "army": "Soldiers of the movement's faith desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other faiths, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "religion",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "reformed_hausa_kingdoms": "chosen"
+    }
+   }
+  },
+  "taiping_rebellion": {
+   "family": "faith",
+   "country": "$dynasty",
+   "cause": "faith",
+   "requirements": [
+    {
+     "exists": "qing"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "The dynasty's right to rule is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "qing",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "The south is restless",
+      "ease": "Officials and judges in the south",
+      "if": {
+       "stat": {
+        "who": "region:south_china",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 45
+       }
+      }
+     },
+     {
+      "label": "Food is short across China",
+      "ease": "Fill the castle stores; open the granaries",
+      "if": {
+       "stat": {
+        "who": "region:china",
+        "stat": "food_security",
+        "op": "<",
+        "value": 0.5
+       }
+      }
+     },
+     {
+      "label": "Defeat by a foreign navy",
+      "ease": "Nothing now: it has happened",
+      "if": {
+       "event": "first_opium_war"
+      }
+     },
+     {
+      "label": "Many landless men and disbanded soldiers",
+      "ease": "New buildings; almshouses; settle them on new land",
+      "if": {
+       "class_share": {
+        "who": "qing",
+        "class": "homeless",
+        "op": ">=",
+        "value": 0.08
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Floods or famine in the south",
+     "mult": 2,
+     "if": {
+      "grievance": {
+       "who": "region:south_china",
+       "id": "hungry",
+       "op": ">=",
+       "value": 0.3
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$dynasty",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "regional_armies_win": "path",
+    "taiping_victory": "path",
+    "foreign_backed_suppression": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.1,
+      "clergy": 0.3,
+      "craftsmen": 0.08,
+      "market_folk": 0.08
+     },
+     "only_of_faith": true,
+     "lords": "Lords of the movement's faith who are Wavering or worse",
+     "army": "Soldiers of the movement's faith desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other faiths, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "religion",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {}
+   }
+  },
+  "mahdist_state": {
+   "family": "faith",
+   "country": "$ruler",
+   "cause": "faith",
+   "requirements": [
+    {
+     "owns": {
+      "who": "$ruler",
+      "where": "area:sudan"
+     }
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "Reformist teaching has a fifth of Sudan",
+      "ease": "Win over the religious teachers; fund the mosques",
+      "if": {
+       "ideology": {
+        "who": "area:sudan",
+        "id": "islamic_reformism",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "Sudan is restless",
+      "ease": "Lower taxes there; send a judge",
+      "if": {
+       "stat": {
+        "who": "area:sudan",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "Heavy taxes in a third of Sudan",
+      "ease": "Lower the tax rate; stop collecting arrears by force",
+      "if": {
+       "grievance": {
+        "who": "area:sudan",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Foreign governors and officers rule Sudan",
+      "ease": "Appoint local governors",
+      "if": {
+       "grievance": {
+        "who": "area:sudan",
+        "id": "foreign_rule",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Your treasury is bankrupt",
+      "ease": "Pay down the debt",
+      "if": {
+       "stat": {
+        "who": "$ruler",
+        "stat": "debt",
+        "op": ">=",
+        "value": 2000
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "You have just lost a war",
+     "mult": 2,
+     "if": {
+      "war_lost": {
+       "who": "$ruler",
+       "within_years": 3
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$ruler",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "mahdist_independence": "path",
+    "negotiated_autonomy": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.1,
+      "clergy": 0.3,
+      "craftsmen": 0.08,
+      "market_folk": 0.08
+     },
+     "only_of_faith": true,
+     "lords": "Lords of the movement's faith who are Wavering or worse",
+     "army": "Soldiers of the movement's faith desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other faiths, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "religion",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "negotiated_autonomy": "chosen"
+    }
+   }
+  },
+  "comuneros_revolt": {
+   "family": "estates",
+   "country": "$crown",
+   "cause": "town",
+   "requirements": [
+    {
+     "government": {
+      "who": "$crown",
+      "is": "monarchy"
+     }
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "A new tax forced through in a quarter of the realm",
+      "ease": "Lower the rate; ask instead of forcing",
+      "if": {
+       "grievance": {
+        "who": "$crown",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.25
+       }
+      }
+     },
+     {
+      "label": "A ruler not yet trusted (foreign-born, often away)",
+      "ease": "Raise legitimacy: stay, marry locally, appoint locals",
+      "if": {
+       "stat": {
+        "who": "$crown",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 50
+       }
+      }
+     },
+     {
+      "label": "Strong towns: a tenth of the people are craftsmen",
+      "ease": "Grant town law charters before they demand them",
+      "if": {
+       "class_share": {
+        "who": "$crown",
+        "class": "craftsmen",
+        "op": ">=",
+        "value": 0.1
+       }
+      }
+     },
+     {
+      "label": "The heartland is restless",
+      "ease": "Officials and judges in the towns",
+      "if": {
+       "stat": {
+        "who": "area:old_castile",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 30
+       }
+      }
+     },
+     {
+      "label": "Two or more lords waver",
+      "ease": "Win back your lords",
+      "if": {
+       "lords": {
+        "who": "$crown",
+        "measure": "wavering_or_worse",
+        "op": ">=",
+        "value": 2
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "A new reign has just begun",
+     "mult": 2,
+     "if": {
+      "flag": {
+       "who": "$crown",
+       "id": "ruler_died"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$crown",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "crushed_at_villalar": "fight",
+    "royal_concessions": "bend",
+    "junta_takes_power": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.2,
+      "market_folk": 0.15,
+      "craftsmen": 0.12,
+      "clerks": 0.1,
+      "scholars": 0.05,
+      "farmers": 0.03
+     },
+     "lords": "Disloyal lords join with their retinues",
+     "army": "Unpaid soldiers desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Loyal lords",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "parliamentarism",
+    "amount": 0.03,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "crushed_at_villalar": "rising_crushed",
+     "royal_concessions": "chosen"
+    }
+   }
+  },
+  "dutch_revolt": {
+   "family": "estates",
+   "country": "$overlord",
+   "cause": "town",
+   "requirements": [
+    {
+     "owns": {
+      "who": "$overlord",
+      "where": "area:low_countries",
+      "min_share": 0.8
+     }
+    },
+    {
+     "religion_share": {
+      "where": "area:low_countries",
+      "religion": "protestant",
+      "op": ">=",
+      "value": 0.15
+     }
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "The Low Countries are restless",
+      "ease": "Lower taxes; keep their charters",
+      "if": {
+       "stat": {
+        "who": "area:low_countries",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "Your hold there is weak",
+      "ease": "Officials; a governor they accept",
+      "if": {
+       "stat": {
+        "who": "area:low_countries",
+        "stat": "control",
+        "op": "<",
+        "value": 50
+       }
+      }
+     },
+     {
+      "label": "New taxes without the estates' consent",
+      "ease": "Ask the estates",
+      "if": {
+       "grievance": {
+        "who": "area:low_countries",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Old privileges revoked",
+      "ease": "Restore the charters",
+      "if": {
+       "grievance": {
+        "who": "area:low_countries",
+        "id": "broken_charter",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "Foreign soldiers quartered in the towns",
+      "ease": "Withdraw them",
+      "if": {
+       "grievance": {
+        "who": "area:low_countries",
+        "id": "soldiers_quartered",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "An inquisition hunts heretics",
+     "mult": 2,
+     "if": {
+      "flag": {
+       "who": "$overlord",
+       "id": "inquisition_established"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$overlord",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "northern_independence": "path",
+    "reconciliation": "bend",
+    "crushed": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.2,
+      "market_folk": 0.15,
+      "craftsmen": 0.12,
+      "clerks": 0.1,
+      "scholars": 0.05,
+      "farmers": 0.03
+     },
+     "lords": "Disloyal lords join with their retinues",
+     "army": "Unpaid soldiers desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Loyal lords",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "parliamentarism",
+    "amount": 0.03,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "reconciliation": "chosen",
+     "crushed": "chosen"
+    }
+   }
+  },
+  "wars_of_the_three_kingdoms": {
+   "family": "estates",
+   "country": "$crown",
+   "cause": "town",
+   "requirements": [
+    {
+     "exists": "england"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "The treasury is empty",
+      "ease": "Call the assembly for taxes; cut costs",
+      "if": {
+       "stat": {
+        "who": "england",
+        "stat": "treasury",
+        "op": "<",
+        "value": 0
+       }
+      }
+     },
+     {
+      "label": "Support for the assembly's rights",
+      "ease": "Call it regularly; honour its votes",
+      "if": {
+       "ideology": {
+        "who": "england",
+        "id": "parliamentarism",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "The northern kingdom resists the crown's church",
+      "ease": "Leave its church alone",
+      "if": {
+       "religion_share": {
+        "where": "area:scotland",
+        "religion": "protestant",
+        "op": ">=",
+        "value": 0.5
+       }
+      }
+     },
+     {
+      "label": "Taxes raised without consent",
+      "ease": "Lower them; ask first",
+      "if": {
+       "grievance": {
+        "who": "england",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.25
+       }
+      }
+     },
+     {
+      "label": "Provinces of another faith under the crown",
+      "ease": "A faith tolerance charter",
+      "if": {
+       "grievance": {
+        "who": "england",
+        "id": "wrong_faith",
+        "op": ">=",
+        "value": 0.1
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "A war forces the crown to ask for money",
+     "mult": 3,
+     "if": {
+      "at_war": {
+       "who": "england"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$crown",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "commonwealth": "path",
+    "royalist_victory": "path",
+    "compromise": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.2,
+      "market_folk": 0.15,
+      "craftsmen": 0.12,
+      "clerks": 0.1,
+      "scholars": 0.05,
+      "farmers": 0.03
+     },
+     "lords": "Disloyal lords join with their retinues",
+     "army": "Unpaid soldiers desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Loyal lords",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "parliamentarism",
+    "amount": 0.03,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "compromise": "chosen"
+    }
+   }
+  },
+  "fronde": {
+   "family": "estates",
+   "country": "$realm",
+   "cause": "town",
+   "requirements": [
+    {
+     "government": {
+      "who": "$realm",
+      "is": "monarchy"
+     }
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "A child ruler and a regent's minister",
+      "ease": "Nothing but time; keep the lords close",
+      "if": {
+       "flag": {
+        "who": "$realm",
+        "id": "regency"
+       }
+      }
+     },
+     {
+      "label": "A long foreign war",
+      "ease": "Make peace",
+      "if": {
+       "at_war": {
+        "who": "$realm"
+       }
+      }
+     },
+     {
+      "label": "War taxes in a third of the realm",
+      "ease": "Lower them",
+      "if": {
+       "grievance": {
+        "who": "$realm",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Debt above 1,000 gold",
+      "ease": "Pay it down",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "debt",
+        "op": ">=",
+        "value": 1000
+       }
+      }
+     },
+     {
+      "label": "Three or more lords waver",
+      "ease": "Gifts, offices, marriages",
+      "if": {
+       "lords": {
+        "who": "$realm",
+        "measure": "wavering_or_worse",
+        "op": ">=",
+        "value": 3
+       }
+      }
+     },
+     {
+      "label": "The people are tired of war",
+      "ease": "Make peace",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "war_weariness",
+        "op": ">=",
+        "value": 10
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "A great lord turns against the court",
+     "mult": 2,
+     "if": {
+      "lords": {
+       "who": "$realm",
+       "measure": "disloyal_or_worse",
+       "op": ">=",
+       "value": 2
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "royal_victory": "fight",
+    "parlement_settlement": "bend",
+    "princes_prevail": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.2,
+      "market_folk": 0.15,
+      "craftsmen": 0.12,
+      "clerks": 0.1,
+      "scholars": 0.05,
+      "farmers": 0.03
+     },
+     "lords": "Disloyal lords join with their retinues",
+     "army": "Unpaid soldiers desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Loyal lords",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "parliamentarism",
+    "amount": 0.03,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "royal_victory": "rising_crushed",
+     "parlement_settlement": "chosen"
+    }
+   }
+  },
+  "glorious_revolution": {
+   "family": "estates",
+   "country": "$realm",
+   "cause": "town",
+   "requirements": [
+    {
+     "religion_share": {
+      "where": "england",
+      "religion": "protestant",
+      "op": ">=",
+      "value": 0.8
+     }
+    },
+    {
+     "any": [
+      {
+       "religion": {
+        "who": "england",
+        "is": "catholic"
+       }
+      },
+      {
+       "flag": {
+        "who": "england",
+        "id": "catholic_heir"
+       }
+      }
+     ]
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "Support for the assembly's rights",
+      "ease": "Call it; honour its votes",
+      "if": {
+       "ideology": {
+        "who": "england",
+        "id": "parliamentarism",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Three or more lords waver",
+      "ease": "Win back your lords",
+      "if": {
+       "lords": {
+        "who": "england",
+        "measure": "wavering_or_worse",
+        "op": ">=",
+        "value": 3
+       }
+      }
+     },
+     {
+      "label": "Town charters recalled by the crown",
+      "ease": "Restore them",
+      "if": {
+       "grievance": {
+        "who": "england",
+        "id": "broken_charter",
+        "op": ">=",
+        "value": 0.1
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "A foreign prince of the majority faith is ready to come",
+     "mult": 2,
+     "if": {
+      "exists": "$invader"
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "constitutional_settlement": "lead",
+    "royal_absolutism": "fight"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.2,
+      "market_folk": 0.15,
+      "craftsmen": 0.12,
+      "clerks": 0.1,
+      "scholars": 0.05,
+      "farmers": 0.03
+     },
+     "lords": "Disloyal lords join with their retinues",
+     "army": "Unpaid soldiers desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Loyal lords",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "parliamentarism",
+    "amount": 0.03,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "royal_absolutism": "rising_crushed"
+    }
+   }
+  },
+  "restoration_of_charles_ii": {
+   "family": "restoration",
+   "country": "$realm",
+   "cause": "pretender",
+   "requirements": [
+    {
+     "government": {
+      "who": "england",
+      "is": "republic"
+     }
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "The republic's right to rule is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "england",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "The republic's leader has just died",
+      "ease": "Nothing: choose a strong successor",
+      "if": {
+       "flag": {
+        "who": "england",
+        "id": "ruler_died"
+       }
+      }
+     },
+     {
+      "label": "The realm is unstable",
+      "ease": "Raise stability",
+      "if": {
+       "stat": {
+        "who": "england",
+        "stat": "stability",
+        "op": "<=",
+        "value": -1
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "restore": "path",
+    "keep_republic": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {},
+     "lords": "Émigré lords and Loyal lords of the old house",
+     "note": "The returning pretender's backers."
+    },
+    "old_order": {
+     "lords": "Lords and officials who gained land or office under the revolution"
+    }
+   },
+   "wave": {
+    "kind": "none",
+    "where": "none"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "keep_republic": "chosen"
+    }
+   }
+  },
+  "american_revolution": {
+   "family": "liberal_national",
+   "country": "$metropole",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "relation": {
+      "who": "$colonists",
+      "other": "$metropole",
+      "type": "subject"
+     }
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "Liberal ideas among the colonists",
+      "ease": "Give the colonies their own assembly",
+      "if": {
+       "ideology": {
+        "who": "$colonists",
+        "id": "liberalism",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Settlement beyond the mountains forbidden",
+      "ease": "Open the frontier (at the cost of the peoples living there)",
+      "if": {
+       "flag": {
+        "who": "$metropole",
+        "id": "proclamation_line_1763"
+       }
+      }
+     },
+     {
+      "label": "A war debt the colonies are asked to share",
+      "ease": "Pay it from home",
+      "if": {
+       "stat": {
+        "who": "$metropole",
+        "stat": "debt",
+        "op": ">=",
+        "value": 1000
+       }
+      }
+     },
+     {
+      "label": "A great colonial war has just been won",
+      "ease": "Nothing: the colonies no longer need protection",
+      "if": {
+       "event": "seven_years_war"
+      }
+     },
+     {
+      "label": "New taxes without a colonial vote",
+      "ease": "Repeal them",
+      "if": {
+       "grievance": {
+        "who": "$colonists",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Soldiers quartered in colonial towns",
+      "ease": "Withdraw them",
+      "if": {
+       "grievance": {
+        "who": "$colonists",
+        "id": "soldiers_quartered",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Troops fire on a crowd",
+     "mult": 3,
+     "if": {
+      "grievance": {
+       "who": "$colonists",
+       "id": "bloodshed",
+       "op": ">",
+       "value": 0
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$metropole",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "independence": "path",
+    "conciliation_offer": "bend",
+    "rebellion_crushed": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "scholars": 0.25,
+      "clerks": 0.15,
+      "craftsmen": 0.12,
+      "market_folk": 0.1,
+      "farmers": 0.04
+     },
+     "farmers_if_hungry": 0.1,
+     "lords": "Few: only Disloyal lords with the Ambitious trait",
+     "army": "Conscripted soldiers desert at 5 % a month while war weariness is high"
+    },
+    "old_order": {
+     "lords": "Every Loyal and Wavering lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "liberalism",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "conciliation_offer": "chosen",
+     "rebellion_crushed": "chosen"
+    }
+   }
+  },
+  "french_revolution": {
+   "family": "liberal_national",
+   "country": "$realm",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "government": {
+      "who": "$realm",
+      "is": "monarchy"
+     }
+    }
+   ],
+   "signs": {
+    "need": 4,
+    "warn_at": 3,
+    "list": [
+     {
+      "label": "Debt above 2,000 gold",
+      "ease": "Cut the court and the army; tax the lords",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "debt",
+        "op": ">=",
+        "value": 2000
+       }
+      }
+     },
+     {
+      "label": "A quarter of the people want a constitution",
+      "ease": "Grant one before they take it",
+      "if": {
+       "ideology": {
+        "who": "$realm",
+        "id": "liberalism",
+        "op": ">=",
+        "value": 0.25
+       }
+      }
+     },
+     {
+      "label": "The crown is distrusted",
+      "ease": "Raise stability or legitimacy",
+      "if": {
+       "any": [
+        {
+         "stat": {
+          "who": "$realm",
+          "stat": "stability",
+          "op": "<=",
+          "value": -1
+         }
+        },
+        {
+         "stat": {
+          "who": "$realm",
+          "stat": "legitimacy",
+          "op": "<",
+          "value": 40
+         }
+        }
+       ]
+      }
+     },
+     {
+      "label": "Bread is short in a fifth of the realm",
+      "ease": "Open the castle stores; import grain",
+      "if": {
+       "grievance": {
+        "who": "$realm",
+        "id": "hungry",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "Lords still hold a third of the land and its dues",
+      "ease": "Take land back; end the lords' dues",
+      "if": {
+       "lords": {
+        "who": "$realm",
+        "measure": "land_share",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Many readers: pamphlets and clubs",
+      "ease": "Censorship slows it",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "literacy",
+        "op": ">=",
+        "value": 30
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "A volcanic winter ruins the harvest",
+     "mult": 2,
+     "if": {
+      "event": "laki_eruption"
+     }
+    },
+    {
+     "label": "A revolution abroad has just won",
+     "mult": 1.5,
+     "if": {
+      "event": "american_revolution"
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "radical_republic": "lead",
+    "constitutional_monarchy": "bend",
+    "royal_reaction": "fight"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "scholars": 0.25,
+      "clerks": 0.15,
+      "craftsmen": 0.12,
+      "market_folk": 0.1,
+      "farmers": 0.04
+     },
+     "farmers_if_hungry": 0.1,
+     "lords": "Few: only Disloyal lords with the Ambitious trait",
+     "army": "Conscripted soldiers desert at 5 % a month while war weariness is high"
+    },
+    "old_order": {
+     "lords": "Every Loyal and Wavering lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "liberalism",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "constitutional_monarchy": "chosen",
+     "royal_reaction": "rising_crushed"
+    }
+   }
+  },
+  "latin_american_independence": {
+   "family": "liberal_national",
+   "country": "$crown",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "colonial_presence": {
+      "who": "$crown",
+      "where": "region:south_america",
+      "op": ">=",
+      "value": 10
+     }
+    },
+    {
+     "ideology": {
+      "who": "region:south_america",
+      "id": "liberalism",
+      "op": ">=",
+      "value": 0.2
+     }
+    }
+   ],
+   "signs": {
+    "need": 1,
+    "warn_at": 0,
+    "list": [
+     {
+      "label": "The crown is captive or deposed in Europe",
+      "ease": "Nothing: win the war at home",
+      "if": {
+       "event": "napoleon_invades_iberia"
+      }
+     },
+     {
+      "label": "The crown's right to rule is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "$crown",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 30
+       }
+      }
+     },
+     {
+      "label": "The realm is in turmoil",
+      "ease": "Raise stability",
+      "if": {
+       "stat": {
+        "who": "$crown",
+        "stat": "stability",
+        "op": "<=",
+        "value": -2
+       }
+      }
+     },
+     {
+      "label": "A free republic already stands in the Caribbean",
+      "ease": "Nothing: it is an example",
+      "if": {
+       "event": "haitian_revolution"
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "News that the king has fallen",
+     "mult": 3,
+     "if": {
+      "event": {
+       "id": "napoleon_invades_iberia",
+       "within_years": 3
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$crown",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "republican_independence": "path",
+    "popular_revolution": "path",
+    "cadiz_compromise": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "scholars": 0.25,
+      "clerks": 0.15,
+      "craftsmen": 0.12,
+      "market_folk": 0.1,
+      "farmers": 0.04
+     },
+     "farmers_if_hungry": 0.1,
+     "lords": "Few: only Disloyal lords with the Ambitious trait",
+     "army": "Conscripted soldiers desert at 5 % a month while war weariness is high"
+    },
+    "old_order": {
+     "lords": "Every Loyal and Wavering lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "liberalism",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "cadiz_compromise": "chosen"
+    }
+   }
+  },
+  "revolutions_of_1848": {
+   "family": "liberal_national",
+   "country": "$states",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "count_countries": {
+      "where": "region:europe",
+      "condition": {
+       "ideology": {
+        "who": "this",
+        "id": "liberalism",
+        "op": ">=",
+        "value": 0.3
+       }
+      },
+      "op": ">=",
+      "value": 3
+     }
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "Food is short across Europe",
+      "ease": "Fill the stores; import grain",
+      "if": {
+       "stat": {
+        "who": "region:europe",
+        "stat": "food_security",
+        "op": "<",
+        "value": 0.6
+       }
+      }
+     },
+     {
+      "label": "A trade crisis: workshops close",
+      "ease": "Public works; new buildings",
+      "if": {
+       "flag": {
+        "who": "global",
+        "id": "commercial_crisis"
+       }
+      }
+     },
+     {
+      "label": "Famine in the west",
+      "ease": "Nothing now",
+      "if": {
+       "event": "great_irish_famine"
+      }
+     },
+     {
+      "label": "Many homeless in the cities",
+      "ease": "Almshouses; new buildings",
+      "if": {
+       "class_share": {
+        "who": "region:europe",
+        "class": "homeless",
+        "op": ">=",
+        "value": 0.08
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "A king falls in a neighbouring capital",
+     "mult": 3,
+     "if": {
+      "count_countries": {
+       "where": "region:europe",
+       "condition": {
+        "flag": {
+         "who": "this",
+         "id": "revolutionary_regime"
+        }
+       },
+       "op": ">=",
+       "value": 1
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$states",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "counter_revolution": "path",
+    "liberal_victory": "path",
+    "early_german_unification": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "scholars": 0.25,
+      "clerks": 0.15,
+      "craftsmen": 0.12,
+      "market_folk": 0.1,
+      "farmers": 0.04
+     },
+     "farmers_if_hungry": 0.1,
+     "lords": "Few: only Disloyal lords with the Ambitious trait",
+     "army": "Conscripted soldiers desert at 5 % a month while war weariness is high"
+    },
+    "old_order": {
+     "lords": "Every Loyal and Wavering lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "liberalism",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {}
+   }
+  },
+  "iranian_constitutional_revolution": {
+   "family": "liberal_national",
+   "country": "$realm",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "exists": "qajar_iran"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "Foreign loans and concessions",
+      "ease": "Pay off the loans; cancel concessions",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "debt",
+        "op": ">=",
+        "value": 1000
+       }
+      }
+     },
+     {
+      "label": "The court's right to rule is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "Merchants and clerics want a constitution",
+      "ease": "Grant a consultative council",
+      "if": {
+       "ideology": {
+        "who": "$realm",
+        "id": "liberalism",
+        "op": ">=",
+        "value": 0.15
+       }
+      }
+     },
+     {
+      "label": "Heavy taxes in a quarter of the realm",
+      "ease": "Lower them",
+      "if": {
+       "grievance": {
+        "who": "$realm",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.25
+       }
+      }
+     },
+     {
+      "label": "Revolution next door",
+      "ease": "Nothing: it is an example",
+      "if": {
+       "event": {
+        "id": "russian_revolution_1905",
+        "within_years": 3
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Bread and sugar prices soar",
+     "mult": 2,
+     "if": {
+      "grievance": {
+       "who": "$realm",
+       "id": "hungry",
+       "op": ">=",
+       "value": 0.2
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "constitution_granted": "bend",
+    "shah_resists": "fight"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "scholars": 0.25,
+      "clerks": 0.15,
+      "craftsmen": 0.12,
+      "market_folk": 0.1,
+      "farmers": 0.04
+     },
+     "farmers_if_hungry": 0.1,
+     "lords": "Few: only Disloyal lords with the Ambitious trait",
+     "army": "Conscripted soldiers desert at 5 % a month while war weariness is high"
+    },
+    "old_order": {
+     "lords": "Every Loyal and Wavering lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "liberalism",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "constitution_granted": "chosen",
+     "shah_resists": "rising_crushed"
+    }
+   }
+  },
+  "young_turk_revolution": {
+   "family": "liberal_national",
+   "country": "$state",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "exists": "ottoman"
+    },
+    {
+     "ideology": {
+      "who": "ottoman",
+      "id": "nationalism",
+      "op": ">=",
+      "value": 0.3
+     }
+    }
+   ],
+   "signs": {
+    "need": 1,
+    "warn_at": 0,
+    "list": [
+     {
+      "label": "A suspended constitution",
+      "ease": "Restore it before officers do",
+      "if": {
+       "event": "ottoman_constitution_1876"
+      }
+     },
+     {
+      "label": "The sultan's right to rule is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "ottoman",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 30
+       }
+      }
+     },
+     {
+      "label": "Risings for independence in the provinces",
+      "ease": "Beat them, or grant self-rule",
+      "if": {
+       "rebels_active": {
+        "who": "ottoman",
+        "type": "independence"
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "A recent lost war",
+     "mult": 2,
+     "if": {
+      "war_lost": {
+       "who": "ottoman",
+       "within_years": 5
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$state",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "committee_rule": "path",
+    "liberal_decentralisation": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "scholars": 0.25,
+      "clerks": 0.15,
+      "craftsmen": 0.12,
+      "market_folk": 0.1,
+      "farmers": 0.04
+     },
+     "farmers_if_hungry": 0.1,
+     "lords": "Few: only Disloyal lords with the Ambitious trait",
+     "army": "Conscripted soldiers desert at 5 % a month while war weariness is high"
+    },
+    "old_order": {
+     "lords": "Every Loyal and Wavering lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "liberalism",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {}
+   }
+  },
+  "xinhai_revolution": {
+   "family": "liberal_national",
+   "country": "$dynasty",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "exists": "qing"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "The dynasty's right to rule is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "qing",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 25
+       }
+      }
+     },
+     {
+      "label": "A third of the people want a nation of their own",
+      "ease": "Grant an assembly; appoint Han officials",
+      "if": {
+       "ideology": {
+        "who": "qing",
+        "id": "nationalism",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Wars lost to foreign powers",
+      "ease": "Nothing now",
+      "if": {
+       "war_lost": {
+        "who": "qing",
+        "within_years": 20
+       }
+      }
+     },
+     {
+      "label": "Indemnities and foreign loans",
+      "ease": "Pay them down",
+      "if": {
+       "stat": {
+        "who": "qing",
+        "stat": "debt",
+        "op": ">=",
+        "value": 2000
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "An army mutiny in a river city",
+     "mult": 3,
+     "if": {
+      "rebels_active": {
+       "who": "qing",
+       "type": "revolutionary"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$dynasty",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "abdication_and_republic": "lead",
+    "constitutional_monarchy": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "scholars": 0.25,
+      "clerks": 0.15,
+      "craftsmen": 0.12,
+      "market_folk": 0.1,
+      "farmers": 0.04
+     },
+     "farmers_if_hungry": 0.1,
+     "lords": "Few: only Disloyal lords with the Ambitious trait",
+     "army": "Conscripted soldiers desert at 5 % a month while war weariness is high"
+    },
+    "old_order": {
+     "lords": "Every Loyal and Wavering lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "liberalism",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "constitutional_monarchy": "chosen"
+    }
+   }
+  },
+  "egyptian_revolution_1919": {
+   "family": "liberal_national",
+   "country": "$overlord",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "relation": {
+      "who": "egypt",
+      "other": "$overlord",
+      "type": "subject"
+     }
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "A third of Egyptians want a nation of their own",
+      "ease": "Promise self-rule",
+      "if": {
+       "ideology": {
+        "who": "egypt",
+        "id": "nationalism",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Support for ending foreign rule",
+      "ease": "Promise self-rule",
+      "if": {
+       "ideology": {
+        "who": "egypt",
+        "id": "anticolonialism",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "A world war has just ended with talk of self-determination",
+      "ease": "Nothing",
+      "if": {
+       "event": {
+        "id": "armistice_1918",
+        "within_years": 3
+       }
+      }
+     },
+     {
+      "label": "Wartime requisitions of grain and men",
+      "ease": "End them; pay for what was taken",
+      "if": {
+       "grievance": {
+        "who": "egypt",
+        "id": "requisitioned",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "The overlord is tired of war",
+      "ease": "Nothing",
+      "if": {
+       "stat": {
+        "who": "$overlord",
+        "stat": "war_weariness",
+        "op": ">=",
+        "value": 10
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "The movement's leaders are arrested and exiled",
+     "mult": 2,
+     "if": {
+      "rebels_active": {
+       "who": "egypt",
+       "type": "anticolonial"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$overlord",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "independence_with_reserved_points": "bend",
+    "hold_by_force": "fight",
+    "full_independence": "lead"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "scholars": 0.25,
+      "clerks": 0.15,
+      "craftsmen": 0.12,
+      "market_folk": 0.1,
+      "farmers": 0.04
+     },
+     "farmers_if_hungry": 0.1,
+     "lords": "Few: only Disloyal lords with the Ambitious trait",
+     "army": "Conscripted soldiers desert at 5 % a month while war weariness is high"
+    },
+    "old_order": {
+     "lords": "Every Loyal and Wavering lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "liberalism",
+    "amount": 0.05,
+    "where": "neighbours"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "independence_with_reserved_points": "chosen",
+     "hold_by_force": "rising_crushed"
+    }
+   }
+  },
+  "haitian_revolution": {
+   "family": "freedom",
+   "country": "$metropole",
+   "cause": "homeland",
+   "requirements": [
+    {
+     "colonial_presence": {
+      "who": "$metropole",
+      "where": "area:saint_domingue",
+      "op": ">=",
+      "value": 1
+     }
+    },
+    {
+     "period_active": "p_caribbean_plantation_complex"
+    },
+    {
+     "stat": {
+      "who": "area:saint_domingue",
+      "stat": "unrest",
+      "op": ">=",
+      "value": 40
+     }
+    }
+   ],
+   "signs": {
+    "need": 1,
+    "warn_at": 0,
+    "list": [
+     {
+      "label": "Revolution in the metropole",
+      "ease": "Nothing: it has happened",
+      "if": {
+       "event": "french_revolution"
+      }
+     },
+     {
+      "label": "The metropole is in turmoil",
+      "ease": "Raise stability",
+      "if": {
+       "stat": {
+        "who": "$metropole",
+        "stat": "stability",
+        "op": "<=",
+        "value": -1
+       }
+      }
+     },
+     {
+      "label": "Talk of rights and liberty in the metropole",
+      "ease": "None that keeps slavery",
+      "if": {
+       "ideology": {
+        "who": "$metropole",
+        "id": "liberalism",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Abolitionist ideas reach the islands",
+      "ease": "Abolish slavery",
+      "if": {
+       "ideology": {
+        "who": "region:caribbean",
+        "id": "abolitionism",
+        "op": ">=",
+        "value": 0.1
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "The metropole is at war in Europe",
+     "mult": 2,
+     "if": {
+      "at_war": {
+       "who": "$metropole"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$metropole",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "independence_and_abolition": "path",
+    "autonomy_under_louverture": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.3,
+      "craftsmen": 0.1,
+      "market_folk": 0.1
+     },
+     "note": "On plantation tiles the farmers are the enslaved workers (event tree population group enslaved_africans); they join at 30 %.",
+     "lords": "None",
+     "army": "Colonial troops of the same people desert at 10 % a month"
+    },
+    "old_order": {
+     "lords": "Planters and settler lords",
+     "clergy": "Colonial clergy"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "abolitionism",
+    "amount": 0.1,
+    "where": "region"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {}
+   }
+  },
+  "shivaji_coronation": {
+   "family": "homeland",
+   "country": "$empire",
+   "cause": "homeland",
+   "requirements": [
+    {
+     "controls": {
+      "who": "marathas",
+      "where": "area:konkan",
+      "min_share": 0.5
+     }
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "Your empire is overstretched",
+      "ease": "Stop expanding; integrate what you hold",
+      "if": {
+       "stat": {
+        "who": "$empire",
+        "stat": "integration_strain",
+        "op": ">=",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "The Deccan sultanate is in disorder",
+      "ease": "Nothing: it is their crisis",
+      "if": {
+       "stat": {
+        "who": "$sultanate",
+        "stat": "stability",
+        "op": "<=",
+        "value": -1
+       }
+      }
+     },
+     {
+      "label": "Foreign rule in a third of the Deccan",
+      "ease": "Appoint local governors and commanders",
+      "if": {
+       "grievance": {
+        "who": "region:deccan",
+        "id": "foreign_rule",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Wrong faith in a fifth of the Deccan",
+      "ease": "Tolerate the local faith; lift the pilgrim and poll taxes",
+      "if": {
+       "grievance": {
+        "who": "region:deccan",
+        "id": "wrong_faith",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "Three of your lords waver",
+      "ease": "Reward them, or recall them",
+      "if": {
+       "lords": {
+        "who": "$empire",
+        "measure": "wavering_or_worse",
+        "op": ">=",
+        "value": 3
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Your armies are worn out by a long war elsewhere",
+     "mult": 1.5,
+     "if": {
+      "stat": {
+       "who": "$empire",
+       "stat": "war_weariness",
+       "op": ">=",
+       "value": 10
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$empire",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "sovereign_coronation": "path",
+    "mughal_mansab": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.2,
+      "herders": 0.1,
+      "woodsmen": 0.08,
+      "farmers": 0.06
+     },
+     "only_of_culture": true,
+     "lords": "Lords of the region's culture who are Wavering or worse",
+     "army": "Soldiers from the region desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other cultures, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "none",
+    "where": "neighbours",
+    "note": "Spreads as Foreign rule grievances in neighbouring provinces held by distant empires."
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "mughal_mansab": "chosen"
+    }
+   }
+  },
+  "sikh_empire_founded": {
+   "family": "homeland",
+   "country": "$displaced",
+   "cause": "homeland",
+   "requirements": [
+    {
+     "religion_share": {
+      "where": "area:punjab",
+      "religion": "sikh",
+      "op": ">=",
+      "value": 0.1
+     }
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "Your hold on Punjab is weak",
+      "ease": "Officials and forts in Punjab",
+      "if": {
+       "stat": {
+        "who": "area:punjab",
+        "stat": "control",
+        "op": "<",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "Sikh bands rule the villages",
+      "ease": "Send governors and a garrison",
+      "if": {
+       "grievance": {
+        "who": "area:punjab",
+        "id": "ungoverned",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Foreign rule in a third of Punjab",
+      "ease": "Appoint local governors",
+      "if": {
+       "grievance": {
+        "who": "area:punjab",
+        "id": "foreign_rule",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "A war lost in the last ten years",
+      "ease": "Nothing now",
+      "if": {
+       "war_lost": {
+        "who": "$displaced",
+        "within_years": 10
+       }
+      }
+     },
+     {
+      "label": "Punjab is restless",
+      "ease": "Lower taxes there; send a judge",
+      "if": {
+       "stat": {
+        "who": "area:punjab",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 40
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Two of your lords waver",
+     "mult": 1.5,
+     "if": {
+      "lords": {
+       "who": "$displaced",
+       "measure": "wavering_or_worse",
+       "op": ">=",
+       "value": 2
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$displaced",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "unified_maharajadom": "path",
+    "misl_confederacy": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.2,
+      "herders": 0.1,
+      "woodsmen": 0.08,
+      "farmers": 0.06
+     },
+     "only_of_culture": true,
+     "lords": "Lords of the region's culture who are Wavering or worse",
+     "army": "Soldiers from the region desert at 5 % a month"
+    },
+    "old_order": {
+     "lords": "Lords of other cultures, and every Loyal lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "none",
+    "where": "neighbours",
+    "note": "Spreads as Foreign rule grievances in neighbouring provinces held by distant empires."
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {}
+   }
+  },
+  "fall_of_beijing_1644": {
+   "family": "agrarian",
+   "country": "$dynasty",
+   "cause": "hunger",
+   "requirements": [
+    {
+     "exists": "ming"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "Peasant armies are in the field",
+      "ease": "Beat them; feed their provinces",
+      "if": {
+       "rebels_active": {
+        "who": "ming",
+        "type": "peasant"
+       }
+      }
+     },
+     {
+      "label": "The dynasty's mandate is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "ming",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 25
+       }
+      }
+     },
+     {
+      "label": "Cold years and failed harvests",
+      "ease": "Fill the granaries",
+      "if": {
+       "stat": {
+        "who": "global",
+        "stat": "climate_anomaly",
+        "op": "<=",
+        "value": -0.5
+       }
+      }
+     },
+     {
+      "label": "Hunger in a third of the realm",
+      "ease": "Open the granaries",
+      "if": {
+       "grievance": {
+        "who": "ming",
+        "id": "hungry",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Unpaid soldiers and courier-station men",
+      "ease": "Pay them",
+      "if": {
+       "stat": {
+        "who": "ming",
+        "stat": "treasury",
+        "op": "<",
+        "value": 0
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "The frontier armies are away fighting the Manchus",
+     "mult": 2,
+     "if": {
+      "at_war": {
+       "who": "ming",
+       "other": "later_jin"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$dynasty",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "qing_enter_beijing": "path",
+    "shun_dynasty": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.15,
+      "herders": 0.1,
+      "woodsmen": 0.08,
+      "miners": 0.08,
+      "craftsmen": 0.04
+     },
+     "lords": "Only lords in revolt",
+     "army": "Soldiers from farming provinces desert at 5 % a month while Hungry"
+    },
+    "old_order": {
+     "lords": "Every lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "none",
+    "where": "neighbours",
+    "note": "Spreads as Neighbour in revolt grievances (rebellions 4.2), not as an ideology."
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "qing_enter_beijing": "chosen"
+    }
+   }
+  },
+  "tay_son_uprising": {
+   "family": "agrarian",
+   "country": "$realm",
+   "cause": "hunger",
+   "requirements": [
+    {
+     "exists": "dai_viet"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "Heavy taxes in a third of the realm",
+      "ease": "Lower them",
+      "if": {
+       "grievance": {
+        "who": "$realm",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "Hunger in a fifth of the realm",
+      "ease": "Open the granaries",
+      "if": {
+       "grievance": {
+        "who": "$realm",
+        "id": "hungry",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "A corrupt regent's rule is despised",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "Rival lords' houses divide the realm",
+      "ease": "Win back your lords",
+      "if": {
+       "lords": {
+        "who": "$realm",
+        "measure": "wavering_or_worse",
+        "op": ">=",
+        "value": 2
+       }
+      }
+     },
+     {
+      "label": "Many landless people",
+      "ease": "New land and buildings",
+      "if": {
+       "class_share": {
+        "who": "$realm",
+        "class": "homeless",
+        "op": ">=",
+        "value": 0.08
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "A child ruler and a grasping regent",
+     "mult": 2,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "regency"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "tay_son_triumph": "path",
+    "lords_crush_the_rising": "fight",
+    "tax_relief": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.15,
+      "herders": 0.1,
+      "woodsmen": 0.08,
+      "miners": 0.08,
+      "craftsmen": 0.04
+     },
+     "lords": "Only lords in revolt",
+     "army": "Soldiers from farming provinces desert at 5 % a month while Hungry"
+    },
+    "old_order": {
+     "lords": "Every lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "none",
+    "where": "neighbours",
+    "note": "Spreads as Neighbour in revolt grievances (rebellions 4.2), not as an ideology."
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "lords_crush_the_rising": "rising_crushed",
+     "tax_relief": "chosen"
+    }
+   }
+  },
+  "donghak_revolution": {
+   "family": "agrarian",
+   "country": "$realm",
+   "cause": "hunger",
+   "requirements": [
+    {
+     "exists": "joseon"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "Officials' extortion in a quarter of the realm",
+      "ease": "Lower taxes; replace greedy officials",
+      "if": {
+       "grievance": {
+        "who": "$realm",
+        "id": "heavy_taxes",
+        "op": ">=",
+        "value": 0.25
+       }
+      }
+     },
+     {
+      "label": "The court's right to rule is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "Anger at foreign merchants and soldiers",
+      "ease": "Limit foreign concessions",
+      "if": {
+       "ideology": {
+        "who": "region:korea",
+        "id": "nationalism",
+        "op": ">=",
+        "value": 0.15
+       }
+      }
+     },
+     {
+      "label": "The countryside is restless",
+      "ease": "Judges; tax relief",
+      "if": {
+       "stat": {
+        "who": "region:korea",
+        "stat": "unrest",
+        "op": ">=",
+        "value": 35
+       }
+      }
+     },
+     {
+      "label": "Hunger in some provinces",
+      "ease": "Open the granaries",
+      "if": {
+       "grievance": {
+        "who": "$realm",
+        "id": "hungry",
+        "op": ">=",
+        "value": 0.15
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "The court persecutes the movement",
+     "mult": 2,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "religious_persecution_active"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "crushed_with_foreign_troops": "fight",
+    "jeonju_truce": "bend",
+    "peasant_victory": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.15,
+      "herders": 0.1,
+      "woodsmen": 0.08,
+      "miners": 0.08,
+      "craftsmen": 0.04
+     },
+     "lords": "Only lords in revolt",
+     "army": "Soldiers from farming provinces desert at 5 % a month while Hungry"
+    },
+    "old_order": {
+     "lords": "Every lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "none",
+    "where": "neighbours",
+    "note": "Spreads as Neighbour in revolt grievances (rebellions 4.2), not as an ideology."
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "crushed_with_foreign_troops": "rising_crushed",
+     "jeonju_truce": "chosen"
+    }
+   }
+  },
+  "mexican_revolution": {
+   "family": "agrarian",
+   "country": "$regime",
+   "cause": "hunger",
+   "requirements": [
+    {
+     "exists": "mexico"
+    },
+    {
+     "stat": {
+      "who": "mexico",
+      "stat": "legitimacy",
+      "op": "<",
+      "value": 40
+     }
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "Peasant bands are in the field",
+      "ease": "Return village lands",
+      "if": {
+       "rebels_active": {
+        "who": "mexico",
+        "type": "peasant"
+       }
+      }
+     },
+     {
+      "label": "A third of the people want real elections",
+      "ease": "Hold them",
+      "if": {
+       "ideology": {
+        "who": "mexico",
+        "id": "liberalism",
+        "op": ">=",
+        "value": 0.35
+       }
+      }
+     },
+     {
+      "label": "Great estates hold half the land",
+      "ease": "Divide some estates",
+      "if": {
+       "lords": {
+        "who": "mexico",
+        "measure": "land_share",
+        "op": ">=",
+        "value": 0.5
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$regime",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "constitution_of_1917": "path",
+    "porfirian_restoration": "path",
+    "agrarian_revolution_wins": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "farmers": 0.15,
+      "herders": 0.1,
+      "woodsmen": 0.08,
+      "miners": 0.08,
+      "craftsmen": 0.04
+     },
+     "lords": "Only lords in revolt",
+     "army": "Soldiers from farming provinces desert at 5 % a month while Hungry"
+    },
+    "old_order": {
+     "lords": "Every lord",
+     "clergy": "Clergy of the state faith"
+    }
+   },
+   "wave": {
+    "kind": "none",
+    "where": "neighbours",
+    "note": "Spreads as Neighbour in revolt grievances (rebellions 4.2), not as an ideology."
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {}
+   }
+  },
+  "petrine_reforms": {
+   "family": "from_above",
+   "country": "$reformer",
+   "cause": "lord",
+   "requirements": [
+    {
+     "exists": "$reformer"
+    },
+    {
+     "stat": {
+      "who": "$reformer",
+      "stat": "legitimacy",
+      "op": ">=",
+      "value": 50
+     }
+    }
+   ],
+   "signs": {
+    "need": 1,
+    "warn_at": 0,
+    "list": [
+     {
+      "label": "War with a better-drilled northern rival",
+      "ease": "",
+      "if": {
+       "at_war": {
+        "who": "$reformer",
+        "other": "sweden"
+       }
+      }
+     },
+     {
+      "label": "War with the great southern empire",
+      "ease": "",
+      "if": {
+       "at_war": {
+        "who": "$reformer",
+        "other": "ottoman"
+       }
+      }
+     },
+     {
+      "label": "The realm is looked down on abroad",
+      "ease": "",
+      "if": {
+       "stat": {
+        "who": "$reformer",
+        "stat": "prestige",
+        "op": "<",
+        "value": 0
+       }
+      }
+     },
+     {
+      "label": "A recent defeat shows the army is behind",
+      "ease": "",
+      "if": {
+       "war_lost": {
+        "who": "$reformer",
+        "within_years": 10
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$reformer",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "full_westernisation": "lead",
+    "limited_military_reform": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {},
+     "note": "Nobody rises for it: the ruler starts it as a decision."
+    },
+    "old_order": {
+     "joins": {
+      "clergy": 0.1,
+      "farmers": 0.02
+     },
+     "lords": "Every Disloyal lord, and Wavering lords with the Pious or Proud trait",
+     "army": "Old-style units (retinues, guards) may mutiny"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "amount": 0.0,
+    "where": "none"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "limited_military_reform": "chosen"
+    }
+   }
+  },
+  "rise_of_the_zulu_kingdom": {
+   "family": "from_above",
+   "country": "$kingdom",
+   "cause": "lord",
+   "requirements": [
+    {
+     "stat": {
+      "who": "area:zululand",
+      "stat": "population",
+      "op": ">=",
+      "value": 100
+     }
+    }
+   ],
+   "signs": {
+    "need": 1,
+    "warn_at": 0,
+    "list": [
+     {
+      "label": "Drought and competition for land",
+      "ease": "",
+      "if": {
+       "stat": {
+        "who": "area:zululand",
+        "stat": "food_security",
+        "op": "<",
+        "value": 0.6
+       }
+      }
+     },
+     {
+      "label": "Trade at Delagoa Bay draws rivals",
+      "ease": "",
+      "if": {
+       "trade_presence": {
+        "who": "area:zululand",
+        "hub": "delagoa_bay",
+        "op": ">=",
+        "value": 0.1
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$kingdom",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "military_kingdom": "lead",
+    "confederacy": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {},
+     "note": "Nobody rises for it: the ruler starts it as a decision."
+    },
+    "old_order": {
+     "joins": {
+      "clergy": 0.1,
+      "farmers": 0.02
+     },
+     "lords": "Every Disloyal lord, and Wavering lords with the Pious or Proud trait",
+     "army": "Old-style units (retinues, guards) may mutiny"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "amount": 0.0,
+    "where": "none"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "confederacy": "chosen"
+    }
+   }
+  },
+  "meiji_restoration": {
+   "family": "from_above",
+   "country": "$shogunate",
+   "cause": "lord",
+   "requirements": [
+    {
+     "exists": "tokugawa"
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "The shogun's right to rule is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "tokugawa",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 30
+       }
+      }
+     },
+     {
+      "label": "A quarter of the people put the nation first",
+      "ease": "Reform before others do",
+      "if": {
+       "ideology": {
+        "who": "tokugawa",
+        "id": "nationalism",
+        "op": ">=",
+        "value": 0.25
+       }
+      }
+     },
+     {
+      "label": "Foreign warships forced the ports open",
+      "ease": "Nothing now",
+      "if": {
+       "event": "perry_expedition"
+      }
+     },
+     {
+      "label": "Great domains defy the shogun",
+      "ease": "Win them back",
+      "if": {
+       "lords": {
+        "who": "tokugawa",
+        "measure": "disloyal_or_worse",
+        "op": ">=",
+        "value": 2
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$shogunate",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "centralising_restoration": "path",
+    "reformed_shogunate": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {},
+     "note": "Nobody rises for it: the ruler starts it as a decision."
+    },
+    "old_order": {
+     "joins": {
+      "clergy": 0.1,
+      "farmers": 0.02
+     },
+     "lords": "Every Disloyal lord, and Wavering lords with the Pious or Proud trait",
+     "army": "Old-style units (retinues, guards) may mutiny"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "amount": 0.0,
+    "where": "none"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {}
+   }
+  },
+  "kemalist_reforms": {
+   "family": "from_above",
+   "country": "$realm",
+   "cause": "lord",
+   "requirements": [
+    {
+     "exists": "turkey"
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "The founders are trusted after victory",
+      "ease": "",
+      "if": {
+       "stat": {
+        "who": "turkey",
+        "stat": "legitimacy",
+        "op": ">=",
+        "value": 50
+       }
+      }
+     },
+     {
+      "label": "The peace treaty is signed",
+      "ease": "",
+      "if": {
+       "event": "treaty_of_lausanne"
+      }
+     },
+     {
+      "label": "A third of the people put the nation first",
+      "ease": "",
+      "if": {
+       "ideology": {
+        "who": "turkey",
+        "id": "nationalism",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "secular_reforms": "lead",
+    "gradual_reform": "bend"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {},
+     "note": "Nobody rises for it: the ruler starts it as a decision."
+    },
+    "old_order": {
+     "joins": {
+      "clergy": 0.1,
+      "farmers": 0.02
+     },
+     "lords": "Every Disloyal lord, and Wavering lords with the Pious or Proud trait",
+     "army": "Old-style units (retinues, guards) may mutiny"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "amount": 0.0,
+    "where": "none"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "gradual_reform": "chosen"
+    }
+   }
+  },
+  "russian_revolution_1905": {
+   "family": "socialist_defeat",
+   "country": "$realm",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "government": {
+      "who": "$realm",
+      "is": "monarchy"
+     }
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "A war lost in the last three years",
+      "ease": "Nothing now",
+      "if": {
+       "war_lost": {
+        "who": "$realm",
+        "within_years": 3
+       }
+      }
+     },
+     {
+      "label": "A fifth of the people want a constitution",
+      "ease": "Grant an assembly",
+      "if": {
+       "ideology": {
+        "who": "$realm",
+        "id": "liberalism",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "Socialist ideas in the factories",
+      "ease": "Shorter hours; censorship",
+      "if": {
+       "ideology": {
+        "who": "$realm",
+        "id": "socialism",
+        "op": ">=",
+        "value": 0.1
+       }
+      }
+     },
+     {
+      "label": "Factory workers crowd the cities",
+      "ease": "Housing: new buildings and almshouses",
+      "if": {
+       "class_share": {
+        "who": "$realm",
+        "class": "craftsmen",
+        "op": ">=",
+        "value": 0.1
+       }
+      }
+     },
+     {
+      "label": "Land hunger: lords' estates beside crowded villages",
+      "ease": "Sell lords' land to farmers",
+      "if": {
+       "grievance": {
+        "who": "$realm",
+        "id": "harsh_lord",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     {
+      "label": "The people are tired of war",
+      "ease": "Make peace",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "war_weariness",
+        "op": ">=",
+        "value": 10
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Troops fire on a peaceful march",
+     "mult": 3,
+     "if": {
+      "grievance": {
+       "who": "$realm",
+       "id": "bloodshed",
+       "op": ">",
+       "value": 0
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "october_manifesto": "bend",
+    "repression_only": "fight",
+    "full_constitution": "lead"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "craftsmen": 0.2,
+      "seafolk": 0.1,
+      "miners": 0.15,
+      "farmers": 0.08,
+      "scholars": 0.1,
+      "clerks": 0.05
+     },
+     "lords": "None",
+     "army": "Soldiers mutiny at 10 % a month while war weariness is above 14"
+    },
+    "old_order": {
+     "lords": "Every lord",
+     "clergy": "Clergy of the state faith",
+     "army": "Officers"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "socialism",
+    "amount": 0.05,
+    "where": "region"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "october_manifesto": "chosen",
+     "repression_only": "rising_crushed"
+    }
+   }
+  },
+  "russian_revolution": {
+   "family": "socialist_defeat",
+   "country": "$old_regime",
+   "cause": "new_ideas",
+   "requirements": [
+    {
+     "exists": "russia"
+    },
+    {
+     "government": {
+      "who": "russia",
+      "is": "monarchy"
+     }
+    }
+   ],
+   "signs": {
+    "need": 3,
+    "warn_at": 2,
+    "list": [
+     {
+      "label": "The people are exhausted by war",
+      "ease": "Make peace",
+      "if": {
+       "stat": {
+        "who": "russia",
+        "stat": "war_weariness",
+        "op": ">=",
+        "value": 14
+       }
+      }
+     },
+     {
+      "label": "The crown is despised",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "russia",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 20
+       }
+      }
+     },
+     {
+      "label": "Communist ideas have a following",
+      "ease": "Land to the farmers; peace",
+      "if": {
+       "ideology": {
+        "who": "russia",
+        "id": "communism",
+        "op": ">=",
+        "value": 0.15
+       }
+      }
+     },
+     {
+      "label": "Bread queues in a fifth of the realm",
+      "ease": "Feed the cities",
+      "if": {
+       "grievance": {
+        "who": "russia",
+        "id": "hungry",
+        "op": ">=",
+        "value": 0.2
+       }
+      }
+     },
+     {
+      "label": "Conscription has emptied a third of the provinces",
+      "ease": "Release men from the army",
+      "if": {
+       "grievance": {
+        "who": "russia",
+        "id": "conscription",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "The ruler took personal command at the front",
+     "mult": 2,
+     "if": {
+      "flag": {
+       "who": "russia",
+       "id": "ruler_led_campaign"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$old_regime",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "bolshevik_seizure_of_power": "path",
+    "provisional_republic_survives": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "craftsmen": 0.2,
+      "seafolk": 0.1,
+      "miners": 0.15,
+      "farmers": 0.08,
+      "scholars": 0.1,
+      "clerks": 0.05
+     },
+     "lords": "None",
+     "army": "Soldiers mutiny at 10 % a month while war weariness is above 14"
+    },
+    "old_order": {
+     "lords": "Every lord",
+     "clergy": "Clergy of the state faith",
+     "army": "Officers"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "socialism",
+    "amount": 0.05,
+    "where": "region"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {}
+   }
+  },
+  "armistice_1918": {
+   "family": "socialist_defeat",
+   "country": "$defeated",
+   "cause": "new_ideas",
+   "requirements": [],
+   "signs": null,
+   "sparks": [
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$defeated",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "armistice_and_revolution": "path",
+    "fight_on_to_the_frontier": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {
+      "homeless": 0.3,
+      "craftsmen": 0.2,
+      "seafolk": 0.1,
+      "miners": 0.15,
+      "farmers": 0.08,
+      "scholars": 0.1,
+      "clerks": 0.05
+     },
+     "lords": "None",
+     "army": "Soldiers mutiny at 10 % a month while war weariness is above 14"
+    },
+    "old_order": {
+     "lords": "Every lord",
+     "clergy": "Clergy of the state faith",
+     "army": "Officers"
+    }
+   },
+   "wave": {
+    "kind": "ideology",
+    "id": "socialism",
+    "amount": 0.05,
+    "where": "region"
+   },
+   "keep_trigger": true,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "fight_on_to_the_frontier": "chosen"
+    }
+   }
+  },
+  "restoration_of_the_old_order": {
+   "family": "restoration",
+   "country": "$realm",
+   "cause": "pretender",
+   "requirements": [
+    {
+     "flag": {
+      "who": "$realm",
+      "id": "emigre_court"
+     }
+    },
+    {
+     "flag": {
+      "who": "$realm",
+      "id": "revolutionary_regime"
+     }
+    }
+   ],
+   "signs": {
+    "need": 2,
+    "warn_at": 1,
+    "list": [
+     {
+      "label": "The new regime's right to rule is doubted",
+      "ease": "Raise legitimacy",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "legitimacy",
+        "op": "<",
+        "value": 40
+       }
+      }
+     },
+     {
+      "label": "The realm is unstable",
+      "ease": "Raise stability",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "stability",
+        "op": "<=",
+        "value": -1
+       }
+      }
+     },
+     {
+      "label": "A war lost in the last two years",
+      "ease": "Nothing now",
+      "if": {
+       "war_lost": {
+        "who": "$realm",
+        "within_years": 2
+       }
+      }
+     },
+     {
+      "label": "The revolution's leader has just died",
+      "ease": "Name a strong successor",
+      "if": {
+       "flag": {
+        "who": "$realm",
+        "id": "ruler_died"
+       }
+      }
+     },
+     {
+      "label": "The people are tired of war",
+      "ease": "Make peace",
+      "if": {
+       "stat": {
+        "who": "$realm",
+        "stat": "war_weariness",
+        "op": ">=",
+        "value": 12
+       }
+      }
+     }
+    ]
+   },
+   "sparks": [
+    {
+     "label": "Foreign armies are on your soil",
+     "mult": 3,
+     "if": {
+      "at_war": {
+       "who": "$realm"
+      }
+     }
+    },
+    {
+     "label": "Foreign gold backs the movement",
+     "mult": 2,
+     "foreign_backing": true,
+     "if": {
+      "flag": {
+       "who": "$realm",
+       "id": "revolution_funded"
+      }
+     }
+    }
+   ],
+   "stances": {
+    "restore_the_dynasty": "path",
+    "keep_the_new_order": "path"
+   },
+   "camps": {
+    "revolution": {
+     "joins": {},
+     "lords": "Émigré lords and Loyal lords of the old house",
+     "note": "The returning pretender's backers."
+    },
+    "old_order": {
+     "lords": "Lords and officials who gained land or office under the revolution"
+    }
+   },
+   "wave": {
+    "kind": "none",
+    "where": "none"
+   },
+   "keep_trigger": false,
+   "rearm": {
+    "grace_years": 3,
+    "after": {
+     "keep_the_new_order": "chosen"
+    }
+   }
+  }
+ },
+ "wave_grievances": {
+  "$comment": "revolutions-design 7 / spec REVO-055: the agrarian and homeland waves spread grievances, not an ideology.",
+  "agrarian": {
+   "id": "neighbour_in_revolt",
+   "where": "neighbouring provinces"
+  },
+  "homeland": {
+   "id": "foreign_rule",
+   "where": "neighbouring provinces held by distant empires"
+  }
+ },
+ "decree_effects": {
+  "$comment": "decrees.yaml `does` and `cost` lines of the decrees whose numbers the design gives (all placeholders).",
+  "sell_church_lands": {
+   "treasury_years_of_church_income": 10,
+   "waver": {
+    "clergy": true,
+    "lord_trait": "Pious"
+   }
+  },
+  "levy_en_masse": {
+   "levy_share_of": "farmers",
+   "levy_cap_mult": 2,
+   "grievance": "conscription",
+   "grievance_years": 3
+  },
+  "revolutionary_tribunal": {
+   "removes_loyalty_at_least": "disloyal",
+   "grievance": "bloodshed",
+   "scholars_may_flee": true
+  },
+  "divide_the_estates": {
+   "tiles_become": "family_farms",
+   "ends": "harsh_lord",
+   "food": "up",
+   "export_wares": "down",
+   "lord_turns": "disloyal"
+  },
+  "censorship": {
+   "ideas_spread_mult": 0.5,
+   "scholars_per_year": -0.1,
+   "presses_and_schools": "slow"
+  },
+  "protection_tribute": {
+   "tax_share": {
+    "chauth": 0.25,
+    "rakhi": 0.2
+   },
+   "owner_opinion": -20,
+   "refused_grievance": "burned_homes"
+  },
+  "call_the_assembly": {
+   "agrees_below_grievance_share": 0.3333333333333333,
+   "needs_not_deep_in_debt": true
+  }
+ },
+ "_provisional": [
+  "foreign_backing.catch_at_peace_add",
+  "foreign_backing.catch_officials_add",
+  "foreign_backing.catch_officials_share",
+  "counter_revolution.years",
+  "counter_revolution.opinion"
+ ]
+}

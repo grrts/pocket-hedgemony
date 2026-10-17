@@ -1,0 +1,537 @@
+{
+  "$comment": "Recruiting (domain/recruiting/spec.md, recruiting design v3, decisions D-RECR-1..24). This file is the recruiting config (D-RECR-19). Every number is a design value or a provisional one for balancing; the provisional keys are listed in _provisional.",
+  "_provisional": [
+    "fightingAgeShare",
+    "callShares",
+    "massConscription.callShareMultiplier",
+    "refillPerYear",
+    "conscription",
+    "fallenFadePerYear",
+    "veteransFadePerYear",
+    "birthsCutPerFallenPercent",
+    "gathering.railwayDays",
+    "levyMoneyPer1000",
+    "levyPay",
+    "payByGroup",
+    "payGroupOfArm",
+    "gunCrew",
+    "standingPayMultiplier",
+    "rations",
+    "harvestLoss",
+    "seasonMonthsByClimate",
+    "pastoral",
+    "riotCallableShare",
+    "trainingRoom",
+    "arms",
+    "veteranTimeFactor",
+    "retrain",
+    "marshal",
+    "trained",
+    "untrained",
+    "goesHome",
+    "paySpentAtHome",
+    "settlers",
+    "lootHome",
+    "sicknessHome",
+    "officialToCommander",
+    "yearsServedBonus",
+    "commissionCost",
+    "fieldWageMultiplier",
+    "staff",
+    "staff.captainHorses",
+    "deputy",
+    "returnBonus",
+    "officialVictory",
+    "landRequestVictories",
+    "theirMan",
+    "logisticsFoodCutPerPoint"
+  ],
+  "fightingAgeShare": 0.25,
+  "callShares": {
+    "homeless": 0.24,
+    "herders": 0.16,
+    "farmers": 0.12,
+    "woodsmen": 0.12,
+    "miners": 0.08,
+    "seafolk": 0.08,
+    "craftsmen": 0.08,
+    "market folk": 0.06,
+    "clerks": 0.04,
+    "clergy": 0,
+    "scholars": 0,
+    "students": 0.04
+  },
+  "massConscription": {
+    "invention": "W15",
+    "callShareMultiplier": 1.5
+  },
+  "standingRegimentsInvention": "W12",
+  "railwayMobilizationInvention": "W18",
+  "refillPerYear": {
+    "base": 0.25,
+    "musterMaster": 0.3333333333333333
+  },
+  "conscription": {
+    "base": 0.25,
+    "withFallen": 0.3333333333333333,
+    "massConscription": 0.1,
+    "$rule": "D-RECR-10: measured on Recruits here after the levy against the ceiling; with W15 the tenth applies even with fallen."
+  },
+  "fallenFadePerYear": 0.1,
+  "fallenYears": 10,
+  "veteransFadePerYear": 0.1,
+  "birthsCutPerFallenPercent": 0.2,
+  "birthsCutYears": 10,
+  "gathering": {
+    "days": 14,
+    "months": 0.5,
+    "railwayDays": 3
+  },
+  "levyMoneyPer1000": 20,
+  "freeMonths": 3,
+  "levyPay": 0.15,
+  "payByGroup": {
+    "foot": 0.2,
+    "gunners": 0.25,
+    "horse": 0.4,
+    "knights": 0.6
+  },
+  "gunCrew": {
+    "men": 15,
+    "payPerCrew": 1
+  },
+  "$payGroupOfArm": "D-RECR-9: foot are arms without shot, gunners are foot with firearms, horse are other mounted arms, knights are the heavy mounted arms.",
+  "payGroupOfArm": {
+    "levy foot": "levy",
+    "pikes": "foot",
+    "armoured foot": "foot",
+    "archers": "foot",
+    "hand gunners": "gunners",
+    "pike and shot": "gunners",
+    "musketeers": "gunners",
+    "line infantry": "gunners",
+    "riflemen": "gunners",
+    "light horse": "horse",
+    "camel riders": "horse",
+    "horse archers": "horse",
+    "knights and lancers": "knights",
+    "war elephants": "knights",
+    "gun crews": "gun crews"
+  },
+  "standingPayMultiplier": 1.5,
+  "rations": {
+    "gathering": 1,
+    "home": 1,
+    "camp": 1.5,
+    "campaign": 2,
+    "horse": 3
+  },
+  "harvestLoss": {
+    "farmerShareMultiplier": 2,
+    "harvestMultiplier": 1.5
+  },
+  "seasonMonthsByClimate": {
+    "north": {
+      "sowing": [
+        3,
+        4
+      ],
+      "harvest": [
+        8,
+        9
+      ]
+    },
+    "south": {
+      "sowing": [
+        9,
+        10
+      ],
+      "harvest": [
+        2,
+        3
+      ]
+    },
+    "rice": {
+      "sowing": [
+        5,
+        6,
+        11,
+        12
+      ],
+      "harvest": [
+        2,
+        3,
+        8,
+        9
+      ]
+    }
+  },
+  "trainingRoom": {
+    "earthwork ring fort": 1000,
+    "stone castle": 3000,
+    "bastion fort": 5000,
+    "star fort": 8000,
+    "drill yard": 1500,
+    "barracks": 4000
+  },
+  "castles": [
+    "earthwork ring fort",
+    "stone castle",
+    "bastion fort",
+    "star fort"
+  ],
+  "arms": {
+    "levy foot": {
+      "months": 0,
+      "gold": 0,
+      "needs": {}
+    },
+    "armoured foot": {
+      "months": 2,
+      "gold": 80,
+      "needs": {
+        "arms": 10
+      }
+    },
+    "pikes": {
+      "months": 3,
+      "gold": 60,
+      "needs": {
+        "arms": 10
+      }
+    },
+    "archers": {
+      "months": 4,
+      "gold": 60,
+      "needs": {
+        "arms": 10
+      }
+    },
+    "hand gunners": {
+      "months": 3,
+      "gold": 120,
+      "needs": {
+        "arms": 10,
+        "powder": 10
+      }
+    },
+    "pike and shot": {
+      "months": 4,
+      "gold": 150,
+      "needs": {
+        "arms": 20,
+        "powder": 10
+      }
+    },
+    "musketeers": {
+      "months": 5,
+      "gold": 180,
+      "needs": {
+        "arms": 20,
+        "powder": 20
+      }
+    },
+    "line infantry": {
+      "months": 6,
+      "gold": 220,
+      "needs": {
+        "arms": 20,
+        "powder": 20
+      }
+    },
+    "riflemen": {
+      "months": 6,
+      "gold": 300,
+      "needs": {
+        "arms": 30,
+        "powder": 30
+      }
+    },
+    "light horse": {
+      "months": 3,
+      "gold": 100,
+      "needs": {
+        "horses": 1000
+      }
+    },
+    "camel riders": {
+      "months": 3,
+      "gold": 100,
+      "needs": {
+        "camels": 1000
+      }
+    },
+    "horse archers": {
+      "months": 6,
+      "gold": 150,
+      "needs": {
+        "horses": 1000,
+        "arms": 10
+      }
+    },
+    "knights and lancers": {
+      "months": 9,
+      "gold": 300,
+      "needs": {
+        "horses": 1500,
+        "arms": 20
+      }
+    },
+    "war elephants": {
+      "months": 6,
+      "gold": 400,
+      "needs": {
+        "elephants": 125
+      }
+    },
+    "gun crews": {
+      "months": 4,
+      "gold": 200,
+      "needs": {
+        "powder": 20
+      },
+      "also": [
+        "the guns",
+        "horses or oxen for them"
+      ]
+    }
+  },
+  "veteranTimeFactor": 0.5,
+  "retrain": {
+    "months": 0.5,
+    "gold": 0.5
+  },
+  "marshal": {
+    "trainingSpeedUp": 0.25,
+    "drill": 4,
+    "hireMultiplier": 3,
+    "wageMultiplier": 2,
+    "idleYears": 10,
+    "idleSkillLoss": 1,
+    "wonBattlesForOffer": 3
+  },
+  "trained": {
+    "drill": 3,
+    "breakPoint": 0.3
+  },
+  "untrained": {
+    "drill": 0,
+    "breakPoint": 0.25
+  },
+  "goesHome": {
+    "afterMonths": 6,
+    "sharePerMonth": 0.05
+  },
+  "paySpentAtHome": 0.2,
+  "settlers": {
+    "clearingFactor": 2,
+    "extraRiotGrievances": 1,
+    "years": 10,
+    "becomes": "farmers"
+  },
+  "lootHome": {
+    "share": 0.1,
+    "years": 1
+  },
+  "sicknessHome": {
+    "withinMonths": 3,
+    "oneIn": 4
+  },
+  "officialToCommander": {
+    "Warden": {
+      "might": 2,
+      "cunning": 1,
+      "logistics": 1,
+      "traits": [
+        "Steady",
+        "Siege master"
+      ]
+    },
+    "Steward": {
+      "might": 0,
+      "cunning": 1,
+      "logistics": 3,
+      "traits": [
+        "Careful"
+      ]
+    },
+    "Muster master": {
+      "might": 1,
+      "cunning": 1,
+      "logistics": 2,
+      "traits": [
+        "Beloved",
+        "Old soldier"
+      ]
+    },
+    "Master of works": {
+      "might": 0,
+      "cunning": 1,
+      "logistics": 2,
+      "traits": [
+        "Siege master"
+      ]
+    },
+    "Tax collector": {
+      "might": 0,
+      "cunning": 2,
+      "logistics": 2,
+      "traits": [
+        "Greedy"
+      ]
+    },
+    "Customs officer": {
+      "might": 0,
+      "cunning": 3,
+      "logistics": 1,
+      "traits": [
+        "Careful"
+      ]
+    },
+    "Judge": {
+      "might": 1,
+      "cunning": 2,
+      "logistics": 1,
+      "traits": [
+        "Steady",
+        "Cruel"
+      ]
+    },
+    "Schoolmaster": {
+      "might": 0,
+      "cunning": 2,
+      "logistics": 1,
+      "traits": [
+        "Old soldier"
+      ]
+    },
+    "Marshal": {
+      "might": 2,
+      "cunning": 2,
+      "logistics": 2,
+      "traits": [
+        "Any"
+      ]
+    },
+    "Chaplain": {
+      "traits": [
+        "Beloved"
+      ],
+      "faithfulArmyOnly": true
+    }
+  },
+  "$chaplain": "The design gives the chaplain only its trait rule (Beloved when most of the army shares the ruler's faith); its skills are not in the scenarios.",
+  "yearsServedBonus": {
+    "atYears": [
+      5,
+      10
+    ],
+    "max": 5
+  },
+  "commissionCost": 10,
+  "fieldWageMultiplier": {
+    "commander": 3,
+    "captain": 2
+  },
+  "staff": {
+    "commander": 100,
+    "captain": 50,
+    "rations": 2,
+    "commanderHorses": 30,
+    "horseRations": 3,
+    "captainHorses": 15
+  },
+  "deputy": {
+    "clerksNeeded": 20,
+    "goldPerMonth": 1
+  },
+  "emptyProvince": {
+    "Leave it": {
+      "tax": 0.5,
+      "recruits": 0.5,
+      "state": "Ungoverned"
+    },
+    "Move another official in": {
+      "movedEffect": 0.5
+    },
+    "Name a deputy": {
+      "tax": 1,
+      "recruits": 1,
+      "typeEffect": 0
+    },
+    "Ask the lord next door": {
+      "recruitsToRetinue": 1,
+      "taxToLord": 0.5,
+      "loyaltySteps": 1
+    }
+  },
+  "releaseYearsFactor": 0.5,
+  "returnBonus": {
+    "victories": 3,
+    "factor": 1.5
+  },
+  "logisticsFoodCutPerPoint": 0.05,
+  "$logisticsFoodCutPerPoint": "Recruiting design §8 worked example: 'The army eats 20 % less (5 % per Logistics point)'.",
+  "lordTraining": {
+    "Warlike": [
+      "knights and lancers",
+      "armoured foot"
+    ],
+    "Greedy": []
+  },
+  "ai": {
+    "personalities": {
+      "militarist": {
+        "levy": "deep",
+        "trains": "expensive arms"
+      },
+      "merchant republic": {
+        "levy": "little",
+        "trains": "nothing",
+        "hires": true
+      },
+      "steppe realm": {
+        "levy": "normal",
+        "trains": "horse archers"
+      }
+    },
+    "commissionFirst": [
+      "Steward",
+      "Warden"
+    ],
+    "keepInSeat": [
+      "Tax collector"
+    ],
+    "harvestMonthsAvoided": "harvest"
+  },
+  "$students": "D-RECR-13: students are called like a class at the clerks' share (provisional).",
+  "freeMonthsStart": "gathered",
+  "$seasonMonthsByClimate": "D-RECR-14: months 1-12. North and south follow X-4 (harvest in September, March); the harvest season is the harvest month and the month before. Rice lands have two crops a year.",
+  "pastoral": {
+    "springMove": {
+      "north": [
+        3,
+        4,
+        5
+      ],
+      "south": [
+        9,
+        10,
+        11
+      ]
+    },
+    "herdShareMultiplier": 2
+  },
+  "riotCallableShare": 0.5,
+  "yearlyMonth": 1,
+  "officialVictory": {
+    "lordLoyaltySteps": 1,
+    "rulerVictories": 1
+  },
+  "landRequestVictories": 6,
+  "theirMan": {
+    "victories": 8,
+    "years": 5
+  },
+  "lootHomeSplit": "by men taken"
+}

@@ -1,0 +1,813 @@
+# Province (PROV)
+
+## 1. Purpose and scope
+
+The province is where the realm's stats actually happen: gold is taxed here, food grows here, recruits are raised
+here, lords and officials govern here, and armies burn it. This context decides what a province holds (land, tiles,
+people, classes), what it produces, how its people grow, starve, move between classes and become homeless, how much
+tax it owes and how much reaches the treasury, who governs it, how it is defended, what grievances it carries, its
+health and land condition, its colony state, and how its numbers add up to the country card.
+
+**In scope**
+- Tiles, tile uses, tile states and tile count (province stats §2).
+- Ground: effects on troops, on buildings and on people working without buildings (§3).
+- Buildings as they touch the province: job slots, fallow rule, tiles without buildings, town building slots, mine
+  seams, timber reach (§4, as a summary; see "Not in scope").
+- Production of food and wares from tiles (§5).
+- People: births and deaths, famine, classes and job slots, overflow, homeless, refugees, faith and tongue mix,
+  recruits, students and scholars counted per province (§6).
+- Toll points and toll rates (§7.2 *Toll*, kept by trade v2).
+- Tax per province and the Tax screen (§8).
+- Roads, rivers and days to capital (§9).
+- Governance: owner, governed by, occupation, years held, homeland, pretenders, officials and their types, lords in
+  the province, charters (§10).
+- Defence stats: castle step, walls, garrison (§11).
+- Grievances and their thresholds, rebels as a province stat (§12.1); plague, fever land, smoke (§12.2); colonies and
+  the people already there as province state (§12.3).
+- Aggregation to the country card (§13).
+- Mapping of the event tree's province stats (§15).
+- Rules for starting values (§16; the data itself belongs to scenario-setup).
+- What is stored and what is worked out, and update cadence (§17).
+
+**Not in scope (owned by …)**
+- What the player sees at each zoom and the map lenses (§14): **map-presentation**.
+- Trade (§7, except tolls): replaced by trade v2, **trade**. Province stats §7.1 (trader paths), §7.2 *Market price*
+  and *Trade balance*, and §7.3 (profit and debt) are superseded; see OQ-PROV-1.
+- The full building list, construction, upkeep, condition, owners and steps: **buildings** (province §4 is a summary).
+- How risings start, grow and end: **rebellions**.
+- How castles fight, sieges, sacks, battles, army food reserves: **warfare**.
+- Days-to-cross marching and the day loop: **troop-movement**.
+- Founding a colony (governors, colony food, progress): **exploration**; colony subject stages: **subjects**.
+- Faith pulls: **religion**; tongue drift: **culture**; officials and lords caps: **government**.
+- Food policy, castle food stores, lords' loyalty, the country card itself: **realm**.
+- Schools, research and the invention tree: **research**.
+- The starting values data per province: **scenario-setup**.
+
+## 2. Sources
+
+Newest decision first.
+1. `planning/gap-lists.md` "Decisions already made" (16 Oct 2026): campaign 1444 to 31 August 1939; one month per turn;
+   multiplayer-friendly (deterministic, orders as data); colonising stateless peoples' land still open.
+2. `trade/trade-design.md` v2 (16 Oct): replaces province stats §7; §14 lists edits for province stats.
+3. `buildings/buildings-design.md` v1 §5.2, §18 (changes for province stats).
+4. `government/government-design.md` v2 §2, "Changes needed elsewhere".
+5. `exploration/exploration-design.md` §4.2, §5, §9.
+6. `diplomacy/diplomacy-design.md` §18; `warfare/warfare-design.md` §18; `recruiting/recruiting-design.md` (changes for
+   province stats); `culture/culture-design.md` (changes for other files); `religion/religion-design.md` §18.
+7. `province-stats/province-stats-design.md` version 3 (all sections except §14; §7 superseded except *Toll*).
+8. `province-stats/rebellions-design.md` v1 §2.1 (only where it contradicts §12.1).
+
+## 3. Ubiquitous language
+
+| Term | Meaning | Not to be confused with |
+|---|---|---|
+| Province | One land area of the map; holds tiles, people, buildings, stats | Sea zone; region |
+| Tile | One of the 4 to 16 slots of land in a province's tile row; has one use | Map hex/pixel; tile type of the terrain art (world-map) |
+| Tile use | Fields, Pasture, Woods, Marsh, Waste, Shore, Town, Castle | Tile state |
+| Tile state | Burned, Fallow or Worn; at most one at a time | Tile use; building condition (buildings) |
+| Ground | The province's one terrain class (11 grounds: farmland, grassland, savanna, drylands, desert, hills, mountains, forest, jungle, marsh, tundra) | Tile use; the 22 map tile types (world-map) |
+| Building | A structure on a tile (land building) or in the town (town building); the castle is a building | Building slot |
+| Job slot | Room for people of one class in a building or on a bare tile, counted in people with their families | Building slot |
+| Building slot | Room for one town building in the Town tile, from town size | Job slot |
+| Class | The group a person belongs to: farmers, herders, woodsmen, miners, seafolk, craftsmen, market folk, clergy, clerks, scholars, homeless | Tongue; faith |
+| Townsfolk / Countryfolk | People of town classes / land classes; shown, not stored | Town size |
+| Town size | Hamlet, village, market town, town, city, great city; read from townsfolk | Tile count |
+| Overflow | Extra people of a full class moving to the least-filled slots | Migration; refugees |
+| Homeless | People with no slot | Refugees |
+| Refugees | People sheltering from another province, outside the classes | Homeless; settlers |
+| Settlers | Your people living in a colony, in thousands | Refugees |
+| Wares | Non-food goods made from tiles and buildings | Trade value (trade) |
+| Harvest roll | Bumper, good, normal, poor, failed | Harvest step |
+| Harvest step | One step better on the harvest roll, given by inventions | |
+| Tax rate | None, light, normal, heavy, crushing; per province | Tribute (subjects) |
+| Tax owed / Reaches you | Gold a province owes in a year / the part that arrives | Trade income |
+| Seat | A governor's hall (town building); provinces near it count days to it | Capital |
+| Days to capital | Travel time to the capital or nearest seat by the fastest route | Days to cross (troop-movement) |
+| Governed by | Official, lord, no one, subject ruler, occupied | Owner |
+| Official | A person of a type who runs one province | Lord |
+| Years served | Years an official has spent in his current province | |
+| Lord | A named holder of at least one province, with his own officials | Courtier |
+| Courtier | A former lord with no land, at court | Lord |
+| Pretender | A named person with a right to this land | Rebel leader |
+| Homeland of | Peoples who see this land as theirs | Owner |
+| Charter | A written privilege granted to one province or town | Grievance |
+| Grievance | A named cause of anger in a province | Riots; rebels |
+| Riots / Rebels | 3 grievances / 4 or more grievances (province stats §12.1) | Rising (rebellions) |
+| Fever land | How dangerous the ground is to people not born there: none, mild, harsh, deadly | Sickness |
+| Sickness | What an army loses each month it stays in a ground | Plague |
+| Smoke | Soot and poisoned water from factories and coal mines (era V on) | |
+| Settlement | None, trading post, settlement, colony | Colony stage (subjects) |
+| Free tile | A tile nobody works in an unowned province | Empty tile in an owned province |
+| Toll point | Bridge, ford, pass, river mouth or strait where a toll can be set | |
+| Mine seams | Years of digging left in a mine | |
+
+## 4. Domain model
+
+### Aggregates
+
+**Province** (identity: province id from the game map)
+Holds: owner; governed by; occupied by and months; years held; homeland of; pretenders; ground; tiles (use, building,
+building step, state, workers); people per class (11 numbers); homeless; refugees; faith mix and tongue mix (top three
+each); recruits here; students here; scholars here; mine seams; tax rate; tolls; charters; grievances; rebels; road
+step; river; plague; fever land; smoke; food stores; castle step, walls and garrison; official (type, years served);
+settlement, settlers, local people's tiles.
+- INV-PROV-1: tile count is between 4 and 16 inclusive and follows the province's size on the map.
+- INV-PROV-2: each tile has exactly one use and at most one state.
+- INV-PROV-3: each land tile holds at most one building; town buildings are limited by building slots from town size.
+- INV-PROV-4: shore tiles exist only in provinces on a coast, lake or navigable river, 1 to 3 of them, and are never lost.
+- INV-PROV-5: every settled province has a Town tile.
+- INV-PROV-6: every person belongs to exactly one class; homeless is a class with no slots; refugees are outside the classes.
+- INV-PROV-7: no class other than homeless holds more people than its slots after overflow, except where the province
+  has no free slot of any kind.
+- INV-PROV-8: scholars only come from graduating students, soldiers only from raised recruits; overflow never enters either.
+- INV-PROV-9: one official runs one province; a seat needs its own official.
+- INV-PROV-10: a province governed by a lord belongs to a lord who holds at least one province.
+- INV-PROV-11: grievances are named causes, never a meter; riots and rebels follow from their count.
+- INV-PROV-12: a colony is founded only in a province no country owns, and takes only free tiles.
+- INV-PROV-13: enslaved people are never a ware.
+
+### Entities and value objects
+- **Tile** (entity within Province): use, building, building step, state, workers.
+- **Ground** (value): troop modifiers, days to cross, foraging, sickness, build cost, building output, people output.
+- **Class population** (value): count per class.
+- **Official** (entity, owned by realm or a lord, assigned here): type, years served, tongue (proposed by culture, OQ-PROV-13).
+- **Charter** (value): kind and date granted; a revoked charter leaves *Broken charter* for 20 years.
+- **Grievance** (value): kind, weight (1 or 2), start date.
+- **Pretender** (reference to a person): right, and its expiry (50 years after loss for an old ruler).
+- **Mine** (entity on a tile): ware, seams left.
+- **Settlement** (value): step, settlers, local people's tiles.
+
+### Domain services
+- **Food producer**: food per tile from people, building, ground, harvest roll and inventions.
+- **Ware producer**: wares per building from workers, ground building output and inventions.
+- **Class balancer**: births, deaths, overflow, homeless drift.
+- **Famine resolver**: compares food with eaters each season.
+- **Tax collector**: tax owed and the part that reaches you.
+- **Grievance evaluator**: starts and ends grievances, sets calm, grumbling, riots or rebels.
+- **Country aggregator**: sums for the country card (§13).
+- **Event mapper**: turns event-tree province stats into concrete changes (§15).
+
+## 5. Requirements
+
+### 5.1 Principles
+- PROV-001: The province shall express every stat as something countable (tiles, buildings, workers, men, days), with no abstract levels. [province-stats intro]
+- PROV-002: The province shall give every stat a list of how it is gained and how it is lost, shown when the player opens that stat. [province-stats intro, §1]
+- PROV-003: The province shall keep all rates and limits (jobs per building, food per worker, ground tables, slots per town size, toll effects, grievance thresholds) in one province config file. [province-stats §17]
+- PROV-004: The province shall not use development, base tax, autonomy, cores, unrest or devastation meters. [province-stats intro]
+
+### 5.2 Tiles
+- PROV-010: The province shall have between 4 tiles (smallest) and 16 tiles (largest), set by the province's size on the map. [§2.1]
+- PROV-011: Each tile shall have one use from Fields, Pasture, Woods, Marsh, Waste, Shore, Town and Castle, and most uses can hold one building. [§2.1]
+- PROV-012: When the player clears a woods tile, the province shall turn it into fields after 3 years at a gold cost, and give one load of timber. [§2.1]
+- PROV-013: If a fields tile is left unworked for 10 years, then the province shall turn it back into woods. [§2.1]
+- PROV-014: If fields or pasture are salted or overgrazed, then the province shall turn the tile to waste. [§2.1]
+- PROV-015: When the player turns a fields tile to pasture, the province shall change its use after one season; ploughing pasture turns it to fields. [§2.1]
+- PROV-016: When marsh is drained with *Polder drainage*, the province shall turn it into fields; floods and dykes broken in war shall turn tiles into marsh. [§2.1]
+- PROV-017: When waste is irrigated with *Qanat and canal irrigation*, the province shall turn it into fields. [§2.1]
+- PROV-018: The province shall give shore tiles (1 to 3) only to provinces on a coast, lake or navigable river, and shall never remove them; a blockade or silted harbour stops their buildings working. [§2.1]
+- PROV-019: The province shall give every settled province one Town tile; when townsfolk reach 40,000 the town shall take a second tile built over fields, and a great city a third. [§2.1]
+- PROV-020: If a town shrinks below the limit of a tile it holds, then the province shall give that tile back as fields. [§2.1]
+- PROV-021: When a castle is built, the province shall place it on any land tile except Town, and that tile shall stop producing. [§2.1]
+- PROV-022: When a castle is destroyed, the province shall turn its tile into waste for 5 years, then into fields. [§2.1]
+- PROV-023: Woods shall be gained by unworked fields growing back and by replanting (later inventions), and lost by clearing, cutting timber faster than it regrows, and fire. [§2.1]
+- PROV-024: Pasture shall be lost to drought and overgrazing (to waste); grassland, savanna and steppe provinces start with many pasture tiles. [§2.1]
+
+### 5.3 Tile states
+- PROV-030: The province shall allow at most one state per tile: Burned, Fallow or Worn. [§2.2]
+- PROV-031: When an army forages or loots, the player burns their own fields (scorched earth), raiders raid or rebels act, the province shall mark the tile Burned: its building is wrecked, it gives nothing, and its workers become refugees or die. [§2.2]
+- PROV-032: While the province has people and peace, it shall rebuild one burned tile a year, faster with gold. [§2.2]
+- PROV-033: While a building has fewer than half its workers, the province shall mark its tile Fallow, until enough workers return. [§2.2, §4]
+- PROV-034: When fields are farmed for decades with more people than the farm needs and no rotation inventions, pasture is overgrazed, or (later) mines and factories wear the land, the province shall mark the tile Worn, giving half output. [§2.2]
+- PROV-035: When a worn tile goes five years without use, the province shall clear the Worn state; *Three-field rotation*, *Fodder crops* and *Four-field rotation* make wearing rarer. [§2.2]
+- PROV-036: The province shall show war damage as burned tiles, not as a meter. [§2.2]
+
+### 5.4 Ground: troops
+- PROV-040: Each province shall have one ground, taken from the game map's terrain, that sets its starting tile mix and its troop, building and people effects. [§3]
+- PROV-041: The province shall apply the ground's foot, horse, guns and defender strength changes, days to cross, foraging and sickness from the ground troop table (§10 config). [§3.1]
+- PROV-042: In desert, the province shall apply 0 to camels instead of the horse −10 %. [§3.1]
+- PROV-043: If an attacker comes over a river shore tile, then the attacker shall fight at −20 %, unless the province has a bridge. [§3.1]
+- PROV-044: The defender shall get +5 % for every two woods tiles, up to +15 %. [§3.1]
+- PROV-045: Burned tiles shall give nothing to forage. [§3.1]
+- PROV-046: Where the province has a castle tile, the defender shall fight from the walls (warfare 8.1). [§3.1, §11]
+- PROV-047: A defending army of the province's homeland tongue shall get a further +10 % in hills, mountains, forest, jungle and marsh. [§3.1]
+- PROV-048: While an army stays in a province, it shall lose its ground's sickness each month, worst for soldiers not born on that ground. [§3.1]
+- PROV-049: Foraging shall be how much an army can take from the tiles before it starts burning them. [§3.1]
+
+### 5.5 Ground: buildings versus people
+- PROV-050: The province shall multiply building costs by the ground's build cost and building output by the ground's building output, and output of people working without a building by the ground's people output (table in §10). [§3.2]
+- PROV-051: In drylands, building output shall be −25 % until irrigated; in marsh −50 % until drained. [§3.2]
+- PROV-052: In desert, building output shall be −50 % except mines and irrigation works. [§3.2]
+- PROV-053: In hills mines shall get +25 %; in mountains farms −50 % and mines +50 %; in forest lumber +50 %. [§3.2]
+
+### 5.6 Buildings in the province (summary; buildings owns the rules)
+- PROV-060: Every building shall stand on a tile in a province, and the castle shall be a building. [§4]
+- PROV-061: Each building shall have job slots for one class; with all slots filled it works fully, with fewer people in proportion, and below half it is fallow. [§4]
+- PROV-062: Buildings shall be gained by building them (cost times the ground's build cost), by conquering the province, by events, and some appear by themselves. [§4]
+- PROV-063: Buildings shall be lost when their tile burns (land buildings), when the town is sacked (town buildings), when upkeep goes unpaid for 10 years (they fall one step or close), when demolished by the player or a peace treaty, or when their tile changes use. [§4] (see OQ-PROV-3)
+- PROV-064: The province shall allow land buildings only on the tile uses listed for them in the land building table, with the slots, products, needs and unlocks given there. [§4.1]
+- PROV-065: Each mine shall show seams left in years of digging; seams are gained by prospecting events and mining inventions and lost every year the mine is dug. [§4.1]
+- PROV-066: When a mine runs out, the province shall close it; its miners overflow into other slots or become homeless, and the town shrinks. [§4.1]
+- PROV-067: Shipyards and mines shall need timber from a lumber camp in the same province or in reach (one ring, more with roads and rivers); without timber no ships are built. [§4.1]
+- PROV-068: A tile with no building shall still have slots for up to 3,000 people of the matching class, working at the ground's people output rate. [§4.2]
+- PROV-069: The Town tile shall have building slots from town size: hamlet 1, village 2, market town 4, town 6, city 9, great city 12. [§4.3]
+- PROV-070: The province shall allow town buildings with the job slots, products and needs of the town building table. [§4.3]
+- PROV-071: An almshouse shall shelter 3,000 homeless, who then stop counting toward theft, the *Homeless* grievance and shanty camps, at a cost in gold upkeep and clergy. [§4.3, §6.4]
+- PROV-072: While a town has a market, homeless people and the raw ware nearby, craft buildings shall now and then appear by themselves. [§4.3]
+- PROV-073: When craftsmen fleeing persecution abroad arrive, they may found a craft building. [§4.3]
+
+### 5.7 Food from tiles
+- PROV-080: The province's harvest shall be the sum of its food tiles, each giving people in its slots × food per person × the ground's output × harvest roll × inventions. [§5.1]
+- PROV-081: Farms, terraces and raised fields shall feed 1.5 people per worker; rice paddies 1.5 with two harvests (rolled twice); ranches 1.33; fisheries 1.33; empty fields, woods and pasture 0.67 × the ground's people output. [§5.1]
+- PROV-082: The harvest roll shall multiply food by bumper ×1.3, good ×1.15, normal ×1, poor ×0.7, failed ×0.3, for farms, terraces, raised fields, rice paddies and empty fields only. [§5.1]
+- PROV-083: Ranches shall not roll a harvest (drought and hard winter events instead); fisheries shall not roll (storms and blockades instead); empty woods and pasture shall not roll. [§5.1]
+- PROV-084: Each of *Three-field rotation*, *Fodder crops*, *Seed drill* and *Four-field rotation* shall make the harvest one step better. [§5.1]
+- PROV-085: With *Maize, potato and cassava*, a failed harvest shall become poor. [§5.1]
+
+### 5.8 Wares
+- PROV-090: Each non-food ware shall be made by the people in a building's slots × the ground's building output × inventions. [§5.2]
+- PROV-091: Craft buildings turning raw wares into finished ones shall add value (wool into cloth is worth three times as much). [§5.2]
+- PROV-092: Wares made shall fall with burned and fallow tiles, plague killing workers, missing inputs (a forge without iron stops) and a mine running out. [§5.2]
+- PROV-093: The list of wares shall live in config, starting with the list in §5.2; later eras add coal, rubber and oil. [§5.2]
+- PROV-094: The province shall never treat enslaved people as a ware. [§5.2]
+
+### 5.9 People: births, deaths and famine
+- PROV-100: Each month, every class shall gain births (people × birth rate) and lose deaths (people × death rate), from the yearly base rates in config. [§6.1]
+- PROV-101: Birth rates shall go up with a food store above 6 months (+0.5) and 10 years of peace in the province (+0.5), and down with a store under 3 months (−1), the *Hungry* grievance (−2), war in the province (−1), plague (−1) and, in later eras, in towns by era. [§6.1] (units: OQ-PROV-8)
+- PROV-102: Death rates shall go up with plague (+5 % rumour, +15 % outbreak, +30 % at its worst), war in the province (+1 %), each burned tile (+0.5 %), fever land for people born elsewhere, and smoke (+1 % for town classes); and down with hospitals, wells and drains (−0.5 % in town) and sanitation and vaccination (each −0.5 %). [§6.1]
+- PROV-103: Clergy birth rate shall be 0.5 % where the faith's clergy don't marry, otherwise as townsfolk. [§6.1]
+- PROV-104: Each season, the province shall compare the food it has (its share of the harvest, its local store and castle deliveries) with the people who must eat. [§6.2]
+- PROV-105: When there is enough food, everyone shall eat and what is left goes to the store. [§6.2]
+- PROV-106: If there is not enough food, then the people the food cannot feed shall die that season, spread over the classes by size, except that a quarter of them flee as refugees if a neighbouring province has food. [§6.2]
+
+### 5.10 Classes and job slots
+- PROV-110: The province shall place every person in one class and give each class its slots in the buildings and tiles listed in the class table. [§6.3]
+- PROV-111: Newborns shall join their parents' class the month they are born. [§6.3]
+- PROV-112: When a class has more people than its slots, the extra shall move to the class whose slots are least filled (lowest share filled), ties going to food classes first. [§6.3]
+- PROV-113: Overflow shall never go into scholars or soldiers. [§6.3]
+- PROV-114: When every slot in the province is full, overflow shall become homeless. [§6.3]
+- PROV-115: When a slot opens (a new building, deaths, plague or a levy), homeless people shall move into it first. [§6.3, §6.4]
+- PROV-116: Each month a share of the homeless shall move to the neighbouring province with the least-filled slots, in the owner's own realm first. [§6.3]
+- PROV-117: A class with fewer people than slots shall leave the slots empty until overflow arrives. [§6.3]
+- PROV-118: Fleet crews shall be raised from seafolk. [§6.3]
+
+### 5.11 Homeless
+- PROV-120: Homeless people shall eat from the local store, make nothing, pay no tax, and die at 5 % a year. [§6.4]
+- PROV-121: While homeless are over 5 % of the people, for every 5 % homeless the province shall send 5 % less tax to you and 5 % fewer traders shall pass (see OQ-PROV-1 for trade v2's wording). [§6.4]
+- PROV-122: While homeless are over 10 % of the people, the province shall have the *Homeless* grievance. [§6.4, §12.1]
+- PROV-123: While homeless are over 20 % of the people (shanty camps), the *Homeless* grievance shall count as two; plague shall start here first and spread twice as fast; town classes shall die 1 % faster; and each year a town building may burn. [§6.4]
+- PROV-124: Rebels shall muster from the homeless first, at twice the rate of other people. [§6.4]
+- PROV-125: The province shall make people homeless from overflow with every slot full, burned tiles, buildings closing, and soldiers and refugees returning with no slot free. [§6.4]
+- PROV-126: The province shall remove homeless people through new slots, rebuilt tiles, almshouses, levies, settlers sent to a colony or frontier with free tiles, and drift to neighbours or abroad. [§6.4]
+
+### 5.12 Other people stats
+- PROV-130: People shall be everyone living in the province, summed over classes. [§6.5]
+- PROV-131: Countryfolk and townsfolk shall be shown, not stored; town size comes from townsfolk; townsfolk grow no food. [§6.5]
+- PROV-132: Refugees shall shelter outside the classes, eat without working at first, go home when it is safe, and after 2 years settle and overflow into slots or become homeless if none are free. [§6.5]
+- PROV-133: Fleeing craftsmen and scholars shall keep their class if a slot is free. [§6.5]
+- PROV-134: The faith mix and tongue mix shall store the top three faiths and tongues; the country's Faith and Tongue % are their people-weighted sums. [§6.5, §17]
+- PROV-135: Persecution shall make people flee and take their faith and crafts elsewhere. [§6.5]
+
+### 5.13 Recruits, students and scholars here
+- PROV-140: Each year the province shall add to recruits here a share of every class except clergy and scholars, more from homeless men. [§6.6]
+- PROV-141: Recruits of royal provinces shall go to the ruler; a lord's recruits go to his retinue. [§6.6]
+- PROV-142: When recruits are raised, they shall leave their class slots. [§6.6]
+- PROV-143: When soldiers come home, they shall rejoin as homeless and overflow into the emptiest slots. [§6.6]
+- PROV-144: While recruits are below a quarter of the pool, the province shall have the *Conscription* grievance, ending when refilled to half. [§6.6, §12.1]
+- PROV-145: Local recruits shall fill local school seats first, then the realm's. [§6.6]
+- PROV-146: Students here shall be lost by graduating, being called to arms, plague and the school being sacked. [§6.6]
+- PROV-147: Scholars here shall be gained by graduation and foreign scholars settling in towns with schools and peace, and lost by old age, war here, persecution and a richer neighbour hiring them. [§6.6]
+
+### 5.14 Tolls (kept from §7.2)
+- PROV-150: The owner shall set a toll rate of none, low or high on each toll point (bridge, ford, pass, river mouth, strait); a free-trade charter sets it to none. [§7.2, trade §7.2]
+
+### 5.15 Tax
+- PROV-160: The province shall have its own tax rate (none, light, normal, heavy, crushing), defaulting to the realm default set on the Tax screen, overridable per province. [§8]
+- PROV-161: Tax owed shall be the gold the province owes each year at its rate, from the value of what its buildings make and its townsfolk; tolls count in trade, not here. [§8]
+- PROV-162: Tax owed shall fall with burned and fallow tiles, homeless people, and riots (half). [§8]
+- PROV-163: Reaches you shall be the part of tax owed that arrives: half without an official, half kept by a lord, a share lost for every day of travel beyond 5, less with enemy armies on the road, and nothing while occupied. [§8]
+- PROV-164: When the player picks a Tax screen preset (e.g. *Even*, *Spare the frontier*, *Squeeze the towns*, *War chest*), the province rates shall be filled in at once. [§8]
+- PROV-165: In a lord's province, the rate shall be what is demanded from the lord; he keeps half of what is collected either way, and a heavy or crushing demand makes him waver. [§8]
+- PROV-166: Riots or rebels may force the rate down, and a tax cap charter shall keep it at light or below. [§8, §10.4]
+- PROV-167: While a province's rate is heavy, it shall have the *Heavy taxes* grievance; crushing counts as two. [§12.1]
+
+### 5.16 Roads and travel
+- PROV-170: The province shall have one road step for the whole province: track, road, paved road, turnpike, railway; each step is unlocked by an invention and built for gold × the ground's build cost. [§9]
+- PROV-171: Roads shall be lost by neglect without upkeep, fighting and floods. [§9]
+- PROV-172: A navigable river shall be fixed, shown as shore tiles; canals add one (*Grand canals*, *Canal locks*); a wrecked canal or silting removes it. River provinces count one ring closer for castle food spread. [§9]
+- PROV-173: Days to capital shall be the travel time to the capital or nearest seat by the fastest road, river or sea route, longer in winter and with enemy armies, broken roads or a sea route closed in war. [§9]
+- PROV-174: While days to capital are above a limit (example 30), the province shall have *Far from the throne*. [§9, §12.1]
+
+### 5.17 Governance
+- PROV-180: Each province shall have an owner, gained by conquest, inheritance, purchase, a lord joining with his land or a colony, and lost by losing a war, a lord defecting, rebels breaking away or ceding it. [§10.1]
+- PROV-181: Each province shall be governed by an official, a lord, no one, a subject ruler, or be occupied. [§10.1]
+- PROV-182: An official shall give full tax and recruits plus the effect of his type; a lord half tax, recruits to his retinue, run by his own officials; no one half of everything and the *Ungoverned* grievance. [§10.1]
+- PROV-183: When a lord's line dies out, his province shall return to royal and need an official. [§10.1]
+- PROV-184: While an enemy holds the castle, or holds a province with no castle for a season, the province shall be occupied, counting months, and its tax, recruits, food and trade go to the occupier. [§10.1]
+- PROV-185: Years held shall count years since this owner gained it; tongue and faith shift faster the longer it is held, and *Foreign rule* fades. [§10.1]
+- PROV-186: Homeland of shall be set at start from the catalogue, gained by a people who make up most of the province for 100 years and lost by a people gone for 100 years. [§10.1]
+- PROV-187: While a homeland is held by a ruler of another tongue, the province shall have *Foreign rule*, and separatist events start here. [§10.1, §12.1]
+- PROV-188: Pretenders shall be gained by inheritance and marriage, by losing the province in war (the old ruler keeps a right for 50 years) and by buying a title, and lost by death without heirs, renouncing in a peace, marrying into your house, and time. [§10.1]
+
+### 5.18 Officials
+- PROV-190: Every official shall have a type; assigned to a province he runs it and gives his type's effect there (officials table, §10 config). [§10.2]
+- PROV-191: One official shall run one province; a seat needs one of its own. [§10.2]
+- PROV-192: An official shall give half his effect in his first year in a province, rising to full after 5 years there; moving him starts him again at half. [§10.2]
+- PROV-193: A colonial governor shall have no effect of his own; he founds a colony and then becomes its ordinary official; he needs a colonial governor slot and does not count against the officials cap while holding one. [§10.2, exploration §4.2]
+- PROV-194: Officials shall be gained by hiring one of a chosen type (gold up front, wages yearly; a foreign specialist costs more), by school graduates (madrasa: judges and chaplains; university: judges and stewards; academy: masters of works and wardens), and by a lord's line dying out; and lost by old age and death, dismissal, unpaid wages, being killed when rebels or an enemy take their province, and a richer neighbour hiring them. [§10.2]
+- PROV-195: The country card's Officials count shall be the sum of the realm's officials. [§10.2, §13]
+
+### 5.19 Lords in the province
+- PROV-200: A lord shall always hold at least one province; someone with no land is a courtier. [§10.3]
+- PROV-201: When a lord loses his last province, he shall stop being a lord: he stays at court as a courtier who can be granted land again, or, if he lost it to you by force, he flees abroad and becomes a pretender to it. [§10.3]
+- PROV-202: A lord shall hire and pay his own officials, with types, from his wealth; they run his provinces and give their type effects there. [§10.3]
+- PROV-203: If a lord's province has none of his officials, then it shall pay him half and have *Ungoverned*. [§10.3]
+- PROV-204: When the player lends a lord one of his officials, it shall cost the player's wage and win the lord's loyalty; the official works for the lord until called back. [§10.3]
+- PROV-205: A lord shall spend his own wealth on buildings in his lands by his traits: Builder the most, Greedy markets and mines, Pious houses of worship, Warlike castles. [§10.3]
+- PROV-206: When the player pays for a building in a lord's province, the building shall be the lord's and his loyalty shall rise one step, unless he is in revolt. [§10.3]
+- PROV-207: When a lord's land comes back to the ruler, its buildings shall come with it. [§10.3]
+
+### 5.20 Charters
+- PROV-210: The ruler may grant a charter to one province or town: market charter, tax cap, town law, no quartering, faith tolerance, free trade, mining right, each with the gain and cost in the charters table. [§10.4]
+- PROV-211: Charters shall be gained by granting, by lords and towns demanding them for loyalty or a loan, or by rebels forcing them. [§10.4]
+- PROV-212: When a charter is revoked, the province shall get *Broken charter* for 20 years, and every lord notices. [§10.4, §12.1]
+- PROV-213: When the province is lost, the conqueror may keep or revoke its charters. [§10.4]
+- PROV-214: Under town law, the town shall need no official, and nothing may be seized there without breaking the charter. [§10.4]
+- PROV-215: Under a mining right, a merchant house shall run the mine for half its output, digging faster and finding new seams. [§10.4]
+
+### 5.21 Defence
+- PROV-220: The castle shall be none, earthwork ring fort, stone castle, bastion fort or star fort; gained by building or upgrading (gold × build cost, and years) or conquest; lost by siege, demolition in a peace, or one step per 10 years without upkeep. [§11]
+- PROV-221: An enemy shall have to besiege the castle to take the province; on hills or mountains it is far harder to take; on a shore tile it can be supplied by sea. [§11]
+- PROV-222: Walls shall be whole or have 1 to 3 breaches; repaired with gold and months; breached by siege guns, mining and earthquakes; each breach shortens a siege and allows an assault. [§11]
+- PROV-223: The garrison shall be soldiers inside counted from the army; if a castle has no garrison, it falls at once. [§11]
+
+### 5.22 Grievances and rebels
+- PROV-230: The province shall keep a list of named grievances, each with the start and end conditions of the grievance table. [§12.1]
+- PROV-231: With 0–1 grievances the province shall be calm; with 2 grumbling (growth slows, scholars and craftsmen start to leave); with 3 riots (tax and recruits halved, traders avoid it, the lord wavers); with 4 or more rebels. [§12.1] (see OQ-PROV-2)
+- PROV-232: While a province has rebels, a share of its recruits shall take up arms each month under a named leader, with a demand from its biggest grievance. [§12.1] (see OQ-PROV-2)
+- PROV-233: Rebels shall be gained from four or more grievances, a disloyal lord raising his retinue, a pretender landing, or foreign gold, and lost by beating them, granting their demand, fixing grievances, or killing or bribing their leader. [§12.1]
+- PROV-234: Rebel armies shall fight as the *Rebel band* kind under the warfare battle rules. [§12.1]
+- PROV-235: A province with riots or rebels shall count toward the country's In revolt. [§12.1, §13]
+- PROV-236: Under a judge official, riots shall need one grievance more and rebels 5 instead of 4, and *Broken charter* shall fade twice as fast. [§10.2]
+
+### 5.23 Health and land condition
+- PROV-240: Plague shall have the steps none, rumour, outbreak, burning out; it spreads with traders along roads, rivers and sea routes, with armies and refugees; crowded towns catch it first. [§12.2]
+- PROV-241: Plague shall burn out after a season or two; quarantine (the player closes the province) stops trade; hospitals, wells and drains slow it. [§12.2]
+- PROV-242: Plague shall kill townsfolk first, then countryfolk, and buildings go fallow. [§12.2]
+- PROV-243: Fever land shall be none, mild, harsh or deadly, set by ground and climate, with marsh tiles adding to it; lowered by draining marsh and later inventions (quinine, sanitation); soldiers and settlers from elsewhere die there, locals mostly don't. [§12.2]
+- PROV-244: From era V, factories and coal mines shall make smoke; townsfolk get sick and tiles become worn; closing them and later inventions reduce it; smoke feeds the event tree's climate stats. [§12.2]
+
+### 5.24 Colonies and the people already there
+- PROV-250: A colony shall be founded only in a province no country owns; land held by any country, tribal countries included, can only be gained by war, treaty, marriage or a lord joining. [§12.3]
+- PROV-251: A colony shall take only the free tiles (nobody works them); tiles the local people work stay theirs. [§12.3]
+- PROV-252: Settlement shall be none, trading post, settlement or colony; gained by founding a colony (exploration), founding a post (envoy and gold), settlers arriving, or a treaty; lost by the local people driving it out, disease, abandoning it, or another power taking it. [§12.3, exploration §5]
+- PROV-253: A trading post shall be a market that draws traders without taking any tile. [§12.3]
+- PROV-254: Settlers shall be sent from provinces with homeless people, live on the colony's free tiles, and stop the colony growing when the free tiles are full; they are lost to fever land, war with the local people, and leaving. [§12.3]
+- PROV-255: The local people shall keep their own tiles, buildings and lords; their tiles are taken only by conquest or treaty once the province is owned, and each tile taken adds grievances and starts resistance events. [§12.3]
+
+### 5.25 Aggregation to the country card
+- PROV-260: The province shall supply the country card's sums as in the aggregation table: gold income, people (people + refugees), recruits (royal provinces only), food, horses, ships, castles, faith and tongue, in revolt, schools/students/scholars, officials. [§13] (gold income: OQ-PROV-1)
+
+### 5.26 Event-tree mapping
+- PROV-270: When an event changes an event-tree province stat, the province shall apply it as the concrete change in the mapping table (§15), e.g. population −10 % → people −10 % (townsfolk first in plague events); devastation +30 → 30 % of tiles burned; prosperity +2 → two new fitting buildings; unrest +20 → one named grievance; fort_level +1 → castle one step up. [§15]
+
+### 5.27 Starting values (rules)
+- PROV-280: At the start the province shall set tile count from map size, ground from terrain, tile mix from ground, shore tiles from coast and rivers, people from population, and how many buildings start built (and town size) from wealth. [§16]
+- PROV-281: At the start the catalogue shall set owner, lords' provinces, homeland, faith and tongue mix, and `administrative_capacity` decides how many royal provinces start with an official. [§16]
+- PROV-282: At the start the research tree's start inventions shall decide which buildings, castle steps and road steps exist; region tables set wares by ground, fever land and crops; event-tree geography anchors fix mines, toll points, castles and markets at named places; the relations file sets trade pacts, occupations and pretenders. [§16]
+- PROV-283: Once buildings are placed, `wealth` shall stop being a live stat. [§16]
+
+### 5.28 Storage and cadence
+- PROV-290: The province shall store only the stored fields of §17 (about 95 small numbers) and work out food made, wares made, tax owed and reaching you, town size and country sums when needed. [§17]
+- PROV-291: Births, deaths and overflow shall update each month; food each season; plague each week while an outbreak runs. [§17] (see OQ-PROV-4)
+- PROV-292: The province card shall show the province's name, owner, governance, official, pretender, ground, tile row and the lines of §1, and tapping a line opens its gain and lose list. [§1]
+
+## 6. Commands
+
+| Command | Who issues it | Preconditions | Result | Events emitted |
+|---|---|---|---|---|
+| SetProvinceTaxRate(province, rate) | player / AI | Owner; no tax cap charter above light | Rate set; heavy/crushing adds *Heavy taxes*; lord wavers if heavy | TaxRateChanged, GrievanceStarted |
+| SetRealmTaxDefault(rate) | player / AI | — | Default for provinces without override | TaxRateChanged |
+| ApplyTaxPreset(preset) | player / AI | — | All rates filled | TaxRateChanged |
+| SetToll(tollPoint, none/low/high) | player / AI | Owns the toll point; no free-trade charter | Toll rate set | TollChanged |
+| ChangeTileUse(tile, newUse) | player / AI | Allowed transition (clear woods, fields↔pasture, drain marsh, irrigate waste) and unlock known | Use changes after its time | TileUseChanged |
+| BurnOwnFields(province) | player / AI | Owner | Tiles Burned (scorched earth) | TileBurned |
+| RebuildBurnedTile(tile, gold) | player / AI | Tile Burned | Faster rebuild | TileRebuilt |
+| AssignOfficial(official, province) | player / AI | Official free; province royal or seat | Governed by official; years served 0 | OfficialAssigned, GrievanceEnded |
+| DismissOfficial(official) | player / AI | — | Province ungoverned | OfficialDismissed, GrievanceStarted |
+| HireOfficial(type) | player / AI | Gold; colonial governor needs a slot | New official | OfficialHired |
+| LendOfficialToLord(official, lord) / RecallLentOfficial | player / AI | Official free / lent | Works for the lord; loyalty up | OfficialLent / OfficialRecalled |
+| PayForBuildingInLordProvince(lord, tile, building) | player / AI | Lord not in revolt for the loyalty step | Lord owns building; loyalty +1 step | BuildingFunded |
+| GrantCharter(province, kind) / RevokeCharter | player / AI | Owner | Charter in force / *Broken charter* 20 years | CharterGranted / CharterRevoked |
+| BuildRoad(province, step) | player / AI | Invention known; gold | Road one step up | RoadBuilt |
+| QuarantineProvince(province, on/off) | player / AI | Owner | Trade stops; plague slowed | QuarantineChanged |
+| AssignGarrison(castle, soldiers) | player / AI | Own soldiers present | Garrison set | GarrisonChanged |
+| RepairWalls(castle) | player / AI | Breaches; gold | Breach removed after months | WallsRepaired |
+| SendSettlers(from, to, count) | player / AI | Homeless in source; free tiles in colony or frontier | Settlers arrive | SettlersSent |
+
+## 7. Domain events
+
+| Event | When | Payload | Consumed by |
+|---|---|---|---|
+| HarvestRolled | Each harvest | province, roll | realm (food year), events |
+| FamineStruck | Season with too little food | province, dead, fled | realm, rebellions, events |
+| RefugeesFled | Famine, war, persecution | from, to, count, classes | province (receiver), culture, religion |
+| PeopleChanged | Monthly births/deaths | province, per class | realm, recruiting |
+| BecameHomeless / HomelessShareCrossed | Overflow with no slot; threshold 5/10/20 % | province, share | rebellions |
+| TileBurned / TileRebuilt / TileStateChanged | State changes | province, tile, state | warfare, map-presentation, buildings |
+| TileUseChanged | Use changes | province, tile, from, to | buildings, map-presentation |
+| MineExhausted | Seams reach 0 | province, mine | buildings, trade |
+| TaxCollected | Tax paid | province, owed, reached | realm |
+| TaxRateChanged / TollChanged | Command | province, rate | realm, trade |
+| GrievanceStarted / GrievanceEnded | Conditions met/lost | province, grievance | rebellions, realm (lord loyalty), revolutions |
+| RiotsBegan / RebelsMustered | 3 / 4+ grievances | province, cause, leader | rebellions, warfare, realm |
+| OfficialAssigned / OfficialDismissed / OfficialHired / OfficialLent | Commands | official, province, type | realm, government |
+| LordLostLastProvince | Lord has no land | lord, cause | realm |
+| CharterGranted / CharterRevoked | Commands | province, charter | realm (lords notice), rebellions |
+| ProvinceOwnerChanged | Conquest, cession, defection, colony | province, from, to | realm, diplomacy, subjects |
+| ProvinceOccupied / ProvinceLiberated | Enemy holds castle / peace or retake | province, occupier | realm, warfare |
+| PlagueStageChanged | Plague step | province, step | events, trade |
+| CastleStepChanged / WallsBreached | Build, siege, neglect | province, step | warfare |
+| SettlementChanged | Settlement step | province, step | subjects, exploration |
+
+## 8. Policies (reactions to other contexts)
+
+- When warfare reports an army foraging or looting, then burn tiles beyond the foraging limit and make their workers refugees or dead.
+- When warfare reports an army requisitioning food from a province's store, then start *Requisitioned* for a season after the last taking.
+- When an army stays more than a season, then start *Soldiers quartered*, unless a no-quartering charter.
+- When warfare reports a castle taken or a province with no castle held for a season, then mark the province occupied.
+- When warfare reports a sack, then apply its loss of town buildings and townsfolk (warfare 8.5).
+- When realm's food year delivers castle food or the local store changes, then use it in the seasonal famine check.
+- When realm grants a fief, then set governed by to the lord and drop the need for a royal official.
+- When realm reports a lord's line dying out, then return his provinces to royal (his officials may enter your service).
+- When research reports an invention known, then unlock its buildings, tile changes, harvest steps, road and castle steps.
+- When exploration reports a colony founded, then set the province's owner, settlement *settlement*, the governor as its official, and put left-over colony food into the store.
+- When government reports an official over the cap, then add *Grasping officials* (not yet in the province grievance table: OQ-PROV-6).
+- When rebellions reports a rising, then count the province as in revolt.
+- When events apply a province effect, then translate it by the §15 mapping.
+- When diplomacy sends an official as envoy, then his province pays half until he returns (country stats 9).
+
+## 9. Monthly turn
+
+Reads first: realm's food policy and castle deliveries, owner and war state, inventions known, armies present (warfare/troop-movement).
+1. Births and deaths per class (monthly share of the yearly rates and modifiers).
+2. Overflow into least-filled slots; homeless take open slots; a share of homeless drift to neighbours.
+3. Rebels: in provinces with 4 or more grievances, a share of recruits take up arms (see OQ-PROV-2).
+4. Sickness for armies staying in the province.
+5. Occupation months advance.
+6. Grievance evaluation (start/end), then calm/grumbling/riots/rebels.
+Each season: food check and famine (§6.2); store rot (realm); *Hungry*, *Requisitioned*, *Soldiers quartered* timers.
+Each autumn (and twice for rice): harvest roll (realm food year).
+Each year: recruits refill; tax owed; years held, official years served; burned tile rebuild; worn tile checks; mine seams fall; upkeep and neglect (buildings); woods regrowth after 10 unworked years; refugees settle after 2 years.
+Each week while an outbreak runs: plague (OQ-PROV-4 on how this fits monthly turns).
+
+## 10. Configuration
+
+All values are placeholders ("Numbers are placeholders for config", province-stats intro). The design names one
+province config file but no file name or keys; keys below are proposed by this spec (OQ-PROV-20).
+
+| Key | Meaning | Value in the design | Placeholder? | Config file |
+|---|---|---|---|---|
+| province.tiles.min / max | Tile count range by map size | 4 / 16 | yes | province config |
+| province.shore_tiles | Shore tiles on coast/lake/river | 1 to 3 | yes | province config |
+| province.clear_woods.years | Years to clear woods | 3 | yes | province config |
+| province.fields_to_woods.years | Unworked years before fields become woods | 10 | yes | province config |
+| province.castle_ruin.waste_years | Years a destroyed castle tile stays waste | 5 | yes | province config |
+| province.town.second_tile_townsfolk | Townsfolk for the second town tile | 40,000 | yes | province config |
+| province.worn.recovery_years | Years without use to clear Worn | 5 | yes | province config |
+| province.burned.rebuild_per_year | Burned tiles rebuilt a year in peace | 1 | yes | province config |
+| province.ground.troops | Foot, horse, guns, defender, days to cross, foraging, sickness per ground | farmland 0/+10/0/0/1/Rich/Low; grassland 0/+25/0/−10/1/Fair/Low; savanna 0/+15/0/0/1/Fair/Medium; drylands 0/+10/0/0/1.5/Poor/Low; desert −10/−10 (camels 0)/−10/+10/2/Almost none/Heat; hills +10/−15/−10/+15/1.5/Fair/Low; mountains 0/−40/−30/+30/3/Poor/Cold; forest 0/−25/−20/+15/2/Fair/Low; jungle −10/−40/−30/+25/3/Poor/High; marsh −10/−30/−30/+20/3/Poor/High; tundra 0/−10/−10/+10/2/Almost none/Cold | yes | province config |
+| province.river_crossing_penalty | Attacker over a river without bridge | −20 % | yes | province config |
+| province.woods_ambush | Defender per two woods tiles / cap | +5 % / +15 % | yes | province config |
+| province.locals_rough_bonus | Homeland defender in rough ground | +10 % | yes | province config |
+| province.ground.economy | Build cost / building output / people output per ground | farmland 100/+25/100; grassland 100/100/+50 herding; savanna 100/100/+25 herding; drylands 125/−25 until irrigated/100; desert 150/−50 except mines and irrigation/100 herding and caravans; hills 125/100 (mines +25)/100; mountains 200/−50 farms, +50 mines/−25; forest 150/100 (lumber +50)/+25 hunting and gathering; jungle 200/−25/+25 gathering; marsh 200/−50 until drained/+25 fishing; tundra 150/−50/100 herding | yes | province config |
+| province.buildings.slots | Job slots per building | farm 12,000; rice paddy 18,000; terrace 12,000; raised fields 12,000; plantation 12,000; ranch 3,000; horse stud 3,000; lumber camp 1,500; mine 6,000; irrigation works 1,500; fishery 3,000; saltworks 1,500; harbour 1,500; shipyard 3,000; bridge 0; loom house 1,500; forge 1,500; kiln 1,500; tannery 1,500; press 900; brewery/winery 900; market 1,500; caravanserai/warehouse 900; house of worship 600; seat 300 + official; almshouse 600; powder mill 900; hospital/wells/drains 600; factory 6,000; rail station 600 | yes | province config / buildings config |
+| province.buildings.land | Tile, needs and unlock per land building | farm: fields, known at start; mill: +25 % gold, F5; rice paddy: fields on wet ground or by a shore, needs shore tile or irrigation, F2; terrace: fields on hills or mountains, F2 or Andean terraces; raised fields: marsh, F6; plantation: fields on tropical ground, F10 (no forced-labour bonus); ranch: pasture, start; horse stud: pasture, F11; lumber camp: woods, start; mine: waste, hills or mountains with a seam, needs timber, start, deeper by research; irrigation works: waste or drylands fields, F3; fishery: shore, start, more with F4; saltworks: shore on dry or warm coast, start; harbour: shore, start; shipyard: shore with a harbour, needs timber, start; bridge: shore on a river, start; castle: castle tile, B4/B1/B5/B6; granary: start, bigger with F7 | yes | province config / buildings config |
+| province.buildings.town | Needs per town building | loom house: raw ware; forge: iron; kiln: clay; tannery: hides; press: paper and printing; brewery/winery: grain or grapes; market: market charter for the fair (weekly market → yearly fair → trading house); caravanserai/warehouse: a road; school: market town or bigger; seat: town or bigger; almshouse: gold upkeep; powder mill: saltpetre; hospital/wells/drains: later inventions; factory: era V inventions, coal or water power; rail station: railway invention and a road | yes | province config / buildings config |
+| province.bare_tile.slots | People per tile without building | 3,000 | yes | province config |
+| province.town.building_slots | Building slots by town size | hamlet 1, village 2, market town 4, town 6, city 9, great city 12 | yes | province config |
+| province.mill.gold_bonus | Mill on a farm | +25 % gold from grain | yes | province config |
+| province.almshouse.shelters | Homeless sheltered | 3,000 | yes | province config |
+| province.food.per_worker | People fed per worker | farm/terrace/raised 1.5; rice 1.5 ×2 harvests; ranch 1.33; fishery 1.33; bare 0.67 × people output | yes | province config |
+| province.harvest.multipliers | Harvest roll | bumper 1.3, good 1.15, normal 1, poor 0.7, failed 0.3 | yes | province config |
+| province.wares.list | Wares | grain, rice, wine, olive oil, wool, cloth, flax, linen, silk, cotton, salt, fish, timber, furs, hides, leather, horses, iron, tools, arms, copper, tin, silver, gold, gems, spices, pepper, sugar, tea, coffee, cocoa, tobacco, incense, ivory, pottery, porcelain, dyes, paper, books, saltpetre, powder; later coal, rubber, oil | yes | province config |
+| province.wares.craft_value | Finished vs raw | ×3 (wool to cloth) | yes | province config |
+| province.births / deaths | Base yearly rates per class | land classes 4.0/3.0; miners 3.5/4.0; craftsmen, market folk, clerks 3.0/3.5; clergy 0.5 (celibate) or as townsfolk /3.0; scholars 1.0/3.0; homeless 4.0/5.0 | yes | province config |
+| province.births.modifiers | Birth modifiers | store >6 months +0.5; peace 10 years +0.5; store <3 months −1; *Hungry* −2; war −1; plague −1; towns by era | yes | province config |
+| province.deaths.modifiers | Death modifiers | plague +5/+15/+30 %; war +1 %; burned tile +0.5 % each; smoke +1 % town; hospitals −0.5 % town; sanitation, vaccination −0.5 % each | yes | province config |
+| province.famine.flee_share | Share of the unfed who flee | a quarter | yes | province config |
+| province.homeless.drift_share | Homeless moving each month | not given | yes | province config |
+| province.homeless.thresholds | Theft / grievance / shanty | 5 % (−5 % tax and traders per 5 %) / 10 % / 20 % | yes | province config |
+| province.homeless.deaths | Yearly deaths | 5 % | yes | province config |
+| province.homeless.rebel_rate | Rebel muster rate vs others | ×2 | yes | province config |
+| province.shanty.town_death_extra | Town class deaths in shanty camps | +1 % | yes | province config |
+| province.refugees.settle_years | Years before refugees settle | 2 | yes | province config |
+| province.recruits.conscription | Conscription start / end | below 1/4 / refilled to 1/2 | yes | province config |
+| province.tax.rates | Tax steps | none, light, normal, heavy, crushing | yes | province config |
+| province.tax.no_official | Share without official | half | yes | province config |
+| province.tax.lord_share | Lord keeps | half | yes | province config |
+| province.tax.free_travel_days | Days before travel losses | 5 | yes | province config |
+| province.far_from_throne.days | Days to capital limit | 30 (example) | yes | province config |
+| province.officials.full_effect_years | Years to full effect | 5 (half in first year) | yes | province config |
+| province.officials.effects | Type effects | tax collector +20 % reaches you; steward +10 % food, store rot ×½; judge riots +1 grievance, rebels 5 not 4, *Broken charter* ×2 fade; master of works −25 % cost, ×½ time, burned rebuild ×2; muster master refill +25 %, levies homeless first; customs officer +15 % traders, fees in full; chaplain faith ×2; schoolmaster tongue ×2, graduate 1 year sooner; warden garrison +25 %, walls repair ×2, castle store rot ×½; colonial governor none | yes | province config |
+| province.homeland.years | Years to gain or lose homeland | 100 | yes | province config |
+| province.pretender.years | Old ruler's right after losing a province | 50 | yes | province config |
+| province.charter.broken_years | *Broken charter* duration | 20 | yes | province config |
+| province.castle.neglect_years | Years without upkeep to drop a step | 10 | yes | province config |
+| province.walls.max_breaches | Breaches | 3 | yes | province config |
+| province.grievances.levels | Calm / grumbling / riots / rebels | 0–1 / 2 / 3 / 4+ | yes | province config |
+| province.plague.steps | Plague steps | none, rumour, outbreak, burning out | no (states) | province config |
+| province.fever_land.steps | Fever land steps | none, mild, harsh, deadly | no (states) | province config |
+
+## 11. Seams
+
+| Other context | Direction | Pattern | What crosses |
+|---|---|---|---|
+| world-map | upstream | Conformist | Ground (terrain), size on the map (tile count), coast, rivers, neighbours, population, wealth |
+| scenario-setup | upstream | Customer–Supplier | Starting values data per province under the §16 rules |
+| time-and-turns | upstream | Conformist | Month, season, year ticks; turn order |
+| buildings | upstream | Customer–Supplier | Building list, job slots, construction, upkeep and condition (neglect), owners; province supplies tiles, ground build cost and output, classes |
+| research | upstream | Published Language | Known inventions unlock buildings, tile changes, harvest steps, road and castle steps |
+| realm | downstream | Customer–Supplier | Province sums for the country card (§13); realm supplies food policy, castle deliveries, lords and loyalty, fief grants |
+| trade | downstream | Customer–Supplier | Wares made, buildings, toll points and rates, customs officer, homeless penalty, quarantine; trade v2 replaces §7 and stores trade value and ratio per province |
+| warfare | downstream | Partnership | Ground troop modifiers, castles, walls, garrison, occupation; warfare sends burned tiles, sacks, requisition, quartering |
+| troop-movement | downstream | Customer–Supplier | Days to cross, foraging, roads, rivers, bridges, days to capital |
+| recruiting | downstream | Customer–Supplier | Recruits here, classes, homeless, muster master; recruiting asks for a ceiling by class, Fallen/Veterans here, Marshal and deputy officials |
+| rebellions | downstream | Customer–Supplier | Grievances, homeless share, classes, leaders; rebellions owns how risings start |
+| revolutions | downstream | Conformist | Grievances and class shares read as signs; pretenders/émigrés |
+| religion | upstream | Customer–Supplier | Faith mix pulls, house of worship, chaplain, *Wrong faith* and *Persecuted* definitions |
+| culture | upstream | Customer–Supplier | Tongue mix drift, *Foreign rule*, *Banned tongue*, *Own tongue* charter, officials' tongue, settlers to own provinces |
+| government | upstream | Customer–Supplier | Officials and lords caps, *Grasping officials*, seats |
+| exploration | upstream | Customer–Supplier | Colonial governor type and slots, founding a colony sets *Settlement* |
+| subjects | downstream | Customer–Supplier | Governed by subject ruler; colony stages follow §12.3 settlers and years |
+| diplomacy | upstream | Customer–Supplier | Envoys taken from officials leave a province at half pay; foreign agitators (via rebellions) |
+| naval | downstream | Customer–Supplier | Seafolk crews, harbours, shipyards, timber |
+| national-strengths | upstream | Conformist | Levers on tax reach, harvest steps, official type strength, grievance shields, building cost |
+| events | upstream | Anti-Corruption Layer | Event-tree province stats translated by §15 |
+| map-presentation | downstream | Published Language | Card fields, tile row, zoom content and lenses (§14) |
+
+## 12. AI
+
+- The AI uses the same stats and commands as the player; lords (AI-driven people) build in their own provinces by their traits: Builder the most, Greedy markets and mines, Pious houses of worship, Warlike castles (§10.3).
+- Lords hire and pay their own officials from their wealth (§10.3).
+- Lords and towns demand charters for loyalty or a loan (§10.4).
+- No other province-level AI behaviour is stated (OQ-PROV-19).
+
+## 13. Open questions and contradictions
+
+- **OQ-PROV-1:** Trade v2 replaces province stats §7 and asks for edits the province design has not adopted: the card's Trade line; 4.3 market text; 6.4 "−5 % traders pass through" → "−5 % trade ratio gain"; 10.2 Customs officer "+15 % traders passing" → "+15 % trade ratio gain"; §13 gold income = reaches you + trade income (not trade balances); §15 `trade_access` → trade ratio gain; §17 yearly trader paths replaced. By the latest-decision rule trade v2 wins; the province design text needs the edits. Blocks: PROV-121, PROV-260, Customs officer effect, event mapping of `trade_access`.
+- **OQ-PROV-2:** Rebels: province §12.1 says 4 or more grievances make rebels and a share of recruits take up arms each month; rebellions §2.1 says 4+ is *Plotting* with a monthly chance to rise (5 %/15 %/30 % for 4/5/6+) and a spark can start a rising at 3. The judge's "rebels need 5 instead of 4" has no counterpart in rebellions. Which governs, and what is the monthly share? Blocks PROV-231, 232, 236.
+- **OQ-PROV-3:** Upkeep: province §4 says unpaid upkeep for 10 years makes a building fall one step or close, §11 says 10 years without upkeep drops the castle a step; buildings §5.2 says one unpaid month makes it Neglected (works at half) and 10 years neglected drops a step; buildings §18 asks the province to adopt neglect. Not adopted.
+- **OQ-PROV-4:** Plague updates each week while an outbreak runs (§17), but the game turn is one month (gap-lists). How weekly plague steps run inside a monthly turn is not said.
+- **OQ-PROV-5:** Muster master and levies: province 6.4 and 10.2 say levies under a muster master take homeless men first; 6.6 says recruits come "more from homeless men". Recruiting asks to drop "homeless first" (every levy takes all classes by share), add a recruit ceiling by class, *Fallen from here*, *Veterans here*, a **Marshal** official type and a **deputy** from clerks. Not adopted.
+- **OQ-PROV-6:** Grievance list is not updated with other designs' additions: *Grasping officials* (government), *Banned tongue* and *Foreign rule* for strangers only before nationalism (culture), the new *Wrong faith* wording and *Persecuted* counting as two (religion), *Foreign agitators* / *Foreign meddling* (diplomacy, addressed to rebellions). Which list is authoritative?
+- **OQ-PROV-7:** Colonising stateless peoples' land is still open (gap-lists A.5). Province §12.3 allows colonies in any unowned province on free tiles and forbids land of "any country, tribal countries included"; whether stateless peoples' land is "unowned" is the open point. Also: province settlement steps (none, trading post, settlement, colony) vs subjects' colony stages (Outpost, Settled, Self-governing) and exploration's "settlement at *settlement*" — the mapping between the two ladders is not stated.
+- **OQ-PROV-8:** Birth and death modifiers are written "+0.5", "−1", "−2" without unit (percentage points of the yearly rate?). The Troyes example (2,800 born, 2,200 dead, "well fed, at peace", 7 months in store) matches the base rates without the +0.5 food and +0.5 peace modifiers; with them births would be about 3,500.
+- **OQ-PROV-9:** Hospitals, wells and drains: province 4.3 "Later inventions"; buildings §18 says the hospital is known at start and wells and drains become ring works. Not adopted.
+- **OQ-PROV-10:** Tax timing and losses: tax owed is yearly but turns are monthly (when is it paid?); "every day of travel beyond 5 loses a share" — the share is not given; can a tax collector's +20 % push "reaches you" above tax owed?
+- **OQ-PROV-11:** Tile count 4–16 "by size on the map": the mapping from map size to count is not given. Town size thresholds in townsfolk (hamlet … great city) are not given except 40,000 for a second tile; "a great city a third" has no number.
+- **OQ-PROV-12:** Wares list additions not adopted: buildings asks for stone, grapes, dates, guns, steel, cement (marble as stone); national strengths asks for amber, wax and honey, alum. Classes for new buildings (buildings §18 6.3) also not adopted.
+- **OQ-PROV-13:** Culture asks that officials have a tongue and learn slower among cousins (7 years) and strangers (10 years), and that settlers may go to own provinces with free tiles; not adopted (10.2 says 5 years for all).
+- **OQ-PROV-14:** Harvest steps: "each is one step better" — what a step does at bumper, and how steps from F19 (+2), F22, F16 (30 years), *Fodder crops* stack, is not said. Food per worker for rice is "1.5, two harvests" — whether per harvest or per year is ambiguous.
+- **OQ-PROV-15:** Sickness (Low, Medium, High, Heat, Cold), foraging (Rich … Almost none) and fever land steps have no numbers in the design (the code's march defines carry foraging numbers: scenario-setup/warfare to confirm).
+- **OQ-PROV-16:** Event mapping leaves choices open: `prosperity +2` → "two new buildings that fit" (who picks?), `control −20` → "the official flees, or the road breaks" (which?), and several rows (`trade_good`, `urbanization`, `manpower_yield`, `environmental_degradation`, `culture_share`, `colonial_status`) have no worked effect.
+- **OQ-PROV-17:** Recruit share per class per year, the homeless drift share, the rebel muster share, and refugee "share" values are not given.
+- **OQ-PROV-18:** Rebels "a share of the recruits take up arms" vs §6.4 "rebels muster from the homeless first, at twice the rate" — which pool (recruits or homeless) feeds rebels first?
+- **OQ-PROV-19:** No AI design for tax rates, tolls, charters, officials placement or food at province level; gap-lists item 18 (the AI as a whole) is open.
+- **OQ-PROV-20:** The province config file and its keys are not named in the design; keys in §10 are proposals.
+- **OQ-PROV-21:** Tax rate scale: province §8 has five steps including *None*; country stats §2 lists four (light/normal/heavy/crushing). Province §8 says it replaces the country rate; realm must align (see OQ-REALM-8).
+- **OQ-PROV-22:** The Troyes card shows a tax collector of 6 years, 3 days to Paris, 11 gold owed and 9 reaching you. No rule in §8 or §10.2 loses those 2 gold (a tax collector at full effect should add 20 %). Which rule applies?
+- **OQ-PROV-23:** Lords' recruits: country stats §5.2 and province §6.6 say a lord keeps his province's recruits as his retinue, but for a lord's province without one of his officials (§10.3: pays him half, *Ungoverned*) the effect on recruits is not stated.
+- **OQ-PROV-24:** Province §10.2 says "one official runs one province", but country stats §4 says inventions raise how many provinces one official can run, and the research tree gives G1 (1 province), G9 (2), G16 (3), B2 and G11 (+1 near or far from the capital), T14 (+1). Which holds? (Same as OQ-REALM-14.)
+
+## 14. Traceability
+
+Every requirement has at least one scenario. PROV-292 (card layout) is also presentation; map-presentation owns the zoom views.
+
+| Requirement | Feature file | Scenario |
+|---|---|---|
+| PROV-001 | province-basics.feature | Every stat is a count, never an abstract meter |
+| PROV-002 | province-basics.feature | The province card explains every number |
+| PROV-003 | province-basics.feature | Rates and limits live in one province config file |
+| PROV-004 | province-basics.feature | Every stat is a count, never an abstract meter |
+| PROV-010 | tiles.feature | Tile count follows the province's size on the map |
+| PROV-011 | tiles.feature | Each tile has one use and holds only the buildings its use allows |
+| PROV-012 | tiles.feature | Clearing woods gives fields after three years and one load of timber |
+| PROV-013 | tiles.feature | Unworked fields grow back into woods |
+| PROV-014 | tiles.feature | Salting or overgrazing turns land to waste |
+| PROV-015 | tiles.feature | Fields turn to pasture after one season and pasture can be ploughed back |
+| PROV-016 | tiles.feature | Marsh comes and goes |
+| PROV-017 | tiles.feature | Irrigation turns waste into fields |
+| PROV-018 | tiles.feature | Shore tiles exist only on water and are never lost |
+| PROV-018 | tiles.feature | A blockade stops shore buildings working but keeps the tile |
+| PROV-019 | tiles.feature | The town grows over fields and shrinks back |
+| PROV-019 | tiles.feature | A great city takes a third tile |
+| PROV-020 | tiles.feature | The town grows over fields and shrinks back |
+| PROV-021 | tiles.feature | A castle can stand on any land tile except the town |
+| PROV-022 | tiles.feature | A destroyed castle leaves waste, then fields |
+| PROV-023 | tiles.feature | Woods and pasture are lost |
+| PROV-023 | tiles.feature | Woods come back on unworked fields and by replanting |
+| PROV-024 | tiles.feature | Woods and pasture are lost |
+| PROV-024 | tiles.feature | Grassland provinces start with many pasture tiles |
+| PROV-030 | tile-states.feature | A tile carries at most one state |
+| PROV-031 | tile-states.feature | Tiles burn |
+| PROV-032 | tile-states.feature | Burned tiles are rebuilt in peace |
+| PROV-033 | tile-states.feature | A building with fewer than half its workers is fallow |
+| PROV-034 | tile-states.feature | Overworked fields wear out and recover |
+| PROV-035 | tile-states.feature | Overworked fields wear out and recover |
+| PROV-035 | tile-states.feature | Rotation inventions make wearing rarer |
+| PROV-036 | tile-states.feature | War damage is burned tiles, not a meter |
+| PROV-040 | ground-troops.feature | Each province takes one ground from the map's terrain |
+| PROV-041 | ground-troops.feature | The ground changes strength by arm and sets crossing, foraging and sickness |
+| PROV-042 | ground-troops.feature | Camels do not suffer in the desert |
+| PROV-043 | ground-troops.feature | Attacking over a river |
+| PROV-044 | ground-troops.feature | Woods tiles give the defender an ambush bonus |
+| PROV-045 | ground-troops.feature | Burned tiles give nothing to forage |
+| PROV-046 | ground-troops.feature | The defender fights from the walls of a castle tile |
+| PROV-047 | ground-troops.feature | Locals know their rough land |
+| PROV-048 | ground-troops.feature | Sickness hits soldiers not born on the ground hardest |
+| PROV-049 | ground-troops.feature | Burned tiles give nothing to forage |
+| PROV-050 | ground-economy.feature | Build cost, building output and people output by ground |
+| PROV-051 | ground-economy.feature | Irrigation and draining lift the building penalty |
+| PROV-052 | ground-economy.feature | In the desert only mines and irrigation works escape the penalty |
+| PROV-053 | ground-economy.feature | Some grounds favour one kind of building |
+| PROV-060 | buildings-in-province.feature | Every building stands on a tile and the castle is a building |
+| PROV-061 | buildings-in-province.feature | A building works in proportion to its filled slots |
+| PROV-062 | buildings-in-province.feature | Ways to gain a building |
+| PROV-063 | buildings-in-province.feature | Ways to lose a building |
+| PROV-064 | buildings-in-province.feature | Land buildings, their tiles and slots |
+| PROV-064 | buildings-in-province.feature | A rice paddy needs water in the province |
+| PROV-064 | buildings-in-province.feature | A farm with a mill earns more gold from its grain |
+| PROV-064 | buildings-in-province.feature | Castle steps come from research |
+| PROV-064 | tiles.feature | Each tile has one use and holds only the buildings its use allows |
+| PROV-065 | buildings-in-province.feature | A mine runs out and leaves a ghost town |
+| PROV-065 | buildings-in-province.feature | Prospecting adds seams |
+| PROV-066 | buildings-in-province.feature | A mine runs out and leaves a ghost town |
+| PROV-067 | buildings-in-province.feature | Shipyards and mines need timber in reach |
+| PROV-068 | buildings-in-province.feature | Bare tiles still give work |
+| PROV-069 | buildings-in-province.feature | Town building slots come from town size |
+| PROV-070 | buildings-in-province.feature | Town buildings and their workers |
+| PROV-070 | buildings-in-province.feature | A school needs a market town or bigger |
+| PROV-071 | buildings-in-province.feature | An almshouse shelters the homeless |
+| PROV-072 | buildings-in-province.feature | Craft buildings appear by themselves where trade is good |
+| PROV-073 | buildings-in-province.feature | Fleeing craftsmen found a craft building |
+| PROV-080 | food-from-tiles.feature | Troyes feeds about 104,000 in a normal year |
+| PROV-081 | food-from-tiles.feature | Troyes feeds about 104,000 in a normal year |
+| PROV-081 | food-from-tiles.feature | People fed per worker by food tile |
+| PROV-082 | food-from-tiles.feature | The harvest roll multiplies field food |
+| PROV-082 | food-from-tiles.feature | Rice is rolled twice |
+| PROV-083 | food-from-tiles.feature | Herds, fish, woods and pasture do not roll a harvest |
+| PROV-084 | food-from-tiles.feature | Rotation inventions improve the harvest one step each |
+| PROV-085 | food-from-tiles.feature | New crops turn a failed harvest into a poor one |
+| PROV-090 | wares.feature | Wares are made by workers times ground times inventions |
+| PROV-091 | wares.feature | Finished wares are worth more than raw ones |
+| PROV-092 | wares.feature | Wares fall when work or inputs fail |
+| PROV-093 | wares.feature | The ware list lives in config and grows in later eras |
+| PROV-094 | wares.feature | Enslaved people are never a ware |
+| PROV-100 | births-deaths-famine.feature | Base yearly birth and death rates by class |
+| PROV-100 | births-deaths-famine.feature | Troyes grows by about 600 a year |
+| PROV-101 | births-deaths-famine.feature | Birth modifiers |
+| PROV-102 | births-deaths-famine.feature | Death modifiers |
+| PROV-102 | births-deaths-famine.feature | Fever land kills people born elsewhere |
+| PROV-103 | births-deaths-famine.feature | Clergy births depend on the faith |
+| PROV-104 | births-deaths-famine.feature | Enough food fills the store |
+| PROV-105 | births-deaths-famine.feature | Enough food fills the store |
+| PROV-106 | births-deaths-famine.feature | Famine kills the people the food cannot feed, and some flee |
+| PROV-106 | births-deaths-famine.feature | With no fed neighbour nobody flees |
+| PROV-110 | classes-and-overflow.feature | Each class works in its own slots |
+| PROV-111 | classes-and-overflow.feature | Newborns join their parents' class at once |
+| PROV-112 | classes-and-overflow.feature | Troyes builds a loom house |
+| PROV-112 | classes-and-overflow.feature | Overflow goes to the least-filled slots |
+| PROV-112 | classes-and-overflow.feature | A tie goes to food classes first |
+| PROV-113 | classes-and-overflow.feature | Overflow never makes scholars or soldiers |
+| PROV-114 | classes-and-overflow.feature | With every slot full, overflow becomes homeless |
+| PROV-115 | classes-and-overflow.feature | Troyes builds a loom house |
+| PROV-115 | classes-and-overflow.feature | Homeless fill gaps left by deaths and levies first |
+| PROV-116 | classes-and-overflow.feature | Homeless drift to the emptiest neighbour in their own realm first |
+| PROV-117 | classes-and-overflow.feature | A short class leaves slots empty |
+| PROV-118 | classes-and-overflow.feature | Fleet crews come from seafolk |
+| PROV-120 | homeless.feature | Homeless eat, make nothing, pay nothing and die fast |
+| PROV-121 | homeless.feature | Theft and begging cut tax and trade |
+| PROV-122 | homeless.feature | The Homeless grievance and shanty camps |
+| PROV-123 | homeless.feature | The Homeless grievance and shanty camps |
+| PROV-123 | homeless.feature | Shanty camps bring plague, death and fire |
+| PROV-124 | homeless.feature | Rebels muster from the homeless first |
+| PROV-125 | homeless.feature | Ways people become homeless |
+| PROV-126 | homeless.feature | Ways to get rid of homeless |
+| PROV-130 | people-stats.feature | People are the sum of the classes; town and country are shown, not stored |
+| PROV-131 | people-stats.feature | People are the sum of the classes; town and country are shown, not stored |
+| PROV-132 | people-stats.feature | Refugees settle after two years |
+| PROV-132 | people-stats.feature | Refugees go home when it is safe |
+| PROV-133 | people-stats.feature | Fleeing scholars keep their class if a slot is free |
+| PROV-134 | people-stats.feature | The country's Faith is the people-weighted sum of the provinces |
+| PROV-134 | people-stats.feature | Only the top three faiths and tongues are stored |
+| PROV-135 | people-stats.feature | Persecuted people take their faith and crafts away |
+| PROV-140 | recruits-students-scholars.feature | Recruits refill from every class except clergy and scholars |
+| PROV-141 | recruits-students-scholars.feature | Whose recruits they are |
+| PROV-142 | recruits-students-scholars.feature | A levy at harvest time empties the farms |
+| PROV-143 | recruits-students-scholars.feature | Soldiers come home homeless |
+| PROV-144 | recruits-students-scholars.feature | Conscription grievance |
+| PROV-145 | recruits-students-scholars.feature | Local recruits fill local school seats first |
+| PROV-146 | recruits-students-scholars.feature | Students here are lost |
+| PROV-147 | recruits-students-scholars.feature | Scholars here come and go |
+| PROV-150 | tax-and-tolls.feature | The owner sets tolls on toll points |
+| PROV-150 | tax-and-tolls.feature | A free-trade charter sets the toll to none |
+| PROV-160 | tax-and-tolls.feature | Provinces follow the realm default unless overridden |
+| PROV-160 | tax-and-tolls.feature | Five tax rates |
+| PROV-161 | tax-and-tolls.feature | Tolls are not part of tax owed |
+| PROV-162 | tax-and-tolls.feature | Troyes owes 11 gold and 9 reach the treasury |
+| PROV-162 | tax-and-tolls.feature | Things that cut tax owed |
+| PROV-162 | tax-and-tolls.feature | Riots halve tax |
+| PROV-163 | tax-and-tolls.feature | Troyes owes 11 gold and 9 reach the treasury |
+| PROV-163 | tax-and-tolls.feature | How much reaches you |
+| PROV-164 | tax-and-tolls.feature | Tax screen presets fill in the realm at once |
+| PROV-165 | tax-and-tolls.feature | A lord keeps half and wavers under a heavy demand |
+| PROV-166 | tax-and-tolls.feature | A tax cap charter keeps the rate at light |
+| PROV-166 | tax-and-tolls.feature | Rebels force the rate down |
+| PROV-167 | tax-and-tolls.feature | Heavy taxes are a grievance |
+| PROV-170 | roads-and-travel.feature | Road steps are unlocked by inventions |
+| PROV-171 | roads-and-travel.feature | Roads are lost |
+| PROV-172 | roads-and-travel.feature | Canals add a river, war wrecks it |
+| PROV-173 | roads-and-travel.feature | Days to capital follow the fastest route |
+| PROV-174 | roads-and-travel.feature | Far from the throne |
+| PROV-180 | governance.feature | A province changes owner |
+| PROV-181 | governance.feature | What governance gives |
+| PROV-181 | governance.feature | A subject ruler governs a subject's province |
+| PROV-182 | governance.feature | What governance gives |
+| PROV-183 | governance.feature | A lord's line dies out |
+| PROV-184 | governance.feature | Occupation |
+| PROV-184 | governance.feature | Peace ends occupation |
+| PROV-185 | governance.feature | Long holding shifts tongue and faith faster and fades Foreign rule |
+| PROV-186 | governance.feature | A people becomes a homeland's people after 100 years |
+| PROV-186 | governance.feature | A people gone for 100 years loses its homeland |
+| PROV-187 | governance.feature | Foreign rule over a homeland |
+| PROV-188 | governance.feature | Pretenders come and go |
+| PROV-190 | officials.feature | Each type has its own effect in the province it runs |
+| PROV-191 | officials.feature | One official runs one province, and a seat needs its own |
+| PROV-192 | officials.feature | Officials grow into their province |
+| PROV-192 | officials.feature | Moving an official starts him again at half |
+| PROV-193 | officials.feature | A colonial governor founds a colony and then runs it |
+| PROV-194 | officials.feature | Schools train officials of certain types |
+| PROV-194 | officials.feature | Officials are gained and lost |
+| PROV-194 | officials.feature | A foreign specialist costs more |
+| PROV-195 | officials.feature | The country card's officials count is the sum of the realm's officials |
+| PROV-200 | lords-in-province.feature | A lord who loses his last province stops being a lord |
+| PROV-201 | lords-in-province.feature | A lord who loses his last province stops being a lord |
+| PROV-201 | lords-in-province.feature | A courtier can be granted land again |
+| PROV-202 | lords-in-province.feature | A lord's officials run his provinces |
+| PROV-203 | lords-in-province.feature | A lord's officials run his provinces |
+| PROV-204 | lords-in-province.feature | Lending an official to a lord |
+| PROV-205 | lords-in-province.feature | Lords build by their traits |
+| PROV-206 | lords-in-province.feature | Paying for a building in a lord's land |
+| PROV-207 | lords-in-province.feature | Land comes back with its buildings |
+| PROV-210 | charters.feature | What each charter gives and costs |
+| PROV-211 | charters.feature | How a province gains a charter |
+| PROV-212 | charters.feature | Revoking a charter leaves a broken charter for 20 years |
+| PROV-213 | charters.feature | A conqueror keeps or revokes charters |
+| PROV-214 | charters.feature | Town law needs no official and blocks seizures |
+| PROV-215 | charters.feature | A mining right hands the mine to a merchant house |
+| PROV-220 | defence.feature | Castle steps |
+| PROV-220 | defence.feature | Conquering a province takes its castle |
+| PROV-221 | defence.feature | Where the castle stands matters |
+| PROV-221 | defence.feature | A castle on a shore tile can be supplied by sea |
+| PROV-222 | defence.feature | Walls are breached and repaired |
+| PROV-223 | defence.feature | A castle with no garrison falls at once |
+| PROV-230 | grievances.feature | Grievances start and end |
+| PROV-230 | grievances.feature | Harsh lord |
+| PROV-231 | grievances.feature | The number of grievances sets the province's mood |
+| PROV-231 | grievances.feature | Grumbling slows growth and drives out scholars and craftsmen |
+| PROV-231 | grievances.feature | Riots halve tax and recruits, drive traders away and make the lord waver |
+| PROV-231 | tax-and-tolls.feature | Riots halve tax |
+| PROV-232 | grievances.feature | Rebels take up arms under a named leader with a demand |
+| PROV-233 | grievances.feature | Rebels come from more than grievances |
+| PROV-233 | grievances.feature | Rebels melt away |
+| PROV-234 | grievances.feature | Rebel armies fight as a rebel band |
+| PROV-235 | grievances.feature | Riots and rebels count as in revolt |
+| PROV-236 | grievances.feature | A judge raises the bar for riots and rebels |
+| PROV-240 | health.feature | Plague spreads along roads, rivers and the sea |
+| PROV-240 | health.feature | Crowded towns catch plague first |
+| PROV-240 | health.feature | Plague runs its steps and burns out |
+| PROV-241 | health.feature | Plague runs its steps and burns out |
+| PROV-241 | health.feature | Quarantine closes the province |
+| PROV-242 | health.feature | Plague kills townsfolk first and leaves buildings fallow |
+| PROV-243 | health.feature | Fever land |
+| PROV-243 | health.feature | Locals mostly survive fever land |
+| PROV-244 | health.feature | Factories make smoke from era V |
+| PROV-250 | colonies.feature | Only unowned provinces can be colonised |
+| PROV-251 | colonies.feature | A colony takes only the free tiles |
+| PROV-252 | colonies.feature | Settlement steps are gained |
+| PROV-252 | colonies.feature | Settlements are lost |
+| PROV-253 | colonies.feature | A trading post draws traders without taking a tile |
+| PROV-254 | colonies.feature | Settlers fill the free tiles and then growth stops |
+| PROV-254 | colonies.feature | Settlers are lost |
+| PROV-255 | colonies.feature | Taking the local people's tiles has a cost |
+| PROV-260 | country-aggregation.feature | Country stats are sums over provinces |
+| PROV-260 | country-aggregation.feature | Lords' recruits and officials stay on their own cards |
+| PROV-270 | event-mapping.feature | Event effects land as concrete province changes |
+| PROV-270 | event-mapping.feature | Event stats map onto province stats |
+| PROV-280 | starting-values.feature | The map sets the land |
+| PROV-281 | starting-values.feature | The catalogue sets owners, lords, homelands and mixes |
+| PROV-282 | starting-values.feature | Other sources fill the rest |
+| PROV-283 | starting-values.feature | Wealth stops being live once buildings are placed |
+| PROV-290 | province-basics.feature | Only stored stats are kept; the rest is worked out when needed |
+| PROV-291 | province-basics.feature | Update cadence |
+| PROV-292 | province-basics.feature | The province card explains every number |

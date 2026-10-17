@@ -1,0 +1,21 @@
+{
+  "name": "@ph/specs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run",
+    "report": "node --experimental-strip-types src/report.ts",
+    "context-map": "node --experimental-strip-types src/context-map.ts"
+  },
+  "dependencies": {
+    "@ph/engine": "workspace:*",
+    "@ph/rules": "workspace:*"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber-expressions": "20.1.0",
+    "@cucumber/gherkin": "42.0.1",
+    "@cucumber/messages": "34.2.1"
+  }
+}

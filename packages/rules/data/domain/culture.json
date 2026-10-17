@@ -1,0 +1,615 @@
+{
+ "$comment": "Culture config (domain/culture/spec.md §10), from culture/culture-config.example.yaml version 1. All numbers are placeholders; '_provisional' lists the keys still being balanced. 'tongues_added' are tongues the design or the feature files name with their family.",
+ "families_event_tree": [
+  "latin",
+  "germanic",
+  "slavic",
+  "hellenic",
+  "turkic",
+  "iranian",
+  "arab",
+  "berber",
+  "cushitic",
+  "semitic_ethiopian",
+  "mande",
+  "akan",
+  "yoruba_edo",
+  "hausa_fulani",
+  "bantu",
+  "khoisan",
+  "nilotic",
+  "indo_aryan",
+  "dravidian",
+  "tibeto_burman",
+  "tai",
+  "austroasiatic",
+  "austronesian",
+  "sinitic",
+  "japonic",
+  "koreanic",
+  "mongolic",
+  "tungusic",
+  "uralic",
+  "nahua",
+  "maya",
+  "andean",
+  "tupi_guarani",
+  "algonquian",
+  "iroquoian",
+  "creole_atlantic",
+  "polynesian",
+  "melanesian",
+  "aboriginal_australian"
+ ],
+ "families_added": [
+  "celtic",
+  "baltic",
+  "caucasian",
+  "hebrew"
+ ],
+ "relation": {
+  "kin": {
+   "tongue_share_weight": 1.0
+  },
+  "cousin": {
+   "tongue_share_weight": 0.5,
+   "foreign_rule": false,
+   "drift_multiplier": 2.0
+  },
+  "stranger": {
+   "tongue_share_weight": 0.0,
+   "foreign_rule": true
+  },
+  "trading": {
+   "tongue_share_weight": 0.0,
+   "foreign_rule": false
+  }
+ },
+ "drift": {
+  "base_rate_per_year": 0.005,
+  "court_pull_needs_years_held": 20,
+  "court_pull_needs": [
+   "own_official",
+   "lord_of_court_tongue"
+  ],
+  "drop_below_share": 0.01,
+  "multipliers": {
+   "town_classes": 2.0,
+   "school_in_pull_tongue": 1.5,
+   "schoolmaster_official": 2.0,
+   "homeland_of_drifting_tongue": 0.5,
+   "way_of_life_in_own_land": 0.5,
+   "diaspora": 0.25,
+   "nationalism_0_3": 0.25,
+   "own_tongue_charter": 0.0,
+   "inventions": {
+    "printing": 1.25,
+    "mass_schooling": 1.25,
+    "newspapers": 1.25,
+    "railways": 1.25
+   }
+  },
+  "way_of_life_lands": {
+   "herding": [
+    "grassland",
+    "drylands"
+   ],
+   "forest": [
+    "forest",
+    "jungle"
+   ],
+   "seafaring": "coastal"
+  }
+ },
+ "policy": {
+  "let_be": {
+   "drift": 0.5
+  },
+  "teach": {
+   "drift": 1.0,
+   "school_upkeep": 1.1
+  },
+  "impose": {
+   "drift": 2.0,
+   "grievance": "banned_tongue",
+   "stranger_lords_waver": 1,
+   "needs_any": [
+    "invention:printing",
+    "start_flag:chancery_tradition"
+   ]
+  }
+ },
+ "start_flag_chancery_tradition": [
+  "ming",
+  "joseon",
+  "castile",
+  "ottoman"
+ ],
+ "officials": {
+  "years_to_full_effect": {
+   "kin": 5,
+   "cousin": 7,
+   "stranger": 10,
+   "local_tongue": 5
+  }
+ },
+ "effects": {
+  "trading_people": {
+   "min_share": 0.02,
+   "needs": "market",
+   "trade_value": 0.1,
+   "extra_traders": 1
+  },
+  "family_neighbour_research_weight": 2.0,
+  "national_levy": {
+   "needs_nationalism": 0.5,
+   "kin_refill": 1.25,
+   "stranger_refill": 0.75,
+   "from_age": "age_of_revolutions"
+  }
+ },
+ "nationalism": {
+  "cousins_become_strangers_at": 0.3,
+  "homeland_demands_country_at": 0.5
+ },
+ "engine_events": {
+  "court_goes_native": {
+   "court_share_below": 0.2,
+   "for_years": 50,
+   "other_tongue_above": 0.5,
+   "recheck_years": 25
+  },
+  "new_tongue_abroad": {
+   "settler_majority_years": 100,
+   "region": "map macro-region",
+   "separated_by_sea": "top-level map region differs from the court capital's"
+  },
+  "merge_without_event": {
+   "needs_policy": "impose",
+   "years": 50,
+   "nation_state": "court tongue is the merges_into of some tongue"
+  },
+  "check_every_years": 5
+ },
+ "family_default_by_region": {
+  "cushitic": {
+   "ethiopian_highlands": "oromo"
+  },
+  "latin": {
+   "iberia": "castilian",
+   "americas": "castilian"
+  }
+ },
+ "tongues": [
+  {
+   "id": "french",
+   "name": "French",
+   "family": "latin",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "occitan",
+   "name": "Occitan",
+   "family": "latin",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "castilian",
+   "name": "Castilian",
+   "family": "latin",
+   "way_of_life": "settled",
+   "splits_to": "criollo"
+  },
+  {
+   "id": "portuguese",
+   "name": "Portuguese",
+   "family": "latin",
+   "way_of_life": "seafaring",
+   "splits_to": "brazilian"
+  },
+  {
+   "id": "criollo",
+   "name": "Criollo",
+   "family": "creole_atlantic",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "brazilian",
+   "name": "Brazilian",
+   "family": "creole_atlantic",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "tuscan",
+   "name": "Tuscan",
+   "family": "latin",
+   "way_of_life": "settled",
+   "merges_into": "italian"
+  },
+  {
+   "id": "lombard",
+   "name": "Lombard",
+   "family": "latin",
+   "way_of_life": "settled",
+   "merges_into": "italian"
+  },
+  {
+   "id": "neapolitan",
+   "name": "Neapolitan",
+   "family": "latin",
+   "way_of_life": "settled",
+   "merges_into": "italian"
+  },
+  {
+   "id": "italian",
+   "name": "Italian",
+   "family": "latin",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "high_german",
+   "name": "High German",
+   "family": "germanic",
+   "way_of_life": "settled",
+   "merges_into": "german",
+   "local_names": [
+    "Swabians",
+    "Franconians",
+    "Bavarians",
+    "Alemannic Swiss Germans"
+   ]
+  },
+  {
+   "id": "low_german",
+   "name": "Low German",
+   "family": "germanic",
+   "way_of_life": "settled",
+   "merges_into": "german",
+   "local_names": [
+    "Westphalians",
+    "German (Eastphalian Low Saxon)"
+   ]
+  },
+  {
+   "id": "german",
+   "name": "German",
+   "family": "germanic",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "flemish",
+   "name": "Flemish",
+   "family": "germanic",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "breton",
+   "name": "Breton",
+   "family": "celtic",
+   "way_of_life": "seafaring"
+  },
+  {
+   "id": "gaelic_irish",
+   "name": "Irish",
+   "family": "celtic",
+   "way_of_life": "settled",
+   "local_names": [
+    "Gaelic Irish"
+   ]
+  },
+  {
+   "id": "mandinka",
+   "name": "Mandinka",
+   "family": "mande",
+   "way_of_life": "settled",
+   "local_names": [
+    "Mandinka (Maninka)"
+   ]
+  },
+  {
+   "id": "bamana",
+   "name": "Bamana",
+   "family": "mande",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "dyula",
+   "name": "Dyula",
+   "family": "mande",
+   "way_of_life": "trading",
+   "diaspora": true,
+   "local_names": [
+    "Dyula and other Mande traders"
+   ]
+  },
+  {
+   "id": "fulbe",
+   "name": "Fulbe",
+   "family": "hausa_fulani",
+   "way_of_life": "herding"
+  },
+  {
+   "id": "armenian",
+   "name": "Armenian",
+   "family": "caucasian",
+   "way_of_life": "trading",
+   "diaspora": true
+  },
+  {
+   "id": "jewish",
+   "name": "Jewish",
+   "family": "hebrew",
+   "way_of_life": "trading",
+   "diaspora": true,
+   "local_names": [
+    "Jewish communities",
+    "Jews"
+   ]
+  },
+  {
+   "id": "oromo",
+   "name": "Oromo",
+   "family": "cushitic",
+   "way_of_life": "herding"
+  },
+  {
+   "id": "manchu",
+   "name": "Manchu",
+   "family": "tungusic",
+   "way_of_life": "forest"
+  },
+  {
+   "id": "han",
+   "name": "Han",
+   "family": "sinitic",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "lithuanian",
+   "name": "Lithuanian",
+   "family": "baltic",
+   "way_of_life": "forest"
+  },
+  {
+   "id": "georgian",
+   "name": "Georgian",
+   "family": "caucasian",
+   "way_of_life": "settled"
+  },
+  {
+   "id": "nahua",
+   "name": "Nahua",
+   "family": "nahua",
+   "way_of_life": "settled"
+  }
+ ],
+ "tongues_added": [
+  {
+   "id": "swahili",
+   "name": "Swahili",
+   "family": "bantu",
+   "way_of_life": "settled",
+   "_from": "culture §1.1"
+  },
+  {
+   "id": "latvian",
+   "name": "Latvian",
+   "family": "baltic",
+   "way_of_life": "settled",
+   "_from": "culture §1.1"
+  },
+  {
+   "id": "catalan",
+   "name": "Catalan",
+   "family": "latin",
+   "way_of_life": "settled",
+   "_from": "culture §1.1; tongue-policy.feature (cousins of Castilian)"
+  },
+  {
+   "id": "anglo_american",
+   "name": "Anglo-American",
+   "family": "creole_atlantic",
+   "way_of_life": "settled",
+   "_from": "culture §6.3"
+  },
+  {
+   "id": "afrikaans",
+   "name": "Afrikaans",
+   "family": "creole_atlantic",
+   "way_of_life": "settled",
+   "_from": "culture §6.3"
+  },
+  {
+   "id": "english",
+   "name": "English",
+   "family": "germanic",
+   "way_of_life": "settled",
+   "splits_to": "anglo_american",
+   "_from": "culture §6.3; family germanic (D-CULT-3 data fix)"
+  },
+  {
+   "id": "dutch",
+   "name": "Dutch",
+   "family": "germanic",
+   "way_of_life": "settled",
+   "splits_to": "afrikaans",
+   "_from": "culture §6.3; family germanic (D-CULT-3 data fix)"
+  },
+  {
+   "id": "great_russian",
+   "name": "Great Russian",
+   "family": null,
+   "way_of_life": "settled",
+   "_from": "culture §1.1; family not given by the design"
+  },
+  {
+   "id": "ruthenian",
+   "name": "Ruthenian",
+   "family": null,
+   "way_of_life": "settled",
+   "_from": "culture §1.1; family not given by the design"
+  },
+  {
+   "id": "russian",
+   "name": "Russian",
+   "family": null,
+   "way_of_life": "settled",
+   "_from": "culture §6.1; family not given by the design"
+  },
+  {
+   "id": "andalusi_arabic",
+   "name": "Andalusi Arabic",
+   "family": null,
+   "way_of_life": "settled",
+   "_from": "culture §6.1 (strangers to Castilian); family not given by the design"
+  },
+  {
+   "id": "basque",
+   "name": "Basque",
+   "family": null,
+   "way_of_life": "settled",
+   "_from": "culture §7.2 (strangers to French); family not given by the design"
+  },
+  {
+   "id": "norman",
+   "name": "Norman",
+   "family": null,
+   "way_of_life": "settled",
+   "_from": "culture §3.1; family not given by the design"
+  },
+  {
+   "id": "cherokee",
+   "name": "Cherokee",
+   "family": null,
+   "way_of_life": "settled",
+   "_from": "culture §6.1 (indian_removal_act); family not given by the design"
+  },
+  {
+   "id": "galician",
+   "name": "Galician",
+   "family": null,
+   "way_of_life": "settled",
+   "_from": "drift.feature; family not given by the design"
+  },
+  {
+   "id": "swedish",
+   "name": "Swedish",
+   "family": "germanic",
+   "way_of_life": "settled",
+   "_from": "culture-design §3.3 Riga example"
+  },
+  {
+   "id": "bosnian",
+   "name": "Bosnian",
+   "family": "slavic",
+   "way_of_life": "settled",
+   "_from": "religion-design §11 (Bosnia converts, tongue stays)"
+  }
+ ],
+ "merge_events": {
+  "italian_unification": {
+   "into": "italian"
+  },
+  "german_unification": {
+   "into": "german"
+  }
+ },
+ "age_of_revolutions": {
+  "$comment": "event-tree data/ages.yaml age_of_revolutions window",
+  "earliest_start": 1750,
+  "force_start": 1800
+ },
+ "dots": {
+  "kin": "green",
+  "cousin": "yellow",
+  "stranger": "red",
+  "trading": "grey"
+ },
+ "lens": {
+  "far": "family",
+  "regional": "tongue",
+  "realm_toggle": "kin, cousin or stranger for the player's realm"
+ },
+ "charter_brought_by": [
+  "the ruler",
+  "its lords",
+  "its towns",
+  "a homeland rising"
+ ],
+ "ai": {
+  "policy": {
+   "hegemon seeker": {
+    "policy": "teach",
+    "with_printing": "impose"
+   },
+   "expansionist": {
+    "policy": "teach",
+    "with_printing": "impose"
+   },
+   "isolationist": {
+    "policy": "let_be"
+   },
+   "mercantile": {
+    "policy": "let_be"
+   },
+   "opportunist": {
+    "policy": "teach"
+   },
+   "zealot": {
+    "policy": "teach"
+   }
+  },
+  "levers": {
+   "hegemon seeker": [
+    "settlers into conquered border provinces",
+    "the war aim \"Gather our kin\" after 1789"
+   ],
+   "expansionist": [
+    "settlers into conquered border provinces",
+    "the war aim \"Gather our kin\" after 1789"
+   ],
+   "isolationist": [
+    "\"Own tongue\" charters to keep strangers calm",
+    "a welcome for trading peoples"
+   ],
+   "mercantile": [
+    "\"Own tongue\" charters to keep strangers calm",
+    "a welcome for trading peoples"
+   ],
+   "opportunist": [
+    "\"Free a people\" against neighbours with stranger homelands in revolt"
+   ],
+   "zealot": [
+    "expulsion of trading peoples of another faith"
+   ]
+  }
+ },
+ "risings": {
+  "homeland_draw": 0.08
+ },
+ "refugees": {
+  "settle_after_years": 2
+ },
+ "schools": {
+  "learned_tongues": [
+   "Latin",
+   "Classical Arabic"
+  ]
+ },
+ "_provisional": [
+  "relation",
+  "drift.base_rate_per_year",
+  "drift.court_pull_needs_years_held",
+  "drift.drop_below_share",
+  "drift.multipliers",
+  "drift.way_of_life_lands",
+  "policy",
+  "officials.years_to_full_effect",
+  "effects",
+  "nationalism",
+  "engine_events",
+  "risings.homeland_draw",
+  "refugees.settle_after_years",
+  "family_default_by_region"
+ ]
+}

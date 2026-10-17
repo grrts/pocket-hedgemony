@@ -1,0 +1,2525 @@
+{
+ "materials": {
+  "timber": {
+   "made_by": "lumber camp",
+   "price": 0.5
+  },
+  "stone": {
+   "made_by": "quarry",
+   "price": 0.5,
+   "far_price_multiplier": 2,
+   "far_after_rings": 3
+  },
+  "bricks": {
+   "made_by": "kiln",
+   "price": 0.8,
+   "counts_as": "stone"
+  },
+  "earth": {
+   "made_by": "anywhere",
+   "price": 0,
+   "counts_as": "stone",
+   "grounds": [
+    "drylands",
+    "desert",
+    "savanna"
+   ],
+   "upkeep_multiplier": 2
+  },
+  "iron": {
+   "made_by": "mine",
+   "price": 2,
+   "from_era": 4
+  },
+  "steel": {
+   "made_by": "factory",
+   "price": 3,
+   "from_era": 6
+  },
+  "concrete": {
+   "made_by": "factory",
+   "price": 3,
+   "from_era": 6
+  }
+ },
+ "ground_multiplier": {
+  "farmland": 1,
+  "hills": 1.25,
+  "mountains": 2,
+  "jungle": 2
+ },
+ "town_slots": {
+  "hamlet": 1,
+  "village": 2,
+  "market_town": 4,
+  "town": 6,
+  "city": 9,
+  "great_city": 12,
+  "capital_extra": 1
+ },
+ "town_sizes": [
+  "hamlet",
+  "village",
+  "market_town",
+  "town",
+  "city",
+  "great_city"
+ ],
+ "sites": {
+  "per_province": {
+   "land": 1,
+   "town": 1
+  },
+  "master_of_works": {
+   "extra_sites": 1,
+   "months_multiplier": 0.5
+  },
+  "half_crew_months_multiplier": 2,
+  "cancel_refund": 0.5,
+  "stop_months_by_climate": {
+   "cold": [
+    1
+   ],
+   "monsoon": [
+    7
+   ]
+  }
+ },
+ "condition": {
+  "neglected_output": 0.5,
+  "damaged_output": 0.5,
+  "years_neglected_to_lose_step": 10,
+  "repair_cost_share": 0.5,
+  "rebuild_cost_share": 0.5,
+  "demolish_material_refund": 0.25,
+  "neglect_recovery_months": 3
+ },
+ "damage": {
+  "plunder_share": 0.3333333333333333,
+  "plunder_share_with_walls": 0.16666666666666666,
+  "earthquake_share": 0.3333333333333333,
+  "fire_buildings": [
+   1,
+   3
+  ]
+ },
+ "village_works": {
+  "chance_per_year": 0.2,
+  "needs": {
+   "years_at_peace": 5,
+   "food_store_months_over": 3,
+   "homeless_or_full_slots": true
+  },
+  "builds": {
+   "fields": "farm",
+   "pasture": "ranch",
+   "shore": "fishery",
+   "woods": "lumber camp"
+  },
+  "owner": "commons"
+ },
+ "crafts_appearing": {
+  "builds": [
+   "loom house",
+   "tannery",
+   "kiln",
+   "brewery"
+  ],
+  "raw": {
+   "loom house": "wool",
+   "tannery": "hides",
+   "kiln": "clay",
+   "brewery": "grain"
+  },
+  "owners": [
+   "town",
+   "commons"
+  ]
+ },
+ "upkeep_groups": {
+  "land": [
+   0,
+   0.5
+  ],
+  "extraction": [
+   0.5,
+   2
+  ],
+  "crafts": [
+   0.5,
+   2
+  ],
+  "learning": [
+   2,
+   6
+  ],
+  "castle": [
+   3,
+   20
+  ],
+  "palace": [
+   5,
+   30
+  ],
+  "worship": "clergy"
+ },
+ "arsenal": {
+  "spoil_share_without": 0.1
+ },
+ "ai": {
+  "reserve_years_of_upkeep": 1,
+  "homeless_share_trigger": 0.05,
+  "food_months_trigger": 3
+ },
+ "advice": {
+  "max_lines": 5
+ },
+ "loyalty_steps": [
+  "wavering",
+  "loyal"
+ ],
+ "owners_may_build": {
+  "clergy": [
+   "house of worship",
+   "monastery",
+   "almshouse",
+   "hospital",
+   "school"
+  ],
+  "town": [
+   "market",
+   "town walls",
+   "guild hall",
+   "bridge"
+  ],
+  "company": [
+   "mine",
+   "warehouse",
+   "market",
+   "plantation",
+   "trading post"
+  ],
+  "commons": [
+   "farm",
+   "ranch",
+   "fishery",
+   "lumber camp"
+  ]
+ },
+ "company_output_share": 0.5,
+ "lord_traits": {
+  "Builder": [
+   "any"
+  ],
+  "Greedy": [
+   "market",
+   "mine"
+  ],
+  "Pious": [
+   "house of worship",
+   "monastery"
+  ],
+  "Warlike": [
+   "castle",
+   "drill yard"
+  ]
+ },
+ "clergy_order": [
+  "house of worship",
+  "monastery",
+  "almshouse",
+  "hospital",
+  "school"
+ ],
+ "town_order": [
+  "market",
+  "town walls",
+  "bridge",
+  "craft"
+ ],
+ "company_order": [
+  "warehouse",
+  "market",
+  "mine",
+  "plantation"
+ ],
+ "ai_personality": {
+  "mercantile": [
+   "market",
+   "harbour"
+  ],
+  "isolationist": [
+   "school"
+  ],
+  "hegemon_seeker": [
+   "castle",
+   "drill yard"
+  ]
+ },
+ "map_wealth": {
+  "1": {
+   "built_tile_share": 0.3333333333333333,
+   "buildings": [
+    "farm",
+    "ranch"
+   ]
+  },
+  "10": {
+   "built_tile_share": 1,
+   "town_step": 2
+  }
+ },
+ "templates": {
+  "European market town": [
+   {
+    "type": "market",
+    "name": "market"
+   },
+   {
+    "type": "house of worship",
+    "name": "church",
+    "faith": "catholic"
+   },
+   {
+    "type": "loom house",
+    "name": "loom house"
+   }
+  ],
+  "Sahel trade town": [
+   {
+    "type": "market",
+    "name": "market"
+   },
+   {
+    "type": "house of worship",
+    "name": "mosque",
+    "faith": "sunni"
+   },
+   {
+    "type": "caravanserai",
+    "name": "caravanserai"
+   }
+  ]
+ },
+ "variants": {
+  "house of worship": {
+   "Catholic Europe": "church",
+   "Sunni Maghreb": "mosque"
+  },
+  "market": {
+   "Ottoman lands": "bazaar",
+   "Mexico": "tianguis"
+  },
+  "caravanserai": {
+   "Andes": "tambo"
+  },
+  "castle": {
+   "Sahel": "tata"
+  },
+  "palace": {
+   "steppe": "ordu"
+  },
+  "granary": {
+   "Andes": "qollqa"
+  }
+ },
+ "landmarks": [
+  {
+   "id": "Hagia Sophia",
+   "province": "Constantinople",
+   "present_1444": true,
+   "building": "house of worship",
+   "step": 4,
+   "converts_by_event": 1453
+  },
+  {
+   "id": "Forbidden City",
+   "province": "Beijing",
+   "present_1444": true,
+   "building": "palace",
+   "step": 4
+  },
+  {
+   "id": "Alhambra",
+   "province": "Granada",
+   "present_1444": true,
+   "building": "palace",
+   "step": 3
+  },
+  {
+   "id": "Great Mosque of Djenné",
+   "province": "Djenné",
+   "present_1444": true,
+   "building": "house of worship",
+   "step": 4,
+   "material": "earth"
+  },
+  {
+   "id": "Sankore Mosque",
+   "province": "Timbuktu",
+   "present_1444": true,
+   "building": "school",
+   "step": 3
+  },
+  {
+   "id": "Masjid al-Haram",
+   "province": "Mecca",
+   "present_1444": true,
+   "building": "pilgrimage shrine",
+   "step": 4
+  },
+  {
+   "id": "St Peter's Basilica",
+   "province": "Rome",
+   "present_1444": false,
+   "founded_by_event": 1506,
+   "building": "house of worship",
+   "step": 4,
+   "asks_gifts_while_built": true
+  },
+  {
+   "id": "Topkapı Palace",
+   "province": "Constantinople",
+   "present_1444": false,
+   "founded_by_event": 1459,
+   "building": "palace",
+   "step": 4
+  },
+  {
+   "id": "Ulugh Beg Observatory",
+   "province": "Samarkand",
+   "present_1444": true,
+   "building": "observatory",
+   "step": 3
+  },
+  {
+   "id": "Kremlin",
+   "province": "Moscow",
+   "present_1444": true,
+   "building": "castle",
+   "step": 3
+  },
+  {
+   "id": "Templo Mayor",
+   "province": "Tenochtitlan",
+   "present_1444": true,
+   "building": "house of worship",
+   "step": 4
+  },
+  {
+   "id": "Coricancha",
+   "province": "Cusco",
+   "present_1444": true,
+   "building": "house of worship",
+   "step": 4
+  },
+  {
+   "id": "Angkor",
+   "province": "Angkor",
+   "present_1444": true,
+   "building": "house of worship",
+   "step": 4,
+   "condition": "neglected",
+   "restoring_is_decision": true
+  },
+  {
+   "id": "Venetian Arsenal",
+   "province": "Venice",
+   "present_1444": true,
+   "building": "shipyard",
+   "step": 4,
+   "slipways": 3
+  },
+  {
+   "id": "Taj Mahal",
+   "province": "Agra",
+   "present_1444": false,
+   "founded_by_event": 1632,
+   "building": "landmark tomb",
+   "step": 1
+  }
+ ],
+ "anchors": [
+  {
+   "id": "Kutná Hora mine",
+   "province": "Kutná Hora",
+   "building": "mine",
+   "from_year": 1444
+  },
+  {
+   "id": "Falun mine",
+   "province": "Falun",
+   "building": "mine",
+   "from_year": 1444
+  },
+  {
+   "id": "Bruges market",
+   "province": "Bruges",
+   "building": "market",
+   "from_year": 1444
+  },
+  {
+   "id": "Champagne fairs",
+   "province": "Troyes",
+   "building": "market",
+   "from_year": 1444
+  },
+  {
+   "id": "Malacca market",
+   "province": "Malacca",
+   "building": "market",
+   "from_year": 1444
+  },
+  {
+   "id": "Potosí mine",
+   "province": "Potosí",
+   "building": "mine",
+   "from_year": 1545,
+   "by_event": true
+  }
+ ],
+ "inventions": {
+  "F5": "Water and wind mills",
+  "W3": "Bombards",
+  "C16": "railways",
+  "G14": "Written constitution",
+  "T3": "Bills of exchange",
+  "L1": "L1",
+  "F8": "F8"
+ },
+ "buildings": [
+  {
+   "id": "farm",
+   "place": [
+    "fields"
+   ],
+   "class": "farmers",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "farm",
+     "cost": {
+      "gold": 30,
+      "months": 6,
+      "timber": 10,
+      "crew": 500
+     },
+     "unlocked_by": "start",
+     "jobs": 12000,
+     "upkeep": 0,
+     "makes": {
+      "grain": 1.5
+     }
+    },
+    {
+     "name": "mill farm",
+     "cost": {
+      "gold": 40,
+      "months": 8,
+      "timber": 20,
+      "crew": 500
+     },
+     "unlocked_by": "F5",
+     "jobs": 12000,
+     "upkeep": 0.5,
+     "needs": {
+      "any_of": [
+       "river",
+       "windy_ground"
+      ]
+     }
+    },
+    {
+     "name": "enclosed farm",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "timber": 20,
+      "crew": 500
+     },
+     "unlocked_by": "F15",
+     "jobs": 9000,
+     "upkeep": 0.5
+    }
+   ],
+   "crops": [
+    "grain",
+    "flax",
+    "hemp",
+    "cotton",
+    "dye_plants",
+    "tobacco"
+   ],
+   "food_crop": "grain"
+  },
+  {
+   "id": "rice paddy",
+   "place": [
+    "fields"
+   ],
+   "class": "farmers",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "rice paddy",
+     "cost": {
+      "gold": 40,
+      "months": 12,
+      "timber": 10
+     },
+     "unlocked_by": "F2",
+     "jobs": 18000,
+     "needs": {
+      "any_of": [
+       "shore",
+       "irrigation"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "terrace",
+   "place": [
+    "fields"
+   ],
+   "class": "farmers",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "terrace",
+     "cost": {
+      "gold": 50,
+      "months": 24,
+      "stone": 20
+     },
+     "unlocked_by": "F2",
+     "jobs": 12000
+    }
+   ]
+  },
+  {
+   "id": "raised fields",
+   "place": [
+    "marsh"
+   ],
+   "class": "farmers",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "raised fields",
+     "cost": {
+      "gold": 40,
+      "months": 18,
+      "timber": 10
+     },
+     "unlocked_by": "F6",
+     "jobs": 12000
+    }
+   ]
+  },
+  {
+   "id": "plantation",
+   "place": [
+    "fields"
+   ],
+   "class": "farmers",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "plantation",
+     "cost": {
+      "gold": 80,
+      "months": 24,
+      "timber": 20
+     },
+     "unlocked_by": "F10",
+     "jobs": 12000
+    }
+   ],
+   "forced_labour_bonus": false
+  },
+  {
+   "id": "grove",
+   "place": [
+    "fields"
+   ],
+   "class": "farmers",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "grove",
+     "cost": {
+      "gold": 40,
+      "months": 12,
+      "timber": 10,
+      "crew": 500
+     },
+     "unlocked_by": "start",
+     "jobs": 6000,
+     "upkeep": 0.5
+    }
+   ],
+   "years_to_bear": 3,
+   "aliases": [
+    "vineyard"
+   ]
+  },
+  {
+   "id": "ranch",
+   "place": [
+    "pasture"
+   ],
+   "class": "herders",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "ranch",
+     "cost": {
+      "gold": 20,
+      "months": 4,
+      "timber": 10
+     },
+     "unlocked_by": "start",
+     "jobs": 3000
+    }
+   ]
+  },
+  {
+   "id": "horse stud",
+   "place": [
+    "pasture"
+   ],
+   "class": "herders",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "horse stud",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "timber": 20
+     },
+     "unlocked_by": "F11",
+     "jobs": 3000
+    }
+   ]
+  },
+  {
+   "id": "irrigation works",
+   "place": [
+    "waste"
+   ],
+   "class": "farmers",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "irrigation works",
+     "cost": {
+      "gold": 60,
+      "months": 24,
+      "stone": 20
+     },
+     "unlocked_by": "F3",
+     "jobs": 1500
+    }
+   ]
+  },
+  {
+   "id": "monastery",
+   "place": [
+    "fields"
+   ],
+   "class": "clergy",
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "monastery",
+     "cost": {
+      "gold": 90,
+      "months": 36,
+      "stone": 40
+     },
+     "unlocked_by": "start",
+     "jobs": 6300,
+     "student_seats_with_L1": 20
+    }
+   ],
+   "outside_town": true,
+   "makes_clergy": true,
+   "grain_at_farm_rate": true,
+   "jobs_text": "300 clergy + 6,000 farmers"
+  },
+  {
+   "id": "lumber camp",
+   "place": [
+    "woods"
+   ],
+   "class": "woodsmen",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "lumber camp",
+     "cost": {
+      "gold": 10,
+      "months": 4
+     },
+     "unlocked_by": "start",
+     "jobs": 1500
+    }
+   ]
+  },
+  {
+   "id": "mine",
+   "place": [
+    "waste",
+    "hills",
+    "mountains"
+   ],
+   "class": "miners",
+   "limit": "per_place",
+   "group": "extraction",
+   "steps": [
+    {
+     "name": "mine",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "timber": 20
+     },
+     "unlocked_by": "start",
+     "jobs": 6000
+    },
+    {
+     "name": "shaft mine",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "C6",
+     "jobs": 6000
+    },
+    {
+     "name": "steam-pumped mine",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "C13",
+     "jobs": 6000
+    }
+   ]
+  },
+  {
+   "id": "quarry",
+   "place": [
+    "waste",
+    "hills",
+    "mountains"
+   ],
+   "class": "miners",
+   "limit": "per_place",
+   "group": "extraction",
+   "steps": [
+    {
+     "name": "quarry",
+     "cost": {
+      "gold": 20,
+      "months": 6,
+      "timber": 10,
+      "crew": 500
+     },
+     "unlocked_by": "start",
+     "jobs": 3000,
+     "upkeep": 0.5,
+     "makes": {
+      "stone": 40
+     }
+    }
+   ]
+  },
+  {
+   "id": "saltworks",
+   "place": [
+    "shore"
+   ],
+   "class": "miners",
+   "limit": "per_place",
+   "group": "extraction",
+   "steps": [
+    {
+     "name": "saltworks",
+     "cost": {
+      "gold": 20,
+      "months": 6,
+      "timber": 10
+     },
+     "unlocked_by": "start",
+     "jobs": 1500
+    }
+   ]
+  },
+  {
+   "id": "saltpetre works",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "saltpetre works",
+     "cost": {
+      "gold": 30,
+      "months": 6,
+      "timber": 10
+     },
+     "unlocked_by": "W3",
+     "jobs": 900,
+     "needs": {
+      "building_in_province_any": [
+       "ranch",
+       "horse stud"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "loom house",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "loom house",
+     "cost": {
+      "gold": 35,
+      "months": 6,
+      "timber": 10,
+      "crew": 1000
+     },
+     "unlocked_by": "start",
+     "jobs": 1500,
+     "upkeep": 1,
+     "makes": {
+      "cloth": 30
+     },
+     "eats": {
+      "wool": 30
+     }
+    },
+    {
+     "name": "draper's hall",
+     "cost": {
+      "gold": 80,
+      "months": 8,
+      "bricks": 20,
+      "crew": 1000
+     },
+     "unlocked_by": "start",
+     "jobs": 2400,
+     "upkeep": 1.5,
+     "eats": {
+      "dyes": 5
+     }
+    },
+    {
+     "name": "weaving manufactory",
+     "cost": {
+      "gold": 160,
+      "months": 18,
+      "stone": 40,
+      "crew": 2000
+     },
+     "unlocked_by": "C11",
+     "jobs": 3900,
+     "upkeep": 3,
+     "needs": {
+      "official_in_province": true
+     }
+    }
+   ],
+   "craft": true,
+   "converts_to": [
+    "forge",
+    "kiln",
+    "tannery",
+    "brewery"
+   ]
+  },
+  {
+   "id": "forge",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "forge",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "start",
+     "jobs": 1500
+    }
+   ],
+   "craft": true
+  },
+  {
+   "id": "kiln",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "kiln",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "start",
+     "jobs": 1500
+    }
+   ],
+   "craft": true
+  },
+  {
+   "id": "tannery",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "tannery",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "start",
+     "jobs": 1500
+    }
+   ],
+   "craft": true
+  },
+  {
+   "id": "brewery",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "brewery",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "start",
+     "jobs": 900
+    }
+   ],
+   "craft": true
+  },
+  {
+   "id": "press",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "press",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "L4",
+     "jobs": 900
+    },
+    {
+     "name": "printing house",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "start",
+     "effect": "schools_in_reach_cost_less"
+    }
+   ],
+   "craft": true
+  },
+  {
+   "id": "paper mill",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "paper mill",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "C1",
+     "jobs": 900
+    }
+   ],
+   "craft": true
+  },
+  {
+   "id": "powder mill",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "powder mill",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "W3",
+     "jobs": 900
+    },
+    {
+     "name": "gunpowder mills",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "C10",
+     "jobs": 900
+    }
+   ],
+   "craft": true
+  },
+  {
+   "id": "gun foundry",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "gun foundry",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "W3",
+     "jobs": 900
+    },
+    {
+     "name": "cannon works",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "C2",
+     "jobs": 900
+    }
+   ],
+   "craft": true
+  },
+  {
+   "id": "factory",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "factory",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "C14",
+     "jobs": 6000
+    },
+    {
+     "name": "powered factory",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "C19",
+     "jobs": 6000,
+     "needs": {
+      "building_in_province": "power station"
+     }
+    },
+    {
+     "name": "assembly plant",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "C21",
+     "jobs": 6000
+    }
+   ],
+   "makes_smoke": true,
+   "products": [
+    "textile mill",
+    "iron and steel works",
+    "engine works",
+    "cannery",
+    "chemical works",
+    "cement works"
+   ]
+  },
+  {
+   "id": "power station",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_province",
+   "group": null,
+   "steps": [
+    {
+     "name": "power station",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "C19",
+     "jobs": 900
+    }
+   ]
+  },
+  {
+   "id": "market",
+   "place": [
+    "town"
+   ],
+   "class": "market_folk",
+   "limit": "per_province",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "weekly market",
+     "cost": {
+      "gold": 40,
+      "months": 6,
+      "timber": 10,
+      "crew": 1000
+     },
+     "unlocked_by": "start",
+     "jobs": 1500,
+     "upkeep": 1,
+     "needs": {
+      "min_town": "village"
+     },
+     "flags": [
+      "trade_endpoint"
+     ]
+    },
+    {
+     "name": "yearly fair",
+     "cost": {
+      "gold": 100,
+      "months": 12,
+      "stone": 30,
+      "crew": 2000
+     },
+     "unlocked_by": "start",
+     "jobs": 2400,
+     "upkeep": 2,
+     "needs": {
+      "charter": "market charter",
+      "min_town": "market_town"
+     },
+     "flags": [
+      "trade_endpoint",
+      "hires_traders"
+     ]
+    },
+    {
+     "name": "trading house",
+     "cost": {
+      "gold": 200,
+      "months": 18,
+      "stone": 40,
+      "crew": 2000
+     },
+     "unlocked_by": "T3",
+     "jobs": 3000,
+     "upkeep": 3,
+     "needs": {
+      "min_town": "town"
+     },
+     "flags": [
+      "trade_endpoint",
+      "hires_traders",
+      "traders_start_stocked",
+      "bills_of_exchange"
+     ]
+    }
+   ],
+   "loot_first": true
+  },
+  {
+   "id": "caravanserai",
+   "place": [
+    "town"
+   ],
+   "class": "market_folk",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "caravanserai",
+     "cost": {
+      "gold": 40,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "start",
+     "jobs": 900,
+     "needs": {
+      "ring_work": "road"
+     },
+     "flags": [
+      "rest_stop"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "warehouse",
+   "place": [
+    "town"
+   ],
+   "class": "market_folk",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "warehouse",
+     "cost": {
+      "gold": 30,
+      "months": 6,
+      "timber": 20
+     },
+     "unlocked_by": "start",
+     "jobs": 900,
+     "needs": {
+      "building_in_province": "market"
+     },
+     "flags": [
+      "storage"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "counting house",
+   "place": [
+    "town"
+   ],
+   "class": "market_folk",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "counting house",
+     "cost": {
+      "gold": 60,
+      "months": 6,
+      "stone": 10
+     },
+     "unlocked_by": "T2",
+     "jobs": 600,
+     "flags": [
+      "counting_house"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trading post",
+   "place": [
+    "shore"
+   ],
+   "class": "market_folk",
+   "limit": "per_place",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "trading post",
+     "cost": {
+      "gold": 60,
+      "months": 6,
+      "timber": 20
+     },
+     "unlocked_by": "start",
+     "jobs": 300,
+     "flags": [
+      "trade_endpoint"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "bank",
+   "place": [
+    "town"
+   ],
+   "class": "market_folk",
+   "limit": "per_province",
+   "group": "crafts",
+   "steps": [
+    {
+     "name": "bank",
+     "cost": {
+      "gold": 150,
+      "months": 12,
+      "stone": 30
+     },
+     "unlocked_by": "T7",
+     "jobs": 900,
+     "needs": {
+      "min_town": "city"
+     },
+     "flags": [
+      "bank"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "house of worship",
+   "place": [
+    "town"
+   ],
+   "class": "clergy",
+   "limit": "per_faith_per_town",
+   "group": "worship",
+   "steps": [
+    {
+     "name": "step1",
+     "cost": {
+      "gold": 40,
+      "months": 12,
+      "stone": 20,
+      "crew": 1000
+     },
+     "unlocked_by": "start",
+     "jobs": 600,
+     "upkeep": 1
+    },
+    {
+     "name": "step2",
+     "cost": {
+      "gold": 120,
+      "months": 36,
+      "stone": 80,
+      "crew": 2000
+     },
+     "unlocked_by": "start",
+     "jobs": 1200,
+     "upkeep": 2
+    },
+    {
+     "name": "step3",
+     "cost": {
+      "gold": 300,
+      "months": 120,
+      "stone": 200,
+      "crew": 2000
+     },
+     "unlocked_by": "start",
+     "jobs": 2000,
+     "upkeep": 4,
+     "needs": {
+      "min_town": "city"
+     }
+    }
+   ],
+   "owner_default": "clergy",
+   "faith_effect": "pulls"
+  },
+  {
+   "id": "minority house of worship",
+   "place": [
+    "town"
+   ],
+   "class": "clergy",
+   "limit": "per_place",
+   "group": "worship",
+   "steps": [
+    {
+     "name": "minority house of worship",
+     "cost": {
+      "gold": 40,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "start",
+     "jobs": 300,
+     "needs": {
+      "any_of": [
+       {
+        "faith_share_at_least": 0.1
+       },
+       {
+        "charter": "Faith tolerance"
+       }
+      ]
+     }
+    }
+   ],
+   "owner_default": "clergy",
+   "faith_effect": "calms"
+  },
+  {
+   "id": "pilgrimage shrine",
+   "place": [
+    "holy_place"
+   ],
+   "class": "clergy",
+   "limit": "per_place",
+   "group": "worship",
+   "steps": [
+    {
+     "name": "pilgrimage shrine",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "start",
+     "jobs": 600
+    }
+   ],
+   "never_on_build_sheet": true,
+   "pilgrims_count_as_traders": true
+  },
+  {
+   "id": "school",
+   "place": [
+    "town"
+   ],
+   "class": "scholars",
+   "limit": "per_province",
+   "group": "learning",
+   "steps": [
+    {
+     "name": "temple school",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "L1",
+     "needs": {
+      "min_town": "market_town"
+     },
+     "seats": 20
+    },
+    {
+     "name": "madrasa or university",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "L2",
+     "seats": {
+      "madrasa": 30,
+      "university": 60
+     }
+    },
+    {
+     "name": "academy",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "L12",
+     "seats": 100
+    }
+   ]
+  },
+  {
+   "id": "library",
+   "place": [
+    "town"
+   ],
+   "class": "scholars",
+   "limit": "per_place",
+   "group": "learning",
+   "steps": [
+    {
+     "name": "library",
+     "cost": {
+      "gold": 80,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "L5",
+     "jobs": 300,
+     "needs": {
+      "building_step": [
+       "school",
+       2
+      ]
+     }
+    }
+   ],
+   "effects": [
+    "graduate_a_year_sooner",
+    "sacked_scholars_not_all_flee"
+   ]
+  },
+  {
+   "id": "observatory",
+   "place": [
+    "outside"
+   ],
+   "class": "scholars",
+   "limit": "per_place",
+   "group": "learning",
+   "steps": [
+    {
+     "name": "observatory",
+     "cost": {
+      "gold": 120,
+      "months": 24,
+      "stone": 40
+     },
+     "unlocked_by": "L3",
+     "jobs": 300,
+     "needs": {
+      "building_in_province": "school"
+     }
+    }
+   ],
+   "effects": [
+    "boats_inventions_double_rate"
+   ]
+  },
+  {
+   "id": "hospital",
+   "place": [
+    "town"
+   ],
+   "class": "clergy",
+   "limit": "per_province",
+   "group": "learning",
+   "steps": [
+    {
+     "name": "hospital",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "start",
+     "jobs": 600
+    }
+   ],
+   "town_death_rate_slower": 0.005,
+   "effects": [
+    "plague_spreads_slower"
+   ]
+  },
+  {
+   "id": "wells and drains",
+   "place": [
+    "ring"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "wells and drains",
+     "cost": {
+      "gold": 200,
+      "months": 36,
+      "stone": 60
+     },
+     "unlocked_by": "B11"
+    }
+   ],
+   "town_plague_deaths_factor": 0.5,
+   "town_size_bonus": 1
+  },
+  {
+   "id": "almshouse",
+   "place": [
+    "town"
+   ],
+   "class": "clergy",
+   "limit": "per_place",
+   "group": "learning",
+   "steps": [
+    {
+     "name": "almshouse",
+     "cost": {
+      "gold": 30,
+      "months": 6,
+      "stone": 10
+     },
+     "unlocked_by": "start",
+     "jobs": 600
+    }
+   ],
+   "shelters_homeless": 3000
+  },
+  {
+   "id": "palace",
+   "place": [
+    "capital_extra"
+   ],
+   "class": "clerks",
+   "limit": "per_realm",
+   "group": "palace",
+   "steps": [
+    {
+     "name": "palace",
+     "cost": {
+      "gold": 100,
+      "months": 24,
+      "stone": 60,
+      "crew": 2000
+     },
+     "unlocked_by": "start",
+     "jobs": 600,
+     "upkeep": 5,
+     "officials": 6,
+     "lords": 2
+    },
+    {
+     "name": "great palace",
+     "cost": {
+      "gold": 300,
+      "months": 60,
+      "stone": 150,
+      "crew": 3000
+     },
+     "unlocked_by": "start",
+     "jobs": 1200,
+     "upkeep": 10,
+     "officials": 10,
+     "lords": 4
+    },
+    {
+     "name": "royal city",
+     "cost": {
+      "gold": 700,
+      "months": 120,
+      "stone": 300,
+      "crew": 4000
+     },
+     "unlocked_by": "G9",
+     "jobs": 2000,
+     "upkeep": 20,
+     "officials": 16,
+     "lords": 6
+    }
+   ]
+  },
+  {
+   "id": "seat",
+   "place": [
+    "town"
+   ],
+   "class": "clerks",
+   "limit": "per_province",
+   "group": null,
+   "steps": [
+    {
+     "name": "seat",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "start",
+     "jobs": 300,
+     "officials": 2
+    },
+    {
+     "name": "seat step 2",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "G11",
+     "officials": 4
+    }
+   ]
+  },
+  {
+   "id": "chancery",
+   "place": [
+    "town"
+   ],
+   "class": "clerks",
+   "limit": "per_realm",
+   "group": null,
+   "steps": [
+    {
+     "name": "chancery",
+     "cost": {
+      "gold": 80,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "G3",
+     "jobs": 300,
+     "officials": 4
+    }
+   ],
+   "enables": [
+    "G3",
+    "G10"
+   ]
+  },
+  {
+   "id": "court of law",
+   "place": [
+    "town"
+   ],
+   "class": "clerks",
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "court of law",
+     "cost": {
+      "gold": 50,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "G1",
+     "jobs": 300,
+     "lords": 2
+    }
+   ]
+  },
+  {
+   "id": "diet hall",
+   "place": [
+    "town"
+   ],
+   "class": "clerks",
+   "limit": "per_realm",
+   "group": null,
+   "steps": [
+    {
+     "name": "diet hall",
+     "cost": {
+      "gold": 100,
+      "months": 18,
+      "stone": 40
+     },
+     "unlocked_by": "start",
+     "jobs": 300,
+     "lords": 3
+    }
+   ]
+  },
+  {
+   "id": "hostage residence",
+   "place": [
+    "town"
+   ],
+   "class": "clerks",
+   "limit": "per_realm",
+   "group": null,
+   "steps": [
+    {
+     "name": "hostage residence",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "start",
+     "jobs": 300,
+     "lords": 3
+    }
+   ]
+  },
+  {
+   "id": "examination hall",
+   "place": [
+    "town"
+   ],
+   "class": "scholars",
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "examination hall",
+     "cost": {
+      "gold": 120,
+      "months": 18,
+      "stone": 40
+     },
+     "unlocked_by": "G4",
+     "jobs": 300,
+     "officials": 4
+    }
+   ]
+  },
+  {
+   "id": "parliament house",
+   "place": [
+    "town"
+   ],
+   "class": "clerks",
+   "limit": "per_realm",
+   "group": null,
+   "steps": [
+    {
+     "name": "parliament house",
+     "cost": {
+      "gold": 250,
+      "months": 36,
+      "stone": 100
+     },
+     "unlocked_by": "G14",
+     "jobs": 600,
+     "officials": 6
+    }
+   ]
+  },
+  {
+   "id": "mint",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_province",
+   "group": null,
+   "steps": [
+    {
+     "name": "mint",
+     "cost": {
+      "gold": 80,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "start",
+     "jobs": 300
+    }
+   ],
+   "coins": [
+    "silver",
+    "gold"
+   ]
+  },
+  {
+   "id": "castle",
+   "place": [
+    "castle"
+   ],
+   "class": "garrison",
+   "limit": "per_province",
+   "group": "castle",
+   "steps": [
+    {
+     "name": "earthwork ring fort",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "timber": 40,
+      "crew": 2000
+     },
+     "unlocked_by": "B4",
+     "upkeep": 3
+    },
+    {
+     "name": "stone castle",
+     "cost": {
+      "gold": 300,
+      "months": 36,
+      "stone": 200,
+      "crew": 3000
+     },
+     "unlocked_by": "B1",
+     "upkeep": 6
+    },
+    {
+     "name": "bastion fort",
+     "cost": {
+      "gold": 600,
+      "months": 48,
+      "stone": 400,
+      "crew": 4000
+     },
+     "unlocked_by": "B5",
+     "upkeep": 12
+    },
+    {
+     "name": "star fort",
+     "cost": {
+      "gold": 900,
+      "months": 60,
+      "stone": 600,
+      "crew": 5000
+     },
+     "unlocked_by": "B6",
+     "upkeep": 20
+    },
+    {
+     "name": "concrete fortress",
+     "cost": {
+      "gold": 1200,
+      "months": 36,
+      "concrete": 300,
+      "crew": 4000
+     },
+     "unlocked_by": "B13",
+     "upkeep": 25
+    }
+   ]
+  },
+  {
+   "id": "granary",
+   "place": [
+    "part_of_castle"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "granary",
+     "cost": {
+      "gold": 30,
+      "months": 6,
+      "timber": 20
+     },
+     "unlocked_by": "start"
+    }
+   ],
+   "needs_castle": true
+  },
+  {
+   "id": "town walls",
+   "place": [
+    "ring"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "palisade",
+     "cost": {
+      "gold": 30,
+      "months": 6,
+      "timber": 40
+     },
+     "unlocked_by": "start"
+    },
+    {
+     "name": "stone walls",
+     "cost": {
+      "gold": 200,
+      "months": 36,
+      "stone": 150
+     },
+     "unlocked_by": "start"
+    },
+    {
+     "name": "bastioned walls",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "B5"
+    }
+   ]
+  },
+  {
+   "id": "drill yard",
+   "place": [
+    "town"
+   ],
+   "class": null,
+   "limit": "per_province",
+   "group": null,
+   "steps": [
+    {
+     "name": "drill yard",
+     "cost": {
+      "gold": 40,
+      "months": 6,
+      "timber": 20,
+      "crew": 500
+     },
+     "unlocked_by": "start",
+     "upkeep": 1,
+     "needs": {
+      "min_town": "town"
+     },
+     "training_room": 1500
+    },
+    {
+     "name": "barracks",
+     "cost": {
+      "gold": 120,
+      "months": 18,
+      "stone": 60,
+      "crew": 1500
+     },
+     "unlocked_by": "W12",
+     "upkeep": 3,
+     "training_room": 4000,
+     "no_soldiers_quartered": true
+    }
+   ]
+  },
+  {
+   "id": "arsenal",
+   "place": [
+    "town"
+   ],
+   "class": "craftsmen",
+   "limit": "per_province",
+   "group": null,
+   "steps": [
+    {
+     "name": "arsenal",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "stone": 30
+     },
+     "unlocked_by": "start",
+     "jobs": 300
+    }
+   ],
+   "stores_keep": true
+  },
+  {
+   "id": "watchtower line",
+   "place": [
+    "ring"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "watchtower line",
+     "cost": {
+      "gold": 20,
+      "months": 6,
+      "stone": 20
+     },
+     "unlocked_by": "start"
+    }
+   ],
+   "effects": [
+    "enemy_armies_seen_one_province_further",
+    "raids_spotted_a_season_ahead"
+   ]
+  },
+  {
+   "id": "airfield",
+   "place": [
+    "fields"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "airfield",
+     "cost": {
+      "gold": 150,
+      "months": 6,
+      "concrete": 40
+     },
+     "unlocked_by": "B16"
+    }
+   ]
+  },
+  {
+   "id": "harbour",
+   "place": [
+    "shore"
+   ],
+   "class": "seafolk",
+   "limit": "per_province",
+   "group": null,
+   "steps": [
+    {
+     "name": "harbour",
+     "cost": {
+      "gold": 40,
+      "months": 12,
+      "timber": 20,
+      "crew": 1000
+     },
+     "unlocked_by": "start",
+     "jobs": 1500,
+     "upkeep": 1,
+     "berths": 10
+    },
+    {
+     "name": "port",
+     "cost": {
+      "gold": 120,
+      "months": 24,
+      "stone": 60,
+      "crew": 2000
+     },
+     "unlocked_by": "start",
+     "jobs": 3000,
+     "upkeep": 3,
+     "needs": {
+      "min_town": "market_town"
+     },
+     "berths": 25
+    },
+    {
+     "name": "great port",
+     "cost": {
+      "gold": 300,
+      "months": 36,
+      "stone": 120,
+      "crew": 3000
+     },
+     "unlocked_by": "S13",
+     "jobs": 4500,
+     "upkeep": 6,
+     "berths": 50
+    }
+   ],
+   "port": true,
+   "raises_sailors": true
+  },
+  {
+   "id": "shipyard",
+   "place": [
+    "shore"
+   ],
+   "class": "seafolk",
+   "limit": "per_province",
+   "group": null,
+   "steps": [
+    {
+     "name": "slipway yard",
+     "cost": {
+      "gold": 60,
+      "months": 12,
+      "timber": 40,
+      "crew": 1000
+     },
+     "unlocked_by": "start",
+     "jobs": 3000,
+     "upkeep": 2,
+     "slipways": 1
+    },
+    {
+     "name": "shipyard",
+     "cost": {
+      "gold": 150,
+      "months": 18,
+      "timber": 80,
+      "crew": 2000
+     },
+     "unlocked_by": "S4",
+     "jobs": 4500,
+     "upkeep": 4,
+     "slipways": 2
+    },
+    {
+     "name": "naval dockyard",
+     "cost": {
+      "gold": 400,
+      "months": 36,
+      "stone": 120,
+      "crew": 3000
+     },
+     "unlocked_by": "S10",
+     "jobs": 6000,
+     "upkeep": 8,
+     "slipways": 2
+    }
+   ],
+   "needs_building": "harbour"
+  },
+  {
+   "id": "fishery",
+   "place": [
+    "shore"
+   ],
+   "class": "seafolk",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "fishery",
+     "cost": {
+      "gold": 15,
+      "months": 4,
+      "timber": 10
+     },
+     "unlocked_by": "start",
+     "jobs": 3000
+    }
+   ]
+  },
+  {
+   "id": "lighthouse",
+   "place": [
+    "shore"
+   ],
+   "class": "seafolk",
+   "limit": "per_province",
+   "group": null,
+   "steps": [
+    {
+     "name": "lighthouse",
+     "cost": {
+      "gold": 60,
+      "months": 18,
+      "stone": 40
+     },
+     "unlocked_by": "start",
+     "jobs": 100
+    }
+   ],
+   "next_zone_storm_loss_factor": 0.5
+  },
+  {
+   "id": "naval base",
+   "place": [
+    "shore"
+   ],
+   "class": "seafolk",
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "naval base",
+     "cost": {
+      "gold": 200,
+      "months": 24,
+      "stone": 100
+     },
+     "unlocked_by": "S10",
+     "jobs": 600,
+     "needs": {
+      "building_step": [
+       "harbour",
+       3
+      ]
+     }
+    }
+   ],
+   "effects": [
+    "based_crews_kept_in_peace_without_pay",
+    "reinforces_sea_battles_next_to_it"
+   ]
+  },
+  {
+   "id": "road",
+   "place": [
+    "ring"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "track",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "start"
+    },
+    {
+     "name": "road",
+     "cost": {
+      "gold": 40,
+      "months": 12,
+      "stone": 20
+     },
+     "unlocked_by": "B2"
+    },
+    {
+     "name": "paved road",
+     "cost": {
+      "gold": 120,
+      "months": 24,
+      "stone": 80
+     },
+     "unlocked_by": "B9"
+    },
+    {
+     "name": "turnpike",
+     "cost": {
+      "gold": null,
+      "months": null
+     },
+     "unlocked_by": "start"
+    },
+    {
+     "name": "railway",
+     "cost": {
+      "gold": 300,
+      "months": 24,
+      "steel": 100
+     },
+     "unlocked_by": "C16"
+    }
+   ]
+  },
+  {
+   "id": "bridge",
+   "place": [
+    "shore"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "bridge",
+     "cost": {
+      "gold": 40,
+      "months": 18,
+      "stone": 40
+     },
+     "unlocked_by": "start"
+    }
+   ],
+   "toll_point": true
+  },
+  {
+   "id": "canal",
+   "place": [
+    "ring"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "canal",
+     "cost": {
+      "gold": 400,
+      "months": 60,
+      "stone": 100,
+      "crew": 6000
+     },
+     "unlocked_by": "B3"
+    }
+   ],
+   "adds_river": true
+  },
+  {
+   "id": "dykes",
+   "place": [
+    "ring"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "dykes",
+     "cost": {
+      "gold": 100,
+      "months": 36,
+      "stone": 60
+     },
+     "unlocked_by": "start"
+    }
+   ],
+   "stops_floods_to_marsh": true,
+   "drain_marsh_with": "F8"
+  },
+  {
+   "id": "rail station",
+   "place": [
+    "town"
+   ],
+   "class": null,
+   "limit": "per_province",
+   "group": null,
+   "steps": [
+    {
+     "name": "rail station",
+     "cost": {
+      "gold": 150,
+      "months": 12,
+      "steel": 40
+     },
+     "unlocked_by": "C16"
+    }
+   ]
+  },
+  {
+   "id": "telegraph office",
+   "place": [
+    "town"
+   ],
+   "class": null,
+   "limit": "per_place",
+   "group": null,
+   "steps": [
+    {
+     "name": "telegraph office",
+     "cost": {
+      "gold": 60,
+      "months": 6,
+      "iron": 10
+     },
+     "unlocked_by": "T14"
+    }
+   ],
+   "days_to_capital": 1
+  }
+ ]
+}
