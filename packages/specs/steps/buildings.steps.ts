@@ -2,6 +2,15 @@ import { expect } from "vitest";
 import { Rng } from "@ph/engine";
 import * as B from "@ph/engine/domain/buildings";
 import { steps, type Scenario } from "../src/registry.ts";
+import ports1444 from "../../rules/data/domain/naval-ports-1444.json" with { type: "json" };
+
+const TIER_STEP: Record<string, number> = { small: 1, port: 2, great: 3 };
+/** Harbour step per province from the naval ports-1444 list (D-BLD-8): the best tier there; landings have none. */
+const PORTS = new Map<string, number>();
+for (const t of ports1444.towns as { province: string; tier: string }[]) {
+  const step = TIER_STEP[t.tier];
+  if (step) PORTS.set(t.province, Math.max(step, PORTS.get(t.province) ?? 0));
+}
 
 const { Given, When, Then } = steps("buildings");
 
@@ -448,8 +457,8 @@ When("a site in {string} buys {int} loads of {string}", (s, p: string, n: number
   s.paid = source.from === "market" ? source.gold : 0;
 });
 
-Then("it pays {int} gold", (s, gold: number) => {
-  expect(s.paid).toBeCloseTo(gold, 6);
+Then(/^it pays ([\d.]+) gold$/, (s, gold: string) => {
+  expect(s.paid).toBeCloseTo(Number(gold), 6);
 });
 
 Given("the province {string} is more than {int} provinces from any quarry", (s, p: string, n: number) => {
@@ -801,6 +810,7 @@ When("the player tries to upgrade the market to a yearly fair", (s) => {
 Then("the upgrade is refused", (s) => {
   expect(s.check.ok).toBe(false);
   P(s, "Troyes", { townSize: "city" }).charters.add("market charter");
+  R(s).inventions.add("T6");
   expect(B.upgrade(R(s), "Troyes", s.building).ok).toBe(true);
 });
 
@@ -1041,10 +1051,11 @@ Then(/^(one building is damaged|one building is ruined|one land building is dama
   if (result.startsWith("one land")) expect(s.hit.place.startsWith("tile:")).toBe(true);
 });
 
-Given(/^the province "([^"]+)" has (\d+) town buildings and (no town walls|stone town walls)$/, (s, p: string, n: string, walls: string) => {
+Given(/^the province "([^"]+)" has (\d+) town buildings and (no town walls|stone town walls|a palisade)$/, (s, p: string, n: string, walls: string) => {
   P(s, p, { townSize: "great_city" });
   for (let i = 0; i < Number(n); i++) place(s, p, "loom house");
   if (walls === "stone town walls") place(s, p, "stone walls");
+  if (walls === "a palisade") place(s, p, "palisade");
   s.province = p;
 });
 
@@ -2406,3 +2417,139 @@ Then("the turn report has one line saying so", (s) => {
   expect(s.newLines).toHaveLength(1);
 });
 
+
+// ---------------------------------------------------------------- decided rules (spec §13, BLD-155 to BLD-161)
+
+Given("the province {string} is a market town with a weekly market and a market charter", (s, p: string) => {
+  P(s, p, { townSize: "market_town", charters: new Set(["market charter"]) });
+  s.building = place(s, p, "weekly market");
+});
+When("the country {string} learns T6", (s) => {
+  R(s).inventions.add("T6");
+});
+Then("a yearly fair may be built in {string}", (s, p: string) => {
+  expect(B.mayBuildYearlyFair(R(s), p)).toBeNull();
+});
+Then(/^the "(caravanserai|counting house)" gives "([^"]+)"$/, (_s, b: "caravanserai" | "counting house", role: string) => {
+  expect(B.tradeRole(b)).toBe(role);
+});
+Given("a town of size {string}", (s, size: B.TownSize) => {
+  s.townSizeOnly = size;
+});
+Then("its chance of a fire this year is {}", (s, c: string) => {
+  expect(B.townFireChance(s.townSizeOnly)).toBeCloseTo(Number(c.replace(/\s*%/, "")) / 100);
+});
+Given(/^a raid of ([\d,]+) men$/, (s, n: string) => {
+  s.raidMen = Number(n.replace(/,/g, ""));
+});
+Then(/^the raid is (small|big)$/, (s, size: string) => {
+  expect(B.isBigRaid(s.raidMen)).toBe(size === "big");
+});
+Given("the province {string} has 2 burned farm tiles", (s, p: string) => {
+  P(s, p, { tiles: [{ use: "fields", burned: true }, { use: "fields", burned: true }] });
+  B.placeBuilding(R(s), p, "farm", "tile:1", { condition: "ruined" });
+  B.placeBuilding(R(s), p, "farm", "tile:2", { condition: "ruined" });
+  s.province = p;
+});
+When("a year of peace passes", (s) => {
+  s.rebuilt = [];
+  for (let i = 0; i < B.freeRebuildsPerYear(); i++) {
+    const b = B.yearlySelfRebuild(R(s), s.province);
+    if (b) s.rebuilt.push(b);
+  }
+});
+Then("1 farm rebuilds by itself for free", (s) => {
+  expect(s.rebuilt).toHaveLength(1);
+  expect(B.prov(R(s), s.province).buildings.filter((b) => b.condition === "ruined")).toHaveLength(1);
+});
+Then(/^paying (\d+) gold rebuilds the other within (\d+) months$/, (_s, g: string, m: string) => {
+  expect(B.paidRebuild()).toEqual({ gold: Number(g), months: Number(m) });
+});
+Given(/^the landmark "([^"]+)" stands in "([^"]+)"$/, (s, id: string, p: string) => {
+  expect(B.landmark(id).province).toBe(p);
+  s.landmarkId = id;
+});
+Then("it is a {string}", (s, type: string) => {
+  expect(B.landmarkInfo(s.landmarkId).type).toBe(type);
+});
+Then("its own effect is {string}", (s, effect: string) => {
+  expect(B.landmarkInfo(s.landmarkId).effect).toBe(effect);
+});
+Then("the variant {string} for {string} is stored in the buildings data, changing {string}", (_s, id: string, who: string, change: string) => {
+  expect(B.uniqueVariant(id)).toEqual({ who, change });
+});
+Given(/^the province "Troyes" is touched by (a|no) trade route$/, (s, a: string) => {
+  s.onRoute = a === "a";
+});
+When("a site there buys 30 stone", (s) => {
+  s.paid = B.buyPrice("stone", 30, 0, s.onRoute);
+});
+When("the player starts a market costing 40 gold and 6 months", (s) => {
+  s.mowCost = B.costOf("market", 1, "farmland", true);
+  const res = B.startSite(R(s), s.province, "market");
+  expect(res.ok).toBe(true);
+});
+Then("it costs 30 gold and takes 3 months", (s) => {
+  expect(s.mowCost.gold).toBe(30);
+  expect(s.mowCost.months).toBe(3);
+});
+Then(/^(\d+) provinces from the naval ports-1444 list have a harbour with its step$/, (_s, n: string) => {
+  expect(B.startingPortsFile()).toBe("naval-ports-1444");
+  expect(PORTS.size).toBe(Number(n));
+});
+Then(/^the (\d+) provinces with a great port of the time have harbour step 3$/, (_s, n: string) => {
+  expect([...PORTS.values()].filter((x) => x === 3)).toHaveLength(Number(n));
+});
+Then(/^the town of "([^"]+)" is a "([^"]+)" with (\d+) town slots$/, (_s, _p: string, size: string, n: string) => {
+  expect(B.troyes1444()).toEqual({ townSize: size, slots: Number(n) });
+});
+Then(/^road step (\d) is the "([^"]+)", needing "([^"]+)" and (\d+) gold$/, (_s, step: string, name: string, unlock: string, gold: string) => {
+  expect(B.roadSteps()[Number(step) - 1]).toEqual({ name, unlock, gold: Number(gold) });
+});
+Then("the {string} has steps up to {int}", (_s, type: string, top: number) => {
+  expect(B.stepsUpTo(type)).toBe(top);
+});
+When("the player pays 15 gold to rebuild the burned field", (s) => {
+  s.paidRebuild = B.paidRebuild();
+  expect(s.paidRebuild.gold).toBe(15);
+});
+Then("the farm is rebuilt in 3 months instead of a year", (s) => {
+  expect(s.paidRebuild.months).toBe(3);
+  expect(s.paidRebuild.months).toBeLessThan(12);
+});
+Then("500 of the homeless form the crew", (s) => {
+  expect(B.stepDef("farm", 1).cost.crew).toBe(500);
+  expect(B.prov(R(s), "Troyes").homeless).toBeGreaterThanOrEqual(500);
+});
+Then("when it is done they move into the farm's slots", () => {
+  expect(B.stepDef("farm", 1).jobs ?? 0).toBeGreaterThanOrEqual(500);
+});
+Given("no free town slot is left in {string}", (s, p: string) => {
+  const q = B.prov(R(s), p);
+  expect(B.townSlotsUsed(q)).toBe(B.townSlots(q.townSize));
+});
+Given("a market charter is granted in {string}", (s, p: string) => {
+  B.prov(R(s), p).charters.add("market charter");
+  P(s, "Champagne").lord = "Count of Champagne";
+  P(s, "Champagne").makes.add("stone");
+});
+When("the player upgrades the market to a yearly fair for 100 gold, 30 stone and 12 months", (s) => {
+  const c = B.costOf("market", 2);
+  expect([c.gold, c.materials.stone, c.months]).toEqual([100, 30, 12]);
+  const market = B.prov(R(s), "Troyes").buildings.find((b) => b.type === "market")!;
+  s.check = B.upgrade(R(s), "Troyes", market);
+  expect(s.check.ok).toBe(true);
+});
+Then("the stone comes free from a quarry in a lord's province one ring away, which counts as the crown's own", (s) => {
+  expect(B.sourceMaterial(R(s), "Troyes", "stone", 30)).toEqual({ from: "reach", province: "Champagne", along: "ring" });
+});
+Then("the crew of 2000 is all homeless", (s) => {
+  expect(B.stepDef("market", 2).cost.crew).toBe(2000);
+  expect(B.prov(R(s), "Troyes").homeless).toBe(3600 - 2000);
+});
+Then("when the fair opens it takes 900 more market folk", () => {
+  expect((B.stepDef("market", 2).jobs ?? 0) - (B.stepDef("market", 1).jobs ?? 0)).toBe(900);
+});
+Then("traders can be hired in {string}", () => {
+  expect(B.stepFlags("market", 2)).toContain("hires_traders");
+});

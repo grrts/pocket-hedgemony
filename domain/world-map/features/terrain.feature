@@ -146,8 +146,7 @@ Feature: Terrain tile types and grounds
       | badlands  | waste (mines)             |
       | paddies   | fields with rice paddies  |
 
-  @MAP-028 @open-question
-  # OQ-MAP-1: provinces store only the ground, not the tile type these rules need
+  @MAP-028
   Scenario Outline: Adopted terrain proposals hold as map facts
     Given a province of the tile type "<type>"
     When movement reads it
@@ -159,3 +158,22 @@ Feature: Terrain tile types and grounds
       | dunes     | guns can't cross without camels and there is no foraging        |
       | glacier   | armies can't enter                                             |
       | paddies   | it is slower to cross in the wet season                        |
+
+  @MAP-048
+  Scenario Outline: Terrain proposals troop movement did not adopt are dropped
+    Given the terrain proposal "<proposal>"
+    When the map's facts are read
+    Then the proposal changes nothing in the game
+
+    Examples:
+      | proposal                 |
+      | broadleaf                |
+      | mediterranean            |
+      | steppe                   |
+      | colddesert               |
+      | swamp                    |
+      | badlands                 |
+      | highlands                |
+      | snowpeaks cold sickness  |
+      | glacier unsettleable     |
+      | paddies horse            |

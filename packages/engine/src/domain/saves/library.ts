@@ -12,7 +12,9 @@ import {
   headerSpan,
   readHeader,
   savesConfig,
+  type AppTier,
   type CampaignOptions,
+  type SaveFlags,
   type Platform,
   type RawChunk,
   type SaveHeader,
@@ -170,6 +172,12 @@ export interface Campaign {
   /** A save that failed the hash check was opened in this campaign. */
   modified: boolean;
   playSeconds: number;
+  /** The player played on as another realm after game over (D-SAVE-1). */
+  switchedCountry?: boolean;
+  /** The campaign began as the tutorial (D-SAVE-1). */
+  beganAsTutorial?: boolean;
+  /** The app that writes its saves; full when not given (D-SAVE-13). */
+  app?: AppTier;
 }
 
 export const DEFAULT_OPTIONS: CampaignOptions = { difficulty: "normal", events: "historical", endDate: "1939-08-31" };
@@ -345,7 +353,8 @@ export function buildSave(ctx: SaveContext, campaign: Campaign, world: World, ki
     ironman: campaign.ironman,
     playSeconds: campaign.playSeconds,
     options: campaign.options,
-    tier: { nation: campaign.playerNation, needsFullGame: needsFullGame(campaign.playerNation) },
+    tier: { nation: campaign.playerNation, needsFullGame: needsFullGame(campaign.playerNation), app: campaign.app ?? "full" },
+    flags: saveFlags(campaign),
     worldHash: hashWorld(restoreWorld(new Map(chunks.map((c) => [c.id, c])), world.rules).world),
     thumbnail: thumbnail(world, campaign.playerNation),
     modified: campaign.modified,
@@ -398,7 +407,7 @@ export function trySave(ctx: SaveContext, campaign: Campaign, world: World, kind
 
 // ---------------------------------------------------------------- autosaves
 
-/** The autosave interval as the settings offer it: 1, 6 or 12 turns, or off. */
+/** The autosave interval as the settings offer it: every 1, 6 or 12 months, or off (X-18: monthly at most). */
 export type AutosaveInterval = 1 | 6 | 12 | "off";
 
 export interface AutosaveOptions {
@@ -407,7 +416,7 @@ export interface AutosaveOptions {
 }
 
 export const AUTOSAVE_DEFAULTS: AutosaveOptions = {
-  interval: C.kinds.autosave.interval_turns as AutosaveInterval,
+  interval: C.kinds.autosave.interval_months as AutosaveInterval,
   keep: C.kinds.autosave.keep as 1 | 3 | 5,
 };
 
@@ -418,15 +427,18 @@ export function autosaveChoices(): { intervals: string[]; counts: number[] } {
 }
 
 /**
- * Whether the turn starting in `month` writes an autosave (SAVE-008). Every 12
- * turns means each January; for every 6 turns the months are not designed
- * (OQ-SAVE-9), so the answer is undefined. Off and ironman never autosave.
+ * Whether a turn writes an autosave at its start (SAVE-008, SAVE-100):
+ * `monthBegins` is the month that begins in the turn, or null when none does
+ * (X-18: the rotating autosave stays monthly, so a turn that begins no month
+ * writes none). Every 12 months means each January, every 6 months January
+ * and July (D-SAVE-9). Off and ironman never autosave.
  */
-export function autosaveDue(interval: AutosaveInterval, month: number, ironman = false): boolean | undefined {
-  if (ironman || interval === "off") return false;
+export function autosaveDue(interval: AutosaveInterval, monthBegins: number | null, ironman = false): boolean {
+  if (ironman || interval === "off" || monthBegins === null) return false;
+  const month = monthBegins;
   if (interval === 1) return true;
   if (interval === 12) return month === C.kinds.autosave.every_12_month;
-  return undefined;
+  return C.kinds.autosave.every_6_months.includes(month);
 }
 
 // ---------------------------------------------------------------- Continue and the Load screen
@@ -541,6 +553,8 @@ export interface OrdersJournal {
   turn: number;
   resumeHash: string;
   orders: Order[];
+  /** Choices made at before-the-battle stops, by day (D-SAVE-10). */
+  choices?: { day: number; choice: string }[];
 }
 
 /** The hash a journal names its Resume save by. */
@@ -557,7 +571,7 @@ export function journalApplies(journal: Pick<OrdersJournal, "turn" | "resumeHash
   return journal.turn === resume.turn && journal.resumeHash === resume.hash;
 }
 
-export type Lifecycle = "end_turn" | "pause" | "quit" | "suspend" | "background" | "safety_timer";
+export type Lifecycle = "end_turn" | "pause" | "quit" | "exit_to_menu" | "suspend" | "background" | "safety_timer";
 
 /**
  * What a lifecycle moment writes (save-system §3.1, §3.2, §5.2): the journal
@@ -696,7 +710,9 @@ export function continueCampaign(
  * file as a new Manual save; an ironman save instead starts on this device as
  * the newest of its line, following the imported one.
  */
-export function importSave(ctx: SaveContext, bytes: Uint8Array): { kind: "imported"; entry: SaveEntry } | { kind: "rejected"; message: string } {
+export function importSave(ctx: SaveContext, bytes: Uint8Array, online = true): { kind: "imported"; entry: SaveEntry } | { kind: "rejected"; message: string } {
+  // An ironman save is imported only online, so the head check runs (D-SAVE-15, SAVE-102).
+  if (!online && readHeader(bytes).kind === "ironman") return { kind: "rejected", message: M.ironman_import_offline };
   // The nation lock is checked when the imported save is opened, like any other.
   const r = openSave(bytes, { rules: ctx.rules, fullGame: true });
   if (r.kind === "rejected") return { kind: "rejected", message: r.message };
@@ -749,4 +765,45 @@ export function bugReport(storage: SaveStorage, campaignId: string, journal: Ord
 /** Whether an ironman campaign writes its save at a moment (SAVE-010: after every End turn and on every exit). */
 export function ironmanWrites(moment: Lifecycle): boolean {
   return (C.kinds.ironman.write_on as string[]).includes(moment);
+}
+
+/** The header flags achievements reads (X-16, D-SAVE-1). */
+export function saveFlags(c: Campaign): SaveFlags {
+  return {
+    ironman_unbroken: c.ironman && !c.modified,
+    cheat_marked: c.modified,
+    switched_country: c.switchedCountry ?? false,
+    began_as_tutorial: c.beganAsTutorial ?? false,
+  };
+}
+
+/**
+ * "Restore the last autosave" on the failure screen (D-SAVE-3, SAVE-101): the
+ * campaign's Resume save, or its newest rotating autosave when every Resume
+ * save is damaged.
+ */
+export function restoreLastAutosave(storage: SaveStorage, campaignId: string, opts: OpenOptions): { opened: Opened; path: string; kind: SaveKind } | { error: string } {
+  const mine = entries(storage).filter((e) => e.header.campaignId === campaignId).sort(newestFirst);
+  for (const kind of ["resume", "autosave"] as const) {
+    for (const e of mine.filter((x) => x.header.kind === kind)) {
+      const r = openSave(storage.read(e.path)!, opts);
+      if (r.kind === "opened") return { opened: r, path: e.path, kind };
+    }
+  }
+  return { error: "This save is damaged." };
+}
+
+/** A choice made at a before-the-battle stop goes into the orders journal with its day (D-SAVE-10, SAVE-103). */
+export function journalChoice(journal: OrdersJournal, day: number, choice: string): OrdersJournal {
+  return { ...journal, choices: [...(journal.choices ?? []), { day, choice }] };
+}
+
+/** The files beside the saves that ride the account sync (D-SAVE-6, SAVE-104). */
+export function syncedFiles(): string[] {
+  return [...C.cloud.synced_files];
+}
+
+/** Whether a lifecycle moment writes the Resume save (SAVE-007): never on backgrounding (D-SAVE-2). */
+export function resumeWrites(moment: Lifecycle): boolean {
+  return (C.kinds.resume.write_on as string[]).includes(moment);
 }

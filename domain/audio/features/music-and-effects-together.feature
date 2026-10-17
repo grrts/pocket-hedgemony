@@ -15,6 +15,7 @@ Feature: Music and effects together
       | war is declared on the player | war_declared | nothing |
       | the battle result is shown | battle_won | battle_rout before it, then silence |
       | peace is signed with a loss | war_lost | diplo_peace_signed first |
+      | a white peace is signed | nothing | diplo_peace_signed |
       | the ruler dies and an heir takes over | ruler_new | realm_ruler_dies first |
       | an age begins | age_<age_id> | nothing |
 
@@ -31,9 +32,8 @@ Feature: Music and effects together
       | 3 | is dropped |
       | 5 | is dropped |
 
-  # The rule also matches frame_logo, frame_campaign_begin and ui_purchase (OQ-AUD-8).
-  @AUD-092 @placeholder @open-question
-  Scenario Outline: Only long priority 1 effects duck music
+  @AUD-092
+  Scenario Outline: Only the six listed effects duck music
     When "<id>" plays
     Then the music <result>
 
@@ -43,6 +43,9 @@ Feature: Music and effects together
       | realm_ruler_dies | ducks by 4 dB for its length |
       | turn_end | does not duck |
       | ui_achievement | does not duck |
+      | frame_logo | does not duck |
+      | frame_campaign_begin | does not duck |
+      | ui_purchase | does not duck |
 
   @AUD-093 @placeholder
   Scenario: Ambience steps back
@@ -52,12 +55,11 @@ Feature: Music and effects together
     When a music track starts
     Then the ambience fades out over 2 seconds
 
-  # frame_pause ducking sits outside the effects ducking rule (OQ-AUD-8).
-  @AUD-094 @open-question
-  Scenario: The pause menu ducks the music
+  @AUD-094
+  Scenario: The game menu leaves the music alone
     When the pause menu opens
     Then "frame_pause" plays
-    And the music ducks by 6 dB while paused
+    And the music is unchanged while the menu is open
 
   @AUD-095 @placeholder
   Scenario: Loudness
@@ -70,3 +72,15 @@ Feature: Music and effects together
   Scenario: Several achievements in one turn
     When three achievements unlock in one turn
     Then "ui_achievement" plays once
+
+  @AUD-135
+  Scenario Outline: Tutorial and Needs attention sounds
+    When onboarding reports "<moment>"
+    Then the effect "<sound>" plays
+    And the music is not ducked
+
+    Examples:
+      | moment | sound |
+      | step shown | ui_hint |
+      | step finished | ui_confirm |
+      | new warning | notify_alert |

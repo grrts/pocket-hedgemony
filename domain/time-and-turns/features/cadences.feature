@@ -17,12 +17,11 @@ Feature: Cadences and stated ordering
       | traders travelling                                  |
       | armies set to attack looking at visible enemies     |
 
-  @TIME-044 @open-question
-  # OQ-TIME-4: number of weeks in a 30-day month and where weekly steps run
-  Scenario Outline: Weekly steps run each week of the month
+  @TIME-044
+  Scenario Outline: Weekly steps run once at the end of every turn
     Given the turn is being processed
-    When the month is played out
-    Then "<step>" runs once a week
+    When the turn is played out
+    Then "<step>" runs once at the end of every turn and on no other day
 
     Examples:
       | step                                              |
@@ -56,12 +55,11 @@ Feature: Cadences and stated ordering
       | AI diplomatic actions                         | diplomacy    |
       | sailors in port and ship states               | naval        |
 
-  @TIME-046 @open-question
-  # OQ-TIME-5: season boundaries are not defined
-  Scenario Outline: Seasonal steps run once every three months
-    Given a season is three months
-    When a season ends
-    Then "<step>" runs once a season
+  @TIME-046
+  Scenario Outline: Seasonal steps run in the first month of each season
+    Given the step "<step>" is seasonal
+    When the turns of a year are played
+    Then "<step>" runs in the turns of March, June, September and December
 
     Examples:
       | step                                              |
@@ -71,16 +69,14 @@ Feature: Cadences and stated ordering
       | resident envoy tie +5                             |
       | pirate fleets grow by one ship                   |
 
-  @TIME-047 @open-question
-  # OQ-TIME-6: which month runs the yearly steps
-  Scenario Outline: Yearly steps run once a year
+  @TIME-047
+  Scenario Outline: Yearly steps run in the January turn
     Given the step "<step>" is yearly
-    When a year ends
-    Then "<step>" runs once a year
+    When the turns of a year are played
+    Then "<step>" runs only in the January turn
 
     Examples:
       | step                                   |
-      | traders and trade balance              |
       | wares made                             |
       | building neglect years counted         |
       | building advice                        |
@@ -116,33 +112,49 @@ Feature: Cadences and stated ordering
 
   @TIME-052
   Scenario: The trade ratio updates after the day loop
-    Given 2 traders walked through a province during the month
+    Given 2 traders walked through a province during the turn
     When the turn is processed
     Then the trade ratio of that province is updated after the day loop has finished
 
   @TIME-053
-  Scenario: Finished buildings open their slots before overflow runs
+  Scenario: A building finished this month takes overflow from the next month on
     Given a loom house is finished this month in a province with homeless people
     When the turn is processed
-    Then the loom house's slots open before the month's overflow is placed
+    Then the month's overflow is placed before the buildings step opens the loom house's slots
+    And the loom house's slots are filled by the next month's overflow
 
   @TIME-054
   Scenario: Culture drift follows births and deaths
     Given a province with French and Flemish speakers
-    When a year ends
+    When the January turn is processed
     Then births and deaths of that month run before culture drift
 
   @TIME-055
-  Scenario: The faith mix updates with the traders
+  Scenario: The faith mix updates once a year, after culture drift
     Given a province with a Catholic and a Protestant community
-    When a year ends
-    Then the faith mix updates in the same step as traders and trade balance
+    When the January turn is processed
+    Then the faith mix updates once, after culture drift
 
   @TIME-057
   Scenario: A diplomatic answer arrives the next turn
-    Given the country "Hungary" asks "Venice" for an alliance in "December 1444"
+    Given the country "Hungary" asks "Venice" for an alliance in the turn starting "25 December 1444"
     When the turn is processed
-    Then the answer arrives in the turn of "January 1445"
+    Then the answer arrives in the turn starting "1 January 1445"
+
+  @TIME-058
+  Scenario Outline: The season follows the hemisphere, read from the latitude
+    Given a province at latitude <latitude>
+    And the month is "<month>"
+    When the season calendar is read
+    Then the season there is <season>
+
+    Examples:
+      | latitude | month    | season |
+      | 48.3     | April    | spring |
+      | 48.3     | December | winter |
+      | -34.6    | April    | autumn |
+      | -34.6    | October  | spring |
+      | -34.6    | January  | summer |
 
   @TIME-058
   Scenario Outline: Winter depends on the hemisphere
@@ -187,16 +199,21 @@ Feature: Cadences and stated ordering
       | the Amazon           | February | the wet season     |
       | the Amazon           | August   | not the wet season |
 
-  @TIME-061 @open-question
-  # OQ-TIME-5: the harvest month is not set
-  Scenario: The harvest is rolled in autumn and paddies harvest twice
-    Given a province with farms and a province with rice paddies
-    When a year passes
-    Then the farms' harvest is rolled once, in autumn
-    And the rice paddies' harvest is rolled twice
+  @TIME-061
+  Scenario Outline: The harvest is rolled in autumn and paddies harvest twice
+    Given a province with <fields> in the <hemisphere> hemisphere
+    When the turns of a year are played
+    Then its harvest is rolled in <months>
+
+    Examples:
+      | fields       | hemisphere | months              |
+      | farms        | northern   | September           |
+      | farms        | southern   | March               |
+      | rice paddies | northern   | March and September |
+      | rice paddies | southern   | March and September |
 
   @TIME-062
-  Scenario: The 12-turn autosave falls each January
-    Given the autosave interval is "every 12 turns"
+  Scenario: The 12-month autosave falls each January
+    Given the autosave interval is "every 12 months"
     When the turns of a year are played
     Then the rotating autosave is written at the start of the January turn

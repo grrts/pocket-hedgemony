@@ -274,7 +274,7 @@ export function applyDriver(st: SettingsState, driverId: string, active: boolean
     Object.assign(sets, def.sets_when[cur] ?? {});
   }
   for (const [id, v] of Object.entries(def.sets_when_on ?? {}).concat(Object.entries(Object.values(def.sets_when ?? {}).reduce((a, b) => ({ ...a, ...b }), {})))) {
-    if (!st.cat.byId.has(id)) continue; // not a setting (engine.worker_budget, OQ-SET-1)
+    if (!st.cat.byId.has(id)) continue; // not a setting
     const want = active && id in sets;
     if (want) {
       // "Reduced or lower": a driver never raises a row above the value it sets.

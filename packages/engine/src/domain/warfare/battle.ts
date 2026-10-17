@@ -49,7 +49,7 @@ const sectorDef = (use: string): SectorDef => {
 const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
 /** One sector of a tile use, on a ground, by era (WAR-091, WAR-148). */
-export function sectorOf(use: string, opts: { ground?: Ground; bridge?: boolean; era?: Era; garrison?: number } = {}): Sector {
+export function sectorOf(use: string, opts: { ground?: Ground; bridge?: boolean; frozen?: boolean; era?: Era; garrison?: number } = {}): Sector {
   const u = cap(use);
   const d = sectorDef(u);
   const charge = d.charge === "by ground" ? !(d.rough_grounds ?? []).includes(opts.ground ?? "farmland") : d.charge === true;
@@ -63,7 +63,8 @@ export function sectorOf(use: string, opts: { ground?: Ground; bridge?: boolean;
     all: d.all ?? 0,
     horse: d.horse ?? 0,
     defender: d.defender ?? 0,
-    attackAcross: d.attack_across !== undefined && !opts.bridge ? d.attack_across : 0,
+    // A frozen river (X-17) is crossed like a bridge: no penalty for attacking across it.
+    attackAcross: d.attack_across !== undefined && !opts.bridge && !opts.frozen ? d.attack_across : 0,
     burnsTown: d.burns_town ?? false,
   };
 }

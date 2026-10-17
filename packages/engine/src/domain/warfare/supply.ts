@@ -18,7 +18,7 @@ export function rating(text: string): Rating {
 }
 export const ratingShare = (r: string): number => W.foraging_rating[rating(r)];
 
-/** A week's share of a month's meals. */
+/** A week's share of a month's meals, eaten once a turn (X-18): monthly × 7 ÷ 30. */
 export const weekOf = (monthly: number): number => (monthly * W.days_per_week) / W.days_per_month;
 
 // ---------------------------------------------------------------- the reserve (WAR-075 … WAR-077)

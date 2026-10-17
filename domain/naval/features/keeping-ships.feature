@@ -137,3 +137,11 @@ Feature: Keeping ships
     When it sails 1 zone
     Then it has a crew of 54
     And it fights at no more than half strength until it docks
+
+  @NAVY-124
+  Scenario: Docking in a subject's port
+    # D-NAVY-28
+    Given a Portuguese fleet docks at "Funchal", a port of a subject of "Portugal" with 500 food in store
+    When it resupplies 120 rations
+    Then the province "Funchal" has 380 food in store
+    And "Portugal" owes nothing

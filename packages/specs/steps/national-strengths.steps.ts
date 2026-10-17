@@ -1,8 +1,10 @@
 import { expect } from "vitest";
 import { steps, type Scenario } from "../src/registry.ts";
 import { Rng } from "@ph/engine";
+import { loadDefaultRuleset, type ProvinceDef } from "@ph/rules";
 import type { Era } from "@ph/engine/domain/research";
 import * as N from "@ph/engine/domain/national-strengths";
+import { allRecords } from "@ph/engine/domain/scenario-setup";
 
 const { Given, When, Then } = steps("national-strengths");
 
@@ -1336,11 +1338,11 @@ Given("{string} has {int} active ambitions, one of them stirred and warm", (s, n
   N.startCampaign(h, rng(s), world(s));
   const open3 = N.openAmbitions(h);
   expect(open3).toHaveLength(n);
-  // The goal of one is partly met: two of three places held.
+  // The goal of one is partly met: one of three places held (warm from a third, D-HER-13).
   const lion = h.ambitions.find((a) => a.item.id === "venice_lion_on_the_adda") ?? (open3[0]!.state === "sealed" ? open3[0]! : open3[0]!);
   if (lion.item.id === "venice_lion_on_the_adda") {
     satisfy(lion.item.stir, world(s), h.country);
-    (facts(s, name).places ??= []).push("Bergamo", "Brescia");
+    (facts(s, name).places ??= []).push("Bergamo");
   } else {
     N.stirAmbitionByEvent(h, lion.item.id, world(s));
     lion.band = "warm";
@@ -1450,4 +1452,294 @@ When("the player looks at {string}", (s, name: string) => {
 Then("the picker shows its birthright and burden, a count of its sealed ambitions and its heydays as ages", (s) => {
   expect(s.picker).toEqual({ birthright: s.data.birthright.name, burden: s.data.burden.name, sealedAmbitions: 3, heydayAges: s.data.heydays.map((h: N.Heyday) => h.age) });
   expect(Object.values(s.picker).flat()).not.toContain(s.data.ambitions[0].text);
+});
+
+// ---------------------------------------------------------------- decided questions (spec 13)
+
+const tax = (points: number): N.Effect[] => [{ lever: "tax_reach_pct", value: Math.round(points * 10) }];
+
+// D-HER-13: warmth bands at a third and two thirds
+Given("an ambition's goal has {int} leaf conditions", (s, n: number) => {
+  const h = heritage(s, "Warmland", { ...madeUp("warmland", 0), ambitions: [] });
+  const a = madeUpAmbition("warmland", 0, true);
+  a.goal = { all: Array.from({ length: n }, (_, i) => ({ knows: { who: "this", invention: `inv${i}` } })) };
+  h.ambitions.push({ item: a, state: "stirred", warmth: 0, band: "cold" });
+  s.amb = h.ambitions[0];
+});
+Given("{int} of them hold", (s, n: number) => {
+  facts(s, "Warmland").knows = Array.from({ length: n }, (_, i) => `inv${i}`);
+});
+Then("its warmth is {string}", (s, warmth: string) => {
+  if (warmth === "done") expect(s.amb.state).toBe("done");
+  else {
+    expect(s.amb.state).toBe("stirred");
+    expect(s.amb.band).toBe(warmth);
+  }
+});
+
+// D-HER-11: a resident envoy reads one ambition
+Given("the country {string} has kept a resident envoy at the court of {string}", (s, reader: string, host: string) => {
+  heritage(s, reader);
+  s.host = heritage(s, host);
+  N.startCampaign(s.host, rng(s), world(s));
+  expect(N.envoyReading(s.host, 1, rng(s))).toBeNull();
+});
+When("{int} years have passed", (s, years: number) => {
+  s.reading = N.envoyReading(s.host, years, rng(s));
+});
+Then("{string} learns the hint and warmth of one active ambition of {string}", (s, _reader: string, _host: string) => {
+  const open = N.openAmbitions(s.host);
+  expect(s.reading).not.toBeNull();
+  expect(open.map((a) => a.item.hint)).toContain(s.reading.hint);
+  expect(["cold", "warm", "hot"]).toContain(s.reading.band);
+});
+Then("never its plain goal", (s) => {
+  const text = JSON.stringify(s.reading);
+  for (const a of N.openAmbitions(s.host)) expect(text).not.toContain(a.item.text);
+});
+
+// D-HER-10: pool limits
+Given("a generated heritage with {int} ambitions in its pool and {int} age ambitions", (s, pool: number, age: number) => {
+  const d = madeUp("gen", pool);
+  for (let i = 0; i < age; i++) d.ambitions.push({ ...madeUpAmbition("gen", 100 + i, false), age: "age_of_exploration" });
+  s.build = () => {
+    s.ok = N.poolWithinLimits(d, "generated");
+    s.poolSize = pool;
+  };
+});
+Then(/^its pool is (too small|within the limits|too large)$/, (s, verdict: string) => {
+  expect(s.ok).toBe(verdict === "within the limits");
+  if (verdict === "too small") expect(s.poolSize).toBeLessThan(N.RULES.ambitions.pool_min_generated);
+  if (verdict === "too large") expect(s.poolSize).toBeGreaterThan(N.RULES.ambitions.pool_max);
+});
+
+// D-HER-12: the AI's choices
+Given("the AI country {string} has 2 heydays awake worth {int} and {int} points", (s, name: string, a: number, b: number) => {
+  const hd = (id: string, pts: number, wake: string): N.Heyday => ({ id, name: id, age: "age_of_exploration", text: "", wakes: { event: { id: wake } }, effects: tax(pts) });
+  const d = { ...madeUp(idOf(name)), heydays: [hd(`h${a}`, a, "go"), hd(`h${b}`, b, "go")] };
+  const h = heritage(s, name, d);
+  world(s).ages.active.push("age_of_exploration");
+  world(s).events.push("go");
+  evaluateAll(s);
+  expect(h.heydays.filter((x) => x.state === "awake")).toHaveLength(2);
+  s.ai = h;
+});
+When("a third heyday worth {float} points would wake", (s, pts: number) => {
+  const h: N.Heritage = s.ai;
+  h.heydays.push({ item: { id: "third", name: "third", age: "age_of_exploration", text: "", wakes: { event: { id: "third" } }, effects: tax(pts) }, state: "waiting", yearsAwake: 0 });
+  world(s).events.push("third");
+  evaluateAll(s);
+  expect(h.ask?.kind).toBe("sleep_heyday");
+});
+Then("the AI puts the heyday worth {int} points to sleep", (s, pts: number) => {
+  expect(N.aiAnswer(s.ai)).toBe(`h${pts}`);
+});
+Then("2 heydays are awake", (s) => {
+  evaluateAll(s);
+  expect((s.ai as N.Heritage).heydays.filter((x) => x.state === "awake").map((x) => x.item.id).sort()).toEqual(["h3", "third"]);
+});
+Given("the AI country {string} holds 5 legacies, the weakest worth {float} points", (s, name: string, weakest: number) => {
+  const h = heritage(s, name);
+  for (const [i, pts] of [1.5, weakest, 1, 2.5, 1.2].entries()) N.grantLegacy(h, { id: `l${pts}`, name: `L${i}`, text: "", effects: tax(pts) });
+  expect(h.legacies).toHaveLength(5);
+  s.ai = h;
+});
+When("it earns a sixth worth {int} points", (s, pts: number) => {
+  expect(N.grantLegacy(s.ai, { id: "new", name: "New", text: "", effects: tax(pts) })).toBe("ask");
+});
+Then("the AI lets the legacy worth {float} points go", (s, pts: number) => {
+  expect(N.aiAnswer(s.ai)).toBe(`l${pts}`);
+  expect((s.ai as N.Heritage).legacies.map((l) => l.id)).toContain("new");
+});
+Then("{string} still holds {int} legacies", (s, name: string, n: number) => {
+  expect(heritage(s, name).legacies).toHaveLength(n);
+  expect(heritage(s, name).ask).toBeNull();
+});
+Then("it changes {string}", (s, meaning: string) => {
+  expect(s.lever.meaning).toBe(meaning);
+});
+
+// D-HER-9, X-18: one evaluation a turn, time in months by the date
+Given("the country {string} has a heyday awake in an active age", (s, name: string) => {
+  const d = { ...madeUp(idOf(name)), heydays: [{ id: "long_heyday", name: "Long", age: "age_of_exploration", text: "", wakes: { event: { id: "go" } }, effects: tax(2) }] };
+  heritage(s, name, d);
+  s.who = name;
+  world(s).ages.active.push("age_of_exploration");
+  world(s).events.push("go");
+});
+When("{int} months pass with its wakes condition holding", (s, months: number) => {
+  const h = heritage(s, s.who);
+  // Weekly turns (X-18): a month is served only in the turn in which a new month begins.
+  for (let i = 0; i < months; i++) {
+    for (let week = 0; week < 3; week++) N.turnTick(h, world(s), rng(s), 0);
+    N.monthTick(h, world(s), rng(s));
+  }
+});
+Then("the heyday has served {int} years", (s, years: number) => {
+  const hd = heritage(s, s.who).heydays[0]!;
+  expect(hd.state).toBe("awake");
+  expect(hd.yearsAwake).toBe(years);
+});
+
+// D-HER-3: the size bonus follows the rules table
+Given("the country {string} has size class {float}", (s, _name: string, size: number) => {
+  s.size = size;
+});
+When("its birthright budget is set", (s) => {
+  s.bonus = N.sizeBonus(s.size);
+  s.budget = N.partBudget("birthright", s.size);
+});
+Then("its size bonus is {float} and its birthright budget is {float}", (s, bonus: number, budget: number) => {
+  expect(s.bonus).toBe(bonus);
+  expect(s.budget).toBe(budget);
+});
+
+// D-HER-1: a claim wakes after 30 years
+Given("the country {string} annexed {string} in {int}", (s, a: string, b: string, year: number) => {
+  world(s).year = year;
+  N.annex(heritage(s, a), heritage(s, b));
+  s.annexer = a;
+  s.annexed = idOf(b);
+});
+Given("{string} has held Constantinople and most of the Byzantine homeland for {int} years", (s, name: string, years: number) => {
+  facts(s, name).homelandHeldYears = { [s.annexed]: years };
+});
+Then("the Byzantine birthright is a dormant claim", (s) => {
+  const h = heritage(s, s.annexer);
+  expect(h.claims.map((c) => c.item.id)).toContain(N.exampleHeritage(s.annexed).birthright.id);
+  expect(h.birthrights).toHaveLength(1);
+});
+Then("the Byzantine birthright is awake as the second birthright of {string}", (s, who: string) => {
+  const h = heritage(s, who);
+  expect(h.birthrights.map((b) => b.item.id)).toEqual([h.birthrights[0]!.item.id, N.exampleHeritage(s.annexed).birthright.id]);
+  expect(h.claims).toHaveLength(0);
+});
+
+// D-HER-17: a formed country keeps two birthrights
+Given("{string} holds its own birthright and one inherited from {string}", (s, name: string, from: string) => {
+  const h = heritage(s, name);
+  N.annex(h, heritage(s, from));
+  expect(N.wakeClaim(h, idOf(from))).toBe(true);
+  expect(h.birthrights).toHaveLength(2);
+  s.forming = h;
+});
+When("{string} forms {string}, which has a birthright of its own", (s, _name: string, formed: string) => {
+  s.formed = N.formCountry(idOf(formed), s.forming, madeUp(idOf(formed)), rng(s));
+});
+Then("{string} holds 2 birthrights: the own birthright of {string} and its own", (s, _formed: string, forming: string) => {
+  const own = N.exampleHeritage(idOf(forming)).birthright.id;
+  expect((s.formed as N.Heritage).birthrights.map((b) => b.item.id)).toEqual([own, `${(s.formed as N.Heritage).country}_birthright`]);
+});
+Then("the birthright inherited from {string} is a dormant claim of {string} again", (s, from: string, _formed: string) => {
+  expect((s.formed as N.Heritage).claims.map((c) => c.from)).toContain(idOf(from));
+});
+
+// D-HER-16: place names bind to the map
+let provinces: ProvinceDef[] | undefined;
+Given("a heritage condition uses the place {string}", (s, place: string) => {
+  s.place = place;
+});
+When("its place names are bound to the map", (s) => {
+  provinces ??= loadDefaultRuleset().provinces;
+  s.bound = N.bindPlace(s.place, provinces);
+});
+Then("{string} is bound to the one land province nearest the place", (s, place: string) => {
+  const p = provinces!.find((x) => x.id === s.bound);
+  expect(p, place).toBeDefined();
+  expect(["sea", "ocean"]).not.toContain(p!.terrain);
+  // it lies in the realm the place names
+  expect(p!.owner).toBe(idOf(place));
+});
+Then("{string} stays on the list of places to bind", (s, _place: string) => {
+  expect(s.bound).toBeNull();
+});
+Then("a holds_place condition on it does not hold", (s) => {
+  expect(N.holds({ holds_place: { who: "this", place: s.place } }, world(s), "anyone")).toBe(false);
+});
+
+// ---------------------------------------------------------------- generation and the phone
+
+// HER-052: build counts over the whole catalogue
+Given("the country catalogue", (s) => {
+  s.build = () => {
+    const kinds = allRecords().map((r) => N.heritageKindOf(N.groupOfRecord(r.tier, r.representation)));
+    s.kinds = kinds;
+  };
+});
+Then("{int} countries have heritage: {int} hand-written and {int} generated", (s, all: number, hand: number, gen: number) => {
+  const k = s.kinds as N.HeritageKind[];
+  expect(k.filter((x) => x !== "none")).toHaveLength(all);
+  expect(k.filter((x) => x === "authored")).toHaveLength(hand);
+  expect(k.filter((x) => x === "generated" || x === "generated_decentralised")).toHaveLength(gen);
+});
+Then("{int} have none", (s, n: number) => {
+  expect((s.kinds as N.HeritageKind[]).filter((x) => x === "none")).toHaveLength(n);
+});
+
+// HER-054: the first allowed age whose regions cover the country
+const REGIONS: Record<string, string[]> = {
+  "the Americas": ["north_america", "central_america", "caribbean", "south_america"],
+  "West Africa": ["sub_saharan_africa"],
+  "Southeast Asia": ["southeast_asia"],
+  "Central Asia": ["central_asia"],
+};
+Given("a forest people in {string}", (s, region: string) => {
+  s.regions = new Set(REGIONS[region]);
+  s.options = N.archetypeTemplates("forest_chiefdom").heydays[0]!.age_options;
+});
+When("its heyday is generated", (s) => {
+  s.age = N.pickAge(s.options, s.regions);
+});
+Then("the heyday belongs to the {string}", (s, age: string) => {
+  expect(N.ageName(s.age)).toBe(age);
+});
+
+// HER-056: decentralised polities take crownless archetypes only
+Given("a decentralised polity", (s) => {
+  s.rec = N.CATALOGUE_EXAMPLES["igbo_societies"]!;
+  expect(s.rec.gameplay.representation.mode).toBe("decentralized_polity");
+});
+When("it is scored against archetypes", (s) => {
+  s.scored = N.scoreArchetypes(s.rec).map((x) => x.id);
+});
+Then("it can only take forest, hill, herding, steppe, desert, island, mountain, ocean, chiefdom, commune, raiders or segmentary archetypes", (s) => {
+  expect(s.scored.length).toBeGreaterThan(0);
+  for (const id of s.scored) expect(N.DECENTRALISED_ARCHETYPES).toContain(id);
+});
+
+// HER-072: the map shimmers over a hot ambition
+Given("the country {string} has a hot ambition naming {string}, {string} and {string}", (s, name: string, a: string, b: string, c: string) => {
+  const h = heritage(s, name);
+  const amb = N.exampleHeritage(idOf(name)).ambitions.find((x) => JSON.stringify(x.goal).includes(a))!;
+  h.ambitions.push({ item: amb, state: "stirred", warmth: 0, band: "cold" });
+  facts(s, name).places = [a, b];
+  evaluateAll(s);
+  expect(h.ambitions.at(-1)!.band).toBe("hot");
+  s.names = [a, b, c];
+  s.who = name;
+});
+When("the player looks at the map", (s) => {
+  s.shimmer = N.shimmer(heritage(s, s.who));
+});
+Then("the region faintly shimmers", (s) => {
+  expect(s.shimmer).toHaveLength(1);
+  expect(s.shimmer[0].places).toEqual(s.names);
+});
+Then("the target is neither outlined nor named", (s) => {
+  expect(s.shimmer[0]).toMatchObject({ outline: false, named: false });
+});
+
+// HER-074: the free tier only limits which countries can be picked
+Given("the player plays the free tier", (s) => {
+  s.tier = "free";
+});
+When("the player picks an allowed country", (s) => {
+  s.free = N.newHeritage("portugal", N.exampleHeritage("portugal"));
+  N.startCampaign(s.free, new Rng(5), N.emptyWorld());
+});
+Then("its heritage works exactly as in the full game", (s) => {
+  const full = N.newHeritage("portugal", N.exampleHeritage("portugal"));
+  N.startCampaign(full, new Rng(5), N.emptyWorld());
+  expect(s.free).toEqual(full);
+  expect(N.card(s.free)).toEqual(N.card(full));
 });

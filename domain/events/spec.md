@@ -14,8 +14,8 @@ contexts extend, and the data build that validates all of it.
   effects, follow-ups, invalidation and exclusivity.
 - The condition, effect and target vocabulary (the engine contract) and the closed lists in enums.
 - Modifiers (159): scope, changes, duration, decay, stacking.
-- Balance values: selection pacing, follow-up boosts, alternate-history presets, AI factors, rebel sizes and
-  thresholds, coverage thresholds.
+- Balance values: selection pacing, follow-up boosts, alternate-history presets, AI factors, rebel sizes (as
+  shares of the recruit pool), coverage thresholds, the mapping table to the owning contexts.
 - AI option choice (weights and factors).
 - The statistics model (stored and derived values) as the event tree's language.
 - Principles: history is reference not script, roles not hard-coded countries, agency, harm depicted never
@@ -31,7 +31,7 @@ contexts extend, and the data build that validates all of it.
 - Faith waves and faith policy: **religion**. Tongues and nationalism: **culture**. Heritage: **national-strengths**.
 - How an event card looks and how unanswered events block End turn: **game-shell**. Music tags: **audio**.
 - Tutorial-only scripted events: **onboarding**.
-- Where events run in the monthly turn: **time-and-turns**.
+- Where events run in the turn, and in which turn their monthly work runs: **time-and-turns**.
 
 ## 2. Sources
 
@@ -76,7 +76,7 @@ Newest decision first.
 | Follow-up | A later event whose weight is boosted for a delay window; never bypasses its trigger. | Prerequisite |
 | Chooser | The role whose controller (player or AI) picks an option; none means a weighted roll. | |
 | Historical option | The one option per event that matches recorded history. | |
-| Effect tier | immediate, delayed, ongoing, long_term (and, if adopted, rising_won, rising_crushed). | |
+| Effect tier | immediate, delayed, ongoing, long_term, rising_won, rising_crushed. | |
 | Modifier | A named, timed bundle of stat changes with decay and stacking. | |
 | Narrative only | `depiction: narrative_only`: an atrocity shown, never rewarded. | |
 | Stored / derived statistic | Persisted state / computed each tick from stored values, never written by events. | |
@@ -154,12 +154,14 @@ Newest decision first.
 
 - EVT-001 The game shall run events from 1444 to the campaign's end date, 31 August 1939 by default (one
   setting). [gap-lists decisions]
-- EVT-002 The game shall treat as out of scope the Second World War events and every event whose history
-  starts after 31 August 1939 (59 in the current data: world_war_ii, holocaust, bengal_famine_1943,
-  atomic_bombings and the events of cold_war_to_present, decolonization_1945_1994 and the post-1939 events of
-  coverage_gaps), and shall not fire them. [gap-lists decisions; event data]
-- EVT-003 The game shall treat the ages Age of Decolonization, Cold War and Age of Globalization as out of
-  scope and shall not start them. [gap-lists decisions]
+- EVT-002 When a campaign loads its events, the game shall drop every event whose history starts after
+  31 August 1939 (59 in the current data: world_war_ii, holocaust, bengal_famine_1943, atomic_bombings and the
+  events of cold_war_to_present, decolonization_1945_1994 and the post-1939 events of coverage_gaps) and shall
+  never fire them; the data keeps them as reference. [gap-lists decisions; X-14; D-EVT-1]
+- EVT-003 The game shall never start the ages Age of Decolonization, Cold War and Age of Globalization, and
+  shall cut every age still running at the end date. An end condition part that names a dropped event never
+  holds, so such an age ends by its other end conditions or at the end date. [gap-lists decisions; X-14;
+  D-EVT-1]
 
 ### 5.2 Principles
 
@@ -208,9 +210,11 @@ Newest decision first.
 ### 5.5 Eligibility
 
 - EVT-018 The game shall not let an event fire outside its `earliest`–`latest` years. [README trigger model]
-- EVT-019 The game shall bind the date by mode: `mandatory` fires in the window if the trigger holds;
-  `approximate` is weighted toward the historical date; `reference` uses the date only as a guide.
-  [README trigger model]
+- EVT-019 The game shall bind the date by mode: `mandatory` fires in the window if the trigger holds (its
+  pool chance becomes certain in the last year of the window); `approximate` multiplies its pool chance by up
+  to `approximate_peak_mult` (2.0) in the history year, fading linearly to 1 at `approximate_spread_years`
+  (10) either side; `reference` uses the date only as a guide (factor 1). [README trigger model; numbers
+  provisional]
 - EVT-020 The game shall repeat events by `repeat`: `one_time` fires once; `recurring` may fire again after
   `cooldown_years`; `process` can fire for several countries as a diffusion. [README trigger model]
 - EVT-021 The game shall require `requires` to hold: `all` mandatory, `any` alternative paths, `not` exclusive,
@@ -223,11 +227,13 @@ Newest decision first.
   types declared in the vocabulary (date, exists, controls, owns, borders, at_war, war_ongoing, relation,
   opinion, stat, rank, government, religion, religion_share, culture_group, innovation, ideology, tech,
   colonial_presence, trade_presence, rebels_active, subject_count, event, event_active, period_active,
-  age_active, flag, any_country, all_countries, count_countries, is_human) with logic all, any, not, at_least.
+  age_active, flag, any_country, all_countries, count_countries) with logic all, any, not, at_least.
   [vocabulary.yaml]
 - EVT-026 The game shall resolve targets as `$role`, an entity id, `province:<id>`, `area:<id>`,
   `region:<id>`, `global`, or `this` inside any_country, all_countries and count_countries. [vocabulary.yaml]
-- EVT-027 The game shall use `is_human` only in selection weights, never in eligibility. [vocabulary.yaml]
+- EVT-027 The game shall have no condition that reads whether a country is played by a person: `is_human` is
+  not in the vocabulary, and the build reports it as an undeclared condition type anywhere it appears.
+  [vocabulary.yaml; DECISIONS principle 3; D-EVT-10]
 - EVT-028 The game shall evaluate the `event` condition as "the event has occurred", optionally with a given
   option outcome, within n years, with a role bound to who. [vocabulary.yaml]
 
@@ -238,18 +244,20 @@ Newest decision first.
   `mean_years`, multiplied by its selection modifiers and follow-up boosts. [README; balance.yaml]
 - EVT-031 When a `decision` event becomes eligible, the game shall offer it to the chooser (player or AI).
   [README]
-- EVT-032 If a decision is left unanswered for `decision_expiry_years` (10), then it lapses and re-enters the
-  pool if still eligible. [balance.yaml] (see OQ-EVT-8)
+- EVT-032 If a decision offered to an AI country is left unanswered for `decision_expiry_years` (10), then
+  it lapses and re-enters the pool (it is rolled as a pool event) if still eligible. A decision offered to
+  the player never lapses (EVT-044). [balance.yaml; screen-flow §4.6; D-EVT-8]
 - EVT-033 The game shall fire at most `max_pool_events_per_country_year` (2) pool events per country per year.
   [balance.yaml]
 - EVT-034 When an event fires, the game shall boost each follow-up's weight by its `boost` during its `delay`
   window, cap any boost at `max_boost` (5.0), fade it linearly over `boost_decay_years` (10) after the window
   closes, and never let a boost bypass a trigger. [README; balance.yaml]
-- EVT-035 Where the alternate history game rule is set, the game shall apply its preset: historical (follow-up
-  boost ×1.5, historical option ×2.0, mean_years ×0.8), plausible (×1.0, ×1.0, ×1.0) or divergent (×0.6,
-  ×0.5, ×1.3). [balance.yaml; README principle 1]
-- EVT-036 Where the "historical lean" game rule is on, the game shall multiply historical options' AI weight
-  by 1.25. [balance.yaml]
+- EVT-035 The game shall apply the alternate history preset: historical (follow-up boost ×1.5, historical
+  option ×2.0, mean_years ×0.8), plausible (×1.0, ×1.0, ×1.0) or divergent (×0.6, ×0.5, ×1.3).
+  [balance.yaml; README principle 1]
+- EVT-036 The game shall set the preset from the new game's "Events" choice: Historical → historical,
+  Plausible → plausible (the default), Free → divergent. There is no separate "historical lean" rule.
+  [screen-flow new-game options; balance.yaml; D-EVT-9]
 
 ### 5.7 Execution
 
@@ -260,32 +268,37 @@ Newest decision first.
 
 ### 5.8 Options and choice
 
-- EVT-039 The game shall give every event two or more options (two or three in the design), exactly one marked
-  historical, with unique ids. [README; balance validation_checks]
+- EVT-039 The game shall give every event two to four options, exactly one marked historical, with unique
+  ids; the build reports more than four as an error and fewer than two as a warning on a major event (an error
+  otherwise). [README; balance validation_checks; revolutions; D-EVT-7]
 - EVT-040 When an option has a chooser, the game shall let that role's controller, player or AI, pick; when it
   has none, the game shall pick by a weighted roll. [README; schema Option]
 - EVT-041 If an option's `allowed` condition is false, then the game shall hide the option. [vocabulary
   option_fields]
 - EVT-042 The game shall weight each option for the AI by its base weight times its named factors: at_war
-  (country is at war), low_treasury (treasury below one year of expenses), high_unrest (average unrest above
-  50), same_religion (other party shares state religion), rival (other party is a rival), great_power
+  (country is at war), low_treasury (treasury below one year of expenses), high_unrest (more than half
+  the country's provinces have 4 or more grievances, D-EVT-5), same_religion (other party shares state religion), rival (other party is a rival), great_power
   (top 8 by great_power_score), threatened (a hostile neighbour has more than 1.5× army_strength).
   [balance.yaml ai_factors; schema]
 - EVT-043 The game shall add an option's effects to the event-level effects. [vocabulary option_fields]
 - EVT-044 When an event is offered to the player, the game shall wait for the player's answer; nothing answers
-  an event for the player. [screen-flow §4.6] (see OQ-EVT-8)
+  an event for the player: while one waits, End turn opens the oldest unanswered event instead of ending
+  the turn. [screen-flow §4.6; D-EVT-8]
 
 ### 5.9 Effects
 
 - EVT-045 The game shall apply effects by tier: `immediate`; `delayed` after n years (or a range); `ongoing`
-  while the event runs; `long_term` as permanent structural change. [README; schema Effects]
+  each month while the event runs; `long_term` as permanent structural change. [README; schema Effects]
 - EVT-046 The game shall apply only effect types declared in the vocabulary: modifier, stat, transfer,
   create_country, annex, vassalize, release, war, peace, casus_belli, relation, rebels, spread, population,
   move_population, set_flag, start_period, end_period, unlock, government, religion, trade_route, colony.
   [vocabulary.yaml]
 - EVT-047 The game shall apply a `stat` change as a one-off delta, `+n` / `-n` or `+n%` / `-n%`. [vocabulary.yaml]
-- EVT-048 The game shall size `rebels` as small 0.5, medium 1.0, large 2.0, huge 4.0 × the province's
-  `manpower_yield`, and use `unrest_spawn` 60 and `unrest_guaranteed` 90. [balance.yaml] (see OQ-EVT-5)
+- EVT-048 When a `rebels` effect applies, the game shall start a rising in the target province at once (the
+  event is a spark), taking its men from the province's recruit pool: small 1/8, medium 1/4, large 1/2, huge
+  the whole pool. Rebellions runs the rising from there. `rebels_active` is true while a rising of the given
+  type (any of enums' rebel_types, `anticolonial` included) is under way. There are no unrest thresholds.
+  [balance.yaml; X-9; D-EVT-5; numbers provisional]
 - EVT-049 The game shall start a war by `war {id, attackers, defenders, goal}` with a stable war id that other
   events can test with `war_ongoing`. [vocabulary.yaml]
 - EVT-050 Adding a new condition or effect type shall need one engine evaluator and nothing else; everything
@@ -311,19 +324,27 @@ Newest decision first.
 - EVT-055 The game shall keep the province, country, global and pairwise statistics of statistics.yaml with
   their units and ranges (for example prosperity 1–60, unrest 0–100, stability −3..+3, opinion −200..200,
   trust 0–100), with formula coefficients `k_*` in balance. [statistics.yaml]
-- EVT-056 The game shall land each event-tree statistic on the concrete stats of the owning designs (province
-  stats 15, country stats 11, trade 12, government 5, diplomacy 11). [province stats §15; country stats §11;
-  trade §12; government §5; diplomacy §11]
+- EVT-056 The game shall land each event-tree statistic on the concrete stats of the owning designs through
+  the mapping table in the events data (province stats 15, country stats 11, trade v2, government 5,
+  diplomacy 11), with no rename in the event data: prosperity +n → n fitting buildings; devastation +n → n %
+  of tiles burned; unrest up → one named grievance; fort_level +n → castle n steps; infrastructure +n → road n
+  steps; industry +n → n factories; disease_burden up → a plague outbreak; trade_access → trade ratio gain %;
+  trade_index → trade ratio; trust down → an Oath broken and notoriety up → a Notorious deed (diplomacy);
+  integration_strain is only read. [province stats §15; country stats §11; trade §12; X-6; government §5;
+  diplomacy §11; D-EVT-4, D-EVT-14]
 
 ### 5.12 Flags and reference tables
 
 - EVT-057 The game shall let triggers read only flags that some effect sets or that are declared system flags,
   set by the engine or the scenario (ruler_died, succession_crisis, succession_dispute, regency,
   female_succession, ruler_led_campaign, atlantic_island_bases, potato_blight, commercial_crisis and the
-  world-state flags of enums.yaml). [enums.yaml system_flags; validation]
+  world-state flags of enums.yaml); religion sets religious_persecution_active, missionary_persecution and
+  inquisition_established by its own rules. [enums.yaml system_flags; validation; religion §10; D-EVT-16]
 - EVT-058 The game shall read religions, governments, innovations, ideologies, culture groups, rebel types,
   relation types, period kinds and entity kinds from closed lists in enums; adding a value needs no engine
-  change. [enums.yaml]
+  change. The lists hold no value first seen after 1939 (no computing, green_revolution_agriculture,
+  internet, non_alignment, environmentalism or neoliberalism), and the culture groups are enums' 39 plus
+  culture's celtic, baltic, caucasian and hebrew. [enums.yaml; X-14; culture §6; D-EVT-12, D-EVT-13]
 - EVT-059 The game shall keep entities with real existence spans; a population group is never owned and an
   organization holds no provinces. [enums.yaml entity_kinds; schema Entity]
 
@@ -353,6 +374,10 @@ Newest decision first.
   revolution), the game shall pass it to the soundtrack. [music-design §6]
 - EVT-067 Where an event is marked `tutorial_only: true`, the game shall never fire it in a real campaign.
   [tutorial-design §3.4]
+- EVT-068 When a rising tagged with an event ends (rebellions), the game shall apply the `rising_won` effects
+  of the event and of the chosen option if the rising won, or their `rising_crushed` effects if it was
+  crushed. Sibling contexts add their conditions and effects as one evaluator each (EVT-050).
+  [revolutions changes-for-other-designs; D-EVT-11]
 
 ## 6. Commands
 
@@ -360,7 +385,7 @@ Newest decision first.
 |---|---|---|---|---|
 | AnswerEvent(event instance, option) | player / AI (the chooser) | Event fired or offered; option allowed | Option effects plus event effects applied | OptionChosen, EffectsApplied |
 | FireEvent(event, bound roles) | system | Eligible and selected | Event fires | EventFired |
-| SetAlternateHistoryMode(mode) | player (new game options) | At game setup | Preset multipliers used | (none) |
+| SetAlternateHistoryMode(choice) | player (new game "Events": Historical, Plausible, Free) | At game setup | Preset historical, plausible or divergent used | (none) |
 
 ## 7. Domain events
 
@@ -375,32 +400,37 @@ Newest decision first.
 | ModifierApplied / ModifierExpired | Modifier effect; duration ends | modifier, target | owning contexts |
 | EventInvalidated | `invalidated_if` holds | event | AI, game-shell (chronicle) |
 | EventCancelled | `cancel_if` holds or `maintain` fails | event | owning contexts |
-| DecisionLapsed | 10 years unanswered | event | AI |
+| DecisionLapsed | An AI's decision 10 years unanswered | event | AI |
+| RisingTierApplied | A tagged rising ends | event, tier | revolutions, game-shell |
 
 ## 8. Policies (reactions to other contexts)
 
 - When any statistic, ownership, war, relation, flag or rising changes (all contexts), then the next
   eligibility check reads the new state.
 - When a tagged revolution rising ends (rebellions), then apply the option's `rising_won` or `rising_crushed`
-  tier (revolutions; pending merge, OQ-EVT-11).
-- When the campaign end date arrives (time-and-turns), then fire the wrap-up event or events (game-shell;
-  not yet designed, OQ-EVT-2).
+  tier (EVT-068, D-EVT-11).
+- When the campaign end date arrives (time-and-turns), then cut every running age and fire nothing more; the
+  final scores screen (game-shell, X-12) is the wrap-up, not an event (D-EVT-2).
 
-## 9. Monthly turn
+## 9. Each month
+
+The events' monthly work runs in the turn in which a new month begins (X-18), in the events step of that turn.
 
 Reads first: every statistic and flag the triggers name, after the other systems' monthly steps.
 
-1. Each year (first month of the year): evaluate age and period start and end conditions inside windows; apply
-   forced dates.
-2. Each month: evaluate eligibility (availability, requires, trigger, invalidation) and bind roles.
-3. Fire immediate events; roll pool events (`pool_roll_interval_months` 1) under the pacing cap; offer
+1. Each year (the turn in which 1 January falls): evaluate age and period start and end conditions inside windows; apply
+   forced dates (D-EVT-15).
+2. Each month: AI decisions unanswered for 10 years lapse into the pool (EVT-032).
+3. Each month: evaluate eligibility (availability, requires, trigger, invalidation) and bind roles.
+4. Fire immediate events; roll pool events (`pool_roll_interval_months` 1) under the pacing cap; offer
    decisions.
-4. Queue fired events for the player in date order; AI choosers answer at once.
-5. Apply chosen options' and events' immediate effects; schedule delayed effects; tick ongoing effects,
-   durations, `maintain` and `cancel_if`; tick modifiers' decay and expiry; fade follow-up boosts.
+5. Queue fired events for the player in date order; AI choosers answer at once.
+6. Apply chosen options' and events' immediate effects; schedule delayed effects; tick ongoing effects,
+   durations, `maintain` and `cancel_if`; tick modifiers' decay and expiry; fade follow-up boosts; recompute
+   derived values.
 
-Gap list item 20 places events last in the turn; screen-flow shows G7 Events after battles. The global order
-belongs to time-and-turns.
+Events run as step 6 of the turn (X-2): after the monthly, seasonal and yearly steps of every other system and
+before achievements and the autosave. The age and period checks run in the events step of the turn in which 1 January falls.
 
 ## 10. Configuration
 
@@ -409,22 +439,26 @@ belongs to time-and-turns.
 | selection.pool_roll_interval_months | How often pool events roll | 1 | yes | data/balance.yaml |
 | selection.max_pool_events_per_country_year | Pacing cap | 2 | yes | data/balance.yaml |
 | selection.decision_expiry_years | Unanswered decision lapses | 10 | yes | data/balance.yaml |
-| selection.historical_weight_bonus | "Historical lean" rule | 1.25 | yes | data/balance.yaml |
+| campaign.events_choice | New-game "Events" choice → preset | Historical, Plausible (default), Free → historical, plausible, divergent | no | events.json |
+| date_binding.approximate_peak_mult | Approximate event's chance in its history year | 2.0 | yes (provisional) | events.json |
+| date_binding.approximate_spread_years | Years either side over which it fades to ×1 | 10 | yes (provisional) | events.json |
+| options.min, options.max | Options per event | 2, 4 | max provisional | events.json |
 | selection.alternate_history_mode.historical | follow_up_boost_mult, historical_option_mult, mean_years_mult | 1.5, 2.0, 0.8 | yes | data/balance.yaml |
 | selection.alternate_history_mode.plausible | same | 1.0, 1.0, 1.0 | yes | data/balance.yaml |
 | selection.alternate_history_mode.divergent | same | 0.6, 0.5, 1.3 | yes | data/balance.yaml |
 | follow_ups.max_boost | Boost cap | 5.0 | yes | data/balance.yaml |
 | follow_ups.boost_decay_years | Linear fade after the window | 10 | yes | data/balance.yaml |
-| ai_factors | Named AI factors | 7 factors (EVT-042) | yes | data/balance.yaml |
-| rebel_sizes | × manpower_yield | small 0.5, medium 1.0, large 2.0, huge 4.0 | yes | data/balance.yaml |
-| rebel_thresholds | Unrest spawn and guaranteed | 60, 90 | yes | data/balance.yaml |
+| ai_factors | Named AI factors | 7 factors (EVT-042); high_unrest: more than 0.5 of provinces at 4+ grievances | yes | data/balance.yaml; events.json ai_factor_rules |
+| rebel_sizes | Share of the province's recruit pool that rises | small 0.125, medium 0.25, large 0.5, huge 1.0 | yes (provisional) | events.json |
+| stat_mapping | Event-tree statistic → concrete change (D-EVT-4) | province §15 table, country §11, trade v2, diplomacy 11 | food_security step size provisional | events.json |
+| derived_formulas | k_supply, good_base_yield, tech_economy_bonus, terrain_supply_mult | 1, 1, 0, 1 | yes (provisional) | events.json |
 | modifier_rules.default_stacking | Default stacking | refresh | yes | data/balance.yaml |
 | modifier_rules.max_stacks | Stack cap | 3 | yes | data/balance.yaml |
 | modifier_rules.exponential_half_life_share | Exponential decay | 0.5 | yes | data/balance.yaml |
 | coverage.min_events_per_region_age | Coverage threshold | 2 | yes | data/balance.yaml |
 | coverage.min_agency_share | Agency threshold | 0.35 | yes | data/balance.yaml |
-| statistics `k_*` coefficients | Formula coefficients | not given | yes | data/balance.yaml (named in statistics.yaml) |
-| campaign end date | Last day of the campaign | 31 August 1939 | no (a setting) | settings |
+| statistics other `k_*` coefficients | Formula coefficients | not given | yes | data/balance.yaml (named in statistics.yaml) |
+| campaign end date | Last day of the campaign | 31 August 1939 | no (a setting) | settings; events.json campaign.end_date |
 | per event `selection.mean_years`, `modifiers`, option `ai.base` | Per-event balance | per event | yes | data/events/*.yaml |
 | per modifier `changes`, `years` | Per-modifier magnitudes | per modifier | yes (design values) | data/modifiers.yaml |
 
@@ -432,104 +466,114 @@ belongs to time-and-turns.
 
 | Other context | Direction | Pattern | What crosses |
 |---|---|---|---|
-| province | downstream | Customer–Supplier | Province stats mapping (§15): population, prosperity → buildings, devastation → burned tiles, unrest → grievances, control, fort_level, infrastructure, industry, trade_access, food_security, disease_burden, culture and religion shares, colonial_status; geography anchors → fixed places |
+| province | downstream | Anti-Corruption Layer | Province stats mapping (§15, the events data's stat_mapping): population, prosperity → buildings, devastation → burned tiles, unrest → grievances, control, fort_level, infrastructure, industry, trade_access, food_security, disease_burden, culture and religion shares, colonial_status; geography anchors → fixed places |
 | realm | downstream | Customer–Supplier | Country stats mapping (§11): legitimacy, stability, war_weariness, prestige, admin_capacity, tech and innovations, literacy, debt, treasury, army and navy; engine flags (ruler_died, regency …) |
 | research | downstream | Customer–Supplier | The 20 innovations are research-tree inventions with the same ids; `tech` tracks |
-| trade | downstream | Customer–Supplier | trade_power, trade_access, world_trade_index, trade_index, trade_presence, trade_route, hubs as labels |
+| trade | downstream | Customer–Supplier | trade_access → trade ratio gain %, trade_index → trade ratio (X-6); trade_presence, trade_route, hubs as labels |
 | government | downstream | Customer–Supplier | 16 `government` values mapped to forms; admin_capacity → officials cap |
-| rebellions | downstream | Customer–Supplier | `rebels` effect, `rebels_active`, `unrest`, `separatism_risk`; events as sparks (OQ-EVT-5) |
-| revolutions | downstream (they extend this) | Customer–Supplier | Proposed: conditions grievance, class_share, lords, war_lost; effects regime, lock; param rebels.revolution; tiers rising_won, rising_crushed; event field revolution with rearm (one_time may fire again); flags revolutionary_regime, emigre_court, reaction_regime, revolution_funded; areas hokuriku, old_castile; entities ikko_ikki_kaga, comuneros, tay_son, donghak_movement, russian_opposition_1905, iranian_constitutionalists; 7 unverified sources; 26 extended and 10 new events; build.py EFFECT_TIERS (not merged) |
-| religion | downstream (they extend this) | Customer–Supplier | Proposed: religions hussite, jain, asian_traditional; conditions faith_policy, holds_holy_place, faith_wave_active; effects faith_wave, faith_policy, preachers; entities tumed, gelug_order, old_believers, gowa_tallo, merina_kingdom; 7 modifiers; 8 unverified sources; 10 new events; faith_wave patches on protestant_reformation, council_of_trent, safavid_rise, sikh_panth_founded, futa_jallon_jihad, sokoto_jihad; flags religious_persecution_active, missionary_persecution, inquisition_established set by religion (not merged) |
-| culture | downstream (they extend this) | Customer–Supplier | Proposed: culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new tongues abroad"; culture effects on listed events; nationalism read from ideology_support |
-| subjects | downstream (they extend this) | Customer–Supplier | vassalize, release, relation subject/overlord/personal_union, subject_count, create_country subject_of, doctrine_of_lapse; proposed subject_loyalty, add_subject_reason, remove_subject_reason, change_subject_kind |
-| diplomacy | downstream (they extend this) | Customer–Supplier | opinion → ledger standing; trust and notoriety read-only; relation types to relation actions; proposed effects war_aim, league, pretender |
-| national-strengths | downstream (they extend this) | Customer–Supplier | Ages for heydays; condition language; proposed effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
-| buildings | downstream (they extend this) | Customer–Supplier | Proposed effects add_building, remove_building, damage_buildings, building_step and condition has_building; landmarks founded by events |
+| rebellions | downstream | Customer–Supplier | `rebels` effect starts a rising from the recruit pool (EVT-048); `rebels_active` reads risings; `unrest` lands as one named grievance; events as sparks; the end of a tagged rising (EVT-068) |
+| revolutions | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11), registered by revolutions: conditions grievance, class_share, lords, war_lost; effects regime, lock; param rebels.revolution; tiers rising_won, rising_crushed; event field revolution with rearm (one_time may fire again); flags revolutionary_regime, emigre_court, reaction_regime, revolution_funded; areas hokuriku, old_castile; entities ikko_ikki_kaga, comuneros, tay_son, donghak_movement, russian_opposition_1905, iranian_constitutionalists; 7 unverified sources; 26 extended and 10 new events; build.py EFFECT_TIERS |
+| religion | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11), registered by religion: religions hussite, jain, asian_traditional; conditions faith_policy, holds_holy_place, faith_wave_active; effects faith_wave, faith_policy, preachers; entities tumed, gelug_order, old_believers, gowa_tallo, merina_kingdom; 7 modifiers; 8 unverified sources; 10 new events; faith_wave patches on protestant_reformation, council_of_trent, safavid_rise, sikh_panth_founded, futa_jallon_jihad, sokoto_jihad; flags religious_persecution_active, missionary_persecution, inquisition_established set by religion (D-EVT-16) |
+| culture | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11, D-EVT-12): culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new tongues abroad"; culture effects on listed events; nationalism read from ideology_support |
+| subjects | downstream (they extend this) | Customer–Supplier | vassalize, release, relation subject/overlord/personal_union, subject_count, create_country subject_of, doctrine_of_lapse; adopted (D-EVT-11) subject_loyalty, add_subject_reason, remove_subject_reason, change_subject_kind |
+| diplomacy | downstream (they extend this) | Customer–Supplier | opinion → ledger standing; trust and notoriety are diplomacy's derived values, an event's change lands as an Oath broken or a Notorious deed (D-EVT-14); relation types to relation actions; adopted effects war_aim, league, pretender (D-EVT-11) |
+| national-strengths | downstream (they extend this) | Customer–Supplier | Ages for heydays; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
+| buildings | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11) effects add_building, remove_building, damage_buildings, building_step and condition has_building; landmarks founded by events |
 | exploration | downstream | Customer–Supplier | `age_of_exploration` gates exploration per region; colonial_presence |
 | warfare | downstream | Customer–Supplier | war, peace, casus_belli; prestige from victories |
-| game-shell | downstream | Published Language | Event modal, queue in date order, unanswered events block End turn, historical or free events option, wrap-up |
+| game-shell | downstream | Published Language | Event modal, queue in date order, unanswered events block End turn (EVT-044), the "Events" choice Historical / Plausible / Free (EVT-036); the final scores screen is the wrap-up (D-EVT-2) |
 | audio | downstream | Published Language | `music:` tags |
 | achievements | downstream | Published Language | `event_role`, historical vs non-historical choices, narrative_only excluded |
 | onboarding | downstream | Customer–Supplier | `tutorial_only` scripted events in event format; requested Varna crusade and abdication events |
-| time-and-turns | upstream | Conformist | Monthly and yearly ticks; events last in the turn |
-| settings | upstream | Customer–Supplier | Campaign end date; alternate history mode |
+| time-and-turns | upstream | Conformist | Events are step 6 of the turn, after every other system and before achievements (X-2); monthly work in the turn a new month begins, yearly checks in the turn in which 1 January falls (X-18) |
+| game-shell (new game) | upstream | Customer–Supplier | The "Events" choice sets the alternate history mode; settings never change it during play (X-15) |
 
 ## 12. AI
 
-- The AI picks among options by base weight times named factors (EVT-042); under the game rules, historical
-  options are multiplied by the preset's `historical_option_mult` and, with "historical lean", by 1.25.
+- The AI picks among options by base weight times named factors (EVT-042); historical options are multiplied
+  by the preset's `historical_option_mult`.
+- A decision the AI leaves unanswered for 10 years lapses into the pool (EVT-032).
 - Options with no chooser are rolled by these same weights.
 - The AI reads the same counts as the player (country stats 11).
 - Revolutions add their own weights (revolutions context).
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-EVT-1: The data still holds 59 events after 31 August 1939 and the Decolonization (window from 1919, start
-  conditions that include `world_war_ii` and Indian independence), Cold War and Globalization ages; the World
-  Wars age ends on `world_war_ii` or after 1940; Imperialism and Industrialization force-end in 1945 and 1950.
-  Gap list 24 asks to mark these out of scope; it is not done. How are they cut: deleted, flagged, or ignored by
-  the engine? Can an in-scope age's end condition that names an out-of-scope event ever be met?
-- OQ-EVT-2: Interwar coverage is thin: 10 events start 1918–1939 (wilsonian_moment, armistice_1918,
-  influenza_pandemic_1918, treaty_of_versailles, may_fourth_movement, soviet_union_founded, treaty_of_lausanne,
-  great_depression, italian_invasion_of_ethiopia, second_sino_japanese_war); the century table counts the 1900s
-  together; Caribbean, Mesoamerica and the steppe are thin in some ages; there is no end-of-campaign wrap-up
-  event (gap list 24, screen-flow). Not designed.
-- OQ-EVT-3: The validator's anachronisms (Johor 1511, Hyderabad, Bengal and Awadh 1707, Tahiti 1768,
-  Dutch Republic 1799, Boer republics 1835, Poland 1917, two mandates 1919) are kept as warnings; gap list 24
-  asks to fix them.
-- OQ-EVT-4: The tree's statistics (prosperity, unrest, devastation, control, legitimacy, integration_strain …)
-  are abstractions the province and country designs replace by concrete counts through a "rename pass"; the
-  pass has not been done in the event data. `integration_strain` and `legitimacy` (partly) have no mapping;
-  trade 12 uses `trade_index`, which is not in statistics.yaml.
-- OQ-EVT-5: `rebels` (type, size × manpower_yield), `rebel_thresholds` (unrest 60 / 90), `rebels_active` and
-  the `high_unrest` AI factor (average unrest above 50) assume an unrest meter, while province stats 12.1 says
-  "there is no anger meter" and rebellions works from grievances and 8 causes. No mapping from rebel types and
-  sizes to causes and men. Also `rebels_active`'s type list omits `anticolonial`, which enums' rebel_types has.
-- OQ-EVT-6: Schema and data disagree: data puts `duration_years`, `cooldown_years`, `max_occurrences`,
-  `maintain` and `cancel_if` under `execution`, the schema puts duration, maintain and cancel at top level and
-  cooldown in `availability` and has no `max_occurrences`; data writes delayed effects as `{after_years, <effect>,
-  if}`, the schema as `{years, effects}`; data writes AI factors as `{if, factor}`, the schema as
-  `{factor: <balance id>, mult}`; data uses the shorthand `{event: <id>}`; the localization runtime is flat keys
-  (`event.<id>.name`, 1,419 keys), the schema an object per id. Which is the contract?
-- OQ-EVT-7: How many options: the README says two or three, the validator 2 or more, revolutions allow up to
-  four, and `printing_press_spreads` has one (a warning).
-- OQ-EVT-8: Balance lets an unanswered decision lapse after 10 years and re-enter the pool; screen-flow (16 Oct)
-  says unanswered events block End turn and nothing ever answers an event for the player. Does lapsing apply
-  only to AI-held decisions?
-- OQ-EVT-9: Game rules: balance has three alternate history presets plus a "historical lean" rule; screen-flow
-  new-game options offer "historical or free events". How do the two map?
-- OQ-EVT-10: `is_human` changes selection weights for human players. Does this break the multiplayer-friendly
-  rule "no player-only shortcuts" (gap list 4)?
-- OQ-EVT-11: None of the sibling additions is merged (religion, revolutions, culture, subjects, diplomacy,
-  national strengths, buildings, tutorial). The event tree has no owner decision on them; the effect tiers
-  `rising_won` / `rising_crushed`, the `revolution` field and `rearm` (which lets a one_time event fire again)
-  need schema and build changes.
-- OQ-EVT-12: Culture says the event tree has 38 culture groups (42 with its four additions); enums.yaml lists 39.
-- OQ-EVT-13: Post-1939 values remain in closed lists: innovations computing, green_revolution_agriculture,
-  internet; ideologies non_alignment, environmentalism, neoliberalism; global `co2_concentration` drives
-  climate "after ~1950". Country stats says the research tree holds all 20 event-tree innovations, while Era
-  VIII is dropped. Are these values removed?
-- OQ-EVT-14: Diplomacy asks for `trust` and `notoriety` to be derived (read-only); statistics.yaml has
-  `notoriety` stored and `trust` stored pairwise.
-- OQ-EVT-15: When in the month do age and period checks run ("yearly")? Ages are checked yearly; periods do not
-  say. The turn order is open (gap list 20).
-- OQ-EVT-16: Religion moves three world-state flags (religious_persecution_active, missionary_persecution,
-  inquisition_established) from "engine" to religion's own rules; enums.yaml still says `set_by: engine`.
+- **D-EVT-1** (was OQ-EVT-1) How post-1939 content is cut: when a campaign loads its events it drops every
+  event whose history starts after 31 August 1939 (59 events); the data keeps them as reference. The ages
+  Decolonization, Cold War and Globalization never start. Every running age is cut at the end date. An end
+  condition part that names a dropped event (the World Wars age's `world_war_ii`) never holds, so the age ends
+  by its other conditions or at the end date; force_end dates after 1939 are never reached. X-14 decides it.
+- **D-EVT-2** (was OQ-EVT-2) Interwar coverage and the wrap-up: the 10 interwar events are the interwar
+  content and no events are added; the end of the campaign has no wrap-up event, the final scores screen of
+  X-12 is the wrap-up. Adding events or a new end mechanic would go beyond the designs.
+- **D-EVT-3** (was OQ-EVT-3) The validator's anachronisms: they stay build warnings that never fail the
+  build (EVT-064); the dates are corrected in the historian's spot-check before release (EVT-065). The build
+  already reports them, and fixing history is a sources task, not a rule.
+- **D-EVT-4** (was OQ-EVT-4) The rename pass: there is no rename in the event data. The events data holds a
+  mapping table (an anti-corruption layer) that lands each change on the owning context (EVT-056): province
+  §15's table, country §11, trade_access → trade ratio gain % and trade_index → trade ratio (X-6), trust and
+  notoriety → diplomacy (D-EVT-14). legitimacy is read as the share of loyal lords and a change lands as the
+  same points of loyalty on each lord. integration_strain is only read, as the share of the realm's provinces
+  with one or more grievances. One table is simpler than rewriting 306 events.
+- **D-EVT-5** (was OQ-EVT-5) Rebels: a `rebels` effect is a spark that starts a rising at once in the target
+  province, with its men taken from the province's recruit pool: small 1/8, medium 1/4, large 1/2, huge the
+  whole pool (provisional; the same 1:2:4:8 steps). Rebellions runs it from there. The unrest thresholds 60 and
+  90 are dropped; `unrest` lands as one named grievance; `rebels_active` reads risings under way and accepts
+  every rebel type, `anticolonial` included; the `high_unrest` AI factor holds when more than half the
+  country's provinces have 4 or more grievances. X-9 says the rebellions design governs and men come from the
+  recruit pool.
+- **D-EVT-6** (was OQ-EVT-6) Schema against data: the built data is the contract and the schema follows it
+  (`execution` holds duration_years, cooldown_years, max_occurrences, maintain and cancel_if; delayed effects
+  are `{after_years, <effect>, if}`; AI factors are `{if, factor}` or a named `{factor, mult}`; `{event: id}`
+  is allowed; localization is flat keys such as `event.<id>.name`). The data is what the build validates and
+  the engine already reads.
+- **D-EVT-7** (was OQ-EVT-7) Number of options: two to four, exactly one historical. More than four is a
+  build error; fewer than two is a warning on a major event (printing_press_spreads, a diffusion with nothing
+  to choose) and an error otherwise. Four covers the revolutions' largest events.
+- **D-EVT-8** (was OQ-EVT-8) Decision expiry: only a decision offered to an AI country lapses after 10 years
+  and re-enters the pool. A decision offered to the player waits and blocks End turn like every event. This
+  keeps screen-flow's "nothing answers an event for the player".
+- **D-EVT-9** (was OQ-EVT-9) Game rules: the new-game "Events" choice has three values, Historical,
+  Plausible (the default) and Free, which are the presets historical, plausible and divergent. The separate
+  "historical lean" rule (×1.25) is dropped. One choice is simpler than two overlapping rules.
+- **D-EVT-10** (was OQ-EVT-10) `is_human`: dropped from the vocabulary; no condition reads whether a country
+  is played by a person, and the build reports it as undeclared. The player and the AI follow the same rules.
+- **D-EVT-11** (was OQ-EVT-11) Sibling additions: adopted. Religion, revolutions, culture, subjects,
+  diplomacy, national strengths, buildings and the tutorial each register their conditions and effects as one
+  evaluator each (EVT-050) and their data patches merge into the tree at build; the tiers `rising_won` and
+  `rising_crushed` apply when a tagged rising ends (EVT-068); the `revolution` field and `rearm` are read
+  through revolutions' re-arm hook. They were designed later and need no new rule in the event tree.
+- **D-EVT-12** (was OQ-EVT-12) Culture groups: enums' list of 39 is the closed list, plus culture's four
+  additions celtic, baltic, caucasian and hebrew, 43 in all. enums is the contract (D-EVT-6).
+- **D-EVT-13** (was OQ-EVT-13) Post-1939 values: removed from the closed lists: the innovations computing,
+  green_revolution_agriculture and internet; the ideologies non_alignment, environmentalism and neoliberalism;
+  the global `co2_concentration`. The research tree holds the 17 remaining innovations. X-14 drops what comes
+  after 1939.
+- **D-EVT-14** (was OQ-EVT-14) trust and notoriety: they are diplomacy's derived values (DIPL-173, DIPL-174).
+  An event may still change them; the change is handed to diplomacy (trust down → an Oath broken, notoriety
+  up → a Notorious deed) and the event tree stores no number. Diplomacy was designed later.
+- **D-EVT-15** (was OQ-EVT-15) When ages and periods are checked: in the turn in which 1 January falls, in the events step
+  (step 6 of X-2), before eligibility. X-2 and X-4 put yearly steps in January.
+- **D-EVT-16** (was OQ-EVT-16) The religion flags: religious_persecution_active, missionary_persecution and
+  inquisition_established are set by religion's own rules (`set_by: religion` in the events data). Religion
+  was designed later.
 
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
 |---|---|---|
-| EVT-001 – 003 | campaign-scope.feature | End date; out-of-scope events and ages |
+| EVT-001 – 003 | campaign-scope.feature | End date; post-1939 events dropped; later ages never start; ages cut at the end date |
 | EVT-004 – 010 | principles.feature | History reference; roles; agency; harm; enslavement; own terms |
 | EVT-011 – 017 | ages-and-periods.feature | Age windows, forced dates; periods |
 | EVT-018 – 028 | eligibility.feature | Availability, mode, repeat, requires, exclusive, invalidation, trigger |
-| EVT-029 – 036 | selection.feature | Immediate, pool, decision, pacing, follow-ups, presets |
+| EVT-029 – 036 | selection.feature | Immediate, pool, decision, AI decisions lapse and the player's do not, pacing, follow-ups, presets, the Events choice |
 | EVT-037 – 038 | effects.feature | Duration, maintain, cancel |
 | EVT-039 – 044 | options.feature | Options, chooser, allowed, AI factors, player answer |
 | EVT-045 – 050 | effects.feature | Effect tiers and types; rebels sizes; new types |
 | EVT-051 – 053 | modifiers.feature | Decay, stacking, scopes |
-| EVT-054 – 056 | statistics.feature | Stored vs derived; mapping |
+| EVT-054 – 056 | statistics.feature | Stored vs derived; derived recomputed each tick; the mapping; trust and notoriety to diplomacy; integration_strain read only |
 | EVT-057 – 059 | data-validation.feature | Flags, enums, entities |
 | EVT-060 – 065 | data-validation.feature | Layers, localization, checks, coverage |
 | EVT-066 – 067 | principles.feature | Music tags, tutorial-only events |
+| EVT-068 | effects.feature | The end of a tagged rising applies its tier |

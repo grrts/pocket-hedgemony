@@ -201,7 +201,9 @@ The AI uses the same levy and training commands. Its catalogue personality sets 
 
 ### Each month
 
-Each province is updated once a month: training months tick down and finished regiments come out, births are cut by men away and fallen, pay starts for levies past their free months, a fifth of pay is spent where soldiers are, the empty province's effects apply, and Marshal idleness counts up. Once a year, in the January turn, the pool refills and Fallen and Veterans fade. A levy itself is worked out in one calculation when you tap it.
+A turn is one week. Everything below happens once a month, at the end of the turn in which the new month begins, with the same amounts as before.
+
+Each province is updated once a month: training months tick down and finished regiments come out, births are cut by men away and fallen, pay starts for levies past their free months, a fifth of pay is spent where soldiers are, the empty province's effects apply, and Marshal idleness counts up. Once a year, in the turn in which 1 January falls, the pool refills and Fallen and Veterans fade. A levy itself is worked out in one calculation when you tap it.
 
 ## What you see
 

@@ -149,8 +149,7 @@ Feature: Commanders and captains
       | Reckless | never  |
       | Careful  | 3 to 2 |
 
-  @WAR-061 @open-question
-  # OQ-WAR-6: recruiting v3 replaces several of these origins
+  @WAR-061
   Scenario Outline: Where commanders come from
     Given the country "France" gets a commander by origin "<origin>"
     When the commander is evaluated
@@ -162,8 +161,9 @@ Feature: Commanders and captains
       | a lord                | he may refuse to serve under a lower-born commander                     |
       | a hired captain       | he leaves when unpaid, like his company                                 |
       | risen from the ranks  | Proud lords waver when he commands them                                 |
-      | a school graduate     | he starts with +1 Cunning or Logistics and no victories                 |
+      | an academy graduate   | he starts with +1 Cunning or Logistics and no victories                 |
       | an exile              | his old ruler sees it as an insult                                      |
+      | a commissioned official | he counts as an academy graduate: +1 Cunning or Logistics and no victories |
 
   @WAR-061
   Scenario: Risen from the ranks is offered once per won battle

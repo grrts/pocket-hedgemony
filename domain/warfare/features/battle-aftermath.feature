@@ -143,25 +143,37 @@ Feature: Battle: night, aftermath, prisoners, standing orders and reports
       | wait   | stays put                    |
 
   @WAR-135
-  Scenario: Battles are resolved one at a time at the end of the month
-    Given three battles were fought in the month
-    When the month ends
+  Scenario: Battles are resolved one at a time in the turn
+    Given three battles were fought in the turn
+    When the turn ends
     Then each battle is resolved one at a time, in order
     And each result is ready before its report shows
 
-  @WAR-136 @open-question
-  # OQ-WAR-2: whether the turn pauses is still being settled in the planning round
-  Scenario: A player battle stops the turn on a report
-    Given the player's country "France" fought a battle at "Troyes" this month
-    When the month ends
-    Then the turn stops on a battle report naming who fought, where, the result, the losses and the one-line reason
-    And the report has a Watch button
-    And the player can watch it, skip it, or replay it later from the report
+  @WAR-136
+  Scenario: A player battle is fought round by round
+    Given the player's country "France" fights a battle at "Troyes" this turn
+    When the battle is fought one round at a time
+    Then it ends with the same result as the battle fought at once
+    And at each round the player can "change standing orders", "retreat" or "switch battle", and there is no Skip to result
+    And after the battle a report names who fought, where, the result, the losses and the one-line reason
+    And the battle can be replayed later from its report
+
+  @WAR-205
+  Scenario: A side can retreat at any round
+    Given the player's country "France" fights a battle at "Troyes" this turn
+    When "France" orders a retreat after round 2
+    Then the battle ends in round 3 with "France" withdrawing
+
+  @WAR-206
+  Scenario: An army that marches in joins a running battle
+    Given the player's country "France" fights a battle at "Troyes" this turn
+    When a French army of 2000 men marches in after round 1
+    Then the French side has 4600 men in the battle
 
   @WAR-137
   Scenario: Battles between other countries don't stop the turn
-    Given "Castile" and "Portugal" fought a battle this month and the player is "France"
-    When the month ends
+    Given "Castile" and "Portugal" fought a battle this turn and the player is "France"
+    When the turn ends
     Then the turn does not stop
     And the battle report waits in the log
 

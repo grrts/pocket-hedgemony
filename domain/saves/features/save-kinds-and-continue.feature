@@ -6,10 +6,10 @@ Feature: Kinds of save and Continue
 
   @SAVE-001
   Scenario: A save is always a turn boundary
-    Given the campaign as "Castile" is at turn 577, May 1492
+    Given the campaign as "Castile" is at turn 2478, May 1492
     And the player has queued 3 orders
     When any save is written
-    Then the save holds the world at the start of turn 577 and the 3 queued orders
+    Then the save holds the world at the start of turn 2478 and the 3 queued orders
     And it holds nothing from halfway through a turn
 
   @SAVE-006
@@ -27,51 +27,61 @@ Feature: Kinds of save and Continue
       | purchases                   |
       | achievement progress        |
 
-  @SAVE-007 @open-question
+  @SAVE-007
   Scenario Outline: The Resume save follows every lifecycle point
-    # OQ-SAVE-2: on backgrounding the design also says only the journal is written
     Given the campaign as "Castile" is loaded and is not ironman
-    When <trigger>
+    When the lifecycle moment "<moment>" comes
     Then the Resume save of the campaign is current
     And the campaign keeps 1 Resume save and 1 backup
     And the Resume save is not listed in Load
 
     Examples:
-      | trigger                        |
-      | the player ends the turn       |
-      | the player pauses              |
-      | the player quits               |
-      | the app is suspended           |
-      | the app is backgrounded        |
+      | moment                 |
+      | End turn               |
+      | pause                  |
+      | quit                   |
+      | exit to the main menu  |
+      | suspend                |
 
-  @SAVE-008 @SAVE-015
+  @SAVE-007 @SAVE-026
+  Scenario: Backgrounding writes only the orders journal
+    Given the campaign as "Castile" is loaded and is not ironman
+    When the lifecycle moment "background" comes
+    Then the orders journal is written
+    And no Resume save is written
+
+  @SAVE-008 @SAVE-015 @SAVE-100
   Scenario Outline: Autosaves rotate on the chosen interval
     Given the autosave interval is "<interval>"
     And autosaves kept per campaign is <keep>
     And the campaign as "Castile" has <existing> autosaves
-    When a turn starts in <month>
+    When a turn starts on "<turn start>"
     Then <result>
 
     Examples:
-      | interval        | keep | existing | month    | result                                                       |
-      | every 12 turns  | 3    | 3        | January  | a new autosave marked "Auto" is written and the oldest is removed |
-      | every 12 turns  | 3    | 2        | March    | no autosave is written                                       |
-      | every turn      | 1    | 1        | March    | a new autosave marked "Auto" is written and the oldest is removed |
-      | every turn      | 5    | 2        | March    | a new autosave marked "Auto" is written and none is removed  |
+      | interval        | keep | existing | turn start | result                                                            |
+      | every 12 months | 3    | 3        | 1449-12-29 | a new autosave marked "Auto" is written and the oldest is removed |
+      | every 12 months | 3    | 2        | 1450-03-01 | no autosave is written                                            |
+      | every month     | 1    | 1        | 1450-03-01 | a new autosave marked "Auto" is written and the oldest is removed |
+      | every month     | 5    | 2        | 1450-02-26 | a new autosave marked "Auto" is written and none is removed       |
+      | every month     | 3    | 1        | 1450-03-08 | no autosave is written                                            |
+      | every 6 months  | 3    | 1        | 1450-07-01 | a new autosave marked "Auto" is written and none is removed       |
+      | every 6 months  | 3    | 1        | 1449-12-29 | a new autosave marked "Auto" is written and none is removed       |
+      | every 6 months  | 3    | 1        | 1450-03-01 | no autosave is written                                            |
 
   @SAVE-015
   Scenario: Autosave defaults
     Given the player has never changed the autosave options
     When the autosave options are read
-    Then the interval is "every 12 turns (each January)"
+    Then the interval is "every 12 months (each January)"
     And autosaves kept per campaign is 3
-    And the offered intervals are "every turn, every 6 turns, every 12 turns (each January), off"
+    And the offered intervals are "every month, every 6 months, every 12 months (each January), off"
     And the offered counts are "1, 3, 5"
 
   @SAVE-016
   Scenario: Off stops autosaves but never the Resume save
     Given the autosave interval is "off"
-    When the player ends the turn in January
+    When the player ends the turn in which January begins
     Then no autosave is written
     And the Resume save is written
 
@@ -131,3 +141,15 @@ Feature: Kinds of save and Continue
       | nation   | date       | device     | this device | label                                         |
       | Portugal | March 1512 | Steam Deck | Pixel 8     | Continue: Portugal, March 1512 (from Steam Deck) |
       | Castile  | May 1492   | Pixel 8    | Pixel 8     | Continue: Castile, May 1492                   |
+
+  @SAVE-101
+  Scenario Outline: Restore the last autosave
+    Given the campaign as "Castile" has a Resume save and 2 autosaves
+    And its Resume saves are <state>
+    When the player picks "Restore the last autosave" on the failure screen
+    Then the <opened> is opened
+
+    Examples:
+      | state   | opened          |
+      | sound   | Resume save     |
+      | damaged | newest autosave |

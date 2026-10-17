@@ -28,7 +28,7 @@ answer it, and what the rebels get if they win.
 - The secret "fund rebels" action itself, its gold and its chance of being caught: **diplomacy**.
 - Faith policy rows, preachers, houses of worship: **religion**. Tongues and nationalism: **culture**.
 - Independence wars of subjects: **subjects** (8.2), which are ordinary wars, not risings.
-- The global order of the monthly turn: **time-and-turns**.
+- The global order of the turn and its monthly steps: **time-and-turns**.
 - How risings are drawn on the map at each zoom: **map-presentation**.
 
 ## 2. Sources
@@ -383,13 +383,15 @@ The secret "fund rebels" order is a diplomacy command (diplomacy 6.11); this con
 - When a rival funds rebels in a province (diplomacy 6.11), then count the rising's arms as Armed from foreign
   gold and do not shrink it while the owner waits.
 
-## 9. Monthly turn
+## 9. Monthly step
+
+A turn is one week (X-18). These steps are monthly: they run once, in the turn in which a new month begins.
 
 Reads first: the province's grievances, homeless share, officials (judge), almshouse, local and castle stores,
 castles and garrisons, lords' loyalty, armies in the region, battles fought this month, funding by rivals.
 
 1. Recount each province's step from its grievances.
-2. Apply sparks that happened this month (from other contexts' steps earlier in the turn).
+2. Apply sparks that happened since the last monthly step (from other contexts' steps in this month's turns).
 3. Roll the rising chance for each plotting province.
 4. Muster: draw join shares into each growing rising.
 5. Feed rebels (store, then forage); apply hunger losses.
@@ -448,7 +450,7 @@ groups.
 | scenario-setup | downstream | Customer–Supplier | A new country for a won homeland rising (catalogue entity or generated) |
 | exploration | upstream | Customer–Supplier | Colonies and local people's tiles; resistance (D-REBL-13) |
 | map-presentation | downstream | Published Language | Steps on the map, rising icons, *Grievances* lens |
-| time-and-turns | upstream | Conformist | Monthly order of steps |
+| time-and-turns | upstream | Conformist | Monthly steps in the turn a new month begins (X-18), order of steps |
 
 ## 12. AI
 

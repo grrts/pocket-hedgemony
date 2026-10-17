@@ -30,10 +30,9 @@ Feature: Achievements in the game
     Then no toast is shown
     And the achievement is unlocked
 
-  # Where the screen opens is placed by the screen flow (OQ-ACH-13).
-  @ACH-072 @open-question
+  @ACH-072
   Scenario: The achievements screen
-    When the player opens the achievements screen from the pause menu
+    When the player opens the achievements screen from the main menu's More
     Then the screen shows a grid of icons grouped by category
     When the player selects "Counting House"
     Then its text, its progress and the date it was earned are shown

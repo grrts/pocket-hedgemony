@@ -75,7 +75,7 @@ Feature: Classes and job slots
 
   @PROV-116 @placeholder
   Scenario: Homeless drift to the emptiest neighbour in their own realm first
-    # config: province.homeless.drift_share (value not given: OQ-PROV-17)
+    # config: province.decided.homeless_drift_share (2 % a year)
     Given the province "Troyes" has 3,600 homeless
     And the French province "Sens" and the Burgundian province "Dijon" border "Troyes"
     And "Dijon" has emptier slots than "Sens"

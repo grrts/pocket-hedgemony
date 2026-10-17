@@ -255,8 +255,8 @@ Newest decision first.
 - When a revolutionary regime pushes the state tongue (revolutions), then CULT applies `set_court_tongue`; the creole republic adopts the creole tongue as court tongue.
 - When a school is built (buildings), then CULT reads its teaching tongue for drift.
 
-## 9. Monthly turn
-- Not monthly. Yearly: drift in every province after births and deaths (needs province population, officials, lords, schools, policy, charters, nationalism, inventions).
+## 9. Monthly step
+- Not monthly. Yearly (in the turn in which 1 January falls, X-18): drift in every province after births and deaths (needs province population, officials, lords, schools, policy, charters, nationalism, inventions).
 - Every 5 years: engine-raised checks (court goes native, new tongue abroad, merge without event).
 - On demand: Tongue % and Peoples screen when opened.
 - Immediate: policy changes, charters, event verbs.

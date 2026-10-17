@@ -36,7 +36,7 @@ Every record carries every section, whatever its importance: region, names, clas
 | Internal estate | Simulated as a faction or region inside another country | 58 |
 | Collective institution | The Empire, the Hanse, confederacies, councils | 16 |
 
-The 16 collective institutions are the Kalmar Union, the Hanseatic League, the Holy Roman Empire, the Council of Basel, the Decapolis, the Swabian League cities, the Swiss Confederation, the Livonian Confederation, the League of Lezhë, Mount Athos, the Gelug monasteries, the Karmapa, the Sakya, the Japanese imperial court, the Kamakura kubō and the Triple Alliance. What rules they follow is still open (OQ-SETUP-8).
+The 16 collective institutions are the Kalmar Union, the Hanseatic League, the Holy Roman Empire, the Council of Basel, the Decapolis, the Swabian League cities, the Swiss Confederation, the Livonian Confederation, the League of Lezhë, Mount Athos, the Gelug monasteries, the Karmapa, the Sakya, the Japanese imperial court, the Kamakura kubō and the Triple Alliance. They are not realms of their own, unless a map nation stands for one: Switzerland plays as the Swiss Confederation and the Aztecs as the Triple Alliance. The rest are background that events can draw on.
 
 ### Starting assessments
 
@@ -89,7 +89,7 @@ Each country's starting counts are set from its assessments:
 | Trade access | Merchants and access to grain prices |
 | Diplomatic influence | Extra officials at court ready to go abroad |
 
-A **low confidence** in the catalogue gives a wider random range for the starting counts, so each campaign starts a little differently. How many of each a level gives is not designed yet (OQ-SETUP-6).
+A **low confidence** in the catalogue gives a wider random range for the starting counts, so each campaign starts a little differently. Each level multiplies the starting count: very low by 0.5, low by 0.75, medium by 1, high by 1.25 and very high by 1.5, and an unknown level counts as medium. Low confidence lets the count vary by up to 20 % either way.
 
 Other starting facts:
 
@@ -163,7 +163,7 @@ The engine starts every nation with 50 gold, levies of 4 men per thousand people
 
 ### From catalogue to map
 
-A mapping plan will say which catalogue record owns which provinces, with capitals, colours, rulers and commanders, and the map setup will use catalogue ids for countries. Today only 100 of the 137 map nations match a catalogue id (OQ-SETUP-1).
+A mapping plan will say which catalogue record owns which provinces, with capitals, colours, rulers and commanders, and the map setup will use catalogue ids for countries. The 137 nations on the map are the realms. Where a map nation's id differs from the catalogue (for example Korea is Joseon), a rename table links the two. A catalogue record that owns no province on the map is background only, and land nobody owns stays free to settle.
 
 A **colony** can be founded only in a province no country owns. Land of a tribe that is a country (a chiefdom or clan council in the 1444 list) can only be taken by war or treaty.
 
@@ -171,7 +171,7 @@ A **colony** can be founded only in a province no country owns. Land of a tribe 
 
 - The **free tier** offers the **Ottomans and France**. The tutorial is played as the Ottomans.
 - Without the full game, the realm picker shows other realms with a padlock and a button to the Unlock screen. Coming back from a purchase keeps the realm you chose.
-- Which of the other realms are playable at launch is not decided (OQ-SETUP-3).
+- Every realm on the map is playable.
 
 ### Campaign rules
 
@@ -231,31 +231,26 @@ The screens themselves are on [Screens and Navigation](Screens-and-Navigation).
 | Starting gold | `economy.startingTreasury` | 50 | Yes |
 | Levies | `levies.menPerThousandPeople` | 4 | Yes |
 | Horse in starting armies | `march.startingHorseShare` | 0.2 | Yes |
-| Low-confidence range | country config | not given | Yes |
+| Low-confidence range | `scenario-setup.json` | ±20 % | Yes |
 | Free realms | store config | the Ottomans, France | No |
+
+## How the start is settled
+
+- **The date.** Every campaign, and the tutorial, starts on 11 November 1444. Mehmed II rules the Ottomans, and the union of Poland and Hungary has ended.
+- **Provinces.** People, wealth and castles come from the map. A province's people are counted in thousands, so Aube (Troyes) has 305 thousand.
+- **Treasury and armies.** Each realm's starting gold, debt and recruits come from its assessment; the flat 50 gold and levies apply only to a realm without one.
+- **Relations.** Alliances, rivalries and wars at the start come from the relations list.
+- **Events.** "Historical" events follow history closely; "free" events allow plausible changes.
+- **Commanders.** Commander numbers come from the map's nation data, so Dunois has Cunning 3.
+- **Minor countries.** Small countries start with no great houses.
+- **Warm-up.** The trade warm-up before the first turn uses the campaign's seed, changes only trade, and does not move the date.
 
 ## Still open
 
-- **OQ-SETUP-1**: The map has 137 nations, the catalogue 963 records, and only 100 ids match. No plan yet says which record owns which provinces.
-- **OQ-SETUP-2**: Which representations own provinces? 2,253 of 4,411 land provinces are unowned today; which belong to decentralised polities?
-- **OQ-SETUP-3**: Which realms are playable at launch beyond the free tier.
-- **OQ-SETUP-4**: The catalogue describes 11 November 1444 but the engine starts in March and the tutorial in April 1444. Which rulers, wars and unions apply? (See OQ-TIME-1.)
-- **OQ-SETUP-5**: The design names sources but no values for each province's people, tiles, buildings and wealth.
-- **OQ-SETUP-6**: No number per assessment level, no low-confidence range, nothing for `unknown`.
-- **OQ-SETUP-7**: How "historical or free events" maps onto the event tree's three presets.
-- **OQ-SETUP-8**: Are the 16 collective institutions countries, institutions over countries, or both?
-- **OQ-SETUP-9**: How group records such as Silesia own and play their provinces.
-- **OQ-SETUP-10**: The catalogue's 1,126 relationship edges and the relations dataset's 280 relations disagree in places; which wins at start?
-- **OQ-SETUP-11**: The engine's flat 50 gold and levies against the assessment-based counts; which replaces which?
-- **OQ-SETUP-12**: Does the trade warm-up use the campaign seed, move the date, or change anything but trade ratios?
-- **OQ-SETUP-13**: Where commander numbers come from (Dunois has cunning 3 on the map but 4 in the troop movement example).
-- **OQ-SETUP-14**: What lords tier B and C countries with several provinces get.
-- **OQ-SETUP-15**: Province names are still modern region names.
-- **OQ-SETUP-16**: Do disputed or stub records enter play?
-- **OQ-SETUP-17**: The map gives Aube (Troyes) 305 thousand people but the province design's Troyes card has 72,000. Which scale is meant?
+Nothing about the start is left open. The assessment factors and the ±20 % range are first values that balancing may change.
 
 ## For developers
 
-- Spec: [`domain/scenario-setup/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/scenario-setup/spec.md), requirement code **SETUP** (SETUP-001 to SETUP-058).
+- Spec: [`domain/scenario-setup/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/scenario-setup/spec.md), requirement code **SETUP**.
 - Features: `domain/scenario-setup/features/` (catalogue, start-forms, country-start, province-start, map-setup, catalogue-to-map, new-campaign).
 - Code and data: the 1444 map setup is built by `tools/mapgen/owners.ts` from `tools/mapgen/nations-1444.json`, `owners-1444.json` and `config.json`; start values the engine uses today are in `packages/rules/data/defines.json`; start forms come from `government/tools/assign_start_forms.py` and `government/config/start-forms.yaml` in the designs. Rules code for this context goes in `packages/engine/src/domain/scenario-setup/`.

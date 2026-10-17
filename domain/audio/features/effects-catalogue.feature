@@ -91,8 +91,8 @@ Feature: The effects catalogue
     And other sectors' sounds play only if a voice is free
 
   @AUD-077
-  Scenario: Skipping a battle
-    When the player skips ahead in a battle
+  Scenario: Skipping ahead in a battle replay
+    When the player skips ahead in a battle replay
     Then only "battle_start", "battle_rout" and the music stinger play
 
   @AUD-078
@@ -100,3 +100,8 @@ Feature: The effects catalogue
     When the player's army plunders a province
     Then "realm_fire" plays at low volume
     And no bright sound plays
+
+  @AUD-070
+  Scenario: The tooltip sound is never played
+    When a tooltip opens
+    Then "ui_tooltip" does not play

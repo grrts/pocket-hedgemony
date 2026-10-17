@@ -4,13 +4,23 @@ Feature: The war AI
   I want to use the same counts, orders and peace voices as the player, set by my personality
   So that the player can read exactly why an enemy fights, waits or talks
 
-  @WAR-194 @open-question
-  # OQ-WAR-14: how free-text military doctrine maps to standing orders and styles
-  Scenario: Personality sets standing orders and starting styles
-    Given the AI country "Castile" with its catalogue military doctrine and risk tolerance
+  @WAR-194 @placeholder
+  Scenario Outline: Risk tolerance sets standing orders
+    Given the AI country "<country>" has the risk tolerance "<risk>"
     When the AI plans its turn
-    Then its armies' retreat ratio and attack or wait come from its personality
-    And the styles its commanders start with come from its personality
+    Then its armies' standing order is "<order>" and they retreat if outnumbered "<ratio>"
+
+    Examples:
+      | country  | risk   | order  | ratio  |
+      | Savoy    | low    | wait   | 1 to 1 |
+      | Castile  | medium | attack | 3 to 2 |
+      | Ottomans | high   | attack | 2 to 1 |
+
+  @WAR-194
+  Scenario: Starting styles come from the style catalogue
+    Given the AI country "Castile" has the risk tolerance "medium"
+    When the AI plans its turn
+    Then its new commanders can start with the style "A la jineta"
 
   @WAR-195
   Scenario Outline: Personality sets which kinds it raises
@@ -24,10 +34,17 @@ Feature: The war AI
       | Venice  | hired companies                                   |
 
   @WAR-195
-  Scenario: Personality sets whether it besieges or raids
-    Given an AI country at war
+  Scenario Outline: Personality sets whether it besieges or raids
+    Given the AI country "<country>" has the risk tolerance "<risk>"
+    And its army is <army>
     When the AI plans its turn
-    Then whether its armies besiege or raid comes from its personality
+    Then its army <does>
+
+    Examples:
+      | country  | risk   | army          | does     |
+      | Ottomans | high   | horse only    | raids    |
+      | Ottomans | high   | foot and horse | besieges |
+      | Castile  | medium | horse only    | besieges |
 
   @WAR-196 @placeholder
   Scenario Outline: Risk sets when the AI talks peace

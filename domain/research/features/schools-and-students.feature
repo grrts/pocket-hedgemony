@@ -43,12 +43,13 @@ Feature: Schools, students and scholars
       | L7 Universities                 | university                   | 60    |
       | L12 Academies of science        | academy                      | 100   |
 
-  @RSCH-003 @open-question
+  @RSCH-003 @RSCH-070 @placeholder
   Scenario: Mass schooling gives every province seats
-    # OQ-RSCH-9: how many seats is not given
+    # config: research.village_school_seats
     Given the country "Prussia" knows the invention "L18 mass_literacy_schooling"
+    And it has 12 provinces, 3 of them with a school
     When the year begins
-    Then every province of "Prussia" has school seats
+    Then the 9 provinces without a school have 10 village-school seats each
 
   @RSCH-004
   Scenario: The player sets how many seats to fill
@@ -96,11 +97,32 @@ Feature: Schools, students and scholars
       | university | judge or steward            |
       | academy    | master of works or warden   |
 
-  @RSCH-007
+  @RSCH-007 @RSCH-081
   Scenario: The examination system makes scholars officials directly
     Given the country "Ming" knows the invention "G4 Examination system"
     When the player needs an official
     Then a scholar can become an official directly
+
+  @RSCH-081
+  Scenario Outline: Who may be made an official
+    Given the country "<country>" has 35 scholars
+    And it <g4> the invention "G4 Examination system"
+    When the player wants a <type> from <who>
+    Then it is <result>
+
+    Examples:
+      | country | g4             | type      | who                              | result  |
+      | Venice  | does not know  | judge     | a new university graduate        | allowed |
+      | Venice  | does not know  | warden    | a new university graduate        | refused |
+      | Venice  | does not know  | judge     | a working scholar                | refused |
+      | Ming    | knows          | warden    | a working scholar                | allowed |
+
+  @RSCH-079
+  Scenario: Students do not choose who becomes a woman scholar
+    Given the country "Venice" has 200 students
+    When some students graduate
+    Then the graduates are counted as scholars without a sex
+    And whether a scholar named to a role is a woman is the realm's women-in-roles roll
 
   @RSCH-008
   Scenario Outline: Scholars come and go

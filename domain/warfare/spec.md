@@ -51,7 +51,7 @@ this changes from era I to era VII as inventions arrive.
 
 Newest decision first.
 1. planning/gap-lists.md "Decisions already made" (16 Oct): campaign 1444 to 31 August 1939; era VIII and
-   1939–1960 of era VII out of scope; one month per turn; battles simulated one at a time; elephants and camels
+   1939–1960 of era VII out of scope; one month per turn, now one week per turn by X-18; battles simulated one at a time; elephants and camels
    are their own unit types; women can be commanders following each country's history, more likely in later
    ages; warfare 19 (hits per bell, break points, troop cap) still open.
 2. diplomacy/diplomacy-design.md v2 (16 Oct): §6.1 calls to arms (replaces warfare 10.2's refusal rule),
@@ -77,7 +77,7 @@ Newest decision first.
 | Kind | Where soldiers come from: levy, retinue, hired company, standing regiment, garrison, rebel band | Arm |
 | Strength per man | An arm's fighting worth per man, by era (config) | Hits |
 | Role | What an arm does in a sector: Line, Brace, Shock, Shot, Light, Heavy, Guns, Air (era VII) | Approach |
-| Drill | Months a company has trained together (0 to 12 in v5 main text) | Scars |
+| Drill | Months a company has trained together (0 to 24, D-WAR-9) | Scars |
 | Scars | Battles a company stood through without breaking (0 to 5) | Victories |
 | Troop level | 1 Raw, 2 Drilled, 3 Seasoned, 4 Veteran, 5 Elite, read from drill and scars | — |
 | Load of arms | One unit of the arms store: pikes, armour, hand guns, lances | Powder |
@@ -147,7 +147,7 @@ Newest decision first.
 - INV-WAR-5: An army stands in exactly one province (troop-movement 2.2).
 
 **Company** (identity: company id; part of an army, a garrison, or a lord's retinue)
-- Holds: kind; arm; men; drill (0–12 per v5 main text); scars (0–5); loads of arms carried; pay owed (months);
+- Holds: kind; arm; men; drill (0–24, D-WAR-9); scars (0–5); loads of arms carried; pay owed (months);
   months out; home province(s); level (derived).
 - INV-WAR-6: A company has exactly one kind and one arm.
 - INV-WAR-7: Scars are between 0 and 5.
@@ -267,7 +267,7 @@ Newest decision first.
 | Woods | 1,000 | No charges; shooting into it halved (cover); companies can hide (Ambush) |
 | Marsh | 500 | No charges; everyone −25 % |
 | Waste (rock, sand) | 1,500 | Open in drylands and desert; rough (no charges) on hills and mountains |
-| Shore (river bank) | 1,000 | Attacking across it −25 % unless the province has a bridge |
+| Shore (river bank) | 1,000 | Attacking across it −20 % unless the province has a bridge or its river is frozen (X-17, MOVE-117) |
 | Town | 1,500 | Defender +50 %, shooting into it halved, no charges; fighting here burns town buildings |
 | Castle | Its garrison | The garrison can join from the walls (walls bonus) |
 
@@ -368,7 +368,7 @@ Newest decision first.
 | VII | People's war | Chinese communists, Yugoslav and other partisans | — | Ambush | In occupied homeland provinces, rebel bands form for you each month | Nothing; slowed by calm provinces |
 | VII | Banzai charge | Japan | — | Assault | Breaks are delayed by one bell; losses ×2 for both sides | W19 |
 
-(Several era VII styles are historically seen only after 31 August 1939: see OQ-WAR-12.)
+(Era VII styles first seen after 31 August 1939 are dropped: D-WAR-12, X-14.)
 
 ## 5. Requirements
 
@@ -376,7 +376,7 @@ Newest decision first.
 
 - WAR-001 The warfare system shall make every army out of companies, each of one kind and one arm, usually 500 to 1,000 men (config), each keeping its own men, drill, scars, arms, pay owed and months out. [warfare §2.1]
 - WAR-002 The warfare system shall add men to a company by raising or refilling from recruits, by wounded coming back and by enlisting prisoners, and shall remove men killed, wounded, fled, deserting, sick, hungry or disbanded. [warfare §2.1]
-- WAR-003 When a month passes with a company in camp, garrison or winter quarters and not marching, the warfare system shall add 1 drill (up to 12); while it is a standing regiment, it shall drill all year. [warfare §2.1]
+- WAR-003 When a month passes with a company in camp, garrison or winter quarters and not marching, the warfare system shall add 1 drill (up to 24, D-WAR-9); while it is a standing regiment, it shall drill all year. [warfare §2.1]
 - WAR-004 When new men join a company, the warfare system shall set its drill to drill × old men ÷ all men, and dilute its scars the same way. [warfare §2.1]
 - WAR-005 When a company has a hungry month, the warfare system shall take 1 drill from it. [warfare §2.1, §7.4]
 - WAR-006 When a company stands through a battle without breaking, the warfare system shall add 1 scar, and 1 more if its side won (to a maximum of 5). [warfare §2.1, §7.12]
@@ -391,7 +391,7 @@ Newest decision first.
 
 ### 5.2 Kinds and break points
 
-- WAR-015 The warfare system shall give each kind its pay rule and base break point: levy 25 % (free for the first 3 months, then normal pay); retinue 35 % (paid by the lord); hired company 35 % (three times normal pay); standing regiment 40 % (1.5 times normal pay, all year, needs W12); garrison 40 % on the walls (normal pay); rebel band 20 % (loot). [warfare §2.3]
+- WAR-015 The warfare system shall give each kind its pay rule and base break point: levy 25 % (free for the first 3 months, then normal pay); retinue 35 % (paid by the lord); hired company 35 % (three times normal pay); standing regiment 30 % (1.5 times normal pay, all year, needs W12); garrison 40 % on the walls (normal pay); rebel band 20 % (loot). [warfare §2.3]
 - WAR-016 When a levy company has been out 6 months, the warfare system shall send 5 % of its men home each month unless it is paid double. [warfare §2.3]
 - WAR-017 While levies are away at harvest, the warfare system shall report that share of farmers away to the province so its harvest falls by that share. [warfare §2.3]
 - WAR-018 While a lord is wavering, the warfare system shall allow him to take his retinue home mid-war. [warfare §2.3, §3.2]
@@ -430,7 +430,7 @@ Newest decision first.
 - WAR-042 When a contract is signed, the warfare system shall add the free company for the contracted months for gold up front plus monthly pay, using no recruits. [warfare §3.3]
 - WAR-043 When a hire contract ends, its pay is owed as in WAR-019, or an enemy outbids, the warfare system shall remove the free company. [warfare §3.3]
 - WAR-044 Each month, the warfare system shall charge the treasury pay for every company except retinues and levies in their first 3 months. [warfare §3.4]
-- WAR-045 Each month, the warfare system shall feed an army 2 rations per soldier on campaign, 3 per horse and 1 per prisoner, from the province at home and from its food reserve abroad. [warfare §3.4, §6.1]
+- WAR-045 At the weekly step at the end of every turn (X-18), the warfare system shall feed an army a week's share (7 ÷ 30) of its monthly rations (2 per soldier on campaign, 3 per horse and 1 per prisoner a month), from the province at home and from its food reserve abroad. [warfare §3.4, §6.1; X-3, X-18]
 - WAR-046 When a company is disbanded, the warfare system shall return its men to their home province's recruit pool and its arms to the store. [warfare §3.5]
 - WAR-047 When a standing regiment is disbanded, the warfare system shall reset all its drill and scars. [warfare §3.5]
 - WAR-048 When soldiers come home from a long war with no slot free, the warfare system shall hand them to the province as homeless (a source of rebels). [warfare §3.5]
@@ -449,7 +449,7 @@ Newest decision first.
 - WAR-058 The warfare system shall apply the traits: Steady +5 % break point for his army; Reckless +10 % strength, −5 % break point, losses ×1.3 for both sides, wounds twice as likely; Careful never ambushed while marching Careful and spots hidden companies as with +1 Cunning; Beloved halves desertion and keeps levies 3 months longer; Cruel makes sacks pay 50 % more, gives *Burned homes* faster where he occupies, and enemy garrisons won't accept his terms; Siege master breaches 25 % faster; Horse lord +10 % Shock and Turn with Shock hits ×2 instead of ×1.5; Old soldier raises his companies' drill 2 a month instead of 1; Greedy keeps a tenth of all loot and takes bribes from garrisons; Ambitious as in WAR-064. [warfare §4.3]
 - WAR-059 When a commander reaches 10 victories, the warfare system may give him a second trait. [warfare §4.3]
 - WAR-060 Where the player has not set an army's standing orders, the warfare system shall set them from the commander's trait (Reckless never retreats; Careful retreats at 3 to 2). [warfare §4.3]
-- WAR-061 The warfare system shall allow commanders from the ruler or an heir, a lord, a hired captain, a captain risen from the ranks after a victory (one offer per won battle), an academy graduate and a foreign exile, with the catches of each origin (succession crisis on the ruler's death or capture; Proud lords refusing a lower-born commander; a hired captain leaving when unpaid; the exile's old ruler insulted). [warfare §4.4; see OQ-WAR-6]
+- WAR-061 The warfare system shall allow commanders from the ruler or an heir, a lord, a hired captain, a captain risen from the ranks after a victory (one offer per won battle), an academy graduate and a foreign exile, with the catches of each origin (succession crisis on the ruler's death or capture; Proud lords refusing a lower-born commander; a hired captain leaving when unpaid; the exile's old ruler insulted). A commissioned official counts as an academy graduate. [warfare §4.4; X-7; D-WAR-6]
 - WAR-062 The warfare system shall lose commanders by death in battle (1 in 20 for the loser's commander, more under Reckless), capture, old age, dismissal (a dismissed lord wavers), defection, or a grant of land after which he leads only his retinue. [warfare §4.4]
 - WAR-063 The warfare system shall let an army have one commander and up to two captains, each standing in one sector; a captain who wins 3 battles under a commander learns his style. [warfare §4.5]
 - WAR-064 When a commander with 8 or more victories has led the same standing regiments or hired companies for 5 years, the warfare system shall mark those companies as "his men", following him before the crown; if he is Ambitious, pay is owed, or the ruler is a child or newly crowned, it shall let events offer him the throne or a march on the capital. [warfare §4.6]
@@ -486,7 +486,7 @@ Newest decision first.
 
 ### 5.9 Battle: setting
 
-- WAR-089 When two hostile armies end a day in the same province, the warfare system shall start a battle unless one withdraws first; an army may slip away before battle if its commander's Cunning is higher than the enemy's and it isn't trapped. [warfare §7.1; troop-movement §6.1]
+- WAR-089 When the day loop brings two hostile armies into the same province, the warfare system shall start a battle unless one withdraws first; an army may slip away before battle if its commander's Cunning is higher than the enemy's and it isn't trapped. [warfare §7.1; troop-movement §6.1; X-1]
 - WAR-090 The warfare system shall run a battle day as 6 bells and end a battle after at most 3 days (eras I–V), when the attacker pulls back. [warfare §7.1; eras §2]
 - WAR-091 The warfare system shall build the battlefield from up to 7 sectors, the middle 7 tiles of the province's tile row (all of them if fewer), each sector with its room and effects (sector table), and put each army's camp (wagons, food reserve, wounded, unplaced guns) behind it. [warfare §7.2]
 - WAR-092 The warfare system shall apply the province's ground on top of the sectors: foot, horse and guns modifiers, the defender bonus, and +10 % for locals in rough country. [warfare §7.2; province §3.1]
@@ -498,7 +498,7 @@ Newest decision first.
 - WAR-095 The warfare system shall give each arm its roles and apply each role: Line holds and fights hand to hand; Brace reverses a charge into it (chargers take double, deal half) but takes ×1.5 from shooting; Shock doubles hits in the first bell it meets an enemy and again after a bell out of contact, only in open sectors; Shot shoots before the lines meet and every bell after while it has ammunition; Light can step back a sector without counting as fleeing and shoot again, and scouts; Heavy halves arrows and spears against it (not hand guns or later shot); Guns shoot into their own and the neighbouring sectors and have no melee. [warfare §7.3]
 - WAR-096 When a war elephant company's sector loses a bell badly, the warfare system shall make the elephants panic and trample their own side for −10 % of its men. [warfare §7.3]
 - WAR-097 The warfare system shall read each company's level 1 to 5 from its drill and scars by the realm's era (eras §4), and apply era I–II effects: Raw −10 % hits and can't fall back without breaking; Drilled can fall back a sector on orders, Light can step back; Seasoned +10 % hits, +5 % break point, can shift to a neighbouring sector within one bell; Veteran +20 % hits, +10 % break point, Line counts as half Brace; Elite +30 % hits, +15 % break point and one free order of its own each bell. [warfare §7.4]
-- WAR-098 The warfare system shall make level thresholds (era I–II): Drilled at 3 months of drill, Seasoned at 6 months and 1 scar, Veteran at 3 scars, Elite at 5 scars and 12 months of drill. [warfare §7.4; see OQ-WAR-9]
+- WAR-098 The warfare system shall make level thresholds (era I–II): Drilled at 3 months of drill, Seasoned at 6 months and 1 scar, Veteran at 3 scars, Elite at 5 scars and 12 months of drill; other eras use their own drill months from the eras table (era I 2/4/8) with the same scars, and drill is capped at 24 months. [warfare §7.4; eras §4; D-WAR-9]
 - WAR-099 The warfare system shall drop a company's level when new men dilute it, after 5 years without a battle, when hungry, and all at once when disbanded; standing regiments (W12) shall never drop below level 2. [warfare §7.4, §7.10]
 - WAR-100 The warfare system shall give every commander a style that belongs to him (not picked per battle), each using one of eight approaches that sets deployment and the priority of his orders (approach table). [warfare §7.5; styles §1]
 - WAR-101 While an Entrenchment commander attacks, the warfare system shall have him fight as Steadfast. [warfare §7.5]
@@ -528,7 +528,7 @@ Newest decision first.
 
 ### 5.12 Inventions in battle
 
-- WAR-122 The warfare system shall apply W inventions in battle: W1 horse archers and +1 order per bell for Skirmish-approach commanders with horse archers; W2 knights and Breakthrough charges ×2.5 instead of ×2; W3 bombards (5 per gun in the field), enabling Bombardment commanders; W4 dug sectors of Entrenchment commanders also block Turn and Drive; W5 hand gunners and Shot ignores Heavy; W6 pikes; W7 pike and shot, Brace mixed with its own shot no longer takes ×1.5 from shooting; W8 field guns reach neighbouring sectors and Bombardment hits ×1.5; W9 Shot hits ×1.5 in the first bell of each day; W10 +1 bell of ammunition; W11 line infantry, every foot company becomes Brace, pikes obsolete; W12 standing regiments never below level 2; W13 guns can Shift with the line and Bombardment keeps the line back only 1 bell; W14 +1 order per bell for every commander; W16/W17 riflemen, hits 5 % then 6 % of the front per bell; W19 shooting from dug-in sectors ×2 and charges into them always fail; W20 Ambush companies can shoot from woods without being spotted; W21 tanks, a Shock arm that ignores dug-in sectors and machine guns; W22 every commander sees hidden companies and aircraft hit any sector or camp; W23 +1 order per bell and captains give orders in their own sector. [warfare §7.10; see OQ-WAR-11]
+- WAR-122 The warfare system shall apply W inventions in battle: W1 horse archers and +1 order per bell for Skirmish-approach commanders with horse archers; W2 knights and Breakthrough charges ×2.5 instead of ×2; W3 bombards (5 per gun in the field), enabling Bombardment commanders; W4 dug sectors of Entrenchment commanders also block Turn and Drive; W5 hand gunners and Shot ignores Heavy; W6 pikes; W7 pike and shot, Brace mixed with its own shot no longer takes ×1.5 from shooting; W8 field guns reach neighbouring sectors and Bombardment hits ×1.5; W9 Shot hits ×1.5 in the first bell of each day; W10 +1 bell of ammunition; W11 line infantry, every foot company becomes Brace, pikes obsolete; W12 standing regiments never below level 2; W13 guns can Shift with the line and Bombardment keeps the line back only 1 bell; W14 +1 order per bell for every commander; W16/W17 riflemen, hits 5 % then 6 % of the front per bell; W19 shooting from dug-in sectors ×2 and charges into them always fail; W20 Ambush companies can shoot from woods without being spotted; W21 tanks, a Shock arm that ignores dug-in sectors and machine guns; W22 every commander sees hidden companies and aircraft hit any sector or camp; W23 +1 order per bell and captains give orders in their own sector. Each invention's era is the research tree's. [warfare §7.10; D-WAR-11]
 
 ### 5.13 Night, aftermath, prisoners
 
@@ -547,14 +547,14 @@ Newest decision first.
 ### 5.14 Standing orders and the battle report
 
 - WAR-134 The warfare system shall give each army standing orders that apply to every battle: retreat if outnumbered 2 to 1, 3 to 2, or never (checked before the battle and each night); attack or wait. [warfare §7.14]
-- WAR-135 When the month ends, the warfare system shall resolve every battle of that month one at a time, in order, with the result ready before any report shows. [warfare §7.15, §16]
-- WAR-136 When a battle involves the player, the warfare system shall stop the turn on a battle report (who fought, where, the result, the losses, and the one-line reason) with a Watch button; the player can watch, skip, or replay it later from the report. [warfare §7.15, §19; see OQ-WAR-2]
-- WAR-137 When a battle involves no player, the warfare system shall not stop the turn and shall put its report in the log. [warfare §7.15]
+- WAR-135 The warfare system shall fight every running battle one round per step, in the order the battles started, with each result ready before its report shows. [warfare §7.15, §16; X-1]
+- WAR-136 While a battle the player's army or fleet is in is running, the warfare system shall fight it one round (one bell) per 4-hour step of the day loop, let the player change its standing orders, order a retreat or switch to another running battle at every step, offer no Skip to result, and after it ends show a battle report (who fought, where, the result, the losses and the one-line reason) that can be replayed later. [warfare §7.15; X-1; D-WAR-2]
+- WAR-137 When a battle involves no player, the warfare system shall fight its six rounds a day at once inside the day loop, never slowing the game, and put its report in the log; other armies may join it at the start of a day. [warfare §7.15; X-1]
 
 ### 5.15 Commander styles: origin, adoption, staleness, learning
 
 - WAR-138 The warfare system shall give each country a list of its styles: catalogue styles whose *From* names it or its people and whose inventions it knows. [styles §2.1]
-- WAR-139 When a new commander appears, the warfare system shall give him one of his country's styles by origin: a noble or lord the country's horse style if it has one; a risen or hired captain its foot style; an academy graduate the style the academy teaches. [styles §2.1; see OQ-WAR-6]
+- WAR-139 When a new commander appears, the warfare system shall give him one of his country's styles by origin: a noble or lord the country's horse style if it has one; a risen or hired captain its foot style; an academy graduate the style the academy teaches. A commissioned official takes the academy graduate's style. [styles §2.1; X-7; D-WAR-6]
 - WAR-140 The warfare system shall make a hired captain bring his own people's style wherever he serves. [styles §2.1; warfare §7.5]
 - WAR-141 If a country has no named style of its own in an era, then the warfare system shall use the nearest one from its region by a config table by culture group. [styles §2.1]
 - WAR-142 When a country that knows a style's inventions hires 3 commanders or captains who use it and 5 years pass, or sets an academy to teach it with one teacher who knows it, or loses 3 battles to it within 10 years, or fights beside an ally using it in 3 battles, or takes the capital of a country that uses it, the warfare system shall add the style to its list as adopted. [styles §2.2]
@@ -566,7 +566,7 @@ Newest decision first.
 ### 5.16 Warfare through the eras
 
 - WAR-147 The warfare system shall fight each realm by the inventions it knows (W, B, S), with no world clock, so armies of different eras can meet on one field. [eras intro]
-- WAR-148 The warfare system shall scale battles by era: eras I–IV a bell is 2 hours, longest battle 3 days, room as in the sector table, hits 4 %; era V the same with 5 % at W16 and 6 % at W17; era VI a bell is half a day, longest battle 10 days, room halved, hits 6 % (8 % with W19); era VII a bell is a day, longest battle 30 days, room a quarter, hits 8 %. [eras §2; see OQ-WAR-10]
+- WAR-148 The warfare system shall scale battles by era: eras I–IV a bell is 2 hours, longest battle 3 days, room as in the sector table, hits 4 %; era V the same with 5 % at W16 and 6 % at W17; era VI a bell is half a day, longest battle 10 days, room halved, hits 6 % (8 % with W19); era VII a bell is a day, longest battle 30 days, room a quarter, hits 8 %. A battle longer than 3 days keeps its armies in the battle and carries over into the next month. [eras §2; D-WAR-10]
 - WAR-149 While an enemy knows the invention that made an arm obsolete, the warfare system shall have that arm fight at half strength against him. [eras §3]
 - WAR-150 When a realm learns the invention that makes one of its arms obsolete, the warfare system shall no longer let it raise that arm. [eras §3]
 - WAR-151 When a company re-arms to a new arm, the warfare system shall take its loads of arms and powder and drop it one level. [eras §3]
@@ -576,7 +576,7 @@ Newest decision first.
 - WAR-155 The warfare system shall apply Might by era: I +8 % hits and +3 % break point per point in his sector, with a 1 in 5 chance of wound, capture or death if his sector is lost; II +7 % and +3 %; III–IV +5 % and +2 %; V +4 % and +2 % with a 1 in 10 risk; VI no sector, +3 % hits and +1 % break point to the whole army per point, at risk only if the camp is taken; VII +2 % and +1 % for the army and +10 % per point to Drive orders. [eras §6]
 - WAR-156 The warfare system shall apply Cunning by era as orders at Cunning 0–1 / 2–3 / 4–5: I 1/2/2 with orders to other sectors arriving next bell; II 1/2/3 with orders to sectors 3+ away arriving next bell; III–IV 1/2/3 all the same bell; V 1/2/3, +1 with W14; VI 2/2/3, captains give their own orders; VII 2/3/4, +1 with W23. [eras §6]
 - WAR-157 The warfare system shall apply Logistics by era: I bows 4 bells + Logistics; II Shot 3 + Logistics; III–IV 3 + Logistics with rotation; V Shot and guns 2 + Logistics, guns needing powder wagons in the camp; VI ammunition 1 + Logistics, each bell without ammunition a company fights at half, rotation up to Logistics × 2 sectors; VII ammunition and fuel (tanks and Air need fuel from the camp, 1 bell + Logistics, then stop), losses replaced from depth at 10 % per point per bell. [eras §6]
-- WAR-158 The warfare system shall grow skills by era: I–II as in WAR-050 to WAR-055; III–V also +1 Might and Cunning from academy training, +1 Cunning from serving as a captain under a Cunning 4+ commander, and Logistics from years as a steward or warden; VI–VII Might mostly from academy and staff college with victories giving +1 only every 4, Cunning +1 from staff college and from wargames (a peacetime year of training, once per era), Logistics +1 from staff college and +1 per year commanding a standing army in peace (up to 3). [eras §6; see OQ-WAR-13]
+- WAR-158 The warfare system shall grow skills by era: I–II as in WAR-050 to WAR-055; III–V also +1 Might and Cunning from academy training, +1 Cunning from serving as a captain under a Cunning 4+ commander, and Logistics from years as a steward or warden; VI–VII Might mostly from academy and staff college with victories giving +1 only every 4, Cunning +1 from staff college and from wargames (a peacetime year of training, once per era), Logistics +1 from staff college and +1 per year commanding a standing army in peace (up to 3). The staff college is the academy of eras VI–VII. [eras §6; D-WAR-13]
 
 ### 5.17 Sieges
 
@@ -627,8 +627,8 @@ Newest decision first.
 
 ### 5.21 AI
 
-- WAR-194 The warfare system shall set an AI country's standing orders (retreat ratio, attack or wait) and its commanders' starting styles from its catalogue military doctrine and risk tolerance. [warfare §15, §7.14]
-- WAR-195 The warfare system shall have the AI choose which kinds it raises (for example Castile noble retinues and frontier light horse; a city republic hired companies) and whether it besieges or raids, from its personality. [warfare §15]
+- WAR-194 The warfare system shall set an AI country's standing orders from its catalogue risk tolerance (low: wait, retreat at 1 to 1; medium: attack, retreat at 3 to 2; high: attack, retreat at 2 to 1) and its commanders' starting styles from the era's styles of its culture group. [warfare §15; D-WAR-14]
+- WAR-195 The warfare system shall have the AI choose which kinds it raises (for example Castile noble retinues and frontier light horse; a city republic hired companies) and whether it besieges or raids, from its personality. [warfare §15] A high-risk AI raids with horse-only armies; the others besiege. [D-WAR-14]
 - WAR-196 The warfare system shall set the share of peace voices an AI needs before it makes peace from its risk tolerance (a low-risk AI offers peace at a third; a hegemon seeker only when forced). [warfare §15]
 - WAR-197 The warfare system shall give the AI only the forage limits, food reserves and peace voices the player sees; it shall not cheat on food. [warfare §15]
 
@@ -637,6 +637,8 @@ Newest decision first.
 - WAR-198 The warfare system shall update sieges and supply once a month. [warfare §16]
 - WAR-199 The warfare system shall keep all rates (strength per man, hits per bell, break points, roles, levels, styles and their order priorities, invention bonuses, the flee share formula, castle table, rations, sickness, pay) in one warfare config file. [warfare §16, intro]
 - WAR-204 The warfare system shall give no national bonus card: how different peoples fight (steppe horse, Swiss pikes, wagon forts, feudal retinues, guns behind carts, forest ambush, highland narrow fields, island fleets, city republics' hired companies, South and Southeast Asian elephants) shall fall out of styles, troop types and ground alone. [warfare §13]
+- WAR-205 When a side orders a retreat during a running battle, the warfare system shall end the battle at the start of the next round with that side withdrawing, cleanly if its commander's Cunning is at least the enemy's, otherwise counted as breaking with half the pursuit. [X-1; WAR-123]
+- WAR-206 When an army marches into a province where a battle is running, the warfare system shall add its companies to the reserve of the side it is allied with from the next round (at any step for a player battle, at the start of a day for an AI battle). [X-1]
 - WAR-200 The warfare system shall not use a morale bar, discipline, combat width, dice, leader pips, manpower, force limit, attrition percentage, fort zone of control, siege dice, casus belli, war score, war exhaustion or aggressive expansion. [warfare §17]
 
 ### 5.23 Presentation (owned by map-presentation; listed so nothing is lost)
@@ -720,34 +722,37 @@ order, Board, Land and Split/Join are troop-movement commands.
 - When naval reports an army's ships lost at sea, then warfare removes the army.
 - When rebellions forms a rebel band, then warfare treats it as companies of kind Rebel band.
 
-## 9. Monthly turn
+## 9. Each turn and each month
+
+A turn is one week (X-18). The monthly steps below keep their size and run once, at the end of the turn in which a new month begins; yearly steps run in the turn in which 1 January falls.
+
 
 Read first: provinces (people, officials, grievances, local stores, castle stores, siege reserve), treasury,
 research (inventions), realm (lords' loyalty, ruler), diplomacy (wars, truces), troop-movement (where armies
 stood each day, contacts).
 
-During the month (inside troop-movement's day loop): contacts → withdraw check → battle (1 to 3 days, eras I–V);
-raids burn one tile a week; armies on forced march lose levies weekly; hungry armies desert and die weekly;
-supply: weekly meals and refills.
+During the turn (inside troop-movement's day loop): contacts → withdraw check → battle (1 to 3 days, eras I–V),
+running battles fought a round per step in the order they started (WAR-135), a player battle in 4-hour steps with
+its report (WAR-136); at the end of every turn, the weekly steps: raids burn one tile; armies on forced march lose
+levies; hungry armies desert and die; supply: weekly meals and refills.
 
-At month end, in order:
-1. Resolve the month's battles one at a time (WAR-135); stop on player battle reports (WAR-136).
-2. Pay (WAR-044), pay owed and its effects (WAR-019, WAR-023), over-cap double pay and desertion (WAR-035).
-3. Supply: reserve rot, quarters, Requisitioned and Hungry flags (WAR-071–086).
-4. Sickness (WAR-084), wounded returning.
-5. Sieges: each step of WAR-162–168; terms; AI garrison decision.
-6. Occupation by holding a season (WAR-175).
-7. Drill +1, months out +1, levy going home (WAR-003, WAR-016), lords going home (WAR-038).
-8. Troop cap recompute (WAR-029).
-9. Peace voices recompute (WAR-180); peace obligations (WAR-181).
-10. Yearly: arms rust 2 %, powder damp 5 %, scars fade after 5 years without battle, ageing and skill loss,
+At the end of the turn in which a new month begins, in order:
+1. Pay (WAR-044), pay owed and its effects (WAR-019, WAR-023), over-cap double pay and desertion (WAR-035).
+2. Supply: reserve rot, quarters, Requisitioned and Hungry flags (WAR-071–086).
+3. Sickness (WAR-084), wounded returning.
+4. Sieges: each step of WAR-162–168; terms; AI garrison decision.
+5. Occupation by holding a season (WAR-175).
+6. Drill +1, months out +1, levy going home (WAR-003, WAR-016), lords going home (WAR-038).
+7. Troop cap recompute (WAR-029).
+8. Peace voices recompute (WAR-180); peace obligations (WAR-181).
+9. Yearly (in the turn in which 1 January falls): arms rust 2 %, powder damp 5 %, scars fade after 5 years without battle, ageing and skill loss,
     victories older than 20 years drop off the country count.
 The global order relative to other contexts lives in time-and-turns.
 
 ## 10. Configuration
 
 All values are placeholders (warfare §16, eras intro, styles intro). Config file: the single warfare config
-file (name not given in the designs; see OQ-WAR-17).
+file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
@@ -757,7 +762,7 @@ file (name not given in the designs; see OQ-WAR-17).
 | warfare.scar_fade_years | Years without battle per −1 scar | 5 | yes | warfare |
 | warfare.arms | Arms table (strength, needs, roles, unlock) | §4 | yes | warfare |
 | warfare.guns_march_penalty | Guns slow an army | +25 % per gun (warfare 2.2) / ×1.25 per army (troop-movement, decided) | yes | march (troop-movement) |
-| warfare.kinds.<kind>.break_point | Base break point | levy 25 %, retinue 35 %, hired 35 %, standing 40 %, garrison 40 %, rebel 20 % | yes | warfare |
+| warfare.kinds.<kind>.break_point | Base break point | levy 25 %, retinue 35 %, hired 35 %, standing 30 %, garrison 40 %, rebel 20 % | yes | warfare |
 | warfare.kinds.levy.free_months | Free service | 3 | yes | warfare |
 | warfare.kinds.levy.go_home_after / rate | Levies going home | 6 months / 5 % a month unless paid double | yes | warfare |
 | warfare.kinds.hired.pay_multiplier | Hired pay | 3 | yes | warfare |
@@ -854,10 +859,10 @@ file (name not given in the designs; see OQ-WAR-17).
 | culture | upstream | Conformist | Homeland tongue (+10 % locals, +5 % break point, guerrilla styles), culture group for style fallback, captain's tongue for bribes |
 | religion | upstream | Conformist | Persecution flag for *Defend the faith* |
 | events | downstream | Published Language | `prestige` ← victories, `war_weariness` ← Fallen and peace voices; events offering the throne to "their man" generals |
-| scenario-setup | upstream | Conformist | Starting styles per country (*From* column), capture warfare realms, starting castles, start inventions |
+| scenario-setup | upstream | Conformist | Risk tolerance for AI standing orders (D-WAR-14); starting styles per country (*From* column), capture warfare realms, starting castles, start inventions |
 | map-presentation | downstream | Published Language | Army card fields, banners, food bars, rumours, battle playback, siege view, burned tiles |
-| game-shell | downstream | Published Language | Battle reports, Watch button, notifications |
-| time-and-turns | upstream | Conformist | Month turn, day loop, battle resolution order |
+| game-shell | downstream | Published Language | Player battles watched in 4-hour steps with standing orders, retreat and switching between battles (X-1, D-WAR-2), battle reports and replay, notifications |
+| time-and-turns | upstream | Conformist | Week turn (X-18), monthly steps, day loop (battles on the day of contact, X-1/X-2), weekly army food at the end of every turn (X-18), battle resolution order |
 | trade | downstream | Published Language | Occupier takes trade; Open the roads term |
 
 ### 11.1 Rules handed to diplomacy (DIPL owns; recorded so nothing is lost)
@@ -876,7 +881,7 @@ file (name not given in the designs; see OQ-WAR-17).
   without a bridge +1 day (MOVE scales by army size). [warfare §5.2]
 - Guns penalty: warfare says +25 % per gun beyond light field guns in hills, mountains, forest, jungle and
   marsh; troop-movement decided one ×1.25 per army. Bombards can't cross mountains without a road. [warfare §2.2]
-- Big armies over the forage limit are slower. [warfare §5.3; see OQ-WAR-4]
+- Big armies over the forage limit are slower. Each adds 1 crossing (D-WAR-4, D-MOVE-2). [warfare §5.3]
 - An enemy garrisoned castle stops armies in its province: back the way they came or onward once it falls;
   besieging with part of the army doesn't open the road; an ungarrisoned castle doesn't block; allies' castles
   block their enemies; landed armies must take castles to move inland. [warfare §5.5; troop-movement §5.2]
@@ -889,11 +894,12 @@ file (name not given in the designs; see OQ-WAR-17).
   submarines, carriers. [warfare §11.1]
 - Sea battles by these bell rules on 3 open-water sectors, admirals' styles with Breakthrough, Steadfast,
   Skirmish or Bombardment approaches; matchups (galleys ×1.5 enclosed / ×0.5 ocean; shooting ships ×1.5 first
-  bell each day; turtle ships ×1.5 within one zone of home); damage equal to strength sinks or takes a ship;
+  bell each day; turtle ships ×1.5 within one zone of home); damage follows naval's rule (D-NAVY-6): a ship that takes
+  hits and stays afloat loses one hull step, and hits equal to its strength sink or take it;
   higher-Cunning admiral slips away at night; repairs in harbour (shipyard ×2); soldiers aboard a lost ship
   drown or are captured. [warfare §11.2]
-- Fleet orders Blockade, Carry (landing a day per 5,000 men), Hunt, Escort; storms 1 in 20 ships a month in
-  storm season unless in port, reduced by S1, S11, S21. [warfare §11.3]
+- Fleet orders Blockade, Carry (landing a day per 5,000 men), Hunt, Escort; storms follow naval's rule (D-NAVY-7):
+  1 in 20 ships a month at sea in storm season, a struck ship losing one hull step and a wrecked one sinking. [warfare §11.3]
 - Naval adds crew share, boarding (on Close order or ram, land bell rules on one sector), prizes, sunk crews,
   pirates and ports at war. [naval §8]
 
@@ -901,15 +907,15 @@ file (name not given in the designs; see OQ-WAR-17).
 
 | Target | Change | Adopted? |
 |---|---|---|
-| realm (country-stats §6) | Link kinds; commanders link; add Arms store, Powder store, Prisoners, Victories/Defeats, Troop cap rows; Food policy *Army supply* no longer fits; Peace voices on the Enemies line; `war_weariness` → Fallen and peace voices, `prestige` → Victories | Not visible in country-stats (OQ-WAR-7) |
+| realm (country-stats §6) | Link kinds; commanders link; add Arms store, Powder store, Prisoners, Victories/Defeats, Troop cap rows; Food policy *Army supply* no longer fits; Peace voices on the Enemies line; `war_weariness` → Fallen and peace voices, `prestige` → Victories | Held by warfare in the realm's war record and shown read-only (D-WAR-7) |
 | province (wares 5.2) | Saltpetre and powder wares; powder mill | Adopted (province, buildings) |
 | province (castle 11) | Walls bonus, shot per breach, mining, garrison room; castles block; sack effects | Adopted (linked) |
 | province (12.1) | Requisitioned grievance | Adopted |
 | rebellions | Rebel band kind and battle rules | Adopted |
 | province (6.3) | Fleet crews from seafolk | Owned by naval now |
-| world-map / terrain | Steppe +10 % horse, dunes (guns need camels), snow peaks, paddies | Snow peaks, dunes, glacier, paddies adopted by troop-movement; steppe not decided (OQ-WAR-8) |
-| research | Era VIII Helicopters and missiles; staff college school type | Era VIII out of scope; staff college not in research or country-stats (OQ-WAR-13) |
-| scenario-setup (catalogue) | Starting styles per country from *From* column | Not in catalogue (OQ-WAR-14) |
+| world-map / terrain | Steppe +10 % horse, dunes (guns need camels), snow peaks, paddies | Snow peaks, dunes, glacier, paddies adopted by troop-movement; steppe dropped; none of them counts in battle (D-WAR-8) |
+| research | Era VIII Helicopters and missiles; staff college school type | Era VIII out of scope; staff college is the academy (D-WAR-13) |
+| scenario-setup (catalogue) | Starting styles per country from *From* column | Era styles of the realm's culture group (D-WAR-14) |
 | code `types.ts` | `UnitDef` → arm + kind + level; `CommanderDef` gains style, trait, victories, defeats, wounds, age, origin | Not yet (code has might/cunning/logistics only) |
 
 ## 12. AI
@@ -922,64 +928,31 @@ file (name not given in the designs; see OQ-WAR-17).
 - Recruiting's AI (what to levy and train, which officials to commission) and diplomacy's AI (when to declare,
   demand first) are owned by those contexts.
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- **OQ-WAR-1** Hits per bell (4 %), break points (25–40 %), the flee share formula and troop cap shares need a
-  balancing pass (warfare §19; gap-lists "Warfare 19" still open). Blocks final config values.
-- **OQ-WAR-2** Does a battle pause the turn? warfare v5 §7.15/§19 say decided (report + Watch, turn stops);
-  gap-lists says "still being settled"; troop-movement §15 OQ1 plays the whole month with replay from notices.
-  Blocks WAR-136 and time-and-turns.
-- **OQ-WAR-3** Guns march penalty: warfare §2.2 "+25 % per gun beyond light field guns" vs troop-movement §3.1
-  decided "one ×1.25 per army". Troop-movement's decision is newer; warfare text not updated.
-- **OQ-WAR-4** Big armies: warfare §5.3 "one day slower per province" vs troop-movement §3.1 "+1 crossing"
-  (6 days). Which is meant?
-- **OQ-WAR-5** River crossing penalty: warfare §7.2 shore sector "−25 % attacking across without a bridge"
-  vs province §3.1 and troop-movement §4.1 "−20 %". Do both apply (sector and ground) or is one wrong?
-- **OQ-WAR-6** Commander origins: warfare §4.4 (lord commands, risen from the ranks, school graduate, exile) vs
-  recruiting v3 §7 and §10 (lords lead only their retinue as captains, risen → raised to Marshal, graduate →
-  Marshal official, exile → official, new row "commissioned official"). Also style at creation: styles §2.1 (by
-  origin) vs recruiting §7.1 ("the realm's current style for its era and country"; a Marshal any style seen in
-  battle). Warfare v5 did not adopt recruiting's changes; and §3.1 *Calling the levy* (better arms at levy,
-  muster master takes homeless first) was replaced by recruiting's levy-then-train.
-- **OQ-WAR-7** Country-stats has none of the rows warfare §18 asked for (arms store, powder store, prisoners,
-  victories/defeats, troop cap, peace voices on the card; *Army supply* food policy). Who holds these stats?
-- **OQ-WAR-8** Terrain *steppe* proposal (+10 % horse) undecided; other proposals adopted only via troop-movement.
-  Does warfare apply steppe, dunes ("guns need camels") and paddies ("horse −25 % in the wet season") in battle?
-- **OQ-WAR-9** Level thresholds: warfare §7.4 says its table (Drilled 3, Seasoned 6, Elite 12 months) shows era
-  I and II values, but eras §4 gives era I as 2/4/8. Also drill is capped at 0–12 (§2.1) while eras IV–VII need
-  18 or 24 months for Elite. Also scar thresholds per level are given only for eras I–II.
-- **OQ-WAR-10** Era VI–VII battles last 10 and 30 days, but troop-movement says a battle takes 1 to 3 days and
-  the month is 30 days; how do month-long battles fit the day loop and "one battle at a time"?
-- **OQ-WAR-11** W20 Smokeless powder: warfare §7.10 "Ambush companies shoot from woods unseen"; eras §3 lists
-  "Quick-firing artillery (W20)"; research-tree "Guns +range". Also era of inventions differs between the
-  research tree and eras §3 (W9 II vs III, W11 III vs IV, W13 IV vs V, W17 V vs VI). Which era does a style
-  or arm belong to?
-- **OQ-WAR-12** Era VII is cut at 31 August 1939, but Bewegungskrieg (France 1940), Glubokiy boy (1944),
-  Motti (1939–40), Bataille conduite (1939–40), Banzai charge (1942) and People's war (1941–45) are seen after
-  it. Are they available before 1939 by their inventions, or removed?
-- **OQ-WAR-13** Staff college (eras §6, §8) and wargames are used for skill growth in eras VI–VII but no school
-  type exists in research or country-stats.
-- **OQ-WAR-14** The country catalogue lists no starting styles; its `military_doctrine` is free text and
-  `risk_tolerance` a level. How are standing orders, starting styles and peace thresholds derived (WAR-194–196)?
-- **OQ-WAR-15** Break point of trained regiments: recruiting §4.3 says 30 % plus level for a trained regiment,
-  25 % for levies; warfare §2.3 gives break points by kind only (levy 25 %). Is break point by kind or by
-  training?
-- **OQ-WAR-16** War at sea: naval §8 adds a **Close** order (boarding) that is not among warfare §7.6's eight
-  orders; naval §13 asks warfare §11.1–11.3 to add caravel, fluyt, steamer, admirals and links, not adopted.
-- **OQ-WAR-17** Amounts the designs leave out: "normal pay" per man (recruiting gives pay by arm), wagon build
-  cost, hired company prices, levy gold ("a little"; recruiting: 20 per 1,000), a "season" for occupation and
-  Requisitioned, the warfare config file's name, "later siege guns" shot, the ransom price by rank, the
-  sickness rate under fever land.
-- **OQ-WAR-18** Ownership of the war-aim effects table and peace-term list: diplomacy v2 claims war aims and
-  says peace "is warfare 10.3 to 10.5"; this spec keeps the effects and war-state preconditions (WAR-184,
-  WAR-189). The diplomacy spec should not duplicate them; to be confirmed by the context map.
-- **OQ-WAR-19** Storming an earthwork ring fort without a breach is "at double losses": does it stack with the
-  ×1.5 stormers' losses, and what walls bonus applies with no breach?
-- **OQ-WAR-20** Logistics era VI rotation "up to Logistics × 2 sectors" and era VII fuel for tanks and Air:
-  fuel is not a store anywhere (only arms and powder). Is fuel a ware or a camp stat?
-- **OQ-WAR-21** Era I Cunning orders (1/2/2) differ from the main formula (1/2/3) and warfare §4.2 says "1 to 3
-  orders"; with W14 +1 and W23 +1 the main table and eras table differ on when they apply (eras: W14 from era V).
-  Confirm W14 and W23 apply in every era.
+Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is a release task, so none stays open.
+
+- **D-WAR-1** (was OQ-WAR-1) Balancing values: hits per bell 4 %, break points 25–40 %, the flee share formula and the troop cap shares stay as they are and are listed as provisional in `warfare.json` `_provisional`. Balancing tunes data, not rules.
+- **D-WAR-2** (was OQ-WAR-2) Battle timing: as X-1 (Leroy, 17 Oct), a battle starts on the day the day loop brings the armies together and is fought over time, one round (one bell) per 4-hour step while the player's army or fleet is in it; the player can change standing orders, retreat (WAR-205) or switch battles at every step, and the result cannot be skipped; other armies can march in and join (WAR-206); AI-only battles fight their six rounds a day at once and never slow the game. X-1 decides it.
+- **D-WAR-3** (was OQ-WAR-3) Guns on the march: one ×1.25 for the whole army with any guns beyond light field guns, not 25 % per gun. Troop-movement's decision is the newer one.
+- **D-WAR-4** (was OQ-WAR-4) Big armies: an army bigger than the entered province's forage limit adds 1 crossing (6 days), not one day (D-MOVE-2). Troop-movement is newer.
+- **D-WAR-5** (was OQ-WAR-5) River in battle: attacking across a river with no bridge costs −20 % once, through the Shore sector; it does not stack with a ground penalty. Province and troop-movement agree on −20 % and one rule is simpler. A river frozen under X-17 (December to March, latitude 55° or more) is crossed like a bridge, so the −20 % does not apply.
+- **D-WAR-6** (was OQ-WAR-6) Commander origins: as X-7, commanders are the ruler or an heir, a lord, a hired captain, risen from the ranks, an academy graduate, an exile or a commissioned official, each with §4.4's catch; a commissioned official counts as an academy graduate; a new commander's style follows WAR-139 (by origin); the levy is recruiting's levy-then-train. X-7 decides it.
+- **D-WAR-7** (was OQ-WAR-7) War stats: the arms store, powder store, prisoners, victories and defeats, troop cap and peace voices are held by warfare in the realm's war record and shown read-only on the realm card; the food policy is the army's supply order. The context that changes a number holds it.
+- **D-WAR-8** (was OQ-WAR-8) Tile terrain in battle: steppe gives no bonus, and dunes and paddies count for movement only (D-MOVE-11); battle terrain is the province's sectors. No new mechanic is added.
+- **D-WAR-9** (was OQ-WAR-9) Level thresholds: the main table (Drilled 3, Seasoned 6, Elite 12 months) is era II; each era uses its own row from the eras table (era I 2/4/8); drill is capped at 24 months, the highest Elite threshold; the scar thresholds are the same in every era. The eras table is the later, era-wide rule.
+- **D-WAR-10** (was OQ-WAR-10) Long battles: an era VI battle lasts up to 10 days and an era VII battle up to 30, six rounds a day in the day loop; its armies stay in the battle and a battle not over at the turn's last day carries into the next turn; a province still holds one battle at a time, which others join. Troop-movement's 1 to 3 days are the length in eras I–V.
+- **D-WAR-11** (was OQ-WAR-11) Invention eras: an invention's era is the research tree's; W20 Smokeless powder lets Ambush companies shoot from woods unseen (warfare 7.10). Research owns the tree and warfare its battle effect.
+- **D-WAR-12** (was OQ-WAR-12) Styles after 1939: dropped, as X-14 (Bewegungskrieg, Glubokiy boy, Banzai charge, People's war); Motti and Bataille conduite, seen in 1939, stay. X-14 decides it.
+- **D-WAR-13** (was OQ-WAR-13) Staff college: it is the academy of eras VI–VII, with no new school type; a commander who graduates gains +1 Logistics, and a first peacetime year of wargames in an era gives +1 Cunning. It reuses the academy that X-7 already has.
+- **D-WAR-14** (was OQ-WAR-14) AI personality: risk tolerance sets the standing orders (low: wait, retreat at 1 to 1; medium: attack, retreat at 3 to 2; high: attack, retreat at 2 to 1), and a high-risk realm raids with horse-only armies while the others besiege; starting styles are the era's styles of the realm's culture group from the style catalogue; peace thresholds stay as WAR-196. The catalogue's level field is the only structured input.
+- **D-WAR-15** (was OQ-WAR-15) Break point: by kind, with recruiting's numbers: a levy breaks at 25 % and a trained (standing) regiment at 30 % instead of 40 %, and the level adds its bonus as before; retinues and hired companies keep 35 %. Recruiting v3 is the later design.
+- **D-WAR-16** (was OQ-WAR-16) War at sea: naval owns it, the Close order, the ship list and ship damage included (a ship that takes hits and stays afloat loses one hull step; hits equal to its strength sink or take it; storms strike hull steps, D-NAVY-6/7); warfare's eight orders are land orders and warfare keeps no naval damage rule of its own. Naval is the later design and §11.3 hands sea war over.
+- **D-WAR-17** (was OQ-WAR-17) Missing amounts: pay is recruiting's pay by group; levy gold is 20 per 1,000 men; a wagon costs 10 gold, a hired company costs its standing pay ×2 a month, a season is 3 months, the config file is `warfare.json`, later siege guns shoot like bombards, ransom is 100 gold for a commander and 25 for a captain, and fever land doubles sickness. All provisional except the ones recruiting decides.
+- **D-WAR-18** (was OQ-WAR-18) War aims: diplomacy owns declaring war and choosing the war aim; warfare keeps the war-aim effects table, the peace terms and the war-state preconditions (WAR-184, WAR-189), and diplomacy refers to them. Diplomacy v2 itself says peace "is warfare 10.3 to 10.5".
+- **D-WAR-19** (was OQ-WAR-19) Storming an earthwork without a breach: stormers' losses are ×2 instead of ×1.5, not stacked, and the castle's full walls bonus applies. The simpler reading.
+- **D-WAR-20** (was OQ-WAR-20) Fuel: there is no fuel ware; tanks and aircraft draw on the powder store; Logistics era VI rotation stays at up to Logistics × 2 sectors. No new store is added.
+- **D-WAR-21** (was OQ-WAR-21) Cunning orders: each era uses its own row of the eras table (era I 1/2/2 by Cunning 0–1, 2–3, 4+; eras II–V 1/2/3, the main formula; eras VI–VII as listed), and W14 and W23 each add +1 order in every era once known. The eras table is the later and fuller rule, and one invention rule for every era is the simpler one.
 
 ## 14. Traceability
 
@@ -1084,7 +1057,7 @@ file (name not given in the designs; see OQ-WAR-17).
 | WAR-095 | features/battle-setup.feature | Roles; Shock charges again after a bell out of contact; Guns have no melee |
 | WAR-096 | features/battle-setup.feature | Elephants panic |
 | WAR-097 | features/battle-setup.feature | Troop levels in battle (eras I and II) |
-| WAR-098 | features/battle-setup.feature | Reaching a level (main table) |
+| WAR-098 | features/battle-setup.feature | Reaching a level (main table, era II) |
 | WAR-099 | features/battle-setup.feature | A standing regiment never drops below level 2; Losing levels |
 | WAR-100 | features/battle-setup.feature | The approach behind each style sets deployment; A style belongs to the commander, not to the battle |
 | WAR-101 | features/battle-setup.feature | Entrenchment digs in only when attacked |
@@ -1124,8 +1097,8 @@ file (name not given in the designs; see OQ-WAR-17).
 | WAR-132 | features/battle-aftermath.feature | What to do with prisoners |
 | WAR-133 | features/battle-aftermath.feature | Capture warfare |
 | WAR-134 | features/battle-aftermath.feature | Standing orders: retreat if outnumbered; Retreat if outnumbered is checked each night; Attack or wait |
-| WAR-135 | features/battle-aftermath.feature | Battles are resolved one at a time at the end of the month |
-| WAR-136 | features/battle-aftermath.feature | A player battle stops the turn on a report |
+| WAR-135 | features/battle-aftermath.feature | Battles are resolved one at a time in the turn |
+| WAR-136 | features/battle-aftermath.feature | A player battle is fought round by round |
 | WAR-137 | features/battle-aftermath.feature | Battles between other countries don't stop the turn |
 | WAR-138 | features/commander-styles.feature | A country's own styles |
 | WAR-139 | features/commander-styles.feature | A new commander takes a style by his origin; An academy graduate takes the style the academy teaches |
@@ -1184,12 +1157,14 @@ file (name not given in the designs; see OQ-WAR-17).
 | WAR-191 | features/inventions-in-war.feature | Army divisions let armies split and join in a day |
 | WAR-192 | features/inventions-in-war.feature | Mass conscription keeps levies longer |
 | WAR-193 | features/inventions-in-war.feature | Military aircraft scout and bomb |
-| WAR-194 | features/war-ai.feature | Personality sets standing orders and starting styles |
+| WAR-194 | features/war-ai.feature | Risk tolerance sets standing orders; Starting styles come from the style catalogue |
 | WAR-195 | features/war-ai.feature | Personality sets which kinds it raises; Personality sets whether it besieges or raids |
 | WAR-196 | features/war-ai.feature | Risk sets when the AI talks peace |
 | WAR-197 | features/war-ai.feature | The AI doesn't cheat on food |
 | WAR-198 | features/sieges.feature | Sieges update once a month |
 | WAR-199 | — | Not testable as behaviour: structural rule (all rates in one warfare config file); checked by config review. |
+| WAR-205 | features/battle-aftermath.feature | A side can retreat at any round |
+| WAR-206 | features/battle-aftermath.feature | An army that marches in joins a running battle |
 | WAR-200 | — | Not testable as behaviour: a negative design rule (no EU4 mechanics); checked by design review. |
 | WAR-201 | — | Presentation only (army card, owned by map-presentation). |
 | WAR-202 | features/battle-aftermath.feature | The battle playback says what each commander did |

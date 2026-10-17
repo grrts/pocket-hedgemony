@@ -44,8 +44,7 @@ Feature: Sea zones and straits
       | Garabogaz strait     |
       | Strait of Maracaibo  |
 
-  @MAP-014 @open-question
-  # OQ-MAP-3: the land list of strait crossings is not in the data
+  @MAP-014
   Scenario Outline: Land neighbours across a strait are listed for armies
     Given the strait crossing "<crossing>" in the movement config
     When the graph is read
@@ -59,8 +58,43 @@ Feature: Sea zones and straits
       | Kerch     |
       | Gibraltar |
 
+  @MAP-014
+  Scenario: Where one province holds both shores, the crossing joins it to the far shore
+    Given the strait crossing "Bosporus" in the movement config
+    When the graph is read
+    Then the strait crossing joins "Istanbul" and "Sakarya"
+
+  @MAP-047
+  Scenario: A large lake the map made a sea zone is a water place for fleets
+    Given the sea zone "Lake Ladoga"
+    When the graph is read
+    Then it is a water place of kind "sea"
+
   @MAP-015
   Scenario: Armies can't walk into a sea zone
     Given an army stands in a coastal province
     When it is ordered to march into the neighbouring sea zone without ships
     Then the order is refused because armies need ships to cross water
+
+  @MAP-049 @placeholder
+  Scenario Outline: Northern seas freeze from December to March
+    Given the sea zone "<zone>"
+    When it is <month>
+    Then the sea zone is <state> to fleets
+
+    Examples:
+      | zone                      | month    | state  |
+      | North Gulf of Bothnia     | January  | closed |
+      | North Gulf of Bothnia     | March    | closed |
+      | North Gulf of Bothnia     | April    | open   |
+      | West White Sea            | December | closed |
+      | Kara Sea 77°N 85°E        | February | closed |
+      | Norwegian Sea 76°N 16°E   | January  | open   |
+      | South Gulf of Bothnia     | November | open   |
+
+  @MAP-049 @placeholder
+  Scenario: A port on frozen water launches no ships
+    Given a port whose only sea zone is "North Gulf of Bothnia"
+    When it is January
+    Then the port can neither launch nor take in ships
+    And in May it can

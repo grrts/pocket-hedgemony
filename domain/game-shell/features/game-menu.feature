@@ -30,9 +30,9 @@ Feature: Game menu
 
     Examples:
       | platform | entries                                                                                 |
-      | Android  | Return to the map, Save, Load, Settings, Encyclopedia, Achievements, Exit to main menu   |
-      | desktop  | Return to the map, Save, Load, Settings, Encyclopedia, Achievements, Exit to main menu, Quit |
-      | Steam    | Return to the map, Save, Load, Settings, Encyclopedia, Achievements, Exit to main menu, Quit |
+      | Android  | Return to the map, Save, Load, Settings, Almanac, Achievements, Exit to main menu   |
+      | desktop  | Return to the map, Save, Load, Settings, Almanac, Achievements, Exit to main menu, Quit |
+      | Steam    | Return to the map, Save, Load, Settings, Almanac, Achievements, Exit to main menu, Quit |
 
   @SHELL-066
   Scenario: Ironman save entry
@@ -61,3 +61,23 @@ Feature: Game menu
       | is not ironman | has no  | Exit to main menu | the main menu is shown without a question    |
       | is not ironman | has     | Quit              | a question about the unsaved turns is shown  |
       | is ironman     | has     | Exit to main menu | the game saves and the main menu is shown without a question |
+
+  @SHELL-132
+  Scenario: Tutorial lines in the game menu
+    Given the tutorial is running on "Android"
+    When the screen "game_menu" opens
+    Then it shows the entries "Return to the map, Skip this chapter, Chapter list, Leave the tutorial, Save, Load, Settings, Almanac, Achievements, Exit to main menu" in order
+
+  @SHELL-132
+  Scenario: No Load in ironman
+    Given the game runs on "Android"
+    And the campaign is ironman
+    When the screen "game_menu" opens
+    Then it shows the entries "Return to the map, Save and quit, Settings, Almanac, Achievements, Exit to main menu" in order
+
+  @SHELL-132
+  Scenario: Achievements entry when they are off
+    Given the game runs on "Android"
+    And achievements are off for this campaign
+    When the screen "game_menu" opens
+    Then it shows the entries "Return to the map, Save, Load, Settings, Almanac, Achievements (off for this campaign), Exit to main menu" in order

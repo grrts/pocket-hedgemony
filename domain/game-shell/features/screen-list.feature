@@ -24,7 +24,7 @@ Feature: Screen list
       | loading       | Full        | tip arrows                          | none                                      | load_resume                   |
       | settings      | Overlay     | first setting                       | where opened                              | unchanged                     |
       | achievements  | Full        | first achievement                   | where opened                              | unchanged                     |
-      | encyclopedia  | Full        | search or first entry               | where opened                              | unchanged                     |
+      | almanac       | Full        | search or first entry               | where opened                              | unchanged                     |
       | unlock        | Full        | Buy                                 | where opened                              | unchanged                     |
       | credits       | Full        | Back                                | main_menu or final_result                 | credits                       |
       | map           | Home        | your capital or last army           | opens game_menu                           | game music                    |
@@ -32,7 +32,7 @@ Feature: Screen list
       | realm_book    | Full        | last tab's first item               | map                                       | unchanged; diplomacy mood on Abroad |
       | game_menu     | Modal       | Return to the map                   | map                                       | unchanged                     |
       | turn          | Overlay     | none                                | none                                      | unchanged                     |
-      | battle        | Full        | Fight before, Carry on after        | Skip to result during a turn; where opened for a replay | war tracks      |
+      | battle        | Full        | Retreat while it runs, Carry on after | back to the map while battles run (they keep running); where opened for a replay | war tracks      |
       | siege         | Full        | Back                                | map                                       | war_siege                     |
       | event         | Modal       | historical option                   | badge on End turn                         | stinger only                  |
       | peace         | Modal       | first term                          | where opened                              | unchanged                     |
@@ -41,4 +41,4 @@ Feature: Screen list
       | game_over     | Full        | Look back                           | none                                      | game_over                     |
       | campaign_end  | Full        | Skip                                | none                                      | campaign_end                  |
       | final_result  | Full        | Main menu                           | main_menu                                 | campaign_end                  |
-      | error         | Full        | Restore the last autosave           | main_menu                                 | none                          |
+      | error         | Full        | Restore the last save               | main_menu                                 | none                          |

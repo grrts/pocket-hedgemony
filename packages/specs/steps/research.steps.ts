@@ -1,6 +1,7 @@
 import { expect } from "vitest";
 import { steps } from "../src/registry.ts";
 import * as R from "@ph/engine/domain/research";
+import { Rng } from "@ph/engine";
 
 const { Given, When, Then } = steps("research");
 
@@ -573,4 +574,388 @@ Then("it knows {string} and the four boughs", (s, root: string) => {
   const t = R.tree();
   expect(t.root.name).toBe(root);
   expect([...p.known].sort()).toEqual([t.root.id, ...t.boughs.map((b) => b.id)].sort());
+});
+
+// ------------------------------------------------------------ decided rules (spec §13)
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+Given(/^the date is (\d+) (January|February|March|April|May|June|July|August|September|October|November|December) (\d+)$/, (s, d: string, m: string, y: string) => {
+  s.date = { year: Number(y), month: MONTHS.indexOf(m) + 1, day: Number(d) };
+});
+
+/** Adds an invention and everything it needs (parent and also needs), recursively. */
+function knowWithNeeds(p: R.Programme, id: string, self = false): void {
+  const inv = R.invention(id);
+  if (self) p.known.add(id);
+  for (const need of [inv.parent, ...inv.also_needs]) {
+    if (p.known.has(need)) continue;
+    if (R.tree().inventions.has(need)) knowWithNeeds(p, need, true);
+  }
+}
+
+Given("the country {string} knows everything {string} needs", (s, country: string, name: string) => {
+  knowWithNeeds(programme(s, country), idOf(name));
+});
+
+Then("the study is refused as out of scope", (s) => {
+  expect(s.result).toEqual({ ok: false, reason: "out_of_scope" });
+});
+
+Then("the {int} event-tree inventions of era VIII keep their ids", (s, n: number) => {
+  const t: R.Tree = s.tree;
+  const viii = [...t.inventions.values()].filter((i) => i.era === "VIII" && i.event_id);
+  expect(viii.map((i) => i.id).sort()).toEqual(["F23", "L25", "T19"]);
+  expect(viii.length).toBe(n);
+});
+
+Then("no country may ever study an invention of era VIII", (s) => {
+  const t: R.Tree = s.tree;
+  for (const inv of t.inventions.values()) {
+    if (inv.era !== "VIII") continue;
+    const p = R.newProgramme("Any", t);
+    knowWithNeeds(p, inv.id);
+    expect(R.eligibility(p, inv.id, { year: 1939, month: 8 }, t)).toEqual({ ok: false, reason: "out_of_scope" });
+  }
+});
+
+Then("{string} has the parent {string} and needs nothing else", (s, name: string, parent: string) => {
+  const inv = R.invention(idOf(name), s.tree);
+  expect(inv.parent).toBe(idOf(parent));
+  expect(inv.also_needs).toEqual([]);
+  expect(inv.or_parents).toEqual([]);
+});
+
+Then("a country of {int} that knows {string} may study {string} for {int} scholar-years", (s, year: number, known: string, name: string, cost: number) => {
+  const p = R.newProgramme("Any");
+  knowWithNeeds(p, idOf(known), true);
+  expect(R.eligibility(p, idOf(name), { year })).toEqual({ ok: true });
+  expect(R.studyCostFor(p, idOf(name), { year })).toBe(cost);
+});
+
+Then("its row reads {string}", (s, unlock: string) => {
+  expect(R.invention(s.learned).unlocks).toBe(unlock);
+});
+
+Then("the effect works only while the realm has a {string}", (s, building: string) => {
+  expect(R.effectActive(s.learned, new Set())).toBe(false);
+  expect(R.effectActive(s.learned, new Set([building]))).toBe(true);
+});
+
+// research itself
+When("research is next worked out", (s) => {
+  const p = programme(s);
+  s.withIt = p;
+  s.without = R.newProgramme("Without");
+});
+
+const upkeepOf = (p: R.Programme): number => {
+  const q: R.Programme = { ...p, schools: [{ province: "X", type: "university", open: true, cohorts: [] }] };
+  return R.schoolUpkeep(q);
+};
+
+Then("school upkeep is {int} % lower", (s, pct: number) => {
+  expect(upkeepOf(s.withIt)).toBeCloseTo((upkeepOf(s.without) * (100 - pct)) / 100);
+});
+
+Then("each partner takes {int} % off", (s, pct: number) => {
+  expect(R.spreadPerPartnerPct(s.withIt ?? programme(s))).toBeCloseTo(pct);
+});
+
+Then("each partner takes {int} % off and school upkeep is {int} % lower", (s, pct: number, up: number) => {
+  expect(R.spreadPerPartnerPct(s.withIt)).toBeCloseTo(pct);
+  expect(upkeepOf(s.withIt)).toBeCloseTo((upkeepOf(s.without) * (100 - up)) / 100);
+});
+
+Then("research is {int} % higher", (s, pct: number) => {
+  expect(R.researchBonusPct(s.withIt, "B6")).toBe(pct);
+});
+
+Then("Learning and Sea inventions get {int} % more research", (s, pct: number) => {
+  expect(R.researchBonusPct(s.withIt, "L7")).toBe(pct);
+  expect(R.researchBonusPct(s.withIt, "S5")).toBe(pct);
+  expect(R.researchBonusPct(s.withIt, "B6")).toBe(0);
+});
+
+Then("{int} in {int} scholars is lost to old age each year instead of {int} in {int}", (s, _a: number, slow: number, _b: number, fast: number) => {
+  s.withIt.scholars = 120;
+  s.without.scholars = 120;
+  expect(R.oldAgeLoss(s.withIt)).toBe(120 / slow);
+  expect(R.oldAgeLoss(s.without)).toBe(120 / fast);
+});
+
+When("{int} neighbours or trade partners of {string} know an invention of its own era", (s, n: number) => {
+  s.partnersN = n;
+});
+
+Then("the invention costs {int} % of its era cost", (s, pct: number) => {
+  expect(R.studyCostFor(programme(s), "B5", { year: 1500 }, s.partnersN)).toBeCloseTo((40 * pct) / 100);
+});
+
+Then("with {int} such partners it costs {int} % of its era cost", (s, n: number, pct: number) => {
+  expect(R.studyCostFor(programme(s), "B5", { year: 1500 }, n)).toBeCloseTo((40 * pct) / 100);
+});
+
+Then("{string} opens on the contact event {string}", (s, name: string, contact: string) => {
+  expect(R.contactOf(idOf(name), s.tree)).toBe(contact);
+});
+
+Then("the country {string} knows {string} from the start", (s, country: string, name: string) => {
+  expect(R.startingKnowledgeFor(country.toLowerCase()).has(idOf(name))).toBe(true);
+});
+
+// progress
+Given("the country {string} has {int} scholars and {int} students", (s, country: string, scholars: number, n: number) => {
+  const p = programme(s, country);
+  p.scholars = scholars;
+  addTempleSchools(p, Math.ceil(n / 20));
+  R.fillSeats(p, { recruits: n }, n, 1440);
+});
+
+Given("it studies {string} with {int} scholar-years of progress", (s, name: string, progress: number) => {
+  const p = programme(s);
+  knowWithNeeds(p, idOf(name));
+  expect(R.setStudy(p, idOf(name), date(s))).toEqual({ ok: true });
+  p.studies.find((x) => x.id === idOf(name))!.progress = progress;
+  s.study = idOf(name);
+});
+
+Given("the country {string} studies {string} with {int} scholar-years of progress", (s, country: string, name: string, progress: number) => {
+  const p = programme(s, country);
+  addTempleSchools(p, 1);
+  knowWithNeeds(p, idOf(name));
+  expect(R.setStudy(p, idOf(name), date(s))).toEqual({ ok: true });
+  p.studies.find((x) => x.id === idOf(name))!.progress = progress;
+});
+
+When("a month passes", (s) => {
+  s.learnedNow = R.researchMonth(programme(s), date(s));
+});
+
+When("{int} more months pass", (s, n: number) => {
+  for (let i = 0; i < n; i++) R.researchMonth(programme(s), date(s));
+});
+
+Then("{float} scholar-years are added to {string}", (s, n: number, name: string) => {
+  expect(programme(s).studies.find((x) => x.id === idOf(name))?.progress).toBeCloseTo(n);
+});
+
+Then("the country {string} knows {string}", (s, _country: string, name: string) => {
+  expect(programme(s).known.has(idOf(name))).toBe(true);
+});
+
+Given("the country {string} is at war with {string}, which knows {string}", (s, country: string, enemy: string, name: string) => {
+  programme(s, country);
+  s.enemyKnows = new Set([idOf(name)]);
+  s.enemy = enemy;
+});
+
+When("the Ottomans occupy a Venetian province with an open school", (s) => {
+  s.helped = R.stealInWar(programme(s), s.enemyKnows, date(s));
+});
+
+Then("the country {string} gains {int} scholar-years toward {string}", (s, _country: string, n: number, name: string) => {
+  expect(s.helped).toEqual([idOf(name)]);
+  expect(programme(s).studies.find((x) => x.id === idOf(name))?.progress).toBeCloseTo(n);
+});
+
+Given("the country {string} has an academy of science, {int} scholars and {int} students", (s, country: string, scholars: number, _n: number) => {
+  const p = programme(s, country);
+  p.known.add("L12");
+  R.gainSchool(p, "London", "academy", "build");
+  p.scholars = scholars;
+});
+
+Given("it studies {string} and {string}", (s, a: string, b: string) => {
+  const p = programme(s);
+  for (const name of [a, b]) {
+    knowWithNeeds(p, idOf(name));
+    expect(R.setStudy(p, idOf(name), date(s))).toEqual({ ok: true });
+  }
+});
+
+When("a year passes", (s) => {
+  const p = programme(s);
+  if (s.treasury) {
+    R.paySchoolUpkeep(p, s.treasury);
+    return;
+  }
+  R.researchYear(p, date(s));
+});
+
+Then("each study has {int} scholar-years of progress", (s, n: number) => {
+  for (const st of programme(s).studies) expect(st.progress).toBeCloseTo(n);
+});
+
+// schools
+Given("it has {int} provinces, {int} of them with a school", (s, n: number, withSchool: number) => {
+  const p = programme(s);
+  s.provinces = Array.from({ length: n }, (_, i) => `P${i + 1}`);
+  for (let i = 0; i < withSchool; i++) p.schools.push({ province: s.provinces[i], type: "temple_or_monastery_school", open: true, cohorts: [] });
+});
+
+When("the year begins", (s) => {
+  const p = programme(s);
+  if (s.provinces) {
+    s.village = R.villageSeats(p, s.provinces);
+    return;
+  }
+  if (s.neighbourGold !== undefined) {
+    s.poached = R.poachingYear(p, s.gold, [{ country: s.neighbourName, gold: s.neighbourGold }]);
+    return;
+  }
+  s.oldAge = R.oldAgeLoss(p);
+  p.scholars -= s.oldAge;
+});
+
+Then("the {int} provinces without a school have {int} village-school seats each", (s, n: number, seats: number) => {
+  expect(s.village).toBe(n * seats);
+  expect(R.villageSeats(R.newProgramme("No L18"), s.provinces)).toBe(0);
+});
+
+Given(/^it (knows|does not know) the invention "([^"]+)"$/, (s, knows: string, name: string) => {
+  if (knows === "knows") R.learn(programme(s), idOf(name));
+  else expect(programme(s).known.has(idOf(name))).toBe(false);
+});
+
+When(/^the player wants a (\w+(?: of works)?) from (a new university graduate|a working scholar)$/, (s, type: string, who: string) => {
+  s.who = who === "a working scholar" ? { graduating: false } : { graduating: true, school: "university" };
+  s.allowed = R.mayBecomeOfficial(programme(s), s.who, type);
+});
+
+Then("it is allowed", (s) => {
+  expect(s.allowed).toBe(true);
+});
+Then("it is refused", (s) => {
+  expect(s.allowed).toBe(false);
+});
+
+Then("the graduates are counted as scholars without a sex", (s) => {
+  const p = programme(s);
+  expect(p.scholars).toBeGreaterThan(0);
+  expect(Object.keys(p)).not.toContain("women");
+});
+
+Then("whether a scholar named to a role is a woman is the realm's women-in-roles roll", (s) => {
+  expect(Object.keys(R)).not.toContain("womanScholarChance");
+});
+
+Then(/^it knows "([^"]+)" and "([^"]+)", which "([^"]+)" needs$/, (s, a: string, b: string, c: string) => {
+  const known: Set<string> = s.p.known;
+  expect(known.has(idOf(c))).toBe(true);
+  expect(known.has(idOf(a))).toBe(true);
+  expect(known.has(idOf(b))).toBe(true);
+  const inv = R.invention(idOf(c));
+  expect([inv.parent, ...inv.also_needs]).toEqual([idOf(a), idOf(b)]);
+});
+
+Then("it does not know {string}", (s, name: string) => {
+  expect(s.p.known.has(idOf(name))).toBe(false);
+});
+
+Then("it has no study under way", (s) => {
+  expect(s.p.studies).toEqual([]);
+});
+
+// war and research
+Given("the country {string} has {int} schools and {int} gold", (s, country: string, n: number, gold: number) => {
+  addTempleSchools(programme(s, country), n);
+  s.treasury = { gold };
+  s.goldBefore = gold;
+});
+
+Then("it pays school upkeep from the same gold that pays soldiers", (s) => {
+  expect(s.treasury.gold).toBeLessThan(s.goldBefore);
+});
+
+Then("the country {string} has {int} gold", (s, _country: string, gold: number) => {
+  expect(s.treasury.gold).toBe(gold);
+});
+
+When("a battle is fought in {string} and the sack roll comes up", (s, province: string) => {
+  // Find a seed whose first roll sacks, then use it.
+  let seed = 1;
+  while (new Rng(seed).int(100) >= R.researchConfig.sack_chance_pct) seed++;
+  s.sack = R.sackRoll(programme(s), province, 20, s.neighbours, new Rng(seed));
+  if (s.sack.sacked) s.outcome = "lost";
+});
+
+Then("10 scholars flee to {string}", (s, country: string) => {
+  expect(s.sack).toEqual({ sacked: true, fled: 10, to: country });
+});
+
+Then("over many battles about {int} % of the rolls sack the school", (s, pct: number) => {
+  const rng = new Rng(7);
+  let sacked = 0;
+  for (let i = 0; i < 2000; i++) {
+    const p = R.newProgramme("Milan");
+    p.schools.push({ province: "Milan", type: "university", open: true, cohorts: [] });
+    if (R.sackRoll(p, "Milan", 20, [], rng).sacked) sacked++;
+  }
+  expect(Math.abs(sacked / 20 - pct)).toBeLessThan(3);
+});
+
+Given("the country {string} has {int} scholars and {int} gold", (s, country: string, scholars: number, gold: number) => {
+  programme(s, country).scholars = scholars;
+  s.gold = gold;
+});
+
+Given("its neighbour {string} has {int} gold", (s, name: string, gold: number) => {
+  s.neighbourName = name;
+  s.neighbourGold = gold;
+});
+
+Then("the country {string} loses {int} scholars to {string}", (s, _country: string, n: number, to: string) => {
+  expect(s.poached.scholars).toBe(n);
+  if (n > 0) expect(s.poached.by).toBe(to);
+});
+
+Then("the country {string} loses {int} scholars to old age", (s, _country: string, n: number) => {
+  expect(s.oldAge).toBe(n);
+});
+
+Given("the AI country {string} has {int} empty seats", (s, country: string, n: number) => {
+  addTempleSchools(programme(s, country), n / 20);
+});
+
+Given(/^it is (at peace|at war)$/, (s, state: string) => {
+  s.atWar = state === "at war";
+});
+
+When("the AI plans its research", (s) => {
+  const p = programme(s);
+  s.aiStudy = R.aiChooseStudy(p, date(s));
+  s.aiSeats = R.aiSeatsToFill(p, s.atWar);
+});
+
+Then("it studies the cheapest invention it may study, ties by id", (s) => {
+  const p = programme(s);
+  const ok = [...R.tree().inventions.keys()].filter((id) => R.eligibility(p, id, date(s)).ok);
+  const cheapest = Math.min(...ok.map((id) => R.studyCostFor(p, id, date(s))));
+  expect(s.aiStudy).toBe(ok.filter((id) => R.studyCostFor(p, id, date(s)) === cheapest).sort()[0]);
+});
+
+Then("it fills {int} seats", (s, n: number) => {
+  expect(s.aiSeats).toBe(n);
+});
+
+Given("the country {string} learned {string} in {int}", (s, country: string, name: string, year: number) => {
+  R.learn(programme(s, country), idOf(name));
+  s.learnedYear = { [idOf(name)]: year };
+});
+
+When("the year {int} begins", (s, year: number) => {
+  s.steps = R.harvestStepsFromInventions(programme(s), year, s.learnedYear);
+});
+
+Then("its inventions give {int} harvest steps from guano", (s, n: number) => {
+  expect(s.steps).toBe(n);
+});
+
+When("the country {string} is set up", (s, country: string) => {
+  s.p = R.startingProgramme(country.toLowerCase());
+});
+
+Then("it typically knows {string}", (s, name: string) => {
+  expect(s.p.known.has(idOf(name))).toBe(true);
 });

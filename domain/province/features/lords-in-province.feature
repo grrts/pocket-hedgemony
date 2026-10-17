@@ -70,3 +70,11 @@ Feature: Lords in the province
     Given the lord "Armagnac" owns a market and a castle in "Armagnac"
     When his land comes back to the country "France"
     Then the market and the castle belong to the country "France"
+
+  @PROV-300
+  Scenario: A lord's province without his official
+    Given the lord "Philip of Burgundy" holds "Dijon" without an official of his own
+    And "Dijon" would give 10 gold and 600 recruits
+    When the game works out the province's stats
+    Then the province "Dijon" is ungoverned
+    And the lord "Philip of Burgundy" gets 5 gold and 300 recruits from it

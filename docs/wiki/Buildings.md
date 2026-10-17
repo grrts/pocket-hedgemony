@@ -89,7 +89,7 @@ Each step has its own gold, materials and months. While a building is being upgr
 
 A building drops **one step** after 10 years of neglect, when sacked, or when hit by an earthquake. A step-1 building that falls becomes ruined.
 
-The **market** shows how steps work: weekly market (1,500 market folk, village or bigger), yearly fair (2,400, needs a market charter and a market town), trading house (3,000, needs T3 *Bills of exchange* and a town or bigger).
+The **market** shows how steps work: weekly market (1,500 market folk, village or bigger), yearly fair (2,400, needs T6 *Merchant fairs*, a market charter and a market town; fairs standing in 1444 stay), trading house (3,000, needs T3 *Bills of exchange* and a town or bigger).
 
 ### Upkeep and condition
 
@@ -204,7 +204,7 @@ All numbers are step 1 on farmland and are placeholders. "g" is gold, "mo" month
 
 | Building | Place | Jobs | Does | Unlocked by | Cost |
 |---|---|---|---|---|---|
-| Market | Town slot | 1,500 / 2,400 / 3,000 market folk | Weekly market: a trade endpoint · yearly fair: traders hired here, draws from further · trading house: traders start with more goods, bills of exchange | Start; step 3 T3 | 40 g / 100 g, 30 stone, 12 mo / 200 g, 40 stone, 18 mo |
+| Market | Town slot | 1,500 / 2,400 / 3,000 market folk | Weekly market: a trade endpoint · yearly fair: traders hired here, draws from further · trading house: traders start with more goods, bills of exchange | Start; step 2 T6; step 3 T3 | 40 g / 100 g, 30 stone, 12 mo / 200 g, 40 stone, 18 mo |
 | Caravanserai (khan, funduq, tambo) | Town slot | 900 market folk | Rest stop: carried trade value grows faster; needs a road; T1 doubles its room | Start | 40 g, 20 stone, 12 mo |
 | Warehouse | Town slot | 900 market folk | Stores the town's wares between seasons; needs a market | Start | 30 g, 20 timber, 6 mo |
 | Counting house | Town slot | 600 market folk | Traders draw treasury gold; a merchant house can lend here; needs market step 2 | T2 | 60 g, 10 stone, 6 mo |
@@ -338,7 +338,9 @@ The AI builds by the same rules and costs. Each month each AI country looks at *
 
 It keeps a year's upkeep in reserve and never starts a site it can't crew. On a phone this is about 400 small checks a month in a 400-country world.
 
-### Each turn
+### Each month
+
+A turn is one week. These steps run once a month, in the turn in which a new month begins.
 
 | Cadence | What happens |
 |---|---|
@@ -353,7 +355,7 @@ Each building stores just five small numbers (type, step, owner, condition, fill
 Troyes starts with 12 tiles (4 farms, a burned field, 2 ranches, a lumber camp, an empty woods tile, a fishery on the Seine, the castle and the town), 3,600 homeless, and a town with 6 full slots: a market, 3 loom houses, a church and a school.
 
 1. **1444, the burned field.** You pay 15 gold, half the cost of a farm, to rebuild it in a season instead of waiting a year. 500 homeless form the crew and then move into the farm's slots.
-2. **1445, the yearly fair.** No free slot, so you upgrade the market to a yearly fair (a market charter granted; 100 gold, 30 stone, 12 months). Troyes has no quarry; the stone comes from one in the Burgundian hills, one ring away but in a lord's province, so it is bought for 15 gold. The crew of 2,000 is all homeless. The fair takes 900 more market folk, and traders can now be hired here.
+2. **1445, the yearly fair.** No free slot, so you upgrade the market to a yearly fair (France has learned T6 and a market charter is granted; 100 gold, 30 stone, 12 months). Troyes has no quarry; the stone comes free from one in the hills one ring away, in a lord's province, which counts as the crown's own. The crew of 2,000 is all homeless. The fair takes 900 more market folk, and traders can now be hired here.
 3. **1447, the town grows to a city** with 9 slots: a drill yard (40 gold), a warehouse (30 gold) and a fourth loom house (35 gold). Each crew takes the homeless first, leaving 400, under 1 %, and no theft.
 4. **1449, the woods tile.** You want a farm, but clearing the woods would leave the lumber camp as the only timber, and the shipyard downriver needs it. You leave the woods and build a quarry on a hills tile of a neighbouring province for 20 gold, so the next castle step needs no bought stone.
 5. **1450, Burgundy invades.** The stone castle upgrade site stops; foragers burn 2 fields; the town is besieged and takes honours of war. With only a palisade, plunder would have burned 1 in 3 town buildings; because the town took terms, none burn.
@@ -472,29 +474,26 @@ Everything lives in one buildings config file, and every value is a placeholder.
 | 1444 ports | `start_ports.file` | `../naval/data/start-ports.json` |
 | Quake regions, fire chance | not yet in config | not given |
 
+## Decided since the first draft
+
+- Troyes starts in 1444 as a town with 6 slots.
+- Bought materials have a fixed price, and cost 25 % more where no trade route reaches the province.
+- A master of works adds one more site of each kind, halves the months and takes 25 % off the gold.
+- Castles and roads have five steps. The track is known from the start; road and paved road need B2, the turnpike B9, and the railway C16.
+- Landmarks stand at their building's top step.
+- A new yearly fair needs T6 (Merchant fairs) and a market charter. Fairs already standing in 1444 stay.
+- The caravanserai makes land traders 25 % stronger and keeps bandits away; the counting house lets foreign traders deposit with bills of exchange.
+- A lord's province counts as yours when fetching materials.
+- Any town walls, a palisade included, cut plunder to 1 in 6 buildings.
+- Burned tiles rebuild themselves, one a year in peace, or you pay half a farm's cost to rebuild one in 3 months.
+- A town has a 1 % chance of fire each year, plus 0.5 % for each size above town. A raid of 2,000 men or more is big.
+- Craft buildings appear only where trade is strong (trade ratio of 30 % or more), with a 1 in 10 chance a year.
+- Unique national building variants are kept in the buildings data.
+
 ## Still open
 
-- **OQ-BLD-1**: Is Troyes a market town (4 slots) or a town (6 slots) in 1444?
-- **OQ-BLD-2**: What price bought materials cost now that trade v2 dropped market prices, and what "few traders" means.
-- **OQ-BLD-3**: Is the master of works' 25 % gold discount part of the rule?
-- **OQ-BLD-4**: The maximum step: castles and roads have five.
-- **OQ-BLD-5**: What step each landmark stands at, when several sit at their type's top step.
-- **OQ-BLD-6**: Is the yearly fair available at start with a charter, or only with T6?
-- **OQ-BLD-7**: Whether the caravanserai and counting house keep the buildings design's roles or take trade's; "room" is undefined.
-- **OQ-BLD-8**: Which 1444 port file is canonical: `start-ports.json` or `ports-1444.json`?
-- **OQ-BLD-9**: Is palace step 3 at start or unlocked by G9?
-- **OQ-BLD-10**: The province design hasn't adopted the buildings changes (hospital at start, ring works, quarry miners, new lenses).
-- **OQ-BLD-11**: Is a lord's province "yours" for material reach?
-- **OQ-BLD-12**: Does a palisade count as town walls for plunder?
-- **OQ-BLD-13**: Road steps: five steps, three unlocks, and missing costs for the track and turnpike.
-- **OQ-BLD-14**: Which castle steps are known in 1444?
-- **OQ-BLD-15**: Crafts appearing: trade's 30 % trade ratio floor and how often "now and then" is.
-- **OQ-BLD-16**: Unique variants have no home in national strengths yet.
-- **OQ-BLD-17**: Fire chance, quake regions, a "big" raid, a "busy path", regional slot templates and buildings for wealth 2 to 9 are not given.
-- **OQ-BLD-18**: One seat per province or per town?
-- **OQ-BLD-19**: Who owns the "decision" to restore Angkor?
-- **OQ-BLD-20**: The 20 % village works rate needs balancing, and faith building numbers may change with religion.
-- **OQ-BLD-21**: When a burned land building both rebuilds at half cost and rebuilds itself for free in peace, which applies?
+Nothing. Every question about buildings has been decided; numbers marked as placeholders are tuned during balancing.
+
 
 ## For developers
 

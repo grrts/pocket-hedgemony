@@ -66,20 +66,23 @@ Feature: Losing a subject
     Then "S" is independent
     And "S" is Hostile toward "O"
 
-  @SUBJ-080 @open-question
-  Scenario: Changing masters
-    # OQ-SUBJ-11: how the rival accepts
+  @SUBJ-080
+  Scenario Outline: Changing masters
     Given "Moldavia" is a Disloyal Vassal of "Poland"
     And "Moldavia" borders "Hungary", a rival of "Poland"
-    When "Moldavia" asks to change masters and "Hungary" accepts
-    Then "Moldavia" is a Vassal of "Hungary"
-    And the stance of "Poland" toward "Moldavia" and toward "Hungary" is "hostile"
+    And "Hungary" has <free> reach free
+    When "Moldavia" asks to change masters
+    Then "Moldavia" <result>
 
-  @SUBJ-081 @open-question
+    Examples:
+      | free | result                                                                  |
+      | 1    | is a Vassal of "Hungary", and "Poland" and "Hungary" are Hostile toward each other |
+      | 0    | stays a Vassal of "Poland"                                              |
+
+  @SUBJ-081
   Scenario Outline: Taken by force
-    # OQ-SUBJ-6: target of Break a subject
-    Given the country "X" declares "Break a subject" on the subject "S" of "O"
-    Then "S" is called as the defender and "O" is called to defend it
+    Given the country "X" declares "Break a subject" against "O" over its Disloyal Vassal "S"
+    Then the war is on "O", who defends, and "S" answers by its kind and loyalty
     When "X" wins and chooses <choice>
     Then "S" <result>
 

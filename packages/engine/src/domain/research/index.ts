@@ -1,4 +1,5 @@
 import config from "../../../../rules/data/domain/research.json" with { type: "json" };
+import type { Rng } from "../../rng.ts";
 
 /**
  * Research (domain/research/spec.md): schools with student seats, students
@@ -38,6 +39,15 @@ export interface InventionEffects {
   village_schools?: boolean;
   spread_pct?: number;
   research_pct?: number;
+  /** Extra research toward inventions whose id starts with a letter (L3: Learning and Sea). */
+  research_pct_for_letters?: Record<string, number>;
+  school_upkeep_pct?: number;
+  /** Scholars lost to old age become 1 in this many a year (L10). */
+  old_age_one_in?: number;
+  /** Years a harvest step lasts (F16). */
+  harvest_steps_years?: number;
+  needs_building?: string;
+  [other: string]: unknown;
 }
 
 /** One config row of the tree (RSCH-044). */
@@ -222,11 +232,19 @@ export function eligibility(p: Programme, id: string, date: Day, t: Tree = tree(
   const inv = t.inventions.get(id);
   if (!inv) return { ok: false, reason: "unknown" };
   if (p.known.has(id)) return { ok: false, reason: "known" };
-  if (config.out_of_scope_eras.includes(inv.era) || !withinCampaign(date)) return { ok: false, reason: "out_of_scope" };
+  if (outOfScope(inv) || !withinCampaign(date)) return { ok: false, reason: "out_of_scope" };
   if (![inv.parent, ...inv.or_parents].some((x) => p.known.has(x))) return { ok: false, reason: "parent" };
   if (!inv.also_needs.every((x) => p.known.has(x))) return { ok: false, reason: "also_needs" };
   if (inv.contact && !p.contacts.has(inv.contact)) return { ok: false, reason: "contact" };
   return { ok: true };
+}
+
+/**
+ * Era VIII and the two Era VII inventions dropped by X-14 (L23 Nuclear physics,
+ * L24 Rocketry) are never studied (RSCH-045, RSCH-062, RSCH-063).
+ */
+export function outOfScope(inv: Invention): boolean {
+  return config.out_of_scope_eras.includes(inv.era) || config.dropped_inventions.includes(inv.id);
 }
 
 /** Records a contact event, opening the contact inventions it names (RSCH-035). */
@@ -263,25 +281,73 @@ export function researchPerYear(scholars: number, studentCount: number): number 
   return scholars * config.scholar_rate + studentCount * config.student_rate;
 }
 
+/** Sum of one numeric effect over every invention a country knows. */
+export function knownEffectSum(p: Programme, key: "research_pct" | "spread_pct" | "school_upkeep_pct", t: Tree = tree()): number {
+  let sum = 0;
+  for (const id of p.known) {
+    const v = t.inventions.get(id)?.effects?.[key];
+    if (typeof v === "number") sum += v;
+  }
+  return sum;
+}
+
 /**
- * A year of research. Progress stops while no school is open (RSCH-012) or
- * after students were called to arms (RSCH-022). With two studies the caller
- * must say how to split the scholar-years (OQ-RSCH-7 leaves it open).
- * Returns the inventions learned (RSCH-011).
+ * Research bonus in percent toward one invention: L6 and L11 +10 % each, L20
+ * +50 %, and L3 +20 % toward Learning (L) and Sea (S) inventions (RSCH-074).
  */
-export function researchYear(p: Programme, date: Day, partnersKnowing: Record<string, number> = {}, split?: number[], t: Tree = tree()): string[] {
+export function researchBonusPct(p: Programme, id: string, t: Tree = tree()): number {
+  let pct = knownEffectSum(p, "research_pct", t);
+  for (const known of p.known) {
+    const byLetter = t.inventions.get(known)?.effects?.research_pct_for_letters;
+    if (byLetter) pct += byLetter[id.charAt(0)] ?? 0;
+  }
+  return pct;
+}
+
+/**
+ * Discount per neighbour or trade partner who knows an invention: 10 %, raised
+ * by a fifth by each of L5, L14 and L21 (RSCH-069).
+ */
+export function spreadPerPartnerPct(p: Programme, t: Tree = tree()): number {
+  return config.spread_per_partner_pct * (1 + knownEffectSum(p, "spread_pct", t) / 100);
+}
+
+/** What a study costs this country now, with its own spread inventions. */
+export function studyCostFor(p: Programme, id: string, date: Day, partnersKnowing = 0, t: Tree = tree()): number {
+  const base = costBeforeDiscounts(invention(id, t).era, date);
+  const off = Math.min(config.spread_cap_pct, spreadPerPartnerPct(p, t) * Math.max(0, partnersKnowing));
+  return (base * (100 - off)) / 100;
+}
+
+function addProgress(p: Programme, scholarYears: number, date: Day, partnersKnowing: Record<string, number>, t: Tree): string[] {
   if (p.stopped || !p.schools.some((s) => s.open) || p.studies.length === 0) return [];
-  const total = researchPerYear(p.scholars, students(p));
-  if (p.studies.length > 1 && !split) throw new Error("two studies need a split (OQ-RSCH-7)");
-  const shares = split ?? [1];
+  // Two studies share the scholar-years evenly (RSCH-068).
+  const share = p.studies.length > 1 ? config.second_study_share : 1;
+  for (const s of p.studies) s.progress += scholarYears * share * (1 + researchBonusPct(p, s.id, t) / 100);
   const learned: string[] = [];
-  p.studies.forEach((s, i) => (s.progress += total * (shares[i] ?? 0)));
   for (const s of [...p.studies]) {
-    if (s.progress >= studyCost(s.id, date, partnersKnowing[s.id] ?? 0, t)) {
+    if (s.progress >= studyCostFor(p, s.id, date, partnersKnowing[s.id] ?? 0, t)) {
       learn(p, s.id);
       learned.push(s.id);
     }
   }
+  return learned;
+}
+
+/**
+ * One monthly step of research: a twelfth of the yearly scholar-years goes into
+ * the current study or studies (RSCH-067). Progress stops while no school is
+ * open (RSCH-012) or after students were called to arms (RSCH-022). Returns the
+ * inventions learned (RSCH-011).
+ */
+export function researchMonth(p: Programme, date: Day, partnersKnowing: Record<string, number> = {}, t: Tree = tree()): string[] {
+  return addProgress(p, researchPerYear(p.scholars, students(p)) / config.research_months_per_year, date, partnersKnowing, t);
+}
+
+/** Twelve monthly steps at once (a year of research). */
+export function researchYear(p: Programme, date: Day, partnersKnowing: Record<string, number> = {}, t: Tree = tree()): string[] {
+  const learned: string[] = [];
+  for (let m = 0; m < config.research_months_per_year; m++) learned.push(...researchMonth(p, date, partnersKnowing, t));
   return learned;
 }
 
@@ -321,6 +387,17 @@ export function loseSchool(p: Programme, province: string, cause: SchoolLoss): "
   if (result === "lost") p.schools = p.schools.filter((s) => s !== school);
   else school.open = false;
   return result;
+}
+
+/**
+ * With L18 every province without a school gets village-school seats: 10 each
+ * (RSCH-070). Village schools are not buildings and cost no upkeep.
+ */
+export function villageSeats(p: Programme, provinces: readonly string[], t: Tree = tree()): number {
+  const has = [...p.known].some((id) => t.inventions.get(id)?.effects?.village_schools === true);
+  if (!has) return 0;
+  const withSchool = new Set(p.schools.map((s) => s.province));
+  return provinces.filter((x) => !withSchool.has(x)).length * config.village_school_seats;
 }
 
 export function seats(p: Programme): number {
@@ -424,11 +501,21 @@ export function changeScholars(p: Programme, cause: ScholarChange, n: number): n
 // ---------------------------------------------------------------- war and research
 
 /**
- * School upkeep is paid each year from the treasury that also pays soldiers
- * (RSCH-021). The gold per school comes from the buildings context (OQ-RSCH-9).
+ * Yearly upkeep of the open schools: temple or monastery school 2 gold,
+ * madrasa and university 4, academy 6, each 10 % less for C1, L4 and L5
+ * (RSCH-070, RSCH-074).
  */
-export function paySchoolUpkeep(p: Programme, treasury: { gold: number }, goldPerSchool: number): number {
-  const due = p.schools.filter((s) => s.open).length * goldPerSchool;
+export function schoolUpkeep(p: Programme, t: Tree = tree()): number {
+  const base = p.schools.filter((s) => s.open).reduce((n, s) => n + config.school_upkeep[s.type], 0);
+  return (base * (100 + knownEffectSum(p, "school_upkeep_pct", t))) / 100;
+}
+
+/**
+ * School upkeep is paid each year from the treasury that also pays soldiers
+ * (RSCH-021). Without a figure the school's own upkeep applies.
+ */
+export function paySchoolUpkeep(p: Programme, treasury: { gold: number }, goldPerSchool?: number): number {
+  const due = goldPerSchool === undefined ? schoolUpkeep(p) : p.schools.filter((s) => s.open).length * goldPerSchool;
   treasury.gold -= due;
   return due;
 }
@@ -444,8 +531,7 @@ export function callStudentsToArms(p: Programme, pool: RecruitPool): number {
 
 /**
  * A battle in a province with a school may sack it and scatter its scholars,
- * who may flee to a peaceful neighbour (RSCH-023). The chance is not given
- * (OQ-RSCH-10), so this says what may happen, not what does.
+ * who may flee to a peaceful neighbour (RSCH-023): what may happen.
  */
 export function battleAtSchool(p: Programme, province: string, neighbours: { country: string; atPeace: boolean }[]): { maySack: boolean; scholarsMayFleeTo: string[] } {
   const has = p.schools.some((s) => s.province === province);
@@ -473,4 +559,164 @@ export function effectsOf(id: string, t: Tree = tree()): InventionEffects {
 export function byEventId(eventId: string, t: Tree = tree()): Invention | undefined {
   for (const inv of t.inventions.values()) if (inv.event_id === eventId) return inv;
   return undefined;
+}
+
+// ---------------------------------------------------------------- decided rules (§13)
+
+/**
+ * Sack roll for a battle in a province with an open school: 25 % to sack it
+ * (the school is lost); then half the province's scholars flee to the first
+ * peaceful neighbour in the order given (ascending nation index), or are lost
+ * when no neighbour is at peace (RSCH-072).
+ */
+export function sackRoll(
+  p: Programme,
+  province: string,
+  provinceScholars: number,
+  neighbours: { country: string; atPeace: boolean }[],
+  rng: Rng,
+): { sacked: boolean; fled: number; to: string | null } {
+  const school = p.schools.find((s) => s.province === province && s.open);
+  if (!school || rng.int(100) >= config.sack_chance_pct) return { sacked: false, fled: 0, to: null };
+  loseSchool(p, province, "sacked");
+  const fled = Math.floor(provinceScholars * config.sack_scholars_flee_share);
+  p.scholars = Math.max(0, p.scholars - fled);
+  const to = neighbours.find((n) => n.atPeace)?.country ?? null;
+  return { sacked: true, fled, to };
+}
+
+/**
+ * Stealing in war: occupying an enemy province with an open school gives each
+ * current study the enemy knows 10 % of its cost, once per province per war
+ * (RSCH-071). The caller keeps the per-war list of provinces already used.
+ */
+export function stealInWar(p: Programme, enemyKnows: ReadonlySet<string>, date: Day, t: Tree = tree()): string[] {
+  const helped: string[] = [];
+  for (const s of p.studies) {
+    if (!enemyKnows.has(s.id)) continue;
+    s.progress += costBeforeDiscounts(invention(s.id, t).era, date) * config.steal_share_of_cost;
+    helped.push(s.id);
+  }
+  return helped;
+}
+
+/** Scholars a country loses to old age each January: 1 in 30, 1 in 60 with L10 (RSCH-075). */
+export function oldAgeLoss(p: Programme, t: Tree = tree()): number {
+  let oneIn = config.old_age_one_in;
+  for (const id of p.known) {
+    const v = t.inventions.get(id)?.effects?.old_age_one_in;
+    if (typeof v === "number") oneIn = Math.max(oneIn, v);
+  }
+  return Math.floor(p.scholars / oneIn);
+}
+
+/**
+ * Poaching each January: the richest neighbour with at least twice your gold
+ * takes 1 in 20 of your scholars (RSCH-073).
+ */
+export function poachingYear(p: Programme, gold: number, neighbours: { country: string; gold: number }[]): { by: string | null; scholars: number } {
+  const rich = neighbours.filter((n) => n.gold >= gold * config.poach_gold_ratio).sort((a, b) => b.gold - a.gold)[0];
+  if (!rich) return { by: null, scholars: 0 };
+  const n = Math.floor(p.scholars / config.poach_one_in);
+  p.scholars -= n;
+  return { by: rich.country, scholars: n };
+}
+
+/**
+ * The inventions a map nation knows at the start: the root and the boughs,
+ * every invention whose start regions include a label the nation belongs to
+ * (research data), the nation's extra list, and everything those need. No
+ * study starts with progress (RSCH-076).
+ */
+export function startingKnowledgeFor(nation: string, t: Tree = tree()): Set<string> {
+  const known = startingKnowledge(t);
+  const members = config.start_region_members as Record<string, string[]>;
+  const extra = (config.start_extra as Record<string, string[]>)[nation] ?? [];
+  const add = (id: string): void => {
+    if (known.has(id)) return;
+    const inv = t.inventions.get(id);
+    if (!inv) return;
+    known.add(id);
+    const parentKnown = [inv.parent, ...inv.or_parents].some((x) => known.has(x));
+    if (!parentKnown) add(inv.parent);
+    for (const need of inv.also_needs) add(need);
+  };
+  for (const inv of t.inventions.values()) {
+    if (outOfScope(inv)) continue;
+    if (inv.start_regions.some((label) => (members[label] ?? []).includes(nation))) add(inv.id);
+  }
+  for (const id of extra) add(id);
+  return known;
+}
+
+/** A programme set up for a map nation at the start. */
+export function startingProgramme(nation: string, t: Tree = tree()): Programme {
+  const p = newProgramme(nation, t);
+  p.known = startingKnowledgeFor(nation, t);
+  return p;
+}
+
+/** The contact event that opens a contact invention (RSCH-077). */
+export function contactOf(id: string, t: Tree = tree()): string | undefined {
+  return invention(id, t).contact;
+}
+
+/**
+ * The AI studies the eligible invention that costs it least now, ties by id
+ * (RSCH-078).
+ */
+export function aiChooseStudy(p: Programme, date: Day, partnersKnowing: Record<string, number> = {}, t: Tree = tree()): string | null {
+  let best: { id: string; cost: number } | null = null;
+  const ids = [...t.inventions.keys()].sort();
+  for (const id of ids) {
+    if (p.studies.some((s) => s.id === id)) continue;
+    if (!eligibility(p, id, date, t).ok) continue;
+    const cost = studyCostFor(p, id, date, partnersKnowing[id] ?? 0, t);
+    if (!best || cost < best.cost) best = { id, cost };
+  }
+  return best?.id ?? null;
+}
+
+/**
+ * Seats the AI fills: every empty seat while at peace, none while at war; it
+ * calls students to arms only at war with no recruits left (RSCH-078).
+ */
+export function aiSeatsToFill(p: Programme, atWar: boolean): number {
+  return atWar ? (config.ai.fill_seats_at_war ? emptySeats(p) : 0) : config.ai.fill_seats_in_peace ? emptySeats(p) : 0;
+}
+
+export function aiCallsStudentsToArms(p: Programme, atWar: boolean, recruits: number): boolean {
+  return atWar && recruits <= 0 && students(p) > 0;
+}
+
+/**
+ * Harvest steps a country's inventions give in a year. F16's step lasts 30
+ * years from the year it was learned, then ends (RSCH-080).
+ */
+export function harvestStepsFromInventions(p: Programme, year: number, learnedYear: Record<string, number> = {}, t: Tree = tree()): number {
+  let steps = 0;
+  for (const id of p.known) {
+    const e = t.inventions.get(id)?.effects;
+    if (!e?.harvest_steps) continue;
+    const lasts = e.harvest_steps_years;
+    if (typeof lasts === "number" && year - (learnedYear[id] ?? year) >= lasts) continue;
+    steps += e.harvest_steps;
+  }
+  return steps;
+}
+
+/**
+ * Who may be made an official: a new graduate, as one of his school's types;
+ * with G4 also a working scholar, as any type (RSCH-081).
+ */
+export function mayBecomeOfficial(p: Programme, who: { graduating: true; school: SchoolType } | { graduating: false }, type: string, t: Tree = tree()): boolean {
+  if (who.graduating && graduateOfficialTypes(who.school).includes(type)) return true;
+  if (!scholarsCanBecomeOfficials(p, t)) return false;
+  return p.scholars > 0 || who.graduating;
+}
+
+/** An invention whose effect needs a building only works while the realm has it (RSCH-066: G3, G10 need a chancery). */
+export function effectActive(id: string, buildings: ReadonlySet<string>, t: Tree = tree()): boolean {
+  const need = invention(id, t).effects?.needs_building;
+  return typeof need !== "string" || buildings.has(need);
 }

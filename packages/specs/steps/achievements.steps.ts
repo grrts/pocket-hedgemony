@@ -2,6 +2,7 @@ import { expect } from "vitest";
 import { steps, type Scenario } from "../src/registry.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import * as A from "@ph/engine/domain/achievements";
+import shell from "../../rules/data/domain/game-shell.json" with { type: "json" };
 
 const { Given, When, Then } = steps("achievements");
 
@@ -38,7 +39,7 @@ function occur(s: Scenario, moment: string, f: A.Facts = facts(s), date: string 
 /** Makes an achievement unlock the way the game does: its moment, with facts that meet its test. */
 function earn(s: Scenario, id: string, place?: string): A.Evaluation {
   const d = def(id);
-  const e = occur(s, d.on, A.factsMeeting(d.test), d.on === "date" ? String(d.test.date) : START, place);
+  const e = occur(s, d.moment, A.factsMeeting(d.test), d.moment === "date" ? String(d.test.date) : START, place);
   s.toast = A.toastFor(d, s.settings ?? { toasts: true }, s.open ?? null);
   return e;
 }
@@ -136,7 +137,7 @@ Then("the campaign can never earn achievements", (s) => {
   expect(c.flags.ironman_unbroken).toBe(false);
   expect(A.eligible(c)).toBe(false);
   // Nothing turns it back on: a later moment still earns nothing.
-  expect(occur(s, "turn_end", { turns_played: 12 }).unlocked).toEqual([]);
+  expect(occur(s, "turn_end", { months_played: 12 }).unlocked).toEqual([]);
 });
 
 When("the player uses a {string} cheat once", (s, cheat: A.Cheat) => {
@@ -169,7 +170,7 @@ When("the player plays on as the country {string}", (s, country: string) => {
   s.lost = A.switchCountry(campaign(s), country);
 });
 Then("no achievement unlocks from that moment on", (s) => {
-  expect(occur(s, "turn_end", { turns_played: 12, gold: 10000 }).unlocked).toEqual([]);
+  expect(occur(s, "turn_end", { months_played: 12, gold: 10000 }).unlocked).toEqual([]);
   expect(occur(s, "regiment_trained", { regiments_trained: 1 }).unlocked).toEqual([]);
 });
 Then("achievements earned before the switch are kept", (s) => {
@@ -243,14 +244,14 @@ Given("the achievement {string} has unlocked", (s, id: string) => {
   const d = def(id);
   s.facts = A.factsMeeting(d.test);
   s.factsBefore = structuredClone(s.facts);
-  occur(s, d.on, s.facts);
+  occur(s, d.moment, s.facts);
   expect(earnedIds(s)).toContain(id);
 });
 Then("the country gains no bonus, no unlocked nation and no cosmetic", (s) => {
   const u: A.AchievementUnlocked = s.last.unlocked[0];
   expect(Object.keys(u).sort()).toEqual(["date", "id", "tier", "type"]);
   expect(s.facts).toEqual(s.factsBefore);
-  const fields = new Set(["id", "name", "text", "category", "tier", "hidden", "scope", "on", "test", "progress", "full_game", "refs"]);
+  const fields = new Set(["id", "name", "text", "category", "tier", "hidden", "scope", "moment", "test", "progress", "full_game", "refs"]);
   for (const d of A.ACHIEVEMENTS) for (const k of Object.keys(d)) expect(fields.has(k), `${d.id}.${k}`).toBe(true);
 });
 
@@ -374,7 +375,7 @@ Given("no achievement is hidden at launch", () => {
   expect(A.ACHIEVEMENTS.filter((d) => d.hidden)).toEqual([]);
 });
 When("a later update adds a hidden achievement for an event chain", (s) => {
-  s.hidden = { id: "secret_chain", name: "A Secret Chain", text: "Follow the hidden chain to its end.", category: "history", tier: "silver", hidden: true, scope: "campaign", on: "event_end", test: { event: "secret_chain_end" }, refs: [] } satisfies A.AchievementDefinition;
+  s.hidden = { id: "secret_chain", name: "A Secret Chain", text: "Follow the hidden chain to its end.", category: "history", tier: "silver", hidden: true, scope: "campaign", moment: "event_end", test: { event: "secret_chain_end" }, refs: [] } satisfies A.AchievementDefinition;
 });
 Then("before it is earned the list shows it as {string} with its tier", (s, label: string) => {
   expect(A.shownAs(s.hidden, false)).toEqual({ name: label, text: null, tier: "silver" });
@@ -394,10 +395,8 @@ Given("the achievement {string} is locked", (s, id: string) => {
   expect(profile(s).unlocked[id]).toBeUndefined();
 });
 
-// Rows that wait on the subjects, naval and exploration designs (OQ-ACH-5) stay todo:
-// their tests read stats those designs have not taken in yet.
-const WAITING_ON_OQ_ACH_5 = ["started_as_subject", "tributaries_min", "fleet_crossed_ocean_and_returned", "contact_by", "founded_with_consent_of_local_people", "fleet_circumnavigated"];
-Given(new RegExp(`^its test (\\{(?!.*\\b(?:${WAITING_ON_OQ_ACH_5.join("|")})\\b).*\\}) holds$`), (s, text: string) => {
+// The subject, naval and exploration rows read stats those designs supply (D-ACH-5).
+Given(/^its test (\{.*\}) holds$/, (s, text: string) => {
   const d = def(s.id);
   const test = parseFlow(text);
   expect(test, "the feature's test is the catalogue's").toEqual(d.test);
@@ -410,7 +409,7 @@ Given(new RegExp(`^its test (\\{(?!.*\\b(?:${WAITING_ON_OQ_ACH_5.join("|")})\\b)
   } else s.facts = A.factsMeeting(test);
 });
 
-// Only the design's moments (§5.1); `castle_gained` is not among them (OQ-ACH-1).
+// The design's moments (§5.1) plus `castle_gained` (D-ACH-1).
 When(new RegExp(`^the moment "(${A.MOMENTS.join("|")})" occurs$`), (s, moment: string) => {
   occur(s, moment);
 });
@@ -440,7 +439,7 @@ Then("only the tests of {string}, {string} and {string} run", (s, a: string, b: 
   expect([...s.last.ran].sort()).toEqual([a, b, c].sort());
 });
 Then("the tests of rows for {string} do not run", (s, moment: string) => {
-  for (const id of s.last.ran) expect(def(id).on).not.toBe(moment);
+  for (const id of s.last.ran) expect(def(id).moment).not.toBe(moment);
 });
 
 Given("the date is {word}", (s, date: string) => {
@@ -647,7 +646,7 @@ Then("it is hidden in every store and its test is turned off", (s) => {
   for (const st of A.STORES) expect(stores(s)[st].hidden).toContain(id);
   const d = def(id);
   const fresh = A.newCampaign({ ironman: true });
-  expect(A.evaluate(catalogue(s), fresh, A.newProfile(), d.on, A.factsMeeting(d.test), START).ran).not.toContain(id);
+  expect(A.evaluate(catalogue(s), fresh, A.newProfile(), d.moment, A.factsMeeting(d.test), START).ran).not.toContain(id);
   expect(catalogue(s).list.map((x: A.AchievementDefinition) => x.id)).toContain(id);
 });
 Then("the player keeps it", (s) => {
@@ -672,7 +671,9 @@ Then("{string} stays earned", (s, id: string) => {
 });
 Then("the achievement {string} can't be earned with the free countries alone", (_s, id: string) => {
   expect(A.earnableWithFreeCountries(def(id))).toBe(false);
-  expect(A.ACHIEVEMENTS.filter((d) => !A.earnableWithFreeCountries(d)).map((d) => d.id)).toEqual(["many_crowns", "every_macro_region"]);
+  expect(A.ACHIEVEMENTS.filter((d) => !A.earnableWithFreeCountries(d)).map((d) => d.id)).toEqual([
+    "independence_won", "walls_held_1453", "four_quarters_hold", "from_one_hall", "decentralised_1500", "many_crowns", "every_macro_region",
+  ]);
 });
 
 Given("the player plays an ironman campaign in the Steam demo", (s) => {
@@ -810,4 +811,37 @@ Then("the turn report has one line for it", (s) => {
 });
 Then("the line jumps to the castle of {string}", (s, province: string) => {
   expect(s.lines[0].jumpTo).toBe(`castle of ${province}`);
+});
+
+Given("the free countries are {string} and {string}", (_s, a: string, b: string) => {
+  expect(shell.freeRealms).toEqual([a, b]);
+});
+Then("the achievement {string} is marked full_game", (_s, id: string) => {
+  expect(def(id).full_game).toBe(true);
+});
+
+// ACH-072, D-ACH-13: the screen opens from the main menu's More; it groups icons by category.
+When("the player opens the achievements screen from the main menu's More", (s) => {
+  expect(shell.screens.achievements.back).toBe("where opened");
+  s.p ??= A.newProfile();
+  const grid = new Map<string, A.AchievementDefinition[]>();
+  for (const d of A.ACHIEVEMENTS) grid.set(d.category, [...(grid.get(d.category) ?? []), d]);
+  s.grid = grid;
+});
+Then("the screen shows a grid of icons grouped by category", (s) => {
+  const grid = s.grid as Map<string, A.AchievementDefinition[]>;
+  expect(grid.size).toBeGreaterThan(1);
+  for (const [cat, rows] of grid) for (const d of rows) expect(d.category).toBe(cat);
+});
+When("the player selects {string}", (s, name: string) => {
+  const d = A.ACHIEVEMENTS.find((x) => x.name === name);
+  expect(d).toBeDefined();
+  s.id = d?.id;
+  A.recordUnlock(profile(s), def(s.id), "1502-03-01");
+});
+Then("its text, its progress and the date it was earned are shown", (s) => {
+  const d = def(s.id);
+  expect(d.text.length).toBeGreaterThan(0);
+  expect(A.targetOf(d)).toBe(10000);
+  expect(profile(s).unlocked[d.id]).toBe("1502-03-01");
 });

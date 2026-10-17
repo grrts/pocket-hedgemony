@@ -31,12 +31,13 @@ export function edgeSwipe(sh: Shell): BackResult | "map pans" | "nothing" {
 export type MapGesture = { tap: string } | { drag: true } | { pinch: true } | { longPress: string } | { tapArmy: string; thenProvince: string; armyAt: string };
 
 /** Touch on the map (SHELL-119): tap selects, drag pans, pinch zooms, long press shows without selecting, army then province marches. */
-export function mapTouch(g: MapGesture): { does: "select" | "pan" | "zoom" | "show under finger" | "march" | "halt"; target?: string; selects: boolean } {
+export function mapTouch(g: MapGesture): { does: "select" | "pan" | "zoom" | "show under finger" | "march" | "halt"; target?: string; selects: boolean; confirm?: false } {
   if ("tap" in g) return { does: "select", target: g.tap, selects: true };
   if ("drag" in g) return { does: "pan", selects: false };
   if ("pinch" in g) return { does: "zoom", selects: false };
   if ("longPress" in g) return { does: "show under finger", target: g.longPress, selects: false };
-  return g.thenProvince === g.armyAt ? { does: "halt", target: g.tapArmy, selects: false } : { does: "march", target: g.thenProvince, selects: false };
+  // No confirm step: tapping the army's own province halts it again (D-SHELL-9).
+  return g.thenProvince === g.armyAt ? { does: "halt", target: g.tapArmy, selects: false, confirm: false } : { does: "march", target: g.thenProvince, selects: false, confirm: false };
 }
 
 export type PanelGesture = "tap" | "drag" | "pinch" | "long press";
@@ -95,4 +96,38 @@ export type DesktopInput = "hover" | "Esc" | "Enter" | "Tab" | "End turn key";
 /** Mouse and keyboard (SHELL-128): hover shows what long press shows; Esc is Back, Enter selects, Tab moves focus. */
 export function desktopInput(i: DesktopInput): "explain" | "Back" | "select" | "next focus" | "End turn" {
   return ({ hover: "explain", Esc: "Back", Enter: "select", Tab: "next focus", "End turn key": "End turn" } as const)[i];
+}
+
+// ---------------------------------------------------------------------------
+// Controller action sets and buttons (SHELL-121, SHELL-122, SHELL-134; D-SHELL-7, D-SHELL-8, D-SHELL-24)
+
+export type ActionSet = "Map" | "Battle" | "Menu";
+
+/** Three sets: Map on the map, Battle in the battle viewer, Menu everywhere else; the Text layer sits on top while a text field is open. */
+export function actionSet(id: FrameId, textFieldOpen = false): { set: ActionSet; textLayer: boolean } {
+  const sets = SHELL.actionSets as { Map: string[]; Battle: string[] };
+  const set: ActionSet = sets.Map.includes(id) ? "Map" : sets.Battle.includes(id) ? "Battle" : "Menu";
+  return { set, textLayer: textFieldOpen };
+}
+
+/** What a set offers. */
+export function actionSetOffers(set: ActionSet): string[] {
+  if (set === "Map") return Object.values(SHELL.mapControls);
+  if (set === "Battle") return Object.keys(SHELL.battleButtons);
+  return [...SHELL.menuControls];
+}
+
+/** Holding Menu (controller) or Enter (keyboard): End turn after the hold time; a short Menu opens the game menu, a short Enter selects (D-SHELL-7). */
+export function holdButton(device: "controller" | "keyboard", seconds: number): "End turn" | "game menu" | "select" {
+  if (seconds >= SHELL.controllerEndTurnHoldSeconds) return "End turn";
+  return device === "controller" ? "game menu" : "select";
+}
+
+export type BattleCard = "running" | "result";
+
+/** A button in the Battle set (SHELL-134, X-1): A pause or play / Carry on, B back to the map (leave a replay), X Retreat, Y the commander's line, LB and RB switch battle, Menu nothing. */
+export function battleButton(button: keyof typeof SHELL.battleButtons, card: BattleCard, replay: boolean): string {
+  const row = SHELL.battleButtons[button] as Record<string, string>;
+  if (replay) return row.replay ?? (card === "result" ? row.result : undefined) ?? row.any ?? (button === "A" ? row.running! : "nothing");
+  return row[card] ?? row.any ?? "nothing";
 }

@@ -46,12 +46,24 @@ Feature: The levy
     Then after 2 weeks the country "France" has 5000 levies of arm "levy foot"
     And the levies can march and fight at once
 
-  @RECR-014 @open-question
-  # OQ-RECR-12: W18 gives "days" with no number
+  @RECR-014 @placeholder
+  # config: gathering.railwayDays 3 (D-RECR-12)
   Scenario: Railway mobilization gathers levies in days
     Given the country "France" knows invention "W18 Railway mobilization"
     When the country "France" levies 5000 men from region "Champagne"
-    Then the levies gather in days instead of weeks
+    Then the levies gather in 3 days instead of 14
+
+  @RECR-103
+  Scenario: A region levy gathers where most men come from
+    When the country "France" levies 5000 men from region "Champagne"
+    Then the levy gathers as one army at "Troyes"
+
+  @RECR-103
+  Scenario: Gathered levies march on to the rally point
+    Given new regiments of "France" go to "Reims"
+    When the country "France" levies 5000 men from region "Champagne"
+    Then the levy gathers as one army at "Troyes"
+    And the gathered army is ordered to march to "Reims"
 
   @RECR-015 @RECR-016 @placeholder
   # config: levy money 20 gold per 1,000 men; gathering 1 ration a man a month

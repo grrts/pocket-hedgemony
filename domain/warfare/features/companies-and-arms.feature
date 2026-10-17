@@ -45,7 +45,7 @@ Feature: Companies and arms
       | levy              | 2      | in winter quarters | 3     |
       | levy              | 2      | in garrison        | 3     |
       | levy              | 2      | marching           | 2     |
-      | levy              | 12     | in camp            | 12    |
+      | levy              | 24     | in camp            | 24    |
       | standing regiment | 5      | marching           | 6     |
 
   @WAR-004

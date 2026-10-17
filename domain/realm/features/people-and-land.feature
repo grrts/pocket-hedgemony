@@ -51,9 +51,8 @@ Feature: People and land
       | it conquers a province and keeps it                    | 19    |
       | it grants one province as a fief                       | 17    |
 
-  @REALM-063 @open-question
+  @REALM-063
   Scenario Outline: Officials are hired, trained and lost
-    # OQ-REALM-14: whether an official can run more than one province
     Given the country "France" has 40 officials
     When <cause>
     Then the country "France" has <count> officials
@@ -141,3 +140,16 @@ Feature: People and land
     When the month ends
     Then its neighbours may be drawn into revolt
     And the country loses taxes and recruits from "Troyes"
+
+  @REALM-063 @REALM-169
+  Scenario Outline: How many provinces one official runs
+    Given the country "France" knows <inventions>
+    When it works out how many officials its 18 royal provinces need
+    Then one official runs <per> provinces and it needs <needed> officials
+
+    Examples:
+      | inventions              | per | needed |
+      | G1                      | 1   | 18     |
+      | G1 and B2               | 2   | 9      |
+      | G1, G9 and G11          | 3   | 6      |
+      | G1, G9, G16, B2 and T14 | 5   | 4      |

@@ -15,7 +15,7 @@ Feature: Other in-campaign screens
 
     Examples:
       | from                                  | result                                         |
-      | by the turn stopping for a battle     | the battle skips to its result card            |
+      | by a running player battle            | the map is shown and the battle keeps running  |
       | from the turn report as a replay      | the turn report is shown                       |
       | from the tab "Chronicle" as a replay  | the tab "Chronicle" is shown                   |
 

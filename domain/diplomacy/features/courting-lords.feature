@@ -35,7 +35,7 @@ Feature: Courting a foreign lord
     # config: actions.court_lord.defect_after_months, defect_needs_border
     Given the lord "Ulrich of Cilli" of "Austria" is Disloyal and his lands border "Hungary"
     And the country "Hungary" has courted him for 12 months
-    When the turn ends
+    When the next month begins
     Then "Ulrich of Cilli" joins "Hungary" with his lands
     And the country "Austria" holds the war aim "Take land" for those provinces
 

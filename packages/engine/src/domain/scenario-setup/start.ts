@@ -10,7 +10,8 @@ import { invention } from "../research/index.ts";
 import { startingKinds, startingTraderCount, type TraderKind } from "../trade/index.ts";
 import { gateAtStart, hasExplorationUnlock, polityRegion } from "../exploration/index.ts";
 import config from "../../../../rules/data/domain/scenario-setup.json" with { type: "json" };
-import { catalogueRecord } from "./catalogue.ts";
+import { catalogueRecord, hasRecord, type Confidence, type Level } from "./catalogue.ts";
+import type { Rng } from "../../rng.ts";
 
 // ---------------------------------------------------------------------------
 // Start forms (SETUP-014 … SETUP-019)
@@ -121,4 +122,52 @@ export function townTemplate(region: string): string {
   const t = (config.town_templates as Record<string, string>)[region];
   if (!t) throw new Error(`no town template for ${region}`);
   return t;
+}
+
+// ---------------------------------------------------------------- decided rules (D-SETUP-1 … D-SETUP-17)
+
+const MAP_TO_CATALOGUE = Object.fromEntries(Object.entries(config.map_to_catalogue).filter(([k]) => k !== "$comment")) as Record<string, string | null>;
+
+/** The catalogue record a map nation is matched to; null when none matches and the map's own data is kept (X-13, D-SETUP-1). */
+export function catalogueIdOf(mapId: string): string | null {
+  if (mapId in MAP_TO_CATALOGUE) return MAP_TO_CATALOGUE[mapId] ?? null;
+  return hasRecord(mapId) ? mapId : null;
+}
+
+/** Only a representation that owns map provinces is a realm (X-13, D-SETUP-2). */
+export function isRealm(provincesOwned: number): boolean {
+  return provincesOwned > 0;
+}
+
+/** A colony may be founded only where no country owns the land (SETUP-050, D-SETUP-2). */
+export function colonisable(owner: string | null): boolean {
+  return owner === null;
+}
+
+/** The factor an assessment level puts on a base start value; unknown counts as moderate (D-SETUP-6). */
+export function levelFactor(level: Level): number {
+  return (config.assessment_factors as Record<Level, number>)[level]!;
+}
+
+/** How far a start value may vary either way for a record of this confidence (D-SETUP-6). */
+export function startSpread(confidence: Confidence): number {
+  return (config.confidence_spread as Record<Confidence, number>)[confidence]!;
+}
+
+/** A start value: base times the level's factor, spread by confidence with the campaign's Rng. */
+export function startValue(base: number, level: Level, confidence: Confidence, rng: Rng): number {
+  const spread = startSpread(confidence);
+  return base * levelFactor(level) * (1 + (rng.next() * 2 - 1) * spread);
+}
+
+/** The event-tree preset behind the new-game events option (D-SETUP-7). */
+export function eventsPreset(option: "historical" | "free"): string {
+  return (config.events_presets as Record<string, string>)[option]!;
+}
+
+/** The AI's risk tolerance in warfare's three steps: the catalogue's five levels folded to low, medium or high (SETUP-012). */
+export function riskTolerance(level: string): "low" | "medium" | "high" {
+  const r = (config.risk_tolerance_levels as Record<string, "low" | "medium" | "high">)[level];
+  if (!r) throw new Error(`unknown risk tolerance level ${level}`);
+  return r;
 }

@@ -268,7 +268,7 @@ its ratio in about seven months.
 - TRADE-096 The game shall set a route by tapping cities in order, finishing by tapping the last stop again, with the preview updating as stops are added, then Confirm. [trade §10.2]
 - TRADE-097 The game shall let a trader copy another trader's route. [trade §10.2]
 - TRADE-098 The game shall show a Trade screen listing every trader and trade ship with kind, route, purse, last deposit, expected gold a month and problems, sortable by gold a month. [trade §10.2]
-- TRADE-099 The turn report shall sum the month's deposits into one line and give only problems (robbed, route broken, ship taken) their own line. [trade §10.2]
+- TRADE-099 The turn report shall sum the turn's deposits (one week, X-18) into one line and give only problems (robbed, route broken, ship taken) their own line. [trade §10.2]
 - TRADE-100 The game shall show the trader card with kind, crew, route and loop days, position, purse bar, last collections, fees and tolls, danger and upkeep. [trade §1]
 
 ### 5.12 Research
@@ -349,15 +349,15 @@ its ratio in about seven months.
 - When **research** grants T or S inventions, then TRADE-101.
 - When **realm** can't pay a trader's upkeep, then count unpaid months (TRADE-007).
 
-## 9. Monthly turn
+## 9. Each turn and each month
 
 Reads first: trader positions from the troop-movement day loop; wares made and trade value (yearly); quarantine, riots,
 homeless, armies, sieges, blockades; diplomacy relations.
-1. During the day loop: traders move; on entering a province they count as passing, collect (crowding counted), pay
+1. Each turn, during the 7 days of the day loop: traders move; on entering a province they count as passing, collect (crowding counted), pay
    fees and tolls, meet risks, and deposit in own cities.
-2. After the day loop: update every touched province's and sea zone's ratio (gain, decay; lazy decay elsewhere).
-3. Charge trader upkeep; count unpaid months.
-4. Turn report: one deposits line, problem lines.
+2. In the turn in which a new month begins, after the day loop: update every touched province's and sea zone's ratio (gain, decay; lazy decay elsewhere).
+3. In the same monthly step: charge trader upkeep; count unpaid months.
+4. Every turn, the turn report: one deposits line for the week, problem lines.
 Yearly: trade value with wares made; AI reroutes and dismissals. The global order is time-and-turns'.
 
 ## 10. Configuration

@@ -4,9 +4,9 @@ Feature: Peace and truces
   I want peace to bring a truce of a known length
   So that wars do not restart at once
 
-  @DIPL-154 @placeholder @open-question
+  @DIPL-154 @placeholder
   Scenario Outline: Truce length after a peace
-    # config: truce.base_months, extra_months_if_land_or_subject; OQ-DIPL-3 (warfare says 10 years, relations 60 months)
+    # config: truce.base_months, extra_months_if_land_or_subject, white_peace_months
     Given the date is "1450-01"
     When the countries "A" and "B" sign a peace that <terms>
     Then their truce lasts until "<until>"

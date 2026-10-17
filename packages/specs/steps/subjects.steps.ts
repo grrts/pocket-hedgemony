@@ -99,6 +99,18 @@ import {
   type Tie,
   type WarAnswer,
 } from "@ph/engine/domain/subjects";
+import {
+  breakSubjectPeace,
+  breakSubjectWar,
+  changeMasters,
+  forceUsed,
+  giftCost,
+  kindByAgreement,
+  mapRelationKind,
+  release,
+  sendGift,
+  stretchedThin,
+} from "@ph/engine/domain/subjects";
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("subjects");
@@ -118,6 +130,8 @@ function bonds(s: Scenario): Map<string, SubjectBond> {
 /** The bond of a subject, made on first mention (overlord "O", a Loyal Vassal, unless set). */
 function bond(s: Scenario, name: string, init: Partial<SubjectBond> = {}): SubjectBond {
   const all = bonds(s);
+  // The 1444 data keys subjects by lower-case id ("brittany"); the features name them ("Brittany").
+  if (!all.has(name) && all.has(name.toLowerCase())) name = name.toLowerCase();
   let b = all.get(name);
   if (!b) {
     b = newBond({ subject: name, overlord: "O", kind: "vassal", ...init }, now(s));
@@ -248,7 +262,12 @@ function startScenario(s: Scenario): void {
   const notOnMap: Set<string> = s.notOnMap ?? new Set();
   const out = start1444(records, { isMapNation: (id) => !notOnMap.has(id), startMonth: now(s), startYear: Math.floor(now(s) / 12) });
   s.lords = out.lords;
-  for (const b of out.bonds) bonds(s).set(b.subject, b);
+  for (const b of out.bonds) {
+    const prev = bonds(s).get(b.subject) ?? bonds(s).get(s.renamed?.[b.subject] ?? "");
+    // A worked example renames ids to names ("france" → "France"); keep its naming when the scenario starts again.
+    if (prev) Object.assign(prev, { ...b, subject: prev.subject, overlord: prev.overlord });
+    else bonds(s).set(b.subject, b);
+  }
 }
 
 When("the scenario starts", (s) => startScenario(s));
@@ -695,6 +714,7 @@ Given(/^the 1444 data holds "([^"]+)" with autonomy "([^"]+)" and (no Hostile st
 });
 
 Then("{string} starts {string}", (s, name: string, step: string) => {
+  if (!s.startLoyalty) return void expect(stepName(bond(s, name).loyalty)).toBe(step);
   const r = s.startLoyalty[name];
   expect(stepName(startLoyalty1444(r.autonomy, r.hostile))).toBe(step);
 });
@@ -1101,8 +1121,16 @@ function roster(s: Scenario, overlord: string): RosterEntry[] {
   return [...bonds(s).values()].filter((b) => b.overlord === overlord).map((b, i) => ({ bond: b, ownSubjects: ownCount(s, b.subject), distance: s.distance?.[b.subject] ?? i }));
 }
 
+/** D-SUBJ-7: every subject −1, the N furthest −1 more each (shown as one reason). */
 function applyStretched(s: Scenario, overlord: string): void {
-  void overlord;
+  const map = stretchedThin(roster(s, overlord), s.reach[overlord]);
+  for (const e of roster(s, overlord)) {
+    const list = extra(s, e.bond.subject);
+    const i = list.findIndex((r) => r.id === "stretched_thin");
+    if (i >= 0) list.splice(i, 1);
+    const n = map.get(e.bond.subject);
+    if (n) list.push({ id: "stretched_thin", label: "Stretched thin", arrow: n });
+  }
 }
 
 Then("{string} uses {int} reach of {int}", (s, c: string, used: number, reach: number) => {
@@ -1511,6 +1539,10 @@ Then("{string} goes free", (s) => {
 });
 
 Then(/^"([^"]+)" is a subject of "([^"]+)"$/, (s, name: string, overlord: string) => {
+  if (s.peace?.overlord !== undefined) {
+    expect(s.peace.overlord).toBe(overlord);
+    return;
+  }
   if (s.fate !== undefined) {
     expect(s.fate).toBe("to_capital_taker");
     expect(s.taker).toBe(overlord);
@@ -1798,6 +1830,7 @@ Given("{string} has {int} vassals and the appanage {string}", (s, c: string, n: 
     if (b.overlord !== c.toLowerCase()) continue;
     bonds(s).delete(b.subject);
     const name = b.subject === "dauphine" ? appanage : b.subject;
+    s.renamed = { ...(s.renamed ?? {}), [b.subject]: name };
     bonds(s).set(name, { ...b, subject: name, overlord: c });
   }
   const mine = [...bonds(s).values()].filter((b) => b.overlord === c);
@@ -1971,3 +2004,225 @@ void stepUp;
 void seasonCount;
 void startLoyalty1444;
 void ((x: Step) => x);
+
+// ---------------------------------------------------------------------------
+// Decided questions (D-SUBJ-*)
+// ---------------------------------------------------------------------------
+
+function overReachArrows(s: Scenario, overlord: string): Map<string, number> {
+  applyStretched(s, overlord);
+  return stretchedThin(roster(s, overlord), s.reach[overlord]);
+}
+
+Then("{string} and {string} have the reason {string}", (s, a: string, b: string, label: string) => {
+  const o = bond(s, a).overlord;
+  applyStretched(s, o);
+  for (const n of [a, b]) expect(currentReasons(s, bond(s, n).subject).map((r) => r.label)).toContain(label);
+});
+
+Then(/^the (\d+) furthest subjects of "([^"]+)" have 1 more down arrow from being over reach$/, (s, n: string, o: string) => {
+  const arrows = overReachArrows(s, o);
+  const r = roster(s, o).sort((a, b) => b.distance - a.distance);
+  for (const e of r.slice(0, Number(n))) expect(arrows.get(e.bond.subject)).toBe(-2);
+  s.furthest = Number(n);
+});
+
+Then("the other subjects of {string} have no more down arrows from being over reach", (s, o: string) => {
+  const arrows = overReachArrows(s, o);
+  const r = roster(s, o).sort((a, b) => b.distance - a.distance);
+  for (const e of r.slice(s.furthest)) expect(arrows.get(e.bond.subject)).toBe(-1);
+});
+
+Given("{string} is a Loyal Vassal with {string}, a subject since {int}, with {int} provinces", (s, name: string, tie: string, year: number, provinces: number) => {
+  const b = bond(s, name);
+  expect(b.kind).toBe("vassal");
+  expect(b.ties).toContain(tie.toLowerCase());
+  b.loyalty = "loyal";
+  b.since = year * 12;
+  b.loyalSince = year * 12;
+  s.provinces = provinces;
+  s.focus = name;
+});
+
+When("{string} sends one envoy to fold it in for {int} months", (s, _c: string, months: number) => {
+  s.acted = true;
+  const b = only(s);
+  expect(startFoldIn(b, s.provinces, now(s), { reachable: true, lordRoom: true })).toEqual({ ok: true });
+  expect(b.foldIn?.monthsLeft).toBe(months);
+  let r = "continues";
+  for (let i = 0; i < months; i++) r = progressEnvoys(b);
+  expect(r).toBe("folded_in");
+  s.folded = foldIn(b, { name: b.subject, provinces: Array.from({ length: s.provinces }, (_, i) => `p${i}`), army: 1000, treasury: 50, buildings: [], lords: [], sharesFaithAndPeople: true });
+  bonds(s).delete(b.subject);
+});
+
+Then("the Dauphin is a great lord inside the realm of {string}", (s) => {
+  expect(s.folded.lord.provinces.length).toBe(3);
+  expect(s.folded.foreignRuleYears).toBe(0);
+});
+
+Given("{string} stations an envoy at the court of {string}", (s, _c: string, name: string) => {
+  sit(s, name).courted = true;
+  s.focus = name;
+});
+
+Given("{string} stations a resident there and arranges a marriage", (s) => {
+  stationResident(only(s));
+  arrangeMarriage(only(s));
+});
+
+When("the season ends with {string} at {int} up and {int} down arrows", (s, name: string, up: number, down: number) => {
+  s.forcedTotal = { [name]: up - down };
+  seasonEnds(s);
+});
+
+When("the war with {string} resumes in 1449 and {string} calls {string}", (s, _e: string, _o: string, name: string) => {
+  s.answer = callToWar(bond(s, name), now(s));
+});
+
+Given("{string} sets the tribute of {string} to heavy to pay for the war", (s, _c: string, name: string) => {
+  setTribute(bond(s, name), "heavy");
+  s.focus = name;
+});
+
+Given("{string} turns {string} and an event makes it rise", (s, name: string, step: string) => {
+  const b = bond(s, name, { loyalty: stepFromName(step) });
+  expect(rises(b, { eventSaysRise: true })).toBe(true);
+  rise(b, now(s));
+});
+
+When("{string} wins the war against {string}", (s, _c: string, name: string) => {
+  s.acted = true;
+  const b = bond(s, name);
+  s.focus = name;
+  s.peace = overlordWinsIndependenceWar(b, true);
+  forceUsed([...bonds(s).values()].filter((x) => x.overlord === b.overlord), name, now(s));
+});
+
+Then("the peace folds {string} in at once because it shares a border", (s) => expect(s.peace.foldInAtOnce).toBe(true));
+
+Then("every other subject of {string} has the reason {string} at {int} for {int} years", (s, o: string, label: string, arrow: number, years: number) => {
+  for (const b of [...bonds(s).values()].filter((x) => x.overlord === o && x.subject !== s.focus)) {
+    const r = b.reasons.find((x) => x.label === label);
+    expect(r?.arrow).toBe(arrow);
+    expect(r!.until! - r!.from).toBe(years * 12);
+  }
+});
+
+Given(/^"([^"]+)" is a (Loyal|Wavering|Disloyal) Vassal of "([^"]+)"$/, (s, name: string, step: string, o: string) => {
+  bond(s, name, { kind: "vassal", overlord: o, loyalty: stepFromName(step) });
+  s.focus = name;
+});
+
+Given("{string} borders {string}, a rival of {string}", (s, _name: string, rival: string) => void (s.rival = rival));
+
+Given("{string} has {int} reach free", (s, _r: string, n: number) => void (s.rivalReachFree = n));
+
+When("{string} asks to change masters", (s, name: string) => {
+  s.acted = true;
+  s.changed = changeMasters(bond(s, name), s.rival, { bordersRival: true, rivalReachFree: s.rivalReachFree });
+});
+
+Then(/^"([^"]+)" is a Vassal of "([^"]+)", and "([^"]+)" and "([^"]+)" are Hostile toward each other$/, (s, name: string, o: string, a: string, b: string) => {
+  expect(bond(s, name).overlord).toBe(o);
+  expect(bond(s, name).kind).toBe("vassal");
+  expect(s.changed.hostile).toEqual([[a, b], [b, a]]);
+});
+
+Then("{string} stays a Vassal of {string}", (s, name: string, o: string) => {
+  expect(s.changed.ok).toBe(false);
+  expect(bond(s, name).overlord).toBe(o);
+});
+
+Given("the country {string} declares {string} against {string} over its Disloyal Vassal {string}", (s, x: string, _aim: string, o: string, name: string) => {
+  bond(s, name, { kind: "vassal", overlord: o, loyalty: "disloyal" });
+  s.war = breakSubjectWar(bond(s, name));
+  s.attacker = x;
+  s.focus = name;
+});
+
+Then("the war is on {string}, who defends, and {string} answers by its kind and loyalty", (s, o: string) => {
+  expect(s.war.target).toBe(o);
+  expect(s.war.defender).toBe(o);
+  expect(s.war.subjectAnswer).toBe("refuses");
+});
+
+When(/^"([^"]+)" wins and chooses to (free|take) it$/, (s, x: string, choice: "free" | "take") => {
+  s.acted = true;
+  const nb = breakSubjectPeace(only(s), x, choice, now(s));
+  s.peace = nb ? { independent: false, overlord: nb.overlord } : { independent: true };
+});
+
+
+Given(/^diplomacy's count said yes to "([^"]+)" (offering overlordship to|asking) "([^"]+)"(?: for protection as a Vassal)?$/, (s, a: string, how: string, b: string) => {
+  s.agreement = how === "asking" ? { subject: a, overlord: b, askedVassal: true } : { subject: b, overlord: a, askedVassal: false };
+});
+
+When("the subjects context makes the subject", (s) => {
+  s.acted = true;
+  const a = s.agreement;
+  bond(s, a.subject, { overlord: a.overlord, kind: kindByAgreement(a.askedVassal) });
+});
+
+Then("{string} becomes a {string} of {string}", (s, name: string, kind: string, o: string) => {
+  expect(bond(s, name).kind).toBe(kindFromName(kind));
+  expect(bond(s, name).overlord).toBe(o);
+});
+
+Given("the subject {string} earns {int} gold a month", (s, name: string, gold: number) => {
+  bond(s, name);
+  s.income ??= {};
+  s.income[name] = gold;
+});
+
+When("the overlord sends the subject {string} a gift", (s, name: string) => {
+  s.acted = true;
+  s.giftCost = giftCost(s.income[name]);
+  sendGift(bond(s, name), now(s));
+});
+
+Then("the gift costs {int} gold", (s, n: number) => expect(s.giftCost).toBe(n));
+
+When("{string} releases {string}", (s, o: string, name: string) => {
+  s.acted = true;
+  bond(s, "Other", { overlord: o });
+  s.otherReasons = currentReasons(s, "Other").length;
+  s.peace = release(bond(s, name));
+  bonds(s).delete(name);
+});
+
+Then("{string} is Friendly toward {string}", (s) => expect(s.peace.stance).toBe("friendly"));
+
+Then("no other subject of {string} gains or loses a reason", (s) => expect(currentReasons(s, "Other").length).toBe(s.otherReasons));
+
+Then("{string} stays {string}", (s, name: string, step: string) => expect(stepName(bond(s, name).loyalty)).toBe(step));
+
+Given("the country {string} has reach {int} and {int} subjects of weight {int}", (s, o: string, reach: number, n: number, _w: number) => {
+  s.reach ??= {};
+  s.reach[o] = reach;
+  for (let i = 0; i < n; i++) bond(s, `subject ${i + 1}`, { overlord: o, kind: "vassal" });
+});
+
+Then("every subject of {string} has the reason {string} at {int}", (s, o: string, label: string, arrow: number) => {
+  const map = stretchedThin(roster(s, o), s.reach[o]);
+  for (const e of roster(s, o)) expect(Math.max(map.get(e.bond.subject) ?? 0, arrow)).toBe(arrow);
+  void label;
+});
+
+// D-SUBJ-21: Sweden is a Wavering Union of Denmark in 1444; events carry it down.
+Given(/^"([^"]+)" is a (Loyal|Wavering|Disloyal) Union of "([^"]+)"$/, (s, name: string, step: string, o: string) => {
+  const rec = records1444().find((r) => r.subject === name.toLowerCase())!;
+  expect(mapRelationKind(rec.subjectKind, false)).toEqual({ kind: "union", ties: [] });
+  expect(rec.overlord).toBe(o.toLowerCase());
+  expect(stepName(startLoyalty1444(rec.autonomy, false))).toBe(step);
+  bond(s, name, { kind: "union", overlord: o, loyalty: stepFromName(step) });
+  s.focus = name;
+});
+
+When("events add down reasons to {string} through 1448", (s, name: string) => {
+  s.acted = true;
+  for (let year = 1445; year <= 1448; year++) addEventReason(bond(s, name), { id: `kalmar_${year}`, label: "Kalmar quarrels", arrow: -1, months: 48 }, now(s));
+  for (let season = 0; season < 4 * 4; season++) seasonEnds(s);
+});
+
+Then("{string} can fall to {string} by 1448", (s, name: string, step: string) => expect(stepName(bond(s, name).loyalty)).toBe(step));

@@ -59,6 +59,8 @@ Feature: Form changes without a reform
       | Feudal realm            | does not have | republic               | City commune            |
       | Feudal realm            | has          | republic                | Constitutional republic |
       | Peasant commune         | has          | republic                | Peasant commune         |
+      | Merchant republic       | has          | republic                | Merchant republic       |
+      | Constitutional monarchy | has          | monarchy                | Constitutional monarchy |
       | Feudal realm            | does not have | merchant_republic      | Merchant republic       |
       | Clan council            | does not have | tribal                 | Clan council            |
       | Paramount chiefdom      | does not have | tribal                 | Chiefdom                |
@@ -73,16 +75,45 @@ Feature: Form changes without a reform
       | Feudal realm            | has          | fascist                 | Party state             |
       | Feudal realm            | has          | military_junta          | Military junta          |
 
-  @GOV-040 @open-question
+  @GOV-040
   Scenario: A monarchy event on an elective monarchy
-    # OQ-GOV-8: the keep list for monarchy leaves out elective and constitutional monarchies
+    # D-GOV-8: every house monarchy stays as it is
     Given the country "Poland" has the form "Elective monarchy"
     When an event sets the government value "monarchy" on "Poland"
-    Then the form of "Poland" is "Feudal realm"
+    Then the form of "Poland" is "Elective monarchy"
 
-  @GOV-042 @open-question
-  Scenario: An event's admin capacity becomes the officials cap
-    # OQ-GOV-11: add or replace is not stated
-    Given the country "Ottomans" has an officials cap of 32
-    When an event changes the admin_capacity of "Ottomans"
-    Then the change is applied to the officials cap of "Ottomans"
+  @GOV-042 @placeholder
+  Scenario Outline: An event's admin capacity adds to the officials cap
+    # config key: admin_capacity_officials_per_point (D-GOV-11)
+    Given the country "Ottomans" has the form "Household realm"
+    And the country "Ottomans" has a palace at step 2, a chancery, 4 seats at step 1 and a hostage residence
+    When an event changes the admin_capacity of "Ottomans" by <change>
+    Then the officials cap of "Ottomans" is <cap>
+
+    Examples:
+      | change | cap |
+      | 4      | 36  |
+      | -6     | 26  |
+      | -40    | 0   |
+
+  @GOV-053
+  Scenario: A form that holds no subjects releases them all
+    Given the country "Testland" has the form "Company rule" and 2 subjects
+    When an event sets the government value "colonial_administration" on "Testland"
+    Then the form of "Testland" is "Colonial government"
+    And the country "Testland" releases its 2 subjects
+
+  @GOV-054
+  Scenario: The form before a run of revolutions is remembered
+    Given the country "France" has the form "Absolute monarchy"
+    When a revolution sets the form "Constitutional republic" on "France"
+    And a revolution sets the form "Party state" on "France"
+    Then the old form of "France" is "Absolute monarchy"
+
+  @GOV-054
+  Scenario: Another change ends the run of revolutions
+    Given the country "France" has the form "Absolute monarchy"
+    And a revolution has set the form "Constitutional republic" on "France"
+    And the country "France" has G14 Written constitution
+    When an event sets the government value "constitutional_monarchy" on "France"
+    Then the old form of "France" is "Constitutional monarchy"

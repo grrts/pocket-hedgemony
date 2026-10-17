@@ -4,15 +4,15 @@ Feature: Putting the catalogue on the map
   I want each catalogue record matched to its land on the map
   So that the 963 researched entities own the provinces they held
 
-  @SETUP-048 @open-question
-  # OQ-SETUP-1: no mapping plan exists yet
-  Scenario: Each owning record has provinces, a capital, a colour, a ruler and commanders
-    Given the catalogue-to-map plan
+  @SETUP-048
+  Scenario: The map's nations are the realms and the playable list
+    Given the map's 137 nations
     When the starting world is built
-    Then every record that owns land has its provinces, capital, colour, ruler and commanders
+    Then every map nation is a realm with provinces, a capital, a colour and commanders
+    And every map nation is playable
+    And 100 of them are catalogue ids and the other 37 go through the rename table
 
-  @SETUP-049 @open-question
-  # OQ-SETUP-1: 37 map ids are not catalogue ids
+  @SETUP-049
   Scenario Outline: Map nations use catalogue ids
     Given the map nation "<map id>"
     When it is matched to the catalogue
@@ -25,16 +25,22 @@ Feature: Putting the catalogue on the map
       | mamluks  | mamluk              |
       | korea    | joseon              |
       | timurids | timurid_empire      |
+      | aztecs   | triple_alliance     |
+      | ireland  | none                |
 
-  @SETUP-050 @open-question
-  # OQ-SETUP-2: which representations own land on the map
-  Scenario Outline: Only land no country owns can be colonised
+  @SETUP-050
+  Scenario Outline: Only land no realm on the map owns can be colonised
     Given a coastal province <held>
     When a colonial governor of "Castile" tries to found a colony there
     Then the colony <result>
 
     Examples:
-      | held                                          | result                      |
-      | owned by no country                           | can be founded on free tiles |
-      | held by a chiefdom that is a country          | can't be founded            |
-      | held by a clan council that is a country      | can't be founded            |
+      | held                         | result                       |
+      | owned by no country          | can be founded on free tiles |
+      | owned by the realm "Mali"    | can't be founded             |
+
+  @SETUP-050
+  Scenario: A catalogue record that owns no map province is not a realm
+    Given the catalogue record "silesia" owns no map province
+    When the starting world is built
+    Then it is reference data and not a realm

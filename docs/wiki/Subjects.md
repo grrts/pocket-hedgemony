@@ -30,7 +30,7 @@ A subject pays its share from its own treasury each month, so a poor subject pay
 | Tie | Set when | Effect |
 |---|---|---|
 | Kin | its ruler is of your ruling house (appanages) | +1 loyalty reason; if your line dies out, its ruler has a claim to your throne |
-| Held of the Church | the overlord is a religious head (the Pope's fiefs) | pays a token (1 %), never fights; breaking the tie is a *Defend the faith* matter for others of that faith |
+| Held of the Church | the overlord is a religious head (the Pope's fiefs) | pays a token (1 %), never fights |
 | Held in fief | a sovereign kingdom holds its crown from someone else | pays a token (1 %), never called to war; counts ½ for reach |
 | Second master | it also pays tribute to someone else | the second master gets a small tribute (5 %) and no other rights; if the two masters fight, it leans to the stronger |
 | Hostage at court | you hold its heir | +1 reason; −2 if he is mistreated or lost |
@@ -40,7 +40,7 @@ A subject pays its share from its own treasury each month, so a poor subject pay
 | Stage | When | Change |
 |---|---|---|
 | Outpost | founded | pays 25 %, no army of its own, your governor (an official) runs it |
-| Settled | 5+ provinces, mostly settler people | raises its own militia; its settlers become a voice that can be Wavering |
+| Settled | 5+ provinces, more than half settler people | raises its own militia; its settlers become a peace voice that can be Wavering; from here its loyalty is counted each season (an Outpost stays Loyal) |
 | Self-governing | 10+ provinces and 50 years, or an event (dominion) | pays 10 %, keeps its own lords; can no longer be folded in, only released or kept |
 
 When a Settled or Self-governing colony turns Disloyal, [Revolutions](Revolutions) gets the settler-independence trigger.
@@ -70,15 +70,15 @@ A subject has one of the lords' four steps:
 | You defended it in the last 20 years | +1 | You left it alone (attacked, you didn't join), 20 years | −1 |
 | Gift in the last 5 years | +1 | Heavy / crushing tribute | −1 / −2 |
 | Marriage between your houses | +1 | You lost a war in the last 10 years | −1 |
-| Kin or Hostage at court | +1 | New ruler on your throne (first 5 years) | −1 |
-| Your resident at its court | +1 | Courted by a foreign envoy | −1 |
-| Common enemy (the same rival) | +1 | Stretched thin (over reach) | −1, more for the furthest |
-| Long held (30+ years) | +1 | Far away (no land path and no sea route of yours) | −1 |
+| Kin; Hostage at court (each, so both is +2) | +1 | New ruler on your throne (first 5 years) | −1 |
+| Your resident at its court | +1 | Courted (a foreign envoy stationed at its court) | −1 |
+| Common enemy (the same rival) | +1 | Stretched thin (over reach) | −1; −2 for the furthest few |
+| Long held (30+ years) | +1 | Far away (no land border, and no sea route: both of you holding coast on a linked sea) | −1 |
 | Light tribute | +1 | Outgrown (more provinces than you, or than its kind allows: a Vassal over half of yours) | −1 |
 | Given a crown (raised while Wavering), 10 years | +1 | Master of others | −3 |
 | Loosened, 10 years | +2 | Hostile / Rival stance toward you | −2 / −1 |
 | | | Kind's drift | −1 |
-| | | Force used on another subject, 5 years | −1 |
+| | | Force used (you folded in, deposed or restored another subject by force), 5 years | −1 |
 | | | Another subject deposed, 5 years | −1 |
 | | | Doctrine of lapse used on another, 10 years | −1 |
 | | | Refused a call again, 12 months | −1 |
@@ -99,7 +99,7 @@ Each action is a button on the subject's card; a locked button names its first m
 | Set tribute (none, light, normal, heavy, crushing) | none | pays ×0, ×0.5, ×1, ×1.5, ×2 of the kind's share; light +1, heavy −1, crushing −2 |
 | Take tribute in grain | none | arrives as grain at your nearest castle |
 | Call to war | none | answered like a lord, by loyalty and kind; tributaries are never called |
-| Send a gift | gold scaled to its income | +1 for 5 years |
+| Send a gift | 6 months of its income | +1 for 5 years |
 | Station a resident | one envoy while it stays | +1; reveals a courting foreign envoy; shows its true army even when Disloyal |
 | Lend an official | one official's wages | +1; the official's type effect applies there |
 | Take a hostage | only from a Loyal or Wavering subject, or as a peace term | *Hostage at court*; the heir returns when its ruler dies; harming him −2 |
@@ -107,10 +107,10 @@ Each action is a button on the subject's card; a locked button names its first m
 | Tighten (Tributary to Vassal only) | one envoy for 6 months; subject Loyal | a Wavering subject refuses and drops a step; Vassal to Union is not possible |
 | Loosen (Vassal or Protectorate to Tributary) | none | +2 for 10 years |
 | Fold in | see below | it becomes one of your lords |
-| Release | none | independent and Friendly toward you |
+| Release | none | independent and Friendly toward you; no other subject's reasons change |
 | Depose its ruler | a pretender of yours, or its ruler Disloyal (if In revolt, win first) | your candidate rules, starting Loyal; every other subject −1 for 5 years |
 
-**Raising a lord.** A Loyal or Wavering lord holding at least 3 provinces can be raised to a Vassal (or a March on a frontier): his provinces become his own country on the map and his retinue its army. A Wavering lord raised gets *Given a crown* +1 for 10 years. He leaves your lord capacity and counts against your subject reach; his land leaves your realm, you get a share instead of half his taxes, and he may make his own friends abroad.
+**Raising a lord.** A Loyal or Wavering lord holding at least 3 provinces can be raised to a Vassal, or to a March if his land borders a foreign realm (you choose): his provinces become his own country on the map and his retinue its army. A Wavering lord raised gets *Given a crown* +1 for 10 years; a Loyal one gets nothing extra. He leaves your lord capacity and counts against your subject reach; his land leaves your realm, you get a share instead of half his taxes, and he may make his own friends abroad.
 
 ### Obligations both ways
 
@@ -121,7 +121,7 @@ Each action is a button on the subject's card; a locked button names its first m
 
 ### Subject reach
 
-**Subject reach** is how many subjects your ruler can watch over. It comes from [Government](Government), starting from the catalogue's administrative capacity: very low 2, low 3, moderate 5, high 7, very high 9. It is a separate number from lord capacity. Each direct subject counts by its weight (Tributary, March and Held in fief ½, the rest 1). Over reach, every subject gets *Stretched thin*, and the furthest takes −1 more for each subject beyond reach.
+**Subject reach** is how many subjects your ruler can watch over. It comes from [Government](Government), starting from the catalogue's administrative capacity: very low 2, low 3, moderate 5, high 7, very high 9. It is a separate number from lord capacity. Each direct subject counts by its weight (Tributary, March and Held in fief ½, the rest 1). Over reach, every subject gets *Stretched thin* −1, and for each point of reach you are over, one more of the furthest subjects takes −1 more (11 of 7 hits the four furthest).
 
 **Subjects with subjects.** A subject that holds subjects counts 3 times its kind's weight plus 1 for each of its own subjects, and gets *Master of others* −3, which goes away when it releases them. Only the direct overlord acts on a subject; a subject's own subjects pay you nothing and count nothing in your reach. When a subject is folded in or falls, its subjects step up to you, keeping their loyalty. March, Colony and Protectorate can't hold subjects.
 
@@ -139,9 +139,9 @@ You keep one envoy at its court for 1 month per province; if the subject drops t
 ### Losing subjects
 
 - **Drifting.** A Disloyal subject stops paying, refuses calls, and bargains with foreign envoys for a **backer** that agrees to declare *Break a subject* when it rises.
-- **Rising.** A Disloyal subject rises to In revolt when it has a backer at peace and willing, or its overlord is at war elsewhere with over half its peace voices for peace, or an event says so. Every other Disloyal subject of yours that borders it or shares its backer rises too. The **independence war** starts with its aim fixed as *Independence* and its backer joining. If you win, the peace can restore it one kind tighter, or fold it in at once if it shares a border. If it wins, it goes free with a Hostile stance toward you.
-- **Changing masters.** A Disloyal subject bordering a rival of yours can ask to pass to that rival; if accepted, it becomes the rival's subject of the same kind and your stance with both turns Hostile.
-- **Taken by force.** When a country declares *Break a subject*, the subject defends and you are called to defend it; if the attacker wins, it chooses whether the subject goes free or becomes its own.
+- **Rising.** A Disloyal subject rises to In revolt when it has a backer at peace and willing, or its overlord is at war elsewhere with over half its peace voices for peace, or an event says so; the seasonal count alone never goes past Disloyal. Every other Disloyal subject of yours that borders it or shares its backer rises too. The **independence war** starts with its aim fixed as *Independence* and its backer joining. If you win, the peace can restore it one kind tighter, or fold it in at once if it shares a border. If it wins, it goes free with a Hostile stance toward you.
+- **Changing masters.** A Disloyal subject bordering a rival of yours can ask to pass to that rival; the rival takes it when it fits within the rival's reach. It becomes the rival's subject of the same kind, and you and the rival turn Hostile toward each other.
+- **Taken by force.** *Break a subject* is a war declared on you, the overlord; the subject answers by its kind and loyalty like any call. If the attacker wins, it chooses whether the subject goes free or becomes its own.
 - **The overlord's fall.** If an overlord is destroyed or becomes someone's subject, its Tributaries and Marches go free, and its Vassals, Unions and Colonies go to whoever took its capital if it wants them, otherwise free.
 
 ### Making a subject
@@ -149,7 +149,7 @@ You keep one envoy at its court for 1 month per province; if the subject drops t
 - A peace term *Become a subject* (over three quarters peace voices): the winner picks Vassal or Tributary, or Protectorate from era VI (era IV for an overseas trade empire). A distant loser with no land path can only be a Tributary.
 - After a 20-year tribute term has run, the receiver can offer the payer Tributary by envoy, which a weaker payer accepts.
 - Winning a war to seat a pretender: the realm becomes your Vassal or ally, the new ruler starting Loyal.
-- A small country threatened by a much stronger Hostile neighbour, offered protection through [Diplomacy](Diplomacy), becomes a Tributary, or a Vassal if it asked.
+- By agreement through [Diplomacy](Diplomacy): when its count says yes to *Offer overlordship* or *Ask for protection*, the smaller country becomes a Tributary, or a Vassal if it asked for that.
 - A ruler inheriting another crown after a marriage makes a Union.
 - A **frontier grant**: give your titles and a gift to a frontier chief who is nobody's subject and shares your border, and he becomes a March.
 - Chartering a group of your colonial provinces in one distant region makes one Colony.
@@ -159,11 +159,11 @@ You keep one envoy at its court for 1 month per province; if the subject drops t
 
 France has high administrative capacity and subject reach 7, with 10 vassals and the appanage of the Dauphiné.
 
-- **The start.** Brittany starts Wavering and Armagnac Loyal. France uses 11 reach of 7, so Brittany and Foix have *Stretched thin*.
-- **Folding in the Dauphiné.** The Dauphiné is a Loyal Vassal with *Kin*, a subject since 1349. France sends one envoy for 3 months; the Dauphin becomes a great lord inside France, which now uses 10 reach of 7.
+- **The start.** Brittany starts Wavering and Armagnac Loyal. France uses 11 reach of 7, so every subject, Brittany and Foix included, has *Stretched thin*, and the four furthest take −1 more.
+- **Folding in the Dauphiné.** The Dauphiné is a Loyal Vassal with *Kin*, a subject since 1349, with 3 provinces. France sends one envoy for 3 months; the Dauphin becomes a great lord inside France, which now uses 10 reach of 7.
 - **Two small vassals.** Folding in the French minor lordships and Nevers over the next years brings reach to 8 of 7, and lord capacity fills up instead.
 - **Brittany is courted.** England stations an envoy at Brittany's court; France stations a resident there and arranges a marriage. The season ends at 3 up and 3 down, so Brittany stays Wavering. When war with England resumes in 1449 and France calls, Brittany comes with half its army, late.
-- **Armagnac.** France sets Armagnac's tribute to heavy to pay for the war. Armagnac turns Disloyal and rises. France wins, the peace folds Armagnac in at once because it shares a border, and every other subject takes −1 for the force used.
+- **Armagnac.** France sets Armagnac's tribute to heavy to pay for the war. Armagnac turns Disloyal, and an event makes it rise. France wins, the peace folds Armagnac in at once because it shares a border, and every other subject takes *Force used* −1 for 5 years.
 
 ### Playing as a subject
 
@@ -175,7 +175,7 @@ As overlord, an AI folds in Loyal subjects when lord capacity allows and its per
 
 ### Each month
 
-Each month tribute is paid, tighten and fold-in envoys progress (stopping if the subject wavers), and risings are checked. At each season's end reasons are recomputed and loyalty moves. Each year march stipends fall due and colony stages are checked.
+A turn is one week; these steps run once a month, at the end of the turn in which the new month begins. Each month tribute is paid, tighten and fold-in envoys progress (stopping if the subject wavers), and risings are checked. At each season's end reasons are recomputed and loyalty moves. Each year march stipends fall due and colony stages are checked.
 
 ## What you see
 
@@ -234,31 +234,7 @@ All values are **placeholders** in `subjects/config/subject-rules.json`, except 
 
 ## Still open
 
-- **OQ-SUBJ-1**: how kinds join wars and their own diplomacy differ between the relations data and this design.
-- **OQ-SUBJ-2**: the relations config's old income and manpower shares by eight kinds.
-- **OQ-SUBJ-3**: who changes the relations data so estates become lords.
-- **OQ-SUBJ-4**: whether a fixed rule or diplomacy's reasons count decides protection, and who picks the kind.
-- **OQ-SUBJ-5**: envoy missions subjects expects (Tighten, Fold in, courting a subject) that diplomacy doesn't list.
-- **OQ-SUBJ-6**: who is the target of *Break a subject*.
-- **OQ-SUBJ-7**: whether *Stretched thin* hits every subject or only the four furthest.
-- **OQ-SUBJ-8**: the Dauphiné's provinces and Brittany's arrow counts in the France example.
-- **OQ-SUBJ-9**: what made Armagnac rise, and when the "force used" reason applies.
-- **OQ-SUBJ-10**: the gift scale, what counts as a common enemy, and "your sea route".
-- **OQ-SUBJ-11**: how a rival accepts a subject changing masters.
-- **OQ-SUBJ-12**: the *Courted* reason after a release.
-- **OQ-SUBJ-13**: what breaks the *Held of the Church* tie.
-- **OQ-SUBJ-14**: raised lords' reasons and which kind a frontier lord becomes.
-- **OQ-SUBJ-15**: whether Colonies and Marches can be tightened.
-- **OQ-SUBJ-16**: the new event keys are not yet in the event vocabulary.
-- **OQ-SUBJ-17**: country stats and warfare haven't taken in the subject changes.
-- **OQ-SUBJ-18**: what an overseas trade empire is.
-- **OQ-SUBJ-19**: whether government's limits on kinds are adopted.
-- **OQ-SUBJ-20**: where the season count, tribute and risings sit in the month.
-- **OQ-SUBJ-21**: whether Sweden's Union kind in 1444 is right.
-- **OQ-SUBJ-22**: who inherits when a foreign house has a stronger marriage claim.
-- **OQ-SUBJ-23**: the settler share for Settled colonies, and what kind of voice settlers are.
-- **OQ-SUBJ-24**: whether the seasonal count can move a subject to In revolt.
-- **OQ-SUBJ-25**: names of some reasons, and whether Kin and Hostage stack.
+Nothing. Every question is decided; numbers marked as placeholders in the data (the gift, the overseas trade empire, *Stretched thin*) may still be tuned.
 
 ## For developers
 

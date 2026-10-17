@@ -29,7 +29,7 @@ export interface AchievementDefinition {
   tier: Tier;
   hidden?: boolean;
   scope: Scope;
-  on: string;
+  moment: string;
   test: Test;
   progress?: { stat: string; target: number | string };
   full_game?: boolean;
@@ -392,7 +392,7 @@ export function lifetimeFacts(p: Profile): Facts {
 }
 
 /**
- * A moment occurred: runs only the rows whose `on` names it (ACH-031), `date`
+ * A moment occurred: runs only the rows whose `moment` names it (ACH-031), `date`
  * rows only on their day and once (ACH-032), and only in an eligible
  * campaign (ACH-014). Campaign rows read this campaign's facts alone
  * (ACH-027); lifetime rows read the profile's counters (ACH-028).
@@ -401,7 +401,7 @@ export function evaluate(cat: Catalogue, c: CampaignAchievements, p: Profile, mo
   const out: Evaluation = { ran: [], unlocked: [] };
   if (!eligible(c)) return out;
   for (const d of cat.list) {
-    if (d.on !== moment || cat.retired.includes(d.id)) continue;
+    if (d.moment !== moment || cat.retired.includes(d.id)) continue;
     if (moment === "date") {
       if (d.test.date !== date || c.datesChecked.includes(d.id)) continue;
       c.datesChecked.push(d.id);
@@ -589,7 +589,7 @@ export function ruledOut(d: AchievementDefinition, date: string): boolean {
   const before = d.test.before;
   if (typeof before === "string" && date >= before) return true;
   const day = d.test.date;
-  return d.on === "date" && typeof day === "string" && date > day;
+  return d.moment === "date" && typeof day === "string" && date > day;
 }
 
 /** The "earnable in this campaign" filter: not earned, not ruled out (ACH-073). */

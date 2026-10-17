@@ -1659,7 +1659,7 @@ Then("all five run the same loop", (s) => {
   }
 });
 
-Given(/^traders of "([^"]+)" deposited (\d+) gold this month and one caravan was robbed$/, (s, c: string, gold: string) => {
+Given(/^traders of "([^"]+)" deposited (\d+) gold this week and one caravan was robbed$/, (s, c: string, gold: string) => {
   city(s, "Troyes", c);
   T.enterProvince(W(s), caravan(s, c, { purse: 10 }), "Troyes");
   T.enterProvince(W(s), caravan(s, c, { purse: Number(gold) - 10 }), "Troyes");

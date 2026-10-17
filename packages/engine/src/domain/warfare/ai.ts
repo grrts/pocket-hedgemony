@@ -42,3 +42,18 @@ export const aircraft = (known: Known): { scoutRange: number; bombs: string[] } 
 export type NoticeKind = keyof typeof W.notifications;
 /** Notifications for short sessions: battle won or lost with the reason, a breach, terms, peace voices passing half, pay owed, an army hungry (WAR-203). */
 export const notification = (kind: NoticeKind, reason?: string): { title: string; reason?: string } => ({ title: W.notifications[kind], ...(reason === undefined ? {} : { reason }) });
+
+export type RiskTolerance = "low" | "medium" | "high";
+
+/** An AI army's standing orders from its realm's risk tolerance (WAR-194, D-WAR-14). */
+export function aiStandingOrders(risk: RiskTolerance): { order: "attack" | "wait"; retreat: string } {
+  const o = W.ai.standing_orders[risk];
+  return { order: o.order === "wait" ? "wait" : "attack", retreat: o.retreat };
+}
+
+/** Whether an AI army besieges or raids: a high-risk realm raids with horse-only armies, others besiege (WAR-195, D-WAR-14). */
+export const aiBesiegesOrRaids = (risk: RiskTolerance, horseOnly: boolean): "raid" | "besiege" =>
+  horseOnly && (W.ai.raids_at as string[]).includes(risk) ? "raid" : "besiege";
+
+/** What the player can do at each 4-hour step of a running battle (WAR-136, X-1); there is no Skip to result. */
+export const BATTLE_STEP_CHOICES: readonly string[] = W.battle_step_choices;

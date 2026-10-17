@@ -39,9 +39,11 @@ Feature: Who gets heritage, and how it is generated
     Then the heyday belongs to the "<age>"
 
     Examples:
-      | region      | age                       |
-      | the Americas| Age of Atlantic Empires   |
-      | West Africa | Age of Gunpowder Empires  |
+      | region         | age                       |
+      | the Americas   | Age of Atlantic Empires   |
+      | West Africa    | Age of Atlantic Empires   |
+      | Southeast Asia | Age of Exploration        |
+      | Central Asia   | Age of Gunpowder Empires  |
 
   @HER-056
   Scenario: Decentralised polities take crownless archetypes only

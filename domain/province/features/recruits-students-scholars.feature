@@ -4,13 +4,19 @@ Feature: Recruits, students and scholars here
   I want recruits, students and scholars counted in each province
   So that levies and schools draw on real people
 
-  @PROV-140 @open-question
+  @PROV-140 @PROV-296 @placeholder
   Scenario: Recruits refill from every class except clergy and scholars
-    # OQ-PROV-17: the yearly share per class is not given
-    Given the province "Troyes" has farmers, craftsmen, clergy, scholars and homeless men
+    Given the province "Troyes" has 40,000 farmers, 5,000 craftsmen, 800 clergy, 100 scholars and 2,000 homeless
     When the year ends
-    Then recruits here grow by a share of every class except clergy and scholars
-    And homeless men give more than other classes
+    Then recruits here grow by 400 farmers, 50 craftsmen and 20 homeless
+    And no clergy or scholars
+
+  @PROV-296 @placeholder
+  Scenario: Homeless drift and refugees settle
+    Given the province "Troyes" has 2,000 homeless
+    When the year ends
+    Then 40 homeless drift to free slots elsewhere
+    And refugees who have stayed 2 years settle
 
   @PROV-141
   Scenario Outline: Whose recruits they are

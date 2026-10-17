@@ -68,7 +68,7 @@ Feature: The 36 revolutions
   Scenario: The generic revolution of 1905 binds any monarchy
     Given the country "Austria" is a monarchy
     And "Austria" has recently lost a war, liberal and socialist ideas, crowded factory workers, land hunger and war weariness
-    When the turn's signs are evaluated
+    When the month's signs are evaluated
     Then "Austria" can break out with "russian_revolution_1905" at 3 of 6 signs
 
   @REVO-068

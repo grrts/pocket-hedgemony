@@ -53,6 +53,12 @@ export interface Country {
   capital?: string;
   form?: string;
   ai: boolean;
+  /** Gold the realm earns in a year (economy supplies it); funding costs 1 % of the target's a month. */
+  yearlyIncome: number;
+  /** Signs lit on the realm's most advanced revolution card (revolutions supplies it). */
+  revolutionSigns: number;
+  /** Sea zones the realm's coast touches (map supplies them). */
+  seaZones: string[];
 }
 
 export interface Province {
@@ -199,7 +205,6 @@ export interface Pretender {
 
 export interface Funding {
   funder: string;
-  province?: string;
   emigreCourt?: string;
   target: string;
   gold: number;
@@ -247,7 +252,12 @@ export interface Diplomacy {
   aims: WarAim[];
   leagues: League[];
   passages: { granter: string; grantee: string; until: string }[];
-  passageDenied: string[];
+  /** Passage refused or revoked: blocks the asker's envoys until `until` (D-DIPL-21). */
+  passageDenied: { by: string; to: string; until: string }[];
+  /** Subjects that asked a country for help against their overlord (DIPL-143). */
+  helpAsked: { subject: string; helper: string }[];
+  /** Notoriety added by events, fading like Notorious deeds (D-DIPL-26). */
+  notorietyDeeds: { actor: string; n: number; date: string }[];
   embargoes: { by: string; on: string }[];
   marriages: { a: string; b: string }[];
   marriageForbidden: string[];
@@ -294,6 +304,8 @@ export function createDiplomacy(date: string, seed = 1): Diplomacy {
     leagues: [],
     passages: [],
     passageDenied: [],
+    helpAsked: [],
+    notorietyDeeds: [],
     embargoes: [],
     marriages: [],
     marriageForbidden: [],
@@ -351,6 +363,9 @@ export function country(d: Diplomacy, id: string): Country {
       armiesAway: false,
       peaceVoicesForPeace: 0,
       ai: true,
+      yearlyIncome: 0,
+      revolutionSigns: 0,
+      seaZones: [],
     };
     d.countries[id] = c;
   }
@@ -450,7 +465,7 @@ export function addEntry(d: Diplomacy, holder: string, other: string, e: Omit<Le
   list.push(entry);
   const max = config.ledger.max_entries_per_pair;
   while (list.length > max) {
-    // OQ-DIPL-19: "smallest" read as smallest by size; Old matters keeps the sum and does not fade.
+    // D-DIPL-19: the two smallest by size merge; Old matters keeps the sum and does not fade.
     list.sort((x, y) => Math.abs(x.weight) - Math.abs(y.weight));
     const [a, b] = list.splice(0, 2) as [LedgerEntry, LedgerEntry];
     const merged: LedgerEntry = { key: "old_matters", name: config.ledger.merged_entry_name, weight: a.weight + b.weight, base: a.weight + b.weight, created: monthOf(d.date) };
@@ -560,7 +575,9 @@ export function relationLine(d: Diplomacy, holder: string, other: string): { rel
 export function standing(d: Diplomacy, holder: string, other: string): number {
   const o = d.standingOverride[key(holder, other)];
   if (o !== undefined) return o;
-  return ledgerOf(d, holder, other).reduce((s, e) => s + e.weight, 0) + relationLine(d, holder, other).weight;
+  const n = ledgerOf(d, holder, other).reduce((s, e) => s + e.weight, 0) + relationLine(d, holder, other).weight;
+  const cap = config.ledger.standing_limit;
+  return Math.max(-cap, Math.min(cap, n));
 }
 
 /** DIPL-077. */

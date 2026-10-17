@@ -309,7 +309,7 @@ export function veteransLeave(p: ProvincePool, men: number): void {
 }
 
 /**
- * The yearly step, run in the January turn (RECR-100, D-RECR-11): refill, a tenth of the fallen fades, a
+ * The yearly step, run in the turn in which 1 January falls (RECR-100, D-RECR-11): refill, a tenth of the fallen fades, a
  * tenth of the veterans are lost to old age (RECR-019, RECR-026, RECR-029).
  */
 export function yearPasses(p: ProvincePool, o: { musterMaster?: boolean } = {}, cfg: RecruitingConfig = config): void {
@@ -866,7 +866,7 @@ export function aiPicksCommander(officials: readonly { id: string; type: string 
 // ---------------------------------------------------------------- monthly update (RECR-100)
 
 /**
- * A month (RECR-100): training ticks down; in the January turn the yearly step (refill, fallen and veterans
+ * A month (RECR-100): training ticks down; in January the yearly step (refill, fallen and veterans
  * fading) runs once (D-RECR-11).
  */
 export function monthPasses(p: ProvincePool, orders: TrainingOrder[], o: { besieged?: boolean; month?: number; musterMaster?: boolean } = {}, cfg: RecruitingConfig = config): Regiment[] {

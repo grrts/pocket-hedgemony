@@ -202,7 +202,7 @@ Homeless people eat from the local store, make nothing, pay no tax, and die at 5
 | Over 10 % | The *Homeless* grievance |
 | Over 20 % (shanty camps) | *Homeless* counts as two; plague starts here first and spreads twice as fast; town classes die 1 % faster; each year a town building may burn |
 
-Rebels muster from the homeless first, at twice the rate of other people.
+Rebels muster from the province's recruits, like any levy.
 
 ### Other people
 
@@ -231,7 +231,7 @@ Each province has its own **tax rate**: none, light, normal, heavy or crushing. 
 - Riots or rebels may force the rate down, and a tax cap charter keeps it at light or below.
 - A heavy rate gives the *Heavy taxes* grievance; crushing counts as two.
 
-Troyes, at normal tax, owes 11 gold and 9 reach you. Which rule loses those 2 gold is still open (OQ-PROV-22).
+Troyes, at normal tax, owes 11 gold a year and all 11 reach you: it is 3 days from Paris and its official is a full-strength tax collector. Tax is paid a twelfth each month. Each day of travel beyond 5 loses 5 % of it, a tax collector makes up to 20 % back, and you never get more than the province owes.
 
 ### Roads, rivers and days to capital
 
@@ -266,10 +266,10 @@ Every official has a **type** and runs **one province**; a seat needs one of its
 |---|---|
 | Tax collector | +20 % of tax owed reaches you |
 | Steward | +10 % food from the tiles; local store rots half as fast |
-| Judge | Riots need one grievance more, rebels need 5 instead of 4; *Broken charter* fades twice as fast |
+| Judge | Riots need one grievance more; *Broken charter* fades twice as fast |
 | Master of works | Buildings and roads 25 % cheaper and twice as fast; burned tiles rebuilt twice as fast |
-| Muster master | Recruits refill 25 % faster; levies take homeless men first |
-| Customs officer | +15 % traders passing; tolls and market fees collected in full |
+| Muster master | Recruits refill 25 % faster |
+| Customs officer | +15 % trade gains |
 | Chaplain | Faith mix moves twice as fast toward the ruler's faith |
 | Schoolmaster | Tongue mix moves twice as fast toward the ruler's tongue; students graduate a year sooner |
 | Warden | Garrison fights 25 % better; walls repair twice as fast; castle store rots half as fast |
@@ -341,9 +341,9 @@ There is no anger meter. A province has a list of **grievances**, each a named c
 | 3 | Riots: tax and recruits halved; traders avoid it; the lord wavers |
 | 4 or more | Rebels: a share of the recruits take up arms each month under a named leader, with a demand from their biggest grievance |
 
-Under a judge, riots need one grievance more and rebels 5 instead of 4.
+Under a judge, riots need one grievance more.
 
-**Rebels** are gained from four or more grievances, a disloyal lord raising his retinue, a pretender landing, or foreign gold. They melt away when beaten, when their demand is granted, when grievances are fixed, or when their leader is killed or bribed. Rebel armies fight as the *Rebel band* kind under the battle rules. A province with riots or rebels counts toward your country's **In revolt**. How risings start and grow is on [Rebellions](Rebellions), which reads these rules differently in places (OQ-PROV-2).
+**Rebels** are gained from four or more grievances, a disloyal lord raising his retinue, a pretender landing, or foreign gold. They melt away when beaten, when their demand is granted, when grievances are fixed, or when their leader is killed or bribed. Rebel armies fight as the *Rebel band* kind under the battle rules. A province with riots or rebels counts toward your country's **In revolt**. At 4 or more grievances a province is *Plotting*: each month it may rise, with a 5 % chance at 4 grievances, 15 % at 5 and 30 % at 6 or more (an event can spark a rising at 3). The rebels are men from the province's recruits. More on [Rebellions](Rebellions).
 
 ### Health and the land
 
@@ -450,7 +450,7 @@ The tile row is the province: tap a tile to see its building, its workers and wh
 
 ## Numbers
 
-All province numbers are placeholders. The design names one province config file but no keys, so the keys below are the spec's proposals (OQ-PROV-20).
+All province numbers are placeholders, kept in one province data file.
 
 | Value | Config key | Design value |
 |---|---|---|
@@ -497,32 +497,24 @@ All province numbers are placeholders. The design names one province config file
 | Wall breaches | `province.walls.max_breaches` | 3 |
 | Grievance levels | `province.grievances.levels` | 0–1 / 2 / 3 / 4+ |
 
+## Decided since the first draft
+
+- Tax is paid monthly, loses 5 % per day of travel beyond 5, and never exceeds what is owed.
+- Provinces have 4 to 16 tiles by their size on the map. A town is a village from 1,000 townsfolk, a market town from 3,000, a town from 8,000, a city from 20,000 and a great city from 40,000. It takes a second tile at 40,000 and a third at 100,000.
+- Each class except clergy and scholars gives 1 % of its people a year as recruits. The homeless are not taken first, and rebels come from the recruit pool.
+- Birth and death modifiers are percentage points: +0.5 turns a 4 % birth rate into 4.5 %.
+- Each harvest step makes the harvest one band better, up to bumper, and steps add up.
+- An unpaid month leaves a building neglected at half output; ten neglected years drop it a step.
+- Land of peoples with no state of their own counts as unowned, so it can be colonised on its free tiles.
+- A customs officer adds 15 % to trade gains; fees and tolls are collected in full with or without him.
+- A judge raises the bar for riots by one grievance.
+- Armies lose men to sickness each month: none in healthy land, 1 % at medium, 2 % in high, hot, cold or fever land.
+- An official learns a province in 5 years among his own people, 7 among related peoples and 10 among strangers. One official runs more provinces as you learn the right government inventions.
+
 ## Still open
 
-- **OQ-PROV-1**: Trade v2 replaces the province's old trade section, but the province design hasn't adopted its edits (trade line, homeless penalty, customs officer, gold income).
-- **OQ-PROV-2**: Rebels at 4 grievances here versus "Plotting" with a monthly chance in the rebellions design; the judge rule has no counterpart there.
-- **OQ-PROV-3**: Upkeep: 10 years unpaid here versus the buildings design's monthly neglect.
-- **OQ-PROV-4**: How weekly plague runs inside a monthly turn.
-- **OQ-PROV-5**: Recruiting's changes (no "homeless first", ceilings by class, Marshal and deputy officials) are not adopted.
-- **OQ-PROV-6**: The grievance list misses other designs' additions (*Grasping officials*, *Banned tongue*, *Persecuted*, foreign agitators).
-- **OQ-PROV-7**: Whether stateless peoples' land is "unowned", and how settlement steps map to subjects' colony stages.
-- **OQ-PROV-8**: Birth and death modifiers have no unit; the Troyes example matches the base rates without its own modifiers.
-- **OQ-PROV-9**: Whether hospitals are known at start and wells and drains become ring works.
-- **OQ-PROV-10**: When yearly tax is paid in a monthly game, how big the travel loss is, and whether a tax collector can push past tax owed.
-- **OQ-PROV-11**: How map size maps to tile count, and the townsfolk thresholds for each town size.
-- **OQ-PROV-12**: Wares and classes other designs asked for (stone, grapes, dates, guns, steel, cement, amber, wax, alum) are not adopted.
-- **OQ-PROV-13**: Culture's request that officials have a tongue and learn slower among cousins and strangers is not adopted.
-- **OQ-PROV-14**: How harvest steps stack and what a step does at bumper; whether rice's 1.5 is per harvest or per year.
-- **OQ-PROV-15**: Sickness, foraging and fever land steps have no numbers.
-- **OQ-PROV-16**: Several event mappings leave the choice open or have no worked effect.
-- **OQ-PROV-17**: Recruit, homeless drift, rebel muster and refugee shares are not given.
-- **OQ-PROV-18**: Do rebels come from recruits or from the homeless first?
-- **OQ-PROV-19**: No province-level AI design for tax, tolls, charters, officials or food.
-- **OQ-PROV-20**: The province config file and its keys are not named.
-- **OQ-PROV-21**: Five tax steps here versus four in the country design.
-- **OQ-PROV-22**: Troyes's card loses 2 gold between owed and reaching you with no rule that explains it.
-- **OQ-PROV-23**: What happens to recruits in a lord's province without his own official.
-- **OQ-PROV-24**: One official per province, or more as inventions allow?
+Nothing. Every question about provinces has been decided; the numbers marked as placeholders are tuned during balancing.
+
 
 ## For developers
 

@@ -36,8 +36,8 @@ Feature: Commanders from officials
       | most        | Beloved |
       | less than half | none |
 
-  @RECR-071 @RECR-074 @placeholder @open-question
-  # OQ-RECR-17: tie rule and the cap of 5
+  @RECR-071 @RECR-074 @placeholder
+  # config: yearsServedBonus; the skill never passes 5 (D-RECR-17)
   Scenario Outline: Years served raise the highest skill
     Given an official of type "Steward" with <years> years served in "Reims"
     When the official is commissioned as commander
@@ -49,6 +49,19 @@ Feature: Commanders from officials
       | 5     | 4         |
       | 8     | 4         |
       | 10    | 5         |
+
+  @RECR-071 @placeholder
+  # D-RECR-17: on a tie the bonus goes to Logistics, then Cunning, then Might
+  Scenario Outline: A tie for the highest skill
+    Given an official of type "<type>" with <years> years served in "Reims"
+    When the official is commissioned as commander
+    Then the commander has Might <might>, Cunning <cunning> and Logistics <logistics>
+
+    Examples:
+      | type          | years | might | cunning | logistics |
+      | Marshal       | 5     | 2     | 2       | 3         |
+      | Tax collector | 10    | 0     | 2       | 4         |
+      | Warden        | 10    | 4     | 1       | 1         |
 
   @RECR-072
   Scenario: Keeping the rolled trait

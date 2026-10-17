@@ -55,7 +55,7 @@ Feature: Subject loyalty
     Then every reason shows as a named badge pointing up or down
     And no loyalty number is shown or kept
 
-  @SUBJ-030 @placeholder
+  @SUBJ-030 @placeholder @SUBJ-110
   Scenario Outline: The seasonal count
     # config: loyalty.check_every_months, step_up_at, step_down_at
     Given the subject "S" is "<from>" with <up> up arrows and <down> down arrows
@@ -69,6 +69,7 @@ Feature: Subject loyalty
       | Wavering | 2  | 4    | Disloyal |
       | Loyal    | 3  | 3    | Loyal    |
       | Loyal    | 1  | 3    | Wavering |
+      | Disloyal | 0  | 5    | Disloyal |
 
   @SUBJ-031 @placeholder
   Scenario: No two steps the same way within a year

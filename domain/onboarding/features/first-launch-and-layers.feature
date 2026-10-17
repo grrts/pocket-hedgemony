@@ -4,11 +4,10 @@ Feature: First launch and the four layers
   I want to choose how much teaching I get
   So that I start the way that suits me
 
-  # The screen flow does not show this question yet (OQ-TUT-5).
-  @TUT-104 @open-question
+  @TUT-104
   Scenario Outline: The first-launch question
     Given the game is launched for the first time
-    When the title screen has passed
+    When the player taps to start for the first time
     Then the game asks "New to Pocket Hegemony?"
     When the player picks "<option>"
     Then <result>

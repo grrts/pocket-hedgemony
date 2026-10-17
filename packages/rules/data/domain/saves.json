@@ -54,11 +54,11 @@
         "pause",
         "quit",
         "suspend",
-        "background"
+        "exit_to_menu"
       ]
     },
     "autosave": {
-      "interval_turns": 12,
+      "interval_months": 12,
       "interval_options": [
         1,
         6,
@@ -72,12 +72,16 @@
         5
       ],
       "interval_labels": {
-        "1": "every turn",
-        "6": "every 6 turns",
-        "12": "every 12 turns (each January)",
+        "1": "every month",
+        "6": "every 6 months",
+        "12": "every 12 months (each January)",
         "off": "off"
       },
-      "every_12_month": 1
+      "every_12_month": 1,
+      "every_6_months": [
+        1,
+        7
+      ]
     },
     "manual": {
       "max_per_campaign": 20,
@@ -90,7 +94,7 @@
         "pause",
         "quit",
         "suspend",
-        "background"
+        "exit_to_menu"
       ]
     }
   },
@@ -99,7 +103,8 @@
       "pause",
       "quit",
       "suspend",
-      "background"
+      "background",
+      "exit_to_menu"
     ],
     "safety_interval_seconds": 30
   },
@@ -164,7 +169,10 @@
         "Play Games saved games",
         "iCloud Documents container"
       ]
-    }
+    },
+    "synced_files": [
+      "settings-personal.json"
+    ]
   },
   "export_import": true,
   "ironman": {
@@ -191,7 +199,8 @@
     "continue": "Continue: {nation}, {date}",
     "continue_from": "Continue: {nation}, {date} (from {device})",
     "new_save": "New save",
-    "load_newer_first": "Load the newer game first."
+    "load_newer_first": "Load the newer game first.",
+    "ironman_import_offline": "Connect to import an ironman save."
   },
   "free_tier": {
     "free_nations": [
@@ -237,5 +246,10 @@
     "android": "share sheet",
     "ios": "share sheet",
     "desktop": "save dialog"
-  }
+  },
+  "_provisional": [
+    "desktop_quit_wait_seconds",
+    "kinds.autosave.every_6_months",
+    "orders_journal.safety_interval_seconds"
+  ]
 }

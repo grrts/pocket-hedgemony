@@ -18,9 +18,8 @@ Feature: Gifts, insults and rivals
       | 150  | 30     |
       | 400  | 30     |
 
-  @DIPL-132 @DIPL-036 @open-question
+  @DIPL-132 @DIPL-036
   Scenario: An insult
-    # OQ-DIPL-4: perspective of the Hostile stance
     Given the lord "Count Pál" of "Hungary" is Warlike and wants a war with "Austria"
     When the country "Hungary" insults the country "Austria"
     Then the stance of "Austria" toward "Hungary" is "hostile"

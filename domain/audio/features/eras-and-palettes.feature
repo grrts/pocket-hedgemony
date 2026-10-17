@@ -49,7 +49,7 @@ Feature: Music eras and regional palettes
       | semitic_ethiopian | africa_east_south |
       | andean | americas |
       | polynesian | oceania |
-      | creole_atlantic | atlantic_creole |
+      | atlantic_creole | atlantic_creole |
 
   @AUD-019 @placeholder
   Scenario Outline: The turkic group splits by capital
@@ -62,11 +62,10 @@ Feature: Music eras and regional palettes
       | west | mena |
       | east | steppe |
 
-  # The blend rule is not designed (OQ-AUD-11).
-  @AUD-020 @open-question
+  @AUD-020
   Scenario: A colonial nation founded after 1500
     Given a colonial nation founded in 1620
-    Then it uses the Atlantic and creole palette, blending palettes 1, 8 and 10 by its culture mix
+    Then it uses the single palette "atlantic_creole", with no blend
 
   @AUD-021
   Scenario: A culture change takes effect at the next track

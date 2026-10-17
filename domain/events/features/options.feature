@@ -5,7 +5,7 @@ Feature: Options and choice
   So that every event is a decision with a historical path and alternatives
 
   @EVT-039
-  Scenario: Every event offers two or more options with exactly one historical
+  Scenario: Every event offers two to four options with exactly one historical
     Given the event "french_revolution"
     When its options are listed
     Then it has the options "radical_republic", "constitutional_monarchy" and "royal_reaction"
@@ -42,7 +42,8 @@ Feature: Options and choice
       | at_war        | the country is at war                                      | 80     |
       | at_war        | the country is at peace                                    | 40     |
       | low_treasury  | the treasury is below one year of expenses                 | 80     |
-      | high_unrest   | average unrest is above 50                                 | 80     |
+      | high_unrest   | more than half its provinces have 4 or more grievances     | 80     |
+      | high_unrest   | half its provinces have 4 or more grievances               | 40     |
       | same_religion | the other party shares the state religion                  | 80     |
       | rival         | the other party is a rival                                 | 80     |
       | great_power   | the country ranks in the top 8 by great power score        | 80     |
@@ -54,10 +55,15 @@ Feature: Options and choice
     When "France" picks "constitutional_monarchy"
     Then "France" gets "stability -2" from the event and "stability +1" from the option
 
-  @EVT-044 @open-question
+  @EVT-044
   Scenario: Nothing answers an event for the player
-    # OQ-EVT-8: decision expiry against screen-flow's rule
     Given an event waits for the player's answer
     When the player tries to end the turn
     Then the turn does not end
     And the first unanswered event opens
+
+  @EVT-039
+  Scenario: More than four options is a build error
+    Given an event offers 5 options
+    When the event tree is built
+    Then the build reports an error

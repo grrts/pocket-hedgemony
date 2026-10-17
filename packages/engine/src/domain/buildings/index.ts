@@ -90,6 +90,7 @@ export interface BuildingType {
 
 export interface Landmark {
   id: string;
+  effect?: string;
   province: string;
   present_1444: boolean;
   founded_by_event?: number;
@@ -110,7 +111,7 @@ export interface BuildingsConfig {
   town_sizes: TownSize[];
   sites: {
     per_province: { land: number; town: number };
-    master_of_works: { extra_sites: number; months_multiplier: number };
+    master_of_works: { extra_sites: number; months_multiplier: number; gold_multiplier: number };
     half_crew_months_multiplier: number;
     cancel_refund: number;
     stop_months_by_climate: Record<string, number[]>;
@@ -124,12 +125,19 @@ export interface BuildingsConfig {
     demolish_material_refund: number;
     neglect_recovery_months: number;
   };
-  damage: { plunder_share: number; plunder_share_with_walls: number; earthquake_share: number; fire_buildings: [number, number] };
+  damage: { plunder_share: number; plunder_share_with_walls: number; earthquake_share: number; fire_buildings: [number, number]; plunder_share_with_walls_from_step: number; town_fire: { chance_per_year: number; per_size_above_town: number }; quake_chance_per_year: number; big_raid_men: number };
   village_works: { chance_per_year: number; needs: { years_at_peace: number; food_store_months_over: number }; builds: Record<string, string>; owner: string };
-  crafts_appearing: { builds: string[]; raw: Record<string, string>; owners: string[] };
+  crafts_appearing: { builds: string[]; raw: Record<string, string>; owners: string[]; trade_ratio_at_least: number; chance_per_year: number };
   upkeep_groups: Record<string, [number, number] | string>;
   arsenal: { spoil_share_without: number };
-  ai: { reserve_years_of_upkeep: number; homeless_share_trigger: number; food_months_trigger: number };
+  ai: { reserve_years_of_upkeep: number; homeless_share_trigger: number; food_months_trigger: number; busy_sites: number };
+  materials_no_route_multiplier: number;
+  burned_rebuild: { free_per_year_in_peace: number; paid_share_of_farm_cost: number; paid_months: number };
+  troyes_1444: { town_size: TownSize; slots: number };
+  starting_ports_file: string;
+  lord_province_counts_as_yours: boolean;
+  caravanserai_land_trader_weight: number;
+  unique_variants: { id: string; who: string; change: string }[];
   advice: { max_lines: number };
   loyalty_steps: string[];
   owners_may_build: Record<string, string[]>;
@@ -583,14 +591,14 @@ export interface Cost {
   materials: Partial<Record<Material, number>>;
 }
 
-/** A step's cost on a ground: gold and months multiplied, materials not; a master of works halves the months. */
+/** A step's cost on a ground: gold and months multiplied, materials not; a master of works halves the months and takes 25 % off the gold (BLD-156). */
 export function costOf(type: string, step: number, ground = "farmland", masterOfWorks = false): Cost {
   const c = stepDef(type, step).cost;
   const g = groundMultiplier(ground);
   const materials: Partial<Record<Material, number>> = {};
   for (const m of ["timber", "stone", "bricks", "iron", "steel", "concrete"] as const) if (c[m]) materials[m] = c[m];
   return {
-    gold: (c.gold ?? 0) * g,
+    gold: (c.gold ?? 0) * g * (masterOfWorks ? cfg.sites.master_of_works.gold_multiplier : 1),
     months: (c.months ?? 0) * g * (masterOfWorks ? cfg.sites.master_of_works.months_multiplier : 1),
     crew: c.crew ?? 0,
     materials,
@@ -614,11 +622,11 @@ export function earthUpkeepMultiplier(): number {
   return cfg.materials.earth.upkeep_multiplier ?? 1;
 }
 
-/** Price of loads bought at the market; stone more than 3 provinces from any quarry costs twice. */
-export function buyPrice(m: Material, loads: number, quarryDistance = 0): number {
+/** Price of loads bought at the market; stone more than 3 provinces from any quarry costs twice; 25 % dearer where no trade route touches the province (D-BLD-2). */
+export function buyPrice(m: Material, loads: number, quarryDistance = 0, onTradeRoute = true): number {
   const def = cfg.materials[m];
   const far = def.far_after_rings !== undefined && quarryDistance > def.far_after_rings ? (def.far_price_multiplier ?? 1) : 1;
-  return loads * def.price * far;
+  return loads * def.price * far * (onTradeRoute ? 1 : cfg.materials_no_route_multiplier);
 }
 
 export type Source = { from: "own"; province: string } | { from: "reach"; province: string; along: "ring" | "road" } | { from: "market"; gold: number };
@@ -632,7 +640,7 @@ export function sourceMaterial(r: Realm, provinceId: string, m: Material, loads:
   if (p.makes.has(m)) return { from: "own", province: p.id };
   for (const n of p.neighbours) {
     const q = r.provinces.get(n);
-    if (q && q.country === r.country && q.makes.has(m)) return { from: "reach", province: n, along: "ring" };
+    if (q && q.country === r.country && q.makes.has(m)) return { from: "reach", province: n, along: "ring" }; // a lord's province counts as yours (D-BLD-11)
   }
   const seen = new Set([p.id]);
   const queue = [...p.roadOrRiver];
@@ -1084,11 +1092,11 @@ export function raid(r: Realm, provinceId: string, big: boolean, rng: Rng): Buil
   return hit;
 }
 
-/** A plundered town: 1 in 3 town buildings ruined, 1 in 6 with town walls. */
+/** A plundered town: 1 in 3 town buildings ruined, 1 in 6 with town walls of any step, a palisade included (D-BLD-12). */
 export function plunder(r: Realm, provinceId: string, rng: Rng): Building[] {
   const p = prov(r, provinceId);
   const town = townBuildings(p);
-  const share = hasTownWalls(p, 2) ? cfg.damage.plunder_share_with_walls : cfg.damage.plunder_share;
+  const share = hasTownWalls(p, cfg.damage.plunder_share_with_walls_from_step) ? cfg.damage.plunder_share_with_walls : cfg.damage.plunder_share;
   const hit = pickSome(town, Math.floor(town.length * share + 1e-9), rng);
   for (const b of hit) ruin(r, b, "ruined by plunder");
   return hit;
@@ -1790,3 +1798,5 @@ export function aiMonth(r: Realm, monthIndex: number, pickType: (p: Province) =>
   const res = startSite(r, id, type);
   return { province: id, started: res.ok ? res.site : null };
 }
+
+export * from "./decided.ts";

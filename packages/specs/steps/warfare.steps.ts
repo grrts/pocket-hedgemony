@@ -61,6 +61,7 @@ const era = (e: string): R.Era => {
 
 for (const w of [
   "the month ends",
+  "the turn ends",
   "the company is evaluated",
   "the commander is evaluated",
   "the battle is resolved",
@@ -647,10 +648,12 @@ Given("an army of {int} soldiers, {int} horses and {int} prisoners", (s, soldier
 Given(/^the army stands (in its own province|in an enemy province)$/, (s, where: string) => {
   s.atHome = where === "in its own province";
 });
+When("a turn is played", (s) => run(s));
 Then(/^it eats (\d+) rations from (the province it stands in|its food reserve)$/, (s, n: string, from: string) => {
-  expect(R.monthRations(s.eater)).toBe(Number(n));
+  close(R.weekRations(s.eater), Number(n));
   expect(R.foodSource(s.atHome)).toBe(from);
 });
+Then("a month's rations are {int}", (s, n: number) => expect(R.monthRations(s.eater)).toBe(n));
 
 Given("a levy company of {int} men from {string} carrying {int} loads of arms", (s, men: number, home: string, arms: number) => {
   s.company = R.newCompany({ kind: "levy", arm: "armoured foot", men, arms, home });
@@ -1342,9 +1345,10 @@ Then("no charges are possible and everyone fights at -25 %", (s) => {
   expect(s.sector.charge).toBe(false);
   expect(s.sector.all).toBe(-0.25);
 });
-Then("attacking across it is -25 % unless the province has a bridge", (s) => {
-  expect(s.sector.attackAcross).toBe(-0.25);
+Then("attacking across it is -20 % unless the province has a bridge or its river is frozen", (s) => {
+  expect(s.sector.attackAcross).toBe(-0.2);
   expect(R.sectorOf(s.use, { bridge: true }).attackAcross).toBe(0);
+  expect(R.sectorOf(s.use, { frozen: true }).attackAcross).toBe(0);
 });
 Then("the defender gets +50 %, shooting into it is halved and no charges", (s) => {
   expect(s.sector.defender).toBe(0.5);
@@ -1959,9 +1963,9 @@ Given("an army with standing order {string}", (s, o: string) => {
 Given("an enemy army comes into a neighbouring province", () => {});
 Then(/^the army (marches on the enemy army|stays put)$/, (s, d: string) => expect(R.attackOrWait(s.attack)).toBe(d));
 
-Given("three battles were fought in the month", (s) => {
+Given("three battles were fought in the turn", (s) => {
   const bs = ["Troyes", "Reims", "Langres"].map((where) => ({ ...nightBattle(), where }));
-  hook(s, () => (s.month = R.resolveMonth(bs, "Castile")));
+  hook(s, () => (s.month = R.resolveTurn(bs, "Castile")));
 });
 Then("each battle is resolved one at a time, in order", (s) => expect(s.month.order).toEqual(["Troyes", "Reims", "Langres"]));
 Then("each result is ready before its report shows", (s) => {
@@ -1971,11 +1975,11 @@ Then("each result is ready before its report shows", (s) => {
     expect(r.reason.length).toBeGreaterThan(0);
   }
 });
-Given("{string} and {string} fought a battle this month and the player is {string}", (s, a: string, b: string, player: string) => {
+Given("{string} and {string} fought a battle this turn and the player is {string}", (s, a: string, b: string, player: string) => {
   const input = nightBattle();
   input.attacker.country = a;
   input.defender.country = b;
-  hook(s, () => (s.month = R.resolveMonth([{ ...input, where: "Badajoz" }], player)));
+  hook(s, () => (s.month = R.resolveTurn([{ ...input, where: "Badajoz" }], player)));
 });
 Then("the turn does not stop", (s) => expect(s.month.playerReports).toHaveLength(0));
 Then("the battle report waits in the log", (s) => expect(s.month.log).toHaveLength(1));
@@ -3113,4 +3117,148 @@ Given("the AI country {string} plans a march into France", (s) => {
 Then("it reads the same forage limits, food reserves and peace voices the player sees", (s) => {
   expect(s.aiView).toBe(s.view);
   expect(s.aiView.forageLimits.Champagne).toBe(30000);
+});
+
+// ---------------------------------------------------------------- decided questions (D-WAR-*)
+
+// D-WAR-2, X-1: a player battle stops the turn on the before-the-battle card.
+Given("the player's country {string} fights a battle at {string} this turn", (s, player: string, where: string) => {
+  hook(s, () => (s.month = R.resolveTurn([{ ...nightBattle(), where }], player)));
+  s.player = player;
+});
+When("the battle is fought one round at a time", (s) => {
+  run(s);
+  const f = R.startBattle(nightBattle());
+  let r: R.BattleResult | null = null;
+  while (!r) r = f.round();
+  s.stepped = r;
+});
+Then("it ends with the same result as the battle fought at once", (s) => {
+  const r: R.BattleResult = s.month.playerReports[0].result;
+  expect([s.stepped.winner, s.stepped.how, s.stepped.bells]).toEqual([r.winner, r.how, r.bells]);
+});
+Then(/^at each round the player can "([^"]+)", "([^"]+)" or "([^"]+)", and there is no Skip to result$/, (s, a: string, b: string, c: string) => {
+  expect([...R.BATTLE_STEP_CHOICES]).toEqual([a, b, c]);
+  expect(R.BATTLE_STEP_CHOICES).not.toContain("Skip to result");
+});
+When(/^"(\w+)" orders a retreat after round (\d+)$/, (s, _c: string, n: string) => {
+  const f = R.startBattle(nightBattle());
+  for (let i = 0; i < Number(n); i++) expect(f.round()).toBeNull();
+  f.retreat(1);
+  s.result = f.round();
+  s.rounds = f.rounds;
+});
+Then(/^the battle ends in round (\d+) with "(\w+)" withdrawing$/, (s, n: string, c: string) => {
+  expect(s.rounds).toBe(Number(n));
+  expect(s.result.loser).toBe(c);
+  expect(s.result.how).toMatch(/^withdrew/);
+});
+When(/^a French army of (\d+) men marches in after round (\d+)$/, (s, men: string, n: string) => {
+  const f = R.startBattle(nightBattle());
+  for (let i = 0; i < Number(n); i++) f.round();
+  f.join(1, [R.newCompany({ kind: "standing regiment", arm: "levy foot", men: Number(men), id: "j1", drill: 6, scars: 1 })]);
+  f.round();
+  s.fight = f;
+});
+Then(/^the French side has (\d+) men in the battle$/, (s, n: string) => expect(s.fight.men[1]).toBe(Number(n)));
+Then("after the battle a report names who fought, where, the result, the losses and the one-line reason", (s) => {
+  const r: R.BattleReport = s.month.playerReports[0];
+  expect(r.who).toContain(s.player);
+  expect(r.where).toBe("Troyes");
+  expect(r.result.winner).toBeTruthy();
+  expect(Object.keys(r.result.losses)).toHaveLength(2);
+  expect(r.reason.length).toBeGreaterThan(0);
+});
+Then("the battle can be replayed later from its report", (s) => {
+  const r: R.BattleReport = s.month.playerReports[0];
+  expect(r.result.lines.length).toBe(r.result.bells);
+});
+
+// D-WAR-9: level thresholds of the main table are era II's.
+Given("a company with drill {int} and scars {int}", (s, drill: number, scars: number) => {
+  s.company = R.newCompany({ kind: "hired company", arm: "pikes", men: 600, id: "c", drill, scars });
+  s.era = "II";
+});
+
+// D-WAR-6, X-7: origins and their catches; a new commander's style by origin.
+Given("the country {string} gets a commander by origin {string}", (s, country: string, origin: string) => {
+  s.country = country;
+  hook(s, () => (s.catch = R.originCatch(origin)));
+});
+Then("the catch is {string}", (s, c: string) => expect(s.catch).toBe(c));
+Given("the country {string} has the horse style {string} and the foot style {string}", (s, country: string, horse: string, foot: string) => {
+  s.country = country;
+  s.styleList = { horse, foot };
+});
+When(/^it gets a new commander who is (a noble|a lord|risen from the ranks)$/, (s, origin: "a noble" | "a lord" | "risen from the ranks") => {
+  s.cmd = R.newCommander("a new commander");
+  const st = R.styleByOrigin(origin, s.styleList);
+  s.cmd.styles = st ? [st] : [];
+});
+
+// D-WAR-14: risk tolerance sets standing orders, starting styles and besiege or raid.
+Given("the AI country {string} has the risk tolerance {string}", (s, country: string, risk: R.RiskTolerance) => {
+  s.country = country;
+  s.risk = risk;
+});
+Given(/^its army is (horse only|foot and horse)$/, (s, army: string) => {
+  s.horseOnly = army === "horse only";
+});
+Then("its armies' standing order is {string} and they retreat if outnumbered {string}", (s, order: string, ratio: string) => {
+  expect(R.aiStandingOrders(s.risk)).toEqual({ order, retreat: ratio });
+});
+Then("its new commanders can start with the style {string}", (s, name: string) => {
+  expect(R.countryStyles(s.country)).toContain(name);
+});
+Then(/^its army (raids|besieges)$/, (s, does: string) => {
+  expect(R.aiBesiegesOrRaids(s.risk, s.horseOnly)).toBe(does === "raids" ? "raid" : "besiege");
+});
+
+// D-WAR-17: later-era arms have provisional strength and needs.
+Given("the arm {string} in config", (s, arm: string) => {
+  s.arm = arm;
+});
+Then("it has a strength per man, needs and an unlocking invention like every other arm", (s) => {
+  const a = (W.later_arms as Record<string, { strength?: number; needs?: Record<string, unknown>; unlock?: string }>)[s.arm];
+  expect(a?.strength).toBeGreaterThan(0);
+  expect(Object.keys(a?.needs ?? {}).length).toBeGreaterThan(0);
+  expect(a?.unlock).toMatch(/^W\d+$/);
+});
+
+// D-WAR-10: battle scale by era.
+Given(/^a battle fought in era (\w+) by realms that know (.+)$/, (s, era: string, inv: string) => {
+  s.era = era as R.Era;
+  s.known = ids(inv);
+});
+const BELL: Record<string, string> = { "2 hours": "2 hours", "half a day": "half a day", "a day": "a day" };
+Then(/^a bell is (2 hours|half a day|a day)$/, (s, bell: string) => expect(R.battleScale(s.era).bell).toBe(BELL[bell]));
+Then("the longest battle is {int} days", (s, d: number) => expect(R.battleScale(s.era).maxDays).toBe(d));
+Then(/^sector room is (all|half|a quarter) of the sector table$/, (s, r: string) => expect(R.battleScale(s.era).room).toBe({ all: 1, half: 0.5, "a quarter": 0.25 }[r]));
+Then("hits per bell are {int} % of the front", (s, h: number) => close(R.hitsShare(s.known, s.era), pct(h)));
+
+// D-WAR-13: skills grow by era; the staff college is the academy of eras VI–VII.
+Given("a commander in era {word}", (s, era: string) => {
+  s.era = era as R.Era;
+});
+const GROWTH: [RegExp, (m: RegExpMatchArray) => R.GrowthEvent][] = [
+  [/^he is trained at an academy$/, () => ({ kind: "academy" })],
+  [/^he graduates from a staff college$/, () => ({ kind: "academy" })],
+  [/^he serves as a captain under a Cunning (\d) commander$/, (m) => ({ kind: "captain under", commanderCunning: Number(m[1]) })],
+  [/^he spends a peacetime year in wargames for the first time this era$/, () => ({ kind: "wargames", firstThisEra: true })],
+  [/^he commands a standing army a year in peace with fewer than 3 such gains$/, () => ({ kind: "peace command year", gainsSoFar: 2 })],
+  [/^he wins his 4th victory since his last Might from victories$/, () => ({ kind: "victories", sinceLastMight: 4 })],
+];
+for (const [re, ev] of GROWTH) When(re, (s, ...args: string[]) => {
+  const m = [""].concat(args) as unknown as RegExpMatchArray;
+  s.gained = R.eraSkillGain(s.era, ev(m));
+});
+Then(/^he gains \+1 (Might|Cunning|Logistics)$/, (s, skill: string) => expect(s.gained).toContain(skill));
+
+// W inventions in battle that the engine already applies (WAR-122).
+Then("in battle every commander gets +1 order per bell", (s) => expect(R.ordersPerBell(2, "V", s.known)).toBe(R.ordersPerBell(2, "V") + 1));
+Then(/^in battle its riflemen hit (\d) % of the front per bell$/, (s, h: string) => close(R.hitsShare(s.known), pct(Number(h))));
+Then("in battle its standing regiments never drop below level 2", (s) => {
+  const c = R.newCompany({ kind: "standing regiment", arm: "pikes", men: 600, id: "c", drill: 0, scars: 0 });
+  expect(R.levelOf(c, "IV", s.known)).toBe(2);
+  expect(R.levelOf(c, "IV")).toBe(1);
 });

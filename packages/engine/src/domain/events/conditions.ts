@@ -60,7 +60,7 @@ export function leaf(c: Condition): [string, Record<string, unknown>] {
   if (entries.length !== 1) throw new Error(`A condition leaf has one key: ${JSON.stringify(c)}`);
   const [type, raw] = entries[0]!;
   if (raw !== null && typeof raw === "object" && !Array.isArray(raw)) return [type, raw as Record<string, unknown>];
-  const short: Record<string, string> = { event: "id", event_active: "id", period_active: "id", age_active: "id", exists: "who", is_human: "who", war_ongoing: "war" };
+  const short: Record<string, string> = { event: "id", event_active: "id", period_active: "id", age_active: "id", exists: "who", war_ongoing: "war" };
   return [type, { [short[type] ?? "value"]: raw }];
 }
 
@@ -182,7 +182,6 @@ export const CONDITIONS: Record<string, LeafEval> = {
   all_countries: (p, w, ctx) => countries(w, p.where).every((id) => holds(p.condition as Condition, w, { ...ctx, this: id })),
   count_countries: (p, w, ctx) =>
     compare(countries(w, p.where).filter((id) => holds(p.condition as Condition, w, { ...ctx, this: id })).length, String(p.op), Number(p.value)),
-  is_human: (p, w, ctx) => some(resolve(p.who, ctx), (id) => w.countries[id]?.human === true),
 };
 
 /** Evaluates a condition tree over the world (EVT-025). */

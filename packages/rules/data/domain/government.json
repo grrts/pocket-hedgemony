@@ -1,5 +1,11 @@
 {
  "$comment": "From government/config/government.yaml (version 2) and start-forms.yaml. Every number is a placeholder for balancing.",
+ "_provisional": [
+  "buildings.palace.landmark_step_4",
+  "admin_capacity_officials_per_point",
+  "ai.reform_month",
+  "ai.reform_gold_reserve_factor"
+ ],
  "colonial_governors_count_against_officials_cap": false,
  "over_cap": {
   "officials": {
@@ -8,6 +14,12 @@
   "lords": {
    "when": "new_year",
    "slips_per_lord_over": 1,
+   "order": [
+    "lowest_loyalty",
+    "most_provinces"
+   ]
+  },
+  "reform": {
    "order": [
     "lowest_loyalty",
     "most_provinces"
@@ -49,14 +61,21 @@
     4,
     6
    ],
-   "note": "by step"
+   "note": "by step",
+   "landmark_step_4": {
+    "officials": {
+     "forbidden_city": 24,
+     "topkapi": 20
+    },
+    "lords": 6
+   }
   },
   "seat": {
    "officials": [
     2,
     4
    ],
-   "note": "by step; any number, one per town"
+   "note": "by step; any number, one per province (D-GOV-10)"
   },
   "chancery": {
    "officials": 4,
@@ -527,7 +546,8 @@
     "no adult heir"
    ],
    "gold": 0,
-   "lords_slip": 0
+   "lords_slip": 0,
+   "automatic": true
   },
   {
    "from": "feudal_realm",
@@ -545,7 +565,8 @@
     "the ruling line dies out"
    ],
    "gold": 0,
-   "lords_slip": 0
+   "lords_slip": 0,
+   "automatic": true
   },
   {
    "from": [
@@ -640,7 +661,8 @@
     "trade in debt 3 years running"
    ],
    "gold": 0,
-   "lords_slip": 1
+   "lords_slip": 1,
+   "automatic": true
   },
   {
    "from": "peasant_commune",
@@ -712,7 +734,8 @@
     "the shogun loses the capital"
    ],
    "gold": 0,
-   "lords_slip": 0
+   "lords_slip": 0,
+   "automatic": true
   },
   {
    "from": "shogunate",
@@ -749,7 +772,8 @@
     "the ruler deposed or abdicates"
    ],
    "gold": 0,
-   "lords_slip": 0
+   "lords_slip": 0,
+   "automatic": true
   },
   {
    "from": "constitutional_republic",
@@ -758,7 +782,8 @@
     "a king invited by parliament"
    ],
    "gold": 0,
-   "lords_slip": 0
+   "lords_slip": 0,
+   "automatic": true
   },
   {
    "from": "company_rule",
@@ -767,7 +792,8 @@
     "the crown takes over"
    ],
    "gold": 0,
-   "lords_slip": 1
+   "lords_slip": 1,
+   "automatic": true
   }
  ],
  "revolution_ignores_era": true,
@@ -778,8 +804,10 @@
     "feudal_realm",
     "diet_monarchy",
     "household_realm",
+    "elective_monarchy",
     "bureaucratic_empire",
     "absolute_monarchy",
+    "constitutional_monarchy",
     "paramount_chiefdom",
     "tribute_empire",
     "warlord_domain",
@@ -803,6 +831,7 @@
    "before_G14": "city_commune",
    "keep_if_in": [
     "city_commune",
+    "merchant_republic",
     "peasant_commune",
     "constitutional_republic"
    ]
@@ -1326,5 +1355,10 @@
   "party_chooses": "the party chooses",
   "owners_appoint": "owners appoint",
   "overlord_appoints": "overlord appoints"
+ },
+ "admin_capacity_officials_per_point": 1,
+ "ai": {
+  "reform_month": 1,
+  "reform_gold_reserve_factor": 2
  }
 }

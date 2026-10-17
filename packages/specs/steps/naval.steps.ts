@@ -1699,3 +1699,184 @@ When("the sea battle is set up", (s) => {
 Then("it is fought on at most 3 sectors", (s) => {
   expect(s.sectors).toBe(3);
 });
+
+// ---------------------------------------------------------------- decided 17 October (D-NAVY-*)
+
+Given(re('the official "([^"]+)" is a customs officer who ran the port province "(\\w+)" for (\\d+) years'), (s, name: string, _p: string, y: string) => {
+  s.official = { name, type: "customs officer", years: num(y) };
+});
+When(re('the country "Portugal" commissions "([^"]+)" as admiral'), (s, name: string) => {
+  s.commissioned = N.commissionAdmiral(name, s.official.type, { yearsServed: s.official.years, inPortProvince: true });
+});
+Then(re("his (\\d+) years in a port count as (\\d+)"), (s, _y: string, c: string) => {
+  expect(s.commissioned.countedYears).toBe(num(c));
+});
+
+Given(re("an admiral whose wage is (\\d+) gold a month"), (s, w: string) => {
+  s.wage = num(w);
+});
+When('the country "Portugal" commissions him', (s) => {
+  s.pay = { sea: N.admiralPay(s.wage, true), port: N.admiralPay(s.wage, false) };
+});
+Then(re('the country "Portugal" pays (\\d+) gold of commission'), (s, g: string) => {
+  expect(s.pay.sea.commission).toBe(num(g));
+});
+Then(re("he is paid (\\d+) gold a month while at sea and (\\d+) in port"), (s, a: string, b: string) => {
+  expect([s.pay.sea.wage, s.pay.port.wage]).toEqual([num(a), num(b)]);
+});
+
+Given(re('the official "([^"]+)" is a colonial governor'), (s, name: string) => {
+  s.official = { name, type: "colonial governor" };
+});
+When(re('the country "Portugal" tries to commission "([^"]+)" as admiral'), (s, name: string) => {
+  try {
+    N.commissionAdmiral(name, s.official.type);
+    s.refused = false;
+  } catch {
+    s.refused = true;
+  }
+});
+Then("the commission is refused", (s) => {
+  expect(s.refused).toBe(true);
+});
+
+Given(re('a "([\\w ]+)"'), (s, type: string) => {
+  s.shipType = type;
+});
+Then(re("it (can|cannot) be set to trade"), (s, can: string) => {
+  expect(N.shipRow(s.shipType).family === "trade" || s.shipType === "galleon").toBe(can === "can");
+  expect(N.shipRow(s.shipType).hold !== undefined).toBe(can === "can");
+});
+
+Given(re('a galleon with a hull "(\\w+)" and a strength of (\\d+)'), (s, h: N.HullStep, st: string) => {
+  s.hull = h;
+  s.strength = num(st);
+});
+When(re("it takes (\\d+) hits in a sea battle"), (s, hits: string) => {
+  s.after = N.battleHull(s.hull, num(hits), s.strength);
+});
+Then(re('its hull is "(\\w+)"'), (s, h: string) => {
+  expect(s.after === "sinks" ? "sunk" : s.after).toBe(h);
+});
+
+Given(re('a Portuguese fleet docks at "(\\w+)", a port of a subject of "Portugal" with (\\d+) food in store'), (s, p: string, food: string) => {
+  expect(N.dockingRight("a subject")).toBe("food");
+  s.store = { id: p, food: num(food) };
+});
+When(re("it resupplies (\\d+) rations"), (s, r: string) => {
+  s.dock = N.dockInSubjectPort(s.store, num(r));
+});
+Then(re('the province "(\\w+)" has (\\d+) food in store'), (s, _p: string, food: string) => {
+  expect(s.store.food).toBe(num(food));
+});
+Then('"Portugal" owes nothing', (s) => {
+  expect(s.dock.owed).toBe(0);
+});
+
+Given('the country "Venice" is an AI sea power by its catalogue personality', (s) => {
+  s.seaPower = true;
+});
+Given(re("it can call (\\d+) seafolk to sea"), (s, n: string) => {
+  s.callableSeafolk = num(n);
+});
+When("it buys ships in peace", (s) => {
+  s.buys = N.seaPowerBuys(false);
+});
+Then("it buys trade ships before warships", (s) => {
+  expect(s.buys).toBe("trade ships first");
+});
+Then(re("it keeps (\\d+) of its seafolk always at sea"), (s, n: string) => {
+  expect(N.seaPowerAtSea(s.callableSeafolk)).toBe(num(n));
+});
+
+Then(re('the province "Arguin" has (\\d+) extra seafolk and (\\d+) small craft only'), (s, sf: string, sc: string) => {
+  expect([s.start.extraSeafolk, s.start.smallCraft, s.start.smallCraftOnly]).toEqual([num(sf), num(sc), true]);
+});
+
+Given(re('a dhow of a Gujarati country that (knows|does not know) T5 "Monsoon sailing calendars"'), (s, k: string) => {
+  s.known = { Gujarat: k === "knows" ? ["T5"] : [] };
+});
+When(re('it plans a route into the ocean zone "([^"]+)"'), (s, z: string) => {
+  s.w = sea({ Surat: coast("Gujarat"), Bay: zone(), [z]: zone(true) }, ["Surat~Bay", `Bay~${z}`]);
+  launch(s, N.newFleet("F", "Gujarat", [ship("dhow", { owner: "Gujarat" })], { name: "A", might: 0, cunning: 0, logistics: 0 }), "Bay");
+  plan(s, z);
+});
+
+Given(re('the province "Lagos" has (\\d+) men who can be called: (\\d+) seafolk, (\\d+) homeless and (\\d+) others'), (s, _t: string, a: string, b: string, c: string) => {
+  s.split = N.byShare({ seafolk: num(a), homeless: num(b), other: num(c) }, 300);
+});
+Then(re("(\\d+) seafolk, (\\d+) homeless and (\\d+) others are taken"), (s, a: string, b: string, c: string) => {
+  expect(s.split).toEqual({ seafolk: num(a), homeless: num(b), other: num(c) });
+});
+
+Given(re('the province "Lagos" has (\\d+) fighting-age men, of whom about (\\d+) can go to sea'), (s, men: string, sea: string) => {
+  const seafolk = s.lagosProvince.people.seafolk as number;
+  near(seafolk * N.navalConfig.fightingAgeShare, num(men), 1);
+  near(N.callableToSea({ seafolk }).seafolk!, num(sea), 5);
+});
+Then(re('the country "Portugal" pays (\\d+) gold of bounty'), (s, g: string) => {
+  expect(N.musterBounty(s.muster.count)).toBe(num(g));
+});
+Then(re('the province "Lagos" loses (\\d+) percent of its fish while they serve'), (s, pct: string) => {
+  expect(Math.round(N.fishLostShare(s.muster.byClass.seafolk, 4600) * 100)).toBe(num(pct));
+});
+Then(re("the (\\d+) sailors are sailors in port at Lagos after (\\d+) days"), (s, n: string, d: string) => {
+  expect(port(s, "Lagos").sailorsInPort).toBe(num(n));
+  expect(N.musterDays()).toBe(num(d));
+});
+
+Given(re('Genoese trade ships call at the port "(\\w+)"'), (s) => {
+  s.call = true;
+});
+Given(re('the port "(\\w+)" has hired (\\d+) Genoese sailors this year'), (s, _p: string, n: string) => {
+  s.hired = num(n);
+});
+When(re('the country "Portugal" hires (\\d+) more'), (s, n: string) => {
+  s.hire = N.mayHireForeignSailors(s.call, s.hired, num(n));
+});
+Then(re("the hire is (done|over the year's limit)"), (s, r: string) => {
+  expect(s.hire).toBe(r === "done");
+});
+
+Given(re('the pirate base of the "([^"]+)" is the province "(\\w+)"'), (s, coast: string, p: string) => {
+  expect(N.pirateBase(coast)).toBe(p);
+  s.pirates = N.pirateFleet(coast, 3, ["Home"]);
+  s.base = p;
+});
+When("the base is burned", (s) => {
+  expect(N.burnPirateBase(s.pirates, s.base)).toBe(true);
+});
+Then("the pirate fleet ends until trade brings it back", (s) => {
+  expect(s.pirates.ended).toBe(true);
+  N.pirateSeason(s.pirates, true, false);
+  expect(s.pirates.ships).toBe(0);
+  N.piratesReturn(s.pirates, true, false);
+  expect([s.pirates.ended, s.pirates.ships]).toEqual([false, N.navalConfig.pirates.startShips]);
+});
+
+Given("the pirate config of the design", (s) => {
+  s.pirateConfig = N.navalConfig.pirates;
+});
+Then(re('the pirate fleet of the "([^"]+)" starts with (\\d+) ships'), (s, coast: string, n: string) => {
+  expect(coast in N.navalConfig.pirateCoasts).toBe(true);
+  expect(s.pirateConfig.startShips).toBe(num(n));
+});
+Then(re("a pirate season lasts (\\d+) months"), (s, n: string) => {
+  expect(s.pirateConfig.seasonMonths).toBe(num(n));
+});
+
+// ---------------------------------------------------------------- frozen seas (X-17, NAVY-125)
+
+const monthNumber: Record<string, number> = { January: 1, February: 2, March: 3, April: 4, May: 5, June: 6, July: 7, August: 8, September: 9, October: 10, November: 11, December: 12 };
+Given(re("it is (January|February|March|April|May|June|July|August|September|October|November|December)"), (s, m: string) => {
+  s.month = monthNumber[m];
+});
+When(re('a fleet plans a route into the "([^"]+)"'), (s, z: string) => {
+  s.w = sea({ Port: coast("Sweden"), Bay: zone(), [z]: zone() }, ["Port~Bay", `Bay~${z}`]);
+  launch(s, N.newFleet("F", "Sweden", [ship("cog", { owner: "Sweden" })], { name: "A", might: 0, cunning: 0, logistics: 0 }), "Bay");
+  s.sea.frozen = N.frozenZones(s.month);
+  plan(s, z);
+});
+Then(re('a port on the "([^"]+)" (can|cannot) launch or take in ships'), (s, z: string, c: string) => {
+  expect(N.portIceBound(z, s.month)).toBe(c === "cannot");
+});

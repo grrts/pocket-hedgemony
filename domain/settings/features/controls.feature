@@ -4,21 +4,20 @@ Feature: Controls
   I want controls that fit my hand and my device
   So that giving orders is quick and comfortable
 
-  @SET-075 @open-question
+  @SET-075
   Scenario Outline: Main hand
-    # OQ-SET-16: where the game menu button goes is not said
     Given the game runs with touch
     When the player sets "Main hand" to "<hand>"
     Then the action bar and the End turn button are on the <side> side
+    And the game menu button is on the <other> side
 
     Examples:
-      | hand  | side  |
-      | Right | right |
-      | Left  | left  |
+      | hand  | side  | other |
+      | Right | right | left  |
+      | Left  | left  | right |
 
-  @SET-076 @open-question
+  @SET-076
   Scenario Outline: Long-press time
-    # OQ-SET-7: screen flow says long press only explains
     Given "Long-press time" is "<value>"
     When the player holds a finger on a stat for <held> seconds
     Then the tooltip <result>
@@ -41,9 +40,8 @@ Feature: Controls
       | Double-tap to zoom | On      |
       | Pan and zoom speed | Medium  |
 
-  @SET-078 @open-question
+  @SET-078
   Scenario Outline: Right-click gives orders
-    # OQ-SET-8: screen flow's touch flow has no confirm step
     Given the game runs on desktop
     And "Right-click gives orders" is "<value>"
     When the player <action>
@@ -52,8 +50,8 @@ Feature: Controls
     Examples:
       | value | action                                                                         |
       | On    | left-clicks the army "Armée de Dunois" and right-clicks the province "Troyes"  |
-      | Off   | clicks the army "Armée de Dunois", clicks the province "Troyes" and confirms   |
-      | On    | clicks the army "Armée de Dunois", clicks the province "Troyes" and confirms   |
+      | Off   | clicks the army "Armée de Dunois" and clicks the province "Troyes"             |
+      | On    | clicks the army "Armée de Dunois" and clicks the province "Troyes"             |
 
   @SET-079
   Scenario Outline: Mouse and keyboard defaults
@@ -75,9 +73,8 @@ Feature: Controls
     Then the question "Also bound to Turn report, swap?" is shown
     And each action holds at most 2 keys
 
-  @SET-081 @open-question
+  @SET-081
   Scenario Outline: Default keys
-    # OQ-SET-4: the zoom keys Q and E disagree between the table and the yaml
     Given the key bindings are the defaults
     When the player presses "<key>" on the map
     Then "<action>" happens
@@ -88,7 +85,9 @@ Feature: Controls
       | Left   | pan left                  |
       | +      | zoom in                   |
       | -      | zoom out                  |
-      | Esc    | the pause menu opens      |
+      | E      | zoom in                   |
+      | Q      | zoom out                  |
+      | Esc    | the game menu opens      |
       | 1      | the lens "realms"         |
       | 2      | the lens "terrain"        |
       | 3      | the lens "people"         |
@@ -186,9 +185,8 @@ Feature: Controls
     When Controls → Controller is opened
     Then "Gyro cursor" is "Off" with the options "Off, While touching the right trackpad / stick, Always"
 
-  @SET-092 @open-question
+  @SET-092
   Scenario Outline: Default controller layout
-    # OQ-SET-3: screen flow holds End turn for half a second
     Given the controller layout is the default
     And the player is on the "<mode>"
     When the player uses "<input>"
@@ -209,8 +207,8 @@ Feature: Controls
       | map         | d-pad up           | cycle map lenses                        |
       | map         | d-pad right        | the next notification                   |
       | map         | View               | the turn report                         |
-      | map         | View held 1 s      | End turn                                |
-      | map         | Menu               | the pause menu                          |
+      | map         | View held 0.5 s    | End turn                                |
+      | map         | Menu               | the game menu                          |
       | map         | left stick click   | jump to capital                         |
       | map         | right stick click  | recentre on the selection               |
       | menu        | left stick         | move focus                              |
@@ -226,11 +224,13 @@ Feature: Controls
       | battle view | right stick        | pan                                     |
       | battle view | LT                 | slower playback                         |
       | battle view | RT                 | faster playback                         |
-      | battle view | A                  | pause or play                           |
-      | battle view | B                  | skip to result                          |
-      | battle view | X                  | replay the last bell                    |
+      | battle view | A                  | change standing orders                  |
+      | battle view | B                  | leave the battle view                   |
+      | battle view | X                  | order a retreat                         |
+      | battle view | LB                 | the previous running battle             |
+      | battle view | RB                 | the next running battle                 |
       | battle view | Y                  | the commander's line                    |
-      | battle view | Menu               | leave the battle view                   |
+      | battle view | Menu               | the game menu                           |
 
   @SET-093
   Scenario Outline: Steam Controller and Deck extras
@@ -246,11 +246,10 @@ Feature: Controls
       | a back grip                | previous or next notification, or the ledger and the turn report |
       | gyro                       | nothing until turned on as "aim while touching the right trackpad" |
 
-  @SET-094 @open-question
+  @SET-094
   Scenario: Steam Input action sets
-    # OQ-SET-5: screen flow defines six action sets
     Given the game runs on Steam
     When Steam Input loads the game's actions
-    Then the action sets are Map, Menu and Battle, plus a Text layer for the on-screen keyboard
+    Then the action sets are Shell, Map, Card, Book, Modal and Battle, plus a Text layer for the on-screen keyboard
     And official configurations exist for the Steam Controller, Steam Deck, Xbox, PlayStation and Nintendo controllers
     And button prompts come from GetGlyphPNGForActionOrigin

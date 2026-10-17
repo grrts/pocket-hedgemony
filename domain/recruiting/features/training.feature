@@ -116,20 +116,55 @@ Feature: Training levies into regiments
       | a trained regiment                | 3     | 30 percent plus troop level |
       | a regiment trained under a Marshal | 4    | 30 percent plus troop level |
 
-  @RECR-051 @placeholder @open-question
-  # OQ-RECR-9: which arms fall into which pay group
+  @RECR-051 @RECR-102 @placeholder
+  # config: payByGroup, payGroupOfArm (D-RECR-9)
   Scenario Outline: Pay by arm after training
-    Given a trained regiment of <men> "<group>"
+    Given a trained regiment of <men> "<arm>"
     When the month is paid after its free months
     Then the regiment costs <gold> gold
 
     Examples:
-      | group     | men  | gold |
-      | foot      | 1000 | 200  |
-      | gunners   | 1000 | 250  |
-      | horse     | 1000 | 400  |
-      | knights   | 1000 | 600  |
-      | gun crews | 150  | 10   |
+      | arm                 | men  | gold |
+      | pikes               | 1000 | 200  |
+      | hand gunners        | 1000 | 250  |
+      | light horse         | 1000 | 400  |
+      | knights and lancers | 1000 | 600  |
+      | gun crews           | 150  | 10   |
+
+  @RECR-102 @placeholder
+  Scenario Outline: Every arm has a pay group
+    Given the arm "<arm>"
+    Then its pay group is "<group>"
+
+    Examples:
+      | arm                 | group     |
+      | armoured foot       | foot      |
+      | pikes               | foot      |
+      | archers             | foot      |
+      | hand gunners        | gunners   |
+      | pike and shot       | gunners   |
+      | musketeers          | gunners   |
+      | line infantry       | gunners   |
+      | riflemen            | gunners   |
+      | light horse         | horse     |
+      | camel riders        | horse     |
+      | horse archers       | horse     |
+      | knights and lancers | knights   |
+      | war elephants       | knights   |
+      | gun crews           | gun crews |
+
+  @RECR-101 @RECR-054
+  Scenario Outline: The free months count from the day the levy has gathered
+    Given a levy that gathered and went straight into training as "<arm>"
+    When its training ends
+    Then it has owed <months> months of pay
+
+    Examples:
+      | arm                 | months |
+      | pikes               | 0      |
+      | light horse         | 0      |
+      | musketeers          | 2      |
+      | knights and lancers | 6      |
 
   @RECR-051
   Scenario: Training doesn't change the kind

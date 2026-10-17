@@ -1,5 +1,5 @@
 import { eatsFrom, landRule } from "./army-rules.ts";
-import { MOVE, type Army, type MoveWorld, armiesIn, placeOf } from "./model.ts";
+import { MARCH, MOVE, type Army, type MoveWorld, armiesIn, monthLength, placeOf } from "./model.ts";
 import type { RoutePlan } from "./planner.ts";
 
 export type FoodColour = "green" | "yellow" | "red";
@@ -30,7 +30,7 @@ export interface FoodStep {
  * at home the locals feed it and refill the reserve, up to what the forage limit left by the armies
  * already there covers; abroad it eats its reserve.
  */
-export function routeFood(w: MoveWorld, a: Army, plan: Pick<RoutePlan, "path" | "arrive">): { steps: FoodStep[]; pointOfNoReturn?: string } {
+export function routeFood(w: MoveWorld, a: Army, plan: Pick<RoutePlan, "path" | "arrive"> & { end?: RoutePlan["end"] }): { steps: FoodStep[]; pointOfNoReturn?: string } {
   const full = a.reserve?.full ?? 0;
   let reserve = a.reserve?.days ?? full;
   let at = a.place;
@@ -50,6 +50,13 @@ export function routeFood(w: MoveWorld, a: Army, plan: Pick<RoutePlan, "path" | 
     at = place;
     prevDay = day;
   });
+  // A route that stops at a castle abroad shows its last province with the reserve left at the end of the
+  // turn, the army standing there until then (D-MOVE-19).
+  const last = steps[steps.length - 1];
+  if (plan.end === "castle" && last && landRule(w, a.owner, last.place).eats !== "locals" && last.arrive < monthLength(w)) {
+    const left = Math.max(0, last.reserve - (monthLength(w) - last.arrive));
+    last.colour = foodColour(full ? left / full : 0);
+  }
   // Point of no return: the last province abroad from which the walk back home still fits in the reserve.
   const home = (p: string) => landRule(w, a.owner, p).eats === "locals";
   let lastHome = home(a.place) ? -1 : undefined;

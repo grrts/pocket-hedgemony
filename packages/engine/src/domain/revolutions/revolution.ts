@@ -161,12 +161,12 @@ export function countriesOf(r: RevoState): string[] {
     .map(([k]) => k);
 }
 
-/** Step 1 of the monthly turn: every revolution in every country. */
+/** Step 1 of the monthly steps: every revolution in every country. */
 export function evaluateAll(r: RevoState): void {
   for (const id of Object.keys(revolutions)) if (r.es.events[id]) for (const c of countriesOf(r)) evaluate(r, id, c);
 }
 
-export type Blocked = E.Ineligible | "not ready" | "same turn" | "grace";
+export type Blocked = E.Ineligible | "not ready" | "same month" | "grace";
 
 /** Why a revolution cannot break out now, or null (REVO-008, REVO-016, REVO-033, INV-REVO-8). */
 export function whyNot(r: RevoState, id: string, country: string): Blocked | null {
@@ -180,7 +180,7 @@ export function whyNot(r: RevoState, id: string, country: string): Blocked | nul
   const at = E.now(r.es.world);
   if (revolution(id).keep_trigger) return holdsFor(r, ev.trigger, roles) ? null : "trigger";
   if (t.stage !== "Ready") return "not ready";
-  if (t.readySince === undefined || t.readySince >= at) return "same turn";
+  if (t.readySince === undefined || t.readySince >= at) return "same month";
   if (t.rearmed && t.rearmedAt !== undefined && at - t.rearmedAt < revolution(id).rearm.grace_years * 12) return "grace";
   return null;
 }
@@ -194,11 +194,11 @@ export function chance(r: RevoState, id: string, country: string): ReturnType<ty
 }
 
 /**
- * The revolutions' part of a monthly turn (spec 9): evaluate signs and
+ * The revolutions' monthly step (spec 9), run in the turn in which a new month begins (X-18): evaluate signs and
  * stages, roll Ready revolutions through the event's selection, then the
  * event ticks (delayed regimes). The caller advances the calendar.
  */
-export function processTurn(r: RevoState, rng: Rng): E.DomainEvent[] {
+export function processMonth(r: RevoState, rng: Rng): E.DomainEvent[] {
   const from = r.log.length;
   for (const id of Object.keys(revolutions)) {
     if (!r.es.events[id]) continue;

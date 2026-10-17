@@ -37,7 +37,7 @@ Each revolution moves through stages for each country.
 | Settlement | A banner says who won, and the won or crushed effects apply |
 | Aftermath | The regime applies; waves, émigrés and reactions abroad follow |
 
-A revolution never fires on the same turn its last needed sign lights. It rolls through the normal selection from then on, so you always get at least one turn with a red card to act. If you ease a sign so that fewer than `need` are lit, the roll stops: opening the castle stores in France so that "Bread is short in a fifth of the realm" goes dark drops it back to Brewing.
+A revolution never fires in the same month its last needed sign lights. It rolls through the normal selection from the next month on, so you always get at least a month with a red card to act. If you ease a sign so that fewer than `need` are lit, the roll stops: opening the castle stores in France so that "Bread is short in a fifth of the realm" goes dark drops it back to Brewing.
 
 ### Stances
 
@@ -322,7 +322,7 @@ Every balance value here is a provisional placeholder.
 | `foreign_backing.mult` | 2 |
 | `foreign_backing.joins_mult` | 1.5 |
 | `foreign_backing.cost` | 1 % of the target's yearly income a month |
-| `foreign_backing.catch_chance` | 3 % a turn |
+| `foreign_backing.catch_chance` | 3 % a month |
 | `foreign_backing.win_opinion` | +25 |
 | `reaction.need_reduction` | 1 sign for 20 years |
 

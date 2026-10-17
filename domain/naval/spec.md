@@ -37,7 +37,7 @@ battles.
 ## 2. Sources
 
 Newest decision first.
-- `planning/gap-lists.md`, "Decisions already made" (16 Oct): one month per turn; multiplayer-friendly orders
+- `planning/gap-lists.md`, "Decisions already made" (16 Oct): one month per turn (since replaced: a turn is one week, X-18); multiplayer-friendly orders
   as data; women can be rulers, lords and commanders; exploration opens with the Age of Exploration; campaign
   ends 31 August 1939.
 - `naval/naval-design.md` (version 1), all sections 1 to 14.
@@ -180,7 +180,7 @@ Newest decision first.
 - NAVY-007: The naval system shall allow shipyard 1 to build galleys and, faster, every hull that needs no
   slipway; shipyard 2 also carracks, armed carracks, galleons, turtle ships and fluyts; shipyard 3 also ships of
   the line, then ironclads and later hulls; the Venetian Arsenal builds as a naval dockyard from the start. [naval §1.2]
-- NAVY-008: Where a lighthouse stands, the naval system shall halve storm losses in its sea zone. [naval §1.2; buildings §7.9]
+- NAVY-008: Where a lighthouse stands, the naval system shall halve the storm chance in the sea zone next to it. [naval §1.2; buildings §7.9] (D-NAVY-7)
 - NAVY-009: Where a ship is crewed in port at a naval base, the naval system shall charge upkeep and food but no
   wages. [naval §1.2, §6.1]
 - NAVY-010: The naval system shall have each ship take one berth, and a ship of the line or anything larger take two. [naval §1.2]
@@ -191,7 +191,7 @@ Newest decision first.
   highest tier among its towns and a shipyard if any of its towns had one. [naval §1.3]
 - NAVY-013: When a campaign starts in 1444, the naval system shall give a great-port province harbour 2; a
   port-tier province harbour 2, or harbour 1 where the town is smaller than the market town harbour 2 needs; a
-  small-harbour province harbour 1; and a canoe-landing province no harbour, extra seafolk and small craft only. [naval §1.3; start-ports.json note]
+  small-harbour province harbour 1; and a canoe-landing province no harbour, 100 extra seafolk and 5 small craft only (provisional, D-NAVY-10). [naval §1.3; start-ports.json note]
 - NAVY-014: When a campaign starts in 1444, the naval system shall give a province marked with a shipyard
   shipyard 1, or shipyard 2 where its holder knows S4 *Carrack and caravel* at the start, and give Venice the
   Venetian Arsenal. [naval §1.3]
@@ -220,11 +220,11 @@ Newest decision first.
   once, with one slider, only for provinces with a harbour. [naval §2.2]
 - NAVY-025: The naval system shall let a muster call, of a province's fighting-age men (a quarter of its people),
   2 in 3 of the seafolk, 1 in 3 of the homeless and 1 in 20 of every other class. [naval §2.2]
-- NAVY-026: When sailors are mustered, the naval system shall take seafolk first. [naval §2.2]
+- NAVY-026: When sailors are mustered, the naval system shall take every callable class by its share, by largest remainder, never seafolk first. [naval §2.2; X-7] (D-NAVY-29)
 - NAVY-027: The naval system shall take sailors from the same people as the levy, so a man at sea cannot be
   levied and the province's levy pool shows the sailors already gone. [naval §2.2]
-- NAVY-028: When a muster is ordered, the naval system shall pay a gold bounty for signing on, lower the
-  province's fish for the seafolk away, and have the sailors ready in that port after a muster time. [naval §2.2, §9]
+- NAVY-028: When a muster is ordered, the naval system shall pay a bounty of 0.05 gold a sailor (rounded), lower the
+  province's fish by seafolk at sea ÷ a third of the province's seafolk, and have the sailors ready in that port after 14 days. [naval §2.2, §9] (D-NAVY-14)
 - NAVY-029: While sailors wait in port, the naval system shall feed each 1 ration a month from the province store
   and pay each 0.1 gold a month. [naval §2.2]
 - NAVY-030: While sailors have waited in port more than 6 months and no ship is being built for them, the naval
@@ -370,10 +370,10 @@ Newest decision first.
   ships to coastal zones; with S1 to ocean zones up to 3 zones from a coast; with S5 *Ocean navigation* to any
   ocean zone. [naval §7.2]
 - NAVY-092: The naval system shall never let galleys enter ocean zones, and shall count junks and dhows as
-  ocean-going in their own monsoon seas from the start (T5 *Monsoon sailing calendars*). [naval §7.2]
+  ocean-going in their own monsoon seas (config) while T5 *Monsoon sailing calendars* is known, as its start regions know it in 1444. [naval §7.2] (D-NAVY-20)
 - NAVY-093: While a fleet sails with the wind of its sea's calendar, the naval system shall halve its days per
   zone; against it, double them; steamships shall ignore wind. [naval §7.3]
-- NAVY-094: While a zone is in its storm season, the naval system shall apply storms as warfare 11.3 sets. [naval §7.3]
+- NAVY-094: While a zone is in its storm season, the naval system shall give each ship at sea and not in port a 1-in-20 chance a month to be struck (Logistics −10 % a point, lighthouse halves); a struck ship loses one hull step and a wrecked one sinks. [naval §7.3; warfare §11.3] (D-NAVY-7)
 - NAVY-095: While Baltic and White Sea zones are frozen in winter, the naval system shall let no fleet enter them,
   and shall ice a fleet caught there into the nearest port. [naval §7.3]
 - NAVY-096: When an army is carried, the naval system shall count its food reserve as loads, each horse as the room
@@ -397,7 +397,7 @@ Newest decision first.
 - NAVY-103: When a season passes in which a pirate coast's home zones saw trade ships pass and no warship hunt
   there, the naval system shall add one ship to its pirate fleet; it shall remove ships taken or sunk. [naval §8]
 - NAVY-104: When a pirate fleet's base (a port province on that coast with no harbour of a realm that hunts it) is
-  burned, the naval system shall end the pirate fleet until trade brings it back. [naval §8]
+  burned (its base is the province config names for the coast, D-NAVY-23), the naval system shall end the pirate fleet until trade brings it back. [naval §8]
 - NAVY-105: Where a pirate people is also a catalogue record (wokou, Orang Laut), the naval system shall let the
   same fleet belong to a lord or be hired. [naval §8]
 - NAVY-106: When an enemy fleet is in a port's zone, the naval system shall block the port (warfare blockade). [naval §8]
@@ -415,7 +415,7 @@ Newest decision first.
 ### AI and the phone
 
 - NAVY-109: Where a country's catalogue personality marks it a sea power (`naval_capability`, `military.naval`,
-  preferred expansion modes), the naval AI shall keep a share of its seafolk at sea, buy trade ships first and buy
+  preferred expansion modes), the naval AI shall keep 1/4 of its callable seafolk at sea (D-NAVY-25), buy trade ships first and buy
   warships when a rival's fleet grows. [naval §11]
 - NAVY-110: Where a country is a land power, the naval AI shall lay its ships up in peace and fit them out when a
   war starts across water. [naval §11]
@@ -428,6 +428,17 @@ Newest decision first.
 - NAVY-115: The naval system shall update sailors in port and ship states once a month with the rest of the province. [naval §11]
 - NAVY-116: The naval system shall fight a sea battle on at most 3 sectors. [naval §11; warfare §11.2]
 - NAVY-117: The naval system shall read all its numbers from one naval config file and the 1444 ports from data. [naval §11, §1.3]
+
+### Decided 17 October
+
+- NAVY-118: When a ship takes hits in a sea battle and stays afloat, the naval system shall lower its hull one step. (D-NAVY-6)
+- NAVY-119: When an admiral is commissioned, the naval system shall charge 10 gold, and while he is at sea pay him three times his wage. (D-NAVY-15)
+- NAVY-120: The naval system shall not let a colonial governor be commissioned as admiral. (D-NAVY-24)
+- NAVY-121: The naval system shall let a port hire foreign sailors of a realm whose trade ships call there, up to 100 a year. (D-NAVY-22)
+- NAVY-122: The naval system shall give each pirate fleet 2 ships at the start and a season of 3 months. (D-NAVY-23)
+- NAVY-123: The naval system shall not let a caravel trade, and a trading ship shall pay the naval upkeep only. (D-NAVY-8)
+- NAVY-124: When a fleet docks in a subject's or lord's port, the naval system shall take its food from that province's store and owe nothing. (D-NAVY-28)
+- NAVY-125: From December to March, the naval system shall close the northern sea zones that froze historically (Gulf of Bothnia, White Sea and the far north; provisional list in config until world-map has it) to fleets, and their ports shall neither launch nor take in ships. (X-17)
 
 ## 6. Commands
 
@@ -493,12 +504,17 @@ Newest decision first.
   carried, the fleet holds him as cargo.
 - When an army boards or lands (troop-movement), then the room of men, horses, guns and food is checked.
 
-## 9. Monthly turn
+## 9. Each turn and each month
 
-Each day of the month (troop-movement day loop): fleets take their step; supply is used per zone; storms,
-ice, docking, resupply (one day) and battles happen on their day.
+Each day of the turn's 7 days (troop-movement day loop): fleets take their step; supply is used per zone; storms,
+ice, docking, resupply (one day) and battles start on their day. Sea battles follow X-1: they are fought over
+time in 4-hour rounds, never resolved at once. While a battle with a player fleet runs, the day loop slows to six
+4-hour steps a day (fleets move a sixth of a day per step and may join), with no skip; the player may retreat at any
+step and switch between running battles. Battles between AI realms fight their six rounds each day inside the normal
+day loop and never slow the game.
 
-Each month, after the province's people and food are known and before the treasury closes:
+In the turn in which a new month begins (X-18), after the province's people and food are known and before the
+treasury closes:
 1. Pay wages (0.2 at sea, 0.1 in port, foreign ×2, naval base none), upkeep and feed sailors in port and
    crewed ships (1 ration each) from the province store. Unpaid: desertion and foreign crews leave.
 2. Sailors waiting more than 6 months drift home (1 in 10).
@@ -554,7 +570,7 @@ All in one naval config file (keys proposed here; the design names only the file
 | naval.step_days | Days per zone (below) | see table | yes | naval |
 | naval.wind_multiplier | With / against the wind | 0.5 / 2 | yes | naval |
 | naval.wind_calendars | Per sea per month | not given (monsoon, trade winds, North Sea/Baltic storms) | yes | naval |
-| naval.storm_seasons / freeze_seasons | Storm and freeze by zone | not given (Baltic and White Sea freeze in winter) | yes | naval |
+| naval.storm_seasons / freeze_seasons | Storm and freeze by zone | December to March: Gulf of Bothnia, White Sea, far north (X-17, `frozenSeas`, provisional) | yes | naval / world-map |
 | naval.ocean_reach_with_s1 | Ocean zones from a coast with S1 | 3 | yes | naval |
 | naval.admiral.might_hits / might_boarding | Per point | +5 % / +10 % | yes | naval |
 | naval.admiral.cunning_days | Per point | −5 % days per zone | yes | naval |
@@ -625,7 +641,7 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | world-map | upstream | Conformist | About 4,700 sea zones (`sea` coastal ~150 km, `ocean` ~300 km), shore tiles, adjacency, provinces for port placement |
 | scenario-setup | downstream | Published Language | `start_ports` (harbour and shipyard per province), canoe landings' extra seafolk and small craft |
 | map-presentation | downstream | Published Language | Port and fleet drawing per zoom, Sea lens, fleet card |
-| time-and-turns | upstream | Conformist | Day loop inside the month, monthly and seasonal steps |
+| time-and-turns | upstream | Conformist | Day loop inside the weekly turn, monthly and seasonal steps (X-18) |
 | events | upstream | Conformist | Ships from events (treasure fleet, gift, wreck) |
 | government | upstream | Conformist | Realms with no officials (chiefdoms, stateless) lead fleets by chiefs or elders |
 
@@ -633,90 +649,44 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 
 - Reads its catalogue personality (`naval_capability`, `military.naval`, preferred expansion modes).
 - Sea powers (Venice, Genoa, Portugal, the Hanse towns, Hormuz, Malacca, Ryukyu) keep a share of their seafolk
-  always at sea, buy trade ships first, and warships when a rival's fleet grows (share not given: OQ-NAVY-25).
+  always at sea, buy trade ships first, and warships when a rival's fleet grows (1/4 of callable seafolk, D-NAVY-25).
 - Land powers lay up their few ships in peace and fit them out when a war starts across water.
 - Every AI keeps a customs officer in each great port it holds, so it has admirals to commission.
 - AI fleets plan with the same zone graph and wind calendar; no fleet AI runs for fleets more than 10 zones from
   the player's realm and ports in peace: their voyages resolve as a day count.
 - The AI uses the same commands as the player (multiplayer decision).
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-NAVY-1: Berths and slipways per step (10/25/50; 1/2/2, Arsenal 3) need a balancing pass with trade's ship
-  numbers. [naval §14.1] Blocks: final config.
-- OQ-NAVY-2: The seafolk share at sea (2 in 3) is high on purpose; lower it if fleets come out too big for small
-  coastal realms. [naval §14.2]
-- OQ-NAVY-3: Women at sea. Naval 14.3 waits on the women question; the 16 Oct decision lets women be rulers, lords
-  and commanders following each country's history. Does it cover admirals (and sailors)? [naval §14.3; gap-lists decisions]
-- OQ-NAVY-4: Ship of the line needs shipyard 3 and S9 (naval 1.2, 3.3), but buildings 7.9 unlocks shipyard step 3
-  only with S10 *Naval dockyards* (and the naval base with S10). Can a realm with S9 but not S10 build any ship of
-  the line? [naval §3.3; buildings §7.9]
-- OQ-NAVY-5: Warfare 11.1 has not adopted naval's asks: no caravel, fluyt or steamer rows; no ship families; crew
-  still "seafolk" not "sailors"; galley crew 150 rowers vs naval 180 sailors (150 row); galley "3 months at sea
-  before port" vs naval galley supply 6 zones; carrack listed as era I (S4) "ocean-going" with no family while
-  naval makes it Trade. 11.2 still reads "Damaged ships repair in a harbour (shipyard twice as fast)" with no
-  admirals, crew share, boarding or prizes; 11.3 *Carry* says "trade ships and galleys carry men", not linking
-  troop movement 11.3 or naval 7.4. [naval §13; warfare §11]
-- OQ-NAVY-6: Damage model: warfare 11.2 counts hits as damage, a ship sinking or taken when hits equal its
-  strength; naval counts hull steps (sound, worn, leaking, wrecked) lost to "battle hits". How many hits make a
-  hull step, and is a damaged-but-afloat ship worn or leaking after battle? Warfare's repair "in a harbour" vs
-  naval's refit only at harbour 2 or a shipyard. [warfare §11.2; naval §4.2, §6.3]
-- OQ-NAVY-7: Storms: warfare 11.3 loses 1 ship in 20 a month in storm season unless in port (reduced by S1, S11,
-  S21); naval adds crew lost to storms, leaking ships losing a hull step, wrecked ships sinking, Logistics −10 %,
-  lighthouse halving, anchorage ships facing storms. How these combine, and what "storm losses" means (ships,
-  crew or hull steps), is not given. Lighthouse area: naval "its sea zone" vs buildings "the sea zone next to it". S21 is era VIII, out of scope. [naval §1.2, §4.2, §5.2, §6.2; warfare §11.3; buildings §7.9]
-- OQ-NAVY-8: Trade 3.2 vs naval 3.3: trade gives the caravel hold ×1 and purse 20 while naval says the caravel is
-  an exploration ship and not a trade ship (blank). Upkeep while trading differs (carrack 1.5 vs naval 3;
-  galleon 2 vs 8; steamer 3 vs "3 + coal"). Trade 2 lists the types that can switch to trade as cog, junk, dhow,
-  carrack; naval says the galleon keeps hold and purse "because trade 3.2 lets it be switched". Trade cites
-  "naval 5.5" (no such section; the rule is 5.1). Which upkeep applies to a trading ship, and can caravels and
-  galleons trade? [naval §3.3, §13; trade §2, §3.2]
-- OQ-NAVY-9: The grievances *Pressed* and *Lost at sea* are not in province stats 12.1's list. [naval §13; province §12.1]
-- OQ-NAVY-10: Canoe landings start with "extra seafolk and small craft" but province stats 16 has no such starting
-  value and no amount is given. [naval §1.3, §13; province §16]
-- OQ-NAVY-11: Recruiting has not adopted that the levy pool counts sailors already gone, nor named commissioning
-  an admiral as the 7.1 act. Recruiting 7.1's years-served bonus (used in the Lagos example: +1 at 5 and 10
-  years) is the only source for that step; confirm. [naval §13; recruiting]
-- OQ-NAVY-12: Country stats 6 *Ships* still reads "building in ports (gold, timber provinces help)"; rows *Sailors*
-  (at sea and in port) and *Admirals* are not added. Province 13 sums Ships as "built at shipyards; based at
-  harbours". [naval §13; country-stats §6; province §13]
-- OQ-NAVY-13: The diplomacy design does not cover docking (peace and no rivalry, no port-access grant), selling
-  hulls to a foreign realm (owner's agreement), or privateers dragging their employer into a war. It also calls
-  "naval captains" officials and leaves sea legs of envoys to naval. [naval §3.4, §5.4, §13; diplomacy]
-- OQ-NAVY-14: Muster numbers missing as rules: the bounty per sailor (examples: 15 gold for 300, 4 for 75), the
-  muster time (example: 2 weeks), the fish-lost formula (−19 % for 280 seafolk away, −5 % for 75 sailors), and
-  the order of classes after seafolk. [naval §2.2, §9]
-- OQ-NAVY-15: Admiral commission cost and pay: the Lagos example has "10 gold commission; his wage ×3 at sea",
-  not stated as a rule. [naval §9]
-- OQ-NAVY-16: Harbour step 3: naval gives "coaling for steamships and later"; buildings 7.9 says "ocean ships and
-  steamships (coal)" and gates step 3's coaling on S13. Do ocean ships need harbour 3? [naval §1.2; buildings §7.9]
-- OQ-NAVY-17: Naval base: buildings 7.9 reads "keep their crews in peace without pay at sea" and adds port
-  reinforcement in sea battles next to it; naval says crewed ships berthed there pay no wages (in port). Which? [naval §1.2, §6.1; buildings §7.9]
-- OQ-NAVY-18: Under-crewing: 4.3 scales days in inverse proportion to crew (half crew, twice the days), 7.1 says
-  under-crewing "doubles" days. Proportional or a flat ×2? [naval §4.3, §7.1]
-- OQ-NAVY-19: Small craft are "Small craft" in the ship table, but 3.2 says every ship type belongs to one of three
-  families; their supply is not given. Built at "any shore" (table) vs "any shore tile with seafolk" (3.5). [naval §3.2, §3.3, §3.5]
-- OQ-NAVY-20: Junks and dhows are ocean-going "in their own monsoon seas from the start (T5)": does this need T5
-  known (T5 has start regions), and which zones are "their own monsoon seas"? [naval §7.2; research-tree T5]
-- OQ-NAVY-21: Later-era ships (ironclads, dreadnoughts, submarines, carriers; S14 to S18) have no crew, cost,
-  months or upkeep; coal for the steamer and powder per voyage have no amounts; S18 *Aircraft carriers* is era VII
-  and may be after 31 August 1939. [naval §3.3; research-tree; gap-lists campaign span]
-- OQ-NAVY-22: Foreign crews: which seafaring peoples call at which ports, and how many sailors can be hired, are
-  not given. [naval §2.3]
-- OQ-NAVY-23: Pirates: "season" length, the starting size of each pirate fleet, the pirate coast list's zones, and
-  the base rule ("a port province on that coast with no harbour of a realm that hunts it") are unclear. [naval §8]
-- OQ-NAVY-24: The official-to-admiral table has no row for the colonial governor (a new official type,
-  exploration 4.2, province 10.2). Can a colonial governor be commissioned as admiral? [naval §5.3; exploration §4.2]
-- OQ-NAVY-25: Sea-power AI keeps "a share of seafolk always at sea": the share is not given. [naval §11]
-- OQ-NAVY-26: Subjects asks naval to define "your sea route" (for *Far away*), a colony's defence by sea, and what
-  counts as an overseas trade empire; naval does not. [subjects §12, §16]
-- OQ-NAVY-27: Map: neighbouring ports share one province (Lübeck, Hamburg, Kiel, Flensburg in
-  *Schleswig-Holstein*; Lisbon and Setúbal in *Setúbal*), Melos and Malé are not land. Rerun `place_ports.py`
-  when gap 25 splits provinces. [naval §1.3, §13]
-- OQ-NAVY-28: Docking in a subject's or lord's port pays food "from that province": the subject's or lord's
-  store, and is anything owed? Not given. [naval §6.3]
-- OQ-NAVY-29: Muster order: 2.2 says "Seafolk are taken first", but the muster preview shows 300 sailors "taken
-  by share: seafolk 280 · homeless 15 · others 5" with far more seafolk callable. First, or by share? [naval §2.2]
+- **D-NAVY-1** (was OQ-NAVY-1) Berths and slipways: keep 10/25/50 berths and 1/2/2 slipways (Arsenal 3) as provisional numbers in `naval.json` (`_provisional`). Balancing changes numbers, not rules.
+- **D-NAVY-2** (was OQ-NAVY-2) The seafolk share that can go to sea stays 2 in 3, provisional. A number to tune, not a rule.
+- **D-NAVY-3** (was OQ-NAVY-3) Women at sea: admirals follow the commander rule of 16 October (each country's history); sailors follow the levy rule. One rule for land and sea.
+- **D-NAVY-4** (was OQ-NAVY-4) Ship of the line needs S9 and a shipyard at step 3, which needs S10, or the Arsenal; with S9 but not S10 a realm builds them only at an Arsenal. Buildings owns the shipyard steps; naval does not add a second gate.
+- **D-NAVY-5** (was OQ-NAVY-5) The naval ship table governs ship types, crews (sailors) and families; warfare keeps strength, room, battle and carry rules and reads the rest from naval. Each fact has one owner.
+- **D-NAVY-6** (was OQ-NAVY-6) Damage: a ship that takes hits in a battle loses one hull step (sound → worn → leaking → wrecked); hits equal to its strength sink or take it. Refit happens at harbour step 2 or a shipyard, as naval says. One step per battle is the simplest rule that keeps both texts.
+- **D-NAVY-7** (was OQ-NAVY-7) Storms: in storm season each ship at sea and not in port has a 1-in-20 chance a month to be struck (Logistics −10 % a point, a lighthouse in the sea zone next to it halves it); a struck ship loses one hull step and a wrecked one sinks with its crew. S21 is out of scope. Hull steps join the two texts without a new mechanic.
+- **D-NAVY-8** (was OQ-NAVY-8) A trading ship pays naval's one upkeep; the caravel cannot trade; cog, junk, dhow, galley, carrack, galleon, fluyt and steamer can. Same as D-TRADE-5.
+- **D-NAVY-9** (was OQ-NAVY-9) *Pressed* and *Lost at sea* are grievances the province context adds to its list. Naval raises them; province owns the list.
+- **D-NAVY-10** (was OQ-NAVY-10) A canoe-landing province starts with 100 extra seafolk and 5 small craft (provisional). A start number, no new rule.
+- **D-NAVY-11** (was OQ-NAVY-11) Commissioning an admiral is recruiting's commission act (X-7); the years-served bonus +1 step at 5 and at 10 years is confirmed, and the levy pool counts sailors already gone. X-7 follows recruiting v3 everywhere.
+- **D-NAVY-12** (was OQ-NAVY-12) The realm card shows Ships, Sailors (at sea and in port) and Admirals; ships are built at shipyards and based at harbours. Naval is the latest text.
+- **D-NAVY-13** (was OQ-NAVY-13) Docking is allowed in the ports of realms at peace and not rivals; selling a hull needs the AI owner's agreement, given when at peace and not rivals; privateers raid only their employer's enemies and never start a war; envoys have no sea legs. No new diplomacy acts needed.
+- **D-NAVY-14** (was OQ-NAVY-14) Muster: bounty 0.05 gold a sailor (300 → 15, 75 → 4, rounded); muster time 14 days; fish lost = seafolk at sea ÷ the third of the province's seafolk who fish (75 of 4600 → 5 %); classes taken by share (D-NAVY-29). Numbers come from the design's examples.
+- **D-NAVY-15** (was OQ-NAVY-15) An admiral's commission costs 10 gold and his wage is ×3 while at sea. The Lagos example becomes the rule.
+- **D-NAVY-16** (was OQ-NAVY-16) Harbour step 3 gives only coaling (S13) and 50 berths; ocean ships need no harbour 3. Ocean-going is set by ship type, not by the port.
+- **D-NAVY-17** (was OQ-NAVY-17) Naval base: crewed ships berthed there pay no wages while in port only. Naval's narrower text is simpler and cheaper to read.
+- **D-NAVY-18** (was OQ-NAVY-18) Under-crewing is proportional: half crew, twice the days. One formula covers every share.
+- **D-NAVY-19** (was OQ-NAVY-19) Small craft belong to the trade family, supply 15 days, built at any shore tile with seafolk. Small craft carry and fish, like trade ships.
+- **D-NAVY-20** (was OQ-NAVY-20) Junks and dhows are ocean-going in their own monsoon seas only with T5 known (T5's start regions have it in 1444); the seas are the Indian Ocean zones of trade's T5 list plus the South China Sea and Java Sea. Uses research's own start knowledge.
+- **D-NAVY-21** (was OQ-NAVY-21) Later ships (ironclad, dreadnought, submarine, aircraft carrier) get provisional crew, cost, months and upkeep in `naval.json`; carriers stay (X-14); steamer coal 1 load a month at sea and powder 1 load a voyage, provisional. X-14 keeps carriers; numbers are provisional.
+- **D-NAVY-22** (was OQ-NAVY-22) Foreign crews: a port can hire sailors of any realm whose trade ships call there, up to 100 a year (provisional). Ties hiring to trade already in the game.
+- **D-NAVY-23** (was OQ-NAVY-23) Pirates: a season lasts 3 months, each pirate fleet starts with 2 ships, and each pirate coast has one base province named in config (provisional). Concrete numbers, no new mechanic.
+- **D-NAVY-24** (was OQ-NAVY-24) A colonial governor cannot be commissioned as admiral. He is bound to his colony.
+- **D-NAVY-25** (was OQ-NAVY-25) The sea-power AI keeps 1/4 of its callable seafolk at sea (provisional). A plain number for the personality.
+- **D-NAVY-26** (was OQ-NAVY-26) "Your sea route" is the shortest charted sea path between the two realms' nearest ports; a colony has no special sea defence; an overseas trade empire is a realm holding a port reachable from its capital only by sea. Each reuses what naval already has.
+- **D-NAVY-27** (was OQ-NAVY-27) One port per province; Melos and Malé stay unplaced until the map gains them. The map owns provinces; naval follows it.
+- **D-NAVY-28** (was OQ-NAVY-28) Docking in a subject's or lord's port takes food from that province's store and nothing is owed. Simplest reading of "from that province".
+- **D-NAVY-29** (was OQ-NAVY-29) Sailors are mustered by share of every callable class, never seafolk first (X-7): 830 callable (770 seafolk, 45 homeless, 15 others) give 300 sailors as 278 seafolk, 16 homeless and 6 others by largest remainder. X-7 rules out "first" orders.
 
 ## 14. Traceability
 
@@ -752,7 +722,7 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | NAVY-023 | sailors.feature | Mustering changes people into sailors who leave their slots empty |
 | NAVY-024 | sailors.feature | Only provinces with a harbour can be picked for a muster |
 | NAVY-025 | sailors.feature | Who can be called, by class |
-| NAVY-026 | sailors.feature | Seafolk are taken first |
+| NAVY-026 | sailors.feature | Sailors are taken by share |
 | NAVY-027 | sailors.feature | A man at sea cannot be levied |
 | NAVY-028 | sailors.feature | The Lagos muster |
 | NAVY-029 | sailors.feature | Sailors in port eat and are paid |
@@ -838,7 +808,7 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | NAVY-091 | sailing.feature | Research opens the sea |
 | NAVY-091 | sailing.feature | Lagos to Arguin with the trades |
 | NAVY-092 | sailing.feature | Galleys never enter the ocean |
-| NAVY-092 | sailing.feature | Junks and dhows sail their own monsoon seas from the start |
+| NAVY-092 | sailing.feature | Junks and dhows sail their own monsoon seas with T5 |
 | NAVY-093 | sailing.feature | Winds |
 | NAVY-093 | sailing.feature | Steamships ignore the wind |
 | NAVY-093 | sailing.feature | Lagos to Arguin with the trades |
@@ -870,3 +840,10 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | NAVY-115 | naval-ai.feature | Sailors in port and ship states update once a month |
 | NAVY-116 | naval-ai.feature | A sea battle has at most 3 sectors |
 | NAVY-117 | — | Configuration structure; checked by config loading, no behaviour |
+| NAVY-118 | fleets-and-hulls.feature | Battle hits lower a hull |
+| NAVY-119, NAVY-120 | admirals.feature | Commission cost and pay; A colonial governor cannot be commissioned |
+| NAVY-121 | sailors.feature | Foreign crews per port and year |
+| NAVY-122 | sea-combat.feature | Pirate fleets at the start |
+| NAVY-123 | buying-ships.feature | Which ships can trade |
+| NAVY-124 | keeping-ships.feature | Docking in a subject's port |
+| NAVY-125 | sailing.feature | Frozen northern seas from December to March |

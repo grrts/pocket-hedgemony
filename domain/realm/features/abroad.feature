@@ -43,9 +43,8 @@ Feature: Abroad
     When "Calais" is settled
     Then they are no longer rivals over it
 
-  @REALM-123 @open-question
+  @REALM-123
   Scenario Outline: Subjects
-    # OQ-REALM-9: subjects design asks for the row to list all kinds
     Given the country "Hungary" has 1 subject
     When <cause>
     Then the country "Hungary" has <count> subjects
@@ -57,6 +56,12 @@ Feature: Abroad
       | the subject wins its independence war          | 0     |
       | it releases the subject                        | 0     |
       | it annexes the subject                         | 0     |
+
+  @REALM-123 @REALM-158
+  Scenario: The Subjects row names the six kinds
+    Given the country "Hungary" has 1 subject
+    When the player opens the country card of "Hungary"
+    Then the Subjects row reads "Vassals, tributaries, unions, marches, colonies and protectorates"
 
   @REALM-123
   Scenario: Subjects pay tribute and send troops
@@ -93,9 +98,8 @@ Feature: Abroad
     When it gives land back
     Then its lands taken fall
 
-  @REALM-126 @open-question
+  @REALM-126 @REALM-158
   Scenario: An envoy is an official abroad
-    # OQ-REALM-2: diplomacy asks to rename the count to Envoy seats
     Given the royal province "Troyes" is run by an official
     When the country "France" sends that official abroad on a marriage mission
     Then "Troyes" pays half until he returns
@@ -109,9 +113,15 @@ Feature: Abroad
     When "England" holds him
     Then the country "France" has one fewer envoy
 
-  @REALM-127 @open-question
+  @REALM-127 @REALM-157 @REALM-158
   Scenario: Merchants are replaced by traders
-    # OQ-REALM-1: trade v2 replaces Merchants with Traders and Trade ships; not yet adopted by country stats
-    Given the country "Venice" places merchants in trade cities under country stats §9
-    When trade v2 applies
-    Then its merchants are counted as traders and trade ships under the trade context
+    Given the country "Venice" has 4 traders and 6 trade ships
+    When the player opens the country card of "Venice"
+    Then the card has the lines "Traders" and "Trade ships" and no line "Merchants"
+    And gold from trade counts deposits from traders, market fees and tolls
+
+  @REALM-158
+  Scenario: The card lines other designs added
+    Given the country "France" is at war
+    When the player opens the country card of "France"
+    Then the card also has the lines "Envoy seats", "Leagues against you", "Pretenders at court", "Arms store", "Powder store", "Prisoners", "Victories / Defeats", "Troop cap" and "Preachers"

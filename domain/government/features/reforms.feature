@@ -29,9 +29,7 @@ Feature: Reforms
       | Tribute empire          | Household realm         | G3 Tax registers or G6 Quipu                       | 150  | 2    |
       | Tribute empire          | Bureaucratic empire     | G4 Examination system                              | 200  | 3    |
       | Horde                   | Household realm         | a palace in a town                                 | 150  | 2    |
-      | Horde                   | Confederation           | no adult heir                                      | 0    | 0    |
       | Feudal realm            | Diet monarchy           | a diet hall                                        | 100  | 0    |
-      | Feudal realm            | Elective monarchy       | the ruling line dies out                           | 0    | 0    |
       | Feudal realm            | Absolute monarchy       | G9 Professional bureaucracy and W12 Standing regiments | 300 | 3  |
       | Diet monarchy           | Absolute monarchy       | G9 Professional bureaucracy and W12 Standing regiments | 300 | 3  |
       | Diet monarchy           | Constitutional monarchy | G14 Written constitution and a parliament house    | 200  | 1    |
@@ -44,7 +42,6 @@ Feature: Reforms
       | City commune            | Merchant republic       | 4 or more traders abroad                           | 100  | 1    |
       | City commune            | Feudal realm            | one family led the city 3 times running            | 150  | 2    |
       | Merchant republic       | Feudal realm            | one family led the city 3 times running            | 150  | 2    |
-      | Merchant republic       | City commune            | trade in debt 3 years running                      | 0    | 1    |
       | Peasant commune         | City commune            | a city in the realm                                | 50   | 0    |
       | City commune            | Constitutional republic | G14 Written constitution and a parliament house    | 150  | 0    |
       | Merchant republic       | Constitutional republic | G14 Written constitution and a parliament house    | 150  | 0    |
@@ -54,13 +51,9 @@ Feature: Reforms
       | Holy rule               | Household realm         | one family chose the ruler 3 times running         | 150  | 1    |
       | Warlord domain          | Shogunate               | holds the imperial capital and 8 or more lords     | 150  | 1    |
       | Warlord domain          | Feudal realm            | G1 Written law codes                               | 100  | 2    |
-      | Shogunate               | Warlord domain          | the shogun loses the capital                       | 0    | 0    |
       | Shogunate               | Constitutional monarchy | G14 Written constitution and a parliament house    | 250  | 4    |
       | Soldier emirs           | Household realm         | one emir's family held the throne 3 reigns         | 150  | 2    |
       | Confederation           | Feudal realm            | one member holds over half the land                | 150  | 3    |
-      | Constitutional monarchy | Constitutional republic | the ruler deposed or abdicates                     | 0    | 0    |
-      | Constitutional republic | Constitutional monarchy | a king invited by parliament                       | 0    | 0    |
-      | Company rule            | Colonial government     | the crown takes over                               | 0    | 1    |
 
   @GOV-028
   Scenario: A reform is refused when a need is missing
@@ -81,9 +74,9 @@ Feature: Reforms
     Then the reform is refused
     And the form of "France" is "Feudal realm"
 
-  @GOV-027 @open-question
+  @GOV-027 @GOV-051
   Scenario Outline: A reform only goes to a listed next form
-    # OQ-GOV-1 and OQ-GOV-2: constitutional reforms and next forms without a reform row
+    # D-GOV-1 and D-GOV-2: only the config's reform rows can be ordered
     Given the country "Testland" has the form "<from>"
     When the country "Testland" reforms to "<to>"
     Then the reform is refused because "<to>" has no reform from "<from>"
@@ -107,10 +100,79 @@ Feature: Reforms
     And the colonial range of "Muscovy" is 20 sea zones
     And succession in "Muscovy" is "eldest heir"
 
-  @GOV-031 @open-question
-  Scenario: Lords lose a step when a reform passes
-    # OQ-GOV-4: which lords lose the step is not stated
-    Given the country "Castile" has the form "Feudal realm" and 9 lords
-    And the country "Castile" meets the needs of the reform to "Absolute monarchy" and has 300 gold
-    When the country "Castile" reforms to "Absolute monarchy"
-    Then 3 lords of "Castile" have lost a loyalty step
+  @GOV-031 @placeholder
+  Scenario: The lords with the lowest loyalty lose a step when a reform passes
+    # config keys: reforms, over_cap.reform.order (D-GOV-4: the New Year order)
+    Given the country "Poland" has the form "Elective monarchy" and 9 lords
+    And the lord "Oleśnicki" has the lowest loyalty
+    And the lords "Tęczyński" and "Tarnowski" share the next lowest loyalty, "Tęczyński" holding more provinces
+    And the country "Poland" meets the needs of the reform to "Feudal realm" and has 100 gold
+    When the country "Poland" reforms to "Feudal realm"
+    Then 2 lords of "Poland" have lost a loyalty step
+    And the lord "Oleśnicki" loses 1 loyalty step
+    And the lord "Tęczyński" loses 1 loyalty step
+    And the lord "Tarnowski" loses no loyalty step
+
+  @GOV-050 @GOV-031 @placeholder
+  Scenario Outline: A condition changes the form by itself
+    # config key: reforms (the rows marked automatic, D-GOV-3)
+    Given the country "Testland" has the form "<from>" and 5 lords
+    And for "Testland" it now holds that "<condition>"
+    When the month ends
+    Then the form of "Testland" is "<to>"
+    And the country "Testland" has paid 0 gold
+    And <slip> lords of "Testland" have lost a loyalty step
+
+    Examples:
+      | from                    | to                      | condition                       | slip |
+      | Feudal realm            | Elective monarchy       | the ruling line dies out        | 0    |
+      | Horde                   | Confederation           | no adult heir                   | 0    |
+      | Shogunate               | Warlord domain          | the shogun loses the capital    | 0    |
+      | Merchant republic       | City commune            | trade in debt 3 years running   | 1    |
+      | Constitutional monarchy | Constitutional republic | the ruler deposed or abdicates  | 0    |
+      | Constitutional republic | Constitutional monarchy | a king invited by parliament    | 0    |
+      | Company rule            | Colonial government     | the crown takes over            | 1    |
+
+  @GOV-050
+  Scenario: A condition change cannot be ordered
+    Given the country "Castile" has the form "Feudal realm"
+    And the country "Castile" has 400 gold
+    When the country "Castile" reforms to "Elective monarchy"
+    Then the reform is refused
+    And the form of "Castile" is "Feudal realm"
+    And the country "Castile" still has 400 gold
+
+  @GOV-051
+  Scenario: A next form with no reform row comes only by revolution or event
+    Given the country "Mexico" has the form "Military junta"
+    When the player opens the government card of "Mexico"
+    Then it shows "Constitutional republic: by revolution or event only" as not met
+
+  @GOV-052 @placeholder
+  Scenario Outline: The AI reforms in January when it meets the needs with gold to spare
+    # config keys: ai.reform_month, ai.reform_gold_reserve_factor
+    Given the country "Castile" has the form "Feudal realm"
+    And the country "Castile" has a diet hall
+    And the country "Castile" has <gold> gold
+    And the date is <date>
+    When the AI of "Castile" considers a reform
+    Then the AI of "Castile" <outcome>
+
+    Examples:
+      | gold | date         | outcome                              |
+      | 200  | January 1450 | orders the reform to "Diet monarchy" |
+      | 199  | January 1450 | orders no reform                     |
+      | 400  | March 1450   | orders no reform                     |
+
+  @GOV-056
+  Scenario Outline: A prince-bishop takes a reformed faith
+    Given the country "Testland" has the form "Prince-bishopric"
+    And the country "Testland" was founded in the faith "Catholic" and now has the state faith "<faith>"
+    And the country "Testland" has 400 gold
+    When the country "Testland" reforms to "Feudal realm"
+    Then the form of "Testland" is "<form>"
+
+    Examples:
+      | faith      | form             |
+      | Protestant | Feudal realm     |
+      | Catholic   | Prince-bishopric |

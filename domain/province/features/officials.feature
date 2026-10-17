@@ -16,10 +16,10 @@ Feature: Officials and their types
       | type             | effect                                                                                  |
       | tax collector    | +20 % of tax owed reaching you                                                          |
       | steward          | +10 % food from the tiles and a local store that rots half as fast                      |
-      | judge            | riots needing one grievance more, rebels needing 5, and Broken charter fading twice as fast |
+      | judge            | riots needing one grievance more and Broken charter fading twice as fast                |
       | master of works  | buildings and roads 25 % cheaper and twice as fast, and burned tiles rebuilt twice as fast |
-      | muster master    | recruits refilling 25 % faster and levies taking homeless men first                     |
-      | customs officer  | +15 % traders passing and tolls and market fees collected in full                       |
+      | muster master    | recruits refilling 25 % faster                                                          |
+      | customs officer  | +15 % trade ratio gain                                                                  |
       | chaplain         | faith mix moving twice as fast toward the ruler's faith                                 |
       | schoolmaster     | tongue mix moving twice as fast toward the ruler's tongue and students graduating a year sooner |
       | warden           | a garrison fighting 25 % better, walls repairing twice as fast and a castle store rotting half as fast |
@@ -99,3 +99,26 @@ Feature: Officials and their types
     Given the country "France" has 18 officials in royal provinces and 22 elsewhere in its service
     When the game works out the province's stats
     Then the country card shows 40 officials
+
+  @PROV-299 @placeholder
+  Scenario Outline: Officials learn by tongue
+    Given an official of the "<official>" tongue runs a province of the "<people>" tongue
+    Then he learns the province in <years> years
+
+    Examples:
+      | official | people  | years |
+      | French   | French  | 5     |
+      | French   | Picard  | 7     |
+      | French   | Breton  | 10    |
+
+  @PROV-191
+  Scenario Outline: How many provinces one official runs
+    Given the country "France" knows <inventions>
+    Then one official runs <count> provinces
+
+    Examples:
+      | inventions    | count |
+      | G1            | 1     |
+      | G1 and G9     | 2     |
+      | G9 and G16    | 3     |
+      | G9 and G11    | 3     |

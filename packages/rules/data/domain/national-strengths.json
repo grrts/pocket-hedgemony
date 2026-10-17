@@ -55,8 +55,9 @@
    "max_per_country": 3,
    "max_active": 2,
    "mark_after_years": 25,
-   "mark_share": 0.33,
-   "$comment": "A heyday wakes when its age is active and its 'wakes' condition holds. It sleeps while 'wakes' fails, and ends for good when its age ends or 'ends' holds. A heyday that ran 25 years in total leaves a mark: a permanent echo worth a third of its points (the 'mark' block, or its first lever at a third of its value)."
+   "mark_share": 0.3333333333333333,
+   "$comment": "A heyday wakes when its age is active and its 'wakes' condition holds. It sleeps while 'wakes' fails, and ends for good when its age ends or 'ends' holds. A heyday that ran 25 years in total leaves a mark: a permanent echo worth a third of its points (the 'mark' block, or its first lever at a third of its value).",
+   "$comment_mark": "D-HER-14: a mark is a legacy and counts toward max_legacies."
   },
   "ambitions": {
    "active": 3,
@@ -79,7 +80,7 @@
     ]
    },
    "envoy_reveal_years": 2,
-   "$comment_envoy": "An envoy kept at a foreign court this many years learns the hint and warmth of one of that country's active ambitions, never its plain goal. The diplomacy design decides how envoys are stationed.",
+   "$comment_envoy": "D-HER-11: a resident envoy (diplomacy) kept this many years at a foreign court learns the hint and warmth of one of that country's active ambitions, never its plain goal.",
    "history_mode_setting": {
     "values": [
      "drawn",
@@ -92,11 +93,13 @@
    "$comment_legacies": "A sixth legacy asks the player which one to let go.",
    "never_revealed": true,
    "warmth_bands": {
-    "$comment": "Share of the goal's leaf conditions that hold.",
+    "$comment": "D-HER-13: cold under a third, warm under two thirds, hot from two thirds.",
     "cold": 0.0,
-    "warm": 0.34,
-    "hot": 0.67
-   }
+    "warm": 0.3333333333333333,
+    "hot": 0.6666666666666666
+   },
+   "pool_max": 7,
+   "$comment_pool": "D-HER-10: a pool holds pool_min_* to pool_max entries; age ambitions join on top and do not count."
   },
   "burden": {
    "per_country_max": 1,
@@ -106,15 +109,23 @@
   "inheritance": {
    "$comment": "What happens to heritage when countries change hands.",
    "annexed_birthright": "dormant_claim",
-   "dormant_claim_wakes_if": "owns the annexed country's capital and has held a majority of its homeland provinces for 30 years, and the annexed country's primary culture is accepted (culture design) or is the owner's own",
+   "dormant_claim_wakes_if": "owns the annexed country's capital and has held a majority of its homeland provinces for claim_years (D-HER-1: no culture test)",
    "max_birthrights": 2,
    "released_country": "gets its own catalogue heritage, or the generated heritage of its archetype if it is not in the catalogue",
-   "formed_country": "keeps the forming country's birthright and legacies, gains the formed country's authored heritage if any, and draws ambitions from both pools",
-   "subject": "keeps its full heritage; an overlord's legacies never apply to subjects"
+   "formed_country": "keeps the forming country's own birthright and legacies, gains the formed country's authored heritage if any (its birthright second), and draws ambitions from both pools; any other birthright of the forming country becomes a dormant claim again (D-HER-17)",
+   "subject": "keeps its full heritage; an overlord's legacies never apply to subjects",
+   "claim_years": 30
   },
   "ai": {
    "ambition_goal_weight": 1.5,
-   "$comment": "The AI treats its active ambitions (it always sees them) as goals with this weight next to its catalogue ai_personality priorities. An AI that completes one gets its legacy like a player."
+   "$comment": "The AI treats its active ambitions (it always sees them) as goals with this weight next to its catalogue ai_personality priorities. An AI that completes one gets its legacy like a player.",
+   "sleep_heyday": "fewest_points",
+   "let_go_legacy": "fewest_points",
+   "$comment_choices": "D-HER-12: the AI sleeps the awake heyday, and lets go the legacy, with the fewest lever points; ties go to the one held longest."
+  },
+  "timing": {
+   "$comment": "D-HER-9, X-18: heritage is evaluated once per turn (one week), in the events step after the event tree, and counts time in months by the date: a month is added only in the turn in which a new month begins.",
+   "months_per_year": 12
   }
  },
  "units": {
@@ -142,8 +153,8 @@
    "params": [
     "where"
    ],
-   "owner": "province-stats 7.3",
-   "meaning": "Profit from wares sold, fees and tolls in the affected provinces.",
+   "owner": "trade v2 (X-6)",
+   "meaning": "Percent on the trade ratio gain in the affected provinces.",
    "better": "higher"
   },
   "toll_gold_pct": {
@@ -572,8 +583,8 @@
    "unit": "count",
    "points": 1.0,
    "params": [],
-   "owner": "trade design (provisional); country-stats 9 merchants",
-   "meaning": "Extra trader units you can field.",
+   "owner": "trade v2 (X-6)",
+   "meaning": "Extra traders at the campaign start.",
    "better": "higher"
   },
   "trader_gain_pct": {
@@ -583,8 +594,8 @@
    "params": [
     "route_kind"
    ],
-   "owner": "trade design (provisional)",
-   "meaning": "Value a trader collects each month on its route (land, river or sea).",
+   "owner": "trade v2 (X-6)",
+   "meaning": "Percent on each deposit a trader makes (land, river or sea).",
    "better": "higher"
   },
   "traders_passing_pct": {
@@ -594,8 +605,8 @@
    "params": [
     "where"
    ],
-   "owner": "province-stats 7.2",
-   "meaning": "Traders passing through the affected provinces.",
+   "owner": "trade v2 (X-6)",
+   "meaning": "Percent on the trade ratio gain in the affected provinces.",
    "better": "higher"
   },
   "invention_cost_pct": {
@@ -708,7 +719,7 @@
    "params": [
     "building"
    ],
-   "owner": "province-stats 4",
+   "owner": "buildings design",
    "meaning": "Gold and time for the named building (negative is cheaper).",
    "better": "lower"
   },
@@ -719,8 +730,8 @@
    "params": [
     "building"
    ],
-   "owner": "province-stats 4",
-   "meaning": "The named building can be built before its invention is known.",
+   "owner": "buildings design",
+   "meaning": "The named building, or a unique variant from buildings 9.2 (D-HER-7), can be built before its invention is known.",
    "better": "higher"
   },
   "invention_known": {
@@ -764,7 +775,7 @@
    "params": [
     "stat"
    ],
-   "owner": "event-tree statistics.yaml",
+   "owner": "events (stat_mapping, D-EVT-4)",
    "meaning": "Compatibility lever for the event tree's abstract stats (legitimacy, stability, prestige). Each unit costs the points set in heritage-rules.json stat_points.",
    "better": "higher"
   },
@@ -820,8 +831,6 @@
   "ship_build_pct",
   "crew_pct",
   "sea_days_pct",
-  "trader_count",
-  "trader_gain_pct",
   "faith_shift_pct",
   "tongue_shift_pct",
   "envoy_count",
@@ -4725,5 +4734,11 @@
     }
    ]
   }
- }
+ },
+ "_provisional": [
+  "rules.inheritance.claim_years",
+  "rules.ambitions.pool_max",
+  "rules.ai.sleep_heyday",
+  "rules.ai.let_go_legacy"
+ ]
 }

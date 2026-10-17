@@ -20,7 +20,7 @@ Feature: Kinds of soldiers and their break points
       | levy              | 25    | free for the first 3 months, then normal pay     |
       | retinue           | 35    | paid by the lord                                 |
       | hired company     | 35    | three times normal pay                           |
-      | standing regiment | 40    | 1.5 times normal pay, all year                   |
+      | standing regiment | 30    | 1.5 times normal pay, all year                   |
       | garrison          | 40    | normal pay                                       |
       | rebel band        | 20    | loot                                             |
 
@@ -69,9 +69,9 @@ Feature: Kinds of soldiers and their break points
 
   @WAR-020
   Scenario: Standing regiments keep drill and scars through peace
-    Given a standing regiment with drill 12 and scars 3
+    Given a standing regiment with drill 24 and scars 3
     When a year of peace passes
-    Then the company has drill 12
+    Then the company has drill 24
 
   @WAR-021 @WAR-030
   Scenario: Garrisons count against their castle's room

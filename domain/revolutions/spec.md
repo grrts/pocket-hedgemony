@@ -95,7 +95,7 @@ Newest decision first.
 - INV-REVO-3: each event has exactly one option with `history: true`.
 - INV-REVO-4: the card is shown only when all requirements hold and at least one sign is lit.
 - INV-REVO-5: `warn_at` ≤ `need` ≤ number of signs.
-- INV-REVO-6: a revolution never fires in the same turn its last needed sign lights.
+- INV-REVO-6: a revolution never fires in the same month its last needed sign lights.
 - INV-REVO-7: a revolution that applied a regime (won) does not re-arm.
 - INV-REVO-8: a revolution cannot happen outside its event's `availability` window, era or period window.
 
@@ -123,7 +123,7 @@ Newest decision first.
 
 ### Domain services
 
-- **Card evaluator**: evaluates requirements and signs each turn per country and sets the stage.
+- **Card evaluator**: evaluates requirements and signs each month per country and sets the stage.
 - **Regime applier**: applies a regime package (`regime` effect) and `lock`.
 - **Re-arm keeper**: tracks stopped revolutions and their grace period.
 - **Revolution build** (offline tool): validates the layer and compiles it into event-tree format.
@@ -151,7 +151,7 @@ Newest decision first.
   with text and stance options), Struggle (option effects; for Fight a tagged rising, shown on the map with
   its camps), Settlement (a banner says who won; `rising_won` or `rising_crushed` applies) and Aftermath
   (the regime applies; wave, émigrés and abroad reactions). [revolutions §2]
-- REVO-008 If the last needed sign lights this turn, then the game shall not fire the revolution this turn; it
+- REVO-008 If the last needed sign lights this month, then the game shall not fire the revolution this month; it
   rolls through the normal selection so the player can still act once the card is red. [revolutions §2]
 - REVO-009 When the lit signs fall below `need`, the game shall stop the roll. [revolutions §2]
 
@@ -308,7 +308,7 @@ Newest decision first.
 - REVO-062 While a revolution is funded, the game shall set `revolution_funded` on the target, apply the spark
   "Foreign gold backs the movement" ×2 (added to every revolution by the build), and multiply its camp's join
   shares by 1.5 if it becomes a rising. [revolutions §7.1; reference.yaml foreign_backing]
-- REVO-063 Each turn while funding runs, the game shall roll a chance of being caught (3 %, +1 % while the target is at peace and +1 % with officials in at least half its provinces; the two
+- REVO-063 Each month while funding runs, the game shall roll a chance of being caught (3 %, +1 % while the target is at peace and +1 % with officials in at least half its provinces; the two
   additions are provisional, D-REVO-1). [revolutions §7.1]
 - REVO-064 When the funding is caught, the game shall end it, give the target the opinion reason "Funded a
   revolution against us" and a reason to fight against the funder, and name the funder on the card.
@@ -404,7 +404,7 @@ Newest decision first.
   `separation_of_church_and_state` may follow (owned by religion; their requirements can read
   `revolutionary_regime`).
 
-## 9. Monthly turn
+## 9. Monthly steps
 
 Reads first: grievances per province, class shares, lords and loyalty, debt, stability, legitimacy, ideology
 and faith shares, wars lost, colonies, funding state.
@@ -416,7 +416,7 @@ and faith shares, wars lost, colonies, funding state.
 5. Apply delayed regimes (`after_years`).
 6. Decree limits tick (once per season, harvest, years).
 
-A revolution never fires on the turn its last needed sign lit (REVO-008). The global order is time-and-turns'.
+These run in the turn in which a new month begins (X-18). A revolution never fires in the month its last needed sign lit (REVO-008). The global order is time-and-turns'.
 
 ## 10. Configuration
 
@@ -438,7 +438,7 @@ A revolution never fires on the turn its last needed sign lit (REVO-008). The gl
 | foreign_backing.mult | Spark multiplier while funded | 2 | yes | data/reference.yaml |
 | foreign_backing.joins_mult | Join multiplier while funded | 1.5 | yes | data/reference.yaml |
 | foreign_backing.cost | Monthly cost | 1 % of target's yearly income | yes | revolutions-design §7.1 |
-| foreign_backing.catch_chance | Chance caught per turn | 3 % | yes | revolutions-design §7.1 |
+| foreign_backing.catch_chance | Chance caught per month | 3 % | yes | revolutions-design §7.1 |
 | foreign_backing.win_opinion | Opinion of funder after win | +25 | yes | revolutions-design §7.1 |
 | reaction.need_reduction | Lower `need` under reaction | 1 sign for 20 years | yes | data/regimes.yaml |
 
@@ -632,7 +632,7 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 | Requirement | Feature file | Scenario |
 |---|---|---|
 | REVO-001 – 006, 078 | revolution-card.feature | Card shown, hidden, ordered, coloured (French Revolution) |
-| REVO-007 – 009 | stages.feature | Stages; never the same turn; easing stops the roll |
+| REVO-007 – 009 | stages.feature | Stages; never the same month; easing stops the roll |
 | REVO-010 – 017 | signs-and-trigger.feature | Compiled trigger; new conditions; windows; keep_trigger |
 | REVO-018 – 025 | stances.feature | Lead, Bend, Fight, Path; after_years; Bloodshed; labels |
 | REVO-026 – 031 | camps.feature | Camps replace the join table |

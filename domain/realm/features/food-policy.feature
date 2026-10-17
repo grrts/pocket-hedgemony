@@ -70,9 +70,8 @@ Feature: The Food policy screen
       | 6       |
       | 12      |
 
-  @REALM-045 @open-question
+  @REALM-045
   Scenario Outline: Army refill at home
-    # OQ-REALM-3: warfare takes from the castle first, then the locals
     Given a French army refills its food reserve at home in "Troyes", a lord's province "Dijon" or a royal province
     When the army refill rule is "<rule>"
     Then <result>
@@ -106,7 +105,7 @@ Feature: The Food policy screen
     Examples:
       | rule                         | result                          |
       | Keep                         | stays and rots                  |
-      | Sell on the market           | is sold for gold                |
+      | Sell to the treasury         | is sold to the treasury for gold |
       | Send to the capital castle   | goes to the castle of the capital |
       | Send to subjects or allies   | goes to subjects or allies      |
 
@@ -139,4 +138,23 @@ Feature: The Food policy screen
   Scenario: The Merchant preset sells the surplus
     Given the country "Venice" keeps its surplus
     When the country "Venice" picks the food preset "Merchant"
-    Then its surplus rule is "Sell on the market"
+    Then its surplus rule is "Sell to the treasury"
+
+  @REALM-172
+  Scenario: Armies at home take from their castle first by default
+    Given the country "France" has not changed its army refill rule
+    When a French army refills its food reserve at home in "Troyes"
+    Then the army refill rule is "Castles hand out first"
+    And the castle hands it out before the locals give
+
+  @REALM-042 @REALM-167 @placeholder
+  Scenario Outline: Frontier and capital castles count double
+    # config: food_year.favoured_weight
+    Given the castles of "Paris" (capital, 100 people), "Calais" (border, 100 people) and "Troyes" (100 people)
+    When the castle shares are set to "<rule>"
+    Then "<castle>" gets half of the food and the other two a quarter each
+
+    Examples:
+      | rule           | castle |
+      | Frontier first | Calais |
+      | Capital first  | Paris  |

@@ -32,9 +32,8 @@ Feature: The event tree's statistics
       | opinion       | -200 to 200|
       | trust         | 0 to 100   |
 
-  @EVT-056 @open-question
+  @EVT-056
   Scenario Outline: Abstract stats land on concrete stats
-    # OQ-EVT-4: the rename pass is not done; some stats have no mapping
     Given an event applies "<effect>" to the province "Troyes"
     When the effect lands
     Then <result>
@@ -48,3 +47,20 @@ Feature: The event tree's statistics
       | infrastructure +1  | its road goes one step up                    |
       | industry +1        | one factory                                  |
       | disease_burden +40 | a plague outbreak                            |
+
+  @EVT-056
+  Scenario Outline: Notoriety and trust land in diplomacy
+    Given the country "Italy" has no notoriety of its own in the event tree
+    When an event applies "<effect>" to "Italy"
+    Then the change is handed to diplomacy as <landing>
+    And the event tree stores no "<stat>" for "Italy"
+
+    Examples:
+      | effect        | landing              | stat      |
+      | notoriety +30 | a notorious deed     | notoriety |
+      | trust -10     | an oath broken       | trust     |
+
+  @EVT-056
+  Scenario: integration_strain is only read
+    When an event tries to change "integration_strain"
+    Then the change is refused because events only read it

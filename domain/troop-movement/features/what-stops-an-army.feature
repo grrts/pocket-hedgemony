@@ -65,7 +65,7 @@ Feature: What stops an army
   Scenario: The planner routes to a castle, never through it
     Given the province "Langres" has a hostile garrisoned castle on the way to "Dijon"
     When the player plans a route to "Dijon"
-    Then the route ends at "Langres" with "stops at Langres until the castle falls"
+    Then the route ends at "Langres" with "stops at Langres on day 8 until the castle falls"
     And the leg to "Dijon" is drawn in grey
 
   @MOVE-048 @MOVE-054
@@ -84,12 +84,13 @@ Feature: What stops an army
       | land of a realm granting passage     | may     | the reserve                                  |
       | land nobody owns                     | may     | the reserve, then plunder                    |
 
-  @MOVE-048 @MOVE-050 @open-question
-  # OQ-MOVE-7: diplomacy lets an army enter without passage as an act of war
+  @MOVE-048 @MOVE-050
+  # D-MOVE-7: no order takes an army into a realm that grants no passage
   Scenario: A realm without passage is closed
     Given the realm "Savoy" is at peace with "France" and grants no passage
     When the army "A" of "France" plans a route whose only way runs through "Savoy"
     Then the planner says "needs passage from Savoy"
+    And no order can march the army "A" into "Savoy"
 
   @MOVE-049
   Scenario: Passage withdrawn on the march
@@ -112,7 +113,7 @@ Feature: What stops an army
   @MOVE-053
   Scenario: Food running out doesn't stop the army
     Given the reserve of the army "A" runs out on the step into "Langres"
-    When the month is played
+    When the weekly turns of the month are played
     Then the army "A" keeps marching
     And its route is red from "Langres"
     And the player gets one notice

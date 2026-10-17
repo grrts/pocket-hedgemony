@@ -91,3 +91,21 @@ export const badgeCount = (list: AttentionList): number => visibleLines(list).le
 export const bellLit = (list: AttentionList): boolean => visibleLines(list).some((l) => l.group === "Warnings");
 
 export const openWarnings = (list: AttentionList): number => visibleLines(list).filter((l) => l.group === "Warnings").length;
+
+/** The screen's title (D-SHELL-15). */
+export const attentionTitle = (): string => config.strings.attentionTitle;
+
+/** The two mute buttons on every line, also shown in the explanation a long press opens (SHELL-087, D-SHELL-10). */
+export function muteButtons(): { label: string; scope: "item" | "kind" }[] {
+  return Object.entries(config.muteButtons).map(([label, scope]) => ({ label, scope: scope as "item" | "kind" }));
+}
+
+/** A long press opens the line's explanation, holding the same two mute buttons as the line (D-SHELL-10). */
+export function explainLine(line: AttentionLine): { text: string; buttons: string[] } {
+  return { text: sentence(line), buttons: muteButtons().map((b) => b.label) };
+}
+
+/** The mutes as the save keeps them (X-16). */
+export function mutesForSave(list: AttentionList): { items: string[]; kinds: AttentionKind[] } {
+  return { items: [...list.mutedItems].sort(), kinds: [...list.mutedKinds].sort() };
+}

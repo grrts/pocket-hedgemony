@@ -327,7 +327,10 @@ Given(/^the game launches for the first time (on .*)$/, (s, on: string) => {
   else if (on.includes("Steam Machine") && !on.includes("not a")) f = { runtime: "electron", steamMachine: true };
   else if (on.startsWith("on Electron")) f = { runtime: "electron" };
   else if (on === "on the web") f = { runtime: "web" };
-  else throw new Error(`no launch facts for: ${on}`);
+  else if (/^on the profile "(.+)"$/.test(on)) {
+    setProfile(s, profileOf(/^on the profile "(.+)"$/.exec(on)![1]!));
+    return;
+  } else throw new Error(`no launch facts for: ${on}`);
   s.launch = f;
 });
 When("the profile is detected", (s) => {
@@ -472,7 +475,7 @@ Given("the player has queued {int} orders", (s, n: number) => {
   for (let i = 0; i < n; i++) s.session.orders.push({ type: "move", army: i, to: i + 1 });
   s.before = structuredClone(s.session);
 });
-When("the player opens Settings from the pause menu and closes it", (s) => {
+When("the player opens Settings from the game menu and closes it", (s) => {
   act(s);
   expect(T.openPauseMenu("Esc").offers).toContain("Settings");
   const scr = T.openSettings(st(s), env(s));
@@ -509,7 +512,7 @@ When("the player presses {string}", (s, button: string) => {
     s.verb = T.pressButton(scr, button);
   } else s.pause = T.openPauseMenu(button);
 });
-Then("the pause menu opens, from which Settings opens", (s) => {
+Then("the game menu opens, from which Settings opens", (s) => {
   expect(s.pause.pauseMenu).toBe(true);
   expect(s.pause.offers).toContain("Settings");
 });
@@ -839,7 +842,7 @@ Then("the {int} settings are unchanged", (s, n: number) => {
 Given("a campaign was begun with {string} set to {string}", (s, rule: string, value: string) => {
   s.campaignRules = { [rule]: value };
 });
-When("the player opens Pause → Campaign rules", (s) => {
+When("the player opens Settings → Campaign rules", (s) => {
   act(s);
   s.rulesView = T.campaignRulesView(s.campaignRules);
 });
@@ -1738,8 +1741,8 @@ Then("the cursor speed is Slow, the screen margin is 5 % and focus outlines are 
   expect(T.focusOutlines(st(s))).toBe(true);
   expect(st(s).controllerPrompts).toBe(false);
 });
-Given(/^(a panel is open over the map|nothing is open over the map|the pause menu is open over the map)$/, (s, state: string) => {
-  s.back = { panelsOpen: state.startsWith("a panel") ? 1 : 0, pauseMenuOpen: state.startsWith("the pause") };
+Given(/^(a panel is open over the map|nothing is open over the map|the game menu is open over the map)$/, (s, state: string) => {
+  s.back = { panelsOpen: state.startsWith("a panel") ? 1 : 0, pauseMenuOpen: state.startsWith("the game menu") };
 });
 When("the player uses the system back gesture", (s) => {
   act(s);
@@ -1748,8 +1751,8 @@ When("the player uses the system back gesture", (s) => {
 Then("the top panel closes", (s) => {
   expect(s.backResult).toBe("close the top panel");
 });
-Then("the pause menu opens", (s) => {
-  expect(s.backResult).toBe("open the pause menu");
+Then("the game menu opens", (s) => {
+  expect(s.backResult).toBe("open the game menu");
 });
 Then("the game does not quit without asking", (s) => {
   expect(s.backResult).toBe("ask before quitting");
@@ -1778,4 +1781,231 @@ Then(/^"Sharpness" is "([^"]*)", "Frame rate cap" is "([^"]*)", "Map detail" is 
     map_detail: T.parseValue(CAT, "graphics.map_detail", detail),
     animations: T.parseValue(CAT, "graphics.animations", anim),
   });
+});
+
+// ---------------------------------------------------------------- decided rules (D-SET-*, X-1, X-17, X-18)
+
+Then("{string} is {int} and shows {string}", (s, name: string, value: number, shown: string) => {
+  const sid = id(name);
+  expect(T.valueOf(st(s), sid)).toBe(value);
+  expect(T.rowView(st(s), sid).setBy).toBe(shown);
+});
+Then("the map redraws only on change", (s) => {
+  expect(T.mapRedraws(st(s), false)).toBe(false);
+  expect(T.mapRedraws(st(s), true)).toBe(true);
+});
+Then("the AI turn's work-step budget is the same as with Battery saver off", (s) => {
+  const sets = (T.resolve(CAT, "graphics.battery_saver").sets_when_on ?? {}) as Record<string, unknown>;
+  expect(Object.keys(sets).some((k) => k.startsWith("engine."))).toBe(false);
+});
+
+Given("the Attention screen has {int} lines", (s, n: number) => {
+  s.attention = n;
+});
+Given("{int} events are unanswered", (s, n: number) => {
+  s.unanswered = n;
+});
+When("the player ends the turn", (s) => {
+  act(s);
+  s.pressed = T.endTurnPress(st(s), s.attention, s.unanswered);
+});
+Then("the turn ends with one tap", (s) => expect(s.pressed).toEqual({ ends: true }));
+Then("a question is asked", (s) => expect(s.pressed).toMatchObject({ asks: true }));
+Then('the question names the count with "Look" and "End turn anyway"', (s) => {
+  expect(s.pressed).toEqual({ asks: true, names: s.attention });
+});
+Then("End turn opens the first unanswered event instead", (s) => {
+  expect(s.pressed).toEqual({ opens: "the first unanswered event" });
+});
+
+When("a player battle runs", (s) => {
+  act(s);
+  s.stepSeconds = T.battleStepSeconds(st(s));
+});
+Then("the turn does not stop", (s) => {
+  expect(T.resolve(CAT, "gameplay.battle_speed").options).not.toContain("stop");
+});
+Then(/^each 4-hour step plays back in ([\d.]+) seconds$/, (s, sec: string) => {
+  expect(s.stepSeconds).toBeCloseTo(Number(sec), 6);
+});
+
+Given(/^the system language is (supported|not supported)$/, (s, sup: string) => {
+  s.languageSupported = sup === "supported";
+});
+Given("the privacy design does not require consent", (s) => {
+  s.consent = false;
+});
+When("the first-launch questions run", (s) => {
+  act(s);
+  s.questions = T.firstLaunchQuestions(st(s).profile, { languageSupported: s.languageSupported, consentRequired: !!s.consent });
+});
+Then("the questions shown are {string}", (s, q: string) => {
+  expect(s.questions.length ? (s.questions as string[]).join(", ").replace(/, (?=[^,]*$)/, ", ") : "none").toBe(q === "none" ? "none" : q.split(/, /).join(", "));
+});
+Then("no settings wizard is shown", (s) => {
+  expect(s.questions.length).toBeLessThanOrEqual(2);
+});
+
+Given("a campaign as {string} is loaded", (s, nation: string) => {
+  s.nation = nation;
+});
+When("the player opens the game menu", (s) => {
+  act(s);
+  s.menu = T.openPauseMenu("Esc");
+});
+Then("it offers Settings, opening over the dimmed map", (s) => {
+  expect(s.menu.pauseMenu).toBe(true);
+  expect(s.menu.offers).toEqual(["Settings"]);
+});
+Then("Settings holds Campaign rules, a read-only section", (s) => {
+  const v = T.campaignRulesView({});
+  expect(v.rows.length).toBeGreaterThan(0);
+  for (const r of v.rows) expect(r.editable).toBe(false);
+});
+
+Given("the game runs with touch", (s) => {
+  setProfile(s, "phone");
+});
+Then(/^the action bar and the End turn button are on the (left|right) side$/, (s, side: string) => {
+  const l = T.mainHandLayout(st(s));
+  expect([l.action_bar, l.end_turn]).toEqual([side, side]);
+});
+Then(/^the game menu button is on the (left|right) side$/, (s, side: string) => {
+  expect(T.mainHandLayout(st(s)).game_menu).toBe(side);
+});
+
+When(/^the player holds a finger on a stat for ([\d.]+) seconds$/, (s, held: string) => {
+  act(s);
+  s.held = Number(held);
+});
+Then(/^the tooltip (shows|does not show)$/, (s, r: string) => {
+  expect(s.held >= T.longPressSeconds(st(s))).toBe(r === "shows");
+});
+
+When(/^the player (left-clicks the army "[^"]+" and right-clicks the province "[^"]+"|clicks the army "[^"]+" and clicks the province "[^"]+")$/, (s, how: string) => {
+  act(s);
+  s.ordered = T.marchOrderBy(st(s), how.includes("right-clicks") ? ["left", "right"] : ["left", "left"]);
+});
+Then("the army {string} is ordered to march to {string}", (s, _a: string, _p: string) => {
+  expect(s.ordered).toBe(true);
+});
+
+// Keys and controller (D-SET-3, D-SET-4, X-1)
+const KEY_NAMES: Record<string, string> = { Left: "ArrowLeft", Right: "ArrowRight", Up: "ArrowUp", Down: "ArrowDown", Esc: "Escape" };
+const KEY_ACTIONS: Record<string, string> = {
+  "pan up": "pan_up", "pan left": "pan_left", "zoom in": "zoom_in", "zoom out": "zoom_out", "the game menu opens": "pause_menu",
+  'the lens "realms"': "lens_1", 'the lens "terrain"': "lens_2", 'the lens "people"': "lens_3", 'the lens "wealth"': "lens_4", 'the lens "walls"': "lens_5", 'the lens "food"': "lens_6",
+  "the next lens": "lens_next", "the next army": "army_next", "the previous army": "army_prev", "the next notification": "notification_next", "the turn report": "turn_report", "jump to capital": "jump_capital", "the ledger": "ledger",
+};
+Given("the key bindings are the defaults", (s) => {
+  s.keys = T.keyBindings(st(s));
+});
+When("the player presses {string} on the map", (s, key: string) => {
+  act(s);
+  const k = KEY_NAMES[key] ?? key;
+  s.happened = Object.entries(s.keys as Record<string, string[]>).filter(([, keys]) => keys.includes(k)).map(([a]) => a);
+});
+const PAD_SETS: Record<string, "map" | "menu" | "battle"> = { map: "map", menu: "menu", "battle view": "battle" };
+const PAD_ACTIONS: Record<string, Record<string, string>> = {
+  map: { "the map cursor moves": "cursor", "the camera pans": "pan", "zoom out": "zoom_out", "zoom in": "zoom_in", select: "select", "deselect, back": "back", "the action menu on the selection": "action_menu", "the info card for what's under the cursor": "info", "the previous army": "army_prev", "the next army": "army_next", "cycle map lenses": "lens_prev", "the next notification": "notification_next", "the turn report": "turn_report", "End turn": "end_turn", "the game menu": "pause_menu", "jump to capital": "jump_capital", "recentre on the selection": "recentre" },
+  menu: { "move focus": "focus", "scroll the panel": "scroll", "the previous page": "page_prev", confirm: "confirm", back: "back", "reset row": "reset_row", "the long description": "describe", "the next tab": "tab_next", "close the panel": "close" },
+  battle: { pan: "pan", "slower playback": "slower", "faster playback": "faster", "change standing orders": "change_orders", "leave the battle view": "leave", "order a retreat": "retreat", "the previous running battle": "battle_prev", "the next running battle": "battle_next", "the commander's line": "commander_line", "the game menu": "pause_menu" },
+};
+Given("the controller layout is the default", (s) => {
+  s.pad = true;
+});
+Given("the player is on the {string}", (s, mode: string) => {
+  s.padSet = PAD_SETS[mode];
+});
+When("the player uses {string}", (s, input: string) => {
+  act(s);
+  s.input = input;
+});
+Then("{string} happens", (s, result: string) => {
+  if (s.keys && !s.pad) {
+    expect(s.happened).toEqual([KEY_ACTIONS[result]]);
+    return;
+  }
+  const set: "map" | "menu" | "battle" = s.padSet;
+  const input: string = s.input;
+  const held = /^(.+) held ([\d.]+) s$/.exec(input);
+  const button = (held ? held[1]! : input).toLowerCase().replace("d-pad ", "dpad_").replace(/ /g, "_");
+  if (set === "menu" && result === "step a value") {
+    expect((D.controller_navigation as Record<string, string>)[input]).toBe("step up");
+    return;
+  }
+  const action = PAD_ACTIONS[set]![result];
+  expect(action, result).toBeDefined();
+  const b = T.padBinding(set, action!);
+  if (held) expect(b).toEqual({ button, hold_seconds: Number(held[2]) });
+  else if (Array.isArray(b)) expect(b.map((x) => x.toLowerCase())).toContain(button);
+  else expect(String(b).toLowerCase()).toBe(button);
+});
+
+When("Steam Input loads the game's actions", (s) => {
+  act(s);
+  s.steam = T.steamInput();
+});
+Then("the action sets are Shell, Map, Card, Book, Modal and Battle, plus a Text layer for the on-screen keyboard", (s) => {
+  expect(s.steam.action_sets).toEqual(["Shell", "Map", "Card", "Book", "Modal", "Battle"]);
+  expect(s.steam.text_layer).toBe("Text");
+});
+Then("official configurations exist for the Steam Controller, Steam Deck, Xbox, PlayStation and Nintendo controllers", (s) => {
+  expect(s.steam.official_configurations).toEqual(["Steam Controller", "Steam Deck", "Xbox", "PlayStation", "Nintendo"]);
+});
+Then("button prompts come from GetGlyphPNGForActionOrigin", (s) => {
+  expect(s.steam.glyphs).toBe("GetGlyphPNGForActionOrigin");
+});
+
+Given("music eras following the calendar or technology is a choice", (s) => {
+  s.rule = "music eras";
+});
+When("the player begins a campaign", (s) => {
+  act(s);
+  s.rulesView = T.campaignRulesView({ "music eras": "calendar" });
+});
+Then("it is chosen on the new game screen as a campaign rule", (s) => {
+  expect((s.rulesView as ReturnType<typeof T.campaignRulesView>).rows.find((r) => r.rule === s.rule)).toMatchObject({ value: "calendar", editable: false });
+});
+Then("it is not offered in Settings", (s) => {
+  expect(CAT.settings.some((d) => /music_era/.test(d.id))).toBe(false);
+});
+
+// Sync (D-SET-13)
+Given(/^on the "([^"]+)" the player set "([^"]+)" to "([^"]+)" at (\d+):(\d+)$/, (s, device: string, name: string, value: string, h: string, m: string) => {
+  s.files ??= {} as Record<string, T.PersonalFile>;
+  const f = (s.files[device] ??= { values: {}, changedAt: {} });
+  const sid = id(name);
+  f.values[sid] = T.parseValue(CAT, sid, value);
+  f.changedAt[sid] = Number(h) * 60 + Number(m);
+});
+When("both devices sync", (s) => {
+  act(s);
+  s.synced = T.syncPersonal(Object.values(s.files as Record<string, T.PersonalFile>));
+});
+Then("both devices have {string} {string} and {string} {string}", (s, a: string, av: string, b: string, bv: string) => {
+  expect(s.synced.values[id(a)]).toEqual(T.parseValue(CAT, id(a), av));
+  expect(s.synced.values[id(b)]).toEqual(T.parseValue(CAT, id(b), bv));
+});
+Then("the {string} keeps its own {string}", (s, _device: string, name: string) => {
+  expect(T.resolve(CAT, id(name)).sync).toBe("device");
+  expect(s.synced.values[id(name)]).toBeUndefined();
+});
+
+// Seasons and colour vision (X-17)
+When("the map is drawn in January and in October", (s) => {
+  act(s);
+  s.means = T.seasonPaletteMeans(st(s));
+});
+Then("the snow and autumn gold palettes are told apart by {word}", (s, means: string) => {
+  expect(s.means.split(" ").at(-1)).toBe(means);
+});
+Then(/^the snow and autumn gold palettes are told apart by (the safe ramp|tile patterns)$/, (s, means: string) => {
+  expect(s.means).toBe(means);
+});
+Then("no setting turns the seasons off", () => {
+  expect(CAT.settings.some((d) => /season/.test(d.id))).toBe(false);
+});
+Then(/^"the lens "(\w+)"" happens$/, (s, lens: string) => {
+  expect(s.happened).toEqual([KEY_ACTIONS[`the lens "${lens}"`]]);
 });

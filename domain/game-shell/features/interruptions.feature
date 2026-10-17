@@ -7,12 +7,11 @@ Feature: Interruptions
   Background:
     Given a campaign as "Portugal" is loaded
 
-  @SHELL-101 @open-question
+  @SHELL-101
   Scenario: Going to the background
-    # OQ-SHELL-5: the saves design writes the orders journal here
     Given the player has given orders since the last save
     When the app goes to the background
-    Then the game saves what changed
+    Then the orders journal is written
     And sound is suspended
 
   @SHELL-101
@@ -54,7 +53,7 @@ Feature: Interruptions
     Examples:
       | then                     | result                                         |
       | comes back               | the worker paused with the app and the turn carries on |
-      | is killed and restarted  | the pre-turn save is used                      |
+      | is killed and restarted  | the Resume save and the orders journal are used |
 
   @SHELL-105
   Scenario Outline: The unlock flow returns where it was opened
@@ -67,7 +66,7 @@ Feature: Interruptions
     Examples:
       | place                          | outcome    | extra                                         |
       | the realm picker on "Castile"  | succeeds   | the realm "Castile" is chosen                 |
-      | the main menu                  | succeeds   | the free tier's ad is gone                    |
+      | the main menu                  | succeeds   | every realm is unlocked                       |
       | the realm picker on "Castile"  | is cancelled | no message beyond the store's own is shown  |
       | the main menu                  | fails      | no message beyond the store's own is shown    |
 
@@ -89,5 +88,17 @@ Feature: Interruptions
 
     Examples:
       | failure                         | approved           | options                                              |
-      | the engine worker crashes       | is approved        | Restore the last autosave, Main menu, Send a report  |
-      | a save won't read               | is not approved    | Restore the last autosave, Main menu                 |
+      | the engine worker crashes       | is approved        | Restore the last save, Main menu, Send a report  |
+      | a save won't read               | is not approved    | Restore the last save, Main menu                 |
+
+  @SHELL-135
+  Scenario Outline: The Unlock screen
+    Given the game runs on "<platform>"
+    When the player opens the screen "unlock"
+    Then it offers one purchase, the full game, which unlocks every realm
+    And it shows the store's price and the buttons "<buttons>"
+
+    Examples:
+      | platform | buttons                  |
+      | Android  | Buy, Restore purchases   |
+      | Steam    | Buy                      |

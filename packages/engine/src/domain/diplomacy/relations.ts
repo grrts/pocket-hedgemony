@@ -354,6 +354,8 @@ export function setRival(g: RelationGraph, a: string, b: string, contested: stri
  * this follows the newer diplomacy design (6.10): the insulted side's stance.
  */
 export function insult(g: RelationGraph, a: string, b: string): void {
+  // D-DIPL-4: the insulted side turns Hostile and any Friendly stance between them ends.
+  if (stance(g, a, b) === "friendly") clearPerspective(g, a, b);
   setStance(g, b, a, "hostile");
 }
 

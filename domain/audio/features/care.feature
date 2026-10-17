@@ -19,7 +19,7 @@ Feature: Care in music and sound
   Scenario: Narrative-only events get no triumph
     When an event marked "depiction: narrative_only" fires
     Then no triumphant stinger plays
-    And only "event_major" plays, in a sombre form
+    And no stinger plays at all
 
   @AUD-126
   Scenario Outline: Harm never gets a rewarding sound

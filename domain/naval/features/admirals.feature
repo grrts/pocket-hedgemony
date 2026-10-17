@@ -88,9 +88,9 @@ Feature: Admirals
       | schoolmaster    | 0     | 1       | 1         | none     |
       | marshal         | 2     | 2       | 1         | any      |
 
-  @NAVY-073 @open-question
+  @NAVY-073
   Scenario: Rui Vaz of Lagos
-    # depends on OQ-NAVY-11: the years-served steps (+1 at 5 and at 10 years) are recruiting 7.1's
+    # D-NAVY-11: the years-served steps (+1 at 5 and at 10 years) are recruiting 7.1's
     Given the official "Rui Vaz" is a customs officer who ran the port province "Lagos" for 9 years
     When the country "Portugal" commissions "Rui Vaz" as admiral
     Then his 9 years in a port count as 18
@@ -115,3 +115,17 @@ Feature: Admirals
       | Portugal | a proud lord                   | he will not sail under an official admiral                              |
       | Portugal | a hired privateer              | he leaves when unpaid and may raid neutral shipping and drag Portugal into a war |
       | Igbo     | an elder                       | the fleet is led as by any lord                                         |
+
+  @NAVY-119 @placeholder
+  Scenario: Commission cost and pay
+    # config: naval.admiralCommission
+    Given an admiral whose wage is 2 gold a month
+    When the country "Portugal" commissions him
+    Then the country "Portugal" pays 10 gold of commission
+    And he is paid 6 gold a month while at sea and 2 in port
+
+  @NAVY-120
+  Scenario: A colonial governor cannot be commissioned
+    Given the official "Diogo Cão" is a colonial governor
+    When the country "Portugal" tries to commission "Diogo Cão" as admiral
+    Then the commission is refused

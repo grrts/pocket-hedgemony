@@ -67,7 +67,7 @@ export function fullSupply(type: string): number {
   const r = shipRow(type);
   if (r.galley) return config.supplyByFamily.galley;
   const s = (config.supplyByFamily as Record<string, number>)[r.family];
-  if (s === undefined) throw new Error(`OQ-NAVY-19: no supply for ${r.family}`);
+  if (s === undefined) throw new Error(`D-NAVY-19: no supply for ${r.family}`);
   return s;
 }
 
@@ -263,14 +263,14 @@ export function towns1444(): Town[] {
  * (port 1 when the town is too small), small 1, canoe landing none; a shipyard 1, or 2 where the holder
  * knows S4; Venice the Arsenal.
  */
-export function startPort(o: { tier: string; shipyard: boolean; holderKnows: Known; townTooSmall?: boolean; towns?: readonly string[] }): { harbour: number; shipyard: number; extraSeafolk: boolean; smallCraftOnly: boolean } {
+export function startPort(o: { tier: string; shipyard: boolean; holderKnows: Known; townTooSmall?: boolean; towns?: readonly string[] }): { harbour: number; shipyard: number; extraSeafolk: number; smallCraft: number; smallCraftOnly: boolean } {
   let harbour = (config.startHarbourByTier as Record<string, number>)[o.tier] ?? 0;
   if (o.tier === "port" && o.townTooSmall) harbour = config.smallTownHarbour;
   let shipyard = 0;
   if (o.towns?.includes(config.arsenalTown)) shipyard = config.arsenalStep;
   else if (o.shipyard && harbour > 0) shipyard = o.holderKnows.includes(config.startShipyard.invention) ? config.startShipyard.withInvention : config.startShipyard.marked;
   const landing = o.tier === "landing";
-  return { harbour, shipyard, extraSeafolk: landing, smallCraftOnly: landing };
+  return { harbour, shipyard, extraSeafolk: landing ? config.canoeLanding.extraSeafolk : 0, smallCraft: landing ? config.canoeLanding.smallCraft : 0, smallCraftOnly: landing };
 }
 
 /** The start ports table: every placed province with a harbour (NAVY-015). */
@@ -319,23 +319,15 @@ export interface SeaProvince {
 }
 
 /**
- * Musters sailors one by one from a port province (NAVY-022..026): seafolk first, then the other classes by
- * their share of who can still be called (the order after seafolk is OQ-NAVY-14). Each leaves his class and
- * his slot empty.
+ * Musters sailors one by one from a port province (NAVY-022..026): every callable class gives by its share,
+ * whole men by largest remainder, never seafolk first (D-NAVY-29, X-7). Each leaves his class and his slot empty.
  */
 export function musterSailors(p: SeaProvince, count: number, port: Port): SailorGroup {
   if (!isPort(port)) throw new Error("only a port musters sailors");
   const callable = callableToSea(p.people);
   const total = Object.values(callable).reduce((a, b) => a + b, 0);
   if (count > total + 1e-9) throw new Error(`only ${Math.floor(total)} can be called`);
-  const byClass: Record<string, number> = {};
-  const fromSeafolk = Math.min(count, callable["seafolk"] ?? 0);
-  if (fromSeafolk > 0) byClass["seafolk"] = fromSeafolk;
-  let rest = count - fromSeafolk;
-  const others = Object.entries(callable).filter(([c]) => c !== "seafolk");
-  const otherTotal = others.reduce((n, [, v]) => n + v, 0);
-  for (const [cls, v] of others) if (rest > 0 && otherTotal > 0) byClass[cls] = (rest * v) / otherTotal;
-  rest = 0;
+  const byClass = byShare(callable, count);
   for (const [cls, n] of Object.entries(byClass)) {
     p.people[cls] = (p.people[cls] ?? 0) - n;
     (p.emptySlots ??= {})[cls] = (p.emptySlots[cls] ?? 0) + n;
@@ -343,6 +335,83 @@ export function musterSailors(p: SeaProvince, count: number, port: Port): Sailor
   p.sailorsAway = (p.sailorsAway ?? 0) + count;
   port.sailorsInPort += count;
   return { home: p.id, count, byClass };
+}
+
+/** Splits a whole count over classes by their share, by largest remainder (D-NAVY-29). */
+export function byShare(pool: Readonly<Record<string, number>>, count: number): Record<string, number> {
+  const total = Object.values(pool).reduce((a, b) => a + b, 0);
+  const entries = Object.entries(pool).filter(([, v]) => v > 0);
+  if (total <= 0) return {};
+  const exact = entries.map(([cls, v]) => ({ cls, x: (count * v) / total }));
+  const out: Record<string, number> = {};
+  for (const e of exact) out[e.cls] = Math.floor(e.x + 1e-9);
+  let left = count - Object.values(out).reduce((a, b) => a + b, 0);
+  for (const e of [...exact].sort((a, b) => b.x - Math.floor(b.x + 1e-9) - (a.x - Math.floor(a.x + 1e-9)))) {
+    if (left <= 0) break;
+    out[e.cls]! += 1;
+    left -= 1;
+  }
+  for (const k of Object.keys(out)) if (out[k] === 0) delete out[k];
+  return out;
+}
+
+/** Gold bounty for a muster: 0.05 gold a sailor, rounded (D-NAVY-14). */
+export const musterBounty = (sailors: number): number => Math.round(sailors * config.muster.bountyPerSailor);
+
+/** Days until a muster is ready in port (D-NAVY-14). */
+export const musterDays = (): number => config.muster.days;
+
+/** Share of a province's fish lost while seafolk are at sea: seafolk away ÷ the fishing third of its seafolk (D-NAVY-14). */
+export const fishLostShare = (seafolkAway: number, seafolk: number): number =>
+  Math.min(1, seafolkAway / Math.max(1, seafolk * config.muster.fishingShareOfSeafolk));
+
+/** A ship that took hits in a battle and stays afloat loses one hull step; hits equal to its strength sink it (D-NAVY-6). */
+export function battleHull(h: HullStep, hits: number, strength: number): HullStep | "sinks" {
+  if (hits >= strength) return "sinks";
+  return hits > 0 ? worse(h, config.battleHullStepsLost) : h;
+}
+
+/** Seafolk a sea-power AI keeps at sea: a quarter of those it can call (D-NAVY-25). */
+export const seaPowerAtSea = (callableSeafolk: number): number => Math.floor(callableSeafolk * config.ai.seaPowerSeafolkAtSea);
+
+/** Commission cost and pay of an admiral: 10 gold, his wage ×3 while at sea (D-NAVY-15). */
+export const admiralPay = (wage: number, atSea: boolean): { commission: number; wage: number } => ({
+  commission: config.admiralCommission.gold,
+  wage: wage * (atSea ? config.admiralCommission.wageAtSeaMultiplier : 1),
+});
+
+/** May junks and dhows sail an ocean zone of their own monsoon seas: with T5 known (D-NAVY-20). */
+export const monsoonOcean = (type: string, zone: string, known: Known): boolean =>
+  config.monsoon.ships.includes(type) && config.monsoon.seas.includes(zone) && known.includes(config.monsoon.needs);
+
+/** The base province of a pirate coast (D-NAVY-23). */
+export const pirateBase = (coast: string): string => (config.pirates.bases as Record<string, string>)[coast] ?? "";
+
+/** A port may hire foreign sailors of a realm whose trade ships call there, up to 100 a year (D-NAVY-22). */
+export const mayHireForeignSailors = (theirShipsCall: boolean, hiredThisYear: number, more: number): boolean =>
+  theirShipsCall && hiredThisYear + more <= config.foreignCrewsPerPortPerYear;
+
+/** Docking in a subject's or lord's port: food from that province's store, nothing owed (D-NAVY-28). */
+export function dockInSubjectPort(store: { food: number }, rations: number): { taken: number; owed: 0 } {
+  const taken = Math.min(store.food, rations);
+  store.food -= taken;
+  return { taken, owed: 0 };
+}
+
+/** Burning a pirate base ends its fleet until trade brings it back (NAVY-104). */
+export function burnPirateBase(p: PirateFleet, province: string): boolean {
+  if (province !== pirateBase(p.coast)) return false;
+  p.ended = true;
+  p.ships = 0;
+  return true;
+}
+
+/** Trade brings an ended pirate fleet back with its starting ships at the end of an unhunted season (NAVY-104, D-NAVY-23). */
+export function piratesReturn(p: PirateFleet, tradePassed: boolean, hunted: boolean): void {
+  if (p.ended && tradePassed && !hunted) {
+    p.ended = false;
+    p.ships = config.pirates.startShips;
+  }
 }
 
 /** Provinces that can be picked for a muster from the country card: only those with a harbour (NAVY-024). */
@@ -640,8 +709,9 @@ export const defendsPort = (s: Ship, battleZone: string, portZone: string): bool
 
 /** Starting skills and trait of an admiral by official type, years served in a port province counting double (NAVY-073; the years steps are recruiting 7.1's). */
 export function commissionAdmiral(name: string, type: string, o: { yearsServed?: number; inPortProvince?: boolean; seaStyle?: string } = {}): { admiral: Admiral; traitOffered: string; countedYears: number } {
+  if (config.admiralCommission.notCommissioned.includes(type)) throw new Error(`a ${type} cannot be commissioned as admiral (D-NAVY-24)`);
   const row = (config.admiralsByOfficial as Record<string, { might: number; cunning: number; logistics: number; trait: string }>)[type];
-  if (!row) throw new Error(`OQ-NAVY-24: no admiral row for ${type}`);
+  if (!row) throw new Error(`no admiral row for ${type}`);
   const years = (o.yearsServed ?? 0) * (o.inPortProvince ? config.admiral.portYearsMultiplier : 1);
   const s: CommanderSkills = yearsServedBonus({ might: row.might, cunning: row.cunning, logistics: row.logistics }, years);
   const admiral: Admiral = { name, ...s, ...(o.seaStyle !== undefined ? { style: o.seaStyle } : {}) };
@@ -841,6 +911,7 @@ export function fleetMayEnter(w: MoveWorld, sea: Sea, f: Fleet, place: string): 
     for (const s of f.ships) {
       const r = shipRow(s.type);
       if (r.stepDays.ocean === null) return { ok: false, reason: "galleys stay off the ocean" };
+      if (monsoonOcean(s.type, place, known)) continue;
       if ((sea.armyAboard ?? []).includes(f.id) && small) return { ok: false, reason: "coastal only" };
       if (r.oceanNeeds) {
         if (!known.includes(r.oceanNeeds)) return { ok: false, reason: "coastal only" };
@@ -896,6 +967,15 @@ export function sail(w: MoveWorld, sea: Sea, f: Fleet, to: string, days: number)
   for (const e of log.entered) if (e.mover === f.id && isWater(placeOf(w, e.place))) useSupply(f, 1);
   return { plan, log };
 }
+
+/** Is a sea zone frozen this month: the northern zones of config, December to March (X-17, provisional until world-map's lookup). */
+export const isFrozen = (zone: string, month: number): boolean => config.frozenSeas.months.includes(month) && config.frozenSeas.zones.includes(zone);
+
+/** The frozen zones of a month, for `Sea.frozen` and the planner (X-17, NAVY-125). */
+export const frozenZones = (month: number): string[] => (config.frozenSeas.months.includes(month) ? [...config.frozenSeas.zones] : []);
+
+/** A port on a frozen zone can neither launch nor take in ships that month (X-17, NAVY-125). */
+export const portIceBound = (portZone: string, month: number): boolean => isFrozen(portZone, month);
 
 /** A fleet caught in a zone that freezes is iced into the nearest port (NAVY-095). */
 export function iceIn(w: MoveWorld, sea: Sea, f: Fleet): string | null {

@@ -2,6 +2,7 @@ import { boardShips, landArmy } from "./army-ops.ts";
 import { refillAndGo } from "./food.ts";
 import { type Army, type MoveWorld, type OnTheWay, type Pace, armyById, blockingCastle, horseOnly, moverById, placeOf, sameSide } from "./model.ts";
 import { castleExitAllowed, planRoute, type RoutePlan } from "./planner.ts";
+import { aiStandingOrders, type RiskTolerance } from "../warfare/index.ts";
 
 /** March orders, sent as data, the same for player and AI (9.1, gap-lists A4). */
 export type MoveOrder =
@@ -52,6 +53,8 @@ export function applyOrder(w: MoveWorld, realm: string, o: MoveOrder): OrderResu
   if (a.broken) return { ok: false, reason: "a broken army takes no orders" };
   switch (o.kind) {
     case "march to":
+      // An order to the province it stands in is a Halt (D-MOVE-5).
+      if (o.to === a.place) return applyOrder(w, realm, { kind: "halt", army: a.id });
       return setRoute(w, a, planRoute(w, a, o.to));
     case "march by":
       return setRoute(w, a, planRoute(w, a, o.to, o.via));
@@ -118,4 +121,12 @@ export function applyOrder(w: MoveWorld, realm: string, o: MoveOrder): OrderResu
       return r ? { ok: true, days: r.days } : { ok: false, reason: "nowhere to refill" };
     }
   }
+}
+
+/** An AI army's standing orders come from its realm's risk tolerance through warfare's rule (MOVE-086, D-WAR-14). */
+export function setAiStandingOrders(a: Army, risk: RiskTolerance): void {
+  const o = aiStandingOrders(risk);
+  const [x, y] = o.retreat.split(" to ").map(Number);
+  a.stance = o.order;
+  a.retreatIfOutnumbered = (x ?? 1) / (y ?? 1);
 }

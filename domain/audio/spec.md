@@ -134,7 +134,7 @@ Newest decision first.
 | 9 | East, Central and Southern Africa (`africa_east_south`) | bantu, nilotic, cushitic, semitic_ethiopian, khoisan | Interlocking thumb-piano W, hocket, Ethiopian qenet modes as tuning tables |
 | 10 | The Americas, Indigenous (`americas`) | nahua, maya, andean, tupi_guarani, algonquian, iroquoian | Pentatonic and tritonic, flute-like P1 at 12.5 %, frame and log drums; Andean and Mesoamerican variants |
 | 11 | Oceania (`oceania`) | polynesian, melanesian, aboriginal_australian | Chant-like narrow melody, body percussion on N, drone on T |
-| 12 | Atlantic and creole (`atlantic_creole`) | creole_atlantic, any colonial nation founded after 1500 | Blend of palettes 1, 8, 10 by culture mix; habanera, later swing |
+| 12 | Atlantic and creole (`atlantic_creole`) | atlantic_creole, any colonial nation founded after 1500 | Blend of palettes 1, 8, 10 by culture mix; habanera, later swing |
 
 Config split: turkic → `mena` if the nation's capital is west of longitude 55, otherwise `steppe`.
 
@@ -153,7 +153,7 @@ Config split: turkic → `mena` if the nation's capital is west of longitude 55,
   are in the field); `crisis` (disaster, plague, famine or succession crisis chain active; low pulses,
   irregular noise, no melody until resolved); `revolution` (revolution period touching the player, Era IV on;
   fast march, rising sequence, ends with the motif inverted); `exploration` (explorers or colonists active and
-  camera on open ocean; light P1 over surf-like N, slow); `world_war` (war involving most great powers, Era V
+  camera on open ocean; light P1 over surf-like N, slow); `world_war` (0.6 of the 8 great powers at war, Era V
   on; replaces `war_campaign`; heavier, W2 brass).
 - War (5, layered): `war_mobilize` (drum ostinato; + bass); `war_campaign` (main theme; + counter-melody when a
   player army is within reach of an enemy; + full percussion when a battle is fought this turn); `war_siege`
@@ -193,7 +193,7 @@ Config split: turkic → `mena` if the nation's capital is west of longitude 55,
 | `ui_slider` | Dragging a slider; pitch rises with value | S1 | 20 ms per step | 5 |
 | `ui_drag_pick` / `ui_drag_drop` | Picking up / dropping (a company between armies) | S3 | 60 ms | 3 |
 | `ui_text_key` | On-screen keyboard | S2 | 10 ms | 5 |
-| `ui_tooltip` | Long-press tooltip opens (off by default) | S1 | 30 ms | 5 |
+| `ui_tooltip` | Long-press tooltip opens (never played, D-AUD-12) | S1 | 30 ms | 5 |
 | `ui_hint` | A tutorial or advisor hint appears | S1 + S3 | 300 ms | 2 |
 | `ui_achievement` | An achievement unlocks (motif on bells) | S1 + S3 | 900 ms | 2 |
 | `ui_save` | Manual save | S3 | 200 ms | 4 |
@@ -277,7 +277,7 @@ Config split: turkic → `mena` if the nation's capital is west of longitude 55,
 | `realm_law` | Law, policy or reform set | S3 | 400 ms | 2 |
 | `realm_ruler_dies` | Ruler dies; then `ruler_new` stinger | S3 | 1.2 s | 1 |
 | `realm_heir_born` | Heir born | S3 | 500 ms | 3 |
-| `realm_stability_up` / `realm_stability_down` | Stability changes | S1 | 200 ms | 3 |
+| `realm_stability_up` / `realm_stability_down` | A lord's loyalty steps up / down (D-AUD-2) | S1 | 200 ms | 3 |
 | `realm_unrest` | Province unrest crosses a threshold | S2 + S1 | 400 ms | 2 |
 | `realm_rising` | Rebels rise | S2 + S3 | 900 ms | 1 |
 | `realm_fire` | Burned homes, plunder, scorched earth (quiet, sombre) | S2 | 600 ms | 3 |
@@ -322,7 +322,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 
 **Haptics** (phones; Capacitor Haptics): `ui_error` light, `turn_ready` light, `battle_start` medium, `siege_breach` medium, `realm_ruler_dies` heavy (once).
 
-**Effect era variants**: turn chimes (game-year era): Era I 12.5 % duty doubling and no bell; each later era adds one arpeggio step; Era V adds a short W2 swell; the notes never change. Marching (army era): I–II frame drum and loose steps; III–IV field drum and measured steps; V–VI snare and boots; VII engine drone on noise with motor transport. Shooting by config `military_bands`: bow I–II, crossbow I–II, matchlock II–III, volley IV–V, rifle V–VI, mg VI–VII.
+**Effect era variants**: turn chimes (game-year era): Era I 12.5 % duty doubling and no bell; each later era adds one arpeggio step; Era V adds a short sustained swell on S3 (D-AUD-1); the notes never change. Marching (army era): I–II frame drum and loose steps; III–IV field drum and measured steps; V–VI snare and boots; VII engine drone on noise with motor transport. Shooting by config `military_bands`: bow I–II, crossbow I–II, matchlock II–III, volley IV–V, rifle V–VI, mg VI–VII.
 
 ### Domain services
 - **Synth** (AudioWorklet; fallback OscillatorNode with PeriodicWave and a looping noise buffer).
@@ -354,13 +354,13 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 ### Music eras
 - AUD-014 The audio context shall pick the music era from the game year using the bands I 1444–1519, II 1520–1649, III 1650–1789, IV 1790–1869, V 1870–31 August 1939. [music §3.2; config eras]
 - AUD-015 The audio context shall take era boundaries from configuration. [music §3.2]
-- AUD-016 The audio context shall use the calendar as the era basis by default, keeping the technology basis (the average of the player's three tech tracks) in config, turned off. [music §3.2, §10.2; config eras.basis]
+- AUD-016 The audio context shall use the calendar as the only era basis in play, keeping the technology basis in config, turned off and not offered as a campaign rule (D-AUD-4). [music §3.2, §10.2; config eras.basis]
 - AUD-017 The audio context shall play no music for ages that fall after the campaign end (Decolonization, Cold War, Globalization) and have no era after V; music stops at the campaign end. [music §3.2; config eras.campaign_end]
 
 ### Palettes
 - AUD-018 The audio context shall pick one of twelve palettes from the player's primary culture group as in the palette table. [music §3.3; config palettes]
 - AUD-019 The audio context shall map the turkic culture group to `mena` when the nation's capital is west of longitude 55, otherwise to `steppe`. [config palettes.split]
-- AUD-020 Where a colonial nation was founded after 1500, the audio context shall use the Atlantic and creole palette, blending palettes 1, 8 and 10 by the nation's culture mix. [music §3.3]
+- AUD-020 Where a colonial nation was founded after 1500, the audio context shall use the single Atlantic and creole palette (`atlantic_creole`), with no blend (D-AUD-11). [music §3.3]
 - AUD-021 When a nation's primary culture changes, the audio context shall change its palette from the next track on. [music §3.3]
 
 ### Track list
@@ -375,16 +375,16 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-030 The audio context shall provide the five layered war tracks `war_mobilize`, `war_campaign`, `war_siege`, `war_naval` and `war_losing`, with layers fading in and out at bar lines. [music §4.5]
 - AUD-031 While the player is at war, `war_campaign` shall add layer 2 when a player army is within 2 provinces of an enemy and layer 3 when a battle is fought this turn. [music §4.5; config war_layers]
 - AUD-032 The audio context shall change war percussion with the era (frame drum → field drum → snare and bass drum → mechanized, noise-heavy) and let the lead follow the palette. [music §4.5]
-- AUD-033 The audio context shall provide the 21 stingers: nine `age_<age_id>`, `war_declared`, `battle_won`, `battle_lost`, `war_won`, `war_lost`, `discovery`, `innovation`, `ruler_new`, `alliance`, `event_good`, `event_bad`, `event_major`, each played on its moment. [music §4.6]
+- AUD-033 The audio context shall provide the 21 stingers: nine `age_<age_id>`, `war_declared`, `battle_won`, `battle_lost`, `war_won`, `war_lost`, `discovery`, `innovation`, `ruler_new`, `alliance`, `event_good`, `event_bad`, `event_major`, each played on its moment; a peace with neither gain nor loss (white peace) plays no stinger (D-AUD-10). [music §4.6]
 - AUD-034 When a rival declares war on the player, `war_declared` shall play in the attacker's palette. [music §4.6, §10.4]
 - AUD-035 The audio context shall ship 47 loops (6 + 24 + 5 + 7 + 5) and 21 stingers in the first release. [music §4.6]
 
 ### Music director
 - AUD-036 The audio context shall run the music director on the main thread from each turn's results and UI state, never inside the engine. [music §5.1]
-- AUD-037 The music director shall read the UI (screen id, realm book tab, camera region and zoom, foreground or background), the player nation (primary culture group, at war, war trend, armies near enemies, sieges, battles this turn, capital occupied, stability, unrest share, treasury trend) and the world (game year, active ages, periods and event chains with music tags, world tension). [music §5.1]
+- AUD-037 The music director shall read the UI (screen id, realm book tab, camera region and zoom, foreground or background), the player nation (primary culture group, at war, war trend, armies near enemies, sieges, battles this turn, capital occupied, lords' loyalty, unrest share, treasury trend) and the world (game year, active ages, periods and event chains with music tags, great powers at war) (D-AUD-2). [music §5.1]
 - AUD-038 The music director shall keep one music state, chosen by the highest-priority rule that holds in the priority stack. [music §5.2]
 - AUD-039 While a screen marked "unchanged" in the screen list is open, the music director shall keep the current state. [music §5.2]
-- AUD-040 The music director shall enter each state when its threshold holds, using the thresholds in `music.yaml` `states`. [music §5.2, §6.2; config states]
+- AUD-040 The music director shall enter each state when its threshold holds, using the thresholds in `music.yaml` `states`: `war_losing` over 0.5 of the player's peace voices accepting the enemy's terms or the capital occupied; `unrest` 0.25 of provinces Plotting or Risen; `prosperity` 10 years at peace, treasury rising, no Disloyal lord and at least half Loyal; `world_war` 0.6 of the 8 great powers at war from Era V (D-AUD-2). [music §5.2, §6.2; config states]
 - AUD-041 The audio context shall play stingers on top of the music, ducking it by 6 dB, or in the gap between two tracks; a stinger is never a state. [music §5.2, §5.3]
 - AUD-042 The music director shall decide a state change only at turn end or on a screen change. [music §5.3]
 - AUD-043 When the state changes, the music director shall wait for the next bar line (war, crisis) or the next phrase end (peace, at most 8 bars) and crossfade over one bar; layer changes fade over one bar. [music §5.3]
@@ -400,7 +400,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-051 The music director shall play each peace track 1–2 loops, then 10–40 s of silence before the next. [music §5.4]
 - AUD-052 The music director shall choose a track's era variant when the track starts. [music §5.4]
 - AUD-053 When an era changes, the next peace track shall be that era's theme, in full, preceded by the age stinger that caused the change. [music §5.4]
-- AUD-054 Where the variety setting is "own palette only", the music director shall pick only from the player's own palette. [music §7.3]
+- AUD-054 Where the variety setting is "own palette only" (the default, D-AUD-3), the music director shall pick only from the player's own palette. [music §7.3]
 
 ### Zoom mix
 - AUD-055 Where zoom mix is on, the audio context shall play the full arrangement at world view and, at local zoom, drop percussion 3 dB and bring the lead forward (+1 dB). [music §5.5; config zoom_mix]
@@ -419,8 +419,8 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-064 The audio context shall keep fixed sounds (taps, toggles, errors, scrolls, the map) the same in every year. [sfx §4.1]
 - AUD-065 The audio context shall change game-year sounds (turn chimes, notification pings, the event scroll) with the music era, by small changes only. [sfx §4.1; config era.turn_chimes]
 - AUD-066 The audio context shall change army sounds (marching, shooting, guns, charges, sieges, ships) with the warfare era of the army's own inventions (I–VII), so two armies of different eras on one field sound different. [sfx §4.1; config era.military]
-- AUD-067 The audio context shall play the turn chimes on S3 with the palette's wavetable and tuning table, and the court horn with the palette's lead wavetable; all other effects are shared, and battle sounds differ by era and troop type, not culture. [sfx §4.2]
-- AUD-068 The audio context shall vary the turn chimes by era without changing their notes: Era I a 12.5 % duty doubling and no bell, each later era one more arpeggio step, Era V a short W2 swell. [sfx §5.3]
+- AUD-067 The audio context shall give the palette's wavetable and tuning only to the effects on the config `palette_sounds` list (the turn chimes, the court horn, `army_levy_call`, `diplo_accepted`, `diplo_refused`, `notify_diplo`, `frame_nation_pick`) (D-AUD-7); all other effects are shared, and battle sounds differ by era and troop type, not culture. [sfx §4.2]
+- AUD-068 The audio context shall vary the turn chimes by era without changing their notes: Era I a 12.5 % duty doubling and no bell, each later era one more arpeggio step, Era V a short sustained swell on S3, never on a music voice (D-AUD-1). [sfx §5.3]
 - AUD-069 The audio context shall stop the effects catalogue at warfare era VII and music era V, with nothing for 1945 onward. [sfx §4.1]
 
 ### The catalogue
@@ -431,7 +431,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-074 When a province changes hands on screen and neither side is the player, `map_border_change` shall be silent. [sfx §5.4]
 - AUD-075 When an army's food reserve runs low, `army_hungry` shall repeat only when it gets worse. [sfx §5.5; config cooldown_ms.army_hungry]
 - AUD-076 While the battle screen plays at normal speed, the audio context shall follow the order of a bell (orders, shooting, charges, melee, breaking), one sound per bell step from the sector closest to the screen centre, other sectors only if a voice is free. [sfx §5.6; config battle_screen]
-- AUD-077 When the player skips ahead in a battle, the audio context shall play only `battle_start`, `battle_rout` and the music stinger. [sfx §5.6]
+- AUD-077 When the player skips ahead in a battle replay (a running battle cannot be skipped, X-1), the audio context shall play only `battle_start`, `battle_rout` and the music stinger. [sfx §5.6]
 - AUD-078 The audio context shall give plunder and razing `realm_fire` at low volume and no bright sound. [sfx §5.7, §11]
 
 ### Ambience
@@ -452,9 +452,9 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 ### Living with the music
 - AUD-090 When the music has a stinger for a moment, the audio context shall not mark the same moment with an effect, except that effects may lead in to a stinger, never playing over its tune. [sfx §7.1]
 - AUD-091 While a stinger plays, the audio context shall drop effects of priority 3 to 5 and duck effects of priority 1 and 2 by 4 dB. [sfx §7.2; config ducking]
-- AUD-092 The audio context shall let effects duck music only for priority 1 sounds longer than 600 ms (`battle_start`, `siege_breach`, `siege_storm`, `realm_rising`, `realm_ruler_dies`, `sea_battle_start`), by 4 dB for their length. [sfx §7.2; config ducking.effects_duck_music]
+- AUD-092 The audio context shall let effects duck music only for the six listed sounds (`battle_start`, `siege_breach`, `siege_storm`, `realm_rising`, `realm_ruler_dies`, `sea_battle_start`), by 4 dB for their length; no other sound ducks music, whatever its length (D-AUD-8). [sfx §7.2; config ducking.effects_duck_music]
 - AUD-093 The audio context shall duck the ambience bed by 6 dB under any effect of priority 1 or 2 and fade it out over 2 s when a music track starts. [sfx §7.2]
-- AUD-094 While the pause menu is open, the audio context shall duck the music by 6 dB. [sfx §5.2, §14]
+- AUD-094 While the game menu is open, the audio context shall leave the music unchanged (no duck; `pause_music_db` is dropped, D-AUD-8). [sfx §5.2, §14]
 - AUD-095 The audio context shall mix a `ui_tap` about 6 dB below the music's average and let a priority 1 sound peak about 3 dB above it, with the whole mix at −16 LUFS. [sfx §7.3; config mix.target_loudness_lufs]
 - AUD-096 When several achievements unlock in one turn, `ui_achievement` shall play once. [sfx §14]
 
@@ -473,13 +473,13 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-106 The audio context shall stay under 2 % of one core on a mid-range phone with music and effects on, checked by the smoke test extended with a music-on run. [music §7.2; sfx §3]
 - AUD-107 The audio context shall start audio on the first tap, using the title screen's "Tap to start" as that gesture. [music §7.3; sfx §8]
 - AUD-108 If the game cold-starts on mobile, then `frame_logo` shall not play (the splash is silent) and the first sound is `frame_start`; desktop and Steam builds play `frame_logo`. [sfx §8]
-- AUD-109 When the app goes to the background or the tab is hidden, the audio context shall suspend the AudioContext (stopping music and effects) and, on return, resume with `load_resume`. [music §7.3; sfx §8]
+- AUD-109 When the app goes to the background or the tab is hidden, the audio context shall suspend the AudioContext (stopping music and effects) and, on return, resume with `load_resume`; on desktop it keeps playing instead while the `play_in_background` setting is on (default off) (D-AUD-9). [music §7.3; sfx §8]
 - AUD-110 When the player returns from the background, notifications that arrived while away shall play no sound. [sfx §8]
-- AUD-111 The audio context shall yield to the player's other audio apps and respect the iPhone ring/silent switch, with effects following the same session setting as music. [music §7.3; sfx §8]
-- AUD-112 Where the device is a phone and haptics are on, the audio context shall give a vibration on the five moments (`ui_error` light, `turn_ready` light, `battle_start` and `siege_breach` medium, `realm_ruler_dies` heavy, once), on by default, never on desktop, and working with sound off. [sfx §8, §15.3; config haptics]
+- AUD-111 The audio context shall use the native "ambient" audio session on iOS, which mixes with the player's other audio apps (`mix_with_other_apps`, default on) and respects the ring/silent switch, with effects following the same session as music (D-AUD-9). [music §7.3; sfx §8]
+- AUD-112 Where the device is a phone and haptics are on, the audio context shall give a vibration on the five moments (all five light: `ui_error`, `turn_ready`, `battle_start`, `siege_breach`, `realm_ruler_dies` once; D-AUD-12), on by default, never on desktop, and working with sound off. [sfx §8, §15.3; config haptics]
 - AUD-113 The audio context shall start interface sounds within one audio block of the tap (about 3 ms at 128 samples) by a direct message to the worklet, and send map and battle sounds through the scheduler so they line up with animation. [sfx §8; config latency]
 - AUD-114 The audio context shall provide the audio settings: master, music, effects and ambience volumes; music on/off (off fully suspends the synth); variety; zoom mix; ambience on/off; interface sounds on/off; haptics; mono; sound captions; reduced intensity. [music §7.3; sfx §14]
-- AUD-115 The audio context shall default music volume to 0.7, effects to 0.8 and ambience to 0.5 (when on), interface sounds on and haptics on (phones). [sfx §7.3, §15; config buses, defaults]
+- AUD-115 The audio context shall default master volume to 0.8, music volume to 0.7, effects to 0.8 and ambience to 0.5 (when on), interface sounds on, haptics on (phones) and the variety to "own palette only" (D-AUD-3, D-AUD-9). [sfx §7.3, §15; config buses, defaults]
 
 ### Accessibility
 - AUD-116 The audio context shall give every sound a visual partner (toast, icon flash or animation), so the game is fully playable muted. [sfx §2.2, §10]
@@ -493,7 +493,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-122 The audio context shall describe musical features in palettes, not ethnic stereotypes, using no "generic exotic" scale shared across unrelated traditions. [music §8]
 - AUD-123 The audio context shall have each palette's tracks reviewed by a musician or scholar of that tradition before release, and name them in the credits. [music §8, §9]
 - AUD-124 The audio context shall not write music for colonized peoples as an "enemy" or "primitive" side, and shall give Indigenous and African palettes the same development across all five eras as European ones. [music §8]
-- AUD-125 When an event marked `depiction: narrative_only` fires, the audio context shall play no triumphant stinger, only `event_major` in a sombre form. [music §8]
+- AUD-125 When an event marked `depiction: narrative_only` fires, the audio context shall play no stinger at all (D-AUD-11). [music §8]
 - AUD-126 The audio context shall never give plunder, razing, massacres, enslavement or `narrative_only` events coins, chimes, fanfares or any rising, rewarding sound (only `realm_fire` or a single low bell at most), and plunder shall add gold silently. [sfx §2.7, §11]
 - AUD-127 The audio context shall give colonial conquest no distinct "victory" sound and sound Indigenous and African arms by era and type with the same quality as anyone's. [sfx §11]
 - AUD-128 The audio context shall sound era VII machine guns, shells and gas at a distance without exaggeration, with no screams, no voices of the wounded and no speech or crowd recordings anywhere; "shout" sounds are pulse sweeps. [sfx §11, §15.6]
@@ -505,6 +505,11 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-132 The audio context shall have the music written in-house by Claude in MML, each track shipped with a rendered MP3 that Leroy approves by ear before it goes in the game (a failing track is reworked, not shipped), plus the palette culture reviews. [music §9]
 - AUD-133 If M1's tracks don't pass the listening gate, then an outside chiptune composer shall be commissioned for the `title` theme and the motif only, keeping the rest in-house. [music §9]
 - AUD-134 The audio context shall build music and effects together in milestones M1/S1 to M4/S4 as listed in §10. [music §9; sfx §13]
+
+### Decisions of this pass
+- AUD-135 When onboarding reports a step shown, a step finished or a new Needs attention warning, the audio context shall play `ui_hint`, `ui_confirm` or `notify_alert`, with no sound for the vizier's note and no music duck. [D-AUD-6]
+- AUD-136 While several of the player's battles run at once (X-1), the audio context shall play battle bell-step effects only for the battle shown in the battle view, and switch them when the player switches battles. [X-1]
+- AUD-137 With turns one week long (X-18), the audio context shall play `turn_end` and `turn_ready` every turn, and shall play the month, season and year cues (`turn_month_new_year`, the era theme, the yearly checks' sounds) once, in the turn in which that month, season or year begins. [X-18]
 
 ## 6. Commands
 
@@ -536,7 +541,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - When warfare declares a war involving the player, then play `war_declared` (attacker's palette if a rival declared on the player); when a battle result is shown, `battle_rout` then `battle_won`/`battle_lost`; when peace is signed, `diplo_peace_signed` then `war_won`/`war_lost`.
 - When warfare reports battle bells, charges, melee, routs, siege steps, then play the matching effect per §5 rules.
 - When naval reports a sea battle, broadside, sinking, blockade or landing, then play the `sea_` sound.
-- When events opens an event, then play `event_open` and the event's music stinger (from its tag); for `narrative_only` only a sombre `event_major`.
+- When events opens an event, then play `event_open` and the event's music stinger (from its tag); for `narrative_only` no stinger (D-AUD-11).
 - When events starts an age, then play `age_<id>`; when the era changes, queue the era theme in full.
 - When research reports an invention adopted, then play `innovation`.
 - When exploration reports a discovery, then play `discovery` and `map_fog_reveal` when land appears on screen.
@@ -551,7 +556,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 ## 9. Monthly turn
 
 1. Read (after every simulation step and the turn report are ready): the player's war state, war trend,
-   battles and sieges this turn, capital occupied, unrest share, stability, treasury trend, active ages,
+   battles and sieges this turn, capital occupied, unrest share, lords' loyalty, treasury trend, active ages,
    periods and chains with music tags, game year (era), culture group.
 2. Evaluate the music state; schedule the transition at the next bar or phrase.
 3. Play the turn results (≤ 5 sounds, 150 ms apart, or `notify_batch`).
@@ -567,15 +572,15 @@ Audio runs on the client main thread and never feeds back into the engine.
 | `eras.campaign_end` | Music stops | 1939-08-31 | no | music.yaml |
 | `palettes.*` | Culture group → palette | as palette table | yes | music.yaml |
 | `palettes.split.turkic` | Longitude split | west of 55 → mena, else steppe | yes | music.yaml |
-| `states.war_losing` | War score below / capital occupied | −40 / true | yes | music.yaml |
-| `states.world_war` | Great powers at war share, min era | 0.6, V | yes | music.yaml |
-| `states.war_naval` | Naval battle share last 5 turns | 0.6 | yes | music.yaml |
-| `states.war_siege` | Siege active, field battles last 3 turns | true, 0 | yes | music.yaml |
-| `states.war_mobilize` | Turns since declaration max, battles fought | 2, 0 | yes | music.yaml |
+| `states.war_losing` | Share of peace voices accepting the enemy's terms above / capital occupied | 0.5 / true | yes | music.yaml |
+| `states.world_war` | Great powers (8 with most provinces) at war share, min era | 8, 0.6, V | yes | music.yaml |
+| `states.war_naval` | Naval battle share in the last 5 months (X-18) | 0.6 | yes | music.yaml |
+| `states.war_siege` | Siege active, field battles in the last 3 months (X-18) | true, 0 | yes | music.yaml |
+| `states.war_mobilize` | Months since declaration max (X-18), battles fought | 2, 0 | yes | music.yaml |
 | `states.revolution` | Period tag, touches player, min era | revolution, true, IV | yes | music.yaml |
 | `states.crisis` | Event chain tag | crisis | yes | music.yaml |
-| `states.unrest` | Unrest province share / stability below | 0.25 / −1 | yes | music.yaml |
-| `states.prosperity` | Stability at least, treasury trend, years at peace | 2, rising, 10 | yes | music.yaml |
+| `states.unrest` | Share of provinces Plotting or Risen | 0.25 | yes | music.yaml |
+| `states.prosperity` | No Disloyal lord, Loyal share at least, treasury trend, years at peace | true, 0.5, rising, 10 | yes | music.yaml |
 | `states.exploration` | Explorers active, camera over | true, ocean | yes | music.yaml |
 | `transitions.min_seconds_in_state` | Min time in state | 45 | yes | music.yaml |
 | `transitions.boundary` | Up / down | bar / phrase | yes | music.yaml |
@@ -596,10 +601,10 @@ Audio runs on the client main thread and never feeds back into the engine.
 | `mix.max_pan` | Pan limit | 0.3 | yes | both |
 | `mix.target_loudness_lufs` | Loudness | −16 | yes | music.yaml |
 | `defaults.music_volume` / `sfx_volume` | Defaults | 0.7 / 0.8 | yes | music.yaml |
-| `defaults.variety` | Variety | all_palettes (conflicts with settings, OQ-AUD-3) | yes | music.yaml |
+| `defaults.variety` | Variety | own_palette (D-AUD-3) | no (decided) | music.yaml |
 | `defaults.ambience` | Ambience | false | no (decided) | music.yaml |
 | `bank.voices` / `tick_hz` / `max_length_ms` | S1–S3, 60, 2000 | — | yes | sfx.yaml |
-| `buses` | master 1.0, music 0.7, effects 0.8, ambience 0.5, ui_sounds true, ambience_on false, haptics true, mono false, captions auto, reduced_intensity false | — | yes | sfx.yaml |
+| `buses` | master 0.8, music 0.7, effects 0.8, ambience 0.5, ui_sounds true, ambience_on false, haptics true, mono false, captions auto, reduced_intensity false | — | yes | sfx.yaml |
 | `era.ui` / `turn_chimes` / `military` | fixed / music_era / army_inventions | — | no | sfx.yaml |
 | `era.military_bands` | bow I–II, crossbow I–II, matchlock II–III, volley IV–V, rifle V–VI, mg VI–VII | — | yes | sfx.yaml |
 | `palette_sounds` | turn_end, turn_ready, turn_month_new_year, army_levy_call, diplo_accepted, diplo_refused, notify_diplo, frame_nation_pick | — | yes | sfx.yaml |
@@ -611,9 +616,9 @@ Audio runs on the client main thread and never feeds back into the engine.
 | `turn_working` | start after 600 ms, tick 500 ms | — | yes | sfx.yaml |
 | `zoom` | world [notify]; regional [notify, army_orders, battle_start, siege_breach, sea_battle_start, map]; local all | — | yes | sfx.yaml |
 | `distance` | linear, edge 0.4, offscreen mute | — | yes | sfx.yaml |
-| `ducking` | during stinger drop ≤3 / duck −4 dB; effects duck music pri 1 ≥600 ms −4 dB; ambience −6 dB under pri ≥2; ambience fade 2 s | — | yes | sfx.yaml |
-| `battle_screen` | 1 sound per bell step, nearest centre, extra if voice free, on skip [battle_start, battle_rout] | — | yes | sfx.yaml |
-| `haptics` | ui_error light, turn_ready light, battle_start medium, siege_breach medium, realm_ruler_dies heavy | — | yes | sfx.yaml |
+| `ducking` | during stinger drop ≤3 / duck −4 dB; effects duck music only for the listed six, −4 dB (D-AUD-8); no pause duck; ambience −6 dB under pri ≥2; ambience fade 2 s | — | yes | sfx.yaml |
+| `battle_screen` | 1 sound per bell step, nearest centre, extra if voice free, on replay skip [battle_start, battle_rout] | — | yes | sfx.yaml |
+| `haptics` | all five light: ui_error, turn_ready, battle_start, siege_breach, realm_ruler_dies (D-AUD-12) | — | no (decided) | sfx.yaml |
 | `latency` | ui direct, map scheduled | — | no | sfx.yaml |
 | `bindings` | game event → sound id (turn.end_pressed → turn_end … hint.shown → ui_hint) | — | — | sfx.yaml |
 | Music length targets | loop 60–150 s, intro 2–8 s, stinger 3–10 s | — | yes | design |
@@ -645,14 +650,14 @@ variants, ambience, captions, reduced intensity, loudness pass).
 | naval | upstream | Published Language | Sea battles, broadsides, sinkings, blockades, landings, fleet orders |
 | troop-movement | upstream | Published Language | March orders, arrival, winter quarters |
 | recruiting | upstream | Published Language | Levy called, lords called, hiring, regiment trained, disband |
-| realm | upstream | Published Language | Ruler death and new ruler, heir born, stability, treasury, income, debt, laws |
+| realm | upstream | Published Language | Ruler death and new ruler, heir born, lords' loyalty and its steps (D-AUD-2), treasury, income, debt, laws |
 | province | upstream | Published Language | Harvest report, plague outbreak, unrest threshold |
 | rebellions | upstream | Published Language | Rising, rebels in the field, unrest share |
 | revolutions | upstream | Published Language | Revolution period touching the player |
 | events | upstream | Published Language | Event opened, chain next, choice, `music:` and `sfx:` tags, `narrative_only`, ages |
 | research | upstream | Published Language | Invention adopted, research pick, tech for technology era basis |
 | exploration | upstream | Published Language | Discovery, explorers and colonists active, fog revealed |
-| diplomacy | upstream | Published Language | Alliance or major treaty, envoy sent, answers, diplomatic messages, great powers / world tension |
+| diplomacy | upstream | Published Language | Alliance or major treaty, envoy sent, answers, diplomatic messages, the 8 great powers (most provinces) and whether they are at war (D-AUD-2) |
 | buildings | upstream | Published Language | Building ordered / finished |
 | trade | upstream | Published Language | Trader sets out, route opens |
 | achievements | upstream | Published Language | AchievementUnlocked → `ui_achievement` |
@@ -663,21 +668,21 @@ variants, ambience, captions, reduced intensity, loudness pass).
 
 None. Audio reacts to the player's view and nation only; computer players hear nothing. (`war_declared` uses the attacking AI's palette.)
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- **OQ-AUD-1** The turn chimes' Era V "short W2 swell" (sfx §5.3) uses a music voice, which contradicts "effects never take a music voice" (§3, decision 15.1) and the three-voice effects bank. Blocks: AUD-068.
-- **OQ-AUD-2** The music director reads a war score (`war_losing: war_score_below −40`, "war score trend") and stability (`prosperity`, `unrest`, `realm_stability_up/down`), but warfare says "there is no single war score" (peace voices instead), and country stats map stability to loyal lords and provinces in revolt with no stability stat. "World tension" and "great powers" are not defined anywhere. Blocks: AUD-037, AUD-040, `war_losing`, `prosperity`, `unrest`, `world_war`.
-- **OQ-AUD-3** Music variety default: `music-config.example.yaml` says `all_palettes`; settings (design and yaml) say "My palette only" (`own_palette`). Blocks: AUD-054, AUD-115.
-- **OQ-AUD-4** Era basis: music §3.2 says "a setting can tie them to the player's technology", §10.2 says the option stays in config but off; settings makes it a campaign rule "if that stays a choice". The config defines technology as "average of the player's three tech tracks", which the research design must confirm. Blocks: AUD-016.
-- **OQ-AUD-5** Gap list 1 item 5 lists "Music 10" (era basis, ambience, rivals' themes) as still open, but music §10 decided all three on 16 Oct. The latest decision (music §10) is used; the gap list is stale. Sound effects §15 also says the music design still lists Era VI, `global_tension` and stingers past 1939; the music README no longer does, so that note is stale too.
-- **OQ-AUD-6** Tutorial needs (tutorial §12): a step-appears chime, a step-complete tick, the vizier's note, and a Needs attention new-warning sound, all "ducked under music like stingers". The catalogue has only `ui_hint`; the sound effects design maps "advisor hints such as famine coming" to `notify_alert`, though there is no advisor after the tutorial; and effects do not duck music (except the priority 1 list). Blocks: onboarding audio.
-- **OQ-AUD-7** Palette-taking effects: sfx §4.2 says only the turn chimes and the court horn take the palette, but `army_levy_call` (palette lead wavetable) and `frame_nation_pick` (highlighted nation's palette) also do, as does the config `palette_sounds` list. Blocks: AUD-067.
-- **OQ-AUD-8** Ducking rules: the rule "priority 1 longer than 600 ms ducks music" also matches `frame_logo` (1.2 s), `frame_campaign_begin` (1.0 s) and `ui_purchase` (700 ms), which are not in the listed six. `frame_pause` ducks music 6 dB while paused although it is a priority 3 effect and the `game_menu` screen is "unchanged". Blocks: AUD-092, AUD-094.
-- **OQ-AUD-9** iOS audio session: whether WKWebView's default session or `navigator.audioSession` respects the silent switch and yields to other apps differs by iOS version; a native Capacitor "ambient" category may be needed. Not verified on a device. Settings adds `mix_with_other_apps` (restart) and a desktop `play_in_background` switch, which conflicts with "suspend when hidden" on desktop/web. Settings' master default is 80 % vs `buses.master: 1.0`. Blocks: AUD-109, AUD-111.
-- **OQ-AUD-10** `war_won` / `war_lost` play on "peace signed with a gain or a loss": what plays for a peace with neither (white peace)? Blocks: AUD-033.
-- **OQ-AUD-11** The Atlantic and creole palette "blends palettes 1, 8 and 10 by the nation's culture mix", but no blend rule exists, and the config maps only `creole_atlantic`. The turkic split by capital longitude 55 is only in the config. `event_major` "in a sombre form" is a variant not in the track list. Blocks: AUD-019, AUD-020, AUD-125.
-- **OQ-AUD-12** `ui_tooltip` is "off by default" but no setting turns it on. Haptics decision §15.3 calls all five moments "light" while §8 gives light, medium and heavy. The music director's screen rules don't name `final_result`, which the screen list gives `campaign_end`. Blocks: catalogue defaults.
-- **OQ-AUD-13** Each palette needs a paid reviewer of its tradition before release (music §8, §9 gate 2), and every track needs Leroy's listening approval (gate 1); not yet arranged.
+- **D-AUD-1** (was OQ-AUD-1) Era V turn chime: the Era V "swell" is played on effects voice S3 as a short sustained note; it never takes music voice W2. Effects never take a music voice.
+- **D-AUD-2** (was OQ-AUD-2) Music state inputs: `war_losing` holds while more than half (0.5) of the player's peace voices would accept the enemy's terms, or the player's capital is occupied; the war trend is that share's change since last month. `unrest` holds while 25 % or more of the player's provinces are Plotting or Risen (X-9); the stability clause is dropped. `prosperity` holds at peace for 10 years with a rising treasury, no Disloyal lord and at least half the lords Loyal. `realm_stability_up` / `realm_stability_down` play when one of the player's lords steps up or down in loyalty. `world_war` holds from Era V while 0.6 of the great powers are at war, the great powers being the 8 countries with the most provinces (provisional). "World tension" is not read. There is no war score and no stability stat, so the director reads what exists.
+- **D-AUD-3** (was OQ-AUD-3) Variety default: `own_palette` ("My palette only"). Settings owns defaults, and the example yaml is changed to match.
+- **D-AUD-4** (was OQ-AUD-4) Era basis: the calendar is the only era basis in play; `era_basis: technology` stays in config, off, and is not offered as a campaign rule. One basis is simpler and needs nothing from research.
+- **D-AUD-5** (was OQ-AUD-5) Stale notes: music §10 (16 Oct) is used; the gap list item and the sfx §15 note are stale. The latest decision wins.
+- **D-AUD-6** (was OQ-AUD-6) Tutorial sounds: step appears `ui_hint`, step finished `ui_confirm`, new Needs attention warning `notify_alert`, no sound for the vizier's note; none of them duck music. Existing catalogue sounds only.
+- **D-AUD-7** (was OQ-AUD-7) Palette-taking effects: the config `palette_sounds` list governs (the turn chimes, the court horn, `army_levy_call` and `frame_nation_pick`). The list is the one place the engine reads.
+- **D-AUD-8** (was OQ-AUD-8) Ducking: only the listed six effects duck music; the length rule is only how they were chosen and is not applied to other sounds. The game menu (`frame_pause`) does not duck music; `pause_music_db` is dropped. An explicit list is simpler than a rule with exceptions.
+- **D-AUD-9** (was OQ-AUD-9) Platform audio: on iOS the game uses the native "ambient" audio session, which respects the silent switch and mixes with other apps; `mix_with_other_apps` defaults to on. On desktop the settings switch `play_in_background` (default off) is honoured; web always suspends when hidden. Master volume defaults to 0.8. The device check of the iOS session is part of the release device test.
+- **D-AUD-10** (was OQ-AUD-10) White peace: a peace with no gain and no loss plays no stinger. Nothing new is added.
+- **D-AUD-11** (was OQ-AUD-11) Palettes: there is no blend; Atlantic and creole nations use the single `atlantic_creole` palette. The turkic split by capital longitude 55 (west `mena`, otherwise `steppe`) stays in config. A `narrative_only` major event plays no stinger, so there is no "sombre" variant. Simplest rules that need no new tracks.
+- **D-AUD-12** (was OQ-AUD-12) Catalogue defaults: `ui_tooltip` is never played (no setting turns it on); all five haptic moments are "light" (§15.3 is later); the `final_result` screen plays `campaign_end`. The later decision and the screen list win.
+- **OQ-AUD-13** Palette reviewers and listening approval (release task): each palette needs a paid reviewer of its tradition, and every track needs Leroy's listening approval, before release.
 
 ## 14. Traceability
 
@@ -703,3 +708,6 @@ None. Audio reacts to the player's view and nation only; computer players hear n
 | AUD-123 … AUD-128 | care.feature | all scenarios |
 | AUD-129 … AUD-131 | audio-data-build.feature | Tools scenarios |
 | AUD-132 … AUD-134 | — | Production process, not game behaviour (milestones listed in §10) |
+| AUD-135 | music-and-effects-together.feature | Tutorial and Needs attention sounds |
+| AUD-136 | busy-turns-and-mixing.feature | Only the battle on screen is heard |
+| AUD-137 | effects-era-and-region.feature | Weekly turns and the new year chime |

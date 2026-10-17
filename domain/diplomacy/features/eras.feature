@@ -47,10 +47,11 @@ Feature: Diplomacy through the eras
       | VI  | 4         |
       | VII | 4         |
 
-  @DIPL-168 @open-question
+  @DIPL-168 @placeholder
   Scenario: Offensive calls between pact partners
-    # OQ-DIPL-11: the pact exists only from era VI
-    Given the allies "Germany" and "Austria-Hungary" share a mobilisation pact
+    # config: eras.VI.pact_offensive_call_bonus
+    Given the date is "1914-07"
+    And the allies "Germany" and "Austria-Hungary" share a mobilisation pact
     When the country "Germany" sends an offensive call to "Austria-Hungary"
     Then the call holds +10 for the pact
 

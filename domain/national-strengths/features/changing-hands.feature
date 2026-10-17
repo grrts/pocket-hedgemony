@@ -4,20 +4,19 @@ Feature: Heritage when countries change hands
   I want clear rules for what happens to heritage
   So that ruling a land for a generation lets me grow into it
 
-  @HER-059 @HER-060 @placeholder @open-question
-  # OQ-HER-1: 30 years and accepted culture are proposals
+  @HER-059 @HER-060 @placeholder
+  # config: inheritance.claim_years
   Scenario Outline: An inherited birthright
     Given the country "Ottoman" annexed "Byzantium" in 1453
     And "Ottoman" has held Constantinople and most of the Byzantine homeland for <years> years
-    And the Greek culture is <culture>
     When the heritage conditions are evaluated
     Then the Byzantine birthright is <state>
 
     Examples:
-      | years | culture      | state                                    |
-      | 10    | accepted     | a dormant claim                          |
-      | 30    | not accepted | a dormant claim                          |
-      | 30    | accepted     | awake as the second birthright of "Ottoman" |
+      | years | state                                       |
+      | 10    | a dormant claim                             |
+      | 29    | a dormant claim                             |
+      | 30    | awake as the second birthright of "Ottoman" |
 
   @HER-060
   Scenario: At most two birthrights
@@ -51,3 +50,10 @@ Feature: Heritage when countries change hands
     Then it keeps the birthright and legacies of the forming country
     And it adds the heritage of "Spain" if it has its own
     And it draws ambitions from both pools
+
+  @HER-063
+  Scenario: A formed country keeps at most two birthrights
+    Given "Castile" holds its own birthright and one inherited from "Granada"
+    When "Castile" forms "Spain", which has a birthright of its own
+    Then "Spain" holds 2 birthrights: the own birthright of "Castile" and its own
+    And the birthright inherited from "Granada" is a dormant claim of "Spain" again

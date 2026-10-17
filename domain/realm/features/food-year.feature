@@ -18,12 +18,13 @@ Feature: A year of food
     When the collection runs
     Then the collected food goes to the castle of "Troyes"
 
-  @REALM-052 @placeholder
+  @REALM-052 @REALM-167 @placeholder
   Scenario: Food moving between castles loses some of its load
-    # config: food.transfer_loss_per_province (value not given: OQ-REALM-11)
+    # config: food_year.transfer_loss_per_province
     Given the castle of "Paris" holds more than its share and "Calais" less
     When the castles exchange food until each holds its share
     Then the food sent from "Paris" to "Calais" arrives with less than was sent, losing some for every province it travels
+    And 1,000 food sent 5 provinces arrives as 904
 
   @REALM-053
   Scenario: The spread keeps the reserve and hands out the rest by rings
@@ -40,12 +41,14 @@ Feature: A year of food
     Then the army eats as much as 2,000 men at home
     And the horses eat as much as 600 men
 
-  @REALM-054
+  @REALM-054 @REALM-167 @placeholder
   Scenario: Stores rot each season, less with granaries
+    # config: food_year.rot_per_season, food_year.rot_per_season_with_granary
     Given the castles of "Troyes" and "Sens" hold the same food and only "Troyes" has a granary
     When a season passes
     Then both lose some food to rot
     And "Troyes" loses less
+    And "Troyes" loses 2.5 % and "Sens" 5 %
 
   @REALM-055
   Scenario: A besieged castle stops spreading
@@ -89,3 +92,35 @@ Feature: A year of food
     Given an enemy army is about to march into the province "Picardy"
     When the country "France" burns its own fields in "Picardy"
     Then the enemy army finds nothing to forage there
+
+  @REALM-050 @REALM-167
+  Scenario Outline: The harvest comes in by hemisphere
+    Given a province lies at latitude <latitude>
+    When its harvest month is worked out
+    Then its harvest comes in <month>
+
+    Examples:
+      | latitude | month     |
+      | 48       | September |
+      | -34      | March     |
+
+  @REALM-050 @REALM-167 @placeholder
+  Scenario: Weather odds per region
+    # config: food_year.weather
+    Given a weather region rolls its harvest weather many times
+    When the rolls are counted
+    Then about 1 in 6 is bad, 1 in 6 is good and the rest normal
+
+  @REALM-032 @REALM-167 @placeholder
+  Scenario Outline: A castle's reach follows its roads
+    # config: food_year.reach_by_road
+    Given the castle of "Troyes" stands on a <road>
+    When its reach is worked out
+    Then it feeds <rings> rings
+
+    Examples:
+      | road       | rings |
+      | track      | 1     |
+      | road       | 2     |
+      | turnpike   | 3     |
+      | railway    | 4     |

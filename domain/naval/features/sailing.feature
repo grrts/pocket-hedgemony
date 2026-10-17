@@ -55,13 +55,19 @@ Feature: Sailing
     When its galley plans a route into an ocean zone
     Then the route is refused
 
-  @NAVY-092 @open-question
-  Scenario: Junks and dhows sail their own monsoon seas from the start
-    # depends on OQ-NAVY-20: whether T5 must be known, and which zones are "their own monsoon seas"
+  @NAVY-092
+  Scenario Outline: Junks and dhows sail their own monsoon seas with T5
+    # config: naval.monsoon (D-NAVY-20); T5's start regions know it in 1444
     Given the date is 1444
-    And a dhow of a Gujarati country in the Indian Ocean
-    When it plans a route into an ocean zone of its own monsoon sea
-    Then the route is allowed
+    And a dhow of a Gujarati country that <knows> T5 "Monsoon sailing calendars"
+    When it plans a route into the ocean zone "<zone>"
+    Then the route is <result>
+
+    Examples:
+      | knows          | zone             | result  |
+      | knows          | Arabian Sea      | allowed |
+      | does not know  | Arabian Sea      | refused |
+      | knows          | Atlantic Ocean   | refused |
 
   @NAVY-093 @placeholder
   Scenario Outline: Winds
@@ -94,6 +100,21 @@ Feature: Sailing
     When a fleet plans a route into a Baltic zone
     Then the route is refused
     And a fleet caught in a Baltic zone when it freezes is iced into the nearest port
+
+  @NAVY-125 @placeholder
+  Scenario Outline: Frozen northern seas from December to March
+    # config: naval.frozenSeas (X-17; provisional until world-map's frozen lookup)
+    Given it is <month>
+    When a fleet plans a route into the "<zone>"
+    Then the route is <result>
+    And a port on the "<zone>" <can> launch or take in ships
+
+    Examples:
+      | month    | zone            | result  | can    |
+      | January  | Gulf of Bothnia | refused | cannot |
+      | March    | White Sea       | refused | cannot |
+      | April    | Gulf of Bothnia | allowed | can    |
+      | January  | North Sea       | allowed | can    |
 
   @NAVY-096 @placeholder
   Scenario: The room an army takes aboard

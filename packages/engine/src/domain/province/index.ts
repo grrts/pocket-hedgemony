@@ -8,3 +8,4 @@ export * from "./land.ts";
 export * from "./people.ts";
 export * from "./rule.ts";
 export * from "./order.ts";
+export * from "./decided.ts";

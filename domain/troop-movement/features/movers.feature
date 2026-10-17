@@ -84,7 +84,7 @@ Feature: One way of moving for armies, ships and traders
   @MOVE-108
   Scenario: Food at sea
     Given the army "A" is aboard ships
-    When a month passes
+    When a month of weekly turns passes
     Then it eats from its reserve, as abroad
 
   @MOVE-109

@@ -114,15 +114,15 @@ Newest decision first.
 - SET-002: When the game first launches, the settings system shall pick a device profile and take every default from it. [settings §1.2, §3]
 - SET-003: When the player changes a setting, it shall apply at once with a preview behind the open panel and no Apply button; the only exception is Display mode, which asks "Keep this display?" and reverts after 15 seconds. [settings §1.3, §5.1; yaml `constants.display_revert_seconds`]
 - SET-004: Every row shall work with touch, mouse, keyboard and controller: no slider that needs a drag, no row that needs hover; sliders shall step with the d-pad or arrow keys and accept a tap at a position. [settings §1.4]
-- SET-005: When Settings is opened from the pause menu in a campaign, nothing shall be lost, and closing it shall return to the exact map spot. [settings §1.5]
+- SET-005: When Settings is opened from the game menu in a campaign, nothing shall be lost, and closing it shall return to the exact map spot. [settings §1.5]
 - SET-006: The settings system shall never change rules, balance or AI; anything that does is a campaign rule. [settings §1.6, §4.3]
 
 ### 5.2 Where Settings lives and the screen
 
-- SET-007: The title screen shall have a Settings button that opens Settings. [settings §2; see OQ-SET-10]
-- SET-008: In a campaign, the pause menu shall open Settings over the dimmed map, and shall also hold Campaign rules, a read-only list of the rules the campaign was started with. [settings §2, §4.3; see OQ-SET-11]
-- SET-009: `Esc` or the Menu button shall open the pause menu, from which Settings opens; on Steam, the Controller section shall have a button that opens Steam's own binding panel. [settings §2, §6.3]
-- SET-010: When the game first launches, the settings system shall show no settings wizard, and only these questions when needed, each on one screen: the language, only when the system language isn't supported; crash reports and usage statistics, when the privacy design requires consent; and "Is this text easy to read?" with Smaller, Fine and Bigger, on the Big screen profile only. [settings §2; see OQ-SET-9]
+- SET-007: The title screen's cog and its More menu shall open Settings as an overlay. [settings §2, §8; D-SET-10]
+- SET-008: In a campaign, the game menu shall open Settings over the dimmed map, and Settings shall hold Campaign rules, a read-only section listing the rules the campaign was started with. [settings §2, §4.3; D-SET-11]
+- SET-009: `Esc` or the Menu button shall open the game menu, from which Settings opens; on Steam, the Controller section shall have a button that opens Steam's own binding panel. [settings §2, §6.3]
+- SET-010: When the game first launches, the settings system shall show no settings wizard, and only these questions when needed, each on one screen: the language, only when the system language isn't supported; crash reports and usage statistics, when the privacy design requires consent; and "Is this text easy to read?" with Smaller, Fine and Bigger, on the Big screen profile only. [settings §2; D-SET-9]
 - SET-011: While the window is landscape (all devices), the Settings screen shall show the section list on the left, the section's rows on the right, and a one-line description of the focused row at the bottom. [settings §2.1]
 - SET-012: While the window is tall (tablets in portrait, tall desktop windows), the Settings screen shall show the section list first, open a section's rows full screen on tap, and return with Back; phones are landscape only. [settings §2.1, §11.1]
 - SET-013: The Settings screen shall show its sections in this order: Gameplay, Graphics, Audio, Controls, Accessibility, Language, Account and cloud saves, Privacy, About. [settings §2.1; yaml `sections`]
@@ -137,7 +137,7 @@ Newest decision first.
 - SET-019: When a controller is connected on any profile, the settings system shall add controller prompts and focus outlines without switching the profile. [settings §3]
 - SET-020: The settings system shall use these per-profile defaults (Phone / Tablet / Desktop / Steam Deck / Big screen): Interface scale Auto / Auto / 100 % / 112 % / 175 %; Text size Normal / Normal / Normal / Normal / Large; Display mode n/a / n/a / Windowed / Fullscreen / Fullscreen; Frame rate cap 60 / 60 / Display rate / 60 / 60; Battery saver Auto / Auto / Off / Auto / Off; Sharpness Balanced / Balanced / Native / Native / Native; Map detail Medium / High / High / High / High; Touch target size Large / Normal / n/a / Normal / n/a; Screen margins 0 / 0 / 0 / 0 / 5 % with the calibration screen offered once; Edge scrolling n/a / n/a / On in fullscreen / Off / Off; Controller cursor speed n/a / n/a / Medium / Medium / Slow; every other setting has one default for all profiles. [settings §3.1; yaml `default_by_profile`]
 - SET-021: Where the profile is Big screen, the game shall use the game shell's Far layout: 175 % scale with Large text puts body text at about 35 px on a 1080p TV, and the 5 % margin keeps everything out of the overscan band. [settings §3.1, §6.2]
-- SET-022: Where Interface scale is Auto, the settings system shall pick the largest scale step at which a 360 × 640 CSS-px safe layout still fits (small phones 100 %, large ones up to 125 %). [settings §3.1; yaml `constants.interface_scale_auto_min_layout`]
+- SET-022: Where Interface scale is Auto, the settings system shall pick the largest scale step at which a 640 × 360 CSS-px safe layout, measured landscape, still fits (D-SET-15) (small phones 100 %, large ones up to 125 %). [settings §3.1; yaml `constants.interface_scale_auto_min_layout`]
 
 ### 5.4 Storage and sync
 
@@ -153,7 +153,7 @@ Newest decision first.
 
 ### 5.5 Campaign rules
 
-- SET-032: The settings system shall treat as campaign rules, chosen on the new game screen, saved in the campaign and shown read-only under Pause → Campaign rules: difficulty, AI aggression, fog of war, historical or free events, ironman (achievements only count in ironman), the campaign end date (default 31 August 1939), and whether music eras follow the calendar or technology if that stays a choice. [settings §4.3; gap-lists campaign span]
+- SET-032: The settings system shall treat as campaign rules, chosen on the new game screen, saved in the campaign and shown read-only under Settings → Campaign rules: difficulty, AI aggression (shown as "AI temper", D-SET-12), fog of war, historical or free events, ironman (achievements only count in ironman), the campaign end date (default 31 August 1939), and whether music eras follow the calendar or technology if that stays a choice. [settings §4.3; gap-lists campaign span]
 - SET-033: The lens menu's "Parchment over unknown lands" toggle shall stay a display switch, since it only hides unknown lands visually; it would become a campaign rule only if fog ever hides information the AI uses. [settings §4.3, recommendation]
 
 ### 5.6 Graphics
@@ -164,7 +164,7 @@ Newest decision first.
 - SET-037: Graphics shall offer Pixel scaling (Crisp, Smooth; default Crisp): Crisp snaps interface art to whole pixel multiples, possibly leaving a few pixels of margin; Smooth fills the space exactly and lets edges blur slightly. [settings §5.1]
 - SET-038: Graphics shall offer Sharpness (Native, Balanced, Battery; per-profile default; applies on view): the map draws with up to the device ratio capped at 3 (Native), up to 2 (Balanced, today's code) or 1 (Battery) screen pixels per CSS pixel, the pixel art staying sharp at all three. [settings §5.1, §8]
 - SET-039: Graphics shall offer Frame rate cap (30, 60, 120, Display rate; per-profile default); when nothing moves the map shall not redraw at all, whatever the cap. [settings §5.1]
-- SET-040: Graphics shall offer Battery saver (Off, Auto, On; per-profile default): On sets a 30 fps cap, Battery sharpness, reduced animations, map redraws only on change, and a smaller worker budget for the AI turn; Auto turns it on when the device reports battery saving (iOS Low Power Mode, Android Battery Saver, Steam Deck on battery under 20 %). [settings §5.1, §6.1; yaml `sets_when_on`, `constants.battery_auto_threshold`; see OQ-SET-1]
+- SET-040: Graphics shall offer Battery saver (Off, Auto, On; per-profile default): On sets a 30 fps cap, Battery sharpness, reduced animations, map redraws only on change, and fewer music voices, and never changes the AI or any result (X-15); Auto turns it on when the device reports battery saving (iOS Low Power Mode, Android Battery Saver, Steam Deck on battery under 20 %). [settings §5.1, §6.1; yaml `sets_when_on`, `constants.battery_auto_threshold`; D-SET-1]
 - SET-041: Graphics shall offer Map detail (Low, Medium, High; per-profile default; applies on view): Low has no 8 × 8 close-in tiles (stays at 4 × 4), no surf and no forest blending; Medium has 8 × 8 tiles and still water; High has everything. [settings §5.1]
 - SET-042: Graphics shall offer Animations (Full, Reduced, Off; default Full) for water, marching columns, flags, smoke and battle playback motion; Off shows battle results as still frames; Accessibility's Reduced motion sets it to Reduced or lower. [settings §5.1]
 - SET-043: Where the game runs on mobile, Graphics shall offer Keep screen awake during the AI turn (On, Off; default On). [settings §5.1]
@@ -191,11 +191,11 @@ Newest decision first.
 
 ### 5.8 Gameplay
 
-- SET-061: Gameplay shall offer Autosave (Every turn, Every 6 turns, Every 12 turns (each January), Off; default Every 12 turns); Off turns off rotating autosaves only, never the Resume save. [settings §5.3; saves §2.3]
+- SET-061: Gameplay shall offer Autosave (Every month, Every 6 months, Every 12 months (each January), Off; default Every 12 months), measured by the date and written at the end of the turn the month begins in; Off turns off rotating autosaves only, never the Resume save. [settings §5.3; saves §2.3; X-18]
 - SET-062: Gameplay shall offer Autosaves kept per campaign (1, 3, 5; default 3). [settings §5.3; saves §2.3]
 - SET-063: While the campaign is ironman, the Autosave and Autosaves kept rows shall be hidden. [settings §5.3; yaml `hide_when: ironman`]
-- SET-064: Gameplay shall offer Confirm End turn (Off, When the Attention screen has lines, Always; default Off); when it asks, the question names the count ("3 warnings, 2 events wait for you · Look · End turn anyway"); unanswered events always ask whatever this says. [settings §5.3; see OQ-SET-2]
-- SET-065: Gameplay shall offer Battle playback speed (1×, 2×, 4×; default 1×), one bell taking 1–2 s at 1×; every player battle stopping the turn is not a setting. [settings §5.3]
+- SET-064: Gameplay shall offer Confirm End turn (Off, When the Attention screen has lines, Always; default Off); when it asks, the question names the count of warnings ("3 warnings wait for you · Look · End turn anyway"); unanswered events block End turn and open the first one whatever this says. [settings §5.3; screen-flow §4.6; D-SET-2]
+- SET-065: Gameplay shall offer Battle playback speed (1×, 2×, 4×; default 1×), one 4-hour step of a running player battle playing back in 0.5 s at 1×, 0.25 s at 2× and 0.125 s at 4×; battles never stop the turn and have no skip, which is not a setting. [settings §5.3; X-1]
 - SET-066: Gameplay shall offer Open the turn report (Every turn, When something important happened, Never; default When something important happened), "important" being defined by the turn report design. [settings §5.3]
 - SET-067: Gameplay shall offer Jump to events (On, Off; default On): the camera glides to an event's province when its card opens. [settings §5.3]
 - SET-068: Gameplay shall offer Tooltips (On, Off; default On): mouse hover after the delay, touch long-press, controller Y on the focused item. [settings §5.3]
@@ -203,18 +203,18 @@ Newest decision first.
 - SET-070: Gameplay shall offer Detailed tooltips (On, Off; default Off), showing the full breakdown of each number ("+12 from the market, −3 from the war tax"). [settings §5.3]
 - SET-071: Gameplay shall offer Tutorial hints (On, Off; default On) and the action "Reset tutorial and hints"; there shall be no advisor row, and muting a kind of warning happens on the Attention screen, not in Settings. [settings §5.3, §11.6]
 - SET-072: Gameplay shall offer Achievement toasts (On, Off; default On); Off hides the toast while achievements still unlock. [settings §5.3]
-- SET-073: Gameplay shall offer Place names (Historical, Modern; default Historical; applies on view): Historical names change with date and owner (Constantinople becomes Istanbul in Ottoman hands), Modern uses today's names; until a historical name list exists both show today's region names. [settings §5.3]
+- SET-073: Gameplay shall offer Place names (Historical, Modern; default Historical; applies on view): Historical names change with date and owner (Constantinople becomes Istanbul in Ottoman hands), Modern uses today's names; no historical name list exists (D-MAP-6), so both show today's region names (D-SET-17). [settings §5.3]
 - SET-074: Gameplay shall offer Date format (16 October 1444, 16 Oct 1444, 16.10.1444, 1444-10-16; default follows the language). [settings §5.3]
 
 ### 5.9 Controls
 
-- SET-075: Where touch is available (mobile, and touch screens on desktop), Controls shall offer Main hand (Right, Left; default Right), Left mirroring the action bar and the End turn button to the left side. [settings §5.4]
-- SET-076: Controls shall offer Long-press time (Short 0.3 s, Medium 0.5 s, Long 0.8 s; default Medium), long-press showing a tooltip or the action menu. [settings §5.4; see OQ-SET-7]
+- SET-075: Where touch is available (mobile, and touch screens on desktop), Controls shall offer Main hand (Right, Left; default Right), Left mirroring the action bar and the End turn button to the left side and moving the game menu button to the right, so the two stay at opposite corners. [settings §5.4; D-SET-16]
+- SET-076: Controls shall offer Long-press time (Short 0.3 s, Medium 0.5 s, Long 0.8 s; default Medium), long-press only explaining (a tooltip); no action is long-press only, and resets are done with each section's Reset to defaults. [settings §5.4; D-SET-7]
 - SET-077: Controls shall offer Double-tap to zoom (On, Off; default On) and Pan and zoom speed (Slow, Medium, Fast; default Medium). [settings §5.4]
-- SET-078: Where the game runs on desktop or web, Controls shall offer Right-click gives orders (On, Off; default On): On selects an army with left-click and marches it with a right-click on a province; Off uses the touch flow (tap army, tap province, confirm); the touch flow always works too. [settings §5.4, §11.3; see OQ-SET-8]
+- SET-078: Where the game runs on desktop or web, Controls shall offer Right-click gives orders (On, Off; default On): On selects an army with left-click and marches it with a right-click on a province; Off uses the touch flow (tap army, tap province, with no confirm step); the touch flow always works too. [settings §5.4, §11.3; D-SET-8]
 - SET-079: Where the game runs on desktop or web, Controls shall offer Wheel zoom (Toward the cursor, Toward the centre; default Toward the cursor), Edge scrolling (On, Off, On in fullscreen; per-profile default) and Pan speed for keys and edge (Slow, Medium, Fast; default Medium). [settings §5.4]
 - SET-080: Where the game runs on desktop or web, Controls shall let the player rebind any action with two keys per action, and a conflict shall ask "Also bound to X, swap?". [settings §5.4]
-- SET-081: The default keys shall be: pan W A S D or arrow keys; zoom wheel, `+` / `−`, `Q` / `E`; End turn `Enter`; pause menu `Esc`; map lenses 1–6 (realms, terrain, people, wealth, walls, food) `1`–`6` with `Tab` cycling; next / previous army `.` / `,`; next notification `N`; turn report `R`; jump to capital `Home`; ledger `L`. [settings §5.4; yaml `controls.keys`; see OQ-SET-4]
+- SET-081: The default keys shall be: pan W A S D or arrow keys; zoom wheel, `+` / `−`, `Q` / `E`; End turn `Enter`; game menu `Esc`; map lenses 1–6 (realms, terrain, people, wealth, walls, food) `1`–`6` with `Tab` cycling; next / previous army `.` / `,`; next notification `N`; turn report `R`; jump to capital `Home`; ledger `L`. [settings §5.4; yaml `controls.keys`; D-SET-4]
 - SET-082: When the player uses the End turn key, the turn shall end on a 0.5 s hold, or on a double press while Hold actions is off. [settings §5.4, §5.5]
 - SET-083: Controls shall offer Button prompts (Auto, Xbox, PlayStation, Nintendo, Steam Controller, Steam Deck; default Auto following the last controller used); on Steam the glyphs shall come from Steam Input so they match the player's own bindings. [settings §5.4, §6.3]
 - SET-084: Controls shall offer Confirm button (Bottom A / ✕, Right B / ○; default Bottom, Right when a Nintendo layout is detected), which swaps confirm and back. [settings §5.4]
@@ -225,9 +225,9 @@ Newest decision first.
 - SET-089: Controls shall offer Gyro cursor (Off, While touching the right trackpad / stick, Always; default Off) for the Steam Controller, Deck and PlayStation controllers; on Steam it is set in Steam Input and the row hides; elsewhere it shows only where the platform reports motion. [settings §5.4, §6.3]
 - SET-090: Controls shall offer Hold to open the action menu (Hold, Tap; default Hold). [settings §5.4]
 - SET-091: Where the game runs on Steam, controller rebinding shall happen in Steam's own panel (`ShowBindingPanel`) through "Open Steam controller settings", and the in-game rebind list shall be hidden; off Steam (iOS, Android, web, non-Steam desktop), controllers shall come through the Gamepad API and the in-game rebind list and deadzone row shall appear. [settings §5.4, §6.3]
-- SET-092: The default controller layout (Xbox names) shall be, for Map / Menus and panels / Battle view: left stick map cursor / move focus / unused; right stick pan / scroll / pan; LT / RT zoom out / in, previous / next page, slower / faster playback; A select / confirm / pause-play; B deselect-back / back / skip to result; X action menu / reset row / replay last bell; Y info card / long description / commander's line; LB / RB previous / next army, previous / next tab, unused; d-pad up / down cycle lenses, move focus, unused; d-pad left / right previous / next notification, step a value, unused; View turn report and hold 1 s End turn, unused, unused; Menu pause menu / close the panel / leave battle view; left stick click jump to capital; right stick click recentre on the selection. [settings §5.4; yaml `controls.pad`; see OQ-SET-3]
+- SET-092: The default controller layout (Xbox names) shall be, for Map / Menus and panels / Battle view: left stick map cursor / move focus / unused; right stick pan / scroll / pan; LT / RT zoom out / in, previous / next page, slower / faster playback; A select / confirm / change standing orders; B deselect-back / back / leave the battle view; X action menu / reset row / order a retreat; Y info card / long description / commander's line; LB / RB previous / next army, previous / next tab, previous / next running battle; d-pad up / down cycle lenses, move focus, unused; d-pad left / right previous / next notification, step a value, unused; View turn report and hold 0.5 s End turn, unused, unused; Menu game menu / close the panel / game menu; left stick click jump to capital; right stick click recentre on the selection. [settings §5.4; yaml `controls.pad`; D-SET-3; X-1]
 - SET-093: The official Steam Input configuration for the Steam Controller and Steam Deck shall add: right trackpad as a mouse-like cursor with momentum; left trackpad panning, with a click zooming to the province under the cursor; back grips (L4 / R4, L5 / R5) for previous / next notification and for the ledger and turn report; gyro off by default, offered as "aim while touching the right trackpad". [settings §5.4]
-- SET-094: Where the game runs on Steam, it shall declare its actions in three action sets, Map, Menu and Battle, plus a Text layer for the on-screen keyboard, ship official configurations for the Steam Controller, Steam Deck, Xbox, PlayStation and Nintendo controllers, and take button prompts from `GetGlyphPNGForActionOrigin`. [settings §6.3; see OQ-SET-5]
+- SET-094: Where the game runs on Steam, it shall declare its actions in six action sets, Shell, Map, Card, Book, Modal and Battle, plus a Text layer for the on-screen keyboard, ship official configurations for the Steam Controller, Steam Deck, Xbox, PlayStation and Nintendo controllers, and take button prompts from `GetGlyphPNGForActionOrigin`. [settings §6.3; screen-flow §8.3; D-SET-5]
 
 ### 5.10 Accessibility
 
@@ -264,7 +264,7 @@ Newest decision first.
 - SET-116: Where the profile is Steam Deck, body text shall be about 19 px at 112 % (17 px at 100 %) at 1280 × 800, the game shall start fullscreen with Deck glyphs, Settings shall need no mouse or keyboard anywhere, and naming a save shall call Steam's floating gamepad keyboard (`ShowFloatingGamepadTextInput`). [settings §6.1]
 - SET-117: Where the profile is Big screen, the game shall use 175 % interface scale and Large text (the same physical size at 4K, since scale works in CSS pixels), a slow cursor, a 5 % screen margin with the calibration screen, and focus outlines always on. [settings §6.2]
 - SET-118: The game shall always respect the safe areas (notch, home bar, camera hole); this is not a setting. [settings §6.4]
-- SET-119: Where the game runs on Android, the system back gesture shall behave like B / `Esc`: it closes the top panel, then opens the pause menu, and never quits the game from the map without asking. [settings §6.4]
+- SET-119: Where the game runs on Android, the system back gesture shall behave like B / `Esc`: it closes the top panel, then opens the game menu, and never quits the game from the map without asking. [settings §6.4]
 - SET-120: Where the game runs on iOS, the silent switch and "Let other apps' audio play" shall use the native "ambient" audio session. [settings §6.4]
 
 ### 5.14 Performance knobs
@@ -284,6 +284,7 @@ Newest decision first.
 - SET-127: A schema test shall check that `settings.yaml` loads, every default is one of its options, and every string key exists in English. [settings §10]
 - SET-128: The accessibility checks shall include screenshots of the map in each Colour vision mode run through a colour-blindness simulator. [settings §10]
 - SET-129: On a Steam Deck, every row shall be reachable with the built-in controls and its text legible at arm's length. [settings §10]
+- SET-130: Each Colour vision mode shall keep the map's season palettes (snow, spring green, summer base, autumn gold, wet season) readable: the season palettes are shifted with the mode's ramp, and No colour shows seasons by tile patterns; no setting turns the seasons off. [X-17; X-15]
 
 ## 6. Commands
 
@@ -343,7 +344,7 @@ the constants and the numbers inside rows.
 | `constants.interface_scale_auto_min_layout` | Layout that must fit for Auto scale | 360 × 640 CSS px | no | settings.yaml |
 | `graphics.interface_scale.options` | Scale steps | auto, 75, 88, 100, 112, 125, 150, 175, 200 | no | settings.yaml |
 | `graphics.sharpness` | Pixel ratio caps | Native ≤ 3, Balanced ≤ 2, Battery 1 | no | settings.yaml |
-| `graphics.battery_saver.sets_when_on` | Battery saver values | frame_cap 30, sharpness battery, animations reduced, engine.worker_budget low | no | settings.yaml |
+| `graphics.battery_saver.sets_when_on` | Battery saver values | frame_cap 30, sharpness battery, animations reduced (`engine.worker_budget` dropped, D-SET-1) | no | settings.yaml |
 | `graphics.screen_margins` | Margin slider | 0–10 %, step 1, Big screen 5 | no | settings.yaml |
 | `audio.master` | Master | 0–100 step 5, default 80 | no | settings.yaml |
 | `audio.music_volume` | Music | default 70 | no | settings.yaml |
@@ -352,7 +353,7 @@ the constants and the numbers inside rows.
 | (sound effects) | Interface sounds level | about 6 dB under the music | sound effects design | sfx config |
 | (sound effects) | Reduced intensity | priority 1 sounds 4 dB softer | sound effects design | sfx config |
 | `gameplay.tooltip_delay` | Delays | instant, short 0.3 s, long 0.8 s | no | settings.yaml |
-| `gameplay.battle_speed` | Playback | 1, 2, 4 (one bell 1–2 s at 1×) | no | settings.yaml |
+| `gameplay.battle_speed` | Playback | 1, 2, 4 (one 4-hour step 0.5 s at 1×) | yes (`battle_step_seconds_at_1x`) | settings.json |
 | `controls.long_press` | Long-press times | 0.3 / 0.5 / 0.8 s | no | settings.yaml |
 | `controls.keys.end_turn` | End turn key | Enter, hold 0.5 s | no | settings.yaml |
 | `controls.keys` slots | Keys per action | 2 | no | settings.yaml |
@@ -375,13 +376,13 @@ the constants and the numbers inside rows.
 | onboarding | downstream | Customer–Supplier | Tutorial hints, Reset tutorial and hints, tooltips and their delay, detailed tooltips; reduced motion respected by the spotlight |
 | achievements | downstream | Customer–Supplier | Achievement toasts switch; "achievements only count in ironman" (campaign rule) |
 | scenario-setup | upstream | Customer–Supplier | Campaign rules list shown read-only |
-| time-and-turns | downstream | Customer–Supplier | Battery saver's smaller worker budget for the AI turn; Keep screen awake during the AI turn |
+| time-and-turns | downstream | Customer–Supplier | Keep screen awake during the AI turn; battle playback speed; nothing touches the AI's budget (D-SET-1) |
 | warfare | downstream | Conformist | Battle playback speed; battle view controls; no-flashes and animation levels in battle |
 | events | downstream | Conformist | Jump to events |
 
 Changes the settings design asks of other designs (§8), and whether they were taken in:
-- Music 7.3: its settings list lives in settings §5.2; era following technology becomes a campaign rule if it stays a choice — open on the music side (gap lists: music 10 still open) (OQ-SET-12).
-- Saves: settings never inside a save (consistent with saves §1.6); personal settings ride account sync and store backups; Auto-Cloud adds `settings-personal.json` — not in the saves design (OQ-SET-13). Autosave values and the Cloud saves row taken in as written (consistent).
+- Music 7.3: its settings list lives in settings §5.2; era following technology becomes a campaign rule if it stays a choice — open on the music side ; it stays a campaign rule (D-SET-12).
+- Saves: settings never inside a save (consistent with saves §1.6); personal settings ride account sync and store backups; Auto-Cloud adds `settings-personal.json` — a request to saves to add it to the synced set (D-SET-13). Autosave values and the Cloud saves row taken in as written (consistent).
 - Sound effects: taken in as written.
 - Screen flow: Settings overlay from the More menu, the cog and the game menu (adopted); Big screen uses Far (adopted).
 - Tutorial 12: the advisor row dropped (adopted: tutorial v3 has no advisor after the tutorial).
@@ -392,31 +393,31 @@ Changes the settings design asks of other designs (§8), and whether they were t
 ## 12. AI
 
 None directly. Settings never change AI (SET-006). Battery saver gives the AI turn a smaller worker budget, which
-the design says makes turns slower; whether it can change AI results is OQ-SET-1.
+the design says makes turns slower; it no longer touches the AI's budget, which is counted in work steps and the same everywhere (D-SET-1).
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-The settings design says "No open questions remain"; these were found against it and its neighbours.
+The settings design said "No open questions remain"; these were found against it and its neighbours and are now decided.
 
-- OQ-SET-1: **Battery saver and the AI worker budget.** Battery saver sets `engine.worker_budget: low` ("the AI turn runs with a smaller worker budget"). If the AI has a computing budget per turn (gap lists List 1 item 18), a smaller budget could change AI decisions, which would break principle 6 (settings never change the simulation), determinism, replays from a report and multiplayer. Needs a rule that the budget only changes speed, not results.
-- OQ-SET-2: **Unanswered events at End turn.** Settings: "Unanswered events always ask" and the question counts events. Screen flow (decided 16 Oct): unanswered events block End turn and the button opens the first one; the question names only warnings.
-- OQ-SET-3: **Controller End turn.** Settings: View button, hold 1 s; screen flow §8.3: held half a second; keyboard: Enter held 0.5 s. Screen flow's controller "next" button opening Attention has no button in the settings layout (d-pad left/right is next notification, View is the turn report).
-- OQ-SET-4: **Zoom keys.** The §5.4 table lists zoom in / out as "`+` / `−`, `Q` / `E`" (Q in, E out by position); the yaml binds `zoom_in: ["+", E]`, `zoom_out: ["-", Q]`.
-- OQ-SET-5: **Action sets.** Settings §6.3 declares three Steam Input action sets (Map, Menu, Battle) plus Text; screen flow §8.3 defines six (Shell, Map, Card, Book, Modal, Battle).
-- OQ-SET-6: **Platform marks between table and yaml.** Screen margins: table "D, S", yaml `[desktop]`; Touch target size: table n/a on Desktop and Big screen, yaml platforms `[mobile, desktop]`; Restore purchases: yaml `[mobile, desktop]` (Steam has no restore need stated); Haptics "On (phones)" vs yaml default true for mobile (tablets included).
-- OQ-SET-7: **Long press.** Settings uses long-press to reset a row (the only per-row reset on touch) and to show "a tooltip or the action menu"; screen flow says long press only explains and no action exists only as a long press.
-- OQ-SET-8: **March order flow.** Settings (right-click off): "tap army, tap province, confirm"; screen flow §8.2: tap an army, then a province, with no confirm step.
-- OQ-SET-9: **First-launch questions.** Settings has three (language, consent, text readability on Big screen); screen flow S2 has two; the tutorial adds "New to Pocket Hegemony?". Also the language card: settings says "only when the system language isn't supported (falls back to English otherwise)", which reads as both asking and falling back.
-- OQ-SET-10: **Settings from the title.** Settings §2: "Title screen: Settings button (full screen)"; screen flow: a cog, and Settings under More, shown as an Overlay; settings §8 itself says overlay.
-- OQ-SET-11: **Pause menu.** Settings adds Campaign rules to the pause menu; screen flow's game menu (G4) does not list it, and screen flow says the game has a game menu, not a pause menu.
-- OQ-SET-12: **Campaign rules list.** "AI aggression" (settings, gap lists) vs "AI temper" (screen flow S5); the music-era rule depends on music open question 2 (gap lists: Music 10 still open); the saves header stores only difficulty, events and end date.
-- OQ-SET-13: **Personal settings sync not taken in by saves.** The saves design has no endpoint, synced-set entry or Auto-Cloud entry for `settings-personal.json`; "newest change wins, setting by setting" needs per-setting timestamps that no file format states.
-- OQ-SET-14: **Profile thresholds vs shapes.** Phone profile: short side under 600 CSS px; game-shell Short wide shape: height under 500 css px. "TV-class display" for Big screen is not defined.
-- OQ-SET-15: **Auto interface scale.** "A 360 × 640 CSS-px safe layout" is portrait-shaped while phones are landscape only; which way the 360 × 640 box is measured is not said.
-- OQ-SET-16: **Main hand Left.** Mirrors the End turn button to the left; screen flow requires End turn and the game menu button at opposite corners — whether the game menu button moves right is not said.
-- OQ-SET-17: **Place names list.** Historical place names need a name list that does not exist; until then both options show today's region names.
-- OQ-SET-18: **Owner designs missing.** Privacy (consent rows, crash reports), store screens (Restore purchases), turn report ("important"), input scheme, accessibility and localisation designs are referenced but not written; Big screen and Deck numbers are to be checked against Valve's Steamworks post.
-- OQ-SET-19: **Hint switches and mutes.** Settings puts "hint switches" in the personal group; the tutorial puts Attention mutes and seen first-time entries in tutorial progress owned by saves. Which store holds "Reset tutorial and hints" state is not settled.
+- **D-SET-1** (was OQ-SET-1) Battery saver and the AI budget: Battery saver only lowers the frame rate, animation and music voices; the AI's budget is counted in work steps and is the same on every setting, and `engine.worker_budget` is dropped. X-15 settles it.
+- **D-SET-2** (was OQ-SET-2) Unanswered events at End turn: unanswered events block End turn and the button opens the first one; the confirmation question names only warnings. Screen flow, decided later, wins.
+- **D-SET-3** (was OQ-SET-3) Controller End turn: the View button held 0.5 s ends the turn, like Enter on the keyboard; there is no extra Attention button, Attention is opened from the End turn question's "Look". Screen flow's half second is later, and no new button is added.
+- **D-SET-4** (was OQ-SET-4) Zoom keys: the yaml binding governs: `+` or `E` zooms in, `-` or `Q` zooms out. The data is what the game reads.
+- **D-SET-5** (was OQ-SET-5) Action sets: screen flow's six sets (Shell, Map, Card, Book, Modal, Battle) plus Text. Screen flow is the later design.
+- **D-SET-6** (was OQ-SET-6) Platform marks: the yaml's platform lists govern every row (Screen margins desktop only, Touch target size on mobile and desktop, Restore purchases on mobile and desktop, Haptics on for mobile, tablets included). The data is what the game reads.
+- **D-SET-7** (was OQ-SET-7) Long press: a long press only explains; resetting is done with each section's Reset to defaults, and the per-row long-press reset is dropped. Screen flow's rule is the simpler one.
+- **D-SET-8** (was OQ-SET-8) March order: tap an army, then a province, with no confirm step. Screen flow is later and simpler.
+- **D-SET-9** (was OQ-SET-9) First-launch questions: the language card only when the system language is not supported (otherwise the game uses it, with no card), the consent card, and on Big screen the text readability card; "New to Pocket Hegemony?" belongs to the tutorial. Each card shows only when needed.
+- **D-SET-10** (was OQ-SET-10) Settings from the title: Settings opens as an overlay from the title's cog and from More. Settings §8 and screen flow agree on an overlay.
+- **D-SET-11** (was OQ-SET-11) Pause menu: there is no pause menu; Settings opens from the game menu, and Campaign rules show read-only as a section inside Settings. Screen flow's game menu is the later design, and nothing is added to it.
+- **D-SET-12** (was OQ-SET-12) Campaign rules list: the rule keeps the key `aiAggression` and is shown as "AI temper"; the music-era rule stays a campaign rule; all campaign rules are saved with the campaign. Screen flow's label is later.
+- **D-SET-13** (was OQ-SET-13) Personal settings sync: `settings-personal.json` syncs as its own small file and holds a change time per setting, so the newest change wins setting by setting (a request to saves to add it to the synced set). It states the needed timestamps without a new mechanic.
+- **D-SET-14** (was OQ-SET-14) Profiles and shapes: the Phone profile is short side under 600 CSS px; game-shell's Short wide shape is a separate layout test; Big screen is the platform's TV mode flag (Steam Big Picture or a console TV mode). Each rule keeps its own job.
+- **D-SET-15** (was OQ-SET-15) Auto interface scale: the safe layout box is 640 × 360 CSS px, measured landscape. Phones are landscape only.
+- **D-SET-16** (was OQ-SET-16) Main hand Left: End turn moves to the left corner and the game menu button moves to the right, so they stay at opposite corners. It keeps screen flow's rule.
+- **D-SET-17** (was OQ-SET-17) Place names: the setting stays as designed, and since no historical name list is added (D-MAP-6), both options show today's region names. Nothing new is added.
+- **OQ-SET-18** (release task) Owner designs missing: privacy and consent rows, store screens and Restore purchases, and the Big screen and Deck numbers need a store and Valve Steamworks check.
+- **D-SET-19** (was OQ-SET-19) Hint switches and mutes: tutorial progress and Needs attention mutes go into the save, hint switches stay personal settings, and "Reset tutorial and hints" clears both. X-16 settles it.
 
 ## 14. Traceability
 
@@ -432,7 +433,7 @@ The settings design says "No open questions remain"; these were found against it
 | SET-006 | campaign-rules.feature | Campaign rules are read-only in the campaign |
 | SET-006 | campaign-rules.feature | No setting changes the simulation |
 | SET-007 | settings-screen.feature | Settings from the title screen |
-| SET-008 | settings-screen.feature | Settings and Campaign rules from the pause menu |
+| SET-008 | settings-screen.feature | Settings from the game menu, with Campaign rules inside |
 | SET-009 | settings-screen.feature | Shortcuts into Settings |
 | SET-009 | settings-screen.feature | Steam's own binding panel |
 | SET-010 | settings-screen.feature | First-launch questions only when needed |
@@ -461,7 +462,7 @@ The settings design says "No open questions remain"; these were found against it
 | SET-030 | storage-and-sync.feature | Loading a save never changes settings |
 | SET-031 | storage-and-sync.feature | Buying the full game keeps settings |
 | SET-032 | campaign-rules.feature | Campaign rules are read-only in the campaign |
-| SET-032 | campaign-rules.feature | The music era rule, if it stays a choice |
+| SET-032 | campaign-rules.feature | The music era rule is a campaign rule |
 | SET-033 | campaign-rules.feature | Parchment fog stays a display switch |
 | SET-034 | graphics.feature | Device profile row |
 | SET-035 | graphics.feature | Display mode only on desktop |
@@ -584,3 +585,4 @@ The settings design says "No open questions remain"; these were found against it
 | SET-127 | settings-data.feature | Schema test |
 | SET-128 | settings-data.feature | Colour vision screenshots |
 | SET-129 | settings-data.feature | Steam Deck check |
+| SET-130 | accessibility.feature | Season palettes stay readable in every colour vision mode |

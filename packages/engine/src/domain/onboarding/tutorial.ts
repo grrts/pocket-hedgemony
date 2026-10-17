@@ -293,7 +293,10 @@ export function stepLook(o: { reducedMotion?: boolean; uiScale?: "default" | "la
 /** The guide face appears only in the tutorial (TUT-062, TUT-071). */
 export const guideFace = (inTutorial: boolean): string | null => (inTutorial ? config.guide_face.name : null);
 
-/** Any battle, Varna included, can be skipped to the result; under reduced motion the hand and spotlight stay still (TUT-111). */
+/** The label on the note's face (TUT-119, D-TUT-2). */
+export const guideFaceLabel = (): string => config.guide_face.label;
+
+/** Any battle, the chapter 5 border clash included, can be skipped to the result; under reduced motion the hand and spotlight stay still (TUT-111). */
 export const battleSkippable = (): boolean => true;
 
 // ---------------------------------------------------------------- tokens and prompts (TUT-006, TUT-059, TUT-098, TUT-099, TUT-113)
@@ -384,7 +387,7 @@ export function warHeldBack(war: { attacker: string; target?: string; region?: s
   return !!region && q.regions.includes(region);
 }
 
-/** Varna always opens the battle screen at one bell every 3 seconds (TUT-023). */
+/** The chapter 5 border clash at Giurgiu always opens the battle screen at one bell every 3 seconds (TUT-023). */
 export function battleView(battle: string, tutorialRunning: boolean): { battleScreen: boolean; secondsPerBell: number | null } {
   const w = SC.watch_speed;
   if (tutorialRunning && battle === w.battle) return { battleScreen: w.opens_battle_screen, secondsPerBell: w.seconds_per_bell };
@@ -401,7 +404,7 @@ export interface ScriptedEvent {
   chapter: number;
   history: { summary: string; sources: string[] };
   line?: string;
-  line_if_peace_refused?: string;
+  options?: string[];
 }
 
 export const SCRIPTED_EVENTS: ScriptedEvent[] = config.scripted_events as ScriptedEvent[];
@@ -420,7 +423,7 @@ export function forcedAi(country: string): (typeof SC.forced_ai)[keyof typeof SC
   return (SC.forced_ai as Record<string, (typeof SC.forced_ai)[keyof typeof SC.forced_ai]>)[country];
 }
 
-/** Hungary offers terms after failing to take one castle in two months, when Varna was lost (TUT-031). */
+/** Hungary offers terms after failing to take one castle in two months, when the border clash was lost (TUT-031). */
 export function hungaryOffersTerms(monthsFailingOneCastle: number): boolean {
   return monthsFailingOneCastle >= SC.forced_ai.Hungary.offers_terms_after_failing_castle_months;
 }
@@ -440,9 +443,9 @@ export function siegeMonth(s: { breached: boolean; moreaOffersTerms: boolean }):
   return s.breached || s.moreaOffersTerms ? "chapter ends" : "carries on";
 }
 
-/** After a lost Varna the step text changes (TUT-031). */
-export function varnaStepText(won: boolean, lang = "en"): string | null {
-  return won ? null : (config.strings as Record<string, Record<string, string>>)[lang]!["tut.ch5.lost_varna"]!;
+/** After a lost border clash the step text changes (TUT-031). */
+export function clashStepText(won: boolean, lang = "en"): string | null {
+  return won ? null : (config.strings as Record<string, Record<string, string>>)[lang]!["tut.ch5.lost_clash"]!;
 }
 
 /** The opening card of a chapter says in one line that history is back on course after a choice that differed (TUT-015). */
@@ -456,7 +459,7 @@ export function playableChapters(edition: string): number[] {
   return config.free_tier.includes(config.tutorial_nation) ? CHAPTERS.map((c) => c.n) : [];
 }
 
-// ---------------------------------------------------------------- the Varna crusade (TUT-036 … TUT-049)
+// ---------------------------------------------------------------- the crusade after Varna (TUT-036 … TUT-049)
 
 export function crusadeLeague(): { against: string; members: string[]; fleets: string[]; regardlessOfThreshold: boolean; line: string; warAim: string; aimGrantedBy: string } {
   const l = SC.league;
@@ -471,11 +474,32 @@ export function crusadeLeague(): { against: string; members: string[]; fleets: s
   };
 }
 
-/** The chapter 4 event line depends on whether the peace was refused (TUT-030). */
-export function crusadeEventLine(peaceRefused: boolean): string {
-  const e = SCRIPTED_EVENTS.find((x) => x.id === "tut_crusade_breaks_peace")!;
-  return peaceRefused ? e.line_if_peace_refused! : e.line!;
+/** The news that ends chapter 3: the crusaders' fleet on the Danube (TUT-037, D-TUT-9). */
+export function danubeNewsLine(): string {
+  return SCRIPTED_EVENTS.find((x) => x.id === "tut_danube_fleet")!.line!;
 }
+
+/** The tutorial's start state (X-5, D-TUT-9): 11 November 1444, Mehmed II on the throne, the crusade war still open with its aim held. */
+export function tutorialStart(): { date: string; ruler: string; rulerAge: number; retired: string; retiredAt: string; crusadeWarOpen: boolean; leagueAim: string; aimGrantedBy: string } {
+  const c = SC.catalogue_court;
+  return { date: config.start_date, ruler: c.ruler, rulerAge: c.ruler_age, retired: c.retired, retiredAt: c.retired_at, crusadeWarOpen: SC.overrides.crusade_war_open, leagueAim: SC.league.war_aim, aimGrantedBy: SC.league.aim_granted_by };
+}
+
+/**
+ * Off script inside one chapter (TUT-030, TUT-032, D-TUT-3): asking Murad to
+ * stay keeps him at Edirne as a commander until chapter 1 ends; ignoring the
+ * wavering lord drops him one step within chapter 2. The next chapter's save
+ * carries nothing over.
+ */
+export function offScript(choice: "Ask him to stay this winter" | "Let him go" | "ignored lord", chapterN: number): { chapter: number; murad?: string; until?: string; loyaltyStepsDown?: number; carriesOver: false } {
+  const o = SC.off_script;
+  if (choice === "ignored lord") return { chapter: chapterN, loyaltyStepsDown: chapterN === o.ignored_lord.chapter ? o.ignored_lord.loyalty_steps_down : 0, carriesOver: false };
+  if (choice === "Let him go") return { chapter: chapterN, murad: "Manisa", carriesOver: false };
+  return { chapter: chapterN, murad: o.murad_stays.murad, until: o.murad_stays.until, carriesOver: false };
+}
+
+/** The Ottoman worked-example numbers for the recruiting, battle and siege lessons (TUT-018, D-TUT-11; provisional). */
+export const ottomanExamples = () => config.ottoman_examples;
 
 export type FaithChoice = keyof typeof SC.faith_choice;
 
@@ -514,8 +538,8 @@ export function lensStep(): { lens: string; marks: string[] } {
   return { lens: step.lens!, marks: (SC.lenses as Record<string, { marks: string[] }>)[step.lens!]!.marks };
 }
 
-/** The turn report after Varna: the result with the faith choice, both sides' dead counted the same way (TUT-047, TUT-049). */
-export function varnaReport(r: { won: boolean; choice: FaithChoice; sipahis: Lord; dead: Record<string, number> }): {
+/** The turn report after the border clash: the result with the faith choice, both sides' dead counted the same way (TUT-047, TUT-049). */
+export function clashReport(r: { won: boolean; choice: FaithChoice; sipahis: Lord; dead: Record<string, number> }): {
   result: string;
   faithChoice: FaithChoice;
   sipahisRode: number;
@@ -534,9 +558,9 @@ export function varnaReport(r: { won: boolean; choice: FaithChoice; sipahis: Lor
   };
 }
 
-/** Peace with Hungary ends the league's war; the league ends with its event (TUT-047). */
-export function afterVarnaPeace(): { leagueWarEnds: true; hungarySuccession: "event tree" } {
-  return { leagueWarEnds: true, hungarySuccession: "event tree" };
+/** Peace with Hungary ends the league's war, and the league with it (TUT-047). */
+export function afterClashPeace(): { leagueWarEnds: true; leagueEnds: true } {
+  return { leagueWarEnds: true, leagueEnds: true };
 }
 
 /** Chapter 6's Faith line and the madrasa's faith (TUT-048). */
@@ -615,3 +639,13 @@ export function straitCrossing(w: MoveWorld, a: Army, from: string, to: string):
   const fleet = s && w.movers.find((m) => m.kind === "fleet" && m.place === s.zone);
   return fleet ? { open: false, banner: fleet.owner, reason: v.reason ?? "" } : { open: false, reason: v.reason ?? "" };
 }
+
+/** The tutorial's action per input, with the controller column the game shell adopted (TUT-100, D-TUT-12). */
+export function tutorialAction(action: string, input: Input): string {
+  const a = (config.inputs.actions as Record<string, Record<Input, string>>)[action];
+  if (!a) throw new Error(`no tutorial action ${action}`);
+  return a[input];
+}
+
+/** Controller holds: skip a step (B / Circle) and End turn (Menu / Options), in seconds (D-TUT-12). */
+export const controllerHolds = () => config.controller_holds;

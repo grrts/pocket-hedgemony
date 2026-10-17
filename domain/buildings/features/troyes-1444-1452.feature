@@ -10,21 +10,24 @@ Feature: Troyes 1444 to 1452 worked example
     And the province "Troyes" has 3600 homeless
     And the town of "Troyes" is a town with 6 slots holding a market, 3 loom houses, a church and a school
 
-  @BLD-062 @BLD-034 @BLD-037 @placeholder @open-question
-  # OQ-BLD-1: Troyes is called a market town in province 1; OQ-BLD-21: burned tiles and paid rebuild
+  @BLD-155
+  Scenario: Troyes in 1444
+    Then the town of "Troyes" is a "town" with 6 town slots
+
+  @BLD-062 @BLD-034 @BLD-037 @BLD-160 @placeholder
   Scenario: 1444, the burned field
     When the player pays 15 gold to rebuild the burned field
-    Then the farm is rebuilt in a season instead of a year
+    Then the farm is rebuilt in 3 months instead of a year
     And 500 of the homeless form the crew
     And when it is done they move into the farm's slots
 
-  @BLD-051 @BLD-025 @BLD-034 @placeholder @open-question
-  # OQ-BLD-11: is a lord's province "yours" for material reach?
+  @BLD-051 @BLD-025 @BLD-034 @BLD-158 @placeholder
   Scenario: 1445, the yearly fair
-    Given no free town slot is left in "Troyes"
+    Given the country "France" knows "T6 Merchant fairs and exchanges"
+    And no free town slot is left in "Troyes"
     And a market charter is granted in "Troyes"
     When the player upgrades the market to a yearly fair for 100 gold, 30 stone and 12 months
-    Then the stone is bought for 15 gold from a quarry in a lord's province one ring away
+    Then the stone comes free from a quarry in a lord's province one ring away, which counts as the crown's own
     And the crew of 2000 is all homeless
     And when the fair opens it takes 900 more market folk
     And traders can be hired in "Troyes"
@@ -44,8 +47,7 @@ Feature: Troyes 1444 to 1452 worked example
     When the player leaves the woods tile and builds a quarry on a hills tile of a neighbouring province for 20 gold
     Then the next castle step in "Troyes" needs no bought stone
 
-  @BLD-043 @BLD-048 @BLD-064 @BLD-066 @open-question
-  # OQ-BLD-12: does a palisade count as town walls for plunder?
+  @BLD-043 @BLD-048 @BLD-064 @BLD-066
   Scenario: 1450, Burgundy invades
     Given the date is 1450
     And a stone castle upgrade site is running in "Troyes"

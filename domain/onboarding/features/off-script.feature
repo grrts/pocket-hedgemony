@@ -4,29 +4,27 @@ Feature: When the player goes off script
   I want the tutorial to guide me without forcing an outcome
   So that my choices count as in a real campaign
 
-  # Cross-chapter consequences vs fixed chapter saves (OQ-TUT-3).
-  @TUT-030 @open-question
-  Scenario: The peace was refused in chapter 1
-    Given the player refused the ten-year peace in chapter 1
-    Then the country "Hungary" stays at war
-    And the quiet world keeps Hungary's armies home until chapter 5
-    And the chapter 4 event reads "The war you chose resumes"
+  @TUT-030
+  Scenario: Murad was asked to stay in chapter 1
+    Given the player picked "Ask him to stay this winter" on the event "Murad goes back to Manisa"
+    Then Murad stays at Edirne as a commander until the end of chapter 1
+    When the player starts chapter 2
+    Then chapter 2 starts from its chapter save with Murad at Manisa
 
   @TUT-031 @placeholder
-  Scenario: Lost at Varna
-    Given the player's army lost the battle at "Varna"
+  Scenario: Lost the border clash
+    Given the player's army lost the border clash at "Giurgiu"
     Then the step reads "Your army broke. Fall back behind the walls of Edirne and call the levy."
     When the country "Hungary" fails to take one castle in two months
     Then Hungary offers terms
     And chapter 5 ends in peace
 
-  # Cross-chapter consequences vs fixed chapter saves (OQ-TUT-3).
-  @TUT-032 @open-question
+  @TUT-032
   Scenario: The wavering lord was ignored
     Given the player left the wavering lord alone in chapter 2
-    Then his loyalty drops
-    When the rising starts in chapter 7
-    Then his riders don't come
+    Then his loyalty drops one step within chapter 2
+    When the player starts chapter 7
+    Then chapter 7 starts from its chapter save and nothing carries over
 
   @TUT-033 @placeholder
   Scenario Outline: An idle player is helped

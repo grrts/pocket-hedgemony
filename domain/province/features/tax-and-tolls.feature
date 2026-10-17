@@ -51,13 +51,33 @@ Feature: Tax and tolls per province
     Then it comes from the value of what its buildings make and its townsfolk
     And the tolls are counted in trade, not in tax owed
 
-  @PROV-162 @PROV-163 @open-question
-  Scenario: Troyes owes 11 gold and 9 reach the treasury
-    # OQ-PROV-22: the design does not say which rule loses the 2 gold
+  @PROV-162 @PROV-163 @PROV-293
+  Scenario: Troyes owes 11 gold and all 11 reach the treasury
     Given the province "Troyes" owes 11 gold this year at "normal"
     And it is a royal province with an official, 3 days from Paris
     When the tax is collected
-    Then 9 gold reach the country "France"
+    Then 11 gold reach the country "France"
+
+  @PROV-293 @placeholder
+  Scenario Outline: Travel loses 5 % a day beyond 5 and a collector makes it up
+    Given the province "Gascony" owes 20 gold this year at "normal"
+    And it is <days> days from the capital with a tax collector at <collector> effect
+    When the tax is collected
+    Then <gold> gold reach the country "France"
+
+    Examples:
+      | days | collector | gold |
+      | 5    | no        | 20   |
+      | 9    | no        | 16   |
+      | 12   | no        | 13   |
+      | 9    | full      | 19.2 |
+      | 3    | full      | 20   |
+
+  @PROV-293
+  Scenario: Tax is paid monthly and capped at what is owed
+    Given the province "Troyes" owes 12 gold this year at "normal"
+    When a month of tax is paid
+    Then 1 gold is paid that month
 
   @PROV-162
   Scenario Outline: Things that cut tax owed
@@ -77,9 +97,9 @@ Feature: Tax and tolls per province
     When the province "Troyes" has riots
     Then it owes 6 gold a year
 
-  @PROV-163 @placeholder @open-question
+  @PROV-163 @placeholder
   Scenario Outline: How much reaches you
-    # config: province.tax.no_official, province.tax.lord_share, province.tax.free_travel_days; OQ-PROV-10 travel share
+    # config: province.tax.no_official, province.tax.lord_share, province.tax.free_travel_days, decided.tax_travel_loss_per_day
     Given the province "<province>" owes 20 gold
     And <condition>
     When the game works out the province's stats
@@ -90,7 +110,7 @@ Feature: Tax and tolls per province
       | Troyes   | it is royal with no official               | at most 10 gold           |
       | Dijon    | a lord governs it                          | at most 10 gold           |
       | Calais   | it is occupied by the country "England"    | nothing                   |
-      | Gascony  | it is 12 days from the capital             | less than within 5 days   |
+      | Gascony  | it is 12 days from the capital             | 13 gold                   |
       | Troyes   | an enemy army sits on the road to Paris    | less than with a free road |
 
   @PROV-164

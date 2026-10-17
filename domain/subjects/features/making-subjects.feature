@@ -39,18 +39,16 @@ Feature: Making a subject
     Then "W" picks "L" as its Vassal or its ally
     And the new ruler of "L" starts "Loyal"
 
-  @SUBJ-086 @open-question
-  Scenario Outline: Offered protection
-    # OQ-SUBJ-4: diplomacy decides protection asks by a reasons count
-    Given the small country "S" has a Hostile neighbour much stronger than itself
-    And "S" <asks>
-    When "P" offers "S" protection
+  @SUBJ-086
+  Scenario Outline: A subject by agreement
+    Given diplomacy's count said yes to <ask>
+    When the subjects context makes the subject
     Then "S" becomes a "<kind>" of "P"
 
     Examples:
-      | asks                     | kind      |
-      | asks nothing             | Tributary |
-      | asks to be a Vassal      | Vassal    |
+      | ask                                        | kind      |
+      | "P" offering overlordship to "S"           | Tributary |
+      | "S" asking "P" for protection as a Vassal  | Vassal    |
 
   @SUBJ-087
   Scenario: Inheritance makes a Union

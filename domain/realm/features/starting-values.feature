@@ -5,9 +5,9 @@ Feature: Starting values rules
   So that every campaign starts from history, a little differently each time
   # The data itself belongs to scenario-setup.
 
-  @REALM-130 @open-question
+  @REALM-130 @REALM-166 @placeholder
   Scenario Outline: Catalogue assessments set starting counts
-    # OQ-REALM-10: the numeric mapping is not given
+    # config: starting
     Given the catalogue rates the country "France" on "<assessment>"
     When the campaign starts
     Then that rating sets its <stats>
@@ -22,15 +22,17 @@ Feature: Starting values rules
       | political_stability and unrest_risk          | lords' starting loyalty and provinces in revolt          |
       | territorial_cohesion                         | number of lords, how much land they hold, and tongue     |
       | institutional_development                    | schools, scholars and starting inventions                |
-      | trade_access                                 | merchants and grain price access                         |
+      | trade_access                                 | starting traders                                         |
       | diplomatic_influence                         | extra officials at court ready to go abroad as envoys    |
 
-  @REALM-131 @open-question
+  @REALM-131 @REALM-166 @placeholder
   Scenario: Low confidence widens the random range
-    # OQ-REALM-10: width of the range and seeded randomness
+    # config: starting.spread_by_confidence
     Given the catalogue has "low" confidence in the country "Kongo"
     When two campaigns start
     Then the starting counts of "Kongo" vary more between them than those of a country with high confidence
+    And each count stays within 25 % of its middle value
+    And the same seed gives the same counts
 
   @REALM-132
   Scenario: Relations and lords come from the 1444 files

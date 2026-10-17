@@ -68,7 +68,7 @@ function rev(s: Scenario, id?: string): V.Revolution {
 function track(s: Scenario, id?: string, country?: string): V.Track {
   return V.trackOf(rs(s), id ?? s.rev, country ?? s.country);
 }
-/** Runs f as if one month earlier (so a sign lit before this turn has been seen). */
+/** Runs f as if one month earlier (so a sign lit before this month has been seen). */
 function monthBefore(s: Scenario, f: () => void): void {
   const world = w(s);
   const [y, m] = [world.year, world.month];
@@ -219,7 +219,7 @@ function light(s: Scenario, id: string, country: string, n: number, requirements
   for (const sign of list.slice(0, n)) satisfy(s, sign.if, roles);
   expect(V.litCount(rs(s), id, country), `lit signs of ${id}`).toBe(n);
 }
-/** Lights n signs and lets the revolution see them before this turn. */
+/** Lights n signs and lets the revolution see them before this month. */
 function litBefore(s: Scenario, id: string, country: string, n: number): void {
   light(s, id, country, n);
   monthBefore(s, () => V.evaluate(rs(s), id, country));
@@ -277,7 +277,7 @@ Given("a quarter of the people of {string} want a constitution", (s, name: strin
 Given("the crown of {string} is distrusted", (s, name: string) => {
   E.country(w(s), realm(s, name)).stats.stability = -1;
 });
-When("the turn's signs are evaluated", (s) => {
+When("the month's signs are evaluated", (s) => {
   V.evaluateAll(rs(s));
   act(s);
 });
@@ -359,8 +359,8 @@ Given(
     s.acted = false;
   },
 );
-When("the turn is processed", (s) => {
-  s.turnLog = V.processTurn(rs(s), rng(s));
+When("the monthly step runs", (s) => {
+  s.turnLog = V.processMonth(rs(s), rng(s));
   act(s);
 });
 Then("the revolution {string} is at the stage {string} for {string}", (s, id: string, stage: string, name: string) => {
@@ -394,15 +394,15 @@ Given("the country {string} has {int} signs of {string} lit", (s, name: string, 
   litBefore(s, id, monarchy(s, name), n);
   expect(track(s).stage).toBe("Brewing");
 });
-When("a fourth sign lights this turn", (s) => {
+When("a fourth sign lights this month", (s) => {
   satisfy(s, rev(s).signs!.list[3]!.if, V.rolesFor(rs(s), s.rev, s.country));
-  s.turnLog = V.processTurn(rs(s), rng(s));
+  s.turnLog = V.processMonth(rs(s), rng(s));
   act(s);
 });
-Then("the event {string} does not fire this turn", (s, id: string) => {
+Then("the event {string} does not fire this month", (s, id: string) => {
   expect(w(s).history.some((h) => h.event === id)).toBe(false);
   expect((s.turnLog as E.DomainEvent[]).some((l) => l.type === "RevolutionRolled" && l.revolution === id)).toBe(false);
-  expect(V.whyNot(rs(s), id, s.country)).toBe("same turn");
+  expect(V.whyNot(rs(s), id, s.country)).toBe("same month");
 });
 Then("the card shows {string} in red", (s, line: string) => {
   expect(card(s).colour).toBe("red");
@@ -416,7 +416,7 @@ When("the player opens the castle stores so that {string} goes dark", (s, label:
 });
 Then("the event {string} no longer rolls", (s, id: string) => {
   expect(V.mayBreakOut(rs(s), id, s.country)).toBe(false);
-  const log = V.processTurn(rs(s), rng(s));
+  const log = V.processMonth(rs(s), rng(s));
   expect(log.some((l) => l.type === "RevolutionRolled" && l.revolution === id)).toBe(false);
 });
 
@@ -1299,7 +1299,7 @@ Given("no sign of {string} was ever lit for any country by {int}", (s, id: strin
 When("the date passes {int}", (s, year: number) => {
   E.nextMonth(w(s));
   expect(w(s).year).toBe(year + 1);
-  s.turnLog = V.processTurn(rs(s), rng(s));
+  s.turnLog = V.processMonth(rs(s), rng(s));
   act(s);
 });
 Then("the revolution {string} never fires", (s, id: string) => {

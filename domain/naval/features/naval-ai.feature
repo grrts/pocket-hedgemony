@@ -4,13 +4,14 @@ Feature: Naval AI and the phone budget
   I want to run my ports and fleets by my catalogue personality with the same rules as the player
   So that sea powers and land powers behave differently within a phone's computing budget
 
-  @NAVY-109 @open-question
+  @NAVY-109 @placeholder
   Scenario: A sea power keeps seafolk at sea and buys trade ships first
-    # depends on OQ-NAVY-25: the share of seafolk kept at sea is not given
+    # config: naval.ai.seaPowerSeafolkAtSea (D-NAVY-25)
     Given the country "Venice" is an AI sea power by its catalogue personality
+    And it can call 1200 seafolk to sea
     When it buys ships in peace
     Then it buys trade ships before warships
-    And it keeps a share of its seafolk always at sea
+    And it keeps 300 of its seafolk always at sea
 
   @NAVY-109
   Scenario: A sea power buys warships when a rival's fleet grows

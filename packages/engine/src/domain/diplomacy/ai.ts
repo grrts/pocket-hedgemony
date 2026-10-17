@@ -1,8 +1,9 @@
 import { config } from "./rules.ts";
 import * as rel from "./relations.ts";
-import { country, neighbours, standingWord, standing, type Ask, type Count, type Diplomacy } from "./model.ts";
+import { borders, country, ledgerOf, neighbours, standingWord, standing, type Ask, type Count, type Diplomacy } from "./model.ts";
+import { kindFights } from "../subjects/index.ts";
 import { countAsk } from "./reasons.ts";
-import { courtView, envoyRoute, envoysAbroad, envoySeats, freeSeats, leagueAgainst, routeDays, warAimsOf } from "./actions.ts";
+import { courtView, envoyRoute, envoysAbroad, envoySeats, freeSeats, leagueAgainst, routeDays, subjectKind, warAimsOf } from "./actions.ts";
 
 /**
  * The diplomacy AI (diplomacy 12): the same counts as the player, its posture
@@ -75,15 +76,14 @@ export function aiWarPlan(d: Diplomacy, a: string, b: string): "demand_first" | 
   return "demand_first";
 }
 
-/** Provinces of rivals an Opportunist or Hegemon seeker may fund (DIPL-182). */
+/** Rivals an Opportunist or Hegemon seeker may fund: a revolution card with a sign lit (DIPL-182, D-DIPL-23). */
 export function aiFundingTargets(d: Diplomacy, c: string): string[] {
   const k = country(d, c);
   const p = config.ai.posture[k.posture] ?? {};
-  const min = p.funds_rebels_if_grievances_at_least;
-  if (typeof min !== "number" || freeSeats(d, c) <= 0 || !k.goldToSpare) return [];
-  return Object.values(d.provinces)
-    .filter((pr) => rel.stance(d.graph, c, pr.owner) === "rival" && pr.grievances.length >= min)
-    .map((pr) => pr.id);
+  if (!p.funds_rebels_if_grievances_at_least || freeSeats(d, c) <= 0 || !k.goldToSpare) return [];
+  return Object.values(d.countries)
+    .filter((t) => t.id !== c && rel.stance(d.graph, c, t.id) === "rival" && t.revolutionSigns >= config.actions.fund_rebels.needs_revolution_signs)
+    .map((t) => t.id);
 }
 
 // ---------------------------------------------------------------- screen
@@ -134,3 +134,81 @@ export function leagueCard(d: Diplomacy, x: string): { name: string; members: { 
 }
 
 export { envoyRoute, routeDays };
+
+// ---------------------------------------------------------------- war declaration sheet
+
+export interface DeclarationSheet {
+  target: string;
+  aim: string;
+  source: string;
+  sides: { country: string; side: string; how: string; soldiers: number }[];
+  peaceVoices: number;
+  answersArrive: string;
+  choices: string[];
+}
+
+/** The war declaration sheet (DIPL-189, D-DIPL-33): it never shows how the called will answer. */
+export function declarationSheet(d: Diplomacy, a: string, b: string, aim: string): DeclarationSheet {
+  const held = warAimsOf(d, a, b).find((x) => x.aim === aim);
+  const sides: DeclarationSheet["sides"] = [];
+  const row = (c: string, side: string, how: string) => sides.push({ country: c, side, how, soldiers: country(d, c).soldiers });
+  for (const x of rel.alliesOf(d.graph, a)) row(x, a, "called");
+  for (const x of rel.alliesOf(d.graph, b)) row(x, b, "called");
+  for (const f of d.graph.facts) if (f.fact === "protection_pledge" && f.target === b) row(f.source, b, "called");
+  for (const [side, enemy] of [[a, b], [b, a]] as const) {
+    for (const s of rel.subjectsOf(d.graph, side)) {
+      const kind = subjectKind(d, s);
+      const fights = kindFights(kind);
+      const joins = fights === "always_if_loyal_or_wavering" || (fights === "own_frontier_only" && borders(d, s, enemy));
+      const how = joins ? "joins" : fights === "when_called_by_loyalty" ? "called" : "does not join";
+      row(s, side, `${kind}, ${how}`);
+    }
+  }
+  const name = (id: string) => ({ take_land: "Take land", no_aim: "No aim" } as Record<string, string>)[id] ?? id;
+  return {
+    target: b,
+    aim: held?.province ? `${name(aim)} — ${held.province}` : name(aim),
+    source: held?.source ?? "",
+    sides,
+    peaceVoices: country(d, a).peaceVoicesForPeace,
+    answersArrive: "a month later",
+    choices: ["Send a demand first", "Declare"],
+  };
+}
+
+/** The lens at a zoom (DIPL-184): world shows colours only; regional adds envoy riders and crossed swords. */
+export function lensMarks(d: Diplomacy, viewer: string, zoom: "world" | "regional"): string[] {
+  if (zoom === "world") return [];
+  const out: string[] = [];
+  for (const e of d.envoys) if (e.country === viewer && e.status === "road") out.push(`envoy rider to ${e.target}`, `dotted route to ${e.target}`);
+  for (const x of new Set(d.aims.filter((x) => x.holder === viewer).map((x) => x.target))) out.push(`crossed sword over ${x}`);
+  return out;
+}
+
+/** The country diplomacy card (DIPL-185): numbers of standing, never a prediction. */
+export function diplomacyCard(d: Diplomacy, viewer: string, c: string): { toward: string; from: string; entries: { name: string; weight: number }[]; status: string; aims: string; lastAnswer?: string; buttons: { label: string; prediction?: string }[] } {
+  const towardN = standing(d, c, viewer);
+  const status = [rel.enemiesOf(d.graph, c).length ? `at war with ${rel.enemiesOf(d.graph, c).join(", ")}` : "", rel.alliesOf(d.graph, c).length ? `allied with ${rel.alliesOf(d.graph, c).join(", ")}` : ""].filter(Boolean).join(" · ");
+  const aims = warAimsOf(d, viewer, c).filter((x) => x.aim !== "raid" && x.aim !== "no_aim");
+  const last = [...d.letters].reverse().find((l) => l.to === viewer && l.from === c && l.answer !== "done");
+  const out: ReturnType<typeof diplomacyCard> = {
+    toward: `${standingWord(towardN)} (${towardN >= 0 ? "+" : ""}${towardN})`,
+    from: standingWord(standing(d, viewer, c)),
+    entries: ledgerOf(d, c, viewer).map((e) => ({ name: e.key === "same_faith" && country(d, c).faith ? `${e.name} (${country(d, c).faith!.replace(/^./, (x) => x.toUpperCase())})` : e.name, weight: e.weight })),
+    status,
+    aims: aims.length ? aims.map((x) => x.aim).join(", ") : "none",
+    buttons: ["Alliance", "Marriage", "Trade pact", "Gift", "Demand"].map((label) => ({ label })),
+  };
+  if (last) out.lastAnswer = `${last.action}, ${last.answer.toUpperCase()} (${last.total ?? 0})`;
+  return out;
+}
+
+/** The envoy picker (DIPL-186): each free official, his days on the road and the province he leaves. */
+export function envoyPicker(d: Diplomacy, c: string, target: string): { official: string; days: number; leaves: string | undefined }[] {
+  const busy = new Set(envoysAbroad(d, c).map((e) => e.person));
+  const days = routeDays(envoyRoute(d, c, target).legs);
+  return country(d, c).officials.filter((o) => !busy.has(o.name)).map((o) => ({ official: o.name, days, leaves: o.province }));
+}
+
+/** Where the card sits (DIPL-187). */
+export const cardPlacement = (orientation: "portrait" | "landscape") => (orientation === "landscape" ? "right of the map" : "over the map");

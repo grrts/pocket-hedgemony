@@ -4,12 +4,11 @@ Feature: Load and loading screens
   I want to pick a save and see real progress with a useful tip
   So that loading is short and never wasted
 
-  @SHELL-038 @open-question
+  @SHELL-038
   Scenario: Load lists saves newest first
-    # OQ-SHELL-4: the saves design groups the list by campaign first
     Given saves exist from May 1503, January 1500 (autosave) and March 1490 (ironman)
     When the player opens the screen "load"
-    Then the saves are listed newest first
+    Then the saves are listed newest first in one list, not grouped by campaign
     And each save shows its banner, realm, in-game date, real date saved, and an autosave or ironman mark
     When the player taps the save from May 1503
     Then its card shows "Load" and "Delete"

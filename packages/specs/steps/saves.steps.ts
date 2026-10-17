@@ -3,6 +3,7 @@ import { inflateRawSync } from "node:zlib";
 import { loadDefaultRuleset, type Ruleset } from "@ph/rules";
 import { createWorld, generateSyntheticRuleset, hashWorld, processTurn, Rng, type Order, type World } from "@ph/engine";
 import * as S from "@ph/engine/domain/saves";
+import { calendarDayOfIso, turnSpan } from "@ph/engine/domain/time-and-turns";
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("saves");
@@ -60,8 +61,10 @@ function ctx(s: Scenario, over: Partial<S.SaveContext> = {}): S.SaveContext {
 function world(s: Scenario): World {
   return (s.world ??= createWorld(s.rules ?? RULES, 7));
 }
-function setDate(w: World, d: { y: number; m: number }, turn?: number): void {
-  w.date = { year: d.y, month: d.m };
+/** Sets the month, keeping the day of the month when the engine's date has one (X-18 weekly turns). */
+function setDate(w: World, d: { y: number; m: number }, turn?: number, day?: number): void {
+  const old = w.date as { day?: number };
+  w.date = { ...w.date, year: d.y, month: d.m, ...(old.day !== undefined ? { day: day ?? old.day } : {}) } as World["date"];
   if (turn !== undefined) w.turn = turn;
 }
 function campaign(s: Scenario, nation = "Castile", ironman = false): S.Campaign {
@@ -115,7 +118,7 @@ function reheader(bytes: Uint8Array, edit: (h: S.SaveHeader) => void, editChunks
   return S.encodeSave(h, [...d.chunks.values()]);
 }
 
-/** End turn: run the month, write the Resume (or Ironman) save, and the autosave if the new turn is due one. */
+/** End turn: run the turn, write the Resume (or Ironman) save, and the autosave if the new turn is due one. */
 function endTurn(s: Scenario): void {
   const w = world(s);
   const c = campaign(s);
@@ -124,13 +127,19 @@ function endTurn(s: Scenario): void {
   s.endWrite = write(s, c.ironman ? "ironman" : "resume");
   turnStarts(s);
 }
-function turnStarts(s: Scenario): void {
+/** The month that begins in the turn starting on the world's date, or null (X-18); a month-only date begins its month. */
+function monthBeginsAt(w: World): number | null {
+  const d = w.date as { year: number; month: number; day?: number };
+  if (d.day === undefined) return d.month;
+  return turnSpan({ year: d.year, month: d.month, day: d.day }).monthBegins?.month ?? null;
+}
+function turnStarts(s: Scenario, monthBegins: number | null = monthBeginsAt(world(s))): void {
   const w = world(s);
   const c = campaign(s);
   const interval: S.AutosaveInterval = s.interval ?? S.AUTOSAVE_DEFAULTS.interval;
   const before = mine(s, "autosave").map((e) => e.path);
   s.autosaveWrite = undefined;
-  if (S.autosaveDue(interval, w.date.month, c.ironman)) s.autosaveWrite = write(s, "autosave", { keep: s.keep ?? S.AUTOSAVE_DEFAULTS.keep });
+  if (S.autosaveDue(interval, monthBegins, c.ironman)) s.autosaveWrite = write(s, "autosave", { keep: s.keep ?? S.AUTOSAVE_DEFAULTS.keep });
   s.autosaveBefore = before;
 }
 
@@ -318,7 +327,7 @@ function checkNotHeld(s: Scenario, thing: string): void {
 }
 
 Given("the autosave interval is {string}", (s, text: string) => {
-  const map: Record<string, S.AutosaveInterval> = { "every turn": 1, "every 6 turns": 6, "every 12 turns": 12, off: "off" };
+  const map: Record<string, S.AutosaveInterval> = { "every month": 1, "every 6 months": 6, "every 12 months": 12, off: "off" };
   s.interval = map[text];
   expect(s.interval, text).toBeDefined();
 });
@@ -338,11 +347,12 @@ Given("the campaign as {string} has {int} autosaves", (s, nation: string, n: num
   }
   expect(mine(s, "autosave")).toHaveLength(n);
 });
-When("a turn starts in {word}", (s, month: string) => {
+When("a turn starts on {string}", (s, iso: string) => {
   const w = world(s);
+  const span = turnSpan(calendarDayOfIso(iso));
   w.turn = 100;
-  w.date = { year: 1450, month: monthOf(month) };
-  turnStarts(s);
+  w.date = { year: span.first.year, month: span.first.month };
+  turnStarts(s, span.monthBegins?.month ?? null);
 });
 Then("a new autosave marked {string} is written and the oldest is removed", (s, mark: string) => {
   const a: S.Written = s.autosaveWrite;
@@ -377,9 +387,9 @@ Then("the offered counts are {string}", (s, list: string) => {
   expect(s.choices.counts.join(", ")).toBe(list);
 });
 
-When("the player ends the turn in January", (s) => {
+When("the player ends the turn in which January begins", (s) => {
   campaign(s);
-  setDate(world(s), { y: 1450, m: 12 }, 50);
+  setDate(world(s), { y: 1450, m: 12 }, 50, 29);
   endTurn(s);
   expect(world(s).date.month).toBe(1);
 });
@@ -1473,8 +1483,11 @@ Then("the new rules apply from the next turn on with the saved Rng state", (s) =
   expect(Array.from(patched.rng.state)).toEqual(Array.from(world(s).rng.state));
   const old = S.openSave(s.saveBytes, { rules: RULES, fullGame: true });
   if (old.kind !== "opened") throw new Error(old.kind);
-  processTurn(patched, [], 0);
-  processTurn(old.world, [], 0);
+  // Five weekly turns always include one in which a month begins and income is paid (X-18).
+  for (let t = 0; t < 5; t++) {
+    processTurn(patched, [], 0);
+    processTurn(old.world, [], 0);
+  }
   const n = patched.nationIndex.get("castile")!;
   expect(patched.nationTreasury[n]).not.toBe(old.world.nationTreasury[n]);
   expect(patched.rules).toBe(s.buildRules);
@@ -1694,7 +1707,7 @@ When("a save of the nation {string} is written", (s, nation: string) => {
   write(s, "manual");
 });
 Then("its header's tier has nation {string} and needsFullGame {word}", (s, nation: string, needs: string) => {
-  expect(s.last.header.tier).toEqual({ nation: nationId(nation), needsFullGame: needs === "true" });
+  expect(s.last.header.tier).toEqual({ nation: nationId(nation), needsFullGame: needs === "true", app: "full" });
 });
 Given("a save of the nation {string} exists", (s, nation: string) => {
   s.campaign = undefined;
@@ -1820,7 +1833,7 @@ Then("it is not possible", (s) => {
   expect(s.possible).toBe(false);
 });
 When("the player exits to the main menu", (s) => {
-  expect(S.ironmanWrites("quit")).toBe(true);
+  expect(S.ironmanWrites("exit_to_menu")).toBe(true);
   s.exitWrite = write(s, "ironman");
 });
 
@@ -2643,4 +2656,129 @@ Then("the server does not unlock {string} on the phone", (s, nation: string) => 
   expect(JSON.stringify([...server(s).rows.values()])).not.toMatch(/purchase|unlock/);
   const again = S.openSave(s.phoneBytes, { rules: RULES, fullGame: s.purchases.android }, nationName);
   expect(again.kind === "locked" && again.nation).toBe(nationId(nation));
+});
+
+// ================================================================ decided rules (D-SAVE-1, 2, 3, 6, 10, 13, 15)
+
+const MOMENTS: Record<string, S.Lifecycle> = {
+  "End turn": "end_turn",
+  pause: "pause",
+  quit: "quit",
+  "exit to the main menu": "exit_to_menu",
+  suspend: "suspend",
+  background: "background",
+};
+Given("the campaign as {string} is loaded and is not ironman", (s, nation: string) => {
+  campaign(s, nation, false);
+  const w = world(s);
+  w.turn = 10;
+  write(s, "resume");
+  w.turn = 11;
+  write(s, "resume");
+});
+When("the lifecycle moment {string} comes", (s, label: string) => {
+  const m = MOMENTS[label];
+  expect(m, label).toBeDefined();
+  s.resumeWrite = S.resumeWrites(m!) ? write(s, "resume") : undefined;
+  s.writes = m === "end_turn" ? [] : S.lifecycleWrites(m!, { turnRunning: false, ordersChanged: true });
+});
+Then("the Resume save of the campaign is current", (s) => {
+  const newest = mine(s, "resume").sort((x, y) => y.header.savedAt - x.header.savedAt || y.header.turn - x.header.turn)[0];
+  expect(newest?.path).toBe(s.resumeWrite.path);
+});
+Then("the campaign keeps {int} Resume save and {int} backup", (s, a: number, b: number) => {
+  expect(mine(s, "resume")).toHaveLength(a + b);
+});
+Then("the Resume save is not listed in Load", (s) => {
+  for (const card of S.loadList(S.entries(storage(s)), nationName)) for (const e of card.saves) expect(e.header.kind).not.toBe("resume");
+});
+Then("no Resume save is written", (s) => {
+  expect(s.resumeWrite).toBeUndefined();
+  expect(mine(s, "resume")).toHaveLength(2);
+});
+
+Given("a save made in the Steam demo", (s) => {
+  campaign(s, "Ottomans").app = "demo";
+  s.demoSave = write(s, "manual");
+});
+Then("its header's tier names the app {string} and lists no limits", (s, app: string) => {
+  const tier = S.readHeader(s.demoSave.bytes).tier;
+  expect(tier.app).toBe(app);
+  expect(Object.keys(tier).sort()).toEqual(["app", "nation", "needsFullGame"]);
+});
+When("the full game loads it", (s) => {
+  s.opened = S.openSave(s.demoSave.bytes, { rules: RULES, fullGame: true });
+});
+Then("the save opens", (s) => {
+  expect(s.opened.kind).toBe("opened");
+});
+
+When("the achievements context reads its header", (s) => {
+  s.readBack = S.readHeader(s.last.bytes);
+});
+Then("it finds the ironman flag and the modified mark", (s) => {
+  expect(typeof s.readBack.ironman).toBe("boolean");
+  expect(typeof s.readBack.modified).toBe("boolean");
+});
+Then("it finds the flags ironman_unbroken, cheat_marked, switched_country and began_as_tutorial", (s) => {
+  expect(Object.keys(s.readBack.flags).sort()).toEqual(["began_as_tutorial", "cheat_marked", "ironman_unbroken", "switched_country"]);
+});
+Given("the player played on as another realm after game over", (s) => {
+  campaign(s).switchedCountry = true;
+});
+Then(
+  /^(?:the save's|its) flags read ironman_unbroken (true|false), cheat_marked (true|false), switched_country (true|false) and began_as_tutorial (true|false)$/,
+  (s, a: string, b: string, c: string, d: string) => {
+    expect(S.readHeader(s.last.bytes).flags).toEqual({
+      ironman_unbroken: a === "true",
+      cheat_marked: b === "true",
+      switched_country: c === "true",
+      began_as_tutorial: d === "true",
+    });
+  },
+);
+Then("its tier is nation {string}, needsFullGame {word} and app {string}", (s, nation: string, needs: string, app: string) => {
+  expect(S.readHeader(s.last.bytes).tier).toEqual({ nation, needsFullGame: needs === "true", app });
+});
+
+When("the player exports it and imports it on the {string} while offline", (s, device: string) => {
+  const file = S.exportSave("desktop", { path: s.deckSave.path, header: s.deckSave.header }, s.deckSave.bytes);
+  s.imported = S.importSave(devCtx(s, dev(s, device)), file.bytes, false);
+});
+Then("the import is refused with {string}", (s, message: string) => {
+  expect(s.imported).toEqual({ kind: "rejected", message });
+});
+
+Given("the campaign as {string} has a Resume save and {int} autosaves", (s, nation: string, n: number) => {
+  campaign(s, nation);
+  const w = world(s);
+  for (let i = 0; i < n; i++) {
+    w.turn = 10 + i;
+    s.newestAuto = write(s, "autosave");
+  }
+  w.turn = 20;
+  s.resumeWrite = write(s, "resume");
+});
+Given(/^its Resume saves are (sound|damaged)$/, (s, state: string) => {
+  if (state === "damaged") for (const e of mine(s, "resume")) storage(s).write(e.path, flip(storage(s).read(e.path)!, chunkByte(storage(s).read(e.path)!)));
+});
+When("the player picks {string} on the failure screen", (s, choice: string) => {
+  expect(choice).toBe("Restore the last autosave");
+  s.restored = S.restoreLastAutosave(storage(s), campaign(s).campaignId, opener(s));
+});
+Then(/^the (Resume save|newest autosave) is opened$/, (s, which: string) => {
+  expect(s.restored.path).toBe(which === "Resume save" ? s.resumeWrite.path : s.newestAuto.path);
+});
+
+When("the player chooses {string} at a before-the-battle stop on day {int}", (s, choice: string, day: number) => {
+  const resume = write(s, "resume");
+  s.journal = S.journalChoice(S.makeJournal(resume, s.orders ?? []), day, choice);
+});
+Then("the orders journal holds {string} on day {int}", (s, choice: string, day: number) => {
+  expect(s.journal.choices).toEqual([{ day, choice }]);
+  expect(s.journal.orders).toHaveLength(2);
+});
+
+Then("the account's synced files include {string}", (_s, file: string) => {
+  expect(S.syncedFiles()).toContain(file);
 });

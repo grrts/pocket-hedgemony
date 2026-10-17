@@ -140,9 +140,10 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   const warnings: string[] = [];
 
   const world = createWorld(rules, 0);
-  const meta = core.meta as { turn: number; date: { year: number; month: number }; options: CampaignOptions; playerNation: string };
+  const meta = core.meta as { turn: number; date: { year: number; month: number; day?: number }; options: CampaignOptions; playerNation: string };
   world.turn = meta.turn;
-  world.date = { year: meta.date.year, month: meta.date.month };
+  // The whole date, with its day when the engine keeps one (X-18 weekly turns).
+  world.date = { ...meta.date } as typeof world.date;
   world.rng = new Rng(core.arrays.rng as Uint32Array);
 
   // Nations: by id, then the nation table, else gone with a warning.

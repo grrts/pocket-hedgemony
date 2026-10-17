@@ -72,7 +72,8 @@
   },
   "master_of_works": {
    "extra_sites": 1,
-   "months_multiplier": 0.5
+   "months_multiplier": 0.5,
+   "gold_multiplier": 0.75
   },
   "half_crew_months_multiplier": 2,
   "cancel_refund": 0.5,
@@ -101,7 +102,14 @@
   "fire_buildings": [
    1,
    3
-  ]
+  ],
+  "plunder_share_with_walls_from_step": 1,
+  "town_fire": {
+   "chance_per_year": 0.01,
+   "per_size_above_town": 0.005
+  },
+  "quake_chance_per_year": 0.002,
+  "big_raid_men": 2000
  },
  "village_works": {
   "chance_per_year": 0.2,
@@ -134,7 +142,9 @@
   "owners": [
    "town",
    "commons"
-  ]
+  ],
+  "trade_ratio_at_least": 0.3,
+  "chance_per_year": 0.1
  },
  "upkeep_groups": {
   "land": [
@@ -169,7 +179,8 @@
  "ai": {
   "reserve_years_of_upkeep": 1,
   "homeless_share_trigger": 0.05,
-  "food_months_trigger": 3
+  "food_months_trigger": 3,
+  "busy_sites": 3
  },
  "advice": {
   "max_lines": 5
@@ -329,44 +340,50 @@
    "province": "Constantinople",
    "present_1444": true,
    "building": "house of worship",
-   "step": 4,
-   "converts_by_event": 1453
+   "step": 3,
+   "converts_by_event": 1453,
+   "effect": "its faith's houses of worship in reach of the capital turn the faith mix twice as fast"
   },
   {
    "id": "Forbidden City",
    "province": "Beijing",
    "present_1444": true,
    "building": "palace",
-   "step": 4
+   "step": 3,
+   "effect": "+24 officials; lords at court never waver"
   },
   {
    "id": "Alhambra",
    "province": "Granada",
    "present_1444": true,
    "building": "palace",
-   "step": 3
+   "step": 3,
+   "effect": "Granada's castle counts one step higher"
   },
   {
    "id": "Great Mosque of Djenné",
    "province": "Djenné",
    "present_1444": true,
    "building": "house of worship",
-   "step": 4,
-   "material": "earth"
+   "step": 3,
+   "material": "earth",
+   "effect": "no grievance from earth upkeep; traders passing +20 % in the replastering season"
   },
   {
    "id": "Sankore Mosque",
    "province": "Timbuktu",
    "present_1444": true,
    "building": "school",
-   "step": 3
+   "step": 3,
+   "effect": "scholars from any Muslim realm may settle here"
   },
   {
    "id": "Masjid al-Haram",
    "province": "Mecca",
    "present_1444": true,
    "building": "pilgrimage shrine",
-   "step": 4
+   "step": 1,
+   "effect": "the largest pilgrims passing in the world"
   },
   {
    "id": "St Peter's Basilica",
@@ -374,7 +391,7 @@
    "present_1444": false,
    "founded_by_event": 1506,
    "building": "house of worship",
-   "step": 4,
+   "step": 3,
    "asks_gifts_while_built": true
   },
   {
@@ -383,42 +400,47 @@
    "present_1444": false,
    "founded_by_event": 1459,
    "building": "palace",
-   "step": 4
+   "step": 3,
+   "effect": "+20 officials; the capital's seat runs two provinces"
   },
   {
    "id": "Ulugh Beg Observatory",
    "province": "Samarkand",
    "present_1444": true,
    "building": "observatory",
-   "step": 3
+   "step": 1,
+   "effect": "Boats and Counting inventions 20 % cheaper for its owner"
   },
   {
    "id": "Kremlin",
    "province": "Moscow",
    "present_1444": true,
    "building": "castle",
-   "step": 3
+   "step": 3,
+   "effect": "the palace and the castle share one tile"
   },
   {
    "id": "Templo Mayor",
    "province": "Tenochtitlan",
    "present_1444": true,
    "building": "house of worship",
-   "step": 4
+   "step": 3,
+   "effect": "Triple Alliance lords gain loyalty when the realm wins a war"
   },
   {
    "id": "Coricancha",
    "province": "Cusco",
    "present_1444": true,
    "building": "house of worship",
-   "step": 4
+   "step": 3,
+   "effect": "every province linked to Cusco by road counts one day closer"
   },
   {
    "id": "Angkor",
    "province": "Angkor",
    "present_1444": true,
    "building": "house of worship",
-   "step": 4,
+   "step": 3,
    "condition": "neglected",
    "restoring_is_decision": true
   },
@@ -427,8 +449,9 @@
    "province": "Venice",
    "present_1444": true,
    "building": "shipyard",
-   "step": 4,
-   "slipways": 3
+   "step": 3,
+   "slipways": 3,
+   "effect": "3 slipways"
   },
   {
    "id": "Taj Mahal",
@@ -436,7 +459,8 @@
    "present_1444": false,
    "founded_by_event": 1632,
    "building": "landmark tomb",
-   "step": 1
+   "step": 1,
+   "effect": "traders passing in Agra +30 %"
   }
  ],
  "anchors": [
@@ -1263,7 +1287,7 @@
       "stone": 30,
       "crew": 2000
      },
-     "unlocked_by": "start",
+     "unlocked_by": "T6",
      "jobs": 2400,
      "upkeep": 2,
      "needs": {
@@ -1273,7 +1297,8 @@
      "flags": [
       "trade_endpoint",
       "hires_traders"
-     ]
+     ],
+     "stands_in_1444": true
     },
     {
      "name": "trading house",
@@ -1555,7 +1580,8 @@
      "needs": {
       "min_town": "market_town"
      },
-     "seats": 20
+     "seats": 20,
+     "upkeep": 2
     },
     {
      "name": "madrasa or university",
@@ -1567,7 +1593,8 @@
      "seats": {
       "madrasa": 30,
       "university": 60
-     }
+     },
+     "upkeep": 4
     },
     {
      "name": "academy",
@@ -1576,7 +1603,8 @@
       "months": null
      },
      "unlocked_by": "L12",
-     "seats": 100
+     "seats": 100,
+     "upkeep": 6
     }
    ]
   },
@@ -2373,8 +2401,9 @@
     {
      "name": "track",
      "cost": {
-      "gold": null,
-      "months": null
+      "gold": 20,
+      "months": 6,
+      "stone": 10
      },
      "unlocked_by": "start"
     },
@@ -2394,15 +2423,16 @@
       "months": 24,
       "stone": 80
      },
-     "unlocked_by": "B9"
+     "unlocked_by": "B2"
     },
     {
      "name": "turnpike",
      "cost": {
-      "gold": null,
-      "months": null
+      "gold": 180,
+      "months": 36,
+      "stone": 120
      },
-     "unlocked_by": "start"
+     "unlocked_by": "B9"
     },
     {
      "name": "railway",
@@ -2520,6 +2550,62 @@
     }
    ],
    "days_to_capital": 1
+  }
+ ],
+ "materials_no_route_multiplier": 1.25,
+ "burned_rebuild": {
+  "free_per_year_in_peace": 1,
+  "paid_share_of_farm_cost": 0.5,
+  "paid_months": 3
+ },
+ "troyes_1444": {
+  "town_size": "town",
+  "slots": 6
+ },
+ "starting_ports_file": "naval-ports-1444",
+ "lord_province_counts_as_yours": true,
+ "caravanserai_land_trader_weight": 0.25,
+ "_provisional": [
+  "materials_no_route_multiplier",
+  "damage.town_fire",
+  "damage.quake_chance_per_year",
+  "damage.big_raid_men",
+  "crafts_appearing.chance_per_year",
+  "burned_rebuild",
+  "ai.busy_sites",
+  "village_works.chance_per_year",
+  "buildings.road.steps.cost"
+ ],
+ "unique_variants": [
+  {
+   "id": "Külliye",
+   "who": "Ottoman",
+   "change": "a great mosque that holds an almshouse, a school and a hospital in one slot"
+  },
+  {
+   "id": "Kontor",
+   "who": "Hanseatic towns",
+   "change": "a warehouse abroad in a foreign town by treaty"
+  },
+  {
+   "id": "Qollqa line",
+   "who": "Inca",
+   "change": "granaries along roads without a castle"
+  },
+  {
+   "id": "Polder mill",
+   "who": "Low Countries",
+   "change": "dykes drain one marsh tile every 5 years by themselves"
+  },
+  {
+   "id": "Ever-normal granary",
+   "who": "Ming, Korea",
+   "change": "granaries in towns as well as castles"
+  },
+  {
+   "id": "Funduq quarter",
+   "who": "Mamluk and Maghrebi ports",
+   "change": "foreign traders passing pay market fees here"
   }
  ]
 }

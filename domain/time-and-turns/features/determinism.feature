@@ -35,18 +35,75 @@ Feature: Determinism and seeded randomness
     When the save is loaded and the next turn is processed with the same orders
     Then the result equals the result of processing that turn without saving
 
-  @TIME-033 @TIME-056 @open-question
-  # OQ-TIME-14: engine phase order not confirmed by any design
-  Scenario: The engine runs its phases in a fixed order
+  @TIME-033 @TIME-056
+  Scenario: A turn runs its stages in a fixed order
+    Given a turn of "March 1445" with a step in every stage
+    When the turn plan is run
+    Then the stages run in this order:
+      | stage            |
+      | apply orders     |
+      | day loop         |
+      | monthly steps    |
+      | seasonal steps   |
+      | yearly steps     |
+      | events           |
+      | checks           |
+      | achievements     |
+      | autosave         |
+      | advance the date |
+
+  @TIME-056
+  Scenario: Monthly steps run in a fixed order of contexts
+    Given a monthly step of each of these contexts, given in this order:
+      | context     |
+      | revolutions |
+      | culture     |
+      | realm       |
+      | province    |
+      | trade       |
+      | rebellions  |
+      | buildings   |
+      | diplomacy   |
+      | research    |
+      | subjects    |
+      | religion    |
+      | recruiting  |
+      | government  |
+    When the turn plan is run
+    Then the monthly steps run in this order of contexts:
+      | context     |
+      | province    |
+      | buildings   |
+      | recruiting  |
+      | realm       |
+      | research    |
+      | trade       |
+      | subjects    |
+      | government  |
+      | diplomacy   |
+      | culture     |
+      | religion    |
+      | rebellions  |
+      | revolutions |
+
+  @TIME-033 @TIME-056
+  Scenario: The engine's own phases sit in the turn order
     Given a world with armies, provinces and nations
     When a turn is processed
     Then the phases run in this order:
-      | phase              |
-      | apply orders       |
-      | marches            |
-      | economy            |
-      | levies             |
-      | advance the date   |
+      | phase            | stage            |
+      | apply orders     | apply orders     |
+      | marches          | day loop         |
+      | economy          | monthly steps    |
+      | levies           | monthly steps    |
+      | advance the date | advance the date |
+
+  @TIME-070
+  Scenario: Setup and warm-up draw from the campaign's one Rng without moving the date
+    Given a new campaign with the seed 1444
+    When 24 months of warm-up run before the first turn
+    Then the date is still "November 1444" and the turn counter is 0
+    And the warm-up drew its numbers from the campaign's Rng
 
   @TIME-037 @TIME-038
   Scenario Outline: Nothing outside the engine changes the simulation
@@ -76,8 +133,7 @@ Feature: Determinism and seeded randomness
     Then nothing halfway through the turn is saved
     And the last turn-boundary save stays valid
 
-  @TIME-041 @open-question
-  # OQ-TIME-7: "processed again" (save system) against "the worker pauses and carries on" (screen flow)
+  @TIME-041
   Scenario: A turn interrupted by the phone is processed again with the same result
     Given End turn was given with 4 queued orders
     And the app was killed while the turn was processed

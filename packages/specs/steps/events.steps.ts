@@ -181,7 +181,7 @@ Given("the event {string} has somehow happened", (s, id: string) => {
   happened(s, id, 1);
 });
 When("the yearly age check runs", (s) => {
-  E.yearlyAgeCheck(st(s), w(s).year);
+  E.yearlyAgeCheck(st(s), w(s).year, s.holds);
   act(s);
 });
 Then("the age {string} is not active, because its window opens in {int}", (s, age: string, year: number) => {
@@ -591,13 +591,12 @@ Given(/^the build reports (no error|an error)$/, (s, what: string) => {
   if (what === "no error") expect(s.report.errors).toEqual([]);
   else expect(s.report.errors.length).toBeGreaterThan(0);
 });
-Given("an event's trigger uses {string}", (s, type: string) => {
-  s.buildEvents = [fixture("human_only", { trigger: { [type]: { who: "$realm" } } })];
+Given("an event's selection weights use {string}", (s, type: string) => {
+  s.buildEvents = [fixture("weights", { selection: { mode: "pool", mean_years: 3, modifiers: [{ if: { [type]: { who: "$realm" } }, mult: 2 }] } })];
 });
-Then("the build reports that {string} may only appear in selection weights", (s, type: string) => {
-  expect(s.report.errors.join("\n")).toContain(`${type} may only appear in selection weights`);
-  const ok = E.validate({ events: [fixture("weights", { selection: { mode: "pool", mean_years: 3, modifiers: [{ if: { is_human: { who: "$realm" } }, mult: 2 }] } })] });
-  expect(ok.errors).toEqual([]);
+Then("the build reports that {string} is not a declared condition type", (s, type: string) => {
+  expect(s.report.errors.join("\n")).toContain(`undeclared condition type ${type}`);
+  expect(E.DECLARED_CONDITIONS).not.toContain(type);
 });
 Given("the event {string} fired {int} years ago with the outcome {string} for {string}", (s, id: string, years: number, outcome: string, who: string) => {
   setYear(s, 1800);
@@ -728,10 +727,6 @@ Then("historical options are multiplied by {float}", (s, x: number) => {
 Then("mean waits are multiplied by {float}", (s, x: number) => {
   expect(s.weighed.wait).toBeCloseTo(x);
 });
-Given("the game rule {string} is on", (s, rule: string) => {
-  expect(rule).toBe("historical lean");
-  st(s).rules.historicalLean = true;
-});
 Given("an option marked historical has an AI weight of {int}", (s, base: number) => {
   s.option = { id: "history", chooser: "$realm", historical: true, ai: { base }, effects: {} } satisfies E.OptionDef;
 });
@@ -810,12 +805,15 @@ Given(/^for the chooser (.+)$/, (s, situation: string) => {
     case "the treasury is below one year of expenses":
       a.stats.treasury = 50;
       break;
-    case "average unrest is above 50":
-      E.place(w(s), "province:a1").owner = "A";
-      E.place(w(s), "province:a1").stats.unrest = 70;
-      E.place(w(s), "province:a2").owner = "A";
-      E.place(w(s), "province:a2").stats.unrest = 40;
+    case "more than half its provinces have 4 or more grievances":
+    case "half its provinces have 4 or more grievances": {
+      const plotting = situation.startsWith("more") ? 3 : 2;
+      for (let i = 1; i <= 4; i++) {
+        E.place(w(s), `province:a${i}`).owner = "A";
+        E.place(w(s), `province:a${i}`).stats.grievances = i <= plotting ? 4 : 1;
+      }
       break;
+    }
     case "the other party shares the state religion":
       a.religion = "catholic";
       c(s, "B").religion = "catholic";
@@ -888,7 +886,7 @@ Then(/^the effect applies (.+)$/, (s, when: string) => {
     expect(tension()).toBe(0);
     months(1);
     expect(tension()).toBe(1);
-  } else if (when === "each turn while the event runs") {
+  } else if (when === "each month while the event runs") {
     expect(tension()).toBe(1);
     months(2);
     expect(tension()).toBe(3);
@@ -1068,8 +1066,8 @@ Given("the country {string} has debt {int} and stability {int}", (s, who: string
 });
 When("the effect {string} applies", (s, text: string) => {
   const m = text.match(/^stat on (\S+) (\w+) (\S+)$/);
-  expect(m).not.toBeNull();
-  E.applyEffect({ on: m![1], stat: { [m![2]!]: m![3] } }, w(s), { roles: {} });
+  if (m) E.applyEffect({ on: m[1], stat: { [m[2]!]: m[3] } }, w(s), { roles: {} });
+  else s.applied = E.applyEffect(parseLeaf(text), w(s), { roles: {} });
 });
 Then(/^"([^"]+)" has (\w+) (-?[\d.]+)$/, (s, who: string, stat: string, v: string) => {
   expect(c(s, who).stats[stat]).toBeCloseTo(Number(v));
@@ -1347,4 +1345,329 @@ When("the sources are listed for review", (s) => {
 });
 Then("the source is marked for a historian to check before release", (s) => {
   expect(s.review.map((x: E.Source) => x.id)).toEqual(["b"]);
+});
+
+// ---------------------------------------------------------------- decided questions (spec 13)
+
+// D-EVT-1: the campaign drops post-1939 events and never starts later ages
+Given(/^the event "([^"]+)" starts in history on (\S+)$/, (s, id: string, date: string) => {
+  s.event = id;
+  expect(E.historyStart(E.tree.index[id]!.date).startsWith(date)).toBe(true);
+});
+When("a campaign loads its events", (s) => {
+  s.campaign = E.campaignEvents(E.tree.events);
+  s.dropped = Object.entries(E.tree.index)
+    .filter(([, e]) => E.outOfScope(e.date))
+    .map(([k]) => k);
+});
+Then("the event {string} is dropped and never fires", (s, id: string) => {
+  expect(s.dropped).toContain(id);
+  expect(s.dropped).toHaveLength(59);
+  expect(Object.keys(s.campaign)).not.toContain(id);
+  const def = E.tree.events[id];
+  if (def) {
+    // even handed the full tree, the engine refuses it as out of scope
+    const full = E.newState(E.emptyWorld(1950), { events: E.clone(E.tree.events) });
+    expect(E.gate(full, full.events[id]!)).toBe("out of scope");
+  }
+});
+Given("the start condition of the age {string} holds", (s, age: string) => {
+  s.age = age;
+  E.ageDef(age);
+  s.holds = (() => true) as E.Holds;
+});
+Then("the age {string} does not start", (s, age: string) => {
+  expect(w(s).ages).not.toContain(age);
+  expect(st(s).log.some((l) => l.type === "AgeStarted" && l.age === age)).toBe(false);
+});
+Given("the end condition of the age {string} names the event {string}", (s, age: string, id: string) => {
+  s.age = age;
+  s.named = id;
+  expect(JSON.stringify(E.ageDef(age).end)).toContain(`"${id}"`);
+});
+Then("that part of the end condition never holds", (s) => {
+  expect(Object.keys(s.campaign)).not.toContain(s.named);
+  const es = E.newState(E.emptyWorld(1939, 8), { events: s.campaign, ages: E.tree.ages, periods: E.tree.periods });
+  E.place(es.world, "global").stats.global_tension = 90;
+  expect(E.holds(E.ageDef(s.age).end, es.world)).toBe(false);
+  s.es = es;
+});
+Then("the age {string} is cut at the end date", (s, age: string) => {
+  w(s).ages = [age];
+  E.processMonth(st(s), rng(s));
+  expect(st(s).ended).toBe(true);
+  expect(w(s).ages).toEqual([]);
+  expect(st(s).log).toContainEqual(expect.objectContaining({ type: "AgeEnded", age, cut: true }));
+});
+
+// D-EVT-5: a rebels effect is a spark; its men come from the recruit pool
+Given("the province {string} has a recruit pool of {int}", (s, id: string, n: number) => {
+  E.place(w(s), id).stats.recruit_pool = n;
+});
+Then("a rising of {int} men starts in {string}", (s, men: number, id: string) => {
+  expect(w(s).rebels.at(-1)).toMatchObject({ on: id, men });
+});
+Then("the recruit pool of {string} is {int}", (s, id: string, n: number) => {
+  expect(E.place(w(s), id).stats.recruit_pool).toBe(n);
+});
+Given("a rising of the type {string} is under way in {string}", (s, type: string, who: string) => {
+  expect(E.eventsConfig.enums.rebel_types).toContain(type);
+  c(s, who).rebels = [type];
+});
+
+// D-EVT-11: rising tiers (EVT-068)
+Given("{string} answered a revolution event whose option has the rising_won effect {string} and the rising_crushed effect {string}", (s, who: string, won: string, crushed: string) => {
+  const eff = (t: string): E.Effect[] => {
+    const [stat, v] = t.split(" ");
+    return [{ on: "$realm", stat: { [stat!]: v } }];
+  };
+  const e = add(s, fixture("rev", { roles: { realm: { historical: [who], select: "fixed", as: ["initiator"] } } }));
+  e.options[0]!.effects = { rising_won: eff(won), rising_crushed: eff(crushed) };
+  w(s).history.push({ event: "rev", year: w(s).year, month: 1, roles: { realm: [who] }, option: e.options[0]!.id });
+});
+Given("the stability of {string} is {int}", (s, who: string, n: number) => {
+  c(s, who).stats.stability = n;
+});
+When("the rising tagged with that event is {word}", (s, outcome: string) => {
+  E.risingEnded(st(s), "rev", outcome === "won");
+});
+
+// D-EVT-4: the mapping
+Given("an event applies {string} to the province {string}", (s, effect: string, prov: string) => {
+  const [stat, change] = effect.split(" ");
+  s.landing = E.landStat(stat!, change!);
+  s.prov = prov;
+});
+When("the effect lands", (s) => {
+  act(s);
+});
+const LANDINGS: Record<string, [string, number]> = {
+  "two new buildings that fit the province": ["fitting_buildings", 2],
+  "30 percent of its tiles are burned": ["burned_tiles_pct", 30],
+  "one named grievance from the event": ["named_grievance", 1],
+  "its castle goes one step up": ["castle_steps", 1],
+  "its road goes one step up": ["road_steps", 1],
+  "one factory": ["factories", 1],
+  "a plague outbreak": ["plague_outbreak", 1],
+};
+Then(new RegExp(`^(${Object.keys(LANDINGS).join("|")})$`), (s, phrase: string) => {
+  const [landsAs, amount] = LANDINGS[phrase]!;
+  expect(s.landing).toEqual({ owner: "province", landsAs, amount });
+});
+Given("the country {string} has no notoriety of its own in the event tree", (s, who: string) => {
+  c(s, who).stats = {};
+});
+When("an event applies {string} to {string}", (s, effect: string, who: string) => {
+  const [stat, change] = effect.split(" ");
+  s.stat = stat;
+  s.applied = E.applyEffect({ on: who, stat: { [stat!]: change } }, w(s), { roles: {} });
+});
+Then(/^the change is handed to diplomacy as (a notorious deed|an oath broken)$/, (s, what: string) => {
+  expect(s.applied[0]).toMatchObject({ type: "stat", values: { stat: s.stat, routed: "diplomacy" } });
+  expect(E.landStat(s.stat, "+1")).toMatchObject({ owner: "diplomacy", landsAs: what === "a notorious deed" ? "notorious_deed" : "oath_broken" });
+});
+Then("the event tree stores no {string} for {string}", (s, stat: string, who: string) => {
+  expect(c(s, who).stats[stat]).toBeUndefined();
+});
+When("an event tries to change {string}", (s, stat: string) => {
+  s.errs = [];
+  try {
+    E.landStat(stat, "+10");
+  } catch (e) {
+    s.errs.push((e as Error).message);
+  }
+  try {
+    E.applyEffect({ on: "A", stat: { [stat]: 10 } }, w(s), { roles: {} });
+  } catch (e) {
+    s.errs.push((e as Error).message);
+  }
+});
+Then("the change is refused because events only read it", (s) => {
+  expect(s.errs).toHaveLength(2);
+  expect(s.errs[0]).toContain("events only read it");
+});
+
+// D-EVT-8: only an AI's decision lapses
+function offeredLongAgo(s: Scenario, human: boolean): void {
+  setYear(s, 1610, 3);
+  const e = add(s, fixture("choice", { selection: { mode: "decision", mean_years: 5 } }));
+  e.options = e.options.map((o) => ({ ...o, chooser: "$realm" }));
+  c(s, "A").human = human;
+  st(s).pending.push({ event: e.id, roles: { realm: ["A"] }, controller: "A", kind: "offered", at: E.now(w(s)) - 120 });
+}
+Given("a decision event was offered to an AI country 10 years ago and left unanswered", (s) => {
+  offeredLongAgo(s, false);
+});
+Given("a decision event was offered to the player's country {int} years ago and is still waiting", (s, years: number) => {
+  expect(years).toBe(E.balance.selection.decision_expiry_years);
+  offeredLongAgo(s, true);
+});
+Given("the event is still eligible", (s) => {
+  expect(E.eligible(st(s), ev(s)).length).toBe(1);
+});
+Then("the decision lapses", (s) => {
+  expect(st(s).log).toContainEqual(expect.objectContaining({ type: "DecisionLapsed", event: s.event }));
+  expect(st(s).pending.some((p) => p.event === s.event && p.kind === "offered")).toBe(false);
+});
+Then("the event re-enters the pool", (s) => {
+  expect(E.selectionMode(st(s), ev(s))).toBe("pool");
+});
+Then("the decision is still waiting for the player", (s) => {
+  expect(st(s).pending.some((p) => p.event === s.event && p.controller === "A")).toBe(true);
+  expect(st(s).log.some((l) => l.type === "DecisionLapsed")).toBe(false);
+});
+
+// D-EVT-9: the new game's events choice
+Given("the new game's events choice is {string}", (s, choice: string) => {
+  s.choice = choice;
+});
+Given("a new game whose events choice is left alone", (s) => {
+  s.choice = undefined;
+});
+When("the campaign's game rules are set", (s) => {
+  s.mode = s.choice === undefined ? E.defaultRules().mode : E.rulesForChoice(s.choice);
+});
+Then("the alternate history mode is {string}", (s, mode: string) => {
+  expect(s.mode).toBe(mode);
+});
+
+// EVT-044: nothing answers an event for the player
+Given("an event waits for the player's answer", (s) => {
+  setYear(s, 1600, 1);
+  c(s, "France").human = true;
+  for (const id of ["first_ask", "second_ask"]) {
+    const e = add(s, fixture(id, { roles: { realm: { historical: ["France"], select: "fixed", as: ["initiator"] } } }));
+    e.options = e.options.map((o) => ({ ...o, chooser: "$realm" }));
+    E.fire(st(s), e, { realm: ["France"] }, rng(s));
+    E.nextMonth(w(s));
+  }
+});
+When("the player tries to end the turn", (s) => {
+  s.blocked = E.unansweredFor(st(s), "France");
+});
+Then("the turn does not end", (s) => {
+  expect(s.blocked).toBeDefined();
+});
+Then("the first unanswered event opens", (s) => {
+  expect(s.blocked.event).toBe("first_ask");
+});
+
+// D-EVT-7: two to four options
+Given("an event offers {int} options", (s, n: number) => {
+  const options: E.OptionDef[] = Array.from({ length: n }, (_, i) => ({ id: `o${i}`, chooser: null, ...(i === 0 ? { historical: true } : {}), ai: { base: 10 }, effects: {} }));
+  s.buildEvents = [fixture("many", { options })];
+});
+
+// EVT-019: how strongly the date binds
+Given("an event with the availability mode {string}", (s, mode: string) => {
+  add(s, fixture("dated", { availability: { earliest: 1550, latest: 1650, mode: mode as E.Availability["mode"], repeat: "one_time" }, selection: { mode: "pool", mean_years: 200 }, history: { date: 1600 } }));
+  s.mode = mode;
+});
+When("it is eligible inside its window", (s) => {
+  s.factors = [1550, 1595, 1600, 1610, 1649].map((y) => E.dateFactor(ev(s), y));
+});
+Then("it fires in the window if its trigger holds", (s) => {
+  expect(s.factors).toEqual([1, 1, 1, 1, 1]);
+  setYear(s, 1650, 6);
+  c(s, "A");
+  E.processMonth(st(s), rng(s));
+  expect(w(s).history.some((h) => h.event === s.event)).toBe(true);
+});
+Then("its chance is weighted toward the historical date", (s) => {
+  const [y1550, y1595, y1600, y1610, y1649] = s.factors as number[];
+  expect(y1600).toBeGreaterThan(y1595!);
+  expect(y1595).toBeGreaterThan(y1610!);
+  expect([y1550, y1649]).toEqual([1, 1]);
+});
+Then("the date is only a guide", (s) => {
+  expect(s.factors).toEqual([1, 1, 1, 1, 1]);
+  expect(E.dateFactor(ev(s), 1650)).toBe(1);
+});
+Given("the event {string} has the availability mode {string} and the history year {int}", (s, id: string, mode: string, year: number) => {
+  s.event = id;
+  expect(E.eventDef(id).availability.mode).toBe(mode);
+  expect(E.historyStart(E.eventDef(id).history!.date).slice(0, 4)).toBe(String(year));
+});
+When("its pool chance is weighed in {int}", (s, year: number) => {
+  s.factor = E.dateFactor(E.eventDef(s.event), year);
+});
+Then("its date factor is {float}", (s, f: number) => {
+  expect(s.factor).toBeCloseTo(f);
+});
+
+// EVT-006: resisters choose their own options
+Given("the event {string} binds {string} as resister and initiator", (s, id: string, who: string) => {
+  const e = ev(s, id);
+  s.event = id;
+  const role = Object.entries(e.roles).find(([, r]) => r.historical.includes(who));
+  expect(role?.[1].as).toEqual(expect.arrayContaining(["resister", "initiator"]));
+  s.role = role![0];
+  s.who = who;
+  // the kingdom answers for itself: its options carry its role as chooser
+  e.options = e.options.map((o) => ({ ...o, chooser: `$${s.role}` }));
+  c(s, who).human = true;
+});
+Then("the controller of {string} chooses the options whose chooser is that role", (s, who: string) => {
+  expect(s.fired).toEqual({ queued: true });
+  expect(st(s).pending.at(-1)).toMatchObject({ event: s.event, controller: who });
+  for (const o of ev(s).options) expect(E.chooserOf(o, roles(s, ev(s)))).toBe(who);
+});
+
+// EVT-008: enslaved people are never a trade good
+Given("a province with plantations in the Caribbean", (s) => {
+  s.prov = "area:caribbean";
+  E.place(w(s), "area:west_africa").groups = { west_africans: 10000 };
+});
+When("its trade good is set", (s) => {
+  const unit = E.eventsConfig.statistics.province.trade_good.unit;
+  s.goods = unit.slice(unit.indexOf("(") + 1, unit.indexOf(")")).split(",").map((x) => x.trim());
+});
+Then("enslaved people are not a trade good", (s) => {
+  expect((s.goods as string[]).some((g) => /slav|people/.test(g))).toBe(false);
+  // the raided source societies' land never gains production from it
+  expect(E.modifierDef("slave_trade_raiding").changes.resource_output).toBeUndefined();
+});
+Then("enslavement is applied as forced population movement with costs on the source societies", (s) => {
+  E.applyEffect({ move_population: { group: "west_africans", from: "area:west_africa", to: s.prov, amount: "10%" } }, w(s), { roles: {} });
+  expect(E.place(w(s), "area:west_africa").groups!.west_africans).toBe(9000);
+  const raid = E.modifierDef("slave_trade_raiding").changes;
+  expect(Number(raid.devastation)).toBeGreaterThan(0);
+  expect(String(raid.population)).toMatch(/^-/);
+});
+
+// EVT-009: disputed numbers lower confidence
+Given("the death toll of {string} is disputed between {int} and {int} million", (s, id: string, a: number, b: number) => {
+  s.event = id;
+  expect(E.eventDef(id).history?.disputes).toContain(`${a}-${b} million`);
+});
+When("its history block is shown", (s) => {
+  s.hist = E.eventDef(s.event).history;
+});
+Then("the dispute is shown with the confidence {string}", (s, conf: string) => {
+  expect(s.hist.confidence).toBe(conf);
+  expect(s.hist.disputes).toBeTruthy();
+});
+Then("the population loss in its effects is a design value", (s) => {
+  const losses = E.eventDef(s.event).options.flatMap((o) => o.effects.immediate ?? []).filter((e) => typeof e.stat === "object" && "population" in (e.stat as object));
+  expect(losses.length).toBeGreaterThan(0);
+  // the loss is a fixed share in the effect, not read from the history block
+  for (const l of losses) expect(String((l.stat as Record<string, unknown>).population)).toMatch(/^-\d+%$/);
+});
+
+// EVT-054: derived values are recomputed every tick
+Given("the province {string} has its devastation raised by an event", (s, id: string) => {
+  const key = `province:${id.toLowerCase()}`;
+  s.prov = key;
+  E.place(w(s), key).stats = { prosperity: 10, infrastructure: 1, control: 100, devastation: 0 };
+  E.deriveAll(w(s));
+  expect(E.place(w(s), key).stats.local_supply).toBe(12);
+  E.applyEffect({ on: key, stat: { devastation: 30 } }, w(s), { roles: {} });
+});
+When("the next tick runs", (s) => {
+  E.tick(st(s));
+});
+Then("its derived local supply and resource output are recomputed from the new devastation", (s) => {
+  const p = E.place(w(s), s.prov).stats;
+  expect(p.local_supply).toBeCloseTo(12 * 0.7);
+  expect(p.resource_output).toBeCloseTo(10 * 0.7);
 });

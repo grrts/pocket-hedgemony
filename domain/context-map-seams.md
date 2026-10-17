@@ -90,7 +90,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | achievements | upstream | Customer–Supplier | Save flags `ironman_unbroken`, `cheat_marked`, `switched_country`; player profile storage and cloud sync; demo profile carry-over |
-| saves | downstream | Customer–Supplier | `ironman` flag, modified mark; achievements asks for `ironman_unbroken`, `cheat_marked`, `switched_country`; demo profile carry-over |
+| saves | downstream | Customer–Supplier | `ironman` flag, modified mark and the header flags `ironman_unbroken`, `cheat_marked`, `switched_country`, `began_as_tutorial` (X-16, D-SAVE-1); lifetime counters and the demo list live in the player profile |
 
 ## achievements ↔ scenario-setup (one-sided)
 
@@ -147,7 +147,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| audio | upstream | Published Language | Alliance or major treaty, envoy sent, answers, diplomatic messages, great powers / world tension |
+| audio | upstream | Published Language | Alliance or major treaty, envoy sent, answers, diplomatic messages, the 8 great powers (most provinces) and whether they are at war (D-AUD-2) |
 
 ## audio ↔ events
 
@@ -187,7 +187,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | audio | upstream | Customer–Supplier | Step/hint shown → `ui_hint`; requested step chime, completion tick, new-warning sound |
-| onboarding | downstream | Customer–Supplier | Step shown / completed, vizier's note, new-warning sound requests |
+| onboarding | downstream | Customer–Supplier | `ui_hint` on step shown, `ui_confirm` on step completed, `notify_alert` on a new Warning; no ducking (D-TUT-7) |
 
 ## audio ↔ province (one-sided)
 
@@ -199,7 +199,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| audio | upstream | Published Language | Ruler death and new ruler, heir born, stability, treasury, income, debt, laws |
+| audio | upstream | Published Language | Ruler death and new ruler, heir born, lords' loyalty and its steps (D-AUD-2), treasury, income, debt, laws |
 
 ## audio ↔ rebellions (one-sided)
 
@@ -293,7 +293,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | buildings | upstream | Published Language | Five building effects, has_building, old-stat mapping, geography anchors, landmark founding events |
-| events | downstream (they extend this) | Customer–Supplier | Proposed effects add_building, remove_building, damage_buildings, building_step and condition has_building; landmarks founded by events |
+| events | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11) effects add_building, remove_building, damage_buildings, building_step and condition has_building; landmarks founded by events |
 
 ## buildings ↔ game-shell (one-sided)
 
@@ -321,8 +321,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | buildings | downstream | Open Host Service | Unique variants (§9.2), landmarks as goals, building ids for building_cost_pct and building_unlock |
-| national-strengths | downstream | Published Language | building_cost_pct, building_unlock; `count building:<id>` |
-| national-strengths | upstream | Open Host Service | Unique variants and landmarks offered as hooks (§9.2, §12.2) |
+| national-strengths | downstream | Published Language | building_cost_pct, building_unlock on buildings-design ids; `count building:<id>` |
+| national-strengths | upstream | Open Host Service | Unique variants of §9.2 are unlocked through `building_unlock` (D-HER-7); landmarks (§12.2) |
 
 ## buildings ↔ naval
 
@@ -368,14 +368,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | buildings | downstream | Open Host Service | House-of-worship slots per faith, minority house of worship, monasteries, pilgrimage shrines, conversion of a building, clergy as owners |
 | buildings | upstream | Customer–Supplier | Faith-pull and calm numbers, conversion cost, holy_places list, seizing church property |
-| religion | upstream | Customer–Supplier | Faith buildings 7.5 (house of worship steps, minority house, monastery, religious school, pilgrimage shrine), converting (5.4), burning (5.3), who builds (6.1, 6.2), landmarks (8); RELG supplies pull and serving rules |
+| religion | upstream | Customer–Supplier | Faith buildings 7.5 (house of worship steps, minority house, monastery, religious school, pilgrimage shrine), converting (5.4), burning (5.3), who builds (6.1, 6.2), landmarks (8); the factory building for secular pull; RELG supplies pull and serving rules, and its words win (monks sent out are preachers; pulling a house down is a take-over or a Persecuted closing, D-RELG-18) |
 
 ## buildings ↔ research
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | buildings | upstream | Conformist | Invention ids that unlock buildings and steps (F, C, L, G, W, B, S, T ids) |
-| research | upstream | Customer–Supplier | School buildings and their steps; buildings hang new buildings on invention ids |
+| research | upstream | Customer–Supplier | School buildings and their steps; the chancery that G3 and G10 need; buildings hang new buildings on invention ids |
 
 ## buildings ↔ revolutions (one-sided)
 
@@ -438,7 +438,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Published Language | Family warmth (+1 / +2 steps), natural rival after nationalism, marriages make lords kin, *Gather our kin* war aim |
+| culture | downstream | Published Language | Family warmth (+1 / +2 steps), natural rival after nationalism, marriages make lords kin; diplomacy owns the war aims *Gather our kin* and *Free a people*, culture supplies their conditions (D-CULT-12) |
 | diplomacy | upstream | Conformist | Same culture group, homelands, accepted cultures |
 
 ## culture ↔ events
@@ -446,14 +446,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | culture | upstream | Published Language | `culture_groups` enum (+4 families), `spread`, nationalism `ideology_support`, new verbs and triggers, migrations, the culture effects for events in §6.1 |
-| events | downstream (they extend this) | Customer–Supplier | Proposed: culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new tongues abroad"; culture effects on listed events; nationalism read from ideology_support |
+| events | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11, D-EVT-12): culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new tongues abroad"; culture effects on listed events; nationalism read from ideology_support |
 
 ## culture ↔ government
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Customer–Supplier | Proposed 1.5 capacity weight of stranger provinces; proposed limits on Tongue policy by government type (neither adopted) |
-| government | upstream | Customer–Supplier | Proposed 1.5 province weight of stranger provinces (not adopted, OQ-GOV-5); "own people" for self-run |
+| culture | downstream | Customer–Supplier | Settled: no capacity weight by tongue (D-CULT-1) and no limits on Tongue policy by form (D-CULT-2); culture reads the form only for a released country |
+| government | upstream | Customer–Supplier | A province's largest tongue and the realm's tongue, for self-run "own people" (D-GOV-13); the 1.5 stranger weight is dropped (D-GOV-5) and forms set no tongue policy limits (D-GOV-6) |
 
 ## culture ↔ map-presentation
 
@@ -467,7 +467,6 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | culture | upstream | Customer–Supplier | Tongue-based strengths (trading network, chancery tradition) |
-| national-strengths | upstream | Customer–Supplier | Accepted cultures for dormant claims |
 | national-strengths | downstream | Published Language | tongue_shift_pct (provisional) |
 
 ## culture ↔ naval (one-sided)
@@ -487,14 +486,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Customer–Supplier | Tongue % on the country card; lords' loyalty steps (kin +1, stranger −1, Impose waver, court goes native); dynasty changes upstream |
+| culture | downstream | Customer–Supplier | Tongue % on the country card (cousins half, D-CULT-6); lords' loyalty: "shares your tongue" cause for kin, stranger starts a step lower (D-CULT-8), one waver when Impose is set (D-CULT-7), court goes native; dynasty changes upstream |
 | realm | upstream | Customer–Supplier | Tongue %, cousins counted half, kin lords' loyalty |
 
 ## culture ↔ rebellions
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Customer–Supplier | Homeland risings draw 8 %, demand a new country at ≥ 0.5; demands for *Own tongue* charter |
+| culture | downstream | Customer–Supplier | Homeland risings draw 8 %, demand a new country at ≥ 0.5 (released country per D-CULT-16); demands for *Own tongue* charter; *Banned tongue* not given under a local official (D-CULT-11) |
 | rebellions | upstream | Customer–Supplier | Homeland risings draw 8 % of the tongue; with nationalism 0.5+ they demand a new country; *Banned tongue* grievance |
 
 ## culture ↔ recruiting (one-sided)
@@ -508,14 +507,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | culture | partnership | Partnership | Same shapes (mix, buildings, charter); trading peoples of another faith; persecution/expulsion of a trading people |
-| religion | partnership | Partnership | Trading peoples of another faith; persecution/expulsion moves them; separate mixes |
+| religion | partnership | Partnership | Trading peoples of another faith; persecution/expulsion moves them; separate mixes; one fourth-newcomer rule for both mixes (D-RELG-17, D-CULT-5) |
 
 ## culture ↔ research
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | culture | partnership | Customer–Supplier | Printing (Impose), printing/mass schooling/newspapers/railways (drift); family neighbours count double toward the 60 % cap; scholars settle by family |
-| research | upstream | Customer–Supplier | Same-family neighbours count double toward the spread cap |
+| research | upstream | Customer–Supplier | Nothing for spread: same-family neighbours count once (D-RSCH-8) |
 
 ## culture ↔ revolutions
 
@@ -543,7 +542,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | culture | upstream | Conformist | Yearly drift slot after births and deaths; 5-yearly checks |
-| time-and-turns | downstream | Customer–Supplier | Yearly drift after births and deaths; five-yearly checks |
+| time-and-turns | downstream | Customer–Supplier | Yearly drift (January) after births and deaths; five-yearly checks |
 
 ## culture ↔ trade (one-sided)
 
@@ -555,15 +554,27 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Customer–Supplier | *Free a people* reads nationalism; garrison bribes; locals know the land; *Gather our kin* |
+| culture | downstream | Customer–Supplier | Garrison bribes; locals know the land |
 | warfare | upstream | Conformist | Homeland tongue (+10 % locals, +5 % break point, guerrilla styles), culture group for style fallback, captain's tongue for bribes |
+
+## culture ↔ world-map (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| culture | upstream | Conformist | Ground and coast for the way-of-life lands (D-CULT-9); map regions and their top-level region for new tongues abroad (D-CULT-10) |
+
+## diplomacy (decided) ↔ subjects (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| subjects | partnership | Customer–Supplier | Diplomacy maps relation kinds onto the six kinds through `mapping_1444` and reads `fights` / `own_diplomacy` from here (X-8); its counts decide asks by agreement and this context picks the kind (D-SUBJ-4); Break a subject targets the overlord (D-SUBJ-6) |
 
 ## diplomacy ↔ events
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | diplomacy | upstream | Published Language | `opinion`, `trust`, `notoriety`, `relation`, new effects `war_aim`, `league`, `pretender`; mobilisation event |
-| events | downstream (they extend this) | Customer–Supplier | opinion → ledger standing; trust and notoriety read-only; relation types to relation actions; proposed effects war_aim, league, pretender |
+| events | downstream (they extend this) | Customer–Supplier | opinion → ledger standing; trust and notoriety are diplomacy's derived values, an event's change lands as an Oath broken or a Notorious deed (D-EVT-14); relation types to relation actions; adopted effects war_aim, league, pretender (D-EVT-11) |
 
 ## diplomacy ↔ exploration (one-sided)
 
@@ -582,7 +593,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| diplomacy | upstream | Customer–Supplier | Cap on officials (envoys count), regency |
+| diplomacy | upstream | Customer–Supplier | Regency; envoys are officials already counted in the cap (D-DIPL-24) |
 | government | upstream | Conformist | "Allied with 2 neighbours of the same people"; subjects count for "3 or more subjects" |
 
 ## diplomacy ↔ map-presentation
@@ -597,14 +608,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | diplomacy | upstream | Open Host Service | Extra reason rows, extra seat, unique war aims |
-| national-strengths | upstream | Customer–Supplier | Envoy stationing; annexation, release |
+| national-strengths | upstream | Customer–Supplier | Resident envoys (D-HER-11); annexation, release; years an annexed homeland is held |
 | national-strengths | downstream | Published Language | envoy_count, opinion_steps, oath_fade_pct, lands_taken_pct; ambition reading |
 
 ## diplomacy ↔ naval
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| diplomacy | upstream | Conformist | Sea-zone travel times for envoys |
+| diplomacy | upstream | Conformist | Sea-zone travel times for envoys; the sea zones a realm touches (notoriety knowers, D-DIPL-26) |
 | naval | upstream | Customer–Supplier | War, peace, rivalry, alliance (docking rights), consent to sell hulls, privateers dragging into war |
 
 ## diplomacy ↔ onboarding (one-sided)
@@ -617,22 +628,22 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| diplomacy | downstream | Customer–Supplier | Province loses its official while the envoy is away; which official type runs a province (funding catch chance) |
+| diplomacy | downstream | Customer–Supplier | Province loses its official while the envoy is away (it runs as if it had none, D-DIPL-12) |
 | province | upstream | Customer–Supplier | Envoys taken from officials leave a province at half pay; foreign agitators (via rebellions) |
 
 ## diplomacy ↔ realm
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| diplomacy | upstream | Customer–Supplier | Officials' types and years, ruler, heirs, traits, marriages, lords and their loyalty / Wants, soldiers under arms, Oaths broken and Lands taken stats; diplomacy reports OathBroken, LordDefected, CrownInherited, envoys card line |
-| realm | downstream | Customer–Supplier | Allies, enemies, rivals, oaths broken, lands taken, envoys (officials), marriages, ruler traits, soldiers counted for strength |
+| diplomacy | upstream | Customer–Supplier | Province count (seats follow at once, D-DIPL-13), yearly income (funding cost), officials' types and years, ruler, heirs, traits, marriages, lords and their loyalty / Wants, soldiers under arms, Oaths broken and Lands taken stats; diplomacy reports OathBroken, LordDefected, CrownInherited, envoys card line |
+| realm | downstream | Customer–Supplier | Allies, enemies, rivals, oaths broken, lands taken (diplomacy's leagues), envoy seats, pretenders, opinion, trust and notoriety, marriages, ruler traits, soldiers counted for strength |
 
 ## diplomacy ↔ rebellions
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| diplomacy | downstream | Customer–Supplier | *Foreign agitators*, *Foreign meddling* grievances, Armed rebels, no shrinking; country fallen to rebels |
-| rebellions | upstream | Customer–Supplier | Fund rebels (secret), *Foreign agitators* / *Foreign meddling* (OQ-REBL-3), envoy flees when the host country falls to rebels |
+| diplomacy | downstream | Customer–Supplier | Country fallen to rebels (residents go home); no funding grievances (D-DIPL-23) |
+| rebellions | upstream | Customer–Supplier | Fund rebels (secret), *Foreign agitators* / *Foreign meddling* (D-REBL-3), envoy flees when the host country falls to rebels |
 
 ## diplomacy ↔ recruiting (one-sided)
 
@@ -652,14 +663,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | diplomacy | upstream | Conformist | G5, G8, T14 known |
-| research | downstream | Customer–Supplier | G5, G8 envoys; G8 asking for passage (asked, not adopted) |
+| research | downstream | Customer–Supplier | G5, G8 envoys; G8 asking for passage (D-RSCH-5) |
 
 ## diplomacy ↔ revolutions
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| diplomacy | downstream | Partnership | Funding at 50 gold as a revolution sign, émigré pretenders, *Different form of rule* reason row |
-| revolutions | downstream / upstream | Partnership | "Different form of rule −20"; counter-revolution war reason; one-off opinion changes; fund-a-revolution action and caught reason (OQ-REVO-1) |
+| diplomacy | upstream / downstream | Partnership | Signs lit on the revolution card (funding needs one); diplomacy sets `revolution_funded`; a won revolution gives *Backed our revolution*; émigré pretenders; *Different form of rule* reason row (X-10, D-DIPL-23) |
+| revolutions | downstream / upstream | Partnership | "Different form of rule −20"; counter-revolution war reason; one-off opinion changes; fund-a-revolution action and caught reason (D-REVO-1) |
 
 ## diplomacy ↔ scenario-setup
 
@@ -672,14 +683,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| diplomacy | downstream | Customer–Supplier | Subject relation records and kinds (diplomacy stores), subjects by agreement, inherited unions, joins_overlord_wars, own diplomacy, *Break a subject* aim |
+| diplomacy | downstream | Customer–Supplier | Subject relation records (diplomacy stores; kinds mapped onto the six kinds by subjects, X-8); diplomacy uses the subjects kind rules for joining wars and own diplomacy (D-DIPL-10); calls to Vassals and Protectorates are answered by subjects by loyalty; subjects by agreement (count here, kind there, D-DIPL-32); *Break a subject* against the overlord (D-DIPL-8) |
 | subjects | upstream | Customer–Supplier | Subject relation records, kinds, `make_subject`, `release_subject`, `independence_war`, envoys, marriages, protection asks, courting, crowns inherited |
 
 ## diplomacy ↔ time-and-turns
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| diplomacy | upstream | Conformist | Month turn, seasons, years, eras, turn order |
+| diplomacy | upstream | Conformist | Week turn, months, seasons, years, eras, turn order (X-2: after subjects and government, D-DIPL-31) |
 | time-and-turns | downstream | Customer–Supplier | Answers next turn; seasonal envoy ties; yearly fades and leagues; each-turn AI |
 
 ## diplomacy ↔ trade
@@ -687,14 +698,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | diplomacy | downstream | Published Language | Trade pact (no tolls), embargo (closed paths), war stops trade |
-| trade | upstream | Customer–Supplier | Trade pact, embargo, closed borders, peace and war |
+| trade | upstream | Customer–Supplier | Trade pact, embargo, peace and war (no closed borders, D-TRADE-8) |
 
 ## diplomacy ↔ troop-movement
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | diplomacy | downstream | Published Language | Passage yes/no per pair, ends the day revoked; route graph and crossing units for envoys |
-| troop-movement | upstream | Customer–Supplier | Yes/no passage per realm pair and its withdrawal day; war state; allies |
+| troop-movement | upstream | Customer–Supplier | Yes/no passage per realm pair and its withdrawal day; war state; allies. No army can enter a realm without passage, so diplomacy's "entered without passage" case can't arise from a march (D-MOVE-7) |
 
 ## diplomacy ↔ warfare
 
@@ -715,29 +726,36 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | events | downstream | Customer–Supplier | `age_of_exploration` gates exploration per region; colonial_presence |
 | exploration | upstream | Conformist | `age_of_exploration` and its regions (the age gate) |
-| exploration | downstream | Published Language | Founded colonies counted by `colonial_presence` (used by the Age of Exploration's end) |
+| exploration | downstream | Published Language | Founded colonies plus trading posts held counted by `colonial_presence` (D-EXPL-8); no first-contact hook (D-EXPL-1) |
+| exploration | upstream | Conformist | The later ages that open the gate outside the Age of Exploration's regions (D-EXPL-3) |
 
 ## events ↔ game-shell
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | downstream | Published Language | Event modal, queue in date order, unanswered events block End turn, historical or free events option, wrap-up |
+| events | downstream | Published Language | Event modal, queue in date order, unanswered events block End turn (EVT-044), the "Events" choice Historical / Plausible / Free (EVT-036); the final scores screen is the wrap-up (D-EVT-2) |
 | game-shell | upstream | Conformist | Events with two or three options, queued in date order; wrap-up events at campaign end |
+
+## events ↔ game-shell (new game) (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| events | upstream | Customer–Supplier | The "Events" choice sets the alternate history mode; settings never change it during play (X-15) |
 
 ## events ↔ government
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | events | downstream | Customer–Supplier | 16 `government` values mapped to forms; admin_capacity → officials cap |
-| government | upstream | Anti-Corruption Layer | 16 event-tree `government` values mapped to forms; `admin_capacity` → officials cap; events read the form's event-tree value |
+| government | upstream | Anti-Corruption Layer | 16 event-tree `government` values mapped to forms; `admin_capacity` adds 1 official per point for good (D-GOV-11); events read the form's event-tree value |
 
 ## events ↔ national-strengths
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | downstream (they extend this) | Customer–Supplier | Ages for heydays; condition language; proposed effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
-| national-strengths | upstream | Conformist | Ages (`ages.yaml`) and their start/end, the condition language, event ids for event_weight/event_option, statistics.yaml stats |
-| national-strengths | downstream | Published Language | Four effects (grant_legacy, wake_heyday, stir_ambition, shed_burden) and the `heritage` condition (proposed) |
+| events | downstream (they extend this) | Customer–Supplier | Ages for heydays; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
+| national-strengths | upstream | Conformist | Ages (`ages.yaml`) and their start/end, the condition language, event ids for event_weight/event_option; the `stat` lever lands through the events mapping (D-EVT-4, D-HER-6); heritage runs right after the event tree each turn |
+| national-strengths | downstream | Published Language | Four effects (grant_legacy, wake_heyday, stir_ambition, shed_burden) and the `heritage` condition (adopted, D-EVT-11) |
 
 ## events ↔ naval (one-sided)
 
@@ -750,13 +768,13 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | events | downstream | Customer–Supplier | `tutorial_only` scripted events in event format; requested Varna crusade and abdication events |
-| onboarding | upstream | Customer–Supplier | Event format, `history` block, `tutorial_only`, `narrative_only`; asks the event tree for the Varna crusade and the abdication as real events, and an effect that grants a war aim |
+| onboarding | upstream | Customer–Supplier | Event format, `history` block, `tutorial_only`, `narrative_only`; scripted events stay in the tutorial scenario file and the league's aim comes from the start state (D-TUT-9) |
 
 ## events ↔ province
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | downstream | Customer–Supplier | Province stats mapping (§15): population, prosperity → buildings, devastation → burned tiles, unrest → grievances, control, fort_level, infrastructure, industry, trade_access, food_security, disease_burden, culture and religion shares, colonial_status; geography anchors → fixed places |
+| events | downstream | Anti-Corruption Layer | Province stats mapping (§15, the events data's stat_mapping): population, prosperity → buildings, devastation → burned tiles, unrest → grievances, control, fort_level, infrastructure, industry, trade_access, food_security, disease_burden, culture and religion shares, colonial_status; geography anchors → fixed places |
 | province | upstream | Anti-Corruption Layer | Event-tree province stats translated by §15 |
 
 ## events ↔ realm
@@ -770,7 +788,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | downstream | Customer–Supplier | `rebels` effect, `rebels_active`, `unrest`, `separatism_risk`; events as sparks (OQ-EVT-5) |
+| events | downstream | Customer–Supplier | `rebels` effect starts a rising from the recruit pool (EVT-048); `rebels_active` reads risings; `unrest` lands as one named grievance; events as sparks; the end of a tagged rising (EVT-068) |
 | rebellions | upstream | Published Language | `rebels` effect, `rebels_active` condition, `unrest` → grievances, sparks from events, `separatism_risk` |
 
 ## events ↔ recruiting (one-sided)
@@ -783,8 +801,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | downstream (they extend this) | Customer–Supplier | Proposed: religions hussite, jain, asian_traditional; conditions faith_policy, holds_holy_place, faith_wave_active; effects faith_wave, faith_policy, preachers; entities tumed, gelug_order, old_believers, gowa_tallo, merina_kingdom; 7 modifiers; 8 unverified sources; 10 new events; faith_wave patches on protestant_reformation, council_of_trent, safavid_rise, sikh_panth_founded, futa_jallon_jihad, sokoto_jihad; flags religious_persecution_active, missionary_persecution, inquisition_established set by religion (not merged) |
-| religion | partnership | Published Language | Faith ids (+3), `religion`/`religion_share`, new conditions and effects, faith waves, flags, 10 new events, 6 patches, periods |
+| events | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11), registered by religion: religions hussite, jain, asian_traditional; conditions faith_policy, holds_holy_place, faith_wave_active; effects faith_wave, faith_policy, preachers; entities tumed, gelug_order, old_believers, gowa_tallo, merina_kingdom; 7 modifiers; 8 unverified sources; 10 new events; faith_wave patches on protestant_reformation, council_of_trent, safavid_rise, sikh_panth_founded, futa_jallon_jihad, sokoto_jihad; flags religious_persecution_active, missionary_persecution, inquisition_established set by religion (D-EVT-16) |
+| religion | partnership | Published Language | Faith ids (+3), `religion`/`religion_share`, new conditions and effects, faith waves, flags, 10 new events, 6 patches, periods: religion's additions are part of the game's content (D-RELG-10); their stat effects go through the events context's own stat mapping (D-RELG-11) |
 
 ## events ↔ research
 
@@ -797,7 +815,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | downstream (they extend this) | Customer–Supplier | Proposed: conditions grievance, class_share, lords, war_lost; effects regime, lock; param rebels.revolution; tiers rising_won, rising_crushed; event field revolution with rearm (one_time may fire again); flags revolutionary_regime, emigre_court, reaction_regime, revolution_funded; areas hokuriku, old_castile; entities ikko_ikki_kaga, comuneros, tay_son, donghak_movement, russian_opposition_1905, iranian_constitutionalists; 7 unverified sources; 26 extended and 10 new events; build.py EFFECT_TIERS (not merged) |
+| events | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11), registered by revolutions: conditions grievance, class_share, lords, war_lost; effects regime, lock; param rebels.revolution; tiers rising_won, rising_crushed; event field revolution with rearm (one_time may fire again); flags revolutionary_regime, emigre_court, reaction_regime, revolution_funded; areas hokuriku, old_castile; entities ikko_ikki_kaga, comuneros, tay_son, donghak_movement, russian_opposition_1905, iranian_constitutionalists; 7 unverified sources; 26 extended and 10 new events; build.py EFFECT_TIERS |
 | revolutions | upstream | Conformist | Revolutions are events: availability, roles, selection, options, effect tiers; this context adds conditions `grievance`, `class_share`, `lords`, `war_lost`, effects `regime`, `lock`, param `rebels.revolution`, tiers `rising_won` / `rising_crushed`, event field `revolution` (with `rearm`), flags `revolutionary_regime`, `emigre_court`, `reaction_regime`, `revolution_funded`, areas `hokuriku`, `old_castile`, 6 entities, 7 unverified sources, 26 extended and 10 new events (patch not yet merged) |
 
 ## events ↔ saves (one-sided)
@@ -812,32 +830,31 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | scenario-setup | upstream | Shared Kernel | Catalogue `event_key`s linked to event-tree ids (260 of 1,175); geography anchors |
 
-## events ↔ settings
+## events ↔ settings (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | upstream | Customer–Supplier | Campaign end date; alternate history mode |
 | settings | downstream | Conformist | Jump to events |
 
 ## events ↔ subjects
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | downstream (they extend this) | Customer–Supplier | vassalize, release, relation subject/overlord/personal_union, subject_count, create_country subject_of, doctrine_of_lapse; proposed subject_loyalty, add_subject_reason, remove_subject_reason, change_subject_kind |
+| events | downstream (they extend this) | Customer–Supplier | vassalize, release, relation subject/overlord/personal_union, subject_count, create_country subject_of, doctrine_of_lapse; adopted (D-EVT-11) subject_loyalty, add_subject_reason, remove_subject_reason, change_subject_kind |
 | subjects | upstream | Published Language | `vassalize`, `release`, `relation`, `subject_count`, `create_country … subject_of`, `doctrine_of_lapse`, new keys |
 
 ## events ↔ time-and-turns
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | upstream | Conformist | Monthly and yearly ticks; events last in the turn |
+| events | upstream | Conformist | Events are step 6 of the turn, after every other system and before achievements (X-2); monthly work in the turn a new month begins, yearly checks in the turn in which 1 January falls (X-18) |
 | time-and-turns | downstream | Partnership | Monthly pool roll; ages with forced dates; end-of-campaign wrap-up |
 
 ## events ↔ trade
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | downstream | Customer–Supplier | trade_power, trade_access, world_trade_index, trade_index, trade_presence, trade_route, hubs as labels |
+| events | downstream | Customer–Supplier | trade_access → trade ratio gain %, trade_index → trade ratio (X-6); trade_presence, trade_route, hubs as labels |
 | trade | upstream | Anti-Corruption Layer | trade_power, trade_access, world_trade_index, trade_index, trade_presence, trade_route, trade_good, hubs, silver flood |
 
 ## events ↔ troop-movement (one-sided)
@@ -857,7 +874,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| world-map | upstream | Shared Kernel | Region ids, areas, anchor provinces |
+| world-map | upstream | Shared Kernel | Region ids, areas; world-map resolves anchor provinces to map provinces |
 
 ## every system context (province, realm, warfare, diplomacy, …) ↔ saves (one-sided) (unknown context name)
 
@@ -876,7 +893,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| exploration | downstream | Published Language | Parchment from the charted map, voyage paths, colony flags and progress rings, range line, colony card |
+| exploration | downstream | Published Language | Parchment from the charted map, voyage paths, colony flags and progress rings, range line, colony card; the client's reach toggle is replaced by the charted map (D-EXPL-16) |
 | map-presentation | upstream | Customer–Supplier | Charted map (parchment), voyages, colonies |
 
 ## exploration ↔ naval
@@ -884,6 +901,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | exploration | upstream | Customer–Supplier | Ship families, the caravel and voyaging canoe rows, 60 supply, colony stores in the hold, docking and resupply, sailing reach (7.2), fleets as movers; EXPL supplies the unlock and the charted map (uncharted may-enter) |
+| exploration | upstream | Customer–Supplier | Ship sinking (a governor aboard dies, EXPL-059); the voyaging canoe needs the full exploration unlock (D-EXPL-18) |
 | naval | downstream | Customer–Supplier | Exploration ships (caravel, voyaging canoe), 60 supply, colony stores, docking; exploration supplies the unlock, the charted map (may-enter for uncharted zones) and carries governors aboard |
 
 ## exploration ↔ province
@@ -903,27 +921,27 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| rebellions | upstream | Customer–Supplier | Colonies and local people's tiles; resistance (OQ-REBL-13) |
+| rebellions | upstream | Customer–Supplier | Colonies and local people's tiles; resistance (D-REBL-13) |
 
 ## exploration ↔ research
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | exploration | upstream | Conformist | S3, S4, S5 (*ocean_navigation*, "opens colonies with 2 colonial governor slots"), T8 and T9 (+1 slot each), S1 |
-| research | downstream | Partnership | S4, S5, T8, T9 colonial governor slots; contact events opening ⇄ inventions |
+| research | downstream | Partnership | S4, S5, T8, T9 colonial governor slots (T8 and T9 keep +1 each); the Atlantic crossing contact event opens F9 (D-RSCH-13) |
 
 ## exploration ↔ scenario-setup
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| exploration | upstream | Conformist | 1444 owners: which land is owned by countries (tribal countries included) and which is unowned with peoples on it |
+| exploration | upstream | Conformist | 1444 owners: land owned by a map nation (tribal countries included) is owned; land no map nation owns is a people's with no country, whatever the catalogue lists (X-13, D-EXPL-2) |
 | scenario-setup | downstream | Customer–Supplier | Charted start; exploration unlock in 1444; unowned land |
 
 ## exploration ↔ subjects
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| exploration | downstream | Customer–Supplier | A founded colony enters at *Outpost* (2.4); the Colony subject charter |
+| exploration | downstream | Customer–Supplier | A founded colony is a royal province (D-EXPL-7); subjects may later charter colonial provinces as a Colony subject (subjects 9); subjects' ports count for colonial range (D-EXPL-5) |
 | subjects | upstream | Customer–Supplier | Colonial provinces chartered into a Colony |
 
 ## exploration ↔ time-and-turns
@@ -963,8 +981,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| game-shell | partnership | Partnership | Tips table, encyclopedia, tutorial start, first-launch "New to Pocket Hegemony?" question, Attention list (tutorial's "Needs attention") and its mutes |
-| onboarding | upstream | Partnership | Attention screen and where it opens; first-launch question; Tutorial menu entry and chapter list; three pause-menu lines; loading-screen tips; turn report link; End turn count |
+| game-shell | partnership | Partnership | Tips table, the Almanac, the tutorial's chapter list and its three game menu lines, the first-launch question (SHELL-131), the lines on the Needs attention screen (warnings, opportunities and New entries) |
+| onboarding | upstream | Partnership | The Needs attention screen (two groups, Show, mute buttons, D-TUT-1) and where it opens; first-launch question; Tutorial menu entry and chapter list; three pause-menu lines; loading-screen tips; turn report link; End turn count |
 
 ## game-shell ↔ province (one-sided)
 
@@ -976,7 +994,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| game-shell | upstream | Conformist | Country card, top bar values (gold, levies), realm no longer exists, realm highs |
+| game-shell | upstream | Conformist | Country card, top bar values (gold, levies), realm no longer exists, realm highs, the Economy, Power and Technology scores and world domination share (realm §12, X-12) |
 | realm | downstream | Published Language | Scores, ranks and the campaign result for end-of-campaign screens |
 
 ## game-shell ↔ recruiting (one-sided)
@@ -1001,7 +1019,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| game-shell | upstream | Customer–Supplier | Newest save and its header summary (Continue label, title background), Load list, pre-turn and background saves, ironman flag, locked-nation check, damaged-save failures |
+| game-shell | upstream | Customer–Supplier | Newest save and its header summary (Continue label, title background), Load list (flat, newest first), the Resume save and orders journal (closed at End turn, written on backgrounding), ironman flag, Needs attention mutes and tutorial progress in the save (X-16), locked-nation check, damaged-save failures |
 | saves | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt |
 
 ## game-shell ↔ scenario-setup
@@ -1028,8 +1046,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| game-shell | upstream | Customer–Supplier | End of month, pause at each player battle and resume (Carry on), end date reached |
-| time-and-turns | downstream | Open Host Service | `TurnStarted`, `PlayerBattleReached`, `TurnEnded`, `CampaignEnded`; End turn blocked by events |
+| game-shell | upstream | Customer–Supplier | The day loop, with 4-hour steps while a player battle runs (X-1, X-2); a request: a way to play one 4-hour step at a time so the shell can wait for the player between steps, end of month, the January turn (domination check), end date reached |
+| time-and-turns | downstream | Open Host Service | `TurnStarted`, `PlayerBattleStarted`, `BattleEnded`, `TurnEnded`, `CampaignEnded`; End turn blocked by events |
 
 ## game-shell ↔ trade (one-sided)
 
@@ -1041,14 +1059,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| troop-movement | downstream | Published Language | Notices of the month |
+| troop-movement | downstream | Published Language | Notices of the turn; the 4-hour battle steps with standing orders, retreat and switching battles (X-1) |
 
 ## game-shell ↔ warfare
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| game-shell | upstream | Customer–Supplier | Battle viewer content, before-the-battle card and standing orders, result card, siege view, peace table, notifications for the turn report and Attention |
-| warfare | downstream | Published Language | Battle reports, Watch button, notifications |
+| game-shell | upstream | Customer–Supplier | Battle view content (progress, standing orders, Retreat; no skip, X-1), result card, siege view, peace table, notifications for the turn report and Attention |
+| warfare | downstream | Published Language | Player battles watched in 4-hour steps with standing orders, retreat and switching between battles (X-1, D-WAR-2), battle reports and replay, notifications |
 
 ## government ↔ map-presentation (one-sided)
 
@@ -1080,8 +1098,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| government | partnership | Partnership | GOV → loyalty slips (New Year, reforms), *Great lord* reasons, succession by form; REALM → lords, their provinces and loyalty, treasury gold |
-| realm | upstream | Customer–Supplier | Officials and lords caps, *Great lord* loyalty reason, succession by form, `admin_capacity` → officials cap |
+| government | partnership | Partnership | GOV → loyalty slips (New Year, reforms, lowest loyalty first), *Great lord* reasons, succession by form (country stats' inheritance law dropped, D-GOV-7); REALM → lords, their provinces and loyalty, treasury gold |
+| realm | upstream | Customer–Supplier | Officials and lords caps, *Great lord* loyalty reason (REALM-162), succession by form (REALM-161), `admin_capacity` → officials cap |
 
 ## government ↔ rebellions
 
@@ -1100,8 +1118,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| government | upstream | Customer–Supplier | "Ruler takes a reformed faith" opens prince-bishopric/order → feudal realm; religion reads forms for the Inquisition |
-| religion | downstream | Customer–Supplier | State faith, clergy lords, holy places held as facts; "ruler takes a reformed faith"; Inquisition limited to monarchies |
+| government | upstream | Customer–Supplier | A change of state faith from the founding faith opens prince-bishopric/order → feudal realm (D-GOV-14); religion reads the forms' event-tree values for the Inquisition (D-GOV-15) |
+| religion | downstream | Customer–Supplier | State faith, clergy lords, holy places held as facts; "ruler takes a reformed faith" = a change to Protestant, Anglican or Hussite (D-RELG-9); Inquisition limited to the forms of rule by a house (D-RELG-8) |
 
 ## government ↔ research
 
@@ -1114,8 +1132,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| government | upstream | Conformist | Regimes set forms (era ignored); `old_form` restore needs the remembered form |
-| revolutions | downstream | Customer–Supplier | Regimes set forms from `government.yaml` forms (any era), `old_form`, `form_before_g14`, `power_base_add` (OQ-REVO-2) |
+| government | upstream | Conformist | Regimes set forms (era ignored); GOV remembers the last form not set by a revolution for `old_form` (D-GOV-9); committee rule only sets its form |
+| revolutions | downstream | Customer–Supplier | Regimes set forms from `government.yaml` forms (any era), `old_form`, `form_before_g14`, `power_base_add` (D-REVO-2) |
 
 ## government ↔ scenario-setup
 
@@ -1128,8 +1146,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| government | downstream | Published Language | Subject reach base and the form's change; colonial government holds none |
-| subjects | upstream | Customer–Supplier | Subject reach (base + form), lord capacity, which kinds a government may hold |
+| government | downstream | Published Language | Subject reach base and the form's change; a change to colonial government releases every subject (D-GOV-16) |
+| subjects | upstream | Customer–Supplier | Subject reach (base + form), lord capacity; government sets no limits on kinds (D-SUBJ-19) |
 
 ## government ↔ trade (one-sided)
 
@@ -1217,7 +1235,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | map-presentation | upstream | Customer–Supplier | Turn results, playback timing, turn-time budgets |
-| time-and-turns | downstream | Customer–Supplier | Month playback; turn-time budgets |
+| time-and-turns | downstream | Customer–Supplier | Month playback as the day loop runs, pausing at each stop; turn-time budgets |
 
 ## map-presentation ↔ trade
 
@@ -1231,7 +1249,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | map-presentation | upstream | Published Language | Routes, arrows, columns, playback events |
-| troop-movement | downstream | Published Language | Route preview, month marks, replay timing, zoom displays |
+| troop-movement | downstream | Published Language | Route preview, turn marks, replay timing, zoom displays |
 
 ## map-presentation ↔ warfare
 
@@ -1299,7 +1317,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | national-strengths | upstream | Customer–Supplier | Reforms and revolutions shedding burdens or granting legacies through event effects |
-| revolutions | downstream | Customer–Supplier | Hook only: a won revolution can shed a burden or grant a legacy (which ones: OQ-REVO-6) |
+| revolutions | downstream | Customer–Supplier | Hook only: a won revolution can shed a burden or grant a legacy (which ones: D-REVO-6) |
 
 ## national-strengths ↔ scenario-setup
 
@@ -1325,13 +1343,13 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| national-strengths | upstream | Conformist | Dates, eras (counsel gold), years counted |
+| national-strengths | upstream | Conformist | Dates, eras (counsel gold); heritage runs in the events step, time in months (X-2, HER-078) |
 
 ## national-strengths ↔ trade
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| national-strengths | downstream | Published Language | trader_count, trader_gain_pct, traders_passing_pct, toll_gold_pct, trade_balance_pct |
+| national-strengths | downstream | Published Language | Trade v2 (X-6): trade_balance_pct and traders_passing_pct on trade ratio gain, trader_gain_pct on each deposit, trader_count extra starting traders; toll_gold_pct |
 | national-strengths | upstream | Conformist | trade_presence condition, hubs |
 | trade | downstream | Published Language | Levers trader_count, trader_gain_pct, traders_passing_pct, toll_gold_pct, trade_balance_pct; trade_presence condition |
 
@@ -1345,7 +1363,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| national-strengths | upstream | Customer–Supplier | Province ids for 273 place names, areas, seas |
+| national-strengths | upstream | Customer–Supplier | Province ids for place names, bound to the nearest land province (D-HER-16); areas, seas |
 
 ## naval ↔ province
 
@@ -1366,7 +1384,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | naval | upstream | Shared Kernel | The levy's people (fighting-age share), commissioning officials (7.1), empty province (7.4), coming home (6.2), guns (4.2); NAVY asks the levy pool to count sailors |
-| recruiting | downstream | Shared Kernel | Mustering sailors uses the levy (fighting-age men, shares); admirals use the commission and the empty province (7.1, 7.4) |
+| recruiting | downstream | Shared Kernel | Mustering sailors uses the levy (fighting-age men, shares) but has its own seafolk ceiling; sailors away are not at home, so they leave the levy's seafolk count (D-RECR-21); admirals use the commission and the empty province (7.1, 7.4) |
 
 ## naval ↔ research
 
@@ -1393,7 +1411,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| naval | upstream | Conformist | Day loop inside the month, monthly and seasonal steps |
+| naval | upstream | Conformist | Day loop inside the weekly turn, monthly and seasonal steps (X-18) |
 | time-and-turns | downstream | Customer–Supplier | Fleets' day step in the same day loop; monthly storm and ship-state steps |
 
 ## naval ↔ trade
@@ -1409,7 +1427,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | naval | upstream | Conformist | Mover model, day loop, shared planner, boarding and landing (11.3); NAVY supplies step days and may-enter rules |
-| troop-movement | both | Shared Kernel | Mover interface, day loop, planner; fleets' step days and may-sail; boarding/landing; enemy fleets closing straits; sailors walking between ports at "levy pace" |
+| troop-movement | both | Shared Kernel | Mover interface, day loop, planner; fleets' step days and may-sail; boarding/landing; enemy fleets closing straits; sailors walking between ports at "levy pace", which is the step days of a foot army of that size at Normal pace (D-MOVE-16) |
 
 ## naval ↔ warfare
 
@@ -1441,13 +1459,13 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream | Conformist | Rising, rebellion card, five answers, grievances, *Sons taken* proposal |
+| onboarding | upstream | Conformist | Rising, rebellion card, five answers, grievances |
 
 ## onboarding ↔ recruiting (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream / downstream | Customer–Supplier | Levy, regiments, Janissaries, recruit pool, Marshal; receives the devshirme proposal |
+| onboarding | upstream | Conformist | Levy, regiments, Janissaries, recruit pool, Marshal (the devshirme stays tutorial narrative, D-TUT-8) |
 
 ## onboarding ↔ religion (one-sided)
 
@@ -1465,8 +1483,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream | Customer–Supplier | Tutorial progress and mutes stored apart and synced; chapter saves shipped read-only; converting a tutorial save into a campaign save marked "began as the tutorial" |
-| saves | downstream | Customer–Supplier | Tutorial progress and Attention mutes stored apart from saves and synced; chapter saves shipped read-only; "began as the tutorial" mark |
+| onboarding | upstream | Customer–Supplier | Tutorial progress and mutes stored in the save (X-16); chapter saves shipped read-only; converting a tutorial save into a campaign save with `began_as_tutorial` in the header |
+| saves | downstream | Customer–Supplier | Tutorial progress and Needs attention mutes live in the player profile and sync with it, not in the save (X-16, D-SAVE-1); chapter saves shipped read-only; the `began_as_tutorial` flag |
 
 ## onboarding ↔ scenario-setup
 
@@ -1479,14 +1497,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream | Conformist | Tooltip delay; Tutorial hints; "Reset tutorial and hints"; reduced motion; UI scale |
+| onboarding | upstream | Conformist | Tooltip delay; Detailed tooltips (Why? in the tooltip) and Tutorial hints (goals list), D-TUT-13; "Reset tutorial and hints"; reduced motion; UI scale |
 | settings | downstream | Customer–Supplier | Tutorial hints, Reset tutorial and hints, tooltips and their delay, detailed tooltips; reduced motion respected by the spotlight |
 
 ## onboarding ↔ subjects (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream | Conformist | Next pass: Serbia returned, the Morea's tribute |
+| onboarding | — | — | Nothing crosses; no subject steps (D-TUT-10) |
 
 ## onboarding ↔ time-and-turns
 
@@ -1532,7 +1550,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | province | downstream | Customer–Supplier | Recruits here, classes, homeless, muster master; recruiting asks for a ceiling by class, Fallen/Veterans here, Marshal and deputy officials |
-| recruiting | upstream | Customer–Supplier | Classes and people per class, job slots, homeless, officials and types, grievances, births, local stores; recruiting writes back empty slots, Conscription, births cut, Recruits/Fallen/Veterans |
+| recruiting | upstream | Customer–Supplier | Classes and people per class, job slots, homeless, officials and types (Marshal, deputy: X-7), grievances, births, local stores; recruiting writes back empty slots, Conscription, births cut, Recruits/Fallen/Veterans (X-7) |
 
 ## province ↔ religion
 
@@ -1658,14 +1676,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| realm | upstream | Conformist | Monthly turn, seasons, end date for score judging |
-| time-and-turns | downstream | Customer–Supplier | Autumn harvest; monthly income; win score timing |
+| realm | upstream | Conformist | Weekly turn with monthly steps (X-18), seasons, end date for score judging |
+| time-and-turns | downstream | Customer–Supplier | Harvest month; monthly income; January domination check; scores judged at the end date (X-12) |
 
 ## realm ↔ trade
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| realm | upstream | Customer–Supplier | Trade income (deposits, fees, tolls); traders and trade ships replace merchants |
+| realm | upstream | Customer–Supplier | Trade income (deposits, fees, tolls); traders and trade ships replace merchants (REALM-157) |
 | trade | downstream | Customer–Supplier | Deposits, market fees, tolls as trade income; founding gold and upkeep; Traders and Trade ships replace Merchants |
 | trade | upstream | Customer–Supplier | Treasury, lords and their wealth, catalogue trade_access |
 
@@ -1673,28 +1691,28 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| realm | downstream | Partnership | Soldiers, horses, commanders, Fallen, army food refill, castles in sieges, victories; warfare asks for arms store, powder store, prisoners, troop cap, peace voices |
+| realm | downstream | Partnership | Soldiers by kind, horses, commanders (warfare §4), Fallen, army food refill (castles first), castles in sieges, victories; arms store, powder store, prisoners, troop cap, peace voices on the card (REALM-158) |
 | warfare | upstream / downstream | Customer–Supplier | REALM → WAR: treasury, lords and loyalty, ruler/heirs, Food policy siege reserve, academies. WAR → REALM: Fallen, victories/defeats, arms and powder stores, prisoners, troop cap, oaths broken |
 
 ## rebellions ↔ recruiting
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| rebellions | upstream | Customer–Supplier | Recruits lost to rebels; armed veterans start a rising armed and drilled (OQ-REBL-14) |
-| recruiting | downstream | Published Language | Armed veterans, rebels drawing from the pool, Conscription grievance |
+| rebellions | upstream | Customer–Supplier | Recruits lost to rebels (D-REBL-14) |
+| recruiting | downstream | Published Language | Armed veterans, a rising's men drawn from the pool (X-9), Conscription grievance |
 
 ## rebellions ↔ religion
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| rebellions | upstream | Customer–Supplier | Faith risings' demand, preachers as leaders, sparks from faith policy and houses (OQ-REBL-2) |
+| rebellions | upstream | Customer–Supplier | Faith risings' demand, preachers as leaders, sparks from faith policy and houses (D-REBL-2) |
 | religion | downstream | Customer–Supplier | Sparks (harsher policy step, insult to faith), faith risings' demand, preachers as leaders, *Bloodshed* |
 
 ## rebellions ↔ revolutions
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| rebellions | downstream | Customer–Supplier | Tagged risings (`revolution: <event>`), camp join shares that replace 5.4 for that rising, `rising_won` / `rising_crushed` hook (proposed, OQ-REBL-4) |
+| rebellions | downstream | Customer–Supplier | Tagged risings (`revolution: <event>`), camp join shares that replace 5.4 for that rising, `rising_won` / `rising_crushed` hook (adopted, D-REBL-4) |
 | revolutions | downstream | Customer–Supplier | Tagged risings; camps replace the join table; won / crushed hook; rising causes from families |
 
 ## rebellions ↔ scenario-setup
@@ -1715,7 +1733,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| rebellions | upstream | Conformist | Monthly order of steps |
+| rebellions | upstream | Conformist | Monthly steps in the turn a new month begins (X-18), order of steps |
 | time-and-turns | downstream | Customer–Supplier | Monthly rising rolls and spread |
 
 ## rebellions ↔ trade
@@ -1756,21 +1774,21 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| recruiting | upstream | Conformist | Month tick, seasons, the order of the monthly steps |
+| recruiting | upstream | Conformist | Week turn (X-18), month tick, seasons (X-4), the order of the monthly steps: recruiting after buildings, yearly rules in January (X-2) |
 | time-and-turns | downstream | Customer–Supplier | Monthly levy recovery and pool refill |
 
 ## recruiting ↔ troop-movement
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| recruiting | downstream | Customer–Supplier | Gathered levies and trained regiments become movers; "new regiments go to" rally point; levies walk to the training place |
-| troop-movement | upstream | Customer–Supplier | Gathered levies and trained regiments to march ("New regiments go to"); levies walking to training places |
+| recruiting | downstream | Customer–Supplier | Gathered levies and trained regiments become movers; a levy gathers in its biggest province and is then ordered to the "new regiments go to" rally point (RECR-103); levies walk to the training place |
+| troop-movement | upstream | Customer–Supplier | Gathered levies (one army in the drawn province with most men, RECR-103) and trained regiments march to "New regiments go to" with no order; levies walking to training places |
 
 ## recruiting ↔ warfare
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| recruiting | downstream | Customer–Supplier | Recruiting produces companies (arm, drill, kind, break point), commanders with skills/traits/style; warfare reports deaths, victories, loot, sieges, generals too big |
+| recruiting | downstream | Customer–Supplier | Recruiting produces companies (arm, drill, kind, break point by training), commanders with skills/traits/style (a commissioned official counts as an academy graduate for style, X-7); warfare reports deaths, victories, loot, sieges, generals too big. Warfare follows recruiting v3 for the levy, commanders and disbanding (X-7) |
 | warfare | upstream | Customer–Supplier | Levies (levy foot, drill 0), trained regiments (arm, drill 3/4), standing regiments signed on, commissioned officials as commanders (skills, trait, style), retinues trained by lords; WAR returns disbanded men, deserters and Fallen |
 
 ## religion ↔ research
@@ -1791,7 +1809,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| religion | downstream | Published Language | 1444 ruler faith and province mix |
+| religion | downstream | Published Language | 1444 ruler faith and province mix; holy places bound to map provinces by name (D-RELG-20) |
 | scenario-setup | downstream | Customer–Supplier | Catalogue faiths per record; province faith mix |
 
 ## religion ↔ subjects
@@ -1806,7 +1824,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | religion | upstream | Conformist | Yearly slot with traders and trade balance; New Year policy changes |
-| time-and-turns | downstream | Customer–Supplier | Yearly faith mix with traders |
+| time-and-turns | downstream | Customer–Supplier | Yearly faith mix (January) after culture drift |
 
 ## religion ↔ trade (one-sided)
 
@@ -1831,7 +1849,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| research | upstream | Customer–Supplier | Start inventions per country from `start_regions`, region and `institutional_development` |
+| research | upstream | Customer–Supplier | Map nations; research data maps each start label to nations (D-RSCH-11) |
 | scenario-setup | upstream | Customer–Supplier | Start inventions per country |
 
 ## research ↔ time-and-turns
@@ -1839,13 +1857,13 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | research | upstream | Conformist | Current date for eras and studying ahead; campaign end 31 August 1939 |
-| time-and-turns | upstream | Conformist | Era dates (I–VII) |
+| time-and-turns | upstream | Conformist | Era dates (I–VII), following the calendar and cut at the end date |
 
 ## research ↔ trade
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| research | upstream | Customer–Supplier | Trade partners for spread; trade v2 rewrites the T-branch effects |
+| research | upstream | Customer–Supplier | Trade partners for spread; the T-branch carries trade v2's effects (D-RSCH-4) |
 | trade | upstream | Conformist | T and S invention ids and their trade effects |
 | trade | downstream | Published Language | Trade partners for invention spread |
 
@@ -1860,14 +1878,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| research | downstream | Customer–Supplier | W, B, S inventions and their numbers (warfare §12); war sacks schools; stealing inventions |
+| research | downstream | Customer–Supplier | W, B, S inventions and their numbers (warfare §12); battles roll the sack (RSCH-072); occupations steal progress (RSCH-071) |
 | warfare | upstream | Conformist | W, B (and S) inventions known |
 
 ## revolutions ↔ subjects
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| revolutions | upstream | Customer–Supplier | Settler independence via a Disloyal Settled or Self-governing colony, `release`, `change_subject_kind`; requested condition "a colony of who is Disloyal" (OQ-REVO-5) |
+| revolutions | upstream | Customer–Supplier | Settler independence via a Disloyal Settled or Self-governing colony, `release`, `change_subject_kind`; requested condition "a colony of who is Disloyal" (D-REVO-5) |
 | subjects | downstream | Customer–Supplier | Settler independence trigger; `change_subject_kind` and `release` by revolution |
 
 ## revolutions ↔ time-and-turns (one-sided)
@@ -1928,7 +1946,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | scenario-setup | downstream | Customer–Supplier | Start date, seed, campaign rules (end date) |
-| time-and-turns | upstream | Customer–Supplier | Start date, seed, campaign rules (end date) |
+| time-and-turns | upstream | Customer–Supplier | Start date 11 November 1444, seed, campaign rules (end date) |
 
 ## scenario-setup ↔ trade
 
@@ -1942,7 +1960,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | scenario-setup | downstream | Customer–Supplier | Castles at start; commanders |
-| warfare | upstream | Conformist | Starting styles per country (*From* column), capture warfare realms, starting castles, start inventions |
+| warfare | upstream | Conformist | Risk tolerance for AI standing orders (D-WAR-14); starting styles per country (*From* column), capture warfare realms, starting castles, start inventions |
 
 ## scenario-setup ↔ world-map
 
@@ -1955,7 +1973,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| settings | downstream | Customer–Supplier | Battery saver's smaller worker budget for the AI turn; Keep screen awake during the AI turn |
+| settings | downstream | Customer–Supplier | Keep screen awake during the AI turn; battle playback speed; nothing touches the AI's budget (D-SET-1) |
 | time-and-turns | upstream | Conformist | End turn confirmation, autosave interval; settings never change the simulation |
 
 ## settings ↔ warfare (one-sided)
@@ -1968,7 +1986,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| subjects | upstream | Conformist | Month, season, year, era |
+| subjects | upstream | Conformist | Week turn (X-18), month, season, year, era; X-2 order: subjects before government and diplomacy (D-SUBJ-20) |
 | time-and-turns | downstream | Customer–Supplier | Monthly tribute; seasonal loyalty |
 
 ## subjects ↔ trade
@@ -1995,7 +2013,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| time-and-turns | downstream | Customer–Supplier | Traders' day step; monthly ratio update after the day loop; yearly reroute |
+| time-and-turns | downstream | Customer–Supplier | Traders' day step; monthly ratio update after the day loop; warm-up from the one `Rng` before turn 0 |
 | trade | upstream | Conformist | Day loop, month end, year |
 
 ## time-and-turns ↔ troop-movement
@@ -2003,14 +2021,14 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | time-and-turns | downstream | Customer–Supplier | The day loop and day order; `DayPassed`; progress carry-over |
-| troop-movement | upstream | Conformist | Month = 30 days, turn order, date and seasons |
+| troop-movement | upstream | Conformist | Turn = 7 days (X-18); month = its real length (`daysInMonth`, X-3), turn order (X-2), weekly steps at the end of every turn (X-18), date and seasons (X-4), the day slowing to 4-hour steps for the player's battles (X-1) |
 
 ## time-and-turns ↔ warfare
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| time-and-turns | downstream | Customer–Supplier | Battle one at a time; weekly food and hunger; monthly siege and sickness |
-| warfare | upstream | Conformist | Month turn, day loop, battle resolution order |
+| time-and-turns | downstream | Customer–Supplier | Battles fought round by round over time; 4-hour steps while a player battle runs; sieges once a month before province; weekly food and hunger (end of each turn); monthly siege month and sickness |
+| warfare | upstream | Conformist | Week turn (X-18), monthly steps, day loop (battles on the day of contact, X-1/X-2), weekly army food at the end of every turn (X-18), battle resolution order |
 
 ## trade ↔ troop-movement
 
@@ -2036,7 +2054,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| troop-movement | both (upstream for battles, sieges, food; downstream for contact) | Partnership | Contact → battles; withdraw/break results; standing orders; sieges and garrisons; food reserve, forage limit, plunder; raids; scouting (what is seen); commander Cunning |
+| troop-movement | both (upstream for battles, sieges, food; downstream for contact) | Partnership | Contact → battles fought in rounds, six a day or one per 4-hour step while a player battle runs (X-1), joinable by armies marching in; withdraw/break results; standing orders (AI's from personality, WAR-194); sieges once a month (X-2); no shore penalty across a frozen river (X-17); food reserve and hunger at the weekly steps (X-3), forage limit, plunder; raids (a week per province); scouting (what is seen; rumours are never intercepted); commander Cunning |
 | warfare | downstream (MOVE consumes WAR rules) / upstream (MOVE supplies contacts) | Partnership | WAR → MOVE: march-order effects, scouting range, standing orders, battle start/withdraw rule, forage limit, food reserve, castle garrisoned state, broken army. MOVE → WAR: daily positions, contacts, arrival in castle province, days walked, march order. |
 
 ## troop-movement ↔ world-map
@@ -2044,7 +2062,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | troop-movement | upstream | Conformist | Province graph `adjStart`/`adjList`, ground, rivers and their scale rank, sea zones, hemisphere, climate |
-| world-map | downstream | Open Host Service | The graph; ground; river and great-river flags; passes, fords, strait crossings |
+| world-map | downstream | Open Host Service | The graph; ground; tile type per province; river and great-river (= navigable) flags; passes, fords, strait crossings resolved to provinces |
 
 ## warfare ↔ world-map
 

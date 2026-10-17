@@ -2,6 +2,7 @@ import type { Rng } from "../../rng.ts";
 import { holds, holdsIfBound, leaves, resolve, type Ctx, type LeafEval } from "./conditions.ts";
 import { applyEffects, effectType, type Applied, type EffectCtx, type EffectEval } from "./effects.ts";
 import { expired } from "./modifiers.ts";
+import { deriveAll } from "./mapping.ts";
 import {
   balance,
   eventsConfig,
@@ -27,8 +28,6 @@ export type AlternateHistoryMode = "historical" | "plausible" | "divergent";
 
 export interface GameRules {
   mode: AlternateHistoryMode;
-  /** The "historical lean" rule (EVT-036). */
-  historicalLean: boolean;
   /** Last day of the campaign, ISO (EVT-001). */
   endDate: string;
   /** A real campaign never fires tutorial-only events (EVT-067). */
@@ -36,7 +35,14 @@ export interface GameRules {
 }
 
 export function defaultRules(): GameRules {
-  return { mode: "plausible", historicalLean: false, endDate: eventsConfig.campaign.end_date, tutorial: false };
+  return { mode: rulesForChoice(eventsConfig.campaign.events_choice.default), endDate: eventsConfig.campaign.end_date, tutorial: false };
+}
+
+/** The new-game "Events" choice (Historical, Plausible, Free) as its alternate history preset (EVT-036, D-EVT-9). */
+export function rulesForChoice(choice: string): AlternateHistoryMode {
+  const mode = (eventsConfig.campaign.events_choice.values as Record<string, string>)[choice];
+  if (!mode) throw new Error(`Unknown events choice: ${choice}`);
+  return mode as AlternateHistoryMode;
 }
 
 export interface Boost {
@@ -82,6 +88,8 @@ export interface EventState {
   boosts: Boost[];
   /** Pool events fired per `country:year` (EVT-033). */
   poolFired: Record<string, number>;
+  /** Decisions an AI left unanswered past decision_expiry_years: they re-enter the pool (EVT-032). */
+  lapsed: string[];
   pending: Pending[];
   delayed: DelayedEffect[];
   /** Ages and periods that have ended (they do not start again) or ever started. */
@@ -108,6 +116,7 @@ export function newState(world: World, data: { events: Record<string, EventDef>;
     bound: {},
     boosts: [],
     poolFired: {},
+    lapsed: [],
     pending: [],
     delayed: [],
     agesEnded: [],
@@ -140,6 +149,14 @@ export function historyStart(date: unknown): string {
 /** Events whose history starts after the end date are out of scope (EVT-002). */
 export function outOfScope(date: unknown, endDate = eventsConfig.campaign.end_date): boolean {
   return historyStart(date) > endDate;
+}
+
+/**
+ * The events a campaign loads: every event whose history starts after the
+ * end date is dropped (EVT-002, D-EVT-1). The data keeps them as reference.
+ */
+export function campaignEvents(events: Record<string, EventDef>, endDate = eventsConfig.campaign.end_date): Record<string, EventDef> {
+  return Object.fromEntries(Object.entries(events).filter(([, e]) => !e.history || !outOfScope(e.history.date, endDate)));
 }
 
 export function isoOf(w: World, day = 1): string {
@@ -369,7 +386,23 @@ export function addFollowUps(s: EventState, ev: EventDef, at = now(s.world)): vo
 }
 
 /** The parts of a pool event's monthly chance (EVT-030, EVT-022, EVT-035). */
-export function poolChance(s: EventState, ev: EventDef, roles: Record<string, string[]>): { base: number; modifiers: number; optional: number; boost: number; chance: number } {
+/**
+ * How strongly the date binds (EVT-019): an approximate event's chance is
+ * weighted toward its history year, fading over approximate_spread_years;
+ * a mandatory event is certain in the last year of its window; a reference
+ * event's date is only a guide.
+ */
+export function dateFactor(ev: EventDef, year: number): number {
+  const a = ev.availability;
+  if (a.mode === "mandatory") return year >= a.latest ? Infinity : 1;
+  if (a.mode !== "approximate" || !ev.history) return 1;
+  const b = balance.date_binding;
+  const hist = Number(historyStart(ev.history.date).slice(0, 4));
+  const near = Math.max(0, 1 - Math.abs(year - hist) / b.approximate_spread_years);
+  return 1 + (b.approximate_peak_mult - 1) * near;
+}
+
+export function poolChance(s: EventState, ev: EventDef, roles: Record<string, string[]>): { base: number; modifiers: number; optional: number; boost: number; date: number; chance: number } {
   const mean = (ev.selection.mean_years ?? 1) * preset(s.rules.mode).mean_years_mult;
   const base = baseChance(mean);
   let modifiers = 1;
@@ -377,7 +410,8 @@ export function poolChance(s: EventState, ev: EventDef, roles: Record<string, st
   let optional = 1;
   for (const o of ev.optional ?? []) if (s.world.history.some((h) => h.event === o.event)) optional *= o.weight;
   const boost = followUpBoost(s, ev.id);
-  return { base, modifiers, optional, boost, chance: Math.min(1, base * modifiers * optional * boost) };
+  const date = dateFactor(ev, s.world.year);
+  return { base, modifiers, optional, boost, date, chance: Math.min(1, base * modifiers * optional * boost * date) };
 }
 
 /** The country a firing counts against for pacing: the first bound role holder. */
@@ -425,9 +459,10 @@ export function namedFactorHolds(name: string, w: World, sit: Situation): boolea
     case "low_treasury":
       return (c.stats.treasury ?? 0) < (c.stats.expenses ?? 0) * r.low_treasury_years_of_expenses;
     case "high_unrest": {
+      // no anger meter (D-EVT-5): more than half the provinces are Plotting (4+ grievances)
       const own = Object.values(w.places).filter((p) => p.owner === sit.chooser);
-      const avg = own.length ? own.reduce((n, p) => n + Number(p.stats.unrest ?? 0), 0) / own.length : (c.stats.average_unrest ?? 0);
-      return avg > r.high_unrest_above;
+      const plotting = own.filter((p) => Number(p.stats.grievances ?? 0) >= r.high_unrest_grievances).length;
+      return own.length > 0 && plotting / own.length > r.high_unrest_share;
     }
     case "same_religion":
       return !!o && !!c.religion && o.religion === c.religion;
@@ -449,7 +484,7 @@ export function namedFactorHolds(name: string, w: World, sit: Situation): boolea
   }
 }
 
-/** An option's AI weight: base × factors × the preset's historical multiplier × historical lean (EVT-035, EVT-036, EVT-042). */
+/** An option's AI weight: base × factors × the preset's historical multiplier (EVT-035, EVT-042). */
 export function aiWeight(s: EventState, o: OptionDef, roles: Record<string, string[]>, sit?: Situation): number {
   let w = o.ai.base;
   for (const f of o.ai.factors ?? []) {
@@ -457,10 +492,7 @@ export function aiWeight(s: EventState, o: OptionDef, roles: Record<string, stri
       if (sit && namedFactorHolds(f.factor, s.world, sit)) w *= f.mult ?? 1;
     } else if (holdsIfBound(f.if, s.world, ctxOf(s, roles)) === true) w *= f.factor;
   }
-  if (o.historical) {
-    w *= preset(s.rules.mode).historical_option_mult;
-    if (s.rules.historicalLean) w *= balance.selection.historical_weight_bonus;
-  }
+  if (o.historical) w *= preset(s.rules.mode).historical_option_mult;
   return w;
 }
 
@@ -550,6 +582,54 @@ export function answer(s: EventState, ev: EventDef, roles: Record<string, string
   return out;
 }
 
+/**
+ * What stops a player's End turn (EVT-044): the first event waiting for that
+ * country's answer, oldest first. Nothing answers it for them.
+ */
+export function unansweredFor(s: EventState, controller: string): Pending | undefined {
+  return s.pending.filter((p) => p.controller === controller).sort((a, b) => a.at - b.at)[0];
+}
+
+/**
+ * Decisions an AI controller left unanswered for decision_expiry_years lapse
+ * and re-enter the pool (EVT-032). A player's decision never lapses (D-EVT-8).
+ */
+export function lapseDecisions(s: EventState): string[] {
+  const w = s.world;
+  const limit = balance.selection.decision_expiry_years * 12;
+  const gone = s.pending.filter((p) => p.kind === "offered" && !(p.controller && w.countries[p.controller]?.human) && now(w) - p.at >= limit);
+  for (const p of gone) {
+    s.pending = s.pending.filter((x) => x !== p);
+    if (!s.lapsed.includes(p.event)) s.lapsed.push(p.event);
+    s.log.push({ type: "DecisionLapsed", event: p.event, controller: p.controller });
+  }
+  return gone.map((p) => p.event);
+}
+
+/** How an eligible event is selected now: a lapsed decision is rolled as a pool event (EVT-032). */
+export function selectionMode(s: EventState, ev: EventDef): EventDef["selection"]["mode"] {
+  return ev.selection.mode === "decision" && s.lapsed.includes(ev.id) ? "pool" : ev.selection.mode;
+}
+
+/**
+ * When a rising tagged with an event ends (rebellions), the option chosen
+ * applies its rising_won or rising_crushed effects (EVT-068, D-EVT-11).
+ */
+export function risingEnded(s: EventState, event: string, won: boolean): Applied[] {
+  const ev = s.events[event];
+  const w = s.world;
+  const last = [...w.history].reverse().find((h) => h.event === event && h.option);
+  if (!ev || !last) return [];
+  const o = ev.options.find((x) => x.id === last.option);
+  const out: Applied[] = [];
+  const tier = won ? "rising_won" : "rising_crushed";
+  applyEffects(ev.effects[tier], w, ctxOf(s, last.roles), out);
+  if (o) applyEffects(o.effects[tier], w, ctxOf(s, last.roles), out);
+  s.log.push({ type: "RisingTierApplied", event, tier });
+  afterEffects(s, out);
+  return out;
+}
+
 function delayYears(d: Effect): number {
   const a = d.after_years ?? d.years;
   return Array.isArray(a) ? Number(a[0]) : Number(a ?? 0);
@@ -594,6 +674,7 @@ export function tick(s: EventState): Applied[] {
   }
   w.modifiers = w.modifiers.filter((m) => !expired(m, at));
   w.flags = w.flags.filter((f) => f.until === undefined || f.until > at);
+  deriveAll(w);
   afterEffects(s, out);
   return out;
 }
@@ -608,8 +689,8 @@ export function nextMonth(w: World): void {
 }
 
 /**
- * The events' part of a monthly turn (spec 9): yearly age and period
- * checks in the first month, eligibility, immediate firing, pool rolls under
+ * The events' monthly work (spec 9), run in the turn in which a new month
+ * begins (X-18): yearly age and period checks in January, eligibility, immediate firing, pool rolls under
  * the pacing cap, decision offers, then the ticks. Stops at the end date.
  */
 export function processMonth(s: EventState, rng: Rng): DomainEvent[] {
@@ -618,6 +699,12 @@ export function processMonth(s: EventState, rng: Rng): DomainEvent[] {
   if (s.ended) return [];
   if (campaignOver(w, s.rules.endDate, 31)) {
     s.ended = true;
+    // every running age is cut at the end date (X-14)
+    for (const a of w.ages) {
+      s.agesEnded.push(a);
+      s.log.push({ type: "AgeEnded", age: a, year: w.year, cut: true });
+    }
+    w.ages = [];
     s.log.push({ type: "CampaignEnded", year: w.year, month: w.month });
     return s.log.slice(from);
   }
@@ -625,10 +712,12 @@ export function processMonth(s: EventState, rng: Rng): DomainEvent[] {
     yearlyAgeCheck(s, w.year);
     periodCheck(s, w.year);
   }
+  lapseDecisions(s);
   for (const ev of Object.values(s.events)) {
+    const mode = selectionMode(s, ev);
     for (const roles of eligible(s, ev)) {
-      if (ev.selection.mode === "immediate") fire(s, ev, roles, rng);
-      else if (ev.selection.mode === "decision") {
+      if (mode === "immediate") fire(s, ev, roles, rng);
+      else if (mode === "decision") {
         if (!s.pending.some((p) => p.event === ev.id && JSON.stringify(p.roles) === JSON.stringify(roles))) offer(s, ev, roles);
       } else {
         const who = pacingCountry(ev, roles);

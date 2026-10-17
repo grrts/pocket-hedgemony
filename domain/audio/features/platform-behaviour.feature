@@ -41,11 +41,24 @@ Feature: Audio on each platform
     Then "load_resume" plays
     And the two notifications play no sound
 
-  # iOS session behaviour is not verified on a device (OQ-AUD-9).
-  @AUD-111 @open-question
+  @AUD-111
   Scenario: The iPhone silent switch
     Given the iPhone's silent switch is on
-    Then music and effects follow the same audio session setting
+    Then the game uses the native "ambient" audio session, which respects the silent switch
+    And it mixes with the player's other audio apps
+    And music and effects follow the same audio session setting
+
+  @AUD-109
+  Scenario Outline: Playing in the background on desktop
+    Given the game runs on "<platform>" with "play in background" <setting>
+    When the window is hidden
+    Then the audio <result>
+
+    Examples:
+      | platform | setting | result |
+      | Steam | off | is suspended |
+      | Steam | on | keeps playing |
+      | web | on | is suspended |
 
   @AUD-112
   Scenario Outline: Haptics on phones
@@ -57,9 +70,9 @@ Feature: Audio on each platform
       | sound | strength |
       | ui_error | light |
       | turn_ready | light |
-      | battle_start | medium |
-      | siege_breach | medium |
-      | realm_ruler_dies | heavy |
+      | battle_start | light |
+      | siege_breach | light |
+      | realm_ruler_dies | light |
 
   @AUD-112
   Scenario: Haptics work with sound off and never on desktop
@@ -80,11 +93,12 @@ Feature: Audio on each platform
     When a battle's sounds play on the map
     Then they go through the scheduler in step with the animation
 
-  # Variety and master defaults differ from settings (OQ-AUD-3, OQ-AUD-9).
-  @AUD-114 @AUD-115 @open-question
+  @AUD-114 @AUD-115 @placeholder
   Scenario: Audio settings and defaults
     Given a fresh install on a phone
-    Then music volume is 0.7, effects volume 0.8 and ambience volume 0.5
+    Then master volume is 0.8
+    And music volume is 0.7, effects volume 0.8 and ambience volume 0.5
+    And the variety is "own palette only"
     And interface sounds are on, haptics are on, ambience is off
     And mono, sound captions and reduced intensity are off
     When the player turns music off

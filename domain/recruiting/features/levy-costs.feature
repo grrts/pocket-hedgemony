@@ -45,13 +45,33 @@ Feature: What a levy costs in food, harvest and births
       | harvest | 6    |
       | winter  | 0    |
 
-  # OQ-RECR-14: no amounts for rice lands and pastoral lands
-  @RECR-035 @RECR-036 @open-question
-  Scenario: Rice and pastoral lands lose in their own way
-    Given a province with rice lands and a pastoral province
-    When men are levied from both in their bad seasons
-    Then the rice province can lose in two harvests a year
-    And the pastoral province loses herd growth when herders are away in the spring move
+  # config: seasonMonthsByClimate.rice, pastoral.springMove (D-RECR-14)
+  @RECR-035 @placeholder
+  Scenario Outline: Rice lands have two harvests and two bad seasons
+    Given a province with rice lands
+    When a levy takes 2 percent of its farmers in month <month>
+    Then its harvest falls by <loss> percent
+
+    Examples:
+      | month | loss |
+      | 3     | 6    |
+      | 5     | 4    |
+      | 7     | 0    |
+      | 9     | 6    |
+      | 11    | 4    |
+
+  @RECR-036 @placeholder
+  Scenario Outline: Pastoral lands lose herd growth in the spring move
+    Given a pastoral province in the <hemisphere>
+    When a levy takes 2 percent of its herders in month <month>
+    Then its herd growth falls by <loss> percent
+    And its harvest does not fall
+
+    Examples:
+      | hemisphere | month | loss |
+      | north      | 4     | 4    |
+      | north      | 10    | 0    |
+      | south      | 10    | 4    |
 
   @RECR-037 @RECR-038
   Scenario: The climate sets the sowing and harvest months

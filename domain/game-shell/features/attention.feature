@@ -62,13 +62,26 @@ Feature: Attention screen
   @SHELL-087
   Scenario Outline: Muting lines
     Given the screen "attention" shows 2 lines of the kind "idle army"
-    When the player mutes one line <how> for <scope>
+    When the player presses "<button>" on one line
     Then <result>
+    And the mutes are kept in the save
 
     Examples:
-      | how                    | scope                 | result                                                                     |
-      | by a long press        | this item             | that line is hidden and the other line of the kind stays                   |
-      | by the button on the line | every item of its kind | both lines are hidden and "idle army" is listed at the bottom as muted |
+      | button                     | result                                                                 |
+      | Mute this                  | that line is hidden and the other line of the kind stays               |
+      | Don't list this kind again | both lines are hidden and "idle army" is listed at the bottom as muted |
+
+  @SHELL-087 @SHELL-120
+  Scenario: A long press on a line shows the same buttons
+    Given the screen "attention" shows 2 lines of the kind "idle army"
+    When the player long-presses one line
+    Then its explanation is shown with the buttons "Mute this" and "Don't list this kind again"
+    And the line itself has the same two buttons
+
+  @SHELL-083
+  Scenario: The screen is titled Needs attention
+    When the screen "attention" opens
+    Then its title reads "Needs attention"
 
   @SHELL-087
   Scenario: Unmuting a kind
@@ -76,10 +89,9 @@ Feature: Attention screen
     When the player unmutes "idle army" from the bottom of the screen "attention"
     Then lines of the kind "idle army" are shown again
 
-  @SHELL-088 @open-question
+  @SHELL-088
   Scenario: The End turn question names the warnings but never blocks
-    # OQ-SHELL-6: settings also counts events in this question
-    Given the setting "Confirm End turn" is on
+    Given the setting "Confirm End turn" is "Always"
     And no event is unanswered
     And "Hungary" has 3 open warnings
     When the player taps End turn

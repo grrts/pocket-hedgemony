@@ -9,6 +9,7 @@ import {
   type Ask, type Call, type Count, type Diplomacy, type Envoy, type Funding, type Letter, type Route, type RouteLeg, type War, type WarAim,
 } from "./model.ts";
 import { countAsk, giftCounts, multiples } from "./reasons.ts";
+import { KINDS, kindFights, mapRelationKind, mayActAbroad, type Kind } from "../subjects/index.ts";
 
 const C = config;
 
@@ -34,14 +35,47 @@ export function freeSeats(d: Diplomacy, c: string): number {
   return envoySeats(d, c) - envoysAbroad(d, c).length;
 }
 
+/**
+ * D-DIPL-13: when seats fall below the envoys abroad, missions finish but
+ * residents beyond the seats are recalled, newest first.
+ */
+export function enforceSeats(d: Diplomacy, c: string): Envoy[] {
+  const out: Envoy[] = [];
+  let over = envoysAbroad(d, c).length - envoySeats(d, c);
+  const residents = envoysAbroad(d, c).filter((e) => e.status === "resident").sort((a, b) => (b.residentSince ?? "").localeCompare(a.residentSince ?? ""));
+  for (const e of residents) {
+    if (over <= 0) break;
+    recallResident(d, c, e.target);
+    out.push(e);
+    over--;
+  }
+  return out;
+}
+
+/** The realm's province count changes (realm supplies it); seats follow at once. */
+export function setProvinceCount(d: Diplomacy, c: string, n: number): void {
+  country(d, c).provinces = n;
+  enforceSeats(d, c);
+}
+
 /** The route an envoy takes: by land, by sea when land crosses an enemy or a denier, or none (DIPL-057). */
 export function envoyRoute(d: Diplomacy, from: string, to: string): { by: "land" | "sea" | "none" | "resident" | "telegraph"; legs: RouteLeg[] } {
   const r: Route | undefined = d.routes[pairKey(from, to)] ?? d.defaultRoute;
   if (!r) return { by: "none", legs: [] };
-  const blocked = (r.land ?? []).some((l) => l.kind === "land" && (l.crosses ?? []).some((x) => rel.has(d.graph, "at_war", x, from) || d.passageDenied.includes(key(x, from))));
+  const blocked = (r.land ?? []).some((l) => l.kind === "land" && (l.crosses ?? []).some((x) => rel.has(d.graph, "at_war", x, from) || passageDenied(d, x, from)));
   if (r.land && !blocked) return { by: "land", legs: r.land };
   if (r.sea) return { by: "sea", legs: r.sea };
   return { by: "none", legs: [] };
+}
+
+/** A country that refused or revoked passage blocks the asker's envoys for 2 years (D-DIPL-21). */
+export function passageDenied(d: Diplomacy, by: string, to: string): boolean {
+  return d.passageDenied.some((x) => x.by === by && x.to === to && monthOf(d.date) < x.until);
+}
+
+function denyPassage(d: Diplomacy, by: string, to: string): void {
+  d.passageDenied = d.passageDenied.filter((x) => !(x.by === by && x.to === to));
+  d.passageDenied.push({ by, to, until: addMonths(monthOf(d.date), C.envoys.passage_denied_blocks_months) });
 }
 
 /** Days on the road: 2 per crossing unit by land, naval times by sea (DIPL-055). */
@@ -144,20 +178,23 @@ function arrive(d: Diplomacy, e: Envoy): void {
   decideMission(d, e);
 }
 
+/** Writes an answer letter, delivered a month after (DIPL-082). */
+export const letterOf = (d: Diplomacy, l: Omit<Letter, "given" | "deliverOn">): Letter => letter(d, l);
+
 function letter(d: Diplomacy, l: Omit<Letter, "given" | "deliverOn">): Letter {
-  const full: Letter = { ...l, given: monthOf(d.date), deliverOn: addMonths(monthOf(d.date), C.answers.delay_turns) };
+  const full: Letter = { ...l, given: monthOf(d.date), deliverOn: addMonths(monthOf(d.date), C.answers.delay_months) };
   d.letters.push(full);
   return full;
 }
 
-/** Letters a country has received by now; none in the turn the answer is given (DIPL-082). */
+/** Letters a country has received by now; none before a month has passed since the answer was given (DIPL-082). */
 export function lettersReceived(d: Diplomacy, c: string): Letter[] {
   return d.letters.filter((l) => l.to === c && l.deliverOn <= monthOf(d.date));
 }
 
 const NO_COUNT = ["send_gift", "courtesy_visit", "make_resident", "court_lord", "fund_rebels", "peace_offer"];
 
-/** Decides a mission on arrival; the answer is a letter the turn after (DIPL-059, DIPL-081, DIPL-082). */
+/** Decides a mission on arrival; the answer is a letter a month after (DIPL-059, DIPL-081, DIPL-082). */
 export function decideMission(d: Diplomacy, e: Envoy, rng?: Rng): Count | undefined {
   const ask = e.ask ?? { action: e.action, asker: e.country, asked: e.target };
   if (NO_COUNT.includes(e.action)) {
@@ -187,7 +224,7 @@ export function applyAnswer(d: Diplomacy, ask: Ask, yes: boolean, rng?: Rng, e?:
     case "arrange_marriage": if (yes) marriageAgreed(d, asker, asked); break;
     case "trade_pact": if (yes) tradePactAgreed(d, asker, asked); break;
     case "swear_peace": if (yes) swornPeace(d, asker, asked); break;
-    case "ask_passage": if (yes) grantPassage(d, asked, asker); break;
+    case "ask_passage": if (yes) grantPassage(d, asked, asker); else denyPassage(d, asked, asker); break;
     case "offer_overlordship": if (yes) emit(d, "SubjectByAgreementAgreed", { overlord: asker, subject: asked }); break;
     case "ask_protection": if (yes) emit(d, "SubjectByAgreementAgreed", { overlord: asked, subject: asker }); break;
     case "demand":
@@ -250,9 +287,9 @@ export function courtView(d: Diplomacy, viewer: string, host: string): { soldier
   };
 }
 
-/** Residents warn one turn ahead of a war on the sender or its allies (DIPL-064). */
+/** Residents warn a month ahead of a war on the sender or its allies (DIPL-064). */
 export function residentWarnings(d: Diplomacy, viewer: string): { host: string; target: string }[] {
-  const next = addMonths(monthOf(d.date), C.envoys.resident.war_warning_turns);
+  const next = addMonths(monthOf(d.date), C.envoys.resident.war_warning_months);
   return d.plannedWars
     .filter((w) => w.month === next && d.envoys.some((e) => e.status === "resident" && e.country === viewer && e.target === w.by))
     .filter((w) => w.on === viewer || rel.alliesOf(d.graph, viewer).includes(w.on))
@@ -357,7 +394,10 @@ export function warAimsOf(d: Diplomacy, holder: string, target: string): WarAim[
   }
   if (d.pretenders.some((x) => x.court === holder && x.throne === target)) add("seat_pretender", "a pretender at our court");
   if (borders(d, holder, target) && h.soldiers >= C.war_aims.tribute_by_strength_multiple * country(d, target).soldiers && country(d, target).soldiers > 0) add("tribute", "three times their soldiers");
-  for (const s of rel.subjectsOf(d.graph, target)) if (rel.stance(d.graph, s, target) === "hostile") add("break_subject", `${s} is Hostile toward ${target}`);
+  for (const s of rel.subjectsOf(d.graph, target)) {
+    if (rel.stance(d.graph, s, target) === "hostile") add("break_subject", `${s} is Hostile toward ${target}`);
+    else if (d.helpAsked.some((x) => x.subject === s && x.helper === holder)) add("break_subject", `${s} asked us for help`);
+  }
   add("raid", "always");
   add("no_aim", "always");
   return out;
@@ -368,6 +408,14 @@ export function holdsAim(d: Diplomacy, holder: string, target: string, aim: stri
 }
 
 // ---------------------------------------------------------------- war and calls
+
+/** The subjects kind of a subject: relation kinds are mapped onto the six kinds (X-8, D-DIPL-10). */
+export function subjectKind(d: Diplomacy, subject: string): Kind {
+  const raw = d.graph.relations.find((r) => r.type === "subject" && r.source === subject)?.subject_kind ?? "vassal";
+  if ((KINDS as string[]).includes(raw)) return raw as Kind;
+  const m = mapRelationKind(raw, false);
+  return "lord" in m ? "vassal" : m.kind;
+}
 
 export interface DeclareOptions {
   aim?: string;
@@ -381,13 +429,14 @@ export function declareWar(d: Diplomacy, a: string, b: string, o: DeclareOptions
   if (country(d, a).regency && !C.war_aims.regency_allows.includes(aim)) throw new RuleError("a regency fights only defensive wars and raids");
   const ov = rel.overlord(d.graph, a);
   if (ov && ov !== b) {
-    const kind = d.graph.relations.find((r) => r.type === "subject" && r.source === a)?.subject_kind ?? "vassal";
-    if (!C.relations.subject_kinds[kind]?.can_conduct_own_diplomacy) throw new RuleError(`a ${kind} has no diplomacy of its own`);
+    const kind = subjectKind(d, a);
+    const againstOverlord = rel.alliesOf(d.graph, ov).includes(b);
+    if (!mayActAbroad(kind, "war", againstOverlord)) throw new RuleError(`a ${kind} has no diplomacy of its own`);
   }
   if (rel.hasFact(d.graph, "protection_pledge", a, b, true)) throw new RuleError(`${a} pledged to protect ${b}; break the pledge first`);
   rel.guarded(d.graph, o.scripted ?? false, () => rel.declareWar(d.graph, a, b));
   d.seq++;
-  const provoked = d.refusedDemands.find((x) => x.asker === b && x.asked === a);
+  const provoked = d.refusedDemands.find((x) => x.asker === a && x.asked === b);
   const trespass = d.trespasses.find((t) => t.intruder === b && t.owner === a && t.month === monthOf(d.date));
   const war: War = { id: `war${d.seq}`, attackers: [a], defenders: [b], aim, declarer: a, target: b, start: monthOf(d.date), startedBy: trespass ? b : a };
   if (provoked) war.provokedBy = b;
@@ -403,7 +452,7 @@ export function declareWar(d: Diplomacy, a: string, b: string, o: DeclareOptions
 function issueCall(d: Diplomacy, war: War, caller: string, called: string, against: string, kind: Call["kind"], via: Call["via"]): Call | undefined {
   if (called === against || d.calls.some((c) => c.war === war.id && c.called === called)) return undefined;
   d.seq++;
-  const call: Call = { id: `call${d.seq}`, caller, called, against, kind, via, war: war.id, issued: monthOf(d.date), answerOn: addMonths(monthOf(d.date), C.answers.delay_turns) };
+  const call: Call = { id: `call${d.seq}`, caller, called, against, kind, via, war: war.id, issued: monthOf(d.date), answerOn: addMonths(monthOf(d.date), C.answers.delay_months) };
   d.calls.push(call);
   emit(d, "CallToArmsIssued", { caller, called, kind, war: war.id });
   if (kind === "defensive" && via === "alliance" && eraAtLeast(d, "VI") && d.mobilisationPacts.includes(pairKey(caller, called))) {
@@ -423,10 +472,15 @@ function issueCalls(d: Diplomacy, war: War): void {
     for (const f of d.graph.facts) if (f.fact === "protection_pledge" && f.target === b) issueCall(d, war, b, f.source, a, "defensive", "pledge");
   }
   for (const l of d.leagues) if (l.target === a) for (const m of l.members) if (m !== b) issueCall(d, war, m, m, a, "defensive", "league");
-  for (const [side, enemy, defending] of [[a, b, false], [b, a, true]] as const) {
+  // D-DIPL-10: subjects follow their kind. A Union joins at once; a Vassal or Protectorate is called and
+  // answers by its loyalty (subjects context); a March joins when the enemy borders it; a Tributary never
+  // joins and a Colony only defends itself.
+  for (const [side, enemy] of [[a, b], [b, a]] as const) {
     for (const r of d.graph.relations.filter((x) => x.type === "subject" && x.target === side)) {
-      const joins = C.relations.subject_kinds[r.subject_kind ?? "vassal"]?.joins_overlord_wars;
-      if (joins === "always" || (joins === "defensive" && defending)) joinWar(d, war, r.source, side, enemy);
+      const fights = kindFights(subjectKind(d, r.source));
+      if (fights === "always_if_loyal_or_wavering") joinWar(d, war, r.source, side, enemy);
+      else if (fights === "own_frontier_only" && borders(d, r.source, enemy)) joinWar(d, war, r.source, side, enemy);
+      else if (fights === "when_called_by_loyalty") issueCall(d, war, side, r.source, enemy, side === a ? attackerKind : "defensive", "subject");
     }
   }
 }
@@ -449,12 +503,13 @@ export function answerCall(d: Diplomacy, call: Call, yes: boolean): void {
     if (call.via !== "league") addRuleEntry(d, call.caller, call.called, "ties", "answered_our_call");
     return;
   }
+  if (call.via === "subject") return; // the subjects context answers a subject's refusal (SUBJ-028)
   if (call.via === "league") {
     for (const l of d.leagues) if (l.target === call.against) l.members = l.members.filter((m) => m !== call.called);
     emit(d, "LeagueMemberLeft", { member: call.called, target: call.against });
     return;
   }
-  if (call.kind !== "defensive") return; // an offensive refusal breaks nothing (OQ-DIPL-2 follows diplomacy 6.1)
+  if (call.kind !== "defensive") return; // an offensive refusal breaks nothing (D-DIPL-2)
   if (call.via === "alliance") {
     rel.breakAlliance(d.graph, call.caller, call.called);
     emit(d, "AllianceBroken", { pair: [call.caller, call.called] });
@@ -563,7 +618,7 @@ export function swornPeace(d: Diplomacy, a: string, b: string): void {
   emit(d, "TruceCreated", { pair: [a, b], expiry: t.expires_on });
 }
 
-/** Truce length after a peace, by its terms (DIPL-154; OQ-DIPL-3). */
+/** Truce length after a peace, by its terms (DIPL-154; X-11, D-DIPL-3). */
 export function truceMonthsAfterPeace(terms: { white?: boolean; landOrSubject?: boolean }): number {
   if (terms.white) return C.truce.white_peace_months;
   return C.truce.base_months + (terms.landOrSubject ? C.truce.extra_months_if_land_or_subject : 0);
@@ -574,6 +629,33 @@ export function markMobilisationPact(d: Diplomacy, a: string, b: string): void {
   if (!rel.has(d.graph, "alliance", a, b)) throw new RuleError("mobilisation pacts need an alliance");
   d.mobilisationPacts.push(pairKey(a, b));
   emit(d, "MobilisationPactMarked", { pair: [a, b] });
+}
+
+/** D-DIPL-22: either ally may unmark a pact, at once. */
+export function unmarkMobilisationPact(d: Diplomacy, a: string, b: string): void {
+  d.mobilisationPacts = d.mobilisationPacts.filter((k) => k !== pairKey(a, b));
+  emit(d, "MobilisationPactUnmarked", { pair: [a, b] });
+}
+
+/** D-DIPL-22: withdrawing a pledge is breaking it (an Oath broken). */
+export const withdrawPledge = (d: Diplomacy, p: string, q: string) => breakPledge(d, p, q);
+
+/** D-DIPL-22: a Rival may be dropped once it has stood 10 years. */
+export function dropRival(d: Diplomacy, a: string, b: string): void {
+  if (!rel.rivalMayChange(d.graph, a, b)) throw new RuleError("a Rival stands at least 10 years");
+  rel.removeRelation(d.graph, "rival", a, b);
+  emit(d, "RivalDropped", { by: a, target: b });
+}
+
+/** D-DIPL-22: an envoy on a mission cannot be recalled; a resident can. */
+export function recallEnvoy(d: Diplomacy, c: string, target: string): void {
+  if (d.envoys.some((e) => e.country === c && e.target === target && e.status === "resident")) return recallResident(d, c, target);
+  throw new RuleError("an envoy on a mission cannot be recalled");
+}
+
+/** A subject asks a country for help against its overlord (DIPL-143). */
+export function askForHelp(d: Diplomacy, subject: string, helper: string): void {
+  d.helpAsked.push({ subject, helper });
 }
 
 // ---------------------------------------------------------------- trade
@@ -600,6 +682,12 @@ export function declareEmbargo(d: Diplomacy, a: string, b: string): void {
   if (rel.has(d.graph, "at_war", a, b)) throw new RuleError("embargo: at war");
   d.embargoes.push({ by: a, on: b });
   emit(d, "EmbargoDeclared", { pair: [a, b] });
+}
+
+/** D-DIPL-22: lifting an embargo is free and instant. */
+export function liftEmbargo(d: Diplomacy, a: string, b: string): void {
+  d.embargoes = d.embargoes.filter((e) => !(e.by === a && e.on === b));
+  emit(d, "EmbargoLifted", { pair: [a, b] });
 }
 
 /** Trade between two countries: stopped by war (DIPL-044) or an embargo either way (DIPL-121). */
@@ -633,6 +721,7 @@ export function grantPassage(d: Diplomacy, granter: string, grantee: string): vo
 /** Revoking passage ends it that day without an Oath broken (DIPL-118). */
 export function revokePassage(d: Diplomacy, granter: string, grantee: string): void {
   d.passages = d.passages.filter((p) => !(p.granter === granter && p.grantee === grantee));
+  denyPassage(d, granter, grantee);
   emit(d, "PassageRevoked", { pair: [granter, grantee] });
 }
 
@@ -815,48 +904,51 @@ export function courtingDefections(d: Diplomacy): void {
 
 // ---------------------------------------------------------------- funding rebels
 
-/** DIPL-134: a free seat, not an ally's or subject's province, 10, 25 or 50 gold a month; secret. */
-export function fundRebels(d: Diplomacy, funder: string, prov: string, gold: number): Funding {
-  const target = d.provinces[prov]?.owner ?? "";
+const FR = () => C.actions.fund_rebels;
+
+/** Gold a month: 1 % of the target's yearly income, at least 1 (X-10, D-DIPL-23). */
+export function fundingGold(d: Diplomacy, target: string): number {
+  return Math.max(1, Math.round(country(d, target).yearlyIncome * FR().gold_share_of_target_yearly_income));
+}
+
+/** DIPL-134: a free seat, not an ally or subject, a revolution card with a sign lit; secret. */
+export function fundRebels(d: Diplomacy, funder: string, target: string): Funding {
   if (freeSeats(d, funder) <= 0) throw new RuleError("no free seat");
   if (rel.has(d.graph, "alliance", funder, target) || rel.overlord(d.graph, target) === funder) throw new RuleError("not in an ally's or subject's land");
-  if (!C.actions.fund_rebels.gold_per_month_choices.includes(gold)) throw new RuleError("funding is 10, 25 or 50 gold a month");
+  if (country(d, target).revolutionSigns < FR().needs_revolution_signs) throw new RuleError("no revolution is brewing there");
   d.seq++;
   const e: Envoy = { id: `envoy${d.seq}`, country: funder, person: `Agent of ${funder}`, personKind: "official", type: "", years: 0, action: "fund_rebels", target, status: "court", sent: d.date, arrival: d.date };
   d.envoys.push(e);
-  const f: Funding = { funder, province: prov, target, gold, envoy: e.id };
+  const f: Funding = { funder, target, gold: fundingGold(d, target), envoy: e.id };
   d.fundings.push(f);
   return f;
 }
 
 /** DIPL-136: an émigré pretender court is funded under the same rules. */
-export function fundEmigreCourt(d: Diplomacy, funder: string, court: string, target: string, gold: number): Funding {
+export function fundEmigreCourt(d: Diplomacy, funder: string, court: string, target: string): Funding {
   if (freeSeats(d, funder) <= 0) throw new RuleError("no free seat");
-  if (!C.actions.fund_rebels.gold_per_month_choices.includes(gold)) throw new RuleError("funding is 10, 25 or 50 gold a month");
-  const f: Funding = { funder, emigreCourt: court, target, gold };
+  const f: Funding = { funder, emigreCourt: court, target, gold: fundingGold(d, target) };
   d.fundings.push(f);
   return f;
 }
 
-/** What funding does to a province (DIPL-135). */
-export function fundedEffects(d: Diplomacy, prov: string): { grievances: string[]; riotGrievancesFewer: number; rebelsArmed: boolean; rebelsDontShrink: boolean; revolutionSign: boolean } {
-  const fs = d.fundings.filter((f) => f.province === prov && !f.caught);
-  const gold = fs.reduce((s, f) => s + f.gold, 0);
-  return {
-    grievances: fs.length ? ["Foreign agitators"] : [],
-    riotGrievancesFewer: fs.length ? 1 : 0,
-    rebelsArmed: fs.length > 0,
-    rebelsDontShrink: fs.length > 0,
-    revolutionSign: fs.some((f) => f.gold >= C.actions.fund_rebels.revolution_camp_sign_at_gold) || gold >= C.actions.fund_rebels.revolution_camp_sign_at_gold,
-  };
+/** DIPL-135: the flag the revolutions context reads. */
+export function revolutionFunded(d: Diplomacy, target: string): boolean {
+  return d.fundings.some((f) => f.target === target && !f.caught);
+}
+
+/** D-DIPL-22: stopping is free and instant; the target is told nothing (D-DIPL-30). */
+export function stopFunding(d: Diplomacy, funder: string, target: string): void {
+  for (const f of d.fundings.filter((x) => x.funder === funder && x.target === target)) {
+    const e = d.envoys.find((x) => x.id === f.envoy);
+    if (e) envoyHome(d, e);
+  }
+  d.fundings = d.fundings.filter((x) => !(x.funder === funder && x.target === target));
 }
 
 /** DIPL-137. */
-export function caughtChance(runBy: string | undefined): number {
-  const c = C.actions.fund_rebels.caught_chance_per_turn;
-  if (runBy === "lord") return c.lord_holds_province;
-  if (runBy === "judge") return c.judge_runs_province;
-  return c.default;
+export function caughtChance(): number {
+  return FR().caught_chance_per_month;
 }
 
 /** DIPL-138. */
@@ -866,20 +958,23 @@ export function fundingCaught(d: Diplomacy, f: Funding): void {
   if (e) e.status = "held";
   d.fundings = d.fundings.filter((x) => x !== f);
   addRuleEntry(d, f.target, f.funder, "wrongs", "stirred_revolt_in_our_land");
-  timedAim(d, f.target, f.funder, "punish", C.actions.fund_rebels.on_caught.aim_years, "caught funding rebels");
-  const until = addMonths(monthOf(d.date), C.actions.fund_rebels.on_caught.grievance_months);
-  for (const p of Object.values(d.provinces)) if (p.owner === f.target) p.grievances.push({ name: "Foreign meddling", until });
-  for (const l of d.lords) if (l.country === f.target) emit(d, "Grievance", { lord: l.name, name: "Foreign meddling", until });
-  emit(d, "RebelFundingCaught", { funder: f.funder, province: f.province, to: f.target });
+  timedAim(d, f.target, f.funder, "punish", FR().on_caught.aim_years, "caught funding rebels");
+  emit(d, "RebelFundingCaught", { funder: f.funder, to: f.target });
   letter(d, { to: f.funder, from: f.target, action: "fund_rebels", answer: "no", reasons: [], subject: "caught" });
+}
+
+/** DIPL-194: the new regime remembers who backed it, unless it is hostile to the funder's form. */
+export function revolutionWon(d: Diplomacy, target: string, hostileToForm: (funder: string) => boolean = () => false): void {
+  const funders = [...new Set(d.fundings.filter((f) => f.target === target).map((f) => f.funder))];
+  for (const f of funders) if (!hostileToForm(f)) addRuleEntry(d, target, f, "ties", "backed_our_revolution");
+  d.fundings = d.fundings.filter((f) => f.target !== target);
 }
 
 /** Charges each funding and rolls the caught chance (DIPL-137). */
 export function fundingMonth(d: Diplomacy, rng?: Rng): void {
   for (const f of [...d.fundings]) {
     country(d, f.funder).gold -= f.gold;
-    const p = f.province ? d.provinces[f.province] : undefined;
-    if (draw(d, rng) < caughtChance(p?.runBy)) fundingCaught(d, f);
+    if (draw(d, rng) < caughtChance()) fundingCaught(d, f);
   }
 }
 
@@ -928,6 +1023,7 @@ export function yearlyLeagueCheck(d: Diplomacy, countFn: (c: string, x: string, 
 /** DIPL-163. */
 export function checkLeagueDissolution(d: Diplomacy): void {
   for (const l of [...d.leagues]) {
+    if (l.origin === "event") continue; // D-DIPL-25: an event league ends only by event or a peace
     if (country(d, l.target).landsTaken < leagueThreshold(d) * C.leagues.dissolve_below_share_of_threshold) dissolveLeague(d, l.target);
   }
 }
@@ -967,8 +1063,18 @@ export function lowerTrust(d: Diplomacy, c: string): void {
  */
 export function eventNotoriety(d: Diplomacy, actor: string, n: number): void {
   const r = entryRule(d, "wrongs", "notorious_deed");
-  const knowers = new Set([...neighbours(d, actor), ...d.graph.facts.filter((f) => f.fact === "trade_agreement" && (f.source === actor || f.target === actor)).map((f) => (f.source === actor ? f.target : f.source))]);
+  d.notorietyDeeds.push({ actor, n, date: monthOf(d.date) });
+  const seas = country(d, actor).seaZones;
+  const bySea = Object.values(d.countries).filter((k) => k.id !== actor && k.seaZones.some((z) => seas.includes(z))).map((k) => k.id);
+  const knowers = new Set([...neighbours(d, actor), ...bySea, ...d.graph.facts.filter((f) => f.fact === "trade_agreement" && (f.source === actor || f.target === actor)).map((f) => (f.source === actor ? f.target : f.source))]);
   for (const k of knowers) addEntry(d, k, actor, { key: "notorious_deed", name: r.name, weight: r.weight_per_notoriety! * n, fadeYears: r.fade_years! });
+}
+
+/** D-DIPL-26: 5 × Lands taken + event notoriety still unfaded (30 years), capped at 100. */
+export function notoriety(d: Diplomacy, c: string): number {
+  const fade = entryRule(d, "wrongs", "notorious_deed").fade_years! * 12;
+  const deeds = d.notorietyDeeds.filter((x) => x.actor === c).reduce((s, x) => s + x.n * Math.max(0, 1 - monthsBetween(x.date, d.date) / fade), 0);
+  return Math.min(C.event_tree_mapping.notoriety.cap, Math.round(5 * country(d, c).landsTaken + deeds));
 }
 
 /** DIPL-175: an event's relation goes through the matching action and its requirements. */
@@ -1004,6 +1110,7 @@ export function advanceMonth(d: Diplomacy, rng?: Rng): void {
   d.date = addMonths(d.date, 1);
   d.graph.date = d.date;
   moveEnvoys(d);
+  for (const c of Object.keys(d.countries)) enforceSeats(d, c);
   fundingMonth(d, rng);
   for (const t of rel.expireTruces(d.graph)) emit(d, "TruceExpired", { pair: [t.source, t.target] });
   d.passages = d.passages.filter((p) => monthOf(d.date) < p.until);

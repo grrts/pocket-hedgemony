@@ -31,11 +31,25 @@ export const savesConfig: SavesConfig = config;
 export type SaveKind = "resume" | "autosave" | "manual" | "ironman";
 export type Platform = "android" | "ios" | "desktop" | "web";
 
-/** Campaign options carried in the header (OQ-SAVE-8: only these three). */
+/** Campaign options carried in the header: every rule from the new-game screen (D-SAVE-8). */
 export interface CampaignOptions {
   difficulty: string;
   events: string;
   endDate: string;
+  aiTemper?: string;
+  fogOfWar?: boolean;
+  musicEra?: string;
+}
+
+/** The app a save was written by (D-SAVE-13). */
+export type AppTier = "free" | "demo" | "full";
+
+/** The flags achievements reads (X-16, D-SAVE-1). */
+export interface SaveFlags {
+  ironman_unbroken: boolean;
+  cheat_marked: boolean;
+  switched_country: boolean;
+  began_as_tutorial: boolean;
 }
 
 /** The header the Load list reads without opening the chunks (SAVE-038). */
@@ -58,7 +72,8 @@ export interface SaveHeader {
   ironman: boolean;
   playSeconds: number;
   options: CampaignOptions;
-  tier: { nation: string; needsFullGame: boolean };
+  tier: { nation: string; needsFullGame: boolean; app: AppTier };
+  flags: SaveFlags;
   worldHash: string;
   /** Base64 PNG, 96 × 64. */
   thumbnail: string;

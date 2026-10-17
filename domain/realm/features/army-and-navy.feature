@@ -107,9 +107,21 @@ Feature: Army and navy summary
 
   @REALM-096 @placeholder
   Scenario: The fallen of the last ten years
-    # config: fallen.window_years; OQ-REALM-12 on window or fade
+    # config: fallen.window_years
     Given the country "France" lost 31,000 soldiers in battles and sieges in the last 10 years
     When the player opens its card
     Then it shows "Fallen (10 yrs) 31,000"
     And its people and lords lean toward peace
     And its recruits refill more slowly
+
+  @REALM-096 @REALM-168 @placeholder
+  Scenario Outline: The window is hard
+    # config: windows
+    Given the country "France" lost 5,000 soldiers <years> years ago
+    When the player opens its card
+    Then its Fallen count includes <counted> of them
+
+    Examples:
+      | years | counted |
+      | 9     | 5,000   |
+      | 11    | 0       |

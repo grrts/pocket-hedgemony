@@ -68,21 +68,38 @@ Feature: Government forms and what they set
       | Uri      | low       | Peasant commune     | 1     |
       | Igbo     | very low  | Clan council        | 0     |
 
-  @GOV-023 @GOV-024 @open-question
+  @GOV-023 @GOV-024
   Scenario Outline: Self-run forms need no official for their own people
-    # OQ-GOV-13: who counts as "own people"
-    Given the country "Gowa" has the form "<form>"
-    And the province "<province>" of "Gowa" is of <people>
+    # D-GOV-13: own people are those whose largest tongue is the realm's own tongue; kin tongues do not count
+    Given the country "Gowa" has the form "<form>" and the tongue "Makassarese"
+    And the largest tongue of the province "<province>" of "Gowa" is "<tongue>"
     And the province "<province>" has no official
     When the month ends
     Then the province "<province>" <outcome>
 
     Examples:
-      | form         | province | people                | outcome                                  |
-      | Chiefdom     | Gowa     | its own people        | needs no official and is not Ungoverned  |
-      | Clan council | Gowa     | its own people        | needs no official and is not Ungoverned  |
-      | Chiefdom     | Bone     | another people        | still needs an official                  |
-      | Feudal realm | Gowa     | its own people        | still needs an official                  |
+      | form         | province | tongue      | outcome                                  |
+      | Chiefdom     | Gowa     | Makassarese | needs no official and is not Ungoverned  |
+      | Clan council | Gowa     | Makassarese | needs no official and is not Ungoverned  |
+      | Chiefdom     | Bone     | Buginese    | still needs an official                  |
+      | Feudal realm | Gowa     | Makassarese | still needs an official                  |
+
+  @GOV-057
+  Scenario Outline: Which forms count as monarchies for the Inquisition
+    # D-GOV-15: by the form's event-tree value
+    When the forms with the event-tree values "monarchy, elective_monarchy, constitutional_monarchy" are listed
+    Then "<form>" <is> among them
+
+    Examples:
+      | form                    | is     |
+      | Feudal realm            | is     |
+      | Elective monarchy       | is     |
+      | Constitutional monarchy | is     |
+      | Tribute empire          | is     |
+      | Shogunate               | is     |
+      | Merchant republic       | is not |
+      | Prince-bishopric        | is not |
+      | Horde                   | is not |
 
   @GOV-025 @GOV-026 @placeholder
   Scenario: Colonial governors and the officials cap

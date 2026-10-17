@@ -90,13 +90,14 @@ Feature: Raising and keeping an army
   Scenario Outline: An army eats rations by where it stands
     Given an army of 10000 soldiers, 2000 horses and 100 prisoners
     And the army stands <where>
-    When the month ends
-    Then it eats 26100 rations from <source>
+    When a turn is played
+    Then it eats 6090 rations from <source>
+    And a month's rations are 26100
 
     Examples:
-      | where                     | source                        |
-      | in its own province       | the province it stands in     |
-      | in an enemy province      | its food reserve              |
+      | where                | source                    |
+      | in its own province  | the province it stands in |
+      | in an enemy province | its food reserve          |
 
   @WAR-046
   Scenario: Disbanded men go home

@@ -67,7 +67,7 @@ Your primary culture group picks one of twelve regional palettes: its scales, tu
 | East, Central and Southern Africa | bantu, nilotic, cushitic, semitic_ethiopian, khoisan | Interlocking thumb piano, hocket, Ethiopian qenet modes |
 | The Americas, Indigenous | nahua, maya, andean, tupi_guarani, algonquian, iroquoian | Pentatonic and tritonic, flute-like lead, frame and log drums; Andean and Mesoamerican variants |
 | Oceania | polynesian, melanesian, aboriginal_australian | Chant-like narrow melody, body percussion, drone |
-| Atlantic and creole | creole_atlantic, any colonial nation founded after 1500 | A blend of the European, West African and Americas palettes by culture mix; habanera, later swing |
+| Atlantic and creole | atlantic_creole, any colonial nation founded after 1500 | One palette of its own drawing on European, West African and Americas music (no mixing by culture share); habanera, later swing |
 
 The turkic group goes to Middle East and North Africa if the capital lies west of longitude 55, otherwise to the steppe. When your primary culture changes, your palette changes from the next track on.
 
@@ -86,7 +86,7 @@ Loops last 60 to 150 seconds with 2 to 8 second intros, and play once or twice b
 
 ### The music director
 
-The director runs on the main thread from each turn's results and the screen you are on, never inside the engine, so it cannot affect the simulation. It reads the screen, the Realm book tab, the camera's region and zoom, and whether the app is in the foreground; your nation's culture group, war state and trend, armies near enemies, sieges, battles this turn, an occupied capital, stability, unrest share and treasury trend; and the world's year, active ages, periods and event chains with music tags, and world tension.
+The director runs on the main thread from each turn's results and the screen you are on, never inside the engine, so it cannot affect the simulation. It reads the screen, the Realm book tab, the camera's region and zoom, and whether the app is in the foreground; your nation's culture group, war state and trend, armies near enemies, sieges, battles this turn, an occupied capital, your lords' loyalty, the share of provinces plotting or risen, and the treasury trend; and the world's year, active ages, periods and event chains with music tags, and how many great powers are at war.
 
 It holds one state at a time, chosen by the highest rule that holds:
 
@@ -124,7 +124,7 @@ When the music has a stinger for a moment, effects stay out of the way: they may
 ### Effects through the centuries
 
 - **Fixed** sounds (taps, toggles, errors, scrolls, the map) never change.
-- **Game-year** sounds (turn chimes, notification pings, the event scroll) change with the music era, but only slightly. The turn chimes keep their notes: era I has a 12.5 % duty doubling and no bell, each later era adds one arpeggio step, and era V adds a short W2 swell.
+- **Game-year** sounds (turn chimes, notification pings, the event scroll) change with the music era, but only slightly. The turn chimes keep their notes: era I has a 12.5 % duty doubling and no bell, each later era adds one arpeggio step, and era V adds a short swell on an effects voice (never a music voice).
 - **Army** sounds (marching, shooting, guns, charges, sieges, ships) change with the warfare era of the army's own inventions (I to VII), so two armies of different eras on one field sound different. Marching: frame drum and loose steps in I and II; field drum and measured steps in III and IV; snare and boots in V and VI; an engine drone with motor transport in VII. Shooting: bow and crossbow I to II, matchlock II to III, volley IV to V, rifle V to VI, machine gun VI to VII.
 - The turn chimes use your palette's wavetable and tuning, and the court horn your palette's lead. Everything else is shared; battle sounds differ by era and troop type, not culture.
 - The catalogue stops at warfare era VII and music era V; there is nothing for 1945 onward.
@@ -144,7 +144,7 @@ When the music has a stinger for a moment, effects stay out of the way: they may
 | Siege (10) | `siege_begin`, `siege_closed`, `siege_bombard`, `siege_mining`, `siege_breach`, `siege_repair`, `siege_sally`, `siege_storm`, `siege_terms`, `siege_fall` (a lower bell for your own castle) |
 | Sea (5) | `sea_battle_start`, `sea_broadside`, `sea_sink`, `sea_blockade`, `sea_landing` |
 | Economy (8) | `econ_income` (once per turn), `econ_income_big`, `econ_spend`, `econ_debt`, `econ_build_start`, `econ_build_done`, `econ_trade`, `econ_harvest` (rising if good, falling if famine looms) |
-| Realm and diplomacy (14) | `realm_research_pick`, `realm_law`, `realm_ruler_dies`, `realm_heir_born`, `realm_stability_up`/`down`, `realm_unrest`, `realm_rising`, `realm_fire` (quiet and sombre), `realm_plague`, `diplo_envoy_sent`, `diplo_accepted`/`refused` (a court horn on the palette lead), `diplo_peace_signed` |
+| Realm and diplomacy (14) | `realm_research_pick`, `realm_law`, `realm_ruler_dies`, `realm_heir_born`, `realm_stability_up`/`down` (a lord's loyalty steps up or down), `realm_unrest`, `realm_rising`, `realm_fire` (quiet and sombre), `realm_plague`, `diplo_envoy_sent`, `diplo_accepted`/`refused` (a court horn on the palette lead), `diplo_peace_signed` |
 | Events and notifications (9) | `event_open`, `event_choice`, `event_chain_next`, `notify_ping`, `notify_alert` (urgent: army in danger, castle closed, pay owed), `notify_war`, `notify_battle_far`, `notify_diplo`, `notify_batch` |
 | Ambience (10) | `amb_sea_coast`, `amb_sea_ocean`, `amb_wind_plain`, `amb_forest`, `amb_jungle`, `amb_desert`, `amb_mountain`, `amb_marsh`, `amb_town` (a factory whistle from era V), `amb_war_front` |
 
@@ -168,9 +168,10 @@ Ambience is off by default. When on, it plays a bed chosen by what is under the 
 ### Mixing with the music
 
 - While a stinger plays, effects of priority 3 to 5 are dropped and priority 1 and 2 are ducked 4 dB.
-- Effects duck the music only for priority 1 sounds longer than 600 ms (`battle_start`, `siege_breach`, `siege_storm`, `realm_rising`, `realm_ruler_dies`, `sea_battle_start`), by 4 dB for their length.
+- Effects duck the music only for six sounds (`battle_start`, `siege_breach`, `siege_storm`, `realm_rising`, `realm_ruler_dies`, `sea_battle_start`), by 4 dB for their length. No other sound ducks it, however long.
 - Ambience ducks 6 dB under any priority 1 or 2 effect and fades out over 2 s when a music track starts.
-- The pause menu ducks the music 6 dB.
+- The game menu leaves the music as it is.
+- While several of your battles run at once, you hear the battle sounds of the one on screen; switching battles switches the sounds.
 - A `ui_tap` sits about 6 dB below the music's average, a priority 1 sound peaks about 3 dB above it, and the whole mix aims at −16 LUFS.
 - Several achievements in one turn play `ui_achievement` once.
 
@@ -180,13 +181,13 @@ Ambience is off by default. When on, it plays a bed chosen by what is under the 
 - Music and effects together stay under 2 % of one core on a mid-range phone.
 - Audio starts on the first tap; the title's "Tap to start" is that tap. A mobile cold start has a silent splash and the first sound is `frame_start`; desktop and Steam play `frame_logo`.
 - In the background, or with the tab hidden, sound is suspended, and it resumes with `load_resume`. Notifications that arrived while you were away play no sound.
-- The game yields to your other audio apps and respects the iPhone silent switch; effects follow the same session as music.
+- On iPhone the game uses the "ambient" audio session: it mixes with your other audio apps and respects the silent switch; effects follow the same session as music. On desktop, "Play in background" (off by default) keeps the sound going when the window is hidden; on the web it always pauses.
 - Interface sounds start within one audio block of the tap (about 3 ms) by a direct message to the worklet; map and battle sounds go through the scheduler so they line up with animation.
-- **Haptics** on phones (on by default, never on desktop, working with sound off): `ui_error` light, `turn_ready` light, `battle_start` medium, `siege_breach` medium, `realm_ruler_dies` heavy, once.
+- **Haptics** on phones (on by default, never on desktop, working with sound off): all light: `ui_error`, `turn_ready`, `battle_start`, `siege_breach`, and `realm_ruler_dies` once.
 
 ### Settings
 
-Master, music, effects and ambience volumes; music on or off (off fully suspends the synth); variety; zoom mix; ambience on or off; interface sounds on or off; haptics; mono; sound captions; reduced intensity. Defaults: music 0.7, effects 0.8, ambience 0.5 when on, interface sounds on, haptics on (phones). The rows themselves live in [Settings](Settings).
+Master, music, effects and ambience volumes; music on or off (off fully suspends the synth); variety; zoom mix; ambience on or off; interface sounds on or off; haptics; mono; sound captions; reduced intensity. Defaults: master 0.8, music 0.7, effects 0.8, ambience 0.5 when on, variety "My palette only", interface sounds on, haptics on (phones). The tooltip sound is never played. The rows themselves live in [Settings](Settings).
 
 ### Accessibility
 
@@ -200,7 +201,9 @@ Master, music, effects and ambience volumes; music on or off (off fully suspends
 
 - Palettes describe musical features, not ethnic stereotypes, and never use a "generic exotic" scale shared across unrelated traditions. Each palette's tracks are reviewed by a musician or scholar of that tradition before release and credited.
 - Colonized peoples are never written as an "enemy" or "primitive" side, and Indigenous and African palettes get the same development across all five eras as European ones.
-- A narrative-only event gets no triumphant stinger, only `event_major` in a sombre form.
+- A narrative-only event gets no stinger at all.
+- A peace with neither gain nor loss plays no stinger.
+- Tutorial steps play `ui_hint` when they appear and `ui_confirm` when done, and a new warning plays `notify_alert`; none of them lowers the music.
 - Plunder, razing, massacres, enslavement and narrative-only events never get coins, chimes, fanfares or any rising, rewarding sound (at most `realm_fire` or a single low bell), and plunder adds gold silently.
 - Colonial conquest has no distinct "victory" sound, and Indigenous and African arms sound by era and type with the same quality as anyone's.
 - Era VII machine guns, shells and gas sound at a distance without exaggeration: no screams, no wounded, no speech or crowds anywhere. "Shout" sounds are pulse sweeps.
@@ -236,7 +239,7 @@ Audio has its own visuals only where they partner a sound: captions at the scree
 - [Naval](Naval): sea battles, broadsides, sinkings, blockades, landings, fleet orders.
 - [Troop movement](Troop-Movement): march orders, arrivals, winter quarters.
 - [Recruiting](Recruiting): levy, lords, hiring, training, disbanding.
-- [Your realm](Your-Realm): ruler deaths and new rulers, heirs, stability, treasury, income, debt, laws.
+- [Your realm](Your-Realm): ruler deaths and new rulers, heirs, lords' loyalty, treasury, income, debt, laws.
 - [Provinces](Provinces): harvest, plague, unrest thresholds.
 - [Rebellions](Rebellions) and [Revolutions](Revolutions): risings, rebels in the field, revolutions touching you.
 - [Historical events](Historical-Events): event cards, chains, choices, tags, narrative-only events, ages.
@@ -252,7 +255,7 @@ Audio never feeds back into the engine, and computer players hear nothing (thoug
 
 ### Each turn
 
-After the simulation and turn report are ready, audio reads your war state, battles and sieges, capital, unrest, stability, treasury trend, active ages and tagged chains, the year and your culture group; evaluates the music state and schedules the change; plays the turn results; then `turn_ready` (or `turn_month_new_year` in January).
+After the simulation and turn report are ready, audio reads your war state, battles and sieges, capital, unrest, lords' loyalty, treasury trend, active ages and tagged chains, the year and your culture group; evaluates the music state and schedules the change; plays the turn results; then `turn_ready` (or `turn_month_new_year` in the turn in which January begins). A turn is one week, so the turn chimes play every week, while month, season and year cues play once, in the turn in which that month, season or year begins.
 
 ## Numbers
 
@@ -264,14 +267,14 @@ From `music.yaml` and `sfx.yaml`. Almost all are provisional placeholders; the e
 | `eras.bands` | I 1444, II 1520, III 1650, IV 1790, V 1870 |
 | `eras.campaign_end` | 1939-08-31 (fixed) |
 | `palettes.split.turkic` | west of longitude 55 → Middle East, else steppe |
-| `states.war_losing` | war score below −40, or capital occupied |
-| `states.world_war` | 60 % of great powers at war, era V |
-| `states.war_naval` | 60 % of battles at sea in the last 5 turns |
-| `states.war_siege` | a siege active and no field battle in the last 3 turns |
-| `states.war_mobilize` | at most 2 turns since declaration, no battle yet |
+| `states.war_losing` | more than half your peace voices would accept the enemy's terms, or capital occupied |
+| `states.world_war` | 60 % of the 8 great powers (most provinces) at war, era V |
+| `states.war_naval` | 60 % of battles at sea in the last 5 months |
+| `states.war_siege` | a siege active and no field battle in the last 3 months |
+| `states.war_mobilize` | at most 2 months since declaration, no battle yet |
 | `states.revolution` | revolution period touching you, era IV on |
-| `states.unrest` | 25 % of provinces, or stability below −1 |
-| `states.prosperity` | stability 2 or more, treasury rising, 10 years at peace |
+| `states.unrest` | 25 % of provinces plotting or risen |
+| `states.prosperity` | no disloyal lord and at least half loyal, treasury rising, 10 years at peace |
 | `transitions.min_seconds_in_state` | 45 |
 | `transitions.max_phrase_wait_bars` / `crossfade_bars` | 8 / 1 |
 | `transitions.silence_after_stinger_seconds` | 3 to 6 |
@@ -285,7 +288,8 @@ From `music.yaml` and `sfx.yaml`. Almost all are provisional placeholders; the e
 | `defaults.music_volume` / `sfx_volume` | 0.7 / 0.8 |
 | `defaults.ambience` | false (decided) |
 | `bank.tick_hz` / `max_length_ms` | 60 / 2000 |
-| `buses` | master 1.0, music 0.7, effects 0.8, ambience 0.5 |
+| `buses` | master 0.8, music 0.7, effects 0.8, ambience 0.5 |
+| `defaults.variety` | own palette only |
 | `priority.defaults_by_group` | ui 3, frame 1, turn 1, map 3, army 2, fleet 2, battle 3, siege 3, sea 3, econ 3, realm 2, diplo 2, event 2, notify 3 |
 | `cooldown_ms` | default 50, scroll 40, slider 20, alert 2000, unrest 5000 |
 | `turn_results` | max 5, 150 ms apart, batch at 5 |
@@ -295,22 +299,11 @@ From `music.yaml` and `sfx.yaml`. Almost all are provisional placeholders; the e
 
 ## Still open
 
-- **OQ-AUD-1:** the era V turn chime's W2 swell uses a music voice, which effects may not do.
-- **OQ-AUD-2:** the director reads a war score, stability, world tension and great powers, none of which other designs define that way.
-- **OQ-AUD-3:** the music config defaults variety to all palettes, settings to own palette only.
-- **OQ-AUD-4:** the technology era basis is kept off; whether it becomes a campaign rule, and research must confirm what "technology" means.
-- **OQ-AUD-5:** the gap list still calls the music decisions open, but they were decided; the note is stale.
-- **OQ-AUD-6:** the tutorial asks for sounds the catalogue does not have.
-- **OQ-AUD-7:** more effects take the palette than the design's rule says.
-- **OQ-AUD-8:** the "priority 1 over 600 ms ducks music" rule also catches sounds not in its list, and the pause duck sits oddly with the game menu being "unchanged".
-- **OQ-AUD-9:** iOS audio session behaviour is unverified, background play on desktop conflicts with suspending, and the master default differs from settings.
-- **OQ-AUD-10:** what plays for a peace with neither gain nor loss.
-- **OQ-AUD-11:** no blend rule for the Atlantic and creole palette, and the sombre `event_major` is not in the track list.
-- **OQ-AUD-12:** `ui_tooltip` has no setting to turn it on, haptic strengths disagree, and the final result screen's music is not named in the director.
-- **OQ-AUD-13:** palette reviewers and listening approvals are not yet arranged.
+- Each palette needs a paid reviewer from its musical tradition, and every track needs Leroy's listening approval, before release.
+- The iPhone audio session is to be checked on real devices before release.
 
 ## For developers
 
-- Spec: [`domain/audio/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/audio/spec.md), requirement code **AUD** (AUD-001 to AUD-134).
+- Spec: [`domain/audio/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/audio/spec.md), requirement code **AUD** (AUD-001 to AUD-137).
 - Features: `domain/audio/features/` (sound-chip, motif, eras-and-palettes, track-list, music-director, peace-rotation, effects-catalogue, effects-era-and-region, ambience, busy-turns-and-mixing, music-and-effects-together, platform-behaviour, audio-accessibility, care, audio-data-build).
-- Code: no domain module yet; it will live in `packages/engine/src/domain/audio/`, though the director and synth run on the client, never in the engine. Track and sound data go in `packages/rules/data/music/tracks/` and `packages/rules/data/audio/sfx/`.
+- Code: `packages/engine/src/domain/audio/` (music, effects, platform); data in `packages/rules/data/domain/audio.json`. The director and synth run on the client, never in the engine. Track and sound data go in `packages/rules/data/music/tracks/` and `packages/rules/data/audio/sfx/`.

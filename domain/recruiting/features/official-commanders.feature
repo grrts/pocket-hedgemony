@@ -12,12 +12,14 @@ Feature: What official commanders bring and cost
     And never goes home with his men mid-war
     And never defects with land
 
-  @RECR-089 @open-question
-  # OQ-RECR-20: "a little" has no number
+  @RECR-089 @placeholder
+  # config: officialVictory (D-RECR-20)
   Scenario: Victories stay with the crown
-    Given an army commanded by a commissioned official wins a battle
-    Then every lord's loyalty rises a little
-    And the ruler's standing rises
+    Given the lord "Count of Foix" is Wavering and the lord "Duke of Bourbon" is Loyal
+    When an army commanded by a commissioned official wins a battle
+    Then the lord "Count of Foix" is Loyal
+    And the lord "Duke of Bourbon" is Loyal
+    And the ruler's victories rise by 1
     And no single lord grows from it
 
   @RECR-090 @placeholder
@@ -62,8 +64,8 @@ Feature: What official commanders bring and cost
     Then the realm has lost a commander and an official
     And paying the ransom brings both back
 
-  @RECR-095 @open-question
-  # OQ-RECR-16: land request at 6 and "their man" at 8 differ from warfare 4.6
+  @RECR-095 @placeholder
+  # config: landRequestVictories 6 (officials only), theirMan 8 victories and 5 years (any commander) (D-RECR-16)
   Scenario Outline: Generals who grow too big
     Given a commissioned official with <victories> victories who led the same regiments <years> years
     When the player answers "<answer>"
@@ -74,6 +76,7 @@ Feature: What official commanders bring and cost
       | 6         | 1     | refuse land     | the official becomes Ambitious                                 |
       | 6         | 1     | grant land      | the official becomes a lord with his old soldiers as retinue   |
       | 8         | 5     | none            | the official becomes "their man"                               |
+      | 5         | 1     | none            | the official asks for nothing                                  |
 
   @RECR-096
   Scenario Outline: Who else leads

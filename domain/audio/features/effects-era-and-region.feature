@@ -27,12 +27,12 @@ Feature: How effects change with era and region
       | II | one arpeggio step added |
       | III | two arpeggio steps added |
 
-  # The Era V W2 swell uses a music voice (OQ-AUD-1).
-  @AUD-068 @open-question
+  @AUD-068
   Scenario: Era V turn chime
     Given the music era is V
     When the player presses End turn
-    Then "turn_end" adds a short W2 swell under the chime
+    Then "turn_end" adds a short sustained swell on S3 under the chime
+    And no music voice is taken
 
   @AUD-066 @placeholder
   Scenario Outline: Army sounds follow the army's own era
@@ -86,3 +86,15 @@ Feature: How effects change with era and region
   Scenario: Nothing beyond 1939
     Given the effects catalogue
     Then no sound variant exists for warfare era VIII or music era VI
+
+  @AUD-137
+  Scenario Outline: Weekly turns and the new year chime
+    Given a weekly turn in which <what> begins
+    When the turn is ready
+    Then the chime is "<sound>"
+
+    Examples:
+      | what | sound |
+      | no new month | turn_ready |
+      | February | turn_ready |
+      | January | turn_month_new_year |

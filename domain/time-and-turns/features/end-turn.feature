@@ -1,7 +1,7 @@
 @context-time-and-turns
 Feature: Orders and End turn
   As a player or an AI country
-  I want my orders queued during the month and applied when the turn ends
+  I want my orders queued during the turn and applied when the turn ends
   So that turns are reproducible and the same rules hold for everyone
 
   @TIME-011 @TIME-039
@@ -13,7 +13,7 @@ Feature: Orders and End turn
     And both are applied by the same End turn pipeline
 
   @TIME-012
-  Scenario: Orders given during the month are queued, not applied
+  Scenario: Orders given during the turn are queued, not applied
     Given the army of "Jean de Dunois" stands in "Paris"
     When the player orders it to march to "Dijon"
     Then the army still stands in "Paris"
@@ -21,10 +21,11 @@ Feature: Orders and End turn
 
   @TIME-013
   Scenario: Queued orders are applied before any phase runs
-    Given the player has queued a move order for an army in "Paris" to "Troyes"
+    Given the day is "27 November 1444"
+    And the player has queued a move order for an army in "Paris" to "Troyes"
     When End turn is given
     Then the order is applied first
-    And then the marches, the economy and the levies run
+    And then the marches run, and the economy and the levies run because a new month begins in the turn
 
   @TIME-014
   Scenario Outline: An order that can't be applied is rejected with a reason and the turn still runs
@@ -40,6 +41,19 @@ Feature: Orders and End turn
       | the army belongs to another country    | not your army                     |
       | the destination is a sea zone          | armies need ships to cross water  |
       | no land route reaches the destination  | no road there over land           |
+
+  @TIME-067
+  Scenario: The player's orders come first, then each AI realm's by nation index
+    Given the player is "France"
+    And orders are queued in this order:
+      | country  | order |
+      | Castile  | 1     |
+      | France   | 2     |
+      | Burgundy | 3     |
+      | France   | 4     |
+      | Castile  | 5     |
+    When End turn is given
+    Then the orders are taken in the order 2, 4, then the AI realms' orders by ascending nation index, each realm's in the order given
 
   @TIME-015
   Scenario: An army takes one move order per turn
@@ -78,10 +92,10 @@ Feature: Orders and End turn
 
   @TIME-019
   Scenario: A turn is presented as turn in progress, battles, events, then the report
-    Given the player's army fights one battle this month
-    And two events fire this month
+    Given the player's army fights one battle this turn
+    And two events fire this turn
     When End turn is given
     Then the turn in progress is shown first
-    And the battle is shown when the month reaches it
+    And the battle is shown when the turn reaches it
     And the events are shown one at a time in date order
     And the turn report is shown last

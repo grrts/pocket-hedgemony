@@ -6,8 +6,7 @@ Feature: Inventions' effects in war
 
   # Config keys: warfare.arms, warfare.hits_per_bell, warfare.siege.b7_multiplier, warfare.castles
 
-  @WAR-122 @placeholder @open-question
-  # OQ-WAR-11: W20's effect differs between warfare 7.10, warfare-eras and the research tree
+  @WAR-122 @placeholder
   Scenario Outline: W inventions in battle
     Given the country "France" knows "<invention>"
     When the invention effects are applied

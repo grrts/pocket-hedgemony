@@ -86,7 +86,7 @@ export function variantAt(id: string, date: Ymd, armyEra?: WarfareEra): string {
 }
 
 /** The turn chime's arrangement: the notes never change (AUD-013, AUD-065, AUD-068). */
-export function turnChime(id: "turn_end" | "turn_ready", era: MusicEra): { notes: string[]; dutyDoubling: number | null; bell: boolean; arpeggioSteps: number; w2Swell: boolean } {
+export function turnChime(id: "turn_end" | "turn_ready", era: MusicEra): { notes: string[]; dutyDoubling: number | null; bell: boolean; arpeggioSteps: number; w2Swell: false; s3Swell: boolean } {
   const tc = X.turn_chimes as unknown as Record<string, { duty_doubling?: number; bell?: boolean; arpeggio_steps: number }> & { turn_end: string[]; turn_ready: string[] };
   const e = tc[era]!;
   return {
@@ -94,8 +94,9 @@ export function turnChime(id: "turn_end" | "turn_ready", era: MusicEra): { notes
     dutyDoubling: era === "I" ? e.duty_doubling ?? null : null,
     bell: era === "I" ? !!e.bell : false,
     arpeggioSteps: e.arpeggio_steps,
-    // The Era V W2 swell needs a music voice (OQ-AUD-1): not built.
+    // Era V adds a short sustained swell on S3; effects never take a music voice (D-AUD-1).
     w2Swell: false,
+    s3Swell: era === "V",
   };
 }
 
@@ -298,11 +299,30 @@ export function underStinger(priority: number): { dropped: boolean; db: number }
   return priority >= d.drop_priority_at_or_below ? { dropped: true, db: 0 } : { dropped: false, db: d.duck_others_db };
 }
 
-/** Effects duck music only when priority 1 and longer than 600 ms (AUD-092). */
+/** Only the six listed effects duck music, by 4 dB for their length (AUD-092, D-AUD-8). */
 export function ducksMusic(id: string): number {
-  const s = sound(id);
+  sound(id);
   const r = X.ducking.effects_duck_music;
-  return s.priority === r.priority && s.lengthMs >= r.min_length_ms ? r.db : 0;
+  return r.only.includes(id) ? r.db : 0;
+}
+
+/** The game menu leaves the music unchanged; there is no pause duck (AUD-094, D-AUD-8). */
+export const gameMenuMusicDb = (): number => 0;
+
+/** Sounds the game never plays: `ui_tooltip` has no setting that turns it on (D-AUD-12). */
+export const neverPlayed = (id: string): boolean => (X.never_played as string[]).includes(id);
+
+/** Onboarding's sounds: step shown, step finished, new warning; none duck music (AUD-135, D-AUD-6). */
+export function onboardingSound(moment: "step shown" | "step finished" | "new warning" | "vizier note"): { sound: string | null; ducksMusic: false } {
+  return { sound: (config.onboarding_sounds as unknown as Record<string, string | null>)[moment] ?? null, ducksMusic: false };
+}
+
+/** Effects take the palette only on the config list (AUD-067, D-AUD-7). */
+export const takesPalette = (id: string): boolean => (X.palette_sounds as string[]).includes(id);
+
+/** While several player battles run, bell-step effects come only from the battle shown (AUD-136, X-1). */
+export function battleStepAudible(battleId: string, shown: string): boolean {
+  return battleId === shown;
 }
 
 /** The ambience bed ducks 6 dB under priority 1–2 effects and fades out over 2 s when a track starts (AUD-093). */
@@ -415,4 +435,9 @@ export function intensity(id: string, reduced: boolean): { gainDb: number; echoR
   const r = X.reduced_intensity;
   if (!reduced) return { gainDb: 0, echoRemoved: false, stutter: id === "battle_shoot_mg" };
   return { gainDb: s.priority === 1 ? r.priority1_db : 0, echoRemoved: !r.echo, stutter: r.mg_stutter && id === "battle_shoot_mg" };
+}
+
+/** Turns are one week (X-18): the turn-ready chime every turn, with the new-year form only in the turn in which January begins (AUD-137). */
+export function turnReadyChime(o: { monthBegan: number | null }): string {
+  return o.monthBegan === 1 ? "turn_month_new_year" : "turn_ready";
 }

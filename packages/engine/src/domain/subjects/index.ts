@@ -364,6 +364,11 @@ export function armySeenByOverlord(b: SubjectBond, trueArmy: number): number | n
 
 export type DiplomaticAct = "alliance" | "war" | "envoy" | "pact";
 
+/** How a kind answers its overlord's wars before loyalty is read (design 2.1; X-8). */
+export function kindFights(kind: Kind): string {
+  return kinds[kind].fights;
+}
+
 /** Whether a subject may act abroad (SUBJ-009). `againstOverlord`: against the overlord or its allies. */
 export function mayActAbroad(kind: Kind, act: DiplomaticAct, againstOverlord: boolean): boolean {
   switch (kinds[kind].own_diplomacy) {
@@ -605,7 +610,7 @@ export function reachUsed(roster: readonly RosterEntry[]): number {
 
 /**
  * *Stretched thin* arrows per subject: every subject −1 while over reach, and
- * −1 more to the furthest for each subject beyond reach (SUBJ-058).
+ * −1 more to each of the N furthest, N being reach used beyond reach (SUBJ-058).
  */
 export function stretchedThin(roster: readonly RosterEntry[], reach: number): Map<string, number> {
   const out = new Map<string, number>();
@@ -613,8 +618,9 @@ export function stretchedThin(roster: readonly RosterEntry[], reach: number): Ma
   if (used <= reach) return out;
   const R = config.reasons.stretched_thin;
   for (const e of roster) out.set(e.bond.subject, R.arrow);
-  const furthest = [...roster].sort((a, b) => b.distance - a.distance)[0];
-  if (furthest) out.set(furthest.bond.subject, R.arrow + Math.ceil(used - reach) * R.per_subject_over_reach_to_furthest);
+  // D-SUBJ-7: the N furthest subjects take −1 more each, N = reach used beyond reach, rounded up.
+  const n = Math.ceil(used - reach);
+  for (const e of [...roster].sort((a, b) => b.distance - a.distance).slice(0, n)) out.set(e.bond.subject, R.arrow + R.per_subject_over_reach_to_furthest);
   return out;
 }
 
@@ -638,9 +644,57 @@ export function setTribute(b: SubjectBond, level: TributeLevel): void {
   b.tribute = level;
 }
 
-/** A gift: +1 for 5 years (SUBJ-039). How it scales with income is open (OQ-SUBJ-10). */
+/** A gift costs 6 months of the subject's income (provisional, D-SUBJ-10). */
+export function giftCost(subjectMonthlyIncome: number): number {
+  return subjectMonthlyIncome * config.gift.months_of_income;
+}
+
+/** A gift: +1 for 5 years (SUBJ-039). */
 export function sendGift(b: SubjectBond, now: number): void {
   addReason(b, "gift", now);
+}
+
+/** *Force used*: −1 for 5 years on every other subject (SUBJ-107, D-SUBJ-9). */
+export function forceUsed(others: readonly SubjectBond[], except: string, now: number): void {
+  for (const o of others) if (o.subject !== except) addReason(o, "force_used_on_other_subject", now);
+}
+
+/** Overseas trade empire: colonies or trade posts in 2+ regions other than the capital's (D-SUBJ-18). */
+export function overseasTradeEmpire(regionsWithColoniesOrPosts: readonly string[], capitalRegion: string): boolean {
+  return new Set(regionsWithColoniesOrPosts.filter((r) => r !== capitalRegion)).size >= config.kinds.protectorate.overseas_trade_empire_min_regions;
+}
+
+/**
+ * Changing masters: a Disloyal subject bordering a rival of its overlord moves
+ * to the rival, same kind, when it fits the rival's reach; the old overlord and
+ * the rival turn Hostile toward each other (SUBJ-080, D-SUBJ-11).
+ */
+export function changeMasters(b: SubjectBond, rival: string, t: { bordersRival: boolean; rivalReachFree: number }): { ok: true; hostile: [string, string][] } | { ok: false; missing: string } {
+  if (b.loyalty !== "disloyal") return { ok: false, missing: "only a Disloyal subject changes masters" };
+  if (!t.bordersRival) return { ok: false, missing: "it must border the rival" };
+  if (reachWeight(b) > t.rivalReachFree) return { ok: false, missing: "it does not fit the rival's reach" };
+  const old = b.overlord;
+  b.overlord = rival;
+  b.reasons = [];
+  return { ok: true, hostile: [[old, rival], [rival, old]] };
+}
+
+/** Making a subject by agreement: Tributary, or Vassal when the small country asked (SUBJ-086, D-SUBJ-4). */
+export function kindByAgreement(askedToBeVassal: boolean): Kind {
+  return askedToBeVassal ? "vassal" : "tributary";
+}
+
+/**
+ * *Break a subject*: the war is on the overlord, who defends; the subject
+ * answers by its kind and loyalty; the winner frees it or takes it (SUBJ-081, D-SUBJ-6).
+ */
+export function breakSubjectWar(b: SubjectBond): { target: string; defender: string; subjectAnswer: WarAnswer } {
+  return { target: b.overlord, defender: b.overlord, subjectAnswer: warAnswer(b) };
+}
+
+export function breakSubjectPeace(b: SubjectBond, winner: string, choice: "free" | "take", now: number): SubjectBond | null {
+  if (choice === "free") return null;
+  return newBond({ subject: b.subject, overlord: winner, kind: b.kind }, now);
 }
 
 export function stationResident(b: SubjectBond): void {
@@ -714,7 +768,7 @@ export function loosen(b: SubjectBond, now: number): ActionResult {
   return { ok: true };
 }
 
-/** Release: independent, Friendly toward the old overlord (SUBJ-046). */
+/** Release: independent, Friendly toward the old overlord; no reasons change for anyone (SUBJ-046, D-SUBJ-12). */
 export function release(_b: SubjectBond): { independent: true; stance: "friendly" } {
   return { independent: true, stance: "friendly" };
 }

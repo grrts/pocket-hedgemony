@@ -14,7 +14,7 @@ The map is build data. Nothing in it changes during a campaign, and none of it i
 
 Provinces start from **modern first-level admin regions** (states, counties, oblasts and so on), which are then merged or split until they are roughly even in size. The target size is set per part of the world, so Europe, India and China are cut more finely than Siberia or the Sahara. The default target is 1,100 pixels; Western and Central Europe aims for 380 and the far north for 3,200.
 
-- A province is **named** after the modern admin region that covers most of it, plus a compass point when it was split (for example "West Pskov"). Historical names are not designed yet (OQ-MAP-6).
+- A province is **named** after the modern admin region that covers most of it, plus a compass point when it was split (for example "West Pskov"). Provinces keep these modern names; there are no historical names.
 - Large lakes are punched out of the land, and connected pieces of one admin region (exclaves, islands) become their own pieces. Islands smaller than 10 pixels are dropped.
 - The current build has **9,158 places**: about 4,400 land provinces (`p0` to `p4410`) followed by about 4,700 sea zones (`sea0` onward).
 
@@ -99,7 +99,7 @@ So a province that is 55 % mountain is mountains; one that is 20 % mountain and 
 
 Each tile type also **suggests starting tile uses** for the province card: farmland suggests fields, steppe suggests pasture, badlands suggests waste with mines, and so on.
 
-A few terrain effects adopted by [Troop Movement](Troop-Movement) hold as map facts: snow peaks close passes in winter, dunes need camels for guns and give no foraging, glacier is impassable, and paddies are slower in the wet season. The other terrain proposals are still undecided (OQ-MAP-2).
+A few terrain effects adopted by [Troop Movement](Troop-Movement) hold as map facts: snow peaks close passes in winter, dunes need camels for guns and give no foraging, glacier is impassable, and paddies are slower in the wet season. No other terrain effects exist: broadleaf, mediterranean, pine forest, steppe, cold desert, swamp, badlands and highlands play only through their ground, and mediterranean and steppe land plays as grassland. Each land province also stores its most common tile type, so these effects know where they apply.
 
 **Ocean depth** is stored for every water pixel in five bands from Natural Earth's sea-floor data: under 200 m, 1 km, 3 km, 5 km, and deeper.
 
@@ -111,7 +111,9 @@ Rivers come from Natural Earth's river centre lines (scale ranks 0 to 8), traced
 - A province with three or more river pixels is a **river province**.
 - A config list of **fords** names river crossings that count as bridges in summer and autumn, such as the Ebro at Tortosa and the Danube at Vidin.
 
-Whether a province has a *navigable* river is recorded too, but which rivers count as navigable is still open (OQ-MAP-4).
+A province has a **navigable river** when a great river runs through at least three of its pixels. Only coasts, lake shores and navigable rivers give a province shore tiles; a small river does not.
+
+In winter, from December to March, rivers north of latitude 55 **freeze**: crossing them costs no extra time, as if they were not there.
 
 ### Passes and roads
 
@@ -180,24 +182,24 @@ These are the map generator's settings. None are game balance placeholders excep
 | River province | river province threshold | 3 river pixels | No |
 | Strait crossings, passes, fords | troop-movement `march` config | named examples only | Yes (lists still to fill) |
 
+## Frozen seas
+
+Seasons show on the map. From December to March the far northern seas freeze: the Gulf of Bothnia, the White Sea, the Arctic seas, Hudson Bay, Foxe Basin and the North Western Passages. Fleets cannot enter a frozen sea, and a port on a frozen sea cannot be used until the ice goes.
+
+## Other map facts
+
+- **Crossing a strait on foot.** Armies cross five straits as if they were land borders: the Bosporus (Istanbul holds both shores), the Øresund, Messina, Kerch and Gibraltar. These are not the same as the sea straits fleets use.
+- **Lakes.** A lake shore gives shore tiles, but a harbour needs a real sea next to it. Fleets can sail the large lakes, such as Ladoga and the Great Lakes, but not smaller ones.
+- **Map size.** The map keeps its 4,411 land provinces. Some ports share a province, and Melos and Malé are not on the map.
+- **Hills and mountains.** A province that is at least half mountain is mountains, and one that is at least a quarter hill or mountain is hills.
+
 ## Still open
 
-- **OQ-MAP-1**: A province stores only its ground, but snow peaks, dunes, glacier and paddies effects need the tile type. Should the map store a dominant tile type per province?
-- **OQ-MAP-2**: Most terrain proposals (broadleaf, mediterranean, pine forest, steppe, colddesert, swamp, badlands, highlands, snowpeaks sickness, glacier unsettleable, paddies horse) still need a yes or no.
-- **OQ-MAP-3**: Strait crossings for armies are not in the data yet, and the sea strait list and the land crossing list overlap in names but mean different things.
-- **OQ-MAP-4**: Which rivers are navigable, and does every river province get a shore tile?
-- **OQ-MAP-5**: Provinces have no great-river flag and no region, area or anchor membership yet; who assigns them?
-- **OQ-MAP-6**: Province names are modern; historical names are not designed.
-- **OQ-MAP-7**: The map is too coarse in places (several ports in one province, Melos and Malé missing); splits wait on the catalogue-to-map work.
-- **OQ-MAP-8**: The 25 % and 50 % hill and mountain thresholds give 443 hill and 610 mountain provinces and were not reviewed by the province design.
-- **OQ-MAP-9**: Should mediterranean land get its own ground instead of playing as grassland?
-- **OQ-MAP-10**: The river crossing rule comes from troop movement (latest wins); the map only supplies the flags.
-- **OQ-MAP-11**: Will the map be re-cut to hold all 963 catalogue records, and will the province count stay near 4,400?
-- **OQ-MAP-12**: 78 provinces are marked coastal with no sea-zone neighbour (lake shores such as Tartu and Põlva). Do lake coasts give shore tiles and ports, and can fleets enter large lakes?
+Nothing about the map is left open. The frozen months and the latitude for frozen rivers are first values that balancing may change.
 
 ## For developers
 
-- Spec: [`domain/world-map/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/world-map/spec.md), requirement code **MAP** (MAP-001 to MAP-045).
+- Spec: [`domain/world-map/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/world-map/spec.md), requirement code **MAP**.
 - Features: `domain/world-map/features/` (grid-and-provinces, sea-zones-and-straits, terrain, rivers-passes-roads, graph-and-regions, map-versions).
 - Map generator: `tools/mapgen/mapgen.ts`, `tools/mapgen/terrain.ts`, settings in `tools/mapgen/config.json`. Built data: `packages/rules/data/world/provinces.json` and `map.json`. Terrain notes: `docs/terrain.md`.
 - The engine reads the graph in `packages/engine/src/world.ts` (`adjStart`, `adjList`). Rules code for this context goes in `packages/engine/src/domain/world-map/`.

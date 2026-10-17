@@ -238,7 +238,7 @@ export function officialEffect(type: string, yearsServed: number, cfg: ProvinceC
 /** Multipliers (×2, ×½) scale toward 1; additive bonuses scale toward 0. */
 function scale(key: string, v: number, share: number): number {
   const multiplier = ["store_rot", "build_time", "burned_rebuild", "faith_shift", "tongue_shift", "walls_repair", "castle_store_rot", "broken_charter_fade"].includes(key);
-  if (key === "rebels_at" || key === "riots_extra_grievances" || key === "graduate_sooner_years") return v;
+  if (key === "riots_extra_grievances" || key === "graduate_sooner_years") return v;
   return multiplier ? 1 + (v - 1) * share : v * share;
 }
 

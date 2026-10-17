@@ -1,7 +1,21 @@
 import { expect } from "vitest";
 import {
+  REFORMED_FAITH_NEED,
   REFORMS,
+  aiReform,
   assignStartForm,
+  automaticFormChange,
+  formsWithEventTreeValue,
+  governmentState,
+  isLandmarkPalace,
+  isOwnPeople,
+  needsOfficial,
+  otherChangesForm,
+  reformLordSlips,
+  revolutionChangesForm,
+  subjectsReleasedOnFormChange,
+  tookReformedFaith,
+  type GovernmentState,
   buildingContribution,
   capBuildingIdFromName,
   capBuildingMissing,
@@ -60,6 +74,12 @@ interface Country {
   lordsCap?: number;
   houses?: number;
   lastChange?: "reform" | "revolution" | "coup" | "event" | "capital_lost";
+  /** The remembered form before a run of revolutions (D-GOV-9). */
+  state?: GovernmentState;
+  /** Sum of event admin_capacity changes (D-GOV-11). */
+  eventAdminCapacity: number;
+  tongue?: string;
+  subjectNames: string[];
 }
 
 function country(s: Scenario, name: string): Country {
@@ -77,6 +97,8 @@ function country(s: Scenario, name: string): Country {
     goldBefore: 0,
     provinces: 1,
     subjects: 0,
+    eventAdminCapacity: 0,
+    subjectNames: [],
   } satisfies Country;
   return s.countries[name];
 }
@@ -103,7 +125,7 @@ function reformCountry(c: Country): ReformCountry {
 }
 
 function caps(c: Country) {
-  return workOutCaps({ form: c.form, buildings: c.buildings, strengths: c.strengths });
+  return workOutCaps({ form: c.form, buildings: c.buildings, strengths: c.strengths, eventAdminCapacity: c.eventAdminCapacity });
 }
 
 function officialsCap(c: Country): number {
@@ -129,6 +151,13 @@ function checkOfficials(s: Scenario, c: Country): void {
     if (!g.has(province)) g.set(province, new Set());
     g.get(province)!.add("Grasping officials");
   }
+}
+
+/** Changes the form other than by revolution, keeping the remembered form (D-GOV-9). */
+function changeForm(c: Country, to: FormId, cause: NonNullable<Country["lastChange"]>): void {
+  c.state = otherChangesForm(c.state ?? governmentState(c.form), to);
+  c.form = to;
+  c.lastChange = cause;
 }
 
 function slipLords(s: Scenario, ids: string[]): void {
@@ -246,7 +275,7 @@ Then("the country {string} has no lords", (s, name: string) => {
 
 Then(/^the (.+) adds (\d+) officials and (\d+) lords to the caps of "([^"]+)"$/, (s, building: string, o: string, l: string, name: string) => {
   const b = country(s, name).buildings.find((x) => x.id === capBuildingIdFromName(building))!;
-  expect(buildingContribution(b.id, b.step)).toEqual({ officials: Number(o), lords: Number(l) });
+  expect(buildingContribution(b.id, b.step, b.landmark)).toEqual({ officials: Number(o), lords: Number(l) });
 });
 
 Given("the country {string} does not have the invention {string}", (s, name: string, invention: string) => {
@@ -398,8 +427,21 @@ When("the month ends", (s) => {
   const next = (month % 12) + 1;
   s.month = next;
   for (const c of Object.values(s.countries as Record<string, Country>)) {
+    const rule = automaticFormChange(reformCountry(c));
+    if (rule) {
+      changeForm(c, rule.to, "reform");
+      c.gold -= rule.gold;
+      s.reform = { ok: true, form: rule.to, goldPaid: rule.gold, lordsSlip: rule.lordsSlip } satisfies ReformResult;
+      slipLords(s, reformLordSlips(c.lords, rule.lordsSlip));
+    }
     checkOfficials(s, c);
     slipLords(s, lordSlipsAtMonthStart(next, c.lords, lordsCap(c)));
+    if (c.tongue !== undefined) {
+      s.needsOfficial ??= new Map<string, boolean>();
+      for (const [province, tongue] of (s.provinceTongues ?? new Map<string, string>()) as Map<string, string>) {
+        s.needsOfficial.set(province, needsOfficial(c.form, isOwnPeople(tongue, c.tongue)));
+      }
+    }
   }
 });
 
@@ -582,9 +624,9 @@ When("the country {string} reforms to {string}", (s, name: string, to: string) =
   const result: ReformResult = reform(reformCountry(c), target);
   s.reform = result;
   if (result.ok) {
-    c.form = result.form;
+    changeForm(c, result.form, "reform");
     c.gold -= result.goldPaid;
-    c.lastChange = "reform";
+    slipLords(s, reformLordSlips(c.lords, result.lordsSlip));
   }
 });
 
@@ -597,9 +639,11 @@ Then("the country {string} has paid {int} gold", (s, name: string, gold: number)
   expect(c.goldBefore - c.gold).toBe(gold);
 });
 
-Then("{int} lords of {string} have lost a loyalty step", (s, n: number) => {
+Then("{int} lords of {string} have lost a loyalty step", (s, n: number, name: string) => {
   expect(s.reform.ok).toBe(true);
   expect(s.reform.lordsSlip).toBe(n);
+  const slipped = [...((s.slipped ?? new Map()) as Map<string, number>).values()].reduce((a, b) => a + b, 0);
+  expect(slipped).toBe(Math.min(n, country(s, name).lords.length));
 });
 
 Then("the reform is refused", (s) => {
@@ -642,7 +686,9 @@ Given("the country {string} has the form {string} and no G14 Written constitutio
 
 function revolution(s: Scenario, name: string, f: string): void {
   const c = country(s, name);
-  c.form = setFormByRevolution(c.form, formIdFromName(f));
+  const to = setFormByRevolution(c.form, formIdFromName(f));
+  c.state = revolutionChangesForm(c.state ?? governmentState(c.form), to);
+  c.form = to;
   c.lastChange = "revolution";
 }
 
@@ -668,16 +714,13 @@ Then("no gold is paid and no reform needs are checked", (s) => {
 });
 
 When("an army coup succeeds in {string}", (s, name: string) => {
-  const c = country(s, name);
-  c.form = formAfterCoup();
-  c.lastChange = "coup";
+  changeForm(country(s, name), formAfterCoup(), "coup");
 });
 
 When("the country {string} loses its capital", (s, name: string) => {
   const c = country(s, name);
   s.formBeforeCapitalLost = c.form;
-  c.form = formAfterCapitalLost(c.form);
-  c.lastChange = "capital_lost";
+  changeForm(c, formAfterCapitalLost(c.form), "capital_lost");
 });
 
 Then("the shogunate breaks into warlord domains", (s) => {
@@ -688,8 +731,133 @@ Then("the shogunate breaks into warlord domains", (s) => {
 
 When("an event sets the government value {string} on {string}", (s, value: string, name: string) => {
   const c = country(s, name);
-  c.form = formFromEvent(c.form, value, c.inventions.has("G14"));
-  c.lastChange = "event";
+  const to = formFromEvent(c.form, value, c.inventions.has("G14"));
+  if (to !== c.form) {
+    s.released = subjectsReleasedOnFormChange(to, c.subjectNames);
+    changeForm(c, to, "event");
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Decided rules (D-GOV-n)
+// ---------------------------------------------------------------------------
+
+Given("the country {string} has the form {string} and {int} lords", (s, name: string, f: string, n: number) => {
+  const c = country(s, name);
+  c.form = formIdFromName(f);
+  setLords(c, n);
+});
+
+Given("the country {string} meets the needs of the reform to {string} and has {int} gold", (s, name: string, to: string, gold: number) => {
+  const c = country(s, name);
+  const rule = REFORMS.find((r) => r.to === formIdFromName(to) && r.from.includes(c.form));
+  expect(rule).toBeDefined();
+  const lords = c.lords;
+  satisfyNeeds(c, rule!.needs);
+  if (c.lords.length < lords.length) c.lords = lords;
+  c.gold = gold;
+  c.goldBefore = gold;
+});
+
+Given("for {string} it now holds that {string}", (s, name: string, condition: string) => {
+  country(s, name).facts.add(condition);
+});
+
+Then("the reform is refused because {string} has no reform from {string}", (s, to: string, from: string) => {
+  expect(s.reform.ok).toBe(false);
+  expect(s.reform.reason).toBe("no_reform");
+  void to;
+  void from;
+});
+
+When("the AI of {string} considers a reform", (s, name: string) => {
+  s.aiReform = aiReform(reformCountry(country(s, name)), s.month ?? 1);
+});
+
+Then("the AI of {string} orders the reform to {string}", (s, _name: string, to: string) => {
+  expect(s.aiReform).toBe(formIdFromName(to));
+});
+
+Then("the AI of {string} orders no reform", (s) => {
+  expect(s.aiReform).toBeNull();
+});
+
+const FAITHS: Record<string, string> = { Catholic: "catholic", Protestant: "protestant" };
+
+Given("the country {string} was founded in the faith {string} and now has the state faith {string}", (s, name: string, founding: string, now: string) => {
+  const c = country(s, name);
+  if (tookReformedFaith(FAITHS[founding] ?? founding, FAITHS[now] ?? now)) c.facts.add(REFORMED_FAITH_NEED);
+});
+
+When("an event changes the admin_capacity of {string} by {int}", (s, name: string, change: number) => {
+  country(s, name).eventAdminCapacity += change;
+});
+
+Given("the country {string} has the form {string} and {int} subjects", (s, name: string, f: string, n: number) => {
+  const c = country(s, name);
+  c.form = formIdFromName(f);
+  c.subjects = n;
+  c.subjectNames = Array.from({ length: n }, (_, i) => `subject ${i + 1}`);
+});
+
+Then("the country {string} releases its {int} subjects", (s, name: string, n: number) => {
+  expect(s.released).toEqual(country(s, name).subjectNames);
+  expect(s.released.length).toBe(n);
+});
+
+Then("the old form of {string} is {string}", (s, name: string, f: string) => {
+  const c = country(s, name);
+  expect(formName((c.state ?? governmentState(c.form)).oldForm)).toBe(f);
+});
+
+Given("the country {string} has the form {string} and the tongue {string}", (s, name: string, f: string, tongue: string) => {
+  const c = country(s, name);
+  c.form = formIdFromName(f);
+  c.tongue = tongue;
+});
+
+Given("the largest tongue of the province {string} of {string} is {string}", (s, province: string, _name: string, tongue: string) => {
+  s.provinceTongues ??= new Map<string, string>();
+  s.provinceTongues.set(province, tongue);
+});
+
+Given("the province {string} has no official", (s, province: string) => {
+  for (const c of Object.values((s.countries ?? {}) as Record<string, Country>)) c.officials = c.officials.filter((o) => o.province !== province);
+});
+
+Then("the province {string} needs no official and is not Ungoverned", (s, province: string) => {
+  expect(s.needsOfficial.get(province)).toBe(false);
+});
+
+Then("the province {string} still needs an official", (s, province: string) => {
+  expect(s.needsOfficial.get(province)).toBe(true);
+});
+
+When("the forms with the event-tree values {string} are listed", (s, values: string) => {
+  s.listedForms = formsWithEventTreeValue(values.split(/,\s*/));
+});
+
+Then(/^"([^"]+)" (is|is not) among them$/, (s, f: string, is: string) => {
+  expect(s.listedForms.includes(formIdFromName(f))).toBe(is === "is");
+});
+
+Given("the country {string} has {int} seats at step {int} in {int} different provinces", (s, name: string, n: number, step: number, provinces: number) => {
+  expect(provinces).toBe(n);
+  const c = country(s, name);
+  for (let i = 0; i < n; i++) c.buildings.push({ id: "seat", step });
+});
+
+Then("the seats add {int} officials to the officials cap of {string}", (s, n: number, name: string) => {
+  const part = caps(country(s, name)).officials.parts.find((p) => p.source.endsWith("seats"));
+  expect(part?.value).toBe(n);
+});
+
+const LANDMARK_PALACES: Record<string, string> = { "Forbidden City": "forbidden_city", "Topkapı Palace": "topkapi" };
+
+Given("the country {string} has the landmark palace {string}", (s, name: string, landmark: string) => {
+  const id = LANDMARK_PALACES[landmark] ?? landmark;
+  expect(isLandmarkPalace(id)).toBe(true);
+  country(s, name).buildings.push({ id: "palace", step: 4, landmark: id });
 });
 
 // ---------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 @context-game-shell
 Feature: The turn on screen
   As a player
-  I want ending a turn to be one tap, with every battle of mine and every event shown to me
+  I want ending a turn to be one tap, with every battle of mine played out in front of me and every event shown to me
   So that nothing is decided for me and nothing is hidden
 
   Background:
@@ -53,57 +53,82 @@ Feature: The turn on screen
       | 1.5     | is not shown                 |
       | 3.0     | is shown after 1.5 seconds   |
 
-  @SHELL-073 @open-question
-  Scenario: A save is taken just before the turn runs
-    # OQ-SHELL-5: the saves design calls this the Resume save plus orders journal
+  @SHELL-073
+  Scenario: The world before the turn is kept before the turn runs
     Given no event is unanswered
     When the player taps End turn
-    Then a save of the world before the turn is taken before the turn runs
+    Then the orders journal is closed with the turn's orders before the turn runs
+    And the Resume save and the orders journal together hold the world before the turn
 
-  @SHELL-074 @open-question
-  Scenario: The turn stops for each player battle
-    # OQ-SHELL-2: warfare 7.15 still describes a report with a Watch button
-    Given the army "Armée de Dunois" of "France" will meet an English army at "Troyes" this month
-    When the turn reaches the battle at "Troyes"
-    Then the turn stops
+  @SHELL-074
+  Scenario: Time slows to 4-hour steps for a player battle
+    Given this month "France" fights at "Troyes" on the 5th
+    When the player taps End turn
+    Then the battle starts on day 5
     And the map flies to "Troyes"
-    And the screen "battle" opens on the before-the-battle card
-    And the card shows both armies, their commanders, the ground and the standing orders of "Armée de Dunois"
-    And the standing orders can be changed for this one battle
+    And the screen "battle" opens on the running battle
+    And time passes in steps of 4 hours, 6 a day, while it runs
+    And the battle view offers "Standing orders" and "Retreat"
+    And the battle view offers no way to skip to the result
+
+  @SHELL-074 @SHELL-077
+  Scenario: A fleet's battle slows time too
+    Given this month a fleet of "France" fights at "the Channel" on the 6th
+    When the player taps End turn
+    Then the battle starts on day 6
+    And the screen "battle" opens on the running battle
 
   @SHELL-075
-  Scenario Outline: Fight or skip, then the result card
-    Given the turn is stopped on the before-the-battle card at "Troyes"
-    When the player presses "<button>"
-    Then <playback>
-    And the battle ends on its result card showing who won, men lost and the one-line reason
+  Scenario: The player watches the battle to its end
+    Given the battle at "Troyes" is running
+    When 6 steps of 4 hours pass
+    Then the battle ends on its result card showing who won, men lost and the one-line reason
     And the result card offers "Carry on"
 
-    Examples:
-      | button         | playback                                  |
-      | Fight          | the battle plays bell by bell             |
-      | Skip to result | the battle jumps to its end               |
+  @SHELL-075
+  Scenario: Standing orders change at any step
+    Given the battle at "Troyes" is running
+    And 2 steps of 4 hours have passed
+    When the player sets the standing orders for this battle to "hold the line"
+    Then the battle at "Troyes" fights on with "hold the line"
+    And no other battle's orders change
 
   @SHELL-075
-  Scenario: Skip to result at any moment
-    Given the battle at "Troyes" is playing bell by bell
-    When the player presses "Skip to result"
-    Then the result card is shown
+  Scenario: Retreat at any step
+    Given the battle at "Troyes" is running
+    And 3 steps of 4 hours have passed
+    When the player presses "Retreat"
+    Then the battle at "Troyes" ends with a retreat after 12 hours
+    And the result card is shown
+
+  @SHELL-136
+  Scenario: Several battles at once, with a switcher
+    Given this month "France" fights at "Troyes" and at "Reims" on the 5th
+    When the player taps End turn
+    Then the battle switcher lists "Troyes" and "Reims", each with its progress
+    When 2 steps of 4 hours pass
+    Then both battles show progress "2 / 6"
+    When the player switches to the battle at "Reims"
+    Then the map flies to "Reims"
+    And the battle view shows "Reims"
+    When the player presses "Retreat"
+    Then the battle at "Reims" ends with a retreat after 8 hours
+    And the battle at "Troyes" is still running
 
   @SHELL-076
-  Scenario: Carry on to the next battle in month order
-    Given this month "France" fights at "Troyes" on the 5th and at "Reims" on the 20th
+  Scenario: Carry on to the next battle in turn order
+    Given this month "France" fights at "Troyes" on the 5th and at "Reims" on the 7th
     And the turn is stopped on the result card at "Troyes"
     When the player presses "Carry on"
-    Then the turn resumes
-    And the turn stops at the before-the-battle card at "Reims"
+    Then the turn resumes in whole days
+    And the battle at "Reims" starts on day 7
 
   @SHELL-077
   Scenario Outline: Other realms' battles never stop the turn
     Given "Castile" and "Portugal" fight a battle this month
     And the battle <matters> to the player
     When the turn runs
-    Then the turn does not stop for that battle
+    Then time does not slow for that battle
     And the battle appears on the map
     And the battle <in report> in the turn report
 
@@ -125,14 +150,14 @@ Feature: The turn on screen
 
   @SHELL-079
   Scenario Outline: Interrupted at a battle
-    Given the turn is stopped on the before-the-battle card at "Troyes"
+    Given the battle at "Troyes" is running
     When the app <what happens>
     Then <result>
 
     Examples:
       | what happens                                  | result                                                                   |
-      | goes to the background and comes back         | the before-the-battle card at "Troyes" is shown again                    |
-      | is killed and started again                   | the pre-turn save replays the month to "Troyes" with the same result     |
+      | goes to the background and comes back         | the running battle at "Troyes" is shown again at the same step           |
+      | is killed and started again                   | the Resume save and the orders journal replay the month to "Troyes" with the same result |
 
   @SHELL-080
   Scenario: Events one at a time in date order
@@ -167,3 +192,13 @@ Feature: The turn on screen
     Given the turn report is open
     When the player taps the map
     Then the turn report closes
+
+  @SHELL-137
+  Scenario: A turn is one week
+    Given a campaign as "France" is loaded on 11 November 1444
+    When the player taps End turn
+    And the turn runs to its end
+    Then the day loop has played 7 days
+    And the top bar shows "18 November 1444"
+    When 3 more turns are played
+    Then the top bar shows "9 December 1444"

@@ -105,15 +105,16 @@ Feature: Named lords
     Then the country "France" holds his provinces
     And he is a lord of "France"
 
-  @REALM-081
+  @REALM-081 @REALM-166 @placeholder
   Scenario Outline: Starting lords
+    # config: starting_lords
     Given the date is 1444
     When the country "<country>" is set up
     Then it starts with <lords>
 
     Examples:
       | country  | lords                                                      |
-      | France   | its great houses from the catalogue, e.g. Burgundy, Brittany and Armagnac |
+      | France   | its great houses from the catalogue, e.g. Armagnac, Bourbon and Orléans |
       | Navarre  | a few generated lords sized to its realm                   |
 
   @REALM-082

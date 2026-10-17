@@ -6,9 +6,9 @@ Feature: Pacing tools the tutorial adds
 
   @TUT-019
   Scenario: Advance to the harvest
-    Given chapter 3 offers "Advance to the harvest, September 1444"
+    Given chapter 3 offers "Advance to the harvest, September 1445"
     When the player takes the Advance to… ribbon
-    Then the turns run in a row until September 1444
+    Then the turns run in a row until September 1445
     And one combined turn report is shown
 
   @TUT-020
@@ -38,11 +38,11 @@ Feature: Pacing tools the tutorial adds
   @TUT-022
   Scenario: Scripted wars still happen
     Given the tutorial is running
-    When the crusade is declared in chapter 4
-    Then the war against the Ottomans begins
+    When the crusaders' fleet reaches the Danube in chapter 4
+    Then the crusade war against the Ottomans goes on
 
   @TUT-023 @placeholder
-  Scenario: The Varna battle at watch speed
-    When the Varna battle starts in chapter 5
+  Scenario: The border clash at watch speed
+    When the border clash at Giurgiu starts in chapter 5
     Then the battle screen opens
     And one bell plays every 3 seconds

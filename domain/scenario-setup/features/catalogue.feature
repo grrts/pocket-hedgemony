@@ -118,6 +118,20 @@ Feature: The country catalogue as the source of 1444 entities
     Then it lists priorities, expansion modes, diplomatic style, economic focus, doctrine, risk tolerance, constraints, opportunities, failure conditions and an adaptation note
     And it gives no scripted moves
 
+  @SETUP-012
+  Scenario Outline: Risk tolerance is read in three steps
+    Given a catalogue risk tolerance of "<level>"
+    When the AI reads it
+    Then its risk tolerance is "<read>"
+
+    Examples:
+      | level     | read   |
+      | very_low  | low    |
+      | low       | low    |
+      | moderate  | medium |
+      | high      | high   |
+      | very_high | high   |
+
   @SETUP-013
   Scenario: Nothing comes from commercial games
     Given any catalogue record

@@ -6,5 +6,6 @@ export * from "./model.ts";
 export * from "./conditions.ts";
 export * from "./modifiers.ts";
 export * from "./effects.ts";
+export * from "./mapping.ts";
 export * from "./engine.ts";
 export * from "./build.ts";

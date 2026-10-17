@@ -33,13 +33,13 @@ Feature: Events and diplomacy
     When an event lowers the trust of "A"
     Then the country "A" gains an Oath broken
 
-  @DIPL-174 @open-question
+  @DIPL-174
   Scenario: Notoriety is derived and written as a notorious deed
-    # OQ-DIPL-26: whose deeds count toward notoriety
     Given the country "A" has 4 Lands taken
     When an event adds notoriety 2 to "A"
-    Then every country that shares a border, a sea zone or a trade partner with "A" gains the wrong "Notorious deed" at -20 fading over 30 years
+    Then every country that shares a border, a sea zone or a trade pact with "A" gains the wrong "Notorious deed" at -20 fading over 30 years
     And the Lands taken of "A" are still 4
+    And the notoriety of "A" is 22
     And the notoriety of "A" never reads above 100
 
   @DIPL-175

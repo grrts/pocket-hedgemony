@@ -42,12 +42,13 @@ Feature: The save file
 
   @SAVE-038
   Scenario: Header fields
-    Given the campaign as "Castile" in May 1492 at turn 577, not ironman, on normal difficulty with historical events and the end date 1939-08-31
+    Given the campaign as "Castile" in May 1492 at turn 2478, not ironman, on normal difficulty with historical events and the end date 1939-08-31
     When a manual save "Castile, May 1492" is written on a "Pixel 8"
     Then the header holds saveId, campaignId, kind "manual", name "Castile, May 1492", savedAt, device "Pixel 8", platform "android"
-    And it holds gameVersion, formatVersion, rulesHash, mapHash, turn 577, date 1492-05 and playerNation "castile"
+    And it holds gameVersion, formatVersion, rulesHash, mapHash, turn 2478, date 1492-05 and playerNation "castile"
     And it holds ironman false, playSeconds, options with difficulty "normal", events "historical" and endDate "1939-08-31"
-    And it holds tier with nation "castile" and needsFullGame false
+    And its tier is nation "castile", needsFullGame true and app "full"
+    And its flags read ironman_unbroken false, cheat_marked false, switched_country false and began_as_tutorial false
     And it holds worldHash and a 96 × 64 PNG thumbnail
 
   @SAVE-039

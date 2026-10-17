@@ -61,3 +61,21 @@ Feature: Tutorial steps and how they look
     Given the tutorial is running
     When the player opens the pause menu
     Then it shows the lines "Skip this chapter", "Chapter list" and "Leave the tutorial"
+
+  @TUT-116
+  Scenario Outline: Steps and warnings play existing sounds
+    When <moment>
+    Then the sound "<sound>" plays
+    And music is not ducked
+
+    Examples:
+      | moment | sound |
+      | a step appears | ui_hint |
+      | a step is finished | ui_confirm |
+      | a new warning joins the Needs attention list | notify_alert |
+
+  @TUT-119
+  Scenario: The guide face is labelled The Grand Vizier
+    Given the tutorial is running
+    When a step is shown
+    Then the face on the note is labelled "The Grand Vizier"

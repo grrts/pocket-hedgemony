@@ -68,9 +68,34 @@ Feature: Rivers, fords, passes and roads as geography
       | turnpike    |
       | railway     |
 
-  @MAP-035 @open-question
-  # OQ-MAP-4: navigable rivers are not separated from other river provinces
-  Scenario: A province records a navigable river
-    Given a province with a navigable river running through it
+  @MAP-035
+  Scenario Outline: A province records a navigable river
+    Given the province "<province>"
     When its record is read
-    Then it shows that a navigable river runs through
+    Then it is a river province
+    And it <does> show that a navigable river runs through
+
+    Examples:
+      | province | does     |
+      | Aube     | does     |
+      | Wien     | does     |
+      | Loiret   | does not |
+
+  @MAP-035
+  Scenario: A navigable river is a great river for movement
+    Given the province "Aube"
+    When its record is read
+    Then its river counts as a great river for movement
+
+  @MAP-050 @placeholder
+  Scenario Outline: Northern rivers freeze and are crossed like a bridge
+    Given a river at latitude <latitude> with a crossing penalty of 1 day
+    When it is <month>
+    Then the river is <state> and its crossing penalty is <penalty> days
+
+    Examples:
+      | latitude | month    | state    | penalty |
+      | 60       | January  | frozen   | 0       |
+      | 55       | March    | frozen   | 0       |
+      | 54       | January  | flowing  | 1       |
+      | 60       | June     | flowing  | 1       |

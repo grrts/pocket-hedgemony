@@ -1,6 +1,14 @@
 {
  "$comment": "Placeholder balance values for subjects-design.md. Loyalty steps are the lords' steps (country stats 5.5). No percentage meter. Copied from subjects/config/subject-rules.json. Keys under reasons marked from_design are the design's own numbers (subjects-design 4, 5) that the source config does not list.",
  "schema_version": 1,
+ "_provisional": [
+  "gift.months_of_income",
+  "kinds.protectorate.overseas_trade_empire_min_regions",
+  "reasons.stretched_thin"
+ ],
+ "gift": {
+  "months_of_income": 6
+ },
  "loyalty": {
   "steps": [
    "loyal",
@@ -150,7 +158,8 @@
    "drift": -1,
    "fold_in": "lord",
    "min_era": "VI",
-   "min_era_overseas_trade_empire": "IV"
+   "min_era_overseas_trade_empire": "IV",
+   "overseas_trade_empire_min_regions": 2
   }
  },
  "ties": {
@@ -248,7 +257,8 @@
   },
   "stretched_thin": {
    "arrow": -1,
-   "per_subject_over_reach_to_furthest": -1
+   "per_subject_over_reach_to_furthest": -1,
+   "note": "Every subject -1; the N furthest subjects -1 more each, N = reach used beyond reach rounded up (D-SUBJ-7)"
   },
   "far_away": {
    "arrow": -1

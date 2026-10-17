@@ -76,11 +76,10 @@ Feature: The 1444 map setup in today's build
       | owned   | on a frontier on farmland with 120 thousand people | an earthwork ring fort    |
       | unowned | anything                                        | no walls                     |
 
-  @SETUP-047 @placeholder @open-question
-  # OQ-SETUP-11: flat engine starts against assessment-based starts
-  Scenario: The engine's flat start values
+  @SETUP-047 @placeholder
+  Scenario: The engine's flat start values serve only realms with no assessment
     Given the config values "economy.startingTreasury" 50, "levies.menPerThousandPeople" 4 and "march.startingHorseShare" 0.2
     When a new campaign starts
-    Then every nation has 50 gold
+    Then every nation with no catalogue assessment has 50 gold
     And its levies are 4 men per thousand people
     And its starting armies are one fifth horse

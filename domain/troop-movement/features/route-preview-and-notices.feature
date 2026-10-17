@@ -1,15 +1,15 @@
 @context-troop-movement
-Feature: What the route preview and the month replay carry
+Feature: What the route preview and the turn replay carry
   As a player
-  I want the route and the month's replay to tell me where my armies will be and what changed
-  So that I can plan a monthly turn and only read what matters
+  I want the route and the turn's replay to tell me where my armies will be and what changed
+  So that I can plan a weekly turn and only read what matters
 
   @MOVE-094
-  Scenario: The route shows days and month marks
+  Scenario: The route shows days and turn marks
     Given the army "A" plans a route from "Paris" through "Troyes" and "Langres" to "Dijon"
     And the steps take 10, 12 and 10 days
     Then the preview shows day counts 10, 22 and 32 and a total of 32
-    And a month mark lies between "Langres" and "Dijon"
+    And turn marks lie between "Paris" and "Troyes", twice between "Troyes" and "Langres", and between "Langres" and "Dijon"
 
   @MOVE-094
   Scenario Outline: Step icons
@@ -41,18 +41,22 @@ Feature: What the route preview and the month replay carry
       | tapping a province   | when the player taps March   |
       | dragging             | on lift                      |
 
-  # config: replaySecondsPer10Days
-  @MOVE-097 @placeholder @open-question
-  # OQ-MOVE-8: whether a battle pauses the turn
-  Scenario: Watching the month
+  # config: replaySecondsPer10Days, battleSteps; X-1: the player's battles slow the turn, AI battles never do
+  @MOVE-097 @MOVE-113 @placeholder
+  Scenario: Watching the turn
+    Given the player's army "A" of "France" will meet the enemy army "B" in "Langres" on day 1
+    And the AI armies "C" of "Burgundy" and "D" of "Savoy" will fight in "Dijon" on day 1
+    And a castle of "Burgundy" will stop the French army "E" in "Beaune"
     When the turn ends
-    Then the month plays at about one second per 10 days with a skip button
-    And battles flash crossed swords and pause half a second
-    And castles that stop an army ring red
+    Then the turn plays at about one second per 10 days with a skip button
+    And the battle in "Dijon" flashes crossed swords and pauses half a second without slowing the turn
+    And day 1 slows to six 4-hour steps while the battle in "Langres" runs
+    And at each step the player can change standing orders, order a retreat or switch battle, and there is no Skip to result
+    And the castle of "Beaune" rings red
 
   @MOVE-098
   Scenario Outline: Only plan-changing events give a notice
-    Given during the month <event>
+    Given during the turn <event>
     Then the player <gets> a notice
 
     Examples:

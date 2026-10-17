@@ -47,8 +47,7 @@ Feature: Hidden ambitions
       | the year 1561 begins          |
       | its fail condition holds      |
 
-  @HER-021 @placeholder @open-question
-  # OQ-HER-13: band edges at exactly one third and two thirds
+  @HER-021
   Scenario Outline: Warmth
     Given an ambition's goal has <leaves> leaf conditions
     And <held> of them hold
@@ -59,7 +58,7 @@ Feature: Hidden ambitions
       | leaves | held | warmth |
       | 3      | 0    | cold   |
       | 3      | 1    | warm   |
-      | 3      | 2    | warm   |
+      | 3      | 2    | hot    |
       | 3      | 3    | done   |
       | 4      | 3    | hot    |
 
@@ -96,10 +95,10 @@ Feature: Hidden ambitions
       | VII | 11    | it pays 380 gold and the ambition stirs and shows its warmth  |
       | II  | 6     | counsel is refused                                            |
 
-  @HER-025 @placeholder @open-question
-  # OQ-HER-11: envoy stationing belongs to diplomacy
-  Scenario: Reading a rival through an envoy
-    Given the country "Milan" has kept an envoy at the court of "Venice"
+  @HER-025 @placeholder
+  # config: ambitions.envoy_reveal_years
+  Scenario: Reading a rival through a resident envoy
+    Given the country "Milan" has kept a resident envoy at the court of "Venice"
     When 2 years have passed
     Then "Milan" learns the hint and warmth of one active ambition of "Venice"
     And never its plain goal
@@ -135,3 +134,39 @@ Feature: Hidden ambitions
     Then it sees its ambitions' plain goals
     And weighs them at 1.5 next to its ai_personality priorities
     And when it completes one it gets the legacy
+
+  @HER-014 @placeholder
+  Scenario Outline: Pool size
+    # config: ambitions.pool_min_generated, ambitions.pool_max
+    Given a generated heritage with <pool> ambitions in its pool and <age> age ambitions
+    When heritage is built
+    Then its pool is <verdict>
+
+    Examples:
+      | pool | age | verdict           |
+      | 3    | 0   | too small         |
+      | 4    | 0   | within the limits |
+      | 7    | 2   | within the limits |
+      | 8    | 0   | too large         |
+
+  @HER-079 @placeholder
+  Scenario: The AI puts its weakest heyday to sleep
+    # config: ai.sleep_heyday
+    Given the AI country "Milan" has 2 heydays awake worth 3 and 2 points
+    When a third heyday worth 2.5 points would wake
+    Then the AI puts the heyday worth 2 points to sleep
+    And 2 heydays are awake
+
+  @HER-079 @placeholder
+  Scenario: The AI lets its weakest legacy go
+    # config: ai.let_go_legacy
+    Given the AI country "Milan" holds 5 legacies, the weakest worth 0.5 points
+    When it earns a sixth worth 2 points
+    Then the AI lets the legacy worth 0.5 points go
+    And "Milan" still holds 5 legacies
+
+  @HER-078
+  Scenario: Heritage counts time month by month
+    Given the country "Portugal" has a heyday awake in an active age
+    When 300 months pass with its wakes condition holding
+    Then the heyday has served 25 years

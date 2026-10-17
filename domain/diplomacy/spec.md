@@ -14,7 +14,7 @@ those types or adds a fact. Diplomacy adds no relation type of its own.
 - Envoys: seats, who an envoy is, the road, missions, residents, envoys held or lost.
 - The pair ledger of ties and wrongs, standing and its words, the two world-wide counts (Oaths broken, Lands
   taken) as reasons.
-- The reasons count: the one way every yes or no is decided, and the one-turn delay of every answer.
+- The reasons count: the one way every yes or no is decided, and the one-month delay of every answer.
 - All diplomatic actions (section 6 of the design): alliances and calls to arms, marriages and pretenders,
   demands, passage, trade pacts and embargoes, pledges and sworn peace, subjects by agreement (the asking
   only), courting a foreign lord, gifts and visits, insults and rivals, funding rebels.
@@ -23,7 +23,7 @@ those types or adds a fact. Diplomacy adds no relation type of its own.
 - Leagues against a conqueror.
 - Era changes to diplomacy, 1444 to 31 August 1939; mobilisation pacts.
 - The mapping of the event tree's `opinion`, `trust`, `notoriety` and `relation` terms, and three new effects.
-- The diplomacy AI (posture, negotiation level, what it does each turn).
+- The diplomacy AI (posture, negotiation level, what it does each month).
 - The diplomacy lens, the country diplomacy card, the envoys strip, the war declaration sheet.
 
 **Not in scope (owned by …)**
@@ -55,7 +55,7 @@ Newest decision first.
    and `country-relations/tests/test_rules.py` (27 tests: the shared contract for the game engine).
 6. `country-relations/uncertainty-report.md`, `country-relations/data/relations-1444.json` (280 relations,
    19 facts, reference date 1444-11-11).
-7. `planning/gap-lists.md` "Decisions already made" (one month per turn; campaign ends 31 August 1939; keep
+7. `planning/gap-lists.md` "Decisions already made" (one month per turn, now one week per turn by X-18; campaign ends 31 August 1939; keep
    designs multiplayer-friendly: deterministic, orders as data).
 8. Read for seams only: warfare-design 10, country-stats-design 9 and 10, research-tree (G5, G8, T14),
    troop-movement-design 5.3 and 15, rebellions-design, revolutions-design 7.1, government-design 3,
@@ -91,7 +91,7 @@ Newest decision first.
 | Lands taken | Country stat (last 20 years); drives leagues | |
 | Reasons count | The list of named reasons with numbers the asked country adds up; over zero is yes | |
 | Base | The negative reason that says how big an ask is | |
-| Answer letter | Yes or no with the full reasons list, delivered the turn after the answer is given | Preview (there is none) |
+| Answer letter | Yes or no with the full reasons list, delivered a month after the answer is given | Preview (there is none) |
 | Soldiers under arms | The strength measure (realm stat); allies who would come count at half | |
 | Full multiple | The whole number of times one side's soldiers contain the other's | |
 | Binding ask | An ask that binds them to you: alliance, pledge, protection (offer overlordship, ask for protection) | |
@@ -108,7 +108,7 @@ Newest decision first.
 | Sworn peace | A Truce of 10 years made without a war | Truce after a war |
 | Offer overlordship / Ask for protection | The two envoy asks that create a subject by agreement | Pledge protection |
 | Court a lord | An envoy working on a foreign Wavering or Disloyal lord | |
-| Fund rebels | A secret envoy action stirring one province of another country | |
+| Fund rebels | A secret envoy action paying for a revolution brewing in another country (X-10) | |
 | War aim | This game's reason for war (warfare 10.1); held from things in the world | |
 | League (against X) | Countries bound to a defensive call against one conqueror X only | Alliance; collective institution |
 | League threshold | Lands taken at which a league can form; per era | |
@@ -155,7 +155,7 @@ Newest decision first.
 - INV-DIPL-15: No member is X's ally, subject or overlord, or at war with X, when it joins.
 
 **Pending answer** (identity: asker, asked, action, turn given)
-- Holds the reasons list, the total and the answer; delivered the turn after it is given.
+- Holds the reasons list, the total and the answer; delivered a month after it is given.
 
 ### Entities and value objects
 
@@ -297,12 +297,12 @@ Years served: +5 more at 10 years. Resident at one court for 5 years: +5 to anyt
 **Standing words**: +100 or more Close; +30 to +99 Warm; −29 to +29 Cool; −30 to −99 Cold; −100 or less Bitter.
 
 **Action catalogue** (design section 6 table; the README counts "fourteen actions", the design text "fifteen",
-the table has fifteen rows and twenty named actions, see OQ-DIPL-1)
+the table has fifteen rows and twenty named actions; the table is canonical, D-DIPL-1)
 
 | # | Action | How | Needs | Base | What happens |
 |---|---|---|---|---|---|
 | 6.1 | Propose alliance | Envoy | No war between you; neither side Hostile; no subject tie | −40 | Alliance (replaces a Truce) |
-| 6.1 | Call to arms | Instant (answer next turn) | An Alliance, a Pledge or a League | −20 defensive / −50 offensive | They join your war, or refuse |
+| 6.1 | Call to arms | Instant (answer a month later) | An Alliance, a Pledge or a League | −20 defensive / −50 offensive | They join your war, or refuse |
 | 6.1 | Break alliance | Instant | An Alliance | — | Ends it; Oath broken; wrong *Broke our alliance* |
 | 6.2 | Arrange marriage | Envoy | An unmarried heir or child of the ruling house on each side | −15 | Marriage fact; tie *Married houses*; a chance at a claim later |
 | 6.3 | Demand | Envoy | A war aim against them, or a Rival or Hostile stance | −60 | They give it, or you gain a war aim |
@@ -319,7 +319,7 @@ the table has fifteen rows and twenty named actions, see OQ-DIPL-1)
 | 6.9 | Make resident | Envoy | G8 | — | Tie *Resident envoy*; sight of their court |
 | 6.10 | Insult | Instant | — | — | Wrong *Insulted us*; Hostile stance |
 | 6.10 | Declare rival | Instant | A contested object | — | Rival stance |
-| 6.11 | Fund rebels | Envoy, secret | Gold each month; not your ally or subject | — | Rebels in one of their provinces grow; you may be caught |
+| 6.11 | Fund rebels | Envoy, secret | 1 % of their yearly income each month; not your ally or subject; their revolution card shows a sign | — | Sets `revolution_funded` on them; caught 3 % a month (D-DIPL-23) |
 
 **Demand kinds**
 
@@ -452,7 +452,7 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 
 - DIPL-047 The diplomacy context shall make every envoy an official sent abroad; the province that official ran is run as if it had no official until the official returns. [diplomacy 2.1; decision 16 Oct]
 - DIPL-048 The diplomacy context shall give a country 1 envoy seat, +1 while its realm has more than 10 provinces, +1 for G5 Royal chancery, +1 for G8 Resident ambassadors, and +1 where a national strength says so. [diplomacy 2.1; config `envoys.seats`]
-- DIPL-049 When a realm shrinks below 10 provinces, the diplomacy context shall remove its second seat; seats from inventions are never lost. [diplomacy 2.1]
+- DIPL-049 When a realm falls to 10 provinces or fewer, the diplomacy context shall remove its size seat; seats from inventions are never lost; when seats fall below envoys abroad, missions finish and residents beyond the seats are recalled, newest first. [diplomacy 2.1; D-DIPL-13]
 - DIPL-050 If a country has no free envoy seat, then the diplomacy context shall refuse to send another envoy. [diplomacy 2.1 "the hard limit"]
 - DIPL-051 When an envoy carries a mission its official type suits, the diplomacy context shall add the type's reason (+10; Steward and Tax collector make a gift count 25 % more instead; Master of works adds nothing). [diplomacy 2.1; config `official_type_bonus`]
 - DIPL-052 When an envoy has served 10 years, the diplomacy context shall add +5 more to the envoy's reason. [diplomacy 2.1, 5.1]
@@ -461,13 +461,13 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 - DIPL-055 The diplomacy context shall move envoys on the army route graph at 2 days per crossing unit (three times march pace), using the naval sea-zone travel times for sea legs. [diplomacy 2.2]
 - DIPL-056 When an envoy is sent on a mission, the diplomacy context shall compute once its arrival (days there), one month at court, and its return (days back). [diplomacy 2.2, 15]
 - DIPL-057 If an envoy's land route crosses a country at war with the sender, or one that has denied the sender passage, then the diplomacy context shall route it by sea or not at all. [diplomacy 2.2]
-- DIPL-058 While both countries know T14 telegraphy, the diplomacy context shall decide a mission in the turn it is sent without the envoy leaving home, the answer still arriving next turn; marriages and residents (and, by config, courtesy visits) still travel. [diplomacy 2.2; config `instant_excludes`]
+- DIPL-058 While both countries know T14 telegraphy, the diplomacy context shall decide a mission in the turn it is sent without the envoy leaving home, the answer still arriving a month later; marriages and residents (and, by config, courtesy visits) still travel. [diplomacy 2.2; config `instant_excludes`]
 - DIPL-059 The diplomacy context shall give each envoy exactly one task: a mission (one action to one country, decided on arrival, then home) or a residence. [diplomacy 2.3]
 - DIPL-060 Where a country knows G8 Resident ambassadors, the diplomacy context shall allow it to make an envoy resident at one court until recalled, holding the seat meanwhile. [diplomacy 2.3]
 - DIPL-061 While an envoy is resident, the diplomacy context shall add the tie *Resident envoy* +5 each season up to +30, and when the residence ends let it fade over 5 years. [diplomacy 2.3, 3.2]
 - DIPL-062 While an envoy is resident, the diplomacy context shall show the sender that country's soldiers, its treasury to the nearest 100 gold and its lords' loyalty. [diplomacy 2.3]
 - DIPL-063 While an envoy is resident, the diplomacy context shall let it carry any mission to that court with no travel time. [diplomacy 2.3]
-- DIPL-064 While an envoy is resident, the diplomacy context shall warn the sender one turn ahead when that country is about to declare war on the sender or the sender's allies. [diplomacy 2.3]
+- DIPL-064 While an envoy is resident, the diplomacy context shall warn the sender a month ahead when that country is about to declare war on the sender or the sender's allies. [diplomacy 2.3]
 - DIPL-065 When a courtesy visit is made, the diplomacy context shall send the envoy, keep it at court one month, bring it back, and add the tie *Courtesy visit* +15 fading over 5 years. [diplomacy 2.3]
 - DIPL-066 When the country hosting an envoy and the sender go to war (either side declaring), the diplomacy context shall hold the envoy until the peace returns it. [diplomacy 2.4]
 - DIPL-067 When a demand is refused by a country Hostile to the asker, the diplomacy context shall hold the envoy with a chance of 1 in 10, and on that roll give the asker the war aim *Punish* against them. [diplomacy 2.4]
@@ -484,14 +484,14 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 - DIPL-075 The diplomacy context shall fade an entry by shrinking its weight in equal yearly steps to zero over its stated years. [diplomacy 3.2]
 - DIPL-076 If a ledger would hold more than 12 entries for a pair, then the diplomacy context shall merge the smallest entries into one entry "Old matters". [diplomacy 3.2]
 - DIPL-077 The diplomacy context shall show standing as a word: +100 or more Close, +30 to +99 Warm, −29 to +29 Cool, −30 to −99 Cold, −100 or less Bitter, with the ledger one tap away. [diplomacy 3.2]
-- DIPL-078 The diplomacy context shall count each Oath broken by the asker (last 30 years) as a reason of −10 in every count anyone makes that relies on the asker's word (alliances, pacts, sworn peace, pledges, marriages). [diplomacy 3.3, 5.1; config `relies_on_word`]
+- DIPL-078 The diplomacy context shall count each Oath broken by the asker (last 30 years) as a reason of −10 in every count of an action that relies on the asker's word: alliance, swear peace, marriage, trade pact, offer overlordship. [diplomacy 3.3, 5.1; config `relies_on_word`; D-DIPL-18]
 - DIPL-079 The diplomacy context shall use the asker's Lands taken (last 20 years) to drive leagues and as a reason in alliance counts made by the asker's neighbours. [diplomacy 3.3]
 - DIPL-080 The diplomacy context shall add to the country card's diplomacy line the counts "Envoys n of m abroad" and "Leagues against you". [diplomacy 4]
 
 ### 5.5 The reasons count
 
 - DIPL-081 When an envoy's request is decided, the diplomacy context shall have the asked country list its reasons, each with a number, and answer yes only when the total is over zero. [diplomacy 5]
-- DIPL-082 The diplomacy context shall show no prediction of an answer before asking, and shall deliver the answer as a letter (yes or no with the full reasons list and numbers) the turn after it is given. [diplomacy 5; decision 16 Oct; config `answers`]
+- DIPL-082 The diplomacy context shall show no prediction of an answer before asking, and shall deliver the answer as a letter (yes or no with the full reasons list and numbers) a month after it is given. [diplomacy 5; decision 16 Oct; config `answers`]
 - DIPL-083 The diplomacy context shall let the asker judge beforehand only from what it can see: the ledger, the stance, and the other side's soldiers (exact with a resident envoy, otherwise an estimate). [diplomacy 5]
 - DIPL-084 The diplomacy context shall put in every count: the action's negative base; standing ÷ 4; −10 per Oath broken if the action relies on the asker's word; the envoy's type and years-served reason; the asked country's personality (−30 to +30 by action); its ruler's traits (for example Pious +10 to anything asked by the same faith, Warlike −10 to sworn peace, Greedy +10 to anything with a gift); and a national strength where it says so. [diplomacy 5.1]
 - DIPL-085 The diplomacy context shall count strength as soldiers under arms, with allies who would come counted at half. [diplomacy 5.2]
@@ -500,9 +500,9 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 - DIPL-088 While the asked country is already at war, the diplomacy context shall add −30 to anything that adds a new commitment, unless it is against the same enemy. [diplomacy 5.2]
 - DIPL-089 The diplomacy context shall add *Too far to matter* −15 when the pair has no shared border and no shared neighbour, and *Very far* −15 more when an envoy needs more than 60 days. [diplomacy 5.3]
 - DIPL-090 The diplomacy context shall add *We share an enemy* +25 when both are at war with the same country. [diplomacy 5.3]
-- DIPL-091 The diplomacy context shall add *You threaten our frontier* −5 for each province in the asker's Lands taken that borders the asked country. [diplomacy 5.3]
+- DIPL-091 The diplomacy context shall add *You threaten our frontier* −5 for each province in the asker's Lands taken that borders the asked country, in every count the asked country makes. [diplomacy 5.3; D-DIPL-17]
 - DIPL-092 The diplomacy context shall add *We already have allies* −10 for each alliance of the asked country beyond two. [diplomacy 5.3]
-- DIPL-093 The diplomacy context shall let each action add at most two reasons of its own to the common reasons. [diplomacy 5.3]
+- DIPL-093 The diplomacy context shall let each action add at most two reasons of its own to the common reasons; *Offer overlordship* keeps the three of its table, and the strength rows of a demand are the common strength reasons. [diplomacy 5.3, 6.7]
 
 ### 5.6 Alliances and calls to arms
 
@@ -511,7 +511,7 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 - DIPL-096 If an ally refuses a defensive call, then the diplomacy context shall break the alliance, give the refuser an Oath broken, and give the caller's ledger the wrong *Abandoned us* toward it. [diplomacy 6.1]
 - DIPL-097 If an ally refuses an offensive call, then the diplomacy context shall break nothing and add no tie; the ally simply stays out. [diplomacy 6.1]
 - DIPL-098 When a call to arms is counted, the diplomacy context shall use base −20 (defensive) or −50 (offensive), plus *Our ally's war aim is our concern* +30 (target is our Rival or Hostile, or the aim frees our people or faith), *We are at war already* −30, and *The enemy is far stronger* −10 per full multiple of the ally's soldiers the enemy side has, up to −40. [diplomacy 6.1]
-- DIPL-099 When a call to arms is issued, the diplomacy context shall send it instantly and deliver the answer the next turn. [diplomacy 6, 7.2]
+- DIPL-099 When a call to arms is issued, the diplomacy context shall send it instantly and deliver the answer a month later. [diplomacy 6, 7.2]
 - DIPL-100 While an ally is in a war, the diplomacy context shall leave its armies under its own command, count its own peace voices, and name it in the peace so it gets the truce too. [diplomacy 6.1]
 - DIPL-101 When over half of an ally's own peace voices say peace, the diplomacy context shall allow it a separate peace with the enemy; this is not an Oath broken, but the ledger loses the tie *Answered our call*. [diplomacy 6.1; config `separate_peace_when_peace_voices_over`]
 - DIPL-102 When an ally joins a war when asked, the diplomacy context shall add the tie *Answered our call* +20; when two countries fight a war on the same side, the tie *Fought side by side* +15. [diplomacy 3.2]
@@ -533,13 +533,13 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 - DIPL-112 When a demand is counted, the diplomacy context shall add *We cannot beat you*, *We have strong friends* and, for a province with their capital or of their own culture, *It's our heartland* −30. [diplomacy 6.3]
 - DIPL-113 When a demand is given in to, the diplomacy context shall give the asker exactly what was demanded and the target the wrong *Threatened us*, with no war and no truce. [diplomacy 6.3]
 - DIPL-114 When a demand is refused, the diplomacy context shall give the asker the matching war aim against the target for 5 years and the target the wrong *Threatened us*. [diplomacy 6.3; config `demand.kinds`]
-- DIPL-115 While a war follows a refused demand, the diplomacy context shall count it as provoked by the target: the asker's lords who are not Warlike don't waver, the asker's allies' offensive calls get +20, and the target's allies' defensive calls lose the +20 bonus to come. [diplomacy 6.3]
+- DIPL-115 While a war follows a demand the target refused, the diplomacy context shall count it as provoked by the target: the asker's lords who are not Warlike don't waver, the asker's offensive calls get *They refused a fair demand* +20, and the target's allies and pledgers get no defensive call. [diplomacy 6.3; D-DIPL-5]
 
 ### 5.9 Passage
 
 - DIPL-116 The diplomacy context shall let a country's armies enter a foreign country only if they are at war, it is the country's subject or ally, or it has granted passage. [diplomacy 6.4]
 - DIPL-117 Where a country knows G8 Resident ambassadors, the diplomacy context shall let it ask for passage by envoy (no war between them, base −10, *You are marching on our friend* −40 when the army's likely target is Friendly or allied with them, *You are marching on our enemy* +20); before G8 a country at peace is closed to its armies unless an ally or subject. [diplomacy 6.4; decision 16 Oct]
-- DIPL-118 When passage is granted, the diplomacy context shall keep it for 2 years and let the granting side revoke it at any time without an Oath broken. [diplomacy 6.4]
+- DIPL-118 When passage is granted, the diplomacy context shall keep it for 2 years and let the granting side revoke it at any time without an Oath broken; a refused or revoked passage blocks the asker's envoys over that land for 2 years. [diplomacy 2.2, 6.4; D-DIPL-21]
 - DIPL-119 If an army enters a country without passage, then the diplomacy context shall treat it as an act of war: the owner may declare war with the aim *Punish* that turn, and the owner's allies' defensive calls count as answered to a war started by the intruder. [diplomacy 6.4]
 
 ### 5.10 Trade pacts and embargoes
@@ -573,11 +573,11 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 
 ### 5.15 Funding rebels
 
-- DIPL-134 When a country funds rebels, the diplomacy context shall require a free envoy seat, a province of a country that is not its ally or subject, and gold every month at 10, 25 or 50, and shall tell nobody unless caught. [diplomacy 6.11; decision 16 Oct]
-- DIPL-135 While a province is funded, the diplomacy context shall give it the grievance *Foreign agitators* (riots there need one grievance fewer), count its rebels as Armed, keep them from shrinking while left to wait, and at 50 gold a month count it as a sign for that country's revolution camp. [diplomacy 6.11]
+- DIPL-134 When a country funds rebels, the diplomacy context shall require a free envoy seat and a target that is not its ally or subject whose revolution card shows at least one sign, charge 1 % of the target's yearly income every month, and tell nobody unless caught, not even when the funding stops. [revolutions 7.1; X-10; D-DIPL-23, D-DIPL-30]
+- DIPL-135 While a country is funded, the diplomacy context shall set the flag `revolution_funded` on it for the revolutions context. [revolutions 7.1; X-10]
 - DIPL-136 Where the target country has an émigré pretender court (revolutions), the diplomacy context shall allow funding it the same way. [diplomacy 6.11]
-- DIPL-137 Each turn of funding, the diplomacy context shall roll a chance of being caught: 1 in 10, or 1 in 5 if a Judge runs the province, or 1 in 20 if a lord holds it. [diplomacy 6.11]
-- DIPL-138 When funding is caught, the diplomacy context shall hold the envoy and stop the funding, give the target the wrong *Stirred revolt in our land* −50 fading over 20 years and the war aim *Punish* for 5 years, and give every lord and royal province of the target that hears of it the grievance *Foreign meddling* for a year; the funder learns it the next turn. [diplomacy 6.11]
+- DIPL-137 Each month of funding, the diplomacy context shall roll a chance of being caught of 3 in 100. [X-10]
+- DIPL-138 When funding is caught, the diplomacy context shall hold the envoy and stop the funding, give the target the wrong *Stirred revolt in our land* −50 fading over 20 years and the war aim *Punish* for 5 years; the funder learns it a month later. [diplomacy 6.11; X-10]
 
 ### 5.16 War aims
 
@@ -585,7 +585,7 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 - DIPL-140 The diplomacy context shall give *Seat a pretender* while a pretender to the target's throne lives at the country's court, including an émigré court. [diplomacy 7.1]
 - DIPL-141 The diplomacy context shall give *Tribute* for 5 years when a bordering target refused a tribute demand, and while true when the country borders the target and has 3 times its soldiers. [diplomacy 7.1]
 - DIPL-142 The diplomacy context shall give *Free a people* while the target's land holds a homeland of a culture with no country of its own that is the country's culture or accepted by it. [diplomacy 7.1]
-- DIPL-143 The diplomacy context shall give *Break a subject* while the target has a subject that is Hostile toward it or asked the country for help. [diplomacy 7.1]
+- DIPL-143 The diplomacy context shall give *Break a subject* against the overlord while it has a subject that is Hostile toward it or asked the country for help. [diplomacy 7.1; D-DIPL-8]
 - DIPL-144 The diplomacy context shall give *Defend the faith* while a province bordering the country carries the persecution flag, or after the target refused a demand to tolerate it. [diplomacy 7.1]
 - DIPL-145 The diplomacy context shall give *Punish* for 5 years when the target broke an oath to the country, insulted it, held its envoy, entered its land without passage, refused an *Apologise and pay* demand, or was caught funding rebels in its land. [diplomacy 7.1]
 - DIPL-146 The diplomacy context shall always allow the aims *Raid* and *No aim*. [diplomacy 7.1]
@@ -595,14 +595,14 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 
 - DIPL-148 When a country declares war, the diplomacy context shall require a target and exactly one aim it holds, and the declaration screen shall show who will be called on each side and how many of the declarer's voices already lean to peace, but not how the called countries will answer. [diplomacy 7.2]
 - DIPL-149 If the declarer has an Alliance, Truce or Pledge with the target, then the diplomacy context shall require it to be broken first, each breaking counting as an Oath broken. [diplomacy 7.2]
-- DIPL-150 When war is declared, the diplomacy context shall send the same turn offensive calls to the declarer's allies and defensive calls to the target's allies and pledgers, bring in both sides' subjects by their kind, and bring in members of a league against the declarer; answers arrive the next turn. [diplomacy 7.2]
+- DIPL-150 When war is declared, the diplomacy context shall send the same turn offensive calls to the declarer's allies and defensive calls to the target's allies and pledgers, bring in both sides' subjects by their kind (a Union joins, a Vassal or Protectorate is called, a March joins when the enemy borders it, a Tributary or Colony stays out), and bring in members of a league against the declarer; answers arrive a month later. [diplomacy 7.2; X-8; D-DIPL-10]
 - DIPL-151 When war is declared, the diplomacy context shall show the aim to every country; for a war with no aim, every neighbour of the declarer gains the wrong *Threatened us*. [diplomacy 7.2]
-- DIPL-152 If a subject's kind has no own diplomacy, then the diplomacy context shall refuse its declaration of war; it can only join its overlord's wars or start an independence war. [diplomacy 7.3]
+- DIPL-152 If a subject is a Union, Colony or Protectorate, or a Vassal declaring on its overlord's ally, then the diplomacy context shall refuse its declaration of war. [diplomacy 7.3; X-8; D-DIPL-10]
 - DIPL-153 While a country has a regency (child ruler), the diplomacy context shall allow it only defensive wars and *Raid*. [diplomacy 7.3; config `war_aims.regency_allows`]
 
 ### 5.18 Peace and truces
 
-- DIPL-154 When a peace is signed, the diplomacy context shall start a truce of 5 years, plus 5 more if the peace moved provinces or made a subject; a white peace gives 5 years. [diplomacy 8; config `truce`]
+- DIPL-154 When a peace is signed, the diplomacy context shall start a truce of 5 years, plus 5 more if the peace moved provinces or made a subject; a white peace gives 5 years. [diplomacy 8; X-11]
 - DIPL-155 Where both sides agree, the diplomacy context shall allow `extend_truce` to lengthen a truce. [diplomacy 8]
 - DIPL-156 Where many-sided peace is unlocked and three or more countries are on each side, the diplomacy context shall let one envoy carry a single peace that every warring country signs at once, each one's peace voices deciding whether it signs; before that each pair makes its own peace. [diplomacy 8, 10]
 
@@ -614,15 +614,15 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 - DIPL-160 When X declares war on any league member, the diplomacy context shall call every member defensively; a member that refuses leaves the league with no Oath broken. [diplomacy 9]
 - DIPL-161 The diplomacy context shall give league members no protection against anyone but X and no other duty. [diplomacy 9]
 - DIPL-162 The diplomacy context shall show X the league, its members and their soldiers on its country card line. [diplomacy 9, 4]
-- DIPL-163 When X's Lands taken falls below half the threshold, or X makes a peace that gives provinces back to members, the diplomacy context shall dissolve the league. [diplomacy 9]
-- DIPL-164 When an event starts a league against a named country, the diplomacy context shall create it regardless of the threshold. [diplomacy 9, 11]
+- DIPL-163 When X's Lands taken falls below half the threshold, or X makes a peace that gives provinces back to members, the diplomacy context shall dissolve a league formed by the threshold; a league started by an event ends only by event or by such a peace. [diplomacy 9; D-DIPL-25]
+- DIPL-164 When an event starts a league against a named country, the diplomacy context shall create it regardless of the threshold and of the number of members. [diplomacy 9, 11; D-DIPL-25]
 
 ### 5.20 Eras
 
 - DIPL-165 While the era is I, the diplomacy context shall allow residents only to countries that know G8 (the Italian states start with it). [diplomacy 10]
 - DIPL-166 When era III begins, or earlier when the event `peace_of_westphalia` fires, the diplomacy context shall unlock many-sided peace. [diplomacy 10; config `eras.III`]
 - DIPL-167 While the era is IV or later, the diplomacy context shall weigh *Married houses* +10 per marriage. [diplomacy 10; config `eras.IV`]
-- DIPL-168 While the era is V or later, the diplomacy context shall add +10 to offensive calls between allies that share a mobilisation pact. [diplomacy 10]
+- DIPL-168 While the era is VI or later, the diplomacy context shall add +10 to offensive calls between allies that share a mobilisation pact. [diplomacy 10; D-DIPL-11]
 - DIPL-169 Where two allies have marked their alliance as a mobilisation pact (era VI or later), the diplomacy context shall answer a defensive call between them automatically with no reasons count and deliver it to the player as an event saying their country has joined the war. [diplomacy 10; decision 16 Oct]
 - DIPL-170 While the era is VII, the diplomacy context shall count gifts at half. [diplomacy 10; config `eras.VII`]
 - DIPL-171 Where a revolution says so, the diplomacy context shall add the revolution's reason row (for example *Different form of rule* −20 with monarchies in every count for a set time). [diplomacy 10]
@@ -631,18 +631,18 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 
 - DIPL-172 When an event applies an `opinion` effect, the diplomacy context shall add an event tie or wrong named after the event with the given weight, fading over 10 years unless the event says otherwise. [diplomacy 11]
 - DIPL-173 The diplomacy context shall expose `trust` read-only as 100 − 10 × Oaths broken, never below 0; an effect that lowers trust adds an Oath broken. [diplomacy 11]
-- DIPL-174 The diplomacy context shall expose `notoriety` read-only as 5 × Lands taken + the weight of Notorious deeds, capped at 100; an effect adding notoriety n adds the wrong *Notorious deed* −10 × n with every country that knows the actor (shares a border, a sea zone or a trade partner), fading over 30 years, and never adds Lands taken. [diplomacy 11]
+- DIPL-174 The diplomacy context shall expose `notoriety` read-only as 5 × Lands taken + the event notoriety still unfaded, capped at 100; an effect adding notoriety n adds the wrong *Notorious deed* −10 × n with every country that shares a border, a sea zone or a trade pact with the actor, fading over 30 years, and never adds Lands taken. [diplomacy 11; D-DIPL-26]
 - DIPL-175 When an event sets a `relation` of type alliance, truce, rivalry, war, trade_pact, embargo, guarantee or non_aggression, the diplomacy context shall apply the matching action (`form_alliance`, sworn peace, `set_rival`, `declare_war`, trade pact, embargo, pledge, sworn peace) with that action's `requires`; an event that needs allies to fight must break the alliance first. [diplomacy 11]
 - DIPL-176 When an event uses the new effects `war_aim`, `league` or `pretender`, the diplomacy context shall grant a war aim against a role for a set number of years, start a league against a role, or place a pretender to a role's throne at another role's court. [diplomacy 11]
 
 ### 5.22 AI
 
 - DIPL-177 The diplomacy context shall have the AI decide with exactly the counts of section 5, adding its posture's and negotiation level's reason rows (Posture rows and Negotiation level, section 4). [diplomacy 12, 12.1, 12.2]
-- DIPL-178 Each turn, the diplomacy context shall let an AI country with a free envoy seat score at most 5 candidate actions per free seat toward countries in its horizon (neighbours, neighbours' neighbours, anyone it holds a relation or fact with, the enemies of its rivals). [diplomacy 12.3, 15]
+- DIPL-178 Each month, the diplomacy context shall let an AI country with a free envoy seat score at most 5 candidate actions per free seat toward countries in its horizon (neighbours, neighbours' neighbours, anyone it holds a relation or fact with, the enemies of its rivals). [diplomacy 12.3, 15]
 - DIPL-179 When an AI chooses a request, the diplomacy context shall have it estimate the other side's count under the player's limits, send the best request whose estimate is over zero, and send a gift first when the best is a close no (−20 or better). [diplomacy 12.3]
 - DIPL-180 Before an AI declares war, the diplomacy context shall have it try a fitting demand first, unless its posture is Opportunist and the target's armies are away. [diplomacy 12.3]
 - DIPL-181 When an AI answers a player's request, the diplomacy context shall use exactly the section 5 count, and the player reads those reasons when the answer arrives. [diplomacy 12.3]
-- DIPL-182 Where an AI is Opportunist or Hegemon seeker and has a free seat and gold to spare, the diplomacy context shall have it fund rebels in a rival's provinces that already have two or more grievances. [diplomacy 12.3]
+- DIPL-182 Where an AI is Opportunist or Hegemon seeker and has a free seat and gold to spare, the diplomacy context shall have it fund the revolution of a Rival whose card shows at least one sign. [diplomacy 12.3; D-DIPL-23]
 
 ### 5.23 Screen and lens
 
@@ -652,12 +652,15 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 - DIPL-186 When an action button is tapped, the diplomacy screen shall open an envoy picker showing which official, the days on the road, and which province loses its official meanwhile. [diplomacy 13.2]
 - DIPL-187 Where the screen is in landscape, the country diplomacy card shall sit on the right of the map instead of covering it. [diplomacy 13.2]
 - DIPL-188 The envoys strip shall show each seat as free, on the road (destination and days) or resident (court). [diplomacy 13.2]
-- DIPL-189 The war declaration sheet shall show the target, the aim and its source, each side's countries and soldiers with who is called and that answers arrive next turn, the declarer's peace voices leaning to peace, and the choices *Send a demand first* and *Declare*. [diplomacy 13.3]
+- DIPL-189 The war declaration sheet shall show the target, the aim and its source, each side's countries and soldiers with who is called and which subjects join or stay out by their kind, that answers arrive a month later, the declarer's peace voices leaning to peace, and the choices *Send a demand first* and *Declare*. [diplomacy 13.3; D-DIPL-33]
 
 ### 5.24 Cost and configuration
 
 - DIPL-190 The diplomacy context shall keep ledgers only for pairs that have dealt with each other, recompute fades once a year, run league checks once a year only for countries over the threshold, and compute an envoy's arrival once when sent. [diplomacy 15]
 - DIPL-191 The diplomacy context shall read every number from one config file (`diplomacy-rules.json`, all placeholders), and changing one shall never touch `country-relations/data/relations-1444.json`. [diplomacy 16; relation-types intro]
+- DIPL-192 The diplomacy context shall keep standing within −200 and +200. [D-DIPL-19]
+- DIPL-193 The diplomacy context shall let a country lift its embargo, stop its rebel funding, and mark or unmark a mobilisation pact (era VI, either ally) at once and at no cost; withdrawing a pledge shall give an Oath broken; a Rival may be dropped once it has stood 10 years; a resident may be recalled at any time, an envoy on a mission may not. [D-DIPL-22]
+- DIPL-194 When a funded revolution wins, the diplomacy context shall give the new regime the tie *Backed our revolution* +25 toward each funder, unless the regime is hostile to the funder's form of rule. [revolutions 7.1; X-10]
 
 ## 6. Commands
 
@@ -668,7 +671,7 @@ All commands are data, the same for player and AI.
 | SendEnvoy(action, target, official) | player / AI | free seat; action's needs; route exists (by sea if needed) | envoy on the road, dates fixed | EnvoySent |
 | RecallEnvoy(envoy) | player / AI | envoy resident | envoy comes home | EnvoyRecalled |
 | ProposeAlliance(target) | player / AI | via SendEnvoy; DIPL-094 | count on arrival | AnswerGiven, AnswerDelivered, AllianceFormed |
-| CallToArms(ally, war, kind) | player / AI / system | Alliance, Pledge or League | answer next turn | CallToArmsIssued, CallToArmsAnswered, AllianceBroken, OathBroken |
+| CallToArms(ally, war, kind) | player / AI / system | Alliance, Pledge or League | answer a month later | CallToArmsIssued, CallToArmsAnswered, AllianceBroken, OathBroken |
 | BreakAlliance(target) | player / AI | Alliance | ended | AllianceBroken, OathBroken, LedgerEntryAdded |
 | MarkMobilisationPact(ally) | player / AI | Alliance; era VI | pact marked | MobilisationPactMarked |
 | ArrangeMarriage(target, persons) | player / AI | DIPL-104 | count | MarriageArranged |
@@ -701,7 +704,7 @@ All commands are data, the same for player and AI.
 | EnvoySent | an envoy leaves | country, envoy, official, province left without official, target, action, arrival, return | province (official away), map-presentation |
 | EnvoyArrived | arrival date | envoy, court | diplomacy |
 | AnswerGiven | a count is made | asker, asked, action, reasons, total, yes/no | diplomacy (delivery) |
-| AnswerDelivered | the turn after AnswerGiven | the letter | game-shell, events (AI) |
+| AnswerDelivered | a month after AnswerGiven | the letter | game-shell, events (AI) |
 | EnvoyHeld / EnvoyReturned / EnvoyLost | 2.4 cases | envoy, reason | province, realm |
 | RelationChanged | any relation action | pair, old, new, origin | all readers of relations (warfare, troop-movement, trade, subjects, map-presentation, events) |
 | AllianceFormed / AllianceBroken | 6.1 | pair | warfare, map-presentation |
@@ -720,7 +723,7 @@ All commands are data, the same for player and AI.
 | TruceCreated / TruceExtended / TruceBroken / TruceExpired | 6.6, 8 | pair, expiry | warfare |
 | SubjectByAgreementAgreed | 6.7 | overlord, subject | subjects |
 | LordCourted / LordDefected / CourtingDiscovered | 6.8 | lord, courting country | realm, rebellions |
-| RebelFundingStarted / RebelFundingCaught | 6.11 | funder, province, gold | rebellions, revolutions |
+| RebelFundingCaught | 6.11 | funder, target | revolutions |
 | WarDeclared | 7.2 | declarer, target, aim, callers | warfare |
 | LeagueFormed / LeagueMemberLeft / LeagueDissolved | 9 | X, members | warfare, map-presentation |
 | MobilisationTriggered | 10 era VI | pact partners, war | events (shown as an event), warfare |
@@ -747,19 +750,19 @@ All commands are data, the same for player and AI.
 - When **troop-movement** reports an army in a country without passage, then DIPL-119 applies.
 - When **time-and-turns** reaches the start of an era, then the era rows apply (DIPL-165 … DIPL-170).
 
-## 9. Monthly turn
+## 9. Monthly steps
 
 Reads first: relations, soldiers under arms (realm/recruiting), lords' loyalty (realm), date and era
 (time-and-turns), known inventions (research), borders and routes (world-map).
-1. Deliver answer letters given last turn (DIPL-082), including call-to-arms answers and caught funding.
+1. Deliver answer letters given last month (DIPL-082), including call-to-arms answers and caught funding.
 2. Envoys whose arrival date falls in this month arrive; their asks are counted (or decided at once with T14);
-   answers are stored for next turn.
+   answers are stored for next month.
 3. Charge monthly rebel funding and roll the caught chance (DIPL-137).
 4. At each season end: resident tie +5 (DIPL-061), courting effects and discovery rolls (DIPL-128, DIPL-130).
 5. Expire truces, passages and timed war aims; return envoys whose return date has come.
 6. AI diplomacy: candidates and sends (DIPL-178 … DIPL-182).
 7. Once a year: fade ledgers (DIPL-075), league checks (DIPL-157), relation decays (DIPL-040 … DIPL-042).
-The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-31).
+The steps run after subjects and government in the global order (X-2, D-DIPL-31).
 
 ## 10. Configuration
 
@@ -777,7 +780,7 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 | `envoys.official_type_bonus.*` | Type reasons | +10; gift ×1.25 | yes | diplomacy-rules.json |
 | `envoys.years_served_bonus` | Years served | 10 years → +5 | yes | diplomacy-rules.json |
 | `envoys.resident_years_bonus` | Resident years | 5 years → +5 | yes | diplomacy-rules.json |
-| `envoys.resident.*` | Resident rules | G8; soldiers, treasury to 100, lord loyalty; warning 1 turn | yes | diplomacy-rules.json |
+| `envoys.resident.*` | Resident rules | G8; soldiers, treasury to 100, lord loyalty; warning 1 month | yes | diplomacy-rules.json |
 | `envoys.held.refused_demand_by_hostile_chance` | Envoy held | 0.1 | yes | diplomacy-rules.json |
 | `ledger.max_entries_per_pair` | Ledger cap | 12 | yes | diplomacy-rules.json |
 | `ledger.stance_lines` | Stance weights | +50, +30, 0, −30, −75, −100, −10 | yes | diplomacy-rules.json (and relation-rules `modifiers`) |
@@ -801,22 +804,25 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 | `actions.offer_overlordship.*` | | −80; +20; +20; −10 | yes | diplomacy-rules.json |
 | `actions.ask_protection.base` | | −10 | yes | diplomacy-rules.json |
 | `actions.court_lord.*` | | 1 step a season; 12 months; border; 0.25 | yes | diplomacy-rules.json |
-| `actions.fund_rebels.*` | | 10/25/50; 50; 0.1/0.2/0.05; 5 years; 12 months | yes | diplomacy-rules.json |
+| `actions.fund_rebels.*` | | 1 % of the target's yearly income; 1 sign; 0.03; 5 years (X-10) | yes | diplomacy-rules.json |
+| `ledger.standing_limit` | | 200 (D-DIPL-19) | yes | diplomacy-rules.json |
+| `envoys.passage_denied_blocks_months` | | 24 (D-DIPL-21) | yes | diplomacy-rules.json |
+| `eras.VI.pact_offensive_call_bonus` | | 10 (D-DIPL-11) | yes | diplomacy-rules.json |
 | `war_aims.*` | | 50 years; 5 years; 5 years; ×3; regency defensive + raid | yes | diplomacy-rules.json |
 | `truce.*` | Truce after peace | 60 + 60 months; white 60 | yes | diplomacy-rules.json |
 | `leagues.*` | Leagues | yearly; 8/8/8/6/6/4/4; −30; ÷−4; +10; +3; ±10; +5; −10; 2; 0.5 | yes | diplomacy-rules.json |
 | `eras.*` | Era rows | section 4 | yes | diplomacy-rules.json |
 | `ai.*` | AI | horizon; 5; −20; postures; negotiation | yes | diplomacy-rules.json |
 | `event_tree_mapping.*` | Events | section 5.21 | yes | diplomacy-rules.json |
-| `answers.delay_turns` / `preview_before_sending` | Answers | 1; false | decided | diplomacy-rules.json |
+| `answers.delay_months` / `preview_before_sending` | Answers | 1; false | decided | diplomacy-rules.json |
 | `default_stance`, `implied_stance` | Stance defaults | neutral; war → hostile, alliance → friendly | game rule | relation-rules.json |
 | `types.friendly.duration.decay_months` | | 240 | yes | relation-rules.json |
 | `types.rival.duration.min_months_before_change` | | 120 | yes | relation-rules.json |
 | `types.hostile.duration.decay_months` | | 120 → rival | yes | relation-rules.json |
 | `types.at_war.duration.war_exhaustion_peace_months` | | 60 | yes | relation-rules.json |
-| `types.truce.duration.default_months` | | 60 (see OQ-DIPL-4) | yes | relation-rules.json |
+| `types.truce.duration.default_months` | | 60 (X-11, D-DIPL-3) | yes | relation-rules.json |
 | `modifiers.hostile.border_raid_chance_per_month` | | 0.02 | yes | relation-rules.json |
-| `modifiers.*` other keys | AI weights, trade access, fact weights | see OQ-DIPL-6 | yes | relation-rules.json |
+| `modifiers.*` other keys | AI weights, trade access, fact weights | retired except the stance weights (D-DIPL-6) | yes | relation-rules.json |
 | `compatibility`, `precedence`, `actions` | Matrix, order, actions | section 4 | rule | relation-rules.json |
 | `subject_kinds`, `autonomy_levels` | Eight kinds, five levels | section 4 | rule | relation-rules.json |
 
@@ -824,150 +830,78 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 
 | Other context | Direction | Pattern | What crosses |
 |---|---|---|---|
-| realm | upstream | Customer–Supplier | Officials' types and years, ruler, heirs, traits, marriages, lords and their loyalty / Wants, soldiers under arms, Oaths broken and Lands taken stats; diplomacy reports OathBroken, LordDefected, CrownInherited, envoys card line |
-| province | downstream | Customer–Supplier | Province loses its official while the envoy is away; which official type runs a province (funding catch chance) |
+| realm | upstream | Customer–Supplier | Province count (seats follow at once, D-DIPL-13), yearly income (funding cost), officials' types and years, ruler, heirs, traits, marriages, lords and their loyalty / Wants, soldiers under arms, Oaths broken and Lands taken stats; diplomacy reports OathBroken, LordDefected, CrownInherited, envoys card line |
+| province | downstream | Customer–Supplier | Province loses its official while the envoy is away (it runs as if it had none, D-DIPL-12) |
 | research | upstream | Conformist | G5, G8, T14 known |
 | warfare | downstream | Partnership | War aims (diplomacy says how held, warfare what winning means), calls to arms, declarations, peace voices, peace terms, truce length, held envoys, separate peace |
-| subjects | downstream | Customer–Supplier | Subject relation records and kinds (diplomacy stores), subjects by agreement, inherited unions, joins_overlord_wars, own diplomacy, *Break a subject* aim |
+| subjects | downstream | Customer–Supplier | Subject relation records (diplomacy stores; kinds mapped onto the six kinds by subjects, X-8); diplomacy uses the subjects kind rules for joining wars and own diplomacy (D-DIPL-10); calls to Vassals and Protectorates are answered by subjects by loyalty; subjects by agreement (count here, kind there, D-DIPL-32); *Break a subject* against the overlord (D-DIPL-8) |
 | troop-movement | downstream | Published Language | Passage yes/no per pair, ends the day revoked; route graph and crossing units for envoys |
-| naval | upstream | Conformist | Sea-zone travel times for envoys |
+| naval | upstream | Conformist | Sea-zone travel times for envoys; the sea zones a realm touches (notoriety knowers, D-DIPL-26) |
 | world-map | upstream | Conformist | Borders, neighbours, route graph |
 | trade | downstream | Published Language | Trade pact (no tolls), embargo (closed paths), war stops trade |
-| rebellions | downstream | Customer–Supplier | *Foreign agitators*, *Foreign meddling* grievances, Armed rebels, no shrinking; country fallen to rebels |
-| revolutions | downstream | Partnership | Funding at 50 gold as a revolution sign, émigré pretenders, *Different form of rule* reason row |
+| rebellions | downstream | Customer–Supplier | Country fallen to rebels (residents go home); no funding grievances (D-DIPL-23) |
+| revolutions | upstream / downstream | Partnership | Signs lit on the revolution card (funding needs one); diplomacy sets `revolution_funded`; a won revolution gives *Backed our revolution*; émigré pretenders; *Different form of rule* reason row (X-10, D-DIPL-23) |
 | religion | upstream | Conformist | Same faith, hostile faiths, tolerance for marriage, persecution flag |
 | culture | upstream | Conformist | Same culture group, homelands, accepted cultures |
-| government | upstream | Customer–Supplier | Cap on officials (envoys count), regency |
+| government | upstream | Customer–Supplier | Regency; envoys are officials already counted in the cap (D-DIPL-24) |
 | national-strengths | upstream | Open Host Service | Extra reason rows, extra seat, unique war aims |
 | events | upstream | Published Language | `opinion`, `trust`, `notoriety`, `relation`, new effects `war_aim`, `league`, `pretender`; mobilisation event |
 | scenario-setup | upstream | Published Language | relations-1444 dataset, catalogue ids, AI personalities, Italian states with G8 |
-| time-and-turns | upstream | Conformist | Month turn, seasons, years, eras, turn order |
+| time-and-turns | upstream | Conformist | Week turn, months, seasons, years, eras, turn order (X-2: after subjects and government, D-DIPL-31) |
 | map-presentation | downstream | Published Language | Diplomacy lens colours, envoy riders, war-aim icon |
 | game-shell | downstream | Published Language | Country diplomacy card, envoy picker, envoys strip, war declaration sheet, answer letters |
 
 ## 12. AI
 
 - Uses exactly the section 5 counts; posture and negotiation level add reason rows (DIPL-177).
-- Each turn with a free seat: up to 5 candidates per free seat within its horizon; estimates under the
+- Each month with a free seat: up to 5 candidates per free seat within its horizon; estimates under the
   player's limits; sends the best over-zero request; sends a gift first when the best is −20 or better
   (DIPL-178, DIPL-179).
 - Tries a demand before war unless Opportunist and the target's armies are away (DIPL-180).
 - Answers the player with the same count (DIPL-181).
-- Opportunists and hegemon seekers fund rebels in a rival's provinces with two or more grievances (DIPL-182).
+- Opportunists and hegemon seekers fund the revolution of a Rival whose card shows at least one sign (DIPL-182, D-DIPL-23).
 - Postures: Bandwagoners seek the strongest neighbour and ask for protection; Opportunists court lords and
   join the stronger side; Isolationists avoid alliances and calls, favour sworn peace and trade pacts;
   Balancers join leagues against the strong; Client seekers seek a protector; Hegemon seekers make demands and
   offer pledges and overlordship to small neighbours (section 4 Posture rows).
-- Relation-level AI hints in relation-rules (`ai` weights, AI forced peace after 60 months) are read through
-  OQ-DIPL-6.
+- Relation-level AI weights in relation-rules are retired (D-DIPL-34); only the forced peace after 60 months stays.
 
-## 13. Open questions and contradictions
+## 13. Decisions and open questions
 
-- OQ-DIPL-1: How many actions? The design says "Fifteen actions" (intro and section 6), the README says
-  "fourteen actions"; the section 6 table has fifteen rows that name twenty actions. Which list is canonical for
-  the command set? Blocks the command catalogue.
-- OQ-DIPL-2: A refused **offensive** call no longer breaks an alliance (diplomacy 6.1, latest), but
-  warfare-design 10.2 still says "An ally who refuses breaks the alliance" and does not list pledges and leagues
-  as defensive callers. The proposed change (diplomacy 18) is not adopted. Blocks warfare/diplomacy call rules.
-- OQ-DIPL-3: Truce length. Diplomacy 8 (latest): 5 years +5 if land moved or a subject made, white peace 5;
-  warfare 10.4 still says 10 years; relation-rules `types.truce.duration.default_months` is 60 and the reference
-  engine uses it for every peace. Diplomacy asks both to read its value; not adopted.
-- OQ-DIPL-4: The engine's `insult(a, b)` sets the **insulter's** stance toward the target to Hostile; diplomacy
-  6.10 says "**Their** stance becomes Hostile" (the insulted side's). Which perspective changes?
-- OQ-DIPL-5: The refused-demand rule says the target's allies' defensive call "loses the +20 bonus to come",
-  but no +20 bonus for defensive calls is defined anywhere (the call reasons are −20 base, +30, −30, −10/multiple).
-  What is removed?
-- OQ-DIPL-6: relation-rules `modifiers` carries numbers that the reasons count replaced or that use another
-  game's words: `accept_call_to_arms` 0.75, `accept_alliance` weights, `trade_access` bonuses, the rival war
-  reward key, the truce-breaking cost keys (a cost "with everyone" of −25 and a realm-wide cost), the subject
-  restlessness keys, the facts' `casus_belli` keys (`claim_throne`, `reconquest`), `shared_ruler` +40,
-  `religious_authority` +10. Diplomacy 3.2 adopts only the stance weights. Which of these survive, and under
-  which project words? (Subjects 12 also asks to rename the subject keys.)
-- OQ-DIPL-7: The proposed relation-rules additions (fact `protection_pledge`; actions `swear_peace`,
-  `grant_passage`, `revoke_passage`, `embargo`, `demand`, `court_lord`) are not in relation-rules.json. Until
-  adopted, the engine cannot run DIPL-117, DIPL-121, DIPL-122, DIPL-124.
-- OQ-DIPL-8: War aim acquisition differs from warfare 10.1, which was not updated: *Punish* there needs only a
-  broken oath; *Tribute* only a border (diplomacy: refused demand or 3× soldiers); *Free a people* "homeland
-  held by another tongue" (diplomacy: a culture with no country, yours or accepted); *Break a subject* "they are
-  a subject of someone" with the **subject** as target, while diplomacy 7.1 makes the **overlord** the target
-  (and subjects 8.4 says the war is declared "on your subject"). Who is the target of *Break a subject*?
-- OQ-DIPL-9: War with no aim: warfare 10.1 says it counts Lands taken for every province, lords waver and
-  allies need not join; diplomacy 7.2 adds *Threatened us* for every neighbour. Are both applied?
-- OQ-DIPL-10: Subjects joining wars. Diplomacy 7.2 brings subjects in by relation-rules `joins_overlord_wars`
-  (vassal defensive, frontier_commandery never, personal_union always), but the subjects context replaces the
-  eight kinds with six and its own rules (Vassal comes when called by loyalty; March only on its own frontier;
-  Union always if Loyal or Wavering; Protectorate when called). Which rule applies? Also 7.3 "no own diplomacy"
-  uses `can_conduct_own_diplomacy`, which the six kinds express differently (Vassal "yes, limited").
-- OQ-DIPL-11: Mobilisation pact in era V: the era V row gives offensive calls +10 "if allies share a
-  Mobilisation pact (VI)", but pacts exist only from era VI; config has no key for the +10.
-- OQ-DIPL-12: Envoy's empty province: diplomacy 2.1 runs it "as if it had no official"; country-stats 9 says
-  "his province pays half until he returns". Country-stats 9 also keeps the stat name "Envoys" (diplomacy asks
-  for "Envoy seats") and its section 10 lists `diplomatic_influence` "extra officials at court, ready to go
-  abroad as envoys", a source of envoys diplomacy does not mention.
-- OQ-DIPL-13: Seats boundary: a seat is gained at "more than 10 provinces" and lost "below 10". Does a realm of
-  exactly 10 keep it? What happens to envoys abroad when seats fall below envoys abroad?
-- OQ-DIPL-14: Hungary's seats in the worked example: "2 envoy seats (more than 10 provinces)". G5 Royal chancery
-  starts known by "many monarchies" (research tree); if Hungary knows G5 it has 3.
-- OQ-DIPL-15: Rounding. Standing ÷ 4 and the league's standing ÷ 4 give fractions; the Venice example turns
-  +10 ÷ 4 into +2 and +30 ÷ 4 into "+5 more" (+7), i.e. rounding down. Confirm rounding toward zero, and how
-  negative values round.
-- OQ-DIPL-16: Strength multiples: is a ratio between 1 and 2 one full multiple (Venice example: −10)? At equal
-  strength do *You are stronger* and *We are stronger* both apply? What counts as "allies who would come"?
-- OQ-DIPL-17: Scope of *You threaten our frontier* (5.3, in every count) versus 3.3 ("a reason in alliance
-  counts made by your neighbours").
-- OQ-DIPL-18: Which actions "rely on your word"? 3.3 lists alliances, pacts, sworn peace, pledges, marriages;
-  config `relies_on_word` lists propose_alliance, swear_peace, pledge_protection, arrange_marriage, trade_pact,
-  offer_overlordship. Pledge protection is instant with no count, so its entry has no effect. Is a call to arms
-  or ask for protection included?
-- OQ-DIPL-19: Ledger details: is standing clamped to −200..+200? Do the state line (Alliance +50) and the
-  implied Friendly stance (+30) both count? "The smallest entries" merged into Old matters: smallest by absolute
-  weight? How does Old matters fade? Does era IV's *Married houses* +10 keep the +30 cap?
-- OQ-DIPL-20: Telegraph exceptions: the design keeps marriages and residents travelling; config also excludes
-  courtesy visits. Which is right?
-- OQ-DIPL-21: "A country that has denied you passage" blocks envoys (2.2). Does a refused passage request count
-  as denial, a revoked passage, or a country that never granted one? For how long?
-- OQ-DIPL-22: Missing commands: lifting an embargo, withdrawing a pledge, stopping rebel funding, dropping a
-  rival from the diplomacy side, recalling an envoy on a mission, marking / unmarking a mobilisation pact (era VI
-  says "may mark", not how). Are they allowed and at what cost?
-- OQ-DIPL-23: Rebel funding differs from revolutions 7.1 (decided 16 Oct, same day): caught chance 3 % there
-  versus 1 in 10 here; the wrong is "Funded a revolution against us" there versus *Stirred revolt in our land*;
-  revolutions only allows funding a revolution whose card is at least brewing and visible where you have a
-  diplomat, and gives +25 opinion of the funder if it wins. One rule or two actions?
-- OQ-DIPL-24: Proposed edits not adopted elsewhere: rebellions-design has no *Foreign agitators* or *Foreign
-  meddling* grievance (only "foreign gold"); research-tree G8 does not say it unlocks passage; event-tree
-  `vocabulary.yaml` lacks `war_aim`, `league`, `pretender` and does not mark `trust` / `notoriety` derived;
-  government does not say envoys count toward the officials cap; troop-movement's passage question is its open
-  question 2 (diplomacy 18 says 3).
-- OQ-DIPL-25: Leagues started by an event: do they dissolve by the same rule (Lands taken below half the
-  threshold), and need they have two members?
-- OQ-DIPL-26: `notoriety` = 5 × Lands taken + "the weight of Notorious deeds": Notorious deeds are negative
-  ledger entries held by many countries. Whose ledger, and is the weight taken as a positive number?
-- OQ-DIPL-27: The relations README and relation types still say a Rival gives "extra prestige for wars" and that
-  breaking a truce "costs stability"; neither stat exists in the project. Remove, or map to "wars against a rival
-  please your lords" (country stats 9) and Oaths broken?
-- OQ-DIPL-28: The 1444 dataset disagrees with the catalogue in nine pairs (Soest, Herzegovina, Athens,
-  Wallachia, Theodoro, Burgundy, Castile–Portugal, Portugal → Castile, Castile–Navarre); eleven records are
-  uncertain; the Tuareg of Timbuktu have no id; `triple_alliance` may need collapsing; 80 seed-only ids; three-
-  letter game tags need a mapping; about 50 catalogue hierarchy edges are not mirrored. The catalogue and
-  scenario-setup owners must decide. Blocks a final 1444 relation set.
-- OQ-DIPL-29: Envoy speed rests on the planning thread's march pace (6 days per crossing unit), which the gap
-  list still marks open.
-- OQ-DIPL-30: Fund rebels "Needs an envoy seat" but the target's caught chance depends on who runs the province;
-  is the funded province's owner told anything when the funding stops without being caught?
-- OQ-DIPL-31: Order of the diplomacy steps inside the month (answers before or after warfare's peace, AI
-  before or after the player's orders) belongs to time-and-turns and is not set.
-- OQ-DIPL-32: Subjects 12 expects envoys to carry *Tighten*, *Fold in*, *Station a resident* and *Offer
-  protection*, and the *Courted* reason to be "a foreign envoy mission" working on a subject. Diplomacy's action
-  list has no Tighten or Fold in mission, and *Court a lord* targets lords, not subject realms. Subjects 9 names
-  the ask "Offer protection" with a fixed acceptance rule (a small threatened country accepts) while diplomacy
-  6.7 has *Offer overlordship* (−80) and *Ask for protection* (−10) decided by a count. Which wins?
-- OQ-DIPL-33: The war declaration sheet (13.3) shows "Serbia (subject, joins)" on the Ottoman side, but Serbia is a
-  tributary in the 1444 data, and tributaries never join their overlord's wars (relation-rules `subject_kinds`,
-  subjects 2.1). Is the sheet example wrong, or do tributaries join defensive wars?
-- OQ-DIPL-34: The relation-rules Alliance description says allies "accept calls to arms" and Friendly "ranks the
-  country as an alliance candidate" through AI weights (`ai.call_to_arms_weight`, `alliance_candidate_weight`,
-  `war_target_weight`, `ally_against_weight`, `border_fort_weight`, `break_truce_weight`), while diplomacy 12 says
-  the AI uses exactly the reasons count. Are these weights still used (for war-target choice), or retired?
+- **D-DIPL-1** (was OQ-DIPL-1) Action count: the section 6 table is canonical; its rows name the command set and "fifteen" or "fourteen" is only a count in prose. One list is simpler than reconciling two numbers.
+- **D-DIPL-2** (was OQ-DIPL-2) Refusing an offensive call: breaks nothing and adds no tie or wrong; only a refused defensive call breaks the alliance (Oath broken, *Abandoned us* −30). Diplomacy 6.1 is the latest text.
+- **D-DIPL-3** (was OQ-DIPL-3) Truce length: 5 years (60 months), +5 years if land changed hands or a subject was made; a white peace gives 5 years. X-11 decides it.
+- **D-DIPL-4** (was OQ-DIPL-4) Insult: the insulted side's stance toward the insulter becomes Hostile, and any Friendly stance between them ends. Diplomacy 6.10 says "their" stance, and the insulted side is the one with the grievance.
+- **D-DIPL-5** (was OQ-DIPL-5) Provoked war: when A declares war on B after B refused A's demand, B's allies and pledgers get no defensive call, A's offensive calls get "They refused a fair demand" +20, and A's lords who are not Warlike don't waver. There is no defensive +20 to remove, so the rule becomes "no defensive call".
+- **D-DIPL-6** (was OQ-DIPL-6) Old relation-rules modifiers: only the stance weights survive; the call, alliance and trade weights, the rival reward, the truce-breaking costs, the subject restlessness keys, the old casus belli keys, `shared_ruler` and `religious_authority` are retired. The reasons count replaced them.
+- **D-DIPL-7** (was OQ-DIPL-7) Relation-rules additions: the fact `protection_pledge` and the actions swear peace, grant passage, revoke passage, embargo, demand and court a lord are adopted in the diplomacy data. The engine already runs them.
+- **D-DIPL-8** (was OQ-DIPL-8) Break a subject: the target is the overlord; the aim is held while one of its subjects is Hostile toward it or asked you for help. Diplomacy 7.1 is the latest text, and the subject is freed by beating its master.
+- **D-DIPL-9** (was OQ-DIPL-9) War with no aim: both rules apply. Every province taken counts toward Lands taken, lords waver, allies need not join, and every neighbour gains *Threatened us*. The two rules don't conflict.
+- **D-DIPL-10** (was OQ-DIPL-10) Subjects in wars: the six subject kinds decide. A Union joins at once. A Vassal or Protectorate is called and answers by loyalty. A March joins when the enemy borders it. A Tributary never joins and a Colony only defends itself. Union, Colony and Protectorate cannot declare war, and a Vassal cannot declare war on its overlord's allies. X-8 decides it.
+- **D-DIPL-11** (was OQ-DIPL-11) Pact bonus: +10 to offensive calls between mobilisation pact partners (`eras.VI.pact_offensive_call_bonus`, provisional), from era VI only. Pacts exist only from era VI.
+- **D-DIPL-12** (was OQ-DIPL-12) Envoy's empty province: diplomacy 2.1 governs. The province runs as if it had no official, the stat is "Envoy seats", and court officials are not a separate source of envoys. One rule is simpler.
+- **D-DIPL-13** (was OQ-DIPL-13) Seat boundary: the size seat is held while the realm has more than 10 provinces (10 is not enough). When seats fall below envoys abroad, missions finish and residents beyond the seats are recalled, newest first. One threshold both ways.
+- **D-DIPL-14** (was OQ-DIPL-14) Hungary's seats: the example stands; Hungary does not know G5 in 1444 and has 2 seats. The worked example is the design's own data.
+- **D-DIPL-15** (was OQ-DIPL-15) Rounding: divisions round toward zero (+10 ÷ 4 = +2, −10 ÷ 4 = −2). It matches the worked example.
+- **D-DIPL-16** (was OQ-DIPL-16) Strength multiples: whole multiples (floor of the ratio), so between 1 and 2 times is one multiple. At equal strength neither reason applies. Allies count at half their soldiers. It matches the Venice example.
+- **D-DIPL-17** (was OQ-DIPL-17) *You threaten our frontier*: −5 per province you took that borders the asked country, in every count it makes. Section 5.3 is the fuller rule.
+- **D-DIPL-18** (was OQ-DIPL-18) Actions that rely on your word: alliance, swear peace, marriage, trade pact and offer overlordship. Pledge protection is dropped (it has no count), and calls and asks for protection are not included. The config list minus the dead entry.
+- **D-DIPL-19** (was OQ-DIPL-19) Ledger details: standing is clamped to −200…+200 (`ledger.standing_limit`, provisional); the state line replaces the implied stance; "smallest" means smallest by size; Old matters does not fade; *Married houses* keeps its +30 cap in era IV. It is the simplest reading.
+- **D-DIPL-20** (was OQ-DIPL-20) Telegraph: only marriages and residents still travel, so courtesy visits become instant. The design text wins over the config.
+- **D-DIPL-21** (was OQ-DIPL-21) Denied passage: a refused or a revoked passage blocks the asker's envoys over that land for 2 years (`envoys.passage_denied_blocks_months` 24, provisional); never having granted passage is not a denial. A clear trigger and an end.
+- **D-DIPL-22** (was OQ-DIPL-22) Missing commands: lifting an embargo, stopping rebel funding and marking or unmarking a mobilisation pact (era VI, either ally) are free and instant. Withdrawing a pledge is an Oath broken. A Rival may be dropped after 10 years. A resident may be recalled at any time, but an envoy on a mission cannot. These reuse rules that already exist.
+- **D-DIPL-23** (was OQ-DIPL-23) Rebel funding: one action, *Fund rebels*, on a target whose revolution card shows at least one sign. It costs 1 % of the target's yearly income a month (provisional) and sets `revolution_funded`. It is caught at 3 % a month (provisional): the envoy is held, *Stirred revolt in our land* −50 fading over 20 years, and the target holds Punish for 5 years. If the revolution wins, the new regime holds *Backed our revolution* +25. The province-level grievances are dropped. X-10 decides it.
+- **D-DIPL-24** (was OQ-DIPL-24) Edits to other designs: no *Foreign agitators* or *Foreign meddling* grievance (D-DIPL-23); G8 unlocks passage (research data already says so); vocabulary keys `war_aim`, `league`, `pretender` and the derived `trust`/`notoriety` are this context's to define; envoys don't count toward the officials cap (an envoy is an official already counted). Each one only states what this context already does.
+- **D-DIPL-25** (was OQ-DIPL-25) Event leagues: no minimum membership and no Lands-taken dissolution; they end only by event or by a peace that gives provinces back to a member. An event league was not made by the threshold.
+- **D-DIPL-26** (was OQ-DIPL-26) Notoriety: min(100, 5 × Lands taken + the event notoriety still unfaded, each point fading over 30 years). The countries that know of it are those sharing a border, a sea zone or a trade pact with the actor. The actor's own deeds count as positive numbers.
+- **D-DIPL-27** (was OQ-DIPL-27) Old stat words: a Rival's "prestige" becomes "wars against a Rival please your lords", and breaking a truce costs an Oath broken. Both stats already exist in this project.
+- **D-DIPL-28** (was OQ-DIPL-28) The 1444 dataset wins over the catalogue for relations, and the engine reads it as it stands. The catalogue and scenario-setup owners reconcile their files. A single source of truth.
+- **D-DIPL-29** (was OQ-DIPL-29) Envoy speed: 2 days per crossing unit by land (provisional), naval times by sea. It is the number already in the data.
+- **D-DIPL-30** (was OQ-DIPL-30) Stopped funding: when funding stops without being caught, the owner is told nothing. It is a secret action.
+- **D-DIPL-31** (was OQ-DIPL-31) Month order: X-2 sets it. Diplomacy runs after subjects and government; answers are given in the month and delivered the next (X-18); AI orders come after the player's.
+- **D-DIPL-32** (was OQ-DIPL-32) Subject asks: diplomacy's counts decide *Offer overlordship* and *Ask for protection*; the subjects context then picks the kind (Tributary, or Vassal when the small country asked). Tighten, Fold in and Station a resident use an envoy's time; *Courted* is a foreign envoy stationed at the subject's court. One count for every ask.
+- **D-DIPL-33** (was OQ-DIPL-33) The declaration sheet: Serbia is a tributary and does not join; the sheet shows it as "tributary, does not join". X-8 decides it.
+- **D-DIPL-34** (was OQ-DIPL-34) Old AI weights: retired; the AI uses only the reasons count. Diplomacy 12 is the latest text.
 
 ## 14. Traceability
 
@@ -1043,7 +977,7 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 | DIPL-046 | relation-actions.feature | A historical truce keeps its recorded term |
 | DIPL-047 | envoys.feature | An envoy is an official taken from his province |
 | DIPL-048 | envoys.feature | Envoy seats |
-| DIPL-049 | envoys.feature | Shrinking below 10 provinces loses the second seat, not invention seats |
+| DIPL-049 | envoys.feature | Falling to 10 provinces loses the size seat, not invention seats |
 | DIPL-050 | envoys.feature | No free seat, no envoy |
 | DIPL-051 | envoys.feature | Official type bonus |
 | DIPL-051 | envoys.feature | Stewards and tax collectors make gifts count more |
@@ -1063,7 +997,7 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 | DIPL-061 | envoys.feature | The resident tie grows each season and fades after |
 | DIPL-062 | envoys.feature | A resident sees the host's court |
 | DIPL-063 | envoys.feature | A resident carries missions without travel |
-| DIPL-064 | envoys.feature | A resident warns of war one turn ahead |
+| DIPL-064 | envoys.feature | A resident warns of war a month ahead |
 | DIPL-065 | envoys.feature | A courtesy visit |
 | DIPL-066 | envoys.feature | When an envoy is lost |
 | DIPL-067 | envoys.feature | A demand refused by a Hostile country may cost the envoy |
@@ -1087,7 +1021,7 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 | DIPL-081 | reasons-count.feature | A gift and a Marshal turn the no into a yes |
 | DIPL-081 | reasons-count.feature | Over zero is yes |
 | DIPL-082 | diplomacy-screen.feature | The country diplomacy card of Venice |
-| DIPL-082 | reasons-count.feature | No preview, the answer arrives the turn after it is given |
+| DIPL-082 | reasons-count.feature | No preview, the answer arrives a month after it is given |
 | DIPL-082 | reasons-count.feature | Action buttons show no prediction |
 | DIPL-083 | reasons-count.feature | What the asker can see before asking |
 | DIPL-084 | reasons-count.feature | Hungary asks Venice for an alliance and is refused |
@@ -1112,7 +1046,7 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 | DIPL-097 | alliances-and-calls.feature | Refusing an offensive call breaks nothing |
 | DIPL-098 | alliances-and-calls.feature | The call count |
 | DIPL-099 | alliances-and-calls.feature | Defensive calls go out when you are attacked |
-| DIPL-099 | alliances-and-calls.feature | Calls are instant and answered next turn |
+| DIPL-099 | alliances-and-calls.feature | Calls are instant and answered a month later |
 | DIPL-100 | alliances-and-calls.feature | An ally fights its own war |
 | DIPL-101 | alliances-and-calls.feature | A separate peace |
 | DIPL-102 | alliances-and-calls.feature | Ties from fighting together |
@@ -1161,7 +1095,6 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 | DIPL-133 | gifts-insults-rivals.feature | Declaring a rival needs a contested object |
 | DIPL-134 | funding-rebels.feature | What funding needs |
 | DIPL-134 | funding-rebels.feature | Funding is secret |
-| DIPL-135 | funding-rebels.feature | What funding does |
 | DIPL-136 | funding-rebels.feature | Funding an émigré pretender |
 | DIPL-137 | funding-rebels.feature | The chance of being caught |
 | DIPL-138 | funding-rebels.feature | Caught |
@@ -1170,7 +1103,7 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 | DIPL-140 | war-aims.feature | Austria holds Seat a pretender against Hungary in 1444 |
 | DIPL-141 | war-aims.feature | Holding Tribute |
 | DIPL-142 | war-aims.feature | Holding Free a people |
-| DIPL-143 | war-aims.feature | Holding Break a subject |
+| DIPL-143 | war-aims.feature | Holding Break a subject against the overlord |
 | DIPL-144 | war-aims.feature | Holding Defend the faith |
 | DIPL-145 | war-aims.feature | Holding Punish for 5 years |
 | DIPL-146 | war-aims.feature | Raid and No aim are always held |
@@ -1235,3 +1168,18 @@ The place of these steps in the global order belongs to time-and-turns (OQ-DIPL-
 | DIPL-190 | ledger-and-standing.feature | Ledgers only for pairs that have dealt with each other |
 | DIPL-190 | ledger-and-standing.feature | Fades are recomputed once a year |
 | DIPL-191 | relation-model.feature | Balance numbers live in config, not in the dataset |
+| DIPL-049 | envoys.feature | Residents beyond the seats are recalled, newest first |
+| DIPL-118 | passage.feature | A refused or revoked passage blocks envoys for 2 years |
+| DIPL-134 | funding-rebels.feature | Funding costs 1 % of the target's yearly income a month |
+| DIPL-134 | funding-rebels.feature | Stopping the funding is free and tells nobody |
+| DIPL-135 | funding-rebels.feature | Funding sets the flag the revolutions read |
+| DIPL-150 | declaring-war.feature | Subjects join their overlord's war by their kind |
+| DIPL-152 | declaring-war.feature | A vassal cannot declare war on its overlord's ally |
+| DIPL-163 | leagues.feature | An event league ends only by event or by a peace |
+| DIPL-192 | ledger-and-standing.feature | Standing stays within -200 and +200 |
+| DIPL-193 | relation-actions.feature | Small commands that cost nothing |
+| DIPL-193 | relation-actions.feature | Withdrawing a pledge is an Oath broken |
+| DIPL-193 | relation-actions.feature | A Rival may be dropped after 10 years |
+| DIPL-193 | relation-actions.feature | Recalling envoys |
+| DIPL-193 | funding-rebels.feature | Stopping the funding is free and tells nobody |
+| DIPL-194 | funding-rebels.feature | A funded revolution that wins remembers its backer |

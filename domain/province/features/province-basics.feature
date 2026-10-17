@@ -32,11 +32,10 @@ Feature: Province basics, storage and cadence
     Then it holds about 95 small numbers including up to 16 tiles and 11 class counts
     And food made, wares made, tax owed and reaching you, town size and country sums are worked out when needed
 
-  @PROV-291 @open-question
+  @PROV-291
   Scenario: Update cadence
-    # OQ-PROV-4: weekly plague inside a monthly turn
     Given the game advances one month
     When the game works out the province's stats
     Then births, deaths and overflow update
     And food updates each season
-    And plague updates each week while an outbreak runs
+    And plague updates on days 7, 14, 21 and 28 while an outbreak runs
