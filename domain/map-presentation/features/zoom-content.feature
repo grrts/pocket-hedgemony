@@ -207,11 +207,12 @@ Feature: What each zoom shows
     When the camera zooms from 4 to 16
     Then the army's figure stays the same size on screen
 
-  @VIEW-086 @feedback-77
-  Scenario: A commander's name carries their realm's flag
-    Given France's army led by "Jean de Dunois" is selected
+  @VIEW-086 @feedback-77 @feedback-89
+  Scenario: An army's men count carries their realm's flag
+    Given France's army of 9,000 men led by "Jean de Dunois" is selected
     When the map is drawn
-    Then the name "Jean de Dunois" shows with France's flag before it
+    Then France's flag shows before "9K", on the same row
+    And the name "Jean de Dunois" shows below them
 
   @VIEW-087 @feedback-58 @feedback-65
   Scenario: Portraits show who people are and what they do

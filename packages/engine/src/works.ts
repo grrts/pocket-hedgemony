@@ -21,7 +21,7 @@ import { invention, startingKnowledgeFor } from "./domain/research/index.ts";
  */
 
 /** The works of this slice, as named in the buildings data. */
-export const WORKS = ["farm", "ranch", "fishery", "lumber camp", "quarry", "market", "harbour", "drill yard", "road", "castle"] as const;
+export const WORKS = ["farm", "ranch", "fishery", "lumber camp", "quarry", "market", "harbour", "drill yard", "road", "castle", "granary"] as const;
 export type WorkName = (typeof WORKS)[number];
 export const WORK_COUNT = WORKS.length;
 export const workIndex = (name: string): number => (WORKS as readonly string[]).indexOf(name);
@@ -29,7 +29,7 @@ export const workIndex = (name: string): number => (WORKS as readonly string[]).
 const W = Object.fromEntries(WORKS.map((w, k) => [w, k])) as Record<WorkName, number>;
 
 /** The highest step of each work this slice builds (later steps need inventions or wares not simulated yet). */
-const TOP: Record<WorkName, number> = { farm: 3, ranch: 1, fishery: 1, "lumber camp": 1, quarry: 1, market: 3, harbour: 3, "drill yard": 2, road: 2, castle: 2 };
+const TOP: Record<WorkName, number> = { farm: 3, ranch: 1, fishery: 1, "lumber camp": 1, quarry: 1, market: 3, harbour: 3, "drill yard": 2, road: 2, castle: 2, granary: 1 };
 
 export interface Site {
   nation: number;
@@ -100,6 +100,8 @@ export const slotsOf = (world: World, p: number): number => world.rules.defines.
 export function slotsUsed(world: World, p: number, pend?: Pending): number {
   let used = 0;
   for (let k = 0; k < WORK_COUNT; k++) {
+    // The granary is part of the castle and takes no slot (BLD-008).
+    if (k === W.granary) continue;
     if (worksAt(world, p, k) > 0) used++;
     else if (pend ? pend.step[p * WORK_COUNT + k]! > 0 : world.sites.some((x) => x.province === p && x.work === k) || world.workQueue.some((x) => x.province === p && x.work === k)) used++;
   }
@@ -143,6 +145,8 @@ function placeFits(world: World, p: number, name: WorkName): boolean {
     case "fishery":
     case "harbour":
       return coastal;
+    case "granary":
+      return hasCastle(world, p);
     default:
       return true;
   }
@@ -205,7 +209,7 @@ export function whyNot(world: World, n: number, p: number, work: number, pend?: 
   const name = WORKS[work]!;
   if (world.provinceOwner[p] !== n) return "not your province";
   if (world.provinceWater[p]) return "no land to build on";
-  if (!placeFits(world, p, name)) return name === "fishery" || name === "harbour" ? "needs a coast" : `the land doesn't suit a ${name}`;
+  if (!placeFits(world, p, name)) return name === "fishery" || name === "harbour" ? "needs a coast" : name === "granary" ? "needs a castle" : `the land doesn't suit a ${name}`;
   const step = nextStep(world, p, work, pend);
   if (step > TOP[name]) return worksAt(world, p, work) >= buildingType(name).steps.length ? "built to the top" : "the next step needs what isn't here yet";
   const def = stepOf(name, step);
@@ -395,6 +399,12 @@ export function roadHours(world: World, p: number): number {
 /** The province's castle: 1 an earthwork ring fort, 2 a stone castle. */
 export const castleStep = (world: World, p: number): number => worksAt(world, p, W.castle);
 
+/** A castle of any step stands in the province (a capital always has one): it is a hub of the realm's food (REALM-030). */
+export const hasCastle = (world: World, p: number): boolean => worksAt(world, p, W.castle) > 0;
+
+/** A granary stands at the province's castle: its store holds more and rots less (REALM-031). */
+export const hasGranary = (world: World, p: number): boolean => worksAt(world, p, W.granary) > 0;
+
 /**
  * Works standing in 1444 (BLD starting buildings): the map's castles and
  * forts and a stone castle in every capital; farms and ranches where the land
@@ -474,7 +484,7 @@ export function aiWorks(world: World, news: News[]): void {
 
 /** Sites a realm of the AI keeps open at most (buildings ai.busy_sites). */
 const AI_BUSY_SITES = 3;
-const AI_ORDER: WorkName[] = ["market", "farm", "harbour", "road", "castle", "drill yard"];
+const AI_ORDER: WorkName[] = ["market", "farm", "harbour", "road", "castle", "drill yard", "granary"];
 
 function borders(world: World, p: number, n: number): boolean {
   for (let k = world.adjStart[p]!, end = world.adjStart[p + 1]!; k < end; k++) {
@@ -508,6 +518,10 @@ export function workEffect(world: World, work: number, step: number): string {
       return `Recruits +${pct(d.drillYardRecruits * step)}`;
     case "road":
       return `Armies march ${pct(d.roadSpeed * step)} faster here; trade +${pct(d.roadTrade * step)}`;
+    case "granary": {
+      const f = world.rules.defines.castleFood;
+      return `The castle store holds ${f.granaryStoreMonths} months instead of ${f.castleStoreMonths}, and rots half as fast`;
+    }
     case "castle":
       return step >= 2 ? "Stone walls: armies must besiege it, and enemies can't march past" : "Earthwork walls: a smaller garrison holds out against a siege";
   }

@@ -2169,3 +2169,126 @@ p.warn {
   color: var(--cloth);
   font-weight: 600;
 }
+
+/* ---- The Food tab (feedback 84, 85) ---- */
+
+/* How the realm is fed, at a glance: three counts side by side. */
+.food-glance {
+  display: flex;
+  gap: 6px;
+  margin: 6px 0;
+}
+.food-glance > div {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  padding: 2px 4px;
+  border: 2px solid var(--outline);
+}
+.food-glance b {
+  font-size: 1.2em;
+}
+.food-glance > div small {
+  opacity: 0.8;
+}
+.food-glance .bad b {
+  color: var(--cloth);
+}
+.food-glance .warn b {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* Choice rows wrap; every button is a 44-point target and the chosen one stays pressed. */
+.food-choices button,
+.food-presets button {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 64px;
+  min-height: 44px;
+  padding: 2px 4px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+}
+.food-presets button {
+  flex: 1 1 40%;
+}
+.food-choices button small,
+.food-presets button small {
+  font-size: 0.7em;
+  opacity: 0.8;
+}
+.food-choices button.paper.on,
+.food-presets button.paper.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+.food-choices button.on::before,
+.food-presets button.on::before {
+  content: "●";
+  position: absolute;
+  left: 4px;
+  font-size: 0.6em;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* A castle: its row, then its own settings folded under it. */
+.castle-row {
+  flex-wrap: wrap;
+}
+.castle-row details.castle-own {
+  flex: 1 1 100%;
+}
+.castle-own summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: var(--ink-soft);
+  font-size: 0.85em;
+  gap: 6px;
+  cursor: pointer;
+}
+.castle-own .hint {
+  margin: 4px 0 0;
+}
+.place-name .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag {
+  font-size: 0.7em;
+  padding: 0 4px;
+  border: 1px solid var(--outline);
+}
+.tag.bad {
+  color: var(--cloth);
+  border-color: var(--cloth);
+}
+
+/* A castle's store against what it holds; the mark is the siege reserve. */
+.store-bar {
+  position: relative;
+  display: block;
+  width: 72px;
+  height: 8px;
+  border: 1px solid var(--outline);
+}
+.store-bar i {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+}
+.store-bar b {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--cloth);
+}

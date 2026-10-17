@@ -134,6 +134,8 @@ export interface TokenStyle {
   naval?: boolean;
   /** Who leads the army, for the figure; without it, a rider in the realm's colour. */
   commander?: CommanderLook;
+  /** The realm's flag, drawn on the men count's row before it (feedback 80). */
+  flag?: HTMLCanvasElement;
   /** 1 faces east, -1 west. */
   dir: 1 | -1;
   moving: boolean;
@@ -159,8 +161,20 @@ export function drawToken(ctx: Ctx, s: TokenStyle): { x: number; y: number; w: n
     brackets(ctx, x, y, img.width, img.height + 10 * u, u, 1 + pulse, PALETTE.gold);
   }
   ctx.drawImage(img, x, y);
-  const plateH = drawPlate(ctx, menShort(s.men), s.x, s.y + 2 * u, u, s.color);
-  return { x, y, w: img.width, h: img.height + plateH + 2 * u };
+  const text = menShort(s.men);
+  const plateTop = s.y + 2 * u;
+  if (!s.flag) {
+    const plateH = drawPlate(ctx, text, s.x, plateTop, u, s.color);
+    return { x, y, w: img.width, h: img.height + plateH + 2 * u };
+  }
+  // Flag and men count side by side, centred under the figure, the flag's middle on the plate's.
+  const gap = u;
+  const plateW = (digitsWidth(text) + 4) * u;
+  const left = Math.round(s.x - (s.flag.width + gap + plateW) / 2);
+  const plateH = drawPlate(ctx, text, left + s.flag.width + gap + plateW / 2, plateTop, u, s.color);
+  ctx.drawImage(s.flag, left, Math.round(plateTop + (plateH - s.flag.height) / 2));
+  const bx = Math.min(x, left);
+  return { x: bx, y, w: Math.max(x + img.width, left + s.flag.width + gap + plateW) - bx, h: img.height + plateH + 2 * u };
 }
 
 export interface RouteStyle {
