@@ -122,3 +122,23 @@ Feature: Layout by window shape
       | hand  | end turn    | menu        |
       | Right | lower right | upper left  |
       | Left  | lower left  | upper right |
+
+  @SHELL-144
+  Scenario: Each subject has one home
+    Given a player-facing feature of the subject "diplomacy"
+    Then all its actions and figures are on the Diplomacy tab of the country card
+    And none of them sit on an unrelated panel
+
+  @SHELL-145
+  Scenario: Important things have an overview
+    Given the player has armies, garrison troops and warnings
+    Then the Army list, each province's Garrison tab and the Needs attention screen show their state at a glance
+    And each line opens its detail in one tap
+
+  @SHELL-146
+  Scenario: Every screen fits a phone in landscape
+    Given a phone held in landscape
+    When any in-campaign screen or card opens
+    Then it fits the window with every tap target at least 44 points and nothing behind the notch or home indicator
+    And the map stays visible beside the card where the card allows
+
