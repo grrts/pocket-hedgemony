@@ -552,6 +552,16 @@ button.icon-only {
   margin-bottom: 4px;
 }
 
+/* The title and its fold and close buttons stay in reach however far the card scrolls. */
+.panel > header {
+  position: sticky;
+  top: -4px;
+  z-index: 3;
+  margin: -4px 0 4px;
+  padding-top: 4px;
+  background: var(--ui-parchment) 0 0 / 64px repeat;
+}
+
 .panel p {
   margin: 4px 0;
 }

@@ -1390,7 +1390,15 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   });
 }
 
+/** Which card the panel shows; a different one opens at its top, with its close button in view. */
+let panelShows = "";
+
 function renderPanel(): void {
+  const shows = `${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${selectedProvince}/${provinceTab}`;
+  if (shows !== panelShows) {
+    panelShows = shows;
+    panel.scrollTop = 0;
+  }
   if (newsView && snapshot) {
     renderNews();
     return;
@@ -2725,8 +2733,10 @@ function bindLearning(): void {
 
 function bindClose(): void {
   panel.querySelector(".close")!.addEventListener("click", () => {
+    // Every view's state is cleared: renderPanel shows the first one still set.
     officialView = -1;
     lordView = -1;
+    armyView = -1;
     grantOpen = false;
     newsView = false;
     realmView = -1;

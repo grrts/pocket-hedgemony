@@ -23,6 +23,8 @@ jobs:
         run: |
           pnpm --filter @ph/client exec playwright-core install --with-deps chromium
           pnpm --filter @ph/client smoke
+      - name: Every panel's close button, tapped on a phone
+        run: pnpm --filter @ph/client close-check
       - name: Frame and turn budgets (docs/performance.md)
         run: pnpm --filter @ph/client perf
       - name: Engine worker in Electron
