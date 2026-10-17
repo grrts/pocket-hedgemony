@@ -57,6 +57,15 @@ for (let t = 0; t < 20 && !shot; t++) {
   }
   await page.waitForFunction((n) => window.__phTurn() > n, turn, { timeout: 120000 });
 }
+// A siege, if one is on: its province opens on the siege view.
+const besieged = await page.evaluate(() => window.__phLookAtSiege?.() ?? null);
+if (besieged) {
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: `${out}/6a-siege-map.png` });
+  await page.evaluate((id) => window.__phSelect(id), besieged);
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: `${out}/6b-siege.png` });
+}
 // The panels: a province's overview and garrison, and the realm.
 await page.evaluate(() => window.__phSelect("p1601"));
 await page.waitForTimeout(400);

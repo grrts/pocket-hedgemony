@@ -7,6 +7,7 @@ export { placeClimate, provinceClimate, seasonName, dayOfYear, snowCover, type P
 export { processTurn, applyNow, advance, STEPS_PER_DAY, STEPS_PER_TURN, HOURS_PER_STEP, type Order, type MoveOrder, type TurnReport } from "./turn.ts";
 export { atWar, controller, engageRange, offerPeace, peaceShare, relationState, wallsOf, warBetween, SIEGE_MONTH_DAYS, type Battle, type News, type PeaceTerms } from "./war.ts";
 export { hashWorld } from "./hash.ts";
+export { cultureOf, officialName, personName } from "./names.ts";
 export { ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply } from "./protocol.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";

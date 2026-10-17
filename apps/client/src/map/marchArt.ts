@@ -360,3 +360,27 @@ export function pruneBattles(live: Iterable<number>): void {
   const keep = new Set(live);
   for (const id of [...lastMen.keys()]) if (!keep.has(id)) (lastMen.delete(id), floaters.delete(id));
 }
+
+/**
+ * A siege on the map: the besieger's standard planted before the walls with
+ * the months held on a plate, and one pip per siege month under it, the last
+ * filling as the month runs.
+ */
+export function drawSiegeMark(ctx: Ctx, x: number, y: number, u: number, color: string, months: number, progress: number): void {
+  drawStandard(ctx, x - 6 * u, y, u, color);
+  const pips = Math.min(months, 5) + 1;
+  const w = pips * 4 * u + u;
+  const left = Math.round(x - w / 2);
+  const top = Math.round(y + 2 * u);
+  ctx.fillStyle = PALETTE.ink;
+  ctx.fillRect(left, top, w, 5 * u);
+  for (let i = 0; i < pips; i++) {
+    const px = left + u + i * 4 * u;
+    ctx.fillStyle = PALETTE.paper;
+    ctx.fillRect(px, top + u, 3 * u, 3 * u);
+    ctx.fillStyle = color;
+    const share = i < pips - 1 ? 1 : progress;
+    ctx.fillRect(px, top + u, Math.round(3 * u * share), 3 * u);
+  }
+  if (months > 5) drawPlate(ctx, String(months), x + w / 2 + 6 * u, top - 2 * u, u, color);
+}

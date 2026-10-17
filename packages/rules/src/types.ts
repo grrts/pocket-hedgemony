@@ -201,6 +201,26 @@ export interface MapInfo {
   terrainImage: string;
 }
 
+/** How a culture puts a name together (data/names.json). */
+export type NameStyle = "family" | "family_first" | "of" | "patronym" | "single" | "title";
+
+export interface CultureNames {
+  style: NameStyle;
+  given: string[];
+  family?: string[];
+  /** The word joining a patronym: "ibn", "bin". */
+  patronym?: string;
+  /** Titles after the name: "Bey", "Khan". */
+  title?: string[];
+}
+
+/** Names for officials and commanders by culture, and each realm's culture (feedback 33). */
+export interface NameBook {
+  fallback: string;
+  cultures: Record<string, CultureNames>;
+  nations: Record<string, string>;
+}
+
 /** Everything the engine needs to run a campaign, loaded from JSON config. */
 export interface Ruleset {
   defines: Defines;
@@ -208,4 +228,6 @@ export interface Ruleset {
   nations: NationDef[];
   provinces: ProvinceDef[];
   map?: MapInfo;
+  /** Culture names; without them, names come from defines.recruit.commanderNames. */
+  names?: NameBook;
 }

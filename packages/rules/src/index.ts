@@ -1,5 +1,6 @@
 import defines from "../data/defines.json" with { type: "json" };
 import units from "../data/units.json" with { type: "json" };
+import names from "../data/names.json" with { type: "json" };
 import map from "../data/world/map.json" with { type: "json" };
 import nations from "../data/world/nations.json" with { type: "json" };
 import provinces from "../data/world/provinces.json" with { type: "json" };
@@ -17,5 +18,6 @@ export function loadDefaultRuleset(): Ruleset {
     nations,
     provinces,
     map,
+    names,
   } as Ruleset);
 }
