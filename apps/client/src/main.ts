@@ -26,7 +26,7 @@ import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
-import { learningLine, learningTab, realmLearningLine } from "./ui/learning.ts";
+import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
 import { provinceWorks, realmWorks, worksLine } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castlesOpen, foodLine, foodTab } from "./ui/food.ts";
@@ -140,8 +140,8 @@ let realmView = -1;
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
 let realmTab: "general" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "works" = "general";
-/** Folding parts of the Learning tab the player opened (found a school, what you know), kept across redraws. */
-const learningOpen = new Set<string>();
+/** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
+const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
 let askedStudy = -1;
 /** Province whose official's screen is open, or -1. */
@@ -760,7 +760,7 @@ function drawOverlay(o: OverlayContext): void {
       // The commander in their realm's colours, kit of the era and age (feedback 56), at one size at every zoom (feedback 57).
       const box = drawToken(ctx, {
         x: sx, y: sy, u: 2, color: realm.color, men: s.armies.men[k]!,
-        dir: armyFacing(k), moving, selected: selected.has(id), t: now,
+        dir: armyFacing(k), moving, selected: selected.has(id), t: now, flag: flagCanvas(realm, 1),
         commander: { name, nation: realm.id, color: realm.color, look: lookOfCulture(rules.names?.nations[realm.id]), era: eraOfYear(s.date.year), age: apparentAge(name, s.date.year) },
       });
       armyHitBoxes.push({ id, ...box });
@@ -768,12 +768,7 @@ function drawOverlay(o: OverlayContext): void {
       if (selected.has(id) || zoom >= 8) {
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        // The realm's flag before the name, so you can tell whose commander it is.
-        const flag = flagCanvas(realm, 1);
-        const label = labelBitmap(name, 10, false);
-        const left = sx - (flag.width + 2 + label.w) / 2;
-        ctx.drawImage(flag, Math.round(left), Math.round(box.y + box.h + 2));
-        pixelText(ctx, name, left + flag.width + 2 + label.w / 2, box.y + box.h + 2, 10);
+        pixelText(ctx, name, sx, box.y + box.h + 2, 10);
       }
     }
   }
@@ -2626,7 +2621,7 @@ function renderRealm(r: number): void {
     : realmTab === "mercenaries" ? mercenarySection()
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
-    : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningOpen)
+    : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
     : realmTab === "works" ? realmWorks(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length)
     : general;
@@ -2698,19 +2693,66 @@ function renderRealm(r: number): void {
   bindNationButtons();
 }
 
-/** The Learning tab's buttons: study, seats, students to arms, found a school; its folds stay as the player left them. */
+/** The Learning tab's buttons: Tree or Schools, the boughs, tapping an invention, study, seats, students to arms, found a school; its folds and the tree's scroll stay as the player left them. */
 function bindLearning(): void {
-  panel.querySelectorAll<HTMLButtonElement>("[data-study]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "setStudy", invention: b.dataset.study! })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-learn-part]").forEach((b) =>
+    b.addEventListener("click", () => {
+      learningUi.part = b.dataset.learnPart as typeof learningUi.part;
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-bough]").forEach((b) =>
+    b.addEventListener("click", () => {
+      learningUi.bough = b.dataset.bough!;
+      learningUi.pick = null;
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-pick]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const id = b.dataset.pick!;
+      const fromSheet = !!b.closest(".pick-sheet");
+      learningUi.pick = id;
+      if (fromSheet) {
+        // A need tapped in the sheet: show it in its own bough, scrolled into view.
+        const bough = learningBough(snapshot!.research!, { ...learningUi, bough: "" });
+        learningUi.bough = bough;
+        const at = scrollFor(bough, id);
+        if (at) learningUi.scroll.set(bough, at);
+      }
+      renderPanel();
+      panel.querySelector(".pick-sheet")?.scrollIntoView({ block: "nearest" });
+    }),
+  );
+  const treeView = panel.querySelector<HTMLElement>(".tree-view");
+  if (treeView && snapshot?.research) {
+    const bough = treeView.dataset.tree!;
+    const at = learningUi.scroll.get(bough) ?? scrollFor(bough, learningUi.pick ?? firstOpen(snapshot.research, bough));
+    if (at) {
+      treeView.scrollLeft = at.left;
+      treeView.scrollTop = at.top;
+    }
+    treeView.addEventListener("scroll", () => learningUi.scroll.set(bough, { left: treeView.scrollLeft, top: treeView.scrollTop }), { passive: true });
+  }
+  panel.querySelectorAll<HTMLButtonElement>("[data-study]").forEach((b) =>
+    b.addEventListener("click", () => {
+      learningUi.pick = null;
+      void actInTreasury({ type: "setStudy", invention: b.dataset.study! });
+    }),
+  );
   panel.querySelectorAll<HTMLButtonElement>("[data-seats]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "setSeats", n: Number(b.dataset.seats) })));
-  panel.querySelector<HTMLButtonElement>("[data-call-students]")?.addEventListener("click", () => void actInTreasury({ type: "callStudentsToArms" }));
+  panel.querySelector<HTMLButtonElement>("[data-call-students]")?.addEventListener("click", () => {
+    learningUi.open.delete("arms");
+    void actInTreasury({ type: "callStudentsToArms" });
+  });
   panel.querySelectorAll<HTMLButtonElement>("[data-found-school]").forEach((b) =>
     b.addEventListener("click", () => {
-      learningOpen.delete("found");
+      learningUi.open.delete("found");
       void actInTreasury({ type: "foundSchool", province: Number(b.dataset.foundSchool) });
     }),
   );
   panel.querySelectorAll<HTMLDetailsElement>("details[data-keep]").forEach((d) =>
-    d.addEventListener("toggle", () => (d.open ? learningOpen.add(d.dataset.keep!) : learningOpen.delete(d.dataset.keep!))),
+    d.addEventListener("toggle", () => (d.open ? learningUi.open.add(d.dataset.keep!) : learningUi.open.delete(d.dataset.keep!))),
   );
 }
 
