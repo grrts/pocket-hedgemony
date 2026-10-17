@@ -1,3 +1,4 @@
+import { CLASS_COUNT, rescaleClasses } from "../../living.ts";
 import type { Ruleset } from "@ph/rules";
 import { hashWorld } from "../../hash.ts";
 import { Rng } from "../../rng.ts";
@@ -74,7 +75,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
     packChunk("provinces", V.provinces, {
       meta: {},
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, classes: world.provinceClasses },
     }),
     packChunk("nations", V.nations, {
       meta: { musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome },
@@ -193,6 +194,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   const covered = new Uint8Array(world.provinceCount);
   const bestShare = new Float64Array(world.provinceCount);
   const population = new Float64Array(world.provinceCount);
+  const classesFrom = new Int32Array(world.provinceCount).fill(-1);
   provinceTargets.forEach((targets, old) => {
     for (const t of targets) {
       if (!covered[t.index]) population[t.index] = 0;
@@ -207,12 +209,15 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         if (prov.wealth) world.provinceWealth[t.index] = prov.wealth[old]!;
         if (prov.recruits) world.provinceRecruits[t.index] = prov.recruits[old]!;
         if (prov.official) world.provinceOfficial[t.index] = prov.official[old]!;
+        classesFrom[t.index] = old;
       }
     }
   });
   const defaulted: string[] = [];
   for (let p = 0; p < world.provinceCount; p++) {
     if (covered[p] && prov.population) world.provincePopulation[p] = population[p]!;
+    // People by class keep the saved mix (or the starting mix, for saves from before classes), scaled to the people now there.
+    if (covered[p]) rescaleClasses(world, p, prov.classes ? prov.classes.subarray(classesFrom[p]! * CLASS_COUNT, (classesFrom[p]! + 1) * CLASS_COUNT) : null);
     if (!covered[p]) defaulted.push(world.provinceIds[p]!);
   }
 

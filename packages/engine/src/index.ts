@@ -9,5 +9,6 @@ export { atWar, controller, engageRange, offerPeace, peaceShare, relationState, 
 export { hashWorld } from "./hash.ts";
 export { cultureOf, officialName, personName } from "./names.ts";
 export { ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
+export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply } from "./protocol.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";

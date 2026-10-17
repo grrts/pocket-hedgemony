@@ -6,6 +6,7 @@ import { Rng } from "./rng.ts";
 import type { Diplomacy } from "./domain/diplomacy/index.ts";
 import { createWarState, maxGarrison, type Battle, type PeaceOffer, type SiegeState } from "./war.ts";
 import { newCommander, type Commander } from "./domain/warfare/index.ts";
+import { createLivingState, seedClasses, type LivingState } from "./living.ts";
 import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 
 /**
@@ -14,7 +15,7 @@ import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIN
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World {
+export interface World extends LivingState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -368,8 +369,10 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     peaceOffers: [],
     nationGone: new Uint8Array(N),
     ...createRecruitState(P, N),
+    ...createLivingState(P),
   };
   world.diplomacy = createWarState(world);
+  seedClasses(world);
   updateWeather(world);
   for (let p = 0; p < P; p++) world.provinceGarrison[p] = maxGarrison(world, p);
 

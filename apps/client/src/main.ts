@@ -121,7 +121,7 @@ let realmTab: "general" | "diplomacy" | "military" | "mercenaries" | "officials"
 /** Province whose official's screen is open, or -1. */
 let officialView = -1;
 /** Which tab of the province overview is open. */
-let provinceTab: "overview" | "garrison" = "overview";
+let provinceTab: "overview" | "people" | "garrison" = "overview";
 /** Map lens: how provinces are coloured. */
 type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food";
 let lens: Lens = "realms";
@@ -1099,6 +1099,10 @@ function renderPanel(): void {
     renderGarrison(selectedProvince);
     return;
   }
+  if (provinceTab === "people") {
+    renderPeople(selectedProvince);
+    return;
+  }
   const armiesHere = snapshot ? [...snapshot.armies.id.keys()].filter((k) => snapshot!.armies.location[k] === selectedProvince && snapshot!.armies.commander[k]! >= 0) : [];
   const official = snapshot && own >= 0 ? officialOf(rules, selectedProvince, own, snapshot.provinceOfficial[selectedProvince]) : undefined;
   const siege = siegeInfo(selectedProvince);
@@ -1108,7 +1112,7 @@ function renderPanel(): void {
     ${siege ? siegeView(rules, siege) : ""}
     <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner.color, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"} · ${p.terrain}${p.river ? " · river" : ""}${p.coastal ? " · coast" : ""}</p>
     <dl class="facts">
-      <dt>People</dt><dd>${fmt(p.population * 1000)}</dd>
+      <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       <dt>Seat</dt><dd>${owner && owner.capital === p.id ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)]}</dd>
       <dt>Walls</dt><dd>${owner && owner.capital === p.id ? WALL_NAMES.castle : p.castle ? WALL_NAMES[p.castle] : "None"}</dd>
@@ -1195,7 +1199,50 @@ function renderOfficial(pi: number): void {
 /** Tabs of the overview of one of the player's provinces. */
 function provinceTabs(): string {
   const tab = (key: typeof provinceTab, label: string) => `<button class="tab${provinceTab === key ? " on" : ""}" data-tab="${key}">${label}</button>`;
-  return `<nav class="tabs">${tab("overview", "Overview")}${tab("garrison", "Garrison")}</nav>`;
+  return `<nav class="tabs">${tab("overview", "Overview")}${tab("people", "People")}${tab("garrison", "Garrison")}</nav>`;
+}
+
+/** What each class does, for the People tab. */
+const CLASS_NOTE: Record<string, string> = {
+  farmers: "Work the fields and grow most of the food",
+  herders: "Keep herds on pasture",
+  woodsmen: "Fell timber and hunt in the woods",
+  miners: "Dig ore and stone",
+  seafolk: "Fish and crew ships",
+  craftsmen: "Make wares in town",
+  "market folk": "Trade in the town's market",
+  clergy: "Keep the churches; give no recruits",
+  clerks: "Keep accounts and run offices",
+  scholars: "Study and teach; give no recruits",
+  homeless: "No work and no home",
+};
+const TOWN_CLASSES = new Set(["craftsmen", "market folk", "clergy", "clerks", "scholars"]);
+
+/** A province's people by class: who they are, how many, and town against countryside. */
+function renderPeople(pi: number): void {
+  const s = snapshot!;
+  const p = provinces[pi]!;
+  const C = s.classNames.length;
+  const row = s.provinceClasses.subarray(pi * C, (pi + 1) * C);
+  const total = s.provincePeople[pi]!;
+  let town = 0;
+  s.classNames.forEach((c, k) => TOWN_CLASSES.has(c) && (town += row[k]!));
+  const share = (x: number) => (total > 0 ? Math.round((x / total) * 100) : 0);
+  const lines = s.classNames
+    .map((c, k) => ({ c, n: row[k]! }))
+    .filter((x) => x.n * 1000 >= 1)
+    .sort((a, b) => b.n - a.n)
+    .map(({ c, n }) => `<tr title="${esc(CLASS_NOTE[c] ?? "")}"><td><b>${esc(c[0]!.toUpperCase() + c.slice(1))}</b></td><td class="num">${fmt(Math.round(n * 1000))}</td><td class="bar"><span style="width:${share(n)}%"></span></td><td class="num"><small>${share(n)} %</small></td></tr>`)
+    .join("");
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
+    ${provinceTabs()}
+    <p><b>${fmt(Math.round(total * 1000))}</b> people: ${fmt(Math.round(town * 1000))} in town (${share(town)} %), ${fmt(Math.round((total - town) * 1000))} in the countryside.</p>
+    <table class="troops classes"><tbody>${lines}</tbody></table>
+    <p class="hint">Each class is born and dies at its own rate, every month. War in the province adds deaths.</p>`;
+  bindClose();
+  showPanel(true);
+  bindProvinceTabs();
 }
 
 function bindProvinceTabs(): void {
