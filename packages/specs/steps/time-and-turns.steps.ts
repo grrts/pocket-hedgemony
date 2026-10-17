@@ -441,6 +441,8 @@ Given("the player has queued a move order for an army in {string} to {string}", 
   c.world.armies.location[army] = placeIndex(c.world, from);
   s.army = army;
   s.from = placeIndex(c.world, from);
+  // France is the player's: the AI would spend its gold on works.
+  c.world.player = n;
   s.before = { treasury: c.world.nationTreasury[n]!, levies: c.world.nationLevies[n]! };
   giveOrder(c, n, { type: "move", army, to: placeIndex(c.world, to) });
 });

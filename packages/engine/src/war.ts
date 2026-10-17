@@ -1,4 +1,5 @@
 import { lordsLoseWar } from "./lords.ts";
+import { castleStep } from "./works.ts";
 import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -21,7 +22,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "built";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -41,12 +42,12 @@ export interface SiegeState {
 /** Days in a siege month (four weeks). */
 export const SIEGE_MONTH_DAYS = 28;
 
-/** Walls by the map's castle field; every capital has a stone castle. */
+/** Walls by the province's castle (works: the map's castles and forts, and those built since); every capital has a stone castle. */
 export function wallsOf(world: World, p: number): string | null {
-  const def = world.rules.provinces[p]!;
   const owner = world.provinceOwner[p]!;
-  if (owner >= 0 && world.rules.nations[owner]!.capital === def.id) return "stone castle";
-  return def.castle === "castle" ? "stone castle" : def.castle === "fort" ? "earthwork ring fort" : null;
+  if (owner >= 0 && world.rules.nations[owner]!.capital === world.provinceIds[p]) return "stone castle";
+  const step = castleStep(world, p);
+  return step >= 2 ? "stone castle" : step === 1 ? "earthwork ring fort" : null;
 }
 
 export function maxGarrison(world: World, p: number): number {

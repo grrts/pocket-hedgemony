@@ -15,6 +15,7 @@ import { realmConfig } from "./domain/realm/index.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
 import { addCommander, ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 import { seedOfficials } from "./officials.ts";
+import { createWorksState, seedWorks, type WorksState } from "./works.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -22,7 +23,7 @@ import { seedOfficials } from "./officials.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, WorksState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -387,11 +388,13 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createFoodState(P),
     ...createMoodState(P),
     ...createLordState(P),
+    ...createWorksState(P, N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
   seedStores(world);
   seedLords(world);
+  seedWorks(world);
   updateWeather(world);
   for (let p = 0; p < P; p++) world.provinceGarrison[p] = maxGarrison(world, p);
 
@@ -490,5 +493,5 @@ export function updateWeather(world: World): void {
 
 /** The world's tiles as a march over them sees them today. */
 export function tileMarch(world: World): TileMarch {
-  return { d: world.rules.defines.march, grid: world.tiles, population: world.provincePopulation, temperature: world.provinceTemperature, rowWidth: world.rowWidth };
+  return { d: world.rules.defines.march, grid: world.tiles, population: world.provincePopulation, temperature: world.provinceTemperature, rowWidth: world.rowWidth, roadHours: world.provinceRoadHours };
 }

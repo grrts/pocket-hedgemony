@@ -1887,3 +1887,105 @@ small.effect {
 .lord-row .lord-who small + small {
   color: #3f6a34;
 }
+
+/* ---- Works (milestone 4): a province's Works tab and the realm's overview ---- */
+
+.work-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.work-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.work-row.off {
+  background: transparent;
+  border-style: dashed;
+}
+.work-row.off .work-name b {
+  color: var(--ink-soft);
+}
+.work-name {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.work-name small {
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+.work-name small.cost {
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.work-name small.why {
+  color: var(--cloth);
+}
+.work-row > button {
+  flex: none;
+  min-width: 72px;
+  min-height: 44px;
+}
+.queue-buttons {
+  flex: none;
+  display: flex;
+  gap: 8px;
+}
+.queue-buttons button {
+  min-height: 44px;
+}
+.queue-buttons button.square {
+  min-width: 44px;
+  padding: 0;
+}
+.progress {
+  display: block;
+  height: 8px;
+  margin-top: 3px;
+  border: 2px solid var(--outline);
+  background: var(--paper);
+}
+.progress i {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.works-standing,
+.works-counts {
+  margin: 4px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+.works-standing {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2px 12px;
+}
+.works-standing li {
+  display: flex;
+  flex-direction: column;
+  padding: 2px 0;
+  line-height: 1.1;
+}
+.works-standing small {
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+.works-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+p.warn {
+  color: var(--cloth);
+  font-weight: 600;
+}

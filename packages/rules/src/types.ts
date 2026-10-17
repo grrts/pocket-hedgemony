@@ -23,10 +23,36 @@ export interface Defines {
   military: {
     upkeepPerThousandMenPerMonth: number;
   };
+  works: WorksDefines;
   march: MarchDefines;
   war: WarDefines;
   recruit: RecruitDefines;
   living: LivingDefines;
+}
+
+/** Works, the first slice of the buildings context (milestone 4): gold scale and the stand-in effects. */
+export interface WorksDefines {
+  /** Treasury gold per gold of the buildings data. */
+  goldScale: number;
+  /** Upkeep a year (data gold) of a work whose step names none. */
+  defaultUpkeepPerYear: number;
+  /** Share off a work's gold with a lumber camp (timber) or quarry (stone) in its province. */
+  materialsAtHandSaving: number;
+  /** Food gained per step of a farm (farmers), and by a ranch (herders) and a fishery (seafolk). */
+  farmFood: number;
+  ranchFood: number;
+  fisheryFood: number;
+  /** Trade gained per step of a market, a harbour and a road, and by a lumber camp or quarry. */
+  marketTrade: number;
+  harbourTrade: number;
+  roadTrade: number;
+  campTrade: number;
+  /** Recruits gained per step of a drill yard. */
+  drillYardRecruits: number;
+  /** Share of marching hours a road saves per step. */
+  roadSpeed: number;
+  /** Gold the AI keeps in hand beyond a work's cost (or a year of works upkeep, whichever is more). */
+  aiReserveGold: number;
 }
 
 /** Wars, sieges and occupation (milestone 1; the warfare context's own numbers stay in domain/warfare.json). */

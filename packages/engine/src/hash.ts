@@ -33,6 +33,10 @@ export function hashWorld(world: World): string {
   feed(world.provinceArmyMonths);
   feed(world.provinceBattleYear);
   feed(world.provinceLord);
+  feed(world.provinceWorks);
+  feed(world.nationNeglect);
+  feed(Float64Array.from(world.sites.flatMap((s) => [s.nation, s.province, s.work, s.step, s.monthsLeft])));
+  feed(Int32Array.from(world.workQueue.flatMap((q) => [q.nation, q.province, q.work, q.step])));
   feed(Int32Array.from(world.lords.flatMap((l) => [l.nation, LOYALTY.indexOf(l.loyalty), l.upCredit])));
   // Army fields of live slots only: a dead slot keeps whatever it held, and a save drops it.
   const live = <T extends ArrayBufferView & ArrayLike<number> & { slice(a?: number, b?: number): T; fill(v: number, a?: number, b?: number): T }>(arr: T, stride = 1): T => {

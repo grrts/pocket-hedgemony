@@ -287,6 +287,18 @@ export const ICONS = {
   ],
   speaker: ["....kk.....", "...kwk...k.", "kkkwwk.k..k", "kwwwwk..k.k", "kwwwwk..k.k", "kwwwwk..k.k", "kkkwwk.k..k", "...kwk...k.", "....kk....."],
   mute: ["....kk.....", "...kwk.....", "kkkwwkr...r", "kwwwwk.r.r.", "kwwwwk..r..", "kwwwwk.r.r.", "kkkwwkr...r", "...kwk.....", "....kk....."],
+  hammer: [
+    ".kkkkkk...",
+    "kiiiiiik..",
+    "kiiiiiikk.",
+    ".kkbbkk...",
+    "...kbk....",
+    "...kbk....",
+    "...kbk....",
+    "...kbk....",
+    "...kbk....",
+    "...kkk....",
+  ],
   anchor: [
     "...kkk...",
     "...kik...",
