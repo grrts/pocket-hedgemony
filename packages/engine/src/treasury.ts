@@ -4,6 +4,7 @@ import { nationPay, ungoverned } from "./recruit.ts";
 import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
 import { interestPct, loanCap, realmConfig } from "./domain/realm/index.ts";
 import { moodShare } from "./moods.ts";
+import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -15,6 +16,7 @@ import { moodShare } from "./moods.ts";
 export const TAX_RATES = ["none", "light", "normal", "heavy", "crushing"] as const;
 export type TaxRateName = (typeof TAX_RATES)[number];
 export const NORMAL_TAX = 2;
+const HEAVY_TAX = 3;
 
 /** Lines of the ledger, in the order the snapshot sends them. */
 export const LEDGER = ["tax", "trade", "army pay", "officials", "interest"] as const;
@@ -63,14 +65,14 @@ export function taxFactor(world: World, rate: number): number {
 export function provinceTax(world: World, p: number, holder: number): number {
   const { economy } = world.rules.defines;
   // A province whose official was commissioned pays half (recruiting RECR-083, "Leave it").
-  // Rioting or plotting provinces pay half (PROV-162).
-  const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p);
+  // Rioting or plotting provinces pay half (PROV-162); a lord keeps his share (REALM-072).
+  const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
   return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share;
 }
 
 /** Trade and market gold a province gives its holder in a month (not taxed by rate). */
 export function provinceTrade(world: World, p: number): number {
-  const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p);
+  const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
   return world.provinceWealth[p]! * world.rules.defines.economy.goldPerWealthPerMonth * share;
 }
 
@@ -116,18 +118,32 @@ export function canBorrow(world: World, n: number): number {
 }
 
 /** Sets a province's rate (-1 = back to the default), or the realm's default when province is -1. */
-export function setTax(world: World, n: number, province: number, rate: number): string | null {
+export function setTax(world: World, n: number, province: number, rate: number, news: News[] = []): string | null {
   if (!Number.isInteger(rate) || rate < -1 || rate >= TAX_RATES.length) return "no such tax rate";
-  if (province < 0) {
-    if (rate < 0) return "the realm needs a default rate";
-    world.nationTaxDefault[n] = rate;
-  } else {
-    if (province >= world.provinceCount || world.provinceOwner[province] !== n) return "not your province";
-    world.provinceTax[province] = rate;
-  }
+  if (province < 0 && rate < 0) return "the realm needs a default rate";
+  if (province >= 0 && (province >= world.provinceCount || world.provinceOwner[province] !== n)) return "not your province";
+  applyRate(world, n, province, rate, news);
   // The ledger shows the new sums at once.
   runLedger(world, false);
   return null;
+}
+
+/**
+ * Puts a rate in place. A lord whose land it raises to heavy or crushing
+ * takes the heavy-taxes cause once (REALM-015, PROV-165).
+ */
+function applyRate(world: World, n: number, province: number, rate: number, news: News[]): void {
+  const touched = province >= 0 ? [province] : [];
+  if (province < 0) for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === n && world.provinceTax[p]! < 0 && world.provinceLord[p]! >= 0) touched.push(p);
+  const before = touched.map((p) => taxRateOf(world, p, n));
+  if (province < 0) world.nationTaxDefault[n] = rate;
+  else world.provinceTax[province] = rate;
+  const stirred = new Set<number>();
+  touched.forEach((p, k) => {
+    const now = taxRateOf(world, p, n);
+    if (world.provinceLord[p]! >= 0 && now > before[k]! && now >= HEAVY_TAX) stirred.add(world.provinceLord[p]!);
+  });
+  for (const lord of stirred) loyaltyStep(world, lord, "heavy_taxes", news);
 }
 
 export function takeLoan(world: World, n: number, gold: number): string | null {
@@ -149,22 +165,17 @@ export function repayLoan(world: World, n: number, gold: number): string | null 
   return null;
 }
 
-/** A realm is fighting a war on either side. */
-export function inAnyWar(world: World, n: number): boolean {
-  const id = world.nationIds[n]!;
-  return world.diplomacy.wars.some((w) => w.attackers.includes(id) || w.defenders.includes(id));
-}
-
 /**
  * The AI's monthly treasury (REALM-171): normal tax at peace and heavy at war,
  * a loan only when its gold is below zero, and repaying once it holds a
  * year's upkeep.
  */
-export function aiTreasury(world: World, _news: News[]): void {
+export function aiTreasury(world: World, news: News[]): void {
   const ai = realmConfig.ai;
   for (let n = 0; n < world.nationCount; n++) {
     if (n === world.player || world.nationGone[n]) continue;
-    world.nationTaxDefault[n] = TAX_RATES.indexOf((inAnyWar(world, n) ? ai.tax_at_war : ai.tax_at_peace) as TaxRateName);
+    const rate = TAX_RATES.indexOf((inAnyWar(world, n) ? ai.tax_at_war : ai.tax_at_peace) as TaxRateName);
+    if (rate !== world.nationTaxDefault[n]) applyRate(world, n, -1, rate, news);
     const gold = world.nationTreasury[n]!;
     if (gold < ai.loan_when_gold_below) {
       const want = Math.min(canBorrow(world, n), -gold + 1);

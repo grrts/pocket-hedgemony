@@ -257,4 +257,6 @@ export interface LivingDefines {
   startingStoreMonths: number;
   /** A province of the same realm with more than this many months stored feeds a hungry neighbour. */
   reliefAboveMonths: number;
+  /** Treasury gold a gift to a lord costs (realm: gift_of_gold raises his loyalty a step). */
+  lordGiftGold: number;
 }

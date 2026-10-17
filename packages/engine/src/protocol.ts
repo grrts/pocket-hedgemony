@@ -1,3 +1,4 @@
+import { giftGold } from "./lords.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
@@ -120,6 +121,10 @@ export interface Snapshot {
   provinceMood: Int8Array;
   grievanceNames: readonly string[];
   moods: readonly string[];
+  /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
+  lords: { name: string; house: string; nation: number; loyalty: string; lands: number }[];
+  provinceLord: Int16Array;
+  giftGold: number;
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -272,6 +277,13 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceMood: Int8Array.from({ length: w.provinceCount }, (_, p) => moodIndex(w, p)),
       grievanceNames: GRIEVANCES,
       moods: MOODS,
+      lords: (() => {
+        const lands = new Int32Array(w.lords.length);
+        for (let p = 0; p < w.provinceCount; p++) if (w.provinceLord[p]! >= 0) lands[w.provinceLord[p]!]!++;
+        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]! }));
+      })(),
+      provinceLord: w.provinceLord.slice(),
+      giftGold: giftGold(w),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
@@ -333,6 +345,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceStarved,
       snap.provinceGrievances,
       snap.provinceMood,
+      snap.provinceLord,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
       ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);

@@ -154,3 +154,23 @@ describe("heavy taxes stir the province", () => {
     expect(grievancesOf(w, paris)).not.toContain("Heavy taxes");
   });
 });
+
+describe("tax and the lords", () => {
+  it("a lord keeps his share, and wavers when his land is taxed heavy", async () => {
+    const w = createWorld(rules, 1, tiles);
+    const fra = nation(w, "france");
+    w.player = fra;
+    const p = Array.from(w.provinceOwner).findIndex((o, i) => o === fra && w.provinceLord[i]! >= 0 && w.lords[w.provinceLord[i]!]!.loyalty === "Loyal");
+    expect(p).toBeGreaterThanOrEqual(0);
+    const lord = w.provinceLord[p]!;
+    const royal = Array.from(w.provinceOwner).findIndex((o, i) => o === fra && w.provinceLord[i]! < 0 && w.provinceOfficial[i]! >= 0);
+    // Same people and official, a lord's province pays the crown half.
+    const perThousand = (q: number) => provinceTax(w, q, fra) / w.provincePopulation[q]!;
+    if (w.provinceOfficial[p]! >= 0) expect(perThousand(p)).toBeCloseTo(perThousand(royal) * 0.5);
+    applyNow(w, { type: "setTax", province: p, rate: rate("light") }, fra);
+    expect(w.lords[lord]!.loyalty).toBe("Loyal");
+    const r = applyNow(w, { type: "setTax", province: p, rate: rate("heavy") }, fra);
+    expect(r.rejectedOrders).toEqual([]);
+    expect(w.lords[lord]!.loyalty).not.toBe("Loyal");
+  });
+});

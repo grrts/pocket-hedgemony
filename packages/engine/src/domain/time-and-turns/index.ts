@@ -335,6 +335,12 @@ export function orderShape(order: Order): string {
       return "take a loan";
     case "repay":
       return "repay a loan";
+    case "gift":
+      return "give a lord gold";
+    case "grantFief":
+      return "grant a fief";
+    case "seizeFief":
+      return "seize a fief";
   }
 }
 

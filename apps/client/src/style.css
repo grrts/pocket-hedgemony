@@ -1233,10 +1233,13 @@ table.classes td.bar span {
   min-height: 44px;
 }
 
-.tax-rates button.on {
-  background: var(--brass-light);
-  outline: 3px solid var(--ink);
-  outline-offset: -3px;
+/* The chosen rate stays pressed in, marked with a dot. */
+.tax-rates button.paper.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+
+.tax-rates button.on::before {
+  content: "● ";
 }
 
 table.ledger td.num {
@@ -1250,4 +1253,29 @@ b.down {
 
 table.ledger tr.total td {
   border-top: 2px solid currentColor;
+}
+
+/* The realm's Provinces overview: rows open their province; troubled rows stand out. */
+table.provinces tr.go {
+  cursor: pointer;
+}
+
+table.provinces tr.bad td {
+  color: var(--wax, #8b1e1e);
+}
+
+table.provinces th.num,
+table.provinces td.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Kept clear of the end-turn button, which stands over the panel's right edge. */
+table.provinces {
+  width: auto;
+  min-width: 60%;
+}
+
+table.provinces td:first-child {
+  padding-right: 24px;
 }

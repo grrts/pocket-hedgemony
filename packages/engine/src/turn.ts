@@ -2,6 +2,7 @@ import { monthlyPeople } from "./living.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
 import { monthlyMoods } from "./moods.ts";
+import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, forageRations, monthlyRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -81,7 +82,11 @@ export type Order =
   | { type: "setTax"; province: number; rate: number }
   /** Borrow gold from lenders, or pay some of it back. */
   | { type: "borrow"; gold: number }
-  | { type: "repay"; gold: number };
+  | { type: "repay"; gold: number }
+  /** Give a lord gold, grant him a royal province, or take a province back from its lord. */
+  | { type: "gift"; lord: number }
+  | { type: "grantFief"; province: number; lord: number }
+  | { type: "seizeFief"; province: number };
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -149,6 +154,7 @@ function startDay(world: World, news: News[]): void {
     monthlyPeople(world, news);
     monthlyFood(world, news);
     monthlyMoods(world, news);
+    monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
     runLedger(world, true);
     aiTreasury(world, news);
@@ -215,11 +221,17 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "disband":
       return disbandArmy(world, actingNation, order.army);
     case "setTax":
-      return setTax(world, actingNation, order.province, order.rate);
+      return setTax(world, actingNation, order.province, order.rate, news);
     case "borrow":
       return takeLoan(world, actingNation, order.gold);
     case "repay":
       return repayLoan(world, actingNation, order.gold);
+    case "gift":
+      return giveGift(world, actingNation, order.lord);
+    case "grantFief":
+      return grantFief(world, actingNation, order.province, order.lord);
+    case "seizeFief":
+      return seizeFief(world, actingNation, order.province, news);
     case "move":
       return orderMarch(world, order, actingNation);
   }

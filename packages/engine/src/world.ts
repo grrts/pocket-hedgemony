@@ -9,6 +9,7 @@ import { newCommander, type Commander } from "./domain/warfare/index.ts";
 import { createTreasuryState, runLedger, type TreasuryState } from "./treasury.ts";
 import { createFoodState, seedStores, type FoodState } from "./food.ts";
 import { createMoodState, type MoodState } from "./moods.ts";
+import { createLordState, seedLords, type LordState } from "./lords.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
 import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 
@@ -18,7 +19,7 @@ import { ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIN
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -376,10 +377,12 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createTreasuryState(P, N),
     ...createFoodState(P),
     ...createMoodState(P),
+    ...createLordState(P),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
   seedStores(world);
+  seedLords(world);
   updateWeather(world);
   for (let p = 0; p < P; p++) world.provinceGarrison[p] = maxGarrison(world, p);
 
