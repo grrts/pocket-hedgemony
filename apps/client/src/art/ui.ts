@@ -8,6 +8,8 @@
  * edges repeat, scaled up by whole steps so pixels stay square.
  */
 
+import { FLAG_H, FLAG_W, flagGrid } from "./flags.ts";
+
 type Px = (x: number, y: number, c: string) => void;
 
 function paint(w: number, h: number, draw: (px: Px, rect: (x: number, y: number, w: number, h: number, c: string) => void) => void): string {
@@ -325,40 +327,65 @@ export function icon(name: IconName, scale = 2, label = ""): string {
   return `<img class="px-icon" src="${iconUrl(name, scale)}" alt="${label}" ${label ? "" : 'aria-hidden="true"'}>`;
 }
 
+/** A realm as far as its flag goes: its id picks the flag, its map colour is the plain cloth for realms without one. */
+export interface FlagOf {
+  id: string;
+  color: string;
+}
+
+/** Each column's drop, in art pixels: the cloth ripples in two waves from hoist to fly. */
+const FLAG_WAVE = [0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0];
+/** Each column's light: +1 on the crest of a fold, -1 in its trough. */
+const FLAG_LIGHT = [1, 0, 0, -1, -1, 0, 0, 1, 1, 0, -1, -1, 0, 0, 1];
+
 /**
- * A realm's flag, as a data URL: a field of cloth in its colour with no pole
- * (feedback 37), rippling in the wind with its folds shaded light and dark,
- * inside an ink rim. Pixel rows are drawn at a whole-number scale.
+ * A realm's flag, as a data URL: its national flag (feedback 55) or, for a
+ * realm without one, a cloth in its colour; no pole (feedback 37), rippling
+ * in the wind with its folds shaded light and dark, inside an ink rim.
+ * Pixel rows are drawn at a whole-number scale.
  */
-export function flagUrl(color: string, scale = 2): string {
-  const key = `flag|${color}|${scale}`;
-  const hit = iconCache.get(key);
-  if (hit) return hit;
-  const rows = [
-    ".kkkk....kkk.",
-    "kLLNNkkkkLNNk",
-    "kLNNNNNNNNNNk",
-    "kNNNNnNNNNNnk",
-    "kNNNnnNNNNnnk",
-    "kNNnnkkkkNnnk",
-    "knnk....knnk.",
-    ".kk......kk..",
-  ];
-  const n = parseInt(color.slice(1), 16);
-  const tone = (f: (v: number) => number) => `rgb(${f((n >> 16) & 255)},${f((n >> 8) & 255)},${f(n & 255)})`;
-  const dark = tone((v) => Math.round(v * 0.68));
-  const light = tone((v) => Math.round(v + (255 - v) * 0.3));
-  const url = paint(rows[0]!.length * scale, rows.length * scale, (_, rect) => {
-    rows.forEach((row, y) => {
-      for (let x = 0; x < row.length; x++) {
-        const ch = row[x]!;
-        if (ch === ".") continue;
-        rect(x * scale, y * scale, scale, scale, ch === "N" ? color : ch === "n" ? dark : ch === "L" ? light : ICON_KEY[ch]!);
-      }
-    });
-  });
-  iconCache.set(key, url);
+export function flagUrl(nation: FlagOf, scale = 2): string {
+  const key = `flag|${nation.id}|${nation.color}|${scale}`;
+  let url = iconCache.get(key);
+  if (!url) iconCache.set(key, (url = flagCanvas(nation, scale).toDataURL()));
   return url;
+}
+
+const flagCanvases = new Map<string, HTMLCanvasElement>();
+
+/** The same flag as a canvas, for drawing on the map. Cached. */
+export function flagCanvas(nation: FlagOf, scale = 1): HTMLCanvasElement {
+  const key = `${nation.id}|${nation.color}|${scale}`;
+  const hit = flagCanvases.get(key);
+  if (hit) return hit;
+  const cloth = flagGrid(nation.id) ?? Array.from({ length: FLAG_H }, () => Array<string>(FLAG_W).fill(nation.color));
+  const w = FLAG_W + 2;
+  const canvas = document.createElement("canvas");
+  canvas.width = w * scale;
+  canvas.height = (FLAG_H + 3) * scale;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+  const rect = (x: number, y: number, rw: number, rh: number, c: string) => {
+    ctx.fillStyle = c;
+    ctx.fillRect(x * scale, y * scale, rw * scale, rh * scale);
+  };
+  for (let x = 0; x < FLAG_W; x++) {
+    const dy = FLAG_WAVE[x]!;
+    // The rim follows the cloth's edge.
+    rect(x + 1, dy, 1, FLAG_H + 2, ICON_KEY.k!);
+    for (let y = 0; y < FLAG_H; y++) rect(x + 1, y + 1 + dy, 1, 1, shadeCloth(cloth[y]![x]!, FLAG_LIGHT[x]!));
+  }
+  rect(0, 1, 1, FLAG_H, ICON_KEY.k!);
+  rect(w - 1, 1, 1, FLAG_H, ICON_KEY.k!);
+  flagCanvases.set(key, canvas);
+  return canvas;
+}
+
+/** A cloth colour lit (+1) or shaded (-1) by its fold. */
+function shadeCloth(hex: string, light: number): string {
+  if (!light || !hex.startsWith("#")) return hex;
+  const n = parseInt(hex.slice(1), 16);
+  const f = (v: number) => Math.round(light > 0 ? v + (255 - v) * 0.18 : v * 0.78);
+  return `rgb(${f((n >> 16) & 255)},${f((n >> 8) & 255)},${f(n & 255)})`;
 }
 
 /** Paints the interface art and publishes it to the stylesheet as CSS variables. */

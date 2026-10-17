@@ -35,7 +35,7 @@ export const LOYALTY_NOTE: Record<string, string> = {
 export const LOYALTY_ORDER = ["In revolt", "Disloyal", "Wavering", "Loyal"];
 
 export function lordPortrait(rules: Ruleset, lord: { name: string; nation: number }, scale = 3): string {
-  return portrait({ name: lord.name, color: rules.nations[lord.nation]!.color, kind: "lord", look: lookOf(rules, lord.nation) }, scale);
+  return portrait({ name: lord.name, color: rules.nations[lord.nation]!.color, kind: "lord", look: lookOf(rules, lord.nation), nation: rules.nations[lord.nation]!.id }, scale);
 }
 
 /** A coloured tag for a loyalty step. */
