@@ -3,15 +3,16 @@ import { loadDefaultRuleset } from "@ph/rules";
 import { DEPTH_COLORS, PALETTE, TERRAIN_CATEGORIES, TERRAIN_COLORS, TERRAINS } from "./art/palette.ts";
 import { sprite, SPRITES, type SpriteName } from "./art/sprites.ts";
 import { BIG_ROWS, SEA_ROW, SHALLOW_ROW, tileCanvas, VARIANTS } from "./art/tiles.ts";
-import { portrait, type Look } from "./art/portraits.ts";
-import { icon, ICONS, installUiArt, flagUrl, UI_COLORS, type IconName } from "./art/ui.ts";
+import { apparentAge, commanderSprite } from "./art/commanders.ts";
+import { portrait, setPortraitYear, type Look } from "./art/portraits.ts";
+import { icon, ICONS, installUiArt, flagUrl, type FlagOf, UI_COLORS, type IconName } from "./art/ui.ts";
 
 installUiArt();
 const rules = loadDefaultRuleset();
 const root = document.querySelector<HTMLElement>("#sheet")!;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const nation = (id: string) => rules.nations.find((n) => n.id === id)!;
-const pennant = (color: string, scale = 2) => `<img class="px-icon" src="${flagUrl(color, scale)}" alt="">`;
+const pennant = (nation: FlagOf, scale = 2) => `<img class="px-icon flag" src="${flagUrl(nation, scale)}" alt="">`;
 
 const figure = (el: HTMLElement | string, caption: string) => {
   const f = document.createElement("figure");
@@ -51,7 +52,7 @@ root.innerHTML = `
   body.innerHTML = `
     <h3>Top bar</h3>
     <header class="hud demo-hud">
-      <div class="realm">${pennant(france.color, 2)}<b>${esc(france.name)}</b></div>
+      <div class="realm">${pennant(france, 2)}<b>${esc(france.name)}</b></div>
       <span class="plaque">18 Nov 1444</span>
       <span class="plaque">${icon("coin", 1)}64 <small>+4.2</small></span>
       <span class="plaque">${icon("swords", 1)}38k</span>
@@ -63,7 +64,7 @@ root.innerHTML = `
     <h3>Buttons</h3>
     <div class="row">
       <button>Move</button>
-      <button class="paper">${pennant(nation("england").color)}England</button>
+      <button class="paper">${pennant(nation("england"))}England</button>
       <button class="wax">${icon("crown", 2)}Rule France</button>
       <button class="icon-only">${icon("map", 3)}</button>
       <button class="icon-only">${icon("castle", 3)}</button>
@@ -72,7 +73,7 @@ root.innerHTML = `
     <h3>Panel</h3>
     <section class="panel framed demo-panel">
       <header><h2 class="ribbon">Île-de-France</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span></header>
-      <p class="owner">${pennant(france.color)}<b>France</b> · farmland</p>
+      <p class="owner">${pennant(france)}<b>France</b> · farmland</p>
       <dl class="facts"><dt>People</dt><dd>412,000</dd><dt>Wealth</dt><dd>${icon("coin", 1).repeat(6)}</dd></dl>
       <div class="army">
         <img class="portrait" src="${sprite("commander", france.color, 3).toDataURL()}" alt="">
@@ -137,19 +138,55 @@ section(
 {
   const body = section(
     "Portraits",
-    "Commanders and officials get a face from their name: skin, hair, beard and headwear picked by a hash of it, dress by where their realm lies, and the realm's colour in the clothes and backdrop. The same person always looks the same.",
+    "Commanders, officials and lords get a face from their name: skin, hair, beard and headwear picked by a hash of it. What they do shows in their dress and what they hold, their realm in its flag behind them and its colours on them, and their age in their hair. The same person always looks the same.",
   );
   const looks: [Look, string, string][] = [
-    ["europe", "castile", "Álvaro de Luna"], ["levant", "ottomans", "Zaganos Pasha"], ["steppe", "great_horde", "Ahmad Khan"], ["eastAsia", "ming", "Yu Qian"],
+    ["europe", "castile", "Álvaro de Luna"], ["europe", "france", "Jean de Dunois"], ["levant", "ottomans", "Zaganos Pasha"], ["steppe", "great_horde", "Ahmad Khan"], ["eastAsia", "ming", "Yu Qian"],
     ["southAsia", "vijayanagar", "Deva Raya Nayaka"], ["africa", "mali", "Mansa Uli"], ["americas", "aztecs", "Tlacaelel"],
   ];
-  for (const kind of ["commander", "official"] as const) {
+  const posts = ["Warden", "Steward", "Muster master", "Master of works", "Tax collector", "Customs officer", "Judge", "Schoolmaster"];
+  for (const kind of ["commander", "official", "lord"] as const) {
     const row = document.createElement("div");
     row.className = "row";
-    for (const [look, id, name] of looks)
-      for (const k of [0, 1]) row.append(figure(portrait({ name: `${name}${k ? " II" : ""}`, color: nation(id).color, kind, look }, 3), `${kind} · ${look}`));
+    looks.forEach(([look, id, name], i) =>
+      row.append(figure(portrait({ name, color: nation(id).color, kind, look, nation: id, post: posts[i]! }, 3), `${kind === "official" ? posts[i] : kind} · ${nation(id).name}`)),
+    );
     body.append(row);
   }
+  // The same commander as the centuries pass: older, and in the kit of each era.
+  const row = document.createElement("div");
+  row.className = "row";
+  for (const year of [1444, 1470, 1520, 1620, 1720, 1820, 1880, 1920, 1970]) {
+    setPortraitYear(year);
+    row.append(figure(portrait({ name: "Jean de Dunois", color: nation("france").color, kind: "commander", look: "europe", nation: "france" }, 3), `${year}`));
+  }
+  setPortraitYear(1444);
+  body.append(row);
+}
+
+// Commanders
+{
+  const body = section(
+    "Commanders",
+    "On the map a commander stands on foot in their realm's flag colours, in the kit of the era (src/art/commanders.ts): plate and sword, halberd, pistol, tricorne, sabre, revolver, rifle, field glasses. Their hair greys with age. One size at every zoom.",
+  );
+  const realms: [Look, string, string][] = [["europe", "france", "Jean de Dunois"], ["europe", "england", "John Talbot"], ["europe", "sweden", "Karl Knutsson"], ["levant", "ottomans", "Zaganos Pasha"], ["steppe", "great_horde", "Ahmad Khan"], ["eastAsia", "ming", "Yu Qian"], ["southAsia", "vijayanagar", "Deva Raya Nayaka"], ["africa", "mali", "Mansa Uli"], ["americas", "aztecs", "Tlacaelel"]];
+  for (const era of [0, 1, 2, 3, 4, 5, 6, 7]) {
+    const row = document.createElement("div");
+    row.className = "row";
+    for (const [look, id, name] of realms) {
+      const n = nation(id);
+      row.append(figure(commanderSprite({ name, nation: id, color: n.color, look, era, age: apparentAge(name, 1444) + era * 15 }, 3, 0), `${n.name} · era ${era + 1}`));
+    }
+    body.append(row);
+  }
+}
+
+// Flags
+{
+  const body = section("Flags", `Every realm's own flag (src/art/nationFlags.ts), without a pole: ${rules.nations.length} realms.`);
+  body.className = "grid";
+  for (const n of rules.nations) body.insertAdjacentHTML("beforeend", `<div class="chip">${pennant(n, 3)}<br>${esc(n.name)}</div>`);
 }
 
 // Palette
@@ -172,5 +209,5 @@ section(
   const size = new Map<string, number>();
   for (const p of rules.provinces) if (p.owner) size.set(p.owner, (size.get(p.owner) ?? 0) + 1);
   const top = [...rules.nations].sort((a, b) => (size.get(b.id) ?? 0) - (size.get(a.id) ?? 0)).slice(0, 24);
-  for (const n of top) body.insertAdjacentHTML("beforeend", `<div class="chip">${pennant(n.color, 3)} ${esc(n.name)}<br>${size.get(n.id)} provinces</div>`);
+  for (const n of top) body.insertAdjacentHTML("beforeend", `<div class="chip">${pennant(n, 3)} ${esc(n.name)}<br>${size.get(n.id)} provinces</div>`);
 }

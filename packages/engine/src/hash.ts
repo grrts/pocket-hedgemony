@@ -23,6 +23,9 @@ export function hashWorld(world: World): string {
   feed(world.provinceRecruits);
   feed(world.provincePopulation);
   feed(world.provinceClasses);
+  feed(world.provinceTax);
+  feed(world.nationTaxDefault);
+  feed(world.nationDebt);
   feed(world.provinceStore);
   feed(world.provinceHarvest);
   feed(world.provinceStarved);
@@ -57,6 +60,8 @@ export function hashWorld(world: World): string {
   feed(new Float64Array(world.mercs.flatMap((m) => [m.nation, m.company.id, m.weeksLeft])));
   feed(new Float64Array(world.freeCompanies.flatMap((c) => [c.id, c.home, ...c.byArm])));
   feed(world.provinceOfficial);
+  feed(world.provinceOfficialSeed);
+  feed(world.provinceOfficialSince);
   feed(live(a.trainArm));
   feed(live(a.trainMen));
   feed(live(a.trainLeft));

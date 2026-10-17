@@ -287,6 +287,31 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 
 - REALM-176: The country card's General tab shall hold REALM-005's lines except Allies, Enemies and Oaths broken, which move to its Diplomacy tab; trade lines go to the Trade tab and soldiers, commanders and ships to the Army tab (game-shell SHELL-139). [F-12]
 
+### 5.17 Tax rates and the treasury ledger (milestone 3)
+The game's first working treasury, built to the milestone 3 plan (slice 2). It replaces the single monthly income with the rules above put to work.
+
+- REALM-177: Each province shall pay tax at its own rate, or at its owner's realm default while it has none; a new realm's default is normal and no province starts with its own rate. A province pays its people's tax times the rate's factor: none nothing, light half, normal once, heavy one and a half, crushing double (`economy.taxRateFactor`, provisional); half while its official's post stands empty (RECR-083), and half while it riots or plots (PROV-162); a lord's province gives the crown only its share of both tax and trade (REALM-072). At heavy it has the *Heavy taxes* grievance, counted twice at crushing (PROV-167). [REALM-015, PROV-160, PROV-162, PROV-167, milestone 3]
+- REALM-187: When a rate is raised so that a lord's province pays heavy or crushing, that lord shall take the *heavy taxes* loyalty cause once, whether the province's own rate or the realm default was raised (an AI realm going to war included). [REALM-015, PROV-165, milestone 3]
+- REALM-178: Trade and market gold (the province's wealth) shall reach the holder whatever the tax rate, halved while the official's post stands empty. [REALM-010, PROV-161, milestone 3]
+- REALM-179: The treasury shall keep a ledger for the month with the lines Tax, Trade, Army pay, Officials and Interest; the month's income is their sum, and it is paid into the treasury when a new month begins. [REALM-010, milestone 3]
+- REALM-180: Officials' wages shall be one wage a month (`economy.officialWagePerMonth`, provisional) for each province whose official is at his post, paid by the owner even while the province is occupied; a commissioned official draws no wage here. Wages and debt interest are paid in twelfths each month, not once a year (default chosen so that the monthly ledger shows every cost). [REALM-063, REALM-012, milestone 3]
+- REALM-181: Lenders shall lend up to one year's tax and trade, less what the realm already owes, at 10 % a year paid monthly; gold can be repaid at any time up to what is owed and what the treasury holds. Until banks are invented (T7, T10, T12) every lender gives these terms. [REALM-164, milestone 3]
+- REALM-182: Each month an AI realm shall set its tax default to normal at peace and heavy at war; borrow only while its gold is below zero, enough to bring it back above zero as far as lenders allow; and repay once its gold is more than a year's army pay and wages. [REALM-171, milestone 3]
+
+#### How the player uses it: tax and the treasury
+- REALM-183: The player sets one province's rate on its card: the province Overview tab shows a Tax line (its rate, whether it follows the realm default, and the gold it pays a month) with a row of buttons, Realm default, None, Light, Normal, Heavy and Crushing; the chosen one is marked. [X-19]
+- REALM-184: Everything about the realm's gold sits on one tab, the Treasury tab of the player's country card, next to General: gold and its change a month, the month's ledger line by line, the realm tax default with the same row of rate buttons, and the debt with its interest, what lenders would still give, and buttons to borrow and repay. [X-19]
+- REALM-185: The gold plaque at the top of the screen is the treasury's overview: it shows gold and its change a month, and tapping it opens the Treasury tab; the General tab's Treasury line opens it too. [X-19]
+- REALM-186: On a phone in landscape the Treasury tab and the Tax line fit the side panel in the Wide and Tall layouts: the tab row scrolls sideways, the rate buttons wrap onto two rows of three, every button is at least 44 points high, and nothing needs hover (each button names what it does). [X-19]
+
+#### How the player uses it: lords and who governs a province
+- REALM-190: Who governs a province comes first on its Overview, above the siege view and the facts: a "Governed by" card with the lord who holds it (portrait, house, loyalty, and buttons to his screen and to seize the land) or "Royal land" (with a Grant as fief button that opens the realm's lords, neighbours first), and the province's official. A lord's official is shown as serving the lord, with no button to the official's screen, so he cannot be commissioned. [F-60, F-62, F-70, X-19]
+- REALM-191: The Lords tab of the country card is the lords' overview: a bar of royal land against the lords' land, the count by loyalty, and a row per lord (portrait, name, house, provinces, people, loyalty as a coloured tag, gold a month to the crown), the least loyal first; tapping a row opens the lord's screen. [F-64, F-65, X-19]
+- REALM-192: A lord's screen shows his portrait, house, loyalty and what it means, his lands (people, gold to the crown), a Gift button while he is not loyal, his provinces as rows with a picture of each (tap to open it on the map, Seize beside it), and the realm's royal provinces to grant him, nearest his lands first (six, with Show all). A button lights his lands on the map: the rest of the land fades to grey, the map frames his provinces, and a chip over the map names him with buttons to reopen his screen and to stop; on a phone the panel folds away so the map shows. [F-67, F-70, X-19]
+- REALM-193: On the map, a lord's land carries a fine pattern of small crosses and a dashed border where it meets royal land or another lord's land; the Lords lens colours the player's royal land gold and each lord's land in his own colour, other realms faded. [F-68, X-19]
+- REALM-194: The Provinces tab lists every province as a row with a picture of the province, its mood, who governs it (lord's house, or royal with the official's post or "no official"), people, food and tax a month, sortable by trouble, people, food or tax; tapping a row opens the province and centres the map on it, and its Map button shows it on the map with the panel folded away. [F-63, X-19]
+- REALM-195: On a phone in landscape these screens fit the side panel in the Wide and Tall layouts: rows and their buttons are at least 44 points high, the lord's grants and lands wrap to one column, and nothing needs hover. [X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -294,7 +319,8 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 | SetFoodPolicy(setting, value) | player / AI | Value from the allowed list | Realm default changed | FoodPolicyChanged |
 | OverrideCastlePolicy(castle, setting, value) | player / AI | Own castle | Castle override | FoodPolicyChanged |
 | ApplyFoodPreset(preset) | player / AI | — | All settings filled | FoodPolicyChanged |
-| TakeLoan(lender, amount) | player / AI | Lender willing (oaths broken lowers it) | Gold up, debt up | LoanTaken |
+| SetTaxDefault(rate) | player / AI | One of the five steps | Every province without its own rate pays at it | TaxRateChanged |
+| TakeLoan(lender, amount) | player / AI | Lender willing (oaths broken lowers it); within the loan cap (REALM-181) | Gold up, debt up | LoanTaken |
 | RepayDebt(loan, amount) | player / AI | Gold | Debt down | DebtRepaid |
 | DefaultOnDebt(loan) | player / AI | Debt | Debt wiped; oath broken | DebtDefaulted, OathBroken |
 | HireOfficial(type) / DismissOfficial | player / AI | Gold | Official count changes | OfficialHired / OfficialDismissed |
@@ -392,6 +418,8 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 | grain_price_gold_per_food | Fixed grain price | 0.5 gold a food | yes | realm.json |
 | food_year.weather, harvest_month, reach_by_road, favoured_weight | Weather odds, harvest month, castle reach, favoured castles | 1 in 6 bad and good; Sep / Mar; 1–4 rings; ×2 | yes | realm.json |
 | debt | Interest, loan cap, refusal per oath | 10 %; 1 year's income (3 with T10); 10 points | yes | realm.json |
+| economy.taxRateFactor | Gold at each tax step against normal | 0, ½, 1, 1½, 2 (not in the design) | yes | defines.json |
+| economy.officialWagePerMonth | An official's wage a month | 0.1 gold (not in the design) | yes | defines.json |
 | starting | Assessment level tables and confidence spread | tables; ±25 / 10 / 5 % | yes | realm.json |
 | starting_lords | Great houses and generated lords | France's seven houses; 1 per 4 provinces | yes | realm.json |
 | officials_per_province | Provinces one official runs | G1 1, G9 2, G16 3, +1 B2, G11, T14 | no | realm.json |
@@ -615,3 +643,20 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-174 | treasury.feature | Five tax steps |
 | REALM-175 | army-and-navy.feature | Commanders |
 | REALM-176 | country-card.feature | The country card's General tab |
+| REALM-177 | treasury-ledger.feature | Each province pays at its own rate or the realm default; Five rates, five sums |
+| REALM-178 | treasury-ledger.feature | Trade does not follow the tax rate |
+| REALM-179 | treasury-ledger.feature | The month's ledger |
+| REALM-180 | treasury-ledger.feature | Officials are paid while they hold their posts |
+| REALM-181 | treasury-ledger.feature | Borrowing up to a year's income; Repaying |
+| REALM-182 | treasury-ledger.feature | The AI's treasury |
+| REALM-183 | treasury-ledger.feature | Setting a province's rate from its card |
+| REALM-184 | treasury-ledger.feature | The Treasury tab |
+| REALM-185 | treasury-ledger.feature | The gold plaque opens the Treasury tab |
+| REALM-187 | — | Covered by engine test (packages/engine/test/treasury.test.ts: tax and the lords) |
+| REALM-186 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/treasury-shots.mjs) |
+| REALM-190 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-191 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-192 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-193 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-194 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |
+| REALM-195 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/lords-shots.mjs) |

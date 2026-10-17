@@ -8,7 +8,11 @@
   "economy": {
     "goldPerThousandPeoplePerMonth": 0.004,
     "goldPerWealthPerMonth": 0.06,
-    "startingTreasury": 50
+    "startingTreasury": 50,
+    "$taxRateFactor": "Milestone 3: gold a province pays at each tax step (none, light, normal, heavy, crushing) against normal. Provisional: the design names the steps but no amounts.",
+    "taxRateFactor": [0, 0.5, 1, 1.5, 2],
+    "$officialWagePerMonth": "Milestone 3: an official's wage, paid monthly while he runs his province (REALM-063 wages). Provisional: the design gives no amount.",
+    "officialWagePerMonth": 0.1
   },
   "levies": {
     "$comment": "Men who can be called per thousand people: the recruiting context's fighting-age share (0.25) times the farmers' call share (0.12).",
