@@ -2159,3 +2159,56 @@ p.warn {
   color: var(--cloth);
   font-weight: 600;
 }
+
+/* ---- Land (feedback 80, 87): a province's tiles as a grid of 44-point squares ---- */
+.land-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 4px;
+  margin: 6px 0 8px;
+}
+button.land-tile {
+  min-height: 56px;
+  min-width: 44px;
+  padding: 2px 4px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  line-height: 1.05;
+  border: 2px solid var(--outline);
+  color: var(--ink);
+  text-shadow: none;
+  white-space: normal;
+  text-align: center;
+}
+button.land-tile b {
+  font-size: 18px;
+}
+button.land-tile small {
+  font-size: 15px;
+  opacity: 0.85;
+}
+button.land-tile.on {
+  outline: 3px solid var(--brass);
+  outline-offset: -5px;
+}
+.land-tile.use-fields { background: #d8c070; }
+.land-tile.use-pasture { background: #a8c47a; }
+.land-tile.use-woods { background: #6f9a58; }
+.land-tile.use-marsh { background: #8fa8a0; }
+.land-tile.use-waste { background: #b8a690; }
+.land-tile.use-shore { background: #8cc0d8; }
+.land-tile.use-town { background: #d8b8a0; }
+.land-sheet {
+  margin: 4px 0 8px;
+  padding: 6px 8px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.land-sheet p {
+  margin: 2px 0 6px;
+}
+.land-sheet button.wax {
+  min-height: 44px;
+  width: 100%;
+}

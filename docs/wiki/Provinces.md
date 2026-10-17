@@ -399,6 +399,16 @@ A province stores about 95 small numbers and works out food made, wares made, ta
 | Yearly | Recruits refill; tax owed; years held and years served; one burned tile rebuilt; worn tile checks; mine seams fall; woods regrow after 10 unworked years; refugees settle after 2 years |
 | Weekly, during an outbreak | Plague |
 
+## In the game now: the land
+
+Every province is laid out in **4 to 16 tiles** from the map: bigger provinces have more. One is the **Town**, a coast gives 1 to 3 **Shore** tiles, and the rest are **Fields**, **Pasture**, **Woods**, **Marsh** or **Waste** in the share of the ground under the province (farmland is mostly fields, mountains mostly waste and pasture, forest mostly woods).
+
+**Food comes from the tiles.** A farm in the province works all its fields: each fields tile has work for 30,000 farmers, who feed 1.1 people each at a plain farm, 1.3 at a mill farm and 1.5 at an enclosed farm. Farmers past that, or with no farm at all, work bare land and feed 0.67 each. Ranches do the same for herders on pasture and fisheries for seafolk on the shore (1.33 each). The ground matters too: farmland farms better, mountains and marsh worse.
+
+**In 1444** every province about feeds itself: its people's own ways of working the land (terraces, ditches, herding on the move) make up what its buildings leave short of 110 % of its needs in a normal year. That stays fixed, so as the people grow, a better farm or another ranch is what feeds them. A poor harvest bites.
+
+**How you use it.** Tap one of your provinces, then its **Land** tab. The first line says how much of its people the land feeds in a normal year, in red under 100 %. Below is the grid of tiles, each coloured by its use and naming the building that works it. Tap a tile to see who works it, what it feeds or gives a year, and the building that would work it better, with its **Build** button or why it can't be built yet. Changing what a tile is used for (clearing woods, draining marsh) and hunting come next.
+
 ## What you see
 
 **The province card**, when you tap a province at close zoom:

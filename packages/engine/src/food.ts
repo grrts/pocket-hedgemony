@@ -5,6 +5,7 @@ import { harvestMultiplier, type HarvestRoll } from "./domain/province/land.ts";
 import { harvestMonth, rollRegionWeather, rotSeason } from "./domain/realm/index.ts";
 import { officialBonus } from "./officials.ts";
 import { worksFood } from "./works.ts";
+import { atHarvest, FOOD_CLASSES } from "./land.ts";
 
 /**
  * Food (milestone 3): each province keeps a local store, counted in months of
@@ -42,16 +43,10 @@ export function seedStores(world: World): void {
   }
 }
 
-const FOOD_CLASSES = ["farmers", "herders", "woodsmen", "seafolk"] as const;
-
-/** People a province's food classes feed in a year, in thousands, at a harvest roll for the farmers. */
+/** People a province's food classes feed in a year, in thousands, at a harvest roll for the farmers (feedback 80: farms, ranches and fisheries give their workers the full rate, bare land less). */
 export function yearlyFood(world: World, p: number, roll: HarvestRoll = "normal"): number {
-  const per = world.rules.defines.living.foodPerWorker;
   let food = 0;
-  for (const c of FOOD_CLASSES) {
-    const workers = world.provinceClasses[p * CLASS_COUNT + CLASS_NAMES.indexOf(c)]!;
-    food += workers * (per[c] ?? 0) * (c === "farmers" ? harvestMultiplier(roll) : 1) * worksFood(world, p, c);
-  }
+  for (const c of FOOD_CLASSES) food += worksFood(world, p, c) * (atHarvest(c) ? harvestMultiplier(roll) : 1);
   return food;
 }
 
@@ -75,14 +70,12 @@ function regionOf(world: World, p: number): number {
  */
 export function monthlyFood(world: World, news: News[]): void {
   const month = world.date.month;
-  const per = world.rules.defines.living.foodPerWorker;
   const store = world.provinceStore;
   const P = world.provinceCount;
   if (month === 1) world.provinceStarved.fill(0);
 
   // Harvests: each region rolls its weather once (bad one band worse, good one better).
   const weather = new Map<number, number>();
-  const farmersAt = CLASS_NAMES.indexOf("farmers");
   for (let p = 0; p < P; p++) {
     if (world.provinceWater[p] || harvestMonth(world.provincePlace[p]!.lat) !== month) continue;
     const r = regionOf(world, p);
@@ -99,7 +92,7 @@ export function monthlyFood(world: World, news: News[]): void {
     // A steward gets more out of the fields (province officials table: +10 % food).
     const steward = officialBonus(world, p, "Steward", "food");
     // Farms raise the harvest (works).
-    store[p] = store[p]! + world.provinceClasses[p * CLASS_COUNT + farmersAt]! * (per.farmers ?? 0) * harvestMultiplier(HARVESTS[roll]!) * 12 * steward * worksFood(world, p, "farmers");
+    store[p] = store[p]! + worksFood(world, p, "farmers") * harvestMultiplier(HARVESTS[roll]!) * 12 * steward;
   }
 
   const season = month % 3 === 0;
@@ -107,7 +100,7 @@ export function monthlyFood(world: World, news: News[]): void {
     if (world.provinceWater[p]) continue;
     // Herds, hunting and the catch: a year's food for F thousand people is F thousand fed a month, every month.
     let other = 0;
-    for (const c of FOOD_CLASSES) if (c !== "farmers") other += world.provinceClasses[p * CLASS_COUNT + CLASS_NAMES.indexOf(c)]! * (per[c] ?? 0) * worksFood(world, p, c);
+    for (const c of FOOD_CLASSES) if (!atHarvest(c)) other += worksFood(world, p, c);
     store[p] = store[p]! + other - world.provincePopulation[p]!;
     if (season && store[p]! > 0) store[p] = rotSeason(store[p]!, false);
   }

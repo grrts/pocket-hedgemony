@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-544 decided and 8 still open across 29 contexts.
+545 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -326,6 +326,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-PROV-22**: (was OQ-PROV-22) Troyes tax: what reaches you is owed × (1 − travel loss) × (1 + collector), capped at owed; Troyes at 3 days and a full-effect collector gets all 11 gold, so the card's "9" is corrected to 11. The rules win over a card mock-up.
 - **D-PROV-23**: (was OQ-PROV-23) A lord's province without his official: it is *Ungoverned* and gives the lord half its tax and half its recruits for his retinue. The same half rule as a royal province without an official.
 - **D-PROV-24**: (was OQ-PROV-24) Officials per province: one official runs 1 province with G1, 2 with G9, 3 with G16, plus one for each of B2, G11 and T14. Same as D-REALM-14.
+- **D-PROV-25**: (17 Oct, Leroy: "Buildings are build in the province but effect tiles, not on tiles"; the food plan, feedback 80 and 87) Land buildings stand in the province, take one building slot and work all its tiles of their use; the tile rules of §2 decide how many people they employ. The map's provinces hold far more people than the design's (median 46,000, a tenth over 300,000), so a tile holds 2.5 times the design's job slots. The 1444 land is laid out from the map's ground, and a province's own ways (terraces, ditches, herding on the move) make up its food to 110 % in 1444. A 15-year run then shows famine touching about 4 % of provinces a year by 1459 against under 1 % before. Tile conversion (feedback 86), hunting (81) and mines with seams (87) build on this next.
 
 ### Realm (realm)
 

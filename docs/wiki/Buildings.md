@@ -367,11 +367,11 @@ Until jobs, wares and labourers are in the game, you build ten **works** for the
 
 | Work | Where | What it does now |
 |---|---|---|
-| Farm (mill farm, enclosed farm) | worked land | farmers' harvest +10 % a step |
-| Ranch | grassland, steppe, drylands, hills | herders' food +15 % |
-| Fishery | a coast | the catch +20 % |
-| Lumber camp | forest | works needing timber here cost 20 % less; trade +5 % |
-| Quarry | hills, mountains, drylands | works needing stone here cost 20 % less; trade +5 % |
+| Farm (mill farm, enclosed farm) | fields tiles | works every fields tile: its farmers feed 1.1, 1.3 or 1.5 people a step, against 0.67 on bare land |
+| Ranch | pasture tiles | works every pasture tile: herders feed 1.33 against 0.67; wool |
+| Fishery | shore tiles | works every shore tile: seafolk feed 1.33 against 0.67 |
+| Lumber camp | woods tiles | timber: works needing it here cost 20 % less; trade +5 % |
+| Quarry | rocky waste tiles | stone: works needing it here cost 20 % less; trade +5 % |
 | Market (weekly market, yearly fair, trading house) | a village or bigger | trade +50 % a step |
 | Harbour (port, great port) | a coast | trade +25 % a step |
 | Drill yard (barracks) | a town | recruits +15 % a step |
@@ -380,7 +380,7 @@ Until jobs, wares and labourers are in the game, you build ten **works** for the
 
 **Slots.** Every province has slots by its people: 2, and one more at 10,000, 30,000, 100,000, 300,000 and 1,000,000 people (so 2 to 7). Every work takes one slot, whatever it is, and keeps it as it grows a step. The same steps give the town its size, from hamlet to great city, which some steps need (a market needs a village). The Build tab's first line says how many slots are taken.
 
-These effects are stand-ins, written into the rules (`defines.works`) until the jobs and wares model replaces them. A step needs its invention: the stone castle needs Stone castles, the road needs Roads and post stations.
+The farm, ranch and fishery work the province's land, which is laid out in tiles (see [Provinces](Provinces.md), *In the game now: the land*): the building stands in the province and takes one slot, and each tile of its use holds work for its people. The other effects are stand-ins, written into the rules (`defines.works`) until the jobs and wares model replaces them. A step needs its invention: the stone castle needs Stone castles, the road needs Roads and post stations.
 
 **How you use it.** Tap a province, then its **Build** tab. At the top are its sites with the months left, and its queue, where ▲ and ▼ move a build and Drop takes it off (nothing was paid). Below is the build sheet: every work the land suits, at its next step, with what it does, its gold, months and upkeep. Tap **Build**. When the site is busy or the gold isn't there yet, the button says **Queue** and the build waits its turn. Stop on a running site gives half its gold back. A province raises one work on its land and one in its town at a time.
 

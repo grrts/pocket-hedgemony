@@ -5,6 +5,8 @@ import { inAnyWar } from "./lords.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { buildingType, siteKind, townAtLeast, type TownSize } from "./domain/buildings/index.ts";
 import { invention, startingKnowledgeFor } from "./domain/research/index.ts";
+import { classFood, FOOD_CLASSES, jobSlots, tileCount, tilesOf, tileWares, USES, type FoodClass, type UseName } from "./land.ts";
+import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
 
 /**
  * Works (milestone 4, first slice of the buildings context): the crown builds
@@ -132,14 +134,15 @@ function placeFits(world: World, p: number, name: WorkName): boolean {
   const ground = world.provinceGround[p];
   const coastal = !!world.rules.provinces[p]!.coastal;
   switch (name) {
+    // A land work stands in the province and works its tiles of one use (Leroy, D-PROV-25): it needs at least one.
     case "farm":
-      return ground !== "desert" && ground !== "tundra" && ground !== "mountains";
+      return tilesOf(world, p, "fields") > 0;
     case "ranch":
-      return ground === "grassland" || ground === "savanna" || ground === "drylands" || ground === "hills";
+      return tilesOf(world, p, "pasture") > 0;
     case "lumber camp":
-      return ground === "forest" || ground === "jungle";
+      return tilesOf(world, p, "woods") > 0;
     case "quarry":
-      return ground === "hills" || ground === "mountains" || ground === "drylands" || ground === "desert";
+      return tilesOf(world, p, "waste") > 0 && (ground === "hills" || ground === "mountains" || ground === "drylands" || ground === "desert");
     case "fishery":
     case "harbour":
       return coastal;
@@ -147,6 +150,9 @@ function placeFits(world: World, p: number, name: WorkName): boolean {
       return true;
   }
 }
+
+/** The tiles a land work improves, as the player reads them. */
+const LAND_USE: Partial<Record<WorkName, string>> = { farm: "fields", ranch: "pasture", "lumber camp": "woods", quarry: "rocky waste" };
 
 /** Cost of a work's step in a province: the data's gold scaled to this economy and its months, cheaper with timber or stone at hand. */
 export function workCost(world: World, p: number, work: number, step: number): { gold: number; months: number } {
@@ -205,7 +211,7 @@ export function whyNot(world: World, n: number, p: number, work: number, pend?: 
   const name = WORKS[work]!;
   if (world.provinceOwner[p] !== n) return "not your province";
   if (world.provinceWater[p]) return "no land to build on";
-  if (!placeFits(world, p, name)) return name === "fishery" || name === "harbour" ? "needs a coast" : `the land doesn't suit a ${name}`;
+  if (!placeFits(world, p, name)) return name === "fishery" || name === "harbour" ? "needs a coast" : LAND_USE[name] ? `needs ${LAND_USE[name]} in the province` : `the land doesn't suit a ${name}`;
   const step = nextStep(world, p, work, pend);
   if (step > TOP[name]) return worksAt(world, p, work) >= buildingType(name).steps.length ? "built to the top" : "the next step needs what isn't here yet";
   const def = stepOf(name, step);
@@ -380,11 +386,10 @@ export function worksTrade(world: World, p: number): number {
   return 1 + gain * share(world, p);
 }
 
-/** Food a class brings in, as a factor from the province's works: farms for farmers, ranches for herders, fisheries for seafolk. */
-export function worksFood(world: World, p: number, cls: string): number {
-  const d = world.rules.defines.works;
-  const gain = cls === "farmers" ? d.farmFood * worksAt(world, p, W.farm) : cls === "herders" ? d.ranchFood * worksAt(world, p, W.ranch) : cls === "seafolk" ? d.fisheryFood * worksAt(world, p, W.fishery) : 0;
-  return 1 + gain * share(world, p);
+/** Food a class brings in a year at a normal harvest, in thousands fed: on its tiles at the rate its building (farm, ranch, fishery) gives, the rest on bare land. */
+export function worksFood(world: World, p: number, cls: "farmers" | "herders" | "seafolk" | "woodsmen"): number {
+  const step = cls === "farmers" ? worksAt(world, p, W.farm) : cls === "herders" ? worksAt(world, p, W.ranch) : cls === "seafolk" ? worksAt(world, p, W.fishery) : 0;
+  return classFood(world, p, cls, step, share(world, p)) * world.provinceLandYield[p]!;
 }
 
 /** Hours of marching in a province against none: a track and a road speed armies on. */
@@ -418,12 +423,20 @@ export function seedWorks(world: World): void {
         free--;
       }
     };
-    put("market", wealth >= 8 ? 2 : 1, wealth >= 4);
+    // Food first: a farm, a ranch and a fishery where the land is worked, as the province's wealth allows (feedback 80).
+    const target = world.provincePopulation[p]! * world.rules.defines.works.seedFoodShare;
+    const food = () => FOOD_CLASSES.reduce((a, c) => a + worksFood(world, p, c), 0);
     put("farm", 1, wealth >= 3 && placeFits(world, p, "farm"));
-    put("fishery", 1, wealth >= 2 && !!def.coastal);
-    put("harbour", 1, wealth >= 5 && !!def.coastal);
     put("ranch", 1, wealth >= 3 && placeFits(world, p, "ranch"));
+    put("fishery", 1, wealth >= 2 && placeFits(world, p, "fishery"));
+    put("market", wealth >= 8 ? 2 : 1, wealth >= 4);
+    put("harbour", 1, wealth >= 5 && !!def.coastal);
     put("road", 1, wealth >= 6);
+    put("lumber camp", 1, wealth >= 5 && placeFits(world, p, "lumber camp"));
+    // The people's own ways make up the rest, up to maxLandYield (D-PROV-25), so better farms are the way to feed more.
+    world.provinceLandYield[p] = 1;
+    const fed = food();
+    if (fed > 0 && fed < target) world.provinceLandYield[p] = Math.min(world.rules.defines.works.maxLandYield, target / fed);
   }
   refreshWorks(world);
 }
@@ -464,6 +477,8 @@ export function aiWorks(world: World, news: News[]): void {
     for (const name of AI_ORDER) {
       const work = W[name];
       if (name === "castle" && !borders(world, p, n)) continue;
+      // Farms where the province does not feed itself.
+      if (name === "farm" && FOOD_CLASSES.reduce((a, c) => a + worksFood(world, p, c), 0) >= world.provincePopulation[p]! * world.rules.defines.works.seedFoodShare) continue;
       if (whyNot(world, n, p, work, pend)) continue;
       if (world.nationTreasury[n]! - workCost(world, p, work, nextStep(world, p, work, pend)).gold < reserve) continue;
       orderWork(world, n, p, work, news, pend);
@@ -485,17 +500,19 @@ function borders(world: World, p: number, n: number): boolean {
 }
 
 
+const people = (thousands: number) => Math.round(thousands * 1000).toLocaleString("en-US");
+
 /** What each work does in this slice, for the build sheet (stand-in effects, from defines.works). */
 export function workEffect(world: World, work: number, step: number): string {
   const d = world.rules.defines.works;
   const pct = (x: number) => `${Math.round(x * 100)} %`;
   switch (WORKS[work]!) {
     case "farm":
-      return `Farmers' harvest +${pct(d.farmFood * step)}`;
+      return `Every fields tile: work for ${people(jobSlots("farm"))} farmers, who feed ${d.farmRates[step - 1] ?? 1.5} people each against 0.67 on bare land`;
     case "ranch":
-      return `Herders' food +${pct(d.ranchFood)}`;
+      return `Every pasture tile: work for ${people(jobSlots("ranch"))} herders, who feed 1.33 each against 0.67 without it`;
     case "fishery":
-      return `Seafolk's catch +${pct(d.fisheryFood)}`;
+      return `Every shore tile: work for ${people(jobSlots("fishery"))} seafolk, who feed 1.33 each against 0.67 without it`;
     case "lumber camp":
       return `Works needing timber here cost ${pct(d.materialsAtHandSaving)} less; trade +${pct(d.campTrade)}`;
     case "quarry":
@@ -544,5 +561,58 @@ export function buildSheets(world: World, n: number): Record<number, WorkRow[]> 
   if (n < 0) return out;
   const pend = pending(world);
   for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === n && !world.provinceWater[p]) out[p] = buildSheet(world, n, p, pend);
+  return out;
+}
+
+/** One tile of a province's Land tab: its use, the building working it, its people and what they make a year. */
+export interface LandTileRow {
+  use: UseName;
+  /** The building working the province's tiles of this use ("three-field farm"), or null for bare land. */
+  building: string | null;
+  /** People working the tile, in thousands. */
+  workers: number;
+  /** People its food feeds a year at a normal harvest, in thousands. */
+  feeds: number;
+  /** A ware it gives a year, in loads. */
+  ware: { name: string; amount: number } | null;
+}
+
+/** The work that works each tile use, and the class on it. */
+const USE_WORK: Partial<Record<UseName, { work: WorkName; cls: FoodClass }>> = {
+  fields: { work: "farm", cls: "farmers" },
+  pasture: { work: "ranch", cls: "herders" },
+  shore: { work: "fishery", cls: "seafolk" },
+  woods: { work: "lumber camp", cls: "woodsmen" },
+};
+
+/**
+ * A province's tiles for the Land tab (feedback 80, 87): each food class's
+ * people and food shared evenly over its tiles, and the wares the
+ * province's lumber camp, quarry and ranch make on them.
+ */
+export function landSheet(world: World, p: number): LandTileRow[] {
+  const rows: LandTileRow[] = [];
+  const n = tileCount(world, p);
+  for (const use of USES) {
+    const count = tilesOf(world, p, use);
+    if (!count) continue;
+    const uw = USE_WORK[use];
+    const step = uw ? worksAt(world, p, W[uw.work]) : 0;
+    const quarry = use === "waste" ? worksAt(world, p, W.quarry) : 0;
+    const building = uw && step > 0 ? workStepName(W[uw.work], step) : quarry > 0 ? "quarry" : null;
+    const workers = uw ? world.provinceClasses[p * CLASS_COUNT + CLASS_NAMES.indexOf(uw.cls)]! : 0;
+    const fed = uw ? worksFood(world, p, uw.cls) : 0;
+    const wareOf = uw?.work === "lumber camp" && step > 0 ? tileWares(world, p, "lumber camp") : use === "pasture" && step > 0 ? tileWares(world, p, "ranch") : quarry > 0 ? tileWares(world, p, "quarry") : null;
+    for (let i = 0; i < count; i++)
+      rows.push({ use, building, workers: workers / count, feeds: fed / count, ware: wareOf ? { name: wareOf.ware, amount: wareOf.amount } : null });
+  }
+  return rows.slice(0, n);
+}
+
+/** Land tabs of every province of realm n. */
+export function landSheets(world: World, n: number): Record<number, LandTileRow[]> {
+  const out: Record<number, LandTileRow[]> = {};
+  if (n < 0) return out;
+  for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === n && !world.provinceWater[p]) out[p] = landSheet(world, p);
   return out;
 }
