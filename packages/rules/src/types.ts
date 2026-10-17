@@ -39,10 +39,14 @@ export interface WorksDefines {
   defaultUpkeepPerYear: number;
   /** Share off a work's gold with a lumber camp (timber) or quarry (stone) in its province. */
   materialsAtHandSaving: number;
-  /** Food gained per step of a farm (farmers), and by a ranch (herders) and a fishery (seafolk). */
-  farmFood: number;
-  ranchFood: number;
-  fisheryFood: number;
+  /** Share of its people's food a province's land is built up to in 1444 (farms, ranches, fisheries), and the AI builds farms below. */
+  seedFoodShare: number;
+  /** Job slots of a land building against the province data's, as the map's provinces are more peopled than the design's. */
+  slotScale: number;
+  /** People a farmer in a farm's job slots feeds a year, by the farm's step (bare land 0.67). */
+  farmRates: number[];
+  /** Most a province's own ways can multiply its food by, where its buildings fall short in 1444. */
+  maxLandYield: number;
   /** Trade gained per step of a market, a harbour and a road, and by a lumber camp or quarry. */
   marketTrade: number;
   harbourTrade: number;
@@ -298,8 +302,6 @@ export interface LivingDefines {
   coastalSeafolk: number;
   /** How countryfolk split by class on each ground. */
   countryMix: Record<string, Record<string, number>>;
-  /** People one worker of a food class feeds a year (province: farm 1.5, bare tiles 0.67); farmers' food comes at the harvest, the rest month by month. */
-  foodPerWorker: Record<string, number>;
   /** Months of eating each province holds beyond its first harvest at the start. */
   startingStoreMonths: number;
   /** A province of the same realm with more than this many months stored feeds a hungry neighbour. */

@@ -325,6 +325,15 @@ settlement, settlers, local people's tiles.
 - PROV-308: Overview: the Officials tab of the player's country card lists every official of the realm with his type, province, years served and effect, and the empty posts; tapping one opens his screen. [F-54; X-19]
 - PROV-309: Phone: in landscape the official's screen and the province list fit the side panel in the Wide and Tall layouts, every row and button is at least 44 points high, and nothing needs hover (each row spells out what the move changes). [F-54; X-19]
 
+### Land in the game (feedback 80 and 87, 17 October 2026)
+- PROV-310: Until the land's tile changes are played, each province shall lay out its 4 to 16 tiles from the map: the count from its size (the smallest 4, the largest 16, on a log scale between the 5th and 95th percentile of province sizes), one Town tile, 1 to 3 Shore tiles on a coast (more with more seafolk), and the rest shared out by the share of each use in the ground of the map squares under it. [PROV-010, PROV-011, PROV-018, D-PROV-25]
+- PROV-311: A land building shall stand in the province, take one of its building slots like every other building, and work all the province's tiles of its use: a farm the fields, a ranch the pasture, a fishery the shore, a lumber camp the woods, a quarry rocky waste. Each such tile holds the building's job slots (times the slot scale), and the building needs at least one tile of its use. [Leroy 17 Oct; D-PROV-25]
+- PROV-312: The food a class grows shall be its workers in the job slots of its tiles at its building's rate (a farm by step 1.1, 1.3, 1.5; ranch and fishery 1.33) times the ground's building output, and everyone else at 0.67 times the ground's people output (bare land); with no building, every worker is on bare land. [PROV-080, PROV-081, feedback 80]
+- PROV-313: In 1444 each province's own ways of working the land shall make up whatever its buildings leave short of 110 % of its people's food in a normal year, up to three times, and stay fixed after; growth past that needs better buildings. [feedback 80; D-PROV-25]
+- PROV-314: Where: the province card's Land tab shows the tiles as a grid of squares coloured by use, each naming the building that works it; tapping one opens a sheet under the grid with who works it, what it feeds or gives a year, and the building that would work it better with its Build button or why not. [X-19]
+- PROV-315: Grouping and overview: the Land tab opens with the land's food against the province's people in a normal year as a share, in warning colours under 100 %; the realm's Provinces list stays the overview of food across the realm. [X-19]
+- PROV-316: Phone: in landscape the tiles are at least 44 points each way in the Wide and Tall layouts, the sheet sits under the grid in the side panel, and nothing needs hover. [X-19]
+
 ### 5.19 Lords in the province
 - PROV-200: A lord shall always hold at least one province; someone with no land is a courtier. [§10.3]
 - PROV-201: When a lord loses his last province, he shall stop being a lord: he stays at court as a courtier who can be granted land again, or, if he lost it to you by force, he flees abroad and becomes a pretender to it. [§10.3]
@@ -605,6 +614,7 @@ province config file but no file name or keys; keys below are proposed by this s
 - **D-PROV-22** (was OQ-PROV-22) Troyes tax: what reaches you is owed × (1 − travel loss) × (1 + collector), capped at owed; Troyes at 3 days and a full-effect collector gets all 11 gold, so the card's "9" is corrected to 11. The rules win over a card mock-up.
 - **D-PROV-23** (was OQ-PROV-23) A lord's province without his official: it is *Ungoverned* and gives the lord half its tax and half its recruits for his retinue. The same half rule as a royal province without an official.
 - **D-PROV-24** (was OQ-PROV-24) Officials per province: one official runs 1 province with G1, 2 with G9, 3 with G16, plus one for each of B2, G11 and T14. Same as D-REALM-14.
+- **D-PROV-25** (17 Oct, Leroy: "Buildings are build in the province but effect tiles, not on tiles"; the food plan, feedback 80 and 87) Land buildings stand in the province, take one building slot and work all its tiles of their use; the tile rules of §2 decide how many people they employ. The map's provinces hold far more people than the design's (median 46,000, a tenth over 300,000), so a tile holds 2.5 times the design's job slots. The 1444 land is laid out from the map's ground, and a province's own ways (terraces, ditches, herding on the move) make up its food to 110 % in 1444. A 15-year run then shows famine touching about 4 % of provinces a year by 1459 against under 1 % before. Tile conversion (feedback 86), hunting (81) and mines with seams (87) build on this next.
 
 ## 14. Traceability
 
@@ -785,6 +795,8 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-306, 307 | officials.feature | Moving an official from his screen |
 | PROV-308 | officials.feature | The Officials tab lists every official |
 | PROV-309 | — | Presentation only: checked on phone screenshots in landscape |
+| PROV-310 … PROV-313 | — | Engine: packages/engine/test/works.test.ts (tiles, farms on fields, 1444 food) |
+| PROV-314 … PROV-316 | — | Presentation: apps/client/scripts/land-shots.mjs on phones in landscape |
 | PROV-200 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A courtier can be granted land again |

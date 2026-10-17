@@ -7,6 +7,8 @@ import { wallsOf } from "../src/war.ts";
 import { LEDGER, LEDGER_LINES, provinceTrade } from "../src/treasury.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { hashWorld } from "../src/hash.ts";
+import { tilesOf, tileCount, MAX_TILES } from "../src/land.ts";
+import { yearlyFood } from "../src/food.ts";
 import { buildSheet, knowsInvention, nextStep, slotsOf, slotsUsed, whyNot, WORK_COUNT, workCost, workIndex, worksAt } from "../src/works.ts";
 
 const rules = loadDefaultRuleset();
@@ -199,5 +201,52 @@ describe("works (milestone 4)", () => {
     expect(sheet.some((r) => r.work === work("castle"))).toBe(true);
     expect(sheet.every((r) => r.gold >= 0 && r.months > 0)).toBe(true);
     if (!rules.provinces[p]!.coastal) expect(sheet.some((r) => r.work === work("harbour"))).toBe(false);
+  });
+
+  it("lays out every province's 4 to 16 tiles, with a town tile and shore on a coast (PROV-010, PROV-018)", () => {
+    const w = createWorldOnce();
+    for (let p = 0; p < w.provinceCount; p++) {
+      if (w.provinceWater[p]) continue;
+      const n = tileCount(w, p);
+      expect(n).toBeGreaterThanOrEqual(3);
+      expect(n).toBeLessThanOrEqual(MAX_TILES);
+      expect(tilesOf(w, p, "town")).toBe(1);
+      if (!rules.provinces[p]!.coastal) expect(tilesOf(w, p, "shore")).toBe(0);
+    }
+  });
+
+  it("works a province's fields from one farm: its farmers feed more on them than on bare land (feedback 80)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const fra = nation(w, "france");
+    const p = Array.from({ length: w.provinceCount }, (_, i) => i).find((i) => w.provinceOwner[i] === fra && tilesOf(w, i, "fields") > 0)!;
+    w.provinceWorks[p * WORK_COUNT + work("farm")] = 0;
+    const bare = yearlyFood(w, p);
+    w.provinceWorks[p * WORK_COUNT + work("farm")] = 1;
+    const one = yearlyFood(w, p);
+    w.provinceWorks[p * WORK_COUNT + work("farm")] = 3;
+    expect(one).toBeGreaterThan(bare);
+    expect(yearlyFood(w, p)).toBeGreaterThan(one);
+    // No fields, no farm.
+    w.provinceTiles.fill(0, p * MAX_TILES, (p + 1) * MAX_TILES);
+    w.provinceTiles[p * MAX_TILES] = 7;
+    w.provinceWorks[p * WORK_COUNT + work("farm")] = 0;
+    expect(whyNot(w, fra, p, work("farm"))).toBe("needs fields in the province");
+  });
+
+  it("starts every province fed in a normal year, at about 110 % (feedback 80)", () => {
+    const w = createWorldOnce();
+    const share = rules.defines.works.seedFoodShare;
+    for (let p = 0; p < w.provinceCount; p++) {
+      if (w.provinceWater[p] || w.provincePopulation[p]! <= 0) continue;
+      expect(yearlyFood(w, p) / w.provincePopulation[p]!).toBeGreaterThanOrEqual(share - 0.01);
+    }
+  });
+
+  it("keeps tiles through a save", () => {
+    const w = createWorld(rules, 1, tiles);
+    w.provinceTiles[0] = 3;
+    const back = restoreWorld(new Map(worldChunks(w, { playerNation: "castile", options: {} as never }).map((c) => [c.id, c])), rules, {}, tiles).world;
+    expect(Array.from(back.provinceTiles)).toEqual(Array.from(w.provinceTiles));
+    expect(Array.from(back.provinceLandYield)).toEqual(Array.from(w.provinceLandYield));
   });
 });

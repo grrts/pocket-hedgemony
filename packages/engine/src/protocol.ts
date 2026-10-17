@@ -6,7 +6,7 @@ import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_T
 import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
 import { badWeatherName } from "./domain/realm/index.ts";
 import { foodView, mapNetwork, type FoodView } from "./castleFood.ts";
-import { buildSheets, slotsOf, slotsUsed, townSize, workCost, WORKS, workStepName, workEffect, type WorkRow } from "./works.ts";
+import { buildSheets, landSheets, slotsOf, slotsUsed, townSize, workCost, WORKS, workStepName, workEffect, type LandTileRow, type WorkRow } from "./works.ts";
 import { buildingType } from "./domain/buildings/index.ts";
 import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
@@ -222,6 +222,8 @@ export interface Snapshot {
   workQueue: { province: number; work: number; step: number; gold: number }[];
   /** Build sheet of each of the player's provinces, by province index. */
   buildSheets: Record<number, WorkRow[]>;
+  /** Land tab of each of the player's provinces: its tiles, the building working them, people, food and wares (feedback 80, 87). */
+  landSheets: Record<number, LandTileRow[]>;
   /** Slots of each of the player's provinces: taken, all, and the town's size that goes with its people. */
   buildSlots: Record<number, { used: number; total: number; town: string }>;
   /** The player's works go unpaid (treasury empty): they give half. */
@@ -389,6 +391,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       sites: w.sites.filter((s) => s.nation === player).map((s) => ({ province: s.province, work: s.work, step: s.step, monthsLeft: s.monthsLeft, months: s.months })),
       workQueue: w.workQueue.filter((q) => q.nation === player).map((q) => ({ province: q.province, work: q.work, step: q.step, gold: workCost(w, q.province, q.work, q.step).gold })),
       buildSheets: buildSheets(w, player),
+      landSheets: landSheets(w, player),
       buildSlots: (() => {
         const out: Snapshot["buildSlots"] = {};
         if (player >= 0) for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === player && !w.provinceWater[p]) out[p] = { used: slotsUsed(w, p), total: slotsOf(w, p), town: townSize(w, p).replace("_", " ") };

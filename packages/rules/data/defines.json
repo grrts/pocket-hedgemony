@@ -19,9 +19,10 @@
     "goldScale": 0.2,
     "defaultUpkeepPerYear": 0.25,
     "materialsAtHandSaving": 0.2,
-    "farmFood": 0.1,
-    "ranchFood": 0.15,
-    "fisheryFood": 0.2,
+    "seedFoodShare": 1.1,
+    "slotScale": 2.5,
+    "farmRates": [1.1, 1.3, 1.5],
+    "maxLandYield": 3,
     "marketTrade": 0.5,
     "harbourTrade": 0.25,
     "roadTrade": 0.05,
@@ -150,7 +151,6 @@
       "jungle": { "farmers": 0.55, "herders": 0.05, "woodsmen": 0.4 },
       "savanna": { "farmers": 0.5, "herders": 0.45, "woodsmen": 0.05 }
     },
-    "foodPerWorker": { "farmers": 1.5, "herders": 1.5, "woodsmen": 1, "seafolk": 1.5 },
     "startingStoreMonths": 4,
     "reliefAboveMonths": 3,
     "lordGiftGold": 5
