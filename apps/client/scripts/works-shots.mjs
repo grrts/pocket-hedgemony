@@ -1,4 +1,4 @@
-// The Works tab of a province and the realm's Works overview as Castile, on a small and a large phone held sideways.
+// The Build tab of a province and the realm's General tab as Castile, on a small and a large phone held sideways.
 // Usage: pnpm build && node scripts/works-shots.mjs <outDir>
 import { chromium, devices } from "playwright-core";
 import { preview } from "vite";
@@ -30,7 +30,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     const sizes = await page.$$eval(".work-row > button", (bs) => bs.map((b) => Math.round(b.getBoundingClientRect().height)));
     console.log(name, "button heights:", Math.min(...sizes));
   }
-  // The realm's Works overview, from the General tab's line.
+  // The realm's General tab.
   await page.evaluate(() => {
     const b = document.createElement("button");
     b.dataset.realm = String(window.__phNation("castile"));
@@ -40,9 +40,6 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   });
   await page.waitForTimeout(300);
   await shot("realm-general");
-  await page.click("[data-realm-open-tab=works]");
-  await page.waitForTimeout(300);
-  await shot("realm-works");
   await page.close();
 }
 await browser.close();

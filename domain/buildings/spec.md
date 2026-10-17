@@ -476,7 +476,7 @@ Works across the province (§7.10)
 #### How the player uses it: the build queue
 - BLD-166 Where: the player taps a province, then its Build tab, and taps a building on the build sheet; with a site free it starts, otherwise the row says "Queued" and the build joins the queue, and the sheet says why a build can't be queued at all. [F-39; X-19]
 - BLD-167 Grouping: the Build tab shows the sites running with their months left, and under them the queue, one row per build with its cost and months and buttons to move it up or down or cancel it. [F-39; X-19]
-- BLD-168 Overview: the realm's Works overview lists every province with a site or a queue, with its counts and the next build to finish; tapping one opens that province's Build tab. [F-39; X-19]
+- BLD-168 Overview: the province's Build tab is where its sites and queue are seen; the country card has no Works overview (Leroy, 17 Oct: "Works can be removed from countries ui"), and the hammers on the map mark the sites (BLD-173). [F-39; X-19]
 - BLD-169 Phone: in landscape the queue rows are at least 48 points tall, the move and cancel buttons at least 44 × 44 with 8 points between them, and nothing needs hover. [F-39; X-19]
 
 ### 5.24 The first playable slice (milestone 4)
@@ -485,8 +485,8 @@ Works across the province (§7.10)
 
 #### How the player uses it: works in the first slice
 - BLD-171 Where: the player taps a province, then its Build tab (its first line gives the slots taken of all, and the town's size and people) (beside Overview, People and Garrison; it shows an hourglass while a site is open). The tab lists the sites running (months left with a bar; Stop gives half the gold back), the queue (▲ ▼ to move a build, Drop to take it off), then the build sheet: each work the land suits at its next step, with what it does, its gold, months and upkeep and a Build button (Queue when the gold isn't there yet), or why it can't be built, naming the invention by its name; then what stands there and what each gives. [X-19]
-- BLD-172 Overview: the player's country card has a Works tab with the works upkeep a month (and whether it goes unpaid), every province with a site or a queue (its counts and the next work to finish, with a bar), and how many of each work stand; each row opens that province's Build tab. The General tab's Works line opens it. [X-19, BLD-134, BLD-168]
-- BLD-173 Map and news: a hammer marks each of the player's sites at region zoom; a finished work is said over the map with Go there, with a sound, and goes in the dispatches. [X-19, BLD-132, BLD-138]
+- BLD-172 Overview: works have no tab or line on the country card (Leroy, 17 Oct); the works upkeep a month shows on the Treasury tab's ledger, each province's sites, queue and standing works on its Build tab, and the sites on the map (BLD-173). [X-19, BLD-134, BLD-168]
+- BLD-173 Map and news: a hammer marks each of the player's sites at region zoom, striking over and over so a site reads as work under way (Leroy, 17 Oct); a finished work is said over the map with Go there, with a sound, and goes in the dispatches. [X-19, BLD-132, BLD-138]
 - BLD-174 Phone: in landscape (Wide and Tall layouts, inside the safe areas) rows stack name, effect and cost over two or three lines with the buttons at the right, every button at least 44 points, 8 points between the queue buttons, and nothing needs hover. [X-19, BLD-169]
 
 ## 6. Commands
