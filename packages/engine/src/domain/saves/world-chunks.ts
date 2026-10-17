@@ -1,3 +1,4 @@
+import type { RealmLord } from "../../lords.ts";
 import { CLASS_COUNT, rescaleClasses } from "../../living.ts";
 import type { Ruleset } from "@ph/rules";
 import { hashWorld } from "../../hash.ts";
@@ -75,10 +76,10 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
     packChunk("provinces", V.provinces, {
       meta: {},
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, classes: world.provinceClasses, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, classes: world.provinceClasses, food: world.provinceStore, harvest: world.provinceHarvest, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord },
     }),
     packChunk("nations", V.nations, {
-      meta: { musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome },
+      meta: { lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
@@ -215,6 +216,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         if (prov.grievances) world.provinceGrievances[t.index] = prov.grievances[old]!;
         if (prov.armyMonths) world.provinceArmyMonths[t.index] = prov.armyMonths[old]!;
         if (prov.battleYear) world.provinceBattleYear[t.index] = prov.battleYear[old]!;
+        if (prov.lord) world.provinceLord[t.index] = prov.lord[old]!;
         if (prov.starved) world.provinceStarved[t.index] = prov.starved[old]! * t.share;
       }
     }
@@ -245,7 +247,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (!name || owner < 0 || nationMap[owner]! < 0) return -1;
     return addCommander(world, nationMap[owner]!, newCommander(name), id);
   });
-  const natMeta = need("nations").meta as { musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[] };
+  const natMeta = need("nations").meta as { lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[] };
   const mapP = (old: number) => world.provinceIndex.get(ids.provinces[old]!) ?? -1;
   const mapN = (old: number) => nationMap[old] ?? -1;
   const mapCompany = (c: FreeCompany): FreeCompany => ({ ...c, home: c.home < 0 ? -1 : mapP(c.home) });
@@ -266,6 +268,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     const c = commanderMap[old]!;
     if (c >= 0) world.commanderHome[c] = p < 0 ? -1 : mapP(p);
   });
+  // Lords keep their places in the list (provinces point at them); one of a realm that is gone holds nothing.
+  if (natMeta.lords) world.lords = natMeta.lords.map((l) => ({ ...l, nation: mapN(l.nation) }));
   if (natMeta.musters) world.musters = natMeta.musters.map((m) => ({ ...m, nation: mapN(m.nation), province: mapP(m.province) })).filter((m) => m.nation >= 0 && m.province >= 0);
   const rec = nat.commanderRecord;
   if (rec) {

@@ -1,6 +1,7 @@
 import { monthlyPeople } from "./living.ts";
 import { monthlyFood } from "./food.ts";
 import { moodShare, monthlyMoods } from "./moods.ts";
+import { crownShare, giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, forageRations, monthlyRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -75,7 +76,11 @@ export type Order =
   | { type: "merge"; army: number; into: number }
   /** Put a commander at the head of an army or garrison troops (swapping with the army he led); -1 leaves the men as a garrison. */
   | { type: "appoint"; army: number; commander: number }
-  | { type: "disband"; army: number };
+  | { type: "disband"; army: number }
+  /** Give a lord gold, grant him a royal province, or take a province back from its lord. */
+  | { type: "gift"; lord: number }
+  | { type: "grantFief"; province: number; lord: number }
+  | { type: "seizeFief"; province: number };
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -143,6 +148,7 @@ function startDay(world: World, news: News[]): void {
     monthlyPeople(world, news);
     monthlyFood(world, news);
     monthlyMoods(world, news);
+    monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
     runEconomy(world, true);
     monthlyDiplomacy(world, news);
@@ -207,6 +213,12 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return appointCommander(world, actingNation, order.army, order.commander);
     case "disband":
       return disbandArmy(world, actingNation, order.army);
+    case "gift":
+      return giveGift(world, actingNation, order.lord);
+    case "grantFief":
+      return grantFief(world, actingNation, order.province, order.lord);
+    case "seizeFief":
+      return seizeFief(world, actingNation, order.province, news);
     case "move":
       return orderMarch(world, order, actingNation);
   }
@@ -471,7 +483,7 @@ function runEconomy(world: World, pay: boolean): void {
     const owner = controller(world, p);
     if (owner < 0) continue;
     // A province whose official was commissioned pays half (recruiting RECR-083, "Leave it").
-    const share = (ungoverned(world, p) ? emptyTax : 1) * moodShare(world, p);
+    const share = (ungoverned(world, p) ? emptyTax : 1) * moodShare(world, p) * crownShare(world, p);
     income[owner] =
       income[owner]! +
       (world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth + world.provinceWealth[p]! * economy.goldPerWealthPerMonth) * share;
