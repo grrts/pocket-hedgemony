@@ -13,6 +13,7 @@ import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages } from "./tiles.ts";
+import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
 
@@ -190,6 +191,10 @@ export interface Snapshot {
   };
   /** Arm names for armies.byArm. */
   arms: readonly string[];
+  /** The player's research for the Learning tab (null before a realm is chosen). */
+  research: ResearchView | null;
+  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%). */
+  realmResearch: { known: number; study: string | null; pct: number }[];
   /** Works (milestone 4): their names, each step's name and what it does, and the step built of each in each province (works.length per province, 0 = none). */
   works: readonly string[];
   workSteps: { name: string; effect: string }[][];
@@ -352,6 +357,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         origin: c.origin ?? "",
       })),
       arms: ARMS,
+      research: player >= 0 ? researchView(w, player, ARMS) : null,
+      realmResearch: realmResearch(w),
       works: WORKS,
       workSteps: WORKS.map((name, k) => buildingType(name).steps.map((_, i) => ({ name: workStepName(k, i + 1), effect: workEffect(w, k, i + 1) }))),
       provinceWorks: w.provinceWorks.slice(),

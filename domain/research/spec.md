@@ -346,6 +346,17 @@ they did by then; L23 and L24 are dropped (D-RSCH-1).
 - RSCH-079: Students shall be taken from recruits and graduates counted as scholars without a sex; whether a scholar named to a role is a woman shall be the realm's women-in-roles roll. [D-RSCH-15]
 - RSCH-080: F16's harvest step shall last 30 years from the year it was learned and then end; F19 gives its own steps. [D-RSCH-16]
 - RSCH-081: Without G4 only a new graduate may be made an official, and only of his school's types; with G4 a working scholar may be made an official of any type at any time. [D-RSCH-17]
+- RSCH-082: At the start each realm shall have one school in its capital (a madrasa where it knows L2, else a temple or monastery school, founded by the clergy where it knows neither L1 nor L2), half its seats filled with students taken from recruits in cohorts enrolled over the last five years, and 5 scholars (2 where it knows neither L1 nor L2). [D-RSCH-18]
+- RSCH-083: The player shall found a school in a town of theirs (25,000 people or more, or the capital) that has none, for the temple school's gold and months (buildings `school` step 1: 60 gold, 12 months; a madrasa where the realm knows L2); it opens when the months have passed. Choosing another study shall drop the progress on the current one. [D-RSCH-19]
+
+### How the player uses it
+- RSCH-084: The player shall find research in a Learning tab of their own country card (Realm book → Learning), which shows: the current study with a progress bar, its scholar-years and the months left at the current pace; scholars, students and seats, with a stepper of 44-point buttons to set how many seats to fill ("each student is a man the army can't raise"); a Call students to arms button that says what it costs; Found a school, opening a list of the towns where one can go with its gold and months; then the inventions that can be studied now, grouped by era, cheapest first, each with its name, what it does, its cost in scholar-years and in months at the realm's pace, and a Study button; and a folding list of what the realm already knows. [X-19]
+- RSCH-085: Everything about research and schools shall sit in that one tab; elsewhere the game only points to it (the commander's Train list names the arms not yet known with a button to the Learning tab). [X-19]
+- RSCH-086: Before a Study button would drop progress on the current study, the tab shall say how many scholar-years would be lost, and the button shall read Switch. [X-19, D-RSCH-19]
+- RSCH-087: The schools' upkeep shall be its own line of the Treasury ledger (Schools). [X-19, RSCH-021]
+- RSCH-088: The General tab of the player's country card shall carry one line, "Studying X · N % · scholars S" (or "Nothing studied · choose what to study"), that opens the Learning tab; another realm's card shall show how many inventions it knows and what it studies. [X-19]
+- RSCH-089: When the player's realm learns an invention, an alert shall say "Learned X. Choose the next study." with an Open button to the Learning tab; while nothing is studied, one alert shall ask the player to choose (at the start and after each invention), the same way. [X-19]
+- RSCH-090: The Learning tab shall work on a phone in landscape and in the Tall layout: inside the safe areas, every button and fold at least 44 points tall, nothing that needs hover, rows that wrap rather than scroll sideways, and each row's Study button at its start, clear of the End turn button in the corner. [X-19, SHELL-108, SHELL-109, SHELL-114]
 
 ## 6. Commands
 
@@ -465,6 +476,8 @@ The file is `packages/rules/data/domain/research.json`; its `_provisional` list 
 - **D-RSCH-15** (was OQ-RSCH-15) Women scholars: students come from recruits and graduates are counted without a sex; whether a scholar named to a role is a woman is the realm's women-in-roles roll (realm). No second pipeline is needed.
 - **D-RSCH-16** (was OQ-RSCH-16) Guano: F16's +1 harvest step lasts 30 years from the year it is learned and then simply ends; F19 gives its own +2. The plain reading of "for 30 years".
 - **D-RSCH-17** (was OQ-RSCH-17) Examination system: without G4 only a new graduate may be made an official, of his school's types; with G4 a working scholar may be made an official of any type at any time. That is the one thing G4 adds to the general rule.
+- **D-RSCH-18** (17 Oct, milestone 4) Starting schools and scholars: the designs give none, so every realm starts with one school in its capital (a madrasa with L2, else a temple or monastery school, founded by the clergy where it knows neither L1 nor L2), half its seats filled with cohorts of the last five years, and 5 scholars (2 without L1 or L2). Research then moves from 1444 for every realm and graduations come every January, while no realm begins ahead of what it knows.
+- **D-RSCH-19** (17 Oct, milestone 4, first slice) Founding schools and switching studies: a school is founded from the Learning tab in a town (25,000 people, the map's town size, or the capital) for buildings' temple-school step (60 gold, 12 months, taken as treasury gold), a madrasa where the realm knows L2 since buildings gives that step no cost; choosing another study drops the progress on the old one. One study at a time; the academy's second study, stealing, sacking, poaching, foreign scholars and contact events wait for later slices. The simplest rules that let the player act now; the buildings context will take schools into its build list.
 
 ## 14. Traceability
 
@@ -531,3 +544,5 @@ Every requirement has at least one scenario. The invention list (§5.8) is check
 | RSCH-079 | schools-and-students.feature | Students do not choose who becomes a woman scholar |
 | RSCH-080 | war-and-research.feature | Guano lasts thirty years |
 | RSCH-081 | schools-and-students.feature | Who may be made an official |
+| RSCH-084 … RSCH-090 | — | Client screens; checked by apps/client/scripts/research-shots.mjs (tap targets, no sideways scroll) |
+| RSCH-082, RSCH-083 | — | Wiring of the first slice; checked by packages/engine/test/research.test.ts |

@@ -293,12 +293,29 @@ Progress moves every month by a twelfth of the yearly rate, and an invention is 
 
 ### The AI
 
-An isolationist AI fills its schools and avoids war; a hegemon seeker keeps its recruits for the army instead of students. No rule yet says which invention the AI studies.
+An isolationist AI fills its schools and avoids war; a hegemon seeker keeps its recruits for the army instead of students. Every AI country studies the invention it can study that costs it least right now (ties go by id), fills every empty seat while at peace and none at war, and calls its students to arms only when it is at war with no recruits left.
 
 ## What you see
 
-- **Schools** on the country card: how many schools, students and scholars, the current study and its progress (for example "studying: Bastion forts 62 %").
-- **The research screen**: choose the current study (and a second one with an academy), set how many seats to fill, call students to arms, hire a foreign scholar, and choose whether a graduate becomes a scholar or an official of an allowed type.
+Everything about research and schools is in one place: the **Learning** tab of your country card (tap your realm's name or flag, then Learning).
+
+- **The study.** At the top: what your scholars study now, a progress bar, its scholar-years and about how many months are left at your current pace. When nothing is studied, the card says so in red.
+- **Scholars and students.** How many scholars you have (1 scholar-year each a year), how many students (0.2 each, scholars after 5 years), your pace a year and the recruits your army can still call. The **−5 −1 +1 +5** buttons set how many seats to fill. Each student is a man the army can't raise: more students fill from your recruit pools at once, fewer go back to them.
+- **Call students to arms.** Empties every school back into recruits at once. Research stops until you fill seats again, and those students never become scholars.
+- **Schools.** Each school, where it is (tap to see the province) and its students; schools being founded and the months until they open; their upkeep a year, also shown as the **Schools** line of the Treasury.
+- **Found a school.** Opens the list of your towns without a school. A temple school costs 60 gold and opens after 12 months (a madrasa, with 30 seats, if you know Madrasa networks). You need Temple and monastery schools or Madrasa networks.
+- **What you can study now.** Every invention open to you, grouped by era, cheapest first. Each row says what it does, its cost in scholar-years, about how long it takes at your pace, how many neighbours already know it (each makes it cheaper) and whether it is ahead of its time (double cost per era ahead). Tap **Study** to start it. Choosing another study while one is under way drops the progress on it: the button then reads **Switch**, and the tab says how much you would lose.
+- **What you know.** A folding list of every invention your realm knows, by era, with how many harvest steps your farming inventions give.
+
+Elsewhere:
+
+- The **General** tab of your country card has a **Learning** line, "Studying Three-field rotation · 40 % · scholars 6", that opens the tab. Another country's card shows how many inventions it knows and what it studies.
+- When you learn an invention an alert says so, with **Open** to choose the next study. While nothing is studied, one alert asks you to choose.
+- A commander's **Train** list offers only the arms your realm knows; the rest are named with a button to the Learning tab (pikes need Pike squares, knights Heavy armoured cavalry).
+
+### In the game now
+
+The first slice of research (milestone 4) plays one study at a time. Every country starts with a school in its capital (a madrasa where it knows Madrasa networks, else a temple school), half its seats filled and a few scholars, so research moves from the first month. Inventions already change: harvests (Three-field rotation and later farming inventions make each harvest a band better), which arms can be trained, and the troop cap (Standing regiments, Mass conscription, Railway mobilization). Castles and roads follow with buildings. Not yet in the game: the academy's second study, stealing and sacking in war, poaching, foreign scholars and contact inventions such as maize and potatoes; the other effects are shown as text.
 
 ## How it connects
 
@@ -347,6 +364,8 @@ All research numbers except the era dates are placeholders. The design names no 
 - Occupying an enemy province with an open school steals 10 % of a study the enemy knows. A battle there sacks the school with a 25 % chance, and half its scholars flee.
 - Spread inventions raise the discount per neighbour from 10 % to 12 %, 14 % and 16 %, still capped at 60 %.
 - Your starting inventions come from your region; Ming and Korea also start with printing.
+- Every country starts with one school in its capital, half full, and 5 scholars (2 where it knows no school type).
+- The AI studies the cheapest invention open to it, fills its seats in peace and empties them only at war with no recruits left.
 - Guano's harvest bonus lasts 30 years, then ends.
 - With the Examination system, any working scholar can be made an official of any kind.
 
@@ -357,6 +376,6 @@ Nothing. Every question about research has been decided; numbers marked as place
 
 ## For developers
 
-- Spec: [`domain/research/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/research/spec.md), requirement code **RSCH** (RSCH-001 to RSCH-061, with the full invention list in section 5.8).
+- Spec: [`domain/research/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/research/spec.md), requirement code **RSCH** (RSCH-001 to RSCH-090, with the full invention list in section 5.8; how the player uses it is RSCH-084 to RSCH-090).
 - Features: `domain/research/features/` (schools-and-students, research-progress, war-and-research, cost-and-eligibility, invention-tree, starting-knowledge, research-readers).
-- Code: rules code for this context goes in `packages/engine/src/domain/research/`, balance numbers and the tree in `packages/rules/data/domain/research.json`.
+- Code: rules code for this context goes in `packages/engine/src/domain/research/`, balance numbers and the tree in `packages/rules/data/domain/research.json`. The turn's wiring is `packages/engine/src/research.ts` (`knows(world, n, id)` for other systems), the Learning tab `apps/client/src/ui/learning.ts`.

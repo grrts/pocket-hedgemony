@@ -57,11 +57,13 @@ export function taxWeight(world: World, p: number): number {
   return (provinceConfig.tax.heavy_weight as Record<string, number>)[rate] ?? 0;
 }
 
-const JUDGE = OFFICIALS.indexOf("Judge");
+/** The Judge's index among the officials, read when first needed: the engine's modules import one another in a cycle, so OFFICIALS may not be set when this file loads. */
+let judge = -2;
+const isJudge = (o: number) => o === (judge === -2 ? (judge = OFFICIALS.indexOf("Judge")) : judge);
 
 /** A province's mood (index into MOODS) from its grievances; a judge in his post raises the riot bar by one. */
 export function moodIndex(world: World, p: number): number {
-  return MOODS.indexOf(moodOf(grievanceCount(world, p), world.provinceOfficial[p] === JUDGE).mood);
+  return MOODS.indexOf(moodOf(grievanceCount(world, p), isJudge(world.provinceOfficial[p]!)).mood);
 }
 
 /** Tax and recruits a rioting or plotting province still gives: half (province PROV-162, PROV-231). */
@@ -115,7 +117,7 @@ export function monthlyMoods(world: World, news: News[]): void {
     const battle = world.provinceBattleYear[p]!;
     if (battle >= 0 && world.date.year - battle < g.bloodshed_years) now |= bit("Bloodshed");
     if (taxWeight(world, p) > 0) now |= bit("Heavy taxes");
-    const before = MOODS.indexOf(moodOf(grievanceCount(world, p), world.provinceOfficial[p] === JUDGE).mood);
+    const before = MOODS.indexOf(moodOf(grievanceCount(world, p), isJudge(world.provinceOfficial[p]!)).mood);
     world.provinceGrievances[p] = now;
     const after = moodIndex(world, p);
     if (owner === world.player && after >= 2 && after > before) {

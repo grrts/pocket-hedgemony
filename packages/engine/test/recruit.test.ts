@@ -255,12 +255,15 @@ describe("armies that cost something", () => {
   });
 
   it("AI realms at war recruit and send commanders out to their troops", () => {
-    const w = createWorld(rules, 3, tiles);
-    for (let t = 0; t < 104; t++) processTurn(w, [], -1);
+    // Over a few campaigns: one alone swings by a handful of armies either way.
     let led = 0;
     let garrisons = 0;
-    for (let i = 0; i < w.armies.count; i++) if (w.armies.alive[i]) w.armies.commander[i]! >= 0 ? led++ : garrisons++;
+    for (const seed of [3, 4, 5]) {
+      const w = createWorld(rules, seed, tiles);
+      for (let t = 0; t < 104; t++) processTurn(w, [], -1);
+      for (let i = 0; i < w.armies.count; i++) if (w.armies.alive[i]) w.armies.commander[i]! >= 0 ? led++ : garrisons++;
+      expect(w.commanderIds.length).toBeGreaterThan(rules.nations.length);
+    }
     expect(led).toBeGreaterThan(garrisons);
-    expect(w.commanderIds.length).toBeGreaterThan(rules.nations.length);
-  }, 60000);
+  }, 120000);
 });

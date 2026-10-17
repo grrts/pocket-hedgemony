@@ -1,6 +1,7 @@
 import { monthlyPeople } from "./living.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
+import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiWorks, cancelWork, judgeNeglect, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { swapOfficials } from "./officials.ts";
@@ -91,6 +92,11 @@ export type Order =
   | { type: "seizeFief"; province: number }
   /** Move officials between two royal provinces: they swap posts, or one takes the other's empty post (AssignOfficial). */
   | { type: "swapOfficials"; a: number; b: number }
+  /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
+  | { type: "setStudy"; invention: string }
+  | { type: "setSeats"; n: number }
+  | { type: "callStudentsToArms" }
+  | { type: "foundSchool"; province: number }
   /** Order the next step of a work (index into WORKS) in a province, or take it off the queue or give up its site. */
   | { type: "build"; province: number; work: number }
   | { type: "cancelBuild"; province: number; work: number }
@@ -165,6 +171,7 @@ function startDay(world: World, news: News[]): void {
     monthlyMoods(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
+    monthlyResearch(world, news);
     runLedger(world, true);
     judgeNeglect(world);
     monthlyWorks(world, news);
@@ -247,6 +254,17 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "swapOfficials": {
       const reason = swapOfficials(world, actingNation, order.a, order.b, news);
       // The ledger shows the new sums at once.
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "setStudy":
+      return setStudy(world, actingNation, order.invention);
+    case "setSeats":
+      return setSeats(world, actingNation, order.n);
+    case "callStudentsToArms":
+      return callStudentsToArms(world, actingNation);
+    case "foundSchool": {
+      const reason = foundSchool(world, actingNation, order.province);
       if (!reason) runLedger(world, false);
       return reason;
     }

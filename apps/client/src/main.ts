@@ -26,6 +26,7 @@ import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
+import { learningLine, learningTab, realmLearningLine } from "./ui/learning.ts";
 import { provinceWorks, realmWorks, worksLine } from "./ui/works.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
@@ -136,7 +137,11 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "treasury" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "works" = "general";
+let realmTab: "general" | "treasury" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "works" = "general";
+/** Folding parts of the Learning tab the player opened (found a school, what you know), kept across redraws. */
+const learningOpen = new Set<string>();
+/** The study the player was last told to choose for (known count), so the alert comes once each time. */
+let askedStudy = -1;
 /** Province whose official's screen is open, or -1. */
 let officialView = -1;
 /** Lord whose screen is open (index into the snapshot's lords), or -1 (feedback 67). */
@@ -1155,7 +1160,8 @@ function applySnapshot(): void {
 }
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
-  war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll", built: "castle",
+  war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
+  invention: "scroll", built: "castle",
 };
 
 /**
@@ -1194,6 +1200,9 @@ function logNews(s: Snapshot): void {
     watching.result = news.find((x) => x.kind === "battle" && !x.begins && x.province === watching!.province)?.text ?? "The battle is over.";
   }
   renderBattleWatch();
+  // Learning: an invention learned, or nothing being studied, opens the Learning tab (RSCH-089).
+  for (const x of news) if (x.kind === "invention" && x.nations.includes(me)) alertPlayer(x.text, "scroll", x.province === undefined ? { tab: "learning" } : { province: x.province });
+  askForStudy(s, news.some((x) => x.kind === "invention" && /Learned/.test(x.text)));
   for (const c of s.calls) {
     if (alerted.has(`call ${c.id}`)) continue;
     alerted.add(`call ${c.id}`);
@@ -1206,26 +1215,35 @@ function logNews(s: Snapshot): void {
   }
 }
 
+/** While nothing is studied, one alert asks the player to choose (once for each thing learned); `told` when a Learned alert already said so. */
+function askForStudy(s: Snapshot, told = false): void {
+  const r = s.research;
+  if (!r || r.study || !r.options.length || askedStudy === r.known.length) return;
+  askedStudy = r.known.length;
+  if (!told) alertPlayer("Choose what your scholars study.", "scroll", { tab: "learning" });
+}
+
 /** Alerts shown at once, at most this many; the oldest gives way. */
 const ALERTS_SHOWN = 3;
 /** How long an alert stays, in ms; everything it says is also in the log. */
 const ALERT_MS = 12000;
 
 /** A short alert over the map, with Go there (to a province) or Answer (opens the dispatches). */
-function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true } = {}): void {
+function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true; tab?: "learning" } = {}): void {
   if ([...alerts.children].some((el) => el.querySelector("span")?.textContent === text)) return;
   const el = document.createElement("div");
   el.className = "alert framed";
   el.setAttribute("role", "status");
   if (to.battle) el.dataset.battle = String(to.province);
   el.innerHTML = `${icon(what, 2)}<span>${esc(text)}</span>${
-    to.battle ? `<button class="wax go-there">${icon("swords", 1)}Watch</button>` : to.province !== undefined ? `<button class="wax go-there">${icon("map", 1)}Go there</button>` : to.answer ? `<button class="wax go-there">Answer</button>` : ""
+    to.battle ? `<button class="wax go-there">${icon("swords", 1)}Watch</button>` : to.tab && snapshot ? `<button class="wax go-there" data-realm="${snapshot.playerNation}" data-realm-open="${to.tab}">Open</button>` : to.province !== undefined ? `<button class="wax go-there">${icon("map", 1)}Go there</button>` : to.answer ? `<button class="wax go-there">Answer</button>` : ""
   }<button class="paper dismiss" aria-label="Dismiss">${icon("close", 1)}</button>`;
   const remove = () => el.remove();
   el.querySelector(".dismiss")!.addEventListener("click", remove);
   el.querySelector(".go-there")?.addEventListener("click", () => {
     remove();
     if (to.battle && to.province !== undefined) watchBattle(to.province);
+    else if (to.tab) return; // its [data-realm] button opens the tab
     else if (to.province !== undefined) goThere(to.province);
     else {
       newsView = true;
@@ -2109,7 +2127,10 @@ function renderArmy(id: number): void {
   const garrison = [...s.armies.id.keys()].filter((j) => s.armies.owner[j] === me && s.armies.location[j] === here && s.armies.commander[j]! < 0 && s.armies.kind[j] === s.armies.kind[k]);
   const idle = idleCommanders();
   const levyFoot = by[0]!;
-  const trainable = rules.defines.recruit.armsAtStart.filter((a) => a !== "levy foot");
+  // Arms the realm's inventions allow (warfare arms' unlock); the rest wait on research.
+  const armsKnown = s.research?.arms ?? rules.defines.recruit.armsAtStart;
+  const trainable = rules.defines.recruit.armsAtStart.filter((a) => a !== "levy foot" && armsKnown.includes(a));
+  const armsNotKnown = rules.defines.recruit.armsAtStart.filter((a) => a !== "levy foot" && !armsKnown.includes(a));
   const ARM_COST: Record<string, { months: number; gold: number }> = {
     "armoured foot": { months: 2, gold: 80 }, pikes: { months: 3, gold: 60 }, archers: { months: 4, gold: 60 }, "light horse": { months: 3, gold: 100 }, "knights and lancers": { months: 9, gold: 300 },
   };
@@ -2156,7 +2177,7 @@ function renderArmy(id: number): void {
               const g = (cost.gold * trainMen * rules.defines.recruit.goldScale) / 1000;
               return `<button class="paper" data-train="${a}" ${g > s.nationTreasury[me]! ? "disabled" : ""}>${ARM_LABEL[a]} · ${cost.months} mo · ${g.toFixed(2)} gold</button>`;
             })
-            .join("")}</div>`
+            .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Learning</button></p>` : ""}`
         : `<p class="hint">No levy foot left to train.</p>`}`}
     ${garrison.length ? `<div class="choices"><button class="wax" data-pickup="${id}">Take in the garrison here: ${fmt(garrison.reduce((t, j) => t + s.armies.men[j]!, 0))} men</button></div>` : ""}
     ${others.length ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(cmdOf(s.armies.commander[j]!).name)}'s army</button>`).join("")}</div>` : ""}
@@ -2431,7 +2452,7 @@ async function actInTreasury(order: Order): Promise<void> {
   renderPanel();
 }
 
-const LEDGER_LABEL: Record<string, string> = { tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest" };
+const LEDGER_LABEL: Record<string, string> = { tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools" };
 
 /**
  * The Treasury tab: the purse (gold, its change a month and how long it
@@ -2509,7 +2530,7 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if (!s || ((realmTab === "treasury" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "works") && !mine)) realmTab = "general";
+  if (!s || ((realmTab === "treasury" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "works") && !mine)) realmTab = "general";
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
@@ -2523,8 +2544,9 @@ function renderRealm(r: number): void {
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
       ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
       <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
-      <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>` : ""}
-      ${mine ? worksLine(s!) : ""}
+      <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
+      ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
+      ${mine ? worksLine(s) : ""}` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
     </dl>
     ${mine ? "" : (() => {
@@ -2544,12 +2566,13 @@ function renderRealm(r: number): void {
     : realmTab === "mercenaries" ? mercenarySection()
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
+    : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningOpen)
     : realmTab === "works" ? realmWorks(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length)
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("treasury", "Treasury") + tab("provinces", "Provinces") + tab("works", "Works") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : ""}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("treasury", "Treasury") + tab("provinces", "Provinces") + tab("works", "Works") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : ""}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -2606,11 +2629,28 @@ function renderRealm(r: number): void {
   bindOffers();
   bindCommand();
   bindTax(-1);
+  bindLearning();
   panel.querySelector("[data-back]")?.addEventListener("click", () => {
     realmView = -1;
     renderPanel();
   });
   bindNationButtons();
+}
+
+/** The Learning tab's buttons: study, seats, students to arms, found a school; its folds stay as the player left them. */
+function bindLearning(): void {
+  panel.querySelectorAll<HTMLButtonElement>("[data-study]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "setStudy", invention: b.dataset.study! })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-seats]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "setSeats", n: Number(b.dataset.seats) })));
+  panel.querySelector<HTMLButtonElement>("[data-call-students]")?.addEventListener("click", () => void actInTreasury({ type: "callStudentsToArms" }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-found-school]").forEach((b) =>
+    b.addEventListener("click", () => {
+      learningOpen.delete("found");
+      void actInTreasury({ type: "foundSchool", province: Number(b.dataset.foundSchool) });
+    }),
+  );
+  panel.querySelectorAll<HTMLDetailsElement>("details[data-keep]").forEach((d) =>
+    d.addEventListener("toggle", () => (d.open ? learningOpen.add(d.dataset.keep!) : learningOpen.delete(d.dataset.keep!))),
+  );
 }
 
 function bindClose(): void {
@@ -2657,6 +2697,8 @@ async function startGame(nation: string): Promise<void> {
   renderPanel();
   renderActions();
   hideLoading();
+  askedStudy = -1;
+  askForStudy(snapshot!);
 }
 
 /** The map images as the engine takes them, so armies march over the map's own tiles. */
