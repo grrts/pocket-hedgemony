@@ -294,18 +294,38 @@ export function recruit(world: World, n: number, p: number, thousands: number, n
   if (where) return where;
   const men = Math.round(thousands) * 1000;
   if (men <= 0) return "no men asked for";
+  const queued = world.musters.find((m) => m.nation === n && m.province === p);
+  const max = world.rules.defines.recruit.queueMax;
   if (men > world.provinceRecruits[p]! + 0.5) return `${provinceName(world, p)} has only ${fmt(world.provinceRecruits[p]!)} men left to call`;
+  if ((queued ? Math.ceil(queued.men / 1000) : 0) + men / 1000 > max) return `the recruit queue at ${provinceName(world, p)} is full: at most ${max} thousands wait to gather`;
   if (!wf.overCap(world.nationCapUsed[n]! + men, world.nationTroopCap[n]!).canRaise) return "that would go over your troop cap";
   const cost = gold(world, rc.levyMoney(men));
   if (cost > world.nationTreasury[n]!) return "not enough gold";
   world.provinceRecruits[p] = Math.max(0, world.provinceRecruits[p]! - men);
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
   const weeks = world.rules.defines.recruit.gatherWeeks;
-  const queue = world.musters.find((m) => m.nation === n && m.province === p);
-  if (queue) queue.men += men;
+  if (queued) queued.men += men;
   else world.musters.push({ nation: n, province: p, men, weeksLeft: weeks });
   recount(world);
   if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} men of ${provinceName(world, p)} are called up; they gather a thousand every ${weeks} weeks.`, nations: [n], province: p });
+  return null;
+}
+
+/**
+ * Take the last thousand off a province's recruit queue: its levy money comes
+ * back and the men go back to the province's pool. The thousand already
+ * gathering can be cancelled too, losing its weeks.
+ */
+export function cancelRecruit(world: World, n: number, p: number): string | null {
+  const i = world.musters.findIndex((m) => m.nation === n && m.province === p);
+  if (i < 0) return `no men are gathering at ${provinceName(world, p)}`;
+  const m = world.musters[i]!;
+  const men = m.men - Math.floor((m.men - 1) / 1000) * 1000;
+  m.men -= men;
+  if (m.men < 1) world.musters.splice(i, 1);
+  world.provinceRecruits[p] = Math.min(world.provinceRecruitCeiling[p]!, world.provinceRecruits[p]! + men);
+  world.nationTreasury[n] = world.nationTreasury[n]! + gold(world, rc.levyMoney(men));
+  recount(world);
   return null;
 }
 

@@ -280,6 +280,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - RECR-114 When an official is commissioned, the recruiting system shall charge `recruiting.commission_gold` (50 gold, provisional) once. [F-28]
 - RECR-115 The AI shall commission an official only when it has at least `recruiting.ai_commission_min_men` (1,000, provisional) men without a commander and no free commander to send, and shall never keep more commanders than its armies need. [F-28]
 - RECR-112 When a commander leaves troops in a province of his realm, the recruiting system shall make them that province's garrison troops (RECR-107); an army keeps at least its commander's own company. [F-13]
+- RECR-116 The province's Garrison tab shall offer one "Recruit 1,000 men" button; each press joins the province's recruit queue, shown one row per thousand with the weeks until it has gathered, at most `recruit.queueMax` (10) per province; the last row can be cancelled for its levy money and men back. [F-38]
 
 ## 6. Commands
 

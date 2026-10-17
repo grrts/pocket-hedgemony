@@ -836,3 +836,52 @@ table.troops td.army-buttons {
   display: flex;
   flex-wrap: wrap;
 }
+
+/* ---- Province queues: recruits gathering, one row per thousand ---- */
+
+.queue-head {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0 2px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.queue {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.queue li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 2px 4px;
+  border-top: 2px dashed var(--ink-soft);
+}
+
+.queue li.now {
+  background: var(--ui-parchment-dark);
+}
+
+.queue .what {
+  flex: 1;
+  min-width: 0;
+}
+
+.queue small {
+  color: var(--ink-soft);
+}
+
+.queue .when {
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.queue button {
+  flex: none;
+  min-width: 40px;
+}
