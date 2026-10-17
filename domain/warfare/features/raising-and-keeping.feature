@@ -137,3 +137,26 @@ Feature: Raising and keeping an army
     Given the country "Venice" has hired a Swiss free company
     Then the company is led by its own captain as the commander of its own army
     And none of Venice's commanders is taken
+
+  @WAR-213 @feedback-53
+  Scenario: Free companies of the age, each its own size and mix
+    Given the year is 1444
+    When the free companies for hire are read
+    Then each has between 300 and 3000 men
+    And each has only the arms its group fielded, in a mix of its own
+    And about six are for hire
+
+  @WAR-213 @feedback-53
+  Scenario: A hired company arrives as it was offered
+    Given the country "Castile" hires a free company of 1450 men
+    When the company reaches the capital "Toledo"
+    Then its army has the same 1450 men in the same arms
+    And it is led by the company's captain
+
+  @WAR-214 @WAR-215 @WAR-216 @WAR-217 @feedback-52
+  Scenario: The Mercenaries tab
+    When the player opens the Mercenaries tab of their country card
+    Then it shows the companies in service, their men and their pay a month
+    And a card for each company on the way, with the weeks left
+    And a card for each company for hire, with its arms, men, captain, weeks to the capital, pay and a Hire button
+    And the Military tab shows one line on free companies that opens this tab

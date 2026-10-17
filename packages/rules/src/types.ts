@@ -50,6 +50,17 @@ export interface WarDefines {
   aiDeclareStrengthRatio: number;
 }
 
+/** A kind of free company (warfare free_companies): where it gathers and what it fields. */
+export interface FreeCompanyDef {
+  group: string;
+  /** Nations whose capitals the company gathers at. */
+  homes: string[];
+  names: string[];
+  captains: string[];
+  /** Share of the company's men by arm, as [lowest, highest]. */
+  mix: Record<string, number[]>;
+}
+
 /** Raising, paying and training armies (milestone 2; the domain's own numbers stay in domain/recruiting.json and domain/warfare.json). */
 export interface RecruitDefines {
   /** Treasury gold per domain gold. */
@@ -60,11 +71,15 @@ export interface RecruitDefines {
   queueMax: number;
   /** Arms a realm can train in 1444, before any invention. */
   armsAtStart: string[];
-  hiredCompanyMen: number;
-  hiredArms: string[];
+  /** A free company's size in this age: from min up to max men. */
+  freeCompanyMen: { min: number; max: number };
+  /** Free companies offered for hire at a time. */
+  freeCompaniesForHire: number;
+  /** The free companies of the age: where they gather, their names and captains, and each arm's share range of their men. */
+  freeCompanies: FreeCompanyDef[];
   /** Share of levies and hired men who leave each month the treasury can't pay them. */
   unpaidDesertion: number;
-  /** Weekly turns a mercenary company takes to arrive. */
+  /** Weekly turns a free company takes to arrive at the least; farther homes take longer. */
   mercenaryWeeks: number;
   /** Gold to commission an official as a commander. */
   commanderGold: number;

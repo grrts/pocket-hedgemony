@@ -5,7 +5,10 @@ import type { Order } from "../../turn.ts";
 import { createArmyPool, createWorld, type World } from "../../world.ts";
 import type { TileGrid } from "../../tiles.ts";
 import type { Battle } from "../../war.ts";
-import { addCommander, ARMS, type Mercenary, type Muster } from "../../recruit.ts";
+import { addCommander, ARMS, type FreeCompany, type Mercenary, type Muster } from "../../recruit.ts";
+
+/** A mercenary as saved: before free companies it held one arm and its men instead of a company. */
+type OldMercenary = { nation: number; weeksLeft: number; company?: FreeCompany; arm?: string; men?: number };
 import { newCommander } from "../warfare/index.ts";
 import { base64, encodePng, fnv1a } from "./bytes.ts";
 import { packChunk, savesConfig, unpackChunk, type CampaignOptions, type RawChunk } from "./format.ts";
@@ -74,7 +77,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
       arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial },
     }),
     packChunk("nations", V.nations, {
-      meta: { musters: world.musters, mercs: world.mercs, commanderHome: world.commanderHome },
+      meta: { musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
@@ -231,10 +234,23 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (!name || owner < 0 || nationMap[owner]! < 0) return -1;
     return addCommander(world, nationMap[owner]!, newCommander(name), id);
   });
-  const natMeta = need("nations").meta as { musters?: Muster[]; mercs?: Mercenary[]; commanderHome?: number[] };
+  const natMeta = need("nations").meta as { musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[] };
   const mapP = (old: number) => world.provinceIndex.get(ids.provinces[old]!) ?? -1;
   const mapN = (old: number) => nationMap[old] ?? -1;
-  if (natMeta.mercs) world.mercs = natMeta.mercs.map((m) => ({ ...m, nation: mapN(m.nation) })).filter((m) => m.nation >= 0);
+  const mapCompany = (c: FreeCompany): FreeCompany => ({ ...c, home: c.home < 0 ? -1 : mapP(c.home) });
+  if (natMeta.freeCompanies) {
+    world.freeCompanies = natMeta.freeCompanies.map(mapCompany);
+    world.freeCompanySeq = natMeta.freeCompanySeq ?? Math.max(0, ...world.freeCompanies.map((c) => c.id));
+  }
+  if (natMeta.mercs) {
+    world.mercs = natMeta.mercs
+      .map((m): Mercenary => {
+        // Saves from before free companies held one arm and its men: that becomes a company of its own.
+        const company = m.company ? mapCompany(m.company) : { id: ++world.freeCompanySeq, group: "free company", name: "A free company", captain: "", home: -1, byArm: ARMS.map((arm) => (arm === m.arm ? (m.men ?? 0) : 0)) };
+        return { nation: mapN(m.nation), company, weeksLeft: m.weeksLeft };
+      })
+      .filter((m) => m.nation >= 0);
+  }
   natMeta.commanderHome?.forEach((p, old) => {
     const c = commanderMap[old]!;
     if (c >= 0) world.commanderHome[c] = p < 0 ? -1 : mapP(p);

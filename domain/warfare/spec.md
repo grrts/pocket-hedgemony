@@ -657,6 +657,13 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - WAR-210 When a contract with a free company is signed, the warfare system shall take the gold up front and have the company arrive at the realm's capital after the days it needs to march there from where it gathers, shown on the hire screen; until it arrives it is not on the map and cannot fight. While the capital is besieged or occupied, no company can be hired. [F-19; playtest feedback]
 - WAR-212 The warfare system shall give levies no service term: a levy company, trained or not, never goes home on its own and stays until its realm disbands it or leaves it as a garrison; lords' retinues and hired companies keep their own rules. [F-23]
 - WAR-211 The warfare system shall have every hired company led by its own captain as the commander of its own army, who leaves with the company when the contract ends; a hired company never takes one of the realm's commanders. [F-19]
+- WAR-213 The warfare system shall offer free companies of the age's groups, each gathered where its group historically gathered, with a random size between the age's smallest and largest company (300 to 3,000 men, config) and a random mix of arms within its group's ranges; about six are for hire at once, some move on each month and new ones gather, and a realm may hire those that reach its capital within 16 weeks. A hired company arrives with exactly the men and arms it was offered with. [F-53; replaces the fixed 1,000-man company of milestone 2]
+
+#### How the player uses it: free companies
+- WAR-214 Where: the player opens their country card and taps the Mercenaries tab; each company for hire is a card with a Hire button, which is greyed with the reason when the capital is besieged or the treasury is short. [F-52; X-19]
+- WAR-215 Grouping: the tab holds everything about free companies and nothing else: "Your companies" (in service, with a Command button, and on the way, with the weeks left) above "For hire". Each card shows the company's name and group, a bar of its arms with the men of each, its men and captain, the weeks to the capital and its pay a month. [F-52; X-19]
+- WAR-216 Overview: the top of the tab gives the companies in service, their men and their pay a month; the Military tab keeps one line ("Free companies: 2 in service, 1 on the way, 5 for hire") that opens the Mercenaries tab. [F-52; X-19]
+- WAR-217 Phone: in landscape the cards are one column across the panel, the Hire and Command buttons are at least 44 × 44 points, the tabs wrap rather than scroll, and nothing needs hover. [F-52; X-19]
 
 ## 6. Commands
 
@@ -1186,3 +1193,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-209 | features/commanders.feature | No army without a commander |
 | WAR-210, 211 | features/raising-and-keeping.feature | Hiring a free company takes no recruits; A hired company arrives after its march |
 | WAR-212 | features/kinds-and-break-points.feature | Levies stay until the realm sends them home |
+| WAR-213 | features/raising-and-keeping.feature | Free companies of the age, each its own size and mix |
+| WAR-214 to 217 | features/raising-and-keeping.feature | The Mercenaries tab |
