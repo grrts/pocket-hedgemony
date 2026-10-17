@@ -23,6 +23,9 @@ importers:
       '@fontsource/jacquard-12':
         specifier: 5.3.0
         version: 5.3.0
+      '@fontsource/jersey-10':
+        specifier: 5.3.0
+        version: 5.3.0
       '@fontsource/pixelify-sans':
         specifier: 5.3.0
         version: 5.3.0
@@ -128,6 +131,9 @@ packages:
 
   '@fontsource/jacquard-12@5.3.0':
     resolution: {integrity: sha512-P1a2NHci2j/ArWzw1AheOtceKy+78J0s891FLuiGhrq0Nj5tfqCAa+FgcXE9dlWvjrTdC/wlXtahcL5JbOAFDA==}
+
+  '@fontsource/jersey-10@5.3.0':
+    resolution: {integrity: sha512-1dOTUg3JXm/Ls6j4BEPLRF5DHGadCGQy/sIHS7L0SWauB2rEd2W6614Xufxoc+TVXtrt8kVR6IWh3RFkXmy/Cw==}
 
   '@fontsource/pixelify-sans@5.3.0':
     resolution: {integrity: sha512-4RCe9nXbi7wUu5+H0FNX1sgPZ2kJ1MmY1uTkEfvQIzzqhoS8zGKJaJfdK8oreE0OU+5gM+NdurFi3H3FJRBvyw==}
@@ -1098,6 +1104,8 @@ snapshots:
       - supports-color
 
   '@fontsource/jacquard-12@5.3.0': {}
+
+  '@fontsource/jersey-10@5.3.0': {}
 
   '@fontsource/pixelify-sans@5.3.0': {}
 
