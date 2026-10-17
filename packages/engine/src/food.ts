@@ -5,7 +5,7 @@ import { harvestMultiplier, type HarvestRoll } from "./domain/province/land.ts";
 import { harvestMonth, rollRegionWeather, rotSeason } from "./domain/realm/index.ts";
 import { officialBonus } from "./officials.ts";
 import { worksFood } from "./works.ts";
-import { atHarvest, FOOD_CLASSES } from "./land.ts";
+import { atHarvest, FOOD_CLASSES, huntingYear } from "./land.ts";
 import { shareFood } from "./castleFood.ts";
 
 /**
@@ -73,7 +73,11 @@ export function monthlyFood(world: World, news: News[]): void {
   const month = world.date.month;
   const store = world.provinceStore;
   const P = world.provinceCount;
-  if (month === 1) world.provinceStarved.fill(0);
+  if (month === 1) {
+    world.provinceStarved.fill(0);
+    // The hunting year: game regrows or thins, and the north rolls its winters (feedback 81).
+    huntingYear(world, (p) => regionOf(world, p));
+  }
 
   // Harvests: each region rolls its weather once (bad one band worse, good one better).
   const weather = new Map<number, number>();

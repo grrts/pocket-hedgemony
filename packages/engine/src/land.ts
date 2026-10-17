@@ -32,10 +32,14 @@ export interface LandState {
    * themselves on the land they hold (D-PROV-25), fixed after.
    */
   provinceLandYield: Float32Array;
+  /** Game in each province's woods, 1 = plenty, down to the floor where hunters crowd them (feedback 81). */
+  provinceGame: Float32Array;
+  /** 1 in a province whose region has a hard winter this year: its hunters bring in less (feedback 81). */
+  provinceHardWinter: Uint8Array;
 }
 
 export function createLandState(P: number): LandState {
-  return { provinceTiles: new Uint8Array(P * MAX_TILES), provinceLandYield: new Float32Array(P).fill(1) };
+  return { provinceTiles: new Uint8Array(P * MAX_TILES), provinceLandYield: new Float32Array(P).fill(1), provinceGame: new Float32Array(P).fill(1), provinceHardWinter: new Uint8Array(P) };
 }
 
 /** Tiles of a use in a province. */
@@ -131,6 +135,8 @@ export function seedLand(world: World): void {
     uses.forEach((n, u) => put(u, n));
     put(U.shore, shore);
   }
+  // Game starts where the 1444 hunting has left it, so nothing crashes in the first years.
+  for (let p = 0; p < P; p++) if (!world.provinceWater[p]) world.provinceGame[p] = gameTarget(world, p);
 }
 
 /** Shares n tiles out by weight, largest remainder first. */
@@ -167,7 +173,7 @@ const FOOD_WORK = {
   farmers: { building: "farm", activity: "farming", harvest: true },
   herders: { building: "ranch", activity: "herding", harvest: false },
   seafolk: { building: "fishery", activity: "fishing", harvest: false },
-  woodsmen: { building: "", activity: "hunting and gathering", harvest: false },
+  woodsmen: { building: "hunting lodge", activity: "hunting and gathering", harvest: false },
 } as const;
 export type FoodClass = keyof typeof FOOD_WORK;
 export const FOOD_CLASSES = Object.keys(FOOD_WORK) as FoodClass[];
@@ -189,11 +195,77 @@ export function classFood(world: World, p: number, cls: FoodClass, step: number,
   const workers = world.provinceClasses[p * CLASS_COUNT + CLASS_NAMES.indexOf(cls)]!;
   const ground = world.provinceGround[p] ?? "grassland";
   const bareRate = BARE * peopleOutput(ground, work.activity);
+  if (cls === "woodsmen") return huntingFood(world, p, workers, bareRate, step > 0 ? share : 0);
   if (!work.building || step <= 0) return workers * bareRate;
   const inside = Math.min(workers, tilesOf(world, p, CLASS_USE[cls]) * slots(work.building));
   const rate = (cls === "farmers" ? world.rules.defines.works.farmRates[step - 1] ?? perWorker("farm") : perWorker(work.building)) * buildingOutput(ground, work.building);
   // Unpaid buildings give half: the rest of their workers count as on bare land.
   return (workers - inside) * bareRate + inside * (rate * share + bareRate * (1 - share));
+}
+
+// ---------------------------------------------------------------- hunting (feedback 81)
+
+const HUNT = provinceConfig.food.hunting;
+
+/** Hunters the province's woods hold at full yield, in thousands: the woods tiles' slots. */
+export const huntingRoom = (world: World, p: number): number => tilesOf(world, p, "woods") * slots("hunting lodge");
+
+/** How rich the ground's game is: boreal woods and tundra most, thin woods least. */
+function gameYield(world: World, p: number): number {
+  const ground = world.provinceGround[p] ?? "grassland";
+  const by = HUNT.game_yield as Record<string, number>;
+  if (ground === "forest" && (world.provincePlace[p]?.lat ?? 45) >= HUNT.boreal_lat) return HUNT.boreal_yield;
+  return by[ground] ?? by.base!;
+}
+
+/** Hunters over the woods' room per hunter that fits. */
+function crowding(world: World, p: number): number {
+  const room = huntingRoom(world, p);
+  const hunters = world.provinceClasses[p * CLASS_COUNT + CLASS_NAMES.indexOf("woodsmen")]!;
+  return room > 0 ? Math.max(0, hunters / room - 1) : 0;
+}
+
+/** The game the hunting leaves in the woods over the years: plenty until the hunters crowd them, then less. */
+export function gameTarget(world: World, p: number): number {
+  return Math.max(HUNT.game_floor, 1 - HUNT.thinning_per_crowding * crowding(world, p));
+}
+
+/**
+ * Food the hunters bring in a year (feedback 81): those the woods hold hunt
+ * at the bare rate × how rich the game is there × how much is left, half as
+ * much again with a hunting lodge; the rest scrape a living beyond the woods
+ * at half the bare rate. A hard winter cuts it all.
+ */
+function huntingFood(world: World, p: number, hunters: number, bareRate: number, lodge: number): number {
+  const inside = Math.min(hunters, huntingRoom(world, p));
+  const lodgeRate = perWorker("hunting lodge") / BARE;
+  const rate = bareRate * gameYield(world, p) * world.provinceGame[p]! * (1 + (lodgeRate - 1) * lodge);
+  const winter = world.provinceHardWinter[p] ? HUNT.hard_winter.catch : 1;
+  return (inside * rate + (hunters - inside) * bareRate * HUNT.beyond_woods) * winter;
+}
+
+/**
+ * The hunting year, each January (feedback 81): game moves a step toward what
+ * the hunting leaves, and each region rolls for a hard winter, more often in
+ * the north. `region` gives a province's weather region.
+ */
+export function huntingYear(world: World, region: (p: number) => number): void {
+  const hw = HUNT.hard_winter;
+  const winters = new Map<number, boolean>();
+  for (let p = 0; p < world.provinceCount; p++) {
+    if (world.provinceWater[p]) continue;
+    const g = world.provinceGame[p]!;
+    world.provinceGame[p] = g + (gameTarget(world, p) - g) * HUNT.regrow_per_year;
+    const lat = Math.abs(world.provincePlace[p]?.lat ?? 45);
+    const oneIn = lat >= hw.north_lat || world.provinceGround[p] === "tundra" ? hw.north_one_in : lat >= hw.mid_lat ? hw.mid_one_in : 0;
+    if (!oneIn) {
+      world.provinceHardWinter[p] = 0;
+      continue;
+    }
+    const r = region(p) * 8 + oneIn;
+    if (!winters.has(r)) winters.set(r, world.rng.int(oneIn) === 0);
+    world.provinceHardWinter[p] = winters.get(r) ? 1 : 0;
+  }
 }
 
 /** Whether a class's food comes at the harvest (farmers) or month by month. */
@@ -212,6 +284,8 @@ export function tileWares(world: World, p: number, building: string): { ware: st
   switch (building) {
     case "lumber camp":
       return { ware: lat >= 55 || ground === "tundra" ? "timber and furs" : "timber", amount: slots("lumber camp") * buildingOutput(ground, "lumber camp") };
+    case "hunting lodge":
+      return lat >= HUNT.boreal_lat || ground === "tundra" ? { ware: "furs", amount: slots("hunting lodge") * gameYield(world, p) * world.provinceGame[p]! * 0.5 } : null;
     case "quarry":
       return { ware: "stone", amount: slots("mine") * buildingOutput(ground, "mine") };
     case "ranch":

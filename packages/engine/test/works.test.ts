@@ -7,7 +7,9 @@ import { wallsOf } from "../src/war.ts";
 import { LEDGER, LEDGER_LINES, provinceTrade } from "../src/treasury.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { hashWorld } from "../src/hash.ts";
-import { tilesOf, tileCount, MAX_TILES } from "../src/land.ts";
+import { gameTarget, huntingRoom, huntingYear, tilesOf, tileCount, MAX_TILES } from "../src/land.ts";
+import { worksFood } from "../src/works.ts";
+import { CLASS_COUNT, CLASS_NAMES } from "../src/living.ts";
 import { yearlyFood } from "../src/food.ts";
 import { buildSheet, knowsInvention, nextStep, slotsOf, slotsUsed, whyNot, WORK_COUNT, workCost, workIndex, worksAt } from "../src/works.ts";
 
@@ -242,11 +244,45 @@ describe("works (milestone 4)", () => {
     }
   });
 
+  it("hunts in the woods: a lodge brings in more, crowded woods thin, a hard winter cuts the catch (feedback 81)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const swe = nation(w, "sweden");
+    const wd = CLASS_NAMES.indexOf("woodsmen");
+    const p = Array.from({ length: w.provinceCount }, (_, i) => i).find((i) => w.provinceOwner[i] === swe && tilesOf(w, i, "woods") > 0 && w.provinceClasses[i * CLASS_COUNT + wd]! > 0)!;
+    // Fewer hunters than the woods hold: plenty of game.
+    w.provinceClasses[p * CLASS_COUNT + wd] = huntingRoom(w, p) / 2;
+    w.provinceGame[p] = 1;
+    expect(gameTarget(w, p)).toBe(1);
+    w.provinceWorks[p * WORK_COUNT + work("hunting lodge")] = 0;
+    const bare = worksFood(w, p, "woodsmen");
+    w.provinceWorks[p * WORK_COUNT + work("hunting lodge")] = 1;
+    const lodge = worksFood(w, p, "woodsmen");
+    expect(lodge).toBeGreaterThan(bare * 1.4);
+    // A hard winter cuts the year's catch.
+    w.provinceHardWinter[p] = 1;
+    expect(worksFood(w, p, "woodsmen")).toBeCloseTo(lodge * 0.6, 5);
+    w.provinceHardWinter[p] = 0;
+    // Three times the hunters the woods hold: the game thins year by year toward the floor.
+    w.provinceClasses[p * CLASS_COUNT + wd] = huntingRoom(w, p) * 3;
+    expect(gameTarget(w, p)).toBeLessThan(0.5);
+    for (let y = 0; y < 10; y++) huntingYear(w, () => 0);
+    expect(w.provinceGame[p]).toBeLessThan(0.6);
+    // Without woods, no lodge.
+    w.provinceTiles.fill(0, p * MAX_TILES, (p + 1) * MAX_TILES);
+    w.provinceTiles[p * MAX_TILES] = 7;
+    w.provinceWorks[p * WORK_COUNT + work("hunting lodge")] = 0;
+    expect(whyNot(w, swe, p, work("hunting lodge"))).toBe("needs woods in the province");
+  });
+
   it("keeps tiles through a save", () => {
     const w = createWorld(rules, 1, tiles);
     w.provinceTiles[0] = 3;
+    w.provinceGame[5] = 0.42;
+    w.provinceHardWinter[5] = 1;
     const back = restoreWorld(new Map(worldChunks(w, { playerNation: "castile", options: {} as never }).map((c) => [c.id, c])), rules, {}, tiles).world;
     expect(Array.from(back.provinceTiles)).toEqual(Array.from(w.provinceTiles));
     expect(Array.from(back.provinceLandYield)).toEqual(Array.from(w.provinceLandYield));
+    expect(back.provinceGame[5]).toBeCloseTo(0.42, 5);
+    expect(back.provinceHardWinter[5]).toBe(1);
   });
 });

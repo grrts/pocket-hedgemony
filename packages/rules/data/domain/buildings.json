@@ -806,6 +806,26 @@
    ]
   },
   {
+   "id": "hunting lodge",
+   "place": [
+    "woods"
+   ],
+   "class": "woodsmen",
+   "limit": "per_place",
+   "group": "land",
+   "steps": [
+    {
+     "name": "hunting lodge",
+     "cost": {
+      "gold": 8,
+      "months": 3
+     },
+     "unlocked_by": "start",
+     "jobs": 1500
+    }
+   ]
+  },
+  {
    "id": "mine",
    "place": [
     "waste",

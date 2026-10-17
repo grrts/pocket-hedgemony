@@ -407,7 +407,9 @@ Every province is laid out in **4 to 16 tiles** from the map: bigger provinces h
 
 **In 1444** every province about feeds itself: its people's own ways of working the land (terraces, ditches, herding on the move) make up what its buildings leave short of 110 % of its needs in a normal year. That stays fixed, so as the people grow, a better farm or another ranch is what feeds them. A poor harvest bites.
 
-**How you use it.** Tap one of your provinces, then its **Land** tab. The first line says how much of its people the land feeds in a normal year, in red under 100 %. Below is the grid of tiles, each coloured by its use and naming the building that works it. Tap a tile to see who works it, what it feeds or gives a year, and the building that would work it better, with its **Build** button or why it can't be built yet. Changing what a tile is used for (clearing woods, draining marsh) and hunting come next.
+**Hunting.** Woodsmen hunt in the woods: each woods tile has room for 3,750 hunters, who feed 0.67 each, more in the northern forests and tundra, less in thin woods. Woodsmen past that room scrape by on half. Crowd the woods and the game thins, year by year, down to a third; fewer hunters let it come back. A **hunting lodge** makes the hunters in the woods bring in half as much again, and gives furs in the north. In the north a **hard winter** (about one year in five or eight) cuts the catch to 0.6.
+
+**How you use it.** Tap one of your provinces, then its **Land** tab. The first line says how much of its people the land feeds in a normal year, in red under 100 %. Below is the grid of tiles, each coloured by its use and naming the building that works it. Tap a tile to see who works it, what it feeds or gives a year, and the building that would work it better, with its **Build** button or why it can't be built yet. Changing what a tile is used for (clearing woods, draining marsh) comes next.
 
 ## What you see
 

@@ -66,6 +66,7 @@
       "ranch": { "uses": ["Pasture"], "slots": 3000, "class": "herders", "unlock": null, "food_per_worker": 1.33, "harvests": 1, "harvest_roll": false, "hazards": ["drought", "hard winter"] },
       "horse stud": { "uses": ["Pasture"], "slots": 3000, "class": "herders", "unlock": "F11" },
       "lumber camp": { "uses": ["Woods"], "slots": 1500, "class": "woodsmen", "unlock": null },
+      "hunting lodge": { "uses": ["Woods"], "slots": 1500, "class": "woodsmen", "unlock": null, "food_per_worker": 1.0, "harvests": 1, "harvest_roll": false, "hazards": ["hard winter"] },
       "mine": { "uses": ["Waste"], "rough_grounds": ["hills", "mountains"], "needs_seam": true, "needs_timber": true, "slots": 6000, "class": "miners", "unlock": null },
       "irrigation works": { "uses": ["Waste", "Fields"], "fields_grounds": ["drylands"], "slots": 1500, "class": "farmers", "unlock": "F3" },
       "fishery": { "uses": ["Shore"], "slots": 3000, "class": "seafolk", "unlock": null, "food_per_worker": 1.33, "harvests": 1, "harvest_roll": false, "hazards": ["storms", "blockades"] },
@@ -105,7 +106,18 @@
     "bare_per_worker": 0.67,
     "harvest": { "bumper": 1.3, "good": 1.15, "normal": 1.0, "poor": 0.7, "failed": 0.3 },
     "harvest_order": ["failed", "poor", "normal", "good", "bumper"],
-    "new_crops": { "invention": "F9", "failed_becomes": "poor" }
+    "new_crops": { "invention": "F9", "failed_becomes": "poor" },
+    "hunting": {
+      "$comment": "Feedback 81. Woods hold game for the hunters their tiles' slots can take; more hunters than that thin it. Game moves toward what the hunting leaves each year; a hard winter cuts the year's catch.",
+      "game_yield": { "tundra": 1.3, "forest": 1.1, "jungle": 1.0, "base": 0.9 },
+      "boreal_lat": 55,
+      "boreal_yield": 1.3,
+      "beyond_woods": 0.5,
+      "thinning_per_crowding": 0.35,
+      "game_floor": 0.3,
+      "regrow_per_year": 0.2,
+      "hard_winter": { "north_lat": 55, "north_one_in": 5, "mid_lat": 45, "mid_one_in": 8, "catch": 0.6 }
+    }
   },
   "wares": {
     "list": ["grain", "rice", "wine", "olive oil", "wool", "cloth", "flax", "linen", "silk", "cotton", "salt", "fish", "timber", "furs", "hides", "leather", "horses", "iron", "tools", "arms", "copper", "tin", "silver", "gold", "gems", "spices", "pepper", "sugar", "tea", "coffee", "cocoa", "tobacco", "incense", "ivory", "pottery", "porcelain", "dyes", "paper", "books", "saltpetre", "powder"],
