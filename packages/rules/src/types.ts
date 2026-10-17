@@ -27,6 +27,8 @@ export type Ground = Exclude<Terrain, "sea" | "ocean">;
 
 /** Marching and feeding armies (warfare design sections 5 and 6). */
 export interface MarchDefines {
+  /** Nominal month the domain's troop-movement rules count in; the game's own calendar uses real month lengths (X-3). */
+  daysPerMonth: number;
   /** Real days for one unit in the days-to-cross table. */
   daysPerCrossing: number;
   /** Province design 3.1: crossing units per ground. */

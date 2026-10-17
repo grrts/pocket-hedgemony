@@ -224,12 +224,18 @@ export function buildTerrain(o: TerrainInput): { base: Uint8Array; detail: Uint8
         // Its look follows the climate; snow where the climate is alpine or
         // polar, and on the high core of temperate ranges.
         const depth = edge[p]! + (n2 - 0.5) * 4;
-        const cold = k === "ET" || k === "EF" || ((k.endsWith("c") || k.endsWith("d")) && edge[p]! >= 4);
+        // Snow that lasts the summer: always in alpine and polar climates; on the
+        // high core of other ranges only outside the tropics, where the snow line
+        // drops below the peaks (near the equator it sits near 5 km, above all
+        // but a handful of summits, which the alpine climate class already marks).
+        const alpine = k === "ET" || k === "EF";
+        const extratropical = Math.abs(lat) >= 30;
+        const cold = alpine || (extratropical && (k.endsWith("c") || k.endsWith("d")) && edge[p]! >= 4);
         const peak: DetailTerrain = k.startsWith("B")
           ? "badlands"
           : k.startsWith("A")
             ? "highlands"
-            : cold || edge[p]! + (n1 - 0.5) * 6 >= 9 || (Math.abs(lat) >= 50 && edge[p]! >= 5)
+            : cold || (extratropical && edge[p]! + (n1 - 0.5) * 6 >= 9) || (Math.abs(lat) >= 50 && edge[p]! >= 5)
               ? "snowpeaks"
               : "mountains";
         if (depth >= 3) t = peak;

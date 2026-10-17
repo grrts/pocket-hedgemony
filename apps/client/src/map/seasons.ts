@@ -1,33 +1,109 @@
-import { isWetSeason, isWinter, type Hemisphere, type WetClimate } from "@ph/engine/domain/time-and-turns";
+import { isWetSeason, type WetClimate } from "@ph/engine/domain/time-and-turns";
+import type { GameDate } from "@ph/rules";
 
 /**
- * Seasons on the map (decision X-17): each province follows the season of its
- * hemisphere (X-4), picked once a month and drawn as a palette swap on its
- * tiles, so it costs nothing per frame. The code goes to the renderer.
+ * Seasons on the map (decision X-17), worked out week by week from a simple
+ * climate model so they come and go gradually: each province gets a
+ * sea-level temperature for the day from its latitude and the time of year,
+ * and how strongly autumn, spring and the wet season show. The renderer
+ * lowers the temperature by each tile's height (6.5 °C a kilometre) and lays
+ * snow where it is below freezing, so snow climbs down the mountains first
+ * and only the highest peaks near the equator keep any.
  */
-export const SEASON = { summer: 0, snow: 1, spring: 2, autumn: 3, wet: 4, bare: 5 } as const;
-export type SeasonCode = (typeof SEASON)[keyof typeof SEASON];
+export interface ProvinceClimate {
+  /** Sea-level temperature for the day, °C. */
+  temperature: number;
+  /** 0..1 how far the leaves and fields have turned. */
+  autumn: number;
+  /** 0..1 how fresh the new green is. */
+  spring: number;
+  /** 0..1 how deep into its wet season a tropical dry land is. */
+  wet: number;
+}
 
-/** Snow covers land from this latitude toward the pole, and every mountain province. */
-const SNOW_LATITUDE = 50;
-const TROPIC = 23.5;
-const SNOWY_GROUND = new Set(["mountains", "snowpeaks", "glacier"]);
-/** Dry lands that green up in their wet season. */
-const DRY_GROUND = new Set(["savanna", "steppe", "drylands", "badlands"]);
+// Zonal means by latitude (°C): yearly average and half the summer-to-winter swing.
+const LATS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+const MEAN = [26, 26, 24, 20, 14, 7, 0, -10, -18, -22];
+const SWING = [1, 2, 4, 7, 9, 11, 14, 17, 18, 18];
+
+const interp = (xs: number[], ys: number[], x: number) => {
+  for (let i = 1; i < xs.length; i++) if (x <= xs[i]!) return ys[i - 1]! + ((ys[i]! - ys[i - 1]!) * (x - xs[i - 1]!)) / (xs[i]! - xs[i - 1]!);
+  return ys.at(-1)!;
+};
+/** 1 inside a box of longitude and latitude, easing to 0 over `edge` degrees outside it, so regions blend. */
+const inBox = (lon: number, lat: number, w: number, s: number, e: number, n: number, edge = 8) => {
+  const ramp = (d: number) => Math.min(1, Math.max(0, 1 - d / edge));
+  return ramp(Math.max(0, w - lon, lon - e)) * ramp(Math.max(0, s - lat, lat - n));
+};
+
+/**
+ * Yearly mean and half-swing at a place. Western Europe is warmed and evened
+ * out by the Gulf Stream; the east sides of North America and Asia are colder
+ * and swing harder; coasts swing less than inland.
+ */
+function climateAt(lon: number, lat: number, coastal: boolean): { mean: number; swing: number } {
+  const a = Math.abs(lat);
+  let mean = interp(LATS, MEAN, a);
+  let swing = interp(LATS, SWING, a);
+  const gulf = inBox(lon, lat, -12, 38, 10, 72);
+  const continental = Math.max(inBox(lon, lat, -110, 35, -55, 70), inBox(lon, lat, 65, 40, 145, 75));
+  mean += 3 * gulf - 3 * continental;
+  swing *= (1 - 0.3 * gulf) * (1 + 0.35 * continental);
+  if (coastal) swing *= 0.8;
+  return { mean, swing };
+}
+
+const DAYS_BEFORE = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+export const dayOfYear = (d: GameDate) => DAYS_BEFORE[d.month - 1]! + (d.day ?? 1);
+
+/** A smooth bump around a day of the year, 1 at its centre, 0 by `width` days away. */
+function bump(day: number, centre: number, width: number): number {
+  let x = Math.abs(day - centre);
+  x = Math.min(x, 365 - x);
+  return x >= width ? 0 : 0.5 + 0.5 * Math.cos((Math.PI * x) / width);
+}
 
 /** Which wet-season calendar a tropical place follows (the domain's are placeholders by region). */
 function wetClimate(lon: number): WetClimate {
   return lon < -30 ? "amazon" : lon > 60 ? "monsoon_asia" : "sahel_and_savanna";
 }
+const DRY_GROUND = new Set(["savanna", "steppe", "drylands", "badlands"]);
 
-export function provinceSeason(lon: number, lat: number, terrain: string, month: number): SeasonCode {
-  const h: Hemisphere = lat >= 0 ? "northern" : "southern";
-  if (Math.abs(lat) < TROPIC) return DRY_GROUND.has(terrain) && isWetSeason(wetClimate(lon), month) ? SEASON.wet : SEASON.summer;
-  // South of the snow line, winter leaves the land bare and dull.
-  if (isWinter(h, month)) return Math.abs(lat) >= SNOW_LATITUDE || SNOWY_GROUND.has(terrain) ? SEASON.snow : SEASON.bare;
-  // The season's months in the north; the south runs six months behind.
-  const m = h === "northern" ? month : ((month + 5) % 12) + 1;
-  return m >= 3 && m <= 5 ? SEASON.spring : m >= 9 && m <= 11 ? SEASON.autumn : SEASON.summer;
+/** What a province's seasons depend on that never changes, worked out once. */
+export interface PlaceClimate {
+  lat: number;
+  mean: number;
+  swing: number;
+  /** Wet-season calendar, for tropical dry lands only. */
+  wet: WetClimate | null;
+}
+
+export function placeClimate(lon: number, lat: number, coastal: boolean, terrain: string): PlaceClimate {
+  const { mean, swing } = climateAt(lon, lat, coastal);
+  return { lat, mean, swing, wet: Math.abs(lat) < 23.5 && DRY_GROUND.has(terrain) ? wetClimate(lon) : null };
+}
+
+/** The months each day of the year falls in, for the wet-season window. */
+const MONTH_OF_DAY = Array.from({ length: 365 }, (_, d) => DAYS_BEFORE.filter((b) => d >= b).length);
+
+export function provinceClimate(place: PlaceClimate, date: GameDate): ProvinceClimate {
+  const { lat, mean, swing } = place;
+  const south = lat < 0;
+  // The year as the northern hemisphere sees it: the south runs half a year behind.
+  const day = (dayOfYear(date) + (south ? 182 : 0)) % 365;
+  // Warmest around 20 July, coldest around 20 January, the land lagging the sun.
+  const temperature = mean + swing * Math.cos((2 * Math.PI * (day - 201)) / 365);
+  // Leaves turn earlier further north; the tropics have no autumn or spring to speak of.
+  const a = Math.abs(lat);
+  const temperate = Math.min(1, Math.max(0, (a - 22) / 10));
+  const autumn = temperate * bump(day, 300 - Math.max(0, a - 40) * 2, 45);
+  const spring = temperate * bump(day, 125 + Math.max(0, a - 40) * 2, 40);
+  // Wet season: the share of the two months around today that are wet, so it eases in and out.
+  let wet = 0;
+  if (place.wet) {
+    for (const k of [-30, -15, 0, 15, 30]) wet += isWetSeason(place.wet, MONTH_OF_DAY[(dayOfYear(date) - 1 + k + 365) % 365]!) ? 0.2 : 0;
+  }
+  return { temperature, autumn, spring, wet };
 }
 
 export function seasonName(lat: number, month: number): string {
