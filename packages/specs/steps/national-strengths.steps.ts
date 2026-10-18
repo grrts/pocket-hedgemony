@@ -1,6 +1,6 @@
 import { expect } from "vitest";
 import { steps, type Scenario } from "../src/registry.ts";
-import { realmStrengths, Rng } from "@ph/engine";
+import { createWorld, heritageChoice, heritageFactor, heritageTaxReach, heritageView, monthlyHeritage, processTurn, realmStrengths, Rng, type World } from "@ph/engine";
 import { loadDefaultRuleset, type ProvinceDef } from "@ph/rules";
 import type { Era } from "@ph/engine/domain/research";
 import * as N from "@ph/engine/domain/national-strengths";
@@ -1784,4 +1784,121 @@ Then("{int} realms have a birthright and every heyday names its age", (s, count:
     expect(r.assessments).toHaveLength(14);
     for (const d of r.heritage!.heydays) expect(d.ageName).toMatch(/^(Age of |Cold War)/);
   }
+});
+
+// ---------------------------------------------------------------- heritage in play (HER-078, HER-084..089)
+
+const game = (s: Scenario): World => s.game as World;
+const realmOf = (s: Scenario, name: string): number => game(s).nationIndex.get(mapRealm(name))!;
+const inPlay = (s: Scenario, name: string): N.Heritage => game(s).heritage!.realms[realmOf(s, name)]!;
+
+Given("a new campaign as {string}", (s, name: string) => {
+  s.game = createWorld(loadDefaultRuleset(), 1);
+  game(s).player = realmOf(s, name);
+});
+When("the campaign plays to the 1st of January 1445", (s) => {
+  const w = game(s);
+  while (w.date.year < 1445 || (w.date.day ?? 1) < 2) processTurn(w, [], -1);
+});
+Then("{string} has {int} ambitions open, at least one of them historical", (s, name: string, n: number) => {
+  const open = N.openAmbitions(inPlay(s, name));
+  expect(open).toHaveLength(n);
+  expect(open.some((a) => a.item.historical)).toBe(true);
+});
+Then("every awake heyday of {string} has served {int} months", (s, name: string, months: number) => {
+  const awake = inPlay(s, name).heydays.filter((x) => x.state === "awake");
+  expect(awake.length).toBeGreaterThan(0);
+  for (const x of awake) expect(Math.round(x.yearsAwake * 12)).toBe(months);
+});
+Then("no realm has an ambition fulfilled or lost", (s) => {
+  for (const h of game(s).heritage!.realms) if (h) expect(h.ambitions.filter((a) => a.state === "done" || a.state === "lost").map((a) => a.item.id)).toEqual([]);
+});
+Then("no realm has shed its burden or earned a legacy", (s) => {
+  for (const h of game(s).heritage!.realms) {
+    if (!h) continue;
+    expect(h.burden?.state ?? "held").toBe("held");
+    expect(h.legacies).toEqual([]);
+  }
+});
+const provincesHeld = (s: Scenario, name: string, lords: boolean): number[] => {
+  const w = game(s);
+  const n = realmOf(s, name);
+  const out: number[] = [];
+  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === n && w.provinceLord[p]! >= 0 === lords) out.push(p);
+  expect(out.length).toBeGreaterThan(0);
+  return out;
+};
+Then("every royal province {string} holds sends it {int} % more tax", (s, name: string, pct: number) => {
+  for (const p of provincesHeld(s, name, false)) expect(heritageTaxReach(game(s), p)).toBeCloseTo(1 + pct / 100, 6);
+});
+Then("every lord's province {string} holds sends it what it always did", (s, name: string) => {
+  for (const p of provincesHeld(s, name, true)) expect(heritageTaxReach(game(s), p)).toBeCloseTo(1, 6);
+});
+Then("the provinces of {string} send it what they always did", (s, name: string) => {
+  const w = game(s);
+  const n = realmOf(s, name);
+  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === n) expect(heritageTaxReach(w, p)).toBe(1);
+});
+When("{string} no longer holds Moscow and a month begins", (s, name: string) => {
+  const w = game(s);
+  const provinces = w.rules.provinces.map((p) => ({ id: p.id, x: p.x!, y: p.y!, terrain: p.terrain }));
+  expect(heritageFactor(w, realmOf(s, name), "official_wage_pct")).toBeCloseTo(0.75, 6);
+  const moscow = w.provinceIndex.get(N.bindPlace("Moscow", provinces)!)!;
+  expect(w.provinceOwner[moscow]).toBe(realmOf(s, name));
+  w.provinceOwner[moscow] = realmOf(s, "Novgorod");
+  monthlyHeritage(w, []);
+});
+Then("the birthright of {string} is dormant", (s, name: string) => {
+  expect(inPlay(s, name).birthrights[0]!.dormant).toBe(true);
+});
+Then("the birthright of {string} is in force", (s, name: string) => {
+  expect(inPlay(s, name).birthrights[0]!.dormant).toBe(false);
+});
+Then("officials' wages in {string} are as they always were", (s, name: string) => {
+  expect(heritageFactor(game(s), realmOf(s, name), "official_wage_pct")).toBe(1);
+});
+When("the player reads the Heritage tab of {string}", (s, name: string) => {
+  s.view = heritageView(game(s), realmOf(s, name));
+});
+Then("it shows {int} ambitions with their hints, never their plain goals", (s, n: number) => {
+  const v = s.view as NonNullable<ReturnType<typeof heritageView>>;
+  expect(v.ambitions).toHaveLength(n);
+  for (const a of v.ambitions!) {
+    expect(a.hint).toBeTruthy();
+    expect(a.plainGoal).toBeUndefined();
+  }
+  expect(v.counsel!.gold).toBeGreaterThan(0);
+});
+Then("it shows each heyday's state", (s) => {
+  const v = s.view as NonNullable<ReturnType<typeof heritageView>>;
+  expect(v.heydays.length).toBeGreaterThan(0);
+  for (const x of v.heydays) expect(["waiting", "awake", "asleep", "ended"]).toContain(x.state);
+});
+Then("it counts {int} sealed ambitions and shows none of them", (s, n: number) => {
+  const v = s.view as NonNullable<ReturnType<typeof heritageView>>;
+  expect(v.sealed).toBe(n);
+  expect(v.ambitions).toBeUndefined();
+  expect(v.counsel).toBeUndefined();
+});
+Given("a third heyday of {string} would wake", (s, name: string) => {
+  const h = inPlay(s, name);
+  const [a, b, c] = h.heydays;
+  a!.state = "awake";
+  b!.state = "awake";
+  c!.state = "asleep";
+  h.ask = { kind: "sleep_heyday", waking: c!.item.id, awake: [a!.item.id, b!.item.id] };
+  s.waking = c!.item.id;
+});
+Then("it asks which heyday sleeps, with one button for each of the {int}", (s, n: number) => {
+  const v = s.view as NonNullable<ReturnType<typeof heritageView>>;
+  expect(v.ask!.kind).toBe("sleep_heyday");
+  expect(v.ask!.options).toHaveLength(n);
+});
+When("the player chooses the waking heyday", (s) => {
+  expect(heritageChoice(game(s), game(s).player, s.waking)).toBeNull();
+});
+Then("no choice waits and {int} heydays are awake", (s, n: number) => {
+  const h = game(s).heritage!.realms[game(s).player]!;
+  expect(h.ask).toBeNull();
+  expect(h.heydays.filter((x) => x.state === "awake")).toHaveLength(n);
 });

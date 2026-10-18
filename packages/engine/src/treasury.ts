@@ -11,6 +11,7 @@ import { schoolUpkeepMonthly } from "./research.ts";
 import { provinceUpkeep } from "./works.ts";
 import { tradeLine, tradeTaxFactor } from "./trade.ts";
 import { subjectPayments } from "./subjects.ts";
+import { heritageFactor, heritageTaxReach } from "./heritage.ts";
 import { navyCosts } from "./navy.ts";
 
 /**
@@ -90,14 +91,14 @@ export function provinceTax(world: World, p: number, holder: number, share = cro
   const { economy } = world.rules.defines;
   // A tax collector brings more of it in (province officials table: +20 % reaching you).
   const collector = officialBonus(world, p, "Tax collector", "tax_reach");
-  // Restricted faiths pay a quarter more on their share, Persecuted ones nothing (RELG-050, RELG-052).
+  // Restricted faiths pay a quarter more on their share, Persecuted ones nothing (RELG-050, RELG-052); heritage may raise or lower what reaches the holder (tax_reach_pct, HER-078).
   // A busy province owes more: 1 % for every 4 points of its trade ratio (TRADE-088).
-  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]! * tradeTaxFactor(world, p);
+  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]! * heritageTaxReach(world, p) * tradeTaxFactor(world, p);
 }
 
 /** Monthly interest on a realm's debt (REALM-164: 10 % a year). */
 export function monthlyInterest(world: World, n: number): number {
-  return (world.nationDebt[n]! * interestPct(KNOWN)) / 100 / 12;
+  return (world.nationDebt[n]! * interestPct(KNOWN) * heritageFactor(world, n, "loan_interest_pct")) / 100 / 12;
 }
 
 /**
@@ -115,7 +116,7 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
     const owner = world.provinceOwner[p]!;
     if (only >= 0 && owner !== only && controller(world, p) !== only) continue;
     if (owner >= 0 && (only < 0 || owner === only)) {
-      if (world.provinceOfficial[p]! >= 0) L[owner * LEDGER_LINES + WAGES] = L[owner * LEDGER_LINES + WAGES]! - wage;
+      if (world.provinceOfficial[p]! >= 0) L[owner * LEDGER_LINES + WAGES] = L[owner * LEDGER_LINES + WAGES]! - wage * heritageFactor(world, owner, "official_wage_pct");
       // And the upkeep of its works (works).
       L[owner * LEDGER_LINES + WORKS_UPKEEP] = L[owner * LEDGER_LINES + WORKS_UPKEEP]! - provinceUpkeep(world, p);
     }

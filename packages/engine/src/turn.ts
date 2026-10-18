@@ -10,6 +10,7 @@ import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, 
 import { monthlyMoods } from "./moods.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
+import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameRouteMode, type GameTraderKind } from "./trade.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
@@ -128,6 +129,9 @@ export type Order =
   | { type: "stopChange"; province: number }
   /** Answer an event or take a decision waiting for the realm, with one of its options (AnswerEvent, EVT-044). */
   | { type: "answerEvent"; event: string; option: string }
+  /** Heritage: pay the court's counsel to read one sealed ambition (HER-024); choose which heyday sleeps or which legacy goes (HER-013, HER-030). */
+  | { type: "heritageCounsel"; ambition: string }
+  | { type: "heritageChoice"; id: string }
   /** Reform the government into one of its next forms (GOV-027). */
   | { type: "reform"; to: string }
   /** Found a trader in an own city (TRADE-003), set its route of 2 to 8 cities (TRADE-050), draw one for its preview (TRADE-054), or dismiss it (TRADE-006). */
@@ -241,6 +245,7 @@ function startDay(world: World, news: News[]): void {
     aiRaise(world, news);
     // Events come last in the month, after every other system (X-2).
     monthlyEvents(world, news);
+    monthlyHeritage(world, news);
   }
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
 }
@@ -378,6 +383,10 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "breakAlliance":
       return breakAlliance(world, actingNation, order.target);
+    case "heritageCounsel":
+      return payCounsel(world, actingNation, order.ambition);
+    case "heritageChoice":
+      return heritageChoice(world, actingNation, order.id);
     case "answerEvent":
       return answerEvent(world, actingNation, order.event, order.option, news);
     case "makeDemand":

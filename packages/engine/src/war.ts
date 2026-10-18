@@ -13,6 +13,7 @@ import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm,
 import { officialBonus } from "./officials.ts";
 import { noteBattle, notePeace, noteSiege } from "./achievements.ts";
 import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
+import { heritageFactor } from "./heritage.ts";
 import { lostBattle } from "./rebels.ts";
 
 /**
@@ -26,7 +27,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "trade";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "trade";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -61,8 +62,10 @@ export function maxGarrison(world: World, p: number): number {
   if (!w) return 0;
   const owner = world.provinceOwner[p]!;
   const g = world.rules.defines.war.garrison;
-  if (owner >= 0 && world.rules.nations[owner]!.capital === world.provinceIds[p]) return g.capital;
-  return w === "stone castle" ? g.castle : g.fort;
+  // Heritage may man the walls more strongly (garrison_pct).
+  const heritage = heritageFactor(world, owner, "garrison_pct");
+  if (owner >= 0 && world.rules.nations[owner]!.capital === world.provinceIds[p]) return g.capital * heritage;
+  return (w === "stone castle" ? g.castle : g.fort) * heritage;
 }
 
 /** The 1444 relations between the map's realms (the dataset also lists realms the map folds into others). */
