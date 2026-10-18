@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-552 decided and 8 still open across 29 contexts.
+553 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -218,6 +218,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-GOV-14**: (was OQ-GOV-14) A reformed faith: met when the state faith of a prince-bishopric or military order is no longer the faith it was founded in, whatever the new faith. Religion's state faith change already exists, so no new term is needed.
 - **D-GOV-15**: (was OQ-GOV-15) Monarchies for the Inquisition: the forms whose event-tree value is `monarchy`, `elective_monarchy` or `constitutional_monarchy` (GOV-057). Every form already carries its event-tree value.
 - **D-GOV-16**: (was OQ-GOV-16) A form that holds no subjects: when a country becomes a colonial government its subjects are all released at once (GOV-053). INV-GOV-6 must hold, and releasing is the existing way a tie ends.
+- **D-GOV-18**: First game slice (milestone 5, provisional): no cap buildings stand in the game yet, so each realm's caps carry *Custom since 1444*, what it held above its form on 1 January 1444, and every realm starts within both caps; conquests, new officials and a reform to a smaller form push a realm over. Reform gold is at the game's gold scale (× 0.2, as works and gifts are). Building needs and condition rows wait on their contexts. Map realms the catalogue names otherwise take their catalogue record's start form. It is the smallest rule that runs the design's caps without flooding every realm with grievances on day one.
 - **D-GOV-17**: (was OQ-GOV-17) "Newest hires first": an official's hire date is the day he entered service in that post, whether hired, a graduate or from a lord's line. One date for every official keeps one order.
 
 ### Map presentation (map-presentation)

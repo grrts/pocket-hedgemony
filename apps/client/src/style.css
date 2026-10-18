@@ -2552,3 +2552,62 @@ details.why summary {
   border-top: 1px solid var(--outline);
   padding-top: 4px;
 }
+
+/* Government tab (GOV-064): two cap buttons, the laws, and a card per next form. */
+.caps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+.caps .cap {
+  display: grid;
+  gap: 2px;
+  min-height: 44px;
+  text-align: left;
+  justify-content: stretch;
+}
+.caps .cap small {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.caps .cap em,
+button.paper.over {
+  font-style: normal;
+  color: var(--cloth);
+}
+.caps .cap.over .progress i {
+  background: var(--cloth);
+}
+.next-forms {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 6px;
+}
+.next-form {
+  padding: 6px 8px;
+}
+.next-form p {
+  margin: 0 0 4px;
+}
+.next-form button {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+}
+.next-form .needs {
+  margin: 2px 0;
+  padding: 0;
+  list-style: none;
+}
+.next-form .needs .met {
+  color: var(--ink);
+}
+.next-form .needs .unmet {
+  color: var(--cloth);
+}
+.next-form .confirm-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}

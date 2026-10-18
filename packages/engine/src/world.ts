@@ -21,6 +21,7 @@ import { createLandState, seedLand, type LandState } from "./land.ts";
 import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
+import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -28,7 +29,7 @@ import { createCastleFoodState, seedCastleStores, type CastleFoodState } from ".
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -401,6 +402,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createLandState(P),
     ...createConversionState(P),
     ...createCastleFoodState(P, N),
+    ...createGovernmentState(P, N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -422,6 +424,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   world.commanderHome = commanderIds.map(() => -1);
   world.commanderSeed = commanderIds.map(() => -1);
   seedOfficials(world);
+  seedGovernment(world);
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where

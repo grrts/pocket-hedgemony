@@ -168,6 +168,21 @@ size no longer affects the cap.
 ### 5.7 What the player sees
 - GOV-049 The government shall show a government card with the form and ruler, each cap as "x of y" with its parts (form, each building), subjects as "x of y", the next forms with each need met or not, and a Reform action. [government §1]
 
+### 5.8 Government in the game (first slice)
+Every realm now has a form, both caps and their consequences in the game's month, and the player reforms from a Government tab (D-GOV-18). Cap buildings, condition rows, self-run provinces, subject reach in numbers and colonial range in play come with their contexts.
+
+- GOV-058 When a campaign starts, the game shall give every realm its 1444 form by the start-form rules (GOV-043), reading a map realm the catalogue names otherwise through its catalogue record (the Ottomans as `ottoman`, Japan as `ashikaga`), and giving the three with no record a form by hand (Albania confederation, Cherokee and Creek chiefdom). [GOV-043; D-GOV-18]
+- GOV-059 Until cap buildings stand in the game, each cap shall carry a part *Custom since 1444*: the officials (royal provinces with an official at his post) and the landed lords the realm held above its form's part on 1 January 1444, fixed for good, so no realm starts over a cap; a reform changes only the form's part. [GOV-001, GOV-002, GOV-047; D-GOV-18]
+- GOV-060 Each month, before moods are counted, the game shall give the province of each of a realm's officials over its officials cap, newest in his post first, the grievance *Grasping officials*, and lift it when the realm is back within the cap; only the crown's officials count (a lord's officials are his own). [GOV-005, GOV-006]
+- GOV-061 In the month that begins with 1 January, the game shall make one of a realm's lords lose a loyalty step for each lord over its lords cap, lowest loyalty first, then most provinces; a slip stops at Disloyal like every loyalty step. [GOV-007]
+- GOV-062 A realm may order a Reform to a next form when the reform row's needs are met and it holds the row's gold at the game's gold scale (the data's gold × `works.goldScale` 0.2, so 100 is 20); the gold is paid, the row's lords slip (GOV-031) and the new form sets the caps and laws from then on. Building needs are not met until cap buildings are built, and other conditions (traders abroad, families, alliances) not until their contexts run. [GOV-027 … GOV-032; D-GOV-18]
+- GOV-063 In the month that begins with 1 January, each AI realm shall order the reform GOV-052 names. [GOV-052]
+- GOV-065 Every realm's form, old form and Custom shall be kept in the save. [SAVE]
+
+#### How the player uses it
+- GOV-064 Where: the player's own realm card (tap the realm in the top bar) has a **Government** tab next to General. It shows, top to bottom, the form and its family; both caps as two 44-point buttons, each "Officials x of y" or "Lords x of y" with a bar, its parts (Form, Custom since 1444) and, when over, in red what that does (which provinces get *Grasping officials*, how many lords slip at New Year); tapping a cap opens the Officials or Lords tab where the player can act (move or commission officials, grant or seize fiefs). Then **Laws of the realm**, what the form sets: succession, how far colonies may reach, and how many subjects it can hold against its reach. Then **Reform**: a card per next form with the change in officials and lords from now, each need marked ✓ or ✗, its gold and the lords who will slip, and a Reform button; a first tap asks "Pay N gold and M lords lose a loyalty step?" with Reform and Cancel, so a reform is never made by a stray tap. A form that comes only by revolution or event, or by itself when its condition holds, says so instead of a button. [X-19, GOV-049]
+- GOV-066 Grouping and overview: everything about the form sits in this one tab. The General tab of the player's card carries one line, "Government: <form> · officials x/y · lords x/y", red when over a cap, that opens the tab; another realm's card shows its form by name. *Grasping officials* shows in a province's grievances with what ends it, and a reform reaches the dispatches. Phone: the tab fits the side panel in the Wide and Tall layouts, the two caps and the next-form cards stack to one column on a narrow panel, every button at least 44 points high, nothing needs hover and the panel never scrolls sideways; a phone held upright is asked to turn sideways, as for the whole game. [X-19, SHELL-108, SHELL-109, SHELL-114]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -327,6 +342,7 @@ Decided on 17 October 2026 (DECISIONS.md). No question stays open.
 - **D-GOV-14** (was OQ-GOV-14) A reformed faith: met when the state faith of a prince-bishopric or military order is no longer the faith it was founded in, whatever the new faith. Religion's state faith change already exists, so no new term is needed.
 - **D-GOV-15** (was OQ-GOV-15) Monarchies for the Inquisition: the forms whose event-tree value is `monarchy`, `elective_monarchy` or `constitutional_monarchy` (GOV-057). Every form already carries its event-tree value.
 - **D-GOV-16** (was OQ-GOV-16) A form that holds no subjects: when a country becomes a colonial government its subjects are all released at once (GOV-053). INV-GOV-6 must hold, and releasing is the existing way a tie ends.
+- **D-GOV-18** First game slice (milestone 5, provisional): no cap buildings stand in the game yet, so each realm's caps carry *Custom since 1444*, what it held above its form on 1 January 1444, and every realm starts within both caps; conquests, new officials and a reform to a smaller form push a realm over. Reform gold is at the game's gold scale (× 0.2, as works and gifts are). Building needs and condition rows wait on their contexts. Map realms the catalogue names otherwise take their catalogue record's start form. It is the smallest rule that runs the design's caps without flooding every realm with grievances on day one.
 - **D-GOV-17** (was OQ-GOV-17) "Newest hires first": an official's hire date is the day he entered service in that post, whether hired, a graduate or from a lord's line. One date for every official keeps one order.
 
 ## 14. Traceability
@@ -359,3 +375,5 @@ Decided on 17 October 2026 (DECISIONS.md). No question stays open.
 | GOV-055 | cap-buildings.feature | A landmark palace is palace step 4 |
 | GOV-056 | reforms.feature | A prince-bishop takes a reformed faith |
 | GOV-057 | forms.feature | Which forms count as monarchies for the Inquisition |
+| GOV-058 … GOV-063, GOV-065 | — | Engine: packages/engine/test/government.test.ts (start forms, Custom, Grasping officials, New Year slips, reform, AI reform, save) |
+| GOV-064, GOV-066 | — | Presentation: apps/client/src/ui/government.ts, the Government tab; screenshots from apps/client/scripts/government-shots.mjs |
