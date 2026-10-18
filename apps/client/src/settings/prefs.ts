@@ -148,6 +148,13 @@ export function mapPower(): { maxFps: number; animMs: number; dprCap: number } {
 export const mapDetail = (): "Low" | "Medium" | "High" => (({ low: "Low", medium: "Medium" }) as Record<string, "Low" | "Medium">)[String(pref("graphics.map_detail"))] ?? "High";
 export const animationsPref = (): "Full" | "Reduced" | "Off" => (({ reduced: "Reduced", off: "Off" }) as Record<string, "Reduced" | "Off">)[String(pref("graphics.animations"))] ?? "Full";
 
+/** What the living map's figures draw: Battery saver holds Map detail at Medium at most, with every figure still (VIEW-129). */
+export function livingPrefs(): { detail: "Low" | "Medium" | "High"; animations: "Full" | "Reduced" | "Off" } {
+  const detail = mapDetail();
+  if (!batteryOn()) return { detail, animations: animationsPref() };
+  return { detail: detail === "High" ? "Medium" : detail, animations: "Off" };
+}
+
 /** Body text 17, 20 or 24 px as a zoom on the interface text (SET-098, SET-137). */
 export function textZoom(): number {
   return ({ normal: 1, large: 20 / 17, larger: 24 / 17 } as Record<string, number>)[String(pref("accessibility.text_size"))] ?? 1;

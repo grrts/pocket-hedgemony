@@ -559,11 +559,11 @@
         "street": 40
       },
       "spacing": [
-        3,
-        3
+        6,
+        5
       ],
       "ranks": 4,
-      "siegeRing": 10,
+      "siegeRing": 14,
       "maxAnimated": 60,
       "frameRate": 10
     },
