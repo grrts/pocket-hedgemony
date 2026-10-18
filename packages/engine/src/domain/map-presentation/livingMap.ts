@@ -380,6 +380,9 @@ export function roadPath(grid: LandGrid, from: number, to: number): number[] | n
   dist[start] = 0;
   open.push(start, 0);
   const h = (x: number, y: number): number => Math.abs(x - ux) + Math.abs(y - ty);
+  // Old roads keep to the straight line between the towns where the ground lets them: a step costs more the farther it strays from it.
+  const lx = ux - fx, ly = ty - fy, len = Math.hypot(lx, ly) || 1;
+  const stray = (x: number, y: number): number => (L.roads.straightness * Math.abs((x - fx) * ly - (y - fy) * lx)) / len;
   const done = new Uint8Array(size);
   while (open.size) {
     const i = open.pop();
@@ -393,7 +396,7 @@ export function roadPath(grid: LandGrid, from: number, to: number): number[] | n
       const t = tile(nx, ny);
       if (isWater(grid, t)) continue;
       const j = local(nx, ny);
-      const d = dist[i]! + stepCost(grid, t);
+      const d = dist[i]! + stepCost(grid, t) + stray(nx, ny);
       if (d < dist[j]!) {
         dist[j] = d;
         prev[j] = i;
@@ -425,9 +428,23 @@ export interface TownSeat {
 }
 
 /**
+ * Whether two neighbouring towns get a road of their own: not when a third
+ * town, neighbour to both, is nearer to each of them than they are to each
+ * other, since the way then runs through that town (the relative neighbourhood
+ * of the towns). Only towns that stand are counted: unsettled land has none.
+ * This keeps a few ways out of each town, as the roads of the time ran, rather
+ * than a web to every neighbour (VIEW-113).
+ */
+export function keepsRoad(grid: Pick<LandGrid, "width">, a: TownSeat, b: TownSeat, shared: readonly TownSeat[]): boolean {
+  const d = tileDistance(grid, a.seed, b.seed);
+  return !shared.some((c) => c.province !== a.province && c.province !== b.province && Math.max(tileDistance(grid, a.seed, c.seed), tileDistance(grid, b.seed, c.seed)) < d);
+}
+
+/**
  * The roads a region draws: one from each town to the town of each
- * neighbouring province (each pair once), and a track from each hamlet to its
- * nearest town or hamlet when that is within trackReach (VIEW-113).
+ * neighbouring province where keepsRoad holds (each pair once), and a track
+ * from each hamlet to its nearest town or hamlet when that is within
+ * trackReach (VIEW-113).
  */
 export function roadLines(grid: LandGrid, towns: readonly TownSeat[], neighbours: (province: number) => readonly number[], hamlets: readonly number[] = []): RoadLine[] {
   const out: RoadLine[] = [];
@@ -440,6 +457,9 @@ export function roadLines(grid: LandGrid, towns: readonly TownSeat[], neighbours
     for (const p of neighbours(a.province)) {
       const b = bySeat.get(p);
       if (!b || b.province <= a.province) continue;
+      const near = new Set(neighbours(b.province));
+      const shared = neighbours(a.province).filter((q) => near.has(q)).map((q) => bySeat.get(q)).filter((c): c is TownSeat => !!c);
+      if (!keepsRoad(grid, a, b, shared)) continue;
       line(a.seed, b.seed, roadGrade(a.roadStep, b.roadStep));
     }
   }
