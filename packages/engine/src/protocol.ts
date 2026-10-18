@@ -1,3 +1,7 @@
+import { realmConfig } from "./domain/realm/index.ts";
+import { rulerViews, type RulerView } from "./rulers.ts";
+import { fallenEffect, type FallenEffect } from "./fallen.ts";
+import { lowFaith, lowTongue } from "./belief.ts";
 import { heritageViews, type HeritageView } from "./heritage.ts";
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
 import { achievementsView, startAchievements } from "./achievements.ts";
@@ -129,6 +133,12 @@ export interface Snapshot {
   statecraft: StatecraftView | null;
   /** Each realm's heritage in play by nation index (null: none recorded); ambitions only for the player's realm (HER-078). */
   heritage: (HeritageView | null)[];
+  /** Each realm's ruler by nation index (REALM-240). */
+  rulers: RulerView[];
+  /** The player's fallen of the last ten years and what they do (REALM-241); null without a player. */
+  fallen: FallenEffect | null;
+  /** Whether the player's Faith % or Tongue % is low enough to stir risings (REALM-239), and the bar. */
+  beliefLow: { faith: boolean; tongue: boolean; under: number } | null;
   /** The map's diplomacy lens: each realm's relation to the player, leagues, envoys on the road and war aims (DIPL-209); null without a player. */
   diplomacyLens: DiplomacyLensView | null;
   /** Sieges under way: months gone, how far into the next siege month (0..1), breaches and men inside. */
@@ -359,6 +369,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       relations,
       statecraft: statecraftView(w, player),
       heritage: heritageViews(w),
+      rulers: rulerViews(w),
+      fallen: player >= 0 ? fallenEffect(w, player) : null,
+      beliefLow: player >= 0 ? { faith: lowFaith(w, player), tongue: lowTongue(w, player), under: realmConfig.belief.low_percent } : null,
       events: eventCards(w, player),
       diplomacyLens: diplomacyLensView(w, player),
       sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),

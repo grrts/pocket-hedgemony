@@ -1,4 +1,5 @@
 import * as ns from "./domain/national-strengths/index.ts";
+import { traitPct } from "./rulers.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import tree from "../../rules/data/domain/events-tree.json" with { type: "json" };
 import places from "../../rules/data/domain/events-places.json" with { type: "json" };
@@ -436,9 +437,9 @@ function placeOf(world: World, p: number, n: number): ns.Place {
   };
 }
 
-/** A realm's percent lever in force as a factor (1 = unchanged): what its owner multiplies its rule by. */
+/** A realm's percent lever in force as a factor (1 = unchanged): what its owner multiplies its rule by. Its ruler's traits add theirs (REALM-237). */
 export function heritageFactor(world: World, n: number, lever: string): number {
-  const pct = n >= 0 ? world.heritage?.levers[n]?.[lever] : undefined;
+  const pct = (n >= 0 ? world.heritage?.levers[n]?.[lever] ?? 0 : 0) + traitPct(world, n, lever);
   return pct ? Math.max(0, 1 + pct / 100) : 1;
 }
 
@@ -452,9 +453,10 @@ export function heritageTaxReach(world: World, p: number): number {
   const g = world.heritage;
   if (!g) return 1;
   const n = world.provinceOwner[p]!;
-  if (g.reachOwner[p] === n) return g.taxReach[p]!;
-  const pct = n >= 0 ? g.levers[n]?.tax_reach_pct : undefined;
-  return pct ? Math.max(0, 1 + pct / 100) : 1;
+  const trait = traitPct(world, n, "tax_reach_pct") / 100;
+  if (g.reachOwner[p] === n) return g.taxReach[p]! + trait;
+  const pct = (n >= 0 ? g.levers[n]?.tax_reach_pct ?? 0 : 0) / 100 + trait;
+  return pct ? Math.max(0, 1 + pct) : 1;
 }
 
 // ---------------------------------------------------------------- the player's choices
