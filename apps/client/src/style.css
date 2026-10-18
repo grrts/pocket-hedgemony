@@ -570,6 +570,27 @@ button.icon-only {
   }
 }
 
+/* A phone held sideways (Short wide): the card is a side sheet on the left, 45 % wide
+   (map-presentation layout.cardPhoneWidthShare), and the map stays live beside it (SHELL-053, SHELL-146). */
+@media (max-height: 500px) and (min-width: 560px) {
+  .panel:not(.chooser) {
+    right: auto;
+    width: max(45vw, 320px);
+    padding: 4px 8px 8px max(8px, env(safe-area-inset-left));
+  }
+
+}
+
+/* With the card open on a larger phone, alerts sit over the map beside it, clear of the side tools;
+   on a small one the map is too narrow for them, so they stay centred over the card. */
+@media (max-height: 500px) and (min-width: 800px) {
+  :root:has(#panel:not([hidden]):not(.chooser)) .alerts {
+    left: calc(max(45vw, 320px) + 6px);
+    transform: none;
+    width: calc(100vw - max(45vw, 320px) - 12px - max(110px, 60px + env(safe-area-inset-right)));
+  }
+}
+
 @media (min-width: 900px) and (min-height: 600px) {
   .panel,
   .panel.chooser {
@@ -612,10 +633,11 @@ button.icon-only {
   gap: 4px;
 }
 
+/* Fold and Close take 44-point taps like every button (SHELL-146). */
 .panel-buttons button {
-  width: 40px;
-  height: 40px;
-  min-height: 40px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
   padding: 0;
 }
 
@@ -3180,12 +3202,6 @@ button.paper.over {
   justify-content: space-between;
   gap: 8px;
   flex: none;
-}
-
-.shell-card .panel-buttons button {
-  width: 44px;
-  height: 44px;
-  min-height: 44px;
 }
 
 .shell-card .ribbon .px-icon {

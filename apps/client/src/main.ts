@@ -4952,6 +4952,16 @@ Object.assign(globalThis, {
     view.lookAt(p.x!, p.y!, 8);
     return p.id;
   },
+  /** Shows a peace offer from a realm as if its AI had sent it, for screenshots (a short play-through rarely reaches one). */
+  __phPretendOffer: (id: string, terms: "take" | "white" | "give" = "white") => {
+    if (!snapshot) return;
+    snapshot.peaceOffers.push({ id: 900000 + snapshot.peaceOffers.length, from: nationIndex.get(id)!, terms });
+    logNews({ ...snapshot, news: [], rejectedOrders: [] });
+    renderHud();
+    renderPanel();
+  },
+  /** The camera as x, y and zoom, to check that selecting moves nothing (SHELL-138). */
+  __phCamera: () => ({ ...view.camera }),
   __phLookAtWar: () => {
     const p = snapshot?.sieges[0]?.province ?? occupiers.findIndex((o) => o >= 0);
     if (p >= 0) view.lookAt(provinces[p]!.x!, provinces[p]!.y!, 4);
