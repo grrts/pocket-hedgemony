@@ -186,7 +186,8 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "colonies" = "general";
+type RealmTab = "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "colonies";
+let realmTab: RealmTab = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -202,7 +203,8 @@ let grantOpen = false;
 /** The lord's screen lists every royal province to grant, not just the nearest. */
 let grantAll = false;
 /** Which tab of the province overview is open. */
-let provinceTab: "overview" | "people" | "garrison" | "land" | "build" | "port" = "overview";
+type ProvinceTab = "overview" | "people" | "garrison" | "land" | "build" | "port";
+let provinceTab: ProvinceTab = "overview";
 /** The player's fleet whose card is open (its id), and the fleet waiting for a tap on where to sail (-1 = none). */
 let fleetView = -1;
 let sailing = -1;
@@ -498,7 +500,7 @@ document.addEventListener(
   (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button");
     if (!b || b.disabled || b.dataset.sfx === "none") return;
-    sound.sfx(b.dataset.sfx ?? (b.matches(".close, [data-back], .fold") ? "ui_back" : "ui_tap"));
+    sound.sfx(b.dataset.sfx ?? (b.matches(".close, [data-back], .fold, .nav-back") ? "ui_back" : "ui_tap"));
   },
   { capture: true },
 );
@@ -2331,7 +2333,7 @@ function renderActions(): void {
 }
 
 function closeButton(): string {
-  return `<span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span>`;
+  return `<span class="panel-buttons"><button class="nav-back" aria-label="Back" title="Back to the previous screen"${screenHistory.length ? "" : " hidden"}>${icon("back", 2)}</button><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span>`;
 }
 
 /** Shows or hides the panel, leaving a tool button to bring a folded panel back. */
@@ -2358,6 +2360,102 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
 /** Which card the panel shows; a different one opens at its top, with its close button in view. */
 let panelShows = "";
 
+/** A screen of the panel as the Back button brings it back (feedback 119). */
+interface Screen {
+  ach: boolean;
+  news: boolean;
+  realm: number;
+  realmTab: RealmTab;
+  official: number;
+  lord: number;
+  army: number;
+  fleet: number;
+  province: number;
+  provinceTab: ProvinceTab;
+}
+/** The screens the player came through, oldest first; Back returns to the last. Closing the panel forgets them. */
+const screenHistory: Screen[] = [];
+/** How many screens Back can step through. */
+const HISTORY_KEPT = 20;
+/** The screen on show, or null while the panel is closed. */
+let shownScreen: Screen | null = null;
+/** renderPanel calls itself when a screen falls back to another; only the outermost call notes the screen. */
+let panelDepth = 0;
+/** A browser history entry stands for the screen history, so the phone's back gesture steps back too. */
+let backArmed = false;
+/** The next popstate is our own, taking that entry away again. */
+let backIgnore = false;
+
+/** The screen the panel shows now, or null when it is closed. */
+function currentScreen(): Screen | null {
+  if (!snapshot) return null;
+  const s: Screen = { ach: achView, news: newsView, realm: realmView, realmTab, official: officialView, lord: lordView, army: armyView, fleet: fleetView, province: selectedProvince, provinceTab };
+  return screenKey(s) ? s : null;
+}
+
+/** What the player sees of a screen, the first view set as renderPanelCard picks it: two screens that look alike are one. */
+function screenKey(s: Screen): string {
+  return s.ach ? "ach" : s.news ? "news" : s.realm >= 0 ? `realm ${s.realm} ${s.realmTab}` : s.official >= 0 ? `official ${s.official}` : s.lord >= 0 ? `lord ${s.lord}` : s.army >= 0 ? `army ${s.army}` : s.fleet >= 0 ? `fleet ${s.fleet}` : s.province >= 0 ? `province ${s.province} ${s.provinceTab}` : "";
+}
+
+/** After a redraw: a new screen puts the one before on the history; a closed panel clears it. */
+function noteScreen(): void {
+  const now = currentScreen();
+  if (!now) screenHistory.length = 0;
+  else if (shownScreen && screenKey(shownScreen) !== screenKey(now)) {
+    screenHistory.push(shownScreen);
+    if (screenHistory.length > HISTORY_KEPT) screenHistory.shift();
+  }
+  shownScreen = now;
+  const b = panel.querySelector<HTMLButtonElement>(".nav-back");
+  if (b) b.hidden = !screenHistory.length;
+  // One browser history entry while there is somewhere to go back to, so the back gesture lands here.
+  if (screenHistory.length && !backArmed) {
+    history.pushState({ phBack: true }, "");
+    backArmed = true;
+  } else if (!screenHistory.length && backArmed) {
+    backArmed = false;
+    backIgnore = true;
+    history.back();
+  }
+}
+
+/** Back: the previous screen again, as it was left. */
+function goBack(): void {
+  const s = screenHistory.pop();
+  if (!s) return;
+  achView = s.ach;
+  newsView = s.news;
+  realmView = s.realm;
+  realmTab = s.realmTab;
+  officialView = s.official;
+  lordView = s.lord;
+  armyView = s.army;
+  fleetView = s.fleet;
+  sailing = -1;
+  grantOpen = false;
+  selectedProvince = s.province;
+  provinceTab = s.provinceTab;
+  panelCollapsed = false;
+  // The screen it leaves is not put on the history again.
+  shownScreen = null;
+  restyleProvinces();
+  renderPanel();
+}
+
+panel.addEventListener("click", (e) => {
+  if ((e.target as HTMLElement).closest(".nav-back")) goBack();
+});
+// The browser's or phone's back steps back through the panel while it has somewhere to go.
+addEventListener("popstate", () => {
+  if (backIgnore) {
+    backIgnore = false;
+    return;
+  }
+  backArmed = false;
+  goBack();
+});
+
 function renderPanel(): void {
   // Opening any other card, or closing the fleet's, drops a course being drawn.
   if (exploring && (fleetView !== exploring.fleet || realmView >= 0 || newsView)) {
@@ -2365,9 +2463,15 @@ function renderPanel(): void {
     voyageBarEl.hidden = true;
     view.invalidate();
   }
-  renderPanelCard();
+  panelDepth++;
+  try {
+    renderPanelCard();
+  } finally {
+    panelDepth--;
+  }
   // Whatever the card, the buttons a revolution's regime locks say so (REVO-092).
   lockRevolutionButtons(panel, snapshot?.revolution);
+  if (!panelDepth) noteScreen();
 }
 
 function renderPanelCard(): void {
@@ -3979,7 +4083,6 @@ function renderRealm(r: number): void {
   const armies = s ? [...s.armies.id.keys()].filter((k) => s.armies.owner[k] === r) : [];
   const men = armies.reduce((t, k) => t + s!.armies.men[k]!, 0);
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
-  const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
   if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "trade" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "colonies") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
@@ -4039,8 +4142,7 @@ function renderRealm(r: number): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
     ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
-    ${content}
-    ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
+    ${content}`;
   bindClose();
   showPanel(true);
   bindNavyLinks();
@@ -4135,10 +4237,6 @@ function renderRealm(r: number): void {
   bindTax(-1);
   bindFood();
   bindLearning();
-  panel.querySelector("[data-back]")?.addEventListener("click", () => {
-    realmView = -1;
-    renderPanel();
-  });
   bindNationButtons();
 }
 
@@ -4513,6 +4611,8 @@ function enterGame(snap: Snapshot): void {
   newsView = false;
   grantOpen = false;
   selected.clear();
+  screenHistory.length = 0;
+  shownScreen = null;
   weekStart = snapshot!.date;
   dispatches = [];
   unread = 0;
