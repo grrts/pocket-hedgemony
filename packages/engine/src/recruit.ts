@@ -3,7 +3,7 @@ import { refillPaces } from "./fallen.ts";
 import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
-import { officialName, personName } from "./names.ts";
+import { mix, officialName, personName, rankedName } from "./names.ts";
 import { OFFICIALS, officialAt, officialBonus } from "./officials.ts";
 import { monthlyRations, wagonRations } from "./march.ts";
 import { campaigning, halt, isMarching } from "./turn.ts";
@@ -62,6 +62,7 @@ export interface FreeCompany {
   id: number;
   group: string;
   name: string;
+  /** The captain's name with his rank, in the language of the company's home (feedback 125). */
   captain: string;
   /** Province it gathers at, -1 = unknown. */
   home: number;
@@ -197,7 +198,7 @@ export function releaseCommander(world: World, n: number, c: number): string | n
 function newCaptain(world: World, n: number, name?: string): number {
   const skill = () => 1 + world.rng.int(3);
   const capital = world.rules.provinces.find((p) => p.id === world.rules.nations[n]!.capital)?.name ?? "";
-  return addCommander(world, n, wf.newCommander(`Captain ${name ?? personName(world.rules, n, world.rng.int(1 << 30), capital)}`, { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
+  return addCommander(world, n, wf.newCommander(name ?? rankedName(world.rules, n, personName(world.rules, n, world.rng.int(1 << 30), capital), "captain"), { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
 }
 
 /** Battles teach commanders: victories grow Might, defeats are counted (WAR-050, WAR-052). */
@@ -710,7 +711,13 @@ function newFreeCompany(world: World): FreeCompany | null {
   // Rounding: the largest arm takes up the difference, so the company has exactly its men.
   const big = byArm.indexOf(Math.max(...byArm));
   byArm[big] = byArm[big]! + men - byArm.reduce((t, m) => t + m, 0);
-  return { id, group: def.group, name: pick(free(def)), captain: pick(def.captains), home: capitalOf(world, pick(homesOf(def))), byArm };
+  const name = pick(free(def));
+  const given = pick(def.captains);
+  const from = pick(homesOf(def));
+  const home = capitalOf(world, from);
+  // The captain is named and ranked in the language of the land the company gathers in (feedback 125): "Hauptmann Ulrich von Hallwyl".
+  const captain = rankedName(world.rules, from, personName(world.rules, from, mix(id, 125), provinceName(world, home), given), "captain");
+  return { id, group: def.group, name, captain, home, byArm };
 }
 
 /** Each month a free company may move on, and new ones gather until the age's number are for hire (warfare free_companies). */

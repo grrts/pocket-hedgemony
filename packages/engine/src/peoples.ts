@@ -223,6 +223,8 @@ export interface PeoplesData extends PeoplesState {
   nationCapital: Int32Array;
   /** Bits of the drift inventions each realm knows, in DRIFT_INVENTIONS order. */
   nationInventions: Uint8Array;
+  /** 1 where a realm serves a faith's communities as the patron of its head while of another faith (nation * FAITH_IDS.length + faith; RELG-145). */
+  nationServes?: Uint8Array;
 }
 
 /** The culture rules' view of a realm (CountryCulture). */
@@ -264,7 +266,8 @@ export function realmFaith(d: PeoplesData, n: number): relg.RealmFaith | null {
     const w = d.nationFaithPending[n * F + f]!;
     if (w !== NO_FAITH && f !== sf) pending[FAITH_IDS[f]!] = FAITH_POLICIES[w]!;
   }
-  return relg.newRealm(d.nationIds[n]!, FAITH_IDS[sf]!, { policies, pending });
+  const served = d.nationServes ? FAITH_IDS.filter((_, f) => d.nationServes![n * F + f]) : [];
+  return relg.newRealm(d.nationIds[n]!, FAITH_IDS[sf]!, { policies, pending, ...(served.length ? { servedByPatronage: served } : {}) });
 }
 
 /** The religion rules' view of a province (ProvinceFaith): its mix, its houses, and the capital's pull. */
@@ -294,7 +297,7 @@ export function peoplesData(world: World): PeoplesData {
       if (knowsInvention(world, n, id)) inventions[n] = inventions[n]! | (1 << k);
     });
   }
-  return { ...pick(world), year: world.date.year, provinceOwner: world.provinceOwner, provinceGovernor: governor, nationIds: world.nationIds, nationCapital: capital, nationInventions: inventions };
+  return { ...pick(world), year: world.date.year, provinceOwner: world.provinceOwner, provinceGovernor: governor, nationIds: world.nationIds, nationCapital: capital, nationInventions: inventions, nationServes: world.nationServes };
 }
 
 function pick(s: PeoplesState): PeoplesState {
@@ -598,6 +601,7 @@ export function peoplesSnapshot(world: World): PeoplesSnapshot {
     nationIds: d.nationIds,
     nationCapital: d.nationCapital,
     nationInventions: d.nationInventions,
+    nationServes: world.nationServes.slice(),
     provinceTongue: d.provinceTongue.slice(),
     provinceTongueShare: d.provinceTongueShare.slice(),
     provinceHomeland: d.provinceHomeland.slice(),

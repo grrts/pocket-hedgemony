@@ -427,6 +427,12 @@ export function orderShape(order: Order): string {
       return "set the Tongue policy";
     case "faithPolicy":
       return "set a Faith policy";
+    case "conclaveGold":
+      return "send gold to the conclave";
+    case "claimCaliphate":
+      return "claim the caliphate";
+    case "raiseOwnPatriarch":
+      return "raise our own patriarch";
     case "answerRevolution":
       return "answer the revolution";
   }

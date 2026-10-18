@@ -40,7 +40,7 @@ Feature: Interruptions
     And the system closed the app
     When the player starts the game
     Then the screen "boot" is shown
-    And "Continue" points at the save written when the app went to the background
+    And "Play" points at the save written when the app went to the background
     When the player continues
     Then the map shows the strip "Picked up where you left off"
 

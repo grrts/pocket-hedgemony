@@ -29,6 +29,7 @@ import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts
 import { createRulerState, seedRulers, type RulerState } from "./rulers.ts";
 import { createFallenState, type FallenState } from "./fallen.ts";
 import { createBeliefState, readBeliefShares, type BeliefState } from "./belief.ts";
+import { createFaithHeadsState, seedFaithHeads, type FaithHeadsState } from "./faithHeads.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
 import { createRevolutionState, type RevolutionState } from "./revolutions.ts";
@@ -46,6 +47,10 @@ import type { AchievementLog } from "./achievements.ts";
  * transferred to the UI thread without serialising objects.
  */
 export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState {
+  /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
+  faithHeads: FaithHeadsState;
+  /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
+  nationServes: Uint8Array;
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -375,7 +380,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
       commanderIds.push(c.id);
       commanderOwnerList.push(i);
       commanderLogisticsList.push(c.logistics);
-      commanders.push(newCommander(c.name, { country: n.id, might: c.might, cunning: c.cunning, logistics: c.logistics }));
+      // The map data's stand-in "General of <realm>" takes a name of the realm's own culture (feedback 125).
+      const name = c.name === `General of ${n.name}` ? personName(rules, i, mix(i + 1, 125), rules.provinces.find((p) => p.id === n.capital)?.name ?? "") : c.name;
+      commanders.push(newCommander(name, { country: n.id, might: c.might, cunning: c.cunning, logistics: c.logistics }));
     }
   });
 
@@ -451,6 +458,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createRulerState(N, seed),
     ...createFallenState(N),
     ...createBeliefState(N),
+    ...createFaithHeadsState(N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -478,6 +486,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedPeoples(world);
   // Rulers read the lords, for a child ruler's regent, and the government form, for the throne law.
   seedRulers(world);
+  // The heads of the faith in 1444 read the faiths and the subjects (RELG-153).
+  seedFaithHeads(world);
   readBeliefShares(world);
   recount(world);
 

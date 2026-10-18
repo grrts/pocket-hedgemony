@@ -285,6 +285,8 @@ export const ICONS = {
     "kddddddddk",
     "kkkkkkkkkk",
   ],
+  // A church with a cross: a head of the faith's seat (RELG-138).
+  seat: ["....k....", "...kyk...", "....k....", "..kkkkk..", ".kwwwwwk.", "kwwkkkwwk", "kwwkbkwwk", "kkkkkkkkk"],
   speaker: ["....kk.....", "...kwk...k.", "kkkwwk.k..k", "kwwwwk..k.k", "kwwwwk..k.k", "kwwwwk..k.k", "kkkwwk.k..k", "...kwk...k.", "....kk....."],
   mute: ["....kk.....", "...kwk.....", "kkkwwkr...r", "kwwwwk.r.r.", "kwwwwk..r..", "kwwwwk.r.r.", "kkkwwkr...r", "...kwk.....", "....kk....."],
   hammer: [

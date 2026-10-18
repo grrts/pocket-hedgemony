@@ -20,6 +20,7 @@ import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { hiredFleetOrder, monthlyHiredFleets, type HireOrder } from "./hiredFleets.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
+import { claimCaliphate, faithHeadsWars, monthlyFaithHeads, raiseOwnPatriarch, sendConclaveGold } from "./faithHeads.ts";
 import { hireOfficial, settleLand, swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
@@ -74,6 +75,9 @@ export type Order =
   /** March to a province, to the given tile in it if any (else its centre). */
   | { type: "move"; army: number; to: number; tile?: number }
   | { type: "declareWar"; target: number }
+  | { type: "conclaveGold"; gold: number }
+  | { type: "claimCaliphate" }
+  | { type: "raiseOwnPatriarch" }
   | { type: "offerPeace"; target: number; terms: PeaceTerms }
   | { type: "answerCall"; call: string; yes: boolean }
   /** Take or turn down a peace the AI offers (its id in the snapshot's peaceOffers). */
@@ -245,6 +249,7 @@ function startDay(world: World, news: News[]): void {
     monthlyFood(world, news);
     monthlyGovernment(world, news);
     monthlyPeoples(world, news);
+    monthlyFaithHeads(world, news);
     monthlyBelief(world, news);
     monthlyMoods(world, news);
     monthlyRebels(world, news);
@@ -267,6 +272,8 @@ function startDay(world: World, news: News[]): void {
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
     aiDeclarations(world, news);
+    // A war just declared may be censured, or call a patron to a holy place (RELG-147, RELG-149).
+    faithHeadsWars(world, news);
     // A demand made before war may reach the player's court this month (DIPL-213).
     libraryEvents(world, news);
     aiRaise(world, news);
@@ -303,8 +310,11 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
   const locked = lockedOrder(world, actingNation, order);
   if (locked) return locked;
   switch (order.type) {
-    case "declareWar":
-      return declareWar(world, actingNation, order.target, news);
+    case "declareWar": {
+      const why = declareWar(world, actingNation, order.target, news);
+      if (!why) faithHeadsWars(world, news);
+      return why;
+    }
     case "offerPeace":
       return offerPeace(world, actingNation, order.target, order.terms, news);
     case "answerPeace":
@@ -419,6 +429,12 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return dismissTrader(world, actingNation, order.trader);
     case "tonguePolicy":
       return setTonguePolicy(world, actingNation, order.policy);
+    case "conclaveGold":
+      return sendConclaveGold(world, actingNation, order.gold);
+    case "claimCaliphate":
+      return claimCaliphate(world, actingNation, news);
+    case "raiseOwnPatriarch":
+      return raiseOwnPatriarch(world, actingNation, news);
     case "faithPolicy":
       return setFaithPolicy(world, actingNation, order.faith, order.policy);
     case "sendEnvoy": {

@@ -36,17 +36,17 @@
       "music": "none"
     },
     "title": {
-      "name": "Title",
+      "name": "Start screen",
       "kind": "Full",
-      "firstFocus": "Tap to start",
+      "firstFocus": "Play",
       "back": "leaves the app on Android",
       "music": "title"
     },
     "main_menu": {
       "name": "Main menu",
       "kind": "Same screen",
-      "firstFocus": "Continue",
-      "back": "title",
+      "firstFocus": "Play",
+      "back": "leaves the app on Android",
       "music": "title"
     },
     "new_campaign": {
@@ -275,6 +275,32 @@
     "Unlock",
     "Credits"
   ],
+  "start": {
+    "$comment": "The start screen (SHELL-149..158): shell.start_zoom, shell.start_pan_speed (map pixels per second at that zoom), shell.start_regions (the 1444 realms whose land the map pans over when no campaign is in progress, one per start), shell.wiki_url (placeholder until the wiki is published).",
+    "zoom": "Region",
+    "zoomLevel": 3,
+    "panSpeed": 6,
+    "regions": [
+      "france",
+      "castile",
+      "ottomans",
+      "muscovy",
+      "mali",
+      "ming",
+      "aztecs",
+      "inca",
+      "venice",
+      "bohemia"
+    ],
+    "wikiUrl": "https://github.com/grrts/pocket-hedgemony/wiki",
+    "icons": [
+      "Settings",
+      "Achievements",
+      "Wiki",
+      "More",
+      "Quit"
+    ]
+  },
   "gameMenu": [
     "Return to the map",
     "Save",

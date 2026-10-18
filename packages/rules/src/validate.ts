@@ -29,6 +29,7 @@ export function validateRuleset(rules: Ruleset): Ruleset {
       if (!c.given?.length) problems.push(`names: culture ${id} has no given names`);
       if ((c.style === "family" || c.style === "family_first") && !c.family?.length) problems.push(`names: culture ${id} needs family names`);
       if (c.style === "title" && !c.title?.length) problems.push(`names: culture ${id} needs titles`);
+      for (const [rank, pattern] of Object.entries(c.ranks ?? {})) if (!pattern.includes("{name}")) problems.push(`names: culture ${id} rank ${rank} has no {name}`);
     }
   }
 

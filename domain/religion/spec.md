@@ -312,7 +312,7 @@ Leroy asked how a ruler becomes "ruler of the faith", for every faith that has o
 - RELG-148 When a patron's (or the Caliph's) state faith changes, the religion system shall end the patronage and give it the wrong *Betrayed the faith* (−30, fading over 30 years) with every realm of the old faith. [faith heads §2.2; config faith_heads.betrayed] @placeholder
 
 #### Censure
-- RELG-149 When a ruler of a faith with a head declares war on a ruler of the same faith with the war aim *Take land*, *Tribute* or *Raid*, the religion system shall have the head censure him; crown-headed churches and faiths with no head are never censured. [faith heads §2.3; config faith_heads.censure.aims]
+- RELG-149 When a ruler of a faith with a head declares war on a ruler of the same faith with the war aim *Take land*, *Tribute*, *Raid* or no aim, the religion system shall have the head censure him; crown-headed churches and faiths with no head are never censured. [faith heads §2.3; config faith_heads.censure.aims; D-RELG-26]
 - RELG-150 While a realm is censured, the religion system shall give it the wrong *Censured by the <head>* (−25) with every realm of that faith, held during the war and fading over 10 years after the peace; make its lords of that faith waver one step when the censure starts; give every realm of that faith the *Punish* war aim against it; and let its allies of that faith refuse its calls without an oath broken. [faith heads §2.3; config faith_heads.censure.*] @placeholder
 - RELG-151 When a censured war ends with a peace that gives back every province taken in it, the religion system shall end the censure at once (its wrong still fades); the head censures his patron like anyone else, and the patron keeps the patronage. [faith heads §2.3]
 
@@ -501,6 +501,8 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 
 - **D-RELG-25** Heads of the faith (18 October, Leroy's list): designed in `religion/faith-heads-design.md` with no meter, every effect on ties, wrongs, preachers, lords, war aims and calls. One patron per head; the Caliph is his own patron; crown-headed churches and faiths with no head are outside censure. The Basel schism of 1444–49 is not modelled (the simpler rule): Savoy follows the Pope, and its `religious_authority` fact stays reference data. All numbers are provisional for the balancing model.
 
+- **D-RELG-26** Heads of the faith, first game slice (provisional): a war declared with no aim is censured like *Take land*, because the game's Declare war does not yet ask for an aim and an aimless war on a fellow believer is the case censure exists for. Until houses of worship have steps, a cardinal is a Catholic house in a province of 300,000 people or more, and the step-4 house for *Raise our own patriarch* is any Orthodox house in the capital. A held seat's patron who changes faith is betrayed and loses the patronage like any other patron, and the patron of another faith (RELG-145) is never sent the call of RELG-147, which goes only to a patron who shares the head's faith. Gold in the design is treasury gold × `defines.works.goldScale`. The smallest rule that makes every head run on the 1444 map.
+
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
@@ -526,10 +528,11 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 | RELG-126 | holy-places.feature | The Temple of the Tooth follows the relic |
 | RELG-127 … RELG-132 | — | Engine: packages/engine/test/peoples.test.ts (1444 faiths and the Bohemia override, Faith policies at New Year, faith tax, Persecuted counting two and closing houses, save) |
 | RELG-133, RELG-134 | — | Presentation: apps/client/src/ui/belief.ts, the Faith line, Peoples tab and Faiths lens; screenshots from apps/client/scripts/belief-shots.mjs |
-| RELG-135 … RELG-138 | faith-heads.feature | The Head of the faith card; the conclave on the card; the censure warning before a war; badges and seats |
+| RELG-135 … RELG-138 | faith-heads.feature | The Head of the faith card; the conclave on the card; the censure warning before a war; badges and seats. Presentation: apps/client/src/ui/faithHeads.ts; screenshots from apps/client/scripts/faith-heads-shots.mjs |
 | RELG-139 … RELG-145 | faith-heads.feature | Who leads each faith; held seats; claiming the caliphate; the conclave; Rome held by another realm; seizing a seat; a patron of another faith |
 | RELG-146 … RELG-148 | faith-heads.feature | What the patron gets; the patron's call; betraying the faith |
 | RELG-149 … RELG-151 | faith-heads.feature | Censure: which wars, its costs, how it ends |
 | RELG-152 | faith-heads.feature | Raising our own patriarch |
 | RELG-153 … RELG-155 | faith-heads.feature | The heads in 1444; the Dalai Lama in 1578; the save |
+| RELG-139 … RELG-155 | — | Engine: packages/engine/test/faithHeads.test.ts (1444 heads, conclave, seized seat, patron's call, censure and its end, betrayal, own patriarch, save) |
 | RELG-156 | faith-heads.feature | AI and the heads |

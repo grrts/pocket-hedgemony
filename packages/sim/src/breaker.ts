@@ -1,10 +1,11 @@
-import { createEngineHost, STEPS_PER_TURN, type EngineRequest, type Order, type Snapshot } from "@ph/engine";
+import type { Snapshot } from "@ph/engine";
 import { createBot } from "./bot.ts";
 import { dayKey } from "./campaign.ts";
 import { simConfig, type SimConfig } from "./config.ts";
 import { badValueFindings, errorFinding, pct, type Finding } from "./findings.ts";
 import { checkFinite, sample, viewOfSnapshot, type RealmSample, type WorldSample } from "./measure.ts";
-import { mapImagesFor, rulesFor, type MapKind } from "./world.ts";
+import { playThroughHost } from "./host.ts";
+import { rulesFor, type MapKind } from "./world.ts";
 
 export interface BreakerOptions {
   /** The realm the bot plays, by id (as in the scenario's nations). */
@@ -17,9 +18,6 @@ export interface BreakerOptions {
   /** The same realm's end in an AI-only campaign of the same seed and length, to measure the bot against. */
   baseline?: RealmSample | null;
 }
-
-/** An engine request without its id (each kind on its own, so its fields stay known). */
-type Request = EngineRequest extends infer R ? (R extends EngineRequest ? Omit<R, "id"> : never) : never;
 
 /** One realm played by the bot: its samples, its orders the game turned down, and what it found. */
 export interface BreakerResult {
@@ -55,42 +53,23 @@ export function runBreaker(o: BreakerOptions): BreakerResult {
   const checks = config.breaker_checks;
   const t0 = performance.now();
   const rules = rulesFor(o.map);
-  const host = createEngineHost(() => rules);
   const land = Uint8Array.from(rules.provinces, (p) => (p.terrain === "sea" || p.terrain === "ocean" ? 0 : 1));
   const nationIds = rules.nations.map((n) => n.id);
   const me = nationIds.indexOf(o.realm);
   if (me < 0) throw new Error(`unknown realm ${o.realm}`);
   const findings: Finding[] = [];
-  const rejected: BreakerResult["rejected"] = {};
   const realmSamples: BreakerResult["realmSamples"] = [];
-  let ordersSent = 0;
   let weeks = 0;
   let weeksAtWar = 0;
   let end: WorldSample | null = null;
 
-  let id = 0;
-  const send = (req: Request): Snapshot => {
-    const r = host({ ...req, id: ++id } as EngineRequest).response;
-    if (r.type === "error") throw new Error(r.message);
-    if (r.type !== "snapshot") throw new Error(`unexpected ${r.type}`);
-    return r.snapshot;
-  };
-  const map = mapImagesFor(o.map);
-  let s = send({ type: "newGame", seed: o.seed, playerNation: o.realm, ...(map ? { map } : {}) });
+  const play = playThroughHost(rules, o.map, o.seed, o.realm);
+  let s = play.s;
   const bot = createBot(rules, config.bot, o.seed * 7919 + me);
   const startYear = s.date.year;
   const stop = dayKey({ ...s.date, year: startYear + o.years });
   let lastSampled = -1;
 
-  const act = (order: Order): Snapshot => {
-    ordersSent++;
-    const next = send({ type: "act", order });
-    for (const r of next.rejectedOrders) {
-      const e = (rejected[r.order.type] ??= { count: 0, reason: r.reason });
-      e.count++;
-    }
-    return next;
-  };
   const worth = (x: Snapshot) => x.nationTreasury[me]! - x.debt;
   const take = (x: Snapshot) => {
     end = sample(viewOfSnapshot(x, nationIds, land));
@@ -102,14 +81,14 @@ export function runBreaker(o: BreakerOptions): BreakerResult {
     while (dayKey(s.date) < stop) {
       for (const probe of bot.probes(s)) {
         const before = worth(s);
-        s = act(probe.orders[0]);
+        s = play.act(probe.orders[0]);
         if (s.rejectedOrders.length) continue;
-        s = act(probe.orders[1]);
+        s = play.act(probe.orders[1]);
         const gain = worth(s) - before;
         if (gain > checks.gold_from_round_trip) findings.push({ severity: "broken", kind: "gold_from_nothing", year: s.date.year, realm: o.realm, text: `"${probe.name}" leaves the realm ${gain.toFixed(2)} gold richer.` });
       }
-      for (const order of bot.decide(s)) s = act(order);
-      s = send({ type: "advance", steps: STEPS_PER_TURN });
+      for (const order of bot.decide(s)) s = play.act(order);
+      s = play.week();
       weeks++;
       if (s.wars.some((w) => w.attackers.includes(me) || w.defenders.includes(me))) weeksAtWar++;
       const bad = checkFinite(s);
@@ -129,7 +108,7 @@ export function runBreaker(o: BreakerOptions): BreakerResult {
   }
   take(s);
   findings.push(...breakerFindings(o.realm, end, weeksAtWar, o.baseline ?? null, checks));
-  return { kind: "breaker", realm: o.realm, seed: o.seed, map: o.map, years: o.years, weeks, seconds: (performance.now() - t0) / 1000, realmSamples, end, baseline: o.baseline ?? null, rejected, ordersSent, weeksAtWar, findings };
+  return { kind: "breaker", realm: o.realm, seed: o.seed, map: o.map, years: o.years, weeks, seconds: (performance.now() - t0) / 1000, realmSamples, end, baseline: o.baseline ?? null, rejected: play.rejected, ordersSent: play.ordersSent, weeksAtWar, findings };
 }
 
 /** The checks on how the bot's realm ended, against the same realm left to the AI. */
