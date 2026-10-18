@@ -43,6 +43,7 @@ export interface Wave {
 export interface Family {
   id: string;
   name: string;
+  idea: string;
   cause: string;
   camps: { revolution: Camp; old_order: Camp };
   stance_labels: { lead: string; bend: string; fight: string };
