@@ -375,7 +375,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
       commanderIds.push(c.id);
       commanderOwnerList.push(i);
       commanderLogisticsList.push(c.logistics);
-      commanders.push(newCommander(c.name, { country: n.id, might: c.might, cunning: c.cunning, logistics: c.logistics }));
+      // The map data's stand-in "General of <realm>" takes a name of the realm's own culture (feedback 125).
+      const name = c.name === `General of ${n.name}` ? personName(rules, i, mix(i + 1, 125), rules.provinces.find((p) => p.id === n.capital)?.name ?? "") : c.name;
+      commanders.push(newCommander(name, { country: n.id, might: c.might, cunning: c.cunning, logistics: c.logistics }));
     }
   });
 

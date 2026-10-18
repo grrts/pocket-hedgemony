@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
-import { applyNow, createWorld, officialName, personName } from "../src/index.ts";
+import { applyNow, createWorld, cultureOf, officialName, personName, rankedName } from "../src/index.ts";
 
 const rules = loadDefaultRuleset();
 const nation = (id: string) => rules.nations.findIndex((n) => n.id === id);
@@ -29,3 +29,33 @@ describe("culture names (feedback 33)", () => {
     expect(w.commanders.at(-1)!.name).toBe(name);
   });
 });
+
+describe("ranks in the culture's language (feedback 125)", () => {
+  it("puts the rank where the language puts it", () => {
+    expect(rankedName(rules, nation("portugal"), "Fernão Coutinho", "admiral")).toBe("Almirante Fernão Coutinho");
+    expect(rankedName(rules, nation("castile"), "Rodrigo Manrique", "general")).toBe("Mariscal Rodrigo Manrique");
+    expect(rankedName(rules, nation("japan"), "Hosokawa Katsumoto", "general")).toBe("Hosokawa Katsumoto Taishō");
+  });
+
+  it("names the map data's stand-in generals in their realm's culture", () => {
+    const w = createWorld(rules, 3);
+    expect(w.commanders.filter((c) => c.name.startsWith("General of ")).map((c) => c.name)).toEqual([]);
+    expect(w.commanders.some((c) => c.name === "Hunyadi János")).toBe(true);
+  });
+
+  it("gives every culture with ranks a rank for leading an army", () => {
+    for (const [id, c] of Object.entries(rules.names!.cultures)) if (c.ranks) expect(c.ranks.general, id).toContain("{name}");
+  });
+
+  it("names a free company's captain with his rank in the language of the land it gathers in", () => {
+    const w = createWorld(rules, 3);
+    expect(w.freeCompanies.length).toBeGreaterThan(0);
+    for (const c of w.freeCompanies) {
+      const home = rules.nations.findIndex((n) => n.capital === rules.provinces[c.home]!.id);
+      const [before, after] = (cultureOf(rules, home)?.ranks?.captain ?? "{name}").split("{name}");
+      expect(c.captain.startsWith(before!) && c.captain.endsWith(after!), c.captain).toBe(true);
+      expect(c.captain.length).toBeGreaterThan(`${before}${after}`.length);
+    }
+  });
+});
+

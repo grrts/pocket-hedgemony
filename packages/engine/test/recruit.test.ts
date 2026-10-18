@@ -223,7 +223,7 @@ describe("armies that cost something", () => {
     const company = armiesOf(w, me).find((i) => w.armies.kind[i] === 1)!;
     expect(armiesOf(w, me).length).toBe(before + 1);
     expect(w.armies.commander[company]).toBeGreaterThanOrEqual(0);
-    expect(w.commanders[w.armies.commander[company]!]!.name).toBe(`Captain ${c.captain}`);
+    expect(w.commanders[w.armies.commander[company]!]!.name).toBe(c.captain);
     ARMS.forEach((a, k) => expect(arm(w, company, a)).toBeCloseTo(c.byArm[k]!));
     expect(w.armies.men[company]).toBeCloseTo(companyMen(c));
     expect(refused(w, { type: "appoint", army: company, commander: -1 }, me)).toMatch(/captain/);
