@@ -190,6 +190,10 @@ export interface War {
   start: string;
   provokedBy?: string;
   startedBy: string;
+  /** Men each side has lost in this war's battles, for the peace settlement (WAR-234). */
+  menLost?: { attackers: number; defenders: number };
+  /** Countries that have surrendered in this war: the victor may ask its full settlement (WAR-240). */
+  surrendered?: string[];
 }
 
 export interface WarAim {

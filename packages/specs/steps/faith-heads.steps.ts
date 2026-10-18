@@ -409,7 +409,7 @@ When(/^the war ends with a peace that (gives back every province taken in it|kee
     const owned = Array.from(w.provinceOwner.keys()).filter((q) => w.provinceOwner[q] === s.fhTarget);
     const p = owned.find((q) => q !== capital) ?? owned[0]!;
     w.provinceOccupier[p] = s.fhMe;
-    offerPeace(w, s.fhMe, s.fhTarget, "take", [], true);
+    offerPeace(w, s.fhMe, s.fhTarget, "take", [], true, [p]);
   } else offerPeace(w, s.fhMe, s.fhTarget, "white", [], true);
   w.date = { year: 1445, month: 1, day: 1 };
   month(w);

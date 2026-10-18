@@ -19,3 +19,4 @@ export * from "./styles.ts";
 export * from "./sieges.ts";
 export * from "./war.ts";
 export * from "./ai.ts";
+export * from "./settlement.ts";

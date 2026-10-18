@@ -84,8 +84,8 @@ export type Order =
   | { type: "conclaveGold"; gold: number }
   | { type: "claimCaliphate" }
   | { type: "raiseOwnPatriarch" }
-  /** Offer peace; with "take", `provinces` are the asker's picks of what to take, at most a third of the loser's land (WAR-227). */
-  | { type: "offerPeace"; target: number; terms: PeaceTerms; provinces?: number[] }
+  /** Offer peace; `provinces` and `gold` are the terms chosen at the peace table: asked with "take", given with "give" (WAR-242); none means the most the war allows. */
+  | { type: "offerPeace"; target: number; terms: PeaceTerms; provinces?: number[]; gold?: number }
   | { type: "answerCall"; call: string; yes: boolean }
   /** Take or turn down a peace the AI offers (its id in the snapshot's peaceOffers). */
   | { type: "answerPeace"; offer: number; yes: boolean }
@@ -346,7 +346,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return why;
     }
     case "offerPeace":
-      return offerPeace(world, actingNation, order.target, order.terms, news, false, order.provinces ?? []);
+      return offerPeace(world, actingNation, order.target, order.terms, news, false, order.provinces ?? [], order.gold ?? 0);
     case "answerPeace":
       return answerPeace(world, order.offer, order.yes, news);
     case "answerCall": {

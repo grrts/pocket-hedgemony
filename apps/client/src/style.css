@@ -907,6 +907,94 @@ button.capital {
   flex: 1 1 auto;
 }
 
+/* The peace table (WAR-242): every row and button a 44-point tap target; the bar carries its numbers as text. */
+.peace-table .peace-meter {
+  height: 14px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.peace-table .peace-meter i {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.peace-table .peace-meter.over i {
+  background: var(--cloth);
+}
+.peace-surrender {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border: 2px solid var(--outline);
+  background: var(--brass-light);
+}
+.peace-why summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.peace-why summary::before {
+  content: "▸";
+  margin-right: 8px;
+}
+.peace-why[open] summary::before {
+  content: "▾";
+}
+.peace-why ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.peace-why li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.peace-picks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px;
+}
+.peace-pick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  text-align: left;
+}
+.peace-pick .box {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--outline);
+  text-align: center;
+  line-height: 16px;
+}
+.peace-pick.on {
+  background: var(--brass-light);
+}
+.peace-pick .what {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.peace-pick small {
+  color: var(--ink-soft);
+}
+.peace-gold {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+.peace-gold button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.peace-gold span {
+  flex: 1;
+}
+
 .army-buttons {
   display: flex;
   flex-direction: column;

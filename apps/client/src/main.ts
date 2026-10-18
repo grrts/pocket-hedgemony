@@ -38,6 +38,7 @@ import type { GameDate } from "@ph/rules";
 import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, overlordCard, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
 import { rebelsUi, risingCard, risingsLine, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
+import { fitDraft, offerLine, peaceTable, startDraft, stepGold, togglePick, type PeaceDraft } from "./ui/peace.ts";
 import { fallenLine, rulerLines } from "./ui/ruler.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
@@ -4749,19 +4750,16 @@ function relationsSection(r: number): string {
   const war = myWars().find((w) => w.theirs.includes(r));
   if (war) {
     // Land each side holds of the other's, for the peace terms.
-    const { taken, lost } = occupiedEachWay(war.ours, war.theirs);
+    const { lost } = occupiedEachWay(war.ours, war.theirs);
     const leaders = s.wars.find((w) => w.id === war.id)!;
     const whole = [leaders.attackers[0], leaders.defenders[0]].includes(me) && [leaders.attackers[0], leaders.defenders[0]].includes(r);
+    const table = s.settlements.find((x) => x.target === r);
+    const dissolve = !!s.empire && s.empire.emperor === r && !s.empire.dissolveWhyNot;
     return `<h3 class="sub">At war</h3>
       ${warCard(war.id)}
-      <p class="hint">${whole ? "Peace with them ends the whole war." : "A separate peace: the rest of the war goes on."} Your side holds ${taken} of their provinces; they hold ${lost} of yours.</p>
-      <div class="choices">
-        <button class="wax" data-peace="take" ${taken ? "" : "disabled"}>${icon("crown", 1)}Peace: take ${taken} province${taken === 1 ? "" : "s"}</button>
-        <button class="paper" data-peace="white">White peace</button>
-        ${lost ? `<button class="paper" data-peace="give">Give up ${lost} province${lost === 1 ? "" : "s"}</button>` : ""}
-        ${s.empire && s.empire.emperor === r && !s.empire.dissolveWhyNot ? `<button class="paper" data-peace="dissolve">${icon("crown", 1)}Dissolve the Empire</button>` : ""}
-      </div>
-      ${s.empire && s.empire.emperor === r && !s.empire.dissolveWhyNot ? `<p class="hint">Dissolve the Empire: every member becomes a free realm and every imperial war aim ends; no land changes hands.</p>` : ""}
+      <p class="hint">${whole ? "Peace with them ends the whole war." : "A separate peace: the rest of the war goes on."}</p>
+      ${table ? peaceTable(table, peaceDraftFor(r), { province: (p) => provinces[p]!.name, realm: (n) => nations[n]!.name, lost }) : ""}
+      ${dissolve ? `<div class="choices"><button class="paper" data-peace="dissolve">${icon("crown", 1)}Dissolve the Empire</button></div><p class="hint">Dissolve the Empire: every member becomes a free realm and every imperial war aim ends; no land changes hands.</p>` : ""}
       ${masterPeace(r, whole)}
       ${realmStatecraft(s.statecraft, r, false, true)}`;
   }
@@ -4825,16 +4823,44 @@ function masterPeace(r: number, whole: boolean): string {
     : `<button class="paper" disabled>${icon("crown", 2)}Make them your subject</button><p class="hint">Not yet: ${esc(t.why ?? "")}.</p>`;
 }
 
+/** The player's choice at each enemy's peace table, until it is sent (WAR-248). */
+const peaceDrafts = new Map<number, PeaceDraft>();
+function peaceDraftFor(r: number): PeaceDraft {
+  const v = snapshot!.settlements.find((x) => x.target === r)!;
+  const d = fitDraft(v, peaceDrafts.get(r) ?? startDraft(v));
+  peaceDrafts.set(r, d);
+  return d;
+}
+
+/** The peace table's buttons: a province in or out, gold up or down, back to the most allowed, and the offer. */
+function bindPeaceTable(r: number): void {
+  const v = snapshot?.settlements.find((x) => x.target === r);
+  if (!v) return;
+  const redraw = (d: PeaceDraft) => {
+    peaceDrafts.set(r, d);
+    const keep = panel.scrollTop;
+    renderPanel();
+    panel.scrollTop = keep;
+  };
+  panel.querySelectorAll<HTMLButtonElement>("[data-peace-pick]").forEach((b) => b.addEventListener("click", () => redraw(togglePick(v, peaceDraftFor(r), Number(b.dataset.peacePick)))));
+  panel.querySelectorAll<HTMLButtonElement>("[data-peace-gold]").forEach((b) => b.addEventListener("click", () => redraw(stepGold(v, peaceDraftFor(r), Number(b.dataset.peaceGold)))));
+  panel.querySelector<HTMLButtonElement>("[data-peace-best]")?.addEventListener("click", () => redraw(startDraft(v)));
+  panel.querySelector<HTMLButtonElement>("[data-peace-offer]")?.addEventListener("click", () => {
+    const demand = peaceDraftFor(r);
+    peaceDrafts.delete(r);
+    void act({ type: "offerPeace", target: r, terms: "take", ...demand });
+  });
+}
+
 /** Peace offered to the player, with the choice to take it. */
 function offerHtml(o: Snapshot["peaceOffers"][number]): string {
   const what =
-    o.terms === "give" ? "it gives up the land you hold of theirs"
-    : o.terms === "take" ? "it asks for the land it holds of yours"
-    : o.terms === "dissolve" ? "it dissolves the Empire; no land changes hands"
-    : "a white peace, no land changes hands";
+    o.terms === "dissolve" ? "offers peace: it dissolves the Empire; no land changes hands"
+    : o.terms === "master" ? "offers peace and becomes your subject"
+    : offerLine(o, (p) => provinces[p]!.name);
   const later = putOffOffers.has(o.id);
   return `<div class="call framed-soft">
-    <p>${icon("crown", 2)} ${realmButton(o.from, "diplomacy")} offers peace: ${what}. The offer waits for your answer${later ? "; put off until next week" : ""}.</p>
+    <p>${icon("crown", 2)} ${realmButton(o.from, "diplomacy")} ${what}. The offer waits for your answer${later ? "; put off until next week" : ""}.</p>
     <div class="choices"><button class="wax" data-offer="${o.id}" data-yes="1">Make peace</button><button class="paper" data-offer="${o.id}" data-yes="0">Fight on</button>${later ? "" : `<button class="paper" data-offer-later="${o.id}">Later</button>`}</div>
   </div>`;
 }
@@ -5199,6 +5225,7 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-peace]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "offerPeace", target: r, terms: b.dataset.peace as PeaceTerms })),
   );
+  bindPeaceTable(r);
   // Declaring opens the declare sheet with the price of war first (WAR-229).
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => {
     declareFor = r;
@@ -6636,6 +6663,8 @@ void refreshSaves().then(() => {
 // Hooks for the scripted play-throughs (scripts/war-shots.mjs).
 Object.assign(globalThis, {
   __phNation: (id: string) => nationIndex.get(id),
+  /** The most provinces the player holds of any one enemy, from the peace tables (scripts/peace-table-shots.mjs). */
+  __phPeaceTable: () => Math.max(0, ...(snapshot?.settlements ?? []).map((x) => x.provinces.length)),
   __phTurn: () => snapshot?.turn ?? -1,
   /** The player's ports and fleets, and an order for the navy (scripts/navy-shots.mjs). */
   __phNavy: () => snapshot?.navy ?? null,
