@@ -305,7 +305,8 @@ because they read standing and forms and add war aims.
   attacker's); calls the Diet when the forecast tally passes.
 - AI members and seats vote by the reasons count (INST-025, INST-041); an AI member with a war aim on a member takes
   it to court when the forecast ruling is for it.
-- An AI member stands for the crown when it is among the three strongest members.
+- An AI member stands for the crown when it is among the three strongest members; the sitting Emperor's house always
+  stands (built in slice 1: the holder is always a candidate).
 - An AI shogun summons the least loyal houses first while hold allows, and confirms Wavering houses.
 
 ## 13. Open questions and contradictions
