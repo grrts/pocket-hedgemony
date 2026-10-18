@@ -3,10 +3,11 @@ import { EMPIRE_FOLDS, INSTITUTIONS_KEY, SILENCE, empireBadge, institutionRow } 
 import { icon } from "../art/ui.ts";
 
 /**
- * The institutions on screen (INST-080 to INST-085, slice 1: the Empire):
- * the Institutions row on the player's own Diplomacy tab, the badge on a
- * member's country card, the Empire card with its four folds, its answer
- * cards in the News and the key of the Institutions map mode. The words come
+ * The institutions on screen (INST-080 to INST-085, the Empire): the
+ * Institutions row on the player's own Diplomacy tab, the badge on a member's
+ * country card, the Empire card with its four folds (the Diet and its reforms,
+ * the Imperial Court), its answer cards in the News and the key of the
+ * Institutions map mode. The words come
  * from the institutions context (screens.ts); this file lays them out as
  * 44-point rows and buttons that open on tap.
  */
@@ -22,6 +23,8 @@ export interface InstitutionsUi {
   pennant: (n: number) => string;
   month: (iso: string) => string;
   faith: (id: string) => string;
+  /** A province's name, by index. */
+  province: (p: number) => string;
 }
 
 /** Which of the Empire card's folds are open and which seat's reasons show; kept between redraws. */
@@ -66,8 +69,8 @@ export function empireCard(v: EmpireView, ui: InstitutionsUi): string {
   const [election, reforms, members, hold] = EMPIRE_FOLDS;
   return `${header}
     ${fold(election, v.election ? "an election sits" : tallyText(v, ui), electionFold(v, ui))}
-    ${fold(reforms, "none passed yet", reformsFold(v))}
-    ${fold(members, `${v.members.length} members`, membersFold(v, ui))}
+    ${fold(reforms, reformsSummary(v), reformsFold(v, ui))}
+    ${fold(members, `${v.members.length} members${breakers(v) ? ` · ${breakers(v)} Breaker${breakers(v) === 1 ? "" : "s"} of the Peace` : ""}`, membersFold(v, ui))}
     ${fold(hold, `${v.hold} · ${v.word}`, holdFold(v))}`;
 }
 
@@ -122,28 +125,85 @@ export function voteButtons(v: EmpireView, ui: InstitutionsUi): string {
     .join("")}</div><p class="hint">If you don't vote, ${SILENCE.election}.</p>`;
 }
 
-const LADDER: [string, string][] = [
-  ["Public Peace", "A member that makes war on another member is a Breaker of the Peace: the Emperor and every member may make war on it."],
-  ["Imperial Court", "A member may take a claim on another member's province to court instead of going to war."],
-  ["Circles", "When an outsider attacks a member, every member of its circle joins the defence."],
-  ["Common Tax", "Every member pays the Emperor 5 % of its tax each month, in place of the dues."],
-  ["Imperial Army", "In a war to defend the Empire the Emperor commands a tenth of every member's soldiers."],
-  ["Hereditary Crown", "The Emperor's heir takes the crown; no more elections."],
-  ["One Realm", "The Empire becomes one realm: every other member's ruler becomes a great lord of the Emperor."],
-];
+/** "12 yes to 10 no — it would pass": over half the votes pass a reform (INST-041). */
+const forecastText = (yes: number, no: number, sitting: boolean) =>
+  `${yes} yes to ${no} no — it ${yes > no ? (sitting ? "passes" : "would pass") : sitting ? "fails" : "would fail"}`;
 
-function reformsFold(v: EmpireView): string {
-  const [next, does] = LADDER[0]!;
-  return `<ol class="ladder">${LADDER.map(([n], i) => `<li class="${i === 0 ? "next" : ""}">${icon(i === 0 ? "scroll" : "hourglass", 1)}<span>${n}${i === 0 ? " <small>next</small>" : ""}</span></li>`).join("")}</ol>
-    <p><b>Next: ${next}.</b> ${does} Passing it spends 30 hold; failing, 10.</p>
-    <p class="hint">The Emperor may call the Diet once hold reaches 50${v.hold >= 50 ? " (it has)" : ` (it is ${v.hold})`}.</p>`;
+const breakers = (v: EmpireView) => v.members.filter((m) => m.breaker).length;
+
+function reformsSummary(v: EmpireView): string {
+  const r = v.reforms;
+  if (r.diet) return `the Diet sits on the ${r.diet.name}`;
+  const n = r.ladder.filter((x) => x.passed).length;
+  return n ? `${n} of ${r.ladder.length} passed` : "none passed yet";
+}
+
+/** INST-081: the ladder of seven, the next reform with its cost and forecast, the Diet while it sits, and the Imperial Court. */
+function reformsFold(v: EmpireView, ui: InstitutionsUi): string {
+  const r = v.reforms;
+  const at = r.diet?.reform ?? r.next?.id;
+  const ladder = `<ol class="ladder">${r.ladder
+    .map((x) => {
+      const mark = x.passed ? "passed" : x.id === at ? (r.diet ? "the Diet sits" : "next") : "";
+      return `<li class="${x.passed ? "passed" : x.id === at ? "next" : ""}"><span class="tick" aria-hidden="true">${x.passed ? "✓" : ""}</span><span>${esc(x.name)}${mark ? ` <small>${mark}</small>` : ""}</span></li>`;
+    })
+    .join("")}</ol>`;
+  return `${ladder}
+    ${r.diet ? dietSitting(v, ui) : r.next ? nextReform(v) : `<p class="hint">${v.ended ? "The Empire has ended." : "Every reform has passed."}</p>`}
+    ${r.contingents.length ? `<p>Imperial contingents in the field: <b>${r.contingents.reduce((t, c) => t + c.men, 0).toLocaleString("en")} men</b>, sent home with the peace.</p>` : ""}
+    ${courtList(v, ui)}`;
+}
+
+/** The next reform: what it does, what it costs and how the Diet would vote today; Call the Diet for the Emperor, or why not. */
+function nextReform(v: EmpireView): string {
+  const n = v.reforms.next!;
+  return `<div class="reform-next framed-soft">
+    <p><b>Next: ${esc(n.name)}.</b> ${esc(n.effect)}</p>
+    <p>Hold: <b>−${n.passCost}</b> if it passes, <b>−${n.failCost}</b> if it fails.</p>
+    <p><b>Forecast:</b> ${forecastText(n.yes, n.no, false)}. <small>Electors' votes count twice.</small></p>
+    ${n.whyNot ? `<p class="hint">Call the Diet: ${esc(n.whyNot)}.</p>` : `<button class="wax wide" data-call-diet>${icon("scroll", 1)}Call the Diet</button><p class="hint">The members vote for a month; you may call it once every 5 years.</p>`}
+  </div>`;
+}
+
+/** A sitting Diet: the reform, when the votes are counted, today's tally and the player's Vote yes / Vote no. */
+function dietSitting(v: EmpireView, ui: InstitutionsUi): string {
+  const d = v.reforms.diet!;
+  const effect = v.reforms.ladder.find((x) => x.id === d.reform)?.effect ?? "";
+  return `<div class="reform-next framed-soft">
+    <p><b>The Diet sits on the ${esc(d.name)}.</b> ${esc(effect)}</p>
+    <p>The votes are counted in ${esc(ui.month(d.ends))}. <b>Today:</b> ${forecastText(d.yes, d.no, false)}.</p>
+    ${v.role ? dietButtons(v) : ""}
+  </div>`;
+}
+
+/** Vote yes / Vote no, the chosen one shown as chosen (silence counts as no, INST-083). */
+function dietButtons(v: EmpireView): string {
+  const mine = v.reforms.diet!.playerVote;
+  const b = (yes: boolean) => {
+    const on = mine === (yes ? "yes" : "no");
+    return `<button class="${on ? "wax" : "paper"}" data-diet-vote="${yes ? 1 : 0}" aria-pressed="${on}">${on ? "✓ " : ""}Vote ${yes ? "yes" : "no"}</button>`;
+  };
+  return `<div class="choices two">${b(true)}${b(false)}</div><p class="hint">${mine ? `You vote ${mine}; tap the other to change it.` : `If you don't vote, your vote counts as ${SILENCE.diet}.`}</p>`;
+}
+
+/** INST-043: the player's land war aims on members, each with Take to court, once the Imperial Court has passed. */
+function courtList(v: EmpireView, ui: InstitutionsUi): string {
+  const c = v.reforms.court;
+  if (!c.length || !v.reforms.ladder.find((x) => x.id === "imperial_court")?.passed) return "";
+  return `<h4>Take to court</h4>
+    <p class="hint">The Imperial Court rules on your claim instead of a war; one who refuses its ruling is a Breaker of the Peace.</p>
+    <div class="court-rows">${c
+      .map(
+        (x) => `<div class="court-row"><span><b>${esc(ui.province(x.province))}</b><small>of ${esc(ui.name(x.realm))} · ${esc(x.source)}</small></span><button class="paper" data-court-realm="${x.realm}" data-court-province="${x.province}">Take to court</button></div>`,
+      )
+      .join("")}</div>`;
 }
 
 function membersFold(v: EmpireView, ui: InstitutionsUi): string {
   return `<div class="members">${v.members
     .map((m) => {
-      const badges = [m.realm === v.emperor ? "Emperor" : "", m.seat ? `Seat: ${m.seat}` : "", m.atWarWithMember ? "At war with a member" : "", m.landHeld ? `Land held by outsiders (${m.landHeld})` : ""].filter(Boolean);
-      return `<button class="paper member-row" data-realm="${m.realm}">${ui.pennant(m.realm)}<span><b>${esc(ui.name(m.realm))}</b><small>${m.provinces} province${m.provinces === 1 ? "" : "s"} · ${esc(ui.faith(m.faith))}</small>${badges.length ? `<span class="badges">${badges.map((b) => `<em class="badge${/war|outsiders/.test(b) ? " down" : ""}">${esc(b)}</em>`).join("")}</span>` : ""}</span></button>`;
+      const badges = [m.realm === v.emperor ? "Emperor" : "", m.seat ? `Seat: ${m.seat}` : "", m.breaker ? "Breaker of the Peace" : "", m.atWarWithMember ? "At war with a member" : "", m.landHeld ? `Land held by outsiders (${m.landHeld})` : ""].filter(Boolean);
+      return `<button class="paper member-row" data-realm="${m.realm}">${ui.pennant(m.realm)}<span><b>${esc(ui.name(m.realm))}</b><small>${m.provinces} province${m.provinces === 1 ? "" : "s"} · ${esc(ui.faith(m.faith))}${m.circle ? ` · ${esc(m.circle)} Circle` : ""}</small>${badges.length ? `<span class="badges">${badges.map((b) => `<em class="badge${/war|outsiders|Breaker/.test(b) ? " down" : ""}">${esc(b)}</em>`).join("")}</span>` : ""}</span></button>`;
     })
     .join("")}</div>`;
 }
@@ -158,6 +218,7 @@ function holdFold(v: EmpireView): string {
     <h4>This year so far</h4>
     ${gain.length || lose.length ? lines("Gains", gain) + lines("Losses", lose) : `<p class="hint">Nothing yet; peace in the Empire adds 2 in January.</p>`}
     ${v.record.length ? `<h4>Last year's count</h4>${lines("Gains", v.record.filter((l) => l.number > 0))}${lines("Losses", v.record.filter((l) => l.number < 0))}` : ""}
+    ${v.reforms.zeroYears ? `<p><b>Hold has stood at 0 for ${v.reforms.zeroYears} year${v.reforms.zeroYears === 1 ? "" : "s"}:</b> at 5 in a row the Empire dissolves.</p>` : ""}
     <p>Dues to the Emperor: <b>${v.dues.toFixed(1)} gold a month</b> (1 per member, times hold ÷ 100), in the Emperor's tribute line.</p>`;
 }
 
@@ -172,6 +233,37 @@ export function electionAnswerCard(v: EmpireView | null, ui: InstitutionsUi): st
     ${voteButtons(v, ui)}
     <button class="paper" data-empire-open>Open the Empire card</button>
   </div>`;
+}
+
+/** INST-083: the sitting Diet's answer card in the News, while the player is a member and has not voted. */
+export function dietAnswerCard(v: EmpireView | null, ui: InstitutionsUi): string {
+  const d = v?.reforms.diet;
+  if (!v || !d || !v.role || d.playerVote) return "";
+  return `<div class="call framed-soft empire-ask">
+    <p>${icon("scroll", 2)} <b>The Diet sits on the ${esc(d.name)}:</b> ${esc(v.reforms.ladder.find((x) => x.id === d.reform)?.effect ?? "")} The votes are counted in ${esc(ui.month(d.ends))}; today ${forecastText(d.yes, d.no, false)}.</p>
+    ${dietButtons(v)}
+    <button class="paper" data-empire-open>Open the Empire card</button>
+  </div>`;
+}
+
+/** INST-043, INST-083: a ruling of the Imperial Court against the player, to hand the province over or refuse. */
+export function rulingAnswerCards(v: EmpireView | null, ui: InstitutionsUi): string {
+  if (!v) return "";
+  return v.reforms.rulings
+    .map(
+      (r) => `<div class="call framed-soft empire-ask">
+    <p>${icon("crown", 2)} <b>The Imperial Court rules you hand ${esc(ui.province(r.province))} to ${esc(ui.name(r.plaintiff))}.</b> Answer by ${esc(ui.month(r.answerOn))}.</p>
+    <div class="choices two"><button class="wax" data-ruling="${esc(r.id)}" data-yes="1">Hand it over</button><button class="paper" data-ruling="${esc(r.id)}" data-yes="0">Refuse</button></div>
+    <p class="hint">Refusing makes you a Breaker of the Peace: the Emperor and every member may make war on you. If you don't answer, it is handed over.</p>
+  </div>`,
+    )
+    .join("");
+}
+
+/** How many of the Empire's answer cards wait on the player (the News plaque's count). */
+export function empireAsks(v: EmpireView | null): number {
+  if (!v || v.ended) return 0;
+  return (v.reforms.diet && v.role && !v.reforms.diet.playerVote ? 1 : 0) + v.reforms.rulings.length + (v.election && hasOwnSeat(v) && v.election.playerVote < 0 ? 1 : 0);
 }
 
 /** INST-084: the Institutions map mode's key, each colour with its pattern in words. */
