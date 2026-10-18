@@ -1471,7 +1471,7 @@ Given("a save from before a balance patch", (s) => {
   s.saveBytes = s.pre.bytes;
 });
 When("it is loaded after the patch", (s) => {
-  s.buildRules = { ...RULES, defines: { ...RULES.defines, economy: { ...RULES.defines.economy, goldPerWealthPerMonth: RULES.defines.economy.goldPerWealthPerMonth * 2 } } };
+  s.buildRules = { ...RULES, defines: { ...RULES.defines, economy: { ...RULES.defines.economy, goldPerThousandPeoplePerMonth: RULES.defines.economy.goldPerThousandPeoplePerMonth * 2 } } };
   loadSave(s);
 });
 Then("the turn already saved is unchanged", (s) => {

@@ -3,7 +3,7 @@ import { CLASS_COUNT, rescaleClasses } from "../../living.ts";
 import { LEDGER_LINES } from "../../treasury.ts";
 import { restoreResearch, saveResearch, type SavedResearch } from "../../research.ts";
 import { graspingFromGrievances, restoreGovernment, saveGovernment, type SavedGovernment } from "../../government.ts";
-import { restoreTrade, saveTrade, type SavedTrade } from "../../trade.ts";
+import { restoreTrade, saveTrade, seedTrade, tradeProvinceArrays, type SavedTrade } from "../../trade.ts";
 import { refreshWorks, WORK_COUNT, workIndex, WORKS, type QueuedWork, type Site } from "../../works.ts";
 import { MAX_TILES } from "../../land.ts";
 import type { Ruleset } from "@ph/rules";
@@ -84,7 +84,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("provinces", V.provinces, {
       // Sieges under way, by province (occupation and garrisons are arrays below); the ground is the map's, not the save's.
       meta: { sieges: [...world.sieges].map(([p, st]) => [p, { ...st, siege: { ...st.siege, ground: undefined } }]), workNames: WORKS },
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore, game: world.provinceGame, hardWinter: world.provinceHardWinter, seam: world.provinceSeam, seamYears: world.provinceSeamYears, changeTile: world.provinceChangeTile, change: world.provinceChange, changeLeft: world.provinceChangeLeft, changeMonths: world.provinceChangeMonths, changeGold: world.provinceChangeGold },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore, game: world.provinceGame, hardWinter: world.provinceHardWinter, seam: world.provinceSeam, seamYears: world.provinceSeamYears, changeTile: world.provinceChangeTile, change: world.provinceChange, changeLeft: world.provinceChangeLeft, changeMonths: world.provinceChangeMonths, changeGold: world.provinceChangeGold, ...tradeProvinceArrays(world) },
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
@@ -98,6 +98,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         debt: world.nationDebt,
         loanMonth: world.nationLoanMonth,
         ledger: world.nationLedger,
+        tradeLast: world.nationTrade,
         neglect: world.nationNeglect,
         grainGold: world.nationGrainGold,
         foodSold: world.nationFoodSold,
@@ -184,7 +185,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   const arm = need("armies");
   const warnings: string[] = [];
 
-  const world = createWorld(rules, 0, tiles);
+  // Trade comes from the save; only a save from before trade is given the start's traders below.
+  const world = createWorld(rules, 0, tiles, { seedTrade: false });
   const meta = core.meta as { turn: number; weatherSeed?: number; day?: number; step?: number; date: { year: number; month: number; day?: number }; options: CampaignOptions; playerNation: string };
   world.turn = meta.turn;
   world.day = meta.day ?? meta.turn * 7;
@@ -356,8 +358,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   // Forms and Custom by realm; a save from before government keeps the 1444 start.
   if (natMeta.government) restoreGovernment(world, natMeta.government, mapN);
   graspingFromGrievances(world);
-  // Traders and ratios; a save from before trade keeps the 1444 start.
-  if (natMeta.trade) restoreTrade(world, natMeta.trade, mapN, mapP);
+  // Traders and ratios.
+  if (natMeta.trade) restoreTrade(world, natMeta.trade, prov, nat.tradeLast, mapN, mapP);
   // Research by realm; a save from before research keeps the 1444 start.
   if (natMeta.research) restoreResearch(world, natMeta.research, mapN, mapP);
   // Lords keep their places in the list (provinces point at them); one of a realm that is gone holds nothing.
@@ -455,6 +457,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     for (const x of [...attackers, ...defenders]) pool.battle[x] = b.id;
   }
   world.battleSeq = armMeta.battleSeq ?? 0;
+  // A save from before trade is given the start's traders, on the world as loaded.
+  if (!natMeta.trade) seedTrade(world);
 
   const events = chunks.has("events") ? (unpackChunk(chunks.get("events")!).meta as unknown as EventsState) : { ...EMPTY_EVENTS };
   const history = chunks.has("history") ? ((unpackChunk(chunks.get("history")!).meta.timeline as unknown[]) ?? []) : [];

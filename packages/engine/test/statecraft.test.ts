@@ -167,7 +167,8 @@ describe("statecraft (milestone 5)", () => {
     expect(makeDemand(quiet, asker, me, "pay_tribute")).toBeNull();
     askArrives(quiet, me, asker);
     months(quiet, 2, me);
-    expect(statecraftView(quiet, me)!.asks).toEqual([]);
+    // Castile's envoy has left; another court's may have come since.
+    expect(statecraftView(quiet, me)!.asks.filter((x) => x.from === asker)).toEqual([]);
     expect(quiet.diplomacy.refusedDemands.some((x) => x.asker === "castile" && x.asked === "navarre")).toBe(true);
   });
 

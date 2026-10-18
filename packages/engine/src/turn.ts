@@ -124,7 +124,7 @@ export type Order =
   /** Found a trader in an own city (TRADE-003), set its route of 2 to 8 cities (TRADE-050), draw one for its preview (TRADE-054), or dismiss it (TRADE-006). */
   | { type: "foundTrader"; city: number; kind: GameTraderKind }
   | { type: "setTradeRoute"; trader: number; stops: number[]; mode?: GameRouteMode }
-  | { type: "draftTradeRoute"; trader: number; stops: number[] }
+  | { type: "draftTradeRoute"; trader: number; stops: number[]; mode?: GameRouteMode }
   | { type: "dismissTrader"; trader: number }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
@@ -334,7 +334,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "setTradeRoute":
       return setTradeRoute(world, actingNation, order.trader, order.stops, order.mode);
     case "draftTradeRoute":
-      return draftTradeRoute(world, actingNation, order.trader, order.stops);
+      return draftTradeRoute(world, actingNation, order.trader, order.stops, order.mode);
     case "dismissTrader":
       return dismissTrader(world, actingNation, order.trader);
     case "sendEnvoy": {

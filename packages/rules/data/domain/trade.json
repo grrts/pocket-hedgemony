@@ -617,7 +617,7 @@
     "game"
   ],
   "game": {
-    "$comment": "D-TRADE-20, the game's first slice of trade (provisional). value_scale turns goods gold into the treasury's gold so the world's trade income in 1444 is about what the old flat trade line paid; purse_scale does the same for purses. Craftsmen make crafts (finished goods) and the food surplus is grain until the craft and food buildings make their own wares. The AI looks for loops within its reach in days, counts a quiet road as this ratio, and founds at most one trader a year while it has fewer than this many times its starting traders, plus one.",
+    "$comment": "D-TRADE-20, the game's first slice of trade (provisional). value_scale turns goods gold into the treasury's gold so the world's trade income in 1444 is about what the old flat trade line paid; purse_scale does the same for purses. Craftsmen make crafts (finished goods) and the food surplus is grain until the craft and food buildings make their own wares. The AI looks for loops within its reach in days, counts a quiet road as this ratio, and founds at most one trader a year while it has fewer than this many times its starting traders, plus one. A loop bringing at least ai_keep_route_over_upkeep times its upkeep is kept at the yearly look.",
     "value_scale": 0.08,
     "purse_scale": 0.2,
     "food_loads_per_thousand_fed": 1,
@@ -628,6 +628,7 @@
     "ai_ratio_floor": 20,
     "ai_candidates": 8,
     "ai_max_traders_per_start": 2,
-    "ai_found_reserve": 3
+    "ai_found_reserve": 3,
+    "ai_keep_route_over_upkeep": 4
   }
 }

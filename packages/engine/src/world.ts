@@ -305,7 +305,8 @@ function growArmyPool(old: ArmyPool): ArmyPool {
  * one the world gets a stand-in with one tile per province, where armies
  * can't march (enough for a probe that only runs a turn).
  */
-export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = pointTileGrid(rules)): World {
+/** `seedTrade: false` leaves trade empty, for a world a save is about to fill. */
+export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = pointTileGrid(rules), opts: { seedTrade?: boolean } = {}): World {
   const provinceIds = rules.provinces.map((p) => p.id);
   const provinceIndex = new Map(provinceIds.map((id, i) => [id, i]));
   const nationIds = rules.nations.map((n) => n.id);
@@ -447,7 +448,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     }
   });
   seedResearch(world);
-  seedTrade(world);
+  if (opts.seedTrade !== false) seedTrade(world);
   recount(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
