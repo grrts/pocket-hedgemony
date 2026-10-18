@@ -724,6 +724,38 @@
     }
   ],
   "goals_months": 12,
+  "first_hints": [
+    {
+      "id": "realm",
+      "line": "Choose a realm to rule: tap one here, or any realm on the map.",
+      "done": "realm chosen"
+    },
+    {
+      "id": "move",
+      "line": "Move an army: tap Commanders, pick a commander, then tap the land to march to.",
+      "done": "move"
+    },
+    {
+      "id": "end_turn",
+      "line": "Tap End turn to play the week: your armies march and your realm works.",
+      "done": "turn ended"
+    },
+    {
+      "id": "recruit",
+      "line": "Recruit men: in a province's Garrison tab, tap Recruit.",
+      "done": "recruit"
+    },
+    {
+      "id": "build",
+      "line": "Build a work: in a province's Build tab, tap Build on one.",
+      "done": "build"
+    },
+    {
+      "id": "envoy",
+      "line": "Send an envoy: in a neighbour's Diplomacy tab, pick a mission.",
+      "done": "sendEnvoy"
+    }
+  ],
   "attention": {
     "kinds_order": [
       "warning",
@@ -903,7 +935,10 @@
     },
     "tutorial_hints": {
       "default": true,
-      "controls": "goals list"
+      "controls": [
+        "goals list",
+        "first-campaign hints"
+      ]
     }
   },
   "controller_holds": {
