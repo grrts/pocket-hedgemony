@@ -158,7 +158,7 @@ Each month every class gains births and loses deaths from yearly base rates:
 
 Troyes, with 72,000 people, well fed and at peace, has about 2,800 births and 2,200 deaths a year, so it grows by about 600 a year until the food runs short.
 
-**Famine.** Each season the province compares the food it has (its share of the harvest, its local store and castle deliveries) with the people who must eat. If there is enough, everyone eats and the rest goes to the store. If not, the people the food can't feed die that season, spread over the classes by size, except that a quarter of them flee as refugees if a neighbouring province has food. If Troyes has food for 64,000 one season, 8,000 can't be fed: 2,000 flee to Sens, which has food to spare, and 6,000 die. With no fed neighbour, all 8,000 die.
+**Famine.** Each season the province compares the food it has (its share of the harvest, its local store and castle deliveries) with the people who must eat. If there is enough, everyone eats and the rest goes to the store. If not, the people the food can't feed die that season, spread over the classes by size, except that a quarter of them flee as refugees if a neighbouring province has food. If Troyes has food for 64,000 one season, 8,000 can't be fed: 2,000 flee to Sens, which has food to spare, and 6,000 die. With no fed neighbour, all 8,000 die. A year's famine never kills more than a fifth of a province, so even two failed harvests in a row kill at most about a third of its people; past that the unfed go hungry instead.
 
 ### Classes and job slots
 

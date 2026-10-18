@@ -150,7 +150,7 @@
     "sanitation": -0.005,
     "vaccination": -0.005
   },
-  "famine": { "flee_share": 0.25 },
+  "famine": { "flee_share": 0.25, "year_share": 0.2 },
   "homeless": { "theft_from": 0.05, "theft_step": 0.05, "grievance_over": 0.10, "shanty_over": 0.20, "shanty_town_death_extra": 0.01, "shanty_plague_spread": 2 },
   "refugees": { "settle_years": 2 },
   "recruits": { "conscription_below": 0.25, "conscription_ends_at": 0.5, "no_recruits_from": ["clergy", "scholars"] },
