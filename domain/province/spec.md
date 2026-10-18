@@ -349,6 +349,13 @@ settlement, settlers, local people's tiles.
 - PROV-326: Where: tapping a tile on the province's Land tab shows under its sheet the one to three changes that fit it, each a 44-point button with what it becomes, its gold and time, or why not (another change under way, the invention it needs by name, its lord, the gold); a tile being changed shows "→ Fields" on the grid and in its sheet the time left with a bar and Stop. [X-19]
 - PROV-327: Overview: the realm's Provinces list has a "Short of food" view listing only the provinces whose land feeds under all their people in a normal year, each with its share and the fix the Land tab offers first (build or improve the farm, clear the woods, drain, irrigate, or bring food in from a castle); a row opens that province's Land tab. Phone: as PROV-316. [X-19, feedback 86]
 
+### Mines and saltworks in the game (feedback 87, 18 October 2026)
+- PROV-328: A province in hills or mountains with a waste tile may hold a seam: one ware (iron, copper, tin, silver, gold or rock salt) and its years of digging left (40 to 160). About a third of such provinces hold one, found by a fixed roll per province so every game has the same geology; the map's famous mines of 1444 (Kutná Hora's silver in Středočeský, Falun's copper in Dalarna) hold theirs whatever the ground, with a waste tile for the mine. [PROV-065, feedback 87, D-PROV-29]
+- PROV-329: A mine shall stand in the province, take one building slot and need rough waste, a seam and timber in reach (a lumber camp in the province or in a neighbouring province of the same realm). It gives work for 6,000 miners, its ware, and trade as a lumber camp does; silver and gold three times as much. The map's famous mines and mines in rich provinces (wealth 5 or more) stand in 1444. [PROV-064, PROV-067, feedback 87]
+- PROV-330: Each January every mine shall dig a year off its seam; when the seam runs out the mine closes and the owner hears of it. Prospecting events and mining inventions that find new seams come later. [PROV-065, PROV-066, feedback 87]
+- PROV-331: Saltworks shall stand in a province with a shore tile on a dry or warm coast (drylands, desert or savanna, or below 42° of latitude); they give work for 1,500 miners, salt and trade as a lumber camp does. [feedback 87]
+- PROV-332: Where: the waste tile's sheet on the Land tab shows the seam and its years left (or none found) and offers the mine with its Build button or why not (no seam, no timber in reach); the shore tile's sheet offers saltworks beside the fishery. Grouping and overview: mines and saltworks sit with the other land on the Land tab; the Build tab lists them with the other works. Phone: as PROV-316. [X-19]
+
 ### 5.19 Lords in the province
 - PROV-200: A lord shall always hold at least one province; someone with no land is a courtier. [§10.3]
 - PROV-201: When a lord loses his last province, he shall stop being a lord: he stays at court as a courtier who can be granted land again, or, if he lost it to you by force, he flees abroad and becomes a pretender to it. [§10.3]
@@ -633,6 +640,7 @@ province config file but no file name or keys; keys below are proposed by this s
 - **D-PROV-26** (17 Oct, feedback 81) Hunting gets its own room in the woods, a lodge, game that thins and hard winters, not the bare rate everywhere. Game starts at the level the 1444 hunting leaves, so the first years don't crash; at that start a tenth of provinces (crowded woods in the steppe and India) sit near the floor and the median at plenty. The province's own ways (PROV-313) are worked out after, so the 1444 food stays at 110 %. Hard winters touch 200 to 300 provinces a year.
 - **D-PROV-27** (17 Oct, feedback 86) Tile changes are few and slow: only the five changes the tile rules (§2.1) name, one per province at a time, for gold and years, and the ground never changes. The tile a change takes is the last of its use, so the player chooses the change, not the square. Lords and the AI act by a plain rule (feed the province first: drain, irrigate, then clear woods), so the AI's land changes slowly and only where it is short.
 - **D-PROV-28** (18 Oct, feedback 93) A year's famine kills at most a fifth of a province. Without a cap, an occupied province or two failed harvests in a row could lose nine in ten of its people (Nordjylland 95 % in 1454 to 1455 on seed 1). With it, the worst two years cost about a third, and famine deaths over the first 16 years fall from about 25M to 16M while the world still grows. Some 60 to 100 provinces a year still reach the cap, mostly in the far north where the food is short every year; that is a balance question for the land, not the famine rule.
+- **D-PROV-29** (18 Oct, feedback 87) Seams come from a fixed roll per province, not the game's dice, so the geology is the same in every game and seeding never shifts the turn's rolls. A third of rough waste holds a seam (about 360 provinces), weighted to iron; silver and gold mines give three times the trade, standing in for the precious-metal flows the trade context will model. Mines need timber from a lumber camp next door at most (one ring); roads and rivers stretching that reach wait for the timber trade.
 
 ## 14. Traceability
 
@@ -819,6 +827,8 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-321 … PROV-322 | — | Presentation: apps/client/src/ui/land.ts woods sheet |
 | PROV-323 … PROV-325 | — | Engine: packages/engine/test/works.test.ts (tile changes, the AI's rule, save) |
 | PROV-326 … PROV-327 | — | Presentation: apps/client/src/ui/land.ts change block; main.ts Short of food view |
+| PROV-328 … PROV-331 | — | Engine: packages/engine/test/works.test.ts (seams, mines, saltworks, save) |
+| PROV-332 | — | Presentation: apps/client/src/ui/land.ts waste and shore sheets |
 | PROV-200 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A courtier can be granted land again |

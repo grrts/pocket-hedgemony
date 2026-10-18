@@ -7,8 +7,8 @@ import { wallsOf } from "../src/war.ts";
 import { LEDGER, LEDGER_LINES, provinceTrade } from "../src/treasury.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { hashWorld } from "../src/hash.ts";
-import { gameTarget, huntingRoom, huntingYear, tilesOf, tileCount, MAX_TILES } from "../src/land.ts";
-import { worksFood } from "../src/works.ts";
+import { gameTarget, huntingRoom, huntingYear, seamWare, SEAM_WARES, tilesOf, tileCount, MAX_TILES } from "../src/land.ts";
+import { landSheet, mineYear, worksFood, worksTrade } from "../src/works.ts";
 import { aiChanges, changeGold, changeMonths, monthlyChanges, orderChange, stopChange, whyNotChange } from "../src/conversion.ts";
 import { CLASS_COUNT, CLASS_NAMES } from "../src/living.ts";
 import { yearlyFood } from "../src/food.ts";
@@ -323,6 +323,8 @@ describe("works (milestone 4)", () => {
     w.provinceChangeTile[5] = 2;
     w.provinceChangeLeft[5] = 7;
     w.provinceHardWinter[5] = 1;
+    w.provinceSeam[5] = 3;
+    w.provinceSeamYears[5] = 17;
     const back = restoreWorld(new Map(worldChunks(w, { playerNation: "castile", options: {} as never }).map((c) => [c.id, c])), rules, {}, tiles).world;
     expect(Array.from(back.provinceTiles)).toEqual(Array.from(w.provinceTiles));
     expect(Array.from(back.provinceLandYield)).toEqual(Array.from(w.provinceLandYield));
@@ -330,5 +332,61 @@ describe("works (milestone 4)", () => {
     expect(back.provinceHardWinter[5]).toBe(1);
     expect(back.provinceChangeTile[5]).toBe(2);
     expect(back.provinceChangeLeft[5]).toBe(7);
+    expect(back.provinceSeam[5]).toBe(3);
+    expect(back.provinceSeamYears[5]).toBe(17);
+  });
+
+  it("finds seams under rough waste and stands the famous mines of 1444 (feedback 87)", () => {
+    const w = createWorldOnce();
+    const kutna = w.rules.provinces.findIndex((d) => d.name === "Středočeský");
+    expect(seamWare(w, kutna)).toBe("silver");
+    expect(worksAt(w, kutna, work("mine"))).toBe(1);
+    // Its seam shows on the waste tile of the Land tab with the mine and its silver.
+    const waste = landSheet(w, kutna).find((t) => t.use === "waste")!;
+    expect(waste.building).toContain("mine");
+    expect(waste.seam).toEqual({ ware: "silver", years: 120 });
+    expect(waste.ware?.name).toContain("silver");
+    // Hundreds of provinces hold a seam: about a third of the rough waste.
+    let seams = 0;
+    for (let p = 0; p < w.provinceCount; p++) if (w.provinceSeam[p]! >= 0) seams++;
+    expect(seams).toBeGreaterThan(200);
+  });
+
+  it("needs a seam and timber in reach for a mine, and digs the seam out year by year (feedback 87)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const n = nation(w, "castile");
+    const rough = [...Array(w.provinceCount).keys()].find((p) => w.provinceOwner[p] === n && (w.provinceGround[p] === "hills" || w.provinceGround[p] === "mountains") && tilesOf(w, p, "waste") > 0 && worksAt(w, p, work("mine")) === 0)!;
+    w.provinceSeam[rough] = -1;
+    expect(whyNot(w, n, rough, work("mine"))).toBe("no seam has been found here");
+    w.provinceSeam[rough] = SEAM_WARES.indexOf("iron");
+    w.provinceSeamYears[rough] = 2;
+    w.provinceWorks[rough * WORK_COUNT + work("lumber camp")] = 0;
+    for (let k = w.adjStart[rough]!; k < w.adjStart[rough + 1]!; k++) w.provinceWorks[w.adjList[k]! * WORK_COUNT + work("lumber camp")] = 0;
+    expect(whyNot(w, n, rough, work("mine"))).toBe("needs timber: a lumber camp here or next door");
+    w.provinceWorks[rough * WORK_COUNT + work("lumber camp")] = 1;
+    expect(whyNot(w, n, rough, work("mine"))).not.toMatch(/seam|timber/);
+    // A mine standing adds trade; silver or gold three times as much.
+    const before = worksTrade(w, rough);
+    w.provinceWorks[rough * WORK_COUNT + work("mine")] = 1;
+    const iron = worksTrade(w, rough) - before;
+    expect(iron).toBeGreaterThan(0);
+    w.provinceSeam[rough] = SEAM_WARES.indexOf("silver");
+    expect(worksTrade(w, rough) - before).toBeCloseTo(iron * 3, 5);
+    // Each January it digs a year off; when the seam runs out the mine closes.
+    const news: { text: string }[] = [];
+    mineYear(w, news as never);
+    expect(w.provinceSeamYears[rough]).toBe(1);
+    expect(worksAt(w, rough, work("mine"))).toBe(1);
+    mineYear(w, news as never);
+    expect(worksAt(w, rough, work("mine"))).toBe(0);
+    expect(seamWare(w, rough)).toBeNull();
+    expect(news.some((x) => /silver mine in .* has run out/.test(x.text))).toBe(true);
+  });
+
+  it("makes salt on a dry or warm coast (feedback 87)", () => {
+    const w = createWorldOnce();
+    const n = nation(w, "castile");
+    const p = whereFits(w, n, "saltworks");
+    expect(buildSheet(w, n, p).some((r) => r.name === "saltworks")).toBe(true);
   });
 });

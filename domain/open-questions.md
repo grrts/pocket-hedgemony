@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-549 decided and 8 still open across 29 contexts.
+550 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -330,6 +330,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-PROV-26**: (17 Oct, feedback 81) Hunting gets its own room in the woods, a lodge, game that thins and hard winters, not the bare rate everywhere. Game starts at the level the 1444 hunting leaves, so the first years don't crash; at that start a tenth of provinces (crowded woods in the steppe and India) sit near the floor and the median at plenty. The province's own ways (PROV-313) are worked out after, so the 1444 food stays at 110 %. Hard winters touch 200 to 300 provinces a year.
 - **D-PROV-27**: (17 Oct, feedback 86) Tile changes are few and slow: only the five changes the tile rules (§2.1) name, one per province at a time, for gold and years, and the ground never changes. The tile a change takes is the last of its use, so the player chooses the change, not the square. Lords and the AI act by a plain rule (feed the province first: drain, irrigate, then clear woods), so the AI's land changes slowly and only where it is short.
 - **D-PROV-28**: (18 Oct, feedback 93) A year's famine kills at most a fifth of a province. Without a cap, an occupied province or two failed harvests in a row could lose nine in ten of its people (Nordjylland 95 % in 1454 to 1455 on seed 1). With it, the worst two years cost about a third, and famine deaths over the first 16 years fall from about 25M to 16M while the world still grows. Some 60 to 100 provinces a year still reach the cap, mostly in the far north where the food is short every year; that is a balance question for the land, not the famine rule.
+- **D-PROV-29**: (18 Oct, feedback 87) Seams come from a fixed roll per province, not the game's dice, so the geology is the same in every game and seeding never shifts the turn's rolls. A third of rough waste holds a seam (about 360 provinces), weighted to iron; silver and gold mines give three times the trade, standing in for the precious-metal flows the trade context will model. Mines need timber from a lumber camp next door at most (one ring); roads and rivers stretching that reach wait for the timber trade.
 
 ### Realm (realm)
 

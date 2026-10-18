@@ -4,7 +4,7 @@ import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.t
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
-import { aiWorks, cancelWork, judgeNeglect, monthlyWorks, moveQueued, orderWork } from "./works.ts";
+import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
@@ -182,6 +182,7 @@ function startDay(world: World, news: News[]): void {
     monthlyResearch(world, news);
     runLedger(world, true);
     judgeNeglect(world);
+    if (world.date.month === 1) mineYear(world, news);
     monthlyWorks(world, news);
     aiWorks(world, news);
     monthlyChanges(world, news);
