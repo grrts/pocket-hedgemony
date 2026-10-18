@@ -1066,14 +1066,38 @@ let townLayer: TownLayer | null = null;
 
 /** Below the living band, how close the camera comes before the towns near it are laid ahead of time. */
 const TOWNS_AHEAD_ZOOM = 10;
-/** Milliseconds a frame the towns may take while being laid, so coming close never stalls a frame. */
-const TOWNS_FRAME_MS = 3;
+/** The most milliseconds one idle slice may spend laying towns; without idle callbacks (Safari) a timer slice gets the least of these. */
+const TOWNS_SLICE_MS = 8;
+const TOWNS_TIMER_SLICE_MS = 4;
+/** What the towns are being laid for: the latest turn and the map rectangles round the view. */
+let townsWanted: { s: Snapshot; rects: { x0: number; y0: number; x1: number; y1: number }[] } | null = null;
+let townsQueued = false;
 
 /**
- * The living map close in: fades the towns in over 14 to 16 (VIEW-101) and
- * lays the towns near the camera, a margin round the view so a pan finds them
- * ready, a few milliseconds a frame from zoom 10 on. Returns how strongly the
- * icons are drawn.
+ * Lays towns in idle time between frames, a slice at a time, so laying them
+ * never lengthens a frame; uploads what changed and asks for a redraw.
+ */
+function queueTowns(): void {
+  if (townsQueued) return;
+  townsQueued = true;
+  const run = (deadline: number) => {
+    townsQueued = false;
+    if (!townsWanted || !mapImage) return;
+    townLayer ??= new TownLayer(rules, mapImage);
+    const more = townLayer.update(townsWanted.s, townsWanted.rects, deadline);
+    const dirty = townLayer.takeDirty();
+    if (dirty) (view.renderer.setSettlement(townLayer.bytes, dirty), view.invalidate());
+    if (more) queueTowns();
+  };
+  if (typeof requestIdleCallback === "function") requestIdleCallback((d) => run(performance.now() + Math.min(TOWNS_SLICE_MS, Math.max(1, d.timeRemaining()))), { timeout: 200 });
+  else setTimeout(() => run(performance.now() + TOWNS_TIMER_SLICE_MS), 0);
+}
+
+/**
+ * The living map close in: fades the towns in over 14 to 16 (VIEW-101) and,
+ * from zoom 10 on, has the towns near the camera laid in idle time, a margin
+ * round the view so a pan finds them ready. Returns how strongly the icons
+ * are drawn.
  */
 function livingMap(o: OverlayContext): number {
   const fade = bandFade(o.zoom, mapDetail());
@@ -1082,7 +1106,6 @@ function livingMap(o: OverlayContext): number {
     view.invalidate();
   }
   if (!detailBands(mapDetail()).living || o.zoom < TOWNS_AHEAD_ZOOM || !snapshot || !mapImage) return fade.icons;
-  townLayer ??= new TownLayer(rules, mapImage);
   const c = view.camera;
   const margin = 12;
   const hw = o.width / 2 / o.zoom + margin, hh = o.height / 2 / o.zoom + margin;
@@ -1091,10 +1114,8 @@ function livingMap(o: OverlayContext): number {
   const x0 = Math.floor(c.x - hw), x1 = Math.ceil(c.x + hw);
   // The map wraps east-west: a view across the edge lays both sides.
   const spans = x0 < 0 ? [[x0 + W, W - 1], [0, x1]] : x1 >= W ? [[x0, W - 1], [0, x1 - W]] : [[x0, x1]];
-  const more = townLayer.update(snapshot, spans.map(([a, b]) => ({ x0: a!, y0, x1: b!, y1 })), performance.now() + TOWNS_FRAME_MS);
-  const dirty = townLayer.takeDirty();
-  if (dirty) view.renderer.setSettlement(townLayer.bytes, dirty);
-  if (more || dirty) view.invalidate();
+  townsWanted = { s: snapshot, rects: spans.map(([a, b]) => ({ x0: a!, y0, x1: b!, y1 })) };
+  queueTowns();
   return fade.icons;
 }
 

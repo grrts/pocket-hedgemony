@@ -12,9 +12,10 @@ import type { MapImage } from "./loadMap.ts";
  * province id texture. Worked out only for the provinces near the camera, the
  * first time the living band comes close, and again for a province when its
  * town's cell count or works change in a new game month (VIEW-108). Roads only
- * depend on the map, so each is laid once. All of it is done a few
- * milliseconds a frame (the map scan, then town by town), so coming close
- * never stalls a frame; the client starts it before the living band.
+ * depend on the map, so each is laid once. All of it is done in small steps
+ * up to a deadline (the map scan a few rows at a time, then town by town and
+ * road by road), so the client can run it in idle time between frames,
+ * starting before the living band.
  */
 
 const WORK = Object.fromEntries(WORKS.map((w, i) => [w, i])) as Record<string, number>;
@@ -58,6 +59,8 @@ export class TownLayer {
   private readonly orders = new Map<number, number[]>();
   private readonly towns = new Map<number, ProvinceTown>();
   private readonly roadsDone = new Set<number>();
+  /** Neighbour pairs whose road is laid, as lower × provinces + higher. */
+  private readonly pairs = new Set<number>();
   private month = "";
   private recheck: number[] = [];
   private dirty: { x0: number; y0: number; x1: number; y1: number } | null = null;
@@ -93,7 +96,7 @@ export class TownLayer {
    */
   update(s: Snapshot, rects: readonly { x0: number; y0: number; x1: number; y1: number }[], deadline: number): boolean {
     if (!this.gridReady) {
-      while (!this.scan.scan(32)) if (performance.now() >= deadline) return true;
+      while (!this.scan.scan(8)) if (performance.now() >= deadline) return true;
       this.gridReady = this.scan.grid();
     }
     const month = `${s.date.year}-${s.date.month}`;
@@ -108,10 +111,12 @@ export class TownLayer {
     }
     for (const r of rects) {
       for (const p of this.provincesIn(r)) {
-        if (this.towns.has(p) && this.roadsDone.has(p)) continue;
-        if (performance.now() >= deadline) return true;
-        if (!this.towns.has(p)) this.settle(s, p);
-        this.lay(p);
+        if (this.roadsDone.has(p)) continue;
+        if (!this.towns.has(p)) {
+          if (performance.now() >= deadline) return true;
+          this.settle(s, p);
+        }
+        if (!this.lay(p, deadline)) return true;
       }
     }
     return false;
@@ -175,21 +180,31 @@ export class TownLayer {
     this.towns.set(p, { key, tiles, hamlets: spots });
   }
 
-  /** The roads from a province's town to its neighbours' towns and from its hamlets, laid once (VIEW-113). */
-  private lay(p: number): void {
-    if (this.roadsDone.has(p)) return;
+  /**
+   * The roads from a province's town to its neighbours' towns and from its
+   * hamlets (VIEW-113), one road at a time until the deadline; each pair of
+   * neighbours is laid once. True once all of the province's roads are laid.
+   */
+  private lay(p: number, deadline: number): boolean {
     const near = this.rules.provinces[p]!.neighbors.map((id) => this.provinceIndex.get(id)).filter((q): q is number => q !== undefined && this.grid.centre[q]! >= 0);
-    // Each pair once: a neighbour whose roads are already laid has laid this one.
-    const roads: RoadLine[] = [];
+    const P = this.rules.provinces.length;
     const from = this.grid.centre[p]!;
     for (const q of near) {
-      if (this.roadsDone.has(q)) continue;
+      const pair = Math.min(p, q) * P + Math.max(p, q);
+      if (this.pairs.has(pair)) continue;
+      if (performance.now() >= deadline) return false;
+      this.pairs.add(pair);
       const path = roadPath(this.grid, from, this.grid.centre[q]!);
-      if (path) roads.push({ from, to: this.grid.centre[q]!, grade: "track", path, bridges: [] });
+      if (path) this.link([{ from, to: this.grid.centre[q]!, grade: "track", path, bridges: [] }]);
     }
+    if (performance.now() >= deadline) return false;
     this.roadsDone.add(p);
     const hamlets = this.towns.get(p)?.hamlets ?? [];
-    if (hamlets.length) roads.push(...roadLines(this.grid, [{ province: p, seed: from, roadStep: 0 }], () => [], hamlets));
+    if (hamlets.length) this.link(roadLines(this.grid, [{ province: p, seed: from, roadStep: 0 }], () => [], hamlets));
+    return true;
+  }
+
+  private link(roads: RoadLine[]): void {
     for (const [t, l] of roadLinks(this.grid, roads)) this.setLinks(t, this.links[t]! | l);
   }
 
