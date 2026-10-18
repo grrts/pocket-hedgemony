@@ -159,3 +159,4 @@ Every requirement has at least one scenario, or a line saying why not (for examp
 | ACH | achievements | achievements |
 | TUT | onboarding | tutorial |
 | AUD | audio | music-design, sound-effects |
+| BAL | balance | X-21 (Leroy, 18 Oct), DECISIONS rule 4, realm §12 scores |

@@ -1,5 +1,6 @@
 import { expect } from "vitest";
-import { ARMS, garrisonView, KIND, Rng, spawnArmy, type GarrisonView } from "@ph/engine";
+import { applyNow, ARMS, cedeProvince, createWorld, garrisonView, KIND, newLands, officialEffect as gameOfficialEffect, Rng, spawnArmy, yearsServed, type GarrisonView } from "@ph/engine";
+import { loadDefaultRuleset } from "@ph/rules";
 import { commanderAt, levyGame, province } from "./levy-game.ts";
 import * as P from "@ph/engine/domain/province";
 import type { Ground, Province, ClassName, TaxRate, Use, Lord, Official } from "@ph/engine/domain/province";
@@ -1887,6 +1888,111 @@ Then("the country card shows {int} officials", (s, n: number) => {
   expect(P.countryOfficials(s.roster)).toBe(n);
 });
 
+// Moving, swapping and hiring officials (PROV-303, PROV-333 to 335).
+Given("the province {string} is royal with its post empty", (s, name: string) => {
+  const p = prov(s, name);
+  p.lord = null;
+  p.official = null;
+  P.refreshGovernance(p);
+});
+When("the country {string} moves the official of {string} to {string}", (s, _c: string, from: string, to: string) => {
+  s.before = { [from]: prov(s, from).official, [to]: prov(s, to).official };
+  expect(P.moveOrSwapOfficial(prov(s, from), prov(s, to))).toBeNull();
+});
+Then(/^the "([^"]+)" runs "([^"]+)"(?: under his own name,)? at half his effect$/, (s, type: string, name: string) => {
+  const o = prov(s, name).official!;
+  expect(o.type).toBe(type);
+  // Under his own name: the same official as before the move, when he moved.
+  const was = Object.values((s.before ?? {}) as Record<string, Official | null>).find((x) => x?.type === type);
+  if (was) expect(o.id).toBe(was.id);
+  expect(P.officialEffectShare(o.yearsServed)).toBe(0.5);
+  expect(prov(s, name).governedBy).toBe("official");
+});
+Then("the post in {string} stands empty", (s, name: string) => {
+  expect(prov(s, name).official).toBeNull();
+  expect(P.governanceGives(prov(s, name)).ungoverned).toBe(true);
+});
+Given("the lord {string} holds {string} with an official of his own", (s, l: string, name: string) => {
+  const p = prov(s, name);
+  p.lord = l;
+  p.official = official("steward", 3, l);
+  P.refreshGovernance(p);
+});
+When("the country {string} tries to move the official of {string}", (s, _c: string, name: string) => {
+  s.refusal = P.moveOrSwapOfficial(prov(s, name), prov(s, "Paris"));
+  expect(prov(s, name).official?.employer).not.toBe("ruler");
+});
+When("the country {string} tries to commission the official of {string}", (s, _c: string, name: string) => {
+  s.refusal = P.servesTheLord(prov(s, name));
+});
+Then(/^it is refused because (.+)$/, (s, why: string) => {
+  expect(s.refusal).toBe(why);
+});
+/** Types serving in the realm's royal posts other than province `but`. */
+const serving = (s: Scenario, but: string): string[] =>
+  Object.entries((s.provinces ?? {}) as Record<string, Province>).filter(([n, p]) => n !== but && p.lord === null && p.official).map(([, p]) => p.official!.type);
+const hire = (s: Scenario, type: string, name: string, foreign: boolean) => {
+  const p = prov(s, name);
+  const gold = s.gold ?? 1e9;
+  s.refusal = P.cannotHire(p, type, foreign, serving(s, name), gold);
+  if (s.refusal) return;
+  s.paid = P.hireIntoPost(p, official(type, 0), foreign);
+  s.gold = gold - s.paid;
+};
+Given("the country {string} has {int} gold", (s, _c: string, gold: number) => {
+  s.gold = gold;
+});
+Given("the country {string} has gold to hire an official", (s) => {
+  s.gold = 1000;
+  prov(s, "Troyes").official = official("master of works", 4);
+  prov(s, "Rouen").official = null;
+});
+When(/^the country "[^"]+" (tries to hire|hires) an? (foreign )?"([^"]+)" for "([^"]+)"$/, (s, how: string, foreign: string | undefined, type: string, name: string) => {
+  hire(s, type, name, !!foreign);
+  if (how === "hires") expect(s.refusal).toBeNull();
+});
+When(/^the country "[^"]+" hires a foreign ([^"]+)$/, (s, type: string) => {
+  hire(s, type, "Rouen", true);
+  expect(s.refusal).toBeNull();
+});
+Then("it pays more than for a native {}", (s, type: string) => {
+  expect(s.paid).toBeGreaterThan(P.hirePrice(false));
+});
+Then("the country {string} has {int} gold left", (s, _c: string, gold: number) => {
+  expect(s.gold).toBe(gold);
+});
+When("the country {string} tries to hire a {string} for {string}, held by the lord {string}", (s, _c: string, type: string, name: string, l: string) => {
+  const p = prov(s, name);
+  p.lord = l;
+  p.official = null;
+  hire(s, type, name, false);
+});
+Given("no {string} serves in a royal post of {string}", (s, type: string) => {
+  expect(serving(s, "").includes(type)).toBe(false);
+});
+
+// Officials in the game (PROV-304, PROV-305).
+When("a new campaign starts", (s) => {
+  s.game = createWorld(loadDefaultRuleset(), 1);
+});
+Then("each official has served between 0 and 10 years in his province", (s) => {
+  const w = s.game;
+  const years: number[] = [];
+  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOfficial[p] >= 0) years.push(yearsServed(w, p));
+  expect(years.length).toBeGreaterThan(100);
+  expect(Math.min(...years)).toBeGreaterThanOrEqual(0);
+  expect(Math.max(...years)).toBeLessThanOrEqual(10);
+  s.years = years;
+});
+Then("not every official has served the same number of years", (s) => {
+  expect(new Set(s.years.map((y: number) => Math.floor(y))).size).toBeGreaterThan(5);
+});
+Then(/^his effect shows as waiting until (buildings|schools) are in the game$/, (s, system: string) => {
+  const o = cur(s).official!;
+  const type = o.type[0]!.toUpperCase() + o.type.slice(1);
+  expect(gameOfficialEffect(type, o.yearsServed).note).toBe(`Takes effect when ${system} arrive`);
+});
+
 // ---------------------------------------------------------------- lords
 
 Given("the lord {string} holds only the province {string}", (s, l: string, name: string) => {
@@ -2952,4 +3058,25 @@ Then("it lists the gathering levies with the days left", (s) => {
 });
 Then("it lists the commanders present who can pick them up", (s) => {
   expect((s.garrisonTab as GarrisonView).commanders).toEqual([s.present]);
+});
+
+// Land just taken (PROV-340).
+Given("the player plays the country {string}", (s, c: string) => {
+  s.game = createWorld(loadDefaultRuleset(), 1);
+  s.me = s.game.nationIndex.get(c.toLowerCase())!;
+  s.game.player = s.me;
+});
+When("a neighbour hands the country {string} one of its provinces", (s) => {
+  const w = s.game;
+  s.taken = Array.from({ length: w.provinceCount }, (_, p) => p).find((p) => w.provinceOwner[p] >= 0 && w.provinceOwner[p] !== s.me && w.provinceOfficial[p] >= 0)!;
+  cedeProvince(w, s.taken, s.me, []);
+});
+Then("the province's post stands empty", (s) => {
+  expect(s.game.provinceOfficial[s.taken]).toBe(-1);
+  expect(s.game.provinceLord[s.taken]).toBe(-1);
+});
+Then("End turn waits until the player fills the post, grants it to a lord or keeps it royal", (s) => {
+  expect(newLands(s.game, s.me)).toEqual([s.taken]);
+  expect(applyNow(s.game, { type: "settleLand", province: s.taken }, s.me).rejectedOrders).toEqual([]);
+  expect(newLands(s.game, s.me)).toEqual([]);
 });

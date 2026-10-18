@@ -2,7 +2,7 @@ import { expect } from "vitest";
 import * as R from "@ph/engine/domain/recruiting";
 import { provinceConfig } from "@ph/engine/domain/province";
 import { type MoveWorld, type Place } from "@ph/engine/domain/troop-movement";
-import { aiCollect, applyNow, ARMS, commanderScreen, createWorld, cultureOf, garrisonTroops, garrisonView, gatherDays, idleCommanders, KIND, LEVY_UNIT, menByArm, monthlyRecruits, personName, rankedName, Rng, spawnArmy, trainingGround, WORK_COUNT, workIndex, type CommanderScreen, type Order } from "@ph/engine";
+import { aiCollect, applyNow, ARMS, commanderScreen, commissionOfficial, createWorld, cultureOf, OFFICIALS, recruit, type World, garrisonTroops, garrisonView, gatherDays, idleCommanders, KIND, LEVY_UNIT, menByArm, monthlyRecruits, personName, rankedName, Rng, spawnArmy, trainingGround, WORK_COUNT, workIndex, type CommanderScreen, type Order } from "@ph/engine";
 import { commanderAt, garrisonMen, levyGame, playDays, province, type LevyGame } from "./levy-game.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { steps, type Scenario } from "../src/registry.ts";
@@ -580,8 +580,8 @@ Then("the Marshal's best skill is 2", (s) => {
   expect(R.idleMarshal(3, 9)).toBe(3);
 });
 
-Then("the country pays 10 gold once", (s) => {
-  expect(s.cost).toBe(10);
+Then("the country pays 50 gold once", (s) => {
+  expect(s.cost).toBe(50);
 });
 Then(re("the field wage is (\\d+) gold a month"), (s, w: string) => {
   expect(s.commission.wage).toBe(num(w));
@@ -1823,4 +1823,49 @@ Then("training is ordered from it", (s) => {
   expect(v.canTrain).toBe(true);
   expect(order(g, { type: "train", army: s.laHire.army, arm: "pikes", men: 1000 })).toBeUndefined();
   expect(commanderScreen(g.w, g.n, s.laHire.army)!.training).toEqual({ arm: "pikes", men: 1000, monthsLeft: 3 });
+});
+
+// ---------------------------------------------------------------- commanders in the game (RECR-111, RECR-114)
+
+/** The 1444 game with France playing (levy-game.ts). */
+function gameFrance(s: Scenario): { w: World; n: number } {
+  return levyGame(s);
+}
+function royalPostOf(w: World, n: number, type: string): number {
+  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === n && w.provinceLord[p]! < 0 && OFFICIALS[w.provinceOfficial[p]!] === type) return p;
+  throw new Error(`no royal ${type}`);
+}
+Given('the country "France" raises a new army', (s) => {
+  const { w, n } = gameFrance(s);
+  const capital = w.provinceIndex.get(w.rules.nations[n]!.capital)!;
+  w.nationTreasury[n] = 10_000;
+  s.commanders = w.commanderIds.length;
+  s.armies = w.armies.count;
+  expect(recruit(w, n, capital, 1, [])).toBeNull();
+  playDays(levyGame(s), 28);
+  s.at = capital;
+});
+Then("the army has no commander until the player commissions an official or one already serving takes it", (s) => {
+  const { w, n } = gameFrance(s);
+  // The men stand in the province without a commander: no commander was made for them.
+  expect(w.commanderIds.length).toBe(s.commanders);
+  expect(commissionOfficial(w, n, royalPostOf(w, n, "Steward"), [])).toBeNull();
+  expect(w.commanderIds.length).toBe(s.commanders + 1);
+});
+Then("no commander is attached to an army by default", (s) => {
+  const { w } = gameFrance(s);
+  for (let i = s.armies; i < w.armies.count; i++) if (w.armies.alive[i]) expect(w.armies.commander[i]).toBe(-1);
+});
+Given('the country "France" has 60 gold', (s) => {
+  const { w, n } = gameFrance(s);
+  w.nationTreasury[n] = 60;
+});
+When('the player commissions the steward of "Reims"', (s) => {
+  const { w, n } = gameFrance(s);
+  // Reims stands for any royal province of France with a steward.
+  expect(commissionOfficial(w, n, royalPostOf(w, n, "Steward"), [])).toBeNull();
+});
+Then("France has 10 gold left", (s) => {
+  const { w, n } = gameFrance(s);
+  expect(w.nationTreasury[n]).toBe(10);
 });

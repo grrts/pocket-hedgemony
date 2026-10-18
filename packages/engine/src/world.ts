@@ -33,6 +33,8 @@ import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
 import { createRevolutionState, type RevolutionState } from "./revolutions.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
+import { seedStartingFleets } from "./startingFleets.ts";
+import { refreshFreeFleets } from "./hiredFleets.ts";
 import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import type { AchievementLog } from "./achievements.ts";
@@ -138,6 +140,10 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   provinceOfficialSeed: Int16Array;
   /** Day (world.day) the official at each post took it up; his years served count from it. */
   provinceOfficialSince: Int32Array;
+  /** Realm a foreign specialist at each post came from, -1 = one of the realm's own (PROV-334). */
+  provinceOfficialFrom: Int16Array;
+  /** 1 while a province the player has just taken waits for him to fill its post, grant it or keep it royal (PROV-340). */
+  provinceNewLand: Uint8Array;
   /** Province each commander was commissioned from, -1 = none. */
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
@@ -488,6 +494,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedResearch(world);
   if (opts.seedTrade !== false) seedTrade(world);
   seedNavy(world);
+  // Realms that had ships in 1444 start with them, and free fleets gather for hire (F-115).
+  seedStartingFleets(world);
+  refreshFreeFleets(world);
   seedRegions(world);
   seedCharts(world);
   recount(world);
