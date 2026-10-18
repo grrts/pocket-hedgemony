@@ -810,13 +810,13 @@ Then("the old form of {string} is {string}", (s, name: string, f: string) => {
   expect(formName((c.state ?? governmentState(c.form)).oldForm)).toBe(f);
 });
 
-Given("the country {string} has the form {string} and the tongue {string}", (s, name: string, f: string, tongue: string) => {
+Given("the country {string} has the form {string} and the language {string}", (s, name: string, f: string, tongue: string) => {
   const c = country(s, name);
   c.form = formIdFromName(f);
   c.tongue = tongue;
 });
 
-Given("the largest tongue of the province {string} of {string} is {string}", (s, province: string, _name: string, tongue: string) => {
+Given("the largest language of the province {string} of {string} is {string}", (s, province: string, _name: string, tongue: string) => {
   s.provinceTongues ??= new Map<string, string>();
   s.provinceTongues.set(province, tongue);
 });

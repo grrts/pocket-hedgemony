@@ -73,7 +73,7 @@ Each form sets the officials and lords it supports, a change to subject reach, i
 
 - **Subject reach** starts from the catalogue's administrative capacity (very low 2, low 3, moderate 5, high 7, very high 9) and the form adds or takes away. A colonial government has none and can't hold subjects. See [Subjects](Subjects).
 - **Colonial range** is how many sea zones from your nearest port or colony you may found a colony. See [Exploration-and-Colonies](Exploration-and-Colonies).
-- **Self-run forms**: under a clan council or chiefdom, provinces of your own people need no official, so *Ungoverned* never appears there; provinces of another people still need one. A province is of your own people when its largest tongue is your realm's tongue. A related tongue doesn't count: under Gowa (Makassarese), Buginese Bone still needs an official.
+- **Self-run forms**: under a clan council or chiefdom, provinces of your own people need no official, so *Ungoverned* never appears there; provinces of another people still need one. A province is of your own people when its largest language is your realm's language. A related language doesn't count: under Gowa (Makassarese), Buginese Bone still needs an official.
 - **Monarchies**: the forms that count as monarchies (for example for the Inquisition, see [Religion](Religion)) are every house form plus the chiefly and warrior monarchies: paramount chiefdom, tribute empire, warlord domain, shogunate and soldier emirs.
 - A colonial governor holding a governor slot doesn't count toward the officials cap; once his colony is founded he counts as its official.
 
@@ -210,7 +210,7 @@ The General tab shows one line with your form and both caps, red when you are ov
 - [Research](Research): G1, G2, G3, G4, G6, G9, G11, G14 and W12 as needs.
 - [National-Strengths](National-Strengths): additions to caps (for example +2 officials for Venice).
 - [Religion](Religion): a change of state faith opens the faith forms' reform; the Inquisition is open to monarchies.
-- [Culture](Culture): a province's largest tongue, which decides "own people" for self-run forms.
+- [Culture](Culture): a province's largest language, which decides "own people" for self-run forms.
 - [Warfare](Warfare): army coups and the shogun's capital.
 - [Trade](Trade): traders abroad and trade debt as reform needs.
 - [Diplomacy](Diplomacy): alliances with neighbours as a need.

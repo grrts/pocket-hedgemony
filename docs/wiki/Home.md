@@ -38,7 +38,7 @@ This wiki explains every system in the game and how it works. Each page is writt
 | [Diplomacy](Diplomacy) | Envoys, relations, the reasons count, war aims, peace and truces |
 | [Subjects](Subjects) | Overlords and subjects, loyalty, folding a subject in |
 | [Government](Government) | Forms of rule, the caps on officials and lords, reforms |
-| [Culture](Culture) | Tongues, kin and strangers, how tongues drift |
+| [Culture](Culture) | Languages, how close each is to yours, how languages drift |
 | [Religion](Religion) | Faiths, the faith mix, preachers, holy places |
 | [Rebellions](Rebellions) | Grievances, risings and how to answer them |
 

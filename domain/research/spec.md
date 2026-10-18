@@ -341,7 +341,7 @@ they did by then; L23 and L24 are dropped (D-RSCH-1).
 - RSCH-066: G8 shall also let a country ask for passage; G3 and G10 shall take effect only while the realm has a chancery; W15 shall give +50 % recruits and W12 a troop cap of +0.5 % of people. There is no staff college: academy graduates are the commanders' school. [diplomacy §18, buildings §18, warfare §12, X-7, D-RSCH-5]
 - RSCH-067: Each monthly research step shall add a twelfth of the year's scholar-years to the current study or studies, and an invention shall be known in the month its progress reaches its cost. [X-2, D-RSCH-6]
 - RSCH-068: With two studies, each shall get half the scholar-years; one open academy anywhere in the realm shall be enough for two studies. [D-RSCH-7]
-- RSCH-069: L5, L14 and L21 shall each raise the discount per neighbour or trade partner by a fifth of the base (10 % → 12 % → 14 % → 16 %); the 60 % cap shall not change, and a neighbour of the same tongue family shall count once like any other. [D-RSCH-8]
+- RSCH-069: L5, L14 and L21 shall each raise the discount per neighbour or trade partner by a fifth of the base (10 % → 12 % → 14 % → 16 %); the 60 % cap shall not change, and a neighbour of the same language family shall count once like any other. [D-RSCH-8]
 - RSCH-070: With L18 each province without a school shall have 10 village-school seats, which cost no upkeep. School upkeep shall be a temple or monastery school 2 gold a year, a madrasa or university 4, an academy 6. [D-RSCH-9]
 - RSCH-071: When a country occupies an enemy province with an open school, each of its current studies that the enemy knows shall gain 10 % of its cost before discounts, once per province per war. [D-RSCH-10]
 - RSCH-072: When a battle is fought in a province with an open school, the school shall be sacked (lost) with a chance of 25 %; then half the province's scholars flee to the first peaceful neighbouring country in nation-index order, or are lost when none is at peace. [D-RSCH-10]
@@ -559,7 +559,7 @@ castles*: they defend with B4 earthworks until they learn dressed stone.
 - When exploration or events report a contact event, then open the matching contact inventions.
 - When province reports famine or plague, then lose students and scholars there.
 - When warfare reports an occupied enemy province with an open school, then each current study the enemy knows gains 10 % of its cost, once per province per war (RSCH-071).
-- A neighbour of the same tongue family counts once, like any other neighbour (D-RSCH-8: culture's request to count it double is not taken).
+- A neighbour of the same language family counts once, like any other neighbour (D-RSCH-8: culture's request to count it double is not taken).
 
 ## 9. Monthly step
 

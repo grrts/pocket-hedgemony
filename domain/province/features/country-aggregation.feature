@@ -11,20 +11,20 @@ Feature: Provinces add up to the country card
     Then the country stat "<stat>" is the sum of <sum>
 
     Examples:
-      | stat                        | sum                                                                  |
-      | Gold income                 | tax reaching you plus trade income over all provinces                |
-      | People                      | people plus refugees                                                 |
-      | Recruits                    | recruits here in royal provinces only                                |
-      | Food                        | local stores and castle stores                                       |
-      | Hungry                      | provinces with the "Hungry" grievance                                |
-      | Horses                      | horse studs and ranches                                              |
-      | Ships                       | ships built at shipyards and based at harbours                       |
-      | Castles                     | castle buildings                                                     |
-      | Faith                       | the people-weighted faith mix                                        |
-      | Tongue                      | the people-weighted tongue mix                                       |
-      | In revolt                   | provinces with riots or rebels                                       |
-      | Schools, Students, Scholars | school buildings, students here and scholars here                    |
-      | Officials                   | your officials in royal provinces and seats                          |
+      | stat                        | sum                                                   |
+      | Gold income                 | tax reaching you plus trade income over all provinces |
+      | People                      | people plus refugees                                  |
+      | Recruits                    | recruits here in royal provinces only                 |
+      | Food                        | local stores and castle stores                        |
+      | Hungry                      | provinces with the "Hungry" grievance                 |
+      | Horses                      | horse studs and ranches                               |
+      | Ships                       | ships built at shipyards and based at harbours        |
+      | Castles                     | castle buildings                                      |
+      | Faith                       | the people-weighted faith mix                         |
+      | Language                    | the people-weighted language mix                      |
+      | In revolt                   | provinces with riots or rebels                        |
+      | Schools, Students, Scholars | school buildings, students here and scholars here     |
+      | Officials                   | your officials in royal provinces and seats           |
 
   @PROV-260
   Scenario: Lords' recruits and officials stay on their own cards

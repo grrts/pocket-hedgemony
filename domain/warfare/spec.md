@@ -594,7 +594,7 @@ Newest decision first.
 - WAR-170 The warfare system shall end a siege by honours of war (garrison marches out with arms to the nearest friendly castle, castle taken whole; terms kept build trust, breaking them is an oath broken), surrender (garrison become prisoners), storm (garrison killed or taken; besieger chooses Spare, Plunder or Raze), relief (a castle-side army wins against the besiegers; the garrison joins as a reserve with +10 % strength), or lifting (the besiegers leave). [warfare §8.5]
 - WAR-171 When a stormed castle is plundered, the warfare system shall give gold equal to a year of the province's tax owed, burn 1 in 3 town buildings, kill or drive off 10 % of townsfolk, and add *Burned homes*; when it is razed, it shall destroy the castle. [warfare §8.5; province §11]
 - WAR-172 The warfare system shall have an AI garrison accept honours when it has a breach or under a month of food and no relief army within 10 days; it shall never accept terms from a Cruel commander. [warfare §8.5]
-- WAR-173 The warfare system shall let a besieger bribe the garrison's captain only when its pay is owed 2 months or more, the castle belongs to a disloyal or wavering lord, or the captain's tongue differs from his ruler's; a Greedy commander inside takes it; a Greedy commander outside pockets a tenth. [warfare §8.6]
+- WAR-173 The warfare system shall let a besieger bribe the garrison's captain only when its pay is owed 2 months or more, the castle belongs to a disloyal or wavering lord, or the captain's language differs from his ruler's; a Greedy commander inside takes it; a Greedy commander outside pockets a tenth. [warfare §8.6]
 - WAR-174 When an army takes a castle, the warfare system shall give it the castle store and the province's food spread (castle as food hub). [warfare §8.7, §6.3]
 
 ### 5.18 Occupation and raids
@@ -898,7 +898,7 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | rebellions | upstream | Customer–Supplier | Rebel bands formed (kind Rebel band); WAR → REBL battles |
 | government | upstream | Conformist | Ruler warlike, regency, succession war |
 | subjects | upstream | Conformist | Subject armies joining by kind; "Break a subject", "Become a subject" terms |
-| culture | upstream | Conformist | Homeland tongue (+10 % locals, +5 % break point, guerrilla styles), culture group for style fallback, captain's tongue for bribes |
+| culture | upstream | Conformist | Homeland language (+10 % locals, +5 % break point, guerrilla styles), culture group for style fallback, captain's language for bribes |
 | religion | upstream | Conformist | Persecution flag for *Defend the faith* |
 | events | downstream | Published Language | `prestige` ← victories, `war_weariness` ← Fallen and peace voices; events offering the throne to "their man" generals |
 | scenario-setup | upstream | Conformist | Risk tolerance for AI standing orders (D-WAR-14); starting styles per country (*From* column), capture warfare realms, starting castles, start inventions |

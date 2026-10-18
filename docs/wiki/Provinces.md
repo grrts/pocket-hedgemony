@@ -63,7 +63,7 @@ On top of that:
 
 - An attacker coming over a river shore tile fights at −20 %, unless the province has a bridge.
 - The defender gets +5 % for every two woods tiles, up to +15 %.
-- A defending army of the province's homeland tongue gets a further +10 % in hills, mountains, forest, jungle and marsh.
+- A defending army of the province's homeland language gets a further +10 % in hills, mountains, forest, jungle and marsh.
 - If the province has a castle tile, the defender fights from the walls (see [Warfare](Warfare)).
 - **Foraging** is how much an army can take from the tiles before it starts burning them. Burned tiles give nothing to forage.
 - An army that stays in a province loses its ground's **sickness** each month, worst for soldiers not born on that ground.
@@ -208,7 +208,7 @@ Rebels muster from the province's recruits, like any levy.
 
 - **People** is everyone in the province, summed over classes.
 - **Refugees** shelter outside the classes, eat without working at first, go home when it is safe, and after 2 years settle and overflow into slots (or become homeless). Fleeing craftsmen and scholars keep their class if a slot is free. If 2,000 refugees from Troyes shelter in Sens, they go home once Troyes is safe.
-- **Faith and tongue mix** store the top three of each; the country's Faith and Tongue percentages are their people-weighted sums. Persecution makes people flee and take their faith and crafts elsewhere. See [Religion](Religion) and [Culture](Culture).
+- **Faith and language mix** store the top three of each; the country's Faith and Language percentages are their people-weighted sums. Persecution makes people flee and take their faith and crafts elsewhere. See [Religion](Religion) and [Culture](Culture).
 
 ### Recruits, students and scholars
 
@@ -255,8 +255,8 @@ Troyes, at normal tax, owes 11 gold a year and all 11 reach you: it is 3 days fr
 - When a lord's line dies out, his province returns to royal and needs an official.
 - **Officials at work.** Who governs a province is the first thing on its card. Each official's type helps the province he runs: a tax collector brings in more tax, a steward more food from the harvest, a muster master refills recruits faster, a customs officer adds trade, a warden makes the garrison harder to storm, a judge keeps riots down. He gives half his effect in his first year and all of it after 5 years there, shown as five pips. The country card's **Officials** tab lists every official with his post, province, effect and years; open one and **Move to another province** lists your royal provinces, the best fit for his type first, to swap him with the official there or move him into an empty post. Whoever moves starts again at half. A lord's officials serve the lord: you can't move or commission them.
 - **Occupied**: while an enemy holds the castle, or holds a province with no castle for a season. Months of occupation are counted.
-- **Years held** counts years since this owner gained it. The longer it is held, the faster tongue and faith shift and the faster *Foreign rule* fades.
-- **Homeland of**: set at start from the catalogue; a people gains it by making up most of the province for 100 years and loses it after being gone 100 years. A homeland held by a ruler of another tongue has *Foreign rule*, and separatist events start there.
+- **Years held** counts years since this owner gained it. The longer it is held, the faster language and faith shift and the faster *Foreign rule* fades.
+- **Homeland of**: set at start from the catalogue; a people gains it by making up most of the province for 100 years and loses it after being gone 100 years. A homeland held by a ruler of another language has *Foreign rule*, and separatist events start there.
 - **Pretenders** are gained by inheritance and marriage, by losing the province in war (the old ruler keeps a right for 50 years) and by buying a title; lost by death without heirs, renouncing in a peace, marrying into your house, and time.
 
 ### Officials
@@ -272,7 +272,7 @@ Every official has a **type** and runs **one province**; a seat needs one of its
 | Muster master | Recruits refill 25 % faster |
 | Customs officer | +15 % trade gains |
 | Chaplain | Faith mix moves twice as fast toward the ruler's faith |
-| Schoolmaster | Tongue mix moves twice as fast toward the ruler's tongue; students graduate a year sooner |
+| Schoolmaster | Language mix moves twice as fast toward the ruler's language; students graduate a year sooner |
 | Warden | Garrison fights 25 % better; walls repair twice as fast; castle store rots half as fast |
 | Colonial governor | No effect of his own: founds a colony, then becomes its ordinary official. Needs a colonial governor slot and doesn't count against the officials cap while holding one |
 
@@ -325,14 +325,14 @@ There is no anger meter. A province has a list of **grievances**, each a named c
 | Soldiers quartered | Any army stays more than a season | It leaves; a no-quartering charter |
 | Burned homes | Any burned tile | All tiles rebuilt |
 | Conscription | Recruits below a quarter of the pool | Refilled to half |
-| Foreign rule | A homeland held by a ruler of another tongue | Enough years held; a lord of the local tongue; the majority changes |
+| Foreign rule | A homeland held by a ruler of another language | Enough years held; a lord of the local language; the majority changes |
 | Wrong faith | Most people don't share the ruler's faith | Conversion; a faith tolerance charter |
 | Ungoverned | No official (a royal province without yours, or a lord's without his) | An official is assigned |
-| Harsh lord | The lord is Cruel or Greedy, or hostile to the people's faith or tongue | The lord changes |
+| Harsh lord | The lord is Cruel or Greedy, or hostile to the people's faith or language | The lord changes |
 | Broken charter | A charter revoked in the last 20 years | Time |
 | Far from the throne | Days to capital above the limit | A seat nearby; roads; moving the capital |
 | Plague | An outbreak here | It burns out |
-| Bloodshed | A rising of the same faith or tongue was massacred in the last 20 years | Time |
+| Bloodshed | A rising of the same faith or language was massacred in the last 20 years | Time |
 | Requisitioned | An army, yours or anyone's, takes food from the store | A season after the last taking |
 | Neighbour in revolt | A neighbouring province has rebels with a grievance this one shares | Those rebels are beaten or satisfied |
 
@@ -364,7 +364,7 @@ See [Exploration and Colonies](Exploration-and-Colonies).
 
 ### Adding up to the country card
 
-Each province supplies your country card's sums: gold income, people (people plus refugees), recruits (royal provinces only), food, horses, ships, castles, faith and tongue, in revolt, schools, students and scholars, and officials. See [Your Realm](Your-Realm).
+Each province supplies your country card's sums: gold income, people (people plus refugees), recruits (royal provinces only), food, horses, ships, castles, faith and language, in revolt, schools, students and scholars, and officials. See [Your Realm](Your-Realm).
 
 ### When events touch a province
 
@@ -431,7 +431,7 @@ Every province is laid out in **4 to 16 tiles** from the map: bigger provinces h
  Tax       normal                 11 gold owed · 9 reach you
  Recruits  1,100                  40 at school
  Castle    stone · 300 garrison   walls whole · 6 months siege store
- Faith     Catholic 100 %         Tongue French 94 % · Flemish 6 %
+ Faith     Catholic 100 %         Language French 94 % · Flemish 6 %
  Grievances (2): soldiers quartered, burned homes          Rebels: none
 ```
 
@@ -456,7 +456,7 @@ The tile row is the province: tap a tile to see its building, its workers and wh
 - [Rebellions](Rebellions): grievances, homeless share and leaders; owns how risings start.
 - [Revolutions](Revolutions): grievances and class shares read as signs.
 - [Religion](Religion): faith mix, houses of worship, chaplains, *Wrong faith*.
-- [Culture](Culture): tongue mix, *Foreign rule*, officials' tongue.
+- [Culture](Culture): language mix, *Foreign rule*, officials' language.
 - [Government](Government): caps on officials and lords; seats.
 - [Exploration and Colonies](Exploration-and-Colonies): colonial governors and founding colonies.
 - [Subjects](Subjects): provinces governed by a subject ruler; colony stages.
@@ -527,7 +527,7 @@ All province numbers are placeholders, kept in one province data file.
 - A customs officer adds 15 % to trade gains; fees and tolls are collected in full with or without him.
 - A judge raises the bar for riots by one grievance.
 - Armies lose men to sickness each month: none in healthy land, 1 % at medium, 2 % in high, hot, cold or fever land.
-- An official learns a province in 5 years among his own people, 7 among related peoples and 10 among strangers. One official runs more provinces as you learn the right government inventions.
+- An official learns a province in 5 years among his own people, 7 among a related language and 10 among a foreign one. One official runs more provinces as you learn the right government inventions.
 
 ## Still open
 

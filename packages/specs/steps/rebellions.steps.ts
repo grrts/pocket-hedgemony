@@ -504,7 +504,7 @@ Given("a tax rising holds the province {string}", (s, name: string) => {
 });
 const CONDITIONS: [RegExp, string][] = [
   [/^has the same grievance$/, "same grievance"],
-  [/^shares the rebels' faith$/, "shares faith or tongue"],
+  [/^shares the rebels' faith$/, "shares faith or language"],
   [/^is joined to "[^"]+" by a road, a river and traders$/, "roads, rivers and traders"],
   [/^has many homeless$/, "many homeless"],
   [/^is owned by a country whose army is away at war$/, "owner's army away at war"],

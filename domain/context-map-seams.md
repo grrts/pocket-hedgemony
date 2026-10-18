@@ -147,7 +147,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | audio | upstream | Conformist | Player's primary culture group and its changes; culture mix |
-| culture | downstream | Published Language | Music palette follows the court tongue's family; palettes for the 4 new families |
+| culture | downstream | Published Language | Music palette follows the court language's family; palettes for the 4 new families |
 
 ## audio ↔ diplomacy (one-sided)
 
@@ -340,7 +340,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | upstream | Customer–Supplier | Schools carry a teaching tongue; Teach raises their upkeep 10 % |
+| culture | upstream | Customer–Supplier | Schools carry a teaching language; Teach raises their upkeep 10 % |
 
 ## buildings ↔ diplomacy (one-sided)
 
@@ -498,7 +498,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Published Language | Family warmth (+1 / +2 steps), natural rival after nationalism, marriages make lords kin; diplomacy owns the war aims *Gather our kin* and *Free a people*, culture supplies their conditions (D-CULT-12) |
+| culture | downstream | Published Language | Family warmth (+1 / +2 steps), natural rival after nationalism, marriages make lords count as the same language; diplomacy owns the war aims *Gather our kin* and *Free a people*, culture supplies their conditions (D-CULT-12) |
 | diplomacy | upstream | Conformist | Same culture group, homelands, accepted cultures |
 
 ## culture ↔ events
@@ -506,55 +506,55 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | culture | upstream | Published Language | `culture_groups` enum (+4 families), `spread`, nationalism `ideology_support`, new verbs and triggers, migrations, the culture effects for events in §6.1 |
-| events | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11, D-EVT-12): culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new tongues abroad"; culture effects on listed events; nationalism read from ideology_support |
+| events | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11, D-EVT-12): culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new languages abroad"; culture effects on listed events; nationalism read from ideology_support |
 
 ## culture ↔ government
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Customer–Supplier | Settled: no capacity weight by tongue (D-CULT-1) and no limits on Tongue policy by form (D-CULT-2); culture reads the form only for a released country |
-| government | upstream | Customer–Supplier | A province's largest tongue and the realm's tongue, for self-run "own people" (D-GOV-13); the 1.5 stranger weight is dropped (D-GOV-5) and forms set no tongue policy limits (D-GOV-6) |
+| culture | downstream | Customer–Supplier | Settled: no capacity weight by language (D-CULT-1) and no limits on Language policy by form (D-CULT-2); culture reads the form only for a released country |
+| government | upstream | Customer–Supplier | A province's largest language and the realm's language, for self-run "own people" (D-GOV-13); the 1.5 weight for foreign-language provinces is dropped (D-GOV-5) and forms set no language policy limits (D-GOV-6) |
 
 ## culture ↔ map-presentation
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Published Language | Tongue lens at three zooms, dots, outlines |
-| map-presentation | upstream | Published Language | Tongue lens and toggle |
+| culture | downstream | Published Language | Language lens at three zooms, dots, outlines |
+| map-presentation | upstream | Published Language | Language lens and toggle |
 
 ## culture ↔ national-strengths
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | upstream | Customer–Supplier | Tongue-based strengths (trading network, chancery tradition) |
+| culture | upstream | Customer–Supplier | Language-based strengths (trading network, chancery tradition) |
 | national-strengths | downstream | Published Language | tongue_shift_pct (provisional) |
 
 ## culture ↔ naval (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Conformist | Seafaring tongues drift slowly on islands; sailors keep their tongue |
+| culture | downstream | Conformist | Seafaring languages drift slowly on islands; sailors keep their language |
 
 ## culture ↔ province
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | partnership | Shared Kernel | Tongue mix (top three), homeland, years held, officials and their tongue, charters (*Own tongue*), grievances (*Banned tongue*, *Foreign rule*); proposed changes to 6.4, 10.2, 10.4, 12.1 |
-| province | upstream | Customer–Supplier | Tongue mix drift, *Foreign rule*, *Banned tongue*, *Own tongue* charter, officials' tongue, settlers to own provinces |
+| culture | partnership | Shared Kernel | Language mix (top three), homeland, years held, officials and their language, charters (*Own language*), grievances (*Banned language*, *Foreign rule*); proposed changes to 6.4, 10.2, 10.4, 12.1 |
+| province | upstream | Customer–Supplier | Language mix drift, *Foreign rule*, *Banned language*, *Own language* charter, officials' language, settlers to own provinces |
 
 ## culture ↔ realm
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Customer–Supplier | Tongue % on the country card (cousins half, D-CULT-6); lords' loyalty: "shares your tongue" cause for kin, stranger starts a step lower (D-CULT-8), one waver when Impose is set (D-CULT-7), court goes native; dynasty changes upstream |
-| realm | upstream | Customer–Supplier | Tongue %, cousins counted half, kin lords' loyalty |
+| culture | downstream | Customer–Supplier | Language % on the country card (related languages half, D-CULT-6); lords' loyalty: "shares your language" cause for the same language, foreign starts a step lower (D-CULT-8), one waver when Impose is set (D-CULT-7), court goes native; dynasty changes upstream |
+| realm | upstream | Customer–Supplier | Language %, related languages counted half, same-language lords' loyalty |
 
 ## culture ↔ rebellions
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Customer–Supplier | Homeland risings draw 8 %, demand a new country at ≥ 0.5 (released country per D-CULT-16); demands for *Own tongue* charter; *Banned tongue* not given under a local official (D-CULT-11) |
-| rebellions | upstream | Customer–Supplier | Homeland risings draw 8 % of the tongue; with nationalism 0.5+ they demand a new country; *Banned tongue* grievance |
+| culture | downstream | Customer–Supplier | Homeland risings draw 8 %, demand a new country at ≥ 0.5 (released country per D-CULT-16); demands for *Own language* charter; *Banned language* not given under a local official (D-CULT-11) |
+| rebellions | upstream | Customer–Supplier | Homeland risings draw 8 % of the language; with nationalism 0.5+ they demand a new country; *Banned language* grievance |
 
 ## culture ↔ recruiting (one-sided)
 
@@ -580,21 +580,21 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | partnership | Customer–Supplier | Creole tongues and nationalism thresholds as signs; regimes use `set_court_tongue` |
-| revolutions | upstream | Customer–Supplier | Nationalism thresholds 0.3 / 0.5 read by liberal and national signs; creole tongues; `set_court_tongue` used by regimes |
+| culture | partnership | Customer–Supplier | Creole languages and nationalism thresholds as signs; regimes use `set_court_tongue` |
+| revolutions | upstream | Customer–Supplier | Nationalism thresholds 0.3 / 0.5 read by liberal and national signs; creole languages; `set_court_tongue` used by regimes |
 
 ## culture ↔ scenario-setup
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Published Language | Court tongue and province top three tongues at start |
-| scenario-setup | downstream | Customer–Supplier | Tongue mix; homelands |
+| culture | downstream | Published Language | Court language and province top three languages at start |
+| scenario-setup | downstream | Customer–Supplier | Language mix; homelands |
 
 ## culture ↔ subjects
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | downstream | Customer–Supplier | Subject of your court tongue integrates faster; a stranger subject's independence war draws its people |
+| culture | downstream | Customer–Supplier | Subject of your court language integrates faster; a foreign-language subject's independence war draws its people |
 | subjects | upstream | Conformist | Same people, accepted cultures |
 
 ## culture ↔ time-and-turns
@@ -615,13 +615,13 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | culture | downstream | Customer–Supplier | Garrison bribes; locals know the land |
-| warfare | upstream | Conformist | Homeland tongue (+10 % locals, +5 % break point, guerrilla styles), culture group for style fallback, captain's tongue for bribes |
+| warfare | upstream | Conformist | Homeland language (+10 % locals, +5 % break point, guerrilla styles), culture group for style fallback, captain's language for bribes |
 
 ## culture ↔ world-map (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| culture | upstream | Conformist | Ground and coast for the way-of-life lands (D-CULT-9); map regions and their top-level region for new tongues abroad (D-CULT-10) |
+| culture | upstream | Conformist | Ground and coast for the way-of-life lands (D-CULT-9); map regions and their top-level region for new languages abroad (D-CULT-10) |
 
 ## diplomacy (decided) ↔ subjects (one-sided) (unknown context name)
 

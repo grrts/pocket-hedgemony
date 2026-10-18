@@ -52,9 +52,9 @@ A rising's **cause** comes from the province's heaviest grievance. The cause set
 | Hunger | *Hungry* | Food, the castle granary opened to them | Farmers and homeless |
 | Tax | *Heavy taxes* or *Conscription* | The tax rate back down and the levy ended | Farmers, craftsmen, market folk |
 | Faith | *Wrong faith* or a faith *Broken charter* | A faith tolerance charter, or a ruler of their faith | Everyone of that faith |
-| Homeland | *Foreign rule* or *Far from the throne* | Self-rule, then independence | Everyone of the homeland's tongue |
+| Homeland | *Foreign rule* or *Far from the throne* | Self-rule, then independence | Everyone of the homeland's language |
 | Town | *Homeless*, *Broken charter* or *Soldiers quartered* | A town law charter, work, the soldiers gone | Homeless, craftsmen, market folk |
-| Lord | *Harsh lord*, or a disloyal lord's own choice | The lord's want (land, an office, lower taxes, independence) | The lord's retinue and officials, plus people of his land who share his faith and tongue |
+| Lord | *Harsh lord*, or a disloyal lord's own choice | The lord's want (land, an office, lower taxes, independence) | The lord's retinue and officials, plus people of his land who share his faith and language |
 | Pretender | A pretender with a right to the province, plus any grievance | The pretender on the throne, or the province handed to them | Lords who back the pretender, plus anyone with a grievance |
 | New ideas | From the age of revolutions, any grievance plus support of 0.3 or more for liberalism, socialism, communism or nationalism | A new kind of government | Townsfolk and scholars first |
 
@@ -82,7 +82,7 @@ Every rising has a named leader drawn from the province, with Might, Cunning and
 |---|---|
 | Homeless | 30 % |
 | The class the cause speaks to | 10 % |
-| Everyone sharing the faith or tongue (faith and homeland risings) | 8 % |
+| Everyone sharing the faith or language (faith and homeland risings) | 8 % |
 | Other classes | 2 % |
 | Clergy and scholars | only in faith and new-ideas risings |
 | A lord's retinue | all of it at once |
@@ -112,7 +112,7 @@ Severity is separate from strength. It follows the rising's size:
 |---|---|---|
 | Riot | One province, no rebel army | |
 | Rising | One province with a rebel army | The province sends you no tax, recruits, food or trade, and its official flees |
-| Rebellion | 2 to 5 provinces | Rising effects in each province; neighbouring lords of the same faith or tongue waver; rebels can besiege castles |
+| Rebellion | 2 to 5 provinces | Rising effects in each province; neighbouring lords of the same faith or language waver; rebels can besiege castles |
 | Great revolt | More than 5 provinces, in or next to the capital's province, or a whole lord's land | Civil war: every lord picks a side by loyalty, allies may stay out, and rival AIs may attack |
 
 A rising that starts in or next to the capital is a great revolt at once.
@@ -120,7 +120,7 @@ A rising that starts in or next to the capital is a great revolt at once.
 **Spreading.** Each month a rising may spread to each neighbouring province. The chance is higher when the neighbour:
 
 - has the same grievance (it also gets *Neighbour in revolt* until those rebels are beaten or satisfied),
-- shares the rebels' faith or tongue,
+- shares the rebels' faith or language,
 - is connected by roads, rivers and traders,
 - has many homeless,
 
@@ -128,10 +128,10 @@ and when your army is away at war, you answered the last rising with a massacre,
 
 **What makes it worse.**
 
-- A disloyal lord whose faith or tongue matches the rebels may join with his retinue, turning the rising into a lord's revolt with Soldiers' arms.
+- A disloyal lord whose faith or language matches the rebels may join with his retinue, turning the rising into a lord's revolt with Soldiers' arms.
 - While rebels hold a province, they loot one town building a season (the market first), kill or drive out officials, burn tiles when they forage, and make scholars flee.
 - A rising keeps pulling in more men every month until its cause is fixed.
-- A massacre adds *Bloodshed* for 20 years to every province of the same faith or tongue.
+- A massacre adds *Bloodshed* for 20 years to every province of the same faith or language.
 
 ### Answering a rising
 
@@ -155,7 +155,7 @@ Hunger and tax risings end when their need is met. Faith, homeland and pretender
 |---|---|
 | Pardon | Survivors return to their classes and the province calms faster, but the leader may rise again |
 | Punish the leaders | The leader is executed; that province gets no new rising from the same cause for 10 years |
-| Massacre | No rising in that province for 20 years; *Bloodshed* across every province of the same faith or tongue; lords of that faith or tongue waver |
+| Massacre | No rising in that province for 20 years; *Bloodshed* across every province of the same faith or language; lords of that faith or language waver |
 
 ### Preventing risings
 
@@ -241,7 +241,7 @@ The first slice plays risings on the eight grievances the game tracks, so the ri
 - [Historical-Events](Historical-Events): the `rebels` effect, `rebels_active`, `unrest` as grievances, sparks from events.
 - [Diplomacy](Diplomacy): secretly funding rebels, and envoys fleeing when a host falls to rebels.
 - [Religion](Religion): faith risings' demands, preachers as leaders, sparks from faith policy and houses.
-- [Culture](Culture): homeland risings draw 8 % of the tongue and, with nationalism 0.5 or more, demand a new country; *Banned tongue*.
+- [Culture](Culture): homeland risings draw 8 % of the language and, with nationalism 0.5 or more, demand a new country; *Banned language*.
 - [Government](Government): a won New ideas rising sets a form; over-cap lords become disloyal.
 - [Subjects](Subjects): a lord leaving with his land.
 - [Recruiting](Recruiting): recruits lost to rebels.
@@ -287,7 +287,7 @@ All numbers are **placeholders** in the province config. The key names are the s
 - The heaviest grievance is the one that counts most. Ties go in the cause table's order.
 - A disloyal lord revolts on a 5 % roll each month.
 - A local leader has Cunning 3 and Might 1, and his Logistics works like any commander's.
-- Below nationalism 0.5, a homeland rising wants its own tongue in the provinces it holds. At 0.5 or more it wants a country of its own.
+- Below nationalism 0.5, a homeland rising wants its own language in the provinces it holds. At 0.5 or more it wants a country of its own.
 - Exploration's local attacks cover new colonies. A resistance covers settled land taken by conquest or treaty.
 - Armed veterans who kept their arms start at *Old weapons*.
 - A riot is just a province state. The rebellion card appears only when a rising starts.

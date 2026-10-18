@@ -672,7 +672,7 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "lords", name: "Lords", note: "who holds your land" },
   { id: "diplomacy", name: "Diplomacy", note: "friend or foe, envoys on the road" },
   { id: "subjects", name: "Subjects", note: "your subjects by loyalty, and your overlord" },
-  { id: "tongues", name: "Tongues", note: "the family of the tongue most speak" },
+  { id: "tongues", name: "Languages", note: "the family of the language most speak" },
   { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
   { id: "trade", name: "Trade", note: "trade ratio, your traders' loops" },
   { id: "charts", name: "Charts", note: "what you have charted, and empty coasts to settle" },
@@ -829,9 +829,9 @@ function tradeKey(): string {
   </div>`;
 }
 
-/** The Tongue and Faith lenses' key: the families or faiths that cover the most of the map, largest first. */
+/** The Language and Faith lenses' key: the families or faiths that cover the most of the map, largest first. */
 function beliefKey(): string {
-  if (!snapshot) return `<div class="lens-key"><p>Choose a realm to see tongues and faiths.</p></div>`;
+  if (!snapshot) return `<div class="lens-key"><p>Choose a realm to see languages and faiths.</p></div>`;
   const count = new Map<string, number>();
   const pe = snapshot.peoples;
   for (let i = 0; i < provinces.length; i++) {
@@ -844,7 +844,7 @@ function beliefKey(): string {
   return `<div class="lens-key">
     ${rows.map(([k]) => `<span><i class="swatch" style="background:${rgb(k)}"></i>${esc(label(k))}</span>`).join("")}
     ${lens === "faiths" ? `<span><i class="swatch hatched" style="background:#b9b3a4"></i>A second faith holds 30% or more</span>` : ""}
-    <p>Tap a province for its ${lens === "tongues" ? "Tongue" : "Faith"} line.</p>
+    <p>Tap a province for its ${lens === "tongues" ? "Language" : "Faith"} line.</p>
   </div>`;
 }
 
@@ -3142,8 +3142,8 @@ const GRIEVANCE_FIX: Record<string, string> = {
   Conscription: "ends when half the recruits are back",
   "Soldiers quartered": "ends when the armies move on",
   Ungoverned: "ends when the official returns to his post",
-  "Foreign rule": "a homeland of a stranger tongue taken since 1444; ends with a lord of its tongue",
-  "Banned tongue": "your Tongue policy is Impose and most here are strangers; ends with Teach or Let be (Peoples tab)",
+  "Foreign rule": "the homeland of a people with a foreign language, taken since 1444; ends with a lord who speaks their language",
+  "Banned language": "your Language policy is Impose and most here speak a foreign language; ends with Teach or Let be (Peoples tab)",
   "Wrong faith": "a third or more keep a faith without a house, or a Restricted majority; ends when it is served (Peoples tab)",
   Persecuted: "a Persecuted faith lives here; counts as two; ends when it is Tolerated or Restricted again (Peoples tab)",
   Bloodshed: "a battle was fought here; it fades after 20 years",

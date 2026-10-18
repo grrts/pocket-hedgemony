@@ -416,7 +416,7 @@ export function orderShape(order: Order): string {
     case "explore":
       return `explore: ${order.do}`;
     case "tonguePolicy":
-      return "set the Tongue policy";
+      return "set the Language policy";
     case "faithPolicy":
       return "set a Faith policy";
     case "answerRevolution":

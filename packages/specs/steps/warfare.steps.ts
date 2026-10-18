@@ -1376,7 +1376,7 @@ Then("the province's foot, horse and guns modifiers and its defender bonus apply
   close(R.armGround("knights and lancers", s.ground), -0.4);
   close(R.armGround("field guns", s.ground), -0.3);
 });
-Then("a defending army of the province's homeland tongue gets +10 % in that rough country", (s) => {
+Then("a defending army of the province's homeland language gets +10 % in that rough country", (s) => {
   close(R.groundOn(s.ground, { defenderHomeland: true }).locals, 0.1);
   expect(R.groundOn(s.ground, { defenderHomeland: false }).locals).toBe(0);
   expect(R.groundOn("farmland", { defenderHomeland: true }).locals).toBe(0);
@@ -2720,8 +2720,8 @@ const BRIBE: Record<string, Parameters<typeof R.bribeCanWork>[0]> = {
   "garrison is owed 2 months of pay": { payOwed: 2 },
   "lord is wavering": { lordLoyalty: "Wavering" },
   "lord is disloyal": { lordLoyalty: "Disloyal" },
-  "captain speaks a tongue different from his ruler's": { captainTongue: "German", rulerTongue: "French" },
-  "garrison is paid and loyal, of its ruler's tongue": { payOwed: 0, lordLoyalty: "Loyal", captainTongue: "French", rulerTongue: "French" },
+  "captain speaks a language different from his ruler's": { captainTongue: "German", rulerTongue: "French" },
+  "garrison is paid and loyal, of its ruler's language": { payOwed: 0, lordLoyalty: "Loyal", captainTongue: "French", rulerTongue: "French" },
 };
 Given(/^a besieged castle whose (.+)$/, (s, c: string) => {
   s.bribe = BRIBE[c];

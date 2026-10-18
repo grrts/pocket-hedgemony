@@ -53,7 +53,7 @@
     "Homeland": {
       "grievances": ["Foreign rule", "Far from the throne"],
       "demand": "self-rule, then independence",
-      "joiners": "everyone of the homeland's tongue",
+      "joiners": "everyone of the homeland's language",
       "classes": [],
       "leader": "local"
     },
@@ -67,7 +67,7 @@
     "Lord": {
       "grievances": ["Harsh lord"],
       "demand": "the lord's want",
-      "joiners": "the lord's retinue and officials, and his people of his faith and tongue",
+      "joiners": "the lord's retinue and officials, and his people of his faith and language",
       "classes": [],
       "leader": "the lord himself"
     },
@@ -94,7 +94,7 @@
     "Persecuted": "Hunger",
     "Ungoverned": "Tax",
     "Grasping officials": "Tax",
-    "Banned tongue": "Homeland"
+    "Banned language": "Homeland"
   },
   "faith_or_tongue_causes": ["Faith", "Homeland"],
   "clergy_scholars_causes": ["Faith", "New ideas"],
@@ -125,7 +125,7 @@
   "spread": {
     "higher": [
       "same grievance",
-      "shares faith or tongue",
+      "shares faith or language",
       "roads, rivers and traders",
       "many homeless",
       "owner's army away at war",

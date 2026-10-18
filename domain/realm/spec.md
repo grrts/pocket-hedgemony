@@ -10,7 +10,7 @@ how events and the AI read its stats, and how a campaign is won.
 - The country card (country stats §1).
 - Treasury: gold, debt, the tax rate default (§2).
 - Food: province food stats, castle food stats, the Food policy screen, the year of food, famine consequences (§3).
-- People and land as country stats: people, provinces, royal provinces, officials, faith, tongue, in revolt (§4).
+- People and land as country stats: people, provinces, royal provinces, officials, faith, language, in revolt (§4).
 - Named lords: card, lords versus officials, how lords are gained and lost, loyalty (§5).
 - Army and navy summary stats (§6).
 - Ruler and family, women in roles (16 Oct decision), inheritance law (§8).
@@ -26,7 +26,7 @@ how events and the AI read its stats, and how a campaign is won.
 - Diplomatic actions, envoy missions, marriages as actions: **diplomacy**; subject kinds and loyalty: **subjects**.
 - Government forms and the officials and lords caps: **government**.
 - Traders and trade income (replaces *Merchants*): **trade**.
-- Faith and tongue drift: **religion**, **culture**.
+- Faith and language drift: **religion**, **culture**.
 - Risings: **rebellions**; regime changes: **revolutions**.
 - End date as a setting and turn order: **time-and-turns**; end-of-campaign screens: **game-shell**.
 - Starting data per country: **scenario-setup**.
@@ -87,7 +87,7 @@ Holds: gold, debt (amounts and lenders), tax default, food policy (realm values 
 (by reference), royal provinces, officials (by reference), lords (by reference), soldiers, recruits, horses, ships,
 castles, commanders, Fallen (dated), ruler, heirs, marriages, inheritance law, allies, enemies, rivals, subjects,
 oaths broken (dated), lands taken (dated), envoys, merchants (superseded), scores and ranks.
-- INV-REALM-1: country totals of people, recruits, food, horses, ships, castles, faith, tongue, in revolt, schools and officials are sums over provinces (province §13), never stored separately.
+- INV-REALM-1: country totals of people, recruits, food, horses, ships, castles, faith, language, in revolt, schools and officials are sums over provinces (province §13), never stored separately.
 - INV-REALM-2: a royal province without an official pays half taxes and gives half recruits.
 - INV-REALM-3: each realm-wide food setting has a default; a castle override replaces it for that castle only.
 - INV-REALM-4: custom castle shares sum to 100 %.
@@ -127,7 +127,7 @@ Holds: castle store, granary size, reach, overrides of food policy.
 - REALM-001: The realm shall express every stat as something countable (coins, sacks, soldiers, ships, castles, named lords, scholars), each with how it is gained and how it is lost; nothing is taken from EU4 and all numbers are config placeholders. [country-stats intro]
 
 ### 5.2 Country card
-- REALM-005: The country card shall show the ruler (title, name, age, years on throne, heirs), Gold, Food (castles feeding how many of the provinces, hungry count), People, Soldiers (plus recruits), Horses, Ships (war / trade), Castles, Officials (for how many royal provinces), Lords (named, by loyalty), Schools (students, scholars, current study and progress), Faith, Tongue, In revolt, Allies, Enemies, Oaths broken and Fallen (10 years). [§1]
+- REALM-005: The country card shall show the ruler (title, name, age, years on throne, heirs), Gold, Food (castles feeding how many of the provinces, hungry count), People, Soldiers (plus recruits), Horses, Ships (war / trade), Castles, Officials (for how many royal provinces), Lords (named, by loyalty), Schools (students, scholars, current study and progress), Faith, Language, In revolt, Allies, Enemies, Oaths broken and Fallen (10 years). [§1]
 
 ### 5.3 Treasury
 - REALM-010: Gold shall be gained by taxes from royal provinces, a share of lords' taxes, trade, tribute from subjects, selling grain, loot and ransoms, and selling titles; and lost by soldiers' pay, officials' wages, school upkeep, building, debt interest, gifts and bribes, and buying grain. [§2]
@@ -183,8 +183,8 @@ Holds: castle store, granary size, reach, overrides of food policy.
 - REALM-063: Officials shall be gained by hiring (gold up front, wages yearly) and school graduates, with inventions raising how many provinces one official can run (REALM-169), and lost by dismissal, unpaid wages and war in their province. [§4, research tree, D-REALM-14]
 - REALM-064: If a royal province has no official, then it shall pay half taxes and give half recruits. [§4]
 - REALM-065: Faith shall be the % of people sharing the ruler's religion, gained by missionaries and clergy, schools of your faith, migrants of your faith and conversion events, and lost by conquering other faiths, reformations and foreign missionaries; a low share means religious revolts and wavering clergy lords. [§4]
-- REALM-066: Tongue shall be the % of people sharing the ruler's culture, gained by slow assimilation, settlers and schools, and lost by conquest, migration and separatist movements; a low share means separatist revolts and slower officials. [§4]
-- REALM-067: In revolt shall count provinces with rebels or riots, raised by heavy taxes, famine, foreign faith or tongue, disloyal lords stirring and lost wars, and lowered by defeating rebels, giving in, lowering taxes and food; it loses taxes and recruits and spreads to neighbours. [§4]
+- REALM-066: Language shall be the % of people sharing the ruler's culture, gained by slow assimilation, settlers and schools, and lost by conquest, migration and separatist movements; a low share means separatist revolts and slower officials. [§4]
+- REALM-067: In revolt shall count provinces with rebels or riots, raised by heavy taxes, famine, foreign faith or language, disloyal lords stirring and lost wars, and lowered by defeating rebels, giving in, lowering taxes and food; it loses taxes and recruits and spreads to neighbours. [§4]
 
 ### 5.9 Lords
 - REALM-070: Each lord shall have a card with lands (at least one province, run by his own officials), retinue, wealth, two traits, one want, loyalty and heir. [§5.1]
@@ -205,7 +205,7 @@ Holds: castle store, granary size, reach, overrides of food policy.
 - REALM-085: When a lord's revolt is defeated, his land shall return to the ruler or to a loyal claimant the ruler picks. [§5.4]
 - REALM-086: A disloyal lord shall be able to defect to a neighbour with his provinces, or rebel. [§5.2, §5.4]
 - REALM-087: When two lords' houses join by marriage, they shall merge into one bigger lord. [§5.4]
-- REALM-088: Loyalty shall rise with granting his want, gifts of gold, offices at court, marriages into the ruling house, victories he took part in, a long secure reign with a clear heir, feeding his lands in famine, and sharing your faith and tongue. [§5.5]
+- REALM-088: Loyalty shall rise with granting his want, gifts of gold, offices at court, marriages into the ruling house, victories he took part in, a long secure reign with a clear heir, feeding his lands in famine, and sharing your faith and language. [§5.5]
 - REALM-089: Loyalty shall fall with heavy or crushing taxes, seizing land from him or another lord, lost wars and battles, a child ruler, a disputed heir or a new ruler, requisitioning his grain, a foreign rival's bribes and promises, and the crown borrowing (REALM-189). [§5.5, feedback 61]
 
 ### 5.10 Army and navy summary
@@ -244,7 +244,7 @@ Holds: castle store, granary size, reach, overrides of food policy.
 - REALM-127: Merchants (trading agents placed in trade cities, hired for gold or provided by merchant lords, thrown out by a city's owner or war) are replaced by trade v2's traders and trade ships (REALM-157). [§9, trade §14, X-6, D-REALM-1]
 
 ### 5.13 Starting values (rules)
-- REALM-130: The catalogue's qualitative assessments shall set starting counts: economic strength and fiscal resilience → gold and debt; manpower potential → recruits; military capability → soldiers, commanders, horses; naval capability → ships; administrative capacity → officials and how many provinces start royal; political stability and unrest risk → lords' starting loyalty and provinces in revolt; territorial cohesion → number of lords, their land, tongue; institutional development → schools, scholars, starting inventions; trade access → merchants and grain price access; diplomatic influence → extra officials at court ready as envoys. [§10]
+- REALM-130: The catalogue's qualitative assessments shall set starting counts: economic strength and fiscal resilience → gold and debt; manpower potential → recruits; military capability → soldiers, commanders, horses; naval capability → ships; administrative capacity → officials and how many provinces start royal; political stability and unrest risk → lords' starting loyalty and provinces in revolt; territorial cohesion → number of lords, their land, language; institutional development → schools, scholars, starting inventions; trade access → merchants and grain price access; diplomatic influence → extra officials at court ready as envoys. [§10]
 - REALM-131: A `low` confidence in the catalogue shall give a wider random range, so each campaign starts a little differently. [§10]
 - REALM-132: Allies, rivals, subjects and enemies shall come from `country-relations/data/relations-1444.json`; lords for major countries from the catalogue's history text. [§10]
 
@@ -264,7 +264,7 @@ Holds: castle store, granary size, reach, overrides of food policy.
 
 ### 5.16 Decided rules (17 October 2026)
 - REALM-157: The card shall show **Traders** and **Trade ships** instead of Merchants; Gold's trade income shall be deposits from traders, market fees and tolls; `trade_access` shall set starting traders; surplus grain shall be sold to the realm's own treasury and bought from it at the fixed grain price (0.5 gold a food), with no market. [trade §14, X-6, D-REALM-1]
-- REALM-158: The card shall also show Envoy seats (and envoys abroad), Leagues against you, Pretenders at court, Arms store, Powder store, Prisoners, Victories / Defeats, Troop cap, Peace voices on the Enemies line, Preachers in Abroad, and the Subjects row "Vassals, tributaries, unions, marches, colonies and protectorates"; Faith counts the state faith or a faith layered with it; Tongue counts cousins as half; building upkeep is a loss of Gold. [diplomacy §18, warfare §18, religion §18, culture, subjects §12, buildings §18, D-REALM-2, D-REALM-3, D-REALM-9]
+- REALM-158: The card shall also show Envoy seats (and envoys abroad), Leagues against you, Pretenders at court, Arms store, Powder store, Prisoners, Victories / Defeats, Troop cap, Peace voices on the Enemies line, Preachers in Abroad, and the Subjects row "Vassals, tributaries, unions, marches, colonies and protectorates"; Faith counts the state faith or a faith layered with it; Language counts related languages as half; building upkeep is a loss of Gold. [diplomacy §18, warfare §18, religion §18, culture, subjects §12, buildings §18, D-REALM-2, D-REALM-3, D-REALM-9]
 - REALM-159: Events shall read `war_weariness` as Fallen and peace voices, `prestige` as victories and lands taken, `admin_capacity` as the officials cap (government), `trade_access` as starting traders, and `opinion`, `trust` and `notoriety` from diplomacy. [warfare §18, government, diplomacy §11, D-REALM-3, D-REALM-4]
 - REALM-160: Army power shall be (foot × 1 + horse × 2 + guns × 3 + warships × 100 + commanders × 1,000) ÷ 1,000. [D-REALM-6]
 - REALM-161: The throne law shall follow the government form's succession: eldest heir and named heir give eldest son (eldest child where the country's history lets a daughter inherit the crown), strongest son gives strongest claimant, eldest of the house and the chief's lineage give eldest of the house, and every form where a body chooses gives election. [government §3, D-REALM-4, D-REALM-5]
@@ -530,7 +530,7 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 | government | upstream | Customer–Supplier | Officials and lords caps, *Great lord* loyalty reason (REALM-162), succession by form (REALM-161), `admin_capacity` → officials cap |
 | trade | upstream | Customer–Supplier | Trade income (deposits, fees, tolls); traders and trade ships replace merchants (REALM-157) |
 | religion | upstream | Customer–Supplier | Faith %, faith steps in lord loyalty, preachers abroad |
-| culture | upstream | Customer–Supplier | Tongue %, cousins counted half, kin lords' loyalty |
+| culture | upstream | Customer–Supplier | Language %, related languages counted half, same-language lords' loyalty |
 | rebellions | downstream | Customer–Supplier | Disloyal lords, lords' retinues and wealth for risings, in revolt counts |
 | revolutions | upstream | Conformist | Regimes set forms; émigré pretenders |
 | events | upstream | Anti-Corruption Layer | Event-tree country stats mapped by §11; ages driving women-in-roles multipliers |
@@ -559,7 +559,7 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 - **D-REALM-6** (was OQ-REALM-6) Win scores: two ways to win as X-12 says; army power is (foot × 1 + horse × 2 + guns × 3 + warships × 100 + commanders × 1,000) ÷ 1,000; settled provinces are land provinces with people; allies-by-marriage do not count; scores are worked out each January, domination wins at once and play may go on, at the end date the leader of each score wins with no margin and ties share. X-12 settles the rules; the weights are provisional.
 - **D-REALM-7** (was OQ-REALM-7) Women in roles: base chances lord 5 %, commander 2 %, official 2 %, scholar 5 % (rulers only by succession), age multipliers ×1.5, ×2 and ×3 for the Ages of Revolutions, Industrialization and World Wars, and ×2 for a country an event or reform has raised; the Age of Decolonization is never reached; students stay men from recruits and scholars named to a role use the scholar chance. Provisional numbers that follow the 16 October decision's shape.
 - **D-REALM-8** (was OQ-REALM-8) Tax scale: five steps, none, light, normal, heavy and crushing, set per province with a realm default. Province §8 is the later design and says it replaces the country rate.
-- **D-REALM-9** (was OQ-REALM-9) Other designs' edits: all adopted: Faith counts the state faith or a faith layered with it, Preachers appear in Abroad and faith steps count in loyalty; Tongue counts cousins as half; the Subjects row names the six kinds (X-8); commanders can come from commissioned officials (X-7); building upkeep is a loss of Gold on the treasury card. Each is a later design's change to text this spec already holds.
+- **D-REALM-9** (was OQ-REALM-9) Other designs' edits: all adopted: Faith counts the state faith or a faith layered with it, Preachers appear in Abroad and faith steps count in loyalty; Language counts related languages as half; the Subjects row names the six kinds (X-8); commanders can come from commissioned officials (X-7); building upkeep is a loss of Gold on the treasury card. Each is a later design's change to text this spec already holds.
 - **D-REALM-10** (was OQ-REALM-10) Starting values: the catalogue's five assessment levels pick values from tables in the realm data (months of tax and trade for gold and a share of the levy ceiling for recruits, REALM-230; per thousand people for soldiers, horses, ships and scholars; shares for royal provinces, loyal lords and provinces in revolt; counts for commanders, traders and envoys), each spread by a factor drawn from the campaign's seeded Rng: ±25 % for low confidence, ±10 % medium, ±5 % high; major countries start with the great houses the data lists from the catalogue, others with one generated lord per 4 provinces. One table keeps balancing in data and the seed keeps every start reproducible.
 - **D-REALM-11** (was OQ-REALM-11) Food year numbers: the harvest comes in September in the north and March in the south (X-4); each region rolls its weather once per harvest, 1 in 6 bad and 1 in 6 good; transfers lose 2 % per province; stores rot 5 % a season (2.5 % with a granary); reach is 1 ring (track or none), 2 (road, paved road), 3 (turnpike), 4 (railway); Frontier first and Capital first count the favoured castles' people double. Provisional numbers for every gap the food year had.
 - **D-REALM-12** (was OQ-REALM-12) Windows: hard windows of 10, 30 and 20 years; "fading" means old entries drop out. The simpler rule and already what the code does.
@@ -631,8 +631,8 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-064 | people-and-land.feature | A royal province without an official pays half |
 | REALM-065 | people-and-land.feature | A low faith share brings religious revolts |
 | REALM-065 | people-and-land.feature | Faith rises and falls |
-| REALM-066 | people-and-land.feature | Tongue rises and falls |
-| REALM-066 | people-and-land.feature | A low tongue share brings separatists and slower officials |
+| REALM-066 | people-and-land.feature | Language rises and falls |
+| REALM-066 | people-and-land.feature | A low language share brings separatists and slower officials |
 | REALM-067 | people-and-land.feature | In revolt |
 | REALM-067 | people-and-land.feature | Revolt spreads to neighbours |
 | REALM-070 | lords.feature | The lord card |

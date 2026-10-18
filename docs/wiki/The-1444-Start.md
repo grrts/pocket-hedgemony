@@ -84,7 +84,7 @@ Each country's starting counts are set from its assessments:
 | Naval capability | Ships |
 | Administrative capacity | Officials, and how many provinces start as royal land |
 | Political stability and unrest risk | Lords' starting loyalty, and provinces in revolt |
-| Territorial cohesion | Number of lords, the land they hold, and Tongue |
+| Territorial cohesion | Number of lords, the land they hold, and Language |
 | Institutional development | Schools, Scholars, starting inventions |
 | Trade access | Merchants and access to grain prices |
 | Diplomatic influence | Extra officials at court ready to go abroad |
@@ -118,7 +118,7 @@ Other starting facts:
 | Shore tiles | Coast and rivers |
 | People | Population |
 | Buildings built and town size | Wealth |
-| Owner, which provinces belong to which named lord, Homeland of, Faith and Tongue mix | The catalogue |
+| Owner, which provinces belong to which named lord, Homeland of, Faith and Language mix | The catalogue |
 | Royal provinces that start with an official | Administrative capacity |
 | Which buildings, castle steps and road steps exist | The research tree's start inventions |
 | Wares each ground makes, fever land, crops | Region tables in config |
@@ -210,7 +210,7 @@ The screens themselves are on [Screens and Navigation](Screens-and-Navigation).
 - [Trade](Trade): starting traders, starting routes and the 24-month warm-up.
 - [Naval](Naval): 1444 ports and shipyards.
 - [Religion](Religion): catalogue faiths and province faith mix.
-- [Culture](Culture): tongue mix and homelands.
+- [Culture](Culture): language mix and homelands.
 - [Exploration and Colonies](Exploration-and-Colonies): the charted start, who can explore in 1444, unowned land.
 - [Research](Research): start inventions per country.
 - [Historical Events](Historical-Events): catalogue event keys linked to event-tree ids (260 of 1,175) and geography anchors.

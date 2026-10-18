@@ -70,19 +70,19 @@ Feature: Government forms and what they set
 
   @GOV-023 @GOV-024
   Scenario Outline: Self-run forms need no official for their own people
-    # D-GOV-13: own people are those whose largest tongue is the realm's own tongue; kin tongues do not count
-    Given the country "Gowa" has the form "<form>" and the tongue "Makassarese"
-    And the largest tongue of the province "<province>" of "Gowa" is "<tongue>"
+    # D-GOV-13: own people are those whose largest language is the realm's own language; related languages do not count
+    Given the country "Gowa" has the form "<form>" and the language "Makassarese"
+    And the largest language of the province "<province>" of "Gowa" is "<language>"
     And the province "<province>" has no official
     When the month ends
     Then the province "<province>" <outcome>
 
     Examples:
-      | form         | province | tongue      | outcome                                  |
-      | Chiefdom     | Gowa     | Makassarese | needs no official and is not Ungoverned  |
-      | Clan council | Gowa     | Makassarese | needs no official and is not Ungoverned  |
-      | Chiefdom     | Bone     | Buginese    | still needs an official                  |
-      | Feudal realm | Gowa     | Makassarese | still needs an official                  |
+      | form         | province | language    | outcome                                 |
+      | Chiefdom     | Gowa     | Makassarese | needs no official and is not Ungoverned |
+      | Clan council | Gowa     | Makassarese | needs no official and is not Ungoverned |
+      | Chiefdom     | Bone     | Buginese    | still needs an official                 |
+      | Feudal realm | Gowa     | Makassarese | still needs an official                 |
 
   @GOV-057
   Scenario Outline: Which forms count as monarchies for the Inquisition

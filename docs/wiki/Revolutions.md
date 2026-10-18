@@ -78,7 +78,7 @@ A revolution stopped by Bend, by a crushed rising, or by a Path that applies no 
 
 ### Regimes
 
-A regime is the package of rules an outcome leaves behind: form of rule, ruler, lords, church, faith, tongue, levy, land, towns, trade, research, decrees, locks, grievances ended and added, flags, reactions abroad, risks and a one-line "loop" that sums up how it plays.
+A regime is the package of rules an outcome leaves behind: form of rule, ruler, lords, church, faith, language, levy, land, towns, trade, research, decrees, locks, grievances ended and added, flags, reactions abroad, risks and a one-line "loop" that sums up how it plays.
 
 - **Form.** The regime sets the form of rule from the [Government](Government) forms. `keep` leaves the form as it is; `old_form` restores the form held before the last revolutionary regime, which the game remembers. A revolution can grant a form before its era. Crown and assembly gives a constitutional monarchy, or a diet monarchy if the country lacks G14 Written constitution.
 - **Numbers come from the form.** A regime never sets its own caps on officials or lords.
@@ -109,7 +109,7 @@ The 33 regimes:
 | Free republic | constitutional republic | replaced | arm the people, divide the estates | trade income halves while unrecognised |
 | Creole republic | constitutional republic | elected | general's pact, call the assembly | a general seizes the presidency |
 | Parliamentary republic | constitutional republic | deposed | call the assembly, sell bonds | extremist risings in a crisis |
-| Committee rule | constitutional monarchy with an army power base | kept | officers to the provinces, call the assembly | other tongues' separatist signs come faster |
+| Committee rule | constitutional monarchy with an army power base | kept | officers to the provinces, call the assembly | other languages' separatist signs come faster |
 | Warlord republic | constitutional republic | elected | buy a warlord, general's pact | warlords fight each other |
 | Secular republic | party state | elected | script and schools, sell church lands | a faith rising sign for 20 years |
 | Agrarian reform | keep | kept | divide the estates | landowners fund risings for 20 years |
@@ -127,7 +127,7 @@ The 33 regimes:
 | Reaction | keep | kept | censorship | revolution needs one sign fewer for 20 years |
 | Restored monarchy | the old form | replaced | none | revoking charters can re-fire the revolution |
 
-The locks, grievance changes, flags, reactions abroad and the full lords, church, faith, tongue, levy, land, towns, trade and research lines of each regime are in the data.
+The locks, grievance changes, flags, reactions abroad and the full lords, church, faith, language, levy, land, towns, trade and research lines of each regime are in the data.
 
 ### Decrees
 
@@ -302,7 +302,7 @@ The 36 historical revolutions read ideologies, legitimacy and ages the game does
 - [Government](Government): regimes set forms, in any era, and restore the old form.
 - [Diplomacy](Diplomacy): "Different form of rule", the counter-revolution reason, and the funding action.
 - [Subjects](Subjects): settler colonies going independent through a Disloyal colony.
-- [Culture](Culture): nationalism thresholds read by liberal and national signs; regimes can set the court tongue.
+- [Culture](Culture): nationalism thresholds read by liberal and national signs; regimes can set the court language.
 - [Religion](Religion): the faith wave, and church events that follow a revolutionary regime.
 - [National strengths](National-Strengths): a won revolution may shed a burden or grant a legacy (a hook only).
 - [Warfare](Warfare): generals growing too big, and a winning general switching the regime.

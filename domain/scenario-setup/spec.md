@@ -180,7 +180,7 @@ Newest decision first.
 
 ### 5.3 Country starting values
 
-- SETUP-020 (Ubiquitous): Each country's starting counts shall be set from the catalogue's assessments: economic strength and fiscal resilience → Gold and Debt; manpower potential → Recruits; military capability → Soldiers, Commanders, Horses; naval capability → Ships; administrative capacity → Officials and how many provinces start as royal land; political stability and unrest risk → lords' starting loyalty and provinces in revolt; territorial cohesion → number of lords, the land they hold, and Tongue; institutional development → Schools, Scholars, starting inventions; trade access → Merchants and grain price access; diplomatic influence → extra officials at court ready to go abroad. [country-stats §10] (D-SETUP-6)
+- SETUP-020 (Ubiquitous): Each country's starting counts shall be set from the catalogue's assessments: economic strength and fiscal resilience → Gold and Debt; manpower potential → Recruits; military capability → Soldiers, Commanders, Horses; naval capability → Ships; administrative capacity → Officials and how many provinces start as royal land; political stability and unrest risk → lords' starting loyalty and provinces in revolt; territorial cohesion → number of lords, the land they hold, and Language; institutional development → Schools, Scholars, starting inventions; trade access → Merchants and grain price access; diplomatic influence → extra officials at court ready to go abroad. [country-stats §10] (D-SETUP-6)
 - SETUP-021 (Ubiquitous): A `low` confidence in the catalogue shall give a wider random range for the starting counts, so each campaign starts a little differently. [country-stats §10]
 - SETUP-022 (Ubiquitous): Allies, Rivals, Subjects and Enemies shall come straight from `country-relations/data/relations-1444.json` (280 relations and 19 facts on 11 November 1444). [country-stats §10; country-relations README]
 - SETUP-023 (Ubiquitous): Lords for major countries shall come from the great houses the catalogue's history names; a country with only one province has no lords. [country-stats §10; government §6]
@@ -192,7 +192,7 @@ Newest decision first.
 ### 5.4 Province starting values
 
 - SETUP-028 (Ubiquitous): Each province's tile count shall come from its size on the map, its ground from terrain, its tile mix from ground, its shore tiles from coast and rivers, its people from population, and how many buildings start built (and town size) from wealth. [province-stats §16]
-- SETUP-029 (Ubiquitous): The catalogue shall set each province's owner, which provinces belong to which named lord, Homeland of, the Faith and Tongue mix, and (by `administrative_capacity`) how many royal provinces start with an official. [province-stats §16]
+- SETUP-029 (Ubiquitous): The catalogue shall set each province's owner, which provinces belong to which named lord, Homeland of, the Faith and Language mix, and (by `administrative_capacity`) how many royal provinces start with an official. [province-stats §16]
 - SETUP-030 (Ubiquitous): The research tree's start inventions shall decide which buildings, castle steps and road steps exist at start. [province-stats §16; buildings §15.2]
 - SETUP-031 (Ubiquitous): Region tables in config shall set which wares each ground makes, fever land and crops. [province-stats §16]
 - SETUP-032 (Ubiquitous): Event-tree geography anchors (Constantinople, Potosí, Malacca …) shall fix mines, toll points, castles and markets at the named places. [province-stats §16; buildings §15.2]
@@ -384,7 +384,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | trade | downstream | Customer–Supplier | Starting traders by `trade_access`; starting routes; warm-up |
 | naval | downstream | Customer–Supplier | 1444 ports and shipyards (`start-ports.json`) |
 | religion | downstream | Customer–Supplier | Catalogue faiths per record; province faith mix |
-| culture | downstream | Customer–Supplier | Tongue mix; homelands |
+| culture | downstream | Customer–Supplier | Language mix; homelands |
 | exploration | downstream | Customer–Supplier | Charted start; exploration unlock in 1444; unowned land |
 | research | upstream | Customer–Supplier | Start inventions per country |
 | events | upstream | Shared Kernel | Catalogue `event_key`s linked to event-tree ids (260 of 1,175); geography anchors |

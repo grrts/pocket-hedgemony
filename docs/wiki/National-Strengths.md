@@ -108,12 +108,12 @@ There are 64 levers in 13 groups:
 | Navy (5) | ship build, crew, ship hits, sea days, storm loss | storm loss 0.03 |
 | Trade (3) | trader count, trader gain, traders passing | trader count 1.0 |
 | Learning (5) | invention cost, scholar output, school seats, spread discount cap, invention known | invention known 1.5 (flag) |
-| Belief (2) | faith shift, tongue shift | 0.05 |
+| Belief (2) | faith shift, language shift | 0.05 |
 | Abroad (4) | envoy count, opinion steps, oath fade, lands taken | envoy count 1.2 |
 | Building (2) | building cost, building unlock | building unlock 1.5 (flag) |
 | Events (3) | event weight, event option, stat | stat: by the stat's points |
 
-Ten levers are provisional because the design that owns their rule is still being written: tribute, official capacity, lord capacity, ship build, crew, sea days, faith shift, tongue shift, envoy count and opinion steps. The trade levers follow the trade design: trade balance and traders passing raise the trade ratio gain, trader gain raises each deposit, and trader count gives extra traders at the start. Building levers use the buildings design's buildings, and a unique building variant is unlocked the same way. Their owner may rename them or point them at a rule; only the key changes in heritage data.
+Ten levers are provisional because the design that owns their rule is still being written: tribute, official capacity, lord capacity, ship build, crew, sea days, faith shift, language shift, envoy count and opinion steps. The trade levers follow the trade design: trade balance and traders passing raise the trade ratio gain, trader gain raises each deposit, and trader count gives extra traders at the start. Building levers use the buildings design's buildings, and a unique building variant is unlocked the same way. Their owner may rename them or point them at a rule; only the key changes in heritage data.
 
 A lever can be limited to a scope with `where`: realm, capital, coast, core, royal, lords, frontier, a terrain, a culture group, a faith, an area or a region. A limited lever costs less.
 
@@ -208,7 +208,7 @@ The computer always knows its own ambitions and treats them as goals with weight
 - [Naval](Naval): ship build, crew and sea days (provisional).
 - [Buildings](Buildings): building cost and unlock levers; unique variants and landmarks offered as hooks.
 - [Government](Government): official and lord capacity; reforms that shed burdens.
-- [Religion](Religion) and [Culture](Culture): faith and tongue shift.
+- [Religion](Religion) and [Culture](Culture): faith and language shift.
 - [Diplomacy](Diplomacy): envoys, annexation and release; envoy and opinion levers.
 - [Subjects](Subjects): tribute; subjects keep their heritage.
 - [Revolutions](Revolutions): reforms and revolutions can shed burdens or grant legacies.

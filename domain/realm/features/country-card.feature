@@ -12,7 +12,7 @@ Feature: The country card
     Then the card shows "Gold 310", "People 9.5 m" and "Soldiers 22,000 (+48,000 recruits)"
     And it shows food as castles feeding a number of the provinces and how many are hungry
     And it shows horses, ships war and trade, castles, officials for royal provinces, lords by loyalty, schools with students, scholars and the current study
-    And it shows faith, tongue, in revolt, allies, enemies, oaths broken and Fallen in 10 years
+    And it shows faith, language, in revolt, allies, enemies, oaths broken and Fallen in 10 years
     And every count opens its list of how it is gained and how it is lost
 
   @REALM-156

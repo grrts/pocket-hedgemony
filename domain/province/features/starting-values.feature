@@ -19,7 +19,7 @@ Feature: Starting values rules
   Scenario: The catalogue sets owners, lords, homelands and mixes
     Given the country catalogue names the house of Burgundy as a great house of "France"
     When the campaign starts
-    Then the catalogue sets each province's owner, the provinces of each named lord, its homeland, and its faith and tongue mix
+    Then the catalogue sets each province's owner, the provinces of each named lord, its homeland, and its faith and language mix
     And the country's administrative capacity decides how many royal provinces start with an official
 
   @PROV-282

@@ -331,7 +331,7 @@ Each month of a siege:
 
 A siege ends by **honours of war** (the garrison marches out armed to the nearest friendly castle and the castle is taken whole; keeping terms builds trust, breaking them is an oath broken), **surrender** (the garrison become prisoners), **storm** (the garrison killed or taken; you choose Spare, Plunder or Raze), **relief** (an army from the castle's side beats the besiegers and the garrison joins as a reserve at +10 %) or **lifting** (the besiegers leave). Plunder gives gold equal to a year of the province's tax owed, burns 1 in 3 town buildings, kills or drives off 10 % of townsfolk and adds Burned homes; Raze destroys the castle.
 
-An AI garrison accepts honours when it has a breach or under a month of food and no relief army within 10 days, and never from a Cruel commander. A besieger can bribe the garrison's captain only when its pay is owed 2 months or more, the castle belongs to a disloyal or wavering lord, or the captain's tongue differs from his ruler's. A Greedy commander inside takes the bribe; a Greedy commander outside pockets a tenth. Taking a castle gives you its store and the province's food spread.
+An AI garrison accepts honours when it has a breach or under a month of food and no relief army within 10 days, and never from a Cruel commander. A besieger can bribe the garrison's captain only when its pay is owed 2 months or more, the castle belongs to a disloyal or wavering lord, or the captain's language differs from his ruler's. A Greedy commander inside takes the bribe; a Greedy commander outside pockets a tenth. Taking a castle gives you its store and the province's food spread.
 
 **The castle of Troyes.** A stone castle with a garrison of 300 and 6 months of store is besieged by Burgundy with 6,000 men and 4 bombards. It is closed, and the besiegers add 8 shot a month. After 3 months it has 1 breach and a walls bonus of about +67 %. Burgundy offers honours, no French relief army is within 10 days, so the garrison accepts and marches to Reims, and Burgundy takes the castle whole with its store and control of food spread in Champagne.
 
@@ -393,7 +393,7 @@ During the turn, inside the day loop: contacts, the withdraw check and battles; 
 - [Rebellions](Rebellions): rebel bands fight as the Rebel band kind.
 - [Government](Government): Warlike rulers, regencies and succession wars.
 - [Subjects](Subjects): subject armies and the Break a subject and Become a subject terms.
-- [Culture](Culture): homeland tongue, culture group for style fallback, a captain's tongue for bribes.
+- [Culture](Culture): homeland language, culture group for style fallback, a captain's language for bribes.
 - [Religion](Religion): persecution for the Defend the faith aim.
 - [Historical-Events](Historical-Events): prestige from victories, war weariness from Fallen and peace voices, throne offers to generals.
 - [The-1444-Start](The-1444-Start): starting styles, capture warfare realms, starting castles and inventions.

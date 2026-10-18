@@ -13,17 +13,17 @@ Feature: Starting values rules
     Then that rating sets its <stats>
 
     Examples:
-      | assessment                                   | stats                                                    |
-      | economic_strength and fiscal_resilience      | gold and debt                                            |
-      | manpower_potential                           | recruits                                                 |
-      | military_capability                          | soldiers, commanders and horses                          |
-      | naval_capability                             | ships                                                    |
-      | administrative_capacity                      | officials and how many provinces start royal             |
-      | political_stability and unrest_risk          | lords' starting loyalty and provinces in revolt          |
-      | territorial_cohesion                         | number of lords, how much land they hold, and tongue     |
-      | institutional_development                    | schools, scholars and starting inventions                |
-      | trade_access                                 | starting traders                                         |
-      | diplomatic_influence                         | extra officials at court ready to go abroad as envoys    |
+      | assessment                              | stats                                                  |
+      | economic_strength and fiscal_resilience | gold and debt                                          |
+      | manpower_potential                      | recruits                                               |
+      | military_capability                     | soldiers, commanders and horses                        |
+      | naval_capability                        | ships                                                  |
+      | administrative_capacity                 | officials and how many provinces start royal           |
+      | political_stability and unrest_risk     | lords' starting loyalty and provinces in revolt        |
+      | territorial_cohesion                    | number of lords, how much land they hold, and language |
+      | institutional_development               | schools, scholars and starting inventions              |
+      | trade_access                            | starting traders                                       |
+      | diplomatic_influence                    | extra officials at court ready to go abroad as envoys  |
 
   @REALM-131 @REALM-166 @placeholder
   Scenario: Low confidence widens the random range

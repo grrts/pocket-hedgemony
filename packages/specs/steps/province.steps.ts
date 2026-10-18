@@ -467,7 +467,7 @@ When("an enemy attacks the garrison of {string}", (s, name: string) => {
 Then("the defender fights from the walls under the warfare castle rules", (s) => {
   expect(s.walls).toBe(true);
 });
-Given("a defending army of the province's homeland tongue", (s) => {
+Given("a defending army of the province's homeland language", (s) => {
   s.homelandArmy = true;
 });
 Given("the province has the ground {string}", (s, g: string) => {
@@ -1353,12 +1353,12 @@ Given("the country {string} is Catholic", (s) => {
 Then(/^the country's Faith is (\d+) %$/, (s, v: string) => {
   expect(P.weightedShare(s.faithRows, s.rulerFaith)).toBeCloseTo(Number(v) / 100);
 });
-Given("the province {string} has tongues French 94 % and Flemish 6 %", (s, name: string) => {
+Given("the province {string} has languages French 94 % and Flemish 6 %", (s, name: string) => {
   const p = prov(s, name);
   p.tongue = P.topThree({ French: 0.94, Flemish: 0.06 });
   p.faith = P.topThree({ Catholic: 0.9, Cathar: 0.04, Jewish: 0.03, Muslim: 0.02, Hussite: 0.01 });
 });
-Then("the province stores at most three tongues and three faiths", (s) => {
+Then("the province stores at most three languages and three faiths", (s) => {
   expect(Object.keys(cur(s).tongue).length).toBeLessThanOrEqual(3);
   expect(Object.keys(cur(s).faith)).toEqual(["Catholic", "Cathar", "Jewish"]);
 });
@@ -1748,7 +1748,7 @@ Then("the province {string} is no longer a homeland of the Moors", (s, name: str
 Given("the province {string} is the homeland of the Bretons", (s, name: string) => {
   prov(s, name).homeland = ["Breton"];
 });
-Given("it is held by a ruler of the French tongue", (s) => {
+Given("it is held by a ruler of the French language", (s) => {
   cur(s).holderTongue = "French";
 });
 Then("the province {string} has the {string} grievance", (s, name: string, g: string) => {
@@ -1791,7 +1791,7 @@ const EFFECTS: Record<string, P.OfficialEffect> = {
   "recruits refilling 25 % faster": { recruit_refill: 0.25 },
   "+15 % trade ratio gain": { trade_ratio_gain: 0.15 },
   "faith mix moving twice as fast toward the ruler's faith": { faith_shift: 2 },
-  "tongue mix moving twice as fast toward the ruler's tongue and students graduating a year sooner": { tongue_shift: 2, graduate_sooner_years: 1 },
+  "language mix moving twice as fast toward the ruler's language and students graduating a year sooner": { tongue_shift: 2, graduate_sooner_years: 1 },
   "a garrison fighting 25 % better, walls repairing twice as fast and a castle store rotting half as fast": { garrison: 0.25, walls_repair: 2, castle_store_rot: 0.5 },
   "no effect of its own": {},
 };
@@ -2348,12 +2348,12 @@ Given("the province {string} has recruits below a quarter of the pool", (s, name
 When("recruits refill to half", (s) => {
   cur(s).recruits = 500;
 });
-Given("the province {string} is a homeland held by a ruler of another tongue", (s, name: string) => {
+Given("the province {string} is a homeland held by a ruler of another language", (s, name: string) => {
   const p = prov(s, name);
   p.homeland = ["Breton"];
   p.holderTongue = "French";
 });
-When("a lord of the local tongue is granted it", (s) => {
+When("a lord of the local language is granted it", (s) => {
   const p = cur(s);
   p.lord = "Duke of Brittany";
   p.holderTongue = "Breton";
@@ -2422,7 +2422,7 @@ Given("the province {string} borders a province whose rebels share one of its gr
 When("those rebels are beaten", (s) => {
   cur(s).neighbourRebels = [];
 });
-Given(/^the province "([^"]+)" is held by a lord who is (Cruel|Greedy|hostile to the people's faith|hostile to the people's tongue)$/, (s, name: string, trait: string) => {
+Given(/^the province "([^"]+)" is held by a lord who is (Cruel|Greedy|hostile to the people's faith|hostile to the people's language)$/, (s, name: string, trait: string) => {
   const p = prov(s, name);
   p.lord = "the lord";
   p.lordTraits = [trait.replace("the people's ", "")];
@@ -2968,7 +2968,7 @@ Then(/^the town is a "([^"]+)" covering (\d+) town tiles$/, (s, size: string, t:
 });
 
 // officials and lords (D-PROV-13, D-PROV-23, D-PROV-24)
-Given(/^an official of the "([^"]+)" tongue runs a province of the "([^"]+)" tongue$/, (s, o: string, p: string) => {
+Given(/^an official of the "([^"]+)" language runs a province of the "([^"]+)" language$/, (s, o: string, p: string) => {
   s.kin = o === p ? "own" : p === "Picard" ? "cousin" : "stranger";
 });
 Then(/^he learns the province in (\d+) years$/, (s, n: string) => {

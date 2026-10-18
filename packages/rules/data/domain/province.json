@@ -243,14 +243,14 @@
     "manpower_yield": "recruits here",
     "disease_burden": "plague and fever land",
     "environmental_degradation": "worn tiles and smoke",
-    "culture_share": "tongue mix",
+    "culture_share": "language mix",
     "religion_share": "faith mix",
     "colonial_status": "settlement and governed by",
     "terrain": "ground and tile mix",
     "innovation_presence": "schools and scholars here"
   },
   "card": {
-    "lines": ["owner", "governance", "official", "pretender", "ground", "tile row", "people", "classes", "food", "town", "trade", "tax", "recruits", "castle", "faith", "tongue", "grievances", "rebels"],
+    "lines": ["owner", "governance", "official", "pretender", "ground", "tile row", "people", "classes", "food", "town", "trade", "tax", "recruits", "castle", "faith", "language", "grievances", "rebels"],
     "gain_lose": {
       "tax": {
         "gain": ["the value of what its buildings make", "townsfolk", "an official in a royal province", "few days to the capital or a seat", "roads"],
@@ -301,7 +301,7 @@
       "Ships": "ships built at shipyards and based at harbours",
       "Castles": "castle buildings",
       "Faith": "the people-weighted faith mix",
-      "Tongue": "the people-weighted tongue mix",
+      "Language": "the people-weighted language mix",
       "In revolt": "provinces with riots or rebels",
       "Schools, Students, Scholars": "school buildings, students here and scholars here",
       "Officials": "your officials in royal provinces and seats"

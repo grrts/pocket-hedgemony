@@ -16,13 +16,13 @@ The country card has four tabs: **General** first, then **Diplomacy**, **Trade**
  Castles   31           Officials 40 for 18 royal provinces
  Lords     11 named: 7 loyal, 3 wavering, 1 disloyal
  Schools   4 (200 students, 35 scholars) · studying: Bastion forts 62 %
- Faith     96 %         Tongue   71 %        In revolt 2
+ Faith     96 %         Language   71 %        In revolt 2
  Allies 2  Enemies 1  Oaths broken 0       Fallen (10 yrs) 31,000
 ```
 
-It shows the ruler (title, name, age, years on throne, heirs), Gold, Food (how many castles feed how many provinces, and how many are hungry), People, Soldiers (plus recruits), Horses, Ships (war and trade), Castles, Officials (for how many royal provinces), Lords (named, by loyalty), Schools (students, scholars, current study and progress), Faith, Tongue, In revolt, Allies, Enemies, Oaths broken, Fallen in the last 10 years, and your rank in each win score.
+It shows the ruler (title, name, age, years on throne, heirs), Gold, Food (how many castles feed how many provinces, and how many are hungry), People, Soldiers (plus recruits), Horses, Ships (war and trade), Castles, Officials (for how many royal provinces), Lords (named, by loyalty), Schools (students, scholars, current study and progress), Faith, Language, In revolt, Allies, Enemies, Oaths broken, Fallen in the last 10 years, and your rank in each win score.
 
-People, recruits, food, horses, ships, castles, faith, tongue, in revolt, schools and officials are always **sums over your provinces**, never stored separately. Every number here is a placeholder until balanced.
+People, recruits, food, horses, ships, castles, faith, language, in revolt, schools and officials are always **sums over your provinces**, never stored separately. Every number here is a placeholder until balanced.
 
 ### Treasury
 
@@ -132,10 +132,10 @@ One **Food policy** sets realm-wide defaults, and any castle can have its own va
 | **Royal provinces** | A lord's line dying out, seizing a lord's land, conquest kept for yourself | Granting land to make a new lord |
 | **Officials** | Hiring (gold up front, wages yearly), school graduates | Dismissal, unpaid wages, war in their province |
 | **Faith** (% sharing the ruler's religion) | Missionaries and clergy, schools of your faith, migrants of your faith, conversion events | Conquering other faiths, reformations, foreign missionaries |
-| **Tongue** (% sharing the ruler's culture) | Slow assimilation, settlers, schools | Conquest, migration, separatist movements |
-| **In revolt** (provinces with riots or rebels) | Heavy taxes, famine, foreign faith or tongue, disloyal lords stirring, lost wars | Defeating rebels, giving in, lowering taxes, food |
+| **Language** (% sharing the ruler's culture) | Slow assimilation, settlers, schools | Conquest, migration, separatist movements |
+| **In revolt** (provinces with riots or rebels) | Heavy taxes, famine, foreign faith or language, disloyal lords stirring, lost wars | Defeating rebels, giving in, lowering taxes, food |
 
-Each province needs an official or a lord to pay properly. A royal province gives full taxes and recruits, but **without an official it pays half taxes and gives half recruits**. One official runs one province with G1, two with G9 and three with G16, plus one more each for B2, G11 and T14. A low Faith share means religious revolts and wavering clergy lords; a low Tongue share means separatist revolts and slower officials. Provinces in revolt lose taxes and recruits and spread trouble to neighbours. Under half counts as low: risings of that kind come half again as often, the lords seated among another faith waver each January (in a theocracy, all of them), and with a low Tongue officials' years count at half pace. The General tab marks a low Faith or Tongue with a warning line under it. A rising spreads to a restless neighbour at about a tenth a month.
+Each province needs an official or a lord to pay properly. A royal province gives full taxes and recruits, but **without an official it pays half taxes and gives half recruits**. One official runs one province with G1, two with G9 and three with G16, plus one more each for B2, G11 and T14. A low Faith share means religious revolts and wavering clergy lords; a low Language share means separatist revolts and slower officials. Provinces in revolt lose taxes and recruits and spread trouble to neighbours. Under half counts as low: risings of that kind come half again as often, the lords seated among another faith waver each January (in a theocracy, all of them), and with a low Tongue officials' years count at half pace. The General tab marks a low Faith or Tongue with a warning line under it. A rising spreads to a restless neighbour at about a tenth a month.
 
 ### Lords
 
@@ -193,7 +193,7 @@ The lord card is the same in every society; only the label changes: nobles, merc
 | Victories he took part in | A child ruler, a disputed heir or a new ruler |
 | A long secure reign with a clear heir | Requisitioning his grain |
 | Feeding his lands in famine | A foreign rival's bribes and promises |
-| Sharing your faith and tongue | |
+| Sharing your faith and language | |
 
 Paying for a building in a lord's province raises his loyalty one step. A famine in his land turns him disloyal; riots or a heavy demand on his province make him waver. At New Year, each lord over the government's cap drops one loyalty step (see [Government](Government)).
 
@@ -265,7 +265,7 @@ While an envoy is abroad he runs no province, so his province pays half until he
 
 ### Starting values
 
-At the start, the catalogue's assessments set your counts: economic strength and fiscal resilience give gold and debt; manpower potential recruits; military capability soldiers, commanders and horses; naval capability ships; administrative capacity officials and royal provinces; political stability and unrest risk lords' loyalty and provinces in revolt; territorial cohesion the number of lords, their land and tongue; institutional development schools, scholars and inventions; trade access starting trade; diplomatic influence extra officials ready as envoys. A low-confidence record starts with a wider random range. Allies, rivals, subjects and enemies come from the 1444 relations file. See [The 1444 Start](The-1444-Start).
+At the start, the catalogue's assessments set your counts: economic strength and fiscal resilience give gold and debt; manpower potential recruits; military capability soldiers, commanders and horses; naval capability ships; administrative capacity officials and royal provinces; political stability and unrest risk lords' loyalty and provinces in revolt; territorial cohesion the number of lords, their land and language; institutional development schools, scholars and inventions; trade access starting trade; diplomatic influence extra officials ready as envoys. A low-confidence record starts with a wider random range. Allies, rivals, subjects and enemies come from the 1444 relations file. See [The 1444 Start](The-1444-Start).
 
 ### Events and the AI
 
@@ -321,7 +321,7 @@ Things you can do: set food policy, override a castle, apply a food preset; take
 - [Subjects](Subjects): subjects and tribute; folding a subject in makes its ruler a lord.
 - [Government](Government): officials and lords caps, succession by form, lords over the cap.
 - [Trade](Trade): trade income (deposits, fees, tolls); traders and trade ships replace merchants.
-- [Religion](Religion) and [Culture](Culture): faith and tongue shares and their effects on lords.
+- [Religion](Religion) and [Culture](Culture): faith and language shares and their effects on lords.
 - [Rebellions](Rebellions): disloyal lords, retinues and wealth for risings, in revolt counts.
 - [Revolutions](Revolutions): regimes set forms; émigré pretenders.
 - [Historical Events](Historical-Events): event country stats mapped as above; ages raise women-in-roles chances.

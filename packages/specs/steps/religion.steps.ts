@@ -1812,10 +1812,10 @@ Given(/^the people of "([^"]+)" convert to (\w+)$/, (s, name: string, faith: str
   s.tongueBefore = { ...s.tongues.people };
   p.mix = { [faith]: 1 };
 });
-Then("their tongue does not change", (s) => {
+Then("their language does not change", (s) => {
   expect(s.tongues.people).toEqual(s.tongueBefore);
 });
-Then("the faith grievances and tongue grievances stay separate", (s) => {
+Then("the faith grievances and language grievances stay separate", (s) => {
   const p = provinces(s)[0]!;
   const faith = Object.keys(G.faithGrievances(p, G.newRealm("Hungary", "catholic")));
   const tongue = C.updateGrievances(s.tongues, C.newCountryCulture("hungary", "Bosnian"));

@@ -57,7 +57,7 @@ Hold slows change but never stops it. A province where one faith has three house
 
 *Worked example: East Bengal, 1444 to 1700.* East Bengal is 70 % hindu, 25 % asian_traditional and 5 % sunni, with 2 hindu temples and a sunni lord, under a sunni ruler. The forest is cleared and a mosque is granted on each of 3 new field tiles. Now sunni has 3.5 pull (three mosques and the lord), hindu 2 (two temples) and asian_traditional 1 (its sacred places). The mix settles toward sunni 54 %, hindu 31 % and asian_traditional 15 %. Once asian_traditional falls below a quarter it loses its sacred-places pull, and by about 1700 East Bengal is mostly sunni.
 
-**Small and new faiths.** A faith under 1 % with no house of its own is removed. A fourth faith arriving gets in only if it is larger than the smallest of the three. Then the smallest of the four joins the province's majority faith, so nobody simply vanishes. Tongues work the same way.
+**Small and new faiths.** A faith under 1 % with no house of its own is removed. A fourth faith arriving gets in only if it is larger than the smallest of the three. Then the smallest of the four joins the province's majority faith, so nobody simply vanishes. Languages work the same way.
 
 **Hidden believers.** For 100 years after a Persecuted faith's houses in a province are closed, that faith stays at 2 % or more there, unless an Inquisition removes the floor. If catholic is Persecuted in Japan and its houses in Nagasaki were closed 40 years ago, it stays at 2 %; after 100 years, or with an Inquisition, it may fall lower.
 
@@ -245,7 +245,7 @@ Each country gets its ruler's faith from the catalogue, and each province the mi
 - *Defend the faith* also opens when a neighbour persecutes your faith in a province bordering yours, when your preacher is killed or expelled, and when a holy place of your faith is held by another faith.
 - Schools have a faith, and persecution drives scholars abroad.
 - Diplomacy gets the fact "same faith" (better starting opinion) and the *Allow preachers* leave.
-- Faith and tongue stay two separate mixes with two separate grievances.
+- Faith and language stay two separate mixes with two separate grievances.
 
 ### The computer players
 

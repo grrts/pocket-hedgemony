@@ -577,7 +577,7 @@ Then("only one lens is on", (s) => {
   expect(s.view.lens).toBe("Food");
 });
 
-Given(/^the (Faith|Tongue|Sea|Subjects|Revolution|Diplomacy) lens is on$/, (s, id: string) => {
+Given(/^the (Faith|Language|Sea|Subjects|Revolution|Diplomacy) lens is on$/, (s, id: string) => {
   s.view = setLens(newMapView(), id).view;
 });
 
@@ -597,7 +597,7 @@ Then(/^the province is coloured "([^"]+)" and (hatched|not hatched)$/, (s, colou
   expect(r.hatched).toBe(hatch === "hatched");
 });
 
-Given(/^the kin toggle is (on|off)$/, (s, toggle: string) => {
+Given(/^the realm toggle is (on|off)$/, (s, toggle: string) => {
   s.view = { ...s.view, tongueKin: toggle === "on" };
 });
 
@@ -607,8 +607,8 @@ When(/^the map is drawn at (\w+) zoom$/, (s, zoom: string) => {
   s.drawn = true;
 });
 
-Then(/^provinces are coloured by (tongue family|tongue|kin, cousin or stranger)$/, (s, colouring: string) => {
-  expect(s.view.lens).toBe("Tongue");
+Then(/^provinces are coloured by (language family|language|same language, related or foreign)$/, (s, colouring: string) => {
+  expect(s.view.lens).toBe("Language");
   expect(tongueLensColouring(s.zoom, s.view.tongueKin)).toBe(colouring);
 });
 

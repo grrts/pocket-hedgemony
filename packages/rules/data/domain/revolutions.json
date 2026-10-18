@@ -879,7 +879,7 @@
    "lords": "Abolished. Their land returns to the state; the lords go abroad as pretenders (province stats 10.1) and pay rivals to fight you.",
    "church": "Church land is seized and sold; house-of-worship slots halve, and the clergy who lose their slots become homeless.",
    "faith": "No state faith for faith grievances: Wrong faith ends everywhere; Pious lords and clergy everywhere waver.",
-   "tongue": "Schools teach in the state tongue (culture design): tongue mix moves twice as fast toward it.",
+   "tongue": "Schools teach in the state language (culture design): the language mix moves twice as fast toward it.",
    "levy": "The mass levy is open: every class can be called.",
    "decrees": [
     "levy_en_masse",
@@ -985,7 +985,7 @@
    ],
    "ruler": "kept",
    "lords": "Kept, but army officers sit beside them.",
-   "tongue": "The state tongue is pushed in schools and offices: tongue mix moves faster toward it, Foreign rule grows in other homelands.",
+   "tongue": "The state language is pushed in schools and offices: the language mix moves faster toward it, Foreign rule grows in other homelands.",
    "decrees": [
     "officers_to_the_provinces",
     "call_the_assembly"
@@ -997,8 +997,8 @@
     "revolutionary_regime"
    ],
    "abroad": "None.",
-   "risk": "Homelands of other tongues raise separatist signs faster.",
-   "loop": "Officers run the provinces and push one nation's tongue: strong in war, hard on minorities."
+   "risk": "Homelands of other languages raise separatist signs faster.",
+   "loop": "Officers run the provinces and push one nation's language: strong in war, hard on minorities."
   },
   "warlord_republic": {
    "id": "warlord_republic",

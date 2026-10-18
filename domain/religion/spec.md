@@ -43,16 +43,16 @@ Newest decision first.
 | Faith | One id of the faith list (catholic, sunni, hindu …) with a local display name from the catalogue | Faith family |
 | Faith family | christian, islamic, indic, buddhist, east_asian, jewish, traditional, none | Culture family |
 | State faith | The realm's one Established faith (the ruler's faith) | Majority faith |
-| Faith mix | Up to three faiths per province, as shares of its people | Tongue mix |
-| Pull | A faith's yearly sum of visible causes in a province (buildings, preachers, schools, capital, lord, traders, waves, policy) | Culture's pull tongue |
+| Faith mix | Up to three faiths per province, as shares of its people | Language mix |
+| Pull | A faith's yearly sum of visible causes in a province (buildings, preachers, schools, capital, lord, traders, waves, policy) | Culture's pull language |
 | Hold | A faith's resistance to change: share × 4 (× 8 if rooted) | — |
 | Target share | (hold + pull) ÷ (all holds + all pulls) | Settled share (pull ÷ all pulls) |
 | Layered | Faiths living in the same people at once: shinto, mahayana, confucian_ritual, daoist; a traditional faith with any faith after 100 years together | — |
 | Rooted | The five traditional faiths: no house needed, hold ×2, sacred places | — |
-| Kin faith | A faith of the same family | Culture's kin |
+| Kin faith | A faith of the same family | Culture's same language (was kin) |
 | Community | A faith with at least 10 % of a province's people | — |
 | Served / unserved | A community with / without its own (or kin, or none needed) house and a Tolerated or Restricted policy | — |
-| Faith policy | Per faith per realm: Established, Tolerated, Restricted, Persecuted | Tongue policy |
+| Faith policy | Per faith per realm: Established, Tolerated, Restricted, Persecuted | Language policy |
 | Faith tax | Restricted: that faith's share of tax is 25 % higher | — |
 | *Wrong faith* | Grievance redefined by religion (see RELG-046) | — |
 | *Persecuted* | New grievance, counts as two | — |
@@ -254,7 +254,7 @@ Newest decision first.
 - RELG-111 The religion system shall give schools a faith, and drive persecuted scholars abroad. [religion §11]
 - RELG-112 The religion system shall supply diplomacy the facts "same faith" (better starting opinion) and the *Allow preachers* leave. [religion §11]
 - RELG-113 The religion system shall count the country card's Faith % as the share of people of the state faith or a faith layered with it, and list Preachers among Abroad. [religion §1, §18]
-- RELG-114 The religion system shall keep faith and tongue as two separate mixes and two separate grievances. [religion §11]
+- RELG-114 The religion system shall keep faith and language as two separate mixes and two separate grievances. [religion §11]
 - RELG-115 The religion system shall have no faith meter, piety, fervour or unity score and no "convert province" button. [religion intro, §17]
 
 ### 5.14 What the player sees
@@ -285,7 +285,7 @@ Every province now holds its faiths and every realm its state faith and Faith po
 - RELG-132 Every province's faiths and houses, and every realm's state faith, Faith policies and pending changes, shall be kept in the save. [SAVE]
 
 #### How the player uses it
-- RELG-133 Where: every province's overview has a **Faith** line under its Tongue line: each faith's share with ↑ or ↓ when it is rising or falling. Tapping it, a 44-point button, opens below it how fast and toward which faith the mix moves, and for each faith its policy, whether its community is served, any grievance, and its pulls with their sources. The player's **Peoples** tab (shared with tongues, CULT-101) lists below the tongues the state faith and Faith %, then one card per faith in the realm, largest first, with its share, people, provinces where it is most and how many are aggrieved; the state faith says Established; every other faith has three buttons, Tolerated, Restricted and Persecuted, and one sentence on what the chosen policy does. A change shows as "Tolerated until New Year, then Restricted", and tapping the current policy again keeps it. [X-19, RELG-116, RELG-117]
+- RELG-133 Where: every province's overview has a **Faith** line under its Language line: each faith's share with ↑ or ↓ when it is rising or falling. Tapping it, a 44-point button, opens below it how fast and toward which faith the mix moves, and for each faith its policy, whether its community is served, any grievance, and its pulls with their sources. The player's **Peoples** tab (shared with languages, CULT-101) lists below the languages the state faith and Faith %, then one card per faith in the realm, largest first, with its share, people, provinces where it is most and how many are aggrieved; the state faith says Established; every other faith has three buttons, Tolerated, Restricted and Persecuted, and one sentence on what the chosen policy does. A change shows as "Tolerated until New Year, then Restricted", and tapping the current policy again keeps it. [X-19, RELG-116, RELG-117]
 - RELG-134 Grouping and overview: the General tab of every realm card has a **Faith** line (state faith, Faith %, number of other faiths), red on the player's card when any faith is aggrieved, opening the Peoples tab. The map has a **Faiths** lens colouring each province by its largest faith, hatched where a second faith holds 30 % or more, with a key. *Wrong faith* and *Persecuted* show in the province's grievances with what ends them, and a policy taking effect reaches the dispatches. Phone: as CULT-101, the faith cards stack in one column in the side panel, every button at least 44 points high, nothing needs hover and nothing scrolls sideways. [X-19, RELG-118, SHELL-108, SHELL-109, SHELL-114]
 
 ### 5.17 Heads of the faith (design, 18 October)
@@ -489,7 +489,7 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 - **D-RELG-14** (was OQ-RELG-14) Hussite merge: at the end of the Reformation period or in 1620, whichever comes first. "By 1620" is a latest date.
 - **D-RELG-15** (was OQ-RELG-15) Secular pull: 0.5 per school, after 1850, in a town with a factory building, in a realm with `mass_literacy_schooling`. The factory building already exists.
 - **D-RELG-16** (was OQ-RELG-16) Amritsar appears when `sikh_panth_founded` fires, not before 1577 (the event's date wins over "the 1580s"); the Temple of the Tooth moves from Kotte to Kandy in 1592 by date (RELG-126). A date needs no new event.
-- **D-RELG-17** (was OQ-RELG-17) Fourth faith: one rule for faiths and tongues. A newcomer enters only if larger than the smallest of the three; the smallest group of the four joins the majority. Nobody vanishes, and one storage rule has one behaviour.
+- **D-RELG-17** (was OQ-RELG-17) Fourth faith: one rule for faiths and languages. A newcomer enters only if larger than the smallest of the three; the smallest group of the four joins the majority. Nobody vanishes, and one storage rule has one behaviour.
 - **D-RELG-18** (was OQ-RELG-18) Wording: religion's words win. Monks who "travel out as missionaries" are the preachers a monastery gives (RELG-068); pulling down a minority house happens only as a take-over or a Persecuted closing. No new action.
 - **D-RELG-19** (was OQ-RELG-19) Preachers after adopting: no special withholding. All old-faith preachers go; the new faith's preachers come from their usual sources, so none from houses until its houses exist, while holy places of the new faith and event grants for it count at once. The count already follows its sources.
 - **D-RELG-20** (was OQ-RELG-20) Holy place provinces are bound to map provinces by their names when the 1444 map is set up, through scenario-setup's rename table (X-13); a name with no map province leaves the place inactive until one exists. X-13 makes the map the truth.

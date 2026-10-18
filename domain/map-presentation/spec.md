@@ -74,7 +74,7 @@ Newest decision first.
 ### Aggregates
 
 **Map view** (identity: one per running client)
-- Holds: camera (x, y, zoom), current zoom level, current lens, lens options (Tongue toggle, patterns),
+- Holds: camera (x, y, zoom), current zoom level, current lens, lens options (Language toggle, patterns),
   parchment on or off, selection, window shape, performance knob values.
 - INV-VIEW-1: Exactly one lens is active at a time.
 - INV-VIEW-2: The zoom level is derived from the camera zoom; the local zoom's tile row is part of the map.
@@ -126,9 +126,9 @@ Newest decision first.
 ### 5.3 Lenses
 
 - VIEW-021 (Ubiquitous): A map lens shall recolour the map by one stat, chosen from the lens picker in the tool column. [province-stats §14; screen-flow §4.2, §4.7]
-- VIEW-022 (Ubiquitous): The lens list shall hold the province lenses Food, Tax reaching you, Days to capital, Grievances, Faith, Tongue, Ground, Recruits; the trade lenses Trade ratio, Trade value and Traders (Trade ratio and Trade value replace Traders passing and Trade balance); and the lenses Diplomacy, Sea, Works, Jobs, Subjects and Revolution. [province-stats §14; trade §10.1; diplomacy §13.1; naval §10; buildings §11.1; subjects §10.3; revolutions §13] The picker also keeps the build's Realms, Terrain, People, Wealth and Walls, 22 lenses in all, and scrolls on a phone (D-VIEW-2).
+- VIEW-022 (Ubiquitous): The lens list shall hold the province lenses Food, Tax reaching you, Days to capital, Grievances, Faith, Language, Ground, Recruits; the trade lenses Trade ratio, Trade value and Traders (Trade ratio and Trade value replace Traders passing and Trade balance); and the lenses Diplomacy, Sea, Works, Jobs, Subjects and Revolution. [province-stats §14; trade §10.1; diplomacy §13.1; naval §10; buildings §11.1; subjects §10.3; revolutions §13] The picker also keeps the build's Realms, Terrain, People, Wealth and Walls, 22 lenses in all, and scrolls on a phone (D-VIEW-2).
 - VIEW-023 (Ubiquitous): The Faith lens shall colour each province by its majority faith, hatched where a community of another faith is 30 % or more; holy places carry a small icon. [religion §12]
-- VIEW-024 (Ubiquitous): The Tongue lens shall colour by tongue family at far zoom and by tongue at regional zoom, with a toggle to kin / cousin / stranger colours for the player's realm, and outline homelands of peoples without a country. [culture §7.3]
+- VIEW-024 (Ubiquitous): The Language lens shall colour by language family at far zoom and by language at regional zoom, with a toggle to same language / related / foreign colours for the player's realm, and outline homelands of peoples without a country. [culture §7.3]
 - VIEW-025 (Ubiquitous): The Diplomacy lens shall colour every country by the player's relation to it: own colour for you and your subjects; blue for allies (light blue pledged); green and pale green for Close and Warm; grey for Cool or nothing recorded; orange for Cold or Rival; red for Hostile, Bitter or at war (hatched at war); a red border for a league against you. [diplomacy §13.1]
 - VIEW-026 (Ubiquitous): The Sea lens shall shade every port by the sailors who can still be called, and show fleets at sea, the month's winds as arrows over sea zones, and the zones a fleet's ships can enter at the current research. [naval §10]
 - VIEW-027 (Ubiquitous): The Trade ratio lens shall colour provinces by trade ratio, with the busiest roads and sea lanes as lines; Traders shows only your traders and their routes. [trade §10.1]
@@ -302,7 +302,7 @@ re-renders only open panels.
 | naval | upstream | Published Language | Ports, fleets, Sea lens |
 | trade | upstream | Published Language | Trade lenses, traders, roads and lanes |
 | religion | upstream | Published Language | Faith lens, worship sprites, preachers, waves |
-| culture | upstream | Published Language | Tongue lens and toggle |
+| culture | upstream | Published Language | Language lens and toggle |
 | diplomacy | upstream | Published Language | Diplomacy lens, envoys, war-aim icons |
 | exploration | upstream | Customer–Supplier | Charted map (parchment), voyages, colonies |
 | buildings | upstream | Published Language | Works and Jobs lenses |
@@ -321,7 +321,7 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 ## 13. Decisions and open questions
 
 - **D-VIEW-1** (was OQ-VIEW-1) Sharpness: Sharpness applies to the overlay only (Balanced up to 2, Native up to 3 device pixels per CSS pixel); the map canvas always shades 1 pixel per CSS pixel. It keeps the performance rule and the code.
-- **D-VIEW-2** (was OQ-VIEW-2) Lenses: the lens picker holds the build's six (Realms, Terrain, People, Wealth, Walls, Food) and every lens the designs add (Tax reaching you, Days to capital, Grievances, Faith, Tongue, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects, Revolution), 22 in all, in a scrolling picker on a phone; Trade ratio and Trade value replace Traders passing and Trade balance. Keep what the game does and follow trade v2 (X-6).
+- **D-VIEW-2** (was OQ-VIEW-2) Lenses: the lens picker holds the build's six (Realms, Terrain, People, Wealth, Walls, Food) and every lens the designs add (Tax reaching you, Days to capital, Grievances, Faith, Language, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects, Revolution), 22 in all, in a scrolling picker on a phone; Trade ratio and Trade value replace Traders passing and Trade balance. Keep what the game does and follow trade v2 (X-6).
 - **D-VIEW-3** (was OQ-VIEW-3) Parchment: "Parchment over unknown lands" is a display toggle only; it never lets the player enter uncharted zones, which stays exploration's rule, and "fog" in the new-game options is the fog-of-war campaign rule, a different thing. X-15: settings never change results.
 - **D-VIEW-4** (was OQ-VIEW-4) Zoom names: there are three zoom levels, World, Region and Local; "Province" in naval and exploration means Local. The simpler set.
 - **D-VIEW-5** (was OQ-VIEW-5) Zoom boundaries: World below camera zoom 2, Region from 2 to under 4, Local from 4 (provisional in `map-presentation.json`). Missing numbers get provisional values.
@@ -361,7 +361,7 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-022 | lenses.feature | The lens list holds every system's lens |
 | VIEW-022 | lenses.feature | The lens picker holds 22 lenses and scrolls on a phone |
 | VIEW-023 | lenses.feature | The Faith lens hatches large minority communities |
-| VIEW-024 | lenses.feature | The Tongue lens changes with zoom and a toggle |
+| VIEW-024 | lenses.feature | The Language lens changes with zoom and a toggle |
 | VIEW-024 | lenses.feature | Homelands of peoples without a country are outlined |
 | VIEW-025 | lenses.feature | The Diplomacy lens colours countries by your relation |
 | VIEW-025 | lenses.feature | A league against you shows as a red border |

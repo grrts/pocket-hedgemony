@@ -68,7 +68,7 @@ A **lens** recolours the map by one stat. You pick it from the lens picker, a sm
 | Days to capital | How far each province is from the capital | [Provinces](Provinces) |
 | Grievances | Grievances in each province | [Provinces](Provinces) |
 | Faith | Majority faith, hatched where another faith is 30 % or more; holy places carry a small icon | [Religion](Religion) |
-| Tongue | Tongue family at far zoom, tongue at region zoom; a toggle to kin, cousin or stranger colours for your realm; homelands of peoples without a country outlined | [Culture](Culture) |
+| Language | Language family at far zoom, language at region zoom; a toggle to same language, related or foreign colours for your realm; homelands of peoples without a country outlined | [Culture](Culture) |
 | Ground | Each province's ground | [Provinces](Provinces) |
 | Recruits | Recruits | [Provinces](Provinces) |
 | Trade ratio | Provinces by trade ratio, with the busiest roads and sea lanes as lines | [Trade](Trade) |
@@ -81,7 +81,7 @@ A **lens** recolours the map by one stat. You pick it from the lens picker, a sm
 | Subjects | Your subjects by loyalty, with a line to each courted subject from the courting country's capital | [Subjects](Subjects) |
 | Revolution | Provinces by how many of the revolution's province-level signs they meet; risen provinces hatched in the revolution's colour | [Revolutions](Revolutions) |
 
-Trade ratio and Trade value replace the older Traders passing and Trade balance lenses. The picker holds 22 lenses: Realms, Terrain, People, Wealth, Walls and Food, plus Tax reaching you, Days to capital, Grievances, Faith, Tongue, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects and Revolution. On a phone the picker scrolls. A system with no zoom plan of its own shows its lens at every zoom and its card only at Local.
+Trade ratio and Trade value replace the older Traders passing and Trade balance lenses. The picker holds 22 lenses: Realms, Terrain, People, Wealth, Walls and Food, plus Tax reaching you, Days to capital, Grievances, Faith, Language, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects and Revolution. On a phone the picker scrolls. A system with no zoom plan of its own shows its lens at every zoom and its card only at Local.
 
 **Diplomacy lens colours:**
 
@@ -177,7 +177,7 @@ To hold these:
 ## What you see
 
 - The map itself at World, Region and Local zoom, as described above.
-- The **tool column** with the **lens picker** pop-over, and the lens menu with the parchment switch and the Tongue toggle.
+- The **tool column** with the **lens picker** pop-over, and the lens menu with the parchment switch and the Language toggle.
 - **Weekly playback**, slowed to 4-hour steps during your battles, and the parchment strip during long turns.
 - Cards as side sheets or bottom sheets depending on the window shape; "Turn your phone sideways" on an upright phone.
 
@@ -193,7 +193,7 @@ Commands you give here never reach the engine: picking a lens, zooming and panni
 - [Naval](Naval): ports, fleets and the Sea lens.
 - [Trade](Trade): trade lenses, traders, roads and lanes.
 - [Religion](Religion): the Faith lens, worship sprites, preachers, waves.
-- [Culture](Culture): the Tongue lens and its toggle.
+- [Culture](Culture): the Language lens and its toggle.
 - [Diplomacy](Diplomacy): the Diplomacy lens, envoys, war-aim icons.
 - [Exploration and Colonies](Exploration-and-Colonies): the charted map under the parchment, voyages, colonies.
 - [Buildings](Buildings): the Works and Jobs lenses.
