@@ -8,7 +8,7 @@
  * edges repeat, scaled up by whole steps so pixels stay square.
  */
 
-import { FLAG_H, FLAG_W, flagGrid } from "./flags.ts";
+import { FLAG_H, FLAG_W, flagCanvasSize, flagGrid } from "./flags.ts";
 
 type Px = (x: number, y: number, c: string) => void;
 
@@ -400,8 +400,9 @@ export function flagCanvas(nation: FlagOf, scale = 1): HTMLCanvasElement {
   const cloth = flagGrid(nation.id) ?? Array.from({ length: FLAG_H }, () => Array<string>(FLAG_W).fill(nation.color));
   const w = FLAG_W + 2;
   const canvas = document.createElement("canvas");
-  canvas.width = w * scale;
-  canvas.height = (FLAG_H + 3) * scale;
+  const size = flagCanvasSize(scale);
+  canvas.width = size.w;
+  canvas.height = size.h;
   const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   const rect = (x: number, y: number, rw: number, rh: number, c: string) => {
     ctx.fillStyle = c;

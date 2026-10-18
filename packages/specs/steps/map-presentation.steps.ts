@@ -122,6 +122,11 @@ import { decodeRgb } from "@ph/engine/node";
 import { fileURLToPath } from "node:url";
 import { FLAG_COLORS, FLAG_H, FLAG_W, flagGrid } from "../../../apps/client/src/art/flags.ts";
 import { steps, type Scenario } from "../src/registry.ts";
+// The client's own art code, for the map figures and portraits (VIEW-084 to VIEW-087).
+import { apparentAge, commanderGrid, commanderKit, commanderSpriteSize, eraOfYear } from "../../../apps/client/src/art/commanders.ts";
+import { FLAG_COLORS, flagCanvasSize, flagColors, flagGrid } from "../../../apps/client/src/art/flags.ts";
+import { lookOfCulture, portraitDress } from "../../../apps/client/src/art/portraits.ts";
+import { armyFigureUnit, armyNameShown, tokenFigure, tokenLayout } from "../../../apps/client/src/map/marchArt.ts";
 
 const { Given, When, Then } = steps("map-presentation");
 
@@ -1767,3 +1772,134 @@ When("the zoom level is worked out", (s) => {
   s.level = zoomForCamera(s.camera);
 });
 Then(/^the zoom level is (World|Region|Local)$/, (s, z: string) => expect(s.level).toBe(z));
+
+// ---------------------------------------------------------------------------------------------------
+// Map figures and portraits (VIEW-084 to VIEW-087, feedback 56-58, 65, 77, 89): these steps check the
+// client's own art code (apps/client/src/art, apps/client/src/map/marchArt.ts), the pure pieces the
+// map and the realm book draw from.
+// ---------------------------------------------------------------------------------------------------
+
+/** France as the client dresses it: its map colour, and the look of its culture. */
+function franceForArt(): { id: string; color: string; look: ReturnType<typeof lookOfCulture> } {
+  const rules = loadDefaultRuleset();
+  const france = rules.nations.find((n) => n.id === "france")!;
+  return { id: "france", color: france.color, look: lookOfCulture(rules.names?.nations["france"]) };
+}
+
+/** The camera zoom where Local zoom begins, where army figures first show close in. */
+const LOCAL_CAMERA = 4;
+
+Given(/^"([^"]+)" commands France's army in (\d+)$/, (s, name: string, year: string) => {
+  s.commanderOnMap = { name, year: Number(year) };
+});
+
+Then(/^he stands on foot in France's blue and white with (.+)$/, (s, kit: string) => {
+  expect(s.zoom).toBe(zoomLevel("Local"));
+  const { name, year } = s.commanderOnMap;
+  const france = franceForArt();
+  const c = { name, nation: france.id, color: france.color, look: france.look, era: eraOfYear(year), age: apparentAge(name, year) };
+  // On foot: the token is the commander's own figure, and only their two boots touch the ground (no horse).
+  expect(tokenFigure({ commander: c })).toBe("commander on foot");
+  const grid = commanderGrid(c, 0);
+  const ground = grid.slice(-2).flat().filter((x): x is string => !!x);
+  expect(ground.length).toBeGreaterThan(0);
+  expect(new Set(ground).size).toBe(1);
+  // France's flag gives blue and white, and both dress the figure.
+  const [first, second] = flagColors(france.id, france.color);
+  expect([first, second]).toEqual([FLAG_COLORS.B, FLAG_COLORS.W]);
+  const colours = new Set(grid.flat());
+  expect(colours.has(FLAG_COLORS.B), "blue on the figure").toBe(true);
+  expect(colours.has(FLAG_COLORS.W), "white on the figure").toBe(true);
+  // The kit of the era, as the figure is drawn from it.
+  const worn = Object.values(commanderKit(c.era, c.look));
+  for (const part of kit.split(" and ").map((p) => p.replace(/^an? /, ""))) expect(worn).toContain(part);
+});
+
+Given("France's army stands in {string}", (s, province: string) => {
+  s.armyOnMap = { province };
+});
+
+When(/^the camera zooms from (\d+) to (\d+)$/, (s, from: string, to: string) => {
+  s.figureSizes = [];
+  for (let zoom = Number(from); zoom <= Number(to); zoom += 0.5) {
+    const u = armyFigureUnit(zoom);
+    const figure = tokenLayout({ x: 100, y: 100, u, men: 9000, figure: commanderSpriteSize(u) }).figure;
+    s.figureSizes.push({ zoom, level: zoomForCamera(zoom), w: figure.w, h: figure.h });
+  }
+});
+
+Then("the army's figure stays the same size on screen", (s) => {
+  const sizes: { zoom: number; level: string; w: number; h: number }[] = s.figureSizes;
+  expect(sizes.length).toBeGreaterThan(1);
+  for (const z of sizes) {
+    expect(z.level).toBe("Local");
+    expect({ w: z.w, h: z.h }, `figure size at camera zoom ${z.zoom}`).toEqual({ w: sizes[0]!.w, h: sizes[0]!.h });
+  }
+});
+
+Given(/^France's army of ([\d,]+) men led by "([^"]+)" is selected$/, (s, men: string, name: string) => {
+  s.armyToken = { men: Number(men.replace(/,/g, "")), name, selected: true };
+});
+
+/** The selected army's token laid out where the map draws it, at Local zoom, on whole and fractional screen points. */
+function armyTokenLayouts(s: Scenario) {
+  const u = armyFigureUnit(LOCAL_CAMERA);
+  return [
+    [200, 150],
+    [201.5, 150.25],
+    [333.7, 98.6],
+  ].map(([x, y]) => tokenLayout({ x: x!, y: y!, u, men: s.armyToken.men, figure: commanderSpriteSize(u), flag: flagCanvasSize(1) }));
+}
+
+Then(/^France's flag shows before "([^"]+)", on the same row$/, (s, men: string) => {
+  expect(flagGrid("france"), "France has a flag of its own").not.toBeNull();
+  for (const L of armyTokenLayouts(s)) {
+    expect(L.plate.text).toBe(men);
+    const flag = L.flag!;
+    expect(flag).not.toBeNull();
+    expect(flag.x + flag.w).toBeLessThanOrEqual(L.plate.x);
+    expect(flag.y + flag.h / 2).toBe(L.plate.y + L.plate.h / 2);
+  }
+});
+
+Then(/^the name "([^"]+)" shows below them$/, (s, name: string) => {
+  expect(s.armyToken.name).toBe(name);
+  expect(armyNameShown(s.armyToken.selected, LOCAL_CAMERA)).toBe(true);
+  for (const L of armyTokenLayouts(s)) {
+    const flag = L.flag!;
+    expect(L.name.y).toBeGreaterThanOrEqual(Math.max(flag.y + flag.h, L.plate.y + L.plate.h, L.figure.y + L.figure.h));
+    // Centred under the flag and the men count.
+    expect(Math.abs((flag.x + L.plate.x + L.plate.w) / 2 - L.name.x)).toBeLessThanOrEqual(0.5);
+  }
+});
+
+Given("France has a judge, a steward and a lord", (s) => {
+  const france = franceForArt();
+  s.sitters = [{ kind: "official", post: "Judge" }, { kind: "official", post: "Steward" }, { kind: "lord" }].map((p) => ({
+    ...p,
+    nation: france.id,
+    look: france.look,
+  }));
+});
+
+When("the player opens the realm book's Officials and Lords tabs", (s) => {
+  s.portraits = s.sitters.map((p: Parameters<typeof portraitDress>[0]) => portraitDress(p, eraOfYear(1444)));
+});
+
+Then("the judge wears a red robe and holds a gavel, the steward holds keys", (s) => {
+  const [judge, steward] = s.portraits;
+  expect(judge.wears).toBe("red robe");
+  expect(judge.holds).toBe("gavel");
+  expect(steward.holds).toBe("keys");
+});
+
+Then("the lord wears a fur mantle and a coronet", (s) => {
+  const lord = s.portraits[2];
+  expect(lord.wears).toBe("fur mantle");
+  expect(lord.head).toBe("coronet");
+});
+
+Then("each stands before France's flag", (s) => {
+  expect(flagGrid("france")).not.toBeNull();
+  for (const p of s.portraits) expect(p.backdrop).toBe("flag");
+});

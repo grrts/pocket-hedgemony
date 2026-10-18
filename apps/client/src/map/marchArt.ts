@@ -145,37 +145,105 @@ export interface TokenStyle {
   t: number;
 }
 
-/** Draws an army token: the figure on its tile with its men on a plate below. Returns its tap box. */
-export function drawToken(ctx: Ctx, s: TokenStyle): { x: number; y: number; w: number; h: number } {
+/**
+ * CSS pixels per art pixel of an army's figure, its flag row and plate at a camera zoom: one size at
+ * every zoom from Local in, so the figure never grows to cover its province (VIEW-085, feedback 57).
+ */
+export function armyFigureUnit(_zoom: number): number {
+  return 2;
+}
+
+/** The commander's name shows under their army when it is selected, or once zoomed in close. */
+export function armyNameShown(selected: boolean, zoom: number): boolean {
+  return selected || zoom >= 8;
+}
+
+/** What stands for an army on the map: its commander on foot, a rider in the realm's colour without one, a ship at sea. */
+export function tokenFigure(s: { naval?: boolean; commander?: unknown }): "commander on foot" | "rider" | "ship" {
+  return s.naval ? "ship" : s.commander ? "commander on foot" : "rider";
+}
+
+export interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** Where each part of an army token goes, in CSS pixels. */
+export interface TokenLayout {
+  /** The figure's sprite. */
+  figure: Box;
+  /** The realm's flag, on the plate's row before it; null without a flag. */
+  flag: Box | null;
+  /** The men count's plate and its text. */
+  plate: Box & { text: string };
+  /** The tap box round figure, flag and plate. */
+  tap: Box;
+  /** The top centre of the commander's name, below everything else. */
+  name: { x: number; y: number };
+}
+
+/**
+ * Lays out an army token (VIEW-086): the figure's feet on the tile's centre (x, y), the men count on a
+ * plate below, and the realm's flag before the plate on the same row, centred on it; the pair is centred
+ * under the figure; the commander's name goes below them. Sizes are the sprites' in CSS pixels.
+ */
+export function tokenLayout(s: {
+  x: number;
+  y: number;
+  u: number;
+  men: number;
+  figure: { w: number; h: number };
+  flag?: { w: number; h: number } | undefined;
+  bob?: number;
+}): TokenLayout {
+  const { u } = s;
+  const img = s.figure;
+  const x = Math.round(s.x - img.w / 2);
+  // The sprite's last row is its feet (or keel): put them on the tile's centre.
+  const y = Math.round(s.y - img.h + u + (s.bob ?? 0));
+  const figure = { x, y, w: img.w, h: img.h };
+  const text = menShort(s.men);
+  const plateTop = Math.round(s.y + 2 * u);
+  const plateW = (digitsWidth(text) + 4) * u;
+  const plateH = 9 * u;
+  let flag: Box | null = null;
+  let plate: Box & { text: string };
+  let tap: Box;
+  if (!s.flag) {
+    plate = { x: Math.round(s.x - plateW / 2), y: plateTop, w: plateW, h: plateH, text };
+    tap = { x, y, w: img.w, h: img.h + plateH + 2 * u };
+  } else {
+    const gap = u;
+    const left = Math.round(s.x - (s.flag.w + gap + plateW) / 2);
+    plate = { x: Math.round(left + s.flag.w + gap), y: plateTop, w: plateW, h: plateH, text };
+    flag = { x: left, y: Math.round(s.y + 2 * u + (plateH - s.flag.h) / 2), w: s.flag.w, h: s.flag.h };
+    const bx = Math.min(x, left);
+    tap = { x: bx, y, w: Math.max(x + img.w, left + s.flag.w + gap + plateW) - bx, h: img.h + plateH + 2 * u };
+  }
+  return { figure, flag, plate, tap, name: { x: s.x, y: tap.y + tap.h + 2 } };
+}
+
+/** Draws an army token: the figure on its tile with its men on a plate below. Returns its layout; `tap` is its tap box. */
+export function drawToken(ctx: Ctx, s: TokenStyle): TokenLayout {
   const { u } = s;
   // Two frames: legs (or waves) step while marching, the standard flutters at rest.
   const frame = Math.floor(s.t / (s.moving ? 160 : 520)) % 2;
   const name: SpriteName = s.naval ? (frame ? "ship1" : "ship0") : frame ? "rider1" : "rider0";
-  const img = s.commander && !s.naval ? commanderSprite(s.commander, u, frame as 0 | 1, s.dir, s.moving) : facing(name, s.color, u, s.dir);
+  const img =
+    tokenFigure(s) === "commander on foot" ? commanderSprite(s.commander!, u, frame as 0 | 1, s.dir, s.moving) : facing(name, s.color, u, s.dir);
   const bob = s.moving && !s.naval ? (frame ? -u : 0) : s.naval && frame ? u : 0;
-  const x = Math.round(s.x - img.width / 2);
-  // The sprite's last row is its feet (or keel): put them on the tile's centre.
-  const y = Math.round(s.y - img.height + u + bob);
+  const L = tokenLayout({ x: s.x, y: s.y, u, men: s.men, figure: { w: img.width, h: img.height }, flag: s.flag && { w: s.flag.width, h: s.flag.height }, bob });
   groundShadow(ctx, s.x, s.y + u, u, 6);
   if (s.selected) {
     const pulse = Math.floor(s.t / 260) % 2;
-    brackets(ctx, x, y, img.width, img.height + 10 * u, u, 1 + pulse, PALETTE.gold);
+    brackets(ctx, L.figure.x, L.figure.y, img.width, img.height + 10 * u, u, 1 + pulse, PALETTE.gold);
   }
-  ctx.drawImage(img, x, y);
-  const text = menShort(s.men);
-  const plateTop = s.y + 2 * u;
-  if (!s.flag) {
-    const plateH = drawPlate(ctx, text, s.x, plateTop, u, s.color);
-    return { x, y, w: img.width, h: img.height + plateH + 2 * u };
-  }
-  // Flag and men count side by side, centred under the figure, the flag's middle on the plate's.
-  const gap = u;
-  const plateW = (digitsWidth(text) + 4) * u;
-  const left = Math.round(s.x - (s.flag.width + gap + plateW) / 2);
-  const plateH = drawPlate(ctx, text, left + s.flag.width + gap + plateW / 2, plateTop, u, s.color);
-  ctx.drawImage(s.flag, left, Math.round(plateTop + (plateH - s.flag.height) / 2));
-  const bx = Math.min(x, left);
-  return { x: bx, y, w: Math.max(x + img.width, left + s.flag.width + gap + plateW) - bx, h: img.height + plateH + 2 * u };
+  ctx.drawImage(img, L.figure.x, L.figure.y);
+  drawPlate(ctx, L.plate.text, L.plate.x + L.plate.w / 2, L.plate.y, u, s.color);
+  if (s.flag && L.flag) ctx.drawImage(s.flag, L.flag.x, L.flag.y);
+  return L;
 }
 
 export interface RouteStyle {

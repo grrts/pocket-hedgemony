@@ -50,7 +50,7 @@ import { commanderPortrait, officialCard, officialOf, officialScreen, officialsT
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
 import { provinceThumb } from "./map/provinceThumb.ts";
-import { drawBattle, drawRoute, drawSiegeMark, drawToken, pruneBattles, weekEnds } from "./map/marchArt.ts";
+import { armyFigureUnit, armyNameShown, drawBattle, drawRoute, drawSiegeMark, drawToken, pruneBattles, weekEnds } from "./map/marchArt.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
@@ -1175,17 +1175,17 @@ function drawOverlay(o: OverlayContext): void {
       const realm = nations[s.armies.owner[k]!]!;
       const name = cmdOf(cmd).name;
       // The commander in their realm's colours, kit of the era and age (feedback 56), at one size at every zoom (feedback 57).
-      const box = drawToken(ctx, {
-        x: sx, y: sy, u: 2, color: realm.color, men: s.armies.men[k]!,
+      const token = drawToken(ctx, {
+        x: sx, y: sy, u: armyFigureUnit(zoom), color: realm.color, men: s.armies.men[k]!,
         dir: armyFacing(k), moving, selected: selected.has(id), t: now, flag: flagCanvas(realm, 1),
         commander: { name, nation: realm.id, color: realm.color, look: lookOfCulture(rules.names?.nations[realm.id]), era: eraOfYear(s.date.year), age: apparentAge(name, s.date.year) },
       });
-      armyHitBoxes.push({ id, ...box });
+      armyHitBoxes.push({ id, ...token.tap });
       animating ||= moving;
-      if (selected.has(id) || zoom >= 8) {
+      if (armyNameShown(selected.has(id), zoom)) {
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
-        pixelText(ctx, name, sx, box.y + box.h + 2, 10);
+        pixelText(ctx, name, token.name.x, token.name.y, 10);
       }
     }
     drawColonies(o, ctx, u, onScreen);
