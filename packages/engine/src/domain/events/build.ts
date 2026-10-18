@@ -205,7 +205,7 @@ export function validate(input: BuildInput): BuildReport {
     earliest.set(id, e);
     return e;
   };
-  for (const ev of input.events) if (reach(ev.id, new Set()) > ev.availability.latest) errors.push(`event ${ev.id}: impossible trigger (earliest reachable ${earliest.get(ev.id)} after latest ${ev.availability.latest})`);
+  for (const ev of input.events) if (ev.availability.latest != null && reach(ev.id, new Set()) > ev.availability.latest) errors.push(`event ${ev.id}: impossible trigger (earliest reachable ${earliest.get(ev.id)} after latest ${ev.availability.latest})`);
   // exclusive pairs jointly required
   for (const ev of input.events) {
     const req = edges[ev.id] ?? [];

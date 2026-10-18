@@ -45,6 +45,7 @@ import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
+import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 
 const rules = loadDefaultRuleset();
@@ -193,6 +194,7 @@ app.innerHTML = `
   <section class="panel framed" id="panel" hidden></section>
   <div class="alerts" id="alerts" aria-live="polite"></div>
   <div class="battle-watch framed" id="battle-watch" hidden></div>
+  <section class="event-card framed" id="event-card" role="dialog" aria-labelledby="event-title" hidden></section>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
   <button class="wax fab end-turn" id="fab" title="End turn" data-sfx="none" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
@@ -203,6 +205,13 @@ const armyList = document.querySelector<HTMLElement>("#army-list")!;
 const armyButton = document.querySelector<HTMLButtonElement>("#armies")!;
 const alerts = document.querySelector<HTMLElement>("#alerts")!;
 const battleWatch = document.querySelector<HTMLElement>("#battle-watch")!;
+const eventCard = document.querySelector<HTMLElement>("#event-card")!;
+/** The waiting event's card is folded into End turn while the player looks at the map (SHELL-081). */
+let eventFolded = false;
+/** The week was paused because an event came for the player: it plays on once none waits. */
+let pausedForEvent = false;
+/** Events the player has been shown, so a new one opens its card once. */
+const eventsSeen = new Set<string>();
 /** The battle the player is watching (its province), and how it ended once it has. */
 let watching: { province: number; result?: string } | null = null;
 const soundButton = document.querySelector<HTMLButtonElement>("#sound")!;
@@ -1305,7 +1314,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", reform: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown",
 };
 
 /**
@@ -1362,6 +1371,51 @@ function logNews(s: Snapshot): void {
     alerted.add(`ask ${a.id}`);
     alertPlayer(`${nations[a.from]!.name}'s envoy waits for your answer.`, "scroll", { answer: true });
   }
+  // A new event for the player opens its card, and the week waits for the answer (EVT-044, EVT-076).
+  const fresh = s.events.filter((c) => !eventsSeen.has(c.event));
+  for (const c of fresh) eventsSeen.add(c.event);
+  if (fresh.length) {
+    eventFolded = false;
+    if (playing && !paused) {
+      paused = true;
+      pausedForEvent = true;
+    }
+  }
+  renderEventCard();
+}
+
+/** The oldest event waiting for the player, as a card over the map, unless folded into End turn. */
+function renderEventCard(): void {
+  const cards = snapshot?.events ?? [];
+  const card = cards[0];
+  eventCard.hidden = !card || eventFolded;
+  if (!card || eventFolded) return;
+  eventCard.innerHTML = eventCardHtml(card, cards.length);
+  eventCard.querySelector("[data-event-fold]")!.addEventListener("click", () => {
+    eventFolded = true;
+    renderEventCard();
+    renderActions();
+  });
+  eventCard.querySelectorAll<HTMLButtonElement>("[data-event-option]").forEach((b) =>
+    b.addEventListener("click", async () => {
+      await act({ type: "answerEvent", event: b.dataset.event!, option: b.dataset.eventOption! });
+      renderEventCard();
+      // The week paused for the event plays on once nothing waits.
+      if (!snapshot?.events.length && pausedForEvent && playing && paused) {
+        pausedForEvent = false;
+        paused = false;
+        resume?.();
+        renderActions();
+      }
+    }),
+  );
+}
+
+/** Opens the oldest waiting event's card (End turn while one waits, Answer in the dispatches). */
+function openEventCard(): void {
+  eventFolded = false;
+  renderEventCard();
+  renderActions();
 }
 
 /** While nothing is studied, one alert asks the player to choose (once for each thing learned); `told` when a Learned alert already said so. */
@@ -1476,6 +1530,7 @@ function renderNews(): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">Dispatches</h2>${closeButton()}</header>
     <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
+    ${waitingEventsHtml(s.events)}
     ${asksHtml()}
     ${s.peaceOffers.map(offerHtml).join("")}
     ${s.calls
@@ -1497,6 +1552,7 @@ function renderNews(): void {
   bindClose();
   showPanel(true);
   bindOffers();
+  panel.querySelectorAll<HTMLButtonElement>("[data-event-open]").forEach((b) => b.addEventListener("click", openEventCard));
   panel.querySelectorAll<HTMLButtonElement>("[data-call]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "answerCall", call: b.dataset.call!, yes: b.dataset.yes === "1" })),
   );
@@ -1514,9 +1570,25 @@ function renderActions(): void {
   fab.hidden = !snapshot;
   fab.classList.toggle("playing", playing);
   fab.classList.toggle("paused", paused);
-  fab.querySelector<HTMLElement>(".badge")!.hidden = true;
+  const waiting = snapshot?.events.length ?? 0;
+  const badge = fab.querySelector<HTMLElement>(".badge")!;
+  badge.hidden = !waiting;
+  badge.textContent = String(waiting);
+  // While events wait, End turn shows their scroll and count (SHELL-070).
+  const want = waiting ? "scroll" : "hourglass";
+  if ((fab.dataset.icon ?? "hourglass") !== want) {
+    fab.querySelector("img")!.outerHTML = icon(want, 3, waiting ? "Answer the event" : "End turn");
+    fab.dataset.icon = want;
+  }
+  fab.classList.toggle("events", waiting > 0);
   if (!snapshot) return;
-  fab.title = playing ? (paused ? "Play on (Space)" : "Pause (Space)") : `End turn (Space): on to ${dateText(addDays(snapshot.date, DAYS_PER_TURN))}`;
+  fab.title = waiting
+    ? `${waiting === 1 ? "An event waits" : `${waiting} events wait`} for your answer (Space opens it)`
+    : playing
+      ? paused
+        ? "Play on (Space)"
+        : "Pause (Space)"
+      : `End turn (Space): on to ${dateText(addDays(snapshot.date, DAYS_PER_TURN))}`;
   renderArmyList();
 }
 
@@ -3163,6 +3235,11 @@ function hearSnapshot(): void {
  */
 async function endTurn(): Promise<void> {
   if (!snapshot) return;
+  // While an event waits, End turn opens it instead (EVT-044, SHELL-070).
+  if (snapshot.events.length) {
+    openEventCard();
+    return;
+  }
   if (playing) {
     paused = !paused;
     if (!paused) resume?.();

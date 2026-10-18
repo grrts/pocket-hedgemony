@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-556 decided and 8 still open across 29 contexts.
+557 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -152,6 +152,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-EVT-14**: (was OQ-EVT-14) trust and notoriety: they are diplomacy's derived values (DIPL-173, DIPL-174).
 - **D-EVT-15**: (was OQ-EVT-15) When ages and periods are checked: in the turn in which 1 January falls, in the events step
 - **D-EVT-16**: (was OQ-EVT-16) The religion flags: religious_persecution_active, missionary_persecution and
+- **D-EVT-17**: First game slice of events (milestone 6, provisional): the bridge maps 13 realm ids of the map to
 
 ### Exploration (exploration)
 
