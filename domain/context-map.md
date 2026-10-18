@@ -1,6 +1,6 @@
 # Pocket Hegemony: context map
 
-Pocket Hegemony is split into 29 bounded contexts. Each one owns a part of the game's rules and its own words for them. This page shows how the contexts fit together and where the seams between them sit. The full detail is in two generated files:
+Pocket Hegemony is split into 30 bounded contexts. Each one owns a part of the game's rules and its own words for them. This page shows how the contexts fit together and where the seams between them sit. The full detail is in two generated files:
 
 - [context-map-seams.md](context-map-seams.md): every pair of contexts, with what each side says crosses between them (303 pairs).
 - [open-questions.md](open-questions.md): every gap and contradiction the specs found, and how each was decided.
@@ -47,6 +47,7 @@ flowchart TB
 | Statecraft | diplomacy, subjects, government, culture, religion, rebellions | How realms treat each other, how they are ruled, who lives in them, and what happens when people rise. |
 | History and identity | events, revolutions, national-strengths | The historical layer: events with choices, revolutions that change how a country plays, and each country's heritage. |
 | Shell and player experience | game-shell, saves, settings, onboarding, achievements, audio, map-presentation | Everything around and on top of the simulation. None of these may change the simulation's results. |
+| Tooling (outside the game) | balance | The balance model: plays the game headless with AI and probe strategies, reads every layer, and checks that no strategy or mechanic dominates (X-20). It never runs in the game and nothing depends on it. |
 
 ## 2. Shared kernels
 
