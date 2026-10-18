@@ -12,12 +12,20 @@ import {
   type MapTiles,
   type MarchMap,
   type News,
+  type FleetView,
   type Order,
   type PeaceTerms,
   type PlaceClimate,
   type Snapshot,
   realmStrengths,
   WORKS,
+  peoplesView,
+  FAITH_IDS,
+  NO_FAITH,
+  NO_TONGUE,
+  SLOTS,
+  TONGUE_FAMILY,
+  faithName,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { askCard, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
@@ -32,6 +40,7 @@ import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
+import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
@@ -46,6 +55,7 @@ import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
+import { fleetButton, fleetCard, navyTab, portTab } from "./ui/navy.ts";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { Rng } from "@ph/engine";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
@@ -164,7 +174,7 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "government" | "heritage" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" = "general";
+let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -180,11 +190,14 @@ let grantOpen = false;
 /** The lord's screen lists every royal province to grant, not just the nearest. */
 let grantAll = false;
 /** Which tab of the province overview is open. */
-let provinceTab: "overview" | "people" | "garrison" | "land" | "build" = "overview";
+let provinceTab: "overview" | "people" | "garrison" | "land" | "build" | "port" = "overview";
+/** The player's fleet whose card is open (its id), and the fleet waiting for a tap on where to sail (-1 = none). */
+let fleetView = -1;
+let sailing = -1;
 /** The tile tapped on the Land tab, or -1. */
 let landTile = -1;
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "tongues" | "faiths";
 let lens: Lens = "realms";
 /** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
 let fogOn = true;
@@ -465,7 +478,22 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "food", name: "Food", note: "men on campaign the store can feed" },
   { id: "lords", name: "Lords", note: "who holds your land" },
   { id: "diplomacy", name: "Diplomacy", note: "friend or foe, envoys on the road" },
+  { id: "tongues", name: "Tongues", note: "the family of the tongue most speak" },
+  { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
 ];
+/** A colour per tongue family and per faith for their lenses (CULT-085, RELG-118): fixed hues, so a family or faith keeps its colour all campaign. */
+const familyRgb = (key: string): number[] => {
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  return hslRgb((h % 360) / 360, 0.45 + ((h >> 9) % 3) * 0.1, 0.42 + ((h >> 11) % 3) * 0.08);
+};
+const FAITH_HEX: Record<string, string> = {
+  catholic: "#c9a227", protestant: "#3b5fb0", anglican: "#7a5bb0", hussite: "#b0703b", orthodox: "#8f2f3a", oriental_christian: "#b04a6a",
+  sunni: "#2f7a44", shia: "#5aa864", ibadi: "#86b85a", hindu: "#d6782e", sikh: "#e0a040", jain: "#e8c890",
+  theravada: "#e0b030", mahayana: "#d4c050", vajrayana: "#b8862a", shinto: "#c84040", confucian_ritual: "#a83e3e", daoist: "#5a8a8a",
+  jewish: "#4a6ad0", indigenous_american: "#8a6040", african_traditional: "#7a5030", pacific_traditional: "#3a8aa0", siberian_steppe_traditional: "#8a8a60", asian_traditional: "#6a7a50", secular: "#9a9a9a",
+};
+const faithRgb = (f: string) => (FAITH_HEX[f] ? hexToRgb(FAITH_HEX[f]!) : familyRgb(f));
 /** The diplomacy lens's colours (DIPL-183), by LENS_RELATIONS; "own" is the realm's own colour. */
 const RELATION_HEX: Record<LensRelation, string> = {
   own: "",
@@ -499,9 +527,10 @@ const relationTo = (n: number): LensRelation | null => {
 const ROYAL_RGB = hexToRgb("#e9c35a");
 /** A colour per lord for the Lords lens: hues spread by the golden angle, kept clear of the crown's gold. */
 function lordRgb(k: number): number[] {
-  const h = (80 + ((k * 137.508) % 260)) / 360;
-  const l = k % 2 ? 0.42 : 0.55;
-  const sat = 0.5;
+  return hslRgb((80 + ((k * 137.508) % 260)) / 360, 0.5, k % 2 ? 0.42 : 0.55);
+}
+/** An HSL colour (each 0..1) as RGB bytes. */
+function hslRgb(h: number, sat: number, l: number): number[] {
   const q = l < 0.5 ? l * (1 + sat) : l + sat - l * sat;
   const p = 2 * l - q;
   const ch = (t: number) => {
@@ -521,7 +550,7 @@ function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map lens</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.name}</b><small>${l.note}</small></button>`).join("")}
-    ${lens === "diplomacy" ? diplomacyKey() : ""}
+    ${lens === "diplomacy" ? diplomacyKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -550,6 +579,25 @@ function diplomacyKey(): string {
   </div>`;
 }
 
+/** The Tongue and Faith lenses' key: the families or faiths that cover the most of the map, largest first. */
+function beliefKey(): string {
+  if (!snapshot) return `<div class="lens-key"><p>Choose a realm to see tongues and faiths.</p></div>`;
+  const count = new Map<string, number>();
+  const pe = snapshot.peoples;
+  for (let i = 0; i < provinces.length; i++) {
+    const k = lens === "tongues" ? (pe.provinceTongue[i * SLOTS] !== NO_TONGUE ? TONGUE_FAMILY[pe.provinceTongue[i * SLOTS]!]! : "") : pe.provinceFaith[i * SLOTS] !== NO_FAITH ? FAITH_IDS[pe.provinceFaith[i * SLOTS]!]! : "";
+    if (k) count.set(k, (count.get(k) ?? 0) + 1);
+  }
+  const rows = [...count].sort((a, b) => b[1] - a[1]).slice(0, 12);
+  const rgb = (k: string) => `rgb(${(lens === "tongues" ? familyRgb(k) : faithRgb(k)).join(",")})`;
+  const label = (k: string) => (lens === "tongues" ? k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, " ") : faithName(k));
+  return `<div class="lens-key">
+    ${rows.map(([k]) => `<span><i class="swatch" style="background:${rgb(k)}"></i>${esc(label(k))}</span>`).join("")}
+    ${lens === "faiths" ? `<span><i class="swatch hatched" style="background:#b9b3a4"></i>A second faith holds 30% or more</span>` : ""}
+    <p>Tap a province for its ${lens === "tongues" ? "Tongue" : "Faith"} line.</p>
+  </div>`;
+}
+
 /** Colour for a province under the current lens. */
 function lensColor(i: number): number[] {
   const o = owners[i]!;
@@ -568,6 +616,14 @@ function lensColor(i: number): number[] {
       if (!snapshot || o !== snapshot.playerNation) return o >= 0 ? nationRgb[o]!.map((v) => Math.round(v * 0.35 + 150)) : unownedRgb;
       const l = snapshot.provinceLord[i]!;
       return l >= 0 ? lordRgb(l) : ROYAL_RGB;
+    }
+    case "tongues": {
+      const t = snapshot?.peoples.provinceTongue[i * SLOTS] ?? NO_TONGUE;
+      return t === NO_TONGUE ? unownedRgb : familyRgb(TONGUE_FAMILY[t]!);
+    }
+    case "faiths": {
+      const f = snapshot?.peoples.provinceFaith[i * SLOTS] ?? NO_FAITH;
+      return f === NO_FAITH ? unownedRgb : faithRgb(FAITH_IDS[f]!);
     }
     case "diplomacy": {
       const r = o >= 0 ? relationTo(o) : null;
@@ -633,7 +689,7 @@ function restyleProvinces(): void {
     const o = owners[i]!;
     const occ = occupiers[i]!;
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
-    const hatched = (occ >= 0 && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war");
+    const hatched = (occ >= 0 && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war") || (lens === "faiths" && (snapshot?.peoples.provinceFaithShare[i * SLOTS + 1] ?? 0) >= 0.3);
     const lord = snapshot ? snapshot.provinceLord[i]! : -1;
     const lit = litLord >= 0 && lord === litLord;
     const flags = (i === selectedProvince ? 1 : 0) | (lit ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
@@ -830,6 +886,11 @@ function drawOverlay(o: OverlayContext): void {
         }) || animating;
     }
     pruneBattles(snapshot.battles.map((b) => b.id));
+    for (const b of snapshot.navy.battles) {
+      if (!isKnown(b.zone)) continue;
+      const [sx, sy] = o.toScreen(provinces[b.zone]!.x!, provinces[b.zone]!.y!);
+      if (onScreen(sx, sy)) swords(ctx, sx, sy - 18 * tokenUnit(zoom), 3 * spriteScale);
+    }
   }
 
   // Armies and their commanders, once zoomed in past the realm names (feedback 31).
@@ -839,6 +900,7 @@ function drawOverlay(o: OverlayContext): void {
     const u = tokenUnit(zoom);
     const now = performance.now();
     const inBattle = new Set(s.battles.map((b) => b.tile));
+    const aboard = new Set(s.navy.aboard);
     // The player's marches first, so the tokens stand on their lines.
     for (let k = 0; k < s.armies.id.length; k++) {
       const path = s.armies.path[k]!;
@@ -862,7 +924,7 @@ function drawOverlay(o: OverlayContext): void {
     armyHitBoxes = [];
     for (let k = 0; k < s.armies.id.length; k++) {
       const cmd = s.armies.commander[k]!;
-      if (cmd < 0 || !isKnown(s.armies.location[k]!)) continue;
+      if (cmd < 0 || !isKnown(s.armies.location[k]!) || aboard.has(s.armies.id[k]!)) continue;
       const tile = s.armies.tile[k]!;
       // Fighting armies are drawn in their battle.
       if (s.armies.battle[k]! >= 0 && inBattle.has(tile)) continue;
@@ -892,6 +954,7 @@ function drawOverlay(o: OverlayContext): void {
         pixelText(ctx, name, sx, box.y + box.h + 2, 10);
       }
     }
+    animating = drawFleets(o, ctx, u, now, onScreen) || animating;
   }
   if (animating) view.invalidate();
   if (performance.now() - stepStart < stepMs) view.invalidate();
@@ -1010,6 +1073,43 @@ function swords(ctx: CanvasRenderingContext2D, x: number, y: number, r: number):
 }
 
 let armyHitBoxes: { id: number; x: number; y: number; w: number; h: number }[] = [];
+let fleetHitBoxes: { id: number; mine: boolean; x: number; y: number; w: number; h: number }[] = [];
+
+/** Where a fleet is drawn: in its sea zone, or in a port just off the coast toward the sea. */
+function fleetXY(f: FleetView): [number, number] {
+  const p = provinces[f.at]!;
+  const sea = isWater[f.at] ? undefined : neighborIdx[f.at]!.find((q) => isWater[q]);
+  if (sea === undefined) return [p.x!, p.y!];
+  const z = provinces[sea]!;
+  return [p.x! + (z.x! - p.x!) * 0.4, p.y! + (z.y! - p.y!) * 0.4];
+}
+
+/** Every known fleet as a ship in its realm's colours with its ship count, and the player's voyages as routes; true while one sails. */
+function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number, now: number, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
+  const s = snapshot!;
+  let moving = false;
+  for (const f of s.navy.fleets) {
+    if (f.owner !== s.playerNation || !f.route.length) continue;
+    const pts = [o.toScreen(...fleetXY(f)), ...f.route.map((q) => o.toScreen(provinces[q]!.x!, provinces[q]!.y!))];
+    drawRoute(ctx, { pts, u, color: nations[s.playerNation]!.color, weeks: [], t: now, viewWidth: o.width });
+  }
+  fleetHitBoxes = [];
+  const stack = new Map<number, number>();
+  for (const f of s.navy.fleets) {
+    if (!f.ships || !isKnown(f.at)) continue;
+    const nth = stack.get(f.at) ?? 0;
+    stack.set(f.at, nth + 1);
+    let [sx, sy] = o.toScreen(...fleetXY(f));
+    sx += nth * 8 * u;
+    sy -= nth * 3 * u;
+    if (!onScreen(sx, sy)) continue;
+    const realm = nations[f.owner]!;
+    const box = drawToken(ctx, { x: sx, y: sy, u: 2, color: realm.color, men: f.ships, naval: true, flag: flagCanvas(realm, 1), dir: 1, moving: f.route.length > 0, selected: fleetView === f.id || sailing === f.id, t: now });
+    fleetHitBoxes.push({ id: f.id, mine: f.owner === s.playerNation, ...box });
+    moving ||= f.route.length > 0;
+  }
+  return moving;
+}
 
 /** Settlement drawn for a province by its people (thousands). */
 function settlementOf(population: number): "village" | "town" | "city" {
@@ -1116,6 +1216,23 @@ function onTap(sx: number, sy: number, province: number): void {
   // Armies sit on top of provinces, so check them first, with some room around each for fingers.
   const PAD = 8;
   const hit = armyHitBoxes.find((b) => sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
+  const fleetHit = fleetHitBoxes.find((b) => b.mine && sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
+  if (fleetHit && !hit && snapshot) {
+    // A fleet tapped is chosen to sail; tapped again, its card opens.
+    if (sailing === fleetHit.id) openFleet(fleetHit.id);
+    else pickFleet(fleetHit.id);
+    return;
+  }
+  if (sailing >= 0 && snapshot && province >= 0 && (isWater[province] || neighborIdx[province]!.some((q) => isWater[q]))) {
+    // A sea zone, a port or a shore: the fleet sets sail at once (an army aboard lands on a shore).
+    const fleet = sailing;
+    sailing = -1;
+    sound.sfx("army_order_move");
+    void act({ type: "navy", do: "sail", fleet, to: province });
+    return;
+  }
+  sailing = -1;
+  fleetView = -1;
   if (hit && snapshot && snapshot.armies.owner[armySlot(hit.id)] === snapshot.playerNation) {
     // With armies chosen, another one joins them (or leaves, tapped again); else it is the one chosen.
     if (selected.size && !selected.has(hit.id)) selected.add(hit.id);
@@ -1167,9 +1284,42 @@ function onTap(sx: number, sy: number, province: number): void {
   renderActions();
 }
 
+/** Chooses a fleet to sail and folds the panel away, as an army is picked; its card waits behind the panel button. */
+function pickFleet(id: number): void {
+  selected.clear();
+  sailing = id;
+  fleetView = id;
+  armyView = -1;
+  realmView = -1;
+  officialView = -1;
+  lordView = -1;
+  newsView = false;
+  panelCollapsed = true;
+  sound.sfx("army_select");
+  restyleProvinces();
+  renderPanel();
+  renderArmyList();
+}
+
+/** Opens a fleet's card. */
+function openFleet(id: number): void {
+  fleetView = id;
+  sailing = -1;
+  armyView = -1;
+  realmView = -1;
+  officialView = -1;
+  lordView = -1;
+  newsView = false;
+  panelCollapsed = false;
+  renderPanel();
+}
+
 /** Picks an army to move and folds the panel away; the map stays where it is (feedback 6). */
 function pickArmy(id: number): void {
   if (!snapshot) return;
+  // An army aboard ships moves with its fleet.
+  const ship = snapshot.navy.fleets.find((f) => f.army === id && f.owner === snapshot!.playerNation);
+  if (ship) return openFleet(ship.id);
   selected.clear();
   selected.add(id);
   selectedProvince = snapshot.armies.location[armySlot(id)]!;
@@ -1360,6 +1510,11 @@ function logNews(s: Snapshot): void {
     if (!x.begins || x.province === undefined || !x.nations.includes(me)) continue;
     if (x.kind !== "battle") {
       alertPlayer(x.text, "castle", { province: x.province });
+      continue;
+    }
+    // A sea battle of the player's: said over the map, with Go there (it is fought out round by round, the week plays on).
+    if (isWater[x.province]) {
+      alertPlayer(x.text, "swords", { province: x.province });
       continue;
     }
     // A battle over as soon as it began (one side swept away) is only in the log.
@@ -1634,7 +1789,7 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   panel.hidden = !open || panelCollapsed;
   reopen.hidden = !open || !panelCollapsed;
   const what =
-    reopenIcon === "crown" ? "Choose a realm" : newsView ? "Dispatches" : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
+    reopenIcon === "crown" ? "Choose a realm" : newsView ? "Dispatches" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
   reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
   reopen.title = `Open the overview: ${what}`;
   panel.querySelector(".fold")?.addEventListener("click", () => {
@@ -1647,7 +1802,7 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
 let panelShows = "";
 
 function renderPanel(): void {
-  const shows = `${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${selectedProvince}/${provinceTab}`;
+  const shows = `${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
@@ -1673,6 +1828,12 @@ function renderPanel(): void {
     return;
   }
   armyView = -1;
+  if (fleetView >= 0 && snapshot && snapshot.navy.fleets.some((f) => f.id === fleetView && f.owner === snapshot!.playerNation)) {
+    renderFleet(fleetView);
+    return;
+  }
+  fleetView = -1;
+  sailing = -1;
   if (!snapshot && selectedProvince < 0) {
     panel.innerHTML = `
       <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button></span></header>
@@ -1702,8 +1863,10 @@ function renderPanel(): void {
       <dl class="facts">
         <dt>Coasts</dt><dd>${coasts ? `${coasts} province${coasts > 1 ? "s" : ""}` : "none"}</dd>
         <dt>Sea lanes</dt><dd>${neighborIdx[selectedProvince]!.length - coasts} zones</dd>
-      </dl>`;
+      </dl>
+      ${seaZoneFleets(selectedProvince)}`;
     bindClose();
+    bindNavyLinks();
     showPanel(true);
     return;
   }
@@ -1721,6 +1884,10 @@ function renderPanel(): void {
   }
   if (provinceTab === "build") {
     renderWorks(selectedProvince);
+    return;
+  }
+  if (provinceTab === "port" && snapshot?.navy.ports.some((x) => x.province === selectedProvince)) {
+    renderPort(selectedProvince);
     return;
   }
   if (provinceTab === "land") {
@@ -1742,6 +1909,7 @@ function renderPanel(): void {
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       ${snapshot ? foodFacts(selectedProvince) : ""}
       ${snapshot && own >= 0 ? moodFacts(selectedProvince) : ""}
+      ${snapshot ? beliefFacts(snapshot.peoples, selectedProvince) : ""}
       <dt>Walls</dt><dd>${wallsAt(selectedProvince) ? WALL_NAMES[wallsAt(selectedProvince)!] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
       ${mineHere ? taxLine(selectedProvince) : ""}
@@ -1773,6 +1941,13 @@ function renderPanel(): void {
   bindProvinceTabs();
   bindNationButtons();
   bindTax(selectedProvince);
+  panel.querySelectorAll<HTMLButtonElement>("[data-belief]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const which = b.dataset.belief as "tongue" | "faith";
+      beliefUi.open = beliefUi.open === which ? null : which;
+      renderPanel();
+    }),
+  );
   bindLords();
   panel.querySelector("[data-realm-open-food]")?.addEventListener("click", () => {
     realmView = snapshot!.playerNation;
@@ -1903,7 +2078,9 @@ function renderOfficial(pi: number): void {
 function provinceTabs(): string {
   const tab = (key: typeof provinceTab, label: string) => `<button class="tab${provinceTab === key ? " on" : ""}" data-tab="${key}">${label}</button>`;
   const building = snapshot?.sites.some((x) => x.province === selectedProvince) ? ` ${icon("hourglass", 1)}` : "";
-  return `<nav class="tabs">${tab("overview", "Overview")}${tab("people", "People")}${tab("garrison", "Garrison")}${tab("land", "Land")}${tab("build", `Build${building}`)}</nav>`;
+  const port = snapshot?.navy.ports.find((x) => x.province === selectedProvince);
+  const hulls = port?.building.length ? ` ${icon("hourglass", 1)}` : "";
+  return `<nav class="tabs">${tab("overview", "Overview")}${tab("people", "People")}${tab("garrison", "Garrison")}${tab("land", "Land")}${tab("build", `Build${building}`)}${port ? tab("port", `Port${hulls}`) : ""}</nav>`;
 }
 
 /** Food lines of a province's overview: months stored, the last harvest and anyone who starved this year. */
@@ -2229,7 +2406,10 @@ const GRIEVANCE_FIX: Record<string, string> = {
   Conscription: "ends when half the recruits are back",
   "Soldiers quartered": "ends when the armies move on",
   Ungoverned: "ends when the official returns to his post",
-  "Foreign rule": "the people were not yours in 1444",
+  "Foreign rule": "a homeland of a stranger tongue taken since 1444; ends with a lord of its tongue",
+  "Banned tongue": "your Tongue policy is Impose and most here are strangers; ends with Teach or Let be (Peoples tab)",
+  "Wrong faith": "a third or more keep a faith without a house, or a Restricted majority; ends when it is served (Peoples tab)",
+  Persecuted: "a Persecuted faith lives here; counts as two; ends when it is Tolerated or Restricted again (Peoples tab)",
   Bloodshed: "a battle was fought here; it fades after 20 years",
   "Heavy taxes": "ends when the tax is normal or lighter; crushing counts twice",
   "Grasping officials": "the realm has more officials than its cap; ends when it is back within (Government tab)",
@@ -2392,7 +2572,7 @@ function idleCommanders(): number[] {
   const s = snapshot!;
   return s.commanders
     .map((c, i) => ({ c, i }))
-    .filter(({ c }) => c.owner === s.playerNation && c.army < 0)
+    .filter(({ c }) => c.owner === s.playerNation && c.army < 0 && c.fleet < 0)
     .sort((x, y) => y.c.might + y.c.cunning + y.c.logistics - (x.c.might + x.c.cunning + x.c.logistics))
     .map(({ i }) => i);
 }
@@ -2476,6 +2656,117 @@ function renderGarrison(pi: number): void {
  * The commander's screen: who leads, the army's troops by arm with what can be
  * done with them (train, split off, send home), its food, pay and time out.
  */
+/** The fleets in a sea zone, and its sea battle, on the sea zone's card. */
+function seaZoneFleets(zone: number): string {
+  if (!snapshot) return "";
+  const me = snapshot.playerNation;
+  const here = snapshot.navy.fleets.filter((f) => f.at === zone && f.ships);
+  const battle = snapshot.navy.battles.find((b) => b.zone === zone);
+  return `${battle ? `<p>${icon("swords", 1)} A sea battle, round ${battle.round}: ${fmt(battle.strength[0])} against ${fmt(battle.strength[1])}.</p>` : ""}
+    ${here.length ? `<h3 class="sub">Fleets here</h3><div class="choices">${here
+      .map((f) => (f.owner === me ? fleetButton(f, (c) => cmdOf(c).name) : `<p>${pennant(nations[f.owner]!)} ${esc(nations[f.owner]!.name)}: ${f.ships} ship${f.ships === 1 ? "" : "s"}, strength ${fmt(f.strength)}</p>`))
+      .join("")}</div>` : ""}`;
+}
+
+/** Fleet and port buttons in any card: open a fleet, a port's tab, or look at a place. */
+function bindNavyLinks(): void {
+  panel.querySelectorAll<HTMLButtonElement>("[data-fleet-open]").forEach((b) => b.addEventListener("click", () => openFleet(Number(b.dataset.fleetOpen))));
+  panel.querySelectorAll<HTMLButtonElement>("[data-port-open]").forEach((b) =>
+    b.addEventListener("click", () => {
+      realmView = -1;
+      fleetView = -1;
+      selectedProvince = Number(b.dataset.portOpen);
+      provinceTab = "port";
+      restyleProvinces();
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-look]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const p = provinces[Number(b.dataset.look)]!;
+      panelCollapsed = true;
+      view.lookAt(p.x!, p.y!, Math.max(view.camera.zoom, ARMY_ZOOM));
+      renderPanel();
+    }),
+  );
+}
+
+/** A coastal province's Port tab: muster sailors, order ships, the hulls building and the fleets in port. */
+function renderPort(pi: number): void {
+  const s = snapshot!;
+  const port = s.navy.ports.find((x) => x.province === pi)!;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
+    ${provinceTabs()}
+    ${portTab(port, { gold: s.nationTreasury[s.playerNation]!, musterGoldEach: s.navy.musterGoldEach, fleetsHere: s.navy.fleets.filter((f) => f.owner === s.playerNation && f.at === pi), admiralName: (c) => cmdOf(c).name })}`;
+  bindClose();
+  showPanel(true);
+  bindProvinceTabs();
+  bindNavyLinks();
+  panel.querySelectorAll<HTMLButtonElement>("[data-port-muster]").forEach((b) =>
+    b.addEventListener("click", () => void act({ type: "navy", do: "muster", province: pi, sailors: Number(b.dataset.portMuster) })),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-port-buy]").forEach((b) =>
+    b.addEventListener("click", async () => {
+      await act({ type: "navy", do: "buy", province: pi, ship: b.dataset.portBuy! });
+      if (snapshot && !snapshot.rejectedOrders.length) sound.sfx("econ_spend");
+    }),
+  );
+}
+
+/** A fleet's card: Sail, its admiral, the army aboard and its ships (naval spec, How the player uses it). */
+function renderFleet(id: number): void {
+  const s = snapshot!;
+  const me = s.playerNation;
+  const v = s.navy;
+  const f = v.fleets.find((x) => x.id === id)!;
+  const mine = v.mine.find((x) => x.id === id)!;
+  const inPort = !isWater[f.at];
+  const aboard = new Set(v.aboard);
+  const armiesHere = inPort
+    ? [...s.armies.id.keys()]
+        .filter((k) => s.armies.owner[k] === me && s.armies.location[k] === f.at && s.armies.commander[k]! >= 0 && s.armies.battle[k]! < 0 && !aboard.has(s.armies.id[k]!))
+        .map((k) => ({ id: s.armies.id[k]!, name: cmdOf(s.armies.commander[k]!).name, men: s.armies.men[k]!, room: s.armies.men[k]! + s.armies.horse[k]! * 3 }))
+    : [];
+  const name = f.admiral >= 0 ? `${cmdOf(f.admiral).name}'s fleet` : "Fleet";
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(name)}</h2>${closeButton()}</header>
+    ${fleetCard(f, mine, {
+      name: (p) => provinces[p]!.name,
+      admiralName: (c) => cmdOf(c).name,
+      idle: idleCommanders().map((c) => ({ id: c, name: cmdOf(c).name, skills: skills(cmdOf(c)) })),
+      armiesHere,
+      fleetsHere: v.fleets.filter((x) => x.owner === me && x.at === f.at && x.id !== id && !x.battle),
+      choosing: sailing === id,
+      inPort,
+      me,
+    })}`;
+  bindClose();
+  showPanel(true);
+  bindNavyLinks();
+  const order = (o: Record<string, unknown>, after?: () => void) =>
+    void act({ type: "navy", fleet: id, ...o } as Order).then(() => {
+      if (snapshot?.rejectedOrders.length) return;
+      after?.();
+      newsView = false;
+      renderPanel();
+    });
+  panel.querySelector("[data-fleet-sail]")?.addEventListener("click", () => {
+    sailing = id;
+    panelCollapsed = true;
+    renderPanel();
+  });
+  panel.querySelectorAll<HTMLButtonElement>("[data-fleet-admiral]").forEach((b) => b.addEventListener("click", () => order({ do: "admiral", commander: Number(b.dataset.fleetAdmiral) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-fleet-board]").forEach((b) => b.addEventListener("click", () => order({ do: "board", army: Number(b.dataset.fleetBoard) })));
+  panel.querySelector("[data-fleet-unload]")?.addEventListener("click", () => order({ do: "unload" }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-fleet-split]").forEach((b) => b.addEventListener("click", () => order({ do: "split", ship: Number(b.dataset.fleetSplit) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-fleet-merge]").forEach((b) => {
+    const into = Number(b.dataset.fleetMerge);
+    b.addEventListener("click", () => order({ do: "merge", into }, () => (fleetView = into)));
+  });
+  panel.querySelector("[data-fleet-disband]")?.addEventListener("click", () => order({ do: "disband" }, () => (fleetView = -1)));
+}
+
 function renderArmy(id: number): void {
   const s = snapshot!;
   const me = s.playerNation;
@@ -2492,6 +2783,7 @@ function renderArmy(id: number): void {
   const others = [...s.armies.id.keys()].filter((j) => j !== k && s.armies.owner[j] === me && s.armies.location[j] === here && s.armies.kind[j] === s.armies.kind[k] && s.armies.commander[j]! >= 0);
   const garrison = [...s.armies.id.keys()].filter((j) => s.armies.owner[j] === me && s.armies.location[j] === here && s.armies.commander[j]! < 0 && s.armies.kind[j] === s.armies.kind[k]);
   const idle = idleCommanders();
+  const shipsHere = isWater[here] ? [] : s.navy.fleets.filter((f) => f.owner === me && f.at === here && f.army < 0 && !f.battle);
   const levyFoot = by[0]!;
   // Arms the realm's inventions allow (warfare arms' unlock); the rest wait on research.
   const armsKnown = s.research?.arms ?? rules.defines.recruit.armsAtStart;
@@ -2546,6 +2838,7 @@ function renderArmy(id: number): void {
             .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Learning</button></p>` : ""}`
         : `<p class="hint">No levy foot left to train.</p>`}`}
     ${garrison.length ? `<div class="choices"><button class="wax" data-pickup="${id}">Take in the garrison here: ${fmt(garrison.reduce((t, j) => t + s.armies.men[j]!, 0))} men</button></div>` : ""}
+    ${shipsHere.length ? `<h3 class="sub">Board ships</h3><div class="choices">${shipsHere.map((f) => `<button class="paper" data-board-fleet="${f.id}">${icon("anchor", 1)}Board ${f.admiral >= 0 ? `${esc(cmdOf(f.admiral).name)}'s fleet` : "the fleet without an admiral"} · room for ${fmt(s.navy.mine.find((m) => m.id === f.id)?.room ?? 0)}</button>`).join("")}</div>` : ""}
     ${others.length ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(cmdOf(s.armies.commander[j]!).name)}'s army</button>`).join("")}</div>` : ""}
     ${hired ? "" : `<h3 class="sub">Command</h3>
     <div class="choices">
@@ -2569,6 +2862,14 @@ function renderArmy(id: number): void {
     b.addEventListener("click", () => void actHere({ type: "train", army: id, arm: b.dataset.train!, men: trainMen })),
   );
   panel.querySelector("[data-pickup]")?.addEventListener("click", () => void actHere({ type: "pickUp", army: id }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-board-fleet]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const fleet = Number(b.dataset.boardFleet);
+      void act({ type: "navy", do: "board", fleet, army: id }).then(() => {
+        if (!snapshot?.rejectedOrders.length) openFleet(fleet);
+      });
+    }),
+  );
   panel.querySelectorAll<HTMLButtonElement>("[data-merge]").forEach((b) =>
     b.addEventListener("click", () => {
       const into = Number(b.dataset.merge);
@@ -2856,7 +3157,7 @@ async function actInTreasury(order: Order): Promise<void> {
   renderPanel();
 }
 
-const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute" };
+const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute", navy: "Ships and sailors" };
 
 /**
  * The Treasury tab: the purse (gold, its change a month and how long it
@@ -2934,8 +3235,9 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning") && !mine)) realmTab = "general";
+  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
+  const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
@@ -2949,6 +3251,7 @@ function renderRealm(r: number): void {
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
       ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
       ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
+      ${peoples ? beliefLines(peoples, mine) : ""}
       <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
       <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
       ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
@@ -2970,9 +3273,11 @@ function renderRealm(r: number): void {
     realmTab === "heritage" ? heritageTab(strengths)
     : realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r))
     : realmTab === "government" && s?.government ? governmentTab(s.government)
+    : realmTab === "peoples" && peoples ? peoplesTab(peoples)
     : realmTab === "treasury" ? treasurySection()
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "military" ? warRoomSection()
+    : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: (c) => cmdOf(c).name })
     : realmTab === "mercenaries" ? mercenarySection()
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
@@ -2981,11 +3286,12 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
   showPanel(true);
+  bindNavyLinks();
   panel.querySelector("[data-go]")?.addEventListener("click", () => {
     realmView = -1;
     selectedProvince = capIdx;
@@ -3048,6 +3354,14 @@ function renderRealm(r: number): void {
     b.addEventListener("click", () => {
       governmentUi.confirm = b.dataset.reformAsk!;
       renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-tongue-policy]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "tonguePolicy", policy: b.dataset.tonguePolicy! })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-faith-policy]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "faithPolicy", faith: b.dataset.faith!, policy: b.dataset.faithPolicy! })));
+  panel.querySelectorAll<HTMLDetailsElement>("details[data-family]").forEach((d) =>
+    d.addEventListener("toggle", () => {
+      if (d.open) beliefUi.families.add(d.dataset.family!);
+      else beliefUi.families.delete(d.dataset.family!);
     }),
   );
   panel.querySelector<HTMLButtonElement>("[data-reform-cancel]")?.addEventListener("click", () => {
@@ -3139,6 +3453,8 @@ function bindClose(): void {
     officialView = -1;
     lordView = -1;
     armyView = -1;
+    fleetView = -1;
+    sailing = -1;
     grantOpen = false;
     newsView = false;
     realmView = -1;
@@ -3817,6 +4133,26 @@ void refreshSaves().then(() => {
 Object.assign(globalThis, {
   __phNation: (id: string) => nationIndex.get(id),
   __phTurn: () => snapshot?.turn ?? -1,
+  /** The player's ports and fleets, and an order for the navy (scripts/navy-shots.mjs). */
+  __phNavy: () => snapshot?.navy ?? null,
+  __phNavyOrder: (o: Record<string, unknown>) => act({ type: "navy", ...o } as Order).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
+  /** Commissions the first official of the player's who serves the crown (not a lord) as a commander. */
+  __phCommission: async () => {
+    if (!snapshot) return null;
+    const me = snapshot.playerNation;
+    const p = provinces.findIndex((_, i) => owners[i] === me && snapshot!.provinceLord[i]! < 0 && officialOf(snapshot!, i, me) && i !== provinceIndex.get(nations[me]!.capital));
+    if (p < 0) return null;
+    await act({ type: "commission", province: p });
+    return snapshot.rejectedOrders.map((r) => r.reason);
+  },
+  /** A coastal sea zone two zones out from a port. */
+  __phSeaNear: (p: number) => {
+    const first = neighborIdx[p]!.find((q) => isWater[q]);
+    return first === undefined ? -1 : (neighborIdx[first]!.find((q) => isWater[q] && !neighborIdx[q]!.includes(p)) ?? first);
+  },
+  /** Province index by id, and its map point. */
+  __phProvince: (id: string) => provinceIndex.get(id),
+  __phPoint: (p: number) => [provinces[p]!.x!, provinces[p]!.y!],
   /** Id of the player's capital province. */
   __phCapital: () => (snapshot ? nations[snapshot.playerNation]!.capital : null),
   /** Sends every army of the player with a commander toward a realm's capital, unless it is already on its way. */

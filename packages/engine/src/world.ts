@@ -23,7 +23,10 @@ import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGameEvents, type GameEvents } from "./events.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
+import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
+import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
+import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -31,7 +34,7 @@ import { adminCapacityRank } from "./realmStrengths.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, PeoplesState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -130,6 +133,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
   commanderSeed: number[];
+  /** Ports, sailors, ships and fleets (navy.ts). */
+  navy: NavyState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
 }
@@ -410,6 +415,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createConversionState(P),
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
+    navy: createNavyState(P),
+    ...createPeoplesState(P, N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -428,10 +435,13 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     // Every province of a realm starts with an official, of a type dealt out in turn.
     if (provinceOwner[p]! >= 0) world.provinceOfficial[p] = p % OFFICIALS.length;
   }
+  // Levies gathered and officials at their posts follow the catalogue (REALM-130).
+  seedStartingPosts(world);
   world.commanderHome = commanderIds.map(() => -1);
   world.commanderSeed = commanderIds.map(() => -1);
   seedOfficials(world);
   seedGovernment(world);
+  seedPeoples(world);
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where
@@ -448,10 +458,13 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     }
   });
   seedResearch(world);
+  seedNavy(world);
   recount(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
   runLedger(world, false);
+  // Gold, debt and envoys at court follow the catalogue, as months of that income (REALM-130).
+  seedStartingPurse(world);
   // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
   syncCountries(world);
 

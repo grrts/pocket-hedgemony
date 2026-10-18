@@ -225,6 +225,18 @@ For France the screen reads:
 
 - **The Tongue lens**: provinces coloured by family at far zoom and by tongue at regional zoom, with a toggle to kin, cousin and stranger colours for your realm. Homelands of peoples without a country are outlined.
 
+### In the game now
+
+Every province starts in 1444 with up to three tongues from its realm's start record: the court tongue, the realm's main peoples, and and, in some areas, a local tongue set by the area rather than the realm. The tongue most people speak in 1444 is the province's homeland.
+
+- **Province card, Tongue line**: the three tongues with their dots. Tap it to open this year's drift: the pull tongue, why (yours where you have held it 20 years and govern it through an official or lord, else the local majority) and each group's rate with its reasons. Tap again to close it.
+- **Your realm card, Peoples tab** (next to Government): the court tongue, Tongue % (kin plus half the cousins), one fold per family with a row per tongue (share, people, relation, provinces, where it is the majority, aggrieved provinces) and the **Tongue policy** buttons: Let be, Teach (the 1444 default) and Impose. Impose needs Printing or a chancery tradition; until then its button is greyed out and says so. The General tab's Tongue line opens the tab.
+- **Grievances**: *Foreign rule* where most people are strangers to the court in their own homeland, on land taken after 1444 (land you held at the start never has it, or 394 provinces in 13 realms would start aggrieved); *Banned tongue* where you Impose and most people are strangers.
+- **The Tongues lens**: each province coloured by the family of the tongue most speak, with a key of the largest families.
+- Drift runs each New Year, so a share moves by a fraction of a point a year: a generation, not a season. There is no list of accepted cultures: who counts as yours comes from kin, cousin and stranger.
+
+Not in yet: per-province homelands, officials' and lords' own tongues, schools and town classes speeding drift, people fleeing, charters, and the computer players changing their policy.
+
 ## How it connects
 
 - [Provinces](Provinces): stores the tongue mix, homeland, years held, officials, the *Own tongue* charter and the grievances; moves settlers, refugees and soldiers.
@@ -293,4 +305,4 @@ Nothing about culture is waiting on a design decision. The numbers above are sti
 
 - Spec: `domain/culture/spec.md` in the game repository; its section 13 lists every decision with its reason.
 - Features: `domain/culture/features/`: `tongues-and-relations.feature` (families, court tongue, Tongue % for France), `drift.feature` (Troyes, pull tongue, multipliers, lands, the fourth tongue), `tongue-policy.feature`, `culture-effects.feature`, `culture-history.feature`, `peoples-screen.feature` and `culture-ai.feature`.
-- Code: `packages/engine/src/domain/culture/`, with its numbers in `packages/rules/data/domain/culture.json`.
+- Code: `packages/engine/src/domain/culture/`, with its numbers in `packages/rules/data/domain/culture.json` and the 1444 start in `packages/rules/data/domain/culture-start-1444.json`. The game wiring (province arrays, New Year drift, grievances, the snapshot) is `packages/engine/src/peoples.ts`; the panels are `apps/client/src/ui/belief.ts`.

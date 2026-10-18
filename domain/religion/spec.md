@@ -265,6 +265,20 @@ Newest decision first.
 - RELG-121 The religion system shall make the AI send preachers first to its own provinces where the state faith is under half, then abroad where it has leave. [religion §13]
 - RELG-122 The religion system shall make the AI adopt a new faith only when an event offers it or the faith is above 60 % of the realm. [religion §13]
 
+### 5.16 Faiths in the game (first slice)
+Every province now holds its faiths and every realm its state faith and Faith policies in the game; faiths move each New Year and give their grievances and faith tax (D-RELG-24). Faith buildings to build, preachers, lords' faith, flight, expulsion, the Inquisition, holy places, waves and adopting a faith come with their contexts.
+
+- RELG-127 When a campaign starts, the game shall give every map realm its state faith and every land province it owns its start mix by RELG-107 and RELG-108 from the realm's catalogue record, or the faith the start data names for a map realm with no record; of the region overrides, it applies those it can place on the map (an area named for its 1444 owner, such as Bohemia, and the Ottoman Balkans west of the Bosporus). [RELG-107, RELG-108; D-RELG-24]
+- RELG-128 Until faith buildings can be built, the game shall give each 1444 community of 10 % or more (of a faith that has houses) one house of worship at step 1 in its province: a house for the state faith, a minority house for the others. [RELG-028, RELG-030, RELG-043; D-RELG-24]
+- RELG-129 In the turn in which 1 January falls, the game shall first apply the Faith policies set during the year (RELG-055), then move every owned land province's mix by RELG-009 to RELG-024 with the pulls the game holds: houses, the ruler's capital, sacred places of rooted faiths, Restricted and Persecuted policies. [RELG-009 … RELG-024, RELG-055]
+- RELG-130 When a faith's policy becomes Persecuted, the game shall close its houses in the realm (the realm choice "close", D-RELG-13); they do not reopen when the policy eases. [RELG-052; D-RELG-13]
+- RELG-131 The game shall give *Wrong faith* and *Persecuted* by RELG-046 and RELG-052 (Persecuted counting two in the mood), and multiply a province's tax by its faiths' shares at the faith tax (Restricted 1.25, Persecuted 0). The AI keeps every faith Tolerated until its religion choices come. [RELG-046, RELG-050, RELG-052, RELG-120]
+- RELG-132 Every province's faiths and houses, and every realm's state faith, Faith policies and pending changes, shall be kept in the save. [SAVE]
+
+#### How the player uses it
+- RELG-133 Where: every province's overview has a **Faith** line under its Tongue line: each faith's share with ↑ or ↓ when it is rising or falling. Tapping it, a 44-point button, opens below it how fast and toward which faith the mix moves, and for each faith its policy, whether its community is served, any grievance, and its pulls with their sources. The player's **Peoples** tab (shared with tongues, CULT-101) lists below the tongues the state faith and Faith %, then one card per faith in the realm, largest first, with its share, people, provinces where it is most and how many are aggrieved; the state faith says Established; every other faith has three buttons, Tolerated, Restricted and Persecuted, and one sentence on what the chosen policy does. A change shows as "Tolerated until New Year, then Restricted", and tapping the current policy again keeps it. [X-19, RELG-116, RELG-117]
+- RELG-134 Grouping and overview: the General tab of every realm card has a **Faith** line (state faith, Faith %, number of other faiths), red on the player's card when any faith is aggrieved, opening the Peoples tab. The map has a **Faiths** lens colouring each province by its largest faith, hatched where a second faith holds 30 % or more, with a key. *Wrong faith* and *Persecuted* show in the province's grievances with what ends them, and a policy taking effect reaches the dispatches. Phone: as CULT-101, the faith cards stack in one column in the side panel, every button at least 44 points high, nothing needs hover and nothing scrolls sideways. [X-19, RELG-118, SHELL-108, SHELL-109, SHELL-114]
+
 ## 6. Commands
 
 | Command | Who | Preconditions | Result | Events emitted |
@@ -419,6 +433,8 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 - **D-RELG-22** (was OQ-RELG-22) No invention grants preachers; they come from houses, monasteries and religious schools, holy places and events. "Some inventions" names none, and no mechanic is added.
 - **D-RELG-23** (was OQ-RELG-23) A holy place is held by the realm that owns its province: Mecca and Medina by the Sharifs (Hejaz, a map realm), not their Mamluk overlord. The domain model already derives the holder from the owner.
 
+- **D-RELG-24** First game slice (provisional): faith buildings cannot be built yet, so each 1444 community of a tenth or more holds one step-1 house (the state faith a house of worship, the others a minority house); this keeps every 1444 community served and the mixes steady, so they move slowly from the capital and the policies. Lords carry no faith yet, so no lord's pull or loyalty step is counted, and the Restricted and Persecuted lords' steps, sparks, flight, war aims and purses wait on their contexts. Of the eight region overrides, the map can place only those named by area for their 1444 owner and the Ottoman Balkans (provinces west of 29° E). The smallest rule that runs the mix, the communities and the policies with their grievances and tax.
+
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
@@ -442,3 +458,5 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 | RELG-124 | faith-waves-and-events.feature | What offers a court conversion |
 | RELG-125 | faiths.feature | Records with no faith of their own |
 | RELG-126 | holy-places.feature | The Temple of the Tooth follows the relic |
+| RELG-127 … RELG-132 | — | Engine: packages/engine/test/peoples.test.ts (1444 faiths and the Bohemia override, Faith policies at New Year, faith tax, Persecuted counting two and closing houses, save) |
+| RELG-133, RELG-134 | — | Presentation: apps/client/src/ui/belief.ts, the Faith line, Peoples tab and Faiths lens; screenshots from apps/client/scripts/belief-shots.mjs |
