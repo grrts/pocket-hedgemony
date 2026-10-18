@@ -1,4 +1,5 @@
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
+import { achievementsView, startAchievements } from "./achievements.ts";
 import { eventCards, type EventCard } from "./events.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
@@ -89,6 +90,8 @@ export interface Snapshot {
   provinceClosed: Uint8Array;
   /** What happened this turn (or from the last order) that concerns the player. */
   news: News[];
+  /** Achievements: unlocks since the last snapshot (once), the campaign's earned list, progress values and eligibility; null before a realm is chosen. */
+  achievements: ReturnType<typeof achievementsView>;
   /** Wars under way, by nation index. */
   wars: { id: string; attackers: number[]; defenders: number[]; start: string }[];
   /** Peace offered to the player by an AI war leader, until the next month: terms as the AI sends them ("give": it gives up land the player holds). */
@@ -317,6 +320,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceOwner: w.provinceOwner.slice(),
       provinceOccupier: w.provinceOccupier.slice(),
       provinceClosed: closedTo(w, player),
+      achievements: achievementsView(w),
       news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed" || x.major),
       wars,
       peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
@@ -508,6 +512,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           if (idx === undefined) throw new Error(`unknown nation ${req.playerNation}`);
           player = idx;
           world.player = idx;
+          startAchievements(world);
           return snapshot(req.id, started, []);
         }
         case "endTurn": {
