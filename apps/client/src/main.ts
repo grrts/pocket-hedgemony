@@ -1148,7 +1148,7 @@ function drawOverlay(o: OverlayContext): void {
       ctx.fillStyle = PALETTE.gold;
       ctx.fillRect(x + u, y + img.height + u, Math.round((w - 2 * u) * Math.min(1, t.purseMax > 0 ? t.purse / t.purseMax : 0)), u);
     }
-    // The stops chosen so far, numbered in order.
+    // Where the route starts and where it goes, numbered 1 and 2.
     if (routing) {
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -4181,7 +4181,7 @@ function showTrader(id: number): void {
 function startRoute(id: number): void {
   const t = snapshot?.trade?.traders.find((x) => x.id === id);
   if (!t) return;
-  routing = { trader: id, kind: t.kind, stops: [], mode: t.mode, note: null };
+  routing = { trader: id, kind: t.kind, stops: [], note: null };
   realmView = -1;
   selectedProvince = -1;
   officialView = -1;
@@ -4200,7 +4200,10 @@ function startRoute(id: number): void {
   void sendDraft();
 }
 
-/** A tap on the map while a route is drawn: a trade stop is added, the last stop again confirms, anything else says why not. */
+/**
+ * A tap on the map while a route is drawn: the first trade stop is where it starts, the next where it goes, and a
+ * further one moves where it goes; the end again confirms, anything else says why not (D-TRADE-21).
+ */
 function routeTap(p: number): void {
   const r = routing!;
   if (p < 0 || !snapshot) return;
@@ -4209,12 +4212,11 @@ function routeTap(p: number): void {
   if (!isKnown(p)) r.note = "you don't know that land yet";
   else if (isWater[p]) r.note = ship ? "tap a port, not the sea" : "tap a city, not the sea";
   else if (!(snapshot.provinceTradeCity[p]! & stopBit(r.kind))) r.note = ship ? `${name} has no harbour` : `${name} is not a city or a market town`;
-  else if (r.stops.at(-1) === p) {
-    if (r.stops.length >= 2) return void confirmRoute();
-    r.note = "tap another city";
-  } else if (r.stops.length >= 8) r.note = "a route has at most 8 stops";
+  else if (r.stops.length >= 2 && r.stops[1] === p) return void confirmRoute();
+  else if (r.stops[0] === p) r.note = `${name} is where it starts: tap where it goes`;
   else {
-    r.stops.push(p);
+    if (r.stops.length >= 2) r.stops[1] = p;
+    else r.stops.push(p);
     r.note = null;
     sound.sfx("map_select_province");
     void sendDraft();
@@ -4226,15 +4228,14 @@ function routeTap(p: number): void {
 /** Sends the stops so far for the preview; a tap made while the engine was busy is sent once it is free. */
 async function sendDraft(): Promise<void> {
   if (!routing) return;
-  // The mode goes with the stops, so the preview is of what Confirm will set.
-  const key = (r: Routing) => `${r.stops.join()}/${r.mode}`;
+  const key = (r: Routing) => r.stops.join();
   const want = key(routing);
-  await act({ type: "draftTradeRoute", trader: routing.trader, stops: routing.stops.slice(), mode: routing.mode });
-  if (routing && key(routing) !== want && !acting) await act({ type: "draftTradeRoute", trader: routing.trader, stops: routing.stops.slice(), mode: routing.mode });
+  await act({ type: "draftTradeRoute", trader: routing.trader, stops: routing.stops.slice() });
+  if (routing && key(routing) !== want && !acting) await act({ type: "draftTradeRoute", trader: routing.trader, stops: routing.stops.slice() });
   renderRouteBar();
 }
 
-/** Leaves route mode; the realm card waits on the Trade tab, folded on a phone so the new loop stays in view. */
+/** Leaves route mode; the realm card waits on the Trade tab, folded on a phone so the new route stays in view. */
 function leaveRoute(): void {
   routing = null;
   renderRouteBar();
@@ -4250,7 +4251,7 @@ function leaveRoute(): void {
 async function confirmRoute(): Promise<void> {
   const r = routing;
   if (!r || r.stops.length < 2 || acting) return;
-  await act({ type: "setTradeRoute", trader: r.trader, stops: r.stops.slice(), mode: r.mode });
+  await act({ type: "setTradeRoute", trader: r.trader, stops: r.stops.slice() });
   const refused = snapshot?.rejectedOrders[0];
   if (refused) {
     r.note = refused.reason;
@@ -4264,11 +4265,7 @@ routeBarEl.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button");
   const r = routing;
   if (!b || b.disabled || !r) return;
-  if (b.dataset.routeMode) {
-    r.mode = b.dataset.routeMode as Routing["mode"];
-    renderRouteBar();
-    if (r.stops.length) void sendDraft();
-  } else if (b.dataset.routeUndo !== undefined) {
+  if (b.dataset.routeUndo !== undefined) {
     r.stops.pop();
     r.note = null;
     renderRouteBar();

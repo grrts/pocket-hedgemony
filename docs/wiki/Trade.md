@@ -8,8 +8,8 @@ Trade in Pocket Hegemony is carried by units you own and steer: caravans, barges
 
 ```
  CARAVAN OF TROYES                         France · pack caravan · 50 market folk
- Route   Troyes ▸ Dijon ▸ Geneva ▸ Dijon ▸ Troyes       loop 38 days · repeats
- Now     Langres, day 12 of 15 to Dijon
+ Route   Troyes ▸ Geneva and back                       38 days · repeats
+ Now     Langres, day 12 of 19 to Geneva
  Purse   ██████░░░░  6.1 / 10 gold                         deposits at Troyes
  Last    collected 0.6 in Langres · 0.5 at Geneva (after a 0.05 market fee) · toll 0.2 at the Jura pass
  Danger  low (no war on the road; bandits near Dijon: 1 in 20 a month)
@@ -17,7 +17,7 @@ Trade in Pocket Hegemony is carried by units you own and steer: caravans, barges
 ```
 
 1. **Found a trader** in one of your cities with a market.
-2. **Set its route** by tapping the cities it should visit, in order. The path between them is found for you.
+2. **Set its route** by tapping where it starts and where it goes. The way between them is found for you, through the most populated land.
 3. Every province the trader passes **gets busier**: its trade ratio rises, more with more traders, yours and everyone else's.
 4. In **every province it enters**, it **collects** a share of that province's trade value, times its trade ratio, into its purse.
 5. When it reaches **a city of your own country**, it **deposits** the purse into your treasury.
@@ -148,24 +148,24 @@ collected = trade value × trade ratio × hold × visit share (0.2) × crowding
 ### Routes
 
 - A **stop** must be a **city**: a settlement of city or great-city size, or one with a market or trading post. Troyes with its weekly market can be a stop; Langres, a village with no market, can't; Elmina, a hamlet with a trading post, can.
-- A route has **2 to 8 stops** and a mode: **loop** (the default), **there and back** (reverse at the last stop), or **once** (wait at the last stop for orders).
-- The path between stops comes from the shared route planner: fewest days by the trader's step days and where it may enter, avoiding forbidden provinces, and preferring lower tolls when two paths are close (a toll counts as 2 days).
-- Every province walked through between stops gets the ratio gain and a collection. A route from Lübeck to Bruges busies the whole coast road in between.
+- A route is **a start and an end**, two different cities. You never draw the way or add stops between them. It runs **there and back** (the default) or **once** (wait at the end for orders).
+- The way comes from the shared route planner: fewest days by the trader's step days and where it may enter, **drawn toward the most populated land** (a province's days count for less the more people live there, up to three times the average), avoiding forbidden provinces, and preferring lower tolls when two paths are close (a toll counts as 2 days). Busy land is where the trade is, so a caravan goes through the towns, not around them.
+- Every province walked through gets the ratio gain and a collection. A route from Lübeck to Bruges busies the whole coast road in between.
 
 **Route preview**, before you confirm:
 
 ```
- Troyes ▸ Dijon ▸ Geneva ▸ Dijon ▸ Troyes           loop 38 days
- Collects in  14 provinces a loop · best: Geneva, Dijon, Troyes
+ Troyes ▸ Geneva and back                           38 days
+ Collects in  14 provinces there and back · best: Geneva, Dijon, Troyes
  Expect       about 2.4 gold a month after fees and tolls
  Tolls        Jura pass (Burgundy, low): 0.2 a pass
  Danger       low · bandits near Dijon
  Crowding     Geneva: 6 of 8 visits taken this month
 ```
 
-**Expect** is the planned collections over one loop at this month's ratios, minus fees and tolls, divided by the loop's months. Provinces you cannot see count as nothing. Red marks show embargoes, quarantines, enemy armies and passes shut by snow.
+**Expect** is the planned collections over one trip there and back at this month's ratios, minus fees and tolls, divided by the trip's months. Provinces you cannot see count as nothing. Red marks show embargoes, quarantines, enemy armies and passes shut by snow.
 
-**When a route breaks** (war, a closed border, quarantine, a snowed pass, a blockade), the route is checked again. A closed path is replaced by a dashed detour if one exists, otherwise that stop is skipped. A closed stop (war with its owner, an embargo, a quarantine) is skipped, shows red, and the turn report says so once. If every stop is closed, the trader goes to the nearest of your cities, deposits and waits for orders.
+**When a route breaks** (war, a closed border, quarantine, a snowed pass, a blockade), the route is checked again. A closed way is replaced by a dashed detour if one exists, otherwise the end is skipped. A closed end (war with its owner, an embargo, a quarantine) is skipped, shows red, and the turn report says so once. If both ends are closed, the trader goes to the nearest of your cities, deposits and waits for orders.
 
 ### Deposits and trade income
 
@@ -242,8 +242,8 @@ Each country starts with traders by its catalogue trade access: very high 6, hig
 
 ### The AI
 
-- Scores possible loops among its own cities and enterable foreign cities within reach (about 12 provinces for caravans, 40 sea zones for ships) by expected gold a month after fees, tolls and crowding, minus upkeep, weighted down by danger.
-- Founds a trader when the best unused loop beats upkeep by a margin set by its personality (merchant republics found more); dismisses one whose loop has lost money for a year.
+- Scores possible routes from a trader's home to its own cities and enterable foreign cities within reach (about 12 provinces for caravans, 40 sea zones for ships) by expected gold a month after fees, tolls and crowding, minus upkeep, weighted down by danger.
+- Founds a trader when the best unused route beats upkeep by a margin set by its personality (merchant republics found more); dismisses one whose route has lost money for a year.
 - Reroutes once a year, and at once when a route breaks.
 - At war, pulls traders off roads near the front and uses trade ships as transports if short of carriers.
 
@@ -260,30 +260,30 @@ On a phone, each province and sea zone stores only its ratio and traders passing
 
 ## What you see
 
-- **The trader card** (above): kind, crew, route and loop days, position, purse bar, last collections, fees and tolls, danger and upkeep.
+- **The trader card** (above): kind, crew, route and its days there and back, position, purse bar, last collections, fees and tolls, danger and upkeep.
 - **Found a trader**: Trade, Found a trader, choose a kind, from a city with a market. Ships are bought on the port screen and switched to Trade.
-- **Setting a route**: tap cities in order and tap the last stop again to finish; the preview updates as you add stops; then Confirm. You can copy another trader's route.
+- **Setting a route**: tap where it starts, then where it goes (another tap moves where it goes), and tap the end again to finish; the preview updates with each tap; then Confirm. You can copy another trader's route.
 - **The Trade screen**: every trader and trade ship with kind, route, purse, last deposit, expected gold a month and problems, sortable by gold a month.
 - **Turn report**: deposits summed into one line ("Traders brought 23 gold this week"); only problems (robbed, route broken, ship taken) get their own line.
 - **On the map**: at world zoom the Trade lens coloured by trade ratio and the busiest roads and sea lanes; at region zoom thicker roads with more traders, trader icons (caravan, barge, ship) with a purse bar, and a coin on market cities; at local zoom caravans, barges and ships moving. Lenses: **Trade ratio**, **Trade value** and **Traders** (your traders and routes). See [Map and Lenses](Map-and-Lenses).
 
 ### In the game now
 
-Trade runs in the game as a first slice: traders you own walk loops between cities, and what they bring home is your **Trade** line in the treasury. The old flat trade sum from a province's wealth is gone.
+Trade runs in the game as a first slice: traders you own walk there and back between two cities, and what they bring home is your **Trade** line in the treasury. The old flat trade sum from a province's wealth is gone.
 
 - **Goods.** Each January every province counts what it makes: the wares of its works (timber and furs, stone, ore, salt, wool and hides), the food it does not eat (as grain), and crafts made by its craftsmen (finished goods, until the loom houses and forges make their own). Priced by tier, with a market's weight added, that is its **trade value** in gold a month. A harbour adds its weight for ships.
 - **Trade stops.** A city, or any town with a market, is a stop for caravans and barges; a port with a harbour is a stop for ships.
-- **Traders.** Pack caravans, camel caravans (from desert or drylands, or with Caravanserai networks), river barges (on rivers only) and the cog. Each walks its loop a month at a time: every province it stands in gets busier, it collects as it enters (10 % to the owner of a foreign province, nothing on unclaimed land) and it empties its purse in every city of yours it reaches. Its upkeep is paid each month; six months unpaid and it is given up.
+- **Traders.** Pack caravans, camel caravans (from desert or drylands, or with Caravanserai networks), river barges (on rivers only) and the cog. Each walks its way there and back a month at a time: every province it stands in gets busier, it collects as it enters (10 % to the owner of a foreign province, nothing on unclaimed land) and it empties its purse in every city of yours it reaches. Its upkeep is paid each month; six months unpaid and it is given up.
 - **Trade ratio.** Each month a province's ratio rises with the traders passing (a customs officer helps, riots hurt, an enemy or a siege stops it) and loses a tenth. Every 4 points of ratio raise the tax the province owes by 1 %.
 - **Your Trade line** is last month's deposits plus market fees paid to you, less your traders' upkeep.
-- **At the start** every realm gets its traders by its trade access (Venice six, France four), on hand-made routes where their cities are on the map and otherwise on the best loops from its best cities, and two years of their walking set the starting ratios.
-- **The AI** looks at each trader once a year and finds it a better loop when its own pays little or is broken, and founds one more a year where a loop pays well, up to twice its starting traders.
+- **At the start** every realm gets its traders by its trade access (Venice six, France four), on hand-made routes where their cities are on the map and otherwise on the best route from each of its best cities, and two years of their walking set the starting ratios.
+- **The AI** looks at each trader once a year and finds it a better route when its own pays little or is broken, and founds one more a year where a route pays well, up to twice its starting traders.
 
 Where you find it:
 
-- **The Trade tab** of your realm card, next to Treasury: last month's deposits, fees and upkeep; your traders, best first, each with its stops, loop days, a purse bar, about what it brings a month, what it deposited last month and what is wrong, with **Route**, **Show** and **Dismiss**; **Found a trader** in each of your cities that can, one button per kind with its gold and upkeep (greyed with the reason when it can't); and your **busiest cities**.
-- **Setting a route**: tap **Route** on a trader. The map switches to the Trade lens and a bar along the bottom asks you to tap cities in order, 2 to 8; the preview (loop days, provinces collected in, about how much a month, the best provinces) grows as you tap. Choose **Loop** or **There and back**, then **Confirm** (or tap the last stop again).
-- **The Trade lens**: provinces coloured by trade ratio, what you don't see in parchment; zoomed in, your traders' loops as dotted lines with each trader and its purse, and a coin on every trade stop.
+- **The Trade tab** of your realm card, next to Treasury: last month's deposits, fees and upkeep; your traders, best first, each with its route ("Paris → Lyon and back"), its days there and back, a purse bar, about what it brings a month, what it deposited last month and what is wrong, with **Route**, **Show** and **Dismiss**; **Found a trader** in each of your cities that can, one button per kind with its gold and upkeep (greyed with the reason when it can't); and your **busiest cities**.
+- **Setting a route**: tap **Route** on a trader. The map switches to the Trade lens and a bar along the bottom asks you to tap where it starts, then where it goes; a third city moves where it goes. You never draw the way: it is found through the most populated land and drawn on the map, with the preview (days there and back, provinces collected in, about how much a month, the best provinces). Then **Confirm** (or tap the end again), **Undo** or **Cancel**.
+- **The Trade lens**: provinces coloured by trade ratio, what you don't see in parchment; zoomed in, your traders' ways there and back as dotted lines with each trader and its purse, and a coin on every trade stop.
 - **The province card** has a Trade line: value a month, ratio, traders passing and its top goods.
 - **The General tab** has one line, "Trade: N traders · +x gold a month", that opens the Trade tab.
 
@@ -327,8 +327,9 @@ Every trade number is a placeholder, all in the trade config file.
 | Market fee; with a pact | `collect.foreign_market_fee`, `collect.trade_pact_fee` | 10 %; 0 |
 | Bills of exchange fee | `deposit.bills_of_exchange_fee` | 10 % |
 | Lord's city to treasury | `deposit.lord_city.to_treasury` | 100 % (decided) |
-| Stops | `route.min_stops`, `route.max_stops` | 2 / 8 |
-| Default mode | `route.default_mode` | loop |
+| Stops: a start and an end | `route.min_stops`, `route.max_stops` | 2 / 2 |
+| Default mode | `route.default_mode` | there and back |
+| Pull of populous land on the planner; its cap | `route.busy_weight`, `route.busy_cap` | 1; 3 × the average |
 | Toll counts as | `route.toll_counts_as_days` | 2 days |
 | Bandits | `danger.bandit_chance_per_month`, `danger.bandit_when.homeless_share_over` | 5 %; homeless over 20 % |
 | Escape a raid | `danger.raid_trader_escapes` | 50 % |

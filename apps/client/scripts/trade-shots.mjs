@@ -1,6 +1,6 @@
 // Trade (TRADE-141 to TRADE-145) as France: the General tab's trade line, the Trade tab (last month, traders, found a
 // trader, busiest cities), a province card's Trade line, the Trade lens at world and regional zoom, and route mode
-// with two stops picked; on a small and a large phone held sideways, a phone held upright (asked to turn), a tall
+// with where it starts and where it goes picked; on a small and a large phone held sideways, a phone held upright (asked to turn), a tall
 // window and a desktop.
 // Usage: pnpm build && node scripts/trade-shots.mjs <outDir> [devices]
 import { chromium, devices } from "playwright-core";
@@ -38,6 +38,9 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.click("[data-nation=france]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
+  // First-campaign hints would cover the shots: stop them.
+  const stopHints = page.locator(".hint-note button", { hasText: "Stop hints" });
+  if (await stopHints.isVisible()) await stopHints.click();
   // The alert asking for a study would cover the card.
   await page.evaluate(() => document.querySelectorAll(".alert .dismiss").forEach((b) => b.click()));
   // The General tab's line, then the Trade tab from it.
@@ -78,7 +81,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.evaluate((id) => window.__phLookAt(id, 3), cities[0]);
   await page.waitForTimeout(600);
   await shot("lens-regional");
-  // Route mode: Route on the first trader card, then two cities tapped on the map.
+  // Route mode: Route on the first trader card, then where it starts and where it goes tapped on the map.
   await page.click(".hud button.realm");
   await page.waitForTimeout(200);
   await page.click("[data-realm-tab=trade]");
@@ -88,19 +91,23 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await shot("route-start");
   const box = await page.locator("#map").boundingBox();
   // Each city is brought to the middle of the map first, clear of the bar.
-  for (const id of cities.slice(0, 2)) {
+  const tap = async (id) => {
     await page.evaluate((id) => window.__phLookAt(id, 3), id);
     await page.waitForTimeout(200);
     const [x, y] = await page.evaluate((id) => window.__phScreenOf(id), id);
     await page.mouse.click(box.x + x, box.y + y);
     await page.waitForTimeout(700);
-  }
+  };
+  await tap(cities[0]);
+  await shot("route-from");
+  await tap(cities[1]);
   await shot("route");
   await check(page, name, "route bar", ".route-bar");
-  // There and back: the preview follows the mode.
-  await page.click("[data-route-mode=there_and_back]");
-  await page.waitForTimeout(600);
-  await shot("route-back");
+  // Another city moves where it goes; the way is planned again.
+  if (cities[2] !== undefined) {
+    await tap(cities[2]);
+    await shot("route-moved");
+  }
   // A tap on the sea says why not.
   await page.mouse.click(box.x + 20, box.y + box.height * 0.45);
   await page.waitForTimeout(300);
