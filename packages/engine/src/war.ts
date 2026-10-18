@@ -19,6 +19,7 @@ import { lostBattle } from "./rebels.ts";
 import { priceContext, priceOfWar, whyAiWontDeclare } from "./priceOfWar.ts";
 import { grabbedLand } from "./conquest.ts";
 import { cededProvinces, fittingAim, landTakenWithoutAim, monthlyRefusals, noteWarVictory, peaceVoices, refusedPeace, truceBroken, type GameWar } from "./peace.ts";
+import { aiAnswersDefence, defenceCalls } from "./institutions.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -199,6 +200,8 @@ export function declareWar(world: World, a: number, b: number, news: News[], o: 
     const n = world.nationIndex.get(id)!;
     if (n !== a && n !== b) news.push({ kind: "joined", text: `${name(world, n)} joins the war on the side of ${name(world, war.attackers.includes(id) ? a : b)}.`, nations: [n, a, b] });
   }
+  // A war on a member of the Empire calls the Emperor to defend it (INST-030).
+  if (world.empire) defenceCalls(world, world.empire, news);
   answerAiCalls(world, news);
   return null;
 }
@@ -230,7 +233,7 @@ export function answerAiCalls(world: World, news: News[]): void {
     if (n === world.player) continue;
     const enemy = world.nationIndex.get(call.against)!;
     // A subject answers its overlord by its loyalty and kind (SUBJ-028, SUBJ-038).
-    const yes = call.via === "subject" ? subjectAnswersCall(world, n) : call.kind === "defensive" || (!dip.warOf(d, call.called) && strength(world, n) * 2 >= strength(world, enemy));
+    const yes = call.via === "subject" ? subjectAnswersCall(world, n) : call.via === "empire" ? aiAnswersDefence(world, call) : call.kind === "defensive" || (!dip.warOf(d, call.called) && strength(world, n) * 2 >= strength(world, enemy));
     answerCall(world, call, yes, news);
   }
 }

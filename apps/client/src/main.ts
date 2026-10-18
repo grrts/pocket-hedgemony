@@ -57,7 +57,7 @@ import { censureWarningHtml, faithBadgeHtml, headCardHtml, seatKeyHtml } from ".
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
-import { castleFoodLine, castlesOpen, foodLine, foodTab } from "./ui/food.ts";
+import { castleFoodLine, castleFoodSettings, foodLine, foodTab } from "./ui/food.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, postScreen, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
@@ -68,6 +68,7 @@ import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
+import { electionAnswerCard, empireBadgeHtml, empireCard, empireUi, institutionsKey, institutionsRows, type InstitutionsUi } from "./ui/institutions.ts";
 import { fleetButton, fleetCard, hireFleetsTab, navyTab, portTab } from "./ui/navy.ts";
 import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } from "./ui/explore.ts";
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, tileKey, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
@@ -177,6 +178,8 @@ let dispatchesMine = false;
 const alerted = new Set<string>();
 /** The dispatches are open in the panel. */
 let newsView = false;
+/** The Empire card is open (INST-081). */
+let empireOpen = false;
 let selectedProvince = -1;
 /** Armies chosen to march (army ids): a tap on the land sends them all (feedback 21). */
 const selected = new Set<number>();
@@ -208,10 +211,11 @@ let panelCollapsed = false;
 let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
-/** Which tab of a country's overview is open (feedback 12). */
 /** The head of the faith whose card is open from the Faiths map mode's seats (RELG-138), or null. */
 let headView: string | null = null;
-let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies" = "general";
+/** Which tab of a country's overview is open (feedback 12). */
+type RealmTab = "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies";
+let realmTab: RealmTab = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -227,7 +231,8 @@ let grantOpen = false;
 /** The lord's screen lists every royal province to grant, not just the nearest. */
 let grantAll = false;
 /** Which tab of the province overview is open. */
-let provinceTab: "overview" | "people" | "garrison" | "land" | "build" | "port" = "overview";
+type ProvinceTab = "overview" | "people" | "garrison" | "land" | "build" | "port";
+let provinceTab: ProvinceTab = "overview";
 /** The player's fleet whose card is open (its id), and the fleet waiting for a tap on where to sail (-1 = none). */
 let fleetView = -1;
 let sailing = -1;
@@ -236,7 +241,7 @@ let exploring: { fleet: number; path: number[]; legs: number[]; carryOn: boolean
 /** The tile tapped on the Land tab, or -1. */
 let landTile = -1;
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "subjects" | "tongues" | "faiths" | "charts" | "trade";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "subjects" | "tongues" | "faiths" | "charts" | "trade" | "institutions";
 let lens: Lens = "realms";
 /** The trader route being drawn on the map, or null when the map is not in route mode (TRADE-142). */
 let routing: Routing | null = null;
@@ -406,11 +411,28 @@ document.addEventListener("click", (e) => {
   renderPanel();
 });
 trophyButton.addEventListener("click", () => openAchievements());
+// The Empire card opens from the Institutions row, a member's badge, a News card or the map mode (INST-080).
+document.addEventListener("click", (e) => {
+  if (!(e.target as HTMLElement).closest("[data-empire-open]") || !snapshot?.empire) return;
+  empireOpen = true;
+  achView = false;
+  newsView = false;
+  realmView = -1;
+  officialView = -1;
+  lordView = -1;
+  armyView = -1;
+  fleetView = -1;
+  panelCollapsed = false;
+  renderPanel();
+});
 // Opening anything else in the panel puts the Achievements card away.
 document.addEventListener(
   "click",
   (e) => {
-    if ((e.target as HTMLElement).closest("[data-realm], [data-news], [data-official], [data-show-province], [data-go-province], .go-there")) achView = false;
+    if ((e.target as HTMLElement).closest("[data-realm], [data-news], [data-official], [data-show-province], [data-go-province], .go-there")) {
+      achView = false;
+      empireOpen = false;
+    }
   },
   { capture: true },
 );
@@ -530,7 +552,7 @@ document.addEventListener(
   (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button");
     if (!b || b.disabled || b.dataset.sfx === "none") return;
-    sound.sfx(b.dataset.sfx ?? (b.matches(".close, [data-back], .fold") ? "ui_back" : "ui_tap"));
+    sound.sfx(b.dataset.sfx ?? (b.matches(".close, [data-back], .fold, .nav-back") ? "ui_back" : "ui_tap"));
   },
   { capture: true },
 );
@@ -690,6 +712,7 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "tongues", name: "Tongues", note: "the family of the tongue most speak" },
   { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
   { id: "trade", name: "Trade", note: "trade ratio, your traders' loops" },
+  { id: "institutions", name: "Institutions", note: "the Empire: Emperor, electors, members" },
   { id: "charts", name: "Charts", note: "what you have charted, and empty coasts to settle" },
 ];
 /** The trade lens's ramp by trade ratio, quiet to busy (TRADE-143); provinces the player doesn't see are parchment. */
@@ -745,6 +768,9 @@ const relationTo = (n: number): LensRelation | null => {
   return r === undefined || r < 0 ? null : LENS_RELATIONS[r]!;
 };
 const ROYAL_RGB = hexToRgb("#e9c35a");
+/** The Institutions map mode's colours (INST-084): the Emperor gold, members light gold, outsiders on imperial land red and hatched. */
+const INSTITUTION_HEX = { gold: "#d0a248", "light gold": "#f1dc98", red: "#b8323a" } as Record<string, string>;
+const INSTITUTION_RGB = { emperor: hexToRgb("#d0a248"), member: hexToRgb("#f1dc98"), outsider: hexToRgb("#b8323a") };
 /** A colour per lord for the Lords lens: hues spread by the golden angle, kept clear of the crown's gold. */
 function lordRgb(k: number): number[] {
   return hslRgb((80 + ((k * 137.508) % 260)) / 360, 0.5, k % 2 ? 0.42 : 0.55);
@@ -778,7 +804,7 @@ function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map lens</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.id === "lords" && snapshot ? cap(titlesOf(snapshot.playerNation).lords) : l.name}</b><small>${l.note}</small></button>`).join("")}
-    ${lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
+    ${lens === "institutions" ? institutionsKey(INSTITUTION_HEX) : lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -921,6 +947,12 @@ function lensColor(i: number): number[] {
       // The player's subjects share the player's own colour.
       return r === "own" ? nationRgb[snapshot!.playerNation]! : RELATION_RGB[r];
     }
+    case "institutions": {
+      const il = snapshot?.institutionsLens;
+      if (il?.outsiderLand[i]) return INSTITUTION_RGB.outsider;
+      const r = o >= 0 ? (il?.realm[o] ?? 0) : 0;
+      return r === 3 ? INSTITUTION_RGB.emperor : r ? INSTITUTION_RGB.member : o >= 0 ? RELATION_RGB.neutral : unownedRgb;
+    }
     case "trade":
       if (!snapshot) return ramp(TRADE_RAMP, 0);
       return snapshot.provinceTradeSeen[i] ? ramp(TRADE_RAMP, snapshot.provinceTradeRatio[i]! / 100) : TRADE_UNSEEN_RGB;
@@ -962,7 +994,7 @@ function restyleProvinces(): void {
     const occ = occupiers[i]!;
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
     const rebels = !!snapshot?.provinceRebels[i];
-    const hatched = ((occ >= 0 || rebels) && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war") || (lens === "faiths" && (snapshot?.peoples.provinceFaithShare[i * SLOTS + 1] ?? 0) >= 0.3);
+    const hatched = ((occ >= 0 || rebels) && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war") || (lens === "faiths" && (snapshot?.peoples.provinceFaithShare[i * SLOTS + 1] ?? 0) >= 0.3) || (lens === "institutions" && !!snapshot?.institutionsLens.outsiderLand[i]);
     const lord = snapshot ? snapshot.provinceLord[i]! : -1;
     const lit = litLord >= 0 && lord === litLord;
     // Under the trade lens, land whose trade the player doesn't see is parchment too (TRADE-143).
@@ -1128,6 +1160,18 @@ function drawOverlay(o: OverlayContext): void {
       const p = provinces[r.siege.province]!;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (onScreen(sx, sy)) drawSiegeMark(ctx, { ...r.siege, x: sx, y: sy - 10 * tokenUnit(zoom), u: tokenUnit(zoom), color: REBEL_COLOR });
+    }
+  }
+
+  // The Institutions map mode: a crown over each elector's realm, so seats read without colour (INST-084).
+  const il = lens === "institutions" ? snapshot?.institutionsLens : null;
+  if (il && crownImage.complete) {
+    for (let n = 0; n < nations.length; n++) {
+      if (il.realm[n]! < 2) continue;
+      const l = nationLabels[n];
+      if (!l) continue;
+      const [sx, sy] = o.toScreen(l.x, l.y);
+      if (onScreen(sx, sy)) ctx.drawImage(crownImage, Math.round(sx - crownImage.width / 2), Math.round(sy - crownImage.height - 10));
     }
   }
 
@@ -1577,6 +1621,7 @@ let hammerTick: ReturnType<typeof setTimeout> | 0 = 0;
 const hammerImage = Object.assign(new Image(), { src: iconUrl("hammer", 1) });
 /** The coin over each trade city under the trade lens, at one and two art pixels a pixel. */
 const coinImages = [1, 2].map((scale) => Object.assign(new Image(), { src: iconUrl("coin", scale) }));
+const crownImage = Object.assign(new Image(), { src: iconUrl("crown", 2) });
 
 /** A province's walls: its castle as the works stand now (the map's before a game starts), a stone castle in every capital. */
 function wallsAt(p: number): "castle" | "fort" | null {
@@ -1728,6 +1773,12 @@ function onTap(sx: number, sy: number, province: number): void {
   armyView = -1;
   realmView = -1;
   newsView = false;
+  empireOpen = false;
+  // Under the Institutions map mode a tap on a member opens the Empire card (INST-084).
+  if (lens === "institutions" && selectedProvince >= 0 && owners[selectedProvince]! >= 0 && snapshot?.institutionsLens.realm[owners[selectedProvince]!]) {
+    empireOpen = true;
+    panelCollapsed = false;
+  }
   // Under the Faiths map mode a tap on a seat opens its head's card (RELG-138).
   headView = lens === "faiths" && selectedProvince >= 0 ? (snapshot?.faithHeads.seats.find((x) => x.province === selectedProvince)?.head ?? null) : null;
   if (headView) panelCollapsed = false;
@@ -1912,7 +1963,8 @@ function renderArmyList(): void {
       })
       .join("") : `<p class="hint">No commander leads an army yet.</p>`}
     <p class="hint">${selected.size ? `${selected.size} chosen: tap the map to send ${selected.size > 1 ? "them all" : "it"} there.` : "Choose one or more, then tap the map."}</p>
-    ${selected.size ? `<button class="paper" data-pick-none>Clear the choice</button>` : ""}`;
+    ${selected.size ? `<button class="paper" data-pick-none>Clear the choice</button>` : ""}
+    ${[...selected].some((id) => marching(armySlot(id))) ? `<button class="paper" data-pick-halt>Halt ${selected.size > 1 ? "them" : "it"} where ${selected.size > 1 ? "they stand" : "it stands"}</button>` : ""}`;
   armyList.querySelectorAll<HTMLButtonElement>("[data-pick]").forEach((b) =>
     b.addEventListener("click", () => {
       const id = Number(b.dataset.pick);
@@ -1925,6 +1977,14 @@ function renderArmyList(): void {
   armyList.querySelector("[data-pick-none]")?.addEventListener("click", () => {
     selected.clear();
     selectionChanged();
+  });
+  armyList.querySelector("[data-pick-halt]")?.addEventListener("click", () => {
+    const armies = [...selected].filter((id) => marching(armySlot(id)));
+    selected.clear();
+    selectionChanged();
+    void (async () => {
+      for (const army of armies) await haltArmy(army);
+    })();
   });
 }
 
@@ -1965,6 +2025,18 @@ function marchLine(k: number): string {
   if (!route.length && !a.path[k]!.length) return "";
   const to = route.length ? route.at(-1)! : a.location[k]!;
   return ` · marching to ${esc(provinces[to]!.name)}${a.etaHours[k]! > 0 ? `, ${hoursText(a.etaHours[k]!)}` : ""}`;
+}
+
+/** Whether the army has a march under way. */
+function marching(k: number): boolean {
+  const a = snapshot!.armies;
+  return k >= 0 && a.battle[k]! < 0 && !a.retreating[k] && (a.route[k]!.length > 0 || a.path[k]!.length > 0);
+}
+
+/** Stops an army where it stands: an order to its own tile is a Halt (MOVE-115, feedback 128). */
+function haltArmy(id: number): Promise<void> {
+  const k = armySlot(id);
+  return act({ type: "move", army: id, to: snapshot!.armies.location[k]!, tile: snapshot!.armies.tile[k]! });
 }
 
 function armySlot(id: number): number {
@@ -2312,6 +2384,48 @@ function goThere(i: number, zoom = 4): void {
   renderPanel();
 }
 
+/** What the institutions screens need of the client. */
+const institutionsUi: InstitutionsUi = {
+  name: (n) => nations[n]?.name ?? "",
+  banner: (n) => `<img class="banner" src="${flagUrl(nations[n]!, 4)}" alt="">`,
+  pennant: (n) => pennant(nations[n]!),
+  month: monthText,
+  faith: (f) => (f ? faithName(f) : "no faith"),
+};
+
+/** The Empire card (INST-081): header and the folds Election, Reforms, Members and Hold, over the map. */
+function renderEmpire(): void {
+  const v = snapshot!.empire!;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(v.name)}</h2>${closeButton()}</header>
+    <div class="empire-card">${empireCard(v, institutionsUi)}</div>`;
+  bindClose();
+  showPanel(true);
+  panel.querySelectorAll<HTMLDetailsElement>("details.inst-fold[data-fold]").forEach((d) =>
+    d.addEventListener("toggle", () => {
+      if (d.open) empireUi.open.add(d.dataset.fold!);
+      else empireUi.open.delete(d.dataset.fold!);
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-seat]").forEach((b) =>
+    b.addEventListener("click", () => {
+      empireUi.seat = empireUi.seat === b.dataset.seat ? null : b.dataset.seat!;
+      renderPanel();
+    }),
+  );
+  bindEmpire();
+}
+
+/** The Empire's orders, from its card or its News answer card. */
+function bindEmpire(): void {
+  const again = () => renderPanel();
+  panel.querySelectorAll<HTMLButtonElement>("[data-empire-vote]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "vote", candidate: Number(b.dataset.empireVote) }).then(again)));
+  panel.querySelectorAll<HTMLButtonElement>("[data-seek-vote]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "seekVote", realm: Number(b.dataset.seekVote) }).then(again)));
+  panel.querySelectorAll<HTMLButtonElement>("[data-stand]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "stand", on: b.dataset.stand === "1" }).then(again)));
+  panel.querySelectorAll<HTMLButtonElement>("[data-grant-seat]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "grantSeat", seat: b.dataset.grantSeat!, realm: Number(b.dataset.grantRealm) }).then(again)));
+  panel.querySelectorAll<HTMLButtonElement>("[data-admit]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "admit", realm: Number(b.dataset.admit) }).then(again)));
+}
+
 /** The dispatches: calls to arms and offers to answer, then the log of everything that happened, newest first. */
 function renderNews(): void {
   const s = snapshot!;
@@ -2331,9 +2445,15 @@ function renderNews(): void {
     ${waitingEventsHtml(s.events)}
     ${asksHtml()}
     ${s.peaceOffers.map(offerHtml).join("")}
+    ${electionAnswerCard(s.empire, institutionsUi)}
     ${s.calls
-      .map(
-        (c) => `<div class="call framed-soft">
+      .map((c) =>
+        c.via === "empire"
+          ? `<div class="call framed-soft">
+          <p>${icon("crown", 2)} ${realmButton(c.caller)} calls on you as Emperor to defend it against ${realmButton(c.against)}. Refusing costs the Empire 15 hold and leaves the electors aggrieved; silence counts as a refusal.</p>
+          <div class="choices"><button class="wax" data-call="${c.id}" data-yes="1">Defend</button><button class="paper" data-call="${c.id}" data-yes="0">Refuse</button></div>
+        </div>`
+          : `<div class="call framed-soft">
           <p>${icon("swords", 2)} ${realmButton(c.caller)} calls you to arms against ${realmButton(c.against)}${c.kind === "defensive" ? " (a defensive call: refusing breaks the alliance)" : ""}.</p>
           <div class="choices"><button class="wax" data-call="${c.id}" data-yes="1">Join the war</button><button class="paper" data-call="${c.id}" data-yes="0">Refuse</button></div>
         </div>`,
@@ -2354,6 +2474,7 @@ function renderNews(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-call]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "answerCall", call: b.dataset.call!, yes: b.dataset.yes === "1" })),
   );
+  bindEmpire();
   panel.querySelectorAll<HTMLButtonElement>("[data-go-province]").forEach((b) => b.addEventListener("click", () => goThere(Number(b.dataset.goProvince))));
   panel.querySelectorAll<HTMLButtonElement>("[data-news-mine]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -2391,7 +2512,7 @@ function renderActions(): void {
 }
 
 function closeButton(): string {
-  return `<span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span>`;
+  return `<span class="panel-buttons"><button class="nav-back" aria-label="Back" title="Back to the previous screen"${screenHistory.length ? "" : " hidden"}>${icon("back", 2)}</button><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span>`;
 }
 
 /** Shows or hides the panel, leaving a tool button to bring a folded panel back. */
@@ -2406,7 +2527,7 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
   const what =
-    reopenIcon === "crown" ? "Choose a realm" : newsView ? "Dispatches" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
+    reopenIcon === "crown" ? "Choose a realm" : empireOpen ? "The Empire" : newsView ? "Dispatches" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
   reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
   reopen.title = `Open the overview: ${what}`;
   panel.querySelector(".fold")?.addEventListener("click", () => {
@@ -2418,6 +2539,102 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
 /** Which card the panel shows; a different one opens at its top, with its close button in view. */
 let panelShows = "";
 
+/** A screen of the panel as the Back button brings it back (feedback 119). */
+interface Screen {
+  ach: boolean;
+  news: boolean;
+  realm: number;
+  realmTab: RealmTab;
+  official: number;
+  lord: number;
+  army: number;
+  fleet: number;
+  province: number;
+  provinceTab: ProvinceTab;
+}
+/** The screens the player came through, oldest first; Back returns to the last. Closing the panel forgets them. */
+const screenHistory: Screen[] = [];
+/** How many screens Back can step through. */
+const HISTORY_KEPT = 20;
+/** The screen on show, or null while the panel is closed. */
+let shownScreen: Screen | null = null;
+/** renderPanel calls itself when a screen falls back to another; only the outermost call notes the screen. */
+let panelDepth = 0;
+/** A browser history entry stands for the screen history, so the phone's back gesture steps back too. */
+let backArmed = false;
+/** The next popstate is our own, taking that entry away again. */
+let backIgnore = false;
+
+/** The screen the panel shows now, or null when it is closed. */
+function currentScreen(): Screen | null {
+  if (!snapshot) return null;
+  const s: Screen = { ach: achView, news: newsView, realm: realmView, realmTab, official: officialView, lord: lordView, army: armyView, fleet: fleetView, province: selectedProvince, provinceTab };
+  return screenKey(s) ? s : null;
+}
+
+/** What the player sees of a screen, the first view set as renderPanelCard picks it: two screens that look alike are one. */
+function screenKey(s: Screen): string {
+  return s.ach ? "ach" : s.news ? "news" : s.realm >= 0 ? `realm ${s.realm} ${s.realmTab}` : s.official >= 0 ? `official ${s.official}` : s.lord >= 0 ? `lord ${s.lord}` : s.army >= 0 ? `army ${s.army}` : s.fleet >= 0 ? `fleet ${s.fleet}` : s.province >= 0 ? `province ${s.province} ${s.provinceTab}` : "";
+}
+
+/** After a redraw: a new screen puts the one before on the history; a closed panel clears it. */
+function noteScreen(): void {
+  const now = currentScreen();
+  if (!now) screenHistory.length = 0;
+  else if (shownScreen && screenKey(shownScreen) !== screenKey(now)) {
+    screenHistory.push(shownScreen);
+    if (screenHistory.length > HISTORY_KEPT) screenHistory.shift();
+  }
+  shownScreen = now;
+  const b = panel.querySelector<HTMLButtonElement>(".nav-back");
+  if (b) b.hidden = !screenHistory.length;
+  // One browser history entry while there is somewhere to go back to, so the back gesture lands here.
+  if (screenHistory.length && !backArmed) {
+    history.pushState({ phBack: true }, "");
+    backArmed = true;
+  } else if (!screenHistory.length && backArmed) {
+    backArmed = false;
+    backIgnore = true;
+    history.back();
+  }
+}
+
+/** Back: the previous screen again, as it was left. */
+function goBack(): void {
+  const s = screenHistory.pop();
+  if (!s) return;
+  achView = s.ach;
+  newsView = s.news;
+  realmView = s.realm;
+  realmTab = s.realmTab;
+  officialView = s.official;
+  lordView = s.lord;
+  armyView = s.army;
+  fleetView = s.fleet;
+  sailing = -1;
+  grantOpen = false;
+  selectedProvince = s.province;
+  provinceTab = s.provinceTab;
+  panelCollapsed = false;
+  // The screen it leaves is not put on the history again.
+  shownScreen = null;
+  restyleProvinces();
+  renderPanel();
+}
+
+panel.addEventListener("click", (e) => {
+  if ((e.target as HTMLElement).closest(".nav-back")) goBack();
+});
+// The browser's or phone's back steps back through the panel while it has somewhere to go.
+addEventListener("popstate", () => {
+  if (backIgnore) {
+    backIgnore = false;
+    return;
+  }
+  backArmed = false;
+  goBack();
+});
+
 function renderPanel(): void {
   // Opening any other card, or closing the fleet's, drops a course being drawn.
   if (exploring && (fleetView !== exploring.fleet || realmView >= 0 || newsView)) {
@@ -2425,9 +2642,15 @@ function renderPanel(): void {
     voyageBarEl.hidden = true;
     view.invalidate();
   }
-  renderPanelCard();
+  panelDepth++;
+  try {
+    renderPanelCard();
+  } finally {
+    panelDepth--;
+  }
   // Whatever the card, the buttons a revolution's regime locks say so (REVO-092).
   lockRevolutionButtons(panel, snapshot?.revolution);
+  if (!panelDepth) noteScreen();
 }
 
 /** The Head of the faith card's buttons: conclave gold in steps, Claim the caliphate, Raise our own patriarch. */
@@ -2466,7 +2689,7 @@ function renderHead(id: string): void {
 }
 
 function renderPanelCard(): void {
-  const shows = `${achView}/${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
+  const shows = `${achView}/${empireOpen}/${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
@@ -2475,6 +2698,11 @@ function renderPanelCard(): void {
     renderAchievements();
     return;
   }
+  if (empireOpen && snapshot?.empire) {
+    renderEmpire();
+    return;
+  }
+  empireOpen = false;
   if (newsView && snapshot) {
     renderNews();
     return;
@@ -2600,6 +2828,7 @@ function renderPanelCard(): void {
       ${mineHere ? taxLine(selectedProvince) : ""}
     </dl>
     ${mineHere ? rateButtons(snapshot!.provinceTax[selectedProvince]!, "province") : ""}
+    ${mineHere ? castleFoodSettings(snapshot!, selectedProvince) : ""}
     ${armiesHere.length ? `<h3 class="sub">Armies</h3>` : ""}
     ${armiesHere
       .map((k) => {
@@ -2635,11 +2864,17 @@ function renderPanelCard(): void {
     }),
   );
   bindLords();
-  panel.querySelector("[data-realm-open-food]")?.addEventListener("click", () => {
-    realmView = snapshot!.playerNation;
-    realmTab = "food";
-    renderPanel();
-  });
+  panel.querySelectorAll("[data-realm-open-food]").forEach((b) =>
+    b.addEventListener("click", () => {
+      realmView = snapshot!.playerNation;
+      realmTab = "food";
+      renderPanel();
+    }),
+  );
+  // The castle's own food settings (feedback 112): the card stays on the province.
+  panel.querySelectorAll<HTMLButtonElement>("[data-food-key]").forEach((b) =>
+    b.addEventListener("click", () => void actHere({ type: "setFood", castle: Number(b.dataset.foodCastle), key: b.dataset.foodKey!, value: JSON.parse(b.dataset.foodValue!) as string | number | null })),
+  );
   panel.querySelector("[data-colony-abandon]")?.addEventListener("click", () => void actHere({ type: "explore", do: "abandon", province: selectedProvince }));
   if (siege) animateSiege(siege);
 }
@@ -3644,6 +3879,8 @@ function renderFleet(id: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-admiral]").forEach((b) => b.addEventListener("click", () => order({ do: "admiral", commander: Number(b.dataset.fleetAdmiral) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-board]").forEach((b) => b.addEventListener("click", () => order({ do: "board", army: Number(b.dataset.fleetBoard) })));
   panel.querySelector("[data-fleet-unload]")?.addEventListener("click", () => order({ do: "unload" }));
+  // Sailing to where it is stops the fleet there (feedback 128).
+  panel.querySelector("[data-fleet-stop]")?.addEventListener("click", () => order({ do: "sail", to: f.at }));
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-split]").forEach((b) => b.addEventListener("click", () => order({ do: "split", ship: Number(b.dataset.fleetSplit) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-merge]").forEach((b) => {
     const into = Number(b.dataset.fleetMerge);
@@ -3702,7 +3939,7 @@ function renderArmy(id: number): void {
     <div class="army">
       ${commanderPortrait(rules, c.name, me)}
       <span class="who"><b>${esc(titledOf(c))}</b> <small>(${roleOf(c)}${c.origin && c.origin !== "a hired captain" ? `, ${esc(c.origin.toLowerCase())}` : ""})</small><br><small>${skills(c)}</small><br><small>${c.victories} victor${c.victories === 1 ? "y" : "ies"}, ${c.defeats} defeat${c.defeats === 1 ? "" : "s"}</small></span>
-      <span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button></span>
+      <span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button>${marching(k) ? `<button class="paper" data-halt>Halt</button>` : ""}</span>
     </div>
     <dl class="facts">
       <dt>Where</dt><dd><button class="paper capital" data-go="${here}">${icon("map", 1)}${esc(provinces[here]!.name)}</button>${marchLine(k)}</dd>
@@ -3759,6 +3996,10 @@ function renderArmy(id: number): void {
   bindClose();
   showPanel(true);
   panel.querySelectorAll<HTMLButtonElement>("[data-army]").forEach((b) => b.addEventListener("click", () => pickArmy(Number(b.dataset.army))));
+  panel.querySelector("[data-halt]")?.addEventListener("click", () => {
+    selected.delete(id);
+    void haltArmy(id).then(() => renderPanel());
+  });
   panel.querySelector("[data-go]")?.addEventListener("click", () => {
     view.lookAt(provinces[here]!.x!, provinces[here]!.y!, Math.max(view.camera.zoom, 4));
   });
@@ -3917,6 +4158,7 @@ function myDiplomacySection(): string {
   const ties = s.relations.filter((x) => x.state !== "war");
   const STATE = { truce: "Truce", alliance: "Ally", subject: "Your overlord", overlord: "Your subject", war: "At war" } as const;
   return `${asksHtml()}${s.peaceOffers.map(offerHtml).join("")}
+    ${institutionsRows(s.empire, institutionsUi)}
     <h3 class="sub">Wars</h3>
     ${myWars().length ? myWars()
       .map((w) => `<p>${icon("swords", 1)} Against ${w.theirs.map((n) => realmButton(n, "diplomacy")).join(" ")} <small>since ${monthText(w.start)}</small></p>`)
@@ -4044,23 +4286,12 @@ function bindTax(province: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-repay]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "repay", gold: Number(b.dataset.repay) })));
 }
 
-/**
- * The Food tab's buttons: a setting for the realm or one castle, a preset;
- * the tab stays open on its new state, and a castle's folded settings stay
- * as the player left them.
- */
+/** The Food tab's buttons: a realm setting or a preset; the tab stays open on its new state. */
 function bindFood(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-food-key]").forEach((b) =>
     b.addEventListener("click", () => void actInTreasury({ type: "setFood", castle: Number(b.dataset.foodCastle), key: b.dataset.foodKey!, value: JSON.parse(b.dataset.foodValue!) as string | number | null })),
   );
   panel.querySelectorAll<HTMLButtonElement>("[data-food-preset]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "foodPreset", name: b.dataset.foodPreset! })));
-  panel.querySelectorAll<HTMLDetailsElement>("details[data-castle]").forEach((d) =>
-    d.addEventListener("toggle", () => {
-      const c = Number(d.dataset.castle);
-      if (d.open) castlesOpen.add(c);
-      else castlesOpen.delete(c);
-    }),
-  );
 }
 
 /** Borrowing and repaying keep the Treasury tab open: what a loan did to the lords goes to the news, and the tab shows the new debt. */
@@ -4140,7 +4371,6 @@ function renderRealm(r: number): void {
   const armies = s ? [...s.armies.id.keys()].filter((k) => s.armies.owner[k] === r) : [];
   const men = armies.reduce((t, k) => t + s!.armies.men[k]!, 0);
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
-  const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
   if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "trade" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "hireFleets" || realmTab === "colonies") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
@@ -4150,7 +4380,7 @@ function renderRealm(r: number): void {
   const general = `
     <div class="realm-card">
       <img class="banner" src="${flagUrl(n, 6)}" alt="">
-      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}<br>
+      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"} ${s ? empireBadgeHtml(s.empire, r) : ""}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
     ${mine && s?.stability ? stabilitySection(s.stability, titlesOf(r)) : ""}
@@ -4203,8 +4433,7 @@ function renderRealm(r: number): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
     ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
-    ${content}
-    ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
+    ${content}`;
   bindClose();
   showPanel(true);
   bindNavyLinks();
@@ -4304,10 +4533,6 @@ function renderRealm(r: number): void {
   bindTax(-1);
   bindFood();
   bindLearning();
-  panel.querySelector("[data-back]")?.addEventListener("click", () => {
-    realmView = -1;
-    renderPanel();
-  });
   bindNationButtons();
 }
 
@@ -4541,6 +4766,7 @@ function bindClose(): void {
     newsView = false;
     realmView = -1;
     achView = false;
+    empireOpen = false;
     headView = null;
     selectedProvince = -1;
     selected.clear();
@@ -4680,6 +4906,8 @@ function enterGame(snap: Snapshot): void {
   newsView = false;
   grantOpen = false;
   selected.clear();
+  screenHistory.length = 0;
+  shownScreen = null;
   weekStart = snapshot!.date;
   dispatches = [];
   unread = 0;
@@ -5530,6 +5758,7 @@ Object.assign(globalThis, {
     armyView = -1;
     realmView = -1;
     newsView = false;
+    empireOpen = false;
     panelCollapsed = false;
     renderPanel();
   },

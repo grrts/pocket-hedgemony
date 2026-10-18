@@ -15,6 +15,7 @@ import { heritageFactor, heritageTaxReach } from "./heritage.ts";
 import { navyCosts } from "./navy.ts";
 import { governorWages } from "./colonies.ts";
 import { W as WARFARE } from "./domain/warfare/index.ts";
+import { empireDues } from "./institutions.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -160,6 +161,8 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
     L[n * LEDGER_LINES + WAGES] = L[n * LEDGER_LINES + WAGES]! - governors[n]!;
     // Grain sold to the treasury this month (REALM-026, castleFood.ts).
     L[n * LEDGER_LINES + GRAIN] = world.nationGrainGold[n]!;
+    // The Emperor's dues from the members come in with the tribute (INST-032).
+    L[n * LEDGER_LINES + TRIBUTE] = L[n * LEDGER_LINES + TRIBUTE]! + empireDues(world, n);
     sumLedger(world, n);
   }
   if (!pay) return;

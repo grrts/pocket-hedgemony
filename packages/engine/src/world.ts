@@ -39,6 +39,7 @@ import { refreshFreeFleets } from "./hiredFleets.ts";
 import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import type { AchievementLog } from "./achievements.ts";
+import { createInstitutionsState, seedInstitutions, type InstitutionsState } from "./institutions.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -46,7 +47,7 @@ import type { AchievementLog } from "./achievements.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState {
   /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
   faithHeads: FaithHeadsState;
   /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
@@ -461,6 +462,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createFallenState(N),
     ...createBeliefState(N),
     ...createFaithHeadsState(N),
+    ...createInstitutionsState(),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -490,6 +492,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedRulers(world);
   // The heads of the faith in 1444 read the faiths and the subjects (RELG-153).
   seedFaithHeads(world);
+  // The Empire of 1444 reads the members' land and the Emperor's ruler (INST-010).
+  seedInstitutions(world);
   readBeliefShares(world);
   recount(world);
 

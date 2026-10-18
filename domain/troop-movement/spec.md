@@ -310,6 +310,9 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - MOVE-131 Grouping: the marks belong to choosing a march, with the commander list's "tap the map to send" hint and the refusal "you need war or passage"; they draw on the map itself, not in a panel. [F-76; X-19]
 - MOVE-132 Overview: the closed borders are the overview of where the player's armies may go; the realm's diplomacy screen, where passage is asked for, says why. [F-76; X-19]
 - MOVE-133 Phone: the game plays in landscape (Wide and Tall); the line is about three screen pixels wide whatever the zoom and the wash leaves the terrain readable; nothing needs hover, and a tap on closed land is refused with the reason as before. [F-76; X-19]
+#### How the player uses it: stopping a march
+- MOVE-134 While a player's army or fleet has a route, the client shall offer to halt it where it stands in one tap: Halt beside Move on the army's card, "Halt it where it stands" in the commander list while a chosen army marches and Stop here beside Sail on the fleet's card; each sends a march (or sail) order to the tile (sea zone, port) it stands on, which is a Halt (MOVE-115). [F-128]
+- MOVE-135 Where, grouping, overview and phone: the halt sits with the march order it cancels (the army's card and the commander list; a banner tapped again does not halt, so a double tap cannot stop an army by accident) and nowhere else; the commander list's "marching to" line is the overview of which armies are under way; every halt button is at least 44 points high, shown only while there is a route, and nothing needs hover. [F-128; X-19]
 
 ## 6. Commands
 
@@ -493,3 +496,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of troop-movement's quest
 | MOVE-127 | moving-many-armies.feature | Several armies selected at once march together |
 | MOVE-129 | route-preview-and-notices.feature | The map marks land the chosen armies may not enter |
 | MOVE-130–133 | — | presentation only (how the marks are reached and drawn) |
+| MOVE-134 | orders.feature | The player halts a marching army in one tap |
+| MOVE-135 | — | presentation only (where the halt buttons sit) |
