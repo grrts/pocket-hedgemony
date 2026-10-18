@@ -1003,11 +1003,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | game-shell | upstream | Conformist | Levy and commission screens in the Army tab and from province cards |
 
-## game-shell ↔ research (one-sided)
+## game-shell ↔ research
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | game-shell | upstream | Conformist | Learning tab, empty research or school slots for Attention |
+| research | downstream | Customer–Supplier | Each realm's standing for the nation picker and country cards (RSCH-104, RSCH-105) |
 
 ## game-shell ↔ revolutions (one-sided)
 
@@ -1565,6 +1566,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | province | upstream | Published Language | Known inventions unlock buildings, tile changes, harvest steps, road and castle steps |
 | research | upstream | Customer–Supplier | Schools, students and scholars per province, Schoolmaster, graduates becoming officials by school type; research sends unlocks (buildings, tile changes, harvest steps, roads, castles) |
+| research | downstream | Customer–Supplier | Without F01 farmland harvests one step worse (RSCH-094) |
 
 ## province ↔ revolutions
 
@@ -1849,7 +1851,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| research | upstream | Customer–Supplier | Map nations; research data maps each start label to nations (D-RSCH-11) |
+| research | upstream | Customer–Supplier | Map nations; each belongs to one start group in the research data (RSCH-098, D-RSCH-21) |
 | scenario-setup | upstream | Customer–Supplier | Start inventions per country |
 
 ## research ↔ time-and-turns
@@ -1872,6 +1874,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | research | downstream | Customer–Supplier | B2, B9 and railways as road factors |
+| research | downstream | Customer–Supplier | Without B01 armies carry half the food (RSCH-094) |
 | troop-movement | upstream | Conformist | W14 Army divisions (split same day, fronts) |
 
 ## research ↔ warfare
@@ -1880,6 +1883,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | research | downstream | Customer–Supplier | W, B, S inventions and their numbers (warfare §12); battles roll the sack (RSCH-072); occupations steal progress (RSCH-071) |
 | warfare | upstream | Conformist | W, B (and S) inventions known |
+
+## research ↔ warfare, recruiting (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| research | downstream | Customer–Supplier | Without C01 regiments fight 20 % weaker; without F03 no horse regiments (RSCH-094) |
 
 ## revolutions ↔ subjects
 
