@@ -30,6 +30,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Subjects and overlords](subjects/spec.md) | SUBJ | [features](subjects/features/) |
 | [Time and turns](time-and-turns/spec.md) | TIME | [features](time-and-turns/features/) |
 | [Trade](trade/spec.md) | TRADE | [features](trade/features/) |
+| [Tribes](tribes/spec.md) | TRIBE | [features](tribes/features/) |
 | [Troop movement](troop-movement/spec.md) | MOVE | [features](troop-movement/features/) |
 | [Warfare](warfare/spec.md) | WAR | [features](warfare/features/) |
 | [World map](world-map/spec.md) | MAP | [features](world-map/features/) |
