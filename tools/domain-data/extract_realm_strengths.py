@@ -7,8 +7,10 @@ the compact catalogue rows (scenario-setup-catalogue.json), the map's nations
 (packages/rules/data/world/nations.json) and the map-to-catalogue rename table
 (scenario-setup.json), and writes packages/rules/data/domain/
 national-strengths-realms.json: for every map nation, its catalogue record id,
-its 14 assessments with their confidence, and its birthright, heydays and
-burden. Ambitions and legacies are left out: they are drawn and earned in play.
+its 14 assessments with their confidence, and its heritage: birthright,
+heydays (with their marks), burden (with its turned legacy) and the pool of
+ambitions the campaign draws from (HER-078). The conditions go with them, so
+the engine can evaluate heritage each month.
 
 Run: python3 -I tools/domain-data/extract_realm_strengths.py [project-files-dir]
 """
@@ -52,10 +54,14 @@ def main():
                 "authored": bool(h.get("authored")),
                 "birthright": part(h["birthright"], ["id", "name", "text", "why", "needs", "effects"]),
                 "heydays": [
-                    {**part(d, ["id", "name", "age", "text", "why", "wakes", "ends", "effects"]), "ageName": ages.get(d["age"], d["age"])}
+                    {**part(d, ["id", "name", "age", "text", "why", "wakes", "ends", "effects", "mark"]), "ageName": ages.get(d["age"], d["age"])}
                     for d in h.get("heydays") or []
                 ],
-                "burden": part(h["burden"], ["id", "name", "text", "why", "shed", "effects"]) if h.get("burden") else None,
+                "burden": part(h["burden"], ["id", "name", "text", "why", "shed", "shed_text", "effects", "turned"]) if h.get("burden") else None,
+                "ambitions": [
+                    part(a, ["id", "name", "theme", "hint", "text", "historical", "window", "stir", "goal", "fail", "age", "legacy"])
+                    for a in h.get("ambitions") or []
+                ],
             }
         realms[nation["id"]] = out
 

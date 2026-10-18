@@ -2961,6 +2961,118 @@ button.paper.over {
   background: #b13e53;
 }
 
+/* ---- Heritage in play: states, seals, warmth and the choice waiting (HER-084, HER-085) ---- */
+
+.heritage-line .dormant {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.heritage-part.off {
+  opacity: 0.7;
+}
+.heritage-part .chip,
+.seal .chip {
+  display: inline-block;
+  padding: 0 6px;
+  border: 2px solid var(--outline);
+  font-size: 0.85em;
+  color: var(--ink);
+}
+.heritage-part .chip.on {
+  background: var(--brass-light);
+}
+.heritage-part .meter {
+  display: inline-block;
+  vertical-align: middle;
+  width: 64px;
+  height: 10px;
+  border: 2px solid var(--outline);
+}
+.heritage-part .meter i {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.heritage-part .in-play {
+  padding-top: 0;
+  font-size: 0.9em;
+  color: var(--ink-soft);
+}
+.heritage-ask {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border: 2px solid var(--outline);
+  background: var(--brass-light);
+}
+.heritage-ask p {
+  margin: 0 0 6px;
+}
+.heritage-ask .choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 6px;
+}
+.heritage-ask button,
+.seal .counsel {
+  min-height: 44px;
+}
+.seals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.seal {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 4px 8px;
+  min-height: 44px;
+  margin: 6px 0;
+  padding: 4px 8px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.seal.sealed .what i {
+  color: var(--ink-soft);
+}
+.seal .what small {
+  display: block;
+  color: var(--ink-soft);
+}
+.seal .counsel {
+  padding: 0 8px;
+  white-space: nowrap;
+}
+.seal .later {
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.seal .warmth {
+  display: inline-flex;
+  gap: 2px;
+}
+.seal .warmth i {
+  width: 10px;
+  height: 14px;
+  border: 2px solid var(--outline);
+}
+.seal .warmth.cold i.on {
+  background: var(--sea);
+}
+.seal .warmth.warm i.on {
+  background: var(--brass);
+}
+.seal .warmth.hot i.on {
+  background: var(--cloth);
+}
+.seal .warm-box small {
+  color: var(--ink-soft);
+}
+.heritage-part .past-list {
+  margin: 0;
+  padding: 4px 8px 8px 24px;
+}
+
 /* ---- Subjects on the Diplomacy tab (SUBJ-091, SUBJ-092) ---- */
 
 /* Loyalty steps tinted green, ochre, orange and red, as the subjects config names them. */

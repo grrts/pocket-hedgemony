@@ -941,12 +941,14 @@ function noBuildData(s: Scenario, what: string): void {
   const re: Record<string, RegExp> = {
     adjacency: /adj|neighbo/i,
     terrain: /terrain|ground/i,
-    water: /water/i,
-    rivers: /river/i,
+    // As keys: a realm's heritage names its strengths by id, and "the embanked river" is no build data.
+    water: /"[^"]*water[^"]*"\s*:/i,
+    rivers: /"[^"]*river[^"]*"\s*:/i,
     "province shapes": /shape|"x"|"y"|polygon/i,
   };
+  const loose: Record<string, RegExp> = { water: /water/i, rivers: /river/i };
   expect(s.chunkText).not.toMatch(re[what]!);
-  for (const a of s.chunkArrays as string[]) expect(a).not.toMatch(re[what]!);
+  for (const a of s.chunkArrays as string[]) expect(a).not.toMatch(loose[what] ?? re[what]!);
 }
 
 function gridRules(ids: string[], pops: number[]): Ruleset {
