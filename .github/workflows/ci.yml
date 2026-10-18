@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/project-thread-e8y1yc]
   pull_request:
 
 jobs:
