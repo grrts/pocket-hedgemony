@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-556 decided and 8 still open across 29 contexts.
+558 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -152,6 +152,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-EVT-14**: (was OQ-EVT-14) trust and notoriety: they are diplomacy's derived values (DIPL-173, DIPL-174).
 - **D-EVT-15**: (was OQ-EVT-15) When ages and periods are checked: in the turn in which 1 January falls, in the events step
 - **D-EVT-16**: (was OQ-EVT-16) The religion flags: religious_persecution_active, missionary_persecution and
+- **D-EVT-17**: First game slice of events (milestone 6, provisional): the bridge maps 13 realm ids of the map to
 
 ### Exploration (exploration)
 
@@ -557,6 +558,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SUBJ-24**: (was OQ-SUBJ-24) In revolt: the seasonal count stops at Disloyal; a subject goes In revolt only by the conditions of 8.2 (a backer, the overlord losing, or an event). It keeps risings deliberate.
 - **D-SUBJ-25**: (was OQ-SUBJ-25) Reason names: "Official lent" (+1), "Hostage harmed" (−2) and "Force used" (−1). Kin and Hostage at court are separate ties and stack (+2). Each reason is named once.
 - **D-SUBJ-26**: First game slice of subjects (milestone 5, provisional): every realm has a subject reach of 5 (moderate) until the catalogue's administrative capacity is read; faith and *Far away* give no reasons yet (no faith data, no distance rule); grain tribute, residents, hostages, tightening, folding in, risings and the subjects lens wait for their slices. A subject's loyalty is counted only at season ends, so the turn stays cheap.
+- **D-SUBJ-27**: Second game slice of subjects (milestone 5, provisional): residents, tightening and folding in use an envoy that stays at the subject's court with the status of a resident, so it takes a seat like any envoy; folding in needs a shared land border (no sea routes yet); a folded-in subject's army disbands and its treasury is lost, since lords hold no retinue or wealth in the game yet; *Foreign rule* waits for culture and faith. Backers are judged, not bargained for: a rival or hostile realm of the overlord at peace, bordering the subject and at least as strong as the overlord, counts as willing, but does not join the war yet.
 
 ### Time and turns (time-and-turns)
 
