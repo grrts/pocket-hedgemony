@@ -9,7 +9,8 @@ import { eventCards, type EventCard } from "./events.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
-import { governmentView, realmForms, type GovernmentView } from "./government.ts";
+import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
+import type { Titles } from "./domain/realm/index.ts";
 import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
@@ -220,6 +221,8 @@ export interface Snapshot {
   provinceRebels: Int32Array;
   /** Every realm's government form by name, for its card. */
   realmForms: string[];
+  /** What every realm calls its lords and officials (REALM-242). */
+  realmTitles: Titles[];
   /** The player's Trade tab: last month's trade, its traders, where it can found more, its busiest cities and the route being drawn (TRADE-130 to TRADE-140); null before a realm is chosen. */
   trade: TradeView | null;
   /** The kinds of trader, with their gold, upkeep, hold, purse and crew. */
@@ -484,6 +487,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       rebels: rebelsView(w),
       provinceRebels: w.provinceRebels.slice(),
       realmForms: realmForms(w),
+      realmTitles: realmTitles(w),
       trade: player >= 0 ? tradeView(w, player) : null,
       traderKinds: TRADER_KINDS.map((k) => kindRow(w, k)),
       provinceTradeValue: Float32Array.from({ length: w.provinceCount }, (_, p) => tradeValueAt(w, p)),

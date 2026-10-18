@@ -1383,3 +1383,22 @@ export function standingFrom1444(relations: readonly Relation1444[], country: st
   const of = (type: string) => mine.filter((r) => r.type === type).map(other).sort();
   return { allies: of("alliance"), rivals: of("rival"), subjects: mine.filter((r) => r.type === "subject" && r.target === country).map((r) => r.source).sort(), enemies: of("at_war") };
 }
+
+// ---------------------------------------------------------------- titles
+
+/** What a realm calls its lords and its officials, singular and plural (REALM-242). */
+export interface Titles {
+  lord: string;
+  lords: string;
+  official: string;
+  officials: string;
+}
+
+/**
+ * A realm's titles: its court language's family first, then its government
+ * form's family, then the default (REALM-242). Only words: no rule reads them.
+ */
+export function titlesFor(languageFamily: string, formFamily: string): Titles {
+  const t = config.titles as { default: Titles; by_form_family: Record<string, Partial<Titles>>; by_language_family: Record<string, Partial<Titles>> };
+  return { ...t.default, ...t.by_form_family[formFamily], ...t.by_language_family[languageFamily] };
+}

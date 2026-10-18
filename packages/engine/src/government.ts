@@ -5,6 +5,8 @@ import * as dip from "./domain/diplomacy/index.ts";
 import { knownSet } from "./research.ts";
 import { LOYALTY } from "./lords.ts";
 import { GRIEVANCES } from "./moods.ts";
+import { NO_TONGUE, TONGUE_FAMILY } from "./peoples.ts";
+import { titlesFor, type Titles } from "./domain/realm/index.ts";
 
 /**
  * Government in the game (GOV-058 to GOV-066): every realm has a government
@@ -307,6 +309,14 @@ export function governmentView(world: World, n: number): GovernmentView {
 /** Every realm's form by name, for another realm's card. */
 export function realmForms(world: World): string[] {
   return Array.from({ length: world.nationCount }, (_, n) => gov.formName(formOf(world, n)));
+}
+
+/** What every realm calls its lords and officials, by its court language and its form (REALM-242). */
+export function realmTitles(world: World): Titles[] {
+  return Array.from({ length: world.nationCount }, (_, n) => {
+    const court = world.nationCourt[n]!;
+    return titlesFor(court === NO_TONGUE ? "" : TONGUE_FAMILY[court]!, gov.form(formOf(world, n)).family);
+  });
 }
 
 /** Government as saved: forms by id, so a later build with other forms still reads them. */

@@ -47,6 +47,7 @@ import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
+import { cap, DEFAULT_TITLES } from "./ui/titles.ts";
 import { lockRevolutionButtons, revolutionCardHtml, revolutionSection } from "./ui/revolution.ts";
 import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
 import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeLine, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
@@ -658,6 +659,9 @@ async function boot(): Promise<void> {
 }
 
 // ---- map styling ----
+/** What realm n calls its lords and officials (REALM-242): chiefs, beys, daimyo, magistrates. */
+const titlesOf = (n: number) => snapshot?.realmTitles?.[n] ?? DEFAULT_TITLES;
+
 const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "realms", name: "Realms", note: "who holds the land" },
   { id: "terrain", name: "Terrain", note: "the bare land" },
@@ -758,7 +762,7 @@ function setLens(l: Lens): void {
 function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map lens</h3>
-    ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.name}</b><small>${l.note}</small></button>`).join("")}
+    ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.id === "lords" && snapshot ? cap(titlesOf(snapshot.playerNation).lords) : l.name}</b><small>${l.note}</small></button>`).join("")}
     ${lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
@@ -2707,7 +2711,7 @@ function renderOfficial(pi: number): void {
   }));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
-    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6)}
+    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me))}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -2762,7 +2766,7 @@ function renderPost(pi: number): void {
   const hires = OFFICIALS.map((t, type) => ({ type, home: home.has(t) }));
   panel.innerHTML = `
     <header><h2 class="ribbon">Post at ${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
-    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!)}
+    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!, titlesOf(me))}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -2890,9 +2894,9 @@ function governanceSection(pi: number, own: number, mine: boolean, official: Ret
     .sort((a, b) => Number(near.has(b.k)) - Number(near.has(a.k)) || LOYALTY_ORDER.indexOf(a.loyalty) - LOYALTY_ORDER.indexOf(b.loyalty));
   // A lord's official serves him: no button to the screen that would commission him (feedback 62).
   const officialHtml = lord && official
-    ? officialCard(rules, official, own, false, true)
-    : officialCard(rules, official, own, mine, false, pi);
-  return governanceCard(rules, { lord, mine, isCapital, province: pi, official: officialHtml, grantOpen, takers });
+    ? officialCard(rules, official, own, false, true, -1, titlesOf(own))
+    : officialCard(rules, official, own, mine, false, pi, titlesOf(own));
+  return governanceCard(rules, { lord, mine, isCapital, province: pi, official: officialHtml, grantOpen, takers }, titlesOf(own));
 }
 
 /** A lord's screen (feedback 67): who he is, his lands and lighting them on the map, gifts, seizing and granting. */
@@ -2920,7 +2924,7 @@ function renderLord(k: number): void {
   const holdings = lands.provinces.map((p) => provinceRow(p, `${MOOD_LABEL[s.provinceMood[p]!]} · ${fmt(Math.round(s.provincePeople[p]! * 1000))} people`));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(l.name)}</h2>${closeButton()}</header>
-    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation) })}`;
+    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation) }, titlesOf(l.nation))}`;
   bindClose();
   showPanel(true);
   bindLords();
@@ -2995,7 +2999,7 @@ function realmLords(r: number): string {
   let royal = 0;
   let all = 0;
   for (let p = 0; p < owners.length; p++) if (owners[p] === r) (all++, s.provinceLord[p]! < 0 && royal++);
-  return lordsTab(rules, lordViews().filter((l) => l.nation === r && l.lands > 0), lordLands(), royal, all);
+  return lordsTab(rules, lordViews().filter((l) => l.nation === r && l.lands > 0), lordLands(), royal, all, titlesOf(r));
 }
 
 /** Sort orders of the Provinces overview. */
@@ -4049,7 +4053,7 @@ function renderRealm(r: number): void {
       <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
-    ${mine && s?.stability ? stabilitySection(s.stability) : ""}
+    ${mine && s?.stability ? stabilitySection(s.stability, titlesOf(r)) : ""}
     ${mine && s?.revolution ? revolutionSection(s.revolution) : ""}
     <dl class="facts">
       ${s?.rulers[r] ? rulerLines(s.rulers[r]!) : ""}
@@ -4094,11 +4098,11 @@ function renderRealm(r: number): void {
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
-    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [])
+    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [], titlesOf(r))
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
