@@ -1,5 +1,6 @@
 import { holds, resolve, type Ctx } from "./conditions.ts";
 import { applyModifier, modifierTargets, parseChange } from "./modifiers.ts";
+import * as subj from "../subjects/index.ts";
 import { balance, country, eventsConfig, modifierDef, now, place, type Effect, type World } from "./model.ts";
 
 /**
@@ -85,6 +86,11 @@ function relate(w: World, a: string, b: string, type: string, set: boolean): voi
   if (set) c.relations.push({ other: b, type });
 }
 
+/** The world's subject bonds, made on first use. */
+function bonds(w: World): Record<string, subj.SubjectBond> {
+  return (w.subjects ??= {});
+}
+
 function shareOf(amount: unknown, of: number): number {
   const s = String(amount);
   return s.endsWith("%") ? (of * Number(s.replace("%", "").replace("+", ""))) / 100 : Number(s);
@@ -147,6 +153,8 @@ export const EFFECTS: Record<string, EffectEval> = {
       const [over] = resolve(p.subject_of, ctx);
       relate(w, id, over!, "subject", true);
       relate(w, over!, id, "overlord", true);
+      const kind = p.kind === undefined ? undefined : subj.kindFromName(String(p.kind));
+      bonds(w)[id] = subj.subjectFromEvent({ key: "create_country", ...(kind ? { kind } : {}) }, id, over!, now(w));
     }
     out.push({ type: "create_country", target: id, values: { ...p } });
   },
@@ -163,7 +171,8 @@ export const EFFECTS: Record<string, EffectEval> = {
     for (const target of resolve(p.target, ctx)) {
       relate(w, target, who!, "subject", true);
       relate(w, who!, target, "overlord", true);
-      out.push({ type: "vassalize", target, values: { who, kind: p.type } });
+      const b = subj.vassalizeByEvent(bonds(w), who!, target, String(p.type ?? "vassal"), now(w));
+      out.push({ type: "vassalize", target, values: { who, kind: p.type, subjectKind: b.kind, ...(b.stage ? { stage: b.stage } : {}) } });
     }
   },
   release: (p, w, ctx, out) => {
@@ -171,6 +180,7 @@ export const EFFECTS: Record<string, EffectEval> = {
     for (const target of resolve(p.target, ctx)) {
       relate(w, target, who!, "subject", false);
       relate(w, who!, target, "overlord", false);
+      if (w.subjects) subj.releaseByEvent(w.subjects, who!, target);
       out.push({ type: "release", target, values: { who } });
     }
   },
@@ -209,6 +219,11 @@ export const EFFECTS: Record<string, EffectEval> = {
     for (const who of resolve(p.who, ctx))
       for (const other of resolve(p.other, ctx)) {
         relate(w, who, other, String(p.type), p.set !== false);
+        // a personal union makes `other` a Union under `who` (SUBJ-090)
+        if (p.type === "personal_union") {
+          if (p.set !== false) bonds(w)[other] = subj.subjectFromEvent({ key: "personal_union" }, other, who, now(w));
+          else if (w.subjects) subj.releaseByEvent(w.subjects, who, other);
+        }
         out.push({ type: "relation", target: who, values: { other, type: p.type, set: p.set !== false } });
       }
   },
@@ -295,6 +310,29 @@ export const EFFECTS: Record<string, EffectEval> = {
     w.tradeRoutes = w.tradeRoutes.filter((r) => !(r.from === from && r.to === to));
     w.tradeRoutes.push({ from, to, open: p.open !== false });
     out.push({ type: "trade_route", values: { from, to, open: p.open !== false } });
+  },
+  // the subject keys adopted from subjects (SUBJ-097, D-SUBJ-16); a target that is no subject is left alone
+  add_subject_reason: (p, w, ctx, out) => {
+    for (const target of resolve(p.target, ctx)) {
+      const b = w.subjects?.[target];
+      if (b) subj.addSubjectReasonByEvent(b, String(p.reason), p.months === undefined ? undefined : Number(p.months), now(w));
+      out.push({ type: "add_subject_reason", target, values: { reason: p.reason, months: p.months } });
+    }
+  },
+  remove_subject_reason: (p, w, ctx, out) => {
+    for (const target of resolve(p.target, ctx)) {
+      const b = w.subjects?.[target];
+      if (b) subj.removeSubjectReasonByEvent(b, String(p.reason));
+      out.push({ type: "remove_subject_reason", target, values: { reason: p.reason } });
+    }
+  },
+  change_subject_kind: (p, w, ctx, out) => {
+    const [who] = resolve(p.who, ctx);
+    for (const target of resolve(p.target, ctx)) {
+      const b = w.subjects ? subj.bondUnder(w.subjects, who!, target) : undefined;
+      if (b) subj.changeSubjectKindByEvent(b, String(p.kind), now(w));
+      out.push({ type: "change_subject_kind", target, values: { who, kind: p.kind } });
+    }
   },
   colony: (p, w, ctx, out) => {
     for (const who of resolve(p.who, ctx)) {

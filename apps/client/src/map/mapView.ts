@@ -25,6 +25,9 @@ export interface FrameStats {
 
 export interface MapViewEvents {
   onTap(screenX: number, screenY: number, province: number): void;
+  /** A finger held still on the map for the long-press time (SUBJ-138); a tap is not sent after it. */
+  onLongPress?(screenX: number, screenY: number, province: number): void;
+  longPressMs?(): number;
   drawOverlay(o: OverlayContext): void;
 }
 
@@ -42,6 +45,7 @@ export class MapView {
   private dirty = true;
   private pointers = new Map<number, { x: number; y: number }>();
   private gesture: { moved: number; pinchDist: number; startZoom: number } | null = null;
+  private pressTimer: ReturnType<typeof setTimeout> | null = null;
   private lastAnim = 0;
   private lastFrame = 0;
   /** Battery saver's knobs (settings): frames a second at most, ms between idle animation frames (0 = none), the overlay's pixel ratio cap. */
@@ -202,7 +206,19 @@ export class MapView {
     el.addEventListener("pointerdown", (e) => {
       el.setPointerCapture(e.pointerId);
       this.pointers.set(e.pointerId, local(e));
-      if (this.pointers.size === 1) this.gesture = { moved: 0, pinchDist: 0, startZoom: this.camera.zoom };
+      if (this.pointers.size === 1) {
+        this.gesture = { moved: 0, pinchDist: 0, startZoom: this.camera.zoom };
+        const at = local(e);
+        if (this.events.onLongPress) {
+          this.pressTimer = setTimeout(() => {
+            this.pressTimer = null;
+            if (!this.gesture || this.gesture.moved >= 8 || this.pointers.size !== 1) return;
+            // Held still: the long-press opens the card, and the lift that follows is no tap.
+            this.gesture.moved = 99;
+            this.events.onLongPress!(at.x, at.y, this.provinceAt(at.x, at.y));
+          }, this.events.longPressMs?.() ?? 500);
+        }
+      }
       if (this.pointers.size === 2) {
         const [a, b] = [...this.pointers.values()];
         this.gesture = { moved: 99, pinchDist: Math.hypot(a!.x - b!.x, a!.y - b!.y), startZoom: this.camera.zoom };
@@ -231,6 +247,8 @@ export class MapView {
     });
 
     const end = (e: PointerEvent) => {
+      if (this.pressTimer) clearTimeout(this.pressTimer);
+      this.pressTimer = null;
       const p = this.pointers.get(e.pointerId);
       this.pointers.delete(e.pointerId);
       if (p && this.gesture && this.pointers.size === 0) {

@@ -7,6 +7,7 @@ import { FAITH_IDS, FAITH_POLICIES, NO_FAITH, NO_TONGUE } from "./peoples.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as subj from "./domain/subjects/index.ts";
 import { courtersOf, isCourted } from "./courting.ts";
+import { catalogueRecord, hasRecord } from "./domain/scenario-setup/catalogue.ts";
 import config from "../../rules/data/domain/subjects.json" with { type: "json" };
 
 /**
@@ -120,7 +121,8 @@ export function subjectPayments(world: World): [payer: number, receiver: number,
   if (hit && hit.key === key) return hit.pays.filter(([a, b]) => !world.nationGone[a] && !world.nationGone[b]);
   const pays: [number, number, number, boolean][] = [];
   for (const { s, o, bond } of subjectTies(world)) {
-    const share = subj.baseShare(bond) * subj.tributeMultiplier(bond.tribute) * subj.loyaltyPays(bond.loyalty);
+    // A subject that withholds its tribute sends nothing (SUBJ-132).
+    const share = bond.withholding ? 0 : subj.baseShare(bond) * subj.tributeMultiplier(bond.tribute) * subj.loyaltyPays(bond.loyalty);
     if (share > 0) pays.push([s, o, share, bond.kind === "vassal"]);
   }
   payCache.set(world, { key, pays });
@@ -460,6 +462,15 @@ function stepUpSubjects(world: World, sid: string, oid: string): void {
 }
 
 /** What a risen subject was, kept on its war so the peace can restore it (SUBJ-077, SUBJ-078). */
+/** Ends subject s's tie in peace, its overlord's envoys at its court coming home (SUBJ-136). */
+export function endTie(world: World, s: number): void {
+  const b = bondOf(world, s);
+  if (!b) return;
+  for (const a of ["subject_resident", "subject_tighten", "subject_fold_in"]) unseatEnvoy(world, b, a);
+  rel.releaseSubject(world.diplomacy.graph, b.subject);
+  bondsChanged(world);
+}
+
 export type IndependenceWar = dip.War & { independence?: { subject: string; overlord: string; kind: subj.Kind } };
 
 /**
@@ -553,15 +564,12 @@ export function aiRisings(world: World, news: News[]): void {
       losing = peaceShare(world, world.nationIndex.get(t.r.target)!, war) > config.rising.overlord_losing_peace_voice_share;
     }
     const neighbours = near(t.s);
-    const backer = [...neighbours].find((id) => {
-      const c = world.nationIndex.get(id)!;
-      const stance = rel.stance(g, id, t.r.target);
-      return id !== t.r.target && (stance === "rival" || stance === "hostile") && !dip.warOf(d, id) && strength(world, c) >= strength(world, t.o);
-    });
+    const found = backersOf(world, t.s, t.o, neighbours)[0];
+    const backer = found === undefined ? undefined : world.nationIds[found]!;
     if (!subj.rises(t.bond, { ...(backer ? { backer: { atPeace: true, willing: true } } : {}), overlordAtWarElsewhere: !!war, overlordPeaceShare: losing ? 1 : 0 })) continue;
     const others = ties.filter((x) => x.o === t.o && x !== t && !risen.has(x.s)).map((x) => ({ bond: x.bond, neighbours: near(x.s), s: x.s }));
     const joiners = subj.joinRising({ bond: t.bond, neighbours }, others).map((b) => others.find((x) => x.bond === b)!.s);
-    const backing = backer === undefined ? undefined : world.nationIndex.get(backer);
+    const backing = found;
     for (const s of [t.s, ...joiners]) if (!riseUp(world, s, news, s === t.s ? backing : undefined)) risen.add(s);
   }
 }
@@ -619,6 +627,157 @@ export function aiMayTakeSubject(world: World, n: number): boolean {
   return subj.aiAcceptsNewSubject(used, reachOf(world, n), subj.reachWeight({ kind: "tributary", ties: [] }));
 }
 
+// ---------------------------------------------------------------- playing as a subject
+
+/** Realms whose land borders realm s. */
+function neighbourIds(world: World, s: number): Set<string> {
+  const out = new Set<string>();
+  for (let p = 0; p < world.provinceCount; p++) {
+    if (world.provinceOwner[p] !== s) continue;
+    for (let k = world.adjStart[p]!; k < world.adjStart[p + 1]!; k++) {
+      const q = world.provinceOwner[world.adjList[k]!]!;
+      if (q >= 0 && q !== s) out.add(world.nationIds[q]!);
+    }
+  }
+  return out;
+}
+
+/**
+ * The realms that would back subject s's rising against overlord o (D-SUBJ-27,
+ * SUBJ-133): a rival or hostile realm of the overlord, at peace, bordering the
+ * subject and at least as strong as the overlord.
+ */
+export function backersOf(world: World, s: number, o: number, neighbours: ReadonlySet<string> = neighbourIds(world, s)): number[] {
+  const d = world.diplomacy;
+  const oid = world.nationIds[o]!;
+  const out: number[] = [];
+  for (const id of neighbours) {
+    const c = world.nationIndex.get(id);
+    if (c === undefined || id === oid || world.nationGone[c]) continue;
+    const stance = rel.stance(d.graph, id, oid);
+    if ((stance === "rival" || stance === "hostile") && !dip.warOf(d, id) && strength(world, c) >= strength(world, o)) out.push(c);
+  }
+  return out;
+}
+
+/** The overlord's wars, each with its enemies and the share of its side's voices that want peace. */
+function warsOf(world: World, o: number): BelowView["wars"] {
+  const oid = world.nationIds[o]!;
+  const idx = (ids: string[]) => ids.map((id) => world.nationIndex.get(id)!).filter((n) => n !== undefined);
+  return world.diplomacy.wars
+    .filter((w) => w.attackers.includes(oid) || w.defenders.includes(oid))
+    .map((w) => {
+      const ours = w.attackers.includes(oid) ? idx(w.attackers) : idx(w.defenders);
+      const theirs = w.attackers.includes(oid) ? idx(w.defenders) : idx(w.attackers);
+      return { enemies: theirs, peaceShare: peaceShare(world, world.nationIndex.get(oid)!, w) };
+    });
+}
+
+/** Whether overlord o's AI is cautious: its catalogue unrest risk or exposure to outside threats is high or very high (SUBJ-134). */
+function cautious(world: World, o: number): boolean {
+  const id = world.nationIds[o]!;
+  return hasRecord(id) && subj.cautiousOverlord(catalogueRecord(id).assessments);
+}
+
+/** Whether overlord o holds more subjects than its reach. */
+function overReach(world: World, o: number, ties: ReturnType<typeof subjectTies> = subjectTies(world)): boolean {
+  const own = ownSubjectCounts(ties);
+  const used = subj.reachUsed(ties.filter((t) => t.o === o).map((t) => ({ bond: t.bond, ownSubjects: own.get(t.s) ?? 0, distance: 0 })));
+  return used > reachOf(world, o);
+}
+
+function belowView(world: World, s: number, o: number, b: Bond, ties: ReturnType<typeof subjectTies>): BelowView {
+  const backers = backersOf(world, s, o);
+  const wars = warsOf(world, o);
+  const married = dip.marriagesBetween(world.diplomacy, world.nationIds[s]!, world.nationIds[o]!) > 0;
+  const reasons = reasonsNow(world, s);
+  const { choices } = subj.cardFromBelow(b, reasons, { backers: backers.map((n) => world.nationIds[n]!), overlordWars: wars, married, overlord: { cautious: cautious(world, o), overReach: overReach(world, o, ties) } });
+  return { choices, backers, wars, married };
+}
+
+/** The subject's own realm for its card: its 1444 ruler, provinces, soldiers, treasury and its own subjects (SUBJ-137). */
+function realmFacts(world: World, s: number, ties: ReturnType<typeof subjectTies>): SubjectView["realm"] {
+  const c = dip.country(world.diplomacy, world.nationIds[s]!);
+  return {
+    ruler: subj.rulerLine(subj.ruler1444(world.nationIds[s]!), world.date.year),
+    provinces: c.provinces ?? 0,
+    army: c.soldiers ?? 0,
+    treasury: Math.round(world.nationTreasury[s]!),
+    ownSubjects: ties.filter((t) => t.o === s).map((t) => t.s),
+  };
+}
+
+/** Why subject s can't take this choice toward its overlord now, or null (SUBJ-131). */
+export function whyNotSubjectChoice(world: World, s: number, action: "stop_paying" | "pay" | "ask_loosen"): string | null {
+  const t = subjectTies(world).find((x) => x.s === s);
+  if (!t) return "you answer to no overlord";
+  const id = action === "pay" ? "pay" : action;
+  const choice = belowView(world, s, t.o, t.bond, subjectTies(world)).choices.find((c) => c.id === id)!;
+  return choice.locked;
+}
+
+/** The subject's own choices toward its overlord: stop paying, pay again, ask politely to loosen (SUBJ-102, SUBJ-103, SUBJ-132, SUBJ-134). */
+export function subjectChoice(world: World, s: number, action: "stop_paying" | "pay" | "ask_loosen", news: News[]): string | null {
+  const why = whyNotSubjectChoice(world, s, action);
+  if (why) return why;
+  const t = subjectTies(world).find((x) => x.s === s)!;
+  const name = (k: number) => world.rules.nations[k]!.name;
+  if (action === "stop_paying") {
+    subj.stopPaying(t.bond);
+    news.push({ kind: "envoy", text: `You stop paying ${name(t.o)}: you send it nothing, and you grow Disloyal a step at a time, a season at a time.`, nations: [s, t.o] });
+  }
+  if (action === "pay") {
+    subj.payAgain(t.bond);
+    news.push({ kind: "envoy", text: `You pay ${name(t.o)} its tribute again.`, nations: [s, t.o] });
+  }
+  if (action === "ask_loosen") {
+    subj.loosen(t.bond, monthNow(world));
+    t.r.subject_kind = t.bond.kind;
+    news.push({ kind: "envoy", text: `${name(t.o)} grants your polite request: you are now its ${KIND_NAME[t.bond.kind].toLowerCase()}.`, nations: [s, t.o] });
+  }
+  bondsChanged(world);
+  return null;
+}
+
+/**
+ * Whether subject s, at war for its independence with its old overlord o, may
+ * make o its own subject in the peace, and of which kind (SUBJ-104, SUBJ-135):
+ * it has outgrown o and over three quarters of o's voices want peace.
+ */
+export function tablesTurned(world: World, war: dip.War, s: number, o: number): { kind: subj.Kind | null; why: string | null } {
+  const x = (war as IndependenceWar).independence;
+  if (!x || x.subject !== world.nationIds[s] || x.overlord !== world.nationIds[o]) return { kind: null, why: "only in your war for independence against your old overlord" };
+  const d = world.diplomacy;
+  const sp = dip.country(d, world.nationIds[s]!).provinces ?? 0;
+  const op = dip.country(d, world.nationIds[o]!).provinces ?? 0;
+  if (!subj.outgrewOverlord(sp, op)) return { kind: null, why: `you hold ${sp} provinces to their ${op}: you must have outgrown them` };
+  const idx = (ids: string[]) => ids.map((id) => world.nationIndex.get(id)!).filter((n) => n !== undefined);
+  const theirs = war.attackers.includes(world.nationIds[o]!) ? idx(war.attackers) : idx(war.defenders);
+  const ours = war.attackers.includes(world.nationIds[o]!) ? idx(war.defenders) : idx(war.attackers);
+  const share = peaceShare(world, o, war);
+  const landPath = neighbourIds(world, s).has(world.nationIds[o]!);
+  const kind = subj.turnTheTables({ subjectProvinces: sp, overlordProvinces: op, won: true, peaceShare: share, landPath });
+  return kind ? { kind, why: null } : { kind: null, why: `${Math.round(share * 100)} in 100 of their voices want peace; over three quarters must` };
+}
+
+function tablesView(world: World, player: number): SubjectsView["tables"] {
+  const id = world.nationIds[player]!;
+  const war = world.diplomacy.wars.find((w) => (w as IndependenceWar).independence?.subject === id) as IndependenceWar | undefined;
+  const o = war ? world.nationIndex.get(war.independence!.overlord) : undefined;
+  if (!war || o === undefined || world.nationGone[o]) return null;
+  return { overlord: o, ...tablesTurned(world, war, player, o) };
+}
+
+/** The peace that makes the old overlord the subject's own (SUBJ-135): it is held Loyal from today, like any subject the game makes. */
+export function turnTables(world: World, s: number, o: number, kind: subj.Kind, news: News[]): void {
+  try {
+    makeSubject(world, o, s, kind);
+  } catch {
+    return;
+  }
+  news.push({ kind: "peace", text: `${world.rules.nations[s]!.name} turns the tables: ${world.rules.nations[o]!.name}, its old master, is now its ${KIND_NAME[kind].toLowerCase()}.`, nations: [s, o] });
+}
+
 // ---------------------------------------------------------------- the view
 
 /** One subject as the Diplomacy tab shows it (SUBJ-091, SUBJ-092). */
@@ -646,6 +805,19 @@ export interface SubjectView {
   /** The realms courting it, as far as the overlord can see: all of them with a resident there, else none named (SUBJ-040, DIPL-218). */
   courtedBy: number[];
   giftCost: number;
+  /** The subject's own realm, as its card shows it (SUBJ-137). */
+  realm: { ruler: string; provinces: number; army: number; treasury: number; ownSubjects: number[] };
+  withholding: boolean;
+}
+
+/** The card from below: the subject's choices and what they read from the world (SUBJ-131). */
+export interface BelowView {
+  choices: subj.BelowChoice[];
+  /** The realms that would back a rising. */
+  backers: number[];
+  /** The overlord's wars: its enemies and how many in 100 of its voices want peace. */
+  wars: { enemies: number[]; peaceShare: number }[];
+  married: boolean;
 }
 
 /** The player's subjects and its overlord, for the Diplomacy tab (SUBJ-091, SUBJ-102). */
@@ -655,8 +827,10 @@ export interface SubjectsView {
   /** Gold a month from all subjects. */
   gold: number;
   subjects: SubjectView[];
-  /** The player's own bond when it is someone's subject. */
-  overlord: (SubjectView & { overlord: number }) | null;
+  /** The player's own bond when it is someone's subject, with its card from below (SUBJ-131). */
+  overlord: (SubjectView & { overlord: number; below: BelowView }) | null;
+  /** In the player's war for independence: whether it may make its old overlord its own subject in the peace (SUBJ-135). */
+  tables: { overlord: number; kind: subj.Kind | null; why: string | null } | null;
 }
 
 const KIND_NAME: Record<subj.Kind, string> = { vassal: "Vassal", tributary: "Tributary", union: "Union", march: "March", colony: "Colony", protectorate: "Protectorate" };
@@ -697,6 +871,8 @@ export function subjectsView(world: World, player: number, ledgerTribute: (n: nu
       hostage: heldUntil(t.bond),
       courtedBy: t.bond.resident ? courtersOf(world, t.s) : [],
       giftCost: subjectGiftCost(world, t.s),
+      realm: realmFacts(world, t.s, ties),
+      withholding: !!t.bond.withholding,
     };
   };
   const mine = ties.filter((t) => t.o === player);
@@ -708,6 +884,7 @@ export function subjectsView(world: World, player: number, ledgerTribute: (n: nu
     used: subj.reachUsed(mine.map((t) => ({ bond: t.bond, ownSubjects: own.get(t.s) ?? 0, distance: 0 }))),
     gold: subjects.reduce((n, x) => n + x.pays, 0),
     subjects,
-    overlord: above ? { ...one(above), overlord: above.o } : null,
+    overlord: above ? { ...one(above), overlord: above.o, below: belowView(world, above.s, above.o, above.bond, ties) } : null,
+    tables: tablesView(world, player),
   };
 }

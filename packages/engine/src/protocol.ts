@@ -45,6 +45,7 @@ import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { newLands, officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
 import { warPeaceView, type WarPeaceView } from "./peace.ts";
+import { subjectTies } from "./subjects.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
 export interface CompanyView {
@@ -140,7 +141,7 @@ export interface Snapshot {
     peace: WarPeaceView | null;
   }[];
   /** Peace offered to the player by an AI war leader, until the next month: terms as the AI sends them ("give": it gives up land the player holds). */
-  peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" | "dissolve" }[];
+  peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" | "dissolve" | "master" }[];
   /** Calls to arms waiting for the player's answer. */
   calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive"; via: "alliance" | "pledge" | "league" | "subject" | "empire" }[];
   /** The player's standing with every other nation that has one. */
@@ -223,6 +224,8 @@ export interface Snapshot {
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
   lords: { name: string; house: string; nation: number; loyalty: string; lands: number }[];
   provinceLord: Int16Array;
+  /** Each realm's direct overlord by nation index, -1 when it is nobody's subject (SUBJ-093: the world-zoom map washes a subject in it). */
+  nationOverlord: Int16Array;
   giftGold: number;
   /** The player's stability: the weakest of its lords, subjects, officials and provinces (REALM-199); null before a realm is chosen. */
   stability: Stability | null;
@@ -502,6 +505,11 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]! }));
       })(),
       provinceLord: w.provinceLord.slice(),
+      nationOverlord: (() => {
+        const out = new Int16Array(w.nationIds.length).fill(-1);
+        for (const t of subjectTies(w)) out[t.s] = t.o;
+        return out;
+      })(),
       giftGold: giftGold(w),
       stability: player >= 0 ? stabilityOf(w, player) : null,
       revolution: player >= 0 ? revolutionView(w, player) : null,

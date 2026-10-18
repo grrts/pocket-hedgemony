@@ -3,7 +3,7 @@ import { armyDead, garrisonDead } from "./fallen.ts";
 import { castleStep } from "./works.ts";
 import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
-import { independencePeace, subjectAnswersCall } from "./subjects.ts";
+import { independencePeace, subjectAnswersCall, tablesTurned, turnTables } from "./subjects.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import navalData from "../../rules/data/domain/naval.json" with { type: "json" };
@@ -780,8 +780,11 @@ function occupy(world: World, p: number, by: number, text: string, news: News[])
 
 // ---------------------------------------------------------------- peace
 
-/** "dissolve" is the peace term *Dissolve the Empire* a non-member who beat the Emperor may take from era IV (INST-051). */
-export type PeaceTerms = "take" | "white" | "give" | "dissolve";
+/**
+ * "dissolve" is the peace term *Dissolve the Empire* a non-member who beat the Emperor may take from era IV (INST-051);
+ * "master": a subject that won its independence makes its old overlord its own subject (SUBJ-135).
+ */
+export type PeaceTerms = "take" | "white" | "give" | "dissolve" | "master";
 
 /** A realm's peace voices are counted from its lords, royal provinces and capital (WAR-180, WAR-221): peace.ts. */
 export { peaceShare, peaceVoices } from "./peace.ts";
@@ -814,6 +817,14 @@ export function offerPeace(world: World, a: number, b: number, terms: PeaceTerms
   if (!war) return "you are not at war with them";
   const leaders = [war.declarer, war.target].map((id) => world.nationIndex.get(id)!);
   const whole = leaders.includes(a) && leaders.includes(b);
+  if (terms === "master") {
+    // Turning the tables (SUBJ-135): the voices are the rule's own, so the old overlord has no say.
+    const t = tablesTurned(world, war, a, b);
+    if (!whole || !t.kind) return whole ? t.why : "only between the war's leaders";
+    makePeace(world, war, true, a, b, [], news);
+    turnTables(world, a, b, t.kind, news);
+    return null;
+  }
   if (terms === "dissolve") {
     const why = whyNotDissolveTerm(world, a, b);
     if (why) return why;

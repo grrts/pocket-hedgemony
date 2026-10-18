@@ -171,12 +171,7 @@ function reasonBadges(r: SubjectRow): string {
 export function mySubjects(v: StatecraftView | null, realmButton: (n: number) => string): string {
   const s = v?.subjects;
   if (!s) return "";
-  const over = s.overlord
-    ? `<h3 class="sub">Your overlord</h3>
-      <p>${realmButton(s.overlord.overlord)} <small>You are its ${esc(s.overlord.kindName.toLowerCase())}, <b class="${loyaltyClass(s.overlord.loyalty)}">${esc(s.overlord.loyalty)}</b>; you send it ${Math.round(s.overlord.pays)} gold a month.</small></p>
-      ${reasonBadges(s.overlord)}
-      ${s.overlord.loyalty === "Disloyal" ? `<button class="wax" data-rise>${icon("swords", 1)}Rise for independence</button><p class="hint">You declare war on your overlord. Win, or end it without giving up land, and you are free; lose land in the peace and you are made its subject again, one kind tighter.</p>` : `<p class="hint">Only a Disloyal subject can rise against its overlord.</p>`}`
-    : "";
+  const over = overlordCard(v, realmButton);
   if (!s.subjects.length) return over;
   return `${over}<h3 class="sub">Subjects</h3>
     <p>Subject limit: ${s.used} of ${s.reach} used · ${icon("coin", 1)} ${Math.round(s.gold)} gold a month in tribute</p>
@@ -187,16 +182,72 @@ export function mySubjects(v: StatecraftView | null, realmButton: (n: number) =>
     <p class="hint">Open a subject to set its tribute, send a gift, loosen or release it. Loyalty is counted each season: two more up than down raises it a step, two more down lowers it.</p>`;
 }
 
+/** The subject's head in the lord card's frame (SUBJ-092, SUBJ-137): its kind, ruler and loyalty, then its realm. */
+function subjectHead(r: SubjectRow, name: string, realmButton?: (n: number) => string): string {
+  const f = r.realm;
+  return `<div class="person-card subject-head"><span class="crest" aria-hidden="true">${KIND_CREST[r.kind] ?? "♜"}</span>
+      <div><p><b>${esc(name)}</b> · ${esc(r.kindName)}</p>${f.ruler ? `<p>${esc(f.ruler)}</p>` : ""}<p><b class="${loyaltyClass(r.loyalty)}">${esc(r.loyalty)}</b> · ▲${r.up} ▼${r.down}</p></div>
+    </div>
+    <dl class="facts">
+      <dt>Provinces</dt><dd>${f.provinces}</dd>
+      <dt>Army</dt><dd>${f.army.toLocaleString("en")} men</dd>
+      <dt>Treasury</dt><dd>${f.treasury.toLocaleString("en")} gold</dd>
+      <dt>Its own subjects</dt><dd>${f.ownSubjects.length && realmButton ? f.ownSubjects.map(realmButton).join(" ") : "none"}</dd>
+    </dl>`;
+}
+
+const KIND_CREST: Record<string, string> = { vassal: "🛡", tributary: "📦", union: "👑", march: "⚔", colony: "⚓", protectorate: "☂" };
+
+type OverlordRow = NonNullable<NonNullable<StatecraftView["subjects"]>["overlord"]>;
+
+/**
+ * The player's own card seen from below (SUBJ-131, SUBJ-140): the same badges
+ * its overlord reads, then its choices, each a 44-point row with what it does
+ * or why not now.
+ */
+export function overlordCard(v: StatecraftView | null, realmButton: (n: number) => string): string {
+  const o: OverlordRow | null | undefined = v?.subjects?.overlord;
+  if (!o) return "";
+  const b = o.below;
+  const choice = (id: string) => b.choices.find((c) => c.id === id)!;
+  const btn = (id: string, label: string, cls: string, does: string) => {
+    const not = choice(id).locked;
+    return not === null ? tile(`<button class="${cls}" data-subject-choice="${id}">${label}</button>`, esc(does)) : tile(`<button class="${cls}" disabled>${label}</button>`, why(not));
+  };
+  const backers = b.backers.length ? `<div class="house-row">${b.backers.map(realmButton).join("")}</div><p class="hint">They are rivals of your overlord, at peace and as strong: the first would join your rising.</p>` : `<p class="hint">${esc(choice("seek_backer").locked ?? "")}.</p>`;
+  const wars = b.wars.length
+    ? b.wars.map((w) => `<p>${icon("swords", 1)} At war with ${w.enemies.map(realmButton).join(" ")} <small>${Math.round(w.peaceShare * 100)} in 100 of their voices want peace${w.peaceShare > 0.5 ? ": the moment to rise" : ""}</small></p>`).join("")
+    : `<p class="hint">They are at peace. A war that goes badly for them, with over half their voices for peace, is the moment to rise.</p>`;
+  return `<h3 class="sub">Your overlord</h3>
+    <p>${realmButton(o.overlord)} <small>You are its ${esc(o.kindName.toLowerCase())}, <b class="${loyaltyClass(o.loyalty)}">${esc(o.loyalty)}</b>; you send it ${Math.round(o.pays)} gold a month. ${esc(o.fights)}</small></p>
+    ${reasonBadges(o)}
+    <p class="hint">These are the reasons your overlord sees. Two more down than up at a season's end and you grow a step less loyal; a Disloyal subject pays nothing and may rise.</p>
+    <h3 class="sub">Your choices</h3>
+    <div class="missions">
+      ${o.withholding ? btn("pay", `${icon("coin", 1)}Pay tribute again`, "wax", "Your tribute flows again and they owe you defence; the Withholds tribute reason ends.") : btn("stop_paying", `${icon("coin", 1)}Stop paying`, "paper", "You keep your tribute, but you grow Disloyal a step at a time, a season at a time (Withholds tribute −2).")}
+      ${btn("ask_loosen", "Ask to loosen", "paper", "An envoy asks politely: they agree when cautious or over their reach. You become their tributary: 15 in 100 of your income, out of their wars (+2 for 10 years).")}
+    </div>
+    <h3 class="sub">Find a backer</h3>
+    ${backers}
+    <h3 class="sub">Their wars</h3>
+    ${wars}
+    <h3 class="sub">Marry into their house</h3>
+    <p class="hint">${b.married ? "Your houses are married: if their line dies out, their crown may pass to your ruler, and they become your union." : "Your houses are not married. Married into theirs, your ruler may inherit their crown if their line dies out."} <i>Arrange a marriage</i> is on their card.</p>
+    <div class="house-row">${realmButton(o.overlord)}</div>
+    ${o.loyalty === "Disloyal" ? `<button class="wax" data-rise>${icon("swords", 1)}Rise for independence</button><p class="hint">You declare war on your overlord${b.backers.length ? ", and your backer joins you" : ""}. Win, or end it without giving up land, and you are free; lose land in the peace and you are made its subject again, one kind tighter. Outgrow them and win, and you can make them your subject.</p>` : `<p class="hint">Only a Disloyal subject can rise against its overlord.</p>`}`;
+}
+
 /** A subject's card on its realm's Diplomacy tab (SUBJ-092, SUBJ-048): loyalty and reasons, what it pays, how it comes to war, and the overlord's actions. */
-export function subjectCard(v: StatecraftView | null, r: number, realmButton?: (n: number) => string): string {
+export function subjectCard(v: StatecraftView | null, r: number, realmButton?: (n: number) => string, name = ""): string {
   const row = v?.subjects?.subjects.find((x) => x.subject === r);
   if (!row) return "";
   const btn = (act: string, label: string, not: string | null, does: string) =>
     not === null ? tile(`<button class="paper" data-subject-act="${act}">${label}</button>`, esc(does)) : tile(`<button class="paper" disabled>${label}</button>`, why(not));
   const union = row.kind === "union";
   return `<h3 class="sub">Your ${esc(row.kindName.toLowerCase())}</h3>
+    ${subjectHead(row, name, realmButton)}
     ${union ? `<p class="hint">${icon("crown", 1)} Your ruler wears their crown too: one ruler for both realms, their lords and laws their own.</p>` : ""}
-    <p><b class="${loyaltyClass(row.loyalty)}">${esc(row.loyalty)}</b> · ▲${row.up} ▼${row.down}. They send you ${Math.round(row.pays)} gold a month (${pct(row.share)} of their ${row.kind === "vassal" ? "taxes" : "income"}). ${esc(row.fights)}</p>
+    <p>They send you ${Math.round(row.pays)} gold a month (${pct(row.share)} of their ${row.kind === "vassal" ? "taxes" : "income"}). ${esc(row.fights)}</p>
     ${reasonBadges(row)}
     ${row.reasons.some((x) => x.label === "Courted") ? `<p class="hint">${row.courtedBy.length && realmButton ? `Courted by ${row.courtedBy.map(realmButton).join(" ")}: a foreign envoy works on them at their court.` : "A foreign envoy courts them at their court. Station a resident there to see whose."}</p>` : ""}
     <h3 class="sub">Tribute</h3>

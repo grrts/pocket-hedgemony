@@ -1,3 +1,4 @@
+import * as subj from "../subjects/index.ts";
 import { eventsConfig, exists, now, type Condition, type World } from "./model.ts";
 
 /**
@@ -115,6 +116,27 @@ function hasRelation(w: World, a: string, b: string, type: string): boolean {
   return has(a, b, type) || (["alliance", "rivalry", "truce", "trade_pact", "personal_union"].includes(type) && has(b, a, type));
 }
 
+/** The kind of the subject bond behind a subject / overlord / personal_union relation (SUBJ-097), if the world keeps it. */
+function subjectKind(w: World, a: string, b: string, type: string): string | undefined {
+  if (!w.subjects || (type !== "subject" && type !== "overlord" && type !== "personal_union")) return undefined;
+  return subj.relationByEvent(w.subjects, a, b, type).kind;
+}
+
+/**
+ * Direct subjects of `id`, a head count or by reach weights (`by_reach: true`,
+ * SUBJ-097). A subject the world keeps no bond for counts as the relations data's plain subject.
+ */
+function subjectCount(w: World, id: string, byReach: boolean): number {
+  const mine = Object.keys(w.countries).filter((o) => o !== id && hasRelation(w, o, id, "subject"));
+  if (!byReach) return mine.length;
+  const t = now(w);
+  const bondOf = (o: string, over: string) => (w.subjects?.[o]?.overlord === over ? w.subjects[o]! : subj.bondFromRelation(o, over, t));
+  const list = mine.map((o) => bondOf(o, id));
+  // their own subjects raise their weight (SUBJ-059)
+  for (const o of mine) for (const x of Object.keys(w.countries)) if (x !== o && hasRelation(w, x, o, "subject")) list.push(bondOf(x, o));
+  return subj.subjectCountByEvent(list, id, true);
+}
+
 function countries(w: World, where: unknown): string[] {
   return Object.entries(w.countries)
     .filter(([, c]) => c.exists !== false && (where === undefined || `region:${c.region}` === where))
@@ -160,7 +182,8 @@ export const CONDITIONS: Record<string, LeafEval> = {
   borders: (p, w, ctx) => some(resolve(p.who, ctx), (a) => resolve(p.other, ctx).some((b) => (w.countries[a]?.borders ?? []).includes(b) || (w.countries[b]?.borders ?? []).includes(a))),
   at_war: (p, w, ctx) => some(resolve(p.who, ctx), (a) => (p.other === undefined ? atWar(w, a) : resolve(p.other, ctx).some((b) => atWar(w, a, b)))),
   war_ongoing: (p, w) => w.wars[String(p.war)]?.ongoing === true,
-  relation: (p, w, ctx) => some(resolve(p.who, ctx), (a) => resolve(p.other, ctx).some((b) => hasRelation(w, a, b, String(p.type)))),
+  relation: (p, w, ctx) =>
+    some(resolve(p.who, ctx), (a) => resolve(p.other, ctx).some((b) => hasRelation(w, a, b, String(p.type)) && (p.kind === undefined || subjectKind(w, a, b, String(p.type)) === p.kind))),
   opinion: (p, w, ctx) => some(resolve(p.who, ctx), (a) => resolve(p.other, ctx).some((b) => compare(w.countries[a]?.opinions?.[b] ?? 0, String(p.op), Number(p.value)))),
   stat: (p, w, ctx) => some(resolve(p.who, ctx), (id) => compare(statOf(w, id, String(p.stat)), String(p.op), p.value as number | string)),
   rank: (p, w, ctx) =>
@@ -186,8 +209,9 @@ export const CONDITIONS: Record<string, LeafEval> = {
   colonial_presence: (p, w, ctx) => some(resolve(p.who, ctx), (id) => compare(w.countries[id]?.colonies?.[String(p.where)] ?? 0, String(p.op), Number(p.value))),
   trade_presence: (p, w, ctx) => some(resolve(p.who, ctx), (id) => compare(w.countries[id]?.tradePresence?.[String(p.hub)] ?? 0, String(p.op), Number(p.value))),
   rebels_active: (p, w, ctx) => some(resolve(p.who, ctx), (id) => (w.countries[id]?.rebels ?? []).some((t) => p.type === undefined || p.type === "any" || t === p.type)),
-  subject_count: (p, w, ctx) =>
-    some(resolve(p.who, ctx), (id) => compare(Object.keys(w.countries).filter((o) => o !== id && hasRelation(w, o, id, "subject")).length, String(p.op), Number(p.value))),
+  subject_count: (p, w, ctx) => some(resolve(p.who, ctx), (id) => compare(subjectCount(w, id, p.by_reach === true), String(p.op), Number(p.value))),
+  subject_loyalty: (p, w, ctx) =>
+    some(resolve(p.who, ctx), (who) => resolve(p.target, ctx).some((t) => subj.subjectLoyaltyHolds(w.subjects ? subj.bondUnder(w.subjects, who, t) : undefined, String(p.op), String(p.step)))),
   event: (p, w) => occurred(w, String(p.id), p.outcome, p.within_years, p.by as { role: string; who: string } | undefined),
   event_active: (p, w) => w.running.some((r) => r.event === p.id),
   period_active: (p, w) => w.periods.includes(String(p.id)),

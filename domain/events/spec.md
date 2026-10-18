@@ -228,7 +228,9 @@ Newest decision first.
   opinion, stat, rank, government, religion, religion_share, culture_group, innovation, ideology, tech,
   colonial_presence, trade_presence, rebels_active, subject_count, event, event_active, period_active,
   age_active, flag, any_country, all_countries, count_countries) with logic all, any, not, at_least.
-  [vocabulary.yaml]
+  [vocabulary.yaml] Subjects adds `subject_loyalty {who, target, op, step}` (the more loyal step is the
+  higher: `>= wavering` is Loyal or Wavering), `subject_count … by_reach: true` (subjects weighed by their
+  reach weights, else a head count) and `relation … kind` (the subject bond's kind) (D-EVT-11, SUBJ-097).
 - EVT-026 The game shall resolve targets as `$role`, an entity id, `province:<id>`, `area:<id>`,
   `region:<id>`, `global`, or `this` inside any_country, all_countries and count_countries. [vocabulary.yaml]
 - EVT-027 The game shall have no condition that reads whether a country is played by a person: `is_human` is
@@ -292,7 +294,9 @@ Newest decision first.
 - EVT-046 The game shall apply only effect types declared in the vocabulary: modifier, stat, transfer,
   create_country, annex, vassalize, release, war, peace, casus_belli, relation, rebels, spread, population,
   move_population, set_flag, start_period, end_period, unlock, government, religion, trade_route, colony.
-  [vocabulary.yaml]
+  [vocabulary.yaml] Subjects adds `change_subject_kind {who, target, kind}` (a kind, or `tighten` /
+  `loosen`), `add_subject_reason {target, reason, months}` (a subjects reason id, its arrow from subjects
+  config) and `remove_subject_reason {target, reason}` (D-EVT-11, SUBJ-097).
 - EVT-047 The game shall apply a `stat` change as a one-off delta, `+n` / `-n` or `+n%` / `-n%`. [vocabulary.yaml]
 - EVT-048 When a `rebels` effect applies, the game shall start a rising in the target province at once (the
   event is a spark), taking its men from the province's recruit pool: small 1/8, medium 1/4, large 1/2, huge

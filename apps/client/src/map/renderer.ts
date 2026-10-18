@@ -4,6 +4,10 @@ import { TOWN_FLAG, TOWN_ROWS, TOWN_TILE, TOWN_VARIANTS, buildTownAtlas } from "
 import { UI_COLORS } from "../art/ui.ts";
 import { ICE } from "@ph/engine/domain/map-presentation";
 import type { MapImage } from "./loadMap.ts";
+import { worldZoomHatchPx } from "@ph/engine/domain/subjects";
+
+/** Width of a subject's hatch at world zoom, in map pixels (SUBJ-093, rules subjects.map.world_zoom_hatch_px). */
+const SUBJECT_HATCH_PX = worldZoomHatchPx();
 
 /** A number as a GLSL float literal. */
 const glf = (n: number): string => (Number.isInteger(n) ? n.toFixed(1) : String(n));
@@ -68,6 +72,8 @@ uniform ivec2 uTileSize;     // texels in this tile's texture (includes 1px over
 uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
 uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones (else +64 faded, +16 closed to the moving armies), a = lord tag (0 = royal land)
 uniform sampler2D uSeason;   // per-province season, see seasonal()
+uniform sampler2D uSubject;  // per-province, for subjects (SUBJ-093): rgb = direct overlord's colour, a = 255 when a subject
+uniform sampler2D uSubjectOf; // per-province: rg = direct overlord's owner index + 1 (0 = nobody's subject)
 uniform int uInfoWidth;
 uniform float uZoom;
 uniform float uTime;
@@ -109,6 +115,12 @@ int riverAt(ivec2 p) {
   return g >= 64 ? g - 64 : 0;
 }
 vec4 info(int id) { return texelFetch(uInfo, ivec2(id % uInfoWidth, id / uInfoWidth), 0); }
+vec4 subjectInfo(int id) { return texelFetch(uSubject, ivec2(id % uInfoWidth, id / uInfoWidth), 0); }
+// The direct overlord of a province's owner, or -1 when the owner is nobody's subject.
+int overlordOf(int id) {
+  vec2 o = texelFetch(uSubjectOf, ivec2(id % uInfoWidth, id / uInfoWidth), 0).rg * 255.0 + 0.5;
+  return int(o.r) * 256 + int(o.g) - 1;
+}
 int ownerOf(int id) {
   vec2 o = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).rg * 255.0 + 0.5;
   return int(o.r) * 256 + int(o.g) - 1;
@@ -477,6 +489,13 @@ float height(int t) {
   return t == ${T.mountains} || t == ${T.badlands} || t == ${T.snowpeaks} ? 2.0 : t == ${T.highlands} ? 1.6 : t == ${T.hills} ? 0.8 : 0.0;
 }
 
+// Two provinces held by a subject and its direct overlord (either way round).
+bool tied(int a, int b) {
+  int oa = ownerOf(a);
+  int ob = ownerOf(b);
+  return oa != ob && ((oa >= 0 && overlordOf(a) == ob) || (ob >= 0 && overlordOf(b) == oa));
+}
+
 vec3 far() {
   ivec2 p = ivec2(floor(vMap));
   int id = idAt(p);
@@ -522,7 +541,12 @@ vec3 far() {
 
   int owner = ownerOf(id);
   bool political = uMode != 1 && owner >= 0;
-  if (political) c = snowOver(realmWash(c, inf.rgb), id, t, bayer(p));
+  // A subject (SUBJ-093) is washed in its direct overlord's colour with a thin
+  // diagonal hatch in its own colour; a chain never stacks a second hatch.
+  vec4 sub = subjectInfo(id);
+  bool subject = political && uMode == 0 && sub.a > 0.5;
+  vec3 realm = subject && ((p.x + p.y) % ${SUBJECT_HATCH_PX * 3}) >= ${SUBJECT_HATCH_PX} ? sub.rgb : inf.rgb;
+  if (political) c = snowOver(realmWash(c, realm), id, t, bayer(p));
   // Great rivers always, the rest once zoomed in a little.
   int rs = riverAt(p);
   if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, riverFrozen(id, t, bayer(p)) ? iceColor(vec2(p)) : uDepth[0], 0.8);
@@ -533,7 +557,11 @@ vec3 far() {
   int d = idAt(p + ivec2(0, 1));
   bool nationEdge = (land(r) && ownerOf(r) != owner) || (land(d) && ownerOf(d) != owner);
   bool provinceEdge = (land(r) && r != id) || (land(d) && d != id);
-  if (nationEdge) {
+  // The border between a subject and its direct overlord is dotted (SUBJ-093).
+  bool dotted = nationEdge && uMode == 0 && !(land(r) && ownerOf(r) != owner && !tied(id, r)) && !(land(d) && ownerOf(d) != owner && !tied(id, d));
+  if (dotted) {
+    if (((p.x + p.y) & 1) == 0) c = mix(c, uInk, uZoom > 2.0 ? 0.85 : 0.65);
+  } else if (nationEdge) {
     c = mix(c, uInk, uZoom > 2.0 ? 0.85 : 0.65);
   } else if (political && uZoom > 2.0) {
     int l = idAt(p - ivec2(1, 0));
@@ -631,6 +659,11 @@ export class MapRenderer {
   private ownerTex: WebGLTexture;
   private seasonTex: WebGLTexture;
   private seasonData: Uint8Array;
+  private subjectTex: WebGLTexture;
+  private subjectData: Uint8Array;
+  private subjectOfTex: WebGLTexture;
+  private subjectOfData: Uint8Array;
+  private subjectDirty = true;
   private atlasTex: WebGLTexture;
   private miniTex: WebGLTexture;
   private terrainColors: number[];
@@ -652,7 +685,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uRoad"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uRoad", "uSubject", "uSubjectOf"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -676,6 +709,10 @@ export class MapRenderer {
     this.ownerTex = makeDataTexture(gl, this.infoWidth, rows);
     this.seasonData = new Uint8Array(this.infoWidth * rows * 4);
     this.seasonTex = makeDataTexture(gl, this.infoWidth, rows);
+    this.subjectData = new Uint8Array(this.infoWidth * rows * 4);
+    this.subjectTex = makeDataTexture(gl, this.infoWidth, rows);
+    this.subjectOfData = new Uint8Array(this.infoWidth * rows * 4);
+    this.subjectOfTex = makeDataTexture(gl, this.infoWidth, rows);
 
     const atlas = buildTileAtlas();
     this.atlasTex = makeDataTexture(gl, atlas.width, atlas.height);
@@ -788,6 +825,34 @@ export class MapRenderer {
     }
   }
 
+  /**
+   * Marks a province's owner as a subject for the world-zoom map (SUBJ-093):
+   * overlordRgb is its direct overlord's colour (the wash), overlord that
+   * overlord's index (for the dotted border); overlord -1 clears it. The
+   * texture is sent with the next upload only when something changed.
+   */
+  setProvinceSubject(i: number, overlord: number, overlordRgb: readonly number[] | null): void {
+    const o = i * 4;
+    const on = overlord >= 0 && overlordRgb !== null;
+    const ow = on ? overlord + 1 : 0;
+    const s = this.subjectData;
+    const f = this.subjectOfData;
+    const r = on ? overlordRgb[0]! : 0;
+    const g = on ? overlordRgb[1]! : 0;
+    const b = on ? overlordRgb[2]! : 0;
+    const a = on ? 255 : 0;
+    const hi = (ow >> 8) & 255;
+    const lo = ow & 255;
+    if (s[o] === r && s[o + 1] === g && s[o + 2] === b && s[o + 3] === a && f[o] === hi && f[o + 1] === lo) return;
+    s[o] = r;
+    s[o + 1] = g;
+    s[o + 2] = b;
+    s[o + 3] = a;
+    f[o] = hi;
+    f[o + 1] = lo;
+    this.subjectDirty = true;
+  }
+
   /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
   setProvinceSeasons(bytes: Uint8Array): void {
     this.seasonData.set(bytes);
@@ -806,6 +871,13 @@ export class MapRenderer {
       gl.bindTexture(gl.TEXTURE_2D, this.townTex);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.townData);
       this.townDirty = false;
+    }
+    if (this.subjectDirty) {
+      gl.bindTexture(gl.TEXTURE_2D, this.subjectTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.subjectData);
+      gl.bindTexture(gl.TEXTURE_2D, this.subjectOfTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.subjectOfData);
+      this.subjectDirty = false;
     }
     if (this.seasonDirty) {
       gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
@@ -862,6 +934,12 @@ export class MapRenderer {
     gl.uniform1i(this.u.uTownAtlas!, 8);
     gl.uniform1f(this.u.uLiving!, this.living);
     gl.uniform3fv(this.u.uRoad!, ["#8a6a44", PALETTE.clay, "#9a94a0"].flatMap((c) => hexToRgb(c).map((v) => v / 255)));
+    gl.activeTexture(gl.TEXTURE9);
+    gl.bindTexture(gl.TEXTURE_2D, this.subjectTex);
+    gl.uniform1i(this.u.uSubject!, 9);
+    gl.activeTexture(gl.TEXTURE10);
+    gl.bindTexture(gl.TEXTURE_2D, this.subjectOfTex);
+    gl.uniform1i(this.u.uSubjectOf!, 10);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);
 
