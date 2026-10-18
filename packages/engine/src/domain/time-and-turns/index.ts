@@ -343,6 +343,12 @@ export function orderShape(order: Order): string {
       return "seize a fief";
     case "swapOfficials":
       return "move an official to another province";
+    case "hireOfficial":
+      return "hire an official";
+    case "settleLand":
+      return "keep new land as royal land";
+    case "answerRevolution":
+      return "answer the revolution";
     case "setStudy":
       return "choose what to study";
     case "setSeats":

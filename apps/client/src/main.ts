@@ -56,7 +56,7 @@ import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, rea
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castlesOpen, foodLine, foodTab } from "./ui/food.ts";
-import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
+import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, postScreen, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
 import { provinceThumb } from "./map/provinceThumb.ts";
@@ -73,7 +73,7 @@ import { Hints, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
-import { Rng } from "@ph/engine";
+import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { autosaveEvery, autosavesKept, battleStepMs, dayMs, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
@@ -363,6 +363,12 @@ document.addEventListener("click", (e) => {
     renderPanel();
   });
 });
+// New land kept as royal land with its post empty (PROV-340).
+document.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-settle]");
+  if (!b) return;
+  void act({ type: "settleLand", province: Number(b.dataset.settle) }).then(() => renderPanel());
+});
 // A province button in the people screens shows it on the map and opens its overview.
 document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLElement>("[data-show-province]");
@@ -370,7 +376,8 @@ document.addEventListener("click", (e) => {
   const i = Number(b.dataset.showProvince);
   officialView = -1;
   lordView = -1;
-  grantOpen = false;
+  // From new land's "Grant to a lord", the overview opens with the lords to grant it to.
+  grantOpen = b.hasAttribute("data-grant-here");
   panel.scrollTop = 0;
   realmView = -1;
   newsView = false;
@@ -2674,11 +2681,12 @@ function renderOfficial(pi: number): void {
   const s = snapshot!;
   const o = officialOf(s, pi, owners[pi]!);
   // A lord's official serves the lord: his screen (and its commission) is not the crown's (feedback 62).
-  if (!o || owners[pi] !== s.playerNation || s.provinceLord[pi]! >= 0) {
+  if (owners[pi] !== s.playerNation || s.provinceLord[pi]! >= 0) {
     officialView = -1;
     renderPanel();
     return;
   }
+  if (!o) return renderPost(pi);
   const me = s.playerNation;
   const options: { p: number; score: number; fit: string }[] = [];
   for (let p = 0; p < owners.length; p++) {
@@ -2695,7 +2703,7 @@ function renderOfficial(pi: number): void {
   }));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
-    ${officialScreen(rules, o, me, rules.defines.recruit.commanderGold, s.nationTreasury[me]!, moves, movesAll || options.length <= 6)}
+    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6)}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -2712,6 +2720,70 @@ function renderOfficial(pi: number): void {
         officialView = to;
         newsView = false;
         movesAll = false;
+        panel.scrollTop = 0;
+        renderPanel();
+      });
+    }),
+  );
+  panel.querySelector("[data-back]")?.addEventListener("click", () => {
+    officialView = -1;
+    realmView = s.playerNation;
+    realmTab = "officials";
+    renderPanel();
+  });
+}
+
+/** An empty royal post's screen (PROV-336): officials who could move in, best fit first, then each type to hire at home or from abroad. */
+function renderPost(pi: number): void {
+  const s = snapshot!;
+  const me = s.playerNation;
+  const home = new Set<string>();
+  const options: { p: number; score: number }[] = [];
+  for (let p = 0; p < owners.length; p++) {
+    if (p === pi || owners[p] !== me || s.provinceLord[p]! >= 0) continue;
+    const other = officialOf(s, p, me);
+    if (!other) continue;
+    home.add(other.post);
+    options.push({ p, score: moveFit(other.post, pi)[0] });
+  }
+  // Each type ranked by how well it suits this province, against the others here.
+  const rank = new Map(OFFICIALS.map((t) => [t, moveFit(t, pi)[0]]));
+  options.sort((a, b) => rank.get(s.provinceOfficial[b.p] as (typeof OFFICIALS)[number])! - rank.get(s.provinceOfficial[a.p] as (typeof OFFICIALS)[number])! || b.score - a.score || a.p - b.p);
+  const moves = (movesAll ? options : options.slice(0, 4)).map(({ p }) => ({
+    province: p,
+    thumb: mapImage ? provinceThumb(mapImage, provinces.length, p, nations[me]!.color) : "",
+    other: officialOf(s, p, me),
+    fit: "",
+  }));
+  const hires = OFFICIALS.map((t, type) => ({ type, home: home.has(t) }));
+  panel.innerHTML = `
+    <header><h2 class="ribbon">Post at ${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
+    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!)}
+    <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
+  bindClose();
+  showPanel(true);
+  panel.querySelector("[data-moves-all]")?.addEventListener("click", () => {
+    movesAll = true;
+    renderPanel();
+  });
+  panel.querySelectorAll<HTMLButtonElement>("[data-swap]").forEach((b) =>
+    b.addEventListener("click", () => {
+      void act({ type: "swapOfficials", a: Number(b.dataset.swap), b: pi }).then(() => {
+        if (!snapshot || snapshot.rejectedOrders.length) return;
+        newsView = false;
+        movesAll = false;
+        panel.scrollTop = 0;
+        renderPanel();
+      });
+    }),
+  );
+  // After hiring, the screen turns into the new official's own.
+  panel.querySelectorAll<HTMLButtonElement>("[data-hire]").forEach((b) =>
+    b.addEventListener("click", () => {
+      if (b.disabled) return;
+      void act({ type: "hireOfficial", province: pi, official: Number(b.dataset.hireType), foreign: b.dataset.hireForeign === "1" }).then(() => {
+        if (!snapshot || snapshot.rejectedOrders.length) return;
+        newsView = false;
         panel.scrollTop = 0;
         renderPanel();
       });
@@ -2815,7 +2887,7 @@ function governanceSection(pi: number, own: number, mine: boolean, official: Ret
   // A lord's official serves him: no button to the screen that would commission him (feedback 62).
   const officialHtml = lord && official
     ? officialCard(rules, official, own, false, true)
-    : officialCard(rules, official, own, mine);
+    : officialCard(rules, official, own, mine, false, pi);
   return governanceCard(rules, { lord, mine, isCapital, province: pi, official: officialHtml, grantOpen, takers });
 }
 
@@ -3260,8 +3332,10 @@ function renderGarrison(pi: number): void {
   const queuedMen = g.gathering.reduce((t, x) => t + x.men, 0);
   const max = rules.defines.recruit.queueMax;
   const gd = s.gatherDays;
+  const lordHere = s.provinceLord[pi]!;
   const why =
-    queued >= max ? `The queue is full: at most ${max} thousands wait here`
+    lordHere >= 0 ? `${s.lords[lordHere]!.name}'s land: its men answer his call, not yours`
+    : queued >= max ? `The queue is full: at most ${max} thousands wait here`
     : left < unit ? "Fewer than a thousand men left to call: the pool refills a quarter of the way each year"
     : capLeft < unit ? "Over your troop cap"
     : levyMoney > s.nationTreasury[me]! ? "Not enough gold"
@@ -4016,7 +4090,7 @@ function renderRealm(r: number): void {
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
-    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length)
+    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [])
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
@@ -4611,6 +4685,18 @@ async function endTurn(): Promise<void> {
   // So does a revolution waiting on the player's stance (REVO-091).
   if (snapshot.revolution?.outbreak) {
     renderRevolutionCard();
+    return;
+  }
+  // And land just taken, until each has a decision: its Officials tab lists it first (PROV-340).
+  if (!playing && snapshot.newLands?.length) {
+    officialView = -1;
+    lordView = -1;
+    newsView = false;
+    achView = false;
+    realmView = snapshot.playerNation;
+    realmTab = "officials";
+    panelCollapsed = false;
+    renderPanel();
     return;
   }
   if (playing) {

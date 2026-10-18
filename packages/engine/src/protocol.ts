@@ -35,7 +35,7 @@ import { openSave, writeSave, memoryStorage, type Campaign, type SaveHeader, typ
 import { Rng } from "./rng.ts";
 import { explorationView, type ExplorationView } from "./colonies.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
-import { officialAt, yearsServed } from "./officials.ts";
+import { newLands, officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
@@ -249,6 +249,10 @@ export interface Snapshot {
   provinceOfficialName: (string | null)[];
   /** Years the official at each post has served there, to one decimal (0 when empty); his effect grows to full at 5 (see officialEffect). */
   provinceOfficialYears: number[];
+  /** Realm a foreign specialist at each post came from (nation index), -1 = one of the realm's own (PROV-334). */
+  provinceOfficialFrom: number[];
+  /** The player's provinces just taken that wait for a decision before the turn ends: fill the post, grant it, or keep it royal (PROV-340). */
+  newLands: number[];
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
   commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number }[];
   /** Ports, sailors and fleets: every fleet for the map, the player's ports and fleets in full (navy.ts). */
@@ -492,6 +496,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
       provinceOfficialName: Array.from({ length: w.provinceCount }, (_, p) => officialAt(w, p)),
       provinceOfficialYears: Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
+      provinceOfficialFrom: Array.from(w.provinceOfficialFrom),
+      newLands: player >= 0 ? newLands(w, player) : [],
       commanders: w.commanders.map((c, k) => ({
         name: c.name,
         owner: w.commanderOwner[k]!,
