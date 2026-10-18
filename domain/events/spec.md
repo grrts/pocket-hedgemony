@@ -379,6 +379,49 @@ Newest decision first.
   crushed. Sibling contexts add their conditions and effects as one evaluator each (EVT-050).
   [revolutions changes-for-other-designs; D-EVT-11]
 
+### 5.15 Events in the game (milestone 6, first slice)
+
+The event tree now runs in the game's month for every realm (D-EVT-17). The library keeps every rule above;
+a bridge shows it the game as the tree's own world, and lands what the game already simulates.
+
+- EVT-069 When a campaign starts, the game shall load the campaign's events (the tree's 247 events whose history
+  starts before the end date, no tutorial-only ones), every age, period and modifier, start the 1444 periods,
+  and check the ages and periods of the start year at once. [EVT-002, EVT-011, EVT-015; D-EVT-17]
+- EVT-070 Each month, as the last of the month's work, the game shall show the tree every realm under its tree id
+  (aliases where the map's id differs), whether it exists, its wars, alliances, subjects and truces, its land
+  neighbours, its gold, debt and men under arms (army_strength in thousands), its legitimacy as the share of its
+  lords who are Loyal and its integration_strain as the share of its provinces with a grievance (D-EVT-4), its
+  stability from the realm's step (Steady +1, Uneasy 0, Troubled −1, Crumbling −3), and who owns and holds each
+  map province of a mapped place; then it shall run the tree's month (spec 9). [EVT-054 … EVT-056; D-EVT-17]
+- EVT-071 When an event or decision is for an AI realm, the AI shall answer it at once by the option weights of
+  EVT-042; an event with no chooser is rolled the same way. [EVT-040, EVT-042; spec 12]
+- EVT-072 When an event fires for the player, or a decision is offered to the player, the game shall keep it
+  waiting until the player answers it; nothing answers it for them and it never lapses. [EVT-044; D-EVT-8]
+- EVT-073 The game shall land on the game what it already simulates: a `transfer` hands the map provinces of
+  the place to the realm, an `annex` hands it all of the target's land, a `treasury` or `debt` change moves the
+  realm's gold or debt (a `%` change of what it holds, a number at the game's gold scale), and a change to
+  legitimacy or stability is kept on top of the realm's own reading. Every other effect stays in the tree's world,
+  where later events read it. [EVT-045, EVT-056; D-EVT-17]
+- EVT-074 When an event fires for a realm or the AI answers one, the dispatches shall say so ("Fall of
+  Constantinople: Ottomans chooses “Imperial capital”"); a major event is told to every realm, any other to the
+  realms in it and those close to them. [EVT-066; game-shell SHELL-082]
+- EVT-075 The event tree's state (its world, ages and periods, what fired, events waiting for an answer, boosts
+  and its dice) shall be kept in the save. [saves; D-EVT-17]
+
+#### How the player uses it: the event card
+- EVT-076 Where: when an event fires for the player, the week pauses and the event card opens over the map,
+  one event at a time, oldest first (SHELL-080). The card shows the event's name, the year it happened in
+  history, the tree's summary of what happened then, *Whatever you choose* with the event's own effects, and
+  each option as a 44-point button with its effects listed under it in words ("You: gold +15%", "Constantinople
+  passes to you"), the historical option marked *As in history*. Tapping an option answers it; the next waiting
+  event follows, and when none is left the paused week plays on. *Look at the map* folds the card into the End
+  turn button, which shows a scroll with the count of waiting events; while any waits, End turn opens the
+  oldest instead of ending the turn (SHELL-070, SHELL-081, EVT-044). Grouping and overview: every event is one
+  card; the dispatches keep a line for each event that fired, so the history of the campaign reads there, and
+  waiting events sit at the top of the dispatches with an *Answer* button. Phone: the card is a sheet over the
+  map in the Wide and Tall layouts, inside the safe areas, its text scrolling while the options stay in reach,
+  every button at least 44 points high, nothing that needs hover. [X-19, SHELL-070, SHELL-080, SHELL-081]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -558,6 +601,18 @@ before achievements and the autosave. The age and period checks run in the event
 - **D-EVT-16** (was OQ-EVT-16) The religion flags: religious_persecution_active, missionary_persecution and
   inquisition_established are set by religion's own rules (`set_by: religion` in the events data). Religion
   was designed later.
+- **D-EVT-17** First game slice of events (milestone 6, provisional): the bridge maps 13 realm ids of the map to
+  the tree's (ottomans → ottoman, mamluks → mamluk, timurids → timurid_empire and so on) and 20 of the tree's
+  places to map provinces by name (Constantinople is Istanbul, Granada is Granada, Málaga and Almería, Guyenne is
+  Gironde, Landes, Dordogne and Lot-et-Garonne …), in `events-places.json`; a place not yet mapped covers no
+  provinces, so a condition on it does not hold and its events wait for the mapping. The tree's own statistics
+  start at one value for every realm (prestige 0, war weariness 0, administration 50, the three tech tracks 6,
+  literacy 5, military quality 40, naval reach 10, navy 0) and every mapped place (control 60, prosperity 10,
+  literacy 5), until the realm and province contexts give them; stability's steps sit at +1, 0, −1 and −3.
+  An AI realm takes up a decision as soon as it is offered. Events roll their own dice, so they never shift the
+  rest of the turn. Only land, gold, debt, legitimacy and stability land on the game in this slice (EVT-073); war,
+  peace, subjects, rebels, buildings and people from events land when their bridges are built. Quick defaults so
+  the game can play history now; each is replaced when its context lands.
 
 ## 14. Traceability
 
@@ -577,3 +632,5 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-060 – 065 | data-validation.feature | Layers, localization, checks, coverage |
 | EVT-066 – 067 | principles.feature | Music tags, tutorial-only events |
 | EVT-068 | effects.feature | The end of a tagged rising applies its tier |
+| EVT-069 … EVT-075 | — | Engine: packages/engine/test/events.test.ts (ages and periods at the start, the AI's Fall of Constantinople, the player's card and answer, the save) |
+| EVT-076 | — | Presentation: apps/client/src/ui/events.ts, the event card |
