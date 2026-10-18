@@ -1,6 +1,7 @@
 import type { World } from "./world.ts";
 import * as dip from "./domain/diplomacy/index.ts";
-import { startLoyalty1444, stepName, type Autonomy } from "./domain/subjects/index.ts";
+import { stepName } from "./domain/subjects/index.ts";
+import { bondOf } from "./subjects.ts";
 import { moodIndex } from "./moods.ts";
 import { realmConfig } from "./domain/realm/index.ts";
 
@@ -40,18 +41,12 @@ function loyaltyStep(c: Record<string, number>): number {
   return all && c["Loyal"]! < all * cfg.loyal_share_for_steady ? 1 : 0;
 }
 
-const AUTONOMY = ["very_low", "low", "moderate", "high", "very_high"];
-
 const byLoyalty = (list: string[]) => Object.fromEntries(LOYALTY.map((l) => [l, list.filter((x) => x === l).length]));
 
-/** A subject's loyalty: the 1444 rule from its autonomy and stance until the seasonal count is built (SUBJ-036). */
+/** A subject's loyalty from its bond, counted each season (SUBJ-030). */
 export function subjectLoyalty(world: World, subject: number): string {
-  const g = world.diplomacy.graph;
-  const x = world.nationIds[subject]!;
-  const r = g.relations.find((q) => q.type === "subject" && q.source === x);
-  if (!r) return "Loyal";
-  const autonomy = (AUTONOMY.includes(String(r.autonomy)) ? r.autonomy : "moderate") as Autonomy;
-  return stepName(startLoyalty1444(autonomy, dip.relations.stance(g, x, r.target) === "hostile"));
+  const b = bondOf(world, subject);
+  return b ? stepName(b.loyalty) : "Loyal";
 }
 
 /** The realm's stability from its lords, subjects, officials and provinces (REALM-199). */

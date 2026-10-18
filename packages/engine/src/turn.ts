@@ -5,6 +5,7 @@ import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { breakAlliance, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
+import { subjectAction } from "./subjects.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { swapOfficials } from "./officials.ts";
@@ -111,6 +112,8 @@ export type Order =
   | { type: "sendEnvoy"; target: number; action: string }
   | { type: "breakAlliance"; target: number }
   | { type: "makeDemand"; target: number; kind: string; province?: number }
+  /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
+  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release"; level?: string }
   | { type: "stopChange"; province: number }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
@@ -320,6 +323,11 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "makeDemand":
       syncCountries(world);
       return makeDemand(world, actingNation, order.target, order.kind, order.province ?? -1);
+    case "subjectAction": {
+      const reason = subjectAction(world, actingNation, order.subject, order.action, news, order.level);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
     case "moveBuild":
       return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":
