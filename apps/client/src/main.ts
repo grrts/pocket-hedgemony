@@ -191,7 +191,7 @@ let exploring: { fleet: number; path: number[]; legs: number[]; carryOn: boolean
 /** The tile tapped on the Land tab, or -1. */
 let landTile = -1;
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "tongues" | "faiths" | "charts" | "trade";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "subjects" | "tongues" | "faiths" | "charts" | "trade";
 let lens: Lens = "realms";
 /** The trader route being drawn on the map, or null when the map is not in route mode (TRADE-142). */
 let routing: Routing | null = null;
@@ -646,6 +646,7 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "food", name: "Food", note: "men on campaign the store can feed" },
   { id: "lords", name: "Lords", note: "who holds your land" },
   { id: "diplomacy", name: "Diplomacy", note: "friend or foe, envoys on the road" },
+  { id: "subjects", name: "Subjects", note: "your subjects by loyalty, and your overlord" },
   { id: "tongues", name: "Tongues", note: "the family of the tongue most speak" },
   { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
   { id: "trade", name: "Trade", note: "trade ratio, your traders' loops" },
@@ -680,6 +681,12 @@ const RELATION_HEX: Record<LensRelation, string> = {
   war: "#b8323a",
 };
 const RELATION_RGB = Object.fromEntries(Object.entries(RELATION_HEX).map(([k, v]) => [k, v ? hexToRgb(v) : []])) as unknown as Record<LensRelation, number[]>;
+/** The subjects lens's colours (SUBJ-095): the player's subjects by loyalty, and its own overlord. */
+const LOYALTY_HEX = { loyal: "#3f8f46", wavering: "#d8a03a", disloyal: "#b8323a" } as const;
+const LOYALTY_RGB = Object.fromEntries(Object.entries(LOYALTY_HEX).map(([k, v]) => [k, hexToRgb(v)])) as unknown as Record<keyof typeof LOYALTY_HEX, number[]>;
+const OVERLORD_HEX = "#7a4fa0";
+const OVERLORD_RGB = hexToRgb(OVERLORD_HEX);
+const loyaltyKey = (l: string): keyof typeof LOYALTY_HEX => (/disloyal/i.test(l) ? "disloyal" : /waver/i.test(l) ? "wavering" : "loyal");
 /** The key under the lens buttons: what each colour means. */
 const RELATION_KEY: [LensRelation, string][] = [
   ["own", "You and your subjects"],
@@ -731,7 +738,7 @@ function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map lens</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.name}</b><small>${l.note}</small></button>`).join("")}
-    ${lens === "diplomacy" ? diplomacyKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
+    ${lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -762,6 +769,20 @@ function chartsKey(): string {
 const SITE_RGB = [[0, 0, 0], hexToRgb("#5fd35a"), hexToRgb("#b7d9a2"), hexToRgb("#f2c14e")];
 
 /** The diplomacy lens's key: a swatch for each relation, and what a tap does. */
+function subjectsKey(): string {
+  const me = snapshot ? nations[snapshot.playerNation] : undefined;
+  const sw = (c: string) => `<i class="swatch" style="background:${c}"></i>`;
+  const sv = snapshot?.statecraft?.subjects;
+  return `<div class="lens-key">
+    <span>${sw(me?.color ?? PALETTE.gold)}Your realm</span>
+    <span>${sw(LOYALTY_HEX.loyal)}Loyal subject</span>
+    <span>${sw(LOYALTY_HEX.wavering)}Wavering subject</span>
+    <span>${sw(LOYALTY_HEX.disloyal)}Disloyal subject</span>
+    <span>${sw(OVERLORD_HEX)}Your overlord</span>
+    <p>${sv ? `Reach used ${sv.used} of ${sv.reach}.` : ""} Tap a subject for its Diplomacy tab.</p>
+  </div>`;
+}
+
 function diplomacyKey(): string {
   const me = snapshot ? nations[snapshot.playerNation] : undefined;
   const swatch = (r: LensRelation) => `<i class="swatch${r === "war" ? " hatched" : ""}" style="background:${r === "own" ? (me?.color ?? PALETTE.gold) : RELATION_HEX[r]}"></i>`;
@@ -828,6 +849,14 @@ function lensColor(i: number): number[] {
     case "faiths": {
       const f = snapshot?.peoples.provinceFaith[i * SLOTS] ?? NO_FAITH;
       return f === NO_FAITH ? unownedRgb : faithRgb(FAITH_IDS[f]!);
+    }
+    case "subjects": {
+      if (o < 0) return unownedRgb;
+      if (o === snapshot?.playerNation) return nationRgb[o]!;
+      const sv = snapshot?.statecraft?.subjects;
+      const mine = sv?.subjects.find((x) => x.subject === o);
+      if (mine) return LOYALTY_RGB[loyaltyKey(mine.loyalty)];
+      return sv?.overlord?.overlord === o ? OVERLORD_RGB : RELATION_RGB.neutral;
     }
     case "charts": {
       // Held land faded in its holder's colour; empty land by whether it can be settled (EXPL-073).
@@ -1600,7 +1629,7 @@ function onTap(sx: number, sy: number, province: number): void {
   realmView = -1;
   newsView = false;
   // Under the diplomacy lens a tap opens the realm's Diplomacy tab: what they think of you, and your envoys (DIPL-185, DIPL-209).
-  if (lens === "diplomacy" && selectedProvince >= 0 && owners[selectedProvince]! >= 0) {
+  if ((lens === "diplomacy" || lens === "subjects") && selectedProvince >= 0 && owners[selectedProvince]! >= 0) {
     realmView = owners[selectedProvince]!;
     realmTab = "diplomacy";
     officialView = -1;
@@ -3898,7 +3927,7 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
   panel.querySelector<HTMLButtonElement>("[data-rise]")?.addEventListener("click", () => void act({ type: "riseUp" }));
   panel.querySelectorAll<HTMLButtonElement>("[data-subject-act]").forEach((b) =>
-    b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "tighten" | "fold_in", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
+    b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
   );
   panel.querySelector<HTMLButtonElement>("[data-break-alliance]")?.addEventListener("click", () => void act({ type: "breakAlliance", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-demand]").forEach((b) =>
