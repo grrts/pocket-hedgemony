@@ -33,6 +33,8 @@ export interface AchievementDefinition {
   test: Test;
   progress?: { stat: string; target: number | string };
   full_game?: boolean;
+  /** The ladder this row is a level of (D-ACH-16). */
+  ladder?: string;
   refs: string[];
 }
 
@@ -283,6 +285,8 @@ export interface Profile {
   unlocked: Record<string, string>;
   /** Lifetime counters: distinct things counted across eligible games (ACH-028, ACH-041). */
   lifetime: Record<string, string[]>;
+  /** Lifetime totals: amounts added up across eligible games, such as province harvests (ACH-085). */
+  totals: Record<string, number>;
   /** Best value reported per progress stat and store (ACH-049). */
   best: Record<string, Record<Store, number>>;
   /** Unlocks not yet on a store (ACH-052). */
@@ -294,7 +298,7 @@ export interface Profile {
 }
 
 export function newProfile(app: App = "full"): Profile {
-  return { app, unlocked: {}, lifetime: {}, best: {}, queue: [], demoList: [], sent: [] };
+  return { app, unlocked: {}, lifetime: {}, totals: {}, best: {}, queue: [], demoList: [], sent: [] };
 }
 
 /** Stores the app talks to: the Steam demo talks to none (ACH-057); a phone build to its own store. */
@@ -387,8 +391,8 @@ export interface Evaluation {
 }
 
 /** Lifetime counters as facts, under their stat names. */
-export function lifetimeFacts(p: Profile): Facts {
-  return Object.fromEntries(Object.entries(p.lifetime).map(([k, v]) => [k, v.length]));
+export function lifetimeFacts(p: Pick<Profile, "lifetime" | "totals">): Facts {
+  return { ...Object.fromEntries(Object.entries(p.lifetime).map(([k, v]) => [k, v.length])), ...p.totals };
 }
 
 /**
@@ -424,6 +428,37 @@ export function countLifetime(p: Profile, c: CampaignAchievements, counter: stri
   const list = (p.lifetime[counter] ??= []);
   if (eligible(c) && !list.includes(thing)) list.push(thing);
   return list.length;
+}
+
+/** Adds an amount to a lifetime total, such as a campaign's province harvests, only for an eligible campaign (ACH-041, ACH-085). */
+export function addLifetime(p: Profile, c: CampaignAchievements, counter: string, n: number): number {
+  if (eligible(c) && n > 0) p.totals[counter] = (p.totals[counter] ?? 0) + n;
+  return p.totals[counter] ?? 0;
+}
+
+// ---------------------------------------------------------------- ladders (ACH-084..086, D-ACH-16)
+
+/** Each ladder's levels, lowest first, in the list's order. */
+export function ladders(list: readonly AchievementDefinition[] = ACHIEVEMENTS): Record<string, AchievementDefinition[]> {
+  const out: Record<string, AchievementDefinition[]> = {};
+  for (const d of list) if (d.ladder) (out[d.ladder] ??= []).push(d);
+  return out;
+}
+
+export interface LadderState {
+  /** Levels earned, counted from the bottom; 0 when none. */
+  level: number;
+  of: number;
+  /** The highest earned level, which sets the badge's frame. */
+  top: AchievementDefinition | null;
+  /** The next level to earn, or null at the top. */
+  next: AchievementDefinition | null;
+}
+
+/** How far a ladder has climbed: the levels earned and the next one (ACH-086). */
+export function ladderState(levels: readonly AchievementDefinition[], earned: Record<string, unknown>): LadderState {
+  const got = levels.filter((d) => d.id in earned);
+  return { level: got.length, of: levels.length, top: got.at(-1) ?? null, next: levels.find((d) => !(d.id in earned)) ?? null };
 }
 
 /**
