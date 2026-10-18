@@ -2427,7 +2427,7 @@ function relationsSection(r: number): string {
     rel?.state === "truce" ? `A truce holds${rel.until ? ` until ${monthText(rel.until)}` : ""}: no war before then.`
     : rel?.state === "alliance" ? "Your ally: they answer your calls to arms."
     : rel?.state === "subject" ? "Your overlord."
-    : rel?.state === "overlord" ? "Your subject: they join your wars."
+    : rel?.state === "overlord" ? (s.statecraft?.realms[r]?.tribute ? `Your tributary: they send you ${Math.round(s.statecraft.realms[r]!.tribute!.pays)} gold a month and stay out of your wars.` : "Your subject: they join your wars.")
     : "No ties between you. Declaring war calls their allies to arms against you, and yours to your side.";
   return `<h3 class="sub">Relations</h3><p>${line}</p>
     ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
@@ -2616,7 +2616,7 @@ async function actInTreasury(order: Order): Promise<void> {
   renderPanel();
 }
 
-const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools" };
+const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute" };
 
 /**
  * The Treasury tab: the purse (gold, its change a month and how long it
@@ -2756,6 +2756,9 @@ function renderRealm(r: number): void {
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
   panel.querySelector<HTMLButtonElement>("[data-break-alliance]")?.addEventListener("click", () => void act({ type: "breakAlliance", target: r }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-demand]").forEach((b) =>
+    b.addEventListener("click", () => void act({ type: "makeDemand", target: r, kind: b.dataset.demand!, ...(b.dataset.province ? { province: Number(b.dataset.province) } : {}) })),
+  );
   panel.querySelectorAll<HTMLButtonElement>("[data-hire]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "hire", company: Number(b.dataset.hire) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-release]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "release", commander: Number(b.dataset.release) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-garrison]").forEach((b) =>

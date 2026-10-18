@@ -669,7 +669,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - DIPL-196 The diplomacy context shall put a country's war and peace actions (declare war, offer or ask peace, open the peace table) on the Diplomacy tab of its country card. [F-11]
 
 ### 5.25 Envoys in the game (milestone 5, first slice)
-The library's envoys, asks, answers and ledgers now run in the game's month for every realm (D-DIPL-35). This slice wires four missions: propose an alliance, arrange a marriage, a courtesy visit and a gift. Demands, subjects, passage and the rest follow in later slices.
+The library's envoys, asks, answers and ledgers now run in the game's month for every realm (D-DIPL-35). This slice wires four missions: propose an alliance, arrange a marriage, a courtesy visit and a gift. Demands follow in 5.26; subjects, passage and the rest in later slices.
 
 - DIPL-197 Each month the game shall give the diplomacy context each realm's soldiers, provinces, gold, gold to spare and capital, move every envoy, enforce seats, fade ledgers, and turn the letters arriving this month into news for the player (their own answers, and other realms' agreements). [DIPL-048, DIPL-055, DIPL-190; D-DIPL-35]
 - DIPL-198 A realm may send an envoy to propose an alliance, arrange a marriage, pay a courtesy visit or bring a gift (30 gold, the data's 150 at the game's gold scale) when it is not at war with the target, has no envoy already on the way there, and has a free seat; an alliance is refused at once to allies, to an overlord or subject, or where either side is Hostile, and a marriage to houses already married. The reason is shown in place of the button. [DIPL-048, DIPL-059, DIPL-081; D-DIPL-35]
@@ -679,6 +679,18 @@ The library's envoys, asks, answers and ledgers now run in the game's month for 
 
 #### How the player uses it: envoys and answers
 - DIPL-202 Where: another realm's card, Diplomacy tab. It shows, top to bottom, what they think of you (the standing word and number, then each ledger line with its weight), your envoy on the way there and when he arrives, their last answer with a *Why?* that opens the reasons and the total on a tap, and *Send an envoy*: the free seats, then the four missions, each a 44-point button with one line on what it does, or a disabled button with why not. *End the alliance* sits under the missions while you are allied, with its cost. At war the missions give way to the war and peace actions (DIPL-196). Grouping and overview: your own card's Diplomacy tab is the overview, listing your envoys abroad (where, why, when they arrive or come home) and the last eight answers with their *Why?*; answers also arrive in the dispatches with a scroll icon. Phone: the tab fits the side panel in the Wide and Tall layouts, every button and *Why?* at least 44 points high, nothing that needs hover. This replaces the envoy picker of DIPL-186 until officials are sent by name. [X-19, DIPL-185, DIPL-188]
+
+### 5.26 Demands in the game (milestone 5, second slice)
+Demands now run in the game for two kinds of the Demand kinds table: *Hand over a province* and *Pay tribute* (D-DIPL-36). The other kinds need pretenders, faith and residents, which come with their contexts.
+
+- DIPL-203 A realm may demand tribute of, or a province from, another realm when it could send an envoy there (DIPL-198), neither is the other's subject or overlord, and it holds a war aim on them other than Raid and No aim or a Rival or Hostile stance toward them; tribute needs a shared border and a target with no overlord, a province must be theirs and border the asker's land. Each reason is shown in place of its button. [DIPL-111; D-DIPL-36]
+- DIPL-204 A demand shall be counted when the envoy arrives, from base −60 with *We cannot beat you*, *We have strong friends* and *It's our heartland* −30 for their capital, and answered by letter with its reasons. [DIPL-087, DIPL-111, DIPL-112]
+- DIPL-205 When a province demand is given in to, the game shall hand the province to the asker with no war and no truce: its lord, any siege and occupation end, and the giver holds the wrong *Took our land* and a *Take land* aim on it. When a tribute demand is given in to, the target shall become the asker's Tributary. Either way the target holds *Threatened us*. [DIPL-113, DIPL-139; SUBJ-004]
+- DIPL-206 Each month a Tributary shall send its overlord 15 % of its tax and trade, shown as the *Tribute* line of both treasuries' ledgers; this holds for the Tributaries of 1444 too. [SUBJ-005; D-DIPL-36]
+- DIPL-207 When an AI realm would declare war on a neighbour other than the player, it shall first demand tribute, or a border province other than their capital, when it can; it declares only after a demand was refused and waits while one is on its way. [DIPL-180; D-DIPL-36]
+
+#### How the player uses it: demands
+- DIPL-208 Where: another realm's card, Diplomacy tab, under the envoys, a *Make a demand* section (hidden at war). It says in one line what a demand costs and risks (*Threatened us*, the war aim on refusal, no calls for their allies), then shows *Demand tribute* with what tribute brings, and *Demand* followed by the province's name, one button for each of their provinces on your border (up to 8, their capital marked). When no demand can be made it shows why in place of the buttons (no envoy free, no reason, a subject tie). The answer comes as a letter with its *Why?*, like any envoy's. Grouping and overview: demands sit with the other envoys on the Diplomacy tab; a tributary's card says what it pays you, and the Treasury tab's *Tribute* line totals it. Phone: every button at least 44 points high in the Wide and Tall layouts, nothing that needs hover. [X-19, DIPL-185]
 
 ## 6. Commands
 
@@ -921,6 +933,7 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 - **D-DIPL-33** (was OQ-DIPL-33) The declaration sheet: Serbia is a tributary and does not join; the sheet shows it as "tributary, does not join". X-8 decides it.
 - **D-DIPL-34** (was OQ-DIPL-34) Old AI weights: retired; the AI uses only the reasons count. Diplomacy 12 is the latest text.
 - **D-DIPL-35** First game slice of envoys (milestone 5, provisional): an envoy is an unnamed "Envoy of" the realm, not a named official, so no province loses its official yet; routes are one land leg of the capitals' map distance ÷ 6; every realm has 2 unmarried children until families exist; the gift is 30 gold; AI courts consider their envoys once a year, asking only the neighbour that thinks best of them, so a large map's month stays cheap; counting a far court's distance stores no route, only a sent envoy does; the library's event log is not kept, letters are kept two years and envoys home a year. Quick defaults so the game can play statecraft now; each is replaced when its context lands.
+- **D-DIPL-36** Second game slice, demands (milestone 5, provisional): only *Hand over a province* and *Pay tribute* run; *Pay tribute* given in makes the target a Tributary that pays 15 % of its tax and trade each month (the subjects context's Tributary share, SUBJ-005), and the 1444 Tributaries pay it too; AI realms demand before war only of other AI realms, because answering a demand is not yet on the player's screen; a province given in moves at once when the envoy is answered, and the letter follows a month later. Quick defaults so demands play now.
 
 ## 14. Traceability
 
@@ -1206,3 +1219,5 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-196 | diplomacy-screen.feature | War and peace live on the Diplomacy tab |
 | DIPL-197 … DIPL-201 | — | Engine: packages/engine/test/statecraft.test.ts (courtesy visit, alliance reasons, gift and refusals, AI marriages, save) |
 | DIPL-202 | — | Presentation: apps/client/src/ui/statecraft.ts, the Diplomacy tab |
+| DIPL-203 … DIPL-207 | — | Engine: packages/engine/test/statecraft.test.ts (tribute demand, province handed over, AI demands before war) |
+| DIPL-208 | — | Presentation: apps/client/src/ui/statecraft.ts, Make a demand |

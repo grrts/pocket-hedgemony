@@ -8,6 +8,7 @@ import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 import { officialBonus } from "./officials.ts";
 import { schoolUpkeepMonthly } from "./research.ts";
 import { provinceUpkeep, worksTrade } from "./works.ts";
+import { TRIBUTE_SHARE, tributaries } from "./statecraft.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -22,7 +23,7 @@ export const NORMAL_TAX = 2;
 const HEAVY_TAX = 3;
 
 /** Lines of the ledger, in the order the snapshot sends them. */
-export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain"] as const;
+export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute"] as const;
 export const LEDGER_LINES = LEDGER.length;
 const TAX = 0;
 const TRADE = 1;
@@ -32,6 +33,7 @@ const INTEREST = 4;
 const WORKS_UPKEEP = 5;
 const SCHOOLS = 6;
 const GRAIN = 7;
+const TRIBUTE = 8;
 
 /** Nothing invented yet: interest and loan caps are the realm context's for a realm without banks. */
 const KNOWN: ReadonlySet<string> = new Set();
@@ -102,27 +104,39 @@ export function monthlyInterest(world: World, n: number): number {
 
 /**
  * Works out each realm's ledger for the month and its income (the sum of the
- * lines), and pays it into the treasury when a new month begins.
+ * lines), and pays it into the treasury when a new month begins. With `only`,
+ * just that realm's lines are worked out again (the player's, between months).
  */
-export function runLedger(world: World, pay: boolean): void {
+export function runLedger(world: World, pay: boolean, only = -1): void {
   const L = world.nationLedger;
   const wage = world.rules.defines.economy.officialWagePerMonth;
-  L.fill(0);
+  if (only >= 0) L.fill(0, only * LEDGER_LINES, (only + 1) * LEDGER_LINES);
+  else L.fill(0);
   for (let p = 0; p < world.provinceCount; p++) {
     // The owner pays the official at his post, occupied or not.
     const owner = world.provinceOwner[p]!;
-    if (owner >= 0 && world.provinceOfficial[p]! >= 0) L[owner * LEDGER_LINES + WAGES] = L[owner * LEDGER_LINES + WAGES]! - wage;
-    // And the upkeep of its works (works).
-    if (owner >= 0) L[owner * LEDGER_LINES + WORKS_UPKEEP] = L[owner * LEDGER_LINES + WORKS_UPKEEP]! - provinceUpkeep(world, p);
+    if (only >= 0 && owner !== only && controller(world, p) !== only) continue;
+    if (owner >= 0 && (only < 0 || owner === only)) {
+      if (world.provinceOfficial[p]! >= 0) L[owner * LEDGER_LINES + WAGES] = L[owner * LEDGER_LINES + WAGES]! - wage;
+      // And the upkeep of its works (works).
+      L[owner * LEDGER_LINES + WORKS_UPKEEP] = L[owner * LEDGER_LINES + WORKS_UPKEEP]! - provinceUpkeep(world, p);
+    }
     // An occupier collects the tax (WAR occupation: tax, recruits, food, trade).
     const holder = controller(world, p);
-    if (holder < 0) continue;
+    if (holder < 0 || (only >= 0 && holder !== only)) continue;
     const share = crownTake(world, p);
     L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + provinceTax(world, p, holder, share);
     L[holder * LEDGER_LINES + TRADE] = L[holder * LEDGER_LINES + TRADE]! + provinceTrade(world, p, share);
   }
+  // A Tributary sends its overlord a share of its tax and trade (SUBJ-005).
+  for (const [payer, receiver] of tributaries(world)) {
+    if (only >= 0 && payer !== only && receiver !== only) continue;
+    const gold = Math.max(0, L[payer * LEDGER_LINES + TAX]! + L[payer * LEDGER_LINES + TRADE]!) * TRIBUTE_SHARE;
+    if (only < 0 || payer === only) L[payer * LEDGER_LINES + TRIBUTE] = L[payer * LEDGER_LINES + TRIBUTE]! - gold;
+    if (only < 0 || receiver === only) L[receiver * LEDGER_LINES + TRIBUTE] = L[receiver * LEDGER_LINES + TRIBUTE]! + gold;
+  }
   const armyPay = allNationPay(world);
-  for (let n = 0; n < world.nationCount; n++) {
+  for (let n = only >= 0 ? only : 0; n < (only >= 0 ? only + 1 : world.nationCount); n++) {
     L[n * LEDGER_LINES + PAY] = -armyPay[n]!;
     L[n * LEDGER_LINES + SCHOOLS] = -schoolUpkeepMonthly(world, n);
     // Grain sold to the treasury this month (REALM-026, castleFood.ts).

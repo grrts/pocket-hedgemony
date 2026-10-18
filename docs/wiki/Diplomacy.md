@@ -318,6 +318,15 @@ The first part of statecraft is in the playable build: envoys, alliances, marria
 - **The other realms** send envoys too: once a year each court picks the neighbour that thinks best of it and weighs an alliance and a marriage there, and sends the best ask its count says yes to, or a gift first when it is close. You see the alliances and marriages they make in the dispatches.
 - **For now** an envoy is not a named official, so no province loses its official while he is away; every realm counts two unmarried children; and the royal marriages of 1444 count from the start. Envoys, letters and alliances are kept in your save.
 
+### Demands in the game today
+
+- **Where**: under the envoys on another realm's **Diplomacy** tab, *Make a demand* (not while you are at war with them).
+- **What you can demand**: *Demand tribute*, or *Demand* a province of theirs on your border (one button each, their capital marked). A demand needs a reason: a war aim on them (for example, sharing a border with three times their soldiers gives you *Tribute*) or a Rival or Hostile stance toward them. If you can't, the tab says why.
+- **How they answer**: your envoy carries it like any mission, and their answer comes back with a *Why?*. They start at −60 and give in only when they cannot beat you (+15 for each time over their soldiers, up to +60), minus half that if their allies would defend them, and −30 if you ask for their capital. What they think of you counts too, so a gift first can tip it.
+- **If they give in**: the province is yours at once, with no war and no truce; or they become your **tributary** and send you 15 in 100 of their tax and trade every month, shown as *Tribute* in your Treasury tab and on their card. A tributary stays out of your wars.
+- **If they refuse**: you hold a war aim on them for 5 years, and a war you start over it brings their allies no call to arms. Either way they remember the threat (−15, fading over 10 years).
+- **The other realms** demand too: before a realm goes to war on a neighbour it first demands tribute or a border province, and fights only if refused. For now they make demands only of each other, not of you.
+
 ## How it connects
 
 - [Your-Realm](Your-Realm): officials, ruler, heirs, marriages, lords and their loyalty and Wants, soldiers, Oaths broken and Lands taken.

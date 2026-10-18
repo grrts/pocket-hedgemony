@@ -3,7 +3,7 @@ import { icon } from "../art/ui.ts";
 
 /**
  * Statecraft on the realm card's Diplomacy tab (milestone 5, DIPL-197 to
- * DIPL-202): for another realm, what it thinks of you and why, and the
+ * DIPL-208): for another realm, what it thinks of you and why, and the
  * envoys you can send it, each a 44-point button with what it does or why
  * not; for your own realm, your envoys abroad and the answers that came
  * back, each with the reasons the court counted behind a tap.
@@ -26,7 +26,7 @@ const MISSIONS: { action: string; label: string; does: (v: StatecraftView) => st
 ];
 
 export const missionName = (action: string): string =>
-  ({ propose_alliance: "propose an alliance", arrange_marriage: "arrange a marriage", courtesy_visit: "pay a courtesy visit", send_gift: "bring a gift" })[action] ?? action.replace(/_/g, " ");
+  ({ propose_alliance: "propose an alliance", arrange_marriage: "arrange a marriage", courtesy_visit: "pay a courtesy visit", send_gift: "bring a gift", demand: "make a demand" })[action] ?? action.replace(/_/g, " ");
 
 /** The reasons a court counted, as a tap-to-open list (DIPL-081, the Why? letter). */
 function reasonsHtml(l: StatecraftView["letters"][number]): string {
@@ -58,7 +58,25 @@ export function realmStatecraft(v: StatecraftView | null, r: number, allied: boo
         : `<button class="paper" disabled>${m.label}</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`;
     }).join("")}</div>
     ${allied ? `<button class="paper" data-break-alliance="${r}">End the alliance</button><p class="hint">An oath broken: they will remember it (−40, fading over 20 years), and other courts trust you less.</p>` : ""}`;
-  return `${standing}${away}${last}${missions}`;
+  return `${standing}${away}${last}${missions}${atWar ? "" : demandsHtml(realm.demands)}`;
+}
+
+/** Make a demand (DIPL-111 to DIPL-114): tribute and their border provinces, each a 44-point button, or why none can be made. */
+function demandsHtml(d: StatecraftView["realms"][number]["demands"]): string {
+  const head = `<h3 class="sub">Make a demand</h3>
+    <p class="hint">A threat carried by an envoy. They think worse of you whatever they answer (−15, fading over 10 years). If they refuse, you hold a war aim on them for 5 years, and a war you start over it brings their allies no call. They give in only when they cannot beat you.</p>`;
+  if (d.why) return `${head}<p class="hint">${esc(d.why.charAt(0).toUpperCase() + d.why.slice(1))}.</p>`;
+  const tribute =
+    d.tribute === null
+      ? `<button class="wax" data-demand="pay_tribute">${icon("crown", 2)}Demand tribute</button><p class="hint">They become your tributary and send you 15 in 100 of their tax and trade each month. A tributary stays out of your wars.</p>`
+      : `<button class="paper" disabled>Demand tribute</button><p class="hint">${esc(d.tribute.charAt(0).toUpperCase() + d.tribute.slice(1))}.</p>`;
+  const provinces = d.provinces.length
+    ? `<p class="hint">Or demand a province on your border; giving up their capital counts against it (−30).</p><div class="missions">${d.provinces
+        .slice(0, 8)
+        .map((p) => `<button class="paper" data-demand="hand_over_province" data-province="${p.province}">Demand ${esc(p.name)}${p.capital ? " (their capital)" : ""}</button>`)
+        .join("")}</div>`
+    : "";
+  return `${head}<div class="missions">${tribute}</div>${provinces}`;
 }
 
 /** Your own statecraft: envoys abroad and the answers of the last two years. */

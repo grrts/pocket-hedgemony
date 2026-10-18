@@ -10,6 +10,7 @@ import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 import { officialBonus } from "./officials.ts";
+import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -805,6 +806,21 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
   checkDestroyed(world, news);
 }
 
+/** A province handed over without a war (a demand given in, DIPL-113): the new owner holds it, its lord and any siege are gone. */
+export function cedeProvince(world: World, p: number, to: number, news: News[]): void {
+  const from = world.provinceOwner[p]!;
+  if (from < 0 || from === to) return;
+  world.provinceOwner[p] = to;
+  world.provinceLord[p] = -1;
+  world.provinceOccupier[p] = -1;
+  world.provinceHold[p] = 0;
+  world.sieges.delete(p);
+  dip.provincesTaken(world.diplomacy, world.nationIds[to]!, world.nationIds[from]!, [world.provinceIds[p]!]);
+  addBorders(world, to);
+  news.push({ kind: "envoy", text: `${name(world, from)} hands ${provinceName(world, p)} to ${name(world, to)}.`, nations: [from, to], province: p });
+  checkDestroyed(world, news);
+}
+
 function addBorders(world: World, n: number): void {
   const d = world.diplomacy;
   for (let p = 0; p < world.provinceCount; p++) {
@@ -920,8 +936,29 @@ export function aiDeclarations(world: World, news: News[]): void {
       .map((id) => world.nationIndex.get(id)!)
       .filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && strength(world, t) * world.rules.defines.war.aiDeclareStrengthRatio < mine);
     if (!targets.length) continue;
-    declareWar(world, n, targets[world.rng.int(targets.length)]!, news);
+    const t = targets[world.rng.int(targets.length)]!;
+    if (demandFirst(world, n, t)) continue;
+    declareWar(world, n, t, news);
   }
+}
+
+/**
+ * Before an AI declares war it tries a fitting demand first (DIPL-180): tribute, else a border
+ * province that is not their capital. It goes to war only once a demand was refused, and waits
+ * while one is on its way. The player is not sent demands yet: answering them is a later slice.
+ */
+function demandFirst(world: World, n: number, t: number): boolean {
+  if (t === world.player) return false;
+  const d = world.diplomacy;
+  const a = world.nationIds[n]!;
+  const b = world.nationIds[t]!;
+  if (d.envoys.some((e) => e.country === a && e.target === b && e.action === "demand" && (e.status === "road" || e.status === "court"))) return true;
+  if (d.refusedDemands.some((x) => x.asker === a && x.asked === b)) return false;
+  if (!whyNotDemand(world, n, t, "pay_tribute")) return !makeDemand(world, n, t, "pay_tribute");
+  const capital = world.provinceIndex.get(world.rules.nations[t]!.capital);
+  const p = demandableProvinces(world, n, t).find((x) => x !== capital);
+  if (p !== undefined && !whyNotDemand(world, n, t, "hand_over_province", p)) return !makeDemand(world, n, t, "hand_over_province", p);
+  return false;
 }
 
 /** AI realms at war raise levies they can pay for; at peace they send levies home before their pay begins. */
