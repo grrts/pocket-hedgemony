@@ -44,3 +44,5 @@ export { succeed, yearlyCrowns } from "./crowns.ts";
 export { risingChanceIn, spark } from "./rebels.ts";
 export { PILLAR_TAB, pillarLine, RATE_LABELS, rateButtons, STABILITY_NOTE, stabilityPlaque, stabilitySection, taxLine, TOP_BAR_PLAQUE, topBar, treasuryView, type LedgerRow, type Opens, type PillarRow, type RateButton, type RealmTab, type StabilitySectionView, type TaxLineView, type TopBarInput, type TopBarItem, type TreasuryInput, type TreasuryView } from "./realmScreens.ts";
 export { reportFailedHarvests } from "./food.ts";
+export { grabbedLand, joinsLeague, leagueView, monthlyConquest, nameAbroadView, notorietyWord, type LeagueView, type NameAbroadView, type NotorietyWord } from "./conquest.ts";
+export { aiWarPay, heedsNoNotoriety, maxCededProvinces, priceContext, priceOfWar, warPay, whyAiWontDeclare, wouldSayPeaceAtDeclaration, type PriceContext, type PriceOfWar, type PriceOfWarCall } from "./priceOfWar.ts";

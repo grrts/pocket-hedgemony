@@ -1,6 +1,6 @@
 {
  "$comment": "Warfare (domain/warfare/spec.md). One warfare config file (WAR-199). Every value is a placeholder from warfare-design v5, warfare-eras and warfare-styles (spec §10); key names follow spec §10. Era VIII and the part of era VII after 31 August 1939 are out of scope.",
- "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "amounts", "later_arms", "levels_by_era", "era_scale", "occupation.tax_share"],
+ "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "ai.war_chest_months", "amounts", "later_arms", "levels_by_era", "era_scale", "occupation.tax_share"],
  "$decisions": "D-WAR-1..21 (spec §13). Standing regiments break at 30 % (D-WAR-15), the Shore sector costs -20 % across a river (D-WAR-5), drill runs to 24 (D-WAR-9).",
  "skill_growth": {
   "$comment": "WAR-158, D-WAR-13: the staff college is the academy of eras VI-VII.",
@@ -312,7 +312,8 @@
   "kinds_raised": { "Castile": ["noble retinues", "frontier light horse"], "city republic": ["hired companies"] },
   "peace_at": { "low risk": 0.3333333333333333, "hegemon seeker": "forced" },
   "standing_orders": { "low": { "order": "wait", "retreat": "1 to 1" }, "medium": { "order": "attack", "retreat": "3 to 2" }, "high": { "order": "attack", "retreat": "2 to 1" } },
-  "raids_at": ["high"]
+  "raids_at": ["high"],
+  "war_chest_months": 6
  },
  "style_region_fallback": { "Sahel": "Furusiyya", "Andes": "Three battles" },
  "adoption": { "officers": 3, "years": 5, "lessons": 3, "lessons_years": 10, "alliance_battles": 3, "first_battle_strength": 0.5 },

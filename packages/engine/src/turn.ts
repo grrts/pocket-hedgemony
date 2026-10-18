@@ -8,6 +8,7 @@ import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
+import { monthlyConquest } from "./conquest.ts";
 import { riseUp, subjectAction } from "./subjects.ts";
 import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
@@ -268,6 +269,8 @@ function startDay(world: World, news: News[]): void {
     aiTreasury(world, news);
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
+    // Lands taken over the last 20 years each month; the league check each January (DIPL-221).
+    monthlyConquest(world, news);
     aiDeclarations(world, news);
     // A war just declared may be censured, or call a patron to a holy place (RELG-147, RELG-149).
     faithHeadsWars(world, news);

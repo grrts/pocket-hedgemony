@@ -16,6 +16,8 @@ import { noteBattle, notePeace, noteSiege } from "./achievements.ts";
 import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
 import { heritageFactor } from "./heritage.ts";
 import { lostBattle } from "./rebels.ts";
+import { priceContext, priceOfWar, whyAiWontDeclare } from "./priceOfWar.ts";
+import { grabbedLand } from "./conquest.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -192,6 +194,16 @@ export function answerCall(world: World, call: dip.Call, yes: boolean, news: New
   dip.answerCall(d, call, yes);
   const n = world.nationIndex.get(call.called)!;
   const caller = world.nationIndex.get(call.caller)!;
+  // A league call is the member's own (DIPL-160): it answers for the league, not for a caller.
+  if (call.via === "league") {
+    const x = world.nationIndex.get(call.against)!;
+    news.push(
+      yes
+        ? { kind: "joined", text: `${name(world, n)} joins the war against ${name(world, x)} with the league.`, nations: [n, x] }
+        : { kind: "refused", text: `${name(world, n)} stays out of the league's war and leaves the league against ${name(world, x)}.`, nations: [n, x] },
+    );
+    return;
+  }
   news.push(
     yes
       ? { kind: "joined", text: `${name(world, n)} answers ${name(world, caller)}'s call to arms against ${name(world, world.nationIndex.get(call.against)!)}.`, nations: [n, caller] }
@@ -838,6 +850,8 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
     for (const p of ceded) gained.set(world.provinceOwner[p]!, [...(gained.get(world.provinceOwner[p]!) ?? []), provinceName(world, p)]);
     dip.provincesTaken(d, world.nationIds[[...gained.keys()][0]!]!, world.nationIds[a === [...gained.keys()][0] ? b : a]!, ceded.map((p) => world.provinceIds[p]!));
     for (const [n, list] of gained) addBorders(world, n);
+    // Neighbours remember land grabbed near them (DIPL-222).
+    grabbedLand(world, ceded, cededFrom, true);
     news.push({ kind: "peace", text: `Peace between ${name(world, a)} and ${name(world, b)}: ${[...gained].map(([n, list]) => `${name(world, n)} takes ${list.join(", ")}`).join("; ")}. Truce for ${truceMonths / 12} years.`, nations: involved, province: ceded[0]! });
   } else {
     news.push({ kind: "peace", text: `White peace between ${name(world, a)} and ${name(world, b)}. Truce for ${truceMonths / 12} years.`, nations: involved });
@@ -961,8 +975,11 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
 // ---------------------------------------------------------------- AI
 
 /**
- * Once a month a realm at peace may start a war on a weaker neighbour it has
- * no truce, alliance or subject tie with (rare, set in defines).
+ * Once a month a realm at peace may start a war on a neighbour it has no
+ * truce, alliance or subject tie with (rare, set in defines), only when it has
+ * counted the price (WAR-228): its side beats the target's with everyone
+ * called against it, it holds a war chest, its people don't want peace and it
+ * isn't too notorious.
  */
 export function aiDeclarations(world: World, news: News[]): void {
   const d = world.diplomacy;
@@ -970,11 +987,11 @@ export function aiDeclarations(world: World, news: News[]): void {
   for (let n = 0; n < world.nationCount; n++) {
     if (n === world.player || world.nationGone[n] || dip.warOf(d, world.nationIds[n]!)) continue;
     if (world.rng.next() >= chance) continue;
-    const mine = strength(world, n);
+    const ctx = priceContext(world, n);
     const targets = dip
       .neighbours(d, world.nationIds[n]!)
       .map((id) => world.nationIndex.get(id)!)
-      .filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && strength(world, t) * world.rules.defines.war.aiDeclareStrengthRatio < mine);
+      .filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && !whyAiWontDeclare(world, n, t, priceOfWar(world, n, t, ctx)));
     if (!targets.length) continue;
     const t = targets[world.rng.int(targets.length)]!;
     if (demandFirst(world, n, t)) continue;
