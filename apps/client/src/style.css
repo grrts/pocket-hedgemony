@@ -4744,3 +4744,56 @@ small.why {
 .new-land > b {
   flex: 1 1 140px;
 }
+
+/* Heads of the faith (RELG-135 to RELG-138): one card in the Peoples tab's column; the two lists side by side when there is room. */
+.faith-head {
+  padding: 6px 8px;
+}
+.faith-head p {
+  margin: 2px 0;
+}
+.head-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 4px 12px;
+}
+.head-lists ul,
+.conclave-rows,
+.censure-warn ul {
+  margin: 2px 0;
+  padding-left: 18px;
+}
+.conclave {
+  border-top: 1px solid var(--outline);
+  margin-top: 4px;
+  padding-top: 4px;
+}
+.conclave-gold {
+  align-items: center;
+}
+.conclave-gold button {
+  min-width: 44px;
+  font-size: 1.2em;
+}
+.censure-warn {
+  padding: 6px 8px;
+  margin-bottom: 6px;
+}
+.censure-warn em {
+  font-style: normal;
+  color: var(--cloth);
+}
+.seat-keys {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0;
+}
+.seat-keys button {
+  justify-content: flex-start;
+}
+.lens-key .seat-keys {
+  grid-column: 1 / -1;
+}
+.seat-keys small {
+  margin-left: auto;
+}

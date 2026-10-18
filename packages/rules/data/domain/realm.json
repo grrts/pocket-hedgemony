@@ -137,7 +137,7 @@
   "loyalty": {
     "steps": ["Loyal", "Wavering", "Disloyal", "In revolt"],
     "up": ["want_granted", "gift_of_gold", "office_at_court", "marriage_into_ruling_house", "victory_taken_part", "long_secure_reign", "fed_in_famine", "shared_faith_and_tongue", "war_against_rival"],
-    "down": ["heavy_taxes", "land_seized_from_him", "land_seized_from_another", "war_lost", "battle_lost", "child_ruler", "disputed_heir", "new_ruler", "grain_requisitioned", "foreign_bribes", "crown_borrowed", "massacre", "faith_not_shared"]
+    "down": ["heavy_taxes", "land_seized_from_him", "land_seized_from_another", "war_lost", "battle_lost", "child_ruler", "disputed_heir", "new_ruler", "grain_requisitioned", "foreign_bribes", "crown_borrowed", "massacre", "faith_not_shared", "censured_by_head"]
   },
   "harvest_steps": ["failed", "poor", "normal", "good", "bumper"],
   "tax_rates": ["none", "light", "normal", "heavy", "crushing"],
