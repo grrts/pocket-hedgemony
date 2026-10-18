@@ -897,15 +897,23 @@ When("the bench processes a turn", (s) => {
   processTurn(w, [], 0); // warm up
   s.treasuryBefore = w.nationTreasury.slice();
   s.turnBefore = w.turn;
+  // Three runs of ten turns, each covering the weekly and monthly steps; the
+  // median run's average per turn counts, so one runner hiccup does not fail CI
+  // while a turn that is truly over budget still does (VIEW-064).
   const turns = 10;
-  const t0 = performance.now();
-  for (let i = 0; i < turns; i++) processTurn(w, [], 0);
-  s.turnMs = (performance.now() - t0) / turns;
+  const runs: number[] = [];
+  for (let r = 0; r < 3; r++) {
+    const t0 = performance.now();
+    for (let i = 0; i < turns; i++) processTurn(w, [], 0);
+    runs.push((performance.now() - t0) / turns);
+    if (r === 0) s.turnAfterFirstRun = w.turn;
+  }
+  s.turnMs = runs.sort((a, b) => a - b)[1]!;
 });
 
 Then("AI nations run in the same worker turn", (s) => {
   const w = s.world;
-  expect(w.turn - s.turnBefore).toBe(10);
+  expect(s.turnAfterFirstRun - s.turnBefore).toBe(10);
   // Every nation's books moved in the player's turn, not only the player's.
   let moved = 0;
   for (let n = 0; n < s.size.nations; n++) if (w.nationTreasury[n] !== s.treasuryBefore[n]) moved++;
