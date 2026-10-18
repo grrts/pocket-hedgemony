@@ -1663,11 +1663,13 @@ table.classes td.bar span {
 }
 
 /* The chosen rate stays pressed in, marked with a dot. */
-.tax-rates button.paper.on {
+.tax-rates button.paper.on,
+.policy-choices button.paper.on {
   border-image-source: var(--ui-btn-paper-down);
 }
 
-.tax-rates button.on::before {
+.tax-rates button.on::before,
+.policy-choices button.on::before {
   content: "● ";
 }
 
@@ -2929,4 +2931,73 @@ button.paper.over {
 .choices.tribute button {
   flex: 1 1 4.5em;
   min-height: 44px;
+}
+
+/* ---- Tongues and faiths (CULT-080..085, RELG-116..118): the province overview's two lines and the realm's Peoples tab ---- */
+.tongue-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 4px 0 2px;
+  border: 2px solid var(--outline);
+  vertical-align: middle;
+}
+.tongue-dot.kin { background: #4f9a46; }
+.tongue-dot.cousin { background: #e0c040; }
+.tongue-dot.stranger { background: #b8323a; }
+.tongue-dot.trading { background: #9a9a9a; }
+button.belief-line {
+  min-height: 44px;
+  justify-content: flex-start;
+  text-align: left;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.facts dd.belief-more {
+  grid-column: 1 / -1;
+  display: block;
+  font-weight: 400;
+  padding: 2px 4px 6px;
+}
+.belief-more ul,
+.families ul,
+.faith-rows {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+.faith-rows {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.families {
+  display: grid;
+  gap: 4px;
+}
+.families details summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  cursor: pointer;
+}
+.families li,
+.faith-row p {
+  margin: 2px 0;
+}
+.faith-row {
+  padding: 6px 8px;
+}
+.faith-row .choices button {
+  min-height: 44px;
+}
+.families em,
+.faith-row em,
+.belief-more em {
+  font-style: normal;
+  color: var(--cloth);
 }

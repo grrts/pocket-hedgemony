@@ -11,6 +11,7 @@ import { monthlyMoods } from "./moods.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
+import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
@@ -126,6 +127,9 @@ export type Order =
   | { type: "answerEvent"; event: string; option: string }
   /** Reform the government into one of its next forms (GOV-027). */
   | { type: "reform"; to: string }
+  /** Set the realm's Tongue policy (CULT-038), or a faith's policy from the next New Year (RELG-055). */
+  | { type: "tonguePolicy"; policy: string }
+  | { type: "faithPolicy"; faith: string; policy: string }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
   | { type: "foodPreset"; name: string }
@@ -201,6 +205,7 @@ function startDay(world: World, news: News[]): void {
     monthlyPeople(world, news);
     monthlyFood(world, news);
     monthlyGovernment(world, news);
+    monthlyPeoples(world, news);
     monthlyMoods(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
@@ -334,6 +339,10 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return stopChange(world, actingNation, order.province);
     case "reform":
       return reform(world, actingNation, order.to, news);
+    case "tonguePolicy":
+      return setTonguePolicy(world, actingNation, order.policy);
+    case "faithPolicy":
+      return setFaithPolicy(world, actingNation, order.faith, order.policy);
     case "sendEnvoy": {
       syncCountries(world);
       const reason = sendEnvoy(world, actingNation, order.target, order.action);

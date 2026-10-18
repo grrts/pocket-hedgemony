@@ -265,6 +265,20 @@ Once a year, alongside traders and the trade balance: pulls, hold and the 3 % mo
 - **Faith %** is the share of people of the state faith or a faith layered with it. Ming, with 10 % confucian_ritual, 50 % mahayana, 30 % daoist and 10 % asian_traditional not yet layered, has a Faith % of 90.
 - **The Faith lens**: at world zoom, provinces coloured by majority faith, hatched where another faith's community is 30 % or more, with holy-place icons. At region zoom, houses as town sprites, preachers as walking figures and waves as a spreading tint. At local zoom, the Faith line.
 
+### In the game now
+
+Every province starts in 1444 with up to three faiths from its realm's start mix, with area overrides (Hussite Bohemia, Orthodox Balkans under the Ottomans). Communities of a tenth or more start with a house of worship where their faith has one.
+
+- **Province card, Faith line**: each faith's share with ↑ or ↓. Tap it for this year's pulls per faith and their sources (houses, your capital, your policy), each community's state, any grievance, and how many points a year the mix moves toward which faith.
+- **Your realm card, Peoples tab**: the state faith, Faith %, and a card per faith in your realm with its share, people and provinces. The state faith is Established; every other faith has three buttons, **Tolerated**, **Restricted** and **Persecuted**, which are your tolerance for that faith. A change is shown as pending and takes effect at New Year; tap the current policy to cancel it.
+  - Tolerated: houses stand, normal tax.
+  - Restricted: a quarter more tax from its people, no new houses, your faith pulls harder; *Wrong faith* where it is the majority.
+  - Persecuted: its houses close at New Year and its people pay no tax, your faith pulls twice as hard; *Persecuted*, which counts as two grievances, wherever it is a tenth or more.
+- **The Faiths lens**: provinces coloured by majority faith, hatched where a second faith holds 30 % or more.
+- Faiths move each New Year, a fraction of a point at a time.
+
+Not in yet: building or paying for houses, preachers, expulsion and the Inquisition, changing the state faith, holy places, lords' faith, faith waves, and the computer players changing their policy.
+
 ## How it connects
 
 - [Provinces](Provinces): stores the faith mix, the clergy class, the Chaplain, the *Faith tolerance* charter, *Wrong faith* and *Persecuted*, refugees and settlers.
@@ -351,4 +365,4 @@ Nothing. Every question about religion has been decided.
 
 - Spec: `domain/religion/spec.md` in the game repository.
 - Features: `domain/religion/features/`: `faiths.feature`, `faith-mix.feature` (one year's move, East Bengal), `faith-buildings.feature`, `communities-and-policy.feature`, `expulsion-and-inquisition.feature` (the Alhambra decree), `preachers.feature`, `state-faith.feature`, `holy-places.feature`, `faith-rules.feature`, `faith-waves-and-events.feature`, `religion-uses.feature`, `religion-view.feature` and `religion-ai.feature`.
-- Code: `packages/engine/src/domain/religion/`, with its numbers in `packages/rules/data/domain/religion.json`.
+- Code: `packages/engine/src/domain/religion/`, with its numbers in `packages/rules/data/domain/religion.json`. The game wiring is `packages/engine/src/peoples.ts`; the panels are `apps/client/src/ui/belief.ts`.

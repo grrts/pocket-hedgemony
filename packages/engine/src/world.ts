@@ -23,6 +23,7 @@ import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGameEvents, type GameEvents } from "./events.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
+import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
@@ -33,7 +34,7 @@ import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, PeoplesState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -415,6 +416,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
     navy: createNavyState(P),
+    ...createPeoplesState(P, N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -439,6 +441,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   world.commanderSeed = commanderIds.map(() => -1);
   seedOfficials(world);
   seedGovernment(world);
+  seedPeoples(world);
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where
