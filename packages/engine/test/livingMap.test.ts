@@ -264,8 +264,8 @@ describe("LandGridScan", () => {
     while (!scan.scan(97)) passes++;
     expect(passes).toBeGreaterThan(1);
     const g = scan.grid();
-    expect([...g.centre]).toEqual([...tiles.centre]);
-    expect([...g.bounds]).toEqual([...tiles.bounds]);
+    expect(Array.from(g.centre)).toEqual([...tiles.centre]);
+    expect(Array.from(g.bounds)).toEqual([...tiles.bounds]);
     const t = tiles.centre[0]!;
     expect([g.provinceAt(t), g.cellAt(t)]).toEqual([tiles.province[t], tiles.cell[t]]);
   });
