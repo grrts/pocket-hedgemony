@@ -363,7 +363,7 @@ they did by then; L23 and L24 are dropped (D-RSCH-1).
 - RSCH-086: Before a Study button would drop progress on the current study, the invention's sheet shall say how many scholar-years would be lost, and the button shall read Switch to this study. [X-19, D-RSCH-19, D-RSCH-20]
 - RSCH-087: The schools' upkeep shall be its own line of the Treasury ledger (Schools). [X-19, RSCH-021]
 - RSCH-088: The General tab of the player's country card shall carry one line, "Studying X · N % · scholars S" (or "Nothing studied · choose what to study"), that opens the Learning tab; another realm's card shall show how many inventions it knows and what it studies. [X-19]
-- RSCH-089: When the player's realm learns an invention, an alert shall say "Learned X. Choose the next study." with an Open button to the Learning tab; while nothing is studied, one alert shall ask the player to choose (at the start and after each invention), the same way. [X-19]
+- RSCH-089: *(With a queue, only when the queue is empty: RSCH-108.)* When the player's realm learns an invention, an alert shall say "Learned X. Choose the next study." with an Open button to the Learning tab; while nothing is studied, one alert shall ask the player to choose (at the start and after each invention), the same way. [X-19]
 - RSCH-090: The Learning tab shall work on a phone in landscape and in the Tall layout: inside the safe areas, every button, tree node and fold at least 44 points tall, nothing that needs hover, and the page never scrolling sideways; the tree scrolls by dragging inside its own frame, and where the tab is at least 500 points wide the invention's sheet stands beside the tree, otherwise above it. [X-19, SHELL-108, SHELL-109, SHELL-114, D-RSCH-20]
 
 ### 5.10 One tree that reaches back before 1444 (18 October 2026, Leroy)
@@ -403,6 +403,14 @@ start sets of RSCH-051 and RSCH-076 (D-RSCH-21). Nothing already in the tree cha
 **Starting knowledge**
 - RSCH-098: Every map nation shall belong to exactly one **start group** (§5.11). It starts knowing the root, the four boughs, its group's past inventions and Era I and II inventions, plus its own additions, minus its own removals; nothing else, and no study under way. Start labels (`start_regions`) stay on the rows as history notes and no longer decide the start. [D-RSCH-21]
 - RSCH-099: A start set shall be complete: every invention in it has its parent (or an alternative) and everything it also needs in the same set; a data check refuses a start set that is not. [D-RSCH-21]
+
+### 5.10a Tree, queue and selection on one screen (18 October 2026, Leroy, feedback 113)
+
+- RSCH-107: The Learning tab shall open on one screen holding the tree, the study queue and what is selected together; Schools is a second part reached by one button in the tab's header, so studying never needs a second part. The queue sits as a strip along the top: the current study (two with an academy) with its progress bar and time left, then the queued inventions in order, each a 44-point chip with its time; the selected invention's sheet stands beside the tree (500 points wide or more) or below the queue strip, otherwise; with nothing picked, the sheet shows the current study. [Leroy 18 Oct, feedback 113, X-19]
+- RSCH-108: A realm shall keep a **study queue** of up to 5 inventions after its current study. When a study is learned, the first queued invention whose needs are now known becomes the current study at once, with no progress lost and no alert asking to choose; the "choose the next study" alert of RSCH-089 comes only when the queue is empty. A queued invention whose needs are no longer met when its turn comes is skipped and stays in the queue, marked waiting. @placeholder [feedback 113, D-RSCH-22]
+- RSCH-109: An invention's sheet shall carry one action that fits it: Study now (nothing being studied), Add to queue (its needs are known or queued ahead of it), or Queue the path (its needs are not yet met: the missing needs, in an order that can be studied, then the invention, with the total scholar-years and time shown before the tap); a known invention has no action. Study now never drops progress; replacing the current study stays the explicit Switch to this study of RSCH-086. If the path would make the queue longer than 5, the sheet says so and queues none of it. [feedback 113, D-RSCH-22]
+- RSCH-110: In the tree, queued inventions shall carry their place number (1 to 5) and a path being considered (the picked invention's missing needs) shall be drawn highlighted, so the player sees in the tree what the queue will study. In the queue strip, tapping a chip selects it in the tree; dragging a chip (or its ◀ ▶ buttons, 44 points each) changes the order, and ✕ removes it. [feedback 113, X-19]
+- RSCH-111: In the Tall layout the screen stacks the queue strip (scrolling sideways inside itself only), the tree frame, and the sheet as a panel that slides up from the bottom when something is picked and closes with its own ✕; nothing scrolls the page sideways and every chip and button is at least 44 points. [feedback 113, X-19, RSCH-106]
 
 ### 5.11 Start groups (18 October 2026)
 
@@ -522,6 +530,7 @@ castles*: they defend with B4 earthworks until they learn dressed stone.
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
 | SetStudy(invention) | player / AI | Eligible (parent, or, also needs, contact, scope) | Becomes the current study | StudyChanged |
+| SetQueue(inventions) | player / AI | At most 5; each eligible once those before it are known | Replaces the study queue | QueueChanged |
 | SetSecondStudy(invention) | player / AI | Has an academy-level school; eligible | Second study set | StudyChanged |
 | SetSeatsToFill(school or realm, n) | player / AI | n ≤ seats; recruits available | Students enrolled from recruits | StudentsEnrolled |
 | CallStudentsToArms() | player / AI | Students enrolled | Schools emptied into recruits; research stops | StudentsCalledToArms |
@@ -534,7 +543,8 @@ castles*: they defend with B4 earthworks until they learn dressed stone.
 | Event | When | Payload | Consumed by |
 |---|---|---|---|
 | InventionLearned | Progress reaches cost; stolen; start | country, invention | province (unlocks), buildings, warfare, trade, exploration, diplomacy, government, realm (Technology score), events |
-| StudyChanged | Command | country, invention(s) | AI, game-shell |
+| StudyChanged | Command; next queued study starts | country, invention(s) | AI, game-shell |
+| QueueChanged | SetQueue | country, inventions | game-shell |
 | StudentsEnrolled / StudentsCalledToArms | Commands | country, count | realm (recruits), province |
 | StudentsGraduated | After 5 years | country, count, path | realm, province (officials) |
 | SchoolSacked / SchoolClosed | War, unpaid upkeep, religious change | province, school | province, buildings |
@@ -589,6 +599,7 @@ On era boundaries (by date): costs of studying ahead change.
 | start_groups | Per group: members, past inventions, Era I and II inventions (§5.11) | 20 groups | yes | research.json |
 | start_add, start_remove | Per realm: inventions added to or removed from its group's set (§5.11) | table | yes | research.json |
 | without | What lacking F01, F03, B01, C01 costs (RSCH-094) | F01 −1 harvest step; F03 no horse regiments or caravans; B01 half the food carried; C01 −20 % strength | yes | research.json |
+| queue_length | Inventions a study queue holds after the current study | 5 | yes | research.json |
 | standing_share | Share of an era's inventions that gives standing in it | 0.25 | yes | research.json |
 | contact_americas | Inventions that open for realms of the Americas only on contact | F03 (first contact), F9 (RSCH-077) | no | research.json |
 
@@ -649,6 +660,7 @@ The file is `packages/rules/data/domain/research.json`; its `_provisional` list 
 - **D-RSCH-19** (17 Oct, milestone 4, first slice) Founding schools and switching studies: a school is founded from the Learning tab in a town (25,000 people, the map's town size, or the capital) for buildings' temple-school step (60 gold, 12 months, taken as treasury gold), a madrasa where the realm knows L2 since buildings gives that step no cost; choosing another study drops the progress on the old one. One study at a time; the academy's second study, stealing, sacking, poaching, foreign scholars and contact events wait for later slices. The simplest rules that let the player act now; the buildings context will take schools into its build list.
 - **D-RSCH-20** (17 Oct, Leroy's feedback 88) The Learning tab shows the tree: the first tab listed the inventions open to study by era, which hid the tree and read as if any invention could be picked, among too many controls. Now the tab is an overview plus two parts, Tree (drawn bough by bough; Study only on an invention whose needs are known, a locked one saying what to learn first) and Schools (seats, students to arms, schools, founding). The rules of what may be studied are unchanged (RSCH-031, RSCH-033).
 - **D-RSCH-21** (18 Oct, Leroy) One tree reaching back before 1444, and start groups: Leroy asked for one single tree, not the four bough tabs, reaching further into the past so some countries start behind, and for each kingdom's starting technologies. The tree is now drawn as one picture with the boughs as bands and a whole-tree zoom (RSCH-100 to RSCH-106); two eras before 1444 add 13 past inventions that Era I rows now need (RSCH-091 to RSCH-096); a realm that lacks one plays below the 1444 baseline, so realms that know them play exactly as today and only the laggards change. Start labels gave thin, uneven sets (France knew 12 inventions, Kongo knew stone castles), so every map nation now belongs to one of 20 start groups with complete sets (RSCH-098, RSCH-099, §5.11), and a realm's standing names how far behind it starts (RSCH-097). Penalties, costs and the standing share are provisional for the balancing model; the Hordes, African start and tribal designs tune their groups.
+- **D-RSCH-22** (18 Oct, Leroy's feedback 113) Tree, queue and selection on one screen: the Learning tab still split the tree from the action, and a realm could only hold one study, so each invention ended in an alert and a fresh choice. Now one screen holds the queue strip, the tree and the selected invention's sheet (RSCH-107, RSCH-111); a queue of 5 carries on by itself (RSCH-108); Queue the path lets the player tap a far invention and get every step to it (RSCH-109); the tree shows queue places (RSCH-110). The AI keeps choosing one study at a time (RSCH-078). The queue length is provisional.
 
 ## 14. Traceability
 
@@ -723,3 +735,5 @@ Every requirement has at least one scenario. The invention list (§5.8) is check
 | RSCH-097 | past-eras.feature | Standing |
 | RSCH-098, RSCH-099 | start-groups.feature | Every realm starts from its group; Start sets are complete; Who starts behind |
 | RSCH-100 … RSCH-106 | — | Client screens; to be checked by apps/client/scripts/research-shots.mjs (one picture, zoom, tap targets, no sideways scroll) |
+| RSCH-108, RSCH-109 | study-queue.feature | The next queued study starts by itself; Queue the path; A full queue takes no path |
+| RSCH-107, RSCH-110, RSCH-111 | — | Client screens; to be checked by apps/client/scripts/research-shots.mjs |
