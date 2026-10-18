@@ -1626,14 +1626,7 @@ function onTap(sx: number, sy: number, province: number): void {
     // With armies chosen, another one joins them (or leaves, tapped again); else it is the one chosen.
     if (selected.size && !selected.has(hit.id)) selected.add(hit.id);
     else if (selected.size > 1) selected.delete(hit.id);
-    else if (selected.has(hit.id) && marching(armySlot(hit.id))) {
-      // The chosen army tapped again while it marches: it halts where it stands (feedback 128).
-      sound.sfx("army_order_move");
-      selected.clear();
-      selectionChanged();
-      void haltArmy(hit.id);
-      return;
-    } else return sound.sfx("army_select"), pickArmy(hit.id);
+    else return sound.sfx("army_select"), pickArmy(hit.id);
     selectionChanged();
     return;
   } else if (selected.size && snapshot && province >= 0 && !isWater[province]) {
