@@ -4744,3 +4744,156 @@ small.why {
 .new-land > b {
   flex: 1 1 140px;
 }
+
+/* ---- Institutions: the Institutions row, the badge and the Empire card (INST-080 to INST-085) ---- */
+
+/* Every row and button of the card is a 44-point tap target; nothing opens on hover. */
+.institution-row,
+.member-row,
+.seat-row {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  justify-content: space-between;
+  text-align: left;
+  gap: 8px;
+}
+.institution-row {
+  justify-content: flex-start;
+  line-height: 1.2;
+}
+.seat-row.plain {
+  align-items: center;
+  padding: 2px 8px;
+  margin-top: 4px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.seat-row small,
+.member-row small {
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+.seat-row.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+.member-row {
+  justify-content: flex-start;
+}
+.member-row > span {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.member-row .badges {
+  margin: 2px 0 0;
+}
+.member-row em.badge {
+  font-style: normal;
+}
+.empire-badge {
+  min-height: 44px;
+  margin: 0 0 0 6px;
+  padding: 0 4px;
+  font-size: 0.9em;
+  vertical-align: middle;
+}
+.hold-bar {
+  position: relative;
+  height: 28px;
+  margin: 6px 0;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.hold-bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: repeating-linear-gradient(90deg, var(--brass) 0 10px, #b88a34 10px 12px);
+}
+.hold-bar span {
+  position: relative;
+  display: block;
+  padding: 0 8px;
+  line-height: 24px;
+  color: var(--ink);
+  font-weight: 600;
+  text-shadow: 1px 1px 0 var(--paper-light);
+}
+.inst-fold {
+  margin: 6px 0;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.inst-fold summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  min-height: 44px;
+  padding: 2px 8px;
+  cursor: pointer;
+  list-style: none;
+}
+.inst-fold summary::-webkit-details-marker {
+  display: none;
+}
+.inst-fold summary::after {
+  content: "+";
+  margin-left: auto;
+}
+.inst-fold[open] > summary::after {
+  content: "−";
+}
+.inst-fold summary small {
+  color: var(--ink-soft);
+}
+.inst-body {
+  padding: 0 8px 8px;
+}
+.inst-fold.small {
+  background: var(--paper);
+}
+.seat-reasons {
+  margin: 4px 0 8px;
+  padding: 6px 8px;
+}
+.seat-reasons .cand {
+  display: flex;
+  justify-content: space-between;
+  margin: 6px 0 0;
+  border-bottom: 1px solid var(--outline);
+}
+.empire-card .stand {
+  width: 100%;
+  margin-top: 8px;
+}
+.empire-card .choices,
+.empire-ask .choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.empire-card h4 {
+  margin: 10px 0 2px;
+}
+.ladder {
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+.ladder li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  border-bottom: 1px dotted var(--outline);
+}
+.ladder li.next {
+  font-weight: 600;
+}
+.ladder small {
+  color: var(--cloth);
+}
+.lens-key .swatch.seat {
+  box-shadow: inset 0 0 0 3px #7a4c2a;
+}
