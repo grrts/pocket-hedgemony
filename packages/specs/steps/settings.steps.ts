@@ -3,6 +3,7 @@ import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, generateSyntheticRuleset, hashWorld, processTurn, Rng, type Order, type World } from "@ph/engine";
 import * as T from "@ph/engine/domain/settings";
 import * as S from "@ph/engine/domain/saves";
+import { detailBands, type MapDetail } from "@ph/engine/domain/map-presentation";
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("settings");
@@ -986,6 +987,12 @@ Then("8 × 8 tiles and still water", (s) => {
 });
 Then("everything", (s) => {
   expect(T.mapDetail(st(s))).toEqual({ close_in_tiles: "8x8", surf: true, forest_blending: true, still_water: true });
+});
+Then(/^close in the map shows (icons at every zoom, with the closest zoom 40|the living map but no street level|the living map and the street level up to 96)$/, (s, close: string) => {
+  const v = String(T.valueOf(st(s), "graphics.map_detail"));
+  const b = detailBands((v[0]!.toUpperCase() + v.slice(1)) as MapDetail);
+  const want = close.startsWith("icons") ? { living: false, street: false, closestZoom: 40 } : close.includes("but no") ? { living: true, street: false, closestZoom: 40 } : { living: true, street: true, closestZoom: 96 };
+  expect({ living: b.living, street: b.street, closestZoom: b.closestZoom }).toEqual(want);
 });
 When(/^"([^"]*)" is "([^"]*)" and a battle result shows$/, (s, name: string, value: string) => {
   act(s);
