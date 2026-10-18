@@ -39,6 +39,7 @@ import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
+import { endCard, scoreLine, scoreTab } from "./ui/score.ts";
 import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
@@ -127,6 +128,11 @@ let dispatchesMine = false;
 const alerted = new Set<string>();
 /** The dispatches are open in the panel. */
 let newsView = false;
+/** The end card is open (SHELL-151); `endShown` is the ending it last opened for, so it opens by itself once. */
+let endView = false;
+let endShown = "";
+/** After game over, the player is picking a realm to play on as (SHELL-095). */
+let pickingPlayOn = false;
 let selectedProvince = -1;
 /** Armies chosen to march (army ids): a tap on the land sends them all (feedback 21). */
 const selected = new Set<number>();
@@ -156,7 +162,7 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" = "general";
+let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "score" = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -1437,6 +1443,8 @@ async function act(order: Order): Promise<void> {
   // What came of it goes in the log; a refusal is also said over the map, where the order was given.
   logNews(snapshot);
   for (const r of snapshot.rejectedOrders) alertPlayer(`Not done: ${r.reason}.`, "scroll");
+  if (!snapshot.campaign.ending) pickingPlayOn = false;
+  watchEnding();
   restyleProvinces();
   renderHud();
   renderPanel();
@@ -1464,8 +1472,60 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", campaign: "crown",
 };
+
+/** The end card (SHELL-151): how the campaign ended, the outcome, the scores and the highs, with its two choices. */
+function renderEnd(): void {
+  const v = snapshot!.campaign;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${v.ending!.kind === "end date" ? "The end" : v.ending!.kind === "game over" ? "Game over" : "Victory"}</h2>${closeButton()}</header>
+    ${endCard(v, (j) => nations[j]!.name)}`;
+  bindClose();
+  showPanel(true);
+  panel.querySelectorAll<HTMLButtonElement>("[data-realm]").forEach((b) =>
+    b.addEventListener("click", () => {
+      endView = false;
+      realmView = Number(b.dataset.realm);
+      realmTab = "general";
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-end]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const what = b.dataset.end;
+      if (what === "new") {
+        location.reload();
+        return;
+      }
+      endView = false;
+      if (what === "keep") void act({ type: "keepPlaying" });
+      if (what === "play-on") {
+        pickingPlayOn = true;
+        realmView = -1;
+        selectedProvince = -1;
+        alertPlayer("Tap a realm on the map, then Rule it to play on.", "crown");
+      }
+      renderPanel();
+      renderActions();
+    }),
+  );
+}
+
+/** When the campaign has just ended, the clock stops and the end card opens by itself, once (SHELL-151). */
+function watchEnding(): void {
+  const e = snapshot?.campaign.ending;
+  if (!e) return;
+  const key = `${e.kind}/${e.date}/${e.realm}`;
+  if (key === endShown) return;
+  endShown = key;
+  // Alerts over the map would cover the end card; everything they said is in the Dispatches.
+  clearAlerts();
+  endView = true;
+  pickingPlayOn = false;
+  panelCollapsed = false;
+  sound.sfx("turn_month_new_year");
+}
 
 /**
  * Takes a snapshot's news into the dispatches log, newest first, without
@@ -1725,19 +1785,23 @@ function renderActions(): void {
   fab.hidden = !snapshot;
   fab.classList.toggle("playing", playing);
   fab.classList.toggle("paused", paused);
-  const waiting = snapshot?.events.length ?? 0;
+  const over = !!snapshot?.campaign.ending;
+  const waiting = over ? 0 : (snapshot?.events.length ?? 0);
   const badge = fab.querySelector<HTMLElement>(".badge")!;
   badge.hidden = !waiting;
   badge.textContent = String(waiting);
-  // While events wait, End turn shows their scroll and count (SHELL-070).
-  const want = waiting ? "scroll" : "hourglass";
+  // While events wait, End turn shows their scroll and count (SHELL-070); once the campaign is over, a crown (SHELL-151).
+  const want = over ? "crown" : waiting ? "scroll" : "hourglass";
   if ((fab.dataset.icon ?? "hourglass") !== want) {
-    fab.querySelector("img")!.outerHTML = icon(want, 3, waiting ? "Answer the event" : "End turn");
+    fab.querySelector("img")!.outerHTML = icon(want, 3, over ? "Campaign over" : waiting ? "Answer the event" : "End turn");
     fab.dataset.icon = want;
   }
   fab.classList.toggle("events", waiting > 0);
+  fab.classList.toggle("over", over);
   if (!snapshot) return;
-  fab.title = waiting
+  fab.title = over
+    ? "Campaign over: open the end card"
+    : waiting
     ? `${waiting === 1 ? "An event waits" : `${waiting} events wait`} for your answer (Space opens it)`
     : playing
       ? paused
@@ -1779,6 +1843,10 @@ function renderPanel(): void {
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
+  }
+  if (endView && snapshot?.campaign.ending) {
+    renderEnd();
+    return;
   }
   if (newsView && snapshot) {
     renderNews();
@@ -3207,7 +3275,7 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy") && !mine)) realmTab = "general";
+  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "score") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
   const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
@@ -3219,6 +3287,7 @@ function renderRealm(r: number): void {
     </div>
     ${mine && s?.stability ? stabilitySection(s.stability) : ""}
     <dl class="facts">
+      ${s ? scoreLine(s.campaign, r, mine) : ""}
       <dt>People</dt><dd>${fmt(people)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
       ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
@@ -3240,9 +3309,11 @@ function renderRealm(r: number): void {
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
       .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!)}${esc(nations[j]!.name)}</button>`)
       .join("")}</div>` : ""}
-    ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}`;
+    ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}
+    ${s && pickingPlayOn && s.campaign.ending?.kind === "game over" && !mine && s.campaign.ranks[r * 3] ? `<button class="wax play" data-play-on="${r}">${icon("crown", 2)}Rule ${esc(n.name)}<small>Achievements end for this campaign</small></button>` : ""}`;
   const content =
-    realmTab === "heritage" ? heritageTab(strengths)
+    realmTab === "score" && s ? scoreTab(s.campaign, r, (j) => nations[j]!.name)
+    : realmTab === "heritage" ? heritageTab(strengths)
     : realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r))
     : realmTab === "government" && s?.government ? governmentTab(s.government)
     : realmTab === "peoples" && peoples ? peoplesTab(peoples)
@@ -3258,7 +3329,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("score", "Score") + tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -3279,6 +3350,7 @@ function renderRealm(r: number): void {
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
   panel.querySelector<HTMLButtonElement>("[data-rise]")?.addEventListener("click", () => void act({ type: "riseUp" }));
+  panel.querySelector<HTMLButtonElement>("[data-play-on]")?.addEventListener("click", () => void playOnAs(r));
   panel.querySelectorAll<HTMLButtonElement>("[data-subject-act]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "tighten" | "fold_in", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
   );
@@ -3429,6 +3501,7 @@ function bindClose(): void {
     sailing = -1;
     grantOpen = false;
     newsView = false;
+    endView = false;
     realmView = -1;
     selectedProvince = -1;
     selected.clear();
@@ -3441,11 +3514,17 @@ function bindNationButtons(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-nation]").forEach((b) => b.addEventListener("click", () => void startGame(b.dataset.nation!)));
 }
 
+/** ?end=YYYY-MM-DD brings the end date near, to try the end card (SHELL-151). */
+const endDateParam = (): { endDate?: string } => {
+  const end = new URLSearchParams(location.search).get("end");
+  return end ? { endDate: end } : {};
+};
+
 async function startGame(nation: string): Promise<void> {
   showLoading(`Gathering the court of ${nations[nationIndex.get(nation)!]!.name}…`, 0.15);
   await painted();
   loadingStage(`Mustering the armies of ${nations[nationIndex.get(nation)!]!.name}…`, 0.6);
-  takeSnapshot(await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}) }), 0);
+  takeSnapshot(await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}), ...endDateParam() }), 0);
   weekStart = snapshot!.date;
   dispatches = [];
   unread = 0;
@@ -3469,6 +3548,22 @@ async function startGame(nation: string): Promise<void> {
   hideLoading();
   askedStudy = -1;
   askForStudy(snapshot!);
+}
+
+/** Plays on as another realm after game over (SHELL-095, SHELL-096): the map turns to its capital. */
+async function playOnAs(r: number): Promise<void> {
+  await act({ type: "playOn", nation: r });
+  if (snapshot?.playerNation !== r) return;
+  const cap = provinceIndex.get(nations[r]!.capital)!;
+  realmView = -1;
+  selectedProvince = cap;
+  panelCollapsed = true;
+  heldBefore = provincesHeld();
+  view.lookAt(provinces[cap]!.x!, provinces[cap]!.y!, 4);
+  restyleProvinces();
+  renderHud();
+  renderPanel();
+  renderActions();
 }
 
 /** The map images as the engine takes them, so armies march over the map's own tiles. */
@@ -3552,6 +3647,14 @@ function hearSnapshot(): void {
  */
 async function endTurn(): Promise<void> {
   if (!snapshot) return;
+  // Once the campaign has ended the button reads Campaign over and reopens the end card (SHELL-151).
+  if (snapshot.campaign.ending) {
+    endView = true;
+    pickingPlayOn = false;
+    panelCollapsed = false;
+    renderPanel();
+    return;
+  }
   // While an event waits, End turn opens it instead (EVT-044, SHELL-070).
   if (snapshot.events.length) {
     openEventCard();
@@ -3570,7 +3673,7 @@ async function endTurn(): Promise<void> {
   if (factMem) factMem.battleThisTurn = false;
   renderActions();
   const turn = snapshot.turn;
-  while (snapshot.turn === turn) {
+  while (snapshot.turn === turn && !snapshot.campaign.ending) {
     if (paused) {
       await new Promise<void>((r) => (resume = r));
       continue;
@@ -3587,9 +3690,10 @@ async function endTurn(): Promise<void> {
     hearSnapshot();
     if (battle) sound.sfx(shotSound(next.date.year), 0.7);
     logNews(next);
+    watchEnding();
     restyleProvinces();
     renderHud();
-    if (!panel.hidden) renderPanel();
+    if (!panel.hidden || endView) renderPanel();
     renderActions();
     // Budgets in docs/performance.md, checked by scripts/perf.mjs: each step's answer, and taking it in.
     performance.measure("turn-wait", "turn-sent", "turn-arrived");

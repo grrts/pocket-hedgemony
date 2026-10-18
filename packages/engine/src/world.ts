@@ -27,6 +27,7 @@ import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
+import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./campaignEnd.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -137,6 +138,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   navy: NavyState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
+  /** Win scores, the end date and how the campaign ended (campaignEnd.ts). */
+  campaign: CampaignEndState;
 }
 
 export interface ArmyPool {
@@ -403,6 +406,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     battleSeq: 0,
     peaceOffers: [],
     nationGone: new Uint8Array(N),
+    campaign: createCampaignEndState(N, rules.defines.startDate),
     ...createRecruitState(P, N),
     ...createLivingState(P),
     ...createTreasuryState(P, N),
@@ -467,6 +471,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedStartingPurse(world);
   // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
   syncCountries(world);
+  // The scores stand from the first day, for the country card (SHELL-149).
+  seedCampaign(world);
 
   // The event tree starts with the campaign, so its first month costs no more than any other.
   world.events = createGameEvents(world);

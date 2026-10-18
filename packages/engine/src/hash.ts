@@ -77,6 +77,8 @@ export function hashWorld(world: World): string {
   feed(world.provinceOfficial);
   feed(world.nationForm);
   feed(world.provinceGrasping);
+  feed(world.campaign.nationLargest);
+  feed(world.campaign.nationBattlesWon);
   feed(world.provinceTongue);
   feed(world.provinceTongueShare);
   feed(world.provinceFaith);

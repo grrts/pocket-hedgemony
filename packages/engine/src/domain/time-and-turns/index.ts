@@ -387,6 +387,10 @@ export function orderShape(order: Order): string {
       return "set the Tongue policy";
     case "faithPolicy":
       return "set a Faith policy";
+    case "keepPlaying":
+      return "keep playing after a win";
+    case "playOn":
+      return "play on as another realm";
   }
 }
 

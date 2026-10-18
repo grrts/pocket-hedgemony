@@ -1,4 +1,5 @@
 import { expect } from "vitest";
+import { advance, applyNow, campaignView, createWorld, setPlayer, STEPS_PER_DAY, type World } from "@ph/engine";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createDayLoop, endCampaign, endTurn, newCampaign, requestSave, campaignOf, scheduleBattle, type Battle, type DayLoop } from "@ph/engine/domain/time-and-turns";
 import { battleMarks, recolourUploads, tapTargetMin, visibleMapArea, recentreForCard, type Window } from "@ph/engine/domain/map-presentation";
@@ -3160,4 +3161,108 @@ When("{int} more turns are played", (s, n: number) => {
     while (topId(sh(s)) !== "map") pop(sh(s));
     playWeek(s);
   }
+});
+
+// ---------------------------------------------------------------------------
+// Campaign end and score in play (SHELL-149 to SHELL-151): the engine's world
+
+const PLAY_RULES = loadDefaultRuleset();
+
+function playWorld(s: Scenario): World {
+  return s.playWorld as World;
+}
+
+const landOf = (w: World, n: number): number[] => {
+  const out: number[] = [];
+  for (let p = 0; p < w.provinceCount; p++) if (!w.provinceWater[p] && w.provinceOwner[p] === n) out.push(p);
+  return out;
+};
+
+Given("a game as {string} begins", (s, realm: string) => {
+  const w = createWorld(PLAY_RULES, 1);
+  setPlayer(w, w.nationIndex.get(realm)!);
+  s.playWorld = w;
+});
+
+Given("a game as {string} begins with the end date {string}", (s, realm: string, end: string) => {
+  const w = createWorld(PLAY_RULES, 1);
+  setPlayer(w, w.nationIndex.get(realm)!);
+  w.campaign.endDate = end;
+  s.playWorld = w;
+});
+
+Then("every realm's card shows its three scores with a rank in each", (s) => {
+  const v = campaignView(playWorld(s));
+  for (let n = 0; n < playWorld(s).nationCount; n++) for (let k = 0; k < 3; k++) {
+    expect(Number.isFinite(v.scores[n * 3 + k])).toBe(true);
+    expect(v.ranks[n * 3 + k]).toBeGreaterThan(0);
+  }
+});
+
+Then("the player's Score card shows Economy as yearly income plus the bank and Power as provinces plus army power", (s) => {
+  const m = campaignView(playWorld(s)).mine!;
+  expect(Math.abs(m.scores[0] - (m.income + m.bank))).toBeLessThanOrEqual(1);
+  expect(Math.abs(m.scores[1] - (m.provinces + m.army))).toBeLessThanOrEqual(1);
+  expect(m.provinces).toBeGreaterThan(0);
+});
+
+Then("the score ledger lists the five leading realms and the player", (s) => {
+  const w = playWorld(s);
+  const v = campaignView(w);
+  expect(v.ledger.length).toBeGreaterThanOrEqual(5);
+  expect(v.ledger.slice(0, 5).every((r, i, a) => i === 0 || a[i - 1]!.ranks.reduce((x, y) => x + y) <= r.ranks.reduce((x, y) => x + y))).toBe(true);
+  expect(v.ledger.some((r) => r.nation === w.player)).toBe(true);
+});
+
+When("the game plays {int} days", (s, days: number) => {
+  advance(playWorld(s), STEPS_PER_DAY * days);
+});
+
+When("the game plays into January 1445", (s) => {
+  const w = playWorld(s);
+  for (let i = 0; i < 60 && !(w.date.year === 1445 && w.date.month === 1); i++) advance(w, STEPS_PER_DAY);
+  // The 1st's monthly steps run as its day begins.
+  advance(w, STEPS_PER_DAY);
+});
+
+When("{string} takes two thirds of the lands of {string} and {string} the rest", (s, a: string, loser: string, b: string) => {
+  const w = playWorld(s);
+  const [na, nl, nb] = [a, loser, b].map((x) => w.nationIndex.get(x)!);
+  landOf(w, nl!).forEach((p, i) => (w.provinceOwner[p] = i % 3 === 0 ? nb! : na!));
+});
+
+Given("{string} holds every land province", (s, realm: string) => {
+  const w = playWorld(s);
+  const n = w.nationIndex.get(realm)!;
+  for (let p = 0; p < w.provinceCount; p++) if (!w.provinceWater[p]) w.provinceOwner[p] = n;
+});
+
+Then("the end card reads {string}", (s, line: string) => expect(campaignView(playWorld(s)).ending?.headline).toBe(line));
+
+Then("the end card offers {string}", (s, list: string) => expect(campaignView(playWorld(s)).ending?.choices.join(", ")).toBe(list));
+
+Then("the clock no longer runs", (s) => {
+  const w = playWorld(s);
+  const day = w.day;
+  advance(w, STEPS_PER_DAY * 7);
+  expect(w.day).toBe(day);
+});
+
+When("the player chooses to play on as {string}", (s, realm: string) => {
+  const w = playWorld(s);
+  expect(applyNow(w, { type: "playOn", nation: w.nationIndex.get(realm)! }, w.player).rejectedOrders).toEqual([]);
+});
+
+When("the player chooses to keep playing", (s) => {
+  const w = playWorld(s);
+  expect(applyNow(w, { type: "keepPlaying" }, w.player).rejectedOrders).toEqual([]);
+});
+
+Then("the clock runs again as {string}", (s, realm: string) => {
+  const w = playWorld(s);
+  expect(w.player).toBe(w.nationIndex.get(realm));
+  expect(campaignView(w).ending).toBeNull();
+  const day = w.day;
+  advance(w, STEPS_PER_DAY);
+  expect(w.day).toBe(day + 1);
 });

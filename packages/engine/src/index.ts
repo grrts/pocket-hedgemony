@@ -15,6 +15,7 @@ export { createEngineHost, type EngineRequest, type EngineResponse, type MapTile
 export type { FleetView, NavyOrder, NavyView } from "./navy.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";
 export { aiTreasury, canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, runLedger, TAX_RATES, taxRateOf } from "./treasury.ts";
+export { campaignView, setPlayer, SCORE_NAMES, type CampaignView, type ScoreBreakdown } from "./campaignEnd.ts";
 export { STABILITY, stabilityOf, subjectLoyalty, type Stability, type StabilityPillar, type StabilityStep } from "./stability.ts";
 export { WORKS, WORK_COUNT, workIndex, type LandTileRow, type WorkRow } from "./works.ts";
 export { USES, type UseName } from "./land.ts";

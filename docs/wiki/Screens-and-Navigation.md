@@ -149,6 +149,8 @@ Lines are listed most urgent first. Each has an icon, one sentence and a Show bu
 
 **Final result.** The scores of your realm and the five leading realms, the outcome (your wins, or with none your place in each score, such as "No victory · Economy 2nd · Power 3rd · Technology 2nd"), the achievements earned in this campaign, and Main menu or Credits. Achievements are earned only in ironman campaigns, so outside ironman the screen says so instead of showing an empty list.
 
+**In the game today.** The ending is one card over the map, the end card. It opens by itself when the end date comes, when your realm holds no land any more, or when the January turn finds your world domination, and the clock stops. It says how the campaign ended with the date ("France was divided between England and Burgundy · 1444", "The campaign ends · 31 August 1939", "World domination · 1700"), the outcome line, your score breakdown, the leading realms and your highs. After the end date it offers **Look at the map** (the End turn button becomes a crown that opens the card again) and **New game**; after game over **Play on as another realm** (tap a realm, then Rule it; achievements end) and **New game**; after world domination **Keep playing** and **New game**. The wrap-up events, the closing sequence, Look back and Credits come later.
+
 ### Interruptions
 
 - **Going to the background** (home button, a call, the screen locks) writes down your orders if you gave any since the last save, and suspends sound.

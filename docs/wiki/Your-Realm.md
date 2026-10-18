@@ -272,10 +272,12 @@ You win by **world domination** or by **leading one of three scores**, each buil
 | **Power** | Provinces held (subjects' provinces count half) plus army power (soldiers weighted by kind, warships, commanders) |
 | **Technology** | Inventions known, each weighted by its era cost; nothing removes a known invention |
 
-- **World domination**: you, your subjects and your allies-by-marriage hold 60 % of the world's settled provinces.
-- **Score victory**: lead a score by 50 % over second place for 25 years, or lead it when the campaign's end date (default 31 August 1939) arrives.
+- **World domination**: you and your subjects hold half of the world's settled land provinces (land with people) in the turn in which 1 January falls. Allies by marriage do not count.
+- **Score victory**: lead a score when the campaign's end date (default 31 August 1939) arrives. Leading earlier wins nothing, however wide the margin.
 
-All three thresholds are placeholders. Army power counts foot as 1, horse as 2, guns as 3, a warship as 100 men and a commander as 1,000. Scores are checked every January. A domination win happens at once and you may play on. At the end date the leader of each score wins, and ties share the win.
+Army power counts foot as 1, horse as 2, guns as 3, a warship as 100 men and a commander as 1,000, all over 1,000; the weights are provisional. Scores are worked out at the start and every January. A domination win happens at once and you may keep playing. At the end date the leader of each score wins, and ties share the win.
+
+**Where you see it.** Every realm's General tab has a **Score** line: its Economy, Power and Technology with its rank in each. On your own card the line opens the **Score** tab: how each of your scores is made (income and bank; provinces and army power; inventions), your rank of how many realms still stand, and the five leading realms beside you. When the campaign ends the clock stops and the end card opens by itself (see [Screens and navigation](Screens-and-Navigation)).
 
 ### Each month
 
