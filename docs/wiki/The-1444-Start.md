@@ -239,6 +239,7 @@ The screens themselves are on [Screens and Navigation](Screens-and-Navigation).
 
 - **The date.** Every campaign, and the tutorial, starts on 11 November 1444. Mehmed II rules the Ottomans, and the union of Poland and Hungary has ended.
 - **Provinces.** People, wealth and castles come from the map. A province's people are counted in thousands, so Aube (Troyes) has 305 thousand.
+- **Strengths and reach.** Each realm carries its record's assessments and heritage, shown on its card's Heritage tab ([National Strengths](National-Strengths)), and its administrative capacity as a rank from 1 to 5 (0 without a record), which subjects will read for how far its rule reaches.
 - **Treasury and armies.** Each realm's starting gold, debt and recruits come from its assessment; the flat 50 gold and levies apply only to a realm without one.
 - **Relations.** Alliances, rivalries and wars at the start come from the relations list.
 - **Events.** "Historical" events follow history closely; "free" events allow plausible changes.

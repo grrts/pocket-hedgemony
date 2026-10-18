@@ -1,4 +1,4 @@
-// Screenshots the answer card of an envoy waiting at the player's court (DIPL-212) in the real dispatches
+// Screenshots the answer card of an envoy waiting at the player's court (DIPL-214) in the real dispatches
 // panel, on a phone in landscape and in a Tall (portrait) window, and measures its buttons. The card is
 // rendered by the game's own askCard (dev server), since an AI ask arrives only after months of play.
 // Phones play in landscape: a phone held upright is asked to turn sideways.

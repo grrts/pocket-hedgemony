@@ -8,13 +8,13 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Audio](audio/spec.md) | AUD | 143 | 15 | 290 | 14 | 1 |
 | [Buildings](buildings/spec.md) | BLD | 175 | 20 | 344 | 23 | 0 |
 | [Culture](culture/spec.md) | CULT | 93 | 7 | 191 | 17 | 0 |
-| [Diplomacy](diplomacy/spec.md) | DIPL | 212 | 23 | 519 | 37 | 0 |
+| [Diplomacy](diplomacy/spec.md) | DIPL | 210 | 23 | 519 | 36 | 0 |
 | [Events](events/spec.md) | EVT | 68 | 10 | 191 | 16 | 0 |
 | [Exploration](exploration/spec.md) | EXPL | 68 | 6 | 126 | 18 | 0 |
 | [Game shell](game-shell/spec.md) | SHELL | 148 | 15 | 403 | 24 | 0 |
 | [Government](government/spec.md) | GOV | 57 | 6 | 261 | 17 | 0 |
 | [Map presentation](map-presentation/spec.md) | VIEW | 87 | 9 | 166 | 9 | 1 |
-| [National strengths](national-strengths/spec.md) | HER | 79 | 12 | 137 | 17 | 0 |
+| [National strengths](national-strengths/spec.md) | HER | 83 | 13 | 141 | 18 | 0 |
 | [Naval](naval/spec.md) | NAVY | 125 | 9 | 259 | 29 | 0 |
 | [Onboarding](onboarding/spec.md) | TUT | 120 | 15 | 179 | 15 | 0 |
 | [Province](province/spec.md) | PROV | 216 | 26 | 612 | 29 | 0 |
@@ -25,7 +25,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Research](research/spec.md) | RSCH | 63 | 7 | 133 | 20 | 0 |
 | [Revolutions](revolutions/spec.md) | REVO | 81 | 14 | 235 | 15 | 1 |
 | [Saves](saves/spec.md) | SAVE | 104 | 11 | 212 | 15 | 1 |
-| [Scenario setup](scenario-setup/spec.md) | SETUP | 58 | 7 | 160 | 17 | 0 |
+| [Scenario setup](scenario-setup/spec.md) | SETUP | 59 | 7 | 164 | 17 | 0 |
 | [Settings](settings/spec.md) | SET | 130 | 12 | 394 | 18 | 1 |
 | [Subjects and overlords](subjects/spec.md) | SUBJ | 117 | 17 | 298 | 26 | 0 |
 | [Time and turns](time-and-turns/spec.md) | TIME | 76 | 7 | 181 | 15 | 0 |
@@ -33,6 +33,6 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Troop movement](troop-movement/spec.md) | MOVE | 133 | 12 | 246 | 20 | 0 |
 | [Warfare](warfare/spec.md) | WAR | 218 | 17 | 654 | 21 | 0 |
 | [World map](world-map/spec.md) | MAP | 50 | 6 | 175 | 12 | 0 |
-| **All 29 contexts** | | 3309 | 357 | 7919 | 554 | 8 |
+| **All 29 contexts** | | 3312 | 358 | 7927 | 554 | 8 |
 
 Scenarios count each row of a Scenario Outline's examples.

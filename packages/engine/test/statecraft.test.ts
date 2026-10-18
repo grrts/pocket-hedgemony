@@ -129,7 +129,7 @@ describe("statecraft (milestone 5)", () => {
     throw new Error("no ask arrived");
   }
 
-  it("waits for the player to answer a demand, and giving in makes them a Tributary at once (DIPL-209, DIPL-210)", () => {
+  it("waits for the player to answer a demand, and giving in makes them a Tributary at once (DIPL-211, DIPL-212)", () => {
     const w = createWorld(rules, 1, tiles);
     const asker = nation(w, "castile");
     const me = nation(w, "navarre");
@@ -148,7 +148,7 @@ describe("statecraft (milestone 5)", () => {
     expect(w.diplomacy.letters.some((l) => l.to === "castile" && l.from === "navarre" && l.action === "demand" && l.answer === "yes")).toBe(true);
   });
 
-  it("gives the asker a war aim when the player refuses, and counts silence as a refusal (DIPL-209)", () => {
+  it("gives the asker a war aim when the player refuses, and counts silence as a refusal (DIPL-211)", () => {
     const w = createWorld(rules, 1, tiles);
     const asker = nation(w, "castile");
     const me = nation(w, "navarre");
@@ -171,7 +171,7 @@ describe("statecraft (milestone 5)", () => {
     expect(quiet.diplomacy.refusedDemands.some((x) => x.asker === "castile" && x.asked === "navarre")).toBe(true);
   });
 
-  it("lets the player agree to an alliance an AI court proposes (DIPL-209, DIPL-210)", () => {
+  it("lets the player agree to an alliance an AI court proposes (DIPL-211, DIPL-212)", () => {
     const w = createWorld(rules, 1, tiles);
     const asker = nation(w, "portugal");
     const me = nation(w, "castile");

@@ -192,7 +192,7 @@ export function lettersReceived(d: Diplomacy, c: string): Letter[] {
   return d.letters.filter((l) => l.to === c && l.deliverOn <= monthOf(d.date));
 }
 
-/** Asks a country the player runs answers itself, not by the count (DIPL-209). */
+/** Asks a country the player runs answers itself, not by the count (DIPL-211). */
 export const PLAYER_ANSWERS = ["propose_alliance", "arrange_marriage", "demand", "offer_overlordship", "ask_protection"];
 
 const NO_COUNT = ["send_gift", "courtesy_visit", "make_resident", "court_lord", "fund_rebels", "peace_offer"];
@@ -213,7 +213,7 @@ export function decideMission(d: Diplomacy, e: Envoy, rng?: Rng): Count | undefi
     return undefined;
   }
   if (!country(d, ask.asked).ai && PLAYER_ANSWERS.includes(e.action)) {
-    // The player answers; the envoy waits at court until he leaves (DIPL-209).
+    // The player answers; the envoy waits at court until he leaves (DIPL-211).
     const now = monthOf(d.date);
     d.seq++;
     (d.asks ??= []).push({ id: `ask${d.seq}`, envoy: e.id, ask, arrived: now, until: e.leaveCourt ? monthOf(e.leaveCourt) : addMonths(now, C.envoys.months_at_court) });
@@ -227,7 +227,7 @@ export function decideMission(d: Diplomacy, e: Envoy, rng?: Rng): Count | undefi
   return count;
 }
 
-/** The player's own answer to an ask at their court (DIPL-210): what a counted yes or no does, and a letter to the asker. */
+/** The player's own answer to an ask at their court (DIPL-212): what a counted yes or no does, and a letter to the asker. */
 export function answerAsk(d: Diplomacy, id: string, yes: boolean, rng?: Rng): void {
   const p = (d.asks ?? []).find((x) => x.id === id);
   if (!p) throw new RuleError("that ask has lapsed");
@@ -238,7 +238,7 @@ export function answerAsk(d: Diplomacy, id: string, yes: boolean, rng?: Rng): vo
   applyAnswer(d, p.ask, yes, rng, e);
 }
 
-/** Asks the player left unanswered until the envoy leaves count as refused (DIPL-209). */
+/** Asks the player left unanswered until the envoy leaves count as refused (DIPL-211). */
 function lapseAsks(d: Diplomacy): void {
   const now = monthOf(d.date);
   for (const p of [...(d.asks ?? [])]) if (p.until <= now) answerAsk(d, p.id, false);

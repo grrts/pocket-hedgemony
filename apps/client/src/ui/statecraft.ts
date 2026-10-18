@@ -152,7 +152,7 @@ export function subjectCard(v: StatecraftView | null, r: number): string {
 
 type AskRow = StatecraftView["asks"][number];
 
-/** What an ask at your court is, and what agreeing and refusing do, in the card's words (DIPL-212). */
+/** What an ask at your court is, and what agreeing and refusing do, in the card's words (DIPL-214). */
 function askWords(a: AskRow): { asks: string; yes: string; no: string; agree: string } {
   switch (a.action) {
     case "demand":
@@ -177,7 +177,7 @@ function askWords(a: AskRow): { asks: string; yes: string; no: string; agree: st
   }
 }
 
-/** An envoy waiting at your court, as an answer card with Agree or Give in, and Refuse (DIPL-212). */
+/** An envoy waiting at your court, as an answer card with Agree or Give in, and Refuse (DIPL-214). */
 export function askCard(a: AskRow, realmButton: (n: number) => string): string {
   const w = askWords(a);
   return `<div class="call framed-soft">

@@ -275,7 +275,7 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   libraryEvents(world, news);
 }
 
-/** Acts on what the library reports: subject ties agreed, demands given in, and asks waiting on the player (DIPL-209). */
+/** Acts on what the library reports: subject ties agreed, demands given in, and asks waiting on the player (DIPL-211). */
 export function libraryEvents(world: World, news: News[]): void {
   const d = world.diplomacy;
   for (const e of d.events) {
@@ -325,7 +325,7 @@ function whyNotAnswer(world: World, n: number, p: dip.PendingAsk): string | null
   return null;
 }
 
-/** The player gives in to, agrees to or refuses an ask at their court (AnswerAsk, DIPL-210). */
+/** The player gives in to, agrees to or refuses an ask at their court (AnswerAsk, DIPL-212). */
 export function answerAsk(world: World, n: number, id: string, yes: boolean, news: News[]): string | null {
   const d = world.diplomacy;
   const p = (d.asks ?? []).find((x) => x.id === id);
@@ -446,7 +446,7 @@ export interface StatecraftView {
   realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView }>;
   /** The player's subjects and its own overlord (SUBJ-091, SUBJ-102). */
   subjects: SubjectsView | null;
-  /** Envoys waiting at the player's court for an answer, oldest first (DIPL-209): what they ask, and the month it stands until. */
+  /** Envoys waiting at the player's court for an answer, oldest first (DIPL-211): what they ask, and the month it stands until. */
   asks: AskView[];
 }
 

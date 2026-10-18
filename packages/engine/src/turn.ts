@@ -112,7 +112,7 @@ export type Order =
   | { type: "sendEnvoy"; target: number; action: string }
   | { type: "breakAlliance"; target: number }
   | { type: "makeDemand"; target: number; kind: string; province?: number }
-  /** Agree to, give in to or refuse an envoy's ask at the player's court (its id in the snapshot's statecraft asks, DIPL-210). */
+  /** Agree to, give in to or refuse an envoy's ask at the player's court (its id in the snapshot's statecraft asks, DIPL-212). */
   | { type: "answerAsk"; ask: string; yes: boolean }
   /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
   | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release"; level?: string }
@@ -203,7 +203,7 @@ function startDay(world: World, news: News[]): void {
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
     aiDeclarations(world, news);
-    // A demand made before war may reach the player's court this month (DIPL-211).
+    // A demand made before war may reach the player's court this month (DIPL-213).
     libraryEvents(world, news);
     aiRaise(world, news);
   }
