@@ -26,6 +26,7 @@ await page.evaluate((t) => {
 await page.waitForTimeout(300);
 console.log("declaring");
 await page.click("[data-declare]").catch((e) => console.log("declare:", e.message));
+await page.click("[data-declare-confirm]").catch((e) => console.log("confirm:", e.message));
 await page.waitForTimeout(300);
 await page.click(".panel .close").catch(() => {});
 let watched = false;

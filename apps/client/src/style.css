@@ -897,8 +897,8 @@ button.small {
 }
 
 .hud .at-war {
-  color: var(--paper, #f8ecc8);
-  background: var(--cloth);
+  color: var(--brass-light);
+  border-image-source: var(--ui-btn-wax);
   cursor: pointer;
 }
 
@@ -5750,4 +5750,229 @@ body.starting .map {
   .start-play {
     min-height: 56px;
   }
+}
+
+/* ---- The price of war (X-21: WAR-229 to WAR-232, DIPL-225, DIPL-226) ----
+ * Every line is a 44-point row that opens its reason on a tap; a line that
+ * hurts is red and carries a "!" so colour is never the only sign; bars carry
+ * their numbers as text. Nothing needs hover.
+ */
+details.pow-line {
+  border-bottom: 1px solid rgb(36 21 12 / 0.25);
+}
+details.pow-line > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  min-height: 44px;
+  padding: 2px 0;
+  list-style: none;
+  cursor: pointer;
+}
+details.pow-line > summary::-webkit-details-marker {
+  display: none;
+}
+details.pow-line > summary .what {
+  flex: 0 1 auto;
+  color: var(--ink-soft);
+}
+details.pow-line > summary .value {
+  flex: 1 1 auto;
+  text-align: right;
+  font-weight: 600;
+  color: var(--ink);
+}
+details.pow-line.hurt > summary .value,
+details.pow-line.hurt > summary .what {
+  color: var(--cloth);
+}
+details.pow-line > .hint {
+  margin: 0 0 6px 26px;
+  font-size: 17px;
+  line-height: 1.25;
+}
+.hurt-mark,
+.calm-mark {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+}
+.hurt-mark {
+  background: var(--cloth);
+  color: var(--paper-light);
+  border: 2px solid var(--outline);
+  font: 700 16px/1 var(--body);
+}
+.value .hurt-mark {
+  display: inline-flex;
+  margin: 0 4px 0 2px;
+  vertical-align: -2px;
+}
+
+/* The declare sheet: price left, terms right in the Wide layout; one column in the Tall one; Confirm pinned at the foot. */
+.panel.declaring {
+  padding-bottom: 0;
+}
+.declare-sheet {
+  container-type: inline-size;
+}
+.declare-cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 16px;
+}
+@media (orientation: landscape) {
+  @container (min-width: 600px) {
+    .declare-cols {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+}
+.declare-terms .censure-warn {
+  margin-top: 8px;
+}
+.declare-terms .name-abroad-link {
+  margin: 8px 0 4px;
+  min-height: 44px;
+}
+.declare-confirm {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 8px -8px 0;
+  padding: 8px 8px max(8px, env(safe-area-inset-bottom));
+  background: var(--ui-parchment) 0 0 / 64px repeat;
+  border-top: 3px solid var(--wood-dark);
+}
+.declare-confirm button {
+  min-height: 48px;
+  padding: 0 14px;
+}
+/* On a phone the card spans the screen: Confirm keeps clear of the End turn button. */
+@media not ((min-width: 900px) and (min-height: 600px)) {
+  .declare-confirm {
+    padding-right: calc(84px + env(safe-area-inset-right));
+  }
+}
+
+/* Peace voices: a bar with the half mark and the number as text (WAR-230, WAR-231). */
+.peace-bar,
+.lands-bar {
+  position: relative;
+  display: inline-block;
+  flex: 1 1 120px;
+  min-width: 90px;
+  max-width: 220px;
+  height: 14px;
+  background: var(--paper-light);
+  border: 2px solid var(--outline);
+}
+.peace-bar i,
+.lands-bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--ink-soft);
+}
+.peace-bar .half {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: calc(50% - 1px);
+  width: 2px;
+  background: var(--outline);
+}
+.peace-bar.amber i,
+.plaque-voices.amber .peace-bar i,
+.lands-bar.amber i {
+  background: #d98a1c;
+}
+.peace-bar.red i,
+.plaque-voices.red .peace-bar i,
+.lands-bar.red i {
+  background: var(--cloth);
+}
+.voices-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-height: 36px;
+  margin-left: 26px;
+}
+.voices-row .what {
+  min-width: 90px;
+}
+.voices-row .value {
+  font-weight: 600;
+}
+
+/* The war plaque's own bars (WAR-231): small, on the plaque's red. */
+.hud .at-war .plaque-voices {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 4px;
+}
+.hud .at-war .peace-bar.small {
+  flex: none;
+  width: 34px;
+  min-width: 0;
+  height: 10px;
+  background: var(--wood-dark);
+  border: 2px solid var(--paper-light);
+}
+.hud .at-war .plaque-voices:not(.amber):not(.red) .peace-bar i {
+  background: var(--paper-light);
+}
+.hud .at-war .plaque-voices.red .peace-bar i {
+  background: #ff6a4d;
+}
+.hud .at-war .peace-bar.small .half {
+  top: -2px;
+  bottom: -2px;
+  background: var(--paper-light);
+}
+.hud .at-war .plaque-voices small {
+  font-size: 16px;
+  color: var(--brass-light);
+}
+
+/* The war card (WAR-230) and Your name abroad (DIPL-225). */
+.war-card,
+.name-abroad {
+  scroll-margin-top: 56px;
+}
+.war-card .war-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px;
+}
+.war-card .sides {
+  margin: 0 0 2px;
+}
+.name-abroad h3.sub {
+  margin-top: 0;
+}
+.league-members {
+  margin: 0 0 4px 26px;
+  padding: 0;
+  list-style: none;
+}
+.league-members li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 44px;
+}
+.league-members button.realm-link {
+  min-height: 44px;
 }

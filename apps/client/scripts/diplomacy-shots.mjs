@@ -41,6 +41,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   });
   await page.waitForTimeout(300);
   await page.click("[data-declare]");
+  await page.click("[data-declare-confirm]");
   await page.waitForTimeout(300);
   await page.click("#panel .close");
   await page.waitForTimeout(300);
