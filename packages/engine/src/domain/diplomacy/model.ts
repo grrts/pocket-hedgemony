@@ -44,6 +44,8 @@ export interface Country {
   noOfficials: boolean;
   officials: Official[];
   extraSeats: number;
+  /** Extra officials at court ready to go abroad as envoys, from the catalogue's diplomatic influence (REALM-130). */
+  courtEnvoys?: number;
   landsTaken: number;
   /** Dates of Oaths broken (realm keeps the stat; diplomacy reports them). */
   oaths: string[];
@@ -369,6 +371,7 @@ export function country(d: Diplomacy, id: string): Country {
       noOfficials: false,
       officials: [],
       extraSeats: 0,
+      courtEnvoys: 0,
       landsTaken: 0,
       oaths: [],
       castles: 0,

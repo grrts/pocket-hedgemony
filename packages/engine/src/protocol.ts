@@ -5,6 +5,7 @@ import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, type GovernmentView } from "./government.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
+import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
@@ -20,6 +21,7 @@ import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages } from "./tiles.ts";
+import { navyView, type NavyView } from "./navy.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
@@ -171,6 +173,8 @@ export interface Snapshot {
   provinceRebels: Int32Array;
   /** Every realm's government form by name, for its card. */
   realmForms: string[];
+  /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
+  peoples: PeoplesSnapshot;
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -184,7 +188,9 @@ export interface Snapshot {
   /** Years the official at each post has served there, to one decimal (0 when empty); his effect grows to full at 5 (see officialEffect). */
   provinceOfficialYears: number[];
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
-  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string }[];
+  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number }[];
+  /** Ports, sailors and fleets: every fleet for the map, the player's ports and fleets in full (navy.ts). */
+  navy: NavyView;
   armies: {
     id: Int32Array;
     owner: Int16Array;
@@ -390,6 +396,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       rebels: rebelsView(w),
       provinceRebels: w.provinceRebels.slice(),
       realmForms: realmForms(w),
+      peoples: peoplesSnapshot(w),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
@@ -407,7 +414,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         army: live.findIndex((slot) => a.commander[slot] === k),
         home: w.commanderHome[k]!,
         origin: c.origin ?? "",
+        fleet: w.navy.fleets.find((f) => f.admiral === k)?.id ?? -1,
       })),
+      navy: navyView(w, player),
       arms: ARMS,
       research: player >= 0 ? researchView(w, player, ARMS) : null,
       realmResearch: realmResearch(w),

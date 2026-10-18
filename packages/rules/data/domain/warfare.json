@@ -388,5 +388,23 @@
   { "era": "VII", "name": "Motti", "from": "Finland", "needs": [], "approach": "Ambush", "rule": "Sprung companies split an enemy sector in two: each half fights alone", "effects": { "split_sector": true }, "stale": [["W22"]], "kind": "foot", "after_1939": true },
   { "era": "VII", "name": "People's war", "from": "Chinese communists, Yugoslav partisans, other partisans", "needs": [], "approach": "Ambush", "rule": "In occupied homeland provinces, rebel bands form for you each month", "effects": { "rebel_bands_occupied": true }, "stale": [], "kind": "foot", "after_1939": true },
   { "era": "VII", "name": "Banzai charge", "from": "Japan", "needs": [], "approach": "Assault", "rule": "Breaks are delayed by one bell; losses x2 for both sides", "effects": { "break_delay_bells": 1, "losses": 2 }, "stale": [["W19"]], "kind": "foot", "after_1939": true }
- ]
+ ],
+ "ships": {
+  "$comment": "Warfare 11.1 (warfare owns ships' fighting strength and room, D-NAVY-5): what each ship fights with and how many men it carries. Turtle ships fight 80 near their home coast and 20 at sea; until home coasts exist they count 20. Caravel and fluyt are naval's proposal (naval §10); steamer, small craft and voyaging canoe are provisional.",
+  "galley": { "fights": 20, "carries": 200 },
+  "cog": { "fights": 5, "carries": 300 },
+  "junk": { "fights": 5, "carries": 300 },
+  "dhow": { "fights": 5, "carries": 300 },
+  "war canoe fleet": { "fights": 8, "carries": 100 },
+  "carrack": { "fights": 15, "carries": 400 },
+  "armed carrack": { "fights": 40, "carries": 300 },
+  "galleon": { "fights": 60, "carries": 500 },
+  "turtle ship": { "fights": 20, "carries": 0 },
+  "ship of the line": { "fights": 150, "carries": 0 },
+  "caravel": { "fights": 8, "carries": 60 },
+  "fluyt": { "fights": 2, "carries": 300 },
+  "steamer": { "fights": 5, "carries": 600 },
+  "small craft": { "fights": 0, "carries": 10 },
+  "voyaging canoe": { "fights": 0, "carries": 20 }
+ }
 }

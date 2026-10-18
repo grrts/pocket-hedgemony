@@ -385,6 +385,12 @@ export function orderShape(order: Order): string {
       return "answer a rising";
     case "treatRebels":
       return "judge beaten rebels";
+    case "navy":
+      return `navy: ${order.do}`;
+    case "tonguePolicy":
+      return "set the Tongue policy";
+    case "faithPolicy":
+      return "set a Faith policy";
   }
 }
 

@@ -24,11 +24,12 @@ describe("statecraft (milestone 5)", () => {
     const me = nation(w, "castile");
     const them = nation(w, "portugal");
     w.player = me;
-    expect(seatsOf(w, me)).toEqual({ seats: 2, free: 2 });
+    // 1 seat, 1 for more than 10 provinces, 1 envoy at court from Castile's standing abroad (REALM-130).
+    expect(seatsOf(w, me)).toEqual({ seats: 3, free: 3 });
     const before = standingOf(w, them, me).standing;
     const r = processTurn(w, [{ type: "sendEnvoy", target: them, action: "courtesy_visit" }], me);
     expect(r.rejectedOrders).toEqual([]);
-    expect(seatsOf(w, me).free).toBe(1);
+    expect(seatsOf(w, me).free).toBe(2);
     expect(whyNotEnvoy(w, me, them, "send_gift")).toBe("an envoy is already on the way");
     const news = months(w, 4, me);
     expect(standingOf(w, them, me).standing).toBe(before + 15);
@@ -60,6 +61,7 @@ describe("statecraft (milestone 5)", () => {
     processTurn(w, [{ type: "sendEnvoy", target: nation(w, "portugal"), action: "send_gift" }], me);
     expect(w.nationTreasury[me]).toBeLessThanOrEqual(100 - giftGold(w) + 1);
     processTurn(w, [{ type: "sendEnvoy", target: nation(w, "france"), action: "courtesy_visit" }], me);
+    processTurn(w, [{ type: "sendEnvoy", target: nation(w, "england"), action: "courtesy_visit" }], me);
     expect(whyNotEnvoy(w, me, nation(w, "navarre"), "courtesy_visit")).toBe("no free envoy: every seat is taken");
     const fresh = createWorld(rules, 1, tiles);
     fresh.player = me;
@@ -168,7 +170,8 @@ describe("statecraft (milestone 5)", () => {
     expect(makeDemand(quiet, asker, me, "pay_tribute")).toBeNull();
     askArrives(quiet, me, asker);
     months(quiet, 2, me);
-    expect(statecraftView(quiet, me)!.asks).toEqual([]);
+    // Other courts may have asks of their own by then (more envoys at court, REALM-230).
+    expect(statecraftView(quiet, me)!.asks.filter((a) => a.from === asker)).toEqual([]);
     expect(quiet.diplomacy.refusedDemands.some((x) => x.asker === "castile" && x.asked === "navarre")).toBe(true);
   });
 

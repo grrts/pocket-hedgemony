@@ -82,6 +82,15 @@ export function hashWorld(world: World): string {
   feed(rebelsHashData(world));
   feed(world.provinceLightTax);
   feed(world.provinceSelfRule);
+  feed(world.provinceTongue);
+  feed(world.provinceTongueShare);
+  feed(world.provinceFaith);
+  feed(world.provinceFaithShare);
+  feed(world.provinceHouses);
+  feed(world.provinceHeldSince);
+  feed(world.nationTonguePolicy);
+  feed(world.nationFaithPolicy);
+  feed(world.nationFaithPending);
   feed(world.provinceOfficialSeed);
   feed(world.provinceOfficialSince);
   feed(live(a.trainArm));
