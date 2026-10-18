@@ -300,7 +300,17 @@ export const ICONS = {
     "...kkk....",
   ],
   menu: ["kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk", "..........", "kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk", "..........", "kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk"],
-  cog: ["....kk....", ".kk.kk.kk.", ".kwkwwkwk.", "..kwwwwk..", "kkwwkkwwkk", "kkwwkkwwkk", "..kwwwwk..", ".kwkwwkwk.", ".kk.kk.kk.", "....kk...."],
+  cog: [
+    "...kkk...",
+    ".kkkgkkk.",
+    ".kggggdk.",
+    "kkggkgdkk",
+    "kggk.kgdk",
+    "kkggkddkk",
+    ".kgddddk.",
+    ".kkkdkkk.",
+    "...kkk...",
+  ],
   anchor: [
     "...kkk...",
     "...kik...",

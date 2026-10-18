@@ -388,6 +388,20 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 - TUT-119 The onboarding context shall label the step note's face "The Grand Vizier". [D-TUT-2]
 - TUT-120 When the player picks "Mute this" on an entry, the onboarding context shall stop listing that one item; every mute can be undone in Settings. [D-TUT-1]
 
+### First-campaign hints (Leroy, 18 October 2026)
+- TUT-121 Where the setting "Tutorial hints" is on, the onboarding context shall show first-campaign hints one at a time, each naming one first action and pointing at the card or button to tap for it, in this order: pick a realm, move an army, end the turn, recruit, build, send an envoy (`first_hints`). [Leroy 18 Oct; D-TUT-16]
+- TUT-122 When the player does a hint's action, in any order and wherever they do it, the onboarding context shall tick that hint off and show the next open one; an order the game refuses ticks nothing. [D-TUT-16]
+- TUT-123 When the player dismisses a hint, the onboarding context shall tick it off without the action and show the next open one. [D-TUT-16]
+- TUT-124 The onboarding context shall keep which hints are done between campaigns and visits: open hints carry over to the next campaign, and once every hint is done none is shown again. [D-TUT-16]
+- TUT-125 When the player turns "Tutorial hints" off, from Settings or from the hint itself, the onboarding context shall hide the hints at once and keep which are done; turned on again, it shows the next open hint, and "Reset tutorial and hints" opens every hint again. [D-TUT-13, D-TUT-16]
+- TUT-126 While an event card, the game menu or one of its screens (Save, Load, Settings) is open, or a turn plays, the onboarding context shall hold the hint back, and show it again when the map is the player's. [D-TUT-16]
+
+#### How the player uses it: first-campaign hints
+- TUT-127 Where: a parchment note along the bottom of the screen says in one line what to tap, and a brass ring pulses around that button or card ("Choose a realm" around the realm list; Commanders, then a commander, then the map for a march; End turn; the Garrison tab, then Recruit; the Build tab, then Build; a neighbour's Diplomacy tab, then an envoy's mission). The note follows the player's taps: once the Garrison tab is open the ring moves to Recruit. When the thing to tap is not on screen, the note's Show me opens the card that holds it (the capital's Garrison or Build tab, the nearest neighbour's Diplomacy tab, the Commanders list). Its × dismisses that one hint; Stop hints turns the setting off. [X-19]
+- TUT-128 Grouping: one note, one hint at a time, never two; the switch and "Reset tutorial and hints" sit together in Settings under Gameplay, the one screen for the game's settings, which the cog in the side tools and the game menu both open. [X-19, SET-071]
+- TUT-129 Overview: the note's counter ("3 / 6") and the Settings row ("3 of 6 done") show at a glance how far the player has come. [X-19]
+- TUT-130 Phone: in landscape (Wide and Tall layouts, inside the safe areas) the note sits along the bottom between the overview button and End turn and moves under the top bar when the ring is low on the screen, so it never covers what it points at; it takes at most a third of the screen's height, its buttons are at least 44 points, the ring takes no taps so the button under it works as ever, the ring stands still where reduced motion is on, and nothing needs hover. In portrait a phone shows the turn-sideways notice over everything, the note included. [X-19, TUT-060, TUT-111]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -470,6 +484,7 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 | Same faith reason | Reason weight between Catholic members | +10 | from diplomacy | diplomacy config |
 | Hungary terms | Offers terms after failing to take one castle in | two months | yes | tutorial scenario |
 | goals period | Guided first turns visible for | first in-game year | yes | onboarding config |
+| `first_hints` | First-campaign hints: id, line, the action that ticks it, in order (D-TUT-16) | six hints: realm, move, end turn, recruit, build, envoy | no | onboarding config |
 | checks | Every Needs attention check, threshold, line, source | §4 table | yes | one checks config file |
 | army food warning | Reserve threshold | under 15 days | yes | checks config |
 | gold warning | Months of gold left (`under_months`) | under three months | yes | checks config |
@@ -532,6 +547,7 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 - **D-TUT-13** (was OQ-TUT-13) Detailed tooltips and Tutorial hints: "Detailed tooltips" (off by default) puts the "Why?" list inside the tooltip itself; "Why?" stays one tap away either way. "Tutorial hints" (on by default) shows or hides the guided first-turns goals list. Each switch gets one clear job.
 - **D-TUT-14** (was OQ-TUT-14) Free tier reference: the source is gap list 1, item 2 (Ottomans and France). Only the citation was wrong.
 - **D-TUT-15** (was OQ-TUT-15) Pastoral realms and lens marks: a pastoral realm gets the normal food goal "Choose how your castles share food"; the herds text is dropped. The tutorial's two lenses keep their non-colour marks (Food: hunger icon; Faith: hatching at 30 % or more). No herds rules exist, and both lenses already have marks.
+- **D-TUT-16** First-campaign hints (Leroy, 18 October 2026): before the goals list and the tutorial are built, the first campaign carries six one-line hints that point at the card or button to tap: pick a realm, move an army, end the turn, recruit, build, send an envoy. They are the first slice of guided first turns (§4), not a tutorial chapter: real screens, no scenario, no vizier. "Tutorial hints" switches them with the goals list, so the switch still has one job: the first-campaign guidance. Which hints are done is the player's, not the save's, so a second campaign does not teach them again.
 
 No onboarding question stays open.
 
@@ -566,3 +582,5 @@ No onboarding question stays open.
 | TUT-118 | guided-first-turns.feature | Tutorial hints switch the goals list |
 | TUT-119 | step-script.feature | The guide face is labelled The Grand Vizier |
 | TUT-120 | needs-attention.feature | Mute one item |
+| TUT-121 … TUT-126 | first-campaign-hints.feature | all scenarios |
+| TUT-127 … TUT-130 | first-campaign-hints.feature | How the player uses it (presentation, checked on a phone in landscape) |

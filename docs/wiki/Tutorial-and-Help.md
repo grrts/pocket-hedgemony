@@ -120,6 +120,12 @@ If you skipped the tutorial, or when you start your first real campaign after fi
 
 The list folds into a single icon with a count and never covers the map. Each goal's Show me runs the matching tutorial steps in your current campaign, without the tutorial's scenario overrides. Goals adapt to the realm: a realm with no lords skips "Check your lords", and a pastoral realm gets the same food goal as everyone else. Closing the list for good from its own menu hides it for good, and turning off "Tutorial hints" in Settings hides it too.
 
+### First-campaign hints
+
+In your first campaign a small parchment note along the bottom of the screen says what to tap next, and a brass ring pulses around the button or card it means. There are six, one at a time: choose a realm, move an army (Commanders, a commander, then the land to march to), end the turn, recruit (a province's Garrison tab, then Recruit), build (the Build tab, then Build) and send an envoy (a neighbour's Diplomacy tab, then a mission). Doing the thing ticks its hint off, in any order, and the next one appears; an order the game refuses ticks nothing. When what to tap is not on screen, Show me opens the card that holds it. The × dismisses one hint, and Stop hints turns them all off.
+
+The note sits between the overview button and End turn and moves under the top bar when what it points at is low, so it never covers it; the ring takes no taps, so the button under it works as ever. The counter ("3 / 6") shows how far you are. Hints wait while an event card or the game menu is open, or a week plays. Which hints are done stays with you, not with the save: a second campaign picks up where the first left off, and once all six are done they never come back. In Settings (the cog in the side tools, or the game menu), Gameplay holds the Tutorial hints switch with "n of 6 done" and "Reset tutorial and hints", which brings all six back.
+
 ### Needs attention
 
 There is no advisor in a real campaign; the vizier belongs to the tutorial. Instead, the Needs attention screen holds one-line entries, each with a Show button that moves the camera or opens the screen. It has two groups: **Warnings** first, then **Waiting for you**, which holds opportunities and then New entries. Opportunity lines state a fact; they never tell you what to do.

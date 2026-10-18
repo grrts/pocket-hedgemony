@@ -13,6 +13,8 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const BUILT = new Set([
   "gameplay.autosave",
   "gameplay.autosaves_kept",
+  "gameplay.tutorial_hints",
+  "gameplay.reset_tutorial_hints",
   "gameplay.turn_speed",
   "gameplay.battle_speed",
   "graphics.battery_saver",
@@ -26,6 +28,21 @@ const BUILT = new Set([
   "audio.interface_sounds",
   "accessibility.text_size",
 ]);
+
+/**
+ * Tutorial hints keep their own record of what the player has done
+ * (onboarding TUT-128, TUT-129); the Gameplay rows show and change it.
+ */
+export interface HintsRows {
+  on(): boolean;
+  progress(): { done: number; of: number };
+  setOn(on: boolean): void;
+  reset(): void;
+}
+let hintsRows: HintsRows | undefined;
+export function setHintsRows(rows: HintsRows): void {
+  hintsRows = rows;
+}
 
 const rowsOf = (section: string) => sectionRows(prefs, section, env).filter((id) => BUILT.has(id));
 const sections = () => prefs.cat.sections.filter((s) => rowsOf(s).length);
@@ -80,6 +97,7 @@ export function renderSettings(root: HTMLElement, close: () => void): void {
   });
   card.querySelector("[data-reset-section]")!.addEventListener("click", () => {
     resetPrefSection(ui.section);
+    if (ui.section === "gameplay") hintsRows?.setOn(true);
     renderSettings(root, close);
   });
   card.querySelectorAll<HTMLButtonElement>("[data-set]").forEach((b) =>
@@ -89,6 +107,15 @@ export function renderSettings(root: HTMLElement, close: () => void): void {
       keepScroll(root, () => renderSettings(root, close));
     }),
   );
+  card.querySelector("[data-hints-toggle]")?.addEventListener("click", () => {
+    hintsRows!.setOn(!hintsRows!.on());
+    keepScroll(root, () => renderSettings(root, close));
+  });
+  card.querySelector("[data-hints-reset]")?.addEventListener("click", () => {
+    hintsRows!.reset();
+    sound.sfx("ui_back");
+    keepScroll(root, () => renderSettings(root, close));
+  });
   card.querySelectorAll<HTMLInputElement>("[data-slide]").forEach((input) => {
     input.addEventListener("input", () => {
       setPref(input.dataset.slide!, Number(input.value));
@@ -101,6 +128,7 @@ export function renderSettings(root: HTMLElement, close: () => void): void {
   // A long press or a right-click on a row's name puts it back to its default (SET-015).
   card.querySelectorAll<HTMLElement>("[data-row]").forEach((row) => {
     const id = row.dataset.row!;
+    if (id.startsWith("gameplay.") && id.includes("tutorial_hints")) return;
     const name = row.querySelector<HTMLElement>(".set-label")!;
     let timer = 0;
     const reset = () => {
@@ -126,6 +154,7 @@ function keepScroll(root: HTMLElement, redraw: () => void): void {
 }
 
 function rowHtml(id: string): string {
+  if (id === "gameplay.tutorial_hints" || id === "gameplay.reset_tutorial_hints") return hintsRowHtml(id);
   const def = resolve(prefs.cat, id);
   const v = pref(id);
   const on = rowEnabled(prefs, id);
@@ -144,5 +173,23 @@ function rowHtml(id: string): string {
     <div class="set-row${on ? "" : " off"}" data-row="${id}">
       <div class="set-label"><b>${esc(nameOf(id))}</b><i class="changed" title="Changed from the default"${isChanged(prefs, id) ? "" : " hidden"}></i><small>${esc(by ?? descOf(id))}</small></div>
       <div class="set-control">${control}</div>
+    </div>`;
+}
+
+function hintsRowHtml(id: string): string {
+  if (!hintsRows) return "";
+  if (id === "gameplay.reset_tutorial_hints") {
+    return `
+    <div class="set-row" data-row="${id}">
+      <div class="set-label"><b>${esc(nameOf(id))}</b><small>${esc(descOf(id))}</small></div>
+      <div class="set-control"><button class="paper" data-hints-reset>Reset</button></div>
+    </div>`;
+  }
+  const on = hintsRows.on();
+  const p = hintsRows.progress();
+  return `
+    <div class="set-row" data-row="${id}">
+      <div class="set-label"><b>${esc(nameOf(id))}</b><i class="changed" title="Changed from the default"${on ? " hidden" : ""}></i><small>${p.done} of ${p.of} done</small></div>
+      <div class="set-control"><button class="paper toggle${on ? " on" : ""}" data-hints-toggle aria-pressed="${on}" data-sfx="${on ? "ui_toggle_off" : "ui_toggle_on"}">${on ? "On" : "Off"}</button></div>
     </div>`;
 }
