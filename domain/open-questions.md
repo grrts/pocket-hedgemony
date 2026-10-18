@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-564 decided and 8 still open across 29 contexts.
+565 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -309,6 +309,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-TUT-13**: (was OQ-TUT-13) Detailed tooltips and Tutorial hints: "Detailed tooltips" (off by default) puts the "Why?" list inside the tooltip itself; "Why?" stays one tap away either way. "Tutorial hints" (on by default) shows or hides the guided first-turns goals list. Each switch gets one clear job.
 - **D-TUT-14**: (was OQ-TUT-14) Free tier reference: the source is gap list 1, item 2 (Ottomans and France). Only the citation was wrong.
 - **D-TUT-15**: (was OQ-TUT-15) Pastoral realms and lens marks: a pastoral realm gets the normal food goal "Choose how your castles share food"; the herds text is dropped. The tutorial's two lenses keep their non-colour marks (Food: hunger icon; Faith: hatching at 30 % or more). No herds rules exist, and both lenses already have marks.
+- **D-TUT-16**: First-campaign hints (Leroy, 18 October 2026): before the goals list and the tutorial are built, the first campaign carries six one-line hints that point at the card or button to tap: pick a realm, move an army, end the turn, recruit, build, send an envoy. They are the first slice of guided first turns (§4), not a tutorial chapter: real screens, no scenario, no vizier. "Tutorial hints" switches them with the goals list, so the switch still has one job: the first-campaign guidance. Which hints are done is the player's, not the save's, so a second campaign does not teach them again.
 
 ### Province (province)
 
