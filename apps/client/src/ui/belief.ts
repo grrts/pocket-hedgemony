@@ -79,14 +79,17 @@ export function beliefFacts(s: PeoplesSnapshot, p: number): string {
   return out;
 }
 
-/** The General tab's two lines: court tongue and Tongue %, state faith and Faith %; on the player's card they open the Peoples tab. */
-export function beliefLines(v: PeoplesView, mine: boolean): string {
+/** The General tab's two lines: court tongue and Tongue %, state faith and Faith % with the head-of-the-faith badge (RELG-138); on the player's card they open the Peoples tab. */
+export function beliefLines(v: PeoplesView, mine: boolean, low: { faith: boolean; tongue: boolean; under: number } | null = null, badge = ""): string {
   const tongue = `${esc(v.courtName)} <small>${pct(v.tonguePercent)} of people · ${v.tongues.length} tongue${v.tongues.length === 1 ? "" : "s"}</small>`;
   const faith = `${esc(v.stateFaithName)} <small>${pct(v.faithPercent)} of people · ${v.faiths.length - 1} more faith${v.faiths.length === 2 ? "" : "s"}</small>`;
-  if (!mine) return `<dt>Tongue</dt><dd>${tongue}</dd><dt>Faith</dt><dd>${faith}</dd>`;
+  if (!mine) return `<dt>Tongue</dt><dd>${tongue}</dd><dt>Faith</dt><dd>${faith}${badge}</dd>`;
   const grieved = v.tongues.some((t) => t.grieved > 0) || v.faiths.some((f) => f.grieved > 0);
-  return `<dt>Tongue</dt><dd><button class="paper" data-realm-open-tab="peoples" title="Open the Peoples tab">${icon("scroll", 1)}${tongue}</button></dd>
-    <dt>Faith</dt><dd><button class="paper${grieved ? " over" : ""}" data-realm-open-tab="peoples" title="Open the Peoples tab">${icon("crown", 1)}${faith}</button></dd>`;
+  // Under the bar, the line says what a low share stirs (REALM-238).
+  const lowTongue = low?.tongue ? `<em class="warn">Under ${low.under} %: separatists rise more often, officials learn their posts slower</em>` : "";
+  const lowFaith = low?.faith ? `<em class="warn">Under ${low.under} %: faith risings come more often, lords of other faiths waver</em>` : "";
+  return `<dt>Tongue</dt><dd><button class="paper${low?.tongue ? " over" : ""}" data-realm-open-tab="peoples" title="Open the Peoples tab">${icon("scroll", 1)}${tongue}</button>${lowTongue}</dd>
+    <dt>Faith</dt><dd><button class="paper${grieved || low?.faith ? " over" : ""}" data-realm-open-tab="peoples" title="Open the Peoples tab">${icon("crown", 1)}${faith}</button>${badge}${lowFaith}</dd>`;
 }
 
 /** Where a tongue or faith lives: "in 34 provinces, most in 5". */

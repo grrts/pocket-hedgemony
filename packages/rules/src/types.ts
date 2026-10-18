@@ -105,7 +105,6 @@ export interface RecruitDefines {
   /** Treasury gold per domain gold. */
   goldScale: number;
   /** Weekly turns a levy spends gathering before it takes the field (recruiting: 2 weeks). */
-  gatherWeeks: number;
   /** Thousands a province can have waiting to gather at once: its recruit queue (Leroy, 17 Oct). */
   queueMax: number;
   /** Arms a realm can train in 1444, before any invention. */
@@ -120,8 +119,6 @@ export interface RecruitDefines {
   unpaidDesertion: number;
   /** Weekly turns a free company takes to arrive at the least; farther homes take longer. */
   mercenaryWeeks: number;
-  /** Gold to commission an official as a commander. */
-  commanderGold: number;
   /** First names for commanders the realm hires. */
   commanderNames: string[];
 }
@@ -255,7 +252,16 @@ export interface CultureNames {
   patronym?: string;
   /** Titles after the name: "Bey", "Khan". */
   title?: string[];
+  /**
+   * Ranks in the culture's own language (feedback 125), each a pattern with
+   * {name} where the name goes: "Almirante {name}", "{name} Taishō". A rank
+   * left out shows the name alone.
+   */
+  ranks?: Partial<Record<Rank, string>>;
 }
+
+/** What a commander is doing: leading an army, leading a fleet, or captaining a hired company. */
+export type Rank = "general" | "admiral" | "captain";
 
 /** Names for officials and commanders by culture, and each realm's culture (feedback 33). */
 export interface NameBook {

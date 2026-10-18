@@ -585,7 +585,8 @@ export function crowding(served: number, visitsSoFar: number): number {
   return visitsSoFar <= served ? 1 : served / visitsSoFar;
 }
 
-export type RouteMode = "loop" | "there_and_back" | "once";
+/** A route is walked there and back between its start and its end, or once, waiting at the end for orders (D-TRADE-21). */
+export type RouteMode = "there_and_back" | "once";
 
 export interface Route {
   stops: string[];
@@ -601,9 +602,11 @@ export interface Route {
 
 export type RouteCheck = { ok: true; route: Route } | { ok: false; reason: string };
 
-/** Checks and builds a route: 2 to 8 stops, every one a city; hubs are labels, never stops. */
+/** Checks and builds a route: a start and an end, both cities, never the same; hubs are labels, never stops (D-TRADE-21). */
 export function makeRoute(w: TradeWorld, stops: readonly string[], mode: RouteMode = config.route.default_mode as RouteMode): RouteCheck {
-  if (stops.length < config.route.min_stops || stops.length > config.route.max_stops) return { ok: false, reason: `a route has ${config.route.min_stops} to ${config.route.max_stops} stops` };
+  if (stops.length < config.route.min_stops || stops.length > config.route.max_stops) return { ok: false, reason: "a route has a start and an end" };
+  if (new Set(stops).size !== stops.length) return { ok: false, reason: "a route goes between two different cities" };
+  if (mode !== "there_and_back" && mode !== "once") return { ok: false, reason: "no such route mode" };
   for (const s of stops) {
     if (w.hubs.has(s)) return { ok: false, reason: `${s} is a hub, not a city` };
     const p = w.provinces.get(s);
@@ -646,25 +649,33 @@ export function advanceStop(t: Trader): void {
     r.next += r.direction;
     return;
   }
-  if (r.mode === "loop") r.next = 0;
-  else if (r.mode === "there_and_back") {
+  if (r.mode === "there_and_back") {
     r.direction = r.direction === 1 ? -1 : 1;
     r.next += r.direction;
   } else r.waiting = true;
+}
+
+/** How much quicker a way through busy land counts: 1 + busy weight × its people over the average, capped (D-TRADE-21). */
+export function busyFactor(busy: number): number {
+  return 1 + config.route.busy_weight * Math.min(Math.max(busy, 0), config.route.busy_cap);
 }
 
 export interface PathOption {
   provinces: string[];
   days: number;
   tolls: number;
+  /** The people along the path over the world's average, 1 for average land (D-TRADE-21); average when not given. */
+  busy?: number;
   /** Sea zones on the path (ships). */
   zones?: string[];
 }
 
 /**
  * Picks a path by the route planner's rule: fewest days with a toll counting
- * as 2 days, skipping forbidden provinces and zones where an enemy hunts when
- * another path exists.
+ * as 2 days, drawn toward the most populated land (the days divided by
+ * 1 + busy weight × the people along it over the average, D-TRADE-21),
+ * skipping forbidden provinces and zones where an enemy hunts when another
+ * path exists.
  */
 export function choosePath(options: readonly PathOption[], forbidden: (p: string) => boolean = () => false, dangerousZone: (z: string) => boolean = () => false): PathOption | null {
   const open = options.filter((o) => !o.provinces.some(forbidden));
@@ -673,7 +684,7 @@ export function choosePath(options: readonly PathOption[], forbidden: (p: string
   let best: PathOption | null = null;
   let bestCost = Infinity;
   for (const o of pool) {
-    const cost = o.days + o.tolls * config.route.toll_counts_as_days;
+    const cost = (o.days + o.tolls * config.route.toll_counts_as_days) / busyFactor(o.busy ?? 1);
     if (cost < bestCost) [best, bestCost] = [o, cost];
   }
   return best;
@@ -1549,13 +1560,17 @@ export function routePreview(w: TradeWorld, t: Trader, legs: readonly PreviewLeg
   };
 }
 
-/** Setting a route by taps (TRADE-096): cities tapped in order, finished by tapping the last stop again. */
+/** Setting a route by taps (TRADE-096): the start, then the end, finished by tapping the end again; another city moves the end (D-TRADE-21). */
 export function routeByTaps(taps: readonly string[]): { stops: string[]; finished: boolean; previews: number } {
   const stops: string[] = [];
   let previews = 0;
   for (const tap of taps) {
-    if (stops.length && stops[stops.length - 1] === tap) return { stops, finished: true, previews };
-    stops.push(tap);
+    if (stops.length && stops[stops.length - 1] === tap) {
+      if (stops.length >= config.route.min_stops) return { stops, finished: true, previews };
+      continue;
+    }
+    if (stops.length >= config.route.max_stops) stops[stops.length - 1] = tap;
+    else stops.push(tap);
     previews += 1;
   }
   return { stops, finished: false, previews };

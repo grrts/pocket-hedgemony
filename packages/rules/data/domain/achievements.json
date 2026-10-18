@@ -9,8 +9,8 @@
   "reserve_points_min": 100,
   "name_max": 24,
   "text_max": 100,
-  "launch_count": 71,
-  "launch_points": 680
+  "launch_count": 75,
+  "launch_points": 755
  },
  "moments": [
   "turn_end",
@@ -140,7 +140,8 @@
    },
    "refs": [
     "country-stats 3.1"
-   ]
+   ],
+   "ladder": "harvests"
   },
   {
    "id": "food_policy_set",
@@ -391,6 +392,86 @@
    ]
   },
   {
+   "id": "harvests_10",
+   "name": "Ten Harvests",
+   "text": "Bring in 10 province harvests, counted across all your campaigns.",
+   "category": "realm",
+   "tier": "copper",
+   "scope": "lifetime",
+   "moment": "harvest",
+   "test": {
+    "provinces_harvested_min": 10
+   },
+   "progress": {
+    "stat": "provinces_harvested",
+    "target": 10
+   },
+   "ladder": "harvests",
+   "refs": [
+    "country-stats 3.1"
+   ]
+  },
+  {
+   "id": "harvests_100",
+   "name": "A Hundred Harvests",
+   "text": "Bring in 100 province harvests, counted across all your campaigns.",
+   "category": "realm",
+   "tier": "silver",
+   "scope": "lifetime",
+   "moment": "harvest",
+   "test": {
+    "provinces_harvested_min": 100
+   },
+   "progress": {
+    "stat": "provinces_harvested",
+    "target": 100
+   },
+   "ladder": "harvests",
+   "refs": [
+    "country-stats 3.1"
+   ]
+  },
+  {
+   "id": "harvests_1000",
+   "name": "A Thousand Harvests",
+   "text": "Bring in 1,000 province harvests, counted across all your campaigns.",
+   "category": "realm",
+   "tier": "gold",
+   "scope": "lifetime",
+   "moment": "harvest",
+   "test": {
+    "provinces_harvested_min": 1000
+   },
+   "progress": {
+    "stat": "provinces_harvested",
+    "target": 1000
+   },
+   "ladder": "harvests",
+   "refs": [
+    "country-stats 3.1"
+   ]
+  },
+  {
+   "id": "harvests_10000",
+   "name": "Ten Thousand Harvests",
+   "text": "Bring in 10,000 province harvests, counted across all your campaigns.",
+   "category": "realm",
+   "tier": "crown",
+   "scope": "lifetime",
+   "moment": "harvest",
+   "test": {
+    "provinces_harvested_min": 10000
+   },
+   "progress": {
+    "stat": "provinces_harvested",
+    "target": 10000
+   },
+   "ladder": "harvests",
+   "refs": [
+    "country-stats 3.1"
+   ]
+  },
+  {
    "id": "lord_raised",
    "name": "Raised Up",
    "text": "Make a new lord.",
@@ -620,7 +701,7 @@
    "moment": "battle_end",
    "test": {
     "player_won": true,
-    "enemy_to_player_men_ratio_min": 2.0
+    "enemy_to_player_men_ratio_min": 2
    },
    "refs": [
     "warfare 7"
@@ -730,7 +811,7 @@
    "test": {
     "player_role": "defender",
     "player_won": true,
-    "enemy_to_player_people_ratio_min": 2.0,
+    "enemy_to_player_people_ratio_min": 2,
     "provinces_lost": 0
    },
    "refs": [

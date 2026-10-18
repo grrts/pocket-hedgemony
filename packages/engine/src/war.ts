@@ -1,4 +1,5 @@
 import { lordsLoseWar } from "./lords.ts";
+import { addFallen, fallenEffect } from "./fallen.ts";
 import { castleStep } from "./works.ts";
 import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
@@ -10,7 +11,7 @@ import { GROUNDS } from "./tiles.ts";
 import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
-import { officialBonus } from "./officials.ts";
+import { officialBonus, provinceTaken } from "./officials.ts";
 import { noteBattle, notePeace, noteSiege } from "./achievements.ts";
 import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
 import { heritageFactor } from "./heritage.ts";
@@ -27,7 +28,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade" | "ruler";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -283,6 +284,9 @@ export interface Battle {
   reason: string;
   attLead: number;
   defLead: number;
+  /** Share of each side's losses that are dead (killed, and wounded who die): the rest are taken or flee home. The fallen count it (REALM-096). */
+  attDead?: number;
+  defDead?: number;
 }
 
 /** How far, in tiles, an army looks for enemies to fight: its commander's cunning over a base, within bounds. */
@@ -460,6 +464,14 @@ function resolve(world: World, b: Battle): void {
     const f = wf.fledAfter(l.fled, held);
     return Math.min(men, Math.round(l.killed + w.die + w.prisoners + f.home));
   };
+  const deadOf = (side: string) => {
+    const l = r.losses[side]!;
+    const w = wf.woundedAfter(l.wounded, r.winner === side);
+    const all = l.killed + w.die + w.prisoners + wf.fledAfter(l.fled, r.winner === side).home;
+    return all > 0 ? (l.killed + w.die) / all : 1;
+  };
+  b.attDead = deadOf(an);
+  b.defDead = deadOf(dn);
   // What is still to be lost is what this result costs on top of what has been dealt.
   b.attLoss = b.attDealt + lostOf(an, attMen);
   b.defLoss = b.defDealt + lostOf(dn, defMen);
@@ -486,8 +498,8 @@ export function fightRound(world: World, news: News[]): void {
     const share = Math.min(1, b.round / b.rounds);
     const attNow = Math.round(b.attLoss * share) - b.attDealt;
     const defNow = Math.round(b.defLoss * share) - b.defDealt;
-    shareLosses(world, b.attackers, attNow);
-    shareLosses(world, b.defenders, defNow);
+    shareLosses(world, b.attackers, attNow, b.attDead ?? 1);
+    shareLosses(world, b.defenders, defNow, b.defDead ?? 1);
     b.attDealt += attNow;
     b.defDealt += defNow;
     if (b.round < b.rounds) continue;
@@ -522,13 +534,15 @@ const months = (m: number) => `${m} month${m === 1 ? "" : "s"}`;
 const sum = (slots: number[], arr: Int32Array) => slots.reduce((t, s) => t + arr[s]!, 0);
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
-function shareLosses(world: World, slots: number[], lost: number): void {
+/** Each army of a side loses its share of `lost` men; `dead` of them count among its realm's fallen (REALM-096). */
+function shareLosses(world: World, slots: number[], lost: number, dead: number): void {
   const a = world.armies;
   const total = sum(slots, a.men);
   if (total <= 0) return;
   for (const s of slots) {
     const share = a.men[s]! / total;
-    const cut = Math.round(lost * share);
+    const cut = Math.min(a.men[s]!, Math.round(lost * share));
+    addFallen(world, a.owner[s]!, cut * dead);
     const horseCut = a.men[s]! > 0 ? Math.round((cut * a.horse[s]!) / a.men[s]!) : 0;
     a.men[s] = Math.max(0, a.men[s]! - cut);
     a.horse[s] = Math.max(0, Math.min(a.men[s]!, a.horse[s]! - horseCut));
@@ -647,8 +661,11 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
       if (st.days % SIEGE_MONTH_DAYS === 0) {
         // A siege that is not closed lets food in (WAR-161).
         const store = st.siege.store;
+        const inside = st.siege.garrison;
         wf.siegeMonth(st.siege);
         if (!wf.isClosed(st.siege)) st.siege.store = store;
+        // The garrison's dead of the siege month are its realm's fallen.
+        addFallen(world, ctl, inside - st.siege.garrison);
         world.provinceGarrison[p] = st.siege.garrison;
         // A warden's garrison fights a storm as if a quarter stronger (province officials table).
         const warden = officialBonus(world, p, "Warden", "garrison");
@@ -659,7 +676,7 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
           occupy(world, p, leader, `${provinceName(world, p)} surrenders to ${name(world, leader)} after ${months(st.siege.months)}.`, news);
         } else if (wf.stormable(st.siege).can && besiegers >= st.siege.garrison * warden * world.rules.defines.war.stormRatio) {
           const terms = wf.storm(st.siege);
-          shareLosses(world, hostile, Math.round(st.siege.garrison * warden * terms.stormerLosses * (1 + terms.walls)));
+          shareLosses(world, hostile, Math.round(st.siege.garrison * warden * terms.stormerLosses * (1 + terms.walls)), 1);
           wf.endSiege(st.siege, "storm");
           noteSiege(world, leader, "stormed", p);
           occupy(world, p, leader, `${name(world, leader)} storms ${provinceName(world, p)} after ${months(st.siege.months)}.`, news);
@@ -719,7 +736,9 @@ export function peaceShare(world: World, side: number[], enemySide: number[]): n
   const ours = field(side);
   const theirs = field(enemySide);
   const outnumbered = theirs > 0 ? Math.min(0.25, Math.max(0, (theirs / Math.max(1, ours) - 1) / 8)) : 0;
-  return Math.min(1, (people > 0 ? lost / people : 0) + capital + outnumbered);
+  // The fallen of the last ten years turn the leader's people and lords toward peace (REALM-096).
+  const fallen = side.length ? fallenEffect(world, side[0]!).peace : 0;
+  return Math.min(1, (people > 0 ? lost / people : 0) + capital + outnumbered + fallen);
 }
 
 function sidesOf(world: World, war: dip.War, n: number): { ours: number[]; theirs: number[] } {
@@ -789,6 +808,7 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
   for (const p of ceded) {
     world.provinceOwner[p] = world.provinceOccupier[p]!;
     world.provinceLord[p] = -1;
+    provinceTaken(world, p);
   }
   // Every other occupation between the realms making peace ends.
   const set = new Set(involved);
@@ -831,6 +851,7 @@ export function cedeProvince(world: World, p: number, to: number, news: News[]):
   if (from < 0 || from === to) return;
   world.provinceOwner[p] = to;
   world.provinceLord[p] = -1;
+  provinceTaken(world, p);
   world.provinceOccupier[p] = -1;
   world.provinceHold[p] = 0;
   world.sieges.delete(p);

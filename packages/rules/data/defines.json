@@ -108,7 +108,6 @@
   "recruit": {
     "$comment": "Milestone 2, armies that cost something. Pay, training costs, the levy and the troop cap come from domain/recruiting.json and domain/warfare.json; these fit them to this game's economy and weekly turn. goldScale turns the domain's gold into the treasury's gold (one domain gold is 0.004 here).",
     "goldScale": 0.004,
-    "gatherWeeks": 2,
     "queueMax": 10,
     "armsAtStart": ["levy foot", "armoured foot", "pikes", "archers", "light horse", "knights and lancers"],
     "freeCompanyMen": { "$comment": "A free company's size in this age: never more than max men, some much smaller (Leroy: no fixed 1,000).", "min": 300, "max": 3000 },
@@ -127,7 +126,6 @@
     ],
     "unpaidDesertion": 0.05,
     "mercenaryWeeks": 4,
-    "commanderGold": 50,
     "commanderNames": ["Juan", "Pedro", "Rodrigo", "Jean", "Guillaume", "Louis", "Henry", "Richard", "Thomas", "Heinrich", "Konrad", "Albrecht", "Giovanni", "Niccolò", "Mehmed", "Ali", "Ivan", "Dmitri", "Jan", "Erik", "Olaf", "Andrzej", "János", "Duarte"]
   },
   "living": {

@@ -74,7 +74,7 @@ export function hashWorld(world: World): string {
   feed(live(a.drill));
   feed(live(a.mix, a.mix.length / a.alive.length));
   feed(new Int32Array(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats])));
-  feed(new Float64Array(world.musters.flatMap((m) => [m.nation, m.province, m.men, m.weeksLeft])));
+  feed(new Float64Array(world.musters.flatMap((m) => [m.nation, m.province, m.men, m.daysLeft])));
   feed(new Float64Array(world.mercs.flatMap((m) => [m.nation, m.company.id, m.weeksLeft])));
   feed(new Float64Array(world.freeCompanies.flatMap((c) => [c.id, c.home, ...c.byArm])));
   feed(world.provinceOfficial);
@@ -98,6 +98,8 @@ export function hashWorld(world: World): string {
   feed(world.nationFaithPending);
   feed(world.provinceOfficialSeed);
   feed(world.provinceOfficialSince);
+  feed(world.provinceOfficialFrom);
+  feed(world.provinceNewLand);
   feed(live(a.trainArm));
   feed(live(a.trainMen));
   feed(live(a.trainLeft));

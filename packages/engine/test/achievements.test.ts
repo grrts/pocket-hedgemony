@@ -46,6 +46,20 @@ describe("achievements in the live game", () => {
     expect(w.achievements!.campaign.counters.gold).toBeGreaterThanOrEqual(0);
   });
 
+  it("counts every province harvest for the device's lifetime total and leaves the ladder's lifetime levels to the device", () => {
+    const { w, me } = setup();
+    let added = 0;
+    for (let i = 0; i < 60; i++) {
+      processTurn(w, [], me);
+      added += achievementsView(w)!.added.provinces_harvested ?? 0;
+    }
+    expect(w.achievements!.harvestsSeen).toBeGreaterThan(0);
+    expect(added).toBe(w.achievements!.provincesHarvested);
+    expect(added).toBeGreaterThanOrEqual(w.achievements!.harvestsSeen);
+    expect(achievementsView(w)!.added).toEqual({});
+    expect(earned(w).some((id) => id.startsWith("harvests_"))).toBe(false);
+  });
+
   it("tests a moment at the turn's end: a castle stormed, a battle won against twice the men", () => {
     const { w, me } = setup();
     const foe = w.nationIndex.get("england")!;

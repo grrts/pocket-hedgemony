@@ -1301,6 +1301,9 @@ Then("the rebels accept", (s) => {
 });
 Given(/^the country "([^"]+)" is (\w+)$/, (s, name: string, faith: string) => {
   realm(s, name, faith);
+  // The heads of the faith steps read it too (faith-heads.steps.ts); "censured" there is a state, not a faith.
+  (s.fhFaiths ??= {})[name] = faith;
+  s.fhMe ??= name;
 });
 When(
   /^(its neighbour persecutes protestants in a province bordering Brandenburg|its preacher is killed in a foreign realm|a protestant holy place is held by another faith)$/,
@@ -1804,9 +1807,6 @@ Then(/^the holy places of the Pope, the Ecumenical Patriarch, a Caliph's claim a
   expect((s.heads1600 as { name: string }[]).map((h) => h.name)).toEqual(["the Pope", "the Ecumenical Patriarch", "a Caliph's claim", "the Dalai Lama"]);
   expect((s.heads1444 as { id: string }[]).map((h) => h.id)).not.toContain("dalai_lama");
   expect(G.churchHeads(Number(year)).map((h) => h.id)).toContain("dalai_lama");
-});
-Then("religion gives church heads no rules of their own", (s) => {
-  for (const h of s.heads1600 as Record<string, unknown>[]) expect(Object.keys(h).sort()).toEqual(["id", "name", "place"]);
 });
 
 Given(/^the people of "([^"]+)" convert to (\w+)$/, (s, name: string, faith: string) => {

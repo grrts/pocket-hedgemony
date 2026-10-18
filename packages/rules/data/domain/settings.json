@@ -1196,7 +1196,7 @@
     "settings.graphics.battery_saver.option.auto": "Auto",
     "settings.graphics.battery_saver.option.on": "On",
     "settings.graphics.map_detail.name": "Map detail",
-    "settings.graphics.map_detail.desc": "Close-in tiles, surf and forest blending.",
+    "settings.graphics.map_detail.desc": "Close-in tiles, surf, forest blending and the living map close in.",
     "settings.graphics.map_detail.option.low": "Low",
     "settings.graphics.map_detail.option.medium": "Medium",
     "settings.graphics.map_detail.option.high": "High",
