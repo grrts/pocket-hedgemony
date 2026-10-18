@@ -109,8 +109,11 @@ console.log(`${animFrames >= ANIM_SHARE ? "PASS" : "FAIL"} animating overlay red
 await shadeMap(true);
 
 // Ending turns: each day (or battle step) of the week as it plays, the engine
-// worker's answer, then taking it in on the main thread. One turn is played
-// first to warm up and is not timed. CI runners share their CPUs, so a single
+// worker's answer, then taking it in on the main thread. Turns are played
+// first to warm up and are not timed, up to and past the first 1st of a month
+// (3 turns from 11 November 1444), so the monthly steps run once before any
+// day is timed: the first run of a code path in the worker is far slower than
+// every later one, and that compile is not the turn the budget is about. CI runners share their CPUs, so a single
 // stalled day can break a budget that every other day meets by far: when an
 // attempt fails, three more turns are played as a fresh attempt, up to three
 // attempts. Every attempt must meet the same budgets to count, so a real
@@ -121,7 +124,7 @@ const playTurns = async (n) => {
     await page.waitForFunction(() => !document.querySelector(".end-turn").classList.contains("playing"), null, { timeout: 60000 });
   }
 };
-await playTurns(1);
+await playTurns(3);
 await page.evaluate(() => (performance.clearMeasures("turn-wait"), performance.clearMeasures("turn-apply")));
 const ATTEMPTS = 3;
 let turnsOk = false;

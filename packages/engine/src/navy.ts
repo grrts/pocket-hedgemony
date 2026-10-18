@@ -8,6 +8,7 @@ import { slotsOf, slotsUsed, WORK_COUNT, workIndex, worksAt } from "./works.ts";
 import { classesOf } from "./living.ts";
 import { armyOf, idleCommanders } from "./recruit.ts";
 import { halt, mayMarchInto } from "./turn.ts";
+import { noteMoment } from "./achievements.ts";
 
 /**
  * Ports, sailors, ships and fleets in play (domain/naval/spec.md), on the
@@ -852,6 +853,7 @@ function endSeaBattle(world: World, b: SeaBattle, loser: 0 | 1, news: News[]): v
     }
   }
   v.battles.splice(v.battles.indexOf(b), 1);
+  for (const s of [0, 1] as const) noteMoment(world, b.leaders[s], "sea_battle_end", { player_won: s === winner }, b.zone);
   dropEmpty(world);
   const who = (s: 0 | 1) => nationName(world, b.leaders[s]);
   news.push({

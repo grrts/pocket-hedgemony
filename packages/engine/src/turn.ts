@@ -16,6 +16,7 @@ import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
+import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -259,6 +260,8 @@ function endDay(world: World, news: News[]): void {
     // The player's ledger is kept current each week; every realm's is worked out when the month turns.
     if (world.player >= 0) runLedger(world, false, world.player);
     answerAiCalls(world, news);
+    // Achievement tests read the turn's final values, last of all (ACH-033).
+    turnEndAchievements(world);
     world.turn++;
   }
 }
@@ -341,9 +344,11 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return reason;
     }
     case "setFood":
-      return setFood(world, actingNation, order.castle, order.key, order.value);
-    case "foodPreset":
-      return setFoodPreset(world, actingNation, order.name);
+    case "foodPreset": {
+      const reason = order.type === "setFood" ? setFood(world, actingNation, order.castle, order.key, order.value) : setFoodPreset(world, actingNation, order.name);
+      if (!reason) noteMoment(world, actingNation, "food_policy_changed", { food_policy_changed: true });
+      return reason;
+    }
     case "changeTile": {
       const reason = orderChange(world, actingNation, order.province, order.change);
       if (!reason) runLedger(world, false);
