@@ -391,6 +391,8 @@ export function orderShape(order: Order): string {
       return "judge beaten rebels";
     case "navy":
       return `navy: ${order.do}`;
+    case "explore":
+      return `explore: ${order.do}`;
     case "tonguePolicy":
       return "set the Tongue policy";
     case "faithPolicy":
