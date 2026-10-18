@@ -118,7 +118,7 @@ export interface Snapshot {
   /** Wars under way, by nation index. */
   wars: { id: string; attackers: number[]; defenders: number[]; start: string }[];
   /** Peace offered to the player by an AI war leader, until the next month: terms as the AI sends them ("give": it gives up land the player holds). */
-  peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" }[];
+  peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" | "master" }[];
   /** Calls to arms waiting for the player's answer. */
   calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
   /** The player's standing with every other nation that has one. */

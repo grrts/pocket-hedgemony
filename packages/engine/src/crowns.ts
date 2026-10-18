@@ -1,7 +1,7 @@
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
-import { bondOf, foldInRealm, makeSubject, mergeCrownsRealm, monthNow } from "./subjects.ts";
+import { bondOf, endTie, foldInRealm, makeSubject, mergeCrownsRealm, monthNow } from "./subjects.ts";
 import config from "../../rules/data/domain/subjects.json" with { type: "json" };
 
 /**
@@ -82,7 +82,10 @@ export function inheritCrown(world: World, n: number, news: News[]): void {
   for (const house of marriedHouses(d, id)) {
     const h = world.nationIndex.get(house);
     if (h === undefined || world.nationGone[h]) continue;
-    if (rel.overlord(d.graph, house) || dip.warOf(d, house)) return;
+    // A union runs either way (SUBJ-136): the dead ruler's own subject inherits him, and the tie between them ends.
+    const ownSubject = rel.overlord(d.graph, house) === id;
+    if ((rel.overlord(d.graph, house) && !ownSubject) || dip.warOf(d, house)) return;
+    if (ownSubject) endTie(world, h);
     try {
       makeSubject(world, n, h, "union");
     } catch {

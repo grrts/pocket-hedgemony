@@ -5,7 +5,7 @@ import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
-import { riseUp, subjectAction } from "./subjects.ts";
+import { backersOf, bondOf, riseUp, subjectAction, subjectChoice } from "./subjects.ts";
 import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
@@ -129,6 +129,8 @@ export type Order =
   | { type: "court"; target: number; lord?: number; recall?: boolean }
   /** A Disloyal subject rises against its overlord (SUBJ-076, SUBJ-077). */
   | { type: "riseUp" }
+  /** A subject's own choices toward its overlord: stop paying, pay again, ask politely to loosen (SUBJ-131). */
+  | { type: "subjectChoice"; action: "stop_paying" | "pay" | "ask_loosen" }
   | { type: "stopChange"; province: number }
   /** Answer an event or take a decision waiting for the realm, with one of its options (AnswerEvent, EVT-044). */
   | { type: "answerEvent"; event: string; option: string }
@@ -391,8 +393,17 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
-    case "riseUp":
-      return riseUp(world, actingNation, news);
+    case "riseUp": {
+      // The first realm that would back the rising joins it (SUBJ-133).
+      const b = bondOf(world, actingNation);
+      const o = b ? world.nationIndex.get(b.overlord) : undefined;
+      return riseUp(world, actingNation, news, o === undefined ? undefined : backersOf(world, actingNation, o)[0]);
+    }
+    case "subjectChoice": {
+      const reason = subjectChoice(world, actingNation, order.action, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
     case "court":
       return order.recall ? recallCourting(world, actingNation, order.target, order.lord) : court(world, actingNation, order.target, order.lord);
     case "subjectAction": {

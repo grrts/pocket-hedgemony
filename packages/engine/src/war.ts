@@ -2,7 +2,7 @@ import { lordsLoseWar } from "./lords.ts";
 import { castleStep } from "./works.ts";
 import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
-import { independencePeace, subjectAnswersCall } from "./subjects.ts";
+import { independencePeace, subjectAnswersCall, tablesTurned, turnTables } from "./subjects.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { planRoute } from "./march.ts";
@@ -694,7 +694,8 @@ function occupy(world: World, p: number, by: number, text: string, news: News[])
 
 // ---------------------------------------------------------------- peace
 
-export type PeaceTerms = "take" | "white" | "give";
+/** "master": a subject that won its independence makes its old overlord its own subject (SUBJ-135). */
+export type PeaceTerms = "take" | "white" | "give" | "master";
 
 /**
  * How ready a side is to make peace, as a share of its voices (WAR-181): the
@@ -747,6 +748,14 @@ export function offerPeace(world: World, a: number, b: number, terms: PeaceTerms
   if (!war) return "you are not at war with them";
   const leaders = [war.declarer, war.target].map((id) => world.nationIndex.get(id)!);
   const whole = leaders.includes(a) && leaders.includes(b);
+  if (terms === "master") {
+    // Turning the tables (SUBJ-135): the voices are the rule's own, so the old overlord has no say.
+    const t = tablesTurned(world, war, a, b);
+    if (!whole || !t.kind) return whole ? t.why : "only between the war's leaders";
+    makePeace(world, war, true, a, b, [], news);
+    turnTables(world, a, b, t.kind, news);
+    return null;
+  }
   const { ours, theirs } = sidesOf(world, war, a);
   const sideA = whole ? ours : [a];
   const sideB = whole ? theirs : [b];
