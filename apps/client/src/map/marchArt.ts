@@ -12,46 +12,6 @@ import { sprite, type SpriteName } from "../art/sprites.ts";
 type Ctx = CanvasRenderingContext2D;
 type Pt = [number, number];
 
-// ---- a 3×5 pixel font for numbers on the map ----
-const GLYPHS: Record<string, string[]> = {
-  "0": ["###", "#.#", "#.#", "#.#", "###"],
-  "1": [".#.", "##.", ".#.", ".#.", "###"],
-  "2": ["##.", "..#", ".#.", "#..", "###"],
-  "3": ["##.", "..#", ".#.", "..#", "##."],
-  "4": ["#.#", "#.#", "###", "..#", "..#"],
-  "5": ["###", "#..", "##.", "..#", "##."],
-  "6": [".##", "#..", "###", "#.#", "###"],
-  "7": ["###", "..#", ".#.", ".#.", ".#."],
-  "8": ["###", "#.#", "###", "#.#", "###"],
-  "9": ["###", "#.#", "###", "..#", "##."],
-  K: ["#.#", "#.#", "##.", "#.#", "#.#"],
-  ".": ["...", "...", "...", "...", ".#."],
-  "-": ["...", "...", "###", "...", "..."],
-  "+": ["...", ".#.", "###", ".#.", "..."],
-};
-
-/** Width in art pixels of a string in the map's number font (a gap of one between glyphs). */
-export function digitsWidth(text: string): number {
-  return [...text].reduce((w, ch) => w + (ch === "." ? 1 : 3) + 1, -1);
-}
-
-/** Draws text in the number font, its top-left at x, y. */
-export function drawDigits(ctx: Ctx, text: string, x: number, y: number, u: number, color: string): void {
-  ctx.fillStyle = color;
-  let cx = x;
-  for (const ch of text.toUpperCase()) {
-    const g = GLYPHS[ch];
-    if (!g) {
-      cx += 2 * u;
-      continue;
-    }
-    const narrow = ch === ".";
-    for (let r = 0; r < 5; r++)
-      for (let c = narrow ? 1 : 0; c < (narrow ? 2 : 3); c++) if (g[r]![c] === "#") ctx.fillRect(cx + (c - (narrow ? 1 : 0)) * u, y + r * u, u, u);
-    cx += ((narrow ? 1 : 3) + 1) * u;
-  }
-}
-
 /** Men as a short count: "800", "4.5K", "12K". Tenths under ten thousand, so a change of a few hundred shows. */
 export function menShort(men: number): string {
   if (men < 1000) return String(Math.round(men));
@@ -59,23 +19,72 @@ export function menShort(men: number): string {
   return k < 10 ? `${(Math.round(k * 10) / 10).toFixed(1).replace(/\.0$/, "")}K` : `${Math.round(k)}K`;
 }
 
-/** A plate in a realm's colour with ink rim and a number on it, centred on x with its top at y. Returns its height. */
-export function drawPlate(ctx: Ctx, text: string, x: number, y: number, u: number, color: string, textColor: string = PALETTE.paper): number {
-  const w = (digitsWidth(text) + 4) * u;
-  const h = 9 * u;
-  const left = Math.round(x - w / 2);
-  const top = Math.round(y);
-  ctx.fillStyle = PALETTE.ink;
-  ctx.fillRect(left + u, top, w - 2 * u, h);
-  ctx.fillRect(left, top + u, w, h - 2 * u);
-  ctx.fillStyle = color;
-  ctx.fillRect(left + u, top + u, w - 2 * u, h - 2 * u);
-  // A dark lip along the bottom for depth.
-  ctx.fillStyle = "rgb(0 0 0 / 0.28)";
-  ctx.fillRect(left + u, top + h - 3 * u, w - 2 * u, u);
-  // Ink under the numbers so they read on light realm colours too.
-  drawDigits(ctx, text, left + 2 * u + u, top + 2 * u, u, PALETTE.ink);
-  drawDigits(ctx, text, left + 2 * u, top + 2 * u, u, textColor);
+/** Parchment and ink of the panels, so the map's number tags read as part of the same UI. */
+const TAG_PAPER = "#f8ecc8";
+const TAG_INK = "#3a2414";
+/** Height in art pixels of a number tag. */
+const TAG_H = 11;
+const TAG_FONT = '"Jersey 10", "Courier New", monospace';
+const tagCache = new Map<string, HTMLCanvasElement>();
+// Tags drawn before the font arrived used a fallback; redraw them.
+document.fonts?.addEventListener("loadingdone", () => tagCache.clear());
+
+/** Width in CSS pixels of a number tag for this text (feedback: counts were hard to read). */
+export function plateWidth(text: string, u: number): number {
+  return plateBitmap(text, u, PALETTE.ink).width / tagDpr();
+}
+
+const tagDpr = () => Math.min(window.devicePixelRatio || 1, 2);
+
+/**
+ * A number tag: light parchment with an ink rim and cut corners, the number in the
+ * UI's font in dark ink, and a strip of the realm's colour along the bottom.
+ * Drawn once per text, size and colour, then reused.
+ */
+function plateBitmap(text: string, u: number, color: string): HTMLCanvasElement {
+  const key = `${u}|${color}|${text}`;
+  const hit = tagCache.get(key);
+  if (hit) return hit;
+  const dpr = tagDpr();
+  const fontPx = Math.round(9 * u * 1.15);
+  const font = `${fontPx}px ${TAG_FONT}`;
+  const canvas = document.createElement("canvas");
+  const c = canvas.getContext("2d")!;
+  c.font = font;
+  const textW = Math.ceil(c.measureText(text).width);
+  // Whole art pixels wide, with room either side of the number.
+  const w = (Math.ceil(textW / u) + 6) * u;
+  const h = TAG_H * u;
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  c.scale(dpr, dpr);
+  c.fillStyle = PALETTE.ink;
+  c.fillRect(u, 0, w - 2 * u, h);
+  c.fillRect(0, u, w, h - 2 * u);
+  c.fillStyle = TAG_PAPER;
+  c.fillRect(u, u, w - 2 * u, h - 2 * u);
+  // The realm's colour along the bottom, an ink line above it so pale colours still show.
+  c.fillStyle = color;
+  c.fillRect(u, h - 3 * u, w - 2 * u, 2 * u);
+  c.fillStyle = "rgb(26 28 44 / 0.45)";
+  c.fillRect(u, h - 4 * u, w - 2 * u, u);
+  c.font = font;
+  c.fillStyle = TAG_INK;
+  c.textAlign = "center";
+  c.textBaseline = "middle";
+  c.fillText(text, w / 2, Math.round((h - 3 * u) / 2) + u * 0.5);
+  tagCache.set(key, canvas);
+  if (tagCache.size > 600) tagCache.delete(tagCache.keys().next().value!);
+  return canvas;
+}
+
+/** A number tag in a realm's colour, centred on x with its top at y. Returns its height. */
+export function drawPlate(ctx: Ctx, text: string, x: number, y: number, u: number, color: string): number {
+  const img = plateBitmap(text, u, color);
+  const dpr = tagDpr();
+  const w = img.width / dpr;
+  const h = img.height / dpr;
+  ctx.drawImage(img, Math.round(x - w / 2), Math.round(y), w, h);
   return h;
 }
 
@@ -169,7 +178,7 @@ export function drawToken(ctx: Ctx, s: TokenStyle): { x: number; y: number; w: n
   }
   // Flag and men count side by side, centred under the figure, the flag's middle on the plate's.
   const gap = u;
-  const plateW = (digitsWidth(text) + 4) * u;
+  const plateW = plateWidth(text, u);
   const left = Math.round(s.x - (s.flag.width + gap + plateW) / 2);
   const plateH = drawPlate(ctx, text, left + s.flag.width + gap + plateW / 2, plateTop, u, s.color);
   ctx.drawImage(s.flag, left, Math.round(plateTop + (plateH - s.flag.height) / 2));
@@ -227,19 +236,7 @@ export function drawRoute(ctx: Ctx, r: RouteStyle): void {
 
 /** A numbered marker for where the army will be when a week ends. */
 function drawWeekMark(ctx: Ctx, x: number, y: number, u: number, n: number, color: string): void {
-  const text = String(n);
-  const w = (digitsWidth(text) + 4) * u;
-  const h = 9 * u;
-  const left = Math.round(x - w / 2);
-  const top = Math.round(y - h / 2);
-  ctx.fillStyle = PALETTE.ink;
-  ctx.fillRect(left + u, top, w - 2 * u, h);
-  ctx.fillRect(left, top + u, w, h - 2 * u);
-  ctx.fillStyle = PALETTE.paper;
-  ctx.fillRect(left + u, top + u, w - 2 * u, h - 2 * u);
-  ctx.fillStyle = color;
-  ctx.fillRect(left + u, top + h - 3 * u, w - 2 * u, u);
-  drawDigits(ctx, text, left + 2 * u, top + 2 * u, u, PALETTE.ink);
+  drawPlate(ctx, String(n), x, y - (TAG_H * u) / 2, u, color);
 }
 
 /** A small standard planted with the foot of its pole dead centre on x, y. */
