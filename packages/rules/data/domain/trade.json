@@ -170,10 +170,13 @@
     "needs_invention_for_abroad": "T3"
   },
   "route": {
+    "$comment": "D-TRADE-21: a route is a start and an end, walked there and back; the planner finds the way, drawn toward the most populated land: a province's days count divided by 1 + busy_weight x its people over the world's average, at most busy_cap times the average.",
     "min_stops": 2,
-    "max_stops": 8,
-    "default_mode": "loop",
-    "toll_counts_as_days": 2
+    "max_stops": 2,
+    "default_mode": "there_and_back",
+    "toll_counts_as_days": 2,
+    "busy_weight": 1,
+    "busy_cap": 3
   },
   "tolls": {
     "none": 0,
@@ -349,8 +352,6 @@
         "label": "galley line",
         "stops": [
           "Venice",
-          "Corfu",
-          "Candia",
           "Alexandria"
         ]
       },
@@ -365,8 +366,6 @@
         "country": "Genoa",
         "stops": [
           "Genoa",
-          "Chios",
-          "Pera",
           "Caffa"
         ]
       },
@@ -374,7 +373,12 @@
         "country": "Lübeck",
         "stops": [
           "Lübeck",
-          "Bergen",
+          "Bergen"
+        ]
+      },
+      {
+        "country": "Lübeck",
+        "stops": [
           "Lübeck",
           "Bruges"
         ]
@@ -392,7 +396,6 @@
         "label": "caravan",
         "stops": [
           "Florence",
-          "Bologna",
           "Venice"
         ]
       },
@@ -401,7 +404,6 @@
         "label": "camel caravan",
         "stops": [
           "Timbuktu",
-          "Taghaza",
           "Sijilmasa"
         ]
       },
@@ -410,9 +412,14 @@
         "label": "dhow",
         "stops": [
           "Kilwa",
-          "Sofala",
+          "Sofala"
+        ]
+      },
+      {
+        "country": "Kilwa",
+        "label": "dhow",
+        "stops": [
           "Kilwa",
-          "Mombasa",
           "Malindi"
         ]
       },
@@ -421,7 +428,6 @@
         "label": "dhow",
         "stops": [
           "Calicut",
-          "Hormuz",
           "Aden"
         ]
       },
@@ -437,7 +443,6 @@
         "country": "Malacca",
         "stops": [
           "Malacca",
-          "Pasai",
           "Calicut"
         ]
       },
@@ -446,7 +451,13 @@
         "label": "junk",
         "stops": [
           "Naha",
-          "Fuzhou",
+          "Fuzhou"
+        ]
+      },
+      {
+        "country": "Ryukyu",
+        "label": "junk",
+        "stops": [
           "Naha",
           "Hakata"
         ]
@@ -598,6 +609,8 @@
     "collect.foreign_market_fee",
     "deposit.bills_of_exchange_fee",
     "route.toll_counts_as_days",
+    "route.busy_weight",
+    "route.busy_cap",
     "tolls.low",
     "tolls.high",
     "danger",

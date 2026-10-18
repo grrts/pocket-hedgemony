@@ -982,6 +982,15 @@ export function countryCard(c: CardInput): { text: string; stat: Stat | "schools
   return lines;
 }
 
+/** Lines REALM-176 moves off the General tab to the Diplomacy tab. */
+const DIPLOMACY_STATS = new Set<string>(["allies", "enemies", "oaths_broken"]);
+
+/** The country card split by tab (REALM-176): the General tab keeps the summary lines, the Diplomacy tab takes Allies, Enemies and Oaths broken. */
+export function cardTabs(c: CardInput): { general: string[]; diplomacy: string[] } {
+  const lines = countryCard(c);
+  return { general: lines.filter((l) => !DIPLOMACY_STATS.has(l.stat)).map((l) => l.text), diplomacy: lines.filter((l) => DIPLOMACY_STATS.has(l.stat)).map((l) => l.text) };
+}
+
 /** Re-exported so callers can check an invention's realm effects (e.g. officials per province). */
 export { effectsOf };
 
@@ -1377,7 +1386,7 @@ export function standingFrom1444(relations: readonly Relation1444[], country: st
 
 // ---------------------------------------------------------------- titles
 
-/** What a realm calls its lords and its officials, singular and plural (REALM-240). */
+/** What a realm calls its lords and its officials, singular and plural (REALM-242). */
 export interface Titles {
   lord: string;
   lords: string;
@@ -1387,7 +1396,7 @@ export interface Titles {
 
 /**
  * A realm's titles: its court language's family first, then its government
- * form's family, then the default (REALM-240). Only words: no rule reads them.
+ * form's family, then the default (REALM-242). Only words: no rule reads them.
  */
 export function titlesFor(languageFamily: string, formFamily: string): Titles {
   const t = config.titles as { default: Titles; by_form_family: Record<string, Partial<Titles>>; by_language_family: Record<string, Partial<Titles>> };

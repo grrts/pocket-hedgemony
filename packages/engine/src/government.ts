@@ -311,7 +311,7 @@ export function realmForms(world: World): string[] {
   return Array.from({ length: world.nationCount }, (_, n) => gov.formName(formOf(world, n)));
 }
 
-/** What every realm calls its lords and officials, by its court language and its form (REALM-240). */
+/** What every realm calls its lords and officials, by its court language and its form (REALM-242). */
 export function realmTitles(world: World): Titles[] {
   return Array.from({ length: world.nationCount }, (_, n) => {
     const court = world.nationCourt[n]!;

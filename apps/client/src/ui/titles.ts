@@ -1,7 +1,7 @@
 import type { Titles } from "@ph/engine";
 
 /**
- * What a realm calls its lords and officials (REALM-240): chiefs, beys,
+ * What a realm calls its lords and officials (REALM-242): chiefs, beys,
  * daimyo, magistrates. The words come from the snapshot; this is the default
  * before a campaign starts and the capitalised forms for labels.
  */

@@ -193,7 +193,7 @@ Feature: Named lords
       | the ruler requisitions his grain              |
       | a foreign rival bribes him with promises      |
 
-  @REALM-240 @placeholder
+  @REALM-242 @placeholder
   Scenario Outline: Lords and officials take their culture's titles
     # config: titles
     Given a realm whose court language is of the "<family>" family and whose form is of the "<form>" family

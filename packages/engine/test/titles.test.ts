@@ -5,7 +5,7 @@ import { createWorld } from "../src/index.ts";
 import { realmTitles } from "../src/government.ts";
 import { titlesFor } from "../src/domain/realm/index.ts";
 
-describe("titles by culture (REALM-240)", () => {
+describe("titles by culture (REALM-242)", () => {
   it("takes the language family first, then the form family, then the default", () => {
     expect(titlesFor("japonic", "warriors")).toEqual({ lord: "daimyo", lords: "daimyo", official: "daikan", officials: "daikan" });
     expect(titlesFor("germanic", "kin").lord).toBe("chief");

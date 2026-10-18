@@ -1,8 +1,8 @@
 @context-trade
 Feature: Routes
   As a player
-  I want to give each trader a route between cities
-  So that it walks, collects and comes home on its own
+  I want to give each trader a start and an end
+  So that it finds its way through the busiest land, collects and comes home on its own
 
   @TRADE-049 @placeholder
   Scenario Outline: Only cities can be stops
@@ -18,7 +18,7 @@ Feature: Routes
       | Elmina   | hamlet      | with a trading post     | can    |
 
   @TRADE-050
-  Scenario Outline: Number of stops
+  Scenario Outline: A start and an end
     Given the trade config of the design
     When the player sets a route with <stops> stops
     Then the route is <result>
@@ -27,19 +27,23 @@ Feature: Routes
       | stops | result   |
       | 1     | refused  |
       | 2     | accepted |
-      | 8     | accepted |
-      | 9     | refused  |
+      | 3     | refused  |
+
+  @TRADE-050
+  Scenario: The start and the end differ
+    Given the trade config of the design
+    When the player sets a route from "Troyes" to "Troyes"
+    Then the route is refused
 
   @TRADE-051
   Scenario Outline: Route modes
-    Given a caravan has the route "Troyes ▸ Dijon ▸ Geneva" in mode "<mode>"
+    Given a caravan has the route "Troyes ▸ Geneva" in mode "<mode>"
     When it reaches "Geneva"
     Then it <next>
 
     Examples:
       | mode           | next                                     |
-      | loop           | goes back to "Troyes" and starts again   |
-      | there and back | reverses toward "Dijon"                  |
+      | there and back | reverses toward "Troyes"                 |
       | once           | stops and waits for orders               |
 
   @TRADE-052 @placeholder
@@ -48,6 +52,13 @@ Feature: Routes
     And the 15-day path has a toll and the 16-day path has none
     When the trade rules are applied
     Then the planner takes the 16-day path, a toll counting as 2 days
+
+  @TRADE-052
+  Scenario: The planner goes through the most populated land
+    Given two paths from "Dijon" to "Geneva" take 15 and 18 days
+    And the 15-day path runs through land of average people and the 18-day path through land with twice as many
+    When the trade rules are applied
+    Then the planner takes the 18-day path through the busier land
 
   @TRADE-053
   Scenario: Every province walked through gets busier and pays
@@ -59,7 +70,7 @@ Feature: Routes
   @TRADE-054 @TRADE-055
   Scenario: The route preview
     Given the trade config of the design
-    When the player sets the route "Troyes ▸ Dijon ▸ Geneva ▸ Dijon ▸ Troyes"
+    When the player sets the route "Troyes ▸ Geneva"
     Then the preview shows a loop of 38 days
     And it collects in 14 provinces a loop, best "Geneva", "Dijon", "Troyes"
     And it expects about 2.4 gold a month after fees and tolls
@@ -69,14 +80,14 @@ Feature: Routes
 
   @TRADE-056 @TRADE-057 @TRADE-058 @TRADE-059
   Scenario Outline: When a route breaks
-    Given a caravan has the route "Troyes ▸ Dijon ▸ Geneva"
+    Given a caravan has the route "Troyes ▸ Geneva"
     When <problem>
     Then the caravan <reaction>
 
     Examples:
-      | problem                                                    | reaction                                                   |
-      | the path from "Dijon" to "Geneva" closes and another exists | takes the other path as a dashed detour                    |
-      | the path from "Dijon" to "Geneva" closes and none exists    | skips "Geneva"                                             |
+      | problem                                                     | reaction                                                   |
+      | the path from "Troyes" to "Geneva" closes and another exists | takes the other path as a dashed detour                    |
+      | the path from "Troyes" to "Geneva" closes and none exists    | skips "Geneva"                                             |
       | "Geneva" is put under quarantine                            | skips "Geneva", which shows red; the turn report says so once |
       | every stop is closed                                        | goes to the nearest own city, deposits and waits for orders |
 
