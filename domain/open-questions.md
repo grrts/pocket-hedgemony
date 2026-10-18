@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-560 decided and 8 still open across 29 contexts.
+563 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -288,6 +288,9 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-NAVY-27**: (was OQ-NAVY-27) One port per province; Melos and Malé stay unplaced until the map gains them. The map owns provinces; naval follows it.
 - **D-NAVY-28**: (was OQ-NAVY-28) Docking in a subject's or lord's port takes food from that province's store and nothing is owed. Simplest reading of "from that province".
 - **D-NAVY-29**: (was OQ-NAVY-29) Sailors are mustered by share of every callable class, never seafolk first (X-7): 830 callable (770 seafolk, 45 homeless, 15 others) give 300 sailors as 278 seafolk, 16 homeless and 6 others by largest remainder. X-7 rules out "first" orders.
+- **D-NAVY-30**: The game's gold and wages for ships are the design's numbers scaled to the treasury the game pays out (Portugal makes about 9 gold a month): ship prices and upkeep ×0.1, sailors' wages and bounties ×0.01 (`naval.json` `game`). Provisional, to tune with playtests.
+- **D-NAVY-31**: First slice of sea battles (NAVY-131) and fleets: the round numbers are provisional (`naval.json` `game`); a ship's fights and carries come from `warfare.json` `ships`, which warfare owns (warfare §11.2). The AI keeps one ship for every two ports, at most four, and hunts enemy fleets it outnumbers by 1.2 within 8 zones.
+- **D-NAVY-32**: Slipways do not need timber within reach: timber is bought in, as Venice and Lisbon did. Two thirds of the 1444 shipyards have no timber land in reach on the map, which would leave them unable to build.
 
 ### Onboarding (onboarding)
 

@@ -440,6 +440,16 @@ Newest decision first.
 - NAVY-124: When a fleet docks in a subject's or lord's port, the naval system shall take its food from that province's store and owe nothing. (D-NAVY-28)
 - NAVY-125: From December to March, the naval system shall close the northern sea zones that froze historically (Gulf of Bothnia, White Sea and the far north; provisional list in config until world-map has it) to fleets, and their ports shall neither launch nor take in ships. (X-17)
 
+### How the player uses it (first slice in the game)
+
+- NAVY-126 Where: the player taps a coastal province of theirs, then its **Port** tab (beside Overview, People, Garrison, Land and Build; it shows an hourglass while hulls are building). The tab gives the harbour and shipyard, berths taken of all and slipways, the sailors ready in port, on their way and still callable, then *Muster 30 / 100 / 300* with the bounty, the hulls on the slipways with their months left, and *Order a ship*: one row per ship the port can build with its gold, crew, months, fights and carries and an Order button, or why not (crew not in port, no slipway, an invention by its name, gold). [X-19; D-NAVY-30]
+- NAVY-127 Grouping: one **fleet card** holds everything about a fleet: where it is and what it is doing, Sail, its admiral (appoint, hand over, send back to court), the army aboard (take aboard an army standing in its port, put it ashore), each ship with its crew, hull and supply and *Part off*, *Join another fleet here* and *Lay up*. It opens by tapping the fleet on the map twice, from the Port tab, from a sea zone's card or from the Navy tab. [X-19]
+- NAVY-128 Sailing: tapping one of the player's fleets on the map chooses it, as an army is picked, and folds the panel away; the next tap on a sea zone, a port or a shore sets sail at once, with the voyage drawn as a dotted course. With an army aboard, a shore of a realm the player may march into is a landing and a friend's port is put into. A fleet with no admiral says so on its card instead of a Sail button. An army aboard stands off the map; picking it from the commanders list opens its fleet. An army in a port shows *Board ships* on its card. [X-19; D-NAVY-31]
+- NAVY-129 Overview: the player's own realm card has a **Navy** tab (after Military): ships and fleets, sailors in port or on their way, the month's cost (also the "Ships and sailors" line of the Treasury ledger), sea battles under way, every fleet with where it is and its voyage, and every port with its shipyard, sailors and hulls, each opening its Port tab. A sea battle of the player's is said over the map with Go there and crossed swords mark its zone; launched ships are said over the map too. [X-19]
+- NAVY-130 Phone: the Port tab, fleet card and Navy tab are cards in the side panel in the Wide and Tall layouts, one column, every button at least 44 points high, nothing that needs hover; checked by apps/client/scripts/navy-shots.mjs on a small and a large phone held sideways and upright. [X-19]
+- NAVY-131 The naval system shall, until the full rules land, fight a sea battle as rounds of 4 hours on one sector: each side's hits are its strength (fights, by crew share, halved out of supply or leaking, galleys halved on the ocean, ×1.5 shooting in the first round, +5 % per point of the admiral's might) × 0.08 × a spread of ±25 %, spent on the enemy's strongest ship first; a ship sinks at damage of its fights; a side breaks at half its starting strength or after 18 rounds, its ships lose a hull step and it runs for its nearest port. (D-NAVY-31)
+
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -687,6 +697,9 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 - **D-NAVY-27** (was OQ-NAVY-27) One port per province; Melos and Malé stay unplaced until the map gains them. The map owns provinces; naval follows it.
 - **D-NAVY-28** (was OQ-NAVY-28) Docking in a subject's or lord's port takes food from that province's store and nothing is owed. Simplest reading of "from that province".
 - **D-NAVY-29** (was OQ-NAVY-29) Sailors are mustered by share of every callable class, never seafolk first (X-7): 830 callable (770 seafolk, 45 homeless, 15 others) give 300 sailors as 278 seafolk, 16 homeless and 6 others by largest remainder. X-7 rules out "first" orders.
+- **D-NAVY-30** The game's gold and wages for ships are the design's numbers scaled to the treasury the game pays out (Portugal makes about 9 gold a month): ship prices and upkeep ×0.1, sailors' wages and bounties ×0.01 (`naval.json` `game`). Provisional, to tune with playtests.
+- **D-NAVY-31** First slice of sea battles (NAVY-131) and fleets: the round numbers are provisional (`naval.json` `game`); a ship's fights and carries come from `warfare.json` `ships`, which warfare owns (warfare §11.2). The AI keeps one ship for every two ports, at most four, and hunts enemy fleets it outnumbers by 1.2 within 8 zones.
+- **D-NAVY-32** Slipways do not need timber within reach: timber is bought in, as Venice and Lisbon did. Two thirds of the 1444 shipyards have no timber land in reach on the map, which would leave them unable to build.
 
 ## 14. Traceability
 
@@ -847,3 +860,5 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | NAVY-123 | buying-ships.feature | Which ships can trade |
 | NAVY-124 | keeping-ships.feature | Docking in a subject's port |
 | NAVY-125 | sailing.feature | Frozen northern seas from December to March |
+| NAVY-126 … NAVY-130 | — | Client screens; checked by apps/client/scripts/navy-shots.mjs |
+| NAVY-131 | — | packages/engine/test/navy.test.ts (sea battle) |
