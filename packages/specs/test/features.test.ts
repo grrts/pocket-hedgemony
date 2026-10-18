@@ -11,7 +11,8 @@ import { readiness, runPickle } from "../src/run.ts";
 for (const feature of loadFeatures()) {
   describe(`${feature.path}: ${feature.name}`, () => {
     for (const pickle of feature.pickles) {
-      if (readiness(pickle, feature.context).automated) it(pickle.name, () => runPickle(pickle, feature.context).then(() => undefined));
+      // Scenarios that build a whole world and write saves take seconds on a shared CI runner; 5 s was too tight for them.
+      if (readiness(pickle, feature.context).automated) it(pickle.name, () => runPickle(pickle, feature.context).then(() => undefined), 30_000);
       else it.todo(pickle.name);
     }
   });
