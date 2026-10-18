@@ -312,6 +312,17 @@ export const ICONS = {
     "..kbbbbk..",
     "..kkkkkk..",
   ],
+  cog: [
+    "...kkk...",
+    ".kkkgkkk.",
+    ".kggggdk.",
+    "kkggkgdkk",
+    "kggk.kgdk",
+    "kkggkddkk",
+    ".kgddddk.",
+    ".kkkdkkk.",
+    "...kkk...",
+  ],
   anchor: [
     "...kkk...",
     "...kik...",

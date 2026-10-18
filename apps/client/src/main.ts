@@ -57,6 +57,8 @@ import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
 import { fleetButton, fleetCard, navyTab, portTab } from "./ui/navy.ts";
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
+import { Hints, type HintTarget } from "./ui/hints.ts";
+import type { Hint } from "@ph/engine/domain/onboarding";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 
 const rules = loadDefaultRuleset();
@@ -201,9 +203,11 @@ app.innerHTML = `
     <button class="icon-only" id="armies" title="Your commanders" aria-expanded="false" hidden>${icon("swords", 3, "Commanders")}</button>
     <button class="icon-only" id="sound" title="Sound and music" aria-expanded="false">${icon("speaker", 3, "Sound")}</button>
     <button class="icon-only" id="trophy" title="Achievements">${icon("trophy", 3, "Achievements")}<span class="dot" hidden></span></button>
+    <button class="icon-only" id="settings" title="Settings" aria-expanded="false">${icon("cog", 3, "Settings")}</button>
   </div>
   <button class="ach-toast framed" id="ach-toast" hidden></button>
   <div class="lens-menu sound-menu framed" id="sound-menu" hidden></div>
+  <div class="lens-menu sound-menu settings-menu framed" id="settings-menu" hidden></div>
   <div class="lens-menu framed" id="lenses" hidden></div>
   <div class="lens-menu army-list framed" id="army-list" hidden></div>
   <button class="wax open-panel" id="reopen" title="Open the overview" hidden></button>
@@ -243,12 +247,17 @@ let achNew = new Set<string>();
 /** Unlocks waiting for their toast. */
 const achToasts: { id: string; date: string; province?: number }[] = [];
 const soundMenu = document.querySelector<HTMLElement>("#sound-menu")!;
+const settingsButton = document.querySelector<HTMLButtonElement>("#settings")!;
+const settingsMenu = document.querySelector<HTMLElement>("#settings-menu")!;
+/** First-campaign hints (onboarding TUT-121 … TUT-130). */
+const hints = new Hints();
 /** The commander list is put away. */
 let armyListClosed = true;
 armyButton.addEventListener("click", () => {
   armyListClosed = !armyListClosed;
   lensMenu.hidden = true;
   soundMenu.hidden = true;
+  settingsMenu.hidden = true;
   armyButton.setAttribute("aria-expanded", String(!armyListClosed));
   renderArmyList();
 });
@@ -370,6 +379,7 @@ function openAchievements(at: string | null = null): void {
   panelCollapsed = false;
   lensMenu.hidden = true;
   soundMenu.hidden = true;
+  settingsMenu.hidden = true;
   renderPanel();
   if (at) panel.querySelector("#ach-detail")?.scrollIntoView({ block: "nearest" });
 }
@@ -404,12 +414,6 @@ function renderAchievements(): void {
       renderAchievements();
     }),
   );
-  panel.querySelector<HTMLButtonElement>("[data-ach-toasts]")!.addEventListener("click", () => {
-    achProfile.toasts = !achProfile.toasts;
-    saveProfile(achProfile);
-    sound.sfx(achProfile.toasts ? "ui_toggle_on" : "ui_toggle_off");
-    renderAchievements();
-  });
 }
 
 /** New unlocks from a snapshot: into the profile at once, a line in the dispatches and a toast each (ACH-051, ACH-074, ACH-079). */
@@ -470,6 +474,7 @@ document.addEventListener(
 soundButton.addEventListener("click", () => {
   soundMenu.hidden = !soundMenu.hidden;
   lensMenu.hidden = true;
+  settingsMenu.hidden = true;
   armyListClosed = true;
   renderArmyList();
   soundButton.setAttribute("aria-expanded", String(!soundMenu.hidden));
@@ -537,6 +542,47 @@ function renderNowPlaying(): void {
 renderSoundButton();
 renderTrophy();
 
+// ---- settings ----
+settingsButton.addEventListener("click", () => {
+  settingsMenu.hidden = !settingsMenu.hidden;
+  lensMenu.hidden = true;
+  soundMenu.hidden = true;
+  armyListClosed = true;
+  renderArmyList();
+  settingsButton.setAttribute("aria-expanded", String(!settingsMenu.hidden));
+  renderSettingsMenu();
+});
+hints.onChange = () => renderSettingsMenu();
+
+/** The Settings card (settings SET-071): Gameplay holds Tutorial hints, with how far they have come, and Reset (TUT-128, TUT-129). */
+function renderSettingsMenu(): void {
+  if (settingsMenu.hidden) return;
+  const on = hints.state.on;
+  const p = hints.progress();
+  settingsMenu.innerHTML = `
+    <h3 class="sub">Settings</h3>
+    <h4 class="settings-group">Gameplay</h4>
+    <div class="sound-row settings-row"><span>Tutorial hints<small>${p.done} of ${p.of} done</small></span><button class="paper toggle${on ? " on" : ""}" data-hints-toggle data-sfx="none" aria-pressed="${on}">${on ? "On" : "Off"}</button></div>
+    <button class="paper settings-action" data-hints-reset>Reset tutorial and hints</button>
+    <div class="sound-row settings-row"><span>Achievement toasts<small>Achievements still unlock when off</small></span><button class="paper toggle${achProfile.toasts ? " on" : ""}" data-ach-toasts data-sfx="none" aria-pressed="${achProfile.toasts}">${achProfile.toasts ? "On" : "Off"}</button></div>`;
+  settingsMenu.querySelector("[data-ach-toasts]")!.addEventListener("click", () => {
+    achProfile.toasts = !achProfile.toasts;
+    saveProfile(achProfile);
+    sound.sfx(achProfile.toasts ? "ui_toggle_on" : "ui_toggle_off");
+    renderSettingsMenu();
+  });
+  settingsMenu.querySelector("[data-hints-toggle]")!.addEventListener("click", () => {
+    hints.setOn(!hints.state.on);
+    sound.sfx(hints.state.on ? "ui_toggle_on" : "ui_toggle_off");
+  });
+  settingsMenu.querySelector("[data-hints-reset]")!.addEventListener("click", () => {
+    hints.reset();
+    if (!hints.state.on) hints.setOn(true);
+    // Mid-campaign the realm is already chosen.
+    if (snapshot) hints.did("realm chosen");
+  });
+}
+
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
@@ -562,6 +608,7 @@ async function boot(): Promise<void> {
     lensMenu.hidden = !lensMenu.hidden;
     armyListClosed = true;
     soundMenu.hidden = true;
+    settingsMenu.hidden = true;
     renderArmyList();
     modeButton.setAttribute("aria-expanded", String(!lensMenu.hidden));
     renderLensMenu();
@@ -575,6 +622,7 @@ async function boot(): Promise<void> {
   renderPanel();
   hideLoading();
   sound.title();
+  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden, turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
 }
 
 // ---- map styling ----
@@ -1572,6 +1620,8 @@ async function act(order: Order): Promise<void> {
   // What came of it goes in the log; a refusal is also said over the map, where the order was given.
   logNews(snapshot);
   for (const r of snapshot.rejectedOrders) alertPlayer(`Not done: ${r.reason}.`, "scroll");
+  // An order the game took ticks off its first-campaign hint; a refused one ticks nothing (TUT-122).
+  if (!snapshot.rejectedOrders.length) hints.did(order.type);
   restyleProvinces();
   renderHud();
   renderPanel();
@@ -3584,6 +3634,106 @@ function bindNationButtons(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-nation]").forEach((b) => b.addEventListener("click", () => void startGame(b.dataset.nation!)));
 }
 
+// ---- first-campaign hints ----
+
+/** Opens one of the player's provinces on a tab, as tapping it and the tab would. */
+function openProvinceTab(i: number, tab: typeof provinceTab): void {
+  officialView = -1;
+  lordView = -1;
+  realmView = -1;
+  armyView = -1;
+  fleetView = -1;
+  newsView = false;
+  selected.clear();
+  selectedProvince = i;
+  provinceTab = tab;
+  panelCollapsed = false;
+  view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
+  restyleProvinces();
+  renderPanel();
+  renderArmyList();
+}
+
+/** The realm the player borders most, for the envoy hint's Show me. */
+function nearestNeighbour(): number {
+  const s = snapshot!;
+  const count = new Map<number, number>();
+  for (let p = 0; p < owners.length; p++) {
+    if (owners[p] !== s.playerNation) continue;
+    for (const q of neighborIdx[p]!) {
+      const o = owners[q]!;
+      if (o >= 0 && o !== s.playerNation) count.set(o, (count.get(o) ?? 0) + 1);
+    }
+  }
+  return [...count].sort((a, b) => b[1] - a[1])[0]?.[0] ?? s.relations.find((r) => r.nation !== s.playerNation)?.nation ?? -1;
+}
+
+/** Where each first-campaign hint points as the screen stands now (TUT-127): the button or card to tap, and Show me when it is not on screen. */
+function hintTarget(h: Hint): HintTarget {
+  const s = snapshot;
+  const open = !panel.hidden;
+  const capital = s ? provinceIndex.get(nations[s.playerNation]!.capital)! : -1;
+  const provinceOpen = open && !!s && realmView < 0 && officialView < 0 && lordView < 0 && armyView < 0 && fleetView < 0 && !newsView && selectedProvince >= 0 && owners[selectedProvince] === s.playerNation;
+  switch (h.id) {
+    case "realm":
+      if (s) return {};
+      if (panelCollapsed) return { el: reopen };
+      return {
+        el: panel.querySelector(".play") ?? panel.querySelector(".nation"),
+        show: () => {
+          realmView = -1;
+          selectedProvince = -1;
+          renderPanel();
+        },
+      };
+    case "move": {
+      if (!s) return {};
+      if (selected.size) return { line: "Now tap the land to march to: the army sets off at once." };
+      if (!armyList.hidden) return { el: armyList.querySelector("[data-pick]") };
+      const openList = () => {
+        panelCollapsed = true;
+        renderPanel();
+        armyListClosed = false;
+        lensMenu.hidden = true;
+        soundMenu.hidden = true;
+        settingsMenu.hidden = true;
+        armyButton.setAttribute("aria-expanded", "true");
+        renderArmyList();
+      };
+      return { el: (open && panel.querySelector("[data-army]")) || armyButton, show: openList };
+    }
+    case "end_turn":
+      return { el: fab };
+    case "recruit":
+    case "build": {
+      if (!s || capital < 0) return {};
+      const tab = h.id === "recruit" ? "garrison" : "build";
+      const button = h.id === "recruit" ? "[data-recruit]" : "[data-build]";
+      const show = () => openProvinceTab(provinceOpen ? selectedProvince : capital, tab);
+      if (provinceOpen && provinceTab === tab) return { el: panel.querySelector(`${button}:not([disabled])`) ?? panel.querySelector(button), show };
+      if (provinceOpen) return { el: panel.querySelector(`[data-tab="${tab}"]`), show };
+      return { show };
+    }
+    case "envoy": {
+      if (!s) return {};
+      const show = () => {
+        const n = realmView >= 0 && realmView !== s.playerNation ? realmView : nearestNeighbour();
+        if (n < 0) return;
+        realmView = n;
+        realmTab = "diplomacy";
+        officialView = -1;
+        lordView = -1;
+        newsView = false;
+        panelCollapsed = false;
+        renderPanel();
+      };
+      if (open && realmView >= 0 && realmView !== s.playerNation) return { el: realmTab === "diplomacy" ? panel.querySelector("[data-envoy]") : panel.querySelector('[data-realm-tab="diplomacy"]'), show };
+      return { show };
+    }
+  }
+  return {};
+}
+
 async function startGame(nation: string): Promise<void> {
   showLoading(`Gathering the court of ${nations[nationIndex.get(nation)!]!.name}…`, 0.15);
   await painted();
@@ -3612,6 +3762,7 @@ async function startGame(nation: string): Promise<void> {
   hideLoading();
   askedStudy = -1;
   askForStudy(snapshot!);
+  hints.did("realm chosen");
 }
 
 /** The map images as the engine takes them, so armies march over the map's own tiles. */
@@ -3710,6 +3861,7 @@ async function endTurn(): Promise<void> {
   paused = false;
   selected.clear();
   sound.sfx("turn_end");
+  hints.did("turn ended");
   if (factMem) factMem.battleThisTurn = false;
   renderActions();
   const turn = snapshot.turn;

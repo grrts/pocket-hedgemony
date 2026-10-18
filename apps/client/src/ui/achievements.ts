@@ -19,7 +19,7 @@ export interface DeviceProfile {
   lifetime: Record<string, string[]>;
   /** Unlocks the player has looked at on the card; the rest mark the trophy button. */
   seen: string[];
-  /** The "Unlock banners" switch (ACH-071). */
+  /** The "Achievement toasts" switch in Settings (ACH-071). */
   toasts: boolean;
 }
 
@@ -171,8 +171,7 @@ export function achievementsCard(p: DeviceProfile, s: Snapshot | null, filter: F
     )
       .map(([f, label]) => `<button class="tab${filter === f ? " on" : ""}" data-ach-filter="${f}">${label}</button>`)
       .join("")}</nav>
-    ${sections || `<p class="hint">${filter === "earned" ? "None earned yet. Your first harvest is a good start." : "Nothing left within reach in this campaign."}</p>`}
-    <div class="sound-row ach-toasts"><span>Unlock banners</span><small>A banner at the top when one is earned</small><button class="paper toggle${p.toasts ? " on" : ""}" data-ach-toasts data-sfx="none" aria-pressed="${p.toasts}">${p.toasts ? "On" : "Off"}</button></div>`;
+    ${sections || `<p class="hint">${filter === "earned" ? "None earned yet. Your first harvest is a good start." : "Nothing left within reach in this campaign."}</p>`}`;
 }
 
 /** The toast's markup: badge, name and tier (ACH-069). */
