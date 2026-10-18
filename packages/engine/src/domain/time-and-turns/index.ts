@@ -383,6 +383,8 @@ export function orderShape(order: Order): string {
       return "reform the government";
     case "navy":
       return `navy: ${order.do}`;
+    case "explore":
+      return `explore: ${order.do}`;
     case "tonguePolicy":
       return "set the Tongue policy";
     case "faithPolicy":

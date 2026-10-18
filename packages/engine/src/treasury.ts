@@ -10,6 +10,7 @@ import { schoolUpkeepMonthly } from "./research.ts";
 import { provinceUpkeep, worksTrade } from "./works.ts";
 import { subjectPayments } from "./subjects.ts";
 import { navyCosts } from "./navy.ts";
+import { governorWages } from "./colonies.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -140,10 +141,13 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
   }
   const armyPay = allNationPay(world);
   const navy = navyCosts(world);
+  const governors = governorWages(world);
   for (let n = only >= 0 ? only : 0; n < (only >= 0 ? only + 1 : world.nationCount); n++) {
     L[n * LEDGER_LINES + PAY] = -armyPay[n]!;
     L[n * LEDGER_LINES + SCHOOLS] = -schoolUpkeepMonthly(world, n);
     L[n * LEDGER_LINES + NAVY] = -navy[n]!;
+    // Colonial governors are officials: their wages join the officials' line (EXPL-025).
+    L[n * LEDGER_LINES + WAGES] = L[n * LEDGER_LINES + WAGES]! - governors[n]!;
     // Grain sold to the treasury this month (REALM-026, castleFood.ts).
     L[n * LEDGER_LINES + GRAIN] = world.nationGrainGold[n]!;
     sumLedger(world, n);
