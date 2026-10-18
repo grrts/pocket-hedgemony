@@ -71,19 +71,24 @@ export function taxFactor(world: World, rate: number): number {
 }
 
 /** Tax a province pays its holder in a month. */
-export function provinceTax(world: World, p: number, holder: number): number {
+/**
+ * What of a province's tax and trade reaches the crown: a province whose official was commissioned
+ * pays half (recruiting RECR-083, "Leave it"), rioting or plotting provinces pay half (PROV-162), and
+ * a lord keeps his share (REALM-072).
+ */
+export function crownTake(world: World, p: number): number {
+  return (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
+}
+
+export function provinceTax(world: World, p: number, holder: number, share = crownTake(world, p)): number {
   const { economy } = world.rules.defines;
-  // A province whose official was commissioned pays half (recruiting RECR-083, "Leave it").
-  // Rioting or plotting provinces pay half (PROV-162); a lord keeps his share (REALM-072).
-  const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
   // A tax collector brings more of it in (province officials table: +20 % reaching you).
   const collector = officialBonus(world, p, "Tax collector", "tax_reach");
   return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector;
 }
 
 /** Trade and market gold a province gives its holder in a month (not taxed by rate). */
-export function provinceTrade(world: World, p: number): number {
-  const share = (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
+export function provinceTrade(world: World, p: number, share = crownTake(world, p)): number {
   // A customs officer raises what trade brings (province officials table: +15 %).
   const customs = officialBonus(world, p, "Customs officer", "trade_ratio_gain");
   // Markets, harbours and roads bring more (works).
@@ -112,8 +117,9 @@ export function runLedger(world: World, pay: boolean): void {
     // An occupier collects the tax (WAR occupation: tax, recruits, food, trade).
     const holder = controller(world, p);
     if (holder < 0) continue;
-    L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + provinceTax(world, p, holder);
-    L[holder * LEDGER_LINES + TRADE] = L[holder * LEDGER_LINES + TRADE]! + provinceTrade(world, p);
+    const share = crownTake(world, p);
+    L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + provinceTax(world, p, holder, share);
+    L[holder * LEDGER_LINES + TRADE] = L[holder * LEDGER_LINES + TRADE]! + provinceTrade(world, p, share);
   }
   const armyPay = allNationPay(world);
   for (let n = 0; n < world.nationCount; n++) {
