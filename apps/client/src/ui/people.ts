@@ -1,5 +1,6 @@
 import { officialEffect, OFFICIALS, type Snapshot } from "@ph/engine";
 import type { Ruleset } from "@ph/rules";
+import { siegeHeld } from "@ph/engine/domain/map-presentation";
 import { sprite } from "../art/sprites.ts";
 import { lookOfCulture, portrait, type Look } from "../art/portraits.ts";
 import { PALETTE } from "../art/palette.ts";
@@ -213,6 +214,9 @@ export interface SiegeInfo {
   progress: number;
   breaches: number;
   garrison: number;
+  /** Days the walls have held, and months of food left in the castle (null while nobody eats from it). */
+  days: number;
+  foodMonths: number | null;
   /** Commanders of the besieging armies in the province, by name. */
   besiegers: { name: string; men: number }[];
   /** The defender, or -1 for land nobody holds. */
@@ -236,9 +240,10 @@ export function siegeView(rules: Ruleset, st: SiegeInfo): string {
       <div class="siege-months" title="Siege months: each ends with a roll to breach the walls">${Array.from({ length: months }, (_, i) =>
         `<span class="${i < st.months ? "done" : "now"}">${i < st.months ? "" : `<i style="width:${Math.round(st.progress * 100)}%"></i>`}</span>`).join("")}</div>
       <dl class="facts">
-        <dt>Held</dt><dd>${st.months} month${st.months === 1 ? "" : "s"} · ${Math.round(st.progress * 100)}% into the next</dd>
+        <dt>Held</dt><dd>${siegeHeld(st)} · ${Math.round(st.progress * 100)}% into the next month</dd>
         <dt>Breaches</dt><dd>${st.breaches ? "▮".repeat(Math.min(st.breaches, 8)) + ` ${st.breaches}` : "none yet"}</dd>
         <dt>Inside</dt><dd>${fmt(st.garrison)} men hold the walls</dd>
+        <dt>Food</dt><dd>${st.foodMonths === null ? "nobody eats from the store" : st.foodMonths < 0.05 ? "the store is empty: they starve" : `${(Math.floor(st.foodMonths * 10) / 10).toFixed(1).replace(/\.0$/, "")} months left in the store`}</dd>
         <dt>Camp</dt><dd>${st.besiegers.length ? st.besiegers.map((b) => `${esc(b.name)} with ${fmt(b.men)}`).join(", ") : "no army left in the siege lines"}</dd>
       </dl>
     </section>`;

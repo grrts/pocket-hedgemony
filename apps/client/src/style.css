@@ -1029,6 +1029,20 @@ button.small {
   transition: width 0.4s steps(4);
 }
 
+/* Men left over morale left, as the map shows over the battle (VIEW-077). */
+.battle-watch .bars {
+  display: grid;
+  gap: 2px;
+}
+
+.battle-watch .bar.morale {
+  height: 6px;
+}
+
+.battle-watch .bar.morale i {
+  background: #f4f4f4;
+}
+
 .battle-watch p {
   margin: 4px 0 0;
 }

@@ -80,6 +80,57 @@ export interface PortraitSpec {
   post?: string;
 }
 
+/** What a portrait's sitter wears below the neck. */
+export type PortraitWear = "armour and tabard" | "buff coat" | "uniform" | "fur mantle" | "red robe" | "steel gorget" | "robe of office";
+/** What a portrait's sitter holds at the bottom of the frame. */
+export type PortraitHeld = "mace" | "sword" | "keys" | "purse" | "ledger" | "gavel" | "book" | "builder's square" | "muster roll" | "spear";
+/** What a portrait's sitter wears on the head; "by look" is the headwear of where the realm lies. */
+export type PortraitHead = "coronet" | "hat of the age" | "white wig" | "by look";
+
+export interface PortraitDress {
+  /** Behind the sitter: the realm's flag, dimmed, or (a realm with no flag) its colour. */
+  backdrop: "flag" | "realm colour";
+  wears: PortraitWear;
+  holds: PortraitHeld | null;
+  head: PortraitHead;
+}
+
+/** The tool each official's post holds (VIEW-087). */
+const HELD_BY_POST: Record<string, PortraitHeld> = {
+  Steward: "keys",
+  "Tax collector": "purse",
+  "Customs officer": "ledger",
+  Judge: "gavel",
+  Schoolmaster: "book",
+  "Master of works": "builder's square",
+  "Muster master": "muster roll",
+  Warden: "spear",
+};
+
+/**
+ * Who a portrait shows and what they do (VIEW-087): the realm's flag behind them; a commander in the
+ * armour or uniform of the era (0 = I); an official in the dress and with the tool of their post; a
+ * lord in a fur mantle and coronet. The portrait is drawn from this.
+ */
+export function portraitDress(p: Pick<PortraitSpec, "kind" | "look" | "nation" | "post">, era: number): PortraitDress {
+  const backdrop = p.nation && flagGrid(p.nation) ? "flag" : "realm colour";
+  if (p.kind === "commander")
+    return {
+      backdrop,
+      wears: era <= 1 ? "armour and tabard" : era === 2 ? "buff coat" : "uniform",
+      holds: era === 0 ? "mace" : era >= 2 && era <= 5 ? "sword" : null,
+      head: era >= 3 ? "hat of the age" : "by look",
+    };
+  if (p.kind === "lord") return { backdrop, wears: "fur mantle", holds: null, head: "coronet" };
+  const post = p.post ?? "";
+  return {
+    backdrop,
+    wears: post === "Judge" ? "red robe" : post === "Warden" || post === "Muster master" ? "steel gorget" : "robe of office",
+    holds: HELD_BY_POST[post] ?? null,
+    head: post === "Judge" && p.look === "europe" ? "white wig" : "by look",
+  };
+}
+
 /** The year portraits are drawn in, for the era's armour and the sitter's age; the game sets it as the date moves. */
 let portraitYear = 1444;
 export function setPortraitYear(year: number): void {
@@ -129,9 +180,10 @@ function draw(ctx: CanvasRenderingContext2D, p: PortraitSpec, s: number, age: nu
   const hairStyle = bits(10, 3); // 0 short, 1 long, 2 receding
   const face = bits(13, 2); // 0 narrow, 1 broad
   const brow = bits(15, 2);
+  const dressed = portraitDress(p, era);
 
   // Backdrop: the realm's flag, dimmed, or its colour with a lighter halo behind the head.
-  const flag = p.nation ? flagGrid(p.nation) : null;
+  const flag = dressed.backdrop === "flag" && p.nation ? flagGrid(p.nation) : null;
   if (flag)
     for (let y = 1; y < H - 1; y++)
       for (let x = 1; x < W - 1; x++) px(x, y, 1, 1, dim(flag[Math.floor(((y - 1) * FLAG_H) / (H - 2))]![Math.floor(((x - 1) * FLAG_W) / (W - 2))]!));
@@ -149,7 +201,7 @@ function draw(ctx: CanvasRenderingContext2D, p: PortraitSpec, s: number, age: nu
   ctx.fillRect((W - 1) * s, 0, s, H * s);
 
   // Shoulders and dress, by what they do.
-  dress(px, p, era, realm, trim);
+  dress(px, dressed.wears, p.look, era, realm, trim);
   // Neck.
   px(8, 15, 4, 2, skinShade);
 
@@ -192,8 +244,8 @@ function draw(ctx: CanvasRenderingContext2D, p: PortraitSpec, s: number, age: nu
   if (beard >= 2) px(hx + 1, ey + 4, hw - 2, 2, hair), px(hx + (hw >> 1) - 1, ey + 3, 2, 1, "#8a4a3c");
   if (beard === 3) px(hx, ey + 2, 1, 4, hair), px(hx + hw - 1, ey + 2, 1, 4, hair), px(hx + 2, ey + 6, hw - 4, 1, hair);
 
-  headwear(px, p, hx, hw, realm, bits(18, 3), era, trim);
-  held(px, p, era);
+  headwear(px, dressed.head, p, hx, hw, realm, bits(18, 3), era, trim);
+  if (dressed.holds) held(px, dressed.holds);
 }
 
 /** A flag colour dimmed for the backdrop, so the face stands out. */
@@ -206,117 +258,102 @@ function dim(c: string): string {
 type Tones = { base: string; dark: string; light: string };
 
 /** What they wear below the neck: armour of the era, the robe of an official's post, a lord's fur mantle. */
-function dress(px: Px, p: PortraitSpec, era: number, realm: Tones, trim: Tones): void {
+function dress(px: Px, wears: PortraitWear, look: Look, era: number, realm: Tones, trim: Tones): void {
   px(2, 16, 16, 5, PALETTE.ink);
-  if (p.kind === "commander") {
-    if (era <= 1) {
-      // Steel shoulders, a tabard in the flag's colours.
+  switch (wears) {
+    case "armour and tabard": // Steel shoulders, a tabard in the flag's colours.
       px(3, 17, 14, 4, PALETTE.steel);
       px(3, 17, 14, 1, PALETTE.mist);
       px(7, 17, 6, 4, realm.base);
       px(7, 17, 6, 1, realm.light);
       px(9, 18, 2, 2, trim.base);
-    } else if (era === 2) {
-      // A buff coat with a sash of the flag's second colour.
+      return;
+    case "buff coat": // With a sash of the flag's second colour.
       px(3, 17, 14, 4, "#c4a070");
       px(3, 17, 14, 1, "#e0c090");
       for (let i = 0; i < 4; i++) px(6 + 2 * i, 17 + i, 2, 1, trim.base);
-    } else {
-      // A uniform coat with facings and epaulettes.
+      return;
+    case "uniform": // A uniform coat with facings and epaulettes.
       px(3, 17, 14, 4, realm.base);
       px(3, 17, 14, 1, realm.light);
       px(8, 17, 4, 4, trim.base);
       px(9, 18, 1, 1, PALETTE.gold), px(9, 20, 1, 1, PALETTE.gold);
       if (era < 6) px(3, 17, 3, 1, PALETTE.gold), px(14, 17, 3, 1, PALETTE.gold);
+      return;
+    case "fur mantle": // A mantle in the realm's colour with an ermine collar, and a chain.
+      px(3, 17, 14, 4, realm.base);
+      px(3, 17, 14, 1, realm.light);
+      px(4, 17, 12, 2, PALETTE.paper);
+      for (const x of [5, 8, 11, 14]) px(x, 17 + (x % 2), 1, 1, PALETTE.ink);
+      for (const x of [6, 9, 12]) px(x, 19, 1, 1, PALETTE.gold);
+      px(9, 20, 2, 1, trim.base === PALETTE.paper ? PALETTE.gold : trim.base);
+      return;
+    case "red robe": // With a white collar.
+      px(3, 17, 14, 4, "#b13e53");
+      px(3, 17, 14, 1, "#d06070");
+      px(7, 17, 6, 2, PALETTE.paper);
+      return;
+    case "steel gorget": // Over a coat in the flag's colours.
+      px(3, 17, 14, 4, realm.dark);
+      px(3, 17, 14, 1, realm.light);
+      px(7, 17, 6, 2, PALETTE.steel);
+      px(7, 17, 6, 1, PALETTE.mist);
+      px(9, 19, 2, 1, trim.base);
+      return;
+    case "robe of office": {
+      // A robe in the realm's colour, a collar and a chain of office.
+      const robe = look === "africa" ? PALETTE.paper : realm.dark;
+      px(3, 17, 14, 4, robe);
+      px(3, 17, 14, 1, realm.light);
+      px(7, 17, 6, 1, look === "europe" ? "#efe2bf" : trim.base);
+      for (const x of [6, 8, 11, 13]) px(x, 18, 1, 1, PALETTE.gold);
+      px(9, 19, 2, 1, PALETTE.gold);
     }
-    return;
   }
-  if (p.kind === "lord") {
-    // A mantle in the realm's colour with an ermine collar, and a chain.
-    px(3, 17, 14, 4, realm.base);
-    px(3, 17, 14, 1, realm.light);
-    px(4, 17, 12, 2, PALETTE.paper);
-    for (const x of [5, 8, 11, 14]) px(x, 17 + (x % 2), 1, 1, PALETTE.ink);
-    for (const x of [6, 9, 12]) px(x, 19, 1, 1, PALETTE.gold);
-    px(9, 20, 2, 1, trim.base === PALETTE.paper ? PALETTE.gold : trim.base);
-    return;
-  }
-  const post = p.post ?? "";
-  if (post === "Judge") {
-    // A red robe with a white collar.
-    px(3, 17, 14, 4, "#b13e53");
-    px(3, 17, 14, 1, "#d06070");
-    px(7, 17, 6, 2, PALETTE.paper);
-    return;
-  }
-  if (post === "Warden" || post === "Muster master") {
-    // A steel gorget over a coat in the flag's colours.
-    px(3, 17, 14, 4, realm.dark);
-    px(3, 17, 14, 1, realm.light);
-    px(7, 17, 6, 2, PALETTE.steel);
-    px(7, 17, 6, 1, PALETTE.mist);
-    px(9, 19, 2, 1, trim.base);
-    return;
-  }
-  // A robe in the realm's colour, a collar and a chain of office.
-  const robe = p.look === "africa" ? PALETTE.paper : realm.dark;
-  px(3, 17, 14, 4, robe);
-  px(3, 17, 14, 1, realm.light);
-  px(7, 17, 6, 1, p.look === "europe" ? "#efe2bf" : trim.base);
-  for (const x of [6, 8, 11, 13]) px(x, 18, 1, 1, PALETTE.gold);
-  px(9, 19, 2, 1, PALETTE.gold);
 }
 
 /** What they hold at the bottom of the frame: the tools of an official's post, a commander's weapon of the era. */
-function held(px: Px, p: PortraitSpec, era: number): void {
+function held(px: Px, what: PortraitHeld): void {
   const k = PALETTE.ink;
-  if (p.kind === "commander") {
-    if (era >= 2 && era <= 5) {
-      // A sword hilt at the shoulder.
+  switch (what) {
+    case "sword": // A sword hilt at the shoulder.
       px(15, 13, 1, 5, PALETTE.mist), px(14, 17, 3, 1, PALETTE.gold);
-    } else if (era === 0) {
-      // A mace.
+      return;
+    case "mace":
       px(15, 15, 1, 5, "#5c3a26"), px(14, 13, 3, 2, PALETTE.steel), px(14, 13, 3, 1, PALETTE.mist);
-    }
-    return;
-  }
-  if (p.kind === "lord") return;
-  switch (p.post) {
-    case "Steward": // Keys on a ring.
+      return;
+    case "keys": // Keys on a ring.
       px(13, 17, 3, 1, PALETTE.gold), px(14, 18, 1, 2, PALETTE.gold), px(15, 19, 1, 1, PALETTE.gold);
       return;
-    case "Tax collector": // A purse of coin.
+    case "purse": // A purse of coin.
       px(13, 17, 4, 3, k), px(14, 17, 2, 3, "#8b5a3c"), px(14, 16, 2, 1, PALETTE.gold);
       return;
-    case "Customs officer": // A ledger.
+    case "ledger":
       px(13, 16, 4, 4, k), px(14, 17, 2, 2, PALETTE.paper), px(14, 18, 2, 1, PALETTE.steel);
       return;
-    case "Judge": // A gavel.
+    case "gavel":
       px(14, 16, 3, 2, "#5c3a26"), px(15, 18, 1, 2, "#5c3a26");
       return;
-    case "Schoolmaster": // A book.
+    case "book":
       px(13, 17, 4, 3, k), px(14, 17, 2, 2, "#b13e53"), px(14, 19, 2, 1, PALETTE.paper);
       return;
-    case "Master of works": // A builder's square.
+    case "builder's square":
       px(13, 16, 1, 4, PALETTE.mist), px(13, 19, 4, 1, PALETTE.mist);
       return;
-    case "Muster master": // The muster roll.
+    case "muster roll":
       px(13, 16, 3, 4, PALETTE.paper), px(13, 16, 3, 1, "#c9b48a"), px(14, 17, 1, 2, PALETTE.steel);
       return;
-    case "Warden": // A spear.
+    case "spear":
       px(15, 9, 1, 11, "#5c3a26"), px(15, 7, 1, 2, PALETTE.mist);
-      return;
-    default:
-      return;
   }
 }
 
 type Px = (x: number, y: number, w: number, h: number, c: string) => void;
 
 /** What the person wears on the head: by kind and look, one of a few per look. */
-function headwear(px: Px, p: PortraitSpec, hx: number, hw: number, realm: Tones, v: number, era: number, trim: Tones): void {
+function headwear(px: Px, head: PortraitHead, p: PortraitSpec, hx: number, hw: number, realm: Tones, v: number, era: number, trim: Tones): void {
   const k = PALETTE.ink;
-  if (p.kind === "lord") {
+  if (head === "coronet") {
     // A coronet: a gold band with points, a jewel in the flag's second colour.
     px(hx - 1, 3, hw + 2, 3, k);
     px(hx, 4, hw, 1, PALETTE.gold);
@@ -324,7 +361,7 @@ function headwear(px: Px, p: PortraitSpec, hx: number, hw: number, realm: Tones,
     px(hx + (hw >> 1) - 1, 4, 2, 1, trim.base);
     return;
   }
-  if (p.kind === "commander" && era >= 3) {
+  if (head === "hat of the age") {
     // The hats of the age: tricorne, bicorne, spiked helmet, steel helmet, beret.
     px(hx - 2, 3, hw + 4, 3, k);
     if (era === 3) px(hx - 1, 4, hw + 2, 1, "#2b2130"), px(hx + 1, 2, hw - 2, 2, "#2b2130"), px(hx + hw, 4, 1, 1, PALETTE.gold);
@@ -334,8 +371,7 @@ function headwear(px: Px, p: PortraitSpec, hx: number, hw: number, realm: Tones,
     else px(hx - 1, 3, hw + 2, 2, realm.base), px(hx, 2, hw - 1, 1, realm.base), px(hx + hw - 2, 4, 1, 1, trim.base);
     return;
   }
-  if (p.kind === "official" && p.post === "Judge" && p.look === "europe") {
-    // A white wig.
+  if (head === "white wig") {
     px(hx - 2, 4, 2, 8, PALETTE.paper), px(hx + hw, 4, 2, 8, PALETTE.paper), px(hx - 1, 3, hw + 2, 2, PALETTE.paper);
     return;
   }
