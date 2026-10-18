@@ -160,6 +160,11 @@ export class Hints {
     const w = this.note.offsetWidth;
     const low = !!box && box.bottom > innerHeight - this.note.offsetHeight - 16 && box.right > (innerWidth - w) / 2 && box.left < (innerWidth + w) / 2;
     this.note.classList.toggle("top", low);
+    // Under the top bar it keeps beside an open side panel, so the panel's close button stays reachable.
+    const panel = low ? document.querySelector<HTMLElement>("#panel:not([hidden])")?.getBoundingClientRect() : undefined;
+    const beside = !!panel && panel.width < innerWidth / 2 && panel.left < 8;
+    this.note.style.left = beside ? `${(panel!.right + innerWidth) / 2}px` : "";
+    this.note.style.width = beside ? `${Math.min(460, innerWidth - panel!.right - 16)}px` : "";
     this.ring.hidden = !box;
     if (box) {
       const pad = 4;
