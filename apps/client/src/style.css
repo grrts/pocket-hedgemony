@@ -3001,3 +3001,199 @@ button.belief-line {
   font-style: normal;
   color: var(--cloth);
 }
+
+/* ---- Achievements (domain/achievements "How the player uses it") ---- */
+
+.tools #trophy {
+  position: relative;
+}
+.tools #trophy .dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  background: var(--cloth);
+  border: 2px solid var(--outline);
+}
+
+.ach-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  background: #cfc3a4;
+  border: 3px solid #8d8778;
+  box-shadow: inset 0 0 0 2px var(--outline);
+  image-rendering: pixelated;
+}
+.ach-badge img {
+  filter: grayscale(1) opacity(0.55);
+}
+.ach-badge.earned {
+  background: var(--paper-light);
+}
+.ach-badge.earned img {
+  filter: none;
+}
+.ach-badge.earned.tier-copper { border-color: #b8693a; }
+.ach-badge.earned.tier-silver { border-color: #c6ccd8; }
+.ach-badge.earned.tier-gold { border-color: #e9b93a; }
+.ach-badge.earned.tier-crown { border-color: #8a4fb0; box-shadow: inset 0 0 0 2px #e9b93a; }
+.ach-badge.not-yet {
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+.ach-head {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font: 600 18px/1.2 var(--body);
+  color: var(--ink);
+}
+.ach-head b {
+  font-size: 22px;
+}
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.ach-grid .ach {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 48px;
+  padding: 2px;
+  background: none;
+  border: 0;
+  position: relative;
+}
+.ach-grid .ach.on .ach-badge {
+  outline: 3px solid var(--cloth);
+}
+.ach-grid .ach.new::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background: var(--cloth);
+  border: 2px solid var(--outline);
+}
+.panel .sub small {
+  font-weight: 400;
+  opacity: 0.8;
+}
+.ach-detail {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 8px;
+  margin: 0 0 10px;
+  color: var(--ink);
+}
+.ach-detail .ach-badge {
+  width: 52px;
+  height: 52px;
+}
+.ach-detail b {
+  display: block;
+  font: 600 19px/1.15 var(--body);
+}
+.ach-detail small {
+  display: block;
+  opacity: 0.8;
+}
+.ach-detail p {
+  margin: 4px 0;
+}
+.ach-status.earned {
+  color: #3d6b2a;
+  font-weight: 600;
+}
+.ach-bar {
+  display: block;
+  height: 10px;
+  background: #cfc3a4;
+  border: 2px solid var(--outline);
+}
+.ach-bar i {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.ach-toasts {
+  grid-template-columns: 1fr auto 64px;
+  margin-top: 8px;
+}
+.ach-open {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+}
+.ach-open small {
+  margin-left: auto;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+/* The unlock toast: top centre under the date bar, over the alerts (ACH-069, ACH-079). */
+.ach-toast {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 50px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(360px, calc(100vw - 2 * max(8px, env(safe-area-inset-left), env(safe-area-inset-right)) - 120px));
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  z-index: 9;
+  text-align: left;
+  color: var(--ink);
+  animation: ach-in 0.25s steps(5) both;
+  text-shadow: none;
+  font: 400 16px/1.2 var(--body);
+}
+.ach-toast[hidden] {
+  display: none;
+}
+.ach-toast span {
+  display: grid;
+  min-width: 0;
+}
+.ach-toast small {
+  font-size: 13px;
+  opacity: 0.8;
+}
+.ach-toast b {
+  font: 600 19px/1.1 var(--body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ach-toast em {
+  font-style: normal;
+  font-size: 14px;
+}
+@keyframes ach-in {
+  from { transform: translate(-50%, -80px); }
+  to { transform: translate(-50%, 0); }
+}
+
+.ach-filter .tab {
+  min-height: 44px;
+}
+/* While a toast shows, the alerts move down under it rather than sit beneath it. */
+.ach-toast:not([hidden]) ~ .alerts {
+  top: calc(env(safe-area-inset-top) + 116px);
+}

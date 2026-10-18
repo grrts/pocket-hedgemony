@@ -56,6 +56,7 @@ import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
 import { fleetButton, fleetCard, navyTab, portTab } from "./ui/navy.ts";
+import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 
 const rules = loadDefaultRuleset();
@@ -199,7 +200,9 @@ app.innerHTML = `
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
     <button class="icon-only" id="armies" title="Your commanders" aria-expanded="false" hidden>${icon("swords", 3, "Commanders")}</button>
     <button class="icon-only" id="sound" title="Sound and music" aria-expanded="false">${icon("speaker", 3, "Sound")}</button>
+    <button class="icon-only" id="trophy" title="Achievements">${icon("trophy", 3, "Achievements")}<span class="dot" hidden></span></button>
   </div>
+  <button class="ach-toast framed" id="ach-toast" hidden></button>
   <div class="lens-menu sound-menu framed" id="sound-menu" hidden></div>
   <div class="lens-menu framed" id="lenses" hidden></div>
   <div class="lens-menu army-list framed" id="army-list" hidden></div>
@@ -228,6 +231,17 @@ const eventsSeen = new Set<string>();
 /** The battle the player is watching (its province), and how it ended once it has. */
 let watching: { province: number; result?: string } | null = null;
 const soundButton = document.querySelector<HTMLButtonElement>("#sound")!;
+const trophyButton = document.querySelector<HTMLButtonElement>("#trophy")!;
+const achToast = document.querySelector<HTMLButtonElement>("#ach-toast")!;
+/** Achievements (domain/achievements "How the player uses it"): the profile on the device, and the card's state. */
+const achProfile = loadProfile();
+let achView = false;
+let achFilter: AchFilter = "all";
+let achChosen: string | null = null;
+/** Unlocks marked new on the card while it is open. */
+let achNew = new Set<string>();
+/** Unlocks waiting for their toast. */
+const achToasts: { id: string; date: string; province?: number }[] = [];
 const soundMenu = document.querySelector<HTMLElement>("#sound-menu")!;
 /** The commander list is put away. */
 let armyListClosed = true;
@@ -318,6 +332,125 @@ document.addEventListener("click", (e) => {
   restyleProvinces();
   renderPanel();
 });
+trophyButton.addEventListener("click", () => openAchievements());
+// Opening anything else in the panel puts the Achievements card away.
+document.addEventListener(
+  "click",
+  (e) => {
+    if ((e.target as HTMLElement).closest("[data-realm], [data-news], [data-official], [data-show-province], [data-go-province], .go-there")) achView = false;
+  },
+  { capture: true },
+);
+achToast.addEventListener("click", () => {
+  const id = achToast.dataset.id;
+  achToast.hidden = true;
+  if (id) openAchievements(id);
+});
+
+/** Opens the Achievements card, at one achievement when given (ACH-076, ACH-079); what was new is marked once, then counts as seen. */
+function openAchievements(at: string | null = null): void {
+  if (achView && at === null && !panel.hidden) {
+    achView = false;
+    renderPanel();
+    return;
+  }
+  achView = true;
+  achChosen = at;
+  if (at) achFilter = "all";
+  achNew = new Set(Object.keys(achProfile.unlocked).filter((id) => !achProfile.seen.includes(id)));
+  achProfile.seen = Object.keys(achProfile.unlocked);
+  saveProfile(achProfile);
+  renderTrophy();
+  officialView = -1;
+  lordView = -1;
+  armyView = -1;
+  fleetView = -1;
+  newsView = false;
+  realmView = -1;
+  panelCollapsed = false;
+  lensMenu.hidden = true;
+  soundMenu.hidden = true;
+  renderPanel();
+  if (at) panel.querySelector("#ach-detail")?.scrollIntoView({ block: "nearest" });
+}
+
+/** The trophy button carries a dot while an unlock has not been looked at (ACH-078). */
+function renderTrophy(): void {
+  const n = unseen(achProfile);
+  trophyButton.querySelector<HTMLElement>(".dot")!.hidden = n === 0;
+  trophyButton.title = n ? `Achievements: ${n} new` : "Achievements";
+}
+
+function renderAchievements(): void {
+  const keep = panel.scrollTop;
+  const card = achievementsCard({ ...achProfile, seen: achProfile.seen.filter((id) => !achNew.has(id)) }, snapshot, achFilter, achChosen, closeButton());
+  panel.innerHTML = card;
+  panel.scrollTop = keep;
+  panel.querySelector(".close")!.addEventListener("click", () => {
+    achView = false;
+    renderPanel();
+  });
+  showPanel(true, snapshot ? "scroll" : "crown");
+  panel.querySelectorAll<HTMLButtonElement>("[data-ach]").forEach((b) =>
+    b.addEventListener("click", () => {
+      achChosen = achChosen === b.dataset.ach ? null : b.dataset.ach!;
+      renderAchievements();
+      panel.querySelector("#ach-detail")?.scrollIntoView({ block: "nearest" });
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-ach-filter]").forEach((b) =>
+    b.addEventListener("click", () => {
+      achFilter = b.dataset.achFilter as AchFilter;
+      renderAchievements();
+    }),
+  );
+  panel.querySelector<HTMLButtonElement>("[data-ach-toasts]")!.addEventListener("click", () => {
+    achProfile.toasts = !achProfile.toasts;
+    saveProfile(achProfile);
+    sound.sfx(achProfile.toasts ? "ui_toggle_on" : "ui_toggle_off");
+    renderAchievements();
+  });
+}
+
+/** New unlocks from a snapshot: into the profile at once, a line in the dispatches and a toast each (ACH-051, ACH-074, ACH-079). */
+function hearAchievements(s: Snapshot): void {
+  const fresh = takeAchievements(achProfile, s, nations[s.playerNation]!.id);
+  if (!fresh.length) return;
+  for (const u of fresh) {
+    dispatches.unshift({ date: { ...s.date }, news: { kind: "event", text: `Achievement earned: ${achievementName(u.id)}.`, nations: [s.playerNation], ...(u.province === undefined ? {} : { province: u.province }) } });
+    if (achProfile.toasts) achToasts.push(u);
+  }
+  renderTrophy();
+  if (achView) renderAchievements();
+  showToast();
+}
+
+let toastTimer: ReturnType<typeof setTimeout> | 0 = 0;
+/** One toast at a time, 3 seconds each, held while an event card or the battle watch is open (ACH-069, ACH-070). */
+function showToast(): void {
+  if (toastTimer || !achToasts.length) return;
+  if (!eventCard.hidden || !battleWatch.hidden) {
+    toastTimer = setTimeout(() => {
+      toastTimer = 0;
+      showToast();
+    }, 500);
+    return;
+  }
+  const u = achToasts.shift()!;
+  achToast.innerHTML = toastHtml(u);
+  achToast.dataset.id = u.id;
+  achToast.setAttribute("aria-label", `Achievement earned: ${achievementName(u.id)}. Opens the Achievements card`);
+  achToast.hidden = false;
+  sound.sfx("ui_achievement");
+  toastTimer = setTimeout(() => {
+    achToast.hidden = true;
+    toastTimer = setTimeout(() => {
+      toastTimer = 0;
+      showToast();
+    }, 300);
+  }, 3000);
+}
+
 reopen.addEventListener("click", () => {
   panelCollapsed = false;
   renderPanel();
@@ -402,6 +535,7 @@ function renderNowPlaying(): void {
       : "Music is off.";
 }
 renderSoundButton();
+renderTrophy();
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
@@ -1188,6 +1322,7 @@ function labelBitmap(text: string, size: number, water: boolean): LabelBitmap {
 // ---- input ----
 function onTap(sx: number, sy: number, province: number): void {
   officialView = -1;
+  achView = false;
   // Armies sit on top of provinces, so check them first, with some room around each for fingers.
   const PAD = 8;
   const hit = armyHitBoxes.find((b) => sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
@@ -1449,6 +1584,7 @@ function takeSnapshot(next: Snapshot, ms: number): void {
   if (snapshot) for (let k = 0; k < snapshot.armies.id.length; k++) at.set(snapshot.armies.id[k]!, armyPosition(k));
   snapshot = next;
   setPortraitYear(next.date.year);
+  hearAchievements(next);
   drawnAt = at;
   stepStart = performance.now();
   stepMs = ms;
@@ -1775,10 +1911,14 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
 let panelShows = "";
 
 function renderPanel(): void {
-  const shows = `${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
+  const shows = `${achView}/${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
+  }
+  if (achView) {
+    renderAchievements();
+    return;
   }
   if (newsView && snapshot) {
     renderNews();
@@ -1817,8 +1957,10 @@ function renderPanel(): void {
         })
         .join("")}</div>
       <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
+      <button class="paper ach-open" data-ach-open>${icon("trophy", 2)}Achievements<small>${Object.keys(achProfile.unlocked).length} earned · every campaign can earn them</small></button>
       <p class="diag" id="diag">${diagnosticsLine()}</p>`;
     bindNationButtons();
+    panel.querySelector("[data-ach-open]")!.addEventListener("click", () => openAchievements());
     showPanel(true, "crown");
     return;
   }
@@ -3430,6 +3572,7 @@ function bindClose(): void {
     grantOpen = false;
     newsView = false;
     realmView = -1;
+    achView = false;
     selectedProvince = -1;
     selected.clear();
     restyleProvinces();

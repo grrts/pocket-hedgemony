@@ -327,6 +327,16 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 ### Adding more later
 - ACH-075 Where spare points are given to new achievements, the achievements context should give them mostly to new copper and silver goals. [achievements §9]
 
+### How the player uses it (first slice in the game)
+- ACH-076 Where: the player taps the **trophy button** in the side tools (beside the map lens, the commanders and the speaker) or the *Achievements* button at the foot of the *Choose your realm* card, and the **Achievements card** opens in the side panel. Until the main menu (S4) is built these two stand in for More → Achievements (D-ACH-13, D-ACH-15). [X-19]
+- ACH-077 Grouping: everything about achievements sits on that one card: the eligibility line ("This campaign can earn achievements"), the filter (*All*, *Within reach* = ACH-073, *Earned*), one section per category with its badges, and the *Unlock banners* switch (ACH-071; it moves to Settings when Settings is built). Tapping a badge opens its detail under the grid: name, tier and points, text, this campaign's progress bar with its value (ACH-050), the date earned, or "Not in the game yet" for a row whose system the build does not have. [X-19]
+- ACH-078 Overview: the card's head shows earned of all and points of 680 at a glance, each category heading shows its own earned of all, and the trophy button carries a dot while an unlock has not been looked at. [X-19]
+- ACH-079 Unlock: the toast (ACH-069) slides in at the top centre under the date bar for 3 seconds with the badge, name and tier, plays the sting and adds a line to Dispatches; tapping it opens the card at that achievement; it waits while an event card or the battle watch is open (ACH-070). [X-19]
+- ACH-080 Phone: the card is one column in the side panel in the Wide and Tall layouts, inside the safe areas; badges, filter chips and the switch are at least 44 points; the detail needs no hover; the toast fits a 375-point-wide screen. Checked by `apps/client/scripts/achievement-shots.mjs` on a small and a large phone held sideways and upright. [X-19]
+- ACH-081 Storage: unlocks with their dates and the lifetime counters are kept on the device in the player profile (local storage), apart from any save, so they survive a new campaign and a reload; the campaign's own counters and earned list travel with the campaign. [ACH-051; saves profile]
+- ACH-082 Timing in the first slice: tests run at the end of each week's turn, after every other system; `year_end`, `harvest`, `spring_start` and `date` rows run at the turn end where their month begins, and a `date` that falls inside a month is checked once at the first turn end on or after it (D-ACH-15). [ACH-031, ACH-032, ACH-033]
+- ACH-083 Eligibility in the first slice: the build has no save, load or cheat yet, so a campaign cannot be reloaded and counts as an unbroken ironman campaign (D-ACH-15). [ACH-034]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -443,6 +453,7 @@ None. Achievements are only for the human player's realm; the designs give compu
 - **D-ACH-12** (was OQ-ACH-12) The tutorial's last card says that achievements start in a real campaign; onboarding adds the line. One line of copy, no rule.
 - **D-ACH-13** (was OQ-ACH-13) The achievements screen opens from the main menu's More, as screen flow places it (the latest design); the game menu does not list it. Latest decision wins.
 - **D-ACH-14** (was OQ-ACH-14) Victory: X-12 decides how a campaign is won; no new achievement is added, and *The Long Road* still needs only reaching 31 August 1939. No new rows beyond the list.
+- **D-ACH-15** First slice in the playable build (X-19, 18 Oct): the build has no main menu, Settings, saves or cheats yet, so the trophy button and the *Choose your realm* card open the Achievements card, the banner switch sits on the card, every campaign counts as ironman, and tests run at each weekly turn end. Rows whose stats the engine does not keep yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, buying a castle, voyages, contact and colonies, rebellions, the famine rule, castle reach 3, macro-regions, world-war and crash tracking) show "Not in the game yet" and stay locked. Badges are a tier frame around a category glyph until the 71 icons of ACH-065 are drawn. Each of these goes when its system lands.
 
 ## 14. Traceability
 
@@ -473,3 +484,4 @@ None. Achievements are only for the human player's realm; the designs give compu
 | ACH-065 … ACH-068 | icons.feature | all scenarios |
 | ACH-069 … ACH-074 | in-game-presentation.feature | all scenarios |
 | ACH-075 | — | Guidance for content updates, not behaviour |
+| ACH-076 … ACH-083 | — | How the player uses it; checked in the client by `apps/client/scripts/achievement-shots.mjs` and engine tests in `packages/engine/test/achievements.test.ts` |
