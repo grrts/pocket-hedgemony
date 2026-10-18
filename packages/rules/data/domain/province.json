@@ -6,6 +6,7 @@
   "clear_woods": { "years": 3, "timber_loads": 1 },
   "fields_to_woods": { "years": 10 },
   "fields_to_pasture": { "seasons": 1 },
+  "woods": { "$comment": "D-PROV-30: woods lost to fire or to cutting more timber in a year than they regrow become waste (stumps and ash) and grow back to woods after regrow_years without use.", "regrow_loads_per_tile": 1, "regrow_years": 10 },
   "tile_changes": {
     "$comment": "Feedback 86: what the player (or a lord, or the AI) pays to change a tile's use, in the buildings data's gold, and the time for the changes clear_woods and fields_to_pasture don't already set. One change at a time per province.",
     "clear woods": { "gold": 30 },
@@ -21,9 +22,23 @@
     "building_slots": { "hamlet": 1, "village": 2, "market town": 4, "town": 6, "city": 9, "great city": 12 },
     "sizes": ["hamlet", "village", "market town", "town", "city", "great city"]
   },
-  "worn": { "recovery_years": 5, "output": 0.5 },
+  "worn": { "$comment": "D-PROV-31: a fields tile farmed with more farmers than its slots for overwork_years in a row wears; each rotation invention known stretches that by rotation_stretch.", "recovery_years": 5, "output": 0.5, "overwork_years": 30, "rotation_stretch": 1.5, "rotation_inventions": ["F1", "F12", "F15"] },
   "burned": { "rebuild_per_year": 1 },
   "ground": {
+    "start_mix": {
+      "$comment": "D-PROV-25, PROV-024: how a square of each ground is shared between the tile uses at the start; grassland and savanna mostly pasture.",
+      "farmland": { "fields": 0.8, "pasture": 0.1, "woods": 0.1 },
+      "grassland": { "pasture": 0.55, "fields": 0.3, "woods": 0.15 },
+      "savanna": { "pasture": 0.6, "fields": 0.25, "waste": 0.15 },
+      "drylands": { "pasture": 0.4, "waste": 0.35, "fields": 0.25 },
+      "desert": { "waste": 0.8, "pasture": 0.15, "fields": 0.05 },
+      "hills": { "pasture": 0.35, "fields": 0.3, "woods": 0.15, "waste": 0.2 },
+      "mountains": { "waste": 0.5, "pasture": 0.3, "woods": 0.15, "fields": 0.05 },
+      "forest": { "woods": 0.6, "fields": 0.25, "pasture": 0.15 },
+      "jungle": { "woods": 0.7, "fields": 0.2, "marsh": 0.1 },
+      "marsh": { "marsh": 0.6, "fields": 0.25, "pasture": 0.15 },
+      "tundra": { "waste": 0.5, "woods": 0.35, "pasture": 0.15 }
+    },
     "troops": {
       "farmland": { "foot": 0, "horse": 0.10, "guns": 0, "defender": 0, "days_to_cross": 1, "foraging": "Rich", "sickness": "Low" },
       "grassland": { "foot": 0, "horse": 0.25, "guns": 0, "defender": -0.10, "days_to_cross": 1, "foraging": "Fair", "sickness": "Low" },
@@ -175,6 +190,7 @@
     "free_travel_days": 5,
     "cap_charter_max": "light",
     "heavy_weight": { "heavy": 1, "crushing": 2 },
+    "owed": { "$comment": "D-PROV-33: gold a year at the normal rate per 1,000 workers in working land buildings and per 1,000 townsfolk; the rate scales it as the realm's tax steps. Tolls are trade's, never here.", "per_1000_building_workers": 0.12, "per_1000_townsfolk": 0.5, "rate_factor": { "none": 0, "light": 0.5, "normal": 1, "heavy": 1.5, "crushing": 2 } },
     "presets": {
       "Even": { "all": "normal" },
       "Spare the frontier": { "border": "light", "heartland": "heavy" },
@@ -183,7 +199,7 @@
     }
   },
   "tolls": { "rates": ["none", "low", "high"], "points": ["bridge", "ford", "pass", "river mouth", "strait"] },
-  "roads": { "steps": ["none", "track", "road", "paved road", "turnpike", "railway"], "canal_inventions": ["B3", "Canal locks"] },
+  "roads": { "steps": ["none", "track", "road", "paved road", "turnpike", "railway"], "canal_inventions": ["B3", "Canal locks"], "travel": { "$comment": "D-PROV-34: winter slows roads and rivers; an enemy army on the road or a broken road forces a detour; a sea route closed in war is no route.", "winter": 1.5, "enemy_army": 2, "broken_road": 2 } },
   "far_from_throne": { "days": 30 },
   "officials": {
     "full_effect_years": 5,
@@ -223,7 +239,17 @@
     "harsh_lord_traits": ["Cruel", "Greedy"]
   },
   "plague": { "steps": ["none", "rumour", "outbreak", "burning out"], "outbreak_seasons": [1, 2], "links": ["road", "river", "sea route", "army", "refugees"] },
-  "fever_land": { "steps": ["none", "mild", "harsh", "deadly"] },
+  "fever_land": {
+    "$comment": "D-PROV-32: steps from the ground, one more in the tropics and one more for every two marsh tiles, one less for each of quinine and sanitation known. People born elsewhere die at the extra yearly rate of the step; locals at local_share of it.",
+    "steps": ["none", "mild", "harsh", "deadly"],
+    "by_ground": { "jungle": 2, "marsh": 1, "savanna": 1 },
+    "tropics_lat": 23.5,
+    "tropics_steps": 1,
+    "marsh_tiles_per_step": 2,
+    "lowered_by": ["quinine", "sanitation"],
+    "deaths_born_elsewhere": { "none": 0, "mild": 0.05, "harsh": 0.15, "deadly": 0.3 },
+    "local_share": 0.1
+  },
   "smoke": { "from_era": "V", "sources": ["factory", "coal mine"] },
   "settlement": { "steps": ["none", "trading post", "settlement", "colony"] },
   "event_map": {
@@ -321,6 +347,7 @@
     "official_learn_years": { "own": 5, "cousin": 7, "stranger": 10 },
     "lord_ungoverned_share": 0.5,
     "sickness_monthly": { "Low": 0, "Medium": 0.01, "High": 0.02, "Heat": 0.02, "Cold": 0.02 },
+    "sickness_local_share": 0.5,
     "plague_week_days": [7, 14, 21, 28],
     "homeless_trade_cut_per_5pct": 0.05,
     "settlement_stages": { "trading post": "Outpost", "settlement": "Settled", "colony": "Self-governing" },

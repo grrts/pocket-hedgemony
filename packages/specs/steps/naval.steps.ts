@@ -34,9 +34,9 @@ function buyer(s: Scenario, c: string): N.Buyer {
   return ((s.buyers ??= {})[c] ??= { name: c, known: knownOf(s, c), gold: 10000, timber: 1000, explorationUnlock: s.noExploration?.[c] ? false : true });
 }
 
-/** A port by name: harbour 2, no shipyard, owned by Portugal unless set. */
+/** A port by name: harbour 2, a slipway yard, owned by Portugal unless set. */
 function port(s: Scenario, name: string, owner = "Portugal"): N.Port {
-  return ((s.ports ??= {})[name] ??= N.newPort(name, owner, 2, 0));
+  return ((s.ports ??= {})[name] ??= N.newPort(name, owner, 2, 1));
 }
 
 let shipIds = 0;
@@ -625,8 +625,13 @@ Then("60 sailors are assigned to the hull and help build it", (s) => {
   expect(s.result.hull.crew).toBe(60);
   expect(s.result.hull.on).toBe("slipway");
 });
-Then("the order is refused because the carrack needs a crew of 60", (s) => {
-  expect(s.result).toEqual({ ok: false, reason: "needs a crew of 60" });
+Then("the carrack waits in the port's queue for its crew", (s) => {
+  expect(s.result.ok).toBe(true);
+  expect([s.result.hull.on, s.result.hull.crew]).toEqual(["waiting", 0]);
+});
+When(re('(\\d+) more sailors come in to the port "(\\w+)"'), (s, n: string, p: string) => {
+  port(s, p).sailorsInPort += num(n);
+  N.layDownWaiting(port(s, p));
 });
 
 When(re('the country "(\\w+)" orders a "([^"]+)" in a port with the right slipway and crew'), (s, c: string, type: string) => {
@@ -684,18 +689,49 @@ Then("2 caravels are built on the slipways in 3 months", (s) => {
   const on = (s.results as N.OrderResult[]).filter((r) => r.ok && r.hull.on === "slipway");
   expect(on.map((r) => (r.ok ? r.hull.monthsLeft : 0))).toEqual([3, 3]);
 });
-Then("1 caravel is built on the harbour in 4.5 months", (s) => {
-  const on = (s.results as N.OrderResult[]).filter((r) => r.ok && r.hull.on === "harbour");
-  expect(on.map((r) => (r.ok ? r.hull.monthsLeft : 0))).toEqual([4.5]);
+Then("1 caravel waits in the queue for a slipway", (s) => {
+  expect((s.results as N.OrderResult[]).filter((r) => r.ok && r.hull.on === "waiting")).toHaveLength(1);
+});
+When(re('(\\d+) months pass in the port "(\\w+)"'), (s, m: string, p: string) => {
+  for (let i = 0; i < num(m); i++) N.advanceHulls(port(s, p), () => `ship-${++shipIds}`);
+});
+Then("the waiting caravel is laid down on a slipway", (s) => {
+  expect(port(s, "Lagos").hulls.map((h) => [h.type, h.on, h.crew])).toEqual([["caravel", "slipway", 25]]);
+});
+Then("every order is refused because the port needs a shipyard", (s) => {
+  expect((s.results as N.OrderResult[]).map((r) => (r.ok ? "ok" : r.reason))).toEqual(["needs a shipyard", "needs a shipyard"]);
+});
+Then("5 cogs wait in the queue and the sixth order is refused because the queue is full", (s) => {
+  expect((s.results as N.OrderResult[]).map((r) => (r.ok ? r.hull.on : r.reason))).toEqual(["waiting", "waiting", "waiting", "waiting", "waiting", "the queue is full"]);
+});
+Given(re('a port whose shipyard builds "([^"]+)"'), (s, list: string) => {
+  s.buildable = list.split(", ");
+});
+Then(re('the "([^"]+)" is (offered|replaced by the .+)'), (s, ship: string, verdict: string) => {
+  const by = N.replacedBy(ship, (t) => (s.buildable as string[]).includes(t));
+  expect(by ? `replaced by the ${by}` : "offered").toBe(verdict);
 });
 Given('the port "Funchal" has a harbour and no shipyard', (s) => {
   (s.ports ??= {})["Funchal"] = N.newPort("Funchal", "Portugal", 1, 0);
 });
-Then("only one cog is built at a time on the harbour", (s) => {
-  const hulls = port(s, "Funchal").hulls;
-  expect(hulls.map((h) => h.on)).toEqual(["harbour", "waiting"]);
-  for (let i = 0; i < 5; i++) N.advanceHulls(port(s, "Funchal"), () => "cog");
-  expect(port(s, "Funchal").hulls.map((h) => h.on)).toEqual(["harbour"]);
+Then('no sailors can be mustered in the port "Funchal"', (s) => {
+  expect(() => N.musterSailors({ id: "Funchal", people: { seafolk: 1000 } }, 10, port(s, "Funchal"))).toThrow(/shipyard/);
+});
+Then('no ship can be ordered in the port "Funchal"', (s) => {
+  expect(N.orderShip(port(s, "Funchal"), "cog", buyer(s, "Portugal"))).toEqual({ ok: false, reason: "needs a shipyard" });
+});
+Given(re('no sailors are on their way to the port "(\\w+)"'), (s) => {
+  s.queue = [];
+});
+When(re('(\\d+) sailors are mustered into the queue of the port "(\\w+)" on day (\\d+)'), (s, n: string, _p: string, d: string) => {
+  s.queue = N.musterBatches(num(n), s.queue, num(d));
+});
+Then(re("they come in as batches of (\\d+), (\\d+) and (\\d+) on days (\\d+), (\\d+) and (\\d+)"), (s, a: string, b: string, c: string, d1: string, d2: string, d3: string) => {
+  expect(s.queue).toEqual([{ sailors: num(a), day: num(d1) }, { sailors: num(b), day: num(d2) }, { sailors: num(c), day: num(d3) }]);
+});
+Then(re("a muster of (\\d+) more sailors is refused because the queue holds at most (\\d+) batches"), (s, n: string, max: string) => {
+  expect(N.navalConfig.game.queues.musterQueueMax).toBe(num(max));
+  expect(N.musterBatches(num(n), s.queue, 0)).toBeNull();
 });
 
 Given(re('a port on the "([^"]+)"'), (s, seaName: string) => {
@@ -837,8 +873,8 @@ When("it orders a war canoe fleet and a voyaging canoe there", (s) => {
   const b: N.Buyer = { name: s.country, known: s.known[s.country], gold: 100, timber: 10 };
   s.results = [N.orderShip(s.beach, "war canoe fleet", b), N.orderShip(s.beach, "voyaging canoe", b)];
 });
-Then("both orders are allowed", (s) => {
-  expect(s.results.map((r: N.OrderResult) => r.ok)).toEqual([true, true]);
+Then("both orders are refused", (s) => {
+  expect(s.results.map((r: N.OrderResult) => r.ok)).toEqual([false, false]);
 });
 
 Given('the country "Portugal" has no ship of that kind', (s) => {

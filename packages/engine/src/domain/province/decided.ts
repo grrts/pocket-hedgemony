@@ -163,6 +163,16 @@ export function sicknessLoss(men: number, sickness: string, feverLand = false, c
   return Math.floor(men * share);
 }
 
+/**
+ * Men an army loses to its ground's sickness in a month, worst for soldiers not born on that
+ * ground: men born there lose half the rate, and fever land spares them (PROV-048, PROV-301, D-PROV-15).
+ */
+export function armySickness(men: number, sickness: string, bornOnGround: boolean, feverLand = false, cfg: ProvinceConfig = provinceConfig): number {
+  if (!bornOnGround) return sicknessLoss(men, sickness, feverLand, cfg);
+  const t = cfg.decided.sickness_monthly as Record<string, number>;
+  return Math.floor(men * (t[sickness] ?? 0) * cfg.decided.sickness_local_share);
+}
+
 // ---------------------------------------------------------------- births, events, sums (D-PROV-8, D-PROV-16, D-PROV-1)
 
 /** A class's yearly birth rate under named conditions, each worth percentage points (PROV-297). */

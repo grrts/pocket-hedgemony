@@ -413,7 +413,11 @@ Every province is laid out in **4 to 16 tiles** from the map: bigger provinces h
 
 **Mines and salt.** A province in hills or mountains may have an ore deposit under its waste: iron, copper, tin, silver, gold or rock salt, with so many years of digging left. Tap the waste tile on the Land tab to see it. A mine needs the ore deposit and timber from a lumber camp in the province or next door; it gives work for 6,000 miners and adds trade, three times as much for silver or gold. Each January it digs a year off the deposit, and when it runs out the mine closes. Kutná Hora's silver (in Středočeský) and Falun's copper (in Dalarna) are already dug in 1444. On a dry or warm coast, saltworks on the shore make salt and add trade too.
 
-**How you use it.** Tap one of your provinces, then its **Land** tab. The first line says how much of its people the land feeds in a normal year, in red under 100 %. Below is the grid of tiles, each coloured by its use and naming the building that works it. Tap a tile to see who works it, what it feeds or gives a year, and the building that would work it better, with its **Build** button or why it can't be built yet. Under the sheet are the one to three changes that tile allows, each with its gold and time. On the country card, **Provinces → Short of food** lists the provinces whose land doesn't feed them and what would fix each; tap one to open its Land tab.
+**Worn fields.** Fields farmed year after year with more farmers than they hold wear out: after 30 years of it one fields tile turns **worn** and gives half, then the next 30 years another. Each rotation invention your realm knows (*Three-field rotation*, *Fodder crops*, *Four-field rotation*) makes that half as long again. Farmers work the sound fields first, so once the sound fields hold them all, the worn tile rests, and after 5 years of rest it is sound again. A better farm, fewer farmers (settlers, recruits, a new town building) or clearing woods for more fields lets it rest. Grassland and savanna start mostly as pasture.
+
+**Fever land.** Every province has a fever land of none, mild, harsh or deadly: jungle is harsh and marsh and savanna mild, a step worse in the tropics and for every two marsh tiles. By the rules, soldiers and settlers born elsewhere die there at 5, 15 or 30 % a year and the people born there at a tenth of that; the game shows it on the Land tab now, and armies and colonies will count it when their sickness is played. Draining the marsh lowers it.
+
+**How you use it.** Tap one of your provinces, then its **Land** tab. The first line says how much of its people the land feeds in a normal year, in red under 100 %; under it, a line names the province's fever land, if it has any. Below is the grid of tiles; a worn field is striped and marked "worn", and its sheet says how long it has rested, each coloured by its use and naming the building that works it. Tap a tile to see who works it, what it feeds or gives a year, and the building that would work it better, with its **Build** button or why it can't be built yet. Under the sheet are the one to three changes that tile allows, each with its gold and time. On the country card, **Provinces → Short of food** lists the provinces whose land doesn't feed them and what would fix each; tap one to open its Land tab.
 
 ## What you see
 
@@ -479,6 +483,10 @@ All province numbers are placeholders, kept in one province data file.
 | Destroyed castle as waste | `province.castle_ruin.waste_years` | 5 years |
 | Second town tile | `province.town.second_tile_townsfolk` | 40,000 townsfolk |
 | Worn recovery | `province.worn.recovery_years` | 5 years |
+| Years of overwork that wear a field | `province.worn.overwork_years`, `rotation_stretch` | 30, ×1.5 per rotation invention |
+| Fever land | `province.fever_land` | jungle harsh, marsh and savanna mild, +1 tropics, +1 per two marsh; 5 / 15 / 30 % a year for people born elsewhere, a tenth for locals |
+| Tax owed | `province.tax.owed` | 0.12 gold per 1,000 building workers, 0.5 per 1,000 townsfolk, at normal |
+| Travel | `province.roads.travel` | winter ×1.5, enemy army or broken road ×2 |
 | Burned tiles rebuilt | `province.burned.rebuild_per_year` | 1 a year |
 | Ground and troops | `province.ground.troops` | table above |
 | River crossing penalty | `province.river_crossing_penalty` | −20 % |

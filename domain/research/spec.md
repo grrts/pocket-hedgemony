@@ -135,14 +135,14 @@ Holds: one row per invention with `id`, `parent`, `also_needs`, `era`, `unlocks`
 ### 5.5 The tree
 - RSCH-040: The tree shall be one tree from the root *Settled life*, splitting into four branches (R1 Tilling and building, R2 Fire and metal, R3 Counting and records, R4 Boats), with inventions branching era by era and many needing an invention from another branch. [research-tree intro]
 - RSCH-041: The letter in an invention id (F, C, T, S, W, B, G, L) shall only describe what it is about and shall not form a separate tree. [research-tree intro]
-- RSCH-042: The tree shall hold the 174 inventions of §5.8, each unlocking what its row says, and the 13 past inventions of RSCH-092 (187 rows once built). [research-tree, D-RSCH-21]
+- RSCH-042: The tree shall hold the 174 inventions of §5.8, each unlocking what its row says, and the 13 past inventions of RSCH-092: 187 rows. [research-tree, D-RSCH-21]
 - RSCH-043: The 20 ★ inventions shall keep their ids so the event tree keeps working; the event tree's `tech_*` and `innovation` read inventions from the tree. [research-tree intro, country-stats §11]
 - RSCH-044: Each invention shall be one config row with `id`, `parent`, `also_needs`, `era`, `unlocks` and `start_regions`, and new inventions (e.g. Andean terrace farming, Ethiopian church schools, Javanese irrigation) can be hung on any branch without code. [research-tree Rules]
 - RSCH-045: The 12 Era VIII inventions shall be out of scope and never studied; of Era VII, L23 and L24 shall never be studied and the other 16 may be studied until 31 August 1939 (RSCH-062, RSCH-063). [gap-lists decisions, item 22, X-14, D-RSCH-1, D-RSCH-2]
 
 ### 5.6 Start
-- RSCH-050: At the start every country shall know the root and the four branches. [research-tree Rules]
-- RSCH-051: *(Replaced by RSCH-098 once built, D-RSCH-21.)* At the start each country shall also know the inventions it historically knew: "start:" names who typically knows each in 1444, and the catalogue's `institutional_development` and region decide the exact set (e.g. East Asian courts printing and the examination system, Iberians ocean ships under way, Timurid lands observatories), worked out as RSCH-076 states. [research-tree Rules, §7.3, §10, D-RSCH-11]
+- RSCH-050: At the start every country shall know the root and the four boughs. [research-tree Rules]
+- RSCH-051: *(Replaced by RSCH-098, built 18 Oct, D-RSCH-21.)* At the start each country shall also know the inventions it historically knew: "start:" names who typically knows each in 1444, and the catalogue's `institutional_development` and region decide the exact set (e.g. East Asian courts printing and the examination system, Iberians ocean ships under way, Timurid lands observatories), worked out as RSCH-076 states. [research-tree Rules, §7.3, §10, D-RSCH-11]
 
 ### 5.7 Reading research elsewhere
 - RSCH-060: The event tree's `literacy` shall read scholars and schools per thousand people. [country-stats §11]
@@ -348,7 +348,7 @@ they did by then; L23 and L24 are dropped (D-RSCH-1).
 - RSCH-073: Each January, the richest neighbour with at least twice a country's gold shall poach 1 in 20 of its scholars. [D-RSCH-10]
 - RSCH-074: L6 and L11 shall each give +10 % research, L20 +50 %, L3 +20 % toward Learning (L) and Sea (S) inventions; C1, L4 and L5 shall each make school upkeep 10 % lower. [D-RSCH-12]
 - RSCH-075: Each January a country shall lose 1 in 30 of its scholars to old age, 1 in 60 once it knows L10. [D-RSCH-12]
-- RSCH-076: *(Replaced by RSCH-098 once built, D-RSCH-21.)* A map nation shall start knowing the root, the four branches, every invention whose start regions name a group the research data puts it in, the extra inventions the data lists for it (Ming and Korea: L5 printing), and everything those need; `institutional_development` is not used, and no study starts with progress. [D-RSCH-11]
+- RSCH-076: *(Replaced by RSCH-098, built 18 Oct, D-RSCH-21.)* A map nation shall start knowing the root, the four boughs, every invention whose start regions name a group the research data puts it in, the extra inventions the data lists for it (Ming and Korea: L5 printing), and everything those need; `institutional_development` is not used, and no study starts with progress. [D-RSCH-11]
 - RSCH-077: F9 shall open for a country when exploration reports its Atlantic crossing; the countries of the Americas know it from the start. [D-RSCH-13]
 - RSCH-078: The AI shall study the eligible invention that costs it least now, ties by id; it shall fill every empty seat while at peace and none while at war, and call students to arms only while at war with no recruits left. [D-RSCH-14]
 - RSCH-079: Students shall be taken from recruits and graduates counted as scholars without a sex; whether a scholar named to a role is a woman shall be the realm's women-in-roles roll. [D-RSCH-15]
@@ -595,13 +595,13 @@ On era boundaries (by date): costs of studying ahead change.
 | sack_chance_pct, sack_scholars_flee_share | Sack chance and share of scholars who flee | 25 %, half | yes | research.json |
 | poach_gold_ratio, poach_one_in | Gold ratio for poaching, share poached | 2×, 1 in 20 | yes | research.json |
 | old_age_one_in | Scholars lost to old age a year | 1 in 30 (1 in 60 with L10) | yes | research.json |
-| start_region_members, start_extra | Which map nations each start label covers; extra start inventions (replaced by start_groups) | table | yes | research.json |
 | start_groups | Per group: members, past inventions, Era I and II inventions (§5.11) | 20 groups | yes | research.json |
 | start_add, start_remove | Per realm: inventions added to or removed from its group's set (§5.11) | table | yes | research.json |
 | without | What lacking F01, F03, B01, C01 costs (RSCH-094) | F01 −1 harvest step; F03 no horse regiments or caravans; B01 half the food carried; C01 −20 % strength | yes | research.json |
 | queue_length | Inventions a study queue holds after the current study | 5 | yes | research.json |
 | standing_share | Share of an era's inventions that gives standing in it | 0.25 | yes | research.json |
-| contact_americas | Inventions that open for realms of the Americas only on contact | F03 (first contact), F9 (RSCH-077) | no | research.json |
+| regional_contacts | Inventions that open only on a contact for the realms of some start groups | F03 on first contact across the ocean for mesoamerica, andes and north_america (RSCH-096); F9's contact stays on its row (RSCH-077) | no | research.json |
+| past_eras, era_names | The eras before 1444 and their names | A Ancient, M Medieval | no | research.json |
 
 The file is `packages/rules/data/domain/research.json`; its `_provisional` list names the provisional values.
 
@@ -734,6 +734,6 @@ Every requirement has at least one scenario. The invention list (§5.8) is check
 | RSCH-096 | past-eras.feature | Horses reach the Americas only by contact |
 | RSCH-097 | past-eras.feature | Standing |
 | RSCH-098, RSCH-099 | start-groups.feature | Every realm starts from its group; Start sets are complete; Who starts behind |
-| RSCH-100 … RSCH-106 | — | Client screens; to be checked by apps/client/scripts/research-shots.mjs (one picture, zoom, tap targets, no sideways scroll) |
+| RSCH-100 … RSCH-106 | — | Client screens; checked by apps/client/scripts/research-shots.mjs and apps/client/src/ui/learning.test.ts (one picture, zoom, tap targets, no sideways scroll) |
 | RSCH-108, RSCH-109 | study-queue.feature | The next queued study starts by itself; Queue the path; A full queue takes no path |
-| RSCH-107, RSCH-110, RSCH-111 | — | Client screens; to be checked by apps/client/scripts/research-shots.mjs |
+| RSCH-107, RSCH-110, RSCH-111 | — | Client screens; checked by apps/client/scripts/research-shots.mjs |

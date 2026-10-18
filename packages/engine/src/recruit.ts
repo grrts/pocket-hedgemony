@@ -7,7 +7,7 @@ import { mix, officialName, personName, rankedName } from "./names.ts";
 import { OFFICIALS, officialAt, officialBonus } from "./officials.ts";
 import { monthlyRations, wagonRations } from "./march.ts";
 import { campaigning, halt, isMarching } from "./turn.ts";
-import { spawnArmy, type World } from "./world.ts";
+import { foodCarriedPct, spawnArmy, type World } from "./world.ts";
 import { armyBreak, atWar, controller, wallsOf, type News } from "./war.ts";
 import { armUnlocked, knownSet } from "./research.ts";
 import { heritageFactor } from "./heritage.ts";
@@ -552,7 +552,7 @@ function addToGarrison(world: World, n: number, p: number, men: number): void {
   a.drill[troop] = (a.drill[troop]! * before) / (before + men);
   a.monthsOut[troop] = Math.round((a.monthsOut[troop]! * before) / (before + men));
   setByArm(world, troop, by);
-  a.food[troop] = a.food[troop]! + wagonRations(world.rules.defines.march, { men, horse: 0, logistics: 0 });
+  a.food[troop] = a.food[troop]! + wagonRations(world.rules.defines.march, { men, horse: 0, logistics: 0, foodCarriedPct: foodCarriedPct(world, n) });
 }
 
 /**

@@ -371,6 +371,12 @@ settlement, settlers, local people's tiles.
 - PROV-331: Saltworks shall stand in a province with a shore tile on a dry or warm coast (drylands, desert or savanna, or below 42° of latitude); they give work for 1,500 miners, salt and trade as a lumber camp does. [feedback 87]
 - PROV-332: Where: the waste tile's sheet on the Land tab shows the ore deposit and its years left (or none found) and offers the mine with its Build button or why not (no ore deposit, no timber in reach); the shore tile's sheet offers saltworks beside the fishery. Grouping and overview: mines and saltworks sit with the other land on the Land tab; the Build tab lists them with the other works. Phone: as PROV-316. [X-19]
 
+### Land and health in the game (18 October 2026)
+- PROV-333: Each January a province whose farmers outnumber what its fields hold shall count a year of overwork, and after 30 years in a row one fields tile wears (half its food), one tile at a time; each of *Three-field rotation*, *Fodder crops* and *Four-field rotation* its owner knows makes that half as long again. Farmers fill the sound fields first, so a worn tile the sound fields can spare rests, and after 5 years of rest it is sound again. [PROV-034, PROV-035, D-PROV-31]
+- PROV-334: Each province shall have a fever land step from its ground (jungle harsh, marsh and savanna mild), a step worse in the tropics (within 23.5° of the equator) and for every two marsh tiles, and a step better for each of quinine and sanitation its owner knows, never below none. People born elsewhere die there at an extra 5, 15 or 30 % a year (mild, harsh, deadly); locals at a tenth of that. Warfare can read the same rate for armies. [PROV-102, PROV-243, D-PROV-32]
+- PROV-335: Where: worn fields show on the province's Land tab as a faded, striped fields square marked "worn"; its sheet says it gives half, why, and how many of its 5 years of rest have passed. Overworked fields that have not worn yet say so on their sheet, with the years so far and the year they wear. Fever land shows as a line under the land's food line ("Harsh fever land", what it does to people from elsewhere, and what sets and lowers it), in warning colours from harsh up. [X-19]
+- PROV-336: Grouping and overview: wearing and fever land sit with the rest of the land on the Land tab; worn fields count at half in its food line, and the realm's Provinces list (Short of food) stays the overview of food across the realm. Phone: as PROV-316: the worn mark is text and stripes, not colour alone or hover, and the fever line wraps in the side panel in the Wide and Tall layouts. [X-19]
+
 ### 5.19 Lords in the province
 - PROV-200: A lord shall always hold at least one province; someone with no land is a courtier. [§10.3]
 - PROV-201: When a lord loses his last province, he shall stop being a lord: he stays at court as a courtier who can be granted land again, or, if he lost it to you by force, he flees abroad and becomes a pretender to it. [§10.3]
@@ -537,7 +543,7 @@ Reads first: realm's food policy and castle deliveries, owner and war state, inv
 6. Grievance evaluation (start/end), then calm/grumbling/riots/rebels.
 Each season: food check and famine (§6.2); store rot (realm); *Hungry*, *Requisitioned*, *Soldiers quartered* timers.
 Each autumn (and twice for rice): harvest roll (realm food year).
-Each year: recruits refill; tax owed; years held, official years served; burned tile rebuild; worn tile checks; ore deposits fall; upkeep and neglect (buildings); woods regrowth after 10 unworked years; refugees settle after 2 years.
+Each year: recruits refill; tax owed; years held, official years served; burned tile rebuild; worn tile checks (overwork wears, rest recovers); mine seams fall; upkeep and neglect (buildings); woods regrowth after 10 unworked years; refugees settle after 2 years.
 Each week while an outbreak runs (days 7, 14, 21, 28): plague (D-PROV-4).
 
 ## 10. Configuration
@@ -554,6 +560,12 @@ province config file but no file name or keys; keys below are proposed by this s
 | province.castle_ruin.waste_years | Years a destroyed castle tile stays waste | 5 | yes | province config |
 | province.town.second_tile_townsfolk | Townsfolk for the second town tile | 40,000 | yes | province config |
 | province.worn.recovery_years | Years without use to clear Worn | 5 | yes | province config |
+| province.worn.overwork_years, rotation_stretch | Years of overwork that wear a fields tile; stretch per rotation invention | 30; ×1.5 (D-PROV-31) | yes | province config |
+| province.woods | Timber loads a woods tile regrows a year; years lost woods take to grow back | 1; 10 (D-PROV-30) | yes | province config |
+| province.fever_land | Steps by ground, tropics, marsh tiles; deaths for people born elsewhere; locals' share | jungle 2, marsh 1, savanna 1, +1 tropics, +1 per 2 marsh; 5/15/30 %; 0.1 (D-PROV-32) | yes | province config |
+| province.tax.owed | Gold per 1,000 building workers and townsfolk; rate factors | 0.12; 0.5; 0, ½, 1, 1½, 2 (D-PROV-33) | yes | province config |
+| province.roads.travel | Winter, enemy army and broken road factors | ×1.5; ×2; ×2 (D-PROV-34) | yes | province config |
+| province.ground.start_mix | Share of each tile use in a square of each ground at the start | grassland pasture 0.55 (PROV-024, D-PROV-25) | yes | province config |
 | province.burned.rebuild_per_year | Burned tiles rebuilt a year in peace | 1 | yes | province config |
 | province.ground.troops | Foot, horse, guns, defender, days to cross, foraging, sickness per ground | farmland 0/+10/0/0/1/Rich/Low; grassland 0/+25/0/−10/1/Fair/Low; savanna 0/+15/0/0/1/Fair/Medium; drylands 0/+10/0/0/1.5/Poor/Low; desert −10/−10 (camels 0)/−10/+10/2/Almost none/Heat; hills +10/−15/−10/+15/1.5/Fair/Low; mountains 0/−40/−30/+30/3/Poor/Cold; forest 0/−25/−20/+15/2/Fair/Low; jungle −10/−40/−30/+25/3/Poor/High; marsh −10/−30/−30/+20/3/Poor/High; tundra 0/−10/−10/+10/2/Almost none/Cold | yes | province config |
 | province.river_crossing_penalty | Attacker over a river without bridge | −20 % | yes | province config |
@@ -665,6 +677,13 @@ province config file but no file name or keys; keys below are proposed by this s
 - **D-PROV-27** (17 Oct, feedback 86) Tile changes are few and slow: only the five changes the tile rules (§2.1) name, one per province at a time, for gold and years, and the ground never changes. The tile a change takes is the last of its use, so the player chooses the change, not the square. Lords and the AI act by a plain rule (feed the province first: drain, irrigate, then clear woods), so the AI's land changes slowly and only where it is short.
 - **D-PROV-28** (18 Oct, feedback 93) A year's famine kills at most a fifth of a province. Without a cap, an occupied province or two failed harvests in a row could lose nine in ten of its people (Nordjylland 95 % in 1454 to 1455 on seed 1). With it, the worst two years cost about a third, and famine deaths over the first 16 years fall from about 25M to 16M while the world still grows. Some 60 to 100 provinces a year still reach the cap, mostly in the far north where the food is short every year; that is a balance question for the land, not the famine rule.
 - **D-PROV-29** (18 Oct, feedback 87) Ore deposits come from a fixed roll per province, not the game's dice, so the geology is the same in every game and seeding never shifts the turn's rolls. A third of rough waste holds an ore deposit (about 360 provinces), weighted to iron; silver and gold mines give three times the trade, standing in for the precious-metal flows the trade context will model. Mines need timber from a lumber camp next door at most (one ring); roads and rivers stretching that reach wait for the timber trade.
+
+- **D-PROV-30** (18 Oct) Woods lost to fire or to cutting more timber in a year than they regrow (one load per woods tile a year) become waste, stumps and ash, and grow back to woods after 10 years, as unworked fields do. The design says woods are lost but not what they become (tiles.feature); waste is the plainest answer and lets them come back on their own.
+- **D-PROV-31** (18 Oct) Wearing: "farmed for decades" is 30 years in a row with more farmers than the fields hold; each rotation invention stretches it by half (45, 68, 101 years), one tile at a time. A worn tile recovers after 5 years without use, which in the game means 5 years in which the sound fields hold every farmer. Wearing starts at none in 1444, so the 1444 food stays at 110 % (D-PROV-25) and only crowded fields wear, slowly. Provisional numbers.
+- **D-PROV-32** (18 Oct) Fever land: ground first (jungle 2, marsh and savanna 1), one more in the tropics, one more per two marsh tiles, one less per quinine and sanitation known; mild, harsh and deadly add 5, 15 and 30 % a year to the death rate of people born elsewhere, the same steps as plague, and locals take a tenth. Quinine and sanitation are not in the research tree yet, so the game's fever land falls only with draining. Provisional numbers.
+- **D-PROV-33** (18 Oct) Tax owed is 0.12 gold a year per 1,000 workers in working land buildings and 0.5 per 1,000 townsfolk at the normal rate, scaled by the realm's tax steps (0, ½, 1, 1½, 2), less the homeless cut (D-PROV-1) and half under riots. Burned and fallow tiles make nothing and so owe nothing. Troyes's 61,500 workers and 6,900 townsfolk owe about 11 gold, as its card says. Tolls are trade's and never counted here. Provisional numbers.
+- **D-PROV-34** (18 Oct) Travel: winter makes roads and rivers half as slow again, an enemy army on the road or a broken road doubles the road's days (the detour), and a sea route closed in war is no route. Days to capital is the fastest of the routes to the capital or a seat as things stand. Provisional numbers.
+- **D-PROV-35** (18 Oct) Sickness: men born on the ground lose half its monthly rate and are spared fever land; everyone else takes the full rate and fever land counts as High (D-PROV-15). People made homeless by a burned tile who stay in the province join the homeless.
 
 ## 14. Traceability
 
@@ -858,6 +877,8 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-326 … PROV-327 | — | Presentation: apps/client/src/ui/land.ts change block; main.ts Short of food view |
 | PROV-328 … PROV-331 | — | Engine: packages/engine/test/works.test.ts (ore deposits, mines, saltworks, save) |
 | PROV-332 | — | Presentation: apps/client/src/ui/land.ts waste and shore sheets |
+| PROV-333 … PROV-334 | — | Engine: packages/engine/test/land.test.ts (wearing and rest, fever land, save) |
+| PROV-335 … PROV-336 | — | Presentation: apps/client/src/ui/land.ts worn tiles and fever line |
 | PROV-200 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A courtier can be granted land again |

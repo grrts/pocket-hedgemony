@@ -3,7 +3,7 @@ import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
-import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
+import { callStudentsToArms, foundSchool, monthlyResearch, moveQueued as moveQueuedStudy, queuePath, queueStudy, setSeats, setStudy, unqueue } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
 import { riseUp, subjectAction } from "./subjects.ts";
@@ -27,7 +27,7 @@ import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
-import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
+import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
 import {
   aiCollect,
   appointCommander,
@@ -120,6 +120,11 @@ export type Order =
   | { type: "settleLand"; province: number }
   /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
   | { type: "setStudy"; invention: string }
+  /** The study queue (RSCH-108 to RSCH-110): add one, queue the path to one, take one out, move one a place earlier (-1) or later (1). */
+  | { type: "queueStudy"; invention: string }
+  | { type: "queuePath"; invention: string }
+  | { type: "unqueueStudy"; invention: string }
+  | { type: "moveQueuedStudy"; invention: string; by: number }
   | { type: "setSeats"; n: number }
   | { type: "callStudentsToArms" }
   | { type: "foundSchool"; province: number }
@@ -376,6 +381,14 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "setStudy":
       return setStudy(world, actingNation, order.invention);
+    case "queueStudy":
+      return queueStudy(world, actingNation, order.invention);
+    case "queuePath":
+      return queuePath(world, actingNation, order.invention);
+    case "unqueueStudy":
+      return unqueue(world, actingNation, order.invention);
+    case "moveQueuedStudy":
+      return moveQueuedStudy(world, actingNation, order.invention, order.by < 0 ? -1 : 1);
     case "setSeats":
       return setSeats(world, actingNation, order.n);
     case "callStudentsToArms":
@@ -739,9 +752,13 @@ function feedArmies(world: World): void {
   const map = marchMap(world);
   const a = world.armies;
   const day = 1 / DAYS_PER_RATION_MONTH;
+  // What each realm's wagons hold (RSCH-094: half without B01), read once per realm per day.
+  const carried = new Int16Array(world.nationCount).fill(-1);
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
-    const army = { ...marching(world, i), campaigning: campaigning(world, i) };
+    const n = a.owner[i]!;
+    if (carried[n]! < 0) carried[n] = foodCarriedPct(world, n);
+    const army = { ...marching(world, i), campaigning: campaigning(world, i), foodCarriedPct: carried[n]! };
     const need = monthlyRations(d, army) * day;
     a.food[i] = a.food[i]! - need;
     const room = wagonRations(d, army) - a.food[i]!;

@@ -2,6 +2,7 @@ import { expect } from "vitest";
 import { steps } from "../src/registry.ts";
 import * as R from "@ph/engine/domain/research";
 import { Rng } from "@ph/engine";
+import { loadDefaultRuleset } from "@ph/rules";
 
 const { Given, When, Then } = steps("research");
 
@@ -124,12 +125,12 @@ Then("{string} grows on the branch {string} although its letter is {word}", (s, 
 });
 
 Then(
-  "it holds {int} inventions: {int} of era I, {int} of era II, {int} of era III, {int} of era IV, {int} of era V, {int} of era VI, {int} of era VII and {int} of era VIII",
+  "it holds {int} inventions: {int} of era A, {int} of era M, {int} of era I, {int} of era II, {int} of era III, {int} of era IV, {int} of era V, {int} of era VI, {int} of era VII and {int} of era VIII",
   (s, total: number, ...byEra: number[]) => {
     const t: R.Tree = s.tree;
     expect(t.inventions.size).toBe(total);
     const counts = R.countByEra(t);
-    expect(R.ERAS.map((e) => counts[e])).toEqual(byEra);
+    expect(R.TREE_ERAS.map((e) => counts[e])).toEqual(byEra);
   },
 );
 
@@ -249,7 +250,7 @@ Then("it can study {int} at once", (s, n: number) => {
   expect(s.max).toBe(n);
   // One more than allowed is refused.
   const p = programme(s);
-  const open = ["B1", "B2", "B4"];
+  const open = ["B02", "B4", "F01"];
   for (let i = 0; i < n; i++) expect(R.setStudy(p, open[i]!, { year: 1444 })).toEqual({ ok: true });
   expect(R.setStudy(p, open[n]!, { year: 1444 })).toEqual({ ok: false, reason: "too_many_studies" });
 });
@@ -846,7 +847,7 @@ Then(/^it knows "([^"]+)" and "([^"]+)", which "([^"]+)" needs$/, (s, a: string,
   expect(known.has(idOf(a))).toBe(true);
   expect(known.has(idOf(b))).toBe(true);
   const inv = R.invention(idOf(c));
-  expect([inv.parent, ...inv.also_needs]).toEqual([idOf(a), idOf(b)]);
+  expect([inv.parent, ...inv.also_needs]).toEqual(expect.arrayContaining([idOf(a), idOf(b)]));
 });
 
 Then("it does not know {string}", (s, name: string) => {
@@ -958,4 +959,242 @@ When("the country {string} is set up", (s, country: string) => {
 
 Then("it typically knows {string}", (s, name: string) => {
   expect(s.p.known.has(idOf(name))).toBe(true);
+});
+
+// ------------------------------------------------------------ the past eras (RSCH-091 to RSCH-097)
+
+const nationId = (country: string): string => country.toLowerCase().replace(/ /g, "_");
+Given("the invention tree config with the past eras", (s) => {
+  s.rows = [...(R.researchConfig.inventions as R.InventionRow[])];
+});
+
+Then("it has the eras Ancient and Medieval before era I", (s) => {
+  expect(R.TREE_ERAS.slice(0, 3)).toEqual(["A", "M", "I"]);
+  expect([R.eraName("A"), R.eraName("M")]).toEqual(["Ancient", "Medieval"]);
+  expect(R.eraIndex("M")).toBeLessThan(R.eraIndex("I"));
+});
+
+Then("it holds {int} past inventions of era Ancient and {int} of era Medieval", (s, a: number, m: number) => {
+  const counts = R.countByEra(s.tree);
+  expect([counts.A, counts.M]).toEqual([a, m]);
+});
+
+Then("it holds {int} inventions in all", (s, n: number) => {
+  expect((s.tree as R.Tree).inventions.size).toBe(n);
+});
+
+Then("{string} needs the past invention {string}", (s, name: string, past: string) => {
+  const inv = R.invention(idOf(name), s.tree);
+  expect(R.isPast(R.invention(idOf(past), s.tree))).toBe(true);
+  expect([inv.parent, ...inv.or_parents, ...inv.also_needs]).toContain(idOf(past));
+});
+
+Given("the country {string} starts without {string} but with {string}", (s, country: string, lacks: string, has: string) => {
+  // Only what the realm has here: the root, the boughs, and the invention it has with all it needs.
+  const p = (s.p = R.newProgramme(nationId(country)));
+  knowWithNeeds(p, idOf(has), true);
+  expect(p.known.has(idOf(lacks))).toBe(false);
+  expect(R.startingKnowledgeFor(nationId(country)).has(idOf(lacks))).toBe(false);
+  expect(R.startingKnowledgeFor(nationId(country)).has(idOf(has))).toBe(true);
+});
+
+Given("the country {string} starts without {string}", (s, country: string, lacks: string) => {
+  s.p = R.startingProgramme(nationId(country));
+  expect(s.p.known.has(idOf(lacks))).toBe(false);
+});
+
+Given("the country {string} starts knowing every past invention", (s, country: string) => {
+  s.p = R.startingProgramme(nationId(country));
+  expect(R.missingPast(s.p.known)).toEqual([]);
+});
+
+When("it tries to study {string} in {int}", (s, name: string, year: number) => {
+  s.date = { year };
+  s.result = R.eligibility(programme(s), idOf(name), s.date);
+  s.cost = R.studyCostFor(programme(s), idOf(name), s.date, s.partners?.[idOf(name)] ?? 0);
+});
+
+Then("the past invention costs {float} scholar-years", (s, cost: number) => {
+  expect(s.result).toEqual({ ok: true });
+  expect(s.cost).toBeCloseTo(cost);
+});
+
+When("its lack of a past invention applies", (s) => {
+  s.without = R.without(programme(s).known);
+});
+
+Then("its farmland harvests one step worse", (s) => {
+  expect(s.without.harvestSteps).toBe(-1);
+});
+
+Then("it can raise no horse regiments", (s) => {
+  expect(s.without.noArms).toEqual(expect.arrayContaining(["light horse", "knights and lancers"]));
+  expect(s.without.noCaravans).toBe(true);
+});
+
+Then("its armies carry half the food", (s) => {
+  expect(s.without.foodCarriedPct).toBe(50);
+});
+
+Then("its regiments fight {int} % weaker", (s, pct: number) => {
+  expect(s.without.strengthPct).toBe(-pct);
+});
+
+Then("nothing changes against today's rules", (s) => {
+  expect(s.without).toEqual({ harvestSteps: 0, noArms: [], noCaravans: false, foodCarriedPct: 100, strengthPct: 0 });
+});
+
+Given("no realm from across the ocean has met it", (s) => {
+  expect(programme(s).contacts.size).toBe(0);
+});
+
+Then("the study is refused until first contact", (s) => {
+  expect(s.result).toEqual({ ok: false, reason: "contact" });
+});
+
+When("exploration reports its first contact with {string}", (s, other: string) => {
+  const p = programme(s);
+  const contact = R.researchConfig.regional_contacts.find((c) => c.groups.includes(p.group ?? ""))!;
+  // The other realm comes from across the ocean: its start group is not one of the contact's.
+  expect(contact.groups).not.toContain(R.startGroupOf(nationId(other)));
+  R.contactEvent(p, contact.contact);
+});
+
+Then("the country {string} may study {string}", (s, _country: string, name: string) => {
+  expect(R.eligibility(programme(s), idOf(name), date(s))).toEqual({ ok: true });
+});
+
+When("the country {string} is set up from its start group", (s, country: string) => {
+  s.p = R.startingProgramme(nationId(country));
+});
+
+Then("its standing is {string}", (s, standing: string) => {
+  expect(R.eraName(R.standing(s.p.known))).toBe(standing);
+});
+
+Then("it is behind the times by {int} eras", (s, n: number) => {
+  expect(R.behindBy(s.p.known, date(s))).toBe(n);
+});
+
+// ------------------------------------------------------------ start groups (RSCH-098, RSCH-099)
+
+Then("it belongs to the start group {string}", (s, group: string) => {
+  expect(s.p.group).toBe(group);
+});
+
+Then("it starts knowing {int} inventions besides the root and the boughs", (s, n: number) => {
+  expect(s.p.known.size - R.startingKnowledge().size).toBe(n);
+});
+
+Given("the research data with start groups", (s) => {
+  s.groups = R.startGroupTable();
+});
+
+When("every map nation is looked up", (s) => {
+  s.nations = loadDefaultRuleset().nations.map((n) => n.id);
+  s.memberships = s.nations.map((id: string) => Object.values(s.groups as Record<string, { realms: string[] }>).filter((g) => g.realms.includes(id)).length);
+});
+
+Then("each of the {int} map nations belongs to exactly one start group", (s, n: number) => {
+  expect(s.nations.length).toBe(n);
+  expect(s.memberships.every((k: number) => k === 1)).toBe(true);
+});
+
+When("every map nation's start set is built", (s) => {
+  s.gaps = loadDefaultRuleset().nations.flatMap((n) => R.startSetGaps(R.startingKnowledgeFor(n.id)).map((g) => ({ nation: n.id, ...g })));
+});
+
+Then("every invention in it has its parent or an alternative and everything it also needs in the same set", (s) => {
+  expect(s.gaps).toEqual([]);
+  // The check refuses a set that is not complete.
+  expect(R.startSetGaps(new Set(["R0", "R1", "R2", "R3", "R4", "W2"]))).toEqual([{ id: "W2", missing: ["C02", "F03"] }]);
+});
+
+Then(/^it (starts knowing|does not start knowing) "([^"]+)"$/, (s, knows: string, name: string) => {
+  expect(s.p.known.has(idOf(name))).toBe(knows === "starts knowing");
+});
+
+// ------------------------------------------------------------ the study queue (RSCH-108, RSCH-109)
+
+/** A realm from its 1444 start with a school and scholars, so research moves. */
+function queueRealm(s: Record<string, any>, country: string): R.Programme {
+  const p = (s.p = R.startingProgramme(nationId(country)));
+  addTempleSchools(p, 1);
+  p.scholars = 10;
+  return p;
+}
+
+Given(/^the country "([^"]+)" studies "([^"]+)" with its queue ((?:"[^"]+"(?:, )?)+)$/, (s, country: string, study: string, queue: string) => {
+  const p = queueRealm(s, country);
+  expect(R.setStudy(p, idOf(study), date(s))).toEqual({ ok: true });
+  p.queue = [...queue.matchAll(/"([^"]+)"/g)].map((m) => idOf(m[1]!));
+});
+
+When("{string} is learned from the queue", (s, name: string) => {
+  const p = programme(s);
+  const study = p.studies.find((x) => x.id === idOf(name))!;
+  study.progress = R.studyCostFor(p, study.id, date(s));
+  s.learnedNow = R.researchMonth(p, date(s));
+  expect(s.learnedNow).toContain(idOf(name));
+});
+
+Then("the queue moves on to {string} with no alert to choose", (s, name: string) => {
+  // The alert to choose comes only when nothing is studied (RSCH-089, RSCH-108).
+  expect(programme(s).studies).toEqual([{ id: idOf(name), progress: 0 }]);
+});
+
+Then("the study queue holds {string}", (s, name: string) => {
+  expect(programme(s).queue).toEqual([idOf(name)]);
+});
+
+Then("{string} stays queued and marked waiting", (s, name: string) => {
+  const p = programme(s);
+  expect(p.queue).toContain(idOf(name));
+  expect(R.queuedWaiting(p, idOf(name), date(s))).toBe(true);
+});
+
+Given("the country {string} has an empty study queue and knows {string}", (s, country: string, name: string) => {
+  const p = queueRealm(s, country);
+  expect(p.queue).toEqual([]);
+  expect(p.known.has(idOf(name))).toBe(true);
+});
+
+When("the player queues the path to {string}", (s, name: string) => {
+  s.queued = R.queuePath(programme(s), idOf(name), date(s));
+});
+
+Then(/^the study queue holds, in an order that can be studied, ((?:"[^"]+"(?:, | and )?)+)$/, (s, list: string) => {
+  const ids = [...list.matchAll(/"([^"]+)"/g)].map((m) => idOf(m[1]!));
+  const p = programme(s);
+  expect(p.queue).toEqual(ids);
+  // Each can be studied once those before it are known.
+  const q = R.newProgramme(p.country);
+  q.known = new Set(p.known);
+  for (const id of p.queue) {
+    expect(R.eligibility(q, id, date(s))).toEqual({ ok: true });
+    q.known.add(id);
+  }
+});
+
+Given("the country {string} has {int} inventions in its study queue", (s, country: string, n: number) => {
+  const p = queueRealm(s, country);
+  const open = [...R.tree().inventions.keys()].filter((id) => R.eligibility(p, id, date(s)).ok);
+  expect(R.setStudy(p, open[0]!, date(s))).toEqual({ ok: true });
+  for (const id of open.slice(1, n + 1)) expect(R.enqueue(p, id, date(s))).toEqual({ ok: true });
+  expect(p.queue.length).toBe(n);
+});
+
+When("the player queues the path to an invention that needs {int} more steps", (s, n: number) => {
+  const p = programme(s);
+  const far = [...R.tree().inventions.keys()].find((id) => {
+    const r = R.pathTo(p, id);
+    return r.ok && r.path.length === n + 1;
+  })!;
+  s.before = [...p.queue];
+  s.queued = R.queuePath(p, far, date(s));
+});
+
+Then("nothing is added to the study queue and the sheet says the queue is full", (s) => {
+  expect(s.queued).toEqual({ ok: false, reason: "queue_full" });
+  expect(programme(s).queue).toEqual(s.before);
 });
