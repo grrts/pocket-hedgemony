@@ -69,13 +69,15 @@ await page.waitForTimeout(400);
 await say("diplomacy");
 await shot("11-envoy-tab");
 await page.tap("[data-envoy]");
-await page.waitForTimeout(600);
+// The envoy is an order sent to the engine; wait for it to come back rather than a fixed time.
+await page.waitForFunction(() => document.querySelector(".hint-note")?.hidden, null, { timeout: 10000 }).catch(() => {});
 console.log("after envoy hidden:", await page.locator(".hint-note").isHidden(), await hint(), await page.locator(".alert").allTextContents());
 if (!(await page.locator(".hint-note").isHidden())) failed = true;
 await page.tap("#settings").catch(async () => {
   await page.tap(".panel .close");
   await page.tap("#settings");
 });
+await page.tap(".settings [data-section=gameplay]");
 await page.waitForTimeout(300);
 await shot("12-settings");
 await page.tap("[data-hints-reset]");
@@ -85,6 +87,8 @@ await page.tap("[data-hints-toggle]");
 await page.waitForTimeout(300);
 console.log("off hidden:", await page.locator(".hint-note").isHidden());
 await page.tap("[data-hints-toggle]");
+await page.waitForTimeout(300);
+await page.tap(".settings .close");
 await page.waitForTimeout(300);
 // Portrait: the phone shows its turn-sideways notice over everything.
 await page.setViewportSize({ width: 412, height: 915 });

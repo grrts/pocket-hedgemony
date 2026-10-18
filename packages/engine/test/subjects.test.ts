@@ -179,4 +179,40 @@ describe("subjects (milestone 5)", () => {
     // Catholic Castile over Sunni Granada: a different faith pulls away.
     expect(row.reasons.some((r) => r.label === "Different faith")).toBe(true);
   });
+
+  it("takes a hostage from a Loyal or Wavering subject: +1 while held, home after 20 years or when sent (SUBJ-042, D-SUBJ-29)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = nation(w, "castile");
+    const g = nation(w, "granada");
+    w.player = me;
+    expect(processTurn(w, [{ type: "subjectAction", subject: g, action: "hostage" }], me).rejectedOrders).toEqual([]);
+    const row = () => statecraftView(w, me)!.subjects!.subjects.find((x) => x.subject === g)!;
+    expect(row().reasons.some((r) => r.label === "Hostage at court" && r.arrow === 1)).toBe(true);
+    expect(row().hostage!.until).toMatch(/^146\d-/);
+    expect(whyNotSubjectAction(w, me, g, "hostage")).toBe("you hold their heir already");
+    processTurn(w, [{ type: "subjectAction", subject: g, action: "send_heir_home" }], me);
+    expect(row().hostage).toBeNull();
+    bondOf(w, g)!.loyalty = "disloyal";
+    expect(whyNotSubjectAction(w, me, g, "hostage")).toMatch(/Disloyal/);
+    bondOf(w, g)!.loyalty = "wavering";
+    processTurn(w, [{ type: "subjectAction", subject: g, action: "hostage" }], me);
+    w.date.year += 20;
+    monthlySubjectEnvoys(w, []);
+    expect(bondOf(w, g)!.ties.includes("hostage_at_court")).toBe(false);
+  });
+
+  it("brings the backer into the independence war on the subject's side (SUBJ-077, D-SUBJ-29)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const g = nation(w, "granada");
+    // Any realm at peace will do as the backer here (Morocco is at war in 1444).
+    const backer = w.nationIds.findIndex((id) => id !== "granada" && id !== "castile" && !dip.warOf(w.diplomacy, id) && !dip.relations.overlord(w.diplomacy.graph, id));
+    bondOf(w, g)!.loyalty = "disloyal";
+    const news: { kind: string; text: string }[] = [];
+    expect(riseUp(w, g, news as never, backer)).toBeNull();
+    const war = w.diplomacy.wars.find((x) => x.declarer === "granada")!;
+    const id = w.nationIds[backer]!;
+    expect(war.attackers).toContain(id);
+    expect(dip.relations.stateOf(w.diplomacy.graph, id, "castile")).toBe("at_war");
+    expect(news.some((x) => x.text === `${w.rules.nations[backer]!.name} backs Granada and declares war on Castile.`)).toBe(true);
+  });
 });

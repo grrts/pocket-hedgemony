@@ -6248,6 +6248,62 @@
   "foreign_backing.catch_officials_add",
   "foreign_backing.catch_officials_share",
   "counter_revolution.years",
-  "counter_revolution.opinion"
- ]
+  "counter_revolution.opinion",
+  "game.need",
+  "game.warn_at",
+  "game.mean_years",
+  "game.signs",
+  "game.spark_lords_disloyal",
+  "game.spark_mult",
+  "game.grace_years",
+  "game.bend_light_tax_years",
+  "game.bend_granary_months",
+  "game.fight_first_musters",
+  "game.ai_weights",
+  "game.ai_fight_strong",
+  "game.ai_fight_weak",
+  "game.new_dynasty_light_tax_years"
+ ],
+ "game": {
+  "$comment": "First game slice (D-REVO-17, REVO-082 to REVO-088): every realm's own revolution from the estates and agrarian families. All provisional.",
+  "need": 3,
+  "warn_at": 2,
+  "mean_years": 1,
+  "signs": {
+   "heavy_taxes_share": 0.25,
+   "hungry_share": 0.2,
+   "restless_share": 0.1,
+   "lords_wavering": 2,
+   "debt_years_of_income": 1,
+   "rebels_won_years": 5
+  },
+  "spark_lords_disloyal": 2,
+  "spark_mult": 2,
+  "grace_years": 3,
+  "bend_light_tax_years": 10,
+  "bend_granary_months": 4,
+  "fight_first_musters": 6,
+  "ai_weights": {
+   "fight": 50,
+   "bend": 30,
+   "lead": 20
+  },
+  "ai_fight_strong": 1.5,
+  "ai_fight_weak": 0.5,
+  "new_dynasty_light_tax_years": 10,
+  "families": {
+   "estates": {
+    "lead": "town_league",
+    "fight_won": "estates_republic",
+    "crushed": "reaction",
+    "cause": "Town"
+   },
+   "agrarian": {
+    "lead": "agrarian_reform",
+    "fight_won": "new_dynasty",
+    "crushed": "reaction",
+    "cause": "Hunger"
+   }
+  }
+ }
 }

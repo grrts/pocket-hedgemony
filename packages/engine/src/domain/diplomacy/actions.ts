@@ -513,7 +513,8 @@ function issueCalls(d: Diplomacy, war: War): void {
   }
 }
 
-function joinWar(d: Diplomacy, war: War, c: string, side: string, enemy: string): void {
+/** Country c joins the war on side's side against enemy (a call answered, or a backer of a rising). */
+export function joinWar(d: Diplomacy, war: War, c: string, side: string, enemy: string): void {
   if (!rel.stateOf(d.graph, c, enemy)) rel.newRecord(d.graph, "at_war", c, enemy, "mutual");
   for (const x of [c, enemy]) if (rel.storedStance(d.graph, x, x === c ? enemy : c) === null) rel.setStance(d.graph, x, x === c ? enemy : c, "hostile");
   (war.attackers.includes(side) ? war.attackers : war.defenders).push(c);

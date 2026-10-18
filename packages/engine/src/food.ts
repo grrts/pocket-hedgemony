@@ -9,6 +9,7 @@ import { worksFood } from "./works.ts";
 import { atHarvest, FOOD_CLASSES, huntingYear } from "./land.ts";
 import { shareFood } from "./castleFood.ts";
 import { provinceConfig } from "./domain/province/model.ts";
+import { heritageSteps } from "./heritage.ts";
 
 /** The most of a province a year's famine takes (feedback 93). */
 const FAMINE_YEAR_SHARE = provinceConfig.famine.year_share;
@@ -138,7 +139,8 @@ export function monthlyFood(world: World, news: News[]): void {
     // Hostile armies in the province burn or eat the crop: one band worse.
     const war = world.provinceOccupier[p]! >= 0 || world.sieges.has(p) ? -1 : 0;
     // Inventions give harvest steps, each a band better (PROV-295).
-    const steps = world.provinceOwner[p]! >= 0 ? world.researchHarvest[world.provinceOwner[p]!]! : 0;
+    // Heritage adds its own (harvest_steps).
+    const steps = world.provinceOwner[p]! >= 0 ? world.researchHarvest[world.provinceOwner[p]!]! + heritageSteps(world, world.provinceOwner[p]!, "harvest_steps") : 0;
     const base = HARVESTS.indexOf(rollBaseHarvest(world.rng));
     const roll = Math.max(0, Math.min(HARVESTS.length - 1, base + weather + war + steps));
     world.provinceHarvest[p] = roll;

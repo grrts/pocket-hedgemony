@@ -10,6 +10,7 @@ import { classFood, FOOD_CLASSES, jobSlots, precious, roughWaste, saltCoast, sea
 import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
 import { yearlyFood } from "./food.ts";
 import { provinceConfig } from "./domain/province/model.ts";
+import { heritageFactor } from "./heritage.ts";
 
 const provinceMines = provinceConfig.mines;
 const MINE_ANCHORS = new Set(Object.keys(provinceMines.anchors));
@@ -34,7 +35,7 @@ export type WorkName = (typeof WORKS)[number];
 export const WORK_COUNT = WORKS.length;
 export const workIndex = (name: string): number => (WORKS as readonly string[]).indexOf(name);
 
-const W = Object.fromEntries(WORKS.map((w, k) => [w, k])) as Record<WorkName, number>;
+export const W = Object.fromEntries(WORKS.map((w, k) => [w, k])) as Record<WorkName, number>;
 
 /** The highest step of each work this slice builds (later steps need inventions or wares not simulated yet). */
 const TOP: Record<WorkName, number> = { farm: 3, ranch: 1, fishery: 1, "lumber camp": 1, quarry: 1, market: 3, harbour: 3, "drill yard": 2, road: 2, castle: 2, granary: 1, "hunting lodge": 1, mine: 1, saltworks: 1 };
@@ -177,6 +178,7 @@ export function workCost(world: World, p: number, work: number, step: number): {
   let gold = (c.gold ?? 0) * d.goldScale;
   if (c.timber && worksAt(world, p, W["lumber camp"]) > 0) gold *= 1 - d.materialsAtHandSaving;
   if ((c.stone || c.bricks) && worksAt(world, p, W.quarry) > 0) gold *= 1 - d.materialsAtHandSaving;
+  gold *= heritageFactor(world, world.provinceOwner[p]!, "building_cost_pct");
   return { gold: Math.round(gold * 10) / 10, months: c.months ?? 0 };
 }
 

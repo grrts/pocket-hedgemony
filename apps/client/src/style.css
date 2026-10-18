@@ -799,7 +799,7 @@ button.capital {
   .rotate {
     position: fixed;
     inset: 0;
-    z-index: 10;
+    z-index: 80;
     display: grid;
     place-items: center;
     padding: 24px;
@@ -2961,6 +2961,118 @@ button.paper.over {
   background: #b13e53;
 }
 
+/* ---- Heritage in play: states, seals, warmth and the choice waiting (HER-084, HER-085) ---- */
+
+.heritage-line .dormant {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+.heritage-part.off {
+  opacity: 0.7;
+}
+.heritage-part .chip,
+.seal .chip {
+  display: inline-block;
+  padding: 0 6px;
+  border: 2px solid var(--outline);
+  font-size: 0.85em;
+  color: var(--ink);
+}
+.heritage-part .chip.on {
+  background: var(--brass-light);
+}
+.heritage-part .meter {
+  display: inline-block;
+  vertical-align: middle;
+  width: 64px;
+  height: 10px;
+  border: 2px solid var(--outline);
+}
+.heritage-part .meter i {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.heritage-part .in-play {
+  padding-top: 0;
+  font-size: 0.9em;
+  color: var(--ink-soft);
+}
+.heritage-ask {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border: 2px solid var(--outline);
+  background: var(--brass-light);
+}
+.heritage-ask p {
+  margin: 0 0 6px;
+}
+.heritage-ask .choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 6px;
+}
+.heritage-ask button,
+.seal .counsel {
+  min-height: 44px;
+}
+.seals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.seal {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 4px 8px;
+  min-height: 44px;
+  margin: 6px 0;
+  padding: 4px 8px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.seal.sealed .what i {
+  color: var(--ink-soft);
+}
+.seal .what small {
+  display: block;
+  color: var(--ink-soft);
+}
+.seal .counsel {
+  padding: 0 8px;
+  white-space: nowrap;
+}
+.seal .later {
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.seal .warmth {
+  display: inline-flex;
+  gap: 2px;
+}
+.seal .warmth i {
+  width: 10px;
+  height: 14px;
+  border: 2px solid var(--outline);
+}
+.seal .warmth.cold i.on {
+  background: var(--sea);
+}
+.seal .warmth.warm i.on {
+  background: var(--brass);
+}
+.seal .warmth.hot i.on {
+  background: var(--cloth);
+}
+.seal .warm-box small {
+  color: var(--ink-soft);
+}
+.heritage-part .past-list {
+  margin: 0;
+  padding: 4px 8px 8px 24px;
+}
+
 /* ---- Subjects on the Diplomacy tab (SUBJ-091, SUBJ-092) ---- */
 
 /* Loyalty steps tinted green, ochre, orange and red, as the subjects config names them. */
@@ -2969,7 +3081,8 @@ button.paper.over {
 .loyalty-disloyal { color: #a4521a; }
 .loyalty-in-revolt { color: var(--cloth); }
 
-.subject-row {
+.subject-row,
+.house-row {
   min-height: 44px;
   display: flex;
   flex-wrap: wrap;
@@ -3003,6 +3116,453 @@ button.paper.over {
 .choices.tribute button {
   flex: 1 1 4.5em;
   min-height: 44px;
+}
+
+/* ---- Game menu, Save, Load and Settings (domain/saves, domain/settings "How the player uses it") ---- */
+
+/* Text size grows the cards' text inside their own width (SET-137). */
+.panel > *,
+.lens-menu > *,
+.alerts > *,
+.shell-card:not(.settings) > *:not(header),
+.settings-rows > .set-row {
+  zoom: var(--text-zoom, 1);
+}
+
+.hud .game-menu {
+  flex: none;
+  width: 44px;
+  height: 40px;
+  min-height: 40px;
+}
+
+/* One card at a time over the dimmed map, inside the safe areas. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  background: rgb(10 14 30 / 0.55);
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+.shell-card {
+  display: flex;
+  flex-direction: column;
+  width: min(560px, 100%);
+  max-height: 100%;
+  min-height: 0;
+  padding: 4px 8px 8px;
+  overflow: hidden;
+}
+
+.shell-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  flex: none;
+}
+
+.shell-card .panel-buttons button {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+}
+
+.shell-card .ribbon .px-icon {
+  vertical-align: -3px;
+}
+
+.shell-card .hint,
+.shell-card .note {
+  margin: 4px 0;
+  color: var(--ink-soft);
+}
+
+.shell-card .note {
+  color: var(--cloth);
+  font-weight: 600;
+}
+
+.game-menu {
+  width: min(380px, 100%);
+}
+
+.menu-date {
+  margin: 2px 0 6px;
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: auto;
+}
+
+.menu-list button {
+  justify-content: flex-start;
+  min-height: 48px;
+}
+
+/* A phone held sideways: the menu in two columns so every entry shows without scrolling. */
+@media (max-height: 500px) {
+  .game-menu {
+    width: min(560px, 100%);
+  }
+
+  .menu-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .menu-list button {
+    min-height: 44px;
+  }
+
+  .menu-list button:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .set-label small,
+  .save-text small {
+    font-size: 15px;
+  }
+}
+
+/* Save and Load: one scrolling column of 44-point lines (SAVE-110). */
+.saves {
+  width: min(640px, 100%);
+}
+
+.new-save {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 4px 0 6px;
+  flex: none;
+}
+
+.new-save label {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.new-save input {
+  min-height: 44px;
+  padding: 0 8px;
+  border: 3px solid var(--outline);
+  background: var(--paper-light);
+  font: 400 21px/1 var(--body);
+  color: var(--ink);
+}
+
+.save-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 2px 0 0;
+  overflow: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.save-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 2px 0;
+  border-bottom: 2px solid rgb(58 36 20 / 0.2);
+}
+
+.save-pick {
+  flex: 1 1 260px;
+  justify-content: flex-start;
+  min-width: 0;
+  padding: 2px 4px;
+  border-image-source: var(--ui-btn-paper);
+  color: var(--ink);
+  text-shadow: none;
+  text-align: left;
+}
+
+.save-row.open .save-pick {
+  outline: 3px solid var(--brass);
+}
+
+.save-row > .save-thumb {
+  flex: none;
+}
+
+.save-thumb img {
+  display: block;
+  width: 72px;
+  height: 48px;
+  image-rendering: pixelated;
+  border: 2px solid var(--outline);
+  background: var(--sea);
+}
+
+.save-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.save-text b {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 19px;
+}
+
+.save-text small {
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--ink-soft);
+  white-space: normal;
+}
+
+.save-text .mark {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--cloth);
+}
+
+.save-act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.save-act.ask {
+  flex-basis: 100%;
+  justify-content: flex-end;
+}
+
+/* The start screen's Continue, Load and Settings, above the realms. */
+.start-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0 8px;
+}
+
+.start-actions .continue {
+  justify-content: flex-start;
+  min-height: 52px;
+  text-align: left;
+}
+
+.start-actions .continue span {
+  line-height: 1.1;
+}
+
+.start-row {
+  display: flex;
+  gap: 6px;
+}
+
+.start-row button {
+  flex: 1;
+}
+
+.sound-menu .all-sound {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* "Saved." over the map, never a dialog (SAVE-022). */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 70;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  border: 4px solid var(--outline);
+  background: var(--paper-light);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.45);
+  pointer-events: none;
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+/* Settings: sections on the left, rows on the right (SET-011, SET-136). */
+.settings {
+  width: min(900px, 100%);
+  height: 100%;
+}
+
+.settings-body {
+  display: grid;
+  grid-template-columns: minmax(150px, 30%) 1fr;
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
+}
+
+.settings-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: auto;
+}
+
+.settings-sections button {
+  justify-content: flex-start;
+}
+
+.settings-sections button.on {
+  border-image-source: var(--ui-btn-wax);
+  color: var(--brass-light);
+  text-shadow: 2px 2px 0 var(--outline);
+}
+
+.settings-rows {
+  overflow: auto;
+  min-height: 0;
+  padding-right: 4px;
+  overscroll-behavior: contain;
+}
+
+.settings-rows .sub {
+  margin: 0 0 4px;
+}
+
+.settings-back {
+  display: none;
+}
+
+.set-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 6px 0;
+  border-bottom: 2px solid rgb(58 36 20 / 0.2);
+}
+
+.set-row.off .set-control {
+  opacity: 0.5;
+}
+
+.set-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  flex: 1 1 180px;
+  min-width: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.set-label small {
+  flex-basis: 100%;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+/* The changed dot: the value differs from the default (SET-014). */
+.set-label .changed {
+  width: 10px;
+  height: 10px;
+  background: var(--cloth);
+  border: 2px solid var(--outline);
+}
+
+.set-label .changed[hidden] {
+  display: none;
+}
+
+.set-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 220px;
+  justify-content: flex-end;
+}
+
+.set-control input[type="range"] {
+  flex: 1;
+  height: 44px;
+  margin: 0;
+  accent-color: #8a6424;
+}
+
+.set-control output {
+  min-width: 3.4em;
+  text-align: right;
+  font-weight: 600;
+}
+
+.set-control .toggle {
+  min-width: 72px;
+}
+
+.set-control .toggle.on,
+.seg button.on {
+  border-image-source: var(--ui-btn-wax);
+  color: var(--brass-light);
+  text-shadow: 2px 2px 0 var(--outline);
+}
+
+.seg {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.seg button {
+  padding: 0 6px;
+  font-size: 19px;
+}
+
+.reset-section {
+  margin: 10px 0 4px;
+}
+
+/* A tall window: the sections first, a section full screen with Back (SET-012). */
+@media (max-aspect-ratio: 1/1) {
+  .settings-body {
+    grid-template-columns: 1fr;
+  }
+
+  .settings[data-open="true"] .settings-sections,
+  .settings[data-open="false"] .settings-rows {
+    display: none;
+  }
+
+  .settings[data-open="true"] .settings-back {
+    display: inline-flex;
+    margin-bottom: 4px;
+  }
 }
 
 /* ---- Tongues and faiths (CULT-080..085, RELG-116..118): the province overview's two lines and the realm's Peoples tab ---- */
@@ -3183,6 +3743,103 @@ table.score-ledger tr.mine td {
 
 .fab.over .px-icon {
   animation: none;
+}
+
+/* The voyage bar (EXPL-069, EXPL-074): along the bottom between the overview
+   button and End turn while a course is drawn, so the sea being tapped stays in
+   view; its buttons wrap rather than shrink below a finger. */
+.voyage-bar {
+  position: absolute;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(520px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
+  padding: 4px 6px 6px;
+  z-index: 7;
+  font: 600 16px/1.2 var(--body);
+}
+
+.voyage-bar .summary {
+  margin: 0 0 4px;
+}
+
+.voyage-bar .controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.voyage-bar .switch,
+.voyage-bar .actions {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 4px;
+}
+
+.voyage-bar button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0 8px;
+}
+
+/* The low-supply choice stays pressed in, marked with a dot, like a tax rate. */
+.switch button.paper.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+
+.switch button.on::before {
+  content: "● ";
+}
+
+/* A reason a button can't be used, written under it: a phone has no hover. */
+small.why {
+  display: block;
+  flex-basis: 100%;
+  margin: 2px 0 4px;
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+.warn {
+  color: #b13e53;
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 100%;
+}
+
+.colony-card {
+  margin: 6px 0;
+}
+
+.colony-progress {
+  height: 10px;
+}
+
+.colony-list {
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.colony-list li {
+  margin: 4px 0;
+}
+
+.colony-list li small {
+  display: block;
+}
+
+.lens-key .swatch.parchment {
+  background: #d9c79a;
+  background-image: repeating-linear-gradient(135deg, rgba(120, 90, 50, 0.3) 0 2px, transparent 2px 5px);
+}
+
+.colony-list button,
+.colony-card button {
+  min-height: 44px;
 }
 
 /* ---- Achievements (domain/achievements "How the player uses it") ---- */
@@ -3381,34 +4038,6 @@ table.score-ledger tr.mine td {
   top: calc(env(safe-area-inset-top) + 116px);
 }
 
-/* ---- Settings card, under the side tools: Gameplay's Tutorial hints (onboarding TUT-128) ---- */
-
-.settings-menu .settings-group {
-  margin: 4px 0 0;
-  font: 600 15px/1.2 var(--body);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-}
-
-.settings-row {
-  grid-template-columns: 1fr 64px;
-}
-
-.settings-row span small {
-  display: block;
-}
-
-.settings-row .toggle {
-  grid-column: 2;
-}
-
-.settings-menu .settings-action {
-  min-height: 44px;
-  margin-top: 6px;
-  font-size: 17px;
-}
-
 /* ---- First-campaign hints (onboarding TUT-127 … TUT-130) ----
    One note along the bottom, between the overview button and End turn, and
    under the top bar when what it points at is low; a brass ring that takes no
@@ -3531,4 +4160,316 @@ table.score-ledger tr.mine td {
   flex-wrap: wrap-reverse;
   align-content: flex-start;
   max-height: calc(100dvh - env(safe-area-inset-top) - 52px - max(10px, env(safe-area-inset-bottom)) - 76px);
+}
+
+/* Revolutions (REVO-090 to REVO-093): the mark on the Stability plaque, the
+   Revolution block under the pillars, the full-screen choice card and the
+   regime card on the Government tab. */
+.plaque.stability {
+  position: relative;
+}
+
+.revo-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  border: 2px solid var(--outline);
+  background: #e0a030;
+  color: var(--outline);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.revo-mark.red {
+  background: var(--cloth);
+  color: var(--paper-light);
+  animation: revo-blink 1.2s steps(2) infinite;
+}
+
+@keyframes revo-blink {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.revolution {
+  margin: 4px 0 10px;
+  padding: 6px 8px;
+}
+
+.revolution.amber {
+  box-shadow: inset 4px 0 0 #e0a030;
+}
+
+.revolution.red {
+  box-shadow: inset 4px 0 0 var(--cloth);
+}
+
+.revolution p {
+  margin: 2px 0 6px;
+}
+
+.revo-quiet {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.revo-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.revo-bar .progress {
+  margin-top: 0;
+}
+
+.progress.amber i {
+  background: #e0a030;
+}
+
+.progress.red i {
+  background: var(--cloth);
+}
+
+.revo-signs {
+  display: grid;
+  gap: 4px;
+}
+
+.revo-sign {
+  display: grid;
+  grid-template-columns: 1.2em minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  text-align: left;
+  font-size: 17px;
+}
+
+.revo-sign span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.revo-sign b {
+  font-weight: 400;
+}
+
+.revo-sign.lit b {
+  font-weight: 600;
+}
+
+.revo-sign small {
+  color: var(--ink-soft);
+}
+
+.revo-sign:not(.lit) {
+  opacity: 0.72;
+}
+
+.revo-sign.lit i {
+  color: var(--cloth);
+}
+
+.revo-sign em {
+  font-style: normal;
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+
+.revo-lines {
+  margin: 6px 0;
+  padding-left: 1.1em;
+}
+
+.revo-lines li.lit {
+  color: var(--cloth);
+}
+
+.revo-lines button {
+  min-height: 44px;
+}
+
+.revo-fold summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.revo-stances {
+  margin: 0;
+}
+
+.revo-stances dt {
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.revo-stances dd {
+  margin: 0;
+}
+
+.revo-stances ul {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+/* The choice card covers the map inside the safe areas; it cannot be folded away. */
+.revolution-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  background: rgb(20 10 4 / 0.6);
+}
+
+.revolution-card {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 100%);
+  max-height: 100%;
+  padding: 4px 8px 8px;
+  animation: alert-in 0.2s steps(4);
+}
+
+.revolution-card .ribbon {
+  white-space: normal;
+  overflow: visible;
+}
+
+.revolution-card header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.revolution-card header small {
+  color: var(--ink-soft);
+}
+
+.revolution-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: auto;
+}
+
+.revolution-card .sub {
+  margin: 8px 0 4px;
+  font: 600 18px/1 var(--body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.revolution-card p {
+  margin: 4px 0;
+}
+
+.revolution-stances {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.revolution-stances .stance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 44px;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.revolution-stances .stance .name {
+  font-size: 1.1em;
+}
+
+.revolution-stances .stance .does {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8em;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+/* A short landscape screen: the story and the answers side by side. */
+@media (max-height: 500px) and (min-width: 540px) {
+  .revolution-body {
+    flex-direction: row;
+    overflow: hidden;
+  }
+
+  .revolution-story,
+  .revolution-stances {
+    flex: 1 1 50%;
+    min-width: 0;
+    overflow: auto;
+  }
+
+  .revolution-card .sub {
+    margin-top: 2px;
+  }
+}
+
+.regime {
+  margin: 4px 0 10px;
+  padding: 6px 8px;
+}
+
+.regime .sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.regime-locks {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.regime-locks li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 8px;
+  border: 2px dashed var(--ink-soft);
+  color: var(--ink-soft);
+  opacity: 0.8;
+}
+
+.regime-locks li b {
+  text-decoration: line-through;
+}
+
+.revo-locked {
+  opacity: 0.6;
+}
+
+.revo-locked .locked-note {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 400;
 }

@@ -299,6 +299,7 @@ export const ICONS = {
     "...kbk....",
     "...kkk....",
   ],
+  menu: ["kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk", "..........", "kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk", "..........", "kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk"],
   trophy: [
     "kkkkkkkkkk",
     "kyygggggdk",

@@ -193,7 +193,7 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 - HER-020 When an ambition's deadline passes or its fail condition holds, the heritage context shall mark it lost without penalty, show its plain goal as what might have been and draw a new one. [ns §2.3]
 - HER-021 The heritage context shall compute warmth as the share of the goal's leaf conditions that hold, with a count leaf counting as partly met by how far it has come, and show it as cold (under a third), warm (from a third to under two thirds) or hot (two thirds or more). [ns §2.3; rules warmth_bands; D-HER-13]
 - HER-022 If an ambition's goal is a single yes-or-no condition, then its warmth shall go from cold straight to done. [ns §2.3]
-- HER-023 If a drawn ambition's goal already holds on the first day of the campaign, then the heritage context shall put it back and draw another. [ns §2.3]
+- HER-023 If a drawn ambition's goal already holds on the first day of the campaign, or when it is drawn later, then the heritage context shall put it back and draw another; so too one that could only be lost, its deadline gone or its fail condition holding. [ns §2.3; D-HER-20]
 - HER-024 When a country pays counsel (gold by era: 30, 50, 80, 120, 180, 260, 380 for eras I–VII), at most once every 10 years, the heritage context shall stir one ambition at once and show its warmth, keeping its words a hint. [ns §2.3; rules counsel]
 - HER-025 When a country has kept a resident envoy (diplomacy) at a foreign court for 2 years, the heritage context shall show it the hint and warmth of one of that country's active ambitions, never its plain goal; the AI may do the same against the player. [ns §2.3; rules envoy_reveal_years; diplomacy residents; D-HER-11]
 - HER-026 When an age begins, the heritage context shall add the pool entries that name that age to the pool. [ns §2.3; rules age_ambitions_join_pool_when_age_starts]
@@ -266,18 +266,24 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 - HER-074 The heritage context shall give every country the same system in every tier; the free tier only limits which countries can be picked. [ns §9]
 
 ### How the player uses it
-- HER-080 The game shall give every realm on the map the heritage of its matched catalogue record (scenario-setup D-SETUP-1): its birthright, heydays and burden; a realm with no heritage in the build says that none is recorded. Ambitions and legacies join when heritage is evaluated each turn (HER-078). [X-19; build/heritage-all.json; D-HER-18]
+- HER-080 The game shall give every realm on the map the heritage of its matched catalogue record (scenario-setup D-SETUP-1): its birthright, heydays, burden and pool of ambitions; a realm with no heritage in the build says that none is recorded. Its ambitions are drawn when the campaign starts and its legacies earned in play (HER-078). [X-19; build/heritage-all.json; D-HER-18]
 - HER-081 The realm card's General tab shall carry one Heritage line, the overview at a glance, naming the realm's birthright and its burden; tapping it opens the realm card's Heritage tab. The Heritage tab is offered for every realm, the player's own and others, before and during a campaign, so the realm picker shows it too (HER-073). [X-19; HER-070]
 - HER-082 The Heritage tab shall hold everything about the realm's strengths in one place: the birthright, each heyday with its age, and the burden, each a row that opens on a tap to its full text and history note (HER-002); under them the realm's 1444 assessments from the catalogue in three groups (Strength, Government, Dangers) as five-step bars with the level in words, marked uncertain where the catalogue's confidence is low. [X-19; scenario-setup SETUP-009]
 - HER-083 The Heritage tab shall work on a phone in landscape: 44-point rows in one column in the Tall layout, the assessment groups side by side where the panel is wide enough, inside the safe areas, and nothing that needs hover. [X-19]
+- HER-085 While a campaign runs, the Heritage tab shall show heritage in play: the birthright in force or dormant (greyed); each heyday waiting for its age, awake or asleep with a meter of its months toward a mark, or ended; the burden held or shed with the legacy it turned into; the legacies earned (of 5); and, for the player's own realm only, the three ambitions as seals with their theme icon and hint, a stirred one with its warmth (three pips: cold, warm, hot), promised legacy and deadline, a sealed one with a 44-point "Ask the court" button priced in gold by era (HER-024), and the ambitions settled under "Past" with their plain goal. Another realm's tab counts its sealed ambitions and shows none of them (HER-016). Each row, opened, says which of its levers the game applies now ("In the game now: …") and that the rest comes as the game grows. [X-19; Leroy 18 Oct]
+- HER-086 When heritage waits on a choice (a third heyday waking, HER-013; a sixth legacy, HER-030), the Heritage tab shall open with it: the question and one 44-point button for each heyday or legacy; the General tab's Heritage line says that a choice waits. The Heritage line, the overview at a glance, also counts heydays awake, ambitions stirred (sealed for another realm), legacies and the burden while held, and strikes through a dormant birthright. [X-19; HER-070]
+- HER-087 When a seal cracks, warmth turns hot, an ambition is fulfilled or lost, a heyday wakes or sleeps, a mark is granted, the burden is shed, the birthright goes dormant or wakes, or a choice waits, the player shall get one dispatch line that opens the Heritage tab (HER-071). [X-19]
 
 ### 5.14 Build and data
 - HER-075 The build shall refresh ids from other designs (`extract_vocab.py`), rebuild archetypes (`make_archetypes.py`), and generate, merge, validate and write `build/` (`build_heritage.py`, with `--check FILE` for one authored file). [ns §12; README]
 - HER-076 When heritage is built, the report shall list budget overruns, unknown ids (levers, ages, events, inventions, styles, buildings, countries, areas) and place names still to bind. [ns §12]
 - HER-077 The heritage context shall read the country catalogue, event tree, country stats, province stats and warfare read-only and change nothing outside its own folder. [README]
 
-### 5.15 Timing
-- HER-078 Each turn, after the event tree's step and before achievements, the heritage context shall evaluate every heritage once (needs, claims, heydays, ambitions, burden), and count heyday years awake and claim years held in months by the date: a month is added in the turn in which a new month begins, 12 months to a year. [X-2; X-18; D-HER-9]
+### 5.15 Timing and play
+- HER-078 On the first of each month, right after the event tree's month and before achievements, the heritage context shall evaluate every realm's heritage once (needs, claims, heydays, ambitions, burden) against the game, count a month for each awake heyday (12 months to a year), draw replacements, let the AI answer its choices (HER-079) and publish the levers then in force until the next month. [X-2; X-18; D-HER-9; D-HER-21]
+- HER-084 When the campaign starts, the heritage context shall wake the birthright and the heydays whose age is under way before it draws the three ambitions; and a burden whose shed condition already holds then shall wait until that condition has failed once before it can be shed, so no realm sheds a burden or earns a legacy on the first day. [D-HER-20]
+- HER-088 The game shall apply these levers in force (D-HER-22): `tax_reach_pct` on the tax each province sends its holder (over the realm, or its capital, coast, core, royal land, lords' land, frontier or a terrain), `official_wage_pct` on officials' wages, `loan_interest_pct` on interest, `building_cost_pct` on the gold for new works, `growth_pct` on births where people grow, `recruit_refill_pct` on how fast recruits refill, `harvest_steps` on harvest rolls, `garrison_pct` on men behind walls and `hired_company_cost_pct` on hired companies' pay; each over the whole realm unless said, and none narrowed to one kind of thing (an arm, ware, building, ship or class). Every other lever waits for its owning context. [HER-035; X-19]
+- HER-089 The heritage context shall read the game for its conditions (HER-040, HER-041): realms under their catalogue ids; provinces, royal provinces, officials, lords and loyal lords, soldiers, allies, subjects, schools, scholars, victories, gold, debt and works as `count` things; wars, alliances, subjects, personal unions and rivalries; borders; inventions known; harbours, on any sea or a named one; places and areas held; stability (Steady 2, Uneasy 1, Troubled 0, Crumbling −1); the ages and the events that have happened. A condition on state the game does not keep yet (trade presence, religion, rebels, colonies, a religion's share, periods) does not hold. [D-HER-19]
 
 ## 6. Commands
 
@@ -319,8 +325,8 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 
 ## 9. Each turn
 
-A turn is one week (X-18). Heritage is evaluated once per turn, in the events step (X-2 step 6) right after the event tree, so a new age is seen the
-same turn; its levers apply from the next month's steps. Time is counted in months by the date, not in turns (HER-078). Steps, in order:
+A turn is one week (X-18). Heritage is evaluated on the first of each month, in the events step (X-2 step 6) right after the event tree's month, so a
+new age is seen the same month; its levers apply from then until the next month. Time is counted in months by the date, not in turns (HER-078, D-HER-21). Steps, in order:
 1. Evaluate dormant claims (wake after 30 years held) and birthright needs (dormant or awake).
 2. Evaluate heydays: age active, wakes, ends; in the turn in which a new month begins, add a month to each awake heyday; grant marks on end; resolve a third
    waking (the AI by HER-079).
@@ -455,6 +461,23 @@ Requests to other designs (`requests-to-other-designs.md`), worked around, nothi
   so the client reads 137 rows, not the whole build. 110 realms have heritage; the 27 without (no record, or a record
   the build gives none, such as the Swiss Confederation) show that none is recorded. The card shows the parts that do
   not need the turn's evaluation; ambitions, legacies and the awake state follow with HER-078.
+- **D-HER-19** (18 Oct, heritage in play) Places, areas and seas: a place name the scenario map does not hold binds through
+  the heritage gazetteer (`national-strengths-places.json`, 159 places as longitude and latitude, hand-entered), so
+  holds_place reads the land province nearest it; an area, region or named province the event tree's place table
+  (`events-places.json`) does not list is a box of longitude and latitude in the same file; a named sea is a box its sea
+  zones lie in, and a realm has a harbour on it when one of its provinces borders such a zone. All approximate; 197 of
+  the 201 place names bind (the rest are not places). Binding by hand-entered coordinates is the cheapest rule that
+  binds nearly every name, and D-HER-16's nearest-province rule still decides the province.
+- **D-HER-20** (18 Oct) Day-one heritage: an ambition that could only be lost (deadline gone or fail holding, like a
+  subject's "endure" ambition while it is a subject) is put back like one already done (HER-023), at the start and at
+  every later draw; a burden whose shed condition holds on the first day waits until it fails once (HER-084). The data
+  was written against the catalogue, not the game's starting numbers, and a free legacy on the first day is no choice.
+- **D-HER-21** (18 Oct, the coordinator's brief) Heritage is evaluated monthly, in the month's block right after the
+  event tree, with a one-line hook in the turn; weeks without a new month change nothing heritage reads that matters,
+  and the turn budget (25 ms) holds. This replaces D-HER-9's weekly check.
+- **D-HER-22** (18 Oct) Levers in play: the nine of HER-088, the ones whose rule the game already has. A lever narrowed
+  to one arm, ware, building, ship or class waits for that rule, and so does a scoped lever but tax. The Heritage tab
+  says which lines are in play, so no effect claims more than the game does.
 - **D-HER-17** (was OQ-HER-17) Formed countries beyond the caps: the formed country keeps the forming country's own
   birthright and adds its own; any other birthright of the forming country becomes a dormant claim again. Legacies
   cannot exceed 5, since a formed heritage brings none, and a burden stays at most one (the formed country's, or else
@@ -476,7 +499,11 @@ Requests to other designs (`requests-to-other-designs.md`), worked around, nothi
 | HER-059..063 | changing-hands.feature | all scenarios |
 | HER-064..068 | heritage-events.feature | all scenarios |
 | HER-069 | ambitions.feature | The AI knows its own ambitions |
-| HER-078 | ambitions.feature | Heritage counts time month by month |
+| HER-078 | ambitions.feature, heritage-in-play.feature | Heritage counts time month by month; Heritage is evaluated each month in the game |
+| HER-084 | heritage-in-play.feature | Nothing is settled on the first day |
+| HER-085..087 | heritage-in-play.feature | The Heritage tab shows heritage in play; A choice waits on the Heritage tab |
+| HER-088 | heritage-in-play.feature | A birthright's tax reaches the treasury; A dormant birthright pulls no lever |
+| HER-089 | heritage-in-play.feature | Heritage reads places, areas and seas from the map |
 | HER-079 | ambitions.feature | The AI puts its weakest heyday to sleep; The AI lets its weakest legacy go |
 | HER-070..074 | heritage-on-the-phone.feature | all scenarios |
 | HER-080 | realm-heritage.feature | all scenarios |

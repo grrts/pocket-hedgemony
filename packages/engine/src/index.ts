@@ -12,8 +12,9 @@ export { officialEffect, OFFICIALS, type OfficialEffectView } from "./officials.
 export { aiRecruits, ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { NOT_YET as ACHIEVEMENTS_NOT_YET, type Unlock as AchievementUnlock } from "./achievements.ts";
-export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply } from "./protocol.ts";
+export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply, type SaveListing } from "./protocol.ts";
 export type { FleetView, NavyOrder, NavyView } from "./navy.ts";
+export type { ExploreOrder, ExplorationView } from "./colonies.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";
 export { aiTreasury, canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, runLedger, TAX_RATES, taxRateOf } from "./treasury.ts";
 export { campaignView, setPlayer, SCORE_NAMES, type CampaignView, type ScoreBreakdown } from "./campaignEnd.ts";
@@ -26,8 +27,10 @@ export { capsOf, formOf, governmentView, type GovernmentView, type NextFormView 
 export { FAITH_FAMILY, FAITH_IDS, FAITH_POLICIES, faithLine, faithName, NO_FAITH, NO_TONGUE, peoplesDataOf, peoplesView, SLOTS, TONGUE_FAMILY, TONGUE_IDS, TONGUE_POLICIES, tongueLine, tongueName, type FaithRow, type PeoplesSnapshot, type PeoplesView, type TongueLine, type TongueRow } from "./peoples.ts";
 export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecraft.ts";
 export { type RebelsView, type RisingView } from "./rebels.ts";
+export { type RegimeView, type RevolutionView, type Sign as RevolutionSign, type StanceView } from "./revolutions.ts";
 export type { EventCard } from "./events.ts";
 export { adminCapacityRank, ASSESSMENT_DIMENSIONS, LEVEL_RANK, realmAssessment, realmStrengths, RISK_DIMENSIONS, type AssessmentConfidence, type AssessmentLevel, type HeritageLine, type RealmAssessment, type RealmHeritage, type RealmHeyday, type RealmStrengths } from "./realmStrengths.ts";
+export { effectInPlay, heritageChoice, heritageFactor, heritageTaxReach, heritageView, IN_PLAY, monthlyHeritage, type HeritageView } from "./heritage.ts";
 export { realmStartingCounts } from "./startingCounts.ts";
 export { byDistance } from "./lords.ts";
 export { LENS_RELATIONS, type LensRelation, type DiplomacyLensView } from "./diplomacyLens.ts";

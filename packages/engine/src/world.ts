@@ -22,11 +22,14 @@ import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGameEvents, type GameEvents } from "./events.ts";
+import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
+import { createRevolutionState, type RevolutionState } from "./revolutions.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
+import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./campaignEnd.ts";
 import type { AchievementLog } from "./achievements.ts";
@@ -37,7 +40,7 @@ import type { AchievementLog } from "./achievements.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, PeoplesState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -138,10 +141,14 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   commanderSeed: number[];
   /** Ports, sailors, ships and fleets (navy.ts). */
   navy: NavyState;
+  /** Charts, voyages, colonial governors and colonies being founded (exploration.ts, colonies.ts). */
+  explore: ExplorationState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
   /** Win scores, the end date and how the campaign ended (campaignEnd.ts). */
   campaign: CampaignEndState;
+  /** Every realm's heritage in play: birthright, heydays, ambitions, legacies and burden (HER-078). */
+  heritage?: GameHeritage;
   /** The player's campaign as achievements see it (achievements.ts). */
   achievements?: AchievementLog;
 }
@@ -424,7 +431,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
     ...createRebelState(P, N),
+    ...createRevolutionState(N),
     navy: createNavyState(P),
+    explore: createExplorationState(P, N),
     ...createPeoplesState(P, N),
   };
   world.diplomacy = createWarState(world);
@@ -468,6 +477,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   });
   seedResearch(world);
   seedNavy(world);
+  seedRegions(world);
+  seedCharts(world);
   recount(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
@@ -476,11 +487,15 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedStartingPurse(world);
   // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
   syncCountries(world);
-  // The scores stand from the first day, for the country card (SHELL-149).
-  seedCampaign(world);
 
   // The event tree starts with the campaign, so its first month costs no more than any other.
   world.events = createGameEvents(world);
+  // Heritage reads the tree's ages, so it starts after it: three ambitions drawn, the birthright in force.
+  world.heritage = createGameHeritage(world);
+  // Worked out again with heritage's tax in force, so lenders and the treasury card know the income the realm will have.
+  runLedger(world, false);
+  // The scores stand from the first day, for the country card (SHELL-149).
+  seedCampaign(world);
   return world;
 }
 
