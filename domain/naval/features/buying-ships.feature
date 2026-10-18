@@ -15,12 +15,15 @@ Feature: Buying ships
     And 60 sailors are assigned to the hull and help build it
     And the port "Lagos" has 0 sailors in port
 
-  @NAVY-044
-  Scenario: No crew in port, no ship
+  @NAVY-044 @NAVY-134
+  Scenario: A ship ordered waits in the queue for a slipway and its crew
     Given the port "Lagos" has 20 sailors in port
     And the port "Lagos" has a free slipway at shipyard step 2
     When the country "Portugal" orders a carrack in the port "Lagos"
-    Then the order is refused because the carrack needs a crew of 60
+    Then the country "Portugal" pays 60 gold and 12 timber at once
+    And the carrack waits in the port's queue for its crew
+    When 40 more sailors come in to the port "Lagos"
+    Then 60 sailors are assigned to the hull and help build it
 
   @NAVY-045
   Scenario Outline: Only unlocked ship types can be bought
@@ -76,22 +79,49 @@ Feature: Buying ships
       | turtle ship      | 120  | 150  | 12     | 8      | 6      |
       | ship of the line | 600  | 600  | 60     | 18     | 25     |
 
-  @NAVY-048 @placeholder
-  Scenario: The Lagos caravels, two on slipways and one on the harbour
+  @NAVY-048 @NAVY-134 @placeholder
+  Scenario: The Lagos caravels, two on slipways and one waiting its turn
+    # config: naval.game.queues (D-NAVY-33)
     Given the country "Portugal" has the exploration unlock
     And the port "Lagos" has shipyard step 2 with 2 free slipways
     And the port "Lagos" has 75 sailors in port
     When the country "Portugal" orders 3 caravels in the port "Lagos"
     Then the country "Portugal" pays 75 gold and 12 timber
     And 2 caravels are built on the slipways in 3 months
-    And 1 caravel is built on the harbour in 4.5 months
+    And 1 caravel waits in the queue for a slipway
+    When 3 months pass in the port "Lagos"
+    Then the waiting caravel is laid down on a slipway
 
-  @NAVY-048
-  Scenario: A harbour without a shipyard builds small hulls one at a time
+  @NAVY-048 @NAVY-132
+  Scenario: A harbour without a shipyard builds no ship
     Given the port "Funchal" has a harbour and no shipyard
     And the port "Funchal" has 60 sailors in port
     When the country "Portugal" orders 2 cogs in the port "Funchal"
-    Then only one cog is built at a time on the harbour
+    Then every order is refused because the port needs a shipyard
+
+  @NAVY-134 @placeholder
+  Scenario: The ship queue holds five ships, and the last can be taken off
+    # config: naval.game.queues.shipQueueMax
+    Given the port "Lagos" has 0 sailors in port
+    When the country "Portugal" orders 6 cogs in the port "Lagos"
+    Then 5 cogs wait in the queue and the sixth order is refused because the queue is full
+
+  @NAVY-135 @placeholder
+  Scenario Outline: A port offers only the newest ship on each upgrade path
+    # config: naval.upgrades (D-NAVY-33)
+    Given a port whose shipyard builds "<buildable>"
+    Then the "<ship>" is <offered>
+
+    Examples:
+      | buildable                      | ship          | offered                       |
+      | cog, galley                    | cog           | offered                       |
+      | cog, carrack, galley           | cog           | replaced by the carrack       |
+      | cog, carrack, fluyt            | carrack       | replaced by the fluyt         |
+      | cog, carrack, fluyt            | cog           | replaced by the fluyt         |
+      | galley, armed carrack, galleon | galley        | replaced by the galleon       |
+      | galley, armed carrack, galleon | armed carrack | replaced by the galleon       |
+      | caravel, carrack, fluyt        | caravel       | offered                       |
+      | turtle ship, ship of the line  | turtle ship   | replaced by the ship of the line |
 
   @NAVY-049
   Scenario Outline: The 1444 trade ship follows the sea
@@ -169,11 +199,12 @@ Feature: Buying ships
       | does not know | refused |
 
   @NAVY-056
-  Scenario: War canoe fleets and voyaging canoes are built on any beach
+  Scenario: War canoe fleets and voyaging canoes are built at a shipyard too
+    # D-NAVY-33 (Leroy): without a shipyard no ship is built; small craft stay the fishery's boats
     Given a country knows S3 "Outrigger voyaging"
     And it holds a beach with seafolk and no harbour
     When it orders a war canoe fleet and a voyaging canoe there
-    Then both orders are allowed
+    Then both orders are refused
 
   @NAVY-057
   Scenario Outline: Other ways to get ships

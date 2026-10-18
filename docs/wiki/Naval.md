@@ -1,12 +1,12 @@
 # Naval
 
-Naval is how your realm gets ships to sea and keeps them there. Ships need ports, and ports need sailors: you muster sailors from a port's people, buy ships only where their crew already waits, put an official in command as admiral, and then keep the fleet paid, supplied and repaired while it sails with the winds. The size of your fleet is always tied to the seafaring people you can put aboard.
+Naval is how your realm gets ships to sea and keeps them there. Ships need ports, and ports need sailors: you muster sailors from a port's people at a shipyard, order ships there and they are laid down once their crew is in port, put an official in command as admiral, and then keep the fleet paid, supplied and repaired while it sails with the winds. The size of your fleet is always tied to the seafaring people you can put aboard.
 
 ## How it works
 
 ### Ports
 
-A **port** is a province with a harbour on a shore tile. Only a port can muster sailors, buy ships (other than small craft) and give berths. A coastal province without a harbour is a **plain shore**: seafolk fish from the beach, small craft can be launched and armies can land, but no ship can be bought, berthed or crewed there. Any realm can make a new port by building a harbour on a shore tile it holds.
+A **port** is a province with a harbour on a shore tile. Only a port can give berths, and only a port with a **shipyard** can muster sailors and build ships (other than small craft). The shipyard is built from the province's Build tab once it has a harbour; it stands with the harbour and takes no slot of its own. A coastal province without a harbour is a **plain shore**: seafolk fish from the beach, small craft can be launched and armies can land, but no ship can be bought, berthed or crewed there. Any realm can make a new port by building a harbour on a shore tile it holds.
 
 | Harbour step | Berths | What it allows |
 |---|---|---|
@@ -33,6 +33,8 @@ Sailors are people, counted one by one. Mustering turns people of a port provinc
 
 **Mustering.** *Muster sailors* is offered on a port, or on the country card for several ports at once, with one slider, only for provinces with a harbour. Of a province's fighting-age men (a quarter of its people), a muster can call 2 in 3 of the seafolk, 1 in 3 of the homeless and 1 in 20 of every other class, each class by its share. Sailors come from the same people as the levy, so a man at sea can't be levied and the levy pool shows the sailors already gone. A muster pays a bounty of 0.05 gold a sailor, lowers the province's fish for the seafolk away, and has the sailors ready in that port after 14 days.
 
+**The muster queue.** Sailors come in batches of 50, each batch two weeks after the one before, like the recruit queue on the Garrison tab: a crew of 200 takes eight weeks. A port holds at most 10 batches on their way, and the last one can be taken off the queue with its bounty and men back.
+
 **Waiting in port.** Each sailor in port eats 1 ration a month from the province store and is paid 0.1 gold. After 6 months with no ship being built for them, 1 in 10 drift back to their slots each month.
 
 **The Lagos muster.** Lagos has 4,600 seafolk and 1,150 fighting-age men, of whom about 770 can go to sea. Portugal musters 75 sailors: it pays 4 gold of bounty, Lagos loses 5 % of its fish while they serve, and the 75 are sailors in port at Lagos when the muster is ready. Each month they eat 75 rations from the Lagos store and cost 7.5 gold in wages.
@@ -55,19 +57,21 @@ Sailors move by road to another of your ports at levy marching pace, eating on t
 
 ### Buying ships
 
-To order a ship you need, in the **same port**, enough sailors in port for its crew, a free slipway of the step the hull needs (or only the harbour for small hulls), and the gold and timber, paid when you order. The crew is assigned to the hull at once and helps build it alongside the shipyard's own seafolk. No crew in port, no ship. You can only buy types your realm has unlocked in the S bough (and the exploration unlock for exploration ships).
+To order a ship you need a port with a shipyard of the step the hull needs, and its gold, paid when you order. The ship joins the port's **ship queue** (at most 5 waiting). The first ship waiting is laid down on a free slipway as soon as its whole crew waits in port; the crew is assigned to the hull and helps build it alongside the shipyard's own seafolk, and the ships behind it wait their turn. So you can order first and muster after: the Port tab's *Muster N for the waiting ships* calls exactly the crews still missing. The last ship waiting can be taken off the queue for its gold back.
 
-At Lagos, with 60 sailors in port, a free slipway at shipyard step 2 and S4 known, Portugal orders a carrack: it pays 60 gold and 12 timber at once, the 60 sailors are assigned to the hull, and Lagos has 0 sailors in port. With only 20 sailors the order is refused, because a carrack needs a crew of 60.
+**The upgrade path.** A port offers only the types your realm has unlocked in the S bough (and the exploration unlock for exploration ships) that its shipyard can build, and only the newest on each path: trade goes cog (junk or dhow by sea), carrack, fluyt, steamer; war goes galley (or war canoe fleet), armed carrack, galleon, ship of the line, and the turtle ship gives way to the ship of the line. An older type disappears once a newer one can be built in that port; a smaller yard that can't build the newer one keeps offering the older. A line under the list names the next types and what they need.
+
+At Lagos, with 60 sailors in port, a free slipway at shipyard step 2 and S4 known, Portugal orders a carrack: it pays 60 gold and 12 timber at once, the 60 sailors are assigned to the hull, and Lagos has 0 sailors in port. With only 20 sailors the carrack waits in the queue until 40 more come in.
 
 Every type belongs to one **family**, which sets its supply: trade and military ships carry 15 zones, galleys 6, and exploration ships 60 plus a hold of colony stores.
 
 | Ship | Family | Unlocked by | Built at | Crew | Gold | Timber | Months | Upkeep a month | Hold | Purse |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Fishing boat, canoe or raft | Small craft | known | any shore | 6 | 2 | 0 | 1 | 0 | | |
-| War canoe fleet | Military | S3 | any shore | 100 | 10 | 2 | 2 | 0.5 | | |
-| Voyaging canoe (100 rations of stores) | Exploration | S3 | any shore with seafolk | 20 | 5 | 1 | 1 | 0.5 | | |
-| Cog, junk or dhow | Trade | known | harbour or slipway | 30 | 25 | 6 | 3 | 1 | ×2 | 30 |
-| Caravel | Exploration | S4 + exploration unlock | harbour or slipway | 25 | 25 | 4 | 3 | 1 | | |
+| War canoe fleet | Military | S3 | shipyard 1 | 100 | 10 | 2 | 2 | 0.5 | | |
+| Voyaging canoe (100 rations of stores) | Exploration | S3 | shipyard 1 | 20 | 5 | 1 | 1 | 0.5 | | |
+| Cog, junk or dhow | Trade | known | shipyard 1 | 30 | 25 | 6 | 3 | 1 | ×2 | 30 |
+| Caravel | Exploration | S4 + exploration unlock | shipyard 1 | 25 | 25 | 4 | 3 | 1 | | |
 | Galley | Military | known | shipyard 1 | 180 (150 row) | 40 | 6 | 4 | 2 | ×2 | 25 |
 | Carrack | Trade | S4 | shipyard 2 | 60 | 60 | 12 | 6 | 3 | ×3 | 50 |
 | Armed carrack | Military | S6 | shipyard 2 | 120 | 120 | 14 | 7 | 5 | | |
@@ -80,12 +84,12 @@ Every type belongs to one **family**, which sets its supply: trade and military 
 
 Hold and purse are the [Trade](Trade) design's numbers.
 
-- A port with no slipway can build cogs, junks, dhows and caravels on its harbour, one at a time, taking half as many months again. With slipways they take the table's months, as many at once as there are slipways.
+- Every hull is built on a slipway at the table's months, as many at once as there are slipways. Without a shipyard no ship is built, war canoes and voyaging canoes included; small craft are the fishery's boats and launch from any shore with seafolk.
 - The cog type follows the sea: cog in Europe, junk in East and Southeast Asia, dhow in the Indian Ocean and Red Sea.
 - Ships that shoot (the armed carrack and later) need their guns, cast or bought as for gun crews, and powder for each voyage.
 - A blockaded port keeps mustering and building, but nothing leaves without a battle. An enemy who takes the port gets every hull on its slipways.
 - **Buying abroad**: in a foreign great port with a shipyard, at peace with you and with its owner's agreement, you can order a hull on the seller's slipway at 1.5 times the gold, with your crew waiting there paid double.
-- **Small craft** can be bought on any shore tile with seafolk, harbour or not. Each has 6 sailors, carries 10 men or a load of goods along coastal zones only, can land an army on any shore, and serves as the fishery's boats. They never fight a sea battle, and a zone with an enemy war fleet is closed to them. With S3 Outrigger voyaging, small craft can cross ocean zones and you can build war canoe fleets and voyaging canoes on any beach.
+- **Small craft** can be bought on any shore tile with seafolk, harbour or not. Each has 6 sailors, carries 10 men or a load of goods along coastal zones only, can land an army on any shore, and serves as the fishery's boats. They never fight a sea battle, and a zone with an enemy war fleet is closed to them. With S3 Outrigger voyaging, small craft can cross ocean zones and you can build war canoe fleets and voyaging canoes at a shipyard.
 - Ships also come by capture with a prize crew, from a loyal lord for the time of his service, from hired privateers or corsairs (ship, crew and commander for a season), and from events (a treasure fleet, a gift from a sea power, a salvaged wreck).
 
 ### Fleets and ships

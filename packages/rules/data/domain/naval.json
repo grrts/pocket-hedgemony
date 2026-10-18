@@ -126,7 +126,7 @@
   "frozenSeas": { "$comment": "X-17: provisional until world-map's frozen lookup exists", "months": [12, 1, 2, 3], "zones": ["Gulf of Bothnia", "Bay of Bothnia", "Gulf of Finland", "White Sea", "Barents Sea", "Kara Sea"] },
   "coalPerMonthAtSea": 1,
   "powderPerVoyage": 1,
-  "_provisional": ["berthsByHarbourStep", "slipwaysByShipyardStep", "musterShare", "ai.seaPowerSeafolkAtSea", "muster.bountyPerSailor", "muster.days", "muster.fishingShareOfSeafolk", "storm.chancePerMonth", "canoeLanding", "foreignCrewsPerPortPerYear", "pirates", "laterShips", "coalPerMonthAtSea", "powderPerVoyage", "frozenSeas", "game"],
+  "_provisional": ["berthsByHarbourStep", "slipwaysByShipyardStep", "musterShare", "ai.seaPowerSeafolkAtSea", "muster.bountyPerSailor", "muster.days", "muster.fishingShareOfSeafolk", "storm.chancePerMonth", "canoeLanding", "foreignCrewsPerPortPerYear", "pirates", "laterShips", "coalPerMonthAtSea", "powderPerVoyage", "frozenSeas", "game", "upgrades"],
   "game": {
     "$comment": "Fits naval's numbers to this game's treasury, as defines' goldScale does for recruiting and works: ship gold and upkeep times goldScale, sailors' wages and bounty times wageScale, so a sailor costs about what a soldier does (D-NAVY-30). Sea battles (D-NAVY-31): each 4-hour round (X-1) a side deals its ships' strength times roundHits, the first ship of the other side's line taking them; a side whose strength falls to breakShare of its start runs for port. Docking takes dockDays; landing an army a day per menLandedPerDay men (warfare 11.3). All provisional.",
     "goldScale": 0.1,
@@ -137,6 +137,25 @@
     "maxRounds": 18,
     "dockDays": 0.5,
     "menLandedPerDay": 5000,
-    "ai": { "reserveGold": 20, "portsPerShip": 2, "maxShips": 4, "huntZones": 8, "huntEdge": 1.2 }
+    "ai": { "reserveGold": 20, "portsPerShip": 2, "maxShips": 4, "huntZones": 8, "huntEdge": 1.2 },
+    "queues": {
+      "$comment": "Build queues in a port (D-NAVY-33): sailors are mustered a batch at a time, each batch muster.days after the one before, at most musterQueueMax batches waiting; ships ordered wait in the port's queue, paid when ordered, and are laid down in turn when a slipway is free and their crew waits in port, at most shipQueueMax waiting. Provisional.",
+      "musterBatch": 50,
+      "musterQueueMax": 10,
+      "shipQueueMax": 5
+    }
+  },
+  "upgrades": {
+    "$comment": "The upgrade path (D-NAVY-33): a port no longer offers a ship type once it can build the type that replaces it, or any type further along. Trade: the sea's cog, junk or dhow, then carrack, fluyt, steamer. War: galley or war canoe fleet, then armed carrack, galleon, ship of the line; the turtle ship gives way to the ship of the line. Exploration ships have no successor yet. Provisional.",
+    "cog": "carrack",
+    "junk": "carrack",
+    "dhow": "carrack",
+    "carrack": "fluyt",
+    "fluyt": "steamer",
+    "galley": "armed carrack",
+    "war canoe fleet": "armed carrack",
+    "armed carrack": "galleon",
+    "galleon": "ship of the line",
+    "turtle ship": "ship of the line"
   }
 }
