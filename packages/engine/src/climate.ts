@@ -96,13 +96,19 @@ export function placeClimate(lon: number, lat: number, coastal: boolean, terrain
 /** The months each day of the year falls in, for the wet-season window. */
 const MONTH_OF_DAY = Array.from({ length: 365 }, (_, d) => DAYS_BEFORE.filter((b) => d >= b).length);
 
-export function provinceClimate(place: PlaceClimate, date: GameDate): ProvinceClimate {
-  const { lat, mean, swing } = place;
-  const south = lat < 0;
+/** The temperature alone (°C), as provinceClimate gives it: the weekly weather needs only this. */
+export function provinceTemperature(place: PlaceClimate, date: GameDate): number {
   // The year as the northern hemisphere sees it: the south runs half a year behind.
-  const day = (dayOfYear(date) + (south ? 182 : 0)) % 365;
+  const day = (dayOfYear(date) + (place.lat < 0 ? 182 : 0)) % 365;
   // Warmest around 20 July, coldest around 20 January, the land lagging the sun.
-  const temperature = mean + swing * Math.cos((2 * Math.PI * (day - 201 - place.lag)) / 365);
+  return place.mean + place.swing * Math.cos((2 * Math.PI * (day - 201 - place.lag)) / 365);
+}
+
+export function provinceClimate(place: PlaceClimate, date: GameDate): ProvinceClimate {
+  const { lat } = place;
+  const south = lat < 0;
+  const day = (dayOfYear(date) + (south ? 182 : 0)) % 365;
+  const temperature = provinceTemperature(place, date);
   // Leaves turn earlier further north; the tropics have no autumn or spring to speak of.
   const a = Math.abs(lat);
   const temperate = Math.min(1, Math.max(0, (a - 22) / 10));

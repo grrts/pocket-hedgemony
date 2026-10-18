@@ -334,6 +334,14 @@ settlement, settlers, local people's tiles.
 - PROV-315: Grouping and overview: the Land tab opens with the land's food against the province's people in a normal year as a share, in warning colours under 100 %; the realm's Provinces list stays the overview of food across the realm. [X-19]
 - PROV-316: Phone: in landscape the tiles are at least 44 points each way in the Wide and Tall layouts, the sheet sits under the grid in the side panel, and nothing needs hover. [X-19]
 
+### Hunting in the game (feedback 81, 17 October 2026)
+- PROV-317: Woodsmen shall hunt and gather in the province's woods: the woods tiles hold a hunting lodge's job slots each (times the slot scale) at 0.67 times the ground's people output times how rich its game is (1.3 in boreal forest north of 55° and in tundra, 1.1 in other forest, 1.0 in jungle, 0.9 in thin woods) times the game left; woodsmen past that room scrape a living at half the bare rate. [PROV-080, feedback 81, D-PROV-26]
+- PROV-318: A hunting lodge shall stand in the province, take one building slot and need a woods tile; it makes the hunters in the woods' room bring in half as much again (1.0 against 0.67), and gives furs in the northern woods. [PROV-311, feedback 81]
+- PROV-319: Each January the game shall move a fifth of the way toward what the hunting leaves: full while the hunters fit the woods' room, 0.35 less for each room's worth of hunters past it, never under 0.3; in 1444 it starts where the hunting of that year leaves it. Fewer woods tiles (cleared for fields) crowd the same hunters and so thin the game. [feedback 81, D-PROV-26]
+- PROV-320: Each January each weather region north of 45° shall roll for a hard winter (one year in 8, one in 5 north of 55° or on tundra); hunting in a hard winter brings in 0.6 of a normal year. Hunting rolls no harvest. The roll comes from the game's seed, the year and the region, apart from the game's other dice, so a hard winter never changes what else happens that turn. [feedback 81, D-PROV-26]
+- PROV-321: Where: the woods tile's sheet on the province's Land tab shows the game left (plenty, thinning or scarce, with the reason) and a hard winter when there is one, and offers both a hunting lodge and a lumber camp, each with its Build button or why not; the Build tab lists the lodge with the other works. [X-19]
+- PROV-322: Grouping and overview: hunting sits with the other food on the Land tab and counts in its food line; the realm's Provinces list stays the overview of food across the realm. Phone: as PROV-316, with one 44-point button per building on the sheet. [X-19]
+
 ### 5.19 Lords in the province
 - PROV-200: A lord shall always hold at least one province; someone with no land is a courtier. [§10.3]
 - PROV-201: When a lord loses his last province, he shall stop being a lord: he stays at court as a courtier who can be granted land again, or, if he lost it to you by force, he flees abroad and becomes a pretender to it. [§10.3]
@@ -615,6 +623,7 @@ province config file but no file name or keys; keys below are proposed by this s
 - **D-PROV-23** (was OQ-PROV-23) A lord's province without his official: it is *Ungoverned* and gives the lord half its tax and half its recruits for his retinue. The same half rule as a royal province without an official.
 - **D-PROV-24** (was OQ-PROV-24) Officials per province: one official runs 1 province with G1, 2 with G9, 3 with G16, plus one for each of B2, G11 and T14. Same as D-REALM-14.
 - **D-PROV-25** (17 Oct, Leroy: "Buildings are build in the province but effect tiles, not on tiles"; the food plan, feedback 80 and 87) Land buildings stand in the province, take one building slot and work all its tiles of their use; the tile rules of §2 decide how many people they employ. The map's provinces hold far more people than the design's (median 46,000, a tenth over 300,000), so a tile holds 2.5 times the design's job slots. The 1444 land is laid out from the map's ground, and a province's own ways (terraces, ditches, herding on the move) make up its food to 110 % in 1444. A 15-year run then shows famine touching about 4 % of provinces a year by 1459 against under 1 % before. Tile conversion (feedback 86), hunting (81) and mines with seams (87) build on this next.
+- **D-PROV-26** (17 Oct, feedback 81) Hunting gets its own room in the woods, a lodge, game that thins and hard winters, not the bare rate everywhere. Game starts at the level the 1444 hunting leaves, so the first years don't crash; at that start a tenth of provinces (crowded woods in the steppe and India) sit near the floor and the median at plenty. The province's own ways (PROV-313) are worked out after, so the 1444 food stays at 110 %. Hard winters touch 200 to 300 provinces a year.
 
 ## 14. Traceability
 
@@ -797,6 +806,8 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-309 | — | Presentation only: checked on phone screenshots in landscape |
 | PROV-310 … PROV-313 | — | Engine: packages/engine/test/works.test.ts (tiles, farms on fields, 1444 food) |
 | PROV-314 … PROV-316 | — | Presentation: apps/client/scripts/land-shots.mjs on phones in landscape |
+| PROV-317 … PROV-320 | — | Engine: packages/engine/test/works.test.ts (hunting: lodge, thinning, hard winter, save) |
+| PROV-321 … PROV-322 | — | Presentation: apps/client/src/ui/land.ts woods sheet |
 | PROV-200 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A courtier can be granted land again |

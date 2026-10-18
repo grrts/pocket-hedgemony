@@ -251,11 +251,13 @@ export function recomputeCap(world: World): void {
   const used = world.nationCapUsed;
   cap.fill(0);
   used.fill(0);
+  // W12, W15 and W18 raise each province's share (WAR-032): one share per realm, worked out once (provinceCap's rule for a royal province).
+  const share = new Float64Array(world.nationCount).fill(-1);
   for (let p = 0; p < world.provinceCount; p++) {
     const owner = world.provinceOwner[p]!;
-    if (owner < 0) continue;
-    // W12, W15 and W18 raise each province's share (WAR-032).
-    cap[owner] = cap[owner]! + wf.provinceCap({ people: world.provincePopulation[p]! * 1000, royal: true, occupied: world.provinceOccupier[p]! >= 0 }, knownSet(world, owner));
+    if (owner < 0 || world.provinceOccupier[p]! >= 0) continue;
+    if (share[owner]! < 0) share[owner] = wf.capShare({}, knownSet(world, owner));
+    cap[owner] = cap[owner]! + world.provincePopulation[p]! * 1000 * share[owner]!;
   }
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i]) used[a.owner[i]!] = used[a.owner[i]!]! + a.men[i]!;

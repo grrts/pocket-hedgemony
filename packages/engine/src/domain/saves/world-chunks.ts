@@ -75,14 +75,14 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
   };
   const chunks = [
     packChunk("core", V.core, {
-      meta: { turn: world.turn, date: world.date, day: world.day, step: world.step, options: game.options, playerNation: game.playerNation },
+      meta: { turn: world.turn, weatherSeed: world.weatherSeed, date: world.date, day: world.day, step: world.step, options: game.options, playerNation: game.playerNation },
       arrays: { rng: new Uint32Array(world.rng.state) },
     }),
     packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
     packChunk("provinces", V.provinces, {
       // Sieges under way, by province (occupation and garrisons are arrays below); the ground is the map's, not the save's.
       meta: { sieges: [...world.sieges].map(([p, st]) => [p, { ...st, siege: { ...st.siege, ground: undefined } }]), workNames: WORKS },
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore, game: world.provinceGame, hardWinter: world.provinceHardWinter },
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
@@ -183,13 +183,14 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   const warnings: string[] = [];
 
   const world = createWorld(rules, 0, tiles);
-  const meta = core.meta as { turn: number; day?: number; step?: number; date: { year: number; month: number; day?: number }; options: CampaignOptions; playerNation: string };
+  const meta = core.meta as { turn: number; weatherSeed?: number; day?: number; step?: number; date: { year: number; month: number; day?: number }; options: CampaignOptions; playerNation: string };
   world.turn = meta.turn;
   world.day = meta.day ?? meta.turn * 7;
   world.step = meta.step ?? 0;
   // The whole date, with its day when the engine keeps one (X-18 weekly turns).
   world.date = { ...meta.date } as typeof world.date;
   world.rng = new Rng(core.arrays.rng as Uint32Array);
+  world.weatherSeed = meta.weatherSeed ?? 0;
 
   // Nations: by id, then the nation table, else gone with a warning.
   const nationMap = ids.nations.map((id) => {
@@ -260,6 +261,9 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         // Tiles as saved; saves from before land keep the ones laid out from the map.
         if (prov.tiles) world.provinceTiles.set(prov.tiles.subarray(old * MAX_TILES, (old + 1) * MAX_TILES), t.index * MAX_TILES);
         if (prov.starved) world.provinceStarved[t.index] = prov.starved[old]! * t.share;
+        // Game in the woods and this year's winter; saves from before hunting keep the 1444 game.
+        if (prov.game) world.provinceGame[t.index] = prov.game[old]!;
+        if (prov.hardWinter) world.provinceHardWinter[t.index] = prov.hardWinter[old]!;
         // Castle stores; saves from before them keep each castle's starting reserve.
         if (prov.castleStore) world.castleStore[t.index] = prov.castleStore[old]! * t.share;
       }

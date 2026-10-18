@@ -1,6 +1,6 @@
 import type { GameDate, Ground, Ruleset } from "@ph/rules";
 import { groundOf, rowWidths, wagonRations, type MarchMap, type TileMarch } from "./march.ts";
-import { placeClimate, provinceClimate, type PlaceClimate } from "./climate.ts";
+import { placeClimate, provinceTemperature, type PlaceClimate } from "./climate.ts";
 import { pointTileGrid, type TileGrid } from "./tiles.ts";
 import { Rng } from "./rng.ts";
 import type { Diplomacy } from "./domain/diplomacy/index.ts";
@@ -36,6 +36,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   /** Days played. */
   day: number;
   rng: Rng;
+  /** The game's seed for its weather rolls (hard winters), apart from `rng` so a roll there never shifts the rest of the turn. */
+  weatherSeed: number;
 
   /** The map's tiles, which armies stand and march on. */
   tiles: TileGrid;
@@ -347,6 +349,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     step: 0,
     day: 0,
     rng: new Rng(seed),
+    weatherSeed: seed >>> 0,
     tiles,
     rowWidth: map && map.height === tiles.height ? rowWidths(tiles.height, map.latTop, map.pxPerDeg) : new Float32Array(tiles.height).fill(1),
     provincePlace,
@@ -497,7 +500,7 @@ export function marchMap(world: World): MarchMap {
 
 /** Each province's sea-level temperature for today (the snow on its tiles slows marches). */
 export function updateWeather(world: World): void {
-  for (let p = 0; p < world.provinceCount; p++) if (!world.provinceWater[p]) world.provinceTemperature[p] = provinceClimate(world.provincePlace[p]!, world.date).temperature;
+  for (let p = 0; p < world.provinceCount; p++) if (!world.provinceWater[p]) world.provinceTemperature[p] = provinceTemperature(world.provincePlace[p]!, world.date);
 }
 
 /** The world's tiles as a march over them sees them today. */

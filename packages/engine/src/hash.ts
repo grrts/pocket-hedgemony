@@ -15,7 +15,7 @@ export function hashWorld(world: World): string {
     for (let i = 0; i < bytes.length; i++) h = Math.imul(h ^ bytes[i]!, 0x01000193);
   };
   const a = world.armies;
-  feed(new Int32Array([world.turn, world.day, world.step, world.date.year, world.date.month, world.date.day ?? 1, a.count, world.battles.length]));
+  feed(new Int32Array([world.weatherSeed, world.turn, world.day, world.step, world.date.year, world.date.month, world.date.day ?? 1, a.count, world.battles.length]));
   feed(world.rng.state);
   feed(world.provinceOwner);
   feed(world.provinceOccupier);
@@ -37,6 +37,8 @@ export function hashWorld(world: World): string {
   feed(world.provinceLord);
   feed(world.provinceWorks);
   feed(world.provinceTiles);
+  feed(world.provinceGame);
+  feed(world.provinceHardWinter);
   feed(world.nationNeglect);
   feed(Float64Array.from(world.sites.flatMap((s) => [s.nation, s.province, s.work, s.step, s.monthsLeft])));
   feed(Int32Array.from(world.workQueue.flatMap((q) => [q.nation, q.province, q.work, q.step])));

@@ -14,14 +14,14 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const people = (thousands: number) => Math.round(thousands * 1000).toLocaleString("en-US");
 
 /** What each use is called on the tab, and the work that improves it. */
-const USE_TEXT: Record<string, { name: string; work: string | null; about: string }> = {
-  fields: { name: "Fields", work: "farm", about: "Farmers grow grain here. A farm gives them work at the full rate; without one they work bare land at 0.67." },
-  pasture: { name: "Pasture", work: "ranch", about: "Herders keep flocks here. A ranch gives them work at 1.33 and wool; without one they herd at 0.67." },
-  woods: { name: "Woods", work: "lumber camp", about: "Woodsmen hunt and gather here at 0.67. A lumber camp cuts timber, so works needing it cost less." },
-  marsh: { name: "Marsh", work: null, about: "Wet land: little grows. Draining it (an invention) turns it to fields." },
-  waste: { name: "Waste", work: "quarry", about: "Rock, scrub or sand. A quarry on rocky ground cuts stone, so works needing it cost less." },
-  shore: { name: "Shore", work: "fishery", about: "Seafolk fish here. A fishery gives them work at 1.33; without one they fish at 0.67." },
-  town: { name: "Town", work: null, about: "The town's buildings stand here, one to a slot: the Build tab orders them." },
+const USE_TEXT: Record<string, { name: string; works: string[]; about: string }> = {
+  fields: { name: "Fields", works: ["farm"], about: "Farmers grow grain here. A farm gives them work at the full rate; without one they work bare land at 0.67." },
+  pasture: { name: "Pasture", works: ["ranch"], about: "Herders keep flocks here. A ranch gives them work at 1.33 and wool; without one they herd at 0.67." },
+  woods: { name: "Woods", works: ["hunting lodge", "lumber camp"], about: "Woodsmen hunt and gather here, best in the northern woods. Too many hunters thin the game; a hard winter cuts the catch. A hunting lodge brings in half as much again (and furs in the north); a lumber camp cuts timber, so works needing it cost less." },
+  marsh: { name: "Marsh", works: [], about: "Wet land: little grows. Draining it (an invention) turns it to fields." },
+  waste: { name: "Waste", works: ["quarry"], about: "Rock, scrub or sand. A quarry on rocky ground cuts stone, so works needing it cost less." },
+  shore: { name: "Shore", works: ["fishery"], about: "Seafolk fish here. A fishery gives them work at 1.33; without one they fish at 0.67." },
+  town: { name: "Town", works: [], about: "The town's buildings stand here, one to a slot: the Build tab orders them." },
 };
 
 /** The Land tab. `chosen` is the tile tapped, or -1. */
@@ -47,18 +47,21 @@ function tileSheet(s: Snapshot, p: number, t: LandTileRow): string {
   const facts = [
     t.workers > 0 ? `<dt>Working it</dt><dd>${people(t.workers)}</dd>` : "",
     t.feeds > 0 ? `<dt>Feeds</dt><dd>${people(t.feeds)} a year</dd>` : "",
+    t.game ? `<dt>Game</dt><dd>${t.game.left > 0.85 ? "plenty" : t.game.left > 0.55 ? "thinning: too many hunters" : "scarce: too many hunters"}${t.game.hardWinter ? "; a hard winter this year" : ""}</dd>` : "",
     t.ware ? `<dt>Gives</dt><dd>${t.ware.amount.toFixed(1)} loads of ${esc(t.ware.name)} a year</dd>` : "",
     `<dt>Worked by</dt><dd>${t.building ? esc(cap(t.building)) : "no building: bare land"}</dd>`,
   ].join("");
-  const work = text.work ? s.works.indexOf(text.work) : -1;
-  const row = work >= 0 ? (s.buildSheets[p] ?? []).find((r) => r.work === work) : undefined;
-  const action = row
-    ? row.why === null
-      ? `<button class="wax" data-build="${row.work}">${t.building ? "Improve" : "Build"}: ${esc(cap(row.name))}</button><p class="hint">${esc(row.effect)}</p>`
-      : row.why === "built to the top"
-        ? ""
-        : `<p class="hint">${esc(cap(row.name))}: ${esc(row.why)}.</p>`
-    : "";
+  // One action per building that works this use: its Build or Improve button, or why it can't be built.
+  const action = text.works
+    .map((name) => {
+      const work = s.works.indexOf(name);
+      const row = work >= 0 ? (s.buildSheets[p] ?? []).find((r) => r.work === work) : undefined;
+      if (!row || row.why === "built to the top") return "";
+      return row.why === null
+        ? `<button class="wax" data-build="${row.work}">${row.step > 1 ? "Improve" : "Build"}: ${esc(cap(row.name))}</button><p class="hint">${esc(row.effect)}</p>`
+        : `<p class="hint">${esc(cap(row.name))}: ${esc(row.why)}.</p>`;
+    })
+    .join("");
   return `<div class="land-sheet">
     <h3 class="sub">${esc(text.name)}</h3>
     <p>${esc(text.about)}</p>

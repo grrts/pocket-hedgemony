@@ -24,7 +24,7 @@ import { yearlyFood } from "./food.ts";
  */
 
 /** The works of this slice, as named in the buildings data. */
-export const WORKS = ["farm", "ranch", "fishery", "lumber camp", "quarry", "market", "harbour", "drill yard", "road", "castle", "granary"] as const;
+export const WORKS = ["farm", "ranch", "fishery", "lumber camp", "quarry", "market", "harbour", "drill yard", "road", "castle", "granary", "hunting lodge"] as const;
 export type WorkName = (typeof WORKS)[number];
 export const WORK_COUNT = WORKS.length;
 export const workIndex = (name: string): number => (WORKS as readonly string[]).indexOf(name);
@@ -32,7 +32,7 @@ export const workIndex = (name: string): number => (WORKS as readonly string[]).
 const W = Object.fromEntries(WORKS.map((w, k) => [w, k])) as Record<WorkName, number>;
 
 /** The highest step of each work this slice builds (later steps need inventions or wares not simulated yet). */
-const TOP: Record<WorkName, number> = { farm: 3, ranch: 1, fishery: 1, "lumber camp": 1, quarry: 1, market: 3, harbour: 3, "drill yard": 2, road: 2, castle: 2, granary: 1 };
+const TOP: Record<WorkName, number> = { farm: 3, ranch: 1, fishery: 1, "lumber camp": 1, quarry: 1, market: 3, harbour: 3, "drill yard": 2, road: 2, castle: 2, granary: 1, "hunting lodge": 1 };
 
 export interface Site {
   nation: number;
@@ -143,6 +143,7 @@ function placeFits(world: World, p: number, name: WorkName): boolean {
     case "ranch":
       return tilesOf(world, p, "pasture") > 0;
     case "lumber camp":
+    case "hunting lodge":
       return tilesOf(world, p, "woods") > 0;
     case "quarry":
       return tilesOf(world, p, "waste") > 0 && (ground === "hills" || ground === "mountains" || ground === "drylands" || ground === "desert");
@@ -157,7 +158,7 @@ function placeFits(world: World, p: number, name: WorkName): boolean {
 }
 
 /** The tiles a land work improves, as the player reads them. */
-const LAND_USE: Partial<Record<WorkName, string>> = { farm: "fields", ranch: "pasture", "lumber camp": "woods", quarry: "rocky waste" };
+const LAND_USE: Partial<Record<WorkName, string>> = { farm: "fields", ranch: "pasture", "lumber camp": "woods", "hunting lodge": "woods", quarry: "rocky waste" };
 
 /** Cost of a work's step in a province: the data's gold scaled to this economy and its months, cheaper with timber or stone at hand. */
 export function workCost(world: World, p: number, work: number, step: number): { gold: number; months: number } {
@@ -393,7 +394,7 @@ export function worksTrade(world: World, p: number): number {
 
 /** Food a class brings in a year at a normal harvest, in thousands fed: on its tiles at the rate its building (farm, ranch, fishery) gives, the rest on bare land. */
 export function worksFood(world: World, p: number, cls: "farmers" | "herders" | "seafolk" | "woodsmen"): number {
-  const step = cls === "farmers" ? worksAt(world, p, W.farm) : cls === "herders" ? worksAt(world, p, W.ranch) : cls === "seafolk" ? worksAt(world, p, W.fishery) : 0;
+  const step = cls === "farmers" ? worksAt(world, p, W.farm) : cls === "herders" ? worksAt(world, p, W.ranch) : cls === "seafolk" ? worksAt(world, p, W.fishery) : worksAt(world, p, W["hunting lodge"]);
   return classFood(world, p, cls, step, share(world, p)) * world.provinceLandYield[p]!;
 }
 
@@ -441,6 +442,7 @@ export function seedWorks(world: World): void {
     put("farm", 1, wealth >= 3 && placeFits(world, p, "farm"));
     put("ranch", 1, wealth >= 3 && placeFits(world, p, "ranch"));
     put("fishery", 1, wealth >= 2 && placeFits(world, p, "fishery"));
+    put("hunting lodge", 1, wealth >= 3 && tilesOf(world, p, "woods") >= 3);
     put("market", wealth >= 8 ? 2 : 1, wealth >= 4);
     put("harbour", 1, wealth >= 5 && !!def.coastal);
     put("road", 1, wealth >= 6);
@@ -490,7 +492,7 @@ export function aiWorks(world: World, news: News[]): void {
       const work = W[name];
       if (name === "castle" && !borders(world, p, n)) continue;
       // Farms where the province does not feed itself.
-      if (name === "farm" && yearlyFood(world, p) >= world.provincePopulation[p]! * world.rules.defines.works.seedFoodShare) continue;
+      if ((name === "farm" || name === "hunting lodge") && yearlyFood(world, p) >= world.provincePopulation[p]! * world.rules.defines.works.seedFoodShare) continue;
       if (whyNot(world, n, p, work, pend)) continue;
       if (world.nationTreasury[n]! - workCost(world, p, work, nextStep(world, p, work, pend)).gold < reserve) continue;
       orderWork(world, n, p, work, news, pend);
@@ -501,7 +503,7 @@ export function aiWorks(world: World, news: News[]): void {
 
 /** Sites a realm of the AI keeps open at most (buildings ai.busy_sites). */
 const AI_BUSY_SITES = 3;
-const AI_ORDER: WorkName[] = ["market", "farm", "harbour", "road", "castle", "drill yard", "granary"];
+const AI_ORDER: WorkName[] = ["market", "farm", "hunting lodge", "harbour", "road", "castle", "drill yard", "granary"];
 
 function borders(world: World, p: number, n: number): boolean {
   for (let k = world.adjStart[p]!, end = world.adjStart[p + 1]!; k < end; k++) {
@@ -525,6 +527,8 @@ export function workEffect(world: World, work: number, step: number): string {
       return `Every pasture tile: work for ${people(jobSlots("ranch"))} herders, who feed 1.33 each against 0.67 without it`;
     case "fishery":
       return `Every shore tile: work for ${people(jobSlots("fishery"))} seafolk, who feed 1.33 each against 0.67 without it`;
+    case "hunting lodge":
+      return `The woods: work for ${people(jobSlots("hunting lodge"))} hunters on every woods tile, who bring in half as much again; furs in the northern woods`;
     case "lumber camp":
       return `Works needing timber here cost ${pct(d.materialsAtHandSaving)} less; trade +${pct(d.campTrade)}`;
     case "quarry":
@@ -591,6 +595,8 @@ export interface LandTileRow {
   feeds: number;
   /** A ware it gives a year, in loads. */
   ware: { name: string; amount: number } | null;
+  /** Woods only: the game left (1 plenty, down to 0.3 where hunters crowd them), and whether this year's winter is hard (feedback 81). */
+  game?: { left: number; hardWinter: boolean };
 }
 
 /** The work that works each tile use, and the class on it. */
@@ -615,12 +621,15 @@ export function landSheet(world: World, p: number): LandTileRow[] {
     const uw = USE_WORK[use];
     const step = uw ? worksAt(world, p, W[uw.work]) : 0;
     const quarry = use === "waste" ? worksAt(world, p, W.quarry) : 0;
-    const building = uw && step > 0 ? workStepName(W[uw.work], step) : quarry > 0 ? "quarry" : null;
+    const lodge = use === "woods" && worksAt(world, p, W["hunting lodge"]) > 0;
+    const building = [uw && step > 0 ? workStepName(W[uw.work], step) : quarry > 0 ? "quarry" : "", lodge ? "hunting lodge" : ""].filter(Boolean).join(" and ") || null;
     const workers = uw ? world.provinceClasses[p * CLASS_COUNT + CLASS_NAMES.indexOf(uw.cls)]! : 0;
     const fed = uw ? worksFood(world, p, uw.cls) : 0;
-    const wareOf = uw?.work === "lumber camp" && step > 0 ? tileWares(world, p, "lumber camp") : use === "pasture" && step > 0 ? tileWares(world, p, "ranch") : quarry > 0 ? tileWares(world, p, "quarry") : null;
-    for (let i = 0; i < count; i++)
-      rows.push({ use, building, workers: workers / count, feeds: fed / count, ware: wareOf ? { name: wareOf.ware, amount: wareOf.amount } : null });
+    const wares = [uw?.work === "lumber camp" && step > 0 ? tileWares(world, p, "lumber camp") : use === "pasture" && step > 0 ? tileWares(world, p, "ranch") : quarry > 0 ? tileWares(world, p, "quarry") : null, lodge ? tileWares(world, p, "hunting lodge") : null].filter((w) => w !== null);
+    // Timber and furs from a lumber camp and a lodge both in the north read as one ware line.
+    const ware = wares.length ? { name: [...new Set(wares.flatMap((w) => w.ware.split(" and ")))].join(" and "), amount: wares.reduce((a, w) => a + w.amount, 0) } : null;
+    const game = use === "woods" ? { left: world.provinceGame[p]!, hardWinter: world.provinceHardWinter[p] === 1 } : undefined;
+    for (let i = 0; i < count; i++) rows.push({ use, building, workers: workers / count, feeds: fed / count, ware, ...(game ? { game } : {}) });
   }
   return rows.slice(0, n);
 }
