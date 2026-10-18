@@ -667,7 +667,7 @@ export interface Commission {
 
 /**
  * Commissions an official as commander or captain (RECR-069..073, RECR-079..081): skills and trait offer by
- * type, years served added, the realm's current style (a Marshal any style seen in battle), 10 gold once,
+ * type, years served added, the realm's current style (a Marshal any style seen in battle), the commission gold once (RECR-114),
  * field wage ×3 or ×2, a staff of 100 or 50.
  */
 export function commission(o: {

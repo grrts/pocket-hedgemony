@@ -4,6 +4,8 @@
     "zoomBoundaries",
     "playback.battleStepSeconds",
     "seasonPalettes.snowFromLatitude",
+    "battleMorale.winnerSpends",
+    "seaIce",
     "livingMap"
   ],
   "zoomLevels": [
@@ -381,6 +383,73 @@
       "wet season"
     ],
     "swap": "per province per month"
+  },
+  "routeStroke": {
+    "dash": "#f4f4f4",
+    "outline": "#1a1c2c",
+    "minContrast": 3
+  },
+  "battleMorale": {
+    "winnerSpends": 0.35
+  },
+  "seaIce": {
+    "openAboveC": -6,
+    "frozenByC": -16,
+    "sampleRadius": 7,
+    "samples": 8,
+    "coldGain": 1.2,
+    "coastWeight": 0.25,
+    "depthWeight": 0.15,
+    "noiseWeight": 0.62,
+    "noiseOctaves": [
+      [
+        23,
+        0.6
+      ],
+      [
+        8.5,
+        0.32
+      ],
+      [
+        3.2,
+        0.08
+      ]
+    ],
+    "slush": [
+      0.15,
+      0.3
+    ],
+    "solid": [
+      0.3,
+      0.45
+    ],
+    "slushMix": 0.55,
+    "slushColour": [
+      0.6,
+      0.71,
+      0.8
+    ],
+    "iceColour": [
+      0.66,
+      0.76,
+      0.85
+    ],
+    "floeColour": [
+      0.78,
+      0.86,
+      0.92
+    ],
+    "crackColour": [
+      0.52,
+      0.64,
+      0.75
+    ],
+    "landSnowColour": [
+      0.97,
+      0.98,
+      1.0
+    ],
+    "closesWhenFrozenShare": 0.5
   },
   "livingMap": {
     "$comment": "The living map close in (living-map-design.md, feedback 126). Every number is a starting value to tune in play (§9 defaults: OQ-VIEW-11..14).",

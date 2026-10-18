@@ -6,6 +6,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 |---|---|---|
 | [Achievements](achievements/spec.md) | ACH | [features](achievements/features/) |
 | [Audio](audio/spec.md) | AUD | [features](audio/features/) |
+| [Balance model](balance/spec.md) | BAL | [features](balance/features/) |
 | [Buildings](buildings/spec.md) | BLD | [features](buildings/features/) |
 | [Culture](culture/spec.md) | CULT | [features](culture/features/) |
 | [Diplomacy](diplomacy/spec.md) | DIPL | [features](diplomacy/features/) |

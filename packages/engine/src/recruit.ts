@@ -3,8 +3,8 @@ import { refillPaces } from "./fallen.ts";
 import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
-import { officialName, personName } from "./names.ts";
-import { OFFICIALS, officialBonus } from "./officials.ts";
+import { mix, officialName, personName, rankedName } from "./names.ts";
+import { OFFICIALS, officialAt, officialBonus } from "./officials.ts";
 import { monthlyRations, wagonRations } from "./march.ts";
 import { campaigning, halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
@@ -62,6 +62,7 @@ export interface FreeCompany {
   id: number;
   group: string;
   name: string;
+  /** The captain's name with his rank, in the language of the company's home (feedback 125). */
   captain: string;
   /** Province it gathers at, -1 = unknown. */
   home: number;
@@ -94,6 +95,10 @@ export function createRecruitState(P: number, N: number) {
     provinceOfficialSeed: new Int16Array(P),
     /** Day the official at each post took it up (world.day): his years served count from it. */
     provinceOfficialSince: new Int32Array(P),
+    /** Realm a foreign specialist came from, -1 = one of the realm's own (PROV-334). */
+    provinceOfficialFrom: new Int16Array(P).fill(-1),
+    /** New land waiting for its owner's decision (officials.ts provinceTaken). */
+    provinceNewLand: new Uint8Array(P),
     /** Province each commander was commissioned from, -1 = none. */
     commanderHome: [] as number[],
     /** Name seed of each commander commissioned from an official (-1 = none), so he goes back to a post as himself. */
@@ -144,6 +149,9 @@ export function idleCommanders(world: World, n: number): number[] {
   return out.sort((x, y) => score(y) - score(x) || x - y);
 }
 
+/** Gold a commission costs once (RECR-114). */
+export const COMMISSION_GOLD = rc.recruitingConfig.commissionCost;
+
 /**
  * Commission a province's official as a commander: he gets his type's skills and waits at court
  * (RECR-069..073). The post is left empty: the province pays half its tax and gives half its
@@ -154,13 +162,12 @@ export function commissionOfficial(world: World, n: number, p: number, news: New
   if (world.provinceLord[p]! >= 0) return `${provinceName(world, p)} is a lord's: his official serves the lord, not the crown`;
   const type = world.provinceOfficial[p]!;
   if (type < 0) return `${provinceName(world, p)} has no official to spare`;
-  const cost = world.rules.defines.recruit.commanderGold;
+  const { commission, cost } = rc.commission({ official: OFFICIALS[type]!, type: OFFICIALS[type]!, province: world.provinceIds[p]! });
   if (cost > world.nationTreasury[n]!) return "not enough gold";
-  const { commission } = rc.commission({ official: OFFICIALS[type]!, type: OFFICIALS[type]!, province: world.provinceIds[p]! });
   const skills = commission.skills ?? { might: 1, cunning: 1, logistics: 1 };
   // The official himself takes the command, under his own name.
   const seed = world.provinceOfficialSeed[p]!;
-  const name = officialName(world.rules, seed, n);
+  const name = officialAt(world, p)!;
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
   const c = addCommander(world, n, wf.newCommander(name, { ...skills, origin: OFFICIALS[type]! }));
   world.commanderHome[c] = p;
@@ -180,7 +187,7 @@ export function releaseCommander(world: World, n: number, c: number): string | n
   const type = OFFICIALS.indexOf(world.commanders[c]!.origin as (typeof OFFICIALS)[number]);
   const seed = world.commanderSeed[c]! >= 0 ? world.commanderSeed[c]! : home;
   // Back at his own post he keeps his years there; if someone else held it meanwhile he starts again.
-  if (world.provinceOfficialSeed[home] !== seed) world.provinceOfficialSince[home] = world.day;
+  if (world.provinceOfficialSeed[home] !== seed) (world.provinceOfficialSince[home] = world.day), (world.provinceOfficialFrom[home] = -1);
   world.provinceOfficial[home] = Math.max(0, type);
   world.provinceOfficialSeed[home] = seed;
   world.commanderOwner[c] = -1;
@@ -191,7 +198,7 @@ export function releaseCommander(world: World, n: number, c: number): string | n
 function newCaptain(world: World, n: number, name?: string): number {
   const skill = () => 1 + world.rng.int(3);
   const capital = world.rules.provinces.find((p) => p.id === world.rules.nations[n]!.capital)?.name ?? "";
-  return addCommander(world, n, wf.newCommander(`Captain ${name ?? personName(world.rules, n, world.rng.int(1 << 30), capital)}`, { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
+  return addCommander(world, n, wf.newCommander(name ?? rankedName(world.rules, n, personName(world.rules, n, world.rng.int(1 << 30), capital), "captain"), { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
 }
 
 /** Battles teach commanders: victories grow Might, defeats are counted (WAR-050, WAR-052). */
@@ -375,6 +382,8 @@ export function gatherDays(world: World, n: number): number {
 export function recruitRefusal(world: World, n: number, p: number, thousands: number): string | null {
   const where = callingPlace(world, n, p);
   if (where) return where;
+  // A lord's men answer his call for his retinue, not the crown's levy (RECR Levy: royal provinces).
+  if (world.provinceLord[p]! >= 0) return `${provinceName(world, p)} is ${world.lords[world.provinceLord[p]!]!.name}'s land: its men answer his call, not yours`;
   const men = Math.round(thousands) * LEVY_UNIT;
   if (men <= 0) return "no men asked for";
   const queued = world.musters.find((m) => m.nation === n && m.province === p);
@@ -702,7 +711,13 @@ function newFreeCompany(world: World): FreeCompany | null {
   // Rounding: the largest arm takes up the difference, so the company has exactly its men.
   const big = byArm.indexOf(Math.max(...byArm));
   byArm[big] = byArm[big]! + men - byArm.reduce((t, m) => t + m, 0);
-  return { id, group: def.group, name: pick(free(def)), captain: pick(def.captains), home: capitalOf(world, pick(homesOf(def))), byArm };
+  const name = pick(free(def));
+  const given = pick(def.captains);
+  const from = pick(homesOf(def));
+  const home = capitalOf(world, from);
+  // The captain is named and ranked in the language of the land the company gathers in (feedback 125): "Hauptmann Ulrich von Hallwyl".
+  const captain = rankedName(world.rules, from, personName(world.rules, from, mix(id, 125), provinceName(world, home), given), "captain");
+  return { id, group: def.group, name, captain, home, byArm };
 }
 
 /** Each month a free company may move on, and new ones gather until the age's number are for hire (warfare free_companies). */
@@ -983,7 +998,7 @@ export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => 
   for (let n = 0; n < world.nationCount; n++) {
     if (n === world.player || world.nationGone[n] || !atWar[n]) continue;
     // Men it could not put under a commander would only stand as garrisons (feedback 28).
-    if (world.nationTreasury[n]! < world.rules.defines.recruit.commanderGold && !idleCommanders(world, n).length) continue;
+    if (world.nationTreasury[n]! < COMMISSION_GOLD && !idleCommanders(world, n).length) continue;
     const cap = capitalOf(world, n);
     if (callingPlace(world, n, cap)) continue;
     // Keep the levies' future pay within half the income.
