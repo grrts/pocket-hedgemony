@@ -1243,16 +1243,13 @@ button.small {
   gap: 4px;
   margin: 4px 0 10px;
   padding: 0 2px;
-  /* The rail is painted, not a border, so a narrow panel can scroll the
-     cards sideways (five tabs on a phone) without clipping where they meet it. */
+  /* Tabs never scroll (feedback 111): a narrow panel wraps them onto a
+     second row, so every tab stays in sight and in the same place. The rail
+     is painted under the last row. */
+  flex-wrap: wrap;
+  row-gap: 2px;
   background: linear-gradient(0deg, var(--wood-dark) 4px, transparent 4px);
   box-shadow: 0 2px 0 var(--wood);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.tabs::-webkit-scrollbar {
-  display: none;
 }
 
 .tabs .tab {
@@ -3176,6 +3173,12 @@ button.paper.over {
 }
 
 .shell-card .ribbon .px-icon {
+  vertical-align: -3px;
+}
+
+/* The owner's flag before a province's name (feedback 110). */
+.panel .ribbon .flag {
+  margin-right: 6px;
   vertical-align: -3px;
 }
 

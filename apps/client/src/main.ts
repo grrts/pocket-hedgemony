@@ -2342,14 +2342,14 @@ function renderPanelCard(): void {
   const official = snapshot && own >= 0 ? officialOf(snapshot, selectedProvince, own) : undefined;
   const siege = siegeInfo(selectedProvince);
   panel.innerHTML = `
-    <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
+    <header><h2 class="ribbon">${owner ? pennant(owner, 2) : ""}${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
-    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"}</p>
+    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}"><b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"}</p>
     <p class="province-kind">${esc(provinceKind(p, !!owner && owner.capital === p.id))}</p>
     ${snapshot ? settleSection(selectedProvince) : ""}
     ${snapshot ? rebelsHere(selectedProvince) : ""}
-    ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
     ${siege ? siegeView(rules, siege) : ""}
+    ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
     <dl class="facts">
       <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
@@ -3820,7 +3820,8 @@ function renderRealm(r: number): void {
   if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "colonies") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
   const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
-  const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
+  // The free companies open from the Military tab's Mercenaries button, so Military stays lit over them (feedback 114).
+  const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key || (key === "military" && realmTab === "mercenaries") ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
       <img class="banner" src="${flagUrl(n, 6)}" alt="">
@@ -3863,7 +3864,7 @@ function renderRealm(r: number): void {
     : realmTab === "military" ? warRoomSection()
     : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: (c) => cmdOf(c).name })
     : realmTab === "colonies" ? coloniesTab(s!.exploration, { name: (p) => provinces[p]!.name, fleetName: fleetLabel, inRange: s!.exploration.sites.reduce((t, x) => t + (x === 1 ? 1 : 0), 0) })
-    : realmTab === "mercenaries" ? mercenarySection()
+    : realmTab === "mercenaries" ? `<button class="paper small" data-realm-open-tab="military">${icon("scroll", 1)}Back to Military</button>${mercenarySection()}`
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
@@ -3871,7 +3872,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -3934,9 +3935,6 @@ function renderRealm(r: number): void {
       renderPanel();
     }),
   );
-  // On a phone the tab row scrolls sideways: keep the open tab in view.
-  const onTab = panel.querySelector<HTMLElement>(".tabs .tab.on");
-  if (onTab) onTab.parentElement!.scrollLeft = onTab.offsetLeft - onTab.parentElement!.offsetLeft + onTab.offsetWidth / 2 - onTab.parentElement!.clientWidth / 2;
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       realmTab = b.dataset.realmTab as typeof realmTab;
