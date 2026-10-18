@@ -151,6 +151,19 @@
     "vaccination": -0.005
   },
   "famine": { "flee_share": 0.25, "year_share": 0.2 },
+  "mines": {
+    "$comment": "Feedback 87, PROV-065 to PROV-067. Rough waste (hills, mountains) may hold a seam: a ware and the years of digging it has left. The map's anchors are the famous mines of 1444; elsewhere a seam is found by a fixed roll per province, so every game has the same geology. A mine digs a year off its seam each January and closes when it runs out.",
+    "seam_chance": 0.35,
+    "ware_weights": { "iron": 45, "copper": 20, "tin": 8, "silver": 12, "gold": 5, "salt": 10 },
+    "years_min": 40,
+    "years_max": 160,
+    "anchors": { "Středočeský": { "ware": "silver", "years": 120, "mine": "Kutná Hora" }, "Dalarna": { "ware": "copper", "years": 300, "mine": "Falun" } },
+    "trade": { "base": 1, "precious": 3 },
+    "precious": ["silver", "gold"],
+    "timber_reach": 1,
+    "salt_grounds": ["drylands", "desert", "savanna"],
+    "salt_lat_below": 42
+  },
   "homeless": { "theft_from": 0.05, "theft_step": 0.05, "grievance_over": 0.10, "shanty_over": 0.20, "shanty_town_death_extra": 0.01, "shanty_plague_spread": 2 },
   "refugees": { "settle_years": 2 },
   "recruits": { "conscription_below": 0.25, "conscription_ends_at": 0.5, "no_recruits_from": ["clergy", "scholars"] },

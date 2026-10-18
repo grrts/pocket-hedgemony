@@ -37,10 +37,14 @@ export interface LandState {
   provinceGame: Float32Array;
   /** 1 in a province whose region has a hard winter this year: its hunters bring in less (feedback 81). */
   provinceHardWinter: Uint8Array;
+  /** The ware of each province's seam (an index into SEAM_WARES), -1 where it has none (feedback 87, PROV-065). */
+  provinceSeam: Int8Array;
+  /** Years of digging left in each province's seam. */
+  provinceSeamYears: Float32Array;
 }
 
 export function createLandState(P: number): LandState {
-  return { provinceTiles: new Uint8Array(P * MAX_TILES), provinceLandYield: new Float32Array(P).fill(1), provinceGame: new Float32Array(P).fill(1), provinceHardWinter: new Uint8Array(P) };
+  return { provinceTiles: new Uint8Array(P * MAX_TILES), provinceLandYield: new Float32Array(P).fill(1), provinceGame: new Float32Array(P).fill(1), provinceHardWinter: new Uint8Array(P), provinceSeam: new Int8Array(P).fill(-1), provinceSeamYears: new Float32Array(P) };
 }
 
 /** Tiles of a use in a province. */
@@ -138,6 +142,7 @@ export function seedLand(world: World): void {
   }
   // Game starts where the 1444 hunting has left it, so nothing crashes in the first years.
   for (let p = 0; p < P; p++) if (!world.provinceWater[p]) world.provinceGame[p] = gameTarget(world, p);
+  seedSeams(world);
 }
 
 /** Shares n tiles out by weight, largest remainder first. */
@@ -290,9 +295,80 @@ export function tileWares(world: World, p: number, building: string): { ware: st
       return lat >= HUNT.boreal_lat || ground === "tundra" ? { ware: "furs", amount: slots("hunting lodge") * gameYield(world, p) * world.provinceGame[p]! * 0.5 } : null;
     case "quarry":
       return { ware: "stone", amount: slots("mine") * buildingOutput(ground, "mine") };
+    case "mine": {
+      const ware = seamWare(world, p);
+      return ware ? { ware, amount: slots("mine") * buildingOutput(ground, "mine") * (precious(ware) ? 0.1 : 1) } : null;
+    }
+    case "saltworks":
+      return { ware: "salt", amount: slots("saltworks") * 2 };
     case "ranch":
       return { ware: ground === "grassland" || ground === "savanna" || ground === "drylands" ? "wool and hides" : "wool", amount: slots("ranch") * buildingOutput(ground, "ranch") * 0.5 };
     default:
       return null;
   }
 }
+
+// ---------------------------------------------------------------- mines and salt (feedback 87)
+
+const MINES = provinceConfig.mines;
+
+/** The wares a seam can hold. */
+export const SEAM_WARES = ["iron", "copper", "tin", "silver", "gold", "salt"] as const;
+export type SeamWare = (typeof SEAM_WARES)[number];
+
+/** Rough waste can hold a seam: hills and mountains with a waste tile (PROV-065). */
+export const roughWaste = (world: World, p: number): boolean => (world.provinceGround[p] === "hills" || world.provinceGround[p] === "mountains") && tilesOf(world, p, "waste") > 0;
+
+/**
+ * Seams in 1444: the map's famous mines (Kutná Hora's silver, Falun's copper),
+ * and elsewhere on rough waste a fixed roll per province, so every game has
+ * the same geology and the roll never touches the turn's dice.
+ */
+function seedSeams(world: World): void {
+  const weights = SEAM_WARES.map((w) => (MINES.ware_weights as Record<string, number>)[w] ?? 0);
+  const total = weights.reduce((a, b) => a + b, 0);
+  const anchors = MINES.anchors as Record<string, { ware: SeamWare; years: number }>;
+  for (let p = 0; p < world.provinceCount; p++) {
+    world.provinceSeam[p] = -1;
+    world.provinceSeamYears[p] = 0;
+    if (world.provinceWater[p]) continue;
+    const anchor = anchors[world.rules.provinces[p]!.name];
+    if (anchor) {
+      // The mine's shafts and spoil take a tile: the last one that isn't the town turns to waste.
+      if (tilesOf(world, p, "waste") === 0) {
+        for (let i = p * MAX_TILES + MAX_TILES - 1; i >= p * MAX_TILES; i--) {
+          const use = world.provinceTiles[i]!;
+          if (use === 0 || use === U.town + 1) continue;
+          world.provinceTiles[i] = U.waste + 1;
+          break;
+        }
+      }
+      world.provinceSeam[p] = SEAM_WARES.indexOf(anchor.ware);
+      world.provinceSeamYears[p] = anchor.years;
+      continue;
+    }
+    if (!roughWaste(world, p)) continue;
+    const id = world.provinceIds[p]!;
+    let h = 0;
+    for (let i = 0; i < id.length; i++) h = mix(h, id.charCodeAt(i));
+    if ((mix(h, 1) % 1000) / 1000 >= MINES.seam_chance) continue;
+    let pick = mix(h, 2) % total;
+    let k = 0;
+    while (pick >= weights[k]!) pick -= weights[k++]!;
+    world.provinceSeam[p] = k;
+    world.provinceSeamYears[p] = MINES.years_min + (mix(h, 3) % (MINES.years_max - MINES.years_min + 1));
+  }
+}
+
+/** The ware of a province's seam, or null. */
+export const seamWare = (world: World, p: number): SeamWare | null => (world.provinceSeam[p]! >= 0 ? SEAM_WARES[world.provinceSeam[p]!]! : null);
+
+/** Salt pans need a dry or warm coast (the buildings data's dry_or_warm_coast). */
+export function saltCoast(world: World, p: number): boolean {
+  if (tilesOf(world, p, "shore") === 0) return false;
+  const ground = world.provinceGround[p] ?? "grassland";
+  return (MINES.salt_grounds as string[]).includes(ground) || Math.abs(world.provincePlace[p]?.lat ?? 45) < MINES.salt_lat_below;
+}
+
+/** Whether a ware is silver or gold, worth the most in trade. */
+export const precious = (ware: string | null): boolean => !!ware && (MINES.precious as string[]).includes(ware);
