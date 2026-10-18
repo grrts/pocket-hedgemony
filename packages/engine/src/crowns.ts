@@ -2,12 +2,16 @@ import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import { bondOf, endTie, foldInRealm, makeSubject, mergeCrownsRealm, monthNow } from "./subjects.ts";
+import { newRuler, yearlyRulers } from "./rulers.ts";
+import { loyaltyStep } from "./lords.ts";
+import { rulerDied } from "./faithHeads.ts";
 import config from "../../rules/data/domain/subjects.json" with { type: "json" };
 
 /**
  * Personal unions in the game (milestone 5, SUBJ-126 to SUBJ-129, D-SUBJ-30):
- * rulers don't age yet, so each January a roll stands in for a ruler dying
- * without a direct heir. His marriages may give the other houses a claim and
+ * each January a roll stands for a ruler dying without a direct heir, beside
+ * the deaths of old age that rulers.ts rolls (REALM-234); both change the
+ * ruler here (succeed). His marriages may give the other houses a claim and
  * a pretender (DIPL-107); with no heir at all his crown passes to the house
  * married most often into his (DIPL-110) as a Union, or a Loyal subject's
  * overlord takes it at once (SUBJ-071).
@@ -30,9 +34,28 @@ function marriedHouses(d: dip.Diplomacy, x: string): string[] {
   return out.map((h, i) => [h, i] as const).sort((p, q) => dip.marriagesBetween(d, q[0], x) - dip.marriagesBetween(d, p[0], x) || p[1] - q[1]).map(([h]) => h);
 }
 
+/**
+ * Who follows a dead ruler (REALM-100 to REALM-103, REALM-113): his heir by
+ * the realm's law, or a kinsman when he died without a direct heir; the lords
+ * take the new ruler's causes. A realm whose crown passed to another house
+ * in a union shares that house's ruler.
+ */
+export function succeed(world: World, n: number, news: News[], kinsman = false, unionWith = -1): void {
+  if (world.nationGone[n]) return;
+  // The ruler of the Papal States was the Pope: a conclave sits (RELG-142).
+  rulerDied(world, n, news);
+  if (unionWith >= 0) {
+    world.rulers[n] = { ...world.rulers[unionWith]!, traits: [...world.rulers[unionWith]!.traits], heir: null, regent: null };
+    return;
+  }
+  newRuler(world, n, news, (lord, cause) => loyaltyStep(world, lord, cause, news), kinsman);
+}
+
 /** The January roll for every ruler but the player's, and claims that lapse (SUBJ-126 to SUBJ-128). */
 export function yearlyCrowns(world: World, news: News[]): void {
   if (world.date.month !== 1) return;
+  // Rulers age, and old ones die (REALM-234); the roll below is the union rules' own.
+  yearlyRulers(world, news, (n) => succeed(world, n, news));
   const d = world.diplomacy;
   const now = monthNow(world);
   const name = (n: number) => world.rules.nations[n]!.name;
@@ -58,8 +81,14 @@ export function yearlyCrowns(world: World, news: News[]): void {
       p.until = now + C.claim_years * 12;
       if (world.nationIndex.get(p.court) === world.player) news.push({ kind: "crown", text: `${name(n)}'s ruler dies without a son: your house gains a claim to its throne until ${Math.floor(p.until / 12)}.`, nations: [world.player, n] });
     }
-    if (dip.draw(d) >= C.no_heir_share) continue;
+    if (dip.draw(d) >= C.no_heir_share) {
+      succeed(world, n, news, true);
+      continue;
+    }
+    const overlord = bondOf(world, n)?.overlord;
     inheritCrown(world, n, news);
+    const bond = bondOf(world, n);
+    succeed(world, n, news, true, bond?.kind === "union" && bond.overlord !== overlord ? (world.nationIndex.get(bond.overlord) ?? -1) : -1);
   }
 }
 

@@ -131,6 +131,8 @@ export interface RealmFaith {
   expelled: string[];
   modifiers: string[];
   personality?: string;
+  /** Faiths whose communities the realm serves as the patron of their head while of another faith (RELG-145). */
+  servedByPatronage?: string[];
 }
 
 export function newRealm(id: string, stateFaith: string, init: Partial<RealmFaith> = {}): RealmFaith {
@@ -552,6 +554,7 @@ export function isServed(p: ProvinceFaith, r: RealmFaith, faith: string): boolea
   if (pol === "established") return true;
   if (pol === "persecuted") return false;
   if (isRooted(faith)) return true;
+  if (r.servedByPatronage?.includes(faith)) return true;
   if (isLayered(faith, r.stateFaith, p.together[faith] ?? p.together[r.stateFaith] ?? 0)) return true;
   if (p.buildings.some((b) => b.faith === faith && serves(b))) return true;
   return (p.mix[faith] ?? 0) < config.relations.kin_serves_community_below && p.buildings.some((b) => isKin(b.faith, faith) && serves(b));
@@ -1016,7 +1019,7 @@ export function holyPlaces(firedEvents: string[] = [], year = 1444): HolyPlace[]
     });
 }
 
-/** Church heads are only marked at their holy place, with no rules of their own (RELG-085). */
+/** Church heads are marked at their holy place, their seat (RELG-085); the heads of the faith rules are RELG-139 onward. */
 export function churchHeads(year = 1444): { id: string; name: string; place: string }[] {
   const heads = config.church_heads as unknown as Record<string, { name: string; place: string; from?: number } | string>;
   const out: { id: string; name: string; place: string }[] = [];
@@ -1417,3 +1420,6 @@ export function aiAdopt(realmShare: number, eventOffers: boolean): "adopts" | "m
   if (realmShare > config.ai.adopt_faith_without_event_above_realm_share) return "adopts";
   return eventOffers ? "may adopt" : "does not adopt";
 }
+
+// Heads of the faith (§5.17, RELG-139 to RELG-156).
+export * as heads from "./faithHeads.ts";

@@ -44,7 +44,7 @@ People, recruits, food, horses, ships, castles, faith, tongue, in revolt, school
 
 #### Tax and the treasury in play
 
-Every province pays at its own tax rate or, until you give it one, at your realm's default, which starts at normal. Against normal, **none** pays nothing, **light** half, **heavy** one and a half times and **crushing** double. A province whose official has been made a commander pays half, and so does one that riots or plots. Heavy tax gives the province the *Heavy taxes* grievance, and crushing counts as two. A lord's province gives you only your share, and raising its rate to heavy or crushing makes its lord waver. Trade from the province's wealth comes in whatever the rate.
+Every province pays at its own tax rate or, until you give it one, at your realm's default, which starts at normal. Against normal, **none** pays nothing, **light** half, **heavy** one and a half times and **crushing** double. A province whose official has been made a commander pays half, and so does one that riots or plots. Heavy tax gives the province the *Heavy taxes* grievance, and crushing counts as two. A lord's province gives you only your share, and raising its rate to heavy or crushing makes its lord waver. A busy province owes more: every 4 points of its trade ratio add 1 %. Trade itself comes from your traders (see [Trade](Trade)), whatever the rate.
 
 The treasury keeps a **ledger** for the month: Tax and Trade coming in, Army pay, Officials and Interest going out. Their sum is your change a month, paid in on the 1st. Each official at his post earns 0.1 gold a month; a commissioned official draws no wage while he commands. Wages and interest are paid a twelfth each month.
 
@@ -135,7 +135,7 @@ One **Food policy** sets realm-wide defaults, and any castle can have its own va
 | **Tongue** (% sharing the ruler's culture) | Slow assimilation, settlers, schools | Conquest, migration, separatist movements |
 | **In revolt** (provinces with riots or rebels) | Heavy taxes, famine, foreign faith or tongue, disloyal lords stirring, lost wars | Defeating rebels, giving in, lowering taxes, food |
 
-Each province needs an official or a lord to pay properly. A royal province gives full taxes and recruits, but **without an official it pays half taxes and gives half recruits**. One official runs one province with G1, two with G9 and three with G16, plus one more each for B2, G11 and T14. A low Faith share means religious revolts and wavering clergy lords; a low Tongue share means separatist revolts and slower officials. Provinces in revolt lose taxes and recruits and spread trouble to neighbours.
+Each province needs an official or a lord to pay properly. A royal province gives full taxes and recruits, but **without an official it pays half taxes and gives half recruits**. One official runs one province with G1, two with G9 and three with G16, plus one more each for B2, G11 and T14. A low Faith share means religious revolts and wavering clergy lords; a low Tongue share means separatist revolts and slower officials. Provinces in revolt lose taxes and recruits and spread trouble to neighbours. Under half counts as low: risings of that kind come half again as often, the lords seated among another faith waver each January (in a theocracy, all of them), and with a low Tongue officials' years count at half pace. The General tab marks a low Faith or Tongue with a warning line under it. A rising spreads to a restless neighbour at about a tenth a month.
 
 ### Lords
 
@@ -197,6 +197,12 @@ The lord card is the same in every society; only the label changes: nobles, merc
 
 Paying for a building in a lord's province raises his loyalty one step. A famine in his land turns him disloyal; riots or a heavy demand on his province make him waver. At New Year, each lord over the government's cap drops one loyalty step (see [Government](Government)).
 
+### What your lords and officials are called
+
+Every realm names its lords and officials in its own words. A Russian prince has boyars and voivodes, the Ottomans beys and subashis, Japan daimyo and daikan, Ethiopia rases and shums, the Inca kurakas and tocricocs, and the peoples of the Americas and much of Africa chiefs and headmen. The word comes from the family of your court's language, and a realm ruled by kin calls them chiefs and headmen where its language has no word of its own. Everyone else keeps lords and officials.
+
+The words show on the country card's tabs, the Stability pillars, the Lords map mode, a lord's and an official's screen and a province's "Governed by" card. Another realm's card uses its own words. Only the words change: chiefs and daimyo follow exactly the same rules as lords, and post types such as Warden or Tax collector stay the same everywhere.
+
 ### Stability
 
 Stability tells you at a glance how well your realm holds together. It is not a hidden number: it reads four pillars, and your realm is only as steady as the weakest of them.
@@ -224,6 +230,8 @@ The stability plaque in the top bar shows the step (amber when Uneasy, red when 
 | **Commanders** (Might, Cunning, Logistics) | Hiring, a lord or heir taking command, promotion after victory | Death in battle, old age, capture |
 | **Fallen** | Your soldiers killed in battles and sieges in the last 10 years | Many dead push people and lords toward peace and slow recruit refills |
 
+The Fallen line on your General tab says what your dead are doing: with a quarter of your recruit ceiling fallen, about a sixteenth more of your voices want peace (at most a quarter), and with half of it fallen recruits refill at three quarters of their pace (never under half).
+
 The details live in [Recruiting](Recruiting), [Warfare](Warfare) and [Naval](Naval).
 
 ### Ruler and family
@@ -233,6 +241,9 @@ The details live in [Recruiting](Recruiting), [Warfare](Warfare) and [Naval](Nav
 - **Heirs** are gained by births, marriages and adopting or naming an heir; lost by death, marrying daughters abroad, and heirs going over to a rebel lord. If the ruler dies with no heir, the realm falls into a **succession war** among the lords.
 - **Traits**: two (for example Pious, Warlike, Builder, Greedy), given at birth and sometimes gained or rarely changed by events. They give small bonuses and lean event options.
 - **Marriages** are living ties to other ruling houses and your own lords, arranged with an heir or a princess, ended by death, divorce events and war between the houses. They give goodwill, loyalty and a path to inheriting another realm.
+
+**In the game now.** Your ruler is on the General tab of your country card, under Stability: name, age, years on the throne, the regent while a child rules, the two traits with what each does, and the heir (or who would follow under your law). Most realms start with their real ruler of 1444. Each January rulers grow a year older and an old one may die: about 1 in 100 a year under 40, 2 in their forties, 4 in their fifties, 8 in their sixties and 16 older. The heir takes the throne and every lord wavers a little; with no heir a kinsman takes it and the lords dispute it. An heirless ruler of 18 to 50 may have a child. A dispatch with the crown tells you of a death, a birth or a child coming of age, in your realm and on your borders. Traits: **Pious** makes faith risings a quarter rarer, **Warlike** refills recruits 10 % faster, **Builder** makes works 10 % cheaper and **Greedy** brings 5 % more tax to you; each also leans the choices an AI ruler makes in events.
+
 
 **Women in roles.** Women can hold every role: ruler, lord, commander, official, scholar. The chance is set per country (or culture) per role from the catalogue's history and succession customs. Where the crown passes only through men (France), no woman inherits the throne, though a duke's daughter can inherit his duchy; where a daughter could inherit (Castile, Navarre), a queen regnant is possible. Wherever a ruler is a child, a queen mother can be regent. The chance rises as history's ages arrive: a little in the Age of Revolutions, more in the Age of Industrialization, more again in the Age of World Wars, and events and reforms can raise one country's chance earlier. Women who held roles in 1444 or appear in events are placed as they were; the chances apply only to characters the game generates.
 

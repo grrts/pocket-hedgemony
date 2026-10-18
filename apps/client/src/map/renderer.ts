@@ -1,11 +1,17 @@
 import { DEPTH_COLORS, hexToRgb, PALETTE, TERRAINS } from "../art/palette.ts";
 import { ATLAS_ROWS, BIG_ROWS, buildMiniAtlas, buildTileAtlas, rowColors, SEA_ROW, SHALLOW_ROW, TILE, VARIANTS, WATER_BASE } from "../art/tiles.ts";
 import { UI_COLORS } from "../art/ui.ts";
+import { ICE } from "@ph/engine/domain/map-presentation";
 import type { MapImage } from "./loadMap.ts";
 import { worldZoomHatchPx } from "@ph/engine/domain/subjects";
 
 /** Width of a subject's hatch at world zoom, in map pixels (SUBJ-093, rules subjects.map.world_zoom_hatch_px). */
 const SUBJECT_HATCH_PX = worldZoomHatchPx();
+
+/** A number as a GLSL float literal. */
+const glf = (n: number): string => (Number.isInteger(n) ? n.toFixed(1) : String(n));
+/** A colour of 0..1 channels as a GLSL vec3. */
+const glv = (c: readonly number[]): string => `vec3(${c.map(glf).join(", ")})`;
 
 /**
  * WebGL2 world map. The province id image is uploaded once; colours live in
@@ -237,18 +243,19 @@ float vnoise(vec2 x) {
   ivec2 c = ivec2(i);
   return mix(mix(hash(c), hash(c + ivec2(1, 0)), f.x), mix(hash(c + ivec2(0, 1)), hash(c + ivec2(1, 1)), f.x), f.y);
 }
-float fbm(vec2 x) { return 0.5 * vnoise(x / 23.0) + 0.3 * vnoise(x / 8.5) + 0.2 * vnoise(x / 3.2); }
-// How cold a sea zone is for ice, 0..1: open water above -6 C, frozen over by -16 C.
-float seaCold(int id) { return smoothstep(-6.0, -16.0, seasonAt(id).r * 127.5 - 60.0); }
-// Slush and sea ice, each 0..1, at map point m (feedback 24-26). The cold is blended across
+float fbm(vec2 x) { return ${ICE.noiseOctaves.map(([scale, weight]) => `${glf(weight)} * vnoise(x / ${glf(scale)})`).join(" + ")}; }
+// How cold a sea zone is for ice, 0..1: open water above ${ICE.openAboveC} C, frozen over by ${ICE.frozenByC} C.
+float seaCold(int id) { return smoothstep(${glf(ICE.openAboveC)}, ${glf(ICE.frozenByC)}, seasonAt(id).r * 127.5 - 60.0); }
+// Slush and sea ice, each 0..1, at map point m (VIEW-080..082): seaIceAt in the engine's
+// map-presentation runs the same sums, for the specs. The cold is blended across
 // neighbouring sea zones so no zone freezes as a block; ice forms first along
-// coasts and over shallow water, and its edge follows noise, not borders.
+// coasts and over shallow water, and its edge follows noise, not borders, with no dither.
 vec2 iceAt(vec2 m) {
   float cold = 0.0;
   float seas = 0.0;
   float coast = 0.0;
-  for (int k = 0; k < 9; k++) {
-    vec2 o = k == 0 ? vec2(0.0) : 7.0 * vec2(cos(float(k) * 0.785), sin(float(k) * 0.785));
+  for (int k = 0; k < ${ICE.samples + 1}; k++) {
+    vec2 o = k == 0 ? vec2(0.0) : ${glf(ICE.sampleRadius)} * vec2(cos(float(k) * 0.785), sin(float(k) * 0.785));
     int id = idAt(ivec2(floor(m + o)));
     if (land(id)) coast += 1.0;
     else if (id >= 0) { cold += seaCold(id); seas += 1.0; }
@@ -256,21 +263,21 @@ vec2 iceAt(vec2 m) {
   if (seas == 0.0 || cold < 0.02) return vec2(0.0);
   cold /= seas;
   float depth = depthAt(ivec2(floor(m))) / ${DEPTH_COLORS.length}.0;
-  float k = cold * 1.2 + 0.25 * coast / 9.0 - 0.15 * depth - 0.62 * fbm(m);
-  return vec2(smoothstep(0.2, 0.3, k), smoothstep(0.3, 0.37, k));
+  float k = cold * ${glf(ICE.coldGain)} + ${glf(ICE.coastWeight)} * coast / ${glf(ICE.samples + 1)} - ${glf(ICE.depthWeight)} * depth - ${glf(ICE.noiseWeight)} * fbm(m);
+  return vec2(smoothstep(${glf(ICE.slush[0])}, ${glf(ICE.slush[1])}, k), smoothstep(${glf(ICE.solid[0])}, ${glf(ICE.solid[1])}, k));
 }
 // Ice: a cool grey-blue, darker than snow on land, with cracks and pale floes.
 vec3 iceColor(vec2 m) {
-  vec3 c = mix(vec3(0.66, 0.76, 0.85), vec3(0.78, 0.86, 0.92), smoothstep(0.55, 0.75, vnoise(m * 0.45)));
+  vec3 c = mix(${glv(ICE.iceColour)}, ${glv(ICE.floeColour)}, smoothstep(0.55, 0.75, vnoise(m * 0.45)));
   // A few long cracks between the floes.
-  if (abs(vnoise(m * 0.22 + 17.0) - 0.5) < 0.018) c = vec3(0.52, 0.64, 0.75);
+  if (abs(vnoise(m * 0.22 + 17.0) - 0.5) < 0.018) c = ${glv(ICE.crackColour)};
   return c;
 }
 // Open water meets the ice in a band of slush rather than a hard line.
 vec3 icedSea(vec3 water, vec2 m) {
   vec2 ice = iceAt(m);
   if (ice.x <= 0.0) return water;
-  return mix(mix(water, vec3(0.6, 0.71, 0.8), 0.55 * ice.x), iceColor(m), ice.y);
+  return mix(mix(water, ${glv(ICE.slushColour)}, ${glf(ICE.slushMix)} * ice.x), iceColor(m), ice.y);
 }
 // Rivers freeze a few degrees below zero, the small ones first.
 bool riverFrozen(int id, int t, float grain) { return smoothstep(-3.0, -8.0, tempAt(id, t)) > grain * 0.9 + 0.05; }

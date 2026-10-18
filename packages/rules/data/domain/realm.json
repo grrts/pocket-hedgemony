@@ -137,7 +137,7 @@
   "loyalty": {
     "steps": ["Loyal", "Wavering", "Disloyal", "In revolt"],
     "up": ["want_granted", "gift_of_gold", "office_at_court", "marriage_into_ruling_house", "victory_taken_part", "long_secure_reign", "fed_in_famine", "shared_faith_and_tongue", "war_against_rival"],
-    "down": ["heavy_taxes", "land_seized_from_him", "land_seized_from_another", "war_lost", "battle_lost", "child_ruler", "disputed_heir", "new_ruler", "grain_requisitioned", "foreign_bribes", "crown_borrowed", "massacre"]
+    "down": ["heavy_taxes", "land_seized_from_him", "land_seized_from_another", "war_lost", "battle_lost", "child_ruler", "disputed_heir", "new_ruler", "grain_requisitioned", "foreign_bribes", "crown_borrowed", "massacre", "faith_not_shared", "censured_by_head"]
   },
   "harvest_steps": ["failed", "poor", "normal", "good", "bumper"],
   "tax_rates": ["none", "light", "normal", "heavy", "crushing"],
@@ -205,5 +205,81 @@
     "empty_posts_share": { "uneasy_up_to": 0.25, "troubled_up_to": 0.5 },
     "restless_share": { "troubled_from": 0.1, "crumbling_from": 0.25 }
   },
-  "_provisional": ["grain_price_gold_per_food", "daughters_inherit_crown", "great_lord", "women_in_roles", "age_multipliers", "women_reform_multiplier", "starting", "starting_armies", "starting_lords", "food_year", "debt", "win.army_weights", "win.warship_men", "win.commander_men", "win.army_power_per_men", "ai", "stability.empty_posts_share", "stability.restless_share"]
+  "titles": {
+    "$comment": "What lords and officials are called: the court language's family first, then the government form's family, then the default (REALM-242). Words only: no rule reads them.",
+    "default": { "lord": "lord", "lords": "lords", "official": "official", "officials": "officials" },
+    "by_form_family": {
+      "kin": { "lord": "chief", "lords": "chiefs", "official": "headman", "officials": "headmen" }
+    },
+    "by_language_family": {
+      "slavic": { "lord": "boyar", "lords": "boyars", "official": "voivode", "officials": "voivodes" },
+      "hellenic": { "lord": "archon", "lords": "archons", "official": "kephale", "officials": "kephales" },
+      "turkic": { "lord": "bey", "lords": "beys", "official": "subashi", "officials": "subashis" },
+      "iranian": { "lord": "khan", "lords": "khans", "official": "darugha", "officials": "darughas" },
+      "arab": { "lord": "emir", "lords": "emirs", "official": "wali", "officials": "walis" },
+      "berber": { "lord": "sheikh", "lords": "sheikhs", "official": "qaid", "officials": "qaids" },
+      "cushitic": { "lord": "garad", "lords": "garads", "official": "wali", "officials": "walis" },
+      "semitic_ethiopian": { "lord": "ras", "lords": "rases", "official": "shum", "officials": "shums" },
+      "mande": { "lord": "chief", "lords": "chiefs", "official": "farba", "officials": "farbas" },
+      "akan": { "lord": "ohene", "lords": "ahene", "official": "headman", "officials": "headmen" },
+      "yoruba_edo": { "lord": "chief", "lords": "chiefs", "official": "ilari", "officials": "ilaris" },
+      "hausa_fulani": { "lord": "sarki", "lords": "sarakuna", "official": "hakimi", "officials": "hakimai" },
+      "bantu": { "lord": "chief", "lords": "chiefs", "official": "headman", "officials": "headmen" },
+      "khoisan": { "lord": "headman", "lords": "headmen", "official": "elder", "officials": "elders" },
+      "nilotic": { "lord": "chief", "lords": "chiefs", "official": "elder", "officials": "elders" },
+      "indo_aryan": { "lord": "thakur", "lords": "thakurs", "official": "amil", "officials": "amils" },
+      "dravidian": { "lord": "nayaka", "lords": "nayakas", "official": "adhikari", "officials": "adhikaris" },
+      "tibeto_burman": { "lord": "myosa", "lords": "myosas", "official": "myothugyi", "officials": "myothugyis" },
+      "tai": { "lord": "chao", "lords": "chaos", "official": "khun", "officials": "khuns" },
+      "austronesian": { "lord": "datu", "lords": "datus", "official": "punggawa", "officials": "punggawas" },
+      "sinitic": { "lord": "prince", "lords": "princes", "official": "magistrate", "officials": "magistrates" },
+      "japonic": { "lord": "daimyo", "lords": "daimyo", "official": "daikan", "officials": "daikan" },
+      "koreanic": { "lord": "yangban", "lords": "yangban", "official": "magistrate", "officials": "magistrates" },
+      "mongolic": { "lord": "noyan", "lords": "noyans", "official": "darughachi", "officials": "darughachi" },
+      "tungusic": { "lord": "beile", "lords": "beile", "official": "amban", "officials": "ambans" },
+      "nahua": { "lord": "tlatoani", "lords": "tlatoque", "official": "calpixqui", "officials": "calpixque" },
+      "maya": { "lord": "ajaw", "lords": "ajaws", "official": "batab", "officials": "batabs" },
+      "andean": { "lord": "kuraka", "lords": "kurakas", "official": "tocricoc", "officials": "tocricocs" },
+      "tupi_guarani": { "lord": "chief", "lords": "chiefs", "official": "elder", "officials": "elders" },
+      "algonquian": { "lord": "sachem", "lords": "sachems", "official": "headman", "officials": "headmen" },
+      "iroquoian": { "lord": "chief", "lords": "chiefs", "official": "headman", "officials": "headmen" },
+      "polynesian": { "lord": "chief", "lords": "chiefs", "official": "steward", "officials": "stewards" },
+      "melanesian": { "lord": "big man", "lords": "big men", "official": "elder", "officials": "elders" },
+      "aboriginal_australian": { "lord": "elder", "lords": "elders", "official": "headman", "officials": "headmen" },
+      "caucasian": { "lord": "prince", "lords": "princes", "official": "mouravi", "officials": "mouravis" }
+    }
+  },
+  "ruler": {
+    "$comment": "REALM-233 to REALM-237: rulers in play. Each January the ruler and heir age a year; a ruler dies with the chance of his age band (age under the first number, chance a year); an heirless ruler of an age to have children gains one; traits lean the AI's event choices (words matched in an option's effects) and give small bonuses (percent levers, as heritage's).",
+    "start_age": { "accession_from": 14, "accession_to": 40, "oldest": 75, "unknown_since_years": [2, 20] },
+    "death_per_year": [[40, 0.01], [50, 0.02], [60, 0.04], [70, 0.08], [999, 0.16]],
+    "heir_at_start": 0.75,
+    "heir_age_gap": [18, 32],
+    "birth_per_year": 0.15,
+    "birth_ages": [18, 50],
+    "kinsman_age": [20, 50],
+    "child_under": 16,
+    "daughter_heir": 0.2,
+    "traits": {
+      "Pious": { "leans": ["religion", "convert", "conversion", "catholic", "protestant", "orthodox", "islam", "sikh", "church", "clergy", "mission"], "bonus": { "faith_revolts_pct": -25 } },
+      "Warlike": { "leans": ["\"war\"", "annex", "vassalize", "casus_belli", "conquest", "militar", "manpower", "army"], "bonus": { "recruit_refill_pct": 10 } },
+      "Builder": { "leans": ["admin_capacity", "prosperity", "canal", "industrial", "railway", "telegraph", "tech_", "reform"], "bonus": { "building_cost_pct": -10 } },
+      "Greedy": { "leans": ["treasury", "income", "trade_route", "revenue", "extraction", "\"debt\""], "bonus": { "tax_reach_pct": 5 } }
+    },
+    "lean_factor": 1.5
+  },
+  "fallen": {
+    "$comment": "REALM-238: the fallen of the last 10 years (windows.fallen) push the realm's voices toward peace and slow its recruits' refill, both read against its recruit ceiling.",
+    "peace_share_per_ceiling": 0.25,
+    "peace_share_cap": 0.25,
+    "refill_slow_per_ceiling": 0.5,
+    "refill_floor": 0.5
+  },
+  "belief": {
+    "$comment": "REALM-239: under this Faith % or Tongue % a realm's faith or tongue risings start more often; low faith makes its lords seated among another faith waver each January, low tongue makes its officials' effect grow more slowly.",
+    "low_percent": 50,
+    "revolt_factor": 1.5,
+    "official_slow": 0.5
+  },
+  "_provisional": ["grain_price_gold_per_food", "daughters_inherit_crown", "great_lord", "women_in_roles", "age_multipliers", "women_reform_multiplier", "starting", "starting_armies", "starting_lords", "food_year", "debt", "win.army_weights", "win.warship_men", "win.commander_men", "win.army_power_per_men", "ai", "stability.empty_posts_share", "stability.restless_share", "ruler", "fallen", "belief", "titles"]
 }

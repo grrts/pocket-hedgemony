@@ -192,3 +192,19 @@ Feature: Named lords
       | a new ruler takes the throne                  |
       | the ruler requisitions his grain              |
       | a foreign rival bribes him with promises      |
+
+  @REALM-242 @placeholder
+  Scenario Outline: Lords and officials take their culture's titles
+    # config: titles
+    Given a realm whose court language is of the "<family>" family and whose form is of the "<form>" family
+    Then it calls a lord a "<lord>" and an official a "<official>"
+
+    Examples:
+      | family    | form     | lord   | official |
+      | latin     | house    | lord   | official |
+      | slavic    | house    | boyar  | voivode  |
+      | turkic    | house    | bey    | subashi  |
+      | japonic   | warriors | daimyo | daikan   |
+      | andean    | kin      | kuraka | tocricoc |
+      | iroquoian | kin      | chief  | headman  |
+      | germanic  | kin      | chief  | headman  |

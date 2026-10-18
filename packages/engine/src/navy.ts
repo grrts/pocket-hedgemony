@@ -77,6 +77,37 @@ export interface NavyFleet {
   battle: number;
   /** Beaten and running for port: it can't be caught until it docks. */
   fleeing: boolean;
+  /** A hired fleet's contract (F-115, hiredFleets.ts); absent for the realm's own ships. */
+  hire?: FleetHire;
+}
+
+/** What a hired fleet is and who is paid for it: a free fleet, or a realm's own fleet lent out. */
+export interface FleetHire {
+  name: string;
+  /** The free fleet's group, or the lending realm's name. */
+  group: string;
+  /** The realm that lent it, -1 for a free fleet. */
+  from: number;
+  /** Gold a month, paid by the hirer (to the lender, for a lent fleet). */
+  pay: number;
+  /** Its own captain, the fleet's admiral, who leaves with it. */
+  captain: number;
+  /** Dismissed or unpaid: it goes once its army is ashore and its battle over. */
+  leaving?: boolean;
+}
+
+/** A free fleet waiting for a contract where it gathered (F-115). */
+export interface FreeFleet {
+  id: number;
+  group: string;
+  name: string;
+  captain: string;
+  /** Its captain's Might, Cunning and Logistics. */
+  skills: [number, number, number];
+  /** The sea zone it gathered in. */
+  at: number;
+  /** Its ships by type, one entry a ship. */
+  ships: string[];
 }
 
 export interface NavyHull {
@@ -125,6 +156,9 @@ export interface NavyState {
   /** 1 for zones that freeze in winter (NAVY-125), 1 for zones of the monsoon seas (NAVY-092). */
   frozen: Uint8Array;
   monsoon: Uint8Array;
+  /** Free fleets for hire (F-115), shared by every realm that can reach them. */
+  forHire: FreeFleet[];
+  hireSeq: number;
 }
 
 export function createNavyState(P: number): NavyState {
@@ -142,6 +176,8 @@ export function createNavyState(P: number): NavyState {
     ocean: new Uint8Array(P),
     frozen: new Uint8Array(P),
     monsoon: new Uint8Array(P),
+    forHire: [],
+    hireSeq: 0,
   };
 }
 
@@ -266,7 +302,7 @@ function buildPlace(world: World, p: number, type: string): "slipway" | "beach" 
 
 // ---------------------------------------------------------------- ships and fleets
 
-const newShip = (world: World, type: string, crew: number, home: number): NavyShip => ({ id: ++world.navy.seq, type, crew, hull: 0, supply: nv.fullSupply(type), damage: 0, wear: 0, age: 0, home });
+export const newShip = (world: World, type: string, crew: number, home: number): NavyShip => ({ id: ++world.navy.seq, type, crew, hull: 0, supply: nv.fullSupply(type), damage: 0, wear: 0, age: 0, home });
 
 export const crewNeed = (s: NavyShip): number => nv.shipRow(s.type).crew;
 const crewShare = (s: NavyShip): number => Math.min(1, s.crew / Math.max(1, crewNeed(s)));
@@ -359,10 +395,10 @@ export function zoneDays(world: World, f: NavyFleet, q: number): number {
  * The quickest voyage from where the fleet is to any province `goal` accepts,
  * over the zones it may enter (a port only as the last step). Dijkstra on days.
  */
-export function planVoyage(world: World, f: NavyFleet, goal: (p: number) => boolean): { path: number[]; days: number } | null {
+export function planVoyage(world: World, f: NavyFleet, goal: (p: number) => boolean, opts: { knownWaters?: boolean } = {}): { path: number[]; days: number } | null {
   const r = reachOf(world, f);
-  // Only exploration ships sail into the parchment; other fleets keep to charted zones (EXPL-016).
-  const blind = !allExplorers(f);
+  // Only exploration ships sail into the parchment; other fleets keep to charted zones (EXPL-016), except hired crews coming in by waters they know (F-115).
+  const blind = !opts.knownWaters && !allExplorers(f);
   const dist = new Map<number, number>([[f.at, 0]]);
   const prev = new Map<number, number>();
   const done = new Set<number>();
@@ -589,6 +625,7 @@ function land(world: World, f: NavyFleet, p: number): boolean {
 function setAdmiral(world: World, n: number, id: number, c: number): string | null {
   const f = fleetById(world, id);
   if (!f || f.owner !== n) return "no such fleet of yours";
+  if (f.hire) return "a hired fleet keeps its own captain";
   if (c < 0) {
     if (world.provinceWater[f.at] && needsAdmiral(f)) return "a fleet at sea keeps its admiral until it is in port";
     f.admiral = -1;
@@ -605,6 +642,7 @@ function merge(world: World, n: number, id: number, into: number): string | null
   const f = fleetById(world, id);
   const g = fleetById(world, into);
   if (!f || !g || f === g || f.owner !== n || g.owner !== n) return "no such fleet of yours";
+  if (f.hire || g.hire) return "a hired fleet sails on its own, under its own captain";
   if (f.at !== g.at || f.battle >= 0 || g.battle >= 0 || f.landing > 0 || g.landing > 0) return "the fleets must lie in the same place, out of battle";
   if (f.army >= 0 && g.army >= 0) return "both fleets carry an army";
   g.ships.push(...f.ships);
@@ -619,6 +657,7 @@ function split(world: World, n: number, id: number, shipId: number): string | nu
   if (!f || f.owner !== n) return "no such fleet of yours";
   const k = f.ships.findIndex((s) => s.id === shipId);
   if (k < 0) return "no such ship in the fleet";
+  if (f.hire) return "a hired fleet keeps its ships together";
   if (f.ships.length < 2) return "the fleet has only that ship";
   if (f.battle >= 0) return "the fleet is fighting";
   if (f.army >= 0 && armyRoom(world, f.army) > fleetRoom({ ...f, ships: f.ships.filter((_, i) => i !== k) })) return "the army aboard needs that ship's room";
@@ -631,6 +670,7 @@ function split(world: World, n: number, id: number, shipId: number): string | nu
 function disband(world: World, n: number, id: number): string | null {
   const f = fleetById(world, id);
   if (!f || f.owner !== n) return "no such fleet of yours";
+  if (f.hire) return "a hired fleet is dismissed, not laid up";
   if (world.provinceWater[f.at]) return "a fleet is broken up only in port";
   if (f.army >= 0 && !land(world, f, f.at)) return "the army aboard may not go ashore here";
   const v = world.navy;
@@ -913,6 +953,8 @@ function dropEmpty(world: World): void {
   v.fleets = v.fleets.filter((f) => {
     if (f.ships.length) return true;
     if (f.army >= 0 && world.armies.alive[f.army]) world.armies.alive[f.army] = 0;
+    // A hired fleet's captain goes with its last ship (F-115).
+    if (f.hire && f.hire.captain >= 0) world.commanderOwner[f.hire.captain] = -1;
     return false;
   });
 }
@@ -967,6 +1009,12 @@ export function navyCosts(world: World): Float64Array {
   const v = world.navy;
   const cost = new Float64Array(world.nationCount);
   for (const f of v.fleets) {
+    // A hired fleet costs its contract instead, paid to the realm that lent it (F-115).
+    if (f.hire) {
+      cost[f.owner] = cost[f.owner]! + f.hire.pay;
+      if (f.hire.from >= 0) cost[f.hire.from] = cost[f.hire.from]! - f.hire.pay;
+      continue;
+    }
     const wage = world.provinceWater[f.at] ? C.wageAtSea : C.wageInPort;
     let t = 0;
     for (const s of f.ships) t += nv.shipRow(s.type).upkeep * G.goldScale + s.crew * wage * G.wageScale;
@@ -1033,7 +1081,7 @@ function aiNavy(world: World, news: News[]): void {
 }
 
 /** The ship an AI realm builds in its port: the strongest warship it can, else its sea's trade ship. */
-function aiShip(world: World, n: number, p: number): string {
+export function aiShip(world: World, n: number, p: number): string {
   let best = localTradeShip(world, p);
   for (const t of SHIP_TYPES) {
     if (!nv.isWarship(t)) continue;
@@ -1093,6 +1141,8 @@ export interface FleetView {
   explorers: boolean;
   /** It needs an admiral to sail (warships or an army aboard). */
   needsAdmiral: boolean;
+  /** A hired fleet's name, who offers it (-1 a free fleet) and its pay a month; null for the realm's own (F-115). */
+  hired: { name: string; group: string; from: number; pay: number; leaving: boolean } | null;
 }
 
 export interface NavyView {
@@ -1144,6 +1194,7 @@ export function navyView(world: World, n: number): NavyView {
     days: f.owner === n ? Math.round(voyageDays(world, f) * 10) / 10 : 0,
     explorers: allExplorers(f),
     needsAdmiral: needsAdmiral(f),
+    hired: f.hire ? { name: f.hire.name, group: f.hire.group, from: f.hire.from, pay: Math.round(f.hire.pay * 100) / 100, leaving: !!f.hire.leaving } : null,
   }));
   const costs = navyCosts(world);
   const mine = v.fleets
@@ -1153,7 +1204,7 @@ export function navyView(world: World, n: number): NavyView {
       return {
         id: f.id,
         room: fleetRoom(f),
-        cost: f.ships.reduce((t, s) => t + nv.shipRow(s.type).upkeep * G.goldScale + s.crew * wage * G.wageScale, 0),
+        cost: f.hire ? f.hire.pay : f.ships.reduce((t, s) => t + nv.shipRow(s.type).upkeep * G.goldScale + s.crew * wage * G.wageScale, 0),
         ships: f.ships.map((s) => ({ id: s.id, type: s.type, crew: s.crew, crewNeed: crewNeed(s), hull: HULLS[s.hull]!, supply: s.supply, supplyMax: nv.fullSupply(s.type), fights: fightsOf(s.type), carries: carriesOf(s.type), age: s.age, stores: s.stores ?? 0, storesMax: nv.shipRow(s.type).colonyStores ?? 0 })),
       };
     });
@@ -1215,6 +1266,8 @@ export interface SavedNavy {
   fleets: NavyFleet[];
   battles: SeaBattle[];
   seq: number;
+  forHire?: FreeFleet[];
+  hireSeq?: number;
 }
 
 export function saveNavy(world: World): SavedNavy {
@@ -1223,7 +1276,7 @@ export function saveNavy(world: World): SavedNavy {
   for (let p = 0; p < world.provinceCount; p++) {
     if (v.shipyard[p] || v.sailors[p] || v.away[p]) ports[world.provinceIds[p]!] = { shipyard: v.shipyard[p]!, sailors: v.sailors[p]!, away: v.away[p]!, waited: v.waited[p]! };
   }
-  return { ports, musters: v.musters, hulls: v.hulls, fleets: v.fleets, battles: v.battles, seq: v.seq };
+  return { ports, musters: v.musters, hulls: v.hulls, fleets: v.fleets, battles: v.battles, seq: v.seq, forHire: v.forHire, hireSeq: v.hireSeq };
 }
 
 /** Puts a saved navy back, its provinces and realms mapped to this build's; what has no place in it is dropped. */
@@ -1241,8 +1294,10 @@ export function restoreNavy(world: World, saved: SavedNavy, mapN: (old: number) 
   v.musters = saved.musters.map((m) => ({ ...m, owner: mapN(m.owner), province: mapP(m.province) })).filter((m) => m.owner >= 0 && m.province >= 0);
   v.hulls = saved.hulls.map((h) => ({ ...h, owner: mapN(h.owner), province: mapP(h.province) })).filter((h) => h.owner >= 0 && h.province >= 0);
   v.fleets = saved.fleets
-    .map((f) => ({ ...f, owner: mapN(f.owner), at: mapP(f.at), route: f.route.map(mapP), landAt: f.landAt < 0 ? -1 : mapP(f.landAt), admiral: f.admiral < 0 ? -1 : mapC(f.admiral), ships: f.ships.map((s) => ({ ...s, home: s.home < 0 ? -1 : mapP(s.home) })) }))
+    .map((f) => ({ ...f, owner: mapN(f.owner), at: mapP(f.at), route: f.route.map(mapP), landAt: f.landAt < 0 ? -1 : mapP(f.landAt), admiral: f.admiral < 0 ? -1 : mapC(f.admiral), ships: f.ships.map((s) => ({ ...s, home: s.home < 0 ? -1 : mapP(s.home) })), ...(f.hire ? { hire: { ...f.hire, from: f.hire.from < 0 ? -1 : mapN(f.hire.from), captain: f.hire.captain < 0 ? -1 : mapC(f.hire.captain) } } : {}) }))
     .filter((f) => f.owner >= 0 && f.at >= 0 && !f.route.includes(-1));
   v.battles = saved.battles.map((b) => ({ ...b, zone: mapP(b.zone), leaders: [mapN(b.leaders[0]), mapN(b.leaders[1])] as [number, number] }));
   v.seq = saved.seq;
+  v.forHire = (saved.forHire ?? []).map((x) => ({ ...x, at: mapP(x.at) })).filter((x) => x.at >= 0);
+  v.hireSeq = saved.hireSeq ?? 0;
 }

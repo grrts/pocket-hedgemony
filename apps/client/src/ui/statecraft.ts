@@ -30,6 +30,10 @@ const MISSIONS: { action: string; label: string; does: (v: StatecraftView) => st
 export const missionName = (action: string): string =>
   ({ propose_alliance: "propose an alliance", arrange_marriage: "arrange a marriage", courtesy_visit: "pay a courtesy visit", send_gift: "bring a gift", demand: "make a demand", offer_overlordship: "offer overlordship", ask_protection: "ask for protection" })[action] ?? action.replace(/_/g, " ");
 
+/** One action as a tile of the Diplomacy tab's grid (DIPL-227): the 44-point button, and under it what it does or why not. */
+const tile = (button: string, hint: string) => `<div class="mission">${button}<p class="hint">${hint}</p></div>`;
+const why = (w: string) => `${esc(w.charAt(0).toUpperCase() + w.slice(1))}.`;
+
 /** The reasons a court counted, as a tap-to-open list (DIPL-081, the Why? letter). */
 function reasonsHtml(l: StatecraftView["letters"][number]): string {
   if (!l.reasons.length) return "";
@@ -55,12 +59,11 @@ export function realmStatecraft(v: StatecraftView | null, r: number, allied: boo
     : `<h3 class="sub">Send an envoy</h3>
     <p class="hint">${v.free} of your ${v.seats} envoy${v.seats === 1 ? "" : "s"} free. An envoy rides to their court, stays a month, and their answer reaches you a month after.</p>
     <div class="missions">${MISSIONS.map((m, k) => {
-      const why = realm.why[k] ?? null;
-      return why === null
-        ? `<button class="wax" data-envoy="${m.action}">${icon("scroll", 2)}${m.label}</button><p class="hint">${esc(m.does(v))}</p>`
-        : `<button class="paper" disabled>${m.label}</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`;
-    }).join("")}</div>
-    ${allied ? `<button class="paper" data-break-alliance="${r}">End the alliance</button><p class="hint">An oath broken: they will remember it (−40, fading over 20 years), and other courts trust you less.</p>` : ""}`;
+      const not = realm.why[k] ?? null;
+      return not === null
+        ? tile(`<button class="wax" data-envoy="${m.action}">${icon("scroll", 1)}${m.label}</button>`, esc(m.does(v)))
+        : tile(`<button class="paper" disabled>${m.label}</button>`, why(not));
+    }).join("")}${allied ? tile(`<button class="paper" data-break-alliance="${r}">End the alliance</button>`, "An oath broken: they will remember it (−40, fading over 20 years), and other courts trust you less.") : ""}</div>`;
   return `${standing}${away}${last}${missions}${atWar ? "" : courtSubjectHtml(v, r)}${atWar ? "" : demandsHtml(realm.demands)}`;
 }
 
@@ -71,13 +74,14 @@ function courtSubjectHtml(v: StatecraftView, r: number): string {
   const c = v.courting;
   if (!c || !(r in c.subjects)) return "";
   const mine = c.mine.find((x) => x.target === r && x.lord === null);
-  const why = c.subjects[r] ?? null;
+  const not = c.subjects[r] ?? null;
   return `<h3 class="sub">Court their loyalty</h3>
-    ${mine
-      ? `<p>${icon("scroll", 1)} Your envoy has courted them since ${monthText(mine.since)}: they count <i>Courted</i> (−1) against their overlord.</p><button class="paper" data-court-subject="${r}" data-recall="1">Recall your envoy</button><p class="hint">He comes home and his seat is free again.</p>`
-      : why === null
-        ? `<button class="wax" data-court-subject="${r}">${icon("scroll", 2)}Court their loyalty</button><p class="hint">One of your envoys stays at their court working against their overlord: they count Courted (−1), and a Disloyal subject may rise. ${COURT_DOES}</p>`
-        : `<button class="paper" disabled>Court their loyalty</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`}`;
+    ${mine ? `<p>${icon("scroll", 1)} Your envoy has courted them since ${monthText(mine.since)}: they count <i>Courted</i> (−1) against their overlord.</p>` : ""}
+    <div class="missions">${mine
+      ? tile(`<button class="paper" data-court-subject="${r}" data-recall="1">Recall your envoy</button>`, "He comes home and his seat is free again.")
+      : not === null
+        ? tile(`<button class="wax" data-court-subject="${r}">${icon("scroll", 1)}Court their loyalty</button>`, `One of your envoys stays at their court working against their overlord: they count Courted (−1), and a Disloyal subject may rise. ${COURT_DOES}`)
+        : tile(`<button class="paper" disabled>Court their loyalty</button>`, why(not))}</div>`;
 }
 
 /** Court him, on a foreign lord's screen (DIPL-215, DIPL-216, DIPL-220). */
@@ -108,11 +112,11 @@ function crownsLine(v: StatecraftView, r: number, married: boolean): string {
 function demandsHtml(d: StatecraftView["realms"][number]["demands"]): string {
   const head = `<h3 class="sub">Make a demand</h3>
     <p class="hint">A threat carried by an envoy. They think worse of you whatever they answer (−15, fading over 10 years). If they refuse, you hold a war aim on them for 5 years, and a war you start over it brings their allies no call. They give in only when they cannot beat you.</p>`;
-  if (d.why) return `${head}<p class="hint">${esc(d.why.charAt(0).toUpperCase() + d.why.slice(1))}.</p>`;
+  if (d.why) return `${head}<p class="hint">${why(d.why)}</p>`;
   const tribute =
     d.tribute === null
-      ? `<button class="wax" data-demand="pay_tribute">${icon("crown", 2)}Demand tribute</button><p class="hint">They become your tributary and send you 15 in 100 of their tax and trade each month. A tributary stays out of your wars.</p>`
-      : `<button class="paper" disabled>Demand tribute</button><p class="hint">${esc(d.tribute.charAt(0).toUpperCase() + d.tribute.slice(1))}.</p>`;
+      ? tile(`<button class="wax" data-demand="pay_tribute">${icon("crown", 1)}Demand tribute</button>`, "They become your tributary and send you 15 in 100 of their tax and trade each month. A tributary stays out of your wars.")
+      : tile(`<button class="paper" disabled>Demand tribute</button>`, why(d.tribute));
   const provinces = d.provinces.length
     ? `<p class="hint">Or demand a province on your border; giving up their capital counts against it (−30).</p><div class="missions">${d.provinces
         .slice(0, 8)
@@ -207,8 +211,8 @@ export function overlordCard(v: StatecraftView | null, realmButton: (n: number) 
   const b = o.below;
   const choice = (id: string) => b.choices.find((c) => c.id === id)!;
   const btn = (id: string, label: string, cls: string, does: string) => {
-    const why = choice(id).locked;
-    return why === null ? `<button class="${cls}" data-subject-choice="${id}">${label}</button><p class="hint">${esc(does)}</p>` : `<button class="${cls}" disabled>${label}</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`;
+    const not = choice(id).locked;
+    return not === null ? tile(`<button class="${cls}" data-subject-choice="${id}">${label}</button>`, esc(does)) : tile(`<button class="${cls}" disabled>${label}</button>`, why(not));
   };
   const backers = b.backers.length ? `<div class="house-row">${b.backers.map(realmButton).join("")}</div><p class="hint">They are rivals of your overlord, at peace and as strong: the first would join your rising.</p>` : `<p class="hint">${esc(choice("seek_backer").locked ?? "")}.</p>`;
   const wars = b.wars.length
@@ -220,7 +224,7 @@ export function overlordCard(v: StatecraftView | null, realmButton: (n: number) 
     <p class="hint">These are the reasons your overlord sees. Two more down than up at a season's end and you grow a step less loyal; a Disloyal subject pays nothing and may rise.</p>
     <h3 class="sub">Your choices</h3>
     <div class="missions">
-      ${o.withholding ? btn("pay", `${icon("coin", 2)}Pay tribute again`, "wax", "Your tribute flows again and they owe you defence; the Withholds tribute reason ends.") : btn("stop_paying", `${icon("coin", 2)}Stop paying`, "paper", "You keep your tribute, but you grow Disloyal a step at a time, a season at a time (Withholds tribute −2).")}
+      ${o.withholding ? btn("pay", `${icon("coin", 1)}Pay tribute again`, "wax", "Your tribute flows again and they owe you defence; the Withholds tribute reason ends.") : btn("stop_paying", `${icon("coin", 1)}Stop paying`, "paper", "You keep your tribute, but you grow Disloyal a step at a time, a season at a time (Withholds tribute −2).")}
       ${btn("ask_loosen", "Ask to loosen", "paper", "An envoy asks politely: they agree when cautious or over their reach. You become their tributary: 15 in 100 of your income, out of their wars (+2 for 10 years).")}
     </div>
     <h3 class="sub">Find a backer</h3>
@@ -230,15 +234,15 @@ export function overlordCard(v: StatecraftView | null, realmButton: (n: number) 
     <h3 class="sub">Marry into their house</h3>
     <p class="hint">${b.married ? "Your houses are married: if their line dies out, their crown may pass to your ruler, and they become your union." : "Your houses are not married. Married into theirs, your ruler may inherit their crown if their line dies out."} <i>Arrange a marriage</i> is on their card.</p>
     <div class="house-row">${realmButton(o.overlord)}</div>
-    ${o.loyalty === "Disloyal" ? `<button class="wax" data-rise>${icon("swords", 2)}Rise for independence</button><p class="hint">You declare war on your overlord${b.backers.length ? ", and your backer joins you" : ""}. Win, or end it without giving up land, and you are free; lose land in the peace and you are made its subject again, one kind tighter. Outgrow them and win, and you can make them your subject.</p>` : `<p class="hint">Only a Disloyal subject can rise against its overlord.</p>`}`;
+    ${o.loyalty === "Disloyal" ? `<button class="wax" data-rise>${icon("swords", 1)}Rise for independence</button><p class="hint">You declare war on your overlord${b.backers.length ? ", and your backer joins you" : ""}. Win, or end it without giving up land, and you are free; lose land in the peace and you are made its subject again, one kind tighter. Outgrow them and win, and you can make them your subject.</p>` : `<p class="hint">Only a Disloyal subject can rise against its overlord.</p>`}`;
 }
 
 /** A subject's card on its realm's Diplomacy tab (SUBJ-092, SUBJ-048): loyalty and reasons, what it pays, how it comes to war, and the overlord's actions. */
 export function subjectCard(v: StatecraftView | null, r: number, realmButton?: (n: number) => string, name = ""): string {
   const row = v?.subjects?.subjects.find((x) => x.subject === r);
   if (!row) return "";
-  const btn = (act: string, label: string, why: string | null, does: string) =>
-    why === null ? `<button class="paper" data-subject-act="${act}">${label}</button><p class="hint">${esc(does)}</p>` : `<button class="paper" disabled>${label}</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`;
+  const btn = (act: string, label: string, not: string | null, does: string) =>
+    not === null ? tile(`<button class="paper" data-subject-act="${act}">${label}</button>`, esc(does)) : tile(`<button class="paper" disabled>${label}</button>`, why(not));
   const union = row.kind === "union";
   return `<h3 class="sub">Your ${esc(row.kindName.toLowerCase())}</h3>
     ${subjectHead(row, name, realmButton)}
@@ -250,22 +254,22 @@ export function subjectCard(v: StatecraftView | null, r: number, realmButton?: (
     <div class="choices tribute">${TRIBUTE.map((t) => `<button class="${t.level === row.tribute ? "wax" : "paper"}" data-subject-act="tribute" data-level="${t.level}" ${t.level === row.tribute ? "disabled" : ""}>${t.label}</button>`).join("")}</div>
     <p class="hint">${esc(TRIBUTE.find((t) => t.level === row.tribute)!.does)} A Wavering subject pays half; a Disloyal one pays nothing and refuses your calls.</p>
     <div class="missions">
-      ${btn("gift", `${icon("coin", 2)}Send a gift`, row.why.gift, `${row.giftCost} gold, six months of their income: +1 loyalty for 5 years.`)}
+      ${btn("gift", `${icon("coin", 1)}Send a gift`, row.why.gift, `${row.giftCost} gold, six months of their income: +1 loyalty for 5 years.`)}
       ${btn("loosen", "Loosen to tributary", row.why.loosen, "They become a tributary: they pay 15 in 100 of their income, stay out of your wars, and like it (+2 for 10 years).")}
       ${btn("release", "Release", row.why.release, "They go free as your friend.")}
     </div>
     <h3 class="sub">Their heir</h3>
     ${row.hostage ? `<p>${icon("crown", 1)} Their heir lives at your court as a hostage (+1 loyalty) and goes home in ${monthText(row.hostage.until)}.</p>` : ""}
     <div class="missions">
-      ${row.hostage ? btn("send_heir_home", "Send the heir home", row.why.send_heir_home, "He goes home now; they lose the +1.") : btn("hostage", `${icon("crown", 2)}Take a hostage`, row.why.hostage, "Their heir comes to live at your court: +1 loyalty for as long as you hold him (20 years, or until you send him home).")}
+      ${row.hostage ? btn("send_heir_home", "Send the heir home", row.why.send_heir_home, "He goes home now; they lose the +1.") : btn("hostage", `${icon("crown", 1)}Take a hostage`, row.why.hostage, "Their heir comes to live at your court: +1 loyalty for as long as you hold him (20 years, or until you send him home).")}
     </div>
     <h3 class="sub">Your envoys at their court</h3>
     ${row.work ? `<p>${icon("scroll", 1)} Your envoy is ${row.work.action === "fold_in" ? "folding them into your realm" : "tightening them to a vassal"}: ${row.work.monthsLeft} month${row.work.monthsLeft === 1 ? "" : "s"} to go${row.work.action === "fold_in" ? ", as long as they stay Loyal" : ""}.</p>` : ""}
     <div class="missions">
-      ${row.resident ? btn("recall", "Recall your resident", row.why.recall, "Your envoy comes home; they lose the +1.") : btn("resident", `${icon("scroll", 2)}Station a resident`, row.why.resident, "One of your envoys stays at their court: +1 loyalty, and you see their true army.")}
+      ${row.resident ? btn("recall", "Recall your resident", row.why.recall, "Your envoy comes home; they lose the +1.") : btn("resident", `${icon("scroll", 1)}Station a resident`, row.why.resident, "One of your envoys stays at their court: +1 loyalty, and you see their true army.")}
       ${row.kind === "tributary" ? btn("tighten", "Tighten to vassal", row.why.tighten, "One envoy for 6 months; they then pay 10 in 100 of their taxes and answer your calls. A Wavering tributary refuses and drops a step.") : ""}
-      ${row.kind !== "tributary" && !union ? btn("fold_in", `${icon("crown", 2)}Fold into your realm`, row.why.fold_in, "One envoy for a month per province. Their land becomes yours, held by their ruler as one of your lords, and the country leaves the map.") : ""}
-      ${union ? btn("merge", `${icon("crown", 2)}Merge the crowns`, row.why.merge, "At once: their provinces join your realm as they are held, their lords serve you with the loyalty they have, and the country leaves the map.") : ""}
+      ${row.kind !== "tributary" && !union ? btn("fold_in", `${icon("crown", 1)}Fold into your realm`, row.why.fold_in, "One envoy for a month per province. Their land becomes yours, held by their ruler as one of your lords, and the country leaves the map.") : ""}
+      ${union ? btn("merge", `${icon("crown", 1)}Merge the crowns`, row.why.merge, "At once: their provinces join your realm as they are held, their lords serve you with the loyalty they have, and the country leaves the map.") : ""}
     </div>`;
 }
 
