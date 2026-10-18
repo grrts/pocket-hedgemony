@@ -1,5 +1,5 @@
 import type { Rng } from "../../rng.ts";
-import { holds, holdsIfBound, leaves, resolve, type Ctx, type LeafEval } from "./conditions.ts";
+import { holds, holdsIfBound, holdsSoFar, leaves, resolve, type Ctx, type LeafEval } from "./conditions.ts";
 import { applyEffects, effectType, type Applied, type EffectCtx, type EffectEval } from "./effects.ts";
 import { expired } from "./modifiers.ts";
 import { deriveAll } from "./mapping.ts";
@@ -265,9 +265,16 @@ export function roleCandidates(s: EventState, ev: EventDef, role: string): strin
   if (!r) throw new Error(`${ev.id} has no role ${role}`);
   if (r.select === "fixed") return [...r.historical];
   const sel = r.select;
-  return Object.entries(s.world.countries)
-    .filter(([id, c]) => c.exists !== false && (sel.where === undefined || `region:${c.region}` === sel.where) && holdsIfBound(sel.condition, s.world, ctxOf(s, {}, { this: id })) === true)
-    .map(([id]) => id);
+  // Read every month for every country, so it walks the countries without copying them.
+  const ctx: Ctx = ctxOf(s, {});
+  const out: string[] = [];
+  for (const id in s.world.countries) {
+    const c = s.world.countries[id]!;
+    if (c.exists === false || (sel.where !== undefined && `region:${c.region}` !== sel.where)) continue;
+    ctx.this = id;
+    if (holdsIfBound(sel.condition, s.world, ctx) === true) out.push(id);
+  }
+  return out;
 }
 
 /**
@@ -292,7 +299,8 @@ export function gate(s: EventState, ev: EventDef): Ineligible | null {
   if (s.ended) return "campaign over";
   if (ev.history && outOfScope(ev.history.date, s.rules.endDate)) return "out of scope";
   if (s.invalidated[ev.id]) return "invalidated";
-  if (w.year < ev.availability.earliest || w.year > ev.availability.latest) return "outside years";
+  // A window without a latest year (null in the data) stays open to the end date.
+  if (w.year < ev.availability.earliest || (ev.availability.latest != null && w.year > ev.availability.latest)) return "outside years";
   for (const x of ev.exclusive_with ?? []) if (w.history.some((o) => o.event === x)) return "exclusive";
   if (!holds(ev.requires, w, ctxOf(s, {}))) return "requires";
   return null;
@@ -347,6 +355,8 @@ export function reemerge(s: EventState, entity: string): string[] {
 export function eligible(s: EventState, ev: EventDef): Record<string, string[]>[] {
   if (checkInvalidation(s, ev)) return [];
   if (gate(s, ev)) return [];
+  // A trigger already false before any role is bound is false for every binding: skip counting the candidates.
+  if (holdsSoFar(ev.trigger, s.world, ctxOf(s, {})) === false) return [];
   const out: Record<string, string[]>[] = [];
   for (const roles of bindings(s, ev)) {
     if (repeatBlocks(s, ev, roles)) continue;
@@ -394,7 +404,7 @@ export function addFollowUps(s: EventState, ev: EventDef, at = now(s.world)): vo
  */
 export function dateFactor(ev: EventDef, year: number): number {
   const a = ev.availability;
-  if (a.mode === "mandatory") return year >= a.latest ? Infinity : 1;
+  if (a.mode === "mandatory") return a.latest != null && year >= a.latest ? Infinity : 1;
   if (a.mode !== "approximate" || !ev.history) return 1;
   const b = balance.date_binding;
   const hist = Number(historyStart(ev.history.date).slice(0, 4));

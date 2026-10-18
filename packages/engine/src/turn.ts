@@ -5,9 +5,10 @@ import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
-import { subjectAction } from "./subjects.ts";
+import { riseUp, subjectAction } from "./subjects.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
+import { answerEvent, monthlyEvents } from "./events.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { swapOfficials } from "./officials.ts";
@@ -117,8 +118,12 @@ export type Order =
   /** Agree to, give in to or refuse an envoy's ask at the player's court (its id in the snapshot's statecraft asks, DIPL-212). */
   | { type: "answerAsk"; ask: string; yes: boolean }
   /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
-  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release"; level?: string }
+  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "tighten" | "fold_in"; level?: string }
+  /** A Disloyal subject rises against its overlord (SUBJ-076, SUBJ-077). */
+  | { type: "riseUp" }
   | { type: "stopChange"; province: number }
+  /** Answer an event or take a decision waiting for the realm, with one of its options (AnswerEvent, EVT-044). */
+  | { type: "answerEvent"; event: string; option: string }
   /** Reform the government into one of its next forms (GOV-027). */
   | { type: "reform"; to: string }
   /** Set the realm's Tongue policy (CULT-038), or a faith's policy from the next New Year (RELG-055). */
@@ -215,6 +220,8 @@ function startDay(world: World, news: News[]): void {
     // A demand made before war may reach the player's court this month (DIPL-213).
     libraryEvents(world, news);
     aiRaise(world, news);
+    // Events come last in the month, after every other system (X-2).
+    monthlyEvents(world, news);
   }
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
 }
@@ -339,6 +346,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "breakAlliance":
       return breakAlliance(world, actingNation, order.target);
+    case "answerEvent":
+      return answerEvent(world, actingNation, order.event, order.option, news);
     case "makeDemand":
       syncCountries(world);
       return makeDemand(world, actingNation, order.target, order.kind, order.province ?? -1);
@@ -347,6 +356,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
+    case "riseUp":
+      return riseUp(world, actingNation, news);
     case "subjectAction": {
       const reason = subjectAction(world, actingNation, order.subject, order.action, news, order.level);
       if (!reason) runLedger(world, false);

@@ -17,7 +17,15 @@ export interface Ctx {
 export type LeafEval = (params: Record<string, unknown>, w: World, ctx: Ctx) => boolean;
 
 /** A role named in a condition that has no holder yet. */
-export class UnboundRole extends Error {}
+/** Thrown when a condition names a role not yet bound; thrown often while binding, so it skips the stack trace. */
+export class UnboundRole extends Error {
+  constructor(role: string) {
+    const limit = Error.stackTraceLimit;
+    Error.stackTraceLimit = 0;
+    super(role);
+    Error.stackTraceLimit = limit;
+  }
+}
 
 const LOGIC = new Set(["all", "any", "not", "at_least"]);
 
@@ -56,13 +64,20 @@ export function resolve(target: unknown, ctx: Ctx): string[] {
 
 /** The type and params of a leaf, with the data's shorthands (`{event: id}`, `{exists: id}`, `{period_active: id}`). */
 export function leaf(c: Condition): [string, Record<string, unknown>] {
+  const known = parsed.get(c);
+  if (known) return known;
   const entries = Object.entries(c);
   if (entries.length !== 1) throw new Error(`A condition leaf has one key: ${JSON.stringify(c)}`);
   const [type, raw] = entries[0]!;
-  if (raw !== null && typeof raw === "object" && !Array.isArray(raw)) return [type, raw as Record<string, unknown>];
-  const short: Record<string, string> = { event: "id", event_active: "id", period_active: "id", age_active: "id", exists: "who", war_ongoing: "war" };
-  return [type, { [short[type] ?? "value"]: raw }];
+  const out: [string, Record<string, unknown>] =
+    raw !== null && typeof raw === "object" && !Array.isArray(raw) ? [type, raw as Record<string, unknown>] : [type, { [SHORT[type] ?? "value"]: raw }];
+  parsed.set(c, out);
+  return out;
 }
+
+const SHORT: Record<string, string> = { event: "id", event_active: "id", period_active: "id", age_active: "id", exists: "who", war_ongoing: "war" };
+/** Leaves are read every month, so each is parsed once. */
+const parsed = new WeakMap<Condition, [string, Record<string, unknown>]>();
 
 function statOf(w: World, id: string, stat: string): number | string | undefined {
   const c = w.countries[id];
@@ -209,6 +224,30 @@ export function holdsIfBound(c: Condition | null | undefined, w: World, ctx: Ctx
     if (e instanceof UnboundRole) return undefined;
     throw e;
   }
+}
+
+/**
+ * Like `holdsIfBound`, but decides what it can leaf by leaf: an `all` with one
+ * false part is false, an `any` with one true part is true, whatever the unbound roles hold.
+ */
+export function holdsSoFar(c: Condition | null | undefined, w: World, ctx: Ctx): boolean | undefined {
+  if (c === null || c === undefined) return true;
+  const parts = Array.isArray(c) ? (c as Condition[]) : "all" in c ? (c.all as Condition[]) : "any" in c ? (c.any as Condition[]) : null;
+  if (parts) {
+    const want = !Array.isArray(c) && "any" in c;
+    let open = false;
+    for (const x of parts) {
+      const v = holdsSoFar(x, w, ctx);
+      if (v === want) return want;
+      if (v === undefined) open = true;
+    }
+    return open ? undefined : !want;
+  }
+  if ("not" in c) {
+    const v = holdsSoFar(c.not as Condition, w, ctx);
+    return v === undefined ? undefined : !v;
+  }
+  return holdsIfBound(c, w, ctx);
 }
 
 /** Walks every leaf of a condition tree. */

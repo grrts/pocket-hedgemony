@@ -52,7 +52,8 @@ export interface RoleDef {
 
 export interface Availability {
   earliest: number;
-  latest: number;
+  /** null: open to the campaign's end. */
+  latest: number | null;
   mode: "mandatory" | "approximate" | "reference";
   repeat: "one_time" | "recurring" | "process";
   cooldown_years?: number;
