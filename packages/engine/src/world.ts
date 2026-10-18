@@ -29,10 +29,13 @@ import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts
 import { createRulerState, seedRulers, type RulerState } from "./rulers.ts";
 import { createFallenState, type FallenState } from "./fallen.ts";
 import { createBeliefState, readBeliefShares, type BeliefState } from "./belief.ts";
+import { createFaithHeadsState, seedFaithHeads, type FaithHeadsState } from "./faithHeads.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
 import { createRevolutionState, type RevolutionState } from "./revolutions.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
+import { seedStartingFleets } from "./startingFleets.ts";
+import { refreshFreeFleets } from "./hiredFleets.ts";
 import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import type { AchievementLog } from "./achievements.ts";
@@ -44,6 +47,10 @@ import type { AchievementLog } from "./achievements.ts";
  * transferred to the UI thread without serialising objects.
  */
 export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState {
+  /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
+  faithHeads: FaithHeadsState;
+  /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
+  nationServes: Uint8Array;
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -138,6 +145,10 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   provinceOfficialSeed: Int16Array;
   /** Day (world.day) the official at each post took it up; his years served count from it. */
   provinceOfficialSince: Int32Array;
+  /** Realm a foreign specialist at each post came from, -1 = one of the realm's own (PROV-334). */
+  provinceOfficialFrom: Int16Array;
+  /** 1 while a province the player has just taken waits for him to fill its post, grant it or keep it royal (PROV-340). */
+  provinceNewLand: Uint8Array;
   /** Province each commander was commissioned from, -1 = none. */
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
@@ -440,6 +451,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createRulerState(N, seed),
     ...createFallenState(N),
     ...createBeliefState(N),
+    ...createFaithHeadsState(N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -467,6 +479,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedPeoples(world);
   // Rulers read the lords, for a child ruler's regent, and the government form, for the throne law.
   seedRulers(world);
+  // The heads of the faith in 1444 read the faiths and the subjects (RELG-153).
+  seedFaithHeads(world);
   readBeliefShares(world);
   recount(world);
 
@@ -486,6 +500,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedResearch(world);
   if (opts.seedTrade !== false) seedTrade(world);
   seedNavy(world);
+  // Realms that had ships in 1444 start with them, and free fleets gather for hire (F-115).
+  seedStartingFleets(world);
+  refreshFreeFleets(world);
   seedRegions(world);
   seedCharts(world);
   recount(world);

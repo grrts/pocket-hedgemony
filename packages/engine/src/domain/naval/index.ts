@@ -503,7 +503,7 @@ export function unlocked(type: string, b: Pick<Buyer, "known" | "explorationUnlo
 export type OrderResult = { ok: true; hull: Hull; gold: number; timber: number } | { ok: false; reason: string };
 
 /**
- * Orders a ship in a port (NAVY-042, NAVY-045, NAVY-051, NAVY-053, NAVY-132, NAVY-134; D-NAVY-33): type
+ * Orders a ship in a port (NAVY-042, NAVY-045, NAVY-051, NAVY-053, NAVY-147, NAVY-149; D-NAVY-33): type
  * unlocked, a shipyard of the step it needs, room in the port's ship queue, gold and timber paid at once. The
  * hull goes on a free slipway with its whole crew when both are there, else it waits in the queue. A blockaded
  * port still builds.
@@ -537,7 +537,7 @@ export function orderShip(port: Port, type: string, b: Buyer, o: { abroad?: bool
   return { ok: true, hull, gold, timber: r.timber };
 }
 
-/** The first ship waiting in a port's queue goes on a free slipway once its whole crew is in port; those behind it wait their turn (NAVY-134). */
+/** The first ship waiting in a port's queue goes on a free slipway once its whole crew is in port; those behind it wait their turn (NAVY-149). */
 export function layDownWaiting(port: Port): void {
   for (const h of port.hulls) {
     if (h.on !== "waiting") continue;
@@ -549,7 +549,7 @@ export function layDownWaiting(port: Port): void {
   }
 }
 
-/** The newest type further along a type's upgrade path that `buildable` allows, or null: then the type is no longer offered (NAVY-135). */
+/** The newest type further along a type's upgrade path that `buildable` allows, or null: then the type is no longer offered (NAVY-150). */
 export function replacedBy(type: string, buildable: (t: string) => boolean): string | null {
   const path = config.upgrades as unknown as Record<string, string | undefined>;
   let found: string | null = null;
@@ -557,7 +557,7 @@ export function replacedBy(type: string, buildable: (t: string) => boolean): str
   return found;
 }
 
-/** The batches a muster of `count` sailors joins the port's queue as, each ready muster.days after the one before; null when the queue can't hold them (NAVY-133). */
+/** The batches a muster of `count` sailors joins the port's queue as, each ready muster.days after the one before; null when the queue can't hold them (NAVY-148). */
 export function musterBatches(count: number, queued: readonly { day: number }[], today: number): { sailors: number; day: number }[] | null {
   const q = config.game.queues;
   const out: { sailors: number; day: number }[] = [];
@@ -578,7 +578,7 @@ export function orderShipAbroad(port: Port & { tier?: string }, type: string, b:
 /** Ships that shoot need their guns (cast or bought as for gun crews) and powder for each voyage (NAVY-050). */
 export const shootingNeeds = (type: string): string[] => (shipRow(type).shoots ? ["guns", "powder each voyage"] : []);
 
-/** A month of building: hulls on the slipways advance; finished ships launch and the queue's next ship takes the freed slipway (NAVY-134). */
+/** A month of building: hulls on the slipways advance; finished ships launch and the queue's next ship takes the freed slipway (NAVY-149). */
 export function advanceHulls(port: Port, mkId: (h: Hull) => string): Ship[] {
   const launched: Ship[] = [];
   for (const h of port.hulls) if (h.on === "slipway") h.monthsLeft = round(h.monthsLeft - 1);

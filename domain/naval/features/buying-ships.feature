@@ -15,7 +15,7 @@ Feature: Buying ships
     And 60 sailors are assigned to the hull and help build it
     And the port "Lagos" has 0 sailors in port
 
-  @NAVY-044 @NAVY-134
+  @NAVY-044 @NAVY-149
   Scenario: A ship ordered waits in the queue for a slipway and its crew
     Given the port "Lagos" has 20 sailors in port
     And the port "Lagos" has a free slipway at shipyard step 2
@@ -79,7 +79,7 @@ Feature: Buying ships
       | turtle ship      | 120  | 150  | 12     | 8      | 6      |
       | ship of the line | 600  | 600  | 60     | 18     | 25     |
 
-  @NAVY-048 @NAVY-134 @placeholder
+  @NAVY-048 @NAVY-149 @placeholder
   Scenario: The Lagos caravels, two on slipways and one waiting its turn
     # config: naval.game.queues (D-NAVY-33)
     Given the country "Portugal" has the exploration unlock
@@ -92,21 +92,21 @@ Feature: Buying ships
     When 3 months pass in the port "Lagos"
     Then the waiting caravel is laid down on a slipway
 
-  @NAVY-048 @NAVY-132
+  @NAVY-048 @NAVY-147
   Scenario: A harbour without a shipyard builds no ship
     Given the port "Funchal" has a harbour and no shipyard
     And the port "Funchal" has 60 sailors in port
     When the country "Portugal" orders 2 cogs in the port "Funchal"
     Then every order is refused because the port needs a shipyard
 
-  @NAVY-134 @placeholder
+  @NAVY-149 @placeholder
   Scenario: The ship queue holds five ships, and the last can be taken off
     # config: naval.game.queues.shipQueueMax
     Given the port "Lagos" has 0 sailors in port
     When the country "Portugal" orders 6 cogs in the port "Lagos"
     Then 5 cogs wait in the queue and the sixth order is refused because the queue is full
 
-  @NAVY-135 @placeholder
+  @NAVY-150 @placeholder
   Scenario Outline: A port offers only the newest ship on each upgrade path
     # config: naval.upgrades (D-NAVY-33)
     Given a port whose shipyard builds "<buildable>"

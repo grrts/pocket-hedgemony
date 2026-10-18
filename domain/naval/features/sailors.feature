@@ -7,7 +7,7 @@ Feature: Sailors
   Background:
     Given the province "Lagos" is a port of the country "Portugal"
 
-  @NAVY-133 @placeholder
+  @NAVY-148 @placeholder
   Scenario: Sailors are mustered through the port's queue
     # config: naval.game.queues.musterBatch, musterQueueMax, naval.muster.days (D-NAVY-33)
     Given no sailors are on their way to the port "Lagos"

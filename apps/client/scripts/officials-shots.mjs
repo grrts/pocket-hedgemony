@@ -1,5 +1,6 @@
 // Officials (feedback 66, 69) as France: the Officials tab, an official's screen with provinces to move him to, after a
-// swap, and a province's governance card; on a small and a large phone held sideways and a desktop window.
+// swap, an empty post's screen with officials to move in and types to hire (PROV-336), a foreign specialist hired,
+// and a province's governance card; on a small and a large phone held sideways and a desktop window.
 // Usage: pnpm build && node scripts/officials-shots.mjs <outDir>
 import { chromium, devices } from "playwright-core";
 import { preview } from "vite";
@@ -29,6 +30,19 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.click("[data-swap]");
   await page.waitForTimeout(500);
   await shot("official-moved");
+  await page.evaluate(() => document.querySelector("[data-back]").click());
+  await page.waitForTimeout(300);
+  const empty = page.locator(".post-buttons [data-official]").first();
+  if (await empty.count()) {
+    await empty.click({ force: true });
+    await page.waitForTimeout(300);
+    await shot("post");
+    await page.locator(".hire-list").scrollIntoViewIfNeeded();
+    await shot("post-hire");
+    await page.locator(".hire-row [data-hire-foreign='1']:not([disabled])").first().click({ force: true });
+    await page.waitForTimeout(500);
+    await shot("post-hired");
+  } else console.log("no empty post");
   await page.evaluate(() => window.__phSelect("p1066"));
   await page.waitForTimeout(400);
   await shot("province");

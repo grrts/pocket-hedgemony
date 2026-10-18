@@ -1337,5 +1337,70 @@
    "place": "lhasa",
    "from": 1578
   }
+ },
+ "faith_heads": {
+  "$comment": "Heads of the faith (RELG-135 to RELG-156, D-RELG-26; design religion/faith-heads-design.md). All numbers provisional. Gold is the design's; the game multiplies it by defines works.goldScale. seat_provinces and holy_place_provinces are the map provinces nearest each place (the map's provinces are finer than the holy place list's regions).",
+  "heads": [
+   { "id": "pope", "name": "the Pope", "faith": "catholic", "seat": "rome", "way": "chosen", "seat_realm": "papal_states" },
+   { "id": "ecumenical_patriarch", "name": "the Ecumenical Patriarch", "faith": "orthodox", "seat": "constantinople", "way": "held" },
+   { "id": "catholicos", "name": "the Catholicos", "faith": "oriental_christian", "seat": "echmiadzin", "way": "held" },
+   { "id": "caliph", "name": "the Caliph", "faith": "sunni", "seat": "mecca_medina", "way": "claimed" },
+   { "id": "dalai_lama", "name": "the Dalai Lama", "faith": "vajrayana", "seat": "lhasa", "way": "held", "from": 1578, "created_by_event": "altan_khan_and_the_dalai_lama" }
+  ],
+  "crown_headed": ["anglican", "protestant"],
+  "no_head_reasons": {
+   "shia": "Twelvers wait for the hidden Imam; the learned guide them",
+   "ibadi": "its imam is the ruler of Oman",
+   "hindu": "many orders and teachers, no single head",
+   "jain": "many orders and teachers, no single head",
+   "sikh": "the scripture and the Khalsa lead it",
+   "theravada": "kings protect the monks; no single head",
+   "mahayana": "kings protect the monks; no single head",
+   "shinto": "the Emperor in Kyoto belongs to the shogunate",
+   "default": "no single head leads it"
+  },
+  "seat_provinces": {
+   "rome": ["p1624"],
+   "constantinople": ["p1662"],
+   "echmiadzin": ["p1705"],
+   "mecca_medina": ["p2932", "p2721"],
+   "lhasa": ["p2614"]
+  },
+  "holy_place_provinces": {
+   "rome": "p1624", "jerusalem": "p2237", "mecca_medina": "p2932", "karbala_najaf": "p2262", "constantinople": "p1662",
+   "echmiadzin": "p1705", "aksum": "p3258", "varanasi": "p2786", "amritsar": "p2323", "lhasa": "p2614",
+   "temple_of_the_tooth": "p3433", "mount_wutai": "p1799", "qufu": "p2083", "santiago": "p1325", "bodh_gaya": "p2789", "ise": "p2110"
+  },
+  "start_1444": {
+   "$comment": "RELG-153, D-RELG-25: the Pope has no patron; the held seats follow their owners; the Mamluks hold the Caliph's claim as if they had taken the decision.",
+   "caliph": "mamluks"
+  },
+  "conclave": {
+   "months": 1,
+   "cardinals_per_house_step3": 1,
+   "$cardinals_stand_in": "Houses of worship have no steps in the game yet: a Catholic house counts as step 3 or more where its province has at least this many thousand people.",
+   "cardinal_stand_in_min_people": 300,
+   "gold_per_vote": 100,
+   "gold_votes_max_share_of_cardinals": 1,
+   "rome_votes": 10,
+   "ai_spare_months_of_income": 6
+  },
+  "patron": { "tie": 15, "tie_name": "{head} favours us", "preachers": 1 },
+  "betrayed": { "weight": -30, "fade_years": 30, "name": "Betrayed the faith" },
+  "seized": { "weight": -20, "fade_years": 20, "name": "Seized the seat" },
+  "freed": { "weight": 20, "fade_years": 20, "name": "Freed the seat" },
+  "censure": {
+   "$aims": "D-RELG-26: No aim is censured too, since it is the plainest war for gain and the only aim the game declares with until the declare sheet offers aims.",
+   "aims": ["take_land", "tribute", "raid", "no_aim"],
+   "weight": -25,
+   "fade_years": 10,
+   "name": "Censured by {head}",
+   "lord_cause": "censured_by_head"
+  },
+  "own_patriarch": {
+   "gold": 200,
+   "preachers": 1,
+   "$step4_stand_in": "Houses of worship have no steps yet: an Orthodox house in the capital stands for the step-4 house."
+  }
  }
 }
