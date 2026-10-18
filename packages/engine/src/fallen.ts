@@ -1,5 +1,6 @@
 import type { World } from "./world.ts";
 import { realmConfig } from "./domain/realm/index.ts";
+import { takePeople } from "./living.ts";
 
 /**
  * The fallen of the last ten years (realm REALM-096, REALM-168, REALM-237):
@@ -52,6 +53,25 @@ export function addFallen(world: World, n: number, men: number): void {
   const slot = moveTo(world);
   world.fallenMonths[n * FALLEN_MONTHS + slot] = world.fallenMonths[n * FALLEN_MONTHS + slot]! + men;
   world.fallenTotal[n] = world.fallenTotal[n]! + men;
+}
+
+/**
+ * Men of an army dead in a battle, a siege or a storm, or of hunger: they count among their realm's
+ * fallen and are taken from the people of the province they were levied from (WAR-226); a hired
+ * company's men are nobody's people here.
+ */
+export function armyDead(world: World, slot: number, men: number): void {
+  if (!(men > 0)) return;
+  addFallen(world, world.armies.owner[slot]!, men);
+  const home = world.armies.home[slot]!;
+  if (home >= 0) takePeople(world, home, men);
+}
+
+/** A castle garrison's dead: its realm's fallen, taken from the people of the garrison's own province (WAR-226). */
+export function garrisonDead(world: World, n: number, p: number, men: number): void {
+  if (!(men > 0)) return;
+  addFallen(world, n, men);
+  takePeople(world, p, men);
 }
 
 /** Realm n's fallen in the last ten years. */

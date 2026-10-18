@@ -8,7 +8,7 @@ import { roadHours, townSize, workIndex, worksAt } from "./works.ts";
 import { yearlyFood } from "./food.ts";
 import { officialBonus } from "./officials.ts";
 import { moodIndex } from "./moods.ts";
-import { knows } from "./research.ts";
+import { knows, withoutOf } from "./research.ts";
 import { realmAssessment } from "./realmStrengths.ts";
 
 /**
@@ -508,8 +508,8 @@ function walk(world: World, t: GameTrader, collect: boolean): void {
       const crowd = Math.min(1, served(world, q) / world.provinceVisits[q]!);
       let gold = value * (world.provinceTradeRatio[q]! / 100) * row.hold * config.collect.visit_share * crowd;
       const owner = world.provinceOwner[q]!;
-      // Unclaimed land pays nothing (TRADE-068); a foreign owner takes its market fee (TRADE-047).
-      if (owner < 0) gold = 0;
+      // Unclaimed land pays nothing (TRADE-068), nor does occupied land, to its owner or its occupier: its trade is lost to the war (WAR-224); a foreign owner takes its market fee (TRADE-047).
+      if (owner < 0 || world.provinceOccupier[q]! >= 0) gold = 0;
       else if (owner !== t.owner) {
         const fee = gold * config.collect.foreign_market_fee;
         world.nationTrade[owner * 3 + 1] = world.nationTrade[owner * 3 + 1]! + fee;
@@ -625,8 +625,10 @@ export function estimateLoop(world: World, n: number, kind: GameTraderKind, path
     days += stepDays(world, kind, q);
     if (world.provinceWater[q]) continue;
     const owner = world.provinceOwner[q]!;
-    if (owner === n && world.provinceTradeCity[q]! > 0) deposits++;
-    if (owner < 0) continue;
+    const occupied = world.provinceOccupier[q]! >= 0;
+    if (owner === n && world.provinceTradeCity[q]! > 0 && !occupied) deposits++;
+    // Unclaimed and occupied land pay nothing, as on the road (walk).
+    if (owner < 0 || occupied) continue;
     let gold = tradeValueAt(world, q, ship) * (Math.max(floor, world.provinceTradeRatio[q]!) / 100) * row.hold * config.collect.visit_share;
     if (gold <= 0) continue;
     collectIn++;
@@ -690,6 +692,8 @@ export function foundProblem(world: World, n: number, city: number, kind: GameTr
   if (isShip(kind)) {
     if (!isPort(world, city)) return "needs a harbour";
   } else if (marketStep(world, city) === 0) return "needs a market";
+  // Without F03 *Riding and pack animals* a realm sends no camel caravans (RSCH-094).
+  if (kind === "camel_caravan" && withoutOf(world, n).noCaravans) return "needs Riding and pack animals";
   if (kind === "camel_caravan" && !DESERT.includes(world.provinceGround[city] ?? "") && !knows(world, n, "T1")) return "needs desert or drylands, or Caravanserai networks";
   if (kind === "river_barge" && !world.provinceRiver[city]) return "needs a river";
   const cls = isShip(kind) ? SEAFOLK : MARKET_FOLK;
@@ -799,7 +803,7 @@ function aiTrade(world: World): void {
     if (n % 12 !== turn || n === world.player || world.nationGone[n] || start === 0 || count[n]! >= G.ai_max_traders_per_start * start + 1) continue;
     const home = homes(world, n)[0];
     if (home === undefined) continue;
-    const kind = kindFor(world, home, count[n]!);
+    const kind = kindFor(world, n, home, count[n]!);
     const row = kindRow(world, kind);
     if (world.nationTreasury[n]! < row.gold * G.ai_found_reserve || foundProblem(world, n, home, kind)) continue;
     const taken = new Set<number>();
@@ -826,10 +830,10 @@ function homes(world: World, n: number): number[] {
   return out.sort((a, b) => (b === cap ? 1 : 0) - (a === cap ? 1 : 0) || world.provinceGoodsValue[b]! - world.provinceGoodsValue[a]!);
 }
 
-/** The kind a realm's i-th trader from this home is: a ship from every other port, a camel caravan from the desert, a barge on a river (TRADE-111). */
-function kindFor(world: World, home: number, i: number): GameTraderKind {
+/** The kind realm n's i-th trader from this home is: a ship from every other port, a camel caravan from the desert (a pack caravan without F03, RSCH-094), a barge on a river (TRADE-111). */
+function kindFor(world: World, n: number, home: number, i: number): GameTraderKind {
   if (isPort(world, home) && (i % 2 === 1 || marketStep(world, home) === 0)) return "cog_junk_dhow";
-  if (DESERT.includes(world.provinceGround[home] ?? "")) return "camel_caravan";
+  if (DESERT.includes(world.provinceGround[home] ?? "") && !withoutOf(world, n).noCaravans) return "camel_caravan";
   if (world.provinceRiver[home] && i % 3 === 2) return "river_barge";
   return "pack_caravan";
 }
@@ -858,7 +862,8 @@ export function seedTrade(world: World): void {
     const stops = r.stops.map((s) => names.get(s.toLowerCase()) ?? -1);
     if (stops.some((s) => s < 0) || world.provinceOwner[stops[0]!] !== n) continue;
     const ship = "label" in r && /galley|dhow|junk|cog/.test(r.label ?? "") ? true : !("label" in r) || !/caravan/.test(r.label ?? "");
-    const kind: GameTraderKind = ship ? "cog_junk_dhow" : /camel/.test(r.label ?? "") ? "camel_caravan" : "pack_caravan";
+    // A realm without F03 walks a camel route with a pack caravan (RSCH-094).
+    const kind: GameTraderKind = ship ? "cog_junk_dhow" : /camel/.test(r.label ?? "") && !withoutOf(world, n).noCaravans ? "camel_caravan" : "pack_caravan";
     if (routeProblem(world, n, kind, stops) || !loopPath(world, n, kind, stops)) continue;
     addTrader(world, n, stops[0]!, kind, stops).chosen = true;
     used[n]!++;
@@ -871,7 +876,7 @@ export function seedTrade(world: World): void {
     let tries = 0;
     for (let i = used[n]!; i < startCount(world, n) && tries < h.length * 2; tries++) {
       const home = h[tries % Math.min(h.length, 4)]!;
-      const kind = kindFor(world, home, i);
+      const kind = kindFor(world, n, home, i);
       const stops = bestRoute(world, n, kind, home, taken);
       if (!stops) continue;
       stops.forEach((s) => taken.add(s));
@@ -975,6 +980,45 @@ export function tradeSeen(world: World, n: number): Uint8Array {
   for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === n) seen[p] = 1;
   for (const t of world.traders) if (t.owner === n) for (const p of peekPath(world, t)) seen[p] = 1;
   return seen;
+}
+
+/** A busy trade path for the living map: its loop province by province, how it goes and the traders on it (VIEW-132). */
+export interface TradePath {
+  /** Seeded from the loop, so its movers keep their places between snapshots. */
+  id: number;
+  medium: "land" | "river" | "sea";
+  path: number[];
+  traders: number;
+  /** The realm of its first trader, for the colours. */
+  owner: number;
+  /** One of the player's traders on it, whose card a tap opens; -1 if none. */
+  mine: number;
+}
+
+/**
+ * The busy trade paths realm n may see on the map: traders sharing a loop and
+ * a way of going are one path, kept where the loop enters a province the realm
+ * sees (D-TRADE-13), busiest first, at most `max`. With no realm, every path.
+ * Planned without keeping, so looking never changes the game.
+ */
+export function tradePaths(world: World, n: number, max: number, seen: Uint8Array | null = n >= 0 ? tradeSeen(world, n) : null): TradePath[] {
+  const byKey = new Map<string, TradePath>();
+  for (const t of world.traders) {
+    const path = peekPath(world, t);
+    if (path.length < 2) continue;
+    const medium = isShip(t.kind) ? "sea" : t.kind === "river_barge" ? "river" : "land";
+    const key = `${medium} ${path.join(",")}`;
+    let e = byKey.get(key);
+    if (!e) {
+      if (seen && !path.some((p) => seen[p])) continue;
+      let h = medium.length;
+      for (const p of path) h = Math.imul(h ^ p, 0x9e3779b1) >>> 0;
+      byKey.set(key, (e = { id: h, medium, path: path.slice(), traders: 0, owner: t.owner, mine: -1 }));
+    }
+    e.traders++;
+    if (t.owner === n && e.mine < 0) e.mine = t.id;
+  }
+  return [...byKey.values()].sort((a, b) => b.traders - a.traders || a.id - b.id).slice(0, max);
 }
 
 // ---------------------------------------------------------------- saves

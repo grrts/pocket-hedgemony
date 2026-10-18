@@ -71,6 +71,14 @@ Feature: March orders and route settings
     When the army "A" is ordered "March to" the province it stands in
     Then the rest of its route is kept, greyed
 
+  @MOVE-134 @feedback-128
+  Scenario: The player halts a marching army in one tap
+    Given the army "A" is on a route to "Dijon"
+    When the player taps Halt on its card
+    Then it is ordered "March to" the tile it stands on
+    And it stands where it was
+    And Halt is no longer offered on its card
+
   @MOVE-082
   Scenario: Besiege holds the army
     Given the army "A" stands in a province with an enemy castle

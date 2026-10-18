@@ -11,14 +11,17 @@ import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
 import type { Titles } from "./domain/realm/index.ts";
-import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
+import { goodsOf, kindRow, TRADER_KINDS, tradePaths, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradePath, type TradeView } from "./trade.ts";
+import { LIVING_MAP } from "./domain/map-presentation/livingMap.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
+import { empireView, institutionsLens, type EmpireView } from "./institutions.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
-import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
+import { canBorrow, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
+import { feverOf, FEVER_STEPS } from "./land.ts";
 import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
 import { badWeatherName } from "./domain/realm/index.ts";
 import { foodView, mapNetwork, type FoodView } from "./castleFood.ts";
@@ -41,6 +44,7 @@ import { explorationView, type ExplorationView } from "./colonies.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { newLands, officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
+import { warPeaceView, type WarPeaceView } from "./peace.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
 export interface CompanyView {
@@ -127,11 +131,18 @@ export interface Snapshot {
   /** Achievements: unlocks since the last snapshot (once), the campaign's earned list, progress values and eligibility; null before a realm is chosen. */
   achievements: ReturnType<typeof achievementsView>;
   /** Wars under way, by nation index. */
-  wars: { id: string; attackers: number[]; defenders: number[]; start: string }[];
+  wars: {
+    id: string;
+    attackers: number[];
+    defenders: number[];
+    start: string;
+    /** The war card's peace facts (WAR-221 to WAR-231): aim, months, the long-war mark, both leaders' peace voices and the most one peace may take from each; null for a war whose leaders are gone. */
+    peace: WarPeaceView | null;
+  }[];
   /** Peace offered to the player by an AI war leader, until the next month: terms as the AI sends them ("give": it gives up land the player holds). */
   peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" }[];
   /** Calls to arms waiting for the player's answer. */
-  calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
+  calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive"; via: "alliance" | "pledge" | "league" | "subject" | "empire" }[];
   /** The player's standing with every other nation that has one. */
   relations: { nation: number; state: "war" | "truce" | "alliance" | "subject" | "overlord"; until?: string }[];
   /** Events and decisions waiting for the player's answer, oldest first (milestone 6). */
@@ -193,6 +204,9 @@ export interface Snapshot {
   provinceWeather: Int8Array;
   provinceClimate: Int8Array;
   provinceHarvestMonths: number[][];
+  /** Each province's fever land (index into feverSteps: none, mild, harsh, deadly), PROV-243. */
+  provinceFever: Int8Array;
+  feverSteps: readonly string[];
   climates: readonly string[];
   /** What bad weather is called in each climate (drought, floods, bad weather). */
   badWeather: readonly string[];
@@ -214,6 +228,10 @@ export interface Snapshot {
   stability: Stability | null;
   /** The player's revolution card, its regime and ruler (REVO-090 to REVO-092); null before a realm is chosen. */
   revolution: RevolutionView | null;
+  /** The Empire card (INST-081): Emperor, hold, seats and votes, members, the hold record; null without an Empire. */
+  empire: EmpireView | null;
+  /** The Institutions map mode (INST-084): per realm 0 none, 1 member, 2 elector, 3 Emperor; imperial provinces held by outsiders. */
+  institutionsLens: { realm: Uint8Array; outsiderLand: Uint8Array };
   /** The player's Government tab: form, both caps, the form's laws and the next forms (GOV-064); null before a realm is chosen. */
   government: GovernmentView | null;
   /** Risings in every realm (the player's with their card and answers), the player's beaten risings waiting for a verdict, and each plotting province's monthly chance to rise (REBL-063). */
@@ -235,6 +253,8 @@ export interface Snapshot {
   provinceTradeCity: Uint8Array;
   /** Provinces whose trade the player sees: its own and those on its traders' loops (D-TRADE-13). */
   provinceTradeSeen: Uint8Array;
+  /** The busy trade paths the player may see, busiest first, for the traders drawn on the living map (VIEW-132). */
+  tradePaths: TradePath[];
   /** What each province the player sees trades: its goods, most gold first, with loads a year and gold a month. */
   provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
@@ -315,8 +335,8 @@ export interface Snapshot {
   arms: readonly string[];
   /** The player's research for the Learning tab (null before a realm is chosen). */
   research: ResearchView | null;
-  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%). */
-  realmResearch: { known: number; study: string | null; pct: number }[];
+  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%), its standing, eras behind the times, and how many inventions it knows that the player's realm does not (RSCH-104). */
+  realmResearch: { known: number; study: string | null; pct: number; standing: string; behind: number; ahead: number }[];
   /** Works (milestone 4): their names, each step's name and what it does, and the step built of each in each province (works.length per province, 0 = none). */
   works: readonly string[];
   workSteps: { name: string; effect: string }[][];
@@ -367,7 +387,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
   function snapshot(id: number, started: number, rejectedOrders: Snapshot["rejectedOrders"], news: News[] = [], withHash = true): HostReply {
     const w = world!;
     const idx = (ids: string[]) => ids.map((x) => w.nationIndex.get(x)!).filter((n) => n !== undefined);
-    const wars = w.diplomacy.wars.map((x) => ({ id: x.id, attackers: idx(x.attackers), defenders: idx(x.defenders), start: x.start }));
+    const wars = w.diplomacy.wars.map((x) => ({ id: x.id, attackers: idx(x.attackers), defenders: idx(x.defenders), start: x.start, peace: warPeaceView(w, x) }));
     // The player hears of what involves them, their partners and their neighbours' wars.
     const close = new Set<number>([player]);
     for (const x of wars) if (x.attackers.includes(player) || x.defenders.includes(player)) for (const n of [...x.attackers, ...x.defenders]) close.add(n);
@@ -405,7 +425,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
       calls: w.diplomacy.calls
         .filter((c) => !c.answer && c.called === w.nationIds[player])
-        .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
+        .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive", via: c.via })),
       relations,
       statecraft: statecraftView(w, player),
       heritage: heritageViews(w),
@@ -451,10 +471,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       classNames: CLASS_NAMES,
       taxRates: TAX_RATES,
       provinceTax: w.provinceTax.slice(),
-      provinceTaxGold: Float32Array.from({ length: w.provinceCount }, (_, p) => {
-        const holder = controller(w, p);
-        return holder >= 0 ? provinceTax(w, p, holder) : 0;
-      }),
+      provinceTaxGold: Float32Array.from({ length: w.provinceCount }, (_, p) => heldTax(w, p)),
       taxDefault: player >= 0 ? w.nationTaxDefault[player]! : NORMAL_TAX,
       ledger: player >= 0 ? LEDGER.map((line, k) => ({ line, gold: w.nationLedger[player * LEDGER_LINES + k]! })) : [],
       debt: player >= 0 ? w.nationDebt[player]! : 0,
@@ -468,6 +485,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       harvests: HARVESTS,
       provinceWeather: w.provinceWeather.slice(),
       provinceClimate: provinceClimates(w).slice(),
+      provinceFever: Int8Array.from({ length: w.provinceCount }, (_, p) => feverOf(w, p)),
+      feverSteps: FEVER_STEPS,
       provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
       climates: CLIMATES,
       badWeather: CLIMATES.map(badWeatherName),
@@ -486,6 +505,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       giftGold: giftGold(w),
       stability: player >= 0 ? stabilityOf(w, player) : null,
       revolution: player >= 0 ? revolutionView(w, player) : null,
+      empire: empireView(w, player),
+      institutionsLens: institutionsLens(w),
       government: player >= 0 ? governmentView(w, player) : null,
       rebels: rebelsView(w),
       provinceRebels: w.provinceRebels.slice(),
@@ -501,7 +522,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         const seen = tradeSeen(w, player);
         const goods: Snapshot["provinceGoods"] = {};
         for (let p = 0; p < w.provinceCount; p++) if (seen[p] && !w.provinceWater[p]) goods[p] = goodsOf(w, p).map((g) => ({ ware: g.ware, loads: g.loads, gold: g.gold }));
-        return { provinceTradeSeen: seen, provinceGoods: goods };
+        return { provinceTradeSeen: seen, provinceGoods: goods, tradePaths: tradePaths(w, player, LIVING_MAP.traders.maxPaths, player >= 0 ? seen : null) };
       })(),
       peoples: peoplesSnapshot(w),
       faithHeads: faithHeadsView(w, player),
@@ -594,6 +615,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceHarvest,
       snap.provinceWeather,
       snap.provinceClimate,
+      snap.provinceFever,
       snap.provinceStarved,
       snap.provinceCastle,
       snap.provinceRing,

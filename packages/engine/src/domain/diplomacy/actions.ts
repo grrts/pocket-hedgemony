@@ -195,7 +195,7 @@ export function lettersReceived(d: Diplomacy, c: string): Letter[] {
 /** Asks a country the player runs answers itself, not by the count (DIPL-211). */
 export const PLAYER_ANSWERS = ["propose_alliance", "arrange_marriage", "demand", "offer_overlordship", "ask_protection"];
 
-const NO_COUNT = ["send_gift", "courtesy_visit", "make_resident", "court_lord", "fund_rebels", "peace_offer"];
+const NO_COUNT = ["send_gift", "courtesy_visit", "make_resident", "court_lord", "fund_rebels", "peace_offer", "seek_vote"];
 
 /** Decides a mission on arrival; the answer is a letter a month after (DIPL-059, DIPL-081, DIPL-082). */
 export function decideMission(d: Diplomacy, e: Envoy, rng?: Rng): Count | undefined {
@@ -203,6 +203,7 @@ export function decideMission(d: Diplomacy, e: Envoy, rng?: Rng): Count | undefi
   if (NO_COUNT.includes(e.action)) {
     if (e.action === "send_gift") receiveGift(d, e.country, e.target, ask.gift ?? 0, e.type || undefined);
     if (e.action === "courtesy_visit") addRuleEntry(d, e.target, e.country, "ties", "courtesy_visit");
+    if (ask.tie) addEntry(d, e.target, e.country, { key: ask.tie.key, name: ask.tie.name, weight: ask.tie.weight, fadeYears: ask.tie.fadeYears });
     if (e.action === "make_resident") {
       e.status = "resident";
       e.residentSince = monthOf(d.date);
@@ -380,6 +381,57 @@ export function provincesTaken(d: Diplomacy, by: string, from: string, provinces
   country(d, by).landsTaken += provinces.length;
 }
 
+/**
+ * Land that joins a realm without being seized: folding in a subject, merging a
+ * Union's crowns (DIPL-224). The province records follow the new owner, but no
+ * Took our land and no Lands taken are written.
+ */
+export function provincesJoined(d: Diplomacy, by: string, from: string, provinces: string[]): void {
+  for (const p of provinces) {
+    const pr = province(d, p);
+    pr.history.push({ owner: from, until: monthOf(d.date) });
+    pr.owner = by;
+  }
+}
+
+/**
+ * Lands taken in the last 20 years (DIPL-157, DIPL-221; REALM-168: a hard
+ * window). `holds` says whether the taker still holds a province, so land given
+ * back stops counting (REALM-125); without it, the library's own records decide.
+ */
+export function landsTakenWithin(d: Diplomacy, c: string, holds?: (c: string, province: string) => boolean): number {
+  const window = C.lands_taken_years * 12;
+  let n = 0;
+  for (const t of d.taken) {
+    if (t.by !== c || monthsBetween(t.date, d.date) >= window) continue;
+    if (holds ? holds(c, t.province) : (d.provinces[t.province]?.owner ?? c) === c) n++;
+  }
+  return n;
+}
+
+/** Sets every country's Lands taken to the last 20 years' (DIPL-221), dropping older entries whole. */
+export function refreshLandsTaken(d: Diplomacy, holds?: (c: string, province: string) => boolean): void {
+  const window = C.lands_taken_years * 12;
+  // Entries older than the window never count again; Took our land and the frontier keep their own ledger entries.
+  const counts = new Map<string, number>();
+  for (const t of d.taken) {
+    if (monthsBetween(t.date, d.date) >= window) continue;
+    if (holds ? !holds(t.by, t.province) : (d.provinces[t.province]?.owner ?? t.by) !== t.by) continue;
+    counts.set(t.by, (counts.get(t.by) ?? 0) + 1);
+  }
+  for (const [id, c] of Object.entries(d.countries)) c.landsTaken = counts.get(id) ?? 0;
+}
+
+/**
+ * DIPL-222: a country near land that changed hands by a peace or a demand holds
+ * the wrong Grabbed land near us toward the taker, −5 a province, fading over 20 years.
+ */
+export function grabbedLandNearUs(d: Diplomacy, holder: string, taker: string, provinces: number): void {
+  if (provinces <= 0 || holder === taker) return;
+  const r = entryRule(d, "wrongs", "grabbed_land_near_us");
+  addEntry(d, holder, taker, { key: "grabbed_land_near_us", name: r.name, weight: r.weight_per_province! * provinces, fadeYears: r.fade_years! });
+}
+
 /** "Freed us" after a won Free a people or Break a subject (diplomacy 3.2). */
 export function freedBy(d: Diplomacy, freed: string, liberator: string): void {
   addRuleEntry(d, freed, liberator, "ties", "freed_us");
@@ -390,6 +442,7 @@ export function freedBy(d: Diplomacy, freed: string, liberator: string): void {
 const AIM_NAMES: Record<string, string> = {
   take_land: "Take land", seat_pretender: "Seat a pretender", tribute: "Tribute", free_people: "Free a people", break_subject: "Break a subject",
   defend_faith: "Defend the faith", punish: "Punish", raid: "Raid", no_aim: "No aim",
+  restore_imperial_land: "Restore imperial land",
 };
 export const aimName = (id: string) => AIM_NAMES[id] ?? id;
 export const aimId = (name: string) => Object.entries(AIM_NAMES).find(([, n]) => n === name)?.[0] ?? name;
@@ -491,6 +544,11 @@ function issueCall(d: Diplomacy, war: War, caller: string, called: string, again
   return call;
 }
 
+/** A call from outside the war's own ties: the Emperor called to defend a member (institutions INST-030). */
+export function issueOutsideCall(d: Diplomacy, war: War, caller: string, called: string, against: string, via: "empire"): Call | undefined {
+  return issueCall(d, war, caller, called, against, "defensive", via);
+}
+
 function issueCalls(d: Diplomacy, war: War): void {
   const a = war.declarer, b = war.target;
   const attackerKind: Call["kind"] = war.startedBy === b ? "defensive" : "offensive";
@@ -533,6 +591,7 @@ export function answerCall(d: Diplomacy, call: Call, yes: boolean): void {
     return;
   }
   if (call.via === "subject") return; // the subjects context answers a subject's refusal (SUBJ-028)
+  if (call.via === "empire") return; // the institutions context answers the Emperor's refusal (INST-030)
   if (call.via === "league") {
     for (const l of d.leagues) if (l.target === call.against) l.members = l.members.filter((m) => m !== call.called);
     emit(d, "LeagueMemberLeft", { member: call.called, target: call.against });
@@ -1099,12 +1158,6 @@ export function eventNotoriety(d: Diplomacy, actor: string, n: number): void {
   for (const k of knowers) addEntry(d, k, actor, { key: "notorious_deed", name: r.name, weight: r.weight_per_notoriety! * n, fadeYears: r.fade_years! });
 }
 
-/** D-DIPL-26: 5 × Lands taken + event notoriety still unfaded (30 years), capped at 100. */
-export function notoriety(d: Diplomacy, c: string): number {
-  const fade = entryRule(d, "wrongs", "notorious_deed").fade_years! * 12;
-  const deeds = d.notorietyDeeds.filter((x) => x.actor === c).reduce((s, x) => s + x.n * Math.max(0, 1 - monthsBetween(x.date, d.date) / fade), 0);
-  return Math.min(C.event_tree_mapping.notoriety.cap, Math.round(5 * country(d, c).landsTaken + deeds));
-}
 
 /** DIPL-175: an event's relation goes through the matching action and its requirements. */
 export function eventRelation(d: Diplomacy, type: string, a: string, b: string, contested?: string): string {

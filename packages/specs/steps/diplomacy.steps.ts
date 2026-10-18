@@ -2487,3 +2487,23 @@ Then("the envoy picker shows each available official, the days on the road, and 
 Given("the screen is in landscape", (s) => void (s.orientation = "landscape"));
 When("the player opens the card of {string}", (s) => void act(s));
 Then("the card sits on the right of the map instead of covering it", (s) => expect(D.cardPlacement(s.orientation)).toBe("right of the map"));
+
+// ---------------------------------------------------------------- neighbours answer conquest (X-21)
+
+Given(/^the country "([^"]*)" has notoriety (\d+)$/, (s, x: string, n: string) => {
+  // Notoriety is 5 × Lands taken with no event notoriety (DIPL-174).
+  c(s, x).landsTaken = Number(n) / 5;
+  expect(D.notoriety(w(s), x)).toBe(Number(n));
+});
+When(/^the AI country "([^"]*)" counts an alliance with (\w+)$/, (s, a: string, x: string) => {
+  act(s);
+  s.count = D.countAsk(w(s), { action: "propose_alliance", asker: x, asked: a });
+});
+When(/^(\w+) counts joining a league against (\w+)$/, (s, a: string, x: string) => {
+  act(s);
+  s.count = D.aiLeagueCount(w(s), a, x, 0);
+});
+Then(/^the count has ([+−-])(\d+) for (\w+)'s notoriety$/, (s, sign: string, n: string) => {
+  const want = (sign === "+" ? 1 : -1) * Number(n);
+  expect(D.reasonNumber(s.count, "Notoriety") + D.reasonNumber(s.count, "X's notoriety")).toBe(want);
+});

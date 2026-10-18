@@ -6,8 +6,10 @@ import { battleArmy, battleRow, cedeProvince, nearest, SIEGE_MONTH_DAYS, wallsOf
 import { cultureKey, grievanceCount, grievancesOf, moodIndex, risingChance, taxWeight } from "./moods.ts";
 import { storeMonths } from "./food.ts";
 import { commanderBattle } from "./recruit.ts";
+import { withoutOf } from "./research.ts";
 import { halt, marchTo } from "./turn.ts";
 import { loyaltyStep } from "./lords.ts";
+import { armyDead, garrisonDead } from "./fallen.ts";
 import { NORMAL_TAX, runLedger, taxRateOf, TAX_RATES } from "./treasury.ts";
 import { CLASS_COUNT, classIndex, CLASS_NAMES } from "./living.ts";
 import { rebelsWonAgainst, revolutionSettled } from "./revolutions.ts";
@@ -435,8 +437,11 @@ function siegeDay(world: World, b: Band, news: News[]): void {
   st.days++;
   if (st.days % SIEGE_MONTH_DAYS !== 0) return;
   const store = st.siege.store;
+  const inside = st.siege.garrison;
   wf.siegeMonth(st.siege);
   if (!wf.isClosed(st.siege)) st.siege.store = store;
+  // The garrison's dead are the owner's fallen and its province's people, as in a war siege (WAR-226).
+  garrisonDead(world, b.owner, p, inside - st.siege.garrison);
   world.provinceGarrison[p] = st.siege.garrison;
   if (st.siege.garrison < 1 || wf.aiAcceptsHonours({ breaches: st.siege.breaches, foodMonths: wf.foodMonths(st.siege), reliefDays: null, cruel: false })) {
     wf.endSiege(st.siege, st.siege.starving ? "surrender" : "honours of war");
@@ -479,7 +484,8 @@ function fight(world: World, b: Band, slots: number[], news: News[]): void {
   const [own, lead] = battleArmy(world, slots, me);
   const era = wf.eraOfYear(world.date.year);
   const r = wf.fightBattle({
-    attacker: { country: me, army: own, known: new Set(), homeland: true },
+    // Without C01 *Iron smelting* the realm's regiments fight 20 % weaker (RSCH-094).
+    attacker: { country: me, army: own, known: new Set(), homeland: true, strengthPct: withoutOf(world, b.owner).strengthPct },
     defender: { country: "rebels", army: rebelArmy(world, b, factor), known: new Set(), homeland: true },
     sectors: wf.battlefield(battleRow(ground), { ground, era }),
     ground,
@@ -492,8 +498,13 @@ function fight(world: World, b: Band, slots: number[], news: News[]): void {
   };
   const ownMen = slots.reduce((t, s) => t + a.men[s]!, 0);
   const ownLost = lost(me, ownMen);
+  // Of the men lost, the killed and the wounded who die are dead; the fled who go home are not (WAR-226).
+  const mine = r.losses[me]!;
+  const dead = mine.killed + wf.woundedAfter(mine.wounded, r.winner === me).die;
+  const deadShare = dead > 0 ? dead / (dead + wf.fledAfter(mine.fled, r.winner === me).home) : 0;
   for (const s of slots) {
     const cut = Math.round((ownLost * a.men[s]!) / Math.max(1, ownMen));
+    armyDead(world, s, cut * deadShare);
     a.horse[s] = Math.max(0, Math.round(a.horse[s]! * (1 - cut / Math.max(1, a.men[s]!))));
     a.men[s] = Math.max(0, a.men[s]! - cut);
   }

@@ -22,6 +22,10 @@ export interface RealmLord {
   loyalty: Loyalty;
   /** Up-causes counted toward the next step, for a great lord (REALM-162). */
   upCredit: number;
+  /** His two traits (REALM-070); unset, they are drawn from his name (lordTraits). */
+  traits?: string[];
+  /** His Want, a province id (REALM-070); unset, it is worked out from his lands' borders (lordWant). */
+  want?: string;
 }
 
 export interface LordState {

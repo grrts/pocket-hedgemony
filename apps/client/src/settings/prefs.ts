@@ -141,16 +141,14 @@ export function mapPower(): { maxFps: number; animMs: number; dprCap: number } {
   };
 }
 
-/**
- * What the living map draws close in (VIEW-104, VIEW-129): Map detail sets the bands, Animations
- * which figures move; Battery saver holds Map detail at Medium at most, with every figure still.
- */
+/** Map detail and Animations as the map rules name them (SET-041, VIEW-104, VIEW-129). */
+export const mapDetail = (): "Low" | "Medium" | "High" => (({ low: "Low", medium: "Medium" }) as Record<string, "Low" | "Medium">)[String(pref("graphics.map_detail"))] ?? "High";
+export const animationsPref = (): "Full" | "Reduced" | "Off" => (({ reduced: "Reduced", off: "Off" }) as Record<string, "Reduced" | "Off">)[String(pref("graphics.animations"))] ?? "Full";
+
+/** What the living map's figures draw: Battery saver holds Map detail at Medium at most, with every figure still (VIEW-129). */
 export function livingPrefs(): { detail: "Low" | "Medium" | "High"; animations: "Full" | "Reduced" | "Off" } {
-  const d = String(pref("graphics.map_detail"));
-  const a = String(pref("graphics.animations"));
-  const detail = d === "low" ? "Low" : d === "medium" ? "Medium" : "High";
-  const animations = a === "off" ? "Off" : a === "reduced" ? "Reduced" : "Full";
-  if (!batteryOn()) return { detail, animations };
+  const detail = mapDetail();
+  if (!batteryOn()) return { detail, animations: animationsPref() };
   return { detail: detail === "High" ? "Medium" : detail, animations: "Off" };
 }
 

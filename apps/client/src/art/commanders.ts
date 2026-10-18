@@ -43,7 +43,8 @@ export function hash(s: string): number {
   return h >>> 0;
 }
 
-const ERA_START = Object.values(research.era_dates) as number[];
+// The dated eras only: Ancient and Medieval (RSCH-091) lie before 1444.
+const ERA_START = Object.entries(research.era_dates).filter(([era]) => !research.past_eras.includes(era)).map(([, year]) => year);
 
 /** The era a year falls in, 0 = I, from the research rules' era dates (RSCH-032). */
 export function eraOfYear(year: number): number {

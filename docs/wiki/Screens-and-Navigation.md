@@ -56,7 +56,7 @@ One screen in three steps, with a strip at the top ("Realm · Options · Begin")
 
 The Load screen lists every save in one list, newest first (not grouped by campaign), each with banner, realm, in-game date, the real date saved and an autosave or ironman mark. Tapping one shows its card with Load and Delete. Loading from the main menu needs no confirmation. Loading from the game menu with unsaved turns first asks "Leave <date> unsaved? · Save first · Leave · Cancel".
 
-The loading screen shows a tip from the one tips table, picked to fit your realm and date (tips are tagged by era, region and whether they are for new players). Tap, or press left and right, for another. The bar shows the real loading steps ("Reading the save", "Drawing the borders", "Waking the courts"), not a fake timer. When loading finishes, the game goes straight to the map without asking for a tap, but keeps a tip on screen at least 2 seconds after it appeared. The load-and-resume music plays.
+The loading screen shows a tip from the one tips table, picked to fit your realm and date (tips are tagged by era, region and whether they are for new players). Tap, or press left and right, for another. The bar shows the real loading steps ("Reading the save", "Drawing the borders", "Waking the courts"), not a fake timer. While the game works, the rider gallops, the road runs under the hooves, a shine runs along the bar and the dots after the step count up, even while the world is being built, so you can always see it has not frozen. When loading finishes, the game goes straight to the map without asking for a tap, but keeps a tip on screen at least 2 seconds after it appeared. The load-and-resume music plays.
 
 ### The four layers of a campaign
 
@@ -74,13 +74,14 @@ A modal accepts no input to the screens below until it is answered or put off.
 - **Top bar:** realm name and banner (opens the country card), the date, gold with its monthly change, and levies. On a phone it holds at most five plaques; the rest move into the country card.
 - **Tool column** on the right edge: map lens, go to capital, and Realm book.
 - **End turn** (the hourglass, lower right) carries a badge counting the items on the Attention screen. Tapping the badge, or the controller's "next" button, opens the Attention screen.
+- **Auto** (just above End turn) lets the weeks play one after another in a single-player campaign; a tap stops it at the end of the current week. See [Time and Turns](Time-and-Turns#auto-turns).
 - **Attention bell** next to the date lights while the Attention screen holds a warning, and opens it. It is the only place the game warns you; there is no advisor.
 - **Game menu button**, a small three-line icon in the upper left next to the banner.
 - The local zoom's tile-row view is still the map, not a separate screen.
 
 ### Cards
 
-A tap on the map only selects, and never moves or zooms the map; the thing's name appears on a tab in the lower left. Army banners take big taps, a tap on a commander in the Army list selects his army, and several armies can be selected at once. Tapping the tab, or tapping the thing again, opens its card. Folding a card away shrinks it back to that tab. When a card opens another card (a province, then its owner's country, then a commander), they stack, and a "Back to <name>" button at the bottom names the card below. Tapping empty map clears the stack. A line that "opens its gain and lose list" opens it inside the card as a fold-out, not as a new screen.
+A tap on the map only selects, and never moves or zooms the map; the thing's name appears on a tab in the lower left. Army banners take big taps, a tap on a commander in the Army list selects his army, and several armies can be selected at once. Tapping the tab, or tapping the thing again, opens its card. Folding a card away shrinks it back to that tab. When a card opens another card (a province, then its owner's country, then a commander), or you switch tabs, the screen you left goes on a history of up to 20 screens. The arrow at the left of the card's header (beside Fold away and the cross) is Back: it returns to the screen before, on the tab you left it, and shows only while there is somewhere to go back to. Your phone's back gesture does the same. A redraw as the week plays adds nothing, and closing the card, or tapping empty map, clears the history. A line that "opens its gain and lose list" opens it inside the card as a fold-out, not as a new screen.
 
 How a card sits depends on the shape:
 

@@ -37,6 +37,14 @@ Every command that changes the world is an **order**, for example "move this arm
 
 **Warnings never block.** If the End turn confirmation setting is on, the game asks first and tells you how many warnings are open, for example "3 warnings wait for you". You can look, or end the turn anyway.
 
+### Auto turns
+
+In a single-player campaign you can let the weeks play one after another. Tap **Auto**, just above End turn, and the next week starts by itself as soon as one has played and been saved, at your Turn playback speed. Auto turns change only when End turn is pressed, never what happens in a week.
+
+**Pausing finishes the week.** While Auto turns run, a tap on End turn or on Auto (or Space) doesn't stop the clock mid-week: the week plays to its end, then the game stops and you can give orders. Until then both buttons say "Stops at the end of this week"; tap Auto again to keep going. On a keyboard, Shift+Space switches Auto turns.
+
+**Auto turns stop by themselves** at the end of a week in which something needs you, and the alert over the map says what: an event, one of your battles or sieges, a war of your realm, a call to arms, a peace offer or an envoy waiting, beaten rebels waiting for your verdict, scholars with nothing to study, or one of your armies reaching the end of its march. An event, a revolution or one of your battles still makes the week wait at once, as it always does. Auto turns are off every time you load a campaign.
+
 ### The order of a turn
 
 Every turn runs the same steps in the same order:
@@ -157,6 +165,7 @@ Which hemisphere a province is in comes from its latitude. Wet seasons follow th
 ## What you see
 
 - **End turn** sends your orders. With the confirmation setting on, it asks first and names the number of open warnings.
+- **Auto**, above End turn: lit while Auto turns run, blinking while they stop at the end of the week.
 - **Turn in progress**: the week plays out on the map, slowing to 4-hour steps while one of your battles runs. Orders are frozen, but you can pan and zoom.
 - **Battle view**: follow a running battle, change its standing orders, retreat, or switch to another of your running battles.
 - **Events**: shown one at a time in date order.

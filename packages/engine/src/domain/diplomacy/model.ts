@@ -136,6 +136,8 @@ export interface Ask {
   passageTarget?: string;
   callKind?: "defensive" | "offensive";
   callTarget?: string;
+  /** A tie the mission leaves at the court it reaches (Seek their vote, institutions INST-026). */
+  tie?: { key: string; name: string; weight: number; fadeYears: number };
 }
 
 export interface Reason {
@@ -170,7 +172,7 @@ export interface Call {
   called: string;
   against: string;
   kind: "defensive" | "offensive";
-  via: "alliance" | "pledge" | "league" | "subject";
+  via: "alliance" | "pledge" | "league" | "subject" | "empire";
   war: string;
   issued: string;
   answerOn: string;
@@ -620,6 +622,19 @@ export function standing(d: Diplomacy, holder: string, other: string): number {
   const n = ledgerOf(d, holder, other).reduce((s, e) => s + e.weight, 0) + relationLine(d, holder, other).weight;
   const cap = config.ledger.standing_limit;
   return Math.max(-cap, Math.min(cap, n));
+}
+
+/** D-DIPL-26: 5 × Lands taken + event notoriety still unfaded (30 years), capped at 100 (DIPL-174). */
+export function notoriety(d: Diplomacy, c: string): number {
+  const fade = entryRule(d, "wrongs", "notorious_deed").fade_years! * 12;
+  let deeds = 0;
+  for (const x of d.notorietyDeeds) if (x.actor === c) deeds += x.n * Math.max(0, 1 - monthsBetween(x.date, d.date) / fade);
+  return Math.min(config.event_tree_mapping.notoriety.cap, Math.round(5 * country(d, c).landsTaken + deeds));
+}
+
+/** Reason points for a country's notoriety: 1 per 5 (DIPL-223). */
+export function notorietyPoints(d: Diplomacy, c: string): number {
+  return Math.floor(notoriety(d, c) / config.ai.notoriety_per_reason);
 }
 
 /** DIPL-077. */

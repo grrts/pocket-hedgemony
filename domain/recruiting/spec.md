@@ -295,6 +295,17 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - RECR-124 Grouping and overview: everything about one army (troops by arm, drill, break point, food, pay, training, split, merge, leave as garrison, pick up) sits on its commander screen; everything about troops without a commander sits on the province's Garrison tab; the realm's Military tab lists the recruit queues and opens each Garrison tab (RECR-119). [F-14; F-17; X-19]
 - RECR-125 Phone: in landscape both screens fit the side panel in the Wide and Tall layouts; every button on them, the small ones in troop rows included, is at least 44 points high, the stepper's − and + at least 44 × 64, and nothing needs hover (each button spells out what it does). Portrait on a phone shows the turn-the-phone screen, as everywhere in the game. [F-14; X-19]
 
+#### Names and ranks in the realm's language (feedback 125)
+- RECR-121 The recruiting system shall name every commander, admiral and hired captain in the language of the realm's culture (`names.json`), in that language's order: family name first where the language puts it first (Chinese, Japanese, Korean, Vietnamese, Hungarian). The 1444 start's historical commanders keep their own names in their own language ("Hunyadi János", "Gjergj Kastrioti", "Konstantinos Palaiologos"), and a realm the map data gives only a stand-in general gets one named in its culture. [F-125; F-33]
+- RECR-122 The recruiting system shall give each commander the rank of his post in the realm's language, from the culture's `ranks`: `general` while he leads an army or waits at court, `admiral` while he leads a fleet; the rank goes where the language puts it ("Almirante Fernão Coutinho", "Hosokawa Katsumoto Taishō"), and a culture with no word for the post shows the name alone. The rank follows the post: an admiral sent back to court is a general again. [F-125]
+- RECR-123 The recruiting system shall name a free company's captain in the culture of the realm the company gathers in, keeping the company's own given name for him, with that culture's `captain` rank ("Hauptmann Ulrich von Hallwyl", "Condottiero Niccolò Piccinino"); he keeps that name in any realm's service. [F-125; WAR-213]
+
+#### How the player uses it: names and ranks
+- RECR-124 Where: the ranked name is the commander's name everywhere the player meets him: the army row on a province card, the commander screen's title, the Military tab's Commanders list, a fleet's name ("Kapudan Mehmed Pasha's fleet") on the Navy tab and port, the army picker, and the Mercenaries tab; short buttons ("Lead: …", "Join …") keep the bare name. Dispatches keep the bare name. [F-125; X-19]
+- RECR-125 Grouping: under the ranked name, the same small line that shows his skills begins with the post in plain English, "commander", "admiral" or "hired captain", so a rank the player does not know is never the only clue. [F-125; X-19]
+- RECR-126 Overview: the Military tab's Commanders list shows every commander of the realm with his rank and post, and the Navy tab every fleet under its admiral's ranked name. [F-125; X-19]
+- RECR-127 Phone: a ranked name wraps inside its card instead of widening the panel, keeps the portrait and buttons at 44 points, and needs no hover to read the post. [F-125; X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -503,3 +514,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 | RECR-111 | commissioning-officials.feature | New commanders come from officials |
 | RECR-113 | training.feature | Trained levies stay until sent home |
 | RECR-114, 115 | commissioning-officials.feature; ai-recruiting.feature | A commission costs 50 gold; The AI commissions only for troops it has |
+| RECR-121–123 | commander-names.feature | Names in the realm's language; The rank follows the post; A free company's captain |
+| RECR-124–127 | — | Presentation only (client UI) |

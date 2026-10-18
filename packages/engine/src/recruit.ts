@@ -1,18 +1,19 @@
-import { crownShare } from "./lords.ts";
+import { crownShare, inAnyWar } from "./lords.ts";
 import { refillPaces } from "./fallen.ts";
 import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
-import { officialName, personName } from "./names.ts";
+import { mix, officialName, personName, rankedName } from "./names.ts";
 import { OFFICIALS, officialAt, officialBonus } from "./officials.ts";
 import { monthlyRations, wagonRations } from "./march.ts";
 import { campaigning, halt, isMarching } from "./turn.ts";
-import { spawnArmy, type World } from "./world.ts";
+import { foodCarriedPct, spawnArmy, type World } from "./world.ts";
 import { armyBreak, atWar, controller, wallsOf, type News } from "./war.ts";
 import { armUnlocked, knownSet } from "./research.ts";
 import { heritageFactor } from "./heritage.ts";
 import { noteRegiment } from "./achievements.ts";
 import { W as WORK, worksAt } from "./works.ts";
+import { refusingPeace } from "./peace.ts";
 
 /**
  * Milestone 2, armies that cost something: wires the recruiting context (who
@@ -62,6 +63,7 @@ export interface FreeCompany {
   id: number;
   group: string;
   name: string;
+  /** The captain's name with his rank, in the language of the company's home (feedback 125). */
   captain: string;
   /** Province it gathers at, -1 = unknown. */
   home: number;
@@ -197,7 +199,7 @@ export function releaseCommander(world: World, n: number, c: number): string | n
 function newCaptain(world: World, n: number, name?: string): number {
   const skill = () => 1 + world.rng.int(3);
   const capital = world.rules.provinces.find((p) => p.id === world.rules.nations[n]!.capital)?.name ?? "";
-  return addCommander(world, n, wf.newCommander(`Captain ${name ?? personName(world.rules, n, world.rng.int(1 << 30), capital)}`, { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
+  return addCommander(world, n, wf.newCommander(name ?? rankedName(world.rules, n, personName(world.rules, n, world.rng.int(1 << 30), capital), "captain"), { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
 }
 
 /** Battles teach commanders: victories grow Might, defeats are counted (WAR-050, WAR-052). */
@@ -240,13 +242,13 @@ const kindMultiplier = (kind: number) => (wf.W.kinds as Record<string, { pay: { 
 
 /**
  * Treasury gold an army costs this month: pay by arm times its kind's multiplier
- * (a levy is free for its first 3 months, a hired company costs three times)
- * (RECR-017, warfare kinds).
+ * (a levy kept at peace is free for its first 3 months, F-23; at war it is paid from its first,
+ * WAR-225; a hired company costs three times) (RECR-017, warfare kinds).
  */
 export function armyPay(world: World, slot: number): number {
   const a = world.armies;
   const kind = a.kind[slot]!;
-  if (kind === KIND.levy && a.monthsOut[slot]! <= wf.W.levy.free_months) return 0;
+  if (kind === KIND.levy && a.monthsOut[slot]! <= wf.W.levy.free_months && !inAnyWar(world, a.owner[slot]!)) return 0;
   const by = menByArm(world, slot);
   let pay = 0;
   ARMS.forEach((arm, k) => (pay += armPay(arm, by[k]!)));
@@ -546,8 +548,9 @@ function addToGarrison(world: World, n: number, p: number, men: number): void {
   by[LEVY] = by[LEVY]! + men;
   a.drill[troop] = (a.drill[troop]! * before) / (before + men);
   a.monthsOut[troop] = Math.round((a.monthsOut[troop]! * before) / (before + men));
+  if (men > before) a.home[troop] = p;
   setByArm(world, troop, by);
-  a.food[troop] = a.food[troop]! + wagonRations(world.rules.defines.march, { men, horse: 0, logistics: 0 });
+  a.food[troop] = a.food[troop]! + wagonRations(world.rules.defines.march, { men, horse: 0, logistics: 0, foodCarriedPct: foodCarriedPct(world, n) });
 }
 
 /**
@@ -581,6 +584,7 @@ export function pickUp(world: World, n: number, army: number, men?: number): str
     const total = a.men[army]!;
     a.drill[army] = total > 0 ? (a.drill[army]! * before + a.drill[t]! * want) / total : 0;
     a.monthsOut[army] = total > 0 ? Math.round((a.monthsOut[army]! * before + a.monthsOut[t]! * want) / total) : 0;
+    if (want > before) a.home[army] = a.home[t]!;
     a.food[army] = a.food[army]! + a.food[t]! * share;
     a.food[t] = a.food[t]! * (1 - share);
     holdTraining(world, t);
@@ -655,7 +659,7 @@ export function splitTroops(world: World, n: number, army: number, arm: string, 
   setByArm(world, army, by);
   holdTraining(world, army);
   const horse = isHorseArm(arm);
-  const slot = spawnArmy(world, n, a.location[army]!, men, c, horse ? men : 0, { kind: a.kind[army]!, drill: a.drill[army]!, tile: a.tile[army]!, ...(horse ? { horseArm: arm } : { foot: arm }) });
+  const slot = spawnArmy(world, n, a.location[army]!, men, c, horse ? men : 0, { kind: a.kind[army]!, drill: a.drill[army]!, tile: a.tile[army]!, home: a.home[army]!, ...(horse ? { horseArm: arm } : { foot: arm }) });
   a.monthsOut[slot] = a.monthsOut[army]!;
   // The new army takes its share of the wagons, not a full set.
   a.food[slot] = a.food[army]! * share;
@@ -710,7 +714,13 @@ function newFreeCompany(world: World): FreeCompany | null {
   // Rounding: the largest arm takes up the difference, so the company has exactly its men.
   const big = byArm.indexOf(Math.max(...byArm));
   byArm[big] = byArm[big]! + men - byArm.reduce((t, m) => t + m, 0);
-  return { id, group: def.group, name: pick(free(def)), captain: pick(def.captains), home: capitalOf(world, pick(homesOf(def))), byArm };
+  const name = pick(free(def));
+  const given = pick(def.captains);
+  const from = pick(homesOf(def));
+  const home = capitalOf(world, from);
+  // The captain is named and ranked in the language of the land the company gathers in (feedback 125): "Hauptmann Ulrich von Hallwyl".
+  const captain = rankedName(world.rules, from, personName(world.rules, from, mix(id, 125), provinceName(world, home), given), "captain");
+  return { id, group: def.group, name, captain, home, byArm };
 }
 
 /** Each month a free company may move on, and new ones gather until the age's number are for hire (warfare free_companies). */
@@ -785,6 +795,8 @@ export function mergeArmies(world: World, n: number, from: number, into: number)
   const men = a.men[from]! + a.men[into]!;
   a.drill[into] = men > 0 ? (a.drill[from]! * a.men[from]! + a.drill[into]! * a.men[into]!) / men : 0;
   a.monthsOut[into] = men > 0 ? Math.round((a.monthsOut[from]! * a.men[from]! + a.monthsOut[into]! * a.men[into]!) / men) : 0;
+  // One home per army: the larger part's (WAR-226).
+  if (a.men[from]! > a.men[into]!) a.home[into] = a.home[from]!;
   setByArm(world, into, byI.map((v, k) => v + byF[k]!));
   a.food[into] = a.food[into]! + a.food[from]!;
   if (a.trainArm[into]! < 0 && a.trainArm[from]! >= 0) {
@@ -915,13 +927,16 @@ export function monthlyRecruits(world: World, news: News[]): void {
   const a = world.armies;
   const deserted = new Float64Array(world.nationCount);
   const broke = world.nationTreasury.map((t) => (t < 0 ? 1 : 0));
+  const refusing = Array.from({ length: world.nationCount }, (_, n) => refusingPeace(world, n));
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
     a.monthsOut[i] = Math.min(65535, a.monthsOut[i]! + 1);
     const kind = a.kind[i]!;
     // Levies don't go home on their own: once raised, the player decides (Leroy's design, over RECR-053).
-    const desert = (kind === KIND.levy ? wf.overCap(world.nationCapUsed[n]!, world.nationTroopCap[n]!).levyDesertion : 0) + (broke[n] ? world.rules.defines.recruit.unpaidDesertion : 0);
+    let desert = (kind === KIND.levy ? wf.overCap(world.nationCapUsed[n]!, world.nationTroopCap[n]!).levyDesertion : 0) + (broke[n] ? world.rules.defines.recruit.unpaidDesertion : 0);
+    // A ruler refusing a peace his voices oblige him to take: levies desert twice as fast, from at least the old going-home pace (WAR-181).
+    if (kind === KIND.levy && refusing[n]) desert = Math.max(desert, wf.W.levy.go_home_rate) * wf.W.peace.refuse_desertion;
     const share = Math.min(1, desert);
     if (share > 0) {
       const lost = Math.round(a.men[i]! * share);

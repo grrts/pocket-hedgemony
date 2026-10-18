@@ -1,11 +1,14 @@
+import { armyDead } from "./fallen.ts";
+import { W as WARFARE } from "./domain/warfare/index.ts";
 import { monthlyPeople } from "./living.ts";
 import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
-import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
+import { callStudentsToArms, foundSchool, monthlyResearch, moveQueued as moveQueuedStudy, queuePath, queueStudy, setSeats, setStudy, unqueue } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
+import { monthlyConquest } from "./conquest.ts";
 import { riseUp, subjectAction } from "./subjects.ts";
 import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
@@ -24,9 +27,10 @@ import { claimCaliphate, faithHeadsWars, monthlyFaithHeads, raiseOwnPatriarch, s
 import { hireOfficial, settleLand, swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
+import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
-import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
+import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
 import {
   aiCollect,
   appointCommander,
@@ -74,11 +78,13 @@ import {
 export type Order =
   /** March to a province, to the given tile in it if any (else its centre). */
   | { type: "move"; army: number; to: number; tile?: number }
-  | { type: "declareWar"; target: number }
+  /** Declare war with an aim the realm holds (else the best it holds, else no aim, WAR-178); `breakTruce` breaks a truce first (WAR-179). */
+  | { type: "declareWar"; target: number; aim?: string; province?: number; breakTruce?: boolean }
   | { type: "conclaveGold"; gold: number }
   | { type: "claimCaliphate" }
   | { type: "raiseOwnPatriarch" }
-  | { type: "offerPeace"; target: number; terms: PeaceTerms }
+  /** Offer peace; with "take", `provinces` are the asker's picks of what to take, at most a third of the loser's land (WAR-227). */
+  | { type: "offerPeace"; target: number; terms: PeaceTerms; provinces?: number[] }
   | { type: "answerCall"; call: string; yes: boolean }
   /** Take or turn down a peace the AI offers (its id in the snapshot's peaceOffers). */
   | { type: "answerPeace"; offer: number; yes: boolean }
@@ -119,6 +125,11 @@ export type Order =
   | { type: "settleLand"; province: number }
   /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
   | { type: "setStudy"; invention: string }
+  /** The study queue (RSCH-108 to RSCH-110): add one, queue the path to one, take one out, move one a place earlier (-1) or later (1). */
+  | { type: "queueStudy"; invention: string }
+  | { type: "queuePath"; invention: string }
+  | { type: "unqueueStudy"; invention: string }
+  | { type: "moveQueuedStudy"; invention: string; by: number }
   | { type: "setSeats"; n: number }
   | { type: "callStudentsToArms" }
   | { type: "foundSchool"; province: number }
@@ -171,7 +182,9 @@ export type Order =
   /** Hire a free or lent fleet, or dismiss one (hiredFleets.ts). */
   | HireOrder
   /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
-  | ExploreOrder;
+  | ExploreOrder
+  /** The Empire: stand for the crown, vote, seek a vote, grant a seat, admit a member (institutions.ts). */
+  | EmpireOrder;
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -266,6 +279,10 @@ function startDay(world: World, news: News[]): void {
     aiTreasury(world, news);
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
+    // Lands taken over the last 20 years each month; the league check each January (DIPL-221).
+    monthlyConquest(world, news);
+    // Institutions read standing and forms and add war aims, so they come after diplomacy and before the wars (INST §9).
+    monthlyInstitutions(world, news);
     aiDeclarations(world, news);
     // A war just declared may be censured, or call a patron to a holy place (RELG-147, RELG-149).
     faithHeadsWars(world, news);
@@ -306,12 +323,16 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
   if (locked) return locked;
   switch (order.type) {
     case "declareWar": {
-      const why = declareWar(world, actingNation, order.target, news);
+      const why = declareWar(world, actingNation, order.target, news, {
+        ...(order.aim ? { aim: order.aim } : {}),
+        ...(order.province !== undefined && world.provinceIds[order.province] ? { province: world.provinceIds[order.province] } : {}),
+        ...(order.breakTruce ? { breakTruce: true } : {}),
+      });
       if (!why) faithHeadsWars(world, news);
       return why;
     }
     case "offerPeace":
-      return offerPeace(world, actingNation, order.target, order.terms, news);
+      return offerPeace(world, actingNation, order.target, order.terms, news, false, order.provinces ?? []);
     case "answerPeace":
       return answerPeace(world, order.offer, order.yes, news);
     case "answerCall": {
@@ -371,6 +392,14 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "setStudy":
       return setStudy(world, actingNation, order.invention);
+    case "queueStudy":
+      return queueStudy(world, actingNation, order.invention);
+    case "queuePath":
+      return queuePath(world, actingNation, order.invention);
+    case "unqueueStudy":
+      return unqueue(world, actingNation, order.invention);
+    case "moveQueuedStudy":
+      return moveQueuedStudy(world, actingNation, order.invention, order.by < 0 ? -1 : 1);
     case "setSeats":
       return setSeats(world, actingNation, order.n);
     case "callStudentsToArms":
@@ -459,6 +488,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return answerRebels(world, actingNation, order.rising, order.answer, news);
     case "treatRebels":
       return verdictOrder(world, actingNation, order.rising, order.treatment, news);
+    case "empire":
+      return empireOrder(world, actingNation, order, news);
     case "answerRevolution":
       return answerRevolution(world, actingNation, order.stance, news);
     case "moveBuild":
@@ -727,14 +758,20 @@ function stepMarches(world: World, hours: number): void {
  * What the land can't make up is hunger: men desert and die, and horses are
  * eaten.
  */
+const HUNGER_DEAD_SHARE = WARFARE.hunger.die / (WARFARE.hunger.die + WARFARE.hunger.desert);
+
 function feedArmies(world: World): void {
   const d = world.rules.defines.march;
   const map = marchMap(world);
   const a = world.armies;
   const day = 1 / DAYS_PER_RATION_MONTH;
+  // What each realm's wagons hold (RSCH-094: half without B01), read once per realm per day.
+  const carried = new Int16Array(world.nationCount).fill(-1);
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
-    const army = { ...marching(world, i), campaigning: campaigning(world, i) };
+    const n = a.owner[i]!;
+    if (carried[n]! < 0) carried[n] = foodCarriedPct(world, n);
+    const army = { ...marching(world, i), campaigning: campaigning(world, i), foodCarriedPct: carried[n]! };
     const need = monthlyRations(d, army) * day;
     a.food[i] = a.food[i]! - need;
     const room = wagonRations(d, army) - a.food[i]!;
@@ -746,7 +783,10 @@ function feedArmies(world: World): void {
     if (a.food[i]! < 0) {
       const short = Math.min(1, -a.food[i]! / need);
       const loss = d.hungerLossPerMonth * day * short;
-      a.men[i] = Math.round(a.men[i]! * (1 - loss));
+      const before = a.men[i]!;
+      a.men[i] = Math.round(before * (1 - loss));
+      // Of the men hunger takes, those who die (warfare hunger: die against desert) are missed at home (WAR-226).
+      armyDead(world, i, (before - a.men[i]!) * HUNGER_DEAD_SHARE);
       a.horse[i] = Math.round(a.horse[i]! * (1 - loss));
       a.food[i] = 0;
     }

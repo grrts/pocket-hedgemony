@@ -263,10 +263,10 @@ export function createRecorder(run: string, w: Readonly<World>, c: BalanceConfig
     for (const war of d().wars) {
       const t = tracked.get(war.id)!;
       if (monthIndex(dip.monthOf(d().date)) - monthIndex(t.start) < c.checks.long_war_months - 1) continue;
-      const side = (xs: string[]) => xs.map((x) => w.nationIndex.get(x)!).filter((n) => n !== undefined);
-      const att = side(war.attackers);
-      const def = side(war.defenders);
-      t.voices = Math.max(peaceShare(w as World, att, def), peaceShare(w as World, def, att));
+      const att = w.nationIndex.get(war.declarer);
+      const def = w.nationIndex.get(war.target);
+      if (att === undefined || def === undefined) continue;
+      t.voices = Math.max(peaceShare(w as World, att, war), peaceShare(w as World, def, war));
     }
     // Risings.
     for (const b of w.bands) {
