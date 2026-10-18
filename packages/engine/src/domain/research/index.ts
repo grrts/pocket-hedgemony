@@ -8,8 +8,14 @@ import type { Rng } from "../../rng.ts";
  * Pure rules: state is plain data the caller owns; nothing here rolls dice.
  */
 
+/** An era a date falls in, from 1444 on. */
 export type Era = "I" | "II" | "III" | "IV" | "V" | "VI" | "VII" | "VIII";
-export const ERAS: readonly Era[] = config.eras as Era[];
+/** An era of the tree: the two before 1444, Ancient and Medieval (RSCH-091), then the dated eras. */
+export type TreeEra = "A" | "M" | Era;
+/** Every era of the tree, the past ones first. */
+export const TREE_ERAS: readonly TreeEra[] = config.eras as TreeEra[];
+/** The eras a date falls in, Era I (1444) on. */
+export const ERAS: readonly Era[] = TREE_ERAS.filter((e) => !config.past_eras.includes(e)) as Era[];
 
 export type SchoolType = keyof typeof config.school_seats;
 export const SCHOOL_TYPES = Object.keys(config.school_seats) as SchoolType[];
@@ -65,10 +71,12 @@ export interface InventionRow {
   /** The contact event that opens a ⇄ invention (RSCH-035). */
   contact?: string;
   effects?: InventionEffects;
+  /** What lacking a past invention costs a realm (RSCH-094), as the sheet says it. */
+  without?: string;
 }
 
 export interface Invention extends InventionRow {
-  era: Era;
+  era: TreeEra;
   /** The bough (R1–R4) this invention grows on, found by walking its parents. */
   bough: string;
 }
@@ -96,9 +104,9 @@ export function loadTree(rows: readonly InventionRow[] = config.inventions as In
     return boughOf(row.parent, seen);
   };
   for (const row of rows) {
-    if (!ERAS.includes(row.era as Era)) throw new Error(`${row.id}: unknown era ${row.era}`);
+    if (!TREE_ERAS.includes(row.era as TreeEra)) throw new Error(`${row.id}: unknown era ${row.era}`);
     for (const need of [...row.or_parents, ...row.also_needs]) if (!byId.has(need) && !boughIds.has(need)) throw new Error(`${row.id}: unknown need ${need}`);
-    inventions.set(row.id, { ...row, era: row.era as Era, bough: boughOf(row.parent, new Set()) });
+    inventions.set(row.id, { ...row, era: row.era as TreeEra, bough: boughOf(row.parent, new Set()) });
   }
   return { root: config.root, boughs: config.boughs, inventions };
 }
@@ -120,8 +128,8 @@ export function startingKnowledge(t: Tree = tree()): Set<string> {
 }
 
 /** Inventions in the tree, counted by era. */
-export function countByEra(t: Tree = tree()): Record<Era, number> {
-  const out = Object.fromEntries(ERAS.map((e) => [e, 0])) as Record<Era, number>;
+export function countByEra(t: Tree = tree()): Record<TreeEra, number> {
+  const out = Object.fromEntries(TREE_ERAS.map((e) => [e, 0])) as Record<TreeEra, number>;
   for (const inv of t.inventions.values()) out[inv.era]++;
   return out;
 }
@@ -150,17 +158,18 @@ export function eraOf(date: Day): Era {
   return found;
 }
 
-export const eraIndex = (era: Era): number => ERAS.indexOf(era);
+/** An era's place: Era I is 0, so the past eras come before it (Ancient −2, Medieval −1). */
+export const eraIndex = (era: TreeEra): number => TREE_ERAS.indexOf(era) - config.past_eras.length;
 
 // ---------------------------------------------------------------- cost
 
 /** Scholar-years an era's invention costs (RSCH-030). */
-export function eraCost(era: Era): number {
+export function eraCost(era: TreeEra): number {
   return config.era_cost[era];
 }
 
 /** Cost before discounts: era cost, doubled for each era ahead of the date (RSCH-031). */
-export function costBeforeDiscounts(era: Era, date: Day): number {
+export function costBeforeDiscounts(era: TreeEra, date: Day): number {
   const ahead = Math.max(0, eraIndex(era) - eraIndex(eraOf(date)));
   return eraCost(era) * config.ahead_multiplier ** ahead;
 }
@@ -206,6 +215,10 @@ export interface Programme {
   scholars: number;
   /** Set when students are called to arms; research stays stopped until students enrol again. */
   stopped: boolean;
+  /** Inventions lined up after the current study, in order (RSCH-108). */
+  queue: string[];
+  /** The start group the realm belongs to (RSCH-098); regional contacts read it (RSCH-096). */
+  group?: string;
 }
 
 /** The recruit pool research draws on (owned by realm and province). */
@@ -216,13 +229,14 @@ export interface RecruitPool {
 }
 
 export function newProgramme(country: string, t: Tree = tree()): Programme {
-  return { country, known: startingKnowledge(t), contacts: new Set(), studies: [], schools: [], scholars: 0, stopped: false };
+  return { country, known: startingKnowledge(t), contacts: new Set(), studies: [], schools: [], scholars: 0, stopped: false, queue: [] };
 }
 
 /** Learns an invention; a known invention is never lost (INV-RSCH-1). */
 export function learn(p: Programme, id: string): void {
   p.known.add(id);
   p.studies = p.studies.filter((s) => s.id !== id);
+  p.queue = p.queue.filter((q) => q !== id);
 }
 
 export type Refusal = "unknown" | "known" | "parent" | "also_needs" | "contact" | "out_of_scope" | "too_many_studies";
@@ -233,10 +247,27 @@ export function eligibility(p: Programme, id: string, date: Day, t: Tree = tree(
   if (!inv) return { ok: false, reason: "unknown" };
   if (p.known.has(id)) return { ok: false, reason: "known" };
   if (outOfScope(inv) || !withinCampaign(date)) return { ok: false, reason: "out_of_scope" };
-  if (!p.known.has(inv.parent) && !inv.or_parents.some((x) => p.known.has(x))) return { ok: false, reason: "parent" };
-  if (!inv.also_needs.every((x) => p.known.has(x))) return { ok: false, reason: "also_needs" };
-  if (inv.contact && !p.contacts.has(inv.contact)) return { ok: false, reason: "contact" };
-  return { ok: true };
+  const need = needsMet(p, inv, p.known);
+  return need ? { ok: false, reason: need } : { ok: true };
+}
+
+/** What stands between a realm and an invention when it has `have`: its parent, its other needs, a contact; null when nothing does. */
+function needsMet(p: Programme, inv: Invention, have: ReadonlySet<string>): Refusal | null {
+  if (!have.has(inv.parent) && !inv.or_parents.some((x) => have.has(x))) return "parent";
+  if (!inv.also_needs.every((x) => have.has(x))) return "also_needs";
+  const contact = contactFor(p, inv);
+  if (contact && !p.contacts.has(contact)) return "contact";
+  return null;
+}
+
+/**
+ * The contact event an invention waits for in this realm: its row's (F9 waits
+ * for the Atlantic crossing), or a regional one, as F03 waits for first
+ * contact across the ocean in the Americas (RSCH-035, RSCH-096).
+ */
+export function contactFor(p: Programme, inv: Invention): string | undefined {
+  if (inv.contact) return inv.contact;
+  return config.regional_contacts.find((c) => c.invention === inv.id && p.group !== undefined && c.groups.includes(p.group))?.contact;
 }
 
 /**
@@ -331,6 +362,7 @@ function addProgress(p: Programme, scholarYears: number, date: Day, partnersKnow
       learned.push(s.id);
     }
   }
+  if (learned.length) startFromQueue(p, date, t);
   return learned;
 }
 
@@ -622,38 +654,274 @@ export function poachingYear(p: Programme, gold: number, neighbours: { country: 
   return { by: rich.country, scholars: n };
 }
 
+// ---------------------------------------------------------------- start groups (§5.11)
+
+interface StartGroup {
+  realms: string[];
+  past: string[];
+  inventions: string[];
+}
+const startGroups = config.start_groups as Record<string, StartGroup>;
+
+/** The start group a map nation belongs to (RSCH-098), or undefined for one in none. */
+export function startGroupOf(nation: string): string | undefined {
+  for (const [g, def] of Object.entries(startGroups)) if (def.realms.includes(nation)) return g;
+  return undefined;
+}
+
+/** Every start group with its realms, for the data checks (INV-RSCH-8). */
+export function startGroupTable(): Record<string, StartGroup> {
+  return startGroups;
+}
+
 /**
- * The inventions a map nation knows at the start: the root and the boughs,
- * every invention whose start regions include a label the nation belongs to
- * (research data), the nation's extra list, and everything those need. No
- * study starts with progress (RSCH-076).
+ * The inventions a map nation knows at the start: the root, the four boughs,
+ * its group's past inventions and Era I and II inventions, its own additions,
+ * minus its own removals; nothing else (RSCH-098).
  */
 export function startingKnowledgeFor(nation: string, t: Tree = tree()): Set<string> {
   const known = startingKnowledge(t);
-  const members = config.start_region_members as Record<string, string[]>;
-  const extra = (config.start_extra as Record<string, string[]>)[nation] ?? [];
-  const add = (id: string): void => {
-    if (known.has(id)) return;
-    const inv = t.inventions.get(id);
-    if (!inv) return;
-    known.add(id);
-    const parentKnown = [inv.parent, ...inv.or_parents].some((x) => known.has(x));
-    if (!parentKnown) add(inv.parent);
-    for (const need of inv.also_needs) add(need);
-  };
-  for (const inv of t.inventions.values()) {
-    if (outOfScope(inv)) continue;
-    if (inv.start_regions.some((label) => (members[label] ?? []).includes(nation))) add(inv.id);
-  }
-  for (const id of extra) add(id);
+  const group = startGroups[startGroupOf(nation) ?? ""];
+  const add = (config.start_add as Record<string, string[]>)[nation] ?? [];
+  const remove = new Set((config.start_remove as Record<string, string[]>)[nation] ?? []);
+  for (const id of [...(group?.past ?? []), ...(group?.inventions ?? []), ...add]) if (!remove.has(id) && t.inventions.has(id)) known.add(id);
   return known;
 }
 
-/** A programme set up for a map nation at the start. */
+/**
+ * What a start set lacks: each invention in it whose parent (or every
+ * alternative) or an "also needs" is missing, with what it misses. Empty when
+ * the set is complete (RSCH-099).
+ */
+export function startSetGaps(known: ReadonlySet<string>, t: Tree = tree()): { id: string; missing: string[] }[] {
+  const out: { id: string; missing: string[] }[] = [];
+  for (const id of known) {
+    const inv = t.inventions.get(id);
+    if (!inv) continue;
+    const missing: string[] = [];
+    if (![inv.parent, ...inv.or_parents].some((x) => known.has(x))) missing.push(inv.parent);
+    for (const x of inv.also_needs) if (!known.has(x)) missing.push(x);
+    if (missing.length) out.push({ id, missing });
+  }
+  return out;
+}
+
+/** A programme set up for a map nation at the start: its start group's knowledge and no study (RSCH-098). */
 export function startingProgramme(nation: string, t: Tree = tree()): Programme {
   const p = newProgramme(nation, t);
   p.known = startingKnowledgeFor(nation, t);
+  const group = startGroupOf(nation);
+  if (group) p.group = group;
   return p;
+}
+
+// ---------------------------------------------------------------- standing (RSCH-097)
+
+/** True for an invention of the eras before 1444, Ancient and Medieval (RSCH-091). */
+export function isPast(inv: Invention): boolean {
+  return config.past_eras.includes(inv.era);
+}
+
+/** The display name of an era: "Ancient", "Medieval", "Era I". */
+export function eraName(era: TreeEra): string {
+  return (config.era_names as Record<string, string>)[era] ?? `Era ${era}`;
+}
+
+/**
+ * A realm's standing: the latest era, from Ancient on, of which it knows at
+ * least a quarter of the inventions in scope, and a quarter of every earlier
+ * era's. Ancient is the floor (RSCH-097).
+ */
+export function standing(known: ReadonlySet<string>, t: Tree = tree()): TreeEra {
+  const all = new Map<TreeEra, number>();
+  const have = new Map<TreeEra, number>();
+  for (const inv of t.inventions.values()) {
+    if (outOfScope(inv)) continue;
+    all.set(inv.era, (all.get(inv.era) ?? 0) + 1);
+    if (known.has(inv.id)) have.set(inv.era, (have.get(inv.era) ?? 0) + 1);
+  }
+  let found: TreeEra = TREE_ERAS[0]!;
+  for (const era of TREE_ERAS) {
+    const n = all.get(era) ?? 0;
+    if (n === 0) continue;
+    if ((have.get(era) ?? 0) < n * config.standing_share) break;
+    found = era;
+  }
+  return found;
+}
+
+/** Eras between a realm's standing and the era of the date: 0 when abreast of the times (RSCH-097). */
+export function behindBy(known: ReadonlySet<string>, date: Day, t: Tree = tree()): number {
+  return Math.max(0, eraIndex(eraOf(date)) - eraIndex(standing(known, t)));
+}
+
+/** Past inventions a realm lacks (to catch up). */
+export function missingPast(known: ReadonlySet<string>, t: Tree = tree()): string[] {
+  return [...t.inventions.values()].filter((i) => isPast(i) && !known.has(i.id)).map((i) => i.id);
+}
+
+// ---------------------------------------------------------------- without it (RSCH-094)
+
+/** What lacking past inventions costs a realm: all neutral for a realm that knows them (RSCH-094). */
+export interface Without {
+  /** Harvest steps added (−1 without F01). */
+  harvestSteps: number;
+  /** Arms the realm can't raise (horse regiments without F03). */
+  noArms: string[];
+  /** No camel caravans (without F03). */
+  noCaravans: boolean;
+  /** Share of the food an army carries, in percent (50 without B01). */
+  foodCarriedPct: number;
+  /** Regiments' strength change in percent (−20 without C01). */
+  strengthPct: number;
+}
+
+interface WithoutRow {
+  harvest_steps?: number;
+  no_arms?: string[];
+  no_caravans?: boolean;
+  food_carried_pct?: number;
+  strength_pct?: number;
+}
+
+export function without(known: ReadonlySet<string>): Without {
+  const out: Without = { harvestSteps: 0, noArms: [], noCaravans: false, foodCarriedPct: 100, strengthPct: 0 };
+  for (const [id, row] of Object.entries(config.without as Record<string, WithoutRow>)) {
+    if (known.has(id)) continue;
+    out.harvestSteps += row.harvest_steps ?? 0;
+    out.noArms.push(...(row.no_arms ?? []));
+    out.noCaravans ||= row.no_caravans ?? false;
+    if (row.food_carried_pct !== undefined) out.foodCarriedPct = Math.min(out.foodCarriedPct, row.food_carried_pct);
+    out.strengthPct += row.strength_pct ?? 0;
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------- the study queue (RSCH-108, RSCH-109)
+
+export const QUEUE_LENGTH: number = config.queue_length;
+
+/** What the realm will have known once the current studies and the queue are learned, in that order. */
+function plannedSet(p: Programme): Set<string> {
+  return new Set([...p.known, ...p.studies.map((s) => s.id), ...p.queue]);
+}
+
+/** True when a queued invention can't start yet: its needs are not known now (RSCH-108). */
+export function queuedWaiting(p: Programme, id: string, date: Day, t: Tree = tree()): boolean {
+  return !eligibility(p, id, date, t).ok;
+}
+
+/**
+ * After a study is learned: the first queued inventions whose needs are now
+ * known become the current studies at once, with no progress lost; one whose
+ * needs are not met is skipped and stays queued, waiting (RSCH-108).
+ */
+export function startFromQueue(p: Programme, date: Day, t: Tree = tree()): string[] {
+  const started: string[] = [];
+  for (const id of [...p.queue]) {
+    if (p.studies.length >= maxStudies(p)) break;
+    if (!eligibility(p, id, date, t).ok) continue;
+    p.queue = p.queue.filter((q) => q !== id);
+    p.studies.push({ id, progress: 0 });
+    started.push(id);
+  }
+  return started;
+}
+
+export type QueueRefusal = Refusal | "queue_full" | "queued";
+
+/**
+ * Add to queue: an invention whose needs are known, being studied or queued
+ * ahead of it goes to the end of the queue (RSCH-109).
+ */
+export function enqueue(p: Programme, id: string, date: Day, t: Tree = tree()): { ok: true } | { ok: false; reason: QueueRefusal } {
+  const inv = t.inventions.get(id);
+  if (!inv) return { ok: false, reason: "unknown" };
+  if (p.known.has(id)) return { ok: false, reason: "known" };
+  if (p.queue.includes(id) || p.studies.some((s) => s.id === id)) return { ok: false, reason: "queued" };
+  if (outOfScope(inv) || !withinCampaign(date)) return { ok: false, reason: "out_of_scope" };
+  const need = needsMet(p, inv, plannedSet(p));
+  if (need) return { ok: false, reason: need };
+  if (p.queue.length >= QUEUE_LENGTH) return { ok: false, reason: "queue_full" };
+  p.queue.push(id);
+  return { ok: true };
+}
+
+/**
+ * The path to an invention: its missing needs, each after its own, in an
+ * order that can be studied, then the invention; what is known, studied or
+ * queued already is left out. Where an invention grows from either of two
+ * parents, one already had (or else the first) is taken. Refused when a step
+ * waits on a contact or lies out of scope (RSCH-109).
+ */
+export function pathTo(p: Programme, id: string, t: Tree = tree()): { ok: true; path: string[] } | { ok: false; reason: Refusal } {
+  const have = plannedSet(p);
+  const path: string[] = [];
+  const bough = new Set([t.root.id, ...t.boughs.map((b) => b.id)]);
+  let refusal: Refusal | null = null;
+  const visit = (x: string): void => {
+    if (refusal || have.has(x) || bough.has(x)) return;
+    const inv = t.inventions.get(x);
+    if (!inv) return void (refusal = "unknown");
+    if (outOfScope(inv)) return void (refusal = "out_of_scope");
+    const parents = [inv.parent, ...inv.or_parents];
+    visit(parents.find((q) => have.has(q) || bough.has(q)) ?? inv.parent);
+    for (const n of inv.also_needs) visit(n);
+    const contact = contactFor(p, inv);
+    if (contact && !p.contacts.has(contact)) refusal ??= "contact";
+    if (refusal) return;
+    have.add(x);
+    path.push(x);
+  };
+  visit(id);
+  if (refusal) return { ok: false, reason: refusal };
+  return { ok: true, path };
+}
+
+/** Queue the path: every missing step to an invention, or none of it when the queue would hold more than 5 (RSCH-109). */
+export function queuePath(p: Programme, id: string, date: Day, t: Tree = tree()): { ok: true; added: string[] } | { ok: false; reason: QueueRefusal } {
+  if (p.known.has(id)) return { ok: false, reason: "known" };
+  if (!withinCampaign(date)) return { ok: false, reason: "out_of_scope" };
+  const r = pathTo(p, id, t);
+  if (!r.ok) return r;
+  if (r.path.length === 0) return { ok: false, reason: "queued" };
+  if (p.queue.length + r.path.length > QUEUE_LENGTH) return { ok: false, reason: "queue_full" };
+  p.queue.push(...r.path);
+  return { ok: true, added: r.path };
+}
+
+/** Removes an invention from the queue, and every queued one that needed it (they could never start). */
+export function dequeue(p: Programme, id: string, t: Tree = tree()): void {
+  p.queue = p.queue.filter((q) => q !== id);
+  // What is left must still be reachable in order; drop the ones that no longer are.
+  const have = new Set([...p.known, ...p.studies.map((s) => s.id)]);
+  const keep: string[] = [];
+  for (const q of p.queue) {
+    const inv = t.inventions.get(q);
+    if (inv && [inv.parent, ...inv.or_parents].some((x) => have.has(x) || isBough(x, t)) && inv.also_needs.every((x) => have.has(x) || isBough(x, t))) {
+      keep.push(q);
+      have.add(q);
+    }
+  }
+  p.queue = keep;
+}
+
+const isBough = (id: string, t: Tree): boolean => id === t.root.id || t.boughs.some((b) => b.id === id);
+
+/**
+ * Moves a queued invention one place earlier (−1) or later (+1). A move that
+ * would put it ahead of something it needs is refused (RSCH-110).
+ */
+export function moveInQueue(p: Programme, id: string, by: -1 | 1, t: Tree = tree()): boolean {
+  const k = p.queue.indexOf(id);
+  const j = k + by;
+  if (k < 0 || j < 0 || j >= p.queue.length) return false;
+  const [first, second] = by < 0 ? [id, p.queue[j]!] : [p.queue[j]!, id];
+  const inv = t.inventions.get(first)!;
+  if ((second === inv.parent && !inv.or_parents.some((x) => p.known.has(x))) || inv.also_needs.includes(second)) return false;
+  p.queue[k] = p.queue[j]!;
+  p.queue[j] = id;
+  return true;
 }
 
 /** The contact event that opens a contact invention (RSCH-077). */

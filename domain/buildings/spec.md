@@ -273,6 +273,7 @@ Works across the province (§7.10)
 - BLD-006 The buildings context shall allow one land building on each land tile (fields, pasture, woods, marsh, waste), of a kind that fits the tile use. [buildings §2.1]
 - BLD-007 The buildings context shall allow one shore building on each shore tile: fishery, saltworks, harbour, shipyard, bridge or lighthouse (also naval base). [buildings §2.1, §7.9]
 - BLD-008 The buildings context shall allow one castle per province on its castle tile, with its granary as a part of the castle and not a second building. [buildings §2.1]
+- BLD-008a The buildings context shall treat the shipyard as part of its province's harbour: it needs a harbour standing, takes no slot of its own, and is where sailors are mustered and ships built (naval NAVY-147, D-NAVY-33). [Leroy, 18 Oct, feedback 116, 117]
 - BLD-009 The buildings context shall give each town the number of town slots of its town size: hamlet 1, village 2, market town 4, town 6, city 9, great city 12. [buildings §2.2]
 - BLD-010 The buildings context shall hold ring works (road, canal, town walls, wells and drains, dykes, watchtower line) as one of each per province, with steps, taking no tile or slot. [buildings §2.1, §7.6, §7.8, §7.10]
 - BLD-011 When a town shrinks below its building count, the buildings context shall keep the buildings and mark the extra ones neglected until the town grows back; the player chooses which on a prompt and the AI drops the newest. [buildings §2.2]

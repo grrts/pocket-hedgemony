@@ -76,7 +76,7 @@ A province outside every castle's reach lives on its own harvest.
 
 ### The Food policy screen
 
-One **Food policy** sets realm-wide defaults, and any castle can have its own value for any setting.
+One **Food policy** sets realm-wide defaults on the realm's **Food** tab, and a castle can have its own collection and siege reserve. Set those on the castle's own province, under **Castle food** on its Overview; tapping a castle on the Food tab takes you there, and **Realm** puts it back on the realm's setting.
 
 | Setting | Options |
 |---|---|

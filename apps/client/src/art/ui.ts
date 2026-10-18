@@ -261,6 +261,7 @@ export const ICONS = {
     "kkkkkkkkkkkk",
   ],
   collapse: ["kk....kk", "kwk..kwk", ".kwkkwk.", "..kwwk..", "...kk..."],
+  back: ["...kk", "..kwk", ".kwk.", "kwk..", "kwk..", ".kwk.", "..kwk", "...kk"],
   close: ["kk....kk", "kwk..kwk", ".kwkkwk.", "..kwwk..", "..kwwk..", ".kwkkwk.", "kwk..kwk", "kk....kk"],
   scroll: [
     ".kkkkkkkk.",
@@ -337,6 +338,18 @@ export const ICONS = {
     "kk.kik.kk",
     ".kkkikkk.",
     "..kkkkk..",
+  ],
+  /** Auto turns (SHELL-159): two play marks, one week after another. */
+  auto: [
+    "k....k....",
+    "kk...kk...",
+    "kyk..kyk..",
+    "kyyk.kyyk.",
+    "kyyykkyyyk",
+    "kyyk.kyyk.",
+    "kyk..kyk..",
+    "kk...kk...",
+    "k....k....",
   ],
 } as const;
 

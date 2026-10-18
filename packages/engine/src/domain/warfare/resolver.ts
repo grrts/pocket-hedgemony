@@ -160,6 +160,8 @@ export interface BattleSide {
   homeland?: boolean;
   forcedMarch?: boolean;
   hungry?: boolean;
+  /** The side's regiments' strength change in percent: −20 without C01 *Iron smelting* (RSCH-094). */
+  strengthPct?: number;
   /** Tokens the enemy has that make styles stale (inventions known, "W8 massed" …). */
   staleTokens?: ReadonlySet<string>;
   /** Companies whose powder was not in the store: they do not fire (WAR-013). */
@@ -418,7 +420,7 @@ function* fightRounds(input: BattleInput, ctl: RoundControl): Generator<void, Ba
         let ground = sec.all + armGround(u.c.arm, input.ground) + (def.horse ? sec.horse : 0);
         if (u.side === 1) ground += sec.defender;
         if (u.side === 0) ground += sec.attackAcross;
-        const ctx = { era, known: s.known, enemyKnown: sides[e]!.known, might, sector: ground, bellInRow: u.bellsInRow + 1, hungry: s.hungry === true, forcedFirstDay: s.forcedMarch === true && days === 1 };
+        const ctx = { era, known: s.known, enemyKnown: sides[e]!.known, might, sector: ground, inventions: 1 + (s.strengthPct ?? 0) / 100, bellInRow: u.bellsInRow + 1, hungry: s.hungry === true, forcedFirstDay: s.forcedMarch === true && days === 1 };
         const enemyHere = active.filter((x) => x.side === e && x.sector === k);
         // Shooting: Shot while it has ammunition and powder; no shooting in a first bell an Assault commander advances.
         const shoots = (roles.includes("Shot") || roles.includes("Guns")) && !(firstBell && assault) && !u.refilling;
@@ -442,7 +444,7 @@ function* fightRounds(input: BattleInput, ctl: RoundControl): Generator<void, Ba
           if (roles.includes("Shock")) {
             const ch = chargeOf({ sectorCharge: sec.charge, firstContact: u.contact === 0, targetRoles: rolesOf(enemyHere[0]!.c), known: s.known, enemyKnown: sides[e]!.known, attackerApproach: approaches[u.side]!.approach, ...(approaches[u.side]!.rule?.["charge"] ? { chargeMul: approaches[u.side]!.rule!["charge"] as number } : {}) });
             mul = ch.dealt;
-            if (ch.taken > 1) dealt.push({ target: [u], hits: hitsOf(enemyHere[0]!.c, { ...ctx, known: sides[e]!.known, enemyKnown: s.known }) * (ch.taken - 1) });
+            if (ch.taken > 1) dealt.push({ target: [u], hits: hitsOf(enemyHere[0]!.c, { ...ctx, known: sides[e]!.known, enemyKnown: s.known, inventions: 1 + (sides[e]!.strengthPct ?? 0) / 100 }) * (ch.taken - 1) });
           }
           dealt.push({ target: enemyHere, hits: hitsOf(u.c, ctx) * mul });
           u.contact += 1;
