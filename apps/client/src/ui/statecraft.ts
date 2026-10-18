@@ -181,7 +181,7 @@ function askWords(a: AskRow): { asks: string; yes: string; no: string; agree: st
 export function askCard(a: AskRow, realmButton: (n: number) => string): string {
   const w = askWords(a);
   return `<div class="call framed-soft">
-    <p>${icon("scroll", 2)} ${realmButton(a.from)}'s envoy ${esc(w.asks)}.</p>
+    <p>${icon("scroll", 2)} An envoy of ${realmButton(a.from)} ${esc(w.asks)}.</p>
     <dl class="facts ask-terms"><dt>${w.agree}</dt><dd>${esc(w.yes)}</dd><dt>Refuse</dt><dd>${esc(w.no)}</dd></dl>
     <p class="hint">He waits at your court until ${monthText(a.until)}; no answer by then is a refusal.</p>
     <div class="choices"><button class="${a.action === "demand" ? "paper" : "wax"}" data-ask="${esc(a.id)}" data-yes="1">${w.agree}</button><button class="${a.action === "demand" ? "wax" : "paper"}" data-ask="${esc(a.id)}" data-yes="0">Refuse</button></div>
