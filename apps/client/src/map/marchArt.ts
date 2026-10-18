@@ -31,29 +31,29 @@ document.fonts?.addEventListener("loadingdone", () => tagCache.clear());
 
 /** Width in CSS pixels of a number tag for this text (feedback: counts were hard to read). */
 export function plateWidth(text: string, u: number): number {
-  return plateBitmap(text, u, PALETTE.ink).width / tagDpr();
+  return plateBitmap(text, u).width / tagDpr();
 }
 
 const tagDpr = () => Math.min(window.devicePixelRatio || 1, 2);
 
 /**
  * A number tag: light parchment with an ink rim and cut corners, the number in the
- * UI's font in dark ink, and a strip of the realm's colour along the bottom.
- * Drawn once per text, size and colour, then reused.
+ * UI's font in dark ink, with even parchment above and below it.
+ * Drawn once per text and size, then reused.
  */
-function plateBitmap(text: string, u: number, color: string): HTMLCanvasElement {
-  const key = `${u}|${color}|${text}`;
+function plateBitmap(text: string, u: number): HTMLCanvasElement {
+  const key = `${u}|${text}`;
   const hit = tagCache.get(key);
   if (hit) return hit;
   const dpr = tagDpr();
-  const fontPx = Math.round(9 * u * 1.15);
+  const fontPx = Math.round(8 * u * 1.15);
   const font = `${fontPx}px ${TAG_FONT}`;
   const canvas = document.createElement("canvas");
   const c = canvas.getContext("2d")!;
   c.font = font;
-  const textW = Math.ceil(c.measureText(text).width);
+  const m = c.measureText(text);
   // Whole art pixels wide, with room either side of the number.
-  const w = (Math.ceil(textW / u) + 6) * u;
+  const w = (Math.ceil(m.width / u) + 6) * u;
   const h = TAG_H * u;
   canvas.width = Math.round(w * dpr);
   canvas.height = Math.round(h * dpr);
@@ -63,24 +63,22 @@ function plateBitmap(text: string, u: number, color: string): HTMLCanvasElement 
   c.fillRect(0, u, w, h - 2 * u);
   c.fillStyle = TAG_PAPER;
   c.fillRect(u, u, w - 2 * u, h - 2 * u);
-  // The realm's colour along the bottom, an ink line above it so pale colours still show.
-  c.fillStyle = color;
-  c.fillRect(u, h - 3 * u, w - 2 * u, 2 * u);
-  c.fillStyle = "rgb(26 28 44 / 0.45)";
-  c.fillRect(u, h - 4 * u, w - 2 * u, u);
   c.font = font;
   c.fillStyle = TAG_INK;
   c.textAlign = "center";
-  c.textBaseline = "middle";
-  c.fillText(text, w / 2, Math.round((h - 3 * u) / 2) + u * 0.5);
+  c.textBaseline = "alphabetic";
+  // Centre the ink of the glyphs, not the em box, so the parchment above and below is the same.
+  const ascent = m.actualBoundingBoxAscent || fontPx * 0.6;
+  const descent = m.actualBoundingBoxDescent || 0;
+  c.fillText(text, w / 2, Math.round(h / 2 + (ascent - descent) / 2));
   tagCache.set(key, canvas);
   if (tagCache.size > 600) tagCache.delete(tagCache.keys().next().value!);
   return canvas;
 }
 
-/** A number tag in a realm's colour, centred on x with its top at y. Returns its height. */
-export function drawPlate(ctx: Ctx, text: string, x: number, y: number, u: number, color: string): number {
-  const img = plateBitmap(text, u, color);
+/** A number tag, centred on x with its top at y. Returns its height. */
+export function drawPlate(ctx: Ctx, text: string, x: number, y: number, u: number): number {
+  const img = plateBitmap(text, u);
   const dpr = tagDpr();
   const w = img.width / dpr;
   const h = img.height / dpr;
@@ -173,14 +171,14 @@ export function drawToken(ctx: Ctx, s: TokenStyle): { x: number; y: number; w: n
   const text = menShort(s.men);
   const plateTop = s.y + 2 * u;
   if (!s.flag) {
-    const plateH = drawPlate(ctx, text, s.x, plateTop, u, s.color);
+    const plateH = drawPlate(ctx, text, s.x, plateTop, u);
     return { x, y, w: img.width, h: img.height + plateH + 2 * u };
   }
   // Flag and men count side by side, centred under the figure, the flag's middle on the plate's.
   const gap = u;
   const plateW = plateWidth(text, u);
   const left = Math.round(s.x - (s.flag.width + gap + plateW) / 2);
-  const plateH = drawPlate(ctx, text, left + s.flag.width + gap + plateW / 2, plateTop, u, s.color);
+  const plateH = drawPlate(ctx, text, left + s.flag.width + gap + plateW / 2, plateTop, u);
   ctx.drawImage(s.flag, left, Math.round(plateTop + (plateH - s.flag.height) / 2));
   const bx = Math.min(x, left);
   return { x: bx, y, w: Math.max(x + img.width, left + s.flag.width + gap + plateW) - bx, h: img.height + plateH + 2 * u };
@@ -227,7 +225,7 @@ export function drawRoute(ctx: Ctx, r: RouteStyle): void {
     }
     carry = d - len;
   }
-  r.weeks.forEach(([x, y], i) => drawWeekMark(ctx, x, y, u, i + 1, r.color));
+  r.weeks.forEach(([x, y], i) => drawWeekMark(ctx, x, y, u, i + 1));
   const [ex, ey] = pts.at(-1)!;
   const pulse = Math.floor(r.t / 300) % 2;
   brackets(ctx, Math.round(ex - 4 * u), Math.round(ey - 4 * u), 8 * u, 8 * u, u, pulse, PALETTE.paper);
@@ -235,8 +233,8 @@ export function drawRoute(ctx: Ctx, r: RouteStyle): void {
 }
 
 /** A numbered marker for where the army will be when a week ends. */
-function drawWeekMark(ctx: Ctx, x: number, y: number, u: number, n: number, color: string): void {
-  drawPlate(ctx, String(n), x, y - (TAG_H * u) / 2, u, color);
+function drawWeekMark(ctx: Ctx, x: number, y: number, u: number, n: number): void {
+  drawPlate(ctx, String(n), x, y - (TAG_H * u) / 2, u);
 }
 
 /** A small standard planted with the foot of its pole dead centre on x, y. */
@@ -347,7 +345,7 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
   for (const f of alive) {
     const age = (t - f.born) / 1400;
     ctx.globalAlpha = 1 - age * age;
-    drawPlate(ctx, f.text, x + f.dx * u, top - 10 * u - age * 14 * u, u, PALETTE.blood);
+    drawPlate(ctx, f.text, x + f.dx * u, top - 10 * u - age * 14 * u, u);
   }
   ctx.globalAlpha = 1;
   floaters.set(b.id, alive);
@@ -366,7 +364,7 @@ function sideBar(ctx: Ctx, x: number, top: number, u: number, men: number, start
   const fill = Math.round((w - 2 * u) * share);
   ctx.fillStyle = color;
   ctx.fillRect(side < 0 ? left + w - u - fill : left + u, top + 10 * u, fill, 2 * u);
-  drawPlate(ctx, menShort(men), left + w / 2, top, u, color);
+  drawPlate(ctx, menShort(men), left + w / 2, top, u);
 }
 
 /** Forgets battles that are over, so their numbers don't linger. */
@@ -396,5 +394,5 @@ export function drawSiegeMark(ctx: Ctx, x: number, y: number, u: number, color: 
     const share = i < pips - 1 ? 1 : progress;
     ctx.fillRect(px, top + u, Math.round(3 * u * share), 3 * u);
   }
-  if (months > 5) drawPlate(ctx, String(months), x + w / 2 + 6 * u, top - 2 * u, u, color);
+  if (months > 5) drawPlate(ctx, String(months), x + w / 2 + 6 * u, top - 2 * u, u);
 }
