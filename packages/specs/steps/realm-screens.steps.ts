@@ -195,8 +195,10 @@ Then("it sets the realm tax default", (s) => {
 
 Then("it shows the debt, its interest and what lenders would still give, with buttons to borrow and repay", (s) => {
   const t = s.treasury;
-  expect(t.debt).toBe(0);
-  expect(t.repay).toEqual([]);
+  // A realm may start owing (REALM-230): the tab shows what the snapshot says, and repay buttons only while it owes.
+  const start = s.snap.debt as number;
+  expect(t.debt).toBe(start);
+  expect(t.repay.length > 0).toBe(start > 0);
   expect(t.canBorrow).toBe(s.snap.canBorrow);
   expect(t.canBorrow).toBeGreaterThan(10);
   expect(t.debtLimit).toBeGreaterThan(0);
@@ -208,12 +210,17 @@ Then("it shows the debt, its interest and what lenders would still give, with bu
 
   act(s, { type: "borrow", gold: ten.gold });
   const owing = treasuryView(s.snap);
-  expect(owing.debt).toBe(ten.owe);
+  expect(owing.debt).toBe(start + ten.owe);
   expect(owing.gold).toBeCloseTo(t.gold + 10);
   expect(owing.canBorrow).toBeLessThan(t.canBorrow);
   expect(owing.interest).toBe(-((s.snap as Snapshot).ledger.find((l) => l.line === "interest")?.gold ?? 0));
   expect(owing.repay.map((b: any) => [b.gold, b.all])).toEqual([[10, false], [owing.debt, true]]);
 
-  act(s, { type: "repay", gold: owing.repay.at(-1)!.gold });
-  expect(treasuryView(s.snap).debt).toBe(0);
+  // Repaying takes the debt down by the gold paid; paying it all clears it.
+  act(s, { type: "repay", gold: 10 });
+  expect(treasuryView(s.snap).debt).toBe(owing.debt - 10);
+  if (!treasuryView(s.snap).repay.at(-1)!.disabled) {
+    act(s, { type: "repay", gold: treasuryView(s.snap).repay.at(-1)!.gold });
+    expect(treasuryView(s.snap).debt).toBe(0);
+  }
 });

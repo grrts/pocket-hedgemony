@@ -1,5 +1,6 @@
-import { stabilityPlaque as plaqueModel, stabilitySection as sectionModel, type Stability } from "@ph/engine";
+import { stabilityPlaque as plaqueModel, stabilitySection as sectionModel, type RevolutionView, type Stability } from "@ph/engine";
 import { icon } from "../art/ui.ts";
+import { revolutionMark } from "./revolution.ts";
 
 /**
  * Stability on screen (realm REALM-203 to REALM-205, F-75): a plaque in the
@@ -8,11 +9,17 @@ import { icon } from "../art/ui.ts";
  * shows and what a tap opens comes from the engine's models (realmScreens.ts).
  */
 
-/** The top bar's plaque: the step in words, tinted by how bad it is; tapping opens the General tab. */
-export function stabilityPlaque(s: Stability, me: number): string {
+/**
+ * The top bar's plaque: the step in words, tinted by how bad it is; tapping
+ * opens the General tab. A brewing or ready revolution adds a mark and names
+ * its lit signs (REVO-090).
+ */
+export function stabilityPlaque(s: Stability, me: number, revo?: RevolutionView | null): string {
   const m = plaqueModel(s);
   const why = m.heldBackBy.length ? `, held back by ${m.heldBackBy.join(" and ")}` : "";
-  return `<button class="plaque stability step-${m.step}" data-realm="${me}" data-realm-open="general" data-stability title="Stability: ${m.words}${why}. Opens the realm's pillars">${icon("crown", 1)}<span>${m.words}</span></button>`;
+  const mark = revolutionMark(revo);
+  const label = `Stability: ${m.words}${why}.${mark ? ` ${mark.label}.` : ""} Opens the realm's pillars`.replace(/"/g, "&quot;");
+  return `<button class="plaque stability step-${m.step}${mark ? ` revo-${mark.colour}` : ""}" data-realm="${me}" data-realm-open="general" data-stability title="${label}" aria-label="${label}">${icon("crown", 1)}<span>${m.words}</span>${mark?.badge ?? ""}</button>`;
 }
 
 /** The General tab's Stability section: the step, what it means and the four pillars. */

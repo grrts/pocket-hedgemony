@@ -30,6 +30,7 @@ import { createFallenState, type FallenState } from "./fallen.ts";
 import { createBeliefState, readBeliefShares, type BeliefState } from "./belief.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
+import { createRevolutionState, type RevolutionState } from "./revolutions.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
 import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
@@ -41,7 +42,7 @@ import type { AchievementLog } from "./achievements.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, PeoplesState, RulerState, FallenState, BeliefState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, RulerState, FallenState, BeliefState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -429,6 +430,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
     ...createRebelState(P, N),
+    ...createRevolutionState(N),
     navy: createNavyState(P),
     explore: createExplorationState(P, N),
     ...createPeoplesState(P, N),

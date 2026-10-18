@@ -11,6 +11,7 @@ import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
+import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
 import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
@@ -148,6 +149,8 @@ export type Order =
   | { type: "answerRebels"; rising: number; answer: "grant" | "talk" | "bribe" }
   /** The verdict on a beaten rising: Pardon, Punish the leaders or Massacre (REBL-050). */
   | { type: "treatRebels"; rising: number; treatment: "Pardon" | "Punish the leaders" | "Massacre" }
+  /** The answer to the player's revolution: Lead, Bend or Fight (REVO-084). */
+  | { type: "answerRevolution"; stance: "lead" | "bend" | "fight" }
   /** Ports, sailors and fleets: muster, buy a ship, sail, board, land, admiral, merge, split, disband (navy.ts). */
   | NavyOrder
   /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
@@ -227,6 +230,7 @@ function startDay(world: World, news: News[]): void {
     monthlyBelief(world, news);
     monthlyMoods(world, news);
     monthlyRebels(world, news);
+    monthlyRevolutions(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
     monthlyResearch(world, news);
@@ -276,6 +280,8 @@ function endDay(world: World, news: News[]): void {
 }
 
 function applyOrder(world: World, order: Order, actingNation: number, news: News[]): string | null {
+  const locked = lockedOrder(world, actingNation, order);
+  if (locked) return locked;
   switch (order.type) {
     case "declareWar":
       return declareWar(world, actingNation, order.target, news);
@@ -406,6 +412,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return answerRebels(world, actingNation, order.rising, order.answer, news);
     case "treatRebels":
       return verdictOrder(world, actingNation, order.rising, order.treatment, news);
+    case "answerRevolution":
+      return answerRevolution(world, actingNation, order.stance, news);
     case "moveBuild":
       return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":

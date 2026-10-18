@@ -189,6 +189,15 @@ export function newRuler(world: World, n: number, news: News[], step: (lord: num
   else if (bordersPlayer(world, n)) news.push({ kind: "ruler", text: `${rulerLabel(old)} of ${world.rules.nations[n]!.name} dies at ${old.age}. ${what}`, nations: [n, world.player] });
 }
 
+/**
+ * A revolution's regime takes the throne (revolutions REVO-039): the
+ * rising's leader, or a ruler the lords elect, with no title of the old house,
+ * 0 years on the throne, new traits and no heir. The regime posts its own news.
+ */
+export function revolutionRuler(world: World, n: number, leader: string | null): void {
+  world.rulers[n] = { title: null, name: leader ?? givenName(world, n), sex: "m", age: between(world.rulerRng, R.kinsman_age), years: 0, traits: drawTraits(world.rulerRng), heir: null, regent: null };
+}
+
 const FEMALE_OF: Record<string, string> = { King: "Queen", Duke: "Duchess", Emperor: "Empress", Count: "Countess", "Grand Duke": "Grand Duchess", "Grand Prince": "Grand Princess" };
 const MALE_OF: Record<string, string> = Object.fromEntries(Object.entries(FEMALE_OF).map(([m, f]) => [f, m]));
 
