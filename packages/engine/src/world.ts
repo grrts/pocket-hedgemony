@@ -21,7 +21,7 @@ import { createLandState, seedLand, type LandState } from "./land.ts";
 import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
-import type { GameEvents } from "./events.ts";
+import { createGameEvents, type GameEvents } from "./events.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -126,7 +126,7 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
   commanderSeed: number[];
-  /** The event tree in play (milestone 6), set up on the first month. */
+  /** The event tree in play (milestone 6). */
   events?: GameEvents;
 }
 
@@ -448,6 +448,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
   syncCountries(world);
 
+  // The event tree starts with the campaign, so its first month costs no more than any other.
+  world.events = createGameEvents(world);
   return world;
 }
 

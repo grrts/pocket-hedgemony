@@ -1,5 +1,5 @@
 import type { Rng } from "../../rng.ts";
-import { holds, holdsIfBound, leaves, resolve, type Ctx, type LeafEval } from "./conditions.ts";
+import { holds, holdsIfBound, holdsSoFar, leaves, resolve, type Ctx, type LeafEval } from "./conditions.ts";
 import { applyEffects, effectType, type Applied, type EffectCtx, type EffectEval } from "./effects.ts";
 import { expired } from "./modifiers.ts";
 import { deriveAll } from "./mapping.ts";
@@ -265,9 +265,16 @@ export function roleCandidates(s: EventState, ev: EventDef, role: string): strin
   if (!r) throw new Error(`${ev.id} has no role ${role}`);
   if (r.select === "fixed") return [...r.historical];
   const sel = r.select;
-  return Object.entries(s.world.countries)
-    .filter(([id, c]) => c.exists !== false && (sel.where === undefined || `region:${c.region}` === sel.where) && holdsIfBound(sel.condition, s.world, ctxOf(s, {}, { this: id })) === true)
-    .map(([id]) => id);
+  // Read every month for every country, so it walks the countries without copying them.
+  const ctx: Ctx = ctxOf(s, {});
+  const out: string[] = [];
+  for (const id in s.world.countries) {
+    const c = s.world.countries[id]!;
+    if (c.exists === false || (sel.where !== undefined && `region:${c.region}` !== sel.where)) continue;
+    ctx.this = id;
+    if (holdsIfBound(sel.condition, s.world, ctx) === true) out.push(id);
+  }
+  return out;
 }
 
 /**
@@ -348,6 +355,8 @@ export function reemerge(s: EventState, entity: string): string[] {
 export function eligible(s: EventState, ev: EventDef): Record<string, string[]>[] {
   if (checkInvalidation(s, ev)) return [];
   if (gate(s, ev)) return [];
+  // A trigger already false before any role is bound is false for every binding: skip counting the candidates.
+  if (holdsSoFar(ev.trigger, s.world, ctxOf(s, {})) === false) return [];
   const out: Record<string, string[]>[] = [];
   for (const roles of bindings(s, ev)) {
     if (repeatBlocks(s, ev, roles)) continue;

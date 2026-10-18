@@ -1005,6 +1005,21 @@ button.small {
   animation: alert-in 0.2s steps(4);
 }
 
+/* Long event names wrap rather than lose their end. */
+.event-card .ribbon {
+  white-space: normal;
+  overflow: visible;
+}
+
+/* Wide screens: with a side panel open, the card sits in the map beside it, so both can be read at once. */
+@media (min-width: 900px) and (min-height: 600px) {
+  :root:has(#panel:not([hidden]):not(.chooser)) .event-card {
+    --side: max(33.333vw, 340px);
+    left: calc(var(--side) + (100vw - var(--side) - 64px) / 2);
+    width: min(620px, calc(100vw - var(--side) - 84px));
+  }
+}
+
 .event-card header {
   display: flex;
   align-items: flex-start;

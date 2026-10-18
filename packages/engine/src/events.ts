@@ -74,6 +74,10 @@ export function createGameEvents(world: World): GameEvents {
   sync(world, g);
   evt.yearlyAgeCheck(state, world.date.year);
   evt.periodCheck(state, world.date.year);
+  // One dry look at every event while the campaign loads, so the first month of play is no slower than the rest.
+  const bound = { ...state.bound };
+  for (const ev of Object.values(state.events)) evt.eligible(state, ev);
+  state.bound = bound;
   return g;
 }
 
@@ -342,13 +346,18 @@ const STAT_WORDS: Record<string, string> = { treasury: "gold", war_weariness: "w
 /** One effect in words for the card, or null for the tree's own bookkeeping (flags, periods, unlocks). */
 function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<string, string[]>, me: number, when: string): string | null {
   const [type, p] = evt.effectType(e);
+  // An effect on a role no realm fills lands on no one, so it is not shown.
+  let nobody = false;
   const who = (t: unknown): string => {
     const ids = typeof t === "string" && t.startsWith("$") ? roles[t.slice(1)] : Array.isArray(t) ? t.flatMap((x) => (typeof x === "string" && x.startsWith("$") ? (roles[x.slice(1)] ?? []) : [String(x)])) : [String(t)];
-    if (!ids?.length) return `the ${humanize(String(t).replace("$", ""))}`;
+    if (!ids?.length) {
+      nobody = true;
+      return "";
+    }
     const names = ids.map((id) => (g.nationOf.get(id) === me ? "you" : nameOf(world, g, id)));
     return names.length > 3 ? `${names.slice(0, 2).join(", ")} and ${names.length - 2} more` : names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names[0]!;
   };
-  const place = (k: unknown) => humanize(String(k));
+  const place = (k: unknown) => data.entities[String(k)] ?? humanize(String(k)).replace(/\b\w/g, (c) => c.toUpperCase());
   const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
   const sign = (c: unknown) => (typeof c === "number" && c > 0 ? `+${c}` : String(c));
   const maybe = e.if === undefined ? "" : " (in some cases)";
@@ -413,7 +422,7 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
       text = `Trade route ${place(p.from_hub ?? p.from)} to ${place(p.to_hub ?? p.to)} ${p.open === false ? "closes" : "opens"}`;
       break;
   }
-  return text === null ? null : `${when}${text}${maybe}`;
+  return text === null || nobody ? null : `${when}${text}${maybe}`;
 }
 
 // ---------------------------------------------------------------- saves
@@ -422,23 +431,24 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
 export type SavedEvents = Omit<evt.EventState, "rules" | "events" | "ages" | "periods" | "log" | "conditions" | "effects" | "mayRefire"> & {
   rng: number[];
   eventRelations: GameEvents["eventRelations"];
-  adjust: GameEvents["adjust"];
+  /** The game's own adjustments ("adjust" would read as map adjacency to the save checks). */
+  shifts: GameEvents["adjust"];
 };
 
 export function saveEvents(world: World): SavedEvents | undefined {
   const g = world.events;
   if (!g) return undefined;
   const { rules: _r, events: _e, ages: _a, periods: _p, log: _l, conditions: _c, effects: _f, mayRefire: _m, ...kept } = g.state;
-  return { ...kept, rng: [...g.rng.state], eventRelations: g.eventRelations, adjust: g.adjust };
+  return { ...kept, rng: [...g.rng.state], eventRelations: g.eventRelations, shifts: g.adjust };
 }
 
-/** Puts a saved event tree back on a restored world; a save from before events starts the tree afresh on the next month. */
+/** Puts a saved event tree back on a restored world; a save from before events keeps the fresh 1444 tree. */
 export function restoreEvents(world: World, saved: SavedEvents): void {
   const g = createGameEvents(world);
-  const { rng, eventRelations, adjust, ...state } = saved;
+  const { rng, eventRelations, shifts, ...state } = saved;
   Object.assign(g.state, state);
   g.rng = new Rng(Uint32Array.from(rng));
   g.eventRelations = eventRelations;
-  g.adjust = adjust;
+  g.adjust = shifts;
   world.events = g;
 }

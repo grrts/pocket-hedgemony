@@ -46,7 +46,7 @@ export function waitingEventsHtml(cards: EventCard[]): string {
   return cards
     .map(
       (c) => `<div class="call framed-soft">
-        <p>${icon("scroll", 2)} <b>${esc(c.title)}</b>: ${c.kind === "offered" ? "a decision is open to you" : "your answer is awaited"}.</p>
+        <p>${icon("scroll", 2)} <span><b>${esc(c.title)}</b>: ${c.kind === "offered" ? "a decision is open to you" : "your answer is awaited"}.</span></p>
         <div class="choices"><button class="wax" data-event-open="${esc(c.event)}">Answer</button></div>
       </div>`,
     )
