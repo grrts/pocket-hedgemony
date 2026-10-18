@@ -21,14 +21,14 @@ Feature: Playing as a subject
   Scenario Outline: Asking to loosen
     Given the player plays the Loyal Vassal "S" of the AI country "O"
     And "O" <state>
-    When "S" sends an envoy to ask politely for a looser kind
+    When "S" sends an envoy to ask politely for a looser type
     Then the ask is <result>
 
     Examples:
       | state                          | result  |
       | is cautious                    | granted |
-      | is over its reach              | granted |
-      | is neither cautious nor over reach | refused |
+      | is over its subject limit      | granted |
+      | is neither cautious nor over its subject limit | refused |
 
   @SUBJ-104
   Scenario: The subject becomes the master

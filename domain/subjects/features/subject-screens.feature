@@ -6,11 +6,11 @@ Feature: Subjects on screen
 
   @SUBJ-091
   Scenario: The subjects list of France
-    Given "France" uses 7 of 9 reach and receives 42 gold and 6 grain a month in tribute
+    Given "France" uses 7 of its subject limit of 9 and receives 42 gold and 6 grain a month in tribute
     When the player opens the subjects tab of the country card
-    Then the header reads "SUBJECTS 7 of 9 reach" and "Tribute 42 gold / 6 grain a month"
+    Then the header reads "SUBJECTS 7 of 9 allowed" and "Tribute 42 gold / 6 grain a month"
     And the rows are sorted by loyalty, worst first
-    And each row shows the kind icon, name, loyalty, up and down arrow counts, what it pays and its worst reason
+    And each row shows the type icon, name, loyalty, up and down arrow counts, what it pays and its worst reason
 
   @SUBJ-091
   Scenario: A row shows its worst reason

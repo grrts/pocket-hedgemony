@@ -263,7 +263,7 @@ Once a year, alongside traders and the trade balance: pulls, hold and the 3 % mo
 - **Province card, Faith line**: each faith's share and whether it is rising or falling. Tap it to see this year's pulls for each faith with their sources, each community's state, and how fast the mix is moving and toward which faith. For example, Rouen at catholic 61 % falling, protestant 37 % rising and jewish 2 % shows the protestant community served by its own church and Tolerated, and the jewish 2 % as below a community with no grievance.
 - **Country card, Faith row**: for example "Catholic · 78 % of people · 3 more faiths · 2 preachers · holds no holy place". Tap it to open the **Faith policy screen**, with one row per faith. Preachers are also listed under Abroad.
 - **Faith %** is the share of people of the state faith or a faith layered with it. Ming, with 10 % confucian_ritual, 50 % mahayana, 30 % daoist and 10 % asian_traditional not yet layered, has a Faith % of 90.
-- **The Faith lens**: at world zoom, provinces coloured by majority faith, hatched where another faith's community is 30 % or more, with holy-place icons. At region zoom, houses as town sprites, preachers as walking figures and waves as a spreading tint. At local zoom, the Faith line.
+- **The Faith map mode**: at world zoom, provinces coloured by majority faith, hatched where another faith's community is 30 % or more, with holy-place icons. At region zoom, houses as town sprites, preachers as walking figures and waves as a spreading tint. At local zoom, the Faith line.
 
 ### In the game now
 
@@ -274,7 +274,7 @@ Every province starts in 1444 with up to three faiths from its realm's start mix
   - Tolerated: houses stand, normal tax.
   - Restricted: a quarter more tax from its people, no new houses, your faith pulls harder; *Wrong faith* where it is the majority.
   - Persecuted: its houses close at New Year and its people pay no tax, your faith pulls twice as hard; *Persecuted*, which counts as two grievances, wherever it is a tenth or more.
-- **The Faiths lens**: provinces coloured by majority faith, hatched where a second faith holds 30 % or more.
+- **The Faiths map mode**: provinces coloured by majority faith, hatched where a second faith holds 30 % or more.
 - Faiths move each New Year, a fraction of a point at a time.
 
 Not in yet: building or paying for houses, preachers, expulsion and the Inquisition, changing the state faith, holy places, lords' faith, faith waves, and the computer players changing their policy.
@@ -296,7 +296,7 @@ Not in yet: building or paying for houses, preachers, expulsion and the Inquisit
 - [Subjects](Subjects): preachers enter subjects without permission.
 - [Revolutions](Revolutions): faith revolutions use waves; regimes may lead to the church events.
 - [The-1444-Start](The-1444-Start): the ruler's faith and each province's starting mix.
-- [Map-and-Lenses](Map-and-Lenses): the Faith lens, house sprites, preachers and wave tint.
+- [Map and Map Modes](Map-and-Lenses): the Faith map mode, house sprites, preachers and wave tint.
 - [Time-and-Turns](Time-and-Turns): the yearly slot and New Year policy changes.
 
 ## Numbers

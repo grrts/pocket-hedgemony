@@ -604,7 +604,7 @@ Then("he leaves with his retinue to defend his lands", (s) => {
 function contract(country: string, months: number): R.Contract {
   return { company: R.newCompany({ kind: "hired company", arm: "pikes", men: 800, arms: 8 }), captain: "a Swiss captain", people: "Swiss Confederacy", months, upFront: 3000, monthlyPay: 1200 };
 }
-Given("the country {string} signs a contract for {int} months with a Swiss free company", (s, country: string, months: number) => {
+Given("the country {string} signs a contract for {int} months with a Swiss mercenary company", (s, country: string, months: number) => {
   s.country = country;
   s.army = R.newArmy("army", country);
   s.treasury = { gold: 10000 };
@@ -620,7 +620,7 @@ Then("Venice pays gold up front and monthly pay", (s) => {
   expect(R.payThisMonth(s.contract.company)).toEqual({ treasury: true, multiplier: 3 });
 });
 Then("no recruits are taken from its provinces", (s) => expect(s.hire.recruitsTaken).toBe(0));
-Given("the country {string} has a hired free company", (s, country: string) => {
+Given("the country {string} has a hired mercenary company", (s, country: string) => {
   s.contract = contract(country, 6);
   s.state = { monthsServed: 2 };
 });
@@ -630,7 +630,7 @@ When("its contract ends", (s) => {
 When("an enemy outbids Venice", (s) => {
   s.state.enemyOffer = s.contract.monthlyPay * 2;
 });
-Then("the free company leaves Venice's service", (s) => {
+Then("the mercenary company leaves Venice's service", (s) => {
   expect(R.hireEnds(s.contract, s.state)).toBe(true);
   expect(R.hireEnds(s.contract, { monthsServed: 2 })).toBe(false);
 });
@@ -2045,7 +2045,7 @@ When("it graduates a commander", (s) => {
   if (st) s.cmd.styles = [st];
 });
 Then("he takes the style {string}", (s, name: string) => expect(cmd(s).styles).toEqual([name]));
-Given("the country {string} hires a Swiss free company with its captain", (s) => {
+Given("the country {string} hires a Swiss mercenary company with its captain", (s) => {
   s.captain = R.hiredCaptainStyle("Swiss Confederacy");
 });
 Then("the captain fights in the style {string}", (s, name: string) => expect(s.captain).toBe(name));

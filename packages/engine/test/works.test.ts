@@ -362,14 +362,14 @@ describe("works (milestone 4)", () => {
     const n = nation(w, "castile");
     const rough = [...Array(w.provinceCount).keys()].find((p) => w.provinceOwner[p] === n && (w.provinceGround[p] === "hills" || w.provinceGround[p] === "mountains") && tilesOf(w, p, "waste") > 0 && worksAt(w, p, work("mine")) === 0)!;
     w.provinceSeam[rough] = -1;
-    expect(whyNot(w, n, rough, work("mine"))).toBe("no seam has been found here");
+    expect(whyNot(w, n, rough, work("mine"))).toBe("no ore deposit has been found here");
     w.provinceSeam[rough] = SEAM_WARES.indexOf("iron");
     w.provinceSeamYears[rough] = 2;
     w.provinceWorks[rough * WORK_COUNT + work("lumber camp")] = 0;
     for (let k = w.adjStart[rough]!; k < w.adjStart[rough + 1]!; k++) w.provinceWorks[w.adjList[k]! * WORK_COUNT + work("lumber camp")] = 0;
     expect(whyNot(w, n, rough, work("mine"))).toBe("needs timber: a lumber camp here or next door");
     w.provinceWorks[rough * WORK_COUNT + work("lumber camp")] = 1;
-    expect(whyNot(w, n, rough, work("mine"))).not.toMatch(/seam|timber/);
+    expect(whyNot(w, n, rough, work("mine"))).not.toMatch(/ore deposit|timber/);
     // A mine standing adds its ore to the province's goods (TRADE-129), silver at the precious price.
     const before = goods(w, rough);
     w.provinceWorks[rough * WORK_COUNT + work("mine")] = 1;

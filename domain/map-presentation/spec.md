@@ -11,7 +11,7 @@ rule of the system that owns the stat.
 **In scope**
 - Zoom levels (World, Region, Local) and what is drawn at each, collected from every system's design.
 - Rendering by zoom (terrain colour with owner wash; 4 × 4 and 8 × 8 art pixels per map pixel; borders).
-- Map lenses: the list, what each colours, lens patterns and colour-blind ramps.
+- Map modes (was map lenses): the list, what each colours, patterns and colour-blind ramps.
 - Parchment (fog) as a display layer over what a country has not charted; its display toggle.
 - Overlays: labels, towns, armies, routes as drawn things.
 - Turn playback on the map (speed, battle flashes, castle rings, slowing for player battles).
@@ -58,8 +58,8 @@ Newest decision first.
 | World zoom | Farthest view: owner colours, lenses, front lines, banners | — |
 | Region zoom | Middle view: towns, castles, roads, routes, sprites | — |
 | Local zoom | Close view: the province's tile row as pixel art; still the map, not a screen | The province card |
-| Lens | A map mode that recolours provinces by one stat | A card; a filter on the realm picker |
-| Lens picker | The small pop-over from the tool column that switches lenses | — |
+| Map mode (was Lens) | A way of colouring the map that recolours provinces by one stat. The rest of this spec, config and ids still say lens | A card; a filter on the realm picker |
+| Map mode picker (was Lens picker) | The small pop-over from the tool column that switches map modes, titled "Map mode" | — |
 | Parchment | The drawn fog over land and sea a country has not charted | Fog of war over enemy armies (rumours, warfare 5.4) |
 | Overlay | What is drawn over the shaded map: labels, towns, armies, routes | — |
 | Owner wash | The owner's colour laid over the terrain colour at World zoom | A lens colour |
@@ -121,11 +121,11 @@ Newest decision first.
 - VIEW-017 (State-driven): While at Region zoom, colonial range shall show as a faint line on the sea and colonisable provinces with a pale flag. [exploration §7]
 - VIEW-018 (State-driven): While at Local zoom, the province's tile row shall show as pixel art: each tile's building as a sprite, burned tiles in ash, workers moving on busy tiles, ships in the harbour, caravans on the road, barges on the river; marching armies as columns of foot, horse, guns and wagons in proportion. [province-stats §14; trade §10.1; troop-movement §10.5]
 - VIEW-019 (State-driven): While at Local zoom, a battle shall be shown on the province's tile row, and a siege as the castle tile with breaches drawn in the walls. [warfare §14, §7.15]
-- VIEW-020 (Ubiquitous): Each system added after the province and warfare designs shall state what it shows at each zoom, including its map lens; a system that gives no zoom table shows its lens at every zoom and its card at Local only. [gap-lists List 1 item 29; D-VIEW-7]
+- VIEW-020 (Ubiquitous): Each system added after the province and warfare designs shall state what it shows at each zoom, including its map mode; a system that gives no zoom table shows its lens at every zoom and its card at Local only. [gap-lists List 1 item 29; D-VIEW-7]
 
 ### 5.3 Lenses
 
-- VIEW-021 (Ubiquitous): A map lens shall recolour the map by one stat, chosen from the lens picker in the tool column. [province-stats §14; screen-flow §4.2, §4.7]
+- VIEW-021 (Ubiquitous): A map mode shall recolour the map by one stat, chosen from the map mode picker in the tool column. [province-stats §14; screen-flow §4.2, §4.7]
 - VIEW-022 (Ubiquitous): The lens list shall hold the province lenses Food, Tax reaching you, Days to capital, Grievances, Faith, Language, Ground, Recruits; the trade lenses Trade ratio, Trade value and Traders (Trade ratio and Trade value replace Traders passing and Trade balance); and the lenses Diplomacy, Sea, Works, Jobs, Subjects and Revolution. [province-stats §14; trade §10.1; diplomacy §13.1; naval §10; buildings §11.1; subjects §10.3; revolutions §13] The picker also keeps the build's Realms, Terrain, People, Wealth and Walls, 22 lenses in all, and scrolls on a phone (D-VIEW-2).
 - VIEW-023 (Ubiquitous): The Faith lens shall colour each province by its majority faith, hatched where a community of another faith is 30 % or more; holy places carry a small icon. [religion §12]
 - VIEW-024 (Ubiquitous): The Language lens shall colour by language family at far zoom and by language at regional zoom, with a toggle to same language / related / foreign colours for the player's realm, and outline homelands of peoples without a country. [culture §7.3]
@@ -141,7 +141,7 @@ Newest decision first.
 
 - VIEW-032 (Ubiquitous): Land and sea a country has not charted shall lie under the parchment. [exploration §3.1]
 - VIEW-033 (Ubiquitous): The parchment shall show the charted map, which only grows; it replaces today's "6 steps from your lands and armies". [exploration §3.1, §9]
-- VIEW-034 (Optional): Where the player turns off "Parchment over unknown lands" in the lens menu, the map shall show the whole world; the switch is display only and never lets anything enter uncharted zones. [settings §4.3; main.ts; D-VIEW-3]
+- VIEW-034 (Optional): Where the player turns off "Hide unexplored lands" in the map mode menu, the map shall show the whole world; the switch is display only and never lets anything enter uncharted zones. [settings §4.3; main.ts; D-VIEW-3]
 
 ### 5.5 Month playback
 
@@ -321,8 +321,8 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 ## 13. Decisions and open questions
 
 - **D-VIEW-1** (was OQ-VIEW-1) Sharpness: Sharpness applies to the overlay only (Balanced up to 2, Native up to 3 device pixels per CSS pixel); the map canvas always shades 1 pixel per CSS pixel. It keeps the performance rule and the code.
-- **D-VIEW-2** (was OQ-VIEW-2) Lenses: the lens picker holds the build's six (Realms, Terrain, People, Wealth, Walls, Food) and every lens the designs add (Tax reaching you, Days to capital, Grievances, Faith, Language, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects, Revolution), 22 in all, in a scrolling picker on a phone; Trade ratio and Trade value replace Traders passing and Trade balance. Keep what the game does and follow trade v2 (X-6).
-- **D-VIEW-3** (was OQ-VIEW-3) Parchment: "Parchment over unknown lands" is a display toggle only; it never lets the player enter uncharted zones, which stays exploration's rule, and "fog" in the new-game options is the fog-of-war campaign rule, a different thing. X-15: settings never change results.
+- **D-VIEW-2** (was OQ-VIEW-2) Lenses: the map mode picker holds the build's six (Realms, Terrain, People, Wealth, Walls, Food) and every lens the designs add (Tax reaching you, Days to capital, Grievances, Faith, Language, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects, Revolution), 22 in all, in a scrolling picker on a phone; Trade ratio and Trade value replace Traders passing and Trade balance. Keep what the game does and follow trade v2 (X-6).
+- **D-VIEW-3** (was OQ-VIEW-3) Parchment: "Hide unexplored lands" (was "Parchment over unknown lands") is a display toggle only; it never lets the player enter uncharted zones, which stays exploration's rule, and "fog" in the new-game options is the fog-of-war campaign rule, a different thing. X-15: settings never change results.
 - **D-VIEW-4** (was OQ-VIEW-4) Zoom names: there are three zoom levels, World, Region and Local; "Province" in naval and exploration means Local. The simpler set.
 - **D-VIEW-5** (was OQ-VIEW-5) Zoom boundaries: World below camera zoom 2, Region from 2 to under 4, Local from 4 (provisional in `map-presentation.json`). Missing numbers get provisional values.
 - **D-VIEW-6** (was OQ-VIEW-6) Playback and battles: the turn plays back as the day loop runs over its 7 days (X-18); while a player battle runs, playback slows to six 4-hour steps a day (provisional 0.5 s each) and never stops or skips; a battle bar lets the player switch between running battles; there are no half-second pauses. X-1 and X-18 (Leroy, 17 Oct) settle it.
@@ -359,7 +359,7 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-020 | zoom-content.feature | A new system with no zoom table falls back to its lens and a Local card |
 | VIEW-021 | lenses.feature | Picking a lens recolours the map |
 | VIEW-022 | lenses.feature | The lens list holds every system's lens |
-| VIEW-022 | lenses.feature | The lens picker holds 22 lenses and scrolls on a phone |
+| VIEW-022 | lenses.feature | The map mode picker holds 22 map modes and scrolls on a phone |
 | VIEW-023 | lenses.feature | The Faith lens hatches large minority communities |
 | VIEW-024 | lenses.feature | The Language lens changes with zoom and a toggle |
 | VIEW-024 | lenses.feature | Homelands of peoples without a country are outlined |

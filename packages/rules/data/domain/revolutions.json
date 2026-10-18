@@ -1131,7 +1131,7 @@
    "form": "household_realm",
    "ruler": "replaced",
    "lords": "No new land grants: ministers, officials and fort commanders are paid in gold, not land. A council of eight ministers are your officials.",
-   "levy": "Light horse and hill infantry; a fleet on the home coast.",
+   "levy": "Light cavalry and hill infantry; a fleet on the home coast.",
    "decrees": [
     "protection_tribute",
     "garrison_hill_forts"

@@ -42,7 +42,7 @@ Feature: Commander styles
 
   @WAR-140
   Scenario: Hired captains carry their people's style abroad
-    Given the country "Milan" hires a Swiss free company with its captain
+    Given the country "Milan" hires a Swiss mercenary company with its captain
     When the battle rules are applied
     Then the captain fights in the style "Gewalthaufen"
 

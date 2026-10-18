@@ -561,7 +561,7 @@ Given("the lens {string} is on", (s, id: string) => {
   s.view = setLens(newMapView(), id).view;
 });
 
-When("the player picks {string} from the lens picker", (s, id: string) => {
+When("the player picks {string} from the map mode picker", (s, id: string) => {
   const r = setLens(s.view, id);
   s.view = r.view;
   s.event = r.event;
@@ -1670,10 +1670,10 @@ Then("the castle tile shows its walls with one breach", (s) => {
 // ---------------------------------------------------------------------------
 // Decided rules (D-VIEW-1, 2, 3, 5, 7, 9)
 
-Given("the lens picker", (s) => {
+Given("the map mode picker", (s) => {
   s.phone = false;
 });
-Given("the lens picker on a phone", (s) => {
+Given("the map mode picker on a phone", (s) => {
   s.phone = true;
 });
 When("the lenses are listed", (s) => {
@@ -1695,7 +1695,7 @@ Then("the lenses {string} and {string} are not offered", (s, a: string, b: strin
   expect(s.picker.lenses).not.toContain(b);
 });
 
-Given(/^the switch "Parchment over unknown lands" is (on|off)$/, (s, sw: string) => {
+Given(/^the switch "Hide unexplored lands" is (on|off)$/, (s, sw: string) => {
   s.view = { ...newMapView(), parchment: sw === "on" };
   s.charted = new Set(["Castile", "Canaries"]);
   s.chartedBefore = new Set(s.charted);

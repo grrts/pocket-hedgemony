@@ -520,10 +520,10 @@ export function navyOrder(world: World, o: NavyOrder, n: number, news: News[]): 
 
 export function muster(world: World, n: number, p: number, count: number): string | null {
   if (p < 0 || p >= world.provinceCount || world.provinceOwner[p] !== n) return "not your province";
-  if (!isPort(world, p)) return "sailors are mustered only in a port: build a harbour first";
+  if (!isPort(world, p)) return "sailors are recruited only in a port: build a harbour first";
   if (world.provinceOccupier[p]! >= 0) return "the enemy holds the port";
   count = Math.floor(count);
-  if (count < 1) return "muster at least one sailor";
+  if (count < 1) return "recruit at least one sailor";
   if (count > callable(world, p)) return "not that many men here can go to sea";
   const gold = musterGold(count);
   if (world.nationTreasury[n]! < gold) return "not enough gold for the bounty";

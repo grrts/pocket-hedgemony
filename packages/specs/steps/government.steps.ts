@@ -533,7 +533,7 @@ Then("the form gives {int} officials and {int} lords to the caps", (s, o: number
   expect([cap.officials.total, cap.lords.total]).toEqual([o, l]);
 });
 
-Then("the form changes subject reach by {int}", (s, n: number) => {
+Then("the form changes subject limit by {int}", (s, n: number) => {
   expect(s.form.subjectReach).toBe(n);
 });
 
@@ -549,16 +549,16 @@ Given("the country {string} has the catalogue administrative capacity {string}",
   country(s, name).capacity = capacityFromName(capacity);
 });
 
-When("its subject reach is worked out", (s) => {
+When("its subject limit is worked out", (s) => {
   s.acted = true;
 });
 
-Then("the subject reach of {string} is {int}", (s, name: string, n: number) => {
+Then("the subject limit of {string} is {int}", (s, name: string, n: number) => {
   const c = country(s, name);
   expect(subjectReach(c.capacity!, c.form)).toBe(n);
 });
 
-Then("the country {string} has no subject reach and can hold no subjects", (s, name: string) => {
+Then("the country {string} has no subject limit and can hold no subjects", (s, name: string) => {
   const f = country(s, name).form;
   for (const capacity of ["very_low", "low", "moderate", "high", "very_high"] as const) expect(subjectReach(capacity, f)).toBeNull();
 });

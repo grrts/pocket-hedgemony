@@ -223,7 +223,7 @@ For France the screen reads:
 | Basque | 0.1 m | foreign | 1 prov | homeland, Own-language charter |
 | Jewish | 0.02 m | trading | 6 towns | +10 % trade in Paris, Lyon |
 
-- **The Language lens**: provinces coloured by family at far zoom and by language at regional zoom, with a toggle to same language, related and foreign colours for your realm. Homelands of peoples without a country are outlined.
+- **The Language map mode**: provinces coloured by family at far zoom and by language at regional zoom, with a toggle to same language, related and foreign colours for your realm. Homelands of peoples without a country are outlined.
 
 ### In the game now
 
@@ -232,7 +232,7 @@ Every province starts in 1444 with up to three languages from its realm's start 
 - **Province card, Language line**: the three languages with their dots. Tap it to open this year's drift: the language it drifts toward, why (yours where you have held it 20 years and govern it through an official or lord, else the local majority) and each group's rate with its reasons. Tap again to close it.
 - **Your realm card, Peoples tab** (next to Government): the court language, Language % (the same language plus half of the related ones), one fold per family with a row per language (share, people, relation, provinces, where it is the majority, aggrieved provinces) and the **Language policy** buttons: Let be, Teach (the 1444 default) and Impose. Impose needs Printing or a chancery tradition; until then its button is greyed out and says so. The General tab's Language line opens the tab.
 - **Grievances**: *Foreign rule* where most people speak a language foreign to the court in their own homeland, on land taken after 1444 (land you held at the start never has it, or 394 provinces in 13 realms would start aggrieved); *Banned language* where you Impose and most people speak a foreign language.
-- **The Languages lens**: each province coloured by the family of the language most speak, with a key of the largest families.
+- **The Languages map mode**: each province coloured by the family of the language most speak, with a key of the largest families.
 - Drift runs each New Year, so a share moves by a fraction of a point a year: a generation, not a season. There is no list of accepted cultures: who counts as yours comes from same language, related and foreign.
 
 Not in yet: per-province homelands, officials' and lords' own languages, schools and town classes speeding drift, people fleeing, charters, and the computer players changing their policy.
@@ -256,7 +256,7 @@ Not in yet: per-province homelands, officials' and lords' own languages, schools
 - [Revolutions](Revolutions): creole languages and nationalism as signs; regimes set the court language.
 - [Naval](Naval): seafaring languages drift slowly on the coast; sailors keep their language.
 - [Music-and-Sound](Music-and-Sound): the music palette follows the court language's family.
-- [Map-and-Lenses](Map-and-Lenses): the Language lens, dots and outlines.
+- [Map and Map Modes](Map-and-Lenses): the Language map mode, dots and outlines.
 - [The-1444-Start](The-1444-Start): court languages and each province's starting languages.
 - [Time-and-Turns](Time-and-Turns): the yearly drift slot and the 5-yearly checks.
 

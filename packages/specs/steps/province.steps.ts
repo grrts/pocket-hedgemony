@@ -572,7 +572,7 @@ const TILE_KINDS: Record<string, { use: Use; ground?: Ground; ctx?: P.PlaceConte
   "fields by a shore": { use: "Fields", extra: (p) => void addTile(p, "Shore") },
   "fields on hills": { use: "Fields", ground: "hills" },
   "fields on tropical ground": { use: "Fields", ctx: { tropical: true } },
-  "mountains with a seam": { use: "Waste", ground: "mountains", ctx: { seam: true } },
+  "mountains with an ore deposit": { use: "Waste", ground: "mountains", ctx: { seam: true } },
   "shore on a warm coast": { use: "Shore", ctx: { dryOrWarmCoast: true } },
   "shore with a harbour": { use: "Shore", extra: (p) => void addTile(p, "Shore", "harbour") },
   "shore on a river": { use: "Shore", river: true },
@@ -630,7 +630,7 @@ Then("it may build a bastion fort only with {string} and a star fort only with {
   known(s).push(b6);
   expect(P.castleStepsAllowed(cur(s))).toContain("star fort");
 });
-Given(/^the province "([^"]+)" has a silver mine with (\d+) years? of seams left(?: and ([\d,]+) miners)?$/, (s, name: string, years: string, miners?: string) => {
+Given(/^the province "([^"]+)" has a silver mine with (\d+) years? of ore left(?: and ([\d,]+) miners)?$/, (s, name: string, years: string, miners?: string) => {
   const p = prov(s, name, "mountains");
   s.tileIdx = addTile(p, "Waste", "mine");
   p.tiles[s.tileIdx]!.seams = Number(years);
@@ -644,7 +644,7 @@ When("the year of digging ends", (s) => {
   P.digYear(cur(s));
   P.balanceClasses(cur(s));
 });
-Then("the mine has 0 seams left and closes", (s) => {
+Then("the mine has no ore left and closes", (s) => {
   const t = cur(s).tiles[s.tileIdx]!;
   expect(t.seams).toBe(0);
   expect(t.building).toBeNull();
@@ -656,10 +656,10 @@ Then("its miners become homeless", (s) => {
 Then("the town shrinks", (s) => {
   expect(P.peopleAtWork(cur(s))).toBe(s.atWork - 6000);
 });
-When("a prospecting event adds {int} years of seams", (s, n: number) => {
+When("a prospecting event adds {int} years of ore", (s, n: number) => {
   P.addSeams(cur(s), s.tileIdx, n);
 });
-Then("the mine has {int} years of seams left", (s, n: number) => {
+Then("the mine has {int} years of ore left", (s, n: number) => {
   expect(cur(s).tiles[s.tileIdx]!.seams).toBe(n);
 });
 Given("the province {string} has a shipyard", (s, name: string) => {
@@ -2124,7 +2124,7 @@ const GAINS: Record<string, (e: P.CharterEffect) => boolean> = {
   "no armies wintering there": (e) => e.noWinterQuarters === true,
   "its minority faith worshipping openly": (e) => e.minorityFaithOpen === true,
   "no tolls": (e) => e.noTolls === true,
-  "faster digging and new seams": (e) => e.fasterDigging === true && e.newSeams === true,
+  "faster digging and new ore deposits": (e) => e.fasterDigging === true && e.newSeams === true,
 };
 const COSTS: Record<string, (e: P.CharterEffect) => boolean> = {
   "a little gold": (e) => e.costsGold === true,
@@ -2203,7 +2203,7 @@ Then("a merchant house runs the mine", (s) => {
 Then("the country gets half the mine's output", (s) => {
   expect(s.effect.ownerOutputShare).toBe(0.5);
 });
-Then("the mine digs faster and finds new seams", (s) => {
+Then("the mine digs faster and finds new ore deposits", (s) => {
   expect(s.effect.fasterDigging && s.effect.newSeams).toBe(true);
 });
 

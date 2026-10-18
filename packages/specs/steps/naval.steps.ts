@@ -386,7 +386,7 @@ Then(re("each of the (\\d+) sailors counts the same toward a ship's crew"), (s, 
 Given('the province "Arguin" has no harbour', (s) => {
   (s.ports ??= {})["Arguin"] = N.newPort("Arguin", "Portugal", 0);
 });
-When('the country "Portugal" opens Muster sailors from the country card', (s) => {
+When('the country "Portugal" opens Recruit sailors from the country card', (s) => {
   s.picks = N.musterPicks(Object.values(s.ports as Record<string, N.Port>));
 });
 Then(re('the province "(\\w+)" (can|cannot) be picked'), (s, p: string, c: string) => {
@@ -750,7 +750,7 @@ Given('the port "Lagos" has 2 caravels on its slipways', (s) => {
 When('the country "Castile" takes the port "Lagos"', (s) => {
   s.taken = N.takePort(port(s, "Lagos"), "Castile");
 });
-Then('the 2 hulls on the slipways belong to the country "Castile"', (s) => {
+Then('the 2 ships being built there belong to the country "Castile"', (s) => {
   expect(s.taken.hulls.filter((h: N.Hull) => h.on === "slipway" && h.owner === "Castile")).toHaveLength(2);
 });
 

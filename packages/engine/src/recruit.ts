@@ -41,6 +41,10 @@ export function armIndex(arm: string): number {
   return i;
 }
 
+/** A troop type's name as the player reads it in news and reasons; the ids stay as they are. */
+const ARM_NAME: Record<string, string> = { "levy foot": "levy infantry", "armoured foot": "heavy infantry", "light horse": "light cavalry" };
+export const armName = (arm: string): string => ARM_NAME[arm] ?? arm;
+
 export const isHorseArm = (arm: string): boolean => (HORSE_ARMS as readonly string[]).includes(arm);
 
 /** Company kinds an army can be, by the warfare context's names. */
@@ -604,10 +608,10 @@ export function trainTroops(world: World, n: number, army: number, arm: string, 
   if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n) return "no such army of yours";
   // Garrison troops train only once a commander has picked them up (RECR-107).
   if (a.commander[army]! < 0) return "troops without a commander can't train: a commander must pick them up first";
-  if (a.trainArm[army]! >= 0) return `already training ${ARMS[a.trainArm[army]!]}`;
-  if (arm === rc.LEVY_ARM || !world.rules.defines.recruit.armsAtStart.includes(arm) || !armUnlocked(world, n, arm)) return `you can't train ${arm} yet`;
+  if (a.trainArm[army]! >= 0) return `already training ${armName(ARMS[a.trainArm[army]!]!)}`;
+  if (arm === rc.LEVY_ARM || !world.rules.defines.recruit.armsAtStart.includes(arm) || !armUnlocked(world, n, arm)) return `you can't train ${armName(arm)} yet`;
   men = Math.round(Math.min(men, menByArm(world, army)[LEVY]!));
-  if (men < 1) return "no levy foot to train";
+  if (men < 1) return "no levy infantry to train";
   if (!trainingGround(world, n, a.location[army]!)) return "men train only at a castle or drill yard of your own: march the army to one";
   const cost = rc.trainingCost(arm, men);
   const g = gold(world, cost.gold);
@@ -616,7 +620,7 @@ export function trainTroops(world: World, n: number, army: number, arm: string, 
   a.trainArm[army] = armIndex(arm);
   a.trainMen[army] = men;
   a.trainLeft[army] = Math.max(1, Math.ceil(cost.months));
-  if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} levy foot begin training as ${arm}: ${Math.ceil(cost.months)} months, ${g.toFixed(1)} gold.`, nations: [n], province: a.location[army]! });
+  if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} levy infantry begin training as ${armName(arm)}: ${Math.ceil(cost.months)} months, ${g.toFixed(1)} gold.`, nations: [n], province: a.location[army]! });
   return null;
 }
 
@@ -628,7 +632,7 @@ export function dismissTroops(world: World, n: number, army: number, arm: string
   if (k < 0) return `no arm ${arm}`;
   const by = menByArm(world, army);
   men = Math.round(Math.min(men, by[k]!));
-  if (men < 1) return `no ${arm} to send home`;
+  if (men < 1) return `no ${armName(arm)} to send home`;
   if (men >= a.men[army]! - 0.5) return disbandArmy(world, n, army);
   by[k] = by[k]! - men;
   setByArm(world, army, by);
@@ -648,7 +652,7 @@ export function splitTroops(world: World, n: number, army: number, arm: string, 
   if (c >= 0 && !idleCommanders(world, n).includes(c)) return "that commander already leads an army";
   const by = menByArm(world, army);
   men = Math.round(Math.min(men, by[k]!));
-  if (men < 1) return `no ${arm} to split off`;
+  if (men < 1) return `no ${armName(arm)} to split off`;
   if (men >= a.men[army]! - 0.5) return "leave some men with the army";
   const share = men / a.men[army]!;
   by[k] = by[k]! - men;
@@ -966,7 +970,7 @@ function trainMonth(world: World, i: number, news: News[]): void {
   noteRegiment(world, a.owner[i]!);
   if (a.owner[i] === world.player) {
     const c = a.commander[i]!;
-    news.push({ kind: "raised", text: `${fmt(men)} men of ${c >= 0 ? world.commanders[c]!.name : "an army"}'s army finish their training as ${arm}.`, nations: [a.owner[i]!], province: p });
+    news.push({ kind: "raised", text: `${fmt(men)} men of ${c >= 0 ? world.commanders[c]!.name : "an army"}'s army finish their training as ${armName(arm)}.`, nations: [a.owner[i]!], province: p });
   }
 }
 

@@ -1,5 +1,5 @@
 @context-map-presentation
-Feature: Map lenses
+Feature: Map modes
   As a player
   I want to recolour the map by one stat at a time
   So that I can see where food, faith, trade or trouble is
@@ -7,13 +7,13 @@ Feature: Map lenses
   @VIEW-021
   Scenario: Picking a lens recolours the map
     Given the lens "Realms" is on
-    When the player picks "Food" from the lens picker
+    When the player picks "Food" from the map mode picker
     Then the map is recoloured by food
     And only one lens is on
 
   @VIEW-022
   Scenario Outline: The lens list holds every system's lens
-    Given the lens picker
+    Given the map mode picker
     When the lenses are listed
     Then the lens "<lens>" is offered, from the context "<context>"
 
@@ -43,8 +43,8 @@ Feature: Map lenses
       | Walls            | warfare     |
 
   @VIEW-022
-  Scenario: The lens picker holds 22 lenses and scrolls on a phone
-    Given the lens picker on a phone
+  Scenario: The map mode picker holds 22 map modes and scrolls on a phone
+    Given the map mode picker on a phone
     When the lenses are listed
     Then 22 lenses are offered
     And the picker scrolls

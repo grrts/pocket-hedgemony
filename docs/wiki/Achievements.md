@@ -108,7 +108,7 @@ All thresholds are provisional placeholders for balancing.
 | Name | Tier | Earned when |
 |---|---|---|
 | Full Granaries | silver | With at least 10 provinces, 60 months with no hungry province (progress) |
-| The Famine Rule | copper | You release the famine rule to a province and nobody there dies of famine that year |
+| Famine Relief | copper | You release famine relief to a province and nobody there dies of famine that year |
 | Seven Fat Years | copper | Your capital has a good harvest or better 7 years in a row (progress) |
 | Clean Books | copper | You repay a loan of at least 1,000 |
 | Counting House | silver | You hold 10,000 gold (progress) |
@@ -226,7 +226,7 @@ All thresholds are provisional placeholders for balancing.
 
 - Tap the **trophy** in the side tools (under the speaker), or *Achievements* at the foot of *Choose your realm*. The Achievements card opens in the side panel: earned of 75 and points of 755 at the top, the eligibility line, a filter (*All*, *Within reach*, *Earned*), then one row of badges per category with its own count. Tap a badge for its text, tier and points, this campaign's progress bar, and the date you earned it. The harvest ladder is one badge in First steps with its level in the corner (3/5); its detail lists every level with its target and date and a bar to the next level, counted across all your campaigns.
 - A badge is the tier's frame round the category's sign (a coin for Realm, swords for War, an anchor for Sea…) until the 71 icons are drawn. Grey means locked; a dashed frame means **Not in the game yet**: 23 rows read systems the build does not have yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, voyages and colonies, rebellions, regions of the world), and they stay locked until those land.
-- When you earn one, a banner slides in under the date bar for three seconds and a line goes into Dispatches; tap the banner to open the card at it. The trophy carries a red dot until you have looked. *Achievement toasts* in Settings → Gameplay (the cog) turns the banner off; achievements still unlock.
+- When you earn one, a banner slides in under the date bar for three seconds and a line goes into the News; tap the banner to open the card at it. The trophy carries a red dot until you have looked. *Achievement toasts* in Settings → Gameplay (the cog) turns the banner off; achievements still unlock.
 - Tests run at the end of each week's turn, after everything else. What you earn is kept on this device, apart from any campaign, so it stays when you start again or reload. The build has no saves yet, so every campaign counts as ironman.
 
 ## How it connects
@@ -238,7 +238,7 @@ All thresholds are provisional placeholders for balancing.
 - [Music and sound](Music-and-Sound): the unlock sound.
 - [Tutorial and help](Tutorial-and-Help): tutorial saves are never ironman, so the tutorial earns none.
 - [Your realm](Your-Realm): harvests, food policy, gold, loans, people, castle reach, lords, ruler years, succession, schools, scholars, trade ships, oaths.
-- [Provinces](Provinces): hungry provinces, the famine rule, officials, charters, provinces gained.
+- [Provinces](Provinces): hungry provinces, famine relief, officials, charters, provinces gained.
 - [Research](Research): inventions, eras, first in the world.
 - [Recruiting](Recruiting): regiments trained, the Marshal.
 - [Warfare](Warfare): battles, sieges, wars, winter quarters, commander styles.

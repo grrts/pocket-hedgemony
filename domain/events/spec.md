@@ -402,7 +402,7 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
   realm's gold or debt (a `%` change of what it holds, a number at the game's gold scale), and a change to
   legitimacy or stability is kept on top of the realm's own reading. Every other effect stays in the tree's world,
   where later events read it. [EVT-045, EVT-056; D-EVT-17]
-- EVT-074 When an event fires for a realm or the AI answers one, the dispatches shall say so ("Fall of
+- EVT-074 When an event fires for a realm or the AI answers one, the News shall say so ("Fall of
   Constantinople: Ottomans chooses “Imperial capital”"); a major event is told to every realm, any other to the
   realms in it and those close to them. [EVT-066; game-shell SHELL-082]
 - EVT-075 The event tree's state (its world, ages and periods, what fired, events waiting for an answer, boosts
@@ -417,8 +417,8 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
   event follows, and when none is left the paused week plays on. *Look at the map* folds the card into the End
   turn button, which shows a scroll with the count of waiting events; while any waits, End turn opens the
   oldest instead of ending the turn (SHELL-070, SHELL-081, EVT-044). Grouping and overview: every event is one
-  card; the dispatches keep a line for each event that fired, so the history of the campaign reads there, and
-  waiting events sit at the top of the dispatches with an *Answer* button. Phone: the card is a sheet over the
+  card; the News keep a line for each event that fired, so the history of the campaign reads there, and
+  waiting events sit at the top of the News with an *Answer* button. Phone: the card is a sheet over the
   map in the Wide and Tall layouts, inside the safe areas, its text scrolling while the options stay in reach,
   every button at least 44 points high, nothing that needs hover. [X-19, SHELL-070, SHELL-080, SHELL-081]
 

@@ -135,7 +135,7 @@ Extraction and materials (§7.2)
 | Building | Place | Jobs | Makes | Needs | Unlocked by | Cost |
 |---|---|---|---|---|---|---|
 | Lumber camp | Woods | 1,500 woodsmen | Timber; furs in boreal woods | Woods regrow at a rate; cutting faster wears the tile | Start | 10 g · 4 mo |
-| Mine | Waste, hills or mountains with a seam | 6,000 miners | Silver, gold, iron, copper, tin, salt, saltpetre, gems; coal from era IV | Timber; seams left | Start; step 2 Shaft mine C6 (+50 % output, deeper seams); step 3 Steam-pumped mine C13 | 60 g · 20 timber · 12 mo |
+| Mine | Waste, hills or mountains with an ore deposit | 6,000 miners | Silver, gold, iron, copper, tin, salt, saltpetre, gems; coal from era IV | Timber; ore left | Start; step 2 Shaft mine C6 (+50 % output, deeper deposits); step 3 Steam-pumped mine C13 | 60 g · 20 timber · 12 mo |
 | Quarry | Waste, hills or mountains | 3,000 miners | Stone; marble in named places (Carrara, Makrana) | | Start | 20 g · 10 timber · 6 mo |
 | Saltworks | Shore on a dry or warm coast | 1,500 miners | Salt | | Start | 20 g · 10 timber · 6 mo |
 | Saltpetre works | Town slot | 900 craftsmen | Saltpetre for the powder mill | A ranch or horse stud in the province | W3 Bombards | 30 g · 10 timber · 6 mo |
@@ -146,7 +146,7 @@ Crafts and industry (§7.3, all in town slots)
 | Loom house | 1,500 craftsmen | Cloth from wool, linen from flax, silk cloth from silk, cotton cloth from cotton | That raw ware | Start | 2 Draper's hall (+900 jobs, dyes its cloth, needs dyes) · 3 Weaving manufactory (C11, +1,500 jobs, needs an official in the province) |
 | Forge | 1,500 craftsmen | Tools and arms from iron | Iron, charcoal (timber) | Start | 2 Bloomery works (C2, double iron use and output) · 3 Iron works (C12, no timber) |
 | Kiln | 1,500 craftsmen | Pottery, bricks; porcelain where the know-how is (C3) | Clay (anywhere), timber | Start | 2 Brickworks (double bricks) · 3 Porcelain works (C3) |
-| Tannery | 1,500 craftsmen | Leather from hides | Hides | Start | 2 Saddlery (light horse train a month faster in the province) |
+| Tannery | 1,500 craftsmen | Leather from hides | Hides | Start | 2 Saddlery (light cavalry train a month faster in the province) |
 | Brewery or winery | 900 craftsmen | Beer, wine, spirits | Grain or grapes | Start | 2 Distillery (spirits, which keep and travel) |
 | Press | 900 craftsmen | Books | Paper | L5 printing, or L4 Metal movable type | 2 Printing house (books for the realm's schools: schools in reach cost less) |
 | Paper mill | 900 craftsmen | Paper from rags or bamboo | Flax or linen; or woods | C1 Paper making | |
@@ -356,7 +356,7 @@ Works across the province (§7.10)
 - BLD-071 When an owner demolishes a building, the buildings context shall return a quarter of its materials and overflow its workers. [buildings §5.3]
 - BLD-072 When a peace treaty demands it, the buildings context shall demolish the named castles. [buildings §5.3]
 - BLD-073 When a tile changes use (woods cleared, town growing over fields), the buildings context shall end the building that no longer fits. [buildings §5.3]
-- BLD-074 When a mine's seam runs out, the buildings context shall close the mine. [buildings §5.3]
+- BLD-074 When a mine's ore deposit runs out, the buildings context shall close the mine. [buildings §5.3]
 
 ### 5.12 Converting
 - BLD-075 When the owner changes a farm's crop (grain, flax, cotton, dyes), the buildings context shall make the change in one season at no cost. [buildings §5.4]
@@ -486,7 +486,7 @@ Works across the province (§7.10)
 #### How the player uses it: works in the first slice
 - BLD-171 Where: the player taps a province, then its Build tab (its first line gives the slots taken of all, and the town's size and people) (beside Overview, People and Garrison; it shows an hourglass while a site is open). The tab lists the sites running (months left with a bar; Stop gives half the gold back), the queue (▲ ▼ to move a build, Drop to take it off), then the build sheet: each work the land suits at its next step, with what it does, its gold, months and upkeep and a Build button (Queue when the gold isn't there yet), or why it can't be built, naming the invention by its name; then what stands there and what each gives. [X-19]
 - BLD-172 Overview: works have no tab or line on the country card (Leroy, 17 Oct); the works upkeep a month shows on the Treasury tab's ledger, each province's sites, queue and standing works on its Build tab, and the sites on the map (BLD-173). [X-19, BLD-134, BLD-168]
-- BLD-173 Map and news: a hammer marks each of the player's sites at region zoom, striking over and over so a site reads as work under way (Leroy, 17 Oct); a finished work is said over the map with Go there, with a sound, and goes in the dispatches. [X-19, BLD-132, BLD-138]
+- BLD-173 Map and news: a hammer marks each of the player's sites at region zoom, striking over and over so a site reads as work under way (Leroy, 17 Oct); a finished work is said over the map with Go there, with a sound, and goes in the News. [X-19, BLD-132, BLD-138]
 - BLD-174 Phone: in landscape (Wide and Tall layouts, inside the safe areas) rows stack name, effect and cost over two or three lines with the buttons at the right, every button at least 44 points, 8 points between the queue buttons, and nothing needs hover. [X-19, BLD-169]
 
 ## 6. Commands
@@ -533,7 +533,7 @@ Works across the province (§7.10)
 - When **province** reports a town size change, then recompute town slots; mark extra buildings neglected (BLD-011).
 - When **province** reports a tile burned (foraging, looting), then the land building on it is ruined (BLD-061, BLD-064).
 - When **province** reports a tile change of use, then end the building that no longer fits (BLD-073).
-- When **province** reports a seam exhausted, then close the mine (BLD-074).
+- When **province** reports an ore deposit exhausted, then close the mine (BLD-074).
 - When **warfare** reports a raid, plunder, sack, siege breach, razing or occupation, then damage, ruin, stop sites or remove the town site (BLD-044, BLD-045, BLD-059, BLD-065, BLD-066).
 - When **warfare** or **diplomacy** applies a peace term demanding castles demolished, then demolish them (BLD-072).
 - When **rebellions** report rebels holding a province, then loot one town building a season, market first (BLD-067).

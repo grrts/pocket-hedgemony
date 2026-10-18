@@ -636,7 +636,7 @@ Then("it keeps at least {int} months", (s, n: number) => {
 Given("the province {string} has {float} months of food in store", (s, _p: string, months: number) => {
   s.storeMonths = months;
 });
-Given("the famine rule is {string}", (s, rule: M.FoodPolicy["famineRule"]) => {
+Given("famine relief is {string}", (s, rule: M.FoodPolicy["famineRule"]) => {
   s.policy = M.foodPolicyFromPreset("Feed the people");
   M.setFoodPolicy(s.policy, "famineRule", rule);
 });

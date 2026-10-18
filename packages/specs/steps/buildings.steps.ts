@@ -1191,7 +1191,7 @@ Then("the {string} ends", (s) => {
   expect(B.prov(R(s), s.province).buildings).not.toContain(s.building);
 });
 
-When("its seam runs out", (s) => {
+When("its ore deposit runs out", (s) => {
   B.seamRunsOut(R(s), s.province, s.building);
 });
 

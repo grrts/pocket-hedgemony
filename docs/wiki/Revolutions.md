@@ -277,7 +277,7 @@ The family stance labels (lead / bend / fight):
 - **The revolution card** on the country screen, about 40 characters wide to fit a phone. For France in 1789 it reads "FRENCH REVOLUTION", brewing, "Breaks out at 4 of 6 signs", with the lit signs first ("Debt above 2,000 gold", "A quarter want a constitution", "The crown is distrusted"), each with how to ease it ("Cut court and army; tax lords"), and the sparks with their multipliers. The bar is neutral, amber at `warn_at` and red at `need`.
 - **"What happens if it breaks out"** opens the stances and the regime each leads to.
 - **Banners.** When a revolution breaks out or ends in another country, a one-line banner ("Revolution in France: the Bastille has fallen") appears, but only for neighbours, rivals and Great Powers. Tapping it opens that country's card.
-- **The revolution lens** shades provinces by how many of the revolution's province-level signs they meet and hatches risen provinces in the revolution's colour.
+- **The revolution map mode** shades provinces by how many of the revolution's province-level signs they meet and hatches risen provinces in the revolution's colour.
 - **The regime card** on the government screen shows the regime's loop line, its decrees as buttons and its locks greyed out.
 
 ### In the game today
@@ -293,7 +293,7 @@ The 36 historical revolutions read ideologies, legitimacy and ages the game does
 - **The struggle**: the rising plays as any other on the map. If it wins, an estates revolution makes you a merchant republic with an elected ruler; an agrarian one puts the rising's leader on your throne, your house goes abroad as pretenders, every lord wavers and tax stays light for 10 years. If it is beaten, starves or is bribed away, the Reaction follows: bloodshed where they rose, and the revolution comes back sooner. If you grant or talk out its demand, it is stopped, not solved.
 - **Rebels who win**: an ordinary rising that wins against you lights the rebels sign, and if your card is then red, or the rebels took your capital's castle, the revolution has won at once.
 - **Government tab**: the regime under your form, its loop line and since when, your ruler, the form before the revolution, and its locks greyed out. Locked orders are refused with "locked by the revolution".
-- **Other realms**: computer realms go through the same rules and pick Fight, Bend or Lead by weight, Fight more often when their armies outnumber the rising. A neighbour's revolution is a line in your Dispatches.
+- **Other realms**: computer realms go through the same rules and pick Fight, Bend or Lead by weight, Fight more often when their armies outnumber the rising. A neighbour's revolution is a line in your News.
 
 ## How it connects
 
@@ -309,7 +309,7 @@ The 36 historical revolutions read ideologies, legitimacy and ages the game does
 - [Provinces](Provinces): grievances and class shares feed the signs; regimes end and add grievances.
 - [Your realm](Your-Realm): lords' loyalty and land, stability and debt; locks on fiefs and titles.
 - [Research](Research): G14 Written constitution decides the crown and assembly form.
-- [Map and lenses](Map-and-Lenses): the revolution lens.
+- [Map and Map Modes](Map-and-Lenses): the revolution map mode.
 - [Screens and navigation](Screens-and-Navigation): banner, card and regime card.
 - [Music and sound](Music-and-Sound): the revolution music tag.
 

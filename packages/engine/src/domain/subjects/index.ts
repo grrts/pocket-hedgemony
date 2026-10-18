@@ -672,7 +672,7 @@ export function overseasTradeEmpire(regionsWithColoniesOrPosts: readonly string[
 export function changeMasters(b: SubjectBond, rival: string, t: { bordersRival: boolean; rivalReachFree: number }): { ok: true; hostile: [string, string][] } | { ok: false; missing: string } {
   if (b.loyalty !== "disloyal") return { ok: false, missing: "only a Disloyal subject changes masters" };
   if (!t.bordersRival) return { ok: false, missing: "it must border the rival" };
-  if (reachWeight(b) > t.rivalReachFree) return { ok: false, missing: "it does not fit the rival's reach" };
+  if (reachWeight(b) > t.rivalReachFree) return { ok: false, missing: "it does not fit under the rival's subject limit" };
   const old = b.overlord;
   b.overlord = rival;
   b.reasons = [];
@@ -1278,7 +1278,7 @@ export function subjectsList(
 ): { header: string; tribute: string; rows: SubjectRow[] } {
   const sorted = [...rows].sort((x, y) => STEPS.indexOf(y.bond.loyalty) - STEPS.indexOf(x.bond.loyalty));
   return {
-    header: `SUBJECTS ${header.used} of ${header.reach} reach`,
+    header: `SUBJECTS ${header.used} of ${header.reach} allowed`,
     tribute: `Tribute ${header.gold} gold / ${header.grain} grain a month`,
     rows: sorted.map((x) => subjectRow(x.bond, x.reasons, x.paysGold)),
   };

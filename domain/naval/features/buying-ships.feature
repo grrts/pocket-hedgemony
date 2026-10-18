@@ -120,10 +120,10 @@ Feature: Buying ships
     But no ship leaves the port "Lagos" without a sea battle
 
   @NAVY-052
-  Scenario: A taken port loses its hulls on the slipways
+  Scenario: A taken port loses the ships being built there
     Given the port "Lagos" has 2 caravels on its slipways
     When the country "Castile" takes the port "Lagos"
-    Then the 2 hulls on the slipways belong to the country "Castile"
+    Then the 2 ships being built there belong to the country "Castile"
 
   @NAVY-053 @placeholder
   Scenario: Buying a hull abroad in Venice

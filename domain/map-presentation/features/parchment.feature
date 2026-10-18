@@ -18,7 +18,7 @@ Feature: Parchment over uncharted land
 
   @VIEW-034
   Scenario Outline: The parchment can be switched off for viewing
-    Given the switch "Parchment over unknown lands" is <switch>
+    Given the switch "Hide unexplored lands" is <switch>
     When the map is drawn
     Then <shown>
     And nothing in the simulation changes
@@ -30,7 +30,7 @@ Feature: Parchment over uncharted land
 
   @VIEW-034
   Scenario: Switching the parchment off charts nothing
-    Given the switch "Parchment over unknown lands" is off
+    Given the switch "Hide unexplored lands" is off
     And the Sargasso Sea is uncharted for "Castile"
     When the map is drawn
     Then the Sargasso Sea is shown

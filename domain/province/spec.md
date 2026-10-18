@@ -12,7 +12,7 @@ health and land condition, its colony state, and how its numbers add up to the c
 - Tiles, tile uses, tile states and tile count (province stats §2).
 - Ground: effects on troops, on buildings and on people working without buildings (§3).
 - Buildings as they touch the province: job slots, fallow rule, tiles without buildings, town building slots, mine
-  seams, timber reach (§4, as a summary; see "Not in scope").
+  ore deposits, timber reach (§4, as a summary; see "Not in scope").
 - Production of food and wares from tiles (§5).
 - People: births and deaths, famine, classes and job slots, overflow, homeless, refugees, faith and language mix,
   recruits, students and scholars counted per province (§6).
@@ -30,7 +30,7 @@ health and land condition, its colony state, and how its numbers add up to the c
 - What is stored and what is worked out, and update cadence (§17).
 
 **Not in scope (owned by …)**
-- What the player sees at each zoom and the map lenses (§14): **map-presentation**.
+- What the player sees at each zoom and the map modes (§14): **map-presentation**.
 - Trade (§7, except tolls): replaced by trade v2, **trade**. Province stats §7.1 (trader paths), §7.2 *Market price*
   and *Trade balance*, and §7.3 (profit and debt) are superseded; see D-PROV-1.
 - The full building list, construction, upkeep, condition, owners and steps: **buildings** (province §4 is a summary).
@@ -99,7 +99,7 @@ Newest decision first.
 | Settlement | None, trading post, settlement, colony | Colony stage (subjects) |
 | Free tile | A tile nobody works in an unowned province | Empty tile in an owned province |
 | Toll point | Bridge, ford, pass, river mouth or strait where a toll can be set | |
-| Mine seams | Years of digging left in a mine | |
+| Ore deposit (was Mine seam) | Ore under a waste tile, counted in years of digging left; a mine digs it | |
 
 ## 4. Domain model
 
@@ -108,7 +108,7 @@ Newest decision first.
 **Province** (identity: province id from the game map)
 Holds: owner; governed by; occupied by and months; years held; homeland of; pretenders; ground; tiles (use, building,
 building step, state, workers); people per class (11 numbers); homeless; refugees; faith mix and language mix (top three
-each); recruits here; students here; scholars here; mine seams; tax rate; tolls; charters; grievances; rebels; road
+each); recruits here; students here; scholars here; ore deposits; tax rate; tolls; charters; grievances; rebels; road
 step; river; plague; fever land; smoke; food stores; castle step, walls and garrison; official (type, years served);
 settlement, settlers, local people's tiles.
 - INV-PROV-1: tile count is between 4 and 16 inclusive and follows the province's size on the map.
@@ -134,7 +134,7 @@ settlement, settlers, local people's tiles.
 - **Charter** (value): kind and date granted; a revoked charter leaves *Broken charter* for 20 years.
 - **Grievance** (value): kind, weight (1 or 2), start date.
 - **Pretender** (reference to a person): right, and its expiry (50 years after loss for an old ruler).
-- **Mine** (entity on a tile): ware, seams left.
+- **Mine** (entity on a tile): ware, years of ore left.
 - **Settlement** (value): step, settlers, local people's tiles.
 
 ### Domain services
@@ -205,7 +205,7 @@ settlement, settlers, local people's tiles.
 - PROV-062: Buildings shall be gained by building them (cost times the ground's build cost), by conquering the province, by events, and some appear by themselves. [§4]
 - PROV-063: Buildings shall be lost when their tile burns (land buildings), when the town is sacked (town buildings), when 10 years of neglect (from unpaid upkeep, which makes them Neglected at half output after one month) drop them a step or close them, when demolished by the player or a peace treaty, or when the province is lost. [§4, buildings §5.2, D-PROV-3]
 - PROV-064: The province shall allow land buildings only on the tile uses listed for them in the land building table, with the slots, products, needs and unlocks given there. [§4.1]
-- PROV-065: Each mine shall show seams left in years of digging; seams are gained by prospecting events and mining inventions and lost every year the mine is dug. [§4.1]
+- PROV-065: Each mine shall show its ore deposit in years of digging left; ore deposits are gained by prospecting events and mining inventions and lost every year the mine is dug. [§4.1]
 - PROV-066: When a mine runs out, the province shall close it; its miners overflow into other slots or become homeless, and the town shrinks. [§4.1]
 - PROV-067: Shipyards and mines shall need timber from a lumber camp in the same province or in reach (one ring, more with roads and rivers); without timber no ships are built. [§4.1]
 - PROV-068: A tile with no building shall still have slots for up to 3,000 people of the matching class, working at the ground's people output rate. [§4.2]
@@ -365,11 +365,11 @@ settlement, settlers, local people's tiles.
 - PROV-327: Overview: the realm's Provinces list has a "Short of food" view listing only the provinces whose land feeds under all their people in a normal year, each with its share and the fix the Land tab offers first (build or improve the farm, clear the woods, drain, irrigate, or bring food in from a castle); a row opens that province's Land tab. Phone: as PROV-316. [X-19, feedback 86]
 
 ### Mines and saltworks in the game (feedback 87, 18 October 2026)
-- PROV-328: A province in hills or mountains with a waste tile may hold a seam: one ware (iron, copper, tin, silver, gold or rock salt) and its years of digging left (40 to 160). About a third of such provinces hold one, found by a fixed roll per province so every game has the same geology; the map's famous mines of 1444 (Kutná Hora's silver in Středočeský, Falun's copper in Dalarna) hold theirs whatever the ground, with a waste tile for the mine. [PROV-065, feedback 87, D-PROV-29]
-- PROV-329: A mine shall stand in the province, take one building slot and need rough waste, a seam and timber in reach (a lumber camp in the province or in a neighbouring province of the same realm). It gives work for 6,000 miners, its ware, and trade as a lumber camp does; silver and gold three times as much. The map's famous mines and mines in rich provinces (wealth 5 or more) stand in 1444. [PROV-064, PROV-067, feedback 87]
-- PROV-330: Each January every mine shall dig a year off its seam; when the seam runs out the mine closes and the owner hears of it. Prospecting events and mining inventions that find new seams come later. [PROV-065, PROV-066, feedback 87]
+- PROV-328: A province in hills or mountains with a waste tile may hold an ore deposit: one ware (iron, copper, tin, silver, gold or rock salt) and its years of digging left (40 to 160). About a third of such provinces hold one, found by a fixed roll per province so every game has the same geology; the map's famous mines of 1444 (Kutná Hora's silver in Středočeský, Falun's copper in Dalarna) hold theirs whatever the ground, with a waste tile for the mine. [PROV-065, feedback 87, D-PROV-29]
+- PROV-329: A mine shall stand in the province, take one building slot and need rough waste, an ore deposit and timber in reach (a lumber camp in the province or in a neighbouring province of the same realm). It gives work for 6,000 miners, its ware, and trade as a lumber camp does; silver and gold three times as much. The map's famous mines and mines in rich provinces (wealth 5 or more) stand in 1444. [PROV-064, PROV-067, feedback 87]
+- PROV-330: Each January every mine shall dig a year off its ore deposit; when the deposit runs out the mine closes and the owner hears of it. Prospecting events and mining inventions that find new ore deposits come later. [PROV-065, PROV-066, feedback 87]
 - PROV-331: Saltworks shall stand in a province with a shore tile on a dry or warm coast (drylands, desert or savanna, or below 42° of latitude); they give work for 1,500 miners, salt and trade as a lumber camp does. [feedback 87]
-- PROV-332: Where: the waste tile's sheet on the Land tab shows the seam and its years left (or none found) and offers the mine with its Build button or why not (no seam, no timber in reach); the shore tile's sheet offers saltworks beside the fishery. Grouping and overview: mines and saltworks sit with the other land on the Land tab; the Build tab lists them with the other works. Phone: as PROV-316. [X-19]
+- PROV-332: Where: the waste tile's sheet on the Land tab shows the ore deposit and its years left (or none found) and offers the mine with its Build button or why not (no ore deposit, no timber in reach); the shore tile's sheet offers saltworks beside the fishery. Grouping and overview: mines and saltworks sit with the other land on the Land tab; the Build tab lists them with the other works. Phone: as PROV-316. [X-19]
 
 ### 5.19 Lords in the province
 - PROV-200: A lord shall always hold at least one province; someone with no land is a courtier. [§10.3]
@@ -387,7 +387,7 @@ settlement, settlers, local people's tiles.
 - PROV-212: When a charter is revoked, the province shall get *Broken charter* for 20 years, and every lord notices. [§10.4, §12.1]
 - PROV-213: When the province is lost, the conqueror may keep or revoke its charters. [§10.4]
 - PROV-214: Under town law, the town shall need no official, and nothing may be seized there without breaking the charter. [§10.4]
-- PROV-215: Under a mining right, a merchant house shall run the mine for half its output, digging faster and finding new seams. [§10.4]
+- PROV-215: Under a mining right, a merchant house shall run the mine for half its output, digging faster and finding new ore deposits. [§10.4]
 
 ### 5.21 Defence
 - PROV-220: The castle shall be none, earthwork ring fort, stone castle, bastion fort or star fort; gained by building or upgrading (gold × build cost, and years) or conquest; lost by siege, demolition in a peace, or one step per 10 years without upkeep. [§11]
@@ -493,7 +493,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 | BecameHomeless / HomelessShareCrossed | Overflow with no slot; threshold 5/10/20 % | province, share | rebellions |
 | TileBurned / TileRebuilt / TileStateChanged | State changes | province, tile, state | warfare, map-presentation, buildings |
 | TileUseChanged | Use changes | province, tile, from, to | buildings, map-presentation |
-| MineExhausted | Seams reach 0 | province, mine | buildings, trade |
+| MineExhausted | Ore deposit reaches 0 | province, mine | buildings, trade |
 | TaxCollected | Tax paid | province, owed, reached | realm |
 | TaxRateChanged / TollChanged | Command | province, rate | realm, trade |
 | GrievanceStarted / GrievanceEnded | Conditions met/lost | province, grievance | rebellions, realm (lord loyalty), revolutions |
@@ -537,7 +537,7 @@ Reads first: realm's food policy and castle deliveries, owner and war state, inv
 6. Grievance evaluation (start/end), then calm/grumbling/riots/rebels.
 Each season: food check and famine (§6.2); store rot (realm); *Hungry*, *Requisitioned*, *Soldiers quartered* timers.
 Each autumn (and twice for rice): harvest roll (realm food year).
-Each year: recruits refill; tax owed; years held, official years served; burned tile rebuild; worn tile checks; mine seams fall; upkeep and neglect (buildings); woods regrowth after 10 unworked years; refugees settle after 2 years.
+Each year: recruits refill; tax owed; years held, official years served; burned tile rebuild; worn tile checks; ore deposits fall; upkeep and neglect (buildings); woods regrowth after 10 unworked years; refugees settle after 2 years.
 Each week while an outbreak runs (days 7, 14, 21, 28): plague (D-PROV-4).
 
 ## 10. Configuration
@@ -561,7 +561,7 @@ province config file but no file name or keys; keys below are proposed by this s
 | province.locals_rough_bonus | Homeland defender in rough ground | +10 % | yes | province config |
 | province.ground.economy | Build cost / building output / people output per ground | farmland 100/+25/100; grassland 100/100/+50 herding; savanna 100/100/+25 herding; drylands 125/−25 until irrigated/100; desert 150/−50 except mines and irrigation/100 herding and caravans; hills 125/100 (mines +25)/100; mountains 200/−50 farms, +50 mines/−25; forest 150/100 (lumber +50)/+25 hunting and gathering; jungle 200/−25/+25 gathering; marsh 200/−50 until drained/+25 fishing; tundra 150/−50/100 herding | yes | province config |
 | province.buildings.slots | Job slots per building | farm 12,000; rice paddy 18,000; terrace 12,000; raised fields 12,000; plantation 12,000; ranch 3,000; horse stud 3,000; lumber camp 1,500; mine 6,000; irrigation works 1,500; fishery 3,000; saltworks 1,500; harbour 1,500; shipyard 3,000; bridge 0; loom house 1,500; forge 1,500; kiln 1,500; tannery 1,500; press 900; brewery/winery 900; market 1,500; caravanserai/warehouse 900; house of worship 600; seat 300 + official; almshouse 600; powder mill 900; hospital/wells/drains 600; factory 6,000; rail station 600 | yes | province config / buildings config |
-| province.buildings.land | Tile, needs and unlock per land building | farm: fields, known at start; mill: +25 % gold, F5; rice paddy: fields on wet ground or by a shore, needs shore tile or irrigation, F2; terrace: fields on hills or mountains, F2 or Andean terraces; raised fields: marsh, F6; plantation: fields on tropical ground, F10 (no forced-labour bonus); ranch: pasture, start; horse stud: pasture, F11; lumber camp: woods, start; mine: waste, hills or mountains with a seam, needs timber, start, deeper by research; irrigation works: waste or drylands fields, F3; fishery: shore, start, more with F4; saltworks: shore on dry or warm coast, start; harbour: shore, start; shipyard: shore with a harbour, needs timber, start; bridge: shore on a river, start; castle: castle tile, B4/B1/B5/B6; granary: start, bigger with F7 | yes | province config / buildings config |
+| province.buildings.land | Tile, needs and unlock per land building | farm: fields, known at start; mill: +25 % gold, F5; rice paddy: fields on wet ground or by a shore, needs shore tile or irrigation, F2; terrace: fields on hills or mountains, F2 or Andean terraces; raised fields: marsh, F6; plantation: fields on tropical ground, F10 (no forced-labour bonus); ranch: pasture, start; horse stud: pasture, F11; lumber camp: woods, start; mine: waste, hills or mountains with an ore deposit, needs timber, start, deeper by research; irrigation works: waste or drylands fields, F3; fishery: shore, start, more with F4; saltworks: shore on dry or warm coast, start; harbour: shore, start; shipyard: shore with a harbour, needs timber, start; bridge: shore on a river, start; castle: castle tile, B4/B1/B5/B6; granary: start, bigger with F7 | yes | province config / buildings config |
 | province.buildings.town | Needs per town building | loom house: raw ware; forge: iron; kiln: clay; tannery: hides; press: paper and printing; brewery/winery: grain or grapes; market: market charter for the fair (weekly market → yearly fair → trading house); caravanserai/warehouse: a road; school: market town or bigger; seat: town or bigger; almshouse: gold upkeep; powder mill: saltpetre; hospital/wells/drains: later inventions; factory: era V inventions, coal or water power; rail station: railway invention and a road | yes | province config / buildings config |
 | province.bare_tile.slots | People per tile without building | 3,000 | yes | province config |
 | province.town.building_slots | Building slots by town size | hamlet 1, village 2, market town 4, town 6, city 9, great city 12 | yes | province config |
@@ -660,11 +660,11 @@ province config file but no file name or keys; keys below are proposed by this s
 - **D-PROV-22** (was OQ-PROV-22) Troyes tax: what reaches you is owed × (1 − travel loss) × (1 + collector), capped at owed; Troyes at 3 days and a full-effect collector gets all 11 gold, so the card's "9" is corrected to 11. The rules win over a card mock-up.
 - **D-PROV-23** (was OQ-PROV-23) A lord's province without his official: it is *Ungoverned* and gives the lord half its tax and half its recruits for his retinue. The same half rule as a royal province without an official.
 - **D-PROV-24** (was OQ-PROV-24) Officials per province: one official runs 1 province with G1, 2 with G9, 3 with G16, plus one for each of B2, G11 and T14. Same as D-REALM-14.
-- **D-PROV-25** (17 Oct, Leroy: "Buildings are build in the province but effect tiles, not on tiles"; the food plan, feedback 80 and 87) Land buildings stand in the province, take one building slot and work all its tiles of their use; the tile rules of §2 decide how many people they employ. The map's provinces hold far more people than the design's (median 46,000, a tenth over 300,000), so a tile holds 2.5 times the design's job slots. The 1444 land is laid out from the map's ground, and a province's own ways (terraces, ditches, herding on the move) make up its food to 110 % in 1444. A 15-year run then shows famine touching about 4 % of provinces a year by 1459 against under 1 % before. Tile conversion (feedback 86), hunting (81) and mines with seams (87) build on this next.
+- **D-PROV-25** (17 Oct, Leroy: "Buildings are build in the province but effect tiles, not on tiles"; the food plan, feedback 80 and 87) Land buildings stand in the province, take one building slot and work all its tiles of their use; the tile rules of §2 decide how many people they employ. The map's provinces hold far more people than the design's (median 46,000, a tenth over 300,000), so a tile holds 2.5 times the design's job slots. The 1444 land is laid out from the map's ground, and a province's own ways (terraces, ditches, herding on the move) make up its food to 110 % in 1444. A 15-year run then shows famine touching about 4 % of provinces a year by 1459 against under 1 % before. Tile conversion (feedback 86), hunting (81) and mines with ore deposits (87) build on this next.
 - **D-PROV-26** (17 Oct, feedback 81) Hunting gets its own room in the woods, a lodge, game that thins and hard winters, not the bare rate everywhere. Game starts at the level the 1444 hunting leaves, so the first years don't crash; at that start a tenth of provinces (crowded woods in the steppe and India) sit near the floor and the median at plenty. The province's own ways (PROV-313) are worked out after, so the 1444 food stays at 110 %. Hard winters touch 200 to 300 provinces a year.
 - **D-PROV-27** (17 Oct, feedback 86) Tile changes are few and slow: only the five changes the tile rules (§2.1) name, one per province at a time, for gold and years, and the ground never changes. The tile a change takes is the last of its use, so the player chooses the change, not the square. Lords and the AI act by a plain rule (feed the province first: drain, irrigate, then clear woods), so the AI's land changes slowly and only where it is short.
 - **D-PROV-28** (18 Oct, feedback 93) A year's famine kills at most a fifth of a province. Without a cap, an occupied province or two failed harvests in a row could lose nine in ten of its people (Nordjylland 95 % in 1454 to 1455 on seed 1). With it, the worst two years cost about a third, and famine deaths over the first 16 years fall from about 25M to 16M while the world still grows. Some 60 to 100 provinces a year still reach the cap, mostly in the far north where the food is short every year; that is a balance question for the land, not the famine rule.
-- **D-PROV-29** (18 Oct, feedback 87) Seams come from a fixed roll per province, not the game's dice, so the geology is the same in every game and seeding never shifts the turn's rolls. A third of rough waste holds a seam (about 360 provinces), weighted to iron; silver and gold mines give three times the trade, standing in for the precious-metal flows the trade context will model. Mines need timber from a lumber camp next door at most (one ring); roads and rivers stretching that reach wait for the timber trade.
+- **D-PROV-29** (18 Oct, feedback 87) Ore deposits come from a fixed roll per province, not the game's dice, so the geology is the same in every game and seeding never shifts the turn's rolls. A third of rough waste holds an ore deposit (about 360 provinces), weighted to iron; silver and gold mines give three times the trade, standing in for the precious-metal flows the trade context will model. Mines need timber from a lumber camp next door at most (one ring); roads and rivers stretching that reach wait for the timber trade.
 
 ## 14. Traceability
 
@@ -728,7 +728,7 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-064 | buildings-in-province.feature | Castle steps come from research |
 | PROV-064 | tiles.feature | Each tile has one use and holds only the buildings its use allows |
 | PROV-065 | buildings-in-province.feature | A mine runs out and leaves a ghost town |
-| PROV-065 | buildings-in-province.feature | Prospecting adds seams |
+| PROV-065 | buildings-in-province.feature | Prospecting adds ore |
 | PROV-066 | buildings-in-province.feature | A mine runs out and leaves a ghost town |
 | PROV-067 | buildings-in-province.feature | Shipyards and mines need timber in reach |
 | PROV-068 | buildings-in-province.feature | Bare tiles still give work |
@@ -856,7 +856,7 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-321 … PROV-322 | — | Presentation: apps/client/src/ui/land.ts woods sheet |
 | PROV-323 … PROV-325 | — | Engine: packages/engine/test/works.test.ts (tile changes, the AI's rule, save) |
 | PROV-326 … PROV-327 | — | Presentation: apps/client/src/ui/land.ts change block; main.ts Short of food view |
-| PROV-328 … PROV-331 | — | Engine: packages/engine/test/works.test.ts (seams, mines, saltworks, save) |
+| PROV-328 … PROV-331 | — | Engine: packages/engine/test/works.test.ts (ore deposits, mines, saltworks, save) |
 | PROV-332 | — | Presentation: apps/client/src/ui/land.ts waste and shore sheets |
 | PROV-200 | lords-in-province.feature | A lord who loses his last province stops being a lord |
 | PROV-201 | lords-in-province.feature | A lord who loses his last province stops being a lord |

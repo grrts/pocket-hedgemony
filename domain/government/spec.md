@@ -4,7 +4,7 @@
 
 Government decides how many **officials** and how many **lords** a country can support (the two caps), what
 happens when a country goes over a cap, which **government form** a country has, how forms change (reform,
-revolution, coup, capital loss, event), and the per-form numbers other contexts read (subject reach change,
+revolution, coup, capital loss, event), and the per-form numbers other contexts read (subject limit change,
 colonial range, succession).
 
 **In scope**
@@ -24,7 +24,7 @@ colonial range, succession).
 - Lords, loyalty steps and reasons, rulers, heirs (realm).
 - Rebellions and the *New ideas* rising (rebellions); when a revolution happens and which regime it sets
   (revolutions).
-- Subject reach and what happens over it (subjects). Colonies, colonial governors (exploration).
+- Subject limit and what happens over it (subjects). Colonies, colonial governors (exploration).
 - Inventions G1, G3, G4, G9, G11, G14, W12 (research).
 - Army coups as an event of the army (warfare); event firing (events).
 
@@ -45,14 +45,14 @@ size no longer affects the cap.
 
 | Term | Meaning | Not to be confused with |
 |---|---|---|
-| Government form | One of 27 named ways a country is ruled (Feudal realm, Horde, Party state …). Sets the form's part of each cap, subject reach change, colonial range and succession | The event tree's 16 `government` values, which map onto forms |
+| Government form | One of 27 named ways a country is ruled (Feudal realm, Horde, Party state …). Sets the form's part of each cap, subject limit change, colonial range and succession | The event tree's 16 `government` values, which map onto forms |
 | Family (of forms) | One of six groups: rule by a house, by citizens, by faith, by kin, by warriors, modern and from abroad | A culture family (culture) or faith family (religion) |
 | Officials cap | Form's officials + buildings' officials. Shown as "x of y" | Officials themselves (province) |
 | Lords cap | Form's lords + buildings' lords. Each lord counts 1 | Lord loyalty (realm) |
 | Over the cap | More officials (or lords) than the cap | — |
 | Grasping officials | Grievance put on the province of each official over the officials cap | *Ungoverned* (province) |
 | Great lord | Permanent loyalty down reason for a lord with 4–7 provinces (one) or 8+ (two) | Lord counting against the cap (always 1) |
-| Subject reach | The subjects cap (subjects design). Start base from the catalogue's `administrative_capacity`; the form adds or takes away | Lords cap |
+| Subject limit (was Subject reach) | The subjects cap (subjects design). Start base from the catalogue's `administrative_capacity`; the form adds or takes away | Lords cap |
 | Colonial range | How many sea zones from your nearest port or colony you may found a colony; set by the form | Naval reach |
 | Succession | How the next ruler is chosen; set by the form | Country stats' former "inheritance law" |
 | Reform | A chosen change from one form to one of its next forms; needs items, costs gold, some lords lose a loyalty step | A revolution, coup or event change |
@@ -67,13 +67,13 @@ size no longer affects the cap.
 **CountryGovernment** (identity: country id)
 - Holds: current form id; the form held before the last revolutionary regime (needed by revolutions' `old_form`, D-GOV-9: the last form not set by a revolution);
   derived officials cap and lords cap with their breakdown (form part, each building's part, national strengths);
-  derived subject reach.
+  derived subject limit.
 - INV-GOV-1: a country has exactly one government form at any time, from the 27 in config.
 - INV-GOV-2: officials cap = form officials + Σ building officials (+ any national-strength additions); lords cap likewise.
 - INV-GOV-3: every lord counts exactly 1 toward the lords cap, whatever his number of provinces.
 - INV-GOV-4: a colonial governor holding a governor slot is not counted toward the officials cap.
 - INV-GOV-5: a reform's target is one of the source form's next forms and matches a reform row in config.
-- INV-GOV-6: a country whose form has subject reach `none` (colonial government) can hold no subjects.
+- INV-GOV-6: a country whose form has subject limit `none` (colonial government) can hold no subjects.
 
 **FormCatalogue** (reference data, config `forms`, `reforms`, `event_tree_map`)
 - INV-GOV-7: every `next`, reform `from`/`to` and event-map `set` names a form that exists (checked by the start-forms tool).
@@ -117,9 +117,9 @@ size no longer affects the cap.
 - GOV-017 The government shall add 6 officials for a parliament house, which needs G14 Written constitution. [government §2.1]
 
 ### 5.3 Forms and what they set
-- GOV-018 The government shall offer exactly the 27 forms in 6 families with the officials, lords, subject reach change, colonial range and succession given in config `forms`. [government §3; config §3]
-- GOV-019 The government shall set a country's subject reach to the start base from the catalogue's `administrative_capacity` (very low 2, low 3, moderate 5, high 7, very high 9) plus its form's subject reach change. [government §2, §3; config subject_reach_start]
-- GOV-020 If a country's form is colonial government, then the government shall give it no subject reach (it cannot hold subjects). [government §3 "none"; config]
+- GOV-018 The government shall offer exactly the 27 forms in 6 families with the officials, lords, subject limit change, colonial range and succession given in config `forms`. [government §3; config §3]
+- GOV-019 The government shall set a country's subject limit to the start base from the catalogue's `administrative_capacity` (very low 2, low 3, moderate 5, high 7, very high 9) plus its form's subject limit change. [government §2, §3; config subject_reach_start]
+- GOV-020 If a country's form is colonial government, then the government shall give it no subject limit (it cannot hold subjects). [government §3 "none"; config]
 - GOV-021 The government shall set a country's colonial range, in sea zones from its nearest port or colony, from its form. [government §3]
 - GOV-022 The government shall set how the next ruler is chosen (succession) from the country's form. [government §3]
 - GOV-023 While a country's form is clan council or chiefdom, the government shall mark provinces of its own people (the province's largest language is the realm's own language) as needing no official, so *Ungoverned* never appears there. [government §3; config self_run; D-GOV-13]
@@ -133,7 +133,7 @@ size no longer affects the cap.
 - GOV-029 When a reform passes, the government shall take the reform's gold from the treasury. [government §4]
 - GOV-030 If the treasury holds less than the reform's gold, then the government shall refuse the reform. [government §4 "costs gold"]
 - GOV-031 When a reform passes, the government shall make the reform's listed number of lords lose a loyalty step, choosing lowest loyalty first, then the lord with the most provinces, as at New Year. [government §4; config lords_slip; D-GOV-4]
-- GOV-032 When a reform passes, the government shall set the new form, so that both caps, subject reach, colonial range and succession follow the new form from then on. [government §3, §4]
+- GOV-032 When a reform passes, the government shall set the new form, so that both caps, subject limit, colonial range and succession follow the new form from then on. [government §3, §4]
 - GOV-033 The government shall use the reform rows of config `reforms` (needs, gold, lords slipping) as the full list of reforms; a form reaches a constitutional form by reform only through a listed row. [government §4 "The full list is in the config"; D-GOV-1]
 
 ### 5.5 Form changes without a reform
@@ -169,7 +169,7 @@ size no longer affects the cap.
 - GOV-049 The government shall show a government card with the form and ruler, each cap as "x of y" with its parts (form, each building), subjects as "x of y", the next forms with each need met or not, and a Reform action. [government §1]
 
 ### 5.8 Government in the game (first slice)
-Every realm now has a form, both caps and their consequences in the game's month, and the player reforms from a Government tab (D-GOV-18). Cap buildings, condition rows, self-run provinces, subject reach in numbers and colonial range in play come with their contexts.
+Every realm now has a form, both caps and their consequences in the game's month, and the player reforms from a Government tab (D-GOV-18). Cap buildings, condition rows, self-run provinces, subject limit in numbers and colonial range in play come with their contexts.
 
 - GOV-058 When a campaign starts, the game shall give every realm its 1444 form by the start-form rules (GOV-043), reading a map realm the catalogue names otherwise through its catalogue record (the Ottomans as `ottoman`, Japan as `ashikaga`), and giving the three with no record a form by hand (Albania confederation, Cherokee and Creek chiefdom). [GOV-043; D-GOV-18]
 - GOV-059 Until cap buildings stand in the game, each cap shall carry a part *Custom since 1444*: the officials (royal provinces with an official at his post) and the landed lords the realm held above its form's part on 1 January 1444, fixed for good, so no realm starts over a cap; a reform changes only the form's part. [GOV-001, GOV-002, GOV-047; D-GOV-18]
@@ -181,7 +181,7 @@ Every realm now has a form, both caps and their consequences in the game's month
 
 #### How the player uses it
 - GOV-064 Where: the player's own realm card (tap the realm in the top bar) has a **Government** tab next to General. It shows, top to bottom, the form and its family; both caps as two 44-point buttons, each "Officials x of y" or "Lords x of y" with a bar, its parts (Form, Custom since 1444) and, when over, in red what that does (which provinces get *Grasping officials*, how many lords slip at New Year); tapping a cap opens the Officials or Lords tab where the player can act (move or commission officials, grant or seize fiefs). Then **Laws of the realm**, what the form sets: succession, how far colonies may reach, and how many subjects it can hold against its reach. Then **Reform**: a card per next form with the change in officials and lords from now, each need marked ✓ or ✗, its gold and the lords who will slip, and a Reform button; a first tap asks "Pay N gold and M lords lose a loyalty step?" with Reform and Cancel, so a reform is never made by a stray tap. A form that comes only by revolution or event, or by itself when its condition holds, says so instead of a button. [X-19, GOV-049]
-- GOV-066 Grouping and overview: everything about the form sits in this one tab. The General tab of the player's card carries one line, "Government: <form> · officials x/y · lords x/y", red when over a cap, that opens the tab; another realm's card shows its form by name. *Grasping officials* shows in a province's grievances with what ends it, and a reform reaches the dispatches. Phone: the tab fits the side panel in the Wide and Tall layouts, the two caps and the next-form cards stack to one column on a narrow panel, every button at least 44 points high, nothing needs hover and the panel never scrolls sideways; a phone held upright is asked to turn sideways, as for the whole game. [X-19, SHELL-108, SHELL-109, SHELL-114]
+- GOV-066 Grouping and overview: everything about the form sits in this one tab. The General tab of the player's card carries one line, "Government: <form> · officials x/y · lords x/y", red when over a cap, that opens the tab; another realm's card shows its form by name. *Grasping officials* shows in a province's grievances with what ends it, and a reform reaches the News. Phone: the tab fits the side panel in the Wide and Tall layouts, the two caps and the next-form cards stack to one column on a narrow panel, every button at least 44 points high, nothing needs hover and the panel never scrolls sideways; a phone held upright is asked to turn sideways, as for the whole game. [X-19, SHELL-108, SHELL-109, SHELL-114]
 ### 5.9 Hordes: how far behind, and how they stay in the game (Leroy, 18 October)
 
 Leroy asked how far behind the hordes are in technology and how to balance it. The answer: a horde starts level with
@@ -296,7 +296,7 @@ All numbers are placeholders (government.yaml header: "Every number is a placeho
 | `hordes.balance.field_win_share` | Horde field wins against an equal settled army, Era I / II / III on (target, GOV-073) | 0.6 / 0.5 / 0.25 | yes (D-GOV-19) | balance targets |
 | `hordes.balance.raid_tribute_gold_share` | Share of a horde's gold from raids and tribute in Era I (target, GOV-074) | at least 1/3 | yes (D-GOV-19) | balance targets |
 
-**Forms** (officials / lords / subject reach / colonial range / succession → next):
+**Forms** (officials / lords / subject limit / colonial range / succession → next):
 
 | Form | Family | Off. | Lords | Subj. | Col. | Succession | Next |
 |---|---|---|---|---|---|---|---|
@@ -337,7 +337,7 @@ All numbers are placeholders (government.yaml header: "Every number is a placeho
 | buildings | upstream | Customer–Supplier | Which cap buildings stand and at what step; GOV supplies the officials/lords per building (buildings 7.7 adopted these) |
 | province | downstream | Customer–Supplier | GOV → *Grasping officials* grievance, self-run provinces need no official; PROV → officials hired (newest first), their provinces |
 | realm | partnership | Partnership | GOV → loyalty slips (New Year, reforms, lowest loyalty first), *Great lord* reasons, succession by form (country stats' inheritance law dropped, D-GOV-7); REALM → lords, their provinces and loyalty, treasury gold |
-| subjects | downstream | Published Language | Subject reach base and the form's change; a change to colonial government releases every subject (D-GOV-16) |
+| subjects | downstream | Published Language | Subject limit base and the form's change; a change to colonial government releases every subject (D-GOV-16) |
 | exploration | downstream | Published Language | Colonial range per form; governors in a slot don't count, founded colony's governor does |
 | revolutions | upstream | Conformist | Regimes set forms (era ignored); GOV remembers the last form not set by a revolution for `old_form` (D-GOV-9); committee rule only sets its form |
 | rebellions | upstream | Customer–Supplier | A won *New ideas* rising sets a form; disloyal lords rebel (consequence of slips) |
@@ -396,7 +396,7 @@ Decided on 17 October 2026 (DECISIONS.md). No question stays open.
 | GOV-009 | caps.feature | A national strength adds to a cap |
 | GOV-010 … GOV-017 | cap-buildings.feature | Buildings add to the caps; Buildings need inventions or forms |
 | GOV-018, GOV-021, GOV-022 | forms.feature | Each form's numbers |
-| GOV-019 | forms.feature | Subject reach from administrative capacity and form |
+| GOV-019 | forms.feature | Subject limit from administrative capacity and form |
 | GOV-020 | forms.feature | Colonial government holds no subjects |
 | GOV-023, GOV-024 | forms.feature | Self-run forms need no official for their own people |
 | GOV-025, GOV-026 | forms.feature | Colonial governors and the officials cap |

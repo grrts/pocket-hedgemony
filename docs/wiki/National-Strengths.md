@@ -214,7 +214,7 @@ The computer always knows its own ambitions and treats them as goals with weight
 - [Revolutions](Revolutions): reforms and revolutions can overcome weaknesses or grant legacies.
 - [Achievements](Achievements): suggested achievements for every ambition of a country and for 5 legacies.
 - [Screens and navigation](Screens-and-Navigation): heritage row and sheet, nation picker, digest lines.
-- [Map and lenses](Map-and-Lenses): the shimmer over hot ambitions; place names bound to provinces.
+- [Map and Map Modes](Map-and-Lenses): the shimmer over hot ambitions; place names bound to provinces.
 - [Settings](Settings): the history mode setting.
 - [Tutorial and help](Tutorial-and-Help): the tutorial ambition with a plain hint.
 - [How a turn works](Time-and-Turns): dates, eras for counsel gold, and years counted.

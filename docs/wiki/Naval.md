@@ -1,16 +1,16 @@
 # Naval
 
-Naval is how your realm gets ships to sea and keeps them there. Ships need ports, and ports need sailors: you muster sailors from a port's people, buy ships only where their crew already waits, put an official in command as admiral, and then keep the fleet paid, supplied and repaired while it sails with the winds. The size of your fleet is always tied to the seafaring people you can put aboard.
+Naval is how your realm gets ships to sea and keeps them there. Ships need ports, and ports need sailors: you recruit sailors from a port's people, buy ships only where their crew already waits, put an official in command as admiral, and then keep the fleet paid, supplied and repaired while it sails with the winds. The size of your fleet is always tied to the seafaring people you can put aboard.
 
 ## How it works
 
 ### Ports
 
-A **port** is a province with a harbour on a shore tile. Only a port can muster sailors, buy ships (other than small craft) and give berths. A coastal province without a harbour is a **plain shore**: seafolk fish from the beach, small craft can be launched and armies can land, but no ship can be bought, berthed or crewed there. Any realm can make a new port by building a harbour on a shore tile it holds.
+A **port** is a province with a harbour on a shore tile. Only a port can recruit sailors, buy ships (other than small craft) and give berths. A coastal province without a harbour is a **plain shore**: seafolk fish from the beach, small craft can be launched and armies can land, but no ship can be bought, berthed or crewed there. Any realm can make a new port by building a harbour on a shore tile it holds.
 
 | Harbour step | Berths | What it allows |
 |---|---|---|
-| 1 Harbour | 10 | mustering, buying, resupply |
+| 1 Harbour | 10 | recruiting sailors, buying, resupply |
 | 2 Port | 25 | also refit and hiring foreign crews |
 | 3 Great port | 50 | also coaling for steamships and later ships |
 
@@ -29,18 +29,18 @@ A harbour burned in a raid or sacked with the town falls a step, and one whose s
 
 ### Sailors
 
-Sailors are people, counted one by one. Mustering turns people of a port province into sailors; each leaves their class and their home slot stays empty until released. Every sailor counts the same toward a crew.
+Sailors are people, counted one by one. Recruiting turns people of a port province into sailors; each leaves their class and their home slot stays empty until released. Every sailor counts the same toward a crew.
 
-**Mustering.** *Muster sailors* is offered on a port, or on the country card for several ports at once, with one slider, only for provinces with a harbour. Of a province's fighting-age men (a quarter of its people), a muster can call 2 in 3 of the seafolk, 1 in 3 of the homeless and 1 in 20 of every other class, each class by its share. Sailors come from the same people as the levy, so a man at sea can't be levied and the levy pool shows the sailors already gone. A muster pays a bounty of 0.05 gold a sailor, lowers the province's fish for the seafolk away, and has the sailors ready in that port after 14 days.
+**Recruiting sailors.** *Recruit sailors* is offered on a port, or on the country card for several ports at once, with one slider, only for provinces with a harbour. Of a province's fighting-age men (a quarter of its people), a muster can call 2 in 3 of the seafolk, 1 in 3 of the homeless and 1 in 20 of every other class, each class by its share. Sailors come from the same people as the levy, so a man at sea can't be levied and the levy pool shows the sailors already gone. A muster pays a bounty of 0.05 gold a sailor, lowers the province's fish for the seafolk away, and has the sailors ready in that port after 14 days.
 
 **Waiting in port.** Each sailor in port eats 1 ration a month from the province store and is paid 0.1 gold. After 6 months with no ship being built for them, 1 in 10 drift back to their slots each month.
 
-**The Lagos muster.** Lagos has 4,600 seafolk and 1,150 fighting-age men, of whom about 770 can go to sea. Portugal musters 75 sailors: it pays 4 gold of bounty, Lagos loses 5 % of its fish while they serve, and the 75 are sailors in port at Lagos when the muster is ready. Each month they eat 75 rations from the Lagos store and cost 7.5 gold in wages.
+**Recruiting at Lagos.** Lagos has 4,600 seafolk and 1,150 fighting-age men, of whom about 770 can go to sea. Portugal recruits 75 sailors: it pays 4 gold of bounty, Lagos loses 5 % of its fish while they serve, and the 75 are sailors in port at Lagos when they are ready. Each month they eat 75 rations from the Lagos store and cost 7.5 gold in wages.
 
 **Other sources:**
 
 - **Foreign crews**: at harbour 2 or better you can hire sailors from a seafaring people whose ships call there. They arrive as sailors in that port, cost twice the wage and leave when unpaid.
-- **Lords**: a loyal lord with a port musters his own sailors by the same rules and brings his ships when called; his ships and crews stay his.
+- **Lords**: a loyal lord with a port recruits his own sailors by the same rules and brings his ships when called; his ships and crews stay his.
 - **Prisoners**: a captured ship's sailors can be taken into service; 1 in 4 desert at the first port friendly to them.
 - **Pressing**: with S9 Line-of-battle tactics you can take seafolk men in a port without the bounty, giving the province the *Pressed* grievance for a year.
 
@@ -50,7 +50,7 @@ Sailors move by road to another of your ports at levy marching pace, eating on t
 
 - A province whose men have served 2 years or more at sea gets +10 % fish and +10 % traders by sea for 10 years.
 - A fifth of the wages of sailors in port is spent in that port as trade for its market folk.
-- While sailors are away their fishery, harbour or shipyard slots stay empty; a fishery under half filled is fallow with no fish. A muster that takes the seafolk a shipyard needs stops its slipways.
+- While sailors are away their fishery, harbour or shipyard slots stay empty; a fishery under half filled is fallow with no fish. Recruiting the seafolk a shipyard needs stops its slipways.
 - A province that loses more than a tenth of its seafolk at sea within 5 years has fewer births for 10 years and the *Lost at sea* grievance for 2 years.
 
 ### Buying ships
@@ -83,7 +83,7 @@ Hold and purse are the [Trade](Trade) design's numbers.
 - A port with no slipway can build cogs, junks, dhows and caravels on its harbour, one at a time, taking half as many months again. With slipways they take the table's months, as many at once as there are slipways.
 - The cog type follows the sea: cog in Europe, junk in East and Southeast Asia, dhow in the Indian Ocean and Red Sea.
 - Ships that shoot (the armed carrack and later) need their guns, cast or bought as for gun crews, and powder for each voyage.
-- A blockaded port keeps mustering and building, but nothing leaves without a battle. An enemy who takes the port gets every hull on its slipways.
+- A blockaded port keeps recruiting and building, but nothing leaves without a battle. An enemy who takes the port gets every ship being built there.
 - **Buying abroad**: in a foreign great port with a shipyard, at peace with you and with its owner's agreement, you can order a hull on the seller's slipway at 1.5 times the gold, with your crew waiting there paid double.
 - **Small craft** can be bought on any shore tile with seafolk, harbour or not. Each has 6 sailors, carries 10 men or a load of goods along coastal zones only, can land an army on any shore, and serves as the fishery's boats. They never fight a sea battle, and a zone with an enemy war fleet is closed to them. With S3 Outrigger voyaging, small craft can cross ocean zones and you can build war canoe fleets and voyaging canoes on any beach.
 - Ships also come by capture with a prize crew, from a loyal lord for the time of his service, from hired privateers or corsairs (ship, crew and commander for a season), and from events (a treasure fleet, a gift from a sea power, a salvaged wreck).
@@ -168,7 +168,7 @@ Sea battles are fought over time, in rounds of 4 hours. While one of your fleets
 - When an admiral gives a **Close** order or a galley rams, its soldiers aboard fight the enemy ship's crew and soldiers by the land bell rules on a single sector, and the ship whose defenders break is taken.
 - A ship taken, or one that strikes to a stronger fleet in a hunt, becomes the winner's if a **prize crew** of at least a quarter of its crew is put aboard from the fleet; otherwise it is burned. Its own crew become prisoners or prize crew.
 - When a ship sinks, a third of its crew swim ashore or are picked up by the winner as prisoners, and the rest drown.
-- An enemy fleet in a port's zone blockades the port. An army that takes a port province's castle takes every ship there that has not sailed and the hulls on its slipways.
+- An enemy fleet in a port's zone blockades the port. An army that takes a port province's castle takes every ship there that has not sailed and the ships being built there.
 
 **Pirates.** Each pirate coast in config (the wokou in the East China Sea, Barbary and Aegean corsairs, the Orang Laut in the Malacca strait, the Caribbean later) has a pirate fleet with no country, hunting trade ships in its home zones and one zone beyond. Each season in which trade ships passed and no warship hunted there, it gains a ship; ships taken or sunk are removed. Burning its base ends the fleet until trade brings it back. Where a pirate people is also a catalogue record (wokou, Orang Laut), the same fleet can belong to a lord or be hired.
 
@@ -184,15 +184,15 @@ Each day of the day loop (7 days a turn) fleets take their step and use supply, 
 
 - **World zoom**: ports as anchor dots in the owner's colour (larger for great ports); fleets as one ship sprite with a count.
 - **Region zoom**: berths used and free, slipways with hulls building, fleets with the admiral's banner and course line in days.
-- **The port card** (province zoom): sailors in port, berths, slipways, ships by state, and the *Muster sailors* and *Buy ship* commands.
-- **The Sea lens**: ports shaded by sailors who can still be called, fleets at sea, the month's winds, and the zones a fleet can enter.
-- **The muster preview**: who is taken by class, the bounty, fish lost and when they are ready.
+- **The port card** (province zoom): sailors in port, berths, slipways, ships by state, and the *Recruit sailors* and *Buy ship* commands.
+- **The Sea map mode**: ports shaded by sailors who can still be called, fleets at sea, the month's winds, and the zones a fleet can enter.
+- **The recruiting preview**: who is taken by class, the bounty, fish lost and when they are ready.
 
 ### In the game now
 
 The first slice of ships is playable:
 
-- **Port tab.** Tap a coastal province of yours and open its Port tab: its harbour and shipyard, berths and slipways, sailors ready, on their way and still callable. *Muster 30, 100 or 300* calls sailors from the levy pool, ready in two weeks. *Order a ship* lists every ship the yard can build with its gold, crew, months, fights and carries, or why it can't yet (crew not in port, no slipway, an invention). A hull on the slipway is launched into the port's fleet when its months are up.
+- **Port tab.** Tap a coastal province of yours and open its Port tab: its harbour and shipyard, berths and slipways, sailors ready, on their way and still callable. *Recruit 30, 100 or 300* calls sailors from the levy pool, ready in two weeks. *Order a ship* lists every ship the yard can build with its gold, crew, months, fights and carries, or why it can't yet (crew not in port, no slipway, an invention). A hull on the slipway is launched into the port's fleet when its months are up.
 - **Fleets on the map.** Every fleet shows as a ship in its realm's colours with its ship count, in its sea zone or just off its port. Tap one of yours to choose it, then tap a sea zone, a port or a shore: it sets sail at once along a dotted course. Tap it again to open its card.
 - **Fleet card.** Where it is, Sail, its admiral (a fleet needs one to sail: appoint a commander waiting at court), the army aboard, every ship with its crew, hull and supply, *Part off*, *Join another fleet here* and *Lay up*.
 - **Carrying armies.** An army standing in a port shows *Board ships*; aboard, it stands off the map and moves with its ships. Sail to a shore you may march into and it lands there; sail into a friend's port and it goes ashore.
@@ -219,7 +219,7 @@ Prices are the design's scaled to the game's treasury (ships ×0.1, wages ×0.01
 - [Subjects](Subjects): subject ports are friendly docking.
 - [World-Map](World-Map): about 4,700 sea zones, shore tiles and adjacency.
 - [The-1444-Start](The-1444-Start): starting harbours and shipyards, canoe landings.
-- [Map-and-Lenses](Map-and-Lenses): ports, fleets and the Sea lens.
+- [Map and Map Modes](Map-and-Lenses): ports, fleets and the Sea map mode.
 - [Time-and-Turns](Time-and-Turns): the day loop and monthly steps.
 - [Historical-Events](Historical-Events): ships from events.
 - [Government](Government): realms with no officials lead fleets by chiefs or elders.
@@ -269,7 +269,7 @@ Ports data: `naval/data/ports-1444.tsv` (hand-edited) and the generated `ports-1
 
 ## How the open points were settled
 
-- **Mustering** takes every class by its share, not seafolk first: from 770 seafolk, 45 homeless and 15 others, 300 sailors are 278 seafolk, 16 homeless and 6 others. The bounty is 0.05 gold a sailor (75 sailors cost 4 gold), the sailors are ready after 14 days, and the province loses fish in proportion to the seafolk away out of the third of its seafolk who fish.
+- **Recruiting sailors** takes every class by its share, not seafolk first: from 770 seafolk, 45 homeless and 15 others, 300 sailors are 278 seafolk, 16 homeless and 6 others. The bounty is 0.05 gold a sailor (75 sailors cost 4 gold), the sailors are ready after 14 days, and the province loses fish in proportion to the seafolk away out of the third of its seafolk who fish.
 - **Admirals**: commissioning costs 10 gold and the admiral is paid three times his wage at sea. Years an official served in a port province count double, with the usual +1 at 5 and 10 years. A colonial governor cannot be made an admiral. Women can be admirals where the country's history allows women commanders.
 - **Battle damage**: a ship that takes hits and stays afloat loses one hull step; hits equal to its strength sink it. Repairs happen at harbour step 2 or a shipyard.
 - **Storms**: in storm season each ship at sea has a 1 in 20 chance a month to be struck, less with a good admiral's Logistics and halved next to a lighthouse. A struck ship loses a hull step, and a wrecked one sinks.
@@ -292,5 +292,5 @@ Nothing in the rules. Balancing is a tuning pass on the numbers.
 ## For developers
 
 - Spec: `domain/naval/spec.md` in the game repository, requirement code **NAVY** (NAVY-001 to NAVY-117).
-- Features: `domain/naval/features/`, including `ports.feature`, `sailors.feature` (the Lagos muster), `buying-ships.feature`, `admirals.feature` (Rui Vaz of Lagos), `sailing.feature` and `sea-combat.feature`.
+- Features: `domain/naval/features/`, including `ports.feature`, `sailors.feature` (recruiting at Lagos), `buying-ships.feature`, `admirals.feature` (Rui Vaz of Lagos), `sailing.feature` and `sea-combat.feature`.
 - Code: there is no `packages/engine/src/domain/naval/` yet. The port placer is `naval/tools/place_ports.py` in the designs.

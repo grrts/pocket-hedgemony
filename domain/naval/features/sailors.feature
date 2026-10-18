@@ -1,7 +1,7 @@
 @context-naval
 Feature: Sailors
   As a player or AI country
-  I want to muster sailors from the people of my ports
+  I want to recruit sailors from the people of my ports
   So that my ships have crews, at the cost of empty boats and slots at home
 
   Background:
@@ -18,7 +18,7 @@ Feature: Sailors
   @NAVY-024
   Scenario: Only provinces with a harbour can be picked for a muster
     Given the province "Arguin" has no harbour
-    When the country "Portugal" opens Muster sailors from the country card
+    When the country "Portugal" opens Recruit sailors from the country card
     Then the province "Lagos" can be picked
     And the province "Arguin" cannot be picked
 

@@ -237,7 +237,7 @@ app.innerHTML = `
   <div class="map" id="map"></div>
   <header class="hud" id="hud"></header>
   <div class="tools">
-    <button class="icon-only" id="mode" title="Map lens" aria-expanded="false">${icon("map", 3, "Map lens")}</button>
+    <button class="icon-only" id="mode" title="Map mode" aria-expanded="false">${icon("map", 3, "Map mode")}</button>
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
     <button class="icon-only" id="armies" title="Your commanders" aria-expanded="false" hidden>${icon("swords", 3, "Commanders")}</button>
     <button class="icon-only" id="sound" title="Sound and music" aria-expanded="false">${icon("speaker", 3, "Sound")}</button>
@@ -675,7 +675,7 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "tongues", name: "Languages", note: "the family of the language most speak" },
   { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
   { id: "trade", name: "Trade", note: "trade ratio, your traders' loops" },
-  { id: "charts", name: "Charts", note: "what you have charted, and empty coasts to settle" },
+  { id: "charts", name: "Exploration", note: "what you have charted, and empty coasts to settle" },
 ];
 /** The trade lens's ramp by trade ratio, quiet to busy (TRADE-143); provinces the player doesn't see are parchment. */
 const TRADE_RAMP = ["#efe39a", "#e0b443", "#c7742a", "#3f8f6e", "#1f5a5e"].map(hexToRgb);
@@ -761,10 +761,10 @@ function setLens(l: Lens): void {
 
 function renderLensMenu(): void {
   lensMenu.innerHTML = `
-    <h3 class="sub">Map lens</h3>
+    <h3 class="sub">Map mode</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.id === "lords" && snapshot ? cap(titlesOf(snapshot.playerNation).lords) : l.name}</b><small>${l.note}</small></button>`).join("")}
     ${lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
-    <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
+    <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Hide unexplored lands</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
       setLens(b.dataset.lens as Lens);
@@ -804,7 +804,7 @@ function subjectsKey(): string {
     <span>${sw(LOYALTY_HEX.wavering)}Wavering subject</span>
     <span>${sw(LOYALTY_HEX.disloyal)}Disloyal subject</span>
     <span>${sw(OVERLORD_HEX)}Your overlord</span>
-    <p>${sv ? `Reach used ${sv.used} of ${sv.reach}.` : ""} A dotted line runs from a courting realm to the subject it courts. Tap a subject for its Diplomacy tab.</p>
+    <p>${sv ? `Subject limit: ${sv.used} of ${sv.reach} used.` : ""} A dotted line runs from a courting realm to the subject it courts. Tap a subject for its Diplomacy tab.</p>
   </div>`;
 }
 
@@ -1948,7 +1948,7 @@ function renderHud(): void {
         case "war":
           return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} title="Your wars">${icon("swords", 1)}At war</button>`;
         case "dispatches":
-          return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
+          return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
       }
     })
     .join("\n    ");
@@ -2273,7 +2273,7 @@ function renderNews(): void {
     else days.push({ date: x.date, news: [x.news] });
   }
   panel.innerHTML = `
-    <header><h2 class="ribbon">Dispatches</h2>${closeButton()}</header>
+    <header><h2 class="ribbon">News</h2>${closeButton()}</header>
     <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
     ${waitingEventsHtml(s.events)}
     ${asksHtml()}
@@ -2338,7 +2338,7 @@ function renderActions(): void {
 }
 
 function closeButton(): string {
-  return `<span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span>`;
+  return `<span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span>`;
 }
 
 /** Shows or hides the panel, leaving a tool button to bring a folded panel back. */
@@ -2353,7 +2353,7 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
   const what =
-    reopenIcon === "crown" ? "Choose a realm" : newsView ? "Dispatches" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
+    reopenIcon === "crown" ? "Choose a realm" : newsView ? "News" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
   reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
   reopen.title = `Open the overview: ${what}`;
   panel.querySelector(".fold")?.addEventListener("click", () => {
@@ -2416,7 +2416,7 @@ function renderPanelCard(): void {
   sailing = -1;
   if (!snapshot && selectedProvince < 0) {
     panel.innerHTML = `
-      <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button></span></header>
+      <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button></span></header>
       ${startActions()}
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
@@ -3290,11 +3290,11 @@ async function actHere(order: Order): Promise<void> {
 }
 
 const ARM_LABEL: Record<string, string> = {
-  "levy foot": "Levy foot",
-  "armoured foot": "Armoured foot",
+  "levy foot": "Levy infantry",
+  "armoured foot": "Heavy infantry",
   pikes: "Pikes",
   archers: "Archers",
-  "light horse": "Light horse",
+  "light horse": "Light cavalry",
   "knights and lancers": "Knights and lancers",
 };
 const armText = (by: number[]) =>
@@ -3628,12 +3628,12 @@ function renderArmy(id: number): void {
     </table>
     ${hired ? "" : `<h3 class="sub">Train</h3>
     ${training
-      ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy foot training as ${esc(training.arm)}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand at a castle or drill yard of your own)"}.</p>`
+      ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy infantry training as ${esc((ARM_LABEL[training.arm] ?? training.arm).toLowerCase())}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand at a castle or drill yard of your own)"}.</p>`
       : trainMen >= 1 && !atHome
-        ? `<p class="hint">Men train only at a castle or drill yard of your own. March the army to one (your capital has a castle) to train its levy foot.</p>`
+        ? `<p class="hint">Men train only at a castle or drill yard of your own. March the army to one (your capital has a castle) to train its levy infantry.</p>`
       : trainMen >= 1
-        ? `<p class="hint">Turn levy foot into another arm. Training goes on while the army stands at a castle or drill yard of your own, and holds while it is away.</p>
-          ${levyFoot >= 2000 ? `<div class="stepper" role="group" aria-label="Levy foot to train"><button class="paper" data-train-less ${trainThousands <= 1 ? "disabled" : ""} aria-label="Fewer">−</button><output>${fmt(trainMen)} of ${fmt(Math.floor(levyFoot))}</output><button class="paper" data-train-more ${trainThousands * 1000 + 1000 > levyFoot ? "disabled" : ""} aria-label="More">+</button></div>` : ""}
+        ? `<p class="hint">Turn levy infantry into another troop type. Training goes on while the army stands at a castle or drill yard of your own, and holds while it is away.</p>
+          ${levyFoot >= 2000 ? `<div class="stepper" role="group" aria-label="Levy infantry to train"><button class="paper" data-train-less ${trainThousands <= 1 ? "disabled" : ""} aria-label="Fewer">−</button><output>${fmt(trainMen)} of ${fmt(Math.floor(levyFoot))}</output><button class="paper" data-train-more ${trainThousands * 1000 + 1000 > levyFoot ? "disabled" : ""} aria-label="More">+</button></div>` : ""}
           <div class="choices">${trainable
             .map((a) => {
               const cost = ARM_COST[a]!;
@@ -3641,7 +3641,7 @@ function renderArmy(id: number): void {
               return `<button class="paper" data-train="${a}" ${g > s.nationTreasury[me]! ? "disabled" : ""}>${ARM_LABEL[a]} · ${cost.months} mo · ${g.toFixed(2)} gold</button>`;
             })
             .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Research</button></p>` : ""}`
-        : `<p class="hint">No levy foot left to train.</p>`}`}
+        : `<p class="hint">No levy infantry left to train.</p>`}`}
     ${(() => {
       const waiting = garrison.reduce((t, j) => t + s.armies.men[j]!, 0);
       return garrison.length
@@ -3861,7 +3861,7 @@ function mercenaryLine(): string {
   const s = snapshot!;
   const serving = hiredArmies().length;
   const parts = [serving ? `${serving} in service` : "", s.mercs.length ? `${s.mercs.length} on the way` : "", `${s.freeCompanies.length} for hire`].filter(Boolean);
-  return `<h3 class="sub">Mercenaries</h3><p><button class="paper" data-realm-open-tab="mercenaries">${icon("coin", 1)}Free companies: ${parts.join(", ")}</button></p>`;
+  return `<h3 class="sub">Mercenaries</h3><p><button class="paper" data-realm-open-tab="mercenaries">${icon("coin", 1)}Mercenary companies: ${parts.join(", ")}</button></p>`;
 }
 
 const hiredArmies = () => {
@@ -3890,12 +3890,12 @@ function mercenarySection(): string {
   const pay = serving.reduce((t, k) => t + s.armies.pay[k]!, 0);
   const card = (inner: string, extra = "") => `<li class="company${extra}">${inner}</li>`;
   return `<p>${serving.length ? `${serving.length} compan${serving.length === 1 ? "y" : "ies"} in service, ${fmt(serving.reduce((t, k) => t + s.armies.men[k]!, 0))} men, ${pay.toFixed(1)} gold a month.` : `No company in your service yet${s.mercs.length ? `; ${s.mercs.length} on the way` : ""}.`}</p>
-    <p class="hint">Free companies come with their own captain and march to your capital. They cost three times a levy's pay; the first month is paid on hiring.</p>
+    <p class="hint">Mercenary companies come with their own captain and march to your capital. They cost three times a levy's pay; the first month is paid on hiring.</p>
     ${serving.length || s.mercs.length ? `<div class="queue-head"><span>Your companies</span><span>${fmt(serving.reduce((t, k) => t + s.armies.men[k]!, 0) + s.mercs.reduce((t, m) => t + m.men, 0))} men</span></div>
     <ol class="companies">${serving
       .map((k) => {
         const c = s.commanders[s.armies.commander[k]!];
-        return card(`<div class="company-head"><b>${esc(c?.name ?? "A free company")}</b><small>${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}</small></div>
+        return card(`<div class="company-head"><b>${esc(c?.name ?? "A mercenary company")}</b><small>${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}</small></div>
           <small>${armText(s.armies.byArm[k]!)} · ${s.armies.pay[k]!.toFixed(1)} gold a month</small>
           <div class="company-foot"><span></span><button class="paper" data-command="${s.armies.id[k]!}">Command</button></div>`);
       })

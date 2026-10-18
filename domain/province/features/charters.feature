@@ -19,7 +19,7 @@ Feature: Charters
       | no quartering   | no armies wintering there                    | winter quarters there                       |
       | faith tolerance | its minority faith worshipping openly        | clergy lords' loyalty; Wrong faith ends there |
       | free trade      | no tolls                                     | toll gold                                   |
-      | mining right    | faster digging and new seams                 | half the mine's output                      |
+      | mining right    | faster digging and new ore deposits          | half the mine's output                      |
 
   @PROV-211
   Scenario Outline: How a province gains a charter
@@ -65,4 +65,4 @@ Feature: Charters
     When the country grants a "mining right" charter there
     Then a merchant house runs the mine
     And the country gets half the mine's output
-    And the mine digs faster and finds new seams
+    And the mine digs faster and finds new ore deposits

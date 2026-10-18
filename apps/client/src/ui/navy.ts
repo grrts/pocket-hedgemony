@@ -34,7 +34,7 @@ export function portTab(port: Port, o: { gold: number; musterGoldEach: number; f
   const muster = (n: number) => {
     const g = Math.round(n * o.musterGoldEach * 100) / 100;
     const why = n > port.callable ? "not enough men to call here" : g > o.gold ? "not enough gold" : "";
-    return `<button class="paper" data-port-muster="${n}" ${why ? `disabled title="${why}"` : ""}>Muster ${fmt(n)} · ${g} gold</button>`;
+    return `<button class="paper" data-port-muster="${n}" ${why ? `disabled title="${why}"` : ""}>Recruit ${fmt(n)} · ${g} gold</button>`;
   };
   const ships = port.ships
     .map(
@@ -49,10 +49,10 @@ export function portTab(port: Port, o: { gold: number; musterGoldEach: number; f
       <dt>Berths</dt><dd>${port.berthsUsed} of ${port.berths} taken · ${plural(port.slipways, "slipway")}</dd>
       <dt>Sailors</dt><dd>${fmt(ready)} ready in port${port.mustering ? `, ${fmt(port.mustering)} on their way` : ""} · ${fmt(port.callable)} more can be called</dd>
     </dl>
-    <h3 class="sub">Muster sailors</h3>
+    <h3 class="sub">Recruit sailors</h3>
     <p class="hint">Sailors come from the levy pool and are ready in two weeks. Each ship needs its crew waiting here before it is ordered.</p>
     <div class="choices">${[30, 100, 300].map(muster).join("")}</div>
-    ${port.building.length ? `<h3 class="sub">On the slipways</h3><ul class="plain">${port.building.map((b) => `<li>${icon("hourglass", 1)} ${esc(cap1(b.type))}: ${plural(b.monthsLeft, "month")} left of ${b.months}</li>`).join("")}</ul>` : ""}
+    ${port.building.length ? `<h3 class="sub">Being built</h3><ul class="plain">${port.building.map((b) => `<li>${icon("hourglass", 1)} ${esc(cap1(b.type))}: ${plural(b.monthsLeft, "month")} left of ${b.months}</li>`).join("")}</ul>` : ""}
     <h3 class="sub">Order a ship</h3>
     <table class="troops ships">${ships}</table>
     ${o.fleetsHere.length ? `<h3 class="sub">In port</h3><div class="choices">${o.fleetsHere.map((f) => fleetButton(f, o.admiralName)).join("")}</div>` : ""}`;
@@ -119,7 +119,7 @@ export function fleetCard(
       )
       .join("")}</table>
     ${o.fleetsHere.length && !f.hired ? `<h3 class="sub">Join another fleet here</h3><div class="choices">${o.fleetsHere.map((x) => `<button class="paper" data-fleet-merge="${x.id}">Into ${x.admiral >= 0 ? `${esc(o.admiralName(x.admiral))}'s fleet` : "the fleet without an admiral"}</button>`).join("")}</div>` : ""}
-    ${o.inPort && f.army < 0 && !f.hired ? `<div class="choices"><button class="paper" data-fleet-disband>Lay up the ships and pay off the crews</button></div>` : ""}`;
+    ${o.inPort && f.army < 0 && !f.hired ? `<div class="choices"><button class="paper" data-fleet-disband>Disband the fleet</button></div>` : ""}`;
 }
 
 /** The realm's Navy tab: the overview of every fleet, port and sea battle, and what it all costs. */
@@ -141,7 +141,7 @@ export function navyTab(v: NavyView, me: number, o: { name: (p: number) => strin
     <h3 class="sub">Fleets</h3>
     ${fleets.length
       ? `<div class="fleet-list">${fleets.map((f) => `<div class="fleet-row">${fleetButton(f, o.admiralName)}<small>${fleetStatus(f, o.name)}</small></div>`).join("")}</div>`
-      : `<p class="hint">No ships yet. Open a port below, muster sailors there and order a ship.</p>`}
+      : `<p class="hint">No ships yet. Open a port below, recruit sailors there and order a ship.</p>`}
     <h3 class="sub">Ports</h3>
     ${v.ports.length
       ? `<table class="troops ports">${v.ports

@@ -65,7 +65,7 @@ Newest decision first.
 | Sailor | A person mustered from a port province's people, counted one by one; their home slot stays empty while they serve | Seafolk (the class), crew |
 | Sailors in port | Mustered sailors waiting in a named port to board a ship | Crew |
 | Crew | Sailors aboard a ship; also the crew number a ship type needs | Sailors in port |
-| Muster | The act that turns people of a port province into sailors | Levy (recruiting) |
+| Recruiting sailors (was Muster) | The act that turns people of a port province into sailors; the command is *Recruit sailors*. Older text and config keys still say muster | Levy (recruiting) |
 | Bounty | Gold paid for signing sailors on at a muster | Wage |
 | Pressing | After S9, taking seafolk men as sailors without the bounty, causing the *Pressed* grievance | Muster |
 | Ship family | Trade, military or exploration; sets the supply a ship carries | Ship type |
@@ -216,7 +216,7 @@ Newest decision first.
 - NAVY-022: When sailors are mustered, the naval system shall change people into sailors one by one, each
   leaving their class and leaving their home slot empty until released. [naval §2.1]
 - NAVY-023: The naval system shall count every sailor the same toward a ship's crew. [naval §2.1]
-- NAVY-024: The naval system shall offer *Muster sailors* on a port, or on the country card for several ports at
+- NAVY-024: The naval system shall offer *Recruit sailors* on a port, or on the country card for several ports at
   once, with one slider, only for provinces with a harbour. [naval §2.2]
 - NAVY-025: The naval system shall let a muster call, of a province's fighting-age men (a quarter of its people),
   2 in 3 of the seafolk, 1 in 3 of the homeless and 1 in 20 of every other class. [naval §2.2]
@@ -409,7 +409,7 @@ Newest decision first.
 - NAVY-108: The naval system shall supply, for each zoom: ports as anchor dots in the owner's colour (larger for
   great ports) and fleets as one ship sprite with a count (world); berths used/free, slipways with hulls building,
   fleets with the admiral's banner and course line in days (region); the port card with sailors in port, berths,
-  slipways, ships by state and the *Muster sailors* and *Buy ship* commands (province); and a Sea lens of ports
+  slipways, ships by state and the *Recruit sailors* and *Buy ship* commands (province); and a Sea lens of ports
   shaded by sailors who can still be called, fleets at sea, the month's winds and the zones a fleet can enter. [naval §10, §4.1]
 
 ### AI and the phone
@@ -442,7 +442,7 @@ Newest decision first.
 
 ### How the player uses it (first slice in the game)
 
-- NAVY-126 Where: the player taps a coastal province of theirs, then its **Port** tab (beside Overview, People, Garrison, Land and Build; it shows an hourglass while hulls are building). The tab gives the harbour and shipyard, berths taken of all and slipways, the sailors ready in port, on their way and still callable, then *Muster 30 / 100 / 300* with the bounty, the hulls on the slipways with their months left, and *Order a ship*: one row per ship the port can build with its gold, crew, months, fights and carries and an Order button, or why not (crew not in port, no slipway, an invention by its name, gold). [X-19; D-NAVY-30]
+- NAVY-126 Where: the player taps a coastal province of theirs, then its **Port** tab (beside Overview, People, Garrison, Land and Build; it shows an hourglass while hulls are building). The tab gives the harbour and shipyard, berths taken of all and slipways, the sailors ready in port, on their way and still callable, then *Recruit 30 / 100 / 300* with the bounty, the ships being built with their months left, and *Order a ship*: one row per ship the port can build with its gold, crew, months, fights and carries and an Order button, or why not (crew not in port, no slipway, an invention by its name, gold). [X-19; D-NAVY-30]
 - NAVY-127 Grouping: one **fleet card** holds everything about a fleet: where it is and what it is doing, Sail, its admiral (appoint, hand over, send back to court), the army aboard (take aboard an army standing in its port, put it ashore), each ship with its crew, hull and supply and *Part off*, *Join another fleet here* and *Lay up*. It opens by tapping the fleet on the map twice, from the Port tab, from a sea zone's card or from the Navy tab. [X-19]
 - NAVY-128 Sailing: tapping one of the player's fleets on the map chooses it, as an army is picked, and folds the panel away; the next tap on a sea zone, a port or a shore sets sail at once, with the voyage drawn as a dotted course. With an army aboard, a shore of a realm the player may march into is a landing and a friend's port is put into. A fleet with no admiral says so on its card instead of a Sail button. An army aboard stands off the map; picking it from the commanders list opens its fleet. An army in a port shows *Board ships* on its card. [X-19; D-NAVY-31]
 - NAVY-129 Overview: the player's own realm card has a **Navy** tab (after Military): ships and fleets, sailors in port or on their way, the month's cost (also the "Ships and sailors" line of the Treasury ledger), sea battles under way, every fleet with where it is and its voyage, and every port with its shipyard, sailors and hulls, each opening its Port tab. A sea battle of the player's is said over the map with Go there and crossed swords mark its zone; launched ships are said over the map too. [X-19]
@@ -795,7 +795,7 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | NAVY-050 | buying-ships.feature | Ships that shoot need guns and powder |
 | NAVY-051 | buying-ships.feature | A blockaded port keeps building but nothing leaves |
 | NAVY-051 | sea-combat.feature | An enemy fleet blocks a port |
-| NAVY-052 | buying-ships.feature | A taken port loses its hulls on the slipways |
+| NAVY-052 | buying-ships.feature | A taken port loses the ships being built there |
 | NAVY-053 | buying-ships.feature | Buying a hull abroad in Venice |
 | NAVY-053 | buying-ships.feature | No crew abroad, no hull abroad |
 | NAVY-054 | buying-ships.feature | Small craft at a canoe landing |

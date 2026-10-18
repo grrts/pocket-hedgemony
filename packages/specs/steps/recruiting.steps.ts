@@ -747,7 +747,7 @@ When(re('the player picks "(the ruler|an heir|a lord|a hired captain|an exile)"'
 });
 Then(
   re(
-    "(the ruler leads|the heir leads|the lord can lead only his own retinue as a captain|the captain comes with his free company|the exile becomes an official of the closest type and can be commissioned)",
+    "(the ruler leads|the heir leads|the lord can lead only his own retinue as a captain|the captain comes with his mercenary company|the exile becomes an official of the closest type and can be commissioned)",
   ),
   (s, r: string) => {
     expect(s.leader).toBe(r);

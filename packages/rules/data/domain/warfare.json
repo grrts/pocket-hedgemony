@@ -28,7 +28,7 @@
  "days_per_week": 7,
  "days_per_month": 30,
  "arms": {
-  "levy foot": { "label": "Levy foot (spears, bows, farm tools)", "strength": 1.0, "unit": "man", "needs": {}, "roles": ["Line"], "unlock": "start", "foot": true },
+  "levy foot": { "label": "Levy infantry (spears, bows, farm tools)", "strength": 1.0, "unit": "man", "needs": {}, "roles": ["Line"], "unlock": "start", "foot": true },
   "armoured foot": { "strength": 1.3, "unit": "man", "needs": { "arms": 1 }, "roles": ["Line", "Heavy"], "unlock": "start", "foot": true, "next_down": "levy foot" },
   "archers": { "strength": 1.1, "unit": "man", "needs": { "arms": 1 }, "roles": ["Shot"], "unlock": "start", "foot": true, "shoots": "arrows" },
   "pikes": { "strength": 1.2, "unit": "man", "needs": { "arms": 1 }, "roles": ["Brace"], "unlock": "W6", "foot": true, "spears": true },

@@ -9,7 +9,7 @@ This wiki explains every system in the game and how it works. Each page is writt
 - [How a turn works](Time-and-Turns): one week per turn, the days inside it, and when the campaign ends.
 - [The 1444 start](The-1444-Start): which realms exist and which you can play.
 - [Your realm](Your-Realm) and [Provinces](Provinces): the two cards everything else feeds.
-- [Map and lenses](Map-and-Lenses): what the map shows at each zoom.
+- [Map and Map Modes](Map-and-Lenses): what the map shows at each zoom.
 
 ## Land and economy
 

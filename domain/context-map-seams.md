@@ -59,7 +59,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| achievements | upstream | Published Language | Hungry provinces, famine rule release, officials, charters, trade hub, province gained |
+| achievements | upstream | Published Language | Hungry provinces, famine relief release, officials, charters, trade hub, province gained |
 
 ## achievements ↔ realm (one-sided)
 
@@ -627,7 +627,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| subjects | partnership | Customer–Supplier | Diplomacy maps relation kinds onto the six kinds through `mapping_1444` and reads `fights` / `own_diplomacy` from here (X-8); its counts decide asks by agreement and this context picks the kind (D-SUBJ-4); Break a subject targets the overlord (D-SUBJ-6) |
+| subjects | partnership | Customer–Supplier | Diplomacy maps relation types onto the six types through `mapping_1444` and reads `fights` / `own_diplomacy` from here (X-8); its counts decide asks by agreement and this context picks the type (D-SUBJ-4); Break a subject targets the overlord (D-SUBJ-6) |
 
 ## diplomacy (heads) ↔ religion (one-sided) (unknown context name)
 
@@ -756,7 +756,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | diplomacy | downstream | Customer–Supplier | Subject relation records (diplomacy stores; kinds mapped onto the six kinds by subjects, X-8); diplomacy uses the subjects kind rules for joining wars and own diplomacy (D-DIPL-10); calls to Vassals and Protectorates are answered by subjects by loyalty; subjects by agreement (count here, kind there, D-DIPL-32); *Break a subject* against the overlord (D-DIPL-8) |
-| subjects | upstream | Customer–Supplier | Subject relation records, kinds, `make_subject`, `release_subject`, `independence_war`, envoys, marriages, protection asks, courting, crowns inherited |
+| subjects | upstream | Customer–Supplier | Subject relation records, types, `make_subject`, `release_subject`, `independence_war`, envoys, marriages, protection asks, courting, crowns inherited |
 
 ## diplomacy ↔ time-and-turns
 
@@ -1255,8 +1255,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| government | downstream | Published Language | Subject reach base and the form's change; a change to colonial government releases every subject (D-GOV-16) |
-| subjects | upstream | Customer–Supplier | Subject reach (base + form), lord capacity; government sets no limits on kinds (D-SUBJ-19) |
+| government | downstream | Published Language | Subject limit base and the form's change; a change to colonial government releases every subject (D-GOV-16) |
+| subjects | upstream | Customer–Supplier | Subject limit (base + form), lord capacity; government sets no limits on types (D-SUBJ-19) |
 
 ## government ↔ trade (one-sided)
 
@@ -1391,7 +1391,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | map-presentation | upstream | Published Language | Subjects lens |
-| subjects | downstream | Published Language | Hatch, dotted border, kind icon and loyalty tint, subjects lens |
+| subjects | downstream | Published Language | Hatch, dotted border, type icon and loyalty tint, subjects lens |
 
 ## map-presentation ↔ time-and-turns
 
@@ -1506,7 +1506,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | national-strengths | downstream | Published Language | tribute_pct; subjects keep heritage |
-| subjects | upstream | Open Host Service | Changes to reach, drift or kinds (Ming tributary reach, Ottoman fold-in of tributaries) |
+| subjects | upstream | Open Host Service | Changes to the subject limit, drift or types (Ming tributary weights, Ottoman fold-in of tributaries) |
 
 ## national-strengths ↔ time-and-turns (one-sided)
 
@@ -1977,7 +1977,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | recruiting | downstream | Customer–Supplier | Recruiting produces companies (arm, drill, kind, break point by training), commanders with skills/traits/style (a commissioned official counts as an academy graduate for style, X-7); warfare reports deaths, victories, loot, sieges, generals too big. Warfare follows recruiting v3 for the levy, commanders and disbanding (X-7) |
-| warfare | upstream | Customer–Supplier | Levies (levy foot, drill 0), trained regiments (arm, drill 3/4), standing regiments signed on, commissioned officials as commanders (skills, trait, style), retinues trained by lords; WAR returns disbanded men, deserters and Fallen |
+| warfare | upstream | Customer–Supplier | Levies (levy infantry, drill 0), trained regiments (arm, drill 3/4), standing regiments signed on, commissioned officials as commanders (skills, trait, style), retinues trained by lords; WAR returns disbanded men, deserters and Fallen |
 
 ## religion ↔ research
 

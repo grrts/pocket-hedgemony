@@ -1017,7 +1017,7 @@ When("the player taps empty map", (s) => {
   acted(s);
 });
 
-When("the player folds it away", (s) => {
+When("the player minimises it", (s) => {
   foldAway(sh(s));
   acted(s);
 });
@@ -1248,7 +1248,7 @@ Given("the province card of {string} is open", (s, province: string) => {
   openCard(ensureCampaign(s), { kind: "province", name: province });
 });
 
-When("the player folds the card away", (s) => {
+When("the player minimises the card", (s) => {
   foldAway(sh(s));
 });
 
@@ -2002,7 +2002,7 @@ Then("the player can answer it or put it off one turn", (s) => {
   expect(back(sh(s))).toBe("put off");
 });
 
-When("the player opens the map lens picker from the tool column", (s) => {
+When("the player opens the map mode picker from the tool column", (s) => {
   openLensPicker(sh(s));
 });
 

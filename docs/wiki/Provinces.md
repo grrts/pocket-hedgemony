@@ -92,7 +92,7 @@ On top of that:
 - Each building has **job slots** for one class. With all slots filled it works fully, with fewer people in proportion, and below half it is fallow.
 - Buildings are gained by building them (cost times the ground's build cost), by conquest, by events, and some appear by themselves. They are lost when their tile burns, when the town is sacked, when upkeep goes unpaid, when demolished by you or a peace treaty, or when their tile changes use.
 - A tile with **no building** still has slots for up to 3,000 people of the matching class, working at the ground's people output.
-- **Mines** show seams left, in years of digging. Seams are gained by prospecting events and mining inventions and lost every year the mine is dug. A mine that runs out closes; its miners overflow into other slots or become homeless, and the town shrinks.
+- **Mines** show the years of digging left in their ore deposit. Ore deposits are gained by prospecting events and mining inventions and lost every year the mine is dug. A mine that runs out closes; its miners overflow into other slots or become homeless, and the town shrinks.
 - **Shipyards and mines need timber** from a lumber camp in the same province or within reach (one ring, more with roads and rivers). Without timber no ships are built.
 - The **Town tile** has building slots by town size:
 
@@ -300,7 +300,7 @@ The ruler may grant a **charter** to one province or town:
 | No quartering | No armies winter there | Winter quarters there |
 | Faith tolerance | Its minority faith worships openly | Clergy lords' loyalty; *Wrong faith* ends there |
 | Free trade | No tolls | Toll gold |
-| Mining right | A merchant house runs the mine, digging faster and finding new seams | Half the mine's output |
+| Mining right | A merchant house runs the mine, digging faster and finding new ore deposits | Half the mine's output |
 
 Charters are granted, demanded by lords and towns for loyalty or a loan, or forced by rebels. Revoking one gives *Broken charter* for 20 years, and every lord notices. A conqueror may keep or revoke the charters of a province he takes.
 
@@ -309,7 +309,7 @@ Charters are granted, demanded by lords and towns for loyalty or a loan, or forc
 - **Castle**: none, earthwork ring fort, stone castle, bastion fort or star fort. Gained by building or upgrading (gold × build cost, and years) or conquest; lost by siege, demolition in a peace, or one step per 10 years without upkeep. An enemy must besiege it to take the province; on hills or mountains it is far harder to take; on a shore tile it can be supplied by sea.
 - **Walls**: whole or with 1 to 3 breaches. Repaired with gold and months; breached by siege guns, mining and earthquakes. Each breach shortens a siege and allows an assault.
 - **Garrison**: soldiers inside, counted from the army. A castle with no garrison falls at once.
-- **The Garrison tab**: the province card lists the troops in the province without a commander (by thousand, arm and drill), levies still gathering with the days left, and the commanders here who can pick them up. Freshly raised levies wait here and man the castle until a commander takes them.
+- **The Garrison tab**: the province card lists the troops in the province without a commander (by thousand, troop type and drill), levies still gathering with the days left, and the commanders here who can pick them up. Freshly raised levies wait here and man the castle until a commander takes them.
 
 See [Warfare](Warfare) for sieges.
 
@@ -396,7 +396,7 @@ A province stores about 95 small numbers and works out food made, wares made, ta
 | Monthly | Births and deaths; overflow and homeless drift; rebels take up arms; sickness for armies staying; occupation months; grievances evaluated |
 | Each season | Food check and famine; *Hungry*, *Requisitioned* and *Soldiers quartered* timers |
 | Each autumn (twice for rice) | Harvest roll |
-| Yearly | Recruits refill; tax owed; years held and years served; one burned tile rebuilt; worn tile checks; mine seams fall; woods regrow after 10 unworked years; refugees settle after 2 years |
+| Yearly | Recruits refill; tax owed; years held and years served; one burned tile rebuilt; worn tile checks; mine ore deposits fall; woods regrow after 10 unworked years; refugees settle after 2 years |
 | Weekly, during an outbreak | Plague |
 
 ## In the game now: the land
@@ -411,7 +411,7 @@ Every province is laid out in **4 to 16 tiles** from the map: bigger provinces h
 
 **Changing a tile.** You can clear woods into fields (3 years), turn fields to pasture or plough pasture back (a season each), drain marsh (3 years, needs *Polder drainage*) and irrigate dry waste (2 years, needs *Qanat and canal irrigation*). Each costs gold up front, more on hard ground; a province changes one tile at a time, and stopping gives half the gold back. The ground itself never changes. Lords change their own land, and other countries change theirs, by a simple rule: a province that can't feed itself drains, irrigates or clears woods.
 
-**Mines and salt.** A province in hills or mountains may have a seam under its waste: iron, copper, tin, silver, gold or rock salt, with so many years of digging left. Tap the waste tile on the Land tab to see it. A mine needs the seam and timber from a lumber camp in the province or next door; it gives work for 6,000 miners and adds trade, three times as much for silver or gold. Each January it digs a year off the seam, and when the seam runs out the mine closes. Kutná Hora's silver (in Středočeský) and Falun's copper (in Dalarna) are already dug in 1444. On a dry or warm coast, saltworks on the shore make salt and add trade too.
+**Mines and salt.** A province in hills or mountains may have an ore deposit under its waste: iron, copper, tin, silver, gold or rock salt, with so many years of digging left. Tap the waste tile on the Land tab to see it. A mine needs the ore deposit and timber from a lumber camp in the province or next door; it gives work for 6,000 miners and adds trade, three times as much for silver or gold. Each January it digs a year off the deposit, and when it runs out the mine closes. Kutná Hora's silver (in Středočeský) and Falun's copper (in Dalarna) are already dug in 1444. On a dry or warm coast, saltworks on the shore make salt and add trade too.
 
 **How you use it.** Tap one of your provinces, then its **Land** tab. The first line says how much of its people the land feeds in a normal year, in red under 100 %. Below is the grid of tiles, each coloured by its use and naming the building that works it. Tap a tile to see who works it, what it feeds or gives a year, and the building that would work it better, with its **Build** button or why it can't be built yet. Under the sheet are the one to three changes that tile allows, each with its gold and time. On the country card, **Provinces → Short of food** lists the provinces whose land doesn't feed them and what would fix each; tap one to open its Land tab.
 
@@ -437,7 +437,7 @@ Every province is laid out in **4 to 16 tiles** from the map: bigger provinces h
 
 The tile row is the province: tap a tile to see its building, its workers and what it makes. Tap any other line to open its gain and lose list.
 
-**The Tax screen** sets the realm default rate, overrides per province and presets. The province lenses (Food, Tax reaching you, Days to capital, Grievances, Ground, Recruits) and what shows at each zoom are on [Map and Lenses](Map-and-Lenses).
+**The Tax screen** sets the realm default rate, overrides per province and presets. The province map modes (Food, Tax reaching you, Days to capital, Grievances, Ground, Recruits) and what shows at each zoom are on [Map and Map Modes](Map-and-Lenses).
 
 **Things you can do**: set a province's tax rate, the realm default or a preset; set a toll; change a tile's use (clear woods, fields to pasture and back, drain marsh, irrigate waste); burn your own fields; pay to rebuild a burned tile faster; assign, dismiss and hire officials; lend an official to a lord and recall him; pay for a building in a lord's province; grant or revoke a charter; build a road; quarantine a province; assign a garrison; repair walls; send settlers.
 
@@ -464,7 +464,7 @@ The tile row is the province: tap a tile to see its building, its workers and wh
 - [Naval](Naval): seafolk crews, harbours, shipyards, timber.
 - [National Strengths](National-Strengths): levers on tax reach, harvest, officials, grievances and building cost.
 - [Historical Events](Historical-Events): event province stats translated as above.
-- [Map and Lenses](Map-and-Lenses): card fields, tile row, zoom content and lenses.
+- [Map and Map Modes](Map-and-Lenses): card fields, tile row, zoom content and map modes.
 
 ## Numbers
 
