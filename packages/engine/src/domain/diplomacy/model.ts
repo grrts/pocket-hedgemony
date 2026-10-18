@@ -136,6 +136,8 @@ export interface Ask {
   passageTarget?: string;
   callKind?: "defensive" | "offensive";
   callTarget?: string;
+  /** A tie the mission leaves at the court it reaches (Seek their vote, institutions INST-026). */
+  tie?: { key: string; name: string; weight: number; fadeYears: number };
 }
 
 export interface Reason {
@@ -170,7 +172,7 @@ export interface Call {
   called: string;
   against: string;
   kind: "defensive" | "offensive";
-  via: "alliance" | "pledge" | "league" | "subject";
+  via: "alliance" | "pledge" | "league" | "subject" | "empire";
   war: string;
   issued: string;
   answerOn: string;

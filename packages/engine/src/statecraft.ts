@@ -63,7 +63,7 @@ function routeUnits(world: World, a: number, b: number): number {
 }
 
 /** The road between two courts, kept for a pair once an envoy is sent between them. */
-function ensureRoute(world: World, a: number, b: number): void {
+export function ensureRoute(world: World, a: number, b: number): void {
   const d = world.diplomacy;
   const key = dip.pairKey(world.nationIds[a]!, world.nationIds[b]!);
   if (!d.routes[key]) d.routes[key] = { land: [{ kind: "land", units: routeUnits(world, a, b) }] };
@@ -236,6 +236,7 @@ const ACTION_TEXT: Record<string, { yes: string; no: string; done: string }> = {
   arrange_marriage: { yes: "agrees to a royal marriage", no: "turns down a royal marriage", done: "" },
   courtesy_visit: { yes: "", no: "", done: "receives our envoy kindly" },
   send_gift: { yes: "", no: "", done: "accepts our gift" },
+  seek_vote: { yes: "", no: "", done: "hears our case for the crown" },
   demand: { yes: "gives in to our demand", no: "refuses our demand", done: "" },
 };
 
