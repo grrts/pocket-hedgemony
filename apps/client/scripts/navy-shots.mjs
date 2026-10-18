@@ -42,6 +42,8 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(300);
   await shot("1-port");
   await check(page, name, "port");
+  // An official commissioned first, while the treasury allows: the fleet's leader later.
+  console.log(name, "commission", await page.evaluate(() => window.__phCommission()));
   // Muster a cog's crew, then wait for them to arrive (two weeks).
   await page.click("[data-port-muster='30']");
   await page.waitForTimeout(300);
@@ -95,8 +97,6 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.evaluate(([x, y]) => window.__phMap.lookAt(x, y, 8), [x, y]);
   await page.waitForTimeout(600);
   await shot("3-fleet-on-map");
-  // An official commissioned, to be the fleet's admiral.
-  console.log(name, "commission", await page.evaluate(() => window.__phCommission()));
   // Its card from the Navy tab.
   await page.click(".hud button.realm");
   await page.waitForTimeout(300);
