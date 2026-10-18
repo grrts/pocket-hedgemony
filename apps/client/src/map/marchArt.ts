@@ -1,7 +1,7 @@
-import { ROUTE_STROKE } from "@ph/engine/domain/map-presentation";
+import { ROUTE_STROKE, type Figure } from "@ph/engine/domain/map-presentation";
 import { PALETTE } from "../art/palette.ts";
 import { commanderSprite, type CommanderLook } from "../art/commanders.ts";
-import { sprite, type SpriteName } from "../art/sprites.ts";
+import { figureSprite, sprite, type FigureName, type SpriteName } from "../art/sprites.ts";
 
 /**
  * The map's moving pieces, drawn as pixel art on the overlay: army tokens (the
@@ -108,7 +108,7 @@ function groundShadow(ctx: Ctx, x: number, y: number, u: number, halfWidth: numb
 }
 
 /** Pixel corner brackets round a box, pushed out by `grow` art pixels. */
-function brackets(ctx: Ctx, x: number, y: number, w: number, h: number, u: number, grow: number, color: string): void {
+export function brackets(ctx: Ctx, x: number, y: number, w: number, h: number, u: number, grow: number, color: string): void {
   const g = grow * u;
   const l = 3 * u;
   const x0 = Math.round(x - g);
@@ -371,6 +371,8 @@ export interface BattleStyle {
   attMorale: number;
   defMorale: number;
   t: number;
+  /** False draws only the plates, bars and losses: the living map draws the figures itself (VIEW-119). */
+  figures?: boolean;
 }
 
 /**
@@ -381,6 +383,8 @@ export interface BattleStyle {
  */
 export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
   const { u, x, y, t } = b;
+  // Faded as the living map takes over, so every alpha here is a share of the one it was called with.
+  const alpha = ctx.globalAlpha;
   const prev = lastMen.get(b.id);
   const list = floaters.get(b.id) ?? [];
   if (prev) {
@@ -392,6 +396,28 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
   lastMen.set(b.id, [b.attMen, b.defMen]);
   const frame = Math.floor(t / 140) % 4;
   const lunge = frame === 1 || frame === 2 ? u : 0;
+  const att = facing(frame % 2 ? "rider1" : "rider0", b.attColor, u, 1);
+  const def = facing(frame % 2 ? "rider0" : "rider1", b.defColor, u, -1);
+  if (b.figures !== false) drawMelee(ctx, b, att, def, frame, lunge, alpha);
+  // Each side's men left, over a bar of what it brought and a bar of its morale (VIEW-077).
+  const top = Math.round(y - att.height - 15 * u);
+  sideBar(ctx, x - 1 * u, top, u, b.attMen, b.attStart, b.attMorale, b.attColor, -1);
+  sideBar(ctx, x + 1 * u, top, u, b.defMen, b.defStart, b.defMorale, b.defColor, 1);
+  // Losses float up and fade.
+  const alive = list.filter((f) => t - f.born < 1400);
+  for (const f of alive) {
+    const age = (t - f.born) / 1400;
+    ctx.globalAlpha = alpha * (1 - age * age);
+    drawPlate(ctx, f.text, x + f.dx * u, top - 10 * u - age * 14 * u, u, PALETTE.blood);
+  }
+  ctx.globalAlpha = alpha;
+  floaters.set(b.id, alive);
+  return true;
+}
+
+/** The two hosts as riders lunging at each other, with dust and sparks. */
+function drawMelee(ctx: Ctx, b: BattleStyle, att: HTMLCanvasElement, def: HTMLCanvasElement, frame: number, lunge: number, alpha: number): void {
+  const { u, x, y, t } = b;
   groundShadow(ctx, x, y + u, u, 14);
   // Dust kicked up around the melee.
   for (let i = 0; i < 6; i++) {
@@ -399,12 +425,10 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
     const dx = ((seed % 23) - 11) * u;
     const dy = (((seed >> 2) % 7) - 6) * u;
     ctx.fillStyle = i % 2 ? PALETTE.paper : PALETTE.sand;
-    ctx.globalAlpha = 0.55;
+    ctx.globalAlpha = alpha * 0.55;
     ctx.fillRect(Math.round(x + dx), Math.round(y + dy), 2 * u, 2 * u);
   }
-  ctx.globalAlpha = 1;
-  const att = facing(frame % 2 ? "rider1" : "rider0", b.attColor, u, 1);
-  const def = facing(frame % 2 ? "rider0" : "rider1", b.defColor, u, -1);
+  ctx.globalAlpha = alpha;
   ctx.drawImage(att, Math.round(x - att.width + 3 * u + lunge), Math.round(y - att.height + u));
   ctx.drawImage(def, Math.round(x - 3 * u - lunge), Math.round(y - def.height + u));
   // Sparks where the blades meet.
@@ -414,20 +438,6 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
     ctx.fillStyle = PALETTE.paper;
     ctx.fillRect(Math.round(x), Math.round(y - 10 * u), u, u);
   }
-  // Each side's men left, over a bar of what it brought and a bar of its morale (VIEW-077).
-  const top = Math.round(y - att.height - 15 * u);
-  sideBar(ctx, x - 1 * u, top, u, b.attMen, b.attStart, b.attMorale, b.attColor, -1);
-  sideBar(ctx, x + 1 * u, top, u, b.defMen, b.defStart, b.defMorale, b.defColor, 1);
-  // Losses float up and fade.
-  const alive = list.filter((f) => t - f.born < 1400);
-  for (const f of alive) {
-    const age = (t - f.born) / 1400;
-    ctx.globalAlpha = 1 - age * age;
-    drawPlate(ctx, f.text, x + f.dx * u, top - 10 * u - age * 14 * u, u, PALETTE.blood);
-  }
-  ctx.globalAlpha = 1;
-  floaters.set(b.id, alive);
-  return true;
 }
 
 /**
@@ -522,4 +532,70 @@ export function drawSiegeMark(ctx: Ctx, s: SiegeMarkStyle): void {
     drawDigits(ctx, text, cx + 6 * u, rowT + 2 * u, u, PALETTE.ink);
     cx += (itemW(text) + 3) * u;
   }
+}
+
+// ---- the living map's figures (VIEW-116..VIEW-120) ----
+
+export interface FormationStyle {
+  /** The screen point the formation stands on. */
+  x: number;
+  y: number;
+  /** CSS pixels per art pixel: whole, so the figure art caches. */
+  u: number;
+  color: string;
+  figures: readonly Figure[];
+  /** The way the formation faces (dx, dy); the figures look east or west by its dx. */
+  facing: readonly [number, number];
+  /** Walking frame, the same for every figure, so they march in step. */
+  frame: 0 | 1;
+  /** Art pixels the front rank pushes forward, for a battle's clash. */
+  lunge?: number;
+}
+
+const FIGURE_ART: Record<Figure["arm"], FigureName> = { foot: "foot0", horse: "horse0", guns: "guns0", wagons: "wagons0" };
+
+/**
+ * An army's figures where `formation` put them, feet on their spots, drawn
+ * back to front so a block of men reads as one body, each over a pixel of
+ * shadow. Returns the box round them all, in CSS pixels.
+ */
+export function drawFormation(ctx: Ctx, f: FormationStyle): Box {
+  const { u } = f;
+  const dir: 1 | -1 = f.facing[0] < 0 ? -1 : 1;
+  const len = Math.hypot(f.facing[0], f.facing[1]) || 1;
+  const fx = f.facing[0] / len, fy = f.facing[1] / len;
+  // The front rank is the figures furthest forward.
+  const front = Math.max(...f.figures.map((g) => g.x * fx + g.y * fy));
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const g of [...f.figures].sort((a, b) => a.y - b.y || a.x - b.x)) {
+    const base = g.banner ? "banner0" : FIGURE_ART[g.arm];
+    const name = (f.frame ? base.replace("0", "1") : base) as FigureName;
+    const img = figureSprite(name, f.color, u, dir);
+    const push = f.lunge && g.x * fx + g.y * fy >= front - 0.5 ? f.lunge : 0;
+    const px = Math.round(f.x + (g.x + push * fx) * u - img.width / 2);
+    const py = Math.round(f.y + (g.y + push * fy) * u - img.height + u);
+    ctx.fillStyle = "rgb(26 28 44 / 0.35)";
+    ctx.fillRect(px, py + img.height, img.width, u);
+    ctx.drawImage(img, px, py);
+    x0 = Math.min(x0, px);
+    y0 = Math.min(y0, py);
+    x1 = Math.max(x1, px + img.width);
+    y1 = Math.max(y1, py + img.height + u);
+  }
+  return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+}
+
+/** A besiegers' camp: a few tents round the walls, `ring` art pixels out, seeded so they stay put. */
+export function drawTents(ctx: Ctx, x: number, y: number, u: number, color: string, ring: number, seed: number): void {
+  for (let i = 0; i < 3; i++) {
+    const a = ((seed * 37 + i * 131) % 360) * (Math.PI / 180);
+    const img = figureSprite("tent", color, u, 1);
+    ctx.drawImage(img, Math.round(x + Math.cos(a) * ring * u - img.width / 2), Math.round(y + Math.sin(a) * ring * u - img.height));
+  }
+}
+
+/** Sparks where two front ranks meet, on the clash frame. */
+export function drawClash(ctx: Ctx, x: number, y: number, u: number): void {
+  ctx.fillStyle = PALETTE.sun;
+  for (const [sx, sy] of [[0, -5], [-1, -7], [1, -8], [0, -3]] as const) ctx.fillRect(Math.round(x + sx * u), Math.round(y + sy * u), u, u);
 }
