@@ -4,11 +4,15 @@ import { loadDefaultRuleset } from "@ph/rules";
 import { applyNow, createWorld, monthBeginning, processTurn, tileMarch, type World } from "../src/index.ts";
 import { tileStepHours } from "../src/march.ts";
 import { wallsOf } from "../src/war.ts";
-import { LEDGER, LEDGER_LINES, provinceTrade } from "../src/treasury.ts";
+import { LEDGER, LEDGER_LINES } from "../src/treasury.ts";
+import { provinceWares, refreshTradeValues, tradeValueAt, warePrice } from "../src/trade.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { hashWorld } from "../src/hash.ts";
 import { gameTarget, huntingRoom, huntingYear, seamWare, SEAM_WARES, tilesOf, tileCount, MAX_TILES } from "../src/land.ts";
-import { landSheet, mineYear, worksFood, worksTrade } from "../src/works.ts";
+import { landSheet, mineYear, worksFood } from "../src/works.ts";
+
+/** Gold a year a province's goods are worth. */
+const goods = (w: World, p: number) => provinceWares(w, p).reduce((t, x) => t + x.loads * warePrice(x.ware), 0);
 import { aiChanges, changeGold, changeMonths, monthlyChanges, orderChange, stopChange, whyNotChange } from "../src/conversion.ts";
 import { CLASS_COUNT, CLASS_NAMES } from "../src/living.ts";
 import { yearlyFood } from "../src/food.ts";
@@ -138,11 +142,12 @@ describe("works (milestone 4)", () => {
     processTurn(w, [], fra);
     expect(w.nationLedger[fra * LEDGER_LINES + LEDGER.indexOf("works")]).toBeLessThan(0);
     const p = Array.from({ length: w.provinceCount }, (_, i) => i).find((i) => w.provinceOwner[i] === fra && worksAt(w, i, work("market")) > 0)!;
-    const full = provinceTrade(w, p);
+    const full = tradeValueAt(w, p);
     w.nationTreasury[fra] = -100;
     untilNewMonth(w, fra);
     expect(w.nationNeglect[fra]).toBe(1);
-    expect(provinceTrade(w, p)).toBeLessThan(full);
+    refreshTradeValues(w);
+    expect(tradeValueAt(w, p)).toBeLessThan(full);
   });
 
   it("needs its invention for the next step: a stone castle where only earthworks are known is out of reach", () => {
@@ -365,13 +370,13 @@ describe("works (milestone 4)", () => {
     expect(whyNot(w, n, rough, work("mine"))).toBe("needs timber: a lumber camp here or next door");
     w.provinceWorks[rough * WORK_COUNT + work("lumber camp")] = 1;
     expect(whyNot(w, n, rough, work("mine"))).not.toMatch(/seam|timber/);
-    // A mine standing adds trade; silver or gold three times as much.
-    const before = worksTrade(w, rough);
+    // A mine standing adds its ore to the province's goods (TRADE-129), silver at the precious price.
+    const before = goods(w, rough);
     w.provinceWorks[rough * WORK_COUNT + work("mine")] = 1;
-    const iron = worksTrade(w, rough) - before;
-    expect(iron).toBeGreaterThan(0);
+    expect(goods(w, rough)).toBeGreaterThan(before);
     w.provinceSeam[rough] = SEAM_WARES.indexOf("silver");
-    expect(worksTrade(w, rough) - before).toBeCloseTo(iron * 3, 5);
+    expect(provinceWares(w, rough).find((x) => x.ware === "silver")).toBeTruthy();
+    expect(warePrice("silver")).toBe(12);
     // Each January it digs a year off; when the seam runs out the mine closes.
     const news: { text: string }[] = [];
     mineYear(w, news as never);
