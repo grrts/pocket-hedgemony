@@ -126,6 +126,21 @@ describe("turns", () => {
     expect(w.armies.route[army]).toEqual([]);
   });
 
+  it("halts a march when ordered to the tile the army stands on (feedback 128)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const fra = w.nationIndex.get("france")!;
+    w.player = fra;
+    const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
+    applyNow(w, { type: "move", army, to: farFrench(w, fra, army) }, fra);
+    advance(w, 6);
+    const here = w.armies.tile[army]!;
+    expect(applyNow(w, { type: "move", army, to: w.armies.location[army]!, tile: here }, fra).rejectedOrders).toEqual([]);
+    expect(w.armies.route[army]).toEqual([]);
+    expect(w.armies.pathAt[army]).toBe(w.armies.path[army]!.length);
+    advance(w, 12);
+    expect(w.armies.tile[army]).toBe(here);
+  });
+
   it("marches slower over rough ground and through snow", () => {
     const w = createWorld(rules, 1, tiles);
     const m = tileMarch(w);

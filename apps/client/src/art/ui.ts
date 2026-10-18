@@ -261,6 +261,7 @@ export const ICONS = {
     "kkkkkkkkkkkk",
   ],
   collapse: ["kk....kk", "kwk..kwk", ".kwkkwk.", "..kwwk..", "...kk..."],
+  back: ["...kk", "..kwk", ".kwk.", "kwk..", "kwk..", ".kwk.", "..kwk", "...kk"],
   close: ["kk....kk", "kwk..kwk", ".kwkkwk.", "..kwwk..", "..kwwk..", ".kwkkwk.", "kwk..kwk", "kk....kk"],
   scroll: [
     ".kkkkkkkk.",
