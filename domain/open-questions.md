@@ -14,7 +14,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **OQ-INST-4** (institutions): The heads of faith design may give the Papacy powers over the Emperor (crowning); the church seats then read that design.
 - **OQ-VIEW-8** (map-presentation): (release task) Budgets on real devices: targets on a low-end Android phone, an older iPhone, Steam Deck and Steam Machine need device tests.
 - **OQ-VIEW-11** (map-presentation): (default chosen) Band thresholds: living from zoom 16 and street level up to 96. Leroy can overrule. [living-map-design §9 OQ-LIVE-1]
-- **OQ-VIEW-12** (map-presentation): (default chosen) Footprint scale: `sqrt(town thousands) × 1.0`, capped at 30 cells, to be tuned so big cities read clearly without swallowing small provinces. [OQ-LIVE-2]
+- **OQ-VIEW-12** (map-presentation): (default chosen) Footprint scale: `sqrt(town thousands) × 1.5`, capped at 30 cells, so Toledo's 119 thousand town people in 1444 make the design's 15 to 20 cells (at 1.0 it was 11); to be tuned so big cities read clearly without swallowing small provinces. [OQ-LIVE-2]
 - **OQ-VIEW-13** (map-presentation): (default chosen) Street level on the phone default: Medium has no street level, to spare the battery; High only. [OQ-LIVE-3]
 - **OQ-VIEW-14** (map-presentation): (default chosen) First landmarks: Toledo, Constantinople (Hagia Sophia), Rome, Paris, Venice, Cairo, Beijing (the Forbidden City) and Cuzco. [OQ-LIVE-4]
 - **OQ-REVO-7** (revolutions): (release task) The seven new sources in additions.yaml are `verified: false`; checking them is a source review, not code.

@@ -3,7 +3,7 @@
 import { expect } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
 import { loadMapTiles } from "@ph/engine/node";
-import { createWorld, tradePaths, tradeSeen } from "@ph/engine";
+import { createWorld, landGrid, tradePaths, tradeSeen, type LandGrid } from "@ph/engine";
 import {
   animatedFigures, bandArtPixels, bandFade, detailBands, figureArms, figureCount, figuresAnimate, figuresLeft, formation, hamletCount, hamletSpots,
   hullCount, hullsInPort, kindOfByte, linksOfByte, livingBand, neighbours4, pieceLabels, pieceUnit, roadGrade, roadLines, roadPath, settlementBytes,
@@ -14,11 +14,11 @@ import { steps } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("map-presentation");
 
-let map: { rules: ReturnType<typeof loadDefaultRuleset>; grid: ReturnType<typeof loadMapTiles> } | null = null;
+let map: { rules: ReturnType<typeof loadDefaultRuleset>; grid: LandGrid } | null = null;
 const world = () => {
   if (!map) {
     const rules = loadDefaultRuleset();
-    map = { rules, grid: loadMapTiles(rules) };
+    map = { rules, grid: landGrid(loadMapTiles(rules)) };
   }
   return map;
 };
@@ -67,11 +67,11 @@ When("the town grows to {int} map pixels", (s, cells: number) => {
 });
 Then("its first {int} pixels are the same as before", (s, n: number) => expect(s.footprint.tiles.slice(0, n)).toEqual(s.before.tiles));
 Then("the town starts at the province's land pixel nearest its centre point", (s) => expect(s.footprint.seed).toBe(world().grid.centre[s.province]));
-Then("the town starts on land of {string}", (s, name: string) => expect(world().grid.province[s.footprint.seed]).toBe(province(name) + 1));
+Then("the town starts on land of {string}", (s, name: string) => expect(world().grid.provinceAt(s.footprint.seed)).toBe(province(name) + 1));
 Then("every town pixel is land of {string} within {int} pixels of the seed", (s, name: string, r: number) => {
   const { grid } = world();
   for (const t of s.footprint.tiles) {
-    expect(grid.province[t]).toBe(province(name) + 1);
+    expect(grid.provinceAt(t)).toBe(province(name) + 1);
     expect(tileDistance(grid, s.footprint.seed, t)).toBeLessThanOrEqual(r);
   }
 });
@@ -129,7 +129,7 @@ Then("every hamlet is at least {int} pixels from the town and from the other ham
   for (const h of s.hamlets) for (const t of [...s.footprint.tiles, ...s.hamlets.filter((x: number) => x !== h)]) expect(tileDistance(world().grid, h, t)).toBeGreaterThanOrEqual(d);
 });
 When("{string} places a mine", (s, name: string) => void (s.mine = worksSpot(world().grid, province(name), "mine", new Set())));
-Then("the mine stands on one pixel of {string}", (s, name: string) => expect(world().grid.province[s.mine]).toBe(province(name) + 1));
+Then("the mine stands on one pixel of {string}", (s, name: string) => expect(world().grid.provinceAt(s.mine)).toBe(province(name) + 1));
 Given("one town has road step {int} and its neighbour road step {int}", (s, a: number, b: number) => void (s.grade = roadGrade(a, b)));
 Then("the road between them is drawn as a {string}", (s, grade: string) => expect(s.grade).toBe(grade));
 Given(/^roads are laid from "([^"]+)" to the towns of its neighbours$/, (s, name: string) => {
@@ -143,7 +143,7 @@ Then("every road runs over land from town to town in steps north, east, south or
   expect(s.roads.length).toBeGreaterThan(0);
   for (const r of s.roads) {
     expect([r.path[0], r.path.at(-1)]).toEqual([r.from, r.to]);
-    for (const t of r.path) expect(grid.province[t]).toBeGreaterThan(0);
+    for (const t of r.path) expect(grid.provinceAt(t)).toBeGreaterThan(0);
     for (let i = 1; i < r.path.length; i++) expect(neighbours4(grid, r.path[i - 1])).toContain(r.path[i]);
   }
 });

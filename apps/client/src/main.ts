@@ -78,6 +78,8 @@ import { Hints, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
 import { nameOnMap, playbackAdvance, playbackHour } from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
+import { detailBands } from "@ph/engine/domain/map-presentation";
+import { TownLayer, townInfo } from "./map/towns.ts";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
 import { SHELL as SHELL_RULES, endTurnInAuto, endTurnLabel, newAutoTurns, startColumn, startIcons, stopAuto, switchAuto, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
@@ -1017,6 +1019,10 @@ function restyleProvinces(): void {
     // Under the diplomacy lens, a league against the player gets the same red border (DIPL-183).
     const closed = (selected.size > 0 && !!snapshot?.provinceClosed[i]) || (lens === "diplomacy" && o >= 0 && snapshot?.diplomacyLens?.league[o] === 1);
     // While a lord's lands are lit, the rest of the land fades to grey so they stand out.
+    if (snapshot && !isWater[i]) {
+      const t = townInfo(rules, snapshot, i);
+      view.renderer.setTownInfo(i, t.walls, t.roadGrade, t.worship, t.style);
+    }
     view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched && lens === "realms" ? (rebels ? rebelRgb : nationRgb[occ]!) : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
@@ -1070,14 +1076,74 @@ function computeNationLabels() {
   });
 }
 
+/** The living map's towns, hamlets and roads, laid the first time the camera comes close (VIEW-105..VIEW-115). */
+let townLayer: TownLayer | null = null;
+
+/** Below the living band, how close the camera comes before the towns near it are laid ahead of time. */
+const TOWNS_AHEAD_ZOOM = 10;
+/** The most milliseconds one idle slice may spend laying towns; without idle callbacks (Safari) a timer slice gets the least of these. */
+const TOWNS_SLICE_MS = 8;
+const TOWNS_TIMER_SLICE_MS = 4;
+/** What the towns are being laid for: the latest turn and the map rectangles round the view. */
+let townsWanted: { s: Snapshot; rects: { x0: number; y0: number; x1: number; y1: number }[] } | null = null;
+let townsQueued = false;
+
+/**
+ * Lays towns in idle time between frames, a slice at a time, so laying them
+ * never lengthens a frame; uploads what changed and asks for a redraw.
+ */
+function queueTowns(): void {
+  if (townsQueued) return;
+  townsQueued = true;
+  const run = (deadline: number) => {
+    townsQueued = false;
+    if (!townsWanted || !mapImage) return;
+    townLayer ??= new TownLayer(rules, mapImage);
+    const more = townLayer.update(townsWanted.s, townsWanted.rects, deadline);
+    const dirty = townLayer.takeDirty();
+    if (dirty) (view.renderer.setSettlement(townLayer.bytes, dirty), view.invalidate());
+    if (more) queueTowns();
+  };
+  if (typeof requestIdleCallback === "function") requestIdleCallback((d) => run(performance.now() + Math.min(TOWNS_SLICE_MS, Math.max(1, d.timeRemaining()))), { timeout: 200 });
+  else setTimeout(() => run(performance.now() + TOWNS_TIMER_SLICE_MS), 0);
+}
+
+/**
+ * The living map close in: fades the towns in over 14 to 16 (VIEW-101) and,
+ * from zoom 10 on, has the towns near the camera laid in idle time, a margin
+ * round the view so a pan finds them ready. Returns how strongly the icons
+ * are drawn.
+ */
+function livingMap(o: OverlayContext): number {
+  const fade = bandFade(o.zoom, mapDetail());
+  if (view.renderer.living !== fade.living) {
+    view.renderer.living = fade.living;
+    view.invalidate();
+  }
+  if (!detailBands(mapDetail()).living || o.zoom < TOWNS_AHEAD_ZOOM || !snapshot || !mapImage) return fade.icons;
+  const c = view.camera;
+  const margin = 12;
+  const hw = o.width / 2 / o.zoom + margin, hh = o.height / 2 / o.zoom + margin;
+  const W = mapImage.width;
+  const y0 = Math.max(0, Math.floor(c.y - hh)), y1 = Math.min(mapImage.height - 1, Math.ceil(c.y + hh));
+  const x0 = Math.floor(c.x - hw), x1 = Math.ceil(c.x + hw);
+  // The map wraps east-west: a view across the edge lays both sides.
+  const spans = x0 < 0 ? [[x0 + W, W - 1], [0, x1]] : x1 >= W ? [[x0, W - 1], [0, x1 - W]] : [[x0, x1]];
+  townsWanted = { s: snapshot, rects: spans.map(([a, b]) => ({ x0: a!, y0, x1: b!, y1 })) };
+  queueTowns();
+  return fade.icons;
+}
+
 function drawOverlay(o: OverlayContext): void {
   const { ctx, zoom } = o;
+  const icons = livingMap(o);
   const onScreen = (sx: number, sy: number, pad = 40) => sx > -pad && sy > -pad && sx < o.width + pad && sy < o.height + pad;
   const spriteScale = zoom >= 8 ? 4 : zoom >= 4 ? 3 : zoom >= 2 ? 2 : 1;
 
   // One settlement per province, sized by its people, with its walls:
   // a stone tower for a castle, a palisade for a fort. Capitals come after.
-  if (zoom >= 3) {
+  if (zoom >= 3 && icons > 0) {
+    ctx.globalAlpha = icons;
     const sc = Math.max(1, spriteScale - 2);
     provinces.forEach((p, i) => {
       const own = owners[i]!;
@@ -1100,8 +1166,10 @@ function drawOverlay(o: OverlayContext): void {
         ctx.drawImage(f, 0, 0, w, f.height, x - sc, y + img.height - f.height + 2 * sc, w, f.height);
       }
     });
+    ctx.globalAlpha = 1;
   }
-  if (zoom >= 1.1) {
+  if (zoom >= 1.1 && icons > 0) {
+    ctx.globalAlpha = icons;
     nations.forEach((n, i) => {
       const p = provinces[provinceIndex.get(n.capital)!]!;
       if (owners[provinceIndex.get(n.capital)!] !== i || !isKnown(provinceIndex.get(n.capital)!)) return;
@@ -1110,6 +1178,7 @@ function drawOverlay(o: OverlayContext): void {
       const img = sprite("capital", n.color, Math.max(1, spriteScale - 1));
       ctx.drawImage(img, Math.round(sx - img.width / 2), Math.round(sy - img.height / 2));
     });
+    ctx.globalAlpha = 1;
   }
 
   // Nation names when zoomed out.

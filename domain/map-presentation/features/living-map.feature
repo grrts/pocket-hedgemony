@@ -72,8 +72,8 @@ Feature: The living map close in
     Examples:
       | town | cells |
       | 0.2  | 1     |
-      | 16   | 4     |
-      | 300  | 17    |
+      | 16   | 6     |
+      | 300  | 26    |
       | 5000 | 30    |
 
   @VIEW-105

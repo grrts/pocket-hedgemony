@@ -1,5 +1,6 @@
 import { DEPTH_COLORS, hexToRgb, PALETTE, TERRAINS } from "../art/palette.ts";
 import { ATLAS_ROWS, BIG_ROWS, buildMiniAtlas, buildTileAtlas, rowColors, SEA_ROW, SHALLOW_ROW, TILE, VARIANTS, WATER_BASE } from "../art/tiles.ts";
+import { TOWN_FLAG, TOWN_ROWS, TOWN_TILE, TOWN_VARIANTS, buildTownAtlas } from "../art/townTiles.ts";
 import { UI_COLORS } from "../art/ui.ts";
 import { ICE } from "@ph/engine/domain/map-presentation";
 import type { MapImage } from "./loadMap.ts";
@@ -77,6 +78,10 @@ uniform vec3 uDepth[${DEPTH_COLORS.length}];     // ocean colour by depth band
 uniform vec3 uFoam, uInk, uHighlight, uSand, uForbid;
 uniform sampler2D uAtlas;    // terrain tiles: ${VARIANTS} variants across, one row per terrain
 uniform sampler2D uMini;     // the same at half size
+uniform sampler2D uTown;     // per-province town (VIEW-110, VIEW-113): r walls (0 none, 1 palisade, 2 stone), g road grade (0 track, 1 road, 2 paved), b worship variant, a style
+uniform sampler2D uTownAtlas; // town tiles: ${TOWN_VARIANTS} variants across, one row per cell kind (row = kind - 1)
+uniform float uLiving;       // 0..1: how far the living map has faded in (VIEW-101)
+uniform vec3 uRoad[3];       // track, road, paved road
 out vec4 outColor;
 
 const vec3 SEA_BASE = ${glsl(WATER_BASE.sea)};
@@ -293,6 +298,71 @@ int effId(vec2 m) {
   return dx + dy < 0.5 ? h : id;
 }
 
+
+// The living map (VIEW-105..VIEW-115): the alpha of the id texture holds each
+// map pixel's settlement byte, the cell kind in bits 0-3 and road links
+// N/E/S/W in bits 4-7. Towns are drawn over the terrain in the ground's own
+// art pixels; walls are worked out from neighbouring core cells.
+int settlementAt(ivec2 p) {
+  ivec2 local = clamp(p - uTileOrigin, ivec2(0), uTileSize - 1);
+  return int(texelFetch(uIds, local, 0).a * 255.0 + 0.5);
+}
+// Cells inside the walls: core, keep, market, worship, docks, drill yard and landmark.
+bool walled(int b) { int k = b & 15; return (k >= 3 && k <= 8) || k == 12; }
+vec4 townInfo(int id) { return floor(texelFetch(uTown, ivec2(id % uInfoWidth, id / uInfoWidth), 0) * 255.0 + 0.5); }
+const vec3 FLAG = ${glsl(TOWN_FLAG)};
+vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
+  int b = settlementAt(p);
+  if (b == 0) return c;
+  int kind = b & 15;
+  int links = b >> 4;
+  ivec2 q = a & ${TOWN_TILE - 1};
+  vec4 ti = townInfo(id);
+  if (links != 0) {
+    // A two-pixel road from the middle of the map pixel to each linked side; a track is broken.
+    bool mid = q.x >= 3 && q.x <= 4;
+    bool row = q.y >= 3 && q.y <= 4;
+    bool on = (mid && row) || ((links & 1) != 0 && mid && q.y <= 4) || ((links & 2) != 0 && row && q.x >= 3) || ((links & 4) != 0 && mid && q.y >= 3) || ((links & 8) != 0 && row && q.x <= 4);
+    // A darker verge one pixel either side, so the road reads on every ground.
+    bool wide = q.x >= 2 && q.x <= 5;
+    bool tall = q.y >= 2 && q.y <= 5;
+    bool verge = !on && ((wide && tall) || ((links & 1) != 0 && wide && q.y <= 5) || ((links & 2) != 0 && tall && q.x >= 2) || ((links & 4) != 0 && wide && q.y >= 2) || ((links & 8) != 0 && tall && q.x <= 5));
+    int grade = clamp(int(ti.g), 0, 2);
+    if (on) c = uRoad[grade] * (hash(a + 3) > 0.8 ? 0.88 : 1.0);
+    else if (verge) c = mix(c, uInk, grade == 0 ? 0.18 : 0.3);
+  }
+  if (kind == 0) return c;
+  bool woods = terrain == ${T.forest} || terrain == ${T.broadleaf} || terrain == ${T.jungle} || terrain == ${T.highlands};
+  int variant = kind == 6 ? int(ti.b) : kind == 9 ? (woods ? 2 : terrain == ${T.hills} ? 1 : terrain == ${T.mountains} || terrain == ${T.badlands} ? 0 : 3) : int(hash(p + ivec2(13, 7)) * ${TOWN_VARIANTS}.0);
+  ivec2 tq = q;
+  if (kind == 7) {
+    // Docks are painted with the quay to the north and the water to the south: turn them to face the water.
+    const int L = ${TOWN_TILE - 1};
+    if (!land(idAt(p + ivec2(0, -1)))) tq = ivec2(q.x, L - q.y);
+    else if (!land(idAt(p + ivec2(1, 0)))) tq = ivec2(q.y, q.x);
+    else if (!land(idAt(p + ivec2(-1, 0)))) tq = ivec2(q.y, L - q.x);
+  }
+  vec4 t = texelFetch(uTownAtlas, ivec2((variant & ${TOWN_VARIANTS - 1}) * ${TOWN_TILE} + tq.x, (kind - 1) * ${TOWN_TILE} + tq.y), 0);
+  if (t.a > 0.5) {
+    c = distance(t.rgb, FLAG) < 0.02 ? realm : t.rgb;
+    // Snow on the roofs in winter (VIEW-128, VIEW-072).
+    c = mix(c, vec3(0.94, 0.96, 1.0), 0.6 * snowAt(id, terrain, hash(a)));
+  }
+  int walls = int(ti.r);
+  if (walls > 0 && walled(b)) {
+    bool n = !walled(settlementAt(p + ivec2(0, -1)));
+    bool s = !walled(settlementAt(p + ivec2(0, 1)));
+    bool w = !walled(settlementAt(p + ivec2(-1, 0)));
+    bool e = !walled(settlementAt(p + ivec2(1, 0)));
+    bool wall = (n && q.y == 0) || (s && q.y == ${TOWN_TILE - 1}) || (w && q.x == 0) || (e && q.x == ${TOWN_TILE - 1});
+    bool cornerX = (w && q.x <= 1) || (e && q.x >= ${TOWN_TILE - 2});
+    bool cornerY = (n && q.y <= 1) || (s && q.y >= ${TOWN_TILE - 2});
+    if (walls == 2 && cornerX && cornerY) c = ((q.x + q.y) & 1) == 0 ? ${glsl("#b5aebb")} : ${glsl("#77707e")};
+    else if (wall) c = walls == 1 ? (((q.x + q.y) & 1) == 0 ? ${glsl("#8a5a2a")} : ${glsl("#5a3a1a")}) : (((q.x + q.y) & 1) == 0 ? ${glsl("#9a94a0")} : ${glsl("#4a4552")});
+  }
+  return c;
+}
+
 // Tiled map: each map pixel is ART × ART art pixels; tiles cover 2 × 2 map pixels.
 vec3 tiled(bool mini) {
   int size = mini ? ${TILE / 2} : ${TILE};
@@ -373,6 +443,8 @@ vec3 tiled(bool mini) {
       c = mix(c, uInk, 0.45);
     }
   }
+
+  if (!mini && uLiving > 0.0) c = mix(c, livingTown(c, p, a, id, terrain, inf.rgb), uLiving);
 
   bool other1 = (land(iR) && ownerOf(iR) != owner) || (land(iL) && ownerOf(iL) != owner) || (land(iD) && ownerOf(iD) != owner) || (land(iU) && ownerOf(iU) != owner);
   if (!land(iR) || !land(iL) || !land(iD) || !land(iU)) {
@@ -565,6 +637,9 @@ export class MapRenderer {
   private infoWidth = 256;
   private infoData: Uint8Array;
   private ownerData: Uint8Array;
+  private townData: Uint8Array;
+  private townTex: WebGLTexture;
+  private townAtlasTex: WebGLTexture;
   private u: Record<string, WebGLUniformLocation | null> = {};
   mode: MapMode = "political";
   readonly canvas: HTMLCanvasElement;
@@ -577,7 +652,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uRoad"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -606,6 +681,12 @@ export class MapRenderer {
     this.atlasTex = makeDataTexture(gl, atlas.width, atlas.height);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, atlas.width, atlas.height, gl.RGBA, gl.UNSIGNED_BYTE, atlas.rgba);
     if (atlas.height !== ATLAS_ROWS * TILE) throw new Error("tile atlas has the wrong size");
+    this.townData = new Uint8Array(this.infoWidth * rows * 4);
+    this.townTex = makeDataTexture(gl, this.infoWidth, rows);
+    const town = buildTownAtlas();
+    if (town.width !== TOWN_VARIANTS * TOWN_TILE || town.height !== TOWN_ROWS * TOWN_TILE) throw new Error("town atlas has the wrong size");
+    this.townAtlasTex = makeDataTexture(gl, town.width, town.height);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, town.width, town.height, gl.RGBA, gl.UNSIGNED_BYTE, town.rgba);
     const mini = buildMiniAtlas();
     this.miniTex = makeDataTexture(gl, mini.width, mini.height);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, mini.width, mini.height, gl.RGBA, gl.UNSIGNED_BYTE, mini.rgba);
@@ -619,6 +700,8 @@ export class MapRenderer {
       const start = ((y + row) * this.map.width + x) * 4;
       pixels.set(this.map.rgba.subarray(start, start + texW * 4), row * texW * 4);
     }
+    // The alpha holds the settlement byte (VIEW-115), none until the living map lays its towns.
+    for (let i = 3; i < pixels.length; i += 4) pixels[i] = 0;
     const texture = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
@@ -667,6 +750,44 @@ export class MapRenderer {
     this.ownerData[o + 3] = lord >= 0 ? (lord % 255) + 1 : 0;
   }
 
+  /** A province's town for the living map: walls (0 none, 1 palisade, 2 stone), road grade (0 track, 1 road, 2 paved), worship variant and style. */
+  setTownInfo(i: number, walls: number, roadGrade: number, worship: number, style: number): void {
+    const o = i * 4;
+    this.townData[o] = walls;
+    this.townData[o + 1] = roadGrade;
+    this.townData[o + 2] = worship;
+    this.townData[o + 3] = style;
+    this.townDirty = true;
+  }
+  private townDirty = false;
+
+  /** How far the living map has faded in, 0..1 (VIEW-101). */
+  living = 0;
+
+  /**
+   * Writes the settlement bytes of a box of map pixels into the alpha of the
+   * id textures it touches, leaving the rest of the GPU's copy alone (VIEW-115).
+   */
+  setSettlement(bytes: Uint8Array, box: { x0: number; y0: number; x1: number; y1: number }): void {
+    const gl = this.gl;
+    const W = this.map.width;
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    for (const t of this.tiles) {
+      const x0 = Math.max(box.x0, t.x), y0 = Math.max(box.y0, t.y);
+      const x1 = Math.min(box.x1, t.x + t.texW - 1), y1 = Math.min(box.y1, t.y + t.texH - 1);
+      if (x1 < x0 || y1 < y0) continue;
+      const w = x1 - x0 + 1, h = y1 - y0 + 1;
+      const buf = new Uint8Array(w * h * 4);
+      for (let y = 0; y < h; y++) {
+        const row = (y0 + y) * W + x0;
+        buf.set(this.map.rgba.subarray(row * 4, (row + w) * 4), y * w * 4);
+        for (let x = 0; x < w; x++) buf[(y * w + x) * 4 + 3] = bytes[row + x]!;
+      }
+      gl.bindTexture(gl.TEXTURE_2D, t.texture);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, x0 - t.x, y0 - t.y, w, h, gl.RGBA, gl.UNSIGNED_BYTE, buf);
+    }
+  }
+
   /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
   setProvinceSeasons(bytes: Uint8Array): void {
     this.seasonData.set(bytes);
@@ -681,6 +802,11 @@ export class MapRenderer {
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.infoData);
     gl.bindTexture(gl.TEXTURE_2D, this.ownerTex);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.ownerData);
+    if (this.townDirty) {
+      gl.bindTexture(gl.TEXTURE_2D, this.townTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.townData);
+      this.townDirty = false;
+    }
     if (this.seasonDirty) {
       gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.seasonData);
@@ -728,6 +854,14 @@ export class MapRenderer {
     gl.activeTexture(gl.TEXTURE6);
     gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
     gl.uniform1i(this.u.uSeason!, 6);
+    gl.activeTexture(gl.TEXTURE7);
+    gl.bindTexture(gl.TEXTURE_2D, this.townTex);
+    gl.uniform1i(this.u.uTown!, 7);
+    gl.activeTexture(gl.TEXTURE8);
+    gl.bindTexture(gl.TEXTURE_2D, this.townAtlasTex);
+    gl.uniform1i(this.u.uTownAtlas!, 8);
+    gl.uniform1f(this.u.uLiving!, this.living);
+    gl.uniform3fv(this.u.uRoad!, ["#8a6a44", PALETTE.clay, "#9a94a0"].flatMap((c) => hexToRgb(c).map((v) => v / 255)));
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);
 

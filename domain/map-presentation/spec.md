@@ -239,7 +239,7 @@ Zoom bands
 - VIEW-104 (Optional): Where Map detail is Low, the map shall draw icons at every zoom with the closest zoom 40; where Medium, the living band and no street level (closest zoom 40), with reduced life; where High, both bands (closest zoom 96) and full life (SET-041). [living-map-design §6]
 
 Towns
-- VIEW-105 (Ubiquitous): A town shall cover `clamp(1, maxCells, round(sqrt(town people in thousands) × cellsPerRootK))` map pixels (`cellsPerRootK` 1.0, `maxCells` 30), its town people being the province's craftsmen, market folk, clergy, clerks and scholars, the town classes the province overview counts. [living-map-design §3.1]
+- VIEW-105 (Ubiquitous): A town shall cover `clamp(1, maxCells, round(sqrt(town people in thousands) × cellsPerRootK))` map pixels (`cellsPerRootK` 1.5, `maxCells` 30), its town people being the province's craftsmen, market folk, clergy, clerks and scholars, the town classes the province overview counts. [living-map-design §3.1]
 - VIEW-106 (Ubiquitous): A town shall grow from its seed, the province's own land pixel nearest its centre point (which can be in the sea), in a fixed order over the province's land within `growRadius` (8) pixels: each next pixel is the cheapest on the town's edge, its cost the distance to the seed plus a small seeded jitter, less a bonus by rivers and coasts, plus a penalty on mountains and marsh; lakes and sea are never used, so a growing town only adds pixels at its edge and a shrinking one only loses them. [living-map-design §3.1]
 - VIEW-107 (Ubiquitous): The first `coreShare` (60 %) of a town's pixels shall be its core (packed houses on cobbles) and the rest its outskirts (scattered houses among strip fields). [living-map-design §3.1]
 - VIEW-108 (Event-driven): When a turn is applied in a new game month, the map shall work out again the footprints of the provinces whose cell count changed, and no others, so towns never flicker. [living-map-design §3.1]
@@ -341,7 +341,7 @@ re-renders only open panels.
 | Map detail | Low / Medium / High | phone Medium | No | settings |
 | Animations | Full / Reduced / Off | Full | No | settings |
 | `livingMap.livingFrom`, `livingFade`, `streetFrom`, `streetTo` | Living and street band zooms | 16, 2, 40, 96 | Yes | `map-presentation.json` |
-| `livingMap.cellsPerRootK`, `maxCells`, `coreShare` | Town footprint | 1.0, 30, 60 % | Yes | `map-presentation.json` |
+| `livingMap.cellsPerRootK`, `maxCells`, `coreShare` | Town footprint | 1.5, 30, 60 % | Yes | `map-presentation.json` |
 | `livingMap.growRadius`, `growth` | Town growth order | 8 pixels; jitter and river, coast, mountain and marsh weights | Yes | `map-presentation.json` |
 | `livingMap.hamlets` | Hamlets and tracks | 40 thousand rural per hamlet, at most 6, 4 apart, tracks within 8 | Yes | `map-presentation.json` |
 | `livingMap.figures` | Figures | 1,000 / 250 men a figure, 12 / 40 at most, 60 animated at 10 fps | Yes | `map-presentation.json` |
@@ -393,7 +393,7 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 - **D-VIEW-10** (was OQ-VIEW-10) Map detail Low: Low keeps 4 × 4 art at every zoom, Local included, and that is a valid close-in view. It only lowers detail and changes nothing else.
 
 - **OQ-VIEW-11** (default chosen) Band thresholds: living from zoom 16 and street level up to 96. Leroy can overrule. [living-map-design §9 OQ-LIVE-1]
-- **OQ-VIEW-12** (default chosen) Footprint scale: `sqrt(town thousands) × 1.0`, capped at 30 cells, to be tuned so big cities read clearly without swallowing small provinces. [OQ-LIVE-2]
+- **OQ-VIEW-12** (default chosen) Footprint scale: `sqrt(town thousands) × 1.5`, capped at 30 cells, so Toledo's 119 thousand town people in 1444 make the design's 15 to 20 cells (at 1.0 it was 11); to be tuned so big cities read clearly without swallowing small provinces. [OQ-LIVE-2]
 - **OQ-VIEW-13** (default chosen) Street level on the phone default: Medium has no street level, to spare the battery; High only. [OQ-LIVE-3]
 - **OQ-VIEW-14** (default chosen) First landmarks: Toledo, Constantinople (Hagia Sophia), Rome, Paris, Venice, Cairo, Beijing (the Forbidden City) and Cuzco. [OQ-LIVE-4]
 

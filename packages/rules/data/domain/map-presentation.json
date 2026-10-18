@@ -493,7 +493,7 @@
       "clerks",
       "scholars"
     ],
-    "cellsPerRootK": 1.0,
+    "cellsPerRootK": 1.5,
     "maxCells": 30,
     "coreShare": 0.6,
     "growRadius": 8,
@@ -589,6 +589,16 @@
       }
     },
     "tapBoxPoints": 44,
+    "worshipVariant": {
+      "christian": 0,
+      "jewish": 0,
+      "islamic": 1,
+      "buddhist": 2,
+      "east_asian": 2,
+      "traditional": 2,
+      "indic": 3,
+      "none": 0
+    },
     "townStyles": {
       "generic": {
         "cultureGroups": []
