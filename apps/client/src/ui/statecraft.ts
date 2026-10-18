@@ -20,7 +20,7 @@ const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 /** The missions in the engine's ENVOY_ACTIONS order: the button and what it does. */
 const MISSIONS: { action: string; label: string; does: (v: StatecraftView) => string }[] = [
   { action: "propose_alliance", label: "Propose an alliance", does: () => "Allies answer each other's calls to arms. They say yes only if their reasons add up above nothing." },
-  { action: "arrange_marriage", label: "Arrange a marriage", does: () => "Married houses think better of each other (+15), and a marriage can bring a claim when a ruler dies without an heir." },
+  { action: "arrange_marriage", label: "Arrange a marriage", does: () => "Married houses think better of each other (+15). When a ruler dies without a son the other house may gain a claim, and if their line dies out their crown passes to the house most married into it." },
   { action: "courtesy_visit", label: "Courtesy visit", does: () => "Always welcome: +15 standing with them, fading over 5 years." },
   { action: "send_gift", label: "Send a gift", does: (v) => `${v.giftGold} gold: +30 standing with them, fading over 10 years.` },
   { action: "offer_overlordship", label: "Offer overlordship", does: () => "If they say yes they become your tributary: 15 in 100 of their income each month, and you owe them defence. A small realm with threats around it is most willing." },
@@ -44,6 +44,7 @@ export function realmStatecraft(v: StatecraftView | null, r: number, allied: boo
   const letter = v.letters.find((l) => l.from === r);
   const standing = `<h3 class="sub">What they think of you</h3>
     <p><b>${esc(realm.word)}</b> (${signed(realm.standing)})${realm.married ? " · your houses are married" : ""}</p>
+    ${crownsLine(v, r, realm.married)}
     ${realm.lines.length ? `<dl class="facts">${realm.lines.map((x) => `<dt>${esc(x.name)}</dt><dd>${signed(x.weight)}</dd>`).join("")}</dl>` : `<p class="hint">You have had no dealings with them yet.</p>`}`;
   const away = envoy
     ? `<p>${icon("scroll", 1)} Your envoy ${envoy.status === "road" ? `rides to ${missionName(envoy.action)}; he reaches their court in ${monthText(envoy.arrival)}` : envoy.status === "court" ? `is at their court to ${missionName(envoy.action)}` : "is on his way home"}.</p>`
@@ -61,6 +62,16 @@ export function realmStatecraft(v: StatecraftView | null, r: number, allied: boo
     }).join("")}</div>
     ${allied ? `<button class="paper" data-break-alliance="${r}">End the alliance</button><p class="hint">An oath broken: they will remember it (−40, fading over 20 years), and other courts trust you less.</p>` : ""}`;
   return `${standing}${away}${last}${missions}${atWar ? "" : demandsHtml(realm.demands)}`;
+}
+
+/** Marriage and claims toward another realm (SUBJ-130): the paths to its crown. */
+function crownsLine(v: StatecraftView, r: number, married: boolean): string {
+  const claim = v.house?.claims.find((c) => c.throne === r);
+  const parts = [
+    married ? "If their line dies out, their crown may pass to your ruler (the house most married into theirs inherits)." : "",
+    claim ? `Your house claims their throne${claim.until ? ` until ${monthText(claim.until)}` : ""}.` : "",
+  ].filter(Boolean);
+  return parts.length ? `<p>${icon("crown", 1)} ${parts.join(" ")}</p>` : "";
 }
 
 /** Make a demand (DIPL-111 to DIPL-114): tribute and their border provinces, each a 44-point button, or why none can be made. */
@@ -88,6 +99,15 @@ export function myStatecraft(v: StatecraftView | null, realmButton: (n: number) 
     <p>${v.free} of ${v.seats} free. <span class="hint">More come with more than 10 provinces and with inventions.</span></p>
     ${v.envoys.length ? v.envoys.map((e) => `<p>${icon("scroll", 1)} ${realmButton(e.target)} <small>${e.status === "road" ? `to ${missionName(e.action)}, there in ${monthText(e.arrival)}` : e.status === "court" ? `at court, to ${missionName(e.action)}` : `coming home${e.home ? ` in ${monthText(e.home)}` : ""}`}</small></p>`).join("") : `<p class="hint">Open another realm to send an envoy there.</p>`}
     ${v.letters.length ? `<h3 class="sub">Answers</h3>${v.letters.slice(0, 8).map((l) => `<div class="letter"><p>${esc(l.text)} <small>(${monthText(l.month)})</small></p>${reasonsHtml(l)}</div>`).join("")}` : ""}`;
+}
+
+/** Your house (SUBJ-130): the houses married into yours and your claims, every path to another crown in one place. */
+export function myHouse(v: StatecraftView | null, realmButton: (n: number) => string): string {
+  const h = v?.house;
+  if (!h) return "";
+  return `<h3 class="sub">Your house</h3>
+    ${h.married.length ? `<p class="hint">Married into your house. If one of their lines dies out, their crown may pass to your ruler.</p><div class="house-row">${h.married.map((n) => realmButton(n)).join("")}</div>` : `<p class="hint">No house is married into yours. Send an envoy to arrange a marriage: a marriage can bring a claim on a throne, or a whole crown.</p>`}
+    ${h.claims.length ? `<p class="hint">Your claims on other thrones:</p>${h.claims.map((c) => `<div class="house-row">${realmButton(c.throne)} <small>${c.until ? `until ${monthText(c.until)}` : "for life"}</small></div>`).join("")}` : ""}`;
 }
 
 type SubjectRow = NonNullable<StatecraftView["subjects"]>["subjects"][number];
@@ -138,7 +158,9 @@ export function subjectCard(v: StatecraftView | null, r: number): string {
   if (!row) return "";
   const btn = (act: string, label: string, why: string | null, does: string) =>
     why === null ? `<button class="paper" data-subject-act="${act}">${label}</button><p class="hint">${esc(does)}</p>` : `<button class="paper" disabled>${label}</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`;
+  const union = row.kind === "union";
   return `<h3 class="sub">Your ${esc(row.kindName.toLowerCase())}</h3>
+    ${union ? `<p class="hint">${icon("crown", 1)} Your ruler wears their crown too: one ruler for both realms, their lords and laws their own.</p>` : ""}
     <p><b class="${loyaltyClass(row.loyalty)}">${esc(row.loyalty)}</b> · ▲${row.up} ▼${row.down}. They send you ${Math.round(row.pays)} gold a month (${pct(row.share)} of their ${row.kind === "vassal" ? "taxes" : "income"}). ${esc(row.fights)}</p>
     ${reasonBadges(row)}
     <h3 class="sub">Tribute</h3>
@@ -159,7 +181,8 @@ export function subjectCard(v: StatecraftView | null, r: number): string {
     <div class="missions">
       ${row.resident ? btn("recall", "Recall your resident", row.why.recall, "Your envoy comes home; they lose the +1.") : btn("resident", `${icon("scroll", 2)}Station a resident`, row.why.resident, "One of your envoys stays at their court: +1 loyalty, and you see their true army.")}
       ${row.kind === "tributary" ? btn("tighten", "Tighten to vassal", row.why.tighten, "One envoy for 6 months; they then pay 10 in 100 of their taxes and answer your calls. A Wavering tributary refuses and drops a step.") : ""}
-      ${row.kind !== "tributary" ? btn("fold_in", `${icon("crown", 2)}Fold into your realm`, row.why.fold_in, "One envoy for a month per province. Their land becomes yours, held by their ruler as one of your lords, and the country leaves the map.") : ""}
+      ${row.kind !== "tributary" && !union ? btn("fold_in", `${icon("crown", 2)}Fold into your realm`, row.why.fold_in, "One envoy for a month per province. Their land becomes yours, held by their ruler as one of your lords, and the country leaves the map.") : ""}
+      ${union ? btn("merge", `${icon("crown", 2)}Merge the crowns`, row.why.merge, "At once: their provinces join your realm as they are held, their lords serve you with the loyalty they have, and the country leaves the map.") : ""}
     </div>`;
 }
 
@@ -180,7 +203,7 @@ function askWords(a: AskRow): { asks: string; yes: string; no: string; agree: st
     case "propose_alliance":
       return { asks: "proposes an alliance", agree: "Agree", yes: "Allies answer each other's calls to arms; refusing a defensive call breaks it.", no: "Nothing changes between you." };
     case "arrange_marriage":
-      return { asks: "proposes a royal marriage", agree: "Agree", yes: "Married houses think better of each other (+15), and a marriage can bring a claim when a ruler dies without an heir.", no: "Nothing changes between you." };
+      return { asks: "proposes a royal marriage", agree: "Agree", yes: "Married houses think better of each other (+15). A marriage can bring a claim on a throne, and a crown whose line dies out.", no: "Nothing changes between you." };
     case "offer_overlordship":
       return { asks: "offers to take you under its protection", agree: "Agree", yes: "You become their tributary: they defend you, you send them 15 in 100 of your income each month.", no: "Nothing changes between you." };
     case "ask_protection":

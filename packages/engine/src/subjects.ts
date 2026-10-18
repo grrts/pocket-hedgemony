@@ -250,6 +250,14 @@ export function whyNotSubjectAction(world: World, n: number, s: number, action: 
   if (action === "recall") return b.resident ? null : "you have no resident there";
   if (action === "hostage") return b.ties.includes("hostage_at_court") ? "you hold their heir already" : b.loyalty === "disloyal" ? "they are Disloyal; a hostage is taken only from a Loyal or Wavering subject" : null;
   if (action === "send_heir_home") return b.ties.includes("hostage_at_court") ? null : "you hold no heir of theirs";
+  if (action === "merge") {
+    if (b.kind !== "union") return "only a Union's crowns are merged";
+    const years = Math.floor((monthNow(world) - b.since) / 12);
+    const need = config.kinds.union.merge_requires_years;
+    if (years < need) return `${years} of the ${need} years in union needed`;
+    return b.loyalty === "loyal" ? null : `they are ${STEP_WORD[b.loyalty]}; merging needs them Loyal`;
+  }
+  if (action === "fold_in" && b.kind === "union") return "a Union joins your realm by merging the crowns";
   if (action === "tighten" || action === "fold_in") {
     if (b.tighten || b.foldIn) return "your envoy is already at work there";
     if (dip.freeSeats(world.diplomacy, b.overlord) <= 0) return "no free envoy: every seat is taken";
@@ -323,6 +331,7 @@ export function subjectAction(world: World, n: number, s: number, action: string
     news.push({ kind: "envoy", text: `${name(s)}'s heir comes to ${name(n)}'s court as a hostage.`, nations: [n, s] });
   }
   if (action === "send_heir_home") sendHeirHome(b);
+  if (action === "merge") mergeCrownsRealm(world, s, n, news);
   if (action === "tighten") {
     subj.tighten(b, now);
     seatEnvoy(world, b, "subject_tighten");
@@ -389,17 +398,7 @@ export function foldInRealm(world: World, s: number, o: number, news: News[]): v
   const g = world.diplomacy.graph;
   const sid = world.nationIds[s]!;
   const oid = world.nationIds[o]!;
-  for (const r of g.relations.filter((x) => x.type === "subject" && x.target === sid)) {
-    const bond = bondOn(world, r);
-    rel.removeRelation(g, "subject", r.source, sid);
-    try {
-      const next = rel.makeSubject(g, r.source, oid, bond.kind);
-      next.origin = "game";
-      next.bond = { ...bond, overlord: oid };
-    } catch {
-      // A tie the relation rules forbid: it goes free.
-    }
-  }
+  stepUpSubjects(world, sid, oid);
   rel.removeRelation(g, "subject", sid, oid);
   const land = provincesOf(world, s);
   const capital = world.provinceIndex.get(world.rules.nations[s]!.capital) ?? land[0]!;
@@ -413,6 +412,46 @@ export function foldInRealm(world: World, s: number, o: number, news: News[]): v
   dip.provincesTaken(world.diplomacy, oid, sid, land.map((p) => world.provinceIds[p]!));
   checkDestroyed(world, news);
   bondsChanged(world);
+}
+
+/**
+ * Merging the crowns completes (SUBJ-070, SUBJ-129): one ruler wears both, so
+ * the Union's land joins the realm as it is held, its lords serving the
+ * overlord with the loyalty they had and its royal land the overlord's own.
+ */
+export function mergeCrownsRealm(world: World, s: number, o: number, news: News[]): void {
+  const g = world.diplomacy.graph;
+  const sid = world.nationIds[s]!;
+  const oid = world.nationIds[o]!;
+  stepUpSubjects(world, sid, oid);
+  rel.removeRelation(g, "subject", sid, oid);
+  const land = provincesOf(world, s);
+  for (const p of land) {
+    world.provinceOwner[p] = o;
+    const l = world.provinceLord[p]!;
+    if (l >= 0 && world.lords[l]) world.lords[l]!.nation = o;
+  }
+  const capital = world.provinceIndex.get(world.rules.nations[s]!.capital) ?? land[0];
+  news.push({ kind: "crown", text: `The crowns of ${world.rules.nations[o]!.name} and ${world.rules.nations[s]!.name} are merged: its ${land.length} province${land.length === 1 ? "" : "s"} join the realm, its lords keep their land.`, nations: [s, o], ...(capital === undefined ? {} : { province: capital }) });
+  dip.provincesTaken(world.diplomacy, oid, sid, land.map((p) => world.provinceIds[p]!));
+  checkDestroyed(world, news);
+  bondsChanged(world);
+}
+
+/** A folded-in or merged realm's own subjects step up to its overlord, keeping their bonds (SUBJ-063). */
+function stepUpSubjects(world: World, sid: string, oid: string): void {
+  const g = world.diplomacy.graph;
+  for (const r of g.relations.filter((x) => x.type === "subject" && x.target === sid)) {
+    const bond = bondOn(world, r);
+    rel.removeRelation(g, "subject", r.source, sid);
+    try {
+      const next = rel.makeSubject(g, r.source, oid, bond.kind);
+      next.origin = "game";
+      next.bond = { ...bond, overlord: oid };
+    } catch {
+      // A tie the relation rules forbid: it goes free.
+    }
+  }
 }
 
 /** What a risen subject was, kept on its war so the peace can restore it (SUBJ-077, SUBJ-078). */
@@ -533,6 +572,11 @@ export function aiOverlordEnvoys(world: World, news: News[]): void {
   for (const t of ties) {
     if (t.o === world.player) continue;
     const centralising = (t.o * 7) % 3 === 0;
+    // A Union ready to merge is merged at once (SUBJ-098, SUBJ-129).
+    if (centralising && t.bond.kind === "union" && !whyNotSubjectAction(world, t.o, t.s, "merge")) {
+      subjectAction(world, t.o, t.s, "merge", news);
+      continue;
+    }
     if (t.bond.loyalty === "loyal" && centralising && !folding.has(t.o) && !whyNotSubjectAction(world, t.o, t.s, "fold_in")) {
       subjectAction(world, t.o, t.s, "fold_in", news);
       folding.add(t.o);
@@ -590,7 +634,7 @@ export interface SubjectView {
   worst: string;
   fights: string;
   /** Why each action can't be taken now (null when it can): gift, loosen, release; and the gift's cost. */
-  why: { gift: string | null; loosen: string | null; release: string | null; resident: string | null; recall: string | null; hostage: string | null; send_heir_home: string | null; tighten: string | null; fold_in: string | null };
+  why: { gift: string | null; loosen: string | null; release: string | null; resident: string | null; recall: string | null; hostage: string | null; send_heir_home: string | null; tighten: string | null; fold_in: string | null; merge: string | null };
   /** Months left of tightening or folding in, when an envoy is at work. */
   work: { action: "tighten" | "fold_in"; monthsLeft: number } | null;
   resident: boolean;
@@ -642,7 +686,7 @@ export function subjectsView(world: World, player: number, ledgerTribute: (n: nu
       reasons: reasons.map((x) => ({ label: x.label, arrow: x.arrow })),
       worst: subj.worstReason(reasons)?.label ?? "",
       fights: FIGHTS[subj.kindFights(t.bond.kind)] ?? "",
-      why: Object.fromEntries((["gift", "loosen", "release", "resident", "recall", "hostage", "send_heir_home", "tighten", "fold_in"] as const).map((a) => [a, whyNotSubjectAction(world, t.o, t.s, a)])) as SubjectView["why"],
+      why: Object.fromEntries((["gift", "loosen", "release", "resident", "recall", "hostage", "send_heir_home", "tighten", "fold_in", "merge"] as const).map((a) => [a, whyNotSubjectAction(world, t.o, t.s, a)])) as SubjectView["why"],
       work: t.bond.foldIn ? { action: "fold_in", monthsLeft: t.bond.foldIn.monthsLeft } : t.bond.tighten ? { action: "tighten", monthsLeft: t.bond.tighten.monthsLeft } : null,
       resident: !!t.bond.resident,
       hostage: heldUntil(t.bond),

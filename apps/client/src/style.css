@@ -3081,7 +3081,8 @@ button.paper.over {
 .loyalty-disloyal { color: #a4521a; }
 .loyalty-in-revolt { color: var(--cloth); }
 
-.subject-row {
+.subject-row,
+.house-row {
   min-height: 44px;
   display: flex;
   flex-wrap: wrap;
