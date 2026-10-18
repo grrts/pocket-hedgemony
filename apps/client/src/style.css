@@ -2786,6 +2786,78 @@ button.paper.over {
   gap: 6px;
 }
 
+/* Rebellions (REBL-063, REBL-065): the rebellion card and verdicts on the province card, the Risings block of the Provinces tab. */
+.rising {
+  padding: 6px 8px;
+  margin: 6px 0 8px;
+  border-left: 4px solid var(--cloth);
+}
+.rising .sub {
+  margin-top: 0;
+  color: var(--cloth);
+}
+.rising dl.facts dd small {
+  display: block;
+  color: var(--ink-soft);
+}
+.rising .progress {
+  width: 100%;
+  min-width: 120px;
+}
+.progress.danger i {
+  background: var(--cloth);
+}
+.rising .answers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+}
+.rising .answers button {
+  display: grid;
+  gap: 2px;
+  min-height: 44px;
+  text-align: left;
+  justify-content: stretch;
+}
+.rising .answers button small {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.rising .answers button.wax small {
+  color: inherit;
+  opacity: 0.85;
+}
+.rising .answers button b {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rising .answers .confirm-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 6px;
+}
+.risings {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.rising-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  text-align: left;
+  justify-content: flex-start;
+}
+.rising-row span {
+  display: grid;
+}
+.rising-row small {
+  font-weight: 400;
+}
+
 /* ---- Heritage: a realm's national strengths and its 1444 assessments (HER-080..083) ---- */
 
 .heritage-line small {
