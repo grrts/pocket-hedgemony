@@ -821,7 +821,7 @@ export interface RisingView {
   monthsToWin: number;
   /** Neighbours of its land with 3 or more grievances: where it may spread next month. */
   spreadTo: number[];
-  siege: { province: number; months: number; progress: number; garrison: number } | null;
+  siege: { province: number; days: number; months: number; progress: number; breaches: number; garrison: number; foodMonths: number | null } | null;
   /** The answers with their gold and why each can't be given now (null = it can); only for the player's risings. */
   answers: { answer: Answer; label: string; gold: number; note: string; why: string | null }[];
 }
@@ -871,7 +871,7 @@ export function rebelsView(world: World): RebelsView {
         monthsHeld: b.monthsHeld,
         monthsToWin: C.win_hold_months,
         spreadTo: [...spread],
-        siege: b.siege ? { province: b.siege.province, months: b.siege.siege.months, progress: (b.siege.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, garrison: b.siege.siege.garrison } : null,
+        siege: b.siege ? { province: b.siege.province, days: b.siege.days, months: b.siege.siege.months, progress: (b.siege.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: b.siege.siege.breaches, garrison: b.siege.siege.garrison, foodMonths: Number.isFinite(wf.foodMonths(b.siege.siege)) ? wf.foodMonths(b.siege.siege) : null } : null,
         answers: costs ? (Object.keys(costs) as Answer[]).map((k) => ({ answer: k, label: LABEL[k], gold: costs[k].gold, note: costs[k].note, why: costs[k].why })) : [],
       };
     }),

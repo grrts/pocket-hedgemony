@@ -21,6 +21,8 @@ import { hashWorld } from "./hash.ts";
 import { advance, applyNow, campaigning, HOURS_PER_STEP, mayMarchInto, processTurn, refillHere, type Order } from "./turn.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
+import { foodMonths } from "./domain/warfare/index.ts";
+import { battleSides } from "./domain/map-presentation/index.ts";
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages, type TileGrid } from "./tiles.ts";
 import { navyView, type NavyView } from "./navy.ts";
@@ -132,9 +134,11 @@ export interface Snapshot {
   /** The map's diplomacy lens: each realm's relation to the player, leagues, envoys on the road and war aims (DIPL-209); null without a player. */
   diplomacyLens: DiplomacyLensView | null;
   /** Sieges under way: months gone, how far into the next siege month (0..1), breaches and men inside. */
-  sieges: { province: number; by: number; months: number; progress: number; breaches: number; garrison: number }[];
+  /** Sieges under way, with their progress for the map and the siege view (WAR-208, VIEW-078): days held, months of food left (null while nobody eats). */
+  sieges: { province: number; by: number; days: number; months: number; progress: number; breaches: number; garrison: number; foodMonths: number | null }[];
   /** Battles being fought: where, each side's leading realm with its men now and at the start, and rounds fought of all. */
-  battles: { id: number; tile: number; province: number; attacker: number; defender: number; attMen: number; defMen: number; attStart: number; defStart: number; round: number; rounds: number; player: boolean }[];
+  /** Battles being fought, with each side's men and morale left after the rounds so far (WAR-207, VIEW-077). */
+  battles: { id: number; tile: number; province: number; attacker: number; defender: number; attMen: number; defMen: number; attStart: number; defStart: number; attMorale: number; defMorale: number; round: number; rounds: number; player: boolean }[];
   /** Width of the tile grid (tile = y * width + x, in map pixels). */
   tileWidth: number;
   nationTreasury: Float64Array;
@@ -361,9 +365,13 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       heritage: heritageViews(w),
       events: eventCards(w, player),
       diplomacyLens: diplomacyLensView(w, player),
-      sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
+      sieges: [...w.sieges].map(([p, st]) => {
+        const food = foodMonths(st.siege);
+        return { province: p, by: st.by, days: st.days, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison), foodMonths: Number.isFinite(food) ? food : null };
+      }),
       battles: w.battles.map((b) => {
         const men = (slots: number[]) => slots.reduce((t, s) => t + (a.alive[s] ? a.men[s]! : 0), 0);
+        const [att, def] = battleSides({ attMen: men(b.attackers), defMen: men(b.defenders), attStart: b.attStart, defStart: b.defStart, round: b.round, rounds: b.rounds, attackerWins: b.attackerWins });
         return {
           id: b.id,
           tile: b.tile,
@@ -374,6 +382,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           defMen: men(b.defenders),
           attStart: b.attStart,
           defStart: b.defStart,
+          attMorale: att.moraleLeft,
+          defMorale: def.moraleLeft,
           round: b.round,
           rounds: b.rounds,
           player: [...b.attackers, ...b.defenders].some((s) => a.owner[s] === player),

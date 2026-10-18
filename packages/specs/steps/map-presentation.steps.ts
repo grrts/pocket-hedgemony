@@ -98,6 +98,29 @@ import {
   aiWorkSteps,
   withBatterySaver,
 } from "@ph/engine/domain/map-presentation";
+import {
+  ICE,
+  ROUTE_STROKE,
+  ZOOMS,
+  armyStand,
+  battleProgressMarks,
+  battleSides,
+  brightness,
+  contrastRatio,
+  iceColour,
+  icedSea,
+  mapNames,
+  playbackAdvance,
+  playbackHour,
+  routeStrokeOver,
+  seaIceAt,
+  siegeProgressMarks,
+  type IceSampler,
+} from "@ph/engine/domain/map-presentation";
+import { foodMonths as wfFoodMonths, newSiege as wfNewSiege, siegeMonth as wfSiegeMonth } from "@ph/engine/domain/warfare";
+import { decodeRgb } from "@ph/engine/node";
+import { fileURLToPath } from "node:url";
+import { FLAG_COLORS, FLAG_H, FLAG_W, flagGrid } from "../../../apps/client/src/art/flags.ts";
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("map-presentation");
@@ -107,6 +130,299 @@ const has = (marks: Mark[], draw: string): Mark => {
   expect(m, `expected a "${draw}" mark in ${JSON.stringify(marks)}`).toBeDefined();
   return m!;
 };
+
+// ---------------------------------------------------------------------------
+// Playtest feedback on the map (VIEW-074..083): the client draws from these.
+
+const MAP_DIR = new URL("../../../apps/client/public/map/", import.meta.url);
+
+/** The real map's tiles, as the client hands them to the engine with newGame. */
+function realMapTiles(): { width: number; height: number; province: Uint16Array; terrain: Uint8Array } {
+  const ids = decodeRgb(fileURLToPath(new URL("provinces.png", MAP_DIR)));
+  const terrain = decodeRgb(fileURLToPath(new URL("terrain.png", MAP_DIR)));
+  const province = new Uint16Array(ids.width * ids.height);
+  for (let p = 0, i = 0; p < province.length; p++, i += 3) province[p] = (ids.rgb[i]! << 16) | (ids.rgb[i + 1]! << 8) | ids.rgb[i + 2]!;
+  return { width: ids.width, height: ids.height, province, terrain: terrain.rgb };
+}
+
+// VIEW-074: the engine walks the army a tile at a time; the map stands it on its tile under its commander's banner.
+Given("an army led by {string} is marching", (s, commander: string) => {
+  const rules = loadDefaultRuleset();
+  const nation = rules.nations.find((n) => n.commanders?.some((c) => c.name === commander)) ?? rules.nations.find((n) => n.id === "france")!;
+  s.host = createEngineHost(loadDefaultRuleset);
+  let snap = s.host({ id: 1, type: "newGame", seed: 1, playerNation: nation.id, map: realMapTiles() }).response.snapshot;
+  const k = [...snap.armies.id.keys()].find((i: number) => snap.armies.commander[i] >= 0 && snap.commanders[snap.armies.commander[i]].name === commander);
+  expect(k, `an army led by ${commander}`).toBeDefined();
+  const reply = s.host({ id: 2, type: "act", order: { type: "move", army: snap.armies.id[k], to: snap.armies.location[k] + 3 } }).response;
+  expect(reply.type).toBe("snapshot");
+  snap = reply.snapshot;
+  expect(snap.armies.path[k].length).toBeGreaterThan(1);
+  s.armyK = k;
+  s.snap = snap;
+  s.commander = commander;
+});
+
+When("the map is drawn during playback", (s) => {
+  const k = s.armyK;
+  s.frames = [] as { tile: number; trail: number[]; marks: Mark[] }[];
+  let snap = s.snap;
+  for (let day = 0; day < 4; day++) {
+    snap = s.host({ id: 10 + day, type: "advance", steps: playbackAdvance(snap.hour, false) }).response.snapshot;
+    const commander = snap.armies.commander[k] >= 0 ? snap.commanders[snap.armies.commander[k]].name : null;
+    s.frames.push({ tile: snap.armies.tile[k], trail: [...snap.armies.trail[k]], marks: armyStand({ tile: snap.armies.tile[k], owner: String(snap.armies.owner[k]), commander }) });
+  }
+  s.startTile = s.snap.armies.tile[k];
+  s.tileWidth = snap.tileWidth;
+});
+
+Then("the army is drawn on its current tile with the banner of {string}", (s, commander: string) => {
+  for (const f of s.frames) expect(f.marks).toEqual([{ draw: "banner", tile: f.tile, commander, colour: expect.any(String) }]);
+});
+
+Then("it moves tile by tile along its route", (s) => {
+  const w: number = s.tileWidth;
+  let at: number = s.startTile;
+  let stepped = 0;
+  for (const f of s.frames) {
+    for (const t of f.trail) {
+      const dx = Math.abs((t % w) - (at % w));
+      const dy = Math.abs(Math.floor(t / w) - Math.floor(at / w));
+      expect(Math.max(dx, dy), `a step from tile ${at} to ${t}`).toBe(1);
+      at = t;
+      stepped++;
+    }
+    expect(f.tile).toBe(at);
+  }
+  expect(stepped).toBeGreaterThan(s.frames.length);
+});
+
+// VIEW-075
+const GROUNDS: Record<string, string> = { snow: "#f4f6ff", desert: "#e0b878", "a white realm's land": "#f4f4f4", sea: "#243a6b", forest: "#257179" };
+
+Given("an army's route crosses snow, desert and a white realm's land", (s) => {
+  s.grounds = ["snow", "desert", "a white realm's land", "sea", "forest"];
+});
+
+Then("it is a light dash over a dark outline", (s) => {
+  const { dash, outline, minContrast } = ROUTE_STROKE;
+  expect(contrastRatio(dash, "#000000")).toBeGreaterThan(contrastRatio(outline, "#000000"));
+  expect(contrastRatio(dash, outline)).toBeGreaterThanOrEqual(minContrast);
+  for (const g of s.grounds as string[]) expect(routeStrokeOver(GROUNDS[g]!).readable, g).toBe(true);
+});
+
+// VIEW-076: the clock ticks through a real turn a day at a time; through a player battle, by 4-hour steps.
+Then("the top bar's date ticks one day at a time", (s) => {
+  const host = createEngineHost(loadDefaultRuleset);
+  let snap = host({ id: 1, type: "newGame", seed: 1, playerNation: "france" }).response.snapshot;
+  const turn = snap.turn;
+  const dayNo = (d: { year: number; month: number; day: number }) => Date.UTC(d.year, d.month - 1, d.day) / 86_400_000;
+  const days: number[] = [dayNo(snap.date)];
+  for (let i = 0; snap.turn === turn && i < 20; i++) {
+    expect(playbackHour(snap.hour, false)).toBeNull();
+    snap = host({ id: 2 + i, type: "advance", steps: playbackAdvance(snap.hour, false) }).response.snapshot;
+    days.push(dayNo(snap.date));
+  }
+  expect(days.length).toBeGreaterThan(2);
+  for (let i = 1; i < days.length; i++) expect(days[i]! - days[i - 1]!).toBe(1);
+});
+
+Then("it shows the hour of each 4-hour step while a player battle runs", (s) => {
+  const labels: (string | null)[] = [];
+  let hour = 0;
+  for (let i = 0; i < STEPS_PER_DAY; i++) {
+    labels.push(playbackHour(hour, true));
+    hour = (hour + playbackAdvance(hour, true) * (24 / STEPS_PER_DAY)) % 24;
+  }
+  expect(labels).toEqual(["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"]);
+  expect(hour).toBe(0);
+  expect(playbackAdvance(8, false)).toBe(4);
+});
+
+// VIEW-077: the map and the battle viewer show the same men and morale from the round's published state.
+Given("a battle runs at {string}", (s, place: string) => {
+  s.battle = { place, attMen: 9000, defMen: 7000, attStart: 9000, defStart: 7000, round: 0, rounds: 8, attackerWins: false };
+});
+
+When("a round is fought", (s) => {
+  s.before = battleSides(s.battle);
+  s.battle = { ...s.battle, round: s.battle.round + 1, attMen: s.battle.attMen - 700, defMen: s.battle.defMen - 300 };
+  const sides = battleSides(s.battle);
+  s.mapMarks = battleProgressMarks(sides);
+  s.viewerMarks = battleProgressMarks(battleSides({ ...s.battle }));
+});
+
+Then("the map shows each side's men and a bar of men and morale left", (s) => {
+  const marks: Mark[] = s.mapMarks;
+  expect(marks.filter((m) => m.draw === "men").map((m) => m.men)).toEqual([8300, 6700]);
+  const bars = marks.filter((m) => m.draw === "bar");
+  expect(bars.map((m) => m.side)).toEqual(["attacker", "defender"]);
+  expect(bars[0]!.menLeft).toBeCloseTo(8300 / 9000, 5);
+  expect(bars[1]!.menLeft).toBeCloseTo(6700 / 7000, 5);
+  // Morale sinks each round, and faster on the side that will break.
+  expect(bars[0]!.moraleLeft as number).toBeLessThan(s.before[0].moraleLeft);
+  expect(bars[0]!.moraleLeft as number).toBeLessThan(bars[1]!.moraleLeft as number);
+});
+
+Then("the battle viewer shows the same", (s) => expect(s.viewerMarks).toEqual(s.mapMarks));
+
+// VIEW-078: a month of a real siege by the warfare rules, shown on the map.
+Given("the castle of {string} is besieged", (s, castle: string) => {
+  const garrison = 1200;
+  const siege = wfNewSiege("stone castle", { garrison, store: garrison * loadDefaultRuleset().defines.war.castleStoreMonths, besiegers: 9000, bombards: 8 });
+  wfSiegeMonth(siege);
+  s.castle = castle;
+  s.siegeState = siege;
+  s.siegeView = { days: 33, months: siege.months, breaches: siege.breaches, garrison: Math.round(siege.garrison), foodMonths: wfFoodMonths(siege) };
+});
+
+When("the map is at Region zoom", (s) => {
+  s.zoom = zoomLevel("Region");
+});
+
+Then("the siege shows how long it has held, its breaches, its garrison and its food left", (s) => {
+  const plate = has(siegeProgressMarks(s.zoom, s.siegeView), "siege plate");
+  expect(plate).toEqual({ draw: "siege plate", held: "1 month", breaches: s.siegeState.breaches, garrison: s.siegeView.garrison, foodMonths: Math.floor(s.siegeView.foodMonths * 10) / 10 });
+  expect(s.siegeView.foodMonths).toBeLessThan(6);
+  expect(siegeProgressMarks("Local", s.siegeView)).toEqual([plate]);
+  expect(siegeProgressMarks("World", s.siegeView)).toEqual([]);
+});
+
+// VIEW-079: the real map's provinces, the capitals of 1444.
+Then("no land province names are drawn except on each country's capital", (s) => {
+  const rules = loadDefaultRuleset();
+  const capitals = new Set(rules.nations.map((n) => n.capital));
+  const water = (p: { terrain?: string }) => p.terrain === "sea" || p.terrain === "ocean";
+  const places = rules.provinces.map((p) => ({ name: p.name, sea: water(p), ownersCapital: capitals.has(p.id) }));
+  const land = new Set(places.filter((p) => !p.sea).map((p) => p.name));
+  const capitalNames = new Set(places.filter((p) => p.ownersCapital).map((p) => p.name));
+  for (const zoom of s.zoom ? [s.zoom] : ZOOMS) {
+    const { drawn } = mapNames(zoom, places);
+    for (const name of drawn) if (land.has(name)) expect(capitalNames.has(name), `${name} at ${zoom} zoom`).toBe(true);
+  }
+  expect(mapNames("Local", places).drawn.filter((n) => land.has(n)).length).toBe([...capitalNames].length);
+  s.places = places;
+});
+
+Then("a selected province shows its name on its name tab and card", (s) => {
+  const p = (s.places as { name: string; sea: boolean; ownersCapital: boolean }[]).find((x) => !x.sea && !x.ownersCapital)!;
+  const names = mapNames("Local", s.places, p);
+  expect(names.drawn).not.toContain(p.name);
+  expect([names.nameTab, names.card]).toEqual([p.name, p.name]);
+});
+
+// VIEW-080..082: the sea-ice model the map shader runs, over a cold sea zone off a coast.
+/** A strip of map: land in the first columns, then one sea zone at a temperature, shallow near the coast. */
+function iceStrip(celsius: number, coastCols = 20): IceSampler {
+  return {
+    at: (x, y) => (y < 0 || y >= 200 || x < 0 || x >= 400 ? null : x < coastCols ? { land: true } : { land: false, celsius }),
+    depth: (x) => Math.min(1, Math.max(0, (x - coastCols) / 200)),
+  };
+}
+
+const iceRow = (sea: IceSampler, y: number) => Array.from({ length: 360 }, (_, i) => seaIceAt(sea, 20 + i, y));
+
+Given("the {string} is partly frozen in {string}", (s, _sea: string, _month: string) => {
+  s.sea = iceStrip(-11.5);
+});
+
+Then("the edge between open sea and ice shows no checkerboard dither pattern", (s) => {
+  const rows = Array.from({ length: 60 }, (_, k) => iceRow(s.sea, 70 + k));
+  expect(rows.flat().some((c) => c.ice > 0.9)).toBe(true);
+  expect(rows.flat().some((c) => c.slush === 0)).toBe(true);
+  // An ordered dither flips pixels to and fro between water and ice, row after row: up, down, up, down.
+  // A soft edge may carry texture, but never that run of flips.
+  const checkerRun = (v: number[]) => {
+    let run = 0;
+    for (let i = 2; i < v.length; i++) {
+      const a = v[i - 1]! - v[i - 2]!;
+      const b = v[i]! - v[i - 1]!;
+      run = Math.abs(a) > 0.15 && Math.abs(b) > 0.15 && Math.sign(a) !== Math.sign(b) ? run + 1 : 0;
+      if (run >= 3) return true;
+    }
+    return false;
+  };
+  let graded = 0;
+  let crossings = 0;
+  for (const row of rows) {
+    expect(checkerRun(row.map((c) => c.slush))).toBe(false);
+    expect(checkerRun(row.map((c) => c.ice))).toBe(false);
+    for (let i = 1; i < row.length; i++) if (row[i - 1]!.slush >= 0.5 !== row[i]!.slush >= 0.5) crossings++;
+    graded += row.filter((c) => c.slush > 0.05 && c.slush < 0.95).length;
+  }
+  for (let i = 0; i < 360; i += 5) expect(checkerRun(rows.map((r) => r[i]!.slush))).toBe(false);
+  // Each crossing from water to ice is a band of several part-frozen pixels, not a hard step.
+  expect(crossings).toBeGreaterThan(0);
+  expect(graded / crossings).toBeGreaterThan(2);
+});
+
+Given("the {string} is frozen and the land around it is under snow in {string}", (s, _sea: string, _month: string) => {
+  s.sea = iceStrip(-20);
+});
+
+When("the map is drawn in every colour vision mode", (s) => {
+  s.modes = Object.keys(colourVision as unknown as object).length ? (["Default", "Red-weak", "Green-weak", "Blue-weak", "No colour"] as ColourVision[]) : [];
+  for (const m of s.modes) colourVision(m);
+});
+
+Then("the sea ice is grey-blue and can be told from the white snow on land", (s) => {
+  const ice = icedSea([0.14, 0.23, 0.42], s.sea, 30, 100);
+  const snow = ICE.landSnowColour;
+  // Grey-blue: blue above red, not saturated.
+  expect(ice[2]).toBeGreaterThan(ice[0]);
+  expect(Math.max(...ice) - Math.min(...ice)).toBeLessThan(0.3);
+  // Every colour vision mode, greys included, keeps brightness: the ice is clearly darker than snow.
+  for (const _mode of s.modes) expect(brightness(snow) - brightness(ice)).toBeGreaterThan(0.12);
+});
+
+Given("the {string} is freezing in {string}", (s, _sea: string, _month: string) => {
+  s.sea = iceStrip(-10);
+});
+
+Then("the ice reaches out from the coasts in a natural shape that does not follow the sea zone's outline", (s) => {
+  // One sea zone, one temperature: yet ice holds near the coast and not far out, and its reach varies along the coast.
+  const reach = Array.from({ length: 160 }, (_, y) => iceRow(s.sea, y + 20).findIndex((c) => c.slush < 0.5));
+  const near = iceRow(s.sea, 100).slice(0, 10);
+  const far = iceRow(s.sea, 100).slice(300);
+  expect(Math.max(...near.map((c) => c.slush))).toBeGreaterThan(0.5);
+  expect(far.every((c) => c.slush === 0)).toBe(true);
+  expect(Math.max(...reach) - Math.min(...reach)).toBeGreaterThan(8);
+});
+
+Then("the edge between open sea and ice is soft and textured", (s) => {
+  const row = iceRow(s.sea, 100);
+  expect(row.some((c) => c.slush > 0.05 && c.slush < 0.95)).toBe(true);
+  const colours = new Set(Array.from({ length: 40 }, (_, i) => iceColour(30 + i * 3, 100).map((v) => v.toFixed(3)).join()));
+  expect(colours.size).toBeGreaterThan(3);
+});
+
+// VIEW-083: the flags the top bar draws (apps/client/src/art/flags.ts).
+When("the player looks at the top bar as {string}", (s, realm: string) => {
+  s.flag = flagGrid(realm.toLowerCase());
+  s.england = flagGrid("england");
+});
+
+Then("France's flag shows blue, white and red bands with no pole", (s) => {
+  const g: string[][] = s.flag;
+  expect(g.length).toBe(FLAG_H);
+  for (const row of g) expect(row.length).toBe(FLAG_W);
+  const third = FLAG_W / 3;
+  const band = (from: number, to: number) => new Set(g.flatMap((row) => row.slice(Math.ceil(from), Math.floor(to))));
+  expect([...band(0, third)]).toEqual([FLAG_COLORS.B]);
+  expect([...band(third, 2 * third)]).toEqual([FLAG_COLORS.W]);
+  expect([...band(2 * third, FLAG_W)]).toEqual([FLAG_COLORS.R]);
+  // No pole: no column in the pole's brown or ink, the cloth runs to the edge.
+  expect(g.flat().some((c) => c === FLAG_COLORS.N || c === FLAG_COLORS.K)).toBe(false);
+});
+
+Then("{string} shows a red cross on white", (s, realm: string) => {
+  const g = flagGrid(realm.toLowerCase())!;
+  const midRow = g[Math.floor(FLAG_H / 2)]!;
+  const midCol = g.map((row) => row[Math.floor(FLAG_W / 2)]!);
+  expect(new Set(midRow)).toEqual(new Set([FLAG_COLORS.R]));
+  expect(new Set(midCol)).toEqual(new Set([FLAG_COLORS.R]));
+  expect(g[0]![0]).toBe(FLAG_COLORS.W);
+  expect(g[FLAG_H - 1]![FLAG_W - 1]).toBe(FLAG_COLORS.W);
+});
 
 // ---------------------------------------------------------------------------
 // Layout by window shape
@@ -282,7 +598,8 @@ Given(/^the kin toggle is (on|off)$/, (s, toggle: string) => {
 });
 
 When(/^the map is drawn at (\w+) zoom$/, (s, zoom: string) => {
-  s.zoom = zoomLevel(zoom);
+  // "any" zoom: each step that follows checks every zoom level.
+  s.zoom = zoom === "any" ? undefined : zoomLevel(zoom);
   s.drawn = true;
 });
 
@@ -745,7 +1062,8 @@ Given("a battle was fought in {string} on day {int}", (s, place: string, day: nu
 });
 
 When("the turn plays back", (s) => {
-  s.playback = playbackCues(s.month);
+  // With no turn given, the steps that follow play a real one (VIEW-076).
+  if (s.month) s.playback = playbackCues(s.month);
 });
 
 Then("the army walks its route", (s) => {

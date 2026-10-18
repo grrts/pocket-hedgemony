@@ -8,7 +8,6 @@ import {
   placeClimate,
   provinceClimate,
   seasonName,
-  STEPS_PER_DAY,
   type MapTiles,
   type MarchMap,
   type News,
@@ -62,6 +61,7 @@ import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } fro
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
 import { Hints, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
+import { nameOnMap, playbackAdvance, playbackHour } from "@ph/engine/domain/map-presentation";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { Rng } from "@ph/engine";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
@@ -92,6 +92,8 @@ const diagnostics: Diagnostics = {
 const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 /** "11 November 1444", or "11 Nov 1444" short. */
+/** The hour beside the date in the top bar, while the player's battle runs (VIEW-076). */
+const clockText = (hour: string | null) => (hour ? ` <small>${hour}</small>` : "");
 const dateText = (d: GameDate, short = false) => `${d.day ?? 1} ${short ? MONTHS[d.month - 1]!.slice(0, 3) : MONTHS[d.month - 1]} ${d.year}`;
 
 const provinces = rules.provinces;
@@ -1013,7 +1015,7 @@ function drawOverlay(o: OverlayContext): void {
     ctx.textBaseline = "top";
     nations.forEach((n, i) => {
       const c = provinceIndex.get(n.capital)!;
-      if (owners[c] !== i || !isKnown(c)) return;
+      if (!nameOnMap({ name: provinces[c]!.name, ownersCapital: owners[c] === i }) || !isKnown(c)) return;
       const [sx, sy] = o.toScreen(provinces[c]!.x!, provinces[c]!.y!);
       if (onScreen(sx, sy)) pixelText(ctx, provinces[c]!.name, sx, sy + 7 * spriteScale, 12);
     });
@@ -1040,20 +1042,20 @@ function drawOverlay(o: OverlayContext): void {
     if (shown && !hammerTick) hammerTick = setTimeout(() => ((hammerTick = 0), view.invalidate()), 100);
   }
 
-  // Sieges under way: how long the walls have held, and how far into the next siege month.
+  // Sieges under way (VIEW-078): how long the walls have held, how far into the next siege month, and the breaches, garrison and food left.
   if (snapshot && zoom >= 2) {
     for (const st of snapshot.sieges) {
       if (!isKnown(st.province)) continue;
       const p = provinces[st.province]!;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) continue;
-      drawSiegeMark(ctx, sx, sy - 10 * tokenUnit(zoom), tokenUnit(zoom), nations[st.by]!.color, st.months, st.progress);
+      drawSiegeMark(ctx, { ...st, x: sx, y: sy - 10 * tokenUnit(zoom), u: tokenUnit(zoom), color: nations[st.by]!.color });
     }
     for (const r of snapshot.rebels.risings) {
       if (!r.siege || !isKnown(r.siege.province)) continue;
       const p = provinces[r.siege.province]!;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
-      if (onScreen(sx, sy)) drawSiegeMark(ctx, sx, sy - 10 * tokenUnit(zoom), tokenUnit(zoom), REBEL_COLOR, r.siege.months, r.siege.progress);
+      if (onScreen(sx, sy)) drawSiegeMark(ctx, { ...r.siege, x: sx, y: sy - 10 * tokenUnit(zoom), u: tokenUnit(zoom), color: REBEL_COLOR });
     }
   }
 
@@ -1114,7 +1116,7 @@ function drawOverlay(o: OverlayContext): void {
         animating = drawBattle(ctx, {
           id: b.id, x: sx, y: sy, u: tokenUnit(zoom), t: now,
           attColor: nations[b.attacker]!.color, defColor: nations[b.defender]!.color,
-          attMen: b.attMen, defMen: b.defMen, attStart: b.attStart, defStart: b.defStart,
+          attMen: b.attMen, defMen: b.defMen, attStart: b.attStart, defStart: b.defStart, attMorale: b.attMorale, defMorale: b.defMorale,
         }) || animating;
     }
     pruneBattles(snapshot.battles.map((b) => b.id));
@@ -1810,7 +1812,7 @@ function renderHud(): void {
   hud.innerHTML = `
     <button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}</button>
     <button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>
-    <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${s.battles.some((b) => b.player) ? ` <small>${String(s.hour).padStart(2, "0")}:00</small>` : ""}</span>
+    <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>
     <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
     ${s.stability ? stabilityPlaque(s.stability, me) : ""}
     ${myWars().length ? `<button class="plaque at-war" data-realm="${me}" data-realm-open="diplomacy" title="Your wars">${icon("swords", 1)}At war</button>` : ""}
@@ -2066,12 +2068,14 @@ function renderBattleWatch(): void {
   const b = watching && snapshot?.battles.find((x) => x.province === watching!.province);
   battleWatch.hidden = !watching;
   if (!watching) return;
-  const side = (n: number, men: number, start: number) => `<div class="side">${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b>
-    <span class="bar"><i style="width:${start ? Math.max(0, Math.min(100, (men / start) * 100)) : 0}%;background:${nations[n]!.color}"></i></span><span class="men">${fmt(men)}</span></div>`;
+  // The same men and morale left as the map shows over the battle (VIEW-077).
+  const pct = (share: number) => Math.round(Math.max(0, Math.min(1, share)) * 100);
+  const side = (n: number, men: number, start: number, morale: number) => `<div class="side">${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b>
+    <span class="bars"><span class="bar" title="Men left"><i style="width:${start ? pct(men / start) : 0}%;background:${nations[n]!.color}"></i></span><span class="bar morale" title="Morale left: ${pct(morale)}%"><i style="width:${pct(morale)}%"></i></span></span><span class="men">${fmt(men)}</span></div>`;
   battleWatch.innerHTML = `
     <header><b>${icon("swords", 1)} Battle of ${esc(provinces[watching.province]!.name)}</b>${b ? `<small>Round ${Math.min(b.round + 1, b.rounds)} of ${b.rounds}</small>` : ""}
       <button class="paper dismiss" aria-label="Stop watching">${icon("close", 1)}</button></header>
-    ${b ? side(b.attacker, b.attMen, b.attStart) + side(b.defender, b.defMen, b.defStart) : `<p>${esc(watching.result ?? "The battle is over.")}</p>`}`;
+    ${b ? side(b.attacker, b.attMen, b.attStart, b.attMorale) + side(b.defender, b.defMen, b.defStart, b.defMorale) : `<p>${esc(watching.result ?? "The battle is over.")}</p>`}`;
   battleWatch.querySelector(".dismiss")!.addEventListener("click", () => {
     watching = null;
     renderBattleWatch();
@@ -4292,7 +4296,8 @@ async function endTurn(): Promise<void> {
     const t0 = performance.now();
     // The steps run in the engine worker; the map stays live meanwhile.
     performance.mark("turn-sent");
-    const next = await engine.send({ type: "advance", steps: battle ? 1 : STEPS_PER_DAY - snapshot.hour / (24 / STEPS_PER_DAY) });
+    // The date ticks a day at a time, and a 4-hour step at a time through the player's battle (VIEW-076).
+    const next = await engine.send({ type: "advance", steps: playbackAdvance(snapshot.hour, battle) });
     performance.mark("turn-arrived");
     takeSnapshot(next, ms);
     applySnapshot();

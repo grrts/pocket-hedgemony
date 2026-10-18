@@ -1,3 +1,4 @@
+import { ROUTE_STROKE } from "@ph/engine/domain/map-presentation";
 import { PALETTE } from "../art/palette.ts";
 import { commanderSprite, type CommanderLook } from "../art/commanders.ts";
 import { sprite, type SpriteName } from "../art/sprites.ts";
@@ -191,7 +192,8 @@ export interface RouteStyle {
 }
 
 /**
- * The march route: a trail of square stones, ink round paper, flowing toward
+ * The march route: a trail of square stones, a light dash over a dark outline so it reads on
+ * snow, desert, sea and white realms alike (VIEW-075), flowing toward
  * the end; a numbered marker where each week ends; and the target tile
  * framed by brackets with a small standard planted dead centre.
  */
@@ -210,10 +212,10 @@ export function drawRoute(ctx: Ctx, r: RouteStyle): void {
     for (; d < len; d += step) {
       const x = Math.round((ax + ((bx - ax) * d) / len) / u) * u;
       const y = Math.round((ay + ((by - ay) * d) / len) / u) * u;
-      ctx.fillStyle = PALETTE.ink;
+      ctx.fillStyle = ROUTE_STROKE.outline;
       ctx.fillRect(x - 2 * u, y - u, 4 * u, 2 * u);
       ctx.fillRect(x - u, y - 2 * u, 2 * u, 4 * u);
-      ctx.fillStyle = PALETTE.paper;
+      ctx.fillStyle = ROUTE_STROKE.dash;
       ctx.fillRect(x - u, y - u, 2 * u, 2 * u);
     }
     carry = d - len;
@@ -297,6 +299,9 @@ export interface BattleStyle {
   defMen: number;
   attStart: number;
   defStart: number;
+  /** Morale left per side, 0..1 (VIEW-077). */
+  attMorale: number;
+  defMorale: number;
   t: number;
 }
 
@@ -341,10 +346,10 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
     ctx.fillStyle = PALETTE.paper;
     ctx.fillRect(Math.round(x), Math.round(y - 10 * u), u, u);
   }
-  // Each side's men left, over a bar of what it brought.
-  const top = Math.round(y - att.height - 12 * u);
-  sideBar(ctx, x - 1 * u, top, u, b.attMen, b.attStart, b.attColor, -1);
-  sideBar(ctx, x + 1 * u, top, u, b.defMen, b.defStart, b.defColor, 1);
+  // Each side's men left, over a bar of what it brought and a bar of its morale (VIEW-077).
+  const top = Math.round(y - att.height - 15 * u);
+  sideBar(ctx, x - 1 * u, top, u, b.attMen, b.attStart, b.attMorale, b.attColor, -1);
+  sideBar(ctx, x + 1 * u, top, u, b.defMen, b.defStart, b.defMorale, b.defColor, 1);
   // Losses float up and fade.
   const alive = list.filter((f) => t - f.born < 1400);
   for (const f of alive) {
@@ -357,18 +362,24 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
   return true;
 }
 
-/** One side's strength: its men on a plate in its colour, the bar under it emptying as men fall. Grows away from x by `side`. */
-function sideBar(ctx: Ctx, x: number, top: number, u: number, men: number, start: number, color: string, side: -1 | 1): void {
+/**
+ * One side's strength: its men on a plate in its colour, a bar under it emptying as men fall, and
+ * a gold bar under that emptying as its morale goes. Grows away from x by `side`.
+ */
+function sideBar(ctx: Ctx, x: number, top: number, u: number, men: number, start: number, morale: number, color: string, side: -1 | 1): void {
   const w = 22 * u;
   const left = side < 0 ? Math.round(x - w) : Math.round(x);
   ctx.fillStyle = PALETTE.ink;
-  ctx.fillRect(left, top + 9 * u, w, 4 * u);
-  ctx.fillStyle = PALETTE.slate;
-  ctx.fillRect(left + u, top + 10 * u, w - 2 * u, 2 * u);
-  const share = Math.max(0, Math.min(1, men / Math.max(1, start)));
-  const fill = Math.round((w - 2 * u) * share);
-  ctx.fillStyle = color;
-  ctx.fillRect(side < 0 ? left + w - u - fill : left + u, top + 10 * u, fill, 2 * u);
+  ctx.fillRect(left, top + 9 * u, w, 7 * u);
+  const bar = (row: number, share: number, fillColor: string) => {
+    ctx.fillStyle = PALETTE.slate;
+    ctx.fillRect(left + u, top + row * u, w - 2 * u, 2 * u);
+    const fill = Math.round((w - 2 * u) * Math.max(0, Math.min(1, share)));
+    ctx.fillStyle = fillColor;
+    ctx.fillRect(side < 0 ? left + w - u - fill : left + u, top + row * u, fill, 2 * u);
+  };
+  bar(10, men / Math.max(1, start), color);
+  bar(13, morale, PALETTE.gold);
   drawPlate(ctx, menShort(men), left + w / 2, top, u, color);
 }
 
@@ -378,12 +389,33 @@ export function pruneBattles(live: Iterable<number>): void {
   for (const id of [...lastMen.keys()]) if (!keep.has(id)) (lastMen.delete(id), floaters.delete(id));
 }
 
+/** Small pictures for the siege plate's row, 5 × 5: a breach in the wall, a helmet for the garrison, a sack of food. */
+const SIEGE_ICONS = {
+  breach: ["##.##", "##.##", "#...#", "##.##", "#####"],
+  garrison: [".###.", "#####", "#.#.#", "#...#", "#...#"],
+  food: [".#.#.", "..#..", ".###.", "#####", ".###."],
+} as const;
+
+export interface SiegeMarkStyle {
+  x: number;
+  y: number;
+  u: number;
+  color: string;
+  months: number;
+  progress: number;
+  breaches: number;
+  garrison: number;
+  /** Months of food left in the castle, or null while nobody eats from it. */
+  foodMonths: number | null;
+}
+
 /**
- * A siege on the map: the besieger's standard planted before the walls with
- * the months held on a plate, and one pip per siege month under it, the last
- * filling as the month runs.
+ * A siege on the map (VIEW-078): the besieger's standard planted before the walls with one pip per
+ * siege month held, the last filling as the month runs (and the months on a plate past five), and
+ * a row under it of the breaches made, the garrison left and the months of food in the castle.
  */
-export function drawSiegeMark(ctx: Ctx, x: number, y: number, u: number, color: string, months: number, progress: number): void {
+export function drawSiegeMark(ctx: Ctx, s: SiegeMarkStyle): void {
+  const { x, y, u, color, months, progress } = s;
   drawStandard(ctx, x - 6 * u, y, u, color);
   const pips = Math.min(months, 5) + 1;
   const w = pips * 4 * u + u;
@@ -400,4 +432,26 @@ export function drawSiegeMark(ctx: Ctx, x: number, y: number, u: number, color: 
     ctx.fillRect(px, top + u, Math.round(3 * u * share), 3 * u);
   }
   if (months > 5) drawPlate(ctx, String(months), x + w / 2 + 6 * u, top - 2 * u, u, color);
+  // The row: each figure after its picture, on a paper strip rimmed in ink.
+  const food = s.foodMonths === null ? "-" : s.foodMonths >= 10 ? String(Math.floor(s.foodMonths)) : (Math.floor(s.foodMonths * 10) / 10).toFixed(1).replace(/\.0$/, "");
+  const items: [keyof typeof SIEGE_ICONS, string][] = [["breach", String(s.breaches)], ["garrison", menShort(s.garrison)], ["food", food]];
+  const itemW = (text: string) => 5 + 1 + digitsWidth(text);
+  const rowW = (items.reduce((t, [, text]) => t + itemW(text), 0) + 3 * (items.length - 1) + 4) * u;
+  const rowL = Math.round(x - rowW / 2);
+  const rowT = top + 6 * u;
+  ctx.fillStyle = PALETTE.ink;
+  ctx.fillRect(rowL + u, rowT, rowW - 2 * u, 9 * u);
+  ctx.fillRect(rowL, rowT + u, rowW, 7 * u);
+  ctx.fillStyle = PALETTE.paper;
+  ctx.fillRect(rowL + u, rowT + u, rowW - 2 * u, 7 * u);
+  let cx = rowL + 2 * u;
+  for (const [name, text] of items) {
+    const art = SIEGE_ICONS[name];
+    ctx.fillStyle = name === "breach" ? PALETTE.blood : name === "food" ? PALETTE.clay : PALETTE.steel;
+    art.forEach((row, ry) => {
+      for (let rx = 0; rx < 5; rx++) if (row[rx] === "#") ctx.fillRect(cx + rx * u, rowT + 2 * u + ry * u, u, u);
+    });
+    drawDigits(ctx, text, cx + 6 * u, rowT + 2 * u, u, PALETTE.ink);
+    cx += (itemW(text) + 3) * u;
+  }
 }

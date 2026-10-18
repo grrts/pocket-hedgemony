@@ -12,6 +12,7 @@ import { MOVE, foodColour, type FoodColour } from "../troop-movement/index.ts";
 import { STEPS_PER_DAY, hemisphereOf, isWetSeason, seasonOf, turnSpan, type CalendarDay, type WetClimate } from "../time-and-turns/index.ts";
 
 export * from "./layout.ts";
+export * from "./onMap.ts";
 
 // ---------------------------------------------------------------------------
 // Zoom levels and rendering (VIEW-001..006, INV-VIEW-2)
