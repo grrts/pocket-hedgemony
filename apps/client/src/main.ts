@@ -2972,8 +2972,9 @@ function renderRealm(r: number): void {
   );
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
+  panel.querySelector<HTMLButtonElement>("[data-rise]")?.addEventListener("click", () => void act({ type: "riseUp" }));
   panel.querySelectorAll<HTMLButtonElement>("[data-subject-act]").forEach((b) =>
-    b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
+    b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "tighten" | "fold_in", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
   );
   panel.querySelector<HTMLButtonElement>("[data-break-alliance]")?.addEventListener("click", () => void act({ type: "breakAlliance", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-demand]").forEach((b) =>
