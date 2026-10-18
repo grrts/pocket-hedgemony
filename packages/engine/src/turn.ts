@@ -172,6 +172,8 @@ export function processTurn(world: World, orders: readonly Order[], actingNation
     if (reason) rejectedOrders.push({ order, reason });
   }
   news.push(...advance(world, STEPS_PER_TURN - world.step));
+  // The acting realm's ledger is current at the end of its turn, as the player's is each week.
+  if (actingNation >= 0 && actingNation !== world.player && actingNation < world.nationCount) runLedger(world, false, actingNation);
   return { turn: world.turn, rejectedOrders, news };
 }
 
@@ -212,7 +214,8 @@ function endDay(world: World, news: News[]): void {
     weeklyMusters(world, news);
     aiCollect(world, news);
     recount(world);
-    runLedger(world, false);
+    // The player's ledger is kept current each week; every realm's is worked out when the month turns.
+    if (world.player >= 0) runLedger(world, false, world.player);
     answerAiCalls(world, news);
     world.turn++;
   }
