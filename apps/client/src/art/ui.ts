@@ -338,6 +338,18 @@ export const ICONS = {
     ".kkkikkk.",
     "..kkkkk..",
   ],
+  /** Auto turns (SHELL-159): two play marks, one week after another. */
+  auto: [
+    "k....k....",
+    "kk...kk...",
+    "kyk..kyk..",
+    "kyyk.kyyk.",
+    "kyyykkyyyk",
+    "kyyk.kyyk.",
+    "kyk..kyk..",
+    "kk...kk...",
+    "k....k....",
+  ],
 } as const;
 
 export type IconName = keyof typeof ICONS;

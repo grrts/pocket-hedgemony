@@ -524,6 +524,47 @@ button.icon-only {
   }
 }
 
+/* Auto turns (SHELL-159): above End turn in its corner, lit while on, blinking while it stops at the week's end. */
+.auto-turns {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: calc(max(10px, env(safe-area-inset-bottom)) + 72px);
+  min-width: 64px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 6px;
+  font: 600 18px/1 var(--body);
+  white-space: nowrap;
+  filter: drop-shadow(0 3px 0 rgb(0 0 0 / 0.45));
+}
+
+.auto-turns.on {
+  border-image-source: var(--ui-btn-wax);
+  color: var(--brass-light);
+}
+
+.auto-turns.stopping {
+  animation: auto-stopping 1s steps(2) infinite;
+}
+
+@keyframes auto-stopping {
+  50% {
+    border-image-source: var(--ui-btn-wax);
+    color: var(--brass-light);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auto-turns.stopping {
+    animation: none;
+    border-image-source: var(--ui-btn-wax);
+    color: var(--brass-light);
+  }
+}
+
 .fab .badge {
   position: absolute;
   top: -8px;
@@ -4383,12 +4424,12 @@ small.why {
   }
 }
 
-/* Six side tools do not fit above End turn on a short phone: the column wraps
+/* Six side tools do not fit above End turn and Auto on a short phone: the column wraps
    into a second one to its left rather than run under the button. */
 .tools {
   flex-wrap: wrap-reverse;
   align-content: flex-start;
-  max-height: calc(100dvh - env(safe-area-inset-top) - 52px - max(10px, env(safe-area-inset-bottom)) - 76px);
+  max-height: calc(100dvh - env(safe-area-inset-top) - 52px - max(10px, env(safe-area-inset-bottom)) - 128px);
 }
 
 /* The ruler's traits on the General tab (REALM-240): each trait with what it does, wrapping on a phone. */

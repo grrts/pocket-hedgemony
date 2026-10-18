@@ -382,6 +382,15 @@ Leroy asked for an actual start screen: a Play button, the moving map zoomed in 
 
   How the player uses it: the game opens on the start screen, so one tap on Play is the whole way back into a campaign, or into New campaign with none. Everything else sits beside Play in two groups: the column holds the ways into a campaign (Play, New campaign, Load, Tutorial), and the icon row holds the things around play (Settings, Achievements, Wiki, More, Quit), so nothing is spread over other screens. The Play button is the overview: its banner, realm and date say at a glance which campaign waits, and the map panning behind it shows that realm's land. On a phone in landscape (Short wide) the logo sits top left, the column and icon row fill the left third on the parchment band inside the safe areas, and the map pans across the right two thirds; in the Tall layout (a tablet held upright) the logo and map fill the top half and the column and row are centred below; in the Large and Far layouts the column keeps a fixed width on the left. Play is at least 56 points tall, every other entry and icon button at least 44 points with 8 between, each icon button has its name under it, and nothing needs hover. A phone held upright shows "Turn your phone sideways" here too (SHELL-113).
 
+### Auto turns (Leroy, 18 October 2026)
+Leroy asked for an auto turn mode for single player that can be paused, and decided that pausing finishes the current week. Auto turns only change when End turn is pressed, never what happens in a week (X-15): the same orders give the same weeks with auto turns on or off.
+
+- SHELL-159: In a single-player campaign the game shell shall offer Auto turns, switched by an Auto button beside End turn (and Shift+Space on a keyboard). While Auto turns are on, each week starts by itself when the one before has finished playing and its saves are written, at the Turn playback speed (SET-131). Auto turns are off whenever a campaign is started or loaded, and are not offered in a campaign with more than one player. [Leroy 18 Oct]
+- SHELL-160: While Auto turns are on and a week plays, a tap on End turn or Auto (or Space) shall stop Auto turns at the end of the current week instead of pausing it: the week plays to its end, then no new week starts and the orders phase opens. End turn and Auto show "Stops at the end of this week" until then, and a second tap on Auto before the week ends keeps Auto turns on. With Auto turns off, End turn pauses and resumes the week as before (SHELL-143). [Leroy 18 Oct]
+- SHELL-161: Auto turns shall stop by themselves at the end of the week in which any of these happens, and the alert over the map that says what happened is the reason: an event waits for an answer, one of the player's battles or sieges begins, a war is declared on or by the player's realm, a call to arms, a peace offer or an envoy waits for an answer, beaten rebels wait for a verdict, the scholars have nothing to study, or one of the player's armies reaches the end of its march ("Your army has reached <province>." with Go there, said only while Auto turns are on). The pauses a week already makes keep happening at once (an event, a revolution, a battle, SHELL-148). Auto turns also stop before a new week would start while End turn cannot start one (an event or a revolution waiting, or land just taken without a decision, PROV-340), and End turn then opens what blocks it. [Leroy 18 Oct]
+
+  How the player uses it: the Auto button sits right beside End turn in the corner the player's hand is on, the only place that controls time, with a 44-point tap target, the double play mark and the word Auto. Lit, it shows Auto turns are on, and the hourglass turns on End turn as every week plays; while it stops at the end of the week it blinks and says so. The End turn corner is the overview: off, on or stopping is readable there at a glance, and an alert under the top bar says why Auto turns stopped. On a phone in landscape the two buttons stand together above the safe area in the Wide and Tall layouts and keep clear of the alerts and the battle strip; nothing needs hover, and a long press is not needed.
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -407,6 +416,7 @@ Leroy asked for an actual start screen: a Play button, the moving map zoomed in 
 | OpenGameMenu | player | Map | Game menu over dimmed map | `ScreenOpened(game_menu)` |
 | ExitToMainMenu / Quit | player | Game menu | Question if unsaved turns (ironman: save and exit) | `CampaignLeft` |
 | EndTurn | player | No unanswered event; not in progress | Turn starts (confirmation if Settings asks) | `EndTurnPressed` |
+| SwitchAutoTurns | player | Single-player campaign | Auto turns on (a week starts if none plays), or stopping at the end of the playing week, or off (SHELL-159, SHELL-160) | — |
 | AnswerEvent | player | Event modal open | Option chosen (events) | `EventAnswered` |
 | LookAtMap | player | Event modal open | Event shrinks into the End turn badge | — |
 | Retreat | player | A player battle running | That battle ends with a retreat at this step | `BattleRetreatOrdered` |
@@ -774,6 +784,9 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-143 | navigation-by-input.feature | Space ends the turn |
 | SHELL-147 | in-campaign-screens.feature | The Dispatches log keeps past weeks; A battle or siege begins |
 | SHELL-148 | in-campaign-screens.feature | The week waits at a battle |
+| SHELL-159 | auto-turns.feature | Auto turns play week after week; Auto turns are off after loading |
+| SHELL-160 | auto-turns.feature | Pausing finishes the current week; Tapping Auto again keeps it on; End turn pauses as before with Auto turns off |
+| SHELL-161 | auto-turns.feature | Auto turns stop by themselves; A blocked End turn stops Auto turns |
 | SHELL-149 | start-screen.feature | The start screen opens with its menu shown |
 | SHELL-150 | start-screen.feature | The map pans behind the start screen at region zoom |
 | SHELL-151 | start-screen.feature | Battery saver keeps the map moving |
