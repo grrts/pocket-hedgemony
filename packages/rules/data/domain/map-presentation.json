@@ -511,6 +511,7 @@
     },
     "traders": {
       "maxMovers": 3,
+      "maxPaths": 200,
       "daysPerPath": 30,
       "mover": {
         "land": "caravan",

@@ -274,6 +274,26 @@ export const SPRITES = {
     ".bbbbbbbbb.",
     "..bbbbbbb..",
   ],
+  /** Close in, a caravan on its trade path: a pack mule leading a covered cart in the realm's colour, walking left (VIEW-123). */
+  caravanTrain: [
+    "....NNNN....NNNNNN.",
+    "...NLLLNn..NLLLLLNn",
+    "ab.bNNNnbb.NNNNNNNn",
+    "abbbbbbbbbbbbbbbbbb",
+    "..bbbbbbb.b.tbt.tbt",
+    "..t.t..t.t..bmb.bmb",
+    "..t.t..t.t..tbt.tbt",
+  ],
+  /** Close in, a barge on a river trade path: bales in the realm's colour and a boatman poling at the stern (VIEW-123). */
+  barge: [
+    "..........f...t",
+    "..........Nn.t.",
+    "..NNN.NNN.Nnt..",
+    "..NLN.NLN.bbt..",
+    "bbbbbbbbbbbbbbb",
+    ".bbbbbbbbbbbbb.",
+    "..ttttttttttt..",
+  ],
   /** Move order arrow head. */
   flag: [
     "kk....",
