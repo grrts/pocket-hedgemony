@@ -4,7 +4,7 @@ Feature: Neighbours answer conquest
   I want to remember the land it grabs, band together against it and trust it less
   So that war is balanced through diplomacy
 
-  # Leroy, 18 Oct (X-20). Config keys: leagues, diplomacy.wrongs.grabbed_land_near_us
+  # Leroy, 18 Oct (X-21). Config keys: leagues, diplomacy.wrongs.grabbed_land_near_us
 
   @DIPL-221
   Scenario: The league check runs each year

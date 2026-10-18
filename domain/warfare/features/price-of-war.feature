@@ -4,7 +4,7 @@ Feature: The price of war
   I want every war to cost gold, men, people and my lords' patience, and one peace to take only part of a realm
   So that war is a choice with a price and not the best answer to everything
 
-  # Leroy, 18 Oct (X-20). Config keys: warfare.peace.long_war_years, warfare.occupation.tax_share,
+  # Leroy, 18 Oct (X-21). Config keys: warfare.peace.long_war_years, warfare.occupation.tax_share,
   # warfare.peace.max_ceded_share, warfare.ai.war_chest_months, warfare.ai.declare_strength_ratio,
   # diplomacy.ai.notoriety_restraint
 

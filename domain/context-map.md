@@ -24,6 +24,7 @@ flowchart TB
   subgraph Statecraft["Statecraft"]
     DIPL[diplomacy] --- SUBJ[subjects] --- GOV[government]
     CULT[culture] --- RELG[religion] --- REBL[rebellions]
+    TRIBE[tribes]
   end
   subgraph Military["Military and the seas"]
     RECR[recruiting] --- WAR[warfare] --- MOVE[troop-movement]
@@ -44,10 +45,10 @@ flowchart TB
 | Foundation | time-and-turns, world-map, scenario-setup | The clock and turn order, the map and its graph, the 1444 start. Every other context conforms to these. |
 | Land and economy | province, realm, research, buildings, trade | People, tiles, food, gold, inventions, buildings and traders. The core domain: almost everything else reads these numbers. |
 | Military and the seas | recruiting, warfare, troop-movement, naval, exploration | Raising, moving, feeding and fighting with armies and fleets, and sailing into the unknown. |
-| Statecraft | diplomacy, subjects, government, culture, religion, rebellions | How realms treat each other, how they are ruled, who lives in them, and what happens when people rise. |
+| Statecraft | diplomacy, subjects, government, culture, religion, rebellions, tribes | How realms treat each other, how they are ruled, who lives in them, and what happens when people rise. |
 | History and identity | events, revolutions, national-strengths | The historical layer: events with choices, revolutions that change how a country plays, and each country's heritage. |
 | Shell and player experience | game-shell, saves, settings, onboarding, achievements, audio, map-presentation | Everything around and on top of the simulation. None of these may change the simulation's results. |
-| Tooling (outside the game) | balance | The balance model: plays the game headless with AI and probe strategies, reads every layer, and checks that no strategy or mechanic dominates (X-20). It never runs in the game and nothing depends on it. |
+| Tooling (outside the game) | balance | The balance model: plays the game headless with AI and probe strategies, reads every layer, and checks that no strategy or mechanic dominates (X-21). It never runs in the game and nothing depends on it. |
 
 ## 2. Shared kernels
 

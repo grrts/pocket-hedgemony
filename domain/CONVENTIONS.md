@@ -149,6 +149,7 @@ Every requirement has at least one scenario, or a line saying why not (for examp
 | GOV | government | government |
 | CULT | culture | culture |
 | RELG | religion | religion |
+| TRIBE | tribes | tribes spec (Leroy, 18 Oct) |
 | REBL | rebellions | province-stats/rebellions-design |
 | REVO | revolutions | revolutions |
 | EVT | events | event-tree |
@@ -158,4 +159,4 @@ Every requirement has at least one scenario, or a line saying why not (for examp
 | ACH | achievements | achievements |
 | TUT | onboarding | tutorial |
 | AUD | audio | music-design, sound-effects |
-| BAL | balance | X-20 (Leroy, 18 Oct), DECISIONS rule 4, realm §12 scores |
+| BAL | balance | X-21 (Leroy, 18 Oct), DECISIONS rule 4, realm §12 scores |

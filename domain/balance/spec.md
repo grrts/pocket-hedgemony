@@ -10,7 +10,7 @@ systems work together. It answers three questions with numbers instead of feel:
 3. Does the world move like history, roughly (realms merge and split at a believable pace, no runaway snowball)?
 
 The first thing it checks is Leroy's concern of 18 October: **war has too few downsides, so it feels
-overpowered; it should be balanced through diplomacy** (X-20). The war-price rules themselves live in warfare
+overpowered; it should be balanced through diplomacy** (X-21). The war-price rules themselves live in warfare
 (WAR-221 to WAR-232) and diplomacy (DIPL-221 to DIPL-226); this context measures whether they work.
 
 In scope:
@@ -31,10 +31,10 @@ Not in scope:
 
 - Leroy, 18 October 2026 (project chat): "there should be a balancing model aimed to check how systems work
   together, and to check if we don't have overpowered mechanics. I feel war right now doesn't have enough
-  negatives, so it feels overpowered; it should be balanced through diplomacy." Decision X-20.
+  negatives, so it feels overpowered; it should be balanced through diplomacy." Decision X-21.
 - DECISIONS.md rule 4: missing numbers get a provisional value marked `provisional` so balancing can find them.
 - X-12 and realm §12: the Economy, Power and Technology scores.
-- The war-cost audit of 18 October (engine at merge #72, summarised in X-20): leagues, peace voices and the
+- The war-cost audit of 18 October (engine at merge #72, summarised in X-21): leagues, peace voices and the
   lords' wavering exist as rule libraries but are not run in the turn; occupation pays the occupier; a peace
   takes every occupied province; the AI weighs no cost before declaring.
 
@@ -93,32 +93,32 @@ Not in scope:
 ### 5.1 Runs
 
 - BAL-001 The balance model shall play the 1444 scenario on the real map from 11 November 1444 with every realm
-  played by the AI except the probe realms, and with no player realm. [X-20]
+  played by the AI except the probe realms, and with no player realm. [X-21]
 - BAL-002 The balance model shall play each run for `balance.years` years (50, provisional), or to 31 August 1939
-  when asked for a full run. [X-20]
+  when asked for a full run. [X-21]
 - BAL-003 The balance model shall play each run set over `balance.seeds` seeds (8, provisional), the same seeds
-  for every strategy and probe realm, so strategies are compared on the same worlds. [X-20]
+  for every strategy and probe realm, so strategies are compared on the same worlds. [X-21]
 - BAL-004 The balance model shall give the same metrics for the same seed, rules data, probe realm and
-  strategy, on every machine. [X-20; DECISIONS rule 3]
+  strategy, on every machine. [X-21; DECISIONS rule 3]
 - BAL-005 The balance model shall play every rule exactly as the game does: it calls the same turn the game
-  calls and changes nothing in the rules. [X-20]
+  calls and changes nothing in the rules. [X-21]
 - BAL-006 If a run throws, stalls or breaks an invariant, then the balance model shall stop that run, record the
-  turn, seed and error, mark the run set failed, and go on with the other runs. [X-20]
+  turn, seed and error, mark the run set failed, and go on with the other runs. [X-21]
 
 ### 5.2 Probe realms and strategies
 
 - BAL-007 The balance model shall pick probe realms in three size bands by settled provinces in 1444 (large,
   medium and small), two per band and from at least three continents, listed in `balance.probes`
-  (provisional: France, Ottomans, Castile, Mali, Brandenburg, Ayutthaya). [X-20]
+  (provisional: France, Ottomans, Castile, Mali, Brandenburg, Ayutthaya). [X-21]
 - BAL-008 The balance model shall play each probe realm, in its own run, by each of four strategies:
   - **Conqueror**: declares war on the weakest neighbour it may (no truce, not allied) whenever it is at peace
     and its treasury is not in debt, and asks every peace for all the land it may take.
   - **Builder**: never declares war; spends on works and learning; answers calls to arms only when bound.
   - **Diplomat**: never declares war without a held war aim; spends on envoys, marriages, alliances, demands,
     subjects and folding them in.
-  - **Court**: the plain AI, as every other realm. [X-20]
+  - **Court**: the plain AI, as every other realm. [X-21]
 - BAL-009 A probe strategy shall send only commands the player could send, and shall answer every call, offer
-  and ask the AI would be asked. [X-20; INV-BAL-3]
+  and ask the AI would be asked. [X-21; INV-BAL-3]
 
 ### 5.3 Metrics
 
@@ -126,14 +126,14 @@ Not in scope:
   subjects, people, the Economy, Power and Technology scores (realm §12), treasury, debt, a year's income and
   spending by ledger line, soldiers and those lost that year (battle, hunger, sickness, desertion), wars
   declared, joined, won and lost, Lands taken (20 years), notoriety, leagues against it and their soldiers,
-  mean standing of its neighbours toward it, its weakest stability pillar, rebels risen, and inventions known. [X-20]
+  mean standing of its neighbours toward it, its weakest stability pillar, rebels risen, and inventions known. [X-21]
 - BAL-011 Each January turn the balance model shall record for the world: realms alive, the largest realm's share
   of settled land, provinces that changed owner that year by war, by demand and by diplomacy (subjects,
   unions, folding in), wars started, wars ended and how (taken land, white peace, obliged by peace voices,
-  exhaustion), the mean length of the wars that ended, and leagues standing. [X-20]
+  exhaustion), the mean length of the wars that ended, and leagues standing. [X-21]
 - BAL-012 For every realm and path the balance model shall work out the return on gold: score gained per 100 gold
   spent on war (armies, companies, their pay and food), on works, on learning and on diplomacy (envoys, gifts,
-  tribute paid), over the run. [X-20]
+  tribute paid), over the run. [X-21]
 
 ### 5.4 Checks
 
@@ -141,59 +141,59 @@ Thresholds are provisional values in `balance.checks`; each check gives pass, wa
 threshold) or fail.
 
 - BAL-013 *No strategy dominates.* Across every probe realm and seed, no strategy shall rank first on the sum of
-  its three score ranks in more than `balance.checks.dominance_share` (60 %, provisional) of the pairs. [X-20]
+  its three score ranks in more than `balance.checks.dominance_share` (60 %, provisional) of the pairs. [X-21]
 - BAL-014 *War is not the best path.* For every size band, the Conqueror's mean score growth shall not exceed the
   better of the Builder's and the Diplomat's by more than `balance.checks.war_edge` (25 %, provisional), and the
-  Diplomat's shall reach at least `balance.checks.diplomacy_floor` (80 %, provisional) of the Conqueror's. [X-20]
+  Diplomat's shall reach at least `balance.checks.diplomacy_floor` (80 %, provisional) of the Conqueror's. [X-21]
 - BAL-015 *War is paid for.* In Conqueror runs, the return on gold of war shall not exceed that of the best other
   path by more than `balance.checks.war_return_edge` (50 %, provisional), and an occupied province shall yield
-  its occupier less than the occupier's own provinces of the same tax. [X-20; WAR-224]
+  its occupier less than the occupier's own provinces of the same tax. [X-21; WAR-224]
 - BAL-016 *Conquest is answered.* In Conqueror runs where Lands taken passes the era's league threshold, a league
   against the probe shall form within 2 years in at least `balance.checks.league_share` (75 %, provisional) of
-  them, and its neighbours' mean standing toward it shall fall below Cool. [X-20; DIPL-221, DIPL-222]
+  them, and its neighbours' mean standing toward it shall fall below Cool. [X-21; DIPL-221, DIPL-222]
 - BAL-017 *Wars end.* In every run, at least `balance.checks.voices_share` (20 %, provisional) of the wars that
   last over a year shall end by an obliged peace (peace voices over half), and no war shall reach the 60-month
-  exhaustion peace in more than 10 % of the wars. [X-20; WAR-221]
+  exhaustion peace in more than 10 % of the wars. [X-21; WAR-221]
 - BAL-018 *No snowball.* Over each run, realms of the top size decile in 1444 shall not grow their share of
   settled land faster than the median realm by more than `balance.checks.snowball_edge` (1.5 ×, provisional),
   and no AI realm shall hold more than `balance.checks.max_share_1544` (10 %, provisional) of settled land by
-  1544 in more than one seed in eight. [X-20; X-12]
+  1544 in more than one seed in eight. [X-21; X-12]
 - BAL-019 *Believable pace.* Realms alive in 1544 shall lie between `balance.checks.alive_1544` (50 % and 90 % of
-  the 1444 count, provisional). [X-20]
+  the 1444 count, provisional). [X-21]
 - BAL-020 *Every path is open to every size.* For the small band, the best strategy's mean score growth shall be at
-  least `balance.checks.small_floor` (70 %, provisional) of the large band's best, so small realms are playable. [X-20]
+  least `balance.checks.small_floor` (70 %, provisional) of the large band's best, so small realms are playable. [X-21]
 - BAL-021 *No collapse without cause.* No realm shall go bankrupt (debt over two years' income) at peace with no
-  rebels in more than `balance.checks.bankrupt_share` (5 %, provisional) of realm-runs. [X-20]
+  rebels in more than `balance.checks.bankrupt_share` (5 %, provisional) of realm-runs. [X-21]
 
 ### 5.5 Lever sweeps
 
 - BAL-022 When asked for a lever sweep, the balance model shall repeat the run set with each lever in
   `balance.sweep.levers` (every provisional key by default) multiplied by each factor in `balance.sweep.factors`
-  (0.5 and 2, provisional), one lever at a time. [X-20; DECISIONS rule 4]
+  (0.5 and 2, provisional), one lever at a time. [X-21; DECISIONS rule 4]
 - BAL-023 The balance model shall name each lever's target metric from `balance.sweep.targets` (for example
   `warfare.occupation.tax_share` → the Conqueror's return on gold of war) and flag a **dead lever** when no factor
-  moves its target by `balance.sweep.dead` (2 %, provisional). [X-20]
+  moves its target by `balance.sweep.dead` (2 %, provisional). [X-21]
 - BAL-024 The balance model shall flag a **sensitive lever** when a factor changes which strategy ranks first in
-  more than `balance.sweep.sensitive` (25 %, provisional) of the pairs. [X-20]
+  more than `balance.sweep.sensitive` (25 %, provisional) of the pairs. [X-21]
 
 ### 5.6 Report
 
 - BAL-025 The balance model shall write each run set's report to `balance-reports/<date>-<config hash>/`:
   `summary.md`, one page with every check's verdict, value and threshold, the flagged levers, and the three
   largest gaps between strategies; `metrics.csv`, one row per realm, run and year; `world.csv`, one row per run
-  and year; and `runs.json`, the run set and every run's error if any. [X-20]
+  and year; and `runs.json`, the run set and every run's error if any. [X-21]
 - BAL-026 The summary shall start with the war-price checks (BAL-014 to BAL-017) and explain each failure in one
-  sentence that names the lever most likely to fix it, from the sweep when one ran. [X-20]
-- BAL-027 The balance model shall exit with a failure code when any check fails, so it can guard a merge. [X-20]
+  sentence that names the lever most likely to fix it, from the sweep when one ran. [X-21]
+- BAL-027 The balance model shall exit with a failure code when any check fails, so it can guard a merge. [X-21]
 
 ### 5.7 Quick run and the full run
 
 - BAL-028 The balance model shall offer a quick run (`balance.quick`: 2 seeds, 20 years, the Conqueror and the
   Court on two probe realms, provisional) that finishes within `balance.quick.minutes` (10, provisional) on the CI
   runner and runs on pull requests that change rules data, the turn or a context's rules; a quick run warns but
-  never fails a merge. [X-20]
+  never fails a merge. [X-21]
 - BAL-029 The full run and lever sweeps shall run on demand (`pnpm balance`, `pnpm balance --sweep`), and their
-  summaries are kept with the milestone that tunes them. [X-20]
+  summaries are kept with the milestone that tunes them. [X-21]
 
 ### How the player uses it
 
@@ -201,7 +201,7 @@ threshold) or fail.
   changes no rule or setting. Its results reach the player only as tuned numbers in the rules data. The report's
   `summary.md` is the developers' overview: one page that shows at a glance whether war, diplomacy and growth are
   in balance. The player-facing side of the price of war (the declare sheet, the war card, *Your name abroad*)
-  is specified in WAR-229 to WAR-232 and DIPL-225 to DIPL-226. [X-19; X-20]
+  is specified in WAR-229 to WAR-232 and DIPL-225 to DIPL-226. [X-19; X-21]
 
 ## 6. Commands
 
