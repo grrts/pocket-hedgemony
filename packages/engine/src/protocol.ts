@@ -5,6 +5,7 @@ import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, type GovernmentView } from "./government.ts";
 import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
+import { rebelsView, type RebelsView } from "./rebels.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
@@ -167,6 +168,10 @@ export interface Snapshot {
   stability: Stability | null;
   /** The player's Government tab: form, both caps, the form's laws and the next forms (GOV-064); null before a realm is chosen. */
   government: GovernmentView | null;
+  /** Risings in every realm (the player's with their card and answers), the player's beaten risings waiting for a verdict, and each plotting province's monthly chance to rise (REBL-063). */
+  rebels: RebelsView;
+  /** Rising holding each province (its id), 0 = none. */
+  provinceRebels: Int32Array;
   /** Every realm's government form by name, for its card. */
   realmForms: string[];
   /** The player's Trade tab: last month's trade, its traders, where it can found more, its busiest cities and the route being drawn (TRADE-130 to TRADE-140); null before a realm is chosen. */
@@ -402,6 +407,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       giftGold: giftGold(w),
       stability: player >= 0 ? stabilityOf(w, player) : null,
       government: player >= 0 ? governmentView(w, player) : null,
+      rebels: rebelsView(w),
+      provinceRebels: w.provinceRebels.slice(),
       realmForms: realmForms(w),
       trade: player >= 0 ? tradeView(w, player) : null,
       traderKinds: TRADER_KINDS.map((k) => kindRow(w, k)),
@@ -503,6 +510,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceRing,
       snap.provinceGrievances,
       snap.provinceMood,
+      snap.provinceRebels,
+      snap.rebels.chance,
       snap.provinceLord,
       snap.provinceWorks,
       snap.provinceTradeValue,

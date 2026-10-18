@@ -389,6 +389,10 @@ export function orderShape(order: Order): string {
       return "draw a trader's route";
     case "dismissTrader":
       return "dismiss a trader";
+    case "answerRebels":
+      return "answer a rising";
+    case "treatRebels":
+      return "judge beaten rebels";
     case "navy":
       return `navy: ${order.do}`;
     case "tonguePolicy":
