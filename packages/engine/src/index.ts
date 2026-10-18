@@ -36,6 +36,6 @@ export { deathChance, rulerLabel, rulerViews, seedRulers, throneLaw, traitLean, 
 export { addFallen, FALLEN_MONTHS, fallenEffect, fallenOf, refillPaces, type FallenEffect } from "./fallen.ts";
 export { beliefRevoltFactor, lowFaith, lowTongue, monthlyBelief, officialPace, readBeliefShares } from "./belief.ts";
 export { succeed, yearlyCrowns } from "./crowns.ts";
-export { risingChanceIn } from "./rebels.ts";
+export { risingChanceIn, spark } from "./rebels.ts";
 export { PILLAR_TAB, pillarLine, RATE_LABELS, rateButtons, STABILITY_NOTE, stabilityPlaque, stabilitySection, taxLine, TOP_BAR_PLAQUE, topBar, treasuryView, type LedgerRow, type Opens, type PillarRow, type RateButton, type RealmTab, type StabilitySectionView, type TaxLineView, type TopBarInput, type TopBarItem, type TreasuryInput, type TreasuryView } from "./realmScreens.ts";
 export { reportFailedHarvests } from "./food.ts";

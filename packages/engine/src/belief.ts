@@ -50,8 +50,8 @@ export function readBeliefShares(world: World): void {
   for (let n = 0; n < N; n++) {
     const court = world.nationCourt[n]!;
     const sf = world.nationStateFaith[n]!;
-    world.nationTonguePercent[n] = court === NONE_T || !Object.keys(byTongue[n]!).length ? -1 : cult.tonguePercent(TONGUE_IDS[court]!, byTongue[n]!);
-    world.nationFaithPercent[n] = sf === NONE_F || !Object.keys(byFaith[n]!).length ? -1 : relg.faithPercent(FAITH_IDS[sf]!, byFaith[n]!);
+    world.nationTonguePercent[n] = court === NONE_T || !Object.keys(byTongue[n]!).length ? -1 : 100 * cult.tonguePercent(TONGUE_IDS[court]!, byTongue[n]!);
+    world.nationFaithPercent[n] = sf === NONE_F || !Object.keys(byFaith[n]!).length ? -1 : 100 * relg.faithPercent(FAITH_IDS[sf]!, byFaith[n]!);
   }
 }
 

@@ -6,6 +6,7 @@ import { loadDefaultRuleset } from "@ph/rules";
 import { Rng } from "@ph/engine";
 import * as G from "@ph/engine";
 import * as DIP from "@ph/engine/domain/diplomacy";
+import * as EVT from "@ph/engine/domain/events";
 import diplomacyConfig from "../../rules/data/domain/diplomacy.json" with { type: "json" };
 import relations1444 from "../../rules/data/domain/diplomacy-relations-1444.json" with { type: "json" };
 
@@ -2510,4 +2511,238 @@ Then("with {int} gold the AI of {string} calls men", (s, gold: number, realm: st
 Given("{string} has paid off the debt it started with", (s, realm: string) => {
   s.game.nationDebt[realmOf(s, realm)] = 0;
   G.runLedger(s.game, false);
+});
+
+// ------------------------------------------------------------ rulers, the fallen and belief in play (REALM-233 to REALM-241)
+// These run against the game: a fresh 1444 world, then the yearly and monthly steps as the turn runs them.
+
+const freshGame = (s: S): GW => (s.game ??= G.createWorld(GAME_RULES, 1));
+/** The feature's towns where the map names the province otherwise: Troyes is the seat of Aube. */
+const PLACE: Record<string, string> = { Troyes: "Aube" };
+const placeOf = (name: string): number => provinceOf(PLACE[name] ?? name);
+const neighboursOf = (w: GW, p: number): number[] => Array.from(w.adjList.subarray(w.adjStart[p]!, w.adjStart[p + 1]!));
+
+// the fallen of the last ten years (REALM-096, REALM-238)
+Given(re(`the country "([^"]+)" lost ${NUM} soldiers in battles and sieges in the last 10 years`), (s, realm: string, men: string) => {
+  const w = freshGame(s);
+  s.realm = realm;
+  s.peaceBefore = G.peaceShare(w, [realmOf(s, realm)], []);
+  G.addFallen(w, realmOf(s, realm), num(men));
+  s.fallenEntries = [{ date: { year: 1500 }, count: G.fallenOf(w, realmOf(s, realm)) }];
+});
+Then("it shows {string}", (s, text: string) => {
+  expect(M.countryCard({ ...franceCard(), country: s.realm, fallen: s.fallenCount }).map((l) => l.text)).toContain(text);
+});
+Then("its people and lords lean toward peace", (s) => {
+  expect(G.fallenEffect(s.game, realmOf(s, s.realm)).peace).toBeGreaterThan(0);
+  expect(G.peaceShare(s.game, [realmOf(s, s.realm)], [])).toBeGreaterThan(s.peaceBefore);
+});
+Then("its recruits refill more slowly", (s) => {
+  expect(G.refillPaces(s.game)[realmOf(s, s.realm)]).toBeLessThan(1);
+});
+
+// the General and Diplomacy tabs of the country card (REALM-176)
+Then("its General tab shows the ruler, gold, food, people and the other summary lines", (s) => {
+  const { general } = M.cardTabs(s.card);
+  for (const p of [/^King Charles VII, \d+ · \d+ years on throne/, /^Gold /, /^Food /, /^People /, /^Soldiers /, /^Lords /, /^Faith /, /^Fallen \(10 yrs\) /]) expect(general.some((t) => p.test(t))).toBe(true);
+  expect(general.some((t) => /^(Allies|Enemies|Oaths broken) /.test(t))).toBe(false);
+});
+Then("Allies, Enemies and Oaths broken are on its Diplomacy tab", (s) => {
+  expect(M.cardTabs(s.card).diplomacy.map((t) => t.replace(/ \d+$/, ""))).toEqual(["Allies", "Enemies", "Oaths broken"]);
+});
+
+// failed harvests (REALM-090)
+Given("the harvests of {string} and {string} of {string} fail", (s, a: string, b: string, realm: string) => {
+  const w = freshGame(s);
+  s.failed = [placeOf(a), placeOf(b)];
+  for (const p of s.failed) expect(w.provinceOwner[p]).toBe(realmOf(s, realm));
+});
+When("the harvest month ends", (s) => {
+  s.news = [];
+  G.reportFailedHarvests(s.game, s.failed, s.news);
+});
+Then("{string} hears one dispatch naming {string} and {string}", (s, realm: string, a: string, b: string) => {
+  const heard = (s.news as G.News[]).filter((n) => n.nations.includes(realmOf(s, realm)));
+  expect(heard).toHaveLength(1);
+  expect(heard[0]!.text).toBe(`The harvest failed in ${a} and ${b}`);
+});
+
+// low faith and tongue shares (REALM-065, REALM-066, REALM-239)
+/** Every province of the realm turned to the people of another realm's faith or tongue, so its share falls to nothing. */
+function convert(s: S, realm: string, what: "faith" | "tongue"): void {
+  const w = freshGame(s);
+  const n = realmOf(s, realm);
+  s.realm = realm;
+  s.before = { faith: G.beliefRevoltFactor(w, n, "Faith"), homeland: G.beliefRevoltFactor(w, n, "Homeland") };
+  const ids = what === "faith" ? w.provinceFaith : w.provinceTongue;
+  const shares = what === "faith" ? w.provinceFaithShare : w.provinceTongueShare;
+  const mine = what === "faith" ? w.nationStateFaith[n]! : w.nationCourt[n]!;
+  const ottomans = w.nationIndex.get("ottomans") ?? w.nationIndex.get("ottoman_empire")!;
+  const other = what === "faith" ? w.nationStateFaith[ottomans]! : w.nationCourt[ottomans]!;
+  expect(other).not.toBe(mine);
+  const slots = ids.length / w.provinceCount;
+  for (let p = 0; p < w.provinceCount; p++) {
+    if (w.provinceOwner[p] !== n) continue;
+    for (let k = 0; k < slots; k++) shares[p * slots + k] = k === 0 ? 1 : 0;
+    ids[p * slots] = other;
+  }
+  G.readBeliefShares(w);
+  expect(what === "faith" ? G.lowFaith(w, n) : G.lowTongue(w, n)).toBe(true);
+}
+Given("the country {string} has a low faith share", (s, realm: string) => convert(s, realm, "faith"));
+Given("the country {string} has a low tongue share", (s, realm: string) => convert(s, realm, "tongue"));
+When("the realm's provinces are checked for revolt", (s) => {
+  const n = realmOf(s, s.realm);
+  s.after = { faith: G.beliefRevoltFactor(s.game, n, "Faith"), homeland: G.beliefRevoltFactor(s.game, n, "Homeland") };
+});
+Then("religious revolts are more likely", (s) => {
+  expect(s.after.faith).toBeGreaterThan(s.before.faith);
+  expect(s.after.homeland).toBe(s.before.homeland);
+});
+Then("separatist revolts are more likely", (s) => {
+  expect(s.after.homeland).toBeGreaterThan(s.before.homeland);
+  expect(s.after.faith).toBe(s.before.faith);
+});
+Then("clergy lords waver", (s) => {
+  const w = s.game as GW;
+  const loyal = () => lordsOf(s, s.realm).filter((k) => w.lords[k]!.loyalty === "Loyal").length;
+  const before = loyal();
+  expect(before).toBeGreaterThan(0);
+  w.date.month = 1;
+  G.monthlyBelief(w, []);
+  expect(loyal()).toBeLessThan(before);
+});
+Then("its officials work more slowly", (s) => {
+  const p = (s.game as GW).provinceOwner.findIndex((o) => o === realmOf(s, s.realm));
+  expect(G.officialPace(s.game, p)).toBeLessThan(1);
+});
+
+// revolt spreads to neighbours (REALM-067, rebellions REBL-038)
+/** One month of play, with the realm's own answer to the rising left to the player. */
+function playMonth(w: GW): G.News[] {
+  const news: G.News[] = [];
+  const m = w.date.month;
+  while (w.date.month === m) news.push(...G.processTurn(w, [], w.player).news);
+  news.push(...G.processTurn(w, [], w.player).news);
+  return news;
+}
+/** Unfed, ungoverned and heavily taxed: the province and its neighbours of the same realm riot. */
+function restless(w: GW, p: number): void {
+  for (const q of [p, ...neighboursOf(w, p).filter((q) => w.provinceOwner[q] === w.provinceOwner[p])]) {
+    w.provinceStore[q] = 0;
+    w.provinceOfficial[q] = -1;
+    w.provinceTax[q] = G.TAX_RATES.indexOf("heavy");
+  }
+  w.castleStore.fill(0);
+}
+Given("the province {string} is in revolt", (s, name: string) => {
+  const w = freshGame(s);
+  const p = placeOf(name);
+  s.province = p;
+  w.player = w.provinceOwner[p]!;
+  restless(w, p);
+  G.spark(w, p, "the tax rate of the province is raised");
+  playMonth(w);
+  expect(w.provinceRebels[p]).toBeGreaterThan(0);
+});
+When("the month ends", (s) => {
+  const w = s.game as GW;
+  s.recruitsBefore = w.provinceRecruits[s.province];
+  s.news = [];
+  // A rising takes a neighbour at a tenth a month (rebellions provisional.spread_chance_per_month): play on a year at most.
+  for (let m = 0; m < 12 && !s.news.some((n: G.News) => n.text.startsWith("The rising spreads")); m++) {
+    restless(w, s.province);
+    s.news.push(...playMonth(w));
+  }
+});
+Then("its neighbours may be drawn into revolt", (s) => {
+  const w = s.game as GW;
+  const taken = neighboursOf(w, s.province).filter((q) => w.provinceRebels[q] === w.provinceRebels[s.province]);
+  expect(taken.length).toBeGreaterThan(0);
+  expect(s.news.some((n: G.News) => n.text.startsWith("The rising spreads to"))).toBe(true);
+});
+Then("the country loses taxes and recruits from {string}", (s, name: string) => {
+  const w = s.game as GW;
+  const p = placeOf(name);
+  expect(w.provinceRebels[p]).toBeGreaterThan(0);
+  expect(G.provinceTax(w, p, w.provinceOwner[p]!)).toBe(0);
+  expect(w.provinceRecruits[p]).toBeLessThanOrEqual(s.recruitsBefore);
+});
+
+// the ruler ages and dies (REALM-100, REALM-234)
+Given(/^(King|Queen) (.+) of "([^"]+)" is (\d+)$/, (s, title: string, name: string, realm: string, age: string) => {
+  const w = freshGame(s);
+  const r = w.rulers[realmOf(s, realm)]!;
+  expect(`${r.title} ${r.name}`).toBe(`${title} ${name}`);
+  r.age = num(age);
+  s.realm = realm;
+  s.ruler = r;
+});
+When("a year passes", (s) => {
+  const w = s.game as GW;
+  w.date.year++;
+  w.date.month = 1;
+  G.yearlyCrowns(w, []);
+});
+Then(/^(?:he|she) is (\d+)$/, (s, age: string) => {
+  // Either the same ruler a year older, or (rarely at his age) a successor.
+  const r = (s.game as GW).rulers[realmOf(s, s.realm)]!;
+  if (r === s.ruler || r.name === s.ruler.name) expect(r.age).toBe(num(age));
+  else expect(G.deathChance(num(age))).toBeGreaterThan(0);
+});
+Then("an old ruler may die", (s) => {
+  expect(G.deathChance(80)).toBeGreaterThan(G.deathChance(42));
+  const w = s.game as GW;
+  const n = realmOf(s, s.realm);
+  const old = w.rulers[n]!;
+  old.age = 90;
+  for (let y = 0; y < 40 && w.rulers[n]!.name === old.name && w.rulers[n]!.age >= 90; y++) {
+    w.date.year++;
+    G.yearlyCrowns(w, []);
+  }
+  expect(w.rulers[n]!.age < 90 || w.rulers[n]!.name !== old.name).toBe(true);
+  expect(w.rulers[n]!.years).toBe(0);
+});
+
+// traits lean the ruler's choices and bring small bonuses (REALM-104, REALM-236)
+Given("the ruler of {string} has the traits {string} and {string}", (s, realm: string, a: string, b: string) => {
+  const w = freshGame(s);
+  s.realm = realm;
+  s.traits = [a, b];
+  w.rulers[realmOf(s, realm)]!.traits = [a, b];
+});
+/** An option fits a trait when its effects carry one of the trait's lean words (realm.json ruler.traits). */
+const fits = (o: EVT.OptionDef, trait: string): boolean => {
+  const text = JSON.stringify(o.effects);
+  return (M.realmConfig.ruler.traits as Record<string, { leans: string[] }>)[trait]!.leans.some((w) => text.includes(w));
+};
+When("an event offers him options", (s) => {
+  const w = s.game as GW;
+  const events = Object.values(w.events!.state.events);
+  const fitsAny = (o: EVT.OptionDef) => s.traits.some((t: string) => fits(o, t));
+  s.event = events.find((e) => e.options.some((o) => o.chooser && s.traits.every((t: string) => e.options.some((x) => x.chooser && fits(x, t)))) && e.options.some((o) => o.chooser && !fitsAny(o)));
+  expect(s.event).toBeDefined();
+});
+Then("he leans toward the options that fit {string} and {string}", (s, a: string, b: string) => {
+  const w = s.game as GW;
+  const n = realmOf(s, s.realm);
+  const me = w.events!.treeId[n]!;
+  const weight = (o: EVT.OptionDef) => EVT.aiWeight(w.events!.state, o, { [o.chooser!.replace(/^\$/, "")]: [me] });
+  const traits = w.rulers[n]!.traits;
+  for (const o of (s.event as EVT.EventDef).options.filter((o) => o.chooser)) {
+    const withTraits = weight(o);
+    w.rulers[n]!.traits = [];
+    const without = weight(o);
+    w.rulers[n]!.traits = traits;
+    const lean = [a, b].filter((t) => fits(o, t)).length;
+    if (without > 0) expect(withTraits / without).toBeCloseTo(M.realmConfig.ruler.lean_factor ** lean, 6);
+  }
+});
+Then("he gets small bonuses from those traits", (s) => {
+  const w = s.game as GW;
+  const n = realmOf(s, s.realm);
+  const pct = (t: string) => (M.realmConfig.ruler.traits as Record<string, { bonus: Record<string, number> }>)[t]!.bonus;
+  for (const t of s.traits as string[]) for (const v of Object.values(pct(t))) expect(Math.abs(v)).toBeLessThanOrEqual(25);
+  if (s.traits.includes("Builder")) expect(G.heritageFactor(w, n, "building_cost_pct")).toBeLessThan(1);
+  if (s.traits.includes("Pious")) expect(G.beliefRevoltFactor(w, n, "Faith")).toBeLessThan(1);
 });
