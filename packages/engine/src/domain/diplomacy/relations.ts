@@ -76,6 +76,17 @@ function stanceRecord(g: RelationGraph, a: string, b: string): RelationRecord | 
   );
 }
 
+/** Every country a holds a stored stance toward, with that stance, in one pass over the relations. */
+export function storedStancesOf(g: RelationGraph, a: string): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const r of g.relations) {
+    if (layerOf(r.type) !== "stance") continue;
+    const c = r.source === a ? r.target : r.direction === "mutual" && r.target === a ? r.source : null;
+    if (c !== null && !out.has(c)) out.set(c, r.type);
+  }
+  return out;
+}
+
 /** The stance stored for a toward b, if any. */
 export function storedStance(g: RelationGraph, a: string, b: string): string | null {
   return stanceRecord(g, a, b)?.type ?? null;

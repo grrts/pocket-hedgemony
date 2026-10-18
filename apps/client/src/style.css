@@ -2524,3 +2524,31 @@ button.land-change small {
   min-height: 44px;
   margin-top: 6px;
 }
+
+/* ---- Statecraft on the Diplomacy tab (milestone 5) ---- */
+
+/* One envoy mission a row: a full-width 44-point button and what it does, or why not, under it. */
+.missions button,
+button[data-break-alliance] {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+}
+
+.missions .hint {
+  margin: 2px 0 4px;
+}
+
+/* The court's reasons open on a tap, never on hover. */
+details.why summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.letter {
+  border-top: 1px solid var(--outline);
+  padding-top: 4px;
+}

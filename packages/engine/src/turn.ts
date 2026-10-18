@@ -4,6 +4,7 @@ import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.t
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
+import { breakAlliance, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { swapOfficials } from "./officials.ts";
@@ -106,6 +107,9 @@ export type Order =
   | { type: "moveBuild"; province: number; work: number; by: number }
   /** Change the use of one of a province's tiles (clear woods, to pasture, plough, drain, irrigate), or stop the change under way, with half its gold back (feedback 86). */
   | { type: "changeTile"; province: number; change: string }
+  /** Send an envoy to another realm's court with a mission (ENVOY_ACTIONS); end an alliance. */
+  | { type: "sendEnvoy"; target: number; action: string }
+  | { type: "breakAlliance"; target: number }
   | { type: "stopChange"; province: number }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
@@ -189,6 +193,7 @@ function startDay(world: World, news: News[]): void {
     aiChanges(world);
     aiTreasury(world, news);
     monthlyDiplomacy(world, news);
+    monthlyStatecraft(world, news);
     aiDeclarations(world, news);
     aiRaise(world, news);
   }
@@ -300,6 +305,14 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "stopChange":
       return stopChange(world, actingNation, order.province);
+    case "sendEnvoy": {
+      syncCountries(world);
+      const reason = sendEnvoy(world, actingNation, order.target, order.action);
+      if (!reason && order.action === "send_gift") runLedger(world, false);
+      return reason;
+    }
+    case "breakAlliance":
+      return breakAlliance(world, actingNation, order.target);
     case "moveBuild":
       return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":

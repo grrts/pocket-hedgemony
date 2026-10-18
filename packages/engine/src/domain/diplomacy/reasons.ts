@@ -148,7 +148,7 @@ function common(d: Diplomacy, ask: Ask, days?: DaysFn): Reason[] {
       out.push({ name: "We are already at war", number: same ? 0 : st.already_at_war_new_commitment });
     }
   }
-  if (!borders(d, asker, asked) && !neighbours(d, asker).some((n) => neighbours(d, asked).includes(n))) {
+  if (!borders(d, asker, asked) && !((near) => neighbours(d, asker).some((n) => near.has(n)))(new Set(neighbours(d, asked)))) {
     out.push({ name: "Too far to matter", number: R.distance.no_shared_border_or_neighbour });
     const n = days?.(asker, asked);
     if (n !== undefined && n > R.distance.envoy_days_over.days) out.push({ name: "Very far", number: R.distance.envoy_days_over.reason });

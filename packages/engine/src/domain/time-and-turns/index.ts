@@ -359,6 +359,10 @@ export function orderShape(order: Order): string {
       return "change a tile's use in province";
     case "stopChange":
       return "stop a tile change in province";
+    case "sendEnvoy":
+      return "send an envoy";
+    case "breakAlliance":
+      return "break an alliance";
     case "moveBuild":
       return "move a work in the province's queue";
     case "setFood":

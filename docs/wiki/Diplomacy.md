@@ -302,6 +302,22 @@ Answer letters from last month are delivered; envoys arriving this month have th
 - **The war declaration sheet**: target, aim and its source, each side's countries and soldiers with who is called, your voices leaning to peace, and *Send a demand first* or *Declare*.
 - **Answer letters**, and the country card line "Envoys n of m abroad" and "Leagues against you".
 
+### Envoys in the game today
+
+The first part of statecraft is in the playable build: envoys, alliances, marriages, courtesy visits and gifts. Demands, subjects and passage come next.
+
+- **Where**: open another realm's card and its **Diplomacy** tab. At the top is what they think of you: the word (Warm, Cool and so on), the number, and every line of their ledger with its weight. Below that is your envoy on the way there, if any, and their last answer; tap **Why?** to see every reason they counted and the total.
+- **Sending an envoy**: under *Send an envoy* you see how many of your envoys are free, then four missions. Each is a button with one line on what it does, or a greyed button that says why not: you are at war, an envoy is already on the way, every seat is taken, you are already allies, a subject tie, they are hostile, your houses are married already, or you lack the gold.
+  - *Propose an alliance*: they say yes only if their reasons add up above nothing.
+  - *Arrange a marriage*: married houses think better of each other (+15).
+  - *Courtesy visit*: always welcome, +15 fading over 5 years.
+  - *Send a gift*: 30 gold, +30 fading over 10 years.
+- **How long it takes**: the envoy rides to their capital (two days per unit of distance), stays at court a month, and the answer reaches you the month after. While he is away his seat is taken. Most realms have one seat, and one more with over 10 provinces.
+- **Your own overview**: your realm card's Diplomacy tab lists your envoys abroad (where, why, and when they arrive or come home) and the last eight answers, each with its *Why?*. Answers also arrive in the dispatches with a scroll.
+- **Ending an alliance**: *End the alliance* on an ally's tab. It is an Oath broken: they remember it (−40, fading over 20 years), and other courts trust you less.
+- **The other realms** send envoys too: once a year each court picks the neighbour that thinks best of it and weighs an alliance and a marriage there, and sends the best ask its count says yes to, or a gift first when it is close. You see the alliances and marriages they make in the dispatches.
+- **For now** an envoy is not a named official, so no province loses its official while he is away; every realm counts two unmarried children; and the royal marriages of 1444 count from the start. Envoys, letters and alliances are kept in your save.
+
 ## How it connects
 
 - [Your-Realm](Your-Realm): officials, ruler, heirs, marriages, lords and their loyalty and Wants, soldiers, Oaths broken and Lands taken.

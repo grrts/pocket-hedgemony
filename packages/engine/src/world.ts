@@ -19,6 +19,7 @@ import { createResearchState, seedResearch, type ResearchState } from "./researc
 import { createWorksState, seedWorks, type WorksState } from "./works.ts";
 import { createLandState, seedLand, type LandState } from "./land.ts";
 import { createConversionState, type ConversionState } from "./conversion.ts";
+import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 
 /**
@@ -441,6 +442,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
   runLedger(world, false);
+  // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
+  syncCountries(world);
 
   return world;
 }

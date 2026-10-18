@@ -17,6 +17,7 @@ import {
   WORKS,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
+import { myStatecraft, realmStatecraft } from "./ui/statecraft.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite, spriteUrl } from "./art/sprites.ts";
@@ -1187,7 +1188,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle",
+  invention: "scroll", built: "castle", envoy: "scroll",
 };
 
 /**
@@ -2419,7 +2420,8 @@ function relationsSection(r: number): string {
         <button class="wax" data-peace="take" ${taken ? "" : "disabled"}>${icon("crown", 2)}Peace: take ${taken} province${taken === 1 ? "" : "s"}</button>
         <button class="paper" data-peace="white">White peace</button>
         ${lost ? `<button class="paper" data-peace="give">Give up ${lost} province${lost === 1 ? "" : "s"}</button>` : ""}
-      </div>`;
+      </div>
+      ${realmStatecraft(s.statecraft, r, false, true)}`;
   }
   const line =
     rel?.state === "truce" ? `A truce holds${rel.until ? ` until ${monthText(rel.until)}` : ""}: no war before then.`
@@ -2428,6 +2430,7 @@ function relationsSection(r: number): string {
     : rel?.state === "overlord" ? "Your subject: they join your wars."
     : "No ties between you. Declaring war calls their allies to arms against you, and yours to your side.";
   return `<h3 class="sub">Relations</h3><p>${line}</p>
+    ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
     ${rel ? "" : `<div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 2)}Declare war</button></div>`}`;
 }
 
@@ -2460,7 +2463,8 @@ function myDiplomacySection(): string {
     ${myWars().length ? myWars()
       .map((w) => `<p>${icon("swords", 1)} Against ${w.theirs.map((n) => realmButton(n, "diplomacy")).join(" ")} <small>since ${monthText(w.start)}</small></p>`)
       .join("") : `<p class="hint">At peace with the world.</p>`}
-    <p class="hint">Open a realm to declare war on it or offer it peace.</p>
+    <p class="hint">Open a realm to send it an envoy, declare war on it or offer it peace.</p>
+    ${myStatecraft(s.statecraft, (n) => realmButton(n, "diplomacy"))}
     ${ties.length ? `<h3 class="sub">Ties</h3>${ties
       .map((x) => `<p>${realmButton(x.nation, "diplomacy")} <small>${STATE[x.state]}${x.until ? ` until ${monthText(x.until)}` : ""}</small></p>`)
       .join("")}` : ""}`;
@@ -2750,6 +2754,8 @@ function renderRealm(r: number): void {
     b.addEventListener("click", () => void act({ type: "offerPeace", target: r, terms: b.dataset.peace as PeaceTerms })),
   );
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
+  panel.querySelector<HTMLButtonElement>("[data-break-alliance]")?.addEventListener("click", () => void act({ type: "breakAlliance", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-hire]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "hire", company: Number(b.dataset.hire) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-release]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "release", commander: Number(b.dataset.release) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-garrison]").forEach((b) =>

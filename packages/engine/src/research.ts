@@ -272,14 +272,23 @@ function aiChoose(world: World, n: number, date: rs.Day): void {
   // rs.aiChooseStudy's rule (cheapest now, ties by id) in one pass over the ids sorted once.
   let pick: string | null = null;
   let best = Infinity;
-  for (const id of (sortedIds ??= [...rs.tree().inventions.keys()].sort())) {
+  // Only an invention with a known parent can be open, so only the known inventions' children are tried.
+  const children = (childIndex ??= buildChildIndex());
+  const tried = new Set<string>();
+  for (const k of p.known) for (const c of children.get(k) ?? []) if (!p.known.has(c)) tried.add(c);
+  for (const id of [...tried].sort()) {
     if (!rs.eligibility(p, id, date).ok) continue;
     const cost = rs.studyCostFor(p, id, date, partnersKnowing(world, n, id));
     if (cost < best) [pick, best] = [id, cost];
   }
   if (pick) rs.setStudy(p, pick, date);
 }
-let sortedIds: string[] | undefined;
+let childIndex: Map<string, string[]> | undefined;
+function buildChildIndex(): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  for (const inv of rs.tree().inventions.values()) for (const parent of [inv.parent, ...inv.or_parents]) (out.get(parent) ?? out.set(parent, []).get(parent)!).push(inv.id);
+  return out;
+}
 
 function callToArms(world: World, n: number): number {
   const p = world.research[n]!;
