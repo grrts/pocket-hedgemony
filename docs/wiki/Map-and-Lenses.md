@@ -101,6 +101,8 @@ Trade ratio and Trade value replace the older Traders passing and Trade balance 
 
 Land and sea your country has not charted lie under a drawn **parchment**. The parchment shows your charted map, which only ever grows; it replaces the old rule of showing everything within 6 steps of your lands and armies. Which places you have charted is decided by [Exploration and Colonies](Exploration-and-Colonies).
 
+The **Charts lens** shows the same charted map with the parchment always on, empty coasts you could settle in green and colonies being founded in gold (see [Exploration and Colonies](Exploration-and-Colonies#how-you-play-it)).
+
 You can turn off "Parchment over unknown lands" in the lens menu to see the whole world. That switch is display only. It only changes what you see: it never lets you enter uncharted waters, and it is not the fog of war campaign rule.
 
 ### Watching the week

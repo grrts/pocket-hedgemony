@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-572 decided and 8 still open across 29 contexts.
+574 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -176,6 +176,8 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-EXPL-16**: (was OQ-EXPL-16) Start reach and the client: the charted map replaces the client's `KNOWN_REACH` toggle: 6 land steps from the country's lands plus the sea zones touching them, and armies and fleets chart only what is next to them (EXPL-011, EXPL-013); a request to the client build. The design asked for the replacement.
 - **D-EXPL-17**: (was OQ-EXPL-17) Voyages at sea: a voyage is given only to ships in port, so it always leaves with full supply; ships at sea must dock first by an ordinary order (EXPL-066). No implied docking means no new rule.
 - **D-EXPL-18**: (was OQ-EXPL-18) Voyaging canoes outside the age: every exploration ship needs the full exploration unlock, the age gate included; naval's "S3 only" for the voyaging canoe follows exploration (EXPL-005, naval NAVY-045). One unlock rule for both exploration ships.
+- **D-EXPL-19**: (Leroy, X-19, 18 October) The voyage path is drawn by taps that each add a leg, the quickest way from the last point, rather than one zone a tap: on a phone a crossing of thirty zones would otherwise need thirty exact taps on small sea zones. The preview, the low-supply choice and every rule of a voyage stay as written (EXPL-017).
+- **D-EXPL-20**: First slice in the game (EXPL-075): the map has no region per province and tiles do not yet record who works them, so a realm's region comes from the event tree's polity list or the scenario catalogue's region group (and colonial presence is not yet counted by region, so age ends read the date alone), every unowned land province counts one free tile, and a founded colony keeps its people, who become the founder's. A voyaging canoe is ordered in a port like the caravel until shores with seafolk can build without a harbour. The AI builds one caravel in its best port once it has the unlock, explores the edge of its charts and founds on the nearest empty coast; it gets colonial governors through the same orders as the player.
 
 ### Game shell (game-shell)
 
