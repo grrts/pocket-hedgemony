@@ -27,6 +27,7 @@ import {
   TONGUE_FAMILY,
   faithName,
   type ExplorationView,
+  rankedName,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
@@ -107,6 +108,16 @@ const REBEL_COLOR = "#2b1d1a";
 const rebelRgb = hexToRgb(REBEL_COLOR);
 /** A commander by index, as the engine last reported him. */
 const cmdOf = (c: number) => snapshot!.commanders[c]!;
+type Commander = Snapshot["commanders"][number];
+/**
+ * A commander's name with his rank in his realm's language (feedback 125):
+ * admiral at the head of a fleet, general otherwise. A hired captain's rank
+ * came with his name, in his company's language.
+ */
+const titledOf = (x: Commander) => (x.origin === "a hired captain" || x.owner < 0 ? x.name : rankedName(rules, x.owner, x.name, x.fleet >= 0 ? "admiral" : "general"));
+const titled = (c: number) => titledOf(cmdOf(c));
+/** The same post in plain English, shown beside the ranked name. */
+const roleOf = (x: Commander) => (x.origin === "a hired captain" ? "hired captain" : x.fleet >= 0 ? "admiral" : "commander");
 const neighborIdx = provinces.map((p) => p.neighbors.map((id) => provinceIndex.get(id)!));
 // The same, flat, for walks over the whole map each turn.
 const neighborStart = new Int32Array(provinces.length + 1);
@@ -1786,7 +1797,7 @@ function renderVoyageBar(): void {
 /** A fleet's name on a button: its admiral's, else what it is. */
 function fleetLabel(id: number): string {
   const f = snapshot?.navy.fleets.find((x) => x.id === id);
-  return !f ? "a lost fleet" : f.admiral >= 0 ? `${cmdOf(f.admiral).name}'s fleet` : f.explorers ? "the explorers" : "the fleet";
+  return !f ? "a lost fleet" : f.admiral >= 0 ? `${titled(f.admiral)}'s fleet` : f.explorers ? "the explorers" : "the fleet";
 }
 
 /** Opens a fleet's card. */
@@ -1834,7 +1845,7 @@ function renderArmyList(): void {
     ${mine.length ? mine
       .map((k) => {
         const id = s.armies.id[k]!;
-        return `<button class="paper lens${selected.has(id) ? " on" : ""}" data-pick="${id}"><b>${esc(cmdOf(s.armies.commander[k]!).name)}</b><small>${fmt(s.armies.men[k]! / 1000)}k at ${esc(provinces[s.armies.location[k]!]!.name)}${marchLine(k)}</small></button>`;
+        return `<button class="paper lens${selected.has(id) ? " on" : ""}" data-pick="${id}"><b>${esc(titled(s.armies.commander[k]!))}</b><small>${fmt(s.armies.men[k]! / 1000)}k at ${esc(provinces[s.armies.location[k]!]!.name)}${marchLine(k)}</small></button>`;
       })
       .join("") : `<p class="hint">No commander leads an army yet.</p>`}
     <p class="hint">${selected.size ? `${selected.size} chosen: tap the map to send ${selected.size > 1 ? "them all" : "it"} there.` : "Choose one or more, then tap the map."}</p>
@@ -2474,7 +2485,7 @@ function renderPanelCard(): void {
         const c = cmd >= 0 ? cmdOf(cmd) : null;
         return `<div class="army">
           ${c ? commanderPortrait(rules, c.name, s.armies.owner[k]!) : `<img class="portrait" src="${spriteUrl("soldier", nations[s.armies.owner[k]!]!.color, 3)}" alt="">`}
-          <span class="who">${c ? `<b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
+          <span class="who">${c ? `<b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
           ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}, ${fmt(s.armies.horse[k]!)} on horse${mine ? `<br><small>${supplyLine(k)}${marchLine(k)}</small>` : ""}</span>
           ${mine ? `<span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button><button class="paper small" data-command="${id}" title="The commander's screen: troops, food, pay, training">Command</button></span>` : ""}
         </div>`;
@@ -3301,7 +3312,7 @@ function seaZoneFleets(zone: number): string {
   const battle = snapshot.navy.battles.find((b) => b.zone === zone);
   return `${battle ? `<p>${icon("swords", 1)} A sea battle, round ${battle.round}: ${fmt(battle.strength[0])} against ${fmt(battle.strength[1])}.</p>` : ""}
     ${here.length ? `<h3 class="sub">Fleets here</h3><div class="choices">${here
-      .map((f) => (f.owner === me ? fleetButton(f, (c) => cmdOf(c).name) : `<p>${pennant(nations[f.owner]!)} ${esc(nations[f.owner]!.name)}: ${f.ships} ship${f.ships === 1 ? "" : "s"}, strength ${fmt(f.strength)}</p>`))
+      .map((f) => (f.owner === me ? fleetButton(f, titled) : `<p>${pennant(nations[f.owner]!)} ${esc(nations[f.owner]!.name)}: ${f.ships} ship${f.ships === 1 ? "" : "s"}, strength ${fmt(f.strength)}</p>`))
       .join("")}</div>` : ""}`;
 }
 
@@ -3335,7 +3346,7 @@ function renderPort(pi: number): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
     ${provinceTabs()}
-    ${portTab(port, { gold: s.nationTreasury[s.playerNation]!, musterGoldEach: s.navy.musterGoldEach, fleetsHere: s.navy.fleets.filter((f) => f.owner === s.playerNation && f.at === pi), admiralName: (c) => cmdOf(c).name })}`;
+    ${portTab(port, { gold: s.nationTreasury[s.playerNation]!, musterGoldEach: s.navy.musterGoldEach, fleetsHere: s.navy.fleets.filter((f) => f.owner === s.playerNation && f.at === pi), admiralName: titled })}`;
   bindClose();
   showPanel(true);
   bindProvinceTabs();
@@ -3365,7 +3376,7 @@ function renderFleet(id: number): void {
         .filter((k) => s.armies.owner[k] === me && s.armies.location[k] === f.at && s.armies.commander[k]! >= 0 && s.armies.battle[k]! < 0 && !aboard.has(s.armies.id[k]!))
         .map((k) => ({ id: s.armies.id[k]!, name: cmdOf(s.armies.commander[k]!).name, men: s.armies.men[k]!, room: s.armies.men[k]! + s.armies.horse[k]! * 3 }))
     : [];
-  const name = f.admiral >= 0 ? `${cmdOf(f.admiral).name}'s fleet` : f.explorers ? "Explorers" : "Fleet";
+  const name = f.admiral >= 0 ? `${titled(f.admiral)}'s fleet` : f.explorers ? "Explorers" : "Fleet";
   const ex = s.exploration;
   const pname = (p: number) => provinces[p]!.name;
   let explore = "";
@@ -3403,7 +3414,7 @@ function renderFleet(id: number): void {
     <header><h2 class="ribbon">${esc(name)}</h2>${closeButton()}</header>
     ${fleetCard(f, mine, {
       name: (p) => provinces[p]!.name,
-      admiralName: (c) => cmdOf(c).name,
+      admiralName: titled,
       idle: idleCommanders().map((c) => ({ id: c, name: cmdOf(c).name, skills: skills(cmdOf(c)) })),
       armiesHere,
       fleetsHere: v.fleets.filter((x) => x.owner === me && x.at === f.at && x.id !== id && !x.battle),
@@ -3478,10 +3489,10 @@ function renderArmy(id: number): void {
   };
   const trainMen = Math.min(1000, Math.floor(levyFoot));
   panel.innerHTML = `
-    <header><h2 class="ribbon">${esc(c.name)}</h2>${closeButton()}</header>
+    <header><h2 class="ribbon">${esc(titledOf(c))}</h2>${closeButton()}</header>
     <div class="army">
       ${commanderPortrait(rules, c.name, me)}
-      <span class="who"><b>${esc(c.name)}</b>${c.origin ? ` <small>(${esc(c.origin.toLowerCase())})</small>` : ""}<br><small>${skills(c)}</small><br><small>${c.victories} victor${c.victories === 1 ? "y" : "ies"}, ${c.defeats} defeat${c.defeats === 1 ? "" : "s"}</small></span>
+      <span class="who"><b>${esc(titledOf(c))}</b> <small>(${roleOf(c)}${c.origin && c.origin !== "a hired captain" ? `, ${esc(c.origin.toLowerCase())}` : ""})</small><br><small>${skills(c)}</small><br><small>${c.victories} victor${c.victories === 1 ? "y" : "ies"}, ${c.defeats} defeat${c.defeats === 1 ? "" : "s"}</small></span>
       <span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button></span>
     </div>
     <dl class="facts">
@@ -3522,8 +3533,8 @@ function renderArmy(id: number): void {
             .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Learning</button></p>` : ""}`
         : `<p class="hint">No levy foot left to train.</p>`}`}
     ${garrison.length ? `<div class="choices"><button class="wax" data-pickup="${id}">Take in the garrison here: ${fmt(garrison.reduce((t, j) => t + s.armies.men[j]!, 0))} men</button></div>` : ""}
-    ${shipsHere.length ? `<h3 class="sub">Board ships</h3><div class="choices">${shipsHere.map((f) => `<button class="paper" data-board-fleet="${f.id}">${icon("anchor", 1)}Board ${f.admiral >= 0 ? `${esc(cmdOf(f.admiral).name)}'s fleet` : "the fleet without an admiral"} · room for ${fmt(s.navy.mine.find((m) => m.id === f.id)?.room ?? 0)}</button>`).join("")}</div>` : ""}
-    ${others.length ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(cmdOf(s.armies.commander[j]!).name)}'s army</button>`).join("")}</div>` : ""}
+    ${shipsHere.length ? `<h3 class="sub">Board ships</h3><div class="choices">${shipsHere.map((f) => `<button class="paper" data-board-fleet="${f.id}">${icon("anchor", 1)}Board ${f.admiral >= 0 ? `${esc(titled(f.admiral))}'s fleet` : "the fleet without an admiral"} · room for ${fmt(s.navy.mine.find((m) => m.id === f.id)?.room ?? 0)}</button>`).join("")}</div>` : ""}
+    ${others.length ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(titled(s.armies.commander[j]!))}'s army</button>`).join("")}</div>` : ""}
     ${hired ? "" : `<h3 class="sub">Command</h3>
     <div class="choices">
       ${idle.slice(0, 3).map((x) => `<button class="paper" data-hand="${x}" title="${skills(cmdOf(x))}">Hand over to ${esc(cmdOf(x).name)}</button>`).join("")}
@@ -3714,7 +3725,7 @@ function warRoomSection(): string {
       .map(({ c, i }) => {
         const k = c.army;
         const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : "waits at court";
-        return `<div class="army">${commanderPortrait(rules, c.name, me)}<span class="who"><b>${esc(c.name)}</b><br><small>${skills(c)} · ${c.victories} won, ${c.defeats} lost</small><br><small>${where}</small></span>
+        return `<div class="army">${commanderPortrait(rules, c.name, me)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)} · ${c.victories} won, ${c.defeats} lost</small><br><small>${where}</small></span>
           <span class="army-buttons">${k >= 0 ? `<button class="paper small" data-command="${s.armies.id[k]!}">Command</button>` : c.home >= 0 ? `<button class="paper small" data-release="${i}" title="Back to his post in ${esc(provinces[c.home]!.name)}">Release</button>` : ""}</span></div>`;
       })
       .join("")}
@@ -3767,7 +3778,7 @@ function mercenarySection(): string {
       })
       .join("")}${s.mercs
       .map((m) => card(`<div class="company-head"><b>${esc(m.name)}</b><small>${icon("hourglass", 1)} at your capital in ${weeks(m.weeksLeft)}</small></div>
-          ${companyMix(m)}<small>${fmt(m.men)} men${m.captain ? ` under Captain ${esc(m.captain)}` : ""}</small>`, " coming"))
+          ${companyMix(m)}<small>${fmt(m.men)} men${m.captain ? ` under ${esc(m.captain)}` : ""}</small>`, " coming"))
       .join("")}</ol>` : ""}
     <div class="queue-head"><span>For hire</span><span>${s.freeCompanies.length} compan${s.freeCompanies.length === 1 ? "y" : "ies"}</span></div>
     ${besieged ? `<p class="hint">${icon("castle", 1)} Your capital is under siege: no company will come until it is free.</p>` : ""}
@@ -3776,7 +3787,7 @@ function mercenarySection(): string {
         const short = c.pay > s.nationTreasury[me]!;
         return card(`<div class="company-head"><b>${esc(c.name)}</b><small>${esc(c.group)}</small></div>
           ${companyMix(c)}
-          <div class="company-foot"><span><b>${fmt(c.men)} men</b> under Captain ${esc(c.captain)}<br><small>at your capital in ${weeks(c.weeks)} · ${c.pay.toFixed(1)} gold a month</small></span>
+          <div class="company-foot"><span><b>${fmt(c.men)} men</b> under ${esc(c.captain)}<br><small>at your capital in ${weeks(c.weeks)} · ${c.pay.toFixed(1)} gold a month</small></span>
           <button class="wax" data-hire="${c.id}" ${besieged || short ? "disabled" : ""} ${short ? 'title="Not enough gold"' : ""}>Hire</button></div>`);
       })
       .join("")}</ol>` : `<p class="hint">No company is near enough to come to your capital this month.</p>`}`;
@@ -3950,7 +3961,7 @@ function renderRealm(r: number): void {
     ${mine ? "" : (() => {
       const list = s ? s.commanders.filter((c) => c.owner === r) : n.commanders;
       return list.length ? `<h3 class="sub">Commanders</h3>${list
-        .map((c) => `<div class="army">${commanderPortrait(rules, c.name, r)}<span class="who"><b>${esc(c.name)}</b><br><small>might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
+        .map((c) => `<div class="army">${commanderPortrait(rules, c.name, r)}<span class="who"><b>${esc("owner" in c ? titledOf(c) : rankedName(rules, r, c.name, "general"))}</b><br><small>${"owner" in c ? `${roleOf(c)} · ` : ""}might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
         .join("")}` : "";
     })()}
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
@@ -3966,7 +3977,7 @@ function renderRealm(r: number): void {
     : realmTab === "trade" && s?.trade ? tradeTab(s.trade, s, (p) => provinces[p]!.name)
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "military" ? warRoomSection()
-    : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: (c) => cmdOf(c).name })
+    : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: titled })
     : realmTab === "colonies" ? coloniesTab(s!.exploration, { name: (p) => provinces[p]!.name, fleetName: fleetLabel, inRange: s!.exploration.sites.reduce((t, x) => t + (x === 1 ? 1 : 0), 0) })
     : realmTab === "mercenaries" ? mercenarySection()
     : realmTab === "lords" ? realmLords(r)

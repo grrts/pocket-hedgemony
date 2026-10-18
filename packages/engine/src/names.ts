@@ -1,4 +1,4 @@
-import type { CultureNames, Ruleset } from "@ph/rules";
+import type { CultureNames, Rank, Ruleset } from "@ph/rules";
 
 /**
  * Names for the people of a realm, from its culture (feedback 33): officials,
@@ -25,15 +25,19 @@ export function cultureOf(rules: Ruleset, nation: number): CultureNames | null {
   return book.cultures[book.nations[id] ?? book.fallback] ?? book.cultures[book.fallback] ?? null;
 }
 
-/** A person's name in a realm's culture, picked by `seed`; `place` names the province for cultures that go by "of". */
-export function personName(rules: Ruleset, nation: number, seed: number, place: string): string {
+/**
+ * A person's name in a realm's culture, picked by `seed`; `place` names the
+ * province for cultures that go by "of". `given` keeps a given name chosen
+ * elsewhere (a free company's captain) and puts the culture's name around it.
+ */
+export function personName(rules: Ruleset, nation: number, seed: number, place: string, given?: string): string {
   const c = cultureOf(rules, nation);
   if (!c) {
     const names = rules.defines.recruit.commanderNames;
-    return `${names[seed % names.length]} of ${place}`;
+    return `${given ?? names[seed % names.length]} of ${place}`;
   }
   const pick = <T>(xs: readonly T[], salt: number) => xs[mix(seed, salt) % xs.length]!;
-  const given = pick(c.given, 1);
+  given ??= pick(c.given, 1);
   switch (c.style) {
     case "family":
       return `${given} ${pick(c.family!, 2)}`;
@@ -51,6 +55,16 @@ export function personName(rules: Ruleset, nation: number, seed: number, place: 
     default:
       return given;
   }
+}
+
+/**
+ * A name with its rank in the realm's language (feedback 125): "Almirante
+ * Fernão Coutinho", "Hosokawa Katsumoto Taishō". A culture without that rank
+ * gives the name alone.
+ */
+export function rankedName(rules: Ruleset, nation: number, name: string, rank: Rank): string {
+  const pattern = cultureOf(rules, nation)?.ranks?.[rank];
+  return pattern ? pattern.replace("{name}", name) : name;
 }
 
 /** The name of the official who holds province p's post for its owner. */

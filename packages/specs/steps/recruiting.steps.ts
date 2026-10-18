@@ -2,7 +2,8 @@ import { expect } from "vitest";
 import * as R from "@ph/engine/domain/recruiting";
 import { provinceConfig } from "@ph/engine/domain/province";
 import { type MoveWorld, type Place } from "@ph/engine/domain/troop-movement";
-import { Rng } from "@ph/engine";
+import { createWorld, cultureOf, personName, rankedName, Rng } from "@ph/engine";
+import { loadDefaultRuleset } from "@ph/rules";
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("recruiting");
@@ -1482,4 +1483,53 @@ Then('1400 veterans return to "Troyes" and will train in half the time', (s) => 
   R.veteransHome(s.troyesPool, 1400);
   expect(s.troyesPool.veterans).toBe(1400);
   expect(R.trainingCost("pikes", 1400, { veteranShare: 1 }).months).toBe(R.trainingCost("pikes", 1400).months / 2);
+});
+
+// ---------------------------------------------------------------- names and ranks in the realm's language (feedback 125)
+
+const nameRules = loadDefaultRuleset();
+const realm = (id: string): number => {
+  const n = nameRules.nations.findIndex((x) => x.id === id);
+  expect(n, id).toBeGreaterThanOrEqual(0);
+  return n;
+};
+
+Given("the country {string}", (s, id: string) => {
+  s.realm = realm(id);
+});
+
+When("one of its people is named", (s) => {
+  s.person = personName(nameRules, s.realm, 4444, "");
+});
+
+Then(re(`the name is in the "(\\w+)" culture with the family name (first|last)`), (s, culture: string, order: string) => {
+  const c = cultureOf(nameRules, s.realm)!;
+  expect(c).toBe(nameRules.names!.cultures[culture]);
+  const family = c.family!.find((f) => (order === "first" ? s.person.startsWith(`${f} `) : s.person.endsWith(` ${f}`)));
+  expect(family, s.person).toBeDefined();
+});
+
+Given("its commander {string}", (s, name: string) => {
+  s.commander = name;
+});
+
+When(re("he leads (a fleet|an army)"), (s, post: string) => {
+  s.ranked = rankedName(nameRules, s.realm, s.commander, post === "a fleet" ? "admiral" : "general");
+});
+
+Then("he is called {string}", (s, ranked: string) => {
+  expect(s.ranked).toBe(ranked);
+});
+
+Given("the free companies for hire in 1444", (s) => {
+  s.companies = createWorld(nameRules, 1).freeCompanies;
+  expect(s.companies.length).toBeGreaterThan(0);
+});
+
+Then("each captain is ranked in the language of the realm his company gathers in", (s) => {
+  for (const c of s.companies as { captain: string; home: number }[]) {
+    const home = nameRules.nations.findIndex((n) => n.capital === nameRules.provinces[c.home]!.id);
+    const [before, after] = (cultureOf(nameRules, home)?.ranks?.captain ?? "{name}").split("{name}");
+    expect(c.captain.startsWith(before!) && c.captain.endsWith(after!), c.captain).toBe(true);
+  }
 });
