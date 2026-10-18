@@ -440,5 +440,9 @@
    "kind_with_land_path": "vassal",
    "kind_otherwise": "tributary"
   }
+ },
+ "map": {
+  "$comment": "How subjects are drawn on the map (subjects-design 10.3, SUBJ-093): at world zoom a subject is washed in its direct overlord's colour with a diagonal hatch this many map pixels wide in its own colour.",
+  "world_zoom_hatch_px": 2
  }
 }

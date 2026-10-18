@@ -899,6 +899,10 @@ function restyleProvinces(): void {
     const closed = (selected.size > 0 && !!snapshot?.provinceClosed[i]) || (lens === "diplomacy" && o >= 0 && snapshot?.diplomacyLens?.league[o] === 1);
     // While a lord's lands are lit, the rest of the land fades to grey so they stand out.
     view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched && lens === "realms" ? (rebels ? rebelRgb : nationRgb[occ]!) : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed);
+    // At world zoom a subject is washed in its direct overlord's colour with a hatch in its own,
+    // and its border with that overlord is dotted (SUBJ-093). Occupied land keeps its occupation hatch.
+    const overlord = lens === "realms" && !hatched && o >= 0 && !isWater[i] ? (snapshot?.nationOverlord[o] ?? -1) : -1;
+    view.renderer.setProvinceSubject(i, overlord, overlord >= 0 ? nationRgb[overlord]! : null);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
   const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
