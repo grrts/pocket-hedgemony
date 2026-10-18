@@ -195,7 +195,7 @@ export function lettersReceived(d: Diplomacy, c: string): Letter[] {
 /** Asks a country the player runs answers itself, not by the count (DIPL-211). */
 export const PLAYER_ANSWERS = ["propose_alliance", "arrange_marriage", "demand", "offer_overlordship", "ask_protection"];
 
-const NO_COUNT = ["send_gift", "courtesy_visit", "make_resident", "court_lord", "fund_rebels", "peace_offer"];
+const NO_COUNT = ["send_gift", "courtesy_visit", "make_resident", "court_lord", "fund_rebels", "peace_offer", "seek_vote"];
 
 /** Decides a mission on arrival; the answer is a letter a month after (DIPL-059, DIPL-081, DIPL-082). */
 export function decideMission(d: Diplomacy, e: Envoy, rng?: Rng): Count | undefined {
@@ -203,6 +203,7 @@ export function decideMission(d: Diplomacy, e: Envoy, rng?: Rng): Count | undefi
   if (NO_COUNT.includes(e.action)) {
     if (e.action === "send_gift") receiveGift(d, e.country, e.target, ask.gift ?? 0, e.type || undefined);
     if (e.action === "courtesy_visit") addRuleEntry(d, e.target, e.country, "ties", "courtesy_visit");
+    if (ask.tie) addEntry(d, e.target, e.country, { key: ask.tie.key, name: ask.tie.name, weight: ask.tie.weight, fadeYears: ask.tie.fadeYears });
     if (e.action === "make_resident") {
       e.status = "resident";
       e.residentSince = monthOf(d.date);
@@ -390,6 +391,7 @@ export function freedBy(d: Diplomacy, freed: string, liberator: string): void {
 const AIM_NAMES: Record<string, string> = {
   take_land: "Take land", seat_pretender: "Seat a pretender", tribute: "Tribute", free_people: "Free a people", break_subject: "Break a subject",
   defend_faith: "Defend the faith", punish: "Punish", raid: "Raid", no_aim: "No aim",
+  restore_imperial_land: "Restore imperial land",
 };
 export const aimName = (id: string) => AIM_NAMES[id] ?? id;
 export const aimId = (name: string) => Object.entries(AIM_NAMES).find(([, n]) => n === name)?.[0] ?? name;
@@ -491,6 +493,11 @@ function issueCall(d: Diplomacy, war: War, caller: string, called: string, again
   return call;
 }
 
+/** A call from outside the war's own ties: the Emperor called to defend a member (institutions INST-030). */
+export function issueOutsideCall(d: Diplomacy, war: War, caller: string, called: string, against: string, via: "empire"): Call | undefined {
+  return issueCall(d, war, caller, called, against, "defensive", via);
+}
+
 function issueCalls(d: Diplomacy, war: War): void {
   const a = war.declarer, b = war.target;
   const attackerKind: Call["kind"] = war.startedBy === b ? "defensive" : "offensive";
@@ -533,6 +540,7 @@ export function answerCall(d: Diplomacy, call: Call, yes: boolean): void {
     return;
   }
   if (call.via === "subject") return; // the subjects context answers a subject's refusal (SUBJ-028)
+  if (call.via === "empire") return; // the institutions context answers the Emperor's refusal (INST-030)
   if (call.via === "league") {
     for (const l of d.leagues) if (l.target === call.against) l.members = l.members.filter((m) => m !== call.called);
     emit(d, "LeagueMemberLeft", { member: call.called, target: call.against });
