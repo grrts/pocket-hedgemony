@@ -10,6 +10,7 @@ import { classFood, FOOD_CLASSES, jobSlots, precious, roughWaste, saltCoast, sea
 import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
 import { yearlyFood } from "./food.ts";
 import { provinceConfig } from "./domain/province/model.ts";
+import { tradeConfig } from "./domain/trade/index.ts";
 import { heritageFactor } from "./heritage.ts";
 
 const provinceMines = provinceConfig.mines;
@@ -429,25 +430,16 @@ export function timberInReach(world: World, p: number): boolean {
 }
 
 /** Trade a mine adds, in camp-trade steps: one, three for silver or gold (feedback 87). */
-function mineTrade(world: World, p: number): number {
-  if (worksAt(world, p, W.mine) === 0) return 0;
-  const ware = seamWare(world, p);
-  const t = provinceMines.trade;
-  return ware ? (precious(ware) ? t.precious : t.base) : 0;
-}
-
-/** Trade a province's works add (market, harbour, road, lumber camp, quarry, mine and saltworks), as a factor on its trade. */
-export function worksTrade(world: World, p: number): number {
-  const d = world.rules.defines.works;
-  const at = (w: WorkName) => worksAt(world, p, W[w]);
-  const gain = d.marketTrade * at("market") + d.harbourTrade * at("harbour") + d.roadTrade * at("road") + d.campTrade * ((at("lumber camp") > 0 ? 1 : 0) + (at("quarry") > 0 ? 1 : 0) + (at("saltworks") > 0 ? 1 : 0) + mineTrade(world, p));
-  return 1 + gain * share(world, p);
-}
-
 /** Food a class brings in a year at a normal harvest, in thousands fed: on its tiles at the rate its building (farm, ranch, fishery) gives, the rest on bare land. */
 export function worksFood(world: World, p: number, cls: "farmers" | "herders" | "seafolk" | "woodsmen"): number {
   const step = cls === "farmers" ? worksAt(world, p, W.farm) : cls === "herders" ? worksAt(world, p, W.ranch) : cls === "seafolk" ? worksAt(world, p, W.fishery) : worksAt(world, p, W["hunting lodge"]);
   return classFood(world, p, cls, step, share(world, p)) * world.provinceLandYield[p]!;
+}
+
+/** A market step's trade effect: its weight, the visits it serves, and that traders are founded there (TRADE-029, TRADE-048, D-TRADE-2). */
+function marketEffect(step: number): string {
+  const w = tradeConfig.value.building_weights[(["weekly_market", "yearly_fair", "trading_house"] as const)[Math.min(step, 3) - 1]!];
+  return `Trade value +${Math.round(w.weight * 100)} %; ${w.serves} trader visits a month at full value; traders can be founded here`;
 }
 
 /** Hours of marching in a province against none: a track and a road speed armies on. */
@@ -585,21 +577,21 @@ export function workEffect(world: World, work: number, step: number): string {
     case "hunting lodge":
       return `The woods: work for ${people(jobSlots("hunting lodge"))} hunters on every woods tile, who bring in half as much again; furs in the northern woods`;
     case "lumber camp":
-      return `Works needing timber here cost ${pct(d.materialsAtHandSaving)} less; trade +${pct(d.campTrade)}`;
+      return `Works needing timber here cost ${pct(d.materialsAtHandSaving)} less; its timber is traded`;
     case "quarry":
-      return `Works needing stone here cost ${pct(d.materialsAtHandSaving)} less; trade +${pct(d.campTrade)}`;
+      return `Works needing stone here cost ${pct(d.materialsAtHandSaving)} less; its stone is traded`;
     case "mine":
-      return `Work for ${people(jobSlots("mine"))} miners digging the seam; trade +${pct(d.campTrade * provinceMines.trade.base)}, or +${pct(d.campTrade * provinceMines.trade.precious)} for silver or gold. The seam runs out after its years of digging`;
+      return `Work for ${people(jobSlots("mine"))} miners digging the seam; its ore is traded, silver and gold dearest. The seam runs out after its years of digging`;
     case "saltworks":
-      return `Work for ${people(jobSlots("saltworks"))} salt makers; salt for the realm; trade +${pct(d.campTrade)}`;
+      return `Work for ${people(jobSlots("saltworks"))} salt makers; salt for the realm and for trade`;
     case "market":
-      return `Trade +${pct(d.marketTrade * step)}`;
+      return marketEffect(step);
     case "harbour":
-      return `Trade +${pct(d.harbourTrade * step)}`;
+      return `Ships stop and trade here; its trade value +${pct(tradeConfig.value.building_weights.harbour.weight)} to ships`;
     case "drill yard":
       return `Recruits +${pct(d.drillYardRecruits * step)}`;
     case "road":
-      return `Armies march ${pct(d.roadSpeed * step)} faster here; trade +${pct(d.roadTrade * step)}`;
+      return `Armies march ${pct(d.roadSpeed * step)} faster here, and traders with them`;
     case "granary": {
       const f = world.rules.defines.castleFood;
       return `The castle store holds ${f.granaryStoreMonths} months instead of ${f.castleStoreMonths}, and rots half as fast`;

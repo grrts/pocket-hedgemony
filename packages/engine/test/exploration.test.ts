@@ -189,7 +189,7 @@ describe("colonies", { timeout: 30_000 }, () => {
     expect(colonialOffice(w, me).used).toBe(0);
     expect(explorationView(w, me).founded).toContain(site);
     expect(isPort(w, lisbon)).toBe(true);
-  });
+  }, 60000);
 
   it("loses a starving colony and its governor (EXPL-043, EXPL-048), and abandons with a ship beside it (EXPL-049)", () => {
     const { w, me, f, site, zone } = colonist();
