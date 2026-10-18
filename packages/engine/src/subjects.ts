@@ -754,7 +754,8 @@ export function tablesTurned(world: World, war: dip.War, s: number, o: number): 
   const idx = (ids: string[]) => ids.map((id) => world.nationIndex.get(id)!).filter((n) => n !== undefined);
   const theirs = war.attackers.includes(world.nationIds[o]!) ? idx(war.attackers) : idx(war.defenders);
   const ours = war.attackers.includes(world.nationIds[o]!) ? idx(war.defenders) : idx(war.attackers);
-  const share = peaceShare(world, o, war);
+  // Their voices, or the share of their people under occupation, whichever says peace louder (SUBJ-135).
+  const share = Math.max(peaceShare(world, o, war), occupiedShare(world, o));
   const landPath = neighbourIds(world, s).has(world.nationIds[o]!);
   const kind = subj.turnTheTables({ subjectProvinces: sp, overlordProvinces: op, won: true, peaceShare: share, landPath });
   return kind ? { kind, why: null } : { kind: null, why: `${Math.round(share * 100)} in 100 of their voices want peace; over three quarters must` };
@@ -887,4 +888,16 @@ export function subjectsView(world: World, player: number, ledgerTribute: (n: nu
     overlord: above ? { ...one(above), overlord: above.o, below: belowView(world, above.s, above.o, above.bond, ties) } : null,
     tables: tablesView(world, player),
   };
+}
+
+/** The share of realm n's people whose provinces are occupied. */
+function occupiedShare(world: World, n: number): number {
+  let people = 0;
+  let held = 0;
+  for (let p = 0; p < world.provinceCount; p++) {
+    if (world.provinceOwner[p] !== n) continue;
+    people += world.provincePopulation[p]!;
+    if (world.provinceOccupier[p]! >= 0) held += world.provincePopulation[p]!;
+  }
+  return people > 0 ? held / people : 0;
 }

@@ -62,7 +62,7 @@ export const heightOfCell = (c: number): number => HEIGHT_KM[c >> 5]!;
 export interface LandGrid {
   width: number;
   height: number;
-  /** Province index + 1 of a tile; 0 for water, lakes included. */
+  /** Province index + 1 of a tile: a sea zone's on its water, 0 for other water (lakes included). */
   provinceAt(t: number): number;
   /** The tile's cell byte, as TileGrid.cell. */
   cellAt(t: number): number;
@@ -124,7 +124,9 @@ export class LandGridScan {
     this.provinceAt = (t) => {
       const p = provincePlusOneAt(t);
       const g = terrain[t * stride + 1]!;
-      return p > 0 && (g === 0 || g >= 64) ? p : 0;
+      if (p > 0 && (g === 0 || g >= 64)) return p;
+      // Water keeps its sea zone, as tileGridFromImages gives it (feedback 122).
+      return p > 0 && isSea(rules.provinces[p - 1]?.terrain) ? p : 0;
     };
   }
 

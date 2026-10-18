@@ -1039,8 +1039,13 @@ function aiOffersPeace(world: World, war: dip.War, ai: number, news: News[]): vo
   const add = (o: Omit<PeaceOffer, "id" | "from">, text: string) => {
     const waiting = world.peaceOffers.find((x) => x.from === ai);
     if (waiting && waiting.terms === o.terms && (waiting.gold ?? 0) === (o.gold ?? 0) && String(waiting.provinces ?? []) === String(o.provinces ?? [])) return;
-    world.peaceOffers = world.peaceOffers.filter((x) => x !== waiting);
-    world.peaceOffers.push({ id: waiting?.id ?? world.turn * 100 + world.peaceOffers.length, from: ai, ...o });
+    if (waiting) {
+      delete waiting.provinces;
+      delete waiting.gold;
+      delete waiting.counter;
+      delete waiting.surrender;
+      Object.assign(waiting, o);
+    } else world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, ...o });
     news.push({ kind: "peace", text, nations: [ai, player] });
   };
   const theirs = settlementTable(world, player, ai)!;
