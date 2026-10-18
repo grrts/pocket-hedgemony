@@ -17,6 +17,7 @@ import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameTraderKind } from "./trade.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
+import { hiredFleetOrder, monthlyHiredFleets, type HireOrder } from "./hiredFleets.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { swapOfficials } from "./officials.ts";
@@ -159,6 +160,8 @@ export type Order =
   | { type: "answerRevolution"; stance: "lead" | "bend" | "fight" }
   /** Ports, sailors and fleets: muster, buy a ship, sail, board, land, admiral, merge, split, disband (navy.ts). */
   | NavyOrder
+  /** Hire a free or lent fleet, or dismiss one (hiredFleets.ts). */
+  | HireOrder
   /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
   | ExploreOrder;
 
@@ -243,6 +246,7 @@ function startDay(world: World, news: News[]): void {
     monthlyTrade(world, news);
     runLedger(world, true);
     monthlyNavy(world, news);
+    monthlyHiredFleets(world, news);
     monthlyColonies(world, news);
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
@@ -434,7 +438,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "move":
       return orderMarch(world, order, actingNation);
     case "navy":
-      return navyOrder(world, order, actingNation, news);
+      return order.do === "hire" || order.do === "dismiss" ? hiredFleetOrder(world, order, actingNation, news) : navyOrder(world, order, actingNation, news);
     case "explore":
       return exploreOrder(world, order, actingNation, news);
   }
