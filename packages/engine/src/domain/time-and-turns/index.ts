@@ -367,6 +367,8 @@ export function orderShape(order: Order): string {
       return "make a demand";
     case "answerEvent":
       return "answer an event";
+    case "subjectAction":
+      return "act on a subject";
     case "moveBuild":
       return "move a work in the province's queue";
     case "setFood":

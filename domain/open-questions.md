@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-553 decided and 8 still open across 29 contexts.
+555 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -251,6 +251,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-HER-14**: (was OQ-HER-14) Mark share: exactly a third; a mark is a legacy and counts toward the cap of 5. A mark is
 - **D-HER-15**: (was OQ-HER-15) Archetype count: 27 archetypes are kept; one that no generated country scores best on is
 - **D-HER-16**: (was OQ-HER-16) Unbound ids: a place name binds to the land province nearest the scenario map's place of
+- **D-HER-18**: (18 Oct, Leroy: give each realm its strengths and assessments on the realm card) The map's realms take
 - **D-HER-17**: (was OQ-HER-17) Formed countries beyond the caps: the formed country keeps the forming country's own
 
 ### Naval (naval)
@@ -554,6 +555,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SUBJ-23**: (was OQ-SUBJ-23) Colonies: "mostly settlers" means more than 50 % settler people; settlers in a Settled colony become a peace voice. Outposts stay Loyal and have no count; the seasonal count starts at Settled. These are the simplest readings.
 - **D-SUBJ-24**: (was OQ-SUBJ-24) In revolt: the seasonal count stops at Disloyal; a subject goes In revolt only by the conditions of 8.2 (a backer, the overlord losing, or an event). It keeps risings deliberate.
 - **D-SUBJ-25**: (was OQ-SUBJ-25) Reason names: "Official lent" (+1), "Hostage harmed" (−2) and "Force used" (−1). Kin and Hostage at court are separate ties and stack (+2). Each reason is named once.
+- **D-SUBJ-26**: First game slice of subjects (milestone 5, provisional): every realm has a subject reach of 5 (moderate) until the catalogue's administrative capacity is read; faith and *Far away* give no reasons yet (no faith data, no distance rule); grain tribute, residents, hostages, tightening, folding in, risings and the subjects lens wait for their slices. A subject's loyalty is counted only at season ends, so the turn stays cheap.
 
 ### Time and turns (time-and-turns)
 

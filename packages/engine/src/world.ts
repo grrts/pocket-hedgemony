@@ -22,6 +22,7 @@ import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGameEvents, type GameEvents } from "./events.ts";
+import { adminCapacityRank } from "./realmStrengths.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -72,6 +73,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   nationLevies: Float64Array;
   nationMaxLevies: Float64Array;
   nationMonthlyIncome: Float64Array;
+  /** Each realm's administrative capacity from the catalogue, 1 (very low) to 5 (very high), 0 unknown: how far its rule reaches (realmStrengths.ts). */
+  nationAdminCapacity: Int8Array;
 
   commanderIds: string[];
   commanderOwner: Int16Array;
@@ -377,6 +380,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     nationLevies: new Float64Array(N),
     nationMaxLevies: new Float64Array(N),
     nationMonthlyIncome: new Float64Array(N),
+    nationAdminCapacity: Int8Array.from(nationIds, adminCapacityRank),
     commanderIds,
     commanderOwner: Int16Array.from(commanderOwnerList),
     commanderLogistics: Int8Array.from(commanderLogisticsList),

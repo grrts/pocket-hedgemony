@@ -314,6 +314,7 @@ button.icon-only {
 }
 
 .lens-menu .sub,
+.lens-menu .lens-key,
 .lens-menu .fog-toggle {
   grid-column: 1 / -1;
 }
@@ -348,9 +349,48 @@ button.icon-only {
   align-items: flex-start;
   justify-content: center;
   gap: 0;
-  min-height: 36px;
+  min-height: 44px;
   padding: 2px 10px;
   text-align: left;
+}
+
+/* The diplomacy lens's key: what each colour means (DIPL-183). */
+.lens-key {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 8px;
+  padding: 4px 2px;
+  font: 600 15px/1.2 var(--body);
+  color: var(--ink);
+}
+
+.lens-key span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lens-key p {
+  grid-column: 1 / -1;
+  margin: 4px 0 0;
+  font-weight: 400;
+}
+
+.lens-key .swatch {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--ink);
+}
+
+.lens-key .swatch.hatched {
+  background-image: repeating-linear-gradient(45deg, rgba(26, 28, 44, 0.45) 0 3px, transparent 3px 6px) !important;
+}
+
+.lens-key .swatch.league {
+  background: #b9b3a4;
+  border-color: #b13e53;
+  box-shadow: inset 0 0 0 2px #b13e53;
 }
 
 .lens-menu .lens small {
@@ -2678,4 +2718,145 @@ details.why summary {
 .letter {
   border-top: 1px solid var(--outline);
   padding-top: 4px;
+}
+
+/* ---- Heritage: a realm's national strengths and its 1444 assessments (HER-080..083) ---- */
+
+.heritage-line small {
+  margin-left: 6px;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.heritage-part {
+  margin: 6px 0;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+.heritage-part summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  min-height: 44px;
+  padding: 2px 8px;
+  cursor: pointer;
+  list-style: none;
+}
+.heritage-part summary::-webkit-details-marker {
+  display: none;
+}
+.heritage-part summary::after {
+  content: "+";
+  margin-left: auto;
+}
+.heritage-part[open] summary::after {
+  content: "−";
+}
+.heritage-part .kind {
+  min-width: 5.5em;
+  color: var(--ink-soft);
+  font-size: 0.9em;
+}
+.heritage-part summary small {
+  color: var(--ink-soft);
+}
+.heritage-part.burden {
+  border-style: dashed;
+}
+.heritage-part p {
+  margin: 0;
+  padding: 4px 8px 8px;
+}
+.heritage-part .why-note {
+  padding-top: 0;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+.assessment-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  align-items: start;
+  gap: 0 24px;
+}
+.assessment-groups h4 {
+  margin: 8px 0 2px;
+}
+.assessments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.assessments li {
+  display: grid;
+  grid-template-columns: 1fr auto 6.5em;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+}
+.assessments small {
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.assessments .what {
+  white-space: nowrap;
+}
+.assessments .steps {
+  display: inline-flex;
+  gap: 2px;
+}
+.assessments .steps i {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--outline);
+  background: transparent;
+}
+.assessments .steps i.on {
+  background: var(--outline);
+}
+.assessments li.risk .steps i.on {
+  background: #b13e53;
+}
+
+/* ---- Subjects on the Diplomacy tab (SUBJ-091, SUBJ-092) ---- */
+
+/* Loyalty steps tinted green, ochre, orange and red, as the subjects config names them. */
+.loyalty-loyal { color: #3d6b2a; }
+.loyalty-wavering { color: #8a6a12; }
+.loyalty-disloyal { color: #a4521a; }
+.loyalty-in-revolt { color: var(--cloth); }
+
+.subject-row {
+  min-height: 44px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  border-top: 1px solid var(--outline);
+}
+
+/* Named reasons as badges pointing up or down; they wrap on a narrow phone. */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0;
+}
+.badge {
+  border: 1px solid var(--outline);
+  padding: 1px 6px;
+  font-size: 0.85em;
+  background: var(--paper-light);
+}
+.badge.up { color: #3d6b2a; }
+.badge.down { color: #a4521a; }
+
+/* Five tribute levels: 44-point buttons that wrap to two rows in Tall layout. */
+.choices.tribute {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.choices.tribute button {
+  flex: 1 1 4.5em;
+  min-height: 44px;
 }

@@ -177,7 +177,7 @@ Newest decision first.
 - VIEW-055 (Ubiquitous): The longest main-thread task while playing shall be at most 50 ms. [performance.md]
 - VIEW-056 (State-driven): While something animates (marching armies), at least 90 % of frames shall be redrawn. [performance.md]
 - VIEW-057 (Ubiquitous): The draw loop shall never read layout; text and sprites shall come from cached bitmaps; nothing per frame shall plan routes or walk the province graph. [performance.md]
-- VIEW-058 (Ubiquitous): An engine turn shall take at most 25 ms with 5,000 provinces and 500 nations and at most 100 ms with 20,000 provinces and 2,000 nations. [performance.md]
+- VIEW-058 (Ubiquitous): An engine turn shall take at most 25 ms with 5,000 provinces and 500 nations and at most 100 ms with 20,000 provinces and 2,000 nations, measured as the median of several runs of consecutive turns so one slow run on a shared CI runner does not count. [performance.md]
 - VIEW-059 (Ubiquitous): The worker's answer after End turn on the real map shall arrive within 250 ms, and applying it on the main thread shall take at most 16 ms (one frame). [performance.md]
 - VIEW-060 (Ubiquitous): The turn shall be simulated in the background (a Web Worker, a Node worker on desktop); only when the worker has no support shall it run on the main thread. [performance.md; README]
 - VIEW-061 (Ubiquitous): The worker shall send typed arrays and transfer them, never JSON of the world; applying a turn updates textures and redraws once; panels re-render only what is open. [performance.md]

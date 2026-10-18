@@ -159,9 +159,9 @@ vec3 depthColor(float v, ivec2 a) {
 }
 bool isBig(int t) { return ${BIG_ROWS.map((r) => `t == ${r}`).join(" || ")}; }
 float flags(int id) { return float(int(info(id).a * 255.0 + 0.5) >> 4); }
-// Occupied land (flag 8): diagonal hatching over the occupier's wash.
+// Occupied land (flag 8): diagonal hatching over the occupier's wash; under the diplomacy lens, realms at war with the player.
 vec3 hatch(vec3 c, int id, ivec2 q, int width) {
-  if (uMode != 0 || (int(flags(id)) & 8) == 0) return c;
+  if (uMode == 1 || (int(flags(id)) & 8) == 0) return c;
   return ((q.x + q.y) / width) % 2 == 0 ? mix(c, uInk, 0.35) : c;
 }
 vec3 highlight(vec3 c, int id, float strength) {
