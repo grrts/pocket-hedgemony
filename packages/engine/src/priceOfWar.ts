@@ -1,5 +1,6 @@
 import type { World } from "./world.ts";
-import { peaceShare, relationState, strength } from "./war.ts";
+import { relationState, strength } from "./war.ts";
+import { maxCeded, peaceShare } from "./peace.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import * as rc from "./domain/recruiting/index.ts";
@@ -62,8 +63,8 @@ function provinceCounts(world: World): Int32Array {
  * belongs to the peace rules; this reads a third until they supply it.
  */
 export function maxCededProvinces(world: World, loser: number, counts?: Int32Array): number {
-  const n = counts ? counts[loser]! : provinceCounts(world)[loser]!;
-  return Math.ceil(n / 3);
+  if (!counts) return maxCeded(world, loser).max;
+  return wf.maxCeded(counts[loser]!).max;
 }
 
 /** A levy's pay a month per 1,000 men once its pay has begun. */
@@ -107,13 +108,11 @@ export function aiWarPay(world: World, n: number): number {
 
 /**
  * Whether the realm's own peace voices would say peace on the day it
- * declares (WAR-228). A simple stand-in on the numbers the turn already
- * keeps (occupied land, a capital held, being outnumbered, the fallen of the
- * last ten years: peaceShare, WAR-181), over half. The real count of peace
- * voices (WAR-221) replaces this body when it runs in the game.
+ * declares (WAR-228): its share of peace voices (WAR-221) in a war it is
+ * already fighting, or at peace the weight of its fallen (REALM-096), over half.
  */
-export function wouldSayPeaceAtDeclaration(world: World, n: number, enemies: readonly number[] = []): boolean {
-  return peaceShare(world, [n], [...enemies]) > wf.W.peace.half;
+export function wouldSayPeaceAtDeclaration(world: World, n: number): boolean {
+  return peaceShare(world, n) > wf.W.peace.half;
 }
 
 /** A Warlike ruler or a hegemon seeker declares whatever its notoriety (WAR-228). */
@@ -255,7 +254,7 @@ export function whyAiWontDeclare(world: World, n: number, t: number, price: Pric
   if (!(price.ourSide > price.theirSide * ratio)) return "their side is too strong";
   const chest = wf.W.ai.war_chest_months * aiWarPay(world, n);
   if (world.nationTreasury[n]! < chest) return "no war chest";
-  if (wouldSayPeaceAtDeclaration(world, n, [t, ...price.against.map((c) => c.nation)])) return "its people want peace";
+  if (wouldSayPeaceAtDeclaration(world, n)) return "its people want peace";
   if (!heedsNoNotoriety(world, n) && dip.notoriety(world.diplomacy, world.nationIds[n]!) >= dip.config.ai.notoriety_restraint) return "too notorious";
   return null;
 }

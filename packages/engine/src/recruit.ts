@@ -13,6 +13,7 @@ import { armUnlocked, knownSet } from "./research.ts";
 import { heritageFactor } from "./heritage.ts";
 import { noteRegiment } from "./achievements.ts";
 import { W as WORK, worksAt } from "./works.ts";
+import { refusingPeace } from "./peace.ts";
 
 /**
  * Milestone 2, armies that cost something: wires the recruiting context (who
@@ -926,13 +927,16 @@ export function monthlyRecruits(world: World, news: News[]): void {
   const a = world.armies;
   const deserted = new Float64Array(world.nationCount);
   const broke = world.nationTreasury.map((t) => (t < 0 ? 1 : 0));
+  const refusing = Array.from({ length: world.nationCount }, (_, n) => refusingPeace(world, n));
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
     a.monthsOut[i] = Math.min(65535, a.monthsOut[i]! + 1);
     const kind = a.kind[i]!;
     // Levies don't go home on their own: once raised, the player decides (Leroy's design, over RECR-053).
-    const desert = (kind === KIND.levy ? wf.overCap(world.nationCapUsed[n]!, world.nationTroopCap[n]!).levyDesertion : 0) + (broke[n] ? world.rules.defines.recruit.unpaidDesertion : 0);
+    let desert = (kind === KIND.levy ? wf.overCap(world.nationCapUsed[n]!, world.nationTroopCap[n]!).levyDesertion : 0) + (broke[n] ? world.rules.defines.recruit.unpaidDesertion : 0);
+    // A ruler refusing a peace his voices oblige him to take: levies desert twice as fast, from at least the old going-home pace (WAR-181).
+    if (kind === KIND.levy && refusing[n]) desert = Math.max(desert, wf.W.levy.go_home_rate) * wf.W.peace.refuse_desertion;
     const share = Math.min(1, desert);
     if (share > 0) {
       const lost = Math.round(a.men[i]! * share);

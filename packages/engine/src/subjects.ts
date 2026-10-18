@@ -1,5 +1,6 @@
 import type { World } from "./world.ts";
-import { checkDestroyed, declareWar, peaceShare, strength, type News } from "./war.ts";
+import { checkDestroyed, declareWar, strength, type News } from "./war.ts";
+import { peaceShare } from "./peace.ts";
 import { personName } from "./names.ts";
 import { capsOf } from "./government.ts";
 import { FAITH_IDS, FAITH_POLICIES, NO_FAITH, NO_TONGUE } from "./peoples.ts";
@@ -548,10 +549,8 @@ export function aiRisings(world: World, news: News[]): void {
     const war = dip.warOf(d, t.r.target);
     let losing = false;
     if (war) {
-      const idx = (ids: string[]) => ids.map((id) => world.nationIndex.get(id)!).filter((n) => n !== undefined);
-      const ours = war.attackers.includes(t.r.target) ? idx(war.attackers) : idx(war.defenders);
-      const theirs = war.attackers.includes(t.r.target) ? idx(war.defenders) : idx(war.attackers);
-      losing = peaceShare(world, ours, theirs) > config.rising.overlord_losing_peace_voice_share;
+      // The overlord's own peace voices in that war (WAR-180, WAR-221).
+      losing = peaceShare(world, world.nationIndex.get(t.r.target)!, war) > config.rising.overlord_losing_peace_voice_share;
     }
     const neighbours = near(t.s);
     const backer = [...neighbours].find((id) => {

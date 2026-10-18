@@ -77,11 +77,13 @@ import {
 export type Order =
   /** March to a province, to the given tile in it if any (else its centre). */
   | { type: "move"; army: number; to: number; tile?: number }
-  | { type: "declareWar"; target: number }
+  /** Declare war with an aim the realm holds (else the best it holds, else no aim, WAR-178); `breakTruce` breaks a truce first (WAR-179). */
+  | { type: "declareWar"; target: number; aim?: string; province?: number; breakTruce?: boolean }
   | { type: "conclaveGold"; gold: number }
   | { type: "claimCaliphate" }
   | { type: "raiseOwnPatriarch" }
-  | { type: "offerPeace"; target: number; terms: PeaceTerms }
+  /** Offer peace; with "take", `provinces` are the asker's picks of what to take, at most a third of the loser's land (WAR-227). */
+  | { type: "offerPeace"; target: number; terms: PeaceTerms; provinces?: number[] }
   | { type: "answerCall"; call: string; yes: boolean }
   /** Take or turn down a peace the AI offers (its id in the snapshot's peaceOffers). */
   | { type: "answerPeace"; offer: number; yes: boolean }
@@ -311,12 +313,16 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
   if (locked) return locked;
   switch (order.type) {
     case "declareWar": {
-      const why = declareWar(world, actingNation, order.target, news);
+      const why = declareWar(world, actingNation, order.target, news, {
+        ...(order.aim ? { aim: order.aim } : {}),
+        ...(order.province !== undefined && world.provinceIds[order.province] ? { province: world.provinceIds[order.province] } : {}),
+        ...(order.breakTruce ? { breakTruce: true } : {}),
+      });
       if (!why) faithHeadsWars(world, news);
       return why;
     }
     case "offerPeace":
-      return offerPeace(world, actingNation, order.target, order.terms, news);
+      return offerPeace(world, actingNation, order.target, order.terms, news, false, order.provinces ?? []);
     case "answerPeace":
       return answerPeace(world, order.offer, order.yes, news);
     case "answerCall": {

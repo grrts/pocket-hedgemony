@@ -272,7 +272,11 @@
   "open_roads_years": 10,
   "royal_grievances": ["Conscription", "Soldiers quartered", "Burned homes", "Hungry", "Heavy taxes"],
   "royal_grievances_needed": 2,
-  "refuse_desertion": 2
+  "refuse_desertion": 2,
+  "$comment": "X-21 (Leroy, 18 Oct): long_war_years (WAR-223) and max_ceded_share (WAR-227) are provisional, for the balance model to tune.",
+  "long_war_years": 2,
+  "max_ceded_share": 0.3333333333333333,
+  "_provisional": ["long_war_years", "max_ceded_share"]
  },
  "raid_war_months": 12,
  "notifications": {

@@ -2537,7 +2537,7 @@ const neighboursOf = (w: GW, p: number): number[] => Array.from(w.adjList.subarr
 Given(re(`the country "([^"]+)" lost ${NUM} soldiers in battles and sieges in the last 10 years`), (s, realm: string, men: string) => {
   const w = freshGame(s);
   s.realm = realm;
-  s.peaceBefore = G.peaceShare(w, [realmOf(s, realm)], []);
+  s.peaceBefore = G.peaceShare(w, realmOf(s, realm));
   G.addFallen(w, realmOf(s, realm), num(men));
   s.fallenEntries = [{ date: { year: 1500 }, count: G.fallenOf(w, realmOf(s, realm)) }];
 });
@@ -2546,7 +2546,7 @@ Then("it shows {string}", (s, text: string) => {
 });
 Then("its people and lords lean toward peace", (s) => {
   expect(G.fallenEffect(s.game, realmOf(s, s.realm)).peace).toBeGreaterThan(0);
-  expect(G.peaceShare(s.game, [realmOf(s, s.realm)], [])).toBeGreaterThan(s.peaceBefore);
+  expect(G.peaceShare(s.game, realmOf(s, s.realm))).toBeGreaterThan(s.peaceBefore);
 });
 Then("its recruits refill more slowly", (s) => {
   expect(G.refillPaces(s.game)[realmOf(s, s.realm)]).toBeLessThan(1);

@@ -204,7 +204,7 @@ describe("the price of war (WAR-228, WAR-229)", () => {
 
   it("may declare when twice as strong as the target's side", () => {
     const { w, n, t } = scene();
-    expect(wouldSayPeaceAtDeclaration(w, n, [t])).toBe(false);
+    expect(wouldSayPeaceAtDeclaration(w, n)).toBe(false);
     expect(whyAiWontDeclare(w, n, t)).toBeNull();
   });
 
@@ -249,10 +249,12 @@ describe("the price of war (WAR-228, WAR-229)", () => {
 
   it("does not declare when its own people already want peace", () => {
     const { w, n, t } = scene();
-    // Most of its land held by rebels or a foe: its voices say peace on the day.
-    for (const p of provincesOf(w, n)) w.provinceOccupier[p] = t;
-    expect(wouldSayPeaceAtDeclaration(w, n, [t])).toBe(true);
-    expect(whyAiWontDeclare(w, n, t)).toBe("its people want peace");
+    // Already at war elsewhere, with most of its land held by the foe: its voices say peace.
+    const u = w.nationIds.map((_, k) => k).find((k) => k !== n && k !== t && !w.nationGone[k] && relationState(w, k, n).state === null)!;
+    expect(declareWar(w, u, n, [])).toBeNull();
+    for (const p of provincesOf(w, n)) w.provinceOccupier[p] = u;
+    expect(wouldSayPeaceAtDeclaration(w, n)).toBe(true);
+    expect(whyAiWontDeclare(w, n, t)).not.toBeNull();
   });
 
   it("prices a war for the player's declare sheet: who is called, who is threatened, a truce broken, pay and the most one peace takes", () => {
