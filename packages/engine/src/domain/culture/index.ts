@@ -1,4 +1,5 @@
 import config from "../../../../rules/data/domain/culture.json" with { type: "json" };
+import start from "../../../../rules/data/domain/culture-start-1444.json" with { type: "json" };
 import { localsBonus } from "../province/index.ts";
 import { REGIONS, type Ground } from "../world-map/index.ts";
 
@@ -28,7 +29,10 @@ export interface Tongue {
   local_names?: string[];
 }
 
-const TONGUES: Tongue[] = [...(config.tongues as Tongue[]), ...(config.tongues_added as Tongue[])];
+/** The config's tongues, then those the 1444 start adds (CULT-086); a start row with the same id fills in a family the config left open. */
+const START_TONGUES = Object.entries(start.tongues as Record<string, Omit<Tongue, "id">>).map(([id, t]) => ({ id, ...t }) as Tongue);
+const TONGUES: Tongue[] = [...(config.tongues as Tongue[]), ...(config.tongues_added as Tongue[])].map((t) => START_TONGUES.find((s) => s.id === t.id) ?? t);
+for (const t of START_TONGUES) if (!TONGUES.some((x) => x.id === t.id)) TONGUES.push(t);
 const norm = (s: string) => s.trim().toLowerCase().replace(/[\s-]+/g, "_");
 
 // ---------------------------------------------------------------- 5.1 tongues and families
@@ -45,9 +49,15 @@ export function tongues(): Tongue[] {
 
 /** A tongue by id or name (case and spaces ignored). */
 export function tongue(idOrName: string): Tongue | undefined {
+  const hit = BY_KEY.get(idOrName);
+  if (hit) return hit;
   const k = norm(idOrName);
-  return TONGUES.find((t) => t.id === k || norm(t.name) === k);
+  const t = TONGUES.find((t) => t.id === k || norm(t.name) === k);
+  if (t) BY_KEY.set(idOrName, t);
+  return t;
 }
+/** Tongues already looked up, by the key they were asked for (drift asks for the same few each year). */
+const BY_KEY = new Map<string, Tongue>();
 
 /** A tongue that must exist. */
 export function mustTongue(idOrName: string): Tongue {

@@ -37,11 +37,14 @@ describe("a living realm: moods", () => {
     expect(w.nationMonthlyIncome[me]).toBeLessThan(income);
   });
 
-  it("holds Foreign rule over a conquered people", () => {
+  it("holds Foreign rule over a conquered people of a stranger tongue, not over cousins (CULT-015)", () => {
     const w = createWorld(rules, 1, tiles);
-    const p = capitalOf(w, "portugal");
-    w.provinceOwner[p] = w.nationIndex.get("castile")!;
+    const p = capitalOf(w, "england");
+    w.provinceOwner[p] = w.nationIndex.get("france")!;
+    const q = capitalOf(w, "portugal");
+    w.provinceOwner[q] = w.nationIndex.get("castile")!;
     nextMonth(w);
     expect(grievancesOf(w, p)).toContain("Foreign rule");
+    expect(grievancesOf(w, q)).not.toContain("Foreign rule");
   });
 });

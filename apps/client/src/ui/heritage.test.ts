@@ -19,6 +19,12 @@ describe("the realm card's Heritage tab (HER-081..083)", () => {
     expect(html).toContain("Reach of rule: moderate (uncertain)");
   });
 
+  it("says under each assessment which starting number it sets (REALM-232)", () => {
+    const html = heritageTab(realmStrengths("france"));
+    for (const what of ["starting gold", "starting debt", "levies at the start", "officials at their posts", "envoys at court"]) expect(html).toContain(`<small class="sets">${what}</small>`);
+    expect(html.match(/class="sets"/g)).toHaveLength(5);
+  });
+
   it("says so for a realm with nothing recorded", () => {
     const html = heritageTab(realmStrengths("ireland"));
     expect(html).toContain("No heritage is recorded");

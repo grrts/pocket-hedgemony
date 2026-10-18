@@ -19,7 +19,7 @@ const C = config;
 export function envoySeats(d: Diplomacy, c: string): number {
   const k = country(d, c);
   const s = C.envoys.seats;
-  let n = s.base + Math.min(1, k.extraSeats);
+  let n = s.base + Math.min(1, k.extraSeats) + (k.courtEnvoys ?? 0);
   if (k.provinces > s.extra_if_provinces_over.provinces) n += s.extra_if_provinces_over.seats;
   for (const [inv, add] of Object.entries(s.inventions)) if (k.inventions.includes(inv)) n += add;
   return n;

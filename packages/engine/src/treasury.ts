@@ -87,8 +87,9 @@ export function provinceTax(world: World, p: number, holder: number, share = cro
   const { economy } = world.rules.defines;
   // A tax collector brings more of it in (province officials table: +20 % reaching you).
   const collector = officialBonus(world, p, "Tax collector", "tax_reach");
+  // Restricted faiths pay a quarter more on their share, Persecuted ones nothing (RELG-050, RELG-052).
   // A busy province owes more: 1 % for every 4 points of its trade ratio (TRADE-088).
-  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * tradeTaxFactor(world, p);
+  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]! * tradeTaxFactor(world, p);
 }
 
 /** Monthly interest on a realm's debt (REALM-164: 10 % a year). */

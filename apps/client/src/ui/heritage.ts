@@ -43,6 +43,15 @@ const GROUPS: { title: string; rows: [string, string][] }[] = [
   },
 ];
 
+/** The starting number each assessment sets, under its bar (REALM-230, REALM-232). */
+const SETS: Record<string, string> = {
+  economic_strength: "starting gold",
+  fiscal_resilience: "starting debt",
+  manpower_potential: "levies at the start",
+  administrative_capacity: "officials at their posts",
+  diplomatic_influence: "envoys at court",
+};
+
 const LEVEL_WORD: Record<string, string> = { very_low: "very low", low: "low", moderate: "moderate", high: "high", very_high: "very high", unknown: "unknown" };
 
 /** The General tab's one line: birthright and burden, opening the Heritage tab. */
@@ -66,7 +75,7 @@ function bar(a: RealmAssessment, label: string): string {
   const word = LEVEL_WORD[a.level]!;
   const unsure = a.confidence === "low" ? " (uncertain)" : "";
   return `<li class="${risk ? "risk" : ""}" aria-label="${label}: ${word}${unsure}">
-    <span class="what">${label}</span>
+    <span class="what">${label}${SETS[a.dimension] ? `<small class="sets">${SETS[a.dimension]}</small>` : ""}</span>
     <span class="steps" aria-hidden="true">${Array.from({ length: 5 }, (_, i) => `<i class="${rank > i ? "on" : ""}"></i>`).join("")}</span>
     <small>${word}${unsure ? "?" : ""}</small>
   </li>`;
@@ -91,6 +100,6 @@ export function heritageTab(s: RealmStrengths): string {
   return `<h3 class="sub">Heritage</h3>
     <div class="heritage">${parts}</div>
     <h3 class="sub">In 1444</h3>
-    <p class="hint">How the chronicles judge the realm at the start; a question mark where they are unsure.</p>
+    <p class="hint">How the chronicles judge the realm at the start, and what each sets it off with; a question mark where they are unsure, and there the start varies more between campaigns.</p>
     <div class="assessment-groups">${standing}</div>`;
 }

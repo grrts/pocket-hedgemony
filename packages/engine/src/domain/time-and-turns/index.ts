@@ -365,10 +365,14 @@ export function orderShape(order: Order): string {
       return "break an alliance";
     case "makeDemand":
       return "make a demand";
+    case "answerEvent":
+      return "answer an event";
     case "answerAsk":
       return "answer an envoy";
     case "subjectAction":
       return "act on a subject";
+    case "riseUp":
+      return "rise against an overlord";
     case "moveBuild":
       return "move a work in the province's queue";
     case "setFood":
@@ -385,6 +389,10 @@ export function orderShape(order: Order): string {
       return "draw a trader's route";
     case "dismissTrader":
       return "dismiss a trader";
+    case "tonguePolicy":
+      return "set the Tongue policy";
+    case "faithPolicy":
+      return "set a Faith policy";
   }
 }
 

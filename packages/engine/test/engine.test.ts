@@ -65,7 +65,8 @@ describe("turns", () => {
     // 11 and 18 November: no new month yet.
     expect(w.nationMonthlyIncome[fra]).toBeGreaterThan(0);
     const before = w.nationTreasury[fra]!;
-    expect(before).toBe(rules.defines.economy.startingTreasury);
+    // France starts rich, from its catalogue assessment (REALM-130), not the flat start.
+    expect(before).toBeGreaterThan(rules.defines.economy.startingTreasury);
     // 25 November: December begins in this turn.
     processTurn(w, [], fra);
     expect(w.nationTreasury[fra]).toBeCloseTo(before + w.nationMonthlyIncome[fra]!);

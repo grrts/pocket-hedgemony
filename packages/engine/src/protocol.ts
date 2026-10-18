@@ -1,9 +1,11 @@
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
+import { eventCards, type EventCard } from "./events.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, type GovernmentView } from "./government.ts";
 import { kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
+import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
@@ -94,6 +96,8 @@ export interface Snapshot {
   calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
   /** The player's standing with every other nation that has one. */
   relations: { nation: number; state: "war" | "truce" | "alliance" | "subject" | "overlord"; until?: string }[];
+  /** Events and decisions waiting for the player's answer, oldest first (milestone 6). */
+  events: EventCard[];
   /** Envoys, answers and what other realms think of the player (milestone 5); null without a player. */
   statecraft: StatecraftView | null;
   /** The map's diplomacy lens: each realm's relation to the player, leagues, envoys on the road and war aims (DIPL-209); null without a player. */
@@ -177,6 +181,8 @@ export interface Snapshot {
   provinceTradeSeen: Uint8Array;
   /** What each province the player sees trades: its goods, most gold first, with loads a year and gold a month. */
   provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
+  /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
+  peoples: PeoplesSnapshot;
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -317,7 +323,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceOwner: w.provinceOwner.slice(),
       provinceOccupier: w.provinceOccupier.slice(),
       provinceClosed: closedTo(w, player),
-      news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed"),
+      news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed" || x.major),
       wars,
       peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
       calls: w.diplomacy.calls
@@ -325,6 +331,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
       relations,
       statecraft: statecraftView(w, player),
+      events: eventCards(w, player),
       diplomacyLens: diplomacyLensView(w, player),
       sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
       battles: w.battles.map((b) => {
@@ -405,6 +412,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         for (let p = 0; p < w.provinceCount; p++) if (seen[p] && !w.provinceWater[p]) goods[p] = w.provinceGoods[p]!.map((g) => ({ ...g }));
         return { provinceTradeSeen: seen, provinceGoods: goods };
       })(),
+      peoples: peoplesSnapshot(w),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],

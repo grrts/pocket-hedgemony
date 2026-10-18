@@ -1033,6 +1033,133 @@ button.small {
   margin: 4px 0 0;
 }
 
+/* The event card (EVT-076): a sheet over the map, inside the safe areas, above
+   the alerts. Its story scrolls while the options stay in reach; in a short
+   landscape screen the story and the options sit side by side. */
+.event-card {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 50px);
+  bottom: max(84px, calc(env(safe-area-inset-bottom) + 74px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(620px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right))));
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px 8px;
+  z-index: 9;
+  animation: alert-in 0.2s steps(4);
+}
+
+/* Long event names wrap rather than lose their end. */
+.event-card .ribbon {
+  white-space: normal;
+  overflow: visible;
+}
+
+/* Wide screens: with a side panel open, the card sits in the map beside it, so both can be read at once. */
+@media (min-width: 900px) and (min-height: 600px) {
+  :root:has(#panel:not([hidden]):not(.chooser)) .event-card {
+    --side: max(33.333vw, 340px);
+    left: calc(var(--side) + (100vw - var(--side) - 64px) / 2);
+    width: min(620px, calc(100vw - var(--side) - 84px));
+  }
+}
+
+.event-card header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.event-card header > div {
+  min-width: 0;
+}
+
+.event-card header small {
+  display: block;
+  color: var(--ink-soft);
+}
+
+.event-card .fold {
+  flex: none;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+}
+
+.event-card .event-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: auto;
+}
+
+.event-card .sub {
+  margin: 8px 0 4px;
+  font: 600 18px/1 var(--body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.event-card p {
+  margin: 4px 0;
+}
+
+.event-effects {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.event-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.event-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 44px;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.event-option small {
+  font-size: 0.75em;
+  opacity: 0.8;
+}
+
+.event-option .does {
+  font-size: 0.8em;
+  line-height: 1.15;
+}
+
+@media (max-height: 500px) and (min-width: 640px) {
+  .event-card {
+    top: calc(env(safe-area-inset-top) + 48px);
+    bottom: max(8px, env(safe-area-inset-bottom));
+    width: min(760px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
+  }
+
+  .event-card .event-body {
+    flex-direction: row;
+    overflow: hidden;
+  }
+
+  .event-card .event-story,
+  .event-card .event-options {
+    flex: 1 1 50%;
+    min-width: 0;
+    overflow: auto;
+  }
+}
+
 @keyframes alert-in {
   from {
     transform: translateY(-12px);
@@ -1536,11 +1663,13 @@ table.classes td.bar span {
 }
 
 /* The chosen rate stays pressed in, marked with a dot. */
-.tax-rates button.paper.on {
+.tax-rates button.paper.on,
+.policy-choices button.paper.on {
   border-image-source: var(--ui-btn-paper-down);
 }
 
-.tax-rates button.on::before {
+.tax-rates button.on::before,
+.policy-choices button.on::before {
   content: "● ";
 }
 
@@ -2737,6 +2866,12 @@ button.paper.over {
 .assessments .what {
   white-space: nowrap;
 }
+/* What the assessment sets the realm off with, under its label (REALM-232). */
+.assessments .what .sets {
+  display: block;
+  font-size: 0.8em;
+  line-height: 1.1;
+}
 .assessments .steps {
   display: inline-flex;
   gap: 2px;
@@ -2996,4 +3131,73 @@ button.paper.over {
   .route-bar .best {
     display: none;
   }
+}
+
+/* ---- Tongues and faiths (CULT-080..085, RELG-116..118): the province overview's two lines and the realm's Peoples tab ---- */
+.tongue-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 4px 0 2px;
+  border: 2px solid var(--outline);
+  vertical-align: middle;
+}
+.tongue-dot.kin { background: #4f9a46; }
+.tongue-dot.cousin { background: #e0c040; }
+.tongue-dot.stranger { background: #b8323a; }
+.tongue-dot.trading { background: #9a9a9a; }
+button.belief-line {
+  min-height: 44px;
+  justify-content: flex-start;
+  text-align: left;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.facts dd.belief-more {
+  grid-column: 1 / -1;
+  display: block;
+  font-weight: 400;
+  padding: 2px 4px 6px;
+}
+.belief-more ul,
+.families ul,
+.faith-rows {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+.faith-rows {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.families {
+  display: grid;
+  gap: 4px;
+}
+.families details summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  cursor: pointer;
+}
+.families li,
+.faith-row p {
+  margin: 2px 0;
+}
+.faith-row {
+  padding: 6px 8px;
+}
+.faith-row .choices button {
+  min-height: 44px;
+}
+.families em,
+.faith-row em,
+.belief-more em {
+  font-style: normal;
+  color: var(--cloth);
 }
