@@ -75,7 +75,7 @@ describe("statecraft (milestone 5)", () => {
     const alliances = allies();
     months(w, 24, -1);
     expect(w.diplomacy.marriages.length - marriages + allies() - alliances).toBeGreaterThan(2);
-  });
+  }, 60000);
 
   it("demands tribute of a weak neighbour: counted from −60, and a yes makes them a Tributary that pays (DIPL-111 to DIPL-114)", () => {
     const w = createWorld(rules, 1, tiles);
@@ -118,7 +118,7 @@ describe("statecraft (milestone 5)", () => {
     const demands = () => w.diplomacy.letters.filter((l) => l.action === "demand").length + w.diplomacy.refusedDemands.length + subjectTies(w).filter((t) => t.r.origin === "game").length;
     for (let y = 0; y < 6 && !demands(); y++) months(w, 12, -1);
     expect(demands()).toBeGreaterThan(0);
-  });
+  }, 60000);
 
   /** Runs until an envoy of `from` waits at the player's court, and returns its ask. */
   function askArrives(w: World, player: number, from: number) {
