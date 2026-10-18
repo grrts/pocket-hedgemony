@@ -387,8 +387,20 @@ export function orderShape(order: Order): string {
       return "fill the food policy from a preset";
     case "reform":
       return "reform the government";
+    case "foundTrader":
+      return "found a trader";
+    case "setTradeRoute":
+      return "set a trader's route";
+    case "draftTradeRoute":
+      return "draw a trader's route";
+    case "dismissTrader":
+      return "dismiss a trader";
+    case "answerRevolution":
+      return "answer a revolution";
     case "answerRebels":
       return "answer a rising";
+    case "answerRevolution":
+      return "answer the revolution";
     case "treatRebels":
       return "judge beaten rebels";
     case "answerRevolution":

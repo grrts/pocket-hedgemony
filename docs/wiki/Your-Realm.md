@@ -44,7 +44,7 @@ People, recruits, food, horses, ships, castles, faith, tongue, in revolt, school
 
 #### Tax and the treasury in play
 
-Every province pays at its own tax rate or, until you give it one, at your realm's default, which starts at normal. Against normal, **none** pays nothing, **light** half, **heavy** one and a half times and **crushing** double. A province whose official has been made a commander pays half, and so does one that riots or plots. Heavy tax gives the province the *Heavy taxes* grievance, and crushing counts as two. A lord's province gives you only your share, and raising its rate to heavy or crushing makes its lord waver. Trade from the province's wealth comes in whatever the rate.
+Every province pays at its own tax rate or, until you give it one, at your realm's default, which starts at normal. Against normal, **none** pays nothing, **light** half, **heavy** one and a half times and **crushing** double. A province whose official has been made a commander pays half, and so does one that riots or plots. Heavy tax gives the province the *Heavy taxes* grievance, and crushing counts as two. A lord's province gives you only your share, and raising its rate to heavy or crushing makes its lord waver. A busy province owes more: every 4 points of its trade ratio add 1 %. Trade itself comes from your traders (see [Trade](Trade)), whatever the rate.
 
 The treasury keeps a **ledger** for the month: Tax and Trade coming in, Army pay, Officials and Interest going out. Their sum is your change a month, paid in on the 1st. Each official at his post earns 0.1 gold a month; a commissioned official draws no wage while he commands. Wages and interest are paid a twelfth each month.
 
