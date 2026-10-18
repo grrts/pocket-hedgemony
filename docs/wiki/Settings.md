@@ -8,7 +8,7 @@ Open Settings from the cog in the side tools, from the game menu (the three-line
 
 What the game has built so far:
 
-- **Gameplay**: Tutorial hints (with how many of the six are done) and Reset tutorial and hints; Autosave and Autosaves kept per campaign; Turn playback speed (1×, 2×, 4×: how fast the week plays out after End turn) and Battle playback speed.
+- **Gameplay**: Tutorial hints (with how many of the six are done) and Reset tutorial and hints; Achievement toasts; Autosave and Autosaves kept per campaign; Turn playback speed (1×, 2×, 4×: how fast the week plays out after End turn) and Battle playback speed.
 - **Graphics**: Battery saver (Off, Auto, On) and the knobs it moves: Frame rate cap, Sharpness and Animations. Rows it moves say "Set by Battery saver". Auto follows your device's battery where the browser reports it.
 - **Audio**: Master, Music on or off and its volume, Effects volume and Interface sounds. The speaker button's Sound card changes the same settings.
 - **Accessibility**: Text size (Normal, Large, Larger) for the cards, menus and alerts.

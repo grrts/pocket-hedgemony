@@ -6,6 +6,7 @@ import { Rng } from "./rng.ts";
 import { stabilityOf } from "./stability.ts";
 import { cedeProvince, controller, type News } from "./war.ts";
 import type { World } from "./world.ts";
+import { noteChoice } from "./achievements.ts";
 
 /**
  * Milestone 6, history (first slice): the 1444 event tree fires in the game.
@@ -249,6 +250,7 @@ function land(world: World, g: GameEvents, log: evt.DomainEvent[], news: News[])
       if (!nations.length) continue;
       const chooser = evt.controllerOf(ev, roles);
       const who = chooser ? nameOf(world, g, chooser) : "Fortune";
+      noteChoice(world, chooser ? g.nationOf.get(chooser) : undefined, ev, String(e.option));
       news.push({ kind: "event", text: `${eventTitle(ev.id)}: ${who} chooses “${optionName(ev.id, String(e.option))}”.`, nations, ...(ev.importance === "major" ? { major: true as const } : {}) });
     } else if (e.type === "EffectApplied") landEffect(world, g, e, news);
   }

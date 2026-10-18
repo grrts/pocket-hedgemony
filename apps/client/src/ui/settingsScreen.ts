@@ -15,6 +15,7 @@ const BUILT = new Set([
   "gameplay.autosaves_kept",
   "gameplay.tutorial_hints",
   "gameplay.reset_tutorial_hints",
+  "gameplay.achievement_toasts",
   "gameplay.turn_speed",
   "gameplay.battle_speed",
   "graphics.battery_saver",
@@ -30,16 +31,21 @@ const BUILT = new Set([
 ]);
 
 /**
- * Tutorial hints keep their own record of what the player has done
- * (onboarding TUT-128, TUT-129); the Gameplay rows show and change it.
+ * Tutorial hints and achievements keep their own records on the device
+ * (onboarding TUT-128, TUT-129; achievements' toasts switch); the Gameplay
+ * rows show and change them.
  */
 export interface HintsRows {
   on(): boolean;
   progress(): { done: number; of: number };
   setOn(on: boolean): void;
   reset(): void;
+  toasts(): boolean;
+  setToasts(on: boolean): void;
 }
 let hintsRows: HintsRows | undefined;
+/** The rows drawn from those records rather than from the settings file. */
+const OWN_ROWS = new Set(["gameplay.tutorial_hints", "gameplay.reset_tutorial_hints", "gameplay.achievement_toasts"]);
 export function setHintsRows(rows: HintsRows): void {
   hintsRows = rows;
 }
@@ -97,7 +103,10 @@ export function renderSettings(root: HTMLElement, close: () => void): void {
   });
   card.querySelector("[data-reset-section]")!.addEventListener("click", () => {
     resetPrefSection(ui.section);
-    if (ui.section === "gameplay") hintsRows?.setOn(true);
+    if (ui.section === "gameplay") {
+      hintsRows?.setOn(true);
+      hintsRows?.setToasts(true);
+    }
     renderSettings(root, close);
   });
   card.querySelectorAll<HTMLButtonElement>("[data-set]").forEach((b) =>
@@ -109,6 +118,10 @@ export function renderSettings(root: HTMLElement, close: () => void): void {
   );
   card.querySelector("[data-hints-toggle]")?.addEventListener("click", () => {
     hintsRows!.setOn(!hintsRows!.on());
+    keepScroll(root, () => renderSettings(root, close));
+  });
+  card.querySelector("[data-ach-toasts]")?.addEventListener("click", () => {
+    hintsRows!.setToasts(!hintsRows!.toasts());
     keepScroll(root, () => renderSettings(root, close));
   });
   card.querySelector("[data-hints-reset]")?.addEventListener("click", () => {
@@ -128,7 +141,7 @@ export function renderSettings(root: HTMLElement, close: () => void): void {
   // A long press or a right-click on a row's name puts it back to its default (SET-015).
   card.querySelectorAll<HTMLElement>("[data-row]").forEach((row) => {
     const id = row.dataset.row!;
-    if (id.startsWith("gameplay.") && id.includes("tutorial_hints")) return;
+    if (OWN_ROWS.has(id)) return;
     const name = row.querySelector<HTMLElement>(".set-label")!;
     let timer = 0;
     const reset = () => {
@@ -154,7 +167,7 @@ function keepScroll(root: HTMLElement, redraw: () => void): void {
 }
 
 function rowHtml(id: string): string {
-  if (id === "gameplay.tutorial_hints" || id === "gameplay.reset_tutorial_hints") return hintsRowHtml(id);
+  if (OWN_ROWS.has(id)) return hintsRowHtml(id);
   const def = resolve(prefs.cat, id);
   const v = pref(id);
   const on = rowEnabled(prefs, id);
@@ -183,6 +196,14 @@ function hintsRowHtml(id: string): string {
     <div class="set-row" data-row="${id}">
       <div class="set-label"><b>${esc(nameOf(id))}</b><small>${esc(descOf(id))}</small></div>
       <div class="set-control"><button class="paper" data-hints-reset>Reset</button></div>
+    </div>`;
+  }
+  if (id === "gameplay.achievement_toasts") {
+    const t = hintsRows.toasts();
+    return `
+    <div class="set-row" data-row="${id}">
+      <div class="set-label"><b>${esc(nameOf(id))}</b><i class="changed" title="Changed from the default"${t ? " hidden" : ""}></i><small>${esc(descOf(id))}</small></div>
+      <div class="set-control"><button class="paper toggle${t ? " on" : ""}" data-ach-toasts aria-pressed="${t}" data-sfx="${t ? "ui_toggle_off" : "ui_toggle_on"}">${t ? "On" : "Off"}</button></div>
     </div>`;
   }
   const on = hintsRows.on();

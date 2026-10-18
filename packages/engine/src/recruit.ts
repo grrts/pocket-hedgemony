@@ -9,6 +9,7 @@ import { campaigning, halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
 import { atWar, controller, wallsOf, type News } from "./war.ts";
 import { armUnlocked, knownSet } from "./research.ts";
+import { noteRegiment } from "./achievements.ts";
 
 /**
  * Milestone 2, armies that cost something: wires the recruiting context (who
@@ -788,6 +789,7 @@ function trainMonth(world: World, i: number, news: News[]): void {
   setByArm(world, i, by);
   a.trainArm[i] = -1;
   a.trainMen[i] = 0;
+  noteRegiment(world, a.owner[i]!);
   if (a.owner[i] === world.player) {
     const c = a.commander[i]!;
     news.push({ kind: "raised", text: `${fmt(men)} men of ${c >= 0 ? world.commanders[c]!.name : "an army"}'s army finish their training as ${arm}.`, nations: [a.owner[i]!], province: p });

@@ -6,6 +6,7 @@ import type { News } from "./war.ts";
 import { controller } from "./war.ts";
 import { inAnyWar } from "./lords.ts";
 import { recount, sendHome } from "./recruit.ts";
+import { noteInvention } from "./achievements.ts";
 
 /**
  * Research (milestone 4, first slice): wires the research context
@@ -213,6 +214,7 @@ const nameOf = (id: string): string => rs.invention(id).name.replace(/_/g, " ");
 
 function learned(world: World, n: number, id: string, news: News[]): void {
   refreshHarvest(world, n);
+  noteInvention(world, n, id);
   if (n === world.player) news.push({ kind: "invention", text: `Learned ${nameOf(id)}. Choose the next study.`, nations: [n] });
 }
 

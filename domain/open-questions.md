@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-569 decided and 8 still open across 29 contexts.
+571 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -30,6 +30,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-ACH-12**: (was OQ-ACH-12) The tutorial's last card says that achievements start in a real campaign; onboarding adds the line. One line of copy, no rule.
 - **D-ACH-13**: (was OQ-ACH-13) The achievements screen opens from the main menu's More, as screen flow places it (the latest design); the game menu does not list it. Latest decision wins.
 - **D-ACH-14**: (was OQ-ACH-14) Victory: X-12 decides how a campaign is won; no new achievement is added, and *The Long Road* still needs only reaching 31 August 1939. No new rows beyond the list.
+- **D-ACH-15**: First slice in the playable build (X-19, 18 Oct): the build has no main menu, saves or cheats yet, so the trophy button and the *Choose your realm* card open the Achievements card, every campaign counts as ironman, and tests run at each weekly turn end. Rows whose stats the engine does not keep yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, buying a castle, voyages, contact and colonies, rebellions, the famine rule, castle reach 3, macro-regions, world-war and crash tracking) show "Not in the game yet" and stay locked. Badges are a tier frame around a category glyph until the 71 icons of ACH-065 are drawn. Each of these goes when its system lands.
 
 ### Audio (audio)
 
@@ -380,6 +381,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-REBL-12**: (was OQ-REBL-12) New ideas cause: the province's event-tree ideology support for liberalism, socialism, communism or nationalism at 0.3 or more, from the age of revolutions. The same 0.3 threshold culture uses.
 - **D-REBL-13**: (was OQ-REBL-13) Both exist and do not overlap: exploration's local aggression roll covers founding a colony; rebellions' resistance covers settled land taken by conquest or treaty. Colonies take only free tiles (province 12.3).
 - **D-REBL-14**: (was OQ-REBL-14) Armed veterans: none. Disbanded men never keep their arms (X-7, Leroy 17 Oct), so a rising never starts armed from veterans and there is no new arms step.
+- **D-REBL-16**: First game slice (milestone 6, provisional): the game's grievances are the eight it tracks (*Hungry*, *Conscription*, *Soldiers quartered*, *Ungoverned*, *Foreign rule*, *Bloodshed*, *Heavy taxes*, *Grasping officials*), so its risings are Hunger, Tax, Homeland and Town ones; the sparks played are a tax raised and a lost battle; a band is one army per rising that walks a province a week; leaders' wants, lords' revolts, looting, forges, official flight and funded rebels wait on their contexts. The other demands are granted as light tax for 10 years. The numbers in REBL-068 are `provisional` in rebellions.json, with a *massacre* cause added to the realm's loyalty-down list for "lords waver one step". It is the smallest game that runs the design's rising, band, answers and win on the grievances the game has.
 - **D-REBL-15**: (was OQ-REBL-15) A *Riot* is a province state shown on the province card, not a rising object; the rebellion card appears only when a rising starts. The card is for risings.
 
 ### Recruiting (recruiting)
