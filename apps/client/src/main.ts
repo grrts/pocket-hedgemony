@@ -41,6 +41,7 @@ import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
+import { lockRevolutionButtons, revolutionCardHtml, revolutionSection } from "./ui/revolution.ts";
 import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
@@ -241,6 +242,7 @@ app.innerHTML = `
   <div class="overlay" id="overlay" hidden></div>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <section class="event-card framed" id="event-card" role="dialog" aria-labelledby="event-title" hidden></section>
+  <div class="revolution-sheet" id="revolution-card" hidden></div>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
   <button class="wax fab end-turn" id="fab" title="End turn" data-sfx="none" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
@@ -253,6 +255,7 @@ const alerts = document.querySelector<HTMLElement>("#alerts")!;
 const battleWatch = document.querySelector<HTMLElement>("#battle-watch")!;
 const voyageBarEl = document.querySelector<HTMLElement>("#voyage-bar")!;
 const eventCard = document.querySelector<HTMLElement>("#event-card")!;
+const revolutionCard = document.querySelector<HTMLElement>("#revolution-card")!;
 /** The waiting event's card is folded into End turn while the player looks at the map (SHELL-081). */
 let eventFolded = false;
 /** The week was paused because an event came for the player: it plays on once none waits. */
@@ -631,7 +634,7 @@ async function boot(): Promise<void> {
   renderPanel();
   hideLoading();
   sound.title();
-  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden, turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
+  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden, turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
 }
 
 // ---- map styling ----
@@ -1830,7 +1833,7 @@ function renderHud(): void {
     <button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>
     <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${s.battles.some((b) => b.player) ? ` <small>${String(s.hour).padStart(2, "0")}:00</small>` : ""}</span>
     <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
-    ${s.stability ? stabilityPlaque(s.stability, me) : ""}
+    ${s.stability ? stabilityPlaque(s.stability, me, s.revolution) : ""}
     ${myWars().length ? `<button class="plaque at-war" data-realm="${me}" data-realm-open="diplomacy" title="Your wars">${icon("swords", 1)}At war</button>` : ""}
     <button class="plaque dispatches${s.calls.length || s.peaceOffers.length || asksOf(s).length ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${unread + s.calls.length + s.peaceOffers.length + asksOf(s).length || ""}</button>`;
 }
@@ -1896,7 +1899,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown", revolution: "crown",
 };
 
 /**
@@ -1978,6 +1981,32 @@ function logNews(s: Snapshot): void {
     }
   }
   renderEventCard();
+  // A revolution breaking out covers the map, and the week waits for the answer (REVO-091).
+  if (s.revolution?.outbreak && playing && !paused) {
+    paused = true;
+    pausedForEvent = true;
+  }
+  renderRevolutionCard();
+}
+
+/** The player's revolution's choice card while it waits on a stance (REVO-091): it cannot be folded away. */
+function renderRevolutionCard(): void {
+  const v = snapshot?.revolution;
+  revolutionCard.hidden = !v?.outbreak;
+  if (!v?.outbreak) return;
+  revolutionCard.innerHTML = revolutionCardHtml(v, nations[snapshot!.playerNation]!.name);
+  revolutionCard.querySelectorAll<HTMLButtonElement>("[data-revolution-stance]").forEach((b) =>
+    b.addEventListener("click", async () => {
+      await act({ type: "answerRevolution", stance: b.dataset.revolutionStance as "lead" | "bend" | "fight" });
+      renderRevolutionCard();
+      if (!snapshot?.revolution?.outbreak && !snapshot?.events.length && pausedForEvent && playing && paused) {
+        pausedForEvent = false;
+        paused = false;
+        resume?.();
+        renderActions();
+      }
+    }),
+  );
 }
 
 /** The oldest event waiting for the player, as a card over the map, unless folded into End turn. */
@@ -2223,6 +2252,12 @@ function renderPanel(): void {
     voyageBarEl.hidden = true;
     view.invalidate();
   }
+  renderPanelCard();
+  // Whatever the card, the buttons a revolution's regime locks say so (REVO-092).
+  lockRevolutionButtons(panel, snapshot?.revolution);
+}
+
+function renderPanelCard(): void {
   const shows = `${achView}/${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
@@ -3823,6 +3858,7 @@ function renderRealm(r: number): void {
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
     ${mine && s?.stability ? stabilitySection(s.stability) : ""}
+    ${mine && s?.revolution ? revolutionSection(s.revolution) : ""}
     <dl class="facts">
       <dt>People</dt><dd>${fmt(people)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
@@ -3850,7 +3886,7 @@ function renderRealm(r: number): void {
   const content =
     realmTab === "heritage" ? heritageTab(strengths, s?.heritage[r] ?? null, s ? s.nationTreasury[r]! : 0)
     : realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r))
-    : realmTab === "government" && s?.government ? governmentTab(s.government)
+    : realmTab === "government" && s?.government ? governmentTab(s.government, s.revolution)
     : realmTab === "peoples" && peoples ? peoplesTab(peoples)
     : realmTab === "treasury" ? treasurySection()
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
@@ -4295,6 +4331,11 @@ async function endTurn(): Promise<void> {
   // While an event waits, End turn opens it instead (EVT-044, SHELL-070).
   if (snapshot.events.length) {
     openEventCard();
+    return;
+  }
+  // So does a revolution waiting on the player's stance (REVO-091).
+  if (snapshot.revolution?.outbreak) {
+    renderRevolutionCard();
     return;
   }
   if (playing) {
