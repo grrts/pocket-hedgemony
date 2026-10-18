@@ -4,7 +4,13 @@ import { sprite } from "./art/sprites.ts";
  * The loading screen (feedback 47): the game's name, a rider galloping along
  * a pixel road as each stage of loading finishes, what is being done now, and
  * a tip to read meanwhile. Its markup sits in index.html so it shows before
- * any script has arrived; this module animates it and moves it on.
+ * any script has arrived; this module moves it on.
+ *
+ * The motion that says the game is still working (the gallop, the passing
+ * road, the shine running along the bar, the dots) is all CSS transform and
+ * opacity animation, which the browser plays off the main thread: building the
+ * map and the realms blocks scripts for a second or more at a time, and a
+ * script-drawn rider froze there, so loading looked stuck.
  */
 
 const TIPS = [
@@ -21,43 +27,45 @@ const root = document.querySelector<HTMLElement>("#loader");
 const stageEl = root?.querySelector<HTMLElement>(".loader-stage");
 const tipEl = root?.querySelector<HTMLElement>(".loader-tip");
 const barEl = root?.querySelector<HTMLElement>(".loader-bar i");
-const art = root?.querySelector<HTMLCanvasElement>(".loader-art");
+const track = root?.querySelector<HTMLElement>(".loader-track");
+const rider = root?.querySelector<HTMLElement>(".loader-rider");
 
 let progress = 0;
-let shown = 0;
-let tipAt = 0;
-let raf = 0;
+let tipTimer = 0;
 const RIDER_COLOR = "#a8323e";
+/** Sprite pixels are drawn at this size, and shown at one 180th of the road's width each. */
+const SCALE = 3;
 
-function frame(t: number): void {
-  if (!root || root.hidden) return;
-  // Ease the rider toward the stage reached, so it never jumps.
-  shown += (progress - shown) * 0.08;
-  if (barEl) barEl.style.width = `${(shown * 100).toFixed(1)}%`;
-  if (art) {
-    const ctx = art.getContext("2d")!;
-    const u = 3;
-    ctx.imageSmoothingEnabled = false;
-    ctx.clearRect(0, 0, art.width, art.height);
-    // The road: ink edge, dust, and stones passing under the hooves.
-    const road = art.height - 6 * u;
-    ctx.fillStyle = "#24150c";
-    ctx.fillRect(0, road, art.width, u);
-    ctx.fillStyle = "#d8be86";
-    ctx.fillRect(0, road + u, art.width, 4 * u);
-    ctx.fillStyle = "#a26a3c";
-    const scroll = Math.floor(t / 40) % (8 * u);
-    for (let x = -scroll; x < art.width; x += 8 * u) ctx.fillRect(x, road + 2 * u, 2 * u, u);
-    const img = sprite(Math.floor(t / 150) % 2 ? "rider1" : "rider0", RIDER_COLOR, u);
-    const x = Math.round((art.width - img.width) * shown);
-    const bob = Math.floor(t / 150) % 2 ? -u : 0;
-    ctx.drawImage(img, x, road - img.height + 2 * u + bob);
-  }
-  if (tipEl && t - tipAt > 4500) {
-    tipAt = t;
-    tipEl.textContent = `Tip: ${TIPS[Math.floor(Math.random() * TIPS.length)]}`;
-  }
-  raf = requestAnimationFrame(frame);
+/** The rider's two gallop frames, one over the other, which CSS shows in turn. */
+function drawRider(): void {
+  if (!rider) return;
+  const frames = (["rider0", "rider1"] as const).map((name) => {
+    const src = sprite(name, RIDER_COLOR, SCALE);
+    const c = document.createElement("canvas");
+    c.width = src.width;
+    c.height = src.height;
+    c.getContext("2d")!.drawImage(src, 0, 0);
+    return c;
+  });
+  track?.style.setProperty("--rw", String(frames[0]!.width / SCALE));
+  track?.style.setProperty("--rh", String(frames[0]!.height / SCALE));
+  rider.replaceChildren(...frames);
+}
+
+/** Moves the rider and the bar to how far along loading is (0 to 1). */
+function show(at: number): void {
+  progress = at;
+  if (barEl) barEl.style.width = `${(at * 100).toFixed(1)}%`;
+  if (track) track.style.transform = `translateX(${(at * 100).toFixed(1)}%)`;
+}
+
+function setStage(stage: string): void {
+  // The dots after the words are animated, so the words lose their own.
+  if (stageEl) stageEl.textContent = stage.replace(/(…|\.\.\.)$/, "");
+}
+
+function nextTip(): void {
+  if (tipEl) tipEl.textContent = `Tip: ${TIPS[Math.floor(Math.random() * TIPS.length)]}`;
 }
 
 /** Shows the loading screen (again), titled with what is loading. */
@@ -65,31 +73,31 @@ export function showLoading(stage: string, at = 0): void {
   if (!root) return;
   root.hidden = false;
   root.classList.remove("done");
-  progress = at;
-  shown = Math.min(shown, at);
-  if (stageEl) stageEl.textContent = stage;
-  cancelAnimationFrame(raf);
-  raf = requestAnimationFrame(frame);
+  show(at);
+  setStage(stage);
+  nextTip();
+  clearInterval(tipTimer);
+  tipTimer = window.setInterval(nextTip, 4500);
 }
 
 /** Moves on to the next stage: what is being done now, and how far along loading is (0 to 1). */
 export function loadingStage(stage: string, at: number): void {
   if (!root) return;
-  progress = Math.max(progress, at);
-  if (stageEl) stageEl.textContent = stage;
+  show(Math.max(progress, at));
+  setStage(stage);
 }
 
 /** Finishes loading: the rider reaches the end of the road and the screen fades away. */
 export function hideLoading(): void {
   if (!root) return;
-  progress = 1;
-  if (stageEl) stageEl.textContent = "Ready";
+  show(1);
+  setStage("Ready");
   root.classList.add("done");
   setTimeout(() => {
     if (!root.classList.contains("done")) return;
     root.hidden = true;
-    cancelAnimationFrame(raf);
-    shown = 0;
+    clearInterval(tipTimer);
+    show(0);
   }, 450);
 }
 
@@ -97,6 +105,8 @@ export function hideLoading(): void {
 export const painted = () => new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 0)));
 
 if (root) {
-  progress = 0.08;
-  raf = requestAnimationFrame(frame);
+  drawRider();
+  show(0.08);
+  nextTip();
+  tipTimer = window.setInterval(nextTip, 4500);
 }
