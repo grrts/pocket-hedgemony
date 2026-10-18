@@ -50,6 +50,10 @@ Feature: Unlock the catalogue
       | people_10m | Many Hearths | turn_end | {people_min: 10000000} | silver | 10 | campaign |
       | trade_hub_held | Where Roads Meet | province_gained | {owns_trade_hub: 1} | copper | 5 | campaign |
       | castle_reach_3 | Long Reach | turn_end | {any_castle_reach_min: 3} | copper | 5 | campaign |
+      | harvests_10 | Ten Harvests | harvest | {provinces_harvested_min: 10} | copper | 5 | lifetime |
+      | harvests_100 | A Hundred Harvests | harvest | {provinces_harvested_min: 100} | silver | 10 | lifetime |
+      | harvests_1000 | A Thousand Harvests | harvest | {provinces_harvested_min: 1000} | gold | 20 | lifetime |
+      | harvests_10000 | Ten Thousand Harvests | harvest | {provinces_harvested_min: 10000} | crown | 40 | lifetime |
 
   @ACH-015 @ACH-018 @placeholder
   Scenario Outline: Lords and rule achievement "<name>" unlocks on its moment
