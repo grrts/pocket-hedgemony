@@ -373,6 +373,8 @@ export function orderShape(order: Order): string {
       return "set the food policy";
     case "foodPreset":
       return "fill the food policy from a preset";
+    case "reform":
+      return "reform the government";
   }
 }
 

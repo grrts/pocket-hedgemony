@@ -8,6 +8,7 @@ import { breakAlliance, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries 
 import { subjectAction } from "./subjects.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
+import { monthlyGovernment, reform } from "./government.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
@@ -115,6 +116,8 @@ export type Order =
   /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
   | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release"; level?: string }
   | { type: "stopChange"; province: number }
+  /** Reform the government into one of its next forms (GOV-027). */
+  | { type: "reform"; to: string }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
   | { type: "foodPreset"; name: string };
@@ -186,6 +189,7 @@ function startDay(world: World, news: News[]): void {
   if (world.day > 0 && world.date.day === 1) {
     monthlyPeople(world, news);
     monthlyFood(world, news);
+    monthlyGovernment(world, news);
     monthlyMoods(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
@@ -312,6 +316,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "stopChange":
       return stopChange(world, actingNation, order.province);
+    case "reform":
+      return reform(world, actingNation, order.to, news);
     case "sendEnvoy": {
       syncCountries(world);
       const reason = sendEnvoy(world, actingNation, order.target, order.action);

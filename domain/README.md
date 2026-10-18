@@ -12,7 +12,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Events](events/spec.md) | EVT | 68 | 10 | 191 | 16 | 0 |
 | [Exploration](exploration/spec.md) | EXPL | 68 | 6 | 126 | 18 | 0 |
 | [Game shell](game-shell/spec.md) | SHELL | 148 | 15 | 403 | 24 | 0 |
-| [Government](government/spec.md) | GOV | 57 | 6 | 261 | 17 | 0 |
+| [Government](government/spec.md) | GOV | 66 | 6 | 261 | 18 | 0 |
 | [Map presentation](map-presentation/spec.md) | VIEW | 87 | 9 | 166 | 9 | 1 |
 | [National strengths](national-strengths/spec.md) | HER | 83 | 13 | 141 | 18 | 0 |
 | [Naval](naval/spec.md) | NAVY | 125 | 9 | 259 | 29 | 0 |
@@ -33,6 +33,6 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Troop movement](troop-movement/spec.md) | MOVE | 133 | 12 | 246 | 20 | 0 |
 | [Warfare](warfare/spec.md) | WAR | 218 | 17 | 654 | 21 | 0 |
 | [World map](world-map/spec.md) | MAP | 50 | 6 | 175 | 12 | 0 |
-| **All 29 contexts** | | 3312 | 358 | 7927 | 554 | 8 |
+| **All 29 contexts** | | 3321 | 358 | 7927 | 555 | 8 |
 
 Scenarios count each row of a Scenario Outline's examples.
