@@ -48,7 +48,7 @@ import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
-import { castleFoodLine, castlesOpen, foodLine, foodTab } from "./ui/food.ts";
+import { castleFoodLine, castleFoodSettings, foodLine, foodTab } from "./ui/food.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
@@ -2465,6 +2465,7 @@ function renderPanelCard(): void {
       ${mineHere ? taxLine(selectedProvince) : ""}
     </dl>
     ${mineHere ? rateButtons(snapshot!.provinceTax[selectedProvince]!, "province") : ""}
+    ${mineHere ? castleFoodSettings(snapshot!, selectedProvince) : ""}
     ${armiesHere.length ? `<h3 class="sub">Armies</h3>` : ""}
     ${armiesHere
       .map((k) => {
@@ -2500,11 +2501,17 @@ function renderPanelCard(): void {
     }),
   );
   bindLords();
-  panel.querySelector("[data-realm-open-food]")?.addEventListener("click", () => {
-    realmView = snapshot!.playerNation;
-    realmTab = "food";
-    renderPanel();
-  });
+  panel.querySelectorAll("[data-realm-open-food]").forEach((b) =>
+    b.addEventListener("click", () => {
+      realmView = snapshot!.playerNation;
+      realmTab = "food";
+      renderPanel();
+    }),
+  );
+  // The castle's own food settings (feedback 112): the card stays on the province.
+  panel.querySelectorAll<HTMLButtonElement>("[data-food-key]").forEach((b) =>
+    b.addEventListener("click", () => void actHere({ type: "setFood", castle: Number(b.dataset.foodCastle), key: b.dataset.foodKey!, value: JSON.parse(b.dataset.foodValue!) as string | number | null })),
+  );
   panel.querySelector("[data-colony-abandon]")?.addEventListener("click", () => void actHere({ type: "explore", do: "abandon", province: selectedProvince }));
   if (siege) animateSiege(siege);
 }
@@ -3844,23 +3851,12 @@ function bindTax(province: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-repay]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "repay", gold: Number(b.dataset.repay) })));
 }
 
-/**
- * The Food tab's buttons: a setting for the realm or one castle, a preset;
- * the tab stays open on its new state, and a castle's folded settings stay
- * as the player left them.
- */
+/** The Food tab's buttons: a realm setting or a preset; the tab stays open on its new state. */
 function bindFood(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-food-key]").forEach((b) =>
     b.addEventListener("click", () => void actInTreasury({ type: "setFood", castle: Number(b.dataset.foodCastle), key: b.dataset.foodKey!, value: JSON.parse(b.dataset.foodValue!) as string | number | null })),
   );
   panel.querySelectorAll<HTMLButtonElement>("[data-food-preset]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "foodPreset", name: b.dataset.foodPreset! })));
-  panel.querySelectorAll<HTMLDetailsElement>("details[data-castle]").forEach((d) =>
-    d.addEventListener("toggle", () => {
-      const c = Number(d.dataset.castle);
-      if (d.open) castlesOpen.add(c);
-      else castlesOpen.delete(c);
-    }),
-  );
 }
 
 /** Borrowing and repaying keep the Treasury tab open: what a loan did to the lords goes to the news, and the tab shows the new debt. */
