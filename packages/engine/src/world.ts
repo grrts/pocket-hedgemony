@@ -30,6 +30,8 @@ import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
 import { createRevolutionState, type RevolutionState } from "./revolutions.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
+import { seedStartingFleets } from "./startingFleets.ts";
+import { refreshFreeFleets } from "./hiredFleets.ts";
 import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import type { AchievementLog } from "./achievements.ts";
@@ -477,6 +479,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedResearch(world);
   if (opts.seedTrade !== false) seedTrade(world);
   seedNavy(world);
+  // Realms that had ships in 1444 start with them, and free fleets gather for hire (F-115).
+  seedStartingFleets(world);
+  refreshFreeFleets(world);
   seedRegions(world);
   seedCharts(world);
   recount(world);

@@ -26,6 +26,7 @@ import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } fro
 import { tileStepHours } from "./march.ts";
 import { tileGridFromImages, type TileGrid } from "./tiles.ts";
 import { navyView, type NavyView } from "./navy.ts";
+import { fleetOffersView, type FleetOfferView } from "./hiredFleets.ts";
 import { openSave, writeSave, memoryStorage, type Campaign, type SaveHeader, type SaveKind, type Platform as SavePlatform } from "./domain/saves/index.ts";
 import { Rng } from "./rng.ts";
 import { explorationView, type ExplorationView } from "./colonies.ts";
@@ -236,6 +237,8 @@ export interface Snapshot {
   commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number }[];
   /** Ports, sailors and fleets: every fleet for the map, the player's ports and fleets in full (navy.ts). */
   navy: NavyView;
+  /** Fleets the player can hire now, free fleets first (hiredFleets.ts, F-115). */
+  fleetsForHire: FleetOfferView[];
   /** The player's charts, colonial governors and colonies, and every colony being founded that they have charted (colonies.ts). */
   exploration: ExplorationView;
   armies: {
@@ -481,6 +484,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         fleet: w.navy.fleets.find((f) => f.admiral === k)?.id ?? -1,
       })),
       navy: navyView(w, player),
+      fleetsForHire: player >= 0 ? fleetOffersView(w, player) : [],
       exploration: explorationView(w, player),
       arms: ARMS,
       research: player >= 0 ? researchView(w, player, ARMS) : null,
