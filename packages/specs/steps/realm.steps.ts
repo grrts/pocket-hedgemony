@@ -116,9 +116,9 @@ const causes: Partial<Record<M.Stat | "warships", Record<string, string>>> = {
   tongue: {
     "provinces held long and well assimilate": "assimilation",
     "settlers move in": "settlers",
-    "schools teach in its tongue": "schools",
-    "it conquers people of another tongue": "conquest",
-    "migrants of another tongue arrive": "migration",
+    "schools teach in its language": "schools",
+    "it conquers people of another language": "conquest",
+    "migrants of another language arrive": "migration",
     "a separatist movement spreads": "separatists",
   },
   in_revolt: {
@@ -230,7 +230,7 @@ function expectDirection(s: S, key: string, word: string): void {
 }
 
 Then(
-  /^its (harvest|local store|herds|fish catch|granary size|reach|people|faith share|tongue share|count in revolt|soldiers|recruits|horses|warships|trade ships) (?:is|are) (\w+)$/,
+  /^its (harvest|local store|herds|fish catch|granary size|reach|people|faith share|language share|count in revolt|soldiers|recruits|horses|warships|trade ships) (?:is|are) (\w+)$/,
   (s, what: string, word: string) => {
     expectDirection(s, what === "warships" || what === "trade ships" ? what : "value", word);
   },
@@ -296,8 +296,8 @@ Then("it shows horses, ships war and trade, castles, officials for royal provinc
   for (const p of pats) expect(s.text.some((t: string) => p.test(t))).toBe(true);
 });
 
-Then("it shows faith, tongue, in revolt, allies, enemies, oaths broken and Fallen in 10 years", (s) => {
-  for (const p of [/^Faith \d+ %$/, /^Tongue \d+ %$/, /^In revolt \d+$/, /^Allies \d+$/, /^Enemies \d+$/, /^Oaths broken \d+$/, /^Fallen \(10 yrs\) [\d,]+$/]) expect(s.text.some((t: string) => p.test(t))).toBe(true);
+Then("it shows faith, language, in revolt, allies, enemies, oaths broken and Fallen in 10 years", (s) => {
+  for (const p of [/^Faith \d+ %$/, /^Language \d+ %$/, /^In revolt \d+$/, /^Allies \d+$/, /^Enemies \d+$/, /^Oaths broken \d+$/, /^Fallen \(10 yrs\) [\d,]+$/]) expect(s.text.some((t: string) => p.test(t))).toBe(true);
 });
 
 Then("every count opens its list of how it is gained and how it is lost", (s) => {
@@ -636,7 +636,7 @@ Then("it keeps at least {int} months", (s, n: number) => {
 Given("the province {string} has {float} months of food in store", (s, _p: string, months: number) => {
   s.storeMonths = months;
 });
-Given("the famine rule is {string}", (s, rule: M.FoodPolicy["famineRule"]) => {
+Given("famine relief is {string}", (s, rule: M.FoodPolicy["famineRule"]) => {
   s.policy = M.foodPolicyFromPreset("Feed the people");
   M.setFoodPolicy(s.policy, "famineRule", rule);
 });
@@ -876,7 +876,7 @@ Then("gives half its recruits", (s) => {
 });
 
 Given("the country {string} has {int} % faith", (s, _c: string, n: number) => track(s, "faith", { value: n }));
-Given("the country {string} has {int} % tongue", (s, _c: string, n: number) => track(s, "tongue", { value: n }));
+Given("the country {string} has {int} % language", (s, _c: string, n: number) => track(s, "tongue", { value: n }));
 Given("the country {string} has {int} provinces in revolt", (s, _c: string, n: number) => track(s, "in_revolt", { value: n }));
 
 // ------------------------------------------------------------ lords
@@ -1145,7 +1145,7 @@ const loyaltyCauses: Record<string, string> = {
   "he takes part in a victory": "victory_taken_part",
   "the reign is long and secure with a clear heir": "long_secure_reign",
   "the ruler feeds his lands in famine": "fed_in_famine",
-  "he shares the ruler's faith and tongue": "shared_faith_and_tongue",
+  "he shares the ruler's faith and language": "shared_faith_and_tongue",
   "his land is taxed heavy or crushing": "heavy_taxes",
   "the ruler seizes land from him": "land_seized_from_him",
   "the ruler seizes land from another lord": "land_seized_from_another",
@@ -2601,7 +2601,7 @@ function convert(s: S, realm: string, what: "faith" | "tongue"): void {
   expect(what === "faith" ? G.lowFaith(w, n) : G.lowTongue(w, n)).toBe(true);
 }
 Given("the country {string} has a low faith share", (s, realm: string) => convert(s, realm, "faith"));
-Given("the country {string} has a low tongue share", (s, realm: string) => convert(s, realm, "tongue"));
+Given("the country {string} has a low language share", (s, realm: string) => convert(s, realm, "tongue"));
 When("the realm's provinces are checked for revolt", (s) => {
   const n = realmOf(s, s.realm);
   s.after = { faith: G.beliefRevoltFactor(s.game, n, "Faith"), homeland: G.beliefRevoltFactor(s.game, n, "Homeland") };

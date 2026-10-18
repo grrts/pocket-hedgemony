@@ -623,7 +623,7 @@ function stir(h: Heritage, a: Heritage["ambitions"][number], w: WorldFacts | nul
   if (a.state !== "sealed") return;
   a.state = "stirred";
   if (w) setBand(h, a, warmth(a.item.goal, w, h.country));
-  h.digest.push(`A seal cracks: ${a.item.hint}`);
+  h.digest.push(`An ambition is revealed: ${a.item.hint}`);
   h.log.push({ type: "AmbitionStirred", id: a.item.id });
 }
 
@@ -933,7 +933,7 @@ export function ambitionView(a: Heritage["ambitions"][number]): AmbitionView {
 }
 
 export interface CardRow {
-  row: "Birthright" | "Heyday" | "Ambitions" | "Burden" | "Legacies";
+  row: "Birthright" | "Golden age" | "Ambitions" | "Weakness" | "Legacies";
   lines: string[];
   greyed?: boolean;
   /** Tapping the row: full text, history note and what it changes (HER-002). */
@@ -946,9 +946,9 @@ export function card(h: Heritage, ageName: (id: string) => string = (id) => id):
   const awake = h.heydays.filter((x) => x.state === "awake");
   return [
     { row: "Birthright", lines: h.birthrights.map((b) => b.item.name), greyed: h.birthrights.every((b) => b.dormant), details: h.birthrights.map((b) => detail(b.item)) },
-    { row: "Heyday", lines: awake.map((x) => `${x.item.name} (${ageName(x.item.age)} · awake)`), details: awake.map((x) => detail(x.item)) },
+    { row: "Golden age", lines: awake.map((x) => `${x.item.name} (${ageName(x.item.age)} · active)`), details: awake.map((x) => detail(x.item)) },
     { row: "Ambitions", lines: openAmbitions(h).map((a) => a.item.hint), details: [] },
-    { row: "Burden", lines: h.burden?.state === "held" ? [h.burden.item.name] : [], details: h.burden?.state === "held" ? [detail(h.burden.item)] : [] },
+    { row: "Weakness", lines: h.burden?.state === "held" ? [h.burden.item.name] : [], details: h.burden?.state === "held" ? [detail(h.burden.item)] : [] },
     { row: "Legacies", lines: h.legacies.length ? h.legacies.map((l) => l.name) : ["none yet"], details: h.legacies.map(detail) },
   ];
 }

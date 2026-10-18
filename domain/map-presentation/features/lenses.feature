@@ -1,5 +1,5 @@
 @context-map-presentation
-Feature: Map lenses
+Feature: Map modes
   As a player
   I want to recolour the map by one stat at a time
   So that I can see where food, faith, trade or trouble is
@@ -7,44 +7,44 @@ Feature: Map lenses
   @VIEW-021
   Scenario: Picking a lens recolours the map
     Given the lens "Realms" is on
-    When the player picks "Food" from the lens picker
+    When the player picks "Food" from the map mode picker
     Then the map is recoloured by food
     And only one lens is on
 
   @VIEW-022
   Scenario Outline: The lens list holds every system's lens
-    Given the lens picker
+    Given the map mode picker
     When the lenses are listed
     Then the lens "<lens>" is offered, from the context "<context>"
 
     Examples:
-      | lens             | context      |
-      | Food             | province     |
-      | Tax reaching you | province     |
-      | Days to capital  | province     |
-      | Grievances       | province     |
-      | Faith            | religion     |
-      | Tongue           | culture      |
-      | Ground           | province     |
-      | Recruits         | province     |
-      | Trade ratio      | trade        |
-      | Trade value      | trade        |
-      | Traders          | trade        |
-      | Diplomacy        | diplomacy    |
-      | Sea              | naval        |
-      | Works            | buildings    |
-      | Jobs             | buildings    |
-      | Subjects         | subjects     |
-      | Revolution       | revolutions  |
-      | Realms           | world-map    |
-      | Terrain          | world-map    |
-      | People           | province     |
-      | Wealth           | province     |
-      | Walls            | warfare      |
+      | lens             | context     |
+      | Food             | province    |
+      | Tax reaching you | province    |
+      | Days to capital  | province    |
+      | Grievances       | province    |
+      | Faith            | religion    |
+      | Language         | culture     |
+      | Ground           | province    |
+      | Recruits         | province    |
+      | Trade ratio      | trade       |
+      | Trade value      | trade       |
+      | Traders          | trade       |
+      | Diplomacy        | diplomacy   |
+      | Sea              | naval       |
+      | Works            | buildings   |
+      | Jobs             | buildings   |
+      | Subjects         | subjects    |
+      | Revolution       | revolutions |
+      | Realms           | world-map   |
+      | Terrain          | world-map   |
+      | People           | province    |
+      | Wealth           | province    |
+      | Walls            | warfare     |
 
   @VIEW-022
-  Scenario: The lens picker holds 22 lenses and scrolls on a phone
-    Given the lens picker on a phone
+  Scenario: The map mode picker holds 22 map modes and scrolls on a phone
+    Given the map mode picker on a phone
     When the lenses are listed
     Then 22 lenses are offered
     And the picker scrolls
@@ -63,21 +63,21 @@ Feature: Map lenses
       | Aube     | Catholic  | Jewish   | 2     | not hatched    |
 
   @VIEW-024
-  Scenario Outline: The Tongue lens changes with zoom and a toggle
-    Given the Tongue lens is on
-    And the kin toggle is <toggle>
+  Scenario Outline: The Language lens changes with zoom and a toggle
+    Given the Language lens is on
+    And the realm toggle is <toggle>
     When the map is drawn at <zoom> zoom
     Then provinces are coloured by <colouring>
 
     Examples:
       | toggle | zoom   | colouring                         |
-      | off    | World  | tongue family                     |
-      | off    | Region | tongue                            |
-      | on     | Region | kin, cousin or stranger           |
+      | off    | World  | language family                   |
+      | off    | Region | language                          |
+      | on     | Region | same language, related or foreign |
 
   @VIEW-024
   Scenario: Homelands of peoples without a country are outlined
-    Given the Tongue lens is on
+    Given the Language lens is on
     And the Basque have a homeland but no country
     When the map is drawn
     Then the Basque homeland is outlined

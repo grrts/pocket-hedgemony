@@ -16,13 +16,13 @@ The country card has four tabs: **General** first, then **Diplomacy**, **Trade**
  Castles   31           Officials 40 for 18 royal provinces
  Lords     11 named: 7 loyal, 3 wavering, 1 disloyal
  Schools   4 (200 students, 35 scholars) · studying: Bastion forts 62 %
- Faith     96 %         Tongue   71 %        In revolt 2
+ Faith     96 %         Language   71 %        In revolt 2
  Allies 2  Enemies 1  Oaths broken 0       Fallen (10 yrs) 31,000
 ```
 
-It shows the ruler (title, name, age, years on throne, heirs), Gold, Food (how many castles feed how many provinces, and how many are hungry), People, Soldiers (plus recruits), Horses, Ships (war and trade), Castles, Officials (for how many royal provinces), Lords (named, by loyalty), Schools (students, scholars, current study and progress), Faith, Tongue, In revolt, Allies, Enemies, Oaths broken, Fallen in the last 10 years, and your rank in each win score.
+It shows the ruler (title, name, age, years on throne, heirs), Gold, Food (how many castles feed how many provinces, and how many are hungry), People, Soldiers (plus recruits), Horses, Ships (war and trade), Castles, Officials (for how many royal provinces), Lords (named, by loyalty), Schools (students, scholars, current study and progress), Faith, Language, In revolt, Allies, Enemies, Oaths broken, Fallen in the last 10 years, and your rank in each win score.
 
-People, recruits, food, horses, ships, castles, faith, tongue, in revolt, schools and officials are always **sums over your provinces**, never stored separately. Every number here is a placeholder until balanced.
+People, recruits, food, horses, ships, castles, faith, language, in revolt, schools and officials are always **sums over your provinces**, never stored separately. Every number here is a placeholder until balanced.
 
 ### Treasury
 
@@ -82,17 +82,17 @@ One **Food policy** sets realm-wide defaults on the realm's **Food** tab, and a 
 |---|---|
 | **Collection**: share of each province's surplus sent to the nearest castle | 0 %, 25 %, 50 %, 75 % |
 | **Castle shares**: how collected food is divided between castles | by people, frontier first, capital first, equal, or custom (a slider per castle, summing to 100 %) |
-| **Spread pattern**: how a castle hands out food by ring (own province / next ring / ring beyond) | default 50/30/20; Tight 80/20/0; Wide 30/35/35 |
+| **Sharing out**: how a castle hands out food by ring (own province / next ring / ring beyond) | default 50/30/20; Tight 80/20/0; Wide 30/35/35 |
 | **Siege reserve**: months a castle keeps and never spreads | 0, 3, 6, 12 |
 | **Army refill**: how armies refill their own reserve at home | locals only (default, from the local store), castles hand out first, no refill in lords' lands |
-| **Famine rule**: below this, a province's castle feeds it first, ignoring the spread | off, 1 month, 3 months |
+| **Famine relief**: below this, a province's castle feeds it first, ignoring how food is shared out | off, 1 month, 3 months |
 | **Surplus** above granary size | keep (it rots), sell on the market, send to the capital castle, send to subjects or allies |
 
 **Lords' castles** follow the policy by loyalty: loyal lords follow it, wavering lords half of it, disloyal lords keep their food.
 
 **Presets** fill the whole screen at once:
 
-| Preset | Collection | Castle shares | Spread | Siege reserve | Army refill |
+| Preset | Collection | Castle shares | Sharing out | Siege reserve | Army refill |
 |---|---|---|---|---|---|
 | Feed the people | 25 % | by people | Wide | 3 months | castles hand out first |
 | Fortress realm | 50 % | frontier first | Tight | 12 months | locals only |
@@ -104,7 +104,7 @@ One **Food policy** sets realm-wide defaults on the realm's **Food** tab, and a 
 1. **Autumn**: every province rolls its harvest. Weather is rolled by region, so neighbours suffer together and grain prices rise for all of them.
 2. **Collection**: the collection share of each province's surplus goes to its nearest castle in reach.
 3. **Castle shares**: castles exchange food until each holds its share. Food moving between castles loses some of its load for every province it travels.
-4. **Spread**: each castle keeps its siege reserve and hands out the rest to the rings around it by the spread pattern.
+4. **Sharing out**: each castle keeps its siege reserve and hands out the rest to the rings around it by its sharing-out pattern.
 5. **Through the year** people eat. Soldiers on campaign eat double, and a horse eats like three men. Stores rot a little each season, less with granaries.
 
 **Under pressure:**
@@ -121,7 +121,7 @@ One **Food policy** sets realm-wide defaults on the realm's **Food** tab, and a 
 - **Weather depends on the climate.** A region rolls once, and each province reads it by its climate: temperate land has bad weather 1 year in 6, dry land (desert, drylands, savanna) a drought 1 in 4, and the monsoon lands of Asia floods 1 in 5. Neighbours still suffer together.
 - **When the harvest comes in**: once a year in September in the north and March in the south. Rice lands from India to South China and the Indies harvest in both March and September once their realm knows *Wet-rice terracing*, each harvest bringing half the year's food, so one bad season costs only half. The tundra grows no crops; it lives on herds, hunting and fishing, which bring food every month.
 - **Armies eat from the land.** A man eats a month of food a month at home, double on campaign (while your realm is at war or the army is abroad), and a horse like three men. An army refills its wagons from the store of the province where it stands. In your own or friendly land the locals keep two months for themselves; in enemy land the foragers take what they find on that ground. What an army takes leaves the store, so a long stay or a march through poor land brings hunger to the province, and then to the army.
-- **Where you see it**: the province card's Overview shows the last harvest and why ("poor · drought in the region"), when it comes in, and how many months of the store the armies standing there eat a month. The Provinces tab counts your last harvests and marks poor and failed ones on each row. A failed harvest sends a dispatch. The army's supply line says how long its wagons last, whether it eats double on campaign, and what the land there gives it. The Food lens shows how many men on campaign each province could feed.
+- **Where you see it**: the province card's Overview shows the last harvest and why ("poor · drought in the region"), when it comes in, and how many months of the store the armies standing there eat a month. The Provinces tab counts your last harvests and marks poor and failed ones on each row. A failed harvest sends a news item. The army's supply line says how long its wagons last, whether it eats double on campaign, and what the land there gives it. The Food map mode shows how many men on campaign each province could feed.
 
 ### People and land
 
@@ -132,10 +132,10 @@ One **Food policy** sets realm-wide defaults on the realm's **Food** tab, and a 
 | **Royal provinces** | A lord's line dying out, seizing a lord's land, conquest kept for yourself | Granting land to make a new lord |
 | **Officials** | Hiring (gold up front, wages yearly), school graduates | Dismissal, unpaid wages, war in their province |
 | **Faith** (% sharing the ruler's religion) | Missionaries and clergy, schools of your faith, migrants of your faith, conversion events | Conquering other faiths, reformations, foreign missionaries |
-| **Tongue** (% sharing the ruler's culture) | Slow assimilation, settlers, schools | Conquest, migration, separatist movements |
-| **In revolt** (provinces with riots or rebels) | Heavy taxes, famine, foreign faith or tongue, disloyal lords stirring, lost wars | Defeating rebels, giving in, lowering taxes, food |
+| **Language** (% sharing the ruler's culture) | Slow assimilation, settlers, schools | Conquest, migration, separatist movements |
+| **In revolt** (provinces with riots or rebels) | Heavy taxes, famine, foreign faith or language, disloyal lords stirring, lost wars | Defeating rebels, giving in, lowering taxes, food |
 
-Each province needs an official or a lord to pay properly. A royal province gives full taxes and recruits, but **without an official it pays half taxes and gives half recruits**. One official runs one province with G1, two with G9 and three with G16, plus one more each for B2, G11 and T14. A low Faith share means religious revolts and wavering clergy lords; a low Tongue share means separatist revolts and slower officials. Provinces in revolt lose taxes and recruits and spread trouble to neighbours. Under half counts as low: risings of that kind come half again as often, the lords seated among another faith waver each January (in a theocracy, all of them), and with a low Tongue officials' years count at half pace. The General tab marks a low Faith or Tongue with a warning line under it. A rising spreads to a restless neighbour at about a tenth a month.
+Each province needs an official or a lord to pay properly. A royal province gives full taxes and recruits, but **without an official it pays half taxes and gives half recruits**. One official runs one province with G1, two with G9 and three with G16, plus one more each for B2, G11 and T14. A low Faith share means religious revolts and wavering clergy lords; a low Language share means separatist revolts and slower officials. Provinces in revolt lose taxes and recruits and spread trouble to neighbours. Under half counts as low: risings of that kind come half again as often, the lords seated among another faith waver each January (in a theocracy, all of them), and with a low Tongue officials' years count at half pace. The General tab marks a low Faith or Tongue with a warning line under it. A rising spreads to a restless neighbour at about a tenth a month.
 
 ### Lords
 
@@ -160,7 +160,7 @@ Each lord is a named character with a card:
 
 The lord card is the same in every society; only the label changes: nobles, merchant houses in city republics, bishops and abbots in theocracies, clan chiefs on the steppe, elders and lineage heads in chiefdoms and stateless societies.
 
-**Where you find them.** Open a province and the first thing on it is who governs it: its lord, with his loyalty and buttons to open him or seize the land, or *Royal land* with a **Grant as fief** button that lists your lords, neighbours first. Its official sits under him; a lord's official serves the lord, so you can't make him a commander. The country card's **Lords** tab is the overview: how much of the realm is royal land, and a row per lord with his portrait, house, lands and loyalty. Tap a lord to open his screen: his lands as a list, a gift while he is not loyal, royal provinces you can grant him (nearest first), and **Show his lands on the map**, which fades the rest of the map and frames his provinces. On the map a lord's land always carries a fine pattern of crosses and a dashed border, and the **Lords** lens colours each of your lords' lands in his own colour.
+**Where you find them.** Open a province and the first thing on it is who governs it: its lord, with his loyalty and buttons to open him or seize the land, or *Royal land* with a **Grant as fief** button that lists your lords, neighbours first. Its official sits under him; a lord's official serves the lord, so you can't make him a commander. The country card's **Lords** tab is the overview: how much of the realm is royal land, and a row per lord with his portrait, house, lands and loyalty. Tap a lord to open his screen: his lands as a list, a gift while he is not loyal, royal provinces you can grant him (nearest first), and **Show his lands on the map**, which fades the rest of the map and frames his provinces. On the map a lord's land always carries a fine pattern of crosses and a dashed border, and the **Lords** map mode colours each of your lords' lands in his own colour.
 
 **Lords versus officials.** A lord costs no gold, but keeps half the taxes of his provinces and keeps their recruits as his retinue. He obeys according to his loyalty, and can be removed only by force, a trial or his line dying out.
 
@@ -193,7 +193,7 @@ The lord card is the same in every society; only the label changes: nobles, merc
 | Victories he took part in | A child ruler, a disputed heir or a new ruler |
 | A long secure reign with a clear heir | Requisitioning his grain |
 | Feeding his lands in famine | A foreign rival's bribes and promises |
-| Sharing your faith and tongue | |
+| Sharing your faith and language | |
 
 Paying for a building in a lord's province raises his loyalty one step. A famine in his land turns him disloyal; riots or a heavy demand on his province make him waver. At New Year, each lord over the government's cap drops one loyalty step (see [Government](Government)).
 
@@ -265,7 +265,7 @@ While an envoy is abroad he runs no province, so his province pays half until he
 
 ### Starting values
 
-At the start, the catalogue's assessments set your counts: economic strength and fiscal resilience give gold and debt; manpower potential recruits; military capability soldiers, commanders and horses; naval capability ships; administrative capacity officials and royal provinces; political stability and unrest risk lords' loyalty and provinces in revolt; territorial cohesion the number of lords, their land and tongue; institutional development schools, scholars and inventions; trade access starting trade; diplomatic influence extra officials ready as envoys. A low-confidence record starts with a wider random range. Allies, rivals, subjects and enemies come from the 1444 relations file. See [The 1444 Start](The-1444-Start).
+At the start, the catalogue's assessments set your counts: economic strength and fiscal resilience give gold and debt; manpower potential recruits; military capability soldiers, commanders and horses; naval capability ships; administrative capacity officials and royal provinces; political stability and unrest risk lords' loyalty and provinces in revolt; territorial cohesion the number of lords, their land and language; institutional development schools, scholars and inventions; trade access starting trade; diplomatic influence extra officials ready as envoys. A low-confidence record starts with a wider random range. Allies, rivals, subjects and enemies come from the 1444 relations file. See [The 1444 Start](The-1444-Start).
 
 ### Events and the AI
 
@@ -295,8 +295,8 @@ A turn is one week. These steps run once a month, in the turn in which a new mon
 | Cadence | What happens |
 |---|---|
 | Monthly | Pay soldiers; add income; desertion if unpaid or unfed; apply loyalty causes; check the ruler's death and succession; check score victory |
-| Each season | Eating and rot of castle and local stores; famine rule releases |
-| Each autumn | Harvest roll by region, collection, castle shares, spread |
+| Each season | Eating and rot of castle and local stores; famine relief releases |
+| Each autumn | Harvest roll by region, collection, castle shares, sharing out |
 | Yearly | Debt interest; officials' wages; recruits refill; ruler and lords age; years on throne; old entries drop out of Fallen, Oaths broken and Lands taken |
 | New Year | Lords over the cap lose a loyalty step |
 
@@ -306,7 +306,7 @@ A turn is one week. These steps run once a month, in the turn in which a new mon
 - **The lord card** for each named lord.
 - **The Food policy screen**, with realm defaults, per-castle overrides and the four presets.
 - **The treasury**: gold, debt and lenders.
-- **The top bar**: your realm, the date, gold and its change a month, stability, the war plaque while at war, and dispatches.
+- **The top bar**: your realm, the date, gold and its change a month, stability, the war plaque while at war, and the News button.
 
 Things you can do: set food policy, override a castle, apply a food preset; take a loan, repay or default; hire and dismiss officials; grant a fief, keep a local ruler, sell a title; seize a lord's land, put a disloyal lord on trial; give a lord gold, an office or a marriage, or grant his want; call a loyal lord's retinue; name an heir; burn your own fields.
 
@@ -321,7 +321,7 @@ Things you can do: set food policy, override a castle, apply a food preset; take
 - [Subjects](Subjects): subjects and tribute; folding a subject in makes its ruler a lord.
 - [Government](Government): officials and lords caps, succession by form, lords over the cap.
 - [Trade](Trade): trade income (deposits, fees, tolls); traders and trade ships replace merchants.
-- [Religion](Religion) and [Culture](Culture): faith and tongue shares and their effects on lords.
+- [Religion](Religion) and [Culture](Culture): faith and language shares and their effects on lords.
 - [Rebellions](Rebellions): disloyal lords, retinues and wealth for risings, in revolt counts.
 - [Revolutions](Revolutions): regimes set forms; émigré pretenders.
 - [Historical Events](Historical-Events): event country stats mapped as above; ages raise women-in-roles chances.
@@ -331,7 +331,7 @@ Things you can do: set food policy, override a castle, apply a food preset; take
 - [Time and Turns](Time-and-Turns): weekly turns with monthly steps, seasons, the end date for judging scores.
 - [Screens and Navigation](Screens-and-Navigation): scores, ranks and the campaign result for the end screens.
 - [Achievements](Achievements): score updates and campaign wins.
-- [Map and Lenses](Map-and-Lenses): country card fields.
+- [Map and Map Modes](Map-and-Lenses): country card fields.
 
 ## Numbers
 
@@ -341,10 +341,10 @@ All realm numbers are placeholders, kept in one realm data file.
 |---|---|---|---|
 | Collection options | `food.collection.options` | 0 / 25 / 50 / 75 % | Yes |
 | Castle share rules | `food.castle_shares.options` | by people, frontier first, capital first, equal, custom | No |
-| Spread patterns | `food.spread.default` / `presets` | 50/30/20; Tight 80/20/0; Wide 30/35/35 | Yes |
+| Sharing-out patterns | `food.spread.default` / `presets` | 50/30/20; Tight 80/20/0; Wide 30/35/35 | Yes |
 | Siege reserve | `food.siege_reserve.options` | 0 / 3 / 6 / 12 months | Yes |
 | Army refill | `food.army_refill.options` | locals only, castles first, no refill in lords' lands | No |
-| Famine rule | `food.famine_rule.options` | off / 1 / 3 months | Yes |
+| Famine relief | `food.famine_rule.options` | off / 1 / 3 months | Yes |
 | Surplus | `food.surplus.options` | keep, sell, capital castle, subjects or allies | No |
 | Lords' castles | `food.lords_castles` | loyal all, wavering half, disloyal none | Yes |
 | Presets | `food.presets` | four, as above | Yes |

@@ -12,14 +12,14 @@ Feature: Events and subjects
 
     Examples:
       | key                                       | effect                                                       |
-      | vassalize who target type                 | a subject is created of the mapped kind                      |
+      | vassalize who target type                 | a subject is created of the mapped type                      |
       | release who target                        | the subject is released                                      |
-      | relation type subject                     | the Subject relation and its kind are read                   |
-      | subject_count                             | the number of subjects is read, by reach weights only if asked |
+      | relation type subject                     | the Subject relation and its type are read                   |
+      | subject_count                             | the number of subjects is read, by subject limit weights only if asked |
       | subject_loyalty who target op step        | a loyalty step is tested                                     |
       | add_subject_reason target reason months   | a reason is added by id for the months given                 |
       | remove_subject_reason                     | a reason is removed by id                                    |
-      | change_subject_kind who target kind       | the kind is tightened or loosened                            |
+      | change_subject_kind who target kind       | the type is tightened or loosened                            |
 
   @SUBJ-097 @SUBJ-035
   Scenario: The Kalmar Union breaking

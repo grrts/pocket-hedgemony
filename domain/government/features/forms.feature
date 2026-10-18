@@ -1,7 +1,7 @@
 @context-government
 Feature: Government forms and what they set
   As the game
-  I want each of the 27 government forms to set its part of the caps, subject reach, colonial range and succession
+  I want each of the 27 government forms to set its part of the caps, subject limit, colonial range and succession
   So that how a country is ruled shapes what it can hold
 
   @GOV-018 @GOV-021 @GOV-022 @placeholder
@@ -11,7 +11,7 @@ Feature: Government forms and what they set
     When the form's numbers are read
     Then the form belongs to the family "<family>"
     And the form gives <officials> officials and <lords> lords to the caps
-    And the form changes subject reach by <subjects>
+    And the form changes subject limit by <subjects>
     And the colonial range of "Testland" is <range> sea zones
     And succession in "Testland" is "<succession>"
 
@@ -47,18 +47,18 @@ Feature: Government forms and what they set
   @GOV-020
   Scenario: Colonial government holds no subjects
     Given the country "Genoese Gazaria" has the form "Colonial government"
-    When its subject reach is worked out
-    Then the country "Genoese Gazaria" has no subject reach and can hold no subjects
+    When its subject limit is worked out
+    Then the country "Genoese Gazaria" has no subject limit and can hold no subjects
     And the colonial range of "Genoese Gazaria" is 15 sea zones
     And succession in "Genoese Gazaria" is "overlord appoints"
 
   @GOV-019 @placeholder
-  Scenario Outline: Subject reach from administrative capacity and form
+  Scenario Outline: Subject limit from administrative capacity and form
     # config keys: subject_reach_start, forms.<form>.subject_reach
     Given the country "<country>" has the catalogue administrative capacity "<capacity>"
     And the country "<country>" has the form "<form>"
-    When its subject reach is worked out
-    Then the subject reach of "<country>" is <reach>
+    When its subject limit is worked out
+    Then the subject limit of "<country>" is <reach>
 
     Examples:
       | country  | capacity  | form                | reach |
@@ -70,19 +70,19 @@ Feature: Government forms and what they set
 
   @GOV-023 @GOV-024
   Scenario Outline: Self-run forms need no official for their own people
-    # D-GOV-13: own people are those whose largest tongue is the realm's own tongue; kin tongues do not count
-    Given the country "Gowa" has the form "<form>" and the tongue "Makassarese"
-    And the largest tongue of the province "<province>" of "Gowa" is "<tongue>"
+    # D-GOV-13: own people are those whose largest language is the realm's own language; related languages do not count
+    Given the country "Gowa" has the form "<form>" and the language "Makassarese"
+    And the largest language of the province "<province>" of "Gowa" is "<language>"
     And the province "<province>" has no official
     When the month ends
     Then the province "<province>" <outcome>
 
     Examples:
-      | form         | province | tongue      | outcome                                  |
-      | Chiefdom     | Gowa     | Makassarese | needs no official and is not Ungoverned  |
-      | Clan council | Gowa     | Makassarese | needs no official and is not Ungoverned  |
-      | Chiefdom     | Bone     | Buginese    | still needs an official                  |
-      | Feudal realm | Gowa     | Makassarese | still needs an official                  |
+      | form         | province | language    | outcome                                 |
+      | Chiefdom     | Gowa     | Makassarese | needs no official and is not Ungoverned |
+      | Clan council | Gowa     | Makassarese | needs no official and is not Ungoverned |
+      | Chiefdom     | Bone     | Buginese    | still needs an official                 |
+      | Feudal realm | Gowa     | Makassarese | still needs an official                 |
 
   @GOV-057
   Scenario Outline: Which forms count as monarchies for the Inquisition

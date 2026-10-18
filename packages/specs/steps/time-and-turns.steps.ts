@@ -937,8 +937,8 @@ When("{int} years have passed", (s, years: number) => {
   s.years = years;
 });
 
-Then("the culture checks for the court going native, new tongues abroad and merges run once every {int} years", (s, every: number) => {
-  const step = cadenceOf("culture checks for the court going native, new tongues abroad and merges")!;
+Then("the culture checks for the court going native, new languages abroad and merges run once every {int} years", (s, every: number) => {
+  const step = cadenceOf("culture checks for the court going native, new languages abroad and merges")!;
   expect(step.cadence).toBe("five-yearly");
   // The January turn of every year divisible by five (D-TIME-6).
   const runs: GameDate[] = [];

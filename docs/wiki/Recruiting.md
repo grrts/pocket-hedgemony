@@ -1,6 +1,6 @@
 # Recruiting
 
-Recruiting is how your realm turns the people of its provinces into soldiers. You call men up with one slider (the levy), train them into regiments of one arm at a castle or drill yard, keep the best as standing regiments, and take officials out of their provinces to lead your armies. Every step has a price in gold, food, work at home and goodwill, and this page explains each one.
+Recruiting is how your realm turns the people of its provinces into soldiers. You call men up with one slider (the levy), train them into regiments of one troop type at a castle or drill yard, keep the best as standing regiments, and take officials out of their provinces to lead your armies. Every step has a price in gold, food, work at home and goodwill, and this page explains each one.
 
 ## How it works
 
@@ -24,7 +24,7 @@ Only fighting-age men can be called, and they are a quarter of a province's peop
 
 Add these up over a province's classes and you get its **men who can be called**, the ceiling. The ceiling is hard: no levy, war or invention ever takes a province past it. In Troyes that works out at about one man in eight of the fighting-age men. Students can be called from the same pool at the clerks' share (1,000 students give 10 men), while clergy and scholars cannot. Students who are called stop making research.
 
-The class a man comes from does not change the soldier he becomes. Every levied man arrives as **levy foot**, the weakest arm, with farm tools. Classes only matter for how many men you can call and what you lose at home when they leave.
+The class a man comes from does not change the soldier he becomes. Every levied man arrives as **levy infantry**, the weakest troop type, with farm tools. Classes only matter for how many men you can call and what you lose at home when they leave.
 
 With the invention W15 Mass conscription every class's call share rises by half (homeless 36 %, farmers 18 % and so on), and the ceiling stays a share of the fighting-age men.
 
@@ -71,7 +71,7 @@ Every January the pool refills by a quarter of the gap to the ceiling, or a thir
 
 ### Training
 
-Training is ordered from the **commander screen**, for the levy foot in that commander's army, while the army stands at a castle or drill yard of yours: set how many thousand with − and +, then tap the arm, which shows its months and gold. Away from a training place the screen tells you to march there first, and training already under way holds while the army is away. The commander screen also shows the army's men by arm, drill and break point, the commander's skills, its companies to split, merge or leave as garrison, its food reserve and food used a day and a month, and its pay.
+Training is ordered from the **commander screen**, for the levy infantry in that commander's army, while the army stands at a castle or drill yard of yours: set how many thousand with − and +, then tap the troop type, which shows its months and gold. Away from a training place the screen tells you to march there first, and training already under way holds while the army is away. The commander screen also shows the army's men by troop type, drill and break point, the commander's skills, its companies to split, merge or leave as garrison, its food reserve and food used a day and a month, and its pay.
 
 Levies can only be trained at a **training place**: a castle or a drill yard of yours. Each has a training room, the number of men it trains at once:
 
@@ -81,15 +81,15 @@ Levies can only be trained at a **training place**: a castle or a drill yard of 
 | Stone castle | 3,000 |
 | Bastion fort | 5,000 |
 | Star fort | 8,000 |
-| Drill yard | 1,500 of any arm |
-| Barracks (drill yard step) | 4,000 of any arm |
+| Drill yard | 1,500 of any troop type |
+| Barracks (drill yard step) | 4,000 of any troop type |
 
-A castle and a drill yard in the same province add their rooms together. You pick the arm, how many men and the place; the men walk there and start. If you order training from a town with neither, the men march to the nearest place that can train. You can only train into arms your realm has unlocked, and training takes the months, gold and goods in this table (per 1,000 men):
+A castle and a drill yard in the same province add their rooms together. You pick the troop type, how many men and the place; the men walk there and start. If you order training from a town with neither, the men march to the nearest place that can train. You can only train into troop types your realm has unlocked, and training takes the months, gold and goods in this table (per 1,000 men):
 
 | Arm | Months | Gold | Needs |
 |---|---|---|---|
-| Levy foot | 0 | 0 | nothing |
-| Armoured foot | 2 | 80 | 10 loads of arms |
+| Levy infantry | 0 | 0 | nothing |
+| Heavy infantry | 2 | 80 | 10 loads of arms |
 | Pikes | 3 | 60 | 10 loads of arms |
 | Archers | 4 | 60 | 10 loads of arms |
 | Hand gunners | 3 | 120 | 10 loads of arms, 10 powder |
@@ -97,7 +97,7 @@ A castle and a drill yard in the same province add their rooms together. You pic
 | Musketeers | 5 | 180 | 20 arms, 20 powder |
 | Line infantry | 6 | 220 | 20 arms, 20 powder |
 | Riflemen | 6 | 300 | 30 arms, 30 powder |
-| Light horse | 3 | 100 | 1,000 horses |
+| Light cavalry | 3 | 100 | 1,000 horses |
 | Camel riders | 3 | 100 | 1,000 camels |
 | Horse archers | 6 | 150 | 1,000 horses, 10 arms |
 | Knights and lancers | 9 | 300 | 1,500 horses, 20 arms |
@@ -108,30 +108,30 @@ Some things speed training up or change it:
 
 - A **Marshal** as the province's official makes training there 25 % faster.
 - **Veterans** train in half the time, so a regiment made mostly of veterans finishes early.
-- **Retraining** a regiment to a newer arm takes half the months and half the gold, and it keeps its drill and scars.
-- Until the order is done the men are still levies. If you **call them out of training** to fight, they go as levy foot and the months spent are lost.
+- **Retraining** a regiment to a newer troop type takes half the months and half the gold, and it keeps its drill and scars.
+- Until the order is done the men are still levies. If you **call them out of training** to fight, they go as levy infantry and the months spent are lost.
 - A castle or town **under siege** stops all training in it.
-- The **3 free months** count from the day the levy has gathered. If training runs past them, you pay for the extra months. Pikes and light horse (3 months) finish inside the free months; musketeers (5 months) cost 2 months of pay and knights (9 months) 6.
+- The **3 free months** count from the day the levy has gathered. If training runs past them, you pay for the extra months. Pikes and light cavalry (3 months) finish inside the free months; musketeers (5 months) cost 2 months of pay and knights (9 months) 6.
 
-When training finishes, the regiment has its arm, drill 3 (drill 4 if trained under a Marshal), pay by its arm and a break point of 30 % plus its troop level. Untrained levies stay at drill 0 and break at 25 %. Training never changes a regiment's kind: a trained levy regiment is still a levy. No levy, trained or not, goes home on its own: it stays until you disband it or leave it as a garrison.
+When training finishes, the regiment has its troop type, drill 3 (drill 4 if trained under a Marshal), pay by its troop type and a break point of 30 % plus its troop level. Untrained levies stay at drill 0 and break at 25 %. Training never changes a regiment's kind: a trained levy regiment is still a levy. No levy, trained or not, goes home on its own: it stays until you disband it or leave it as a garrison.
 
-Pay by arm, per 1,000 men a month: foot 200 gold, gunners 250, horse 400, knights 600, and gun crews 1 gold per crew of 15 (10 gold for 150 men). Each arm belongs to one of these groups:
+Pay by troop type, per 1,000 men a month: foot 200 gold, gunners 250, horse 400, knights 600, and gun crews 1 gold per crew of 15 (10 gold for 150 men). Each troop type belongs to one of these groups:
 
-| Pay group | Arms |
+| Pay group | Troop types |
 |---|---|
-| Foot | Armoured foot, pikes, archers |
+| Foot | Heavy infantry, pikes, archers |
 | Gunners | Hand gunners, pike and shot, musketeers, line infantry, riflemen |
-| Horse | Light horse, camel riders, horse archers |
+| Horse | Light cavalry, camel riders, horse archers |
 | Knights | Knights and lancers, war elephants |
 | Gun crews | Gun crews |
 
-**Champagne continued.** Of the 5,000 levies, 2,500 train into pikes at the castle of Troyes and 500 into light horse at Reims, while 2,000 march at once as levies. The pikes cost 150 gold and 25 loads of arms and eat 11,250 rations in 3 months. The light horse cost 50 gold and 500 horses and eat 6,750 rations. Training eats 18,000 rations from the castle stores at Troyes and Reims, and no pay is owed. Filling a 2-month reserve then takes 23,000 rations. From the 4th month the army costs 1,000 gold a month in pay and eats 11,500 rations a month on campaign, about 6,500 more than the men would eat at home.
+**Champagne continued.** Of the 5,000 levies, 2,500 train into pikes at the castle of Troyes and 500 into light cavalry at Reims, while 2,000 march at once as levies. The pikes cost 150 gold and 25 loads of arms and eat 11,250 rations in 3 months. The light cavalry cost 50 gold and 500 horses and eat 6,750 rations. Training eats 18,000 rations from the castle stores at Troyes and Reims, and no pay is owed. Filling a 2-month reserve then takes 23,000 rations. From the 4th month the army costs 1,000 gold a month in pay and eats 11,500 rations a month on campaign, about 6,500 more than the men would eat at home.
 
 ### Standing regiments and retinues
 
 With W12 Standing regiments you can **sign on** a trained regiment. It stays under arms in peace, keeps its drill and scars, and is paid 1.5 times, all year round. Its men are gone from their province's pool and their slots stay empty. Housed in a barracks in peace, a standing regiment gives the province no Soldiers quartered; without a barracks it is quartered on the people like any army in winter.
 
-Lords raise their retinues by the same rules, with their own wealth and at their own castles. Their traits decide what they train: a Warlike lord trains knights and armoured foot, a Greedy one keeps levies.
+Lords raise their retinues by the same rules, with their own wealth and at their own castles. Their traits decide what they train: a Warlike lord trains knights and heavy infantry, a Greedy one keeps levies.
 
 ### What recruiting gives back
 
@@ -197,17 +197,17 @@ The Marshal is an official type trained for war. You get one from an academy, by
 - If one is killed or captured you lose a commander and an official; a ransom brings both back.
 - Any commander with 8 victories who has led the same regiments for 5 years becomes "their man". An official at 6 victories asks for land: refusing makes them Ambitious, granting turns them into a lord with their old soldiers as his retinue.
 
-Other leaders: the ruler and heirs can lead, lords lead only their own retinues (as captains in a royal army), hired captains come with their free companies, and exiles who ask to serve become officials of the type closest to their past.
+Other leaders: the ruler and heirs can lead, lords lead only their own retinues (as captains in a royal army), hired captains come with their mercenary companies, and exiles who ask to serve become officials of the type closest to their past.
 
 ### Names and ranks
 
-Every commander is named the way his own people name someone: a Castilian is "Rodrigo Manrique", a Hungarian "Hunyadi János" and a Japanese "Hosokawa Katsumoto", family name first where the language puts it first. The great commanders of 1444 go by their own names too: Hunyadi János, Gjergj Kastrioti, Konstantinos Palaiologos. He also carries the rank of his post in that language: a Portuguese commander leading an army is "Marechal Fernão Coutinho" and the same man at the head of a fleet is "Almirante Fernão Coutinho"; an Ottoman admiral is "Kapudan Mehmed Pasha", a Japanese general "Hosokawa Katsumoto Taishō". The rank changes with the post, so an admiral sent back to court is a general again. A free company's captain is named and ranked in the language of the land the company gathers in ("Hauptmann Ulrich von Hallwyl", "Condottiero Niccolò Piccinino") and keeps that name in your service. A people with no word for a post in the game's data shows the name alone.
+Every commander is named the way his own people name someone: a Castilian is "Rodrigo Manrique", a Hungarian "Hunyadi János" and a Japanese "Hosokawa Katsumoto", family name first where the language puts it first. The great commanders of 1444 go by their own names too: Hunyadi János, Gjergj Kastrioti, Konstantinos Palaiologos. He also carries the rank of his post in that language: a Portuguese commander leading an army is "Marechal Fernão Coutinho" and the same man at the head of a fleet is "Almirante Fernão Coutinho"; an Ottoman admiral is "Kapudan Mehmed Pasha", a Japanese general "Hosokawa Katsumoto Taishō". The rank changes with the post, so an admiral sent back to court is a general again. A mercenary company's captain is named and ranked in the language of the land the company gathers in ("Hauptmann Ulrich von Hallwyl", "Condottiero Niccolò Piccinino") and keeps that name in your service. A people with no word for a post in the game's data shows the name alone.
 
 The ranked name is used on the army row of a province card, the commander screen, the Military tab's Commanders list, the army picker, fleet names on the Navy tab and in port, and the Mercenaries tab. Under it, the small line with his skills starts with his post in plain English (commander, admiral or hired captain), so you never need to know the word. Dispatches and short buttons use the plain name.
 
 ### The computer players
 
-The AI uses the same levy and training commands. Its catalogue personality sets how much of its pool it dares to levy and what it trains: a militarist levies deep and trains expensive arms, a merchant republic levies little and hires companies instead, a steppe realm trains horse archers. It avoids levying in harvest months unless an enemy army is in its land, and it commissions stewards and wardens first, keeping tax collectors in their seats. It commissions an official only when at least 1,000 of its men have no commander and no free commander can go to them, so it never keeps more commanders than its armies need.
+The AI uses the same levy and training commands. Its catalogue personality sets how much of its pool it dares to levy and what it trains: a militarist levies deep and trains expensive troop types, a merchant republic levies little and hires companies instead, a steppe realm trains horse archers. It avoids levying in harvest months unless an enemy army is in its land, and it commissions stewards and wardens first, keeping tax collectors in their seats. It commissions an official only when at least 1,000 of its men have no commander and no free commander can go to them, so it never keeps more commanders than its armies need.
 
 ### Each month
 
@@ -218,7 +218,7 @@ Each province is updated once a month: training months tick down and finished re
 ## What you see
 
 - **The levy screen**, opened from a province card: one men slider in thousands; Gold now, Food now, Pay, Harvest, Pool left and Ready in; a season and harvest warning sign; a gain and lose list behind every cost line.
-- **The commander screen**: the army's stats, troops, food and pay, and the training choice (arm, thousands of men, castle or drill yard).
+- **The commander screen**: the army's stats, troops, food and pay, and the training choice (troop type, thousands of men, castle or drill yard).
 - **The Garrison tab** of the province card: troops without a commander, levies still gathering and the commanders who can pick them up.
 - **Where to settle men**: soldier settlers for a frontier or colony province.
 - **The commission choice**: commander or captain, the trait to pick, and the four ways to run the empty province.
@@ -232,7 +232,7 @@ Each province is updated once a month: training months tick down and finished re
 - [Buildings](Buildings): castle steps, the drill yard and its barracks step set training room.
 - [Research](Research): W12, W15 and W18 unlock signing on, raise call shares and speed gathering.
 - [Troop-Movement](Troop-Movement): gathered levies and trained regiments become movers, and levies walk to their training place.
-- [Naval](Naval): mustering sailors reuses the levy with its own ceiling for seafolk (sailors at sea are not at home to be levied), and admirals reuse the commission and the empty province.
+- [Naval](Naval): recruiting sailors reuses the levy with its own ceiling for seafolk (sailors at sea are not at home to be levied), and admirals reuse the commission and the empty province.
 - [Rebellions](Rebellions): armed veterans, a rising's men drawn from the pool, and the Conscription grievance.
 - [Historical-Events](Historical-Events): plague rumours brought home and generals who grow too big.
 - [Time-and-Turns](Time-and-Turns): the month tick, the seasons and the order of monthly steps.
@@ -257,12 +257,12 @@ The numbers live in the recruiting config file. Most are **provisional** and wai
 | Levy money | 20 gold per 1,000 men |
 | Free months | 3, from the day the levy has gathered |
 | Levy pay | 0.15 gold per man a month |
-| Pay by arm (per man a month) | foot 0.2, gunners 0.25, horse 0.4, knights 0.6; gun crews 1 per crew of 15 |
+| Pay by troop type (per man a month) | foot 0.2, gunners 0.25, horse 0.4, knights 0.6; gun crews 1 per crew of 15 |
 | Standing pay | ×1.5 |
 | Rations | gathering 1, camp 1.5, campaign 2, home 1; horse 3 |
 | Lost harvest | ×2 share of farmers taken, ×1.5 at harvest |
 | Lost herd growth | ×2 share of herders taken in the spring move |
-| Training room, arm table | see tables above |
+| Training room, troop type table | see tables above |
 | Veterans / retraining | half the time / half months and half gold |
 | Marshal | 25 % faster, drill 4, hired at 3×, paid 2×, −1 skill after 10 idle years |
 | Drill and break point | trained 3 and 30 % + troop level; levies 0 and 25 % |

@@ -19,7 +19,7 @@ const USE_TEXT: Record<string, { name: string; works: string[]; about: string }>
   pasture: { name: "Pasture", works: ["ranch"], about: "Herders keep flocks here. A ranch gives them work at 1.33 and wool; without one they herd at 0.67." },
   woods: { name: "Woods", works: ["hunting lodge", "lumber camp"], about: "Woodsmen hunt and gather here, best in the northern woods. Too many hunters thin the game; a hard winter cuts the catch. A hunting lodge brings in half as much again (and furs in the north); a lumber camp cuts timber, so works needing it cost less." },
   marsh: { name: "Marsh", works: [], about: "Wet land: little grows. Draining it (an invention) turns it to fields." },
-  waste: { name: "Waste", works: ["mine", "quarry"], about: "Rock, scrub or sand. In hills and mountains it may hold a seam of iron, copper, tin, silver, gold or rock salt: a mine digs it until it runs out, and needs timber from a lumber camp here or next door. A quarry on rocky ground cuts stone, so works needing it cost less." },
+  waste: { name: "Waste", works: ["mine", "quarry"], about: "Rock, scrub or sand. In hills and mountains it may hold an ore deposit of iron, copper, tin, silver, gold or rock salt: a mine digs it until it runs out, and needs timber from a lumber camp here or next door. A quarry on rocky ground cuts stone, so works needing it cost less." },
   shore: { name: "Shore", works: ["fishery", "saltworks"], about: "Seafolk fish here. A fishery gives them work at 1.33; without one they fish at 0.67. On a dry or warm coast, saltworks make salt from the sea." },
   town: { name: "Town", works: [], about: "The town's buildings stand here, one to a slot: the Build tab orders them." },
 };
@@ -66,7 +66,7 @@ function tileSheet(s: Snapshot, p: number, t: LandTileRow): string {
     t.workers > 0 ? `<dt>Working it</dt><dd>${people(t.workers)}</dd>` : "",
     t.feeds > 0 ? `<dt>Feeds</dt><dd>${people(t.feeds)} a year</dd>` : "",
     t.game ? `<dt>Game</dt><dd>${t.game.left > 0.85 ? "plenty" : t.game.left > 0.55 ? "thinning: too many hunters" : "scarce: too many hunters"}${t.game.hardWinter ? "; a hard winter this year" : ""}</dd>` : "",
-    t.seam ? `<dt>Seam</dt><dd>${esc(t.seam.ware)}, ${t.seam.years} years of digging left</dd>` : t.use === "waste" ? `<dt>Seam</dt><dd>none found</dd>` : "",
+    t.seam ? `<dt>Ore deposit</dt><dd>${esc(t.seam.ware)}, ${t.seam.years} years of digging left</dd>` : t.use === "waste" ? `<dt>Ore deposit</dt><dd>none found</dd>` : "",
     t.ware ? `<dt>Gives</dt><dd>${t.ware.amount.toFixed(1)} loads of ${esc(t.ware.name)} a year</dd>` : "",
     `<dt>Worked by</dt><dd>${t.building ? esc(cap(t.building)) : "no building: bare land"}</dd>`,
     wearFacts(t),

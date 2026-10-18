@@ -1,15 +1,15 @@
 @context-subjects
-Feature: Subject reach
+Feature: Subject limit
   As a ruler
   I want a limit on how many subjects I can watch over
   So that holding many subjects has a cost
 
   @SUBJ-056 @placeholder
-  Scenario Outline: Reach from administrative capacity
+  Scenario Outline: Subject limit from administrative capacity
     # config: reach_by_administrative_capacity
     Given the country "C" has the catalogue administrative capacity "<capacity>" and a government that changes nothing
-    When its reach is counted
-    Then the subject reach of "C" is <reach>
+    When its subject limit is counted
+    Then the subject limit of "C" is <reach>
 
     Examples:
       | capacity  | reach |
@@ -20,34 +20,34 @@ Feature: Subject reach
       | very high | 9     |
 
   @SUBJ-056
-  Scenario: Reach and lord capacity are separate numbers
-    Given the country "France" has a lord capacity and a subject reach
+  Scenario: The subject limit and lord capacity are separate numbers
+    Given the country "France" has a lord capacity and a subject limit
     When "France" gains a lord
-    Then its subject reach is unchanged
+    Then its subject limit is unchanged
 
   @SUBJ-057 @placeholder
   Scenario: The Ming's tributaries and marches
     # config: kinds.*.reach_weight
-    Given the country "Ming" has reach 9
+    Given the country "Ming" has a subject limit of 9
     And "Ming" holds 5 tributaries and 7 marches
-    When its reach is counted
-    Then "Ming" uses 6 reach of 9
+    When its subject limit is counted
+    Then "Ming" uses 6 of its subject limit of 9
 
   @SUBJ-058 @placeholder
-  Scenario: Over reach
+  Scenario: Over the subject limit
     # config: reasons.stretched_thin
-    Given the country "O" has reach 7 and 9 subjects of weight 1
+    Given the country "O" has a subject limit of 7 and 9 subjects of weight 1
     When the season ends
     Then every subject of "O" has the reason "Stretched thin" at -1
-    And the 2 furthest subjects of "O" have 1 more down arrow from being over reach
-    And the other subjects of "O" have no more down arrows from being over reach
+    And the 2 furthest subjects of "O" have 1 more down arrow from being over the subject limit
+    And the other subjects of "O" have no more down arrows from being over the subject limit
 
   @SUBJ-059 @placeholder
-  Scenario: Naples costs the Pope 4 reach
+  Scenario: Naples takes 4 of the Pope's subject limit
     # config: subjects_with_subjects
     Given "Naples" is a Vassal of "Papal States"
     And "Taranto" is a subject of "Naples"
-    When the reach of "Papal States" is counted
+    When the subject limit used by "Papal States" is counted
     Then "Naples" counts 4
 
   @SUBJ-060
@@ -61,7 +61,7 @@ Feature: Subject reach
     Given "Taranto" is a subject of "Naples", a Vassal of "Papal States"
     When "Papal States" opens the card of "Taranto"
     Then "Papal States" has no buttons on "Taranto"
-    And "Taranto" counts nothing in the reach of "Papal States" and pays it nothing
+    And "Taranto" counts nothing toward the subject limit of "Papal States" and pays it nothing
 
   @SUBJ-062
   Scenario: Breaking the chain

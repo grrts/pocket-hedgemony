@@ -48,6 +48,6 @@ Feature: Levers
 
   @HER-039
   Scenario: A strength pulls one to three levers
-    Given the heyday "Carreira da Índia"
+    Given the golden age "Carreira da Índia"
     When its effects are read
     Then it pulls 3 levers: trader_gain_pct, building_cost_pct and official_type_pct

@@ -5,10 +5,10 @@ Feature: What each country knows in 1444
   So that the tree starts from history
 
   @RSCH-050
-  Scenario: Everyone knows the root and the boughs
+  Scenario: Everyone knows the root and the branches
     Given the date is 1444
     When any country is set up
-    Then it knows "Settled life" and the four boughs
+    Then it knows "Settled life" and the four branches
 
   @RSCH-051 @RSCH-076 @placeholder
   Scenario Outline: Historical starting inventions

@@ -26,6 +26,15 @@ const IDS: Record<string, string> = { Ottomans: "ottoman" };
 /** People of a province when a scenario does not say (Troyes: province stats, 72,000). */
 const POPULATION: Record<string, number> = { Troyes: 72000 };
 const POLICY: Record<string, C.TonguePolicy> = { "Let be": "let_be", Teach: "teach", Impose: "impose" };
+/** The words the features use for a relation (kin, cousin, stranger in the code). */
+const RELATION_SAID: Record<C.Relation, string> = { kin: "same language", cousin: "related", stranger: "foreign", trading: "trading" };
+function relationOf(word: string): C.Relation {
+  const w = word.replace(/^of the /, "");
+  if (w === "trading people") return "trading";
+  const hit = (Object.keys(RELATION_SAID) as C.Relation[]).find((r) => RELATION_SAID[r] === w);
+  if (!hit) throw new Error(`unknown relation ${word}`);
+  return hit;
+}
 
 function cc(s: Scenario, name: string): C.CountryCulture {
   s.cc ??= {};
@@ -61,10 +70,10 @@ Given(/^the AI country "([^"]+)" (has|does not have) printing$/, (s, name: strin
   s.printing = has === "has";
   if (s.printing) cc(s, name).inventions.push("printing");
 });
-When("it chooses its Tongue policy", (s) => {
+When("it chooses its Language policy", (s) => {
   s.chosen = C.aiTonguePolicy(s.personality, !!s.printing);
 });
-Then("its Tongue policy is {string}", (s, policy: string) => {
+Then("its Language policy is {string}", (s, policy: string) => {
   expect(s.chosen).toBe(POLICY[policy]);
 });
 Then(/^it uses (.+)$/, (s, lever: string) => {
@@ -73,10 +82,10 @@ Then(/^it uses (.+)$/, (s, lever: string) => {
 
 // ---------------------------------------------------------------- officials
 
-Given("the country {string} has the court tongue {string}", (s, name: string, t: string) => {
+Given("the country {string} has the court language {string}", (s, name: string, t: string) => {
   cc(s, name).court = C.mustTongue(t).id;
 });
-Given(/^an official of the tongue "([^"]+)" serves in a province whose people are (\S+) \(\w+\)$/, (s, official: string, people: string) => {
+Given(/^an official of the language "([^"]+)" serves in a province whose people are (\S+) \([^)]+\)$/, (s, official: string, people: string) => {
   s.official = { tongue: official, people };
 });
 When("the years pass", () => {});
@@ -89,7 +98,7 @@ When(/^an official is hired in the province "([^"]+)", which is (\w+)$/, (s, nam
 When(/^an official is graduated from a school teaching in (\w+)$/, (s, t: string) => {
   s.officialTongue = C.officialTongue({ school: t });
 });
-Then("the official has the tongue {string}", (s, t: string) => {
+Then("the official has the language {string}", (s, t: string) => {
   expect(s.officialTongue).toBe(C.mustTongue(t).id);
 });
 
@@ -102,7 +111,7 @@ Given(/^the province "([^"]+)" is the (\w+) homeland with nationalism ([\d.]+)$/
 When("a homeland rising starts in {string}", (s, name: string) => {
   s.rising = { province: name, demand: C.homelandRisingDemand(prov(s, name).nationalism) };
 });
-Then(/^it draws (\d+) % of everyone of the tongue "([^"]+)"$/, (s, pct: string) => {
+Then(/^it draws (\d+) % of everyone of the language "([^"]+)"$/, (s, pct: string) => {
   expect(C.homelandRisingDraw(1000) / 10).toBeCloseTo(Number(pct));
 });
 Then("its demand is {string}", (s, demand: string) => {
@@ -112,14 +121,14 @@ Given(/^a battle in rough ground in the (\w+) homeland$/, (s, t: string) => {
   s.homeland = t;
   s.ground = "hills";
 });
-When(/^defenders of the tongue "([^"]+)" fight, rebels or not$/, (s, t: string) => {
+When(/^defenders of the language "([^"]+)" fight, rebels or not$/, (s, t: string) => {
   // Rebels and soldiers alike: the rule reads only the defenders' tongue.
   s.bonus = [C.locals(s.ground, t, s.homeland), C.locals(s.ground, t, s.homeland)];
 });
 Then(/^they get \+(\d+) %$/, (s, pct: string) => {
   for (const b of s.bonus) expect(b * 100).toBeCloseTo(Number(pct));
 });
-Given("a garrison captain of the tongue {string} serves a ruler of the tongue {string}", (s, captain: string, ruler: string) => {
+Given("a garrison captain of the language {string} serves a ruler of the language {string}", (s, captain: string, ruler: string) => {
   s.captain = { captain, ruler };
 });
 Given(/^nationalism is ([\d.]+)$/, (s, n: string) => {
@@ -128,7 +137,8 @@ Given(/^nationalism is ([\d.]+)$/, (s, n: string) => {
 Then(/^the captain (can|cannot) be bribed$/, (s, can: string) => {
   expect(C.captainBribable(s.captain.ruler, s.captain.captain, s.nationalism ?? 0)).toBe(can === "can");
 });
-Given(/^the province "([^"]+)" is the homeland of "([^"]+)", (\w+) to its ruler, with nationalism ([\d.]+)$/, (s, name: string, t: string, rel: string, n: string) => {
+Given(/^the province "([^"]+)" is the homeland of "([^"]+)", (foreign|related|of the same language) to its ruler, with nationalism ([\d.]+)$/, (s, name: string, t: string, word: string, n: string) => {
+  const rel = relationOf(word);
   const p = prov(s, name, { [t]: 90000 }, { homelandOf: [C.mustTongue(t).id], nationalism: Number(n) });
   expect(C.relationTo(cc(s, "France").court, t)).toBe(rel);
   s.free = p;
@@ -163,8 +173,8 @@ Then(/^the war aim "Gather our kin" is not offered$/, (s) => {
 Given("the age of revolutions has begun", (s) => {
   s.age = true;
 });
-Given(/^a province of "([^"]+)" is (kin|stranger|cousin) with nationalism ([\d.]+)$/, (s, _c: string, rel: C.Relation, n: string) => {
-  s.levy = { rel, n: Number(n) };
+Given(/^a province of "([^"]+)" whose majority is (same language|related|foreign) has nationalism ([\d.]+)$/, (s, _c: string, word: string, n: string) => {
+  s.levy = { rel: relationOf(word), n: Number(n) };
 });
 Then(/^recruits refill there (25 % faster|at the usual rate|25 % slower)$/, (s, speed: string) => {
   const m = C.nationalLevy(s.levy.rel, s.levy.n, !!s.age);
@@ -177,7 +187,7 @@ Given(/^the province "([^"]+)" has a market: (yes|no)$/, (s, name: string, m: st
   s.market = m === "yes";
   s.tp = name;
 });
-Given(/^the tongue "([^"]+)" is (\d+) % of the province$/, (s, t: string, pct: string) => {
+Given(/^the language "([^"]+)" is (\d+) % of the province$/, (s, t: string, pct: string) => {
   s.share = { t, v: Number(pct) / 100 };
 });
 Then(/^the province gets \+(\d+) % trade value and may hire one extra (\w+) trader$/, (s, pct: string, t: string) => {
@@ -223,7 +233,7 @@ Then(/^"([^"]+)" counts double toward the 60 % cap on cheaper research$/, (s, n:
 Then(/^"([^"]+)" of another family counts once$/, (s, n: string) => {
   expect(C.neighbourResearchWeight(s.research.own, s.research[n])).toBe(1);
 });
-Given("a foreign scholar of the tongue {string} looks for a realm", (s, t: string) => {
+Given("a foreign scholar of the language {string} looks for a realm", (s, t: string) => {
   s.scholar = t;
 });
 Given(/^"([^"]+)" \((\w+)\) and "([^"]+)" \((\w+)\) both welcome scholars$/, (s, a: string, fa: string, b: string, fb: string) => {
@@ -235,7 +245,7 @@ Given(/^"([^"]+)" \((\w+)\) and "([^"]+)" \((\w+)\) both welcome scholars$/, (s,
 Then("the scholar settles first in {string}", (s, name: string) => {
   expect(C.scholarRealmOrder<{ name: string; family: string }>(s.scholar, s.realms)[0]!.name).toBe(name);
 });
-Given(/^the ruler of "([^"]+)" has the court tongue "([^"]+)" and the ruler of "([^"]+)" has the court tongue "([^"]+)"$/, (s, _a: string, ta: string, _b: string, tb: string) => {
+Given(/^the ruler of "([^"]+)" has the court language "([^"]+)" and the ruler of "([^"]+)" has the court language "([^"]+)"$/, (s, _a: string, ta: string, _b: string, tb: string) => {
   s.pair = [ta, tb];
 });
 Then(/^relations between them start (\d+) steps warmer$/, (s, n: string) => {
@@ -244,10 +254,10 @@ Then(/^relations between them start (\d+) steps warmer$/, (s, n: string) => {
 Given("nationalism has spread", (s) => {
   s.nationalismSpread = true;
 });
-Given("the country {string} holds many people of the tongue {string}", (s, _c: string, t: string) => {
+Given("the country {string} holds many people of the language {string}", (s, _c: string, t: string) => {
   s.holdsMany = C.mustTongue(t).id;
 });
-Then("{string} is a natural rival of {string}, whose court tongue is {string}", (s, _a: string, b: string, t: string) => {
+Then("{string} is a natural rival of {string}, whose court language is {string}", (s, _a: string, b: string, t: string) => {
   cc(s, b).court = C.mustTongue(t).id;
   expect(C.naturalRival(!!s.nationalismSpread, s.holdsMany === cc(s, b).court)).toBe(true);
 });
@@ -260,10 +270,10 @@ Given(/^the event "([^"]+)" spreads the family "([^"]+)" into the Ethiopian high
 When("the event applies its spread", (s) => {
   for (const p of s.spread.provinces as C.ProvinceTongues[]) C.spreadFamily(p, s.spread.family, 1000, s.spread.region);
 });
-Then("the tongue {string} rises in each province of the Ethiopian highlands", (s, t: string) => {
+Then("the language {string} rises in each province of the Ethiopian highlands", (s, t: string) => {
   for (const p of s.spread.provinces as C.ProvinceTongues[]) expect(p.people[C.mustTongue(t).id] ?? 0).toBeGreaterThan(0);
 });
-Given(/^the province "([^"]+)" has the latin tongues "([^"]+)" (\d+) % and "([^"]+)" (\d+) %$/, (s, name: string, a: string, pa: string, b: string, pb: string) => {
+Given(/^the province "([^"]+)" has the latin languages "([^"]+)" (\d+) % and "([^"]+)" (\d+) %$/, (s, name: string, a: string, pa: string, b: string, pb: string) => {
   prov(s, name, mix(100000, [[a, Number(pa)], [b, Number(pb)]]));
   s.before = { ...prov(s, name).people };
 });
@@ -285,7 +295,7 @@ Given("{string} is over half of the people of {string}", (s, t: string) => {
   const rest = 100 - Object.values(s.people as Record<string, number>).reduce((a, b) => a + b, 0);
   s.people[C.mustTongue(t).id] = rest;
 });
-Given("the country {string} has the court tongue {string} at {int} % of its people", (s, name: string, t: string, pct: number) => {
+Given("the country {string} has the court language {string} at {int} % of its people", (s, name: string, t: string, pct: number) => {
   cc(s, name).court = C.mustTongue(t).id;
   s.people = { [C.mustTongue(t).id]: pct, occitan: 100 - pct };
   s.checks = C.newChecks();
@@ -319,27 +329,27 @@ function raiseNative(s: Scenario, name: string, majority: string, year: number):
     { name: "a Manchu banner lord", tongue: c.court },
     { name: "a Han lord", tongue: majority },
   ];
-  s.raised = { country: c.id, majority: C.mustTongue(majority).id, choices: ["Take their tongue", "Keep ours"], year } satisfies C.CourtGoesNative;
+  s.raised = { country: c.id, majority: C.mustTongue(majority).id, choices: ["Take their language", "Keep ours"], year } satisfies C.CourtGoesNative;
   s.courtBefore = c.court;
 }
-Given(/^the event "The court goes native" is raised for "([^"]+)" with the majority tongue "([^"]+)"$/, (s, name: string, t: string) => {
+Given(/^the event "The court goes native" is raised for "([^"]+)" with the majority language "([^"]+)"$/, (s, name: string, t: string) => {
   raiseNative(s, name, t, 1700);
 });
 Given(/^the event "The court goes native" is raised for "([^"]+)" in (\d+)$/, (s, name: string, year: string) => {
   raiseNative(s, name, "Han", Number(year));
 });
-When(/^"([^"]+)" chooses "(Take their tongue|Keep ours)"$/, (s, name: string, choice: "Take their tongue" | "Keep ours") => {
+When(/^"([^"]+)" chooses "(Take their language|Keep ours)"$/, (s, name: string, choice: "Take their language" | "Keep ours") => {
   s.answer = C.answerCourtGoesNative(cc(s, name), s.checks, s.raised, choice, s.lords);
   act(s);
 });
-Then(/^the court tongue of "([^"]+)" is "([^"]+)"$/, (s, name: string, t: string) => {
+Then(/^the court language of "([^"]+)" is "([^"]+)"$/, (s, name: string, t: string) => {
   expect(cc(s, name).court).toBe(C.mustTongue(t).id);
 });
-Then("lords of the tongue {string} waver a step", (s, t: string) => {
+Then("lords of the language {string} waver a step", (s, t: string) => {
   const of = (s.lords as { name: string; tongue: string }[]).filter((l) => l.tongue === C.mustTongue(t).id).map((l) => l.name);
   expect(s.answer.wavering).toEqual(of);
 });
-Then(/^the "([^"]+)" people become strangers to "([^"]+)"$/, (s, t: string, name: string) => {
+Then(/^the "([^"]+)" people become foreign to "([^"]+)"$/, (s, t: string, name: string) => {
   expect(C.relationTo(cc(s, name).court, t)).toBe("stranger");
 });
 Then("nothing changes", (s) => {
@@ -352,7 +362,7 @@ Then("the check for {string} runs again in {int}", (s, _n: string, year: number)
 Given(/^the province "([^"]+)" is the homeland of "([^"]+)" with nationalism ([\d.]+)$/, (s, name: string, t: string, n: string) => {
   prov(s, name, { [t]: 90000 }, { homelandOf: [C.mustTongue(t).id], nationalism: Number(n), yearsHeld: 50, governor: { kind: "official" } });
 });
-Then(/^the "([^"]+)" people of "([^"]+)" count as strangers to "([^"]+)"$/, (s, t: string, name: string, country: string) => {
+Then(/^the "([^"]+)" people of "([^"]+)" count as foreign to "([^"]+)"$/, (s, t: string, name: string, country: string) => {
   expect(C.relationTo(cc(s, country).court, t, prov(s, name).nationalism)).toBe("stranger");
 });
 Then(/^"([^"]+)" has the grievance "Foreign rule" if held by "([^"]+)"$/, (s, name: string, country: string) => {
@@ -373,7 +383,7 @@ When("the event {string} runs merge_tongues", (s, ev: string) => {
   s.mergeIds = m.ids;
   C.mergeTongues(m.ids, m.into, [p]);
 });
-Then(/^the tongues (.+) merge into "([^"]+)"$/, (s, list: string, into: string) => {
+Then(/^the languages (.+) merge into "([^"]+)"$/, (s, list: string, into: string) => {
   const named = [...list.matchAll(/"([^"]+)"/g)].map((x) => C.mustTongue(x[1]!).id);
   expect([...s.mergeIds].sort()).toEqual(named.sort());
   expect(prov(s, "a province").people).toEqual({ [C.mustTongue(into).id]: 1000 * named.length });
@@ -399,10 +409,10 @@ When(/^an event applies "([^"]+)" with (.+)$/, (s, verb: string, params: string)
   } else throw new Error(verb);
   act(s);
 });
-Then(/^the tongue "([^"]+)" rises in (\w+)$/, (s, t: string, name: string) => {
+Then(/^the language "([^"]+)" rises in (\w+)$/, (s, t: string, name: string) => {
   expect(prov(s, name).people[C.mustTongue(t).id]).toBeGreaterThan(s.before);
 });
-Then(/^the two tongues become "([^"]+)" in (\w+)$/, (s, t: string, name: string) => {
+Then(/^the two languages become "([^"]+)" in (\w+)$/, (s, t: string, name: string) => {
   expect(prov(s, name).people).toEqual({ [C.mustTongue(t).id]: 3000 });
 });
 Then(/^(\w+) people leave (\w+) as refugees and settle in (\w+)$/, (s, t: string, from: string, to: string) => {
@@ -427,7 +437,7 @@ Then(/^the trigger (.+) is true$/, (s, trig: string) => {
 
 // ---------------------------------------------------------------- drift
 
-Given("the country {string} has the court tongue {string} and the Tongue policy {string}", (s, name: string, t: string, policy: string) => {
+Given("the country {string} has the court language {string} and the Language policy {string}", (s, name: string, t: string, policy: string) => {
   const c = cc(s, name);
   c.court = C.mustTongue(t).id;
   c.policy = POLICY[policy]!;
@@ -454,7 +464,7 @@ function yearEnds(s: Scenario): void {
   act(s);
 }
 When("a year ends", (s) => yearEnds(s));
-Then("the pull tongue of {string} is {string}", (s, name: string, t: string) => {
+Then("the pull language of {string} is {string}", (s, name: string, t: string) => {
   expect(s.drift[name].pull).toBe(C.mustTongue(t).id);
 });
 function moved(s: Scenario, t: string, name: string): { share: number; n: number } {
@@ -493,22 +503,22 @@ Given(/^the province "([^"]+)" is mostly (\w+)$/, (s, name: string, t: string) =
 Given("the province {string} has been held {int} years", (s, name: string, years: number) => {
   prov(s, name).yearsHeld = years;
 });
-Given(/^the province "([^"]+)" is governed by (?:a royal official|a lord of the tongue (\w+))$/, (s, name: string, lord?: string) => {
+Given(/^the province "([^"]+)" is governed by (?:a royal official|a lord of the language (\w+))$/, (s, name: string, lord?: string) => {
   prov(s, name).governor = lord ? { kind: "lord", tongue: C.mustTongue(lord).id } : { kind: "official" };
 });
 const DRIFTERS: Record<string, Partial<C.DriftCase> & { drifting: string }> = {
   "Flemish farmers with no other condition, under Teach": { drifting: "Flemish", policy: "teach" },
   "Flemish craftsmen in the town": { drifting: "Flemish", townClass: true },
-  "Occitan farmers (cousins)": { drifting: "Occitan" },
+  "Occitan farmers (related)": { drifting: "Occitan" },
   "Flemish farmers, under Let be": { drifting: "Flemish", policy: "let_be" },
   "Flemish farmers, under Impose": { drifting: "Flemish", policy: "impose" },
   "Breton farmers in the Breton homeland": { drifting: "Breton", homeland: true },
-  "farmers of a herding tongue on the steppe": { drifting: "Fulbe", ground: "grassland" },
+  "farmers of a herding language on the steppe": { drifting: "Fulbe", ground: "grassland" },
   "Jewish farmers (a trading people)": { drifting: "Jewish" },
   "Breton farmers where Breton nationalism is 0.3": { drifting: "Breton", nationalism: 0.3 },
   "Flemish farmers, the country has printing and railways": { drifting: "Flemish", inventions: ["printing", "railways"] },
 };
-Given("a province whose pull tongue is {string}", (s, t: string) => {
+Given("a province whose pull language is {string}", (s, t: string) => {
   s.pull = t;
 });
 Given(/^the drifting people are (.+)$/, (s, who: string) => {
@@ -520,10 +530,10 @@ Given(/^the drifting people are (.+)$/, (s, who: string) => {
 Then(/^their drift rate is the base 0\.5 % times ([\d.]+)$/, (s, m: string) => {
   expect(C.driftRate(s.case) / C.cultureConfig.drift.base_rate_per_year).toBeCloseTo(Number(m), 6);
 });
-Given(/^the province "([^"]+)" has an "Own tongue" charter for "([^"]+)"$/, (s, name: string, t: string) => {
+Given(/^the province "([^"]+)" has an "Own language" charter for "([^"]+)"$/, (s, name: string, t: string) => {
   prov(s, name, { [t]: 90000, French: 10000 }, { ownTongueCharter: C.mustTongue(t).id });
 });
-Given(/^the pull tongue of "([^"]+)" would be "([^"]+)"$/, (s, name: string, t: string) => {
+Given(/^the pull language of "([^"]+)" would be "([^"]+)"$/, (s, name: string, t: string) => {
   const p = prov(s, name);
   p.yearsHeld = 50;
   p.governor = { kind: "official" };
@@ -533,7 +543,7 @@ Then(/^no (\w+) people of "([^"]+)" become (\w+)$/, (s, t: string, name: string,
   expect(s.drift[name].pull).toBe(C.mustTongue(to).id);
   expect(s.drift[name].moved[C.mustTongue(t).id] ?? 0).toBe(0);
 });
-Given("the province {string} has been held {int} years and its majority tongue is {string}", (s, name: string, years: number, t: string) => {
+Given("the province {string} has been held {int} years and its majority language is {string}", (s, name: string, years: number, t: string) => {
   prov(s, name, { [t]: 90000 }, { yearsHeld: years });
   (s.owner ??= {})[name] = "England";
 });
@@ -552,7 +562,7 @@ Given(/^the province "([^"]+)" has ([\d.]+) % (\w+) people after drift$/, (s, na
 When("the year's drift is finished", (s) => {
   for (const p of Object.values(s.p as Record<string, C.ProvinceTongues>)) C.dropSmallTongues(p);
 });
-Then("the tongue {string} is no longer in {string}", (s, t: string, name: string) => {
+Then("the language {string} is no longer in {string}", (s, t: string, name: string) => {
   expect(prov(s, name).people[C.mustTongue(t).id]).toBeUndefined();
 });
 When(/^(settlers from Castile|Andalusi refugees|homeless Galicians drifting next door|soldiers coming home to Galicia) arrive in the province "([^"]+)"$/, (s, who: string, name: string) => {
@@ -578,7 +588,7 @@ Then(/^they add (\w+) people to (\w+), an own province with free tiles$/, (s, t:
   expect(prov(s, name).people[C.mustTongue(t).id]).toBe(51000);
   expect(C.arrive(prov(s, name), "settlers", t, 1, { ownProvince: true, freeTiles: false })).toBe(false);
 });
-Then(/^they count in the Tongue mix of (\w+) after (\d+) years$/, (s, name: string, years: string) => {
+Then(/^they count in the Language mix of (\w+) after (\d+) years$/, (s, name: string, years: string) => {
   const p = prov(s, name);
   for (let y = 1; y <= Number(years); y++) {
     expect(p.people["andalusi_arabic"]).toBeUndefined();
@@ -589,16 +599,16 @@ Then(/^they count in the Tongue mix of (\w+) after (\d+) years$/, (s, name: stri
 Then(/^they add (\w+) people to (\w+)$/, (s, t: string, name: string) => {
   expect(prov(s, name).people[C.mustTongue(t).id]).toBe(1000);
 });
-Then(/^they rejoin the (\w+) tongue$/, (s, t: string) => {
+Then(/^they rejoin the (\w+) language$/, (s, t: string) => {
   expect(prov(s, s.dest).people[C.mustTongue(t).id]).toBe(51000);
 });
 
 // ---------------------------------------------------------------- Tongue policy and charters
 
-Given("the country {string} has the Tongue policy {string}", (s, name: string, policy: string) => {
+Given("the country {string} has the Language policy {string}", (s, name: string, policy: string) => {
   cc(s, name).policy = POLICY[policy]!;
 });
-Then(/^drift toward the court tongue in "([^"]+)" is multiplied by ([\d.]+)$/, (s, where: string, m: string) => {
+Then(/^drift toward the court language in "([^"]+)" is multiplied by ([\d.]+)$/, (s, where: string, m: string) => {
   const isCountry = s.cc?.[where] !== undefined;
   const c = isCountry ? cc(s, where) : cc(s, s.main);
   expect(C.policyDriftMultiplier(C.policyIn(c, isCountry ? undefined : where))).toBeCloseTo(Number(m));
@@ -606,13 +616,13 @@ Then(/^drift toward the court tongue in "([^"]+)" is multiplied by ([\d.]+)$/, (
 Given("a new campaign starts", (s) => {
   cc(s, "France");
 });
-Then("the Tongue policy of {string} is {string}", (s, name: string, policy: string) => {
+Then("the Language policy of {string} is {string}", (s, name: string, policy: string) => {
   expect(cc(s, name).policy).toBe(POLICY[policy]);
 });
-When("the player sets the Tongue policy of the province {string} to {string}", (s, name: string, policy: string) => {
+When("the player sets the Language policy of the province {string} to {string}", (s, name: string, policy: string) => {
   expect(C.setTonguePolicy(cc(s, s.main), POLICY[policy]!, name)).toBe(true);
 });
-Then("the realm-wide Tongue policy of {string} is still {string}", (s, name: string, policy: string) => {
+Then("the realm-wide Language policy of {string} is still {string}", (s, name: string, policy: string) => {
   expect(cc(s, name).policy).toBe(POLICY[policy]);
 });
 When("upkeep is paid", (s) => {
@@ -621,7 +631,7 @@ When("upkeep is paid", (s) => {
 Then("the school in {string} costs {int} % more upkeep", (s, _n: string, pct: number) => {
   expect((s.upkeep - 1) * 100).toBeCloseTo(pct);
 });
-Given(/^the province "([^"]+)" is mostly (.+?) \((cousins|strangers)\)$/, (s, name: string, t: string) => {
+Given(/^the province "([^"]+)" is mostly (.+?) \((related|foreign)\)$/, (s, name: string, t: string) => {
   prov(s, name, { [t]: 90000, [cc(s, s.main ?? "France").court]: 10000 });
 });
 When("nationalism in {string} reaches {float}", (s, name: string, n: number) => {
@@ -631,7 +641,7 @@ When("nationalism in {string} reaches {float}", (s, name: string, n: number) => 
 Given(/^the country "([^"]+)" (has|does not have) the invention "Printing"$/, (s, name: string, has: string) => {
   if (has === "has") cc(s, name).inventions.push("printing");
 });
-When("the country {string} sets the Tongue policy {string}", (s, name: string, policy: string) => {
+When("the country {string} sets the Language policy {string}", (s, name: string, policy: string) => {
   s.set = C.setTonguePolicy(cc(s, name), POLICY[policy]!);
   act(s);
 });
@@ -650,15 +660,15 @@ Given(/^the province "([^"]+)" (has|does not have) the grievance "([^"]+)"$/, (s
   if (has === "has") expect(p.grievances).toContain(g);
   else expect(p.grievances).not.toContain(g);
 });
-When(/^the Tongue policy becomes "([^"]+)"$/, (s, policy: string) => {
+When(/^the Language policy becomes "([^"]+)"$/, (s, policy: string) => {
   expect(C.setTonguePolicy(cc(s, s.main), POLICY[policy]!)).toBe(true);
   act(s);
 });
-When(/^an "Own tongue" charter is granted in "([^"]+)"$/, (s, name: string) => {
+When(/^an "Own language" charter is granted in "([^"]+)"$/, (s, name: string) => {
   C.grantOwnTongue(prov(s, name), owner(s, name));
   act(s);
 });
-When(/^the majority of "([^"]+)" becomes kin$/, (s, name: string) => {
+When(/^the majority of "([^"]+)" comes to speak the court language$/, (s, name: string) => {
   const p = prov(s, name);
   p.people[owner(s, name).court] = 2 * C.totalPeople(p);
   act(s);
@@ -670,7 +680,7 @@ Given(/^the province "([^"]+)" is mostly (\w+) with the grievances "([^"]+)" and
   C.updateGrievances(p, c);
   expect(p.grievances).toEqual(expect.arrayContaining([a, b]));
 });
-When(/^the lords of "([^"]+)" demand an "Own tongue" charter and it is granted$/, (s, name: string) => {
+When(/^the lords of "([^"]+)" demand an "Own language" charter and it is granted$/, (s, name: string) => {
   expect(C.charterBroughtBy()).toContain("its lords");
   C.grantOwnTongue(prov(s, name), owner(s, name));
   act(s);
@@ -687,7 +697,7 @@ Then("drift toward {string} stops in {string}", (s, t: string, name: string) => 
   expect(r.pull).toBe(C.mustTongue(t).id);
   expect(r.moved[local]).toBe(0);
 });
-Then("officials in {string} must be of the tongue {string}", (s, name: string, t: string) => {
+Then("officials in {string} must be of the language {string}", (s, name: string, t: string) => {
   expect(C.officialTongueRequired(prov(s, name))).toBe(C.mustTongue(t).id);
 });
 const BRINGERS: Record<string, string> = {
@@ -700,12 +710,12 @@ When(/^(the ruler grants it|its lords demand it|its towns demand it|a homeland r
   s.bringer = BRINGERS[who];
   prov(s, name, { Basque: 90000, French: 10000 });
 });
-Then(/^an "Own tongue" charter can be granted in "([^"]+)"$/, (s, name: string) => {
+Then(/^an "Own language" charter can be granted in "([^"]+)"$/, (s, name: string) => {
   expect(C.charterBroughtBy()).toContain(s.bringer);
   C.grantOwnTongue(prov(s, name), owner(s, name));
   expect(prov(s, name).ownTongueCharter).toBe("basque");
 });
-Given(/^the province "([^"]+)" has an "Own tongue" charter$/, (s, name: string) => {
+Given(/^the province "([^"]+)" has an "Own language" charter$/, (s, name: string) => {
   prov(s, name, { Basque: 90000, French: 10000 }, { ownTongueCharter: "basque", homelandOf: ["basque"] });
 });
 When("the country {string} revokes it", (s, name: string) => {
@@ -718,40 +728,40 @@ Given(/^the province "([^"]+)" is the (\w+) homeland held by "([^"]+)"$/, (s, na
   (s.owner ??= {})[name] = holder;
   cc(s, holder);
 });
-When(/^the duke of \w+, of the tongue "([^"]+)", holds "([^"]+)" as a lord of "([^"]+)"$/, (s, t: string, name: string) => {
+When(/^the duke of \w+, of the language "([^"]+)", holds "([^"]+)" as a lord of "([^"]+)"$/, (s, t: string, name: string) => {
   prov(s, name).governor = { kind: "lord", tongue: C.mustTongue(t).id };
   act(s);
 });
-Given("the house {string} is of the tongue {string}", (s, house: string, t: string) => {
+Given("the house {string} is of the language {string}", (s, house: string, t: string) => {
   s.house = { house, tongue: t };
 });
 When("the ruler of {string} marries into the house {string}", (s, name: string, house: string) => {
   cc(s, name).marriedHouses.push(house);
 });
-Then("the lords of the house {string} count as kin for loyalty", (s, house: string) => {
+Then("the lords of the house {string} count as the same language for loyalty", (s, house: string) => {
   expect(C.lordCountsAsKin(cc(s, s.main), { tongue: s.house.tongue, house })).toBe(true);
   expect(C.lordCountsAsKin(cc(s, s.main), { tongue: s.house.tongue, house: "another house" })).toBe(false);
 });
 
 // ---------------------------------------------------------------- tongues and relations
 
-Given("the tongue {string} is in config", (s, t: string) => {
+Given("the language {string} is in config", (s, t: string) => {
   expect(C.tongue(t)).toBeDefined();
 });
-Then("the tongue {string} belongs to the family {string}", (s, t: string, f: string) => {
+Then("the language {string} belongs to the family {string}", (s, t: string, f: string) => {
   expect(C.familyOf(t)).toBe(f);
   expect(C.families()).toContain(f);
 });
 Given("the catalogue culture string {string}", (s, str: string) => {
   (s.strings ??= []).push(str);
 });
-Given("the catalogue culture string {string} matches no tongue", (s, str: string) => {
+Given("the catalogue culture string {string} matches no language", (s, str: string) => {
   (s.strings ??= []).push(str);
 });
-When("the catalogue strings are mapped to tongues", (s) => {
+When("the catalogue strings are mapped to languages", (s) => {
   s.mapped = C.mapCatalogueStrings(s.strings ?? []);
 });
-Then("the string maps to the tongue {string}", (s, t: string) => {
+Then("the string maps to the language {string}", (s, t: string) => {
   expect(s.mapped.tongueOf[s.strings[0]]).toBe(C.mustTongue(t).id);
 });
 Then("the tooltip shows the local name {string}", (s, name: string) => {
@@ -760,7 +770,7 @@ Then("the tooltip shows the local name {string}", (s, name: string) => {
 Then("the string {string} is on the review list", (s, str: string) => {
   expect(s.mapped.review).toContain(str);
 });
-Then("the tongues {string} and {string} are different tongues", (s, a: string, b: string) => {
+Then("the languages {string} and {string} are different languages", (s, a: string, b: string) => {
   expect(C.mustTongue(a).id).not.toBe(C.mustTongue(b).id);
 });
 When("the player opens the country card of {string}", (s, name: string) => {
@@ -769,18 +779,18 @@ When("the player opens the country card of {string}", (s, name: string) => {
 Then("there is no culture meter, no cultural power and no list of accepted cultures", (s) => {
   expect(Object.keys(s.card).sort()).toEqual(["percent", "tongue"]);
 });
-When(/^a dynasty of the tongue "([^"]+)" takes the throne of "([^"]+)" by (conquest|inheritance|marriage|a lord's revolt)$/, (s, t: string, name: string) => {
+When(/^a dynasty of the language "([^"]+)" takes the throne of "([^"]+)" by (conquest|inheritance|marriage|a lord's revolt)$/, (s, t: string, name: string) => {
   s.changed = C.setCourtTongue(cc(s, name), t);
 });
-Then(/^people of the tongue "([^"]+)" are (\w+) to "([^"]+)"$/, (s, t: string, rel: string, name: string) => {
+Then(/^the relation of the language "([^"]+)" to "([^"]+)" is "([^"]+)"$/, (s, t: string, name: string, word: string) => {
   s.lastRel = C.relationTo(cc(s, name).court, t);
-  expect(s.lastRel).toBe(rel);
+  expect(s.lastRel).toBe(relationOf(word));
 });
 Then("the music palette of {string} changes from the next track", (s, name: string) => {
   expect(s.changed?.country).toBe(cc(s, name).id);
   expect(s.changed?.musicPaletteFromNextTrack).toBe(true);
 });
-Then(/^they count ([\d.]+) toward the Tongue % of "([^"]+)"$/, (s, w: string) => {
+Then(/^they count ([\d.]+) toward the Language % of "([^"]+)"$/, (s, w: string) => {
   expect(C.tongueShareWeight(s.lastRel)).toBeCloseTo(Number(w));
 });
 Given(/^the realm of "([^"]+)" holds (.*million.*) people$/, (s, name: string, list: string) => {
@@ -788,7 +798,7 @@ Given(/^the realm of "([^"]+)" holds (.*million.*) people$/, (s, name: string, l
   s.realmPeople = {};
   for (const m of list.matchAll(/([\d.]+) million (\w+)/g)) s.realmPeople[C.mustTongue(m[2]!).id] = Number(m[1]) * 1e6;
 });
-Then("the Tongue % of {string} is {int}", (s, _n: string, pct: number) => {
+Then("the Language % of {string} is {int}", (s, _n: string, pct: number) => {
   expect(s.card.percent).toBe(pct);
 });
 When("grievances are worked out", (s) => {
@@ -809,7 +819,7 @@ Then(/^"([^"]+)" has a (\w+) dot and "([^"]+)" a (\w+) dot$/, (s, a: string, ca:
   expect(s.line.dots[a]).toBe(ca);
   expect(s.line.dots[b]).toBe(cb);
 });
-When("the player taps the Tongue line", (s) => {
+When("the player taps the Language line", (s) => {
   s.explain = C.driftExplanation(prov(s, s.looking), owner(s, s.looking));
 });
 Then(/^it shows this year's drift, that it pulls toward "([^"]+)", and why$/, (s, t: string) => {
@@ -818,9 +828,9 @@ Then(/^it shows this year's drift, that it pulls toward "([^"]+)", and why$/, (s
   expect(s.explain.groups.length).toBeGreaterThan(0);
   for (const g of s.explain.groups) expect(g.rate).toBeGreaterThan(0);
 });
-When("a tongue of the realm is shown on the province card", () => {});
-Then(/^a tongue that is (kin|cousin|stranger|trading people) shows a (\w+) dot$/, (s, rel: string, colour: string) => {
-  expect(C.dotColour(rel === "trading people" ? "trading" : (rel as C.Relation))).toBe(colour);
+When("a language of the realm is shown on the province card", () => {});
+Then(/^a language that is (same language|related|foreign|trading people) shows a (\w+) dot$/, (s, word: string, colour: string) => {
+  expect(C.dotColour(relationOf(word))).toBe(colour);
 });
 /** The realm of France as the design's Peoples screen shows it (culture §7.2). */
 const FRANCE_PEOPLES: C.PeoplesRowInput[] = [
@@ -837,25 +847,27 @@ Given(/^the realm of "([^"]+)" holds ((?:(?!million).)*) people$/, (s, name: str
   s.peoples = FRANCE_PEOPLES.filter((r) => named.includes(r.tongue));
   expect(s.peoples.length).toBe(named.length);
 });
-When("the player taps the Tongue line of the country card of {string}", (s, name: string) => {
+When("the player taps the Language line of the country card of {string}", (s, name: string) => {
   s.screen = C.peoplesScreen(cc(s, name), s.peoples);
 });
-Then("the Peoples screen opens with the Tongue policy {string}", (s, policy: string) => {
+Then("the Peoples screen opens with the Language policy {string}", (s, policy: string) => {
   expect(s.screen.policy).toBe(POLICY[policy]);
 });
 Then("it lists, largest first:", (s, table: Table) => {
   const [head, ...rows] = table;
-  const got = (s.screen.rows as C.PeoplesRow[]).map((r) => head!.map((h) => String(r[h as keyof C.PeoplesRow] ?? "")));
+  const field = (h: string) => (h === "language" ? "tongue" : h) as keyof C.PeoplesRow;
+  const say = (h: string, v: unknown) => (h === "relation" ? (RELATION_SAID[v as C.Relation] ?? v) : v);
+  const got = (s.screen.rows as C.PeoplesRow[]).map((r) => head!.map((h) => String(say(h, r[field(h)]) ?? "")));
   expect(got).toEqual(rows);
 });
-Given(/^the realm of "([^"]+)" holds (\d+) tongues in (\d+) families$/, (s, _n: string, t: string, f: string) => {
+Given(/^the realm of "([^"]+)" holds (\d+) languages in (\d+) families$/, (s, _n: string, t: string, f: string) => {
   s.rows = Array.from({ length: Number(t) }, (_, i) => ({ tongue: `tongue ${i + 1}`, family: `family ${(i % Number(f)) + 1}` }));
   s.families = Number(f);
 });
 When("the player opens the Peoples screen", (s) => {
   s.groups = C.foldByFamily(s.rows);
 });
-Then("the tongues are grouped by family, folded shut", (s) => {
+Then("the languages are grouped by family, folded shut", (s) => {
   expect(s.groups.length).toBe(s.families);
   expect(s.groups.every((g: { folded: boolean }) => g.folded)).toBe(true);
   expect(s.groups.reduce((n: number, g: { rows: unknown[] }) => n + g.rows.length, 0)).toBe(s.rows.length);
@@ -878,7 +890,7 @@ When("the player long-presses the row {string}", (s, t: string) => {
 Then(/^it shows the (\w+) lords, officials and any rising$/, (s) => {
   expect(s.detail).toEqual({ lords: ["the Duke of Rohan"], officials: ["the bailiff of Rennes"], risings: [] });
 });
-Given("the Tongue lens is on", () => {});
+Given("the Language lens is on", () => {});
 When(/^the map is at (far zoom|regional zoom|any zoom with the realm toggle on)$/, (s, zoom: string) => {
   s.colouring = zoom === "far zoom" ? C.lensColouring("far") : zoom === "regional zoom" ? C.lensColouring("regional") : C.lensColouring("far", true);
 });
@@ -899,30 +911,30 @@ function regionId(name: string): string {
   if (!r) throw new Error(`unknown region ${name}`);
   return r.id;
 }
-Given(/^settlers of the tongue "([^"]+)" have been the majority for (\d+) years in the map region "([^"]+)"$/, (s, t: string, years: string, region: string) => {
+Given(/^settlers of the language "([^"]+)" have been the majority for (\d+) years in the map region "([^"]+)"$/, (s, t: string, years: string, region: string) => {
   s.abroad = { tongue: t, years: Number(years), region: regionId(region), courtRegion: "", province: prov(s, region, { [t]: 90000 }) };
 });
 Given(/^the court of "([^"]+)" sits in the map region "([^"]+)"$/, (s, name: string, region: string) => {
   s.abroad.courtRegion = regionId(region);
   cc(s, name).court = C.mustTongue(s.abroad.tongue).id;
 });
-Then(/^the tongue "([^"]+)" in "([^"]+)" becomes "([^"]+)" of the family "([^"]+)"$/, (s, t: string, region: string, to: string, fam: string) => {
+Then(/^the language "([^"]+)" in "([^"]+)" becomes "([^"]+)" of the family "([^"]+)"$/, (s, t: string, region: string, to: string, fam: string) => {
   const p = prov(s, region);
   expect(p.people[C.mustTongue(t).id]).toBeUndefined();
   expect(p.people[C.mustTongue(to).id]).toBe(90000);
   expect(C.familyOf(to)).toBe(fam);
 });
-Then(/^"([^"]+)" people are cousins to "([^"]+)" and get no "Foreign rule" at once$/, (s, t: string, name: string) => {
+Then(/^"([^"]+)" people are related to "([^"]+)" and get no "Foreign rule" at once$/, (s, t: string, name: string) => {
   const c = cc(s, name);
   expect(C.relationTo(c.court, t)).toBe("cousin");
   const p = C.newProvinceTongues("abroad", { [t]: 1000 }, { homelandOf: [C.mustTongue(t).id] });
   expect(C.hasForeignRule(p, c)).toBe(false);
 });
-Then(/^the tongue "([^"]+)" in "([^"]+)" stays "([^"]+)"$/, (s, t: string, region: string) => {
+Then(/^the language "([^"]+)" in "([^"]+)" stays "([^"]+)"$/, (s, t: string, region: string) => {
   expect(prov(s, region).people[C.mustTongue(t).id]).toBe(90000);
 });
 
-Given(/^the country "([^"]+)" has the court tongue "([^"]+)" and the Tongue policy "Impose" for (\d+) years$/, (s, name: string, t: string, years: string) => {
+Given(/^the country "([^"]+)" has the court language "([^"]+)" and the Language policy "Impose" for (\d+) years$/, (s, name: string, t: string, years: string) => {
   const c = cc(s, name);
   c.court = C.mustTongue(t).id;
   c.policy = "impose";
@@ -944,23 +956,23 @@ Then(/^"([^"]+)" and "([^"]+)" (merge into "[^"]+"|stay apart)$/, (s, a: string,
   if (into) for (const p of ps) expect(p.people[C.mustTongue(into).id]).toBe(100000);
 });
 
-Given(/^the province "([^"]+)" is Breton with "Foreign rule" and "Banned tongue"$/, (s, name: string) => {
+Given(/^the province "([^"]+)" is Breton with "Foreign rule" and "Banned language"$/, (s, name: string) => {
   const c = cc(s, "France");
   c.policy = "impose";
   const p = prov(s, name, { Breton: 90000, French: 10000 }, { homelandOf: ["breton"], yearsHeld: 100, governor: { kind: "official", tongue: "french" } });
-  expect(C.updateGrievances(p, c)).toEqual(["Foreign rule", "Banned tongue"]);
+  expect(C.updateGrievances(p, c)).toEqual(["Foreign rule", "Banned language"]);
 });
 When(/^a (?!Schoolmaster)(\w+) official serves in "([^"]+)"$/, (s, t: string, name: string) => {
   prov(s, name).governor = { kind: "official", tongue: C.mustTongue(t).id };
   act(s);
 });
 
-Given(/^a province of "([^"]+)" whose majority is (kin|cousin|stranger)$/, (s, name: string, rel: string) => {
-  const t = { kin: "French", cousin: "Occitan", stranger: "Breton" }[rel]!;
+Given(/^a province of "([^"]+)" whose majority is (same language|related|foreign)$/, (s, name: string, word: string) => {
+  const t = { kin: "French", cousin: "Occitan", stranger: "Breton", trading: "Jewish" }[relationOf(word)];
   s.capProvince = prov(s, "the province", { [t]: 90000, French: 10000 });
   cc(s, name);
 });
-Then(/^its tongue adds nothing to the officials cap or the lords cap of "([^"]+)"$/, () => {
+Then(/^its language adds nothing to the officials cap or the lords cap of "([^"]+)"$/, () => {
   expect((C.cultureConfig.officials as Record<string, unknown>).capacity_weight).toBeUndefined();
 });
 Then(/^an official sent there from the court needs (\d+) years to reach full effect$/, (s, years: string) => {
@@ -968,13 +980,13 @@ Then(/^an official sent there from the court needs (\d+) years to reach full eff
   expect(C.officialYearsToFullEffect(c, c.court, C.majorityTongue(s.capProvince))).toBe(Number(years));
 });
 
-When(/^a lord of the tongue "([^"]+)" is weighed for loyalty$/, (s, t: string) => {
+When(/^a lord of the language "([^"]+)" is weighed for loyalty$/, (s, t: string) => {
   s.lordLoyalty = C.lordTongueLoyalty(cc(s, s.main), { tongue: t });
 });
-Then(/^his loyalty has the rising cause "shares your tongue"$/, (s) => {
+Then(/^his loyalty has the rising cause "shares your language"$/, (s) => {
   expect(s.lordLoyalty).toEqual({ sharesTongue: true, startSteps: 0 });
 });
-Then("his loyalty is not changed by tongue", (s) => {
+Then("his loyalty is not changed by language", (s) => {
   expect(s.lordLoyalty).toEqual({ sharesTongue: false, startSteps: 0 });
 });
 Then("his loyalty starts one step lower", (s) => {
@@ -1022,12 +1034,12 @@ When(/^(\w+) people as many as (\d+) % of "([^"]+)" arrive there$/, (s, t: strin
   C.arrive(p, "migrants", t, (C.totalPeople(p) * Number(pct)) / 100);
   s.arrived = { tongue: C.mustTongue(t).id, n: (100000 * Number(pct)) / 100 };
 });
-Then(/^the tongue "([^"]+)" (is|is not) among the top three of "([^"]+)"$/, (s, t: string, is: string, name: string) => {
+Then(/^the language "([^"]+)" (is|is not) among the top three of "([^"]+)"$/, (s, t: string, is: string, name: string) => {
   const p = prov(s, name);
   expect(Object.keys(p.people).length).toBeLessThanOrEqual(3);
   expect(p.people[C.mustTongue(t).id] !== undefined).toBe(is === "is");
 });
-Then(/^the (\w+) people join the majority tongue "([^"]+)"$/, (s, t: string, major: string) => {
+Then(/^the (\w+) people join the majority language "([^"]+)"$/, (s, t: string, major: string) => {
   const id = C.mustTongue(t).id;
   const n = id === s.arrived.tongue ? s.arrived.n : s.before[id];
   expect(prov(s, "Riga").people[C.mustTongue(major).id]).toBeCloseTo(s.before[C.mustTongue(major).id] + n);
@@ -1036,29 +1048,29 @@ Then(/^the (\w+) people join the majority tongue "([^"]+)"$/, (s, t: string, maj
 Given(/^a province whose ground is "([^"]+)" and which (touches|does not touch) the sea$/, (s, ground: string, coast: string) => {
   s.land = { ground: ground as Ground, coastal: coast === "touches" };
 });
-Then(/^a (herding|forest|seafaring) tongue there (lives|does not live) in its own kind of land$/, (s, way: C.WayOfLife, out: string) => {
+Then(/^a (herding|forest|seafaring) language there (lives|does not live) in its own kind of land$/, (s, way: C.WayOfLife, out: string) => {
   expect(C.livesInOwnLand(way, s.land.ground, s.land.coastal)).toBe(out === "lives");
   const t = ({ herding: "Fulbe", forest: "Lithuanian", seafaring: "Breton" } as Record<string, string>)[way] ?? "Fulbe";
   expect(C.mustTongue(t).way_of_life).toBe(way);
   const names = C.driftMultipliers({ pull: "French", drifting: t, ...s.land }).map((m) => m.name);
   expect(names.includes("way of life in its own land")).toBe(out === "lives");
 });
-Then(/^the school in "([^"]+)" counts for (no tongue's drift|the tongue "[^"]+")$/, (s, name: string, w: string) => {
+Then(/^the school in "([^"]+)" counts for (no language's drift|the language "[^"]+")$/, (s, name: string, w: string) => {
   const t = /"([^"]+)"/.exec(w)?.[1];
   const school = prov(s, name).schools[0]!;
   expect(C.schoolTongue(school)).toBe(t ? C.mustTongue(t).id : null);
 });
 
-Given(/^the province "([^"]+)" is mostly (\w+) \((cousins|strangers)\) with nationalism ([\d.]+)$/, (s, name: string, t: string, _r: string, n: string) => {
+Given(/^the province "([^"]+)" is mostly (\w+) \((related|foreign)\) with nationalism ([\d.]+)$/, (s, name: string, t: string, _r: string, n: string) => {
   prov(s, name, { [t]: 90000, [cc(s, s.main ?? "France").court]: 10000 }, { nationalism: Number(n) });
 });
-Given(/^the country "([^"]+)" has the court tongue "([^"]+)" and the chancery tradition$/, (s, name: string, t: string) => {
+Given(/^the country "([^"]+)" has the court language "([^"]+)" and the chancery tradition$/, (s, name: string, t: string) => {
   const c = cc(s, name);
   c.court = C.mustTongue(t).id;
   expect(C.hasChanceryTradition(c.id)).toBe(true);
   s.policyBefore = c.policy;
 });
-Given(/^the lord "([^"]+)" is of the tongue "([^"]+)"$/, (s, name: string, t: string) => {
+Given(/^the lord "([^"]+)" is of the language "([^"]+)"$/, (s, name: string, t: string) => {
   (s.lordsList ??= []).push({ name, tongue: C.mustTongue(t).id });
 });
 Then(/^the lord "([^"]+)" wavers one step$/, (s, name: string) => {
@@ -1093,7 +1105,7 @@ Then(/^the "([^"]+)" people of "([^"]+)" give no "Foreign rule" grievance$/, (s,
   p.homelandOf = [C.mustTongue(t).id];
   expect(C.updateGrievances(p, owner(s, name))).not.toContain("Foreign rule");
 });
-Then("they count as neither kin nor stranger for grievances", (s) => {
+Then("they count as neither the same language nor foreign for grievances", (s) => {
   s.lastRel = C.relationTo(cc(s, s.main).court, s.community);
   expect(s.lastRel).toBe("trading");
 });

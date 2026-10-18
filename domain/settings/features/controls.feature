@@ -204,7 +204,7 @@ Feature: Controls
       | map         | Y                  | the info card for what's under the cursor |
       | map         | LB                 | the previous army                       |
       | map         | RB                 | the next army                           |
-      | map         | d-pad up           | cycle map lenses                        |
+      | map         | d-pad up           | cycle map modes                         |
       | map         | d-pad right        | the next notification                   |
       | map         | View               | the turn report                         |
       | map         | View held 0.5 s    | End turn                                |

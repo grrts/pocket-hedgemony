@@ -29,9 +29,9 @@ block, `revolution`; the struggle is a tagged rising in the rebellions system.
 - Government forms and their caps: **government**.
 - The diplomatic action "fund a revolution / fund rebels", opinion reasons and war reasons: **diplomacy**.
 - Settler colonies turning Disloyal, `release`, `change_subject_kind`: **subjects**.
-- Faith waves and the church events after a revolution: **religion**. Nationalism and court tongue: **culture**.
+- Faith waves and the church events after a revolution: **religion**. Nationalism and court language: **culture**.
 - Generals growing too big (warfare 4.6): **warfare**.
-- Legacies and burdens: **national-strengths** (hook only).
+- Legacies and weaknesses: **national-strengths** (hook only).
 
 ## 2. Sources
 
@@ -241,7 +241,7 @@ Newest decision first.
 ### 5.7 Regimes
 
 - REVO-039 When a `regime {on, id}` effect applies, the game shall apply the regime's package: form, ruler,
-  lords, church, faith, tongue, levy, land, towns, trade, research, decrees, locks, grievances to end and add,
+  lords, church, faith, language, levy, land, towns, trade, research, decrees, locks, grievances to end and add,
   flags to set and clear. [revolutions §6, §11; regimes.yaml]
 - REVO-040 The game shall set the regime's form from the government forms; `keep` leaves the form as it is;
   `old_form` restores the form saved before the last revolutionary regime. [revolutions §6; regimes.yaml]
@@ -382,7 +382,7 @@ Newest decision first.
 - REVO-090 Where: the top bar's **Stability** plaque carries a mark while the player's card is amber (a revolution brewing) or red (it may break out any month); its label lists the lit signs, and tapping it opens the General tab, where the **Revolution** block sits under the four pillars: the family and its idea, a bar of lit signs against `need`, the signs lit first, each with how to ease it and the tab that eases it as a button, the spark, the monthly chance when Ready, "Stopped, not solved" with the year the grace ends, and a fold "What happens if it breaks out" with the three stances and the regime each leads to. When nothing is lit the block is one quiet line. [X-19, REVO-001 … REVO-006, REVO-078]
 - REVO-091 When the player's revolution breaks out, a **full-screen choice card** covers the map: the revolution's name and idea, the signs that lit it, and the three stances as 44-point buttons, each with its consequences (form, ruler, laws locked, or what Bend gives up and that it can come back; Fight with the men it would raise). It cannot be folded away or skipped: End turn waits on it, like an unanswered event. The result of the struggle comes as an alert over the map with Go there. [X-19, REVO-007, REVO-018]
 - REVO-092 The **Government** tab shows the regime under the form: its name and loop line, since when, the ruler (the house of 1444, a new ruler from the rising with the old house abroad, or elected), the form before the revolution, and its locks greyed out with "Locked by the revolution"; the locked buttons elsewhere (crushing tax, grant or seize a fief, hire a company, Massacre) say the same. [X-19, REVO-077]
-- REVO-093 Another realm's revolution breaking out or ending shows a **news line** in Dispatches for the player's neighbours (a shared border), naming the realm, the stance or result and its new form; it opens that realm's card. Phone: the Revolution block and the regime card fit the side panel in the Wide and Tall layouts with nothing sideways-scrolling; the choice card fills the safe area in landscape and portrait, its buttons stack in one column on a narrow screen, at least 44 points high, and nothing needs hover. [X-19, REVO-075, SHELL-108, SHELL-109]
+- REVO-093 Another realm's revolution breaking out or ending shows a **news line** in the News for the player's neighbours (a shared border), naming the realm, the stance or result and its new form; it opens that realm's card. Phone: the Revolution block and the regime card fit the side panel in the Wide and Tall layouts with nothing sideways-scrolling; the choice card fills the safe area in landscape and portrait, its buttons stack in one column on a narrow screen, at least 44 points high, and nothing needs hover. [X-19, REVO-075, SHELL-108, SHELL-109]
 
 ## 6. Commands
 
@@ -479,7 +479,7 @@ These run in the turn in which a new month begins (X-18). A revolution never fir
 | free_republic | constitutional_republic | replaced | arm_the_people, divide_the_estates | grant_fief, sell_title | − harsh_lord | revolutionary_regime | slave-holders −60, no trade pacts 30 years, indemnity event | trade income halves while unrecognised |
 | creole_republic | constitutional_republic | elected | caudillos_pact, call_the_assembly | – | – | revolutionary_regime | old crown: reconquest reason 15 years | a general seizes the presidency |
 | parliamentary_republic | constitutional_republic | deposed | call_the_assembly, sell_bonds | grant_fief, sell_title | − harsh_lord | revolutionary_regime, emigre_court | parliamentary countries +15 | extremist risings in a crisis |
-| committee_rule | constitutional_monarchy + army power base | kept | officers_to_the_provinces, call_the_assembly | – | + foreign_rule | revolutionary_regime | none | other tongues' separatist signs faster |
+| committee_rule | constitutional_monarchy + army power base | kept | officers_to_the_provinces, call_the_assembly | – | + foreign_rule | revolutionary_regime | none | other languages' separatist signs faster |
 | warlord_republic | constitutional_republic | elected | buy_a_warlord, caudillos_pact | – | – | revolutionary_regime | foreign powers back warlords | warlords fight each other |
 | secular_republic | party_state | elected | script_and_schools, sell_church_lands | grant_fief, sell_title | + wrong_faith | revolutionary_regime | none | faith rising sign for 20 years |
 | agrarian_reform | keep | kept | divide_the_estates | grant_fief, sell_title | − harsh_lord | revolutionary_regime | foreign estate owners −30 | landowners fund risings 20 years |
@@ -497,7 +497,7 @@ These run in the turn in which a new month begins (X-18). A revolution never fir
 | reaction | keep | kept | censorship | – | + bloodshed | reaction_regime | other crowns +20 | `need` one lower for 20 years |
 | restored_monarchy | old_form | replaced | – | – | – | reaction_regime; clears revolutionary_regime, emigre_court | monarchies +30; counter-revolution reason ends | revoking charters can re-fire the revolution |
 
-The lords, church, faith, tongue, levy, land, towns, trade and research lines and the full `loop` sentence of
+The lords, church, faith, language, levy, land, towns, trade and research lines and the full `loop` sentence of
 each regime are in data/regimes.yaml and are part of the regime (REVO-039, REVO-050).
 
 ### 10.3 The 34 decrees (data/decrees.yaml)
@@ -605,9 +605,9 @@ What each decree does is the `does` line in data/decrees.yaml (REVO-054).
 | government | downstream | Customer–Supplier | Regimes set forms from `government.yaml` forms (any era), `old_form`, `form_before_g14`, `power_base_add` (D-REVO-2) |
 | diplomacy | downstream / upstream | Partnership | "Different form of rule −20"; counter-revolution war reason; one-off opinion changes; fund-a-revolution action and caught reason (D-REVO-1) |
 | subjects | upstream | Customer–Supplier | Settler independence via a Disloyal Settled or Self-governing colony, `release`, `change_subject_kind`; requested condition "a colony of who is Disloyal" (D-REVO-5) |
-| culture | upstream | Customer–Supplier | Nationalism thresholds 0.3 / 0.5 read by liberal and national signs; creole tongues; `set_court_tongue` used by regimes |
+| culture | upstream | Customer–Supplier | Nationalism thresholds 0.3 / 0.5 read by liberal and national signs; creole languages; `set_court_tongue` used by regimes |
 | religion | downstream | Customer–Supplier | Faith family wave uses `faith_wave`; `revolution_and_the_church`, `separation_of_church_and_state` follow regimes and read `revolutionary_regime` |
-| national-strengths | downstream | Customer–Supplier | Hook only: a won revolution can shed a burden or grant a legacy (which ones: D-REVO-6) |
+| national-strengths | downstream | Customer–Supplier | Hook only: a won revolution can overcome a weakness or grant a legacy (which ones: D-REVO-6) |
 | warfare | downstream | Customer–Supplier | Generals too big ×2 in revolutionary republics; a winning general switches regime |
 | province | upstream | Customer–Supplier | Grievances and class shares read by signs; regimes end and add grievances; locks of crushing_taxes and revoke_charter |
 | realm | upstream / downstream | Customer–Supplier | Lords' loyalty and land read by signs; regimes change lords; locks of grant_fief, sell_title, seize_land; stability, debt |

@@ -191,7 +191,7 @@ Ambience is off by default. When on, it plays a bed chosen by what is under the 
 
 ### The Sound card
 
-The speaker button in the side tools, under the map lens and your commanders, opens the Sound card: what is playing now and why (for example "Mobilizing: war has been declared, the armies gather"), the volume, music on or off with its volume, the effects volume, and button sounds on or off. The speaker shows struck through while music is off, so you can tell without opening it. Sound starts with your first tap, as browsers and phones require, and your choices stay on the device.
+The speaker button in the side tools, under the map mode and your commanders, opens the Sound card: what is playing now and why (for example "Mobilizing: war has been declared, the armies gather"), the volume, music on or off with its volume, the effects volume, and button sounds on or off. The speaker shows struck through while music is off, so you can tell without opening it. Sound starts with your first tap, as browsers and phones require, and your choices stay on the device.
 
 In this first cut the game plays the title theme, two peace tunes for each half of the eras in your palette's own tuning and timbre, prosperity, diplomacy, mobilizing, campaign (whose layers join as your armies close on the enemy and fight), siege, a losing war, unrest and crisis, with stingers for war declared, battles won and lost, and wars won and lost. Turns chime at their end and start (the full motif at a new year), taps click, and marches, levies, battles, sieges, famine and unrest each have a sound.
 
@@ -242,7 +242,7 @@ Audio has its own visuals only where they partner a sound: captions at the scree
 - [Screens and navigation](Screens-and-Navigation): screen ids and their music column, the Realm book tab, pause, "Tap to start", toasts and captions.
 - [Settings](Settings): every audio setting.
 - [How a turn works](Time-and-Turns): turn end, turn ready, the game year and January.
-- [Map and lenses](Map-and-Lenses): camera position, region and zoom, what is on screen, terrain under the camera.
+- [Map and Map Modes](Map-and-Lenses): camera position, region and zoom, what is on screen, terrain under the camera.
 - [Culture](Culture): your primary culture group, its changes and culture mix.
 - [The 1444 start](The-1444-Start): capital longitude for the turkic split, colonial founding dates.
 - [Warfare](Warfare): war declared, war trend, occupied capital, battles, bells, routs, sieges, army eras and troop types.

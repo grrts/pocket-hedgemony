@@ -4,7 +4,7 @@ Rebellions turn a province's grievances into a rising. There is no anger meter: 
 
 ## How it works
 
-### From grievances to a rising
+### From grievances to an uprising
 
 Every province counts its grievances (the list, and when each starts and ends, is on [Provinces](Provinces)). The count sets the province's step:
 
@@ -52,9 +52,9 @@ A rising's **cause** comes from the province's heaviest grievance. The cause set
 | Hunger | *Hungry* | Food, the castle granary opened to them | Farmers and homeless |
 | Tax | *Heavy taxes* or *Conscription* | The tax rate back down and the levy ended | Farmers, craftsmen, market folk |
 | Faith | *Wrong faith* or a faith *Broken charter* | A faith tolerance charter, or a ruler of their faith | Everyone of that faith |
-| Homeland | *Foreign rule* or *Far from the throne* | Self-rule, then independence | Everyone of the homeland's tongue |
+| Homeland | *Foreign rule* or *Far from the throne* | Self-rule, then independence | Everyone of the homeland's language |
 | Town | *Homeless*, *Broken charter* or *Soldiers quartered* | A town law charter, work, the soldiers gone | Homeless, craftsmen, market folk |
-| Lord | *Harsh lord*, or a disloyal lord's own choice | The lord's want (land, an office, lower taxes, independence) | The lord's retinue and officials, plus people of his land who share his faith and tongue |
+| Lord | *Harsh lord*, or a disloyal lord's own choice | The lord's want (land, an office, lower taxes, independence) | The lord's retinue and officials, plus people of his land who share his faith and language |
 | Pretender | A pretender with a right to the province, plus any grievance | The pretender on the throne, or the province handed to them | Lords who back the pretender, plus anyone with a grievance |
 | New ideas | From the age of revolutions, any grievance plus support of 0.3 or more for liberalism, socialism, communism or nationalism | A new kind of government | Townsfolk and scholars first |
 
@@ -72,7 +72,7 @@ Every rising has a named leader drawn from the province, with Might, Cunning and
 | The lord himself | A lord's revolt | His retinue, wealth and officials |
 | The pretender | A pretender's war | The lords who back them and foreign help |
 
-### Strength: how hard a rising is to beat
+### Strength: how hard an uprising is to beat
 
 **Strength = Men × Arms × Leader × Ground**, and food decides how long they last. In battle, rebels fight as the *Rebel band* kind under the [Warfare](Warfare) battle rules.
 
@@ -82,7 +82,7 @@ Every rising has a named leader drawn from the province, with Might, Cunning and
 |---|---|
 | Homeless | 30 % |
 | The class the cause speaks to | 10 % |
-| Everyone sharing the faith or tongue (faith and homeland risings) | 8 % |
+| Everyone sharing the faith or language (faith and homeland risings) | 8 % |
 | Other classes | 2 % |
 | Clergy and scholars | only in faith and new-ideas risings |
 | A lord's retinue | all of it at once |
@@ -112,7 +112,7 @@ Severity is separate from strength. It follows the rising's size:
 |---|---|---|
 | Riot | One province, no rebel army | |
 | Rising | One province with a rebel army | The province sends you no tax, recruits, food or trade, and its official flees |
-| Rebellion | 2 to 5 provinces | Rising effects in each province; neighbouring lords of the same faith or tongue waver; rebels can besiege castles |
+| Rebellion | 2 to 5 provinces | Rising effects in each province; neighbouring lords of the same faith or language waver; rebels can besiege castles |
 | Great revolt | More than 5 provinces, in or next to the capital's province, or a whole lord's land | Civil war: every lord picks a side by loyalty, allies may stay out, and rival AIs may attack |
 
 A rising that starts in or next to the capital is a great revolt at once.
@@ -120,7 +120,7 @@ A rising that starts in or next to the capital is a great revolt at once.
 **Spreading.** Each month a rising may spread to each neighbouring province. The chance is higher when the neighbour:
 
 - has the same grievance (it also gets *Neighbour in revolt* until those rebels are beaten or satisfied),
-- shares the rebels' faith or tongue,
+- shares the rebels' faith or language,
 - is connected by roads, rivers and traders,
 - has many homeless,
 
@@ -128,12 +128,12 @@ and when your army is away at war, you answered the last rising with a massacre,
 
 **What makes it worse.**
 
-- A disloyal lord whose faith or tongue matches the rebels may join with his retinue, turning the rising into a lord's revolt with Soldiers' arms.
+- A disloyal lord whose faith or language matches the rebels may join with his retinue, turning the rising into a lord's revolt with Soldiers' arms.
 - While rebels hold a province, they loot one town building a season (the market first), kill or drive out officials, burn tiles when they forage, and make scholars flee.
 - A rising keeps pulling in more men every month until its cause is fixed.
-- A massacre adds *Bloodshed* for 20 years to every province of the same faith or tongue.
+- A massacre adds *Bloodshed* for 20 years to every province of the same faith or language.
 
-### Answering a rising
+### Answering an uprising
 
 You have five answers:
 
@@ -155,9 +155,9 @@ Hunger and tax risings end when their need is met. Faith, homeland and pretender
 |---|---|
 | Pardon | Survivors return to their classes and the province calms faster, but the leader may rise again |
 | Punish the leaders | The leader is executed; that province gets no new rising from the same cause for 10 years |
-| Massacre | No rising in that province for 20 years; *Bloodshed* across every province of the same faith or tongue; lords of that faith or tongue waver |
+| Massacre | No rising in that province for 20 years; *Bloodshed* across every province of the same faith or language; lords of that faith or language waver |
 
-### Preventing risings
+### Preventing uprisings
 
 - End grievances: once a grievance ends, it no longer counts.
 - A **judge** running a restless province raises each step's bar by one grievance.
@@ -206,7 +206,7 @@ A turn is one week, so these steps run once a month, in the turn in which a new 
 
 ## What you see
 
-- **Steps on the map**: each province's step (grumbling, riots, plotting, risen) shows on the map, with rising icons and a *Grievances* lens.
+- **Steps on the map**: each province's step (grumbling, riots, plotting, risen) shows on the map, with rising icons and a *Grievances* map mode.
 - **The province card**: while plotting, the monthly chance to rise and the named plotter.
 - **The rebellion card**: the rising's name, cause and demand, its leader and a skill, who joined, men, arms and multiplier, what it holds, food in months, severity with its province count and neighbours sharing the grievance, who backs it, where it may spread next month, and the five answers.
 
@@ -227,7 +227,7 @@ The first slice plays risings on the eight grievances the game tracks, so the ri
 - **On the map**: the band stands in its province as a dark rider with its men, and the land it holds is hatched dark. It besieges the castles of its land; once it holds two or more provinces it marches a province a week on the nearest castle beside its land. A taken castle arms it.
 - **What it costs you**: a province the rebels hold sends you no tax and no recruits, and its men are taken from its recruits.
 - **Beating them**: march an army with a commander onto the band. If you win, the rebels scatter and the same card asks for your verdict: Pardon, Punish the leaders or Massacre. Massacre asks once more. An army that stands four weeks in a held province the band has left takes it back.
-- **Overview**: your realm's Provinces tab opens with a Risings block listing every rising and every beaten rising waiting on you, and the General tab has a red Risings line that opens it. A plotting province's mood line gives its chance to rise each month.
+- **Overview**: your realm's Provinces tab opens with an Uprisings block listing every rising and every beaten rising waiting on you, and the General tab has a red Uprisings line that opens it. A plotting province's mood line gives its chance to rise each month.
 - **Answers today**: granting a tax demand puts the tax back to normal and ends the musters there. A hunger demand opens the castle granary (up to 4 months of food). A homeland demand gives self-rule, so *Foreign rule* no longer counts there and the tax stays light for good. A town demand sends your armies out of their land. Talks cost 10 gold a province, once a month. A bribe costs 1 gold per 100 rebels.
 - **If they win** (a year held, or the capital's castle taken): tax and town risings keep their tax light for 10 years; hunger risings empty the castles into their stores and turn their lords disloyal; a homeland rising breaks away to the realm that held it in 1444.
 
@@ -241,7 +241,7 @@ The first slice plays risings on the eight grievances the game tracks, so the ri
 - [Historical-Events](Historical-Events): the `rebels` effect, `rebels_active`, `unrest` as grievances, sparks from events.
 - [Diplomacy](Diplomacy): secretly funding rebels, and envoys fleeing when a host falls to rebels.
 - [Religion](Religion): faith risings' demands, preachers as leaders, sparks from faith policy and houses.
-- [Culture](Culture): homeland risings draw 8 % of the tongue and, with nationalism 0.5 or more, demand a new country; *Banned tongue*.
+- [Culture](Culture): homeland risings draw 8 % of the language and, with nationalism 0.5 or more, demand a new country; *Banned language*.
 - [Government](Government): a won New ideas rising sets a form; over-cap lords become disloyal.
 - [Subjects](Subjects): a lord leaving with his land.
 - [Recruiting](Recruiting): recruits lost to rebels.
@@ -249,7 +249,7 @@ The first slice plays risings on the eight grievances the game tracks, so the ri
 - [Trade](Trade): traders avoid riots, bandits appear, and rebels act as an enemy army for trade.
 - [The-1444-Start](The-1444-Start): a new country for a won homeland rising.
 - [Exploration-and-Colonies](Exploration-and-Colonies): colonies, local people's tiles and resistance.
-- [Map-and-Lenses](Map-and-Lenses): steps on the map, rising icons and the *Grievances* lens.
+- [Map and Map Modes](Map-and-Lenses): steps on the map, rising icons and the *Grievances* map mode.
 - [Time-and-Turns](Time-and-Turns): where the monthly steps sit in the turn.
 
 ## Numbers
@@ -287,7 +287,7 @@ All numbers are **placeholders** in the province config. The key names are the s
 - The heaviest grievance is the one that counts most. Ties go in the cause table's order.
 - A disloyal lord revolts on a 5 % roll each month.
 - A local leader has Cunning 3 and Might 1, and his Logistics works like any commander's.
-- Below nationalism 0.5, a homeland rising wants its own tongue in the provinces it holds. At 0.5 or more it wants a country of its own.
+- Below nationalism 0.5, a homeland rising wants its own language in the provinces it holds. At 0.5 or more it wants a country of its own.
 - Exploration's local attacks cover new colonies. A resistance covers settled land taken by conquest or treaty.
 - Armed veterans who kept their arms start at *Old weapons*.
 - A riot is just a province state. The rebellion card appears only when a rising starts.

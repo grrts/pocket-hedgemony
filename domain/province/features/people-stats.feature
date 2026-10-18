@@ -1,7 +1,7 @@
 @context-province
 Feature: Other people stats
   As a player
-  I want people, refugees, faith and tongue counted per province
+  I want people, refugees, faith and language counted per province
   So that the country sums and the province card can show them
 
   @PROV-130 @PROV-131
@@ -44,10 +44,10 @@ Feature: Other people stats
     Then the country's Faith is 86 %
 
   @PROV-134
-  Scenario: Only the top three faiths and tongues are stored
-    Given the province "Troyes" has tongues French 94 % and Flemish 6 %
+  Scenario: Only the top three faiths and languages are stored
+    Given the province "Troyes" has languages French 94 % and Flemish 6 %
     When the game works out the province's stats
-    Then the province stores at most three tongues and three faiths
+    Then the province stores at most three languages and three faiths
 
   @PROV-135
   Scenario: Persecuted people take their faith and crafts away

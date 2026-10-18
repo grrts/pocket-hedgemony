@@ -139,7 +139,7 @@ The map credits its data: Natural Earth (public domain), the Köppen-Geiger clim
 
 ## What you see
 
-The world map has no screen of its own; [Map and Lenses](Map-and-Lenses) draws it. What it hands over for drawing:
+The world map has no screen of its own; [Map and Map Modes](Map-and-Lenses) draws it. What it hands over for drawing:
 
 - The **province id image**, which says which place each pixel belongs to.
 - The **terrain image**: terrain per pixel in the red channel, ocean depth in the green channel (0 on land, otherwise depth band plus one), and river size and links where a river runs.
@@ -155,7 +155,7 @@ The world map has no screen of its own; [Map and Lenses](Map-and-Lenses) draws i
 - [Exploration and Colonies](Exploration-and-Colonies): graph steps for the charted start; coastal provinces.
 - [The 1444 Start](The-1444-Start): places to own; size, terrain and coast for 1444 population and wealth; asks for rebuilds when provinces must be split.
 - [Historical Events](Historical-Events): shares region ids, areas and anchor provinces.
-- [Map and Lenses](Map-and-Lenses): draws the id image, terrain, depth and rivers.
+- [Map and Map Modes](Map-and-Lenses): draws the id image, terrain, depth and rivers.
 - [Saving](Saving): `mapHash` and the rename table; map data is never saved.
 - [Buildings](Buildings): ground (build cost), shore tiles, anchors for fixed mines and markets.
 

@@ -265,7 +265,7 @@ On a phone, each province and sea zone stores only its ratio and traders passing
 - **Setting a route**: tap where it starts, then where it goes (another tap moves where it goes), and tap the end again to finish; the preview updates with each tap; then Confirm. You can copy another trader's route.
 - **The Trade screen**: every trader and trade ship with kind, route, purse, last deposit, expected gold a month and problems, sortable by gold a month.
 - **Turn report**: deposits summed into one line ("Traders brought 23 gold this week"); only problems (robbed, route broken, ship taken) get their own line.
-- **On the map**: at world zoom the Trade lens coloured by trade ratio and the busiest roads and sea lanes; at region zoom thicker roads with more traders, trader icons (caravan, barge, ship) with a purse bar, and a coin on market cities; at local zoom caravans, barges and ships moving. Lenses: **Trade ratio**, **Trade value** and **Traders** (your traders and routes). See [Map and Lenses](Map-and-Lenses).
+- **On the map**: at world zoom the Trade map mode coloured by trade ratio and the busiest roads and sea lanes; at region zoom thicker roads with more traders, trader icons (caravan, barge, ship) with a purse bar, and a coin on market cities; at local zoom caravans, barges and ships moving. Map modes: **Trade ratio**, **Trade value** and **Traders** (your traders and routes). See [Map and Map Modes](Map-and-Lenses).
 
 ### In the game now
 
@@ -282,8 +282,8 @@ Trade runs in the game as a first slice: traders you own walk there and back bet
 Where you find it:
 
 - **The Trade tab** of your realm card, next to Treasury: last month's deposits, fees and upkeep; your traders, best first, each with its route ("Paris → Lyon and back"), its days there and back, a purse bar, about what it brings a month, what it deposited last month and what is wrong, with **Route**, **Show** and **Dismiss**; **Found a trader** in each of your cities that can, one button per kind with its gold and upkeep (greyed with the reason when it can't); and your **busiest cities**.
-- **Setting a route**: tap **Route** on a trader. The map switches to the Trade lens and a bar along the bottom asks you to tap where it starts, then where it goes; a third city moves where it goes. You never draw the way: it is found through the most populated land and drawn on the map, with the preview (days there and back, provinces collected in, about how much a month, the best provinces). Then **Confirm** (or tap the end again), **Undo** or **Cancel**.
-- **The Trade lens**: provinces coloured by trade ratio, what you don't see in parchment; zoomed in, your traders' ways there and back as dotted lines with each trader and its purse, and a coin on every trade stop.
+- **Setting a route**: tap **Route** on a trader. The map switches to the Trade map mode and a bar along the bottom asks you to tap where it starts, then where it goes; a third city moves where it goes. You never draw the way: it is found through the most populated land and drawn on the map, with the preview (days there and back, provinces collected in, about how much a month, the best provinces). Then **Confirm** (or tap the end again), **Undo** or **Cancel**.
+- **The Trade map mode**: provinces coloured by trade ratio, what you don't see in parchment; zoomed in, your traders' ways there and back as dotted lines with each trader and its purse, and a coin on every trade stop.
 - **The province card** has a Trade line: value a month, ratio, traders passing and its top goods.
 - **The General tab** has one line, "Trade: N traders · +x gold a month", that opens the Trade tab.
 
@@ -304,7 +304,7 @@ Not yet: tolls, trade pacts and embargoes, bandits and capture on the road, lord
 - [The 1444 Start](The-1444-Start): starting traders and routes; the warm-up.
 - [National Strengths](National-Strengths): trader and toll levers; trade presence conditions.
 - [Rebellions](Rebellions): rebels holding provinces act as enemy armies.
-- [Map and Lenses](Map-and-Lenses): Trade lenses, trader icons, road thickness.
+- [Map and Map Modes](Map-and-Lenses): Trade map modes, trader icons, road thickness.
 - [Screens and Navigation](Screens-and-Navigation): Trade screen, trader card, route preview, turn report lines.
 - [Time and Turns](Time-and-Turns): day loop, month end, year.
 
