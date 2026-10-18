@@ -42,7 +42,7 @@ Feature: Navigation by input
     Examples:
       | platform | screen    | result                       |
       | Android  | map       | the screen "game_menu" opens |
-      | Android  | main_menu | "Tap to start" is shown      |
+      | Android  | main_menu | the app is left              |
       | Android  | title     | the app is left              |
 
   @SHELL-119
