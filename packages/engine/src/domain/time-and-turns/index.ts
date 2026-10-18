@@ -439,6 +439,10 @@ export function orderShape(order: Order): string {
       return "answer the revolution";
     case "empire":
       return "act in the Empire";
+    case "keepPlaying":
+      return "keep playing after a win";
+    case "playOn":
+      return "play on as another realm";
   }
 }
 

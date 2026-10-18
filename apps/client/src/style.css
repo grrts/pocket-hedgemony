@@ -4649,6 +4649,117 @@ button.belief-line {
   color: var(--cloth);
 }
 
+/* ---- Score and the end of the campaign (SHELL-162 to SHELL-164) ---- */
+
+.score-line button,
+.score-line {
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.score-line span {
+  white-space: nowrap;
+}
+
+.score-parts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.score-part {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0 8px;
+  padding: 6px 8px;
+  border: 2px solid var(--ink-soft);
+  background: rgb(255 255 255 / 0.18);
+}
+
+.score-part .made {
+  grid-column: 1;
+  color: var(--ink-soft);
+}
+
+.score-part .total {
+  grid-column: 2;
+  grid-row: 1;
+  font-weight: 600;
+  text-align: right;
+}
+
+.score-part em {
+  grid-column: 2;
+  grid-row: 2;
+  font-style: normal;
+  text-align: right;
+}
+
+table.score-ledger th.num,
+table.score-ledger td.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+table.score-ledger td small {
+  display: block;
+  color: var(--ink-soft);
+}
+
+table.score-ledger td .realm-link {
+  color: var(--ink);
+  min-height: 44px;
+  text-align: left;
+}
+
+table.score-ledger tr.mine td {
+  background: rgb(208 162 72 / 0.3);
+  font-weight: 600;
+}
+
+.end-headline {
+  margin: 4px 0;
+  font: 600 26px/1.1 var(--body);
+}
+
+.end-outcome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+}
+
+.end-outcome.won b {
+  color: var(--cloth);
+}
+
+.end-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 4px;
+}
+
+.end-choices button {
+  flex: 1 1 140px;
+  min-height: 52px;
+  flex-direction: column;
+}
+
+.end-choices small,
+.play small {
+  display: block;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.fab.over .px-icon {
+  animation: none;
+}
+
 /* The voyage bar (EXPL-069, EXPL-074): along the bottom between the overview
    button and End turn while a course is drawn, so the sea being tapped stays in
    view; its buttons wrap rather than shrink below a finger. */

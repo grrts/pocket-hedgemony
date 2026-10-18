@@ -11,6 +11,7 @@ import { planRoute } from "./march.ts";
 import { GROUNDS } from "./tiles.ts";
 import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
+import { battleWon } from "./campaignEnd.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 import { withoutOf } from "./research.ts";
 import { officialBonus, provinceTaken } from "./officials.ts";
@@ -34,7 +35,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade" | "ruler";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade" | "ruler" | "campaign";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -578,6 +579,7 @@ export function fightRound(world: World, news: News[]): void {
     const winStart = b.attackerWins ? b.attStart : b.defStart;
     const loseStart = b.attackerWins ? b.defStart : b.attStart;
     commanderBattle(world, b.attackerWins ? b.attLead : b.defLead, true, winStart < loseStart);
+    battleWon(world, winner);
     commanderBattle(world, b.attackerWins ? b.defLead : b.attLead, false, false);
     endBattle(world, b);
     noteBattle(world, winner, loser, winStart, loseStart, b.province);

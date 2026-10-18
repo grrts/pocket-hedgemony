@@ -38,6 +38,7 @@ import { seedStartingFleets } from "./startingFleets.ts";
 import { refreshFreeFleets } from "./hiredFleets.ts";
 import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
+import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./campaignEnd.ts";
 import type { AchievementLog } from "./achievements.ts";
 import { createInstitutionsState, seedInstitutions, type InstitutionsState } from "./institutions.ts";
 
@@ -160,6 +161,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   explore: ExplorationState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
+  /** Win scores, the end date and how the campaign ended (campaignEnd.ts). */
+  campaign: CampaignEndState;
   /** Every realm's heritage in play: birthright, heydays, ambitions, legacies and burden (HER-078). */
   heritage?: GameHeritage;
   /** The player's campaign as achievements see it (achievements.ts). */
@@ -445,6 +448,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     battleSeq: 0,
     peaceOffers: [],
     nationGone: new Uint8Array(N),
+    campaign: createCampaignEndState(N, rules.defines.startDate),
     ...createRecruitState(P, N),
     ...createLivingState(P),
     ...createTreasuryState(P, N),
@@ -540,6 +544,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   world.heritage = createGameHeritage(world);
   // Worked out again with heritage's tax in force, so lenders and the treasury card know the income the realm will have.
   runLedger(world, false);
+  // The scores stand from the first day, for the country card (SHELL-162).
+  seedCampaign(world);
   return world;
 }
 

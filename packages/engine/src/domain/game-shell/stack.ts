@@ -550,7 +550,7 @@ export function gameMenuEntries(platform: Platform, ironman: boolean, o: GameMen
     .filter((e) => e !== "Quit" || hasQuit(platform))
     .filter((e) => e !== "Load" || !ironman)
     .map((e) => (e === "Save" && ironman ? "Save and quit" : e))
-    .map((e) => (e === "Achievements" && o.canEarnAchievements === false ? config.strings.achievementsOff : e));
+    .map((e) => (e === "Achievements" && o.canEarnAchievements === false ? config.strings.playedOn : e));
   if (o.tutorial) out.splice(1, 0, ...config.tutorialMenuLines);
   return out;
 }

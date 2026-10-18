@@ -239,7 +239,7 @@
     "leaveUnsaved": "Leave {date} unsaved? · Save first · Leave · Cancel",
     "tapToStart": "Tap to start",
     "noAchievementsOutsideIronman": "Achievements are earned only in ironman campaigns",
-    "achievementsOff": "Achievements (off for this campaign)",
+    "playedOn": "Achievements (off for this campaign)",
     "attentionTitle": "Needs attention",
     "firstLaunch": "New to Pocket Hegemony?"
   },

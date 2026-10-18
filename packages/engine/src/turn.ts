@@ -26,6 +26,7 @@ import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { claimCaliphate, faithHeadsWars, monthlyFaithHeads, raiseOwnPatriarch, sendConclaveGold } from "./faithHeads.ts";
 import { hireOfficial, settleLand, swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
+import { clockStopped, dailyEndCheck, keepPlaying, playOn, weeklyEndCheck, yearlyScores } from "./campaignEnd.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
@@ -186,7 +187,10 @@ export type Order =
   /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
   | ExploreOrder
   /** The Empire: stand for the crown, vote, seek a vote, grant a seat, admit a member (institutions.ts). */
-  | EmpireOrder;
+  | EmpireOrder
+  /** After world domination, play on to the end date; after game over, play on as another realm (SHELL-164). */
+  | { type: "keepPlaying" }
+  | { type: "playOn"; nation: number };
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -219,6 +223,7 @@ export function applyNow(world: World, order: Order, actingNation: number): Turn
 export function advance(world: World, steps: number): News[] {
   const news: News[] = [];
   for (let s = 0; s < steps; s++) {
+    if (clockStopped(world)) break;
     if (world.step === 0) startDay(world, news);
     stepMarches(world, HOURS_PER_STEP);
     stepNavy(world, HOURS_PER_STEP, news);
@@ -293,6 +298,7 @@ function startDay(world: World, news: News[]): void {
     aiRaise(world, news);
     // Events come last in the month, after every other system (X-2).
     monthlyEvents(world, news);
+    if (world.date.month === 1) yearlyScores(world, news);
     monthlyHeritage(world, news);
   }
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
@@ -307,6 +313,7 @@ function endDay(world: World, news: News[]): void {
   world.day++;
   updateWeather(world);
   syncDate(world);
+  dailyEndCheck(world, news);
   if (world.day % DAYS_PER_TURN === 0) {
     weeklyMusters(world, news);
     aiCollect(world, news);
@@ -314,6 +321,7 @@ function endDay(world: World, news: News[]): void {
     // The player's ledger is kept current each week; every realm's is worked out when the month turns.
     if (world.player >= 0) runLedger(world, false, world.player);
     answerAiCalls(world, news);
+    weeklyEndCheck(world, news);
     // Achievement tests read the turn's final values, last of all (ACH-033).
     turnEndAchievements(world);
     world.turn++;
@@ -324,6 +332,10 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
   const locked = lockedOrder(world, actingNation, order);
   if (locked) return locked;
   switch (order.type) {
+    case "keepPlaying":
+      return keepPlaying(world);
+    case "playOn":
+      return playOn(world, order.nation);
     case "declareWar": {
       const why = declareWar(world, actingNation, order.target, news, {
         ...(order.aim ? { aim: order.aim } : {}),

@@ -18,6 +18,7 @@ import { revolutionView, type RevolutionView } from "./revolutions.ts";
 import { empireView, institutionsLens, type EmpireView } from "./institutions.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
+import { campaignView, setPlayer, type CampaignView } from "./campaignEnd.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
@@ -67,7 +68,7 @@ const companyView = (c: FreeCompany): CompanyView => ({
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
   /** `map` is the map's images as the UI decoded them, so armies march over its tiles; without it they stand still. */
-  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles }
+  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string }
   /** Plays a whole week at once (the start-up probe and the benchmarks). */
   | { id: number; type: "endTurn"; orders: Order[] }
   /** Plays the clock on by some 4-hour steps (six a day). */
@@ -262,6 +263,8 @@ export interface Snapshot {
   provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
   peoples: PeoplesSnapshot;
+  /** Win scores, ranks, the player's breakdown and ledger, and how the campaign ended. */
+  campaign: CampaignView;
   /** Heads of the faith: seats, each realm's Faith-line badge, the player's Head of the faith card and the censure a war would bring (RELG-135 to RELG-138). */
   faithHeads: FaithHeadsView;
   /** The player's men gathering in provinces: men still to come, days to the next thousand and to the last. */
@@ -533,6 +536,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         return { provinceTradeSeen: seen, provinceGoods: goods, tradePaths: tradePaths(w, player, LIVING_MAP.traders.maxPaths, player >= 0 ? seen : null) };
       })(),
       peoples: peoplesSnapshot(w),
+      campaign: campaignView(w),
       faithHeads: faithHeadsView(w, player),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, daysLeft: m.daysLeft, daysAll: daysToGather(w, m) })),
       gatherDays: player >= 0 ? gatherDays(w, player) : 14,
@@ -657,7 +661,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           const idx = world.nationIndex.get(req.playerNation);
           if (idx === undefined) throw new Error(`unknown nation ${req.playerNation}`);
           player = idx;
-          world.player = idx;
+          setPlayer(world, idx);
+          // A nearer end date (YYYY-MM-DD), for trying the end card (SHELL-164).
+          if (req.endDate && /^\d{4}-\d\d-\d\d$/.test(req.endDate)) world.campaign.endDate = req.endDate;
           startAchievements(world);
           return snapshot(req.id, started, []);
         }
@@ -674,6 +680,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         case "act": {
           if (!world) throw new Error("no game in progress");
           const report = applyNow(world, req.order, player);
+          // Playing on as another realm changes who the player is (SHELL-096).
+          player = world.player;
           return snapshot(req.id, started, report.rejectedOrders, report.news);
         }
         case "save": {

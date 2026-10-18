@@ -87,6 +87,8 @@ export function hashWorld(world: World): string {
   feed(world.provinceGrasping);
   feed(world.provinceTradeRatio);
   feed(tradeHashData(world));
+  feed(world.campaign.nationLargest);
+  feed(world.campaign.nationBattlesWon);
   feed(world.provinceRebels);
   feed(rebelsHashData(world));
   feed(revolutionsHashData(world));
