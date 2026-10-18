@@ -400,7 +400,7 @@ export function orderShape(order: Order): string {
     case "faithPolicy":
       return "set a Faith policy";
     case "answerRevolution":
-      return "answer the revolution";
+      return "answer a revolution";
   }
 }
 
