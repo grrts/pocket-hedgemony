@@ -64,6 +64,7 @@ import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } fro
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
 import { Hints, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
+import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { Rng } from "@ph/engine";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
@@ -2444,14 +2445,14 @@ function renderPanelCard(): void {
   const official = snapshot && own >= 0 ? officialOf(snapshot, selectedProvince, own) : undefined;
   const siege = siegeInfo(selectedProvince);
   panel.innerHTML = `
-    <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
+    <header><h2 class="ribbon">${owner ? pennant(owner, 2) : ""}${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
-    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"}</p>
+    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}"><b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"}</p>
     <p class="province-kind">${esc(provinceKind(p, !!owner && owner.capital === p.id))}</p>
     ${snapshot ? settleSection(selectedProvince) : ""}
     ${snapshot ? rebelsHere(selectedProvince) : ""}
-    ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
     ${siege ? siegeView(rules, siege) : ""}
+    ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
     <dl class="facts">
       <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
@@ -3203,6 +3204,8 @@ const armText = (by: number[]) =>
     .map(([a, m]) => `${fmt(m)} ${ARM_LABEL[a]!.toLowerCase()}`)
     .join(", ");
 const weeks = (w: number) => `${w} week${w === 1 ? "" : "s"}`;
+/** Days as the queue says them: "in 9 days", "tomorrow" (or bare, "14 days"). */
+const days = (d: number, inWord = true) => (inWord && d <= 1 ? "tomorrow" : `${inWord ? "in " : ""}${Math.max(1, Math.round(d))} day${Math.round(d) === 1 ? "" : "s"}`);
 
 /** Commanders of the player waiting at court, best first. */
 function idleCommanders(): number[] {
@@ -3217,8 +3220,10 @@ function idleCommanders(): number[] {
 const skills = (c: Snapshot["commanders"][number]) => `might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}`;
 
 /**
- * A province's garrison: men who can be called there, a thousand at a time,
- * those still gathering, troops waiting without a commander, and its official.
+ * A province's Garrison tab (PROV-302, RECR-116..120): men who can be called
+ * there a thousand at a time, the queue still gathering with the days left,
+ * troops waiting without a commander by arm and drill, and the commanders
+ * standing here who can pick them up.
  */
 function renderGarrison(pi: number): void {
   const s = snapshot!;
@@ -3226,55 +3231,60 @@ function renderGarrison(pi: number): void {
   const p = provinces[pi]!;
   const left = Math.floor(s.provinceRecruits[pi]!);
   const ceiling = p.population * rules.defines.levies.menPerThousandPeople;
+  const unit = provinceLevy(left, 1).men;
   const levyMoney = 20 * rules.defines.recruit.goldScale;
-  const gather = s.musters.find((m) => m.province === pi);
-  const troops = [...s.armies.id.keys()].filter((k) => s.armies.location[k] === pi && s.armies.owner[k] === me && s.armies.commander[k]! < 0);
-  const led = [...s.armies.id.keys()].filter((k) => s.armies.location[k] === pi && s.armies.owner[k] === me && s.armies.commander[k]! >= 0 && s.armies.kind[k] === 0);
+  const g = s.garrisons.find((x) => x.province === pi) ?? { troops: [], gathering: [], commanders: [] };
   const idle = idleCommanders();
-  const official = s.provinceOfficial[pi];
   const capLeft = Math.max(0, s.nationTroopCap[me]! - s.nationCapUsed[me]!);
-  const queued = gather ? Math.ceil(gather.men / 1000) : 0;
+  const queued = g.gathering.length;
+  const queuedMen = g.gathering.reduce((t, x) => t + x.men, 0);
   const max = rules.defines.recruit.queueMax;
-  const gw = rules.defines.recruit.gatherWeeks;
+  const gd = s.gatherDays;
   const why =
     queued >= max ? `The queue is full: at most ${max} thousands wait here`
-    : left < 1000 ? "Fewer than a thousand men left to call: the pool refills a quarter of the way each year"
-    : capLeft < 1000 ? "Over your troop cap"
+    : left < unit ? "Fewer than a thousand men left to call: the pool refills a quarter of the way each year"
+    : capLeft < unit ? "Over your troop cap"
     : levyMoney > s.nationTreasury[me]! ? "Not enough gold"
     : "";
+  const allIn = queued ? g.gathering[queued - 1]!.daysLeft + gd : gd;
   // Each queued thousand, oldest first: the first is gathering, the rest wait their turn.
-  const rows = Array.from({ length: queued }, (_, i) => {
-    const men = i === queued - 1 ? gather!.men - (queued - 1) * 1000 : 1000;
-    const ready = gather!.weeksLeft + i * gw;
-    return `<li class="${i === 0 ? "now" : ""}">${icon("hourglass", 1)}<span class="what"><b>${fmt(men)} men</b> <small>${i === 0 ? "gathering" : "waiting"}</small></span><span class="when">${ready <= 1 ? "next week" : `in ${weeks(ready)}`}</span>${i === queued - 1 ? `<button class="paper small" data-cancel-recruit title="Cancel: the levy money comes back">×</button>` : ""}</li>`;
-  }).join("");
+  const rows = g.gathering
+    .map((x, i) => `<li class="${i === 0 ? "now" : ""}">${icon("hourglass", 1)}<span class="what"><b>${fmt(x.men)} men</b> <small>${x.state}</small></span><span class="when">${days(x.daysLeft)}</span>${i === queued - 1 ? `<button class="paper small" data-cancel-recruit title="Cancel: the levy money and the men come back" aria-label="Cancel the last thousand">×</button>` : ""}</li>`)
+    .join("");
+  const here = g.commanders;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
     ${provinceTabs()}
+    <div class="garrison">
     <h3 class="sub">Recruit</h3>
-    <p>${fmt(left)} of ${fmt(ceiling)} men here can be called. Each thousand takes ${weeks(gw)} to gather, one after another.</p>
-    <div class="choices"><button class="paper" data-recruit="1" ${why ? "disabled" : ""} title="${why || `Gathered in ${weeks(queued ? gather!.weeksAll + gw : gw)}`}">Recruit ${fmt(1000)} men · ${levyMoney.toFixed(2)} gold</button></div>
-    ${why ? `<p class="hint">${why}.</p>` : ""}
-    <div class="queue-head"><span>Queue</span><span>${queued} / ${max}</span></div>
+    <p>${fmt(left)} of ${fmt(ceiling)} men here can be called. Each thousand takes ${days(gd, false)} to gather, one after another.</p>
+    <div class="choices"><button class="paper" data-recruit="1" ${why ? "disabled" : ""}>Recruit ${fmt(unit)} men · ${levyMoney.toFixed(2)} gold<small>${why ? `${why}.` : `${provinceLevy(left, 1).percent} % of the men who can be called · all in ${days(allIn, false)}`}</small></button></div>
+    <div class="queue-head"><span>Queue${queuedMen ? ` · ${fmt(queuedMen)} men` : ""}</span><span>${queued} / ${max}</span></div>
     ${queued ? `<ol class="queue">${rows}</ol>` : `<p class="hint">Nobody is gathering here.</p>`}
     <h3 class="sub">Troops without a commander</h3>
-    ${troops.length
-      ? troops
-          .map((k) => {
-            const id = s.armies.id[k]!;
+    ${g.troops.length
+      ? g.troops
+          .map((t) => {
+            const join = here.filter((c) => s.armies.kind[armySlot(c.army)] === t.kind);
             return `<div class="army">
               <img class="portrait" src="${spriteUrl("soldier", nations[me]!.color, 3)}" alt="">
-              <span class="who"><b>${fmt(s.armies.men[k]!)} men</b><br><small>${armText(s.armies.byArm[k]!)}</small></span>
+              <span class="who"><b>${fmt(t.men)} men</b><br><small>${armText(t.byArm)}</small><br><small>drill ${t.drill.toFixed(1)}</small></span>
               <span class="army-buttons">
-                ${led.map((j) => `<button class="small" data-pickup="${s.armies.id[j]!}">Join ${esc(cmdOf(s.armies.commander[j]!).name)}</button>`).join("")}
-                ${idle.slice(0, 3).map((c) => `<button class="paper small" data-lead="${id}" data-by="${c}" title="${skills(cmdOf(c))}">Lead: ${esc(cmdOf(c).name)}</button>`).join("")}
-                <button class="paper small" data-disband="${id}">Send home</button>
+                ${join
+                  .map((c) => {
+                    const name = esc(cmdOf(c.commander).name);
+                    return `${t.men > unit ? `<button class="small" data-pickup="${c.army}" data-men="${unit}">${name} takes ${fmt(unit)}</button>` : ""}<button class="small" data-pickup="${c.army}">${name} takes ${t.men > unit ? "all" : fmt(t.men)}</button>`;
+                  })
+                  .join("")}
+                ${idle.slice(0, 3).map((c) => `<button class="paper small" data-lead="${t.army}" data-by="${c}" title="${skills(cmdOf(c))}">Lead: ${esc(cmdOf(c).name)}</button>`).join("")}
+                <button class="paper small" data-disband="${t.army}">Send home</button>
               </span>
             </div>`;
           })
           .join("")
       : `<p class="hint">None. Men you call here wait in the garrison until a commander leads them or picks them up.</p>`}
-    ${troops.length && !idle.length && !led.length ? `<p class="hint">No commander is free: commission an official, below or in another province.</p>` : ""}`;
+    ${g.troops.length ? `<p class="hint">${here.length ? `Commanders here: ${here.map((c) => esc(cmdOf(c.commander).name)).join(", ")}.` : idle.length ? "No commander stands here: one from court can lead them." : "No commander is free: commission an official from the Officials tab."}</p>` : ""}
+    </div>`;
   bindClose();
   bindProvinceTabs();
   showPanel(true);
@@ -3282,7 +3292,9 @@ function renderGarrison(pi: number): void {
     b.addEventListener("click", () => void actHere({ type: "recruit", province: pi, thousands: Number(b.dataset.recruit) })),
   );
   panel.querySelector<HTMLButtonElement>("[data-cancel-recruit]")?.addEventListener("click", () => void actHere({ type: "cancelRecruit", province: pi }));
-  panel.querySelectorAll<HTMLButtonElement>("[data-pickup]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "pickUp", army: Number(b.dataset.pickup) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-pickup]").forEach((b) =>
+    b.addEventListener("click", () => void actHere({ type: "pickUp", army: Number(b.dataset.pickup), ...(b.dataset.men ? { men: Number(b.dataset.men) } : {}) })),
+  );
   panel.querySelectorAll<HTMLButtonElement>("[data-lead]").forEach((b) =>
     b.addEventListener("click", () => void actHere({ type: "appoint", army: Number(b.dataset.lead), commander: Number(b.dataset.by) })),
   );
@@ -3451,6 +3463,9 @@ function renderFleet(id: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-colony-found]").forEach((b) => b.addEventListener("click", () => colony({ do: "found", province: Number(b.dataset.colonyFound) })));
 }
 
+/** Thousands of levy foot the commander screen's Train buttons send (RECR-109). */
+let trainPick = 1;
+
 function renderArmy(id: number): void {
   const s = snapshot!;
   const me = s.playerNation;
@@ -3476,7 +3491,9 @@ function renderArmy(id: number): void {
   const ARM_COST: Record<string, { months: number; gold: number }> = {
     "armoured foot": { months: 2, gold: 80 }, pikes: { months: 3, gold: 60 }, archers: { months: 4, gold: 60 }, "light horse": { months: 3, gold: 100 }, "knights and lancers": { months: 9, gold: 300 },
   };
-  const trainMen = Math.min(1000, Math.floor(levyFoot));
+  // The player picks how many thousand to train (RECR-109); the rest stay levy foot.
+  const trainThousands = Math.max(1, Math.min(trainPick, Math.floor(levyFoot / 1000)));
+  const trainMen = levyFoot >= 1000 ? trainThousands * 1000 : Math.floor(levyFoot);
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(c.name)}</h2>${closeButton()}</header>
     <div class="army">
@@ -3508,11 +3525,12 @@ function renderArmy(id: number): void {
     </table>
     ${hired ? "" : `<h3 class="sub">Train</h3>
     ${training
-      ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy foot training as ${esc(training.arm)}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand at a castle of your own)"}.</p>`
+      ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy foot training as ${esc(training.arm)}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand at a castle or drill yard of your own)"}.</p>`
       : trainMen >= 1 && !atHome
-        ? `<p class="hint">Men train only at a castle of your own. March the army to one (your capital has one) to train its levy foot.</p>`
+        ? `<p class="hint">Men train only at a castle or drill yard of your own. March the army to one (your capital has a castle) to train its levy foot.</p>`
       : trainMen >= 1
-        ? `<p class="hint">Turn ${fmt(trainMen)} levy foot into another arm. Training goes on while the army stands at a castle of your own, and stops while it is away.</p>
+        ? `<p class="hint">Turn levy foot into another arm. Training goes on while the army stands at a castle or drill yard of your own, and holds while it is away.</p>
+          ${levyFoot >= 2000 ? `<div class="stepper" role="group" aria-label="Levy foot to train"><button class="paper" data-train-less ${trainThousands <= 1 ? "disabled" : ""} aria-label="Fewer">−</button><output>${fmt(trainMen)} of ${fmt(Math.floor(levyFoot))}</output><button class="paper" data-train-more ${trainThousands * 1000 + 1000 > levyFoot ? "disabled" : ""} aria-label="More">+</button></div>` : ""}
           <div class="choices">${trainable
             .map((a) => {
               const cost = ARM_COST[a]!;
@@ -3521,7 +3539,12 @@ function renderArmy(id: number): void {
             })
             .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Learning</button></p>` : ""}`
         : `<p class="hint">No levy foot left to train.</p>`}`}
-    ${garrison.length ? `<div class="choices"><button class="wax" data-pickup="${id}">Take in the garrison here: ${fmt(garrison.reduce((t, j) => t + s.armies.men[j]!, 0))} men</button></div>` : ""}
+    ${(() => {
+      const waiting = garrison.reduce((t, j) => t + s.armies.men[j]!, 0);
+      return garrison.length
+        ? `<h3 class="sub">Garrison here</h3><div class="choices">${waiting > 1000 ? `<button class="paper" data-pickup="${id}" data-men="1000">Take in ${fmt(1000)}</button>` : ""}<button class="wax" data-pickup="${id}">Take in ${waiting > 1000 ? "all " : ""}${fmt(waiting)} men</button></div>`
+        : "";
+    })()}
     ${shipsHere.length ? `<h3 class="sub">Board ships</h3><div class="choices">${shipsHere.map((f) => `<button class="paper" data-board-fleet="${f.id}">${icon("anchor", 1)}Board ${f.admiral >= 0 ? `${esc(cmdOf(f.admiral).name)}'s fleet` : "the fleet without an admiral"} · room for ${fmt(s.navy.mine.find((m) => m.id === f.id)?.room ?? 0)}</button>`).join("")}</div>` : ""}
     ${others.length ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(cmdOf(s.armies.commander[j]!).name)}'s army</button>`).join("")}</div>` : ""}
     ${hired ? "" : `<h3 class="sub">Command</h3>
@@ -3545,7 +3568,17 @@ function renderArmy(id: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-train]").forEach((b) =>
     b.addEventListener("click", () => void actHere({ type: "train", army: id, arm: b.dataset.train!, men: trainMen })),
   );
-  panel.querySelector("[data-pickup]")?.addEventListener("click", () => void actHere({ type: "pickUp", army: id }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-pickup]").forEach((b) =>
+    b.addEventListener("click", () => void actHere({ type: "pickUp", army: id, ...(b.dataset.men ? { men: Number(b.dataset.men) } : {}) })),
+  );
+  panel.querySelector("[data-train-less]")?.addEventListener("click", () => {
+    trainPick = trainThousands - 1;
+    renderPanel();
+  });
+  panel.querySelector("[data-train-more]")?.addEventListener("click", () => {
+    trainPick = trainThousands + 1;
+    renderPanel();
+  });
   panel.querySelectorAll<HTMLButtonElement>("[data-board-fleet]").forEach((b) =>
     b.addEventListener("click", () => {
       const fleet = Number(b.dataset.boardFleet);
@@ -3590,11 +3623,9 @@ function renderArmy(id: number): void {
 const RATION_MONTH_DAYS = 30;
 
 /** Where the player's armies may train: a held province of the realm with a stone castle, capitals included (RECR-109). */
+/** A castle or drill yard of the player's own, not besieged: the engine's list (RECR-109). */
 function canTrainAt(p: number): boolean {
-  const me = snapshot!.playerNation;
-  const owner = nations[owners[p]!];
-  const castle = wallsAt(p) === "castle" || (owner !== undefined && owner.capital === provinces[p]!.id);
-  return owners[p] === me && occupiers[p]! < 0 && castle && !snapshot!.sieges.some((x) => x.province === p);
+  return snapshot!.trainingGrounds.includes(p);
 }
 
 /** No company is hired while the capital is besieged or held by the enemy (WAR-210). */
@@ -3626,7 +3657,7 @@ function relationsSection(r: number): string {
       <p>Since ${monthText(war.start)}. With you: ${war.ours.map((n) => esc(nations[n]!.name)).join(", ")}. Against you: ${war.theirs.map((n) => esc(nations[n]!.name)).join(", ")}.</p>
       <p class="hint">${whole ? "Peace with them ends the whole war." : "A separate peace: the rest of the war goes on."} Your side holds ${taken} of their provinces; they hold ${lost} of yours.</p>
       <div class="choices">
-        <button class="wax" data-peace="take" ${taken ? "" : "disabled"}>${icon("crown", 2)}Peace: take ${taken} province${taken === 1 ? "" : "s"}</button>
+        <button class="wax" data-peace="take" ${taken ? "" : "disabled"}>${icon("crown", 1)}Peace: take ${taken} province${taken === 1 ? "" : "s"}</button>
         <button class="paper" data-peace="white">White peace</button>
         ${lost ? `<button class="paper" data-peace="give">Give up ${lost} province${lost === 1 ? "" : "s"}</button>` : ""}
       </div>
@@ -3641,7 +3672,7 @@ function relationsSection(r: number): string {
   return `<h3 class="sub">Relations</h3><p>${line}</p>
     ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy")) : ""}
     ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
-    ${rel ? "" : `<div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 2)}Declare war</button></div>`}`;
+    ${rel ? "" : `<h3 class="sub">War</h3><div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 1)}Declare war</button></div>`}`;
 }
 
 /** Peace offered to the player, with the choice to take it. */
@@ -3707,7 +3738,7 @@ function warRoomSection(): string {
     <p class="hint">Call men up from a province's Garrison tab, a thousand at a time.${gathering ? ` ${fmt(gathering)} men are gathering now.` : ""} Over the cap, pay doubles and levies desert.</p>
     ${s.musters.length ? `<div class="queue-head"><span>Recruiting</span><span>${fmt(gathering)} men</span></div>
     <ol class="queue">${s.musters
-      .map((m) => `<li><button class="paper small" data-garrison="${m.province}">${esc(provinces[m.province]!.name)}</button><span class="what"><small>${Math.ceil(m.men / 1000)} / ${rules.defines.recruit.queueMax} queued</small></span><span class="when">all in ${weeks(m.weeksAll)}</span></li>`)
+      .map((m) => `<li><button class="paper small" data-garrison="${m.province}">${esc(provinces[m.province]!.name)}</button><span class="what"><small>${Math.ceil(m.men / 1000)} / ${rules.defines.recruit.queueMax} queued</small></span><span class="when">all ${days(m.daysAll)}</span></li>`)
       .join("")}</ol>` : ""}
     <h3 class="sub">Commanders</h3>
     ${mine
@@ -3923,7 +3954,8 @@ function renderRealm(r: number): void {
   if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "trade" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "colonies") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
   const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
-  const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
+  // The free companies open from the Military tab's Mercenaries button, so Military stays lit over them (feedback 114).
+  const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key || (key === "military" && realmTab === "mercenaries") ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
       <img class="banner" src="${flagUrl(n, 6)}" alt="">
@@ -3959,7 +3991,7 @@ function renderRealm(r: number): void {
     ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}`;
   const content =
     realmTab === "heritage" ? heritageTab(strengths, s?.heritage[r] ?? null, s ? s.nationTreasury[r]! : 0)
-    : realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r))
+    : realmTab === "diplomacy" ? `<div class="diplomacy-tab">${mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r)}</div>`
     : realmTab === "government" && s?.government ? governmentTab(s.government, s.revolution)
     : realmTab === "peoples" && peoples ? peoplesTab(peoples)
     : realmTab === "treasury" ? treasurySection()
@@ -3968,7 +4000,7 @@ function renderRealm(r: number): void {
     : realmTab === "military" ? warRoomSection()
     : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: (c) => cmdOf(c).name })
     : realmTab === "colonies" ? coloniesTab(s!.exploration, { name: (p) => provinces[p]!.name, fleetName: fleetLabel, inRange: s!.exploration.sites.reduce((t, x) => t + (x === 1 ? 1 : 0), 0) })
-    : realmTab === "mercenaries" ? mercenarySection()
+    : realmTab === "mercenaries" ? `<button class="paper small" data-realm-open-tab="military">${icon("scroll", 1)}Back to Military</button>${mercenarySection()}`
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
@@ -3976,7 +4008,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -4039,9 +4071,6 @@ function renderRealm(r: number): void {
       renderPanel();
     }),
   );
-  // On a phone the tab row scrolls sideways: keep the open tab in view.
-  const onTab = panel.querySelector<HTMLElement>(".tabs .tab.on");
-  if (onTab) onTab.parentElement!.scrollLeft = onTab.offsetLeft - onTab.parentElement!.offsetLeft + onTab.offsetWidth / 2 - onTab.parentElement!.clientWidth / 2;
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       realmTab = b.dataset.realmTab as typeof realmTab;

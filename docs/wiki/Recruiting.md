@@ -30,20 +30,20 @@ With the invention W15 Mass conscription every class's call share rises by half 
 
 ### The levy
 
-Tap Levy on a province's card and you get one slider for how many men, in whole thousands, shown also as the share of that province's men who can be called, with the costs underneath. There is no levy for a whole region or the country: you recruit one province at a time.
+Tap one of your provinces, then its **Garrison** tab, and press **Recruit 1,000 men** once for each thousand you want. Under the button you see what that thousand is as a share of the province's men who can be called, and when all the thousands queued there will have gathered; when the button can't be pressed it says why (queue full, too few men, over your troop cap, not enough gold). Up to 10 thousands wait in a province's queue, one row each with the days left, and the × on the last row takes it back with its levy money and men. There is no levy for a whole region or the country: you recruit one province at a time. The costs below are the design's full levy screen; the game shows the levy money on the button.
 
 - **Gold now**: levy money of 20 gold per 1,000 men, paid up front for food on the road.
 - **Food now**: while they gather, levies eat 1 ration a man a month from the province's local store.
 - **Pay**: free for the first 3 months, then 0.15 gold per man a month.
 - **Harvest**: how much of the harvest you lose by taking farmers.
 - **Pool left**: how much of each province's recruit pool remains.
-- **Ready in**: when each thousand will be ready. The men gather a thousand at a time, about 2 weeks for each thousand (provisional), so 10,000 men take months to assemble.
+- **Ready in**: when each thousand will be ready. The men gather a thousand at a time, 14 days for each thousand (provisional), so 10,000 men take months to assemble.
 
 A warning sign shows when the season is wrong, and every cost line opens its own gain and lose list so you can see where the number comes from.
 
 There are no class or province settings, and a region or country levy draws only your royal provinces; lords' men come as their retinues. The screen names the bigger classes and sums the small ones as "others". A levy takes men from every class in proportion to its share of the men who can be called, and from every province of a region by its share of the region's men. Veterans come along by their share of the pool too: if Troyes has 2,000 recruits of whom 400 are veterans, a levy of 1,000 brings 200 veterans.
 
-Each thousand gathers in about 2 weeks (3 days once you know W18 Railway mobilization) and joins the province's **garrison**: troops without a commander. They man the province's castle if it has one, and wait on the province card's Garrison tab. They can't march, fight in the field or train until a commander comes to the province and picks them up into his army, which takes a day. A commander can also leave men behind as a province's garrison. While they are away their job slots stay empty, so a building that falls under half filled goes fallow and pays no tax and makes no wares.
+Each thousand gathers in 14 days (3 days once you know W18 Railway mobilization, so several can come in one week) and joins the province's **garrison**: troops without a commander. They man the province's castle if it has one, and wait on the province card's Garrison tab, listed with their arms and drill; only you see them. They can't march, fight in the field or train until a commander picks them up into his army, which happens at once. A commander standing in the province does it from the Garrison tab ("La Hire takes 1,000" or "takes all") or from his own screen ("Take in 1,000" or "Take in all"); a commander waiting at court can be put at their head with "Lead". A commander can also leave men behind as a province's garrison. While they are away their job slots stay empty, so a building that falls under half filled goes fallow and pays no tax and makes no wares.
 
 *This worked example comes from the design and is drawn as a region levy; today the same levy is raised province by province.* **Champagne, late summer 1444.** France is at war with Burgundy. Champagne has 4 royal provinces, about 260,000 people, 65,000 fighting-age men and 7,900 men who can be called, 65 % of them farmers. It is 3 weeks before harvest. A levy of 5,000 costs 100 gold and 2,500 rations, cuts the Champagne harvest by 6 %, and leaves each province 37 % of its pool. The levy takes 3,250 farmers, 550 herders, 500 homeless, 300 woodsmen, 200 craftsmen, 150 seafolk and 50 others. The screen reads "Ready in 2 weeks at Troyes" as 5,000 levies, with a harvest warning. Push the slider to 6,000 and each province keeps only 24 % of its pool, so all four get the Conscription grievance.
 
@@ -71,7 +71,7 @@ Every January the pool refills by a quarter of the gap to the ceiling, or a thir
 
 ### Training
 
-Training is ordered from the **commander screen**, for the levies in that commander's army: pick the arm, how many thousand and the training place, and the army marches there. The commander screen also shows the army's men by arm, drill and break point, the commander's skills, its companies to split, merge or leave as garrison, its food reserve and food used a day and a month, and its pay.
+Training is ordered from the **commander screen**, for the levy foot in that commander's army, while the army stands at a castle or drill yard of yours: set how many thousand with − and +, then tap the arm, which shows its months and gold. Away from a training place the screen tells you to march there first, and training already under way holds while the army is away. The commander screen also shows the army's men by arm, drill and break point, the commander's skills, its companies to split, merge or leave as garrison, its food reserve and food used a day and a month, and its pay.
 
 Levies can only be trained at a **training place**: a castle or a drill yard of yours. Each has a training room, the number of men it trains at once:
 

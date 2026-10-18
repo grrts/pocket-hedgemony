@@ -736,6 +736,12 @@ and whole realms are gained by diplomacy rather than one war. The latest decisio
 - DIPL-225 Where and grouping: your own country card's Diplomacy tab opens with a *Your name abroad* card: notoriety as a word (Trusted under 25, Watched 25 to 49, Feared 50 to 74, Hated 75 or more), Lands taken in the last 20 years as a bar against the era's league threshold ("6 of 8 before a league"), and every league against you with its members and their soldiers. The declare sheet's *Price of war* (WAR-229) links to it, and nothing about your standing abroad sits elsewhere. [X-21; X-19; DIPL-080]
 - DIPL-226 Overview and phone: the diplomacy lens keeps the red border for a league against you (DIPL-183), and the card lists leagues before anything else when one stands. In landscape the card is one column inside the safe area, its rows are at least 44 points tall and open their reasons on tap, the bar shows its numbers as text, and nothing needs hover. [X-21; X-19]
 
+### 5.31 A compact Diplomacy tab (milestone 5)
+Leroy found the Diplomacy tab's buttons far too large: each action was a full-width bar across the card, so on a phone held sideways the missions alone took three screens to scroll. This changes how the tab is laid out, not what it holds or does.
+
+#### How the player uses it: a compact Diplomacy tab
+- DIPL-227 Where: the realm card's Diplomacy tab, yours and another realm's, holds the same sections in the same order as DIPL-202, DIPL-208 and DIPL-220, but every action (the missions, *End the alliance*, *Court their loyalty* and its recall, *Demand tribute* and each province demand, and a subject's gift, loosen, release, hostage, resident and fold-in actions) is a tile in a grid: a 44-point button sized to its words with a small icon, and under it the one line on what it does or why not. Tiles sit two or three side by side when the card is wide (a phone held sideways, where the card fills the screen) and one to a row when it is narrow (the desktop side panel), so no button stretches across the whole card. Declaring war sits under its own *War* heading at the foot of the tab, and the peace terms, tribute levels and answer buttons sit in a row at their own width. Grouping and overview: unchanged, standing first, then envoys, courting, demands and war; your own Diplomacy tab stays the overview. Phone: every button at least 44 points high in the Wide and Tall layouts, text no smaller than the hints elsewhere, nothing that needs hover; checked on a small and a large phone held sideways and a desktop window with `apps/client/scripts/diplomacy-tab-shots.mjs`. [X-19, DIPL-202, DIPL-208, DIPL-220]
+
 ## 6. Commands
 
 All commands are data, the same for player and AI.
@@ -1278,3 +1284,4 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-220 | — | Presentation: apps/client/src/ui/statecraft.ts and apps/client/src/main.ts, Court him, Court their loyalty and the Subjects lens lines |
 | DIPL-221 … DIPL-224 | features/neighbours-answer-conquest.feature | The league check runs each year; Grabbed land near us; The AI counts notoriety; A whole realm is gained by diplomacy |
 | DIPL-225 … DIPL-226 | features/neighbours-answer-conquest.feature | Your name abroad |
+| DIPL-227 | — | Presentation: apps/client/src/ui/statecraft.ts, apps/client/src/style.css (`.missions`, `.diplomacy-tab`); apps/client/scripts/diplomacy-tab-shots.mjs |

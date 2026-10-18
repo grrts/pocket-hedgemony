@@ -660,9 +660,9 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - WAR-213 The warfare system shall offer free companies of the age's groups, each gathered where its group historically gathered, with a random size between the age's smallest and largest company (300 to 3,000 men, config) and a random mix of arms within its group's ranges; about six are for hire at once, some move on each month and new ones gather, and a realm may hire those that reach its capital within 16 weeks. A hired company arrives with exactly the men and arms it was offered with. [F-53; replaces the fixed 1,000-man company of milestone 2]
 
 #### How the player uses it: free companies
-- WAR-214 Where: the player opens their country card and taps the Mercenaries tab; each company for hire is a card with a Hire button, which is greyed with the reason when the capital is besieged or the treasury is short. [F-52; X-19]
-- WAR-215 Grouping: the tab holds everything about free companies and nothing else: "Your companies" (in service, with a Command button, and on the way, with the weeks left) above "For hire". Each card shows the company's name and group, a bar of its arms with the men of each, its men and captain, the weeks to the capital and its pay a month. [F-52; X-19]
-- WAR-216 Overview: the top of the tab gives the companies in service, their men and their pay a month; the Military tab keeps one line ("Free companies: 2 in service, 1 on the way, 5 for hire") that opens the Mercenaries tab. [F-52; X-19]
+- WAR-214 Where: the player opens their country card's Military tab and taps its Free companies button, which opens the companies' page with a Back to Military button (no tab of its own, feedback 114); each company for hire is a card with a Hire button, which is greyed with the reason when the capital is besieged or the treasury is short. [F-52; X-19]
+- WAR-215 Grouping: the page holds everything about free companies and nothing else: "Your companies" (in service, with a Command button, and on the way, with the weeks left) above "For hire". Each card shows the company's name and group, a bar of its arms with the men of each, its men and captain, the weeks to the capital and its pay a month. [F-52; X-19]
+- WAR-216 Overview: the top of the page gives the companies in service, their men and their pay a month; the Military tab keeps one line ("Free companies: 2 in service, 1 on the way, 5 for hire") that opens the companies' page, and the Military tab stays lit while it is open. [F-52; F-114; X-19]
 - WAR-217 Phone: in landscape the cards are one column across the panel, the Hire and Command buttons are at least 44 × 44 points, the tabs wrap rather than scroll, and nothing needs hover. [F-52; X-19]
 
 ### 5.24 The price of war (X-21, Leroy 18 Oct)
@@ -1218,6 +1218,6 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-210, 211 | features/raising-and-keeping.feature | Hiring a free company takes no recruits; A hired company arrives after its march |
 | WAR-212 | features/kinds-and-break-points.feature | Levies stay until the realm sends them home |
 | WAR-213 | features/raising-and-keeping.feature | Free companies of the age, each its own size and mix |
-| WAR-214 to 217 | features/raising-and-keeping.feature | The Mercenaries tab |
+| WAR-214 to 217 | features/raising-and-keeping.feature | The free companies page |
 | WAR-221 … WAR-228 | features/price-of-war.feature | Peace voices in the game; Refusing an obliged peace costs the ruler; A war with no fitting aim in the game; Lords tire of a long war; Occupation does not pay for the war; Levies at war are paid at once; The dead are missed at home; One peace cannot swallow a realm; The AI counts the price before declaring |
 | WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The war card |
