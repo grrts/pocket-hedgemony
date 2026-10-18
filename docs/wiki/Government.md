@@ -158,7 +158,7 @@ A confederation, a military junta and a party state list the constitutional repu
 
 A **horde** is a realm with the Horde form: the Great Horde, Crimea, Kazan, the Nogais, the Uzbeks, Moghulistan, the Oirats, the Mongols and the Qara Qoyunlu in 1444.
 
-**How far behind.** A steppe horde starts level with anyone in the horse (composite-bow horse archery, horse breeding) and one era level behind its settled neighbours (Muscovy, the Ottomans, the Timurids, Ming) in everything else: no stone castles, no guns, no knights or wagon forts, no feudal grants or royal chancery. It keeps written law and temple schools, and the Islamic hordes keep madrasas.
+**How far behind.** A steppe horde starts level with anyone in the horse (riding, composite-bow horse archery, horse breeding) and one era level behind its settled neighbours (Muscovy, the Ottomans, the Timurids, Ming) in everything else: no stone castles, no steel or gunpowder, no knights or wagon forts, no feudal grants or royal chancery. It keeps writing, written law and temple schools, and the Islamic hordes keep madrasas.
 
 **Why it is strong.** Horse archers, the *Feigned flight* style, herds that give horses and horse-only raids make a horde win most field battles in Era I and about half in Era II.
 

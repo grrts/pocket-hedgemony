@@ -11,22 +11,23 @@ Feature: Hordes and technology
     And the country "<realm>" is in the start group "<group>"
 
     Examples:
-      | realm         | group  |
-      | great_horde   | Steppe |
-      | crimea        | Steppe |
-      | kazan         | Steppe |
-      | nogai         | Steppe |
-      | uzbek_khanate | Steppe |
-      | oirat         | Steppe |
+      | realm         | group    |
+      | great_horde   | hordes   |
+      | crimea        | khanates |
+      | kazan         | khanates |
+      | nogai         | hordes   |
+      | uzbek_khanate | khanates |
+      | oirat         | hordes   |
 
   @GOV-068
   Scenario Outline: A horde starts level in the horse and behind in the rest
-    # The era levels below Era I come from the single tree (research).
+    # The Ancient and Medieval eras and the start groups come from the single tree (research §5.10–5.11).
     Given the campaign starts on 11 November 1444
     Then the country "<realm>" <knows> the invention "<invention>"
 
     Examples:
       | realm       | knows          | invention |
+      | great_horde | knows          | F03       |
       | great_horde | knows          | W1        |
       | great_horde | knows          | F11       |
       | great_horde | knows          | G1        |
@@ -35,6 +36,7 @@ Feature: Hordes and technology
       | great_horde | does not know  | B1        |
       | great_horde | does not know  | W3        |
       | great_horde | does not know  | W5        |
+      | great_horde | does not know  | C03       |
       | great_horde | does not know  | G5        |
       | oirat       | knows          | W1        |
       | oirat       | does not know  | L2        |
