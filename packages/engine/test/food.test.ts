@@ -53,6 +53,26 @@ describe("a living realm: food", () => {
     expect(w.provincePopulation[p]).toBeGreaterThan(people * 0.6);
   });
 
+  it("lets a year's famine take at most a fifth of a province, however long its food fails (feedback 93)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const p = capitalOf(w, "castile");
+    untilDate(w, 1445, 1);
+    const people = w.provincePopulation[p]!;
+    const realm = [...Array(w.provinceCount).keys()].filter((q) => w.provinceOwner[q] === w.provinceOwner[p]);
+    let worst = 0;
+    while (w.date.year < 1447) {
+      // Two years with nothing in the store, the realm's or the castles': the harvests fail and nobody can help.
+      for (const q of realm) w.provinceStore[q] = 0;
+      w.castleStore.fill(0);
+      processTurn(w, [], -1);
+      worst = Math.max(worst, w.provinceStarved[p]! / (w.provincePopulation[p]! + w.provinceStarved[p]!));
+    }
+    expect(worst).toBeGreaterThan(0.1);
+    expect(worst).toBeLessThanOrEqual(0.2001);
+    // Two hard years together cost less than half the province, the refugees included.
+    expect(w.provincePopulation[p]).toBeGreaterThan(people * 0.5);
+  });
+
   it("keeps the world fed: over three years famines touch few provinces", () => {
     const w = createWorld(rules, 3, tiles);
     let starved = 0;

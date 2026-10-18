@@ -8,6 +8,10 @@ import { officialBonus } from "./officials.ts";
 import { worksFood } from "./works.ts";
 import { atHarvest, FOOD_CLASSES, huntingYear } from "./land.ts";
 import { shareFood } from "./castleFood.ts";
+import { provinceConfig } from "./domain/province/model.ts";
+
+/** The most of a province a year's famine takes (feedback 93). */
+const FAMINE_YEAR_SHARE = provinceConfig.famine.year_share;
 
 /**
  * Food (milestone 3): each province keeps a local store, counted in months of
@@ -187,12 +191,16 @@ export function monthlyFood(world: World, news: News[]): void {
   const flee = 0.25;
   for (let p = 0; p < P; p++) {
     if (world.provinceWater[p] || store[p]! >= 0) continue;
-    const unfed = Math.min(-store[p]!, world.provincePopulation[p]!) / 3;
-    store[p] = 0;
     const people = world.provincePopulation[p]!;
-    if (people <= 0) continue;
+    const store0 = store[p]!;
+    // A year's famine takes at most a fifth of the people the province had in January; past that the unfed go hungry (feedback 93).
+    const room = Math.max(0, (people + world.provinceStarved[p]!) * FAMINE_YEAR_SHARE - world.provinceStarved[p]!);
+    store[p] = 0;
+    if (people <= 0 || room <= 0) continue;
     const refuge = neighbourWithFood(world, p);
-    const fled = refuge >= 0 ? unfed * flee : 0;
+    const fleeing = refuge >= 0 ? flee : 0;
+    const unfed = Math.min(-store0 / 3, people / 3, room / (1 - fleeing));
+    const fled = unfed * fleeing;
     const keep = 1 - unfed / people;
     let total = 0;
     for (let c = 0; c < CLASS_COUNT; c++) {
