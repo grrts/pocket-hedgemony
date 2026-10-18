@@ -24,6 +24,8 @@ await page.waitForTimeout(300);
 await page.evaluate(() => document.querySelector("[data-realm-tab=diplomacy]")?.click());
 await page.waitForTimeout(300);
 await page.evaluate(() => document.querySelector("[data-declare]")?.click());
+await page.waitForTimeout(200);
+await page.evaluate(() => document.querySelector("[data-declare-confirm]")?.click());
 await page.waitForTimeout(300);
 // Into the autumn of 1445: past the September harvest. A battle that pauses the week plays on at another End turn.
 const turns = Number(process.env.TURNS ?? 46);

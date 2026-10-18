@@ -25,6 +25,7 @@ await page.evaluate(() => {
 });
 await page.waitForTimeout(300);
 await page.click("[data-declare]");
+await page.click("[data-declare-confirm]");
 await page.waitForTimeout(300);
 await page.click(".panel .close").catch(() => {});
 const card = page.locator("#event-card:not([hidden])");
