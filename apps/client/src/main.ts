@@ -35,7 +35,7 @@ import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite, spriteUrl } from "./art/sprites.ts";
-import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, type FlagOf } from "./art/ui.ts";
+import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, UI_COLORS, type FlagOf } from "./art/ui.ts";
 import { apparentAge, eraOfYear } from "./art/commanders.ts";
 import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
@@ -43,6 +43,7 @@ import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { lockRevolutionButtons, revolutionCardHtml, revolutionSection } from "./ui/revolution.ts";
 import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
+import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeLine, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
@@ -184,7 +185,7 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "colonies" = "general";
+let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "colonies" = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -209,8 +210,10 @@ let exploring: { fleet: number; path: number[]; legs: number[]; carryOn: boolean
 /** The tile tapped on the Land tab, or -1. */
 let landTile = -1;
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "subjects" | "tongues" | "faiths" | "charts";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "subjects" | "tongues" | "faiths" | "charts" | "trade";
 let lens: Lens = "realms";
+/** The trader route being drawn on the map, or null when the map is not in route mode (TRADE-142). */
+let routing: Routing | null = null;
 /** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
 let fogOn = true;
 /** Provinces the player has charted (bit p of byte p >> 3, EXPL-010), or null before a realm is chosen. */
@@ -650,8 +653,12 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "subjects", name: "Subjects", note: "your subjects by loyalty, and your overlord" },
   { id: "tongues", name: "Tongues", note: "the family of the tongue most speak" },
   { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
+  { id: "trade", name: "Trade", note: "trade ratio, your traders' loops" },
   { id: "charts", name: "Charts", note: "what you have charted, and empty coasts to settle" },
 ];
+/** The trade lens's ramp by trade ratio, quiet to busy (TRADE-143); provinces the player doesn't see are parchment. */
+const TRADE_RAMP = ["#efe39a", "#e0b443", "#c7742a", "#3f8f6e", "#1f5a5e"].map(hexToRgb);
+const TRADE_UNSEEN_RGB = hexToRgb(UI_COLORS.parchment);
 /** A colour per tongue family and per faith for their lenses (CULT-085, RELG-118): fixed hues, so a family or faith keeps its colour all campaign. */
 const familyRgb = (key: string): number[] => {
   let h = 0;
@@ -723,6 +730,7 @@ const FOOD_RAMP = ["#a8323e", "#d08a48", "#e9d79a", "#8cb85a", "#3f7a44"].map(he
 const ramp = (colors: number[][], t: number) => colors[Math.max(0, Math.min(colors.length - 1, Math.floor(t * colors.length)))]!;
 const lensMenu = document.querySelector<HTMLElement>("#lenses")!;
 
+/** Turns a lens on: the renderer's mode, the provinces' colours and the menu. */
 function setLens(l: Lens): void {
   lens = l;
   view.renderer.mode = lens === "realms" ? "political" : lens === "terrain" ? "terrain" : "lens";
@@ -734,7 +742,7 @@ function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map lens</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.name}</b><small>${l.note}</small></button>`).join("")}
-    ${lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : ""}
+    ${lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -786,6 +794,17 @@ function diplomacyKey(): string {
     ${RELATION_KEY.map(([r, text]) => `<span>${swatch(r)}${text}</span>`).join("")}
     <span><i class="swatch league"></i>League against you</span>
     <p>Zoom in to see your envoys riding and a sword over realms you hold a war aim on. Tap a realm for its Diplomacy tab.</p>
+  </div>`;
+}
+
+/** The trade lens's key: the ratio ramp, parchment for what isn't seen, and what zooming in shows. */
+function tradeKey(): string {
+  const hex = (c: number[]) => `rgb(${c.join(",")})`;
+  const steps = ["0 to 19 %", "20 to 39 %", "40 to 59 %", "60 to 79 %", "80 % and over"];
+  return `<div class="lens-key">
+    ${TRADE_RAMP.map((c, i) => `<span><i class="swatch" style="background:${hex(c)}"></i>${steps[i]}</span>`).join("")}
+    <span><i class="swatch" style="background:${hex(TRADE_UNSEEN_RGB)}"></i>Not seen</span>
+    <p>Trade ratio: how busy each province's trade is. Zoom in to see your traders' loops with their purses, and a coin on each trade city.</p>
   </div>`;
 }
 
@@ -855,6 +874,9 @@ function lensColor(i: number): number[] {
       // The player's subjects share the player's own colour.
       return r === "own" ? nationRgb[snapshot!.playerNation]! : RELATION_RGB[r];
     }
+    case "trade":
+      if (!snapshot) return ramp(TRADE_RAMP, 0);
+      return snapshot.provinceTradeSeen[i] ? ramp(TRADE_RAMP, snapshot.provinceTradeRatio[i]! / 100) : TRADE_UNSEEN_RGB;
     default:
       return o >= 0 ? nationRgb[o]! : unownedRgb;
   }
@@ -896,7 +918,9 @@ function restyleProvinces(): void {
     const hatched = ((occ >= 0 || rebels) && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war") || (lens === "faiths" && (snapshot?.peoples.provinceFaithShare[i * SLOTS + 1] ?? 0) >= 0.3);
     const lord = snapshot ? snapshot.provinceLord[i]! : -1;
     const lit = litLord >= 0 && lord === litLord;
-    const flags = (i === selectedProvince ? 1 : 0) | (lit ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
+    // Under the trade lens, land whose trade the player doesn't see is parchment too (TRADE-143).
+    const unseen = !isKnown(i) || (lens === "trade" && !!snapshot && !isWater[i] && !snapshot.provinceTradeSeen[i]);
+    const flags = (i === selectedProvince ? 1 : 0) | (lit ? 2 : 0) | (unseen ? 4 : 0) | (hatched ? 8 : 0);
     // While armies are chosen to march, land they may not enter gets red borders (feedback 76).
     // Under the diplomacy lens, a league against the player gets the same red border (DIPL-183).
     const closed = (selected.size > 0 && !!snapshot?.provinceClosed[i]) || (lens === "diplomacy" && o >= 0 && snapshot?.diplomacyLens?.league[o] === 1);
@@ -1079,6 +1103,60 @@ function drawOverlay(o: OverlayContext): void {
     }
   }
 
+  // The trade lens, zoomed in to regional: a coin on each trade city, the player's traders' loops dotted in its colour with
+  // each trader where it stands and its purse, and the route being drawn (TRADE-142, TRADE-143). Only what is on screen is drawn.
+  const tv = lens === "trade" ? snapshot?.trade : null;
+  if (tv && zoom >= REGIONAL_ZOOM) {
+    const s = snapshot!;
+    const u = tokenUnit(zoom);
+    const color = nations[s.playerNation]!.color;
+    const coinImage = coinImages[u >= 3 ? 1 : 0]!;
+    if (coinImage.complete)
+      for (let i = 0; i < provinces.length; i++) {
+        // Coins on the cities whose trade the player sees; while a route is drawn, on every city it could tap.
+        if (!s.provinceTradeCity[i] || !isKnown(i) || (!routing && !s.provinceTradeSeen[i])) continue;
+        const [sx, sy] = o.toScreen(provinces[i]!.x!, provinces[i]!.y!);
+        if (onScreen(sx, sy, 16)) ctx.drawImage(coinImage, Math.round(sx + 3 * u), Math.round(sy - 7 * u));
+      }
+    const at = (p: number) => o.toScreen(provinces[p]!.x!, provinces[p]!.y!);
+    const loop = (path: readonly number[], fill: string) => {
+      if (path.length < 2) return;
+      for (let k = 0; k < path.length; k++) dottedLine(ctx, at(path[k]!), at(path[(k + 1) % path.length]!), u, fill, o.width, o.height);
+    };
+    for (const t of tv.traders) loop(t.path, color);
+    const draft = routing && tv.draft?.trader === routing.trader ? tv.draft : null;
+    if (draft) loop(draft.path, PALETTE.gold);
+    for (const t of tv.traders) {
+      const [sx, sy] = at(t.at);
+      if (!onScreen(sx, sy)) continue;
+      const img = sprite(isShipKind(t.kind) ? "cog" : "caravan", color, u);
+      const x = Math.round(sx - img.width / 2);
+      const y = Math.round(sy - img.height - 2 * u);
+      ctx.drawImage(img, x, y);
+      // Its purse: a gold bar under it, filling as it collects.
+      const w = img.width;
+      ctx.fillStyle = PALETTE.ink;
+      ctx.fillRect(x, y + img.height, w, 3 * u);
+      ctx.fillStyle = PALETTE.gold;
+      ctx.fillRect(x + u, y + img.height + u, Math.round((w - 2 * u) * Math.min(1, t.purseMax > 0 ? t.purse / t.purseMax : 0)), u);
+    }
+    // The stops chosen so far, numbered in order.
+    if (routing) {
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      routing.stops.forEach((p, k) => {
+        const [sx, sy] = at(p);
+        if (!onScreen(sx, sy)) return;
+        const r = 6 * u;
+        ctx.fillStyle = PALETTE.ink;
+        ctx.fillRect(Math.round(sx - r / 2 - u), Math.round(sy - r / 2 - u), r + 2 * u, r + 2 * u);
+        ctx.fillStyle = PALETTE.gold;
+        ctx.fillRect(Math.round(sx - r / 2), Math.round(sy - r / 2), r, r);
+        pixelText(ctx, String(k + 1), sx, sy - r, 12);
+      });
+    }
+  }
+
   // The subjects lens: a dotted line from each courting realm's capital to the subject it courts, yours and those you know of (DIPL-220, SUBJ-095).
   const sc = lens === "subjects" ? snapshot?.statecraft : null;
   if (sc) {
@@ -1238,6 +1316,25 @@ function drawEnvoy(ctx: CanvasRenderingContext2D, a: number[], b: number[], prog
   ctx.textAlign = "center";
   ctx.textBaseline = "bottom";
   pixelText(ctx, label, rx, ry - img.height - 2, 10);
+}
+
+/** A dotted line between two points on screen, ink dots filled with a colour; skipped when it is off screen or wraps the map. */
+function dottedLine(ctx: CanvasRenderingContext2D, a: number[], b: number[], u: number, fill: string, w: number, h: number): void {
+  const [ax, ay] = a as [number, number];
+  const [bx, by] = b as [number, number];
+  if ((ax < 0 && bx < 0) || (ay < 0 && by < 0) || (ax > w && bx > w) || (ay > h && by > h)) return;
+  const len = Math.hypot(bx - ax, by - ay);
+  if (len > w * 2) return;
+  const step = 5 * u;
+  for (let d = step / 2; d < len; d += step) {
+    const x = Math.round(ax + ((bx - ax) * d) / len);
+    const y = Math.round(ay + ((by - ay) * d) / len);
+    if (x < -4 || y < -4 || x > w + 4 || y > h + 4) continue;
+    ctx.fillStyle = PALETTE.ink;
+    ctx.fillRect(x - u, y - u, 2 * u, 2 * u);
+    ctx.fillStyle = fill;
+    ctx.fillRect(x - u / 2, y - u / 2, u, u);
+  }
 }
 
 /** Armies show once the realm names are gone (feedback 31). */
@@ -1407,6 +1504,8 @@ let hammerTick: ReturnType<typeof setTimeout> | 0 = 0;
 
 /** The hammer marking a building site on the map. */
 const hammerImage = Object.assign(new Image(), { src: iconUrl("hammer", 1) });
+/** The coin over each trade city under the trade lens, at one and two art pixels a pixel. */
+const coinImages = [1, 2].map((scale) => Object.assign(new Image(), { src: iconUrl("coin", scale) }));
 
 /** A province's walls: its castle as the works stand now (the map's before a game starts), a stone castle in every capital. */
 function wallsAt(p: number): "castle" | "fort" | null {
@@ -1491,6 +1590,8 @@ function labelBitmap(text: string, size: number, water: boolean): LabelBitmap {
 
 // ---- input ----
 function onTap(sx: number, sy: number, province: number): void {
+  // While a route is drawn, a tap picks its next stop (TRADE-142).
+  if (routing) return routeTap(province);
   officialView = -1;
   achView = false;
   // Drawing a course: each tap on the sea adds a leg; the bar over the map says what it takes (EXPL-069).
@@ -1877,11 +1978,12 @@ function applySnapshot(): void {
   occupiers = snapshot!.provinceOccupier;
   nationLabels = computeNationLabels();
   renderLitChip();
+  renderRouteBar();
 }
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown", revolution: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown", revolution: "crown", trade: "scroll",
 };
 
 /**
@@ -2353,6 +2455,7 @@ function renderPanelCard(): void {
     <dl class="facts">
       <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
+      ${snapshot ? provinceTradeLine(snapshot, selectedProvince) : ""}
       ${snapshot ? foodFacts(selectedProvince) : ""}
       ${snapshot && own >= 0 ? moodFacts(selectedProvince) : ""}
       ${snapshot ? beliefFacts(snapshot.peoples, selectedProvince) : ""}
@@ -3882,7 +3985,7 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "colonies") && !mine)) realmTab = "general";
+  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "trade" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "colonies") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
   const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
@@ -3898,6 +4001,7 @@ function renderRealm(r: number): void {
       <dt>People</dt><dd>${fmt(people)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
       ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
+      ${mine && s.trade ? tradeLine(s.trade) : ""}
       ${mine ? risingsLine(s.rebels, r) : ""}
       ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
       ${peoples ? beliefLines(peoples, mine) : ""}
@@ -3924,6 +4028,7 @@ function renderRealm(r: number): void {
     : realmTab === "government" && s?.government ? governmentTab(s.government, s.revolution)
     : realmTab === "peoples" && peoples ? peoplesTab(peoples)
     : realmTab === "treasury" ? treasurySection()
+    : realmTab === "trade" && s?.trade ? tradeTab(s.trade, s, (p) => provinces[p]!.name)
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "military" ? warRoomSection()
     : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: (c) => cmdOf(c).name })
@@ -3936,7 +4041,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -4030,6 +4135,7 @@ function renderRealm(r: number): void {
     governmentUi.confirm = null;
     void act({ type: "reform", to: (e.currentTarget as HTMLButtonElement).dataset.reform! });
   });
+  bindTrade();
   bindOffers();
   bindCommand();
   bindTax(-1);
@@ -4041,6 +4147,164 @@ function renderRealm(r: number): void {
   });
   bindNationButtons();
 }
+
+// ---- trade: the Trade tab's buttons and the route drawn on the map (TRADE-141, TRADE-142) ----
+
+/** The route bar along the bottom of the map, inside the safe areas. */
+const routeBarEl = document.createElement("div");
+routeBarEl.className = "route-bar framed";
+routeBarEl.hidden = true;
+app.append(routeBarEl);
+
+function renderRouteBar(): void {
+  // A trader lost while its route was drawn ends the drawing.
+  if (routing && snapshot?.trade && !snapshot.trade.traders.some((t) => t.id === routing!.trader)) routing = null;
+  routeBarEl.hidden = !routing;
+  if (routing) routeBarEl.innerHTML = routeBar(routing, snapshot?.trade ?? null, (p) => provinces[p]!.name);
+}
+
+/** On a phone a card folds away so the map stays in view; on a desktop it stays beside the map. */
+const foldOnPhone = () => !matchMedia("(min-width: 900px) and (min-height: 600px)").matches;
+
+function bindTrade(): void {
+  const id = (b: HTMLElement, key: string) => Number(b.dataset[key]);
+  panel.querySelectorAll<HTMLButtonElement>("[data-trader-route]").forEach((b) => b.addEventListener("click", () => startRoute(id(b, "traderRoute"))));
+  panel.querySelectorAll<HTMLButtonElement>("[data-trader-show]").forEach((b) => b.addEventListener("click", () => showTrader(id(b, "traderShow"))));
+  panel.querySelectorAll<HTMLButtonElement>("[data-trader-ask]").forEach((b) =>
+    b.addEventListener("click", () => {
+      tradeUi.dismiss = id(b, "traderAsk");
+      renderPanel();
+    }),
+  );
+  panel.querySelector<HTMLButtonElement>("[data-trader-keep]")?.addEventListener("click", () => {
+    tradeUi.dismiss = -1;
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-trader-dismiss]")?.addEventListener("click", (e) => {
+    tradeUi.dismiss = -1;
+    void act({ type: "dismissTrader", trader: id(e.currentTarget as HTMLElement, "traderDismiss") });
+  });
+  panel.querySelectorAll<HTMLButtonElement>("[data-found-city]").forEach((b) =>
+    b.addEventListener("click", () => void act({ type: "foundTrader", city: id(b, "foundCity"), kind: b.dataset.foundKind as Routing["kind"] })),
+  );
+  panel.querySelector<HTMLButtonElement>("[data-found-all]")?.addEventListener("click", () => {
+    tradeUi.allCities = !tradeUi.allCities;
+    renderPanel();
+  });
+}
+
+/** Show on a trader card: the map centres on the trader, zoomed in to regional, under the trade lens. */
+function showTrader(id: number): void {
+  const t = snapshot?.trade?.traders.find((x) => x.id === id);
+  if (!t) return;
+  panelCollapsed = foldOnPhone();
+  setLens("trade");
+  view.lookAt(provinces[t.at]!.x!, provinces[t.at]!.y!, Math.max(view.camera.zoom, 3));
+  renderPanel();
+}
+
+/** Route on a trader card: the card closes, the trade lens comes on and the route bar waits for taps on the map. */
+function startRoute(id: number): void {
+  const t = snapshot?.trade?.traders.find((x) => x.id === id);
+  if (!t) return;
+  routing = { trader: id, kind: t.kind, stops: [], mode: t.mode, note: null };
+  realmView = -1;
+  selectedProvince = -1;
+  officialView = -1;
+  lordView = -1;
+  armyView = -1;
+  newsView = false;
+  selected.clear();
+  lensMenu.hidden = true;
+  armyListClosed = true;
+  renderArmyList();
+  setLens("trade");
+  view.lookAt(provinces[t.home]!.x!, provinces[t.home]!.y!, Math.max(view.camera.zoom, 3));
+  renderPanel();
+  renderRouteBar();
+  // An old draft, of this trader or another, is cleared.
+  void sendDraft();
+}
+
+/** A tap on the map while a route is drawn: a trade stop is added, the last stop again confirms, anything else says why not. */
+function routeTap(p: number): void {
+  const r = routing!;
+  if (p < 0 || !snapshot) return;
+  const name = provinces[p]!.name;
+  const ship = isShipKind(r.kind);
+  if (!isKnown(p)) r.note = "you don't know that land yet";
+  else if (isWater[p]) r.note = ship ? "tap a port, not the sea" : "tap a city, not the sea";
+  else if (!(snapshot.provinceTradeCity[p]! & stopBit(r.kind))) r.note = ship ? `${name} has no harbour` : `${name} is not a city or a market town`;
+  else if (r.stops.at(-1) === p) {
+    if (r.stops.length >= 2) return void confirmRoute();
+    r.note = "tap another city";
+  } else if (r.stops.length >= 8) r.note = "a route has at most 8 stops";
+  else {
+    r.stops.push(p);
+    r.note = null;
+    sound.sfx("map_select_province");
+    void sendDraft();
+  }
+  renderRouteBar();
+  view.invalidate();
+}
+
+/** Sends the stops so far for the preview; a tap made while the engine was busy is sent once it is free. */
+async function sendDraft(): Promise<void> {
+  if (!routing) return;
+  // The mode goes with the stops, so the preview is of what Confirm will set.
+  const key = (r: Routing) => `${r.stops.join()}/${r.mode}`;
+  const want = key(routing);
+  await act({ type: "draftTradeRoute", trader: routing.trader, stops: routing.stops.slice(), mode: routing.mode });
+  if (routing && key(routing) !== want && !acting) await act({ type: "draftTradeRoute", trader: routing.trader, stops: routing.stops.slice(), mode: routing.mode });
+  renderRouteBar();
+}
+
+/** Leaves route mode; the realm card waits on the Trade tab, folded on a phone so the new loop stays in view. */
+function leaveRoute(): void {
+  routing = null;
+  renderRouteBar();
+  if (snapshot) {
+    realmView = snapshot.playerNation;
+    realmTab = "trade";
+    panelCollapsed = foldOnPhone();
+  }
+  renderPanel();
+  view.invalidate();
+}
+
+async function confirmRoute(): Promise<void> {
+  const r = routing;
+  if (!r || r.stops.length < 2 || acting) return;
+  await act({ type: "setTradeRoute", trader: r.trader, stops: r.stops.slice(), mode: r.mode });
+  const refused = snapshot?.rejectedOrders[0];
+  if (refused) {
+    r.note = refused.reason;
+    renderRouteBar();
+    return;
+  }
+  leaveRoute();
+}
+
+routeBarEl.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button");
+  const r = routing;
+  if (!b || b.disabled || !r) return;
+  if (b.dataset.routeMode) {
+    r.mode = b.dataset.routeMode as Routing["mode"];
+    renderRouteBar();
+    if (r.stops.length) void sendDraft();
+  } else if (b.dataset.routeUndo !== undefined) {
+    r.stops.pop();
+    r.note = null;
+    renderRouteBar();
+    view.invalidate();
+    void sendDraft();
+  } else if (b.dataset.routeCancel !== undefined) {
+    void act({ type: "draftTradeRoute", trader: r.trader, stops: [] });
+    leaveRoute();
+  } else if (b.dataset.routeConfirm !== undefined) void confirmRoute();
+});
 
 /** The Learning tab's buttons: Tree or Schools, the boughs, tapping an invention, study, seats, students to arms, found a school; its folds and the tree's scroll stay as the player left them. */
 function bindLearning(): void {
@@ -4962,6 +5226,19 @@ Object.assign(globalThis, {
     const mine = [...snapshot.armies.id.keys()].filter((j) => snapshot!.armies.owner[j] === snapshot!.playerNation);
     const k = mine.find((j) => snapshot!.armies.commander[j]! >= 0) ?? mine[0];
     return k === undefined ? null : provinces[snapshot.armies.location[k]!]!.id;
+  },
+  /** Where a province's centre is on screen, by id (CSS pixels in the map). */
+  __phScreenOf: (id: string) => {
+    const p = provinces[provinceIndex.get(id)!]!;
+    return view.toScreen(p.x!, p.y!);
+  },
+  /** The player's busiest trade cities by id, and the provinces of its first trader's loop. */
+  __phTradeCities: () => (snapshot?.trade ? snapshot.trade.centres.map((c) => provinces[c.province]!.id) : []),
+  __phTraderPath: () => (snapshot?.trade?.traders[0]?.path ?? []).map((p) => provinces[p]!.id),
+  /** Centres the map on a province by id, at a zoom. */
+  __phLookAt: (id: string, zoom: number) => {
+    const p = provinces[provinceIndex.get(id)!]!;
+    view.lookAt(p.x!, p.y!, zoom);
   },
   /** Opens a province's overview by id. */
   __phSelect: (id: string) => {

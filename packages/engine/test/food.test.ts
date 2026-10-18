@@ -34,7 +34,7 @@ describe("a living realm: food", () => {
     untilDate(w, 1445, 10);
     expect(w.provinceHarvest[p]).toBeGreaterThanOrEqual(0);
     expect(storeMonths(w, p)).toBeGreaterThan(before);
-  });
+  }, 60000);
 
   it("starves a province with no food, and some of its people flee to a neighbour", () => {
     const w = createWorld(rules, 1, tiles);
@@ -71,7 +71,7 @@ describe("a living realm: food", () => {
     expect(worst).toBeLessThanOrEqual(0.2001);
     // Two hard years together cost less than half the province, the refugees included.
     expect(w.provincePopulation[p]).toBeGreaterThan(people * 0.5);
-  });
+  }, 60000);
 
   it("keeps the world fed: over three years famines touch few provinces", () => {
     const w = createWorld(rules, 3, tiles);

@@ -1332,7 +1332,7 @@ Given("a campaign saved in {string} under the old rules", (s, when: string) => {
 
 When("it is loaded with changed rules", (s) => {
   const e = rules.defines.economy;
-  s.changed = { ...rules, defines: { ...rules.defines, economy: { ...e, goldPerWealthPerMonth: e.goldPerWealthPerMonth * 2 } } };
+  s.changed = { ...rules, defines: { ...rules.defines, economy: { ...e, goldPerThousandPeoplePerMonth: e.goldPerThousandPeoplePerMonth * 2 } } };
   s.loaded = copyWorld(s.saved, s.changed);
   s.loadedHash = hashWorld(s.loaded);
 });

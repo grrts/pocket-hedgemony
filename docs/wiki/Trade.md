@@ -267,6 +267,28 @@ On a phone, each province and sea zone stores only its ratio and traders passing
 - **Turn report**: deposits summed into one line ("Traders brought 23 gold this week"); only problems (robbed, route broken, ship taken) get their own line.
 - **On the map**: at world zoom the Trade lens coloured by trade ratio and the busiest roads and sea lanes; at region zoom thicker roads with more traders, trader icons (caravan, barge, ship) with a purse bar, and a coin on market cities; at local zoom caravans, barges and ships moving. Lenses: **Trade ratio**, **Trade value** and **Traders** (your traders and routes). See [Map and Lenses](Map-and-Lenses).
 
+### In the game now
+
+Trade runs in the game as a first slice: traders you own walk loops between cities, and what they bring home is your **Trade** line in the treasury. The old flat trade sum from a province's wealth is gone.
+
+- **Goods.** Each January every province counts what it makes: the wares of its works (timber and furs, stone, ore, salt, wool and hides), the food it does not eat (as grain), and crafts made by its craftsmen (finished goods, until the loom houses and forges make their own). Priced by tier, with a market's weight added, that is its **trade value** in gold a month. A harbour adds its weight for ships.
+- **Trade stops.** A city, or any town with a market, is a stop for caravans and barges; a port with a harbour is a stop for ships.
+- **Traders.** Pack caravans, camel caravans (from desert or drylands, or with Caravanserai networks), river barges (on rivers only) and the cog. Each walks its loop a month at a time: every province it stands in gets busier, it collects as it enters (10 % to the owner of a foreign province, nothing on unclaimed land) and it empties its purse in every city of yours it reaches. Its upkeep is paid each month; six months unpaid and it is given up.
+- **Trade ratio.** Each month a province's ratio rises with the traders passing (a customs officer helps, riots hurt, an enemy or a siege stops it) and loses a tenth. Every 4 points of ratio raise the tax the province owes by 1 %.
+- **Your Trade line** is last month's deposits plus market fees paid to you, less your traders' upkeep.
+- **At the start** every realm gets its traders by its trade access (Venice six, France four), on hand-made routes where their cities are on the map and otherwise on the best loops from its best cities, and two years of their walking set the starting ratios.
+- **The AI** looks at each trader once a year and finds it a better loop when its own pays little or is broken, and founds one more a year where a loop pays well, up to twice its starting traders.
+
+Where you find it:
+
+- **The Trade tab** of your realm card, next to Treasury: last month's deposits, fees and upkeep; your traders, best first, each with its stops, loop days, a purse bar, about what it brings a month, what it deposited last month and what is wrong, with **Route**, **Show** and **Dismiss**; **Found a trader** in each of your cities that can, one button per kind with its gold and upkeep (greyed with the reason when it can't); and your **busiest cities**.
+- **Setting a route**: tap **Route** on a trader. The map switches to the Trade lens and a bar along the bottom asks you to tap cities in order, 2 to 8; the preview (loop days, provinces collected in, about how much a month, the best provinces) grows as you tap. Choose **Loop** or **There and back**, then **Confirm** (or tap the last stop again).
+- **The Trade lens**: provinces coloured by trade ratio, what you don't see in parchment; zoomed in, your traders' loops as dotted lines with each trader and its purse, and a coin on every trade stop.
+- **The province card** has a Trade line: value a month, ratio, traders passing and its top goods.
+- **The General tab** has one line, "Trade: N traders · +x gold a month", that opens the Trade tab.
+
+Not yet: tolls, trade pacts and embargoes, bandits and capture on the road, lords' traders, ships other than the cog, copying a route and the "once" mode.
+
 ## How it connects
 
 - [Troop Movement](Troop-Movement): the shared mover model, day loop, graph, route planner and step days; trade supplies where traders may enter and stop.

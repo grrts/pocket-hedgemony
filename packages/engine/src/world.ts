@@ -24,6 +24,7 @@ import { createCastleFoodState, seedCastleStores, type CastleFoodState } from ".
 import { createGameEvents, type GameEvents } from "./events.ts";
 import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
+import { createTradeState, seedTrade, type TradeState } from "./trade.ts";
 import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
@@ -39,7 +40,7 @@ import type { AchievementLog } from "./achievements.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -325,7 +326,8 @@ function growArmyPool(old: ArmyPool): ArmyPool {
  * one the world gets a stand-in with one tile per province, where armies
  * can't march (enough for a probe that only runs a turn).
  */
-export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = pointTileGrid(rules)): World {
+/** `seedTrade: false` leaves trade empty, for a world a save is about to fill. */
+export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = pointTileGrid(rules), opts: { seedTrade?: boolean } = {}): World {
   const provinceIds = rules.provinces.map((p) => p.id);
   const provinceIndex = new Map(provinceIds.map((id, i) => [id, i]));
   const nationIds = rules.nations.map((n) => n.id);
@@ -428,6 +430,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createConversionState(P),
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
+    ...createTradeState(P, N),
     ...createRebelState(P, N),
     ...createRevolutionState(N),
     navy: createNavyState(P),
@@ -474,6 +477,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     }
   });
   seedResearch(world);
+  if (opts.seedTrade !== false) seedTrade(world);
   seedNavy(world);
   seedRegions(world);
   seedCharts(world);
