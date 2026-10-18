@@ -121,7 +121,7 @@ export type Order =
   /** Agree to, give in to or refuse an envoy's ask at the player's court (its id in the snapshot's statecraft asks, DIPL-212). */
   | { type: "answerAsk"; ask: string; yes: boolean }
   /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
-  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "tighten" | "fold_in"; level?: string }
+  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in"; level?: string }
   /** A Disloyal subject rises against its overlord (SUBJ-076, SUBJ-077). */
   | { type: "riseUp" }
   | { type: "stopChange"; province: number }
