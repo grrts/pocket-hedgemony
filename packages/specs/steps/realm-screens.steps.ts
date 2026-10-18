@@ -68,9 +68,9 @@ Then("the Treasury tab of the country card opens", (s) => {
   expect(s.opened).toEqual({ card: "realm", tab: "treasury" });
 });
 
-Then("the top bar shows the realm, the date, gold, stability, the war plaque while at war and dispatches", (s) => {
+Then("the top bar shows the realm, the date, gold, stability, the war plaque while at war and the News button", (s) => {
   expect(bar(s).map((p) => p.key)).toEqual(["realm", "date", "gold", "stability", "dispatches"]);
-  // While at war the war plaque stands between stability and dispatches, and opens Diplomacy.
+  // While at war the war plaque stands between stability and News, and opens Diplomacy.
   const atWar = { ...s.snap, wars: [{ id: "w", attackers: [s.me], defenders: [s.me === 0 ? 1 : 0], start: "1444-11-11" }] };
   const warBar = topBar(atWar, 0);
   expect(warBar.map((p) => p.key)).toEqual(["realm", "date", "gold", "stability", "war", "dispatches"]);

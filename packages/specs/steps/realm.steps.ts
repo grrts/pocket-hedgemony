@@ -230,7 +230,7 @@ function expectDirection(s: S, key: string, word: string): void {
 }
 
 Then(
-  /^its (harvest|local store|herds|fish catch|granary size|reach|people|faith share|tongue share|count in revolt|soldiers|recruits|horses|warships|trade ships) (?:is|are) (\w+)$/,
+  /^its (harvest|local store|herds|fish catch|granary size|reach|people|faith share|language share|count in revolt|soldiers|recruits|horses|warships|trade ships) (?:is|are) (\w+)$/,
   (s, what: string, word: string) => {
     expectDirection(s, what === "warships" || what === "trade ships" ? what : "value", word);
   },
@@ -2601,7 +2601,7 @@ function convert(s: S, realm: string, what: "faith" | "tongue"): void {
   expect(what === "faith" ? G.lowFaith(w, n) : G.lowTongue(w, n)).toBe(true);
 }
 Given("the country {string} has a low faith share", (s, realm: string) => convert(s, realm, "faith"));
-Given("the country {string} has a low tongue share", (s, realm: string) => convert(s, realm, "tongue"));
+Given("the country {string} has a low language share", (s, realm: string) => convert(s, realm, "tongue"));
 When("the realm's provinces are checked for revolt", (s) => {
   const n = realmOf(s, s.realm);
   s.after = { faith: G.beliefRevoltFactor(s.game, n, "Faith"), homeland: G.beliefRevoltFactor(s.game, n, "Homeland") };
