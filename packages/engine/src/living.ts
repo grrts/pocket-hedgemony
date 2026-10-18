@@ -2,6 +2,7 @@ import type { World } from "./world.ts";
 import { birthRate, deathModifiers, deathRate } from "./domain/province/people.ts";
 import { CLASSES, type ClassName } from "./domain/province/model.ts";
 import type { News } from "./war.ts";
+import { heritageFactor } from "./heritage.ts";
 
 /**
  * A living realm (milestone 3): each province's people by class, born and
@@ -96,10 +97,13 @@ export function monthlyPeople(world: World, _news: News[]): void {
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p]) continue;
     const extra = atWar(world, p, fighting) ? war.everyone : 0;
+    // Heritage speeds or slows growth (growth_pct), never a decline.
+    const growth = heritageFactor(world, world.provinceOwner[p]!, "growth_pct");
     let total = 0;
     for (let c = 0; c < CLASS_COUNT; c++) {
       const i = p * CLASS_COUNT + c;
-      const rate = BIRTHS[c]! - DEATHS[c]! - extra;
+      const net = BIRTHS[c]! - DEATHS[c]! - extra;
+      const rate = net > 0 ? net * growth : net;
       cls[i] = Math.max(0, cls[i]! * (1 + rate / 12));
       total += cls[i]!;
     }

@@ -1,3 +1,4 @@
+import { heritageViews, type HeritageView } from "./heritage.ts";
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
 import { achievementsView, startAchievements } from "./achievements.ts";
 import { eventCards, type EventCard } from "./events.ts";
@@ -105,6 +106,8 @@ export interface Snapshot {
   events: EventCard[];
   /** Envoys, answers and what other realms think of the player (milestone 5); null without a player. */
   statecraft: StatecraftView | null;
+  /** Each realm's heritage in play by nation index (null: none recorded); ambitions only for the player's realm (HER-078). */
+  heritage: (HeritageView | null)[];
   /** The map's diplomacy lens: each realm's relation to the player, leagues, envoys on the road and war aims (DIPL-209); null without a player. */
   diplomacyLens: DiplomacyLensView | null;
   /** Sieges under way: months gone, how far into the next siege month (0..1), breaches and men inside. */
@@ -330,6 +333,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
       relations,
       statecraft: statecraftView(w, player),
+      heritage: heritageViews(w),
       events: eventCards(w, player),
       diplomacyLens: diplomacyLensView(w, player),
       sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
@@ -404,7 +408,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       peoples: peoplesSnapshot(w),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
-      freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
+      freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c, player), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
       provinceOfficialName: Array.from({ length: w.provinceCount }, (_, p) => officialAt(w, p)),
       provinceOfficialYears: Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
