@@ -12,7 +12,7 @@ export { officialEffect, OFFICIALS, type OfficialEffectView } from "./officials.
 export { aiRecruits, ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { NOT_YET as ACHIEVEMENTS_NOT_YET, type Unlock as AchievementUnlock } from "./achievements.ts";
-export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply } from "./protocol.ts";
+export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply, type SaveListing } from "./protocol.ts";
 export type { FleetView, NavyOrder, NavyView } from "./navy.ts";
 export type { ExploreOrder, ExplorationView } from "./colonies.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";

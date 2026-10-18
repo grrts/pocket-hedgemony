@@ -43,6 +43,9 @@ export class MapView {
   private pointers = new Map<number, { x: number; y: number }>();
   private gesture: { moved: number; pinchDist: number; startZoom: number } | null = null;
   private lastAnim = 0;
+  private lastFrame = 0;
+  /** Battery saver's knobs (settings): frames a second at most, ms between idle animation frames (0 = none), the overlay's pixel ratio cap. */
+  private power = { maxFps: 60, animMs: 200, dprCap: 2 };
   private root: HTMLElement;
   /** The view's size in CSS pixels, kept from the last resize: reading it from the page on every call forces layout. */
   private viewW = 0;
@@ -68,8 +71,10 @@ export class MapView {
     new ResizeObserver(() => this.resize()).observe(root);
     this.resize();
     const frame = (t: number) => {
-      // Waves and the selection blink only need a few frames a second.
-      if (this.dirty || t - this.lastAnim > 200) {
+      // Waves and the selection blink only need a few frames a second; the frame cap holds the rest back.
+      const capped = t - this.lastFrame < 1000 / this.power.maxFps - 1;
+      if (!capped && (this.dirty || (this.power.animMs > 0 && t - this.lastAnim > this.power.animMs))) {
+        this.lastFrame = t;
         // Cleared before drawing, so a drawOverlay that is still animating
         // (marching armies) can ask for the very next frame.
         this.dirty = false;
@@ -91,6 +96,14 @@ export class MapView {
     this.dirty = true;
   }
 
+  /** Takes the performance settings at once (SET-003). */
+  setPower(power: { maxFps: number; animMs: number; dprCap: number }): void {
+    const sharper = power.dprCap !== this.power.dprCap;
+    this.power = power;
+    if (sharper) this.resize();
+    this.invalidate();
+  }
+
   lookAt(x: number, y: number, zoom = this.camera.zoom): void {
     this.camera = { x, y, zoom: Math.min(this.maxZoom, Math.max(this.minZoom, zoom)) };
     this.clamp();
@@ -98,7 +111,7 @@ export class MapView {
   }
 
   private resize(): void {
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.dpr = Math.min(window.devicePixelRatio || 1, this.power.dprCap);
     const w = (this.viewW = this.root.clientWidth);
     const h = (this.viewH = this.root.clientHeight);
     // The map is pixel art, so it is drawn at one pixel per CSS pixel and

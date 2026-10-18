@@ -192,11 +192,14 @@ export interface BatteryReport {
   iosLowPowerMode?: boolean;
   androidBatterySaver?: boolean;
   steamDeck?: { onBattery: boolean; level: number };
+  /** A browser's or phone's battery, where it reports one (level 0..1). */
+  battery?: { charging: boolean; level: number };
 }
 
 /** Whether the device reports battery saving: Steam Deck counts below the threshold on battery. */
 export function deviceSavesBattery(st: SettingsState, r: BatteryReport): boolean {
   if (r.iosLowPowerMode || r.androidBatterySaver) return true;
+  if (r.battery && !r.battery.charging && r.battery.level < st.cat.constants.battery_auto_threshold) return true;
   return !!r.steamDeck && r.steamDeck.onBattery && r.steamDeck.level < st.cat.constants.battery_auto_threshold;
 }
 
@@ -717,6 +720,11 @@ export function copyDiagnostics(st: SettingsState, diagnosticsLine: string): str
 /** One 4-hour battle step's playback time at the chosen speed; battles never stop the turn (SET-065, X-1). */
 export function battleStepSeconds(st: SettingsState): number {
   return (DESIGN.battle_step_seconds_at_1x as number) / num(valueOf(st, "gameplay.battle_speed"));
+}
+
+/** One day's playback time after End turn at the chosen speed (SET-131). */
+export function daySeconds(st: SettingsState): number {
+  return (DESIGN.day_seconds_at_1x as number) / num(valueOf(st, "gameplay.turn_speed"));
 }
 
 /** The pad binding of an action in a set: a button name, or a button held for some seconds (SET-092, D-SET-3). */
