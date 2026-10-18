@@ -5,6 +5,7 @@ import * as R from "@ph/engine/domain/research";
 import { loadDefaultRuleset } from "@ph/rules";
 import { Rng } from "@ph/engine";
 import * as G from "@ph/engine";
+import * as DIP from "@ph/engine/domain/diplomacy";
 import diplomacyConfig from "../../rules/data/domain/diplomacy.json" with { type: "json" };
 import relations1444 from "../../rules/data/domain/diplomacy-relations-1444.json" with { type: "json" };
 
@@ -1732,7 +1733,7 @@ When("the campaign starts", (s) => {
     const dims = s.assessment.split(" and ");
     // A good rating is a high level, except for unrest risk, where it is a low one.
     const mirror = (lvl: M.Level): M.Level => LEVELS[4 - LEVELS.indexOf(lvl)]!;
-    const at = (lvl: M.Level) => M.startingCounts(Object.fromEntries(dims.map((d: string) => [d, d === "unrest_risk" ? mirror(lvl) : lvl])), 9500, 52, "high", new Rng(1));
+    const at = (lvl: M.Level) => M.startingCounts(Object.fromEntries(dims.map((d: string) => [d, d === "unrest_risk" ? mirror(lvl) : lvl])), 9500, 52, "high", new Rng(1), 60);
     s.low = at("very_low");
     s.high = at("very_high");
   }
@@ -1752,7 +1753,7 @@ Given("the catalogue has {string} confidence in the country {string}", (s, conf:
   s.confidence = conf;
 });
 When("two campaigns start", (s) => {
-  const run = (conf: M.Confidence, seed: number) => M.startingCounts({}, 2000, 20, conf, new Rng(seed));
+  const run = (conf: M.Confidence, seed: number) => M.startingCounts({}, 2000, 20, conf, new Rng(seed), 100);
   s.spreadOf = (conf: M.Confidence) => {
     let lo = Infinity;
     let hi = -Infinity;
@@ -1761,7 +1762,7 @@ When("two campaigns start", (s) => {
       lo = Math.min(lo, g);
       hi = Math.max(hi, g);
     }
-    return { lo, hi, mid: run(conf, 1).gold && M.startingCounts({}, 2000, 20, "high", new Rng(0)).gold };
+    return { lo, hi };
   };
   s.run = run;
 });
@@ -1771,7 +1772,7 @@ Then("the starting counts of {string} vary more between them than those of a cou
   expect(low.hi - low.lo).toBeGreaterThan(high.hi - high.lo);
 });
 Then("each count stays within {int} % of its middle value", (s, pct: number) => {
-  const mid = 2000 * M.realmConfig.starting.per_thousand_people.gold[2]!;
+  const mid = 100 * M.realmConfig.starting.gold_months_of_income[2]!;
   const r = s.spreadOf(s.confidence);
   expect(r.lo).toBeGreaterThanOrEqual(Math.floor(mid * (1 - pct / 100)));
   expect(r.hi).toBeLessThanOrEqual(Math.ceil(mid * (1 + pct / 100)));
@@ -2435,4 +2436,78 @@ When(/^an army refills there in (its own|an enemy's) land$/, (s, whose: string) 
 });
 Then(re(`it can take up to ${NUM} rations a month from the store`), (s, n: string) => {
   expect(s.refill).toBeCloseTo(num(n));
+});
+
+// ---------------------------------------------------------------- starting numbers (REALM-230, REALM-231)
+
+const startOf = (s: S, realm: string): M.StartingCounts => G.realmStartingCounts(s.game, realmOf(s, realm))!;
+Then("{string} starts with {int} months of its tax and trade in gold, within {int} %", (s, realm: string, months: number, pct: number) => {
+  const month = ledger(s, realm, "tax") + ledger(s, realm, "trade");
+  const gold = s.game.nationTreasury[realmOf(s, realm)];
+  expect(gold).toBeGreaterThanOrEqual(month * months * (1 - pct / 100) - 1);
+  expect(gold).toBeLessThanOrEqual(month * months * (1 + pct / 100) + 1);
+});
+Then("{string} starts owing half its gold", (s, realm: string) => {
+  const n = realmOf(s, realm);
+  expect(s.game.nationDebt[n]).toBe(Math.round(s.game.nationTreasury[n] * 0.5));
+});
+Then("the levies of {string} start between {int} % and all of its levy ceiling", (s, realm: string, pct: number) => {
+  const n = realmOf(s, realm);
+  const share = s.game.nationLevies[n] / s.game.nationMaxLevies[n];
+  expect(share).toBeGreaterThanOrEqual(pct / 100 - 1e-9);
+  expect(share).toBeLessThanOrEqual(1);
+  expect(startOf(s, realm).recruitShare).toBeCloseTo(share, 3);
+});
+Then("{string} starts with {int} envoys at court, each an envoy seat", (s, realm: string, envoys: number) => {
+  const c = DIP.country(s.game.diplomacy, s.game.nationIds[realmOf(s, realm)]);
+  expect(c.courtEnvoys).toBe(envoys);
+  const seats = DIP.envoySeats(s.game.diplomacy, c.id);
+  c.courtEnvoys = 0;
+  expect(seats - DIP.envoySeats(s.game.diplomacy, c.id)).toBe(envoys);
+  c.courtEnvoys = envoys;
+});
+Then("the empty posts of {string} are its royal provinces farthest from its capital", (s, realm: string) => {
+  const w = s.game as GW;
+  const n = realmOf(s, realm);
+  const capital = w.provinceIndex.get(GAME_RULES.nations[n]!.capital)!;
+  const royal = G.byDistance(w, n, capital).filter((p) => w.provinceLord[p]! < 0);
+  const filled = royal.filter((p) => w.provinceOfficial[p]! >= 0).length;
+  // Castile's moderate reach gives fewer officials than royal provinces.
+  expect(filled).toBeLessThan(royal.length);
+  expect(filled).toBe(Math.max(1, Math.min(royal.length, Math.round(royal.length * startOf(s, realm).officialsPerRoyal))));
+  royal.forEach((p, k) => expect(w.provinceOfficial[p]! >= 0, GAME_RULES.provinces[p]!.name).toBe(k < filled));
+});
+Then("a realm with no catalogue assessment starts with {int} gold", (s, gold: number) => {
+  const w = s.game as GW;
+  const bare = w.nationIds.filter((id) => !G.realmStrengths(id).assessments.length);
+  expect(bare.length).toBeGreaterThan(0);
+  for (const id of bare) expect(w.nationTreasury[w.nationIndex.get(id)!]).toBe(gold);
+});
+Given("every commander of {string} leads an army", (s, realm: string) => {
+  const w = s.game as GW;
+  const n = realmOf(s, realm);
+  const leading = new Set<number>();
+  for (let i = 0; i < w.armies.count; i++) if (w.armies.alive[i]) leading.add(w.armies.commander[i]!);
+  for (let c = 0; c < w.commanderIds.length; c++) if (w.commanderOwner[c] === n) expect(leading.has(c)).toBe(true);
+});
+const callsMen = (s: S, realm: string, gold: number): boolean => {
+  const w = s.game as GW;
+  const n = realmOf(s, realm);
+  w.nationTreasury[n] = gold;
+  w.musters = w.musters.filter((m) => m.nation !== n);
+  G.aiRecruits(w, [], (k) => k === n);
+  return w.musters.some((m) => m.nation === n);
+};
+When("the AI of {string} calls up men for a war with {int} gold", (s, realm: string, gold: number) => {
+  s.called = callsMen(s, realm, gold);
+});
+Then("the AI of {string} calls no men", (s) => {
+  expect(s.called).toBe(false);
+});
+Then("with {int} gold the AI of {string} calls men", (s, gold: number, realm: string) => {
+  expect(callsMen(s, realm, gold)).toBe(true);
+});
+Given("{string} has paid off the debt it started with", (s, realm: string) => {
+  s.game.nationDebt[realmOf(s, realm)] = 0;
+  G.runLedger(s.game, false);
 });

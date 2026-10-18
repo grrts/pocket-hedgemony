@@ -25,6 +25,7 @@ import { createGameEvents, type GameEvents } from "./events.ts";
 import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
+import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -431,6 +432,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     // Every province of a realm starts with an official, of a type dealt out in turn.
     if (provinceOwner[p]! >= 0) world.provinceOfficial[p] = p % OFFICIALS.length;
   }
+  // Levies gathered and officials at their posts follow the catalogue (REALM-130).
+  seedStartingPosts(world);
   world.commanderHome = commanderIds.map(() => -1);
   world.commanderSeed = commanderIds.map(() => -1);
   seedOfficials(world);
@@ -453,6 +456,10 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedResearch(world);
   recount(world);
   refreshFreeCompanies(world);
+  // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
+  runLedger(world, false);
+  // Gold, debt and envoys at court follow the catalogue, as months of that income (REALM-130).
+  seedStartingPurse(world);
   // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
   syncCountries(world);
 
@@ -460,7 +467,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   world.events = createGameEvents(world);
   // Heritage reads the tree's ages, so it starts after it: three ambitions drawn, the birthright in force.
   world.heritage = createGameHeritage(world);
-  // The ledger is worked out from the start, heritage's tax with it, so lenders and the treasury card know the realm's income.
+  // Worked out again with heritage's tax in force, so lenders and the treasury card know the income the realm will have.
   runLedger(world, false);
   return world;
 }

@@ -9,7 +9,7 @@ export { atWar, controller, engageRange, offerPeace, peaceShare, relationState, 
 export { hashWorld } from "./hash.ts";
 export { cultureOf, officialName, personName } from "./names.ts";
 export { officialEffect, OFFICIALS, type OfficialEffectView } from "./officials.ts";
-export { ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
+export { aiRecruits, ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply } from "./protocol.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";
@@ -24,4 +24,6 @@ export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecra
 export type { EventCard } from "./events.ts";
 export { adminCapacityRank, ASSESSMENT_DIMENSIONS, LEVEL_RANK, realmAssessment, realmStrengths, RISK_DIMENSIONS, type AssessmentConfidence, type AssessmentLevel, type HeritageLine, type RealmAssessment, type RealmHeritage, type RealmHeyday, type RealmStrengths } from "./realmStrengths.ts";
 export { effectInPlay, heritageChoice, heritageFactor, heritageTaxReach, heritageView, IN_PLAY, monthlyHeritage, type HeritageView } from "./heritage.ts";
+export { realmStartingCounts } from "./startingCounts.ts";
+export { byDistance } from "./lords.ts";
 export { LENS_RELATIONS, type LensRelation, type DiplomacyLensView } from "./diplomacyLens.ts";

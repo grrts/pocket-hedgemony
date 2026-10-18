@@ -2,7 +2,7 @@ import type { World } from "./world.ts";
 import { cedeProvince, type News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
-import { aiMayTakeSubject, aiOverlords, makeSubject, seasonalSubjects, subjectByAgreement, subjectsView, type SubjectsView } from "./subjects.ts";
+import { aiMayTakeSubject, aiOverlordEnvoys, aiOverlords, aiRisings, monthlySubjectEnvoys, makeSubject, seasonalSubjects, subjectByAgreement, subjectsView, type SubjectsView } from "./subjects.ts";
 
 /**
  * Milestone 5, statecraft (first slice): envoys carry the realm's asks to
@@ -269,7 +269,10 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   d.envoys = d.envoys.filter((e) => (e.status !== "home" && e.status !== "failed") || dip.monthsBetween(dip.monthOf(e.returnDate ?? e.arrival), month) < 12);
   libraryEvents(world, news);
   seasonalSubjects(world, news);
+  monthlySubjectEnvoys(world, news);
+  aiRisings(world, news);
   aiOverlords(world, news);
+  aiOverlordEnvoys(world, news);
   aiEnvoys(world);
   // An AI envoy to a near court arrives this month: the player hears of the ask at once.
   libraryEvents(world, news);

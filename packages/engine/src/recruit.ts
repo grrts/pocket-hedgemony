@@ -814,7 +814,8 @@ export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => 
   }
   for (let n = 0; n < world.nationCount; n++) {
     if (n === world.player || world.nationGone[n] || !atWar[n]) continue;
-    if (world.nationTreasury[n]! < 0) continue;
+    // Men it could not put under a commander would only stand as garrisons (feedback 28).
+    if (world.nationTreasury[n]! < world.rules.defines.recruit.commanderGold && !idleCommanders(world, n).length) continue;
     const cap = capitalOf(world, n);
     if (callingPlace(world, n, cap)) continue;
     // Keep the levies' future pay within half the income.

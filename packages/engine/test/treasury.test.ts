@@ -76,6 +76,8 @@ describe("tax rates and the treasury ledger", () => {
     const w = createWorld(rules, 1, tiles);
     const cas = nation(w, "castile");
     w.player = cas;
+    // Castile starts owing what its finances say (REALM-130); clear it to count from nothing.
+    w.nationDebt[cas] = 0;
     runLedger(w, false);
     const year = 12 * (line(w, cas, "tax") + line(w, cas, "trade"));
     expect(canBorrow(w, cas)).toBeCloseTo(year / 1.1);
@@ -102,9 +104,12 @@ describe("tax rates and the treasury ledger", () => {
     const hun = nation(w, "hungary");
     const id = w.nationIds[hun]!;
     const atWar = w.diplomacy.wars.some((x) => x.attackers.includes(id) || x.defenders.includes(id));
+    const owed = w.nationDebt[hun]!;
     aiTreasury(w, []);
     expect(w.nationTaxDefault[hun]).toBe(rate(atWar ? "heavy" : "normal"));
-    expect(w.nationDebt[hun]).toBe(0);
+    // No new loan while it holds gold (it may repay what it started owing).
+    expect(w.nationDebt[hun]).toBeLessThanOrEqual(owed);
+    w.nationDebt[hun] = 0;
     w.nationTreasury[hun] = -30;
     aiTreasury(w, []);
     expect(w.nationDebt[hun]).toBeCloseTo(31 * 1.1);
@@ -112,9 +117,10 @@ describe("tax rates and the treasury ledger", () => {
     // The player's realm is left alone.
     const fra = nation(w, "france");
     w.player = fra;
+    const fraOwed = w.nationDebt[fra]!;
     w.nationTreasury[fra] = -30;
     aiTreasury(w, []);
-    expect(w.nationDebt[fra]).toBe(0);
+    expect(w.nationDebt[fra]).toBe(fraOwed);
   });
 
   it("unsettles the realm's lords when it borrows, at most once a year", () => {

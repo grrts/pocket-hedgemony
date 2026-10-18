@@ -1491,7 +1491,8 @@ Then("the new rules apply from the next turn on with the saved Rng state", (s) =
     processTurn(old.world, [], 0);
   }
   const n = patched.nationIndex.get("castile")!;
-  expect(patched.nationTreasury[n]).not.toBe(old.world.nationTreasury[n]);
+  // The AI pays its debt off with gold above a year's upkeep, so gold less debt shows the patch.
+  expect(patched.nationTreasury[n]! - patched.nationDebt[n]!).not.toBeCloseTo(old.world.nationTreasury[n]! - old.world.nationDebt[n]!, 6);
   expect(patched.rules).toBe(s.buildRules);
 });
 Then("the save is not corrupted", (s) => {
