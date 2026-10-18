@@ -8,7 +8,7 @@ import { formOf } from "./government.ts";
 import data from "../../rules/data/domain/rulers-1444.json" with { type: "json" };
 
 /**
- * Rulers in play (realm REALM-233 to REALM-237): every realm has a ruler from
+ * Rulers in play (realm REALM-233 to REALM-236): every realm has a ruler from
  * the 1444 records, with an age, years on the throne, two traits and perhaps
  * an heir. Each January they grow a year older, an old ruler may die and an
  * heirless one may have a child. Who follows a dead ruler is crowns.ts's

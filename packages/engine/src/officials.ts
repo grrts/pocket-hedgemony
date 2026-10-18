@@ -94,7 +94,7 @@ const TYPE_INDEX = new Map<string, number>(OFFICIALS.map((t, k) => [t, k]));
  */
 export function officialBonus(world: World, p: number, type: (typeof OFFICIALS)[number], key: string): number {
   if (world.provinceOfficial[p] !== TYPE_INDEX.get(type) || world.provinceOccupier[p]! >= 0) return 1;
-  // In a realm of a low Tongue % an official's effect grows more slowly (REALM-239).
+  // In a realm of a low Tongue % an official's effect grows more slowly (REALM-238).
   return 1 + (effectsOf(type)[key] ?? 0) * officialEffectShare(yearsServed(world, p) * officialPace(world, p));
 }
 

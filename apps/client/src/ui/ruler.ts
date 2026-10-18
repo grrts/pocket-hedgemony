@@ -21,10 +21,10 @@ function noHeir(v: RulerView): string {
 
 export function rulerLines(v: RulerView): string {
   const heir = v.heir ? `${esc(v.heir.name)}, ${v.heir.age} <small>${v.heir.relation === "sibling" ? "of the house" : v.heir.daughter ? "daughter" : "son"}</small>` : `<small>${noHeir(v)}</small>`;
-  return `<dt>Ruler</dt><dd>${icon("crown", 1)}<b>${esc(v.label)}</b>, ${v.age} <small>${v.years} year${v.years === 1 ? "" : "s"} on the throne</small></dd>
+  return `<dt>Ruler</dt><dd class="ruler">${icon("crown", 1)}<b>${esc(v.label)}</b>, ${v.age} <small>${v.years} year${v.years === 1 ? "" : "s"} on the throne</small></dd>
     ${v.regent ? `<dt>Regent</dt><dd>${esc(v.regent)} <small>rules until the ruler is 16</small></dd>` : ""}
     <dt>Traits</dt><dd class="traits">${v.traits.map((t) => `<span><b>${esc(t.name)}</b> <small>${esc(t.note)}</small></span>`).join("")}</dd>
-    <dt>Heir</dt><dd>${heir}</dd>`;
+    <dt>Heir</dt><dd class="ruler">${heir}</dd>`;
 }
 
 export function fallenLine(f: FallenEffect): string {
@@ -32,5 +32,5 @@ export function fallenLine(f: FallenEffect): string {
   const slow = Math.round((1 - f.refill) * 100);
   const peace = Math.round(f.peace * 100);
   const effects = [slow ? `recruits refill ${slow} % slower` : "", peace ? `peace voices +${peace} %` : ""].filter(Boolean).join(" · ");
-  return `<dt>Fallen <small>(10 yrs)</small></dt><dd>${fmt(f.fallen)}${effects ? ` <small>${effects}</small>` : ""}</dd>`;
+  return `<dt>Fallen <small>(10 yrs)</small></dt><dd>${fmt(f.fallen)}${effects ? ` <small class="line">${effects}</small>` : ""}</dd>`;
 }

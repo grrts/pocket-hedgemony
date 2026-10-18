@@ -85,7 +85,7 @@ export function beliefLines(v: PeoplesView, mine: boolean, low: { faith: boolean
   const faith = `${esc(v.stateFaithName)} <small>${pct(v.faithPercent)} of people · ${v.faiths.length - 1} more faith${v.faiths.length === 2 ? "" : "s"}</small>`;
   if (!mine) return `<dt>Tongue</dt><dd>${tongue}</dd><dt>Faith</dt><dd>${faith}</dd>`;
   const grieved = v.tongues.some((t) => t.grieved > 0) || v.faiths.some((f) => f.grieved > 0);
-  // Under the bar, the line says what a low share stirs (REALM-239).
+  // Under the bar, the line says what a low share stirs (REALM-238).
   const lowTongue = low?.tongue ? `<em class="warn">Under ${low.under} %: separatists rise more often, officials learn their posts slower</em>` : "";
   const lowFaith = low?.faith ? `<em class="warn">Under ${low.under} %: faith risings come more often, lords of other faiths waver</em>` : "";
   return `<dt>Tongue</dt><dd><button class="paper${low?.tongue ? " over" : ""}" data-realm-open-tab="peoples" title="Open the Peoples tab">${icon("scroll", 1)}${tongue}</button>${lowTongue}</dd>

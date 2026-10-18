@@ -10,7 +10,7 @@ import { formOf } from "./government.ts";
 import { FAITH_IDS, NO_FAITH as NONE_F, NO_TONGUE as NONE_T, SLOTS, TONGUE_IDS } from "./peoples.ts";
 
 /**
- * Faith and tongue shares at work (realm REALM-065, REALM-066, REALM-239):
+ * Faith and tongue shares at work (realm REALM-065, REALM-066, REALM-238):
  * each month the realm's Faith % and Tongue % are read from its provinces as
  * the Peoples tab reads them. Under `belief.low_percent`, faith risings (or
  * separatist ones, the Homeland cause) start more often; a low faith makes

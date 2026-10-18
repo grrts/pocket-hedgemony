@@ -437,7 +437,7 @@ function placeOf(world: World, p: number, n: number): ns.Place {
   };
 }
 
-/** A realm's percent lever in force as a factor (1 = unchanged): what its owner multiplies its rule by. Its ruler's traits add theirs (REALM-237). */
+/** A realm's percent lever in force as a factor (1 = unchanged): what its owner multiplies its rule by. Its ruler's traits add theirs (REALM-236). */
 export function heritageFactor(world: World, n: number, lever: string): number {
   const pct = (n >= 0 ? world.heritage?.levers[n]?.[lever] ?? 0 : 0) + traitPct(world, n, lever);
   return pct ? Math.max(0, 1 + pct / 100) : 1;

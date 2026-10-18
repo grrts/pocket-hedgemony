@@ -4055,12 +4055,21 @@ small.why {
 .facts dd.traits {
   gap: 2px 10px;
 }
+.facts dd.ruler {
+  gap: 2px 6px;
+}
+/* What the fallen do, on its own line so it wraps on a narrow panel (REALM-241). */
+.facts dd small.line {
+  flex: 1 1 100%;
+  min-width: 0;
+  white-space: normal;
+}
 .facts dd.traits span {
   display: inline-flex;
   gap: 4px;
   align-items: baseline;
 }
-/* A low Faith % or Tongue % says what it stirs under its button (REALM-239). */
+/* A low Faith % or Tongue % says what it stirs under its button (REALM-238). */
 .facts dd em.warn {
   flex: 1 1 100%;
   font-style: normal;

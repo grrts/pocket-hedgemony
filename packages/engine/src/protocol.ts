@@ -138,7 +138,7 @@ export interface Snapshot {
   rulers: RulerView[];
   /** The player's fallen of the last ten years and what they do (REALM-241); null without a player. */
   fallen: FallenEffect | null;
-  /** Whether the player's Faith % or Tongue % is low enough to stir risings (REALM-239), and the bar. */
+  /** Whether the player's Faith % or Tongue % is low enough to stir risings (REALM-238), and the bar. */
   beliefLow: { faith: boolean; tongue: boolean; under: number } | null;
   /** The map's diplomacy lens: each realm's relation to the player, leagues, envoys on the road and war aims (DIPL-209); null without a player. */
   diplomacyLens: DiplomacyLensView | null;

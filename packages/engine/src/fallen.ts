@@ -2,7 +2,7 @@ import type { World } from "./world.ts";
 import { realmConfig } from "./domain/realm/index.ts";
 
 /**
- * The fallen of the last ten years (realm REALM-096, REALM-168, REALM-238):
+ * The fallen of the last ten years (realm REALM-096, REALM-168, REALM-237):
  * each realm counts its soldiers killed in battles and sieges by month, in a
  * ring of the window's months, so an entry drops out whole once it is ten
  * years old. Many dead push the realm's voices toward peace (peaceShare in

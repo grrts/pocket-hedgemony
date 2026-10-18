@@ -144,7 +144,7 @@ function neighbours(world: World, p: number): number[] {
   return Array.from(world.adjList.subarray(world.adjStart[p]!, world.adjStart[p + 1]!));
 }
 
-/** A plotting province's monthly chance to rise, by its heaviest cause: faith and separatist risings come more often in a realm of low faith or tongue (REALM-239). */
+/** A plotting province's monthly chance to rise, by its heaviest cause: faith and separatist risings come more often in a realm of low faith or tongue (REALM-238). */
 export function risingChanceIn(world: World, p: number): number {
   const chance = risingChance(world, p);
   if (chance <= 0) return chance;

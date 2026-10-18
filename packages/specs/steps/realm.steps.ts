@@ -2522,7 +2522,7 @@ const PLACE: Record<string, string> = { Troyes: "Aube" };
 const placeOf = (name: string): number => provinceOf(PLACE[name] ?? name);
 const neighboursOf = (w: GW, p: number): number[] => Array.from(w.adjList.subarray(w.adjStart[p]!, w.adjStart[p + 1]!));
 
-// the fallen of the last ten years (REALM-096, REALM-238)
+// the fallen of the last ten years (REALM-096, REALM-237)
 Given(re(`the country "([^"]+)" lost ${NUM} soldiers in battles and sieges in the last 10 years`), (s, realm: string, men: string) => {
   const w = freshGame(s);
   s.realm = realm;
@@ -2567,7 +2567,7 @@ Then("{string} hears one dispatch naming {string} and {string}", (s, realm: stri
   expect(heard[0]!.text).toBe(`The harvest failed in ${a} and ${b}`);
 });
 
-// low faith and tongue shares (REALM-065, REALM-066, REALM-239)
+// low faith and tongue shares (REALM-065, REALM-066, REALM-238)
 /** Every province of the realm turned to the people of another realm's faith or tongue, so its share falls to nothing. */
 function convert(s: S, realm: string, what: "faith" | "tongue"): void {
   const w = freshGame(s);
@@ -2617,7 +2617,7 @@ Then("its officials work more slowly", (s) => {
   expect(G.officialPace(s.game, p)).toBeLessThan(1);
 });
 
-// revolt spreads to neighbours (REALM-067, rebellions REBL-038)
+// revolt spreads to neighbours (REALM-067, REALM-239, rebellions REBL-038)
 /** One month of play, with the realm's own answer to the rising left to the player. */
 function playMonth(w: GW): G.News[] {
   const news: G.News[] = [];
