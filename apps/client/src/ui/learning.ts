@@ -70,8 +70,10 @@ function standingText(era: string, behind: number): string {
 /** Another realm's research on its country card: its standing, what it knows that the player doesn't, and its study (RSCH-088, RSCH-104). */
 export function realmLearningLine(x: Snapshot["realmResearch"][number] | undefined): string {
   if (!x) return "";
-  const ahead = x.ahead ? `knows ${fmt(x.ahead)} you don't: as a neighbour it makes them cheaper for you` : "knows nothing you don't";
-  return `<dt>Research</dt><dd>${standingText(x.standing, x.behind)}<br><small>${fmt(x.known)} inventions known · ${ahead}${x.study ? ` · studying ${esc(nice(x.study))} (${x.pct} %)` : ""}</small></dd>`;
+  // "N ahead of you · N behind you" (GOV-078); what it knows ahead it makes cheaper for you as a neighbour (RSCH-104).
+  const ahead = x.ahead ? `${fmt(x.ahead)} ahead of you, cheaper for you as its neighbour` : "none ahead of you";
+  const behind = x.behindYou ? ` · ${fmt(x.behindYou)} behind you` : "";
+  return `<dt>Research</dt><dd>${standingText(x.standing, x.behind)}<br><small>${fmt(x.known)} inventions known · ${ahead}${behind}${x.study ? ` · studying ${esc(nice(x.study))} (${x.pct} %)` : ""}</small></dd>`;
 }
 
 /** A realm's standing at the 1444 start, for the nation picker: "Starts in Ancient", "Starts in Era I" (RSCH-105). */

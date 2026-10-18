@@ -128,7 +128,8 @@ const diagnostics: Diagnostics = {
 // Read by the wrapper smoke tests.
 (globalThis as { __phDiagnostics?: Diagnostics }).__phDiagnostics = diagnostics;
 
-const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali"];
+// ?feature=great_horde adds realms to the list, for the screenshot scripts.
+const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali", ...(new URLSearchParams(location.search).get("feature")?.split(",") ?? [])];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 /** "11 November 1444", or "11 Nov 1444" short. */
 /** The hour beside the date in the top bar, while the player's battle runs (VIEW-076). */
@@ -5386,6 +5387,8 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-open-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       realmTab = b.dataset.realmOpenTab as typeof realmTab;
+      // A line naming an invention opens the tree on it (GOV-078).
+      if (b.dataset.learnPick) Object.assign(learningUi, { part: "tree", pick: b.dataset.learnPick, center: b.dataset.learnPick, slide: true });
       renderPanel();
     }),
   );
