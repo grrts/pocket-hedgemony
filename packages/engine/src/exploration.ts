@@ -1,3 +1,4 @@
+import * as nv from "./domain/naval/index.ts";
 import * as ex from "./domain/exploration/index.ts";
 import { catalogueRecord, hasRecord } from "./domain/scenario-setup/catalogue.ts";
 import type { World } from "./world.ts";
@@ -129,7 +130,10 @@ export function chartFleets(world: World): void {
   for (const f of world.navy.fleets) {
     if (e.lastAt.get(f.id) === f.at) continue;
     e.lastAt.set(f.id, f.at);
-    const added = chartAround(world, f.owner, f.at);
+    let added = chartAround(world, f.owner, f.at);
+    // A viceroy's fleet charts a ring of zones further (NAVY-154).
+    const rings = f.admiral >= 0 ? (nv.postRow(f.post).chartRings ?? 1) : 1;
+    if (rings > 1) for (let k = world.adjStart[f.at]!; k < world.adjStart[f.at + 1]!; k++) if (world.provinceWater[world.adjList[k]!]) added += chartAround(world, f.owner, world.adjList[k]!);
     if (added) {
       const v = e.voyages.find((x) => x.fleet === f.id);
       if (v) v.charted += added;

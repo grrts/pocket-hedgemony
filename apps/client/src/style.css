@@ -1896,6 +1896,35 @@ table.classes td.bar span {
   content: "● ";
 }
 
+/* ---- Fleets (naval spec, fleets at sea) ---- */
+
+/* The leader's three posts on one row, 44 points high, 8 apart; the one he holds pressed in (NAVY-162, NAVY-164). */
+.fleet-posts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.fleet-posts button {
+  min-height: 44px;
+  min-width: 0;
+  padding: 0 2px;
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.fleet-posts button.paper.on {
+  border-image-source: var(--ui-btn-paper-down);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Blockades held and suffered: each row's zone button, then what it closes. */
+ul.blockades li {
+  margin: 4px 0;
+}
+
 table.ledger td.num {
   text-align: right;
 }

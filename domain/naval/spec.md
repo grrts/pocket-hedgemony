@@ -314,7 +314,7 @@ Newest decision first.
 ### Admirals
 
 - NAVY-065: If a fleet of warships or troop carriers would leave port without an admiral, then the naval system
-  shall keep it in port; such ships can still defend the port in a sea battle in the port's own zone. [naval §5.1]
+  shall keep it in port; such ships can still defend the port in a sea battle in the port's own zone. [naval §5.1] *Replaced in part by NAVY-153 (any of the three leader posts lets a fleet sail, not only an admiral) (playtest feedback).*
 - NAVY-066: The naval system shall let trade ships sail with no admiral, under the country they belong to, on the
   routes the trade design gives them. [naval §5.1]
 - NAVY-067: When an official is commissioned as admiral, the naval system shall use the same act as an army
@@ -406,7 +406,7 @@ Newest decision first.
   burned (its base is the province config names for the coast, D-NAVY-23), the naval system shall end the pirate fleet until trade brings it back. [naval §8]
 - NAVY-105: Where a pirate people is also a catalogue record (wokou, Orang Laut), the naval system shall let the
   same fleet belong to a lord or be hired. [naval §8]
-- NAVY-106: When an enemy fleet is in a port's zone, the naval system shall block the port (warfare blockade). [naval §8]
+- NAVY-106: When an enemy fleet is in a port's zone, the naval system shall block the port (warfare blockade). [naval §8] *Replaced in part by NAVY-155, NAVY-156 (a fleet blockades only while at war, with a warship and a leader, lying still) (playtest feedback).*
 - NAVY-107: When an army takes a port province's castle, the naval system shall give its owner every ship in that
   port that has not sailed and the hulls on its slipways. [naval §8]
 
@@ -495,6 +495,29 @@ Newest decision first.
 - NAVY-145 Overview: the Navy tab's Cost line shows how much of the month's cost is for hired fleets, and each hired fleet is marked "hired" in its Fleets list; the Treasury's Ships and sailors line carries the pay (and, for a lender, the gold it receives). Hiring, dismissal, an unpaid fleet leaving and a lent fleet called home are said in the News. [F-115; X-19]
 - NAVY-146 Phone: the Hire a fleet screen and the hired fleet card are cards in the side panel in the Wide and Tall layouts, one column, every button at least 44 points high, nothing that needs hover (reasons are written, not tooltips); checked by apps/client/scripts/hired-fleet-shots.mjs on a small and a large phone held sideways, a phone held upright (asked to turn) and a desktop. [F-115; X-19]
 
+### Fleets at sea (afternoon playtest, 18 October)
+
+- NAVY-147: The naval system shall keep every fleet on one map tile: a water tile of the sea zone it is in, or, while it lies in port, the port's anchorage (the water tile beside the port nearest the port's centre). [F-122]
+- NAVY-148: When a fleet sails, the naval system shall still plan its voyage over sea zones (winds, reach, charts, ice and docking rights unchanged), and sail it leg by leg over water tiles: from its tile to the next zone's centre tile (the anchorage for a port, the water nearest the shore for a landing), by the shortest water path through the two zones (straight zone to zone when there is none). A leg takes that zone's days as before, spread evenly over the leg's tiles, so the fleet's tile changes each 4-hour step and never jumps at the end of a turn; the fleet is in the zone its tile lies in. [F-122]
+- NAVY-149: When the player taps any spot of a sea zone while a fleet of theirs is chosen, the naval system shall sail the fleet to that spot, ending its last leg on the tapped tile; it shall publish each fleet's tile and the tiles of its leg ahead, so the map draws the ship where it is and its course through the water. [F-122]
+- NAVY-150: The naval system shall let hostile fleets meet only in the same sea zone, and only once their tiles come within the seeking fleet's sighting range: 20 tiles plus 1 per point of its leader's Cunning, at most 30 (`seaEngage` base 20, perCunning 1, max 30; armies meet at 10 to 15, MOVE-126). Where the map has no tiles (the coarse test grid), anywhere in the zone counts as in range. [F-127]
+- NAVY-151: When a fleet comes within its sighting range of a sea battle in its own zone, the naval system shall have it join its side; a sea battle shall be fought where the defender stands, published as the battle's tile. If a fleet lies in port, runs for port after a beaten battle, or belongs to a realm not at war with the other, then the naval system shall never have it meet. [F-127]
+- NAVY-152: The naval system shall have every fleet leader hold one of three posts: **admiral** (war: his Might and Cunning count in full in sea battles), **commodore** (trade) or **viceroy** (exploration and colonies), whose Might counts half in a sea battle (`admiralPosts.<post>.mightShare` 1 / 0.5 / 0.5). [F-124]
+- NAVY-153: When a leader is appointed, the naval system shall give him the post that fits the fleet: commodore for trade ships only, viceroy for exploration ships only, otherwise admiral; the player may change the post from the fleet card at any time at no cost. Any of the three posts lets warships and troop ships leave port. [F-124]
+- NAVY-154: While a commodore's fleet lies in a sea zone, the naval system shall let his realm's trade ships pass enemy blockades there, let his realm's ports beside that zone gain trade ratio 25 % faster (`admiralPosts.commodore.tradeGain` 0.25), and give a blockade he holds 1.5 times the prize money (`prizeFactor` 1.5). While a viceroy leads a fleet, the naval system shall have it chart two rings of sea zones around it instead of one (`chartRings` 2), and start a colony founded from his fleet 10 progress ahead (`colonyStart` 10). [F-124]
+- NAVY-155: The naval system shall count a fleet as blockading while its realm is at war, it has at least one warship and a leader, and it lies still in a sea zone: no voyage, not landing, not in battle and not running for port. [F-123]
+- NAVY-156: While a fleet blockades, the naval system shall close every coastal province beside its zone that a realm at war with it holds, and close the zone to those realms' trade ships; a closed port gains no trade ratio (TRADE-042), and its Port tab says "Blockaded by <realm>". [F-123]
+- NAVY-157: If a trade ship of a blocked realm would sail through a zone a blockade closes, then the naval system shall route it round or have it wait; if its way is shut while it is in the zone, it loses its purse to the blockading realm as a prize. While a commodore's fleet of its own realm lies in that zone, the naval system shall let it pass. [F-123]
+- NAVY-158: When a new month begins, the naval system shall pay each blockading realm prize money for each port it closes: half (`blockade.prizeShare` 0.5) of the port's sea trade value for the month (its value to ships times its trade ratio), 1.5 times that under a commodore. [F-123]
+- NAVY-159: When a blocked side weighs peace, the naval system shall count each port closed against it as half (`blockade.peaceWeight` 0.5) of an occupied province. [F-123]
+- NAVY-160: When a fleet of the player's starts a blockade, and when an enemy fleet closes ports of the player's, the naval system shall send the player news of it. [F-123]
+
+### How the player uses it (fleets at sea)
+
+- NAVY-161 Where: tapping one of the player's fleets on the map chooses it; the next tap on any spot of the sea sails it there. The ship glides over the water tile by tile, with its course drawn through the water to the spot. Tapping the fleet twice opens its fleet card, which holds the leader's post and the blockade with its prize money. A blockade needs no order: the fleet lies still off the enemy's shore. [X-19; F-122, F-123]
+- NAVY-162 Grouping: the leader and his post sit together in the fleet card's leader section: three post buttons (Admiral, Commodore, Viceroy) on one row and one line saying what the chosen post does. The blockade sits on the fleet card's state line ("Blockading 3 ports of Castile: about 4 gold a month in prizes"). A blockaded port says so on its own Port tab. [X-19; F-123, F-124]
+- NAVY-163 Overview: the Navy tab lists blockades held and suffered, each with its ports and prize money a month, and the month's prize money. On the map, closed ports wear a chain mark in the blockader's colour, and the chosen fleet shows its sighting ring. [X-19; F-123, F-127]
+- NAVY-164 Phone: the three post buttons fit one row, each 44 points high; nothing needs hover; the fleet card, Port tab and Navy tab keep the Wide and Tall layouts, checked by apps/client/scripts/navy-shots.mjs on a small and a large phone held sideways and upright. [X-19]
 
 ## 6. Commands
 
@@ -508,13 +531,14 @@ Newest decision first.
 | BuyShipAbroad(foreign port, type) | player / AI | Seller great port with shipyard, at peace, owner agrees; own crew waiting there | As BuyShip at 1.5× gold on seller's slipway | ShipOrdered |
 | BuySmallCraft(shore tile, count) | player / AI | Shore tile with seafolk; 6 sailors each | Small craft | ShipLaunched |
 | CommissionAdmiral(official, fleet) | player / AI | An official (recruiting 7.1) | Admiral with skills by type; province left as recruiting 7.4 | AdmiralCommissioned |
-| AssignLeader(fleet, ruler/heir/lord/privateer/elder) | player / AI | As 5.4 | Fleet led | AdmiralCommissioned |
+| AssignLeader(fleet, ruler/heir/lord/privateer/elder, post?) | player / AI | As 5.4 | Fleet led, in the post given or the one that fits the fleet (NAVY-153; order `navy` `admiral` with optional `post`) | AdmiralCommissioned |
+| SetPost(fleet, admiral/commodore/viceroy) | player / AI | The fleet has a leader | The leader holds that post at once, at no cost (NAVY-152..154; order `navy` `post`) | — |
 | ReleaseAdmiral(fleet, province) | player / AI | — | Official returns to a chosen province | AdmiralReleased |
 | HirePrivateer(season) | player / AI | A privateer or corsair on offer; gold | Ship, crew and commander for a season | PrivateerHired |
 | HireFleet(free fleet or lent fleet) | player / AI | The fleet can reach a port of the hirer's within 112 days; gold for the first month; a lent fleet's realm at peace with all and not a rival | The fleet is the hirer's, under its own captain, sailing for the hirer's nearest port | FleetHired |
 | DismissFleet(fleet) | player | A hired fleet of the realm's, no army aboard, not fighting | A free fleet sails off; a lent fleet goes home; its captain leaves | FleetLeft |
 | FormFleet / SplitFleet | player / AI | Ships in the same place | Fleet regrouped | — |
-| SailFleet(route) | player / AI | Admiral (unless trade ships); crew ≥ a quarter; may-enter allows the route | Fleet sails as a mover | FleetSailed |
+| SailFleet(route, tile?) | player / AI | A leader in any post (unless trade ships, NAVY-153); crew ≥ a quarter; may-enter allows the route | Fleet sails as a mover, tile by tile, to the zone's centre or to the tapped tile (NAVY-148, NAVY-149; order `navy` `sail` with optional `tile`) | FleetSailed |
 | Dock(port) | player / AI / system (turn back) | Docking right | Resupply (and refit if allowed), load colony stores | FleetDocked, FleetResupplied |
 | LayUp(ship) | player / AI | In port | Crew released; tenth of upkeep | ShipLaidUp, SailorsReleased |
 | FitOut(ship) | player / AI | Crew as sailors in that port | Crewed after a month | ShipFittedOut |
@@ -539,7 +563,8 @@ Newest decision first.
 | FleetResupplied | Docking | port, food or gold paid | province (food), realm (gold) |
 | ShipSunk | Battle or storm | ship, crew lost, survivors | realm, province (*Lost at sea* count) |
 | ShipCaptured / ShipBurned | Prize | ship, captor | realm |
-| PortBlockaded | Enemy fleet in port's zone | port | trade, warfare |
+| PortBlockaded | A fleet starts blockading (NAVY-155, NAVY-156) | ports closed, blockading realm, fleet | trade (no ratio gain, trade ships kept out), warfare and diplomacy (peace weight, NAVY-159), player news (NAVY-160) |
+| BlockadePrize | A new month, per blockade (NAVY-158); a trade ship's purse taken (NAVY-157) | blockading realm, ports, gold | realm (treasury), trade |
 | PortTaken | Castle of a port province taken | port, ships and hulls taken | realm, warfare |
 | PirateFleetGrew / PirateFleetEnded | Season / base burned | pirate coast | trade |
 | ProvinceSeaSkilled | 2 years served | province, until date | trade (+10 % traders by sea), province (+10 % fish) |
@@ -649,6 +674,9 @@ All in one naval config file (keys proposed here; the design names only the file
 | naval.ai.fleet_ai_radius_zones | No fleet AI beyond | 10 | yes | naval |
 | naval.startingFleets | Starting warships and transports by naval capability; ages; no starting ships west of 30° W | warships 0/0/1/3/6, transports 0/1/1/2/3, ages 0 to 15 | yes | naval (F-115) |
 | naval.hiredFleets | Free fleets for hire, moving on, reach, pay multipliers, lenders, captains' skills, AI reserve, the groups and their seas, ships, names and captains | 4 for hire, 1 in 6 move on a month, 112 days, ×3 free / ×2 lent, high and very high lend with 2+ warships, skills 1 to 3, 6 months | yes | naval (F-115) |
+| seaEngage.base / perCunning / max | Sighting range in tiles within one sea zone (NAVY-150) | 20 / +1 per Cunning / 30 (F-127) | yes | naval |
+| admiralPosts.<post> | Name, what the post does, mightShare (admiral 1, commodore and viceroy 0.5); commodore tradeGain 0.25 and prizeFactor 1.5; viceroy chartRings 2 and colonyStart 10 (NAVY-152..154) | as given (F-124) | yes | naval |
+| blockade.prizeShare / peaceWeight | Prize money share of a closed port's sea trade value; each closed port's weight as occupied when weighing peace (NAVY-158, NAVY-159) | 0.5 / 0.5 (F-123) | yes | naval |
 
 **Ship table** (`naval.ships`, all placeholders; hold and purse are the trade design's numbers):
 
@@ -923,3 +951,14 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | NAVY-132 … NAVY-134 | features/starting-fleets.feature | Sea powers start with their ships; The starting fleet's port and ships; Starting crews come from the port |
 | NAVY-135 … NAVY-142 | features/hired-fleets.feature | Free fleets gather in their seas; A sea power lends its fleet; Reach; Pay; Hiring; Own captain; Leaving; The AI hires when outgunned |
 | NAVY-143 … NAVY-146 | — | Client screens; checked by apps/client/scripts/hired-fleet-shots.mjs; the rules by packages/engine/test/hiredFleets.test.ts |
+| NAVY-147 … NAVY-149 | — | Tile movement; packages/engine/test/fleets-at-sea.test.ts |
+| NAVY-150 | fleets-at-sea.feature | Sighting range grows with the leader's Cunning |
+| NAVY-151 | — | packages/engine/test/fleets-at-sea.test.ts (joining a battle, battle tile) |
+| NAVY-152, NAVY-153 | fleets-at-sea.feature | Appointing picks the post that fits the fleet; A leader's Might in a sea battle |
+| NAVY-154 | fleets-at-sea.feature | A commodore takes more prize money (prize factor); the rest packages/engine/test/fleets-at-sea.test.ts |
+| NAVY-155 | fleets-at-sea.feature | When a fleet blockades |
+| NAVY-156 | — | packages/engine/test/fleets-at-sea.test.ts (ports closed) |
+| NAVY-157 | fleets-at-sea.feature | Blocked trade ships pass only with their own commodore |
+| NAVY-158 | fleets-at-sea.feature | Prize money from a closed port; A commodore takes more prize money |
+| NAVY-159 | fleets-at-sea.feature | A closed port weighs half an occupied province |
+| NAVY-160 … NAVY-164 | — | News and client screens; checked by apps/client/scripts/navy-shots.mjs |

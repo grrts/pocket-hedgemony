@@ -97,6 +97,25 @@ export function createTradeState(P: number, N: number): TradeState {
   };
 }
 
+/** A commodore lying off a port of his realm speeds its trade (NAVY-154). */
+const COMMODORE_GAIN = navalConfig.admiralPosts.commodore.tradeGain;
+
+/** Whether a trade ship of realm n may pass sea zone z: not while an enemy blockades it, unless a commodore of n's lies there (NAVY-157; the navy works the blockades out). */
+function tradeShipMayPass(world: World, n: number, z: number): boolean {
+  const b = world.navy.blockade[z]!;
+  return !b || !atWar(world, n, b - 1) || (world.navy.escorts.get(z)?.includes(n) ?? false);
+}
+
+/** A trade ship stopped by a blockade in zone z: its purse is the blockading realm's prize (NAVY-157). */
+function seizePurse(world: World, z: number, purse: number): void {
+  const b = world.navy.blockade[z]!;
+  const v = world.navy;
+  if (!b || purse <= 0) return;
+  world.nationTreasury[b - 1] = world.nationTreasury[b - 1]! + purse;
+  if (v.seized.length !== world.nationCount) v.seized = new Float64Array(world.nationCount);
+  v.seized[b - 1] = v.seized[b - 1]! + purse;
+}
+
 // ---------------------------------------------------------------- goods and value
 
 // Works by index, looked up on first use (works.ts imports this module's neighbours).
@@ -265,7 +284,8 @@ function stepDays(world: World, kind: GameTraderKind, q: number): number {
 
 /** Whether realm n's traders may enter q: not the land of a realm at war with it, nor land its enemies hold (TRADE-066, TRADE-067). */
 export function traderMayEnter(world: World, n: number, q: number): boolean {
-  if (world.provinceWater[q]) return true;
+  // An enemy blockade shuts the sea to a realm's trade ships, unless its commodore escorts them (NAVY-157).
+  if (world.provinceWater[q]) return tradeShipMayPass(world, n, q);
   const o = world.provinceOwner[q]!;
   if (o >= 0 && o !== n && atWar(world, n, o)) return false;
   const occ = world.provinceOccupier[q]!;
@@ -378,7 +398,7 @@ function plan(world: World, n: number, kind: GameTraderKind, from: number, maxDa
 
 /** traderMayEnter, with each realm's war with n looked up once a search (ownerAt: 2×stamp at peace, 2×stamp+1 at war). */
 function mayEnterIn(world: World, n: number, q: number, stamp: number): boolean {
-  if (world.provinceWater[q]) return true;
+  if (world.provinceWater[q]) return tradeShipMayPass(world, n, q);
   const hostile = (o: number) => {
     if (o < 0 || o === n) return false;
     if (ownerAt[o] !== 2 * stamp && ownerAt[o] !== 2 * stamp + 1) ownerAt[o] = 2 * stamp + (atWar(world, n, o) ? 1 : 0);
@@ -488,6 +508,11 @@ function walk(world: World, t: GameTrader, collect: boolean): void {
     const q = path[next]!;
     const cost = stepDays(world, t.kind, q);
     if (cost === Infinity || !traderMayEnter(world, t.owner, q)) {
+      // A ship a blockade stops loses its purse to the blockading realm (NAVY-157).
+      if (ship && world.provinceWater[q] && cost !== Infinity) {
+        if (collect) seizePurse(world, q, t.purse);
+        t.purse = 0;
+      }
       // The way is shut: plan the loop again next month.
       t.path = [];
       t.blocked = q;
@@ -539,9 +564,9 @@ function updateRatios(world: World): void {
     const ratio = r[p]!;
     let gain = 0;
     if (passing > 0) {
-      const enemy = world.provinceOccupier[p]! >= 0 || world.sieges.has(p);
-      // A customs officer +15 %, riots −50 % (TRADE-035, TRADE-038); an enemy or a siege stops the gain (TRADE-041).
-      const share = enemy ? 0 : Math.max(0, officialBonus(world, p, "Customs officer", "trade_ratio_gain") + (moodIndex(world, p) >= 2 ? config.ratio.modifiers.riots : 0));
+      const enemy = world.provinceOccupier[p]! >= 0 || world.sieges.has(p) || world.navy.blockade[p]! > 0;
+      // A customs officer +15 %, riots −50 %, a commodore lying off the port +25 % (TRADE-035, TRADE-038, NAVY-154); an enemy, a siege or a blockade stops the gain (TRADE-041, TRADE-042).
+      const share = enemy ? 0 : Math.max(0, officialBonus(world, p, "Customs officer", "trade_ratio_gain") + (moodIndex(world, p) >= 2 ? config.ratio.modifiers.riots : 0) + (world.navy.guarded[p] ? COMMODORE_GAIN : 0));
       gain = config.ratio.gain_per_trader * passing * (1 - ratio / config.ratio.max) * share;
     }
     r[p] = Math.max(0, Math.min(config.ratio.max, ratio + gain - ratio * config.ratio.decay_share));

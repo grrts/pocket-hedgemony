@@ -6,6 +6,7 @@ import type { Ground } from "@ph/rules";
 import { independencePeace, subjectAnswersCall } from "./subjects.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
+import navalData from "../../rules/data/domain/naval.json" with { type: "json" };
 import { planRoute } from "./march.ts";
 import { GROUNDS } from "./tiles.ts";
 import { halt, marchTo, routeBars } from "./turn.ts";

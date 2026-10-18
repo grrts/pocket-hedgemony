@@ -260,8 +260,8 @@ export interface CultureNames {
   ranks?: Partial<Record<Rank, string>>;
 }
 
-/** What a commander is doing: leading an army, leading a fleet, or captaining a hired company. */
-export type Rank = "general" | "admiral" | "captain";
+/** What a commander is doing: leading an army, leading a fleet in one of its three posts (NAVY-152), or captaining a hired company. */
+export type Rank = "general" | "admiral" | "commodore" | "viceroy" | "captain";
 
 /** Names for officials and commanders by culture, and each realm's culture (feedback 33). */
 export interface NameBook {

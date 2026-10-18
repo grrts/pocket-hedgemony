@@ -9,7 +9,7 @@
  */
 import config from "../../../../rules/data/domain/map-presentation.json" with { type: "json" };
 import { mix } from "../../names.ts";
-import { GROUNDS, groundOfCell, riverOfCell, type LandGrid } from "../../tiles.ts";
+import { GROUNDS, groundOfCell, riverOfCell, WATER, type LandGrid } from "../../tiles.ts";
 import type { MapDetail } from "./index.ts";
 
 const L = config.livingMap;
@@ -85,8 +85,9 @@ export function neighbours4(grid: Pick<LandGrid, "width" | "height">, t: number)
   return [y > 0 ? t - width : -1, y * width + ((x + 1) % width), y < height - 1 ? t + width : -1, y * width + ((x + width - 1) % width)];
 }
 
-const isWater = (grid: LandGrid, t: number): boolean => t < 0 || grid.provinceAt(t) === 0;
-const touchesWater = (grid: LandGrid, t: number): boolean => neighbours4(grid, t).some((n) => n >= 0 && grid.provinceAt(n) === 0);
+// Water is told by the ground: water tiles may carry their sea zone as their province (NAVY-147).
+const isWater = (grid: LandGrid, t: number): boolean => t < 0 || groundOfCell(grid.cellAt(t)) === WATER;
+const touchesWater = (grid: LandGrid, t: number): boolean => neighbours4(grid, t).some((n) => n >= 0 && isWater(grid, n));
 
 /** Wrapped distance between two tiles, in map pixels. */
 export function tileDistance(grid: Pick<LandGrid, "width">, a: number, b: number): number {
@@ -226,7 +227,7 @@ export function townPlan(grid: LandGrid, footprint: TownFootprint, s: TownState)
     special.set(t, kind);
   }
   const step = s.castleStep ?? 0;
-  const piers = docks === undefined ? [] : neighbours4(grid, docks).filter((n) => n >= 0 && grid.provinceAt(n) === 0);
+  const piers = docks === undefined ? [] : neighbours4(grid, docks).filter((n) => n >= 0 && isWater(grid, n));
   return { footprint, special, walls: step <= 0 ? "none" : step === 1 ? "palisade" : "stone", piers };
 }
 

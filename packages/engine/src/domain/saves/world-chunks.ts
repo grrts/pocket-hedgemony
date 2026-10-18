@@ -23,7 +23,7 @@ import { hashWorld } from "../../hash.ts";
 import { Rng } from "../../rng.ts";
 import type { Order } from "../../turn.ts";
 import { createArmyPool, createWorld, type World } from "../../world.ts";
-import type { TileGrid } from "../../tiles.ts";
+import { groundOfCell, WATER, type TileGrid } from "../../tiles.ts";
 import type { Battle, SiegeState } from "../../war.ts";
 import { addCommander, ARMS, type FreeCompany, type Mercenary, type Muster } from "../../recruit.ts";
 
@@ -488,7 +488,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (A.mix) pool.mix.set(A.mix.subarray(k * MIX, (k + 1) * MIX), slot * MIX);
     pool.route[slot] = route;
     // A path walked over another map's tiles is planned again from the route.
-    pool.path[slot] = sameMap && path.every((t) => world.tiles.province[t]! > 0) ? path : new Int32Array(0);
+    pool.path[slot] = sameMap && path.every((t) => world.tiles.province[t]! > 0 && groundOfCell(world.tiles.cell[t]!) !== WATER) ? path : new Int32Array(0);
     if (A.retreating) pool.retreating[slot] = A.retreating[k]!;
     if (A.cameFrom) pool.cameFrom[slot] = A.cameFrom[k]! < 0 ? -1 : mapProvince(A.cameFrom[k]!);
   }

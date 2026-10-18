@@ -116,7 +116,7 @@ export function refreshFreeFleets(world: World): void {
 /** A fleet of these ships for realm n lying at `at`, to plan a voyage with. */
 function probe(n: number, at: number, ships: readonly string[]): NavyFleet {
   return {
-    id: -1, owner: n, at, route: [], progress: 0, admiral: -1, army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false,
+    id: -1, owner: n, at, route: [], progress: 0, admiral: -1, tile: -1, path: [], pathAt: 0, legHours: 0, goal: -1, post: "admiral", blockading: false, army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false,
     ships: ships.map((type) => ({ id: 0, type, crew: nv.shipRow(type).crew, hull: 0, supply: nv.fullSupply(type), damage: 0, wear: 0, age: 0, home: -1 })),
   };
 }
@@ -227,7 +227,7 @@ export function hireFleet(world: World, n: number, o: { free?: number; lent?: nu
   if (x.free >= 0) {
     v.forHire = v.forHire.filter((y) => y.id !== x.free);
     const rng = new Rng(mix(world.weatherSeed ^ 0x0a6e, x.free));
-    f = { id: ++v.seq, owner: n, at: x.at, route: [], progress: 0, admiral: -1, ships: x.ships.map((t) => ({ ...newShip(world, t, nv.shipRow(t).crew, -1), age: rng.int(16) })), army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false };
+    f = { id: ++v.seq, owner: n, at: x.at, route: [], progress: 0, admiral: -1, tile: -1, path: [], pathAt: 0, legHours: 0, goal: -1, post: "admiral", blockading: false, ships: x.ships.map((t) => ({ ...newShip(world, t, nv.shipRow(t).crew, -1), age: rng.int(16) })), army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false };
     v.fleets.push(f);
   } else {
     f = v.fleets.find((y) => y.id === x.lent)!;
