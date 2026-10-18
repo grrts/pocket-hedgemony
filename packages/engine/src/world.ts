@@ -29,6 +29,7 @@ import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts
 import { createRulerState, seedRulers, type RulerState } from "./rulers.ts";
 import { createFallenState, type FallenState } from "./fallen.ts";
 import { createBeliefState, readBeliefShares, type BeliefState } from "./belief.ts";
+import { createFaithHeadsState, seedFaithHeads, type FaithHeadsState } from "./faithHeads.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
 import { createRevolutionState, type RevolutionState } from "./revolutions.ts";
@@ -46,6 +47,10 @@ import type { AchievementLog } from "./achievements.ts";
  * transferred to the UI thread without serialising objects.
  */
 export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState {
+  /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
+  faithHeads: FaithHeadsState;
+  /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
+  nationServes: Uint8Array;
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -446,6 +451,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createRulerState(N, seed),
     ...createFallenState(N),
     ...createBeliefState(N),
+    ...createFaithHeadsState(N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -473,6 +479,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedPeoples(world);
   // Rulers read the lords, for a child ruler's regent, and the government form, for the throne law.
   seedRulers(world);
+  // The heads of the faith in 1444 read the faiths and the subjects (RELG-153).
+  seedFaithHeads(world);
   readBeliefShares(world);
   recount(world);
 

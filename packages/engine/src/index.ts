@@ -27,6 +27,7 @@ export { capsOf, formOf, governmentView, realmTitles, type GovernmentView, type 
 export { titlesFor, type Titles } from "./domain/realm/index.ts";
 export { TRADER_KINDS, traderKindName, type FoundOption, type GameTraderKind, type KindRow, type RouteEstimate, type TradeView, type TraderView } from "./trade.ts";
 export { FAITH_FAMILY, FAITH_IDS, FAITH_POLICIES, faithLine, faithName, NO_FAITH, NO_TONGUE, peoplesDataOf, peoplesView, SLOTS, TONGUE_FAMILY, TONGUE_IDS, TONGUE_POLICIES, tongueLine, tongueName, type FaithRow, type PeoplesSnapshot, type PeoplesView, type TongueLine, type TongueRow } from "./peoples.ts";
+export { censurePreview, faithBadge, faithHeadsView, headCard, type FaithHeadsView, type HeadCard } from "./faithHeads.ts";
 export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecraft.ts";
 export { type RebelsView, type RisingView } from "./rebels.ts";
 export { type RegimeView, type RevolutionView, type Sign as RevolutionSign, type StanceView } from "./revolutions.ts";

@@ -52,6 +52,7 @@ import { lockRevolutionButtons, revolutionCardHtml, revolutionSection } from "./
 import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
 import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeLine, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
+import { censureWarningHtml, faithBadgeHtml, headCardHtml, seatKeyHtml } from "./ui/faithHeads.ts";
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
@@ -197,6 +198,8 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
+/** The head of the faith whose card is open from the Faiths map mode's seats (RELG-138), or null. */
+let headView: string | null = null;
 let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies" = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
@@ -773,6 +776,17 @@ function renderLensMenu(): void {
       lensMenu.querySelector(".lens-key")?.scrollIntoView({ block: "nearest" });
     }),
   );
+  lensMenu.querySelectorAll<HTMLButtonElement>("[data-head-view]").forEach((b) =>
+    b.addEventListener("click", () => {
+      headView = b.dataset.headView!;
+      lensMenu.hidden = true;
+      document.querySelector("#mode")?.setAttribute("aria-expanded", "false");
+      realmView = -1;
+      newsView = false;
+      panelCollapsed = false;
+      renderPanel();
+    }),
+  );
   lensMenu.querySelector<HTMLInputElement>("#fog")!.addEventListener("change", (e) => {
     fogOn = (e.target as HTMLInputElement).checked;
     restyleProvinces();
@@ -844,8 +858,8 @@ function beliefKey(): string {
   const label = (k: string) => (lens === "tongues" ? k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, " ") : faithName(k));
   return `<div class="lens-key">
     ${rows.map(([k]) => `<span><i class="swatch" style="background:${rgb(k)}"></i>${esc(label(k))}</span>`).join("")}
-    ${lens === "faiths" ? `<span><i class="swatch hatched" style="background:#b9b3a4"></i>A second faith holds 30% or more</span>` : ""}
-    <p>Tap a province for its ${lens === "tongues" ? "Tongue" : "Faith"} line.</p>
+    ${lens === "faiths" ? `<span><i class="swatch hatched" style="background:#b9b3a4"></i>A second faith holds 30% or more</span>${seatKeyHtml(snapshot.faithHeads)}` : ""}
+    <p>Tap a province for its ${lens === "tongues" ? "Tongue" : "Faith"} line${lens === "faiths" ? ", or a seat for its head of the faith" : ""}.</p>
   </div>`;
 }
 
@@ -1122,6 +1136,16 @@ function drawOverlay(o: OverlayContext): void {
       const a = o.toScreen(provinces[e.from]!.x!, provinces[e.from]!.y!);
       const b = o.toScreen(provinces[e.to]!.x!, provinces[e.to]!.y!);
       drawEnvoy(ctx, a, b, e.progress, u, color, `${e.daysLeft} ${e.daysLeft === 1 ? "day" : "days"}`, onScreen);
+    }
+  }
+
+  // The Faiths map mode marks each head of the faith's seat; a tap on it opens his card (RELG-138).
+  if (lens === "faiths" && snapshot && zoom >= 1.1) {
+    for (const seat of snapshot.faithHeads.seats) {
+      const p = provinces[seat.province];
+      if (!p || !isKnown(seat.province)) continue;
+      const [sx, sy] = o.toScreen(p.x!, p.y!);
+      if (onScreen(sx, sy)) seatMark(ctx, sx, sy, 2 + spriteScale);
     }
   }
 
@@ -1438,6 +1462,20 @@ function swords(ctx: CanvasRenderingContext2D, x: number, y: number, r: number):
   ctx.lineCap = "butt";
 }
 
+/** A head of the faith's seat: a small church with a cross, u pixels to a block. */
+function seatMark(ctx: CanvasRenderingContext2D, x: number, y: number, u: number): void {
+  const X = Math.round(x - 2.5 * u);
+  const Y = Math.round(y - 3 * u);
+  ctx.fillStyle = PALETTE.ink;
+  ctx.fillRect(X - 1, Y + 2 * u - 1, 5 * u + 2, 3 * u + 2);
+  ctx.fillRect(X + 2 * u - 1, Y - 1, u + 2, 2 * u + 2);
+  ctx.fillStyle = PALETTE.paper;
+  ctx.fillRect(X, Y + 2 * u, 5 * u, 3 * u);
+  ctx.fillRect(X + 2 * u, Y, u, 2 * u);
+  ctx.fillStyle = PALETTE.ink;
+  ctx.fillRect(X + 2 * u, Y + 3 * u, u, 2 * u);
+}
+
 let armyHitBoxes: { id: number; x: number; y: number; w: number; h: number }[] = [];
 let fleetHitBoxes: { id: number; mine: boolean; x: number; y: number; w: number; h: number }[] = [];
 
@@ -1679,6 +1717,9 @@ function onTap(sx: number, sy: number, province: number): void {
   armyView = -1;
   realmView = -1;
   newsView = false;
+  // Under the Faiths map mode a tap on a seat opens its head's card (RELG-138).
+  headView = lens === "faiths" && selectedProvince >= 0 ? (snapshot?.faithHeads.seats.find((x) => x.province === selectedProvince)?.head ?? null) : null;
+  if (headView) panelCollapsed = false;
   // Under the diplomacy lens a tap opens the realm's Diplomacy tab: what they think of you, and your envoys (DIPL-185, DIPL-209).
   if ((lens === "diplomacy" || lens === "subjects") && selectedProvince >= 0 && owners[selectedProvince]! >= 0) {
     realmView = owners[selectedProvince]!;
@@ -2378,6 +2419,41 @@ function renderPanel(): void {
   lockRevolutionButtons(panel, snapshot?.revolution);
 }
 
+/** The Head of the faith card's buttons: conclave gold in steps, Claim the caliphate, Raise our own patriarch. */
+function bindHeadButtons(run: (order: Order) => Promise<void>): void {
+  panel.querySelectorAll<HTMLButtonElement>("[data-conclave-gold]").forEach((b) => b.addEventListener("click", () => void run({ type: "conclaveGold", gold: Number(b.dataset.conclaveGold) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-head-action]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const kind = b.dataset.headAction;
+      if (kind === "caliphate") void run({ type: "claimCaliphate" });
+      else if (kind === "patriarch") void run({ type: "raiseOwnPatriarch" });
+      else panel.querySelector<HTMLButtonElement>("[data-conclave-gold]:not([disabled])")?.focus();
+    }),
+  );
+}
+
+/** A head's card opened from its seat on the Faiths map mode: read-only unless it is the player's own faith. */
+function renderHead(id: string): void {
+  const s = snapshot!;
+  const card = s.faithHeads.cards[id];
+  if (!card) {
+    headView = null;
+    renderPanel();
+    return;
+  }
+  const mine = s.faithHeads.card?.head === id;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(card.title ?? "Head of the faith")}</h2>${closeButton()}</header>
+    ${headCardHtml(card, (n) => nations[n]!.name, mine)}
+`;
+  bindClose();
+  bindHeadButtons(async (order) => {
+    await act(order);
+    renderPanel();
+  });
+  showPanel(true);
+}
+
 function renderPanelCard(): void {
   const shows = `${achView}/${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
@@ -2390,6 +2466,10 @@ function renderPanelCard(): void {
   }
   if (newsView && snapshot) {
     renderNews();
+    return;
+  }
+  if (headView && snapshot && realmView < 0) {
+    renderHead(headView);
     return;
   }
   if (realmView >= 0) {
@@ -3784,7 +3864,7 @@ function relationsSection(r: number): string {
   return `<h3 class="sub">Relations</h3><p>${line}</p>
     ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy")) : ""}
     ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
-    ${rel ? "" : `<h3 class="sub">War</h3><div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 1)}Declare war</button></div>`}`;
+    ${rel ? "" : `<h3 class="sub">War</h3>${censureWarningHtml(s.faithHeads?.censure[r])}<div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 1)}Declare war</button></div>`}`;
 }
 
 /** Peace offered to the player, with the choice to take it. */
@@ -4072,7 +4152,7 @@ function renderRealm(r: number): void {
       ${mine && s.trade ? tradeLine(s.trade) : ""}
       ${mine ? risingsLine(s.rebels, r) : ""}
       ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
-      ${peoples ? beliefLines(peoples, mine, mine ? s.beliefLow : null) : ""}
+      ${peoples ? beliefLines(peoples, mine, mine ? s.beliefLow : null, faithBadgeHtml(s.faithHeads?.badges[r] ?? null)) : ""}
       <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
       <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
       ${mine && s.fallen ? fallenLine(s.fallen) : ""}
@@ -4095,7 +4175,7 @@ function renderRealm(r: number): void {
     realmTab === "heritage" ? heritageTab(strengths, s?.heritage[r] ?? null, s ? s.nationTreasury[r]! : 0)
     : realmTab === "diplomacy" ? `<div class="diplomacy-tab">${mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r)}</div>`
     : realmTab === "government" && s?.government ? governmentTab(s.government, s.revolution)
-    : realmTab === "peoples" && peoples ? peoplesTab(peoples)
+    : realmTab === "peoples" && peoples ? peoplesTab(peoples) + headCardHtml(s?.faithHeads?.card ?? null, (n) => nations[n]!.name, true)
     : realmTab === "treasury" ? treasurySection()
     : realmTab === "trade" && s?.trade ? tradeTab(s.trade, s, (p) => provinces[p]!.name)
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
@@ -4192,6 +4272,7 @@ function renderRealm(r: number): void {
   );
   panel.querySelectorAll<HTMLButtonElement>("[data-tongue-policy]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "tonguePolicy", policy: b.dataset.tonguePolicy! })));
   panel.querySelectorAll<HTMLButtonElement>("[data-faith-policy]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "faithPolicy", faith: b.dataset.faith!, policy: b.dataset.faithPolicy! })));
+  bindHeadButtons(actInTreasury);
   panel.querySelectorAll<HTMLDetailsElement>("details[data-family]").forEach((d) =>
     d.addEventListener("toggle", () => {
       if (d.open) beliefUi.families.add(d.dataset.family!);
@@ -4449,6 +4530,7 @@ function bindClose(): void {
     newsView = false;
     realmView = -1;
     achView = false;
+    headView = null;
     selectedProvince = -1;
     selected.clear();
     restyleProvinces();
