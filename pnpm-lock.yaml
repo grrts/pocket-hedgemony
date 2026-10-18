@@ -73,6 +73,15 @@ importers:
 
   packages/rules: {}
 
+  packages/sim:
+    dependencies:
+      '@ph/engine':
+        specifier: workspace:*
+        version: link:../engine
+      '@ph/rules':
+        specifier: workspace:*
+        version: link:../rules
+
   packages/specs:
     dependencies:
       '@ph/engine':

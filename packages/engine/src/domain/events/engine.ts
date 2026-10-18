@@ -103,6 +103,8 @@ export interface EventState {
   effects?: Record<string, EffectEval>;
   /** Other contexts can let a one-time event fire again (revolutions' re-arm, REVO-038). */
   mayRefire?: (event: string, roles: Record<string, string[]>) => boolean;
+  /** Other contexts can lean a chooser toward an option (the realm's ruler traits, REALM-104): a factor on its AI weight. */
+  lean?: (chooser: string, o: OptionDef) => number;
 }
 
 export function newState(world: World, data: { events: Record<string, EventDef>; ages?: AgeDef[]; periods?: PeriodDef[] }, rules: GameRules = defaultRules()): EventState {
@@ -503,6 +505,8 @@ export function aiWeight(s: EventState, o: OptionDef, roles: Record<string, stri
     } else if (holdsIfBound(f.if, s.world, ctxOf(s, roles)) === true) w *= f.factor;
   }
   if (o.historical) w *= preset(s.rules.mode).historical_option_mult;
+  const chooser = s.lean && chooserOf(o, roles);
+  if (chooser) w *= s.lean!(chooser, o);
   return w;
 }
 

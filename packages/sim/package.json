@@ -1,0 +1,16 @@
+{
+  "name": "@ph/sim",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run",
+    "campaign": "node --experimental-strip-types src/cli.ts campaign",
+    "breaker": "node --experimental-strip-types src/cli.ts breaker"
+  },
+  "dependencies": {
+    "@ph/engine": "workspace:*",
+    "@ph/rules": "workspace:*"
+  }
+}

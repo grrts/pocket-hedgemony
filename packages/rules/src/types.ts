@@ -105,7 +105,6 @@ export interface RecruitDefines {
   /** Treasury gold per domain gold. */
   goldScale: number;
   /** Weekly turns a levy spends gathering before it takes the field (recruiting: 2 weeks). */
-  gatherWeeks: number;
   /** Thousands a province can have waiting to gather at once: its recruit queue (Leroy, 17 Oct). */
   queueMax: number;
   /** Arms a realm can train in 1444, before any invention. */

@@ -287,6 +287,13 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - RECR-118 Grouping: the queue sits under the button in the same tab, one row per thousand with "gathering" or "waiting" and the weeks until it has gathered, and a × on the last row; troops that have gathered show just below, under "Troops without a commander". [F-38; X-19]
 - RECR-119 Overview: the realm's Military tab lists every province with a recruit queue, its count and when all will have gathered; tapping one opens that province's Garrison tab. [F-38; X-19]
 - RECR-120 Phone: in landscape the button spans the panel, each row is at least 48 points tall and the × at least 44 × 44, and nothing needs hover. [F-38; X-19]
+- RECR-121 The Recruit button shall show, under its label, the thousand it calls as a percent of the men who can be called in the province, and when all queued thousands will have gathered; the queue rows count down in days, since a thousand gathers in 14 days, or 3 with W18 Railway mobilization (RECR-105, RECR-106). [F-18; X-19]
+
+#### How the player uses it: picking up garrison troops and training
+- RECR-122 Where: the player picks garrison troops up from either side. On the province's Garrison tab, each row of troops without a commander has, per commander standing there, "‹name› takes 1,000" and "‹name› takes all"; on the commander screen, "Take in 1,000" and "Take in all" under "Garrison here". Both act at once (RECR-108). A commander at court is put at their head with "Lead: ‹name›". [F-15; X-19]
+- RECR-123 Training is ordered on the commander screen only: its Train block names the arms the realm knows, each with months and gold, and a − / + stepper picks how many thousand levy foot train (the rest stay levy foot). Away from a castle or drill yard of the realm's own the block says so and offers nothing to press; while training is held it says why (RECR-109). Garrison troops can't train until picked up (RECR-107). [F-14; X-19]
+- RECR-124 Grouping and overview: everything about one army (troops by arm, drill, break point, food, pay, training, split, merge, leave as garrison, pick up) sits on its commander screen; everything about troops without a commander sits on the province's Garrison tab; the realm's Military tab lists the recruit queues and opens each Garrison tab (RECR-119). [F-14; F-17; X-19]
+- RECR-125 Phone: in landscape both screens fit the side panel in the Wide and Tall layouts; every button on them, the small ones in troop rows included, is at least 44 points high, the stepper's − and + at least 44 × 64, and nothing needs hover (each button spells out what it does). Portrait on a phone shows the turn-the-phone screen, as everywhere in the game. [F-14; X-19]
 
 #### Names and ranks in the realm's language (feedback 125)
 - RECR-121 The recruiting system shall name every commander, admiral and hired captain in the language of the realm's culture (`names.json`), in that language's order: family name first where the language puts it first (Chinese, Japanese, Korean, Vietnamese, Hungarian). The 1444 start's historical commanders keep their own names in their own language ("Hunyadi János", "Gjergj Kastrioti", "Konstantinos Palaiologos"), and a realm the map data gives only a stand-in general gets one named in its culture. [F-125; F-33]
@@ -502,7 +509,8 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 | RECR-100 | recruit-pool.feature | The monthly update ticks training down / The yearly step runs when January begins |
 | Worked example (§5, §8) | champagne-1444.feature | Champagne late summer 1444 |
 | RECR-104–107 | levy.feature | The levy screen for Troyes; Levies gather a thousand at a time; Gathered levies wait as garrison troops |
-| RECR-108–110, 112 | training.feature | A commander picks up garrison troops; Giving a training order; The commander screen; Leaving troops as a garrison |
+| RECR-108–110, 112 | training.feature | A commander picks up garrison troops; Giving a training order; Training only at a castle; The commander screen; Leaving troops as a garrison |
+| RECR-121–125 | — | Presentation only: checked on phone screenshots in landscape |
 | RECR-111 | commissioning-officials.feature | New commanders come from officials |
 | RECR-113 | training.feature | Trained levies stay until sent home |
 | RECR-114, 115 | commissioning-officials.feature; ai-recruiting.feature | A commission costs 50 gold; The AI commissions only for troops it has |

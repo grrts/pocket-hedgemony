@@ -4,6 +4,9 @@ import { LEDGER_LINES } from "../../treasury.ts";
 import { restoreResearch, saveResearch, type SavedResearch } from "../../research.ts";
 import { restoreEvents, saveEvents, type SavedEvents } from "../../events.ts";
 import { restoreHeritage, saveHeritage, type SavedRealmHeritage } from "../../heritage.ts";
+import { restoreRulers, saveRulers } from "../../rulers.ts";
+import { restoreFallen, saveFallen, type SavedFallen } from "../../fallen.ts";
+import { readBeliefShares } from "../../belief.ts";
 import { graspingFromGrievances, restoreGovernment, saveGovernment, type SavedGovernment } from "../../government.ts";
 import { restoreTrade, saveTrade, seedTrade, tradeProvinceArrays, type SavedTrade } from "../../trade.ts";
 import { restoreRebels, saveRebels, type SavedRebels } from "../../rebels.ts";
@@ -95,7 +98,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
-      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed, foodPolicy: world.foodPolicy, diplomacy: { ...world.diplomacy, events: [] }, government: saveGovernment(world), events: saveEvents(world), navy: saveNavy(world), exploration: saveExploration(world), peoples: savePeoples(world), rebels: saveRebels(world), heritage: saveHeritage(world), revolutions: saveRevolutions(world), trade: saveTrade(world) },
+      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed, foodPolicy: world.foodPolicy, diplomacy: { ...world.diplomacy, events: [] }, government: saveGovernment(world), events: saveEvents(world), navy: saveNavy(world), exploration: saveExploration(world), peoples: savePeoples(world), rebels: saveRebels(world), heritage: saveHeritage(world), revolutions: saveRevolutions(world), trade: saveTrade(world), rulers: saveRulers(world), fallen: saveFallen(world) },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
@@ -329,7 +332,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (!name || owner < 0 || nationMap[owner]! < 0) return -1;
     return addCommander(world, nationMap[owner]!, newCommander(name), id);
   });
-  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[]; foodPolicy?: FoodPolicyScreen[]; diplomacy?: World["diplomacy"]; government?: SavedGovernment; events?: SavedEvents; navy?: SavedNavy; exploration?: SavedExploration; peoples?: SavedPeoples; rebels?: SavedRebels; heritage?: Record<string, SavedRealmHeritage>; revolutions?: SavedRevolutions; trade?: SavedTrade };
+  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[]; foodPolicy?: FoodPolicyScreen[]; diplomacy?: World["diplomacy"]; government?: SavedGovernment; events?: SavedEvents; navy?: SavedNavy; exploration?: SavedExploration; peoples?: SavedPeoples; rebels?: SavedRebels; heritage?: Record<string, SavedRealmHeritage>; revolutions?: SavedRevolutions; trade?: SavedTrade; rulers?: ReturnType<typeof saveRulers>; fallen?: SavedFallen };
   const mapP = (old: number) => world.provinceIndex.get(ids.provinces[old]!) ?? -1;
   const mapN = (old: number) => nationMap[old] ?? -1;
   const mapCompany = (c: FreeCompany): FreeCompany => ({ ...c, home: c.home < 0 ? -1 : mapP(c.home) });
@@ -361,6 +364,9 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   if (natMeta.events) restoreEvents(world, natMeta.events);
   // Heritage by realm (heydays, ambitions, legacies, burden); a save from before it draws afresh.
   if (natMeta.heritage) restoreHeritage(world, natMeta.heritage);
+  // Rulers and the fallen by realm; a save from before them keeps the rulers the seed drew and counts no fallen.
+  restoreRulers(world, natMeta.rulers);
+  restoreFallen(world, natMeta.fallen);
   // Food policies by realm (castles' own values are keyed by province id); saves from before them keep the starting policy.
   natMeta.foodPolicy?.forEach((screen, old) => {
     const n = mapN(old);
@@ -377,6 +383,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   if (natMeta.revolutions) restoreRevolutions(world, natMeta.revolutions, mapN);
   // Tongues and faiths by province and realm; a save from before them keeps the 1444 start.
   restorePeoples(world, natMeta.peoples);
+  readBeliefShares(world);
   // Research by realm; a save from before research keeps the 1444 start.
   if (natMeta.research) restoreResearch(world, natMeta.research, mapN, mapP);
   // Ports, sailors and fleets; a save from before the navy keeps the 1444 ports.
@@ -392,7 +399,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   if (worksMeta.workQueue) world.workQueue = worksMeta.workQueue.map((q) => mapWork<QueuedWork>(q)).filter(placed);
   refreshWorks(world);
   if (natMeta.lords) world.lords = natMeta.lords.map((l) => ({ ...l, nation: mapN(l.nation) }));
-  if (natMeta.musters) world.musters = natMeta.musters.map((m) => ({ ...m, nation: mapN(m.nation), province: mapP(m.province) })).filter((m) => m.nation >= 0 && m.province >= 0);
+  // Saves from before RECR-106 counted the next thousand in weeks.
+  if (natMeta.musters) world.musters = (natMeta.musters as (Muster & { weeksLeft?: number })[]).map(({ weeksLeft, ...m }) => ({ ...m, daysLeft: m.daysLeft ?? (weeksLeft ?? 2) * 7, nation: mapN(m.nation), province: mapP(m.province) })).filter((m) => m.nation >= 0 && m.province >= 0);
   const rec = nat.commanderRecord;
   if (rec) {
     commanderMap.forEach((now, old) => {

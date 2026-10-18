@@ -2,7 +2,8 @@ import { expect } from "vitest";
 import * as R from "@ph/engine/domain/recruiting";
 import { provinceConfig } from "@ph/engine/domain/province";
 import { type MoveWorld, type Place } from "@ph/engine/domain/troop-movement";
-import { createWorld, cultureOf, personName, rankedName, Rng } from "@ph/engine";
+import { aiCollect, applyNow, ARMS, commanderScreen, createWorld, cultureOf, garrisonTroops, garrisonView, gatherDays, idleCommanders, KIND, LEVY_UNIT, menByArm, monthlyRecruits, personName, rankedName, Rng, spawnArmy, trainingGround, WORK_COUNT, workIndex, type CommanderScreen, type Order } from "@ph/engine";
+import { commanderAt, garrisonMen, levyGame, playDays, province, type LevyGame } from "./levy-game.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { steps, type Scenario } from "../src/registry.ts";
 
@@ -970,6 +971,7 @@ When("the month ends", (s) => {
   if (s.pay !== undefined) s.spent = R.paySpentAtHome(s.pay);
   if (s.standing) s.quartered = R.soldiersQuartered(s.standing.peace, s.barracksRoom, s.standing.men);
   if (s.regiment && !s.standing) s.goneHome = R.goingHome(s.regiment);
+  if (s.regimentSlot !== undefined) monthlyRecruits(levyGame(s).w, []);
 });
 Then(re('the province "Troyes" (gets|does not get) "Soldiers quartered"'), (s, g: string) => {
   expect(s.quartered).toBe(g === "gets");
@@ -1532,4 +1534,293 @@ Then("each captain is ranked in the language of the realm his company gathers in
     const [before, after] = (cultureOf(nameRules, home)?.ranks?.captain ?? "{name}").split("{name}");
     expect(c.captain.startsWith(before!) && c.captain.endsWith(after!), c.captain).toBe(true);
   }
+});
+// ---------------------------------------------------------------- the levy, garrison and training in the game (RECR-104..115)
+// These run the engine's own rules on the 1444 map, with France as the player (levy-game.ts).
+
+const order = (g: LevyGame, o: Order): string | undefined => applyNow(g.w, o, g.n).rejectedOrders[0]?.reason;
+const troyes = (s: Scenario) => province(levyGame(s), "Troyes");
+
+When('the country "France" levies 5000 men from province "Troyes"', (s) => {
+  const g = levyGame(s);
+  s.idleBefore = idleCommanders(g.w, g.n).length;
+  s.armiesBefore = Array.from({ length: g.w.armies.count }, (_, i) => i).filter((i) => g.w.armies.alive[i] && g.w.armies.owner[i] === g.n).length;
+  expect(order(g, { type: "recruit", province: troyes(s), thousands: 5 })).toBeUndefined();
+});
+Then('after 14 days the province "Troyes" has 1000 garrison troops of arm "levy foot"', (s) => {
+  const g = levyGame(s);
+  playDays(g, 7);
+  expect(garrisonMen(g, troyes(s))).toBe(0);
+  playDays(g, 7);
+  expect(garrisonMen(g, troyes(s), "levy foot")).toBeCloseTo(1000, 0);
+});
+Then("the garrison troops can march and fight only once a commander picks them up", (s) => {
+  const g = levyGame(s);
+  const p = troyes(s);
+  const [troop] = garrisonTroops(g.w, g.n, p);
+  const next = g.w.rules.provinces[p]!.neighbors.map((id) => g.w.provinceIndex.get(id)!).find((q) => g.w.provinceOwner[q] === g.n)!;
+  expect(order(g, { type: "move", army: troop!, to: next })).toMatch(/commander/);
+  // Never drawn on the map: troops without a commander are no army.
+  expect(g.w.armies.commander[troop!]).toBe(-1);
+  const led = commanderAt(g, p);
+  expect(order(g, { type: "pickUp", army: led.army })).toBeUndefined();
+  expect(garrisonMen(g, p)).toBe(0);
+  expect(g.w.armies.men[led.army]).toBeCloseTo(2000, 0);
+  expect(order(g, { type: "move", army: led.army, to: next })).toBeUndefined();
+});
+Then("each thousand gathers in 3 days instead of 14", (s) => {
+  const g = levyGame(s);
+  expect(gatherDays(g.w, g.n)).toBe(3);
+  // Days 3 and 6 of the first week: two thousands, and the third is due on day 9.
+  playDays(g, 7);
+  expect(garrisonMen(g, troyes(s))).toBeCloseTo(2000, 0);
+  expect(garrisonView(g.w, g.n, troyes(s)).gathering[0]!.daysLeft).toBe(2);
+});
+Then('the levy gathers as garrison troops at "Troyes"', (s) => {
+  const g = levyGame(s);
+  playDays(g, 14);
+  expect(garrisonMen(g, troyes(s))).toBeCloseTo(1000, 0);
+  expect(garrisonTroops(g.w, g.n, troyes(s)).every((i) => g.w.armies.location[i] === troyes(s))).toBe(true);
+});
+Then("no army is formed until a commander picks them up", (s) => {
+  const g = levyGame(s);
+  for (const i of garrisonTroops(g.w, g.n, troyes(s))) expect(g.w.armies.commander[i]).toBe(-1);
+  // No commander was taken from court for them.
+  expect(idleCommanders(g.w, g.n).length).toBe(s.idleBefore);
+});
+
+When('the player opens the levy screen from the province card of "Troyes"', (s) => {
+  const g = levyGame(s);
+  s.callable = g.w.provinceRecruits[troyes(s)]!;
+  s.levyScreen = R.provinceLevy(s.callable, 1);
+});
+Then("the men are chosen in whole thousands", (s) => {
+  expect(LEVY_UNIT).toBe(1000);
+  expect(R.provinceLevy(s.callable, 2.4).men).toBe(2000);
+  const g = levyGame(s);
+  expect(order(g, { type: "recruit", province: troyes(s), thousands: 2 })).toBeUndefined();
+  expect(g.w.provinceRecruits[troyes(s)]).toBeCloseTo(s.callable - 2000, 0);
+});
+Then('the screen shows the thousands chosen as a percent of the men who can be called in "Troyes"', (s) => {
+  expect(s.levyScreen.percent).toBe(Math.round((1000 / s.callable) * 100));
+  expect(R.provinceLevy(5000, 1).percent).toBe(20);
+});
+Then("there is no levy for a region or the whole country", (s) => {
+  const g = levyGame(s);
+  // The levy names one province; anything else is no place to call men.
+  expect(order(g, { type: "recruit", province: -1, thousands: 1 } as Order)).toBeTruthy();
+  expect(order(g, { type: "recruit", thousands: 1 } as unknown as Order)).toBeTruthy();
+});
+Then("the first 1000 men are gathered after 14 days", (s) => {
+  const g = levyGame(s);
+  playDays(g, 14);
+  expect(garrisonMen(g, troyes(s))).toBeCloseTo(1000, 0);
+});
+Then("all 5000 men are gathered after 70 days", (s) => {
+  const g = levyGame(s);
+  playDays(g, 56 - 7);
+  expect(garrisonMen(g, troyes(s))).toBeCloseTo(4000, 0);
+  playDays(g, 7);
+  expect(garrisonMen(g, troyes(s))).toBeCloseTo(5000, 0);
+  expect(garrisonView(g.w, g.n, troyes(s)).gathering).toEqual([]);
+});
+
+Given('the country "France" has gathered 2000 levies in "Troyes"', (s) => {
+  const g = levyGame(s);
+  expect(order(g, { type: "recruit", province: troyes(s), thousands: 2 })).toBeUndefined();
+  playDays(g, 28);
+  expect(garrisonMen(g, troyes(s))).toBeCloseTo(2000, 0);
+});
+Then('they are garrison troops of "Troyes" on its Garrison tab', (s) => {
+  const g = levyGame(s);
+  const tab = garrisonView(g.w, g.n, troyes(s));
+  expect(tab.troops.reduce((t, x) => t + x.men, 0)).toBeCloseTo(2000, 0);
+  // Only their own realm sees them.
+  const england = g.w.nationIndex.get("england")!;
+  expect(garrisonView(g.w, england, troyes(s)).troops).toEqual([]);
+});
+Then("they cannot march, fight in the field or train until a commander picks them up", (s) => {
+  const g = levyGame(s);
+  const [troop] = garrisonTroops(g.w, g.n, troyes(s));
+  const next = g.w.rules.provinces[troyes(s)]!.neighbors.map((id) => g.w.provinceIndex.get(id)!)[0]!;
+  expect(order(g, { type: "move", army: troop!, to: next })).toMatch(/commander/);
+  expect(order(g, { type: "train", army: troop!, arm: "pikes", men: 1000 })).toMatch(/commander/);
+});
+
+// Training at a castle or drill yard, from the commander screen (RECR-043, RECR-108, RECR-109, RECR-112, RECR-113).
+
+const LA_HIRE = (s: Scenario, p: number, men: number) => {
+  const g = levyGame(s);
+  s.laHire = commanderAt(g, p, men);
+  g.w.commanders[s.laHire.commander]!.name = "La Hire";
+  return s.laHire as { army: number; commander: number };
+};
+
+Given('the commander "La Hire" leads 5000 levies at "Troyes"', (s) => {
+  LA_HIRE(s, troyes(s), 5000);
+});
+When('the player trains 2000 of them into "pikes" at the castle of "Troyes" from his commander screen', (s) => {
+  const g = levyGame(s);
+  const p = troyes(s);
+  // Troyes has its castle (the scenario's place to train).
+  g.w.provinceWorks[p * WORK_COUNT + workIndex("castle")] = Math.max(1, g.w.provinceWorks[p * WORK_COUNT + workIndex("castle")]!);
+  expect(order(g, { type: "train", army: s.laHire.army, arm: "pikes", men: 2000 })).toBeUndefined();
+});
+Then('2000 levies walk to the castle of "Troyes" and start training', (s) => {
+  const a = levyGame(s).w.armies;
+  expect(a.trainArm[s.laHire.army]).toBe(ARMS.indexOf("pikes"));
+  expect(a.trainMen[s.laHire.army]).toBe(2000);
+});
+Then("the other 3000 stay levies", (s) => {
+  const a = levyGame(s).w.armies;
+  expect(a.men[s.laHire.army]! - a.trainMen[s.laHire.army]!).toBe(3000);
+  expect(menByArm(levyGame(s).w, s.laHire.army)[ARMS.indexOf("levy foot")]).toBeCloseTo(5000, 0);
+});
+
+Given('a trained regiment of kind "levy" that has been out 7 months', (s) => {
+  const g = levyGame(s);
+  const p = g.w.provinceIndex.get(g.w.rules.nations[g.n]!.capital)!;
+  const slot = spawnArmy(g.w, g.n, p, 1000, -1, 0, { kind: KIND.levy, foot: "pikes", drill: 30 });
+  g.w.armies.monthsOut[slot] = 7;
+  s.regimentSlot = slot;
+});
+Then("none of its men go home on their own", (s) => {
+  const g = levyGame(s);
+  expect(g.w.armies.alive[s.regimentSlot]).toBe(1);
+  expect(menByArm(g.w, s.regimentSlot)[ARMS.indexOf("pikes")]).toBeCloseTo(1000, 0);
+});
+
+Given('the province "Troyes" has 3000 garrison troops', (s) => {
+  const g = levyGame(s);
+  spawnArmy(g.w, g.n, troyes(s), 3000, -1, 0, { kind: KIND.levy });
+});
+Given('the commander "La Hire" stands in "Troyes"', (s) => {
+  LA_HIRE(s, troyes(s), 1000);
+  s.menBefore = levyGame(s).w.armies.men[s.laHire.army];
+});
+When('"La Hire" picks up 2000 of them', (s) => {
+  const g = levyGame(s);
+  s.dayBefore = g.w.day;
+  expect(order(g, { type: "pickUp", army: s.laHire.army, men: 2000 })).toBeUndefined();
+});
+Then("at once his army has 2000 more men", (s) => {
+  const g = levyGame(s);
+  expect(g.w.day).toBe(s.dayBefore);
+  expect(g.w.armies.men[s.laHire.army]! - s.menBefore).toBeCloseTo(2000, 0);
+});
+Then('1000 garrison troops stay in "Troyes"', (s) => {
+  expect(garrisonMen(levyGame(s), troyes(s))).toBeCloseTo(1000, 0);
+});
+
+Given('the commander "La Hire" stands with his army in a province of France with no castle', (s) => {
+  const g = levyGame(s);
+  const capital = g.w.provinceIndex.get(g.w.rules.nations[g.n]!.capital)!;
+  let p = -1;
+  for (let q = 0; q < g.w.provinceCount && p < 0; q++) if (q !== capital && g.w.provinceOwner[q] === g.n && !g.w.provinceWater[q]) p = q;
+  // No castle and no drill yard there.
+  g.w.provinceWorks[p * WORK_COUNT + workIndex("castle")] = 0;
+  g.w.provinceWorks[p * WORK_COUNT + workIndex("drill yard")] = 0;
+  s.bare = p;
+  LA_HIRE(s, p, 2000);
+});
+When("the player orders 1000 of his levies trained as pikes", (s) => {
+  s.refused = order(levyGame(s), { type: "train", army: s.laHire.army, arm: "pikes", men: 1000 });
+});
+Then("the order is refused until the army stands at a castle or drill yard of France", (s) => {
+  const g = levyGame(s);
+  expect(s.refused).toMatch(/castle or drill yard/);
+  expect(trainingGround(g.w, g.n, s.bare)).toBe(false);
+  // A drill yard there is enough.
+  g.w.provinceWorks[s.bare * WORK_COUNT + workIndex("drill yard")] = 1;
+  expect(trainingGround(g.w, g.n, s.bare)).toBe(true);
+  expect(order(g, { type: "train", army: s.laHire.army, arm: "pikes", men: 1000 })).toBeUndefined();
+});
+
+Given('the commander "La Hire" stands with his army in "Troyes"', (s) => {
+  LA_HIRE(s, troyes(s), 3000);
+});
+When("he leaves 1000 men there", (s) => {
+  expect(order(levyGame(s), { type: "split", army: s.laHire.army, arm: "levy foot", men: 1000 })).toBeUndefined();
+});
+Then('they become garrison troops of "Troyes"', (s) => {
+  const g = levyGame(s);
+  expect(garrisonMen(g, troyes(s))).toBeCloseTo(1000, 0);
+  expect(g.w.armies.men[s.laHire.army]).toBeCloseTo(2000, 0);
+});
+
+// The AI commissions only for troops it has (RECR-115).
+
+Given(re("an AI country has (\\d+) men without a commander and (\\d) free commanders"), (s, men: string, free: string) => {
+  const g = levyGame(s);
+  const n = g.w.nationIndex.get("burgundy")!;
+  const a = g.w.armies;
+  // Burgundy's armies and commanders put aside: only the scenario's men and commanders are left.
+  for (let i = 0; i < a.count; i++) if (a.owner[i] === n) a.alive[i] = 0;
+  const kept = g.w.commanderOwner.map((o, c) => (o === n ? c : -1)).filter((c) => c >= 0);
+  kept.forEach((c, k) => {
+    if (k >= num(free)) g.w.commanderOwner[c] = -1;
+  });
+  g.w.nationTreasury[n] = 1000;
+  const p = g.w.provinceIndex.get(g.w.rules.nations[n]!.capital)!;
+  s.ai = { n, troops: spawnArmy(g.w, n, p, num(men), -1, 0, { kind: KIND.levy }), commanders: () => g.w.commanderOwner.filter((o) => o === n).length };
+  s.ai.before = s.ai.commanders();
+});
+When("its turn is played", (s) => {
+  aiCollect(levyGame(s).w, []);
+});
+Then(re("it (commissions no official|commissions one official|sends its free commander)"), (s, what: string) => {
+  const g = levyGame(s);
+  const led = g.w.armies.commander[s.ai.troops]!;
+  if (what === "commissions no official") {
+    expect(s.ai.commanders()).toBe(s.ai.before);
+    expect(led).toBe(-1);
+  } else if (what === "commissions one official") {
+    expect(s.ai.commanders()).toBe(s.ai.before + 1);
+    expect(led).toBeGreaterThanOrEqual(0);
+  } else {
+    expect(s.ai.commanders()).toBe(s.ai.before);
+    expect(led).toBeGreaterThanOrEqual(0);
+  }
+});
+
+When('the player opens the commander screen of "La Hire"', (s) => {
+  const g = levyGame(s);
+  const p = troyes(s);
+  const { army } = LA_HIRE(s, p, 3000);
+  // A second army at Troyes it could merge with, and Troyes's castle to train at.
+  const other = g.w.commanderOwner.findIndex((o, c) => o === g.n && c !== s.laHire.commander);
+  for (let i = 0; i < g.w.armies.count; i++) if (g.w.armies.commander[i] === other) g.w.armies.alive[i] = 0;
+  s.second = spawnArmy(g.w, g.n, p, 1000, other);
+  g.w.provinceWorks[p * WORK_COUNT + workIndex("castle")] = Math.max(1, g.w.provinceWorks[p * WORK_COUNT + workIndex("castle")]!);
+  s.screen = commanderScreen(g.w, g.n, army);
+});
+Then("it shows the army's men by arm and kind, drill, break point and his skills", (s) => {
+  const v = s.screen as CommanderScreen;
+  expect(v.byArm[ARMS.indexOf("levy foot")]).toBeCloseTo(3000, 0);
+  expect(v.kind).toBe("levy");
+  expect(v.drill).toBeGreaterThanOrEqual(0);
+  expect(v.breakPoint).toBeGreaterThan(0);
+  expect(v.commander.name).toBe("La Hire");
+  for (const k of ["might", "cunning", "logistics"] as const) expect(typeof v.commander[k]).toBe("number");
+});
+Then("it shows the companies with split, merge and leave-as-garrison", (s) => {
+  const v = s.screen as CommanderScreen;
+  expect(v.companies.map((c) => c.arm)).toEqual(["levy foot"]);
+  expect(v.companies[0]!.actions).toEqual(expect.arrayContaining(["split", "leave as garrison"]));
+  expect(v.mergeWith).toEqual([s.second]);
+});
+Then("it shows the food reserve, the food used a day and a month, and the pay a month", (s) => {
+  const v = s.screen as CommanderScreen;
+  expect(v.food.reserve).toBeGreaterThan(0);
+  expect(v.food.perMonth).toBeGreaterThan(0);
+  expect(v.food.perDay).toBeCloseTo(v.food.perMonth / 30, 6);
+  // A fresh levy is paid nothing for its first 3 months.
+  expect(v.payPerMonth).toBe(0);
+});
+Then("training is ordered from it", (s) => {
+  const g = levyGame(s);
+  const v = s.screen as CommanderScreen;
+  expect(v.canTrain).toBe(true);
+  expect(order(g, { type: "train", army: s.laHire.army, arm: "pikes", men: 1000 })).toBeUndefined();
+  expect(commanderScreen(g.w, g.n, s.laHire.army)!.training).toEqual({ arm: "pikes", men: 1000, monthsLeft: 3 });
 });

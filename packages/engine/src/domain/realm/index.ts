@@ -982,6 +982,15 @@ export function countryCard(c: CardInput): { text: string; stat: Stat | "schools
   return lines;
 }
 
+/** Lines REALM-176 moves off the General tab to the Diplomacy tab. */
+const DIPLOMACY_STATS = new Set<string>(["allies", "enemies", "oaths_broken"]);
+
+/** The country card split by tab (REALM-176): the General tab keeps the summary lines, the Diplomacy tab takes Allies, Enemies and Oaths broken. */
+export function cardTabs(c: CardInput): { general: string[]; diplomacy: string[] } {
+  const lines = countryCard(c);
+  return { general: lines.filter((l) => !DIPLOMACY_STATS.has(l.stat)).map((l) => l.text), diplomacy: lines.filter((l) => DIPLOMACY_STATS.has(l.stat)).map((l) => l.text) };
+}
+
 /** Re-exported so callers can check an invention's realm effects (e.g. officials per province). */
 export { effectsOf };
 
