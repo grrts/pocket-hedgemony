@@ -241,6 +241,17 @@ export const SPRITES = {
     "..ss.ss...",
     ".bbb.bbb..",
   ],
+  /** An envoy on the road, riding right with his letter (DIPL-184). */
+  envoy: [
+    "......f....",
+    ".....NNw...",
+    ".....NLw...",
+    "..bbbNbbab.",
+    ".bbbbbbbbaa",
+    "b.bbbbbbb..",
+    "..t.t..t.t.",
+    "..t.t..t.t.",
+  ],
   /** Move order arrow head. */
   flag: [
     "kk....",
