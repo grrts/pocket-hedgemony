@@ -286,7 +286,7 @@ function nodes(lay: TreeLayout, r: Research, st: Map<string, State>, focus: stri
 function closeUp(lay: TreeLayout, r: Research, st: Map<string, State>, focus: string | null, path: Set<string>): string {
   const w = nodeX(lay.cols) + PAD;
   const h = nodeY(lay.rows) + PAD;
-  return `<div class="tree-view close" data-tree tabindex="0" aria-label="The invention tree, close up: drag to move, pinch for the whole tree">
+  return `<div class="tree-view near" data-tree tabindex="0" aria-label="The invention tree, close up: drag to move, pinch for the whole tree">
       <div class="tree-canvas" style="width:${at(w)};height:${h}px">
         ${eraHeads(lay, r, w, h)}
         ${bandColumn(lay, h)}

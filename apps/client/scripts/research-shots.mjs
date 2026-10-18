@@ -77,7 +77,7 @@ for (const [size, device, realms] of sizes) {
     await page.waitForTimeout(300);
     await shot("research");
     // One picture: four branch bands, no bough tabs (RSCH-100).
-    if ((await page.locator(".tree-view.close .tree-bands .band-name").count()) !== 4) fail(name, "the tree has not four bands");
+    if ((await page.locator(".tree-view.near .tree-bands .band-name").count()) !== 4) fail(name, "the tree has not four bands");
     if (await page.locator("[data-bough]").count()) fail(name, "the bough tabs are still there");
     if ((await page.locator(".tree-eras b.now").count()) !== 1) fail(name, "no era marked Now");
     await checkTargets("at the start");
@@ -144,10 +144,10 @@ for (const [size, device, realms] of sizes) {
     const plot = await page.locator("[data-whole]").boundingBox();
     if (device.hasTouch) await page.touchscreen.tap(plot.x + plot.width * 0.6, plot.y + plot.height * 0.7);
     else await page.mouse.click(plot.x + plot.width * 0.6, plot.y + plot.height * 0.7);
-    await page.waitForSelector(".tree-view.close");
+    await page.waitForSelector(".tree-view.near");
     await page.waitForTimeout(200);
     await shot("close-there");
-    const moved = await page.evaluate(() => document.querySelector(".tree-view.close").scrollLeft);
+    const moved = await page.evaluate(() => document.querySelector(".tree-view.near").scrollLeft);
     if (moved < 200) fail(name, "Close up did not open at the place tapped", moved);
     // Schools, one button away in the header.
     await press(page.locator("[data-learn-part=schools]"));
