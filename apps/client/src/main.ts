@@ -27,11 +27,18 @@ import {
   TONGUE_FAMILY,
   faithName,
   type ExplorationView,
+  rateButtons as rateButtonsOf,
+  RATE_LABELS,
+  taxLine as taxLineOf,
+  topBar,
+  treasuryView,
+  type Opens,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
 import { rebelsUi, risingCard, risingsLine, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
+import { fallenLine, rulerLines } from "./ui/ruler.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { sprite, spriteUrl } from "./art/sprites.ts";
@@ -1806,15 +1813,27 @@ function renderHud(): void {
   const s = snapshot;
   const me = s.playerNation;
   const n = nations[me]!;
-  const inc = s.nationMonthlyIncome[me]!;
-  hud.innerHTML = `
-    <button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}</button>
-    <button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>
-    <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${s.battles.some((b) => b.player) ? ` <small>${String(s.hour).padStart(2, "0")}:00</small>` : ""}</span>
-    <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
-    ${s.stability ? stabilityPlaque(s.stability, me) : ""}
-    ${myWars().length ? `<button class="plaque at-war" data-realm="${me}" data-realm-open="diplomacy" title="Your wars">${icon("swords", 1)}At war</button>` : ""}
-    <button class="plaque dispatches${s.calls.length || s.peaceOffers.length || asksOf(s).length ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${unread + s.calls.length + s.peaceOffers.length + asksOf(s).length || ""}</button>`;
+  // The plaques, their order and what each opens come from the engine's top-bar model (REALM-205).
+  const open = (o: Opens) => (o && "card" in o && o.tab ? ` data-realm-open="${o.tab}"` : "");
+  hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}</button>
+    ` + topBar(s, unread, asksOf(s).length)
+    .map((p) => {
+      switch (p.key) {
+        case "realm":
+          return `<button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>`;
+        case "date":
+          return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${s.battles.some((b) => b.player) ? ` <small>${String(s.hour).padStart(2, "0")}:00</small>` : ""}</span>`;
+        case "gold":
+          return `<button class="plaque" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(p.gold)} <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small></button>`;
+        case "stability":
+          return stabilityPlaque(s.stability!, me);
+        case "war":
+          return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} title="Your wars">${icon("swords", 1)}At war</button>`;
+        case "dispatches":
+          return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
+      }
+    })
+    .join("\n    ");
 }
 
 /** Wars the player fights, with the player's side first. */
@@ -1878,7 +1897,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown", ruler: "crown",
 };
 
 /**
@@ -1928,6 +1947,7 @@ function logNews(s: Snapshot): void {
   for (const x of news) if (x.kind === "heritage" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "heritage" });
   // A crown inherited, a claim gained or lapsed, crowns merged: one line that opens the Diplomacy tab, where Your house lists them (SUBJ-130).
   for (const x of news) if (x.kind === "crown" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "diplomacy" });
+  for (const x of news) if (x.kind === "ruler" && x.nations[0] === me) alertPlayer(x.text, "crown", { tab: "general" });
   askForStudy(s, news.some((x) => x.kind === "invention" && /Learned/.test(x.text)));
   for (const c of s.calls) {
     if (alerted.has(`call ${c.id}`)) continue;
@@ -2010,7 +2030,7 @@ const ALERTS_SHOWN = 3;
 const ALERT_MS = 12000;
 
 /** A short alert over the map, with Go there (to a province) or Answer (opens the dispatches). */
-function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true; tab?: "learning" | "heritage" | "diplomacy" } = {}): void {
+function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true; tab?: "learning" | "heritage" | "diplomacy" | "general" } = {}): void {
   if ([...alerts.children].some((el) => el.querySelector("span")?.textContent === text)) return;
   const el = document.createElement("div");
   el.className = "alert framed";
@@ -3646,26 +3666,23 @@ function mercenarySection(): string {
 
 // ---- Tax and the treasury (milestone 3) ----
 
-const RATE_LABEL = ["None", "Light", "Normal", "Heavy", "Crushing"];
 const gold2 = (g: number) => (Math.abs(g) < 10 ? g.toFixed(2) : g.toFixed(1));
 
-/** A province's Tax line: its rate, whether it follows the realm default, and the gold it pays a month. */
+/** A province's Tax line: its rate, whether it follows the realm default, and the gold it pays a month (the engine's taxLine model, REALM-183). */
 function taxLine(p: number): string {
-  const s = snapshot!;
-  const own = s.provinceTax[p]!;
-  const rate = own >= 0 ? own : s.taxDefault;
-  return `<dt>Tax</dt><dd>${RATE_LABEL[rate]} (${own >= 0 ? "own rate" : "realm default"}) · ${gold2(s.provinceTaxGold[p]!)} gold a month</dd>`;
+  const t = taxLineOf(snapshot!, p);
+  return `<dt>Tax</dt><dd>${t.rateLabel} (${t.followsDefault ? "realm default" : "own rate"}) · ${gold2(t.goldPerMonth)} gold a month</dd>`;
 }
 
 /**
  * The row of rate buttons: for a province, Realm default and the five rates
  * (its own rate marked, or Realm default while it follows it); for the realm,
- * the five rates with the default marked.
+ * the five rates with the default marked (the engine's rateButtons model).
  */
 function rateButtons(current: number, scope: "province" | "realm"): string {
-  const button = (rate: number, label: string) =>
-    `<button class="paper${current === rate ? " on" : ""}" aria-pressed="${current === rate}" data-tax="${rate}" title="${rate < 0 ? "Follow the realm default" : `Tax ${scope === "realm" ? "every province that follows the default" : "this province"} ${label.toLowerCase()}`}">${label}</button>`;
-  return `<div class="choices tax-rates">${scope === "province" ? button(-1, "Realm default") : ""}${RATE_LABEL.map((l, k) => button(k, l)).join("")}</div>`;
+  return `<div class="choices tax-rates">${rateButtonsOf(current, scope)
+    .map((b) => `<button class="paper${b.on ? " on" : ""}" aria-pressed="${b.on}" data-tax="${b.rate}" title="${b.title}">${b.label}</button>`)
+    .join("")}</div>`;
 }
 
 /** Binds the rate buttons (province -1: the realm default) and the borrow and repay buttons. */
@@ -3704,31 +3721,24 @@ async function actInTreasury(order: Order): Promise<void> {
   renderPanel();
 }
 
-const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute", navy: "Ships and sailors" };
-
 /**
  * The Treasury tab: the purse (gold, its change a month and how long it
  * lasts), the month's ledger as bars of gold in and out, the realm tax
  * default, and the debt as a meter against what lenders allow, with what a
- * loan costs said before the borrow buttons (REALM-184, REALM-198).
+ * loan costs said before the borrow buttons (REALM-184, REALM-198). What it
+ * shows comes from the engine's treasuryView model.
  */
 function treasurySection(): string {
   const s = snapshot!;
-  const me = s.playerNation;
-  const gold = s.nationTreasury[me]!;
-  const net = s.ledger.reduce((t, l) => t + l.gold, 0);
-  const own = Array.from(s.provinceTax).filter((t, p) => t >= 0 && owners[p] === me).length;
-  const interest = -(s.ledger.find((l) => l.line === "interest")?.gold ?? 0);
-  const borrow = [10, 50].filter((g) => g < s.canBorrow);
+  const t = treasuryView(s);
+  const { gold, income, spending } = t;
+  const net = t.perMonth;
+  const own = t.ownRates;
   const signed = (g: number) => (Math.abs(g) < 0.005 ? "0" : `${g > 0 ? "+" : "−"}${gold2(Math.abs(g))}`);
-  const income = s.ledger.reduce((t, l) => t + Math.max(0, l.gold), 0);
-  const spending = s.ledger.reduce((t, l) => t - Math.min(0, l.gold), 0);
   const largest = Math.max(income, spending, 0.01);
-  const lasts = net < 0 && gold > 0 ? `Gold runs out in about <b>${Math.max(1, Math.floor(gold / -net))} month${Math.floor(gold / -net) === 1 ? "" : "s"}</b>.` : net < 0 ? "<b>The treasury is empty.</b>" : "The treasury grows.";
+  const lasts = typeof t.lasts === "number" ? `Gold runs out in about <b>${t.lasts} month${Math.floor(gold / -net) === 1 ? "" : "s"}</b>.` : t.lasts === "empty" ? "<b>The treasury is empty.</b>" : "The treasury grows.";
   const bar = (label: string, g: number) => `<li class="${g < 0 ? "out" : "in"}"><span class="what">${label}</span><span class="bar"><i style="width:${Math.max(2, (Math.abs(g) / largest) * 100).toFixed(1)}%"></i></span><b class="num">${signed(g)}</b></li>`;
-  const owed = s.debtLimit > 0 ? Math.min(100, (s.debt / s.debtLimit) * 100) : s.debt > 0 ? 100 : 0;
-  const pct = Math.round((s.loanDebtFactor - 1) * 100);
-  const cost = (g: number) => `you owe ${fmt(Math.round(g * s.loanDebtFactor))}`;
+  const [most, ...fixed] = [t.borrow.at(-1)!, ...t.borrow.slice(0, -1)];
   return `
     <div class="purse">
       <span class="purse-coin">${icon("coin", 4)}</span>
@@ -3743,24 +3753,22 @@ function treasurySection(): string {
       <span class="in" style="flex:${income.toFixed(3)}">In ${gold2(income)}</span><span class="out" style="flex:${spending.toFixed(3)}">Out ${gold2(spending)}</span>
     </div>
     <ul class="ledger-bars">
-      ${s.ledger.filter((l) => l.gold > 0).map((l) => bar(LEDGER_LABEL[l.line] ?? l.line, l.gold)).join("")}
-      ${s.ledger.filter((l) => l.gold < 0).map((l) => bar(LEDGER_LABEL[l.line] ?? l.line, l.gold)).join("")}
+      ${t.ledger.map((l) => bar(l.label, l.gold)).join("")}
       <li class="total ${net < 0 ? "out" : "in"}"><span class="what">Change a month</span><span class="bar"></span><b class="num">${signed(net)}</b></li>
     </ul>
     <h3 class="sub">Realm tax</h3>
-    <p>Provinces pay at <b>${RATE_LABEL[s.taxDefault]!.toLowerCase()}</b> unless you set their own rate on their card${own ? ` (${own} province${own === 1 ? " has" : "s have"} one)` : ""}.</p>
-    ${rateButtons(s.taxDefault, "realm")}
+    <p>Provinces pay at <b>${RATE_LABELS[t.taxDefault]!.toLowerCase()}</b> unless you set their own rate on their card${own ? ` (${own} province${own === 1 ? " has" : "s have"} one)` : ""}.</p>
+    ${rateButtons(t.taxDefault, "realm")}
     <h3 class="sub">Debt</h3>
-    <div class="debt-meter" role="img" aria-label="Owed ${fmt(s.debt)} of ${fmt(s.debtLimit)} gold lenders allow"><i style="width:${owed.toFixed(1)}%"></i></div>
-    <p class="meter-caption">${s.debt > 0 ? `You owe <b>${fmt(s.debt)} gold</b>, costing ${gold2(interest)} gold a month in interest.` : "You owe nothing."} Lenders let you owe up to ${fmt(s.debtLimit)} gold, a year's tax and trade.</p>
-    <p class="loan-cost">A loan adds the gold <b>plus ${pct} % interest</b> to the debt at once${s.loanUnsettlesLords ? ", and <b>your lords think less of you</b>: each falls a step in loyalty (once a year)" : ""}.</p>
+    <div class="debt-meter" role="img" aria-label="Owed ${fmt(t.debt)} of ${fmt(t.debtLimit)} gold lenders allow"><i style="width:${t.owedPct.toFixed(1)}%"></i></div>
+    <p class="meter-caption">${t.debt > 0 ? `You owe <b>${fmt(t.debt)} gold</b>, costing ${gold2(t.interest)} gold a month in interest.` : "You owe nothing."} Lenders let you owe up to ${fmt(t.debtLimit)} gold, a year's tax and trade.</p>
+    <p class="loan-cost">A loan adds the gold <b>plus ${t.loanPct} % interest</b> to the debt at once${t.loanUnsettlesLords ? ", and <b>your lords think less of you</b>: each falls a step in loyalty (once a year)" : ""}.</p>
     <div class="choices loans">
-      ${borrow.map((g) => `<button class="paper" data-borrow="${g}">Borrow ${g}<small>${cost(g)}</small></button>`).join("")}
-      <button class="paper" data-borrow="${Math.floor(s.canBorrow)}" ${s.canBorrow < 1 ? "disabled" : ""}>Borrow ${fmt(Math.floor(s.canBorrow))}<small>${s.canBorrow < 1 ? "lenders refuse" : cost(Math.floor(s.canBorrow))}</small></button>
+      ${fixed.map((b) => `<button class="paper" data-borrow="${b.gold}">Borrow ${b.gold}<small>you owe ${fmt(b.owe)}</small></button>`).join("")}
+      <button class="paper" data-borrow="${most.gold}" ${most.disabled ? "disabled" : ""}>Borrow ${fmt(most.gold)}<small>${most.disabled ? "lenders refuse" : `you owe ${fmt(most.owe)}`}</small></button>
     </div>
-    ${s.debt > 0 ? `<div class="choices loans">
-      ${s.debt > 10 ? `<button class="paper" data-repay="10" ${gold < 10 ? "disabled" : ""}>Repay 10</button>` : ""}
-      <button class="paper" data-repay="${s.debt}" ${gold < s.debt ? 'disabled title="Not enough gold"' : ""}>Repay all ${fmt(s.debt)}</button>
+    ${t.repay.length ? `<div class="choices loans">
+      ${t.repay.map((b) => (b.all ? `<button class="paper" data-repay="${b.gold}" ${b.disabled ? 'disabled title="Not enough gold"' : ""}>Repay all ${fmt(b.gold)}</button>` : `<button class="paper" data-repay="${b.gold}" ${b.disabled ? "disabled" : ""}>Repay ${b.gold}</button>`)).join("\n      ")}
     </div>` : ""}`;
 }
 
@@ -3794,14 +3802,16 @@ function renderRealm(r: number): void {
     </div>
     ${mine && s?.stability ? stabilitySection(s.stability) : ""}
     <dl class="facts">
+      ${s?.rulers[r] ? rulerLines(s.rulers[r]!) : ""}
       <dt>People</dt><dd>${fmt(people)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
       ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
       ${mine ? risingsLine(s.rebels, r) : ""}
       ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
-      ${peoples ? beliefLines(peoples, mine) : ""}
+      ${peoples ? beliefLines(peoples, mine, mine ? s.beliefLow : null) : ""}
       <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
       <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
+      ${mine && s.fallen ? fallenLine(s.fallen) : ""}
       ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
       ${mine ? foodLine(s, own) : ""}` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>

@@ -4050,3 +4050,20 @@ small.why {
   align-content: flex-start;
   max-height: calc(100dvh - env(safe-area-inset-top) - 52px - max(10px, env(safe-area-inset-bottom)) - 76px);
 }
+
+/* The ruler's traits on the General tab (REALM-240): each trait with what it does, wrapping on a phone. */
+.facts dd.traits {
+  gap: 2px 10px;
+}
+.facts dd.traits span {
+  display: inline-flex;
+  gap: 4px;
+  align-items: baseline;
+}
+/* A low Faith % or Tongue % says what it stirs under its button (REALM-239). */
+.facts dd em.warn {
+  flex: 1 1 100%;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+}
