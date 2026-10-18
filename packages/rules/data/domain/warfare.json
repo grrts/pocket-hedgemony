@@ -1,6 +1,6 @@
 {
  "$comment": "Warfare (domain/warfare/spec.md). One warfare config file (WAR-199). Every value is a placeholder from warfare-design v5, warfare-eras and warfare-styles (spec §10); key names follow spec §10. Era VIII and the part of era VII after 31 August 1939 are out of scope.",
- "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "amounts", "later_arms", "levels_by_era", "era_scale"],
+ "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "amounts", "later_arms", "levels_by_era", "era_scale", "occupation.tax_share"],
  "$decisions": "D-WAR-1..21 (spec §13). Standing regiments break at 30 % (D-WAR-15), the Shore sector costs -20 % across a river (D-WAR-5), drill runs to 24 (D-WAR-9).",
  "skill_growth": {
   "$comment": "WAR-158, D-WAR-13: the staff college is the academy of eras VI-VII.",
@@ -262,7 +262,7 @@
  "ai_honours": { "relief_days": 10, "food_months": 1 },
  "bribe": { "pay_owed_months": 2, "greedy_outside_share": 0.1 },
  "raid": { "riders_per_load": 50, "tiles_per_week": 1 },
- "occupation": { "hold_months": 3 },
+ "occupation": { "hold_months": 3, "$comment": "WAR-224 (X-21): an occupier gets this share of an occupied province's tax and none of its trade; the rest is lost to the war.", "tax_share": 0.5 },
  "peace": {
   "capital_share": 0.3333333333333333,
   "warlike_ignore": 0.25,

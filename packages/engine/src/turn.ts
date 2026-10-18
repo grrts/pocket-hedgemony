@@ -1,3 +1,5 @@
+import { armyDead } from "./fallen.ts";
+import { W as WARFARE } from "./domain/warfare/index.ts";
 import { monthlyPeople } from "./living.ts";
 import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
@@ -727,6 +729,8 @@ function stepMarches(world: World, hours: number): void {
  * What the land can't make up is hunger: men desert and die, and horses are
  * eaten.
  */
+const HUNGER_DEAD_SHARE = WARFARE.hunger.die / (WARFARE.hunger.die + WARFARE.hunger.desert);
+
 function feedArmies(world: World): void {
   const d = world.rules.defines.march;
   const map = marchMap(world);
@@ -746,7 +750,10 @@ function feedArmies(world: World): void {
     if (a.food[i]! < 0) {
       const short = Math.min(1, -a.food[i]! / need);
       const loss = d.hungerLossPerMonth * day * short;
-      a.men[i] = Math.round(a.men[i]! * (1 - loss));
+      const before = a.men[i]!;
+      a.men[i] = Math.round(before * (1 - loss));
+      // Of the men hunger takes, those who die (warfare hunger: die against desert) are missed at home (WAR-226).
+      armyDead(world, i, (before - a.men[i]!) * HUNGER_DEAD_SHARE);
       a.horse[i] = Math.round(a.horse[i]! * (1 - loss));
       a.food[i] = 0;
     }

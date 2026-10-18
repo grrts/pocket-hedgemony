@@ -1,4 +1,4 @@
-import { crownShare } from "./lords.ts";
+import { crownShare, inAnyWar } from "./lords.ts";
 import { refillPaces } from "./fallen.ts";
 import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
@@ -241,13 +241,13 @@ const kindMultiplier = (kind: number) => (wf.W.kinds as Record<string, { pay: { 
 
 /**
  * Treasury gold an army costs this month: pay by arm times its kind's multiplier
- * (a levy is free for its first 3 months, a hired company costs three times)
- * (RECR-017, warfare kinds).
+ * (a levy kept at peace is free for its first 3 months, F-23; at war it is paid from its first,
+ * WAR-225; a hired company costs three times) (RECR-017, warfare kinds).
  */
 export function armyPay(world: World, slot: number): number {
   const a = world.armies;
   const kind = a.kind[slot]!;
-  if (kind === KIND.levy && a.monthsOut[slot]! <= wf.W.levy.free_months) return 0;
+  if (kind === KIND.levy && a.monthsOut[slot]! <= wf.W.levy.free_months && !inAnyWar(world, a.owner[slot]!)) return 0;
   const by = menByArm(world, slot);
   let pay = 0;
   ARMS.forEach((arm, k) => (pay += armPay(arm, by[k]!)));
@@ -547,6 +547,7 @@ function addToGarrison(world: World, n: number, p: number, men: number): void {
   by[LEVY] = by[LEVY]! + men;
   a.drill[troop] = (a.drill[troop]! * before) / (before + men);
   a.monthsOut[troop] = Math.round((a.monthsOut[troop]! * before) / (before + men));
+  if (men > before) a.home[troop] = p;
   setByArm(world, troop, by);
   a.food[troop] = a.food[troop]! + wagonRations(world.rules.defines.march, { men, horse: 0, logistics: 0 });
 }
@@ -582,6 +583,7 @@ export function pickUp(world: World, n: number, army: number, men?: number): str
     const total = a.men[army]!;
     a.drill[army] = total > 0 ? (a.drill[army]! * before + a.drill[t]! * want) / total : 0;
     a.monthsOut[army] = total > 0 ? Math.round((a.monthsOut[army]! * before + a.monthsOut[t]! * want) / total) : 0;
+    if (want > before) a.home[army] = a.home[t]!;
     a.food[army] = a.food[army]! + a.food[t]! * share;
     a.food[t] = a.food[t]! * (1 - share);
     holdTraining(world, t);
@@ -656,7 +658,7 @@ export function splitTroops(world: World, n: number, army: number, arm: string, 
   setByArm(world, army, by);
   holdTraining(world, army);
   const horse = isHorseArm(arm);
-  const slot = spawnArmy(world, n, a.location[army]!, men, c, horse ? men : 0, { kind: a.kind[army]!, drill: a.drill[army]!, tile: a.tile[army]!, ...(horse ? { horseArm: arm } : { foot: arm }) });
+  const slot = spawnArmy(world, n, a.location[army]!, men, c, horse ? men : 0, { kind: a.kind[army]!, drill: a.drill[army]!, tile: a.tile[army]!, home: a.home[army]!, ...(horse ? { horseArm: arm } : { foot: arm }) });
   a.monthsOut[slot] = a.monthsOut[army]!;
   // The new army takes its share of the wagons, not a full set.
   a.food[slot] = a.food[army]! * share;
@@ -792,6 +794,8 @@ export function mergeArmies(world: World, n: number, from: number, into: number)
   const men = a.men[from]! + a.men[into]!;
   a.drill[into] = men > 0 ? (a.drill[from]! * a.men[from]! + a.drill[into]! * a.men[into]!) / men : 0;
   a.monthsOut[into] = men > 0 ? Math.round((a.monthsOut[from]! * a.men[from]! + a.monthsOut[into]! * a.men[into]!) / men) : 0;
+  // One home per army: the larger part's (WAR-226).
+  if (a.men[from]! > a.men[into]!) a.home[into] = a.home[from]!;
   setByArm(world, into, byI.map((v, k) => v + byF[k]!));
   a.food[into] = a.food[into]! + a.food[from]!;
   if (a.trainArm[into]! < 0 && a.trainArm[from]! >= 0) {

@@ -508,8 +508,8 @@ function walk(world: World, t: GameTrader, collect: boolean): void {
       const crowd = Math.min(1, served(world, q) / world.provinceVisits[q]!);
       let gold = value * (world.provinceTradeRatio[q]! / 100) * row.hold * config.collect.visit_share * crowd;
       const owner = world.provinceOwner[q]!;
-      // Unclaimed land pays nothing (TRADE-068); a foreign owner takes its market fee (TRADE-047).
-      if (owner < 0) gold = 0;
+      // Unclaimed land pays nothing (TRADE-068), nor does occupied land, to its owner or its occupier: its trade is lost to the war (WAR-224); a foreign owner takes its market fee (TRADE-047).
+      if (owner < 0 || world.provinceOccupier[q]! >= 0) gold = 0;
       else if (owner !== t.owner) {
         const fee = gold * config.collect.foreign_market_fee;
         world.nationTrade[owner * 3 + 1] = world.nationTrade[owner * 3 + 1]! + fee;
@@ -625,8 +625,10 @@ export function estimateLoop(world: World, n: number, kind: GameTraderKind, path
     days += stepDays(world, kind, q);
     if (world.provinceWater[q]) continue;
     const owner = world.provinceOwner[q]!;
-    if (owner === n && world.provinceTradeCity[q]! > 0) deposits++;
-    if (owner < 0) continue;
+    const occupied = world.provinceOccupier[q]! >= 0;
+    if (owner === n && world.provinceTradeCity[q]! > 0 && !occupied) deposits++;
+    // Unclaimed and occupied land pay nothing, as on the road (walk).
+    if (owner < 0 || occupied) continue;
     let gold = tradeValueAt(world, q, ship) * (Math.max(floor, world.provinceTradeRatio[q]!) / 100) * row.hold * config.collect.visit_share;
     if (gold <= 0) continue;
     collectIn++;

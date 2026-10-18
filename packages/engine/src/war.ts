@@ -1,5 +1,5 @@
 import { lordsLoseWar } from "./lords.ts";
-import { addFallen, fallenEffect } from "./fallen.ts";
+import { armyDead, fallenEffect, garrisonDead } from "./fallen.ts";
 import { castleStep } from "./works.ts";
 import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
@@ -534,7 +534,7 @@ const months = (m: number) => `${m} month${m === 1 ? "" : "s"}`;
 const sum = (slots: number[], arr: Int32Array) => slots.reduce((t, s) => t + arr[s]!, 0);
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
-/** Each army of a side loses its share of `lost` men; `dead` of them count among its realm's fallen (REALM-096). */
+/** Each army of a side loses its share of `lost` men; `dead` of them count among its realm's fallen (REALM-096) and leave its home's people (WAR-226). */
 function shareLosses(world: World, slots: number[], lost: number, dead: number): void {
   const a = world.armies;
   const total = sum(slots, a.men);
@@ -542,7 +542,7 @@ function shareLosses(world: World, slots: number[], lost: number, dead: number):
   for (const s of slots) {
     const share = a.men[s]! / total;
     const cut = Math.min(a.men[s]!, Math.round(lost * share));
-    addFallen(world, a.owner[s]!, cut * dead);
+    armyDead(world, s, cut * dead);
     const horseCut = a.men[s]! > 0 ? Math.round((cut * a.horse[s]!) / a.men[s]!) : 0;
     a.men[s] = Math.max(0, a.men[s]! - cut);
     a.horse[s] = Math.max(0, Math.min(a.men[s]!, a.horse[s]! - horseCut));
@@ -664,8 +664,8 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
         const inside = st.siege.garrison;
         wf.siegeMonth(st.siege);
         if (!wf.isClosed(st.siege)) st.siege.store = store;
-        // The garrison's dead of the siege month are its realm's fallen.
-        addFallen(world, ctl, inside - st.siege.garrison);
+        // The garrison's dead of the siege month are its realm's fallen, and its province's people (WAR-226).
+        garrisonDead(world, ctl, p, inside - st.siege.garrison);
         world.provinceGarrison[p] = st.siege.garrison;
         // A warden's garrison fights a storm as if a quarter stronger (province officials table).
         const warden = officialBonus(world, p, "Warden", "garrison");

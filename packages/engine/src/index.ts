@@ -17,7 +17,7 @@ export type { FleetView, NavyOrder, NavyView } from "./navy.ts";
 export type { FleetOfferView, HireOrder } from "./hiredFleets.ts";
 export type { ExploreOrder, ExplorationView } from "./colonies.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";
-export { aiTreasury, canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, runLedger, TAX_RATES, taxRateOf } from "./treasury.ts";
+export { aiTreasury, canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, heldTax, provinceTax, runLedger, TAX_RATES, taxRateOf } from "./treasury.ts";
 export { STABILITY, stabilityOf, subjectLoyalty, type Stability, type StabilityPillar, type StabilityStep } from "./stability.ts";
 export { WORKS, WORK_COUNT, workIndex, type LandTileRow, type WorkRow } from "./works.ts";
 export { USES, type UseName } from "./land.ts";

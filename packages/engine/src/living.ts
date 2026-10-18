@@ -75,6 +75,21 @@ export function classesOf(world: World, p: number): Record<ClassName, number> {
   return out;
 }
 
+/**
+ * Takes `men` dead soldiers from a province's people: a levy takes every class by its share (X-7),
+ * so its dead come from every class by its share too (WAR-226). Returns the people taken, in thousands.
+ */
+export function takePeople(world: World, p: number, men: number): number {
+  const people = world.provincePopulation[p]!;
+  if (!(men > 0) || !(people > 0)) return 0;
+  const taken = Math.min(people, men / 1000);
+  const keep = 1 - taken / people;
+  const cls = world.provinceClasses;
+  for (let c = 0; c < CLASS_COUNT; c++) cls[p * CLASS_COUNT + c] = cls[p * CLASS_COUNT + c]! * keep;
+  world.provincePopulation[p] = people - taken;
+  return taken;
+}
+
 /** Yearly birth and death rates per class (province context PROV-100, PROV-103; clergy don't marry). */
 const BIRTHS = CLASS_NAMES.map((c) => birthRate(c));
 const DEATHS = CLASS_NAMES.map((c) => deathRate(c));

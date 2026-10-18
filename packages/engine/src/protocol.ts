@@ -18,7 +18,7 @@ import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
-import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
+import { canBorrow, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
 import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
 import { badWeatherName } from "./domain/realm/index.ts";
 import { foodView, mapNetwork, type FoodView } from "./castleFood.ts";
@@ -451,10 +451,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       classNames: CLASS_NAMES,
       taxRates: TAX_RATES,
       provinceTax: w.provinceTax.slice(),
-      provinceTaxGold: Float32Array.from({ length: w.provinceCount }, (_, p) => {
-        const holder = controller(w, p);
-        return holder >= 0 ? provinceTax(w, p, holder) : 0;
-      }),
+      provinceTaxGold: Float32Array.from({ length: w.provinceCount }, (_, p) => heldTax(w, p)),
       taxDefault: player >= 0 ? w.nationTaxDefault[player]! : NORMAL_TAX,
       ledger: player >= 0 ? LEDGER.map((line, k) => ({ line, gold: w.nationLedger[player * LEDGER_LINES + k]! })) : [],
       debt: player >= 0 ? w.nationDebt[player]! : 0,
