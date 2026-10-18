@@ -32,11 +32,16 @@ jobs:
           pnpm --filter @ph/client smoke
       - name: Every panel's close button, tapped on a phone
         run: pnpm --filter @ph/client close-check
+      # Timing budgets swing with how busy the runner is, so they run on
+      # pushes to main and the build branch, not on every PR push.
       - name: Frame and turn budgets (docs/performance.md)
+        if: github.event_name == 'push'
         run: pnpm --filter @ph/client perf
       - name: Engine worker in Electron
         run: xvfb-run -a pnpm --filter @ph/desktop smoke
-      - run: pnpm bench
+      - name: Engine turn bench (docs/performance.md)
+        if: github.event_name == 'push'
+        run: pnpm bench
 
   server:
     runs-on: ubuntu-latest
