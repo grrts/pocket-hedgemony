@@ -1,8 +1,8 @@
 # Pocket Hegemony: context map
 
-Pocket Hegemony is split into 30 bounded contexts. Each one owns a part of the game's rules and its own words for them. This page shows how the contexts fit together and where the seams between them sit. The full detail is in two generated files:
+Pocket Hegemony is split into 31 bounded contexts. Each one owns a part of the game's rules and its own words for them. This page shows how the contexts fit together and where the seams between them sit. The full detail is in two generated files:
 
-- [context-map-seams.md](context-map-seams.md): every pair of contexts, with what each side says crosses between them (303 pairs).
+- [context-map-seams.md](context-map-seams.md): every pair of contexts, with what each side says crosses between them (331 pairs).
 - [open-questions.md](open-questions.md): every gap and contradiction the specs found, and how each was decided.
 - [DECISIONS.md](DECISIONS.md): the decisions that cross several contexts, and the rules used to decide.
 
@@ -24,7 +24,7 @@ flowchart TB
   subgraph Statecraft["Statecraft"]
     DIPL[diplomacy] --- SUBJ[subjects] --- GOV[government]
     CULT[culture] --- RELG[religion] --- REBL[rebellions]
-    TRIBE[tribes]
+    TRIBE[tribes] --- INST[institutions]
   end
   subgraph Military["Military and the seas"]
     RECR[recruiting] --- WAR[warfare] --- MOVE[troop-movement]
@@ -45,7 +45,7 @@ flowchart TB
 | Foundation | time-and-turns, world-map, scenario-setup | The clock and turn order, the map and its graph, the 1444 start. Every other context conforms to these. |
 | Land and economy | province, realm, research, buildings, trade | People, tiles, food, gold, inventions, buildings and traders. The core domain: almost everything else reads these numbers. |
 | Military and the seas | recruiting, warfare, troop-movement, naval, exploration | Raising, moving, feeding and fighting with armies and fleets, and sailing into the unknown. |
-| Statecraft | diplomacy, subjects, government, culture, religion, rebellions, tribes | How realms treat each other, how they are ruled, who lives in them, and what happens when people rise. |
+| Statecraft | diplomacy, subjects, government, culture, religion, rebellions, tribes, institutions | How realms treat each other, how they are ruled, who lives in them, the offices they share (the Empire, the Shogunate), and what happens when people rise. |
 | History and identity | events, revolutions, national-strengths | The historical layer: events with choices, revolutions that change how a country plays, and each country's heritage. |
 | Shell and player experience | game-shell, saves, settings, onboarding, achievements, audio, map-presentation | Everything around and on top of the simulation. None of these may change the simulation's results. |
 
@@ -107,7 +107,7 @@ The specs found that many seams were agreed by one side only: a design asked ano
 These appear as seams or open questions but have no design document and so no context of their own yet:
 
 - **The AI as a whole** (gap list item 18). Each spec has an AI section with what its design says; there is no shared AI design, difficulty levels or per-turn computing budget.
-- **Big institutions**: the Empire, the Church, leagues and the tributary system (gap list item 8). Scenario-setup keeps its 16 collective institution records as reference data unless a map nation matches one (D-SETUP-8).
+- **Big institutions** beyond the Empire and the Shogunate (which the institutions context now owns): the Church and heads of faith, leagues as institutions and the tributary system (gap list item 8). Scenario-setup keeps its 16 collective institution records as reference data unless a map nation matches one (D-SETUP-8).
 - **Modern politics and industry, 1789–1939** (gap list items 12–13), beyond what revolutions and the research tree cover.
 - **Disasters and epidemics** (gap list item 19), beyond plague as a province stat.
 - **Store, purchases and the free tier** beyond what game-shell and saves say.

@@ -608,6 +608,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | diplomacy | upstream | Customer–Supplier | Regency; envoys are officials already counted in the cap (D-DIPL-24) |
 | government | upstream | Conformist | "Allied with 2 neighbours of the same people"; subjects count for "3 or more subjects" |
 
+## diplomacy ↔ institutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Customer–Supplier | Reasons count, envoy missions (*Seek their vote*, admit), calls to arms, ties and wrongs |
+
 ## diplomacy ↔ map-presentation
 
 | Said by | Other side is | Pattern | What crosses |
@@ -766,6 +772,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | events | downstream | Customer–Supplier | 16 `government` values mapped to forms; admin_capacity → officials cap |
 | government | upstream | Anti-Corruption Layer | 16 event-tree `government` values mapped to forms; `admin_capacity` adds 1 official per point for good (D-GOV-11); events read the form's event-tree value |
+
+## events ↔ institutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Published Language | `peace_of_augsburg`, `peace_of_westphalia`, `onin_war`, `perry_expedition`, `meiji_restoration` |
 
 ## events ↔ national-strengths
 
@@ -988,6 +1000,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | exploration | upstream | Conformist | Sea zones (~150 km coastal, ~300 km ocean), coastal provinces, adjacency, steps for the start charted reach |
 | world-map | downstream | Customer–Supplier | Graph steps for the charted start; coastal provinces |
 
+## game-shell ↔ institutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Customer–Supplier | Institutions row, cards, answer cards, Needs attention |
+
 ## game-shell ↔ map-presentation
 
 | Said by | Other side is | Pattern | What crosses |
@@ -1099,6 +1117,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | game-shell | upstream | Customer–Supplier | Battle view content (progress, standing orders, Retreat; no skip, X-1), result card, siege view, peace table, notifications for the turn report and Attention |
 | warfare | downstream | Published Language | Player battles watched in 4-hour steps with standing orders, retreat and switching between battles (X-1, D-WAR-2), battle reports and replay, notifications |
 
+## government ↔ institutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Partnership | Shogunate and warlord domain forms; GOV-038 break; the warlord domain → shogunate reform |
+
 ## government ↔ map-presentation (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
@@ -1204,6 +1228,48 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | religion | partnership | Partnership | Shinto's Emperor in Kyoto and the Empire's crowning stay with the institutions design; heads of the faith stay here |
+
+## institutions ↔ map-presentation (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Published Language | Institutions lens |
+
+## institutions ↔ realm (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Customer–Supplier | Rulers and heirs, lords as great houses, loyalty reasons, soldiers |
+
+## institutions ↔ religion (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Conformist | Faiths, the head of the Catholic faith, RELG-079 |
+
+## institutions ↔ revolutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Customer–Supplier | The restoration for the Court |
+
+## institutions ↔ scenario-setup (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Conformist | 1444 members, seats, houses, imperial land |
+
+## institutions ↔ trade (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Customer–Supplier | Closed country's one port |
+
+## institutions ↔ warfare (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Customer–Supplier | War aims *Restore imperial land*, Breaker of the Peace, *Bring to heel*; peace term *Dissolve the Empire*; contingents; circle defence |
 
 ## map-presentation ↔ national-strengths
 
