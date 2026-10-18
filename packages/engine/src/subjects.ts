@@ -18,6 +18,23 @@ import config from "../../rules/data/domain/subjects.json" with { type: "json" }
 
 const rel = dip.relations;
 type Bond = subj.SubjectBond;
+/** The month the overlord took the heir, kept on the bond so a save keeps it. */
+type HostageBond = Bond & { hostageSince?: number };
+/** The heir goes home after this long, standing in for his father's death until rulers age (SUBJ-042, D-SUBJ-29). */
+const HOSTAGE_MONTHS = 20 * 12;
+
+/** When a held heir goes home, as "YYYY-MM", or null when none is held. */
+function heldUntil(b: Bond): { until: string } | null {
+  const since = (b as HostageBond).hostageSince;
+  if (!b.ties.includes("hostage_at_court") || since === undefined) return null;
+  const m = since + HOSTAGE_MONTHS;
+  return { until: `${Math.floor(m / 12)}-${String((m % 12) + 1).padStart(2, "0")}` };
+}
+
+function sendHeirHome(b: Bond): void {
+  subj.subjectRulerDied(b);
+  delete (b as HostageBond).hostageSince;
+}
 
 /** Reach of a realm whose administrative capacity the catalogue does not know: moderate, 5 (SUBJ-056, D-SUBJ-28). */
 export const REACH = subj.reachFromCapacity("moderate");
@@ -231,6 +248,8 @@ export function whyNotSubjectAction(world: World, n: number, s: number, action: 
   if (action === "release") return null;
   if (action === "resident") return b.resident ? "a resident is at their court already" : dip.freeSeats(world.diplomacy, b.overlord) <= 0 ? "no free envoy: every seat is taken" : null;
   if (action === "recall") return b.resident ? null : "you have no resident there";
+  if (action === "hostage") return b.ties.includes("hostage_at_court") ? "you hold their heir already" : b.loyalty === "disloyal" ? "they are Disloyal; a hostage is taken only from a Loyal or Wavering subject" : null;
+  if (action === "send_heir_home") return b.ties.includes("hostage_at_court") ? null : "you hold no heir of theirs";
   if (action === "tighten" || action === "fold_in") {
     if (b.tighten || b.foldIn) return "your envoy is already at work there";
     if (dip.freeSeats(world.diplomacy, b.overlord) <= 0) return "no free envoy: every seat is taken";
@@ -298,6 +317,12 @@ export function subjectAction(world: World, n: number, s: number, action: string
     delete b.resident;
     unseatEnvoy(world, b, "subject_resident");
   }
+  if (action === "hostage") {
+    subj.takeHostage(b);
+    (b as HostageBond).hostageSince = now;
+    news.push({ kind: "envoy", text: `${name(s)}'s heir comes to ${name(n)}'s court as a hostage.`, nations: [n, s] });
+  }
+  if (action === "send_heir_home") sendHeirHome(b);
   if (action === "tighten") {
     subj.tighten(b, now);
     seatEnvoy(world, b, "subject_tighten");
@@ -325,9 +350,16 @@ const provincesOf = (world: World, n: number): number[] => {
  */
 export function monthlySubjectEnvoys(world: World, news: News[]): void {
   const name = (k: number) => world.rules.nations[k]!.name;
+  const now = monthNow(world);
   for (const t of subjectTies(world)) {
     const b = t.bond;
     if (b.resident && !hasSeatEnvoy(world, b, "subject_resident")) delete b.resident;
+    const since = (b as HostageBond).hostageSince;
+    if (since !== undefined && now - since >= HOSTAGE_MONTHS) {
+      sendHeirHome(b);
+      bondsChanged(world);
+      if (t.o === world.player || t.s === world.player) news.push({ kind: "envoy", text: `${name(t.s)}'s heir goes home from ${name(t.o)}'s court to take up his inheritance.`, nations: [t.o, t.s] });
+    }
     if (!b.tighten && !b.foldIn) continue;
     const action = b.foldIn ? "subject_fold_in" : "subject_tighten";
     if (!hasSeatEnvoy(world, b, action)) {
@@ -390,7 +422,7 @@ export type IndependenceWar = dip.War & { independence?: { subject: string; over
  * A subject rises (SUBJ-074 to SUBJ-077): the tie ends, both turn Hostile and
  * the subject declares its independence war on its old overlord.
  */
-export function riseUp(world: World, s: number, news: News[]): string | null {
+export function riseUp(world: World, s: number, news: News[], backer?: number): string | null {
   const t = subjectTies(world).find((x) => x.s === s);
   if (!t) return "you answer to no overlord";
   if (t.bond.loyalty !== "disloyal") return `you are ${STEP_WORD[t.bond.loyalty]}: only a Disloyal subject rises`;
@@ -406,6 +438,11 @@ export function riseUp(world: World, s: number, news: News[]): string | null {
   const war = world.diplomacy.wars[world.diplomacy.wars.length - 1] as IndependenceWar;
   war.independence = { subject: t.r.source, overlord: t.r.target, kind };
   news.push({ kind: "war", text: `${world.rules.nations[s]!.name} rises against ${world.rules.nations[t.o]!.name} for its independence.`, nations: [s, t.o] });
+  // Its backer declares *Break a subject* and fights on its side (SUBJ-077, D-SUBJ-29).
+  if (backer !== undefined && !world.nationGone[backer] && !dip.warOf(world.diplomacy, world.nationIds[backer]!)) {
+    dip.joinWar(world.diplomacy, war, world.nationIds[backer]!, t.r.source, t.r.target);
+    news.push({ kind: "joined", text: `${world.rules.nations[backer]!.name} backs ${world.rules.nations[s]!.name} and declares war on ${world.rules.nations[t.o]!.name}.`, nations: [backer, s, t.o] });
+  }
   return null;
 }
 
@@ -482,11 +519,12 @@ export function aiRisings(world: World, news: News[]): void {
     if (!subj.rises(t.bond, { ...(backer ? { backer: { atPeace: true, willing: true } } : {}), overlordAtWarElsewhere: !!war, overlordPeaceShare: losing ? 1 : 0 })) continue;
     const others = ties.filter((x) => x.o === t.o && x !== t && !risen.has(x.s)).map((x) => ({ bond: x.bond, neighbours: near(x.s), s: x.s }));
     const joiners = subj.joinRising({ bond: t.bond, neighbours }, others).map((b) => others.find((x) => x.bond === b)!.s);
-    for (const s of [t.s, ...joiners]) if (!riseUp(world, s, news)) risen.add(s);
+    const backing = backer === undefined ? undefined : world.nationIndex.get(backer);
+    for (const s of [t.s, ...joiners]) if (!riseUp(world, s, news, s === t.s ? backing : undefined)) risen.add(s);
   }
 }
 
-/** AI overlords fold in Loyal subjects that are ready, and station residents on Wavering ones, once a season (SUBJ-098). */
+/** AI overlords fold in Loyal subjects that are ready, and station residents on and take hostages from Wavering ones, once a season (SUBJ-098). */
 export function aiOverlordEnvoys(world: World, news: News[]): void {
   if (!subj.isSeasonEnd(world.date.month)) return;
   const ties = subjectTies(world);
@@ -500,6 +538,8 @@ export function aiOverlordEnvoys(world: World, news: News[]): void {
       folding.add(t.o);
     }
     else if (t.bond.loyalty === "wavering" && !whyNotSubjectAction(world, t.o, t.s, "resident")) subjectAction(world, t.o, t.s, "resident", news);
+    // A Wavering subject's heir is also worth holding (SUBJ-098, D-SUBJ-29).
+    if (t.bond.loyalty === "wavering" && !whyNotSubjectAction(world, t.o, t.s, "hostage")) subjectAction(world, t.o, t.s, "hostage", news);
   }
 }
 
@@ -550,10 +590,12 @@ export interface SubjectView {
   worst: string;
   fights: string;
   /** Why each action can't be taken now (null when it can): gift, loosen, release; and the gift's cost. */
-  why: { gift: string | null; loosen: string | null; release: string | null; resident: string | null; recall: string | null; tighten: string | null; fold_in: string | null };
+  why: { gift: string | null; loosen: string | null; release: string | null; resident: string | null; recall: string | null; hostage: string | null; send_heir_home: string | null; tighten: string | null; fold_in: string | null };
   /** Months left of tightening or folding in, when an envoy is at work. */
   work: { action: "tighten" | "fold_in"; monthsLeft: number } | null;
   resident: boolean;
+  /** Whether the overlord holds the subject's heir, and the month he goes home. */
+  hostage: { until: string } | null;
   giftCost: number;
 }
 
@@ -600,9 +642,10 @@ export function subjectsView(world: World, player: number, ledgerTribute: (n: nu
       reasons: reasons.map((x) => ({ label: x.label, arrow: x.arrow })),
       worst: subj.worstReason(reasons)?.label ?? "",
       fights: FIGHTS[subj.kindFights(t.bond.kind)] ?? "",
-      why: Object.fromEntries((["gift", "loosen", "release", "resident", "recall", "tighten", "fold_in"] as const).map((a) => [a, whyNotSubjectAction(world, t.o, t.s, a)])) as SubjectView["why"],
+      why: Object.fromEntries((["gift", "loosen", "release", "resident", "recall", "hostage", "send_heir_home", "tighten", "fold_in"] as const).map((a) => [a, whyNotSubjectAction(world, t.o, t.s, a)])) as SubjectView["why"],
       work: t.bond.foldIn ? { action: "fold_in", monthsLeft: t.bond.foldIn.monthsLeft } : t.bond.tighten ? { action: "tighten", monthsLeft: t.bond.tighten.monthsLeft } : null,
       resident: !!t.bond.resident,
+      hostage: heldUntil(t.bond),
       giftCost: subjectGiftCost(world, t.s),
     };
   };

@@ -149,6 +149,11 @@ export function subjectCard(v: StatecraftView | null, r: number): string {
       ${btn("loosen", "Loosen to tributary", row.why.loosen, "They become a tributary: they pay 15 in 100 of their income, stay out of your wars, and like it (+2 for 10 years).")}
       ${btn("release", "Release", row.why.release, "They go free as your friend.")}
     </div>
+    <h3 class="sub">Their heir</h3>
+    ${row.hostage ? `<p>${icon("crown", 1)} Their heir lives at your court as a hostage (+1 loyalty) and goes home in ${monthText(row.hostage.until)}.</p>` : ""}
+    <div class="missions">
+      ${row.hostage ? btn("send_heir_home", "Send the heir home", row.why.send_heir_home, "He goes home now; they lose the +1.") : btn("hostage", `${icon("crown", 2)}Take a hostage`, row.why.hostage, "Their heir comes to live at your court: +1 loyalty for as long as you hold him (20 years, or until you send him home).")}
+    </div>
     <h3 class="sub">Your envoys at their court</h3>
     ${row.work ? `<p>${icon("scroll", 1)} Your envoy is ${row.work.action === "fold_in" ? "folding them into your realm" : "tightening them to a vassal"}: ${row.work.monthsLeft} month${row.work.monthsLeft === 1 ? "" : "s"} to go${row.work.action === "fold_in" ? ", as long as they stay Loyal" : ""}.</p>` : ""}
     <div class="missions">

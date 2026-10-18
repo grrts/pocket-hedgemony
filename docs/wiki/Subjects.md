@@ -195,7 +195,10 @@ A turn is one week; these steps run once a month, at the end of the turn in whic
 - **Making subjects**: send an envoy to *Offer overlordship* to a smaller realm (it becomes your tributary) or *Ask for protection* of a larger one (you become its vassal), or demand tribute. The other realms offer overlordship too.
 - **Your envoys at their court**: *Station a resident* (+1 loyalty, takes one of your envoys while he stays), *Tighten to vassal* (a Loyal tributary, one envoy for 6 months) and *Fold into your realm* (Loyal for 10 years, a subject for 20, sharing a border, and room under your lords cap; one envoy for a month per province). When folding in completes, their land is yours, held by their ruler as one of your lords, and the country leaves the map. Other realms fold in their subjects too, one at a time.
 - **Rising**: a Disloyal subject may rise and declare its independence war. The other realms' subjects rise when their overlord is losing a war elsewhere or a stronger enemy of it waits next door, and their Disloyal neighbours rise with them. Lose land in the peace and the subject is taken back one kind tighter (its fellow subjects remember the force used); otherwise it is free. If you are a subject and Disloyal, *Rise for independence* is on your Diplomacy tab.
-- **Not yet**: hostages, backers that join the war, merging crowns and the subjects map lens come later; distance gives no reason yet. Faith and tongue do: the same state faith or court tongue pulls a subject closer, a different faith pushes it away, more so where you persecute it.
+- **Their heir**: *Take a hostage* from a Loyal or Wavering subject: his heir lives at your court (+1 loyalty) until you *Send the heir home* or 20 years pass.
+- **Backers**: a Disloyal subject with a stronger enemy of its overlord next door rises with that realm at its side; the backer declares war on the overlord at once.
+- **The Subjects lens**: from the map lens menu, your realm in its colour, your subjects green, amber or red by loyalty, your overlord purple. Tap one for its Diplomacy tab.
+- **Not yet**: merging crowns, courting other realms' subjects and harming a hostage come later; distance gives no reason yet. Faith and tongue do: the same state faith or court tongue pulls a subject closer, a different faith pushes it away, more so where you persecute it.
 
 ## How it connects
 
