@@ -11,7 +11,7 @@ import { workIndex, WORK_COUNT, worksAt } from "../src/works.ts";
 import { tradeConfig } from "../src/domain/trade/index.ts";
 import {
   bestRoute, dismissTrader, draftTradeRoute, estimateLoop, foundProblem, foundTrader, isTradeStop, kindRow, loopPath, monthlyTrade, provinceWares, refreshTradeValues,
-  routeProblem, setTradeRoute, startCount, tradeLine, tradePaths, tradeSeen, tradeTaxFactor, tradeValueAt, tradeView, warePrice,
+  routeProblem, setTradeRoute, startCount, tradeDay, tradeLine, tradeSeen, traderWalks, tradeTaxFactor, tradeValueAt, tradeView, warePrice,
 } from "../src/trade.ts";
 
 const rules = loadDefaultRuleset();
@@ -253,42 +253,51 @@ describe("trade in the game (TRADE-129 to TRADE-140)", () => {
   });
 });
 
-describe("the trade path feed for the living map (VIEW-132)", () => {
+describe("traders walk a day at a time (TRADE-132, VIEW-132)", () => {
   const w = createWorld(rules, 1, tiles);
   const fra = nation(w, "france");
 
-  it("groups traders by loop and way of going, busiest first, where the realm sees them", () => {
-    const before = hashWorld(w);
-    const paths = tradePaths(w, fra, 1000);
-    expect(hashWorld(w)).toBe(before);
-    expect(paths.length).toBeGreaterThan(0);
-    const seen = tradeSeen(w, fra);
-    for (const p of paths) {
-      expect(["land", "river", "sea"]).toContain(p.medium);
-      expect(p.path.length).toBeGreaterThanOrEqual(2);
-      expect(p.path.some((q) => seen[q])).toBe(true);
-    }
-    for (let i = 1; i < paths.length; i++) expect(paths[i]!.traders).toBeLessThanOrEqual(paths[i - 1]!.traders);
-    expect(new Set(paths.map((p) => `${p.medium} ${p.path.join(",")}`)).size).toBe(paths.length);
-    // Every French trader with a route is on a path it can open.
-    const mine = paths.filter((p) => p.mine >= 0);
-    for (const p of mine) expect(w.traders.find((t) => t.id === p.mine)!.owner).toBe(fra);
-    const routed = w.traders.filter((t) => t.owner === fra && t.stops.length >= 2).length;
-    expect(mine.reduce((n, p) => n + p.traders, 0)).toBeGreaterThanOrEqual(routed > 0 ? 1 : 0);
-    // The cap keeps the busiest, and the ids stay put between calls.
-    expect(tradePaths(w, fra, 3)).toEqual(paths.slice(0, 3));
-    // With no realm, every path; at least those France sees.
-    expect(tradePaths(w, -1, 100000).length).toBeGreaterThanOrEqual(paths.length);
+  it("walks every trader one day on, entering the next province when its days are walked", () => {
+    const t = w.traders.find((x) => x.owner === fra && x.path.length >= 2)!;
+    const at = t.at;
+    let days = 0;
+    while (t.at === at && days < 60) (tradeDay(w), days++);
+    expect(t.at).not.toBe(at);
+    // It took the days its kind needs for the province, not a month at once.
+    expect(days).toBeGreaterThan(0);
+    expect(days).toBeLessThan(30);
   });
 
-  it("counts two traders on one loop as one path with two traders", () => {
-    const t = w.traders.find((x) => x.owner === fra && x.stops.length >= 2 && x.path.length >= 2) ?? w.traders.find((x) => x.stops.length >= 2)!;
-    const key = (p: { medium: string; path: number[] }) => `${p.medium} ${p.path.join(",")}`;
-    const one = tradePaths(w, -1, 100000).find((p) => p.path.join(",") === (t.path.length ? t.path : loopPath(w, t.owner, t.kind, t.stops)!).join(","))!;
-    w.traders.push({ ...t, id: 999999, path: t.path.slice(), stops: t.stops.slice() });
-    const two = tradePaths(w, -1, 100000).find((p) => key(p) === key(one))!;
-    w.traders.pop();
-    expect(two.traders).toBe(one.traders + 1);
-    expect(two.id).toBe(one.id);
+  it("counts a trader once in each province it stood in during the month (TRADE-033)", () => {
+    const t = w.traders.find((x) => x.owner === fra && x.path.length >= 2)!;
+    for (let d = 0; d < 20; d++) tradeDay(w);
+    expect(new Set(t.marked).size).toBe(t.marked.length);
+    expect(t.marked).toContain(t.path[t.at]);
+  });
+
+  it("shows each trader the realm sees on its leg, how far along, with the leg's tiles over land", () => {
+    const before = hashWorld(w);
+    const walks = traderWalks(w, fra, 1000);
+    expect(hashWorld(w)).toBe(before);
+    const seen = tradeSeen(w, fra);
+    expect(walks.length).toBeGreaterThan(0);
+    expect(walks[0]!.mine).toBe(true);
+    for (const x of walks) {
+      expect(seen[x.from] || seen[x.to]).toBeTruthy();
+      expect(x.progress).toBeGreaterThanOrEqual(0);
+      expect(x.progress).toBeLessThanOrEqual(1);
+      if (x.medium !== "sea" && x.from !== x.to) {
+        // The leg runs from the centre of one province to the centre of the next, through those two only.
+        expect(x.tiles[0]).toBe(w.tiles.centre[x.from]);
+        expect(x.tiles[x.tiles.length - 1]).toBe(w.tiles.centre[x.to]);
+        for (const tile of x.tiles) expect([x.from, x.to]).toContain(w.tiles.province[tile]! - 1);
+      }
+    }
+    const t = w.traders.find((x) => x.owner === fra && x.path.length >= 2)!;
+    const mine = walks.find((x) => x.id === t.id)!;
+    expect(mine.from).toBe(t.path[t.at]);
+    expect(mine.to).toBe(t.path[(t.at + 1) % t.path.length]);
+    expect(traderWalks(w, fra, 3)).toHaveLength(3);
+    expect(traderWalks(w, -1, 100000)).toHaveLength(w.traders.length);
   });
 });

@@ -16,6 +16,7 @@ import {
   type PeaceTerms,
   type PlaceClimate,
   type Snapshot,
+  type TraderWalk,
   realmStrengths,
   WORKS,
   peoplesView,
@@ -65,7 +66,7 @@ import { loadMapImage, type MapImage } from "./map/loadMap.ts";
 import { provinceThumb } from "./map/provinceThumb.ts";
 import { armyFigureUnit, armyNameShown, brackets, drawBattle, drawClash, drawFormation, drawPlate, drawRoute, drawSiegeMark, drawTents, drawToken, menShort, pruneBattles, weekEnds } from "./map/marchArt.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
-import { clockDays, placeMovers } from "./map/traders.ts";
+import { placeTrader } from "./map/traders.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
@@ -204,8 +205,8 @@ const selected = new Set<number>();
 let stepStart = 0;
 /** How long the latest step is shown for, in ms: armies walk their trail over it. */
 let stepMs = 0;
-/** The game clock (days) the previous snapshot stood at: traders walk on from it over the step (VIEW-123). */
-let clockFrom = 0;
+/** Each trader's walk in the previous snapshot, by id: it walks on from there over the step (VIEW-123). */
+let walkedBefore = new Map<number, TraderWalk>();
 /** Where each army was drawn when the latest snapshot arrived, by army id, for walking on from there. */
 let drawnAt = new Map<number, [number, number]>();
 /**
@@ -1771,53 +1772,44 @@ let armyHitBoxes: { id: number; x: number; y: number; w: number; h: number }[] =
 /** Traders drawn close in, with their tap boxes: a tap on one of the player's opens its card in the Trade tab (VIEW-125). */
 let traderHitBoxes: { mine: number; x: number; y: number; w: number; h: number }[] = [];
 
-/** The traders' game clock: from the previous snapshot's to this one's over the step, so they walk on without jumps (VIEW-123). */
-function traderClock(): number {
-  const s = snapshot!;
-  const to = clockDays(s.date, s.hour);
-  const t = stepMs ? Math.min(1, (performance.now() - stepStart) / stepMs) : 1;
-  return to - clockFrom > 0 && to - clockFrom <= 2 ? clockFrom + (to - clockFrom) * t : to;
-}
-
 /**
- * Close in, the busy trade paths the player sees carry their caravans, barges
- * and ships in the ground's art pixels, fading in as the icons fade out
- * (VIEW-101, VIEW-123). Returns true while they are walking.
+ * Close in, every trader the player sees is drawn where the daily walk has it,
+ * stepping along its leg's tiles as an army does and walking on over the step,
+ * fading in as the icons fade out (VIEW-101, VIEW-123). Returns true while they walk.
  */
 function drawTraders(o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
   traderHitBoxes = [];
   const s = snapshot;
   const detail = mapDetail();
   const fade = bandFade(o.zoom, detail).living;
-  if (!s || fade <= 0 || !s.tradePaths?.length) return false;
+  if (!s || fade <= 0 || !s.traderWalks?.length) return false;
   const { ctx } = o;
   const u = Math.max(1, Math.round(pieceUnit(Math.max(o.zoom, LIVING_MAP.livingFrom), detail)));
   const moving = figuresAnimate(animationsPref(), "marching");
-  const days = moving ? traderClock() : clockDays(s.date, s.hour);
+  const t = moving && stepMs ? (performance.now() - stepStart) / stepMs : 1;
   const centre = (p: number) => [provinces[p]!.x!, provinces[p]!.y!] as const;
   ctx.save();
   ctx.globalAlpha = fade;
-  for (const path of s.tradePaths) {
-    const color = nations[path.owner]?.color ?? PALETTE.clay;
-    for (const m of placeMovers(path, days, centre)) {
-      if (!isKnown(m.from) || !isKnown(m.to)) continue;
-      // Each keeps to the right of its way, so two meeting pass side by side.
-      const [px, py] = o.toScreen(m.x, m.y);
-      const sx = px - m.uy * 5 * u, sy = py + m.ux * 5 * u;
-      if (!onScreen(sx, sy)) continue;
-      const img = sprite(m.sprite, color, u);
-      const x = Math.round(sx - img.width / 2);
-      const y = Math.round(sy - img.height + 2 * u);
-      if (m.right) {
-        ctx.save();
-        ctx.translate(x + img.width, y);
-        ctx.scale(-1, 1);
-        ctx.drawImage(img, 0, 0);
-        ctx.restore();
-      } else ctx.drawImage(img, x, y);
-      const box = tapBox(img.width, img.height, 1);
-      traderHitBoxes.push({ mine: path.mine, x: x + img.width / 2 - box.w / 2, y: y + img.height / 2 - box.h / 2, w: box.w, h: box.h });
-    }
+  for (const w of s.traderWalks) {
+    if (!isKnown(w.from) || !isKnown(w.to)) continue;
+    const color = nations[w.owner]?.color ?? PALETTE.clay;
+    const m = placeTrader(w, walkedBefore.get(w.id), t, tileXY, centre);
+    // A little to the right of its way, so two meeting pass side by side.
+    const [px, py] = o.toScreen(m.x, m.y);
+    const sx = px - m.uy * 2 * u, sy = py + m.ux * 2 * u;
+    if (!onScreen(sx, sy)) continue;
+    const img = sprite(m.sprite, color, u);
+    const x = Math.round(sx - img.width / 2);
+    const y = Math.round(sy - img.height + 2 * u);
+    if (m.ux > 0) {
+      ctx.save();
+      ctx.translate(x + img.width, y);
+      ctx.scale(-1, 1);
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
+    } else ctx.drawImage(img, x, y);
+    const box = tapBox(img.width, img.height, 1);
+    traderHitBoxes.push({ mine: w.mine ? w.id : -1, x: x + img.width / 2 - box.w / 2, y: y + img.height / 2 - box.h / 2, w: box.w, h: box.h });
   }
   ctx.restore();
   return moving && performance.now() - stepStart < stepMs;
@@ -2443,7 +2435,7 @@ async function act(order: Order): Promise<void> {
 function takeSnapshot(next: Snapshot, ms: number): void {
   const at = new Map<number, [number, number]>();
   if (snapshot) for (let k = 0; k < snapshot.armies.id.length; k++) at.set(snapshot.armies.id[k]!, armyPosition(k));
-  clockFrom = snapshot ? traderClock() : clockDays(next.date, next.hour);
+  walkedBefore = new Map((snapshot?.traderWalks ?? []).map((w) => [w.id, w]));
   snapshot = next;
   setPortraitYear(next.date.year);
   hearAchievements(next);
@@ -6342,10 +6334,10 @@ Object.assign(globalThis, {
   __phTraderPath: () => (snapshot?.trade?.traders[0]?.path ?? []).map((p) => provinces[p]!.id),
   /** The traders drawn close in, with their tap boxes in CSS pixels (VIEW-123, VIEW-125). */
   __phTraderBoxes: () => traderHitBoxes.slice(),
-  /** Centres the map on the first walking trader of the player's busiest path, at a zoom. */
+  /** Centres the map on the player's first trader walking over land, at a zoom. */
   __phLookAtTrader: (zoom: number) => {
-    const path = snapshot?.tradePaths.find((p) => p.mine >= 0) ?? snapshot?.tradePaths[0];
-    const m = path && placeMovers(path, clockDays(snapshot!.date, snapshot!.hour), (p) => [provinces[p]!.x!, provinces[p]!.y!])[0];
+    const w = snapshot?.traderWalks.find((x) => x.mine && x.medium === "land" && x.from !== x.to) ?? snapshot?.traderWalks[0];
+    const m = w && placeTrader(w, undefined, 1, tileXY, (p) => [provinces[p]!.x!, provinces[p]!.y!]);
     if (m) view.lookAt(m.x, m.y, zoom);
   },
   /** Centres the map on a province by id, at a zoom. */
