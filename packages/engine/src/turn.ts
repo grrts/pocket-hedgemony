@@ -79,7 +79,7 @@ export type Order =
   /** Take the last thousand off a province's recruit queue, with its levy money back. */
   | { type: "cancelRecruit"; province: number }
   /** The army's commander takes in the garrison troops where it stands. */
-  | { type: "pickUp"; army: number }
+  | { type: "pickUp"; army: number; men?: number }
   /** Commission a province's official as a commander; release one back to his post. */
   | { type: "commission"; province: number }
   | { type: "release"; commander: number }
@@ -292,7 +292,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "cancelRecruit":
       return cancelRecruit(world, actingNation, order.province);
     case "pickUp":
-      return pickUp(world, actingNation, order.army);
+      return pickUp(world, actingNation, order.army, order.men);
     case "commission":
       return commissionOfficial(world, actingNation, order.province, news);
     case "release":

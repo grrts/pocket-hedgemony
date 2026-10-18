@@ -1574,6 +1574,19 @@ button.person-tile {
   min-height: 44px;
 }
 
+/* ---- Garrison tab (PROV-302, RECR-120): every button a full touch target ---- */
+
+.garrison button.small,
+table.troops button.small {
+  min-height: 44px;
+}
+
+.garrison [data-recruit] small {
+  display: block;
+  font-size: 16px;
+  opacity: 0.85;
+}
+
 /* ---- Mercenaries tab: one card per free company (feedback 52, 53) ---- */
 
 .companies {
