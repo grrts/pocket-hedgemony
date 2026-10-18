@@ -12,7 +12,7 @@ Feature: Who gets heritage, and how it is generated
 
     Examples:
       | group                                   | heritage                                                         |
-      | tier A playable                         | hand-written birthright, 2–3 heydays, 5–7 ambitions and a burden |
+      | tier A playable                         | hand-written birthright, 2–3 golden ages, 5–7 ambitions and a weakness |
       | tier B and C playable                   | generated heritage by archetype                                  |
       | decentralised polity                    | generated heritage with a decentralised archetype                |
       | background or non-state actor           | no heritage                                                      |
@@ -29,14 +29,14 @@ Feature: Who gets heritage, and how it is generated
     Given "Igbo village-group societies" is a decentralised polity matching the archetype "forest people"
     When heritage is built
     Then its birthright "paths of the forest" makes foot fight harder and march faster in forest and makes conquerors' Foreign rule last longer
-    And its heyday "forest refuge" belongs to the "Age of Atlantic Empires" and is awake while at war
+    And its golden age "forest refuge" belongs to the "Age of Atlantic Empires" and is active while at war
     And its ambitions include outlasting "Benin" and enduring as an independent people to 1600
 
   @HER-054
   Scenario Outline: The first age whose regions cover the country
     Given a forest people in "<region>"
-    When its heyday is generated
-    Then the heyday belongs to the "<age>"
+    When its golden age is generated
+    Then the golden age belongs to the "<age>"
 
     Examples:
       | region         | age                       |
@@ -55,8 +55,8 @@ Feature: Who gets heritage, and how it is generated
   Scenario: Best and second-best archetypes
     Given two sea-trading cities in different regions
     When heritage is generated
-    Then each takes its birthright and burden from its best archetype
-    And its second-best archetype may add a heyday, so the two differ
+    Then each takes its birthright and weakness from its best archetype
+    And its second-best archetype may add a golden age, so the two differ
 
   @HER-058
   Scenario: Authored overrides generated

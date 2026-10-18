@@ -135,6 +135,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         progress: pick(a.progress, (n) => new Float32Array(n)),
         kind: Uint8Array.from(live, (s) => a.kind[s]!),
         monthsOut: Int32Array.from(live, (s) => a.monthsOut[s]!),
+        home: Int32Array.from(live, (s) => a.home[s]!),
         drill: Float32Array.from(live, (s) => a.drill[s]!),
         trainArm: Int8Array.from(live, (s) => a.trainArm[s]!),
         trainMen: Int32Array.from(live, (s) => a.trainMen[s]!),
@@ -353,7 +354,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     world.mercs = natMeta.mercs
       .map((m): Mercenary => {
         // Saves from before free companies held one arm and its men: that becomes a company of its own.
-        const company = m.company ? mapCompany(m.company) : { id: ++world.freeCompanySeq, group: "free company", name: "A free company", captain: "", home: -1, byArm: ARMS.map((arm) => (arm === m.arm ? (m.men ?? 0) : 0)) };
+        const company = m.company ? mapCompany(m.company) : { id: ++world.freeCompanySeq, group: "free company", name: "A mercenary company", captain: "", home: -1, byArm: ARMS.map((arm) => (arm === m.arm ? (m.men ?? 0) : 0)) };
         return { nation: mapN(m.nation), company, weeksLeft: m.weeksLeft };
       })
       .filter((m) => m.nation >= 0);
@@ -478,6 +479,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     pool.progress[slot] = A.progress![k]!;
     if (A.kind) pool.kind[slot] = A.kind[k]!;
     if (A.monthsOut) pool.monthsOut[slot] = A.monthsOut[k]!;
+    // A save from before armies kept their home takes their dead from no one's people.
+    if (A.home) pool.home[slot] = A.home[k]! < 0 ? -1 : mapProvince(A.home[k]!);
     if (A.drill) pool.drill[slot] = A.drill[k]!;
     if (A.trainArm) pool.trainArm[slot] = A.trainArm[k]!;
     if (A.trainMen) pool.trainMen[slot] = A.trainMen[k]!;

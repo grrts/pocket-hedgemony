@@ -382,7 +382,7 @@ export function orderShape(order: Order): string {
     case "heritageCounsel":
       return "ask the court about an ambition";
     case "heritageChoice":
-      return "choose a heyday or legacy";
+      return "choose a golden age or legacy";
     case "answerEvent":
       return "answer an event";
     case "answerAsk":
@@ -424,7 +424,7 @@ export function orderShape(order: Order): string {
     case "explore":
       return `explore: ${order.do}`;
     case "tonguePolicy":
-      return "set the Tongue policy";
+      return "set the Language policy";
     case "faithPolicy":
       return "set a Faith policy";
     case "conclaveGold":

@@ -12,7 +12,7 @@ In scope:
   seven reforms, the faith settlements, dissolution.
 - The Shogunate: the houses, the shogun's hold and actions, the break into warlord domains, the vacant office and
   the Court's appointment, the oath of the houses, the closed country, the end.
-- The Empire card, the Shogunate card, the Institutions row and the Institutions lens's meaning.
+- The Empire card, the Shogunate card, the Institutions row and the Institutions map mode's meaning.
 
 Not in scope (owned by …):
 - Heads of faith and the Papacy (religion; a separate design on Leroy's list).
@@ -189,7 +189,7 @@ Not in scope (owned by …):
 - INST-080 Where: your own country card's Diplomacy tab shows an **Institutions** row, one line per institution you
   belong to (name, holder, hold with its word, your role: Emperor, Elector, Member, Shogun, House), and a member's
   country card shows a small badge (Empire, Elector, Shogun); each opens the institution's card. Grouping: one card
-  per institution holds everything about it. Overview: this row and the Institutions lens. [X-19; institutions §5]
+  per institution holds everything about it. Overview: this row and the Institutions map mode. [X-19; institutions §5]
 - INST-081 The Empire card shall have a header (Emperor's banner, ruler and since when; the hold bar with number and
   word; your role) and four folds: **Election** (each seat and whom it would vote for today, the tally in words and
   numbers, *Stand for the crown*, and a tap on a seat that opens its reasons list with *Seek their vote*);
@@ -203,9 +203,9 @@ Not in scope (owned by …):
   Kyoto, *Ask the Court* when you qualify, *Close the country* or *Open the ports*), **Hold**, and while hold is Weak
   or lower a warning line "At hold 0 the houses break away". [X-19; institutions §5]
 - INST-083 An election, a sitting Diet, a call to defend the Empire, a court ruling and a request to swear to the
-  shogun shall arrive as answer cards in the dispatches and on Needs attention with two 44-point buttons; silence on
+  shogun shall arrive as answer cards in the News and on Needs attention with two 44-point buttons; silence on
   a Diet vote counts as no, on a defence call as a refusal, on an oath as a refusal. [X-19; DIPL-214]
-- INST-084 The Institutions lens shall colour the holder gold, members light gold, seats with a mark, imperial land
+- INST-084 The Institutions map mode shall colour the holder gold, members light gold, seats with a mark, imperial land
   held by a non-member hatched, and Japan by house while whole and by member realm while broken; it reads with
   patterns as well as colours. [X-19; institutions §5]
 - INST-085 Phone: the cards shall be side sheets in the Wide layout and bottom sheets in the Tall layout, inside the
@@ -296,7 +296,7 @@ because they read standing and forms and add war aims.
 | revolutions | downstream | Customer–Supplier | The restoration for the Court |
 | trade | downstream | Customer–Supplier | Closed country's one port |
 | scenario-setup | upstream | Conformist | 1444 members, seats, houses, imperial land |
-| map-presentation | downstream | Published Language | Institutions lens |
+| map-presentation | downstream | Published Language | Institutions map mode |
 | game-shell | downstream | Customer–Supplier | Institutions row, cards, answer cards, Needs attention |
 
 ## 12. AI
@@ -330,4 +330,4 @@ because they read standing and forms and add war aims.
 | INST-040 … INST-048 | imperial-reforms.feature | The Diet; each reform |
 | INST-050, INST-051 | empire-end.feature | Westphalia seat; dissolution |
 | INST-060 … INST-069 | shogunate.feature | Houses, hold, summons, the break, the Court, the oath, closed country, end |
-| INST-080 … INST-085 | institution-screens.feature | The row, the cards, answer cards, lens, phone |
+| INST-080 … INST-085 | institution-screens.feature | The row, the cards, answer cards, map mode, phone |

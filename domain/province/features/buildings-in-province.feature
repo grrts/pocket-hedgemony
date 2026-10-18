@@ -77,7 +77,7 @@ Feature: Buildings in the province
       | Troyes   | pasture                    | known at start                  | ranch            | 3,000  | herders   |
       | Andalusia | pasture                   | F11 Horse breeding studs        | horse stud       | 3,000  | herders   |
       | Troyes   | woods                      | known at start                  | lumber camp      | 1,500  | woodsmen  |
-      | Potosí   | mountains with a seam      | known at start                  | mine             | 6,000  | miners    |
+      | Potosí   | mountains with an ore deposit | known at start                  | mine             | 6,000  | miners    |
       | Herat    | waste                      | F3 Qanat and canal irrigation   | irrigation works | 1,500  | farmers   |
       | Lisboa   | shore                      | known at start                  | fishery          | 3,000  | seafolk   |
       | Cádiz    | shore on a warm coast      | known at start                  | saltworks        | 1,500  | miners    |
@@ -106,18 +106,18 @@ Feature: Buildings in the province
 
   @PROV-065 @PROV-066
   Scenario: A mine runs out and leaves a ghost town
-    Given the province "Potosí" has a silver mine with 1 year of seams left and 6,000 miners
+    Given the province "Potosí" has a silver mine with 1 year of ore left and 6,000 miners
     And every other slot in "Potosí" is full
     When the year of digging ends
-    Then the mine has 0 seams left and closes
+    Then the mine has no ore left and closes
     And its miners become homeless
     And the town shrinks
 
   @PROV-065
-  Scenario: Prospecting adds seams
-    Given the province "Potosí" has a silver mine with 10 years of seams left
-    When a prospecting event adds 5 years of seams
-    Then the mine has 15 years of seams left
+  Scenario: Prospecting adds ore
+    Given the province "Potosí" has a silver mine with 10 years of ore left
+    When a prospecting event adds 5 years of ore
+    Then the mine has 15 years of ore left
 
   @PROV-067
   Scenario Outline: Shipyards and mines need timber in reach

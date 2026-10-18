@@ -1,7 +1,7 @@
 @context-realm
 Feature: People and land
   As a player
-  I want people, provinces, officials, faith, tongue and revolts counted for the realm
+  I want people, provinces, officials, faith, language and revolts counted for the realm
   So that I see how much I hold and how well it is run
 
   @REALM-060
@@ -96,23 +96,23 @@ Feature: People and land
       | foreign missionaries arrive                 | lower     |
 
   @REALM-066
-  Scenario Outline: Tongue rises and falls
-    Given the country "France" has 71 % tongue
+  Scenario Outline: Language rises and falls
+    Given the country "France" has 71 % language
     When <cause>
-    Then its tongue share is <direction>
+    Then its language share is <direction>
 
     Examples:
       | cause                                         | direction |
       | provinces held long and well assimilate        | higher    |
       | settlers move in                               | higher    |
-      | schools teach in its tongue                    | higher    |
-      | it conquers people of another tongue           | lower     |
-      | migrants of another tongue arrive              | lower     |
+      | schools teach in its language                    | higher    |
+      | it conquers people of another language           | lower     |
+      | migrants of another language arrive              | lower     |
       | a separatist movement spreads                  | lower     |
 
   @REALM-066
-  Scenario: A low tongue share brings separatists and slower officials
-    Given the country "Castile" has a low tongue share
+  Scenario: A low language share brings separatists and slower officials
+    Given the country "Castile" has a low language share
     When the realm's provinces are checked for revolt
     Then separatist revolts are more likely
     And its officials work more slowly

@@ -197,7 +197,9 @@ export interface ArmyPool {
   cameFrom: Int32Array;
   /** Company kind: levy or hired (see KIND). */
   kind: Uint8Array;
-  /** Months since the men were raised (a levy's pay begins in the fourth). */
+  /** Province the men were levied from (-1 = none, as for a hired company): its people lose the army's dead (WAR-226). */
+  home: Int32Array;
+  /** Months since the men were raised (a levy kept at peace is paid from the fourth, at war from the first: WAR-225). */
   monthsOut: Uint16Array;
   /** Months drilled together (0 untrained, 3 trained). */
   drill: Float32Array;
@@ -214,6 +216,8 @@ export interface ArmyMake {
   kind?: number;
   /** Tile to stand on, in the province (else its centre). */
   tile?: number;
+  /** Province the men were levied from (else where they stand, or none for a hired company). */
+  home?: number;
   drill?: number;
   /** Arm of the foot and of the horse. */
   foot?: string;
@@ -240,6 +244,7 @@ export function createArmyPool(capacity: number): ArmyPool {
     battle: new Int32Array(capacity).fill(-1),
     cameFrom: new Int32Array(capacity).fill(-1),
     kind: new Uint8Array(capacity),
+    home: new Int32Array(capacity).fill(-1),
     monthsOut: new Uint16Array(capacity),
     drill: new Float32Array(capacity),
     mix: defaultMix(capacity),
@@ -289,6 +294,7 @@ export function spawnArmy(world: World, owner: number, location: number, men: nu
   pool.battle[slot] = -1;
   pool.cameFrom[slot] = -1;
   pool.kind[slot] = make.kind ?? KIND.levy;
+  pool.home[slot] = make.home ?? (pool.kind[slot] === KIND.hired ? -1 : location);
   pool.monthsOut[slot] = 0;
   pool.drill[slot] = make.drill ?? 0;
   const base = slot * ARMS.length;
@@ -329,6 +335,7 @@ function growArmyPool(old: ArmyPool): ArmyPool {
   next.retreating.set(old.retreating);
   next.battle.set(old.battle);
   next.kind.set(old.kind);
+  next.home.set(old.home);
   next.monthsOut.set(old.monthsOut);
   next.drill.set(old.drill);
   next.mix.set(old.mix);

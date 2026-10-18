@@ -123,7 +123,7 @@ export function coloniesTab(ex: ExplorationView, o: { name: (p: number) => strin
     return `
       <dl class="facts"><dt>Colonies</dt><dd>Not yet</dd></dl>
       <p class="hint">Colonial governors open with ocean navigation (or outrigger voyaging). ${ex.unlocked ? "Your caravels can already chart the world: give one a voyage from its fleet card." : ex.why ? `Exploration ships wait: ${esc(ex.why)}.` : "Exploration ships come with Carrack and caravel."}</p>
-      <div class="choices"><button class="paper" data-show-charts>${icon("map", 1)}Show the Charts lens</button></div>`;
+      <div class="choices"><button class="paper" data-show-charts>${icon("map", 1)}Show the Exploration map mode</button></div>`;
   }
   const mine = ex.colonies.filter((c) => c.owner >= 0 && ex.governors.some((g) => g.colony === c.province));
   const where = (g: Governor) =>
@@ -148,5 +148,5 @@ export function coloniesTab(ex: ExplorationView, o: { name: (p: number) => strin
     ${ex.founded.length ? `<h3 class="sub">Founded</h3><div class="choices">${ex.founded.map((p) => `<button class="paper capital" data-look="${p}">${icon("castle", 1)}${esc(o.name(p))}</button>`).join("")}</div>` : ""}
     <h3 class="sub">Empty coasts</h3>
     <p>${o.inRange ? `${plural(o.inRange, "empty coast")} charted inside your range.` : "No empty coast you have charted lies inside your range: explore further."}</p>
-    <div class="choices"><button class="paper" data-show-charts>${icon("map", 1)}Show on the Charts lens</button></div>`;
+    <div class="choices"><button class="paper" data-show-charts>${icon("map", 1)}Show on the Exploration map mode</button></div>`;
 }

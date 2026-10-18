@@ -14,6 +14,7 @@ import { subjectPayments } from "./subjects.ts";
 import { heritageFactor, heritageTaxReach } from "./heritage.ts";
 import { navyCosts } from "./navy.ts";
 import { governorWages } from "./colonies.ts";
+import { W as WARFARE } from "./domain/warfare/index.ts";
 import { empireDues, empireTax } from "./institutions.ts";
 
 /**
@@ -98,6 +99,19 @@ export function provinceTax(world: World, p: number, holder: number, share = cro
   return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]! * heritageTaxReach(world, p) * tradeTaxFactor(world, p);
 }
 
+/**
+ * Tax a province sends whoever holds it this month: all of it to its owner, or, while it is
+ * occupied, `warfare.occupation.tax_share` of what it would pay its owner to the occupier; the
+ * rest is lost to the war (WAR-224, replacing the tax part of PROV-184).
+ */
+export function heldTax(world: World, p: number, share = crownTake(world, p)): number {
+  const holder = controller(world, p);
+  if (holder < 0) return 0;
+  const owner = world.provinceOwner[p]!;
+  if (holder === owner || owner < 0) return provinceTax(world, p, holder, share);
+  return provinceTax(world, p, owner, share) * WARFARE.occupation.tax_share;
+}
+
 /** Monthly interest on a realm's debt (REALM-164: 10 % a year). */
 export function monthlyInterest(world: World, n: number): number {
   return (world.nationDebt[n]! * interestPct(KNOWN) * heritageFactor(world, n, "loan_interest_pct")) / 100 / 12;
@@ -122,11 +136,10 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
       // And the upkeep of its works (works).
       L[owner * LEDGER_LINES + WORKS_UPKEEP] = L[owner * LEDGER_LINES + WORKS_UPKEEP]! - provinceUpkeep(world, p);
     }
-    // An occupier collects the tax (WAR occupation: tax, recruits, food, trade).
+    // Whoever holds it collects the tax; an occupier only its share (WAR-224).
     const holder = controller(world, p);
     if (holder < 0 || (only >= 0 && holder !== only)) continue;
-    const share = crownTake(world, p);
-    L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + provinceTax(world, p, holder, share);
+    L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + heldTax(world, p);
   }
   // Trade is what each realm's traders deposited last month, with market fees paid to it, less their upkeep (TRADE-064).
   for (let n = 0; n < world.nationCount; n++) if (only < 0 || n === only) L[n * LEDGER_LINES + TRADE] = tradeLine(world, n);

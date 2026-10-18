@@ -72,7 +72,7 @@ Then("it costs {int} scholar-years", (s, cost: number) => {
   expect(s.cost).toBe(cost);
 });
 
-Given("the country {string} knows the bough {string}", (s, country: string, bough: string) => {
+Given("the country {string} knows the branch {string}", (s, country: string, bough: string) => {
   const p = programme(s, country);
   const b = R.tree().boughs.find((x) => x.name === bough);
   expect(b).toBeDefined();
@@ -102,7 +102,7 @@ When("the tree is loaded", (s) => {
 });
 
 Then(
-  "it has one root {string} with the boughs R1 {string}, R2 {string}, R3 {string} and R4 {string}",
+  "it has one root {string} with the branches R1 {string}, R2 {string}, R3 {string} and R4 {string}",
   (s, root: string, r1: string, r2: string, r3: string, r4: string) => {
     const t: R.Tree = s.tree;
     expect(t.root.name).toBe(root);
@@ -117,7 +117,7 @@ Then(
   },
 );
 
-Then("{string} grows on the bough {string} although its letter is {word}", (s, name: string, bough: string, letter: string) => {
+Then("{string} grows on the branch {string} although its letter is {word}", (s, name: string, bough: string, letter: string) => {
   const t: R.Tree = s.tree;
   const inv = R.invention(idOf(name), t);
   expect(inv.id.startsWith(letter)).toBe(true);
@@ -570,7 +570,7 @@ When("any country is set up", (s) => {
   s.p = R.newProgramme("Any");
 });
 
-Then("it knows {string} and the four boughs", (s, root: string) => {
+Then("it knows {string} and the four branches", (s, root: string) => {
   const p = programme(s);
   const t = R.tree();
   expect(t.root.name).toBe(root);

@@ -103,11 +103,11 @@ Most of exploration happens on the fleet card and the map; the Colonies tab is i
 
 - **Order a caravel** on the Port tab of a coastal province, like any ship. It sails in its own fleet of explorers and needs no admiral.
 - **Explore** on the fleet card (in port) folds the card away and brings up the **voyage bar** along the bottom of the map. Tap sea zones, under the parchment or not: each tap adds a leg, the course is drawn in gold, and the bar shows the zones, how many are uncharted, the supply out and back and any shortfall. Pick *Turn back* or *Carry on*, then *Set sail*; *Undo* takes back the last leg and *Cancel* drops the course. A zone too far out for your ships' reach says why when tapped.
-- As the fleet sails the **parchment lifts** from every zone and coast next to it, and a dispatch reports how many places the voyage charted when it ends.
+- As the fleet sails the **parchment lifts** from every zone and coast next to it, and a news line reports how many places the voyage charted when it ends.
 - **The Colony section** of the same card (once you know Ocean navigation): *Hire a colonial governor* in a port of yours, *Load* colony stores, then at sea beside an empty coast one *Found a colony in …* button per coast, each with the reason underneath when it can't be used. Beside your colony, *Unload* puts the stores ashore.
 - **A colony being founded** shows its card on the province: progress and the month's change, the locals, food and whether it will last, and *Abandon* when a ship of yours lies beside it. On the map it is a small flag over a ring that fills as it grows.
-- **The Charts lens** (Map lens menu) shows what you have charted, empty coasts inside your colonial range in bright green, empty land beyond it in pale green and colonies being founded in gold.
-- **The Colonies tab** of your country card: governors used of slots and the range, where each governor is (tap to go there), colonies being founded with their progress and food, those founded, and how many empty coasts lie in range, with a button to the Charts lens.
+- **The Exploration map mode** (Map mode menu) shows what you have charted, empty coasts inside your colonial range in bright green, empty land beyond it in pale green and colonies being founded in gold.
+- **The Colonies tab** of your country card: governors used of slots and the range, where each governor is (tap to go there), colonies being founded with their progress and food, those founded, and how many empty coasts lie in range, with a button to the Exploration map mode.
 
 On a phone in landscape the voyage bar sits between the overview button and End turn, wraps its buttons rather than shrinking them, and every reason is written under its button since there is no hover.
 
@@ -126,7 +126,7 @@ On a phone in landscape the voyage bar sits between the overview button and End 
 - [Your-Realm](Your-Realm): the country card line and the governor's gold and wage.
 - [Troop-Movement](Troop-Movement): the shared planner and day loop voyages use.
 - [Diplomacy](Diplomacy): war and rivalry close ports to a voyage.
-- [Map-and-Lenses](Map-and-Lenses): the parchment, paths, flags, range line and colony card.
+- [Map and Map Modes](Map-and-Lenses): the parchment, paths, flags, range line and colony card.
 - [Time-and-Turns](Time-and-Turns): the monthly colony update and the day loop.
 
 ## Numbers

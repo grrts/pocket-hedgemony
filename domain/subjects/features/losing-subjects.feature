@@ -70,7 +70,7 @@ Feature: Losing a subject
   Scenario Outline: Changing masters
     Given "Moldavia" is a Disloyal Vassal of "Poland"
     And "Moldavia" borders "Hungary", a rival of "Poland"
-    And "Hungary" has <free> reach free
+    And "Hungary" has <free> free under its subject limit
     When "Moldavia" asks to change masters
     Then "Moldavia" <result>
 
@@ -82,7 +82,7 @@ Feature: Losing a subject
   @SUBJ-081
   Scenario Outline: Taken by force
     Given the country "X" declares "Break a subject" against "O" over its Disloyal Vassal "S"
-    Then the war is on "O", who defends, and "S" answers by its kind and loyalty
+    Then the war is on "O", who defends, and "S" answers by its type and loyalty
     When "X" wins and chooses <choice>
     Then "S" <result>
 

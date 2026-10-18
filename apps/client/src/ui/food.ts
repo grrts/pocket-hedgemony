@@ -110,13 +110,13 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
     <h3 class="sub">Collection</h3>
     <p class="hint">The share of each province's surplus over a year's eating that goes to its castle at the harvest.</p>
     ${choiceRow("collection", collectionChoices(f), f.realm.collection)}
-    <h3 class="sub">Spread</h3>
+    <h3 class="sub">Sharing out</h3>
     <p class="hint">How a castle hands out what it holds over its reserve, in percent: its own province · the next ring · the ring beyond.${reach < 2 ? " Your castles reach one ring until a road is built at them: the ring beyond's share stays in the castle." : ""}</p>
     ${choiceRow("spread", spreadChoices, f.realm.spread)}
     <h3 class="sub">Siege reserve</h3>
     <p class="hint">Months of food each castle keeps and never hands out, for a siege.${noGranary.length && f.realm.siegeReserve > smallest ? ` <b>${noGranary.length} castle${noGranary.length === 1 ? "" : "s"} without a granary hold only ${smallest} months.</b>` : ""}</p>
     ${choiceRow("siegeReserve", reserveChoices(f), f.realm.siegeReserve)}
-    <h3 class="sub">Famine rule</h3>
+    <h3 class="sub">Famine relief</h3>
     <p class="hint">A province with less food than this is fed first from its castle's store over the reserve.</p>
     ${choiceRow("famineRule", famineChoices, f.realm.famineRule)}
     <h3 class="sub">Surplus</h3>

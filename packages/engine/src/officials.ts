@@ -79,7 +79,7 @@ export function officialEffect(type: string, years: number): OfficialEffectView 
       note = "Takes effect when buildings arrive";
       break;
     case "Schoolmaster":
-      lines.push("Tongue drifts toward yours faster");
+      lines.push("Language drifts toward yours faster");
       note = "Takes effect when schools arrive";
       break;
   }

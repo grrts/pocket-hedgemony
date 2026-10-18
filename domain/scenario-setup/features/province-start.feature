@@ -18,7 +18,7 @@ Feature: Province starting values
     Given the province "Côte-d'Or" whose catalogue owner is "burgundy"
     When the starting world is built
     Then its owner is Burgundy
-    And its lord, Homeland of, Faith mix and Tongue mix follow the catalogue
+    And its lord, Homeland of, Faith mix and Language mix follow the catalogue
     And whether it starts with an official follows Burgundy's administrative capacity
 
   @SETUP-030

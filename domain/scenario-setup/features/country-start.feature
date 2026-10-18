@@ -18,7 +18,7 @@ Feature: Country starting values
       | france | military_capability     | high      | Soldiers, Commanders and Horses            |
       | venice | naval_capability        | very_high | Ships                                      |
       | france | administrative_capacity | high      | Officials and royal provinces              |
-      | france | territorial_cohesion    | low       | number of lords, their land, and Tongue    |
+      | france | territorial_cohesion    | low       | number of lords, their land, and Language    |
       | venice | institutional_development | very_high | Schools, Scholars and starting inventions |
       | venice | trade_access            | very_high | Merchants and grain price access           |
       | france | diplomatic_influence    | very_high | extra officials at court for envoys        |

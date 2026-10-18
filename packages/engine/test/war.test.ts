@@ -46,7 +46,8 @@ describe("war and conquest", () => {
     const kinds = new Set(news.map((x) => x.kind));
     expect(kinds.has("siege") || kinds.has("battle")).toBe(true);
     expect(peace).toBe(true);
-    expect(w.provinceOwner[target]).toBe(me);
+    // One peace never takes a capital that is not the loser's last province (WAR-227).
+    expect(w.provinceOwner[target]).toBe(foe);
     expect(relationState(w, me, foe).state).toBe("truce");
   }, 60000);
 
@@ -64,9 +65,13 @@ describe("war and conquest", () => {
       offer = w.peaceOffers.find((o) => o.from === foe);
     }
     expect(offer?.terms).toBe("give");
+    const portugal = w.provinceOwner.filter((o) => o === foe).length;
+    const mine = w.provinceOwner.filter((o) => o === me).length;
     expect(applyNow(w, { type: "answerPeace", offer: offer!.id, yes: true }, me).rejectedOrders).toEqual([]);
     expect(w.nationGone[foe] || relationState(w, me, foe).state === "truce").toBeTruthy();
-    expect(w.provinceOwner[w.provinceIndex.get(rules.nations[foe]!.capital)!]).toBe(me);
+    // It gives up at most a third of its land, and keeps its capital (WAR-227).
+    expect(w.provinceOwner[w.provinceIndex.get(rules.nations[foe]!.capital)!]).toBe(foe);
+    expect(w.provinceOwner.filter((o) => o === me).length - mine).toBe(Math.ceil(portugal / 3));
     expect(w.peaceOffers).toEqual([]);
   }, 60000);
 

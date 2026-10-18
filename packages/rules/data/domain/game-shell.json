@@ -318,7 +318,7 @@
     "levies"
   ],
   "toolColumn": [
-    "map lens",
+    "map mode",
     "go to capital",
     "Realm book"
   ],
@@ -472,7 +472,7 @@
   ],
   "otherScreens": {
     "lens_picker": {
-      "name": "Map lens picker",
+      "name": "Map mode picker",
       "kind": "Pop-over",
       "firstFocus": "not given",
       "back": "map",

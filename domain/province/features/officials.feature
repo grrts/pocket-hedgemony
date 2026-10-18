@@ -21,7 +21,7 @@ Feature: Officials and their types
       | muster master    | recruits refilling 25 % faster                                                          |
       | customs officer  | +15 % trade ratio gain                                                                  |
       | chaplain         | faith mix moving twice as fast toward the ruler's faith                                 |
-      | schoolmaster     | tongue mix moving twice as fast toward the ruler's tongue and students graduating a year sooner |
+      | schoolmaster     | language mix moving twice as fast toward the ruler's language and students graduating a year sooner |
       | warden           | a garrison fighting 25 % better, walls repairing twice as fast and a castle store rotting half as fast |
       | colonial governor | no effect of its own                                                                   |
 
@@ -101,8 +101,8 @@ Feature: Officials and their types
     Then the country card shows 40 officials
 
   @PROV-299 @placeholder
-  Scenario Outline: Officials learn by tongue
-    Given an official of the "<official>" tongue runs a province of the "<people>" tongue
+  Scenario Outline: Officials learn by language
+    Given an official of the "<official>" language runs a province of the "<people>" language
     Then he learns the province in <years> years
 
     Examples:

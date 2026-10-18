@@ -1,7 +1,7 @@
 @context-diplomacy
 Feature: Diplomacy screen and lens
   As a player
-  I want a map lens and a country card for diplomacy
+  I want a map mode and a country card for diplomacy
   So that I see my relations at a glance and act from one place
 
   @DIPL-183

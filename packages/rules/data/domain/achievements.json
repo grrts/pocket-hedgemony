@@ -271,8 +271,8 @@
   },
   {
    "id": "famine_averted",
-   "name": "The Famine Rule",
-   "text": "Let your famine rule save a starving province from any famine deaths that year.",
+   "name": "Famine Relief",
+   "text": "Let famine relief save a starving province from any famine deaths that year.",
    "category": "realm",
    "tier": "copper",
    "scope": "campaign",

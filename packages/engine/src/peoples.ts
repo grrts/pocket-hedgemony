@@ -13,7 +13,7 @@ import { knowsInvention } from "./works.ts";
  * Tongue policy, a state faith and one Faith policy per faith. Each New Year
  * tongues drift toward the pull tongue and faiths move toward their pulls, by
  * the culture and religion libraries' rules; their grievances (*Foreign rule*,
- * *Banned tongue*, *Wrong faith*, *Persecuted*) feed the province's mood.
+ * *Banned language*, *Wrong faith*, *Persecuted*) feed the province's mood.
  * Lords and officials carry no tongue or faith yet: a lord counts as of the
  * court tongue, and faith buildings stand for the 1444 communities (D-RELG-24).
  */
@@ -34,7 +34,7 @@ export const FAITH_POLICIES: readonly Exclude<relg.Policy, "established">[] = ["
 export const HELD_BEFORE_START = -1;
 
 /** Grievance bits culture and religion give a province, which the mood reads (moods.ts). */
-export const BELIEF_GRIEVANCES = ["Foreign rule", "Banned tongue", "Wrong faith", "Persecuted"] as const;
+export const BELIEF_GRIEVANCES = ["Foreign rule", "Banned language", "Wrong faith", "Persecuted"] as const;
 const FOREIGN_RULE = 1;
 const BANNED_TONGUE = 2;
 const WRONG_FAITH = 4;
@@ -352,7 +352,7 @@ export function beliefBits(d: PeoplesData, p: number, cc: cult.CountryCulture | 
     const g = cult.updateGrievances(provinceTongues(d, p), cc);
     // A realm's own 1444 land is not foreign-ruled: its court has held it for generations (D-CULT-18).
     if (g.includes("Foreign rule") && d.provinceHeldSince[p] !== HELD_BEFORE_START) bits |= FOREIGN_RULE;
-    if (g.includes("Banned tongue")) bits |= BANNED_TONGUE;
+    if (g.includes("Banned language")) bits |= BANNED_TONGUE;
   }
   if (r && d.provinceFaith[p * SLOTS] !== NO_FAITH) {
     const g = relg.faithGrievances(provinceFaith(d, p), r);
@@ -439,9 +439,9 @@ function driftYear(world: World, d: PeoplesData): void {
 /** Sets the realm's Tongue policy (CULT-038, CULT-042): Impose needs Printing or a chancery tradition. */
 export function setTonguePolicy(world: World, n: number, policy: string): string | null {
   const k = TONGUE_POLICIES.indexOf(policy as cult.TonguePolicy);
-  if (k < 0) return "no such Tongue policy";
+  if (k < 0) return "no such Language policy";
   const cc = realmCulture(peoplesData(world), n);
-  if (!cc) return "the realm has no court tongue";
+  if (!cc) return "the realm has no court language";
   if (policy === "impose" && !cult.mayImpose(cc)) return "Impose needs Printing or a chancery tradition";
   world.nationTonguePolicy[n] = k;
   refreshRealm(world, n);
@@ -484,7 +484,7 @@ export interface TongueRow {
   /** Provinces where it is the majority, and where it is the homeland. */
   majority: number;
   homeland: number;
-  /** Provinces of it with *Foreign rule* or *Banned tongue*. */
+  /** Provinces of it with *Foreign rule* or *Banned language*. */
   grieved: number;
 }
 
@@ -642,7 +642,7 @@ export function tongueLine(d: PeoplesData, p: number): TongueLine | null {
     rows: Object.entries(pt.people).map(([t, sh]) => ({ tongue: t, name: tongueName(t), share: sh, relation: cult.relationTo(cc.court, t, pt.nationalism), homeland: pt.homelandOf.includes(t) })),
     pull: ex.pull,
     pullName: tongueName(ex.pull),
-    why: ex.pull === cc.court ? (held === HELD_BEFORE_START ? "held from before 1444 and governed for the court" : `held since ${held} and governed for the court`) : held !== HELD_BEFORE_START && d.year - held < cult.cultureConfig.drift.court_pull_needs_years_held ? `the majority tongue; the court's pulls after ${cult.cultureConfig.drift.court_pull_needs_years_held} years held (since ${held})` : "the majority tongue; the court's pulls only where an official or a lord governs",
+    why: ex.pull === cc.court ? (held === HELD_BEFORE_START ? "held from before 1444 and governed for the court" : `held since ${held} and governed for the court`) : held !== HELD_BEFORE_START && d.year - held < cult.cultureConfig.drift.court_pull_needs_years_held ? `the majority language; the court's pulls after ${cult.cultureConfig.drift.court_pull_needs_years_held} years held (since ${held})` : "the majority language; the court's pulls only where an official or a lord governs",
     groups: ex.groups.map((g) => ({ name: tongueName(g.tongue), rate: g.rate, reasons: g.multipliers })),
     heldSince: held === HELD_BEFORE_START ? null : held,
   };

@@ -3,7 +3,7 @@ import { realmStrengths } from "@ph/engine";
 import { heritageTab } from "./heritage.ts";
 
 describe("the realm card's Heritage tab (HER-081..083)", () => {
-  it("shows the birthright, each heyday with its age and the burden, each opening on a tap to its history note", () => {
+  it("shows the birthright, each golden age with its age and the weakness, each opening on a tap to its history note", () => {
     const html = heritageTab(realmStrengths("france"));
     expect(html.match(/<details class="heritage-part/g)).toHaveLength(5);
     expect(html).toContain("Taille without consent");

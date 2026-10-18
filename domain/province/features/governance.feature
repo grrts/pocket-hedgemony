@@ -61,10 +61,10 @@ Feature: Who holds and governs the province
     Then the province "Calais" is no longer occupied
 
   @PROV-185
-  Scenario: Long holding shifts tongue and faith faster and fades Foreign rule
+  Scenario: Long holding shifts language and faith faster and fades Foreign rule
     Given the province "Brittany" has been held by "France" for 60 years
     When the game works out the province's stats
-    Then its tongue and faith shift toward the ruler's faster than in its first years
+    Then its language and faith shift toward the ruler's faster than in its first years
     And "Foreign rule" there fades
 
   @PROV-186 @placeholder
@@ -83,7 +83,7 @@ Feature: Who holds and governs the province
   @PROV-187
   Scenario: Foreign rule over a homeland
     Given the province "Brittany" is the homeland of the Bretons
-    And it is held by a ruler of the French tongue
+    And it is held by a ruler of the French language
     When the game works out the province's stats
     Then the province "Brittany" has the "Foreign rule" grievance
     And separatist events can start there

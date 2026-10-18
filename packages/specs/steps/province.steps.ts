@@ -467,7 +467,7 @@ When("an enemy attacks the garrison of {string}", (s, name: string) => {
 Then("the defender fights from the walls under the warfare castle rules", (s) => {
   expect(s.walls).toBe(true);
 });
-Given("a defending army of the province's homeland tongue", (s) => {
+Given("a defending army of the province's homeland language", (s) => {
   s.homelandArmy = true;
 });
 Given("the province has the ground {string}", (s, g: string) => {
@@ -572,7 +572,7 @@ const TILE_KINDS: Record<string, { use: Use; ground?: Ground; ctx?: P.PlaceConte
   "fields by a shore": { use: "Fields", extra: (p) => void addTile(p, "Shore") },
   "fields on hills": { use: "Fields", ground: "hills" },
   "fields on tropical ground": { use: "Fields", ctx: { tropical: true } },
-  "mountains with a seam": { use: "Waste", ground: "mountains", ctx: { seam: true } },
+  "mountains with an ore deposit": { use: "Waste", ground: "mountains", ctx: { seam: true } },
   "shore on a warm coast": { use: "Shore", ctx: { dryOrWarmCoast: true } },
   "shore with a harbour": { use: "Shore", extra: (p) => void addTile(p, "Shore", "harbour") },
   "shore on a river": { use: "Shore", river: true },
@@ -630,7 +630,7 @@ Then("it may build a bastion fort only with {string} and a star fort only with {
   known(s).push(b6);
   expect(P.castleStepsAllowed(cur(s))).toContain("star fort");
 });
-Given(/^the province "([^"]+)" has a silver mine with (\d+) years? of seams left(?: and ([\d,]+) miners)?$/, (s, name: string, years: string, miners?: string) => {
+Given(/^the province "([^"]+)" has a silver mine with (\d+) years? of ore left(?: and ([\d,]+) miners)?$/, (s, name: string, years: string, miners?: string) => {
   const p = prov(s, name, "mountains");
   s.tileIdx = addTile(p, "Waste", "mine");
   p.tiles[s.tileIdx]!.seams = Number(years);
@@ -644,7 +644,7 @@ When("the year of digging ends", (s) => {
   P.digYear(cur(s));
   P.balanceClasses(cur(s));
 });
-Then("the mine has 0 seams left and closes", (s) => {
+Then("the mine has no ore left and closes", (s) => {
   const t = cur(s).tiles[s.tileIdx]!;
   expect(t.seams).toBe(0);
   expect(t.building).toBeNull();
@@ -656,10 +656,10 @@ Then("its miners become homeless", (s) => {
 Then("the town shrinks", (s) => {
   expect(P.peopleAtWork(cur(s))).toBe(s.atWork - 6000);
 });
-When("a prospecting event adds {int} years of seams", (s, n: number) => {
+When("a prospecting event adds {int} years of ore", (s, n: number) => {
   P.addSeams(cur(s), s.tileIdx, n);
 });
-Then("the mine has {int} years of seams left", (s, n: number) => {
+Then("the mine has {int} years of ore left", (s, n: number) => {
   expect(cur(s).tiles[s.tileIdx]!.seams).toBe(n);
 });
 Given("the province {string} has a shipyard", (s, name: string) => {
@@ -1353,12 +1353,12 @@ Given("the country {string} is Catholic", (s) => {
 Then(/^the country's Faith is (\d+) %$/, (s, v: string) => {
   expect(P.weightedShare(s.faithRows, s.rulerFaith)).toBeCloseTo(Number(v) / 100);
 });
-Given("the province {string} has tongues French 94 % and Flemish 6 %", (s, name: string) => {
+Given("the province {string} has languages French 94 % and Flemish 6 %", (s, name: string) => {
   const p = prov(s, name);
   p.tongue = P.topThree({ French: 0.94, Flemish: 0.06 });
   p.faith = P.topThree({ Catholic: 0.9, Cathar: 0.04, Jewish: 0.03, Muslim: 0.02, Hussite: 0.01 });
 });
-Then("the province stores at most three tongues and three faiths", (s) => {
+Then("the province stores at most three languages and three faiths", (s) => {
   expect(Object.keys(cur(s).tongue).length).toBeLessThanOrEqual(3);
   expect(Object.keys(cur(s).faith)).toEqual(["Catholic", "Cathar", "Jewish"]);
 });
@@ -1757,7 +1757,7 @@ Then("the province {string} is no longer a homeland of the Moors", (s, name: str
 Given("the province {string} is the homeland of the Bretons", (s, name: string) => {
   prov(s, name).homeland = ["Breton"];
 });
-Given("it is held by a ruler of the French tongue", (s) => {
+Given("it is held by a ruler of the French language", (s) => {
   cur(s).holderTongue = "French";
 });
 Then("the province {string} has the {string} grievance", (s, name: string, g: string) => {
@@ -1800,7 +1800,7 @@ const EFFECTS: Record<string, P.OfficialEffect> = {
   "recruits refilling 25 % faster": { recruit_refill: 0.25 },
   "+15 % trade ratio gain": { trade_ratio_gain: 0.15 },
   "faith mix moving twice as fast toward the ruler's faith": { faith_shift: 2 },
-  "tongue mix moving twice as fast toward the ruler's tongue and students graduating a year sooner": { tongue_shift: 2, graduate_sooner_years: 1 },
+  "language mix moving twice as fast toward the ruler's language and students graduating a year sooner": { tongue_shift: 2, graduate_sooner_years: 1 },
   "a garrison fighting 25 % better, walls repairing twice as fast and a castle store rotting half as fast": { garrison: 0.25, walls_repair: 2, castle_store_rot: 0.5 },
   "no effect of its own": {},
 };
@@ -2133,7 +2133,7 @@ const GAINS: Record<string, (e: P.CharterEffect) => boolean> = {
   "no armies wintering there": (e) => e.noWinterQuarters === true,
   "its minority faith worshipping openly": (e) => e.minorityFaithOpen === true,
   "no tolls": (e) => e.noTolls === true,
-  "faster digging and new seams": (e) => e.fasterDigging === true && e.newSeams === true,
+  "faster digging and new ore deposits": (e) => e.fasterDigging === true && e.newSeams === true,
 };
 const COSTS: Record<string, (e: P.CharterEffect) => boolean> = {
   "a little gold": (e) => e.costsGold === true,
@@ -2212,7 +2212,7 @@ Then("a merchant house runs the mine", (s) => {
 Then("the country gets half the mine's output", (s) => {
   expect(s.effect.ownerOutputShare).toBe(0.5);
 });
-Then("the mine digs faster and finds new seams", (s) => {
+Then("the mine digs faster and finds new ore deposits", (s) => {
   expect(s.effect.fasterDigging && s.effect.newSeams).toBe(true);
 });
 
@@ -2357,12 +2357,12 @@ Given("the province {string} has recruits below a quarter of the pool", (s, name
 When("recruits refill to half", (s) => {
   cur(s).recruits = 500;
 });
-Given("the province {string} is a homeland held by a ruler of another tongue", (s, name: string) => {
+Given("the province {string} is a homeland held by a ruler of another language", (s, name: string) => {
   const p = prov(s, name);
   p.homeland = ["Breton"];
   p.holderTongue = "French";
 });
-When("a lord of the local tongue is granted it", (s) => {
+When("a lord of the local language is granted it", (s) => {
   const p = cur(s);
   p.lord = "Duke of Brittany";
   p.holderTongue = "Breton";
@@ -2431,7 +2431,7 @@ Given("the province {string} borders a province whose rebels share one of its gr
 When("those rebels are beaten", (s) => {
   cur(s).neighbourRebels = [];
 });
-Given(/^the province "([^"]+)" is held by a lord who is (Cruel|Greedy|hostile to the people's faith|hostile to the people's tongue)$/, (s, name: string, trait: string) => {
+Given(/^the province "([^"]+)" is held by a lord who is (Cruel|Greedy|hostile to the people's faith|hostile to the people's language)$/, (s, name: string, trait: string) => {
   const p = prov(s, name);
   p.lord = "the lord";
   p.lordTraits = [trait.replace("the people's ", "")];
@@ -2977,7 +2977,7 @@ Then(/^the town is a "([^"]+)" covering (\d+) town tiles$/, (s, size: string, t:
 });
 
 // officials and lords (D-PROV-13, D-PROV-23, D-PROV-24)
-Given(/^an official of the "([^"]+)" tongue runs a province of the "([^"]+)" tongue$/, (s, o: string, p: string) => {
+Given(/^an official of the "([^"]+)" language runs a province of the "([^"]+)" language$/, (s, o: string, p: string) => {
   s.kin = o === p ? "own" : p === "Picard" ? "cousin" : "stranger";
 });
 Then(/^he learns the province in (\d+) years$/, (s, n: string) => {

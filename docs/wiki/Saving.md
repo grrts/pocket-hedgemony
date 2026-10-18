@@ -190,7 +190,7 @@ Send a report, on the failure screen, attaches the Resume save and the orders jo
 - [Achievements](Achievements): reads the ironman flag and the modified mark, and asks for more flags.
 - [Tutorial and help](Tutorial-and-Help): tutorial progress and Needs attention mutes live in your player profile, apart from saves.
 - [The 1444 start](The-1444-Start): campaign options, ironman and the player's nation at a new game.
-- [Map and lenses](Map-and-Lenses): the map hash, province ids and the rename table.
+- [Map and Map Modes](Map-and-Lenses): the map hash, province ids and the rename table.
 - [Historical events](Historical-Events): the events chunk.
 - Every system ([Provinces](Provinces), [Your realm](Your-Realm), [Warfare](Warfare), [Diplomacy](Diplomacy) …) owns its own chunk with its own version and migrations.
 

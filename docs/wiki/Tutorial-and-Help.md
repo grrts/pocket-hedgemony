@@ -22,7 +22,7 @@ The tutorial is played as the Ottomans, from 11 November 1444 to 1447, in ten ch
 
 | # | Chapter | Date | Turns | What it teaches | Done when |
 |---|---|---|---|---|---|
-| 0 | The map | November 1444 | 0 | Pan and zoom through world, region and local view; select a province; open its card; switch lenses (Food, then Faith); find the capital, the Straits and Varna | You have opened Edirne's province card and seen the Food and Faith lenses |
+| 0 | The map | November 1444 | 0 | Pan and zoom through world, region and local view; select a province; open its card; switch map modes (Food, then Faith); find the capital, the Straits and Varna | You have opened Edirne's province card and seen the Food and Faith map modes |
 | 1 | A month at a time | November 1444 to January 1445 | 3 | Country card; gold and food at a glance; End turn; the turn report; the first event (Murad goes back to Manisa: let him go, or ask him to stay this winter) | The Manisa event is answered and the turn report read |
 | 2 | A boy on the throne | February to April 1445 | 3 | Ruler and heirs; why a child ruler and a new reign make lords waver; the lords Evrenos, Mihal and Turahan; what a lord wants; royal provinces and lords' lands; hiring an official; tax rates | An official is placed, and one wavering lord has been given his want, a gift, or left alone (each is fine; the turn report shows the result) |
 | 3 | Bread and castles | May to September 1445 | 1 plus Advance | Food lives in provinces; castles collect and spread it; reach rings; the Food policy screen and presets; the September harvest; ends when news comes that the crusaders' fleet is on the Danube | A preset is chosen, the harvest turn played, and one hungry province's "Why?" opened |
@@ -67,7 +67,7 @@ Chapter saves are rebuilt by a tool whenever rules change, by playing the previo
 
 The crusade is built on the real [Religion](Religion), [Diplomacy](Diplomacy), [Warfare](Warfare) and [Troop movement](Troop-Movement) rules.
 
-- **Chapter 0.** After the Food lens you switch to the Faith lens: Rumelia shows as Orthodox under a Sunni realm, hatched where a community is 30 % or more, with the line "Most of your people in Rumelia are Orthodox Christians. You rule them as a Sunni sultan."
+- **Chapter 0.** After the Food map mode you switch to the Faith map mode: Rumelia shows as Orthodox under a Sunni realm, hatched where a community is 30 % or more, with the line "Most of your people in Rumelia are Orthodox Christians. You rule them as a Sunni sultan."
 - **The league.** The crusading league against the Ottomans is at war from the start, regardless of the usual threshold: Hungary, Wallachia and the Papal States as members, with Venice and Burgundy sending fleets. On chapter 3's last turn the news comes that its fleet is on the Danube, and the country card shows "League against the Ottomans: 3 members, 24,000 soldiers". The league holds the Defend the faith aim from the start (a Restricted policy alone would not qualify), and the war screen shows the aim, its cause and one linked line on why this aim and not Take land. Tapping a league member opens its reasons (Same faith +10 between Catholic members; "Our ally's war aim is our concern"), the same screen used for your own alliances.
 - **The faith choice (chapter 4).** When the league calls on the sultan's Christian subjects to rise, the vizier opens the Faith policy screen at the Orthodox row, and you choose:
 
@@ -183,7 +183,7 @@ The game tracks the last input you touched and swaps every prompt live, even mid
 | Action menu | Action menu button on the selection | Right-click; Space | X / Square |
 | Move an army | Tap army, tap Move, tap target | Select, right-click target | Select, X for Move, cursor to target, A |
 | Cycle my armies | Tap the army count in the top bar | Tab | LB and RB |
-| Cycle lenses | Lens button, then pick | L | LT and RT |
+| Cycle map modes | Map mode button, then pick | L | LT and RT |
 | Country card | The realm's pennant in the top bar | C | View / Share |
 | End turn | Hourglass, lower right | Enter | Hold Menu / Options for half a second |
 | Pause menu | Menu button | Esc with nothing open | Menu / Options, short press |
@@ -197,7 +197,7 @@ At the end of chapter 9, "Keep ruling the Ottomans" turns the tutorial save into
 
 ### Accessibility and language
 
-The note's text follows the UI scale and may take up to two lines more at the largest size. The chapter 0 lens lesson uses the Food lens, whose hungry provinces also carry the hunger icon, so it works without telling colours apart. With reduced motion on, the hand does not bob and the spotlight does not pulse, and the border clash can be skipped to its result like any battle. All tutorial, Needs attention and Almanac text lives in string tables with keys, tokens stay inside the strings, and the step length check runs per language.
+The note's text follows the UI scale and may take up to two lines more at the largest size. The chapter 0 map mode lesson uses the Food map mode, whose hungry provinces also carry the hunger icon, so it works without telling colours apart. With reduced motion on, the hand does not bob and the spotlight does not pulse, and the border clash can be skipped to its result like any battle. All tutorial, Needs attention and Almanac text lives in string tables with keys, tokens stay inside the strings, and the step length check runs per language.
 
 ### Measuring
 
@@ -225,7 +225,7 @@ Only with your consent, the game sends one event per tutorial step reached, skip
 - [Religion](Religion), [Diplomacy](Diplomacy), [Warfare](Warfare), [Troop movement](Troop-Movement): the crusade lesson.
 - [Recruiting](Recruiting): levy, regiments, the Janissaries, the recruit pool. The devshirme stays a tutorial story, not a campaign rule.
 - [Your realm](Your-Realm) and [Provinces](Provinces): country and province cards, food, lords, officials, tax, grievances.
-- [Map and lenses](Map-and-Lenses): zoom levels, the Food and Faith lenses, the hunger icon, the camera.
+- [Map and Map Modes](Map-and-Lenses): zoom levels, the Food and Faith map modes, the hunger icon, the camera.
 - [Research](Research): choosing an invention, eras, the Inventions section.
 - [Rebellions](Rebellions): the rising, the rebellion card and its five answers.
 - [National strengths](National-Strengths): the *Kapıkulu household* birthright; strengths in the Realms section.

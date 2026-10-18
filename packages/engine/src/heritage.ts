@@ -126,15 +126,15 @@ function ageBeginnings(h: ns.Heritage, w: ns.WorldFacts): string[] {
 }
 
 const NEWS_LINE: Record<string, (h: ns.Heritage, id: string) => string | null> = {
-  HeydayWoke: (h, id) => `${heydayName(h, id)} wakes: its heyday has come.`,
-  HeydaySlept: (h, id) => `${heydayName(h, id)} sleeps until its time returns.`,
-  MarkGranted: (h, id) => `${h.legacies.find((l) => l.id === id)?.name ?? "A heyday"} stays with you as a legacy.`,
+  HeydayWoke: (h, id) => `${heydayName(h, id)} begins: its golden age has come.`,
+  HeydaySlept: (h, id) => `${heydayName(h, id)} is inactive until its time returns.`,
+  MarkGranted: (h, id) => `${h.legacies.find((l) => l.id === id)?.name ?? "A golden age"} stays with you as a legacy.`,
   AmbitionDone: (h, id) => {
     const a = h.ambitions.find((x) => x.item.id === id)!.item;
     return `Ambition fulfilled: ${a.text} You gain ${a.legacy.name}.`;
   },
   AmbitionLost: (h, id) => `Ambition lost: ${h.ambitions.find((x) => x.item.id === id)!.item.text}`,
-  BurdenShed: (h) => `${h.burden!.item.name} is shed: ${h.burden!.item.turned.name} takes its place.`,
+  BurdenShed: (h) => `${h.burden!.item.name} is overcome: ${h.burden!.item.turned.name} takes its place.`,
   BirthrightDormant: (h, id) => `${h.birthrights.find((b) => b.item.id === id)!.item.name} lies dormant.`,
   BirthrightWoke: (h, id) => `${h.birthrights.find((b) => b.item.id === id)!.item.name} wakes again.`,
 };
@@ -148,8 +148,8 @@ function tellPlayer(world: World, n: number, h: ns.Heritage, happened: ns.Herita
     const line = e.id ? NEWS_LINE[e.type]?.(h, e.id) : null;
     if (line) lines.push(line);
   }
-  if (h.ambitions.length > before && happened.some((e) => e.type === "AmbitionDone" || e.type === "AmbitionLost")) lines.push("A new ambition is drawn, sealed.");
-  if (h.ask) lines.push(h.ask.kind === "sleep_heyday" ? "A third heyday would wake: choose which one sleeps." : "A sixth legacy is earned: choose which one to let go.");
+  if (h.ambitions.length > before && happened.some((e) => e.type === "AmbitionDone" || e.type === "AmbitionLost")) lines.push("A new ambition is drawn, hidden.");
+  if (h.ask) lines.push(h.ask.kind === "sleep_heyday" ? "A third golden age would begin: choose which one becomes inactive." : "A sixth legacy is earned: choose which one to let go.");
   for (const text of lines) news.push({ kind: "heritage", text, nations: [n] });
 }
 
@@ -481,7 +481,7 @@ export function heritageChoice(world: World, n: number, id: string): string | nu
   const h = g?.realms[n];
   if (!h?.ask) return "no choice waits";
   if (h.ask.kind === "sleep_heyday") {
-    if (![h.ask.waking, ...h.ask.awake].includes(id)) return "not one of the heydays";
+    if (![h.ask.waking, ...h.ask.awake].includes(id)) return "not one of the golden ages";
     ns.chooseSleepingHeyday(h, id);
   } else {
     if (![h.ask.legacy.id, ...h.legacies.map((l) => l.id)].includes(id)) return "not one of the legacies";
