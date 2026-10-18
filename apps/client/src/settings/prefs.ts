@@ -4,6 +4,7 @@ import {
   batterySaverActive,
   battleStepSeconds,
   daySeconds,
+  longPressSeconds,
   detectProfile,
   readSettings,
   saveSettings,
@@ -124,6 +125,8 @@ export const batteryOn = () => batterySaverActive(prefs, battery);
 // ---- what the rows do ----
 /** One day's playback after End turn, ms (SET-131). */
 export const dayMs = () => daySeconds(prefs) * 1000;
+/** How long a long-press takes (SET-080): it opens a realm's card from the map (SUBJ-138). */
+export const longPressMs = () => longPressSeconds(prefs) * 1000;
 /** One 4-hour step of a running battle, ms (SET-065). */
 export const battleStepMs = () => battleStepSeconds(prefs) * 1000;
 export const autosaveEvery = () => autosaveInterval(prefs);

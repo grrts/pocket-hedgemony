@@ -29,7 +29,7 @@ import {
   type ExplorationView,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
-import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
+import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, overlordCard, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
 import { rebelsUi, risingCard, risingsLine, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { loadDefaultRuleset } from "@ph/rules";
@@ -66,7 +66,7 @@ import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type Fa
 import { Rng } from "@ph/engine";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
-import { autosaveEvery, autosavesKept, battleStepMs, dayMs, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
+import { autosaveEvery, autosavesKept, battleStepMs, dayMs, longPressMs, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
 import { openSettingsAt, renderSettings, setHintsRows } from "./ui/settingsScreen.ts";
 
 const rules = loadDefaultRuleset();
@@ -602,7 +602,7 @@ async function boot(): Promise<void> {
   const image = (mapImage = await loadMapImage(rules.map!, provinces.length));
   loadingStage("Raising the realms…", 0.75);
   await painted();
-  view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay });
+  view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay, onLongPress, longPressMs });
   view.setPower(mapPower());
   // Read by the performance checks (scripts/perf.mjs).
   (globalThis as { __phMap?: MapView }).__phMap = view;
@@ -1487,6 +1487,20 @@ function labelBitmap(text: string, size: number, water: boolean): LabelBitmap {
 }
 
 // ---- input ----
+/** A long-press on a realm's land opens its card at the Diplomacy tab, where a subject's card sits (SUBJ-096, SUBJ-138). */
+function onLongPress(_sx: number, _sy: number, province: number): void {
+  if (!snapshot || province < 0 || isWater[province] || !isKnown(province)) return;
+  const owner = owners[province]!;
+  if (owner < 0) return;
+  realmView = owner;
+  officialView = -1;
+  lordView = -1;
+  realmTab = "diplomacy";
+  newsView = false;
+  panelCollapsed = false;
+  renderPanel();
+}
+
 function onTap(sx: number, sy: number, province: number): void {
   officialView = -1;
   achView = false;
@@ -3492,18 +3506,30 @@ function relationsSection(r: number): string {
         <button class="paper" data-peace="white">White peace</button>
         ${lost ? `<button class="paper" data-peace="give">Give up ${lost} province${lost === 1 ? "" : "s"}</button>` : ""}
       </div>
+      ${masterPeace(r, whole)}
       ${realmStatecraft(s.statecraft, r, false, true)}`;
   }
   const line =
     rel?.state === "truce" ? `A truce holds${rel.until ? ` until ${monthText(rel.until)}` : ""}: no war before then.`
     : rel?.state === "alliance" ? "Your ally: they answer your calls to arms."
-    : rel?.state === "subject" ? "Your overlord: see your own Diplomacy tab for what you owe it."
+    : rel?.state === "subject" ? "Your overlord. Your card as they see it, and your choices toward them:"
     : rel?.state === "overlord" ? "Your subject."
     : "No ties between you. Declaring war calls their allies to arms against you, and yours to your side.";
   return `<h3 class="sub">Relations</h3><p>${line}</p>
-    ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy")) : ""}
+    ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy"), nations[r]!.name) : ""}
+    ${rel?.state === "subject" && s.statecraft?.subjects?.overlord?.overlord === r ? overlordCard(s.statecraft, (n) => realmButton(n, "diplomacy")) : ""}
     ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
     ${rel ? "" : `<div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 2)}Declare war</button></div>`}`;
+}
+
+/** In the player's war for independence: make the old overlord its own subject in the peace (SUBJ-135, SUBJ-140). */
+function masterPeace(r: number, whole: boolean): string {
+  const t = snapshot!.statecraft?.subjects?.tables;
+  if (!t || t.overlord !== r || !whole) return "";
+  const kind = t.kind === "vassal" ? "vassal" : "tributary";
+  return t.kind
+    ? `<button class="wax" data-peace="master">${icon("crown", 2)}Make them your subject</button><p class="hint">You have outgrown your old master and over three quarters of their voices want peace: they become your ${kind}, held Loyal from today.</p>`
+    : `<button class="paper" disabled>${icon("crown", 2)}Make them your subject</button><p class="hint">Not yet: ${esc(t.why ?? "")}.</p>`;
 }
 
 /** Peace offered to the player, with the choice to take it. */
@@ -3857,6 +3883,7 @@ function renderRealm(r: number): void {
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
   panel.querySelector<HTMLButtonElement>("[data-rise]")?.addEventListener("click", () => void act({ type: "riseUp" }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-subject-choice]").forEach((b) => b.addEventListener("click", () => void act({ type: "subjectChoice", action: b.dataset.subjectChoice as "stop_paying" | "pay" | "ask_loosen" })));
   panel.querySelectorAll<HTMLButtonElement>("[data-court-subject]").forEach((b) => b.addEventListener("click", () => void act({ type: "court", target: Number(b.dataset.courtSubject), ...(b.dataset.recall ? { recall: true } : {}) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-subject-act]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in" | "merge", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
