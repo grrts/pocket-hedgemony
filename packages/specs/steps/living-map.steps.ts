@@ -1,12 +1,13 @@
-// The living map close in (map-presentation, VIEW-100..VIEW-131): features/living-map.feature.
+// The living map close in (map-presentation, VIEW-100..VIEW-132): features/living-map.feature.
 // "Map detail is {string}" (s.detail) and "the camera zoom is N" (s.camera) come from map-presentation.steps.ts.
 import { expect } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
 import { loadMapTiles } from "@ph/engine/node";
+import { createWorld, tradePaths, tradeSeen } from "@ph/engine";
 import {
   animatedFigures, bandArtPixels, bandFade, detailBands, figureArms, figureCount, figuresAnimate, figuresLeft, formation, hamletCount, hamletSpots,
   hullCount, hullsInPort, kindOfByte, linksOfByte, livingBand, neighbours4, pieceLabels, pieceUnit, roadGrade, roadLines, roadPath, settlementBytes,
-  tapBox, tapTarget, tileDistance, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan, townsToRefresh, traderMovers, worksSpot,
+  tapBox, tapTarget, tileDistance, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan, townsToRefresh, traderMovers, worksSpot, LIVING_MAP,
   type LivingBand, type MapDetail, type TownState,
 } from "@ph/engine/domain/map-presentation";
 import { steps } from "../src/registry.ts";
@@ -204,6 +205,34 @@ Then("it carries {int} barges spaced evenly along it", (s, n: number) => {
 Then("a moment later they have barely moved", (s) => {
   const later = traderMovers(s.path, 100.01);
   later.forEach((m, i) => expect(Math.abs(m.at - s.movers[i].at)).toBeLessThan(0.001));
+});
+
+Given("a new game as {string}", (s, nation: string) => {
+  const { rules, grid } = world();
+  s.game = createWorld(rules, 1, grid);
+  s.nation = s.game.nationIndex.get(nation.toLowerCase());
+  expect(s.nation).toBeDefined();
+});
+When(/^the trade paths \w+ may see are read$/, (s) => void (s.paths = tradePaths(s.game, s.nation, LIVING_MAP.traders.maxPaths)));
+Then("each is a loop of at least {int} provinces by land, river or sea with at least {int} trader", (s, stops: number, traders: number) => {
+  expect(s.paths.length).toBeGreaterThan(0);
+  for (const p of s.paths) {
+    expect(p.path.length).toBeGreaterThanOrEqual(stops);
+    expect(["land", "river", "sea"]).toContain(p.medium);
+    expect(p.traders).toBeGreaterThanOrEqual(traders);
+  }
+});
+Then(/^each enters a province whose trade \w+ sees$/, (s) => {
+  const seen = tradeSeen(s.game, s.nation);
+  for (const p of s.paths) expect(p.path.some((q: number) => seen[q])).toBe(true);
+});
+Then(/^they come busiest first, at most (\d+), and one shows on each \w+'s trader with a route$/, (s, max: string) => {
+  expect(s.paths.length).toBeLessThanOrEqual(Number(max));
+  for (let i = 1; i < s.paths.length; i++) expect(s.paths[i].traders).toBeLessThanOrEqual(s.paths[i - 1].traders);
+  const routed = s.game.traders.filter((t: { owner: number; stops: number[] }) => t.owner === s.nation && t.stops.length >= 2);
+  const mine = s.paths.filter((p: { mine: number }) => p.mine >= 0);
+  expect(mine.length).toBeGreaterThan(0);
+  expect(mine.reduce((n: number, p: { traders: number }) => n + p.traders, 0)).toBeLessThanOrEqual(routed.length);
 });
 
 // Taps, Markers, animation and budget

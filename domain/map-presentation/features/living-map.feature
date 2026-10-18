@@ -263,6 +263,15 @@ Feature: The living map close in
     Then it carries 3 barges spaced evenly along it
     And a moment later they have barely moved
 
+  @VIEW-132 @placeholder
+  # livingMap.traders.maxPaths
+  Scenario: The snapshot feeds the busy trade paths
+    Given a new game as "France"
+    When the trade paths France may see are read
+    Then each is a loop of at least 2 provinces by land, river or sea with at least 1 trader
+    And each enters a province whose trade France sees
+    And they come busiest first, at most 200, and one shows on each France's trader with a route
+
   @VIEW-125
   Scenario: A tap goes to the piece before the province
     Given an army stands in "Toledo" in the living band
