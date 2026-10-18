@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-568 decided and 8 still open across 29 contexts.
+569 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -30,6 +30,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-ACH-12**: (was OQ-ACH-12) The tutorial's last card says that achievements start in a real campaign; onboarding adds the line. One line of copy, no rule.
 - **D-ACH-13**: (was OQ-ACH-13) The achievements screen opens from the main menu's More, as screen flow places it (the latest design); the game menu does not list it. Latest decision wins.
 - **D-ACH-14**: (was OQ-ACH-14) Victory: X-12 decides how a campaign is won; no new achievement is added, and *The Long Road* still needs only reaching 31 August 1939. No new rows beyond the list.
+- **D-ACH-15**: First slice in the playable build (X-19, 18 Oct): the build has no main menu, saves or cheats yet, so the trophy button and the *Choose your realm* card open the Achievements card, every campaign counts as ironman, and tests run at each weekly turn end. Rows whose stats the engine does not keep yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, buying a castle, voyages, contact and colonies, rebellions, the famine rule, castle reach 3, macro-regions, world-war and crash tracking) show "Not in the game yet" and stay locked. Badges are a tier frame around a category glyph until the 71 icons of ACH-065 are drawn. Each of these goes when its system lands.
 
 ### Audio (audio)
 

@@ -29,6 +29,7 @@ import { createRebelState, type RebelState } from "./rebels.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
 import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
+import type { AchievementLog } from "./achievements.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -141,6 +142,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   explore: ExplorationState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
+  /** The player's campaign as achievements see it (achievements.ts). */
+  achievements?: AchievementLog;
 }
 
 export interface ArmyPool {
