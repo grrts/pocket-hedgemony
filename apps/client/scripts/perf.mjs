@@ -79,7 +79,7 @@ const TURN_WAIT_MS = 250;
 const TURN_APPLY_MS = 16;
 const LONG_TASK_MS = 50;
 let failed = false;
-for (const zoom of [1.2, 2.5, 4, 6, 10]) {
+for (const zoom of [1.2, 2.5, 4, 6, 10, 20]) {
   const o = stat(await pan(zoom));
   const ok = o.avg <= OVERLAY_AVG_MS && o.p95 <= OVERLAY_P95_MS;
   if (!ok) failed = true;

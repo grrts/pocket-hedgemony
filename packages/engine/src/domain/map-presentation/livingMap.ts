@@ -9,7 +9,7 @@
  */
 import config from "../../../../rules/data/domain/map-presentation.json" with { type: "json" };
 import { mix } from "../../names.ts";
-import { GROUNDS, groundOfCell, riverOfCell, type TileGrid } from "../../tiles.ts";
+import { GROUNDS, groundOfCell, riverOfCell, type LandGrid } from "../../tiles.ts";
 import type { MapDetail } from "./index.ts";
 
 const L = config.livingMap;
@@ -78,18 +78,18 @@ const MOUNTAINS = GROUNDS.indexOf("mountains");
 const MARSH = GROUNDS.indexOf("marsh");
 
 /** The four neighbours of a tile, N, E, S, W; the map wraps east-west, -1 off the top or bottom. */
-export function neighbours4(grid: Pick<TileGrid, "width" | "height">, t: number): [number, number, number, number] {
+export function neighbours4(grid: Pick<LandGrid, "width" | "height">, t: number): [number, number, number, number] {
   const { width, height } = grid;
   const x = t % width;
   const y = (t - x) / width;
   return [y > 0 ? t - width : -1, y * width + ((x + 1) % width), y < height - 1 ? t + width : -1, y * width + ((x + width - 1) % width)];
 }
 
-const isWater = (grid: TileGrid, t: number): boolean => t < 0 || grid.province[t] === 0;
-const touchesWater = (grid: TileGrid, t: number): boolean => neighbours4(grid, t).some((n) => n >= 0 && grid.province[n] === 0);
+const isWater = (grid: LandGrid, t: number): boolean => t < 0 || grid.provinceAt(t) === 0;
+const touchesWater = (grid: LandGrid, t: number): boolean => neighbours4(grid, t).some((n) => n >= 0 && grid.provinceAt(n) === 0);
 
 /** Wrapped distance between two tiles, in map pixels. */
-export function tileDistance(grid: Pick<TileGrid, "width">, a: number, b: number): number {
+export function tileDistance(grid: Pick<LandGrid, "width">, a: number, b: number): number {
   const w = grid.width;
   const ax = a % w, ay = (a - ax) / w, bx = b % w, by = (b - bx) / w;
   const dx = Math.min(Math.abs(ax - bx), w - Math.abs(ax - bx));
@@ -107,12 +107,12 @@ const unit = (t: number, salt: number): number => mix(t, salt) / 4294967296;
  * penalty on mountains and marsh. Water is never used. Because the order is
  * fixed, a growing town only adds tiles at its edge (VIEW-106).
  */
-export function townGrowthOrder(grid: TileGrid, province: number): number[] {
+export function townGrowthOrder(grid: LandGrid, province: number): number[] {
   const seed = grid.centre[province] ?? -1;
-  if (seed < 0 || grid.province[seed] !== province + 1) return [];
+  if (seed < 0 || grid.provinceAt(seed) !== province + 1) return [];
   const g = L.growth;
   const cost = (t: number): number => {
-    const c = grid.cell[t]!;
+    const c = grid.cellAt(t);
     const ground = groundOfCell(c);
     let k = tileDistance(grid, seed, t) + unit(t, province) * g.jitter;
     if (riverOfCell(c)) k -= g.riverBonus;
@@ -126,7 +126,7 @@ export function townGrowthOrder(grid: TileGrid, province: number): number[] {
   const edge: { t: number; k: number }[] = [];
   const reach = (from: number): void => {
     for (const n of neighbours4(grid, from)) {
-      if (n < 0 || seen.has(n) || grid.province[n] !== province + 1 || tileDistance(grid, seed, n) > L.growRadius) continue;
+      if (n < 0 || seen.has(n) || grid.provinceAt(n) !== province + 1 || tileDistance(grid, seed, n) > L.growRadius) continue;
       seen.add(n);
       edge.push({ t: n, k: cost(n) });
     }
@@ -151,7 +151,7 @@ export interface TownFootprint {
 }
 
 /** A town's tiles: the first `cells` of its growth order, the first coreShare of them the core (VIEW-106, VIEW-107). */
-export function townFootprint(grid: TileGrid, province: number, cells: number, order: readonly number[] = townGrowthOrder(grid, province)): TownFootprint {
+export function townFootprint(grid: LandGrid, province: number, cells: number, order: readonly number[] = townGrowthOrder(grid, province)): TownFootprint {
   const tiles = order.slice(0, Math.max(0, Math.min(cells, order.length)));
   const coreCount = tiles.length ? Math.max(1, Math.round(tiles.length * L.coreShare)) : 0;
   return { seed: order[0] ?? -1, tiles, core: tiles.slice(0, coreCount), outskirts: tiles.slice(coreCount) };
@@ -203,7 +203,7 @@ export interface TownPlan {
  * seed: keep (capital), market, worship (always), drill yard; the docks take
  * the first town tile by water when there is a harbour or the coast (VIEW-109).
  */
-export function townPlan(grid: TileGrid, footprint: TownFootprint, s: TownState): TownPlan {
+export function townPlan(grid: LandGrid, footprint: TownFootprint, s: TownState): TownPlan {
   const special = new Map<number, CellKind>();
   const free = footprint.core.slice();
   let docks: number | undefined;
@@ -226,7 +226,7 @@ export function townPlan(grid: TileGrid, footprint: TownFootprint, s: TownState)
     special.set(t, kind);
   }
   const step = s.castleStep ?? 0;
-  const piers = docks === undefined ? [] : neighbours4(grid, docks).filter((n) => n >= 0 && grid.province[n] === 0);
+  const piers = docks === undefined ? [] : neighbours4(grid, docks).filter((n) => n >= 0 && grid.provinceAt(n) === 0);
   return { footprint, special, walls: step <= 0 ? "none" : step === 1 ? "palisade" : "stone", piers };
 }
 
@@ -243,7 +243,7 @@ export function townCellKinds(plan: TownPlan): Map<number, CellKind> {
  * meets a tile that is not core. Returned as tile and side (0 N, 1 E, 2 S, 3 W).
  * The shader works the same out from neighbouring core cells (VIEW-110).
  */
-export function wallEdges(grid: TileGrid, plan: TownPlan): [number, number][] {
+export function wallEdges(grid: LandGrid, plan: TownPlan): [number, number][] {
   if (plan.walls === "none") return [];
   const core = new Set(plan.footprint.core);
   const out: [number, number][] = [];
@@ -261,21 +261,21 @@ export function hamletCount(ruralThousands: number): number {
 }
 
 /** Land tiles of a province in a seeded order (stable for the province). */
-function seededTiles(grid: TileGrid, province: number, salt: number): number[] {
+function seededTiles(grid: LandGrid, province: number, salt: number): number[] {
   const out: number[] = [];
   const b = grid.bounds;
   const [x0, y0, x1, y1] = [b[province * 4]!, b[province * 4 + 1]!, b[province * 4 + 2]!, b[province * 4 + 3]!];
   if (!(x1 >= x0 && y1 >= y0)) return out;
   for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
     const t = y * grid.width + x;
-    if (grid.province[t] === province + 1) out.push(t);
+    if (grid.provinceAt(t) === province + 1) out.push(t);
   }
   const key = (t: number): number => mix(t, province * 31 + salt);
   return out.sort((a, b) => key(a) - key(b) || a - b);
 }
 
 /** Hamlet tiles: seeded, at least minSpacing from the town and from each other (VIEW-111). */
-export function hamletSpots(grid: TileGrid, province: number, count: number, town: readonly number[]): number[] {
+export function hamletSpots(grid: LandGrid, province: number, count: number, town: readonly number[]): number[] {
   const out: number[] = [];
   if (count <= 0) return out;
   const far = (t: number, from: readonly number[]): boolean => from.every((u) => tileDistance(grid, t, u) >= L.hamlets.minSpacing);
@@ -289,10 +289,10 @@ export function hamletSpots(grid: TileGrid, province: number, count: number, tow
 export type WorksSpotKind = keyof typeof L.worksSpots;
 
 /** One seeded tile for a mine, quarry or lumber camp, on matching ground when the province has it (VIEW-112). */
-export function worksSpot(grid: TileGrid, province: number, work: WorksSpotKind, taken: ReadonlySet<number>): number | null {
+export function worksSpot(grid: LandGrid, province: number, work: WorksSpotKind, taken: ReadonlySet<number>): number | null {
   const grounds = new Set((L.worksSpots[work] as string[]).map((g) => GROUNDS.indexOf(g as (typeof GROUNDS)[number])));
   const tiles = seededTiles(grid, province, 2 + Object.keys(L.worksSpots).indexOf(work)).filter((t) => !taken.has(t));
-  return tiles.find((t) => grounds.has(groundOfCell(grid.cell[t]!))) ?? tiles[0] ?? null;
+  return tiles.find((t) => grounds.has(groundOfCell(grid.cellAt(t)))) ?? tiles[0] ?? null;
 }
 
 export type RoadGrade = "track" | "road" | "paved road";
@@ -303,10 +303,54 @@ export function roadGrade(stepA: number, stepB: number): RoadGrade {
   return ROAD_STEPS[Math.max(0, Math.min(ROAD_STEPS.length - 1, Math.min(stepA, stepB)))]!;
 }
 
-const stepCost = (grid: TileGrid, t: number): number => {
+const stepCost = (grid: LandGrid, t: number): number => {
   const c = L.roads.cost as Record<string, number>;
-  return c[GROUNDS[groundOfCell(grid.cell[t]!)] ?? ""] ?? c.default!;
+  return c[GROUNDS[groundOfCell(grid.cellAt(t))] ?? ""] ?? c.default!;
 };
+
+/** A binary min-heap of indices by priority, ties broken by the lower index so paths are the same everywhere. */
+class MinHeap {
+  private ids: number[] = [];
+  private keys: number[] = [];
+  get size(): number {
+    return this.ids.length;
+  }
+  private less(a: number, b: number): boolean {
+    return this.keys[a]! < this.keys[b]! || (this.keys[a] === this.keys[b] && this.ids[a]! < this.ids[b]!);
+  }
+  private swap(a: number, b: number): void {
+    [this.ids[a], this.ids[b]] = [this.ids[b]!, this.ids[a]!];
+    [this.keys[a], this.keys[b]] = [this.keys[b]!, this.keys[a]!];
+  }
+  push(id: number, key: number): void {
+    this.ids.push(id);
+    this.keys.push(key);
+    for (let i = this.ids.length - 1; i > 0; ) {
+      const up = (i - 1) >> 1;
+      if (!this.less(i, up)) break;
+      this.swap(i, up);
+      i = up;
+    }
+  }
+  pop(): number {
+    const top = this.ids[0]!;
+    const lastId = this.ids.pop()!, lastKey = this.keys.pop()!;
+    if (this.ids.length) {
+      this.ids[0] = lastId;
+      this.keys[0] = lastKey;
+      for (let i = 0; ; ) {
+        const l = 2 * i + 1, r = l + 1;
+        let m = i;
+        if (l < this.ids.length && this.less(l, m)) m = l;
+        if (r < this.ids.length && this.less(r, m)) m = r;
+        if (m === i) break;
+        this.swap(i, m);
+        i = m;
+      }
+    }
+    return top;
+  }
+}
 
 /**
  * The line a road takes from one tile to another over land, north, east,
@@ -314,7 +358,7 @@ const stepCost = (grid: TileGrid, t: number): number => {
  * within the box of both ends plus a margin. Rivers are crossed on a tile
  * that becomes a bridge (VIEW-113).
  */
-export function roadPath(grid: TileGrid, from: number, to: number): number[] | null {
+export function roadPath(grid: LandGrid, from: number, to: number): number[] | null {
   if (isWater(grid, from) || isWater(grid, to)) return null;
   if (from === to) return [from];
   const w = grid.width;
@@ -330,15 +374,16 @@ export function roadPath(grid: TileGrid, from: number, to: number): number[] | n
   const size = bw * (by1 - by0 + 1);
   const dist = new Float64Array(size).fill(Infinity);
   const prev = new Int32Array(size).fill(-1);
-  const open: { i: number; f: number }[] = [];
+  const open = new MinHeap();
   const start = local(fx, fy), goal = local(ux, ty);
   dist[start] = 0;
-  open.push({ i: start, f: 0 });
+  open.push(start, 0);
   const h = (x: number, y: number): number => Math.abs(x - ux) + Math.abs(y - ty);
-  while (open.length) {
-    let b = 0;
-    for (let k = 1; k < open.length; k++) if (open[k]!.f < open[b]!.f || (open[k]!.f === open[b]!.f && open[k]!.i < open[b]!.i)) b = k;
-    const { i } = open.splice(b, 1)[0]!;
+  const done = new Uint8Array(size);
+  while (open.size) {
+    const i = open.pop();
+    if (done[i]) continue;
+    done[i] = 1;
     if (i === goal) break;
     const x = (i % bw) + bx0, y = Math.floor(i / bw) + by0;
     for (const [dx, dy] of [[0, -1], [1, 0], [0, 1], [-1, 0]] as const) {
@@ -351,7 +396,7 @@ export function roadPath(grid: TileGrid, from: number, to: number): number[] | n
       if (d < dist[j]!) {
         dist[j] = d;
         prev[j] = i;
-        open.push({ i: j, f: d + h(nx, ny) });
+        open.push(j, d + h(nx, ny));
       }
     }
   }
@@ -383,12 +428,12 @@ export interface TownSeat {
  * neighbouring province (each pair once), and a track from each hamlet to its
  * nearest town or hamlet when that is within trackReach (VIEW-113).
  */
-export function roadLines(grid: TileGrid, towns: readonly TownSeat[], neighbours: (province: number) => readonly number[], hamlets: readonly number[] = []): RoadLine[] {
+export function roadLines(grid: LandGrid, towns: readonly TownSeat[], neighbours: (province: number) => readonly number[], hamlets: readonly number[] = []): RoadLine[] {
   const out: RoadLine[] = [];
   const bySeat = new Map(towns.map((t) => [t.province, t]));
   const line = (from: number, to: number, grade: RoadGrade): void => {
     const path = roadPath(grid, from, to);
-    if (path) out.push({ from, to, grade, path, bridges: path.filter((t) => riverOfCell(grid.cell[t]!)) });
+    if (path) out.push({ from, to, grade, path, bridges: path.filter((t) => riverOfCell(grid.cellAt(t))) });
   };
   for (const a of towns) {
     for (const p of neighbours(a.province)) {
@@ -411,7 +456,7 @@ export function roadLines(grid: TileGrid, towns: readonly TownSeat[], neighbours
 }
 
 /** The N/E/S/W road links on every tile the roads pass (bit 0 N, 1 E, 2 S, 3 W). */
-export function roadLinks(grid: TileGrid, roads: readonly RoadLine[]): Map<number, number> {
+export function roadLinks(grid: LandGrid, roads: readonly RoadLine[]): Map<number, number> {
   const links = new Map<number, number>();
   const add = (t: number, bit: number): void => void links.set(t, (links.get(t) ?? 0) | bit);
   for (const r of roads) {
@@ -448,7 +493,7 @@ export const linksOfByte = (b: number): number => b >> 4;
  * province id texture. Ash and building sites cover town tiles; town tiles
  * cover works and hamlets; roads add their links on any tile (VIEW-115).
  */
-export function settlementBytes(grid: TileGrid, settlements: Iterable<ProvinceSettlement>, roads: readonly RoadLine[] = []): Uint8Array {
+export function settlementBytes(grid: LandGrid, settlements: Iterable<ProvinceSettlement>, roads: readonly RoadLine[] = []): Uint8Array {
   const kind = new Uint8Array(grid.width * grid.height);
   for (const s of settlements) {
     for (const t of s.hamlets ?? []) kind[t] = cellKindCode("hamlet");

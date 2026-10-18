@@ -2,7 +2,7 @@ export { Rng } from "./rng.ts";
 export { addDays, daysInMonth, DAYS_PER_TURN, isLeapYear, monthBeginning, turnOfDay } from "./calendar.ts";
 export { createWorld, spawnArmy, areNeighbors, marchMap, tileMarch, type World, type ArmyPool } from "./world.ts";
 export { planRoute, stepDays, forageLimit, forageRations, monthlyRations, refillRations, wagonRations, groundOf, planTilePath, tileStepHours, corridor, rowWidths, type MarchMap, type MarchingArmy, type Route, type TileMarch, type TilePath } from "./march.ts";
-export { tileGridFromImages, blockTileGrid, pointTileGrid, TILE_TERRAINS, GROUNDS, type TileGrid } from "./tiles.ts";
+export { tileGridFromImages, blockTileGrid, pointTileGrid, landGrid, landGridFromImages, LandGridScan, terrainCell, TILE_TERRAINS, GROUNDS, type TileGrid, type LandGrid } from "./tiles.ts";
 export { placeClimate, provinceClimate, seasonName, dayOfYear, snowCover, type PlaceClimate, type ProvinceClimate } from "./climate.ts";
 export { processTurn, applyNow, advance, STEPS_PER_DAY, STEPS_PER_TURN, HOURS_PER_STEP, type Order, type MoveOrder, type TurnReport } from "./turn.ts";
 export { atWar, cedeProvince, controller, engageRange, offerPeace, peaceShare, relationState, wallsOf, warBetween, SIEGE_MONTH_DAYS, type Battle, type News, type PeaceTerms } from "./war.ts";

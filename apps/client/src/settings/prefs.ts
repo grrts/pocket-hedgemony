@@ -141,6 +141,12 @@ export function mapPower(): { maxFps: number; animMs: number; dprCap: number } {
   };
 }
 
+/** Map detail as the map draws it: Low, Medium or High (SET-041, VIEW-104). */
+export function mapDetail(): "Low" | "Medium" | "High" {
+  const d = String(pref("graphics.map_detail"));
+  return d === "low" ? "Low" : d === "medium" ? "Medium" : "High";
+}
+
 /** Body text 17, 20 or 24 px as a zoom on the interface text (SET-098, SET-137). */
 export function textZoom(): number {
   return ({ normal: 1, large: 20 / 17, larger: 24 / 17 } as Record<string, number>)[String(pref("accessibility.text_size"))] ?? 1;
