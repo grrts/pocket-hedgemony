@@ -363,6 +363,8 @@ export function orderShape(order: Order): string {
       return "send an envoy";
     case "breakAlliance":
       return "break an alliance";
+    case "makeDemand":
+      return "make a demand";
     case "moveBuild":
       return "move a work in the province's queue";
     case "setFood":

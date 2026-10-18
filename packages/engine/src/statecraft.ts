@@ -1,6 +1,7 @@
 import type { World } from "./world.ts";
-import type { News } from "./war.ts";
+import { cedeProvince, type News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
+import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 
 /**
  * Milestone 5, statecraft (first slice): envoys carry the realm's asks to
@@ -122,6 +123,113 @@ export function sendEnvoy(world: World, n: number, t: number, action: string): s
   return null;
 }
 
+/** The demands the player can make in this slice (Demand kinds table, DIPL-111). */
+export const DEMAND_KINDS = ["hand_over_province", "pay_tribute"] as const;
+export type DemandKind = (typeof DEMAND_KINDS)[number];
+
+/** Why realm n can't make any demand of t now, or null: an envoy, and a war aim on them or a Rival or Hostile stance (DIPL-111). */
+export function whyNotDemandAtAll(world: World, n: number, t: number): string | null {
+  const why = whyNotEnvoy(world, n, t, "courtesy_visit");
+  if (why) return why;
+  const d = world.diplomacy;
+  const a = world.nationIds[n]!;
+  const b = world.nationIds[t]!;
+  if (rel.overlord(d.graph, a) === b || rel.overlord(d.graph, b) === a) return "a subject is bound already";
+  const stance = rel.stance(d.graph, a, b);
+  const aim = dip.warAimsOf(d, a, b).some((x) => x.aim !== "raid" && x.aim !== "no_aim");
+  if (stance !== "rival" && stance !== "hostile" && !aim) return "you need a reason: a war aim on them, or a Rival or Hostile stance toward them";
+  return null;
+}
+
+/** Their provinces that border your land: the ones you can demand (Hand over a province needs a border). */
+export function demandableProvinces(world: World, n: number, t: number): number[] {
+  const out: number[] = [];
+  for (let p = 0; p < world.provinceCount; p++) {
+    if (world.provinceOwner[p] !== t) continue;
+    for (let k = world.adjStart[p]!; k < world.adjStart[p + 1]!; k++) {
+      if (world.provinceOwner[world.adjList[k]!] === n) {
+        out.push(p);
+        break;
+      }
+    }
+  }
+  return out;
+}
+
+/** Why this demand can't be made now, or null (Demand kinds table). */
+export function whyNotDemand(world: World, n: number, t: number, kind: string, p = -1): string | null {
+  if (!(DEMAND_KINDS as readonly string[]).includes(kind)) return "no such demand";
+  const why = whyNotDemandAtAll(world, n, t);
+  if (why) return why;
+  if (kind === "pay_tribute") {
+    if (!demandableProvinces(world, n, t).length) return "you share no border";
+    if (rel.overlord(world.diplomacy.graph, world.nationIds[t]!)) return "they already answer to an overlord";
+  }
+  if (kind === "hand_over_province") {
+    if (p < 0 || p >= world.provinceCount || world.provinceOwner[p] !== t) return "that province is not theirs";
+    if (!demandableProvinces(world, n, t).includes(p)) return "it does not border your land";
+  }
+  return null;
+}
+
+/** Sends an envoy with a demand (MakeDemand): counted from base −60 when he arrives (DIPL-111, DIPL-112). */
+export function makeDemand(world: World, n: number, t: number, kind: string, p = -1): string | null {
+  const why = whyNotDemand(world, n, t, kind, p);
+  if (why) return why;
+  ensureRoute(world, n, t);
+  const d = world.diplomacy;
+  const ask: Partial<dip.Ask> = { demandKind: kind };
+  if (kind === "hand_over_province") {
+    const id = world.provinceIds[p]!;
+    // The library reads the province for It's our heartland (their capital).
+    dip.province(d, id, world.nationIds[t]!).capital = world.rules.nations[t]!.capital === id;
+    ask.province = id;
+  }
+  try {
+    dip.sendEnvoy(d, { country: world.nationIds[n]!, target: world.nationIds[t]!, action: "demand", ask });
+  } catch (e) {
+    return e instanceof Error ? e.message : String(e);
+  }
+  return null;
+}
+
+/** A demand given in (DIPL-113): the province changes hands, or they become a Tributary (SUBJ-005). */
+function demandGivenIn(world: World, asker: number, asked: number, kind: string, province: string | undefined, news: News[]): void {
+  if (kind === "hand_over_province" && province) {
+    const p = world.provinceIndex.get(province);
+    if (p !== undefined && world.provinceOwner[p] === asked) cedeProvince(world, p, asker, news);
+  }
+  if (kind === "pay_tribute" && !rel.overlord(world.diplomacy.graph, world.nationIds[asked]!)) {
+    try {
+      rel.makeSubject(world.diplomacy.graph, world.nationIds[asked]!, world.nationIds[asker]!, "tributary");
+      news.push({ kind: "envoy", text: `${world.rules.nations[asked]!.name} agrees to pay tribute to ${world.rules.nations[asker]!.name}.`, nations: [asked, asker] });
+    } catch {
+      // A tie the relation rules forbid (an alliance, a truce of another kind): the demand lapses.
+    }
+  }
+}
+
+/** The share of a Tributary's income it sends its overlord each month (SUBJ-005, subjects `kinds.tributary.pays_share`). */
+export const TRIBUTE_SHARE = 0.15;
+
+/** Tributaries of each realm and what they pay a month: [payer, receiver] pairs. */
+const tributeCache = new WeakMap<World, { key: string; pairs: [number, number][] }>();
+export function tributaries(world: World): [number, number][] {
+  const g = world.diplomacy.graph;
+  const key = `${g.relations.length}|${g.seq}|${world.diplomacy.seq}`;
+  const hit = tributeCache.get(world);
+  if (hit && hit.key === key) return hit.pairs.filter(([a, b]) => !world.nationGone[a] && !world.nationGone[b]);
+  const out: [number, number][] = [];
+  for (const r of world.diplomacy.graph.relations) {
+    if (r.type !== "subject" || dip.subjectKind(world.diplomacy, r.source) !== "tributary") continue;
+    const payer = world.nationIndex.get(r.source);
+    const receiver = world.nationIndex.get(r.target);
+    if (payer !== undefined && receiver !== undefined && !world.nationGone[payer] && !world.nationGone[receiver]) out.push([payer, receiver]);
+  }
+  tributeCache.set(world, { key, pairs: out });
+  return out;
+}
+
 /** Breaks an alliance (DIPL-103): an Oath broken and the wrong Broke our alliance. */
 export function breakAlliance(world: World, n: number, t: number): string | null {
   const a = world.nationIds[n];
@@ -137,6 +245,7 @@ const ACTION_TEXT: Record<string, { yes: string; no: string; done: string }> = {
   arrange_marriage: { yes: "agrees to a royal marriage", no: "turns down a royal marriage", done: "" },
   courtesy_visit: { yes: "", no: "", done: "receives our envoy kindly" },
   send_gift: { yes: "", no: "", done: "accepts our gift" },
+  demand: { yes: "gives in to our demand", no: "refuses our demand", done: "" },
 };
 
 /** The answer letter in the player's words ("Castile agrees to an alliance"). */
@@ -169,6 +278,12 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   // Letters are kept two years for the Why? on the Diplomacy tab; the library's event log is not kept.
   d.letters = d.letters.filter((l) => dip.monthsBetween(l.deliverOn, month) < 24);
   d.envoys = d.envoys.filter((e) => (e.status !== "home" && e.status !== "failed") || dip.monthsBetween(dip.monthOf(e.returnDate ?? e.arrival), month) < 12);
+  for (const e of d.events) {
+    if (e.type !== "DemandGivenIn") continue;
+    const asker = world.nationIndex.get(String(e.asker));
+    const asked = world.nationIndex.get(String(e.asked));
+    if (asker !== undefined && asked !== undefined) demandGivenIn(world, asker, asked, String(e.kind), e.province === undefined ? undefined : String(e.province), news);
+  }
   d.events.length = 0;
   aiEnvoys(world);
 }
@@ -265,7 +380,14 @@ export interface StatecraftView {
   /** Answers received in the last two years, newest first, with the reasons each court counted. */
   letters: { from: number; action: string; answer: "yes" | "no" | "done"; text: string; reasons: { name: string; number: number }[]; total?: number; month: string }[];
   /** For every other realm: what it thinks of the player, the ledger behind it, and why each mission can't be sent now (null when it can), in ENVOY_ACTIONS order. */
-  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean }>;
+  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView; tribute: { pays: number; to: number } | null }>;
+}
+
+/** The demands the player can make of a realm: why none can (null when some can), tribute or why not, and the border provinces. */
+export interface DemandView {
+  why: string | null;
+  tribute: string | null;
+  provinces: { province: number; name: string; capital: boolean }[];
 }
 
 export function statecraftView(world: World, player: number): StatecraftView | null {
@@ -282,10 +404,22 @@ export function statecraftView(world: World, player: number): StatecraftView | n
     .sort((a, b) => b.deliverOn.localeCompare(a.deliverOn))
     .map((l) => ({ from: world.nationIndex.get(l.from) ?? -1, action: l.action, answer: l.answer, text: letterText(world, l), reasons: l.reasons.map((r) => ({ name: r.name, number: Math.round(r.number) })), ...(l.total !== undefined ? { total: Math.round(l.total) } : {}), month: l.deliverOn }));
   const realms: StatecraftView["realms"] = {};
+  const tribute = tributaries(world);
   for (let n = 0; n < world.nationCount; n++) {
     if (n === player || world.nationGone[n]) continue;
     const s = standingOf(world, n, player);
-    realms[n] = { ...s, why: ENVOY_ACTIONS.map((a) => whyNotEnvoy(world, player, n, a)), married: dip.marriagesBetween(d, me, world.nationIds[n]!) > 0 };
+    const why = whyNotDemandAtAll(world, player, n);
+    const near = why ? [] : demandableProvinces(world, player, n);
+    const capital = world.provinceIndex.get(world.rules.nations[n]!.capital);
+    const demands: DemandView = { why, tribute: why ? why : whyNotDemand(world, player, n, "pay_tribute"), provinces: near.map((p) => ({ province: p, name: world.rules.provinces[p]!.name, capital: p === capital })) };
+    const pair = tribute.find(([payer]) => payer === n);
+    realms[n] = {
+      ...s,
+      why: ENVOY_ACTIONS.map((a) => whyNotEnvoy(world, player, n, a)),
+      married: dip.marriagesBetween(d, me, world.nationIds[n]!) > 0,
+      demands,
+      tribute: pair ? { pays: Math.max(0, -world.nationLedger[n * LEDGER_LINES + LEDGER.indexOf("tribute")]!), to: pair[1] } : null,
+    };
   }
   return { seats, free, giftGold: giftGold(world), envoys, letters, realms };
 }

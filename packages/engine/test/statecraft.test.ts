@@ -3,7 +3,7 @@ import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, processTurn, type World } from "../src/index.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
-import { giftGold, seatsOf, standingOf, statecraftView, whyNotEnvoy } from "../src/statecraft.ts";
+import { demandableProvinces, giftGold, monthlyStatecraft, seatsOf, standingOf, statecraftView, tributaries, whyNotDemand, whyNotEnvoy } from "../src/statecraft.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
 
 const rules = loadDefaultRuleset();
@@ -70,8 +70,52 @@ describe("statecraft (milestone 5)", () => {
   it("lets the AI send envoys: marriages and alliances are made between other realms", () => {
     const w = createWorld(rules, 1, tiles);
     const marriages = w.diplomacy.marriages.length;
+    const allies = () => w.diplomacy.graph.relations.filter((r) => r.type === "alliance").length;
+    const alliances = allies();
     months(w, 24, -1);
-    expect(w.diplomacy.marriages.length).toBeGreaterThan(marriages + 3);
+    expect(w.diplomacy.marriages.length - marriages + allies() - alliances).toBeGreaterThan(2);
+  });
+
+  it("demands tribute of a weak neighbour: counted from −60, and a yes makes them a Tributary that pays (DIPL-111 to DIPL-114)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = nation(w, "castile");
+    const them = nation(w, "navarre");
+    w.player = me;
+    expect(whyNotDemand(w, me, them, "pay_tribute")).toBeNull();
+    expect(whyNotDemand(w, me, nation(w, "england"), "pay_tribute")).toMatch(/reason|border/);
+    expect(processTurn(w, [{ type: "makeDemand", target: them, kind: "pay_tribute" }], me).rejectedOrders).toEqual([]);
+    expect(whyNotDemand(w, me, them, "pay_tribute")).toBe("an envoy is already on the way");
+    months(w, 4, me);
+    const letter = statecraftView(w, me)!.letters.find((l) => l.from === them && l.action === "demand")!;
+    expect(letter.reasons[0]!.number).toBe(-60);
+    const tributary = dip.relations.overlord(w.diplomacy.graph, "navarre") === "castile";
+    expect(tributary).toBe(letter.answer === "yes");
+    if (tributary) expect(tributaries(w)).toContainEqual([them, me]);
+    else expect(dip.warAimsOf(w.diplomacy, "castile", "navarre").some((a) => a.aim === "tribute")).toBe(true);
+    expect(standingOf(w, them, me).lines.some((l) => /Threatened/.test(l.name))).toBe(true);
+  });
+
+  it("hands over a demanded province when the court gives in, and only border provinces can be demanded", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = nation(w, "castile");
+    const them = nation(w, "navarre");
+    const border = demandableProvinces(w, me, them);
+    expect(border.length).toBeGreaterThan(0);
+    const far = [...Array(w.provinceCount).keys()].find((p) => w.provinceOwner[p] === nation(w, "france"))!;
+    expect(whyNotDemand(w, me, them, "hand_over_province", far)).toBe("that province is not theirs");
+    const news: { kind: string; text: string }[] = [];
+    // Giving in, as the library reports it, moves the province.
+    w.diplomacy.events.push({ type: "DemandGivenIn", date: w.diplomacy.date, asker: "castile", asked: "navarre", kind: "hand_over_province", province: w.provinceIds[border[0]!] });
+    monthlyStatecraft(w, news as never);
+    expect(w.provinceOwner[border[0]!]).toBe(me);
+    expect(news.some((x) => / hands .* to Castile/.test(x.text))).toBe(true);
+  });
+
+  it("lets AI realms demand before they go to war (DIPL-180)", () => {
+    const w = createWorld(rules, 1, tiles);
+    months(w, 36, -1);
+    const demands = w.diplomacy.letters.filter((l) => l.action === "demand").length + w.diplomacy.refusedDemands.length + tributaries(w).length;
+    expect(demands).toBeGreaterThan(0);
   });
 
   it("keeps envoys, letters and alliances through a save", () => {

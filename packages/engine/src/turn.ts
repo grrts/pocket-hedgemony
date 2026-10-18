@@ -4,7 +4,7 @@ import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.t
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
-import { breakAlliance, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
+import { breakAlliance, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { swapOfficials } from "./officials.ts";
@@ -110,6 +110,7 @@ export type Order =
   /** Send an envoy to another realm's court with a mission (ENVOY_ACTIONS); end an alliance. */
   | { type: "sendEnvoy"; target: number; action: string }
   | { type: "breakAlliance"; target: number }
+  | { type: "makeDemand"; target: number; kind: string; province?: number }
   | { type: "stopChange"; province: number }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
@@ -313,6 +314,9 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "breakAlliance":
       return breakAlliance(world, actingNation, order.target);
+    case "makeDemand":
+      syncCountries(world);
+      return makeDemand(world, actingNation, order.target, order.kind, order.province ?? -1);
     case "moveBuild":
       return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":

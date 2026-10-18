@@ -8,6 +8,7 @@ import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 import { officialBonus } from "./officials.ts";
 import { schoolUpkeepMonthly } from "./research.ts";
 import { provinceUpkeep, worksTrade } from "./works.ts";
+import { TRIBUTE_SHARE, tributaries } from "./statecraft.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -22,7 +23,7 @@ export const NORMAL_TAX = 2;
 const HEAVY_TAX = 3;
 
 /** Lines of the ledger, in the order the snapshot sends them. */
-export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain"] as const;
+export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute"] as const;
 export const LEDGER_LINES = LEDGER.length;
 const TAX = 0;
 const TRADE = 1;
@@ -32,6 +33,7 @@ const INTEREST = 4;
 const WORKS_UPKEEP = 5;
 const SCHOOLS = 6;
 const GRAIN = 7;
+const TRIBUTE = 8;
 
 /** Nothing invented yet: interest and loan caps are the realm context's for a realm without banks. */
 const KNOWN: ReadonlySet<string> = new Set();
@@ -120,6 +122,12 @@ export function runLedger(world: World, pay: boolean): void {
     const share = crownTake(world, p);
     L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + provinceTax(world, p, holder, share);
     L[holder * LEDGER_LINES + TRADE] = L[holder * LEDGER_LINES + TRADE]! + provinceTrade(world, p, share);
+  }
+  // A Tributary sends its overlord a share of its tax and trade (SUBJ-005).
+  for (const [payer, receiver] of tributaries(world)) {
+    const gold = Math.max(0, L[payer * LEDGER_LINES + TAX]! + L[payer * LEDGER_LINES + TRADE]!) * TRIBUTE_SHARE;
+    L[payer * LEDGER_LINES + TRIBUTE] = L[payer * LEDGER_LINES + TRIBUTE]! - gold;
+    L[receiver * LEDGER_LINES + TRIBUTE] = L[receiver * LEDGER_LINES + TRIBUTE]! + gold;
   }
   const armyPay = allNationPay(world);
   for (let n = 0; n < world.nationCount; n++) {
