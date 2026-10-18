@@ -149,6 +149,7 @@ Every requirement has at least one scenario, or a line saying why not (for examp
 | GOV | government | government |
 | CULT | culture | culture |
 | RELG | religion | religion |
+| TRIBE | tribes | tribes spec (Leroy, 18 Oct) |
 | REBL | rebellions | province-stats/rebellions-design |
 | REVO | revolutions | revolutions |
 | EVT | events | event-tree |

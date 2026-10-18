@@ -1574,6 +1574,19 @@ button.person-tile {
   min-height: 44px;
 }
 
+/* ---- Garrison tab (PROV-302, RECR-120): every button a full touch target ---- */
+
+.garrison button.small,
+table.troops button.small {
+  min-height: 44px;
+}
+
+.garrison [data-recruit] small {
+  display: block;
+  font-size: 16px;
+  opacity: 0.85;
+}
+
 /* ---- Mercenaries tab: one card per free company (feedback 52, 53) ---- */
 
 .companies {
@@ -2701,16 +2714,51 @@ button.land-change small {
 
 /* ---- Statecraft on the Diplomacy tab (milestone 5) ---- */
 
-/* One envoy mission a row: a full-width 44-point button and what it does, or why not, under it. */
+/* The Diplomacy tab, compact (DIPL-227):
+ * Every action is a tile in a grid: a 44-point button sized to its words
+ * and, under it, one short line on what it does or why not. Two or three
+ * tiles sit side by side when the panel is wide, one when it is narrow;
+ * war and peace buttons sit in a row at their own width, not across the card.
+ */
+.missions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: 6px 12px;
+  align-items: start;
+  margin: 4px 0 8px;
+}
+
+.missions .mission {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .missions button,
 button[data-break-alliance] {
   width: 100%;
   min-height: 44px;
-  margin-top: 6px;
+  margin: 0;
+  padding: 0 6px;
+  font-size: 18px;
+  line-height: 1.1;
 }
 
 .missions .hint {
-  margin: 2px 0 4px;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.diplomacy-tab .hint {
+  font-size: 17px;
+}
+
+.diplomacy-tab .choices button {
+  flex: 0 1 auto;
+  min-width: 140px;
+  padding: 0 12px;
+  font-size: 18px;
 }
 
 /* The court's reasons open on a tap, never on hover. */

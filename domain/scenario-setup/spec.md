@@ -36,6 +36,8 @@ world; it does not run anything after the first turn.
 
 Newest decision first.
 
+0. `domain/DECISIONS.md` X-20 (Leroy, 18 Oct): African starts, more historical states and peoples on the map with as
+   little change to the rules of play as possible (§5.8).
 1. `planning/gap-lists.md` v2 (16 Oct): decisions (campaign span); List 1 item 2 (playable nations; free
    tier the Ottomans and France, tutorial the Ottomans), item 8 (big institutions), item 25 (catalogue
    against the map), item 26 (province starting values); List 3 item 2.
@@ -80,6 +82,8 @@ Newest decision first.
 | Stand-in rule | A placeholder rule (castles, wealth) used until the province data is researched | — |
 | Campaign rules | Options chosen at new game and saved with the campaign: difficulty, AI temper, fog, events, ironman, end date | Settings |
 | Free tier | The realms playable without buying: the Ottomans and France | The Steam demo (one way to reach it) |
+| African nation | A catalogue record of the African regions put on the map by X-20: a playable country or subject, or a people's small realm | The 13 African map nations of before |
+| Ways to grow | The realm picker's line on how a realm can grow from its start: tributaries, free land, trade | Strengths at a glance |
 | Warm-up | Running the starting traders for 24 months before the first turn so busy roads start busy | A turn |
 
 ## 4. Domain model
@@ -229,6 +233,86 @@ Newest decision first.
 - SETUP-057 (Ubiquitous): Each save header shall record the player's nation and whether it needs the full game. [save-system §4.2, §6.1]
 - SETUP-058 (Ubiquitous): Quick start shall skip to Begin with the last options used and the realm last tapped (or the first suggested realm). [screen-flow S5]
 
+### 5.8 African starts (Leroy, 18 October; X-20)
+
+Africa in 1444 is a land of many realms and peoples, not empty space. Today's map puts 13 realms there and leaves
+365 of the 439 sub-Saharan land provinces unowned and unwalled, while the catalogue holds 60 playable countries,
+12 playable subjects and 48 stateless peoples for the same lands. These rules put those records on the map so an
+African start has neighbours to make tributaries of, court, trade with and fight, and so it can play well. They
+change who owns the land and how it is walled at the start, and nothing in the rules of play (Leroy: "don't change
+too much in terms of gameplay").
+
+- SETUP-060 (Ubiquitous): Every catalogue record of the African regions (`af_west`, `af_central_south`,
+  `af_northeast_east`, `af_north_sahara`) whose representation is playable country or playable subject shall be a map
+  nation, with a capital placed by hand in the map nations data from the record's capital or core region and a note
+  of where it was read. [X-20; country-catalogue README §2]
+- SETUP-061 (Ubiquitous): Every record of those regions represented as a decentralised polity, and every non-state
+  actor that holds a homeland (for example the San, the Maasai, the equatorial forest societies), shall be a map
+  nation too: a small realm of that people, taking its start form by the start-form rules (GOV-043), so most start
+  as a clan council or chiefdom. Non-state actors that are migrations, raiders or rebels (the Fulbe herders, the
+  Juhayna Arabs, the Nilotic herders, the Banu Kanz, the Beta Israel) and background-only records stay reference data
+  for events, as do group records whose land another realm owns. [X-20; SETUP-005; D-SETUP-9]
+- SETUP-062 (Ubiquitous): A record that becomes a map nation shall keep its catalogue id (so no rename is needed), its
+  assessments, its faith and its relations: a playable subject starts under the overlord the relations file names
+  (Kayor, Baol and Waalo under Jolof; Sofala and Mafia under Kilwa), or independent where the relations file names
+  none (D-SETUP-10). [X-20; SETUP-022]
+- SETUP-063 (Ubiquitous): A new African nation shall take only land no realm owns: first the provinces its owner rule
+  names, if it has one, then, from all new capitals at once, one unowned neighbouring province per nation per round
+  in ascending nation index, until each has its size from its `manpower_potential` (very low 1, low 2, moderate 3,
+  high 5, very high 8, unknown 2 provinces). [X-20] @placeholder `scenario_setup.africa.size_by_manpower`
+- SETUP-064 (Unwanted): If a new nation's capital lies in a province another realm owns and no owner rule gives it
+  land, then it shall stay reference data, and the map build's report shall list it. [X-20; SETUP-042]
+- SETUP-065 (Ubiquitous): African land still unowned after SETUP-063 (most of the deep Sahara and parts of the
+  rainforest) shall stay land of a people with no country, colonisable by the exploration rules as today. [X-20;
+  D-EXPL-2]
+- SETUP-066 (Ubiquitous): Each new nation shall get a colour by SETUP-043 and one commander named from its tongue's
+  name list, his skills set from `military_capability` like any realm's starting counts (SETUP-020). [X-20; F-13]
+- SETUP-067 (Ubiquitous): In sub-Saharan Africa (the map's Sub-Saharan Africa macro-region, MAP-039) the stand-in
+  castle rule (SETUP-046) shall be: every capital walled with an earthwork ring fort, about 15 % of other owned
+  provinces with an old ring fort, and stone only where a geography anchor names a stone castle (for example Great
+  Zimbabwe, Kilwa, Mombasa); the frontier and population steps to stone do not apply there. Earthworks are what
+  most of these lands built (Benin's walls, Kano's walls), and a war there is won by holding the land a season, not
+  by sieges. [X-20; SETUP-046; research B4; PROV-184]
+- SETUP-068 (Ubiquitous): The geography anchors (SETUP-032) shall name Africa's gold fields as gold mines (Bambuk,
+  Bure, the Akan forest, the Zimbabwe plateau and Manyika) and its trade towns (Timbuktu, Djenne, Gao, Kano, Agadez,
+  Kilwa, Mombasa, Mogadishu) with their regional town template and 1444 port tier, so African realms start with the
+  wealth they had. [X-20; SETUP-032; SETUP-035; SETUP-036]
+- SETUP-069 (Ubiquitous): African nations shall start from their assessments by the same rules as every realm
+  (SETUP-020, SETUP-021): no bonus and no penalty of their own. Whether they can play well is checked by the
+  balance targets (SETUP-070) and tuned in the numbers, not with a new rule. [X-20; rule 2 of DECISIONS]
+
+#### Balance targets
+
+- SETUP-070 (Ubiquitous): The balancing model shall check African starts in seeded AI-only campaigns to 1600, and a
+  missed target shall be tuned in the numbers (sizes, assessment factors, AI temper) rather than with a new rule:
+  (a) at least a quarter of the African nations of 1444 still exist in 1600; (b) no one realm holds more than a
+  third of the settled sub-Saharan provinces in 1600; (c) at most 15 % of sub-Saharan coastal provinces are other
+  continents' colonies in 1600; (d) in at least one seeded run each, a clan council or chiefdom of one or two
+  provinces grows to five or more by 1550, by tributaries, folding in or war. [X-20] @placeholder
+  `balance.africa.*`
+- SETUP-071 (Ubiquitous): The extra nations shall keep the week's turn inside the phone's turn budget (performance
+  design): the AI's work steps for a realm of one or two provinces at peace stay a small share of the turn, counted
+  in work steps (X-15). [X-20; X-15]
+
+#### How the player uses it
+
+- SETUP-072 Where: an African realm is chosen in the realm picker (SETUP-053, SHELL-031) like any other. The region
+  filter has Sub-Saharan Africa and North Africa; with a region chosen, the picker zooms the map to it so small
+  realms are big enough to tap, and the list beside the map (Wide) or under it (Tall) lists every realm of the
+  region by name, one 44-point row each, so a realm of one province is never only a speck to hit. [X-19; X-20]
+- SETUP-073 The realm's card in the picker, the same card for every realm, shows its form, provinces, people and
+  strengths at a glance, and one line **Ways to grow** read from the start: how many smaller neighbours could become
+  tributaries, how much free land borders it, and its trade (gold fields, caravan towns, ports). The player sees
+  before Begin how the realm plays. [X-19; X-20; SHELL-031]
+- SETUP-074 Grouping and overview: nothing new is added to play. An African realm is played with the same country
+  card (General, Diplomacy, Trade, Army), the Subjects lens and tab for its tributaries, and the Diplomacy tab for
+  its neighbours; the new nations are ordinary realms, so every existing overview shows them. The suggested realms
+  in the picker gain one African start per part of Africa (Mali, Benin, Kongo, Ethiopia, Kilwa). [X-19; X-20]
+- SETUP-075 The map and the phone: new nations are drawn and named like every realm (realm names stay at every zoom,
+  F-22); free land keeps the unowned colour. On a phone, held sideways or upright, the region list, the realm card
+  and the Ways to grow line fit the Wide and Tall layouts inside the safe areas, every row and button is at least 44
+  points high, and nothing needs hover. [X-19; X-20]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -282,6 +366,8 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | `march.startingHorseShare` | Horse in starting armies | 0.2 | Yes | `defines.json` |
 | low-confidence range | Wider random start for `low` confidence | not given | Yes | country config |
 | world domination share | (country stats 12) | 60 % | Yes | country config |
+| `scenario_setup.africa.size_by_manpower` | Provinces a new African nation takes by `manpower_potential` | very low 1, low 2, moderate 3, high 5, very high 8, unknown 2 (X-20) | Yes | `scenario-setup.json` |
+| `balance.africa.*` | Balance targets of African starts | SETUP-070 (X-20) | Yes | balancing model |
 | free realms | Free tier | Ottomans, France | No | store config |
 
 ## 11. Seams
@@ -335,6 +421,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 - **D-SETUP-15** (was OQ-SETUP-15) Province names: modern region names stay. D-MAP-6 settles it.
 - **D-SETUP-16** (was OQ-SETUP-16) Coverage and certainty: a disputed, partial or stub record enters play only if it owns map provinces, and low confidence only widens its start range (D-SETUP-6). X-13 settles it.
 - **D-SETUP-17** (was OQ-SETUP-17) Population scale: the map's figure is the province's people in thousands (Aube 305 thousand); the Troyes card's 72,000 is a town-sized illustration, not data. The map is the only complete set.
+- **D-SETUP-18** African starts (Leroy, 18 Oct; X-20): in the four African regions, D-SETUP-2's "only a representation that owns map provinces is a realm" now applies after the catalogue's playable countries, subjects and peoples are given the unowned land around their capitals (SETUP-060 to SETUP-065); elsewhere D-SETUP-2 stands. Leroy asked for more of the historical states and tribes, even very small ones, and as little change to the rules of play as possible.
 
 ## 14. Traceability
 
@@ -412,3 +499,20 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-056 | new-campaign.feature | A new game starts from a seed with a new campaign id |
 | SETUP-057 | new-campaign.feature | The save header records whether the realm needs the full game |
 | SETUP-058 | new-campaign.feature | Quick start skips to Begin |
+| SETUP-060 | african-starts.feature | The catalogue's African countries and subjects are on the map |
+| SETUP-061 | african-starts.feature | Stateless peoples with a homeland become small realms |
+| SETUP-061 | african-starts.feature | Migrations, raiders and background records stay reference data |
+| SETUP-062 | african-starts.feature | A playable subject starts under the overlord the relations file names |
+| SETUP-063 | african-starts.feature | New nations take unowned land around their capitals by size |
+| SETUP-064 | african-starts.feature | A capital inside another realm leaves the record as reference data |
+| SETUP-065 | african-starts.feature | Land left over stays free and colonisable |
+| SETUP-066 | african-starts.feature | A new nation gets a colour and a commander |
+| SETUP-067 | african-starts.feature | Sub-Saharan castles are earthworks except named stone castles |
+| SETUP-068 | african-starts.feature | Gold fields and trade towns are anchored |
+| SETUP-069 | african-starts.feature | African nations start by the same rules as every realm |
+| SETUP-070 | african-starts.feature | Balance targets for African starts |
+| SETUP-071 | — | Checked by the performance budget, not a scenario |
+| SETUP-072 | african-starts.feature | Choosing a region lists every realm in it |
+| SETUP-073 | african-starts.feature | The realm card shows how the realm can grow |
+| SETUP-074 | african-starts.feature | African starts join the suggested realms |
+| SETUP-075 | — | Presentation and phone layout (checked by screenshots) |
