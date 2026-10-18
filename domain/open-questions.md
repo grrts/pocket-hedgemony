@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-553 decided and 8 still open across 29 contexts.
+554 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -132,6 +132,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-DIPL-34**: (was OQ-DIPL-34) Old AI weights: retired; the AI uses only the reasons count. Diplomacy 12 is the latest text.
 - **D-DIPL-35**: First game slice of envoys (milestone 5, provisional): an envoy is an unnamed "Envoy of" the realm, not a named official, so no province loses its official yet; routes are one land leg of the capitals' map distance ÷ 6; every realm has 2 unmarried children until families exist; the gift is 30 gold; AI courts consider their envoys once a year, asking only the neighbour that thinks best of them, so a large map's month stays cheap; counting a far court's distance stores no route, only a sent envoy does; the library's event log is not kept, letters are kept two years and envoys home a year. Quick defaults so the game can play statecraft now; each is replaced when its context lands.
 - **D-DIPL-36**: Second game slice, demands (milestone 5, provisional): only *Hand over a province* and *Pay tribute* run; *Pay tribute* given in makes the target a Tributary that pays 15 % of its tax and trade each month (the subjects context's Tributary share, SUBJ-005), and the 1444 Tributaries pay it too; AI realms demand before war only of other AI realms, because answering a demand is not yet on the player's screen; a province given in moves at once when the envoy is answered, and the letter follows a month later. Quick defaults so demands play now.
+- **D-DIPL-37**: Third game slice, the player answers (milestone 5, provisional): the asks made of the player wait for their answer for the month the envoy stays at court, and no answer is a refusal, because an envoy does not wait forever and a demand ignored is a demand refused; the answer letter still reaches the asker a month later; this replaces D-DIPL-36's "AI realms demand before war only of other AI realms". Quick defaults so the player is asked now.
 
 ### Events (events)
 

@@ -112,6 +112,15 @@ export interface Envoy {
   missionMonths?: number;
 }
 
+/** An ask waiting at the player's court for their own answer, until the month the envoy leaves (DIPL-209). */
+export interface PendingAsk {
+  id: string;
+  envoy: string;
+  ask: Ask;
+  arrived: string;
+  until: string;
+}
+
 /** An ask carried to another country, decided by the reasons count. */
 export interface Ask {
   action: string;
@@ -269,6 +278,8 @@ export interface Diplomacy {
   trespasses: { intruder: string; owner: string; month: string }[];
   plannedWars: { by: string; on: string; month: string }[];
   refusedDemands: { asker: string; asked: string; kind: string; province?: string; date: string }[];
+  /** Asks waiting for the player's answer (DIPL-209); missing in saves made before it. */
+  asks?: PendingAsk[];
   defections: { from: string; to: string; provinces: string[] }[];
   taken: { by: string; from: string; province: string; date: string }[];
   statelessCultures: string[];
@@ -317,6 +328,7 @@ export function createDiplomacy(date: string, seed = 1): Diplomacy {
     trespasses: [],
     plannedWars: [],
     refusedDemands: [],
+    asks: [],
     defections: [],
     taken: [],
     statelessCultures: [],

@@ -267,6 +267,17 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   // Letters are kept two years for the Why? on the Diplomacy tab; the library's event log is not kept.
   d.letters = d.letters.filter((l) => dip.monthsBetween(l.deliverOn, month) < 24);
   d.envoys = d.envoys.filter((e) => (e.status !== "home" && e.status !== "failed") || dip.monthsBetween(dip.monthOf(e.returnDate ?? e.arrival), month) < 12);
+  libraryEvents(world, news);
+  seasonalSubjects(world, news);
+  aiOverlords(world, news);
+  aiEnvoys(world);
+  // An AI envoy to a near court arrives this month: the player hears of the ask at once.
+  libraryEvents(world, news);
+}
+
+/** Acts on what the library reports: subject ties agreed, demands given in, and asks waiting on the player (DIPL-209). */
+export function libraryEvents(world: World, news: News[]): void {
+  const d = world.diplomacy;
   for (const e of d.events) {
     if (e.type === "SubjectByAgreementAgreed") {
       const o = world.nationIndex.get(String(e.overlord));
@@ -276,15 +287,66 @@ export function monthlyStatecraft(world: World, news: News[]): void {
       if (o !== undefined && s !== undefined) subjectByAgreement(world, o, s, asked, news);
       continue;
     }
+    if (e.type === "AskAwaitingAnswer") {
+      const asker = world.nationIndex.get(String(e.asker));
+      if (asker !== undefined && world.player >= 0) news.push({ kind: "envoy", text: `${world.rules.nations[asker]!.name}'s envoy ${ASK_TEXT[String(e.action)] ?? "asks something of you"}.`, nations: [world.player, asker] });
+      continue;
+    }
     if (e.type !== "DemandGivenIn") continue;
     const asker = world.nationIndex.get(String(e.asker));
     const asked = world.nationIndex.get(String(e.asked));
     if (asker !== undefined && asked !== undefined) demandGivenIn(world, asker, asked, String(e.kind), e.province === undefined ? undefined : String(e.province), news);
   }
   d.events.length = 0;
-  seasonalSubjects(world, news);
-  aiOverlords(world, news);
-  aiEnvoys(world);
+}
+
+/** What an envoy at the player's court asks, in the alert's words. */
+const ASK_TEXT: Record<string, string> = {
+  propose_alliance: "proposes an alliance",
+  arrange_marriage: "proposes a royal marriage",
+  demand: "comes with a demand",
+  offer_overlordship: "offers you protection as their tributary",
+  ask_protection: "asks for your protection",
+};
+
+/** What a yes to an ask at the player's court brings, for the news. */
+const ASK_DONE: Record<string, string> = {
+  propose_alliance: "you are allies",
+  arrange_marriage: "your houses are married",
+  offer_overlordship: "you become their tributary",
+  ask_protection: "they become your subject",
+};
+
+/** Why the player can't answer this ask now, or null. */
+function whyNotAnswer(world: World, n: number, p: dip.PendingAsk): string | null {
+  const me = world.nationIds[n];
+  if (!me || p.ask.asked !== me) return "that ask is not yours to answer";
+  if (rel.has(world.diplomacy.graph, "at_war", p.ask.asker, me)) return "you are at war with them now";
+  return null;
+}
+
+/** The player gives in to, agrees to or refuses an ask at their court (AnswerAsk, DIPL-210). */
+export function answerAsk(world: World, n: number, id: string, yes: boolean, news: News[]): string | null {
+  const d = world.diplomacy;
+  const p = (d.asks ?? []).find((x) => x.id === id);
+  if (!p) return "that ask has lapsed";
+  const why = whyNotAnswer(world, n, p);
+  if (why) {
+    if (why !== "that ask is not yours to answer") d.asks = d.asks!.filter((x) => x !== p);
+    return why;
+  }
+  syncCountries(world);
+  try {
+    dip.answerAsk(d, id, yes);
+  } catch (e) {
+    return e instanceof Error ? e.message : String(e);
+  }
+  const asker = world.nationIndex.get(p.ask.asker)!;
+  const name = world.rules.nations[asker]!.name;
+  const what = p.ask.action === "demand" ? (yes ? `You give in to ${name}'s demand.` : `You refuse ${name}'s demand.`) : yes ? `You agree to ${name}'s ask: ${ASK_DONE[p.ask.action] ?? "it is done"}.` : `You turn down ${name}'s envoy.`;
+  news.push({ kind: "envoy", text: what, nations: [n, asker] });
+  libraryEvents(world, news);
+  return null;
 }
 
 /** Realms next to each realm, from the map; worked out again when owners change. */
@@ -384,6 +446,18 @@ export interface StatecraftView {
   realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView }>;
   /** The player's subjects and its own overlord (SUBJ-091, SUBJ-102). */
   subjects: SubjectsView | null;
+  /** Envoys waiting at the player's court for an answer, oldest first (DIPL-209): what they ask, and the month it stands until. */
+  asks: AskView[];
+}
+
+/** An ask waiting on the player: the asker, the mission, a demand's kind and province, and the last month to answer. */
+export interface AskView {
+  id: string;
+  from: number;
+  action: string;
+  kind?: string;
+  province?: { province: number; name: string; capital: boolean };
+  until: string;
 }
 
 /** The demands the player can make of a realm: why none can (null when some can), tribute or why not, and the border provinces. */
@@ -422,5 +496,18 @@ export function statecraftView(world: World, player: number): StatecraftView | n
     };
   }
   const subjects = subjectsView(world, player, (n) => world.nationLedger[n * LEDGER_LINES + LEDGER.indexOf("tribute")]!);
-  return { seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects };
+  const asks: AskView[] = (d.asks ?? [])
+    .filter((p) => p.ask.asked === me && world.nationIndex.has(p.ask.asker))
+    .map((p) => {
+      const prov = p.ask.province === undefined ? undefined : world.provinceIndex.get(p.ask.province);
+      return {
+        id: p.id,
+        from: world.nationIndex.get(p.ask.asker)!,
+        action: p.ask.action,
+        ...(p.ask.demandKind ? { kind: p.ask.demandKind } : {}),
+        ...(prov !== undefined ? { province: { province: prov, name: world.rules.provinces[prov]!.name, capital: world.rules.nations[player]!.capital === p.ask.province } } : {}),
+        until: p.until,
+      };
+    });
+  return { seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects, asks };
 }

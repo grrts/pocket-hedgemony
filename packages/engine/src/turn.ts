@@ -4,7 +4,7 @@ import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.t
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
-import { breakAlliance, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
+import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
 import { subjectAction } from "./subjects.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
@@ -112,6 +112,8 @@ export type Order =
   | { type: "sendEnvoy"; target: number; action: string }
   | { type: "breakAlliance"; target: number }
   | { type: "makeDemand"; target: number; kind: string; province?: number }
+  /** Agree to, give in to or refuse an envoy's ask at the player's court (its id in the snapshot's statecraft asks, DIPL-210). */
+  | { type: "answerAsk"; ask: string; yes: boolean }
   /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
   | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release"; level?: string }
   | { type: "stopChange"; province: number }
@@ -201,6 +203,8 @@ function startDay(world: World, news: News[]): void {
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
     aiDeclarations(world, news);
+    // A demand made before war may reach the player's court this month (DIPL-211).
+    libraryEvents(world, news);
     aiRaise(world, news);
   }
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
@@ -323,6 +327,11 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "makeDemand":
       syncCountries(world);
       return makeDemand(world, actingNation, order.target, order.kind, order.province ?? -1);
+    case "answerAsk": {
+      const reason = answerAsk(world, actingNation, order.ask, order.yes, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
     case "subjectAction": {
       const reason = subjectAction(world, actingNation, order.subject, order.action, news, order.level);
       if (!reason) runLedger(world, false);

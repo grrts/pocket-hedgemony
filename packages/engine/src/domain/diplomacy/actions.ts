@@ -192,6 +192,9 @@ export function lettersReceived(d: Diplomacy, c: string): Letter[] {
   return d.letters.filter((l) => l.to === c && l.deliverOn <= monthOf(d.date));
 }
 
+/** Asks a country the player runs answers itself, not by the count (DIPL-209). */
+export const PLAYER_ANSWERS = ["propose_alliance", "arrange_marriage", "demand", "offer_overlordship", "ask_protection"];
+
 const NO_COUNT = ["send_gift", "courtesy_visit", "make_resident", "court_lord", "fund_rebels", "peace_offer"];
 
 /** Decides a mission on arrival; the answer is a letter a month after (DIPL-059, DIPL-081, DIPL-082). */
@@ -209,11 +212,36 @@ export function decideMission(d: Diplomacy, e: Envoy, rng?: Rng): Count | undefi
     letter(d, { to: e.country, from: e.target, action: e.action, answer: "done", reasons: [] });
     return undefined;
   }
+  if (!country(d, ask.asked).ai && PLAYER_ANSWERS.includes(e.action)) {
+    // The player answers; the envoy waits at court until he leaves (DIPL-209).
+    const now = monthOf(d.date);
+    d.seq++;
+    (d.asks ??= []).push({ id: `ask${d.seq}`, envoy: e.id, ask, arrived: now, until: e.leaveCourt ? monthOf(e.leaveCourt) : addMonths(now, C.envoys.months_at_court) });
+    emit(d, "AskAwaitingAnswer", { asker: ask.asker, asked: ask.asked, action: ask.action });
+    return undefined;
+  }
   const count = countAsk(d, ask, (a, b) => routeDays(envoyRoute(d, a, b).legs));
   emit(d, "AnswerGiven", { asker: ask.asker, asked: ask.asked, action: ask.action, total: count.total, yes: count.yes });
   letter(d, { to: e.country, from: e.target, action: e.action, answer: count.yes ? "yes" : "no", reasons: count.reasons, total: count.total });
   applyAnswer(d, ask, count.yes, rng, e);
   return count;
+}
+
+/** The player's own answer to an ask at their court (DIPL-210): what a counted yes or no does, and a letter to the asker. */
+export function answerAsk(d: Diplomacy, id: string, yes: boolean, rng?: Rng): void {
+  const p = (d.asks ?? []).find((x) => x.id === id);
+  if (!p) throw new RuleError("that ask has lapsed");
+  d.asks = d.asks!.filter((x) => x !== p);
+  const e = d.envoys.find((x) => x.id === p.envoy);
+  emit(d, "AnswerGiven", { asker: p.ask.asker, asked: p.ask.asked, action: p.ask.action, yes });
+  letter(d, { to: p.ask.asker, from: p.ask.asked, action: p.ask.action, answer: yes ? "yes" : "no", reasons: [] });
+  applyAnswer(d, p.ask, yes, rng, e);
+}
+
+/** Asks the player left unanswered until the envoy leaves count as refused (DIPL-209). */
+function lapseAsks(d: Diplomacy): void {
+  const now = monthOf(d.date);
+  for (const p of [...(d.asks ?? [])]) if (p.until <= now) answerAsk(d, p.id, false);
 }
 
 /** What a yes or a no does (section 6). */
@@ -1109,6 +1137,7 @@ export function eventEffect(d: Diplomacy, effect: string, roles: { holder?: stri
 export function advanceMonth(d: Diplomacy, rng?: Rng): void {
   d.date = addMonths(d.date, 1);
   d.graph.date = d.date;
+  lapseAsks(d);
   moveEnvoys(d);
   for (const c of Object.keys(d.countries)) enforceSeats(d, c);
   fundingMonth(d, rng);
@@ -1121,6 +1150,7 @@ export function advanceMonth(d: Diplomacy, rng?: Rng): void {
 
 /** The month's envoys and ledgers for a game that keeps the date itself: arrivals, answers, homecomings and fading entries. */
 export function envoysAndLedgers(d: Diplomacy): void {
+  lapseAsks(d);
   moveEnvoys(d);
   for (const c of Object.keys(d.countries)) enforceSeats(d, c);
   fadeLedgers(d);

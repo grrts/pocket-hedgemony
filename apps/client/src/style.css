@@ -617,6 +617,11 @@ button.icon-only {
   flex-wrap: wrap;
 }
 
+/* What agreeing and refusing an envoy's ask do (DIPL-212): plain sentences, not figures. */
+.ask-terms dd {
+  font-weight: 400;
+}
+
 .hint {
   color: var(--ink-soft);
   font-size: 20px;
