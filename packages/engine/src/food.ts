@@ -111,6 +111,17 @@ function regionOf(world: World, p: number): number {
   return Math.floor((lat + 90) / 10) * 64 + Math.min(63, Math.max(0, Math.floor(((def.x ?? 0) / width) * 36)));
 }
 
+/** One dispatch per realm for the harvests that failed this harvest month, naming them (REALM-220). */
+export function reportFailedHarvests(world: World, failed: readonly number[], news: News[]): void {
+  const byOwner = new Map<number, number[]>();
+  for (const p of failed) byOwner.set(world.provinceOwner[p]!, [...(byOwner.get(world.provinceOwner[p]!) ?? []), p]);
+  for (const [owner, ps] of byOwner) {
+    const names = ps.slice(0, 3).map((p) => world.rules.provinces[p]!.name);
+    const list = names.length > 1 && ps.length <= 3 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names.join(", ");
+    news.push({ kind: "famine", text: `The harvest failed in ${list}${ps.length > 3 ? ` and ${ps.length - 3} more` : ""}`, nations: [owner], province: ps[0]! });
+  }
+}
+
 /**
  * The monthly food step: harvests where this is the harvest month, the
  * month's catch and herds, eating, seasonal rot, then famine and relief.
@@ -153,13 +164,7 @@ export function monthlyFood(world: World, news: News[]): void {
     // Farms raise the harvest (works). Two harvests a year bring half the year's food each.
     store[p] = store[p]! + worksFood(world, p, "farmers") * harvestMultiplier(HARVESTS[roll]!) * (12 / months.length) * steward;
   }
-  // One dispatch per realm for its failed harvests.
-  const byOwner = new Map<number, number[]>();
-  for (const p of failed) byOwner.set(world.provinceOwner[p]!, [...(byOwner.get(world.provinceOwner[p]!) ?? []), p]);
-  for (const [owner, ps] of byOwner) {
-    const names = ps.slice(0, 3).map((p) => world.rules.provinces[p]!.name).join(", ");
-    news.push({ kind: "famine", text: `The harvest failed in ${names}${ps.length > 3 ? ` and ${ps.length - 3} more` : ""}`, nations: [owner], province: ps[0]! });
-  }
+  reportFailedHarvests(world, failed, news);
 
   const season = month % 3 === 0;
   for (let p = 0; p < P; p++) {

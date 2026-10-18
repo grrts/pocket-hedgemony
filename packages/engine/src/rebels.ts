@@ -1,4 +1,5 @@
 import type { World } from "./world.ts";
+import { beliefRevoltFactor } from "./belief.ts";
 import * as rb from "./domain/rebellions/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { battleArmy, battleRow, cedeProvince, nearest, SIEGE_MONTH_DAYS, wallsOf, type News } from "./war.ts";
@@ -143,6 +144,14 @@ function neighbours(world: World, p: number): number[] {
   return Array.from(world.adjList.subarray(world.adjStart[p]!, world.adjStart[p + 1]!));
 }
 
+/** A plotting province's monthly chance to rise, by its heaviest cause: faith and separatist risings come more often in a realm of low faith or tongue (REALM-238). */
+export function risingChanceIn(world: World, p: number): number {
+  const chance = risingChance(world, p);
+  if (chance <= 0) return chance;
+  const found = rb.heaviestCause(weighted(world, p));
+  return found ? Math.min(1, chance * beliefRevoltFactor(world, world.provinceOwner[p]!, found.cause)) : chance;
+}
+
 // ---------------------------------------------------------------- sparks
 
 /** A spark happened in province p (REBL-010): a rioting province rises from it at the next monthly step. */
@@ -273,7 +282,7 @@ export function monthlyRebels(world: World, news: News[]): void {
   // 3. Plotting provinces roll (REBL-005); a granted demand emboldens the realm's others (D-REBL-6).
   for (let p = 0; p < world.provinceCount; p++) {
     if (!world.provinceGrievances[p] || world.provinceRebels[p]) continue;
-    let chance = risingChance(world, p);
+    let chance = risingChanceIn(world, p);
     if (chance <= 0) continue;
     const owner = world.provinceOwner[p]!;
     if (owner < 0) continue;
@@ -841,7 +850,7 @@ export interface RisingView {
   monthsToWin: number;
   /** Neighbours of its land with 3 or more grievances: where it may spread next month. */
   spreadTo: number[];
-  siege: { province: number; months: number; progress: number; garrison: number } | null;
+  siege: { province: number; days: number; months: number; progress: number; breaches: number; garrison: number; foodMonths: number | null } | null;
   /** The answers with their gold and why each can't be given now (null = it can); only for the player's risings. */
   answers: { answer: Answer; label: string; gold: number; note: string; why: string | null }[];
 }
@@ -859,7 +868,7 @@ const LABEL: Record<Answer, string> = { grant: "Grant demand", talk: "Talk", bri
 export function rebelsView(world: World): RebelsView {
   const me = world.player;
   const chance = new Float32Array(world.provinceCount);
-  if (me >= 0) for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === me && world.provinceGrievances[p] && !world.provinceRebels[p]) chance[p] = risingChance(world, p);
+  if (me >= 0) for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === me && world.provinceGrievances[p] && !world.provinceRebels[p]) chance[p] = risingChanceIn(world, p);
   return {
     risings: world.bands.map((b) => {
       const r = asRising(world, b);
@@ -891,7 +900,7 @@ export function rebelsView(world: World): RebelsView {
         monthsHeld: b.monthsHeld,
         monthsToWin: C.win_hold_months,
         spreadTo: [...spread],
-        siege: b.siege ? { province: b.siege.province, months: b.siege.siege.months, progress: (b.siege.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, garrison: b.siege.siege.garrison } : null,
+        siege: b.siege ? { province: b.siege.province, days: b.siege.days, months: b.siege.siege.months, progress: (b.siege.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: b.siege.siege.breaches, garrison: b.siege.siege.garrison, foodMonths: Number.isFinite(wf.foodMonths(b.siege.siege)) ? wf.foodMonths(b.siege.siege) : null } : null,
         answers: costs ? (Object.keys(costs) as Answer[]).map((k) => ({ answer: k, label: LABEL[k], gold: costs[k].gold, note: costs[k].note, why: costs[k].why })) : [],
       };
     }),

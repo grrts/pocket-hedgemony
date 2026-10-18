@@ -343,6 +343,12 @@ export function orderShape(order: Order): string {
       return "seize a fief";
     case "swapOfficials":
       return "move an official to another province";
+    case "hireOfficial":
+      return "hire an official";
+    case "settleLand":
+      return "keep new land as royal land";
+    case "answerRevolution":
+      return "answer the revolution";
     case "setStudy":
       return "choose what to study";
     case "setSeats":
@@ -387,12 +393,24 @@ export function orderShape(order: Order): string {
       return "fill the food policy from a preset";
     case "reform":
       return "reform the government";
+    case "foundTrader":
+      return "found a trader";
+    case "setTradeRoute":
+      return "set a trader's route";
+    case "draftTradeRoute":
+      return "draw a trader's route";
+    case "dismissTrader":
+      return "dismiss a trader";
+    case "answerRevolution":
+      return "answer a revolution";
     case "answerRebels":
       return "answer a rising";
+    case "answerRevolution":
+      return "answer the revolution";
     case "treatRebels":
       return "judge beaten rebels";
     case "answerRevolution":
-      return "answer the revolution";
+      return "answer a revolution";
     case "navy":
       return `navy: ${order.do}`;
     case "explore":
@@ -401,6 +419,14 @@ export function orderShape(order: Order): string {
       return "set the Tongue policy";
     case "faithPolicy":
       return "set a Faith policy";
+    case "conclaveGold":
+      return "send gold to the conclave";
+    case "claimCaliphate":
+      return "claim the caliphate";
+    case "raiseOwnPatriarch":
+      return "raise our own patriarch";
+    case "answerRevolution":
+      return "answer the revolution";
   }
 }
 

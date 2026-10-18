@@ -193,3 +193,13 @@ export function monthlyLords(world: World, atPeace: (n: number) => boolean, news
     if (world.nationTreasury[l.nation]! >= giftGold(world) * 2) giveGift(world, l.nation, k);
   });
 }
+
+/**
+ * The crown pays for a building in a lord's province (PROV-206): the building
+ * is his, and he takes it as a gift, a step more loyal, unless he is in revolt.
+ */
+export function lordGetsBuilding(world: World, p: number, news: News[]): void {
+  const lord = world.provinceLord[p]!;
+  if (lord < 0 || world.lords[lord]!.loyalty === "In revolt") return;
+  loyaltyStep(world, lord, "gift_of_gold", news);
+}

@@ -8,3 +8,4 @@
   4. How it looks and works on a phone in landscape: Wide and Tall layouts, safe areas, 44-point tap targets, nothing that needs hover.
   If an answer makes for a poor experience, change the design first.
 - Run `pnpm --filter @ph/specs test` after changing `domain/`, and `pnpm --filter @ph/specs context-map` to refresh the generated files.
+- Balance runs (`packages/sim`, `docs/balance-runs.md`) play whole campaigns without a player; start one only when Leroy asks.

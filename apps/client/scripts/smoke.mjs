@@ -11,11 +11,11 @@ const base = "http://localhost:4173/";
 const browser = await chromium.launch({ args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 let failed = false;
 
-async function check(name, expectedMode, setup) {
+async function check(name, expectedMode, setup, path = "") {
   const context = await browser.newContext({ ...devices["Pixel 7 landscape"] });
   const page = await context.newPage();
   await setup?.(page);
-  await page.goto(base);
+  await page.goto(base + path);
   const d = await page.waitForFunction(
     () => {
       const d = globalThis.__phDiagnostics;
@@ -24,6 +24,8 @@ async function check(name, expectedMode, setup) {
     null,
     { timeout: 15000 },
   ).then((h) => h.jsonValue());
+  // Through the start screen when asked: Play with no campaign goes to the realms.
+  if (path.includes("start")) await page.click(".start-play");
   // Play one turn through the real UI too.
   await page.click("[data-nation=france]");
   await page.click(".end-turn");
@@ -36,6 +38,7 @@ async function check(name, expectedMode, setup) {
 
 try {
   await check("module worker", "worker");
+  await check("start screen", "worker", undefined, "?start");
   await check("worker blocked", "main-thread", (page) =>
     page.route("**/engine.worker-*.js", (route) => route.fulfill({ status: 404 })),
   );

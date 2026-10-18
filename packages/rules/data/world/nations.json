@@ -70,7 +70,7 @@
     "commanders": [
       {
         "id": "burgundy_1",
-        "name": "Charles the Bold",
+        "name": "Charles le Téméraire",
         "might": 4,
         "cunning": 2,
         "logistics": 2
@@ -661,7 +661,7 @@
     "commanders": [
       {
         "id": "hungary_1",
-        "name": "John Hunyadi",
+        "name": "Hunyadi János",
         "might": 4,
         "cunning": 4,
         "logistics": 3
@@ -739,7 +739,7 @@
     "commanders": [
       {
         "id": "albania_1",
-        "name": "Skanderbeg",
+        "name": "Gjergj Kastrioti",
         "might": 5,
         "cunning": 4,
         "logistics": 2
@@ -770,7 +770,7 @@
     "commanders": [
       {
         "id": "byzantium_1",
-        "name": "Constantine XI",
+        "name": "Konstantinos Palaiologos",
         "might": 3,
         "cunning": 2,
         "logistics": 3
@@ -954,7 +954,7 @@
     "commanders": [
       {
         "id": "muscovy_1",
-        "name": "Vasily II",
+        "name": "Vasily Vasilyevich",
         "might": 2,
         "cunning": 2,
         "logistics": 2
@@ -1108,7 +1108,7 @@
     "commanders": [
       {
         "id": "mamluks_1",
-        "name": "Sultan Jaqmaq",
+        "name": "Jaqmaq al-Zahiri",
         "might": 3,
         "cunning": 2,
         "logistics": 3
@@ -1169,7 +1169,7 @@
     "commanders": [
       {
         "id": "timurids_1",
-        "name": "Shah Rukh",
+        "name": "Shahrukh Mirza",
         "might": 2,
         "cunning": 3,
         "logistics": 3
@@ -1932,7 +1932,7 @@
     "commanders": [
       {
         "id": "aztecs_1",
-        "name": "Moctezuma I",
+        "name": "Motecuhzoma Ilhuicamina",
         "might": 4,
         "cunning": 2,
         "logistics": 2
@@ -1993,7 +1993,7 @@
     "commanders": [
       {
         "id": "inca_1",
-        "name": "Pachacuti",
+        "name": "Pachakutiq Inka Yupanki",
         "might": 4,
         "cunning": 4,
         "logistics": 3

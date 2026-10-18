@@ -334,6 +334,54 @@ export function moveOfficial(from: Province, to: Province): Official | null {
   return to.official;
 }
 
+/** Why the crown can't move or commission the official of a province, or null: a lord's official serves him (PROV-303, PROV-202). */
+export function servesTheLord(p: Province): string | null {
+  return p.lord !== null || (p.official !== null && p.official.employer !== "ruler") ? "he serves the lord, not the crown" : null;
+}
+
+/**
+ * Moves the official of `from` to `to` (PROV-303): the two swap posts, or he
+ * takes the empty post and leaves his own empty. Whoever moves keeps his name
+ * and type and starts again at half (PROV-192). Returns why not, or null.
+ */
+export function moveOrSwapOfficial(from: Province, to: Province): string | null {
+  const why = servesTheLord(from) ?? servesTheLord(to);
+  if (why) return why;
+  if (!from.official) return "the post stands empty";
+  const there = to.official;
+  to.official = { ...from.official, yearsServed: 0 };
+  from.official = there ? { ...there, yearsServed: 0 } : null;
+  refreshGovernance(from);
+  refreshGovernance(to);
+  return null;
+}
+
+/** Gold up front to hire an official: a foreign specialist costs more (PROV-333, PROV-334). */
+export function hirePrice(foreign: boolean, cfg: ProvinceConfig = provinceConfig): number {
+  return cfg.officials.hire.gold * (foreign ? cfg.officials.hire.foreign_multiplier : 1);
+}
+
+/**
+ * Why an official of `type` can't be hired into province p's post, or null
+ * (PROV-333 to 335): the post must be an empty royal one, and a native hire
+ * needs the type serving in another royal post of the realm (`serving`).
+ */
+export function cannotHire(p: Province, type: string, foreign: boolean, serving: readonly string[], gold: number, cfg: ProvinceConfig = provinceConfig): string | null {
+  if (!(cfg.officials.types as string[]).includes(type) || type === "colonial governor") return "no such type";
+  if (p.lord !== null) return "he serves the lord, not the crown";
+  if (p.official) return "the post is filled";
+  if (!foreign && !serving.includes(type)) return "no one at home knows the trade";
+  if (gold < hirePrice(foreign, cfg)) return "not enough gold";
+  return null;
+}
+
+/** Hires an official into province p's empty post (PROV-333): he starts at half. Returns the gold paid. */
+export function hireIntoPost(p: Province, o: Official, foreign: boolean, cfg: ProvinceConfig = provinceConfig): number {
+  p.official = { ...o, yearsServed: 0 };
+  refreshGovernance(p);
+  return hirePrice(foreign, cfg);
+}
+
 /** A colonial governor holding a governor slot does not count against the officials cap (PROV-193). */
 export function countsAgainstCap(o: Official, holdsGovernorSlot: boolean): boolean {
   return !(o.type === "colonial governor" && holdsGovernorSlot);

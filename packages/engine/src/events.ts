@@ -7,6 +7,8 @@ import { stabilityOf } from "./stability.ts";
 import { cedeProvince, controller, type News } from "./war.ts";
 import type { World } from "./world.ts";
 import { noteChoice } from "./achievements.ts";
+import { traitLean } from "./rulers.ts";
+import { headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
 
 /**
  * Milestone 6, history (first slice): the 1444 event tree fires in the game.
@@ -65,6 +67,7 @@ export function createGameEvents(world: World): GameEvents {
   for (const id of treeId) evt.country(tree, id).stats = { ...bridge.start.country };
   const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods });
   state.conditions = {};
+  leanByTraits(world, state, nationOf);
   evt.startCampaign(state, world.date.year);
   const knownAtStart = world.nationIds.map((_, n) => world.research[n]?.known.size ?? 0);
   const g: GameEvents = { state, rng: new Rng(world.weatherSeed ^ 0x5eed), treeId, nationOf, places, eventRelations: [], adjust: {}, stability: new Map(), knownAtStart };
@@ -72,6 +75,8 @@ export function createGameEvents(world: World): GameEvents {
   // Opinion is the standing one court holds of another (D-EVT-4, diplomacy's ledger), read only when asked.
   state.conditions.opinion = (p, _w, ctx) =>
     evt.resolve(p.who, ctx).some((a) => evt.resolve(p.other, ctx).some((b) => evt.compare(opinionOf(world, g, a, b), String(p.op), Number(p.value))));
+  // Whether a realm is a head's patron (RELG-154).
+  state.conditions.faith_head_patron = (p, _w, ctx) => evt.resolve(p.who, ctx).some((id) => isHeadPatron(world, String(p.head), g.nationOf.get(id) ?? -1));
   sync(world, g);
   evt.yearlyAgeCheck(state, world.date.year);
   evt.periodCheck(state, world.date.year);
@@ -80,6 +85,14 @@ export function createGameEvents(world: World): GameEvents {
   for (const ev of Object.values(state.events)) evt.eligible(state, ev);
   state.bound = bound;
   return g;
+}
+
+/** The chooser's ruler's traits lean the AI's pick (REALM-104). */
+function leanByTraits(world: World, state: evt.EventState, nationOf: Map<string, number>): void {
+  state.lean = (chooser, o) => {
+    const n = nationOf.get(chooser);
+    return n === undefined ? 1 : traitLean(world, n, o.effects);
+  };
 }
 
 /** A tree statistic, with legitimacy and stability read from the realm (D-EVT-4, D-EVT-17). */
@@ -251,6 +264,8 @@ function land(world: World, g: GameEvents, log: evt.DomainEvent[], news: News[])
       const chooser = evt.controllerOf(ev, roles);
       const who = chooser ? nameOf(world, g, chooser) : "Fortune";
       noteChoice(world, chooser ? g.nationOf.get(chooser) : undefined, ev, String(e.option));
+      // Altan Khan's chooser is the first Dalai Lama's patron (RELG-154).
+      if (chooser) headEventChosen(world, ev.id, g.nationOf.get(chooser) ?? -1, news);
       news.push({ kind: "event", text: `${eventTitle(ev.id)}: ${who} chooses “${optionName(ev.id, String(e.option))}”.`, nations, ...(ev.importance === "major" ? { major: true as const } : {}) });
     } else if (e.type === "EffectApplied") landEffect(world, g, e, news);
   }
@@ -261,6 +276,11 @@ function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[
   const target = e.target as string | undefined;
   const n = target === undefined ? undefined : g.nationOf.get(target);
   switch (e.effect) {
+    case "faith_head_patron": {
+      const who = g.nationOf.get(String(v.who ?? target));
+      if (who !== undefined) setHeadPatron(world, String(v.head), who);
+      return;
+    }
     case "transfer": {
       const p = world.provinceIndex.get(String(target).replace(/^g:/, ""));
       const to = g.nationOf.get(String(v.to));
@@ -430,7 +450,7 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
 // ---------------------------------------------------------------- saves
 
 /** What a save keeps of the event tree: its world and clock, the dice and the bridge's own records (not the data). */
-export type SavedEvents = Omit<evt.EventState, "rules" | "events" | "ages" | "periods" | "log" | "conditions" | "effects" | "mayRefire"> & {
+export type SavedEvents = Omit<evt.EventState, "rules" | "events" | "ages" | "periods" | "log" | "conditions" | "effects" | "mayRefire" | "lean"> & {
   rng: number[];
   eventRelations: GameEvents["eventRelations"];
   /** The game's own adjustments ("adjust" would read as map adjacency to the save checks). */
@@ -440,7 +460,7 @@ export type SavedEvents = Omit<evt.EventState, "rules" | "events" | "ages" | "pe
 export function saveEvents(world: World): SavedEvents | undefined {
   const g = world.events;
   if (!g) return undefined;
-  const { rules: _r, events: _e, ages: _a, periods: _p, log: _l, conditions: _c, effects: _f, mayRefire: _m, ...kept } = g.state;
+  const { rules: _r, events: _e, ages: _a, periods: _p, log: _l, conditions: _c, effects: _f, mayRefire: _m, lean: _n, ...kept } = g.state;
   return { ...kept, rng: [...g.rng.state], eventRelations: g.eventRelations, shifts: g.adjust };
 }
 
