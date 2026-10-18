@@ -29,7 +29,7 @@ import {
   type ExplorationView,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
-import { askCard, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
+import { askCard, myHouse, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
 import { rebelsUi, risingCard, risingsLine, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { loadDefaultRuleset } from "@ph/rules";
@@ -1850,7 +1850,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown",
 };
 
 /**
@@ -1898,6 +1898,8 @@ function logNews(s: Snapshot): void {
   for (const x of news) if (x.kind === "invention" && x.nations.includes(me)) alertPlayer(x.text, "scroll", x.province === undefined ? { tab: "learning" } : { province: x.province });
   // A seal cracks, an ambition is settled, a heyday wakes or a choice waits: one quiet line that opens the Heritage tab (HER-071).
   for (const x of news) if (x.kind === "heritage" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "heritage" });
+  // A crown inherited, a claim gained or lapsed, crowns merged: one line that opens the Diplomacy tab, where Your house lists them (SUBJ-130).
+  for (const x of news) if (x.kind === "crown" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "diplomacy" });
   askForStudy(s, news.some((x) => x.kind === "invention" && /Learned/.test(x.text)));
   for (const c of s.calls) {
     if (alerted.has(`call ${c.id}`)) continue;
@@ -1980,7 +1982,7 @@ const ALERTS_SHOWN = 3;
 const ALERT_MS = 12000;
 
 /** A short alert over the map, with Go there (to a province) or Answer (opens the dispatches). */
-function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true; tab?: "learning" | "heritage" } = {}): void {
+function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true; tab?: "learning" | "heritage" | "diplomacy" } = {}): void {
   if ([...alerts.children].some((el) => el.querySelector("span")?.textContent === text)) return;
   const el = document.createElement("div");
   el.className = "alert framed";
@@ -3516,6 +3518,7 @@ function myDiplomacySection(): string {
       .join("") : `<p class="hint">At peace with the world.</p>`}
     <p class="hint">Open a realm to send it an envoy, declare war on it or offer it peace.</p>
     ${mySubjects(s.statecraft, (n) => realmButton(n, "diplomacy"))}
+    ${myHouse(s.statecraft, (n) => realmButton(n, "diplomacy"))}
     ${myStatecraft(s.statecraft, (n) => realmButton(n, "diplomacy"))}
     ${ties.length ? `<h3 class="sub">Ties</h3>${ties
       .map((x) => `<p>${realmButton(x.nation, "diplomacy")} <small>${STATE[x.state]}${x.until ? ` until ${monthText(x.until)}` : ""}</small></p>`)
@@ -3822,7 +3825,7 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
   panel.querySelector<HTMLButtonElement>("[data-rise]")?.addEventListener("click", () => void act({ type: "riseUp" }));
   panel.querySelectorAll<HTMLButtonElement>("[data-subject-act]").forEach((b) =>
-    b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
+    b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in" | "merge", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
   );
   panel.querySelector<HTMLButtonElement>("[data-break-alliance]")?.addEventListener("click", () => void act({ type: "breakAlliance", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-demand]").forEach((b) =>

@@ -411,5 +411,11 @@
   "reach_multiplier": 3,
   "reach_per_own_subject": 1,
   "overlord_can_act_on_sub_subjects": false
+ },
+ "crowns": {
+  "$comment": "Personal unions in the game (SUBJ-126, SUBJ-127, D-SUBJ-30): a yearly roll stands in for a ruler dying without an heir until rulers age.",
+  "heirless_per_year": 0.02,
+  "no_heir_share": 0.25,
+  "claim_years": 20
  }
 }

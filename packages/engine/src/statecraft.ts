@@ -2,6 +2,7 @@ import type { World } from "./world.ts";
 import { cedeProvince, type News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
+import { houseView, yearlyCrowns, type HouseView } from "./crowns.ts";
 import { aiMayTakeSubject, aiOverlordEnvoys, aiOverlords, aiRisings, monthlySubjectEnvoys, makeSubject, seasonalSubjects, subjectByAgreement, subjectsView, type SubjectsView } from "./subjects.ts";
 
 /**
@@ -273,6 +274,7 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   aiRisings(world, news);
   aiOverlords(world, news);
   aiOverlordEnvoys(world, news);
+  yearlyCrowns(world, news);
   aiEnvoys(world);
   // An AI envoy to a near court arrives this month: the player hears of the ask at once.
   libraryEvents(world, news);
@@ -449,6 +451,8 @@ export interface StatecraftView {
   realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView }>;
   /** The player's subjects and its own overlord (SUBJ-091, SUBJ-102). */
   subjects: SubjectsView | null;
+  /** The houses married into the player's and its claims to other thrones (SUBJ-130). */
+  house: HouseView | null;
   /** Envoys waiting at the player's court for an answer, oldest first (DIPL-211): what they ask, and the month it stands until. */
   asks: AskView[];
 }
@@ -512,5 +516,5 @@ export function statecraftView(world: World, player: number): StatecraftView | n
         until: p.until,
       };
     });
-  return { seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects, asks };
+  return { seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects, house: houseView(world, player), asks };
 }
