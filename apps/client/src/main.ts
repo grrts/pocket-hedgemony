@@ -1624,7 +1624,14 @@ function onTap(sx: number, sy: number, province: number): void {
     // With armies chosen, another one joins them (or leaves, tapped again); else it is the one chosen.
     if (selected.size && !selected.has(hit.id)) selected.add(hit.id);
     else if (selected.size > 1) selected.delete(hit.id);
-    else return sound.sfx("army_select"), pickArmy(hit.id);
+    else if (selected.has(hit.id) && marching(armySlot(hit.id))) {
+      // The chosen army tapped again while it marches: it halts where it stands (feedback 128).
+      sound.sfx("army_order_move");
+      selected.clear();
+      selectionChanged();
+      void haltArmy(hit.id);
+      return;
+    } else return sound.sfx("army_select"), pickArmy(hit.id);
     selectionChanged();
     return;
   } else if (selected.size && snapshot && province >= 0 && !isWater[province]) {
@@ -1839,7 +1846,8 @@ function renderArmyList(): void {
       })
       .join("") : `<p class="hint">No commander leads an army yet.</p>`}
     <p class="hint">${selected.size ? `${selected.size} chosen: tap the map to send ${selected.size > 1 ? "them all" : "it"} there.` : "Choose one or more, then tap the map."}</p>
-    ${selected.size ? `<button class="paper" data-pick-none>Clear the choice</button>` : ""}`;
+    ${selected.size ? `<button class="paper" data-pick-none>Clear the choice</button>` : ""}
+    ${[...selected].some((id) => marching(armySlot(id))) ? `<button class="paper" data-pick-halt>Halt ${selected.size > 1 ? "them" : "it"} where ${selected.size > 1 ? "they stand" : "it stands"}</button>` : ""}`;
   armyList.querySelectorAll<HTMLButtonElement>("[data-pick]").forEach((b) =>
     b.addEventListener("click", () => {
       const id = Number(b.dataset.pick);
@@ -1852,6 +1860,14 @@ function renderArmyList(): void {
   armyList.querySelector("[data-pick-none]")?.addEventListener("click", () => {
     selected.clear();
     selectionChanged();
+  });
+  armyList.querySelector("[data-pick-halt]")?.addEventListener("click", () => {
+    const armies = [...selected].filter((id) => marching(armySlot(id)));
+    selected.clear();
+    selectionChanged();
+    void (async () => {
+      for (const army of armies) await haltArmy(army);
+    })();
   });
 }
 
@@ -1892,6 +1908,18 @@ function marchLine(k: number): string {
   if (!route.length && !a.path[k]!.length) return "";
   const to = route.length ? route.at(-1)! : a.location[k]!;
   return ` · marching to ${esc(provinces[to]!.name)}${a.etaHours[k]! > 0 ? `, ${hoursText(a.etaHours[k]!)}` : ""}`;
+}
+
+/** Whether the army has a march under way. */
+function marching(k: number): boolean {
+  const a = snapshot!.armies;
+  return k >= 0 && a.battle[k]! < 0 && !a.retreating[k] && (a.route[k]!.length > 0 || a.path[k]!.length > 0);
+}
+
+/** Stops an army where it stands: an order to its own tile is a Halt (MOVE-115, feedback 128). */
+function haltArmy(id: number): Promise<void> {
+  const k = armySlot(id);
+  return act({ type: "move", army: id, to: snapshot!.armies.location[k]!, tile: snapshot!.armies.tile[k]! });
 }
 
 function armySlot(id: number): number {
@@ -3449,6 +3477,8 @@ function renderFleet(id: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-admiral]").forEach((b) => b.addEventListener("click", () => order({ do: "admiral", commander: Number(b.dataset.fleetAdmiral) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-board]").forEach((b) => b.addEventListener("click", () => order({ do: "board", army: Number(b.dataset.fleetBoard) })));
   panel.querySelector("[data-fleet-unload]")?.addEventListener("click", () => order({ do: "unload" }));
+  // Sailing to where it is stops the fleet there (feedback 128).
+  panel.querySelector("[data-fleet-stop]")?.addEventListener("click", () => order({ do: "sail", to: f.at }));
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-split]").forEach((b) => b.addEventListener("click", () => order({ do: "split", ship: Number(b.dataset.fleetSplit) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-merge]").forEach((b) => {
     const into = Number(b.dataset.fleetMerge);
@@ -3506,7 +3536,7 @@ function renderArmy(id: number): void {
     <div class="army">
       ${commanderPortrait(rules, c.name, me)}
       <span class="who"><b>${esc(c.name)}</b>${c.origin ? ` <small>(${esc(c.origin.toLowerCase())})</small>` : ""}<br><small>${skills(c)}</small><br><small>${c.victories} victor${c.victories === 1 ? "y" : "ies"}, ${c.defeats} defeat${c.defeats === 1 ? "" : "s"}</small></span>
-      <span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button></span>
+      <span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button>${marching(k) ? `<button class="paper" data-halt>Halt</button>` : ""}</span>
     </div>
     <dl class="facts">
       <dt>Where</dt><dd><button class="paper capital" data-go="${here}">${icon("map", 1)}${esc(provinces[here]!.name)}</button>${marchLine(k)}</dd>
@@ -3563,6 +3593,10 @@ function renderArmy(id: number): void {
   bindClose();
   showPanel(true);
   panel.querySelectorAll<HTMLButtonElement>("[data-army]").forEach((b) => b.addEventListener("click", () => pickArmy(Number(b.dataset.army))));
+  panel.querySelector("[data-halt]")?.addEventListener("click", () => {
+    selected.delete(id);
+    void haltArmy(id).then(() => renderPanel());
+  });
   panel.querySelector("[data-go]")?.addEventListener("click", () => {
     view.lookAt(provinces[here]!.x!, provinces[here]!.y!, Math.max(view.camera.zoom, 4));
   });
