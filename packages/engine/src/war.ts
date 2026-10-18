@@ -174,8 +174,7 @@ export function declareWar(world: World, a: number, b: number, news: News[], o: 
   const [x, y] = [world.nationIds[a]!, world.nationIds[b]!];
   const truce = rel.has(d.graph, "truce", x, y);
   if (truce && !o.breakTruce) return `a truce holds with ${name(world, b)}: break it to declare war`;
-  const held = dip.warAimsOf(d, x, y);
-  const aim = o.aim ? held.find((h) => h.aim === o.aim && (!o.province || h.province === o.province)) : (AIM_ORDER.map((k) => held.find((h) => h.aim === k)).find((h) => h) ?? held.find((h) => h.aim === "no_aim"));
+  const aim = o.aim ? dip.warAimsOf(d, x, y).find((h) => h.aim === o.aim && (!o.province || h.province === o.province)) : defaultAim(world, a, b);
   if (!aim) return `you hold no aim ${o.aim} against ${name(world, b)}`;
   let war: dip.War;
   try {
@@ -206,6 +205,12 @@ export function declareWar(world: World, a: number, b: number, news: News[], o: 
 
 /** Fitting aims a declaration picks when none is named, best first; a raid is only ever named (it ends by itself, WAR-186). */
 const AIM_ORDER = ["take_land", "seat_pretender", "break_subject", "free_people", "defend_faith", "punish", "tribute"];
+
+/** The aim a declaration of a on b takes when none is named: the best fitting aim a holds, else "no aim". */
+export function defaultAim(world: World, a: number, b: number): { aim: string; province?: string } | undefined {
+  const held = dip.warAimsOf(world.diplomacy, world.nationIds[a]!, world.nationIds[b]!);
+  return AIM_ORDER.map((k) => held.find((h) => h.aim === k)).find((h) => h) ?? held.find((h) => h.aim === "no_aim");
+}
 
 /** A regency may fight only some wars: an aim it may not use falls back to no aim. */
 function declareWithAim(d: dip.Diplomacy, x: string, y: string, aim: string): dip.War {

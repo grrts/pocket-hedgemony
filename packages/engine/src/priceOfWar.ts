@@ -1,5 +1,6 @@
 import type { World } from "./world.ts";
-import { relationState, strength } from "./war.ts";
+import { defaultAim, relationState, strength } from "./war.ts";
+import { censureOf } from "./faithHeads.ts";
 import { maxCeded, peaceShare } from "./peace.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
@@ -256,5 +257,7 @@ export function whyAiWontDeclare(world: World, n: number, t: number, price: Pric
   if (world.nationTreasury[n]! < chest) return "no war chest";
   if (wouldSayPeaceAtDeclaration(world, n)) return "its people want peace";
   if (!heedsNoNotoriety(world, n) && dip.notoriety(world.diplomacy, world.nationIds[n]!) >= dip.config.ai.notoriety_restraint) return "too notorious";
+  // A war its faith's head would censure costs a wrong with every fellow believer and a Punish aim for all (RELG-156).
+  if (!heedsNoNotoriety(world, n) && censureOf(world, n, t, defaultAim(world, n, t)?.aim ?? "no_aim")) return "the faith would censure it";
   return null;
 }
