@@ -309,7 +309,7 @@ The first part of statecraft is in the playable build: envoys, alliances, marria
 - **Where**: open another realm's card and its **Diplomacy** tab. At the top is what they think of you: the word (Warm, Cool and so on), the number, and every line of their ledger with its weight. Below that is your envoy on the way there, if any, and their last answer; tap **Why?** to see every reason they counted and the total.
 - **Sending an envoy**: under *Send an envoy* you see how many of your envoys are free, then four missions. Each is a button with one line on what it does, or a greyed button that says why not: you are at war, an envoy is already on the way, every seat is taken, you are already allies, a subject tie, they are hostile, your houses are married already, or you lack the gold.
   - *Propose an alliance*: they say yes only if their reasons add up above nothing.
-  - *Arrange a marriage*: married houses think better of each other (+15).
+  - *Arrange a marriage*: married houses think better of each other (+15), and a marriage can bring a claim on their throne or their whole crown (see [Subjects](Subjects), personal unions).
   - *Courtesy visit*: always welcome, +15 fading over 5 years.
   - *Send a gift*: 30 gold, +30 fading over 10 years.
 - **How long it takes**: the envoy rides to their capital (two days per unit of distance), stays at court a month, and the answer reaches you the month after. While he is away his seat is taken. Most realms have one seat, and one more with over 10 provinces.

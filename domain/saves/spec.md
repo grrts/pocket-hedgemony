@@ -286,6 +286,15 @@ Newest decision first.
 - SAVE-103: When the player makes a choice at a before-the-battle stop, the save system shall append it to the orders journal with its day, so a replay reaches the same result. [X-1; D-SAVE-10]
 - SAVE-104: The save system shall sync the personal settings file `settings-personal.json` with the account's saves, under the same rules as a save. [settings §8; D-SAVE-6]
 
+### 5.14 How the player uses it
+
+- SAVE-105: The player shall reach saving and loading from the game menu (the three-line button at the top left of the map's top bar, or Esc), which holds Return to the map, Save, Load, Settings and Exit to main menu, opened as one card over the dimmed map; the start screen shall hold Continue (with its label, SAVE-014), Load and Settings above the realms to choose. [X-19; SHELL-051, SHELL-064, SHELL-065]
+- SAVE-106: The Save card shall be the one place for saving by hand: the new save's name, filled in with the default (SAVE-018) and changeable, and a Save button at the top; under them the campaign's manual saves newest first with their in-game date and when they were saved, each with Save over, which asks "Replace?" in the row itself; at the slot limit the new save gives way to "pick a save to replace" (SAVE-020); while the week plays, Save waits and says so, because a save is a turn boundary (SAVE-001). [X-19]
+- SAVE-107: The Load card shall be the overview of every save on the device: one line per campaign for where the player left off (its Resume save, marked "Where you left off"), then every autosave and manual save, all newest first, each with its map crop, banner, realm, in-game date, when it was saved and an "Auto" mark; tapping a line opens it in place with Load and Delete, and Delete asks first (SAVE-021). [X-19; D-SAVE-17]
+- SAVE-108: The autosave choices shall live in Settings → Gameplay (Autosave, Autosaves kept), and a toast "Saved." shall show over the map whenever the player saves, never a dialog; autosaves and the Resume save are written quietly after End turn. [X-19; SAVE-022, SET-061, SET-062]
+- SAVE-109: Exit to main menu shall keep the campaign's Resume save current and return to the start screen, where Continue opens it again. [X-19; SAVE-007]
+- SAVE-110: On a phone in landscape the Save and Load cards shall be one scrolling column inside the safe areas, with every button and save line at least 44 points high and nothing that needs hover; on the web the saves shall live in the browser's IndexedDB, one transaction per save written. [X-19; SAVE-032, SAVE-077]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -446,6 +455,7 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 - **D-SAVE-14** (was OQ-SAVE-14) "Send a report" sits on the failure screen X1 only, as screen flow says. Latest design wins.
 - **D-SAVE-15** (was OQ-SAVE-15) Importing an ironman save needs a connection: offline, the import is refused with "Connect to import an ironman save", so the head check always runs. It closes the split with no new state.
 - **D-SAVE-16** (was OQ-SAVE-16) Every way out of an ironman campaign is an exit: "Save and quit", "Exit to main menu" and the app being closed write the ironman save; a kill mid-turn resumes from the Resume save and journal like any campaign. One rule for all exits.
+- **D-SAVE-17** The Load card lists each campaign's Resume save as its first line, "Where you left off", although SAVE-013 keeps Resume saves out of Load: with several campaigns and no manual saves, Continue alone reaches only the newest, and the player would have no way back to the others. One line per campaign, so the list stays short (X-19).
 
 ## 14. Traceability
 
@@ -575,3 +585,4 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-102 | ironman.feature | An ironman save is not imported offline |
 | SAVE-103 | resume-and-orders-journal.feature | A choice at a before-the-battle stop goes into the journal |
 | SAVE-104 | cloud-sync.feature | Personal settings ride the account sync |
+| SAVE-105 … SAVE-110 | — | Client screens; checked by apps/client/scripts/saves-shots.mjs |

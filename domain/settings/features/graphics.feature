@@ -108,6 +108,8 @@ Feature: Graphics settings
       | a Steam Deck runs on battery under 20 %         | on    |
       | a Steam Deck runs on battery at 45 %            | off   |
       | a Steam Deck runs on its charger                | off   |
+      | the browser reports its battery under 20 % and not charging | on |
+      | the browser reports its battery under 20 % while charging   | off |
 
   @SET-041
   Scenario Outline: Map detail

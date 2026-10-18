@@ -164,7 +164,7 @@ Newest decision first.
 - SET-037: Graphics shall offer Pixel scaling (Crisp, Smooth; default Crisp): Crisp snaps interface art to whole pixel multiples, possibly leaving a few pixels of margin; Smooth fills the space exactly and lets edges blur slightly. [settings §5.1]
 - SET-038: Graphics shall offer Sharpness (Native, Balanced, Battery; per-profile default; applies on view): the map draws with up to the device ratio capped at 3 (Native), up to 2 (Balanced, today's code) or 1 (Battery) screen pixels per CSS pixel, the pixel art staying sharp at all three. [settings §5.1, §8]
 - SET-039: Graphics shall offer Frame rate cap (30, 60, 120, Display rate; per-profile default); when nothing moves the map shall not redraw at all, whatever the cap. [settings §5.1]
-- SET-040: Graphics shall offer Battery saver (Off, Auto, On; per-profile default): On sets a 30 fps cap, Battery sharpness, reduced animations, map redraws only on change, and fewer music voices, and never changes the AI or any result (X-15); Auto turns it on when the device reports battery saving (iOS Low Power Mode, Android Battery Saver, Steam Deck on battery under 20 %). [settings §5.1, §6.1; yaml `sets_when_on`, `constants.battery_auto_threshold`; D-SET-1]
+- SET-040: Graphics shall offer Battery saver (Off, Auto, On; per-profile default): On sets a 30 fps cap, Battery sharpness, reduced animations, map redraws only on change, and fewer music voices, and never changes the AI or any result (X-15); Auto turns it on when the device reports battery saving (iOS Low Power Mode, Android Battery Saver, Steam Deck on battery under 20 %, or a browser that reports its battery under 20 % and not charging; D-SET-21). [settings §5.1, §6.1; yaml `sets_when_on`, `constants.battery_auto_threshold`; D-SET-1]
 - SET-041: Graphics shall offer Map detail (Low, Medium, High; per-profile default; applies on view): Low has no 8 × 8 close-in tiles (stays at 4 × 4), no surf and no forest blending; Medium has 8 × 8 tiles and still water; High has everything. [settings §5.1]
 - SET-042: Graphics shall offer Animations (Full, Reduced, Off; default Full) for water, marching columns, flags, smoke and battle playback motion; Off shows battle results as still frames; Accessibility's Reduced motion sets it to Reduced or lower. [settings §5.1]
 - SET-043: Where the game runs on mobile, Graphics shall offer Keep screen awake during the AI turn (On, Off; default On). [settings §5.1]
@@ -286,6 +286,16 @@ Newest decision first.
 - SET-129: On a Steam Deck, every row shall be reachable with the built-in controls and its text legible at arm's length. [settings §10]
 - SET-130: Each Colour vision mode shall keep the map's season palettes (snow, spring green, summer base, autumn gold, wet season) readable: the season palettes are shifted with the mode's ramp, and No colour shows seasons by tile patterns; no setting turns the seasons off. [X-17; X-15]
 
+### 5.17 How the player uses it
+
+- SET-131: Gameplay shall offer Turn playback speed (1×, 2×, 4×; default 1×), one day of the week playing back on the map after End turn in 0.3 s at 1×, 0.15 s at 2× and 0.075 s at 4×; it changes only how fast the week is shown, never what happens in it. [X-19; D-SET-20; design `day_seconds_at_1x`]
+- SET-132: Settings shall open from the game menu (the three-line button at the top left of the map's top bar, or Esc), from the cog in the side tools and from the start screen's Settings button, as one full screen over the dimmed map, and close back to where the player was with nothing lost; the Sound card stays the quick way to the volumes while playing (AUD-138), and both change the same settings. [X-19; SET-005, SET-007, SET-008]
+- SET-133: Each section shall be one subject: Gameplay holds Tutorial hints with "Reset tutorial and hints" and Achievement toasts, saving (Autosave, Autosaves kept) and playback speed (Turn playback speed, Battle playback speed); Graphics holds Battery saver with the knobs it drives (Frame rate cap, Sharpness, Animations); Audio holds the volumes and switches; Accessibility holds Text size. Until a row's effect is built in the client, the client shall leave that row out rather than show a setting that does nothing, and a section with no built rows shall not be listed. [X-19; D-SET-22]
+- SET-134: A row shall show its name, its changed dot, its control and one line saying what it does, under the name, so nothing needs hover; a choice of up to four values shall be a row of buttons, a slider shall take a tap at a position and step by 5, a toggle shall be one On/Off button, and every control shall be at least 44 points high; a long press on a row's name, or the section's Reset this section button, shall put it back to its default. [X-19; SET-004, SET-014, SET-015]
+- SET-135: A row driven by Battery saver shall say "Set by Battery saver" under its name, so the state of the battery saving shows on the rows it changes. [X-19; SET-124]
+- SET-136: On a phone in landscape the Settings screen shall show the section list as a column on the left and the rows on the right, inside the safe areas, scrolling the rows and never the page; in a tall window it shall show the sections first and open one full screen with Back, as SET-011 and SET-012 say. [X-19; SET-011, SET-012]
+- SET-137: Text size shall grow the text of the cards, menus, alerts and Settings (17, 20 and 24 px body text), the top bar keeping its one thin strip so the map keeps the screen, the cards reflowing inside their own width so they grow taller, never wider; the map's own labels are not text size's (map presentation). [X-19; SET-098]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -353,6 +363,7 @@ the constants and the numbers inside rows.
 | (sound effects) | Interface sounds level | about 6 dB under the music | sound effects design | sfx config |
 | (sound effects) | Reduced intensity | priority 1 sounds 4 dB softer | sound effects design | sfx config |
 | `gameplay.tooltip_delay` | Delays | instant, short 0.3 s, long 0.8 s | no | settings.yaml |
+| `gameplay.turn_speed` | Turn playback | 1, 2, 4 (one day 0.3 s at 1×) | yes (`day_seconds_at_1x`) | settings.json |
 | `gameplay.battle_speed` | Playback | 1, 2, 4 (one 4-hour step 0.5 s at 1×) | yes (`battle_step_seconds_at_1x`) | settings.json |
 | `controls.long_press` | Long-press times | 0.3 / 0.5 / 0.8 s | no | settings.yaml |
 | `controls.keys.end_turn` | End turn key | Enter, hold 0.5 s | no | settings.yaml |
@@ -418,6 +429,9 @@ The settings design said "No open questions remain"; these were found against it
 - **D-SET-17** (was OQ-SET-17) Place names: the setting stays as designed, and since no historical name list is added (D-MAP-6), both options show today's region names. Nothing new is added.
 - **OQ-SET-18** (release task) Owner designs missing: privacy and consent rows, store screens and Restore purchases, and the Big screen and Deck numbers need a store and Valve Steamworks check.
 - **D-SET-19** (was OQ-SET-19) Hint switches and mutes: tutorial progress and Needs attention mutes go into the save, hint switches stay personal settings, and "Reset tutorial and hints" clears both. X-16 settles it.
+- **D-SET-20** Turn playback speed is a Gameplay row of its own beside Battle playback speed: the week's playback after End turn is the speed players notice most, and like Battle playback speed it only changes how fast the week is shown (X-15). Leroy asked for a speed setting (17 October 2026 brief).
+- **D-SET-21** On the web and on phones without a low-power signal the game can read, Auto counts a battery under the 20 % threshold and not charging as the device saving battery, as for the Steam Deck. Same threshold, one rule.
+- **D-SET-22** The client builds the Settings screen from settings.json but lists only the rows whose effect it has built, so no row promises something the game does not do; rows join as their effects are built. A row that does nothing is a poor experience (X-19).
 
 ## 14. Traceability
 
@@ -586,3 +600,5 @@ The settings design said "No open questions remain"; these were found against it
 | SET-128 | settings-data.feature | Colour vision screenshots |
 | SET-129 | settings-data.feature | Steam Deck check |
 | SET-130 | accessibility.feature | Season palettes stay readable in every colour vision mode |
+| SET-131 | gameplay.feature | Turn playback speed |
+| SET-132 … SET-137 | — | Client screen; checked by apps/client/scripts/saves-shots.mjs |

@@ -11,8 +11,10 @@ import { monthlyMoods } from "./moods.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
+import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
+import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
@@ -122,12 +124,15 @@ export type Order =
   /** Agree to, give in to or refuse an envoy's ask at the player's court (its id in the snapshot's statecraft asks, DIPL-212). */
   | { type: "answerAsk"; ask: string; yes: boolean }
   /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
-  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "tighten" | "fold_in"; level?: string }
+  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in" | "merge"; level?: string }
   /** A Disloyal subject rises against its overlord (SUBJ-076, SUBJ-077). */
   | { type: "riseUp" }
   | { type: "stopChange"; province: number }
   /** Answer an event or take a decision waiting for the realm, with one of its options (AnswerEvent, EVT-044). */
   | { type: "answerEvent"; event: string; option: string }
+  /** Heritage: pay the court's counsel to read one sealed ambition (HER-024); choose which heyday sleeps or which legacy goes (HER-013, HER-030). */
+  | { type: "heritageCounsel"; ambition: string }
+  | { type: "heritageChoice"; id: string }
   /** Reform the government into one of its next forms (GOV-027). */
   | { type: "reform"; to: string }
   /** Set the realm's Tongue policy (CULT-038), or a faith's policy from the next New Year (RELG-055). */
@@ -143,7 +148,9 @@ export type Order =
   /** The answer to the player's revolution: Lead, Bend or Fight (REVO-084). */
   | { type: "answerRevolution"; stance: "lead" | "bend" | "fight" }
   /** Ports, sailors and fleets: muster, buy a ship, sail, board, land, admiral, merge, split, disband (navy.ts). */
-  | NavyOrder;
+  | NavyOrder
+  /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
+  | ExploreOrder;
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -179,6 +186,7 @@ export function advance(world: World, steps: number): News[] {
     if (world.step === 0) startDay(world, news);
     stepMarches(world, HOURS_PER_STEP);
     stepNavy(world, HOURS_PER_STEP, news);
+    stepVoyages(world, news);
     engage(world, news);
     fightRound(world, news);
     for (let i = 0; i < world.armies.count; i++) if (world.armies.alive[i] && world.armies.men[i]! < 1) world.armies.alive[i] = 0;
@@ -223,6 +231,7 @@ function startDay(world: World, news: News[]): void {
     monthlyResearch(world, news);
     runLedger(world, true);
     monthlyNavy(world, news);
+    monthlyColonies(world, news);
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
     monthlyWorks(world, news);
@@ -238,12 +247,14 @@ function startDay(world: World, news: News[]): void {
     aiRaise(world, news);
     // Events come last in the month, after every other system (X-2).
     monthlyEvents(world, news);
+    monthlyHeritage(world, news);
   }
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
 }
 
 function endDay(world: World, news: News[]): void {
   feedArmies(world);
+  dailyExploration(world);
   runOccupation(world, world.date.day === 1, news);
   dailyRebels(world, news);
   world.date = addDays(world.date, 1);
@@ -369,6 +380,10 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "breakAlliance":
       return breakAlliance(world, actingNation, order.target);
+    case "heritageCounsel":
+      return payCounsel(world, actingNation, order.ambition);
+    case "heritageChoice":
+      return heritageChoice(world, actingNation, order.id);
     case "answerEvent":
       return answerEvent(world, actingNation, order.event, order.option, news);
     case "makeDemand":
@@ -398,6 +413,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return orderMarch(world, order, actingNation);
     case "navy":
       return navyOrder(world, order, actingNation, news);
+    case "explore":
+      return exploreOrder(world, order, actingNation, news);
   }
 }
 

@@ -67,6 +67,17 @@
         "section": "gameplay"
       },
       {
+        "id": "gameplay.turn_speed",
+        "type": "choice",
+        "options": [
+          1,
+          2,
+          4
+        ],
+        "default": 1,
+        "section": "gameplay"
+      },
+      {
         "id": "gameplay.battle_speed",
         "type": "choice",
         "options": [
@@ -1099,6 +1110,11 @@
     "settings.gameplay.confirm_end_turn.option.off": "Off",
     "settings.gameplay.confirm_end_turn.option.when_attention": "When the Attention screen has lines",
     "settings.gameplay.confirm_end_turn.option.always": "Always",
+    "settings.gameplay.turn_speed.name": "Turn playback speed",
+    "settings.gameplay.turn_speed.desc": "How fast the week plays out on the map after End turn. A day takes 0.3 seconds at 1×.",
+    "settings.gameplay.turn_speed.option.1": "1×",
+    "settings.gameplay.turn_speed.option.2": "2×",
+    "settings.gameplay.turn_speed.option.4": "4×",
     "settings.gameplay.battle_speed.name": "Battle playback speed",
     "settings.gameplay.battle_speed.desc": "How fast your battles play back while they run. One 4-hour step takes half a second at 1×.",
     "settings.gameplay.battle_speed.option.1": "1×",
@@ -1764,6 +1780,7 @@
       "deutan": "the safe ramp",
       "tritan": "the safe ramp",
       "none": "tile patterns"
-    }
+    },
+    "day_seconds_at_1x": 0.3
   }
 }

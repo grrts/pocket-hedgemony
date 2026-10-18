@@ -365,6 +365,10 @@ export function orderShape(order: Order): string {
       return "break an alliance";
     case "makeDemand":
       return "make a demand";
+    case "heritageCounsel":
+      return "ask the court about an ambition";
+    case "heritageChoice":
+      return "choose a heyday or legacy";
     case "answerEvent":
       return "answer an event";
     case "answerAsk":
@@ -387,6 +391,8 @@ export function orderShape(order: Order): string {
       return "judge beaten rebels";
     case "navy":
       return `navy: ${order.do}`;
+    case "explore":
+      return `explore: ${order.do}`;
     case "tonguePolicy":
       return "set the Tongue policy";
     case "faithPolicy":

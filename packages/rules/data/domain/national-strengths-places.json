@@ -1,0 +1,1008 @@
+{
+ "$comment": "D-HER-16: where heritage place names the scenario map does not hold lie, as [longitude, latitude], so each binds to the land province nearest it like a map capital or port. Hand-entered from the places' known locations (approximate to a few kilometres); a region or route is placed at its main town or centre. Names that are not places ('None', 'Uncertain', 'Mobile horde') stay unbound and their conditions do not hold.",
+ "places": {
+  "Edinburgh": [
+   -3.19,
+   55.95
+  ],
+  "Paris": [
+   2.35,
+   48.86
+  ],
+  "Dijon": [
+   5.04,
+   47.32
+  ],
+  "Amiens": [
+   2.3,
+   49.89
+  ],
+  "Bruges": [
+   3.22,
+   51.21
+  ],
+  "Ghent": [
+   3.72,
+   51.05
+  ],
+  "Nancy": [
+   6.18,
+   48.69
+  ],
+  "Luxembourg": [
+   6.13,
+   49.61
+  ],
+  "Brussels": [
+   4.35,
+   50.85
+  ],
+  "Liège": [
+   5.57,
+   50.63
+  ],
+  "Utrecht": [
+   5.12,
+   52.09
+  ],
+  "Abbeville": [
+   1.83,
+   50.11
+  ],
+  "Saint-Quentin": [
+   3.29,
+   49.85
+  ],
+  "Rome": [
+   12.5,
+   41.9
+  ],
+  "Metz": [
+   6.18,
+   49.12
+  ],
+  "Canary Islands": [
+   -15.6,
+   28.1
+  ],
+  "Perpignan": [
+   2.9,
+   42.7
+  ],
+  "Corsica": [
+   9.1,
+   42.15
+  ],
+  "Sardinia": [
+   9.0,
+   40.0
+  ],
+  "Arguin bank": [
+   -16.5,
+   20.6
+  ],
+  "Arzila": [
+   -6.03,
+   35.46
+  ],
+  "Cremona": [
+   10.02,
+   45.13
+  ],
+  "Brescia": [
+   10.21,
+   45.54
+  ],
+  "Bergamo": [
+   9.67,
+   45.7
+  ],
+  "Bellinzona": [
+   9.02,
+   46.19
+  ],
+  "Bologna": [
+   11.34,
+   44.49
+  ],
+  "Crema": [
+   9.69,
+   45.36
+  ],
+  "Siena": [
+   11.33,
+   43.32
+  ],
+  "Lucca": [
+   10.5,
+   43.84
+  ],
+  "Ravenna": [
+   12.2,
+   44.42
+  ],
+  "Tolfa": [
+   11.94,
+   42.15
+  ],
+  "Krujë": [
+   19.79,
+   41.51
+  ],
+  "Vienna": [
+   16.37,
+   48.21
+  ],
+  "Habsburg": [
+   8.18,
+   47.46
+  ],
+  "Prague": [
+   14.42,
+   50.09
+  ],
+  "Plzeň": [
+   13.38,
+   49.74
+  ],
+  "Český Krumlov": [
+   14.32,
+   48.81
+  ],
+  "Tábor": [
+   14.68,
+   49.41
+  ],
+  "Breslau": [
+   17.04,
+   51.11
+  ],
+  "Bautzen": [
+   14.42,
+   51.18
+  ],
+  "Kutná Hora": [
+   15.27,
+   49.95
+  ],
+  "Baden-Baden": [
+   8.24,
+   48.76
+  ],
+  "Freiberg": [
+   13.34,
+   50.91
+  ],
+  "Wittenberg": [
+   12.65,
+   51.87
+  ],
+  "Meissen": [
+   13.47,
+   51.16
+  ],
+  "Dresden": [
+   13.74,
+   51.05
+  ],
+  "Leipzig": [
+   12.37,
+   51.34
+  ],
+  "Altenburg": [
+   12.43,
+   50.99
+  ],
+  "Lübben": [
+   13.9,
+   51.94
+  ],
+  "Frankfurt (Oder)": [
+   14.55,
+   52.35
+  ],
+  "Neumark": [
+   15.0,
+   52.9
+  ],
+  "Berlin-Cölln": [
+   13.4,
+   52.52
+  ],
+  "Prenzlau": [
+   13.86,
+   53.32
+  ],
+  "Schwerin": [
+   11.42,
+   53.63
+  ],
+  "Marienburg": [
+   19.03,
+   54.04
+  ],
+  "Thorn (Toruń)": [
+   18.6,
+   53.01
+  ],
+  "Lwów": [
+   24.03,
+   49.84
+  ],
+  "Vilnius": [
+   25.28,
+   54.69
+  ],
+  "Smolensk": [
+   32.05,
+   54.78
+  ],
+  "Kiev": [
+   30.52,
+   50.45
+  ],
+  "Buda": [
+   19.04,
+   47.5
+  ],
+  "Belgrade (Nándorfehérvár)": [
+   20.46,
+   44.82
+  ],
+  "Székesfehérvár": [
+   18.41,
+   47.19
+  ],
+  "Edirne": [
+   26.56,
+   41.68
+  ],
+  "Suceava": [
+   26.25,
+   47.65
+  ],
+  "Blagaj": [
+   17.89,
+   43.26
+  ],
+  "Smederevo": [
+   20.93,
+   44.66
+  ],
+  "Otranto": [
+   18.49,
+   40.15
+  ],
+  "Amid": [
+   40.23,
+   37.91
+  ],
+  "Elbistan": [
+   37.2,
+   38.2
+  ],
+  "Tabriz": [
+   46.3,
+   38.08
+  ],
+  "Erzurum": [
+   41.27,
+   39.9
+  ],
+  "Herat": [
+   62.2,
+   34.35
+  ],
+  "Moscow": [
+   37.62,
+   55.75
+  ],
+  "Pereyaslavl-Ryazansky": [
+   39.74,
+   54.63
+  ],
+  "Kholmogory": [
+   41.97,
+   64.22
+  ],
+  "Oreshek": [
+   31.04,
+   59.95
+  ],
+  "Sarai": [
+   47.0,
+   47.4
+  ],
+  "Hajji Tarkhan": [
+   48.03,
+   46.35
+  ],
+  "Volga-Don portage": [
+   44.0,
+   48.7
+  ],
+  "Sighnaq": [
+   67.0,
+   44.0
+  ],
+  "Lower Syr Darya towns": [
+   65.5,
+   44.8
+  ],
+  "Chimgi-Tura": [
+   65.53,
+   57.15
+  ],
+  "Cairo": [
+   31.24,
+   30.04
+  ],
+  "Malatya": [
+   38.31,
+   38.35
+  ],
+  "Karakorum": [
+   102.83,
+   47.2
+  ],
+  "Hami": [
+   93.51,
+   42.83
+  ],
+  "Beijing": [
+   116.4,
+   39.9
+  ],
+  "Jingdezhen": [
+   117.18,
+   29.27
+  ],
+  "Hanseong": [
+   126.98,
+   37.57
+  ],
+  "Hoeryong": [
+   129.75,
+   42.44
+  ],
+  "Uiju": [
+   124.53,
+   40.2
+  ],
+  "Thăng Long (Đông Kinh, modern Hanoi)": [
+   105.85,
+   21.03
+  ],
+  "Hóa Châu / Thuận Hóa": [
+   107.58,
+   16.46
+  ],
+  "Vijaya": [
+   109.1,
+   13.9
+  ],
+  "Muang Sua": [
+   102.14,
+   19.89
+  ],
+  "Phitsanulok": [
+   100.26,
+   16.82
+  ],
+  "Chiang Mai": [
+   98.99,
+   18.79
+  ],
+  "Nakhon Si Thammarat": [
+   99.96,
+   8.43
+  ],
+  "Tenasserim / Mergui": [
+   98.6,
+   12.44
+  ],
+  "Angkor": [
+   103.87,
+   13.41
+  ],
+  "Kyaukse": [
+   96.13,
+   21.6
+  ],
+  "Ava (Inwa)": [
+   95.96,
+   21.86
+  ],
+  "Bhamo region": [
+   97.24,
+   24.27
+  ],
+  "Prome": [
+   95.22,
+   18.82
+  ],
+  "Toungoo": [
+   96.43,
+   18.94
+  ],
+  "Yamethin": [
+   96.15,
+   20.43
+  ],
+  "Trowulan (Majapahit)": [
+   112.38,
+   -7.56
+  ],
+  "Daha (Kediri)": [
+   112.01,
+   -7.82
+  ],
+  "Malacca (Melaka)": [
+   102.25,
+   2.19
+  ],
+  "Riau-Lingga islands": [
+   104.5,
+   0.2
+  ],
+  "Penarikan portage": [
+   102.9,
+   3.2
+  ],
+  "Pahang river": [
+   103.3,
+   3.5
+  ],
+  "Shadiabad Mandu": [
+   75.4,
+   22.35
+  ],
+  "Sirhind": [
+   76.38,
+   30.64
+  ],
+  "Gaur": [
+   88.13,
+   24.87
+  ],
+  "Sonargaon": [
+   90.6,
+   23.65
+  ],
+  "Kamatapur": [
+   89.5,
+   26.35
+  ],
+  "Raichur": [
+   77.36,
+   16.2
+  ],
+  "Warangal": [
+   79.6,
+   17.97
+  ],
+  "Bidar": [
+   77.52,
+   17.91
+  ],
+  "Gulbarga": [
+   76.83,
+   17.33
+  ],
+  "Daulatabad": [
+   75.21,
+   19.94
+  ],
+  "Mudgal": [
+   76.44,
+   16.01
+  ],
+  "Udayagiri": [
+   79.3,
+   14.87
+  ],
+  "Tirupati": [
+   79.42,
+   13.63
+  ],
+  "Ahmedabad": [
+   72.57,
+   23.03
+  ],
+  "Champaner": [
+   73.54,
+   22.49
+  ],
+  "Junagadh": [
+   70.46,
+   21.52
+  ],
+  "Mandu": [
+   75.4,
+   22.35
+  ],
+  "Chanderi": [
+   78.14,
+   24.72
+  ],
+  "Chittor": [
+   74.65,
+   24.89
+  ],
+  "Kherla": [
+   78.0,
+   21.9
+  ],
+  "Kumbhalgarh": [
+   73.59,
+   25.15
+  ],
+  "Mandore": [
+   73.05,
+   26.35
+  ],
+  "Dimapur": [
+   93.73,
+   25.9
+  ],
+  "Fez": [
+   -5.0,
+   34.03
+  ],
+  "Marrakesh": [
+   -7.99,
+   31.63
+  ],
+  "Debdou": [
+   -3.05,
+   33.98
+  ],
+  "Bure gold fields": [
+   -9.0,
+   11.6
+  ],
+  "Niani": [
+   -8.37,
+   11.37
+  ],
+  "Djenne": [
+   -4.55,
+   13.9
+  ],
+  "Royal seat traditionally at Niani on the Sankarani": [
+   -8.37,
+   11.37
+  ],
+  "Ngazargamu": [
+   12.0,
+   13.0
+  ],
+  "Bilma": [
+   12.92,
+   18.69
+  ],
+  "Owu Ipole": [
+   4.3,
+   7.5
+  ],
+  "Mbanza Kongo": [
+   14.24,
+   -6.27
+  ],
+  "Tzintzuntzan": [
+   -101.58,
+   19.63
+  ],
+  "Ihuatzio": [
+   -101.61,
+   19.57
+  ],
+  "Tierra Caliente": [
+   -101.0,
+   18.6
+  ],
+  "Ucareo-Zinapécuaro": [
+   -100.75,
+   19.86
+  ],
+  "Cusco (Qusqu)": [
+   -71.97,
+   -13.53
+  ],
+  "Lake Titicaca basin": [
+   -69.6,
+   -15.8
+  ],
+  "Chan Chan": [
+   -79.07,
+   -8.11
+  ],
+  "Cyprus": [
+   33.2,
+   35.1
+  ],
+  "Danzig": [
+   18.65,
+   54.35
+  ],
+  "Diu": [
+   70.98,
+   20.71
+  ],
+  "Tana": [
+   39.3,
+   47.1
+  ],
+  "Valencia": [
+   -0.38,
+   39.47
+  ]
+ },
+ "$comment_areas": "Areas and regions heritage names that the event tree's place table (events-places.json) does not list, as [west, south, east, north] boxes in degrees: an area holds the land provinces whose centre lies inside (approximate, hand-entered). A province: target binds like a place name.",
+ "areas": {
+  "area:altishahr": [
+   75,
+   36,
+   90,
+   42.5
+  ],
+  "area:andalusia": [
+   -7.5,
+   36,
+   -2,
+   38.6
+  ],
+  "area:azerbaijan": [
+   44.5,
+   37,
+   50,
+   41.5
+  ],
+  "area:bengal": [
+   86,
+   21.5,
+   92.5,
+   27
+  ],
+  "area:cambodia": [
+   102.3,
+   10.4,
+   107.6,
+   14.7
+  ],
+  "area:carnatic": [
+   77.5,
+   8.5,
+   80.5,
+   14.5
+  ],
+  "area:cochinchina": [
+   104.5,
+   8.5,
+   107.5,
+   11.5
+  ],
+  "area:cusco": [
+   -73.5,
+   -15,
+   -70.5,
+   -12.5
+  ],
+  "area:dzungaria": [
+   80,
+   42.5,
+   92,
+   48
+  ],
+  "area:egypt": [
+   25,
+   22,
+   35,
+   31.7
+  ],
+  "area:eritrea": [
+   36.4,
+   14.3,
+   43,
+   18
+  ],
+  "area:ethiopian_highlands": [
+   35,
+   7,
+   42,
+   15
+  ],
+  "area:fezzan": [
+   10,
+   23,
+   17,
+   28
+  ],
+  "area:gulf_of_guinea_islands": [
+   5,
+   -1.5,
+   9,
+   4
+  ],
+  "area:hausaland": [
+   6,
+   10,
+   10,
+   14
+  ],
+  "area:hejaz": [
+   36,
+   20,
+   42,
+   28.5
+  ],
+  "area:iraq": [
+   42,
+   29.5,
+   48.5,
+   36.5
+  ],
+  "area:isfahan_region": [
+   49.5,
+   31,
+   54,
+   34.5
+  ],
+  "area:kandahar": [
+   63.5,
+   30,
+   68,
+   33
+  ],
+  "area:kazakhstan": [
+   50,
+   42,
+   87,
+   55
+  ],
+  "area:konkan": [
+   72.6,
+   15,
+   74,
+   20
+  ],
+  "area:laos": [
+   100,
+   14,
+   107.5,
+   22.5
+  ],
+  "area:liaodong": [
+   120,
+   38.7,
+   125,
+   43
+  ],
+  "area:lithuania": [
+   21,
+   53.8,
+   27,
+   56.4
+  ],
+  "area:lombardy_venetia": [
+   8.5,
+   44.8,
+   13.8,
+   46.6
+  ],
+  "area:louisiana": [
+   -94,
+   29,
+   -88.8,
+   33
+  ],
+  "area:low_countries": [
+   2.5,
+   49.5,
+   7.2,
+   53.6
+  ],
+  "area:lower_burma": [
+   94,
+   15,
+   98,
+   19.5
+  ],
+  "area:lower_yangzi": [
+   116,
+   29.5,
+   122,
+   33
+  ],
+  "area:malaya_and_borneo": [
+   100,
+   -4,
+   119.5,
+   7
+  ],
+  "area:middle_volga": [
+   45,
+   53,
+   52,
+   57
+  ],
+  "area:north_china_plain": [
+   113,
+   34,
+   119,
+   40
+  ],
+  "area:north_java_coast": [
+   106,
+   -7.2,
+   114,
+   -6
+  ],
+  "area:northern_angola": [
+   12.5,
+   -10,
+   19,
+   -5.5
+  ],
+  "area:quito": [
+   -80,
+   -2.5,
+   -77.5,
+   1
+  ],
+  "area:south_vietnam": [
+   104.5,
+   8.5,
+   109.5,
+   13.5
+  ],
+  "area:southern_italy": [
+   13.5,
+   37.8,
+   18.6,
+   42
+  ],
+  "area:st_lawrence": [
+   -75,
+   45,
+   -64,
+   49.5
+  ],
+  "area:sumatra": [
+   95,
+   -6,
+   106,
+   6
+  ],
+  "area:thirteen_colonies": [
+   -84,
+   31,
+   -67,
+   45.5
+  ],
+  "area:thrace": [
+   25.5,
+   40.3,
+   29.5,
+   42.3
+  ],
+  "area:tungabhadra": [
+   75,
+   14.5,
+   78.5,
+   16.5
+  ],
+  "area:uzbekistan": [
+   56,
+   37,
+   73,
+   46
+  ],
+  "area:van": [
+   42,
+   37.5,
+   44.5,
+   39.5
+  ],
+  "area:vilcabamba": [
+   -74,
+   -13.5,
+   -72.5,
+   -12.5
+  ],
+  "area:western_algeria": [
+   -2,
+   33,
+   1.5,
+   36
+  ],
+  "area:yunnan": [
+   97.5,
+   21,
+   106,
+   29
+  ],
+  "region:americas": [
+   -170,
+   -56,
+   -34,
+   72
+  ],
+  "region:brazil": [
+   -74,
+   -34,
+   -34,
+   5
+  ],
+  "region:italy": [
+   6.6,
+   36.6,
+   18.6,
+   47.1
+  ],
+  "region:korea": [
+   124.5,
+   33,
+   130.5,
+   43
+  ],
+  "region:levant": [
+   34,
+   29.5,
+   38.5,
+   37
+  ],
+  "region:mesopotamia": [
+   38,
+   29.5,
+   48.5,
+   37.5
+  ],
+  "region:north_america": [
+   -170,
+   15,
+   -52,
+   72
+  ],
+  "region:north_india": [
+   68,
+   21,
+   89,
+   35
+  ],
+  "region:siberia": [
+   60,
+   50,
+   180,
+   78
+  ],
+  "region:west_africa": [
+   -18,
+   4,
+   15,
+   20
+  ]
+ },
+ "provinces": {
+  "province:elmina": [
+   -1.35,
+   5.08
+  ],
+  "province:goa": [
+   73.83,
+   15.5
+  ],
+  "province:luanda": [
+   13.23,
+   -8.84
+  ],
+  "province:timbuktu": [
+   -3.0,
+   16.77
+  ],
+  "province:vijayanagara": [
+   76.46,
+   15.33
+  ]
+ }
+}
