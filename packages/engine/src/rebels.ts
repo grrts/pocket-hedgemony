@@ -9,6 +9,7 @@ import { halt, marchTo } from "./turn.ts";
 import { loyaltyStep } from "./lords.ts";
 import { NORMAL_TAX, runLedger, taxRateOf, TAX_RATES } from "./treasury.ts";
 import { CLASS_COUNT, classIndex, CLASS_NAMES } from "./living.ts";
+import { rebelsWonAgainst, revolutionSettled } from "./revolutions.ts";
 
 /**
  * Rebellions (milestone 6): grievances raise rebel bands. A plotting province
@@ -54,6 +55,8 @@ export interface Band {
   /** world.day of the last talks (one a month). */
   talked: number;
   started: string;
+  /** The revolution family whose Fight raised it (REVO-021), absent for an ordinary rising. */
+  revolution?: string;
 }
 
 /** A beaten rising whose survivors wait on the owner's verdict (REBL-050). */
@@ -187,17 +190,24 @@ function joinShare(world: World, p: number, cause: rb.Cause): number {
 }
 
 /** Men of province p join the band: out of the recruits, so the owner can no longer call them (REBL-023, REBL-026). */
-function muster(world: World, b: Band, p: number, first = false): number {
+function muster(world: World, b: Band, p: number, first = 0): number {
   const pool = world.provinceRecruits[p]!;
   // A rising begins with the men who rose: the first month's share at least a muster's worth.
-  const men = Math.min(pool, Math.floor(pool * joinShare(world, p, b.cause) * (first ? 3 : 1)));
+  const men = Math.min(pool, Math.floor(pool * joinShare(world, p, b.cause) * (first || 1)));
   world.provinceRecruits[p] = pool - men;
   b.men += men;
   return men;
 }
 
-function startRising(world: World, p: number, reason: string, news: News[]): Band | null {
-  const found = rb.heaviestCause(weighted(world, p));
+/** A revolution's Fight (REVO-084): its cause, its family, and how many first musters it rises with. */
+export interface RevolutionTag {
+  cause: rb.Cause;
+  family: string;
+  musters: number;
+}
+
+function startRising(world: World, p: number, reason: string, news: News[], tag?: RevolutionTag): Band | null {
+  const found = tag ? { cause: tag.cause, grievance: grievancesOf(world, p)[0] ?? "the revolution" } : rb.heaviestCause(weighted(world, p));
   if (!found || !mayStart(world, p, found.cause)) return null;
   const owner = world.provinceOwner[p]!;
   const leader = rb.chooseLeader(found.cause, pname(world, p), world.rng);
@@ -220,8 +230,9 @@ function startRising(world: World, p: number, reason: string, news: News[]): Ban
     retaking: {},
     talked: -1,
     started: `${world.date.year}-${String(world.date.month).padStart(2, "0")}`,
+    ...(tag ? { revolution: tag.family } : {}),
   };
-  muster(world, b, p, true);
+  muster(world, b, p, tag?.musters ?? 3);
   if (b.men < P.melts_below_men) {
     // Too few to hold the province: the trouble stays riots.
     world.provinceRecruits[p] = world.provinceRecruits[p]! + b.men;
@@ -229,10 +240,14 @@ function startRising(world: World, p: number, reason: string, news: News[]): Ban
   }
   world.bands.push(b);
   world.provinceRebels[p] = b.id;
+  if (tag) return b;
   const why = reason === "roll" ? "" : ` after ${sparkText(reason)}`;
   news.push({ kind: "rebels", text: `Rising in ${pname(world, p)}${why}: ${leader.name} leads ${fmt(b.men)} men over ${b.grievance.toLowerCase()}. They want ${demandOf(b)}.`, nations: [owner], province: p, begins: true });
   return b;
 }
+
+/** A revolution's rising in province p (REVO-084); null when too few rise or the province can't. */
+export const startRevolutionRising = (world: World, p: number, tag: RevolutionTag, news: News[]): Band | null => startRising(world, p, "revolution", news, tag);
 
 /** A spark as a few words for the news and the card. */
 const SPARK_TEXT: Record<string, string> = {
@@ -525,7 +540,7 @@ function endBand(world: World, b: Band, how: NonNullable<rb.Rising["ended"]>, te
   }
   b.men = 0;
   if (text) news.push({ kind: "rebels", text, nations: [b.owner], province: b.provinces[0]! });
-  void how;
+  if (b.revolution && how !== "won") revolutionSettled(world, b, how === "granted" || how === "talked" ? "stopped" : "crushed", news);
 }
 
 /** The owner's armies standing in province p march out to the nearest of its provinces with no rebels (a Town demand: the soldiers gone). */
@@ -542,7 +557,7 @@ function soldiersLeave(world: World, n: number, provinces: number[]): void {
 }
 
 /** Tax down to light at most, until a year (SELF_RULE for good). */
-function lightTax(world: World, provinces: number[], until: number): void {
+export function lightTax(world: World, provinces: number[], until: number): void {
   for (const p of provinces) {
     world.provinceLightTax[p] = Math.max(world.provinceLightTax[p]!, until);
     if (taxRateOf(world, p, world.provinceOwner[p]!) > lightRate()) world.provinceTax[p] = lightRate();
@@ -550,7 +565,7 @@ function lightTax(world: World, provinces: number[], until: number): void {
 }
 
 /** Food from the castles that feed the provinces into the provinces' stores, up to `months` of eating (Hunger: the granary opened). */
-function openGranary(world: World, provinces: number[], months: number): number {
+export function openGranary(world: World, provinces: number[], months: number): number {
   let given = 0;
   for (const p of provinces) {
     const c = world.provinceCastle[p]!;
@@ -607,6 +622,10 @@ function giveDemand(world: World, b: Band, half: boolean): void {
 
 /** What a won rising takes, by cause (REBL-057). */
 function rebelsWin(world: World, b: Band, news: News[]): void {
+  if (b.revolution) {
+    endBand(world, b, "won", null, news);
+    return revolutionSettled(world, b, "won", news);
+  }
   const year = world.date.year;
   const where = b.provinces.map((p) => pname(world, p)).join(", ");
   let what: string;
@@ -649,6 +668,7 @@ function rebelsWin(world: World, b: Band, news: News[]): void {
       what = "their tax stays light";
   }
   endBand(world, b, "won", `The rebels win in ${where}: ${what}.`, news);
+  rebelsWonAgainst(world, b, news);
 }
 
 // ---------------------------------------------------------------- answers
