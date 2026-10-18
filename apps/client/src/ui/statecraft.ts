@@ -61,7 +61,37 @@ export function realmStatecraft(v: StatecraftView | null, r: number, allied: boo
         : `<button class="paper" disabled>${m.label}</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`;
     }).join("")}</div>
     ${allied ? `<button class="paper" data-break-alliance="${r}">End the alliance</button><p class="hint">An oath broken: they will remember it (−40, fading over 20 years), and other courts trust you less.</p>` : ""}`;
-  return `${standing}${away}${last}${missions}${atWar ? "" : demandsHtml(realm.demands)}`;
+  return `${standing}${away}${last}${missions}${atWar ? "" : courtSubjectHtml(v, r)}${atWar ? "" : demandsHtml(realm.demands)}`;
+}
+
+const COURT_DOES = "Each season there is 1 in 4 that they find out: they will hold it against you (−25, fading over 10 years) and send him home.";
+
+/** Court their loyalty, on another realm's subject (DIPL-215, DIPL-218, DIPL-220). */
+function courtSubjectHtml(v: StatecraftView, r: number): string {
+  const c = v.courting;
+  if (!c || !(r in c.subjects)) return "";
+  const mine = c.mine.find((x) => x.target === r && x.lord === null);
+  const why = c.subjects[r] ?? null;
+  return `<h3 class="sub">Court their loyalty</h3>
+    ${mine
+      ? `<p>${icon("scroll", 1)} Your envoy has courted them since ${monthText(mine.since)}: they count <i>Courted</i> (−1) against their overlord.</p><button class="paper" data-court-subject="${r}" data-recall="1">Recall your envoy</button><p class="hint">He comes home and his seat is free again.</p>`
+      : why === null
+        ? `<button class="wax" data-court-subject="${r}">${icon("scroll", 2)}Court their loyalty</button><p class="hint">One of your envoys stays at their court working against their overlord: they count Courted (−1), and a Disloyal subject may rise. ${COURT_DOES}</p>`
+        : `<button class="paper" disabled>Court their loyalty</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`}`;
+}
+
+/** Court him, on a foreign lord's screen (DIPL-215, DIPL-216, DIPL-220). */
+export function courtLordHtml(v: StatecraftView | null, k: number, realm: number): string {
+  const c = v?.courting;
+  if (!c || !(k in c.lords)) return "";
+  const mine = c.mine.find((x) => x.lord === k);
+  const why = c.lords[k] ?? null;
+  return `<h3 class="sub">Court him</h3>
+    ${mine
+      ? `<p>${icon("scroll", 1)} Your envoy has courted him since ${monthText(mine.since)}.</p><button class="paper" data-court-lord="${k}" data-realm="${realm}" data-recall="1">Recall your envoy</button><p class="hint">He comes home and his seat is free again.</p>`
+      : why === null
+        ? `<button class="wax" data-court-lord="${k}" data-realm="${realm}">${icon("scroll", 2)}Court him</button><p class="hint">One of your envoys stays at his court: he loses a step of loyalty each season unless his ruler wins him back, and once Disloyal for a year with land next to yours he comes over to you with it. ${COURT_DOES}</p>`
+        : `<button class="paper" disabled>Court him</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`}`;
 }
 
 /** Marriage and claims toward another realm (SUBJ-130): the paths to its crown. */
@@ -98,6 +128,7 @@ export function myStatecraft(v: StatecraftView | null, realmButton: (n: number) 
   return `<h3 class="sub">Envoys</h3>
     <p>${v.free} of ${v.seats} free. <span class="hint">More come with more than 10 provinces and with inventions.</span></p>
     ${v.envoys.length ? v.envoys.map((e) => `<p>${icon("scroll", 1)} ${realmButton(e.target)} <small>${e.status === "road" ? `to ${missionName(e.action)}, there in ${monthText(e.arrival)}` : e.status === "court" ? `at court, to ${missionName(e.action)}` : `coming home${e.home ? ` in ${monthText(e.home)}` : ""}`}</small></p>`).join("") : `<p class="hint">Open another realm to send an envoy there.</p>`}
+    ${(v.courting?.mine ?? []).map((c) => `<p>${icon("scroll", 1)} ${realmButton(c.target)} <small>at court, courting ${c.lordName ? esc(c.lordName) : "their loyalty to their overlord"} since ${monthText(c.since)}</small></p>`).join("")}
     ${v.letters.length ? `<h3 class="sub">Answers</h3>${v.letters.slice(0, 8).map((l) => `<div class="letter"><p>${esc(l.text)} <small>(${monthText(l.month)})</small></p>${reasonsHtml(l)}</div>`).join("")}` : ""}`;
 }
 
@@ -153,7 +184,7 @@ export function mySubjects(v: StatecraftView | null, realmButton: (n: number) =>
 }
 
 /** A subject's card on its realm's Diplomacy tab (SUBJ-092, SUBJ-048): loyalty and reasons, what it pays, how it comes to war, and the overlord's actions. */
-export function subjectCard(v: StatecraftView | null, r: number): string {
+export function subjectCard(v: StatecraftView | null, r: number, realmButton?: (n: number) => string): string {
   const row = v?.subjects?.subjects.find((x) => x.subject === r);
   if (!row) return "";
   const btn = (act: string, label: string, why: string | null, does: string) =>
@@ -163,6 +194,7 @@ export function subjectCard(v: StatecraftView | null, r: number): string {
     ${union ? `<p class="hint">${icon("crown", 1)} Your ruler wears their crown too: one ruler for both realms, their lords and laws their own.</p>` : ""}
     <p><b class="${loyaltyClass(row.loyalty)}">${esc(row.loyalty)}</b> · ▲${row.up} ▼${row.down}. They send you ${Math.round(row.pays)} gold a month (${pct(row.share)} of their ${row.kind === "vassal" ? "taxes" : "income"}). ${esc(row.fights)}</p>
     ${reasonBadges(row)}
+    ${row.reasons.some((x) => x.label === "Courted") ? `<p class="hint">${row.courtedBy.length && realmButton ? `Courted by ${row.courtedBy.map(realmButton).join(" ")}: a foreign envoy works on them at their court.` : "A foreign envoy courts them at their court. Station a resident there to see whose."}</p>` : ""}
     <h3 class="sub">Tribute</h3>
     <div class="choices tribute">${TRIBUTE.map((t) => `<button class="${t.level === row.tribute ? "wax" : "paper"}" data-subject-act="tribute" data-level="${t.level}" ${t.level === row.tribute ? "disabled" : ""}>${t.label}</button>`).join("")}</div>
     <p class="hint">${esc(TRIBUTE.find((t) => t.level === row.tribute)!.does)} A Wavering subject pays half; a Disloyal one pays nothing and refuses your calls.</p>

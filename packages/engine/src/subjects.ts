@@ -5,6 +5,7 @@ import { capsOf } from "./government.ts";
 import { FAITH_IDS, FAITH_POLICIES, NO_FAITH, NO_TONGUE } from "./peoples.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as subj from "./domain/subjects/index.ts";
+import { courtersOf, isCourted } from "./courting.ts";
 import config from "../../rules/data/domain/subjects.json" with { type: "json" };
 
 /**
@@ -152,6 +153,7 @@ function situation(world: World, s: number, o: number, ownSubjects: number, thin
     commonEnemy: rel.enemiesOf(g, b).some((x) => theirs.has(x)),
     ownSubjects,
     stretchedThin: thin,
+    courted: isCourted(world, s),
   };
 }
 
@@ -640,6 +642,8 @@ export interface SubjectView {
   resident: boolean;
   /** Whether the overlord holds the subject's heir, and the month he goes home. */
   hostage: { until: string } | null;
+  /** The realms courting it, as far as the overlord can see: all of them with a resident there, else none named (SUBJ-040, DIPL-218). */
+  courtedBy: number[];
   giftCost: number;
 }
 
@@ -690,6 +694,7 @@ export function subjectsView(world: World, player: number, ledgerTribute: (n: nu
       work: t.bond.foldIn ? { action: "fold_in", monthsLeft: t.bond.foldIn.monthsLeft } : t.bond.tighten ? { action: "tighten", monthsLeft: t.bond.tighten.monthsLeft } : null,
       resident: !!t.bond.resident,
       hostage: heldUntil(t.bond),
+      courtedBy: t.bond.resident ? courtersOf(world, t.s) : [],
       giftCost: subjectGiftCost(world, t.s),
     };
   };

@@ -377,6 +377,8 @@ export function orderShape(order: Order): string {
       return "act on a subject";
     case "riseUp":
       return "rise against an overlord";
+    case "court":
+      return "court a foreign lord or subject";
     case "moveBuild":
       return "move a work in the province's queue";
     case "setFood":

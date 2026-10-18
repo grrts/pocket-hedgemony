@@ -29,7 +29,7 @@ import {
   type ExplorationView,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
-import { askCard, myHouse, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
+import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
 import { rebelsUi, risingCard, risingsLine, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { loadDefaultRuleset } from "@ph/rules";
@@ -771,7 +771,7 @@ function subjectsKey(): string {
     <span>${sw(LOYALTY_HEX.wavering)}Wavering subject</span>
     <span>${sw(LOYALTY_HEX.disloyal)}Disloyal subject</span>
     <span>${sw(OVERLORD_HEX)}Your overlord</span>
-    <p>${sv ? `Reach used ${sv.used} of ${sv.reach}.` : ""} Tap a subject for its Diplomacy tab.</p>
+    <p>${sv ? `Reach used ${sv.used} of ${sv.reach}.` : ""} A dotted line runs from a courting realm to the subject it courts. Tap a subject for its Diplomacy tab.</p>
   </div>`;
 }
 
@@ -1073,6 +1073,31 @@ function drawOverlay(o: OverlayContext): void {
       const b = o.toScreen(provinces[e.to]!.x!, provinces[e.to]!.y!);
       drawEnvoy(ctx, a, b, e.progress, u, color, `${e.daysLeft} ${e.daysLeft === 1 ? "day" : "days"}`, onScreen);
     }
+  }
+
+  // The subjects lens: a dotted line from each courting realm's capital to the subject it courts, yours and those you know of (DIPL-220, SUBJ-095).
+  const sc = lens === "subjects" ? snapshot?.statecraft : null;
+  if (sc) {
+    const cap = (n: number) => provinceIndex.get(nations[n]!.capital);
+    const lines: [number, number][] = [
+      ...(sc.courting?.mine ?? []).filter((c) => c.lord === null).map((c): [number, number] => [snapshot!.playerNation, c.target]),
+      ...(sc.subjects?.subjects ?? []).flatMap((r) => r.courtedBy.map((n): [number, number] => [n, r.subject])),
+    ];
+    ctx.save();
+    ctx.setLineDash([4 * spriteScale, 4 * spriteScale]);
+    ctx.lineWidth = 2 * spriteScale;
+    for (const [from, to] of lines) {
+      const pa = cap(from), pb = cap(to);
+      if (pa === undefined || pb === undefined) continue;
+      const [ax, ay] = o.toScreen(provinces[pa]!.x!, provinces[pa]!.y!);
+      const [bx, by] = o.toScreen(provinces[pb]!.x!, provinces[pb]!.y!);
+      ctx.strokeStyle = nations[from]!.color;
+      ctx.beginPath();
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(bx, by);
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   // Battles: the two hosts fighting it out on their tile; zoomed out, crossed swords mark where.
@@ -2656,7 +2681,7 @@ function renderLord(k: number): void {
   const holdings = lands.provinces.map((p) => provinceRow(p, `${MOOD_LABEL[s.provinceMood[p]!]} · ${fmt(Math.round(s.provincePeople[p]! * 1000))} people`));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(l.name)}</h2>${closeButton()}</header>
-    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6 })}`;
+    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation) })}`;
   bindClose();
   showPanel(true);
   bindLords();
@@ -2855,6 +2880,10 @@ function bindLords(): void {
     renderPanel();
   });
   panel.querySelectorAll<HTMLButtonElement>("[data-gift]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "gift", lord: Number(b.dataset.gift) })));
+  // Court a foreign lord, or call the envoy home (DIPL-220).
+  panel.querySelectorAll<HTMLButtonElement>("[data-court-lord]").forEach((b) =>
+    b.addEventListener("click", () => void actHere({ type: "court", target: Number(b.dataset.realm), lord: Number(b.dataset.courtLord), ...(b.dataset.recall ? { recall: true } : {}) })),
+  );
   panel.querySelectorAll<HTMLButtonElement>("[data-seize]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "seizeFief", province: Number(b.dataset.seize) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-grant]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -3468,7 +3497,7 @@ function relationsSection(r: number): string {
     : rel?.state === "overlord" ? "Your subject."
     : "No ties between you. Declaring war calls their allies to arms against you, and yours to your side.";
   return `<h3 class="sub">Relations</h3><p>${line}</p>
-    ${rel?.state === "overlord" ? subjectCard(s.statecraft, r) : ""}
+    ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy")) : ""}
     ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
     ${rel ? "" : `<div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 2)}Declare war</button></div>`}`;
 }
@@ -3824,6 +3853,7 @@ function renderRealm(r: number): void {
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
   panel.querySelector<HTMLButtonElement>("[data-rise]")?.addEventListener("click", () => void act({ type: "riseUp" }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-court-subject]").forEach((b) => b.addEventListener("click", () => void act({ type: "court", target: Number(b.dataset.courtSubject), ...(b.dataset.recall ? { recall: true } : {}) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-subject-act]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in" | "merge", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
   );
