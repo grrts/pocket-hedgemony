@@ -75,6 +75,8 @@ export function hashWorld(world: World): string {
   feed(new Float64Array(world.mercs.flatMap((m) => [m.nation, m.company.id, m.weeksLeft])));
   feed(new Float64Array(world.freeCompanies.flatMap((c) => [c.id, c.home, ...c.byArm])));
   feed(world.provinceOfficial);
+  feed(world.nationForm);
+  feed(world.provinceGrasping);
   feed(world.provinceOfficialSeed);
   feed(world.provinceOfficialSince);
   feed(live(a.trainArm));

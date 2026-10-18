@@ -2,6 +2,7 @@ import { statecraftView, type StatecraftView } from "./statecraft.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
+import { governmentView, realmForms, type GovernmentView } from "./government.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
@@ -158,6 +159,10 @@ export interface Snapshot {
   giftGold: number;
   /** The player's stability: the weakest of its lords, subjects, officials and provinces (REALM-199); null before a realm is chosen. */
   stability: Stability | null;
+  /** The player's Government tab: form, both caps, the form's laws and the next forms (GOV-064); null before a realm is chosen. */
+  government: GovernmentView | null;
+  /** Every realm's government form by name, for its card. */
+  realmForms: string[];
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -372,6 +377,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceLord: w.provinceLord.slice(),
       giftGold: giftGold(w),
       stability: player >= 0 ? stabilityOf(w, player) : null,
+      government: player >= 0 ? governmentView(w, player) : null,
+      realmForms: realmForms(w),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
