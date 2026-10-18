@@ -336,3 +336,58 @@ export function spriteUrl(name: SpriteName, nationColor: string, scale: number):
   if (!url) urlCache.set(key, (url = sprite(name, nationColor, scale).toDataURL()));
   return url;
 }
+
+/**
+ * The living map's figures (VIEW-116..VIEW-120), drawn in the ground's own art
+ * pixels: a few pixels each, so a dozen make a block on one map pixel. Facing
+ * east with their feet on the last row (the ink outline adds one below). Two
+ * frames each where they walk.
+ */
+export const FIGURES = {
+  foot0: ["...s", ".s.s", ".f.s", "NNNs", "NLNs", ".n.s", "k.k."],
+  foot1: ["...s", ".s.s", ".f.s", "NNNs", "NLNs", ".n.s", ".kk."],
+  horse0: ["...s...", "...f...", "..NNn..", "bbbNbaa", ".bbbbb.", ".H...H."],
+  horse1: ["...s...", "...f...", "..NNn..", "bbbNbaa", ".bbbbb.", "..H.H.."],
+  guns0: ["..f....", ".NNsssk", "tttNt..", "k.k...."],
+  guns1: ["..f....", ".NNsssk", "tttNt..", ".k.k..."],
+  wagons0: [".wwww.", "wwwwww", "tNNNNt", ".k..k."],
+  wagons1: [".wwww.", "wwwwww", "tNNNNt", ".k..k."],
+  banner0: ["tNNN", "tLNn", "tNN.", "t.s.", "t.f.", "tNNN", "tNLN", "t.n.", ".k.k"],
+  banner1: ["tNN.", "tNLN", "tNNn", "t.s.", "t.f.", "tNNN", "tNLN", "t.n.", "..kk"],
+  /** A besieger's tent, its stripe in the realm's colour. */
+  tent: ["..k..", ".wwe.", "wwNee", "wNNNe", "wwkee"],
+} as const;
+
+export type FigureName = keyof typeof FIGURES;
+
+/** Least-recently-used cache of figure art, keyed by figure, colour, whole art pixel and facing (VIEW-130). */
+const figureCache = new Map<string, HTMLCanvasElement>();
+const FIGURE_CACHE_MAX = 400;
+
+/** A figure at a whole number of CSS pixels per art pixel, tinted with its realm's colour, facing east (1) or west (-1). */
+export function figureSprite(name: FigureName, color: string, u: number, dir: 1 | -1): HTMLCanvasElement {
+  const key = `${name}|${color}|${u}|${dir}`;
+  const hit = figureCache.get(key);
+  if (hit) {
+    figureCache.delete(key);
+    figureCache.set(key, hit);
+    return hit;
+  }
+  // Outlined in ink like every sprite, so each figure in a block reads on any ground.
+  const rows = outlined(FIGURES[name].map((r) => (dir === 1 ? r : [...r].reverse().join(""))));
+  const canvas = document.createElement("canvas");
+  canvas.width = rows[0]!.length * u;
+  canvas.height = rows.length * u;
+  const ctx = canvas.getContext("2d")!;
+  rows.forEach((row, y) => {
+    for (let x = 0; x < row.length; x++) {
+      const ch = row[x]!;
+      if (ch === ".") continue;
+      ctx.fillStyle = ch === "N" ? color : ch === "n" || ch === "L" ? shade(color, ch) : KEY[ch]!;
+      ctx.fillRect(x * u, y * u, u, u);
+    }
+  });
+  figureCache.set(key, canvas);
+  if (figureCache.size > FIGURE_CACHE_MAX) figureCache.delete(figureCache.keys().next().value!);
+  return canvas;
+}

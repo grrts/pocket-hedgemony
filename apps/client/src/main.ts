@@ -61,7 +61,7 @@ import { commanderPortrait, officialCard, officialOf, officialScreen, officialsT
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
 import { provinceThumb } from "./map/provinceThumb.ts";
-import { armyFigureUnit, armyNameShown, drawBattle, drawRoute, drawSiegeMark, drawToken, pruneBattles, weekEnds } from "./map/marchArt.ts";
+import { armyFigureUnit, armyNameShown, brackets, drawBattle, drawClash, drawFormation, drawPlate, drawRoute, drawSiegeMark, drawTents, drawToken, menShort, pruneBattles, weekEnds } from "./map/marchArt.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
@@ -72,14 +72,29 @@ import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } fro
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, tileKey, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
 import { Hints, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
-import { nameOnMap, playbackAdvance, playbackHour } from "@ph/engine/domain/map-presentation";
+import {
+  animatedFigures,
+  bandFade,
+  figuresAnimate,
+  figuresLeft,
+  formation,
+  LIVING_MAP,
+  nameOnMap,
+  pieceLabels,
+  pieceUnit,
+  playbackAdvance,
+  playbackHour,
+  tapBox,
+  type Figure,
+  type FormationState,
+} from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
 import { SHELL as SHELL_RULES, startColumn, startIcons, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
-import { autosaveEvery, autosavesKept, battleStepMs, dayMs, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
+import { autosaveEvery, autosavesKept, battleStepMs, dayMs, livingPrefs, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
 import { openSettingsAt, renderSettings, setHintsRows } from "./ui/settingsScreen.ts";
 
 const rules = loadDefaultRuleset();
@@ -768,7 +783,8 @@ function renderLensMenu(): void {
     <h3 class="sub">Map lens</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.id === "lords" && snapshot ? cap(titlesOf(snapshot.playerNation).lords) : l.name}</b><small>${l.note}</small></button>`).join("")}
     ${lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
-    <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
+    <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>
+    <label class="fog-toggle"><input type="checkbox" id="markers" ${markersOn ? "checked" : ""}> Markers: men and names over every army close in</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
       setLens(b.dataset.lens as Lens);
@@ -790,6 +806,15 @@ function renderLensMenu(): void {
   lensMenu.querySelector<HTMLInputElement>("#fog")!.addEventListener("change", (e) => {
     fogOn = (e.target as HTMLInputElement).checked;
     restyleProvinces();
+  });
+  lensMenu.querySelector<HTMLInputElement>("#markers")!.addEventListener("change", (e) => {
+    markersOn = (e.target as HTMLInputElement).checked;
+    try {
+      localStorage.setItem(MARKERS_KEY, markersOn ? "1" : "0");
+    } catch {
+      // Private windows may refuse storage; the toggle still holds for this visit.
+    }
+    view.invalidate();
   });
 }
 
@@ -1018,6 +1043,8 @@ function drawOverlay(o: OverlayContext): void {
   const { ctx, zoom } = o;
   const onScreen = (sx: number, sy: number, pad = 40) => sx > -pad && sy > -pad && sx < o.width + pad && sy < o.height + pad;
   const spriteScale = zoom >= 8 ? 4 : zoom >= 4 ? 3 : zoom >= 2 ? 2 : 1;
+  // Close in, armies become figures; between zoom 14 and 16 the tokens fade out as they fade in (VIEW-101).
+  const liv = livingView(zoom);
 
   // One settlement per province, sized by its people, with its walls:
   // a stone tower for a castle, a palisade for a fort. Capitals come after.
@@ -1104,7 +1131,10 @@ function drawOverlay(o: OverlayContext): void {
   }
 
   // Sieges under way (VIEW-078): how long the walls have held, how far into the next siege month, and the breaches, garrison and food left.
-  if (snapshot && zoom >= 2) {
+  // Close in, the besiegers' camp tells it; the mark comes back with Markers (VIEW-126).
+  const markAlpha = markersOn ? 1 : liv.icons;
+  if (snapshot && zoom >= 2 && markAlpha > 0) {
+    ctx.globalAlpha = markAlpha;
     for (const st of snapshot.sieges) {
       if (!isKnown(st.province)) continue;
       const p = provinces[st.province]!;
@@ -1118,6 +1148,7 @@ function drawOverlay(o: OverlayContext): void {
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (onScreen(sx, sy)) drawSiegeMark(ctx, { ...r.siege, x: sx, y: sy - 10 * tokenUnit(zoom), u: tokenUnit(zoom), color: REBEL_COLOR });
     }
+    ctx.globalAlpha = 1;
   }
 
   // The diplomacy lens, zoomed in to regional: envoys riding their dotted roads, and a sword over each realm the player holds a war aim on (DIPL-184).
@@ -1230,19 +1261,29 @@ function drawOverlay(o: OverlayContext): void {
 
   // Battles: the two hosts fighting it out on their tile; zoomed out, crossed swords mark where.
   let animating = false;
+  // Figures step at about ten frames a second, not every frame (VIEW-130).
+  let figuresTicking = false;
   if (snapshot && zoom >= 1.6) {
     const now = performance.now();
     for (const b of snapshot.battles) {
       if (!isKnown(b.province)) continue;
       const [sx, sy] = o.toScreen(...tileXY(b.tile));
       if (!onScreen(sx, sy, 80)) continue;
-      if (zoom < ARMY_ZOOM) swords(ctx, sx, sy, 3 * spriteScale);
-      else
+      if (zoom < ARMY_ZOOM) {
+        swords(ctx, sx, sy, 3 * spriteScale);
+        continue;
+      }
+      // Close in, the two sides' figures fight it out (VIEW-119); their plates and bars come back with Markers.
+      if (liv.living > 0) figuresTicking = drawFieldBattle(ctx, b, sx, sy, liv, now) || figuresTicking;
+      if (liv.icons > 0 || markersOn) {
+        ctx.globalAlpha = liv.icons > 0 ? liv.icons : 1;
         animating = drawBattle(ctx, {
-          id: b.id, x: sx, y: sy, u: tokenUnit(zoom), t: now,
+          id: b.id, x: sx, y: sy, u: tokenUnit(zoom), t: now, figures: liv.icons > 0,
           attColor: nations[b.attacker]!.color, defColor: nations[b.defender]!.color,
           attMen: b.attMen, defMen: b.defMen, attStart: b.attStart, defStart: b.defStart, attMorale: b.attMorale, defMorale: b.defMorale,
         }) || animating;
+        ctx.globalAlpha = 1;
+      }
     }
     pruneBattles(snapshot.battles.map((b) => b.id));
     for (const b of snapshot.navy.battles) {
@@ -1281,6 +1322,8 @@ function drawOverlay(o: OverlayContext): void {
     }
     const stackCount = new Map<number, number>();
     armyHitBoxes = [];
+    const pieces: LivingPiece[] = [];
+    const besieged = new Map(s.sieges.map((st) => [st.province, st.by]));
     for (let k = 0; k < s.armies.id.length; k++) {
       const cmd = s.armies.commander[k]!;
       if (cmd < 0 || !isKnown(s.armies.location[k]!) || aboard.has(s.armies.id[k]!)) continue;
@@ -1290,35 +1333,65 @@ function drawOverlay(o: OverlayContext): void {
       const nth = stackCount.get(tile) ?? 0;
       stackCount.set(tile, nth + 1);
       const [px, py] = armyPosition(k);
-      let [sx, sy] = o.toScreen(px, py);
+      const [cx, cy] = o.toScreen(px, py);
       // The first army on a tile stands dead centre; others fan out behind it.
-      sx += nth * 8 * u;
-      sy -= nth * 3 * u;
-      if (!onScreen(sx, sy)) continue;
+      const sx = cx + nth * 8 * u;
+      const sy = cy - nth * 3 * u;
       const id = s.armies.id[k]!;
       const moving = performance.now() - stepStart < stepMs && s.armies.trail[k]!.length > 0;
       const realm = nations[s.armies.owner[k]!]!;
       const name = cmdOf(cmd).name;
+      const dir = armyFacing(k);
+      if (liv.living > 0) {
+        // Besiegers ring the town; the others stand, or march in a column, on their tile.
+        const location = s.armies.location[k]!;
+        const state: FormationState = besieged.get(location) === s.armies.owner[k] ? "besieging" : moving || s.armies.path[k]!.length ? "marching" : "standing";
+        const at = state === "besieging" ? o.toScreen(provinces[location]!.x!, provinces[location]!.y!) : [cx + nth * 16 * liv.u, cy - nth * 4 * liv.u];
+        const horse = s.armies.horse[k]!;
+        const men = s.armies.men[k]!;
+        const heading = state === "standing" ? ([dir, 0] as const) : armyHeading(k, dir);
+        pieces.push({
+          id, x: at[0]!, y: at[1]!, color: realm.color, men, name, state, facing: heading, selected: selected.has(id), seed: location,
+          figures: formation({ men, foot: men - horse, horse, wagons: s.armies.food[k]! > 0, state, band: "living", facing: heading }),
+        });
+      }
+      if (liv.icons <= 0 || !onScreen(sx, sy)) continue;
       // The commander in their realm's colours, kit of the era and age (feedback 56), at one size at every zoom (feedback 57).
+      ctx.globalAlpha = liv.icons;
       const token = drawToken(ctx, {
         x: sx, y: sy, u: armyFigureUnit(zoom), color: realm.color, men: s.armies.men[k]!,
-        dir: armyFacing(k), moving, selected: selected.has(id), t: now, flag: flagCanvas(realm, 1),
+        dir, moving, selected: selected.has(id), t: now, flag: flagCanvas(realm, 1),
         commander: { name, nation: realm.id, color: realm.color, look: lookOfCulture(rules.names?.nations[realm.id]), era: eraOfYear(s.date.year), age: apparentAge(name, s.date.year) },
       });
-      armyHitBoxes.push({ id, ...token.tap });
+      if (liv.living < 0.5) armyHitBoxes.push({ id, ...token.tap });
       animating ||= moving;
       if (armyNameShown(selected.has(id), zoom)) {
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         pixelText(ctx, name, token.name.x, token.name.y, 10);
       }
+      ctx.globalAlpha = 1;
     }
+    // Rebels are the same figures in the rebels' colour, with no banner (VIEW-120).
+    if (liv.living > 0)
+      for (const r of s.rebels.risings) {
+        if (!isKnown(r.location)) continue;
+        const state: FormationState = r.siege ? "besieging" : r.target >= 0 ? "marching" : "standing";
+        const at = r.siege ? o.toScreen(provinces[r.siege.province]!.x!, provinces[r.siege.province]!.y!) : o.toScreen(...tileXY(r.tile));
+        const heading = rebelHeading(r.location, r.target);
+        pieces.push({
+          x: at[0]!, y: at[1]!, color: REBEL_COLOR, men: r.men, state, facing: heading, selected: false, seed: r.location,
+          figures: formation({ men: r.men, state, band: "living", facing: heading, rebel: true }),
+        });
+      }
+    figuresTicking = drawLivingPieces(ctx, pieces, liv, now, o, onScreen) || figuresTicking;
     drawColonies(o, ctx, u, onScreen);
     animating = drawFleets(o, ctx, u, now, onScreen) || animating;
   }
   // Rebel bands where they stand, in the rebels' colour with no flag (REBL-066); a tap on the province opens their card.
-  if (snapshot && zoom >= ARMY_ZOOM) {
+  if (snapshot && zoom >= ARMY_ZOOM && liv.icons > 0) {
     const now = performance.now();
+    ctx.globalAlpha = liv.icons;
     for (const r of snapshot.rebels.risings) {
       if (!isKnown(r.location)) continue;
       const [sx, sy] = o.toScreen(...tileXY(r.tile));
@@ -1326,8 +1399,10 @@ function drawOverlay(o: OverlayContext): void {
       drawToken(ctx, { x: sx - 6 * tokenUnit(zoom), y: sy, u: 2, color: REBEL_COLOR, men: r.men, dir: -1, moving: r.target >= 0, selected: false, t: now });
       animating ||= r.target >= 0;
     }
+    ctx.globalAlpha = 1;
   }
   if (animating) view.invalidate();
+  else if (figuresTicking && !figureTick) figureTick = setTimeout(() => ((figureTick = 0), view.invalidate()), 1000 / LIVING_MAP.figures.frameRate);
   if (performance.now() - stepStart < stepMs) view.invalidate();
 }
 
@@ -1387,6 +1462,138 @@ function dottedLine(ctx: CanvasRenderingContext2D, a: number[], b: number[], u: 
 const ARMY_ZOOM = 3.5;
 /** CSS pixels per art pixel of the army tokens, routes and battles. */
 const tokenUnit = (zoom: number) => (zoom >= 12 ? 3 : 2);
+
+/** Markers: men and names over every army close in (VIEW-126), remembered on this device. */
+const MARKERS_KEY = "ph.markers";
+let markersOn = (() => {
+  try {
+    return localStorage.getItem(MARKERS_KEY) === "1";
+  } catch {
+    return false;
+  }
+})();
+let figureTick: ReturnType<typeof setTimeout> | 0 = 0;
+
+type LivingView = { icons: number; living: number; u: number; animations: "Full" | "Reduced" | "Off" };
+
+/**
+ * The living map at a camera zoom (VIEW-100..VIEW-104, VIEW-129): how strongly the icons and the
+ * figures show, CSS pixels per art pixel of the figures (whole, for the sprite caches) and which
+ * figures move. Street level comes in a later step; until then the figures keep the living band's size.
+ */
+function livingView(zoom: number): LivingView {
+  const { detail, animations } = livingPrefs();
+  const fade = bandFade(zoom, detail);
+  return { ...fade, u: Math.max(2, Math.round(pieceUnit(Math.min(zoom, LIVING_MAP.streetFrom - 1), detail))), animations };
+}
+
+/** An army or rebel band as figures on the living map. */
+interface LivingPiece {
+  /** The army's id for its tap box; rebels have none and open from their province. */
+  id?: number;
+  x: number;
+  y: number;
+  color: string;
+  men: number;
+  name?: string;
+  state: FormationState;
+  facing: readonly [number, number];
+  figures: Figure[];
+  selected: boolean;
+  /** Seeds where a besiegers' tents stand. */
+  seed: number;
+}
+
+/** The way army slot k marches, (dx, dy) in tiles: toward the next tile of its path, or the way it last stepped. */
+function armyHeading(k: number, dir: 1 | -1): readonly [number, number] {
+  const s = snapshot!;
+  const w = s.tileWidth;
+  const at = s.armies.tile[k]!;
+  const next = s.armies.path[k]![0] ?? -1;
+  const trail = s.armies.trail[k]!;
+  const [a, b] = next >= 0 ? [at, next] : [trail.length > 1 ? trail.at(-2)! : -1, at];
+  if (a < 0 || a === b) return [dir, 0];
+  let dx = (b % w) - (a % w);
+  if (Math.abs(dx) > w / 2) dx -= Math.sign(dx) * w;
+  return [dx, Math.floor(b / w) - Math.floor(a / w)];
+}
+
+/** Rebels face the province they march on, or west while they wait. */
+function rebelHeading(from: number, to: number): readonly [number, number] {
+  if (to < 0 || to === from) return [-1, 0];
+  const a = provinces[from]!, b = provinces[to]!;
+  return [b.x! - a.x!, b.y! - a.y!];
+}
+
+/**
+ * Draws the armies and rebels as figures (VIEW-116..VIEW-120): back to front, with a besiegers'
+ * camp round the walls, brackets round the selected army, and its plate and name when Markers is
+ * on or it is selected (VIEW-126). Each army gets a tap box of at least 44 points (VIEW-125).
+ * At most `maxAnimated` figures move, the nearest the screen's centre first (VIEW-130).
+ * Returns whether any figure moves, so the overlay ticks again.
+ */
+function drawLivingPieces(ctx: CanvasRenderingContext2D, pieces: LivingPiece[], liv: LivingView, now: number, o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
+  const u = liv.u;
+  const shown = pieces.filter((p) => onScreen(p.x, p.y, 30 * u)).map((p) => ({ p, distance: Math.hypot(p.x - o.width / 2, p.y - o.height / 2) }));
+  const moving = animatedFigures(shown.filter((e) => figuresAnimate(liv.animations, e.p.state)), (e) => e.p.figures.length);
+  const step = Math.floor(now / (2000 / LIVING_MAP.figures.frameRate)) % 2;
+  ctx.globalAlpha = liv.living;
+  for (const { p } of shown.sort((a, b) => a.p.y - b.p.y)) {
+    if (p.state === "besieging") drawTents(ctx, p.x, p.y, u, p.color, LIVING_MAP.figures.siegeRing + 4, p.seed);
+    const animated = shown.some((e) => e.p === p && moving.has(e));
+    const box = drawFormation(ctx, { x: p.x, y: p.y, u, color: p.color, figures: p.figures, facing: p.facing, frame: animated ? (step as 0 | 1) : 0 });
+    if (p.selected) brackets(ctx, box.x, box.y, box.w, box.h, u, 1 + (Math.floor(now / 260) % 2), PALETTE.gold);
+    const labels = pieceLabels("living", { markers: markersOn, selected: p.selected });
+    let bottom = box.y + box.h;
+    if (labels.plate) bottom += drawPlate(ctx, menShort(p.men), box.x + box.w / 2, bottom + 2, 2, p.color) + 2;
+    if (labels.name && p.name) {
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      pixelText(ctx, p.name, box.x + box.w / 2, bottom + 2, 10);
+    }
+    if (p.id !== undefined && liv.living >= 0.5) {
+      const tap = tapBox(box.w / u, (bottom - box.y) / u, u);
+      armyHitBoxes.push({ id: p.id, x: box.x + box.w / 2 - tap.w / 2, y: (box.y + bottom) / 2 - tap.h / 2, w: tap.w, h: tap.h });
+    }
+  }
+  ctx.globalAlpha = 1;
+  return moving.size > 0;
+}
+
+/**
+ * A battle close in (VIEW-119): each side's figures face the other across the tile, as many as
+ * its men left of those it brought, the front ranks clashing. Returns whether they move.
+ */
+function drawFieldBattle(ctx: CanvasRenderingContext2D, b: Snapshot["battles"][number], x: number, y: number, liv: LivingView, now: number): boolean {
+  const s = snapshot!;
+  const u = liv.u;
+  const men: [number, number] = [0, 0], horse: [number, number] = [0, 0];
+  for (let k = 0; k < s.armies.id.length; k++) {
+    if (s.armies.battle[k] !== b.id) continue;
+    const side = s.armies.owner[k] === b.defender ? 1 : 0;
+    men[side] += s.armies.men[k]!;
+    horse[side] += s.armies.horse[k]!;
+  }
+  const moves = figuresAnimate(liv.animations, "fighting");
+  const clash = moves && Math.floor(now / (2000 / LIVING_MAP.figures.frameRate)) % 2 === 1;
+  ctx.globalAlpha = liv.living;
+  const sides = [
+    { color: nations[b.attacker]!.color, start: b.attStart, now: b.attMen, dir: 1 },
+    { color: nations[b.defender]!.color, start: b.defStart, now: b.defMen, dir: -1 },
+  ];
+  sides.forEach((side, i) => {
+    const n = figuresLeft(side.start, side.now, "living");
+    if (n <= 0) return;
+    // Arms in the share the side's armies have them; the count from the men it has left.
+    const share = men[i]! > 0 ? horse[i]! / men[i]! : 0;
+    const facing = [side.dir, 0] as const;
+    const figures = formation({ men: n * LIVING_MAP.figures.menPerFigure.living, foot: 1 - share, horse: share, state: "fighting", band: "living", facing });
+    drawFormation(ctx, { x: x - side.dir * 4 * u, y, u, color: side.color, figures, facing, frame: clash ? 1 : 0, lunge: clash ? 1 : 0 });
+  });
+  if (clash) drawClash(ctx, x, y, u);
+  ctx.globalAlpha = 1;
+  return moves;
+}
 
 /** Whole hours from one date to a later one (within a few weeks). */
 function hoursBetween(from: GameDate, to: GameDate): number {
@@ -5553,11 +5760,11 @@ Object.assign(globalThis, {
     return !!b;
   },
   /** Centres the map on the first siege and returns its province's id, or null. */
-  __phLookAtSiege: () => {
+  __phLookAtSiege: (zoom = 8) => {
     const st = snapshot?.sieges[0];
     if (!st) return null;
     const p = provinces[st.province]!;
-    view.lookAt(p.x!, p.y!, 8);
+    view.lookAt(p.x!, p.y!, zoom);
     return p.id;
   },
   __phLookAtWar: () => {

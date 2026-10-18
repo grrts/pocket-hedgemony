@@ -141,6 +141,19 @@ export function mapPower(): { maxFps: number; animMs: number; dprCap: number } {
   };
 }
 
+/**
+ * What the living map draws close in (VIEW-104, VIEW-129): Map detail sets the bands, Animations
+ * which figures move; Battery saver holds Map detail at Medium at most, with every figure still.
+ */
+export function livingPrefs(): { detail: "Low" | "Medium" | "High"; animations: "Full" | "Reduced" | "Off" } {
+  const d = String(pref("graphics.map_detail"));
+  const a = String(pref("graphics.animations"));
+  const detail = d === "low" ? "Low" : d === "medium" ? "Medium" : "High";
+  const animations = a === "off" ? "Off" : a === "reduced" ? "Reduced" : "Full";
+  if (!batteryOn()) return { detail, animations };
+  return { detail: detail === "High" ? "Medium" : detail, animations: "Off" };
+}
+
 /** Body text 17, 20 or 24 px as a zoom on the interface text (SET-098, SET-137). */
 export function textZoom(): number {
   return ({ normal: 1, large: 20 / 17, larger: 24 / 17 } as Record<string, number>)[String(pref("accessibility.text_size"))] ?? 1;
