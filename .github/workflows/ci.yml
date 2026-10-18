@@ -5,11 +5,11 @@ on:
     branches: [main, claude/project-thread-e8y1yc]
   pull_request:
 
-# A newer push to a PR (a fix, a base merge) cancels its older run, and
-# closing or merging the PR cancels the run still going (ci-cancel.yml).
-# Pushes to main always run to the end.
+# A newer push cancels the older run on the same PR or branch: a fix or base
+# merge on a PR, or the next merge into main (its run checks both merges).
+# Closing or merging a PR cancels its run still going (ci-cancel.yml).
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.run_id }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
