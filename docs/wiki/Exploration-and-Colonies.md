@@ -97,13 +97,21 @@ If nobody lives in the province or any neighbour, the colony is Peaceful.
 
 A country whose catalogue personality favours expansion by sea sends exploration ships along the edge of its charted map, then founds colonies on the nearest unowned coasts, always loading the stores its rolled aggression needs on average plus a quarter: 450 rations for Peaceful, 575 for Wary, 750 for Hostile and 1,125 for Fierce. Land powers never explore. The AI uses the same commands as the player. Charted maps are stored as one bit per province and zone per country, and colonies update once a month with the province.
 
-## What you see
+## How you play it
 
-- **World zoom**: the parchment over what you haven't charted, voyage paths as dotted lines, and colonies being founded as a small flag with a progress ring.
-- **Region zoom**: your colonial range as a faint line on the sea, and colonisable provinces marked with a pale flag.
-- **The voyage preview**: zones and uncharted count, supply out and back with any shortfall, ports on the way, and Turn back or Carry on.
-- **The colony card** (province zoom): governor, progress and average monthly change, the locals and their monthly range, food and months left with a shortfall warning, and *Abandon*.
-- **The country card**: "Colonial governors n of m · range r zones".
+Most of exploration happens on the fleet card and the map; the Colonies tab is its overview.
+
+- **Order a caravel** on the Port tab of a coastal province, like any ship. It sails in its own fleet of explorers and needs no admiral.
+- **Explore** on the fleet card (in port) folds the card away and brings up the **voyage bar** along the bottom of the map. Tap sea zones, under the parchment or not: each tap adds a leg, the course is drawn in gold, and the bar shows the zones, how many are uncharted, the supply out and back and any shortfall. Pick *Turn back* or *Carry on*, then *Set sail*; *Undo* takes back the last leg and *Cancel* drops the course. A zone too far out for your ships' reach says why when tapped.
+- As the fleet sails the **parchment lifts** from every zone and coast next to it, and a dispatch reports how many places the voyage charted when it ends.
+- **The Colony section** of the same card (once you know Ocean navigation): *Hire a colonial governor* in a port of yours, *Load* colony stores, then at sea beside an empty coast one *Found a colony in …* button per coast, each with the reason underneath when it can't be used. Beside your colony, *Unload* puts the stores ashore.
+- **A colony being founded** shows its card on the province: progress and the month's change, the locals, food and whether it will last, and *Abandon* when a ship of yours lies beside it. On the map it is a small flag over a ring that fills as it grows.
+- **The Charts lens** (Map lens menu) shows what you have charted, empty coasts inside your colonial range in bright green, empty land beyond it in pale green and colonies being founded in gold.
+- **The Colonies tab** of your country card: governors used of slots and the range, where each governor is (tap to go there), colonies being founded with their progress and food, those founded, and how many empty coasts lie in range, with a button to the Charts lens.
+
+On a phone in landscape the voyage bar sits between the overview button and End turn, wraps its buttons rather than shrinking them, and every reason is written under its button since there is no hover.
+
+**In the game today.** Until the map records regions per province and who works each tile, a realm's region for the age gate comes from the event tree's 1444 list or the scenario catalogue's region, every unowned land province has one free tile, and a founded colony keeps the people living there, who become yours. The computer players that explore are the sea-minded realms of the catalogue (Castile, Portugal, Novgorod): each keeps one caravel exploring the edge of its charts and, once it can hire governors, settles the nearest empty coast in range with the stores it needs.
 
 ## How it connects
 
@@ -153,6 +161,6 @@ Nothing in exploration waits on a design decision any more. There is no first co
 
 ## For developers
 
-- Spec: `domain/exploration/spec.md` in the game repository, requirement code **EXPL** (EXPL-001 to EXPL-068).
+- Spec: `domain/exploration/spec.md` in the game repository, requirement code **EXPL** (EXPL-001 to EXPL-075; EXPL-069 to EXPL-074 are the screens).
 - Features: `domain/exploration/features/`: `unlocking-exploration.feature`, `charted-map.feature`, `voyages.feature` (São Gabriel, Castile 1493), `colonial-governors.feature`, `founding-a-colony.feature` (Castile 1493) and `exploration-ai.feature`.
-- Code: `packages/engine/src/domain/exploration/`, numbers in `packages/rules/data/domain/exploration.json`. The client's parchment toggle in `apps/client/src/main.ts` is to be replaced by the charted map.
+- Code: the rules in `packages/engine/src/domain/exploration/`, the game in `packages/engine/src/exploration.ts` (charts, unlock) and `colonies.ts` (voyages, governors, colonies, AI, the player's view); numbers in `packages/rules/data/domain/exploration.json`. Screens in `apps/client/src/ui/explore.ts`, checked on phones by `apps/client/scripts/explore-shots.mjs`.

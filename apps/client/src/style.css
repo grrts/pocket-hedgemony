@@ -3020,22 +3020,32 @@ button.belief-line {
   margin: 0 0 4px;
 }
 
-.voyage-bar .switch,
-.voyage-bar .actions {
+.voyage-bar .controls {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: 4px;
+}
+
+.voyage-bar .switch,
+.voyage-bar .actions {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 4px;
 }
 
 .voyage-bar button {
   flex: 1 1 auto;
   min-height: 44px;
+  padding: 0 8px;
 }
 
-.switch button.on {
-  background: var(--brass);
-  box-shadow: inset 0 0 0 2px var(--outline);
+/* The low-supply choice stays pressed in, marked with a dot, like a tax rate. */
+.switch button.paper.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+
+.switch button.on::before {
+  content: "● ";
 }
 
 /* A reason a button can't be used, written under it: a phone has no hover. */
@@ -3082,4 +3092,9 @@ small.why {
 .lens-key .swatch.parchment {
   background: #d9c79a;
   background-image: repeating-linear-gradient(135deg, rgba(120, 90, 50, 0.3) 0 2px, transparent 2px 5px);
+}
+
+.colony-list button,
+.colony-card button {
+  min-height: 44px;
 }

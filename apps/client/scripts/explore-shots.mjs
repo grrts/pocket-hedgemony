@@ -59,8 +59,11 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   // Crew for a caravel, then the caravel.
   await openPort();
   await tap("[data-port-muster='30']");
-  for (let t = 0; t < 3; t++) await endTurn();
-  await openPort();
+  for (let t = 0; t < 8; t++) {
+    await endTurn();
+    await openPort();
+    if (await page.locator("[data-port-buy=caravel]:not([disabled])").count()) break;
+  }
   await shot("1-port-caravel");
   await check(page, name, "port");
   await tap("[data-port-buy=caravel]");
@@ -134,11 +137,11 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
         { id: 1, name: "Diogo de Teive", age: 41, port: -1, fleet: f.id, colony: -1, homeward: false },
         { id: 2, name: "João Vaz Corte-Real", age: 36, port: -1, fleet: -1, colony: 7, homeward: false },
       ],
-      colonies: [{ province: 7, owner: 0, progress: 140, aggression: "Wary", food: 900, monthsOfFood: 6, average: 9, pressureMax: 4, lastChange: 11, governor: "João Vaz Corte-Real", monthsLeft: 9 }],
+      colonies: [{ province: 7, owner: 0, progress: 40, aggression: "Wary", food: 900, monthsOfFood: 6, average: 9, pressureMax: 4, lastChange: 11, governor: "João Vaz Corte-Real", monthsLeft: 9 }],
       fleets: [{ id: f.id, oceanReach: 255, frozen: false, load: { rations: 300, pays: "food", gold: 0 } }],
     };
     const ui = window.__phExploreUi;
-    const name = () => "Terra Nova";
+    const name = (p) => (p === 8 ? "Cabo Frio" : "Terra Nova");
     window.__phFake = {
       fleet: `<header><h2 class="ribbon">Explorers</h2></header>${ui.colonySection(f, fake, { inPort: false, portOfMine: false, gold: 120, stores: 300, storesMax: 300, coasts: [{ province: 7, why: null }, { province: 8, why: "beyond your colonial range" }], colonyHere: null, waiting: [], name })}`,
       colony: `<header><h2 class="ribbon">Terra Nova</h2></header>${ui.colonyCard(fake.colonies[0], fake, { mine: true, owner: "Portugal", shipBeside: false })}`,

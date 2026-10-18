@@ -84,6 +84,7 @@ export function voyageBar(d: { zones: number; uncharted: number; supply: number;
     : "<b>Tap the sea</b> to draw a course; each tap adds a leg.";
   return `
     <p class="summary">${summary}</p>
+    <div class="controls">
     <div class="switch" role="radiogroup" aria-label="When supply runs low">
       <button class="paper${d.carryOn ? "" : " on"}" data-voyage-low="back" role="radio" aria-checked="${!d.carryOn}">Turn back</button>
       <button class="paper${d.carryOn ? " on" : ""}" data-voyage-low="on" role="radio" aria-checked="${d.carryOn}">Carry on</button>
@@ -92,6 +93,7 @@ export function voyageBar(d: { zones: number; uncharted: number; supply: number;
       <button class="paper" data-voyage-undo ${d.zones ? "" : "disabled"}>Undo</button>
       <button class="paper" data-voyage-cancel>Cancel</button>
       <button class="wax" data-voyage-go ${d.zones ? "" : "disabled"}>Set sail</button>
+    </div>
     </div>`;
 }
 
