@@ -5,6 +5,13 @@ on:
     branches: [main, claude/project-thread-e8y1yc]
   pull_request:
 
+# A newer push to a PR (a fix, a base merge) cancels its older run, and
+# closing or merging the PR cancels the run still going (ci-cancel.yml).
+# Pushes to main always run to the end.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   game:
     runs-on: ubuntu-latest
