@@ -315,7 +315,7 @@ The first part of statecraft is in the playable build: envoys, alliances, marria
 - **How long it takes**: the envoy rides to their capital (two days per unit of distance), stays at court a month, and the answer reaches you the month after. While he is away his seat is taken. Most realms have one seat, and one more with over 10 provinces.
 - **Your own overview**: your realm card's Diplomacy tab lists your envoys abroad (where, why, and when they arrive or come home) and the last eight answers, each with its *Why?*. Answers also arrive in the dispatches with a scroll.
 - **Ending an alliance**: *End the alliance* on an ally's tab. It is an Oath broken: they remember it (−40, fading over 20 years), and other courts trust you less.
-- **The other realms** send envoys too: every six months each court weighs an ask (an alliance or a marriage, in turn) with three of its neighbours, and sends the best ask its count says yes to, or a gift first when it is close. You see the alliances and marriages they make in the dispatches.
+- **The other realms** send envoys too: once a year each court picks the neighbour that thinks best of it and weighs an alliance and a marriage there, and sends the best ask its count says yes to, or a gift first when it is close. You see the alliances and marriages they make in the dispatches.
 - **For now** an envoy is not a named official, so no province loses its official while he is away; every realm counts two unmarried children; and the royal marriages of 1444 count from the start. Envoys, letters and alliances are kept in your save.
 
 ## How it connects

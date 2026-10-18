@@ -233,7 +233,7 @@ export function eligibility(p: Programme, id: string, date: Day, t: Tree = tree(
   if (!inv) return { ok: false, reason: "unknown" };
   if (p.known.has(id)) return { ok: false, reason: "known" };
   if (outOfScope(inv) || !withinCampaign(date)) return { ok: false, reason: "out_of_scope" };
-  if (![inv.parent, ...inv.or_parents].some((x) => p.known.has(x))) return { ok: false, reason: "parent" };
+  if (!p.known.has(inv.parent) && !inv.or_parents.some((x) => p.known.has(x))) return { ok: false, reason: "parent" };
   if (!inv.also_needs.every((x) => p.known.has(x))) return { ok: false, reason: "also_needs" };
   if (inv.contact && !p.contacts.has(inv.contact)) return { ok: false, reason: "contact" };
   return { ok: true };

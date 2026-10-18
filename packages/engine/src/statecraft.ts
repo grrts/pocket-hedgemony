@@ -194,10 +194,8 @@ function neighbourRealms(world: World): Set<number>[] {
   return table;
 }
 
-/** AI realms consider their envoys once every few months, a share of them each month, so the work is spread. */
-const AI_EVERY_MONTHS = 6;
-/** How many neighbours an AI court weighs each time it considers its envoys. */
-const AI_NEIGHBOURS = 3;
+/** AI realms consider their envoys once a year, a twelfth of them each month, so the work is spread. */
+const AI_EVERY_MONTHS = 12;
 
 /**
  * The AI's envoys (DIPL-177 to DIPL-179): a realm with a free seat looks at
@@ -213,21 +211,21 @@ function aiEnvoys(world: World): void {
     if (n === world.player || world.nationGone[n] || (n + turn) % AI_EVERY_MONTHS !== 0) continue;
     const id = world.nationIds[n]!;
     if (dip.freeSeats(d, id) <= 0) continue;
-    // A few neighbours a time, in turn, so the court's counting stays cheap on a large map.
-    const list = [...near[n]!];
-    let best: { t: number; action: string; total: number } | null = null;
-    const from = Math.floor(turn / AI_EVERY_MONTHS) * AI_NEIGHBOURS;
+    // The neighbour who thinks best of us is the one worth an envoy; only that court's asks are counted in full.
+    let t = -1;
+    let warmest = -Infinity;
+    for (const x of near[n]!) {
+      if (world.nationGone[x]) continue;
+      const w = dip.standing(d, world.nationIds[x]!, id);
+      if (w > warmest) [t, warmest] = [x, w];
+    }
+    if (t < 0) continue;
     const days = countDays(world);
-    for (let k = 0; k < Math.min(AI_NEIGHBOURS, list.length); k++) {
-      const t = list[(from + k) % list.length]!;
-      if (world.nationGone[t]) continue;
-      // One ask a neighbour each time, alliance and marriage in turn.
-      {
-        const action = (Math.floor(turn / AI_EVERY_MONTHS) + n + k) % 2 === 0 ? "propose_alliance" : "arrange_marriage";
-        if (whyNotEnvoy(world, n, t, action)) continue;
-        const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days);
-        if (!best || count.total > best.total) best = { t, action, total: count.total };
-      }
+    let best: { t: number; action: string; total: number } | null = null;
+    for (const action of ["propose_alliance", "arrange_marriage"] as const) {
+      if (whyNotEnvoy(world, n, t, action)) continue;
+      const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days);
+      if (!best || count.total > best.total) best = { t, action, total: count.total };
     }
     if (!best) continue;
     const choice = dip.aiChoose(best.total);
