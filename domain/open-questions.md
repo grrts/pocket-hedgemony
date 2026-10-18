@@ -52,6 +52,12 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-AUD-13**: (17 Oct, Leroy: pull music and sound forward for playtesting) The music and effects are built ahead of their milestones in a first cut: the director, 16 written tracks (title, two peace tunes per half of the eras, prosperity, diplomacy, the five war and situation tracks with layers, six stingers) and 30 effects, synthesized in the page (AUD-141). The worklet, the MML build, ambience, captions, haptics and the full catalogue follow in their milestones; the palette tunings are drafts awaiting review (OQ-AUD-13).
 - **D-AUD-14**: (17 Oct, Leroy: "its not really nice to listen to, it sounds like noise mostly"; the effects are fine) The music leaves the strict PH-5 chip rules of AUD-004 that made it harsh: square and narrow pulses buzzed, the 16-step envelopes and stepped triangle crackled, and the noise voice ticked on most beats. The music keeps the voice roles (P1, P2, T, W, N), the tunes, the motif and the palettes, and plays them soft (AUD-143), with a pad voice holding chords and a small hall where AUD-004 and §2 forbid reverb tails. Measured on the first tracks, spectral flatness (how much of the sound is noise) falls from about 0.36 to under 0.08 and the brightness centre from about 3 kHz to about 1 kHz. The effects keep the chip sound unchanged. The worklet synth (AUD-104) follows this decision when it is built.
 
+### Balance model (balance)
+
+- **D-BAL-1**: Scores as the yardstick: strategies are compared on the game's own Economy, Power and Technology
+- **D-BAL-3**: One set of tools: the model extends `packages/sim` (feedback 130) and its config, report and run rule
+- **D-BAL-2**: First thresholds are provisional and chosen so today's engine fails BAL-014 to BAL-016: the audit
+
 ### Buildings (buildings)
 
 - **D-BLD-1**: (was OQ-BLD-1) Troyes is a town with 6 slots in 1444. The worked example is the more detailed text.
