@@ -193,7 +193,9 @@ A turn is one week; these steps run once a month, at the end of the turn in whic
 - **What they pay**: the kind's share times the tribute level, all of it while Loyal, half while Wavering and nothing while Disloyal. A Vassal pays 10 in 100 of its taxes; a Tributary 15 in 100 of its income. It shows as *Tribute* in your Treasury tab.
 - **Loyalty** is counted at the end of every season: two more arrows up than down raise it a step, two more down lower it, never twice the same way within a year. You hear when it moves. A Disloyal subject refuses your calls to arms.
 - **Making subjects**: send an envoy to *Offer overlordship* to a smaller realm (it becomes your tributary) or *Ask for protection* of a larger one (you become its vassal), or demand tribute. The other realms offer overlordship too.
-- **Not yet**: folding in, tightening, residents, hostages, risings and the subjects lens come later; faith and distance give no reasons yet.
+- **Your envoys at their court**: *Station a resident* (+1 loyalty, takes one of your envoys while he stays), *Tighten to vassal* (a Loyal tributary, one envoy for 6 months) and *Fold into your realm* (Loyal for 10 years, a subject for 20, sharing a border, and room under your lords cap; one envoy for a month per province). When folding in completes, their land is yours, held by their ruler as one of your lords, and the country leaves the map. Other realms fold in their subjects too, one at a time.
+- **Rising**: a Disloyal subject may rise and declare its independence war. The other realms' subjects rise when their overlord is losing a war elsewhere or a stronger enemy of it waits next door, and their Disloyal neighbours rise with them. Lose land in the peace and the subject is taken back one kind tighter (its fellow subjects remember the force used); otherwise it is free. If you are a subject and Disloyal, *Rise for independence* is on your Diplomacy tab.
+- **Not yet**: hostages, backers that join the war, merging crowns and the subjects map lens come later; faith and distance give no reasons yet.
 
 ## How it connects
 

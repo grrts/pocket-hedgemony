@@ -5,7 +5,7 @@ import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
-import { subjectAction } from "./subjects.ts";
+import { riseUp, subjectAction } from "./subjects.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { monthlyGovernment, reform } from "./government.ts";
@@ -116,7 +116,9 @@ export type Order =
   /** Agree to, give in to or refuse an envoy's ask at the player's court (its id in the snapshot's statecraft asks, DIPL-212). */
   | { type: "answerAsk"; ask: string; yes: boolean }
   /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
-  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release"; level?: string }
+  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "tighten" | "fold_in"; level?: string }
+  /** A Disloyal subject rises against its overlord (SUBJ-076, SUBJ-077). */
+  | { type: "riseUp" }
   | { type: "stopChange"; province: number }
   /** Reform the government into one of its next forms (GOV-027). */
   | { type: "reform"; to: string }
@@ -338,6 +340,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
+    case "riseUp":
+      return riseUp(world, actingNation, news);
     case "subjectAction": {
       const reason = subjectAction(world, actingNation, order.subject, order.action, news, order.level);
       if (!reason) runLedger(world, false);
