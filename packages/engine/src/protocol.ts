@@ -608,7 +608,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     return { response: { id, type: "snapshot", snapshot: snap }, transfer };
   }
 
-  return function handle(req: EngineRequest): HostReply {
+  function handle(req: EngineRequest): HostReply {
     const started = now();
     try {
       switch (req.type) {
@@ -664,7 +664,15 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     } catch (e) {
       return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e) }, transfer: [] };
     }
-  };
+  }
+
+  /**
+   * The world in play, for headless tools that measure it (packages/sim's
+   * balance runs read metrics the snapshot does not carry). Read-only by
+   * contract: the game's screens never call it, and nothing may write through it.
+   */
+  const current = (): Readonly<World> | null => world;
+  return Object.assign(handle, { world: current });
 }
 
 /** Hours an army still has to march along the tiles it has planned (left of a march planned a province at a time: none). */
