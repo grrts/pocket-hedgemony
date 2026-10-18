@@ -12,7 +12,7 @@ Feature: Rules the achievement list follows
   @ACH-002
   Scenario: One list for every store
     When the store lists are built from the YAML
-    Then Steam, Game Center and Google Play each receive the same 71 achievements
+    Then Steam, Game Center and Google Play each receive the same 75 achievements
 
   @ACH-003
   Scenario: Every achievement is original
@@ -47,9 +47,9 @@ Feature: Rules the achievement list follows
   @ACH-008 @ACH-010 @ACH-011
   Scenario: The list stays inside the store limits
     Given the launch achievement list
-    Then it holds 71 achievements worth 680 points
+    Then it holds 75 achievements worth 755 points
     And every achievement's points are a multiple of 5 and at most 40
-    And 29 slots and 320 points are kept for updates
+    And 25 slots and 245 points are kept for updates
     And the list can never hold more than 100 achievements or 1000 points
 
   @ACH-009
@@ -60,10 +60,10 @@ Feature: Rules the achievement list follows
 
     Examples:
       | tier | points | count |
-      | copper | 5 | 38 |
-      | silver | 10 | 21 |
-      | gold | 20 | 10 |
-      | crown | 40 | 2 |
+      | copper | 5 | 39 |
+      | silver | 10 | 22 |
+      | gold | 20 | 11 |
+      | crown | 40 | 3 |
 
   @ACH-012
   Scenario: An update keeps a reserve

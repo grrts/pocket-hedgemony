@@ -95,6 +95,10 @@ export interface AchievementLog {
   nonhistoricalMajor: number;
   /** Distinct non-historical options picked (event:option), for the lifetime row on the device. */
   choices: string[];
+  /** Province harvests brought in this campaign (ACH-085). */
+  provincesHarvested?: number;
+  /** Amounts for the device's lifetime totals not yet read (ACH-085). */
+  added?: Record<string, number>;
 }
 
 const isoOf = (world: World): string => {
@@ -137,7 +141,8 @@ export function startAchievements(world: World): void {
   world.achievements = {
     campaign: A.newCampaign({ ironman: true, realm: id }),
     profile: A.newProfile(),
-    catalogue: { list: A.ACHIEVEMENTS.filter((d) => !NOT_YET.has(d.id)), retired: [] },
+    // Lifetime rows add up across campaigns, so the device tests them (ACH-028).
+    catalogue: { list: A.ACHIEVEMENTS.filter((d) => !NOT_YET.has(d.id) && d.scope === "campaign"), retired: [] },
     fresh: [],
     queue: [],
     month: isoOf(world).slice(0, 7),
@@ -166,6 +171,8 @@ export function startAchievements(world: World): void {
     historical: 0,
     nonhistoricalMajor: 0,
     choices: [],
+    provincesHarvested: 0,
+    added: {},
   };
 }
 
@@ -293,6 +300,7 @@ function stateFacts(world: World, log: AchievementLog): A.Facts {
     people,
     provinces: log.provinces,
     harvests_seen: log.harvestsSeen,
+    provinces_harvested: log.provincesHarvested ?? 0,
     capital_good_harvest_streak: log.goodStreak,
     years_in_a_row: log.goodStreak,
     months_no_hungry_province: log.monthsNoHungry,
@@ -378,17 +386,20 @@ function newMonth(world: World, log: AchievementLog): string[] {
   const hungry = 1 << GRIEVANCES.indexOf("Hungry");
   let anyHungry = false;
   let unrest = false;
-  let harvested = false;
+  let harvested = 0;
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceOwner[p] !== n || world.provinceWater[p]) continue;
     if (world.provinceGrievances[p]! & hungry) anyHungry = true;
     if (moodIndex(world, p) >= 2) unrest = true;
-    if (!harvested && harvestMonthsOf(world, p).includes(month)) harvested = true;
+    if (harvestMonthsOf(world, p).includes(month)) harvested++;
   }
   log.monthsNoHungry = anyHungry ? 0 : log.monthsNoHungry + 1;
   log.monthsNoUnrest = unrest ? 0 : log.monthsNoUnrest + 1;
   if (harvested) {
     log.harvestsSeen++;
+    log.provincesHarvested = (log.provincesHarvested ?? 0) + harvested;
+    const added = (log.added ??= {});
+    added.provinces_harvested = (added.provinces_harvested ?? 0) + harvested;
     moments.push("harvest");
     const cap = world.provinceIndex.get(world.rules.nations[n]!.capital);
     if (cap !== undefined && world.provinceOwner[cap] === n && harvestMonthsOf(world, cap).includes(month)) {
@@ -440,10 +451,12 @@ export function turnEndAchievements(world: World): void {
 }
 
 /** The snapshot's part: new unlocks (handed over once), the earned list, the progress values and eligibility. */
-export function achievementsView(world: World): { fresh: Unlock[]; earned: Record<string, string>; counters: Record<string, number>; eligible: boolean; inScope: number; choices: string[]; months: number } | null {
+export function achievementsView(world: World): { fresh: Unlock[]; added: Record<string, number>; earned: Record<string, string>; counters: Record<string, number>; eligible: boolean; inScope: number; choices: string[]; months: number } | null {
   const log = world.achievements;
   if (!log) return null;
   const fresh = log.fresh;
   log.fresh = [];
-  return { fresh, earned: { ...log.campaign.earned }, counters: { ...log.campaign.counters }, eligible: A.eligible(log.campaign), inScope: rs.tree().inventions.size, choices: [...log.choices], months: log.months };
+  const added = log.added ?? {};
+  log.added = {};
+  return { fresh, added, earned: { ...log.campaign.earned }, counters: { ...log.campaign.counters }, eligible: A.eligible(log.campaign), inScope: rs.tree().inventions.size, choices: [...log.choices], months: log.months };
 }
