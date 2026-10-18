@@ -1,5 +1,5 @@
-// Ships and ports as Portugal (naval spec, How the player uses it): the Port tab of Lisbon, mustering sailors and
-// ordering a cog, the fleet on the map, its card with an admiral, sailing by tapping the sea, and the Navy tab;
+// Ships and ports as Portugal (naval spec, How the player uses it): the Port tab of Lisbon, ordering a carrack and
+// mustering its crew in the queues, the fleet on the map, its card with an admiral, sailing by tapping the sea, and the Navy tab;
 // on a small and a large phone held sideways, a phone held upright (asked to turn), and a desktop.
 // Usage: pnpm build && node scripts/navy-shots.mjs <outDir>
 import { chromium, devices } from "playwright-core";
@@ -38,9 +38,13 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(300);
   await shot("1-port");
   await check(page, name, "port");
-  // Muster a cog's crew, then wait for them to arrive (two weeks).
-  await page.click("[data-port-muster='30']");
+  // Order a carrack (Portugal's yard no longer offers the cog it replaces), then muster its crew for the queue.
+  await page.click("[data-port-buy=carrack]");
   await page.waitForTimeout(300);
+  await page.locator("[data-port-muster]").last().click();
+  await page.waitForTimeout(300);
+  await shot("2-port-queues");
+  await check(page, name, "port queues");
   const endTurn = async () => {
     const turn = await page.evaluate(() => window.__phTurn());
     await page.click(".end-turn");
@@ -53,16 +57,12 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
       }
     }
   };
-  await endTurn();
-  await endTurn();
-  await endTurn();
+  for (let t = 0; t < 5; t++) await endTurn();
   await page.evaluate((id) => window.__phSelect(id), lisbonId);
   await page.waitForTimeout(200);
   await page.click("[data-tab=port]");
   await page.waitForTimeout(200);
-  await page.click("[data-port-buy=cog]");
-  await page.waitForTimeout(300);
-  await shot("2-port-building");
+  await shot("2b-port-building");
   const lisbon = await page.evaluate((id) => window.__phProvince(id), lisbonId);
   for (let t = 0; t < 30 && !(await page.evaluate(() => window.__phNavy().mine.length)); t++) await endTurn();
   console.log(name, "fleets", await page.evaluate(() => window.__phNavy().mine.length));

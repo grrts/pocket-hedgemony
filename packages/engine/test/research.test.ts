@@ -67,6 +67,36 @@ describe("research", () => {
     expect(news.some((x) => x.kind === "invention" && /Learned printing/.test(x.text))).toBe(true);
   });
 
+  it("carries on with the study queue without asking, and queues the path to a far invention (RSCH-108, RSCH-109)", () => {
+    const { w, me, p } = setup();
+    ok(w, { type: "setStudy", invention: "L5" }, me);
+    ok(w, { type: "queueStudy", invention: "B4" }, me);
+    expect(p.queue).toEqual(["B4"]);
+    p.studies[0]!.progress = 1000;
+    const news = untilNewMonth(w, me);
+    expect(knows(w, me, "L5")).toBe(true);
+    expect(p.studies.map((s) => s.id)).toEqual(["B4"]);
+    expect(news.some((x) => x.kind === "invention" && /Choose/.test(x.text))).toBe(false);
+    // Kongo knows iron but neither steel nor horses: the path to heavy cavalry queues both first.
+    const k = setup("kongo");
+    ok(k.w, { type: "queuePath", invention: "W2" }, k.me);
+    expect([...k.p.studies.map((s) => s.id), ...k.p.queue]).toEqual(["C02", "F03", "W2"]);
+    // Heavy cavalry can't move ahead of the horses it needs.
+    expect(refused(k.w, { type: "moveQueuedStudy", invention: "W2", by: -1 }, k.me)).toMatch(/before what it needs/);
+    ok(k.w, { type: "unqueueStudy", invention: "F03" }, k.me);
+    expect(k.p.queue).toEqual([]);
+  });
+
+  it("starts the Americas without horses until first contact, and every realm from its start group (RSCH-096, RSCH-098)", () => {
+    const { w } = setup();
+    const aztecs = w.nationIndex.get("aztecs")!;
+    expect(knows(w, aztecs, "F03")).toBe(false);
+    expect(rs.eligibility(w.research[aztecs]!, "F03", { year: 1444 })).toEqual({ ok: false, reason: "contact" });
+    expect(armUnlocked(w, aztecs, "light horse")).toBe(false);
+    expect(armUnlocked(w, w.nationIndex.get("france")!, "light horse")).toBe(true);
+    for (const p of w.research) expect(p.group).toBeDefined();
+  });
+
   it("takes students from the recruit pools and gives them back when called to arms", () => {
     const { w, me, p } = setup();
     const levies = w.nationLevies[me]!;

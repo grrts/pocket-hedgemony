@@ -43,6 +43,9 @@ export function hashWorld(world: World): string {
   feed(world.provinceTiles);
   feed(world.provinceGame);
   feed(world.provinceHardWinter);
+  feed(world.provinceWorn);
+  feed(world.provinceOverwork);
+  feed(world.provinceRested);
   feed(world.provinceSeam);
   feed(world.provinceSeamYears);
   feed(world.provinceChangeTile);
@@ -72,6 +75,7 @@ export function hashWorld(world: World): string {
   feed(live(a.progress));
   feed(live(a.kind));
   feed(live(a.monthsOut));
+  feed(live(a.home));
   feed(live(a.drill));
   feed(live(a.mix, a.mix.length / a.alive.length));
   feed(new Int32Array(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats])));

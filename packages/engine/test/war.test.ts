@@ -48,6 +48,7 @@ describe("war and conquest", () => {
     const kinds = new Set(news.map((x) => x.kind));
     expect(kinds.has("siege") || kinds.has("battle")).toBe(true);
     expect(peace).toBe(true);
+    // The province the war lets Castile ask for changes hands (WAR-244).
     expect(w.provinceOwner[target]).toBe(me);
     expect(relationState(w, me, foe).state).toBe("truce");
   }, 60000);
@@ -66,12 +67,13 @@ describe("war and conquest", () => {
       offer = w.peaceOffers.find((o) => o.from === foe);
     }
     expect(offer?.terms).toBe("give");
+    const portugal = w.provinceOwner.filter((o) => o === foe).length;
     expect(offer!.provinces!.length).toBeGreaterThan(0);
     expect(applyNow(w, { type: "answerPeace", offer: offer!.id, yes: true }, me).rejectedOrders).toEqual([]);
     expect(relationState(w, me, foe).state).toBe("truce");
     // It gives what the peace table allows: at most a third of its land, never its capital while it has more (WAR-227).
     for (const p of offer!.provinces!) expect(w.provinceOwner[p]).toBe(me);
-    expect(offer!.provinces!.length).toBeLessThanOrEqual(Math.ceil(14 / 3));
+    expect(offer!.provinces!.length).toBeLessThanOrEqual(Math.ceil(portugal / 3));
     expect(w.provinceOwner[w.provinceIndex.get(rules.nations[foe]!.capital)!]).toBe(foe);
     expect(w.peaceOffers).toEqual([]);
   }, 60000);

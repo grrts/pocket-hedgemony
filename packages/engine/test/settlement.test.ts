@@ -127,10 +127,10 @@ describe("peace settlement scoring in the game", () => {
     const t = settlementTable(w, me, foe)!;
     expect(t.candidates.map((c) => c.province)).not.toContain(capital);
     expect(t.limits.mostPerRealm.get(foe)).toBe(Math.ceil(theirs.length / 3));
-    expect(applyNow(w, { type: "offerPeace", target: foe, terms: "take", demand: { provinces: [capital], gold: 0 } }, me).rejectedOrders[0]?.reason).toMatch(/holds/);
+    expect(applyNow(w, { type: "offerPeace", target: foe, terms: "take", provinces: [capital], gold: 0 }, me).rejectedOrders[0]?.reason).toMatch(/holds/);
     const cheapest = [...t.candidates].sort((a, b) => a.cost - b.cost)[0]!;
     expect(cheapest.cost).toBeLessThanOrEqual(t.capacity.capacity);
-    const r = applyNow(w, { type: "offerPeace", target: foe, terms: "take", demand: { provinces: [cheapest.province], gold: 0 } }, me);
+    const r = applyNow(w, { type: "offerPeace", target: foe, terms: "take", provinces: [cheapest.province], gold: 0 }, me);
     expect(r.rejectedOrders).toEqual([]);
     expect(w.provinceOwner[cheapest.province]).toBe(me);
     expect(relationState(w, me, foe).state).toBe("truce");
@@ -144,7 +144,7 @@ describe("peace settlement scoring in the game", () => {
     expect(Math.min(...t.candidates.map((c) => c.cost))).toBeLessThanOrEqual(t.capacity.capacity);
     const all = { provinces: t.candidates.map((c) => c.province).slice(0, t.limits.mostPerRealm.get(foe)), gold: t.limits.maxGold };
     expect(all.provinces.reduce((s, p) => s + t.candidates.find((c) => c.province === p)!.cost, 0) + Math.ceil(all.gold / 25)).toBeGreaterThan(t.capacity.capacity);
-    const r = applyNow(w, { type: "offerPeace", target: foe, terms: "take", demand: all }, me);
+    const r = applyNow(w, { type: "offerPeace", target: foe, terms: "take", ...all }, me);
     expect(r.rejectedOrders).toEqual([]);
     expect(relationState(w, me, foe).state).toBe("war");
     const counter = w.peaceOffers.find((o) => o.from === foe && o.counter)!;
@@ -167,7 +167,7 @@ describe("peace settlement scoring in the game", () => {
     for (let i = 0; i < w.armies.count; i++) if (w.armies.owner[i] === me) w.armies.alive[i] = 0;
     const t = settlementTable(w, me, foe)!;
     expect(t.capacity.capacity).toBeLessThan(t.candidates[0]!.cost);
-    const r = applyNow(w, { type: "offerPeace", target: foe, terms: "take", demand: { provinces: [p], gold: 0 } }, me);
+    const r = applyNow(w, { type: "offerPeace", target: foe, terms: "take", provinces: [p], gold: 0 }, me);
     expect(r.news.some((x) => x.kind === "refused")).toBe(true);
     expect(relationState(w, me, foe).state).toBe("war");
   });
@@ -191,7 +191,7 @@ describe("peace settlement scoring in the game", () => {
     // The rules still hold: at most a third of their land, no capital while they keep more.
     const most = view.mostPerRealm.find((x) => x.realm === foe)!.most;
     const ask = view.provinces.filter((x) => !x.why).slice(0, most).map((x) => x.province);
-    expect(applyNow(w, { type: "offerPeace", target: foe, terms: "take", demand: { provinces: ask, gold: view.maxGold } }, me).rejectedOrders).toEqual([]);
+    expect(applyNow(w, { type: "offerPeace", target: foe, terms: "take", provinces: ask, gold: view.maxGold }, me).rejectedOrders).toEqual([]);
     for (const p of ask) expect(w.provinceOwner[p]).toBe(me);
     expect(relationState(w, me, foe).state).toBe("truce");
   });

@@ -10,6 +10,7 @@ import {
   adCard,
   applyPreset,
   answerEndTurnQuestion,
+  endTurnInAuto,
   answerEvent,
   answerFirstRun,
   appBackgrounded,
@@ -1408,6 +1409,11 @@ Given("the setting {string} is {string}", (s, setting: string, value: string) =>
 });
 
 When("the player taps End turn", (s) => {
+  // With Auto turns in play (auto-turns.feature), End turn stops them at the week's end or pauses the week (SHELL-160).
+  if (s.auto) {
+    if (s.playing && endTurnInAuto(s.auto) === "pause") s.paused = !s.paused;
+    return;
+  }
   const shell = sh(s);
   s.depth = shell.stack.length;
   s.endTurn = pressEndTurn(shell);

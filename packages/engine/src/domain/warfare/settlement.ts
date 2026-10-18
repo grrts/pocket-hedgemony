@@ -1,7 +1,7 @@
 import { W } from "./model.ts";
 
 /**
- * Peace settlement scoring (spec §5.25, WAR-240 … WAR-251; Leroy X-22). Every
+ * Peace settlement scoring (spec §5.25, WAR-240 … WAR-251; Leroy X-23). Every
  * province has a demand cost; the way the war has gone gives the winning side
  * a capacity in the same points. Demands that fit are signed, and the AI
  * answers with the same counts the player sees: accept, counter with what fits,

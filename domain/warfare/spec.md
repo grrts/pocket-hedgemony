@@ -688,7 +688,7 @@ rules are the latest decision and replace what they name; the balance model (BAL
 - WAR-231 Overview: the war plaque in the top bar (REALM-205) shows each war's peace voices for your side as a small bar that turns amber past a third and red past half, when a peace becomes obliged; tapping it opens the war card. [X-21; X-19]
 - WAR-232 Phone: in landscape the declare sheet is two columns in the Wide layout (price on the left, terms on the right) and one scrolling column in the Tall layout, with Confirm pinned inside the safe area; every line and button is at least 44 points tall, bars carry their number as text so colour is never the only sign, and nothing needs hover. [X-21; X-19]
 
-### 5.25 Peace settlement scoring (X-22, Leroy 18 Oct)
+### 5.25 Peace settlement scoring (X-23, Leroy 18 Oct)
 Leroy, 18 October: how much a country can demand from a beaten enemy is scored from how the war went; every province
 has a configurable demand cost; demands are combined within the capacity; the AI answers by the same counts (accept,
 counter or refuse); a decisively beaten AI may surrender unconditionally. The capacity is this game's own: it is
@@ -700,35 +700,35 @@ from a war score. WAR-184's preconditions and WAR-227's peace limit still hold. 
   `per_sqrt_thousand_people` times the square root of its people in thousands, plus `per_wealth` times its wealth,
   plus `castle` when it has walls, `coastal` on the coast and `river` on a river; times `capital_multiplier` for a
   realm's capital and `not_bordering_multiplier` when it does not touch the asking side's land; rounded, at least 1.
-  [X-22]
+  [X-23]
 - WAR-241 The warfare system shall give the asking side a settlement capacity against the giving side: the giving
   side's realm value (the demand cost of all its land) times what was won, the sum of `capacity_weights.land_held`
   times the share of that value the asking side holds, `capital_held` when it holds the giving leader's capital, and
   `battles` times the giving side's men lost in this war's battles beyond the asking side's, against those men plus
   its strength now; raised by the factor 1 + `armies` times the asking side's edge in strength (1 − theirs ÷ ours,
   at least 0) + `will_to_fight` times the giving side's share of peace voices; rounded down, never above the realm
-  value. Nothing won gives no capacity. It is recomputed from the war's state, never stored (INV-WAR-19). [X-22]
+  value. Nothing won gives no capacity. It is recomputed from the war's state, never stored (INV-WAR-19). [X-23]
 - WAR-242 The warfare system shall let the asking side combine demands: provinces of the giving side it holds
   (WAR-184), at most WAR-227's share of each giving realm's provinces and its capital only with its last, and gold up
   to the giving realm's treasury; a demand costs its provinces' costs plus one point for each `gold_per_point` gold,
-  rounded up. [X-22; WAR-184; WAR-227]
+  rounded up. [X-23; WAR-184; WAR-227]
 - WAR-243 When a demand is put to an AI realm, the warfare system shall have it sign when the demand costs no more
   than the capacity; otherwise offer back the dearest of the asked provinces that fit, within the limits, and as
-  much of the asked gold as the rest buys; and refuse when nothing fits. [X-22; WAR-183]
+  much of the asked gold as the rest buys; and refuse when nothing fits. [X-23; WAR-183]
 - WAR-244 When an AI realm asks for peace terms, the warfare system shall have it spend the capacity the same way:
   the dearest provinces it holds that still fit, within the limits, and gold up to their treasury with the rest; the
   AI offers the player this when it is losing and its voices want peace, and asks it of the player when the player's
   voices want peace and it holds the player's land. Between AI realms these terms end the war when the loser's
-  voices want peace (WAR-183). [X-22; DIPL-195]
+  voices want peace (WAR-183). [X-23; DIPL-195]
 - WAR-245 The warfare system shall count an AI side as beaten when at least `surrender.peace_share` of its voices
   say peace, its strength is at most `surrender.army_ratio` of the enemy's, and the enemy holds its leader's capital
   or at least `surrender.land_share` of its realm value; a beaten AI surrenders unconditionally, and the news says
-  so. The player never surrenders by the game's choice. [X-22]
+  so. The player never surrenders by the game's choice. [X-23]
 - WAR-246 While a side has surrendered, its capacity shall be its whole realm value, and it signs any demand the
   rules allow (WAR-242); an AI victor signs its fullest terms at once; a player victor is sent a surrender offer with
-  the fullest terms, and may instead ask anything else at the peace table. [X-22; WAR-185]
+  the fullest terms, and may instead ask anything else at the peace table. [X-23; WAR-185]
 - WAR-247 When an AI realm counters the player's demand, the warfare system shall send the player its counter as a
-  peace offer that names the provinces and gold, standing until the month is out like any peace offer. [X-22;
+  peace offer that names the provinces and gold, standing until the month is out like any peace offer. [X-23;
   DIPL-195]
 
 #### How the player uses it: the peace table
@@ -739,16 +739,16 @@ from a war score. WAR-184's preconditions and WAR-227's peace limit still hold. 
   why it can't be asked (their capital, the peace limit); then gold with − and + buttons a step at a time. The draft
   starts as the most the war allows. *Offer these terms*, *Ask the most the war allows*, *White peace* and *Give up*
   close it. A counter or a surrender arrives as a peace offer in the dispatches and on their card, naming what it
-  gives, with *Make peace* and *Fight on*. [X-22; X-19; DIPL-196]
+  gives, with *Make peace* and *Fight on*. [X-23; X-19; DIPL-196]
 - WAR-249 Grouping and overview: the peace table is the only place terms are made, on the war card next to the
   war's other facts (WAR-230); the war plaque (WAR-231) and the dispatches, which count peace offers, are the
-  overview; a surrender is also told in the news. [X-22; X-19]
+  overview; a surrender is also told in the news. [X-23; X-19]
 - WAR-250 Phone: in the Wide and Tall layouts the province toggles sit two or three side by side when the card is
   wide and one to a row when it is narrow; every toggle and button is at least 44 points high, the bar carries its
   numbers as text so colour is never the only sign, the parts open on a tap and nothing needs hover; checked with
-  `apps/client/scripts/peace-table-shots.mjs` on a small and a large phone held sideways and a desktop. [X-22; X-19]
+  `apps/client/scripts/peace-table-shots.mjs` on a small and a large phone held sideways and a desktop. [X-23; X-19]
 - WAR-251 The warfare system shall score settlements the same for player and AI, from the same config, with no
-  randomness: the same war state always gives the same costs, capacity, answer and terms. [X-22; WAR-183; X-15]
+  randomness: the same war state always gives the same costs, capacity, answer and terms. [X-23; WAR-183; X-15]
 
 ## 6. Commands
 

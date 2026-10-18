@@ -4,7 +4,7 @@ Feature: Peace settlement scoring
   I want to know how much the war lets me ask, and what each province costs
   So that I can choose my terms, and the AI answers them by the same counts I see
 
-  # Leroy, 18 Oct (X-22). Config keys: warfare.settlement.province_cost.*, warfare.settlement.capacity_weights.*,
+  # Leroy, 18 Oct (X-23). Config keys: warfare.settlement.province_cost.*, warfare.settlement.capacity_weights.*,
   # warfare.settlement.gold_per_point, warfare.settlement.surrender.*, warfare.peace.max_ceded_share
 
   @WAR-240 @placeholder

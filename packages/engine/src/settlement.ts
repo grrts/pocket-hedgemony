@@ -1,5 +1,6 @@
 import * as wf from "./domain/warfare/index.ts";
-import { peaceShare, sidesOf, strength, wallsOf, warBetween } from "./war.ts";
+import { sidesOf, strength, wallsOf, warBetween } from "./war.ts";
+import { maxCeded, peaceShare } from "./peace.ts";
 import type { World } from "./world.ts";
 
 /**
@@ -71,7 +72,7 @@ export function settlementTable(world: World, a: number, b: number): SettlementT
   }
   // One peace takes at most a share of each realm's provinces, and its capital only when it is the last (WAR-227).
   const mostPerRealm = new Map<number, number>();
-  for (const [o, n] of owned) mostPerRealm.set(o, Math.ceil(n * wf.W.peace.max_ceded_share));
+  for (const o of owned.keys()) mostPerRealm.set(o, maxCeded(world, o).max);
   const candidates = held.filter((c) => world.rules.nations[c.realm]!.capital !== world.provinceIds[c.province] || owned.get(c.realm) === 1);
   const capital = world.provinceIndex.get(world.rules.nations[givers[0]!]!.capital);
   const attackerSide = war.attackers.includes(world.nationIds[a]!);
@@ -83,7 +84,8 @@ export function settlementTable(world: World, a: number, b: number): SettlementT
     capitalHeld: capital !== undefined && takers.has(world.provinceOccupier[capital]!),
     menLost: attackerSide ? { ours: lost.attackers, theirs: lost.defenders } : { ours: lost.defenders, theirs: lost.attackers },
     strength: { ours: field(askers), theirs: field(givers) },
-    theirPeaceShare: peaceShare(world, givers, askers),
+    // The giving leader's peace voices (WAR-180, WAR-221).
+    theirPeaceShare: peaceShare(world, b, war),
     surrendered: (war.surrendered ?? []).includes(world.nationIds[b]!),
   };
   return {

@@ -381,6 +381,57 @@ export function provincesTaken(d: Diplomacy, by: string, from: string, provinces
   country(d, by).landsTaken += provinces.length;
 }
 
+/**
+ * Land that joins a realm without being seized: folding in a subject, merging a
+ * Union's crowns (DIPL-224). The province records follow the new owner, but no
+ * Took our land and no Lands taken are written.
+ */
+export function provincesJoined(d: Diplomacy, by: string, from: string, provinces: string[]): void {
+  for (const p of provinces) {
+    const pr = province(d, p);
+    pr.history.push({ owner: from, until: monthOf(d.date) });
+    pr.owner = by;
+  }
+}
+
+/**
+ * Lands taken in the last 20 years (DIPL-157, DIPL-221; REALM-168: a hard
+ * window). `holds` says whether the taker still holds a province, so land given
+ * back stops counting (REALM-125); without it, the library's own records decide.
+ */
+export function landsTakenWithin(d: Diplomacy, c: string, holds?: (c: string, province: string) => boolean): number {
+  const window = C.lands_taken_years * 12;
+  let n = 0;
+  for (const t of d.taken) {
+    if (t.by !== c || monthsBetween(t.date, d.date) >= window) continue;
+    if (holds ? holds(c, t.province) : (d.provinces[t.province]?.owner ?? c) === c) n++;
+  }
+  return n;
+}
+
+/** Sets every country's Lands taken to the last 20 years' (DIPL-221), dropping older entries whole. */
+export function refreshLandsTaken(d: Diplomacy, holds?: (c: string, province: string) => boolean): void {
+  const window = C.lands_taken_years * 12;
+  // Entries older than the window never count again; Took our land and the frontier keep their own ledger entries.
+  const counts = new Map<string, number>();
+  for (const t of d.taken) {
+    if (monthsBetween(t.date, d.date) >= window) continue;
+    if (holds ? !holds(t.by, t.province) : (d.provinces[t.province]?.owner ?? t.by) !== t.by) continue;
+    counts.set(t.by, (counts.get(t.by) ?? 0) + 1);
+  }
+  for (const [id, c] of Object.entries(d.countries)) c.landsTaken = counts.get(id) ?? 0;
+}
+
+/**
+ * DIPL-222: a country near land that changed hands by a peace or a demand holds
+ * the wrong Grabbed land near us toward the taker, −5 a province, fading over 20 years.
+ */
+export function grabbedLandNearUs(d: Diplomacy, holder: string, taker: string, provinces: number): void {
+  if (provinces <= 0 || holder === taker) return;
+  const r = entryRule(d, "wrongs", "grabbed_land_near_us");
+  addEntry(d, holder, taker, { key: "grabbed_land_near_us", name: r.name, weight: r.weight_per_province! * provinces, fadeYears: r.fade_years! });
+}
+
 /** "Freed us" after a won Free a people or Break a subject (diplomacy 3.2). */
 export function freedBy(d: Diplomacy, freed: string, liberator: string): void {
   addRuleEntry(d, freed, liberator, "ties", "freed_us");
@@ -1107,12 +1158,6 @@ export function eventNotoriety(d: Diplomacy, actor: string, n: number): void {
   for (const k of knowers) addEntry(d, k, actor, { key: "notorious_deed", name: r.name, weight: r.weight_per_notoriety! * n, fadeYears: r.fade_years! });
 }
 
-/** D-DIPL-26: 5 × Lands taken + event notoriety still unfaded (30 years), capped at 100. */
-export function notoriety(d: Diplomacy, c: string): number {
-  const fade = entryRule(d, "wrongs", "notorious_deed").fade_years! * 12;
-  const deeds = d.notorietyDeeds.filter((x) => x.actor === c).reduce((s, x) => s + x.n * Math.max(0, 1 - monthsBetween(x.date, d.date) / fade), 0);
-  return Math.min(C.event_tree_mapping.notoriety.cap, Math.round(5 * country(d, c).landsTaken + deeds));
-}
 
 /** DIPL-175: an event's relation goes through the matching action and its requirements. */
 export function eventRelation(d: Diplomacy, type: string, a: string, b: string, contested?: string): string {

@@ -220,7 +220,7 @@ Newest decision first.
 - SHELL-039: When the player loads a save from the main menu, the game shell shall go to Loading with no confirmation. [screen-flow §3 S6]
 - SHELL-040: When the player loads from the game menu while the current campaign has unsaved turns, the game shell shall first ask "Leave <date> unsaved? · Save first · Leave · Cancel". [screen-flow §3 S6, §4.5]
 - SHELL-041: The loading screen shall show a tip from the one tips table in the config, tagged by era, region and whether it is for new players, picking one that fits the realm and date; tapping or pressing left and right shall show another. [screen-flow §3 S7]
-- SHELL-042: The loading screen's bar shall show the real loading steps ("Reading the save", "Drawing the borders", "Waking the courts") rather than a fake timer. [screen-flow §3 S7]
+- SHELL-042: The loading screen's bar shall show the real loading steps ("Reading the save", "Drawing the borders", "Waking the courts") rather than a fake timer, and its rider, road, bar and dots shall keep moving while the game is busy, so the player can see it has not frozen. [screen-flow §3 S7]
 - SHELL-043: When loading finishes, the game shell shall go straight to the map without asking for a tap, but shall keep a tip on screen for at least 2 s after it appeared before fading. [screen-flow §3 S7; placeholder]
 - SHELL-044: While the loading screen is shown, the `load_resume` track shall play. [screen-flow §3 S7]
 
@@ -365,6 +365,9 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - SHELL-148: When a battle of the player's begins while the week plays, the game shell shall pause the week and alert "A battle has begun at <province>. The week waits." with Watch; the alert stays until the battle ends. Watch flies the map to the battle, plays on at a slower pace for every 4-hour step while the player watches (`WATCH_STEP_MS` 1.2 s, provisional), and shows a battle strip over the map with both realms, the men each has left against the men they started with, and the round of the rounds the battle lasts; when the battle ends the strip says how. End turn instead plays on without watching. *Changes SHELL-076 to SHELL-079: the map no longer flies to a battle by itself; the week waits for the player.* [F-73]
 
   How the player uses it: the alert drops in under the top bar and the End turn button shows paused, so the player sees at once that the week waits and why. One tap on Watch (44 points) goes there; the strip sits along the bottom between the overview button and End turn so the fight on the map stays in view in the Wide and Tall layouts, and its cross stops watching. The battle on the map and the strip are the overview of the fight; the Dispatches keep the result. Nothing needs hover.
+- SHELL-159: When the player goes from one screen of the panel to another (a province card and its tab, a country card and its tab, a commander, an official, a lord, a fleet, the Dispatches or the Achievements), the game shell shall keep the screen left behind on a screen history of at most 20 screens, and a Back button in the card's header shall return to the last one and take it off; a redraw of the same screen (as the week plays) adds nothing, closing the card clears the history, and the device's back gesture does the same as Back while the history holds a screen. *Replaces the "Back to <name>" button of SHELL-046.* [F-119]
+
+  How the player uses it: Back is the arrow at the left of the card's header, beside Fold away and the cross, a 44-point button that shows only while there is somewhere to go back to, so the header itself says whether the player came from another screen. One tap returns to the screen before, on the tab it was left on; tapping again keeps stepping back. On a phone in landscape the three header buttons sit in a row at the right of the title in the Wide and Tall layouts, and the phone's back gesture steps back too. Nothing needs hover.
 
 ### Start screen (Leroy, 18 October 2026)
 Leroy asked for an actual start screen: a Play button, the moving map zoomed in behind it, Settings and Load on it, and a link to the web wiki. It is the latest decision, so it replaces the title and main menu's "Tap to start" step: the title (S3) and the main menu (S4) become one start screen (screen id `title`, kept so music and sound keep keying on it). The entries of SHELL-020 to SHELL-029 keep their rules except where these say otherwise.
@@ -381,6 +384,15 @@ Leroy asked for an actual start screen: a Play button, the moving map zoomed in 
 - SHELL-158: When the player picks Exit to main menu in a campaign, the game shell shall return to the start screen, its background now panning over the realm just left. [Leroy 18 Oct; SHELL-086]
 
   How the player uses it: the game opens on the start screen, so one tap on Play is the whole way back into a campaign, or into New campaign with none. Everything else sits beside Play in two groups: the column holds the ways into a campaign (Play, New campaign, Load, Tutorial), and the icon row holds the things around play (Settings, Achievements, Wiki, More, Quit), so nothing is spread over other screens. The Play button is the overview: its banner, realm and date say at a glance which campaign waits, and the map panning behind it shows that realm's land. On a phone in landscape (Short wide) the logo sits top left, the column and icon row fill the left third on the parchment band inside the safe areas, and the map pans across the right two thirds; in the Tall layout (a tablet held upright) the logo and map fill the top half and the column and row are centred below; in the Large and Far layouts the column keeps a fixed width on the left. Play is at least 56 points tall, every other entry and icon button at least 44 points with 8 between, each icon button has its name under it, and nothing needs hover. A phone held upright shows "Turn your phone sideways" here too (SHELL-113).
+
+### Auto turns (Leroy, 18 October 2026)
+Leroy asked for an auto turn mode for single player that can be paused, and decided that pausing finishes the current week. Auto turns only change when End turn is pressed, never what happens in a week (X-15): the same orders give the same weeks with auto turns on or off.
+
+- SHELL-159: In a single-player campaign the game shell shall offer Auto turns, switched by an Auto button beside End turn (and Shift+Space on a keyboard). While Auto turns are on, each week starts by itself when the one before has finished playing and its saves are written, at the Turn playback speed (SET-131). Auto turns are off whenever a campaign is started or loaded, and are not offered in a campaign with more than one player. [Leroy 18 Oct]
+- SHELL-160: While Auto turns are on and a week plays, a tap on End turn or Auto (or Space) shall stop Auto turns at the end of the current week instead of pausing it: the week plays to its end, then no new week starts and the orders phase opens. End turn and Auto show "Stops at the end of this week" until then, and a second tap on Auto before the week ends keeps Auto turns on. With Auto turns off, End turn pauses and resumes the week as before (SHELL-143). [Leroy 18 Oct]
+- SHELL-161: Auto turns shall stop by themselves at the end of the week in which any of these happens, and the alert over the map that says what happened is the reason: an event waits for an answer, one of the player's battles or sieges begins, a war is declared on or by the player's realm, a call to arms, a peace offer or an envoy waits for an answer, beaten rebels wait for a verdict, the scholars have nothing to study, or one of the player's armies reaches the end of its march ("Your army has reached <province>." with Go there, said only while Auto turns are on). The pauses a week already makes keep happening at once (an event, a revolution, a battle, SHELL-148). Auto turns also stop before a new week would start while End turn cannot start one (an event or a revolution waiting, or land just taken without a decision, PROV-340), and End turn then opens what blocks it. [Leroy 18 Oct]
+
+  How the player uses it: the Auto button sits right beside End turn in the corner the player's hand is on, the only place that controls time, with a 44-point tap target, the double play mark and the word Auto. Lit, it shows Auto turns are on, and the hourglass turns on End turn as every week plays; while it stops at the end of the week it blinks and says so. The End turn corner is the overview: off, on or stopping is readable there at a glance, and an alert under the top bar says why Auto turns stopped. On a phone in landscape the two buttons stand together above the safe area in the Wide and Tall layouts and keep clear of the alerts and the battle strip; nothing needs hover, and a long press is not needed.
 
 ## 6. Commands
 
@@ -407,6 +419,7 @@ Leroy asked for an actual start screen: a Play button, the moving map zoomed in 
 | OpenGameMenu | player | Map | Game menu over dimmed map | `ScreenOpened(game_menu)` |
 | ExitToMainMenu / Quit | player | Game menu | Question if unsaved turns (ironman: save and exit) | `CampaignLeft` |
 | EndTurn | player | No unanswered event; not in progress | Turn starts (confirmation if Settings asks) | `EndTurnPressed` |
+| SwitchAutoTurns | player | Single-player campaign | Auto turns on (a week starts if none plays), or stopping at the end of the playing week, or off (SHELL-159, SHELL-160) | — |
 | AnswerEvent | player | Event modal open | Option chosen (events) | `EventAnswered` |
 | LookAtMap | player | Event modal open | Event shrinks into the End turn badge | — |
 | Retreat | player | A player battle running | That battle ends with a retreat at this step | `BattleRetreatOrdered` |
@@ -774,6 +787,9 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-143 | navigation-by-input.feature | Space ends the turn |
 | SHELL-147 | in-campaign-screens.feature | The Dispatches log keeps past weeks; A battle or siege begins |
 | SHELL-148 | in-campaign-screens.feature | The week waits at a battle |
+| SHELL-159 | auto-turns.feature | Auto turns play week after week; Auto turns are off after loading |
+| SHELL-160 | auto-turns.feature | Pausing finishes the current week; Tapping Auto again keeps it on; End turn pauses as before with Auto turns off |
+| SHELL-161 | auto-turns.feature | Auto turns stop by themselves; A blocked End turn stops Auto turns |
 | SHELL-149 | start-screen.feature | The start screen opens with its menu shown |
 | SHELL-150 | start-screen.feature | The map pans behind the start screen at region zoom |
 | SHELL-151 | start-screen.feature | Battery saver keeps the map moving |
@@ -784,4 +800,5 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-156 | start-screen.feature | Version and Full game ribbon |
 | SHELL-157 | start-screen.feature | Back on the start screen |
 | SHELL-158 | start-screen.feature | Exit to main menu returns to the start screen |
+| SHELL-159 | map-and-cards.feature | Back returns to the screen before |
 | SHELL-144–146 | layout-by-shape.feature | Each subject has one home; Important things have an overview; Every screen fits a phone in landscape |

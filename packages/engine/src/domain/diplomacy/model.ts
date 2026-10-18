@@ -628,6 +628,19 @@ export function standing(d: Diplomacy, holder: string, other: string): number {
   return Math.max(-cap, Math.min(cap, n));
 }
 
+/** D-DIPL-26: 5 × Lands taken + event notoriety still unfaded (30 years), capped at 100 (DIPL-174). */
+export function notoriety(d: Diplomacy, c: string): number {
+  const fade = entryRule(d, "wrongs", "notorious_deed").fade_years! * 12;
+  let deeds = 0;
+  for (const x of d.notorietyDeeds) if (x.actor === c) deeds += x.n * Math.max(0, 1 - monthsBetween(x.date, d.date) / fade);
+  return Math.min(config.event_tree_mapping.notoriety.cap, Math.round(5 * country(d, c).landsTaken + deeds));
+}
+
+/** Reason points for a country's notoriety: 1 per 5 (DIPL-223). */
+export function notorietyPoints(d: Diplomacy, c: string): number {
+  return Math.floor(notoriety(d, c) / config.ai.notoriety_per_reason);
+}
+
 /** DIPL-077. */
 export function standingWord(n: number): string {
   for (const w of config.ledger.standing_words) if (n >= w.min) return w.word[0]!.toUpperCase() + w.word.slice(1);
