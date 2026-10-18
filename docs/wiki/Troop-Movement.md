@@ -93,6 +93,8 @@ Splitting an army takes 2 days before W14 Army divisions and no time after, and 
 
 You can change an army's orders as often as you like before ending the turn; the last order stands. Every army can **March to** (fastest route to a province it may enter; marching to the province it stands in is a Halt), **March by** (through waypoints), **Halt** (stop, keeping the rest of the route greyed), **Return home** (to the nearest own province with a castle) and **Follow / Join** (follow a friendly army and join when you meet, or chase an enemy). Horse-only armies can **Raid**, walking each step at raid pace and then spending 7 days in each province they enter before riding on. Any army in a province with an enemy castle can **Besiege**, and can't march on until the castle falls. Armies in a port with ships, or at sea, can **Board ships / Land**.
 
+To stop a march, tap **Halt** beside Move on the army's card, tap **Halt it where it stands** in the commander list, and it stops on the spot. A fleet under sail has **Stop here** beside Sail on its card. These show only while there is a route to cancel.
+
 Each army remembers two route settings: **Pace** (Normal, Forced, Careful) and **On the way** (keep marching, halt when the enemy is seen, attack what we see). There are no standing orders beyond warfare's. Every order is data, the same for player and AI; an AI army's standing orders come from its realm's personality.
 
 ### One way of moving

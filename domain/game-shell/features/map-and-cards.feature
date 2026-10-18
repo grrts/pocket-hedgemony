@@ -185,3 +185,18 @@ Feature: Map and cards
     When the player taps a commander in the Army list
     Then that commander's army is selected
     And army banners take taps of at least 44 points
+
+  @SHELL-159 @feedback-119
+  Scenario: Back returns to the screen before
+    Given the province card of "Champagne" is open
+    When the player opens the country card of "France" from it
+    And the player opens the Lords tab
+    Then the card's header shows a Back button
+    When the player presses Back
+    Then the country card of "France" shows its General tab
+    When the player presses Back
+    Then the province card of "Champagne" is shown
+    And the card's header shows no Back button
+    When the player opens the country card of "France" from it
+    And the player closes the card
+    Then the screen history is empty

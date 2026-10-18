@@ -82,7 +82,7 @@ export function fleetCard(
 ): string {
   const sail = f.admiral < 0 && f.needsAdmiral
     ? `<p class="hint">A fleet needs an admiral to sail. Put a commander at its head below.</p>`
-    : `<div class="army-buttons"><button class="wax" data-fleet-sail="${f.id}">${o.choosing ? "Pick a sea or shore" : f.battle ? "Sail away" : "Sail"}</button></div>
+    : `<div class="army-buttons"><button class="wax" data-fleet-sail="${f.id}">${o.choosing ? "Pick a sea or shore" : f.battle ? "Sail away" : "Sail"}</button>${f.route.length && !f.battle ? `<button class="paper" data-fleet-stop>Stop here</button>` : ""}</div>
        <p class="hint">Tap Sail, then a sea zone, a port to put into${f.army >= 0 ? " or a shore to land the army on" : ""}.</p>`;
   return `
     <dl class="facts">

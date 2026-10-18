@@ -613,9 +613,9 @@ button.icon-only {
 }
 
 .panel-buttons button {
-  width: 40px;
-  height: 40px;
-  min-height: 40px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
   padding: 0;
 }
 
@@ -2847,25 +2847,14 @@ button.land-tile.on {
   transform: translateY(-50%);
 }
 
-/* A castle: its row, then its own settings folded under it. */
-.castle-row {
-  flex-wrap: wrap;
-}
-.castle-row details.castle-own {
-  flex: 1 1 100%;
-}
-.castle-own summary {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  color: var(--ink-soft);
-  font-size: 0.85em;
-  gap: 6px;
-  cursor: pointer;
-}
+/* A castle's own food settings on its province's Overview (feedback 112). */
 .castle-own .hint {
   margin: 4px 0 0;
+}
+.castle-own button.wide {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
 }
 .place-name .tags {
   display: flex;

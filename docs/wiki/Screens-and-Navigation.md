@@ -80,7 +80,7 @@ A modal accepts no input to the screens below until it is answered or put off.
 
 ### Cards
 
-A tap on the map only selects, and never moves or zooms the map; the thing's name appears on a tab in the lower left. Army banners take big taps, a tap on a commander in the Army list selects his army, and several armies can be selected at once. Tapping the tab, or tapping the thing again, opens its card. Minimising a card shrinks it back to that tab. When a card opens another card (a province, then its owner's country, then a commander), they stack, and a "Back to <name>" button at the bottom names the card below. Tapping empty map clears the stack. A line that "opens its gain and lose list" opens it inside the card as a fold-out, not as a new screen.
+A tap on the map only selects, and never moves or zooms the map; the thing's name appears on a tab in the lower left. Army banners take big taps, a tap on a commander in the Army list selects his army, and several armies can be selected at once. Tapping the tab, or tapping the thing again, opens its card. Minimising a card shrinks it back to that tab. When a card opens another card (a province, then its owner's country, then a commander), or you switch tabs, the screen you left goes on a history of up to 20 screens. The arrow at the left of the card's header (beside Minimise and the cross) is Back: it returns to the screen before, on the tab you left it, and shows only while there is somewhere to go back to. Your phone's back gesture does the same. A redraw as the week plays adds nothing, and closing the card, or tapping empty map, clears the history. A line that "opens its gain and lose list" opens it inside the card as a fold-out, not as a new screen.
 
 How a card sits depends on the shape:
 

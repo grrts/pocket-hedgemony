@@ -270,6 +270,7 @@ How the player uses it
 - VIEW-129 (Optional): Where Animations is Off, every figure shall be drawn still; where Reduced, only marching and battles move; Battery saver sets Map detail Medium with still figures. [living-map-design §6]
 - VIEW-130 (Ubiquitous): The overlay shall animate at most `maxAnimated` (60) figures at about 10 frames a second, the nearest the screen's centre first, from sprite caches keyed by piece, colour and whole `u` with least-recently-used eviction; towns cost the tiled tiers one extra texture read, and the budgets do not change (VIEW-054). [living-map-design §1.5, §6]
 - VIEW-131 (Ubiquitous): Town buildings shall take their culture group's style (`townStyles`: roof and wall colours from the 32-colour palette and a house variant set), with one generic set until a group has its own, and a hand-made landmark (`landmarks`, per province) replaces the generic keep or worship cell where one exists. [living-map-design §3.4]
+- VIEW-132 (Ubiquitous): The snapshot shall carry the busy trade paths the player may see for the living map: traders sharing a loop and a way of going (land, river or sea) are one path, with its loop province by province, its trader count, the realm of its first trader for the colours and one of the player's traders on it; a path is kept where its loop enters a province whose trade the player sees (D-TRADE-13), busiest first, at most `livingMap.traders.maxPaths` (200). A tap on a mover of a path the player has a trader on opens that trader's card in the Trade tab; others give way to the province beneath, as there is no card for another realm's trader. [living-map-design §4.3, §7]
 
 #### How the player uses it: the living map
 1. Where: the player pinches past the Local icons and nothing else is new. A tap on a town cell opens its province card, a tap on a formation or fleet its own card, a tap on a moving caravan the trade path's card; taps go to the piece first, then the province.
@@ -346,6 +347,7 @@ re-renders only open panels.
 | `livingMap.figures` | Figures | 1,000 / 250 men a figure, 12 / 40 at most, 60 animated at 10 fps | Yes | `map-presentation.json` |
 | `livingMap.hulls` | Hulls | 5 / 1 ships a hull, 8 / 24 at most | Yes | `map-presentation.json` |
 | `livingMap.traders.maxMovers` | Movers per trade path | 3 | Yes | `map-presentation.json` |
+| `livingMap.traders.maxPaths` | Trade paths in the snapshot feed | 200 | Yes | `map-presentation.json` |
 | `livingMap.byDetail` | Bands and life by Map detail | Low off, Medium living, High living and street | Yes | `map-presentation.json` |
 | `livingMap.townStyles`, `landmarks` | Culture styles and landmarks | generic set; Toledo, Constantinople, Rome, Paris, Venice, Cairo, Beijing, Cuzco | Yes | `map-presentation.json` |
 
@@ -525,3 +527,4 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-129 | living-map.feature | Animations set which figures move |
 | VIEW-130 | living-map.feature | At most 60 figures move at once |
 | VIEW-131 | — | presentation only: culture styles and landmarks are art |
+| VIEW-132 | living-map.feature | The snapshot feeds the busy trade paths |

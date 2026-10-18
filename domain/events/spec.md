@@ -417,7 +417,7 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
   event follows, and when none is left the paused week plays on. *Look at the map* folds the card into the End
   turn button, which shows a scroll with the count of waiting events; while any waits, End turn opens the
   oldest instead of ending the turn (SHELL-070, SHELL-081, EVT-044). Grouping and overview: every event is one
-  card; the News keep a line for each event that fired, so the history of the campaign reads there, and
+  card; the News keeps a line for each event that fired, so the history of the campaign reads there, and
   waiting events sit at the top of the News with an *Answer* button. Phone: the card is a sheet over the
   map in the Wide and Tall layouts, inside the safe areas, its text scrolling while the options stay in reach,
   every button at least 44 points high, nothing that needs hover. [X-19, SHELL-070, SHELL-080, SHELL-081]

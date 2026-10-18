@@ -5,8 +5,8 @@ import { icon } from "../art/ui.ts";
  * The Food tab of the player's country card (feedback 84, 85; realm "How the
  * player uses it: the Food tab"): how the realm is fed at a glance, the
  * presets, one row of choices per setting, and every castle with its store,
- * what it feeds and whether war has cut it off. A castle's own settings fold
- * open under its row.
+ * what it feeds and whether war has cut it off. A castle's own settings sit
+ * on its province's Overview (feedback 112); its row here opens it.
  */
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -17,9 +17,6 @@ const monthsText = (m: number) => `${m} month${m === 1 ? "" : "s"}`;
 const SURPLUS_LABEL: Record<string, string> = { Keep: "Keep (it spoils)", "Sell to the treasury": "Sell to the treasury", "Send to the capital castle": "Send to the capital" };
 const FAMINE_LABEL: Record<string, string> = { Off: "Off", "1 month": "Below 1 month", "3 months": "Below 3 months" };
 const SPREAD_LABEL: Record<string, string> = { Tight: "Tight", "50/30/20": "Even", Wide: "Wide" };
-
-/** Castles whose own settings the player has folded open, kept across redraws. */
-export const castlesOpen = new Set<number>();
 
 type Choice = { value: string | number; label: string; note?: string };
 
@@ -87,21 +84,12 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
     .map((c) => {
       const reserve = c.own.siegeReserve ?? f.realm.siegeReserve;
       const tags = [c.besieged ? `<span class="tag bad">Besieged</span>` : "", c.cut ? `<span class="tag bad">Roads cut</span>` : "", c.granary ? `<span class="tag">Granary</span>` : "", Object.keys(c.own).length ? `<span class="tag">Own policy</span>` : ""].join("");
-      const open = castlesOpen.has(c.province);
       return `<div class="province-row castle-row${c.besieged || c.cut ? " bad" : ""}">
-        <button class="place" data-open-province="${c.province}" title="Open ${esc(name(c.province))}">
+        <button class="place" data-open-province="${c.province}" title="Open ${esc(name(c.province))} and its own settings">
           <img class="thumb" src="${thumb(c.province)}" alt="" width="48" height="48">
           <span class="place-name"><b>${esc(name(c.province))}</b><small>Feeds ${c.provinces} province${c.provinces === 1 ? "" : "s"} · reach ${c.reach} ring${c.reach === 1 ? "" : "s"}</small>${tags ? `<span class="tags">${tags}</span>` : ""}</span>
           <span class="place-stats"><small>${c.storeMonths.toFixed(1)} of ${c.capMonths} months</small>${storeBar(c, reserve)}</span>
         </button>
-        <details class="castle-own" data-castle="${c.province}"${open ? " open" : ""}>
-          <summary>${Object.keys(c.own).length ? "Its own settings (set)" : "Its own settings"}</summary>
-          <p class="hint">Collection here</p>
-          ${choiceRow("collection", collectionChoices(f), c.own.collection, c.province)}
-          <p class="hint">Siege reserve here${c.granary ? "" : ` (holds ${c.capMonths} months without a granary)`}</p>
-          ${choiceRow("siegeReserve", reserveChoices(f), c.own.siegeReserve, c.province)}
-          ${c.granary ? "" : `<button class="paper wide" data-open-build="${c.province}">${icon("hammer", 1)}Build a granary here</button>`}
-        </details>
       </div>`;
     })
     .join("");
@@ -135,9 +123,30 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
     <p class="hint">What happens to food that doesn't fit: a province holds ${monthsText(f.localCapMonths)} at most, a castle ${monthsText(smallest)}, or ${monthsText(f.granaryCapMonths)} with a granary.</p>
     ${choiceRow("surplus", surplusChoices, f.realm.surplus)}
     <h3 class="sub">Castles</h3>
-    <p class="hint">Enemy armies on your land cut the roads: food doesn't pass them, and a besieged castle feeds only its own province.</p>
+    <p class="hint">Enemy armies on your land cut the roads: food doesn't pass them, and a besieged castle feeds only its own province. Tap a castle to open its province and give it its own collection and siege reserve.</p>
     <div class="province-list">${castleRows || `<p class="hint">You hold no castle.</p>`}</div>
     ${outside}`;
+}
+
+/**
+ * A castle's own food settings on its province's Overview (feedback 112):
+ * its collection and siege reserve, each with Realm to follow the realm
+ * again, and Build a granary here, which opens the Build tab. Only for the
+ * player's own castle; empty elsewhere.
+ */
+export function castleFoodSettings(s: Snapshot, p: number): string {
+  const f = s.food;
+  const c = s.provinceOwner[p] === s.playerNation ? f?.castles.find((x) => x.province === p) : undefined;
+  if (!f || !c) return "";
+  return `<section class="castle-own">
+      <h3 class="sub">Castle food${Object.keys(c.own).length ? ` <span class="tag">Own policy</span>` : ""}</h3>
+      <p class="hint">Collection here: the share of the surplus of the provinces it feeds that comes to this castle at the harvest.</p>
+      ${choiceRow("collection", collectionChoices(f), c.own.collection, c.province)}
+      <p class="hint">Siege reserve here${c.granary ? "" : ` (holds ${c.capMonths} months without a granary)`}</p>
+      ${choiceRow("siegeReserve", reserveChoices(f), c.own.siegeReserve, c.province)}
+      ${c.granary ? "" : `<button class="paper wide" data-tab="build">${icon("hammer", 1)}Build a granary here</button>`}
+      <button class="paper wide" data-realm-open-food title="Open the Food tab">${icon("castle", 1)}Realm defaults on the Food tab</button>
+    </section>`;
 }
 
 /** The General tab's Food line: hungry and low counts, opening the Food tab. */
