@@ -25,7 +25,7 @@ import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFie
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
-import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
+import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
 import {
   aiCollect,
   appointCommander,
@@ -729,9 +729,13 @@ function feedArmies(world: World): void {
   const map = marchMap(world);
   const a = world.armies;
   const day = 1 / DAYS_PER_RATION_MONTH;
+  // What each realm's wagons hold (RSCH-094: half without B01), read once per realm per day.
+  const carried = new Int16Array(world.nationCount).fill(-1);
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
-    const army = { ...marching(world, i), campaigning: campaigning(world, i) };
+    const n = a.owner[i]!;
+    if (carried[n]! < 0) carried[n] = foodCarriedPct(world, n);
+    const army = { ...marching(world, i), campaigning: campaigning(world, i), foodCarriedPct: carried[n]! };
     const need = monthlyRations(d, army) * day;
     a.food[i] = a.food[i]! - need;
     const room = wagonRations(d, army) - a.food[i]!;
