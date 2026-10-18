@@ -8,7 +8,8 @@ const out = process.argv[2] ?? ".";
 const nation = process.argv[3] ?? "majapahit";
 const server = await preview({ preview: { port: 4178, strictPort: true } });
 const browser = await chromium.launch({ args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
-for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["landscape", devices["Pixel 7 landscape"]], ["portrait", devices["Pixel 7"]]]) {
+const all = [["small", devices["iPhone SE landscape"]], ["landscape", devices["Pixel 7 landscape"]], ["portrait", devices["Pixel 7"]]];
+for (const [name, device] of all.filter(([n]) => !process.env.ONLY || process.env.ONLY === n)) {
   const page = await browser.newPage({ ...device });
   page.on("pageerror", (e) => console.log("pageerror:", e.message));
   page.on("console", (m) => m.type() === "error" && console.log("console:", m.text()));
@@ -27,7 +28,6 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     const turn = await page.evaluate(() => window.__phTurn());
     await page.click("#fab").catch(() => {});
     await page.waitForFunction((t) => window.__phTurn() > t, turn, { timeout: 60000 }).catch(() => {});
-    await page.keyboard.press("Escape").catch(() => {});
   }
   await page.evaluate(() => window.__phSelect(window.__phCapital()));
   await page.waitForTimeout(300);

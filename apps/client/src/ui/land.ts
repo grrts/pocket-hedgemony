@@ -44,13 +44,13 @@ export function provinceLand(s: Snapshot, p: number, chosen: number): string {
 }
 
 /** What each step of fever land means for the people who come here (PROV-243). */
-const FEVER_TEXT = ["", "Soldiers and settlers born elsewhere sicken and some die here; locals mostly don't.", "Many soldiers and settlers born elsewhere die here each year; locals mostly don't.", "Soldiers and settlers born elsewhere die here in droves; locals mostly don't."];
+const FEVER_TEXT = ["", "Some soldiers and settlers from elsewhere die here.", "Many soldiers and settlers from elsewhere die here.", "Soldiers and settlers from elsewhere die here in droves."];
 
 /** The province's fever land under the food line, when it has any. */
 function feverLine(s: Snapshot, p: number): string {
   const step = s.provinceFever[p] ?? 0;
   if (!step) return "";
-  return `<p class="${step >= 2 ? "warn" : ""}"><b>${esc(cap(s.feverSteps[step]!))} fever land.</b> ${FEVER_TEXT[step]} Ground, the tropics and marsh tiles set it; draining the marsh lowers it.</p>`;
+  return `<p class="${step >= 2 ? "warn" : ""}"><b>${esc(cap(s.feverSteps[step]!))} fever land.</b> ${FEVER_TEXT[step]} Locals mostly don't. Draining marsh lowers it.</p>`;
 }
 
 /** What wearing means for a fields tile: worn and resting, or the years of overwork so far. */
