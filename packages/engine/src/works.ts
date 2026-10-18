@@ -234,7 +234,7 @@ export function whyNot(world: World, n: number, p: number, work: number, pend?: 
   // A shipyard's slipways run down into a harbour (buildings needs_building).
   if (name === "shipyard" && worksAt(world, p, W.harbour) === 0) return "needs a harbour first";
   if (name === "mine" && worksAt(world, p, work) === 0) {
-    if (!seamWare(world, p)) return "no seam has been found here";
+    if (!seamWare(world, p)) return "no ore deposit has been found here";
     if (!timberInReach(world, p)) return "needs timber: a lumber camp here or next door";
   }
   const step = nextStep(world, p, work, pend);
@@ -596,7 +596,7 @@ export function workEffect(world: World, work: number, step: number): string {
     case "quarry":
       return `Works needing stone here cost ${pct(d.materialsAtHandSaving)} less; its stone is traded`;
     case "mine":
-      return `Work for ${people(jobSlots("mine"))} miners digging the seam; its ore is traded, silver and gold dearest. The seam runs out after its years of digging`;
+      return `Work for ${people(jobSlots("mine"))} miners digging the ore; its ore is traded, silver and gold dearest. The ore deposit runs out after its years of digging`;
     case "saltworks":
       return `Work for ${people(jobSlots("saltworks"))} salt makers; salt for the realm and for trade`;
     case "market":

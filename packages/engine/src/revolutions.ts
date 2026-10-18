@@ -399,7 +399,7 @@ const LOCK_NAME: Record<string, string> = {
   crushing_taxes: "Crushing taxes",
   grant_fief: "Granting fiefs",
   seize_land: "Seizing a lord's land",
-  hire_companies: "Hiring free companies",
+  hire_companies: "Hiring mercenary companies",
   massacre: "Massacring beaten rebels",
   sell_title: "Selling titles",
   revoke_charter: "Revoking town charters",

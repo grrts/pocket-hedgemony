@@ -83,7 +83,7 @@ Feature: Battle: field, roles, levels, approaches and skills
     Given a battle in a mountains province with a woods sector and a river bank
     When the battle is resolved
     Then the province's foot, horse and guns modifiers and its defender bonus apply
-    And a defending army of the province's homeland tongue gets +10 % in that rough country
+    And a defending army of the province's homeland language gets +10 % in that rough country
 
   @WAR-093 @placeholder
   Scenario: Depth steps forward

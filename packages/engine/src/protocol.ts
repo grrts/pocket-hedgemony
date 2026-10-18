@@ -336,7 +336,7 @@ export interface Snapshot {
   };
   /** Arm names for armies.byArm. */
   arms: readonly string[];
-  /** The player's research for the Learning tab (null before a realm is chosen). */
+  /** The player's research for the Research tab (null before a realm is chosen). */
   research: ResearchView | null;
   /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%), its standing, eras behind the times, and how many inventions it knows that the player's realm does not (RSCH-104). */
   realmResearch: { known: number; study: string | null; pct: number; standing: string; behind: number; ahead: number }[];

@@ -85,7 +85,7 @@ Feature: Answering a rebellion
       | Massacre             | "Troyes" gets no rising for 20 years                                                            |
 
   @REBL-041 @REBL-050 @placeholder
-  Scenario: Massacre spreads Bloodshed to every province of the same faith or tongue
+  Scenario: Massacre spreads Bloodshed to every province of the same faith or language
     Given the rebels of "Troyes" are Catholic and speak French
     And the provinces "Sens" and "Reims" are Catholic or French-speaking
     And the lord "Count of Armagnac" is French-speaking

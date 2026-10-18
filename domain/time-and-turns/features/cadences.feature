@@ -89,7 +89,7 @@ Feature: Cadences and stated ordering
   Scenario: Culture's engine-raised checks run every five years
     Given the date is "January 1449"
     When 5 years have passed
-    Then the culture checks for the court going native, new tongues abroad and merges run once every 5 years
+    Then the culture checks for the court going native, new languages abroad and merges run once every 5 years
 
   @TIME-049 @placeholder
   Scenario: Pool events roll once a month

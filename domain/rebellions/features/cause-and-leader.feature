@@ -18,12 +18,12 @@ Feature: Cause, demand and leader of a rising
       | Heavy taxes        | Tax      | the tax rate back down; the levy ended              | farmers, craftsmen, market folk          |
       | Conscription       | Tax      | the tax rate back down; the levy ended              | farmers, craftsmen, market folk          |
       | Wrong faith        | Faith    | a faith tolerance charter, or a ruler of their faith | everyone of that faith                   |
-      | Foreign rule       | Homeland | self-rule, then independence                        | everyone of the homeland's tongue        |
-      | Far from the throne| Homeland | self-rule, then independence                        | everyone of the homeland's tongue        |
+      | Foreign rule       | Homeland | self-rule, then independence                        | everyone of the homeland's language        |
+      | Far from the throne| Homeland | self-rule, then independence                        | everyone of the homeland's language        |
       | Homeless           | Town     | a town law charter; work; the soldiers gone         | homeless, craftsmen, market folk         |
       | Broken charter     | Town     | a town law charter; work; the soldiers gone         | homeless, craftsmen, market folk         |
       | Soldiers quartered | Town     | a town law charter; work; the soldiers gone         | homeless, craftsmen, market folk         |
-      | Harsh lord         | Lord     | the lord's want                                     | the lord's retinue and officials, and his people of his faith and tongue |
+      | Harsh lord         | Lord     | the lord's want                                     | the lord's retinue and officials, and his people of his faith and language |
 
   @REBL-013 @REBL-014 @REBL-015
   Scenario: A pretender with a right to the province gives a pretender's war

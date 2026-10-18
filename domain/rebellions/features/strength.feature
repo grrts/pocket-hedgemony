@@ -31,7 +31,7 @@ Feature: Strength of a rising
       | Tax    | scholars    | 0      |
 
   @REBL-024 @placeholder
-  Scenario: Faith and homeland risings draw everyone of the faith or tongue
+  Scenario: Faith and homeland risings draw everyone of the faith or language
     Given a rising with the cause "Faith" is growing in the province "Prague"
     And 1000 men of another class in "Prague" share the rebels' faith
     When the month is processed

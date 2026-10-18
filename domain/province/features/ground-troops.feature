@@ -82,7 +82,7 @@ Feature: Ground effects on troops
   @PROV-047 @placeholder
   Scenario Outline: Locals know their rough land
     # config: province.locals_rough_bonus
-    Given a defending army of the province's homeland tongue
+    Given a defending army of the province's homeland language
     And the province has the ground "<ground>"
     When the game works out the province's stats
     Then the defender gets a further <bonus>

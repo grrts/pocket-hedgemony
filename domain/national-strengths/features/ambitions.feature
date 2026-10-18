@@ -12,23 +12,23 @@ Feature: Hidden ambitions
     And at least one of them is tagged historical
 
   @HER-016 @HER-017
-  Scenario: A sealed ambition
-    Given the country "Venice" has the sealed ambition with hint "The Visconti line is ending; the river is a border only by habit."
+  Scenario: A hidden ambition
+    Given the country "Venice" has the hidden ambition with hint "The Visconti line is ending; the river is a border only by habit."
     When the player opens the heritage card
     Then the ambition shows a theme icon and the hint
     And its plain goal is not shown
 
   @HER-018
-  Scenario: The seal cracks
-    Given the country "Venice" has a sealed ambition
-    When its stir condition holds
-    Then the ambition is stirred
+  Scenario: A hidden ambition is revealed
+    Given the country "Venice" has a hidden ambition
+    When its hint condition holds
+    Then the ambition is hinted
     And it shows a warmth, the name of the legacy it promises and its deadline
     And the hint stays the only words shown
 
   @HER-019
   Scenario: An ambition done
-    Given the country "Portugal" has the stirred ambition "Beyond the Cape of Storms"
+    Given the country "Portugal" has the hinted ambition "Beyond the Cape of Storms"
     When "Portugal" holds "Calicut"
     Then the legacy "Estado da Índia" is granted
     And the plain goal is shown for the first time
@@ -90,9 +90,9 @@ Feature: Hidden ambitions
 
     Examples:
       | era | since | result                                                        |
-      | I   | 10    | it pays 30 gold and the ambition stirs and shows its warmth   |
-      | IV  | 12    | it pays 120 gold and the ambition stirs and shows its warmth  |
-      | VII | 11    | it pays 380 gold and the ambition stirs and shows its warmth  |
+      | I   | 10    | it pays 30 gold and the ambition is hinted and shows its warmth |
+      | IV  | 12    | it pays 120 gold and the ambition is hinted and shows its warmth |
+      | VII | 11    | it pays 380 gold and the ambition is hinted and shows its warmth |
       | II  | 6     | counsel is refused                                            |
 
   @HER-025 @placeholder
@@ -150,12 +150,12 @@ Feature: Hidden ambitions
       | 8    | 0   | too large         |
 
   @HER-079 @placeholder
-  Scenario: The AI puts its weakest heyday to sleep
+  Scenario: The AI makes its weakest golden age inactive
     # config: ai.sleep_heyday
-    Given the AI country "Milan" has 2 heydays awake worth 3 and 2 points
-    When a third heyday worth 2.5 points would wake
-    Then the AI puts the heyday worth 2 points to sleep
-    And 2 heydays are awake
+    Given the AI country "Milan" has 2 golden ages active worth 3 and 2 points
+    When a third golden age worth 2.5 points would begin
+    Then the AI makes the golden age worth 2 points inactive
+    And 2 golden ages are active
 
   @HER-079 @placeholder
   Scenario: The AI lets its weakest legacy go
@@ -167,6 +167,6 @@ Feature: Hidden ambitions
 
   @HER-078
   Scenario: Heritage counts time month by month
-    Given the country "Portugal" has a heyday awake in an active age
-    When 300 months pass with its wakes condition holding
-    Then the heyday has served 25 years
+    Given the country "Portugal" has an active golden age in an active age
+    When 300 months pass with its start condition holding
+    Then the golden age has served 25 years

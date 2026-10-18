@@ -126,7 +126,7 @@ In peace, burned (ruined) land buildings rebuild by themselves, one a year; town
 - A **flood** in a river or marsh province damages land buildings on shore and marsh tiles; a dyke broken in war turns fields to marsh.
 - An **earthquake** event in a quake region damages one building in three and takes castles a step down.
 - **Demolishing** returns a quarter of the materials and overflows the workers. A peace treaty can demand named castles be demolished.
-- A tile changing use (woods cleared, the town growing over fields) ends the building that no longer fits. A mine closes when its seam runs out.
+- A tile changing use (woods cleared, the town growing over fields) ends the building that no longer fits. A mine closes when its ore deposit runs out.
 
 ### Converting
 
@@ -179,7 +179,7 @@ All numbers are step 1 on farmland and are placeholders. "g" is gold, "mo" month
 | Building | Place | Jobs | Makes | Unlocked by | Cost |
 |---|---|---|---|---|---|
 | Lumber camp | Woods | 1,500 woodsmen | Timber; furs in boreal woods. Cutting faster than woods regrow wears the tile | Start | 10 g, 4 mo |
-| Mine | Waste, hills or mountains with a seam | 6,000 miners | Silver, gold, iron, copper, tin, salt, saltpetre, gems; coal from era IV. Needs timber and seams | Start; step 2 shaft mine C6 (+50 %, deeper seams); step 3 steam-pumped C13 | 60 g, 20 timber, 12 mo |
+| Mine | Waste, hills or mountains with an ore deposit | 6,000 miners | Silver, gold, iron, copper, tin, salt, saltpetre, gems; coal from era IV. Needs timber and ore deposits | Start; step 2 shaft mine C6 (+50 %, deeper deposits); step 3 steam-pumped C13 | 60 g, 20 timber, 12 mo |
 | Quarry | Waste, hills or mountains | 3,000 miners | Stone (40 a year at full jobs); marble at Carrara and Makrana | Start | 20 g, 10 timber, 6 mo |
 | Saltworks | Shore on a dry or warm coast | 1,500 miners | Salt | Start | 20 g, 10 timber, 6 mo |
 | Saltpetre works | Town slot | 900 craftsmen | Saltpetre; needs a ranch or horse stud in the province | W3 | 30 g, 10 timber, 6 mo |
@@ -191,7 +191,7 @@ All numbers are step 1 on farmland and are placeholders. "g" is gold, "mo" month
 | Loom house | 1,500 craftsmen | Cloth from wool, linen from flax, silk cloth, cotton cloth (30 cloth from 30 wool) | Start (35 g, 10 timber, 6 mo, crew 1,000) | Draper's hall (+900 jobs, dyes its cloth; 80 g, 20 bricks, 8 mo) · Weaving manufactory (C11, +1,500 jobs, needs an official; 160 g, 40 stone, 18 mo) |
 | Forge | 1,500 craftsmen | Tools and arms from iron and charcoal | Start | Bloomery works (C2, double) · Iron works (C12, no timber) |
 | Kiln | 1,500 craftsmen | Pottery, bricks; porcelain with C3 | Start | Brickworks (double bricks) · Porcelain works (C3) |
-| Tannery | 1,500 craftsmen | Leather from hides | Start | Saddlery (light horse train a month faster here) |
+| Tannery | 1,500 craftsmen | Leather from hides | Start | Saddlery (light cavalry train a month faster here) |
 | Brewery or winery | 900 craftsmen | Beer, wine, spirits from grain or grapes | Start | Distillery (spirits, which keep and travel) |
 | Press | 900 craftsmen | Books from paper | L5 or L4 | Printing house (schools in reach cost less) |
 | Paper mill | 900 craftsmen | Paper from rags, flax or linen, or bamboo | C1 | |
@@ -254,7 +254,7 @@ Holy places: Mecca and Medina, Rome, Jerusalem, Constantinople, Santiago, Echmia
 | Castle | Castle tile | Steps: earthwork ring fort, stone castle, bastion fort, star fort, concrete fortress | B4; B1; B5; B6; B13 | Earthwork 60 g, 40 timber, 12 mo; stone 300 g, 200 stone, 36 mo; bastion 600 g, 400 stone, 48 mo; star 900 g, 600 stone, 60 mo; concrete 1,200 g, 300 concrete, 36 mo |
 | Granary | Part of the castle | Castle store size and rot; bigger with F7 | Start | 30 g, 20 timber, 6 mo |
 | Town walls | Ring works | Raids and rebels can't loot town buildings without storming; plunder ruins 1 in 6 instead of 1 in 3. Steps palisade, stone walls, bastioned walls (B5) | Start | Palisade 30 g, 40 timber, 6 mo; stone 200 g, 150 stone, 36 mo |
-| Drill yard | Town slot, town or bigger | Training room 1,500 men of any arm; barracks step (W12) 4,000, and standing regiments housed there don't give *Soldiers quartered* | Start; W12 | 40 g, 20 timber, 6 mo |
+| Drill yard | Town slot, town or bigger | Training room 1,500 men of any troop type; barracks step (W12) 4,000, and standing regiments housed there don't give *Soldiers quartered* | Start; W12 | 40 g, 20 timber, 6 mo |
 | Arsenal | Town slot (300 craftsmen) | Arms and powder stores don't spoil here; without one they lose a tenth a year | Start | 60 g, 30 stone, 12 mo |
 | Watchtower line | Ring works, border provinces | Enemy armies seen one province further away; raids spotted a season ahead | Start | 20 g, 20 stone, 6 mo |
 | Airfield | Fields tile | Era VII aircraft base | B16 | 150 g, 40 concrete, 6 mo |
@@ -437,7 +437,7 @@ Costs and months are already multiplied by the ground. A grey row says what is m
 - **Build all advised** queues every suggestion that fits the gold you set aside.
 - **Batch orders** build one thing everywhere it fits, such as a granary at every castle.
 
-**On the map**: at world zoom only landmarks (a small icon); at region zoom the castle, town size, harbour anchor, a hammer on provinces with a site, and a cracked icon for neglected or damaged buildings; at local zoom each building's sprite and step, with scaffolding and ash. The **Works lens** colours sites green, neglected or damaged amber and ruined red; the **Jobs lens** shows empty job slots against homeless people. See [Map and Lenses](Map-and-Lenses).
+**On the map**: at world zoom only landmarks (a small icon); at region zoom the castle, town size, harbour anchor, a hammer on provinces with a site, and a cracked icon for neglected or damaged buildings; at local zoom each building's sprite and step, with scaffolding and ash. The **Works map mode** colours sites green, neglected or damaged amber and ruined red; the **Jobs map mode** shows empty job slots against homeless people. See [Map and Map Modes](Map-and-Lenses).
 
 **Turn report**: one line per finished building, one per building lost, and one in the month upkeep first goes unpaid.
 
@@ -459,7 +459,7 @@ Costs and months are already multiplied by the ground. A grey row says what is m
 - [Revolutions](Revolutions): counts of factories, rail stations and presses.
 - [Diplomacy](Diplomacy) and [Subjects](Subjects): treaties granting trading posts abroad or demanding castles demolished.
 - [The 1444 Start](The-1444-Start): wealth, population, faith, lords, start inventions, regional templates.
-- [Map and Lenses](Map-and-Lenses): sprites by zoom, Works and Jobs lenses, landmark icons.
+- [Map and Map Modes](Map-and-Lenses): sprites by zoom, Works and Jobs map modes, landmark icons.
 - [Screens and Navigation](Screens-and-Navigation): Works screen, build sheet, building card, turn report lines.
 - [Time and Turns](Time-and-Turns): monthly, seasonal and yearly ticks.
 - [World Map](World-Map): climate, quake regions, rivers, coasts.

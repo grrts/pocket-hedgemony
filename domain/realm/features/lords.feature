@@ -164,15 +164,15 @@ Feature: Named lords
     Then his loyalty rises
 
     Examples:
-      | cause                                                   |
-      | the ruler grants him the county of Champagne he wants   |
-      | the ruler gives him a gift of gold                      |
-      | the ruler gives him an office at court                  |
-      | his house marries into the ruling house                 |
-      | he takes part in a victory                              |
-      | the reign is long and secure with a clear heir          |
-      | the ruler feeds his lands in famine                     |
-      | he shares the ruler's faith and tongue                  |
+      | cause                                                 |
+      | the ruler grants him the county of Champagne he wants |
+      | the ruler gives him a gift of gold                    |
+      | the ruler gives him an office at court                |
+      | his house marries into the ruling house               |
+      | he takes part in a victory                            |
+      | the reign is long and secure with a clear heir        |
+      | the ruler feeds his lands in famine                   |
+      | he shares the ruler's faith and language              |
 
   @REALM-089
   Scenario Outline: Loyalty goes down

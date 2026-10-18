@@ -63,7 +63,7 @@ The loading screen shows a tip from the one tips table, picked to fit your realm
 | Layer | Examples | How it closes |
 |---|---|---|
 | Map | Home | Back opens the game menu |
-| Cards | Province, army, commander, country, lord, castle, rebellion, sea zone | Back, ✕, tapping empty map, or folding away |
+| Cards | Province, army, commander, country, lord, castle, rebellion, sea zone | Back, ✕, tapping empty map, or minimising |
 | Full screens | Realm book, levy, Food policy, Tax, battle viewer | Back or ✕ returns to whatever was below |
 | Modals | Event, peace offer, confirmation, game menu | Only their own buttons; Back means "decide later" where that is allowed |
 
@@ -72,7 +72,7 @@ A modal accepts no input to the screens below until it is answered or put off.
 ### The map
 
 - **Top bar:** realm name and banner (opens the country card), the date, gold with its monthly change, and levies. On a phone it holds at most five plaques; the rest move into the country card.
-- **Tool column** on the right edge: map lens, go to capital, and Realm book.
+- **Tool column** on the right edge: map mode, go to capital, and Realm book.
 - **End turn** (the hourglass, lower right) carries a badge counting the items on the Attention screen. Tapping the badge, or the controller's "next" button, opens the Attention screen.
 - **Auto** (just above End turn) lets the weeks play one after another in a single-player campaign; a tap stops it at the end of the current week. See [Time and Turns](Time-and-Turns#auto-turns).
 - **Attention bell** next to the date lights while the Attention screen holds a warning, and opens it. It is the only place the game warns you; there is no advisor.
@@ -81,7 +81,7 @@ A modal accepts no input to the screens below until it is answered or put off.
 
 ### Cards
 
-A tap on the map only selects, and never moves or zooms the map; the thing's name appears on a tab in the lower left. Army banners take big taps, a tap on a commander in the Army list selects his army, and several armies can be selected at once. Tapping the tab, or tapping the thing again, opens its card. Folding a card away shrinks it back to that tab. When a card opens another card (a province, then its owner's country, then a commander), or you switch tabs, the screen you left goes on a history of up to 20 screens. The arrow at the left of the card's header (beside Fold away and the cross) is Back: it returns to the screen before, on the tab you left it, and shows only while there is somewhere to go back to. Your phone's back gesture does the same. A redraw as the week plays adds nothing, and closing the card, or tapping empty map, clears the history. A line that "opens its gain and lose list" opens it inside the card as a fold-out, not as a new screen.
+A tap on the map only selects, and never moves or zooms the map; the thing's name appears on a tab in the lower left. Army banners take big taps, a tap on a commander in the Army list selects his army, and several armies can be selected at once. Tapping the tab, or tapping the thing again, opens its card. Minimising a card shrinks it back to that tab. When a card opens another card (a province, then its owner's country, then a commander), or you switch tabs, the screen you left goes on a history of up to 20 screens. The arrow at the left of the card's header (beside Minimise and the cross) is Back: it returns to the screen before, on the tab you left it, and shows only while there is somewhere to go back to. Your phone's back gesture does the same. A redraw as the week plays adds nothing, and closing the card, or tapping empty map, clears the history. A line that "opens its gain and lose list" opens it inside the card as a fold-out, not as a new screen.
 
 How a card sits depends on the shape:
 
@@ -118,7 +118,7 @@ The game menu opens from its button, from Back on an empty map, from Esc, or fro
 2. **Turn in progress.** Your orders for the turn are written down before it runs, so together with the last save the world before the turn is kept and killing the app mid-turn loses nothing. The map stays visible and can be panned and zoomed, orders are frozen, the hourglass turns, armies march along their routes and borders change as results arrive. If a turn takes longer than 1.5 seconds, a small parchment strip says what is being worked out ("The courts of Europe deliberate…").
 3. **Battles.** Each turn is one week: End turn plays 7 days, and the top bar shows the date with its day, such as "18 November 1444". The week plays out day by day. When one of your armies or fleets meets an enemy, the map flies there and the battle view opens: both sides, their commanders, the ground, how far the battle has got, and its standing orders. While any of your battles runs, time slows to steps of 4 hours, six a day, and you watch it round by round. At any step you can change the standing orders for that battle or press Retreat. You cannot skip to the result. If several of your battles run at once, a battle switcher lists them with each one's progress, and you can jump between them. When all of them have ended, a result card (who won, men lost, the one-line reason) with Carry on sends time back to whole days until your next battle or the end of the week. Battles between other realms never slow the game; they appear on the map and, if they matter to you, in the turn report. Every battle can be watched again from the turn report and the Chronicle.
 4. **Events** open one at a time as modal cards (picture, text, two or three options, each showing its effects on tap or focus), in date order. Look at the map shrinks the event into the badge on End turn so you can check something first. Nothing ever answers an event for you. See [Historical events](Historical-Events).
-5. **Dispatches.** What happened goes in the Dispatches log, which never opens by itself. Tap the scroll button in the top bar to read it: calls to arms and peace offers to answer come first, then every dispatch of past weeks, newest first under a heading per day, with a switch between everything and only your realm. Each line with a place has a map button that takes you there. The button counts what came about your realm since you last looked, and blinks while a call or offer waits. When one of your battles or sieges begins, or a call to arms or peace offer arrives, a short alert drops in under the top bar with Go there (or Answer); it goes away on its own, and the log keeps what it said. A battle of yours also makes the week wait: tap Watch on its alert and the map goes there, the week plays on slowly enough to follow, and a strip along the bottom shows each side's men left against what they started with and the round; when the battle ends the strip says how. Tap End turn instead to play on without watching.
+5. **News.** What happened goes in the News log, which never opens by itself. Tap the scroll button in the top bar to read it: calls to arms and peace offers to answer come first, then every news item of past weeks, newest first under a heading per day, with a switch between everything and only your realm. Each line with a place has a map button that takes you there. The button counts what came about your realm since you last looked, and blinks while a call or offer waits. When one of your battles or sieges begins, or a call to arms or peace offer arrives, a short alert drops in under the top bar with Go there (or Answer); it goes away on its own, and the log keeps what it said. A battle of yours also makes the week wait: tap Watch on its alert and the map goes there, the week plays on slowly enough to follow, and a strip along the bottom shows each side's men left against what they started with and the round; when the battle ends the strip says how. Tap End turn instead to play on without watching.
 6. The Attention list and badge refresh, and the next orders phase begins.
 
 If the app goes to the background while one of your battles runs, it comes back to the same battle at the same step. If the app was killed, the last save and the written-down orders replay the month to that battle with the same result.
@@ -139,7 +139,7 @@ Lines are listed most urgent first. Each has an icon, one sentence and a Show bu
 - **Battle view:** while your battles run, Back takes you to the map and the battles keep running; the switcher brings you back. In a replay, Back returns to where the replay was opened. With a controller: A is pause and play, then Carry on; B goes back to the map (or leaves a replay); X is Retreat; Y shows the commander's line; the bumpers switch battle; Menu does nothing.
 - **Siege view:** a full screen opened from a besieged castle at local zoom or from its card; Back returns to the map at the castle.
 - **Peace table:** a modal opened from the Abroad tab, an enemy's country card or an incoming offer, returning where it was opened. An incoming offer cannot be dismissed, only answered or put off one turn.
-- **Map lens picker:** a small pop-over from the tool column.
+- **Map mode picker:** a small pop-over from the tool column.
 - **Confirmation:** a small modal for destructive actions only, returning to the screen below unchanged.
 
 ### How a campaign ends
@@ -185,7 +185,7 @@ Phones play in landscape only, on every screen including menus; a phone held upr
 
 **Controller.** There are three sets of controls: Map on the map, Battle in the battle viewer, and Menu on every other screen (move focus, select, back, the bumpers to switch tabs or step through stacked cards, and Show on map). A text field adds the on-screen keyboard on top. On the map: a free cursor on the left stick that snaps gently to provinces, armies and castles, pan on the right stick, zoom on the triggers, select, next army on the bumpers, and d-pad right for the Needs attention screen and its next line. A short press of Menu opens the game menu; holding Menu for half a second ends the turn. A Steam Controller or Steam Deck trackpad acts as a mouse on the map and shows the pointer; otherwise the stick cursor shows.
 
-**Focus.** While a controller or keyboard is in use, exactly one element has focus, drawn with the gold frame used for the chosen map lens. Every screen has its own first focus, and focus order follows reading order.
+**Focus.** While a controller or keyboard is in use, exactly one element has focus, drawn with the gold frame used for the chosen map mode. Every screen has its own first focus, and focus order follows reading order.
 
 **Prompts and text.** Button prompts match the last device used: none for touch, the controller's own glyphs for Xbox, PlayStation, Steam or Switch-style controllers, keys for a keyboard, switching at once when the device changes. Text fields use the platform's on-screen keyboard and have a filled-in default so you can confirm without typing.
 
@@ -232,7 +232,7 @@ The screen list is the single catalogue that code, music and sound key on:
 - [How a turn works](Time-and-Turns): the month day by day, slowing to 4-hour steps while your battles run, the January checks, the end date.
 - [Warfare](Warfare): the battle view, standing orders and Retreat, the result card, siege view, peace table.
 - [Historical events](Historical-Events): event cards in date order and the wrap-up events.
-- [Map and lenses](Map-and-Lenses): map rendering, zoom levels, lenses, the title background, camera moves.
+- [Map and Map Modes](Map-and-Lenses): map rendering, zoom levels, map modes, the title background, camera moves.
 - [Tutorial and help](Tutorial-and-Help): tips, the Almanac, the tutorial and its chapter list, and what goes on the Needs attention list.
 - [Achievements](Achievements): play on ends achievements; the final result shows them.
 - [Music and sound](Music-and-Sound): screen ids and Realm book tabs drive music; sound suspends and resumes.

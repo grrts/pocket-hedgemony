@@ -527,8 +527,8 @@
  },
  "lens": {
   "far": "family",
-  "regional": "tongue",
-  "realm_toggle": "kin, cousin or stranger for the player's realm"
+  "regional": "language",
+  "realm_toggle": "same language, related or foreign for the player's realm"
  },
  "charter_brought_by": [
   "the ruler",
@@ -569,15 +569,15 @@
     "the war aim \"Gather our kin\" after 1789"
    ],
    "isolationist": [
-    "\"Own tongue\" charters to keep strangers calm",
+    "\"Own language\" charters to keep foreign peoples calm",
     "a welcome for trading peoples"
    ],
    "mercantile": [
-    "\"Own tongue\" charters to keep strangers calm",
+    "\"Own language\" charters to keep foreign peoples calm",
     "a welcome for trading peoples"
    ],
    "opportunist": [
-    "\"Free a people\" against neighbours with stranger homelands in revolt"
+    "\"Free a people\" against neighbours with foreign homelands in revolt"
    ],
    "zealot": [
     "expulsion of trading peoples of another faith"

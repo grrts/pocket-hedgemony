@@ -28,7 +28,7 @@ contexts extend, and the data build that validates all of it.
   **trade** (trade 12), **government** (government 5), **diplomacy** (diplomacy 11), **subjects** (subjects 11).
 - Rising mechanics behind the `rebels` effect: **rebellions**.
 - The revolution layer (signs, stances, regimes) built on events: **revolutions**.
-- Faith waves and faith policy: **religion**. Tongues and nationalism: **culture**. Heritage: **national-strengths**.
+- Faith waves and faith policy: **religion**. Languages and nationalism: **culture**. Heritage: **national-strengths**.
 - How an event card looks and how unanswered events block End turn: **game-shell**. Music tags: **audio**.
 - Tutorial-only scripted events: **onboarding**.
 - Where events run in the turn, and in which turn their monthly work runs: **time-and-turns**.
@@ -402,7 +402,7 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
   realm's gold or debt (a `%` change of what it holds, a number at the game's gold scale), and a change to
   legitimacy or stability is kept on top of the realm's own reading. Every other effect stays in the tree's world,
   where later events read it. [EVT-045, EVT-056; D-EVT-17]
-- EVT-074 When an event fires for a realm or the AI answers one, the dispatches shall say so ("Fall of
+- EVT-074 When an event fires for a realm or the AI answers one, the News shall say so ("Fall of
   Constantinople: Ottomans chooses “Imperial capital”"); a major event is told to every realm, any other to the
   realms in it and those close to them. [EVT-066; game-shell SHELL-082]
 - EVT-075 The event tree's state (its world, ages and periods, what fired, events waiting for an answer, boosts
@@ -417,8 +417,8 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
   event follows, and when none is left the paused week plays on. *Look at the map* folds the card into the End
   turn button, which shows a scroll with the count of waiting events; while any waits, End turn opens the
   oldest instead of ending the turn (SHELL-070, SHELL-081, EVT-044). Grouping and overview: every event is one
-  card; the dispatches keep a line for each event that fired, so the history of the campaign reads there, and
-  waiting events sit at the top of the dispatches with an *Answer* button. Phone: the card is a sheet over the
+  card; the News keeps a line for each event that fired, so the history of the campaign reads there, and
+  waiting events sit at the top of the News with an *Answer* button. Phone: the card is a sheet over the
   map in the Wide and Tall layouts, inside the safe areas, its text scrolling while the options stay in reach,
   every button at least 44 points high, nothing that needs hover. [X-19, SHELL-070, SHELL-080, SHELL-081]
 
@@ -517,10 +517,10 @@ before achievements and the autosave. The age and period checks run in the event
 | rebellions | downstream | Customer–Supplier | `rebels` effect starts a rising from the recruit pool (EVT-048); `rebels_active` reads risings; `unrest` lands as one named grievance; events as sparks; the end of a tagged rising (EVT-068) |
 | revolutions | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11), registered by revolutions: conditions grievance, class_share, lords, war_lost; effects regime, lock; param rebels.revolution; tiers rising_won, rising_crushed; event field revolution with rearm (one_time may fire again); flags revolutionary_regime, emigre_court, reaction_regime, revolution_funded; areas hokuriku, old_castile; entities ikko_ikki_kaga, comuneros, tay_son, donghak_movement, russian_opposition_1905, iranian_constitutionalists; 7 unverified sources; 26 extended and 10 new events; build.py EFFECT_TIERS |
 | religion | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11), registered by religion: religions hussite, jain, asian_traditional; conditions faith_policy, holds_holy_place, faith_wave_active; effects faith_wave, faith_policy, preachers; entities tumed, gelug_order, old_believers, gowa_tallo, merina_kingdom; 7 modifiers; 8 unverified sources; 10 new events; faith_wave patches on protestant_reformation, council_of_trent, safavid_rise, sikh_panth_founded, futa_jallon_jihad, sokoto_jihad; flags religious_persecution_active, missionary_persecution, inquisition_established set by religion (D-EVT-16) |
-| culture | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11, D-EVT-12): culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new tongues abroad"; culture effects on listed events; nationalism read from ideology_support |
+| culture | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11, D-EVT-12): culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new languages abroad"; culture effects on listed events; nationalism read from ideology_support |
 | subjects | downstream (they extend this) | Customer–Supplier | vassalize, release, relation subject/overlord/personal_union, subject_count, create_country subject_of, doctrine_of_lapse; adopted (D-EVT-11) subject_loyalty, add_subject_reason, remove_subject_reason, change_subject_kind |
 | diplomacy | downstream (they extend this) | Customer–Supplier | opinion → ledger standing; trust and notoriety are diplomacy's derived values, an event's change lands as an Oath broken or a Notorious deed (D-EVT-14); relation types to relation actions; adopted effects war_aim, league, pretender (D-EVT-11) |
-| national-strengths | downstream (they extend this) | Customer–Supplier | Ages for heydays; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
+| national-strengths | downstream (they extend this) | Customer–Supplier | Ages for golden ages; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
 | buildings | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11) effects add_building, remove_building, damage_buildings, building_step and condition has_building; landmarks founded by events |
 | exploration | downstream | Customer–Supplier | `age_of_exploration` gates exploration per region; colonial_presence |
 | warfare | downstream | Customer–Supplier | war, peace, casus_belli; prestige from victories |

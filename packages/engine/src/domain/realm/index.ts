@@ -967,7 +967,7 @@ export function countryCard(c: CardInput): { text: string; stat: Stat | "schools
     { text: `Lords ${c.lords.length} named: ${count("Loyal")} loyal, ${count("Wavering")} wavering, ${count("Disloyal")} disloyal`, stat: "lords" },
     { text: `Schools ${c.schools.count} (${grouped(c.schools.students)} students, ${grouped(c.schools.scholars)} scholars) · studying: ${c.schools.study ?? "nothing"} ${c.schools.progressPct ?? 0} %`, stat: "schools" },
     { text: `Faith ${c.faithPct} %`, stat: "faith" },
-    { text: `Tongue ${c.tonguePct} %`, stat: "tongue" },
+    { text: `Language ${c.tonguePct} %`, stat: "tongue" },
     { text: `In revolt ${c.inRevolt}`, stat: "in_revolt" },
     { text: `Allies ${c.allies}`, stat: "allies" },
     { text: `Enemies ${c.enemies}`, stat: "enemies" },

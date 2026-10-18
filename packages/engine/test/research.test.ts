@@ -177,7 +177,7 @@ describe("research", () => {
     expect(knows(restored, me, "L1")).toBe(true);
   });
 
-  it("sends the Learning tab and every realm's research in the snapshot", () => {
+  it("sends the Research tab and every realm's research in the snapshot", () => {
     const host = createEngineHost(() => rules);
     const reply = host({ id: 1, type: "newGame", seed: 1, playerNation: "france" });
     if (reply.response.type !== "snapshot") throw new Error(reply.response.type === "error" ? reply.response.message : "no snapshot");

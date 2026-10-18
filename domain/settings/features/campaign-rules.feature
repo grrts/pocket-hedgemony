@@ -44,7 +44,7 @@ Feature: Campaign rules are not settings
 
   @SET-033
   Scenario: Parchment fog stays a display switch
-    Given the lens menu has "Parchment over unknown lands"
+    Given the map mode menu has "Hide unexplored lands"
     When the player turns it off
     Then unknown lands are drawn without parchment
     And no campaign rule changes

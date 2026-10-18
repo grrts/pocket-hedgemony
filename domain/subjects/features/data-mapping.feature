@@ -1,11 +1,11 @@
 @context-subjects
-Feature: Mapping the data onto the six kinds
+Feature: Mapping the data onto the six types
   As the game
-  I want the relations data and the event tree mapped onto the six kinds
-  So that every subject in 1444 and every subject made by an event has one kind
+  I want the relations data and the event tree mapped onto the six types
+  So that every subject in 1444 and every subject made by an event has one type
 
   @SUBJ-014
-  Scenario Outline: Relations kinds
+  Scenario Outline: Relations types
     Given the 1444 data holds "<subject>" as a subject of "<overlord>" with kind "<data_kind>"
     When the scenario starts
     Then "<subject>" is <result>

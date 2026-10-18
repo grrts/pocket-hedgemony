@@ -146,7 +146,7 @@ The Bastard of Burgundy (Cunning 2) leads 8,000 men, seen by France only as a ru
 - [Research](Research): W14 Army divisions for same-day splits and fronts.
 - [Historical-Events](Historical-Events): floods.
 - [Time-and-Turns](Time-and-Turns): the weekly turn, real month lengths, turn order and seasons.
-- [Map-and-Lenses](Map-and-Lenses) and [Screens-and-Navigation](Screens-and-Navigation): the route preview, replay and notices.
+- [Map and Map Modes](Map-and-Lenses) and [Screens-and-Navigation](Screens-and-Navigation): the route preview, replay and notices.
 - [Rebellions](Rebellions): rebel-held provinces may be entered and plundered.
 
 ## Numbers
