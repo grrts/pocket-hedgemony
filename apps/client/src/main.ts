@@ -1721,7 +1721,7 @@ function drawLivingPieces(ctx: CanvasRenderingContext2D, pieces: LivingPiece[], 
     if (p.selected) brackets(ctx, box.x, box.y, box.w, box.h, u, 1 + (Math.floor(now / 260) % 2), PALETTE.gold);
     const labels = pieceLabels("living", { markers: markersOn, selected: p.selected });
     let bottom = box.y + box.h;
-    if (labels.plate) bottom += drawPlate(ctx, menShort(p.men), box.x + box.w / 2, bottom + 2, 2, p.color) + 2;
+    if (labels.plate) bottom += drawPlate(ctx, menShort(p.men), box.x + box.w / 2, bottom + 2, 2) + 2;
     if (labels.name && p.name) {
       ctx.textAlign = "center";
       ctx.textBaseline = "top";

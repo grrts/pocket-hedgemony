@@ -79,11 +79,8 @@ function plateBitmap(text: string, u: number): HTMLCanvasElement {
   return canvas;
 }
 
-/**
- * A number tag, centred on x with its top at y, with the owner's colour as a strip along
- * its bottom when given, so the realm still reads at a glance. Returns its height.
- */
-export function drawPlate(ctx: Ctx, text: string, x: number, y: number, u: number, color?: string): number {
+/** A number tag, centred on x with its top at y. Returns its height. */
+export function drawPlate(ctx: Ctx, text: string, x: number, y: number, u: number): number {
   const img = plateBitmap(text, u);
   const dpr = tagDpr();
   const w = img.width / dpr;
@@ -91,10 +88,6 @@ export function drawPlate(ctx: Ctx, text: string, x: number, y: number, u: numbe
   const left = Math.round(x - w / 2);
   const top = Math.round(y);
   ctx.drawImage(img, left, top, w, h);
-  if (color) {
-    ctx.fillStyle = color;
-    ctx.fillRect(left + u, top + h - 3 * u, w - 2 * u, 2 * u);
-  }
   return h;
 }
 
@@ -299,7 +292,7 @@ export function drawToken(ctx: Ctx, s: TokenStyle): TokenLayout {
     brackets(ctx, L.figure.x, L.figure.y, img.width, img.height + 10 * u, u, 1 + pulse, PALETTE.gold);
   }
   ctx.drawImage(img, L.figure.x, L.figure.y);
-  drawPlate(ctx, L.plate.text, L.plate.x + L.plate.w / 2, L.plate.y, u, s.color);
+  drawPlate(ctx, L.plate.text, L.plate.x + L.plate.w / 2, L.plate.y, u);
   if (s.flag && L.flag) ctx.drawImage(s.flag, L.flag.x, L.flag.y);
   return L;
 }
@@ -454,7 +447,7 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
   for (const f of alive) {
     const age = (t - f.born) / 1400;
     ctx.globalAlpha = alpha * (1 - age * age);
-    drawPlate(ctx, f.text, x + f.dx * u, top - 10 * u - age * 14 * u, u, PALETTE.blood);
+    drawPlate(ctx, f.text, x + f.dx * u, top - 10 * u - age * 14 * u, u);
   }
   ctx.globalAlpha = alpha;
   floaters.set(b.id, alive);
@@ -504,7 +497,7 @@ function sideBar(ctx: Ctx, x: number, top: number, u: number, men: number, start
   };
   bar(10, men / Math.max(1, start), color);
   bar(13, morale, PALETTE.paper);
-  drawPlate(ctx, menShort(men), left + w / 2, top, u, color);
+  drawPlate(ctx, menShort(men), left + w / 2, top, u);
 }
 
 /** Forgets battles that are over, so their numbers don't linger. */
@@ -555,7 +548,7 @@ export function drawSiegeMark(ctx: Ctx, s: SiegeMarkStyle): void {
     const share = i < pips - 1 ? 1 : progress;
     ctx.fillRect(px, top + u, Math.round(3 * u * share), 3 * u);
   }
-  if (months > 5) drawPlate(ctx, String(months), x + w / 2 + 6 * u, top - 2 * u, u, color);
+  if (months > 5) drawPlate(ctx, String(months), x + w / 2 + 6 * u, top - 2 * u, u);
   // The row: each figure after its picture, on a paper strip rimmed in ink.
   const food = s.foodMonths === null ? "-" : s.foodMonths >= 10 ? String(Math.floor(s.foodMonths)) : (Math.floor(s.foodMonths * 10) / 10).toFixed(1).replace(/\.0$/, "");
   const items: [keyof typeof SIEGE_ICONS, string][] = [["breach", String(s.breaches)], ["garrison", menShort(s.garrison)], ["food", food]];
