@@ -11,6 +11,7 @@ import { restorePeoples, savePeoples, type SavedPeoples } from "../../peoples.ts
 import { refreshWorks, WORK_COUNT, workIndex, WORKS, type QueuedWork, type Site } from "../../works.ts";
 import { MAX_TILES } from "../../land.ts";
 import { restoreNavy, saveNavy, type SavedNavy } from "../../navy.ts";
+import { restoreExploration, saveExploration, type SavedExploration } from "../../colonies.ts";
 import type { Ruleset } from "@ph/rules";
 import { hashWorld } from "../../hash.ts";
 import { Rng } from "../../rng.ts";
@@ -93,7 +94,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
-      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed, foodPolicy: world.foodPolicy, diplomacy: { ...world.diplomacy, events: [] }, government: saveGovernment(world), events: saveEvents(world), navy: saveNavy(world), peoples: savePeoples(world), rebels: saveRebels(world), heritage: saveHeritage(world), trade: saveTrade(world) },
+      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed, foodPolicy: world.foodPolicy, diplomacy: { ...world.diplomacy, events: [] }, government: saveGovernment(world), events: saveEvents(world), navy: saveNavy(world), exploration: saveExploration(world), peoples: savePeoples(world), rebels: saveRebels(world), heritage: saveHeritage(world), trade: saveTrade(world) },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
@@ -327,7 +328,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (!name || owner < 0 || nationMap[owner]! < 0) return -1;
     return addCommander(world, nationMap[owner]!, newCommander(name), id);
   });
-  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[]; foodPolicy?: FoodPolicyScreen[]; diplomacy?: World["diplomacy"]; government?: SavedGovernment; events?: SavedEvents; navy?: SavedNavy; peoples?: SavedPeoples; rebels?: SavedRebels; heritage?: Record<string, SavedRealmHeritage>; trade?: SavedTrade };
+  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[]; foodPolicy?: FoodPolicyScreen[]; diplomacy?: World["diplomacy"]; government?: SavedGovernment; events?: SavedEvents; navy?: SavedNavy; exploration?: SavedExploration; peoples?: SavedPeoples; rebels?: SavedRebels; heritage?: Record<string, SavedRealmHeritage>; trade?: SavedTrade };
   const mapP = (old: number) => world.provinceIndex.get(ids.provinces[old]!) ?? -1;
   const mapN = (old: number) => nationMap[old] ?? -1;
   const mapCompany = (c: FreeCompany): FreeCompany => ({ ...c, home: c.home < 0 ? -1 : mapP(c.home) });
@@ -377,6 +378,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   if (natMeta.research) restoreResearch(world, natMeta.research, mapN, mapP);
   // Ports, sailors and fleets; a save from before the navy keeps the 1444 ports.
   if (natMeta.navy) restoreNavy(world, natMeta.navy, mapN, mapP, (old) => commanderMap[old] ?? -1);
+  // Charts and colonies; a save from before exploration keeps the 1444 charts.
+  if (natMeta.exploration) restoreExploration(world, natMeta.exploration, mapN, mapP);
   // Lords keep their places in the list (provinces point at them); one of a realm that is gone holds nothing.
   type SavedWork<T> = Omit<T, "work"> & { work: string };
   const worksMeta = need("nations").meta as { sites?: SavedWork<Site>[]; workQueue?: SavedWork<QueuedWork>[] };

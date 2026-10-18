@@ -26,6 +26,7 @@ import {
   SLOTS,
   TONGUE_FAMILY,
   faithName,
+  type ExplorationView,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { askCard, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
@@ -58,6 +59,7 @@ import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
 import { fleetButton, fleetCard, navyTab, portTab } from "./ui/navy.ts";
+import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } from "./ui/explore.ts";
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
 import { Hints, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
@@ -164,7 +166,7 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" = "general";
+let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "colonies" = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -184,19 +186,19 @@ let provinceTab: "overview" | "people" | "garrison" | "land" | "build" | "port" 
 /** The player's fleet whose card is open (its id), and the fleet waiting for a tap on where to sail (-1 = none). */
 let fleetView = -1;
 let sailing = -1;
+/** A course being drawn for a fleet of explorers (EXPL-069): its zones, where each leg ends (for Undo), and the low-supply choice. */
+let exploring: { fleet: number; path: number[]; legs: number[]; carryOn: boolean } | null = null;
 /** The tile tapped on the Land tab, or -1. */
 let landTile = -1;
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "tongues" | "faiths" | "trade";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "tongues" | "faiths" | "charts" | "trade";
 let lens: Lens = "realms";
 /** The trader route being drawn on the map, or null when the map is not in route mode (TRADE-142). */
 let routing: Routing | null = null;
 /** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
 let fogOn = true;
-/** Provinces the player knows, or null before a realm is chosen. */
+/** Provinces the player has charted (bit p of byte p >> 3, EXPL-010), or null before a realm is chosen. */
 let known: Uint8Array | null = null;
-/** How far, in provinces, a realm knows the world around its lands and armies. */
-const KNOWN_REACH = 6;
 
 // ---- DOM ----
 installUiArt();
@@ -221,6 +223,7 @@ app.innerHTML = `
   <section class="panel framed" id="panel" hidden></section>
   <div class="alerts" id="alerts" aria-live="polite"></div>
   <div class="battle-watch framed" id="battle-watch" hidden></div>
+  <div class="voyage-bar framed" id="voyage-bar" hidden></div>
   <section class="event-card framed" id="event-card" role="dialog" aria-labelledby="event-title" hidden></section>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
   <button class="wax fab end-turn" id="fab" title="End turn" data-sfx="none" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
@@ -232,6 +235,7 @@ const armyList = document.querySelector<HTMLElement>("#army-list")!;
 const armyButton = document.querySelector<HTMLButtonElement>("#armies")!;
 const alerts = document.querySelector<HTMLElement>("#alerts")!;
 const battleWatch = document.querySelector<HTMLElement>("#battle-watch")!;
+const voyageBarEl = document.querySelector<HTMLElement>("#voyage-bar")!;
 const eventCard = document.querySelector<HTMLElement>("#event-card")!;
 /** The waiting event's card is folded into End turn while the player looks at the map (SHELL-081). */
 let eventFolded = false;
@@ -645,6 +649,7 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "tongues", name: "Tongues", note: "the family of the tongue most speak" },
   { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
   { id: "trade", name: "Trade", note: "trade ratio, your traders' loops" },
+  { id: "charts", name: "Charts", note: "what you have charted, and empty coasts to settle" },
 ];
 /** The trade lens's ramp by trade ratio, quiet to busy (TRADE-143); provinces the player doesn't see are parchment. */
 const TRADE_RAMP = ["#efe39a", "#e0b443", "#c7742a", "#3f8f6e", "#1f5a5e"].map(hexToRgb);
@@ -719,19 +724,18 @@ function setLens(l: Lens): void {
   lens = l;
   view.renderer.mode = lens === "realms" ? "political" : lens === "terrain" ? "terrain" : "lens";
   restyleProvinces();
-  if (!lensMenu.hidden) renderLensMenu();
+  renderLensMenu();
 }
 
 function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map lens</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.name}</b><small>${l.note}</small></button>`).join("")}
-    ${lens === "diplomacy" ? diplomacyKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "trade" ? tradeKey() : ""}
+    ${lens === "diplomacy" ? diplomacyKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
       setLens(b.dataset.lens as Lens);
-      renderLensMenu();
       // The key sits under the buttons; bring it into view on a short screen.
       lensMenu.querySelector(".lens-key")?.scrollIntoView({ block: "nearest" });
     }),
@@ -741,6 +745,21 @@ function renderLensMenu(): void {
     restyleProvinces();
   });
 }
+
+/** The Charts lens's key (EXPL-073). */
+function chartsKey(): string {
+  const ex = snapshot?.exploration;
+  const sw = (rgb: number[]) => `<i class="swatch" style="background:rgb(${rgb.join(",")})"></i>`;
+  return `<div class="lens-key">
+    <span>${sw(SITE_RGB[1]!)}Empty coast inside your colonial range${ex?.colonial ? ` (${ex.range} zones)` : ""}</span>
+    <span>${sw(SITE_RGB[2]!)}Empty land beyond it, or inland</span>
+    <span>${sw(SITE_RGB[3]!)}A colony being founded</span>
+    <span><i class="swatch parchment"></i>Not charted yet: send explorers</span>
+    ${ex && !ex.colonial ? "<p>Colonies open with ocean navigation.</p>" : "<p>Tap an empty coast for what it takes to settle it.</p>"}
+  </div>`;
+}
+/** Colours of empty land under the Charts lens: in range, beyond it, being settled. */
+const SITE_RGB = [[0, 0, 0], hexToRgb("#5fd35a"), hexToRgb("#b7d9a2"), hexToRgb("#f2c14e")];
 
 /** The diplomacy lens's key: a swatch for each relation, and what a tap does. */
 function diplomacyKey(): string {
@@ -810,6 +829,12 @@ function lensColor(i: number): number[] {
       const f = snapshot?.peoples.provinceFaith[i * SLOTS] ?? NO_FAITH;
       return f === NO_FAITH ? unownedRgb : faithRgb(FAITH_IDS[f]!);
     }
+    case "charts": {
+      // Held land faded in its holder's colour; empty land by whether it can be settled (EXPL-073).
+      const site = snapshot?.exploration.sites[i] ?? 0;
+      if (o < 0) return site ? SITE_RGB[site]! : unownedRgb;
+      return nationRgb[o]!.map((v) => Math.round(v * 0.45 + 130));
+    }
     case "diplomacy": {
       const r = o >= 0 ? relationTo(o) : null;
       if (!r) return o >= 0 ? RELATION_RGB.neutral : unownedRgb;
@@ -824,29 +849,8 @@ function lensColor(i: number): number[] {
   }
 }
 
-/** Provinces within KNOWN_REACH steps (over land or sea) of the player's lands and armies. */
-function computeKnown(): Uint8Array | null {
-  if (!snapshot) return null;
-  const me = snapshot.playerNation;
-  const dist = new Int16Array(provinces.length).fill(-1);
-  const queue = new Int32Array(provinces.length);
-  let tail = 0;
-  for (let i = 0; i < provinces.length; i++) if (owners[i] === me) ((dist[i] = 0), (queue[tail++] = i));
-  const { location, owner } = snapshot.armies;
-  for (let k = 0; k < location.length; k++) if (owner[k] === me && dist[location[k]!]! < 0) ((dist[location[k]!] = 0), (queue[tail++] = location[k]!));
-  for (let h = 0; h < tail; h++) {
-    const p = queue[h]!;
-    if (dist[p]! >= KNOWN_REACH) continue;
-    for (let e = neighborStart[p]!; e < neighborStart[p + 1]!; e++) {
-      const n = neighborList[e]!;
-      if (dist[n]! < 0) ((dist[n] = dist[p]! + 1), (queue[tail++] = n));
-    }
-  }
-  const out = new Uint8Array(provinces.length);
-  for (let i = 0; i < out.length; i++) out[i] = dist[i]! >= 0 ? 1 : 0;
-  return out;
-}
-const isKnown = (i: number) => !fogOn || !known || known[i] === 1;
+/** Charted by the player: the parchment lifts from it (EXPL-015); under the Charts lens the parchment shows whatever the fog switch says. */
+const isKnown = (i: number) => (!fogOn && lens !== "charts") || !known || (known[i >> 3]! & (1 << (i & 7))) !== 0;
 
 /** Latitude and longitude of a province's centre. */
 const latOf = (p: { y?: number }) => rules.map!.latTop - (p.y ?? 0) / rules.map!.pxPerDeg;
@@ -872,7 +876,7 @@ function seasonsFor(date: GameDate): Uint8Array {
 }
 
 function restyleProvinces(): void {
-  known = computeKnown();
+  known = snapshot?.exploration.charted ?? null;
   for (let i = 0; i < provinces.length; i++) {
     const o = owners[i]!;
     const occ = occupiers[i]!;
@@ -1205,6 +1209,7 @@ function drawOverlay(o: OverlayContext): void {
         pixelText(ctx, name, sx, box.y + box.h + 2, 10);
       }
     }
+    drawColonies(o, ctx, u, onScreen);
     animating = drawFleets(o, ctx, u, now, onScreen) || animating;
   }
   // Rebel bands where they stand, in the rebels' colour with no flag (REBL-066); a tap on the province opens their card.
@@ -1374,6 +1379,12 @@ function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number,
     const pts = [o.toScreen(...fleetXY(f)), ...f.route.map((q) => o.toScreen(provinces[q]!.x!, provinces[q]!.y!))];
     drawRoute(ctx, { pts, u, color: nations[s.playerNation]!.color, weeks: [], t: now, viewWidth: o.width });
   }
+  // The course being drawn for explorers, in gold over the sea (EXPL-069).
+  const draft = exploring && s.navy.fleets.find((f) => f.id === exploring!.fleet);
+  if (draft && exploring!.path.length) {
+    const pts = [o.toScreen(...fleetXY(draft)), ...exploring!.path.map((q) => o.toScreen(provinces[q]!.x!, provinces[q]!.y!))];
+    drawRoute(ctx, { pts, u, color: PALETTE.gold, weeks: [], t: now, viewWidth: o.width });
+  }
   fleetHitBoxes = [];
   const stack = new Map<number, number>();
   for (const f of s.navy.fleets) {
@@ -1390,6 +1401,32 @@ function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number,
     moving ||= f.route.length > 0;
   }
   return moving;
+}
+
+/** Colonies being founded: a small flag of the founder over a ring that fills as the colony grows (EXPL-052, EXPL-073). */
+function drawColonies(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number, onScreen: (x: number, y: number, pad?: number) => boolean): void {
+  const s = snapshot;
+  if (!s) return;
+  for (const c of s.exploration.colonies) {
+    if (!isKnown(c.province)) continue;
+    const p = provinces[c.province]!;
+    const [x, y] = o.toScreen(p.x!, p.y!);
+    if (!onScreen(x, y)) continue;
+    const r = 6 * u;
+    ctx.lineWidth = 2 * u;
+    ctx.strokeStyle = PALETTE.ink;
+    ctx.fillStyle = "rgba(20, 14, 8, 0.55)";
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = nations[c.owner]!.color;
+    ctx.beginPath();
+    ctx.arc(x, y, r, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * c.progress) / s.exploration.progressFounded);
+    ctx.stroke();
+    const flag = flagCanvas(nations[c.owner]!, 1);
+    ctx.drawImage(flag, Math.round(x - flag.width / 2), Math.round(y - r - flag.height - u), flag.width, flag.height);
+  }
 }
 
 /** Settlement drawn for a province by its people (thousands). */
@@ -1499,6 +1536,11 @@ function onTap(sx: number, sy: number, province: number): void {
   if (routing) return routeTap(province);
   officialView = -1;
   achView = false;
+  // Drawing a course: each tap on the sea adds a leg; the bar over the map says what it takes (EXPL-069).
+  if (exploring && snapshot) {
+    if (province >= 0 && isWater[province]) addLeg(province);
+    return;
+  }
   // Armies sit on top of provinces, so check them first, with some room around each for fingers.
   const PAD = 8;
   const hit = armyHitBoxes.find((b) => sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
@@ -1585,6 +1627,108 @@ function pickFleet(id: number): void {
   restyleProvinces();
   renderPanel();
   renderArmyList();
+}
+
+/** Starts drawing a course for a fleet of explorers in port: the panel folds away and the voyage bar shows (EXPL-069). */
+function startExplore(id: number): void {
+  exploring = { fleet: id, path: [], legs: [], carryOn: false };
+  sailing = -1;
+  fleetView = id;
+  panelCollapsed = true;
+  renderPanel();
+  renderVoyageBar();
+}
+
+/** The quickest way, in zones, from where the course ends to a tapped zone, over the sea the fleet may enter. */
+function legTo(from: number, to: number, reach: number): number[] | null {
+  const ex = snapshot!.exploration;
+  const may = (q: number) => isWater[q] && (!ex.ocean[q] || reach === 255 || (reach >= 0 && ex.coastDist[q]! <= reach));
+  if (!may(to)) return null;
+  const prev = new Map<number, number>([[from, -1]]);
+  const queue = [from];
+  for (let i = 0; i < queue.length; i++) {
+    const p = queue[i]!;
+    if (p === to) {
+      const path: number[] = [];
+      for (let x = to; x !== from; x = prev.get(x)!) path.push(x);
+      return path.reverse();
+    }
+    for (const q of neighborIdx[p]!) if (!prev.has(q) && may(q)) (prev.set(q, p), queue.push(q));
+  }
+  return null;
+}
+
+function addLeg(zone: number): void {
+  const x = exploring!;
+  const f = snapshot!.navy.fleets.find((y) => y.id === x.fleet);
+  const reach = snapshot!.exploration.fleets.find((y) => y.id === x.fleet)?.oceanReach ?? -1;
+  if (!f) return cancelExplore();
+  const leg = legTo(x.path.at(-1) ?? f.at, zone, reach);
+  if (!leg || !leg.length) {
+    alertPlayer(`${provinces[zone]!.name} is out of these ships' reach: open ocean needs ${reach < 0 ? "the compass and sea charts" : "ocean navigation"} this far out.`, "scroll");
+    return;
+  }
+  sound.sfx("army_order_move");
+  x.legs.push(x.path.length);
+  x.path.push(...leg);
+  renderVoyageBar();
+  view.invalidate();
+}
+
+function cancelExplore(): void {
+  exploring = null;
+  voyageBarEl.hidden = true;
+  reopen.hidden = false;
+  view.invalidate();
+  renderPanel();
+}
+
+/** The voyage bar over the map while a course is drawn (EXPL-069, EXPL-074). */
+function renderVoyageBar(): void {
+  const x = exploring;
+  if (!x || !snapshot) {
+    voyageBarEl.hidden = true;
+    return;
+  }
+  const ex = snapshot.exploration;
+  const bits = ex.charted;
+  const uncharted = x.path.filter((q) => !(bits[q >> 3]! & (1 << (q & 7)))).length;
+  const supply = Math.min(...(snapshot.navy.mine.find((m) => m.id === x.fleet)?.ships.map((sh) => sh.supplyMax) ?? [0]));
+  voyageBarEl.innerHTML = voyageBar({ zones: x.path.length, uncharted, supply, carryOn: x.carryOn });
+  voyageBarEl.hidden = false;
+  reopen.hidden = true;
+  voyageBarEl.querySelectorAll<HTMLButtonElement>("[data-voyage-low]").forEach((b) =>
+    b.addEventListener("click", () => {
+      x.carryOn = b.dataset.voyageLow === "on";
+      renderVoyageBar();
+    }),
+  );
+  voyageBarEl.querySelector("[data-voyage-undo]")?.addEventListener("click", () => {
+    x.path.length = x.legs.pop() ?? 0;
+    renderVoyageBar();
+    view.invalidate();
+  });
+  voyageBarEl.querySelector("[data-voyage-cancel]")?.addEventListener("click", () => {
+    panelCollapsed = false;
+    cancelExplore();
+  });
+  voyageBarEl.querySelector("[data-voyage-go]")?.addEventListener("click", () => {
+    const { fleet, path, carryOn } = x;
+    void act({ type: "explore", do: "voyage", fleet, path, carryOn }).then(() => {
+      if (snapshot?.rejectedOrders.length) return;
+      exploring = null;
+      voyageBarEl.hidden = true;
+      sound.sfx("army_order_move");
+      renderPanel();
+      view.invalidate();
+    });
+  });
+}
+
+/** A fleet's name on a button: its admiral's, else what it is. */
+function fleetLabel(id: number): string {
+  const f = snapshot?.navy.fleets.find((x) => x.id === id);
+  return !f ? "a lost fleet" : f.admiral >= 0 ? `${cmdOf(f.admiral).name}'s fleet` : f.explorers ? "the explorers" : "the fleet";
 }
 
 /** Opens a fleet's card. */
@@ -1779,7 +1923,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", trade: "scroll",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", trade: "scroll",
 };
 
 /**
@@ -2082,7 +2226,8 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   }
   panel.classList.toggle("chooser", reopenIcon === "crown");
   panel.hidden = !open || panelCollapsed;
-  reopen.hidden = !open || !panelCollapsed;
+  // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
+  reopen.hidden = !open || !panelCollapsed || !!exploring;
   const what =
     reopenIcon === "crown" ? "Choose a realm" : newsView ? "Dispatches" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
   reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
@@ -2097,6 +2242,12 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
 let panelShows = "";
 
 function renderPanel(): void {
+  // Opening any other card, or closing the fleet's, drops a course being drawn.
+  if (exploring && (fleetView !== exploring.fleet || realmView >= 0 || newsView)) {
+    exploring = null;
+    voyageBarEl.hidden = true;
+    view.invalidate();
+  }
   const shows = `${achView}/${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
@@ -2202,6 +2353,7 @@ function renderPanel(): void {
     ${mineHere ? provinceTabs() : ""}
     <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"}</p>
     <p class="province-kind">${esc(provinceKind(p, !!owner && owner.capital === p.id))}</p>
+    ${snapshot ? settleSection(selectedProvince) : ""}
     ${snapshot ? rebelsHere(selectedProvince) : ""}
     ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
     ${siege ? siegeView(rules, siege) : ""}
@@ -2257,7 +2409,27 @@ function renderPanel(): void {
     realmTab = "food";
     renderPanel();
   });
+  panel.querySelector("[data-colony-abandon]")?.addEventListener("click", () => void actHere({ type: "explore", do: "abandon", province: selectedProvince }));
   if (siege) animateSiege(siege);
+}
+
+/** The province's Colony section (EXPL-071): a colony being founded here, a colony founded, or what it takes to settle empty land. */
+function settleSection(p: number): string {
+  const s = snapshot!;
+  const ex = s.exploration;
+  const me = s.playerNation;
+  const c = ex.colonies.find((x) => x.province === p);
+  if (c) {
+    const shipBeside = s.navy.fleets.some((f) => f.owner === me && isWater[f.at] && neighborIdx[p]!.includes(f.at));
+    return colonyCard(c, ex, { mine: c.owner === me, owner: nations[c.owner]!.name, shipBeside });
+  }
+  if (ex.founded.includes(p) && owners[p] === me) return `<p class="hint">${icon("crown", 1)}A colony of yours, founded by your settlers.</p>`;
+  if (owners[p]! >= 0 || isWater[p]) return "";
+  const why = !provinces[p]!.coastal ? "It has no coast: colonies are founded from the sea."
+    : ex.sites[p] === 1 ? "Empty land inside your colonial range: sail a caravel with a colonial governor beside it to found a colony."
+    : ex.colonial ? "Empty land beyond your colonial range."
+    : "Empty land. Colonies open with ocean navigation.";
+  return `<p class="hint">${icon("map", 1)}${why}</p>`;
 }
 
 /** What kind of province p is, after the realm that rules it (feedback 78): its seat and land, then river and coast. */
@@ -3094,7 +3266,40 @@ function renderFleet(id: number): void {
         .filter((k) => s.armies.owner[k] === me && s.armies.location[k] === f.at && s.armies.commander[k]! >= 0 && s.armies.battle[k]! < 0 && !aboard.has(s.armies.id[k]!))
         .map((k) => ({ id: s.armies.id[k]!, name: cmdOf(s.armies.commander[k]!).name, men: s.armies.men[k]!, room: s.armies.men[k]! + s.armies.horse[k]! * 3 }))
     : [];
-  const name = f.admiral >= 0 ? `${cmdOf(f.admiral).name}'s fleet` : "Fleet";
+  const name = f.admiral >= 0 ? `${cmdOf(f.admiral).name}'s fleet` : f.explorers ? "Explorers" : "Fleet";
+  const ex = s.exploration;
+  const pname = (p: number) => provinces[p]!.name;
+  let explore = "";
+  if (f.explorers) {
+    // The coasts beside the fleet that are not the player's, and why each can't be settled (EXPL-070).
+    const coasts = inPort
+      ? []
+      : neighborIdx[f.at]!.filter((q) => !isWater[q] && owners[q] !== me).map((q) => ({
+          province: q,
+          why:
+            owners[q]! >= 0 ? `${nations[owners[q]!]!.name} holds it: only war or a treaty takes it`
+            : ex.sites[q] === 3 ? "a colony is already being founded there"
+            : ex.sites[q] === 2 ? (ex.colonial ? "beyond your colonial range" : "colonies open with ocean navigation")
+            : null,
+        }));
+    const near = new Set(neighborIdx[f.at]!);
+    const colonyHere = inPort ? null : (ex.colonies.find((c) => c.owner === me && near.has(c.province)) ?? null);
+    const stores = mine.ships.reduce((t, sh) => t + sh.stores, 0);
+    const storesMax = mine.ships.reduce((t, sh) => t + sh.storesMax, 0);
+    explore =
+      exploreSection(f, ex, { inPort, drawing: exploring?.fleet === id, name: pname }) +
+      colonySection(f, ex, {
+        inPort,
+        portOfMine: inPort && owners[f.at] === me,
+        gold: s.nationTreasury[me]!,
+        stores,
+        storesMax,
+        coasts,
+        colonyHere,
+        waiting: ex.governors.filter((g) => g.port === f.at && g.fleet < 0 && g.colony < 0),
+        name: pname,
+      });
+  }
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(name)}</h2>${closeButton()}</header>
     ${fleetCard(f, mine, {
@@ -3106,6 +3311,7 @@ function renderFleet(id: number): void {
       choosing: sailing === id,
       inPort,
       me,
+      explore,
     })}`;
   bindClose();
   showPanel(true);
@@ -3131,6 +3337,19 @@ function renderFleet(id: number): void {
     b.addEventListener("click", () => order({ do: "merge", into }, () => (fleetView = into)));
   });
   panel.querySelector("[data-fleet-disband]")?.addEventListener("click", () => order({ do: "disband" }, () => (fleetView = -1)));
+  // Explore and Colony (EXPL-069, EXPL-070).
+  const colony = (o: Record<string, unknown>) =>
+    void act({ type: "explore", fleet: id, ...o } as Order).then(() => {
+      if (snapshot?.rejectedOrders.length) return;
+      newsView = false;
+      renderPanel();
+    });
+  panel.querySelector("[data-explore]")?.addEventListener("click", () => startExplore(id));
+  panel.querySelector("[data-colony-hire]")?.addEventListener("click", () => colony({ do: "hire" }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-colony-embark]").forEach((b) => b.addEventListener("click", () => colony({ do: "embark", governor: Number(b.dataset.colonyEmbark) })));
+  panel.querySelector("[data-colony-load]")?.addEventListener("click", () => colony({ do: "load" }));
+  panel.querySelector("[data-colony-unload]")?.addEventListener("click", () => colony({ do: "unload" }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-colony-found]").forEach((b) => b.addEventListener("click", () => colony({ do: "found", province: Number(b.dataset.colonyFound) })));
 }
 
 function renderArmy(id: number): void {
@@ -3601,7 +3820,7 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "trade" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy") && !mine)) realmTab = "general";
+  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "trade" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "colonies") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
   const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
@@ -3647,6 +3866,7 @@ function renderRealm(r: number): void {
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "military" ? warRoomSection()
     : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: (c) => cmdOf(c).name })
+    : realmTab === "colonies" ? coloniesTab(s!.exploration, { name: (p) => provinces[p]!.name, fleetName: fleetLabel, inRange: s!.exploration.sites.reduce((t, x) => t + (x === 1 ? 1 : 0), 0) })
     : realmTab === "mercenaries" ? mercenarySection()
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
@@ -3655,12 +3875,13 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
   showPanel(true);
   bindNavyLinks();
+  panel.querySelectorAll("[data-show-charts]").forEach((b) => b.addEventListener("click", () => setLens("charts")));
   panel.querySelector("[data-go]")?.addEventListener("click", () => {
     realmView = -1;
     selectedProvince = capIdx;
@@ -4314,6 +4535,24 @@ Object.assign(globalThis, {
   /** The player's ports and fleets, and an order for the navy (scripts/navy-shots.mjs). */
   __phNavy: () => snapshot?.navy ?? null,
   __phNavyOrder: (o: Record<string, unknown>) => act({ type: "navy", ...o } as Order).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
+  /** The player's charts, governors and colonies (scripts/explore-shots.mjs). */
+  __phExploration: () => (snapshot ? { ...snapshot.exploration, charted: undefined, sites: undefined, coastDist: undefined, ocean: undefined } : null),
+  /** The exploration cards' builders, to show states a short play-through can't reach (a governor aboard, a colony growing). */
+  __phExploreUi: { colonySection, colonyCard, coloniesTab },
+  /** A sea zone k zones out from port p that a fleet with this ocean reach may enter, the farthest found first. */
+  __phSeaOut: (p: number, k: number, reach = -1) => {
+    const ex = snapshot!.exploration;
+    const may = (q: number) => isWater[q] && (!ex.ocean[q] || reach === 255 || (reach >= 0 && ex.coastDist[q]! <= reach));
+    const dist = new Map<number, number>([[p, 0]]);
+    const queue = [p];
+    let best = -1;
+    for (let i = 0; i < queue.length; i++) {
+      const x = queue[i]!;
+      if (dist.get(x)! >= k) continue;
+      for (const q of neighborIdx[x]!) if (!dist.has(q) && may(q)) (dist.set(q, dist.get(x)! + 1), queue.push(q), (best = q));
+    }
+    return best;
+  },
   /** Commissions the first official of the player's who serves the crown (not a lord) as a commander. */
   __phCommission: async () => {
     if (!snapshot) return null;

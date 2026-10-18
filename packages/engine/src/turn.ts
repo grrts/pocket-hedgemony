@@ -14,6 +14,7 @@ import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameRouteMode, type GameTraderKind } from "./trade.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
+import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
@@ -150,7 +151,9 @@ export type Order =
   /** The verdict on a beaten rising: Pardon, Punish the leaders or Massacre (REBL-050). */
   | { type: "treatRebels"; rising: number; treatment: "Pardon" | "Punish the leaders" | "Massacre" }
   /** Ports, sailors and fleets: muster, buy a ship, sail, board, land, admiral, merge, split, disband (navy.ts). */
-  | NavyOrder;
+  | NavyOrder
+  /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
+  | ExploreOrder;
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -186,6 +189,7 @@ export function advance(world: World, steps: number): News[] {
     if (world.step === 0) startDay(world, news);
     stepMarches(world, HOURS_PER_STEP);
     stepNavy(world, HOURS_PER_STEP, news);
+    stepVoyages(world, news);
     engage(world, news);
     fightRound(world, news);
     for (let i = 0; i < world.armies.count; i++) if (world.armies.alive[i] && world.armies.men[i]! < 1) world.armies.alive[i] = 0;
@@ -230,6 +234,7 @@ function startDay(world: World, news: News[]): void {
     monthlyTrade(world, news);
     runLedger(world, true);
     monthlyNavy(world, news);
+    monthlyColonies(world, news);
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
     monthlyWorks(world, news);
@@ -252,6 +257,7 @@ function startDay(world: World, news: News[]): void {
 
 function endDay(world: World, news: News[]): void {
   feedArmies(world);
+  dailyExploration(world);
   runOccupation(world, world.date.day === 1, news);
   dailyRebels(world, news);
   world.date = addDays(world.date, 1);
@@ -414,6 +420,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return orderMarch(world, order, actingNation);
     case "navy":
       return navyOrder(world, order, actingNation, news);
+    case "explore":
+      return exploreOrder(world, order, actingNation, news);
   }
 }
 

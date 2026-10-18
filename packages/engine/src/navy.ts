@@ -8,6 +8,7 @@ import { slotsOf, slotsUsed, WORK_COUNT, workIndex, worksAt } from "./works.ts";
 import { classesOf } from "./living.ts";
 import { armyOf, idleCommanders } from "./recruit.ts";
 import { halt, mayMarchInto } from "./turn.ts";
+import { isCharted, whyNoExploration } from "./exploration.ts";
 import { noteMoment } from "./achievements.ts";
 
 /**
@@ -29,8 +30,8 @@ const HULLS = C.hullSteps;
 const WRECKED = HULLS.length - 1;
 const LEAKING = HULLS.indexOf("leaking");
 
-/** Ships a port can be asked for, in the order the port card lists them. Exploration ships wait on exploration; small craft on fishing. */
-export const SHIP_TYPES = ["cog", "junk", "dhow", "galley", "war canoe fleet", "carrack", "fluyt", "armed carrack", "galleon", "turtle ship", "ship of the line", "steamer"] as const;
+/** Ships a port can be asked for, in the order the port card lists them. Small craft wait on fishing. */
+export const SHIP_TYPES = ["cog", "junk", "dhow", "caravel", "voyaging canoe", "galley", "war canoe fleet", "carrack", "fluyt", "armed carrack", "galleon", "turtle ship", "ship of the line", "steamer"] as const;
 const TRADE_SHIPS = new Set(["cog", "junk", "dhow"]);
 
 export interface NavyShip {
@@ -50,6 +51,8 @@ export interface NavyShip {
   age: number;
   /** Port its crew was mustered at. */
   home: number;
+  /** Colony stores in the hold, apart from its supply (exploration ships only, EXPL-044). */
+  stores?: number;
 }
 
 export interface NavyFleet {
@@ -231,6 +234,10 @@ export function whyNotShip(world: World, n: number, p: number, type: string): st
   if (TRADE_SHIPS.has(type) && type !== localTradeShip(world, p)) return `this sea builds the ${localTradeShip(world, p)}`;
   const row = nv.shipRow(type);
   if (row.unlock && !knows(world, n, row.unlock)) return `needs ${inventionName(world, row.unlock)}`;
+  if (row.family === "exploration") {
+    const why = whyNoExploration(world, n);
+    if (why) return why;
+  }
   const where = buildPlace(world, p, type);
   if (where === "no shipyard") return typeof row.builtAt === "number" ? `needs a shipyard of step ${row.builtAt}` : "needs a shipyard";
   if (where === "busy") return "every slipway is busy";
@@ -275,13 +282,17 @@ export const fleetRoom = (f: NavyFleet): number => f.ships.reduce((t, s) => t + 
 export const armyRoom = (world: World, slot: number): number => world.armies.men[slot]! + world.armies.horse[slot]! * (C.room.horse - 1);
 export const fleetById = (world: World, id: number): NavyFleet | undefined => world.navy.fleets.find((f) => f.id === id);
 
-/** Warships or a fleet carrying an army need an admiral to leave port; trade ships sail without (NAVY-065, NAVY-066). */
-const needsAdmiral = (f: NavyFleet): boolean => f.army >= 0 || f.ships.some((s) => nv.isWarship(s.type));
+/** A fleet of nothing but exploration ships: the only fleets that sail into uncharted zones (INV-EXPL-3). */
+export const allExplorers = (f: Pick<NavyFleet, "ships">): boolean => f.ships.length > 0 && f.ships.every((s) => nv.shipRow(s.type).family === "exploration");
 
-/** The fleet of realm n lying in port p without an admiral, which a new ship joins. */
-function portFleet(world: World, n: number, p: number): NavyFleet {
+/** Warships or a fleet carrying an army need an admiral to leave port; trade ships sail without (NAVY-065, NAVY-066). */
+export const needsAdmiral = (f: NavyFleet): boolean => f.army >= 0 || f.ships.some((s) => nv.isWarship(s.type));
+
+/** The fleet of realm n lying in port p without an admiral, which a new ship joins; exploration ships keep a fleet of their own, so they may explore (EXPL-069). */
+function portFleet(world: World, n: number, p: number, type: string): NavyFleet {
   const v = world.navy;
-  const f = v.fleets.find((x) => x.owner === n && x.at === p && x.admiral < 0 && x.army < 0 && !x.route.length && x.battle < 0);
+  const explorer = nv.shipRow(type).family === "exploration";
+  const f = v.fleets.find((x) => x.owner === n && x.at === p && x.admiral < 0 && x.army < 0 && !x.route.length && x.battle < 0 && allExplorers(x) === explorer);
   if (f) return f;
   const made: NavyFleet = { id: ++v.seq, owner: n, at: p, route: [], progress: 0, admiral: -1, ships: [], army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false };
   v.fleets.push(made);
@@ -289,19 +300,22 @@ function portFleet(world: World, n: number, p: number): NavyFleet {
 }
 
 /** The rules of who may sail where for a fleet (NAVY-091, NAVY-092): coasts, the ocean near them with the compass, any ocean with ocean navigation. */
-interface SeaReach {
+export interface SeaReach {
   galley: boolean;
+  /** Only voyaging canoes: they cross open ocean from the start (EXPL-008). */
+  canoe: boolean;
   near: boolean;
   far: boolean;
   monsoon: boolean;
   frozen: boolean;
 }
 
-function reachOf(world: World, f: Pick<NavyFleet, "owner" | "ships">): SeaReach {
+export function reachOf(world: World, f: Pick<NavyFleet, "owner" | "ships">): SeaReach {
   const n = f.owner;
   const types = f.ships.map((s) => s.type);
   return {
     galley: types.some((t) => nv.shipRow(t).galley || nv.shipRow(t).stepDays.ocean === null),
+    canoe: types.length > 0 && types.every((t) => t === "voyaging canoe"),
     near: knows(world, n, C.seaInventions.compass),
     far: knows(world, n, C.seaInventions.ocean),
     monsoon: types.length > 0 && types.every((t) => C.monsoon.ships.includes(t)) && knows(world, n, C.monsoon.needs),
@@ -315,7 +329,7 @@ export function mayEnterZone(world: World, r: SeaReach, q: number): boolean {
   if (r.frozen && v.frozen[q]) return false;
   if (!v.ocean[q]) return true;
   if (r.galley) return false;
-  return r.far || (r.near && v.coastDist[q]! <= C.oceanReachWithS1) || (r.monsoon && !!v.monsoon[q]);
+  return r.canoe || r.far || (r.near && v.coastDist[q]! <= C.oceanReachWithS1) || (r.monsoon && !!v.monsoon[q]);
 }
 
 /** Who may put into port p: its own realm and partners take food, realms at peace pay gold, enemies none (NAVY-081). */
@@ -347,6 +361,8 @@ export function zoneDays(world: World, f: NavyFleet, q: number): number {
  */
 export function planVoyage(world: World, f: NavyFleet, goal: (p: number) => boolean): { path: number[]; days: number } | null {
   const r = reachOf(world, f);
+  // Only exploration ships sail into the parchment; other fleets keep to charted zones (EXPL-016).
+  const blind = !allExplorers(f);
   const dist = new Map<number, number>([[f.at, 0]]);
   const prev = new Map<number, number>();
   const done = new Set<number>();
@@ -391,7 +407,7 @@ export function planVoyage(world: World, f: NavyFleet, goal: (p: number) => bool
     if (p !== f.at && !world.provinceWater[p]) continue;
     for (let k = world.adjStart[p]!; k < world.adjStart[p + 1]!; k++) {
       const q = world.adjList[k]!;
-      if (done.has(q)) continue;
+      if (done.has(q) || (blind && !isCharted(world, f.owner, q))) continue;
       let cost: number;
       if (world.provinceWater[q]) {
         if (!mayEnterZone(world, r, q)) continue;
@@ -714,6 +730,12 @@ function useSupply(f: NavyFleet): void {
 
 /** Putting into port: every ship takes on full supply, the port's food in a friendly port, gold in a neutral one; an army aboard goes ashore (NAVY-082, NAVY-083). */
 function dock(world: World, f: NavyFleet): void {
+  resupply(world, f);
+  if (f.army >= 0) land(world, f, f.at);
+}
+
+/** Every ship of a fleet in port takes on full supply, paid in the port's food or in gold (NAVY-082, EXPL-018). */
+export function resupply(world: World, f: NavyFleet): void {
   const p = f.at;
   const pays = dockRight(world, f.owner, p);
   let rations = 0;
@@ -731,7 +753,6 @@ function dock(world: World, f: NavyFleet): void {
     world.nationTreasury[f.owner] = world.nationTreasury[f.owner]! - gold;
     if (holder >= 0) world.nationTreasury[holder] = world.nationTreasury[holder]! + gold;
   }
-  if (f.army >= 0) land(world, f, p);
 }
 
 // ---------------------------------------------------------------- sea battles
@@ -905,7 +926,7 @@ export function monthlyNavy(world: World, news: News[]): void {
   v.hulls = v.hulls.filter((h) => {
     if (--h.monthsLeft > 0) return true;
     if (world.provinceOwner[h.province] !== h.owner) return false;
-    portFleet(world, h.owner, h.province).ships.push(newShip(world, h.type, h.crew, h.province));
+    portFleet(world, h.owner, h.province, h.type).ships.push(newShip(world, h.type, h.crew, h.province));
     if (h.owner === world.player) news.push({ kind: "built", text: `A ${h.type} is launched at ${provinceName(world, h.province)}.`, nations: [h.owner], province: h.province });
     return false;
   });
@@ -995,7 +1016,8 @@ function aiNavy(world: World, news: News[]): void {
   }
   const idle = new Map<number, number[]>();
   for (const f of v.fleets) {
-    if (f.owner === world.player || f.battle >= 0 || !f.ships.length) continue;
+    // Exploration ships are the exploration AI's (colonies.ts).
+    if (f.owner === world.player || f.battle >= 0 || !f.ships.length || allExplorers(f)) continue;
     if (f.admiral < 0) {
       if (!idle.has(f.owner)) idle.set(f.owner, idleCommanders(world, f.owner).filter((c) => !v.fleets.some((x) => x.admiral === c)));
       const c = idle.get(f.owner)!.shift();
@@ -1067,6 +1089,10 @@ export interface FleetView {
   battle: boolean;
   fleeing: boolean;
   days: number;
+  /** Nothing but exploration ships: it may explore (EXPL-069). */
+  explorers: boolean;
+  /** It needs an admiral to sail (warships or an army aboard). */
+  needsAdmiral: boolean;
 }
 
 export interface NavyView {
@@ -1076,7 +1102,7 @@ export interface NavyView {
     id: number;
     room: number;
     cost: number;
-    ships: { id: number; type: string; crew: number; crewNeed: number; hull: string; supply: number; supplyMax: number; fights: number; carries: number; age: number }[];
+    ships: { id: number; type: string; crew: number; crewNeed: number; hull: string; supply: number; supplyMax: number; fights: number; carries: number; age: number; stores: number; storesMax: number }[];
   }[];
   ports: {
     province: number;
@@ -1116,6 +1142,8 @@ export function navyView(world: World, n: number): NavyView {
     battle: f.battle >= 0,
     fleeing: f.fleeing,
     days: f.owner === n ? Math.round(voyageDays(world, f) * 10) / 10 : 0,
+    explorers: allExplorers(f),
+    needsAdmiral: needsAdmiral(f),
   }));
   const costs = navyCosts(world);
   const mine = v.fleets
@@ -1126,7 +1154,7 @@ export function navyView(world: World, n: number): NavyView {
         id: f.id,
         room: fleetRoom(f),
         cost: f.ships.reduce((t, s) => t + nv.shipRow(s.type).upkeep * G.goldScale + s.crew * wage * G.wageScale, 0),
-        ships: f.ships.map((s) => ({ id: s.id, type: s.type, crew: s.crew, crewNeed: crewNeed(s), hull: HULLS[s.hull]!, supply: s.supply, supplyMax: nv.fullSupply(s.type), fights: fightsOf(s.type), carries: carriesOf(s.type), age: s.age })),
+        ships: f.ships.map((s) => ({ id: s.id, type: s.type, crew: s.crew, crewNeed: crewNeed(s), hull: HULLS[s.hull]!, supply: s.supply, supplyMax: nv.fullSupply(s.type), fights: fightsOf(s.type), carries: carriesOf(s.type), age: s.age, stores: s.stores ?? 0, storesMax: nv.shipRow(s.type).colonyStores ?? 0 })),
       };
     });
   const ports: NavyView["ports"] = [];
