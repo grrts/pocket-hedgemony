@@ -9,7 +9,7 @@ This page covers every screen of Pocket Hegemony, from the boot logo to the fina
 - **The map is home.** While a campaign is loaded, every screen is either a card over the map or a full screen that closes back onto the map. The map is never unloaded.
 - **One stack, one Back.** All screens live on one stack. The system back gesture, the on-screen Back button, Esc and the controller's B button all pop the top of it.
 - **Never more than three steps from the map.**
-- **Two taps to play.** From a cold start with a campaign in progress you reach your map with Tap to start, then Continue.
+- **One tap to play.** From a cold start with a campaign in progress you reach your map with one tap on Play.
 - **Ask only when something is lost.** First-run questions appear only once. Confirmations appear only where you would lose something (leaving without saving, overwriting a save).
 - **Layout by shape, not by device.** Screens follow the shape of the window.
 - **Every input works everywhere.** Every screen works with only a controller and with only touch. Nothing exists only as a hover or only as a long press.
@@ -18,30 +18,35 @@ This page covers every screen of Pocket Hegemony, from the boot logo to the fina
 
 **Boot.** A cold start shows the pixel logo on parchment with the hourglass turning while the map, sprites and engine load. No studio logos, no video. On iOS and Android the native launch screen shows the same logo. If loading takes under 0.6 seconds the boot screen still stays 0.6 seconds; otherwise it stays only as long as loading takes. If loading fails (a missing file, or the engine worker will not start and the fallback also fails), you get the failure screen.
 
-**First run.** The first time the game runs, it asks its first-run questions before the title, each as one card with one choice, and never again. If your device language is one the game has, it is used silently (you can change it in [Settings](Settings)); otherwise a card asks. Where something needs consent (crash reports, and counting how far players get in the tutorial), one consent card asks for both, with both off until you turn them on; where nothing on a store needs consent, it does not appear. There are only these two first-run questions. The game never asks you to sign in before play, and it plays offline.
+**First run.** The first time the game runs, it asks its first-run questions before the start screen, each as one card with one choice, and never again. If your device language is one the game has, it is used silently (you can change it in [Settings](Settings)); otherwise a card asks. Where something needs consent (crash reports, and counting how far players get in the tutorial), one consent card asks for both, with both off until you turn them on; where nothing on a store needs consent, it does not appear. There are only these two first-run questions. The game never asks you to sign in before play, and it plays offline.
 
-**Title.** The real map at world zoom drifts slowly across a region. With a campaign in progress, it drifts over your realm in its current borders, read from the latest save's summary rather than the whole save. Any touch, click, key or button counts as Tap to start and starts the title music. A small cog opens Settings straight away, a ✕ quits (desktop only) and the version number sits in a corner.
+**Start screen.** The game opens on the start screen with its menu already showing; there is no "Tap to start". Behind it the real map pans slowly at region zoom, close enough to see provinces, towns and castles. With a campaign in progress it pans over your realm in its current borders and season, read from the latest save's summary; otherwise it picks one of a handful of 1444 regions. The map behind takes no input and runs no simulation, and with Battery saver on it keeps moving at the lower frame rate. The title music starts on your first touch, click, key or button.
 
-**New to Pocket Hegemony?** The very first time you tap to start, with no campaign yet, the game asks once: Play the tutorial (focused), Guided campaign, or I know the way. The tutorial starts at its first chapter; Guided campaign opens New campaign with the goals list for your first year switched on; I know the way opens New campaign without it. See [Tutorial and help](Tutorial-and-Help).
+The menu has two groups:
 
-**Main menu.** "Tap to start" folds open into the main menu in the same place; Back returns to "Tap to start".
+| Group | Entry | When it shows | Where it goes |
+|---|---|---|---|
+| Column | **Play** (large, wax-red, focused first) | Always | With a campaign in progress it shows the realm's banner, name and date ("France · May 1503") and loads the newest save; otherwise New campaign |
+| Column | New campaign | While a campaign is in progress | New campaign |
+| Column | Load | While any save exists | Load |
+| Column | Tutorial | Until the tutorial is finished, then under More | The tutorial's chapter list |
+| Icon row | Settings | Always | Settings, over the start screen |
+| Icon row | Achievements | Always | Achievements |
+| Icon row | Wiki | Always | This wiki, in your browser; the game stays where it was |
+| Icon row | More | Always | Almanac, Credits, Unlock (Buy the full game in the Steam demo), and Tutorial once finished |
+| Icon row | Quit | Desktop and Steam only; phones have none | Closes the game |
 
-| Entry | When it shows | Where it goes |
-|---|---|---|
-| Continue | While a campaign exists, labelled with banner, realm and date ("France · May 1503") | Loading with the newest save |
-| New campaign | Always | New campaign |
-| Load | While any save exists | Load |
-| Tutorial | Always; moves under More once the tutorial is finished | The tutorial's chapter list |
-| More | Always | Settings, Achievements, Almanac, Unlock (Buy the full game in the Steam demo), Credits |
-| Quit | Desktop and Steam only; phones have none | Closes the game |
+The version number sits small in the lower right corner. Back on the start screen leaves the app on Android and does nothing elsewhere. Exit to main menu in a campaign brings you back here, with the map panning over the realm you just left.
 
-Focus starts on Continue when it exists, otherwise on New campaign. The first entry is large and wax-red; the rest are paper buttons.
+On a phone in landscape the logo sits top left, the column and icon row fill the left third on a parchment band, and the map pans across the rest; on a tablet held upright the map fills the top half and the menu sits below it. Play is at least 56 points tall, everything else at least 44, and each icon has its name under it.
 
-**The free tier.** The free mobile download and the Steam demo let you play the Ottomans and France, with nothing else held back. They show a small "Full game" ribbon on the main menu that leads to Unlock, never as a pop-up. No version of the game shows ads. The Unlock screen offers one purchase, the full game, which unlocks every realm; it shows the store's price and a Buy button, and on phones also Restore purchases.
+**New to Pocket Hegemony?** The very first time you press Play, with no campaign yet, the game asks once: Play the tutorial (focused), Guided campaign, or I know the way. The tutorial starts at its first chapter; Guided campaign opens New campaign with the goals list for your first year switched on; I know the way opens New campaign without it. See [Tutorial and help](Tutorial-and-Help).
+
+**The free tier.** The free mobile download and the Steam demo let you play the Ottomans and France, with nothing else held back. They show a small "Full game" ribbon beside the logo on the start screen that leads to Unlock, never as a pop-up. No version of the game shows ads. The Unlock screen offers one purchase, the full game, which unlocks every realm; it shows the store's price and a Buy button, and on phones also Restore purchases.
 
 ### New campaign
 
-One screen in three steps, with a strip at the top ("Realm · Options · Begin"). Back moves one step back, and from step 1 returns to the main menu without asking. The nation select music plays, its lead voice changing with the highlighted realm.
+One screen in three steps, with a strip at the top ("Realm · Options · Begin"). Back moves one step back, and from step 1 returns to the start screen without asking. The nation select music plays, its lead voice changing with the highlighted realm.
 
 1. **Realm.** Choose a realm on the map at world zoom, with filters (region, difficulty, free or locked) and a short list of suggested realms. Tapping a realm shows its card with its strengths at a glance. A locked realm shows a padlock and a button to Unlock; coming back from a purchase returns you to step 1 with that realm still chosen. Quick start skips straight to Begin with the last options used and the realm you last tapped (or the first suggested one).
 2. **Options.** Difficulty, AI aggression, fog, historical or free events, ironman, and the end date, with presets that fill the whole step. The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
@@ -171,7 +176,7 @@ Phones play in landscape only, on every screen including menus; a phone held upr
 
 ### Navigation by input
 
-**Back on each device.** Android: the system back button or gesture. iOS: the on-screen Back or ✕, with an edge swipe on full screens only, never over the map. Keyboard: Esc. Controller: B (the east button). Mouse: the on-screen Back or ✕, or mouse button 4. Back on the map with nothing open opens the game menu; on the main menu it returns to "Tap to start"; on Android, Back on "Tap to start" leaves the app.
+**Back on each device.** Android: the system back button or gesture. iOS: the on-screen Back or ✕, with an edge swipe on full screens only, never over the map. Keyboard: Esc. Controller: B (the east button). Mouse: the on-screen Back or ✕, or mouse button 4. Back on the map with nothing open opens the game menu; on the start screen it leaves the app on Android and does nothing elsewhere.
 
 **Touch on the map.** Tap selects a province, army or castle and shows its name tab; drag pans; pinch zooms; long press shows what is under your finger without selecting it. Tapping an army and then a province gives a march order at once, with no confirm step; tapping the army's own province halts it.
 
@@ -193,8 +198,8 @@ The screen list is the single catalogue that code, music and sound key on:
 |---|---|---|---|---|
 | boot | Full | none | none | none |
 | first_run | Full | the only choice | none, it must be answered | none |
-| title | Full | Tap to start | leaves the app on Android | title |
-| main_menu | Same screen | Continue | title | title |
+| title (start screen) | Full | Play | leaves the app on Android | title |
+| main_menu | Part of the start screen | Play | as title | title |
 | new_campaign | Full | first suggested realm | previous step, then main menu | nation_select |
 | load | Full | newest save | where opened | unchanged |
 | loading | Full | tip arrows | none | load_resume |
