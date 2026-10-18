@@ -295,11 +295,13 @@ Answer letters from last month are delivered; envoys arriving this month have th
 
 ## What you see
 
-- **The diplomacy lens**: every country coloured by its relation to you: your colour for you and your subjects; blue for allies and light blue for pledges; green and pale green for Close and Warm; grey for Cool or nothing recorded; orange for Cold or Rival; red for Hostile, Bitter or at war (hatched at war); a red border for a league against you. Envoys on the road appear as small riders with a dotted line, and a crossed-sword icon marks countries you hold a war aim against (regional zoom only).
+- **The diplomacy map mode**: every country coloured by its relation to you: your colour for you and your subjects; blue for allies and light blue for pledges; green and pale green for Close and Warm; grey for Cool or nothing recorded; orange for Cold or Rival; red for Hostile, Bitter or at war (hatched at war); a red border for a league against you. Envoys on the road appear as small riders with a dotted line, and a crossed-sword icon marks countries you hold a war aim against (regional zoom only).
 - **The country diplomacy card**: their standing toward you and your stance, ties and wrongs, relations, your war aims on them, the last answer with a *Why?* button for the full reasons, and action buttons that show no prediction. In landscape it sits to the right of the map.
 - **The envoy picker**: which official goes, the days on the road, and which province loses its official meanwhile.
 - **The envoys strip**: each seat as free, on the road (destination and days) or resident (court).
-- **The war declaration sheet**: target, aim and its source, each side's countries and soldiers with who is called, your voices leaning to peace, and *Send a demand first* or *Declare*.
+- **The declare sheet**: the *Price of war* (who is called against you and how, the neighbours alarmed, the lords who will waver, a truce broken, your pay at war, the most one peace can take) above *Confirm*; see [Warfare](Warfare#the-price-of-war).
+- **Your name abroad**: your own Diplomacy tab opens with it. Any league against you comes first, with each member and its soldiers; then your **notoriety** as a word (*Trusted* under 25, *Watched* from 25, *Feared* from 50, *Hated* from 75), and your **Lands taken** in the last 20 years as a bar against the era's league threshold ("6 of 8 before a league"). Notoriety is 5 for each land taken plus notorious deeds, fading over 30 years; courts trust you less for it (less willing to ally, marry or pledge) and are readier to join a league against you. Land taken also leaves the wrong *Grabbed land near us* with the realms that border it. Every row opens its reason on a tap.
+- **The war card** for each war you fight, with both sides' peace voices; see [Warfare](Warfare#the-price-of-war).
 - **Answer letters**, and the country card line "Envoys n of m abroad" and "Leagues against you".
 
 ### Envoys in the game today
@@ -313,10 +315,10 @@ The first part of statecraft is in the playable build: envoys, alliances, marria
   - *Courtesy visit*: always welcome, +15 fading over 5 years.
   - *Send a gift*: 30 gold, +30 fading over 10 years.
 - **How long it takes**: the envoy rides to their capital (two days per unit of distance), stays at court a month, and the answer reaches you the month after. While he is away his seat is taken. Most realms have one seat, and one more with over 10 provinces.
-- **Your own overview**: your realm card's Diplomacy tab lists your envoys abroad (where, why, and when they arrive or come home) and the last eight answers, each with its *Why?*. Answers also arrive in the dispatches with a scroll.
+- **Your own overview**: your realm card's Diplomacy tab lists your envoys abroad (where, why, and when they arrive or come home) and the last eight answers, each with its *Why?*. Answers also arrive in the News with a scroll.
 - **Ending an alliance**: *End the alliance* on an ally's tab. It is an Oath broken: they remember it (−40, fading over 20 years), and other courts trust you less.
 - **Courting a lord**: tap a province of another realm, open its lord from *Governed by* (*Lord*), and if he is Wavering or Disloyal, *Court him*. One of your envoys stays at his court: each season he loses a step unless his ruler wins him back, and once Disloyal for a year with land next to yours he comes over with it (his old ruler remembers *Took our land*). Each season there is 1 in 4 they find out: *Courted our lord* (−25, fading over 10 years) and your envoy comes home. Your courting envoys are listed with your envoys abroad, and *Recall your envoy* frees the seat. Realms court the lords and subjects of neighbours they hold as rivals or hostile.
-- **The other realms** send envoys too: once a year each court picks the neighbour that thinks best of it and weighs an alliance and a marriage there, and sends the best ask its count says yes to, or a gift first when it is close. You see the alliances and marriages they make in the dispatches.
+- **The other realms** send envoys too: once a year each court picks the neighbour that thinks best of it and weighs an alliance and a marriage there, and sends the best ask its count says yes to, or a gift first when it is close. You see the alliances and marriages they make in the News.
 - **For now** an envoy is not a named official, so no province loses its official while he is away; every realm counts two unmarried children; and the royal marriages of 1444 count from the start. Envoys, letters and alliances are kept in your save.
 
 ### Demands in the game today
@@ -347,7 +349,7 @@ The first part of statecraft is in the playable build: envoys, alliances, marria
 - [National-Strengths](National-Strengths): extra reasons, seats and unique war aims.
 - [Historical-Events](Historical-Events): opinion, trust, notoriety, relations, and the new effects.
 - [The-1444-Start](The-1444-Start): the 1444 relations, AI personalities, Italian states with G8.
-- [Time-and-Turns](Time-and-Turns), [Map-and-Lenses](Map-and-Lenses), [Screens-and-Navigation](Screens-and-Navigation): turn order, the lens, cards and letters.
+- [Time-and-Turns](Time-and-Turns), [Map and Map Modes](Map-and-Lenses), [Screens-and-Navigation](Screens-and-Navigation): turn order, the map mode, cards and letters.
 
 ## Numbers
 

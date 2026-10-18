@@ -54,7 +54,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await shot("ambitions");
   await page.locator(".assessment-groups").scrollIntoViewIfNeeded();
   await shot("assessments");
-  // A few months on: seals crack, heydays count their months.
+  // A few months on: ambitions are revealed, golden ages count their months.
   await page.click(".panel .close").catch(() => {});
   for (let t = 0; t < 12; t++) {
     const turn = await page.evaluate(() => window.__phTurn());

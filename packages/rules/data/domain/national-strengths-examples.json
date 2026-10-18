@@ -2060,7 +2060,7 @@
     "id": "castile_mesta_and_jinetes",
     "name": "Mesta and jinetes",
     "text": "Herds grow 25 % faster and wool output is 25 % higher; commanders may fight à la jineta.",
-    "why": "Transhumant Mesta flocks and merino wool via Burgos were Castile's wealth, and the Granadan frontier bred light horse (jinetes) that won La Higueruela in 1431.",
+    "why": "Transhumant Mesta flocks and merino wool via Burgos were Castile's wealth, and the Granadan frontier bred light cavalry (jinetes) that won La Higueruela in 1431.",
     "effects": [
      {
       "lever": "herd_growth_pct",

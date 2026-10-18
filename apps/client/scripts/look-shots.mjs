@@ -37,6 +37,7 @@ await page.evaluate(() => {
   b.remove();
 });
 await page.click("[data-declare]");
+await page.click("[data-declare-confirm]");
 await page.waitForTimeout(300);
 let shot = false;
 for (let t = 0; t < 20 && !shot; t++) {

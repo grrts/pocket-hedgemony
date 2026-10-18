@@ -846,7 +846,7 @@ export function otherLeader(leader: "the ruler" | "an heir" | "a lord" | "a hire
     "the ruler": "the ruler leads",
     "an heir": "the heir leads",
     "a lord": "the lord can lead only his own retinue as a captain",
-    "a hired captain": "the captain comes with his free company",
+    "a hired captain": "the captain comes with his mercenary company",
     "an exile": "the exile becomes an official of the closest type and can be commissioned",
   }[leader];
 }

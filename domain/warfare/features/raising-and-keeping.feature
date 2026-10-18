@@ -1,7 +1,7 @@
 @context-warfare
 Feature: Raising and keeping an army
   As a player
-  I want to call the lords, hire free companies, pay and feed my army and send it home
+  I want to call the lords, hire mercenary companies, pay and feed my army and send it home
   So that an army costs gold, food and goodwill while it exists
 
   # The levy and training belong to recruiting; this feature covers the army side only.
@@ -48,14 +48,14 @@ Feature: Raising and keeping an army
     Then he leaves with his retinue to defend his lands
 
   @WAR-041
-  Scenario: Free companies are found where they historically gathered
-    Given the country "Milan" looks for free companies
+  Scenario: Mercenary companies are found where they historically gathered
+    Given the country "Milan" looks for mercenary companies
     When the country looks for soldiers
     Then it is offered Italian condottieri, each with a captain, men, arm, drill, scars and a price
 
   @WAR-042
-  Scenario: Hiring a free company takes no recruits
-    Given the country "Venice" signs a contract for 6 months with a Swiss free company
+  Scenario: Hiring a mercenary company takes no recruits
+    Given the country "Venice" signs a contract for 6 months with a Swiss mercenary company
     When the contract is signed
     Then the company sets out for Venice's land, led by its own captain
     And Venice pays gold up front and monthly pay
@@ -63,9 +63,9 @@ Feature: Raising and keeping an army
 
   @WAR-043
   Scenario Outline: Losing a hired company
-    Given the country "Venice" has a hired free company
+    Given the country "Venice" has a hired mercenary company
     When <event>
-    Then the free company leaves Venice's service
+    Then the mercenary company leaves Venice's service
 
     Examples:
       | event                                        |
@@ -120,7 +120,7 @@ Feature: Raising and keeping an army
 
   @WAR-210 @feedback-19
   Scenario: A hired company arrives after its march
-    Given the country "Venice" hires a Swiss free company
+    Given the country "Venice" hires a Swiss mercenary company
     When the contract is signed
     Then Venice pays the gold up front
     And the hire screen shows the days the company needs to march to the capital "Venezia"
@@ -129,35 +129,35 @@ Feature: Raising and keeping an army
   @WAR-210 @feedback-19
   Scenario: No company comes to a besieged capital
     Given the capital "Venezia" is under siege
-    When the country "Venice" tries to hire a Swiss free company
+    When the country "Venice" tries to hire a Swiss mercenary company
     Then the order is refused
 
   @WAR-211 @feedback-19
   Scenario: A hired company brings its own commander
-    Given the country "Venice" has hired a Swiss free company
+    Given the country "Venice" has hired a Swiss mercenary company
     Then the company is led by its own captain as the commander of its own army
     And none of Venice's commanders is taken
 
   @WAR-213 @feedback-53
-  Scenario: Free companies of the age, each its own size and mix
+  Scenario: Mercenary companies of the age, each its own size and mix
     Given the year is 1444
-    When the free companies for hire are read
+    When the mercenary companies for hire are read
     Then each has between 300 and 3000 men
     And each has only the arms its group fielded, in a mix of its own
     And about six are for hire
 
   @WAR-213 @feedback-53
   Scenario: A hired company arrives as it was offered
-    Given the country "Castile" hires a free company of 1450 men
+    Given the country "Castile" hires a mercenary company of 1450 men
     When the company reaches the capital "Toledo"
     Then its army has the same 1450 men in the same arms
     And it is led by the company's captain
 
   @WAR-214 @WAR-215 @WAR-216 @WAR-217 @feedback-52 @feedback-114
-  Scenario: The free companies page
-    When the player opens the free companies from the Military tab of their country card
+  Scenario: The mercenary companies page
+    When the player opens Mercenaries from the Military tab of their country card
     Then it shows the companies in service, their men and their pay a month
     And a card for each company on the way, with the weeks left
     And a card for each company for hire, with its arms, men, captain, weeks to the capital, pay and a Hire button
-    And the Military tab shows one line on free companies that opens this page
+    And the Military tab shows one line on mercenary companies that opens this page
     And there is no Mercenaries tab of its own

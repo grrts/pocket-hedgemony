@@ -30,7 +30,7 @@ battles.
 - The levy, commanders from officials, the empty province an official leaves: recruiting.
 - Seafolk class, food stores, officials, grievances, fisheries: province.
 - The *Ships* country stat and lords: realm.
-- The S bough of research: research.
+- The S inventions of research: research.
 - Docking rights between realms, selling hulls between realms, privateers dragging a realm into war: diplomacy.
 - Drawing ports, fleets and the Sea lens: map-presentation (this spec lists what the naval design asks it to show).
 
@@ -45,7 +45,7 @@ Newest decision first.
 - `naval/data/ports-1444.tsv`, `naval/data/ports-1444.json`, `naval/data/start-ports.json` (structure and counts only).
 - Read for seams and contradictions: `exploration/exploration-design.md` 2.1, 9; `buildings/buildings-design.md`
   7.9; `warfare/warfare-design.md` 11; `troop-movement/troop-movement-design.md` 11; `trade/trade-design.md`
-  (v2) 2, 3.2; `country-stats/research-tree.md` (S bough, T5); `province-stats/province-stats-design.md` 12.1,
+  (v2) 2, 3.2; `country-stats/research-tree.md` (S inventions, T5); `province-stats/province-stats-design.md` 12.1,
   13, 16; `country-stats/country-stats-design.md` 6; `subjects/subjects-design.md` 12, 16; `diplomacy/diplomacy-design.md`.
 
 ## 3. Ubiquitous language
@@ -68,7 +68,7 @@ Newest decision first.
 | Sailor | A person mustered from a port province's people, counted one by one; their home slot stays empty while they serve | Seafolk (the class), crew |
 | Sailors in port | Mustered sailors waiting in a named port to board a ship | Crew |
 | Crew | Sailors aboard a ship; also the crew number a ship type needs | Sailors in port |
-| Muster | The act that turns people of a port province into sailors | Levy (recruiting) |
+| Recruiting sailors (was Muster) | The act that turns people of a port province into sailors; the command is *Recruit sailors*. Older text and config keys still say muster | Levy (recruiting) |
 | Bounty | Gold paid for signing sailors on at a muster | Wage |
 | Pressing | After S9, taking seafolk men as sailors without the bounty, causing the *Pressed* grievance | Muster |
 | Ship family | Trade, military or exploration; sets the supply a ship carries | Ship type |
@@ -219,7 +219,7 @@ Newest decision first.
 - NAVY-022: When sailors are mustered, the naval system shall change people into sailors one by one, each
   leaving their class and leaving their home slot empty until released. [naval §2.1]
 - NAVY-023: The naval system shall count every sailor the same toward a ship's crew. [naval §2.1]
-- NAVY-024: The naval system shall offer *Muster sailors* on a port, or on the country card for several ports at
+- NAVY-024: The naval system shall offer *Recruit sailors* on a port, or on the country card for several ports at
   once, with one slider, only for provinces with a harbour. [naval §2.2]
 - NAVY-025: The naval system shall let a muster call, of a province's fighting-age men (a quarter of its people),
   2 in 3 of the seafolk, 1 in 3 of the homeless and 1 in 20 of every other class. [naval §2.2]
@@ -266,7 +266,7 @@ Newest decision first.
   build it alongside the shipyard's own seafolk. [naval §3.1, §3.3]
 - NAVY-044: If a port lacks the sailors for a ship's crew, then the naval system shall refuse the order. [naval §3.1]
   Replaced by D-NAVY-33: the order waits in the ship queue until its crew is in port (NAVY-149).
-- NAVY-045: The naval system shall sell only ship types the realm has unlocked in the S bough (and, for
+- NAVY-045: The naval system shall sell only ship types the realm has unlocked in the S branch (and, for
   exploration ships, the exploration unlock). [naval §3.3, §3.2]
 - NAVY-046: The naval system shall put every ship type in one family, trade, military or exploration, carrying 15
   zones of supply (trade, military), 6 (galleys) or 60 plus a hold of colony stores (exploration). [naval §3.2]
@@ -415,7 +415,7 @@ Newest decision first.
 - NAVY-108: The naval system shall supply, for each zoom: ports as anchor dots in the owner's colour (larger for
   great ports) and fleets as one ship sprite with a count (world); berths used/free, slipways with hulls building,
   fleets with the admiral's banner and course line in days (region); the port card with sailors in port, berths,
-  slipways, ships by state and the *Muster sailors* and *Buy ship* commands (province); and a Sea lens of ports
+  slipways, ships by state and the *Recruit sailors* and *Buy ship* commands (province); and a Sea lens of ports
   shaded by sailors who can still be called, fleets at sea, the month's winds and the zones a fleet can enter. [naval §10, §4.1]
 
 ### AI and the phone
@@ -492,7 +492,7 @@ Newest decision first.
 
 - NAVY-143 Where: a realm's starting fleet lies in its port from the first day: in the Navy tab's Fleets list, the Port tab's In port line and on the map. The Navy tab has one line, "Hired fleets: 1 in service, 4 for hire", that opens the **Hire a fleet** screen in the country card (the Navy tab stays lit, and "Back to the Navy" returns). Each fleet for hire is a card: its name and who offers it (a free fleet's group, or "lent by" the realm with its flag), its ships by type with what they fight and carry, its captain and skills, the port it would sail to and the days, its pay a month, and a Hire button, greyed with the reason written under it (not enough gold); with no port in reach, the screen says why instead of listing offers. [F-115; X-19]
 - NAVY-144 Grouping: the Hire a fleet screen holds everything about hired fleets: "In your service" (each with where it is, its pay, Open and Dismiss, Dismiss greyed with its reason while an army is aboard or it fights) above "For hire" (free fleets first, then lent fleets, cheapest first). A hired fleet's own fleet card says it is hired, from whom, and its pay, names its captain in place of the admiral, shows a Contract part with Dismiss in place of the admiral buttons, and has no Part off, Join or Lay up. [F-115; X-19]
-- NAVY-145 Overview: the Navy tab's Cost line shows how much of the month's cost is for hired fleets, and each hired fleet is marked "hired" in its Fleets list; the Treasury's Ships and sailors line carries the pay (and, for a lender, the gold it receives). Hiring, dismissal, an unpaid fleet leaving and a lent fleet called home are said in the dispatches. [F-115; X-19]
+- NAVY-145 Overview: the Navy tab's Cost line shows how much of the month's cost is for hired fleets, and each hired fleet is marked "hired" in its Fleets list; the Treasury's Ships and sailors line carries the pay (and, for a lender, the gold it receives). Hiring, dismissal, an unpaid fleet leaving and a lent fleet called home are said in the News. [F-115; X-19]
 - NAVY-146 Phone: the Hire a fleet screen and the hired fleet card are cards in the side panel in the Wide and Tall layouts, one column, every button at least 44 points high, nothing that needs hover (reasons are written, not tooltips); checked by apps/client/scripts/hired-fleet-shots.mjs on a small and a large phone held sideways, a phone held upright (asked to turn) and a desktop. [F-115; X-19]
 
 
@@ -552,7 +552,7 @@ Newest decision first.
 - When a harbour is built, raised or loses a step (buildings), then the naval system recomputes berths and
   whether the province is a port, and refreshes cached paths.
 - When a shipyard is built, raised or burned (buildings), then slipways are recomputed; hulls beyond them wait.
-- When the realm learns S1, S3, S4, S5, S9 or another S-bough ship invention (research), then sailable zones,
+- When the realm learns S1, S3, S4, S5, S9 or another S ship invention (research), then sailable zones,
   ship types and pressing unlock, and cached paths are recomputed.
 - When the exploration context opens the exploration unlock for a realm, then exploration ships can be bought.
 - When a war starts or a rivalry is made (warfare, diplomacy), then docking rights change; AI land powers fit out.
@@ -695,7 +695,7 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | recruiting | upstream | Shared Kernel | The levy's people (fighting-age share), commissioning officials (7.1), empty province (7.4), coming home (6.2), guns (4.2); NAVY asks the levy pool to count sailors |
 | province | upstream | Customer–Supplier | Seafolk and other classes, slots, fisheries, food store, officials and types, plague; NAVY emits *Pressed* and *Lost at sea* grievances, fish and trader effects, births |
 | realm | downstream | Customer–Supplier | *Ships* stat, proposed *Sailors* and *Admirals* rows; lords (country 5), ruler and heir (succession crisis) come from realm (upstream) |
-| research | upstream | Conformist | S bough (S1, S3, S4, S5, S6, S7, S8, S9, S13, S14–S18), T5 monsoon seas |
+| research | upstream | Conformist | S inventions (S1, S3, S4, S5, S6, S7, S8, S9, S13, S14–S18), T5 monsoon seas |
 | trade | downstream | Customer–Supplier | Trade ships bought and crewed here, hold and purse per type (trade supplies the numbers), ports as route ends, pirates as hunting fleets, blockades |
 | exploration | downstream | Customer–Supplier | Exploration ships (caravel, voyaging canoe), 60 supply, colony stores, docking; exploration supplies the unlock, the charted map (may-enter for uncharted zones) and carries governors aboard |
 | diplomacy | upstream | Customer–Supplier | War, peace, rivalry, alliance (docking rights), consent to sell hulls, privateers dragging into war |
@@ -821,7 +821,7 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | NAVY-050 | buying-ships.feature | Ships that shoot need guns and powder |
 | NAVY-051 | buying-ships.feature | A blockaded port keeps building but nothing leaves |
 | NAVY-051 | sea-combat.feature | An enemy fleet blocks a port |
-| NAVY-052 | buying-ships.feature | A taken port loses its hulls on the slipways |
+| NAVY-052 | buying-ships.feature | A taken port loses the ships being built there |
 | NAVY-053 | buying-ships.feature | Buying a hull abroad in Venice |
 | NAVY-053 | buying-ships.feature | No crew abroad, no hull abroad |
 | NAVY-054 | buying-ships.feature | Small craft at a canoe landing |

@@ -39,7 +39,7 @@ describe("tongues and faiths", () => {
     expect(Object.keys(faithsOf(w, capitalOf(w, "bohemia")))[0]).toBe("hussite");
   });
 
-  it("puts Foreign rule on a stranger homeland taken from its 1444 owner, and Banned tongue under Impose (CULT-015, CULT-040)", () => {
+  it("puts Foreign rule on a stranger homeland taken from its 1444 owner, and Banned language under Impose (CULT-015, CULT-040)", () => {
     const w = createWorld(rules, 1, tiles);
     const p = capitalOf(w, "england");
     const castile = nation(w, "castile");
@@ -47,13 +47,13 @@ describe("tongues and faiths", () => {
     w.date = { year: 1445, month: 2, day: 1 };
     monthlyPeoples(w, []);
     expect(hasBelief(w, p, "Foreign rule")).toBe(true);
-    expect(hasBelief(w, p, "Banned tongue")).toBe(false);
+    expect(hasBelief(w, p, "Banned language")).toBe(false);
     // Castile has a chancery tradition and may Impose from 1444; France, without Printing, may not.
     expect(refused(w, { type: "tonguePolicy", policy: "impose" }, castile)).toBeNull();
-    expect(hasBelief(w, p, "Banned tongue")).toBe(true);
+    expect(hasBelief(w, p, "Banned language")).toBe(true);
     expect(refused(w, { type: "tonguePolicy", policy: "impose" }, nation(w, "france"))).toMatch(/Printing/);
     applyNow(w, { type: "tonguePolicy", policy: "teach" }, castile);
-    expect(hasBelief(w, p, "Banned tongue")).toBe(false);
+    expect(hasBelief(w, p, "Banned language")).toBe(false);
   });
 
   it("drifts tongues slowly toward the court each New Year, faster under Impose (CULT-016 to CULT-025)", () => {
@@ -72,7 +72,7 @@ describe("tongues and faiths", () => {
     expect(before.galician! - teach.galician!).toBeLessThan(teach.galician! - impose.galician!);
     const line = tongueLine(peoplesData(w), p)!;
     expect(line.pull).toBe("castilian");
-    expect(line.groups.find((g) => g.name === "Galician")!.reasons).toContain("cousins of the pull tongue");
+    expect(line.groups.find((g) => g.name === "Galician")!.reasons).toContain("related to the language it drifts toward");
   });
 
   it("takes a Faith policy at the next New Year: Restricted pays more tax, Persecuted counts twice and closes houses (RELG-050 to RELG-055)", () => {

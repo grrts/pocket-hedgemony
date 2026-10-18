@@ -1,6 +1,6 @@
-# Map and Lenses
+# Map and Map Modes
 
-The map is home in Pocket Hegemony: you play on it, and cards and screens open over it. This page covers how the map is drawn, what you see at each of the three zoom levels, the lenses that recolour the world by one stat, the parchment over lands you have not charted, how the month plays back after End turn, how screens arrange themselves on phones, tablets, PCs and TVs, and the speed budgets that keep it all smooth on a phone. All of it is presentation only: what a lens or an icon *means* is the rule of the system that owns that stat, and nothing the map does ever changes the simulation.
+The map is home in Pocket Hegemony: you play on it, and cards and screens open over it. This page covers how the map is drawn, what you see at each of the three zoom levels, the map modes that recolour the world by one stat, the parchment over lands you have not charted, how the month plays back after End turn, how screens arrange themselves on phones, tablets, PCs and TVs, and the speed budgets that keep it all smooth on a phone. All of it is presentation only: what a map mode or an icon *means* is the rule of the system that owns that stat, and nothing the map does ever changes the simulation.
 
 ## How it works
 
@@ -20,7 +20,7 @@ Nation borders are an ink line with a band of the owner's colour inside. Each ti
 
 Labels, towns, armies and routes are painted on a separate overlay at the device's pixel ratio, from cached bitmaps, so text stays crisp.
 
-The map never unloads during a campaign, and exactly one lens is active at a time.
+The map never unloads during a campaign, and exactly one map mode is active at a time.
 
 ### The three zoom levels
 
@@ -32,13 +32,13 @@ There are three zoom levels: **World**, **Region** and **Local** ("Province" zoo
 - Armies as a banner with a men count, each standing on its own tile with its commander's banner and moving tile by tile as the week plays; battles as crossed swords with each side's men and a bar of men and morale left; besieged castles with a ring. Armies on the move are arrows, thick by men and coloured by owner, with no day counts.
 - Ports as anchor dots in the owner's colour, larger for great ports; fleets as a single ship sprite with a count.
 - The parchment, voyage paths as dotted lines, and colonies being founded as a small flag with a progress ring.
-- For diplomacy, only the lens colours.
+- For diplomacy, only the map mode colours.
 
 **Region zoom** shows a province's life:
 
 - Sieges with their progress: how long the castle has held, its breaches, and the garrison and food left.
 - Town size, the castle and its reach rings, roads, rivers and the busiest trade paths (thicker means more traders), armies and sieges, burned provinces hatched, and plague.
-- Armies as sprites by arm (foot, horse, guns) with a food bar on the banner showing days of reserve left; rumours as faded banners; the forage limit while you drag an army; and the full route of a selected army with day counts, month marks, food colour and step icons.
+- Armies as sprites by troop type (foot, horse, guns) with a food bar on the banner showing days of reserve left; rumours as faded banners; the forage limit while you drag an army; and the full route of a selected army with day counts, month marks, food colour and step icons.
 - The harbour tile with an anchor icon showing berths used and free (for example `7/20`), a slipway icon with hulls being built, and fleets with their admiral's banner and course line in days.
 - Each house of worship as a sprite in the town, preachers as walking figures, and active faith waves as a soft tint spreading from their source.
 - Envoys on the road as small riders with a dotted route, and the war-aim icon on countries you hold a war aim against.
@@ -55,7 +55,7 @@ There are three zoom levels: **World**, **Region** and **Local** ("Province" zoo
 
 Land provinces have no names on the map at any zoom, except each country's capital, so you can see whose capital it is. Every province's name shows on its name tab and card when you select it. Realm names and sea names stay. Route lines are a light dash over a dark outline, so they read on every colour.
 
-Every system added after the province and warfare designs has to state what it shows at each zoom, including its lens.
+Every system added after the province and warfare designs has to state what it shows at each zoom, including its map mode.
 
 ### Close in: the living map
 
@@ -75,22 +75,22 @@ Between zoom 14 and 16 the icons fade out as the living pieces fade in, so nothi
 
 **Armies, fleets and traders.** An army is one figure per 1,000 men (one per 250 at street level), up to 12 (40), split between foot, horse, guns and wagons. It stands in ranks, marches in a column behind its banner along the roads, clashes front rank to front rank in battle and loses figures as it loses men, and rings a town it besieges. Rebels carry no banner. A fleet is one hull per 5 ships (one per ship at street level), sailing in a loose formation or lying at its harbour's berths. Each busy trade path you can see (one through your lands or on your own traders' loops) carries up to three caravans, barges or trading ships in the colours of the realm that sends them. They walk the path there and back with the game clock, keeping to their side of the way, and stand still while the game waits for you. Tap one of yours to open its card in the Trade tab; another realm's caravan gives way to the province beneath it.
 
-**Reading the numbers.** The living map is for seeing; the cards are for knowing. Every number stays in its card. Tap a town to open its province card, and a formation, fleet or caravan to open its own card; a tap goes to the piece first, then the province, and every piece has a tap box of at least 44 points. The **Markers** switch in the Map lens menu brings back the number plates and names over every piece, and the siege marks and battle bars; the selected piece always shows its plate, name and route. The army list, the battle bar and the province's Garrison tab keep every number either way.
+**Reading the numbers.** The living map is for seeing; the cards are for knowing. Every number stays in its card. Tap a town to open its province card, and a formation, fleet or caravan to open its own card; a tap goes to the piece first, then the province, and every piece has a tap box of at least 44 points. The **Markers** switch in the map mode menu brings back the number plates and names over every piece, and the siege marks and battle bars; the selected piece always shows its plate, name and route. The army list, the battle bar and the province's Garrison tab keep every number either way.
 
 **Map detail.** Low keeps the icons at every zoom (closest zoom 40). Medium, the phone default, has the living map but no street level. High has both. With Animations Off every figure stands still, and Reduced moves only marching and fighting armies.
 
-### Lenses
+### Map modes
 
-A **lens** recolours the map by one stat. You pick it from the lens picker, a small pop-over in the tool column. The lens list brings together every system's lens:
+A **map mode** recolours the map by one stat. You pick it from the map mode picker, a small pop-over in the tool column. The map mode list brings together every system's map mode:
 
-| Lens | What it colours | Owner |
+| Map mode | What it colours | Owner |
 |---|---|---|
 | Food | Food in each province | [Provinces](Provinces) |
 | Tax reaching you | Tax that reaches your treasury | [Provinces](Provinces) |
 | Days to capital | How far each province is from the capital | [Provinces](Provinces) |
 | Grievances | Grievances in each province | [Provinces](Provinces) |
 | Faith | Majority faith, hatched where another faith is 30 % or more; holy places carry a small icon | [Religion](Religion) |
-| Tongue | Tongue family at far zoom, tongue at region zoom; a toggle to kin, cousin or stranger colours for your realm; homelands of peoples without a country outlined | [Culture](Culture) |
+| Language | Language family at far zoom, language at region zoom; a toggle to same language, related or foreign colours for your realm; homelands of peoples without a country outlined | [Culture](Culture) |
 | Ground | Each province's ground | [Provinces](Provinces) |
 | Recruits | Recruits | [Provinces](Provinces) |
 | Trade ratio | Provinces by trade ratio, with the busiest roads and sea lanes as lines | [Trade](Trade) |
@@ -103,9 +103,9 @@ A **lens** recolours the map by one stat. You pick it from the lens picker, a sm
 | Subjects | Your subjects by loyalty, with a line to each courted subject from the courting country's capital | [Subjects](Subjects) |
 | Revolution | Provinces by how many of the revolution's province-level signs they meet; risen provinces hatched in the revolution's colour | [Revolutions](Revolutions) |
 
-Trade ratio and Trade value replace the older Traders passing and Trade balance lenses. The picker holds 22 lenses: Realms, Terrain, People, Wealth, Walls and Food, plus Tax reaching you, Days to capital, Grievances, Faith, Tongue, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects and Revolution. On a phone the picker scrolls. A system with no zoom plan of its own shows its lens at every zoom and its card only at Local.
+Trade ratio and Trade value replace the older Traders passing and Trade balance map modes. The picker holds 22 map modes: Realms, Terrain, People, Wealth, Walls and Food, plus Tax reaching you, Days to capital, Grievances, Faith, Language, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects and Revolution. On a phone the picker scrolls. A system with no zoom plan of its own shows its map mode at every zoom and its card only at Local.
 
-**Diplomacy lens colours:**
+**Diplomacy map mode colours:**
 
 | Colour | Means |
 |---|---|
@@ -123,9 +123,9 @@ Trade ratio and Trade value replace the older Traders passing and Trade balance 
 
 Land and sea your country has not charted lie under a drawn **parchment**. The parchment shows your charted map, which only ever grows; it replaces the old rule of showing everything within 6 steps of your lands and armies. Which places you have charted is decided by [Exploration and Colonies](Exploration-and-Colonies).
 
-The **Charts lens** shows the same charted map with the parchment always on, empty coasts you could settle in green and colonies being founded in gold (see [Exploration and Colonies](Exploration-and-Colonies#how-you-play-it)).
+The **Exploration** map mode shows the same charted map with the parchment always on, empty coasts you could settle in green and colonies being founded in gold (see [Exploration and Colonies](Exploration-and-Colonies#how-you-play-it)).
 
-You can turn off "Parchment over unknown lands" in the lens menu to see the whole world. That switch is display only. It only changes what you see: it never lets you enter uncharted waters, and it is not the fog of war campaign rule.
+You can turn off "Hide unexplored lands" in the map mode menu to see the whole world. That switch is display only. It only changes what you see: it never lets you enter uncharted waters, and it is not the fog of war campaign rule.
 
 ### Watching the week
 
@@ -156,11 +156,11 @@ Every tap target is at least 44 × 44 points with 8 points between neighbours (5
 
 ### Map accessibility
 
-- **Colour vision modes** swap nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable, and switch each lens to a safe ramp (blue to orange instead of red to green). "No colour" uses greys with patterns.
-- **Patterns on lenses** add hatching, dots and stripes by band so every lens reads without colour.
+- **Colour vision modes** swap nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable, and switch each map mode to a safe ramp (blue to orange instead of red to green). "No colour" uses greys with patterns.
+- **Patterns on map modes** add hatching, dots and stripes by band so every map mode reads without colour.
 - **High contrast borders** draw nation borders in black and white ink two art pixels wide.
 - Route food colours also carry a pattern (solid, dashed, dotted). Day counts stay at least 10 points tall at region zoom and hide rather than shrink when you zoom too far out.
-- Every lens the tutorial teaches reads without telling colours apart; for example, hungry provinces also carry the hunger icon on the Food lens.
+- Every map mode the tutorial teaches reads without telling colours apart; for example, hungry provinces also carry the hunger icon on the Food map mode.
 
 ### Staying smooth: performance budgets
 
@@ -199,33 +199,33 @@ To hold these:
 ## What you see
 
 - The map itself at World, Region and Local zoom, as described above.
-- The **tool column** with the **lens picker** pop-over, and the lens menu with the parchment switch and the Tongue toggle.
+- The **tool column** with the **map mode picker** pop-over, and the map mode menu with the parchment switch and the Language toggle.
 - **Weekly playback**, slowed to 4-hour steps during your battles, and the parchment strip during long turns.
 - Cards as side sheets or bottom sheets depending on the window shape; "Turn your phone sideways" on an upright phone.
 
-Commands you give here never reach the engine: picking a lens, zooming and panning, toggling the parchment, and skipping playback. Picking a lens and crossing a zoom boundary are passed to [Music and Sound](Music-and-Sound) (the lens sound and the music's zoom mix), and the end of playback tells [Screens and Navigation](Screens-and-Navigation) to show the turn report.
+Commands you give here never reach the engine: picking a map mode, zooming and panning, toggling the parchment, and skipping playback. Picking a map mode and crossing a zoom boundary are passed to [Music and Sound](Music-and-Sound) (the map mode sound and the music's zoom mix), and the end of playback tells [Screens and Navigation](Screens-and-Navigation) to show the turn report.
 
 ## How it connects
 
 - [World Map](World-Map): supplies the id image, terrain image, depth, rivers and tile colours.
 - [Time and Turns](Time-and-Turns): turn results, playback timing and turn-time budgets.
-- [Provinces](Provinces): province zoom content and the Food, Tax, Days to capital, Grievances, Ground and Recruits lenses.
+- [Provinces](Provinces): province zoom content and the Food, Tax, Days to capital, Grievances, Ground and Recruits map modes.
 - [Warfare](Warfare): army banners, battles, sieges, rumours, front lines.
 - [Troop Movement](Troop-Movement): routes, arrows, columns and playback events.
-- [Naval](Naval): ports, fleets and the Sea lens.
-- [Trade](Trade): trade lenses, traders, roads and lanes.
-- [Religion](Religion): the Faith lens, worship sprites, preachers, waves.
-- [Culture](Culture): the Tongue lens and its toggle.
-- [Diplomacy](Diplomacy): the Diplomacy lens, envoys, war-aim icons.
+- [Naval](Naval): ports, fleets and the Sea map mode.
+- [Trade](Trade): trade map modes, traders, roads and lanes.
+- [Religion](Religion): the Faith map mode, worship sprites, preachers, waves.
+- [Culture](Culture): the Language map mode and its toggle.
+- [Diplomacy](Diplomacy): the Diplomacy map mode, envoys, war-aim icons.
 - [Exploration and Colonies](Exploration-and-Colonies): the charted map under the parchment, voyages, colonies.
-- [Buildings](Buildings): the Works and Jobs lenses.
-- [Subjects](Subjects): the Subjects lens.
-- [Revolutions](Revolutions): the Revolution lens.
+- [Buildings](Buildings): the Works and Jobs map modes.
+- [Subjects](Subjects): the Subjects map mode.
+- [Revolutions](Revolutions): the Revolution map mode.
 - [National Strengths](National-Strengths): the ambition shimmer.
 - [Settings](Settings): performance knobs, colour vision, patterns, borders, reduced motion.
 - [Screens and Navigation](Screens-and-Navigation): layout by window shape, the map as home, cards over the map.
-- [Music and Sound](Music-and-Sound): lens and zoom events.
-- [Tutorial and Help](Tutorial-and-Help): the lens and zoom steps the tutorial teaches.
+- [Music and Sound](Music-and-Sound): map mode and zoom events.
+- [Tutorial and Help](Tutorial-and-Help): the map mode and zoom steps the tutorial teaches.
 
 ## Numbers
 
@@ -269,4 +269,4 @@ Commands you give here never reach the engine: picking a lens, zooming and panni
 
 - Spec: [`domain/map-presentation/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/map-presentation/spec.md), requirement code **VIEW**.
 - Features: `domain/map-presentation/features/` (map-rendering, zoom-content, lenses, parchment, month-playback, layout, map-accessibility, performance).
-- Code: the map is drawn in the client, `apps/client/src/map/mapView.ts` (`MAP_PIXEL_RATIO`) and `apps/client/src/main.ts` (today's lenses and fog toggle). Budgets are documented in `docs/performance.md` and checked by `pnpm bench` and `pnpm --filter @ph/client perf`. This context is presentation only and has no engine rules folder.
+- Code: the map is drawn in the client, `apps/client/src/map/mapView.ts` (`MAP_PIXEL_RATIO`) and `apps/client/src/main.ts` (today's map modes and fog toggle). Budgets are documented in `docs/performance.md` and checked by `pnpm bench` and `pnpm --filter @ph/client perf`. This context is presentation only and has no engine rules folder.

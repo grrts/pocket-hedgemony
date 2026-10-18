@@ -15,7 +15,7 @@ Feature: Subject AI
       | has a Loyal subject that meets every fold-in requirement and likes centralising | folds it in                               |
       | is at war elsewhere and has a Disloyal Vassal                                 | loosens it                                   |
       | has a big Wavering subject and a free envoy                                   | stations a resident there                    |
-      | is at reach 7 of 7                                                            | gains no subject that would take it past 8   |
+      | is at subject limit 7 of 7                                                    | gains no subject that would take it past 8   |
 
   @SUBJ-099
   Scenario Outline: The AI as subject

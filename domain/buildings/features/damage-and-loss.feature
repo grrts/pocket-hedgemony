@@ -89,7 +89,7 @@ Feature: How buildings are damaged or lost
   @BLD-074
   Scenario: A mine running out closes
     Given the province "Kutná Hora" has a silver mine
-    When its seam runs out
+    When its ore deposit runs out
     Then the mine closes
 
   @BLD-161 @placeholder

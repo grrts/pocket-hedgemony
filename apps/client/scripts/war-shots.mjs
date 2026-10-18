@@ -24,6 +24,7 @@ await page.evaluate(() => {
 await page.waitForTimeout(300);
 await page.screenshot({ path: `${out}/1-portugal.png` });
 await page.click("[data-declare]");
+await page.click("[data-declare-confirm]");
 await page.waitForTimeout(500);
 await page.screenshot({ path: `${out}/2-declared.png` });
 // March the army on Lisbon and end turns until something happens.

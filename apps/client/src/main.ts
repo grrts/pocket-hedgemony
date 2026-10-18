@@ -54,6 +54,7 @@ import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts"
 import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeLine, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { censureWarningHtml, faithBadgeHtml, headCardHtml, seatKeyHtml } from "./ui/faithHeads.ts";
+import { declareSheetHtml, nameAbroadHtml, warCardHtml, warPlaqueBars } from "./ui/priceOfWar.ts";
 import { closeUpPoint, firstShown, jumpTarget, learningLine, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
@@ -238,6 +239,8 @@ let headView: string | null = null;
 /** Which tab of a country's overview is open (feedback 12). */
 type RealmTab = "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies";
 let realmTab: RealmTab = "general";
+/** The realm whose declare sheet is open (WAR-229), -1 for none. */
+let declareFor = -1;
 /** What the player left open in the Research tab (tree or Schools, the zoom, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -279,7 +282,7 @@ app.innerHTML = `
   <div class="map" id="map"></div>
   <header class="hud" id="hud"></header>
   <div class="tools">
-    <button class="icon-only" id="mode" title="Map lens" aria-expanded="false">${icon("map", 3, "Map lens")}</button>
+    <button class="icon-only" id="mode" title="Map mode" aria-expanded="false">${icon("map", 3, "Map mode")}</button>
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
     <button class="icon-only" id="armies" title="Your commanders" aria-expanded="false" hidden>${icon("swords", 3, "Commanders")}</button>
     <button class="icon-only" id="sound" title="Sound and music" aria-expanded="false">${icon("speaker", 3, "Sound")}</button>
@@ -371,10 +374,16 @@ document.addEventListener("click", (e) => {
   realmView = Number(b.dataset.realm);
   officialView = -1;
   lordView = -1;
+  declareFor = -1;
   realmTab = (b.dataset.realmOpen as typeof realmTab | undefined) ?? "general";
   newsView = false;
   panelCollapsed = false;
   renderPanel();
+});
+// The war plaque opens the Diplomacy tab at the first war's card (WAR-231).
+document.addEventListener("click", (e) => {
+  if (!(e.target as HTMLElement).closest("[data-war-focus]")) return;
+  panel.querySelector<HTMLElement>("[data-war-card]")?.scrollIntoView({ block: "start" });
 });
 document.addEventListener("click", (e) => {
   if (!(e.target as HTMLElement).closest("[data-news]")) return;
@@ -736,11 +745,11 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "lords", name: "Lords", note: "who holds your land" },
   { id: "diplomacy", name: "Diplomacy", note: "friend or foe, envoys on the road" },
   { id: "subjects", name: "Subjects", note: "your subjects by loyalty, and your overlord" },
-  { id: "tongues", name: "Tongues", note: "the family of the tongue most speak" },
+  { id: "tongues", name: "Languages", note: "the family of the language most speak" },
   { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
   { id: "trade", name: "Trade", note: "trade ratio, your traders' loops" },
   { id: "institutions", name: "Institutions", note: "the Empire: Emperor, electors, members" },
-  { id: "charts", name: "Charts", note: "what you have charted, and empty coasts to settle" },
+  { id: "charts", name: "Exploration", note: "what you have charted, and empty coasts to settle" },
 ];
 /** The trade lens's ramp by trade ratio, quiet to busy (TRADE-143); provinces the player doesn't see are parchment. */
 const TRADE_RAMP = ["#efe39a", "#e0b443", "#c7742a", "#3f8f6e", "#1f5a5e"].map(hexToRgb);
@@ -829,10 +838,10 @@ function setLens(l: Lens): void {
 
 function renderLensMenu(): void {
   lensMenu.innerHTML = `
-    <h3 class="sub">Map lens</h3>
+    <h3 class="sub">Map mode</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.id === "lords" && snapshot ? cap(titlesOf(snapshot.playerNation).lords) : l.name}</b><small>${l.note}</small></button>`).join("")}
     ${lens === "institutions" ? institutionsKey(INSTITUTION_HEX) : lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
-    <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>
+    <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Hide unexplored lands</label>
     <label class="fog-toggle"><input type="checkbox" id="markers" ${markersOn ? "checked" : ""}> Markers: men and names over every army close in</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -893,7 +902,7 @@ function subjectsKey(): string {
     <span>${sw(LOYALTY_HEX.wavering)}Wavering subject</span>
     <span>${sw(LOYALTY_HEX.disloyal)}Disloyal subject</span>
     <span>${sw(OVERLORD_HEX)}Your overlord</span>
-    <p>${sv ? `Reach used ${sv.used} of ${sv.reach}.` : ""} A dotted line runs from a courting realm to the subject it courts. Tap a subject for its Diplomacy tab.</p>
+    <p>${sv ? `Subject limit: ${sv.used} of ${sv.reach} used.` : ""} A dotted line runs from a courting realm to the subject it courts. Tap a subject for its Diplomacy tab.</p>
   </div>`;
 }
 
@@ -918,9 +927,9 @@ function tradeKey(): string {
   </div>`;
 }
 
-/** The Tongue and Faith lenses' key: the families or faiths that cover the most of the map, largest first. */
+/** The Language and Faith lenses' key: the families or faiths that cover the most of the map, largest first. */
 function beliefKey(): string {
-  if (!snapshot) return `<div class="lens-key"><p>Choose a realm to see tongues and faiths.</p></div>`;
+  if (!snapshot) return `<div class="lens-key"><p>Choose a realm to see languages and faiths.</p></div>`;
   const count = new Map<string, number>();
   const pe = snapshot.peoples;
   for (let i = 0; i < provinces.length; i++) {
@@ -933,7 +942,7 @@ function beliefKey(): string {
   return `<div class="lens-key">
     ${rows.map(([k]) => `<span><i class="swatch" style="background:${rgb(k)}"></i>${esc(label(k))}</span>`).join("")}
     ${lens === "faiths" ? `<span><i class="swatch hatched" style="background:#b9b3a4"></i>A second faith holds 30% or more</span>${seatKeyHtml(snapshot.faithHeads)}` : ""}
-    <p>Tap a province for its ${lens === "tongues" ? "Tongue" : "Faith"} line${lens === "faiths" ? ", or a seat for its head of the faith" : ""}.</p>
+    <p>Tap a province for its ${lens === "tongues" ? "Language" : "Faith"} line${lens === "faiths" ? ", or a seat for its head of the faith" : ""}.</p>
   </div>`;
 }
 
@@ -2356,9 +2365,9 @@ function renderHud(): void {
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
         case "war":
-          return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} title="Your wars">${icon("swords", 1)}At war</button>`;
+          return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} data-war-focus title="Your wars: your side's peace voices, amber past a third, red past half">${icon("swords", 1)}At war${warPlaqueBars(myWarsRaw(), me)}</button>`;
         case "dispatches":
-          return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
+          return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
       }
     })
     .join("\n    ");
@@ -2371,6 +2380,33 @@ function myWars(): { id: string; ours: number[]; theirs: number[]; start: string
   return snapshot.wars
     .filter((w) => w.attackers.includes(me) || w.defenders.includes(me))
     .map((w) => (w.attackers.includes(me) ? { id: w.id, ours: w.attackers, theirs: w.defenders, start: w.start } : { id: w.id, ours: w.defenders, theirs: w.attackers, start: w.start }));
+}
+
+/** The snapshot's wars the player fights, with their peace facts (WAR-230). */
+const myWarsRaw = () => (snapshot ? snapshot.wars.filter((w) => w.attackers.includes(snapshot!.playerNation) || w.defenders.includes(snapshot!.playerNation)) : []);
+
+/** Provinces of the enemy side the player's side occupies, and of the player's side the enemy occupies. */
+function occupiedEachWay(ours: number[], theirs: number[]): { taken: number; lost: number } {
+  const o = new Set(ours);
+  const t = new Set(theirs);
+  let taken = 0;
+  let lost = 0;
+  for (let i = 0; i < provinces.length; i++) {
+    if (t.has(owners[i]!) && o.has(occupiers[i]!)) taken++;
+    if (o.has(owners[i]!) && t.has(occupiers[i]!)) lost++;
+  }
+  return { taken, lost };
+}
+
+/** A running war's card (WAR-230). */
+function warCard(id: string): string {
+  const s = snapshot!;
+  const w = s.wars.find((x) => x.id === id);
+  if (!w) return "";
+  const me = s.playerNation;
+  const attacker = w.attackers.includes(me);
+  const { taken, lost } = occupiedEachWay(attacker ? w.attackers : w.defenders, attacker ? w.defenders : w.attackers);
+  return warCardHtml(w, me, { name: (n) => nations[n]!.name, taken, lost, provinceName: (p) => provinces[p]!.name, titles: titlesOf(me) });
 }
 
 const relationOf = (n: number) => snapshot?.relations.find((r) => r.nation === n) ?? null;
@@ -2477,9 +2513,9 @@ function logNews(s: Snapshot): void {
     watching.result = news.find((x) => x.kind === "battle" && !x.begins && x.province === watching!.province)?.text ?? "The battle is over.";
   }
   renderBattleWatch();
-  // Learning: an invention learned, or nothing being studied, opens the Learning tab (RSCH-089).
+  // Research: an invention learned, or nothing being studied, opens the Research tab (RSCH-089).
   for (const x of news) if (x.kind === "invention" && x.nations.includes(me)) alertPlayer(x.text, "scroll", x.province === undefined ? { tab: "learning" } : { province: x.province });
-  // A seal cracks, an ambition is settled, a heyday wakes or a choice waits: one quiet line that opens the Heritage tab (HER-071).
+  // An ambition is revealed or settled, a golden age begins or a choice waits: one quiet line that opens the Heritage tab (HER-071).
   for (const x of news) if (x.kind === "heritage" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "heritage" });
   // A crown inherited, a claim gained or lapsed, crowns merged: one line that opens the Diplomacy tab, where Your house lists them (SUBJ-130).
   for (const x of news) if (x.kind === "crown" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "diplomacy" });
@@ -2740,7 +2776,7 @@ function renderNews(): void {
     else days.push({ date: x.date, news: [x.news] });
   }
   panel.innerHTML = `
-    <header><h2 class="ribbon">Dispatches</h2>${closeButton()}</header>
+    <header><h2 class="ribbon">News</h2>${closeButton()}</header>
     <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
     ${waitingEventsHtml(s.events)}
     ${asksHtml()}
@@ -2819,7 +2855,7 @@ function renderActions(): void {
 }
 
 function closeButton(): string {
-  return `<span class="panel-buttons"><button class="nav-back" aria-label="Back" title="Back to the previous screen"${screenHistory.length ? "" : " hidden"}>${icon("back", 2)}</button><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span>`;
+  return `<span class="panel-buttons"><button class="nav-back" aria-label="Back" title="Back to the previous screen"${screenHistory.length ? "" : " hidden"}>${icon("back", 2)}</button><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span>`;
 }
 
 /** Shows or hides the panel, leaving a tool button to bring a folded panel back. */
@@ -2836,7 +2872,7 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
   const what =
-    reopenIcon === "crown" ? "Choose a realm" : empireOpen ? "The Empire" : newsView ? "Dispatches" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
+    reopenIcon === "crown" ? "Choose a realm" : empireOpen ? "The Empire" : newsView ? "News" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
   reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
   reopen.title = `Open the overview: ${what}`;
   panel.querySelector(".fold")?.addEventListener("click", () => {
@@ -2998,7 +3034,8 @@ function renderHead(id: string): void {
 }
 
 function renderPanelCard(): void {
-  const shows = `${achView}/${empireOpen}/${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
+  panel.classList.remove("declaring");
+  const shows = `${achView}/${empireOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
@@ -3021,7 +3058,9 @@ function renderPanelCard(): void {
     return;
   }
   if (realmView >= 0) {
-    renderRealm(realmView);
+    if (declareFor >= 0 && (declareFor !== realmView || !snapshot)) declareFor = -1;
+    if (declareFor >= 0) renderDeclareSheet(declareFor);
+    else renderRealm(realmView);
     return;
   }
   if (officialView >= 0 && snapshot) {
@@ -3050,7 +3089,7 @@ function renderPanelCard(): void {
   }
   if (!snapshot && selectedProvince < 0) {
     panel.innerHTML = `
-      <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close" data-start-back aria-label="Back to the start screen">${icon("close", 2)}</button></span></header>
+      <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close" data-start-back aria-label="Back to the start screen">${icon("close", 2)}</button></span></header>
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
@@ -3787,8 +3826,8 @@ const GRIEVANCE_FIX: Record<string, string> = {
   Conscription: "ends when half the recruits are back",
   "Soldiers quartered": "ends when the armies move on",
   Ungoverned: "ends when the official returns to his post",
-  "Foreign rule": "a homeland of a stranger tongue taken since 1444; ends with a lord of its tongue",
-  "Banned tongue": "your Tongue policy is Impose and most here are strangers; ends with Teach or Let be (Peoples tab)",
+  "Foreign rule": "the homeland of a people with a foreign language, taken since 1444; ends with a lord who speaks their language",
+  "Banned language": "your Language policy is Impose and most here speak a foreign language; ends with Teach or Let be (Peoples tab)",
   "Wrong faith": "a third or more keep a faith without a house, or a Restricted majority; ends when it is served (Peoples tab)",
   Persecuted: "a Persecuted faith lives here; counts as two; ends when it is Tolerated or Restricted again (Peoples tab)",
   Bloodshed: "a battle was fought here; it fades after 20 years",
@@ -3935,11 +3974,11 @@ async function actHere(order: Order): Promise<void> {
 }
 
 const ARM_LABEL: Record<string, string> = {
-  "levy foot": "Levy foot",
-  "armoured foot": "Armoured foot",
+  "levy foot": "Levy infantry",
+  "armoured foot": "Heavy infantry",
   pikes: "Pikes",
   archers: "Archers",
-  "light horse": "Light horse",
+  "light horse": "Light cavalry",
   "knights and lancers": "Knights and lancers",
 };
 const armText = (by: number[]) =>
@@ -4277,12 +4316,12 @@ function renderArmy(id: number): void {
     </table>
     ${hired ? "" : `<h3 class="sub">Train</h3>
     ${training
-      ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy foot training as ${esc(training.arm)}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand at a castle or drill yard of your own)"}.</p>`
+      ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy infantry training as ${esc((ARM_LABEL[training.arm] ?? training.arm).toLowerCase())}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand at a castle or drill yard of your own)"}.</p>`
       : trainMen >= 1 && !atHome
-        ? `<p class="hint">Men train only at a castle or drill yard of your own. March the army to one (your capital has a castle) to train its levy foot.</p>`
+        ? `<p class="hint">Men train only at a castle or drill yard of your own. March the army to one (your capital has a castle) to train its levy infantry.</p>`
       : trainMen >= 1
-        ? `<p class="hint">Turn levy foot into another arm. Training goes on while the army stands at a castle or drill yard of your own, and holds while it is away.</p>
-          ${levyFoot >= 2000 ? `<div class="stepper" role="group" aria-label="Levy foot to train"><button class="paper" data-train-less ${trainThousands <= 1 ? "disabled" : ""} aria-label="Fewer">−</button><output>${fmt(trainMen)} of ${fmt(Math.floor(levyFoot))}</output><button class="paper" data-train-more ${trainThousands * 1000 + 1000 > levyFoot ? "disabled" : ""} aria-label="More">+</button></div>` : ""}
+        ? `<p class="hint">Turn levy infantry into another troop type. Training goes on while the army stands at a castle or drill yard of your own, and holds while it is away.</p>
+          ${levyFoot >= 2000 ? `<div class="stepper" role="group" aria-label="Levy infantry to train"><button class="paper" data-train-less ${trainThousands <= 1 ? "disabled" : ""} aria-label="Fewer">−</button><output>${fmt(trainMen)} of ${fmt(Math.floor(levyFoot))}</output><button class="paper" data-train-more ${trainThousands * 1000 + 1000 > levyFoot ? "disabled" : ""} aria-label="More">+</button></div>` : ""}
           <div class="choices">${trainable
             .map((a) => {
               const cost = ARM_COST[a]!;
@@ -4290,7 +4329,7 @@ function renderArmy(id: number): void {
               return `<button class="paper" data-train="${a}" ${g > s.nationTreasury[me]! ? "disabled" : ""}>${ARM_LABEL[a]} · ${cost.months} mo · ${g.toFixed(2)} gold</button>`;
             })
             .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Research</button></p>` : ""}`
-        : `<p class="hint">No levy foot left to train.</p>`}`}
+        : `<p class="hint">No levy infantry left to train.</p>`}`}
     ${(() => {
       const waiting = garrison.reduce((t, j) => t + s.armies.men[j]!, 0);
       return garrison.length
@@ -4399,18 +4438,11 @@ function relationsSection(r: number): string {
   const war = myWars().find((w) => w.theirs.includes(r));
   if (war) {
     // Land each side holds of the other's, for the peace terms.
-    const ours = new Set(war.ours);
-    const theirs = new Set(war.theirs);
-    let taken = 0;
-    let lost = 0;
-    for (let i = 0; i < provinces.length; i++) {
-      if (theirs.has(owners[i]!) && ours.has(occupiers[i]!)) taken++;
-      if (ours.has(owners[i]!) && theirs.has(occupiers[i]!)) lost++;
-    }
+    const { taken, lost } = occupiedEachWay(war.ours, war.theirs);
     const leaders = s.wars.find((w) => w.id === war.id)!;
     const whole = [leaders.attackers[0], leaders.defenders[0]].includes(me) && [leaders.attackers[0], leaders.defenders[0]].includes(r);
     return `<h3 class="sub">At war</h3>
-      <p>Since ${monthText(war.start)}. With you: ${war.ours.map((n) => esc(nations[n]!.name)).join(", ")}. Against you: ${war.theirs.map((n) => esc(nations[n]!.name)).join(", ")}.</p>
+      ${warCard(war.id)}
       <p class="hint">${whole ? "Peace with them ends the whole war." : "A separate peace: the rest of the war goes on."} Your side holds ${taken} of their provinces; they hold ${lost} of yours.</p>
       <div class="choices">
         <button class="wax" data-peace="take" ${taken ? "" : "disabled"}>${icon("crown", 1)}Peace: take ${taken} province${taken === 1 ? "" : "s"}</button>
@@ -4428,7 +4460,44 @@ function relationsSection(r: number): string {
   return `<h3 class="sub">Relations</h3><p>${line}</p>
     ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy")) : ""}
     ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
-    ${rel ? "" : `<h3 class="sub">War</h3>${censureWarningHtml(s.faithHeads?.censure[r])}<div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 1)}Declare war</button></div>`}`;
+    ${rel && rel.state !== "truce" ? "" : `<h3 class="sub">War</h3><div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 1)}Declare war</button></div><p class="hint">Shows the price of war before you confirm.</p>`}`;
+}
+
+/**
+ * The declare sheet (WAR-229, WAR-232): the price of war beside the terms, the
+ * faith head's censure above Confirm, and Confirm pinned at the foot. Confirm
+ * breaks a truce when one holds; Back returns to the realm's Diplomacy tab.
+ */
+function renderDeclareSheet(r: number): void {
+  const s = snapshot!;
+  const me = s.playerNation;
+  const price = s.statecraft?.realms[r]?.price ?? null;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">War on ${esc(nations[r]!.name)}?</h2>${closeButton()}</header>
+    ${declareSheetHtml({
+      target: r,
+      price,
+      name: (n) => nations[n]!.name,
+      titles: titlesOf(me),
+      income: s.nationMonthlyIncome[me]!,
+      nameAbroad: s.statecraft?.nameAbroad ?? null,
+      me,
+      censure: censureWarningHtml(s.faithHeads?.censure[r]),
+    })}`;
+  panel.classList.add("declaring");
+  bindClose();
+  showPanel(true);
+  panel.querySelector("[data-declare-back]")?.addEventListener("click", () => {
+    declareFor = -1;
+    realmTab = "diplomacy";
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-declare-confirm]")?.addEventListener("click", (e) => {
+    const breakTruce = !!(e.currentTarget as HTMLButtonElement).dataset.breakTruce;
+    declareFor = -1;
+    realmTab = "diplomacy";
+    void act({ type: "declareWar", target: r, ...(breakTruce ? { breakTruce: true } : {}) });
+  });
 }
 
 /** Peace offered to the player, with the choice to take it. */
@@ -4469,12 +4538,11 @@ function myDiplomacySection(): string {
   const s = snapshot!;
   const ties = s.relations.filter((x) => x.state !== "war");
   const STATE = { truce: "Truce", alliance: "Ally", subject: "Your overlord", overlord: "Your subject", war: "At war" } as const;
-  return `${asksHtml()}${s.peaceOffers.map(offerHtml).join("")}
+  // Your name abroad opens the tab (DIPL-225), then what waits for an answer, then each war's card (WAR-230).
+  return `${s.statecraft ? nameAbroadHtml(s.statecraft.nameAbroad, (n) => nations[n]!.name) : ""}${asksHtml()}${s.peaceOffers.map(offerHtml).join("")}
     ${institutionsRows(s.empire, institutionsUi)}
     <h3 class="sub">Wars</h3>
-    ${myWars().length ? myWars()
-      .map((w) => `<p>${icon("swords", 1)} Against ${w.theirs.map((n) => realmButton(n, "diplomacy")).join(" ")} <small>since ${monthText(w.start)}</small></p>`)
-      .join("") : `<p class="hint">At peace with the world.</p>`}
+    ${myWars().length ? myWars().map((w) => warCard(w.id)).join("") : `<p class="hint">At peace with the world.</p>`}
     <p class="hint">Open a realm to send it an envoy, declare war on it or offer it peace.</p>
     ${mySubjects(s.statecraft, (n) => realmButton(n, "diplomacy"))}
     ${myHouse(s.statecraft, (n) => realmButton(n, "diplomacy"))}
@@ -4515,7 +4583,7 @@ function mercenaryLine(): string {
   const s = snapshot!;
   const serving = hiredArmies().length;
   const parts = [serving ? `${serving} in service` : "", s.mercs.length ? `${s.mercs.length} on the way` : "", `${s.freeCompanies.length} for hire`].filter(Boolean);
-  return `<h3 class="sub">Mercenaries</h3><p><button class="paper" data-realm-open-tab="mercenaries">${icon("coin", 1)}Free companies: ${parts.join(", ")}</button></p>`;
+  return `<h3 class="sub">Mercenaries</h3><p><button class="paper" data-realm-open-tab="mercenaries">${icon("coin", 1)}Mercenary companies: ${parts.join(", ")}</button></p>`;
 }
 
 const hiredArmies = () => {
@@ -4544,12 +4612,12 @@ function mercenarySection(): string {
   const pay = serving.reduce((t, k) => t + s.armies.pay[k]!, 0);
   const card = (inner: string, extra = "") => `<li class="company${extra}">${inner}</li>`;
   return `<p>${serving.length ? `${serving.length} compan${serving.length === 1 ? "y" : "ies"} in service, ${fmt(serving.reduce((t, k) => t + s.armies.men[k]!, 0))} men, ${pay.toFixed(1)} gold a month.` : `No company in your service yet${s.mercs.length ? `; ${s.mercs.length} on the way` : ""}.`}</p>
-    <p class="hint">Free companies come with their own captain and march to your capital. They cost three times a levy's pay; the first month is paid on hiring.</p>
+    <p class="hint">Mercenary companies come with their own captain and march to your capital. They cost three times a levy's pay; the first month is paid on hiring.</p>
     ${serving.length || s.mercs.length ? `<div class="queue-head"><span>Your companies</span><span>${fmt(serving.reduce((t, k) => t + s.armies.men[k]!, 0) + s.mercs.reduce((t, m) => t + m.men, 0))} men</span></div>
     <ol class="companies">${serving
       .map((k) => {
         const c = s.commanders[s.armies.commander[k]!];
-        return card(`<div class="company-head"><b>${esc(c?.name ?? "A free company")}</b><small>${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}</small></div>
+        return card(`<div class="company-head"><b>${esc(c?.name ?? "A mercenary company")}</b><small>${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}</small></div>
           <small>${armText(s.armies.byArm[k]!)} · ${s.armies.pay[k]!.toFixed(1)} gold a month</small>
           <div class="company-foot"><span></span><button class="paper" data-command="${s.armies.id[k]!}">Command</button></div>`);
       })
@@ -4762,7 +4830,11 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-peace]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "offerPeace", target: r, terms: b.dataset.peace as PeaceTerms })),
   );
-  panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
+  // Declaring opens the declare sheet with the price of war first (WAR-229).
+  panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => {
+    declareFor = r;
+    renderPanel();
+  });
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
   panel.querySelector<HTMLButtonElement>("[data-rise]")?.addEventListener("click", () => void act({ type: "riseUp" }));
   panel.querySelectorAll<HTMLButtonElement>("[data-court-subject]").forEach((b) => b.addEventListener("click", () => void act({ type: "court", target: Number(b.dataset.courtSubject), ...(b.dataset.recall ? { recall: true } : {}) })));
@@ -5164,6 +5236,7 @@ function bindClose(): void {
     achView = false;
     empireOpen = false;
     headView = null;
+    declareFor = -1;
     selectedProvince = -1;
     selected.clear();
     restyleProvinces();
@@ -6215,6 +6288,13 @@ Object.assign(globalThis, {
   },
   /** Sends one of the player's envoys to a realm by id, on a mission (ENVOY_ACTIONS). */
   __phEnvoy: (id: string, action = "courtesy_visit") => act({ type: "sendEnvoy", target: nationIndex.get(id)!, action }),
+  /** Redraws the open Your name abroad card from a given view by realm ids, to check how a league looks (price-of-war-shots.mjs). */
+  __phNameAbroad: (v: { notoriety: number; landsTaken: number; threshold: number; leagues: { members: [string, number][] }[] }) => {
+    const el = panel.querySelector("#name-abroad");
+    const word = v.notoriety >= 75 ? "Hated" : v.notoriety >= 50 ? "Feared" : v.notoriety >= 25 ? "Watched" : "Trusted";
+    const leagues = v.leagues.map((l) => ({ target: snapshot!.playerNation, members: l.members.map(([id, soldiers]) => ({ nation: nationIndex.get(id)!, soldiers })) }));
+    if (el) el.outerHTML = nameAbroadHtml({ ...v, word, leagues }, (n) => nations[n]!.name);
+  },
   /** Id of the province the player's first army with a commander stands in. */
   __phArmyProvince: () => {
     if (!snapshot) return null;

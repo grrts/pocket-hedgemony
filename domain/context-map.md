@@ -55,7 +55,7 @@ flowchart TB
 Three things are shared by several contexts and must be built once.
 
 1. **The mover** (troop-movement, naval, trade, exploration). Armies, fleets, traders and exploration ships move with one model: a route planned over one graph, walked in a day loop inside the month, with each kind adding its own "may enter", "stops at" and step-days rules. Troop-movement owns the day loop and planner; the others plug in.
-2. **The people mix of a province** (province, culture, religion). A province holds its classes, its tongue mix and its faith mix side by side. Culture and religion change their own mix with the same "pull toward a target each year" shape; province owns the people they belong to.
+2. **The people mix of a province** (province, culture, religion). A province holds its classes, its language mix and its faith mix side by side. Culture and religion change their own mix with the same "pull toward a target each year" shape; province owns the people they belong to.
 3. **The levy's people** (recruiting, naval). The sailor muster reuses recruiting's levy shares and commissioning of officials.
 
 ## 3. The main flows

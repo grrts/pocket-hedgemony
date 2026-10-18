@@ -1,7 +1,7 @@
 @context-game-shell
 Feature: Other in-campaign screens
   As a player
-  I want the battle viewer, siege view, peace table, lens picker and confirmations to open and close predictably
+  I want the battle viewer, siege view, peace table, map mode picker and confirmations to open and close predictably
   So that Back always does what I expect
 
   Background:
@@ -51,8 +51,8 @@ Feature: Other in-campaign screens
     And the player can answer it or put it off one turn
 
   @SHELL-093
-  Scenario: Lens picker and confirmations
-    When the player opens the map lens picker from the tool column
+  Scenario: Map mode picker and confirmations
+    When the player opens the map mode picker from the tool column
     Then it is a small pop-over that returns to the map
     When the player starts a destructive action
     Then a small confirmation modal is shown
@@ -67,13 +67,13 @@ Feature: Other in-campaign screens
     And the realm's Diplomacy tab is marked until the offer is answered or put off
 
   @SHELL-147 @feedback-72
-  Scenario: The Dispatches log keeps past weeks
+  Scenario: The News log keeps past weeks
     Given the player's realm fought a battle last week
     When the player ends the turn and the week plays out
-    Then the Dispatches do not open by themselves
-    And the Dispatches button counts the new dispatches about the player's realm
-    When the player taps the Dispatches button
-    Then this week's dispatches are listed first under their day
+    Then the News does not open by itself
+    And the News button counts the new news items about the player's realm
+    When the player taps the News button
+    Then this week's news is listed first under its day
     And last week's battle is still listed under its day
 
   @SHELL-147 @feedback-72

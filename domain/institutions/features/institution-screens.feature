@@ -40,7 +40,7 @@ Feature: Institutions on screen
   @INST-083
   Scenario Outline: What asks the player
     When <ask> concerns the player
-    Then an answer card with two 44-point buttons waits in the dispatches and on Needs attention
+    Then an answer card with two 44-point buttons waits in the News and on Needs attention
     And silence counts as "<silence>"
 
     Examples:
@@ -50,11 +50,11 @@ Feature: Institutions on screen
       | a request to swear an oath  | refusal |
 
   @INST-084
-  Scenario: The Institutions lens
-    When the player picks the Institutions lens
+  Scenario: The Institutions map mode
+    When the player picks the Institutions map mode
     Then the Emperor's land is gold and members' land light gold
     And seats carry a mark and imperial land held by outsiders is hatched
-    And the lens reads with patterns as well as colours
+    And the map mode reads with patterns as well as colours
 
   @INST-085
   Scenario Outline: The cards on a phone

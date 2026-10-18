@@ -41,7 +41,7 @@ Feature: Raising a lord to a subject
     Given the lord "L" of "France" holds 3 provinces
     When "France" raises "L"
     Then "L" no longer counts against the lord capacity of "France"
-    And "L" counts against the subject reach of "France"
+    And "L" counts against the subject limit of "France"
     And the provinces of "L" are no longer in the realm of "France"
     And "France" receives a Vassal's share instead of half his taxes
     And "L" may make friends abroad of its own
