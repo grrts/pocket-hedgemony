@@ -1314,7 +1314,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", heritage: "crown",
 };
 
 /**
@@ -1355,6 +1355,8 @@ function logNews(s: Snapshot): void {
   renderBattleWatch();
   // Learning: an invention learned, or nothing being studied, opens the Learning tab (RSCH-089).
   for (const x of news) if (x.kind === "invention" && x.nations.includes(me)) alertPlayer(x.text, "scroll", x.province === undefined ? { tab: "learning" } : { province: x.province });
+  // A seal cracks, an ambition is settled, a heyday wakes or a choice waits: one quiet line that opens the Heritage tab (HER-071).
+  for (const x of news) if (x.kind === "heritage" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "heritage" });
   askForStudy(s, news.some((x) => x.kind === "invention" && /Learned/.test(x.text)));
   for (const c of s.calls) {
     if (alerted.has(`call ${c.id}`)) continue;
@@ -1432,7 +1434,7 @@ const ALERTS_SHOWN = 3;
 const ALERT_MS = 12000;
 
 /** A short alert over the map, with Go there (to a province) or Answer (opens the dispatches). */
-function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true; tab?: "learning" } = {}): void {
+function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true; tab?: "learning" | "heritage" } = {}): void {
   if ([...alerts.children].some((el) => el.querySelector("span")?.textContent === text)) return;
   const el = document.createElement("div");
   el.className = "alert framed";
@@ -2926,7 +2928,7 @@ function renderRealm(r: number): void {
       ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
       ${mine ? foodLine(s, own) : ""}` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
-      ${heritageLine(strengths)}
+      ${heritageLine(strengths, s?.heritage[r] ?? null)}
     </dl>
     ${mine ? "" : (() => {
       const list = s ? s.commanders.filter((c) => c.owner === r) : n.commanders;
@@ -2939,7 +2941,7 @@ function renderRealm(r: number): void {
       .join("")}</div>` : ""}
     ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}`;
   const content =
-    realmTab === "heritage" ? heritageTab(strengths)
+    realmTab === "heritage" ? heritageTab(strengths, s?.heritage[r] ?? null, s ? s.nationTreasury[r]! : 0)
     : realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r))
     : realmTab === "government" && s?.government ? governmentTab(s.government)
     : realmTab === "treasury" ? treasurySection()
@@ -2999,6 +3001,12 @@ function renderRealm(r: number): void {
       provinceTab = "build";
       renderPanel();
     }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-heritage-counsel]").forEach((b) =>
+    b.addEventListener("click", () => void actHere({ type: "heritageCounsel", ambition: b.dataset.heritageCounsel! })),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-heritage-choice]").forEach((b) =>
+    b.addEventListener("click", () => void actHere({ type: "heritageChoice", id: b.dataset.heritageChoice! })),
   );
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-open-tab]").forEach((b) =>
     b.addEventListener("click", () => {

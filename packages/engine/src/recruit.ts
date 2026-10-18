@@ -9,6 +9,7 @@ import { campaigning, halt, isMarching } from "./turn.ts";
 import { spawnArmy, type World } from "./world.ts";
 import { atWar, controller, wallsOf, type News } from "./war.ts";
 import { armUnlocked, knownSet } from "./research.ts";
+import { heritageFactor } from "./heritage.ts";
 
 /**
  * Milestone 2, armies that cost something: wires the recruiting context (who
@@ -239,7 +240,7 @@ export function armyPay(world: World, slot: number): number {
   const by = menByArm(world, slot);
   let pay = 0;
   ARMS.forEach((arm, k) => (pay += armPay(arm, by[k]!)));
-  return gold(world, pay * kindMultiplier(kind));
+  return gold(world, pay * kindMultiplier(kind)) * (kind === KIND.hired ? heritageFactor(world, a.owner[slot]!, "hired_company_cost_pct") : 1);
 }
 
 /**
@@ -579,8 +580,8 @@ export function freeCompaniesFor(world: World, n: number): FreeCompany[] {
 }
 
 /** Treasury gold a free company costs a month: its arms' pay times the hired multiplier. */
-export function companyPay(world: World, c: FreeCompany): number {
-  return gold(world, ARMS.reduce((t, arm, k) => t + armPay(arm, c.byArm[k]!), 0) * kindMultiplier(KIND.hired));
+export function companyPay(world: World, c: FreeCompany, n = -1): number {
+  return gold(world, ARMS.reduce((t, arm, k) => t + armPay(arm, c.byArm[k]!), 0) * kindMultiplier(KIND.hired)) * heritageFactor(world, n, "hired_company_cost_pct");
 }
 
 /**
@@ -595,7 +596,7 @@ export function hireCompany(world: World, n: number, id: number, news: News[]): 
   const cap = capitalOf(world, n);
   if (controller(world, cap) !== n || world.sieges.has(cap)) return "your capital is under siege: no company will come";
   if (!wf.overCap(world.nationCapUsed[n]! + men, world.nationTroopCap[n]!).canRaise) return "that would go over your troop cap";
-  const cost = companyPay(world, c);
+  const cost = companyPay(world, c, n);
   if (cost > world.nationTreasury[n]!) return "not enough gold";
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
   const weeks = companyWeeks(world, c, n);
@@ -732,7 +733,8 @@ export function monthlyRecruits(world: World, news: News[]): void {
     const pool = { recruits: world.provinceRecruits[p]!, ceiling: world.provinceRecruitCeiling[p]! };
     // A muster master refills the pool faster (province officials table: +25 %).
     const muster = officialBonus(world, p, "Muster master", "recruit_refill");
-    rc.refill(pool as rc.ProvincePool, 1, rate * muster * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * crownShare(world, p));
+    const heritage = heritageFactor(world, world.provinceOwner[p]!, "recruit_refill_pct");
+    rc.refill(pool as rc.ProvincePool, 1, rate * muster * heritage * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * crownShare(world, p));
     world.provinceRecruits[p] = pool.recruits;
   }
   recomputeCap(world);

@@ -22,6 +22,7 @@ import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGameEvents, type GameEvents } from "./events.ts";
+import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 
@@ -132,6 +133,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   commanderSeed: number[];
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
+  /** Every realm's heritage in play: birthright, heydays, ambitions, legacies and burden (HER-078). */
+  heritage?: GameHeritage;
 }
 
 export interface ArmyPool {
@@ -450,13 +453,15 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedResearch(world);
   recount(world);
   refreshFreeCompanies(world);
-  // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
-  runLedger(world, false);
   // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
   syncCountries(world);
 
   // The event tree starts with the campaign, so its first month costs no more than any other.
   world.events = createGameEvents(world);
+  // Heritage reads the tree's ages, so it starts after it: three ambitions drawn, the birthright in force.
+  world.heritage = createGameHeritage(world);
+  // The ledger is worked out from the start, heritage's tax with it, so lenders and the treasury card know the realm's income.
+  runLedger(world, false);
   return world;
 }
 
