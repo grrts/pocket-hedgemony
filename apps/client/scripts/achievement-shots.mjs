@@ -57,6 +57,27 @@ for (const [name, device] of phones) {
   await shot("card-reach");
   const stored = await page.evaluate(() => localStorage.getItem("ph.profile.default.achievements"));
   console.log(name, "stored", stored?.slice(0, 120));
+  // A ladder at level 3 of 5, from a profile that has brought in 140 province harvests (ACH-086).
+  await page.evaluate(() => {
+    const p = JSON.parse(localStorage.getItem("ph.profile.default.achievements"));
+    Object.assign(p.unlocked, { first_harvest: "1445-09-01", harvests_10: "1445-09-01", harvests_100: "1452-09-01" });
+    p.totals = { provinces_harvested: 140 };
+    localStorage.setItem("ph.profile.default.achievements", JSON.stringify(p));
+  });
+  await page.reload();
+  await page.waitForSelector("[data-ach-open]", { timeout: 60000 });
+  await page.tap("[data-ach-open]");
+  await page.waitForTimeout(300);
+  // The first-campaign hint would cover the card in these shots.
+  await page.evaluate(() => document.querySelector("[data-hint=stop]")?.click());
+  await page.$eval("[data-ach=first_harvest]", (e) => e.scrollIntoView({ block: "center" }));
+  await page.waitForTimeout(200);
+  await shot("ladder-grid");
+  await page.tap("[data-ach=first_harvest]");
+  await page.waitForTimeout(300);
+  await page.$eval("#ach-detail", (e) => e.scrollIntoView({ block: "start" }));
+  await shot("ladder");
+  console.log(name, "ladder", await page.$eval("#ach-detail", (e) => e.innerText.replace(/\s+/g, " ")));
   await page.close();
 }
 await browser.close();

@@ -15,7 +15,7 @@ import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions
 import { answerEvent, monthlyEvents } from "./events.ts";
 import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
-import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameRouteMode, type GameTraderKind } from "./trade.ts";
+import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameTraderKind } from "./trade.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
@@ -142,8 +142,8 @@ export type Order =
   | { type: "reform"; to: string }
   /** Found a trader in an own city (TRADE-003), set its route of 2 to 8 cities (TRADE-050), draw one for its preview (TRADE-054), or dismiss it (TRADE-006). */
   | { type: "foundTrader"; city: number; kind: GameTraderKind }
-  | { type: "setTradeRoute"; trader: number; stops: number[]; mode?: GameRouteMode }
-  | { type: "draftTradeRoute"; trader: number; stops: number[]; mode?: GameRouteMode }
+  | { type: "setTradeRoute"; trader: number; stops: number[] }
+  | { type: "draftTradeRoute"; trader: number; stops: number[] }
   | { type: "dismissTrader"; trader: number }
   /** Set the realm's Tongue policy (CULT-038), or a faith's policy from the next New Year (RELG-055). */
   | { type: "tonguePolicy"; policy: string }
@@ -383,9 +383,9 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "foundTrader":
       return foundTrader(world, actingNation, order.city, order.kind);
     case "setTradeRoute":
-      return setTradeRoute(world, actingNation, order.trader, order.stops, order.mode);
+      return setTradeRoute(world, actingNation, order.trader, order.stops);
     case "draftTradeRoute":
-      return draftTradeRoute(world, actingNation, order.trader, order.stops, order.mode);
+      return draftTradeRoute(world, actingNation, order.trader, order.stops);
     case "dismissTrader":
       return dismissTrader(world, actingNation, order.trader);
     case "tonguePolicy":
