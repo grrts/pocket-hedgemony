@@ -7,6 +7,7 @@ import { stabilityOf } from "./stability.ts";
 import { cedeProvince, controller, type News } from "./war.ts";
 import type { World } from "./world.ts";
 import { noteChoice } from "./achievements.ts";
+import { traitLean } from "./rulers.ts";
 
 /**
  * Milestone 6, history (first slice): the 1444 event tree fires in the game.
@@ -65,6 +66,7 @@ export function createGameEvents(world: World): GameEvents {
   for (const id of treeId) evt.country(tree, id).stats = { ...bridge.start.country };
   const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods });
   state.conditions = {};
+  leanByTraits(world, state, nationOf);
   evt.startCampaign(state, world.date.year);
   const knownAtStart = world.nationIds.map((_, n) => world.research[n]?.known.size ?? 0);
   const g: GameEvents = { state, rng: new Rng(world.weatherSeed ^ 0x5eed), treeId, nationOf, places, eventRelations: [], adjust: {}, stability: new Map(), knownAtStart };
@@ -80,6 +82,14 @@ export function createGameEvents(world: World): GameEvents {
   for (const ev of Object.values(state.events)) evt.eligible(state, ev);
   state.bound = bound;
   return g;
+}
+
+/** The chooser's ruler's traits lean the AI's pick (REALM-104). */
+function leanByTraits(world: World, state: evt.EventState, nationOf: Map<string, number>): void {
+  state.lean = (chooser, o) => {
+    const n = nationOf.get(chooser);
+    return n === undefined ? 1 : traitLean(world, n, o.effects);
+  };
 }
 
 /** A tree statistic, with legitimacy and stability read from the realm (D-EVT-4, D-EVT-17). */
@@ -430,7 +440,7 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
 // ---------------------------------------------------------------- saves
 
 /** What a save keeps of the event tree: its world and clock, the dice and the bridge's own records (not the data). */
-export type SavedEvents = Omit<evt.EventState, "rules" | "events" | "ages" | "periods" | "log" | "conditions" | "effects" | "mayRefire"> & {
+export type SavedEvents = Omit<evt.EventState, "rules" | "events" | "ages" | "periods" | "log" | "conditions" | "effects" | "mayRefire" | "lean"> & {
   rng: number[];
   eventRelations: GameEvents["eventRelations"];
   /** The game's own adjustments ("adjust" would read as map adjacency to the save checks). */
@@ -440,7 +450,7 @@ export type SavedEvents = Omit<evt.EventState, "rules" | "events" | "ages" | "pe
 export function saveEvents(world: World): SavedEvents | undefined {
   const g = world.events;
   if (!g) return undefined;
-  const { rules: _r, events: _e, ages: _a, periods: _p, log: _l, conditions: _c, effects: _f, mayRefire: _m, ...kept } = g.state;
+  const { rules: _r, events: _e, ages: _a, periods: _p, log: _l, conditions: _c, effects: _f, mayRefire: _m, lean: _n, ...kept } = g.state;
   return { ...kept, rng: [...g.rng.state], eventRelations: g.eventRelations, shifts: g.adjust };
 }
 

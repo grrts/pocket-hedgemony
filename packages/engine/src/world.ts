@@ -26,6 +26,9 @@ import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { createTradeState, seedTrade, type TradeState } from "./trade.ts";
 import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
+import { createRulerState, seedRulers, type RulerState } from "./rulers.ts";
+import { createFallenState, type FallenState } from "./fallen.ts";
+import { createBeliefState, readBeliefShares, type BeliefState } from "./belief.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
 import { createRevolutionState, type RevolutionState } from "./revolutions.ts";
@@ -40,7 +43,7 @@ import type { AchievementLog } from "./achievements.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -434,6 +437,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     navy: createNavyState(P),
     explore: createExplorationState(P, N),
     ...createPeoplesState(P, N),
+    ...createRulerState(N, seed),
+    ...createFallenState(N),
+    ...createBeliefState(N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -459,6 +465,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedOfficials(world);
   seedGovernment(world);
   seedPeoples(world);
+  // Rulers read the lords, for a child ruler's regent, and the government form, for the throne law.
+  seedRulers(world);
+  readBeliefShares(world);
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where

@@ -1,3 +1,7 @@
+import { realmConfig } from "./domain/realm/index.ts";
+import { rulerViews, type RulerView } from "./rulers.ts";
+import { fallenEffect, type FallenEffect } from "./fallen.ts";
+import { lowFaith, lowTongue } from "./belief.ts";
 import { heritageViews, type HeritageView } from "./heritage.ts";
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
 import { achievementsView, startAchievements } from "./achievements.ts";
@@ -31,7 +35,7 @@ import { Rng } from "./rng.ts";
 import { explorationView, type ExplorationView } from "./colonies.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { officialAt, yearsServed } from "./officials.ts";
-import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
+import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
 export interface CompanyView {
@@ -131,6 +135,12 @@ export interface Snapshot {
   statecraft: StatecraftView | null;
   /** Each realm's heritage in play by nation index (null: none recorded); ambitions only for the player's realm (HER-078). */
   heritage: (HeritageView | null)[];
+  /** Each realm's ruler by nation index (REALM-240). */
+  rulers: RulerView[];
+  /** The player's fallen of the last ten years and what they do (REALM-241); null without a player. */
+  fallen: FallenEffect | null;
+  /** Whether the player's Faith % or Tongue % is low enough to stir risings (REALM-238), and the bar. */
+  beliefLow: { faith: boolean; tongue: boolean; under: number } | null;
   /** The map's diplomacy lens: each realm's relation to the player, leagues, envoys on the road and war aims (DIPL-209); null without a player. */
   diplomacyLens: DiplomacyLensView | null;
   /** Sieges under way: months gone, how far into the next siege month (0..1), breaches and men inside. */
@@ -220,8 +230,14 @@ export interface Snapshot {
   provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
   peoples: PeoplesSnapshot;
-  /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
-  musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
+  /** The player's men gathering in provinces: men still to come, days to the next thousand and to the last. */
+  musters: { province: number; men: number; daysLeft: number; daysAll: number }[];
+  /** Days each thousand of the player's levy takes to gather (RECR-106). */
+  gatherDays: number;
+  /** The Garrison tab of each province where the player has men gathering or troops without a commander (PROV-302). */
+  garrisons: GarrisonView[];
+  /** The player's provinces where an army can train now: a castle or drill yard of its own, not besieged (RECR-109). */
+  trainingGrounds: number[];
   /** The player's free companies on their way to the capital. */
   mercs: (CompanyView & { weeksLeft: number })[];
   /** Free companies the player can hire: their pay a month (paid at once on hiring) and weeks to reach the capital. */
@@ -376,6 +392,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       relations,
       statecraft: statecraftView(w, player),
       heritage: heritageViews(w),
+      rulers: rulerViews(w),
+      fallen: player >= 0 ? fallenEffect(w, player) : null,
+      beliefLow: player >= 0 ? { faith: lowFaith(w, player), tongue: lowTongue(w, player), under: realmConfig.belief.low_percent } : null,
       events: eventCards(w, player),
       diplomacyLens: diplomacyLensView(w, player),
       sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
@@ -461,7 +480,10 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         return { provinceTradeSeen: seen, provinceGoods: goods };
       })(),
       peoples: peoplesSnapshot(w),
-      musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
+      musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, daysLeft: m.daysLeft, daysAll: daysToGather(w, m) })),
+      gatherDays: player >= 0 ? gatherDays(w, player) : 14,
+      garrisons: player >= 0 ? garrisonViews(w, player) : [],
+      trainingGrounds: player >= 0 ? trainingGrounds(w, player) : [],
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c, player), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
