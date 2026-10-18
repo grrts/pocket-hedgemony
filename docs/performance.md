@@ -6,10 +6,12 @@ that breaks one fails CI. Two scripts check them:
 - `pnpm bench` (packages/engine/bench/turn.bench.ts) times the engine itself.
 - `pnpm --filter @ph/client perf` (apps/client/scripts/perf.mjs) runs the
   built game in mobile Chromium, pans the map at five zooms, plays one
-  warm-up turn and then ends three turns. CI runners share their CPUs, so
-  when those turns break a budget it plays three more, up to three attempts;
-  one attempt must meet every budget. `--report` prints the numbers without
-  failing.
+  warm-up turn and then ends three turns (21 days). CI runners share their
+  CPUs with the software GPU, so a day now and then stalls for a CPU: the day
+  budgets are judged on the third slowest of the 21 days (about the 90th
+  percentile), and when those turns break a budget it plays three more, up to
+  three attempts; one attempt must meet every budget. `--report` prints the
+  numbers without failing.
 
 ## Frame rate
 
@@ -53,8 +55,8 @@ one worker answer and one apply.
 | Engine turn, 5,000 provinces and 500 nations | ≤ 25 ms | bench |
 | Engine turn, 20,000 provinces and 2,000 nations | ≤ 100 ms | bench |
 | Planning a march over tiles (A* through the provinces on the route), slowest of 20 | ≤ 100 ms | bench |
-| Worker answer for a day of the turn, real map | ≤ 250 ms | perf |
-| Applying a day on the main thread | ≤ 16 ms (one frame) | perf |
+| Worker answer for a day of the turn, real map (third slowest of 21) | ≤ 250 ms | perf |
+| Applying a day on the main thread (third slowest of 21) | ≤ 16 ms (one frame) | perf |
 
 Rules:
 

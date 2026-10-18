@@ -1,4 +1,5 @@
 import { crownShare } from "./lords.ts";
+import { refillPaces } from "./fallen.ts";
 import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
@@ -890,12 +891,15 @@ export function weeklyMusters(world: World, news: News[], days = 7): void {
 export function monthlyRecruits(world: World, news: News[]): void {
   const rate = rc.refillRate() / 12;
   const empty = rc.emptyProvinceEffect("Leave it").recruits;
+  // Many fallen in the last ten years slow the refill (REALM-096).
+  const fallen = refillPaces(world);
   for (let p = 0; p < world.provinceCount; p++) {
     const pool = { recruits: world.provinceRecruits[p]!, ceiling: world.provinceRecruitCeiling[p]! };
     // A muster master refills the pool faster (province officials table: +25 %).
     const muster = officialBonus(world, p, "Muster master", "recruit_refill");
     const heritage = heritageFactor(world, world.provinceOwner[p]!, "recruit_refill_pct");
-    rc.refill(pool as rc.ProvincePool, 1, rate * muster * heritage * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * crownShare(world, p));
+    const owner = world.provinceOwner[p]!;
+    rc.refill(pool as rc.ProvincePool, 1, rate * muster * heritage * (owner >= 0 ? fallen[owner]! : 1) * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * crownShare(world, p));
     world.provinceRecruits[p] = pool.recruits;
   }
   recomputeCap(world);
