@@ -2545,6 +2545,8 @@ button.land-tile.on {
 .land-tile.use-waste { background: #b8a690; }
 .land-tile.use-shore { background: #8cc0d8; }
 .land-tile.use-town { background: #d8b8a0; }
+/* A worn field: the fields colour, faded and striped, so it reads without colour too (PROV-034). */
+.land-tile.use-fields.worn { background: repeating-linear-gradient(135deg, #d8c070 0 6px, #b8a46a 6px 10px); }
 .land-sheet {
   margin: 4px 0 8px;
   padding: 6px 8px;

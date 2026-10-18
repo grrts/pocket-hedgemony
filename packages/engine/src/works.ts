@@ -6,7 +6,7 @@ import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { buildingType, siteKind, townAtLeast, type TownSize } from "./domain/buildings/index.ts";
 import { invention, startingKnowledgeFor } from "./domain/research/index.ts";
 import { CHANGES, changeRows, changeTitle, changeUses, changing, type ChangeRow } from "./conversion.ts";
-import { classFood, FOOD_CLASSES, jobSlots, precious, roughWaste, saltCoast, seamWare, tileCount, tilesOf, tileWares, USES, type FoodClass, type UseName } from "./land.ts";
+import { classFood, FOOD_CLASSES, jobSlots, precious, roughWaste, saltCoast, seamWare, tileCount, tilesOf, tileWares, USES, wearYearsOf, wornFields, type FoodClass, type UseName } from "./land.ts";
 import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
 import { yearlyFood } from "./food.ts";
 import { provinceConfig } from "./domain/province/model.ts";
@@ -662,6 +662,10 @@ export interface LandTileRow {
   changes: ChangeRow[];
   /** The change under way on this tile, if any. */
   changing?: { title: string; to: UseName; monthsLeft: number; months: number };
+  /** Fields only: worn by overwork, it gives half until it rests (PROV-034, PROV-035). */
+  worn?: { restedYears: number; restYears: number };
+  /** Fields only: years the fields have been farmed with more farmers than they hold, and the years that wears one. */
+  overwork?: { years: number; wearsAt: number };
 }
 
 /** The work that works each tile use, and the class on it. */
@@ -701,8 +705,14 @@ export function landSheet(world: World, p: number): LandTileRow[] {
     const changes = changeRows(world, world.provinceOwner[p]!, p, use);
     // A change takes the last tile of its use, so it shows on the last of the use's row.
     const under = changing(world, p) && changeUses(CHANGES[world.provinceChange[p]!]!)[0] === use;
+    // Worn fields are the last of the use's row and feed half what a sound one does.
+    const worn = use === "fields" ? wornFields(world, p) : 0;
+    const sound = fed / (count - worn * (1 - provinceConfig.worn.output));
+    const overwork = use === "fields" && world.provinceOverwork[p]! > 0 ? { years: world.provinceOverwork[p]!, wearsAt: Math.round(wearYearsOf(world, p)) } : undefined;
     for (let i = 0; i < count; i++) {
-      const row: LandTileRow = { use, building, workers: workers / count, feeds: fed / count, ware, changes, ...(game ? { game } : {}), ...(seam ? { seam } : {}) };
+      const isWorn = i >= count - worn;
+      const row: LandTileRow = { use, building, workers: workers / count, feeds: isWorn ? sound * provinceConfig.worn.output : sound, ware, changes, ...(game ? { game } : {}), ...(seam ? { seam } : {}), ...(overwork ? { overwork } : {}) };
+      if (isWorn) row.worn = { restedYears: world.provinceRested[p]!, restYears: provinceConfig.worn.recovery_years };
       if (under && i === count - 1) row.changing = { title: changeTitle(CHANGES[world.provinceChange[p]!]!), to: changeUses(CHANGES[world.provinceChange[p]!]!)[1], monthsLeft: world.provinceChangeLeft[p]!, months: world.provinceChangeMonths[p]! };
       rows.push(row);
     }

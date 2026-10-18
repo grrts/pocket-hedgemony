@@ -32,14 +32,32 @@ export function provinceLand(s: Snapshot, p: number, chosen: number): string {
   const pct = needs > 0 ? Math.round((fed / needs) * 100) : 100;
   const grid = tiles
     .map(
-      (t, i) => `<button class="land-tile use-${t.use}${i === chosen ? " on" : ""}" data-land-tile="${i}" aria-pressed="${i === chosen}" title="${esc(USE_TEXT[t.use]!.name)}">
-        <b>${esc(USE_TEXT[t.use]!.name)}</b>${t.changing ? `<small>→ ${esc(USE_TEXT[t.changing.to]!.name)}</small>` : t.building ? `<small>${esc(t.building)}</small>` : ""}</button>`,
+      (t, i) => `<button class="land-tile use-${t.use}${t.worn ? " worn" : ""}${i === chosen ? " on" : ""}" data-land-tile="${i}" aria-pressed="${i === chosen}" title="${esc(USE_TEXT[t.use]!.name)}${t.worn ? " (worn)" : ""}">
+        <b>${esc(USE_TEXT[t.use]!.name)}</b>${t.changing ? `<small>→ ${esc(USE_TEXT[t.changing.to]!.name)}</small>` : t.worn ? `<small>worn</small>` : t.building ? `<small>${esc(t.building)}</small>` : ""}</button>`,
     )
     .join("");
   return `
     <p class="${pct < 100 ? "warn" : ""}">${icon("scroll", 1)} The land feeds <b>${people(fed)}</b> of ${people(needs)} people in a normal year (<b>${pct} %</b>).</p>
+    ${feverLine(s, p)}
     <div class="land-grid" role="group" aria-label="Tiles">${grid}</div>
     ${chosen >= 0 && tiles[chosen] ? tileSheet(s, p, tiles[chosen]!) : `<p class="hint">Tap a tile to see who works it and what would work it better.</p>`}`;
+}
+
+/** What each step of fever land means for the people who come here (PROV-243). */
+const FEVER_TEXT = ["", "Soldiers and settlers born elsewhere sicken and some die here; locals mostly don't.", "Many soldiers and settlers born elsewhere die here each year; locals mostly don't.", "Soldiers and settlers born elsewhere die here in droves; locals mostly don't."];
+
+/** The province's fever land under the food line, when it has any. */
+function feverLine(s: Snapshot, p: number): string {
+  const step = s.provinceFever[p] ?? 0;
+  if (!step) return "";
+  return `<p class="${step >= 2 ? "warn" : ""}"><b>${esc(cap(s.feverSteps[step]!))} fever land.</b> ${FEVER_TEXT[step]} Ground, the tropics and marsh tiles set it; draining the marsh lowers it.</p>`;
+}
+
+/** What wearing means for a fields tile: worn and resting, or the years of overwork so far. */
+function wearFacts(t: LandTileRow): string {
+  if (t.worn) return `<dt>Worn</dt><dd>gives half: farmed too hard for too long. It recovers after ${t.worn.restYears} years unneeded${t.worn.restedYears ? ` (${t.worn.restedYears} so far)` : "; fewer farmers than the sound fields hold let it rest"}.</dd>`;
+  if (t.overwork) return `<dt>Overworked</dt><dd>more farmers than the fields hold for ${t.overwork.years} years; a field wears at ${t.overwork.wearsAt}. Rotation inventions make it rarer.</dd>`;
+  return "";
 }
 
 function tileSheet(s: Snapshot, p: number, t: LandTileRow): string {
@@ -51,6 +69,7 @@ function tileSheet(s: Snapshot, p: number, t: LandTileRow): string {
     t.seam ? `<dt>Seam</dt><dd>${esc(t.seam.ware)}, ${t.seam.years} years of digging left</dd>` : t.use === "waste" ? `<dt>Seam</dt><dd>none found</dd>` : "",
     t.ware ? `<dt>Gives</dt><dd>${t.ware.amount.toFixed(1)} loads of ${esc(t.ware.name)} a year</dd>` : "",
     `<dt>Worked by</dt><dd>${t.building ? esc(cap(t.building)) : "no building: bare land"}</dd>`,
+    wearFacts(t),
   ].join("");
   // One action per building that works this use: its Build or Improve button, or why it can't be built.
   const action = text.works

@@ -6,7 +6,7 @@ import { harvestClimate, harvestMonth, harvestMonthsAt, rollBaseHarvest, rotSeas
 import { knownSet } from "./research.ts";
 import { officialBonus } from "./officials.ts";
 import { worksFood } from "./works.ts";
-import { atHarvest, FOOD_CLASSES, huntingYear } from "./land.ts";
+import { atHarvest, FOOD_CLASSES, huntingYear, wearYear } from "./land.ts";
 import { shareFood } from "./castleFood.ts";
 import { provinceConfig } from "./domain/province/model.ts";
 import { heritageSteps } from "./heritage.ts";
@@ -123,6 +123,8 @@ export function monthlyFood(world: World, news: News[]): void {
     world.provinceStarved.fill(0);
     // The hunting year: game regrows or thins, and the north rolls its winters (feedback 81).
     huntingYear(world, (p) => regionOf(world, p));
+    // The wearing year: overworked fields wear, rested ones recover (PROV-034, PROV-035).
+    wearYear(world);
   }
 
   // Harvests: each province rolls its own, then its region's weather (rolled once, read by each climate) and war move it a band.

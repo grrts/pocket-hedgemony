@@ -3,7 +3,8 @@ import type { World } from "./world.ts";
 import type { Ground } from "@ph/rules";
 import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
 import { GROUNDS, groundOfCell, WATER } from "./tiles.ts";
-import { buildingOutput, peopleOutput } from "./domain/province/land.ts";
+import { buildingOutput, groundStartMix, peopleOutput, shareOut } from "./domain/province/land.ts";
+import { knownSet } from "./research.ts";
 import { provinceConfig } from "./domain/province/model.ts";
 
 /**
@@ -41,10 +42,16 @@ export interface LandState {
   provinceSeam: Int8Array;
   /** Years of digging left in each province's seam. */
   provinceSeamYears: Float32Array;
+  /** Fields tiles worn by overwork in each province: they give half until they rest (PROV-034, PROV-035). */
+  provinceWorn: Uint8Array;
+  /** Years in a row each province's fields have been farmed with more farmers than they hold. */
+  provinceOverwork: Uint8Array;
+  /** Years in a row each province's worn fields have rested, unneeded. */
+  provinceRested: Uint8Array;
 }
 
 export function createLandState(P: number): LandState {
-  return { provinceTiles: new Uint8Array(P * MAX_TILES), provinceLandYield: new Float32Array(P).fill(1), provinceGame: new Float32Array(P).fill(1), provinceHardWinter: new Uint8Array(P), provinceSeam: new Int8Array(P).fill(-1), provinceSeamYears: new Float32Array(P) };
+  return { provinceTiles: new Uint8Array(P * MAX_TILES), provinceLandYield: new Float32Array(P).fill(1), provinceGame: new Float32Array(P).fill(1), provinceHardWinter: new Uint8Array(P), provinceSeam: new Int8Array(P).fill(-1), provinceSeamYears: new Float32Array(P), provinceWorn: new Uint8Array(P), provinceOverwork: new Uint8Array(P), provinceRested: new Uint8Array(P) };
 }
 
 /** Tiles of a use in a province. */
@@ -70,20 +77,8 @@ export function tileUse(world: World, p: number, i: number): UseName | null {
 
 // ---------------------------------------------------------------- 1444
 
-/** How a square of each ground is shared between the tile uses (a stand-in for the map's own fields and pastures, D-PROV-25). */
-const GROUND_USES: Record<Ground, Partial<Record<UseName, number>>> = {
-  farmland: { fields: 0.8, pasture: 0.1, woods: 0.1 },
-  grassland: { fields: 0.45, pasture: 0.4, woods: 0.15 },
-  savanna: { pasture: 0.6, fields: 0.25, waste: 0.15 },
-  drylands: { pasture: 0.4, waste: 0.35, fields: 0.25 },
-  desert: { waste: 0.8, pasture: 0.15, fields: 0.05 },
-  hills: { pasture: 0.35, fields: 0.3, woods: 0.15, waste: 0.2 },
-  mountains: { waste: 0.5, pasture: 0.3, woods: 0.15, fields: 0.05 },
-  forest: { woods: 0.6, fields: 0.25, pasture: 0.15 },
-  jungle: { woods: 0.7, fields: 0.2, marsh: 0.1 },
-  marsh: { marsh: 0.6, fields: 0.25, pasture: 0.15 },
-  tundra: { waste: 0.5, woods: 0.35, pasture: 0.15 },
-};
+/** How a square of each ground is shared between the tile uses (the province config's ground.start_mix, a stand-in for the map's own fields and pastures, D-PROV-25). */
+const groundUses = (g: Ground): [UseName, number][] => Object.entries(groundStartMix(g)).map(([use, w]) => [use as UseName, w]);
 
 /**
  * Lays out every province's tiles from the map (PROV-010, PROV-011,
@@ -109,7 +104,7 @@ export function seedLand(world: World): void {
       if (g === WATER || g >= G) continue;
       byGround[(id - 1) * G + g]!++;
     }
-    const weights = GROUNDS.map((name) => Object.entries(GROUND_USES[name] ?? {}).map(([use, w]) => [U[use as UseName], w!] as const));
+    const weights = GROUNDS.map((name) => groundUses(name).map(([use, w]) => [U[use], w] as const));
     for (let p = 0; p < P; p++)
       for (let g = 0; g < G; g++) {
         const n = byGround[p * G + g]!;
@@ -126,12 +121,12 @@ export function seedLand(world: World): void {
   for (let p = 0; p < P; p++) {
     if (world.provinceWater[p]) continue;
     const ground = world.provinceGround[p] ?? "grassland";
-    if (squares[p] === 0) for (const [use, w] of Object.entries(GROUND_USES[ground])) mix[p * USES.length + U[use as UseName]] = w!;
+    if (squares[p] === 0) for (const [use, w] of groundUses(ground)) mix[p * USES.length + U[use]] = w;
     const scale = squares[p]! > 0 && hi > lo ? Math.min(1, Math.max(0, (Math.log(squares[p]!) - lo) / (hi - lo))) : 0.4;
     const count = Math.round(4 + (MAX_TILES - 4) * scale);
     const shore = world.rules.provinces[p]!.coastal ? Math.min(3, 1 + Math.floor(world.provinceClasses[p * CLASS_COUNT + seafolk]! / 6)) : 0;
     const land = Math.max(1, count - 1 - shore);
-    const uses = shareOut(mix.subarray(p * USES.length, (p + 1) * USES.length), land);
+    const uses = shareOut(mix.subarray(p * USES.length, (p + 1) * USES.length), land, U.fields);
     let i = p * MAX_TILES;
     const put = (u: number, n: number) => {
       for (let k = 0; k < n; k++) world.provinceTiles[i++] = u + 1;
@@ -143,23 +138,6 @@ export function seedLand(world: World): void {
   // Game starts where the 1444 hunting has left it, so nothing crashes in the first years.
   for (let p = 0; p < P; p++) if (!world.provinceWater[p]) world.provinceGame[p] = gameTarget(world, p);
   seedSeams(world);
-}
-
-/** Shares n tiles out by weight, largest remainder first. */
-function shareOut(weights: ArrayLike<number>, n: number): number[] {
-  let total = 0;
-  for (let i = 0; i < weights.length; i++) total += weights[i]!;
-  if (total <= 0) return Array.from(weights, (_, i) => (i === U.fields ? n : 0));
-  const exact = Array.from(weights, (w) => (w / total) * n);
-  const out = exact.map(Math.floor);
-  let left = n - out.reduce((a, b) => a + b, 0);
-  const order = exact.map((x, i) => [x - Math.floor(x), i] as const).sort((a, b) => b[0] - a[0]);
-  for (const [, i] of order) {
-    if (left <= 0) break;
-    out[i]!++;
-    left--;
-  }
-  return out;
 }
 
 // ---------------------------------------------------------------- food and wares
@@ -202,11 +180,91 @@ export function classFood(world: World, p: number, cls: FoodClass, step: number,
   const ground = world.provinceGround[p] ?? "grassland";
   const bareRate = BARE * peopleOutput(ground, work.activity);
   if (cls === "woodsmen") return huntingFood(world, p, workers, bareRate, step > 0 ? share : 0);
-  if (!work.building || step <= 0) return workers * bareRate;
-  const inside = Math.min(workers, tilesOf(world, p, CLASS_USE[cls]) * slots(work.building));
+  const room = tilesOf(world, p, CLASS_USE[cls]) * slots(work.building);
+  // Farmers fill the sound fields first; those on worn fields bring in half (PROV-034).
+  const onWorn = cls === "farmers" ? Math.max(0, Math.min(workers, room) - (room - wornFields(world, p) * slots(work.building))) : 0;
+  const wornLoss = 1 - WORN.output;
+  if (!work.building || step <= 0) return (workers - onWorn * wornLoss) * bareRate;
+  const inside = Math.min(workers, room);
   const rate = (cls === "farmers" ? world.rules.defines.works.farmRates[step - 1] ?? perWorker("farm") : perWorker(work.building)) * buildingOutput(ground, work.building);
   // Unpaid buildings give half: the rest of their workers count as on bare land.
-  return (workers - inside) * bareRate + inside * (rate * share + bareRate * (1 - share));
+  const inRate = rate * share + bareRate * (1 - share);
+  return (workers - inside) * bareRate + (inside - onWorn * wornLoss) * inRate;
+}
+
+// ---------------------------------------------------------------- worn fields (PROV-034, PROV-035)
+
+const WORN = provinceConfig.worn;
+
+/** Worn fields tiles of a province, never more than its fields. */
+export const wornFields = (world: World, p: number): number => Math.min(world.provinceWorn[p]!, tilesOf(world, p, "fields"));
+
+/** Years of overwork before a province's fields wear: 30, half as long again for each rotation invention its owner knows (D-PROV-31). */
+export function wearYearsOf(world: World, p: number): number {
+  const owner = world.provinceOwner[p]!;
+  const known = owner >= 0 ? knownSet(world, owner) : null;
+  return WORN.overwork_years * WORN.rotation_stretch ** (known ? WORN.rotation_inventions.filter((id) => known.has(id)).length : 0);
+}
+
+/**
+ * The wearing year, each January (PROV-034, PROV-035, D-PROV-31): fields farmed with more
+ * farmers than they hold, year after year, wear one tile at a time; a worn tile the sound
+ * fields can spare rests, and after 5 years of rest it is sound again.
+ */
+export function wearYear(world: World): void {
+  const farmers = CLASS_NAMES.indexOf("farmers");
+  const perTile = slots("farm");
+  for (let p = 0; p < world.provinceCount; p++) {
+    if (world.provinceWater[p]) continue;
+    const fields = tilesOf(world, p, "fields");
+    const worn = wornFields(world, p);
+    world.provinceWorn[p] = worn;
+    const people = world.provinceClasses[p * CLASS_COUNT + farmers]!;
+    if (fields > 0 && people > fields * perTile) {
+      world.provinceRested[p] = 0;
+      world.provinceOverwork[p] = Math.min(255, world.provinceOverwork[p]! + 1);
+      if (world.provinceOverwork[p]! >= wearYearsOf(world, p) && worn < fields) {
+        world.provinceWorn[p] = worn + 1;
+        world.provinceOverwork[p] = 0;
+      }
+      continue;
+    }
+    world.provinceOverwork[p] = 0;
+    if (worn > 0 && people <= (fields - worn) * perTile) {
+      world.provinceRested[p]!++;
+      if (world.provinceRested[p]! >= WORN.recovery_years) {
+        world.provinceWorn[p] = worn - 1;
+        world.provinceRested[p] = 0;
+      }
+    } else world.provinceRested[p] = 0;
+  }
+}
+
+// ---------------------------------------------------------------- fever land (PROV-243)
+
+const FEVER = provinceConfig.fever_land;
+export const FEVER_STEPS = FEVER.steps as readonly string[];
+
+/**
+ * A province's fever land, 0 (none) to 3 (deadly), as the province context sets it
+ * (D-PROV-32): its ground, a step more in the tropics, a step more for every two marsh tiles,
+ * a step less for each of quinine and sanitation its owner knows.
+ */
+export function feverOf(world: World, p: number): number {
+  if (world.provinceWater[p]) return 0;
+  const ground = world.provinceGround[p] ?? "grassland";
+  const tropics = Math.abs(world.provincePlace[p]?.lat ?? 45) <= FEVER.tropics_lat ? FEVER.tropics_steps : 0;
+  const at = Math.min(FEVER_STEPS.length - 1, ((FEVER.by_ground as Record<string, number>)[ground] ?? 0) + tropics + Math.floor(tilesOf(world, p, "marsh") / FEVER.marsh_tiles_per_step));
+  if (at <= 0) return 0;
+  const owner = world.provinceOwner[p]!;
+  const known = owner >= 0 ? knownSet(world, owner) : null;
+  return Math.max(0, at - (known ? FEVER.lowered_by.filter((id) => known.has(id)).length : 0));
+}
+
+/** The extra yearly death rate of fever land: in full for people born elsewhere, a tenth for locals (PROV-102). Warfare reads it for armies. */
+export function feverDeathRateOf(world: World, p: number, bornHere: boolean): number {
+  const rate = (FEVER.deaths_born_elsewhere as Record<string, number>)[FEVER_STEPS[feverOf(world, p)]!] ?? 0;
+  return bornHere ? rate * FEVER.local_share : rate;
 }
 
 // ---------------------------------------------------------------- hunting (feedback 81)

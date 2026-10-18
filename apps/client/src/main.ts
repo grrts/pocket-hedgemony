@@ -4857,6 +4857,12 @@ Object.assign(globalThis, {
     const k = mine.find((j) => snapshot!.armies.commander[j]! >= 0) ?? mine[0];
     return k === undefined ? null : provinces[snapshot.armies.location[k]!]!.id;
   },
+  /** The first of the player's provinces with a worn field, by id (screenshots). */
+  __phWorn: () => {
+    if (!snapshot) return null;
+    const p = Object.keys(snapshot.landSheets).find((k) => snapshot!.landSheets[Number(k)]!.some((t) => t.worn));
+    return p === undefined ? null : provinces[Number(p)]!.id;
+  },
   /** Opens a province's overview by id. */
   __phSelect: (id: string) => {
     selected.clear();
