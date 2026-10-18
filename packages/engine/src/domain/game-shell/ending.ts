@@ -3,7 +3,7 @@
  * play on, the end date's wrap-up, closing sequence and final result, leaving
  * and coming back, a turn interrupted, and the one failure screen.
  */
-import { SHELL, push, replaceAll, topId, type Frame, type Shell } from "./stack.ts";
+import { SHELL, openStartScreen, push, replaceAll, topId, type Frame, type Shell } from "./stack.ts";
 import { raiseEvents, turnOf, type PendingEvent } from "./turn.ts";
 
 // ---------------------------------------------------------------------------
@@ -48,8 +48,8 @@ export function gameOverChoice(sh: Shell, choice: string, realmsOnMap: readonly 
     case "Play on as another realm":
       return { pick: realmsOnMap.filter((r) => r !== sh.campaign?.realm) };
     case "Main menu":
+      openStartScreen(sh, sh.campaign?.realm);
       sh.campaign = null;
-      replaceAll(sh, { id: "main_menu" });
       return { mainMenu: true };
     default:
       throw new Error(`No game over choice ${choice}`);
@@ -221,8 +221,8 @@ export function finalResultChoice(sh: Shell, choice: string): void {
     replaceAll(sh, { id: "map" });
   } else if (choice === "Credits") push(sh, { id: "credits", openedFrom: "final_result" });
   else if (choice === "Main menu") {
+    openStartScreen(sh, sh.campaign?.realm);
     sh.campaign = null;
-    replaceAll(sh, { id: "main_menu" });
   } else throw new Error(`No final result choice ${choice}`);
 }
 

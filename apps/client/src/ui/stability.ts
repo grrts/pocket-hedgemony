@@ -1,6 +1,7 @@
-import { stabilityPlaque as plaqueModel, stabilitySection as sectionModel, type RevolutionView, type Stability } from "@ph/engine";
+import { stabilityPlaque as plaqueModel, stabilitySection as sectionModel, type RevolutionView, type Stability, type Titles } from "@ph/engine";
 import { icon } from "../art/ui.ts";
 import { revolutionMark } from "./revolution.ts";
+import { DEFAULT_TITLES, cap } from "./titles.ts";
 
 /**
  * Stability on screen (realm REALM-203 to REALM-205, F-75): a plaque in the
@@ -23,9 +24,9 @@ export function stabilityPlaque(s: Stability, me: number, revo?: RevolutionView 
 }
 
 /** The General tab's Stability section: the step, what it means and the four pillars. */
-export function stabilitySection(s: Stability): string {
+export function stabilitySection(s: Stability, t: Titles = DEFAULT_TITLES): string {
   const m = sectionModel(s);
   return `<h3 class="sub">Stability: ${m.words}</h3>
     <p class="hint">${m.note} Tap a pillar to see what to mend.</p>
-    <div class="pillars">${m.pillars.map((p) => `<button class="paper pillar step-${p.step}" data-realm-open-tab="${p.opens}"><b>${p.label}</b><span>${p.line}</span><em>${p.words}</em></button>`).join("")}</div>`;
+    <div class="pillars">${m.pillars.map((p) => `<button class="paper pillar step-${p.step}" data-realm-open-tab="${p.opens}"><b>${p.opens === "lords" ? cap(t.lords) : p.opens === "officials" ? cap(t.officials) : p.label}</b><span>${p.opens === "lords" ? p.line.replace(/^No lords/, `No ${t.lords}`) : p.line}</span><em>${p.words}</em></button>`).join("")}</div>`;
 }
