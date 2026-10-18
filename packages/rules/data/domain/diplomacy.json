@@ -1,0 +1,1370 @@
+{
+ "$comment": "Diplomacy context config. 'relations' is copied from country-relations/config/relation-rules.json (relation model, matrix, actions, durations); the rest from diplomacy/diplomacy-rules.json. Every number is a placeholder balancing knob owned by game design. Subject kinds: the engine reads relations.subject_kinds only for labels; joining wars and own diplomacy follow the six kinds of subjects.json (X-8, D-DIPL-10).",
+ "schema_version": "1.0",
+ "_provisional": [
+  "actions.fund_rebels.gold_share_of_target_yearly_income",
+  "actions.fund_rebels.caught_chance_per_month",
+  "ledger.ties.backed_our_revolution",
+  "ledger.standing_limit",
+  "envoys.passage_denied_blocks_months",
+  "envoys.days_per_crossing_unit",
+  "eras.VI.pact_offensive_call_bonus"
+ ],
+ "relations": {
+  "layers": {
+   "hierarchy": {
+    "types": [
+     "subject"
+    ],
+    "rule": "A country has at most one direct overlord. Chains are allowed (a subject may have subjects); cycles are not."
+   },
+   "state": {
+    "types": [
+     "at_war",
+     "truce",
+     "alliance"
+    ],
+    "rule": "At most one state relation per unordered pair."
+   },
+   "stance": {
+    "types": [
+     "friendly",
+     "neutral",
+     "rival",
+     "hostile"
+    ],
+    "rule": "At most one stance per perspective (A towards B). A mutual stance record fills both perspectives; a one-way record fills only source towards target. With no stance stored, the game uses the default stance, which is not a historical claim."
+   }
+  },
+  "default_stance": "neutral",
+  "implied_stance": {
+   "$comment": "Effective stance when none is stored for a perspective: at war reads as hostile, allies read as friendly, everything else falls back to default_stance.",
+   "at_war": "hostile",
+   "alliance": "friendly"
+  },
+  "types": {
+   "alliance": {
+    "label": "Alliance",
+    "layer": "state",
+    "direction": "mutual",
+    "stored": true,
+    "definition": "A formal, mutual commitment to support one another in war.",
+    "applies_when": "There is a treaty, sworn league or documented joint war effort binding both sides. Friendship, marriage or a shared enemy alone is not enough.",
+    "duration": {
+     "kind": "open_ended",
+     "default_months": null,
+     "expires_on_end_date": false
+    },
+    "establish_actions": [
+     "form_alliance",
+     "peace_term_force_alliance"
+    ],
+    "terminate_actions": [
+     "break_alliance",
+     "declare_war",
+     "make_subject",
+     "country_destroyed"
+    ],
+    "ai": {
+     "call_to_arms_weight": 1.0,
+     "attack_ally_weight": -1.0
+    },
+    "modifiers": "alliance"
+   },
+   "friendly": {
+    "label": "Friendly",
+    "layer": "stance",
+    "direction": "mutual_or_one_way",
+    "stored": true,
+    "definition": "Active cooperation or warm diplomatic relations without a binding war commitment.",
+    "applies_when": "Documented cooperation: a peace treaty kept in good faith, dynastic or political partnership, joint diplomacy, or protection without formal subjection.",
+    "duration": {
+     "kind": "open_ended",
+     "decay_months": 240
+    },
+    "establish_actions": [
+     "improve_relations",
+     "royal_marriage",
+     "gift",
+     "event_outcome"
+    ],
+    "terminate_actions": [
+     "insult",
+     "declare_war",
+     "set_rival",
+     "event_outcome",
+     "decay"
+    ],
+    "ai": {
+     "alliance_candidate_weight": 0.5
+    },
+    "modifiers": "friendly"
+   },
+   "neutral": {
+    "label": "Neutral",
+    "layer": "stance",
+    "direction": "mutual_or_one_way",
+    "stored": true,
+    "definition": "No significant alignment or hostility.",
+    "applies_when": "Store it only when neutrality is itself a documented, meaningful fact (a declared neutrality, a deliberate abstention from a war both sides tried to draw the country into). Otherwise leave the pair empty and let the game apply the default stance.",
+    "duration": {
+     "kind": "open_ended"
+    },
+    "establish_actions": [
+     "declare_neutrality",
+     "decay"
+    ],
+    "terminate_actions": [
+     "any_stance_change"
+    ],
+    "ai": {},
+    "modifiers": "neutral"
+   },
+   "rival": {
+    "label": "Rival",
+    "layer": "stance",
+    "direction": "mutual_or_one_way",
+    "stored": true,
+    "definition": "Competition for territory, power, a throne, influence or trade.",
+    "applies_when": "A documented contested object: a disputed province, crown, trade route, sphere or office. Neighbourhood alone never makes a rivalry.",
+    "duration": {
+     "kind": "open_ended",
+     "min_months_before_change": 120
+    },
+    "establish_actions": [
+     "set_rival",
+     "event_outcome",
+     "peace_term_claim_left_open"
+    ],
+    "terminate_actions": [
+     "drop_rival",
+     "country_destroyed",
+     "contested_object_resolved"
+    ],
+    "ai": {
+     "war_target_weight": 0.6,
+     "ally_against_weight": 0.5
+    },
+    "modifiers": "rival"
+   },
+   "hostile": {
+    "label": "Hostile",
+    "layer": "stance",
+    "direction": "mutual_or_one_way",
+    "stored": true,
+    "definition": "Serious antagonism or an ongoing dispute that may lead to war: raiding, feuds, a revolt-in-waiting, a broken treaty.",
+    "applies_when": "Documented raids, open disputes, recent betrayal, or a subject openly working against its overlord. Stronger than rivalry; the two never coexist in one perspective.",
+    "duration": {
+     "kind": "open_ended",
+     "decay_months": 120,
+     "decays_to": "rival"
+    },
+    "establish_actions": [
+     "insult",
+     "border_raid",
+     "break_truce",
+     "event_outcome",
+     "war_ends_without_reconciliation"
+    ],
+    "terminate_actions": [
+     "improve_relations",
+     "peace_with_reconciliation",
+     "decay"
+    ],
+    "ai": {
+     "war_target_weight": 1.0,
+     "border_fort_weight": 0.5
+    },
+    "modifiers": "hostile"
+   },
+   "at_war": {
+    "label": "At War",
+    "layer": "state",
+    "direction": "mutual",
+    "stored": true,
+    "definition": "The two countries are actively fighting.",
+    "applies_when": "A declared war or campaign is in progress on the reference date, or a state of war continues with no peace or truce concluded.",
+    "duration": {
+     "kind": "until_peace",
+     "war_exhaustion_peace_months": 60
+    },
+    "establish_actions": [
+     "declare_war",
+     "join_war_as_ally",
+     "join_war_as_subject",
+     "independence_war",
+     "event_outcome"
+    ],
+    "terminate_actions": [
+     "make_peace",
+     "white_peace",
+     "country_destroyed"
+    ],
+    "ai": {},
+    "modifiers": "at_war"
+   },
+   "subject": {
+    "label": "Subject",
+    "layer": "hierarchy",
+    "direction": "directed",
+    "stored": true,
+    "source_role": "subject",
+    "target_role": "overlord",
+    "definition": "The source country is politically subordinate to the target and owes defined obligations (tribute, troops, homage, investiture).",
+    "applies_when": "A documented obligation exists: tribute actually owed, fief held, investiture received, estate within a composite crown. Influence, protection or cultural sway is not subjection.",
+    "duration": {
+     "kind": "open_ended"
+    },
+    "establish_actions": [
+     "peace_term_vassalize",
+     "diplomatic_vassalize",
+     "inheritance_union",
+     "event_outcome"
+    ],
+    "terminate_actions": [
+     "independence_war_won",
+     "release_subject",
+     "annex_subject",
+     "overlord_destroyed",
+     "event_outcome"
+    ],
+    "kinds": "subject_kinds",
+    "ai": {},
+    "modifiers": "subject"
+   },
+   "overlord": {
+    "label": "Overlord",
+    "layer": "hierarchy",
+    "direction": "directed",
+    "stored": false,
+    "derived_from": "subject",
+    "definition": "The country that holds authority over a subject. Always derived by reading a subject record from the other end; never stored.",
+    "applies_when": "Exactly when a subject record names this country as target."
+   },
+   "truce": {
+    "label": "Truce",
+    "layer": "state",
+    "direction": "mutual",
+    "stored": true,
+    "definition": "A temporary agreement not to resume hostilities after a conflict.",
+    "applies_when": "A truce or peace treaty concluded after a conflict is in force on the reference date. Use the treaty's own term as expires_on when one is recorded.",
+    "duration": {
+     "kind": "fixed",
+     "default_months": 60,
+     "historical_term_overrides_default": true
+    },
+    "establish_actions": [
+     "make_peace",
+     "white_peace",
+     "negotiate_truce",
+     "event_outcome"
+    ],
+    "terminate_actions": [
+     "expires",
+     "break_truce",
+     "form_alliance",
+     "make_subject"
+    ],
+    "ai": {
+     "break_truce_weight": -1.0
+    },
+    "modifiers": "truce"
+   }
+  },
+  "subject_kinds": {
+   "vassal": {
+    "label": "Vassal",
+    "obligations": [
+     "military_service",
+     "homage"
+    ],
+    "can_conduct_own_diplomacy": true,
+    "joins_overlord_wars": "defensive"
+   },
+   "tributary": {
+    "label": "Tributary",
+    "obligations": [
+     "tribute"
+    ],
+    "can_conduct_own_diplomacy": true,
+    "joins_overlord_wars": "never"
+   },
+   "personal_union": {
+    "label": "Junior partner in a personal union",
+    "obligations": [
+     "shared_ruler"
+    ],
+    "can_conduct_own_diplomacy": false,
+    "joins_overlord_wars": "always"
+   },
+   "estate": {
+    "label": "Constituent estate of a composite realm",
+    "obligations": [
+     "taxes",
+     "military_service"
+    ],
+    "can_conduct_own_diplomacy": false,
+    "joins_overlord_wars": "always",
+    "note": "Kingdoms, principalities, magnate blocs or leagues inside a larger crown that the catalogue records as separate actors."
+   },
+   "appanage": {
+    "label": "Appanage or princely apanage",
+    "obligations": [
+     "homage",
+     "military_service"
+    ],
+    "can_conduct_own_diplomacy": false,
+    "joins_overlord_wars": "always"
+   },
+   "fief": {
+    "label": "Fief held from a sovereign suzerain",
+    "obligations": [
+     "homage",
+     "census_or_investiture"
+    ],
+    "can_conduct_own_diplomacy": true,
+    "joins_overlord_wars": "never",
+    "note": "For example a kingdom held as a papal fief: real legal obligation, very high autonomy."
+   },
+   "colony": {
+    "label": "Overseas or colonial dependency",
+    "obligations": [
+     "governor_appointed",
+     "trade_monopoly"
+    ],
+    "can_conduct_own_diplomacy": false,
+    "joins_overlord_wars": "always"
+   },
+   "frontier_commandery": {
+    "label": "Frontier commandery or guard under imperial titles",
+    "obligations": [
+     "tribute_missions",
+     "border_service"
+    ],
+    "can_conduct_own_diplomacy": true,
+    "joins_overlord_wars": "never"
+   }
+  },
+  "autonomy_levels": [
+   "very_low",
+   "low",
+   "moderate",
+   "high",
+   "very_high"
+  ],
+  "compatibility": {
+   "$comment": "Pair-level rules, read regardless of direction. Pairs not listed are allowed. 'forbidden' is a validation error; 'redundant' is a warning (store only the stronger relation); 'allowed_with_note' must carry a note in the record.",
+   "rules": [
+    {
+     "a": "alliance",
+     "b": "at_war",
+     "result": "forbidden"
+    },
+    {
+     "a": "alliance",
+     "b": "truce",
+     "result": "forbidden"
+    },
+    {
+     "a": "at_war",
+     "b": "truce",
+     "result": "forbidden"
+    },
+    {
+     "a": "subject",
+     "b": "at_war",
+     "result": "forbidden",
+     "note": "A subject that fights its overlord has left the hierarchy: record the independence war, not both."
+    },
+    {
+     "a": "subject",
+     "b": "truce",
+     "result": "forbidden"
+    },
+    {
+     "a": "subject",
+     "b": "alliance",
+     "result": "forbidden",
+     "note": "The subject's obligations already cover what an alliance would."
+    },
+    {
+     "a": "subject",
+     "b": "neutral",
+     "result": "forbidden"
+    },
+    {
+     "a": "alliance",
+     "b": "hostile",
+     "result": "forbidden"
+    },
+    {
+     "a": "alliance",
+     "b": "neutral",
+     "result": "forbidden"
+    },
+    {
+     "a": "alliance",
+     "b": "friendly",
+     "result": "redundant",
+     "note": "Alliance already implies a friendly stance."
+    },
+    {
+     "a": "alliance",
+     "b": "rival",
+     "result": "allowed_with_note",
+     "note": "Allies may compete over a contested object (for example a throne or a frontier)."
+    },
+    {
+     "a": "at_war",
+     "b": "friendly",
+     "result": "forbidden"
+    },
+    {
+     "a": "at_war",
+     "b": "neutral",
+     "result": "forbidden"
+    },
+    {
+     "a": "subject",
+     "b": "friendly",
+     "result": "redundant",
+     "note": "A loyal subject is the default; store friendly only if it says more than loyalty."
+    },
+    {
+     "a": "subject",
+     "b": "hostile",
+     "result": "allowed_with_note",
+     "note": "A disloyal subject; feeds the revolt risk."
+    },
+    {
+     "a": "subject",
+     "b": "rival",
+     "result": "allowed_with_note",
+     "note": "A subject competing with its overlord for power."
+    }
+   ]
+  },
+  "precedence": {
+   "$comment": "When gameplay creates a relation that is incompatible with an existing one, the newer relation wins and ends the older one, except where an action is blocked by 'requires'. When two stored historical records conflict, validation fails: precedence never silently fixes data.",
+   "order": [
+    "at_war",
+    "truce",
+    "subject",
+    "alliance",
+    "hostile",
+    "rival",
+    "friendly",
+    "neutral"
+   ]
+  },
+  "actions": {
+   "declare_war": {
+    "requires": {
+     "no_relation": [
+      "alliance",
+      "truce"
+     ],
+     "not_subject_of_target": true
+    },
+    "ends": [
+     "friendly",
+     "neutral"
+    ],
+    "sets_stance_if_missing": "hostile",
+    "note": "Breaking an alliance or truce first is a separate action with its own cost."
+   },
+   "independence_war": {
+    "actor": "subject",
+    "ends": [
+     "subject"
+    ],
+    "creates": "at_war",
+    "sets_stance": "hostile",
+    "on_overlord_victory": "restore_subject"
+   },
+   "make_peace": {
+    "ends": [
+     "at_war"
+    ],
+    "creates": "truce",
+    "truce_months_from": "truce.duration.default_months",
+    "may_create": [
+     "subject"
+    ],
+    "stance_after": "keep_or_hostile"
+   },
+   "white_peace": {
+    "ends": [
+     "at_war"
+    ],
+    "creates": "truce",
+    "stance_after": "rival_if_hostile"
+   },
+   "extend_truce": {
+    "requires": {
+     "relation": "truce"
+    },
+    "sets": "expires_on",
+    "note": "Prolongs an existing truce; history did this repeatedly (England-France 1444-49)."
+   },
+   "break_truce": {
+    "ends": [
+     "truce"
+    ],
+    "sets_stance": "hostile",
+    "penalty": "truce_breaking"
+   },
+   "form_alliance": {
+    "requires": {
+     "stance_not": [
+      "hostile"
+     ],
+     "no_relation": [
+      "at_war"
+     ],
+     "not_subject_pair": true
+    },
+    "ends": [
+     "truce",
+     "neutral"
+    ],
+    "creates": "alliance"
+   },
+   "break_alliance": {
+    "ends": [
+     "alliance"
+    ],
+    "penalty": "alliance_breaking"
+   },
+   "make_subject": {
+    "ends": [
+     "alliance",
+     "truce",
+     "at_war",
+     "neutral"
+    ],
+    "creates": "subject"
+   },
+   "release_subject": {
+    "ends": [
+     "subject"
+    ],
+    "sets_stance": "friendly"
+   },
+   "set_rival": {
+    "requires": {
+     "contested_object": true
+    },
+    "ends": [
+     "friendly",
+     "neutral"
+    ],
+    "creates": "rival"
+   },
+   "insult": {
+    "ends": [
+     "friendly"
+    ],
+    "creates": "hostile"
+   },
+   "improve_relations": {
+    "steps": [
+     "hostile",
+     "rival",
+     "neutral",
+     "friendly"
+    ]
+   },
+   "truce_expires": {
+    "ends": [
+     "truce"
+    ]
+   },
+   "country_destroyed": {
+    "ends": [
+     "all"
+    ]
+   }
+  },
+  "fact_types": {
+   "$comment": "Diplomatic facts are optional context attached to a pair. They are not relations, never block or imply a relation type, and feed modifiers only.",
+   "royal_marriage": {
+    "direction": "mutual"
+   },
+   "dynastic_claim": {
+    "direction": "directed",
+    "source_role": "claimant",
+    "target_role": "claimed"
+   },
+   "territorial_claim": {
+    "direction": "directed",
+    "source_role": "claimant",
+    "target_role": "holder"
+   },
+   "trade_agreement": {
+    "direction": "mutual_or_one_way"
+   },
+   "secondary_tribute": {
+    "direction": "directed",
+    "source_role": "payer",
+    "target_role": "receiver",
+    "note": "Tribute paid to a power other than the single direct overlord (dual tributaries), or protection money."
+   },
+   "shared_ruler": {
+    "direction": "mutual",
+    "note": "Same ruler, no subordination recorded (or subordination recorded elsewhere)."
+   },
+   "membership": {
+    "direction": "directed",
+    "source_role": "member",
+    "target_role": "institution"
+   },
+   "religious_authority": {
+    "direction": "directed",
+    "source_role": "follower",
+    "target_role": "authority"
+   }
+  },
+  "confidence_levels": {
+   "high": "Stated in standard scholarship; dates and parties secure.",
+   "medium": "Supported by scholarship, but the exact status, date or classification is debated or simplified for the game.",
+   "low": "Plausible and attested, but thinly or indirectly; listed in the uncertainty report."
+  },
+  "origin_values": {
+   "historical_start": "Present at the start date from the historical dataset. Mutable in play unless locked.",
+   "gameplay": "Created during play. Never written back to the historical dataset."
+  },
+  "modifiers": {
+   "hostile": {
+    "border_raid_chance_per_month": 0.02
+   },
+   "at_war": {
+    "trade_access": -1.0
+   }
+  },
+  "reference_date": "1444-11-11",
+  "proposed_fact_types": {
+   "protection_pledge": {
+    "direction": "directed",
+    "source_role": "protector",
+    "target_role": "protected",
+    "note": "Proposed by diplomacy 6.6 (OQ-DIPL-7)."
+   }
+  }
+ },
+ "envoys": {
+  "seats": {
+   "base": 1,
+   "extra_if_provinces_over": {
+    "provinces": 10,
+    "seats": 1
+   },
+   "inventions": {
+    "G5": 1,
+    "G8": 1
+   },
+   "inventions_never_lost": true
+  },
+  "source": "official",
+  "source_without_officials": "lord",
+  "lord_loyalty_step_lost_if_mission_months_over": 12,
+  "days_per_crossing_unit": 2,
+  "months_at_court": 1,
+  "instant_if_both_know": "T14",
+  "instant_excludes": [
+   "arrange_marriage",
+   "make_resident"
+  ],
+  "official_type_bonus": {
+   "judge": {
+    "actions": [
+     "peace_offer",
+     "demand",
+     "swear_peace"
+    ],
+    "reason": 10
+   },
+   "customs_officer": {
+    "actions": [
+     "trade_pact",
+     "ask_passage"
+    ],
+    "reason": 10
+   },
+   "chaplain": {
+    "actions": [
+     "*"
+    ],
+    "only_if": "same_faith",
+    "reason": 10
+   },
+   "steward": {
+    "actions": [
+     "send_gift"
+    ],
+    "gift_multiplier": 1.25
+   },
+   "tax_collector": {
+    "actions": [
+     "send_gift"
+    ],
+    "gift_multiplier": 1.25
+   },
+   "marshal": {
+    "actions": [
+     "propose_alliance",
+     "call_to_arms"
+    ],
+    "reason": 10
+   },
+   "warden": {
+    "actions": [
+     "propose_alliance",
+     "call_to_arms"
+    ],
+    "reason": 10
+   },
+   "muster_master": {
+    "actions": [
+     "propose_alliance",
+     "call_to_arms"
+    ],
+    "reason": 10
+   },
+   "schoolmaster": {
+    "actions": [
+     "arrange_marriage",
+     "court_lord"
+    ],
+    "reason": 10
+   },
+   "master_of_works": {
+    "actions": [],
+    "reason": 0
+   }
+  },
+  "years_served_bonus": {
+   "at_years": 10,
+   "reason": 5
+  },
+  "resident_years_bonus": {
+   "at_years": 5,
+   "reason": 5
+  },
+  "resident": {
+   "requires_invention": "G8",
+   "reveals": [
+    "soldiers",
+    "treasury_rounded_100",
+    "lord_loyalty"
+   ],
+   "war_warning_months": 1
+  },
+  "passage_denied_blocks_months": 24,
+  "held": {
+   "on_war_with_host": true,
+   "peace_envoy_never_held": true,
+   "refused_demand_by_hostile_chance": 0.1
+  }
+ },
+ "ledger": {
+  "max_entries_per_pair": 12,
+  "fade": "linear_yearly",
+  "stance_lines": {
+   "alliance": 50,
+   "friendly": 30,
+   "neutral": 0,
+   "rival": -30,
+   "hostile": -75,
+   "at_war": -100,
+   "truce": -10
+  },
+  "ties": {
+   "married_houses": {
+    "weight": 15,
+    "max": 30,
+    "lasts": "while_marriage",
+    "name": "Married houses"
+   },
+   "gift": {
+    "weight_per_gold": 0.2,
+    "max": 30,
+    "fade_years": 10,
+    "name": "Gift"
+   },
+   "courtesy_visit": {
+    "weight": 15,
+    "fade_years": 5,
+    "name": "Courtesy visit"
+   },
+   "resident_envoy": {
+    "weight_per_season": 5,
+    "max": 30,
+    "lasts": "while_resident",
+    "fade_years_after": 5,
+    "name": "Resident envoy"
+   },
+   "fought_side_by_side": {
+    "weight": 15,
+    "fade_years": 20,
+    "name": "Fought side by side"
+   },
+   "answered_our_call": {
+    "weight": 20,
+    "fade_years": 20,
+    "name": "Answered our call"
+   },
+   "share_a_rival": {
+    "weight": 15,
+    "lasts": "while_true",
+    "name": "Share a rival"
+   },
+   "same_faith": {
+    "weight": 10,
+    "lasts": "while_true",
+    "owner": "religion",
+    "name": "Same faith"
+   },
+   "same_culture_group": {
+    "weight": 5,
+    "lasts": "while_true",
+    "owner": "culture",
+    "name": "Same culture group"
+   },
+   "trade_pact": {
+    "weight": 10,
+    "lasts": "while_true",
+    "name": "Trade pact"
+   },
+   "pledged_to_protect_us": {
+    "weight": 15,
+    "lasts": "while_true",
+    "name": "Pledged to protect us"
+   },
+   "freed_us": {
+    "weight": 40,
+    "fade_years": 30,
+    "name": "Freed us"
+   },
+   "backed_our_revolution": {
+    "weight": 25,
+    "fade_years": 30,
+    "name": "Backed our revolution"
+   }
+  },
+  "wrongs": {
+   "took_our_land": {
+    "weight_per_province": -10,
+    "fade_years": 20,
+    "name": "Took our land"
+   },
+   "broke_truce_or_alliance": {
+    "weight": -40,
+    "fade_years": 30,
+    "name": "Broke a truce with us / broke our alliance",
+    "names": {
+     "truce": "Broke a truce with us",
+     "alliance": "Broke our alliance"
+    }
+   },
+   "abandoned_us": {
+    "weight": -30,
+    "fade_years": 30,
+    "name": "Abandoned us"
+   },
+   "insulted_us": {
+    "weight": -20,
+    "fade_years": 10,
+    "name": "Insulted us"
+   },
+   "threatened_us": {
+    "weight": -15,
+    "fade_years": 10,
+    "name": "Threatened us"
+   },
+   "holds_claim_on_us": {
+    "weight": -20,
+    "lasts": "while_true",
+    "name": "Holds a claim on our land or throne"
+   },
+   "courted_our_lord": {
+    "weight": -25,
+    "fade_years": 10,
+    "name": "Courted our lord"
+   },
+   "embargo_against_us": {
+    "weight": -15,
+    "lasts": "while_true",
+    "name": "Embargo against us"
+   },
+   "hostile_faith": {
+    "weight_range": [
+     -25,
+     -10
+    ],
+    "lasts": "while_true",
+    "owner": "religion",
+    "name": "Different faith"
+   },
+   "notorious_deed": {
+    "weight_per_notoriety": -10,
+    "fade_years": 30,
+    "name": "Notorious deed"
+   },
+   "stirred_revolt_in_our_land": {
+    "weight": -50,
+    "fade_years": 20,
+    "name": "Stirred revolt in our land"
+   }
+  },
+  "standing_words": [
+   {
+    "min": 100,
+    "word": "close"
+   },
+   {
+    "min": 30,
+    "word": "warm"
+   },
+   {
+    "min": -29,
+    "word": "cool"
+   },
+   {
+    "min": -99,
+    "word": "cold"
+   },
+   {
+    "min": -200,
+    "word": "bitter"
+   }
+  ],
+  "merged_entry_name": "Old matters",
+  "standing_limit": 200,
+  "resident_envoy_season_months": 3
+ },
+ "reasons": {
+  "standing_divisor": 4,
+  "per_oath_broken": -10,
+  "relies_on_word": [
+   "propose_alliance",
+   "swear_peace",
+   "arrange_marriage",
+   "trade_pact",
+   "offer_overlordship"
+  ],
+  "strength": {
+   "allies_counted_at": 0.5,
+   "binding_asks": [
+    "propose_alliance",
+    "pledge_protection",
+    "offer_overlordship",
+    "ask_protection"
+   ],
+   "you_are_stronger_per_multiple": 10,
+   "you_are_stronger_max": 40,
+   "we_are_stronger_per_multiple": -10,
+   "we_are_stronger_max": -40,
+   "cannot_beat_you_per_multiple_beyond_1": 15,
+   "cannot_beat_you_max": 60,
+   "strong_friends_factor": -0.5,
+   "already_at_war_new_commitment": -30
+  },
+  "distance": {
+   "no_shared_border_or_neighbour": -15,
+   "envoy_days_over": {
+    "days": 60,
+    "reason": -15
+   }
+  },
+  "share_an_enemy": 25,
+  "frontier_threat_per_province": -5,
+  "allies_beyond_free": {
+   "free": 2,
+   "per_extra": -10
+  },
+  "ruler_traits": {
+   "pious_same_faith": 10,
+   "warlike_vs_swear_peace": -10,
+   "greedy_with_gift": 10
+  }
+ },
+ "actions": {
+  "propose_alliance": {
+   "envoy": true,
+   "base": -40,
+   "relations_action": "form_alliance"
+  },
+  "call_to_arms": {
+   "envoy": false,
+   "defensive": {
+    "base": -20,
+    "refusal": {
+     "ends": "alliance",
+     "oath_broken": true,
+     "wrong": "abandoned_us"
+    }
+   },
+   "offensive": {
+    "base": -50,
+    "refusal": {
+     "ends": null
+    }
+   },
+   "aim_is_our_concern": 30,
+   "enemy_stronger_per_multiple": -10,
+   "enemy_stronger_max": -40,
+   "separate_peace_when_peace_voices_over": 0.5
+  },
+  "break_alliance": {
+   "envoy": false,
+   "relations_action": "break_alliance",
+   "oath_broken": true,
+   "wrong": "broke_truce_or_alliance"
+  },
+  "arrange_marriage": {
+   "envoy": true,
+   "base": -15,
+   "their_house_greater": 10,
+   "per_existing_marriage": -10,
+   "claim_chance_per_heirless_death": 0.1
+  },
+  "demand": {
+   "envoy": true,
+   "base": -60,
+   "heartland_province": -30,
+   "kinds": {
+    "hand_over_province": {
+     "grants_aim": "take_land"
+    },
+    "pay_tribute": {
+     "grants_aim": "tribute"
+    },
+    "recognise_pretender": {
+     "grants_aim": "seat_pretender"
+    },
+    "release_subject": {
+     "grants_aim": "break_subject"
+    },
+    "tolerate_faith": {
+     "grants_aim": "defend_faith"
+    },
+    "apologise_and_pay": {
+     "grants_aim": "punish"
+    },
+    "expel_envoy_or_cut_alliance": {
+     "grants_aim": "punish"
+    }
+   },
+   "on_refusal": {
+    "aim_years": 5,
+    "provoked_by_target": true,
+    "our_offensive_call_bonus": 20,
+    "lords_not_warlike_waver": false
+   },
+   "wrong_to_target": "threatened_us"
+  },
+  "ask_passage": {
+   "envoy": true,
+   "base": -10,
+   "months": 24,
+   "revocable": true,
+   "marching_on_our_friend": -40,
+   "marching_on_our_enemy": 20,
+   "entering_without": {
+    "grants_aim_to_owner": "punish"
+   },
+   "requires_invention": "G8",
+   "before_invention": "closed_except_allies_and_subjects"
+  },
+  "trade_pact": {
+   "envoy": true,
+   "base": -10,
+   "relations_fact": "trade_agreement",
+   "tolls_waived": true
+  },
+  "embargo": {
+   "envoy": false,
+   "closes_paths": true
+  },
+  "pledge_protection": {
+   "envoy": false,
+   "relations_fact": "protection_pledge",
+   "refusal_is_oath_broken": true
+  },
+  "swear_peace": {
+   "envoy": true,
+   "base": -20,
+   "truce_months": 120,
+   "we_fear_you_per_multiple": 10,
+   "we_want_your_land": -30
+  },
+  "offer_overlordship": {
+   "envoy": true,
+   "base": -80,
+   "need_protector_per_threat": 20,
+   "already_pledged": 20,
+   "proud_per_castle_beyond_2": -10,
+   "owner": "subject_management"
+  },
+  "ask_protection": {
+   "envoy": true,
+   "base": -10,
+   "owner": "subject_management"
+  },
+  "court_lord": {
+   "envoy": true,
+   "requires_lord_loyalty": [
+    "wavering",
+    "disloyal"
+   ],
+   "loyalty_steps_per_season": 1,
+   "defect_after_months": 12,
+   "defect_needs_border": true,
+   "discovery_chance_per_season": 0.25
+  },
+  "send_gift": {
+   "envoy": true
+  },
+  "courtesy_visit": {
+   "envoy": true
+  },
+  "make_resident": {
+   "envoy": true,
+   "requires_invention": "G8"
+  },
+  "insult": {
+   "envoy": false,
+   "relations_action": "insult",
+   "grants_target_aim": "punish"
+  },
+  "declare_rival": {
+   "envoy": false,
+   "relations_action": "set_rival",
+   "requires_contested_object": true
+  },
+  "fund_rebels": {
+   "envoy": true,
+   "secret": true,
+   "target": "a revolution card in the target realm",
+   "needs_revolution_signs": 1,
+   "gold_share_of_target_yearly_income": 0.01,
+   "flag": "revolution_funded",
+   "caught_chance_per_month": 0.03,
+   "on_caught": {
+    "envoy": "held",
+    "wrong": "stirred_revolt_in_our_land",
+    "grants_target_aim": "punish",
+    "aim_years": 5
+   },
+   "if_revolution_wins": {
+    "tie": "backed_our_revolution",
+    "unless_regime_hostile_to_funder_form": true
+   }
+  }
+ },
+ "war_aims": {
+  "held_province_years": 50,
+  "refused_demand_years": 5,
+  "punish_years": 5,
+  "tribute_by_strength_multiple": 3,
+  "no_aim_wrong_to_neighbours": "threatened_us",
+  "regency_allows": [
+   "defensive",
+   "raid"
+  ]
+ },
+ "truce": {
+  "base_months": 60,
+  "extra_months_if_land_or_subject": 60,
+  "white_peace_months": 60
+ },
+ "leagues": {
+  "check": "yearly",
+  "threshold_by_era": {
+   "I": 8,
+   "II": 8,
+   "III": 8,
+   "IV": 6,
+   "V": 6,
+   "VI": 4,
+   "VII": 4
+  },
+  "base": -30,
+  "standing_divisor": -4,
+  "took_our_land_per_province": 10,
+  "lands_taken_per_province": 3,
+  "could_crush_us_per_multiple": {
+   "balancer": 10,
+   "bandwagoner": -10
+  },
+  "per_member": 5,
+  "same_faith": -10,
+  "min_members": 2,
+  "refusal_leaves_league": true,
+  "dissolve_below_share_of_threshold": 0.5
+ },
+ "eras": {
+  "III": {
+   "unlocks": [
+    "many_sided_peace"
+   ],
+   "or_event": "peace_of_westphalia"
+  },
+  "IV": {
+   "ties": {
+    "married_houses": {
+     "weight": 10
+    }
+   }
+  },
+  "V": {
+   "envoy_instant_invention": "T14"
+  },
+  "VI": {
+   "unlocks": [
+    "mobilisation_pact"
+   ],
+   "mobilisation_pact_auto_answers_defensive_call": true,
+   "mobilisation_pact_delivered_as": "event",
+   "mobilisation_event": "Our pact partner is attacked: we mobilise",
+   "pact_offensive_call_bonus": 10
+  },
+  "VII": {
+   "ties": {
+    "gift": {
+     "weight_per_gold": 0.1
+    }
+   }
+  }
+ },
+ "ai": {
+  "horizon": [
+   "neighbours",
+   "neighbours_of_neighbours",
+   "relation_or_fact_holders",
+   "enemies_of_rivals"
+  ],
+  "candidates_per_free_seat": 5,
+  "gift_first_if_total_at_least": -20,
+  "demand_before_war": true,
+  "posture": {
+   "mixed": {},
+   "bandwagoner": {
+    "alliance_with_stronger": 20,
+    "ask_protection": 20,
+    "league_vs_strong_per_multiple": -10
+   },
+   "opportunist": {
+    "join_war_on_stronger_side": 20,
+    "defensive_call_vs_stronger": -20,
+    "own_view_per_oath_broken": -5,
+    "courts_lords": true,
+    "funds_rebels_if_grievances_at_least": 2
+   },
+   "isolationist": {
+    "propose_alliance": -30,
+    "call_to_arms": -30,
+    "swear_peace": 20,
+    "trade_pact": 20,
+    "ask_passage": -20
+   },
+   "balancer": {
+    "league_vs_strong_per_multiple": 10,
+    "alliance_vs_strongest_neighbour": 20
+   },
+   "client_seeker": {
+    "offer_overlordship_from_stronger_warm": 30,
+    "pledge_from_stronger_warm": 30,
+    "asks_protection_when_threatened": true
+   },
+   "hegemon_seeker": {
+    "alliance_with_stronger": -20,
+    "makes_demands": true,
+    "offers_pledges_and_overlordship": true,
+    "funds_rebels_if_grievances_at_least": 2
+   }
+  },
+  "negotiation": {
+   "very_high": 15,
+   "high": 10,
+   "moderate": 0,
+   "low": -10,
+   "very_low": -20,
+   "unknown": 0,
+   "very_high_gift_multiplier": 1.25
+  },
+  "estimates_counts_with_player_limits": true
+ },
+ "event_tree_mapping": {
+  "opinion": {
+   "becomes": "event_tie_or_wrong",
+   "default_fade_years": 10
+  },
+  "trust": {
+   "derived": "100 - 10 * oaths_broken",
+   "write": "adds_oath_broken"
+  },
+  "notoriety": {
+   "derived": "5 * lands_taken + notorious_deeds",
+   "cap": 100,
+   "write": "notorious_deed_with_all_known"
+  },
+  "relation": {
+   "alliance": "form_alliance",
+   "truce": "swear_peace",
+   "rivalry": "set_rival",
+   "war": "declare_war",
+   "trade_pact": "trade_pact",
+   "embargo": "embargo",
+   "guarantee": "pledge_protection",
+   "non_aggression": "swear_peace",
+   "subject": "subject_management",
+   "overlord": "subject_management",
+   "personal_union": "subject_management"
+  },
+  "new_effects": [
+   "war_aim",
+   "league",
+   "pretender"
+  ]
+ },
+ "answers": {
+  "$comment": "No preview: the asker learns yes or no, with the full reasons list, a month after the answer is given.",
+  "delay_months": 1,
+  "preview_before_sending": false
+ },
+ "eras_by_year": [
+  {
+   "era": "I",
+   "from": 1444
+  },
+  {
+   "era": "II",
+   "from": 1500
+  },
+  {
+   "era": "III",
+   "from": 1600
+  },
+  {
+   "era": "IV",
+   "from": 1700
+  },
+  {
+   "era": "V",
+   "from": 1800
+  },
+  {
+   "era": "VI",
+   "from": 1870
+  },
+  {
+   "era": "VII",
+   "from": 1914
+  }
+ ],
+ "campaign_end": "1939-08-31",
+ "oaths_broken_years": 30,
+ "lands_taken_years": 20
+}

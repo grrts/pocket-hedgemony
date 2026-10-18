@@ -1,0 +1,415 @@
+{
+ "$comment": "Placeholder balance values for subjects-design.md. Loyalty steps are the lords' steps (country stats 5.5). No percentage meter. Copied from subjects/config/subject-rules.json. Keys under reasons marked from_design are the design's own numbers (subjects-design 4, 5) that the source config does not list.",
+ "schema_version": 1,
+ "_provisional": [
+  "gift.months_of_income",
+  "kinds.protectorate.overseas_trade_empire_min_regions",
+  "reasons.stretched_thin"
+ ],
+ "gift": {
+  "months_of_income": 6
+ },
+ "loyalty": {
+  "steps": [
+   "loyal",
+   "wavering",
+   "disloyal",
+   "in_revolt"
+  ],
+  "check_every_months": 3,
+  "step_up_at": 2,
+  "step_down_at": -2,
+  "min_months_between_same_direction_steps": 12,
+  "effects": {
+   "loyal": {
+    "pays": 1.0,
+    "call": "full_at_once",
+    "foreign_envoys": "refused",
+    "can_fold_in": true
+   },
+   "wavering": {
+    "pays": 0.5,
+    "call": "half_late",
+    "goes_home_after_months": 6,
+    "foreign_envoys": "listens"
+   },
+   "disloyal": {
+    "pays": 0.0,
+    "call": "refuses",
+    "foreign_envoys": "seeks_backer",
+    "hides_army": true
+   },
+   "in_revolt": {
+    "pays": 0.0,
+    "state": "independence_war"
+   }
+  },
+  "start_1444_by_autonomy": {
+   "very_low": "loyal",
+   "low": "loyal",
+   "moderate": "loyal",
+   "high": "wavering",
+   "very_high": "wavering"
+  },
+  "start_1444_hostile_stance_steps_down": 1,
+  "tint_by_step": {
+   "loyal": "green",
+   "wavering": "yellow",
+   "disloyal": "orange",
+   "in_revolt": "red",
+   "from_design": "10.3"
+  }
+ },
+ "kinds": {
+  "vassal": {
+   "icon": "shield",
+   "pays_share": 0.1,
+   "fights": "when_called_by_loyalty",
+   "own_diplomacy": "limited",
+   "own_subjects": true,
+   "overlord_owes": [
+    "defence"
+   ],
+   "reach_weight": 1.0,
+   "drift": 0,
+   "fold_in": "lord"
+  },
+  "tributary": {
+   "icon": "chest",
+   "pays_share": 0.15,
+   "fights": "never",
+   "own_diplomacy": "full",
+   "own_subjects": true,
+   "overlord_owes": [
+    "defence_except_from_overlord"
+   ],
+   "reach_weight": 0.5,
+   "drift": -1,
+   "fold_in": "tighten_first"
+  },
+  "union": {
+   "icon": "two_crowns",
+   "pays_share": 0.05,
+   "fights": "always_if_loyal_or_wavering",
+   "own_diplomacy": "none",
+   "own_subjects": true,
+   "overlord_owes": [
+    "defence",
+    "shared_ruler"
+   ],
+   "reach_weight": 1.0,
+   "drift": 0,
+   "fold_in": "merge_crowns",
+   "merge_requires_years": 50
+  },
+  "march": {
+   "icon": "watchtower",
+   "pays_share": 0.0,
+   "fights": "own_frontier_only",
+   "own_diplomacy": "no_alliances",
+   "own_subjects": false,
+   "overlord_owes": [
+    "yearly_stipend"
+   ],
+   "reach_weight": 0.5,
+   "drift": -1,
+   "fold_in": "lord"
+  },
+  "colony": {
+   "icon": "anchor",
+   "pays_share": 0.25,
+   "fights": "defends_self",
+   "own_diplomacy": "none",
+   "own_subjects": false,
+   "overlord_owes": [
+    "defence",
+    "sea_route"
+   ],
+   "reach_weight": 1.0,
+   "drift": 0,
+   "fold_in": "royal_land",
+   "stages": {
+    "outpost": {
+     "pays_share": 0.25
+    },
+    "settled": {
+     "min_provinces": 5,
+     "pays_share": 0.25,
+     "militia": true
+    },
+    "self_governing": {
+     "min_provinces": 10,
+     "min_years": 50,
+     "pays_share": 0.1,
+     "fold_in": "never"
+    }
+   }
+  },
+  "protectorate": {
+   "icon": "key",
+   "pays_share": 0.1,
+   "fights": "when_called_by_loyalty",
+   "own_diplomacy": "none",
+   "own_subjects": false,
+   "overlord_owes": [
+    "defence"
+   ],
+   "reach_weight": 1.0,
+   "drift": -1,
+   "fold_in": "lord",
+   "min_era": "VI",
+   "min_era_overseas_trade_empire": "IV",
+   "overseas_trade_empire_min_regions": 2
+  }
+ },
+ "ties": {
+  "kin": {
+   "loyalty": 1,
+   "claim_on_overlord_throne_if_line_ends": true
+  },
+  "held_of_the_church": {
+   "pays_share": 0.01,
+   "fights": "never"
+  },
+  "held_in_fief": {
+   "pays_share": 0.01,
+   "fights": "never",
+   "reach_weight": 0.5
+  },
+  "second_master": {
+   "second_master_share": 0.05
+  },
+  "hostage_at_court": {
+   "loyalty": 1,
+   "loyalty_if_harmed": -2
+  }
+ },
+ "reasons": {
+  "much_stronger": {
+   "arrow": 1,
+   "test": "overlord_soldiers >= 3 * subject_soldiers"
+  },
+  "not_much_stronger": {
+   "arrow": -1,
+   "test": "subject_soldiers >= 0.5 * overlord_soldiers"
+  },
+  "same_faith": {
+   "arrow": 1
+  },
+  "different_faith": {
+   "arrow": -1
+  },
+  "persecuted_faith": {
+   "arrow": -2
+  },
+  "same_people": {
+   "arrow": 1
+  },
+  "different_people": {
+   "arrow": -1,
+   "unless": "accepted_culture"
+  },
+  "defended": {
+   "arrow": 1,
+   "months": 240
+  },
+  "left_alone": {
+   "arrow": -1,
+   "months": 240,
+   "also": "oath_broken"
+  },
+  "gift": {
+   "arrow": 1,
+   "months": 60
+  },
+  "marriage": {
+   "arrow": 1
+  },
+  "resident_at_court": {
+   "arrow": 1
+  },
+  "courted": {
+   "arrow": -1
+  },
+  "common_enemy": {
+   "arrow": 1
+  },
+  "long_held": {
+   "arrow": 1,
+   "min_years": 30
+  },
+  "light_tribute": {
+   "arrow": 1
+  },
+  "heavy_tribute": {
+   "arrow": -1
+  },
+  "crushing_tribute": {
+   "arrow": -2
+  },
+  "lost_war": {
+   "arrow": -1,
+   "months": 120
+  },
+  "new_overlord_ruler": {
+   "arrow": -1,
+   "months": 60
+  },
+  "stretched_thin": {
+   "arrow": -1,
+   "per_subject_over_reach_to_furthest": -1,
+   "note": "Every subject -1; the N furthest subjects -1 more each, N = reach used beyond reach rounded up (D-SUBJ-7)"
+  },
+  "far_away": {
+   "arrow": -1
+  },
+  "outgrown": {
+   "arrow": -1,
+   "vassal_max_province_share": 0.5
+  },
+  "hostile_stance": {
+   "arrow": -2
+  },
+  "rival_stance": {
+   "arrow": -1
+  },
+  "given_a_crown": {
+   "arrow": 1,
+   "months": 120
+  },
+  "loosened": {
+   "arrow": 2,
+   "months": 120
+  },
+  "force_used_on_other_subject": {
+   "arrow": -1,
+   "months": 60
+  },
+  "deposed_other_subject": {
+   "arrow": -1,
+   "months": 60
+  },
+  "lapse_annexation": {
+   "arrow": -1,
+   "months": 120
+  },
+  "refused_call_again": {
+   "arrow": -1,
+   "months": 12
+  },
+  "missed_stipend": {
+   "arrow": -1,
+   "months": 12
+  },
+  "master_of_others": {
+   "arrow": -3,
+   "test": "subject has subjects of its own"
+  },
+  "lent_official": {
+   "arrow": 1,
+   "from_design": "4: Lend an official, +1"
+  },
+  "left_other_subject_alone": {
+   "arrow": -1,
+   "months": 60,
+   "from_design": "5: your other subjects take a -1 reason for 5 years"
+  },
+  "quarrel_forbidden": {
+   "arrow": -1,
+   "months": 60,
+   "from_design": "5: forbid it (both get -1 for 5 years)"
+  },
+  "kin": {
+   "arrow": 1,
+   "from_design": "ties.kin"
+  }
+ },
+ "tribute_levels": {
+  "none": 0.0,
+  "light": 0.5,
+  "normal": 1.0,
+  "heavy": 1.5,
+  "crushing": 2.0
+ },
+ "reach_by_administrative_capacity": {
+  "very_low": 2,
+  "low": 3,
+  "moderate": 5,
+  "high": 7,
+  "very_high": 9
+ },
+ "raise_lord": {
+  "min_provinces": 3,
+  "allowed_loyalty": [
+   "loyal",
+   "wavering"
+  ],
+  "kinds": [
+   "vassal",
+   "march"
+  ]
+ },
+ "fold_in": {
+  "min_loyal_years": 10,
+  "min_years_as_subject": 20,
+  "needs_path": true,
+  "needs_lord_capacity": true,
+  "envoy_months_per_province": 1,
+  "foreign_rule_grievance_years": 10,
+  "start_1444_years_if_unknown": 20
+ },
+ "tighten": {
+  "envoy_months": 6,
+  "requires": "loyal",
+  "refusal_steps_down": 1,
+  "order": [
+   "tributary",
+   "vassal"
+  ]
+ },
+ "loosen": {
+  "order": {
+   "vassal": "tributary",
+   "protectorate": "tributary"
+  }
+ },
+ "rising": {
+  "needs_backer_or_overlord_losing": true,
+  "overlord_losing_peace_voice_share": 0.5,
+  "disloyal_neighbours_join": true
+ },
+ "mapping_1444": {
+  "relations_subject_kind": {
+   "vassal": "vassal",
+   "fief": [
+    "vassal",
+    "held_in_fief_or_held_of_the_church_if_overlord_is_religious_head"
+   ],
+   "appanage": [
+    "vassal",
+    "kin"
+   ],
+   "tributary": "tributary",
+   "personal_union": "union",
+   "frontier_commandery": "march",
+   "colony": "colony",
+   "estate": "lord"
+  },
+  "event_vassalize_type": {
+   "vassal": "vassal",
+   "tributary": "tributary",
+   "colony": "colony",
+   "protectorate": "protectorate",
+   "puppet": "protectorate",
+   "dominion": [
+    "colony",
+    "self_governing"
+   ]
+  }
+ },
+ "subjects_with_subjects": {
+  "reach_multiplier": 3,
+  "reach_per_own_subject": 1,
+  "overlord_can_act_on_sub_subjects": false
+ }
+}

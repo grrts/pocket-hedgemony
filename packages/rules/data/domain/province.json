@@ -1,0 +1,329 @@
+{
+  "$comment": "Province config (domain/province/spec.md §10; province-stats design v3). Every value is a placeholder for balancing. Rates are fractions (0.05 = 5 %). Key names are the spec's proposals (OQ-PROV-20).",
+  "tiles": { "min": 4, "max": 16 },
+  "shore_tiles": { "min": 1, "max": 3 },
+  "months_per_season": 3,
+  "clear_woods": { "years": 3, "timber_loads": 1 },
+  "fields_to_woods": { "years": 10 },
+  "fields_to_pasture": { "seasons": 1 },
+  "tile_changes": {
+    "$comment": "Feedback 86: what the player (or a lord, or the AI) pays to change a tile's use, in the buildings data's gold, and the time for the changes clear_woods and fields_to_pasture don't already set. One change at a time per province.",
+    "clear woods": { "gold": 30 },
+    "to pasture": { "gold": 5 },
+    "plough": { "gold": 10, "seasons": 1 },
+    "drain": { "gold": 60, "years": 3, "needs": "F8" },
+    "irrigate": { "gold": 60, "years": 2, "needs": "F3", "grounds": ["drylands", "desert", "savanna"] }
+  },
+  "castle_ruin": { "waste_years": 5 },
+  "town": {
+    "second_tile_townsfolk": 40000,
+    "great_city_tiles": 3,
+    "building_slots": { "hamlet": 1, "village": 2, "market town": 4, "town": 6, "city": 9, "great city": 12 },
+    "sizes": ["hamlet", "village", "market town", "town", "city", "great city"]
+  },
+  "worn": { "recovery_years": 5, "output": 0.5 },
+  "burned": { "rebuild_per_year": 1 },
+  "ground": {
+    "troops": {
+      "farmland": { "foot": 0, "horse": 0.10, "guns": 0, "defender": 0, "days_to_cross": 1, "foraging": "Rich", "sickness": "Low" },
+      "grassland": { "foot": 0, "horse": 0.25, "guns": 0, "defender": -0.10, "days_to_cross": 1, "foraging": "Fair", "sickness": "Low" },
+      "savanna": { "foot": 0, "horse": 0.15, "guns": 0, "defender": 0, "days_to_cross": 1, "foraging": "Fair", "sickness": "Medium" },
+      "drylands": { "foot": 0, "horse": 0.10, "guns": 0, "defender": 0, "days_to_cross": 1.5, "foraging": "Poor", "sickness": "Low" },
+      "desert": { "foot": -0.10, "horse": -0.10, "camels": 0, "guns": -0.10, "defender": 0.10, "days_to_cross": 2, "foraging": "Almost none", "sickness": "Heat" },
+      "hills": { "foot": 0.10, "horse": -0.15, "guns": -0.10, "defender": 0.15, "days_to_cross": 1.5, "foraging": "Fair", "sickness": "Low" },
+      "mountains": { "foot": 0, "horse": -0.40, "guns": -0.30, "defender": 0.30, "days_to_cross": 3, "foraging": "Poor", "sickness": "Cold" },
+      "forest": { "foot": 0, "horse": -0.25, "guns": -0.20, "defender": 0.15, "days_to_cross": 2, "foraging": "Fair", "sickness": "Low" },
+      "jungle": { "foot": -0.10, "horse": -0.40, "guns": -0.30, "defender": 0.25, "days_to_cross": 3, "foraging": "Poor", "sickness": "High" },
+      "marsh": { "foot": -0.10, "horse": -0.30, "guns": -0.30, "defender": 0.20, "days_to_cross": 3, "foraging": "Poor", "sickness": "High" },
+      "tundra": { "foot": 0, "horse": -0.10, "guns": -0.10, "defender": 0.10, "days_to_cross": 2, "foraging": "Almost none", "sickness": "Cold" }
+    },
+    "economy": {
+      "farmland": { "build_cost": 1.0, "building_output": { "base": 1.25 }, "people_output": { "base": 1.0 } },
+      "grassland": { "build_cost": 1.0, "building_output": { "base": 1.0 }, "people_output": { "base": 1.0, "herding": 1.5 } },
+      "savanna": { "build_cost": 1.0, "building_output": { "base": 1.0 }, "people_output": { "base": 1.0, "herding": 1.25 } },
+      "drylands": { "build_cost": 1.25, "building_output": { "base": 0.75, "lifted_by": "irrigated" }, "people_output": { "base": 1.0 } },
+      "desert": { "build_cost": 1.5, "building_output": { "base": 0.5, "mine": 1.0, "irrigation works": 1.0 }, "people_output": { "base": 1.0, "herding": 1.0, "caravans": 1.0 } },
+      "hills": { "build_cost": 1.25, "building_output": { "base": 1.0, "mine": 1.25 }, "people_output": { "base": 1.0 } },
+      "mountains": { "build_cost": 2.0, "building_output": { "base": 1.0, "farm": 0.5, "mine": 1.5 }, "people_output": { "base": 0.75 } },
+      "forest": { "build_cost": 1.5, "building_output": { "base": 1.0, "lumber camp": 1.5 }, "people_output": { "base": 1.0, "hunting and gathering": 1.25 } },
+      "jungle": { "build_cost": 2.0, "building_output": { "base": 0.75 }, "people_output": { "base": 1.0, "gathering": 1.25 } },
+      "marsh": { "build_cost": 2.0, "building_output": { "base": 0.5, "lifted_by": "drained" }, "people_output": { "base": 1.0, "fishing": 1.25 } },
+      "tundra": { "build_cost": 1.5, "building_output": { "base": 0.5 }, "people_output": { "base": 1.0, "herding": 1.0 } }
+    }
+  },
+  "river_crossing_penalty": -0.20,
+  "woods_ambush": { "per_two_woods": 0.05, "cap": 0.15 },
+  "locals_rough_bonus": { "bonus": 0.10, "grounds": ["hills", "mountains", "forest", "jungle", "marsh"] },
+  "castle_hard_grounds": ["hills", "mountains"],
+  "bare_tile": {
+    "slots": 3000,
+    "by_use": {
+      "Fields": { "class": "farmers", "activity": "farming", "food": true, "harvest_roll": true },
+      "Pasture": { "class": "herders", "activity": "herding", "food": true, "harvest_roll": false },
+      "Woods": { "class": "woodsmen", "activity": "hunting and gathering", "food": true, "harvest_roll": false },
+      "Shore": { "class": "seafolk", "activity": "fishing", "food": false, "harvest_roll": false }
+    }
+  },
+  "buildings": {
+    "land": {
+      "farm": { "uses": ["Fields"], "slots": 12000, "class": "farmers", "unlock": null, "food_per_worker": 1.5, "harvests": 1, "harvest_roll": true },
+      "rice paddy": { "uses": ["Fields"], "slots": 18000, "class": "farmers", "unlock": "F2", "needs_water": true, "food_per_worker": 1.5, "harvests": 2, "harvest_roll": true },
+      "terrace": { "uses": ["Fields"], "grounds": ["hills", "mountains"], "slots": 12000, "class": "farmers", "unlock": "F2", "food_per_worker": 1.5, "harvests": 1, "harvest_roll": true },
+      "raised fields": { "uses": ["Marsh"], "slots": 12000, "class": "farmers", "unlock": "F6", "food_per_worker": 1.5, "harvests": 1, "harvest_roll": true },
+      "plantation": { "uses": ["Fields"], "tropical": true, "slots": 12000, "class": "farmers", "unlock": "F10" },
+      "ranch": { "uses": ["Pasture"], "slots": 3000, "class": "herders", "unlock": null, "food_per_worker": 1.33, "harvests": 1, "harvest_roll": false, "hazards": ["drought", "hard winter"] },
+      "horse stud": { "uses": ["Pasture"], "slots": 3000, "class": "herders", "unlock": "F11" },
+      "lumber camp": { "uses": ["Woods"], "slots": 1500, "class": "woodsmen", "unlock": null },
+      "hunting lodge": { "uses": ["Woods"], "slots": 1500, "class": "woodsmen", "unlock": null, "food_per_worker": 1.0, "harvests": 1, "harvest_roll": false, "hazards": ["hard winter"] },
+      "mine": { "uses": ["Waste"], "rough_grounds": ["hills", "mountains"], "needs_seam": true, "needs_timber": true, "slots": 6000, "class": "miners", "unlock": null },
+      "irrigation works": { "uses": ["Waste", "Fields"], "fields_grounds": ["drylands"], "slots": 1500, "class": "farmers", "unlock": "F3" },
+      "fishery": { "uses": ["Shore"], "slots": 3000, "class": "seafolk", "unlock": null, "food_per_worker": 1.33, "harvests": 1, "harvest_roll": false, "hazards": ["storms", "blockades"] },
+      "saltworks": { "uses": ["Shore"], "dry_or_warm_coast": true, "slots": 1500, "class": "miners", "unlock": null },
+      "harbour": { "uses": ["Shore"], "slots": 1500, "class": "seafolk", "unlock": null },
+      "shipyard": { "uses": ["Shore"], "needs_harbour": true, "needs_timber": true, "slots": 3000, "class": "seafolk", "unlock": null },
+      "bridge": { "uses": ["Shore"], "river": true, "slots": 0, "class": null, "unlock": null },
+      "castle": { "uses": ["Castle"], "slots": 0, "class": null, "unlock": null }
+    },
+    "town": {
+      "loom house": { "slots": 1500, "class": "craftsmen", "needs": ["raw ware"] },
+      "forge": { "slots": 1500, "class": "craftsmen", "needs": ["iron"] },
+      "kiln": { "slots": 1500, "class": "craftsmen", "needs": ["clay"] },
+      "tannery": { "slots": 1500, "class": "craftsmen", "needs": ["hides"] },
+      "press": { "slots": 900, "class": "craftsmen", "needs": ["paper", "printing"] },
+      "brewery or winery": { "slots": 900, "class": "craftsmen", "needs": ["grain or grapes"] },
+      "market": { "slots": 1500, "class": "market folk", "needs": ["market charter for the fair"] },
+      "caravanserai or warehouse": { "slots": 900, "class": "market folk", "needs": ["road"] },
+      "house of worship": { "slots": 600, "class": "clergy", "needs": [] },
+      "school": { "slots": 0, "class": "scholars", "needs": [], "min_town_size": "market town" },
+      "seat": { "slots": 300, "class": "clerks", "needs": ["own official"], "min_town_size": "town" },
+      "almshouse": { "slots": 600, "class": "clergy", "needs": ["gold upkeep"] },
+      "powder mill": { "slots": 900, "class": "craftsmen", "needs": ["saltpetre"] },
+      "hospital, wells and drains": { "slots": 600, "class": "clergy", "needs": ["later inventions"] },
+      "factory": { "slots": 6000, "class": "craftsmen", "needs": ["era V inventions", "coal or water power"] },
+      "rail station": { "slots": 600, "class": "craftsmen", "needs": ["railway invention", "road"] }
+    },
+    "craft": ["loom house", "forge", "kiln", "tannery", "press", "brewery or winery", "powder mill"],
+    "mill": { "unlock": "F5", "gold_bonus": 0.25 },
+    "castle_steps": { "none": null, "earthwork ring fort": "B4", "stone castle": "B1", "bastion fort": "B5", "star fort": "B6" },
+    "fallow_below": 0.5,
+    "timber_reach_rings": 1,
+    "lord_traits": { "Builder": ["any"], "Greedy": ["market", "mine"], "Pious": ["house of worship"], "Warlike": ["castle"] }
+  },
+  "almshouse": { "shelters": 3000 },
+  "food": {
+    "bare_per_worker": 0.67,
+    "harvest": { "bumper": 1.3, "good": 1.15, "normal": 1.0, "poor": 0.7, "failed": 0.3 },
+    "harvest_order": ["failed", "poor", "normal", "good", "bumper"],
+    "new_crops": { "invention": "F9", "failed_becomes": "poor" },
+    "hunting": {
+      "$comment": "Feedback 81. Woods hold game for the hunters their tiles' slots can take; more hunters than that thin it. Game moves toward what the hunting leaves each year; a hard winter cuts the year's catch.",
+      "game_yield": { "tundra": 1.3, "forest": 1.1, "jungle": 1.0, "base": 0.9 },
+      "boreal_lat": 55,
+      "boreal_yield": 1.3,
+      "beyond_woods": 0.5,
+      "thinning_per_crowding": 0.35,
+      "game_floor": 0.3,
+      "regrow_per_year": 0.2,
+      "hard_winter": { "north_lat": 55, "north_one_in": 5, "mid_lat": 45, "mid_one_in": 8, "catch": 0.6 }
+    }
+  },
+  "wares": {
+    "list": ["grain", "rice", "wine", "olive oil", "wool", "cloth", "flax", "linen", "silk", "cotton", "salt", "fish", "timber", "furs", "hides", "leather", "horses", "iron", "tools", "arms", "copper", "tin", "silver", "gold", "gems", "spices", "pepper", "sugar", "tea", "coffee", "cocoa", "tobacco", "incense", "ivory", "pottery", "porcelain", "dyes", "paper", "books", "saltpetre", "powder"],
+    "later": ["coal", "rubber", "oil"],
+    "craft_value": 3,
+    "crafts": { "cloth": "wool", "linen": "flax", "leather": "hides", "tools": "iron", "arms": "iron" }
+  },
+  "classes": {
+    "all": ["farmers", "herders", "woodsmen", "miners", "seafolk", "craftsmen", "market folk", "clergy", "clerks", "scholars", "homeless"],
+    "town": ["craftsmen", "market folk", "clergy", "clerks", "scholars"],
+    "food": ["farmers", "herders", "woodsmen", "seafolk"],
+    "no_overflow": ["scholars"]
+  },
+  "births": { "farmers": 0.04, "herders": 0.04, "woodsmen": 0.04, "seafolk": 0.04, "miners": 0.035, "craftsmen": 0.03, "market folk": 0.03, "clerks": 0.03, "clergy_celibate": 0.005, "scholars": 0.01, "homeless": 0.04 },
+  "deaths": { "farmers": 0.03, "herders": 0.03, "woodsmen": 0.03, "seafolk": 0.03, "miners": 0.04, "craftsmen": 0.035, "market folk": 0.035, "clerks": 0.035, "clergy": 0.03, "scholars": 0.03, "homeless": 0.05 },
+  "death_modifiers": {
+    "plague": { "rumour": 0.05, "outbreak": 0.15, "worst": 0.30 },
+    "war": 0.01,
+    "per_burned_tile": 0.005,
+    "smoke_town": 0.01,
+    "hospitals_town": -0.005,
+    "sanitation": -0.005,
+    "vaccination": -0.005
+  },
+  "famine": { "flee_share": 0.25, "year_share": 0.2 },
+  "mines": {
+    "$comment": "Feedback 87, PROV-065 to PROV-067. Rough waste (hills, mountains) may hold a seam: a ware and the years of digging it has left. The map's anchors are the famous mines of 1444; elsewhere a seam is found by a fixed roll per province, so every game has the same geology. A mine digs a year off its seam each January and closes when it runs out.",
+    "seam_chance": 0.35,
+    "ware_weights": { "iron": 45, "copper": 20, "tin": 8, "silver": 12, "gold": 5, "salt": 10 },
+    "years_min": 40,
+    "years_max": 160,
+    "anchors": { "Středočeský": { "ware": "silver", "years": 120, "mine": "Kutná Hora" }, "Dalarna": { "ware": "copper", "years": 300, "mine": "Falun" } },
+    "trade": { "base": 1, "precious": 3 },
+    "precious": ["silver", "gold"],
+    "timber_reach": 1,
+    "salt_grounds": ["drylands", "desert", "savanna"],
+    "salt_lat_below": 42
+  },
+  "homeless": { "theft_from": 0.05, "theft_step": 0.05, "grievance_over": 0.10, "shanty_over": 0.20, "shanty_town_death_extra": 0.01, "shanty_plague_spread": 2 },
+  "refugees": { "settle_years": 2 },
+  "recruits": { "conscription_below": 0.25, "conscription_ends_at": 0.5, "no_recruits_from": ["clergy", "scholars"] },
+  "tax": {
+    "rates": ["none", "light", "normal", "heavy", "crushing"],
+    "no_official_share": 0.5,
+    "lord_share": 0.5,
+    "riots_factor": 0.5,
+    "free_travel_days": 5,
+    "cap_charter_max": "light",
+    "heavy_weight": { "heavy": 1, "crushing": 2 },
+    "presets": {
+      "Even": { "all": "normal" },
+      "Spare the frontier": { "border": "light", "heartland": "heavy" },
+      "Squeeze the towns": { "towns": "heavy", "countryside": "light" },
+      "War chest": { "all": "heavy" }
+    }
+  },
+  "tolls": { "rates": ["none", "low", "high"], "points": ["bridge", "ford", "pass", "river mouth", "strait"] },
+  "roads": { "steps": ["none", "track", "road", "paved road", "turnpike", "railway"], "canal_inventions": ["B3", "Canal locks"] },
+  "far_from_throne": { "days": 30 },
+  "officials": {
+    "full_effect_years": 5,
+    "first_year_share": 0.5,
+    "types": ["tax collector", "steward", "judge", "master of works", "muster master", "customs officer", "chaplain", "schoolmaster", "warden", "colonial governor"],
+    "effects": {
+      "tax collector": { "tax_reach": 0.20 },
+      "steward": { "food": 0.10, "store_rot": 0.5 },
+      "judge": { "riots_extra_grievances": 1, "broken_charter_fade": 2 },
+      "master of works": { "build_cost": -0.25, "build_time": 0.5, "burned_rebuild": 2 },
+      "muster master": { "recruit_refill": 0.25 },
+      "customs officer": { "trade_ratio_gain": 0.15 },
+      "chaplain": { "faith_shift": 2 },
+      "schoolmaster": { "tongue_shift": 2, "graduate_sooner_years": 1 },
+      "warden": { "garrison": 0.25, "walls_repair": 2, "castle_store_rot": 0.5 },
+      "colonial governor": {}
+    },
+    "school_trains": { "madrasa": ["judge", "chaplain"], "university": ["judge", "steward"], "academy": ["master of works", "warden"] }
+  },
+  "loyalty": ["In revolt", "Disloyal", "Wavering", "Loyal"],
+  "homeland": { "years": 100 },
+  "pretender": { "years": 50 },
+  "charters": {
+    "kinds": ["market charter", "tax cap", "town law", "no quartering", "faith tolerance", "free trade", "mining right"],
+    "broken_years": 20,
+    "mining_right_share": 0.5
+  },
+  "castle": { "steps": ["none", "earthwork ring fort", "stone castle", "bastion fort", "star fort"], "neglect_years": 10 },
+  "walls": { "max_breaches": 3 },
+  "grievances": {
+    "levels": { "grumbling": 2, "riots": 3, "rebels": 4 },
+    "hungry": { "starts_below_months": 1, "ends_above_months": 3 },
+    "soldiers_quartered_seasons": 1,
+    "requisitioned_seasons": 1,
+    "bloodshed_years": 20,
+    "harsh_lord_traits": ["Cruel", "Greedy"]
+  },
+  "plague": { "steps": ["none", "rumour", "outbreak", "burning out"], "outbreak_seasons": [1, 2], "links": ["road", "river", "sea route", "army", "refugees"] },
+  "fever_land": { "steps": ["none", "mild", "harsh", "deadly"] },
+  "smoke": { "from_era": "V", "sources": ["factory", "coal mine"] },
+  "settlement": { "steps": ["none", "trading post", "settlement", "colony"] },
+  "event_map": {
+    "population": "People",
+    "prosperity": "buildings and their workers",
+    "devastation": "burned tiles",
+    "unrest": "grievances and rebels",
+    "control": "governed by, days to capital and reaches you",
+    "fort_level": "castle and walls",
+    "infrastructure": "road, harbour and bridge",
+    "industry": "factories",
+    "trade_good": "wares made",
+    "trade_access": "trade ratio gain",
+    "local_supply": "food from tiles, local store and castle store",
+    "food_security": "food from tiles, local store and castle store",
+    "urbanization": "townsfolk share",
+    "manpower_yield": "recruits here",
+    "disease_burden": "plague and fever land",
+    "environmental_degradation": "worn tiles and smoke",
+    "culture_share": "tongue mix",
+    "religion_share": "faith mix",
+    "colonial_status": "settlement and governed by",
+    "terrain": "ground and tile mix",
+    "innovation_presence": "schools and scholars here"
+  },
+  "card": {
+    "lines": ["owner", "governance", "official", "pretender", "ground", "tile row", "people", "classes", "food", "town", "trade", "tax", "recruits", "castle", "faith", "tongue", "grievances", "rebels"],
+    "gain_lose": {
+      "tax": {
+        "gain": ["the value of what its buildings make", "townsfolk", "an official in a royal province", "few days to the capital or a seat", "roads"],
+        "lose": ["burned and fallow tiles", "homeless people", "riots (half)", "no official (half)", "a lord (he keeps half)", "every day of travel beyond 5", "enemy armies on the road", "occupation (nothing)"]
+      },
+      "people": {
+        "gain": ["births", "refugees settling", "migrants coming for work"],
+        "lose": ["deaths", "famine", "war", "leaving for work or safety", "soldiers who die on campaign"]
+      },
+      "recruits": {
+        "gain": ["a share of every class except clergy and scholars each year, more from homeless men"],
+        "lose": ["raising soldiers", "enrolling students", "famine and plague", "losing the province"]
+      },
+      "castle": {
+        "gain": ["building or upgrading", "conquering one"],
+        "lose": ["destroyed in a siege", "demolished in a peace", "10 years without upkeep drops it a step"]
+      }
+    }
+  },
+  "decided": {
+    "tax_months_per_year": 12,
+    "neglected_output": 0.5,
+    "event_effects": {
+      "population": "people −10 %, townsfolk first in plague events",
+      "prosperity": "two new buildings the owner picks",
+      "devastation": "30 % of its tiles burned",
+      "unrest": "one named grievance from the event",
+      "control": "its official fleeing, or its road a step down",
+      "fort_level": "its castle one step up",
+      "infrastructure": "its road one step up",
+      "industry": "one factory",
+      "trade_access": "trade ratio gain −20 % for the event's duration",
+      "food_security": "a harvest two steps worse",
+      "disease_burden": "a plague outbreak",
+      "trade_good": "a new main ware",
+      "urbanization": "5 % of its people moving to town",
+      "manpower_yield": "its recruit share up by a fifth",
+      "environmental_degradation": "one tile worn",
+      "colonial_status": "its settlement one step up"
+    },
+    "country_sums": {
+      "Gold income": "tax reaching you plus trade income over all provinces",
+      "People": "people plus refugees",
+      "Recruits": "recruits here in royal provinces only",
+      "Food": "local stores and castle stores",
+      "Hungry": "provinces with the \"Hungry\" grievance",
+      "Horses": "horse studs and ranches",
+      "Ships": "ships built at shipyards and based at harbours",
+      "Castles": "castle buildings",
+      "Faith": "the people-weighted faith mix",
+      "Tongue": "the people-weighted tongue mix",
+      "In revolt": "provinces with riots or rebels",
+      "Schools, Students, Scholars": "school buildings, students here and scholars here",
+      "Officials": "your officials in royal provinces and seats"
+    },
+    "birth_points": { "food over 6 months": 0.5, "10 years of peace": 0.5, "food under 3 months": -1, "Hungry": -2, "war": -1, "plague": -1 },
+    "tax_travel_loss_per_day": 0.05,
+    "tax_collector_bonus": 0.2,
+    "town_size_floors": { "hamlet": 0, "village": 1000, "market town": 3000, "town": 8000, "city": 20000, "great city": 40000 },
+    "town_tiles_at": [0, 40000, 100000],
+    "recruit_share_per_class": 0.01,
+    "homeless_drift_share": 0.02,
+    "refugee_settle_years": 2,
+    "plotting_at": 4,
+    "spark_at": 3,
+    "rise_chance": { "4": 0.05, "5": 0.15, "6": 0.3 },
+    "judge_riots_extra": 1,
+    "official_learn_years": { "own": 5, "cousin": 7, "stranger": 10 },
+    "lord_ungoverned_share": 0.5,
+    "sickness_monthly": { "Low": 0, "Medium": 0.01, "High": 0.02, "Heat": 0.02, "Cold": 0.02 },
+    "plague_week_days": [7, 14, 21, 28],
+    "homeless_trade_cut_per_5pct": 0.05,
+    "settlement_stages": { "trading post": "Outpost", "settlement": "Settled", "colony": "Self-governing" },
+    "officials_per_province": { "G1": 1, "G9": 2, "G16": 3, "extra_from": ["B2", "G11", "T14"] }
+  },
+  "_provisional": ["decided.tax_travel_loss_per_day", "decided.town_size_floors", "decided.town_tiles_at", "decided.recruit_share_per_class", "decided.homeless_drift_share", "decided.refugee_settle_years", "decided.sickness_monthly", "decided.official_learn_years"]
+}

@@ -1,0 +1,1364 @@
+{
+ "$comment": "From government/config/government.yaml (version 2) and start-forms.yaml. Every number is a placeholder for balancing.",
+ "_provisional": [
+  "buildings.palace.landmark_step_4",
+  "admin_capacity_officials_per_point",
+  "ai.reform_month",
+  "ai.reform_gold_reserve_factor"
+ ],
+ "colonial_governors_count_against_officials_cap": false,
+ "over_cap": {
+  "officials": {
+   "grievance": "grasping_officials"
+  },
+  "lords": {
+   "when": "new_year",
+   "slips_per_lord_over": 1,
+   "order": [
+    "lowest_loyalty",
+    "most_provinces"
+   ]
+  },
+  "reform": {
+   "order": [
+    "lowest_loyalty",
+    "most_provinces"
+   ]
+  }
+ },
+ "great_lord": [
+  {
+   "provinces_min": 4,
+   "provinces_max": 7,
+   "down_reasons": 1
+  },
+  {
+   "provinces_min": 8,
+   "provinces_max": 999,
+   "down_reasons": 2
+  }
+ ],
+ "subject_reach_start": {
+  "very_low": 2,
+  "low": 3,
+  "moderate": 5,
+  "high": 7,
+  "very_high": 9
+ },
+ "start": {
+  "form": "historical, from config/start-forms.yaml",
+  "lords": "the catalogue's historical houses; a country with one province starts with none"
+ },
+ "buildings": {
+  "palace": {
+   "officials": [
+    6,
+    10,
+    16
+   ],
+   "lords": [
+    2,
+    4,
+    6
+   ],
+   "note": "by step",
+   "landmark_step_4": {
+    "officials": {
+     "forbidden_city": 24,
+     "topkapi": 20
+    },
+    "lords": 6
+   }
+  },
+  "seat": {
+   "officials": [
+    2,
+    4
+   ],
+   "note": "by step; any number, one per province (D-GOV-10)"
+  },
+  "chancery": {
+   "officials": 4,
+   "needs": "G3"
+  },
+  "court_of_law": {
+   "lords": 2,
+   "needs": "G1"
+  },
+  "diet_hall": {
+   "lords": 3,
+   "forms": [
+    "feudal_realm",
+    "diet_monarchy",
+    "elective_monarchy",
+    "confederation"
+   ]
+  },
+  "hostage_residence": {
+   "lords": 3,
+   "forms": [
+    "household_realm",
+    "tribute_empire",
+    "horde",
+    "warlord_domain",
+    "shogunate"
+   ]
+  },
+  "examination_hall": {
+   "officials": 4,
+   "needs": "G4"
+  },
+  "parliament_house": {
+   "officials": 6,
+   "needs": "G14"
+  }
+ },
+ "forms": {
+  "feudal_realm": {
+   "family": "house",
+   "officials": 6,
+   "lords": 8,
+   "subject_reach": 0,
+   "colonial_range": 20,
+   "succession": "eldest_heir",
+   "event_tree": "monarchy",
+   "next": [
+    "diet_monarchy",
+    "absolute_monarchy",
+    "elective_monarchy"
+   ]
+  },
+  "diet_monarchy": {
+   "family": "house",
+   "officials": 8,
+   "lords": 10,
+   "subject_reach": 0,
+   "colonial_range": 20,
+   "succession": "eldest_heir",
+   "event_tree": "monarchy",
+   "next": [
+    "absolute_monarchy",
+    "constitutional_monarchy"
+   ]
+  },
+  "household_realm": {
+   "family": "house",
+   "officials": 10,
+   "lords": 4,
+   "subject_reach": 1,
+   "colonial_range": 10,
+   "succession": "strongest_son",
+   "event_tree": "monarchy",
+   "next": [
+    "absolute_monarchy",
+    "bureaucratic_empire"
+   ]
+  },
+  "bureaucratic_empire": {
+   "family": "house",
+   "officials": 20,
+   "lords": 2,
+   "subject_reach": 1,
+   "colonial_range": 10,
+   "succession": "named_heir",
+   "event_tree": "monarchy",
+   "next": [
+    "constitutional_monarchy"
+   ]
+  },
+  "elective_monarchy": {
+   "family": "house",
+   "officials": 4,
+   "lords": 12,
+   "subject_reach": -1,
+   "colonial_range": 10,
+   "succession": "lords_elect",
+   "event_tree": "elective_monarchy",
+   "next": [
+    "feudal_realm",
+    "diet_monarchy"
+   ]
+  },
+  "absolute_monarchy": {
+   "family": "house",
+   "officials": 16,
+   "lords": 4,
+   "subject_reach": 1,
+   "colonial_range": 20,
+   "succession": "eldest_heir",
+   "event_tree": "monarchy",
+   "next": [
+    "constitutional_monarchy"
+   ]
+  },
+  "constitutional_monarchy": {
+   "family": "house",
+   "officials": 24,
+   "lords": 4,
+   "subject_reach": 1,
+   "colonial_range": 30,
+   "succession": "eldest_heir",
+   "event_tree": "constitutional_monarchy",
+   "next": [
+    "constitutional_republic"
+   ]
+  },
+  "city_commune": {
+   "family": "citizens",
+   "officials": 8,
+   "lords": 4,
+   "subject_reach": -1,
+   "colonial_range": 10,
+   "succession": "council_picks",
+   "event_tree": "republic",
+   "next": [
+    "merchant_republic",
+    "feudal_realm",
+    "constitutional_republic"
+   ]
+  },
+  "merchant_republic": {
+   "family": "citizens",
+   "officials": 10,
+   "lords": 4,
+   "subject_reach": 1,
+   "colonial_range": 30,
+   "succession": "council_picks",
+   "event_tree": "merchant_republic",
+   "next": [
+    "city_commune",
+    "feudal_realm",
+    "constitutional_republic"
+   ]
+  },
+  "peasant_commune": {
+   "family": "citizens",
+   "officials": 4,
+   "lords": 1,
+   "subject_reach": -2,
+   "colonial_range": 0,
+   "succession": "assembly_picks",
+   "event_tree": "republic",
+   "next": [
+    "city_commune",
+    "constitutional_republic"
+   ]
+  },
+  "constitutional_republic": {
+   "family": "citizens",
+   "officials": 24,
+   "lords": 0,
+   "subject_reach": 0,
+   "colonial_range": 30,
+   "succession": "elections",
+   "event_tree": "republic",
+   "next": [
+    "constitutional_monarchy"
+   ]
+  },
+  "prince_bishopric": {
+   "family": "faith",
+   "officials": 6,
+   "lords": 3,
+   "subject_reach": -1,
+   "colonial_range": 5,
+   "succession": "chapter_elects",
+   "event_tree": "theocracy",
+   "next": [
+    "feudal_realm"
+   ]
+  },
+  "military_order": {
+   "family": "faith",
+   "officials": 8,
+   "lords": 4,
+   "subject_reach": 0,
+   "colonial_range": 15,
+   "succession": "brothers_elect",
+   "event_tree": "theocracy",
+   "next": [
+    "feudal_realm"
+   ]
+  },
+  "holy_rule": {
+   "family": "faith",
+   "officials": 6,
+   "lords": 4,
+   "subject_reach": 0,
+   "colonial_range": 5,
+   "succession": "clergy_choose",
+   "event_tree": "theocracy",
+   "next": [
+    "household_realm"
+   ]
+  },
+  "clan_council": {
+   "family": "kin",
+   "officials": 0,
+   "lords": 0,
+   "subject_reach": -2,
+   "colonial_range": 0,
+   "succession": "elders_choose",
+   "event_tree": "tribal",
+   "next": [
+    "chiefdom",
+    "confederation"
+   ],
+   "self_run": true
+  },
+  "chiefdom": {
+   "family": "kin",
+   "officials": 2,
+   "lords": 3,
+   "subject_reach": -1,
+   "colonial_range": 0,
+   "succession": "chosen_from_lineage",
+   "event_tree": "tribal",
+   "next": [
+    "paramount_chiefdom"
+   ],
+   "self_run": true
+  },
+  "paramount_chiefdom": {
+   "family": "kin",
+   "officials": 4,
+   "lords": 6,
+   "subject_reach": 0,
+   "colonial_range": 5,
+   "succession": "chosen_from_lineage",
+   "event_tree": "monarchy",
+   "next": [
+    "tribute_empire",
+    "feudal_realm",
+    "household_realm"
+   ]
+  },
+  "tribute_empire": {
+   "family": "kin",
+   "officials": 6,
+   "lords": 12,
+   "subject_reach": 3,
+   "colonial_range": 5,
+   "succession": "royal_kin_choose",
+   "event_tree": "monarchy",
+   "next": [
+    "household_realm",
+    "bureaucratic_empire"
+   ]
+  },
+  "horde": {
+   "family": "kin",
+   "officials": 2,
+   "lords": 10,
+   "subject_reach": 2,
+   "colonial_range": 0,
+   "succession": "eldest_of_house",
+   "event_tree": "nomadic_empire",
+   "next": [
+    "household_realm",
+    "confederation"
+   ]
+  },
+  "confederation": {
+   "family": "kin",
+   "officials": 2,
+   "lords": 10,
+   "subject_reach": -1,
+   "colonial_range": 0,
+   "succession": "members_rotate",
+   "event_tree": "confederation",
+   "next": [
+    "feudal_realm",
+    "constitutional_republic"
+   ]
+  },
+  "warlord_domain": {
+   "family": "warriors",
+   "officials": 4,
+   "lords": 6,
+   "subject_reach": 0,
+   "colonial_range": 5,
+   "succession": "heir_or_adopted",
+   "event_tree": "monarchy",
+   "next": [
+    "shogunate",
+    "feudal_realm"
+   ]
+  },
+  "shogunate": {
+   "family": "warriors",
+   "officials": 8,
+   "lords": 14,
+   "subject_reach": 3,
+   "colonial_range": 10,
+   "succession": "heir_or_adopted",
+   "event_tree": "monarchy",
+   "next": [
+    "warlord_domain",
+    "constitutional_monarchy"
+   ]
+  },
+  "soldier_emirs": {
+   "family": "warriors",
+   "officials": 10,
+   "lords": 6,
+   "subject_reach": 1,
+   "colonial_range": 10,
+   "succession": "emirs_choose",
+   "event_tree": "monarchy",
+   "next": [
+    "household_realm"
+   ]
+  },
+  "military_junta": {
+   "family": "warriors",
+   "officials": 20,
+   "lords": 2,
+   "subject_reach": 0,
+   "colonial_range": 15,
+   "succession": "generals_choose",
+   "event_tree": "military_junta",
+   "next": [
+    "constitutional_republic"
+   ]
+  },
+  "party_state": {
+   "family": "modern",
+   "officials": 30,
+   "lords": 0,
+   "subject_reach": 2,
+   "colonial_range": 20,
+   "succession": "party_chooses",
+   "event_tree": "one_party_state",
+   "next": [
+    "constitutional_republic"
+   ]
+  },
+  "company_rule": {
+   "family": "modern",
+   "officials": 8,
+   "lords": 4,
+   "subject_reach": 2,
+   "colonial_range": 40,
+   "succession": "owners_appoint",
+   "event_tree": "company",
+   "next": [
+    "colonial_government"
+   ]
+  },
+  "colonial_government": {
+   "family": "modern",
+   "officials": 6,
+   "lords": 4,
+   "subject_reach": "none",
+   "colonial_range": 15,
+   "succession": "overlord_appoints",
+   "event_tree": "colonial_administration",
+   "next": []
+  }
+ },
+ "reforms": [
+  {
+   "from": "clan_council",
+   "to": "chiefdom",
+   "needs": [
+    "5 or more provinces"
+   ],
+   "gold": 0,
+   "lords_slip": 0
+  },
+  {
+   "from": "clan_council",
+   "to": "confederation",
+   "needs": [
+    "allied with 2 neighbours of the same people"
+   ],
+   "gold": 0,
+   "lords_slip": 0
+  },
+  {
+   "from": "chiefdom",
+   "to": "paramount_chiefdom",
+   "needs": [
+    "8 or more provinces"
+   ],
+   "gold": 50,
+   "lords_slip": 1
+  },
+  {
+   "from": "paramount_chiefdom",
+   "to": "tribute_empire",
+   "needs": [
+    "3 or more subjects"
+   ],
+   "gold": 100,
+   "lords_slip": 1
+  },
+  {
+   "from": "paramount_chiefdom",
+   "to": "feudal_realm",
+   "needs": [
+    "G2 Feudal grants"
+   ],
+   "gold": 100,
+   "lords_slip": 1
+  },
+  {
+   "from": "paramount_chiefdom",
+   "to": "household_realm",
+   "needs": [
+    "G1 Written law codes"
+   ],
+   "gold": 100,
+   "lords_slip": 2
+  },
+  {
+   "from": "tribute_empire",
+   "to": "household_realm",
+   "needs": [
+    "G3 Tax registers or G6 Quipu"
+   ],
+   "gold": 150,
+   "lords_slip": 2
+  },
+  {
+   "from": "tribute_empire",
+   "to": "bureaucratic_empire",
+   "needs": [
+    "G4 Examination system"
+   ],
+   "gold": 200,
+   "lords_slip": 3
+  },
+  {
+   "from": "horde",
+   "to": "household_realm",
+   "needs": [
+    "a palace in a town"
+   ],
+   "gold": 150,
+   "lords_slip": 2
+  },
+  {
+   "from": "horde",
+   "to": "confederation",
+   "needs": [
+    "no adult heir"
+   ],
+   "gold": 0,
+   "lords_slip": 0,
+   "automatic": true
+  },
+  {
+   "from": "feudal_realm",
+   "to": "diet_monarchy",
+   "needs": [
+    "a diet hall"
+   ],
+   "gold": 100,
+   "lords_slip": 0
+  },
+  {
+   "from": "feudal_realm",
+   "to": "elective_monarchy",
+   "needs": [
+    "the ruling line dies out"
+   ],
+   "gold": 0,
+   "lords_slip": 0,
+   "automatic": true
+  },
+  {
+   "from": [
+    "feudal_realm",
+    "diet_monarchy"
+   ],
+   "to": "absolute_monarchy",
+   "needs": [
+    "G9 Professional bureaucracy",
+    "W12 Standing regiments"
+   ],
+   "gold": 300,
+   "lords_slip": 3
+  },
+  {
+   "from": [
+    "diet_monarchy",
+    "absolute_monarchy",
+    "bureaucratic_empire"
+   ],
+   "to": "constitutional_monarchy",
+   "needs": [
+    "G14 Written constitution",
+    "a parliament house"
+   ],
+   "gold": 200,
+   "lords_slip": 1
+  },
+  {
+   "from": "elective_monarchy",
+   "to": "feudal_realm",
+   "needs": [
+    "the same house elected 3 times running"
+   ],
+   "gold": 100,
+   "lords_slip": 2
+  },
+  {
+   "from": "elective_monarchy",
+   "to": "diet_monarchy",
+   "needs": [
+    "a diet hall"
+   ],
+   "gold": 100,
+   "lords_slip": 1
+  },
+  {
+   "from": "household_realm",
+   "to": "absolute_monarchy",
+   "needs": [
+    "G9 Professional bureaucracy",
+    "W12 Standing regiments"
+   ],
+   "gold": 250,
+   "lords_slip": 2
+  },
+  {
+   "from": "household_realm",
+   "to": "bureaucratic_empire",
+   "needs": [
+    "G9 Professional bureaucracy",
+    "an examination hall"
+   ],
+   "gold": 250,
+   "lords_slip": 2
+  },
+  {
+   "from": "city_commune",
+   "to": "merchant_republic",
+   "needs": [
+    "4 or more traders abroad"
+   ],
+   "gold": 100,
+   "lords_slip": 1
+  },
+  {
+   "from": [
+    "city_commune",
+    "merchant_republic"
+   ],
+   "to": "feudal_realm",
+   "needs": [
+    "one family led the city 3 times running"
+   ],
+   "gold": 150,
+   "lords_slip": 2
+  },
+  {
+   "from": "merchant_republic",
+   "to": "city_commune",
+   "needs": [
+    "trade in debt 3 years running"
+   ],
+   "gold": 0,
+   "lords_slip": 1,
+   "automatic": true
+  },
+  {
+   "from": "peasant_commune",
+   "to": "city_commune",
+   "needs": [
+    "a city in the realm"
+   ],
+   "gold": 50,
+   "lords_slip": 0
+  },
+  {
+   "from": [
+    "city_commune",
+    "merchant_republic",
+    "peasant_commune"
+   ],
+   "to": "constitutional_republic",
+   "needs": [
+    "G14 Written constitution",
+    "a parliament house"
+   ],
+   "gold": 150,
+   "lords_slip": 0
+  },
+  {
+   "from": [
+    "prince_bishopric",
+    "military_order"
+   ],
+   "to": "feudal_realm",
+   "needs": [
+    "the ruler takes a reformed faith (religion design)"
+   ],
+   "gold": 100,
+   "lords_slip": 2
+  },
+  {
+   "from": "holy_rule",
+   "to": "household_realm",
+   "needs": [
+    "one family chose the ruler 3 times running"
+   ],
+   "gold": 150,
+   "lords_slip": 1
+  },
+  {
+   "from": "warlord_domain",
+   "to": "shogunate",
+   "needs": [
+    "holds the imperial capital",
+    "8 or more lords"
+   ],
+   "gold": 150,
+   "lords_slip": 1
+  },
+  {
+   "from": "warlord_domain",
+   "to": "feudal_realm",
+   "needs": [
+    "G1 Written law codes"
+   ],
+   "gold": 100,
+   "lords_slip": 2
+  },
+  {
+   "from": "shogunate",
+   "to": "warlord_domain",
+   "needs": [
+    "the shogun loses the capital"
+   ],
+   "gold": 0,
+   "lords_slip": 0,
+   "automatic": true
+  },
+  {
+   "from": "shogunate",
+   "to": "constitutional_monarchy",
+   "needs": [
+    "G14 Written constitution",
+    "a parliament house"
+   ],
+   "gold": 250,
+   "lords_slip": 4
+  },
+  {
+   "from": "soldier_emirs",
+   "to": "household_realm",
+   "needs": [
+    "one emir's family held the throne 3 reigns"
+   ],
+   "gold": 150,
+   "lords_slip": 2
+  },
+  {
+   "from": "confederation",
+   "to": "feudal_realm",
+   "needs": [
+    "one member holds over half the land"
+   ],
+   "gold": 150,
+   "lords_slip": 3
+  },
+  {
+   "from": "constitutional_monarchy",
+   "to": "constitutional_republic",
+   "needs": [
+    "the ruler deposed or abdicates"
+   ],
+   "gold": 0,
+   "lords_slip": 0,
+   "automatic": true
+  },
+  {
+   "from": "constitutional_republic",
+   "to": "constitutional_monarchy",
+   "needs": [
+    "a king invited by parliament"
+   ],
+   "gold": 0,
+   "lords_slip": 0,
+   "automatic": true
+  },
+  {
+   "from": "company_rule",
+   "to": "colonial_government",
+   "needs": [
+    "the crown takes over"
+   ],
+   "gold": 0,
+   "lords_slip": 1,
+   "automatic": true
+  }
+ ],
+ "revolution_ignores_era": true,
+ "event_tree_map": {
+  "monarchy": {
+   "set": "feudal_realm",
+   "keep_if_in": [
+    "feudal_realm",
+    "diet_monarchy",
+    "household_realm",
+    "elective_monarchy",
+    "bureaucratic_empire",
+    "absolute_monarchy",
+    "constitutional_monarchy",
+    "paramount_chiefdom",
+    "tribute_empire",
+    "warlord_domain",
+    "shogunate",
+    "soldier_emirs"
+   ]
+  },
+  "elective_monarchy": {
+   "set": "elective_monarchy"
+  },
+  "theocracy": {
+   "set": "holy_rule",
+   "keep_if_in": [
+    "prince_bishopric",
+    "military_order",
+    "holy_rule"
+   ]
+  },
+  "republic": {
+   "set": "constitutional_republic",
+   "before_G14": "city_commune",
+   "keep_if_in": [
+    "city_commune",
+    "merchant_republic",
+    "peasant_commune",
+    "constitutional_republic"
+   ]
+  },
+  "merchant_republic": {
+   "set": "merchant_republic"
+  },
+  "tribal": {
+   "set": "chiefdom",
+   "keep_if_in": [
+    "clan_council",
+    "chiefdom"
+   ]
+  },
+  "confederation": {
+   "set": "confederation"
+  },
+  "nomadic_empire": {
+   "set": "horde"
+  },
+  "company": {
+   "set": "company_rule"
+  },
+  "colonial_administration": {
+   "set": "colonial_government"
+  },
+  "constitutional_monarchy": {
+   "set": "constitutional_monarchy"
+  },
+  "liberal_democracy": {
+   "set": "constitutional_republic"
+  },
+  "one_party_state": {
+   "set": "party_state"
+  },
+  "communist": {
+   "set": "party_state"
+  },
+  "fascist": {
+   "set": "party_state"
+  },
+  "military_junta": {
+   "set": "military_junta"
+  }
+ },
+ "start_forms": {
+  "default": "chiefdom",
+  "kingdom_by_region": {
+   "eu_": "feudal_realm",
+   "as_anatolia_caucasus": "feudal_realm",
+   "as_levant_egypt_arabia": "household_realm",
+   "as_iran_transoxiana": "household_realm",
+   "as_south_asia_": "feudal_realm",
+   "as_china_inner_asia": "feudal_realm",
+   "as_steppe_siberia": "horde",
+   "as_japan_korea": "warlord_domain",
+   "as_se_asia_": {
+    "tier_a_b": "tribute_empire",
+    "tier_c": "paramount_chiefdom"
+   },
+   "af_north_sahara": "household_realm",
+   "af_": "paramount_chiefdom",
+   "am_": "paramount_chiefdom",
+   "oc_": "paramount_chiefdom"
+  },
+  "entity_type": {
+   "empire": "household_realm",
+   "grand_duchy": "feudal_realm",
+   "duchy": "feudal_realm",
+   "principality": "feudal_realm",
+   "county": "feudal_realm",
+   "margraviate": "feudal_realm",
+   "landgraviate": "feudal_realm",
+   "electorate": "feudal_realm",
+   "lordship": "feudal_realm",
+   "despotate": "feudal_realm",
+   "voivodeship": "feudal_realm",
+   "prince_bishopric": "prince_bishopric",
+   "prince_archbishopric": "prince_bishopric",
+   "imperial_abbey": "prince_bishopric",
+   "theocracy": "holy_rule",
+   "imamate": "holy_rule",
+   "sharifate": "holy_rule",
+   "military_order": "military_order",
+   "republic": "city_commune",
+   "city_state": "city_commune",
+   "free_imperial_city": "city_commune",
+   "merchant_republic": "merchant_republic",
+   "peasant_republic": "peasant_commune",
+   "league": "confederation",
+   "confederation": "confederation",
+   "supranational_institution": "confederation",
+   "tribal_confederation": "confederation",
+   "ayllu_federation": "confederation",
+   "sultanate": "household_realm",
+   "emirate": "household_realm",
+   "beylik": "household_realm",
+   "atabegate": "household_realm",
+   "khanate": "horde",
+   "horde": "horde",
+   "nomadic_confederation": "horde",
+   "sheikhdom": "chiefdom",
+   "chiefdom": "chiefdom",
+   "cacicazgo": "chiefdom",
+   "tusi_chieftaincy": "chiefdom",
+   "paramount_chiefdom": "paramount_chiefdom",
+   "altepetl": "paramount_chiefdom",
+   "kuchkabal": "paramount_chiefdom",
+   "rajahnate": "paramount_chiefdom",
+   "hueyaltepetl": "tribute_empire",
+   "mandala_polity": "tribute_empire",
+   "stateless_society": "clan_council",
+   "segmentary_lineage_society": "clan_council",
+   "iwi_network": "clan_council",
+   "shugo_domain": "warlord_domain",
+   "shogunate": "shogunate",
+   "colonial_possession": "colonial_government",
+   "trading_post": "colonial_government"
+  },
+  "text_rules": [
+   {
+    "match": "ecclesiastic|bishop|archbishop|abbey|abbot",
+    "form": "prince_bishopric",
+    "skip_types": [
+     "theocracy"
+    ]
+   },
+   {
+    "match": "elective monarchy|elective kingship|elected king|elective personal union",
+    "form": "elective_monarchy"
+   },
+   {
+    "match": "merchant republic|merchant oligarch",
+    "form": "merchant_republic",
+    "only_types": [
+     "republic",
+     "city_state",
+     "free_imperial_city",
+     "merchant_republic",
+     "other"
+    ]
+   },
+   {
+    "match": "military order|order province|knightly order",
+    "form": "military_order"
+   },
+   {
+    "match": "sufi order|monastic|religious corporation|temple",
+    "form": "holy_rule",
+    "only_types": [
+     "other",
+     "theocracy"
+    ]
+   },
+   {
+    "match": "bureaucratic",
+    "form": "bureaucratic_empire"
+   },
+   {
+    "match": "patrimonial",
+    "form": "household_realm"
+   },
+   {
+    "match": "military companies|raiding bands|loyalist band|military lordship|warrior house",
+    "form": "warlord_domain",
+    "only_types": [
+     "other"
+    ]
+   },
+   {
+    "match": "acephalous|communit|village|lineage organisation|lineage-based|suku|bands|communal|council|assembly|decentralised",
+    "form": "clan_council",
+    "only_types": [
+     "other"
+    ]
+   },
+   {
+    "match": "chief|señor|senor|headman",
+    "form": "chiefdom",
+    "only_types": [
+     "other"
+    ]
+   },
+   {
+    "match": "lordship|seigneur|baron|magnate|princely|appanage|eristav|malik|governorship|kingship|kingdom|monarch|saopha|warrior house",
+    "form": "feudal_realm",
+    "only_types": [
+     "other"
+    ]
+   },
+   {
+    "match": "dependency|governorate|regional administration",
+    "form": "colonial_government",
+    "only_types": [
+     "other"
+    ]
+   }
+  ],
+  "overrides": {
+   "ottoman": {
+    "form": "household_realm",
+    "why": "palace servants (kul), timar grants, open succession among sons"
+   },
+   "muscovy": {
+    "form": "household_realm",
+    "why": "grand prince's household and boyars; appanages and service lands"
+   },
+   "timurid_empire": {
+    "form": "household_realm",
+    "why": "appanages for princes, household amirs"
+   },
+   "delhi": {
+    "form": "household_realm",
+    "why": "iqta grants to amirs"
+   },
+   "vijayanagara": {
+    "form": "household_realm",
+    "why": "nayaka service grants (amaram) from the raya"
+   },
+   "bahmani": {
+    "form": "household_realm",
+    "why": "tarafdar governors on service"
+   },
+   "safaviyya": {
+    "form": "holy_rule",
+    "why": "a Sufi order before it became a dynasty (1501)"
+   },
+   "ming": {
+    "form": "bureaucratic_empire",
+    "why": "examination officials, Six Ministries"
+   },
+   "joseon": {
+    "form": "bureaucratic_empire",
+    "why": "examination officials (yangban)"
+   },
+   "dai_viet": {
+    "form": "bureaucratic_empire",
+    "why": "Le dynasty examinations and Chinese-style ministries"
+   },
+   "mamluk": {
+    "form": "soldier_emirs",
+    "why": "bought soldiers rule; emirs choose the sultan"
+   },
+   "venice": {
+    "form": "merchant_republic",
+    "why": "patriciate, doge for life"
+   },
+   "genoa": {
+    "form": "merchant_republic",
+    "why": "merchant alberghi, doge"
+   },
+   "ragusa": {
+    "form": "merchant_republic",
+    "why": "patrician councils, rector"
+   },
+   "lubeck": {
+    "form": "merchant_republic",
+    "why": "council of merchant families, head of the Hanse"
+   },
+   "hamburg": {
+    "form": "merchant_republic",
+    "why": "merchant council"
+   },
+   "hanseatic_league": {
+    "form": "confederation",
+    "why": "league of towns (an institution)"
+   },
+   "florence": {
+    "form": "city_commune",
+    "why": "guild republic under Medici influence"
+   },
+   "novgorod": {
+    "form": "city_commune",
+    "why": "veche republic with a posadnik and archbishop"
+   },
+   "pskov": {
+    "form": "city_commune",
+    "why": "veche republic"
+   },
+   "england": {
+    "form": "diet_monarchy",
+    "why": "Parliament grants taxes"
+   },
+   "aragon": {
+    "form": "diet_monarchy",
+    "why": "Cortes of each realm of the crown"
+   },
+   "aragon_kingdom": {
+    "form": "diet_monarchy",
+    "why": "Cortes of Aragon"
+   },
+   "catalonia": {
+    "form": "diet_monarchy",
+    "why": "Corts and the Generalitat"
+   },
+   "valencia": {
+    "form": "diet_monarchy",
+    "why": "Corts of Valencia"
+   },
+   "poland": {
+    "form": "elective_monarchy",
+    "why": "Jagiellonian kings elected by the lords"
+   },
+   "hungary": {
+    "form": "elective_monarchy",
+    "why": "diet elects the king; regency of Hunyadi"
+   },
+   "bohemia": {
+    "form": "elective_monarchy",
+    "why": "estates elect; interregnum"
+   },
+   "swiss_confederation": {
+    "form": "confederation",
+    "why": "diet of cantons"
+   },
+   "uri": {
+    "form": "peasant_commune",
+    "why": "Landsgemeinde"
+   },
+   "schwyz": {
+    "form": "peasant_commune",
+    "why": "Landsgemeinde"
+   },
+   "unterwalden": {
+    "form": "peasant_commune",
+    "why": "Landsgemeinde"
+   },
+   "glarus": {
+    "form": "peasant_commune",
+    "why": "Landsgemeinde"
+   },
+   "appenzell": {
+    "form": "peasant_commune",
+    "why": "Landsgemeinde"
+   },
+   "dithmarschen": {
+    "form": "peasant_commune",
+    "why": "farmers' republic"
+   },
+   "iceland": {
+    "form": "peasant_commune",
+    "why": "Althing under the crown"
+   },
+   "haudenosaunee": {
+    "form": "confederation",
+    "why": "league council of nations"
+   },
+   "ashikaga": {
+    "form": "shogunate",
+    "why": "military government over shugo houses"
+   },
+   "japan_imperial_court": {
+    "form": "holy_rule",
+    "why": "court monarchy whose power is ritual and appointment"
+   },
+   "honganji_temples": {
+    "form": "holy_rule",
+    "why": "self-governing temple corporations"
+   },
+   "inca": {
+    "form": "tribute_empire",
+    "why": "kept kuraka lords give labour and loyalty"
+   },
+   "tenochtitlan": {
+    "form": "tribute_empire",
+    "why": "tribute provinces of the Triple Alliance"
+   },
+   "triple_alliance": {
+    "form": "tribute_empire",
+    "why": "hegemonic tribute alliance"
+   },
+   "texcoco": {
+    "form": "tribute_empire",
+    "why": "partner in the Triple Alliance"
+   },
+   "chimor": {
+    "form": "tribute_empire",
+    "why": "coastal kingdom holding valley lords"
+   },
+   "purepecha": {
+    "form": "tribute_empire",
+    "why": "tribute state ruled from Tzintzuntzan"
+   },
+   "mali": {
+    "form": "tribute_empire",
+    "why": "mansa over clans and tributary rulers"
+   },
+   "songhai": {
+    "form": "paramount_chiefdom",
+    "why": "Sunni kingship before its expansion (1464)"
+   },
+   "bornu": {
+    "form": "household_realm",
+    "why": "Sayfawa mai with titled officials"
+   },
+   "ethiopia": {
+    "form": "feudal_realm",
+    "why": "Solomonic emperor with rases and a moving royal camp"
+   },
+   "kongo": {
+    "form": "paramount_chiefdom",
+    "why": "mani Kongo chosen by electors from the royal kin"
+   },
+   "majapahit": {
+    "form": "tribute_empire",
+    "why": "mandala over tributary courts"
+   },
+   "ayutthaya": {
+    "form": "tribute_empire",
+    "why": "mandala; sakdina ranks being set up"
+   },
+   "papal_states": {
+    "form": "holy_rule",
+    "why": "the pope chosen by cardinals"
+   },
+   "teutonic_order": {
+    "form": "military_order",
+    "why": "Grand Master and commanderies"
+   },
+   "livonian_order": {
+    "form": "military_order",
+    "why": "Landmeister and commanderies"
+   },
+   "knights_hospitaller": {
+    "form": "military_order",
+    "why": "Grand Master at Rhodes"
+   },
+   "great_horde": {
+    "form": "horde",
+    "why": "Jochid khans and begs"
+   },
+   "crimea": {
+    "form": "horde",
+    "why": "Giray khan with four clan beys"
+   },
+   "kazan": {
+    "form": "household_realm",
+    "why": "settled khanate with towns and farmland"
+   },
+   "northern_yuan": {
+    "form": "horde",
+    "why": "Chinggisid khan and taishi"
+   },
+   "oirat": {
+    "form": "horde",
+    "why": "clan league under a taishi"
+   },
+   "hre": {
+    "form": "elective_monarchy",
+    "why": "electors choose the king; an institution over member realms"
+   },
+   "council_of_basel": {
+    "form": "holy_rule",
+    "why": "church council claiming authority over the pope"
+   },
+   "neuchatel": {
+    "form": "feudal_realm",
+    "why": "a county"
+   },
+   "idrisid_sharifs_fez": {
+    "form": "holy_rule",
+    "why": "sharifian lineage with religious standing"
+   },
+   "kandy": {
+    "form": "feudal_realm",
+    "why": "local aristocracy under a king"
+   },
+   "silesia": {
+    "form": "confederation",
+    "why": "duchies under the Bohemian crown"
+   },
+   "bavarian_minor_estates": {
+    "form": "feudal_realm",
+    "why": "small lordships"
+   },
+   "franconian_minor_estates": {
+    "form": "feudal_realm",
+    "why": "small lordships"
+   },
+   "swabian_minor_estates": {
+    "form": "feudal_realm",
+    "why": "small lordships"
+   },
+   "upper_rhine_minor_estates": {
+    "form": "feudal_realm",
+    "why": "small lordships"
+   },
+   "ryukyu": {
+    "form": "feudal_realm",
+    "why": "Sho kings over island lords (aji)"
+   },
+   "qara_qoyunlu": {
+    "form": "horde",
+    "why": "Turkmen tribal confederation under a ruling clan"
+   },
+   "aq_qoyunlu": {
+    "form": "horde",
+    "why": "Turkmen tribal confederation under a ruling clan"
+   }
+  }
+ },
+ "succession_names": {
+  "eldest_heir": "eldest heir",
+  "strongest_son": "strongest son",
+  "named_heir": "named heir",
+  "lords_elect": "lords elect",
+  "council_picks": "council picks",
+  "assembly_picks": "assembly picks",
+  "elections": "elections",
+  "chapter_elects": "chapter elects",
+  "brothers_elect": "brothers elect",
+  "clergy_choose": "clergy choose",
+  "elders_choose": "elders choose",
+  "chosen_from_lineage": "chosen from the chief's lineage",
+  "royal_kin_choose": "royal kin choose",
+  "eldest_of_house": "eldest of the house",
+  "members_rotate": "members take turns",
+  "heir_or_adopted": "heir or adopted son",
+  "emirs_choose": "emirs choose",
+  "generals_choose": "generals choose",
+  "party_chooses": "the party chooses",
+  "owners_appoint": "owners appoint",
+  "overlord_appoints": "overlord appoints"
+ },
+ "admin_capacity_officials_per_point": 1,
+ "ai": {
+  "reform_month": 1,
+  "reform_gold_reserve_factor": 2
+ }
+}

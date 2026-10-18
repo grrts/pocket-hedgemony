@@ -1,0 +1,670 @@
+{
+  "$comment": "Time and turns (domain/time-and-turns/spec.md). Turn order from DECISIONS X-2, weeks X-3, seasons X-4, start date X-5, victory timing X-12, the 1939 cut X-14. Wet seasons are placeholders; ages from event-tree/data/ages.yaml.",
+  "_provisional": [
+    "seasons.wetSeason",
+    "playback.secondsPer10Days",
+    "playback.secondsPerBattleStep"
+  ],
+  "startDate": {
+    "year": 1444,
+    "month": 11,
+    "day": 11,
+    "$comment": "X-5: every campaign starts on 11 November 1444. defines.json startDate is still March 1444 (a request to the game build); newCampaign uses this value."
+  },
+  "endDate": "1939-08-31",
+  "campaignRules": [
+    "difficulty",
+    "aiAggression",
+    "fogOfWar",
+    "events",
+    "ironman",
+    "endDate",
+    "musicEras"
+  ],
+  "dayPhases": [
+    "move",
+    "stopChecks",
+    "contact",
+    "battles",
+    "standingOrders"
+  ],
+  "moverKindOrder": [
+    [
+      "army"
+    ],
+    [
+      "fleet"
+    ],
+    [
+      "trader",
+      "trade ship"
+    ],
+    [
+      "exploration ship"
+    ]
+  ],
+  "turnStages": [
+    "apply orders",
+    "day loop",
+    "monthly steps",
+    "seasonal steps",
+    "yearly steps",
+    "events",
+    "checks",
+    "achievements",
+    "autosave",
+    "advance the date"
+  ],
+  "monthlyContextOrder": [
+    "warfare",
+    "naval",
+    "exploration",
+    "province",
+    "buildings",
+    "recruiting",
+    "realm",
+    "research",
+    "trade",
+    "subjects",
+    "government",
+    "diplomacy",
+    "culture",
+    "religion",
+    "rebellions",
+    "revolutions"
+  ],
+  "battleDays": {
+    "min": 1,
+    "max": 3
+  },
+  "cadences": [
+    {
+      "step": "where movers stand",
+      "context": "troop-movement",
+      "cadence": "daily",
+      "phase": "move"
+    },
+    {
+      "step": "armies marching",
+      "context": "troop-movement",
+      "cadence": "daily",
+      "phase": "move",
+      "kind": "army"
+    },
+    {
+      "step": "fleets sailing",
+      "context": "naval",
+      "cadence": "daily",
+      "phase": "move",
+      "kind": "fleet"
+    },
+    {
+      "step": "traders travelling",
+      "context": "trade",
+      "cadence": "daily",
+      "phase": "move",
+      "kind": "trader"
+    },
+    {
+      "step": "who meets whom",
+      "context": "troop-movement",
+      "cadence": "daily",
+      "phase": "contact"
+    },
+    {
+      "step": "armies set to attack looking at visible enemies",
+      "context": "troop-movement",
+      "cadence": "daily",
+      "phase": "standingOrders"
+    },
+    {
+      "step": "an army abroad eats from its reserve",
+      "context": "warfare",
+      "cadence": "weekly"
+    },
+    {
+      "step": "an army at home takes its week's meals",
+      "context": "warfare",
+      "cadence": "weekly"
+    },
+    {
+      "step": "hunger in an army with no food",
+      "context": "warfare",
+      "cadence": "weekly"
+    },
+    {
+      "step": "plunder burning one tile",
+      "context": "warfare",
+      "cadence": "weekly"
+    },
+    {
+      "step": "a raid burning one tile and moving on",
+      "context": "warfare",
+      "cadence": "weekly"
+    },
+    {
+      "step": "forced-march desertion of 2 % of levies",
+      "context": "warfare",
+      "cadence": "weekly"
+    },
+    {
+      "step": "plague while an outbreak runs",
+      "context": "province",
+      "cadence": "weekly"
+    },
+    {
+      "step": "births, deaths and overflow",
+      "context": "province",
+      "cadence": "monthly"
+    },
+    {
+      "step": "building upkeep and construction sites",
+      "context": "buildings",
+      "cadence": "monthly"
+    },
+    {
+      "step": "AI looks at one province per country for building",
+      "context": "buildings",
+      "cadence": "monthly"
+    },
+    {
+      "step": "siege month",
+      "context": "warfare",
+      "cadence": "monthly",
+      "aka": [
+        "sieges"
+      ]
+    },
+    {
+      "step": "sickness on campaign",
+      "context": "warfare",
+      "cadence": "monthly",
+      "aka": [
+        "sickness"
+      ]
+    },
+    {
+      "step": "pay owed, months out, drill",
+      "context": "warfare",
+      "cadence": "monthly",
+      "aka": [
+        "pay"
+      ]
+    },
+    {
+      "step": "reserve rot",
+      "context": "warfare",
+      "cadence": "monthly"
+    },
+    {
+      "step": "storms at sea in storm season",
+      "context": "naval",
+      "cadence": "monthly"
+    },
+    {
+      "step": "trade ratio gain and decay",
+      "context": "trade",
+      "cadence": "monthly",
+      "afterDayLoop": true
+    },
+    {
+      "step": "trader upkeep",
+      "context": "trade",
+      "cadence": "monthly"
+    },
+    {
+      "step": "colony progress and colony food",
+      "context": "exploration",
+      "cadence": "monthly"
+    },
+    {
+      "step": "recruit pool refill",
+      "context": "recruiting",
+      "cadence": "monthly"
+    },
+    {
+      "step": "realm treasury and lords",
+      "context": "realm",
+      "cadence": "monthly"
+    },
+    {
+      "step": "research progress",
+      "context": "research",
+      "cadence": "monthly"
+    },
+    {
+      "step": "government monthly step",
+      "context": "government",
+      "cadence": "monthly"
+    },
+    {
+      "step": "culture monthly step",
+      "context": "culture",
+      "cadence": "monthly"
+    },
+    {
+      "step": "religion monthly step",
+      "context": "religion",
+      "cadence": "monthly"
+    },
+    {
+      "step": "rising chance in plotting provinces",
+      "context": "rebellions",
+      "cadence": "monthly"
+    },
+    {
+      "step": "subject tribute",
+      "context": "subjects",
+      "cadence": "monthly"
+    },
+    {
+      "step": "fund rebels caught roll",
+      "context": "diplomacy",
+      "cadence": "monthly"
+    },
+    {
+      "step": "fund a revolution caught roll",
+      "context": "revolutions",
+      "cadence": "monthly"
+    },
+    {
+      "step": "AI diplomatic actions",
+      "context": "diplomacy",
+      "cadence": "monthly"
+    },
+    {
+      "step": "sailors in port and ship states",
+      "context": "naval",
+      "cadence": "monthly"
+    },
+    {
+      "step": "pool events roll",
+      "context": "events",
+      "cadence": "monthly"
+    },
+    {
+      "step": "famine check in every province",
+      "context": "province",
+      "cadence": "seasonal"
+    },
+    {
+      "step": "farms, groves and fisheries make food",
+      "context": "buildings",
+      "cadence": "seasonal"
+    },
+    {
+      "step": "subject loyalty worked out",
+      "context": "subjects",
+      "cadence": "seasonal"
+    },
+    {
+      "step": "resident envoy tie +5",
+      "context": "diplomacy",
+      "cadence": "seasonal"
+    },
+    {
+      "step": "pirate fleets grow by one ship",
+      "context": "naval",
+      "cadence": "seasonal"
+    },
+    {
+      "step": "lords lose loyalty while an army takes their grain",
+      "context": "warfare",
+      "cadence": "seasonal"
+    },
+    {
+      "step": "world domination check",
+      "context": "realm",
+      "cadence": "yearly"
+    },
+    {
+      "step": "harvest",
+      "context": "realm",
+      "cadence": "harvest"
+    },
+    {
+      "step": "wares made",
+      "context": "buildings",
+      "cadence": "yearly"
+    },
+    {
+      "step": "building neglect years counted",
+      "context": "buildings",
+      "cadence": "yearly"
+    },
+    {
+      "step": "building advice",
+      "context": "buildings",
+      "cadence": "yearly"
+    },
+    {
+      "step": "culture drift",
+      "context": "culture",
+      "cadence": "yearly"
+    },
+    {
+      "step": "faith mix",
+      "context": "religion",
+      "cadence": "yearly"
+    },
+    {
+      "step": "diplomacy fades",
+      "context": "diplomacy",
+      "cadence": "yearly"
+    },
+    {
+      "step": "league checks",
+      "context": "diplomacy",
+      "cadence": "yearly"
+    },
+    {
+      "step": "culture checks for the court going native, new tongues abroad and merges",
+      "context": "culture",
+      "cadence": "five-yearly"
+    }
+  ],
+  "afterTurnChecks": [
+    "attention and tutorial checks"
+  ],
+  "lastOfTurn": [
+    "achievement tests"
+  ],
+  "presentation": [
+    "turn in progress",
+    "battle",
+    "event",
+    "turn report"
+  ],
+  "endTurnConfirmation": {
+    "question": "{n} warnings wait for you",
+    "choices": [
+      "Look",
+      "End turn anyway"
+    ],
+    "proceed": "End turn anyway"
+  },
+  "seasons": {
+    "winter": {
+      "northern": [
+        12,
+        1,
+        2
+      ],
+      "southern": [
+        6,
+        7,
+        8
+      ]
+    },
+    "snowPassClosed": {
+      "northern": [
+        12,
+        1,
+        2,
+        3
+      ],
+      "southern": [
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    "wetSeason": {
+      "monsoon_asia": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "sahel_and_savanna": [
+        7,
+        8,
+        9
+      ],
+      "amazon": [
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "startMonths": [
+      3,
+      6,
+      9,
+      12
+    ],
+    "names": {
+      "northern": {
+        "3": "spring",
+        "6": "summer",
+        "9": "autumn",
+        "12": "winter"
+      },
+      "southern": {
+        "3": "autumn",
+        "6": "winter",
+        "9": "spring",
+        "12": "summer"
+      }
+    },
+    "harvestMonth": {
+      "northern": 9,
+      "southern": 3
+    },
+    "paddyHarvestMonths": [
+      3,
+      9
+    ]
+  },
+  "autosave": {
+    "every month": {
+      "everyMonth": true
+    },
+    "every 12 months": {
+      "month": 1
+    },
+    "off": {
+      "never": true
+    }
+  },
+  "selection": {
+    "poolRollIntervalMonths": 1
+  },
+  "outOfScope": {
+    "ages": [
+      "age_of_decolonization",
+      "cold_war",
+      "age_of_globalization"
+    ],
+    "events": [
+      "second_world_war"
+    ]
+  },
+  "ages": [
+    {
+      "id": "age_of_gunpowder_empires",
+      "name": "Age of Gunpowder Empires",
+      "window": [
+        1444,
+        1760
+      ],
+      "forceStart": 1444,
+      "forceEnd": 1760
+    },
+    {
+      "id": "age_of_exploration",
+      "name": "Age of Exploration",
+      "window": [
+        1444,
+        1680
+      ],
+      "forceStart": 1444,
+      "forceEnd": 1680
+    },
+    {
+      "id": "age_of_reformations",
+      "name": "Age of Reformations",
+      "window": [
+        1480,
+        1700
+      ],
+      "forceStart": 1530,
+      "forceEnd": 1700
+    },
+    {
+      "id": "age_of_atlantic_empires",
+      "name": "Age of Atlantic Empires",
+      "window": [
+        1480,
+        1880
+      ],
+      "forceStart": 1520,
+      "forceEnd": 1880
+    },
+    {
+      "id": "age_of_crisis_and_absolutism",
+      "name": "Age of Crisis and Absolutism",
+      "window": [
+        1590,
+        1790
+      ],
+      "forceStart": 1640,
+      "forceEnd": 1790
+    },
+    {
+      "id": "age_of_revolutions",
+      "name": "Age of Revolutions",
+      "window": [
+        1750,
+        1880
+      ],
+      "forceStart": 1800,
+      "forceEnd": 1880
+    },
+    {
+      "id": "age_of_industrialization",
+      "name": "Age of Industrialization",
+      "window": [
+        1700,
+        1950
+      ],
+      "forceStart": 1830,
+      "forceEnd": 1950
+    },
+    {
+      "id": "age_of_imperialism",
+      "name": "Age of Imperialism",
+      "window": [
+        1800,
+        1945
+      ],
+      "forceStart": 1860,
+      "forceEnd": 1945
+    },
+    {
+      "id": "age_of_world_wars",
+      "name": "Age of World Wars",
+      "window": [
+        1890,
+        1960
+      ],
+      "forceStart": 1925,
+      "forceEnd": 1960
+    },
+    {
+      "id": "age_of_decolonization",
+      "name": "Age of Decolonization",
+      "window": [
+        1919,
+        1997
+      ],
+      "forceStart": 1955,
+      "forceEnd": 1997
+    },
+    {
+      "id": "cold_war",
+      "name": "Cold War",
+      "window": [
+        1945,
+        2000
+      ],
+      "forceStart": 1950,
+      "forceEnd": 2000
+    },
+    {
+      "id": "age_of_globalization",
+      "name": "Age of Globalization",
+      "window": [
+        1978,
+        null
+      ],
+      "forceStart": 1995,
+      "forceEnd": null
+    }
+  ],
+  "yearlyMonth": 1,
+  "fiveYearlyEvery": 5,
+  "eras": [
+    {
+      "era": "I",
+      "from": 1444
+    },
+    {
+      "era": "II",
+      "from": 1500
+    },
+    {
+      "era": "III",
+      "from": 1600
+    },
+    {
+      "era": "IV",
+      "from": 1700
+    },
+    {
+      "era": "V",
+      "from": 1800
+    },
+    {
+      "era": "VI",
+      "from": 1870
+    },
+    {
+      "era": "VII",
+      "from": 1914
+    }
+  ],
+  "victory": {
+    "dominationShare": 0.5,
+    "checkMonth": 1,
+    "ways": [
+      "world domination",
+      "best at the end"
+    ],
+    "scores": [
+      "Economy",
+      "Power",
+      "Technology"
+    ]
+  },
+  "playback": {
+    "secondsPer10Days": 1,
+    "secondsPerBattleStep": 0.5
+  },
+  "ageStartsOnPostEndEvent": [
+    "age_of_decolonization"
+  ],
+  "enginePhases": {
+    "apply orders": "apply orders",
+    "marches": "day loop",
+    "economy": "monthly steps",
+    "levies": "monthly steps",
+    "advance the date": "advance the date"
+  },
+  "battleStepsPerDay": 6,
+  "turnDays": 7
+}

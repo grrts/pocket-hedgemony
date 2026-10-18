@@ -1,0 +1,4744 @@
+{
+ "$comment": "National strengths (domain/national-strengths/spec.md). Copied from national-strengths/config: heritage-rules.json (rules), levers.json (levers, scope_cost, where_values, units) and archetypes.json (archetypes); ages and their regions from event-tree/data/ages.yaml. Every number is a placeholder for tuning.",
+ "rules": {
+  "$comment": "Heritage system rules and balance. Every number is a placeholder for tuning; nothing here is taken from another game.",
+  "budget": {
+   "$comment": "Points a part may spend, from levers.json point costs. Small countries get a bonus so a county's birthright matters as much to it as an empire's does to the empire. size_class is the mean of the catalogue's size-dependent assessments (economic_strength, manpower_potential, military_capability, naval_capability, diplomatic_influence, trade_access) on very_low=1 .. very_high=5.",
+   "birthright": 3.0,
+   "heyday": 3.0,
+   "legacy": 2.0,
+   "great_legacy": 3.0,
+   "burden": -2.0,
+   "tolerance": 0.6,
+   "size_bonus": [
+    {
+     "size_class_min": 4.5,
+     "bonus": 0.0
+    },
+    {
+     "size_class_min": 3.5,
+     "bonus": 0.5
+    },
+    {
+     "size_class_min": 2.5,
+     "bonus": 1.0
+    },
+    {
+     "size_class_min": 1.5,
+     "bonus": 1.5
+    },
+    {
+     "size_class_min": 0.0,
+     "bonus": 2.0
+    }
+   ],
+   "size_bonus_applies_to": [
+    "birthright",
+    "heyday"
+   ]
+  },
+  "stat_points": {
+   "legitimacy": 0.1,
+   "stability": 1.0,
+   "prestige": 1.0,
+   "notoriety": 0.5,
+   "admin_capacity": 0.1,
+   "literacy": 0.2,
+   "cohesion": 0.1
+  },
+  "birthright": {
+   "per_country": 1,
+   "dormant_if_condition_false": true,
+   "$comment_dormant": "A birthright whose 'needs' condition fails (Venice without the lagoon, a steppe horde without pasture) goes dormant and wakes again when it holds."
+  },
+  "heydays": {
+   "max_per_country": 3,
+   "max_active": 2,
+   "mark_after_years": 25,
+   "mark_share": 0.3333333333333333,
+   "$comment": "A heyday wakes when its age is active and its 'wakes' condition holds. It sleeps while 'wakes' fails, and ends for good when its age ends or 'ends' holds. A heyday that ran 25 years in total leaves a mark: a permanent echo worth a third of its points (the 'mark' block, or its first lever at a third of its value).",
+   "$comment_mark": "D-HER-14: a mark is a legacy and counts toward max_legacies."
+  },
+  "ambitions": {
+   "active": 3,
+   "pool_min_authored": 5,
+   "pool_min_generated": 4,
+   "guaranteed_historical": 1,
+   "redraw_on_complete_or_fail": true,
+   "age_ambitions_join_pool_when_age_starts": true,
+   "counsel": {
+    "$comment": "Have the court read one ambition: it stirs at once and shows its warmth. Its words stay a hint; ambitions are never fully revealed while open.",
+    "cooldown_years": 10,
+    "gold_by_era": [
+     30,
+     50,
+     80,
+     120,
+     180,
+     260,
+     380
+    ]
+   },
+   "envoy_reveal_years": 2,
+   "$comment_envoy": "D-HER-11: a resident envoy (diplomacy) kept this many years at a foreign court learns the hint and warmth of one of that country's active ambitions, never its plain goal.",
+   "history_mode_setting": {
+    "values": [
+     "drawn",
+     "historical_only"
+    ],
+    "default": "drawn",
+    "$comment": "drawn: 3 drawn from the pool with one historical guaranteed. historical_only: only ambitions tagged historical. No setting reveals ambitions."
+   },
+   "max_legacies": 5,
+   "$comment_legacies": "A sixth legacy asks the player which one to let go.",
+   "never_revealed": true,
+   "warmth_bands": {
+    "$comment": "D-HER-13: cold under a third, warm under two thirds, hot from two thirds.",
+    "cold": 0.0,
+    "warm": 0.3333333333333333,
+    "hot": 0.6666666666666666
+   },
+   "pool_max": 7,
+   "$comment_pool": "D-HER-10: a pool holds pool_min_* to pool_max entries; age ambitions join on top and do not count."
+  },
+  "burden": {
+   "per_country_max": 1,
+   "turned_legacy": true,
+   "$comment": "A burden is a historical weakness. When its 'shed' condition holds, it is removed and its 'turned' legacy is granted."
+  },
+  "inheritance": {
+   "$comment": "What happens to heritage when countries change hands.",
+   "annexed_birthright": "dormant_claim",
+   "dormant_claim_wakes_if": "owns the annexed country's capital and has held a majority of its homeland provinces for claim_years (D-HER-1: no culture test)",
+   "max_birthrights": 2,
+   "released_country": "gets its own catalogue heritage, or the generated heritage of its archetype if it is not in the catalogue",
+   "formed_country": "keeps the forming country's own birthright and legacies, gains the formed country's authored heritage if any (its birthright second), and draws ambitions from both pools; any other birthright of the forming country becomes a dormant claim again (D-HER-17)",
+   "subject": "keeps its full heritage; an overlord's legacies never apply to subjects",
+   "claim_years": 30
+  },
+  "ai": {
+   "ambition_goal_weight": 1.5,
+   "$comment": "The AI treats its active ambitions (it always sees them) as goals with this weight next to its catalogue ai_personality priorities. An AI that completes one gets its legacy like a player.",
+   "sleep_heyday": "fewest_points",
+   "let_go_legacy": "fewest_points",
+   "$comment_choices": "D-HER-12: the AI sleeps the awake heyday, and lets go the legacy, with the fewest lever points; ties go to the one held longest."
+  },
+  "timing": {
+   "$comment": "D-HER-9, X-18: heritage is evaluated once per turn (one week), in the events step after the event tree, and counts time in months by the date: a month is added only in the turn in which a new month begins.",
+   "months_per_year": 12
+  }
+ },
+ "units": {
+  "pct": "Percent change relative to the base rule (+10 = ten percent more). Negative means less.",
+  "steps": "Whole steps on a ladder the owning design defines (harvest steps, loyalty steps, troop levels, road steps).",
+  "count": "Whole things: envoys, officials, ships, rings, months, years.",
+  "flag": "On or off; value is true. Names a rule switch or an access."
+ },
+ "levers": {
+  "tax_reach_pct": {
+   "group": "treasury",
+   "unit": "pct",
+   "points": 0.1,
+   "params": [
+    "where"
+   ],
+   "owner": "province-stats 8",
+   "meaning": "Share of tax owed that reaches the treasury.",
+   "better": "higher"
+  },
+  "trade_balance_pct": {
+   "group": "treasury",
+   "unit": "pct",
+   "points": 0.1,
+   "params": [
+    "where"
+   ],
+   "owner": "trade v2 (X-6)",
+   "meaning": "Percent on the trade ratio gain in the affected provinces.",
+   "better": "higher"
+  },
+  "toll_gold_pct": {
+   "group": "treasury",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [
+    "where"
+   ],
+   "owner": "province-stats 7.2",
+   "meaning": "Gold per trader at your toll points (bridges, passes, straits).",
+   "better": "higher"
+  },
+  "loan_interest_pct": {
+   "group": "treasury",
+   "unit": "pct",
+   "points": 0.03,
+   "params": [],
+   "owner": "country-stats 2",
+   "meaning": "Yearly interest on your debt (negative is cheaper).",
+   "better": "lower"
+  },
+  "tribute_pct": {
+   "group": "treasury",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [],
+   "owner": "country-stats 9; subjects design (provisional)",
+   "meaning": "Gold and grain your subjects and tributaries send.",
+   "better": "higher"
+  },
+  "loot_pct": {
+   "group": "treasury",
+   "unit": "pct",
+   "points": 0.03,
+   "params": [],
+   "owner": "warfare 8.5, 9.2",
+   "meaning": "Gold from sacks, raids and ransoms.",
+   "better": "higher"
+  },
+  "ware_output_pct": {
+   "group": "economy",
+   "unit": "pct",
+   "points": 0.06,
+   "params": [
+    "ware",
+    "where"
+   ],
+   "owner": "province-stats 5.2",
+   "meaning": "Loads made of one named ware (or all wares if no ware is given, at triple cost).",
+   "better": "higher"
+  },
+  "harvest_steps": {
+   "group": "food",
+   "unit": "steps",
+   "points": 1.2,
+   "params": [
+    "where",
+    "tile"
+   ],
+   "owner": "province-stats 5.1",
+   "meaning": "Harvest rolls one step better (normal becomes good) on the affected food tiles.",
+   "better": "higher"
+  },
+  "herd_growth_pct": {
+   "group": "food",
+   "unit": "pct",
+   "points": 0.04,
+   "params": [],
+   "owner": "country-stats 3.1",
+   "meaning": "Yearly growth of herds; also softens drought losses by the same share.",
+   "better": "higher"
+  },
+  "fish_pct": {
+   "group": "food",
+   "unit": "pct",
+   "points": 0.03,
+   "params": [],
+   "owner": "province-stats 5.1",
+   "meaning": "Food from fisheries.",
+   "better": "higher"
+  },
+  "store_rot_pct": {
+   "group": "food",
+   "unit": "pct",
+   "points": 0.02,
+   "params": [],
+   "owner": "country-stats 3.2",
+   "meaning": "Rot of local and castle stores (negative rots less).",
+   "better": "lower"
+  },
+  "castle_reach_rings": {
+   "group": "food",
+   "unit": "count",
+   "points": 1.0,
+   "params": [],
+   "owner": "country-stats 3.2",
+   "meaning": "Rings of provinces each castle can feed.",
+   "better": "higher"
+  },
+  "growth_pct": {
+   "group": "people",
+   "unit": "pct",
+   "points": 0.1,
+   "params": [
+    "where"
+   ],
+   "owner": "province-stats 6.1",
+   "meaning": "Yearly population growth.",
+   "better": "higher"
+  },
+  "migrants_pct": {
+   "group": "people",
+   "unit": "pct",
+   "points": 0.03,
+   "params": [
+    "class"
+   ],
+   "owner": "country-stats 4, 7.1",
+   "meaning": "Share of refugees, craftsmen and scholars fleeing abroad who choose you.",
+   "better": "higher"
+  },
+  "class_slots_pct": {
+   "group": "people",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [
+    "class"
+   ],
+   "owner": "province-stats 6.3",
+   "meaning": "Job slots of one class (seafolk, herders, market folk ...) in your buildings.",
+   "better": "higher"
+  },
+  "official_wage_pct": {
+   "group": "rule",
+   "unit": "pct",
+   "points": 0.06,
+   "params": [],
+   "owner": "country-stats 4",
+   "meaning": "Yearly wage of officials (negative is cheaper).",
+   "better": "lower"
+  },
+  "official_type_pct": {
+   "group": "rule",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [
+    "type"
+   ],
+   "owner": "province-stats 10.2",
+   "meaning": "Strength of one official type's effect where assigned (a tax collector's +20 % becomes +30 % at +50).",
+   "better": "higher"
+  },
+  "official_years_to_full": {
+   "group": "rule",
+   "unit": "count",
+   "points": 0.6,
+   "params": [],
+   "owner": "province-stats 10.2",
+   "meaning": "Years an official needs to reach full effect (base 5; negative is faster).",
+   "better": "lower"
+  },
+  "official_capacity": {
+   "group": "rule",
+   "unit": "count",
+   "points": 0.5,
+   "params": [],
+   "owner": "government design (provisional)",
+   "meaning": "Officials the government can support before strain.",
+   "better": "higher"
+  },
+  "lord_capacity": {
+   "group": "rule",
+   "unit": "count",
+   "points": 0.5,
+   "params": [],
+   "owner": "government design (provisional)",
+   "meaning": "Named lords the government can support before strain.",
+   "better": "higher"
+  },
+  "lord_loyalty_start_steps": {
+   "group": "rule",
+   "unit": "steps",
+   "points": 1.0,
+   "params": [
+    "lord_kind"
+   ],
+   "owner": "country-stats 5.5",
+   "meaning": "Lords start one step more loyal (wavering becomes loyal).",
+   "better": "higher"
+  },
+  "lord_loyalty_shield": {
+   "group": "rule",
+   "unit": "flag",
+   "points": 1.0,
+   "params": [
+    "cause"
+   ],
+   "owner": "country-stats 5.5",
+   "meaning": "One named cause no longer lowers lords' loyalty (for example 'new_ruler' or 'heavy_taxes').",
+   "better": "higher"
+  },
+  "retinue_pct": {
+   "group": "rule",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [],
+   "owner": "warfare 3.2",
+   "meaning": "Men lords bring when called.",
+   "better": "higher"
+  },
+  "grievance_shield": {
+   "group": "rule",
+   "unit": "flag",
+   "points": 1.5,
+   "params": [
+    "grievance",
+    "where"
+   ],
+   "owner": "province-stats 12.1",
+   "meaning": "One named grievance does not count in the affected provinces.",
+   "better": "higher"
+  },
+  "days_to_capital_pct": {
+   "group": "rule",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [],
+   "owner": "province-stats 9",
+   "meaning": "Days to capital or seat (negative is closer).",
+   "better": "lower"
+  },
+  "integration_years_pct": {
+   "group": "rule",
+   "unit": "pct",
+   "points": 0.04,
+   "params": [],
+   "owner": "province-stats 12.1 (Foreign rule)",
+   "meaning": "Years before Foreign rule fades in conquered land (negative is faster).",
+   "better": "lower"
+  },
+  "recruit_refill_pct": {
+   "group": "army",
+   "unit": "pct",
+   "points": 0.06,
+   "params": [],
+   "owner": "country-stats 6",
+   "meaning": "Yearly refill of recruits.",
+   "better": "higher"
+  },
+  "troop_cap_share": {
+   "group": "army",
+   "unit": "count",
+   "points": 2.0,
+   "params": [],
+   "owner": "warfare 2.5",
+   "meaning": "Percentage points added to the troop cap share of royal provinces with an official (base 2).",
+   "better": "higher"
+  },
+  "levy_free_months": {
+   "group": "army",
+   "unit": "count",
+   "points": 0.5,
+   "params": [],
+   "owner": "warfare 2.3",
+   "meaning": "Months a levy serves before pay is due (base 3).",
+   "better": "higher"
+  },
+  "break_point_pct": {
+   "group": "army",
+   "unit": "pct",
+   "points": 0.15,
+   "params": [
+    "kind",
+    "arm"
+   ],
+   "owner": "warfare 2.3",
+   "meaning": "Break point of the named kind or arm, in percentage points.",
+   "better": "higher"
+  },
+  "hits_pct": {
+   "group": "army",
+   "unit": "pct",
+   "points": 0.08,
+   "params": [
+    "arm",
+    "terrain"
+   ],
+   "owner": "warfare 7.8",
+   "meaning": "Hits dealt by the named arm (optionally only on the named ground).",
+   "better": "higher"
+  },
+  "horses_pct": {
+   "group": "army",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [],
+   "owner": "country-stats 6",
+   "meaning": "Horses bred each year.",
+   "better": "higher"
+  },
+  "march_days_pct": {
+   "group": "army",
+   "unit": "pct",
+   "points": 0.06,
+   "params": [
+    "terrain"
+   ],
+   "owner": "warfare 5.2",
+   "meaning": "Days to cross (negative is faster), optionally only on the named ground.",
+   "better": "lower"
+  },
+  "forage_pct": {
+   "group": "army",
+   "unit": "pct",
+   "points": 0.04,
+   "params": [],
+   "owner": "warfare 6.3",
+   "meaning": "Food your armies can take from the locals without causing Requisitioned.",
+   "better": "higher"
+  },
+  "siege_pct": {
+   "group": "army",
+   "unit": "pct",
+   "points": 0.06,
+   "params": [],
+   "owner": "warfare 8.3",
+   "meaning": "Speed of your sieges (breaches and mining).",
+   "better": "higher"
+  },
+  "garrison_pct": {
+   "group": "army",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [],
+   "owner": "warfare 8.1",
+   "meaning": "Strength of garrisons on your walls.",
+   "better": "higher"
+  },
+  "hired_company_cost_pct": {
+   "group": "army",
+   "unit": "pct",
+   "points": 0.04,
+   "params": [],
+   "owner": "warfare 3.3",
+   "meaning": "Pay of hired companies (negative is cheaper).",
+   "better": "lower"
+  },
+  "commander_style": {
+   "group": "army",
+   "unit": "flag",
+   "points": 1.0,
+   "params": [
+    "style"
+   ],
+   "owner": "warfare-styles 2.1",
+   "meaning": "Your commanders may take this style even before its inventions are known.",
+   "better": "higher"
+  },
+  "commander_skill": {
+   "group": "army",
+   "unit": "count",
+   "points": 1.2,
+   "params": [
+    "skill",
+    "origin"
+   ],
+   "owner": "warfare 4.2",
+   "meaning": "New commanders of the named origin start with this many extra points in the named skill.",
+   "better": "higher"
+  },
+  "ship_build_pct": {
+   "group": "navy",
+   "unit": "pct",
+   "points": 0.06,
+   "params": [
+    "ship"
+   ],
+   "owner": "warfare 11.1; naval design (provisional)",
+   "meaning": "Months to build ships (negative is faster).",
+   "better": "lower"
+  },
+  "crew_pct": {
+   "group": "navy",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [],
+   "owner": "warfare 11.1; naval design (provisional)",
+   "meaning": "Sailors raised per thousand seafolk in port provinces.",
+   "better": "higher"
+  },
+  "ship_hits_pct": {
+   "group": "navy",
+   "unit": "pct",
+   "points": 0.07,
+   "params": [
+    "ship",
+    "sea"
+   ],
+   "owner": "warfare 11.2",
+   "meaning": "Hits dealt by your ships.",
+   "better": "higher"
+  },
+  "sea_days_pct": {
+   "group": "navy",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [
+    "sea"
+   ],
+   "owner": "naval design (provisional)",
+   "meaning": "Days to cross a sea zone (negative is faster).",
+   "better": "lower"
+  },
+  "storm_loss_pct": {
+   "group": "navy",
+   "unit": "pct",
+   "points": 0.03,
+   "params": [],
+   "owner": "warfare 11.3",
+   "meaning": "Ships lost in storms (negative loses fewer).",
+   "better": "lower"
+  },
+  "trader_count": {
+   "group": "trade",
+   "unit": "count",
+   "points": 1.0,
+   "params": [],
+   "owner": "trade v2 (X-6)",
+   "meaning": "Extra traders at the campaign start.",
+   "better": "higher"
+  },
+  "trader_gain_pct": {
+   "group": "trade",
+   "unit": "pct",
+   "points": 0.08,
+   "params": [
+    "route_kind"
+   ],
+   "owner": "trade v2 (X-6)",
+   "meaning": "Percent on each deposit a trader makes (land, river or sea).",
+   "better": "higher"
+  },
+  "traders_passing_pct": {
+   "group": "trade",
+   "unit": "pct",
+   "points": 0.06,
+   "params": [
+    "where"
+   ],
+   "owner": "trade v2 (X-6)",
+   "meaning": "Percent on the trade ratio gain in the affected provinces.",
+   "better": "higher"
+  },
+  "invention_cost_pct": {
+   "group": "learning",
+   "unit": "pct",
+   "points": 0.08,
+   "params": [
+    "bough",
+    "inventions"
+   ],
+   "owner": "research-tree",
+   "meaning": "Scholar-years an invention costs (negative is cheaper). Bough R1-R4 or a list of invention ids.",
+   "better": "lower"
+  },
+  "scholar_output_pct": {
+   "group": "learning",
+   "unit": "pct",
+   "points": 0.1,
+   "params": [],
+   "owner": "country-stats 7.3",
+   "meaning": "Research made by each scholar and student.",
+   "better": "higher"
+  },
+  "school_seats_pct": {
+   "group": "learning",
+   "unit": "pct",
+   "points": 0.04,
+   "params": [
+    "school"
+   ],
+   "owner": "country-stats 7.1",
+   "meaning": "Student seats in your schools.",
+   "better": "higher"
+  },
+  "spread_discount_cap": {
+   "group": "learning",
+   "unit": "count",
+   "points": 0.1,
+   "params": [],
+   "owner": "research-tree",
+   "meaning": "Percentage points added to the 60 % cap on spread discounts.",
+   "better": "higher"
+  },
+  "faith_shift_pct": {
+   "group": "belief",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [
+    "where"
+   ],
+   "owner": "province-stats 4.3 (house of worship); religion design (provisional)",
+   "meaning": "Speed at which houses of worship and chaplains move the faith mix.",
+   "better": "higher"
+  },
+  "tongue_shift_pct": {
+   "group": "belief",
+   "unit": "pct",
+   "points": 0.05,
+   "params": [
+    "where"
+   ],
+   "owner": "country-stats 4; culture design (provisional)",
+   "meaning": "Speed of assimilation toward the ruler's tongue.",
+   "better": "higher"
+  },
+  "envoy_count": {
+   "group": "abroad",
+   "unit": "count",
+   "points": 1.2,
+   "params": [],
+   "owner": "country-stats 9; diplomacy design (provisional)",
+   "meaning": "Envoys you can send at once.",
+   "better": "higher"
+  },
+  "opinion_steps": {
+   "group": "abroad",
+   "unit": "steps",
+   "points": 0.8,
+   "params": [
+    "of"
+   ],
+   "owner": "country-relations; diplomacy design (provisional)",
+   "meaning": "Opinion of the named group of countries toward you (same faith, same culture group, neighbours, a named country).",
+   "better": "higher"
+  },
+  "oath_fade_pct": {
+   "group": "abroad",
+   "unit": "pct",
+   "points": 0.03,
+   "params": [],
+   "owner": "country-stats 9",
+   "meaning": "Years before broken oaths fade (negative fades faster).",
+   "better": "lower"
+  },
+  "lands_taken_pct": {
+   "group": "abroad",
+   "unit": "pct",
+   "points": 0.04,
+   "params": [
+    "where"
+   ],
+   "owner": "country-stats 9",
+   "meaning": "How much each province you seize counts toward Lands taken (negative alarms neighbours less).",
+   "better": "lower"
+  },
+  "building_cost_pct": {
+   "group": "building",
+   "unit": "pct",
+   "points": 0.04,
+   "params": [
+    "building"
+   ],
+   "owner": "buildings design",
+   "meaning": "Gold and time for the named building (negative is cheaper).",
+   "better": "lower"
+  },
+  "building_unlock": {
+   "group": "building",
+   "unit": "flag",
+   "points": 1.5,
+   "params": [
+    "building"
+   ],
+   "owner": "buildings design",
+   "meaning": "The named building, or a unique variant from buildings 9.2 (D-HER-7), can be built before its invention is known.",
+   "better": "higher"
+  },
+  "invention_known": {
+   "group": "learning",
+   "unit": "flag",
+   "points": 1.5,
+   "params": [
+    "invention"
+   ],
+   "owner": "research-tree",
+   "meaning": "The named invention is known (granted once).",
+   "better": "higher"
+  },
+  "event_weight": {
+   "group": "events",
+   "unit": "pct",
+   "points": 0.01,
+   "params": [
+    "event"
+   ],
+   "owner": "event-tree selection",
+   "meaning": "Selection weight of the named event for this country (+100 doubles it).",
+   "better": "higher"
+  },
+  "event_option": {
+   "group": "events",
+   "unit": "flag",
+   "points": 0.5,
+   "params": [
+    "event",
+    "option"
+   ],
+   "owner": "event-tree options",
+   "meaning": "Makes the named option available to this country (overrides the option's allowed test).",
+   "better": "higher"
+  },
+  "stat": {
+   "group": "events",
+   "unit": "count",
+   "points": 0.0,
+   "params": [
+    "stat"
+   ],
+   "owner": "events (stat_mapping, D-EVT-4)",
+   "meaning": "Compatibility lever for the event tree's abstract stats (legitimacy, stability, prestige). Each unit costs the points set in heritage-rules.json stat_points.",
+   "better": "higher"
+  },
+  "homeland_resistance_pct": {
+   "group": "rule",
+   "unit": "pct",
+   "points": 0.03,
+   "params": [],
+   "owner": "province-stats 12.1 (Foreign rule)",
+   "meaning": "Years Foreign rule lasts in your homeland provinces while a conqueror holds them (+ is longer, which is good for you).",
+   "better": "higher"
+  }
+ },
+ "where_values": [
+  "realm",
+  "capital",
+  "coast",
+  "core",
+  "royal",
+  "lords",
+  "frontier",
+  "terrain:<id>",
+  "culture:<group>",
+  "faith:<id>",
+  "area:<id>",
+  "region:<id>"
+ ],
+ "scope_cost": {
+  "$comment": "Cost multiplier for a scoped lever. Factors multiply; the result is never below 0.25.",
+  "where": {
+   "realm": 1.0,
+   "capital": 0.5,
+   "coast": 0.5,
+   "core": 0.5,
+   "royal": 0.5,
+   "lords": 0.5,
+   "frontier": 0.5,
+   "terrain": 0.5,
+   "culture": 0.5,
+   "faith": 0.5,
+   "region": 0.5,
+   "area": 0.25,
+   "place": 0.25
+  },
+  "terrain_param": 0.5,
+  "sea_param": 0.5,
+  "floor": 0.25
+ },
+ "provisional_levers": [
+  "tribute_pct",
+  "official_capacity",
+  "lord_capacity",
+  "ship_build_pct",
+  "crew_pct",
+  "sea_days_pct",
+  "faith_shift_pct",
+  "tongue_shift_pct",
+  "envoy_count",
+  "opinion_steps"
+ ],
+ "heritage_conditions": [
+  "knows",
+  "holds_place",
+  "coastal",
+  "count",
+  "heritage",
+  "independent"
+ ],
+ "heritage_states": [
+  "awake",
+  "done",
+  "lost",
+  "shed",
+  "held"
+ ],
+ "themes": [
+  "land",
+  "sea",
+  "trade",
+  "faith",
+  "crown",
+  "learning",
+  "survival",
+  "wealth"
+ ],
+ "size_dims": [
+  "economic_strength",
+  "manpower_potential",
+  "military_capability",
+  "naval_capability",
+  "diplomatic_influence",
+  "trade_access"
+ ],
+ "levels": {
+  "very_low": 1,
+  "low": 2,
+  "moderate": 3,
+  "high": 4,
+  "very_high": 5
+ },
+ "groups": {
+  "tier_a": {
+   "modes": [
+    "playable_country",
+    "playable_subject"
+   ],
+   "heritage": "authored",
+   "count": 58
+  },
+  "tier_b_c": {
+   "modes": [
+    "playable_country",
+    "playable_subject"
+   ],
+   "heritage": "generated",
+   "count": 434
+  },
+  "decentralised": {
+   "modes": [
+    "decentralized_polity"
+   ],
+   "heritage": "generated_decentralised",
+   "count": 214
+  },
+  "background": {
+   "modes": [
+    "background",
+    "non_state_actor",
+    "internal_estate",
+    "collective_institution"
+   ],
+   "heritage": "none",
+   "count": 257
+  }
+ },
+ "ages": [
+  {
+   "id": "age_of_gunpowder_empires",
+   "name": "Age of Gunpowder Empires",
+   "regions": [
+    "middle_east",
+    "south_asia",
+    "central_asia",
+    "east_asia",
+    "europe",
+    "north_africa",
+    "sub_saharan_africa"
+   ]
+  },
+  {
+   "id": "age_of_exploration",
+   "name": "Age of Exploration",
+   "regions": [
+    "europe",
+    "sub_saharan_africa",
+    "south_asia",
+    "southeast_asia",
+    "east_asia",
+    "caribbean",
+    "central_america",
+    "south_america",
+    "north_africa",
+    "oceania"
+   ]
+  },
+  {
+   "id": "age_of_reformations",
+   "name": "Age of Reformations",
+   "regions": [
+    "europe",
+    "middle_east",
+    "south_asia",
+    "east_asia",
+    "central_asia"
+   ]
+  },
+  {
+   "id": "age_of_atlantic_empires",
+   "name": "Age of Atlantic Empires",
+   "regions": [
+    "europe",
+    "sub_saharan_africa",
+    "caribbean",
+    "north_america",
+    "central_america",
+    "south_america"
+   ]
+  },
+  {
+   "id": "age_of_crisis_and_absolutism",
+   "name": "Age of Crisis and Absolutism",
+   "regions": [
+    "europe",
+    "east_asia",
+    "south_asia",
+    "middle_east",
+    "central_asia",
+    "sub_saharan_africa",
+    "north_america"
+   ]
+  },
+  {
+   "id": "age_of_revolutions",
+   "name": "Age of Revolutions",
+   "regions": [
+    "europe",
+    "north_america",
+    "caribbean",
+    "central_america",
+    "south_america",
+    "sub_saharan_africa",
+    "middle_east",
+    "north_africa"
+   ]
+  },
+  {
+   "id": "age_of_industrialization",
+   "name": "Age of Industrialization",
+   "regions": [
+    "europe",
+    "north_america",
+    "east_asia",
+    "south_asia",
+    "south_america",
+    "middle_east"
+   ]
+  },
+  {
+   "id": "age_of_imperialism",
+   "name": "Age of Imperialism",
+   "regions": [
+    "sub_saharan_africa",
+    "north_africa",
+    "south_asia",
+    "southeast_asia",
+    "east_asia",
+    "central_asia",
+    "oceania",
+    "middle_east",
+    "europe",
+    "north_america"
+   ]
+  },
+  {
+   "id": "age_of_world_wars",
+   "name": "Age of World Wars",
+   "regions": [
+    "europe",
+    "east_asia",
+    "southeast_asia",
+    "north_africa",
+    "middle_east",
+    "south_asia",
+    "sub_saharan_africa",
+    "oceania",
+    "north_america"
+   ]
+  },
+  {
+   "id": "age_of_decolonization",
+   "name": "Age of Decolonization",
+   "regions": [
+    "south_asia",
+    "southeast_asia",
+    "sub_saharan_africa",
+    "north_africa",
+    "middle_east",
+    "caribbean",
+    "oceania"
+   ]
+  },
+  {
+   "id": "cold_war",
+   "name": "Cold War",
+   "regions": [
+    "europe",
+    "north_america",
+    "east_asia",
+    "southeast_asia",
+    "south_asia",
+    "middle_east",
+    "sub_saharan_africa",
+    "central_america",
+    "south_america",
+    "caribbean",
+    "central_asia"
+   ]
+  },
+  {
+   "id": "age_of_globalization",
+   "name": "Age of Globalization",
+   "regions": [
+    "europe",
+    "north_america",
+    "east_asia",
+    "south_asia",
+    "southeast_asia",
+    "middle_east",
+    "sub_saharan_africa",
+    "south_america",
+    "central_america",
+    "central_asia",
+    "oceania",
+    "north_africa",
+    "caribbean"
+   ]
+  }
+ ],
+ "macro_regions": {
+  "eu_": [
+   "europe"
+  ],
+  "as_anatolia_caucasus": [
+   "middle_east"
+  ],
+  "as_levant_egypt_arabia": [
+   "middle_east",
+   "north_africa"
+  ],
+  "as_iran_transoxiana": [
+   "middle_east",
+   "central_asia"
+  ],
+  "as_steppe_siberia": [
+   "central_asia"
+  ],
+  "as_china_inner_asia": [
+   "east_asia",
+   "central_asia"
+  ],
+  "as_japan_korea": [
+   "east_asia"
+  ],
+  "as_se_asia": [
+   "southeast_asia"
+  ],
+  "as_south_asia": [
+   "south_asia"
+  ],
+  "af_north_sahara": [
+   "north_africa"
+  ],
+  "af_west": [
+   "sub_saharan_africa"
+  ],
+  "af_central_south": [
+   "sub_saharan_africa"
+  ],
+  "af_northeast_east": [
+   "sub_saharan_africa",
+   "north_africa"
+  ],
+  "am_north": [
+   "north_america"
+  ],
+  "am_mesoamerica_caribbean": [
+   "central_america",
+   "caribbean"
+  ],
+  "am_south": [
+   "south_america"
+  ],
+  "oc_oceania": [
+   "oceania"
+  ]
+ },
+ "path_theme": {
+  "territorial_expansion": "land",
+  "consolidation": "crown",
+  "union_or_merger": "crown",
+  "exploration": "sea",
+  "trade_competition": "trade",
+  "independence": "survival",
+  "political_reform": "crown",
+  "economic_transformation": "wealth",
+  "military_reform": "land",
+  "religious_transformation": "faith"
+ },
+ "path_hint": {
+  "land": "A border history once moved.",
+  "crown": "A crown history once shaped.",
+  "sea": "A course history once sailed.",
+  "trade": "A market history once fought over.",
+  "survival": "A freedom history once won.",
+  "wealth": "A fortune history once made.",
+  "faith": "A faith history once remade."
+ },
+ "archetypes": {
+  "decentralized_allowed": [
+   "segmentary_society",
+   "forest_chiefdom",
+   "hill_chieftaincy",
+   "pastoral_people",
+   "steppe_horde",
+   "desert_caravan",
+   "ocean_voyagers",
+   "chiefly_society",
+   "peasant_republic",
+   "raiders",
+   "island_realm",
+   "mountain_folk",
+   "andean_realm"
+  ],
+  "$comment": "Archetypes for generated heritage (national-strengths-design.md 6.1). detect: entity_type (catalogue classification), focus_any (ai_personality.economic_priorities.focus), modes_any (expansion.modes), seas (true = must have sea access, false = must not), rivers_min, naval_min (naval_capability level 1-5), size_min (size class), text_any (words in geography, economy and history text), region_any (catalogue region), religion_any (words in the main religion), mode (representation mode). Placeholders in text: {name} {capital} {goods} {sea} {river} {woods} {terrain_words}. Heyday age_options: first age whose regions cover the country is used. Effects are written for a size bonus of 0; percentages scale with the country's budget.",
+  "archetypes": [
+   {
+    "id": "sea_trading_city",
+    "label": "Sea-trading city",
+    "detect": {
+     "entity_type": [
+      "city_state",
+      "merchant_republic",
+      "republic",
+      "free_imperial_city",
+      "trading_post",
+      "league"
+     ],
+     "seas": true,
+     "focus_any": [
+      "trade",
+      "maritime_commerce",
+      "banking_and_finance"
+     ]
+    },
+    "birthright": {
+     "name": "Wharves of {capital}",
+     "text": "Traders at sea gather 20 % more; 15 % more traders pass the capital; ports raise 20 % more sailors.",
+     "why": "{name} lived from the sea trade through {capital} ({goods}).",
+     "effects": [
+      {
+       "lever": "trader_gain_pct",
+       "value": 20,
+       "route_kind": "sea"
+      },
+      {
+       "lever": "traders_passing_pct",
+       "value": 15,
+       "where": "capital"
+      },
+      {
+       "lever": "crew_pct",
+       "value": 20
+      }
+     ],
+     "needs": {
+      "coastal": {
+       "who": "this"
+      }
+     }
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_exploration",
+       "age_of_gunpowder_empires",
+       "age_of_atlantic_empires"
+      ],
+      "name": "Carrying trade",
+      "text": "One more trader; traders at sea gather 15 % more; customs officers 20 % stronger.",
+      "why": "Inferred: a free port's chance came when ocean routes multiplied the goods to carry.",
+      "wakes": {
+       "all": [
+        {
+         "coastal": {
+          "who": "this"
+         }
+        },
+        {
+         "independent": {
+          "who": "this"
+         }
+        }
+       ]
+      },
+      "effects": [
+       {
+        "lever": "trader_count",
+        "value": 1
+       },
+       {
+        "lever": "trader_gain_pct",
+        "value": 15,
+        "route_kind": "sea"
+       },
+       {
+        "lever": "official_type_pct",
+        "value": 20,
+        "type": "customs_officer"
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Few hands",
+     "text": "Recruits refill 20 % slower, and levies serve one month less before pay.",
+     "why": "A city's people are craftsmen and sailors, not soldiers (inferred from the catalogue's small manpower).",
+     "effects": [
+      {
+       "lever": "recruit_refill_pct",
+       "value": -20
+      },
+      {
+       "lever": "levy_free_months",
+       "value": -1
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "provinces",
+       "op": ">=",
+       "value": "start*3"
+      }
+     },
+     "shed_text": "Hold three times the provinces you began with.",
+     "turned": {
+      "name": "Mainland domain",
+      "text": "Recruits refill 15 % faster and the troop cap share is half a point higher.",
+      "effects": [
+       {
+        "lever": "recruit_refill_pct",
+        "value": 15
+       },
+       {
+        "lever": "troop_cap_share",
+        "value": 0.5
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "trade",
+     "wealth",
+     "sea"
+    ]
+   },
+   {
+    "id": "inland_trade_city",
+    "label": "Inland trading city",
+    "detect": {
+     "entity_type": [
+      "city_state",
+      "free_imperial_city",
+      "republic",
+      "merchant_republic",
+      "league"
+     ],
+     "seas": false,
+     "focus_any": [
+      "trade",
+      "manufacturing",
+      "banking_and_finance"
+     ]
+    },
+    "birthright": {
+     "name": "Fairs of {capital}",
+     "text": "20 % more traders pass the capital; trade profit +15 %; markets cost a quarter less.",
+     "why": "{capital} was a market and craft town ({goods}).",
+     "effects": [
+      {
+       "lever": "traders_passing_pct",
+       "value": 20,
+       "where": "capital"
+      },
+      {
+       "lever": "trade_balance_pct",
+       "value": 15
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -25,
+       "building": "market"
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_reformations",
+       "age_of_gunpowder_empires",
+       "age_of_crisis_and_absolutism"
+      ],
+      "name": "Presses and counting houses",
+      "text": "Presses cost 30 % less, scholars work 10 % better, and record-keeping inventions cost 10 % less.",
+      "why": "Inferred: rich towns were where printing, bookkeeping and schools took hold.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "building_cost_pct",
+        "value": -30,
+        "building": "press"
+       },
+       {
+        "lever": "scholar_output_pct",
+        "value": 10
+       },
+       {
+        "lever": "invention_cost_pct",
+        "value": -10,
+        "bough": "R3"
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Walls without fields",
+     "text": "Harvests roll a step worse at home, and stores rot 20 % faster.",
+     "why": "The town bought its grain from the countryside (inferred).",
+     "effects": [
+      {
+       "lever": "harvest_steps",
+       "value": -1,
+       "where": "core"
+      },
+      {
+       "lever": "store_rot_pct",
+       "value": 20
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "provinces",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "shed_text": "Hold twice the provinces you began with.",
+     "turned": {
+      "name": "Contado",
+      "text": "Harvests a step better at home and the people grow 10 % faster.",
+      "effects": [
+       {
+        "lever": "harvest_steps",
+        "value": 1,
+        "where": "core"
+       },
+       {
+        "lever": "growth_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "trade",
+     "learning",
+     "wealth"
+    ]
+   },
+   {
+    "id": "maritime_realm",
+    "label": "Seafaring realm",
+    "detect": {
+     "seas": true,
+     "focus_any": [
+      "maritime_commerce",
+      "trade"
+     ],
+     "naval_min": 3,
+     "entity_type": [
+      "kingdom",
+      "sultanate",
+      "duchy",
+      "principality",
+      "county",
+      "lordship",
+      "emirate",
+      "mandala_polity"
+     ]
+    },
+    "birthright": {
+     "name": "Sailors of the {sea}",
+     "text": "Ships build 15 % faster, ports raise 20 % more sailors, and fisheries feed 30 % more.",
+     "why": "{name} faced the {sea}; its coasts lived from fishing and shipping.",
+     "effects": [
+      {
+       "lever": "ship_build_pct",
+       "value": -15
+      },
+      {
+       "lever": "crew_pct",
+       "value": 20
+      },
+      {
+       "lever": "fish_pct",
+       "value": 30
+      }
+     ],
+     "needs": {
+      "coastal": {
+       "who": "this"
+      }
+     }
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_exploration",
+       "age_of_atlantic_empires",
+       "age_of_gunpowder_empires"
+      ],
+      "name": "Open ocean",
+      "text": "Sea crossings 15 % shorter, ships build 15 % faster, traders at sea gather 15 % more.",
+      "why": "Inferred: seafaring realms gained most when ocean sailing spread.",
+      "wakes": {
+       "all": [
+        {
+         "coastal": {
+          "who": "this"
+         }
+        },
+        {
+         "knows": {
+          "who": "this",
+          "invention": "S4"
+         }
+        }
+       ]
+      },
+      "effects": [
+       {
+        "lever": "sea_days_pct",
+        "value": -15
+       },
+       {
+        "lever": "ship_build_pct",
+        "value": -15
+       },
+       {
+        "lever": "trader_gain_pct",
+        "value": 15,
+        "route_kind": "sea"
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Thin soil",
+     "text": "Harvests roll a step worse at home and the people grow 10 % slower.",
+     "why": "Inferred from the catalogue's reliance on the sea over farmland.",
+     "effects": [
+      {
+       "lever": "harvest_steps",
+       "value": -1,
+       "where": "core"
+      },
+      {
+       "lever": "growth_pct",
+       "value": -10
+      }
+     ],
+     "shed": {
+      "knows": {
+       "who": "this",
+       "invention": "F12"
+      }
+     },
+     "shed_text": "Learn Fodder crops.",
+     "turned": {
+      "name": "Improved fields",
+      "text": "Harvests a step better at home, stores rot 30 % less, growth +5 %.",
+      "effects": [
+       {
+        "lever": "harvest_steps",
+        "value": 1,
+        "where": "core"
+       },
+       {
+        "lever": "store_rot_pct",
+        "value": -30
+       },
+       {
+        "lever": "growth_pct",
+        "value": 5
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "sea",
+     "trade",
+     "land"
+    ]
+   },
+   {
+    "id": "island_realm",
+    "label": "Island realm",
+    "detect": {
+     "text_any": [
+      "island",
+      "islands",
+      "archipelago",
+      "isle"
+     ],
+     "seas": true
+    },
+    "birthright": {
+     "name": "Sea-girt {name}",
+     "text": "Conquerors' Foreign rule lasts 40 % longer here; garrisons 20 % stronger; fisheries feed 30 % more.",
+     "why": "{name}'s core lay on islands: the sea was its wall and its larder.",
+     "effects": [
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 40
+      },
+      {
+       "lever": "garrison_pct",
+       "value": 20
+      },
+      {
+       "lever": "fish_pct",
+       "value": 30
+      }
+     ],
+     "needs": {
+      "coastal": {
+       "who": "this"
+      }
+     }
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_exploration",
+       "age_of_atlantic_empires",
+       "age_of_gunpowder_empires"
+      ],
+      "name": "Harbour of the seas",
+      "text": "20 % more traders pass the coast, harbours cost a quarter less, ports raise 20 % more sailors.",
+      "why": "Inferred: island harbours became waypoints once ocean routes grew.",
+      "wakes": {
+       "coastal": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "traders_passing_pct",
+        "value": 20,
+        "where": "coast"
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -25,
+        "building": "harbour"
+       },
+       {
+        "lever": "crew_pct",
+        "value": 20
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Far from the mainland",
+     "text": "Inventions cost 10 % more and 15 % fewer traders pass.",
+     "why": "Inferred: distance slowed the spread of new techniques.",
+     "effects": [
+      {
+       "lever": "invention_cost_pct",
+       "value": 10
+      },
+      {
+       "lever": "traders_passing_pct",
+       "value": -15
+      }
+     ],
+     "shed": {
+      "knows": {
+       "who": "this",
+       "invention": "S4"
+      }
+     },
+     "shed_text": "Learn Carrack and caravel.",
+     "turned": {
+      "name": "Island roads",
+      "text": "Sea crossings 20 % shorter, 15 % more traders on the coast, 10 % more sailors.",
+      "effects": [
+       {
+        "lever": "sea_days_pct",
+        "value": -20
+       },
+       {
+        "lever": "traders_passing_pct",
+        "value": 15,
+        "where": "coast"
+       },
+       {
+        "lever": "crew_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "sea",
+     "survival",
+     "trade"
+    ]
+   },
+   {
+    "id": "steppe_horde",
+    "label": "Steppe horde",
+    "detect": {
+     "entity_type": [
+      "khanate",
+      "horde",
+      "nomadic_confederation",
+      "tribal_confederation"
+     ],
+     "focus_any": [
+      "pastoralism",
+      "plunder",
+      "tribute"
+     ],
+     "text_any": [
+      "steppe",
+      "horse",
+      "nomad"
+     ]
+    },
+    "birthright": {
+     "name": "Remounts of the steppe",
+     "text": "Horses breed 30 % faster, herds grow 10 % faster, horse archers hit 15 % harder on grassland, and armies march 10 % faster.",
+     "why": "{name}'s strength was its herds and its riders.",
+     "effects": [
+      {
+       "lever": "horses_pct",
+       "value": 30
+      },
+      {
+       "lever": "herd_growth_pct",
+       "value": 10
+      },
+      {
+       "lever": "hits_pct",
+       "value": 15,
+       "arm": "horse_archers",
+       "terrain": "grassland"
+      },
+      {
+       "lever": "march_days_pct",
+       "value": -10
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires"
+      ],
+      "name": "The last great ride",
+      "text": "Horse archers hit 15 % harder, loot +30 %, recruits refill 15 % faster, until you learn massed hand guns.",
+      "why": "Inferred: steppe armies kept their edge until gunpowder infantry and field guns spread.",
+      "wakes": {
+       "not": {
+        "knows": {
+         "who": "this",
+         "invention": "W5"
+        }
+       }
+      },
+      "effects": [
+       {
+        "lever": "hits_pct",
+        "value": 15,
+        "arm": "horse_archers"
+       },
+       {
+        "lever": "loot_pct",
+        "value": 30
+       },
+       {
+        "lever": "recruit_refill_pct",
+        "value": 15
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Divided ulus",
+     "text": "Lords start a step less loyal and officials take a year longer to settle in.",
+     "why": "Steppe power was shared among clans and princes (catalogue constraints).",
+     "effects": [
+      {
+       "lever": "lord_loyalty_start_steps",
+       "value": -1
+      },
+      {
+       "lever": "official_years_to_full",
+       "value": 1
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "loyal_lords",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "shed_text": "Have twice as many loyal lords as at the start.",
+     "turned": {
+      "name": "One khan",
+      "text": "A new ruler no longer shakes the lords; retinues 15 % larger.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "new_ruler"
+       },
+       {
+        "lever": "retinue_pct",
+        "value": 15
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "land",
+     "wealth",
+     "crown"
+    ]
+   },
+   {
+    "id": "desert_caravan",
+    "label": "Desert and caravan people",
+    "detect": {
+     "text_any": [
+      "desert",
+      "sahara",
+      "oasis",
+      "oases",
+      "camel"
+     ],
+     "focus_any": [
+      "trade",
+      "pastoralism"
+     ]
+    },
+    "birthright": {
+     "name": "Masters of the wells",
+     "text": "Armies cross desert 25 % faster, tolls pay 30 % more, and armies forage 20 % more.",
+     "why": "{name} held wells and caravan roads ({goods}).",
+     "effects": [
+      {
+       "lever": "march_days_pct",
+       "value": -25,
+       "terrain": "desert"
+      },
+      {
+       "lever": "toll_gold_pct",
+       "value": 30
+      },
+      {
+       "lever": "forage_pct",
+       "value": 20
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires",
+       "age_of_exploration"
+      ],
+      "name": "Caravan peace",
+      "text": "25 % more traders pass, and traders on land gather 15 % more.",
+      "why": "Inferred: caravan traffic peaked while the great land routes stayed safe.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "traders_passing_pct",
+        "value": 25
+       },
+       {
+        "lever": "trader_gain_pct",
+        "value": 15,
+        "route_kind": "land"
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Thirsty land",
+     "text": "People grow 10 % slower and harvests roll a step worse at home.",
+     "why": "Inferred from the catalogue's dry ground.",
+     "effects": [
+      {
+       "lever": "growth_pct",
+       "value": -10
+      },
+      {
+       "lever": "harvest_steps",
+       "value": -1,
+       "where": "core"
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "building:irrigation_works",
+       "op": ">=",
+       "value": 3
+      }
+     },
+     "shed_text": "Build three irrigation works.",
+     "turned": {
+      "name": "Qanats and channels",
+      "text": "Harvests a step better on drylands and the people grow 10 % faster.",
+      "effects": [
+       {
+        "lever": "harvest_steps",
+        "value": 1,
+        "where": "terrain:drylands"
+       },
+       {
+        "lever": "growth_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "trade",
+     "survival",
+     "wealth"
+    ]
+   },
+   {
+    "id": "mountain_folk",
+    "label": "Mountain realm",
+    "detect": {
+     "text_any": [
+      "mountain",
+      "highland",
+      "alpine",
+      "alps",
+      "plateau"
+     ],
+     "entity_type": [
+      "confederation",
+      "peasant_republic",
+      "lordship",
+      "county",
+      "principality",
+      "kingdom"
+     ]
+    },
+    "birthright": {
+     "name": "Passes of {name}",
+     "text": "Garrisons 25 % stronger, conquerors' Foreign rule lasts 40 % longer, tolls pay 10 % more.",
+     "why": "{name}'s land was {terrain_words}: easy to hold, hard to take.",
+     "effects": [
+      {
+       "lever": "garrison_pct",
+       "value": 25
+      },
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 40
+      },
+      {
+       "lever": "toll_gold_pct",
+       "value": 10
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires",
+       "age_of_reformations"
+      ],
+      "name": "Hired valour",
+      "text": "Hired companies cost 20 % less, levies break 5 points later, recruits refill 20 % faster.",
+      "why": "Inferred: mountain peoples sold their soldiering when armies grew.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "hired_company_cost_pct",
+        "value": -20
+       },
+       {
+        "lever": "break_point_pct",
+        "value": 5,
+        "kind": "levy"
+       },
+       {
+        "lever": "recruit_refill_pct",
+        "value": 20
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Poor valleys",
+     "text": "Tax reaching you −10 %, and harvests roll a step worse at home.",
+     "why": "Inferred: mountain farms fed few.",
+     "effects": [
+      {
+       "lever": "tax_reach_pct",
+       "value": -10
+      },
+      {
+       "lever": "harvest_steps",
+       "value": -1,
+       "where": "core"
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "building:mine",
+       "op": ">=",
+       "value": "start+2"
+      }
+     },
+     "shed_text": "Open two more mines.",
+     "turned": {
+      "name": "Mountain ore",
+      "text": "Silver mines yield 30 % more.",
+      "effects": [
+       {
+        "lever": "ware_output_pct",
+        "value": 30,
+        "ware": "silver"
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "survival",
+     "land",
+     "wealth"
+    ]
+   },
+   {
+    "id": "river_kingdom",
+    "label": "River kingdom",
+    "detect": {
+     "rivers_min": 1,
+     "focus_any": [
+      "agriculture",
+      "taxation"
+     ],
+     "entity_type": [
+      "kingdom",
+      "sultanate",
+      "empire",
+      "principality",
+      "grand_duchy",
+      "duchy"
+     ],
+     "text_any": [
+      "river",
+      "delta",
+      "flood",
+      "floodplain",
+      "irrigat",
+      "basin",
+      "doab"
+     ]
+    },
+    "birthright": {
+     "name": "Gifts of the {river}",
+     "text": "Harvests a step better at home, 15 % fewer days to the capital, 20 % more traders, growth +5 %.",
+     "why": "The {river} carried {name}'s grain and trade.",
+     "effects": [
+      {
+       "lever": "harvest_steps",
+       "value": 1,
+       "where": "core"
+      },
+      {
+       "lever": "days_to_capital_pct",
+       "value": -15
+      },
+      {
+       "lever": "traders_passing_pct",
+       "value": 20
+      },
+      {
+       "lever": "growth_pct",
+       "value": 5
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_crisis_and_absolutism",
+       "age_of_gunpowder_empires",
+       "age_of_atlantic_empires"
+      ],
+      "name": "Granaries of the river",
+      "text": "Stores rot 30 % less, castles feed one more ring, growth +10 %, while at peace.",
+      "why": "Inferred: river kingdoms flourished in long peace.",
+      "wakes": {
+       "not": {
+        "at_war": {
+         "who": "this"
+        }
+       }
+      },
+      "effects": [
+       {
+        "lever": "store_rot_pct",
+        "value": -30
+       },
+       {
+        "lever": "castle_reach_rings",
+        "value": 1
+       },
+       {
+        "lever": "growth_pct",
+        "value": 10
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Floods and fevers",
+     "text": "Stores rot 30 % faster and growth −5 %.",
+     "why": "Inferred: river plains flooded and bred fevers.",
+     "effects": [
+      {
+       "lever": "store_rot_pct",
+       "value": 30
+      },
+      {
+       "lever": "growth_pct",
+       "value": -5
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "building:granary",
+       "op": ">=",
+       "value": 3
+      }
+     },
+     "shed_text": "Build three granaries.",
+     "turned": {
+      "name": "Embanked river",
+      "text": "Castles feed one more ring and stores rot 30 % less.",
+      "effects": [
+       {
+        "lever": "castle_reach_rings",
+        "value": 1
+       },
+       {
+        "lever": "store_rot_pct",
+        "value": -30
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "land",
+     "wealth",
+     "crown"
+    ]
+   },
+   {
+    "id": "great_empire",
+    "label": "Great empire",
+    "detect": {
+     "entity_type": [
+      "empire",
+      "sultanate",
+      "kingdom",
+      "khanate"
+     ],
+     "size_min": 4.0
+    },
+    "birthright": {
+     "name": "Imperial muster",
+     "text": "Troop cap share +0.5 points, tax collectors 25 % stronger, one more envoy.",
+     "why": "{name}: among the largest states of its world.",
+     "effects": [
+      {
+       "lever": "troop_cap_share",
+       "value": 0.5
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 25,
+       "type": "tax_collector"
+      },
+      {
+       "lever": "envoy_count",
+       "value": 1
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires",
+       "age_of_crisis_and_absolutism"
+      ],
+      "name": "Fiscal-military state",
+      "text": "Sieges 20 % faster, officials settle a year sooner, troop cap share +0.5.",
+      "why": "Inferred: large states that mastered guns and taxes pulled ahead.",
+      "wakes": {
+       "knows": {
+        "who": "this",
+        "invention": "W3"
+       }
+      },
+      "effects": [
+       {
+        "lever": "siege_pct",
+        "value": 20
+       },
+       {
+        "lever": "official_years_to_full",
+        "value": -1
+       },
+       {
+        "lever": "troop_cap_share",
+        "value": 0.5
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Overstretched",
+     "text": "Days to the capital +20 %, and conquered land takes 20 % longer to settle.",
+     "why": "Inferred: size slowed orders and integration.",
+     "effects": [
+      {
+       "lever": "days_to_capital_pct",
+       "value": 20
+      },
+      {
+       "lever": "integration_years_pct",
+       "value": 20
+      }
+     ],
+     "shed": {
+      "knows": {
+       "who": "this",
+       "invention": "G11"
+      }
+     },
+     "shed_text": "Learn Postal service.",
+     "turned": {
+      "name": "Post riders",
+      "text": "Days to the capital −20 %, conquered land settles 20 % faster.",
+      "effects": [
+       {
+        "lever": "days_to_capital_pct",
+        "value": -20
+       },
+       {
+        "lever": "integration_years_pct",
+        "value": -20
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "land",
+     "crown",
+     "wealth"
+    ]
+   },
+   {
+    "id": "church_state",
+    "label": "Church state",
+    "detect": {
+     "entity_type": [
+      "prince_bishopric",
+      "prince_archbishopric",
+      "imperial_abbey",
+      "theocracy",
+      "sharifate",
+      "imamate"
+     ],
+     "focus_any": [
+      "pilgrimage_and_religious_revenue"
+     ]
+    },
+    "birthright": {
+     "name": "Altar and see",
+     "text": "Faith spreads 30 % faster, one step better opinion from your faith, school seats +20 %.",
+     "why": "{name}: ruled by its clergy.",
+     "effects": [
+      {
+       "lever": "faith_shift_pct",
+       "value": 30
+      },
+      {
+       "lever": "opinion_steps",
+       "value": 1,
+       "of": "same_faith"
+      },
+      {
+       "lever": "school_seats_pct",
+       "value": 20
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_reformations",
+       "age_of_gunpowder_empires"
+      ],
+      "name": "Defenders of the faith",
+      "text": "Faith spreads 30 % faster, one step better opinion from your faith, school seats +15 %.",
+      "why": "Inferred: church states gained weight when religion divided rulers.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "faith_shift_pct",
+        "value": 30
+       },
+       {
+        "lever": "opinion_steps",
+        "value": 1,
+        "of": "same_faith"
+       },
+       {
+        "lever": "school_seats_pct",
+        "value": 15
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Swords for hire",
+     "text": "Recruits refill 20 % slower and hired companies cost 15 % more.",
+     "why": "A clerical lord raised few men of his own (inferred).",
+     "effects": [
+      {
+       "lever": "recruit_refill_pct",
+       "value": -20
+      },
+      {
+       "lever": "hired_company_cost_pct",
+       "value": 15
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "castles",
+       "op": ">=",
+       "value": "start+2"
+      }
+     },
+     "shed_text": "Build two more castles.",
+     "turned": {
+      "name": "Church militia",
+      "text": "Recruits refill 15 % faster and garrisons 20 % stronger.",
+      "effects": [
+       {
+        "lever": "recruit_refill_pct",
+        "value": 15
+       },
+       {
+        "lever": "garrison_pct",
+        "value": 20
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "faith",
+     "learning",
+     "survival"
+    ]
+   },
+   {
+    "id": "crusading_order",
+    "label": "Military order",
+    "detect": {
+     "entity_type": [
+      "military_order"
+     ]
+    },
+    "birthright": {
+     "name": "Brethren of the order",
+     "text": "Break point +5 points, new commanders start with one more Might, garrisons 20 % stronger.",
+     "why": "{name}: a brotherhood of knights.",
+     "effects": [
+      {
+       "lever": "break_point_pct",
+       "value": 5
+      },
+      {
+       "lever": "commander_skill",
+       "value": 1,
+       "skill": "might"
+      },
+      {
+       "lever": "garrison_pct",
+       "value": 20
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires",
+       "age_of_reformations"
+      ],
+      "name": "Bulwark of the frontier",
+      "text": "Garrisons 25 % stronger, castles cost a quarter less, recruits refill 10 % faster.",
+      "why": "Inferred: the orders' castles mattered most on contested frontiers.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "garrison_pct",
+        "value": 25
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -25,
+        "building": "castle"
+       },
+       {
+        "lever": "recruit_refill_pct",
+        "value": 10
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Celibate brethren",
+     "text": "Recruits refill 20 % slower and hired companies cost 20 % more.",
+     "why": "An order recruited brothers, not families (catalogue constraints).",
+     "effects": [
+      {
+       "lever": "recruit_refill_pct",
+       "value": -20
+      },
+      {
+       "lever": "hired_company_cost_pct",
+       "value": 20
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "lords",
+       "op": ">=",
+       "value": "start+3"
+      }
+     },
+     "shed_text": "Grant land to three new lords.",
+     "turned": {
+      "name": "Secular duchy",
+      "text": "Lords start a step more loyal and recruits refill 15 % faster.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_start_steps",
+        "value": 1
+       },
+       {
+        "lever": "recruit_refill_pct",
+        "value": 15
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "faith",
+     "land",
+     "survival"
+    ]
+   },
+   {
+    "id": "frontier_march",
+    "label": "Frontier march",
+    "detect": {
+     "entity_type": [
+      "margraviate",
+      "voivodeship",
+      "despotate",
+      "beylik"
+     ],
+     "text_any": [
+      "frontier",
+      "march",
+      "border"
+     ],
+     "modes_any": [
+      "raiding"
+     ]
+    },
+    "birthright": {
+     "name": "Wardens of the march",
+     "text": "Garrisons 20 % stronger and wardens 40 % stronger.",
+     "why": "{name} sat on a contested border.",
+     "effects": [
+      {
+       "lever": "garrison_pct",
+       "value": 20
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 40,
+       "type": "warden"
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires",
+       "age_of_reformations"
+      ],
+      "name": "Border levies",
+      "text": "Levies serve two months more before pay, recruits refill 20 % faster, armies forage 15 % more.",
+      "why": "Inferred: frontier societies lived armed.",
+      "wakes": {
+       "at_war": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "levy_free_months",
+        "value": 2
+       },
+       {
+        "lever": "recruit_refill_pct",
+        "value": 20
+       },
+       {
+        "lever": "forage_pct",
+        "value": 15
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Burned border",
+     "text": "Growth −10 % and stores rot 20 % faster.",
+     "why": "Raids kept the border poor (inferred).",
+     "effects": [
+      {
+       "lever": "growth_pct",
+       "value": -10
+      },
+      {
+       "lever": "store_rot_pct",
+       "value": 20
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "castles",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "shed_text": "Have twice the castles you began with.",
+     "turned": {
+      "name": "Settled border",
+      "text": "Growth +10 % and harvests a step better on the frontier.",
+      "effects": [
+       {
+        "lever": "growth_pct",
+        "value": 10
+       },
+       {
+        "lever": "harvest_steps",
+        "value": 1,
+        "where": "frontier"
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "land",
+     "survival",
+     "crown"
+    ]
+   },
+   {
+    "id": "feudal_realm",
+    "label": "Feudal realm",
+    "detect": {
+     "entity_type": [
+      "kingdom",
+      "duchy",
+      "county",
+      "principality",
+      "grand_duchy",
+      "electorate",
+      "landgraviate",
+      "margraviate",
+      "lordship"
+     ],
+     "religion_any": [
+      "christ",
+      "catholic",
+      "orthodox"
+     ]
+    },
+    "birthright": {
+     "name": "Sworn vassals",
+     "text": "Noble lords start a step more loyal, retinues 20 % larger, levies serve a month longer, castles 15 % cheaper.",
+     "why": "{name}'s power rested on its sworn nobility.",
+     "effects": [
+      {
+       "lever": "lord_loyalty_start_steps",
+       "value": 1,
+       "lord_kind": "noble"
+      },
+      {
+       "lever": "retinue_pct",
+       "value": 20
+      },
+      {
+       "lever": "levy_free_months",
+       "value": 1
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -15,
+       "building": "castle"
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_crisis_and_absolutism",
+       "age_of_gunpowder_empires",
+       "age_of_reformations"
+      ],
+      "name": "Royal government",
+      "text": "Officials settle a year sooner and cost 15 % less, tax reaching you +5 %, and seizing land no longer shakes the lords.",
+      "why": "Inferred: crowns that paid their own officials outgrew their lords.",
+      "wakes": {
+       "count": {
+        "who": "this",
+        "thing": "officials",
+        "op": ">=",
+        "value": "start*2"
+       }
+      },
+      "effects": [
+       {
+        "lever": "official_years_to_full",
+        "value": -1
+       },
+       {
+        "lever": "official_wage_pct",
+        "value": -15
+       },
+       {
+        "lever": "tax_reach_pct",
+        "value": 5
+       },
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "seized_land"
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Overmighty lords",
+     "text": "Noble lords start a step less loyal and bring 20 % fewer men.",
+     "why": "Great houses rivalled the crown (catalogue constraints).",
+     "effects": [
+      {
+       "lever": "lord_loyalty_start_steps",
+       "value": -1,
+       "lord_kind": "noble"
+      },
+      {
+       "lever": "retinue_pct",
+       "value": -20
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "officials",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "shed_text": "Have twice the officials you began with.",
+     "turned": {
+      "name": "Royal justice",
+      "text": "Judges 30 % stronger, and heavy taxes no longer shake the lords.",
+      "effects": [
+       {
+        "lever": "official_type_pct",
+        "value": 30,
+        "type": "judge"
+       },
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "heavy_taxes"
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "crown",
+     "land",
+     "wealth"
+    ]
+   },
+   {
+    "id": "sultanate_court",
+    "label": "Sultanate court",
+    "detect": {
+     "entity_type": [
+      "sultanate",
+      "emirate",
+      "atabegate",
+      "beylik",
+      "khanate"
+     ],
+     "religion_any": [
+      "islam",
+      "sunni",
+      "shi",
+      "ibadi",
+      "zaydi"
+     ]
+    },
+    "birthright": {
+     "name": "Court of {capital}",
+     "text": "Officials cost 15 % less, judges 30 % stronger, 20 % more fleeing scholars choose you.",
+     "why": "{capital} was a court of scholars, judges and soldiers.",
+     "effects": [
+      {
+       "lever": "official_wage_pct",
+       "value": -15
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 30,
+       "type": "judge"
+      },
+      {
+       "lever": "migrants_pct",
+       "value": 20,
+       "class": "scholars"
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires",
+       "age_of_crisis_and_absolutism"
+      ],
+      "name": "Patronage of the learned",
+      "text": "40 % more fleeing scholars choose you, scholars work 10 % better, schools cost a quarter less.",
+      "why": "Inferred: Islamic courts competed for scholars in this age.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "migrants_pct",
+        "value": 40,
+        "class": "scholars"
+       },
+       {
+        "lever": "scholar_output_pct",
+        "value": 10
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -25,
+        "building": "school"
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Contested throne",
+     "text": "Lords start a step less loyal and stability −0.5.",
+     "why": "Successions were fought among princes (catalogue constraints).",
+     "effects": [
+      {
+       "lever": "lord_loyalty_start_steps",
+       "value": -1
+      },
+      {
+       "lever": "stat",
+       "value": -0.5,
+       "stat": "stability"
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "loyal_lords",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "shed_text": "Have twice as many loyal lords as at the start.",
+     "turned": {
+      "name": "Settled dynasty",
+      "text": "A new ruler or a disputed heir no longer shakes the lords.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "disputed_heir"
+       },
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "new_ruler"
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "faith",
+     "learning",
+     "land"
+    ]
+   },
+   {
+    "id": "warrior_domain",
+    "label": "Warrior house",
+    "detect": {
+     "entity_type": [
+      "shugo_domain",
+      "shogunate"
+     ]
+    },
+    "birthright": {
+     "name": "House of the bow",
+     "text": "New commanders from the ruling house start with one more Might, retinues break 5 points later and are 20 % larger.",
+     "why": "{name}: a house of mounted warriors and retainers.",
+     "effects": [
+      {
+       "lever": "commander_skill",
+       "value": 1,
+       "skill": "might",
+       "origin": "ruler"
+      },
+      {
+       "lever": "break_point_pct",
+       "value": 5,
+       "kind": "retinue"
+      },
+      {
+       "lever": "retinue_pct",
+       "value": 20
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires"
+      ],
+      "name": "Warring provinces",
+      "text": "New commanders start with one more Cunning, recruits refill 15 % faster, sieges 10 % faster, while at war.",
+      "why": "Inferred: the age of warring provinces rewarded houses that fought.",
+      "wakes": {
+       "at_war": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "commander_skill",
+        "value": 1,
+        "skill": "cunning"
+       },
+       {
+        "lever": "recruit_refill_pct",
+        "value": 15
+       },
+       {
+        "lever": "siege_pct",
+        "value": 10
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Restless retainers",
+     "text": "Lords start a step less loyal and recruits refill 10 % slower.",
+     "why": "Retainers and deputies could turn on their lord (catalogue constraints).",
+     "effects": [
+      {
+       "lever": "lord_loyalty_start_steps",
+       "value": -1
+      },
+      {
+       "lever": "recruit_refill_pct",
+       "value": -10
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "victories",
+       "op": ">=",
+       "value": 10
+      }
+     },
+     "shed_text": "Win ten battles.",
+     "turned": {
+      "name": "Bound retainers",
+      "text": "Lords start a step more loyal and retinues are 15 % larger.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_start_steps",
+        "value": 1
+       },
+       {
+        "lever": "retinue_pct",
+        "value": 15
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "land",
+     "crown",
+     "wealth"
+    ]
+   },
+   {
+    "id": "hill_chieftaincy",
+    "label": "Hill chieftaincy",
+    "detect": {
+     "entity_type": [
+      "tusi_chieftaincy",
+      "chiefdom",
+      "paramount_chiefdom"
+     ],
+     "text_any": [
+      "hill",
+      "mountain",
+      "highland",
+      "upland"
+     ]
+    },
+    "birthright": {
+     "name": "Hill chiefs",
+     "text": "Conquerors' Foreign rule lasts 40 % longer, foot fights 15 % harder in hills, and Far from the throne does not count.",
+     "why": "{name} held the hills on its own terms.",
+     "effects": [
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 40
+      },
+      {
+       "lever": "hits_pct",
+       "value": 15,
+       "arm": "foot",
+       "terrain": "hills"
+      },
+      {
+       "lever": "grievance_shield",
+       "value": true,
+       "grievance": "far_from_the_throne"
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires",
+       "age_of_exploration",
+       "age_of_atlantic_empires"
+      ],
+      "name": "Valued auxiliaries",
+      "text": "Retinues 25 % larger, one step better opinion from neighbours, foot 15 % harder in hills.",
+      "why": "Inferred: empires paid hill chiefs for soldiers.",
+      "wakes": {
+       "not": {
+        "at_war": {
+         "who": "this"
+        }
+       }
+      },
+      "effects": [
+       {
+        "lever": "retinue_pct",
+        "value": 25
+       },
+       {
+        "lever": "opinion_steps",
+        "value": 1,
+        "of": "neighbours"
+       },
+       {
+        "lever": "hits_pct",
+        "value": 15,
+        "arm": "foot",
+        "terrain": "hills"
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Under another's seal",
+     "text": "Neighbours think a step less of you and tax reaching you −10 %.",
+     "why": "{name} answered to an overlord's seal (catalogue).",
+     "effects": [
+      {
+       "lever": "opinion_steps",
+       "value": -1,
+       "of": "neighbours"
+      },
+      {
+       "lever": "tax_reach_pct",
+       "value": -10
+      }
+     ],
+     "shed": {
+      "independent": {
+       "who": "this"
+      }
+     },
+     "shed_text": "Be independent.",
+     "turned": {
+      "name": "Our own seal",
+      "text": "One more envoy and tax reaching you +5 %.",
+      "effects": [
+       {
+        "lever": "envoy_count",
+        "value": 1
+       },
+       {
+        "lever": "tax_reach_pct",
+        "value": 5
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "survival",
+     "land",
+     "crown"
+    ]
+   },
+   {
+    "id": "mesoamerican_city",
+    "label": "Mesoamerican city-state",
+    "detect": {
+     "entity_type": [
+      "altepetl",
+      "hueyaltepetl",
+      "kuchkabal",
+      "cacicazgo"
+     ],
+     "region_any": [
+      "am_mesoamerica_caribbean"
+     ]
+    },
+    "birthright": {
+     "name": "Calpolli of {capital}",
+     "text": "Tribute +30 %, levies serve a month longer, harvests a step better at home, raised fields 15 % cheaper.",
+     "why": "{capital}'s wards and fields fed a dense city.",
+     "effects": [
+      {
+       "lever": "tribute_pct",
+       "value": 30
+      },
+      {
+       "lever": "levy_free_months",
+       "value": 1
+      },
+      {
+       "lever": "harvest_steps",
+       "value": 1,
+       "where": "core"
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -15,
+       "building": "raised_fields"
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_exploration",
+       "age_of_gunpowder_empires"
+      ],
+      "name": "Flower of the valley",
+      "text": "Tribute +20 %, markets a quarter cheaper, growth +10 %, while independent.",
+      "why": "Inferred: the fifteenth century was the height of Mesoamerican city-states.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "tribute_pct",
+        "value": 20
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -25,
+        "building": "market"
+       },
+       {
+        "lever": "growth_pct",
+        "value": 10
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Tribute owed",
+     "text": "Tax reaching you −15 %.",
+     "why": "Much of its surplus went to an overlord (inferred from the catalogue's tributary ties).",
+     "effects": [
+      {
+       "lever": "tax_reach_pct",
+       "value": -15
+      }
+     ],
+     "shed": {
+      "all": [
+       {
+        "independent": {
+         "who": "this"
+        }
+       },
+       {
+        "subject_count": {
+         "who": "this",
+         "op": ">=",
+         "value": 1
+        }
+       }
+      ]
+     },
+     "shed_text": "Be independent with a subject of your own.",
+     "turned": {
+      "name": "Tribute taken",
+      "text": "Tribute +30 % and levies serve a month longer.",
+      "effects": [
+       {
+        "lever": "tribute_pct",
+        "value": 30
+       },
+       {
+        "lever": "levy_free_months",
+        "value": 1
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "land",
+     "faith",
+     "survival"
+    ]
+   },
+   {
+    "id": "andean_realm",
+    "label": "Andean realm",
+    "detect": {
+     "region_any": [
+      "am_south"
+     ],
+     "text_any": [
+      "andes",
+      "andean",
+      "highland",
+      "puna",
+      "terrace",
+      "quechua",
+      "aymara"
+     ]
+    },
+    "birthright": {
+     "name": "Terraces and storehouses",
+     "text": "Harvests a step better in the mountains, stores rot 30 % less, terraces a quarter cheaper, days to the capital −10 %.",
+     "why": "{name} farmed the high valleys on terraces.",
+     "effects": [
+      {
+       "lever": "harvest_steps",
+       "value": 1,
+       "where": "terrain:mountains"
+      },
+      {
+       "lever": "store_rot_pct",
+       "value": -30
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -25,
+       "building": "terrace"
+      },
+      {
+       "lever": "days_to_capital_pct",
+       "value": -10
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_exploration",
+       "age_of_atlantic_empires"
+      ],
+      "name": "Roads of the mountains",
+      "text": "Days to the capital −20 %, armies march 15 % faster, stores rot 25 % less, castles feed one more ring.",
+      "why": "Inferred: Andean states held their valleys together by roads and stores.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "days_to_capital_pct",
+        "value": -20
+       },
+       {
+        "lever": "march_days_pct",
+        "value": -15
+       },
+       {
+        "lever": "store_rot_pct",
+        "value": -25
+       },
+       {
+        "lever": "castle_reach_rings",
+        "value": 1
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Knotted records",
+     "text": "Record-keeping inventions cost 10 % more; officials take a year longer to settle in.",
+     "why": "Inferred: administration ran on cords and memory.",
+     "effects": [
+      {
+       "lever": "invention_cost_pct",
+       "value": 10,
+       "bough": "R3"
+      },
+      {
+       "lever": "official_years_to_full",
+       "value": 1
+      }
+     ],
+     "shed": {
+      "knows": {
+       "who": "this",
+       "invention": "G3"
+      }
+     },
+     "shed_text": "Learn Tax registers.",
+     "turned": {
+      "name": "Counted realm",
+      "text": "Officials settle a year sooner, tax reaching you +10 %.",
+      "effects": [
+       {
+        "lever": "official_years_to_full",
+        "value": -1
+       },
+       {
+        "lever": "tax_reach_pct",
+        "value": 10
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "survival",
+     "land",
+     "crown"
+    ]
+   },
+   {
+    "id": "forest_chiefdom",
+    "label": "Forest people",
+    "detect": {
+     "entity_type": [
+      "chiefdom",
+      "paramount_chiefdom",
+      "stateless_society",
+      "confederation",
+      "tribal_confederation"
+     ],
+     "text_any": [
+      "forest",
+      "jungle",
+      "rainforest",
+      "woodland",
+      "woods"
+     ]
+    },
+    "birthright": {
+     "name": "Paths of the {woods}",
+     "text": "Foot fights 20 % harder and marches 20 % faster in {woods}; conquerors' Foreign rule lasts 40 % longer; foraging +10 %.",
+     "why": "{name} lived in {woods} country.",
+     "effects": [
+      {
+       "lever": "hits_pct",
+       "value": 20,
+       "arm": "foot",
+       "terrain": "{woods}"
+      },
+      {
+       "lever": "march_days_pct",
+       "value": -20,
+       "terrain": "{woods}"
+      },
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 40
+      },
+      {
+       "lever": "forage_pct",
+       "value": 10
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_atlantic_empires",
+       "age_of_exploration",
+       "age_of_gunpowder_empires"
+      ],
+      "name": "Forest refuge",
+      "text": "Conquerors' Foreign rule lasts 50 % longer, foot fights 20 % harder and marches 20 % faster in {woods}, while at war.",
+      "why": "Inferred: forest peoples resisted larger powers by retreat and ambush.",
+      "wakes": {
+       "at_war": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "homeland_resistance_pct",
+        "value": 50
+       },
+       {
+        "lever": "hits_pct",
+        "value": 20,
+        "arm": "foot",
+        "terrain": "{woods}"
+       },
+       {
+        "lever": "march_days_pct",
+        "value": -20,
+        "terrain": "{woods}"
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Small villages",
+     "text": "Recruits refill 15 % slower and tax reaching you −10 %.",
+     "why": "Settlements were small and scattered (inferred).",
+     "effects": [
+      {
+       "lever": "recruit_refill_pct",
+       "value": -15
+      },
+      {
+       "lever": "tax_reach_pct",
+       "value": -10
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "building:market",
+       "op": ">=",
+       "value": 2
+      }
+     },
+     "shed_text": "Build two markets.",
+     "turned": {
+      "name": "Market villages",
+      "text": "20 % more traders and tax reaching you +5 %.",
+      "effects": [
+       {
+        "lever": "traders_passing_pct",
+        "value": 20
+       },
+       {
+        "lever": "tax_reach_pct",
+        "value": 5
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "survival",
+     "trade",
+     "land"
+    ]
+   },
+   {
+    "id": "sahel_kingdom",
+    "label": "Savanna trading kingdom",
+    "detect": {
+     "region_any": [
+      "af_west",
+      "af_north_sahara"
+     ],
+     "focus_any": [
+      "trade",
+      "tribute"
+     ],
+     "entity_type": [
+      "kingdom",
+      "empire",
+      "sultanate"
+     ]
+    },
+    "birthright": {
+     "name": "Gold and salt roads",
+     "text": "Trade profit +10 %, 15 % more traders, horses breed 20 % faster.",
+     "why": "{name} sat on the trade between savanna and desert ({goods}).",
+     "effects": [
+      {
+       "lever": "trade_balance_pct",
+       "value": 10
+      },
+      {
+       "lever": "traders_passing_pct",
+       "value": 15
+      },
+      {
+       "lever": "horses_pct",
+       "value": 20
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires",
+       "age_of_atlantic_empires"
+      ],
+      "name": "Scholars of the bend",
+      "text": "30 % more fleeing scholars choose you, schools a quarter cheaper, 15 % more traders.",
+      "why": "Inferred: Sahel towns drew scholars and merchants in this age.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "migrants_pct",
+        "value": 30,
+        "class": "scholars"
+       },
+       {
+        "lever": "building_cost_pct",
+        "value": -25,
+        "building": "school"
+       },
+       {
+        "lever": "traders_passing_pct",
+        "value": 15
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "The dry season",
+     "text": "Harvests a step worse at home, stores rot 30 % faster, growth −5 %.",
+     "why": "Inferred: rainfall decided every year.",
+     "effects": [
+      {
+       "lever": "harvest_steps",
+       "value": -1,
+       "where": "core"
+      },
+      {
+       "lever": "store_rot_pct",
+       "value": 30
+      },
+      {
+       "lever": "growth_pct",
+       "value": -5
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "building:granary",
+       "op": ">=",
+       "value": 3
+      }
+     },
+     "shed_text": "Build three granaries.",
+     "turned": {
+      "name": "Full granaries",
+      "text": "Stores rot 40 % less, harvests a step better at home, growth +5 %.",
+      "effects": [
+       {
+        "lever": "store_rot_pct",
+        "value": -40
+       },
+       {
+        "lever": "harvest_steps",
+        "value": 1,
+        "where": "core"
+       },
+       {
+        "lever": "growth_pct",
+        "value": 5
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "trade",
+     "faith",
+     "land"
+    ]
+   },
+   {
+    "id": "peasant_republic",
+    "label": "Free commune",
+    "detect": {
+     "entity_type": [
+      "peasant_republic",
+      "confederation",
+      "league"
+     ]
+    },
+    "birthright": {
+     "name": "Free valleys",
+     "text": "Levies serve two months longer, break 5 points later, and conquerors' Foreign rule lasts 40 % longer.",
+     "why": "{name} governed itself through its communes.",
+     "effects": [
+      {
+       "lever": "levy_free_months",
+       "value": 2
+      },
+      {
+       "lever": "break_point_pct",
+       "value": 5,
+       "kind": "levy"
+      },
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 40
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_reformations",
+       "age_of_gunpowder_empires"
+      ],
+      "name": "Common men's war",
+      "text": "Levies break 5 points later and serve two months longer; recruits refill 15 % faster.",
+      "why": "Inferred: communal levies were at their best before standing armies.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "break_point_pct",
+        "value": 5,
+        "kind": "levy"
+       },
+       {
+        "lever": "levy_free_months",
+        "value": 2
+       },
+       {
+        "lever": "recruit_refill_pct",
+        "value": 15
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "No standing host",
+     "text": "Hired companies cost 20 % more and sieges are 20 % slower.",
+     "why": "Communes fought at home and seldom took castles (inferred).",
+     "effects": [
+      {
+       "lever": "hired_company_cost_pct",
+       "value": 20
+      },
+      {
+       "lever": "siege_pct",
+       "value": -20
+      }
+     ],
+     "shed": {
+      "knows": {
+       "who": "this",
+       "invention": "W6"
+      }
+     },
+     "shed_text": "Learn Pike squares.",
+     "turned": {
+      "name": "Pike squares",
+      "text": "Levies break 10 points later; sieges 5 % faster.",
+      "effects": [
+       {
+        "lever": "break_point_pct",
+        "value": 10,
+        "kind": "levy"
+       },
+       {
+        "lever": "siege_pct",
+        "value": 5
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "survival",
+     "trade",
+     "land"
+    ]
+   },
+   {
+    "id": "segmentary_society",
+    "label": "Society without a crown",
+    "detect": {
+     "mode": [
+      "decentralized_polity"
+     ]
+    },
+    "birthright": {
+     "name": "No crown to take",
+     "text": "Conquerors' Foreign rule lasts 60 % longer, and Ungoverned does not count in your land.",
+     "why": "{name} had no single ruler a conqueror could depose.",
+     "effects": [
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 60
+      },
+      {
+       "lever": "grievance_shield",
+       "value": true,
+       "grievance": "ungoverned"
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_atlantic_empires",
+       "age_of_exploration",
+       "age_of_gunpowder_empires"
+      ],
+      "name": "Melting away",
+      "text": "Conquerors' Foreign rule lasts 50 % longer, armies march 15 % faster, loot +20 %, while at war.",
+      "why": "Inferred: decentralised peoples resisted by moving and raiding.",
+      "wakes": {
+       "at_war": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "homeland_resistance_pct",
+        "value": 50
+       },
+       {
+        "lever": "march_days_pct",
+        "value": -15
+       },
+       {
+        "lever": "loot_pct",
+        "value": 20
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "No single voice",
+     "text": "One envoy fewer.",
+     "why": "Many councils, no single voice abroad (inferred).",
+     "effects": [
+      {
+       "lever": "envoy_count",
+       "value": -1
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "allies",
+       "op": ">=",
+       "value": 3
+      }
+     },
+     "shed_text": "Have three allies.",
+     "turned": {
+      "name": "Council of many",
+      "text": "One more envoy, and neighbours think a step better of you.",
+      "effects": [
+       {
+        "lever": "envoy_count",
+        "value": 1
+       },
+       {
+        "lever": "opinion_steps",
+        "value": 1,
+        "of": "neighbours"
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "survival",
+     "trade",
+     "faith"
+    ]
+   },
+   {
+    "id": "pastoral_people",
+    "label": "Herding people",
+    "detect": {
+     "focus_any": [
+      "pastoralism"
+     ],
+     "text_any": [
+      "cattle",
+      "herd",
+      "pastoral",
+      "camel",
+      "sheep"
+     ]
+    },
+    "birthright": {
+     "name": "Herds of {name}",
+     "text": "Herds grow 25 % faster, herder slots +20 %, armies forage 20 % more.",
+     "why": "{name}'s wealth was counted in animals.",
+     "effects": [
+      {
+       "lever": "herd_growth_pct",
+       "value": 25
+      },
+      {
+       "lever": "class_slots_pct",
+       "value": 20,
+       "class": "herders"
+      },
+      {
+       "lever": "forage_pct",
+       "value": 20
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_crisis_and_absolutism",
+       "age_of_gunpowder_empires",
+       "age_of_atlantic_empires"
+      ],
+      "name": "Cattle wealth",
+      "text": "Herds grow 25 % faster, horses 20 % faster, recruits refill 15 % faster.",
+      "why": "Inferred: herding peoples grew strong in good grazing years.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "herd_growth_pct",
+        "value": 25
+       },
+       {
+        "lever": "horses_pct",
+        "value": 20
+       },
+       {
+        "lever": "recruit_refill_pct",
+        "value": 15
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Drought years",
+     "text": "Herds grow 20 % slower and people 5 % slower.",
+     "why": "Inferred: drought struck herds first.",
+     "effects": [
+      {
+       "lever": "herd_growth_pct",
+       "value": -20
+      },
+      {
+       "lever": "growth_pct",
+       "value": -5
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "building:ranch",
+       "op": ">=",
+       "value": "start+3"
+      }
+     },
+     "shed_text": "Build three more ranches.",
+     "turned": {
+      "name": "Wells and grazing law",
+      "text": "Herds grow 25 % faster and stores rot 25 % less.",
+      "effects": [
+       {
+        "lever": "herd_growth_pct",
+        "value": 25
+       },
+       {
+        "lever": "store_rot_pct",
+        "value": -25
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "wealth",
+     "survival",
+     "land"
+    ]
+   },
+   {
+    "id": "raiders",
+    "label": "Raiding power",
+    "detect": {
+     "focus_any": [
+      "plunder"
+     ],
+     "modes_any": [
+      "raiding"
+     ]
+    },
+    "birthright": {
+     "name": "Swift raiders",
+     "text": "Loot +40 %, armies march 10 % faster, light troops hit 15 % harder.",
+     "why": "{name} lived partly by raiding (catalogue).",
+     "effects": [
+      {
+       "lever": "loot_pct",
+       "value": 40
+      },
+      {
+       "lever": "march_days_pct",
+       "value": -10
+      },
+      {
+       "lever": "hits_pct",
+       "value": 15,
+       "arm": "light"
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_gunpowder_empires",
+       "age_of_atlantic_empires"
+      ],
+      "name": "Raiding season",
+      "text": "Loot +40 %, armies march 10 % faster, horses breed 20 % faster, while at war.",
+      "why": "Inferred: raiding peaked while frontiers were open.",
+      "wakes": {
+       "at_war": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "loot_pct",
+        "value": 40
+       },
+       {
+        "lever": "march_days_pct",
+        "value": -10
+       },
+       {
+        "lever": "horses_pct",
+        "value": 20
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Feared by all",
+     "text": "Neighbours think a step less of you, and each province taken counts 20 % more toward Lands taken.",
+     "why": "Raids made enemies of neighbours (inferred).",
+     "effects": [
+      {
+       "lever": "opinion_steps",
+       "value": -1,
+       "of": "neighbours"
+      },
+      {
+       "lever": "lands_taken_pct",
+       "value": 20
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "allies",
+       "op": ">=",
+       "value": 2
+      }
+     },
+     "shed_text": "Have two allies.",
+     "turned": {
+      "name": "Honoured guests",
+      "text": "Neighbours think a step better of you, 15 % more traders.",
+      "effects": [
+       {
+        "lever": "opinion_steps",
+        "value": 1,
+        "of": "neighbours"
+       },
+       {
+        "lever": "traders_passing_pct",
+        "value": 15
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "land",
+     "wealth",
+     "survival"
+    ]
+   },
+   {
+    "id": "ocean_voyagers",
+    "label": "Ocean voyagers",
+    "detect": {
+     "region_any": [
+      "oc_oceania"
+     ]
+    },
+    "birthright": {
+     "name": "Wayfinders",
+     "text": "Sea crossings 20 % shorter, storms sink 40 % fewer ships, fisheries feed 30 % more.",
+     "why": "{name}'s people crossed open ocean by stars and swells.",
+     "effects": [
+      {
+       "lever": "sea_days_pct",
+       "value": -20
+      },
+      {
+       "lever": "storm_loss_pct",
+       "value": -40
+      },
+      {
+       "lever": "fish_pct",
+       "value": 30
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_exploration",
+       "age_of_atlantic_empires"
+      ],
+      "name": "Long voyages",
+      "text": "Sea crossings 15 % shorter, ports raise 25 % more sailors, fisheries feed 30 % more.",
+      "why": "Inferred: voyaging links between islands carried power and goods.",
+      "wakes": {
+       "coastal": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "sea_days_pct",
+        "value": -15
+       },
+       {
+        "lever": "crew_pct",
+        "value": 25
+       },
+       {
+        "lever": "fish_pct",
+        "value": 30
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Far from everyone",
+     "text": "Inventions cost 15 % more and 10 % fewer traders pass.",
+     "why": "Distance kept new techniques far away (inferred).",
+     "effects": [
+      {
+       "lever": "invention_cost_pct",
+       "value": 15
+      },
+      {
+       "lever": "traders_passing_pct",
+       "value": -10
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "allies",
+       "op": ">=",
+       "value": 1
+      }
+     },
+     "shed_text": "Have an ally.",
+     "turned": {
+      "name": "Many harbours",
+      "text": "15 % more traders on the coast and one more trader.",
+      "effects": [
+       {
+        "lever": "traders_passing_pct",
+        "value": 15,
+        "where": "coast"
+       },
+       {
+        "lever": "trader_count",
+        "value": 1
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "sea",
+     "survival",
+     "faith"
+    ]
+   },
+   {
+    "id": "chiefly_society",
+    "label": "Chiefdom",
+    "detect": {
+     "entity_type": [
+      "chiefdom",
+      "paramount_chiefdom",
+      "cacicazgo",
+      "tribal_confederation",
+      "confederation"
+     ]
+    },
+    "birthright": {
+     "name": "Kin and chiefs",
+     "text": "Tribute +20 %, levies serve a month longer, and conquerors' Foreign rule lasts 30 % longer.",
+     "why": "{name}: held together by chiefs, kin and gifts.",
+     "effects": [
+      {
+       "lever": "tribute_pct",
+       "value": 20
+      },
+      {
+       "lever": "levy_free_months",
+       "value": 1
+      },
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 30
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_atlantic_empires",
+       "age_of_exploration",
+       "age_of_gunpowder_empires"
+      ],
+      "name": "Feasts and alliances",
+      "text": "One step better opinion from neighbours, retinues 20 % larger, tribute +15 %, while independent.",
+      "why": "Inferred: chiefs grew strong by gifts and marriage ties with neighbours.",
+      "wakes": {
+       "independent": {
+        "who": "this"
+       }
+      },
+      "effects": [
+       {
+        "lever": "opinion_steps",
+        "value": 1,
+        "of": "neighbours"
+       },
+       {
+        "lever": "retinue_pct",
+        "value": 20
+       },
+       {
+        "lever": "tribute_pct",
+        "value": 15
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Rival lineages",
+     "text": "Lords start a step less loyal and stability −0.5.",
+     "why": "Chiefly succession was open to many kin (inferred).",
+     "effects": [
+      {
+       "lever": "lord_loyalty_start_steps",
+       "value": -1
+      },
+      {
+       "lever": "stat",
+       "value": -0.5,
+       "stat": "stability"
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "loyal_lords",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "shed_text": "Have twice as many loyal lords as at the start.",
+     "turned": {
+      "name": "Paramount line",
+      "text": "A new ruler no longer shakes the lords; retinues 15 % larger.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "new_ruler"
+       },
+       {
+        "lever": "retinue_pct",
+        "value": 15
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "survival",
+     "land",
+     "trade"
+    ]
+   },
+   {
+    "id": "settled_realm",
+    "label": "Settled realm",
+    "detect": {},
+    "birthright": {
+     "name": "Old fields of {name}",
+     "text": "Harvests a step better at home, growth +10 %, tax reaching you +10 %.",
+     "why": "{name}'s farmland was its strength ({goods}).",
+     "effects": [
+      {
+       "lever": "harvest_steps",
+       "value": 1,
+       "where": "core"
+      },
+      {
+       "lever": "growth_pct",
+       "value": 10
+      },
+      {
+       "lever": "tax_reach_pct",
+       "value": 10
+      }
+     ]
+    },
+    "heydays": [
+     {
+      "age_options": [
+       "age_of_crisis_and_absolutism",
+       "age_of_gunpowder_empires",
+       "age_of_exploration",
+       "age_of_atlantic_empires"
+      ],
+      "name": "Good harvest years",
+      "text": "Harvests a step better at home, growth +10 %, stores rot 25 % less, tax reaching you +10 %, while at peace.",
+      "why": "Inferred: long peace let farming realms grow.",
+      "wakes": {
+       "not": {
+        "at_war": {
+         "who": "this"
+        }
+       }
+      },
+      "effects": [
+       {
+        "lever": "harvest_steps",
+        "value": 1,
+        "where": "core"
+       },
+       {
+        "lever": "growth_pct",
+        "value": 10
+       },
+       {
+        "lever": "store_rot_pct",
+        "value": -25
+       },
+       {
+        "lever": "tax_reach_pct",
+        "value": 10
+       }
+      ]
+     }
+    ],
+    "burden": {
+     "name": "Old quarrels",
+     "text": "Lords start a step less loyal, broken oaths fade 20 % slower.",
+     "why": "Inferred from the catalogue's internal divisions.",
+     "effects": [
+      {
+       "lever": "lord_loyalty_start_steps",
+       "value": -1
+      },
+      {
+       "lever": "oath_fade_pct",
+       "value": 20
+      }
+     ],
+     "shed": {
+      "count": {
+       "who": "this",
+       "thing": "officials",
+       "op": ">=",
+       "value": "start*2"
+      }
+     },
+     "shed_text": "Have twice the officials you began with.",
+     "turned": {
+      "name": "Peace of the land",
+      "text": "Lost wars no longer shake the lords; growth +5 %.",
+      "effects": [
+       {
+        "lever": "lord_loyalty_shield",
+        "value": true,
+        "cause": "lost_wars"
+       },
+       {
+        "lever": "growth_pct",
+        "value": 5
+       }
+      ]
+     }
+    },
+    "ambition_themes": [
+     "crown",
+     "land",
+     "wealth"
+    ]
+   }
+  ],
+  "theme_ambitions": {
+   "wealth": {
+    "name": "A full treasury",
+    "hint": "Coin that counts itself.",
+    "text": "Hold five times the gold you began with and owe nothing.",
+    "stir": {
+     "count": {
+      "who": "this",
+      "thing": "gold",
+      "op": ">=",
+      "value": "start*2"
+     }
+    },
+    "goal": {
+     "all": [
+      {
+       "count": {
+        "who": "this",
+        "thing": "gold",
+        "op": ">=",
+        "value": "start*5"
+       }
+      },
+      {
+       "count": {
+        "who": "this",
+        "thing": "debt",
+        "op": "==",
+        "value": 0
+       }
+      }
+     ]
+    }
+   },
+   "sea": {
+    "name": "Masters of the harbour",
+    "hint": "Sails beyond counting.",
+    "text": "Have three times the trade ships you began with.",
+    "stir": {
+     "count": {
+      "who": "this",
+      "thing": "trade_ships",
+      "op": ">=",
+      "value": "start*2"
+     }
+    },
+    "goal": {
+     "count": {
+      "who": "this",
+      "thing": "trade_ships",
+      "op": ">=",
+      "value": "start*3"
+     }
+    }
+   },
+   "trade": {
+    "name": "Market of the region",
+    "hint": "Where every road ends.",
+    "text": "Have three more markets than at the start.",
+    "stir": {
+     "count": {
+      "who": "this",
+      "thing": "building:market",
+      "op": ">=",
+      "value": "start+1"
+     }
+    },
+    "goal": {
+     "count": {
+      "who": "this",
+      "thing": "building:market",
+      "op": ">=",
+      "value": "start+3"
+     }
+    }
+   },
+   "learning": {
+    "name": "House of learning",
+    "hint": "Ink that outlasts swords.",
+    "text": "Have two more schools and three times the scholars you began with.",
+    "stir": {
+     "count": {
+      "who": "this",
+      "thing": "schools",
+      "op": ">=",
+      "value": "start+1"
+     }
+    },
+    "goal": {
+     "all": [
+      {
+       "count": {
+        "who": "this",
+        "thing": "schools",
+        "op": ">=",
+        "value": "start+2"
+       }
+      },
+      {
+       "count": {
+        "who": "this",
+        "thing": "scholars",
+        "op": ">=",
+        "value": "start*3"
+       }
+      }
+     ]
+    }
+   },
+   "faith": {
+    "name": "Houses of worship",
+    "hint": "Bells, drums or calls to prayer in every valley.",
+    "text": "Have four more houses of worship than at the start.",
+    "stir": {
+     "count": {
+      "who": "this",
+      "thing": "building:house_of_worship",
+      "op": ">=",
+      "value": "start+2"
+     }
+    },
+    "goal": {
+     "count": {
+      "who": "this",
+      "thing": "building:house_of_worship",
+      "op": ">=",
+      "value": "start+4"
+     }
+    }
+   },
+   "survival": {
+    "name": "Endure",
+    "hint": "Still standing when the world has changed.",
+    "text": "Be independent in 1600.",
+    "stir": {
+     "at_war": {
+      "who": "this"
+     }
+    },
+    "goal": {
+     "all": [
+      {
+       "independent": {
+        "who": "this"
+       }
+      },
+      {
+       "date": {
+        "min": 1600
+       }
+      }
+     ]
+    },
+    "fail": {
+     "not": {
+      "independent": {
+       "who": "this"
+      }
+     }
+    },
+    "window": [
+     1444,
+     1600
+    ]
+   },
+   "crown": {
+    "name": "A loyal realm",
+    "hint": "Every banner turned the same way.",
+    "text": "Have twice as many loyal lords as at the start.",
+    "stir": {
+     "count": {
+      "who": "this",
+      "thing": "loyal_lords",
+      "op": ">=",
+      "value": "start*1.5"
+     }
+    },
+    "goal": {
+     "count": {
+      "who": "this",
+      "thing": "loyal_lords",
+      "op": ">=",
+      "value": "start*2"
+     }
+    }
+   },
+   "land": {
+    "name": "Wider borders",
+    "hint": "More land than your fathers knew.",
+    "text": "Hold twice the provinces you began with.",
+    "stir": {
+     "count": {
+      "who": "this",
+      "thing": "provinces",
+      "op": ">=",
+      "value": "start*1.5"
+     }
+    },
+    "goal": {
+     "count": {
+      "who": "this",
+      "thing": "provinces",
+      "op": ">=",
+      "value": "start*2"
+     }
+    }
+   }
+  },
+  "legacies": {
+   "land": [
+    {
+     "name": "Marcher lords",
+     "text": "Each province taken counts 20 % less toward Lands taken; conquered land settles 25 % faster.",
+     "effects": [
+      {
+       "lever": "lands_taken_pct",
+       "value": -20
+      },
+      {
+       "lever": "integration_years_pct",
+       "value": -25
+      }
+     ]
+    },
+    {
+     "name": "Veteran captains",
+     "text": "New commanders start with one more Might; break point +5 points.",
+     "effects": [
+      {
+       "lever": "commander_skill",
+       "value": 1,
+       "skill": "might"
+      },
+      {
+       "lever": "break_point_pct",
+       "value": 5
+      }
+     ]
+    }
+   ],
+   "sea": [
+    {
+     "name": "Dockyard tradition",
+     "text": "Ships build 15 % faster and ports raise 20 % more sailors.",
+     "effects": [
+      {
+       "lever": "ship_build_pct",
+       "value": -15
+      },
+      {
+       "lever": "crew_pct",
+       "value": 20
+      }
+     ]
+    },
+    {
+     "name": "Charted coasts",
+     "text": "Sea crossings 15 % shorter and storms sink 30 % fewer ships.",
+     "effects": [
+      {
+       "lever": "sea_days_pct",
+       "value": -15
+      },
+      {
+       "lever": "storm_loss_pct",
+       "value": -30
+      }
+     ]
+    }
+   ],
+   "trade": [
+    {
+     "name": "Merchant houses",
+     "text": "One more trader and trade profit +10 %.",
+     "effects": [
+      {
+       "lever": "trader_count",
+       "value": 1
+      },
+      {
+       "lever": "trade_balance_pct",
+       "value": 10
+      }
+     ]
+    },
+    {
+     "name": "Fair towns",
+     "text": "20 % more traders pass; markets cost 20 % less.",
+     "effects": [
+      {
+       "lever": "traders_passing_pct",
+       "value": 20
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -20,
+       "building": "market"
+      }
+     ]
+    }
+   ],
+   "faith": [
+    {
+     "name": "Pious foundations",
+     "text": "Faith spreads 25 % faster; one step better opinion from your faith.",
+     "effects": [
+      {
+       "lever": "faith_shift_pct",
+       "value": 25
+      },
+      {
+       "lever": "opinion_steps",
+       "value": 1,
+       "of": "same_faith"
+      }
+     ]
+    },
+    {
+     "name": "Learned clergy",
+     "text": "School seats +20 % and chaplains 25 % stronger.",
+     "effects": [
+      {
+       "lever": "school_seats_pct",
+       "value": 20
+      },
+      {
+       "lever": "official_type_pct",
+       "value": 25,
+       "type": "chaplain"
+      }
+     ]
+    }
+   ],
+   "crown": [
+    {
+     "name": "Loyal houses",
+     "text": "Lords start a step more loyal; retinues 20 % larger.",
+     "effects": [
+      {
+       "lever": "lord_loyalty_start_steps",
+       "value": 1
+      },
+      {
+       "lever": "retinue_pct",
+       "value": 20
+      }
+     ]
+    },
+    {
+     "name": "Royal clerks",
+     "text": "Officials cost 15 % less, settle a year sooner; tax reaching you +5 %.",
+     "effects": [
+      {
+       "lever": "official_wage_pct",
+       "value": -15
+      },
+      {
+       "lever": "official_years_to_full",
+       "value": -1
+      },
+      {
+       "lever": "tax_reach_pct",
+       "value": 5
+      }
+     ]
+    }
+   ],
+   "learning": [
+    {
+     "name": "Patrons of learning",
+     "text": "Scholars work 10 % better; 30 % more fleeing scholars choose you.",
+     "effects": [
+      {
+       "lever": "scholar_output_pct",
+       "value": 10
+      },
+      {
+       "lever": "migrants_pct",
+       "value": 30,
+       "class": "scholars"
+      }
+     ]
+    },
+    {
+     "name": "Copyists and presses",
+     "text": "Inventions cost 10 % less; school seats +25 %.",
+     "effects": [
+      {
+       "lever": "invention_cost_pct",
+       "value": -10
+      },
+      {
+       "lever": "school_seats_pct",
+       "value": 25
+      }
+     ]
+    }
+   ],
+   "survival": [
+    {
+     "name": "Unbowed",
+     "text": "Conquerors' Foreign rule lasts 40 % longer; garrisons 15 % stronger.",
+     "effects": [
+      {
+       "lever": "homeland_resistance_pct",
+       "value": 40
+      },
+      {
+       "lever": "garrison_pct",
+       "value": 15
+      }
+     ]
+    },
+    {
+     "name": "Hard people",
+     "text": "Recruits refill 15 % faster; armies forage 25 % more.",
+     "effects": [
+      {
+       "lever": "recruit_refill_pct",
+       "value": 15
+      },
+      {
+       "lever": "forage_pct",
+       "value": 25
+      }
+     ]
+    }
+   ],
+   "wealth": [
+    {
+     "name": "Sound coin",
+     "text": "Debt interest −30 %; tax reaching you +10 %.",
+     "effects": [
+      {
+       "lever": "loan_interest_pct",
+       "value": -30
+      },
+      {
+       "lever": "tax_reach_pct",
+       "value": 10
+      }
+     ]
+    },
+    {
+     "name": "Thrifty court",
+     "text": "Officials cost 15 % less; buildings cost 20 % less.",
+     "effects": [
+      {
+       "lever": "official_wage_pct",
+       "value": -15
+      },
+      {
+       "lever": "building_cost_pct",
+       "value": -20
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_provisional": [
+  "rules.inheritance.claim_years",
+  "rules.ambitions.pool_max",
+  "rules.ai.sleep_heyday",
+  "rules.ai.let_go_legacy"
+ ]
+}

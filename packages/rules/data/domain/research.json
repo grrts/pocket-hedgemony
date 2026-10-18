@@ -1,0 +1,3637 @@
+{
+ "$comment": "Research (domain/research/spec.md). Era costs, rates and seats are placeholders from the research tree and country stats v3 section 7. Inventions are the 174 rows of the tree (research-tree.md), one config row each.",
+ "root": {
+  "id": "R0",
+  "name": "Settled life"
+ },
+ "boughs": [
+  {
+   "id": "R1",
+   "name": "Tilling and building"
+  },
+  {
+   "id": "R2",
+   "name": "Fire and metal"
+  },
+  {
+   "id": "R3",
+   "name": "Counting and records"
+  },
+  {
+   "id": "R4",
+   "name": "Boats"
+  }
+ ],
+ "eras": [
+  "I",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "VII",
+  "VIII"
+ ],
+ "era_cost": {
+  "I": 20,
+  "II": 40,
+  "III": 80,
+  "IV": 150,
+  "V": 250,
+  "VI": 400,
+  "VII": 650,
+  "VIII": 1000
+ },
+ "era_dates": {
+  "I": 1444,
+  "II": 1500,
+  "III": 1600,
+  "IV": 1700,
+  "V": 1800,
+  "VI": 1870,
+  "VII": 1914,
+  "VIII": 1960
+ },
+ "campaign_end": {
+  "year": 1939,
+  "month": 8,
+  "day": 31
+ },
+ "out_of_scope_eras": [
+  "VIII"
+ ],
+ "ahead_multiplier": 2,
+ "spread_per_partner_pct": 10,
+ "spread_cap_pct": 60,
+ "scholar_rate": 1,
+ "student_rate": 0.2,
+ "graduation_years": 5,
+ "schoolmaster_years_sooner": 1,
+ "studies_with_academy": 2,
+ "school_seats": {
+  "temple_or_monastery_school": 20,
+  "madrasa": 30,
+  "university": 60,
+  "academy": 100
+ },
+ "school_invention": {
+  "temple_or_monastery_school": "L1",
+  "madrasa": "L2",
+  "university": "L7",
+  "academy": "L12"
+ },
+ "academy_level_schools": [
+  "academy"
+ ],
+ "graduate_official_types": {
+  "madrasa": [
+   "judge",
+   "chaplain"
+  ],
+  "university": [
+   "judge",
+   "steward"
+  ],
+  "academy": [
+   "master of works",
+   "warden"
+  ]
+ },
+ "school_gained_by": [
+  "build",
+  "lord_founds",
+  "clergy_founds",
+  "conquest"
+ ],
+ "school_lost_by": {
+  "upkeep_unpaid": "closed",
+  "sacked": "lost",
+  "religious_change": "closed"
+ },
+ "students": {
+  "gained_by": [
+   "enrolled"
+  ],
+  "lost_by": [
+   "graduated",
+   "called_to_arms",
+   "famine",
+   "plague"
+  ]
+ },
+ "scholars": {
+  "gained_by": [
+   "graduated",
+   "hired_foreign",
+   "fled_to_you"
+  ],
+  "lost_by": [
+   "old_age",
+   "war_in_town",
+   "persecution",
+   "poached"
+  ]
+ },
+ "inventions": [
+  {
+   "id": "B1",
+   "name": "Stone castles",
+   "era": "I",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Castles",
+   "start_regions": [
+    "Most settled realms"
+   ],
+   "effects": {
+    "buildings": [
+     "castle"
+    ]
+   }
+  },
+  {
+   "id": "B5",
+   "name": "bastion_fortification",
+   "era": "II",
+   "parent": "B1",
+   "or_parents": [],
+   "also_needs": [
+    "W3"
+   ],
+   "unlocks": "Castles resist guns",
+   "start_regions": [],
+   "event_id": "bastion_fortification"
+  },
+  {
+   "id": "B6",
+   "name": "Star forts",
+   "era": "II",
+   "parent": "B5",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Strong castles; sieges take far longer",
+   "start_regions": []
+  },
+  {
+   "id": "B7",
+   "name": "Siege parallels",
+   "era": "III",
+   "parent": "B6",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Attackers take castles faster",
+   "start_regions": []
+  },
+  {
+   "id": "B2",
+   "name": "Roads and post stations",
+   "era": "I",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Grain and armies move faster; officials run +1 province close to the capital",
+   "start_regions": [
+    "Ming",
+    "Ottoman",
+    "Inca",
+    "Mali trade roads"
+   ],
+   "effects": {
+    "faster": [
+     "grain",
+     "armies"
+    ],
+    "official_reach": 1
+   }
+  },
+  {
+   "id": "B3",
+   "name": "Grand canals",
+   "era": "I",
+   "parent": "B2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "River-and-canal grain transport",
+   "start_regions": [
+    "China"
+   ]
+  },
+  {
+   "id": "B8",
+   "name": "Canal locks",
+   "era": "III",
+   "parent": "B3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Canals across hills",
+   "start_regions": []
+  },
+  {
+   "id": "W10",
+   "name": "Supply magazines",
+   "era": "III",
+   "parent": "B2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Armies far from home don't starve",
+   "start_regions": []
+  },
+  {
+   "id": "B9",
+   "name": "Turnpike roads",
+   "era": "IV",
+   "parent": "B2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Faster grain and armies",
+   "start_regions": [],
+   "effects": {
+    "faster": [
+     "grain",
+     "armies"
+    ]
+   }
+  },
+  {
+   "id": "B4",
+   "name": "Earthwork ring forts",
+   "era": "I",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Cheap forts",
+   "start_regions": [
+    "West Africa (e.g. Benin walls)",
+    "Polynesia"
+   ]
+  },
+  {
+   "id": "F1",
+   "name": "Three-field rotation",
+   "era": "I",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+1 harvest step on farmland",
+   "start_regions": [
+    "Most of Europe"
+   ],
+   "effects": {
+    "harvest_steps": 1
+   }
+  },
+  {
+   "id": "F7",
+   "name": "Ever-normal granaries",
+   "era": "I",
+   "parent": "F1",
+   "or_parents": [
+    "F2"
+   ],
+   "also_needs": [],
+   "unlocks": "Granaries hold 50 % more and rot less",
+   "start_regions": [
+    "China",
+    "Korea"
+   ],
+   "effects": {
+    "granary_pct": 50
+   }
+  },
+  {
+   "id": "F12",
+   "name": "Fodder crops (clover, turnips)",
+   "era": "III",
+   "parent": "F1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Horses eat half the grain; +1 harvest step",
+   "start_regions": [],
+   "effects": {
+    "harvest_steps": 1
+   }
+  },
+  {
+   "id": "F13",
+   "name": "Selective livestock breeding",
+   "era": "IV",
+   "parent": "F12",
+   "or_parents": [],
+   "also_needs": [
+    "F11"
+   ],
+   "unlocks": "Herds grow faster",
+   "start_regions": []
+  },
+  {
+   "id": "F14",
+   "name": "Seed drill",
+   "era": "IV",
+   "parent": "F12",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+1 harvest step",
+   "start_regions": [],
+   "effects": {
+    "harvest_steps": 1
+   }
+  },
+  {
+   "id": "F15",
+   "name": "Four-field rotation",
+   "era": "IV",
+   "parent": "F12",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "No fallow year: +1 harvest step",
+   "start_regions": [],
+   "effects": {
+    "harvest_steps": 1
+   }
+  },
+  {
+   "id": "F2",
+   "name": "Wet-rice terracing",
+   "era": "I",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Two harvests a year on irrigated rice land",
+   "start_regions": [
+    "East and Southeast Asia"
+   ],
+   "effects": {
+    "harvests_per_year_irrigated_rice": 2
+   }
+  },
+  {
+   "id": "F3",
+   "name": "Qanat and canal irrigation",
+   "era": "I",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Dry provinces harvest at normal",
+   "start_regions": [
+    "Iran",
+    "Central Asia",
+    "North Africa",
+    "Andes"
+   ]
+  },
+  {
+   "id": "F10",
+   "name": "Sugar and spice plantations",
+   "era": "II",
+   "parent": "F3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "New trade goods (event tree's harm rules apply: no forced labour bonus)",
+   "start_regions": []
+  },
+  {
+   "id": "F4",
+   "name": "Fish salting and drying",
+   "era": "I",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Fish keeps for a year; coastal grain store +20 %",
+   "start_regions": [
+    "Coasts worldwide"
+   ],
+   "effects": {
+    "coastal_grain_store_pct": 20,
+    "salting": true
+   }
+  },
+  {
+   "id": "F5",
+   "name": "Water and wind mills",
+   "era": "I",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Grain into flour cheaply: +gold per farmland province",
+   "start_regions": [
+    "Europe",
+    "Middle East",
+    "China"
+   ]
+  },
+  {
+   "id": "F8",
+   "name": "Polder drainage",
+   "era": "II",
+   "parent": "F5",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Turn marsh provinces into farmland",
+   "start_regions": [
+    "Low Countries"
+   ]
+  },
+  {
+   "id": "F6",
+   "name": "Chinampa and raised fields",
+   "era": "I",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Marsh and lake provinces farm well",
+   "start_regions": [
+    "Mexico basin",
+    "Andes lakes"
+   ]
+  },
+  {
+   "id": "F11",
+   "name": "Horse breeding studs",
+   "era": "II",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+Horses per grassland province",
+   "start_regions": [
+    "Steppe",
+    "Arabia",
+    "Iberia"
+   ]
+  },
+  {
+   "id": "F9",
+   "name": "Maize, potato and cassava",
+   "era": "II",
+   "parent": "R1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "A failed harvest becomes poor; more people per farmland",
+   "start_regions": [
+    "Americas"
+   ],
+   "contact": "atlantic_crossing",
+   "effects": {
+    "failed_harvest_becomes": "poor"
+   }
+  },
+  {
+   "id": "C1",
+   "name": "Paper making",
+   "era": "I",
+   "parent": "R2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Schools cost less",
+   "start_regions": [
+    "Worldwide except Americas and Oceania"
+   ],
+   "effects": {
+    "school_upkeep_pct": -10
+   }
+  },
+  {
+   "id": "L4",
+   "name": "Metal movable type",
+   "era": "I",
+   "parent": "C1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Books spread: students cost less",
+   "start_regions": [
+    "Korea"
+   ],
+   "effects": {
+    "school_upkeep_pct": -10
+   }
+  },
+  {
+   "id": "L5",
+   "name": "printing",
+   "era": "I",
+   "parent": "C1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Inventions spread +20 %; schools cost less",
+   "start_regions": [],
+   "event_id": "printing",
+   "effects": {
+    "spread_pct": 20,
+    "school_upkeep_pct": -10
+   }
+  },
+  {
+   "id": "L6",
+   "name": "humanist_learning",
+   "era": "I",
+   "parent": "L5",
+   "or_parents": [
+    "L2"
+   ],
+   "also_needs": [],
+   "unlocks": "Scholars +research",
+   "start_regions": [],
+   "event_id": "humanist_learning",
+   "effects": {
+    "research_pct": 10
+   }
+  },
+  {
+   "id": "T4",
+   "name": "Paper money",
+   "era": "I",
+   "parent": "C1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Print gold (risk of price rises)",
+   "start_regions": [
+    "China (Ming notes, heavily devalued by 1444)"
+   ]
+  },
+  {
+   "id": "C2",
+   "name": "Blast furnace",
+   "era": "I",
+   "parent": "R2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+iron: guns and tools cheaper",
+   "start_regions": [
+    "China",
+    "parts of Europe"
+   ]
+  },
+  {
+   "id": "W3",
+   "name": "Bombards",
+   "era": "I",
+   "parent": "C2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Siege guns: castles fall faster",
+   "start_regions": [
+    "Ottoman",
+    "Western Europe",
+    "China"
+   ]
+  },
+  {
+   "id": "W5",
+   "name": "gunpowder_infantry",
+   "era": "I",
+   "parent": "W3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Hand-gun infantry",
+   "start_regions": [
+    "Ottoman",
+    "Ming",
+    "parts of Europe"
+   ],
+   "event_id": "gunpowder_infantry"
+  },
+  {
+   "id": "W7",
+   "name": "Pike and shot",
+   "era": "II",
+   "parent": "W5",
+   "or_parents": [],
+   "also_needs": [
+    "W6"
+   ],
+   "unlocks": "Mixed infantry: foot +strength",
+   "start_regions": []
+  },
+  {
+   "id": "W11",
+   "name": "Flintlock and bayonet",
+   "era": "III",
+   "parent": "W7",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Pikes obsolete; foot +strength",
+   "start_regions": []
+  },
+  {
+   "id": "W9",
+   "name": "Volley fire drill",
+   "era": "II",
+   "parent": "W5",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Gun infantry +strength",
+   "start_regions": []
+  },
+  {
+   "id": "W8",
+   "name": "Field artillery",
+   "era": "II",
+   "parent": "W3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Guns in battle",
+   "start_regions": []
+  },
+  {
+   "id": "C10",
+   "name": "Gunpowder mills",
+   "era": "II",
+   "parent": "C2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Guns cost less to raise",
+   "start_regions": []
+  },
+  {
+   "id": "S6",
+   "name": "Ship-mounted cannon",
+   "era": "II",
+   "parent": "C10",
+   "or_parents": [],
+   "also_needs": [
+    "S4"
+   ],
+   "unlocks": "Warships with guns",
+   "start_regions": []
+  },
+  {
+   "id": "S8",
+   "name": "Turtle and armoured ships",
+   "era": "II",
+   "parent": "S6",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Coastal defence ships",
+   "start_regions": []
+  },
+  {
+   "id": "C6",
+   "name": "Mining pumps and shafts",
+   "era": "II",
+   "parent": "C2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+output from mines; silver and gold mines",
+   "start_regions": [
+    "Central Europe"
+   ]
+  },
+  {
+   "id": "C7",
+   "name": "Mercury silver refining",
+   "era": "II",
+   "parent": "C6",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Double silver from silver mines",
+   "start_regions": []
+  },
+  {
+   "id": "C12",
+   "name": "Coke smelting",
+   "era": "IV",
+   "parent": "C6",
+   "or_parents": [],
+   "also_needs": [
+    "C2"
+   ],
+   "unlocks": "Iron without forests",
+   "start_regions": []
+  },
+  {
+   "id": "B10",
+   "name": "Iron bridges",
+   "era": "IV",
+   "parent": "C12",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Cross rivers anywhere",
+   "start_regions": []
+  },
+  {
+   "id": "C13",
+   "name": "steam_power",
+   "era": "IV",
+   "parent": "C12",
+   "or_parents": [],
+   "also_needs": [
+    "L11"
+   ],
+   "unlocks": "Pumps, then engines",
+   "start_regions": [],
+   "event_id": "steam_power"
+  },
+  {
+   "id": "C14",
+   "name": "mechanized_textiles",
+   "era": "IV",
+   "parent": "C13",
+   "or_parents": [],
+   "also_needs": [
+    "C8"
+   ],
+   "unlocks": "Factories: big +gold in cloth provinces",
+   "start_regions": [],
+   "event_id": "mechanized_textiles"
+  },
+  {
+   "id": "C15",
+   "name": "Machine tools",
+   "era": "V",
+   "parent": "C13",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Needed for rifles, reapers, engines",
+   "start_regions": []
+  },
+  {
+   "id": "F17",
+   "name": "Mechanical reaper",
+   "era": "V",
+   "parent": "C15",
+   "or_parents": [],
+   "also_needs": [
+    "F14"
+   ],
+   "unlocks": "Fewer farmers per harvest: more recruits",
+   "start_regions": []
+  },
+  {
+   "id": "W16",
+   "name": "Rifled musket",
+   "era": "V",
+   "parent": "C15",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Foot +strength; more Fallen",
+   "start_regions": []
+  },
+  {
+   "id": "W17",
+   "name": "Breech-loading rifle",
+   "era": "V",
+   "parent": "W16",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Foot +strength",
+   "start_regions": []
+  },
+  {
+   "id": "C18",
+   "name": "Bessemer steel",
+   "era": "VI",
+   "parent": "C15",
+   "or_parents": [],
+   "also_needs": [
+    "C12"
+   ],
+   "unlocks": "Cheap steel: guns, ships, rails",
+   "start_regions": []
+  },
+  {
+   "id": "S14",
+   "name": "Ironclads",
+   "era": "V",
+   "parent": "S13",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Wooden fleets obsolete",
+   "start_regions": []
+  },
+  {
+   "id": "B13",
+   "name": "Reinforced concrete",
+   "era": "VI",
+   "parent": "C18",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Strong forts, dams",
+   "start_regions": []
+  },
+  {
+   "id": "B14",
+   "name": "Hydroelectric dams",
+   "era": "VI",
+   "parent": "B13",
+   "or_parents": [],
+   "also_needs": [
+    "C19"
+   ],
+   "unlocks": "Power and irrigation",
+   "start_regions": []
+  },
+  {
+   "id": "C19",
+   "name": "electrification",
+   "era": "VI",
+   "parent": "C18",
+   "or_parents": [],
+   "also_needs": [
+    "T14"
+   ],
+   "unlocks": "Factories and towns +gold",
+   "start_regions": [],
+   "event_id": "electrification"
+  },
+  {
+   "id": "L20",
+   "name": "Research laboratories",
+   "era": "VI",
+   "parent": "C19",
+   "or_parents": [],
+   "also_needs": [
+    "L12"
+   ],
+   "unlocks": "Research +50 %",
+   "start_regions": [],
+   "effects": {
+    "research_pct": 50
+   }
+  },
+  {
+   "id": "L23",
+   "name": "Nuclear physics",
+   "era": "VII",
+   "parent": "L20",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Unlocks nuclear power and propulsion",
+   "start_regions": []
+  },
+  {
+   "id": "L24",
+   "name": "Rocketry",
+   "era": "VII",
+   "parent": "L20",
+   "or_parents": [],
+   "also_needs": [
+    "C20"
+   ],
+   "unlocks": "Unlocks missiles and satellites",
+   "start_regions": []
+  },
+  {
+   "id": "L25",
+   "name": "computing",
+   "era": "VIII",
+   "parent": "L20",
+   "or_parents": [],
+   "also_needs": [
+    "C19"
+   ],
+   "unlocks": "Research +50 %; officials +1 province",
+   "start_regions": [],
+   "event_id": "computing"
+  },
+  {
+   "id": "C24",
+   "name": "Automation",
+   "era": "VIII",
+   "parent": "L25",
+   "or_parents": [],
+   "also_needs": [
+    "C21"
+   ],
+   "unlocks": "Fewer workers: +recruits and +students",
+   "start_regions": []
+  },
+  {
+   "id": "B17",
+   "name": "Prefab housing",
+   "era": "VIII",
+   "parent": "C24",
+   "or_parents": [],
+   "also_needs": [
+    "B13"
+   ],
+   "unlocks": "Towns grow fast",
+   "start_regions": []
+  },
+  {
+   "id": "G20",
+   "name": "Digital government",
+   "era": "VIII",
+   "parent": "L25",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Officials run 5 provinces",
+   "start_regions": [],
+   "effects": {
+    "provinces_per_official": 5
+   }
+  },
+  {
+   "id": "S21",
+   "name": "Satellite navigation",
+   "era": "VIII",
+   "parent": "L25",
+   "or_parents": [],
+   "also_needs": [
+    "L24"
+   ],
+   "unlocks": "No ships lost to navigation",
+   "start_regions": []
+  },
+  {
+   "id": "T18",
+   "name": "Electronic banking",
+   "era": "VIII",
+   "parent": "L25",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Merchants and officials +20 %",
+   "start_regions": []
+  },
+  {
+   "id": "T19",
+   "name": "internet",
+   "era": "VIII",
+   "parent": "L25",
+   "or_parents": [],
+   "also_needs": [
+    "T18"
+   ],
+   "unlocks": "Inventions spread at double speed",
+   "start_regions": [],
+   "event_id": "internet"
+  },
+  {
+   "id": "W24",
+   "name": "Guided missiles",
+   "era": "VIII",
+   "parent": "L25",
+   "or_parents": [],
+   "also_needs": [
+    "L24"
+   ],
+   "unlocks": "Strike from far away",
+   "start_regions": []
+  },
+  {
+   "id": "C21",
+   "name": "Assembly line",
+   "era": "VII",
+   "parent": "C19",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Factories double output",
+   "start_regions": []
+  },
+  {
+   "id": "C22",
+   "name": "motor_and_air_transport",
+   "era": "VII",
+   "parent": "C21",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Trucks, tractors and aircraft, as built by 1939",
+   "start_regions": [],
+   "event_id": "motor_and_air_transport"
+  },
+  {
+   "id": "B15",
+   "name": "Highways",
+   "era": "VII",
+   "parent": "C22",
+   "or_parents": [],
+   "also_needs": [
+    "B13"
+   ],
+   "unlocks": "Trucks move everything",
+   "start_regions": []
+  },
+  {
+   "id": "B16",
+   "name": "Airfields",
+   "era": "VII",
+   "parent": "C22",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Air routes and air bases",
+   "start_regions": []
+  },
+  {
+   "id": "F21",
+   "name": "Tractors",
+   "era": "VII",
+   "parent": "C22",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Many fewer farmers: +recruits and +students",
+   "start_regions": []
+  },
+  {
+   "id": "F23",
+   "name": "green_revolution_agriculture",
+   "era": "VIII",
+   "parent": "F21",
+   "or_parents": [],
+   "also_needs": [
+    "F22"
+   ],
+   "unlocks": "Famines nearly end",
+   "start_regions": [],
+   "event_id": "green_revolution_agriculture"
+  },
+  {
+   "id": "F24",
+   "name": "Drip irrigation",
+   "era": "VIII",
+   "parent": "F23",
+   "or_parents": [],
+   "also_needs": [
+    "F3"
+   ],
+   "unlocks": "Dry provinces harvest at good",
+   "start_regions": []
+  },
+  {
+   "id": "S18",
+   "name": "Aircraft carriers",
+   "era": "VII",
+   "parent": "C22",
+   "or_parents": [],
+   "also_needs": [
+    "S16"
+   ],
+   "unlocks": "Fleets strike from the air",
+   "start_regions": []
+  },
+  {
+   "id": "S20",
+   "name": "Nuclear propulsion",
+   "era": "VIII",
+   "parent": "S18",
+   "or_parents": [],
+   "also_needs": [
+    "L23"
+   ],
+   "unlocks": "Ships go years without port",
+   "start_regions": []
+  },
+  {
+   "id": "W21",
+   "name": "Tanks",
+   "era": "VII",
+   "parent": "C22",
+   "or_parents": [],
+   "also_needs": [
+    "W19"
+   ],
+   "unlocks": "Break trench lines",
+   "start_regions": []
+  },
+  {
+   "id": "W22",
+   "name": "Military aircraft",
+   "era": "VII",
+   "parent": "C22",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Scout and bomb",
+   "start_regions": []
+  },
+  {
+   "id": "T17",
+   "name": "Container shipping",
+   "era": "VIII",
+   "parent": "C21",
+   "or_parents": [],
+   "also_needs": [
+    "S13"
+   ],
+   "unlocks": "Trade ships carry 5×",
+   "start_regions": []
+  },
+  {
+   "id": "L21",
+   "name": "Radio",
+   "era": "VII",
+   "parent": "C19",
+   "or_parents": [],
+   "also_needs": [
+    "L16"
+   ],
+   "unlocks": "Faster spread of news and inventions",
+   "start_regions": [],
+   "effects": {
+    "spread_pct": 20
+   }
+  },
+  {
+   "id": "S19",
+   "name": "Radar",
+   "era": "VII",
+   "parent": "L21",
+   "or_parents": [],
+   "also_needs": [
+    "C19"
+   ],
+   "unlocks": "Fleets see far",
+   "start_regions": []
+  },
+  {
+   "id": "W23",
+   "name": "Field radio",
+   "era": "VII",
+   "parent": "L21",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Armies coordinate",
+   "start_regions": []
+  },
+  {
+   "id": "C20",
+   "name": "chemical_industry",
+   "era": "VI",
+   "parent": "C18",
+   "or_parents": [],
+   "also_needs": [
+    "L15"
+   ],
+   "unlocks": "Fertilizer, dyes, explosives",
+   "start_regions": [],
+   "event_id": "chemical_industry"
+  },
+  {
+   "id": "F19",
+   "name": "Chemical fertilizer",
+   "era": "VI",
+   "parent": "C20",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+2 harvest steps",
+   "start_regions": [],
+   "effects": {
+    "harvest_steps": 2
+   }
+  },
+  {
+   "id": "F22",
+   "name": "Hybrid seeds",
+   "era": "VII",
+   "parent": "F19",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+1 harvest step",
+   "start_regions": [],
+   "effects": {
+    "harvest_steps": 1
+   }
+  },
+  {
+   "id": "S15",
+   "name": "Torpedo boats",
+   "era": "VI",
+   "parent": "C20",
+   "or_parents": [],
+   "also_needs": [
+    "S14"
+   ],
+   "unlocks": "Small navies threaten big ones",
+   "start_regions": []
+  },
+  {
+   "id": "S17",
+   "name": "Submarines",
+   "era": "VI",
+   "parent": "S15",
+   "or_parents": [],
+   "also_needs": [
+    "C19"
+   ],
+   "unlocks": "Blockade by stealth",
+   "start_regions": []
+  },
+  {
+   "id": "W20",
+   "name": "Smokeless powder",
+   "era": "VI",
+   "parent": "C20",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Guns +range",
+   "start_regions": []
+  },
+  {
+   "id": "C23",
+   "name": "Plastics",
+   "era": "VII",
+   "parent": "C20",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+gold from industry",
+   "start_regions": []
+  },
+  {
+   "id": "S16",
+   "name": "Dreadnought battleships",
+   "era": "VI",
+   "parent": "C18",
+   "or_parents": [],
+   "also_needs": [
+    "S14"
+   ],
+   "unlocks": "Strongest warships",
+   "start_regions": []
+  },
+  {
+   "id": "W19",
+   "name": "Machine gun",
+   "era": "VI",
+   "parent": "C18",
+   "or_parents": [],
+   "also_needs": [
+    "W17"
+   ],
+   "unlocks": "Defence +strength; huge Fallen",
+   "start_regions": []
+  },
+  {
+   "id": "C16",
+   "name": "railways",
+   "era": "V",
+   "parent": "C13",
+   "or_parents": [],
+   "also_needs": [
+    "C12"
+   ],
+   "unlocks": "Move grain and armies far faster",
+   "start_regions": [],
+   "event_id": "railways",
+   "effects": {
+    "faster": [
+     "grain",
+     "armies"
+    ]
+   }
+  },
+  {
+   "id": "T14",
+   "name": "telegraphy",
+   "era": "V",
+   "parent": "C16",
+   "or_parents": [],
+   "also_needs": [
+    "L16"
+   ],
+   "unlocks": "Instant prices; officials run +1 province",
+   "start_regions": [],
+   "event_id": "telegraphy",
+   "effects": {
+    "official_reach": 1
+   }
+  },
+  {
+   "id": "W18",
+   "name": "Railway mobilization",
+   "era": "VI",
+   "parent": "C16",
+   "or_parents": [],
+   "also_needs": [
+    "W15"
+   ],
+   "unlocks": "Whole army raised in weeks",
+   "start_regions": []
+  },
+  {
+   "id": "S13",
+   "name": "Steamships",
+   "era": "V",
+   "parent": "C13",
+   "or_parents": [],
+   "also_needs": [
+    "S10"
+   ],
+   "unlocks": "Ships ignore wind; faster trade",
+   "start_regions": []
+  },
+  {
+   "id": "F16",
+   "name": "Guano and imported fertilizer",
+   "era": "V",
+   "parent": "S13",
+   "or_parents": [],
+   "also_needs": [
+    "F15"
+   ],
+   "unlocks": "+1 harvest step for 30 years",
+   "start_regions": [],
+   "effects": {
+    "harvest_steps": 1,
+    "harvest_steps_years": 30
+   }
+  },
+  {
+   "id": "F20",
+   "name": "Refrigerated shipping",
+   "era": "VI",
+   "parent": "S13",
+   "or_parents": [],
+   "also_needs": [
+    "F18"
+   ],
+   "unlocks": "Sell grain and meat overseas",
+   "start_regions": []
+  },
+  {
+   "id": "W13",
+   "name": "Light field artillery",
+   "era": "IV",
+   "parent": "C12",
+   "or_parents": [],
+   "also_needs": [
+    "W8"
+   ],
+   "unlocks": "Guns move with the army",
+   "start_regions": []
+  },
+  {
+   "id": "C17",
+   "name": "Gas lighting",
+   "era": "V",
+   "parent": "C12",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Towns grow; schools work longer",
+   "start_regions": []
+  },
+  {
+   "id": "C3",
+   "name": "Porcelain kilns",
+   "era": "I",
+   "parent": "R2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Porcelain trade good",
+   "start_regions": [
+    "China",
+    "Korea",
+    "Vietnam"
+   ]
+  },
+  {
+   "id": "C4",
+   "name": "Silk and cotton weaving",
+   "era": "I",
+   "parent": "R2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Cloth trade good",
+   "start_regions": [
+    "Asia",
+    "Middle East"
+   ]
+  },
+  {
+   "id": "C8",
+   "name": "Putting-out workshops",
+   "era": "II",
+   "parent": "C4",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Cloth provinces +gold",
+   "start_regions": []
+  },
+  {
+   "id": "C11",
+   "name": "Manufactories",
+   "era": "III",
+   "parent": "C8",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "A new building: +gold, needs officials",
+   "start_regions": []
+  },
+  {
+   "id": "S10",
+   "name": "Naval dockyards",
+   "era": "III",
+   "parent": "C11",
+   "or_parents": [],
+   "also_needs": [
+    "S7"
+   ],
+   "unlocks": "Ships cheaper to build and keep",
+   "start_regions": []
+  },
+  {
+   "id": "S12",
+   "name": "Copper sheathing",
+   "era": "IV",
+   "parent": "S10",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Ships rot slower",
+   "start_regions": []
+  },
+  {
+   "id": "C5",
+   "name": "Glass and lenses",
+   "era": "I",
+   "parent": "R2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Needed for spectacles and telescopes",
+   "start_regions": [
+    "Venice",
+    "Middle East"
+   ]
+  },
+  {
+   "id": "C9",
+   "name": "Clockmaking",
+   "era": "II",
+   "parent": "C5",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Needed for chronometer",
+   "start_regions": []
+  },
+  {
+   "id": "S11",
+   "name": "Marine chronometer",
+   "era": "IV",
+   "parent": "C9",
+   "or_parents": [],
+   "also_needs": [
+    "S5"
+   ],
+   "unlocks": "Fewer ships lost on long voyages",
+   "start_regions": []
+  },
+  {
+   "id": "L10",
+   "name": "Spectacles and telescopes",
+   "era": "II",
+   "parent": "C5",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Scholars work into old age",
+   "start_regions": [],
+   "effects": {
+    "old_age_one_in": 60
+   }
+  },
+  {
+   "id": "W1",
+   "name": "Composite-bow horse archery",
+   "era": "I",
+   "parent": "R2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Strong horse archers",
+   "start_regions": [
+    "Steppe",
+    "Iran",
+    "Ottoman",
+    "North India"
+   ]
+  },
+  {
+   "id": "W2",
+   "name": "Heavy armoured cavalry",
+   "era": "I",
+   "parent": "R2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Knights and lancers",
+   "start_regions": [
+    "Europe",
+    "India",
+    "Middle East"
+   ]
+  },
+  {
+   "id": "W4",
+   "name": "Wagon fort",
+   "era": "I",
+   "parent": "R2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Defensive wagons and hand guns",
+   "start_regions": [
+    "Bohemia",
+    "Hungary",
+    "Muscovy",
+    "Ming"
+   ]
+  },
+  {
+   "id": "W6",
+   "name": "Pike squares",
+   "era": "I",
+   "parent": "R2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Foot that stops horse",
+   "start_regions": [
+    "Swiss",
+    "Scots"
+   ]
+  },
+  {
+   "id": "G1",
+   "name": "Written law codes",
+   "era": "I",
+   "parent": "R3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "One official runs 1 province",
+   "start_regions": [
+    "Most states"
+   ],
+   "effects": {
+    "provinces_per_official": 1
+   }
+  },
+  {
+   "id": "G3",
+   "name": "Tax registers",
+   "era": "I",
+   "parent": "G1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Royal provinces pay +10 % (only with a chancery)",
+   "start_regions": [
+    "Ming",
+    "Ottoman",
+    "Venice"
+   ],
+   "effects": {
+    "royal_tax_pct": 10,
+    "needs_building": "chancery"
+   }
+  },
+  {
+   "id": "G7",
+   "name": "Venal offices",
+   "era": "II",
+   "parent": "G3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Sell offices for gold (officials worse)",
+   "start_regions": []
+  },
+  {
+   "id": "G9",
+   "name": "Professional bureaucracy",
+   "era": "III",
+   "parent": "G3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Officials cost less; each runs 2 provinces",
+   "start_regions": [],
+   "effects": {
+    "provinces_per_official": 2,
+    "officials_cost_less": true
+   }
+  },
+  {
+   "id": "G10",
+   "name": "Census",
+   "era": "III",
+   "parent": "G9",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Recruits and taxes counted correctly: +10 % (only with a chancery)",
+   "start_regions": [],
+   "effects": {
+    "needs_building": "chancery",
+    "recruits_pct": 10,
+    "tax_pct": 10
+   }
+  },
+  {
+   "id": "G12",
+   "name": "Statistical bureau",
+   "era": "IV",
+   "parent": "G10",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "See every province's harvest early",
+   "start_regions": []
+  },
+  {
+   "id": "G18",
+   "name": "Planned economy",
+   "era": "VII",
+   "parent": "G12",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Factories directed by the state",
+   "start_regions": []
+  },
+  {
+   "id": "G11",
+   "name": "Postal service",
+   "era": "III",
+   "parent": "G9",
+   "or_parents": [],
+   "also_needs": [
+    "B2"
+   ],
+   "unlocks": "Officials run +1 province further from the capital",
+   "start_regions": [],
+   "effects": {
+    "official_reach": 1
+   }
+  },
+  {
+   "id": "W12",
+   "name": "Standing regiments",
+   "era": "III",
+   "parent": "G9",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Soldiers who stay: no losses from disbanding; troop cap +0.5 % of people",
+   "start_regions": [],
+   "effects": {
+    "troop_cap_pct_of_people": 0.5
+   }
+  },
+  {
+   "id": "W14",
+   "name": "Army divisions",
+   "era": "IV",
+   "parent": "W12",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Armies split and join faster",
+   "start_regions": []
+  },
+  {
+   "id": "W15",
+   "name": "Mass conscription",
+   "era": "V",
+   "parent": "W14",
+   "or_parents": [],
+   "also_needs": [
+    "G10"
+   ],
+   "unlocks": "+50 % recruits from all provinces",
+   "start_regions": [],
+   "effects": {
+    "recruits_pct": 50
+   }
+  },
+  {
+   "id": "G13",
+   "name": "Rational legal codes",
+   "era": "IV",
+   "parent": "G9",
+   "or_parents": [],
+   "also_needs": [
+    "L6"
+   ],
+   "unlocks": "Lords' trials cause less anger",
+   "start_regions": []
+  },
+  {
+   "id": "G14",
+   "name": "Written constitution",
+   "era": "IV",
+   "parent": "G13",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "New government forms",
+   "start_regions": []
+  },
+  {
+   "id": "G4",
+   "name": "Examination system",
+   "era": "I",
+   "parent": "G1",
+   "or_parents": [],
+   "also_needs": [
+    "C1"
+   ],
+   "unlocks": "Scholars can become officials directly",
+   "start_regions": [
+    "China",
+    "Korea",
+    "Vietnam"
+   ],
+   "effects": {
+    "scholars_become_officials": true
+   }
+  },
+  {
+   "id": "G5",
+   "name": "Royal chancery",
+   "era": "I",
+   "parent": "G1",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Envoys +1",
+   "start_regions": [
+    "Many monarchies"
+   ],
+   "effects": {
+    "envoys": 1
+   }
+  },
+  {
+   "id": "G8",
+   "name": "Resident ambassadors",
+   "era": "II",
+   "parent": "G5",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Envoys +1; see others' armies; may ask for passage",
+   "start_regions": [
+    "Italian states"
+   ],
+   "effects": {
+    "envoys": 1,
+    "ask_passage": true
+   }
+  },
+  {
+   "id": "G2",
+   "name": "Feudal grants",
+   "era": "I",
+   "parent": "R3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Create lords by granting fiefs",
+   "start_regions": [
+    "Europe",
+    "Japan",
+    "India"
+   ]
+  },
+  {
+   "id": "G6",
+   "name": "Quipu and knot records",
+   "era": "I",
+   "parent": "R3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Tax registers without writing",
+   "start_regions": [
+    "Inca"
+   ]
+  },
+  {
+   "id": "L1",
+   "name": "Temple and monastery schools",
+   "era": "I",
+   "parent": "R3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "School type with 20 seats",
+   "start_regions": [
+    "Most settled realms"
+   ],
+   "effects": {
+    "school": "temple_or_monastery_school"
+   }
+  },
+  {
+   "id": "L7",
+   "name": "Universities",
+   "era": "II",
+   "parent": "L1",
+   "or_parents": [
+    "L2",
+    "L5"
+   ],
+   "also_needs": [],
+   "unlocks": "School type with 60 seats",
+   "start_regions": [],
+   "effects": {
+    "school": "university"
+   }
+  },
+  {
+   "id": "L8",
+   "name": "Anatomy",
+   "era": "II",
+   "parent": "L7",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Fewer Fallen from wounds",
+   "start_regions": []
+  },
+  {
+   "id": "L11",
+   "name": "experimental_science",
+   "era": "III",
+   "parent": "L7",
+   "or_parents": [],
+   "also_needs": [
+    "L10"
+   ],
+   "unlocks": "Scholars +research; unlocks steam and chemistry",
+   "start_regions": [],
+   "event_id": "experimental_science",
+   "effects": {
+    "research_pct": 10
+   }
+  },
+  {
+   "id": "L12",
+   "name": "Academies of science",
+   "era": "III",
+   "parent": "L11",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "School type with 100 seats; study two inventions at once",
+   "start_regions": [],
+   "effects": {
+    "school": "academy",
+    "studies": 2
+   }
+  },
+  {
+   "id": "L14",
+   "name": "Encyclopedias",
+   "era": "IV",
+   "parent": "L12",
+   "or_parents": [],
+   "also_needs": [
+    "L5"
+   ],
+   "unlocks": "Inventions spread +20 %",
+   "start_regions": [],
+   "effects": {
+    "spread_pct": 20
+   }
+  },
+  {
+   "id": "L18",
+   "name": "mass_literacy_schooling",
+   "era": "V",
+   "parent": "L14",
+   "or_parents": [],
+   "also_needs": [
+    "G10"
+   ],
+   "unlocks": "Village schools: every province gets seats",
+   "start_regions": [],
+   "event_id": "mass_literacy_schooling",
+   "effects": {
+    "village_schools": true
+   }
+  },
+  {
+   "id": "G16",
+   "name": "Civil service exams",
+   "era": "V",
+   "parent": "L18",
+   "or_parents": [],
+   "also_needs": [
+    "G9"
+   ],
+   "unlocks": "Officials run 3 provinces",
+   "start_regions": [],
+   "effects": {
+    "provinces_per_official": 3
+   }
+  },
+  {
+   "id": "L13",
+   "name": "Microscope",
+   "era": "III",
+   "parent": "L11",
+   "or_parents": [],
+   "also_needs": [
+    "L10"
+   ],
+   "unlocks": "Needed for germ theory",
+   "start_regions": []
+  },
+  {
+   "id": "L17",
+   "name": "vaccination_and_sanitation",
+   "era": "V",
+   "parent": "L13",
+   "or_parents": [],
+   "also_needs": [
+    "L9"
+   ],
+   "unlocks": "Plague and smallpox deaths fall",
+   "start_regions": [],
+   "event_id": "vaccination_and_sanitation"
+  },
+  {
+   "id": "L19",
+   "name": "Germ theory and antiseptics",
+   "era": "VI",
+   "parent": "L17",
+   "or_parents": [],
+   "also_needs": [
+    "L13"
+   ],
+   "unlocks": "Far fewer Fallen from disease",
+   "start_regions": []
+  },
+  {
+   "id": "L22",
+   "name": "Antibiotics",
+   "era": "VII",
+   "parent": "L19",
+   "or_parents": [],
+   "also_needs": [
+    "C20"
+   ],
+   "unlocks": "Few deaths from infection",
+   "start_regions": []
+  },
+  {
+   "id": "L15",
+   "name": "Chemistry",
+   "era": "IV",
+   "parent": "L11",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Needed for chemical industry",
+   "start_regions": []
+  },
+  {
+   "id": "L16",
+   "name": "Electricity studies",
+   "era": "IV",
+   "parent": "L11",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Needed for telegraphy",
+   "start_regions": []
+  },
+  {
+   "id": "B11",
+   "name": "Sewers and clean water",
+   "era": "V",
+   "parent": "L11",
+   "or_parents": [],
+   "also_needs": [
+    "B8"
+   ],
+   "unlocks": "Fewer plague deaths in towns",
+   "start_regions": []
+  },
+  {
+   "id": "B12",
+   "name": "Tenements and city planning",
+   "era": "V",
+   "parent": "B11",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Towns hold more people",
+   "start_regions": []
+  },
+  {
+   "id": "F18",
+   "name": "Canned food",
+   "era": "V",
+   "parent": "L11",
+   "or_parents": [],
+   "also_needs": [
+    "F4"
+   ],
+   "unlocks": "Armies carry 6 months of food",
+   "start_regions": []
+  },
+  {
+   "id": "L2",
+   "name": "Madrasa networks",
+   "era": "I",
+   "parent": "R3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "School type with 30 seats",
+   "start_regions": [
+    "Islamic world"
+   ],
+   "effects": {
+    "school": "madrasa"
+   }
+  },
+  {
+   "id": "L3",
+   "name": "Observatories",
+   "era": "I",
+   "parent": "L2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+research for Learning and Sea inventions",
+   "start_regions": [
+    "Timurid Samarkand",
+    "Ming",
+    "Maragha tradition"
+   ],
+   "effects": {
+    "research_pct_for_letters": {
+     "L": 20,
+     "S": 20
+    }
+   }
+  },
+  {
+   "id": "T1",
+   "name": "Caravanserai networks",
+   "era": "I",
+   "parent": "R3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Camel caravans; land traders lose their purse to bandits half as often",
+   "start_regions": [
+    "Middle East",
+    "Central Asia",
+    "Sahel"
+   ],
+   "effects": {
+    "bandit_loss_pct": -50
+   }
+  },
+  {
+   "id": "T2",
+   "name": "Double-entry bookkeeping",
+   "era": "I",
+   "parent": "R3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Collections +10 %",
+   "start_regions": [
+    "Italian cities"
+   ],
+   "effects": {
+    "collections_pct": 10
+   }
+  },
+  {
+   "id": "T3",
+   "name": "Bills of exchange",
+   "era": "I",
+   "parent": "T2",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Deposit abroad; move gold without carrying it; loans cheaper",
+   "start_regions": [
+    "Italy",
+    "Low Countries",
+    "Hanse"
+   ],
+   "effects": {
+    "deposit_abroad": true
+   }
+  },
+  {
+   "id": "T6",
+   "name": "Merchant fairs and exchanges",
+   "era": "II",
+   "parent": "T3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Market step 2 (yearly fair) can be built; every market serves +2 visits a month",
+   "start_regions": [],
+   "effects": {
+    "buildings": [
+     "yearly fair"
+    ],
+    "market_visits": 2
+   }
+  },
+  {
+   "id": "T8",
+   "name": "Licensed trading companies",
+   "era": "II",
+   "parent": "T6",
+   "or_parents": [],
+   "also_needs": [
+    "S5"
+   ],
+   "unlocks": "Trading posts overseas count as cities and can found traders; +1 colonial governor slot",
+   "start_regions": [],
+   "effects": {
+    "colonial_governor_slots": 1,
+    "trading_posts_count_as_cities": true
+   }
+  },
+  {
+   "id": "T7",
+   "name": "Deposit banks",
+   "era": "II",
+   "parent": "T3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Debt interest −20 %",
+   "start_regions": [],
+   "effects": {
+    "debt_interest_pct": -20
+   }
+  },
+  {
+   "id": "T10",
+   "name": "public_debt_markets",
+   "era": "III",
+   "parent": "T7",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Borrow much more at lower interest",
+   "start_regions": [],
+   "event_id": "public_debt_markets"
+  },
+  {
+   "id": "T12",
+   "name": "Central bank",
+   "era": "IV",
+   "parent": "T10",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Debt interest −30 %; default is rarer",
+   "start_regions": [],
+   "effects": {
+    "debt_interest_pct": -30
+   }
+  },
+  {
+   "id": "T13",
+   "name": "Commodity exchanges",
+   "era": "IV",
+   "parent": "T12",
+   "or_parents": [],
+   "also_needs": [
+    "T6"
+   ],
+   "unlocks": "See every known province's trade value and ratio",
+   "start_regions": [],
+   "effects": {
+    "see_all_trade": true
+   }
+  },
+  {
+   "id": "G15",
+   "name": "Income tax",
+   "era": "V",
+   "parent": "T12",
+   "or_parents": [],
+   "also_needs": [
+    "G10"
+   ],
+   "unlocks": "Tax from towns and industry",
+   "start_regions": []
+  },
+  {
+   "id": "G17",
+   "name": "Social insurance",
+   "era": "VI",
+   "parent": "G15",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Fewer revolts in towns",
+   "start_regions": []
+  },
+  {
+   "id": "G19",
+   "name": "Welfare state",
+   "era": "VII",
+   "parent": "G17",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Famines and revolts rare",
+   "start_regions": []
+  },
+  {
+   "id": "T16",
+   "name": "Postal savings and mass banking",
+   "era": "VI",
+   "parent": "T12",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "+gold from people",
+   "start_regions": []
+  },
+  {
+   "id": "T9",
+   "name": "joint_stock_finance",
+   "era": "III",
+   "parent": "T7",
+   "or_parents": [],
+   "also_needs": [
+    "T8"
+   ],
+   "unlocks": "Trade ships cost 25 % less to buy; +1 colonial governor slot",
+   "start_regions": [],
+   "event_id": "joint_stock_finance",
+   "effects": {
+    "colonial_governor_slots": 1,
+    "trade_ship_cost_pct": -25
+   }
+  },
+  {
+   "id": "T11",
+   "name": "Marine insurance",
+   "era": "III",
+   "parent": "T9",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Half the purse of a lost ship is refunded",
+   "start_regions": [],
+   "effects": {
+    "lost_purse_refund_pct": 50
+   }
+  },
+  {
+   "id": "T15",
+   "name": "Limited-liability companies",
+   "era": "V",
+   "parent": "T9",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Industry grows faster",
+   "start_regions": []
+  },
+  {
+   "id": "T5",
+   "name": "Monsoon sailing calendars",
+   "era": "I",
+   "parent": "R3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Storm losses for trade ships in the Indian Ocean halved",
+   "start_regions": [
+    "Swahili coast",
+    "Gujarat",
+    "Arabia",
+    "Malay world"
+   ],
+   "effects": {
+    "indian_ocean_storm_loss_pct": -50
+   }
+  },
+  {
+   "id": "L9",
+   "name": "Variolation",
+   "era": "II",
+   "parent": "R3",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Fewer smallpox deaths",
+   "start_regions": [
+    "China",
+    "Ottoman",
+    "West Africa",
+    "India"
+   ]
+  },
+  {
+   "id": "S1",
+   "name": "Magnetic compass and sea charts",
+   "era": "I",
+   "parent": "R4",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Ships may leave the coast",
+   "start_regions": [
+    "Mediterranean",
+    "China",
+    "Indian Ocean"
+   ]
+  },
+  {
+   "id": "S4",
+   "name": "Carrack and caravel",
+   "era": "I",
+   "parent": "S1",
+   "or_parents": [],
+   "also_needs": [
+    "S2"
+   ],
+   "unlocks": "Ocean-going ships",
+   "start_regions": [
+    "Portugal",
+    "Castile",
+    "Genoa",
+    "Venice"
+   ]
+  },
+  {
+   "id": "S5",
+   "name": "ocean_navigation",
+   "era": "II",
+   "parent": "S4",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Cross oceans; opens colonies with 2 colonial governor slots (see [exploration-design.md](../exploration/exploration-design.md))",
+   "start_regions": [],
+   "event_id": "ocean_navigation",
+   "effects": {
+    "cross_oceans": true,
+    "colonial_governor_slots": 2
+   }
+  },
+  {
+   "id": "S7",
+   "name": "Galleon",
+   "era": "II",
+   "parent": "S5",
+   "or_parents": [],
+   "also_needs": [
+    "S6"
+   ],
+   "unlocks": "Strong trade and war ships",
+   "start_regions": []
+  },
+  {
+   "id": "S9",
+   "name": "Line-of-battle tactics",
+   "era": "III",
+   "parent": "S7",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Warships +strength in fleets",
+   "start_regions": []
+  },
+  {
+   "id": "S2",
+   "name": "Lateen and junk rigging",
+   "era": "I",
+   "parent": "R4",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Better trade ships: trade ships' hold +0.5",
+   "start_regions": [
+    "Mediterranean",
+    "Indian Ocean",
+    "China"
+   ],
+   "effects": {
+    "trade_ship_hold": 0.5
+   }
+  },
+  {
+   "id": "S3",
+   "name": "Outrigger voyaging",
+   "era": "I",
+   "parent": "R4",
+   "or_parents": [],
+   "also_needs": [],
+   "unlocks": "Long canoe voyages between islands",
+   "start_regions": [
+    "Pacific",
+    "Malay world"
+   ]
+  }
+ ],
+ "dropped_inventions": [
+  "L23",
+  "L24"
+ ],
+ "research_months_per_year": 12,
+ "second_study_share": 0.5,
+ "village_school_seats": 10,
+ "school_upkeep": {
+  "temple_or_monastery_school": 2,
+  "madrasa": 4,
+  "university": 4,
+  "academy": 6
+ },
+ "steal_share_of_cost": 0.1,
+ "sack_chance_pct": 25,
+ "sack_scholars_flee_share": 0.5,
+ "poach_gold_ratio": 2,
+ "poach_one_in": 20,
+ "old_age_one_in": 30,
+ "ai": {
+  "study": "cheapest_eligible",
+  "fill_seats_in_peace": true,
+  "fill_seats_at_war": false
+ },
+ "start_extra": {
+  "ming": [
+   "L5"
+  ],
+  "korea": [
+   "L5"
+  ]
+ },
+ "_provisional": [
+  "research_months_per_year",
+  "second_study_share",
+  "village_school_seats",
+  "school_upkeep",
+  "steal_share_of_cost",
+  "sack_chance_pct",
+  "sack_scholars_flee_share",
+  "poach_gold_ratio",
+  "poach_one_in",
+  "old_age_one_in",
+  "start_region_members",
+  "start_extra",
+  "inventions[].effects.research_pct",
+  "inventions[].effects.spread_pct",
+  "inventions[].effects.school_upkeep_pct",
+  "inventions[].effects.old_age_one_in",
+  "era_cost",
+  "ahead_multiplier",
+  "spread_per_partner_pct",
+  "spread_cap_pct",
+  "scholar_rate",
+  "student_rate",
+  "graduation_years",
+  "school_seats"
+ ],
+ "start_region_members": {
+  "Americas": [
+   "aztecs",
+   "purepecha",
+   "zapotec",
+   "maya",
+   "inca",
+   "chimu",
+   "muisca",
+   "iroquois",
+   "huron",
+   "cherokee",
+   "creek",
+   "pueblo"
+  ],
+  "Andes": [
+   "inca",
+   "chimu",
+   "muisca"
+  ],
+  "Andes lakes": [
+   "inca"
+  ],
+  "Arabia": [
+   "hejaz",
+   "yemen",
+   "oman",
+   "mamluks"
+  ],
+  "Asia": [
+   "ming",
+   "korea",
+   "japan",
+   "dai_viet",
+   "champa",
+   "lan_xang",
+   "lan_na",
+   "ayutthaya",
+   "khmer",
+   "ava",
+   "pegu",
+   "majapahit",
+   "malacca",
+   "brunei",
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "bahmanis",
+   "vijayanagar",
+   "gujarat",
+   "malwa",
+   "mewar",
+   "orissa",
+   "gondwana",
+   "kashmir",
+   "multan",
+   "sindh",
+   "ahom",
+   "ottomans",
+   "karaman",
+   "candar",
+   "trebizond",
+   "dulkadir",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "mamluks",
+   "hejaz",
+   "yemen",
+   "oman",
+   "shirvan",
+   "timurids",
+   "timurids",
+   "uzbek_khanate",
+   "moghulistan"
+  ],
+  "Bohemia": [
+   "bohemia"
+  ],
+  "Castile": [
+   "castile"
+  ],
+  "Central Asia": [
+   "timurids",
+   "uzbek_khanate",
+   "moghulistan"
+  ],
+  "Central Europe": [
+   "austria",
+   "bohemia",
+   "bavaria",
+   "saxony",
+   "hungary",
+   "wurttemberg",
+   "palatinate",
+   "hesse"
+  ],
+  "China": [
+   "ming"
+  ],
+  "China (Ming notes, heavily devalued by 1444)": [
+   "ming"
+  ],
+  "Coasts worldwide": [
+   "england",
+   "scotland",
+   "ireland",
+   "france",
+   "burgundy",
+   "brittany",
+   "provence",
+   "savoy",
+   "lorraine",
+   "navarre",
+   "castile",
+   "aragon",
+   "portugal",
+   "granada",
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples",
+   "austria",
+   "bohemia",
+   "bavaria",
+   "wurttemberg",
+   "palatinate",
+   "cologne",
+   "hesse",
+   "saxony",
+   "brandenburg",
+   "luneburg",
+   "hamburg",
+   "mecklenburg",
+   "pomerania",
+   "switzerland",
+   "teutonic_order",
+   "livonian_order",
+   "denmark",
+   "sweden",
+   "norway",
+   "poland",
+   "lithuania",
+   "hungary",
+   "moldavia",
+   "wallachia",
+   "serbia",
+   "bosnia",
+   "albania",
+   "ragusa",
+   "byzantium",
+   "ottomans",
+   "karaman",
+   "candar",
+   "trebizond",
+   "dulkadir",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "cyprus",
+   "knights_of_rhodes",
+   "georgia",
+   "shirvan",
+   "muscovy",
+   "novgorod",
+   "pskov",
+   "tver",
+   "ryazan",
+   "kazan",
+   "great_horde",
+   "crimea",
+   "nogai",
+   "uzbek_khanate",
+   "mamluks",
+   "hejaz",
+   "yemen",
+   "oman",
+   "timurids",
+   "moghulistan",
+   "oirat",
+   "mongols",
+   "tibet",
+   "ming",
+   "jurchens",
+   "korea",
+   "japan",
+   "dai_viet",
+   "champa",
+   "lan_xang",
+   "lan_na",
+   "ayutthaya",
+   "khmer",
+   "ava",
+   "pegu",
+   "majapahit",
+   "malacca",
+   "brunei",
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "bahmanis",
+   "vijayanagar",
+   "gujarat",
+   "malwa",
+   "mewar",
+   "orissa",
+   "gondwana",
+   "kashmir",
+   "multan",
+   "sindh",
+   "ahom",
+   "morocco",
+   "tlemcen",
+   "tunis",
+   "mali",
+   "songhai",
+   "jolof",
+   "mossi",
+   "kano",
+   "kanem_bornu",
+   "benin",
+   "ethiopia",
+   "adal",
+   "ajuran",
+   "kilwa",
+   "mutapa",
+   "kongo",
+   "aztecs",
+   "purepecha",
+   "zapotec",
+   "maya",
+   "inca",
+   "chimu",
+   "muisca",
+   "iroquois",
+   "huron",
+   "cherokee",
+   "creek",
+   "pueblo"
+  ],
+  "East and Southeast Asia": [
+   "ming",
+   "korea",
+   "japan",
+   "dai_viet",
+   "champa",
+   "lan_xang",
+   "lan_na",
+   "ayutthaya",
+   "khmer",
+   "ava",
+   "pegu",
+   "majapahit",
+   "malacca",
+   "brunei"
+  ],
+  "Europe": [
+   "england",
+   "scotland",
+   "ireland",
+   "france",
+   "burgundy",
+   "brittany",
+   "provence",
+   "savoy",
+   "lorraine",
+   "navarre",
+   "castile",
+   "aragon",
+   "portugal",
+   "granada",
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples",
+   "austria",
+   "bohemia",
+   "bavaria",
+   "wurttemberg",
+   "palatinate",
+   "cologne",
+   "hesse",
+   "saxony",
+   "brandenburg",
+   "luneburg",
+   "hamburg",
+   "mecklenburg",
+   "pomerania",
+   "switzerland",
+   "teutonic_order",
+   "livonian_order",
+   "denmark",
+   "sweden",
+   "norway",
+   "poland",
+   "lithuania",
+   "hungary",
+   "moldavia",
+   "wallachia",
+   "serbia",
+   "bosnia",
+   "albania",
+   "ragusa",
+   "byzantium",
+   "cyprus",
+   "knights_of_rhodes",
+   "muscovy",
+   "novgorod",
+   "pskov",
+   "tver",
+   "ryazan",
+   "georgia"
+  ],
+  "Genoa": [
+   "genoa"
+  ],
+  "Gujarat": [
+   "gujarat"
+  ],
+  "Hanse": [
+   "hamburg",
+   "luneburg",
+   "mecklenburg",
+   "pomerania",
+   "teutonic_order",
+   "livonian_order"
+  ],
+  "Hungary": [
+   "hungary"
+  ],
+  "Iberia": [
+   "castile",
+   "aragon",
+   "portugal",
+   "navarre",
+   "granada"
+  ],
+  "Inca": [
+   "inca"
+  ],
+  "India": [
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "bahmanis",
+   "vijayanagar",
+   "gujarat",
+   "malwa",
+   "mewar",
+   "orissa",
+   "gondwana",
+   "kashmir",
+   "multan",
+   "sindh",
+   "ahom"
+  ],
+  "Indian Ocean": [
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "bahmanis",
+   "vijayanagar",
+   "gujarat",
+   "malwa",
+   "mewar",
+   "orissa",
+   "gondwana",
+   "kashmir",
+   "multan",
+   "sindh",
+   "ahom",
+   "hejaz",
+   "yemen",
+   "oman",
+   "mamluks",
+   "kilwa",
+   "ajuran",
+   "adal",
+   "majapahit",
+   "malacca",
+   "brunei",
+   "gujarat"
+  ],
+  "Iran": [
+   "timurids",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "shirvan"
+  ],
+  "Islamic world": [
+   "ottomans",
+   "karaman",
+   "candar",
+   "dulkadir",
+   "trebizond",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "mamluks",
+   "hejaz",
+   "yemen",
+   "oman",
+   "shirvan",
+   "timurids",
+   "uzbek_khanate",
+   "moghulistan",
+   "kazan",
+   "great_horde",
+   "crimea",
+   "nogai",
+   "granada",
+   "morocco",
+   "tlemcen",
+   "tunis",
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "bahmanis",
+   "gujarat",
+   "malwa",
+   "kashmir",
+   "multan",
+   "sindh",
+   "mali",
+   "songhai",
+   "kano",
+   "kanem_bornu",
+   "adal",
+   "ajuran",
+   "kilwa",
+   "malacca",
+   "brunei"
+  ],
+  "Italian cities": [
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples"
+  ],
+  "Italian states": [
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples"
+  ],
+  "Italy": [
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples"
+  ],
+  "Japan": [
+   "japan"
+  ],
+  "Korea": [
+   "korea"
+  ],
+  "Low Countries": [
+   "burgundy"
+  ],
+  "Malay world": [
+   "majapahit",
+   "malacca",
+   "brunei"
+  ],
+  "Mali trade roads": [
+   "mali",
+   "songhai"
+  ],
+  "Many monarchies": [
+   "england",
+   "scotland",
+   "ireland",
+   "france",
+   "burgundy",
+   "brittany",
+   "provence",
+   "savoy",
+   "lorraine",
+   "navarre",
+   "castile",
+   "aragon",
+   "portugal",
+   "granada",
+   "milan",
+   "modena",
+   "naples",
+   "austria",
+   "bohemia",
+   "bavaria",
+   "wurttemberg",
+   "palatinate",
+   "cologne",
+   "hesse",
+   "saxony",
+   "brandenburg",
+   "luneburg",
+   "mecklenburg",
+   "pomerania",
+   "denmark",
+   "sweden",
+   "norway",
+   "poland",
+   "lithuania",
+   "hungary",
+   "moldavia",
+   "wallachia",
+   "serbia",
+   "bosnia",
+   "albania",
+   "byzantium",
+   "cyprus",
+   "muscovy",
+   "tver",
+   "ryazan",
+   "georgia",
+   "ottomans",
+   "karaman",
+   "candar",
+   "trebizond",
+   "dulkadir",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "mamluks",
+   "hejaz",
+   "yemen",
+   "oman",
+   "shirvan",
+   "timurids",
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "bahmanis",
+   "vijayanagar",
+   "gujarat",
+   "malwa",
+   "mewar",
+   "orissa",
+   "gondwana",
+   "kashmir",
+   "multan",
+   "sindh",
+   "ahom",
+   "korea",
+   "japan",
+   "ethiopia",
+   "dai_viet",
+   "champa",
+   "lan_xang",
+   "lan_na",
+   "ayutthaya",
+   "khmer",
+   "ava",
+   "pegu",
+   "majapahit",
+   "malacca",
+   "brunei"
+  ],
+  "Maragha tradition": [
+   "timurids",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "shirvan"
+  ],
+  "Mediterranean": [
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples",
+   "castile",
+   "aragon",
+   "portugal",
+   "granada",
+   "provence",
+   "byzantium",
+   "ottomans",
+   "mamluks",
+   "tunis",
+   "tlemcen",
+   "morocco",
+   "cyprus",
+   "knights_of_rhodes",
+   "ragusa"
+  ],
+  "Mexico basin": [
+   "aztecs"
+  ],
+  "Middle East": [
+   "ottomans",
+   "karaman",
+   "candar",
+   "trebizond",
+   "dulkadir",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "mamluks",
+   "hejaz",
+   "yemen",
+   "oman",
+   "shirvan",
+   "timurids"
+  ],
+  "Ming": [
+   "ming"
+  ],
+  "Most of Europe": [
+   "england",
+   "scotland",
+   "ireland",
+   "france",
+   "burgundy",
+   "brittany",
+   "provence",
+   "savoy",
+   "lorraine",
+   "navarre",
+   "castile",
+   "aragon",
+   "portugal",
+   "granada",
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples",
+   "austria",
+   "bohemia",
+   "bavaria",
+   "wurttemberg",
+   "palatinate",
+   "cologne",
+   "hesse",
+   "saxony",
+   "brandenburg",
+   "luneburg",
+   "hamburg",
+   "mecklenburg",
+   "pomerania",
+   "switzerland",
+   "teutonic_order",
+   "livonian_order",
+   "denmark",
+   "sweden",
+   "norway",
+   "poland",
+   "hungary",
+   "moldavia",
+   "wallachia",
+   "serbia",
+   "bosnia",
+   "albania",
+   "ragusa",
+   "byzantium",
+   "cyprus",
+   "knights_of_rhodes",
+   "georgia"
+  ],
+  "Most settled realms": [
+   "england",
+   "scotland",
+   "ireland",
+   "france",
+   "burgundy",
+   "brittany",
+   "provence",
+   "savoy",
+   "lorraine",
+   "navarre",
+   "castile",
+   "aragon",
+   "portugal",
+   "granada",
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples",
+   "austria",
+   "bohemia",
+   "bavaria",
+   "wurttemberg",
+   "palatinate",
+   "cologne",
+   "hesse",
+   "saxony",
+   "brandenburg",
+   "luneburg",
+   "hamburg",
+   "mecklenburg",
+   "pomerania",
+   "switzerland",
+   "teutonic_order",
+   "livonian_order",
+   "denmark",
+   "sweden",
+   "norway",
+   "poland",
+   "lithuania",
+   "hungary",
+   "moldavia",
+   "wallachia",
+   "serbia",
+   "bosnia",
+   "albania",
+   "ragusa",
+   "byzantium",
+   "ottomans",
+   "karaman",
+   "candar",
+   "trebizond",
+   "dulkadir",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "cyprus",
+   "knights_of_rhodes",
+   "georgia",
+   "shirvan",
+   "muscovy",
+   "novgorod",
+   "pskov",
+   "tver",
+   "ryazan",
+   "kazan",
+   "great_horde",
+   "crimea",
+   "nogai",
+   "uzbek_khanate",
+   "mamluks",
+   "hejaz",
+   "yemen",
+   "oman",
+   "timurids",
+   "moghulistan",
+   "oirat",
+   "mongols",
+   "tibet",
+   "ming",
+   "jurchens",
+   "korea",
+   "japan",
+   "dai_viet",
+   "champa",
+   "lan_xang",
+   "lan_na",
+   "ayutthaya",
+   "khmer",
+   "ava",
+   "pegu",
+   "majapahit",
+   "malacca",
+   "brunei",
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "bahmanis",
+   "vijayanagar",
+   "gujarat",
+   "malwa",
+   "mewar",
+   "orissa",
+   "gondwana",
+   "kashmir",
+   "multan",
+   "sindh",
+   "ahom",
+   "morocco",
+   "tlemcen",
+   "tunis",
+   "mali",
+   "songhai",
+   "jolof",
+   "mossi",
+   "kano",
+   "kanem_bornu",
+   "benin",
+   "ethiopia",
+   "adal",
+   "ajuran",
+   "kilwa",
+   "mutapa",
+   "kongo",
+   "aztecs",
+   "purepecha",
+   "zapotec",
+   "maya",
+   "inca",
+   "chimu",
+   "muisca"
+  ],
+  "Most states": [
+   "england",
+   "scotland",
+   "ireland",
+   "france",
+   "burgundy",
+   "brittany",
+   "provence",
+   "savoy",
+   "lorraine",
+   "navarre",
+   "castile",
+   "aragon",
+   "portugal",
+   "granada",
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples",
+   "austria",
+   "bohemia",
+   "bavaria",
+   "wurttemberg",
+   "palatinate",
+   "cologne",
+   "hesse",
+   "saxony",
+   "brandenburg",
+   "luneburg",
+   "hamburg",
+   "mecklenburg",
+   "pomerania",
+   "switzerland",
+   "teutonic_order",
+   "livonian_order",
+   "denmark",
+   "sweden",
+   "norway",
+   "poland",
+   "lithuania",
+   "hungary",
+   "moldavia",
+   "wallachia",
+   "serbia",
+   "bosnia",
+   "albania",
+   "ragusa",
+   "byzantium",
+   "ottomans",
+   "karaman",
+   "candar",
+   "trebizond",
+   "dulkadir",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "cyprus",
+   "knights_of_rhodes",
+   "georgia",
+   "shirvan",
+   "muscovy",
+   "novgorod",
+   "pskov",
+   "tver",
+   "ryazan",
+   "kazan",
+   "great_horde",
+   "crimea",
+   "nogai",
+   "uzbek_khanate",
+   "mamluks",
+   "hejaz",
+   "yemen",
+   "oman",
+   "timurids",
+   "moghulistan",
+   "oirat",
+   "mongols",
+   "tibet",
+   "ming",
+   "jurchens",
+   "korea",
+   "japan",
+   "dai_viet",
+   "champa",
+   "lan_xang",
+   "lan_na",
+   "ayutthaya",
+   "khmer",
+   "ava",
+   "pegu",
+   "majapahit",
+   "malacca",
+   "brunei",
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "bahmanis",
+   "vijayanagar",
+   "gujarat",
+   "malwa",
+   "mewar",
+   "orissa",
+   "gondwana",
+   "kashmir",
+   "multan",
+   "sindh",
+   "ahom",
+   "morocco",
+   "tlemcen",
+   "tunis",
+   "mali",
+   "songhai",
+   "jolof",
+   "mossi",
+   "kano",
+   "kanem_bornu",
+   "benin",
+   "ethiopia",
+   "adal",
+   "ajuran",
+   "kilwa",
+   "mutapa",
+   "kongo",
+   "aztecs",
+   "purepecha",
+   "zapotec",
+   "maya",
+   "inca",
+   "chimu",
+   "muisca"
+  ],
+  "Muscovy": [
+   "muscovy"
+  ],
+  "North Africa": [
+   "morocco",
+   "tlemcen",
+   "tunis",
+   "mamluks",
+   "granada"
+  ],
+  "North India": [
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "malwa",
+   "mewar",
+   "kashmir",
+   "multan",
+   "sindh"
+  ],
+  "Ottoman": [
+   "ottomans",
+   "karaman",
+   "candar",
+   "dulkadir"
+  ],
+  "Pacific": [],
+  "Polynesia": [],
+  "Portugal": [
+   "portugal"
+  ],
+  "Sahel": [
+   "mali",
+   "songhai",
+   "jolof",
+   "mossi",
+   "kano",
+   "kanem_bornu"
+  ],
+  "Scots": [
+   "scotland"
+  ],
+  "Steppe": [
+   "great_horde",
+   "crimea",
+   "nogai",
+   "kazan",
+   "uzbek_khanate",
+   "moghulistan",
+   "oirat",
+   "mongols"
+  ],
+  "Swahili coast": [
+   "kilwa",
+   "ajuran",
+   "adal"
+  ],
+  "Swiss": [
+   "switzerland"
+  ],
+  "Timurid Samarkand": [
+   "timurids"
+  ],
+  "Venice": [
+   "venice"
+  ],
+  "Vietnam": [
+   "dai_viet"
+  ],
+  "West Africa": [
+   "mali",
+   "songhai",
+   "jolof",
+   "mossi",
+   "kano",
+   "kanem_bornu",
+   "benin"
+  ],
+  "West Africa (e.g. Benin walls)": [
+   "benin"
+  ],
+  "Western Europe": [
+   "england",
+   "scotland",
+   "ireland",
+   "france",
+   "burgundy",
+   "brittany",
+   "provence",
+   "savoy",
+   "lorraine",
+   "navarre",
+   "castile",
+   "aragon",
+   "portugal",
+   "granada",
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples",
+   "austria",
+   "bohemia",
+   "bavaria",
+   "wurttemberg",
+   "palatinate",
+   "cologne",
+   "hesse",
+   "saxony",
+   "brandenburg",
+   "luneburg",
+   "hamburg",
+   "mecklenburg",
+   "pomerania",
+   "switzerland",
+   "teutonic_order",
+   "livonian_order",
+   "denmark",
+   "sweden",
+   "norway"
+  ],
+  "Worldwide except Americas and Oceania": [
+   "england",
+   "scotland",
+   "ireland",
+   "france",
+   "burgundy",
+   "brittany",
+   "provence",
+   "savoy",
+   "lorraine",
+   "navarre",
+   "castile",
+   "aragon",
+   "portugal",
+   "granada",
+   "milan",
+   "venice",
+   "genoa",
+   "florence",
+   "modena",
+   "papal_states",
+   "naples",
+   "austria",
+   "bohemia",
+   "bavaria",
+   "wurttemberg",
+   "palatinate",
+   "cologne",
+   "hesse",
+   "saxony",
+   "brandenburg",
+   "luneburg",
+   "hamburg",
+   "mecklenburg",
+   "pomerania",
+   "switzerland",
+   "teutonic_order",
+   "livonian_order",
+   "denmark",
+   "sweden",
+   "norway",
+   "poland",
+   "lithuania",
+   "hungary",
+   "moldavia",
+   "wallachia",
+   "serbia",
+   "bosnia",
+   "albania",
+   "ragusa",
+   "byzantium",
+   "ottomans",
+   "karaman",
+   "candar",
+   "trebizond",
+   "dulkadir",
+   "aq_qoyunlu",
+   "qara_qoyunlu",
+   "cyprus",
+   "knights_of_rhodes",
+   "georgia",
+   "shirvan",
+   "muscovy",
+   "novgorod",
+   "pskov",
+   "tver",
+   "ryazan",
+   "kazan",
+   "great_horde",
+   "crimea",
+   "nogai",
+   "uzbek_khanate",
+   "mamluks",
+   "hejaz",
+   "yemen",
+   "oman",
+   "timurids",
+   "moghulistan",
+   "oirat",
+   "mongols",
+   "tibet",
+   "ming",
+   "jurchens",
+   "korea",
+   "japan",
+   "dai_viet",
+   "champa",
+   "lan_xang",
+   "lan_na",
+   "ayutthaya",
+   "khmer",
+   "ava",
+   "pegu",
+   "majapahit",
+   "malacca",
+   "brunei",
+   "delhi",
+   "jaunpur",
+   "bengal",
+   "bahmanis",
+   "vijayanagar",
+   "gujarat",
+   "malwa",
+   "mewar",
+   "orissa",
+   "gondwana",
+   "kashmir",
+   "multan",
+   "sindh",
+   "ahom",
+   "morocco",
+   "tlemcen",
+   "tunis",
+   "mali",
+   "songhai",
+   "jolof",
+   "mossi",
+   "kano",
+   "kanem_bornu",
+   "benin",
+   "ethiopia",
+   "adal",
+   "ajuran",
+   "kilwa",
+   "mutapa",
+   "kongo"
+  ],
+  "parts of Europe": [
+   "burgundy",
+   "milan",
+   "venice",
+   "austria",
+   "bohemia",
+   "saxony"
+  ]
+ }
+}

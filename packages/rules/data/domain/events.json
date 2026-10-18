@@ -1,0 +1,1181 @@
+{
+ "$comment": "Event tree rules (domain/events/spec.md). balance = event-tree/data/balance.yaml; vocabulary, enums and statistics are the event tree's closed lists. All balance values are placeholders.",
+ "campaign": {
+  "start_year": 1444,
+  "end_date": "1939-08-31",
+  "out_of_scope_ages": [
+   "age_of_decolonization",
+   "cold_war",
+   "age_of_globalization"
+  ],
+  "events_choice": {
+   "$comment": "D-EVT-9: the new-game 'Events' choice; its value picks the alternate history preset.",
+   "default": "Plausible",
+   "values": {
+    "Historical": "historical",
+    "Plausible": "plausible",
+    "Free": "divergent"
+   }
+  },
+  "$comment": "D-EVT-1: events whose history starts after end_date are dropped when a campaign loads; out_of_scope_ages never start (X-14)."
+ },
+ "balance": {
+  "selection": {
+   "pool_roll_interval_months": 1,
+   "max_pool_events_per_country_year": 2,
+   "decision_expiry_years": 10,
+   "alternate_history_mode": {
+    "historical": {
+     "follow_up_boost_mult": 1.5,
+     "historical_option_mult": 2.0,
+     "mean_years_mult": 0.8
+    },
+    "plausible": {
+     "follow_up_boost_mult": 1.0,
+     "historical_option_mult": 1.0,
+     "mean_years_mult": 1.0
+    },
+    "divergent": {
+     "follow_up_boost_mult": 0.6,
+     "historical_option_mult": 0.5,
+     "mean_years_mult": 1.3
+    }
+   }
+  },
+  "follow_ups": {
+   "max_boost": 5.0,
+   "boost_decay_years": 10
+  },
+  "ai_factors": {
+   "at_war": "Country is at war.",
+   "low_treasury": "Treasury below one year of expenses.",
+   "high_unrest": "More than half the country's provinces have 4 or more grievances (Plotting).",
+   "same_religion": "Other party shares state religion.",
+   "rival": "Other party is a rival.",
+   "great_power": "Country ranks in the top 8 by great_power_score.",
+   "threatened": "A hostile neighbour has more than 1.5x army_strength."
+  },
+  "rebel_sizes": {
+   "$comment": "D-EVT-5: share of the province's recruit pool that rises (X-9). Same 1:2:4:8 steps as the tree's sizes.",
+   "small": 0.125,
+   "medium": 0.25,
+   "large": 0.5,
+   "huge": 1.0
+  },
+  "modifier_rules": {
+   "default_stacking": "refresh",
+   "max_stacks": 3,
+   "exponential_half_life_share": 0.5
+  },
+  "coverage": {
+   "min_events_per_region_age": 2,
+   "min_agency_share": 0.35
+  },
+  "validation_checks": [
+   "Every referenced id (age, period, event, entity, region, area, province, modifier, source, stat, flag) exists.",
+   "Every condition and effect type is declared in vocabulary.yaml with known parameters.",
+   "Roles referenced as $role are declared in the event; every event has at least one role.",
+   "Each event has 2+ options, exactly one historical option, and unique option ids.",
+   "narrative_only events offer no option with a positive stat or prestige payoff to the perpetrator.",
+   "Mandatory prerequisite graph (requires / event conditions in triggers) has no cycles (Tarjan SCC).",
+   "Earliest possible date propagated through prerequisites never exceeds an event's latest date (no impossible triggers).",
+   "Mutually exclusive events are never both mandatory prerequisites of a third event.",
+   "Entities referenced in a trigger exist at the event's date or are created by a reachable earlier event.",
+   "Flags read by triggers are set by some effect or declared as system flags.",
+   "Ages and periods have start and end conditions; periods lie inside at least one of their ages.",
+   "Coverage: events per macro-region per age, and agency share per region."
+  ],
+  "date_binding": {
+   "$comment": "EVT-019: approximate events weigh their pool chance toward the history date; mandatory events fire in their last year if the trigger holds.",
+   "approximate_peak_mult": 2.0,
+   "approximate_spread_years": 10
+  },
+  "options": {
+   "$comment": "D-EVT-7",
+   "min": 2,
+   "max": 4
+  }
+ },
+ "vocabulary": {
+  "targets": [
+   "role",
+   "entity",
+   "province",
+   "area",
+   "region",
+   "global",
+   "this"
+  ],
+  "logic": [
+   "all",
+   "any",
+   "not",
+   "at_least"
+  ],
+  "conditions": {
+   "date": [
+    "min",
+    "max"
+   ],
+   "exists": [
+    "who"
+   ],
+   "controls": [
+    "who",
+    "where",
+    "min_share"
+   ],
+   "owns": [
+    "who",
+    "where",
+    "min_share"
+   ],
+   "borders": [
+    "who",
+    "other"
+   ],
+   "at_war": [
+    "who",
+    "other"
+   ],
+   "war_ongoing": [
+    "war"
+   ],
+   "relation": [
+    "who",
+    "other",
+    "type"
+   ],
+   "opinion": [
+    "who",
+    "other",
+    "op",
+    "value"
+   ],
+   "stat": [
+    "who",
+    "stat",
+    "op",
+    "value"
+   ],
+   "rank": [
+    "who",
+    "stat",
+    "op",
+    "value"
+   ],
+   "government": [
+    "who",
+    "is"
+   ],
+   "religion": [
+    "who",
+    "is"
+   ],
+   "religion_share": [
+    "where",
+    "religion",
+    "op",
+    "value"
+   ],
+   "culture_group": [
+    "who",
+    "is"
+   ],
+   "innovation": [
+    "who",
+    "id",
+    "op",
+    "value"
+   ],
+   "ideology": [
+    "who",
+    "id",
+    "op",
+    "value"
+   ],
+   "tech": [
+    "who",
+    "track",
+    "op",
+    "value"
+   ],
+   "colonial_presence": [
+    "who",
+    "where",
+    "op",
+    "value"
+   ],
+   "trade_presence": [
+    "who",
+    "hub",
+    "op",
+    "value"
+   ],
+   "rebels_active": [
+    "who",
+    "type"
+   ],
+   "subject_count": [
+    "who",
+    "op",
+    "value"
+   ],
+   "event": [
+    "id",
+    "outcome",
+    "within_years",
+    "by"
+   ],
+   "event_active": [
+    "id"
+   ],
+   "period_active": [
+    "id"
+   ],
+   "age_active": [
+    "id"
+   ],
+   "flag": [
+    "who",
+    "id"
+   ],
+   "any_country": [
+    "where",
+    "condition"
+   ],
+   "all_countries": [
+    "where",
+    "condition"
+   ],
+   "count_countries": [
+    "where",
+    "condition",
+    "op",
+    "value"
+   ]
+  },
+  "effects": {
+   "modifier": [
+    "on",
+    "id",
+    "years"
+   ],
+   "stat": [
+    "on",
+    "changes"
+   ],
+   "transfer": [
+    "where",
+    "from",
+    "to"
+   ],
+   "create_country": [
+    "entity",
+    "where",
+    "from",
+    "subject_of"
+   ],
+   "annex": [
+    "who",
+    "target"
+   ],
+   "vassalize": [
+    "who",
+    "target",
+    "type"
+   ],
+   "release": [
+    "who",
+    "target"
+   ],
+   "war": [
+    "id",
+    "attackers",
+    "defenders",
+    "goal"
+   ],
+   "peace": [
+    "war",
+    "terms"
+   ],
+   "casus_belli": [
+    "who",
+    "against",
+    "type",
+    "years"
+   ],
+   "relation": [
+    "who",
+    "other",
+    "type",
+    "set"
+   ],
+   "rebels": [
+    "on",
+    "type",
+    "size"
+   ],
+   "spread": [
+    "kind",
+    "id",
+    "where",
+    "amount"
+   ],
+   "population": [
+    "on",
+    "change",
+    "group"
+   ],
+   "move_population": [
+    "group",
+    "from",
+    "to",
+    "amount"
+   ],
+   "set_flag": [
+    "on",
+    "id",
+    "years"
+   ],
+   "start_period": [
+    "id"
+   ],
+   "end_period": [
+    "id"
+   ],
+   "unlock": [
+    "on",
+    "id"
+   ],
+   "government": [
+    "on",
+    "set"
+   ],
+   "religion": [
+    "on",
+    "set"
+   ],
+   "trade_route": [
+    "from_hub",
+    "to_hub",
+    "open"
+   ],
+   "colony": [
+    "who",
+    "where",
+    "type"
+   ]
+  },
+  "selection_only_conditions": [
+   "is_human"
+  ]
+ },
+ "schema_fields": {
+  "$comment": "Field names of event-tree.d.ts the engine reads.",
+  "Selection": [
+   "mode",
+   "mean_years",
+   "weight",
+   "modifiers"
+  ],
+  "Geography": [
+   "regions",
+   "areas",
+   "provinces",
+   "trade_hubs"
+  ]
+ },
+ "effect_tiers": [
+  "immediate",
+  "delayed",
+  "ongoing",
+  "long_term",
+  "rising_won",
+  "rising_crushed"
+ ],
+ "layers": [
+  "history_reference",
+  "ages",
+  "periods",
+  "event_definitions",
+  "triggers",
+  "selection",
+  "execution",
+  "choices",
+  "ai",
+  "effects",
+  "modifiers",
+  "statistics",
+  "balance",
+  "localization.en"
+ ],
+ "enums": {
+  "religions": [
+   "catholic",
+   "protestant",
+   "anglican",
+   "orthodox",
+   "oriental_christian",
+   "sunni",
+   "shia",
+   "ibadi",
+   "jewish",
+   "hindu",
+   "sikh",
+   "theravada",
+   "mahayana",
+   "vajrayana",
+   "shinto",
+   "confucian_ritual",
+   "daoist",
+   "indigenous_american",
+   "african_traditional",
+   "pacific_traditional",
+   "siberian_steppe_traditional",
+   "secular"
+  ],
+  "governments": [
+   "monarchy",
+   "elective_monarchy",
+   "theocracy",
+   "republic",
+   "merchant_republic",
+   "tribal",
+   "confederation",
+   "nomadic_empire",
+   "company",
+   "colonial_administration",
+   "constitutional_monarchy",
+   "liberal_democracy",
+   "one_party_state",
+   "communist",
+   "fascist",
+   "military_junta"
+  ],
+  "innovations": [
+   "printing",
+   "humanist_learning",
+   "bastion_fortification",
+   "gunpowder_infantry",
+   "ocean_navigation",
+   "joint_stock_finance",
+   "public_debt_markets",
+   "experimental_science",
+   "steam_power",
+   "mechanized_textiles",
+   "railways",
+   "telegraphy",
+   "vaccination_and_sanitation",
+   "electrification",
+   "mass_literacy_schooling",
+   "chemical_industry",
+   "motor_and_air_transport"
+  ],
+  "ideologies": [
+   "humanism",
+   "devotional_reform",
+   "religious_zeal",
+   "religious_tolerance",
+   "qizilbash_messianism",
+   "islamic_reformism",
+   "sinocentric_order",
+   "parliamentarism",
+   "liberalism",
+   "nationalism",
+   "abolitionism",
+   "humanitarianism",
+   "militarism",
+   "socialism",
+   "communism",
+   "fascism",
+   "anticolonialism",
+   "pan_africanism",
+   "pan_arabism",
+   "pan_islamism"
+  ],
+  "culture_groups": [
+   "latin",
+   "germanic",
+   "slavic",
+   "hellenic",
+   "turkic",
+   "iranian",
+   "arab",
+   "berber",
+   "cushitic",
+   "semitic_ethiopian",
+   "mande",
+   "akan",
+   "yoruba_edo",
+   "hausa_fulani",
+   "bantu",
+   "khoisan",
+   "nilotic",
+   "indo_aryan",
+   "dravidian",
+   "tibeto_burman",
+   "tai",
+   "austroasiatic",
+   "austronesian",
+   "sinitic",
+   "japonic",
+   "koreanic",
+   "mongolic",
+   "tungusic",
+   "uralic",
+   "nahua",
+   "maya",
+   "andean",
+   "tupi_guarani",
+   "algonquian",
+   "iroquoian",
+   "creole_atlantic",
+   "polynesian",
+   "melanesian",
+   "aboriginal_australian",
+   "celtic",
+   "baltic",
+   "caucasian",
+   "hebrew"
+  ],
+  "rebel_types": [
+   "peasant",
+   "religious",
+   "noble",
+   "separatist",
+   "revolutionary",
+   "independence",
+   "anticolonial",
+   "any"
+  ],
+  "relation_types": [
+   "alliance",
+   "rivalry",
+   "subject",
+   "overlord",
+   "truce",
+   "trade_pact",
+   "guarantee",
+   "personal_union",
+   "embargo",
+   "non_aggression"
+  ],
+  "period_kinds": [
+   "political",
+   "war",
+   "religious",
+   "economic",
+   "colonial",
+   "demographic",
+   "environmental",
+   "intellectual"
+  ],
+  "entity_kinds": [
+   "polity",
+   "company",
+   "movement",
+   "population_group",
+   "organization"
+  ]
+ },
+ "system_flags": [
+  "ruler_died",
+  "succession_crisis",
+  "succession_dispute",
+  "regency",
+  "female_succession",
+  "ruler_led_campaign",
+  "atlantic_island_bases",
+  "potato_blight",
+  "commercial_crisis",
+  "claim_on_spain",
+  "claim_on_milan",
+  "claim_on_naples",
+  "catholic_heir",
+  "church_corruption_scandal",
+  "inquisition_established",
+  "religious_persecution_active",
+  "missionary_persecution",
+  "colonial_dispute",
+  "confederation_policy",
+  "cotton_famine_or_sugar_boom",
+  "doctrine_of_lapse",
+  "forced_cash_crops",
+  "french_pacific_claims",
+  "opium_ban_enforced",
+  "penal_transport_needed",
+  "rubber_boom",
+  "sepoy_grievance",
+  "settler_land_pressure",
+  "transit_of_venus",
+  "witwatersrand_gold"
+ ],
+ "statistics": {
+  "province": {
+   "population": {
+    "kind": "stored",
+    "unit": "thousands of people"
+   },
+   "culture_share": {
+    "kind": "stored",
+    "unit": "map culture_id -> share 0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "religion_share": {
+    "kind": "stored",
+    "unit": "map religion_id -> share 0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "prosperity": {
+    "kind": "stored",
+    "unit": "integer level 1-60",
+    "range": [
+     1,
+     60
+    ]
+   },
+   "infrastructure": {
+    "kind": "stored",
+    "unit": "level 0-10",
+    "range": [
+     0,
+     10
+    ]
+   },
+   "industry": {
+    "kind": "stored",
+    "unit": "level 0-10",
+    "range": [
+     0,
+     10
+    ]
+   },
+   "trade_good": {
+    "kind": "stored",
+    "unit": "id (grain, fish, wool, cloth, sugar, spices, silver, gold, cotton, coal, iron, oil, rubber, ...); enslaved people are never a trade good, see redundancy_notes"
+   },
+   "trade_access": {
+    "kind": "derived",
+    "unit": "0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "resource_output": {
+    "kind": "derived",
+    "unit": "goods units / year"
+   },
+   "devastation": {
+    "kind": "stored",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   },
+   "unrest": {
+    "kind": "stored",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   },
+   "control": {
+    "kind": "stored",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   },
+   "colonial_status": {
+    "kind": "stored",
+    "unit": "enum none | trading_post | settlement | plantation | protectorate | colony | occupied | mandate"
+   },
+   "disease_burden": {
+    "kind": "stored",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   },
+   "fort_level": {
+    "kind": "stored",
+    "unit": "0-5",
+    "range": [
+     0,
+     5
+    ]
+   },
+   "terrain": {
+    "kind": "stored (static)",
+    "unit": "enum"
+   },
+   "local_supply": {
+    "kind": "derived",
+    "unit": "regiments supportable"
+   },
+   "manpower_yield": {
+    "kind": "derived",
+    "unit": "men / year"
+   },
+   "urbanization": {
+    "kind": "derived",
+    "unit": "0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "food_security": {
+    "kind": "derived",
+    "unit": "0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "innovation_presence": {
+    "kind": "stored",
+    "unit": "map institution_id -> 0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "environmental_degradation": {
+    "kind": "stored",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   }
+  },
+  "country": {
+   "treasury": {
+    "kind": "stored",
+    "unit": "gold (era-normalized currency)"
+   },
+   "debt": {
+    "kind": "stored",
+    "unit": "gold"
+   },
+   "income": {
+    "kind": "derived",
+    "unit": "gold / year"
+   },
+   "expenses": {
+    "kind": "derived",
+    "unit": "gold / year"
+   },
+   "economic_output": {
+    "kind": "derived",
+    "unit": "index"
+   },
+   "trade_power": {
+    "kind": "derived",
+    "unit": "share per trade node"
+   },
+   "industrial_capacity": {
+    "kind": "derived",
+    "unit": "index"
+   },
+   "manpower": {
+    "kind": "stored pool with derived max",
+    "unit": "men"
+   },
+   "army_strength": {
+    "kind": "derived",
+    "unit": "index"
+   },
+   "military_quality": {
+    "kind": "derived",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   },
+   "navy_strength": {
+    "kind": "derived",
+    "unit": "index"
+   },
+   "naval_reach": {
+    "kind": "derived",
+    "unit": "sea zones"
+   },
+   "admin_capacity": {
+    "kind": "stored",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   },
+   "integration_strain": {
+    "kind": "derived",
+    "unit": "0-200 %",
+    "range": [
+     0,
+     200
+    ]
+   },
+   "stability": {
+    "kind": "stored",
+    "unit": "integer -3..+3",
+    "range": [
+     -3,
+     3
+    ]
+   },
+   "legitimacy": {
+    "kind": "stored",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   },
+   "war_weariness": {
+    "kind": "stored",
+    "unit": "0-20",
+    "range": [
+     0,
+     20
+    ]
+   },
+   "prestige": {
+    "kind": "stored",
+    "unit": "-100..100",
+    "range": [
+     -100,
+     100
+    ]
+   },
+   "notoriety": {
+    "kind": "derived",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ],
+    "owner": "diplomacy",
+    "lands_as": "notorious_deed"
+   },
+   "great_power_score": {
+    "kind": "derived",
+    "unit": "index"
+   },
+   "tech_state": {
+    "kind": "stored",
+    "unit": "level 1-40",
+    "range": [
+     1,
+     40
+    ]
+   },
+   "tech_economy": {
+    "kind": "stored",
+    "unit": "level 1-40",
+    "range": [
+     1,
+     40
+    ]
+   },
+   "tech_military": {
+    "kind": "stored",
+    "unit": "level 1-40",
+    "range": [
+     1,
+     40
+    ]
+   },
+   "innovations": {
+    "kind": "stored",
+    "unit": "set of institution ids"
+   },
+   "literacy": {
+    "kind": "stored",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   },
+   "ideology_support": {
+    "kind": "stored",
+    "unit": "map ideology_id -> 0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "cohesion": {
+    "kind": "derived",
+    "unit": "0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "separatism_risk": {
+    "kind": "derived",
+    "unit": "0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "public_health": {
+    "kind": "derived",
+    "unit": "0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "resource_dependency": {
+    "kind": "derived",
+    "unit": "0-1",
+    "range": [
+     0,
+     1
+    ]
+   },
+   "government": {
+    "kind": "stored",
+    "unit": "enum"
+   },
+   "state_religion": {
+    "kind": "stored",
+    "unit": "id"
+   },
+   "primary_culture": {
+    "kind": "stored",
+    "unit": "id"
+   }
+  },
+  "global": {
+   "global_tension": {
+    "kind": "stored",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ]
+   },
+   "climate_anomaly": {
+    "kind": "stored",
+    "unit": "degrees C relative to 1850-1900 baseline (scenario values)",
+    "range": [
+     1850,
+     1900
+    ]
+   },
+   "world_trade_index": {
+    "kind": "derived",
+    "unit": "index"
+   },
+   "innovation_spread": {
+    "kind": "derived",
+    "unit": "map institution_id -> share of world prosperity"
+   }
+  },
+  "relationships": {
+   "opinion": {
+    "kind": "stored",
+    "unit": "-200..200",
+    "range": [
+     -200,
+     200
+    ]
+   },
+   "trust": {
+    "kind": "derived",
+    "unit": "0-100",
+    "range": [
+     0,
+     100
+    ],
+    "owner": "diplomacy",
+    "lands_as": "oath_broken"
+   }
+  }
+ },
+ "statistics_notes": [
+  "Province wealth, tax base, goods output and recruit pool collapse into one stored `prosperity` value plus terrain/good weights: separate stored values would let events desync them and add clicks without decisions.",
+  "Loyalty, autonomy, local governance, colonial control and territorial control are one `control` value; colonial_status says why control is low.",
+  "Stability and legitimacy are kept separate because events need both: a legitimate dynasty can be unstable in a famine, and an illegitimate usurper can rule a stable realm.",
+  "Morale, readiness and discipline collapse into derived military_quality.",
+  "Disease exposure and public health share one stored value (province disease_burden) and one derived value (country public_health).",
+  "Education, literacy and scientific development share `literacy`; applied science lives in tech_economy.",
+  "Food production and food security are derived only; storing them would let events desync them from devastation and climate.",
+  "Language is folded into culture.",
+  "Exports and imports are not stored; trade_power and resource_dependency give the decisions they would support.",
+  "Enslavement is never a trade good or a positive production modifier on the victims' land; it is modelled as forced population movement (move_population) with costs on the source societies and gains for the enslaving and plantation economies (see modifiers slave_trade_*)."
+ ],
+ "rebel_size_stat": "recruit_pool",
+ "ai_factor_rules": {
+  "$comment": "The numbers in balance.yaml ai_factors' descriptions. high_unrest (D-EVT-5): more than high_unrest_share of the chooser's provinces have high_unrest_grievances or more grievances.",
+  "great_power_top": 8,
+  "threatened_ratio": 1.5,
+  "low_treasury_years_of_expenses": 1,
+  "high_unrest_share": 0.5,
+  "high_unrest_grievances": 4
+ },
+ "modifier_changes": {
+  "$comment": "modifiers.yaml header: plain numbers hold on level stats and apply per year on accumulating stats.",
+  "accumulating": [
+   "prestige",
+   "literacy",
+   "prosperity",
+   "tech_state",
+   "tech_economy",
+   "tech_military"
+  ]
+ },
+ "rise_is_cost": {
+  "$comment": "Statistics whose rise is a burden in statistics.yaml (narrative_only payoff check).",
+  "stats": [
+   "unrest",
+   "devastation",
+   "war_weariness",
+   "debt",
+   "notoriety",
+   "integration_strain",
+   "disease_burden",
+   "environmental_degradation",
+   "separatism_risk",
+   "expenses"
+  ]
+ },
+ "system_flag_owners": {
+  "$comment": "D-EVT-16: flags other contexts set by their own rules; the rest are set by the engine or the scenario.",
+  "religious_persecution_active": "religion",
+  "missionary_persecution": "religion",
+  "inquisition_established": "religion"
+ },
+ "stat_mapping": {
+  "$comment": "D-EVT-4: the anti-corruption mapping. Event data keeps the tree's names; each change lands as the owning context's concrete change. per_point: amount per point of change; fixed: amount for any rise; scale: multiplies a fractional change.",
+  "population": {
+   "owner": "province",
+   "lands_as": "people_pct",
+   "per_point": 1
+  },
+  "prosperity": {
+   "owner": "province",
+   "lands_as": "fitting_buildings",
+   "per_point": 1
+  },
+  "devastation": {
+   "owner": "province",
+   "lands_as": "burned_tiles_pct",
+   "per_point": 1
+  },
+  "unrest": {
+   "owner": "province",
+   "lands_as": "named_grievance",
+   "fixed": 1
+  },
+  "control": {
+   "owner": "province",
+   "lands_as": "official_flees_or_road_breaks",
+   "fixed": 1
+  },
+  "fort_level": {
+   "owner": "province",
+   "lands_as": "castle_steps",
+   "per_point": 1
+  },
+  "infrastructure": {
+   "owner": "province",
+   "lands_as": "road_steps",
+   "per_point": 1
+  },
+  "industry": {
+   "owner": "province",
+   "lands_as": "factories",
+   "per_point": 1
+  },
+  "trade_access": {
+   "owner": "trade",
+   "lands_as": "trade_ratio_gain_pct",
+   "scale": 100
+  },
+  "food_security": {
+   "owner": "province",
+   "lands_as": "harvest_steps_worse",
+   "per_tenth": 0.67
+  },
+  "disease_burden": {
+   "owner": "province",
+   "lands_as": "plague_outbreak",
+   "fixed": 1
+  },
+  "legitimacy": {
+   "owner": "realm",
+   "lands_as": "lord_loyalty_points",
+   "per_point": 1
+  },
+  "stability": {
+   "owner": "realm",
+   "lands_as": "lord_loyalty_and_revolt",
+   "per_point": 1
+  },
+  "war_weariness": {
+   "owner": "realm",
+   "lands_as": "fallen",
+   "per_point": 1
+  },
+  "trade_index": {
+   "owner": "trade",
+   "lands_as": "trade_ratio_pct",
+   "per_point": 1
+  },
+  "trust": {
+   "owner": "diplomacy",
+   "lands_as": "oath_broken",
+   "fixed": 1
+  },
+  "notoriety": {
+   "owner": "diplomacy",
+   "lands_as": "notorious_deed",
+   "per_point": 1
+  },
+  "integration_strain": {
+   "owner": "events",
+   "lands_as": "read_only",
+   "read_as": "share of the realm's provinces with one or more grievances, in %"
+  }
+ },
+ "derived_formulas": {
+  "$comment": "EVT-054: derived province values the tree recomputes each tick (statistics.yaml), with provisional k values.",
+  "k_supply": 1,
+  "good_base_yield": 1,
+  "tech_economy_bonus": 0,
+  "terrain_supply_mult": 1
+ },
+ "_provisional": [
+  "balance.rebel_sizes",
+  "balance.date_binding.approximate_peak_mult",
+  "balance.date_binding.approximate_spread_years",
+  "balance.options.max",
+  "ai_factor_rules.high_unrest_share",
+  "stat_mapping.food_security.per_tenth",
+  "derived_formulas.k_supply",
+  "derived_formulas.good_base_yield",
+  "derived_formulas.tech_economy_bonus",
+  "derived_formulas.terrain_supply_mult"
+ ]
+}

@@ -5,8 +5,11 @@ that breaks one fails CI. Two scripts check them:
 
 - `pnpm bench` (packages/engine/bench/turn.bench.ts) times the engine itself.
 - `pnpm --filter @ph/client perf` (apps/client/scripts/perf.mjs) runs the
-  built game in mobile Chromium, pans the map at five zooms and ends three
-  turns. `--report` prints the numbers without failing.
+  built game in mobile Chromium, pans the map at five zooms, plays one
+  warm-up turn and then ends three turns. CI runners share their CPUs, so
+  when those turns break a budget it plays three more, up to three attempts;
+  one attempt must meet every budget. `--report` prints the numbers without
+  failing.
 
 ## Frame rate
 
@@ -31,28 +34,34 @@ Rules that keep it there:
   map canvas does not, because shading 4 to 7 times the pixels is what
   overheats phones. Close-up tile detail switches in by CSS zoom.
 
-GPU time is not measured in CI (it runs on a software GPU); the map's frame
-time is reported only.
+GPU time is not measured in CI (it runs on a software GPU, about 120 ms a
+frame); the map's frame time is reported only. So perf turns the map's
+shading off while it pans and animates, which keeps the check under a
+minute, and back on before it ends turns.
 
 ## Ending a turn
 
 The turn is simulated **in the background**: the engine runs in a Web
 Worker (a Node worker on desktop) and the main thread keeps drawing while
 it works. Only when the worker has no support does the turn run on the
-main thread.
+main thread. End turn plays the week a day at a time (about 300 ms a day,
+a 4-hour step every half second while the player fights), so each day is
+one worker answer and one apply.
 
 | What | Budget | Checked by |
 | --- | --- | --- |
 | Engine turn, 5,000 provinces and 500 nations | ≤ 25 ms | bench |
 | Engine turn, 20,000 provinces and 2,000 nations | ≤ 100 ms | bench |
-| Worker answer after End turn, real map | ≤ 250 ms | perf |
-| Applying the answer on the main thread | ≤ 16 ms (one frame) | perf |
+| Planning a march over tiles (A* through the provinces on the route), slowest of 20 | ≤ 100 ms | bench |
+| Worker answer for a day of the turn, real map | ≤ 250 ms | perf |
+| Applying a day on the main thread | ≤ 16 ms (one frame) | perf |
 
 Rules:
 
 - The worker sends typed arrays and transfers them; no JSON of the world.
-- Applying a turn updates textures and redraws once; panels re-render only
-  what is open.
+- Applying a day updates textures and redraws once; panels re-render only
+  what is open. Seasons change once a week, worked out ahead while the
+  player looks at the map.
 - Budgets scale with the world, not the player: AI nations run in the same
   worker turn.
 
@@ -69,8 +78,9 @@ Dragging an army plans a route each time the target changes.
 
 - Overlay: about 1 ms a frame at every zoom (was about 11 ms, from a layout
   read in the draw loop).
-- Applying a turn: 7.5 ms (was 4.3 s, from re-encoding sprite images on
-  every panel render).
+- Applying a turn: 4 to 6 ms (was 14 to 26 ms, from converting every
+  province's season on the main thread; before that 4.3 s, from re-encoding
+  sprite images on every panel render).
 - Worker answer: about 50 ms.
 - Engine turn: 0.2 ms at 5,000 provinces, 0.4 ms at 20,000.
 - Animation: every frame (was one in five, so marching armies moved at

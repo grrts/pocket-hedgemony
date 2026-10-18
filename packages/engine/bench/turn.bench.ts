@@ -2,13 +2,15 @@
 // (~5k land provinces), against the budgets in docs/performance.md.
 // Fails (exit 1) when a budget is broken. Run with: pnpm bench
 import { loadDefaultRuleset } from "@ph/rules";
-import { createWorld, generateSyntheticRuleset, marchMap, planRoute, processTurn } from "../src/index.ts";
+import { blockTileGrid, corridor, createWorld, generateSyntheticRuleset, marchMap, planRoute, planTilePath, processTurn, tileMarch } from "../src/index.ts";
 
-// A turn runs in the engine worker while the player waits; this leaves most
-// of the 250 ms answer budget for messaging and the snapshot.
+// A week (42 four-hour steps) in the engine worker. The game plays it a day
+// or a step at a time, so each answer is a seventh of this or less.
 const TURN_MS = { 5000: 25, 20000: 100 } as const;
 // The map plans a route every time the player drags an army; one frame's slack.
 const ROUTE_MS = 8;
+// A march over tiles is planned once, when the order is given, in the worker.
+const WALK_MS = 100;
 
 let failed = false;
 const check = (name: string, ms: number, budget: number) => {
@@ -19,7 +21,8 @@ const check = (name: string, ms: number, budget: number) => {
 
 for (const [provinces, nations] of [[5000, 500], [20000, 2000]] as const) {
   const rules = generateSyntheticRuleset(loadDefaultRuleset(), { provinces, nations });
-  const world = createWorld(rules, 1);
+  // Provinces of 12 by 12 tiles, about the real map's land provinces.
+  const world = createWorld(rules, 1, blockTileGrid(rules, Math.ceil(Math.sqrt(provinces)), 12));
   const turns = 120;
   const t0 = performance.now();
   for (let i = 0; i < turns; i++) processTurn(world, [], 0);
@@ -39,5 +42,18 @@ for (const [provinces, nations] of [[5000, 500], [20000, 2000]] as const) {
     if (i >= 0) worst = Math.max(worst, performance.now() - r0);
   }
   check(`${provinces} provinces, slowest of ${routes} routes`, worst, ROUTE_MS * (provinces / 5000));
+
+  // A march the player orders: the province route, then the walk over its tiles.
+  const allowed = new Uint8Array(provinces);
+  let worstWalk = 0;
+  for (let i = -5; i < 20; i++) {
+    const from = land[((i + 5) * 7919) % land.length]!;
+    const to = land[((i + 5) * 7919 + 37 * 71) % land.length]!;
+    const r0 = performance.now();
+    const route = planRoute(rules.defines.march, map, from, to, army);
+    if (route) planTilePath(tileMarch(world), world.tiles.centre[from]!, world.tiles.centre[to]!, corridor(map, [from, ...route.path], allowed), army);
+    if (i >= 0) worstWalk = Math.max(worstWalk, performance.now() - r0);
+  }
+  check(`${provinces} provinces, slowest of 20 marches over tiles`, worstWalk, WALK_MS);
 }
 if (failed) process.exit(1);

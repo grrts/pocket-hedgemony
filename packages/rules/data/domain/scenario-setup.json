@@ -1,0 +1,272 @@
+{
+  "$comment": "Scenario setup (SETUP) config: the 1444 start. Sources: country-catalogue README and schema; government start-forms.yaml (read through government.json); tools/mapgen owners.ts and config.json (the stand-in map rules); naval 1.3 (port tiers); buildings 15.2 (town templates); gap-lists decisions (free tier, tutorial realm); settings 4.3 and screen-flow S5 (campaign rules). Map numbers are the mapgen placeholders; the generated catalogue and map rows are in scenario-setup-catalogue.json and scenario-setup-map.json.",
+  "_provisional": [
+    "assessment_factors",
+    "confidence_spread"
+  ],
+  "reference_day": "1444-11-11",
+  "catalogue": {
+    "representations": [
+      "playable_country",
+      "playable_subject",
+      "decentralized_polity",
+      "collective_institution",
+      "non_state_actor",
+      "internal_estate",
+      "background_only"
+    ],
+    "stateless_representations": [
+      "decentralized_polity",
+      "non_state_actor"
+    ],
+    "stateless_entity_types": [
+      "stateless_society",
+      "segmentary_lineage_society"
+    ],
+    "inclusion": {
+      "included": "included",
+      "disputed": "included_disputed",
+      "anachronistic": "excluded_anachronistic",
+      "not_distinct": "excluded_not_distinct",
+      "merged": "merged_into_other"
+    },
+    "date_test_decade": [
+      1440,
+      1449
+    ],
+    "allowed_numeric_fields": [
+      "existence.emergence.year_min",
+      "existence.emergence.year_max",
+      "existence.end.year",
+      "historical.society.population.reference_year",
+      "historical.society.population.low",
+      "historical.society.population.high"
+    ],
+    "assessment_levels": [
+      "very_low",
+      "low",
+      "moderate",
+      "high",
+      "very_high",
+      "unknown"
+    ],
+    "assessment_scales": {
+      "global": [
+        "economic_strength",
+        "manpower_potential",
+        "military_capability",
+        "naval_capability",
+        "diplomatic_influence",
+        "trade_access"
+      ],
+      "relative": [
+        "political_stability",
+        "administrative_capacity",
+        "fiscal_resilience",
+        "institutional_development",
+        "territorial_cohesion",
+        "long_term_potential"
+      ],
+      "risk": [
+        "unrest_risk",
+        "external_threat_exposure"
+      ]
+    },
+    "personality_fields": [
+      "strategic_priorities",
+      "expansion",
+      "diplomacy",
+      "economic_priorities",
+      "military_doctrine",
+      "risk_tolerance",
+      "constraints",
+      "opportunities",
+      "failure_conditions",
+      "adaptation"
+    ],
+    "edges": {
+      "hierarchical": [
+        "vassalage",
+        "tributary",
+        "membership",
+        "union",
+        "claim",
+        "raiding_pressure"
+      ],
+      "symmetric": [
+        "alliance",
+        "rivalry",
+        "war",
+        "trade"
+      ]
+    },
+    "collective_institutions": [
+      "kalmar_union",
+      "hanseatic_league",
+      "hre",
+      "council_of_basel",
+      "decapolis",
+      "swabian_league_cities",
+      "swiss_confederation",
+      "livonian_confederation",
+      "league_of_lezhe",
+      "mount_athos",
+      "gelug_monasteries",
+      "karmapa",
+      "sakya",
+      "japan_imperial_court",
+      "kamakura_kubo",
+      "triple_alliance"
+    ]
+  },
+  "start_forms_never": [
+    "absolute_monarchy",
+    "constitutional_monarchy",
+    "constitutional_republic",
+    "military_junta",
+    "party_state",
+    "company_rule"
+  ],
+  "map": {
+    "lowDensityGrounds": [
+      "mountains",
+      "desert",
+      "tundra"
+    ],
+    "lowDensityFactor": 0.35,
+    "highDensityGrounds": [
+      "farmland",
+      "marsh"
+    ],
+    "highDensityFactor": 1.3,
+    "capitalDensityFactor": 2.5,
+    "populationSpread": [
+      0.7,
+      1.3
+    ],
+    "unownedDensityCapFactor": 2,
+    "coastalWealth": 1,
+    "capitalWealth": 2,
+    "wealthSpread": [
+      0.75,
+      1.25
+    ],
+    "wealthRange": [
+      1,
+      10
+    ],
+    "castle": {
+      "capitalOrPopulation": 400,
+      "frontierHighPopulation": 30,
+      "frontierPopulation": 200,
+      "highGrounds": [
+        "hills",
+        "mountains"
+      ],
+      "oldFortShare": 0.15
+    }
+  },
+  "ports": {
+    "$comment": "Naval 1.3: what each 1444 port tier starts with.",
+    "great": {
+      "harbour": 2
+    },
+    "port": {
+      "harbour": 2,
+      "harbour_if_small_town": 1
+    },
+    "small": {
+      "harbour": 1
+    },
+    "landing": {
+      "harbour": 0,
+      "extra_seafolk": true,
+      "small_craft_only": true
+    }
+  },
+  "town_templates": {
+    "Europe": "European market town",
+    "the Sahel": "Sahel trade town"
+  },
+  "free_realms": [
+    "ottomans",
+    "france"
+  ],
+  "tutorial_realm": "ottomans",
+  "campaign_rules": {
+    "fields": [
+      "difficulty",
+      "ai_temper",
+      "fog",
+      "events",
+      "ironman",
+      "end_date"
+    ],
+    "default_end_date": "1939-08-31"
+  },
+  "map_to_catalogue": {
+    "$comment": "X-13, D-SETUP-1: the 37 map ids that are not catalogue ids. A record id, or null where no record matches and the map's own data is kept.",
+    "ireland": null,
+    "modena": null,
+    "bavaria": null,
+    "wurttemberg": null,
+    "pomerania": null,
+    "switzerland": "swiss_confederation",
+    "albania": null,
+    "ottomans": "ottoman",
+    "knights_of_rhodes": "knights_hospitaller",
+    "mamluks": "mamluk",
+    "hejaz": null,
+    "yemen": null,
+    "oman": null,
+    "timurids": "timurid_empire",
+    "mongols": null,
+    "tibet": null,
+    "jurchens": null,
+    "korea": "joseon",
+    "japan": null,
+    "khmer": null,
+    "pegu": null,
+    "bahmanis": "bahmani",
+    "vijayanagar": "vijayanagara",
+    "orissa": null,
+    "tunis": null,
+    "mossi": null,
+    "kanem_bornu": "bornu",
+    "aztecs": "triple_alliance",
+    "zapotec": null,
+    "maya": null,
+    "chimu": "chimor",
+    "muisca": null,
+    "iroquois": "haudenosaunee",
+    "huron": null,
+    "cherokee": null,
+    "creek": null,
+    "pueblo": null
+  },
+  "assessment_factors": {
+    "very_low": 0.5,
+    "low": 0.75,
+    "moderate": 1,
+    "high": 1.25,
+    "very_high": 1.5,
+    "unknown": 1
+  },
+  "confidence_spread": {
+    "low": 0.2,
+    "medium": 0,
+    "high": 0
+  },
+  "events_presets": {
+    "historical": "historical",
+    "free": "plausible"
+  },
+  "risk_tolerance_levels": {
+    "very_low": "low",
+    "low": "low",
+    "moderate": "medium",
+    "high": "high",
+    "very_high": "high",
+    "unknown": "medium"
+  }
+}

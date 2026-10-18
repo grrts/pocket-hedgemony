@@ -2,15 +2,41 @@
   "$comment": "Global balance numbers. Every value here can be tuned without touching engine code.",
   "startDate": {
     "year": 1444,
-    "month": 3
+    "month": 11,
+    "day": 11
   },
   "economy": {
     "goldPerThousandPeoplePerMonth": 0.004,
     "goldPerWealthPerMonth": 0.06,
-    "startingTreasury": 50
+    "startingTreasury": 50,
+    "$taxRateFactor": "Milestone 3: gold a province pays at each tax step (none, light, normal, heavy, crushing) against normal. Provisional: the design names the steps but no amounts.",
+    "taxRateFactor": [0, 0.5, 1, 1.5, 2],
+    "$officialWagePerMonth": "Milestone 3: an official's wage, paid monthly while he runs his province (REALM-063 wages). Provisional: the design gives no amount.",
+    "officialWagePerMonth": 0.1
+  },
+  "works": {
+    "$comment": "Milestone 4, works (first slice of the buildings context). goldScale turns the buildings data's gold into the treasury's gold. The effects are stand-ins for the jobs-and-wares model (BLD-002, BLD-005) on numbers the game already simulates; all provisional.",
+    "goldScale": 0.2,
+    "defaultUpkeepPerYear": 0.25,
+    "materialsAtHandSaving": 0.2,
+    "seedFoodShare": 1.1,
+    "slotScale": 2.5,
+    "farmRates": [1.1, 1.3, 1.5],
+    "maxLandYield": 3,
+    "marketTrade": 0.5,
+    "harbourTrade": 0.25,
+    "roadTrade": 0.05,
+    "campTrade": 0.05,
+    "drillYardRecruits": 0.15,
+    "roadSpeed": 0.15,
+    "aiReserveGold": 10,
+    "$slots": "Leroy, 17 Oct: a province's slots come from its people, one kind of slot for every work. baseSlots plus one for each townPeople step passed (thousands of people), which also sets the town's size: hamlet, village, market town, town, city, great city.",
+    "baseSlots": 2,
+    "townPeople": [10, 30, 100, 300, 1000]
   },
   "levies": {
-    "menPerThousandPeople": 4,
+    "$comment": "Men who can be called per thousand people: the recruiting context's fighting-age share (0.25) times the farmers' call share (0.12).",
+    "menPerThousandPeople": 30,
     "monthlyRecoveryFraction": 0.0167
   },
   "military": {
@@ -49,12 +75,92 @@
     "horseSpeedBonus": 0.5,
     "bigArmyExtraCrossings": 1,
     "riverCrossingDays": 1,
-    "rationsPerSoldier": 2,
+    "tilesPerCrossing": 14,
+    "snowSlowdown": 1,
+    "rationsPerSoldier": 1,
     "rationsPerHorse": 3,
     "rationsStoredPerPerson": 0.5,
     "monthsCarried": 2,
+    "homeReserveMonths": 2,
     "logisticsRationCut": 0.05,
     "hungerLossPerMonth": 0.28,
     "startingHorseShare": 0.2
+  },
+  "war": {
+    "$comment": "Milestone 1, war and conquest. Battles, sieges and peace use the warfare and diplomacy contexts' own numbers; these only fit them to the weekly turn.",
+    "holdWeeks": 4,
+    "engageBase": 9,
+    "engageMin": 10,
+    "engageMax": 15,
+    "menPerBattleRound": 6000,
+    "garrison": {
+      "capital": 1500,
+      "castle": 1000,
+      "fort": 500
+    },
+    "garrisonRecoveryPerMonth": 0.1,
+    "castleStoreMonths": 6,
+    "stormRatio": 4,
+    "disperseBelow": 100,
+    "aiDeclareChancePerMonth": 0.01,
+    "aiDeclareStrengthRatio": 2
+  },
+  "recruit": {
+    "$comment": "Milestone 2, armies that cost something. Pay, training costs, the levy and the troop cap come from domain/recruiting.json and domain/warfare.json; these fit them to this game's economy and weekly turn. goldScale turns the domain's gold into the treasury's gold (one domain gold is 0.004 here).",
+    "goldScale": 0.004,
+    "gatherWeeks": 2,
+    "queueMax": 10,
+    "armsAtStart": ["levy foot", "armoured foot", "pikes", "archers", "light horse", "knights and lancers"],
+    "freeCompanyMen": { "$comment": "A free company's size in this age: never more than max men, some much smaller (Leroy: no fixed 1,000).", "min": 300, "max": 3000 },
+    "freeCompaniesForHire": 6,
+    "freeCompanies": [
+      { "group": "Swiss and German foot", "homes": ["switzerland", "wurttemberg", "bavaria"], "names": ["Reisläufer of Uri", "Bernese free company", "Company of Schwyz", "Swabian foot", "Zürich free company"], "captains": ["Hans", "Ulrich", "Konrad", "Rudolf"], "mix": { "pikes": [0.6, 0.85], "armoured foot": [0.1, 0.3], "archers": [0, 0.1] } },
+      { "group": "Italian condottieri", "homes": ["milan", "florence", "papal_states", "naples", "venice"], "names": ["The Braccheschi", "The Sforzeschi", "Company of the Star", "Company of Saint George", "The Black Company"], "captains": ["Niccolò", "Bartolomeo", "Jacopo", "Francesco"], "mix": { "knights and lancers": [0.35, 0.6], "armoured foot": [0.2, 0.4], "archers": [0.1, 0.25], "light horse": [0, 0.1] } },
+      { "group": "Genoese crossbowmen", "homes": ["genoa"], "names": ["Genoese crossbowmen", "Ligurian crossbow company"], "captains": ["Ottone", "Antonio"], "mix": { "archers": [0.7, 0.9], "armoured foot": [0.1, 0.3] } },
+      { "group": "English free companies", "homes": ["england"], "names": ["The White Company", "Company of the Rose", "Gascon archers"], "captains": ["John", "Thomas", "Robert"], "mix": { "archers": [0.6, 0.75], "armoured foot": [0.25, 0.4] } },
+      { "group": "Bohemian field companies", "homes": ["bohemia"], "names": ["Brethren of the wagon fort", "Tábor field company"], "captains": ["Jan", "Prokop"], "mix": { "armoured foot": [0.3, 0.5], "archers": [0.3, 0.5], "pikes": [0, 0.2], "light horse": [0, 0.1] } },
+      { "group": "Scottish and Irish gallowglass", "homes": ["scotland", "ireland"], "names": ["MacSweeney gallowglass", "MacDonald redshanks", "Clan Sheehy axes"], "captains": ["Donnchadh", "Alasdair", "Eoin"], "mix": { "armoured foot": [0.6, 0.9], "archers": [0.1, 0.3], "light horse": [0, 0.1] } },
+      { "group": "Albanian and Greek stradioti", "homes": ["albania", "byzantium"], "names": ["Stradioti of Morea", "Albanian riders"], "captains": ["Gjon", "Theodoros"], "mix": { "light horse": [0.9, 1], "armoured foot": [0, 0.1] } },
+      { "group": "Catalan almogavars", "homes": ["aragon"], "names": ["Almogavars of the Pyrenees", "Catalan company"], "captains": ["Bernat", "Ramon"], "mix": { "levy foot": [0.3, 0.5], "armoured foot": [0.3, 0.5], "light horse": [0, 0.2] } },
+      { "group": "Turkic and Afghan horse", "homes": ["timurids", "uzbek_khanate", "delhi"], "names": ["Lodi horse", "Chagatai riders", "Turkmen horse"], "captains": ["Bahlul", "Timur", "Ali"], "mix": { "light horse": [0.7, 1], "archers": [0, 0.2], "armoured foot": [0, 0.1] } },
+      { "group": "Javanese and Japanese sword bands", "homes": ["japan", "majapahit"], "names": ["Ronin band", "Wako sword band", "Javanese keris company"], "captains": ["Saburō", "Gajah"], "mix": { "armoured foot": [0.5, 0.8], "archers": [0.2, 0.4], "pikes": [0, 0.1] } }
+    ],
+    "unpaidDesertion": 0.05,
+    "mercenaryWeeks": 4,
+    "commanderGold": 50,
+    "commanderNames": ["Juan", "Pedro", "Rodrigo", "Jean", "Guillaume", "Louis", "Henry", "Richard", "Thomas", "Heinrich", "Konrad", "Albrecht", "Giovanni", "Niccolò", "Mehmed", "Ali", "Ivan", "Dmitri", "Jan", "Erik", "Olaf", "Andrzej", "János", "Duarte"]
+  },
+  "living": {
+    "$comment": "Milestone 3, people by class. Each province's people are seeded into the province context's classes from its population, ground, coast and wealth (the context gives the classes and their birth and death rates but no 1444 mix, so these shares are provisional).",
+    "townShareBase": 0.03,
+    "townSharePerWealth": 0.025,
+    "townShareMax": 0.35,
+    "townMix": { "craftsmen": 0.42, "market folk": 0.3, "clergy": 0.12, "clerks": 0.13, "scholars": 0.03 },
+    "homelessShare": 0.02,
+    "coastalSeafolk": 0.12,
+    "countryMix": {
+      "grassland": { "farmers": 0.7, "herders": 0.2, "woodsmen": 0.1 },
+      "farmland": { "farmers": 0.85, "herders": 0.1, "woodsmen": 0.05 },
+      "hills": { "farmers": 0.55, "herders": 0.25, "woodsmen": 0.1, "miners": 0.1 },
+      "mountains": { "farmers": 0.4, "herders": 0.4, "woodsmen": 0.1, "miners": 0.1 },
+      "drylands": { "farmers": 0.5, "herders": 0.45, "miners": 0.05 },
+      "marsh": { "farmers": 0.55, "herders": 0.15, "woodsmen": 0.3 },
+      "forest": { "farmers": 0.5, "herders": 0.1, "woodsmen": 0.4 },
+      "desert": { "farmers": 0.3, "herders": 0.65, "miners": 0.05 },
+      "tundra": { "farmers": 0.05, "herders": 0.6, "woodsmen": 0.35 },
+      "jungle": { "farmers": 0.55, "herders": 0.05, "woodsmen": 0.4 },
+      "savanna": { "farmers": 0.5, "herders": 0.45, "woodsmen": 0.05 }
+    },
+    "startingStoreMonths": 4,
+    "reliefAboveMonths": 3,
+    "lordGiftGold": 5
+  },
+  "castleFood": {
+    "$comment": "Feedback 84 and 85: castles collect a share of each province's surplus at the harvest, keep a siege reserve and spread the rest by rings; stores are capped (a province's own at localStoreCapMonths, a castle's at castleStoreMonths, granaryStoreMonths with a granary) and the surplus rule decides what happens to the rest. The realm data gives the grain price (0.5 gold a food); grainGoldScale turns it into the treasury's gold for the engine's food (a thousand people fed for a month), so a month's food sells for about what its eaters pay in tax a month. All provisional.",
+    "localStoreCapMonths": 18,
+    "castleStoreMonths": 6,
+    "granaryStoreMonths": 18,
+    "keepMonths": 12,
+    "grainGoldScale": 0.008
   }
 }

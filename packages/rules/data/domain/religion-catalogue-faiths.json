@@ -1,0 +1,9862 @@
+{
+"andorra": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"aragon": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"sunni",
+"jewish"
+],
+"source_texts": [
+"Latin (Catholic) Christianity",
+"Islam",
+"Judaism"
+]
+},
+"aragon_kingdom": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Catholic Christianity",
+"Islam"
+]
+},
+"braganza": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"castile": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish",
+"sunni"
+],
+"source_texts": [
+"Latin (Catholic) Christianity",
+"Judaism",
+"Islam",
+"Converso Christianity"
+]
+},
+"castilian_magnates": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"castilian_military_orders": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"catalonia": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Judaism"
+]
+},
+"granada": {
+"region": "eu_iberia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"jewish",
+"catholic"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Judaism",
+"Christianity"
+]
+},
+"navarre": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish",
+"sunni"
+],
+"source_texts": [
+"Latin (Catholic) Christianity",
+"Judaism",
+"Islam"
+]
+},
+"portugal": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish",
+"sunni"
+],
+"source_texts": [
+"Latin (Catholic) Christianity",
+"Judaism",
+"Islam"
+]
+},
+"valencia": {
+"region": "eu_iberia",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Catholic Christianity",
+"Islam"
+]
+},
+"albret": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"alencon": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"anjou": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"armagnac": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"bourbon": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"brittany": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"burgundy": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity",
+"Modern Devotion and beguinages"
+]
+},
+"comtat_venaissin": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"dauphine": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"ecorcheurs": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"english_france": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"foix": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"france": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin (Catholic) Christianity",
+"Judaism"
+]
+},
+"french_minor_lordships": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"nevers": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"orange": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"orleans": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"provence": {
+"region": "eu_france",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Judaism"
+]
+},
+"breifne": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"connacht_burkes": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"desmond": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"douglas_earldom": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"england": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity",
+"Lollardy"
+]
+},
+"gaelic_connacht_minor": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"gaelic_leinster_midlands": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"gaelic_munster_minor": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"isle_of_man": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"kildare": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"leinster_kavanagh": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"lordship_of_ireland": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"lordship_of_the_isles": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"maccarthy_mor": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"orkney": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"ormond": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"scotland": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"thomond": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"tyrconnell": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"tyrone": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"ulster_minor": {
+"region": "eu_british_isles",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"denmark": {
+"region": "eu_nordic",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"faroes": {
+"region": "eu_nordic",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"gotland": {
+"region": "eu_nordic",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"iceland": {
+"region": "eu_nordic",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"kalmar_union": {
+"region": "eu_nordic",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Catholic Christianity",
+"Sámi religion"
+]
+},
+"norse_greenland": {
+"region": "eu_nordic",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"norway": {
+"region": "eu_nordic",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Catholic Christianity",
+"Sámi religion"
+]
+},
+"sapmi": {
+"region": "eu_nordic",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [
+"catholic"
+],
+"source_texts": [
+"Sámi religion",
+"Catholic and Orthodox Christianity"
+]
+},
+"schleswig": {
+"region": "eu_nordic",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"sweden": {
+"region": "eu_nordic",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Catholic Christianity",
+"Sámi religion"
+]
+},
+"aachen": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"bar": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"brabant": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity (dioceses of Utrecht, Liège, Cambrai, Tournai, Thérouanne, Arras)"
+]
+},
+"cambrai": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity (dioceses of Utrecht, Liège, Cambrai, Tournai, Thérouanne, Arras)"
+]
+},
+"cleves": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"cologne": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"cologne_city": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Jews"
+]
+},
+"dortmund": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"east_frisia": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"east_frisian_minor_chieftaincies": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"flanders": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity (dioceses of Utrecht, Liège, Cambrai, Tournai, Thérouanne, Arras)"
+]
+},
+"frankfurt": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"friesland": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"ghent": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity (dioceses of Utrecht, Liège, Cambrai, Tournai, Thérouanne, Arras)"
+]
+},
+"groningen": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"guelders": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"hainaut": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity (dioceses of Utrecht, Liège, Cambrai, Tournai, Thérouanne, Arras)"
+]
+},
+"hesse": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"holland": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity (dioceses of Utrecht, Liège, Cambrai, Tournai, Thérouanne, Arras)",
+"Modern Devotion (Devotio Moderna) communities"
+]
+},
+"julich_berg": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"katzenelnbogen": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"liege": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"lorraine": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"lr_minor_ecclesiastical_estates": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"luxembourg": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity (dioceses of Utrecht, Liège, Cambrai, Tournai, Thérouanne, Arras)"
+]
+},
+"mainz": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"mark": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"metz": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"munster": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"nassau": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"osnabruck": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"paderborn": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"palatinate": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Jews"
+]
+},
+"palatine_cadet_lines": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"rhenish_imperial_cities": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"rhineland_minor_counties": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"soest": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"toul_verdun": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"trier": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"utrecht": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity",
+"Modern Devotion (Brethren of the Common Life, Windesheim)"
+]
+},
+"vaudemont": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"waldeck": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"westphalian_counties": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"wetterau_counties": {
+"region": "eu_low_countries_rhine",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"anhalt": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"brandenburg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Judaism"
+]
+},
+"bremen": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"bremen_city": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"brunswick_city": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"brunswick_gottingen": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"brunswick_grubenhagen": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"brunswick_wolfenbuttel": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"calenberg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"dithmarschen": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"erfurt": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"goslar": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"halberstadt": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"hamburg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"hanseatic_league": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"harz_thuringian_counties": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"hildesheim": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"holstein": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"hoya": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"hre": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"hussite",
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Hussite (Utraquist) Christianity",
+"Judaism"
+]
+},
+"lippe": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"lower_saxon_minor_counties": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"lubeck": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"luneburg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"magdeburg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"mansfeld": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"mecklenburg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"mecklenburg_stargard": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"meissen": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"minden": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"north_german_minor_bishoprics": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"oldenburg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"pomerania_stettin": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"pomerania_stolp": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"pomerania_wolgast": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"ratzeburg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"saxe_lauenburg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"saxon_hanse_towns": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"saxony": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Judaism"
+]
+},
+"schwarzburg": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"thuringia": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"thuringian_imperial_cities": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"verden": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"wendish_hanse_towns": {
+"region": "eu_hre_north",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"alsace_habsburg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"ansbach": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"appenzell": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"augsburg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"augsburg_bishopric": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"austria": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"baden": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"bamberg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"basel": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"bavaria_ingolstadt": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"bavaria_landshut": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"bavaria_munich": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"bavarian_minor_estates": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"bern": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"bohemia": {
+"region": "eu_hre_south",
+"state_faith": "hussite",
+"people_majority": "hussite",
+"communities": [
+"catholic",
+"jewish"
+],
+"source_texts": [
+"Utraquist (Hussite) Christianity",
+"Roman Catholic Christianity",
+"Radical Hussite remnants (Táborites)",
+"Judaism"
+]
+},
+"breslau": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Roman Catholicism"
+]
+},
+"brixen": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"cilli": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"constance": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"council_of_basel": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity (conciliarist)"
+]
+},
+"decapolis": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"eichstatt": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"franconian_minor_estates": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"fribourg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"glarus": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"gorizia": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"grisons": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"kulmbach": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"lower_lusatia": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Roman Catholicism"
+]
+},
+"lucerne": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"moravia": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"hussite"
+],
+"source_texts": [
+"Roman Catholicism",
+"Utraquism"
+]
+},
+"neuchatel": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"nuremberg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"palatinate_mosbach": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"palatinate_neumarkt": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"passau": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"podebrady_landfriede": {
+"region": "eu_hre_south",
+"state_faith": "hussite",
+"people_majority": "hussite",
+"communities": [
+"catholic"
+],
+"source_texts": [
+"Utraquist Christianity",
+"Catholicism"
+]
+},
+"regensburg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"rosenberg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"hussite"
+],
+"source_texts": [
+"Roman Catholicism",
+"Utraquism"
+]
+},
+"salzburg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"schaffhausen": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"schwyz": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"silesia": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"hussite"
+],
+"source_texts": [
+"Roman Catholicism",
+"Hussitism"
+]
+},
+"solothurn": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"st_gallen": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"strasbourg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"swabian_league_cities": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"swabian_minor_estates": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"swiss_confederation": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"tabor": {
+"region": "eu_hre_south",
+"state_faith": "hussite",
+"people_majority": "hussite",
+"communities": [],
+"source_texts": [
+"Táborite Hussitism"
+]
+},
+"trent": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"tyrol": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"ulm": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"unterwalden": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"upper_lusatia": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Roman Catholicism"
+]
+},
+"upper_rhine_minor_estates": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"uri": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"valais": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"wurttemberg_stuttgart": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"wurttemberg_urach": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"wurzburg": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"zug": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"zurich": {
+"region": "eu_hre_south",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"ancona": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"asti": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"bologna": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"camerino": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"correggio": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"corsica": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"faenza": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"ferrara": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"florence": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"forli": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"genoa": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"ligurian_minor_lordships": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"lucca": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"malaspina_lunigiana": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"mantua": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"milan": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"monaco": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"montferrat": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"naples": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox",
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Byzantine-rite Christianity",
+"Judaism"
+]
+},
+"oristano": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"papal_states": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"pesaro": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"piombino": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"rimini": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"romagna_minor_signorie": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"roman_baronial_houses": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"saluzzo": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity",
+"Waldensian Christianity"
+]
+},
+"san_marino": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"sardinia": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"savoy": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Waldensian Christianity",
+"Judaism"
+]
+},
+"sforza_marche": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"sicily": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Judaism"
+]
+},
+"siena": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"taranto": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Latin Christianity",
+"Byzantine-rite Christianity"
+]
+},
+"urbino": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"venice": {
+"region": "eu_italy",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox",
+"jewish"
+],
+"source_texts": [
+"Latin Christianity",
+"Orthodox Christianity",
+"Judaism"
+]
+},
+"courland_bishopric": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Catholic Christianity",
+"Indigenous folk practice"
+]
+},
+"croatia": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Glagolitic Catholic liturgy",
+"Orthodox Christianity"
+]
+},
+"dorpat": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Catholic Christianity",
+"Indigenous folk practice"
+]
+},
+"ermland": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"hungary": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox",
+"hussite",
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity",
+"Hussite currents",
+"Judaism"
+]
+},
+"lithuania": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox",
+"sunni",
+"jewish"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity",
+"Remnant pre-Christian practice",
+"Sunni Islam",
+"Judaism and Karaite Judaism"
+]
+},
+"livonian_confederation": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"livonian_order": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional",
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Indigenous folk practice",
+"Orthodox Christianity"
+]
+},
+"mazovia": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Judaism"
+]
+},
+"mazovia_plock": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Judaism"
+]
+},
+"mazovia_warsaw": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Judaism"
+]
+},
+"moldavia": {
+"region": "eu_baltic_east_central",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"catholic",
+"oriental_christian",
+"hussite"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity",
+"Armenian Apostolic Christianity",
+"Hussite refugees"
+]
+},
+"neumark": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"osel_wiek": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Catholic Christianity",
+"Indigenous folk practice"
+]
+},
+"oswiecim_zator": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"poland": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox",
+"jewish",
+"oriental_christian",
+"hussite"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity",
+"Judaism",
+"Armenian Apostolic Christianity",
+"Hussite sympathies"
+]
+},
+"prussian_confederation": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Catholic Christianity"
+]
+},
+"riga": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Catholic Christianity",
+"Indigenous folk practice"
+]
+},
+"riga_city": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Catholic Christianity",
+"Indigenous folk practice"
+]
+},
+"teutonic_order": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Catholic Christianity",
+"Old Prussian folk practice"
+]
+},
+"transylvania": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity"
+]
+},
+"upper_hungary_giskra": {
+"region": "eu_baltic_east_central",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"hussite"
+],
+"source_texts": [
+"Catholic Christianity",
+"Utraquist/Hussite"
+]
+},
+"volhynia": {
+"region": "eu_baltic_east_central",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"catholic"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"arianiti": {
+"region": "eu_balkans_aegean",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"catholic"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"athens": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"balsha_remnant": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity"
+]
+},
+"bosnia": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Bosnian Church (krstjani)",
+"Catholic Christianity",
+"Orthodox Christianity"
+]
+},
+"bosnian_magnates": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Bosnian Church",
+"Catholic Christianity",
+"Orthodox Christianity"
+]
+},
+"byzantium": {
+"region": "eu_balkans_aegean",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"catholic",
+"jewish"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity",
+"Judaism"
+]
+},
+"chios": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"cyprus": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox",
+"oriental_christian"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity",
+"Armenian and Syriac churches"
+]
+},
+"dukagjini": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity"
+]
+},
+"dushmani": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity"
+]
+},
+"epirus": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"genoese_aegean": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"herzegovina": {
+"region": "eu_balkans_aegean",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"catholic"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Bosnian Church",
+"Catholic Christianity"
+]
+},
+"kastrioti": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox",
+"sunni"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity",
+"Islam"
+]
+},
+"knights_hospitaller": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity"
+]
+},
+"league_of_lezhe": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity"
+]
+},
+"lesbos": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"morea": {
+"region": "eu_balkans_aegean",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"catholic",
+"jewish"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity",
+"Judaism"
+]
+},
+"mount_athos": {
+"region": "eu_balkans_aegean",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Orthodox Christianity"
+]
+},
+"naxos": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"ottoman": {
+"region": "eu_balkans_aegean",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"orthodox",
+"jewish",
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam (Hanafi)",
+"Sufi and heterodox dervish movements",
+"Orthodox Christianity",
+"Judaism",
+"Armenian Apostolic Christianity"
+]
+},
+"ragusa": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity",
+"Bosnian Church"
+]
+},
+"serbia": {
+"region": "eu_balkans_aegean",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"catholic"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"thasos_imbros": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"venetian_stato_da_mar": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox",
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity",
+"Judaism"
+]
+},
+"vlachs_aromanians": {
+"region": "eu_balkans_aegean",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Orthodox Christianity"
+]
+},
+"wallachia": {
+"region": "eu_balkans_aegean",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"catholic"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"zaharia": {
+"region": "eu_balkans_aegean",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox Christianity"
+]
+},
+"zeta": {
+"region": "eu_balkans_aegean",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"catholic"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Catholic Christianity"
+]
+},
+"galich_shemyaka": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"gazaria": {
+"region": "eu_rus",
+"state_faith": "catholic",
+"people_majority": "orthodox",
+"communities": [
+"orthodox",
+"sunni",
+"jewish"
+],
+"source_texts": [
+"Catholic Christianity",
+"Orthodox and Armenian Christianity",
+"Islam",
+"Judaism"
+]
+},
+"great_perm": {
+"region": "eu_rus",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Traditional Komi religion",
+"Orthodox Christianity"
+]
+},
+"komi": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Traditional Komi beliefs"
+]
+},
+"mari_chuvash_mordva": {
+"region": "eu_rus",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [
+"sunni",
+"orthodox"
+],
+"source_texts": [
+"Traditional religions",
+"Islam",
+"Orthodox Christianity"
+]
+},
+"mozhaysk": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"muscovy": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"siberian_steppe_traditional",
+"sunni"
+],
+"source_texts": [
+"Eastern Orthodox Christianity",
+"Animist and traditional Finnic religion",
+"Sunni Islam"
+]
+},
+"novgorod": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"siberian_steppe_traditional",
+"catholic"
+],
+"source_texts": [
+"Eastern Orthodox Christianity",
+"Traditional Finnic, Sami and Uralic religions",
+"Catholic Christianity"
+]
+},
+"novgorod_lands_karelia": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Traditional Finnic beliefs"
+]
+},
+"pronsk": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"pskov": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"rostov": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"ryazan": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"siberian_steppe_traditional",
+"sunni"
+],
+"source_texts": [
+"Eastern Orthodox Christianity",
+"Traditional Mordvin religion",
+"Islam"
+]
+},
+"serpukhov_borovsk": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"theodoro": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"tver": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"upper_oka": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"vereya_beloozero": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"vyatka": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Eastern Orthodox Christianity",
+"Traditional Udmurt and Mari religion"
+]
+},
+"yaroslavl": {
+"region": "eu_rus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Eastern Orthodox Christianity"
+]
+},
+"bashkir": {
+"region": "as_steppe_siberia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Sunni Islam",
+"Traditional beliefs"
+]
+},
+"crimea": {
+"region": "as_steppe_siberia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"orthodox",
+"oriental_christian",
+"jewish",
+"catholic"
+],
+"source_texts": [
+"Sunni Islam (Hanafi)",
+"Orthodox Christianity",
+"Armenian Apostolic Christianity",
+"Karaite and Rabbanite Judaism",
+"Latin Christianity"
+]
+},
+"evenki_tungus": {
+"region": "as_steppe_siberia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Shamanism"
+]
+},
+"great_horde": {
+"region": "as_steppe_siberia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"siberian_steppe_traditional",
+"orthodox"
+],
+"source_texts": [
+"Sunni Islam",
+"Steppe customary practices",
+"Orthodox and Armenian Christianity"
+]
+},
+"kazan": {
+"region": "as_steppe_siberia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"siberian_steppe_traditional",
+"orthodox"
+],
+"source_texts": [
+"Sunni Islam (Hanafi)",
+"Traditional religions",
+"Orthodox Christianity"
+]
+},
+"kyrgyz_yenisei": {
+"region": "as_steppe_siberia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Tengrism and shamanism"
+]
+},
+"nogai": {
+"region": "as_steppe_siberia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"northeast_siberian_peoples": {
+"region": "as_steppe_siberia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Shamanism"
+]
+},
+"ob_ugrian_principalities": {
+"region": "as_steppe_siberia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Traditional Ugric religion"
+]
+},
+"samoyed_peoples": {
+"region": "as_steppe_siberia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Shamanism"
+]
+},
+"sayyid_ahmad_horde": {
+"region": "as_steppe_siberia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"taibugid_sibir": {
+"region": "as_steppe_siberia",
+"state_faith": "sunni",
+"people_majority": "siberian_steppe_traditional",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Islam",
+"Traditional religion"
+]
+},
+"tyumen_sibir": {
+"region": "as_steppe_siberia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Sunni Islam",
+"Traditional religion"
+]
+},
+"uzbek_khanate": {
+"region": "as_steppe_siberia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Sunni Islam (Hanafi)",
+"Steppe customary practices",
+"Traditional religions"
+]
+},
+"yakut": {
+"region": "as_steppe_siberia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Tengrism and shamanism"
+]
+},
+"alania_ossetia": {
+"region": "as_anatolia_caucasus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Orthodox Christianity (residual) and indigenous beliefs"
+]
+},
+"aq_qoyunlu": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam",
+"Syriac Orthodox Christianity",
+"Armenian Christianity"
+]
+},
+"armenian_meliks": {
+"region": "as_anatolia_caucasus",
+"state_faith": "oriental_christian",
+"people_majority": "oriental_christian",
+"communities": [],
+"source_texts": [
+"Armenian Apostolic Christianity"
+]
+},
+"avar_khanate": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam",
+"Christianity/indigenous remnants"
+]
+},
+"bitlis": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam",
+"Armenian Christianity"
+]
+},
+"candar": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Sunni Islam",
+"Orthodox Christianity"
+]
+},
+"circassians": {
+"region": "as_anatolia_caucasus",
+"state_faith": "oriental_christian",
+"people_majority": "oriental_christian",
+"communities": [
+"asian_traditional",
+"sunni"
+],
+"source_texts": [
+"Christianity (residual)",
+"Indigenous beliefs",
+"Islam"
+]
+},
+"dagestan_free_societies": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"dulkadir": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam",
+"Armenian Christianity"
+]
+},
+"georgia": {
+"region": "as_anatolia_caucasus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"oriental_christian",
+"sunni"
+],
+"source_texts": [
+"Georgian Orthodox Christianity",
+"Armenian Apostolic Christianity",
+"Islam"
+]
+},
+"hakkari": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam",
+"Church of the East"
+]
+},
+"hasankeyf": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam",
+"Syriac Christianity"
+]
+},
+"imereti_odishi": {
+"region": "as_anatolia_caucasus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Georgian Orthodox Christianity"
+]
+},
+"kaitag": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"karaman": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Sunni Islam",
+"Orthodox and Armenian Christianity"
+]
+},
+"kazikumukh": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"kurdish_emirates": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian",
+"minor_other"
+],
+"source_texts": [
+"Sunni Islam",
+"Christianity",
+"Yazidism"
+]
+},
+"qara_qoyunlu": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"shia",
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam",
+"Shi'i and Sufi-Alid currents",
+"Armenian Apostolic Christianity",
+"Church of the East and Syriac Christianity"
+]
+},
+"ramadanids": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam",
+"Armenian Christianity"
+]
+},
+"samtskhe": {
+"region": "as_anatolia_caucasus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [],
+"source_texts": [
+"Georgian Orthodox Christianity"
+]
+},
+"sheki": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam"
+]
+},
+"shirvan": {
+"region": "as_anatolia_caucasus",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian"
+],
+"source_texts": [
+"Sunni Islam",
+"Christianity and Judaism"
+]
+},
+"trebizond": {
+"region": "as_anatolia_caucasus",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"oriental_christian",
+"sunni"
+],
+"source_texts": [
+"Eastern Orthodox Christianity",
+"Armenian Christianity",
+"Sunni Islam"
+]
+},
+"vainakh": {
+"region": "as_anatolia_caucasus",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous beliefs and residual Christianity"
+]
+},
+"yazidi_communities": {
+"region": "as_anatolia_caucasus",
+"state_faith": "minor_other",
+"people_majority": "minor_other",
+"communities": [],
+"source_texts": [
+"Yazidism"
+]
+},
+"bedouin_egypt_syria": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"druze_maan": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "minor_other",
+"people_majority": "minor_other",
+"communities": [
+"oriental_christian",
+"sunni"
+],
+"source_texts": [
+"Druze faith",
+"Maronite Christianity",
+"Sunni and Shi'i Islam"
+]
+},
+"hadramawt_kathiri": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni (Shafi'i) Islam"
+]
+},
+"hormuz": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"shia",
+"hindu"
+],
+"source_texts": [
+"Sunni Islam",
+"Shi'i Islam",
+"Hinduism"
+]
+},
+"jabrids": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "shia",
+"communities": [
+"shia"
+],
+"source_texts": [
+"Sunni Islam",
+"Twelver Shi'ism"
+]
+},
+"mahra": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"mamluk": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"oriental_christian",
+"jewish",
+"minor_other"
+],
+"source_texts": [
+"Sunni Islam",
+"Coptic Christianity",
+"Melkite, Maronite, Syriac and Armenian Christianity",
+"Judaism",
+"Druze, Nusayri (Alawite) and Twelver Shi'i communities"
+]
+},
+"mecca": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"shia"
+],
+"source_texts": [
+"Sunni Islam",
+"Zaydi Shi'i sympathies"
+]
+},
+"medina_amirs": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"shia"
+],
+"source_texts": [
+"Sunni Islam",
+"Twelver/Imami Shi'ism"
+]
+},
+"najd_bedouin": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"oman_nabhani": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "ibadi",
+"people_majority": "ibadi",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Ibadi Islam",
+"Sunni Islam"
+]
+},
+"rasulid_yemen": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"shia"
+],
+"source_texts": [
+"Sunni (Shafi'i) Islam",
+"Zaydi Shi'ism"
+]
+},
+"socotra": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "oriental_christian",
+"people_majority": "oriental_christian",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Christianity",
+"Islam"
+]
+},
+"tahirid": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni (Shafi'i) Islam"
+]
+},
+"zaydi_imamate": {
+"region": "as_levant_egypt_arabia",
+"state_faith": "shia",
+"people_majority": "shia",
+"communities": [],
+"source_texts": [
+"Zaydi Shi'ism"
+]
+},
+"afghan_tribes": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"badakhshan": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam",
+"Isma'ili Islam"
+]
+},
+"baluch": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Sunni Islam",
+"Zikri traditions"
+]
+},
+"biya_pas": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"shia"
+],
+"source_texts": [
+"Sunni Islam (Shafi'i)",
+"Shi'ism"
+]
+},
+"gilan": {
+"region": "as_iran_transoxiana",
+"state_faith": "shia",
+"people_majority": "shia",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Zaydi Shi'ism",
+"Sunni Islam"
+]
+},
+"hazara": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam (Sunni and Shi'i; Shi'ism spread later)"
+]
+},
+"kafiristan": {
+"region": "as_iran_transoxiana",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous Kafir religion"
+]
+},
+"lur_kuchak": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam (Shi'i and Sunni elements; folk religion)"
+]
+},
+"mazandaran": {
+"region": "as_iran_transoxiana",
+"state_faith": "shia",
+"people_majority": "shia",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Twelver Shi'ism",
+"Sunni Islam"
+]
+},
+"moghulistan": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"mushasha": {
+"region": "as_iran_transoxiana",
+"state_faith": "shia",
+"people_majority": "shia",
+"communities": [],
+"source_texts": [
+"Extremist (ghulat) Shi'i messianism",
+"Twelver Shi'ism and Sunni Islam"
+]
+},
+"rustamdar": {
+"region": "as_iran_transoxiana",
+"state_faith": "shia",
+"people_majority": "shia",
+"communities": [],
+"source_texts": [
+"Shi'ism and Sunni Islam"
+]
+},
+"safaviyya": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sufi Islam (Sunni-leaning; Shi'i turn later)"
+]
+},
+"sistan": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"shia"
+],
+"source_texts": [
+"Sunni Islam",
+"Shi'ism"
+]
+},
+"timurid_empire": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"shia",
+"jewish"
+],
+"source_texts": [
+"Sunni Islam (Hanafi)",
+"Twelver Shi'ism and Alid devotion",
+"Sufi orders (Naqshbandiyya, Kubrawiyya and others)",
+"Messianic movements (Hurufiyya, Nurbakhshiyya)",
+"Jewish and Zoroastrian communities"
+]
+},
+"timurid_fars": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"shia"
+],
+"source_texts": [
+"Sunni Islam",
+"Twelver Shi'ism"
+]
+},
+"timurid_samarkand": {
+"region": "as_iran_transoxiana",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Hanafi)",
+"Naqshbandi and other Sufi orders"
+]
+},
+"ahom": {
+"region": "as_south_asia_north",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Tai Ahom religion",
+"Hinduism"
+]
+},
+"amber": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"baghela": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Hinduism",
+"Tribal religions"
+]
+},
+"baltistan": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"mahayana"
+],
+"source_texts": [
+"Islam (Nurbakhshi/Shi'a)",
+"Buddhism"
+]
+},
+"bayana_mewat": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Islam",
+"Hinduism"
+]
+},
+"bengal": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "hindu",
+"communities": [
+"hindu",
+"mahayana"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism",
+"Buddhism (remnant)"
+]
+},
+"bhutan_lords": {
+"region": "as_south_asia_north",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism",
+"Bon and local religion"
+]
+},
+"bhuyan_chiefs": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"bundi": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"chotanagpur_nagvanshi": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "asian_traditional",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Tribal religions (Sarna)",
+"Hinduism"
+]
+},
+"chutia": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Tribal and Hindu (Shakta) traditions"
+]
+},
+"dardistan": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Islam",
+"Local religions"
+]
+},
+"delhi": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "hindu",
+"communities": [
+"hindu",
+"jain"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism (various traditions)",
+"Jainism",
+"Sufi orders (Chishti)"
+]
+},
+"doab_chiefs": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Hinduism",
+"Islam"
+]
+},
+"garhwal": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"gwalior": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"jain"
+],
+"source_texts": [
+"Hinduism",
+"Jainism"
+]
+},
+"jaintia": {
+"region": "as_south_asia_north",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Khasi-Pnar religion"
+]
+},
+"jaisalmer": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"jain"
+],
+"source_texts": [
+"Hinduism",
+"Jainism"
+]
+},
+"jaunpur": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "hindu",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism"
+]
+},
+"kachari": {
+"region": "as_south_asia_north",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Dimasa religion"
+]
+},
+"kamata": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Hinduism (Shaiva and Shakta)",
+"Tribal religions"
+]
+},
+"kashmir": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Islam (Sunni majority; Shi'a minority)",
+"Hinduism (Kashmiri Shaivism)",
+"Sufism (Rishi order and Kubrawi)"
+]
+},
+"khasa_doti": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"mahayana"
+],
+"source_texts": [
+"Hinduism",
+"Buddhism"
+]
+},
+"khasi_hima": {
+"region": "as_south_asia_north",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Khasi religion"
+]
+},
+"khokhars": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"kirat_limbuwan": {
+"region": "as_south_asia_north",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Kirat Mundhum"
+]
+},
+"kumaon": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"ladakh": {
+"region": "as_south_asia_north",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism"
+]
+},
+"lo_mustang": {
+"region": "as_south_asia_north",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism (Sakya)"
+]
+},
+"manipur": {
+"region": "as_south_asia_north",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Sanamahi religion"
+]
+},
+"marwar": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"jain"
+],
+"source_texts": [
+"Hinduism",
+"Jainism"
+]
+},
+"mewar": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"jain",
+"asian_traditional"
+],
+"source_texts": [
+"Hinduism (Shaiva and Vaishnava)",
+"Jainism",
+"Bhil traditions"
+]
+},
+"mithila": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Hinduism (Smarta Brahmanical)",
+"Islam"
+]
+},
+"multan": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism"
+]
+},
+"naga_societies": {
+"region": "as_south_asia_north",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Naga religions"
+]
+},
+"nagaur": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "hindu",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism"
+]
+},
+"ne_hill_societies": {
+"region": "as_south_asia_north",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religions"
+]
+},
+"nepal_malla": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"vajrayana"
+],
+"source_texts": [
+"Hinduism",
+"Newar Vajrayana Buddhism"
+]
+},
+"punjab_hill_states": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"rajput_minor_states": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"jain"
+],
+"source_texts": [
+"Hinduism",
+"Jainism"
+]
+},
+"sikkim_lepcha": {
+"region": "as_south_asia_north",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Mun/Bongthing religion"
+]
+},
+"sindh": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism",
+"Sufism"
+]
+},
+"sirhind_lodi": {
+"region": "as_south_asia_north",
+"state_faith": "sunni",
+"people_majority": "hindu",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism"
+]
+},
+"sirmur": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"tripura": {
+"region": "as_south_asia_north",
+"state_faith": "hindu",
+"people_majority": "asian_traditional",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Hinduism",
+"Tripuri religion"
+]
+},
+"baglana": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"bahmani": {
+"region": "as_south_asia_south",
+"state_faith": "sunni",
+"people_majority": "hindu",
+"communities": [
+"shia",
+"hindu"
+],
+"source_texts": [
+"Sunni Islam",
+"Shia Islam",
+"Hinduism",
+"Sufi orders (Chishti, Qadiri)"
+]
+},
+"calicut": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"sunni",
+"catholic"
+],
+"source_texts": [
+"Hinduism",
+"Islam",
+"Christianity and Judaism"
+]
+},
+"champaner": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"chanda_gonds": {
+"region": "as_south_asia_south",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Gond religion"
+]
+},
+"cochin": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"catholic",
+"jewish",
+"sunni"
+],
+"source_texts": [
+"Hinduism",
+"Christianity (Syriac)",
+"Judaism",
+"Islam"
+]
+},
+"gajapati": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"asian_traditional",
+"sunni"
+],
+"source_texts": [
+"Vaishnava Hinduism (Jagannatha cult)",
+"Shaivism and Shaktism",
+"Adivasi religions",
+"Islam"
+]
+},
+"gondwana": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "asian_traditional",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Gond religion",
+"Hinduism"
+]
+},
+"gujarat": {
+"region": "as_south_asia_south",
+"state_faith": "sunni",
+"people_majority": "hindu",
+"communities": [
+"hindu",
+"jain",
+"shia",
+"minor_other"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism",
+"Jainism",
+"Ismaili Shia (Bohras)",
+"Zoroastrianism (Parsis)"
+]
+},
+"idar": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"jain"
+],
+"source_texts": [
+"Hinduism",
+"Jainism"
+]
+},
+"jaffna": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"sunni",
+"theravada"
+],
+"source_texts": [
+"Shaiva Hinduism",
+"Islam",
+"Buddhism"
+]
+},
+"junagadh": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"jain"
+],
+"source_texts": [
+"Hinduism",
+"Jainism"
+]
+},
+"kalahandi_bastar": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "asian_traditional",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Adivasi religions",
+"Hinduism"
+]
+},
+"kandy": {
+"region": "as_south_asia_south",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [],
+"source_texts": [
+"Theravada Buddhism"
+]
+},
+"kerala_minor_swaroopams": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"catholic",
+"sunni"
+],
+"source_texts": [
+"Hinduism",
+"Christianity",
+"Islam"
+]
+},
+"khandesh": {
+"region": "as_south_asia_south",
+"state_faith": "sunni",
+"people_majority": "hindu",
+"communities": [
+"hindu",
+"asian_traditional"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism",
+"Bhil religion"
+]
+},
+"kolathunadu": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Hinduism",
+"Islam"
+]
+},
+"konkan_chiefs": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"kotte": {
+"region": "as_south_asia_south",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"hindu",
+"sunni"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Hinduism",
+"Islam"
+]
+},
+"lakshadweep": {
+"region": "as_south_asia_south",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"malabar_muslim_merchants": {
+"region": "as_south_asia_south",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Shafii)"
+]
+},
+"maldives": {
+"region": "as_south_asia_south",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"malwa": {
+"region": "as_south_asia_south",
+"state_faith": "sunni",
+"people_majority": "hindu",
+"communities": [
+"hindu",
+"jain"
+],
+"source_texts": [
+"Sunni Islam",
+"Hinduism",
+"Jainism"
+]
+},
+"rachakonda": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"rajahmundry_reddi": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"ratanpur_haihaya": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Hinduism",
+"Adivasi religions"
+]
+},
+"saurashtra_kutch_chiefs": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"tenkasi_pandyas": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Shaiva Hinduism"
+]
+},
+"tulu_canara_chiefs": {
+"region": "as_south_asia_south",
+"state_faith": "jain",
+"people_majority": "hindu",
+"communities": [
+"hindu",
+"sunni"
+],
+"source_texts": [
+"Hinduism",
+"Jainism",
+"Islam"
+]
+},
+"valluvanad": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"vanni": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"theravada",
+"asian_traditional"
+],
+"source_texts": [
+"Hinduism",
+"Buddhism",
+"Vedda religion"
+]
+},
+"venad": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"catholic",
+"sunni"
+],
+"source_texts": [
+"Hinduism",
+"Christianity",
+"Islam"
+]
+},
+"vijayanagara": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"jain",
+"sunni",
+"asian_traditional"
+],
+"source_texts": [
+"Shaiva and Vaishnava Hinduism",
+"Jainism",
+"Islam",
+"Local and tribal deity cults"
+]
+},
+"vijayanagara_subordinate_chiefs": {
+"region": "as_south_asia_south",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hinduism"
+]
+},
+"western_india_forest_peoples": {
+"region": "as_south_asia_south",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Bhil religion and Hinduism"
+]
+},
+"bozhou": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Chinese popular religion and Buddhism",
+"Local traditions"
+]
+},
+"dughlat_kashgar": {
+"region": "as_china_inner_asia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"gelug_monasteries": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Gelug Buddhism"
+]
+},
+"guge": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism",
+"Bon"
+]
+},
+"gyantse": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism",
+"Bon"
+]
+},
+"haixi": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Shamanic traditions"
+]
+},
+"hami": {
+"region": "as_china_inner_asia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"mahayana"
+],
+"source_texts": [
+"Islam",
+"Buddhism"
+]
+},
+"jianzhou": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Shamanic traditions"
+]
+},
+"karmapa": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Karma Kagyu Buddhism"
+]
+},
+"lijiang": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [
+"vajrayana"
+],
+"source_texts": [
+"Dongba religion",
+"Tibetan Buddhism"
+]
+},
+"luchuan": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [
+"theravada"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Tai spirit cults"
+]
+},
+"miao_yao": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Ancestral and animist traditions"
+]
+},
+"ming": {
+"region": "as_china_inner_asia",
+"state_faith": "confucian_ritual",
+"people_majority": "mahayana",
+"communities": [
+"mahayana",
+"daoist",
+"sunni",
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"State ritual and Confucian orthodoxy (Cheng-Zhu)",
+"Buddhism (Chan and Pure Land; Tibetan Buddhism at court)",
+"Daoism and popular religion",
+"Islam",
+"Local animist and ancestral traditions"
+]
+},
+"northern_yuan": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "siberian_steppe_traditional",
+"communities": [
+"siberian_steppe_traditional"
+],
+"source_texts": [
+"Shamanic traditions",
+"Tibetan Buddhism"
+]
+},
+"oirat": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "siberian_steppe_traditional",
+"communities": [
+"siberian_steppe_traditional",
+"sunni"
+],
+"source_texts": [
+"Shamanic traditions",
+"Tibetan Buddhism",
+"Islam"
+]
+},
+"phagmodrupa": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism (several schools)",
+"Bon"
+]
+},
+"rinpungpa": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism",
+"Bon"
+]
+},
+"sakya": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism",
+"Bon"
+]
+},
+"shuixi": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Yi bimo religion"
+]
+},
+"taiwan_indigenous": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Animist traditions"
+]
+},
+"tibetan_kham_amdo": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism",
+"Bon"
+]
+},
+"tibetan_minor_lords": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [],
+"source_texts": [
+"Tibetan Buddhism",
+"Bon"
+]
+},
+"turpan": {
+"region": "as_china_inner_asia",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"mahayana"
+],
+"source_texts": [
+"Islam",
+"Buddhism"
+]
+},
+"tusi_group": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [
+"mahayana"
+],
+"source_texts": [
+"Local traditions",
+"Buddhism"
+]
+},
+"uriankhai": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Shamanic traditions"
+]
+},
+"western_guards": {
+"region": "as_china_inner_asia",
+"state_faith": "vajrayana",
+"people_majority": "vajrayana",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Tibetan Buddhism",
+"Islam"
+]
+},
+"wild_jurchens": {
+"region": "as_china_inner_asia",
+"state_faith": "siberian_steppe_traditional",
+"people_majority": "siberian_steppe_traditional",
+"communities": [],
+"source_texts": [
+"Shamanic and animist traditions"
+]
+},
+"wokou": {
+"region": "as_china_inner_asia",
+"state_faith": null,
+"people_majority": null,
+"communities": [],
+"source_texts": [
+"Mixed"
+]
+},
+"ainu": {
+"region": "as_japan_korea",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Ainu animist religion (kamuy, iyomante bear ceremony)"
+]
+},
+"akamatsu": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"ando": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"ashikaga": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Zen Buddhism (Rinzai Gozan)",
+"Tendai, Shingon and Nara schools",
+"Pure Land (Jōdo, Jōdo Shinshū, Ji) and Nichiren (Hokke)",
+"Kami worship (shrine cults)"
+]
+},
+"ashina": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"central_minor_houses": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"chiba": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"date": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"hatakeyama": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"honganji_temples": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [],
+"source_texts": [
+"Tendai (Enryakuji)",
+"Hossō (Kōfukuji)",
+"Shingon (Kōyasan, Negoro)",
+"Jōdo Shinshū (Honganji)"
+]
+},
+"hosokawa": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"imagawa": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"isshiki": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"ito": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"japan_imperial_court": {
+"region": "as_japan_korea",
+"state_faith": "shinto",
+"people_majority": "shinto",
+"communities": [
+"mahayana"
+],
+"source_texts": [
+"Shinto court ritual",
+"Buddhism"
+]
+},
+"joseon": {
+"region": "as_japan_korea",
+"state_faith": "confucian_ritual",
+"people_majority": "confucian_ritual",
+"communities": [
+"mahayana",
+"asian_traditional"
+],
+"source_texts": [
+"Neo-Confucianism (Cheng-Zhu)",
+"Buddhism (Seon and Gyo)",
+"Korean shamanism and local spirit cults"
+]
+},
+"kamakura_kubo": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"kanto_minor_houses": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"kikuchi": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"kitabatake": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"kokujin_ikki": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"kono": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"kyogoku": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"kyushu_minor_houses": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"nanbu": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"otomo": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"ouchi": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"rokkaku": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"ryukyu": {
+"region": "as_japan_korea",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"mahayana"
+],
+"source_texts": [
+"Ryukyuan indigenous religion (noro priestesses, utaki sacred groves)",
+"Buddhism (Zen from Japan)",
+"Chinese popular religion"
+]
+},
+"ryukyu_outer_islands": {
+"region": "as_japan_korea",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Ryukyuan indigenous religion"
+]
+},
+"satake": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"shiba": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"shimazu": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"shoni": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"so": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"southern_court_loyalists": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"takeda": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"togashi": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"tohoku_minor_houses": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"toki": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"uesugi": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"yamana": {
+"region": "as_japan_korea",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"shinto"
+],
+"source_texts": [
+"Buddhism (Zen, Tendai, Shingon, Pure Land, Nichiren schools)",
+"Kami worship (shrine cults)"
+]
+},
+"annamite_highland_peoples": {
+"region": "as_se_asia_mainland",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Animism"
+]
+},
+"ava": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Nat spirit cults"
+]
+},
+"ayutthaya": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"hindu",
+"sunni",
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Brahmanical court ritual",
+"Islam",
+"Spirit cults"
+]
+},
+"cambodia": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Brahmanical ritual"
+]
+},
+"champa": {
+"region": "as_se_asia_mainland",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"mahayana",
+"sunni"
+],
+"source_texts": [
+"Shaivite Hinduism",
+"Mahayana Buddhism",
+"Islam"
+]
+},
+"chin_kachin_hill": {
+"region": "as_se_asia_mainland",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Animism"
+]
+},
+"dai_viet": {
+"region": "as_se_asia_mainland",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [
+"confucian_ritual",
+"daoist",
+"asian_traditional"
+],
+"source_texts": [
+"Mahayana Buddhism",
+"Neo-Confucianism",
+"Daoism and spirit cults",
+"Animist and ancestor cults"
+]
+},
+"hanthawaddy": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Islam and Hinduism"
+]
+},
+"hsenwi": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"hsipaw": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"kale": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"kengtung": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"lan_na": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit cults"
+]
+},
+"lan_xang": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "asian_traditional",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"mogaung": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"mohnyin": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"mrauk_u": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Islam"
+]
+},
+"nan_phrae": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"phuan": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"prome": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [],
+"source_texts": [
+"Theravada Buddhism"
+]
+},
+"salween_hill_peoples": {
+"region": "as_se_asia_mainland",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"theravada"
+],
+"source_texts": [
+"Animism",
+"Theravada Buddhism"
+]
+},
+"shan_minor_states": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"sipsongpanna": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"sukhothai": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"tai_dam_muang": {
+"region": "as_se_asia_mainland",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"theravada"
+],
+"source_texts": [
+"Spirit and ancestor cults",
+"Theravada Buddhism"
+]
+},
+"toungoo": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [],
+"source_texts": [
+"Theravada Buddhism"
+]
+},
+"yawnghwe": {
+"region": "as_se_asia_mainland",
+"state_faith": "theravada",
+"people_majority": "theravada",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Theravada Buddhism",
+"Spirit (phi) cults"
+]
+},
+"ambon_hitu": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Local religion",
+"Islam"
+]
+},
+"aru": {
+"region": "as_se_asia_maritime",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Islam",
+"Batak and local traditions"
+]
+},
+"bacan": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Local religion",
+"Islam"
+]
+},
+"bali": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Balinese Hinduism (Shaiva-Buddhist)"
+]
+},
+"banda": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion and Islam"
+]
+},
+"banjar": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "asian_traditional",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Hindu-Javanese traditions",
+"Local religions"
+]
+},
+"batak": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Batak traditional religion"
+]
+},
+"bone": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"brunei": {
+"region": "as_se_asia_maritime",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"hindu"
+],
+"source_texts": [
+"Islam",
+"Hindu-Buddhist and local traditions"
+]
+},
+"buton": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"butuan": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"cebu": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"dayak_interior": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"east_sumatra_minor_polities": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local and Hindu-Buddhist traditions; Islam spreading"
+]
+},
+"eastern_lesser_sunda_societies": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"gowa": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"jailolo": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Local religion",
+"Islam"
+]
+},
+"jambi": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hindu-Buddhist and local traditions"
+]
+},
+"kedah": {
+"region": "as_se_asia_maritime",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"mahayana"
+],
+"source_texts": [
+"Islam (possibly)",
+"Buddhist and Hindu traditions"
+]
+},
+"kelantan": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local and Buddhist traditions; Islam spreading"
+]
+},
+"kutai": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hindu-Javanese and local traditions"
+]
+},
+"lombok_sumbawa": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local and Hindu-Javanese traditions"
+]
+},
+"luwu": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Bugis ancestral religion (pre-Islamic)"
+]
+},
+"majapahit": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"sunni",
+"asian_traditional"
+],
+"source_texts": [
+"Shaivism and Buddhism (Shiva-Buddha syncretism)",
+"Islam",
+"Local Javanese traditions"
+]
+},
+"malacca": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"sunni",
+"asian_traditional"
+],
+"source_texts": [
+"Sunni Islam (Shafi'i)",
+"Hindu-Buddhist traditions",
+"Animist and local traditions",
+"Hindu (Tamil, Gujarati) and Chinese religions"
+]
+},
+"malay_peninsula_minor_polities": {
+"region": "as_se_asia_maritime",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam spreading; local traditions"
+]
+},
+"maluku_other_societies": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"namayan": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"orang_asli": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"orang_laut": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"pagaruyung": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hindu-Buddhist court legacy and local adat religion"
+]
+},
+"pahang": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hindu-Buddhist and Theravada influence; local religion"
+]
+},
+"palembang": {
+"region": "as_se_asia_maritime",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Islam",
+"Chinese religion and Hindu-Buddhist traditions"
+]
+},
+"pattani": {
+"region": "as_se_asia_maritime",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [],
+"source_texts": [
+"Buddhist and local traditions; some Muslims"
+]
+},
+"pedir_lamuri": {
+"region": "as_se_asia_maritime",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Islam",
+"Local traditions"
+]
+},
+"philippine_lowland_polities": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Local religions",
+"Islam"
+]
+},
+"philippine_upland_societies": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"samudra_pasai": {
+"region": "as_se_asia_maritime",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Sunni Islam (Shafi'i)",
+"Local traditions"
+]
+},
+"south_sulawesi_minor_polities": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"sulawesi_upland_societies": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"sulu": {
+"region": "as_se_asia_maritime",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"asian_traditional"
+],
+"source_texts": [
+"Islam",
+"Local religion"
+]
+},
+"sumatra_other_societies": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"sunda": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Hindu-Buddhist and Sundanese ancestral religion",
+"Islam"
+]
+},
+"tanjungpura": {
+"region": "as_se_asia_maritime",
+"state_faith": "hindu",
+"people_majority": "hindu",
+"communities": [],
+"source_texts": [
+"Hindu-Javanese and local traditions"
+]
+},
+"ternate": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Moluccan local religion",
+"Islam"
+]
+},
+"tidore": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Local religion",
+"Islam"
+]
+},
+"timor": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"tondo": {
+"region": "as_se_asia_maritime",
+"state_faith": "asian_traditional",
+"people_majority": "asian_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"atlas_berbers": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Sunni Islam (Maliki) and local saints' cults",
+"Judaism"
+]
+},
+"beni_hassan_maqil": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"bougie": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Maliki)"
+]
+},
+"canarian_lordship": {
+"region": "af_north_sahara",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Latin Christianity",
+"Indigenous religion"
+]
+},
+"debdou": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Judaism"
+]
+},
+"fezzan": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"gran_canaria": {
+"region": "af_north_sahara",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religion"
+]
+},
+"hafsid": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"ibadi",
+"jewish",
+"catholic"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Ibadi Islam",
+"Judaism",
+"Latin Christianity"
+]
+},
+"hilali_sulaymi_arabs": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Maliki)"
+]
+},
+"hintata_marrakesh": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Judaism"
+]
+},
+"idrisid_sharifs_fez": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Maliki) and sharifian devotion"
+]
+},
+"kabyle": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Maliki) and marabout lineages"
+]
+},
+"la_palma": {
+"region": "af_north_sahara",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religion"
+]
+},
+"morocco": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Sufism and sharifism",
+"Judaism"
+]
+},
+"mzab": {
+"region": "af_north_sahara",
+"state_faith": "ibadi",
+"people_majority": "ibadi",
+"communities": [],
+"source_texts": [
+"Ibadi Islam"
+]
+},
+"portuguese_ceuta": {
+"region": "af_north_sahara",
+"state_faith": "catholic",
+"people_majority": "catholic",
+"communities": [],
+"source_texts": [
+"Latin Christianity"
+]
+},
+"sanhaja_zenaga": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Maliki)"
+]
+},
+"siwa": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"tenerife_menceyatos": {
+"region": "af_north_sahara",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Guanche indigenous religion"
+]
+},
+"tlemcen": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Judaism"
+]
+},
+"touggourt_ouargla": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"ibadi"
+],
+"source_texts": [
+"Sunni Islam",
+"Ibadi Islam"
+]
+},
+"tripoli_regency": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"ibadi",
+"jewish"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Ibadi Islam",
+"Judaism"
+]
+},
+"tuareg_kel_ajjer": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"tuat": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"jewish"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Judaism"
+]
+},
+"tubu_teda": {
+"region": "af_north_sahara",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Local beliefs"
+]
+},
+"air_agadez": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam"
+]
+},
+"akan_forest": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Akan religion"
+]
+},
+"allada_tado": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Vodun religions"
+]
+},
+"bambuk": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Traditional religion",
+"Islam"
+]
+},
+"baol": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Islam",
+"Traditional religion"
+]
+},
+"begho": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Akan and local religions"
+]
+},
+"benin": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Edo religion"
+]
+},
+"bijagos": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religion"
+]
+},
+"biram": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Hausa traditional religion (Maguzanci)"
+]
+},
+"bono": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Akan religion"
+]
+},
+"borgu": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Traditional religion",
+"Islam"
+]
+},
+"bornu": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Local traditional religions"
+]
+},
+"bulala": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Traditional"
+]
+},
+"cross_river_societies": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religions"
+]
+},
+"dagbon": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Traditional religion",
+"Islam"
+]
+},
+"daura": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Hausa traditional religion (Maguzanci)"
+]
+},
+"diara": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam and traditional"
+]
+},
+"djenne": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam"
+]
+},
+"fulbe_pastoralists": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Traditional"
+]
+},
+"gambia_mandinka_kingdoms": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Islam",
+"Traditional"
+]
+},
+"gobir": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Hausa traditional religion (Maguzanci)"
+]
+},
+"gurma": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religion"
+]
+},
+"ife": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Yoruba religion (orisa)",
+"Islam"
+]
+},
+"igala": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Igala religion"
+]
+},
+"igbo_societies": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Odinani"
+]
+},
+"ijaw_delta": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Ijaw religion"
+]
+},
+"ijebu": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Yoruba religion (orisa)",
+"Islam"
+]
+},
+"jolof": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Wolof traditional religion"
+]
+},
+"kaabu": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Mande traditional religion",
+"Islam"
+]
+},
+"kano": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Hausa traditional religion (Maguzanci)"
+]
+},
+"katsina": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Hausa traditional religion (Maguzanci)"
+]
+},
+"kayor": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Islam",
+"Traditional religion"
+]
+},
+"kotoko": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religion"
+]
+},
+"kwararafa": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Jukun religion"
+]
+},
+"mali": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Sunni Islam (Maliki)",
+"Mande traditional religion"
+]
+},
+"mamprusi": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Traditional religion",
+"Islam"
+]
+},
+"mandara": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religion"
+]
+},
+"mande_kafus": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Mande traditional religion",
+"Islam"
+]
+},
+"massina_fulbe": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam and traditional"
+]
+},
+"middle_belt_societies": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religions"
+]
+},
+"mossi_ouagadougou": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Mossi traditional religion",
+"Islam"
+]
+},
+"nri": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Odinani (Igbo religion)"
+]
+},
+"nupe": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religion"
+]
+},
+"owu": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Yoruba religion (orisa)",
+"Islam"
+]
+},
+"oyo": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Yoruba religion (orisa)",
+"Islam"
+]
+},
+"rano": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Hausa traditional religion (Maguzanci)"
+]
+},
+"sine": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Serer religion",
+"Islam"
+]
+},
+"songhai": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Songhai traditional religion"
+]
+},
+"southern_rivers_peoples": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religions"
+]
+},
+"takrur_futa_toro": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam"
+]
+},
+"timbuktu": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Maliki)"
+]
+},
+"timbuktu_tuareg": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam"
+]
+},
+"upper_guinea_coast": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religions"
+]
+},
+"voltaic_stateless_societies": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religions"
+]
+},
+"waalo": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Islam",
+"Traditional religion"
+]
+},
+"walata": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Islam"
+]
+},
+"windward_coast_peoples": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Indigenous religions"
+]
+},
+"yoruba_minor_states": {
+"region": "af_west",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Yoruba religion"
+]
+},
+"zamfara": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Hausa traditional religion (Maguzanci)"
+]
+},
+"zazzau": {
+"region": "af_west",
+"state_faith": "sunni",
+"people_majority": "african_traditional",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Islam",
+"Hausa traditional religion (Maguzanci)"
+]
+},
+"adal": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Shafi'i)"
+]
+},
+"afar_dankali": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"ajuran": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"alodia": {
+"region": "af_northeast_east",
+"state_faith": "oriental_christian",
+"people_majority": "oriental_christian",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Nubian Christianity",
+"Islam"
+]
+},
+"ankole": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religions"
+]
+},
+"bale": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Sunni Islam",
+"Traditional religions"
+]
+},
+"banu_kanz": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"barawa": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"beja": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"beta_israel": {
+"region": "af_northeast_east",
+"state_faith": "jewish",
+"people_majority": "jewish",
+"communities": [],
+"source_texts": [
+"Beta Israel Judaism"
+]
+},
+"buganda": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religion (lubaale)"
+]
+},
+"dahlak": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"damot": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Traditional religions",
+"Orthodox Christianity"
+]
+},
+"darfur_tunjur": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"sunni",
+"oriental_christian"
+],
+"source_texts": [
+"Traditional religions",
+"Islam",
+"Christian influences"
+]
+},
+"dawaro": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Sunni Islam",
+"Orthodox Christianity"
+]
+},
+"dotawo": {
+"region": "af_northeast_east",
+"state_faith": "oriental_christian",
+"people_majority": "oriental_christian",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Nubian Christianity",
+"Islam"
+]
+},
+"ethiopia": {
+"region": "af_northeast_east",
+"state_faith": "oriental_christian",
+"people_majority": "oriental_christian",
+"communities": [
+"sunni",
+"jewish",
+"african_traditional"
+],
+"source_texts": [
+"Orthodox Tewahedo Christianity",
+"Islam",
+"Beta Israel Judaism",
+"Traditional religions"
+]
+},
+"hadiya": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Sunni Islam",
+"Traditional religions"
+]
+},
+"juhayna_arabs": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"kaffa": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [
+"orthodox"
+],
+"source_texts": [
+"Traditional religion",
+"Orthodox Christianity"
+]
+},
+"karagwe": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religions"
+]
+},
+"kilwa": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam (Shafi'i)"
+]
+},
+"kitara": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religions (Chwezi spirit cult)"
+]
+},
+"lamu": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"maasai_kenya_highlands": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religions"
+]
+},
+"mafia": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"malindi": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"medri_bahri": {
+"region": "af_northeast_east",
+"state_faith": "orthodox",
+"people_majority": "orthodox",
+"communities": [
+"sunni"
+],
+"source_texts": [
+"Orthodox Christianity",
+"Islam"
+]
+},
+"mogadishu": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"mombasa": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"mozambique_island": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"nilotic_pastoralists": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religions"
+]
+},
+"oromo": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Waaqeffanna (traditional)"
+]
+},
+"pate": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"rwanda": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religion (Imana, ancestor cults)"
+]
+},
+"sidama_omotic_kingdoms": {
+"region": "af_northeast_east",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Traditional religions"
+]
+},
+"sofala": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"swahili_lesser_towns": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"warsangali": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"zanzibar": {
+"region": "af_northeast_east",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"comoros": {
+"region": "af_central_south",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [],
+"source_texts": [
+"Sunni Islam"
+]
+},
+"delagoa_lowland_chiefdoms": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"equatorial_forest_societies": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religions (ancestors, forest spirits)"
+]
+},
+"great_zimbabwe": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Shona religion (Mwari, ancestors, mhondoro spirits)"
+]
+},
+"kakongo": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion (nkisi, territorial spirits, sacral kingship)"
+]
+},
+"khoikhoi": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Khoe religion (Tsui-Goab)"
+]
+},
+"kongo": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Kongo religion (ancestors, territorial spirits, nkisi)"
+]
+},
+"kunene_peoples": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion (ancestors)"
+]
+},
+"kwango_kasai_societies": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religions (ancestors, nature spirits, chiefly ritual)"
+]
+},
+"lake_malawi_peoples": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion (rain shrines, ancestors)"
+]
+},
+"loango": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Vili religion (nkisi, territorial spirits, sacral kingship)"
+]
+},
+"luba": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion (ancestors, chiefly ritual)"
+]
+},
+"madagascar_coast": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Malagasy religion"
+]
+},
+"madagascar_highlands": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Malagasy religion (ancestors, razana)"
+]
+},
+"madagascar_north_trading_towns": {
+"region": "af_central_south",
+"state_faith": "sunni",
+"people_majority": "sunni",
+"communities": [
+"african_traditional"
+],
+"source_texts": [
+"Sunni Islam",
+"Malagasy religion"
+]
+},
+"makua_lomwe": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"manyika": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Shona religion"
+]
+},
+"mbundu_chiefdoms": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Mbundu religion (ancestors, lineage shrines, sacred objects of titles)"
+]
+},
+"mutapa": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Shona religion (Mwari, mhondoro royal ancestral spirits)"
+]
+},
+"ngoyo": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion (nkisi, territorial spirits, sacral kingship)"
+]
+},
+"nguni": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Nguni religion (ancestors)"
+]
+},
+"ovimbundu_central_angola": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion (ancestors, land spirits)"
+]
+},
+"san": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"San religion (trance dance)"
+]
+},
+"sotho_tswana": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion (ancestors)"
+]
+},
+"thulamela": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"tio": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Teke religion; national spirit Nkwe Mbali"
+]
+},
+"tonga_zambezi": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Local religion (rain shrines, ancestors)"
+]
+},
+"torwa": {
+"region": "af_central_south",
+"state_faith": "african_traditional",
+"people_majority": "african_traditional",
+"communities": [],
+"source_texts": [
+"Shona religion (Mwari)"
+]
+},
+"abenaki_wabanaki": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Wabanaki religion (Gluskabe traditions)"
+]
+},
+"apachean": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Athabaskan religion"
+]
+},
+"apalachee": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mississippian religion; ball game ritual"
+]
+},
+"beothuk": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Beothuk religion (red ochre ritual)"
+]
+},
+"caddo": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Caddo religion (Caddi Ayo; temple fire)"
+]
+},
+"california_peoples": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Kuksu, World Renewal, Chinigchinich and other traditions"
+]
+},
+"calusa": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Calusa religion (three souls, temple at Mound Key)"
+]
+},
+"casqui_pacaha": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mississippian religion"
+]
+},
+"chumash": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Chumash religion ('antap, rock art)"
+]
+},
+"coast_salish": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Spirit dancing, guardian spirits"
+]
+},
+"cofitachequi": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mississippian religion"
+]
+},
+"coosa": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mississippian religion (Southeastern Ceremonial Complex legacy, busk/green corn ceremonies inferred)"
+]
+},
+"dene": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Dene religion"
+]
+},
+"fort_ancient": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"great_basin": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Basin religions"
+]
+},
+"greenland_inuit": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Inuit religion"
+]
+},
+"haudenosaunee": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Haudenosaunee religion: Creator and Sky World traditions, thanksgiving address, condolence ritual, medicine societies"
+]
+},
+"hopi": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Hopi religion (katsinas)"
+]
+},
+"innu_cree": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Boreal Algonquian religion (shaking tent, animal masters)"
+]
+},
+"inuit_thule": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Inuit religion (Sedna, angakkuit)"
+]
+},
+"lenape": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Lenape religion (Creator, manitowak, Big House ceremony; antiquity of the latter uncertain)"
+]
+},
+"mandan_hidatsa": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mandan religion (Okipa ceremony later)"
+]
+},
+"mikmaq": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mi'kmaq religion (Kluskap traditions, puoinaq shamans)"
+]
+},
+"moundville": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mississippian religion"
+]
+},
+"natchez_plaquemine": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mississippian religion (sacred fire, sun cult later documented)"
+]
+},
+"neutral_erie": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Iroquoian religion"
+]
+},
+"ojibwe_anishinaabe": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Anishinaabe religion; Midewiwin society (antiquity debated)"
+]
+},
+"oneota": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"oodham": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"pacific_northwest": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Northwest Coast religion"
+]
+},
+"paquime": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religion with Mesoamerican elements"
+]
+},
+"pawnee_plains_villagers": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Plains Caddoan religion (star lore, sacred bundles; later)"
+]
+},
+"plains_nomads": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Plains religions"
+]
+},
+"plateau_peoples": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Plateau religion (guardian spirits)"
+]
+},
+"powhatan_precursors": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Algonquian religion with temples (quioccosan) and priests"
+]
+},
+"pueblo_rio_grande": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Pueblo religion: katsinas, kivas, medicine societies"
+]
+},
+"southeast_interior_other": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mississippian and other local religions"
+]
+},
+"southern_new_england_algonquians": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Algonquian religion (Kiehtan/Cautantowwit, manitou, powwaw shamans)"
+]
+},
+"st_lawrence_iroquoians": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local Iroquoian religion"
+]
+},
+"susquehannock": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Iroquoian religion (inferred)"
+]
+},
+"timucua": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Timucua religion"
+]
+},
+"tlingit_haida": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Northwest Coast religion"
+]
+},
+"wakashan": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Winter ceremonials"
+]
+},
+"wendat": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Wendat religion (Aataentsic and Iouskeha creation traditions, Feast of the Dead ossuary burials)"
+]
+},
+"yupik_unangan": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Arctic religions"
+]
+},
+"zuni": {
+"region": "am_north",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Zuni religion (katsinas, priesthoods)"
+]
+},
+"acalan": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Yucatec Maya religion (Itzamna, Chaak, Kukulkan cults, Ix Chel pilgrimage at Cozumel)"
+]
+},
+"boriken": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Taíno religion (cemí cult, behique shamans, areíto)"
+]
+},
+"chalco": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"chiapas_highland": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"chichimeca": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religious traditions"
+]
+},
+"cholula": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Quetzalcoatl cult"
+]
+},
+"chorotega": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion (Nahua-related pantheon among Pipil and Nicarao)"
+]
+},
+"cohuixco": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"coixtlahuaca": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"cuba_taino": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Taíno religion (cemí cult, behique shamans, areíto)"
+]
+},
+"cuzcatlan": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion (Nahua-related pantheon among Pipil and Nicarao)"
+]
+},
+"eastern_highland_maya": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Highland Maya religion (K'iche' patron deities such as Tohil)"
+]
+},
+"guanahatabey": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": null,
+"people_majority": null,
+"communities": [],
+"source_texts": [
+"Unknown"
+]
+},
+"higuey": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Taíno religion (cemí cult, behique shamans, areíto)"
+]
+},
+"huastec": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"huexotzinco": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"isthmo_colombian": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Isthmo-Colombian religious traditions (shamans, ancestor and animal spirits)"
+]
+},
+"itza": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Maya religion"
+]
+},
+"jamaica_taino": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Taíno religion (cemí cult, behique shamans, areíto)"
+]
+},
+"jaragua": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Taíno religion (cemí cult, behique shamans, areíto)"
+]
+},
+"kalinago": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Kalinago religion"
+]
+},
+"kaqchikel": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Highland Maya religion (K'iche' patron deities such as Tohil)"
+]
+},
+"kiche": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Highland Maya religion (K'iche' patron deities such as Tohil)"
+]
+},
+"lakandon_chol": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Maya religion"
+]
+},
+"lenca": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Isthmo-Colombian religious traditions (shamans, ancestor and animal spirits)"
+]
+},
+"lucayan": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Taíno religion (cemí cult, behique shamans, areíto)"
+]
+},
+"magua": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Taíno religion (cemí cult, behique shamans, areíto)"
+]
+},
+"maguana": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Taíno religion (cemí cult, behique shamans, areíto)"
+]
+},
+"mam": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Highland Maya religion (K'iche' patron deities such as Tohil)"
+]
+},
+"marien": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Taíno religion (cemí cult, behique shamans, areíto)"
+]
+},
+"matlatzinca": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"maya_chetumal": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Yucatec Maya religion (Itzamna, Chaak, Kukulkan cults, Ix Chel pilgrimage at Cozumel)"
+]
+},
+"maya_cupul": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Yucatec Maya religion (Itzamna, Chaak, Kukulkan cults, Ix Chel pilgrimage at Cozumel)"
+]
+},
+"maya_ecab": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Yucatec Maya religion (Itzamna, Chaak, Kukulkan cults, Ix Chel pilgrimage at Cozumel)"
+]
+},
+"maya_mani_xiu": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Yucatec Maya religion (Itzamna, Chaak, Kukulkan cults, Ix Chel pilgrimage at Cozumel)"
+]
+},
+"maya_other_kuchkabal": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Yucatec Maya religion (Itzamna, Chaak, Kukulkan cults, Ix Chel pilgrimage at Cozumel)"
+]
+},
+"maya_sotuta_cocom": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Yucatec Maya religion (Itzamna, Chaak, Kukulkan cults, Ix Chel pilgrimage at Cozumel)"
+]
+},
+"metztitlan": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"mixteca_alta": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"nicarao": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion (Nahua-related pantheon among Pipil and Nicarao)"
+]
+},
+"oaxaca_mountain_peoples": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"pech_mayangna": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Isthmo-Colombian religious traditions (shamans, ancestor and animal spirits)"
+]
+},
+"potonchan": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Yucatec Maya religion (Itzamna, Chaak, Kukulkan cults, Ix Chel pilgrimage at Cozumel)"
+]
+},
+"purepecha": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Purépecha religion (Curicaueri)",
+"Local deities of conquered groups"
+]
+},
+"soconusco": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"tenochtitlan": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion, with Huitzilopochtli as Mexica patron"
+]
+},
+"tepeaca": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"texcoco": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"tlachinollan": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"tlacopan": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"tlatelolco": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"tlaxcala": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion",
+"Camaxtli (Mixcoatl) cult"
+]
+},
+"totonacapan": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"trinidad_tobago_peoples": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"triple_alliance": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion (Huitzilopochtli, Tlaloc, Tezcatlipoca, Quetzalcoatl cults)"
+]
+},
+"tututepec": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"tzutujil": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Highland Maya religion (K'iche' patron deities such as Tohil)"
+]
+},
+"west_mexico_chiefdoms": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"yopitzinco": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion (Xipe Totec)"
+]
+},
+"zaachila": {
+"region": "am_mesoamerica_caribbean",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mesoamerican religion"
+]
+},
+"altiplano_lordships": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion"
+]
+},
+"arawak_guianas": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Lokono religion"
+]
+},
+"atacameno": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion"
+]
+},
+"cajamarca": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion"
+]
+},
+"canari": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local Andean religion"
+]
+},
+"caquetio": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Caquetío religion"
+]
+},
+"carib_mainland": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Kari'na religion with piai shamans"
+]
+},
+"cauca_chiefdoms": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"central_amazon_chiefdoms": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"central_coast_lordships": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean coastal religion"
+]
+},
+"central_highland_chiefdoms": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion; Catequil oracle at Huamachuco"
+]
+},
+"chachapoya": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local Andean religion"
+]
+},
+"chaco_peoples": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Various religions"
+]
+},
+"chanka": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion"
+]
+},
+"charcas_qaraqara": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion"
+]
+},
+"charrua": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Charrúa religion"
+]
+},
+"chibcha_other": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"chimor": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean coastal religion with moon cult and ancestor shrines"
+]
+},
+"chincha": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean coastal religion"
+]
+},
+"colla": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion with lake and mountain huacas and ancestor cults (chullpa)"
+]
+},
+"cuyo_cordoba_peoples": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"diaguita": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion"
+]
+},
+"guarani": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Guaraní religion with prophet-shamans"
+]
+},
+"huanca": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion with Wari Willka shrine"
+]
+},
+"inca": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion with the cult of the Sun (Inti) and Viracocha",
+"Huaca and ancestor cults"
+]
+},
+"lupaca": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Andean religion"
+]
+},
+"manta_huancavilca": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local Andean religion"
+]
+},
+"mapuche": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Mapuche religion (machi shamans, ngillatun)"
+]
+},
+"marajoara": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Ancestor and mortuary cults"
+]
+},
+"montana_peoples": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local Andean religion"
+]
+},
+"moxos": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"muisca_bacata": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Muisca religion (Sué, Chía, Bochica; lake shrines such as Guatavita)"
+]
+},
+"muisca_hunza": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Muisca religion (Sué, Chía, Bochica; lake shrines such as Guatavita)"
+]
+},
+"muisca_iraca": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Muisca religion (Sué, Chía, Bochica; lake shrines such as Guatavita)"
+]
+},
+"muisca_tundama": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Muisca religion (Sué, Chía, Bochica; lake shrines such as Guatavita)"
+]
+},
+"omagua": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Omagua religion"
+]
+},
+"orinoco_llanos_peoples": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religions"
+]
+},
+"puruha": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local Andean religion"
+]
+},
+"quimbaya": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religion"
+]
+},
+"quitu_cara": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local Andean religion"
+]
+},
+"selknam": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Selk'nam religion"
+]
+},
+"tairona": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Tairona religion with priestly specialists"
+]
+},
+"tapajos": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Tapajó religion with ancestor cults"
+]
+},
+"tapuia_je": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Various religions"
+]
+},
+"tehuelche": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Tehuelche religion"
+]
+},
+"timoto_cuica": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Local religion with mountain shrines"
+]
+},
+"tupinamba": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Tupi religion with shamans (pajé) and prophets (karaí)"
+]
+},
+"upper_xingu": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Xinguano ritual system"
+]
+},
+"yaghan_kawesqar": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Yámana and Kawésqar religions"
+]
+},
+"ychsma": {
+"region": "am_south",
+"state_faith": "indigenous_american",
+"people_majority": "indigenous_american",
+"communities": [],
+"source_texts": [
+"Pachacamac cult"
+]
+},
+"zenu": {
+"region": "am_south",
+"state_faith": "mahayana",
+"people_majority": "mahayana",
+"communities": [],
+"source_texts": [
+"Zenú religion with ancestor and temple cults"
+]
+},
+"aboriginal_north": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Aboriginal religious law: Dreaming ancestors, sacred sites, ceremony and songlines (regionally diverse)"
+]
+},
+"aboriginal_southeast": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Aboriginal religious law: Dreaming ancestors, sacred sites, ceremony and songlines (regionally diverse)"
+]
+},
+"aboriginal_tasmania": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Aboriginal religious law: Dreaming ancestors, sacred sites, ceremony and songlines (regionally diverse)"
+]
+},
+"aboriginal_west_central": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Aboriginal religious law: Dreaming ancestors, sacred sites, ceremony and songlines (regionally diverse)"
+]
+},
+"aotearoa_north": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Māori religion: atua (Tāne, Tangaroa, Rongo, Tū), tapu and mana, tohunga"
+]
+},
+"aotearoa_south": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Māori religion"
+]
+},
+"bismarck_archipelago": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Local religions (e.g. malagan mortuary cults of New Ireland, documented later)"
+]
+},
+"central_carolines": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Micronesian and Polynesian religions"
+]
+},
+"cook_islands": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Polynesian religion; marae"
+]
+},
+"east_polynesia_minor": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Polynesian religions"
+]
+},
+"fiji": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Fijian religion: ancestral gods (kalou vu), priests (bete), spirit houses"
+]
+},
+"hawaii_island": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Hawaiian religion: akua (Kū, Lono, Kāne, Kanaloa), heiau temples, kapu system"
+]
+},
+"kauai": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Hawaiian religion: akua (Kū, Lono, Kāne, Kanaloa), heiau temples, kapu system"
+]
+},
+"kosrae": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Kosraean religion: deities and spirits; chiefly ritual"
+]
+},
+"marianas_chamorro": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Chamorro religion: ancestor spirits (taotaomo'na), makåhna specialists"
+]
+},
+"marquesas": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Polynesian religion; tau'a inspirational priests"
+]
+},
+"marshall": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Marshallese religion"
+]
+},
+"maui": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Hawaiian religion: akua (Kū, Lono, Kāne, Kanaloa), heiau temples, kapu system"
+]
+},
+"moriori": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Moriori religion (Polynesian-derived)"
+]
+},
+"new_caledonia": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Kanak religion; ancestors and clan totems"
+]
+},
+"new_guinea_coasts": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Local religions, ancestor and spirit cults (e.g. Sepik men's house cults)"
+]
+},
+"new_guinea_highlands": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Local religions: ancestral spirits, fertility cults, sorcery beliefs"
+]
+},
+"oahu": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Hawaiian religion: akua (Kū, Lono, Kāne, Kanaloa), heiau temples, kapu system"
+]
+},
+"palau": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Palauan religion"
+]
+},
+"pohnpei_saudeleur": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Pohnpeian religion: Nahnisohn Sahpw (thunder god, tied to the Isokelekel tradition), ancestral and nature spirits"
+]
+},
+"rapa_nui": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Rapanui religion: ancestor veneration expressed in moai and ahu; Makemake (prominent later)"
+]
+},
+"samoa": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Samoan religion: Tagaloa, family and village atua, aitu spirits"
+]
+},
+"solomons": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Local religions; ancestral skull shrines (New Georgia)"
+]
+},
+"tahiti": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Polynesian religion: Taʻaroa, Tāne, later ʻOro (ascendancy date uncertain); marae worship"
+]
+},
+"torres_strait": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Island religions; hero cults (Malo-Bomai)"
+]
+},
+"tuii_tonga": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Tongan religion: Tangaloa and other atua, ancestral spirits, chiefly sanctity (tapu, mana)"
+]
+},
+"tuvalu_kiribati": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Micronesian and Polynesian religions"
+]
+},
+"uvea_futuna": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Polynesian religion"
+]
+},
+"vanuatu": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Local religions; grade rituals"
+]
+},
+"west_polynesia_minor": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Polynesian religions"
+]
+},
+"yap": {
+"region": "oc_oceania",
+"state_faith": "pacific_traditional",
+"people_majority": "pacific_traditional",
+"communities": [],
+"source_texts": [
+"Yapese and Carolinian religions; Yapese sorcery as an instrument of power"
+]
+}
+}

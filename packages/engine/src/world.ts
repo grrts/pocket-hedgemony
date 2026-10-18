@@ -1,6 +1,26 @@
 import type { GameDate, Ground, Ruleset } from "@ph/rules";
-import { groundOf, monthlyRations, type MarchMap } from "./march.ts";
+import { groundOf, rowWidths, wagonRations, type MarchMap, type TileMarch } from "./march.ts";
+import { placeClimate, provinceTemperature, type PlaceClimate } from "./climate.ts";
+import { pointTileGrid, type TileGrid } from "./tiles.ts";
 import { Rng } from "./rng.ts";
+import type { Diplomacy } from "./domain/diplomacy/index.ts";
+import { createWarState, maxGarrison, type Battle, type PeaceOffer, type SiegeState } from "./war.ts";
+import { newCommander, type Commander } from "./domain/warfare/index.ts";
+import { createTreasuryState, runLedger, type TreasuryState } from "./treasury.ts";
+import { createFoodState, seedStores, type FoodState } from "./food.ts";
+import { createMoodState, type MoodState } from "./moods.ts";
+import { byDistance, createLordState, seedLords, type LordState } from "./lords.ts";
+import { mix, personName } from "./names.ts";
+import { realmConfig } from "./domain/realm/index.ts";
+import { createLivingState, seedClasses, type LivingState } from "./living.ts";
+import { addCommander, ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
+import { seedOfficials } from "./officials.ts";
+import { createResearchState, seedResearch, type ResearchState } from "./research.ts";
+import { createWorksState, seedWorks, type WorksState } from "./works.ts";
+import { createLandState, seedLand, type LandState } from "./land.ts";
+import { createConversionState, type ConversionState } from "./conversion.ts";
+import { syncCountries } from "./statecraft.ts";
+import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -8,11 +28,26 @@ import { Rng } from "./rng.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState {
   rules: Ruleset;
+  /** Weeks played. */
   turn: number;
   date: GameDate;
+  /** 4-hour step of the day, 0 to 5 (STEPS_PER_DAY). */
+  step: number;
+  /** Days played. */
+  day: number;
   rng: Rng;
+  /** The game's seed for its weather rolls (hard winters), apart from `rng` so a roll there never shifts the rest of the turn. */
+  weatherSeed: number;
+
+  /** The map's tiles, which armies stand and march on. */
+  tiles: TileGrid;
+  /** East-west size of a tile on each row of the map. */
+  rowWidth: Float32Array;
+  /** What each province's weather depends on, and its sea-level temperature today (°C). */
+  provincePlace: PlaceClimate[];
+  provinceTemperature: Float32Array;
 
   provinceCount: number;
   provinceIds: string[];
@@ -40,28 +75,110 @@ export interface World {
   commanderIds: string[];
   commanderOwner: Int16Array;
   commanderLogistics: Int8Array;
+  /** Each commander as the warfare context sees him: skills, victories and defeats grow with his battles. */
+  commanders: Commander[];
 
   armies: ArmyPool;
+
+  /** The nation the player rules, or -1; the AI leaves it alone. */
+  player: number;
+  /** Who is at war, allied, under truce or subject: the diplomacy context's state. */
+  diplomacy: Diplomacy;
+  /** Nation occupying each province in a war, -1 = none. */
+  provinceOccupier: Int16Array;
+  /** Days a hostile army has held a province without walls. */
+  provinceHold: Uint8Array;
+  /** Realm that began holding each province (the first to arrive takes it, Leroy F-45), -1 = none. */
+  provinceHoldBy: Int16Array;
+  /** Men behind each province's walls. */
+  provinceGarrison: Float32Array;
+  sieges: Map<number, SiegeState>;
+  /** Battles being fought, round by round. */
+  battles: Battle[];
+  battleSeq: number;
+  /** Peace the AI offers the player, waiting for an answer until the next month. */
+  peaceOffers: PeaceOffer[];
+  /** 1 once a nation has lost all its land. */
+  nationGone: Uint8Array;
+
+  /** Men who can be called in each province now (recruiting: Recruits here), and the most there can be. */
+  provinceRecruits: Float32Array;
+  provinceRecruitCeiling: Float32Array;
+  /** Troop cap per nation (warfare WAR-029) and the men counting toward it. */
+  nationTroopCap: Float64Array;
+  nationCapUsed: Float64Array;
+  /** Men called up in provinces, gathering a thousand at a time. */
+  musters: Muster[];
+  /** Mercenary companies on their way. */
+  mercs: Mercenary[];
+  /** Free companies for hire, shared by every realm that can reach them. */
+  freeCompanies: FreeCompany[];
+  /** Number of the last free company drawn. */
+  freeCompanySeq: number;
+  /** Official of each province (index into OFFICIALS), -1 = his post stands empty. */
+  provinceOfficial: Int8Array;
+  /** Province each official's name comes from: it goes with him when he moves (officials.ts). */
+  provinceOfficialSeed: Int16Array;
+  /** Day (world.day) the official at each post took it up; his years served count from it. */
+  provinceOfficialSince: Int32Array;
+  /** Province each commander was commissioned from, -1 = none. */
+  commanderHome: number[];
+  /** Name seed of each commander commissioned from an official, -1 = none. */
+  commanderSeed: number[];
 }
 
 export interface ArmyPool {
   count: number; // high-water mark; slots below it may be dead
   alive: Uint8Array;
   owner: Int16Array;
+  /** Province the army stands in (the province of its tile). */
   location: Int32Array;
+  /** Tile the army stands on. */
+  tile: Int32Array;
   men: Int32Array;
   commander: Int32Array; // -1 = none
   /** Men on horseback, counted within men. */
   horse: Int32Array;
   /** Rations in the army's wagons. */
   food: Float64Array;
-  /** Days already marched toward the next province on the route. */
-  progress: Float32Array;
-  movedThisTurn: Uint8Array;
   /** Provinces still to march through, in order. */
   route: number[][];
-  /** Provinces walked last turn, starting where the army set out (for drawing the march). */
-  marched: number[][];
+  /** Tiles planned ahead, walked from pathAt on (a route is walked a province at a time when it isn't planned through). */
+  path: Int32Array[];
+  pathAt: Int32Array;
+  /** Hours already walked toward the next tile. */
+  progress: Float32Array;
+  /** Tiles stepped onto since the UI last looked, for drawing the march. */
+  trail: number[][];
+  /** 1 while a beaten army falls back: it can't be caught or given orders until it gets there. */
+  retreating: Uint8Array;
+  /** Battle the army is fighting in (its id), or -1. */
+  battle: Int32Array;
+  /** The province the army last marched in from (-1 = none): the way back past an enemy castle. */
+  cameFrom: Int32Array;
+  /** Company kind: levy or hired (see KIND). */
+  kind: Uint8Array;
+  /** Months since the men were raised (a levy's pay begins in the fourth). */
+  monthsOut: Uint16Array;
+  /** Months drilled together (0 untrained, 3 trained). */
+  drill: Float32Array;
+  /** Shares of the foot by arm (FOOT_ARMS) and of the horse by arm (HORSE_ARMS), ARMS.length per army. */
+  mix: Float32Array;
+  /** Arm being trained (index into ARMS, -1 = none), men in training and months left. */
+  trainArm: Int8Array;
+  trainMen: Int32Array;
+  trainLeft: Float32Array;
+}
+
+/** How an army's men split by arm and what kind of company they are. */
+export interface ArmyMake {
+  kind?: number;
+  /** Tile to stand on, in the province (else its centre). */
+  tile?: number;
+  drill?: number;
+  /** Arm of the foot and of the horse. */
+  foot?: string;
+  horseArm?: string;
 }
 
 export function createArmyPool(capacity: number): ArmyPool {
@@ -70,18 +187,41 @@ export function createArmyPool(capacity: number): ArmyPool {
     alive: new Uint8Array(capacity),
     owner: new Int16Array(capacity),
     location: new Int32Array(capacity),
+    tile: new Int32Array(capacity),
     men: new Int32Array(capacity),
     commander: new Int32Array(capacity).fill(-1),
     horse: new Int32Array(capacity),
     food: new Float64Array(capacity),
-    progress: new Float32Array(capacity),
-    movedThisTurn: new Uint8Array(capacity),
     route: Array.from({ length: capacity }, () => []),
-    marched: Array.from({ length: capacity }, () => []),
+    path: Array.from({ length: capacity }, () => NO_PATH),
+    pathAt: new Int32Array(capacity),
+    progress: new Float32Array(capacity),
+    trail: Array.from({ length: capacity }, () => []),
+    retreating: new Uint8Array(capacity),
+    battle: new Int32Array(capacity).fill(-1),
+    cameFrom: new Int32Array(capacity).fill(-1),
+    kind: new Uint8Array(capacity),
+    monthsOut: new Uint16Array(capacity),
+    drill: new Float32Array(capacity),
+    mix: defaultMix(capacity),
+    trainArm: new Int8Array(capacity).fill(-1),
+    trainMen: new Int32Array(capacity),
+    trainLeft: new Float32Array(capacity),
   };
 }
 
-export function spawnArmy(world: World, owner: number, location: number, men: number, commander = -1, horse = 0): number {
+export const NO_PATH = new Int32Array(0);
+
+function defaultMix(capacity: number): Float32Array {
+  const mix = new Float32Array(capacity * ARMS.length);
+  for (let i = 0; i < capacity; i++) {
+    mix[i * ARMS.length + armIndex(FOOT_ARMS[0])] = 1;
+    mix[i * ARMS.length + armIndex(HORSE_ARMS[0])] = 1;
+  }
+  return mix;
+}
+
+export function spawnArmy(world: World, owner: number, location: number, men: number, commander = -1, horse = 0, make: ArmyMake = {}): number {
   let pool = world.armies;
   let slot = -1;
   for (let i = 0; i < pool.count; i++) {
@@ -97,17 +237,32 @@ export function spawnArmy(world: World, owner: number, location: number, men: nu
   pool.alive[slot] = 1;
   pool.owner[slot] = owner;
   pool.location[slot] = location;
+  pool.tile[slot] = make.tile ?? world.tiles.centre[location]!;
   pool.men[slot] = men;
   pool.commander[slot] = commander;
   pool.horse[slot] = horse;
-  pool.progress[slot] = 0;
-  pool.movedThisTurn[slot] = 0;
   pool.route[slot] = [];
-  pool.marched[slot] = [];
+  pool.path[slot] = NO_PATH;
+  pool.pathAt[slot] = 0;
+  pool.progress[slot] = 0;
+  pool.trail[slot] = [];
+  pool.retreating[slot] = 0;
+  pool.battle[slot] = -1;
+  pool.cameFrom[slot] = -1;
+  pool.kind[slot] = make.kind ?? KIND.levy;
+  pool.monthsOut[slot] = 0;
+  pool.drill[slot] = make.drill ?? 0;
+  const base = slot * ARMS.length;
+  pool.mix.fill(0, base, base + ARMS.length);
+  pool.mix[base + armIndex(make.foot ?? FOOT_ARMS[0])] = 1;
+  pool.mix[base + armIndex(make.horseArm ?? HORSE_ARMS[0])] = 1;
+  pool.trainArm[slot] = -1;
+  pool.trainMen[slot] = 0;
+  pool.trainLeft[slot] = 0;
   // Wagons start full.
   const d = world.rules.defines.march;
   const logistics = commander >= 0 ? world.commanderLogistics[commander]! : 0;
-  pool.food[slot] = monthlyRations(d, { men, horse, logistics }) * d.monthsCarried;
+  pool.food[slot] = wagonRations(d, { men, horse, logistics });
   return slot;
 }
 
@@ -117,18 +272,35 @@ function growArmyPool(old: ArmyPool): ArmyPool {
   next.alive.set(old.alive);
   next.owner.set(old.owner);
   next.location.set(old.location);
+  next.tile.set(old.tile);
   next.men.set(old.men);
   next.commander.set(old.commander);
   next.horse.set(old.horse);
   next.food.set(old.food);
-  next.progress.set(old.progress);
-  next.movedThisTurn.set(old.movedThisTurn);
   old.route.forEach((r, i) => (next.route[i] = r));
-  old.marched.forEach((r, i) => (next.marched[i] = r));
+  old.path.forEach((r, i) => (next.path[i] = r));
+  next.pathAt.set(old.pathAt);
+  next.progress.set(old.progress);
+  old.trail.forEach((r, i) => (next.trail[i] = r));
+  next.retreating.set(old.retreating);
+  next.battle.set(old.battle);
+  next.kind.set(old.kind);
+  next.monthsOut.set(old.monthsOut);
+  next.drill.set(old.drill);
+  next.mix.set(old.mix);
+  next.trainArm.set(old.trainArm);
+  next.trainMen.set(old.trainMen);
+  next.trainLeft.set(old.trainLeft);
+  next.cameFrom.set(old.cameFrom);
   return next;
 }
 
-export function createWorld(rules: Ruleset, seed: number): World {
+/**
+ * A new campaign. `tiles` is the map's tile grid (tileGridFromImages); without
+ * one the world gets a stand-in with one tile per province, where armies
+ * can't march (enough for a probe that only runs a turn).
+ */
+export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = pointTileGrid(rules)): World {
   const provinceIds = rules.provinces.map((p) => p.id);
   const provinceIndex = new Map(provinceIds.map((id, i) => [id, i]));
   const nationIds = rules.nations.map((n) => n.id);
@@ -158,19 +330,32 @@ export function createWorld(rules: Ruleset, seed: number): World {
   const commanderIds: string[] = [];
   const commanderOwnerList: number[] = [];
   const commanderLogisticsList: number[] = [];
+  const commanders: Commander[] = [];
   rules.nations.forEach((n, i) => {
     for (const c of n.commanders) {
       commanderIds.push(c.id);
       commanderOwnerList.push(i);
       commanderLogisticsList.push(c.logistics);
+      commanders.push(newCommander(c.name, { country: n.id, might: c.might, cunning: c.cunning, logistics: c.logistics }));
     }
   });
 
+  const map = rules.map;
+  const lonLat = (x: number | undefined, y: number | undefined): [number, number] =>
+    map ? [(x ?? 0) / map.pxPerDeg - 180, map.latTop - (y ?? 0) / map.pxPerDeg] : [0, 45];
+  const provincePlace = rules.provinces.map((p) => placeClimate(...lonLat(p.x, p.y), !!p.coastal, p.terrain));
   const world: World = {
     rules,
     turn: 0,
     date: { ...rules.defines.startDate },
+    step: 0,
+    day: 0,
     rng: new Rng(seed),
+    weatherSeed: seed >>> 0,
+    tiles,
+    rowWidth: map && map.height === tiles.height ? rowWidths(tiles.height, map.latTop, map.pxPerDeg) : new Float32Array(tiles.height).fill(1),
+    provincePlace,
+    provinceTemperature: new Float32Array(P),
     provinceCount: P,
     provinceIds,
     provinceIndex,
@@ -192,30 +377,118 @@ export function createWorld(rules: Ruleset, seed: number): World {
     commanderIds,
     commanderOwner: Int16Array.from(commanderOwnerList),
     commanderLogistics: Int8Array.from(commanderLogisticsList),
+    commanders,
     armies: createArmyPool(Math.max(16, N * 2)),
+    player: -1,
+    diplomacy: null!,
+    provinceOccupier: new Int16Array(P).fill(-1),
+    provinceHold: new Uint8Array(P),
+    provinceHoldBy: new Int16Array(P).fill(-1),
+    provinceGarrison: new Float32Array(P),
+    sieges: new Map(),
+    battles: [],
+    battleSeq: 0,
+    peaceOffers: [],
+    nationGone: new Uint8Array(N),
+    ...createRecruitState(P, N),
+    ...createLivingState(P),
+    ...createTreasuryState(P, N),
+    ...createFoodState(P),
+    ...createMoodState(P),
+    ...createLordState(P),
+    ...createResearchState(N),
+    ...createWorksState(P, N),
+    ...createLandState(P),
+    ...createConversionState(P),
+    ...createCastleFoodState(P, N),
   };
+  world.diplomacy = createWarState(world);
+  seedClasses(world);
+  seedStores(world);
+  seedLords(world);
+  seedLand(world);
+  seedWorks(world);
+  seedCastleStores(world);
+  updateWeather(world);
+  for (let p = 0; p < P; p++) world.provinceGarrison[p] = maxGarrison(world, p);
 
-  recomputeMaxLevies(world);
-  world.nationLevies.set(world.nationMaxLevies);
+  for (let p = 0; p < P; p++) {
+    if (provinceWater[p]) continue;
+    world.provinceRecruitCeiling[p] = provincePopulation[p]! * rules.defines.levies.menPerThousandPeople;
+    world.provinceRecruits[p] = world.provinceRecruitCeiling[p]!;
+    // Every province of a realm starts with an official, of a type dealt out in turn.
+    if (provinceOwner[p]! >= 0) world.provinceOfficial[p] = p % OFFICIALS.length;
+  }
+  world.commanderHome = commanderIds.map(() => -1);
+  world.commanderSeed = commanderIds.map(() => -1);
+  seedOfficials(world);
+  recount(world);
 
-  // Every nation starts with one army in its capital, led by its first commander.
+  // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where
+  // the data has no figure), within its cap, spread over its land (REALM-196, REALM-197).
   rules.nations.forEach((n, i) => {
-    const firstCommander = commanderOwnerList.indexOf(i);
-    const men = 5000;
-    spawnArmy(world, i, provinceIndex.get(n.capital)!, men, firstCommander, Math.round(men * rules.defines.march.startingHorseShare));
+    const cap = world.nationTroopCap[i]!;
+    const total = Math.max(1000, Math.min(Math.floor(cap / 1000) * 1000, n.army ?? Math.round(cap / 4000) * 1000));
+    const capital = provinceIndex.get(n.capital)!;
+    for (const { province, men, commander } of startingArmies(world, i, capital, total)) {
+      // Levies already called, half of the foot armoured men-at-arms, the horse light horse.
+      const slot = spawnArmy(world, i, province, men, commander, Math.round(men * rules.defines.march.startingHorseShare), { kind: KIND.levy, drill: 1.5 });
+      world.armies.mix[slot * ARMS.length + armIndex("levy foot")] = 0.5;
+      world.armies.mix[slot * ARMS.length + armIndex("armoured foot")] = 0.5;
+    }
   });
+  seedResearch(world);
+  recount(world);
+  refreshFreeCompanies(world);
+  // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
+  runLedger(world, false);
+  // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
+  syncCountries(world);
 
   return world;
 }
 
-export function recomputeMaxLevies(world: World): void {
-  const max = world.nationMaxLevies;
-  const perThousand = world.rules.defines.levies.menPerThousandPeople;
-  max.fill(0);
-  for (let p = 0; p < world.provinceCount; p++) {
-    const owner = world.provinceOwner[p]!;
-    if (owner >= 0) max[owner] = max[owner]! + world.provincePopulation[p]! * perThousand;
+/** The most men one army starts with: a realm with more gets more commanders. */
+const START_ARMY_MAX = 30000;
+
+/**
+ * Commanders a realm starts with for its men under arms: one per
+ * `starting_armies.men_per_commander`, at least one and at most
+ * `most_commanders`, but always enough that no army is above START_ARMY_MAX (REALM-197).
+ */
+export function startingCommanderCount(men: number): number {
+  const c = realmConfig.starting_armies;
+  return Math.max(1, Math.min(c.most_commanders, Math.round(men / c.men_per_commander)), Math.ceil(men / START_ARMY_MAX));
+}
+
+/**
+ * Where a realm's starting men stand (REALM-196, REALM-197): every man in an
+ * army under a commander, one army per commander, of thousands as even as
+ * they come; the first in the capital and the others spread evenly over its
+ * land from the capital outward (a small realm may have fewer armies than the
+ * count, at least a thousand men each). The data's commanders lead first; the
+ * realm gets more of its own culture to match its men.
+ */
+function startingArmies(world: World, n: number, capital: number, total: number): { province: number; men: number; commander: number }[] {
+  const land = byDistance(world, n, capital).filter((p) => !world.provinceWater[p]);
+  const armies = Math.max(1, Math.min(startingCommanderCount(total), Math.floor(total / 1000)));
+  const commanders: number[] = [];
+  for (let c = 0; c < world.commanderIds.length; c++) if (world.commanderOwner[c] === n && commanders.length < armies) commanders.push(c);
+  const capitalName = world.rules.provinces[capital]!.name;
+  for (let k = commanders.length; k < armies; k++) {
+    const seed = mix(n + 1, k + 101);
+    const skill = (salt: number) => 1 + (mix(seed, salt) % 3);
+    const name = personName(world.rules, n, seed, capitalName);
+    commanders.push(addCommander(world, n, newCommander(name, { might: skill(1), cunning: skill(2), logistics: skill(3) }), `${world.nationIds[n]}_start_${k + 1}`));
   }
+  // Thousands dealt out in turn, so the armies differ by a thousand at most; the capital's takes what is left over.
+  const thousands = Math.floor(total / 1000);
+  const where = Array.from({ length: armies }, (_, k) => land[Math.floor((k * land.length) / armies)] ?? capital);
+  return where.map((province, k) => ({
+    province,
+    men: (Math.floor(thousands / armies) + (k < thousands % armies ? 1 : 0)) * 1000 + (k === 0 ? total - thousands * 1000 : 0),
+    commander: commanders[k]!,
+  }));
 }
 
 export function areNeighbors(world: World, a: number, b: number): boolean {
@@ -228,4 +501,14 @@ export function areNeighbors(world: World, a: number, b: number): boolean {
 /** The world's province graph as the march planner sees it. */
 export function marchMap(world: World): MarchMap {
   return { adjStart: world.adjStart, adjList: world.adjList, ground: world.provinceGround, population: world.provincePopulation, river: world.provinceRiver };
+}
+
+/** Each province's sea-level temperature for today (the snow on its tiles slows marches). */
+export function updateWeather(world: World): void {
+  for (let p = 0; p < world.provinceCount; p++) if (!world.provinceWater[p]) world.provinceTemperature[p] = provinceTemperature(world.provincePlace[p]!, world.date);
+}
+
+/** The world's tiles as a march over them sees them today. */
+export function tileMarch(world: World): TileMarch {
+  return { d: world.rules.defines.march, grid: world.tiles, population: world.provincePopulation, temperature: world.provinceTemperature, rowWidth: world.rowWidth, roadHours: world.provinceRoadHours };
 }

@@ -140,6 +140,91 @@ export const SPRITES = {
     ".....bb.bb...bb.bb....",
     ".....HH.HH...HH.HH....",
   ],
+  /**
+   * Army on the map: the commander's knight, facing east (drawn mirrored to
+   * face west). Two frames: the horse gallops and the pennant flutters.
+   */
+  rider0: [
+    "..y........NL.........",
+    "..tNNNNN..Nn..........",
+    "..tLLLN..ggg..........",
+    "..tnnnnngssd..........",
+    "..t......ffd..........",
+    "..t......Ffs.....Hb...",
+    "..t....sLNNNns...aab..",
+    "..t....gLyyynd..hbbzbb",
+    "..tfssssLNyNn...hbbyHb",
+    "..t.f...LNLNn..hbbbbbH",
+    "..t.....LNNNn.hbbb..bb",
+    "..t.aaaatttttaaabb....",
+    "..thbLLLLLssLLLbb.....",
+    "..tHbNyNNyssyNNb......",
+    "..t.bNNyNNsdNyNb......",
+    ".ht.bnnnnndnnnnb......",
+    ".ht.HnHnHnHnHnHH......",
+    "..h..bH.bH...bH.bH....",
+    ".....bH.bH...bH.bH....",
+    ".....ba.bb...ba.bb....",
+    ".....bb.bb...bb.bb....",
+    ".....HH.HH...HH.HH....",
+  ],
+  rider1: [
+    "..y........NL.........",
+    "..tNNNN...Nn..........",
+    "..tLLLNN.ggg..........",
+    "..tnnnnNgssd..........",
+    "..t......ffd..........",
+    "..t......Ffs.....Hb...",
+    "..t....sLNNNns...aab..",
+    "..t....gLyyynd..hbbzbb",
+    "..tfssssLNyNn...hbbyHb",
+    "..t.f...LNLNn..hbbbbbH",
+    "..t.....LNNNn.hbbb..bb",
+    "..t.aaaatttttaaabb....",
+    "..thbLLLLLssLLLbb.....",
+    "..tHbNyNNyssyNNb......",
+    "..t.bNNyNNsdNyNb......",
+    ".ht.bnnnnndnnnnb......",
+    ".ht.HnHnHnHnHnHH......",
+    "..h..bH.bH...bH.bH....",
+    "....bH...bH.bH...bH...",
+    "...ba.....bbba....bb..",
+    "...bb......bb......bb.",
+    "...HH......HH......HH.",
+  ],
+  /** A fleet on the map: a cog with a sail in the realm's colour, rocking on the swell. */
+  ship0: [
+    ".......tNNN.....",
+    ".......tLNn.....",
+    ".......t........",
+    "....wwwtwww.....",
+    "...wwNNtNNww....",
+    "...wNNNtNNNw....",
+    "...wwNNtNNww....",
+    "....wwwtwww.....",
+    ".......t........",
+    ".bbb...t....bbb.",
+    ".bobbbbbbbbbbob.",
+    "..bbwbbwbbwbbb..",
+    "...bbbbbbbbbb...",
+    "..gg..gggg..gg..",
+  ],
+  ship1: [
+    ".......tNN......",
+    ".......tLNNn....",
+    ".......t........",
+    "....wwwtwww.....",
+    "...wwNNtNNww....",
+    "...wNNNtNNNw....",
+    "...wwNNtNNww....",
+    "....wwwtwww.....",
+    ".......t........",
+    ".bbb...t....bbb.",
+    ".bobbbbbbbbbbob.",
+    "..bbwbbwbbwbbb..",
+    "...bbbbbbbbbb...",
+    ".gg..gg..gg..gg.",
+  ],
   /** Plain army without a named commander: a helmeted spearman. */
   soldier: [
     "....s.....",
@@ -197,7 +282,7 @@ export function sprite(name: SpriteName, nationColor: string, scale: number): HT
   const canvas = document.createElement("canvas");
   canvas.width = rows[0]!.length * scale;
   canvas.height = rows.length * scale;
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   rows.forEach((row, y) => {
     for (let x = 0; x < row.length; x++) {
       const ch = row[x]!;

@@ -1,0 +1,577 @@
+{
+  "$comment": "Game shell (domain/game-shell/spec.md, screen-flow design v1). Screen list from screen-flow §9; menus §3 S4, §4.5; Realm book §4.4; Attention groups §4.6 G9; Back by device §8.1; touch §8.2; prompts §8.3. Numbers are the screen-flow placeholders 'for one interface config file' (spec §10); layout numbers live in map-presentation.json. Decisions of 17 October (spec §13, D-SHELL-n): no ads, the Almanac, the Resume save, victory (X-12), controller sets and buttons.",
+  "bootMinSeconds": 0.6,
+  "tipMinSeconds": 2,
+  "turnStripAfterSeconds": 1.5,
+  "maxStepsFromMap": 3,
+  "realmBookMaxTabs": 6,
+  "controllerEndTurnHoldSeconds": 0.5,
+  "campaignEndDateDefault": "1939-08-31",
+  "endDateEarliestYear": 1494,
+  "dominationShare": 0.5,
+  "dominationCheckMonth": 1,
+  "ledgerLeaders": 5,
+  "scores": [
+    "Economy",
+    "Power",
+    "Technology"
+  ],
+  "freeRealms": [
+    "Ottomans",
+    "France"
+  ],
+  "screens": {
+    "boot": {
+      "name": "Boot",
+      "kind": "Full",
+      "firstFocus": "none",
+      "back": "none",
+      "music": "none"
+    },
+    "first_run": {
+      "name": "First-run questions",
+      "kind": "Full",
+      "firstFocus": "the only choice",
+      "back": "none, it must be answered",
+      "music": "none"
+    },
+    "title": {
+      "name": "Title",
+      "kind": "Full",
+      "firstFocus": "Tap to start",
+      "back": "leaves the app on Android",
+      "music": "title"
+    },
+    "main_menu": {
+      "name": "Main menu",
+      "kind": "Same screen",
+      "firstFocus": "Continue",
+      "back": "title",
+      "music": "title"
+    },
+    "new_campaign": {
+      "name": "New campaign",
+      "kind": "Full",
+      "firstFocus": "first suggested realm",
+      "back": "previous step, then main_menu",
+      "music": "nation_select"
+    },
+    "load": {
+      "name": "Load",
+      "kind": "Full",
+      "firstFocus": "newest save",
+      "back": "where opened",
+      "music": "unchanged"
+    },
+    "loading": {
+      "name": "Loading",
+      "kind": "Full",
+      "firstFocus": "tip arrows",
+      "back": "none",
+      "music": "load_resume"
+    },
+    "settings": {
+      "name": "Settings",
+      "kind": "Overlay",
+      "firstFocus": "first setting",
+      "back": "where opened",
+      "music": "unchanged"
+    },
+    "achievements": {
+      "name": "Achievements",
+      "kind": "Full",
+      "firstFocus": "first achievement",
+      "back": "where opened",
+      "music": "unchanged"
+    },
+    "almanac": {
+      "name": "Almanac",
+      "kind": "Full",
+      "firstFocus": "search or first entry",
+      "back": "where opened",
+      "music": "unchanged"
+    },
+    "unlock": {
+      "name": "Unlock / Buy the full game",
+      "kind": "Full",
+      "firstFocus": "Buy",
+      "back": "where opened",
+      "music": "unchanged"
+    },
+    "credits": {
+      "name": "Credits",
+      "kind": "Full",
+      "firstFocus": "Back",
+      "back": "main_menu or final_result",
+      "music": "credits"
+    },
+    "map": {
+      "name": "Map",
+      "kind": "Home",
+      "firstFocus": "your capital or last army",
+      "back": "opens game_menu",
+      "music": "game music"
+    },
+    "card": {
+      "name": "Any card",
+      "kind": "Sheet",
+      "firstFocus": "first line",
+      "back": "previous card or map",
+      "music": "unchanged"
+    },
+    "realm_book": {
+      "name": "Realm book",
+      "kind": "Full",
+      "firstFocus": "last tab's first item",
+      "back": "map",
+      "music": "unchanged; diplomacy mood on Abroad"
+    },
+    "game_menu": {
+      "name": "Game menu",
+      "kind": "Modal",
+      "firstFocus": "Return to the map",
+      "back": "map",
+      "music": "unchanged"
+    },
+    "turn": {
+      "name": "Turn in progress",
+      "kind": "Overlay",
+      "firstFocus": "none",
+      "back": "none",
+      "music": "unchanged"
+    },
+    "battle": {
+      "name": "Battle viewer",
+      "kind": "Full",
+      "firstFocus": "Retreat while it runs, Carry on after",
+      "back": "back to the map while battles run (they keep running); where opened for a replay",
+      "music": "war tracks"
+    },
+    "siege": {
+      "name": "Siege view",
+      "kind": "Full",
+      "firstFocus": "Back",
+      "back": "map",
+      "music": "war_siege"
+    },
+    "event": {
+      "name": "Event",
+      "kind": "Modal",
+      "firstFocus": "historical option",
+      "back": "badge on End turn",
+      "music": "stinger only"
+    },
+    "peace": {
+      "name": "Peace table",
+      "kind": "Modal",
+      "firstFocus": "first term",
+      "back": "where opened",
+      "music": "unchanged"
+    },
+    "turn_report": {
+      "name": "Turn report",
+      "kind": "Sheet",
+      "firstFocus": "first line",
+      "back": "map",
+      "music": "unchanged"
+    },
+    "attention": {
+      "name": "Needs attention",
+      "kind": "Sheet",
+      "firstFocus": "first warning",
+      "back": "map",
+      "music": "unchanged"
+    },
+    "game_over": {
+      "name": "Game over",
+      "kind": "Full",
+      "firstFocus": "Look back",
+      "back": "none",
+      "music": "game_over"
+    },
+    "campaign_end": {
+      "name": "Closing sequence",
+      "kind": "Full",
+      "firstFocus": "Skip",
+      "back": "none",
+      "music": "campaign_end"
+    },
+    "final_result": {
+      "name": "Final result",
+      "kind": "Full",
+      "firstFocus": "Main menu",
+      "back": "main_menu",
+      "music": "campaign_end"
+    },
+    "error": {
+      "name": "Something went wrong",
+      "kind": "Full",
+      "firstFocus": "Restore the last save",
+      "back": "main_menu",
+      "music": "none"
+    }
+  },
+  "boot": {
+    "logo": "pixel logo on parchment",
+    "hourglass": "turning",
+    "studioLogos": false,
+    "video": false,
+    "waitsFor": [
+      "map",
+      "sprites",
+      "engine worker"
+    ]
+  },
+  "consentItems": [
+    "crash reports",
+    "tutorial step counts"
+  ],
+  "loadingSteps": [
+    "Reading the save",
+    "Drawing the borders",
+    "Waking the courts"
+  ],
+  "strings": {
+    "turnStrip": "The courts of Europe deliberate…",
+    "pickedUp": "Picked up where you left off",
+    "noConnection": "No connection: try again later",
+    "playOnWarning": "Achievements end for this campaign",
+    "leaveUnsaved": "Leave {date} unsaved? · Save first · Leave · Cancel",
+    "tapToStart": "Tap to start",
+    "noAchievementsOutsideIronman": "Achievements are earned only in ironman campaigns",
+    "achievementsOff": "Achievements (off for this campaign)",
+    "attentionTitle": "Needs attention",
+    "firstLaunch": "New to Pocket Hegemony?"
+  },
+  "newCampaignSteps": [
+    "Realm",
+    "Options",
+    "Begin"
+  ],
+  "realmFilters": [
+    "region",
+    "difficulty",
+    "free or locked"
+  ],
+  "campaignOptions": [
+    "difficulty",
+    "AI aggression",
+    "fog",
+    "historical or free events",
+    "ironman",
+    "end date"
+  ],
+  "summaryCard": [
+    "banner",
+    "ruler",
+    "capital",
+    "start date",
+    "options"
+  ],
+  "moreMenu": [
+    "Settings",
+    "Achievements",
+    "Almanac",
+    "Unlock",
+    "Credits"
+  ],
+  "gameMenu": [
+    "Return to the map",
+    "Save",
+    "Load",
+    "Settings",
+    "Almanac",
+    "Achievements",
+    "Exit to main menu",
+    "Quit"
+  ],
+  "topBar": [
+    "realm name and banner",
+    "date",
+    "gold with its monthly change",
+    "levies"
+  ],
+  "toolColumn": [
+    "map lens",
+    "go to capital",
+    "Realm book"
+  ],
+  "realmBook": {
+    "Realm": [
+      "country card in full",
+      "ruler and family",
+      "lords",
+      "government"
+    ],
+    "Treasury": [
+      "treasury",
+      "Tax screen",
+      "Food policy screen",
+      "trade"
+    ],
+    "Army": [
+      "all armies and fleets",
+      "commanders",
+      "levy",
+      "commission",
+      "troop cap"
+    ],
+    "Abroad": [
+      "diplomacy",
+      "relations",
+      "subjects",
+      "wars and peace voices"
+    ],
+    "Learning": [
+      "schools",
+      "research tree",
+      "religion and culture"
+    ],
+    "Chronicle": [
+      "past turn reports",
+      "event log",
+      "battle reports",
+      "ledger"
+    ]
+  },
+  "attention": {
+    "famine in a province within two months": {
+      "group": "Warnings",
+      "icon": "famine"
+    },
+    "pay owed to an army": {
+      "group": "Warnings",
+      "icon": "pay"
+    },
+    "an army hungry": {
+      "group": "Warnings",
+      "icon": "hunger"
+    },
+    "a castle breached": {
+      "group": "Warnings",
+      "icon": "castle"
+    },
+    "a rising brewing": {
+      "group": "Warnings",
+      "icon": "rising"
+    },
+    "peace voices passing half against you": {
+      "group": "Warnings",
+      "icon": "peace voices"
+    },
+    "a ruler without an heir": {
+      "group": "Warnings",
+      "icon": "heir"
+    },
+    "an event not yet answered": {
+      "group": "Waiting for you",
+      "icon": "scroll"
+    },
+    "a peace offer": {
+      "group": "Waiting for you",
+      "icon": "peace"
+    },
+    "an idle army": {
+      "group": "Waiting for you",
+      "icon": "army"
+    },
+    "an idle fleet": {
+      "group": "Waiting for you",
+      "icon": "fleet"
+    },
+    "an empty research slot": {
+      "group": "Waiting for you",
+      "icon": "research"
+    },
+    "an empty school slot": {
+      "group": "Waiting for you",
+      "icon": "school"
+    },
+    "unspent levies": {
+      "group": "Waiting for you",
+      "icon": "levy"
+    }
+  },
+  "backInputs": {
+    "Android": [
+      "system back gesture",
+      "system back button",
+      "on-screen Back",
+      "the cross on the card"
+    ],
+    "iOS": [
+      "on-screen Back",
+      "the cross on the card",
+      "edge swipe"
+    ],
+    "keyboard": [
+      "Esc"
+    ],
+    "controller": [
+      "B (east button)"
+    ],
+    "mouse": [
+      "on-screen Back",
+      "the cross on the card",
+      "mouse button 4"
+    ]
+  },
+  "prompts": {
+    "touch": "none",
+    "Xbox": "Xbox glyphs",
+    "PlayStation": "PlayStation glyphs",
+    "Steam": "Steam glyphs",
+    "Switch-style": "Switch-style glyphs",
+    "keyboard": "keys"
+  },
+  "textKeyboards": {
+    "Steam Deck": "Steam's on-screen keyboard",
+    "Steam in Big Picture": "Steam's on-screen keyboard",
+    "Android": "the system keyboard",
+    "iOS": "the system keyboard"
+  },
+  "failureOptions": [
+    "Restore the last save",
+    "Main menu",
+    "Send a report"
+  ],
+  "gameOverChoices": [
+    "Look back",
+    "Play on as another realm",
+    "Main menu"
+  ],
+  "finalResultChoices": [
+    "Main menu",
+    "Credits"
+  ],
+  "otherScreens": {
+    "lens_picker": {
+      "name": "Map lens picker",
+      "kind": "Pop-over",
+      "firstFocus": "not given",
+      "back": "map",
+      "music": "unchanged"
+    },
+    "confirmation": {
+      "name": "Confirmation",
+      "kind": "Modal",
+      "firstFocus": "not given",
+      "back": "the screen below, unchanged",
+      "music": "unchanged"
+    },
+    "book_screen": {
+      "name": "Realm book screen opened from a card",
+      "kind": "Full",
+      "firstFocus": "not given",
+      "back": "where opened",
+      "music": "unchanged"
+    }
+  },
+  "firstLaunchChoices": {
+    "Play the tutorial": {
+      "opens": "tutorial chapter 0",
+      "guidedTurns": false
+    },
+    "Guided campaign": {
+      "opens": "new_campaign",
+      "guidedTurns": true
+    },
+    "I know the way": {
+      "opens": "new_campaign",
+      "guidedTurns": false
+    }
+  },
+  "tutorialMenuLines": [
+    "Skip this chapter",
+    "Chapter list",
+    "Leave the tutorial"
+  ],
+  "muteButtons": {
+    "Mute this": "item",
+    "Don't list this kind again": "kind"
+  },
+  "actionSets": {
+    "Map": [
+      "map"
+    ],
+    "Battle": [
+      "battle"
+    ],
+    "Menu": "every other screen"
+  },
+  "mapControls": {
+    "left stick": "free cursor that snaps gently to provinces, armies and castles",
+    "right stick": "pan",
+    "triggers": "zoom",
+    "A": "select",
+    "bumpers": "next army",
+    "d-pad right": "next waiting item",
+    "Menu short press": "game menu",
+    "Menu held": "End turn"
+  },
+  "menuControls": [
+    "move focus",
+    "select",
+    "back",
+    "bumpers switch tabs or step through the card stack",
+    "Show on map"
+  ],
+  "battleButtons": {
+    "A": {
+      "running": "pause or play",
+      "result": "Carry on"
+    },
+    "B": {
+      "running": "back to the map",
+      "result": "back to the map",
+      "replay": "leave"
+    },
+    "X": {
+      "running": "Retreat",
+      "replay": "replay the last round"
+    },
+    "Y": {
+      "any": "the commander's line"
+    },
+    "LB and RB": {
+      "running": "switch battle",
+      "replay": "nothing"
+    },
+    "Menu": {
+      "running": "nothing",
+      "result": "nothing",
+      "replay": "leave"
+    }
+  },
+  "unlock": {
+    "purchase": "the full game",
+    "unlocks": "every realm",
+    "buttons": [
+      "Buy"
+    ],
+    "phoneButtons": [
+      "Restore purchases"
+    ],
+    "price": "from the store"
+  },
+  "_provisional": [
+    "bootMinSeconds",
+    "tipMinSeconds",
+    "turnStripAfterSeconds",
+    "controllerEndTurnHoldSeconds",
+    "endDateEarliestYear",
+    "ledgerLeaders"
+  ],
+  "battleSteps": {
+    "hoursPerStep": 4,
+    "stepsPerDay": 6
+  },
+  "battleViewButtons": [
+    "Standing orders",
+    "Retreat"
+  ],
+  "turn": {
+    "days": 7,
+    "dateFormat": "{day} {month} {year}"
+  }
+}

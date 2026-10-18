@@ -8,6 +8,7 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "specs": "pnpm --filter @ph/specs report",
     "bench": "pnpm --filter @ph/engine bench",
     "desktop": "pnpm --filter @ph/client build && pnpm --filter @ph/desktop start"
   },

@@ -59,7 +59,8 @@ uniform sampler2D uLand;     // per pixel: R terrain index; G water depth band +
 uniform ivec2 uTileOrigin;   // tile's top-left in map pixels
 uniform ivec2 uTileSize;     // texels in this tile's texture (includes 1px overlap)
 uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
-uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones
+uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones (else +64 faded, +16 closed to the moving armies), a = lord tag (0 = royal land)
+uniform sampler2D uSeason;   // per-province season, see seasonal()
 uniform int uInfoWidth;
 uniform float uZoom;
 uniform float uTime;
@@ -67,7 +68,7 @@ uniform int uMode;           // 0 political, 1 terrain, 2 data lens
 uniform vec3 uParchment, uParchmentDark;
 uniform vec3 uTerrain[${TERRAINS.length}];  // average colour of each terrain's tiles
 uniform vec3 uDepth[${DEPTH_COLORS.length}];     // ocean colour by depth band
-uniform vec3 uFoam, uInk, uHighlight, uSand;
+uniform vec3 uFoam, uInk, uHighlight, uSand, uForbid;
 uniform sampler2D uAtlas;    // terrain tiles: ${VARIANTS} variants across, one row per terrain
 uniform sampler2D uMini;     // the same at half size
 out vec4 outColor;
@@ -100,6 +101,13 @@ vec4 info(int id) { return texelFetch(uInfo, ivec2(id % uInfoWidth, id / uInfoWi
 int ownerOf(int id) {
   vec2 o = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).rg * 255.0 + 0.5;
   return int(o.r) * 256 + int(o.g) - 1;
+}
+// Which lord holds a province, as a tag (0 = royal land); neighbours with different tags have a fief border.
+int lordTag(int id) { return int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).a * 255.0 + 0.5); }
+// Land faded back while other provinces are picked out (owner b = 64), e.g. while a lord's lands are lit.
+vec3 faded(vec3 c, int id) {
+  float b = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b;
+  return b > 0.2 && b < 0.4 ? mix(vec3(dot(c, vec3(0.3, 0.55, 0.15))), uParchmentDark, 0.25) * 0.75 : c;
 }
 // Land province (not a lake, not a sea zone).
 bool land(int id) {
@@ -151,18 +159,111 @@ vec3 depthColor(float v, ivec2 a) {
 }
 bool isBig(int t) { return ${BIG_ROWS.map((r) => `t == ${r}`).join(" || ")}; }
 float flags(int id) { return float(int(info(id).a * 255.0 + 0.5) >> 4); }
+// Occupied land (flag 8): diagonal hatching over the occupier's wash.
+vec3 hatch(vec3 c, int id, ivec2 q, int width) {
+  if (uMode != 0 || (int(flags(id)) & 8) == 0) return c;
+  return ((q.x + q.y) / width) % 2 == 0 ? mix(c, uInk, 0.35) : c;
+}
 vec3 highlight(vec3 c, int id, float strength) {
   int f = int(flags(id));
   if ((f & 1) != 0) c = mix(c, uHighlight, strength + strength * step(0.5, fract(uTime * 1.5)));
   if ((f & 2) != 0) c = mix(c, uHighlight, strength * 1.2);
   return c;
 }
+// Seasons (decision X-17), from the engine's climate.ts once a turn: uSeason per province
+// holds r = sea-level temperature ((C + 60) / 127.5), g = autumn, b = spring,
+// a = wet season. Each tile is cooled by its height, so snow lies where it
+// is below freezing there: first on the peaks, then down into the valleys.
+vec4 seasonAt(int id) { return texelFetch(uSeason, ivec2(id % uInfoWidth, id / uInfoWidth), 0); }
+float heightKm(int t) {
+  return t == ${T.snowpeaks} ? 3.6 : t == ${T.glacier} ? 3.0 : t == ${T.mountains} ? 2.1 : t == ${T.highlands} ? 1.3 : t == ${T.badlands} ? 0.7 : t == ${T.hills} ? 0.5 : 0.1;
+}
+float tempAt(int id, int t) { return seasonAt(id).r * 127.5 - 60.0 - 6.5 * heightKm(t); }
+// Snow cover 0..1: none above +1 C, full by -5 C. grain in 0..1 breaks
+// light cover into patches of art pixels.
+float snowAt(int id, int t, float grain) {
+  float cover = smoothstep(1.0, -5.0, tempAt(id, t));
+  return clamp((cover - grain * 0.8) / 0.2, 0.0, 1.0) * step(0.02, cover);
+}
+vec3 seasonal(vec3 c, int t, int id, float grain) {
+  vec4 s = seasonAt(id);
+  float temp = tempAt(id, t);
+  float l = lum(c);
+  bool trees = t == ${T.forest} || t == ${T.broadleaf} || t == ${T.jungle} || t == ${T.highlands};
+  bool green = t == ${T.grassland} || t == ${T.farmland} || t == ${T.broadleaf} || t == ${T.forest} || t == ${T.mediterranean} || t == ${T.paddies} || t == ${T.steppe} || t == ${T.hills} || t == ${T.marsh};
+  bool gold = t == ${T.grassland} || t == ${T.farmland} || t == ${T.broadleaf} || t == ${T.paddies} || t == ${T.steppe} || t == ${T.hills} || t == ${T.mediterranean};
+  // Wet season on tropical dry lands, fresh spring green, autumn gold.
+  c = mix(c, clamp(vec3(0.62, 1.15, 0.5) * l, 0.0, 1.0), 0.45 * s.a);
+  if (green) c = mix(c, clamp(c * vec3(0.92, 1.12, 0.86) + vec3(0.0, 0.02, 0.0), 0.0, 1.0), s.b);
+  if (gold) c = mix(c, vec3(1.4, 0.95, 0.38) * l, (t == ${T.broadleaf} ? 0.75 : 0.55) * s.g);
+  else if (t == ${T.forest}) c = mix(c, vec3(1.25, 0.9, 0.45) * l, 0.25 * s.g);
+  // The small white caps of the mountain tiles are snow too: where it is warm
+  // up there (the tropics, or any summer low enough) they turn to bare rock.
+  if (t == ${T.mountains} && l > 0.72) c = mix(c, vec3(0.56, 0.54, 0.52), smoothstep(-1.0, 5.0, temp - 6.5));
+  // Cold without snow leaves the land bare and dull.
+  float cold = smoothstep(9.0, 2.0, temp);
+  c = mix(c, vec3(1.02, 0.97, 0.9) * l, 0.45 * cold);
+  // Snow: bright where the ground is light, blue shadow where it is dark;
+  // trees stay a little darker so forests still read.
+  float snow = snowAt(id, t, grain);
+  vec3 white = mix(vec3(0.58, 0.64, 0.78), vec3(0.97, 0.98, 1.0), clamp(l * 1.9 - 0.15, 0.0, 1.0));
+  return mix(c, white, snow * (trees ? 0.55 : 0.85));
+}
+
 // How much of the realm's colour to lay over the terrain: more when far out,
 // so realms read at a glance, less up close where the art carries the map.
 float wash() { return uMode == 2 ? 0.78 : mix(0.62, 0.3, smoothstep(1.0, ${DETAIL_ZOOM}.0, uZoom)); }
 vec3 realmWash(vec3 terrain, vec3 realm) {
   return mix(terrain, realm * (0.45 + 0.85 * lum(terrain)), wash());
 }
+// Smooth value noise over map pixels, and a few octaves of it, for shapes
+// that follow no province line.
+float vnoise(vec2 x) {
+  vec2 i = floor(x);
+  vec2 f = fract(x);
+  f = f * f * (3.0 - 2.0 * f);
+  ivec2 c = ivec2(i);
+  return mix(mix(hash(c), hash(c + ivec2(1, 0)), f.x), mix(hash(c + ivec2(0, 1)), hash(c + ivec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 x) { return 0.5 * vnoise(x / 23.0) + 0.3 * vnoise(x / 8.5) + 0.2 * vnoise(x / 3.2); }
+// How cold a sea zone is for ice, 0..1: open water above -6 C, frozen over by -16 C.
+float seaCold(int id) { return smoothstep(-6.0, -16.0, seasonAt(id).r * 127.5 - 60.0); }
+// Slush and sea ice, each 0..1, at map point m (feedback 24-26). The cold is blended across
+// neighbouring sea zones so no zone freezes as a block; ice forms first along
+// coasts and over shallow water, and its edge follows noise, not borders.
+vec2 iceAt(vec2 m) {
+  float cold = 0.0;
+  float seas = 0.0;
+  float coast = 0.0;
+  for (int k = 0; k < 9; k++) {
+    vec2 o = k == 0 ? vec2(0.0) : 7.0 * vec2(cos(float(k) * 0.785), sin(float(k) * 0.785));
+    int id = idAt(ivec2(floor(m + o)));
+    if (land(id)) coast += 1.0;
+    else if (id >= 0) { cold += seaCold(id); seas += 1.0; }
+  }
+  if (seas == 0.0 || cold < 0.02) return vec2(0.0);
+  cold /= seas;
+  float depth = depthAt(ivec2(floor(m))) / ${DEPTH_COLORS.length}.0;
+  float k = cold * 1.2 + 0.25 * coast / 9.0 - 0.15 * depth - 0.62 * fbm(m);
+  return vec2(smoothstep(0.2, 0.3, k), smoothstep(0.3, 0.37, k));
+}
+// Ice: a cool grey-blue, darker than snow on land, with cracks and pale floes.
+vec3 iceColor(vec2 m) {
+  vec3 c = mix(vec3(0.66, 0.76, 0.85), vec3(0.78, 0.86, 0.92), smoothstep(0.55, 0.75, vnoise(m * 0.45)));
+  // A few long cracks between the floes.
+  if (abs(vnoise(m * 0.22 + 17.0) - 0.5) < 0.018) c = vec3(0.52, 0.64, 0.75);
+  return c;
+}
+// Open water meets the ice in a band of slush rather than a hard line.
+vec3 icedSea(vec3 water, vec2 m) {
+  vec2 ice = iceAt(m);
+  if (ice.x <= 0.0) return water;
+  return mix(mix(water, vec3(0.6, 0.71, 0.8), 0.55 * ice.x), iceColor(m), ice.y);
+}
+// Rivers freeze a few degrees below zero, the small ones first.
+bool riverFrozen(int id, int t, float grain) { return smoothstep(-3.0, -8.0, tempAt(id, t)) > grain * 0.9 + 0.05; }
+// Snow lies over the realm's colour too, so winter reads from far out.
+vec3 snowOver(vec3 c, int id, int t, float grain) { return mix(c, vec3(0.94, 0.96, 1.0), 0.32 * snowAt(id, t, grain)); }
 
 vec3 tileAt(bool mini, int row, int variant, ivec2 local) {
   if (mini) return texelFetch(uMini, ivec2(variant * ${TILE / 2} + local.x, row * ${TILE / 2} + local.y), 0).rgb;
@@ -220,6 +321,7 @@ vec3 tiled(bool mini) {
     } else if (id >= 0 && ((iR >= 0 && iR != id) || (iD >= 0 && iD != id)) && ((a.x + a.y) / 2 & 1) == 0) {
       c = mix(c, uFoam, 0.3); // dashed line between sea zones
     }
+    c = icedSea(c, m);
     return id >= 0 ? highlight(c, id, 0.15) : c;
   }
 
@@ -234,11 +336,11 @@ vec3 tiled(bool mini) {
     variant = (q.x >> shift) + 2 * (q.y >> shift);
     local = q & (size - 1);
   }
-  vec3 c = tileAt(mini, terrain, variant, local);
+  vec3 c = seasonal(tileAt(mini, terrain, variant, local), terrain, id, hash(a));
   int owner = ownerOf(id);
   bool political = uMode != 1 && owner >= 0;
   if (political) {
-    c = realmWash(c, inf.rgb);
+    c = snowOver(realmWash(c, inf.rgb), id, terrain, hash(a));
     // A wider band of the owner's colour along its borders.
     bool edge = false;
     for (int k = 0; k < 4; k++) {
@@ -246,6 +348,11 @@ vec3 tiled(bool mini) {
       if (land(n) && ownerOf(n) != owner) edge = true;
     }
     if (edge) c = mix(c, inf.rgb, 0.35);
+    // A lord's land (feedback 68): a sparse diaper of small dark crosses, like a fief's mantle.
+    if (lordTag(id) > 0 && uMode == 0) {
+      ivec2 d = ivec2(a.x + ((a.y >> 3) & 1) * 4, a.y) & 7;
+      if ((d.x == 2 && d.y >= 1 && d.y <= 3) || (d.y == 2 && d.x >= 1 && d.x <= 3)) c = mix(c, uInk, 0.28);
+    }
   }
 
   // Rivers: a winding band of water with dark banks.
@@ -254,7 +361,7 @@ vec3 tiled(bool mini) {
     float w = (rv.y > 1.5 ? 0.26 : 0.17) * (mini ? 1.3 : 1.0);
     if (rv.x < w) {
       float ripple = step(0.82, hash(a + ivec2(int(uTime * 2.0), 0)));
-      c = mix(mix(uDepth[0], SHALLOW_BASE, 0.5), uFoam, 0.25 * ripple);
+      c = riverFrozen(id, terrain, hash(a)) ? iceColor(m) : mix(mix(uDepth[0], SHALLOW_BASE, 0.5), uFoam, 0.25 * ripple);
     } else if (rv.x < w + 1.0 / art) {
       c = mix(c, uInk, 0.45);
     }
@@ -277,11 +384,13 @@ vec3 tiled(bool mini) {
       c = mix(c, min(inf.rgb * 1.15 + 0.06, 1.0), 0.8);
     } else if (other2) {
       c = mix(c, uInk, 0.35);
+    } else if (political && uMode == 0 && ((iR != id && lordTag(iR) != lordTag(id)) || (iL != id && lordTag(iL) != lordTag(id)) || (iD != id && lordTag(iD) != lordTag(id)) || (iU != id && lordTag(iU) != lordTag(id)))) {
+      if (((a.x + a.y) >> 1 & 1) == 0) c = mix(c, uInk, 0.7); // dashed border between fiefs and royal land
     } else if ((iR != id || iL != id || iD != id || iU != id) && ((a.x + a.y) & 1) == 0) {
       c = mix(c, uInk, 0.5); // dotted province border
     }
   }
-  return highlight(c, id, 0.18);
+  return highlight(hatch(faded(c, id), id, a, max(2, size / 2)), id, 0.18);
 }
 
 // Rough height of a terrain, for hill shading on the far map.
@@ -308,12 +417,13 @@ vec3 far() {
       int d = idAt(p + ivec2(0, 1));
       if (((r >= 0 && r != id) || (d >= 0 && d != id)) && ((p.x + p.y) & 1) == 0) c = mix(c, uFoam, 0.15);
     }
+    c = icedSea(c, vMap);
     return id >= 0 ? highlight(c, id, 0.2) : c;
   }
 
   vec4 inf = info(id);
   int t = terrainAt(p);
-  vec3 c = uTerrain[t];
+  vec3 c = seasonal(uTerrain[t], t, id, bayer(p));
 
   // Texture: a few darker pixels in fixed patterns, like old tile sets.
   float h = hash(p);
@@ -333,10 +443,10 @@ vec3 far() {
 
   int owner = ownerOf(id);
   bool political = uMode != 1 && owner >= 0;
-  if (political) c = realmWash(c, inf.rgb);
+  if (political) c = snowOver(realmWash(c, inf.rgb), id, t, bayer(p));
   // Great rivers always, the rest once zoomed in a little.
   int rs = riverAt(p);
-  if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, uDepth[0], 0.8);
+  if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, riverFrozen(id, t, bayer(p)) ? iceColor(vec2(p)) : uDepth[0], 0.8);
 
   // Borders: nation borders always, with an inner band of the realm's
   // colour once pixels are big enough; province borders once zoomed in.
@@ -350,11 +460,12 @@ vec3 far() {
     int l = idAt(p - ivec2(1, 0));
     int u = idAt(p - ivec2(0, 1));
     if ((land(l) && ownerOf(l) != owner) || (land(u) && ownerOf(u) != owner)) c = mix(c, inf.rgb, 0.7);
-    else if (provinceEdge) c *= 0.72;
+    else if (provinceEdge) c *= (land(r) && lordTag(r) != lordTag(id)) || (land(d) && lordTag(d) != lordTag(id)) ? 0.5 : 0.72;
+    else if (uMode == 0 && lordTag(id) > 0 && uZoom > 3.0 && (p.x & 3) == 1 && (p.y & 3) == 1) c *= 0.8;
   } else if (provinceEdge && uZoom > 1.2) {
     c *= 0.72;
   }
-  return highlight(c, id, 0.3);
+  return highlight(hatch(faded(c, id), id, p, 2), id, 0.3);
 }
 
 // Undiscovered land and sea: old parchment with stains and a ruled grid.
@@ -371,6 +482,29 @@ vec3 parchment(vec2 m) {
   return c;
 }
 
+// Land the chosen armies may not enter (owner b bit 16, MOVE-129): a faint red
+// wash, and a red line on its side of every border with land they may enter.
+bool shut(int id) { return id >= 0 && (int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b * 255.0 + 0.5) & 16) != 0; }
+vec3 forbidden(vec3 c, vec2 m) {
+  bool tiles = uZoom >= ${MID_ZOOM}.0;
+  float art = uZoom >= ${DETAIL_ZOOM}.0 ? ${TILE / 2}.0 : ${TILE / 4}.0;
+  // Art pixel or map pixel centre, and a line about three screen pixels wide.
+  vec2 q = tiles ? (floor(m * art) + 0.5) / art : floor(m) + 0.5;
+  float d = tiles ? 2.0 / art : max(1.0, floor(3.0 / uZoom));
+  int id = tiles ? effId(q) : idAt(ivec2(q));
+  if (!land(id) || !shut(id)) return c;
+  bool edge = false;
+  for (int k = 0; k < 4; k++) {
+    vec2 dir = vec2(k == 0 ? 1.0 : k == 1 ? -1.0 : 0.0, k == 2 ? 1.0 : k == 3 ? -1.0 : 0.0);
+    for (int j = 1; j <= 2; j++) {
+      vec2 at = q + dir * d * float(j) * 0.5;
+      int n = tiles ? effId(at) : idAt(ivec2(floor(at)));
+      if (land(n) && !shut(n) && !unknown(n)) edge = true;
+    }
+  }
+  return edge ? mix(c, uForbid, 0.85) : mix(c, uForbid, 0.16);
+}
+
 void main() {
   vec2 m = vMap;
   int id = idAt(ivec2(floor(m)));
@@ -379,6 +513,7 @@ void main() {
     return;
   }
   vec3 c = uZoom >= ${DETAIL_ZOOM}.0 ? tiled(false) : uZoom >= ${MID_ZOOM}.0 ? tiled(true) : far();
+  c = forbidden(c, m);
   // A dark seam where the known world meets the unknown.
   ivec2 p = ivec2(floor(m));
   if (unknown(idAt(p + ivec2(1, 0))) || unknown(idAt(p - ivec2(1, 0))) || unknown(idAt(p + ivec2(0, 1))) || unknown(idAt(p - ivec2(0, 1)))) {
@@ -399,12 +534,24 @@ interface Tile {
   vao: WebGLVertexArrayObject;
 }
 
+/** Packs province `i`'s season into `out`: sea-level °C, and autumn, spring and wet season 0..1 (the engine's climate.ts). */
+export function seasonBytes(out: Uint8Array, i: number, temperature: number, autumn: number, spring: number, wet: number): void {
+  const o = i * 4;
+  const byte = (v: number) => Math.max(0, Math.min(255, Math.round(v * 255)));
+  out[o] = byte((temperature + 60) / 127.5);
+  out[o + 1] = byte(autumn);
+  out[o + 2] = byte(spring);
+  out[o + 3] = byte(wet);
+}
+
 export class MapRenderer {
   readonly gl: WebGL2RenderingContext;
   private program: WebGLProgram;
   private tiles: Tile[] = [];
   private infoTex: WebGLTexture;
   private ownerTex: WebGLTexture;
+  private seasonTex: WebGLTexture;
+  private seasonData: Uint8Array;
   private atlasTex: WebGLTexture;
   private miniTex: WebGLTexture;
   private terrainColors: number[];
@@ -423,7 +570,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uAtlas", "uMini", "uLand"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -445,6 +592,8 @@ export class MapRenderer {
     this.ownerData = new Uint8Array(this.infoWidth * rows * 4);
     this.infoTex = makeDataTexture(gl, this.infoWidth, rows);
     this.ownerTex = makeDataTexture(gl, this.infoWidth, rows);
+    this.seasonData = new Uint8Array(this.infoWidth * rows * 4);
+    this.seasonTex = makeDataTexture(gl, this.infoWidth, rows);
 
     const atlas = buildTileAtlas();
     this.atlasTex = makeDataTexture(gl, atlas.width, atlas.height);
@@ -493,9 +642,12 @@ export class MapRenderer {
 
   /**
    * Sets each province's fill colour, owner and flags.
-   * flags: 1 = selected, 2 = highlighted (e.g. a move target), 4 = undiscovered.
+   * flags: 1 = selected, 2 = highlighted (e.g. a move target, a lord's lands), 4 = undiscovered.
+   * lord: the lord holding it, -1 for royal land (drawn as a fief border and a pattern).
+   * fade: land drawn faded to grey, so the provinces that are not stand out.
+   * closed: land the armies being moved may not enter, drawn with red borders.
    */
-  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false): void {
+  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false, lord = -1, fade = false, closed = false): void {
     const o = i * 4;
     this.infoData[o] = rgb[0]!;
     this.infoData[o + 1] = rgb[1]!;
@@ -504,8 +656,16 @@ export class MapRenderer {
     const ow = owner + 1;
     this.ownerData[o] = (ow >> 8) & 255;
     this.ownerData[o + 1] = ow & 255;
-    this.ownerData[o + 2] = water ? 255 : 0;
+    this.ownerData[o + 2] = water ? 255 : (fade ? 64 : 0) | (closed ? 16 : 0);
+    this.ownerData[o + 3] = lord >= 0 ? (lord % 255) + 1 : 0;
   }
+
+  /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
+  setProvinceSeasons(bytes: Uint8Array): void {
+    this.seasonData.set(bytes);
+    this.seasonDirty = true;
+  }
+  private seasonDirty = false;
 
   uploadProvinceStyles(): void {
     const gl = this.gl;
@@ -514,6 +674,11 @@ export class MapRenderer {
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.infoData);
     gl.bindTexture(gl.TEXTURE_2D, this.ownerTex);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.ownerData);
+    if (this.seasonDirty) {
+      gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.seasonData);
+      this.seasonDirty = false;
+    }
   }
 
   draw(camera: Camera, time: number): void {
@@ -538,6 +703,7 @@ export class MapRenderer {
     col("uInk", PALETTE.ink);
     col("uHighlight", PALETTE.paper);
     col("uSand", PALETTE.sand);
+    col("uForbid", PALETTE.blood);
 
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.infoTex);
@@ -552,6 +718,9 @@ export class MapRenderer {
     gl.activeTexture(gl.TEXTURE5);
     gl.bindTexture(gl.TEXTURE_2D, this.miniTex);
     gl.uniform1i(this.u.uMini!, 5);
+    gl.activeTexture(gl.TEXTURE6);
+    gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
+    gl.uniform1i(this.u.uSeason!, 6);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);
 

@@ -18,7 +18,7 @@ The generator is `tools/mapgen/terrain.ts`. It decides each map pixel (about 7 k
 2. **Mountain ranges**, from Natural Earth's range outlines. Each range is filled edge to edge with a mountain type, with a rim of hills 1–3 pixels wide. Which mountain type depends on the climate:
    - desert climates give badlands (red rock);
    - tropical climates give highlands (green slopes);
-   - alpine and polar climates, the high core of large ranges, and ranges north of 50° give snow peaks;
+   - alpine and polar climates, the high core of large ranges outside the tropics (30° and beyond), and ranges north of 50° give snow peaks; tropical highlands such as Ethiopia stay bare, since the snow line there is near 5 km;
    - everywhere else gets grey-rock mountains.
 3. **Wetlands**, from Natural Earth: swamp in the tropics, marsh elsewhere.
 4. **Breaking up** each zone with woods and fields:
