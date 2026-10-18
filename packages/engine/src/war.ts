@@ -2,6 +2,7 @@ import { lordsLoseWar } from "./lords.ts";
 import { castleStep } from "./works.ts";
 import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
+import { subjectAnswersCall } from "./subjects.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { planRoute } from "./march.ts";
@@ -168,7 +169,8 @@ export function answerAiCalls(world: World, news: News[]): void {
     const n = world.nationIndex.get(call.called)!;
     if (n === world.player) continue;
     const enemy = world.nationIndex.get(call.against)!;
-    const yes = call.kind === "defensive" || (!dip.warOf(d, call.called) && strength(world, n) * 2 >= strength(world, enemy));
+    // A subject answers its overlord by its loyalty and kind (SUBJ-028, SUBJ-038).
+    const yes = call.via === "subject" ? subjectAnswersCall(world, n) : call.kind === "defensive" || (!dip.warOf(d, call.called) && strength(world, n) * 2 >= strength(world, enemy));
     answerCall(world, call, yes, news);
   }
 }

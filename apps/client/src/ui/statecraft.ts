@@ -23,10 +23,12 @@ const MISSIONS: { action: string; label: string; does: (v: StatecraftView) => st
   { action: "arrange_marriage", label: "Arrange a marriage", does: () => "Married houses think better of each other (+15), and a marriage can bring a claim when a ruler dies without an heir." },
   { action: "courtesy_visit", label: "Courtesy visit", does: () => "Always welcome: +15 standing with them, fading over 5 years." },
   { action: "send_gift", label: "Send a gift", does: (v) => `${v.giftGold} gold: +30 standing with them, fading over 10 years.` },
+  { action: "offer_overlordship", label: "Offer overlordship", does: () => "If they say yes they become your tributary: 15 in 100 of their income each month, and you owe them defence. A small realm with threats around it is most willing." },
+  { action: "ask_protection", label: "Ask for protection", does: () => "If they say yes you become their vassal: they defend you, you send them 10 in 100 of your taxes and answer their calls to arms." },
 ];
 
 export const missionName = (action: string): string =>
-  ({ propose_alliance: "propose an alliance", arrange_marriage: "arrange a marriage", courtesy_visit: "pay a courtesy visit", send_gift: "bring a gift", demand: "make a demand" })[action] ?? action.replace(/_/g, " ");
+  ({ propose_alliance: "propose an alliance", arrange_marriage: "arrange a marriage", courtesy_visit: "pay a courtesy visit", send_gift: "bring a gift", demand: "make a demand", offer_overlordship: "offer overlordship", ask_protection: "ask for protection" })[action] ?? action.replace(/_/g, " ");
 
 /** The reasons a court counted, as a tap-to-open list (DIPL-081, the Why? letter). */
 function reasonsHtml(l: StatecraftView["letters"][number]): string {
@@ -86,4 +88,64 @@ export function myStatecraft(v: StatecraftView | null, realmButton: (n: number) 
     <p>${v.free} of ${v.seats} free. <span class="hint">More come with more than 10 provinces and with inventions.</span></p>
     ${v.envoys.length ? v.envoys.map((e) => `<p>${icon("scroll", 1)} ${realmButton(e.target)} <small>${e.status === "road" ? `to ${missionName(e.action)}, there in ${monthText(e.arrival)}` : e.status === "court" ? `at court, to ${missionName(e.action)}` : `coming home${e.home ? ` in ${monthText(e.home)}` : ""}`}</small></p>`).join("") : `<p class="hint">Open another realm to send an envoy there.</p>`}
     ${v.letters.length ? `<h3 class="sub">Answers</h3>${v.letters.slice(0, 8).map((l) => `<div class="letter"><p>${esc(l.text)} <small>(${monthText(l.month)})</small></p>${reasonsHtml(l)}</div>`).join("")}` : ""}`;
+}
+
+type SubjectRow = NonNullable<StatecraftView["subjects"]>["subjects"][number];
+
+const TRIBUTE: { level: string; label: string; does: string }[] = [
+  { level: "none", label: "None", does: "They pay nothing." },
+  { level: "light", label: "Light", does: "Half the share; they like it (+1)." },
+  { level: "normal", label: "Normal", does: "The kind's share." },
+  { level: "heavy", label: "Heavy", does: "One and a half times; they resent it (−1)." },
+  { level: "crushing", label: "Crushing", does: "Twice the share; they hate it (−2)." },
+];
+
+const pct = (share: number) => `${Math.round(share * 100)} in 100`;
+const loyaltyClass = (l: string) => `loyalty-${l.toLowerCase().replace(/ /g, "-")}`;
+
+/** Loyalty reasons as named badges, up or down, with no hidden number (SUBJ-029). */
+function reasonBadges(r: SubjectRow): string {
+  return `<div class="badges">${r.reasons
+    .slice()
+    .sort((a, b) => b.arrow - a.arrow)
+    .map((x) => `<span class="badge ${x.arrow > 0 ? "up" : "down"}">${x.arrow > 0 ? "▲".repeat(x.arrow) : "▼".repeat(-x.arrow)} ${esc(x.label)}</span>`)
+    .join("")}</div>`;
+}
+
+/** The subjects list on your Diplomacy tab (SUBJ-091): reach, tribute, one row per subject, worst first; the row opens its realm. */
+export function mySubjects(v: StatecraftView | null, realmButton: (n: number) => string): string {
+  const s = v?.subjects;
+  if (!s) return "";
+  const over = s.overlord
+    ? `<h3 class="sub">Your overlord</h3>
+      <p>${realmButton(s.overlord.overlord)} <small>You are its ${esc(s.overlord.kindName.toLowerCase())}, <b class="${loyaltyClass(s.overlord.loyalty)}">${esc(s.overlord.loyalty)}</b>; you send it ${Math.round(s.overlord.pays)} gold a month.</small></p>
+      ${reasonBadges(s.overlord)}`
+    : "";
+  if (!s.subjects.length) return over;
+  return `${over}<h3 class="sub">Subjects</h3>
+    <p>${s.used} of ${s.reach} reach used · ${icon("coin", 1)} ${Math.round(s.gold)} gold a month in tribute</p>
+    ${s.used > s.reach ? `<p class="hint">Over your reach: every subject is Stretched thin (−1), the furthest more.</p>` : ""}
+    ${s.subjects
+      .map((r) => `<div class="subject-row">${realmButton(r.subject)} <small>${esc(r.kindName)} · <b class="${loyaltyClass(r.loyalty)}">${esc(r.loyalty)}</b> · ▲${r.up} ▼${r.down} · pays ${Math.round(r.pays)}${r.worst ? ` · worst: ${esc(r.worst)}` : ""}</small></div>`)
+      .join("")}
+    <p class="hint">Open a subject to set its tribute, send a gift, loosen or release it. Loyalty is counted each season: two more up than down raises it a step, two more down lowers it.</p>`;
+}
+
+/** A subject's card on its realm's Diplomacy tab (SUBJ-092, SUBJ-048): loyalty and reasons, what it pays, how it comes to war, and the overlord's actions. */
+export function subjectCard(v: StatecraftView | null, r: number): string {
+  const row = v?.subjects?.subjects.find((x) => x.subject === r);
+  if (!row) return "";
+  const btn = (act: string, label: string, why: string | null, does: string) =>
+    why === null ? `<button class="paper" data-subject-act="${act}">${label}</button><p class="hint">${esc(does)}</p>` : `<button class="paper" disabled>${label}</button><p class="hint">${esc(why.charAt(0).toUpperCase() + why.slice(1))}.</p>`;
+  return `<h3 class="sub">Your ${esc(row.kindName.toLowerCase())}</h3>
+    <p><b class="${loyaltyClass(row.loyalty)}">${esc(row.loyalty)}</b> · ▲${row.up} ▼${row.down}. They send you ${Math.round(row.pays)} gold a month (${pct(row.share)} of their ${row.kind === "vassal" ? "taxes" : "income"}). ${esc(row.fights)}</p>
+    ${reasonBadges(row)}
+    <h3 class="sub">Tribute</h3>
+    <div class="choices tribute">${TRIBUTE.map((t) => `<button class="${t.level === row.tribute ? "wax" : "paper"}" data-subject-act="tribute" data-level="${t.level}" ${t.level === row.tribute ? "disabled" : ""}>${t.label}</button>`).join("")}</div>
+    <p class="hint">${esc(TRIBUTE.find((t) => t.level === row.tribute)!.does)} A Wavering subject pays half; a Disloyal one pays nothing and refuses your calls.</p>
+    <div class="missions">
+      ${btn("gift", `${icon("coin", 2)}Send a gift`, row.why.gift, `${row.giftCost} gold, six months of their income: +1 loyalty for 5 years.`)}
+      ${btn("loosen", "Loosen to tributary", row.why.loosen, "They become a tributary: they pay 15 in 100 of their income, stay out of your wars, and like it (+2 for 10 years).")}
+      ${btn("release", "Release", row.why.release, "They go free as your friend.")}
+    </div>`;
 }

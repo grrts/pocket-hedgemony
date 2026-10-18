@@ -8,7 +8,7 @@ import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 import { officialBonus } from "./officials.ts";
 import { schoolUpkeepMonthly } from "./research.ts";
 import { provinceUpkeep, worksTrade } from "./works.ts";
-import { TRIBUTE_SHARE, tributaries } from "./statecraft.ts";
+import { subjectPayments } from "./subjects.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -128,10 +128,10 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
     L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + provinceTax(world, p, holder, share);
     L[holder * LEDGER_LINES + TRADE] = L[holder * LEDGER_LINES + TRADE]! + provinceTrade(world, p, share);
   }
-  // A Tributary sends its overlord a share of its tax and trade (SUBJ-005).
-  for (const [payer, receiver] of tributaries(world)) {
+  // Each subject sends its overlord its kind's share, by tribute level and loyalty: a Vassal of its taxes, the rest of tax and trade (SUBJ-005).
+  for (const [payer, receiver, share, taxOnly] of subjectPayments(world)) {
     if (only >= 0 && payer !== only && receiver !== only) continue;
-    const gold = Math.max(0, L[payer * LEDGER_LINES + TAX]! + L[payer * LEDGER_LINES + TRADE]!) * TRIBUTE_SHARE;
+    const gold = Math.max(0, L[payer * LEDGER_LINES + TAX]! + (taxOnly ? 0 : L[payer * LEDGER_LINES + TRADE]!)) * share;
     if (only < 0 || payer === only) L[payer * LEDGER_LINES + TRIBUTE] = L[payer * LEDGER_LINES + TRIBUTE]! - gold;
     if (only < 0 || receiver === only) L[receiver * LEDGER_LINES + TRIBUTE] = L[receiver * LEDGER_LINES + TRIBUTE]! + gold;
   }

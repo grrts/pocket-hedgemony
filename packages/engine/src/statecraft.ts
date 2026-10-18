@@ -2,6 +2,7 @@ import type { World } from "./world.ts";
 import { cedeProvince, type News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
+import { aiMayTakeSubject, aiOverlords, makeSubject, seasonalSubjects, subjectByAgreement, subjectsView, type SubjectsView } from "./subjects.ts";
 
 /**
  * Milestone 5, statecraft (first slice): envoys carry the realm's asks to
@@ -17,7 +18,7 @@ import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 const rel = dip.relations;
 
 /** The envoy missions the player can send in this slice. */
-export const ENVOY_ACTIONS = ["propose_alliance", "arrange_marriage", "courtesy_visit", "send_gift"] as const;
+export const ENVOY_ACTIONS = ["propose_alliance", "arrange_marriage", "courtesy_visit", "send_gift", "offer_overlordship", "ask_protection"] as const;
 export type EnvoyAction = (typeof ENVOY_ACTIONS)[number];
 
 /** A gift's worth in the diplomacy data's gold (the most a gift counts for: +30 at 0.2 a gold), and what it costs the treasury. */
@@ -99,6 +100,15 @@ export function whyNotEnvoy(world: World, n: number, t: number, action: string):
     if (rel.has(g, "alliance", a, b)) return "already allies";
     if (rel.overlord(g, a) === b || rel.overlord(g, b) === a) return "a subject is bound already";
     if (rel.stance(g, a, b) === "hostile" || rel.stance(g, b, a) === "hostile") return "they are hostile";
+  }
+  if (action === "offer_overlordship" || action === "ask_protection") {
+    const [o, sub] = action === "offer_overlordship" ? [n, t] : [t, n];
+    if (rel.overlord(g, world.nationIds[sub]!)) return action === "offer_overlordship" ? "they already answer to an overlord" : "you already answer to an overlord";
+    if (rel.overlord(g, world.nationIds[o]!) === world.nationIds[sub]) return "a subject is bound already";
+    if (rel.has(g, "alliance", a, b)) return "you are allies: end the alliance first";
+    // Only the smaller realm comes under the larger (SUBJ-086).
+    const size = (k: number) => dip.country(world.diplomacy, world.nationIds[k]!).provinces ?? 1;
+    if (size(sub) >= size(o)) return action === "offer_overlordship" ? "they are not smaller than you" : "you are not smaller than them";
   }
   if (action === "arrange_marriage" && dip.marriagesBetween(world.diplomacy, a, b) > 0) return "your houses are married already";
   if (action === "send_gift" && world.nationTreasury[n]! < giftGold(world)) return `needs ${giftGold(world)} gold`;
@@ -201,33 +211,12 @@ function demandGivenIn(world: World, asker: number, asked: number, kind: string,
   }
   if (kind === "pay_tribute" && !rel.overlord(world.diplomacy.graph, world.nationIds[asked]!)) {
     try {
-      rel.makeSubject(world.diplomacy.graph, world.nationIds[asked]!, world.nationIds[asker]!, "tributary");
+      makeSubject(world, asked, asker, "tributary");
       news.push({ kind: "envoy", text: `${world.rules.nations[asked]!.name} agrees to pay tribute to ${world.rules.nations[asker]!.name}.`, nations: [asked, asker] });
     } catch {
       // A tie the relation rules forbid (an alliance, a truce of another kind): the demand lapses.
     }
   }
-}
-
-/** The share of a Tributary's income it sends its overlord each month (SUBJ-005, subjects `kinds.tributary.pays_share`). */
-export const TRIBUTE_SHARE = 0.15;
-
-/** Tributaries of each realm and what they pay a month: [payer, receiver] pairs. */
-const tributeCache = new WeakMap<World, { key: string; pairs: [number, number][] }>();
-export function tributaries(world: World): [number, number][] {
-  const g = world.diplomacy.graph;
-  const key = `${g.relations.length}|${g.seq}|${world.diplomacy.seq}`;
-  const hit = tributeCache.get(world);
-  if (hit && hit.key === key) return hit.pairs.filter(([a, b]) => !world.nationGone[a] && !world.nationGone[b]);
-  const out: [number, number][] = [];
-  for (const r of world.diplomacy.graph.relations) {
-    if (r.type !== "subject" || dip.subjectKind(world.diplomacy, r.source) !== "tributary") continue;
-    const payer = world.nationIndex.get(r.source);
-    const receiver = world.nationIndex.get(r.target);
-    if (payer !== undefined && receiver !== undefined && !world.nationGone[payer] && !world.nationGone[receiver]) out.push([payer, receiver]);
-  }
-  tributeCache.set(world, { key, pairs: out });
-  return out;
 }
 
 /** Breaks an alliance (DIPL-103): an Oath broken and the wrong Broke our alliance. */
@@ -279,12 +268,22 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   d.letters = d.letters.filter((l) => dip.monthsBetween(l.deliverOn, month) < 24);
   d.envoys = d.envoys.filter((e) => (e.status !== "home" && e.status !== "failed") || dip.monthsBetween(dip.monthOf(e.returnDate ?? e.arrival), month) < 12);
   for (const e of d.events) {
+    if (e.type === "SubjectByAgreementAgreed") {
+      const o = world.nationIndex.get(String(e.overlord));
+      const s = world.nationIndex.get(String(e.subject));
+      // Ask for protection comes from the subject; Offer overlordship from the overlord (SUBJ-086).
+      const asked = d.letters.some((l) => l.action === "ask_protection" && l.from === String(e.overlord) && l.to === String(e.subject) && l.answer === "yes");
+      if (o !== undefined && s !== undefined) subjectByAgreement(world, o, s, asked, news);
+      continue;
+    }
     if (e.type !== "DemandGivenIn") continue;
     const asker = world.nationIndex.get(String(e.asker));
     const asked = world.nationIndex.get(String(e.asked));
     if (asker !== undefined && asked !== undefined) demandGivenIn(world, asker, asked, String(e.kind), e.province === undefined ? undefined : String(e.province), news);
   }
   d.events.length = 0;
+  seasonalSubjects(world, news);
+  aiOverlords(world, news);
   aiEnvoys(world);
 }
 
@@ -337,8 +336,10 @@ function aiEnvoys(world: World): void {
     if (t < 0) continue;
     const days = countDays(world);
     let best: { t: number; action: string; total: number } | null = null;
-    for (const action of ["propose_alliance", "arrange_marriage"] as const) {
+    for (const action of ["propose_alliance", "arrange_marriage", "offer_overlordship"] as const) {
       if (whyNotEnvoy(world, n, t, action)) continue;
+      // An AI overlord takes no subject that would put it more than 1 over its reach (SUBJ-098).
+      if (action === "offer_overlordship" && !aiMayTakeSubject(world, n)) continue;
       const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days);
       if (!best || count.total > best.total) best = { t, action, total: count.total };
     }
@@ -380,7 +381,9 @@ export interface StatecraftView {
   /** Answers received in the last two years, newest first, with the reasons each court counted. */
   letters: { from: number; action: string; answer: "yes" | "no" | "done"; text: string; reasons: { name: string; number: number }[]; total?: number; month: string }[];
   /** For every other realm: what it thinks of the player, the ledger behind it, and why each mission can't be sent now (null when it can), in ENVOY_ACTIONS order. */
-  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView; tribute: { pays: number; to: number } | null }>;
+  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView }>;
+  /** The player's subjects and its own overlord (SUBJ-091, SUBJ-102). */
+  subjects: SubjectsView | null;
 }
 
 /** The demands the player can make of a realm: why none can (null when some can), tribute or why not, and the border provinces. */
@@ -404,7 +407,6 @@ export function statecraftView(world: World, player: number): StatecraftView | n
     .sort((a, b) => b.deliverOn.localeCompare(a.deliverOn))
     .map((l) => ({ from: world.nationIndex.get(l.from) ?? -1, action: l.action, answer: l.answer, text: letterText(world, l), reasons: l.reasons.map((r) => ({ name: r.name, number: Math.round(r.number) })), ...(l.total !== undefined ? { total: Math.round(l.total) } : {}), month: l.deliverOn }));
   const realms: StatecraftView["realms"] = {};
-  const tribute = tributaries(world);
   for (let n = 0; n < world.nationCount; n++) {
     if (n === player || world.nationGone[n]) continue;
     const s = standingOf(world, n, player);
@@ -412,14 +414,13 @@ export function statecraftView(world: World, player: number): StatecraftView | n
     const near = why ? [] : demandableProvinces(world, player, n);
     const capital = world.provinceIndex.get(world.rules.nations[n]!.capital);
     const demands: DemandView = { why, tribute: why ? why : whyNotDemand(world, player, n, "pay_tribute"), provinces: near.map((p) => ({ province: p, name: world.rules.provinces[p]!.name, capital: p === capital })) };
-    const pair = tribute.find(([payer]) => payer === n);
     realms[n] = {
       ...s,
       why: ENVOY_ACTIONS.map((a) => whyNotEnvoy(world, player, n, a)),
       married: dip.marriagesBetween(d, me, world.nationIds[n]!) > 0,
       demands,
-      tribute: pair ? { pays: Math.max(0, -world.nationLedger[n * LEDGER_LINES + LEDGER.indexOf("tribute")]!), to: pair[1] } : null,
     };
   }
-  return { seats, free, giftGold: giftGold(world), envoys, letters, realms };
+  const subjects = subjectsView(world, player, (n) => world.nationLedger[n * LEDGER_LINES + LEDGER.indexOf("tribute")]!);
+  return { seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects };
 }
