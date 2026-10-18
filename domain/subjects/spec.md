@@ -367,6 +367,8 @@ Newest decision first.
 
 - SUBJ-097 The subjects context shall read and write the event-tree keys `vassalize`, `release`, `relation {subject | overlord | personal_union}`, `subject_count` (by reach weights only if the event says so), `create_country … subject_of` and the `doctrine_of_lapse` flag, and the new keys `subject_loyalty`, `add_subject_reason` / `remove_subject_reason` and `change_subject_kind`. [subjects 11.1]
 
+How the player uses it (X-19): there is no new screen. An event that makes, loosens, tightens or releases a subject, or adds or lifts a reason, says so in words on its event card before the player chooses ("Navarre becomes a subject of you", "Sweden: loyalty reason “You lost a war” for 36 months"); a subject made or freed and a kind changed arrive in the dispatches. The change then shows where every subject change shows: the *Subjects* list and the subject's card on the Diplomacy tabs (kind, reason badges) and the *Subjects* lens at a glance. Phone: the event card's effect lines wrap in the Wide and Tall layouts like its other lines; nothing needs hover. The game's own bonds are the truth: `subject_loyalty` reads the bond's loyalty, `subject_count by_reach` its reach weights.
+
 ### 5.16 AI
 
 - SUBJ-098 Where an AI is an overlord, the subjects context shall have it fold in Loyal subjects when lord capacity allows and its personality likes centralising, loosen a Disloyal subject when at war elsewhere, station residents on its biggest Wavering subjects, and never let reach overflow by more than 1. [subjects 11.2]
