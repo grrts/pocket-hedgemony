@@ -86,7 +86,8 @@ export function provinceTax(world: World, p: number, holder: number, share = cro
   const { economy } = world.rules.defines;
   // A tax collector brings more of it in (province officials table: +20 % reaching you).
   const collector = officialBonus(world, p, "Tax collector", "tax_reach");
-  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector;
+  // Restricted faiths pay a quarter more on their share, Persecuted ones nothing (RELG-050, RELG-052).
+  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]!;
 }
 
 /** Trade and market gold a province gives its holder in a month (not taxed by rate). */

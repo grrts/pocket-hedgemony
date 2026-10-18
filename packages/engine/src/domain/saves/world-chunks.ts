@@ -3,6 +3,7 @@ import { CLASS_COUNT, rescaleClasses } from "../../living.ts";
 import { LEDGER_LINES } from "../../treasury.ts";
 import { restoreResearch, saveResearch, type SavedResearch } from "../../research.ts";
 import { graspingFromGrievances, restoreGovernment, saveGovernment, type SavedGovernment } from "../../government.ts";
+import { restorePeoples, savePeoples, type SavedPeoples } from "../../peoples.ts";
 import { refreshWorks, WORK_COUNT, workIndex, WORKS, type QueuedWork, type Site } from "../../works.ts";
 import { MAX_TILES } from "../../land.ts";
 import type { Ruleset } from "@ph/rules";
@@ -87,7 +88,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
-      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed, foodPolicy: world.foodPolicy, diplomacy: { ...world.diplomacy, events: [] }, government: saveGovernment(world) },
+      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed, foodPolicy: world.foodPolicy, diplomacy: { ...world.diplomacy, events: [] }, government: saveGovernment(world), peoples: savePeoples(world) },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
@@ -319,7 +320,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (!name || owner < 0 || nationMap[owner]! < 0) return -1;
     return addCommander(world, nationMap[owner]!, newCommander(name), id);
   });
-  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[]; foodPolicy?: FoodPolicyScreen[]; diplomacy?: World["diplomacy"]; government?: SavedGovernment };
+  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[]; foodPolicy?: FoodPolicyScreen[]; diplomacy?: World["diplomacy"]; government?: SavedGovernment; peoples?: SavedPeoples };
   const mapP = (old: number) => world.provinceIndex.get(ids.provinces[old]!) ?? -1;
   const mapN = (old: number) => nationMap[old] ?? -1;
   const mapCompany = (c: FreeCompany): FreeCompany => ({ ...c, home: c.home < 0 ? -1 : mapP(c.home) });
@@ -355,6 +356,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   // Forms and Custom by realm; a save from before government keeps the 1444 start.
   if (natMeta.government) restoreGovernment(world, natMeta.government, mapN);
   graspingFromGrievances(world);
+  // Tongues and faiths by province and realm; a save from before them keeps the 1444 start.
+  restorePeoples(world, natMeta.peoples);
   // Research by realm; a save from before research keeps the 1444 start.
   if (natMeta.research) restoreResearch(world, natMeta.research, mapN, mapP);
   // Lords keep their places in the list (provinces point at them); one of a realm that is gone holds nothing.

@@ -18,6 +18,13 @@ import {
   type Snapshot,
   realmStrengths,
   WORKS,
+  peoplesView,
+  FAITH_IDS,
+  NO_FAITH,
+  NO_TONGUE,
+  SLOTS,
+  TONGUE_FAMILY,
+  faithName,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { askCard, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
@@ -32,6 +39,7 @@ import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
+import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
@@ -145,7 +153,7 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "government" | "heritage" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" = "general";
+let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -165,7 +173,7 @@ let provinceTab: "overview" | "people" | "garrison" | "land" | "build" = "overvi
 /** The tile tapped on the Land tab, or -1. */
 let landTile = -1;
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "tongues" | "faiths";
 let lens: Lens = "realms";
 /** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
 let fogOn = true;
@@ -431,7 +439,22 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "food", name: "Food", note: "men on campaign the store can feed" },
   { id: "lords", name: "Lords", note: "who holds your land" },
   { id: "diplomacy", name: "Diplomacy", note: "friend or foe, envoys on the road" },
+  { id: "tongues", name: "Tongues", note: "the family of the tongue most speak" },
+  { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
 ];
+/** A colour per tongue family and per faith for their lenses (CULT-085, RELG-118): fixed hues, so a family or faith keeps its colour all campaign. */
+const familyRgb = (key: string): number[] => {
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  return hslRgb((h % 360) / 360, 0.45 + ((h >> 9) % 3) * 0.1, 0.42 + ((h >> 11) % 3) * 0.08);
+};
+const FAITH_HEX: Record<string, string> = {
+  catholic: "#c9a227", protestant: "#3b5fb0", anglican: "#7a5bb0", hussite: "#b0703b", orthodox: "#8f2f3a", oriental_christian: "#b04a6a",
+  sunni: "#2f7a44", shia: "#5aa864", ibadi: "#86b85a", hindu: "#d6782e", sikh: "#e0a040", jain: "#e8c890",
+  theravada: "#e0b030", mahayana: "#d4c050", vajrayana: "#b8862a", shinto: "#c84040", confucian_ritual: "#a83e3e", daoist: "#5a8a8a",
+  jewish: "#4a6ad0", indigenous_american: "#8a6040", african_traditional: "#7a5030", pacific_traditional: "#3a8aa0", siberian_steppe_traditional: "#8a8a60", asian_traditional: "#6a7a50", secular: "#9a9a9a",
+};
+const faithRgb = (f: string) => (FAITH_HEX[f] ? hexToRgb(FAITH_HEX[f]!) : familyRgb(f));
 /** The diplomacy lens's colours (DIPL-183), by LENS_RELATIONS; "own" is the realm's own colour. */
 const RELATION_HEX: Record<LensRelation, string> = {
   own: "",
@@ -465,9 +488,10 @@ const relationTo = (n: number): LensRelation | null => {
 const ROYAL_RGB = hexToRgb("#e9c35a");
 /** A colour per lord for the Lords lens: hues spread by the golden angle, kept clear of the crown's gold. */
 function lordRgb(k: number): number[] {
-  const h = (80 + ((k * 137.508) % 260)) / 360;
-  const l = k % 2 ? 0.42 : 0.55;
-  const sat = 0.5;
+  return hslRgb((80 + ((k * 137.508) % 260)) / 360, 0.5, k % 2 ? 0.42 : 0.55);
+}
+/** An HSL colour (each 0..1) as RGB bytes. */
+function hslRgb(h: number, sat: number, l: number): number[] {
   const q = l < 0.5 ? l * (1 + sat) : l + sat - l * sat;
   const p = 2 * l - q;
   const ch = (t: number) => {
@@ -487,7 +511,7 @@ function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map lens</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.name}</b><small>${l.note}</small></button>`).join("")}
-    ${lens === "diplomacy" ? diplomacyKey() : ""}
+    ${lens === "diplomacy" ? diplomacyKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -516,6 +540,25 @@ function diplomacyKey(): string {
   </div>`;
 }
 
+/** The Tongue and Faith lenses' key: the families or faiths that cover the most of the map, largest first. */
+function beliefKey(): string {
+  if (!snapshot) return `<div class="lens-key"><p>Choose a realm to see tongues and faiths.</p></div>`;
+  const count = new Map<string, number>();
+  const pe = snapshot.peoples;
+  for (let i = 0; i < provinces.length; i++) {
+    const k = lens === "tongues" ? (pe.provinceTongue[i * SLOTS] !== NO_TONGUE ? TONGUE_FAMILY[pe.provinceTongue[i * SLOTS]!]! : "") : pe.provinceFaith[i * SLOTS] !== NO_FAITH ? FAITH_IDS[pe.provinceFaith[i * SLOTS]!]! : "";
+    if (k) count.set(k, (count.get(k) ?? 0) + 1);
+  }
+  const rows = [...count].sort((a, b) => b[1] - a[1]).slice(0, 12);
+  const rgb = (k: string) => `rgb(${(lens === "tongues" ? familyRgb(k) : faithRgb(k)).join(",")})`;
+  const label = (k: string) => (lens === "tongues" ? k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, " ") : faithName(k));
+  return `<div class="lens-key">
+    ${rows.map(([k]) => `<span><i class="swatch" style="background:${rgb(k)}"></i>${esc(label(k))}</span>`).join("")}
+    ${lens === "faiths" ? `<span><i class="swatch hatched" style="background:#b9b3a4"></i>A second faith holds 30% or more</span>` : ""}
+    <p>Tap a province for its ${lens === "tongues" ? "Tongue" : "Faith"} line.</p>
+  </div>`;
+}
+
 /** Colour for a province under the current lens. */
 function lensColor(i: number): number[] {
   const o = owners[i]!;
@@ -534,6 +577,14 @@ function lensColor(i: number): number[] {
       if (!snapshot || o !== snapshot.playerNation) return o >= 0 ? nationRgb[o]!.map((v) => Math.round(v * 0.35 + 150)) : unownedRgb;
       const l = snapshot.provinceLord[i]!;
       return l >= 0 ? lordRgb(l) : ROYAL_RGB;
+    }
+    case "tongues": {
+      const t = snapshot?.peoples.provinceTongue[i * SLOTS] ?? NO_TONGUE;
+      return t === NO_TONGUE ? unownedRgb : familyRgb(TONGUE_FAMILY[t]!);
+    }
+    case "faiths": {
+      const f = snapshot?.peoples.provinceFaith[i * SLOTS] ?? NO_FAITH;
+      return f === NO_FAITH ? unownedRgb : faithRgb(FAITH_IDS[f]!);
     }
     case "diplomacy": {
       const r = o >= 0 ? relationTo(o) : null;
@@ -599,7 +650,7 @@ function restyleProvinces(): void {
     const o = owners[i]!;
     const occ = occupiers[i]!;
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
-    const hatched = (occ >= 0 && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war");
+    const hatched = (occ >= 0 && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war") || (lens === "faiths" && (snapshot?.peoples.provinceFaithShare[i * SLOTS + 1] ?? 0) >= 0.3);
     const lord = snapshot ? snapshot.provinceLord[i]! : -1;
     const lit = litLord >= 0 && lord === litLord;
     const flags = (i === selectedProvince ? 1 : 0) | (lit ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
@@ -1642,6 +1693,7 @@ function renderPanel(): void {
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       ${snapshot ? foodFacts(selectedProvince) : ""}
       ${snapshot && own >= 0 ? moodFacts(selectedProvince) : ""}
+      ${snapshot ? beliefFacts(snapshot.peoples, selectedProvince) : ""}
       <dt>Walls</dt><dd>${wallsAt(selectedProvince) ? WALL_NAMES[wallsAt(selectedProvince)!] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
       ${mineHere ? taxLine(selectedProvince) : ""}
@@ -1673,6 +1725,13 @@ function renderPanel(): void {
   bindProvinceTabs();
   bindNationButtons();
   bindTax(selectedProvince);
+  panel.querySelectorAll<HTMLButtonElement>("[data-belief]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const which = b.dataset.belief as "tongue" | "faith";
+      beliefUi.open = beliefUi.open === which ? null : which;
+      renderPanel();
+    }),
+  );
   bindLords();
   panel.querySelector("[data-realm-open-food]")?.addEventListener("click", () => {
     realmView = snapshot!.playerNation;
@@ -2129,7 +2188,10 @@ const GRIEVANCE_FIX: Record<string, string> = {
   Conscription: "ends when half the recruits are back",
   "Soldiers quartered": "ends when the armies move on",
   Ungoverned: "ends when the official returns to his post",
-  "Foreign rule": "the people were not yours in 1444",
+  "Foreign rule": "a homeland of a stranger tongue taken since 1444; ends with a lord of its tongue",
+  "Banned tongue": "your Tongue policy is Impose and most here are strangers; ends with Teach or Let be (Peoples tab)",
+  "Wrong faith": "a third or more keep a faith without a house, or a Restricted majority; ends when it is served (Peoples tab)",
+  Persecuted: "a Persecuted faith lives here; counts as two; ends when it is Tolerated or Restricted again (Peoples tab)",
   Bloodshed: "a battle was fought here; it fades after 20 years",
   "Heavy taxes": "ends when the tax is normal or lighter; crushing counts twice",
   "Grasping officials": "the realm has more officials than its cap; ends when it is back within (Government tab)",
@@ -2834,8 +2896,9 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning") && !mine)) realmTab = "general";
+  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
+  const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
     <div class="realm-card">
@@ -2849,6 +2912,7 @@ function renderRealm(r: number): void {
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
       ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
       ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
+      ${peoples ? beliefLines(peoples, mine) : ""}
       <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
       <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
       ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
@@ -2870,6 +2934,7 @@ function renderRealm(r: number): void {
     realmTab === "heritage" ? heritageTab(strengths)
     : realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r))
     : realmTab === "government" && s?.government ? governmentTab(s.government)
+    : realmTab === "peoples" && peoples ? peoplesTab(peoples)
     : realmTab === "treasury" ? treasurySection()
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "military" ? warRoomSection()
@@ -2881,7 +2946,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -2947,6 +3012,14 @@ function renderRealm(r: number): void {
     b.addEventListener("click", () => {
       governmentUi.confirm = b.dataset.reformAsk!;
       renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-tongue-policy]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "tonguePolicy", policy: b.dataset.tonguePolicy! })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-faith-policy]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "faithPolicy", faith: b.dataset.faith!, policy: b.dataset.faithPolicy! })));
+  panel.querySelectorAll<HTMLDetailsElement>("details[data-family]").forEach((d) =>
+    d.addEventListener("toggle", () => {
+      if (d.open) beliefUi.families.add(d.dataset.family!);
+      else beliefUi.families.delete(d.dataset.family!);
     }),
   );
   panel.querySelector<HTMLButtonElement>("[data-reform-cancel]")?.addEventListener("click", () => {
