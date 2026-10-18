@@ -20,7 +20,7 @@ import {
   WORKS,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
-import { mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
+import { askCard, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
@@ -1245,7 +1245,7 @@ function renderHud(): void {
     <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
     ${s.stability ? stabilityPlaque(s.stability, me) : ""}
     ${myWars().length ? `<button class="plaque at-war" data-realm="${me}" data-realm-open="diplomacy" title="Your wars">${icon("swords", 1)}At war</button>` : ""}
-    <button class="plaque dispatches${s.calls.length || s.peaceOffers.length ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${unread + s.calls.length + s.peaceOffers.length || ""}</button>`;
+    <button class="plaque dispatches${s.calls.length || s.peaceOffers.length || asksOf(s).length ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${unread + s.calls.length + s.peaceOffers.length + asksOf(s).length || ""}</button>`;
 }
 
 /** Wars the player fights, with the player's side first. */
@@ -1356,6 +1356,11 @@ function logNews(s: Snapshot): void {
     if (alerted.has(`peace ${o.id}`)) continue;
     alerted.add(`peace ${o.id}`);
     alertPlayer(`${nations[o.from]!.name} offers peace.`, "crown", { answer: true });
+  }
+  for (const a of asksOf(s)) {
+    if (alerted.has(`ask ${a.id}`)) continue;
+    alerted.add(`ask ${a.id}`);
+    alertPlayer(`${nations[a.from]!.name}'s envoy waits for your answer.`, "scroll", { answer: true });
   }
 }
 
@@ -1471,6 +1476,7 @@ function renderNews(): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">Dispatches</h2>${closeButton()}</header>
     <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
+    ${asksHtml()}
     ${s.peaceOffers.map(offerHtml).join("")}
     ${s.calls
       .map(
@@ -2563,12 +2569,26 @@ function offerHtml(o: Snapshot["peaceOffers"][number]): string {
 }
 
 function offersFrom(r: number): string {
-  return snapshot!.peaceOffers.filter((o) => o.from === r).map(offerHtml).join("");
+  return asksHtml(r) + snapshot!.peaceOffers.filter((o) => o.from === r).map(offerHtml).join("");
+}
+
+/** Envoys waiting at the player's court for an answer (DIPL-214). */
+const asksOf = (s: Snapshot) => s.statecraft?.asks ?? [];
+
+/** The answer cards of envoys at your court, all of them or one realm's. */
+function asksHtml(from?: number): string {
+  return asksOf(snapshot!)
+    .filter((a) => from === undefined || a.from === from)
+    .map((a) => askCard(a, (n) => realmButton(n, "diplomacy")))
+    .join("");
 }
 
 function bindOffers(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-offer]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "answerPeace", offer: Number(b.dataset.offer), yes: b.dataset.yes === "1" })),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-ask]").forEach((b) =>
+    b.addEventListener("click", () => void act({ type: "answerAsk", ask: b.dataset.ask!, yes: b.dataset.yes === "1" })),
   );
 }
 
@@ -2577,7 +2597,7 @@ function myDiplomacySection(): string {
   const s = snapshot!;
   const ties = s.relations.filter((x) => x.state !== "war");
   const STATE = { truce: "Truce", alliance: "Ally", subject: "Your overlord", overlord: "Your subject", war: "At war" } as const;
-  return `${s.peaceOffers.map(offerHtml).join("")}
+  return `${asksHtml()}${s.peaceOffers.map(offerHtml).join("")}
     <h3 class="sub">Wars</h3>
     ${myWars().length ? myWars()
       .map((w) => `<p>${icon("swords", 1)} Against ${w.theirs.map((n) => realmButton(n, "diplomacy")).join(" ")} <small>since ${monthText(w.start)}</small></p>`)

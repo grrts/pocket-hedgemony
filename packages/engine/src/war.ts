@@ -947,10 +947,9 @@ export function aiDeclarations(world: World, news: News[]): void {
 /**
  * Before an AI declares war it tries a fitting demand first (DIPL-180): tribute, else a border
  * province that is not their capital. It goes to war only once a demand was refused, and waits
- * while one is on its way. The player is not sent demands yet: answering them is a later slice.
+ * while one is on its way. The player answers theirs on an answer card (DIPL-213).
  */
 function demandFirst(world: World, n: number, t: number): boolean {
-  if (t === world.player) return false;
   const d = world.diplomacy;
   const a = world.nationIds[n]!;
   const b = world.nationIds[t]!;

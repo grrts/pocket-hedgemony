@@ -365,6 +365,8 @@ export function orderShape(order: Order): string {
       return "break an alliance";
     case "makeDemand":
       return "make a demand";
+    case "answerAsk":
+      return "answer an envoy";
     case "subjectAction":
       return "act on a subject";
     case "moveBuild":
