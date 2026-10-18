@@ -4,6 +4,7 @@ import { allNationPay, ungoverned } from "./recruit.ts";
 import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
 import { interestPct, loanCap, realmConfig } from "./domain/realm/index.ts";
 import { moodShare } from "./moods.ts";
+import { taxCapped, taxRaised } from "./rebels.ts";
 import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 import { officialBonus } from "./officials.ts";
 import { schoolUpkeepMonthly } from "./research.ts";
@@ -187,7 +188,13 @@ export function setTax(world: World, n: number, province: number, rate: number, 
   if (!Number.isInteger(rate) || rate < -1 || rate >= TAX_RATES.length) return "no such tax rate";
   if (province < 0 && rate < 0) return "the realm needs a default rate";
   if (province >= 0 && (province >= world.provinceCount || world.provinceOwner[province] !== n)) return "not your province";
+  if (province >= 0) {
+    const capped = taxCapped(world, province, rate);
+    if (capped) return capped;
+  }
+  const was = province >= 0 ? taxRateOf(world, province, n) : world.nationTaxDefault[n]!;
   applyRate(world, n, province, rate, news);
+  if ((province >= 0 ? taxRateOf(world, province, n) : rate) > was) taxRaised(world, n, province);
   // The ledger shows the new sums at once.
   runLedger(world, false);
   return null;

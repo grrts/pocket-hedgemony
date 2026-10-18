@@ -219,6 +219,18 @@ A turn is one week, so these steps run once a month, in the turn in which a new 
 - "Backed by nobody yet", and where it may spread next month.
 - The buttons Grant demand, Talk, Bribe leader, Wait and Attack.
 
+### In the game today
+
+The first slice plays risings on the eight grievances the game tracks, so the risings you meet are hunger, tax, homeland and town ones. They start from a plotting province's monthly roll, or at once in a rioting province when you raise its tax or your army loses a battle in or next to it.
+
+- **Where**: an alert over the map says a rising has begun, with Go there. The province's card opens with the rebellion card, and the five answers under it as big buttons with their gold and odds. Grant asks once more before it gives anything up; Attack sends your nearest free army; Wait folds the card.
+- **On the map**: the band stands in its province as a dark rider with its men, and the land it holds is hatched dark. It besieges the castles of its land; once it holds two or more provinces it marches a province a week on the nearest castle beside its land. A taken castle arms it.
+- **What it costs you**: a province the rebels hold sends you no tax and no recruits, and its men are taken from its recruits.
+- **Beating them**: march an army with a commander onto the band. If you win, the rebels scatter and the same card asks for your verdict: Pardon, Punish the leaders or Massacre. Massacre asks once more. An army that stands four weeks in a held province the band has left takes it back.
+- **Overview**: your realm's Provinces tab opens with a Risings block listing every rising and every beaten rising waiting on you, and the General tab has a red Risings line that opens it. A plotting province's mood line gives its chance to rise each month.
+- **Answers today**: granting a tax demand puts the tax back to normal and ends the musters there. A hunger demand opens the castle granary (up to 4 months of food). A homeland demand gives self-rule, so *Foreign rule* no longer counts there and the tax stays light for good. A town demand sends your armies out of their land. Talks cost 10 gold a province, once a month. A bribe costs 1 gold per 100 rebels.
+- **If they win** (a year held, or the capital's castle taken): tax and town risings keep their tax light for 10 years; hunger risings empty the castles into their stores and turn their lords disloyal; a homeland rising breaks away to the realm that held it in 1444.
+
 ## How it connects
 
 - [Provinces](Provinces): grievances, homeless, classes and slots, the local store, judges, almshouses, charters and castles; rebellions writes *Neighbour in revolt*, *Bloodshed* and *Burned homes*.

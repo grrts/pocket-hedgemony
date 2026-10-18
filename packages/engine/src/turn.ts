@@ -8,6 +8,7 @@ import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft,
 import { riseUp, subjectAction } from "./subjects.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
+import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
@@ -134,6 +135,10 @@ export type Order =
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
   | { type: "foodPreset"; name: string }
+  /** Answer a rising against the player: grant its demand, talk or bribe its leader (REBL-045 to REBL-047); waiting needs no order, attacking is a march. */
+  | { type: "answerRebels"; rising: number; answer: "grant" | "talk" | "bribe" }
+  /** The verdict on a beaten rising: Pardon, Punish the leaders or Massacre (REBL-050). */
+  | { type: "treatRebels"; rising: number; treatment: "Pardon" | "Punish the leaders" | "Massacre" }
   /** Ports, sailors and fleets: muster, buy a ship, sail, board, land, admiral, merge, split, disband (navy.ts). */
   | NavyOrder
   /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
@@ -211,6 +216,7 @@ function startDay(world: World, news: News[]): void {
     monthlyGovernment(world, news);
     monthlyPeoples(world, news);
     monthlyMoods(world, news);
+    monthlyRebels(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
     monthlyResearch(world, news);
@@ -240,6 +246,7 @@ function endDay(world: World, news: News[]): void {
   feedArmies(world);
   dailyExploration(world);
   runOccupation(world, world.date.day === 1, news);
+  dailyRebels(world, news);
   world.date = addDays(world.date, 1);
   world.day++;
   updateWeather(world);
@@ -374,6 +381,10 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
+    case "answerRebels":
+      return answerRebels(world, actingNation, order.rising, order.answer, news);
+    case "treatRebels":
+      return verdictOrder(world, actingNation, order.rising, order.treatment, news);
     case "moveBuild":
       return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":

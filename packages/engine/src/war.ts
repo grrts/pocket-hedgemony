@@ -12,6 +12,7 @@ import { marchMap, NO_PATH, type World } from "./world.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 import { officialBonus } from "./officials.ts";
 import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
+import { lostBattle } from "./rebels.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -24,7 +25,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "event" | "voyage" | "colony";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "voyage" | "colony";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -207,7 +208,7 @@ const provinceName = (world: World, p: number) => world.rules.provinces[p]!.name
 // ---------------------------------------------------------------- battles
 
 /** A battlefield row by the province's ground (the province context's tiles are not simulated yet). */
-function battleRow(g: Ground): string[] {
+export function battleRow(g: Ground): string[] {
   switch (g) {
     case "forest":
     case "jungle":
@@ -230,7 +231,7 @@ function battleRow(g: Ground): string[] {
  * One side's armies as a warfare army: companies by arm, kind and drill, led by
  * the best commander among them (returned too, by index, or -1).
  */
-function battleArmy(world: World, slots: number[], id: string): [wf.Army, number] {
+export function battleArmy(world: World, slots: number[], id: string): [wf.Army, number] {
   const a = world.armies;
   const size = wf.W.company_size.max;
   const companies: wf.Company[] = [];
@@ -496,6 +497,7 @@ export function fightRound(world: World, news: News[]): void {
     commanderBattle(world, b.attackerWins ? b.defLead : b.attLead, false, false);
     endBattle(world, b);
     for (const s of loseSlots) fallBack(world, s, enemies, news);
+    lostBattle(world, loser, b.province);
     news.push({
       kind: "battle",
       text: `Battle of ${provinceName(world, b.province)}: ${name(world, winner)} (${fmt(winStart)}) beat ${name(world, loser)} (${fmt(loseStart)}). ${capitalise(b.reason)}. Losses ${fmt(b.attackerWins ? b.attDealt : b.defDealt)} and ${fmt(b.attackerWins ? b.defDealt : b.attDealt)}.`,
