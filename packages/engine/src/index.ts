@@ -21,3 +21,4 @@ export { CHANGES, type ChangeName, type ChangeRow } from "./conversion.ts";
 export { castleCap, FOOD_SETTINGS, foodView, mapNetwork, reachOf, setFood, setFoodPreset, shareFood, SURPLUS_RULES, type CastleView, type FoodView } from "./castleFood.ts";
 export { capsOf, formOf, governmentView, type GovernmentView, type NextFormView } from "./government.ts";
 export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecraft.ts";
+export { LENS_RELATIONS, type LensRelation, type DiplomacyLensView } from "./diplomacyLens.ts";

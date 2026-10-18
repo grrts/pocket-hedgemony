@@ -1,4 +1,5 @@
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
+import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, type GovernmentView } from "./government.ts";
@@ -94,6 +95,8 @@ export interface Snapshot {
   relations: { nation: number; state: "war" | "truce" | "alliance" | "subject" | "overlord"; until?: string }[];
   /** Envoys, answers and what other realms think of the player (milestone 5); null without a player. */
   statecraft: StatecraftView | null;
+  /** The map's diplomacy lens: each realm's relation to the player, leagues, envoys on the road and war aims (DIPL-209); null without a player. */
+  diplomacyLens: DiplomacyLensView | null;
   /** Sieges under way: months gone, how far into the next siege month (0..1), breaches and men inside. */
   sieges: { province: number; by: number; months: number; progress: number; breaches: number; garrison: number }[];
   /** Battles being fought: where, each side's leading realm with its men now and at the start, and rounds fought of all. */
@@ -308,6 +311,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
       relations,
       statecraft: statecraftView(w, player),
+      diplomacyLens: diplomacyLensView(w, player),
       sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
       battles: w.battles.map((b) => {
         const men = (slots: number[]) => slots.reduce((t, s) => t + (a.alive[s] ? a.men[s]! : 0), 0);

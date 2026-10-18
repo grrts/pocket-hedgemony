@@ -3,6 +3,8 @@ import {
   DAYS_PER_TURN,
   forageLimit,
   groundOf,
+  LENS_RELATIONS,
+  type LensRelation,
   placeClimate,
   provinceClimate,
   seasonName,
@@ -161,7 +163,7 @@ let provinceTab: "overview" | "people" | "garrison" | "land" | "build" = "overvi
 /** The tile tapped on the Land tab, or -1. */
 let landTile = -1;
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy";
 let lens: Lens = "realms";
 /** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
 let fogOn = true;
@@ -426,7 +428,38 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "walls", name: "Walls", note: "castles and forts" },
   { id: "food", name: "Food", note: "men on campaign the store can feed" },
   { id: "lords", name: "Lords", note: "who holds your land" },
+  { id: "diplomacy", name: "Diplomacy", note: "friend or foe, envoys on the road" },
 ];
+/** The diplomacy lens's colours (DIPL-183), by LENS_RELATIONS; "own" is the realm's own colour. */
+const RELATION_HEX: Record<LensRelation, string> = {
+  own: "",
+  ally: "#3b5fb0",
+  pledged: "#8fb6e8",
+  close: "#3f8f46",
+  warm: "#a8d27a",
+  neutral: "#b9b3a4",
+  cold: "#e08a35",
+  hostile: "#b8323a",
+  war: "#b8323a",
+};
+const RELATION_RGB = Object.fromEntries(Object.entries(RELATION_HEX).map(([k, v]) => [k, v ? hexToRgb(v) : []])) as unknown as Record<LensRelation, number[]>;
+/** The key under the lens buttons: what each colour means. */
+const RELATION_KEY: [LensRelation, string][] = [
+  ["own", "You and your subjects"],
+  ["ally", "Allies"],
+  ["pledged", "Pledged"],
+  ["close", "Close"],
+  ["warm", "Warm"],
+  ["neutral", "Cool, or no dealings"],
+  ["cold", "Cold or Rival"],
+  ["hostile", "Hostile or Bitter"],
+  ["war", "At war (hatched)"],
+];
+/** The player's relation to realm n under the diplomacy lens, or null when it isn't known. */
+const relationTo = (n: number): LensRelation | null => {
+  const r = snapshot?.diplomacyLens?.relation[n];
+  return r === undefined || r < 0 ? null : LENS_RELATIONS[r]!;
+};
 const ROYAL_RGB = hexToRgb("#e9c35a");
 /** A colour per lord for the Lords lens: hues spread by the golden angle, kept clear of the crown's gold. */
 function lordRgb(k: number): number[] {
@@ -452,6 +485,7 @@ function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map lens</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.name}</b><small>${l.note}</small></button>`).join("")}
+    ${lens === "diplomacy" ? diplomacyKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Parchment over unknown lands</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -459,12 +493,25 @@ function renderLensMenu(): void {
       view.renderer.mode = lens === "realms" ? "political" : lens === "terrain" ? "terrain" : "lens";
       restyleProvinces();
       renderLensMenu();
+      // The key sits under the buttons; bring it into view on a short screen.
+      lensMenu.querySelector(".lens-key")?.scrollIntoView({ block: "nearest" });
     }),
   );
   lensMenu.querySelector<HTMLInputElement>("#fog")!.addEventListener("change", (e) => {
     fogOn = (e.target as HTMLInputElement).checked;
     restyleProvinces();
   });
+}
+
+/** The diplomacy lens's key: a swatch for each relation, and what a tap does. */
+function diplomacyKey(): string {
+  const me = snapshot ? nations[snapshot.playerNation] : undefined;
+  const swatch = (r: LensRelation) => `<i class="swatch${r === "war" ? " hatched" : ""}" style="background:${r === "own" ? (me?.color ?? PALETTE.gold) : RELATION_HEX[r]}"></i>`;
+  return `<div class="lens-key">
+    ${RELATION_KEY.map(([r, text]) => `<span>${swatch(r)}${text}</span>`).join("")}
+    <span><i class="swatch league"></i>League against you</span>
+    <p>Zoom in to see your envoys riding and a sword over realms you hold a war aim on. Tap a realm for its Diplomacy tab.</p>
+  </div>`;
 }
 
 /** Colour for a province under the current lens. */
@@ -485,6 +532,12 @@ function lensColor(i: number): number[] {
       if (!snapshot || o !== snapshot.playerNation) return o >= 0 ? nationRgb[o]!.map((v) => Math.round(v * 0.35 + 150)) : unownedRgb;
       const l = snapshot.provinceLord[i]!;
       return l >= 0 ? lordRgb(l) : ROYAL_RGB;
+    }
+    case "diplomacy": {
+      const r = o >= 0 ? relationTo(o) : null;
+      if (!r) return o >= 0 ? RELATION_RGB.neutral : unownedRgb;
+      // The player's subjects share the player's own colour.
+      return r === "own" ? nationRgb[snapshot!.playerNation]! : RELATION_RGB[r];
     }
     default:
       return o >= 0 ? nationRgb[o]! : unownedRgb;
@@ -544,14 +597,15 @@ function restyleProvinces(): void {
     const o = owners[i]!;
     const occ = occupiers[i]!;
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
-    const hatched = occ >= 0 && lens === "realms";
+    const hatched = (occ >= 0 && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war");
     const lord = snapshot ? snapshot.provinceLord[i]! : -1;
     const lit = litLord >= 0 && lord === litLord;
     const flags = (i === selectedProvince ? 1 : 0) | (lit ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
     // While armies are chosen to march, land they may not enter gets red borders (feedback 76).
-    const closed = selected.size > 0 && !!snapshot?.provinceClosed[i];
+    // Under the diplomacy lens, a league against the player gets the same red border (DIPL-183).
+    const closed = (selected.size > 0 && !!snapshot?.provinceClosed[i]) || (lens === "diplomacy" && o >= 0 && snapshot?.diplomacyLens?.league[o] === 1);
     // While a lord's lands are lit, the rest of the land fades to grey so they stand out.
-    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed);
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched && lens === "realms" ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
   const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
@@ -704,6 +758,25 @@ function drawOverlay(o: OverlayContext): void {
     }
   }
 
+  // The diplomacy lens, zoomed in to regional: envoys riding their dotted roads, and a sword over each realm the player holds a war aim on (DIPL-184).
+  const dl = lens === "diplomacy" ? snapshot?.diplomacyLens : null;
+  if (dl && zoom >= REGIONAL_ZOOM) {
+    const u = tokenUnit(zoom);
+    for (const n of dl.aims) {
+      const l = nationLabels[n];
+      if (relationTo(n) === "own") continue;
+      if (!l || !isKnown(provinceIndex.get(nations[n]!.capital)!)) continue;
+      const [sx, sy] = o.toScreen(l.x, l.y);
+      if (onScreen(sx, sy)) swords(ctx, sx, sy, 3 * spriteScale);
+    }
+    const color = nations[snapshot!.playerNation]!.color;
+    for (const e of dl.envoys) {
+      const a = o.toScreen(provinces[e.from]!.x!, provinces[e.from]!.y!);
+      const b = o.toScreen(provinces[e.to]!.x!, provinces[e.to]!.y!);
+      drawEnvoy(ctx, a, b, e.progress, u, color, `${e.daysLeft} ${e.daysLeft === 1 ? "day" : "days"}`, onScreen);
+    }
+  }
+
   // Battles: the two hosts fighting it out on their tile; zoomed out, crossed swords mark where.
   let animating = false;
   if (snapshot && zoom >= 1.6) {
@@ -786,6 +859,39 @@ function drawOverlay(o: OverlayContext): void {
   }
   if (animating) view.invalidate();
   if (performance.now() - stepStart < stepMs) view.invalidate();
+}
+
+/** The diplomacy lens shows only colours at world zoom; envoys and war aims from here in (DIPL-184). */
+const REGIONAL_ZOOM = 2;
+
+/** An envoy on the road: a dotted line from court to court, the rider where he is now, and the days still to ride. */
+function drawEnvoy(ctx: CanvasRenderingContext2D, a: number[], b: number[], progress: number, u: number, color: string, label: string, onScreen: (x: number, y: number, pad?: number) => boolean): void {
+  const [ax, ay] = a as [number, number];
+  const [bx, by] = b as [number, number];
+  const len = Math.hypot(bx - ax, by - ay);
+  const step = 5 * u;
+  for (let d = step / 2; d < len; d += step) {
+    const x = Math.round(ax + ((bx - ax) * d) / len);
+    const y = Math.round(ay + ((by - ay) * d) / len);
+    if (!onScreen(x, y)) continue;
+    ctx.fillStyle = PALETTE.ink;
+    ctx.fillRect(x - u, y - u, 2 * u, 2 * u);
+    ctx.fillStyle = PALETTE.paper;
+    ctx.fillRect(x - u / 2, y - u / 2, u, u);
+  }
+  const rx = ax + (bx - ax) * progress;
+  const ry = ay + (by - ay) * progress;
+  if (!onScreen(rx, ry)) return;
+  const img = sprite("envoy", color, u);
+  ctx.save();
+  ctx.translate(Math.round(rx), Math.round(ry - img.height / 2));
+  // The rider faces the way he rides.
+  if (bx < ax) ctx.scale(-1, 1);
+  ctx.drawImage(img, -Math.round(img.width / 2), -Math.round(img.height / 2));
+  ctx.restore();
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  pixelText(ctx, label, rx, ry - img.height - 2, 10);
 }
 
 /** Armies show once the realm names are gone (feedback 31). */
@@ -1012,6 +1118,14 @@ function onTap(sx: number, sy: number, province: number): void {
   armyView = -1;
   realmView = -1;
   newsView = false;
+  // Under the diplomacy lens a tap opens the realm's Diplomacy tab: what they think of you, and your envoys (DIPL-185, DIPL-209).
+  if (lens === "diplomacy" && selectedProvince >= 0 && owners[selectedProvince]! >= 0) {
+    realmView = owners[selectedProvince]!;
+    realmTab = "diplomacy";
+    officialView = -1;
+    lordView = -1;
+    panelCollapsed = false;
+  }
   restyleProvinces();
   renderPanel();
   renderActions();
@@ -3125,6 +3239,8 @@ Object.assign(globalThis, {
     });
     for (const army of idle.map((k) => snapshot!.armies.id[k]!)) await act({ type: "move", army, to });
   },
+  /** Sends one of the player's envoys to a realm by id, on a mission (ENVOY_ACTIONS). */
+  __phEnvoy: (id: string, action = "courtesy_visit") => act({ type: "sendEnvoy", target: nationIndex.get(id)!, action }),
   /** Id of the province the player's first army with a commander stands in. */
   __phArmyProvince: () => {
     if (!snapshot) return null;
@@ -3134,6 +3250,7 @@ Object.assign(globalThis, {
   },
   /** Opens a province's overview by id. */
   __phSelect: (id: string) => {
+    selected.clear();
     selectedProvince = provinceIndex.get(id)!;
     provinceTab = "overview";
     armyView = -1;
