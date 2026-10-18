@@ -14,11 +14,12 @@ import { steps } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("map-presentation");
 
-let map: { rules: ReturnType<typeof loadDefaultRuleset>; grid: LandGrid } | null = null;
+let map: { rules: ReturnType<typeof loadDefaultRuleset>; tiles: ReturnType<typeof loadMapTiles>; grid: LandGrid } | null = null;
 const world = () => {
   if (!map) {
     const rules = loadDefaultRuleset();
-    map = { rules, grid: landGrid(loadMapTiles(rules)) };
+    const tiles = loadMapTiles(rules);
+    map = { rules, tiles, grid: landGrid(tiles) };
   }
   return map;
 };
@@ -208,8 +209,8 @@ Then("a moment later they have barely moved", (s) => {
 });
 
 Given("a new game as {string}", (s, nation: string) => {
-  const { rules, grid } = world();
-  s.game = createWorld(rules, 1, grid);
+  const { rules, tiles } = world();
+  s.game = createWorld(rules, 1, tiles);
   s.nation = s.game.nationIndex.get(nation.toLowerCase());
   expect(s.nation).toBeDefined();
 });
