@@ -1125,7 +1125,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| government | upstream | Conformist | G1, G2, G3, G4, G6, G9, G11, G14, W12 as reform needs and building needs |
+| government | upstream | Conformist | G1, G2, G3, G4, G6, G9, G11, G14, W12 as reform needs and building needs; the steppe start group's start set (GOV-068) and the cheaper earlier-era inventions (GOV-070) are research data and rules, placed on the single tree's era levels |
 | research | downstream | Customer–Supplier | G9, G14 and other ids as reform requirements |
 
 ## government ↔ revolutions
@@ -1159,7 +1159,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| government | upstream | Customer–Supplier | Army coup; loss of the shogun's capital |
+| government | upstream | Customer–Supplier | Army coup; loss of the shogun's capital; horse archers, *Feigned flight*, raids and tribute as the horde's strengths and the balance targets they are checked against (GOV-073, GOV-074) |
 | warfare | upstream | Conformist | Ruler warlike, regency, succession war |
 
 ## map-presentation ↔ national-strengths

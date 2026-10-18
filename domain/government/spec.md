@@ -182,6 +182,38 @@ Every realm now has a form, both caps and their consequences in the game's month
 #### How the player uses it
 - GOV-064 Where: the player's own realm card (tap the realm in the top bar) has a **Government** tab next to General. It shows, top to bottom, the form and its family; both caps as two 44-point buttons, each "Officials x of y" or "Lords x of y" with a bar, its parts (Form, Custom since 1444) and, when over, in red what that does (which provinces get *Grasping officials*, how many lords slip at New Year); tapping a cap opens the Officials or Lords tab where the player can act (move or commission officials, grant or seize fiefs). Then **Laws of the realm**, what the form sets: succession, how far colonies may reach, and how many subjects it can hold against its reach. Then **Reform**: a card per next form with the change in officials and lords from now, each need marked ✓ or ✗, its gold and the lords who will slip, and a Reform button; a first tap asks "Pay N gold and M lords lose a loyalty step?" with Reform and Cancel, so a reform is never made by a stray tap. A form that comes only by revolution or event, or by itself when its condition holds, says so instead of a button. [X-19, GOV-049]
 - GOV-066 Grouping and overview: everything about the form sits in this one tab. The General tab of the player's card carries one line, "Government: <form> · officials x/y · lords x/y", red when over a cap, that opens the tab; another realm's card shows its form by name. *Grasping officials* shows in a province's grievances with what ends it, and a reform reaches the dispatches. Phone: the tab fits the side panel in the Wide and Tall layouts, the two caps and the next-form cards stack to one column on a narrow panel, every button at least 44 points high, nothing needs hover and the panel never scrolls sideways; a phone held upright is asked to turn sideways, as for the whole game. [X-19, SHELL-108, SHELL-109, SHELL-114]
+### 5.9 Hordes: how far behind, and how they stay in the game (Leroy, 18 October)
+
+Leroy asked how far behind the hordes are in technology and how to balance it. The answer: a horde starts level with
+anyone in the horse and one era level behind its settled neighbours in everything else. It wins in the field in
+Eras I and II, cannot take castles well, lives from raids and tribute, and fades from Era III unless it studies what
+its neighbours know or settles. The era levels are the single tree's (research); this section only places the steppe
+start group on them. Numbers are provisional (D-GOV-19).
+
+#### How far behind
+- GOV-067 A **horde** is a realm whose form is horde (GOV-043 gives it to steppe and Siberia kingdoms and the overrides, for example the Great Horde, Crimea, Kazan, the Nogais, the Uzbeks, Moghulistan, the Oirats, the Mongols and the Qara Qoyunlu). The **steppe start group** is research's start group `Steppe` (great_horde, crimea, nogai, kazan, uzbek_khanate, moghulistan, oirat, mongols). [Leroy 18 Oct; research start_region_members]
+- GOV-068 In 1444 the steppe start group shall know the **horse line** at the level of the best realm that knows it (W1 *Composite-bow horse archery*, F11 *Horse breeding studs* and every invention below Era I that they grow from), and in every other line shall stand one era level below what its settled neighbours (Muscovy, the Ottomans, the Timurids and Ming) start with: no B1 *Stone castles*, no W2, W3, W4 or W5 (no knights, guns or wagon forts), no G2 *Feudal grants* and no G5 *Royal chancery*; it keeps G1 *Written law codes* and L1 *Temple and monastery schools*, and its Islamic realms (Great Horde, Crimea, Kazan, Nogais, Uzbeks) keep L2 *Madrasa networks*. Research's start sets carry this as data; nothing in the code names a horde. [Leroy 18 Oct; D-GOV-19]
+- GOV-069 The balance target for the start is that a horde's Technology score in 1444 is about half that of Muscovy, its nearest settled rival (`hordes.balance.start_score_vs_muscovy` 0.5, provisional), and that the gap is never so large that a horde cannot field horse archers against anyone in Era I. [Leroy 18 Oct; D-GOV-19]
+
+#### How they catch up
+- GOV-070 Every realm, horde or not, shall pay less for an invention of an era earlier than the current date: 25 % less for each era it lies behind, at most 50 % off (`research.behind_discount_pct_per_era` 25, `research.behind_discount_cap_pct` 50, provisional), applied after the cost by era and before the spread from neighbours and trade partners (RSCH-034); an invention never costs less than a fifth of its era cost. This is how anyone who starts behind (hordes, African and American starts) catches up: what the world already knows is cheap to learn, and what is new still costs full price. [Leroy 18 Oct; D-GOV-19]
+- GOV-071 The balance target for catching up is that a horde which keeps its school seats full and studies only what its neighbours know closes its one-era gap outside the horse line by about 1550 (`hordes.balance.catch_up_by` 1550, provisional), and one that never fills its seats is still an era behind in 1650. [D-GOV-19]
+- GOV-072 A horde shall settle by the reform that already exists, Horde → Household realm (a palace in a town, 150 gold, 2 lords slip). It keeps every invention it knows (INV-RSCH-1), so a settled horde keeps its horse archers; it gains the household realm's officials (2 → 10), so more provinces are governed and taxed and it can pay for more schools; and it loses the horde's lords (10 → 4) and subject reach (+2 → +1). [government §4; reforms config; D-GOV-19]
+
+#### Why a horde is strong while it is behind (rules that already exist)
+- GOV-073 The balance shall be made only with the rules other contexts already have, with no new horde bonus: horse archers (2.5 strength, Light and Shot, warfare §5), *Feigned flight* (warfare styles, needs W1), pasture and herds that give horses (province, realm), raids by horse-only armies that burn and loot (WAR-176) and the tribute term of a peace (WAR-182). The balance target is that a horde army beats a settled army of the same size on open ground in about 6 battles out of 10 in Era I, 5 in 10 in Era II once the settled side fields W5 and W8, and at most 1 in 4 from Era III against W9 and W11, the point where horse archers keep only scouting and raiding (warfare obsolescence table) (`hordes.balance.field_win_share` 0.6 / 0.5 / 0.25, provisional). [warfare §5, §9.2, §10.3; D-GOV-19]
+
+#### Why it does not overrun everyone (the weaknesses)
+- GOV-074 Without B1 and W3 a horde shall have no castles of its own to build and no siege guns, so it takes a settled realm's castles slowly; its wars are raids and tribute more than conquest. The balance target is that a horde earns at least a third of its gold from raid loot and tribute in Era I and that a settled neighbour can buy peace with tribute for less than a year of raids costs it (`hordes.balance.raid_tribute_gold_share` 1/3, provisional). This keeps war against a horde a matter for diplomacy: paying tribute, allying against it, or settling the border, not only fighting. [Leroy 18 Oct (war balanced through diplomacy); WAR-176, WAR-182; D-GOV-19]
+- GOV-075 A horde's research shall stay slow for the reasons the rules already give: few towns, so few schools (RSCH-001); a horde's 2 officials, so few governed provinces and little tax for school upkeep (GOV-001, RSCH-021); and every student is a rider the horde cannot raise (RSCH-020). No extra penalty is added. [research §5.1, §5.3; D-GOV-19]
+
+#### The computer hordes
+- GOV-076 An AI horde shall study by the research AI's rule (RSCH-078: the eligible invention that costs it least now), which with GOV-070 makes it study first what its neighbours already know, and shall settle by the government AI's rule (GOV-052) once it has a palace in a town and the gold twice over. No AI rule is added for hordes. [RSCH-078, GOV-052; D-GOV-19]
+
+#### How the player uses it
+- GOV-077 Where: on the player's own realm card. The **Learning** tab's overview (RSCH-084) shall carry one more line, "Behind your neighbours: N inventions they know and you don't", which opens the tree with those inventions marked; each invention's sheet shall show "Behind the times: −X %" beside its spread discount when GOV-070 applies, so the player sees why it is cheap. For a horde, the **Government** tab's Laws of the realm shall carry one line on the horde's edge and its end, "Your riders: strong until your enemies field field guns (W8) and flintlocks (W11)", and the Horde → Household realm card says what settling changes (officials, lords, subject reach; inventions kept). [X-19, RSCH-084, GOV-064]
+- GOV-078 Grouping and overview: technology stays in the Learning tab and the form in the Government tab; the line in each opens the other where they meet (the settle card names the inventions that help a settled realm, G3 and L7). The overview at a glance is the Learning overview's "Behind your neighbours" line; another realm's card already shows how many inventions it knows, and shall also say "N ahead of you" or "N behind you". [X-19, RSCH-088]
+- GOV-079 Phone: both lines are single rows inside the existing tabs, at least 44 points tall, tappable, with no hover and no sideways scroll, in the Wide and Tall layouts and inside the safe areas, as RSCH-090 and GOV-066 already require for their tabs. [X-19, SHELL-108, SHELL-109, SHELL-114]
 
 ## 6. Commands
 
@@ -258,6 +290,11 @@ All numbers are placeholders (government.yaml header: "Every number is a placeho
 | `revolution_ignores_era` | Revolution may set a form before its era | true (decided 16 Oct) | no (decision) | government.yaml |
 | `event_tree_map.<value>` | set, keep_if_in, before_G14 | table in §5 of design | yes | government.yaml |
 | `default`, `kingdom_by_region`, `entity_type`, `text_rules`, `overrides` | Start-form rules (75 overrides) | see start-forms.yaml | yes | start-forms.yaml |
+| `research.behind_discount_pct_per_era` / `research.behind_discount_cap_pct` | Cheaper inventions from an earlier era (GOV-070), floor a fifth of the era cost | 25 % per era / 50 % | yes (D-GOV-19) | research.json |
+| `hordes.balance.start_score_vs_muscovy` | Horde Technology score in 1444 against Muscovy's (target, GOV-069) | 0.5 | yes (D-GOV-19) | balance targets |
+| `hordes.balance.catch_up_by` | Year a studying horde closes its gap (target, GOV-071) | 1550 | yes (D-GOV-19) | balance targets |
+| `hordes.balance.field_win_share` | Horde field wins against an equal settled army, Era I / II / III on (target, GOV-073) | 0.6 / 0.5 / 0.25 | yes (D-GOV-19) | balance targets |
+| `hordes.balance.raid_tribute_gold_share` | Share of a horde's gold from raids and tribute in Era I (target, GOV-074) | at least 1/3 | yes (D-GOV-19) | balance targets |
 
 **Forms** (officials / lords / subject reach / colonial range / succession → next):
 
@@ -305,11 +342,11 @@ All numbers are placeholders (government.yaml header: "Every number is a placeho
 | revolutions | upstream | Conformist | Regimes set forms (era ignored); GOV remembers the last form not set by a revolution for `old_form` (D-GOV-9); committee rule only sets its form |
 | rebellions | upstream | Customer–Supplier | A won *New ideas* rising sets a form; disloyal lords rebel (consequence of slips) |
 | events | upstream | Anti-Corruption Layer | 16 event-tree `government` values mapped to forms; `admin_capacity` adds 1 official per point for good (D-GOV-11); events read the form's event-tree value |
-| research | upstream | Conformist | G1, G2, G3, G4, G6, G9, G11, G14, W12 as reform needs and building needs |
+| research | upstream | Conformist | G1, G2, G3, G4, G6, G9, G11, G14, W12 as reform needs and building needs; the steppe start group's start set (GOV-068) and the cheaper earlier-era inventions (GOV-070) are research data and rules, placed on the single tree's era levels |
 | national-strengths | upstream | Customer–Supplier | Additions to caps (e.g. +2 officials for Venice) |
 | religion | upstream | Customer–Supplier | A change of state faith from the founding faith opens prince-bishopric/order → feudal realm (D-GOV-14); religion reads the forms' event-tree values for the Inquisition (D-GOV-15) |
 | culture | upstream | Customer–Supplier | A province's largest tongue and the realm's tongue, for self-run "own people" (D-GOV-13); the 1.5 stranger weight is dropped (D-GOV-5) and forms set no tongue policy limits (D-GOV-6) |
-| warfare | upstream | Customer–Supplier | Army coup; loss of the shogun's capital |
+| warfare | upstream | Customer–Supplier | Army coup; loss of the shogun's capital; horse archers, *Feigned flight*, raids and tribute as the horde's strengths and the balance targets they are checked against (GOV-073, GOV-074) |
 | trade | upstream | Conformist | "4 or more traders abroad", "trade in debt 3 years running" as reform needs |
 | diplomacy | upstream | Conformist | "Allied with 2 neighbours of the same people"; subjects count for "3 or more subjects" |
 | scenario-setup | downstream | Published Language | Start form per record (`start-forms.csv`), start lords |
@@ -344,6 +381,7 @@ Decided on 17 October 2026 (DECISIONS.md). No question stays open.
 - **D-GOV-16** (was OQ-GOV-16) A form that holds no subjects: when a country becomes a colonial government its subjects are all released at once (GOV-053). INV-GOV-6 must hold, and releasing is the existing way a tie ends.
 - **D-GOV-18** First game slice (milestone 5, provisional): no cap buildings stand in the game yet, so each realm's caps carry *Custom since 1444*, what it held above its form on 1 January 1444, and every realm starts within both caps; conquests, new officials and a reform to a smaller form push a realm over. Reform gold is at the game's gold scale (× 0.2, as works and gifts are). Building needs and condition rows wait on their contexts. Map realms the catalogue names otherwise take their catalogue record's start form. It is the smallest rule that runs the design's caps without flooding every realm with grievances on day one.
 - **D-GOV-17** (was OQ-GOV-17) "Newest hires first": an official's hire date is the day he entered service in that post, whether hired, a graduate or from a lord's line. One date for every official keeps one order.
+- **D-GOV-19** (Leroy, 18 Oct: "design how far back the hordes are in terms of technology, and try and find the balance for it") Hordes start level in the horse line and one era level behind their settled neighbours in everything else (GOV-068), on the single tree's era levels. They catch up through one general rule, cheaper inventions from an earlier era (25 % per era, at most 50 %, GOV-070), which also helps every other start that is behind, and by settling through the existing reform (GOV-072). No horde bonus or penalty is added: their edge (horse archers, *Feigned flight*, raids) and their limits (no castles or guns, few schools and officials) already exist, so the balance is set by the start sets and checked against four targets (GOV-069, GOV-071, GOV-073, GOV-074) that the balance model runs. The targets keep war against a horde a matter for diplomacy as well (tribute, alliances), as Leroy asked for war in general. All numbers are provisional.
 
 ## 14. Traceability
 
@@ -377,3 +415,9 @@ Decided on 17 October 2026 (DECISIONS.md). No question stays open.
 | GOV-057 | forms.feature | Which forms count as monarchies for the Inquisition |
 | GOV-058 … GOV-063, GOV-065 | — | Engine: packages/engine/test/government.test.ts (start forms, Custom, Grasping officials, New Year slips, reform, AI reform, save) |
 | GOV-064, GOV-066 | — | Presentation: apps/client/src/ui/government.ts, the Government tab; screenshots from apps/client/scripts/government-shots.mjs |
+| GOV-067, GOV-068 | hordes.feature | Which realms are hordes; A horde starts level in the horse and behind in the rest |
+| GOV-069, GOV-071, GOV-073, GOV-074 | hordes.feature | Balance targets for hordes |
+| GOV-070 | hordes.feature | Inventions from an earlier era cost less |
+| GOV-072 | hordes.feature | A horde settles and keeps what it knows |
+| GOV-075, GOV-076 | — | No new rule: existing research and government rules (RSCH-001, RSCH-020, RSCH-021, RSCH-078, GOV-052) |
+| GOV-077 … GOV-079 | — | Presentation: the Learning and Government tabs |
