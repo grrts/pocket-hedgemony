@@ -252,7 +252,16 @@ export interface CultureNames {
   patronym?: string;
   /** Titles after the name: "Bey", "Khan". */
   title?: string[];
+  /**
+   * Ranks in the culture's own language (feedback 125), each a pattern with
+   * {name} where the name goes: "Almirante {name}", "{name} Taishō". A rank
+   * left out shows the name alone.
+   */
+  ranks?: Partial<Record<Rank, string>>;
 }
+
+/** What a commander is doing: leading an army, leading a fleet, or captaining a hired company. */
+export type Rank = "general" | "admiral" | "captain";
 
 /** Names for officials and commanders by culture, and each realm's culture (feedback 33). */
 export interface NameBook {

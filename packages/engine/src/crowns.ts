@@ -4,6 +4,7 @@ import * as dip from "./domain/diplomacy/index.ts";
 import { bondOf, foldInRealm, makeSubject, mergeCrownsRealm, monthNow } from "./subjects.ts";
 import { newRuler, yearlyRulers } from "./rulers.ts";
 import { loyaltyStep } from "./lords.ts";
+import { rulerDied } from "./faithHeads.ts";
 import config from "../../rules/data/domain/subjects.json" with { type: "json" };
 
 /**
@@ -41,6 +42,8 @@ function marriedHouses(d: dip.Diplomacy, x: string): string[] {
  */
 export function succeed(world: World, n: number, news: News[], kinsman = false, unionWith = -1): void {
   if (world.nationGone[n]) return;
+  // The ruler of the Papal States was the Pope: a conclave sits (RELG-142).
+  rulerDied(world, n, news);
   if (unionWith >= 0) {
     world.rulers[n] = { ...world.rulers[unionWith]!, traits: [...world.rulers[unionWith]!.traits], heir: null, regent: null };
     return;

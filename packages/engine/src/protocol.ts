@@ -9,12 +9,14 @@ import { eventCards, type EventCard } from "./events.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
-import { governmentView, realmForms, type GovernmentView } from "./government.ts";
+import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
+import type { Titles } from "./domain/realm/index.ts";
 import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
 import { empireView, institutionsLens, type EmpireView } from "./institutions.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
+import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
@@ -225,6 +227,8 @@ export interface Snapshot {
   provinceRebels: Int32Array;
   /** Every realm's government form by name, for its card. */
   realmForms: string[];
+  /** What every realm calls its lords and officials (REALM-242). */
+  realmTitles: Titles[];
   /** The player's Trade tab: last month's trade, its traders, where it can found more, its busiest cities and the route being drawn (TRADE-130 to TRADE-140); null before a realm is chosen. */
   trade: TradeView | null;
   /** The kinds of trader, with their gold, upkeep, hold, purse and crew. */
@@ -240,6 +244,8 @@ export interface Snapshot {
   provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
   peoples: PeoplesSnapshot;
+  /** Heads of the faith: seats, each realm's Faith-line badge, the player's Head of the faith card and the censure a war would bring (RELG-135 to RELG-138). */
+  faithHeads: FaithHeadsView;
   /** The player's men gathering in provinces: men still to come, days to the next thousand and to the last. */
   musters: { province: number; men: number; daysLeft: number; daysAll: number }[];
   /** Days each thousand of the player's levy takes to gather (RECR-106). */
@@ -491,6 +497,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       rebels: rebelsView(w),
       provinceRebels: w.provinceRebels.slice(),
       realmForms: realmForms(w),
+      realmTitles: realmTitles(w),
       trade: player >= 0 ? tradeView(w, player) : null,
       traderKinds: TRADER_KINDS.map((k) => kindRow(w, k)),
       provinceTradeValue: Float32Array.from({ length: w.provinceCount }, (_, p) => tradeValueAt(w, p)),
@@ -504,6 +511,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         return { provinceTradeSeen: seen, provinceGoods: goods };
       })(),
       peoples: peoplesSnapshot(w),
+      faithHeads: faithHeadsView(w, player),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, daysLeft: m.daysLeft, daysAll: daysToGather(w, m) })),
       gatherDays: player >= 0 ? gatherDays(w, player) : 14,
       garrisons: player >= 0 ? garrisonViews(w, player) : [],
@@ -615,7 +623,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     return { response: { id, type: "snapshot", snapshot: snap }, transfer };
   }
 
-  return function handle(req: EngineRequest): HostReply {
+  function handle(req: EngineRequest): HostReply {
     const started = now();
     try {
       switch (req.type) {
@@ -671,7 +679,15 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     } catch (e) {
       return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e) }, transfer: [] };
     }
-  };
+  }
+
+  /**
+   * The world in play, for headless tools that measure it (packages/sim's
+   * balance runs read metrics the snapshot does not carry). Read-only by
+   * contract: the game's screens never call it, and nothing may write through it.
+   */
+  const current = (): Readonly<World> | null => world;
+  return Object.assign(handle, { world: current });
 }
 
 /** Hours an army still has to march along the tiles it has planned (left of a march planned a province at a time: none). */
