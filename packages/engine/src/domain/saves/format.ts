@@ -205,8 +205,9 @@ export interface DecodedSave {
 }
 
 export function decodeSave(bytes: Uint8Array): DecodedSave {
-  const header = readHeader(bytes);
+  // The table first: a file cut short fails there before its header is parsed.
   const table = readTable(bytes);
+  const header = readHeader(bytes);
   const chunks = new Map<string, RawChunk>();
   for (const e of table) {
     const data = bytes.subarray(e.offset, e.offset + e.length);

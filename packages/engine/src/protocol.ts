@@ -6,6 +6,7 @@ import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, type GovernmentView } from "./government.ts";
+import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
@@ -32,7 +33,7 @@ import { Rng } from "./rng.ts";
 import { explorationView, type ExplorationView } from "./colonies.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { officialAt, yearsServed } from "./officials.ts";
-import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
+import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
 export interface CompanyView {
@@ -208,10 +209,29 @@ export interface Snapshot {
   provinceRebels: Int32Array;
   /** Every realm's government form by name, for its card. */
   realmForms: string[];
+  /** The player's Trade tab: last month's trade, its traders, where it can found more, its busiest cities and the route being drawn (TRADE-130 to TRADE-140); null before a realm is chosen. */
+  trade: TradeView | null;
+  /** The kinds of trader, with their gold, upkeep, hold, purse and crew. */
+  traderKinds: KindRow[];
+  /** Every province's trade value (gold a month), trade ratio (0 to 100), traders passing last month, and whether it is a trade stop (bit 1 city, bit 2 port). */
+  provinceTradeValue: Float32Array;
+  provinceTradeRatio: Uint8Array;
+  provinceTradePassing: Uint8Array;
+  provinceTradeCity: Uint8Array;
+  /** Provinces whose trade the player sees: its own and those on its traders' loops (D-TRADE-13). */
+  provinceTradeSeen: Uint8Array;
+  /** What each province the player sees trades: its goods, most gold first, with loads a year and gold a month. */
+  provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
   peoples: PeoplesSnapshot;
-  /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
-  musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
+  /** The player's men gathering in provinces: men still to come, days to the next thousand and to the last. */
+  musters: { province: number; men: number; daysLeft: number; daysAll: number }[];
+  /** Days each thousand of the player's levy takes to gather (RECR-106). */
+  gatherDays: number;
+  /** The Garrison tab of each province where the player has men gathering or troops without a commander (PROV-302). */
+  garrisons: GarrisonView[];
+  /** The player's provinces where an army can train now: a castle or drill yard of its own, not besieged (RECR-109). */
+  trainingGrounds: number[];
   /** The player's free companies on their way to the capital. */
   mercs: (CompanyView & { weeksLeft: number })[];
   /** Free companies the player can hire: their pay a month (paid at once on hiring) and weeks to reach the capital. */
@@ -444,8 +464,23 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       rebels: rebelsView(w),
       provinceRebels: w.provinceRebels.slice(),
       realmForms: realmForms(w),
+      trade: player >= 0 ? tradeView(w, player) : null,
+      traderKinds: TRADER_KINDS.map((k) => kindRow(w, k)),
+      provinceTradeValue: Float32Array.from({ length: w.provinceCount }, (_, p) => tradeValueAt(w, p)),
+      provinceTradeRatio: Uint8Array.from(w.provinceTradeRatio, (r) => Math.round(r)),
+      provinceTradePassing: Uint8Array.from(w.provincePassed, (x) => Math.min(255, Math.round(x))),
+      provinceTradeCity: w.provinceTradeCity.slice(),
+      ...(() => {
+        const seen = tradeSeen(w, player);
+        const goods: Snapshot["provinceGoods"] = {};
+        for (let p = 0; p < w.provinceCount; p++) if (seen[p] && !w.provinceWater[p]) goods[p] = goodsOf(w, p).map((g) => ({ ware: g.ware, loads: g.loads, gold: g.gold }));
+        return { provinceTradeSeen: seen, provinceGoods: goods };
+      })(),
       peoples: peoplesSnapshot(w),
-      musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
+      musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, daysLeft: m.daysLeft, daysAll: daysToGather(w, m) })),
+      gatherDays: player >= 0 ? gatherDays(w, player) : 14,
+      garrisons: player >= 0 ? garrisonViews(w, player) : [],
+      trainingGrounds: player >= 0 ? trainingGrounds(w, player) : [],
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c, player), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
@@ -537,6 +572,11 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.rebels.chance,
       snap.provinceLord,
       snap.provinceWorks,
+      snap.provinceTradeValue,
+      snap.provinceTradeRatio,
+      snap.provinceTradePassing,
+      snap.provinceTradeCity,
+      snap.provinceTradeSeen,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
       ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);

@@ -98,6 +98,9 @@ export function fromUtf8(bytes: Uint8Array): string {
 export type ArrayKind = "i8" | "u8" | "i16" | "u32" | "i32" | "f32" | "f64";
 export type Typed = Int8Array | Uint8Array | Int16Array | Uint32Array | Int32Array | Float32Array | Float64Array;
 
+/** Whether this platform keeps numbers little-endian, so typed arrays copy as they are. */
+const LITTLE_ENDIAN = new Uint8Array(new Uint16Array([1]).buffer)[0] === 1;
+
 const SIZE: Record<ArrayKind, number> = { i8: 1, u8: 1, i16: 2, u32: 4, i32: 4, f32: 4, f64: 8 };
 
 export function kindOf(a: Typed): ArrayKind {
@@ -112,6 +115,7 @@ export function kindOf(a: Typed): ArrayKind {
 
 /** Raw little-endian bytes of a typed array, whatever the platform's own byte order (SAVE-043). */
 export function toLE(a: Typed): Uint8Array {
+  if (LITTLE_ENDIAN) return new Uint8Array(a.buffer.slice(a.byteOffset, a.byteOffset + a.byteLength));
   const kind = kindOf(a);
   const size = SIZE[kind];
   const out = new Uint8Array(a.length * size);
@@ -149,6 +153,10 @@ export function fromLE(kind: ArrayKind, bytes: Uint8Array, offset: number, lengt
     }
   };
   const out = make();
+  if (LITTLE_ENDIAN) {
+    new Uint8Array(out.buffer).set(bytes.subarray(offset, offset + length * size));
+    return out;
+  }
   for (let i = 0; i < length; i++) {
     const o = i * size;
     switch (kind) {
@@ -202,17 +210,24 @@ function reverse(code: number, len: number): number {
 }
 
 /** Fixed Huffman code of a literal/length symbol (RFC 1951 §3.2.6). */
+const LIT_CODE = new Uint16Array(288);
+const LIT_BITS = new Uint8Array(288);
+for (let sym = 0; sym < 288; sym++) {
+  const [code, n] = sym < 144 ? [0x30 + sym, 8] : sym < 256 ? [0x190 + sym - 144, 9] : sym < 280 ? [sym - 256, 7] : [0xc0 + sym - 280, 8];
+  LIT_CODE[sym] = reverse(code, n);
+  LIT_BITS[sym] = n;
+}
 function putLitLen(b: BitWriter, sym: number): void {
-  if (sym < 144) putBits(b, reverse(0x30 + sym, 8), 8);
-  else if (sym < 256) putBits(b, reverse(0x190 + sym - 144, 9), 9);
-  else if (sym < 280) putBits(b, reverse(sym - 256, 7), 7);
-  else putBits(b, reverse(0xc0 + sym - 280, 8), 8);
+  putBits(b, LIT_CODE[sym]!, LIT_BITS[sym]!);
 }
 
-function lengthCode(len: number): number {
-  let c = 0;
+const LEN_CODE = new Uint8Array(259);
+for (let len = 3, c = 0; len <= 258; len++) {
   while (c < 28 && LEN_BASE[c + 1]! <= len) c++;
-  return c;
+  LEN_CODE[len] = c;
+}
+function lengthCode(len: number): number {
+  return LEN_CODE[len]!;
 }
 
 function distCode(dist: number): number {
@@ -220,6 +235,8 @@ function distCode(dist: number): number {
   while (c < 29 && DIST_BASE[c + 1]! <= dist) c++;
   return c;
 }
+
+const DIST_REV = Uint8Array.from({ length: 30 }, (_, dc) => reverse(dc, 5));
 
 const WINDOW = 32768;
 const HASH_BITS = 15;
@@ -271,7 +288,7 @@ export function deflateRaw(input: Uint8Array): Uint8Array {
       putLitLen(b, 257 + lc);
       if (LEN_EXTRA[lc]) putBits(b, bestLen - LEN_BASE[lc]!, LEN_EXTRA[lc]!);
       const dc = distCode(bestDist);
-      putBits(b, reverse(dc, 5), 5);
+      putBits(b, DIST_REV[dc]!, 5);
       if (DIST_EXTRA[dc]) putBits(b, bestDist - DIST_BASE[dc]!, DIST_EXTRA[dc]!);
       for (let k = 0; k < bestLen; k++) insert(i + k);
       i += bestLen;
@@ -333,18 +350,34 @@ export function inflateRaw(data: Uint8Array): Uint8Array {
     return v;
   };
   const bits = (n: number): number => {
-    let v = 0;
-    for (let i = 0; i < n; i++) v |= bit() << i;
+    while (bitCnt < n) {
+      if (pos >= data.length) throw new InflateError("deflate data cut short");
+      bitBuf |= data[pos++]! << bitCnt;
+      bitCnt += 8;
+    }
+    const v = bitBuf & ((1 << n) - 1);
+    bitBuf >>>= n;
+    bitCnt -= n;
     return v;
   };
   const decode = (h: Huff): number => {
+    // Up to 15 bits are read ahead into the buffer; only the code's own bits are used up.
+    while (bitCnt < 15 && pos < data.length) {
+      bitBuf |= data[pos++]! << bitCnt;
+      bitCnt += 8;
+    }
     let code = 0;
     let first = 0;
     let index = 0;
     for (let len = 1; len < 16; len++) {
-      code |= bit();
+      if (len > bitCnt) throw new InflateError("deflate data cut short");
+      code |= (bitBuf >>> (len - 1)) & 1;
       const count = h.counts[len]!;
-      if (code - count < first) return h.symbols[index + (code - first)]!;
+      if (code - count < first) {
+        bitBuf >>>= len;
+        bitCnt -= len;
+        return h.symbols[index + (code - first)]!;
+      }
       index += count;
       first += count;
       first <<= 1;
@@ -357,6 +390,8 @@ export function inflateRaw(data: Uint8Array): Uint8Array {
     final = bit();
     const type = bits(2);
     if (type === 0) {
+      // Whole bytes read ahead go back; the rest of the current byte is padding.
+      pos -= bitCnt >>> 3;
       bitBuf = 0;
       bitCnt = 0;
       if (pos + 4 > data.length) throw new InflateError("deflate data cut short");

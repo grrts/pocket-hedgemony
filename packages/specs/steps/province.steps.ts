@@ -1,5 +1,6 @@
 import { expect } from "vitest";
-import { Rng } from "@ph/engine";
+import { ARMS, garrisonView, KIND, Rng, spawnArmy, type GarrisonView } from "@ph/engine";
+import { commanderAt, levyGame, province } from "./levy-game.ts";
 import * as P from "@ph/engine/domain/province";
 import type { Ground, Province, ClassName, TaxRate, Use, Lord, Official } from "@ph/engine/domain/province";
 import { steps, type Scenario } from "../src/registry.ts";
@@ -2924,4 +2925,31 @@ Then(/^(at most 10 gold|nothing|less than with a free road) reaches the treasury
   if (what === "nothing") expect(got).toBe(0);
   else if (what === "at most 10 gold") expect(got).toBeLessThanOrEqual(10);
   else expect(got).toBeLessThan(P.reachesTreasury(20, { ...s.reach, blockedDays: 0 }));
+});
+
+// ---------------------------------------------------------------- the Garrison tab (PROV-302), on the 1444 map with France playing
+
+Given('the province "Troyes" has 2000 garrison troops and 1000 levies still gathering', (s) => {
+  const g = levyGame(s);
+  const p = province(g, "Troyes");
+  spawnArmy(g.w, g.n, p, 2000, -1, 0, { kind: KIND.levy, drill: 1 });
+  g.w.musters.push({ nation: g.n, province: p, men: 1000, daysLeft: 9 });
+  s.present = commanderAt(g, p);
+});
+When('the player opens the Garrison tab of "Troyes"', (s) => {
+  const g = levyGame(s);
+  s.garrisonTab = garrisonView(g.w, g.n, province(g, "Troyes"));
+});
+Then("it lists the 2000 troops by arm and drill", (s) => {
+  const tab = s.garrisonTab as GarrisonView;
+  expect(tab.troops).toHaveLength(1);
+  expect(tab.troops[0]!.men).toBe(2000);
+  expect(tab.troops[0]!.byArm[ARMS.indexOf("levy foot")]).toBeCloseTo(2000, 0);
+  expect(tab.troops[0]!.drill).toBe(1);
+});
+Then("it lists the gathering levies with the days left", (s) => {
+  expect((s.garrisonTab as GarrisonView).gathering).toEqual([{ men: 1000, daysLeft: 9, state: "gathering" }]);
+});
+Then("it lists the commanders present who can pick them up", (s) => {
+  expect((s.garrisonTab as GarrisonView).commanders).toEqual([s.present]);
 });

@@ -14,6 +14,7 @@ import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions
 import { answerEvent, monthlyEvents } from "./events.ts";
 import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
+import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameRouteMode, type GameTraderKind } from "./trade.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
@@ -80,7 +81,7 @@ export type Order =
   /** Take the last thousand off a province's recruit queue, with its levy money back. */
   | { type: "cancelRecruit"; province: number }
   /** The army's commander takes in the garrison troops where it stands. */
-  | { type: "pickUp"; army: number }
+  | { type: "pickUp"; army: number; men?: number }
   /** Commission a province's official as a commander; release one back to his post. */
   | { type: "commission"; province: number }
   | { type: "release"; commander: number }
@@ -138,6 +139,11 @@ export type Order =
   | { type: "heritageChoice"; id: string }
   /** Reform the government into one of its next forms (GOV-027). */
   | { type: "reform"; to: string }
+  /** Found a trader in an own city (TRADE-003), set its route of 2 to 8 cities (TRADE-050), draw one for its preview (TRADE-054), or dismiss it (TRADE-006). */
+  | { type: "foundTrader"; city: number; kind: GameTraderKind }
+  | { type: "setTradeRoute"; trader: number; stops: number[]; mode?: GameRouteMode }
+  | { type: "draftTradeRoute"; trader: number; stops: number[]; mode?: GameRouteMode }
+  | { type: "dismissTrader"; trader: number }
   /** Set the realm's Tongue policy (CULT-038), or a faith's policy from the next New Year (RELG-055). */
   | { type: "tonguePolicy"; policy: string }
   | { type: "faithPolicy"; faith: string; policy: string }
@@ -232,6 +238,7 @@ function startDay(world: World, news: News[]): void {
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
     monthlyResearch(world, news);
+    monthlyTrade(world, news);
     runLedger(world, true);
     monthlyNavy(world, news);
     monthlyColonies(world, news);
@@ -298,7 +305,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "cancelRecruit":
       return cancelRecruit(world, actingNation, order.province);
     case "pickUp":
-      return pickUp(world, actingNation, order.army);
+      return pickUp(world, actingNation, order.army, order.men);
     case "commission":
       return commissionOfficial(world, actingNation, order.province, news);
     case "release":
@@ -371,6 +378,14 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return stopChange(world, actingNation, order.province);
     case "reform":
       return reform(world, actingNation, order.to, news);
+    case "foundTrader":
+      return foundTrader(world, actingNation, order.city, order.kind);
+    case "setTradeRoute":
+      return setTradeRoute(world, actingNation, order.trader, order.stops, order.mode);
+    case "draftTradeRoute":
+      return draftTradeRoute(world, actingNation, order.trader, order.stops, order.mode);
+    case "dismissTrader":
+      return dismissTrader(world, actingNation, order.trader);
     case "tonguePolicy":
       return setTonguePolicy(world, actingNation, order.policy);
     case "faithPolicy":
