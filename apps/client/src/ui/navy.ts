@@ -60,7 +60,7 @@ export function portTab(port: Port, o: { gold: number; musterGoldEach: number; f
 
 /** A button that opens a fleet's card. */
 export function fleetButton(f: FleetView, admiralName: (c: number) => string): string {
-  return `<button class="paper" data-fleet-open="${f.id}">${icon("anchor", 1)}${f.admiral >= 0 ? `${esc(admiralName(f.admiral))}'s fleet` : "Fleet without an admiral"} · ${plural(f.ships, "ship")}${f.men ? ` · ${fmt(f.men)} men aboard` : ""}</button>`;
+  return `<button class="paper" data-fleet-open="${f.id}">${icon("anchor", 1)}${f.admiral >= 0 ? `${esc(admiralName(f.admiral))}'s fleet` : f.explorers ? "Explorers" : "Fleet without an admiral"} · ${plural(f.ships, "ship")}${f.men ? ` · ${fmt(f.men)} men aboard` : ""}</button>`;
 }
 
 /** The fleet card: where it is, Sail, its admiral, the army aboard and every ship. */
@@ -76,9 +76,11 @@ export function fleetCard(
     choosing: boolean;
     inPort: boolean;
     me: number;
+    /** The Explore and Colony sections of a fleet of explorers (ui/explore.ts), under Sail. */
+    explore?: string;
   },
 ): string {
-  const sail = f.admiral < 0
+  const sail = f.admiral < 0 && f.needsAdmiral
     ? `<p class="hint">A fleet needs an admiral to sail. Put a commander at its head below.</p>`
     : `<div class="army-buttons"><button class="wax" data-fleet-sail="${f.id}">${o.choosing ? "Pick a sea or shore" : f.battle ? "Sail away" : "Sail"}</button></div>
        <p class="hint">Tap Sail, then a sea zone, a port to put into${f.army >= 0 ? " or a shore to land the army on" : ""}.</p>`;
@@ -91,6 +93,7 @@ export function fleetCard(
       <dt>Cost</dt><dd>${mine.cost.toFixed(2)} gold a month</dd>
     </dl>
     ${sail}
+    ${o.explore ?? ""}
     <h3 class="sub">Army aboard</h3>
     ${f.army >= 0
       ? `<p>${fmt(f.men)} men${f.landAt >= 0 ? `, to land at ${esc(o.name(f.landAt))}` : ""}.</p>${o.inPort ? `<div class="choices"><button class="paper" data-fleet-unload>Put them ashore here</button></div>` : ""}`
@@ -101,7 +104,8 @@ export function fleetCard(
     <div class="choices">
       ${o.idle.slice(0, 3).map((c) => `<button class="paper" data-fleet-admiral="${c.id}" title="${esc(c.skills)}">${f.admiral >= 0 ? "Hand over to" : "Appoint"} ${esc(c.name)}</button>`).join("")}
       ${f.admiral >= 0 ? `<button class="paper" data-fleet-admiral="-1">Send ${esc(o.admiralName(f.admiral))} back to court</button>` : ""}
-      ${!o.idle.length && f.admiral < 0 ? `<p class="hint">No commander waits at court. Commission an official as one first.</p><button class="paper" data-realm="${o.me}" data-realm-open="officials">Officials</button>` : ""}
+      ${!f.needsAdmiral && f.admiral < 0 ? `<p class="hint">Explorers sail without one; an admiral leads them if war finds them.</p>` : ""}
+      ${!o.idle.length && f.admiral < 0 && f.needsAdmiral ? `<p class="hint">No commander waits at court. Commission an official as one first.</p><button class="paper" data-realm="${o.me}" data-realm-open="officials">Officials</button>` : ""}
     </div>
     <h3 class="sub">Ships</h3>
     <table class="troops ships">${mine.ships
