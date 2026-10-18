@@ -3301,16 +3301,6 @@ button.paper.over {
   padding: 0 4px;
   font-size: 19px;
 }
-/* The two modes sit in the row like the other buttons, so the row wraps only when it must. */
-.route-mode {
-  display: contents;
-}
-.route-mode button.on {
-  border-image-source: var(--ui-btn-paper-down);
-}
-.route-mode button.on::before {
-  content: "● ";
-}
 /* On a short phone the bar keeps to the essentials, so the map above stays tappable. */
 @media (max-height: 420px) {
   .route-bar .best {

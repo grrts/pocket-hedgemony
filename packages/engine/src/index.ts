@@ -23,7 +23,7 @@ export { USES, type UseName } from "./land.ts";
 export { CHANGES, type ChangeName, type ChangeRow } from "./conversion.ts";
 export { castleCap, FOOD_SETTINGS, foodView, mapNetwork, reachOf, setFood, setFoodPreset, shareFood, SURPLUS_RULES, type CastleView, type FoodView } from "./castleFood.ts";
 export { capsOf, formOf, governmentView, type GovernmentView, type NextFormView } from "./government.ts";
-export { TRADER_KINDS, traderKindName, type FoundOption, type GameRouteMode, type GameTraderKind, type KindRow, type RouteEstimate, type TradeView, type TraderView } from "./trade.ts";
+export { TRADER_KINDS, traderKindName, type FoundOption, type GameTraderKind, type KindRow, type RouteEstimate, type TradeView, type TraderView } from "./trade.ts";
 export { FAITH_FAMILY, FAITH_IDS, FAITH_POLICIES, faithLine, faithName, NO_FAITH, NO_TONGUE, peoplesDataOf, peoplesView, SLOTS, TONGUE_FAMILY, TONGUE_IDS, TONGUE_POLICIES, tongueLine, tongueName, type FaithRow, type PeoplesSnapshot, type PeoplesView, type TongueLine, type TongueRow } from "./peoples.ts";
 export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecraft.ts";
 export { type RebelsView, type RisingView } from "./rebels.ts";
