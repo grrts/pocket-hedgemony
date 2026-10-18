@@ -154,22 +154,32 @@ function weights(world: World, p: number, ship: boolean): number {
 
 /** Works out every province's goods, value and whether it is a trade city (each January, and at the start). */
 export function refreshTradeValues(world: World): void {
-  for (let p = 0; p < world.provinceCount; p++) {
-    if (world.provinceWater[p]) continue;
-    const wares = provinceWares(world, p);
-    let gold = 0;
-    world.provinceGoods[p] = wares.map((w) => {
-      const g = w.loads * warePrice(w.ware);
-      gold += g;
-      return { ware: w.ware, loads: w.loads, gold: tradeValueOf(g, 0) };
-    });
-    world.provinceGoodsValue[p] = gold;
-    world.provinceWeight[p] = weights(world, p, false);
-    const size = townSize(world, p);
-    const city = (config.value.city_size_is_city as string[]).includes(size) || marketStep(world, p) > 0;
-    world.provinceTradeCity[p] = (city ? 1 : 0) | (isPort(world, p) ? 2 : 0);
-  }
+  for (let p = 0; p < world.provinceCount; p++) if (!world.provinceWater[p]) refreshProvince(world, p);
   laneCache.delete(world);
+}
+
+function refreshProvince(world: World, p: number): void {
+  const goods = countGoods(world, p);
+  world.provinceGoods[p] = goods;
+  world.provinceGoodsValue[p] = goods.reduce((sum, g) => sum + g.value, 0);
+  world.provinceWeight[p] = weights(world, p, false);
+  const size = townSize(world, p);
+  const city = (config.value.city_size_is_city as string[]).includes(size) || marketStep(world, p) > 0;
+  world.provinceTradeCity[p] = (city ? 1 : 0) | (isPort(world, p) ? 2 : 0);
+}
+
+/** A province's goods now, with each ware's worth a year (`value`) and gold a month. */
+function countGoods(world: World, p: number): { ware: string; loads: number; gold: number; value: number }[] {
+  return provinceWares(world, p).map((w) => {
+    const value = w.loads * warePrice(w.ware);
+    return { ware: w.ware, loads: w.loads, gold: tradeValueOf(value, 0), value };
+  });
+}
+
+/** What a province trades, for the screens; after a load it is counted when first asked for. */
+export function goodsOf(world: World, p: number): { ware: string; loads: number; gold: number }[] {
+  if (world.provinceWater[p]) return [];
+  return (world.provinceGoods[p] ??= countGoods(world, p));
 }
 
 /** Gold a month from goods worth `goodsYear` a year with these weights (TRADE-025). */
@@ -995,9 +1005,10 @@ export function saveTrade(world: World): SavedTrade {
  * realm's deposits, fees and upkeep of last month.
  */
 export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<string, ArrayLike<number>>>, last: ArrayLike<number> | undefined, mapN: (old: number) => number, mapP: (old: number) => number): void {
-  // The goods for the screens are counted again; the numbers trade runs on are last January's, as saved.
-  refreshTradeValues(world);
+  // The numbers trade runs on are last January's, as saved; the goods for the screens are counted when asked for.
+  world.provinceGoods = new Array(world.provinceCount);
   world.provinceTradeRatio.fill(0);
+  const filled = new Uint8Array(world.provinceCount);
   const { tradeRatio: ratio, tradeGoods: goods, tradeWeight: weight, tradeCity: city } = prov;
   if (ratio) for (let old = 0; old < ratio.length; old++) {
     const p = mapP(old);
@@ -1006,7 +1017,10 @@ export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<s
     if (goods) world.provinceGoodsValue[p] = goods[old]!;
     if (weight) world.provinceWeight[p] = weight[old]!;
     if (city) world.provinceTradeCity[p] = city[old]!;
+    filled[p] = 1;
   }
+  // A province the save did not know is counted now.
+  for (let p = 0; p < world.provinceCount; p++) if (!filled[p] && !world.provinceWater[p]) refreshProvince(world, p);
   world.nationTrade.fill(0);
   if (last) for (let old = 0; old * 3 < last.length; old++) {
     const n = mapN(old);
