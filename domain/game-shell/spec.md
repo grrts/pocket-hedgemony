@@ -220,7 +220,7 @@ Newest decision first.
 - SHELL-039: When the player loads a save from the main menu, the game shell shall go to Loading with no confirmation. [screen-flow §3 S6]
 - SHELL-040: When the player loads from the game menu while the current campaign has unsaved turns, the game shell shall first ask "Leave <date> unsaved? · Save first · Leave · Cancel". [screen-flow §3 S6, §4.5]
 - SHELL-041: The loading screen shall show a tip from the one tips table in the config, tagged by era, region and whether it is for new players, picking one that fits the realm and date; tapping or pressing left and right shall show another. [screen-flow §3 S7]
-- SHELL-042: The loading screen's bar shall show the real loading steps ("Reading the save", "Drawing the borders", "Waking the courts") rather than a fake timer. [screen-flow §3 S7]
+- SHELL-042: The loading screen's bar shall show the real loading steps ("Reading the save", "Drawing the borders", "Waking the courts") rather than a fake timer, and its rider, road, bar and dots shall keep moving while the game is busy, so the player can see it has not frozen. [screen-flow §3 S7]
 - SHELL-043: When loading finishes, the game shell shall go straight to the map without asking for a tap, but shall keep a tip on screen for at least 2 s after it appeared before fading. [screen-flow §3 S7; placeholder]
 - SHELL-044: While the loading screen is shown, the `load_resume` track shall play. [screen-flow §3 S7]
 
