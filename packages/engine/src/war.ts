@@ -27,7 +27,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -840,7 +840,7 @@ export function cedeProvince(world: World, p: number, to: number, news: News[]):
   checkDestroyed(world, news);
 }
 
-function addBorders(world: World, n: number): void {
+export function addBorders(world: World, n: number): void {
   const d = world.diplomacy;
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceOwner[p] !== n) continue;

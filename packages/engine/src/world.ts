@@ -28,6 +28,7 @@ import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createRebelState, type RebelState } from "./rebels.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
+import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import type { AchievementLog } from "./achievements.ts";
 
@@ -138,6 +139,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   commanderSeed: number[];
   /** Ports, sailors, ships and fleets (navy.ts). */
   navy: NavyState;
+  /** Charts, voyages, colonial governors and colonies being founded (exploration.ts, colonies.ts). */
+  explore: ExplorationState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
   /** Every realm's heritage in play: birthright, heydays, ambitions, legacies and burden (HER-078). */
@@ -424,6 +427,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createGovernmentState(P, N),
     ...createRebelState(P, N),
     navy: createNavyState(P),
+    explore: createExplorationState(P, N),
     ...createPeoplesState(P, N),
   };
   world.diplomacy = createWarState(world);
@@ -467,6 +471,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   });
   seedResearch(world);
   seedNavy(world);
+  seedRegions(world);
+  seedCharts(world);
   recount(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.

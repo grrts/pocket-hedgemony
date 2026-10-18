@@ -3186,6 +3186,103 @@ button.belief-line {
   color: var(--cloth);
 }
 
+/* The voyage bar (EXPL-069, EXPL-074): along the bottom between the overview
+   button and End turn while a course is drawn, so the sea being tapped stays in
+   view; its buttons wrap rather than shrink below a finger. */
+.voyage-bar {
+  position: absolute;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(520px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
+  padding: 4px 6px 6px;
+  z-index: 7;
+  font: 600 16px/1.2 var(--body);
+}
+
+.voyage-bar .summary {
+  margin: 0 0 4px;
+}
+
+.voyage-bar .controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.voyage-bar .switch,
+.voyage-bar .actions {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 4px;
+}
+
+.voyage-bar button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0 8px;
+}
+
+/* The low-supply choice stays pressed in, marked with a dot, like a tax rate. */
+.switch button.paper.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+
+.switch button.on::before {
+  content: "● ";
+}
+
+/* A reason a button can't be used, written under it: a phone has no hover. */
+small.why {
+  display: block;
+  flex-basis: 100%;
+  margin: 2px 0 4px;
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+.warn {
+  color: #b13e53;
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 100%;
+}
+
+.colony-card {
+  margin: 6px 0;
+}
+
+.colony-progress {
+  height: 10px;
+}
+
+.colony-list {
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.colony-list li {
+  margin: 4px 0;
+}
+
+.colony-list li small {
+  display: block;
+}
+
+.lens-key .swatch.parchment {
+  background: #d9c79a;
+  background-image: repeating-linear-gradient(135deg, rgba(120, 90, 50, 0.3) 0 2px, transparent 2px 5px);
+}
+
+.colony-list button,
+.colony-card button {
+  min-height: 44px;
+}
+
 /* ---- Achievements (domain/achievements "How the player uses it") ---- */
 
 .tools #trophy {
