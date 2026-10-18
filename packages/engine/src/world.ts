@@ -36,6 +36,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   /** Days played. */
   day: number;
   rng: Rng;
+  /** The game's seed for its weather rolls (hard winters), apart from `rng` so a roll there never shifts the rest of the turn. */
+  weatherSeed: number;
 
   /** The map's tiles, which armies stand and march on. */
   tiles: TileGrid;
@@ -347,6 +349,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     step: 0,
     day: 0,
     rng: new Rng(seed),
+    weatherSeed: seed >>> 0,
     tiles,
     rowWidth: map && map.height === tiles.height ? rowWidths(tiles.height, map.latTop, map.pxPerDeg) : new Float32Array(tiles.height).fill(1),
     provincePlace,

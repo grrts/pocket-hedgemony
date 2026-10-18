@@ -1,3 +1,4 @@
+import { mix } from "./names.ts";
 import type { World } from "./world.ts";
 import type { Ground } from "@ph/rules";
 import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
@@ -247,7 +248,8 @@ function huntingFood(world: World, p: number, hunters: number, bareRate: number,
 /**
  * The hunting year, each January (feedback 81): game moves a step toward what
  * the hunting leaves, and each region rolls for a hard winter, more often in
- * the north. `region` gives a province's weather region.
+ * the north. The roll comes from the game's weather seed, the year and the
+ * region, not from `world.rng`, so it never shifts the rest of the turn. `region` gives a province's weather region.
  */
 export function huntingYear(world: World, region: (p: number) => number): void {
   const hw = HUNT.hard_winter;
@@ -263,7 +265,7 @@ export function huntingYear(world: World, region: (p: number) => number): void {
       continue;
     }
     const r = region(p) * 8 + oneIn;
-    if (!winters.has(r)) winters.set(r, world.rng.int(oneIn) === 0);
+    if (!winters.has(r)) winters.set(r, mix(mix(world.weatherSeed, world.date.year), r) % oneIn === 0);
     world.provinceHardWinter[p] = winters.get(r) ? 1 : 0;
   }
 }

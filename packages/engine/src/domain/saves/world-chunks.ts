@@ -75,7 +75,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
   };
   const chunks = [
     packChunk("core", V.core, {
-      meta: { turn: world.turn, date: world.date, day: world.day, step: world.step, options: game.options, playerNation: game.playerNation },
+      meta: { turn: world.turn, weatherSeed: world.weatherSeed, date: world.date, day: world.day, step: world.step, options: game.options, playerNation: game.playerNation },
       arrays: { rng: new Uint32Array(world.rng.state) },
     }),
     packChunk("ids", V.ids, { meta: { provinces: world.provinceIds, nations: world.nationIds, commanders: world.commanderIds, commanderNames: world.commanders.map((c) => c.name) }, arrays: {} }),
@@ -183,13 +183,14 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   const warnings: string[] = [];
 
   const world = createWorld(rules, 0, tiles);
-  const meta = core.meta as { turn: number; day?: number; step?: number; date: { year: number; month: number; day?: number }; options: CampaignOptions; playerNation: string };
+  const meta = core.meta as { turn: number; weatherSeed?: number; day?: number; step?: number; date: { year: number; month: number; day?: number }; options: CampaignOptions; playerNation: string };
   world.turn = meta.turn;
   world.day = meta.day ?? meta.turn * 7;
   world.step = meta.step ?? 0;
   // The whole date, with its day when the engine keeps one (X-18 weekly turns).
   world.date = { ...meta.date } as typeof world.date;
   world.rng = new Rng(core.arrays.rng as Uint32Array);
+  world.weatherSeed = meta.weatherSeed ?? 0;
 
   // Nations: by id, then the nation table, else gone with a warning.
   const nationMap = ids.nations.map((id) => {
