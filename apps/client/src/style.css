@@ -2797,3 +2797,203 @@ button.paper.over {
   flex: 1 1 4.5em;
   min-height: 44px;
 }
+
+/* ---- Trade (TRADE-141 to TRADE-145): the Trade tab, the province's Trade line and the route bar ---- */
+
+.trade-last dd.up {
+  color: #3d6b2a;
+}
+.trade-last dd.down {
+  color: var(--cloth);
+}
+/* One card per trader; a narrow panel shows them in one column. */
+.traders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 6px;
+}
+.trader {
+  margin: 0;
+  padding: 6px 8px;
+  min-width: 0;
+}
+.trader p {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+.trader small {
+  color: var(--ink-soft);
+}
+.trader .purse-bar {
+  margin: 0 0 2px;
+}
+.trader-why {
+  color: var(--cloth);
+}
+.trader.bad {
+  border-color: var(--cloth);
+}
+.trader-buttons,
+.trader .confirm-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+.trader .confirm-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.trader-buttons button,
+.trader .confirm-row button {
+  min-height: 44px;
+  padding: 0 2px;
+  gap: 2px;
+  font-size: 19px;
+}
+/* Found a trader: a city, then one button per kind with its gold and upkeep, greyed with the reason. */
+.found-city {
+  margin: 4px 0 8px;
+}
+.found-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px;
+}
+.found-kinds {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+  gap: 4px;
+}
+.found-kinds button {
+  display: grid;
+  justify-content: stretch;
+  align-content: center;
+  gap: 1px;
+  min-height: 44px;
+  padding: 2px 4px;
+  text-align: left;
+  line-height: 1;
+}
+.found-kinds button small {
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+.found-kinds button small.why {
+  color: var(--cloth);
+}
+/* Busiest cities: a row each, value, ratio bar and traders passed; a tap opens the province. */
+.trade-cities {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 4px;
+}
+.trade-city {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-content: stretch;
+  align-items: center;
+  gap: 2px 8px;
+  min-height: 44px;
+  padding: 2px 6px;
+  text-align: left;
+  line-height: 1;
+}
+.trade-city .ratio {
+  grid-column: 1 / -1;
+  display: block;
+  height: 6px;
+  border: 2px solid var(--outline);
+  background: var(--paper);
+}
+.trade-city .ratio i {
+  display: block;
+  height: 100%;
+  background: #4f8a6a;
+}
+.trade-city small {
+  grid-column: 1 / -1;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.trade-line small {
+  margin-left: 4px;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+/* The route bar (TRADE-142, TRADE-145): along the bottom of the map, inside the safe areas, clear of End turn; its buttons wrap. */
+.route-bar {
+  position: absolute;
+  left: max(8px, env(safe-area-inset-left));
+  right: calc(max(10px, env(safe-area-inset-right)) + 70px);
+  bottom: max(8px, env(safe-area-inset-bottom));
+  max-height: calc(100dvh - env(safe-area-inset-top) - 60px);
+  overflow: auto;
+  border-width: 8px;
+  border-image-width: 8px;
+  padding: 2px 6px 4px;
+  z-index: 7;
+  font-size: 18px;
+  line-height: 1.1;
+  color: var(--ink);
+}
+@media (min-width: 900px) {
+  .route-bar {
+    left: 50%;
+    right: auto;
+    width: min(720px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 160px));
+    transform: translateX(-50%);
+  }
+}
+.route-bar p {
+  margin: 0 0 2px;
+}
+.route-bar small,
+.route-bar .soft {
+  color: var(--ink-soft);
+}
+.route-why {
+  color: var(--cloth);
+  font-weight: 600;
+}
+.route-stops {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 4px;
+  margin: 0 0 3px;
+}
+.route-stops .chip {
+  padding: 1px 6px;
+  border: 2px solid var(--outline);
+  background: var(--brass-light);
+  white-space: nowrap;
+}
+.route-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.route-buttons button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0 4px;
+  font-size: 19px;
+}
+/* The two modes sit in the row like the other buttons, so the row wraps only when it must. */
+.route-mode {
+  display: contents;
+}
+.route-mode button.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+.route-mode button.on::before {
+  content: "● ";
+}
+/* On a short phone the bar keeps to the essentials, so the map above stays tappable. */
+@media (max-height: 420px) {
+  .route-bar .best {
+    display: none;
+  }
+}
