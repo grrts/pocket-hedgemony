@@ -706,14 +706,23 @@ export class MapRenderer {
   setProvinceSubject(i: number, overlord: number, overlordRgb: readonly number[] | null): void {
     const o = i * 4;
     const on = overlord >= 0 && overlordRgb !== null;
-    const next = on ? [overlordRgb[0]!, overlordRgb[1]!, overlordRgb[2]!, 255] : [0, 0, 0, 0];
     const ow = on ? overlord + 1 : 0;
-    const of = [(ow >> 8) & 255, ow & 255, 0, 0];
-    for (let k = 0; k < 4; k++) {
-      if (this.subjectData[o + k] !== next[k] || this.subjectOfData[o + k] !== of[k]) this.subjectDirty = true;
-      this.subjectData[o + k] = next[k]!;
-      this.subjectOfData[o + k] = of[k]!;
-    }
+    const s = this.subjectData;
+    const f = this.subjectOfData;
+    const r = on ? overlordRgb[0]! : 0;
+    const g = on ? overlordRgb[1]! : 0;
+    const b = on ? overlordRgb[2]! : 0;
+    const a = on ? 255 : 0;
+    const hi = (ow >> 8) & 255;
+    const lo = ow & 255;
+    if (s[o] === r && s[o + 1] === g && s[o + 2] === b && s[o + 3] === a && f[o] === hi && f[o + 1] === lo) return;
+    s[o] = r;
+    s[o + 1] = g;
+    s[o + 2] = b;
+    s[o + 3] = a;
+    f[o] = hi;
+    f[o + 1] = lo;
+    this.subjectDirty = true;
   }
 
   /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
