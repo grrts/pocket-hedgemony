@@ -23,10 +23,15 @@ for (const [provinces, nations] of [[5000, 500], [20000, 2000]] as const) {
   const rules = generateSyntheticRuleset(loadDefaultRuleset(), { provinces, nations });
   // Provinces of 12 by 12 tiles, about the real map's land provinces.
   const world = createWorld(rules, 1, blockTileGrid(rules, Math.ceil(Math.sqrt(provinces)), 12));
-  const turns = 120;
-  const t0 = performance.now();
-  for (let i = 0; i < turns; i++) processTurn(world, [], 0);
-  check(`${provinces} provinces, ${nations} nations, per turn`, (performance.now() - t0) / turns, TURN_MS[provinces]);
+  // Five runs of 24 turns (about half a year each); the median run's average
+  // per turn counts, so a runner hiccup in one run does not fail the budget.
+  const runs: number[] = [];
+  for (let r = 0; r < 5; r++) {
+    const t0 = performance.now();
+    for (let i = 0; i < 24; i++) processTurn(world, [], 0);
+    runs.push((performance.now() - t0) / 24);
+  }
+  check(`${provinces} provinces, ${nations} nations, per turn (median of 5 runs)`, runs.sort((a, b) => a - b)[2]!, TURN_MS[provinces]);
 
   const map = marchMap(world);
   const land = map.ground.flatMap((g, p) => (g ? [p] : []));
