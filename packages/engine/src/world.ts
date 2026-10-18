@@ -18,6 +18,7 @@ import { seedOfficials } from "./officials.ts";
 import { createResearchState, seedResearch, type ResearchState } from "./research.ts";
 import { createWorksState, seedWorks, type WorksState } from "./works.ts";
 import { createLandState, seedLand, type LandState } from "./land.ts";
+import { createConversionState, type ConversionState } from "./conversion.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 
 /**
@@ -26,7 +27,7 @@ import { createCastleFoodState, seedCastleStores, type CastleFoodState } from ".
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -397,6 +398,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createResearchState(N),
     ...createWorksState(P, N),
     ...createLandState(P),
+    ...createConversionState(P),
     ...createCastleFoodState(P, N),
   };
   world.diplomacy = createWarState(world);

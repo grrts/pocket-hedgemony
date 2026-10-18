@@ -33,7 +33,7 @@ export function provinceLand(s: Snapshot, p: number, chosen: number): string {
   const grid = tiles
     .map(
       (t, i) => `<button class="land-tile use-${t.use}${i === chosen ? " on" : ""}" data-land-tile="${i}" aria-pressed="${i === chosen}" title="${esc(USE_TEXT[t.use]!.name)}">
-        <b>${esc(USE_TEXT[t.use]!.name)}</b>${t.building ? `<small>${esc(t.building)}</small>` : ""}</button>`,
+        <b>${esc(USE_TEXT[t.use]!.name)}</b>${t.changing ? `<small>→ ${esc(USE_TEXT[t.changing.to]!.name)}</small>` : t.building ? `<small>${esc(t.building)}</small>` : ""}</button>`,
     )
     .join("");
   return `
@@ -67,5 +67,29 @@ function tileSheet(s: Snapshot, p: number, t: LandTileRow): string {
     <p>${esc(text.about)}</p>
     <dl class="facts">${facts}</dl>
     ${action}
+    ${changeBlock(t)}
   </div>`;
+}
+
+const years = (months: number) => (months % 12 === 0 ? `${months / 12} year${months === 12 ? "" : "s"}` : `${months} months`);
+
+/** The tile's change under way with a bar and Stop, or the one to three changes it offers (feedback 86). */
+function changeBlock(t: LandTileRow): string {
+  if (t.changing) {
+    const done = t.changing.months - t.changing.monthsLeft;
+    const pct = Math.round((done / t.changing.months) * 100);
+    return `<h3 class="sub">Changing</h3>
+      <p>${esc(t.changing.title)}: <b>${esc(USE_TEXT[t.changing.to]!.name)}</b> in ${years(t.changing.monthsLeft)}.</p>
+      <span class="progress" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></span>
+      <button class="paper" data-stop-change>Stop (half the gold back)</button>`;
+  }
+  if (!t.changes.length) return "";
+  const rows = t.changes
+    .map((c) =>
+      c.why === null
+        ? `<button class="paper land-change" data-change-tile="${esc(c.change)}"><b>${esc(c.title)}</b><small>to ${esc(USE_TEXT[c.to]!.name.toLowerCase())} · ${c.gold.toFixed(1)} gold · ${years(c.months)}</small></button>`
+        : `<p class="hint">${esc(c.title)}: ${esc(c.why)}.</p>`,
+    )
+    .join("");
+  return `<h3 class="sub">Change its use</h3>${rows}<p class="hint">One change at a time in a province. The ground stays what it is.</p>`;
 }

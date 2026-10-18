@@ -3,6 +3,7 @@ import { setFood, setFoodPreset } from "./castleFood.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
+import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { aiWorks, cancelWork, judgeNeglect, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { swapOfficials } from "./officials.ts";
@@ -103,6 +104,9 @@ export type Order =
   | { type: "cancelBuild"; province: number; work: number }
   /** Move a queued work one place earlier (-1) or later (1) in its province's queue. */
   | { type: "moveBuild"; province: number; work: number; by: number }
+  /** Change the use of one of a province's tiles (clear woods, to pasture, plough, drain, irrigate), or stop the change under way, with half its gold back (feedback 86). */
+  | { type: "changeTile"; province: number; change: string }
+  | { type: "stopChange"; province: number }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
   | { type: "foodPreset"; name: string };
@@ -180,6 +184,8 @@ function startDay(world: World, news: News[]): void {
     judgeNeglect(world);
     monthlyWorks(world, news);
     aiWorks(world, news);
+    monthlyChanges(world, news);
+    aiChanges(world);
     aiTreasury(world, news);
     monthlyDiplomacy(world, news);
     aiDeclarations(world, news);
@@ -286,6 +292,13 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return setFood(world, actingNation, order.castle, order.key, order.value);
     case "foodPreset":
       return setFoodPreset(world, actingNation, order.name);
+    case "changeTile": {
+      const reason = orderChange(world, actingNation, order.province, order.change);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "stopChange":
+      return stopChange(world, actingNation, order.province);
     case "moveBuild":
       return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":

@@ -9,6 +9,7 @@ import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { hashWorld } from "../src/hash.ts";
 import { gameTarget, huntingRoom, huntingYear, tilesOf, tileCount, MAX_TILES } from "../src/land.ts";
 import { worksFood } from "../src/works.ts";
+import { aiChanges, changeGold, changeMonths, monthlyChanges, orderChange, stopChange, whyNotChange } from "../src/conversion.ts";
 import { CLASS_COUNT, CLASS_NAMES } from "../src/living.ts";
 import { yearlyFood } from "../src/food.ts";
 import { buildSheet, knowsInvention, nextStep, slotsOf, slotsUsed, whyNot, WORK_COUNT, workCost, workIndex, worksAt } from "../src/works.ts";
@@ -274,15 +275,60 @@ describe("works (milestone 4)", () => {
     expect(whyNot(w, swe, p, work("hunting lodge"))).toBe("needs woods in the province");
   });
 
+  it("changes a tile's use one at a time, for gold and months (feedback 86)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const fra = nation(w, "france");
+    w.player = fra;
+    const p = Array.from({ length: w.provinceCount }, (_, i) => i).find((i) => w.provinceOwner[i] === fra && w.provinceLord[i]! < 0 && tilesOf(w, i, "woods") > 0)!;
+    w.nationTreasury[fra] = 1000;
+    const woods = tilesOf(w, p, "woods");
+    const fields = tilesOf(w, p, "fields");
+    expect(orderChange(w, fra, p, "clear woods")).toBeNull();
+    expect(w.nationTreasury[fra]).toBeCloseTo(1000 - changeGold(w, p, "clear woods"), 4);
+    // One at a time.
+    expect(whyNotChange(w, fra, p, "to pasture")).toMatch(/one change at a time/);
+    for (let m = 0; m < changeMonths("clear woods") - 1; m++) monthlyChanges(w, []);
+    expect(tilesOf(w, p, "woods")).toBe(woods);
+    const news: { text: string }[] = [];
+    monthlyChanges(w, news as never);
+    expect(tilesOf(w, p, "woods")).toBe(woods - 1);
+    expect(tilesOf(w, p, "fields")).toBe(fields + 1);
+    expect(news[0]!.text).toMatch(/Woods cleared/);
+    // Stopping gives half the gold back.
+    expect(orderChange(w, fra, p, "to pasture")).toBeNull();
+    const after = w.nationTreasury[fra]!;
+    expect(stopChange(w, fra, p)).toBeNull();
+    expect(w.nationTreasury[fra]).toBeCloseTo(after + changeGold(w, p, "to pasture") / 2, 4);
+    // Draining needs Polder drainage; a lord's land is his to change.
+    w.provinceTiles[p * MAX_TILES + 1] = 4;
+    if (!w.research[fra]?.known.has("F8")) expect(whyNotChange(w, fra, p, "drain")).toMatch(/Polder drainage/);
+    w.provinceLord[p] = 0;
+    expect(whyNotChange(w, fra, p, "plough")).toMatch(/lord/);
+  });
+
+  it("lets the AI clear woods where a province goes hungry (feedback 86)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const p = Array.from({ length: w.provinceCount }, (_, i) => i).find((i) => w.provinceOwner[i]! >= 0 && w.provinceOwner[i] !== w.player && tilesOf(w, i, "woods") >= 2)!;
+    w.nationTreasury[w.provinceOwner[p]!] = 1000;
+    w.provincePopulation[p] = w.provincePopulation[p]! * 3;
+    w.date.month = 1;
+    aiChanges(w);
+    expect(w.provinceChangeTile[p]).toBeGreaterThanOrEqual(0);
+  });
+
   it("keeps tiles through a save", () => {
     const w = createWorld(rules, 1, tiles);
     w.provinceTiles[0] = 3;
     w.provinceGame[5] = 0.42;
+    w.provinceChangeTile[5] = 2;
+    w.provinceChangeLeft[5] = 7;
     w.provinceHardWinter[5] = 1;
     const back = restoreWorld(new Map(worldChunks(w, { playerNation: "castile", options: {} as never }).map((c) => [c.id, c])), rules, {}, tiles).world;
     expect(Array.from(back.provinceTiles)).toEqual(Array.from(w.provinceTiles));
     expect(Array.from(back.provinceLandYield)).toEqual(Array.from(w.provinceLandYield));
     expect(back.provinceGame[5]).toBeCloseTo(0.42, 5);
     expect(back.provinceHardWinter[5]).toBe(1);
+    expect(back.provinceChangeTile[5]).toBe(2);
+    expect(back.provinceChangeLeft[5]).toBe(7);
   });
 });

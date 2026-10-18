@@ -1871,7 +1871,7 @@ function realmLords(r: number): string {
 }
 
 /** Sort orders of the Provinces overview. */
-let provinceSort: "trouble" | "people" | "food" | "tax" = "trouble";
+let provinceSort: "trouble" | "people" | "food" | "tax" | "short" = "trouble";
 
 /**
  * The realm's provinces at a glance (milestone 3 overview, richer for
@@ -1890,6 +1890,7 @@ function provincesTab(r: number): string {
     people: (a: number, b: number) => s.provincePeople[b]! - s.provincePeople[a]!,
     food: (a: number, b: number) => s.provinceFoodMonths[a]! - s.provinceFoodMonths[b]!,
     tax: (a: number, b: number) => s.provinceTaxGold[b]! - s.provinceTaxGold[a]!,
+    short: (a: number, b: number) => landShare(a) - landShare(b),
   }[provinceSort];
   list.sort((a, b) => by(a, b) || a - b);
   const people = list.reduce((t, p) => t + s.provincePeople[p]!, 0);
@@ -1904,17 +1905,20 @@ function provincesTab(r: number): string {
   const [bad, fair, rich] = [band(0, 1), band(2, 2), band(3, 4)];
   const harvests = harvested.length ? `<p>Last harvests: ${rich ? `${rich} good or bumper, ` : ""}${fair} normal${bad ? `, <b>${bad} poor or failed</b>` : ""}.</p>` : "";
   const color = nations[r]!.color;
-  const rows = list
+  // Short of food (feedback 86): only the provinces whose land feeds under all their people in a normal year; the counts above stay the realm's.
+  const shown = provinceSort === "short" ? list.filter((p) => landShare(p) < 1) : list;
+  const rows = shown
     .map((p) => {
       const months = s.provinceFoodMonths[p]!;
       const l = s.provinceLord[p]!;
       const post = s.provinceOfficial[p];
       const bad = s.provinceMood[p]! >= 2 || months < 1;
       const gov = l >= 0 ? `Lord ${esc(s.lords[l]!.house)}` : post ? `Royal · ${esc(post.toLowerCase())}` : "Royal · <b>no official</b>";
+      const fix = provinceSort === "short" ? `<small>Land feeds ${Math.round(landShare(p) * 100)} % · ${esc(foodFix(p))}</small>` : "";
       return `<div class="province-row${bad ? " bad" : ""}">
-        <button class="place" data-open-province="${p}" title="Open ${esc(provinces[p]!.name)}">
+        <button class="place" ${provinceSort === "short" ? `data-open-land="${p}"` : `data-open-province="${p}"`} title="Open ${esc(provinces[p]!.name)}">
           <img class="thumb" src="${mapImage ? provinceThumb(mapImage, provinces.length, p, color) : ""}" alt="" width="48" height="48">
-          <span class="place-name"><b>${esc(provinces[p]!.name)}</b><small>${MOOD_LABEL[s.provinceMood[p]!]} · ${gov}</small></span>
+          <span class="place-name"><b>${esc(provinces[p]!.name)}</b><small>${MOOD_LABEL[s.provinceMood[p]!]} · ${gov}</small>${fix}</span>
           <span class="place-stats"><small>${fmt(Math.round(s.provincePeople[p]! * 1000))} people</small><small>${months.toFixed(1)} months food${s.provinceHarvest[p]! >= 0 && s.provinceHarvest[p]! <= 1 ? ` · ${s.harvests[s.provinceHarvest[p]!]!} harvest` : ""}</small><small>${gold2(s.provinceTaxGold[p]!)} gold</small></span>
         </button>
         <button class="paper small map-go" data-map-province="${p}" title="Show ${esc(provinces[p]!.name)} on the map" aria-label="Show on the map">${icon("scroll", 1)}Map</button>
@@ -1924,8 +1928,28 @@ function provincesTab(r: number): string {
   const sortButton = (key: typeof provinceSort, label: string) => `<button class="tab${provinceSort === key ? " on" : ""}" data-province-sort="${key}">${label}</button>`;
   return `<p><b>${fmt(Math.round(people * 1000))}</b> people in ${list.length} provinces paying <b>${gold2(tax)}</b> gold a month. ${hungry ? `<b>${hungry} hungry</b>, ` : ""}${low ? `${low} low on food, ` : ""}${restless ? `<b>${restless} rioting or plotting</b>, ` : ""}${grumbling ? `${grumbling} grumbling.` : hungry || low || restless ? "the rest content." : "All fed and calm."}</p>
     ${harvests}
-    <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}${sortButton("tax", "Most tax")}</nav>
+    <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}${sortButton("tax", "Most tax")}${sortButton("short", "Short of food")}</nav>
+    ${provinceSort === "short" && !shown.length ? `<p class="hint">Every province's land feeds its people in a normal year.</p>` : ""}
     <div class="province-list">${rows}</div>`;
+}
+
+/** The share of its people a province's land feeds in a normal year (its Land tab's first line). */
+function landShare(p: number): number {
+  const tiles = snapshot?.landSheets[p] ?? [];
+  const people = snapshot?.provincePeople[p] ?? 0;
+  return people > 0 ? tiles.reduce((a, t) => a + t.feeds, 0) / people : 1;
+}
+
+/** What would feed a short province, as its Land tab offers it: a farm, a better farm, clearing woods, or bringing food in. */
+function foodFix(p: number): string {
+  const s = snapshot!;
+  const tiles = s.landSheets[p] ?? [];
+  const farm = (s.buildSheets[p] ?? []).find((r) => r.work === s.works.indexOf("farm"));
+  if (s.provinceLord[p]! >= 0) return "its lord decides on his land";
+  if (farm && farm.why === null) return farm.step > 1 ? `improve the farm to a ${farm.name}` : "build a farm";
+  const clear = tiles.find((t) => t.changes.some((c) => c.why === null && c.to === "fields"));
+  if (clear) return clear.changes.find((c) => c.why === null && c.to === "fields")!.title.toLowerCase();
+  return "bring food in from a castle";
 }
 
 /** Opens province i's overview and centres the map on it; folded, the panel leaves the map clear. */
@@ -1951,6 +1975,13 @@ function bindLords(): void {
     }),
   );
   panel.querySelectorAll<HTMLElement>("[data-open-province]").forEach((row) => row.addEventListener("click", () => goToProvince(Number(row.dataset.openProvince), false)));
+  panel.querySelectorAll<HTMLElement>("[data-open-land]").forEach((row) =>
+    row.addEventListener("click", () => {
+      goToProvince(Number(row.dataset.openLand), false);
+      provinceTab = "land";
+      renderPanel();
+    }),
+  );
   panel.querySelectorAll<HTMLElement>("[data-map-province]").forEach((b) => b.addEventListener("click", () => goToProvince(Number(b.dataset.mapProvince), true)));
   panel.querySelectorAll<HTMLButtonElement>("[data-lord-open]").forEach((b) => b.addEventListener("click", () => openLord(Number(b.dataset.lordOpen))));
   panel.querySelectorAll<HTMLButtonElement>("[data-lord-light]").forEach((b) => b.addEventListener("click", () => lightLord(Number(b.dataset.lordLight))));
@@ -2076,6 +2107,13 @@ function renderLand(pi: number): void {
       if (snapshot && !snapshot.rejectedOrders.length) sound.sfx("econ_spend");
     }),
   );
+  panel.querySelectorAll<HTMLButtonElement>("[data-change-tile]").forEach((b) =>
+    b.addEventListener("click", async () => {
+      await act({ type: "changeTile", province: pi, change: b.dataset.changeTile! });
+      if (snapshot && !snapshot.rejectedOrders.length) sound.sfx("econ_spend");
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-stop-change]").forEach((b) => b.addEventListener("click", () => act({ type: "stopChange", province: pi })));
 }
 
 function bindProvinceTabs(): void {

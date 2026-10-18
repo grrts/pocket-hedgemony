@@ -82,7 +82,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("provinces", V.provinces, {
       // Sieges under way, by province (occupation and garrisons are arrays below); the ground is the map's, not the save's.
       meta: { sieges: [...world.sieges].map(([p, st]) => [p, { ...st, siege: { ...st.siege, ground: undefined } }]), workNames: WORKS },
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore, game: world.provinceGame, hardWinter: world.provinceHardWinter },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore, game: world.provinceGame, hardWinter: world.provinceHardWinter, changeTile: world.provinceChangeTile, change: world.provinceChange, changeLeft: world.provinceChangeLeft, changeMonths: world.provinceChangeMonths, changeGold: world.provinceChangeGold },
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
@@ -264,6 +264,14 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         // Game in the woods and this year's winter; saves from before hunting keep the 1444 game.
         if (prov.game) world.provinceGame[t.index] = prov.game[old]!;
         if (prov.hardWinter) world.provinceHardWinter[t.index] = prov.hardWinter[old]!;
+        // A tile change under way (feedback 86), kept when the province keeps its tiles.
+        if (prov.changeTile && prov.tiles) {
+          world.provinceChangeTile[t.index] = prov.changeTile[old]!;
+          world.provinceChange[t.index] = prov.change![old]!;
+          world.provinceChangeLeft[t.index] = prov.changeLeft![old]!;
+          world.provinceChangeMonths[t.index] = prov.changeMonths![old]!;
+          world.provinceChangeGold[t.index] = prov.changeGold![old]!;
+        }
         // Castle stores; saves from before them keep each castle's starting reserve.
         if (prov.castleStore) world.castleStore[t.index] = prov.castleStore[old]! * t.share;
       }
