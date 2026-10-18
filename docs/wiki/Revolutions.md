@@ -280,6 +280,21 @@ The family stance labels (lead / bend / fight):
 - **The revolution lens** shades provinces by how many of the revolution's province-level signs they meet and hatches risen provinces in the revolution's colour.
 - **The regime card** on the government screen shows the regime's loop line, its decrees as buttons and its locks greyed out.
 
+### In the game today
+
+The 36 historical revolutions read ideologies, legitimacy and ages the game does not track yet, so the first slice gives every realm one revolution of its own, built from the two oldest families. A monarchy with no hunger has an **Estates and towns** revolution (as the Fronde and the Comuneros); a realm that is hungry, or not a monarchy, has a **Peasant and agrarian** one (as the Tay Son and Donghak risings).
+
+- **Signs** (3 of 6 to break out, amber at 2): *Heavy taxes* in a quarter of the realm; *Hungry* in a fifth; a tenth rioting or plotting; two or more lords Wavering or worse; debt above a year's income; rebels holding your land, or rebels who won against you in the last 5 years. Under the reaction regime one sign fewer is enough, for 20 years.
+- **Breaking out**: a red card breaks out on a roll of 1 in 12 a month, 1 in 6 while two or more lords are Disloyal, never in the month it turned red and never within 3 years of the last revolution, Bend or crushed rising.
+- **Where you see it**: the Stability plaque in the top bar carries a mark while a revolution brews (amber) or may break out (red); tap it for the General tab, where the Revolution block under the four pillars lists the lit signs first, each with a button to the tab that eases it, and folds out what each answer would do.
+- **When it breaks out**: a full-screen card asks how you answer, and End turn waits for it.
+  - Estates: **Share power** makes you a diet monarchy (League of towns, crushing taxes locked); **Grant charters** fixes the tax at light for 10 years wherever it is heavy, and the revolution is stopped, not solved; **Break them** raises a town rising in your most restless province.
+  - Agrarian: **Divide the land** (Land to the villages: no more fiefs granted, every lord loses a loyalty step); **Cut taxes and open the granaries** (light tax for 10 years where it is heavy, castle granaries opened where people are hungry; stopped, not solved); **Crush the bands** raises a hunger rising.
+- **The struggle**: the rising plays as any other on the map. If it wins, an estates revolution makes you a merchant republic with an elected ruler; an agrarian one puts the rising's leader on your throne, your house goes abroad as pretenders, every lord wavers and tax stays light for 10 years. If it is beaten, starves or is bribed away, the Reaction follows: bloodshed where they rose, and the revolution comes back sooner. If you grant or talk out its demand, it is stopped, not solved.
+- **Rebels who win**: an ordinary rising that wins against you lights the rebels sign, and if your card is then red, or the rebels took your capital's castle, the revolution has won at once.
+- **Government tab**: the regime under your form, its loop line and since when, your ruler, the form before the revolution, and its locks greyed out. Locked orders are refused with "locked by the revolution".
+- **Other realms**: computer realms go through the same rules and pick Fight, Bend or Lead by weight, Fight more often when their armies outnumber the rising. A neighbour's revolution is a line in your Dispatches.
+
 ## How it connects
 
 - [Historical events](Historical-Events): revolutions are events; this adds four conditions, the regime and lock effects, two new effect tiers and four flags (not merged yet).

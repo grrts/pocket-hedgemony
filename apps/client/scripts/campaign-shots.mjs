@@ -77,7 +77,9 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   if (!(await page.$("#alerts .alert:has-text('offers peace')"))) fail(`${name}: no alert for the offer`);
   if (!(await page.$('#panel .tab.marked[data-realm-tab="diplomacy"]'))) fail(`${name}: Diplomacy tab not marked`);
   await shot("offer-card");
-  await tap("#alerts .alert:has-text('offers peace') .go-there");
+  // Answer opens the Dispatches; the alert may already have gone on a slow runner, so the top bar button does too.
+  const answer = await page.$("#alerts .alert:has-text('offers peace') .go-there");
+  await (answer ? answer.click() : page.click(".hud [data-news]"));
   await page.waitForTimeout(400);
   if (!(await page.$("#panel h3:text('Waiting for you')"))) fail(`${name}: no Waiting for you in the Dispatches`);
   await shot("offer-dispatches");

@@ -3153,6 +3153,206 @@ button.paper.over {
   min-height: 44px;
 }
 
+/* ---- Trade (TRADE-141 to TRADE-145): the Trade tab, the province's Trade line and the route bar ---- */
+
+.trade-last dd.up {
+  color: #3d6b2a;
+}
+.trade-last dd.down {
+  color: var(--cloth);
+}
+/* One card per trader; a narrow panel shows them in one column. */
+.traders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 6px;
+}
+.trader {
+  margin: 0;
+  padding: 6px 8px;
+  min-width: 0;
+}
+.trader p {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+.trader small {
+  color: var(--ink-soft);
+}
+.trader .purse-bar {
+  margin: 0 0 2px;
+}
+.trader-why {
+  color: var(--cloth);
+}
+.trader.bad {
+  border-color: var(--cloth);
+}
+.trader-buttons,
+.trader .confirm-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+.trader .confirm-row {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.trader-buttons button,
+.trader .confirm-row button {
+  min-height: 44px;
+  padding: 0 2px;
+  gap: 2px;
+  font-size: 19px;
+}
+/* Found a trader: a city, then one button per kind with its gold and upkeep, greyed with the reason. */
+.found-city {
+  margin: 4px 0 8px;
+}
+.found-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px;
+}
+.found-kinds {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+  gap: 4px;
+}
+.found-kinds button {
+  display: grid;
+  justify-content: stretch;
+  align-content: center;
+  gap: 1px;
+  min-height: 44px;
+  padding: 2px 4px;
+  text-align: left;
+  line-height: 1;
+}
+.found-kinds button small {
+  font-weight: 400;
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+.found-kinds button small.why {
+  color: var(--cloth);
+}
+/* Busiest cities: a row each, value, ratio bar and traders passed; a tap opens the province. */
+.trade-cities {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 4px;
+}
+.trade-city {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-content: stretch;
+  align-items: center;
+  gap: 2px 8px;
+  min-height: 44px;
+  padding: 2px 6px;
+  text-align: left;
+  line-height: 1;
+}
+.trade-city .ratio {
+  grid-column: 1 / -1;
+  display: block;
+  height: 6px;
+  border: 2px solid var(--outline);
+  background: var(--paper);
+}
+.trade-city .ratio i {
+  display: block;
+  height: 100%;
+  background: #4f8a6a;
+}
+.trade-city small {
+  grid-column: 1 / -1;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.trade-line small {
+  margin-left: 4px;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+/* The route bar (TRADE-142, TRADE-145): along the bottom of the map, inside the safe areas, clear of End turn; its buttons wrap. */
+.route-bar {
+  position: absolute;
+  left: max(8px, env(safe-area-inset-left));
+  right: calc(max(10px, env(safe-area-inset-right)) + 70px);
+  bottom: max(8px, env(safe-area-inset-bottom));
+  max-height: calc(100dvh - env(safe-area-inset-top) - 60px);
+  overflow: auto;
+  border-width: 8px;
+  border-image-width: 8px;
+  padding: 2px 6px 4px;
+  z-index: 7;
+  font-size: 18px;
+  line-height: 1.1;
+  color: var(--ink);
+}
+@media (min-width: 900px) {
+  .route-bar {
+    left: 50%;
+    right: auto;
+    width: min(720px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 160px));
+    transform: translateX(-50%);
+  }
+}
+.route-bar p {
+  margin: 0 0 2px;
+}
+.route-bar small,
+.route-bar .soft {
+  color: var(--ink-soft);
+}
+.route-why {
+  color: var(--cloth);
+  font-weight: 600;
+}
+.route-stops {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px 4px;
+  margin: 0 0 3px;
+}
+.route-stops .chip {
+  padding: 1px 6px;
+  border: 2px solid var(--outline);
+  background: var(--brass-light);
+  white-space: nowrap;
+}
+.route-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.route-buttons button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0 4px;
+  font-size: 19px;
+}
+/* The two modes sit in the row like the other buttons, so the row wraps only when it must. */
+.route-mode {
+  display: contents;
+}
+.route-mode button.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+.route-mode button.on::before {
+  content: "● ";
+}
+/* On a short phone the bar keeps to the essentials, so the map above stays tappable. */
+@media (max-height: 420px) {
+  .route-bar .best {
+    display: none;
+  }
+}
+
 /* ---- Game menu, Save, Load and Settings (domain/saves, domain/settings "How the player uses it") ---- */
 
 /* Text size grows the cards' text inside their own width (SET-137). */
@@ -4078,4 +4278,316 @@ small.why {
   flex-wrap: wrap-reverse;
   align-content: flex-start;
   max-height: calc(100dvh - env(safe-area-inset-top) - 52px - max(10px, env(safe-area-inset-bottom)) - 76px);
+}
+
+/* Revolutions (REVO-090 to REVO-093): the mark on the Stability plaque, the
+   Revolution block under the pillars, the full-screen choice card and the
+   regime card on the Government tab. */
+.plaque.stability {
+  position: relative;
+}
+
+.revo-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  border: 2px solid var(--outline);
+  background: #e0a030;
+  color: var(--outline);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.revo-mark.red {
+  background: var(--cloth);
+  color: var(--paper-light);
+  animation: revo-blink 1.2s steps(2) infinite;
+}
+
+@keyframes revo-blink {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.revolution {
+  margin: 4px 0 10px;
+  padding: 6px 8px;
+}
+
+.revolution.amber {
+  box-shadow: inset 4px 0 0 #e0a030;
+}
+
+.revolution.red {
+  box-shadow: inset 4px 0 0 var(--cloth);
+}
+
+.revolution p {
+  margin: 2px 0 6px;
+}
+
+.revo-quiet {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.revo-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.revo-bar .progress {
+  margin-top: 0;
+}
+
+.progress.amber i {
+  background: #e0a030;
+}
+
+.progress.red i {
+  background: var(--cloth);
+}
+
+.revo-signs {
+  display: grid;
+  gap: 4px;
+}
+
+.revo-sign {
+  display: grid;
+  grid-template-columns: 1.2em minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  text-align: left;
+  font-size: 17px;
+}
+
+.revo-sign span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.revo-sign b {
+  font-weight: 400;
+}
+
+.revo-sign.lit b {
+  font-weight: 600;
+}
+
+.revo-sign small {
+  color: var(--ink-soft);
+}
+
+.revo-sign:not(.lit) {
+  opacity: 0.72;
+}
+
+.revo-sign.lit i {
+  color: var(--cloth);
+}
+
+.revo-sign em {
+  font-style: normal;
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+
+.revo-lines {
+  margin: 6px 0;
+  padding-left: 1.1em;
+}
+
+.revo-lines li.lit {
+  color: var(--cloth);
+}
+
+.revo-lines button {
+  min-height: 44px;
+}
+
+.revo-fold summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.revo-stances {
+  margin: 0;
+}
+
+.revo-stances dt {
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.revo-stances dd {
+  margin: 0;
+}
+
+.revo-stances ul {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+/* The choice card covers the map inside the safe areas; it cannot be folded away. */
+.revolution-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  background: rgb(20 10 4 / 0.6);
+}
+
+.revolution-card {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 100%);
+  max-height: 100%;
+  padding: 4px 8px 8px;
+  animation: alert-in 0.2s steps(4);
+}
+
+.revolution-card .ribbon {
+  white-space: normal;
+  overflow: visible;
+}
+
+.revolution-card header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.revolution-card header small {
+  color: var(--ink-soft);
+}
+
+.revolution-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: auto;
+}
+
+.revolution-card .sub {
+  margin: 8px 0 4px;
+  font: 600 18px/1 var(--body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.revolution-card p {
+  margin: 4px 0;
+}
+
+.revolution-stances {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.revolution-stances .stance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 44px;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.revolution-stances .stance .name {
+  font-size: 1.1em;
+}
+
+.revolution-stances .stance .does {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8em;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+/* A short landscape screen: the story and the answers side by side. */
+@media (max-height: 500px) and (min-width: 540px) {
+  .revolution-body {
+    flex-direction: row;
+    overflow: hidden;
+  }
+
+  .revolution-story,
+  .revolution-stances {
+    flex: 1 1 50%;
+    min-width: 0;
+    overflow: auto;
+  }
+
+  .revolution-card .sub {
+    margin-top: 2px;
+  }
+}
+
+.regime {
+  margin: 4px 0 10px;
+  padding: 6px 8px;
+}
+
+.regime .sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.regime-locks {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.regime-locks li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 8px;
+  border: 2px dashed var(--ink-soft);
+  color: var(--ink-soft);
+  opacity: 0.8;
+}
+
+.regime-locks li b {
+  text-decoration: line-through;
+}
+
+.revo-locked {
+  opacity: 0.6;
+}
+
+.revo-locked .locked-note {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 400;
 }

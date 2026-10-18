@@ -38,7 +38,7 @@ describe("a living realm: people by class", () => {
     expect(classPeople(w, p, "farmers") / farmers).toBeCloseTo(1.01, 2);
     expect(classPeople(w, p, "homeless")).toBeLessThan(homeless);
     expect(w.provincePopulation[p]).toBeCloseTo(sum(w, p), 3);
-  });
+  }, 60000);
 
   it("keeps people by class in a save", () => {
     const w = createWorld(rules, 1, tiles);

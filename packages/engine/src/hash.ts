@@ -1,7 +1,9 @@
 import { LOYALTY } from "./lords.ts";
+import { tradeHashData } from "./trade.ts";
 import { researchHashData } from "./research.ts";
 import { castleFoodHashData } from "./castleFood.ts";
 import { rebelsHashData } from "./rebels.ts";
+import { revolutionsHashData } from "./revolutions.ts";
 import type { World } from "./world.ts";
 
 /**
@@ -78,8 +80,11 @@ export function hashWorld(world: World): string {
   feed(world.provinceOfficial);
   feed(world.nationForm);
   feed(world.provinceGrasping);
+  feed(world.provinceTradeRatio);
+  feed(tradeHashData(world));
   feed(world.provinceRebels);
   feed(rebelsHashData(world));
+  feed(revolutionsHashData(world));
   feed(world.provinceLightTax);
   feed(world.provinceSelfRule);
   feed(world.provinceTongue);

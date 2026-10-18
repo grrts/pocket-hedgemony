@@ -1,5 +1,6 @@
-import type { GovernmentView, NextFormView } from "@ph/engine";
+import type { GovernmentView, NextFormView, RevolutionView } from "@ph/engine";
 import { icon } from "../art/ui.ts";
+import { regimeCard } from "./revolution.ts";
 
 /**
  * Government on the realm card (GOV-064 to GOV-066): the Government tab of
@@ -67,14 +68,15 @@ function nextCard(v: GovernmentView, x: NextFormView): string {
     </div>`;
 }
 
-/** The Government tab of the player's own card. */
-export function governmentTab(v: GovernmentView): string {
+/** The Government tab of the player's own card; under the form, the regime a revolution set and the ruler (REVO-092). */
+export function governmentTab(v: GovernmentView, revo?: RevolutionView | null): string {
   const lordsOver = v.lords.used - v.lords.cap.total;
   const officialsOver = v.officials.used - v.officials.cap.total;
   const officials = capBlock("Officials", v.officials.used, v.officials.cap, `${officialsOver} over: the newest ${officialsOver === 1 ? "official's province has" : `${officialsOver} officials' provinces have`} Grasping officials`, "officials");
   const lords = capBlock("Lords", v.lords.used, v.lords.cap, `At New Year ${lordsOver} lord${lordsOver === 1 ? "" : "s"} will lose a loyalty step`, "lords");
   return `<h3 class="sub">${esc(v.form)}</h3>
     <p class="hint">${esc(FAMILY[v.family] ?? v.family)}. The form sets how many officials and lords you can hold, and the laws below. Tap a cap to see its people.</p>
+    ${regimeCard(revo)}
     <div class="caps">${officials}${lords}</div>
     <h3 class="sub">Laws of the realm</h3>
     <dl class="facts">
