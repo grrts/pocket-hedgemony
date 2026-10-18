@@ -100,6 +100,7 @@ export interface Snapshot {
   /** Hour of the day (0, 4, 8 … 20). */
   hour: number;
   playerNation: number;
+  /** worldHash at the end of a whole turn or a new game; empty for a day or step played (hashing the world costs more than the day). */
   hash: string;
   computeMs: number;
   rejectedOrders: { order: Order; reason: string }[];
@@ -307,7 +308,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
   /** The map's tiles from the last newGame or load, for loading saves onto. */
   let grid: TileGrid | undefined;
 
-  function snapshot(id: number, started: number, rejectedOrders: Snapshot["rejectedOrders"], news: News[] = []): HostReply {
+  function snapshot(id: number, started: number, rejectedOrders: Snapshot["rejectedOrders"], news: News[] = [], withHash = true): HostReply {
     const w = world!;
     const idx = (ids: string[]) => ids.map((x) => w.nationIndex.get(x)!).filter((n) => n !== undefined);
     const wars = w.diplomacy.wars.map((x) => ({ id: x.id, attackers: idx(x.attackers), defenders: idx(x.defenders), start: x.start }));
@@ -336,7 +337,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       date: { ...w.date },
       hour: w.step * HOURS_PER_STEP,
       playerNation: player,
-      hash: hashWorld(w),
+      hash: withHash ? hashWorld(w) : "",
       computeMs: now() - started,
       rejectedOrders,
       provinceOwner: w.provinceOwner.slice(),
@@ -545,7 +546,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         case "advance": {
           if (!world) throw new Error("no game in progress");
           const news = advance(world, Math.max(1, Math.min(req.steps, 42)));
-          return snapshot(req.id, started, [], news);
+          return snapshot(req.id, started, [], news, false);
         }
         case "act": {
           if (!world) throw new Error("no game in progress");
