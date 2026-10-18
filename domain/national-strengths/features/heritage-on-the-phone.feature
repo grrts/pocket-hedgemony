@@ -6,9 +6,9 @@ Feature: Heritage on the phone
 
   @HER-070
   Scenario: The Heritage row
-    Given the country "Venice" has a birthright, an awake heyday, 3 sealed ambitions and a burden
+    Given the country "Venice" has a birthright, an active golden age, 3 hidden ambitions and a weakness
     When the player opens the country card
-    Then one Heritage row shows the birthright icon, the heyday icon, three seals and the burden icon
+    Then one Heritage row shows the birthright icon, the golden age icon, three hidden ambitions and the weakness icon
     And tapping it opens the Heritage sheet
 
   @HER-071
@@ -20,7 +20,7 @@ Feature: Heritage on the phone
 
     Examples:
       | change                         |
-      | its seal cracks                |
+      | it is revealed                 |
       | its warmth rises to hot        |
 
   @HER-072
@@ -34,7 +34,7 @@ Feature: Heritage on the phone
   Scenario: The nation picker
     Given the player is choosing a country
     When the player looks at "Portugal"
-    Then the picker shows its birthright and burden, a count of its sealed ambitions and its heydays as ages
+    Then the picker shows its birthright and weakness, a count of its hidden ambitions and its golden ages as ages
 
   @HER-074
   Scenario: Free tier

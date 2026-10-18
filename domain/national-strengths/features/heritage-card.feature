@@ -7,11 +7,11 @@ Feature: Heritage card
   @HER-001 @HER-002
   Scenario: The heritage card of Venice
     Given the country "Venice" has the birthright "Lagoon and Arsenal"
-    And the heyday "The mude to Alexandria" is awake in the "Age of Gunpowder Empires"
-    And "Venice" has 3 active ambitions, one of them stirred and warm
-    And "Venice" carries the burden "The feared lion" and has no legacies
+    And the golden age "The mude to Alexandria" is active in the "Age of Gunpowder Empires"
+    And "Venice" has 3 active ambitions, one of them hinted and warm
+    And "Venice" has the weakness "The feared lion" and no legacies
     When the player opens the heritage card of "Venice"
-    Then the card shows the rows Birthright, Heyday, Ambitions, Burden and Legacies and no more
+    Then the card shows the rows Birthright, Golden age, Ambitions, Weakness and Legacies and no more
     And the Legacies row says "none yet"
     And tapping a row shows its full text, its history note and what it changes
 

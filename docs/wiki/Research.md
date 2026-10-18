@@ -72,14 +72,14 @@ Some inventions change research itself: L5 *Printing* (inventions spread +20 %, 
 
 ### The tree
 
-There is **one tree**, from the root **Settled life**, which everyone knows. It splits into four **boughs**, which every country also knows at the start:
+There is **one tree**, from the root **Settled life**, which everyone knows. It splits into four **branches**, which every country also knows at the start:
 
 - **R1 Tilling and building**
 - **R2 Fire and metal**
 - **R3 Counting and records**
 - **R4 Boats**
 
-Inventions branch era by era, and many need an invention from another bough. The letter in an invention's id only says what it is about (F food, C crafts and industry, T trade, S sea, W war, B building, G government, L learning); it is not a separate tree. Each invention is one config row (`id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions`), so new inventions such as Andean terrace farming, Ethiopian church schools or Javanese irrigation can be hung on any branch without code.
+Inventions branch era by era, and many need an invention from another branch. The letter in an invention's id only says what it is about (F food, C crafts and industry, T trade, S sea, W war, B building, G government, L learning); it is not a separate tree. Each invention is one config row (`id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions`), so new inventions such as Andean terrace farming, Ethiopian church schools or Javanese irrigation can be hung on any branch without code.
 
 The tree holds **174 inventions**. Twenty of them keep ids the event tree uses (marked "event id" below) so events keep working; the event tree's technology and innovation stats read them from the tree. Where another system gives an invention's effect in numbers ([Warfare](Warfare), [Trade](Trade), [Exploration and Colonies](Exploration-and-Colonies)), that system owns the numbers. Nuclear physics and Rocketry are never studied, and the other Era VII inventions stay in play until August 1939 with what they did by then.
 
@@ -87,42 +87,42 @@ The tree holds **174 inventions**. Twenty of them keep ids the event tree uses (
 
 | Id | Invention | Era | Grows from | Also needs | Unlocks | Known in 1444 by |
 |---|---|---|---|---|---|---|
-| B1 | Stone castles | I | the bough |  | Castles | Most settled realms |
+| B1 | Stone castles | I | the branch |  | Castles | Most settled realms |
 | B5 | Bastion fortification (event id) | II | B1 Stone castles | W3 Bombards | Castles resist guns |  |
 | B6 | Star forts | II | B5 Bastion fortification |  | Strong castles; sieges take far longer |  |
 | B7 | Siege parallels | III | B6 Star forts |  | Attackers take castles faster |  |
-| B2 | Roads and post stations | I | the bough |  | Grain and armies move faster; officials run +1 province close to the capital | Ming, Ottoman, Inca, Mali trade roads |
+| B2 | Roads and post stations | I | the branch |  | Grain and armies move faster; officials run +1 province close to the capital | Ming, Ottoman, Inca, Mali trade roads |
 | B3 | Grand canals | I | B2 Roads and post stations |  | River-and-canal grain transport | China |
 | B8 | Canal locks | III | B3 Grand canals |  | Canals across hills |  |
 | W10 | Supply magazines | III | B2 Roads and post stations |  | Armies far from home don't starve |  |
 | B9 | Turnpike roads | IV | B2 Roads and post stations |  | Faster grain and armies |  |
-| B4 | Earthwork ring forts | I | the bough |  | Cheap forts | West Africa (e.g. Benin walls), Polynesia |
-| F1 | Three-field rotation | I | the bough |  | +1 harvest step on farmland | Most of Europe |
+| B4 | Earthwork ring forts | I | the branch |  | Cheap forts | West Africa (e.g. Benin walls), Polynesia |
+| F1 | Three-field rotation | I | the branch |  | +1 harvest step on farmland | Most of Europe |
 | F7 | Ever-normal granaries | I | F1 Three-field rotation or F2 Wet-rice terracing |  | Granaries hold 50 % more and rot less | China, Korea |
 | F12 | Fodder crops (clover, turnips) | III | F1 Three-field rotation |  | Horses eat half the grain; +1 harvest step |  |
 | F13 | Selective livestock breeding | IV | F12 Fodder crops (clover, turnips) | F11 Horse breeding studs | Herds grow faster |  |
 | F14 | Seed drill | IV | F12 Fodder crops (clover, turnips) |  | +1 harvest step |  |
 | F15 | Four-field rotation | IV | F12 Fodder crops (clover, turnips) |  | No fallow year: +1 harvest step |  |
-| F2 | Wet-rice terracing | I | the bough |  | Two harvests a year on irrigated rice land | East and Southeast Asia |
-| F3 | Qanat and canal irrigation | I | the bough |  | Dry provinces harvest at normal | Iran, Central Asia, North Africa, Andes |
+| F2 | Wet-rice terracing | I | the branch |  | Two harvests a year on irrigated rice land | East and Southeast Asia |
+| F3 | Qanat and canal irrigation | I | the branch |  | Dry provinces harvest at normal | Iran, Central Asia, North Africa, Andes |
 | F10 | Sugar and spice plantations | II | F3 Qanat and canal irrigation |  | New trade goods (event tree's harm rules apply: no forced labour bonus) |  |
-| F4 | Fish salting and drying | I | the bough |  | Fish keeps for a year; coastal grain store +20 % | Coasts worldwide |
-| F5 | Water and wind mills | I | the bough |  | Grain into flour cheaply: +gold per farmland province | Europe, Middle East, China |
+| F4 | Fish salting and drying | I | the branch |  | Fish keeps for a year; coastal grain store +20 % | Coasts worldwide |
+| F5 | Water and wind mills | I | the branch |  | Grain into flour cheaply: +gold per farmland province | Europe, Middle East, China |
 | F8 | Polder drainage | II | F5 Water and wind mills |  | Turn marsh provinces into farmland | Low Countries |
-| F6 | Chinampa and raised fields | I | the bough |  | Marsh and lake provinces farm well | Mexico basin, Andes lakes |
-| F11 | Horse breeding studs | II | the bough |  | +Horses per grassland province | Steppe, Arabia, Iberia |
-| F9 | Maize, potato and cassava (contact) | II | the bough |  | A failed harvest becomes poor; more people per farmland | Americas |
+| F6 | Chinampa and raised fields | I | the branch |  | Marsh and lake provinces farm well | Mexico basin, Andes lakes |
+| F11 | Horse breeding studs | II | the branch |  | +Horses per grassland province | Steppe, Arabia, Iberia |
+| F9 | Maize, potato and cassava (contact) | II | the branch |  | A failed harvest becomes poor; more people per farmland | Americas |
 
 #### Fire and metal (R2)
 
 | Id | Invention | Era | Grows from | Also needs | Unlocks | Known in 1444 by |
 |---|---|---|---|---|---|---|
-| C1 | Paper making | I | the bough |  | Schools cost less | Worldwide except Americas and Oceania |
+| C1 | Paper making | I | the branch |  | Schools cost less | Worldwide except Americas and Oceania |
 | L4 | Metal movable type | I | C1 Paper making |  | Books spread: students cost less | Korea |
 | L5 | Printing (event id) | I | C1 Paper making |  | Inventions spread +20 %; schools cost less |  |
 | L6 | Humanist learning (event id) | I | L5 Printing or L2 Madrasa networks |  | Scholars +research |  |
 | T4 | Paper money | I | C1 Paper making |  | Print gold (risk of price rises) | China (Ming notes, heavily devalued by 1444) |
-| C2 | Blast furnace | I | the bough |  | +iron: guns and tools cheaper | China, parts of Europe |
+| C2 | Blast furnace | I | the branch |  | +iron: guns and tools cheaper | China, parts of Europe |
 | W3 | Bombards | I | C2 Blast furnace |  | Siege guns: castles fall faster | Ottoman, Western Europe, China |
 | W5 | Gunpowder infantry (event id) | I | W3 Bombards |  | Hand-gun infantry | Ottoman, Ming, parts of Europe |
 | W7 | Pike and shot | II | W5 Gunpowder infantry | W6 Pike squares | Mixed infantry: foot +strength |  |
@@ -178,26 +178,26 @@ The tree holds **174 inventions**. Twenty of them keep ids the event tree uses (
 | F20 | Refrigerated shipping | VI | S13 Steamships | F18 Canned food | Sell grain and meat overseas |  |
 | W13 | Light field artillery | IV | C12 Coke smelting | W8 Field artillery | Guns move with the army |  |
 | C17 | Gas lighting | V | C12 Coke smelting |  | Towns grow; schools work longer |  |
-| C3 | Porcelain kilns | I | the bough |  | Porcelain trade good | China, Korea, Vietnam |
-| C4 | Silk and cotton weaving | I | the bough |  | Cloth trade good | Asia, Middle East |
+| C3 | Porcelain kilns | I | the branch |  | Porcelain trade good | China, Korea, Vietnam |
+| C4 | Silk and cotton weaving | I | the branch |  | Cloth trade good | Asia, Middle East |
 | C8 | Putting-out workshops | II | C4 Silk and cotton weaving |  | Cloth provinces +gold |  |
 | C11 | Manufactories | III | C8 Putting-out workshops |  | A new building: +gold, needs officials |  |
 | S10 | Naval dockyards | III | C11 Manufactories | S7 Galleon | Ships cheaper to build and keep |  |
 | S12 | Copper sheathing | IV | S10 Naval dockyards |  | Ships rot slower |  |
-| C5 | Glass and lenses | I | the bough |  | Needed for spectacles and telescopes | Venice, Middle East |
+| C5 | Glass and lenses | I | the branch |  | Needed for spectacles and telescopes | Venice, Middle East |
 | C9 | Clockmaking | II | C5 Glass and lenses |  | Needed for chronometer |  |
 | S11 | Marine chronometer | IV | C9 Clockmaking | S5 ocean_navigation | Fewer ships lost on long voyages |  |
 | L10 | Spectacles and telescopes | II | C5 Glass and lenses |  | Scholars work into old age |  |
-| W1 | Composite-bow horse archery | I | the bough |  | Strong horse archers | Steppe, Iran, Ottoman, North India |
-| W2 | Heavy armoured cavalry | I | the bough |  | Knights and lancers | Europe, India, Middle East |
-| W4 | Wagon fort | I | the bough |  | Defensive wagons and hand guns | Bohemia, Hungary, Muscovy, Ming |
-| W6 | Pike squares | I | the bough |  | Foot that stops horse | Swiss, Scots |
+| W1 | Composite-bow horse archery | I | the branch |  | Strong horse archers | Steppe, Iran, Ottoman, North India |
+| W2 | Heavy armoured cavalry | I | the branch |  | Knights and lancers | Europe, India, Middle East |
+| W4 | Wagon fort | I | the branch |  | Defensive wagons and hand guns | Bohemia, Hungary, Muscovy, Ming |
+| W6 | Pike squares | I | the branch |  | Foot that stops horse | Swiss, Scots |
 
 #### Counting and records (R3)
 
 | Id | Invention | Era | Grows from | Also needs | Unlocks | Known in 1444 by |
 |---|---|---|---|---|---|---|
-| G1 | Written law codes | I | the bough |  | One official runs 1 province | Most states |
+| G1 | Written law codes | I | the branch |  | One official runs 1 province | Most states |
 | G3 | Tax registers | I | G1 Written law codes |  | Royal provinces pay +10 % | Ming, Ottoman, Venice |
 | G7 | Venal offices | II | G3 Tax registers |  | Sell offices for gold (officials worse) |  |
 | G9 | Professional bureaucracy | III | G3 Tax registers |  | Officials cost less; each runs 2 provinces |  |
@@ -213,9 +213,9 @@ The tree holds **174 inventions**. Twenty of them keep ids the event tree uses (
 | G4 | Examination system | I | G1 Written law codes | C1 Paper making | Scholars can become officials directly | China, Korea, Vietnam |
 | G5 | Royal chancery | I | G1 Written law codes |  | Envoys +1 | Many monarchies |
 | G8 | Resident ambassadors | II | G5 Royal chancery |  | Envoys +1; see others' armies | Italian states |
-| G2 | Feudal grants | I | the bough |  | Create lords by granting fiefs | Europe, Japan, India |
-| G6 | Quipu and knot records | I | the bough |  | Tax registers without writing | Inca |
-| L1 | Temple and monastery schools | I | the bough |  | School type with 20 seats | Most settled realms |
+| G2 | Feudal grants | I | the branch |  | Create lords by granting fiefs | Europe, Japan, India |
+| G6 | Quipu and knot records | I | the branch |  | Tax registers without writing | Inca |
+| L1 | Temple and monastery schools | I | the branch |  | School type with 20 seats | Most settled realms |
 | L7 | Universities | II | L1 Temple and monastery schools or L2 Madrasa networks, L5 printing |  | School type with 60 seats |  |
 | L8 | Anatomy | II | L7 Universities |  | Fewer Fallen from wounds |  |
 | L11 | Experimental science (event id) | III | L7 Universities | L10 Spectacles and telescopes | Scholars +research; unlocks steam and chemistry |  |
@@ -232,10 +232,10 @@ The tree holds **174 inventions**. Twenty of them keep ids the event tree uses (
 | B11 | Sewers and clean water | V | L11 Experimental science | B8 Canal locks | Fewer plague deaths in towns |  |
 | B12 | Tenements and city planning | V | B11 Sewers and clean water |  | Towns hold more people |  |
 | F18 | Canned food | V | L11 Experimental science | F4 Fish salting and drying | Armies carry 6 months of food |  |
-| L2 | Madrasa networks | I | the bough |  | School type with 30 seats | Islamic world |
+| L2 | Madrasa networks | I | the branch |  | School type with 30 seats | Islamic world |
 | L3 | Observatories | I | L2 Madrasa networks |  | +research for Learning and Sea inventions | Timurid Samarkand, Ming, Maragha tradition |
-| T1 | Caravanserai networks | I | the bough |  | Caravans lose less on long routes | Middle East, Central Asia, Sahel |
-| T2 | Double-entry bookkeeping | I | the bough |  | Merchants earn +10 % | Italian cities |
+| T1 | Caravanserai networks | I | the branch |  | Caravans lose less on long routes | Middle East, Central Asia, Sahel |
+| T2 | Double-entry bookkeeping | I | the branch |  | Merchants earn +10 % | Italian cities |
 | T3 | Bills of exchange | I | T2 Double-entry bookkeeping |  | Move gold without carrying it; loans cheaper | Italy, Low Countries, Hanse |
 | T6 | Merchant fairs and exchanges | II | T3 Bills of exchange |  | +1 merchant slot |  |
 | T8 | Licensed trading companies | II | T6 Merchant fairs and exchanges | S5 ocean_navigation | Trading posts overseas; +1 colonial governor slot |  |
@@ -250,20 +250,20 @@ The tree holds **174 inventions**. Twenty of them keep ids the event tree uses (
 | T9 | Joint stock finance (event id) | III | T7 Deposit banks | T8 Licensed trading companies | Companies that fund fleets and colonies; +1 colonial governor slot |  |
 | T11 | Marine insurance | III | T9 Joint stock finance |  | Ships lost cost less |  |
 | T15 | Limited-liability companies | V | T9 Joint stock finance |  | Industry grows faster |  |
-| T5 | Monsoon sailing calendars | I | the bough |  | Indian Ocean trade ships safer | Swahili coast, Gujarat, Arabia, Malay world |
-| L9 | Variolation | II | the bough |  | Fewer smallpox deaths | China, Ottoman, West Africa, India |
+| T5 | Monsoon sailing calendars | I | the branch |  | Indian Ocean trade ships safer | Swahili coast, Gujarat, Arabia, Malay world |
+| L9 | Variolation | II | the branch |  | Fewer smallpox deaths | China, Ottoman, West Africa, India |
 
 #### Boats (R4)
 
 | Id | Invention | Era | Grows from | Also needs | Unlocks | Known in 1444 by |
 |---|---|---|---|---|---|---|
-| S1 | Magnetic compass and sea charts | I | the bough |  | Ships may leave the coast | Mediterranean, China, Indian Ocean |
+| S1 | Magnetic compass and sea charts | I | the branch |  | Ships may leave the coast | Mediterranean, China, Indian Ocean |
 | S4 | Carrack and caravel | I | S1 Magnetic compass and sea charts | S2 Lateen and junk rigging | Ocean-going ships | Portugal, Castile, Genoa, Venice |
 | S5 | Ocean navigation (event id) | II | S4 Carrack and caravel |  | Cross oceans; opens colonies with 2 colonial governor slots  |  |
 | S7 | Galleon | II | S5 Ocean navigation | S6 Ship-mounted cannon | Strong trade and war ships |  |
 | S9 | Line-of-battle tactics | III | S7 Galleon |  | Warships +strength in fleets |  |
-| S2 | Lateen and junk rigging | I | the bough |  | Better trade ships | Mediterranean, Indian Ocean, China |
-| S3 | Outrigger voyaging | I | the bough |  | Long canoe voyages between islands | Pacific, Malay world |
+| S2 | Lateen and junk rigging | I | the branch |  | Better trade ships | Mediterranean, Indian Ocean, China |
+| S3 | Outrigger voyaging | I | the branch |  | Long canoe voyages between islands | Pacific, Malay world |
 
 
 #### Out of the game: Era VIII
@@ -272,7 +272,7 @@ These 12 Era VIII inventions are in the tree's data but never studied: L25 Compu
 
 ### What each country knows in 1444
 
-Every country starts knowing the root and the four boughs. It also knows the inventions it historically knew: the "Known in 1444 by" column says who typically knows each one, and the catalogue's institutional development and region decide the exact set. For example, East Asian courts know printing and the examination system, Iberians have ocean ships under way, and Timurid lands have observatories. See [The 1444 Start](The-1444-Start).
+Every country starts knowing the root and the four branches. It also knows the inventions it historically knew: the "Known in 1444 by" column says who typically knows each one, and the catalogue's institutional development and region decide the exact set. For example, East Asian courts know printing and the examination system, Iberians have ocean ships under way, and Timurid lands have observatories. See [The 1444 Start](The-1444-Start).
 
 ### Research elsewhere
 
@@ -297,21 +297,21 @@ An isolationist AI fills its schools and avoids war; a hegemon seeker keeps its 
 
 ## What you see
 
-Everything about research and schools is in one place: the **Learning** tab of your country card (tap your realm's name or flag, then Learning).
+Everything about research and schools is in one place: the **Research** tab of your country card (tap your realm's name or flag, then Research).
 
 - **The overview.** At the top: what your scholars study now, a progress bar, its scholar-years and about how long is left at your current pace, then your scholars, students, scholar-years a year and how many of the tree's inventions you know. When nothing is studied, the card says so in red.
 
 Below it the tab has two parts:
 
-- **Tree.** The invention tree, one bough at a time: tap **Tilling and building**, **Fire and metal**, **Counting and records** or **Boats** (each tab says how many of its inventions you know and how many you can study). The bough sits at the left and each era is a column; lines run from each invention to the ones that grow from it, dashed for an extra need. Drag inside the frame to move around. Inventions are green with ✓ when known, gold with ◆ when you can study them, darker gold while being studied, and grey with a dashed edge when locked.
+- **Tree.** The invention tree, one branch at a time: tap **Tilling and building**, **Fire and metal**, **Counting and records** or **Boats** (each tab says how many of its inventions you know and how many you can study). The branch sits at the left and each era is a column; lines run from each invention to the ones that grow from it, dashed for an extra need. Drag inside the frame to move around. Inventions are green with ✓ when known, gold with ◆ when you can study them, darker gold while being studied, and grey with a dashed edge when locked.
   Tap an invention to see its sheet: what it does, what it grows from and what it also needs (each marked ✓ or ✗; tap one to jump to it). Only an invention marked ◆ has a **Study this** button, with its cost in scholar-years, about how long it takes at your pace, how many neighbours already know it (each makes it cheaper) and whether it is ahead of its time (double cost per era ahead). A locked invention tells you what to learn first. Choosing another study while one is under way drops the progress on it: the button then reads **Switch to this study**, and the sheet says how much you would lose.
 - **Schools.** Your students: the **−5** and **+5** buttons set how many seats to fill. Each student is a man the army can't raise: more students fill from your recruit pools at once, fewer go back to them. **In need of soldiers?** folds out **Call students to arms**, which empties every school back into recruits at once; research stops until you fill seats again, and those students never become scholars. Then each school, where it is (tap to see the province) and its students, schools being founded with the months until they open, and their upkeep a year, also shown as the **Schools** line of the Treasury. **Found a school** opens the list of your towns without a school: a temple school costs 60 gold and opens after 12 months (a madrasa, with 30 seats, if you know Madrasa networks). You need Temple and monastery schools or Madrasa networks.
 
 Elsewhere:
 
-- The **General** tab of your country card has a **Learning** line, "Studying Three-field rotation · 40 % · scholars 6", that opens the tab. Another country's card shows how many inventions it knows and what it studies.
+- The **General** tab of your country card has a **Research** line, "Studying Three-field rotation · 40 % · scholars 6", that opens the tab. Another country's card shows how many inventions it knows and what it studies.
 - When you learn an invention an alert says so, with **Open** to choose the next study. While nothing is studied, one alert asks you to choose.
-- A commander's **Train** list offers only the arms your realm knows; the rest are named with a button to the Learning tab (pikes need Pike squares, knights Heavy armoured cavalry).
+- A commander's **Train** list offers only the arms your realm knows; the rest are named with a button to the Research tab (pikes need Pike squares, knights Heavy armoured cavalry).
 
 ### In the game now
 
@@ -378,4 +378,4 @@ Nothing. Every question about research has been decided; numbers marked as place
 
 - Spec: [`domain/research/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/research/spec.md), requirement code **RSCH** (RSCH-001 to RSCH-090, with the full invention list in section 5.8; how the player uses it is RSCH-084 to RSCH-090).
 - Features: `domain/research/features/` (schools-and-students, research-progress, war-and-research, cost-and-eligibility, invention-tree, starting-knowledge, research-readers).
-- Code: rules code for this context goes in `packages/engine/src/domain/research/`, balance numbers and the tree in `packages/rules/data/domain/research.json`. The turn's wiring is `packages/engine/src/research.ts` (`knows(world, n, id)` for other systems), the Learning tab `apps/client/src/ui/learning.ts`.
+- Code: rules code for this context goes in `packages/engine/src/domain/research/`, balance numbers and the tree in `packages/rules/data/domain/research.json`. The turn's wiring is `packages/engine/src/research.ts` (`knows(world, n, id)` for other systems), the Research tab `apps/client/src/ui/learning.ts`.

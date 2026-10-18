@@ -249,13 +249,13 @@ Then("{string} still has the birthright {string}", (s, name: string, br: string)
 
 // ---------------------------------------------------------------- heydays
 
-Given("the country {string} has the heyday {string} of the {string}", (s, name: string, hd: string, age: string) => {
+Given("the country {string} has the golden age {string} of the {string}", (s, name: string, hd: string, age: string) => {
   const h = heritage(s, name);
   s.heyday = h.heydays.find((x) => x.item.name === hd)!;
   expect(s.heyday.item.age).toBe(age);
   s.subject = name;
 });
-Given("its wakes condition is: an Atlantic harbour and knowing {string}", (s, inv: string) => {
+Given("its start condition is: an Atlantic harbour and knowing {string}", (s, inv: string) => {
   expect(s.heyday.item.wakes).toEqual({ all: [{ coastal: { who: "this", sea: "atlantic" } }, { knows: { who: "this", invention: inv } }] });
 });
 function wakeIt(s: Scenario): void {
@@ -285,18 +285,18 @@ Given("the age has ended", (s) => {
   world(s).ages.active = [];
   world(s).ages.ended.push(s.heyday.item.age);
 });
-Then("the heyday is waiting", (s) => {
+Then("the golden age is waiting", (s) => {
   expect(s.heyday.state).toBe("waiting");
 });
-Then("the heyday is awake", (s) => {
+Then("the golden age is active", (s) => {
   expect(s.heyday.state).toBe("awake");
   for (const e of s.heyday.item.effects) expect(effectsOf(s, s.subject)).toContainEqual(e);
 });
-Then("the heyday is asleep, keeping its years served", (s) => {
+Then("the golden age is inactive, keeping its years served", (s) => {
   expect(s.heyday.state).toBe("asleep");
   expect(s.heyday.yearsAwake).toBe(10);
 });
-Then("the heyday is ended for good", (s) => {
+Then("the golden age is ended for good", (s) => {
   expect(s.heyday.state).toBe("ended");
   // Even if its age came back and the condition held, it stays ended.
   world(s).ages.active.push(s.heyday.item.age);
@@ -317,12 +317,12 @@ When(/^the "([^"]*)" begins(?: early)?$/, (s, age: string) => {
   for (const h of Object.values(heritages(s))) N.ageBegins(h, age);
   evaluateAll(s);
 });
-Then("Atlantic heydays can wake early", (s) => {
+Then("Atlantic golden ages can begin early", (s) => {
   expect(world(s).year).toBeLessThan(1492);
   expect(s.heyday.state).toBe("awake");
 });
 
-Given("the heyday {string} was awake {int} years in total", (s, name: string, years: number) => {
+Given("the golden age {string} was active {int} years in total", (s, name: string, years: number) => {
   s.subject = "Portugal";
   s.heyday = heritage(s, "Portugal").heydays.find((x) => x.item.name === name)!;
   wakeIt(s);
@@ -343,7 +343,7 @@ Then("the mark {string} is granted as a permanent legacy", (s, mark: string) => 
   for (const e of s.heyday.item.mark.effects) expect(N.activeEffects(h)).toContainEqual(e);
 });
 
-Given(/^a heyday with no mark block whose first lever is (\w+) \+(\d+)$/, (s, lever: string, value: string) => {
+Given(/^a golden age with no mark block whose first lever is (\w+) \+(\d+)$/, (s, lever: string, value: string) => {
   const data = madeUp("testland");
   data.heydays = [{ id: "testland_heyday", name: "A heyday", age: "age_of_exploration", text: "", wakes: { independent: { who: "this" } }, effects: [{ lever, value: Number(value) }, { lever: "growth_pct", value: 10 }] }];
   heritage(s, "Testland", data);
@@ -351,7 +351,7 @@ Given(/^a heyday with no mark block whose first lever is (\w+) \+(\d+)$/, (s, le
   s.heyday = heritage(s, "Testland").heydays[0]!;
   expect(s.heyday.item.mark).toBeUndefined();
 });
-Given("it was awake {int} years", (s, years: number) => {
+Given("it was active {int} years", (s, years: number) => {
   world(s).ages.active.push(s.heyday.item.age);
   evaluateAll(s);
   expect(s.heyday.state).toBe("awake");
@@ -373,7 +373,7 @@ function threeHeydays(id: string): N.HeritageData {
   data.heydays = ["age_of_exploration", "age_of_gunpowder_empires", "age_of_reformations"].map((age, i) => ({ id: `${id}_heyday_${i}`, name: `Heyday ${i}`, age, text: "", wakes: { event: { id: `${id}_wakes_${i}` } }, effects: [{ lever: "garrison_pct", value: 10 }] }));
   return data;
 }
-Given("the country {string} has 2 heydays awake", (s, name: string) => {
+Given("the country {string} has 2 golden ages active", (s, name: string) => {
   const h = heritage(s, name, threeHeydays(idOf(name)));
   s.subject = name;
   world(s).ages.active.push(...h.heydays.map((x) => x.item.age));
@@ -381,17 +381,17 @@ Given("the country {string} has 2 heydays awake", (s, name: string) => {
   evaluateAll(s);
   expect(h.heydays.filter((x) => x.state === "awake")).toHaveLength(2);
 });
-When("a third heyday's wakes condition holds", (s) => {
+When("a third golden age's start condition holds", (s) => {
   const h = heritage(s, s.subject);
   satisfy(h.heydays[2]!.item.wakes, world(s), h.country);
   evaluateAll(s);
 });
-Then("the player is asked which heyday sleeps", (s) => {
+Then("the player is asked which golden age becomes inactive", (s) => {
   const h = heritage(s, s.subject);
   expect(h.ask).toMatchObject({ kind: "sleep_heyday", waking: h.heydays[2]!.item.id });
   N.chooseSleepingHeyday(h, h.heydays[0]!.item.id);
 });
-Then("only 2 heydays are awake afterwards", (s) => {
+Then("only 2 golden ages are active afterwards", (s) => {
   const h = heritage(s, s.subject);
   const awake = () => h.heydays.filter((x) => x.state === "awake").map((x) => x.item.id);
   expect(awake()).toEqual([h.heydays[1]!.item.id, h.heydays[2]!.item.id]);
@@ -426,7 +426,7 @@ Then("at least one of them is tagged historical", (s) => {
   for (const d of s.draws) expect(d.some((a: { item: N.Ambition }) => a.item.historical)).toBe(true);
 });
 
-Given("the country {string} has the sealed ambition with hint {string}", (s, name: string, hint: string) => {
+Given("the country {string} has the hidden ambition with hint {string}", (s, name: string, hint: string) => {
   s.amb = open(heritage(s, name), (a) => a.hint === hint);
 });
 When("the player opens the heritage card", (s) => {
@@ -441,11 +441,11 @@ Then("its plain goal is not shown", (s) => {
   expect(Object.values(s.view)).not.toContain(s.amb.item.text);
 });
 
-Given("the country {string} has a sealed ambition", (s, name: string) => {
+Given("the country {string} has a hidden ambition", (s, name: string) => {
   s.subject = name;
   s.amb = open(heritage(s, name), (a) => a.id === "venice_lion_on_the_adda");
 });
-When("its stir condition holds", (s) => {
+When("its hint condition holds", (s) => {
   if (s.amb) {
     satisfy(s.amb.item.stir, world(s), heritage(s, s.subject).country);
   } else {
@@ -454,7 +454,7 @@ When("its stir condition holds", (s) => {
   }
   evaluateAll(s);
 });
-Then("the ambition is stirred", (s) => {
+Then("the ambition is hinted", (s) => {
   expect(s.amb.state).toBe("stirred");
 });
 Then("it shows a warmth, the name of the legacy it promises and its deadline", (s) => {
@@ -469,7 +469,7 @@ Then("the hint stays the only words shown", (s) => {
   expect(v.plainGoal).toBeUndefined();
 });
 
-Given("the country {string} has the stirred ambition {string}", (s, name: string, amb: string) => {
+Given("the country {string} has the hinted ambition {string}", (s, name: string, amb: string) => {
   s.subject = name;
   s.amb = open(heritage(s, name), (a) => a.name === amb, "stirred");
 });
@@ -590,7 +590,7 @@ Given("the country {string} last paid counsel {int} years ago", (s, name: string
 When("{string} asks for counsel on one ambition", (s, name: string) => {
   s.counsel = N.payCounsel(heritage(s, name), s.amb.item.id, world(s), s.era, s.treasury);
 });
-Then("it pays {int} gold and the ambition stirs and shows its warmth", (s, gold: number) => {
+Then("it pays {int} gold and the ambition is hinted and shows its warmth", (s, gold: number) => {
   expect(s.counsel).toEqual({ ok: true, gold });
   expect(s.treasury.gold).toBe(1000 - gold);
   expect(s.amb.state).toBe("stirred");
@@ -689,7 +689,7 @@ When("an ambition is done", (s) => {
   evaluateAll(s);
   expect(a.state).toBe("done");
 });
-When("a heyday awake 25 years ends and leaves its mark", (s) => {
+When("a golden age active 25 years ends and leaves its mark", (s) => {
   const h = heritage(s, s.subject);
   const hd = h.heydays.find((x) => x.item.mark)!;
   world(s).ages.active.push(hd.item.age);
@@ -699,7 +699,7 @@ When("a heyday awake 25 years ends and leaves its mark", (s) => {
   world(s).ages.ended.push(hd.item.age);
   evaluateAll(s);
 });
-When("its burden is shed and turned", (s) => {
+When("its weakness is overcome and turned", (s) => {
   const h = heritage(s, s.subject);
   satisfy(h.burden!.item.shed, world(s), h.country);
   evaluateAll(s);
@@ -758,7 +758,7 @@ Then("it gives one more trader and customs officers {int} % stronger on the coas
   hasEffect(s.legacy.effects, "official_type_pct", pct, { type: "customs_officer", where: "coast" });
 });
 
-Given("the country {string} carries the burden {string} with lords one step less loyal", (s, name: string, burden: string) => {
+Given("the country {string} has the weakness {string} with lords one step less loyal", (s, name: string, burden: string) => {
   s.subject = name;
   const h = heritage(s, name);
   expect(h.burden!.item.name.toLowerCase()).toBe(burden);
@@ -775,7 +775,7 @@ Then("a new ruler or a disputed heir no longer shakes the lords", (s) => {
   expect(N.leverIn(h, "lord_loyalty_shield", {}, { cause: "disputed_heir" })).toBe(1);
 });
 
-Given("the country {string} carries the burden {string}", (s, name: string, burden: string) => {
+Given("the country {string} has the weakness {string}", (s, name: string, burden: string) => {
   s.subject = name;
   const h = heritage(s, name);
   expect(h.burden!.item.name.toLowerCase()).toContain(burden);
@@ -784,7 +784,7 @@ When("{string} offers gold to remove it", (s, name: string) => {
   expect(N.offerGoldForBurden(heritage(s, name), 10000)).toBe(false);
   evaluateAll(s);
 });
-When("its shed condition holds", (s) => {
+When("the condition to overcome it holds", (s) => {
   const h = heritage(s, s.subject);
   satisfy(h.burden!.item.shed, world(s), h.country);
   evaluateAll(s);
@@ -792,12 +792,12 @@ When("its shed condition holds", (s) => {
 When("a reform event applies shed_burden", (s) => {
   N.shedBurden(heritage(s, s.subject));
 });
-Then("the burden is {word}", (s, state: string) => {
+Then("the weakness is {word}", (s, state: string) => {
   const h = heritage(s, s.subject);
-  // "gone" (HER-032) and "shed" (HER-034) both mean the burden no longer weighs.
-  expect(["kept", "shed", "gone"]).toContain(state);
+  // "gone" (HER-032) and "overcome" (HER-034) both mean the weakness no longer weighs.
+  expect(["kept", "overcome", "gone"]).toContain(state);
   expect(h.burden!.state).toBe(state === "kept" ? "held" : "shed");
-  if (state === "shed") expect(h.legacies).toContainEqual(h.burden!.item.turned);
+  if (state === "overcome") expect(h.legacies).toContainEqual(h.burden!.item.turned);
   if (state === "gone") expect(N.leverIn(h, "lord_loyalty_start_steps")).toBe(0);
 });
 
@@ -854,7 +854,7 @@ Then("only the key changes in heritage data", (s) => {
   expect(JSON.stringify(s.renamed.data)).not.toContain(`"${s.key}"`);
 });
 
-Given("the heyday {string}", (s, name: string) => {
+Given("the golden age {string}", (s, name: string) => {
   s.heyday = heritage(s, "Portugal").heydays.find((x) => x.item.name === name)!;
 });
 When("its effects are read", (s) => {
@@ -1019,7 +1019,7 @@ When("heritage is generated", (s) => {
 });
 Then(/^it gets (.*)$/, (s, what: string) => {
   switch (what) {
-    case "hand-written birthright, 2–3 heydays, 5–7 ambitions and a burden":
+    case "hand-written birthright, 2–3 golden ages, 5–7 ambitions and a weakness":
       expect(s.kind).toBe("authored");
       expect(s.built.authored).toBe(true);
       expect(s.built.heydays.length).toBeGreaterThanOrEqual(2);
@@ -1069,7 +1069,7 @@ Then("its birthright {string} makes foot fight harder and march faster in forest
   expect(e.find((x) => x.lever === "march_days_pct" && x.terrain === "forest")!.value).toBeLessThan(0);
   expect(e.find((x) => x.lever === "homeland_resistance_pct")!.value).toBeGreaterThan(0);
 });
-Then("its heyday {string} belongs to the {string} and is awake while at war", (s, name: string, age: string) => {
+Then("its golden age {string} belongs to the {string} and is active while at war", (s, name: string, age: string) => {
   const hd: N.Heyday = s.built.heydays.find((x: N.Heyday) => x.name.toLowerCase() === name)!;
   expect(N.ageName(hd.age)).toBe(age);
   const h = N.newHeritage("igbo_societies", s.built);
@@ -1094,7 +1094,7 @@ Given("two sea-trading cities in different regions", (s) => {
   expect(s.cities[0].meta.region).not.toBe(s.cities[1].meta.region);
   s.build = () => (s.builtAll = s.cities.map((r: N.CatalogueRecord) => N.generate(r, N.sizeBonus(N.recordSize(r)))));
 });
-Then("each takes its birthright and burden from its best archetype", (s) => {
+Then("each takes its birthright and weakness from its best archetype", (s) => {
   for (const [i, g] of (s.builtAll as N.HeritageData[]).entries()) {
     const best = N.scoreArchetypes(s.cities[i])[0]!.id;
     expect(best).toBe("sea_trading_city");
@@ -1104,7 +1104,7 @@ Then("each takes its birthright and burden from its best archetype", (s) => {
     expect(g.burden!.effects.map((e) => e.lever)).toEqual(t.burden.effects.map((e) => e.lever));
   }
 });
-Then("its second-best archetype may add a heyday, so the two differ", (s) => {
+Then("its second-best archetype may add a golden age, so the two differ", (s) => {
   const [a, b] = s.builtAll as N.HeritageData[];
   expect(a!.secondary_archetype).not.toBe(b!.secondary_archetype);
   expect(a!.heydays).not.toEqual(b!.heydays);
@@ -1232,7 +1232,7 @@ Then("{string} holds the legacy {string}", (s, name: string, id: string) => {
   expect(N.heritageStates(heritage(s, name), id)).toContain("held");
 });
 
-Given("the heyday {string} is asleep because {string} lacks {string}", (s, id: string, name: string, inv: string) => {
+Given("the golden age {string} is inactive because {string} lacks {string}", (s, id: string, name: string, inv: string) => {
   s.subject = name;
   s.heyday = heritage(s, name).heydays.find((x) => x.item.id === id)!;
   world(s).year = 1500;
@@ -1246,7 +1246,7 @@ Given("the heyday {string} is asleep because {string} lacks {string}", (s, id: s
 When("an event applies wake_heyday on {string} with years {int}", (s, name: string, years: number) => {
   N.wakeHeydayByEvent(heritage(s, name), s.heyday.item.id, years, world(s));
 });
-Then("the heyday is awake for {int} years even though its condition fails", (s, years: number) => {
+Then("the golden age is active for {int} years even though its condition fails", (s, years: number) => {
   expect(N.holds(s.heyday.item.wakes, world(s), idOf(s.subject))).toBe(false);
   expect(s.heyday.state).toBe("awake");
   const start = world(s).year;
@@ -1261,7 +1261,7 @@ Then("the heyday is awake for {int} years even though its condition fails", (s, 
 When("an event applies stir_ambition on it", (s) => {
   N.stirAmbitionByEvent(heritage(s, s.subject), s.amb.item.id, world(s));
 });
-Then("the ambition is stirred and shows its warmth", (s) => {
+Then("the ambition is hinted and shows its warmth", (s) => {
   expect(s.amb.state).toBe("stirred");
   expect(["cold", "warm", "hot"]).toContain(N.ambitionView(s.amb).warmth);
 });
@@ -1271,21 +1271,21 @@ Then("its words stay a hint", (s) => {
   expect(v.plainGoal).toBeUndefined();
 });
 
-Given("the country {string} carries a burden", (s, name: string) => {
+Given("the country {string} has a weakness", (s, name: string) => {
   s.subject = name;
   expect(heritage(s, name).burden!.state).toBe("held");
 });
 When("a reform event applies shed_burden on {string}", (s, name: string) => {
   N.shedBurden(heritage(s, name));
 });
-Then("the burden is shed and its turned legacy is granted", (s) => {
+Then("the weakness is overcome and its turned legacy is granted", (s) => {
   const h = heritage(s, s.subject);
   expect(h.burden!.state).toBe("shed");
   expect(h.legacies).toEqual([h.burden!.item.turned]);
   expect(N.heritageStates(h, h.burden!.item.id)).toContain("shed");
 });
 
-Given("the country {string} has its Atlantic heyday awake", (s, name: string) => {
+Given("the country {string} has its Atlantic golden age active", (s, name: string) => {
   s.subject = name;
   s.heyday = heritage(s, name).heydays.find((x) => x.item.id === "portugal_carreira_da_india")!;
   wakeIt(s);
@@ -1324,7 +1324,7 @@ Then("the option is available", (s) => {
 
 // ---------------------------------------------------------------- the card and the phone
 
-Given("the heyday {string} is awake in the {string}", (s, name: string, age: string) => {
+Given("the golden age {string} is active in the {string}", (s, name: string, age: string) => {
   const h = heritage(s, s.subject);
   const hd = h.heydays.find((x) => x.item.name === name)!;
   expect(hd.item.age).toBe(ageIdOf(age));
@@ -1333,7 +1333,7 @@ Given("the heyday {string} is awake in the {string}", (s, name: string, age: str
   evaluateAll(s);
   expect(hd.state).toBe("awake");
 });
-Given("{string} has {int} active ambitions, one of them stirred and warm", (s, name: string, n: number) => {
+Given("{string} has {int} active ambitions, one of them hinted and warm", (s, name: string, n: number) => {
   const h = heritage(s, name);
   N.startCampaign(h, rng(s), world(s));
   const open3 = N.openAmbitions(h);
@@ -1350,7 +1350,7 @@ Given("{string} has {int} active ambitions, one of them stirred and warm", (s, n
   evaluateAll(s);
   expect(N.openAmbitions(h).filter((a) => a.state === "stirred" && a.band === "warm")).toHaveLength(1);
 });
-Given("{string} carries the burden {string} and has no legacies", (s, name: string, burden: string) => {
+Given("{string} has the weakness {string} and no legacies", (s, name: string, burden: string) => {
   const h = heritage(s, name);
   expect(h.burden?.item.name).toBe(burden);
   expect(h.legacies).toEqual([]);
@@ -1358,9 +1358,9 @@ Given("{string} carries the burden {string} and has no legacies", (s, name: stri
 When("the player opens the heritage card of {string}", (s, name: string) => {
   s.card = N.card(heritage(s, name), N.ageName);
 });
-Then("the card shows the rows Birthright, Heyday, Ambitions, Burden and Legacies and no more", (s) => {
-  expect(s.card.map((r: N.CardRow) => r.row)).toEqual(["Birthright", "Heyday", "Ambitions", "Burden", "Legacies"]);
-  expect(s.card[1].lines).toEqual(["The mude to Alexandria (Age of Gunpowder Empires · awake)"]);
+Then("the card shows the rows Birthright, Golden age, Ambitions, Weakness and Legacies and no more", (s) => {
+  expect(s.card.map((r: N.CardRow) => r.row)).toEqual(["Birthright", "Golden age", "Ambitions", "Weakness", "Legacies"]);
+  expect(s.card[1].lines).toEqual(["The mude to Alexandria (Age of Gunpowder Empires · active)"]);
   expect(s.card[2].lines).toHaveLength(3);
 });
 Then("the Legacies row says {string}", (s, text: string) => {
@@ -1383,7 +1383,7 @@ Then("galleys build 30 % faster, the capital's garrison is 40 % stronger and por
   expect(N.leverIn(h, "garrison_pct", { capital: false })).toBe(0);
 });
 
-Given("the country {string} has a birthright, an awake heyday, 3 sealed ambitions and a burden", (s, name: string) => {
+Given("the country {string} has a birthright, an active golden age, 3 hidden ambitions and a weakness", (s, name: string) => {
   s.subject = name;
   const h = heritage(s, name);
   const hd = h.heydays[0]!;
@@ -1396,7 +1396,7 @@ Given("the country {string} has a birthright, an awake heyday, 3 sealed ambition
 When("the player opens the country card", (s) => {
   s.row = N.heritageRow(heritage(s, s.subject));
 });
-Then("one Heritage row shows the birthright icon, the heyday icon, three seals and the burden icon", (s) => {
+Then("one Heritage row shows the birthright icon, the golden age icon, three hidden ambitions and the weakness icon", (s) => {
   const h = heritage(s, s.subject);
   expect(s.row).toMatchObject({ birthright: h.birthrights[0]!.item.id, heyday: h.heydays[0]!.item.id, seals: ["sealed", "sealed", "sealed"], burden: h.burden!.item.id });
 });
@@ -1414,7 +1414,7 @@ Given("the country {string} has an ambition", (s, name: string) => {
   h.pool.push(a);
   s.amb = open(h, (x) => x === a);
 });
-When("its seal cracks", (s) => {
+When("it is revealed", (s) => {
   const h = heritage(s, s.subject);
   h.digest = [];
   s.logFrom = h.log.length;
@@ -1449,7 +1449,7 @@ When("the player looks at {string}", (s, name: string) => {
   s.data = N.exampleHeritage(idOf(name));
   s.picker = N.pickerSummary(s.data);
 });
-Then("the picker shows its birthright and burden, a count of its sealed ambitions and its heydays as ages", (s) => {
+Then("the picker shows its birthright and weakness, a count of its hidden ambitions and its golden ages as ages", (s) => {
   expect(s.picker).toEqual({ birthright: s.data.birthright.name, burden: s.data.burden.name, sealedAmbitions: 3, heydayAges: s.data.heydays.map((h: N.Heyday) => h.age) });
   expect(Object.values(s.picker).flat()).not.toContain(s.data.ambitions[0].text);
 });
@@ -1514,7 +1514,7 @@ Then(/^its pool is (too small|within the limits|too large)$/, (s, verdict: strin
 });
 
 // D-HER-12: the AI's choices
-Given("the AI country {string} has 2 heydays awake worth {int} and {int} points", (s, name: string, a: number, b: number) => {
+Given("the AI country {string} has 2 golden ages active worth {int} and {int} points", (s, name: string, a: number, b: number) => {
   const hd = (id: string, pts: number, wake: string): N.Heyday => ({ id, name: id, age: "age_of_exploration", text: "", wakes: { event: { id: wake } }, effects: tax(pts) });
   const d = { ...madeUp(idOf(name)), heydays: [hd(`h${a}`, a, "go"), hd(`h${b}`, b, "go")] };
   const h = heritage(s, name, d);
@@ -1524,17 +1524,17 @@ Given("the AI country {string} has 2 heydays awake worth {int} and {int} points"
   expect(h.heydays.filter((x) => x.state === "awake")).toHaveLength(2);
   s.ai = h;
 });
-When("a third heyday worth {float} points would wake", (s, pts: number) => {
+When("a third golden age worth {float} points would begin", (s, pts: number) => {
   const h: N.Heritage = s.ai;
   h.heydays.push({ item: { id: "third", name: "third", age: "age_of_exploration", text: "", wakes: { event: { id: "third" } }, effects: tax(pts) }, state: "waiting", yearsAwake: 0 });
   world(s).events.push("third");
   evaluateAll(s);
   expect(h.ask?.kind).toBe("sleep_heyday");
 });
-Then("the AI puts the heyday worth {int} points to sleep", (s, pts: number) => {
+Then("the AI makes the golden age worth {int} points inactive", (s, pts: number) => {
   expect(N.aiAnswer(s.ai)).toBe(`h${pts}`);
 });
-Then("2 heydays are awake", (s) => {
+Then("2 golden ages are active", (s) => {
   evaluateAll(s);
   expect((s.ai as N.Heritage).heydays.filter((x) => x.state === "awake").map((x) => x.item.id).sort()).toEqual(["h3", "third"]);
 });
@@ -1560,14 +1560,14 @@ Then("it changes {string}", (s, meaning: string) => {
 });
 
 // D-HER-9, X-18: one evaluation a turn, time in months by the date
-Given("the country {string} has a heyday awake in an active age", (s, name: string) => {
+Given("the country {string} has an active golden age in an active age", (s, name: string) => {
   const d = { ...madeUp(idOf(name)), heydays: [{ id: "long_heyday", name: "Long", age: "age_of_exploration", text: "", wakes: { event: { id: "go" } }, effects: tax(2) }] };
   heritage(s, name, d);
   s.who = name;
   world(s).ages.active.push("age_of_exploration");
   world(s).events.push("go");
 });
-When("{int} months pass with its wakes condition holding", (s, months: number) => {
+When("{int} months pass with its start condition holding", (s, months: number) => {
   const h = heritage(s, s.who);
   // Weekly turns (X-18): a month is served only in the turn in which a new month begins.
   for (let i = 0; i < months; i++) {
@@ -1575,7 +1575,7 @@ When("{int} months pass with its wakes condition holding", (s, months: number) =
     N.monthTick(h, world(s), rng(s));
   }
 });
-Then("the heyday has served {int} years", (s, years: number) => {
+Then("the golden age has served {int} years", (s, years: number) => {
   const hd = heritage(s, s.who).heydays[0]!;
   expect(hd.state).toBe("awake");
   expect(hd.yearsAwake).toBe(years);
@@ -1687,10 +1687,10 @@ Given("a forest people in {string}", (s, region: string) => {
   s.regions = new Set(REGIONS[region]);
   s.options = N.archetypeTemplates("forest_chiefdom").heydays[0]!.age_options;
 });
-When("its heyday is generated", (s) => {
+When("its golden age is generated", (s) => {
   s.age = N.pickAge(s.options, s.regions);
 });
-Then("the heyday belongs to the {string}", (s, age: string) => {
+Then("the golden age belongs to the {string}", (s, age: string) => {
   expect(N.ageName(s.age)).toBe(age);
 });
 
@@ -1761,10 +1761,10 @@ Then("its birthright is {string}", (s, name: string) => {
   expect(s.strengths.heritage.birthright.name).toBe(name);
   expect(s.strengths.heritage.birthright.why).toBeTruthy();
 });
-Then("its burden is {string}", (s, name: string) => {
+Then("its weakness is {string}", (s, name: string) => {
   expect(s.strengths.heritage.burden.name).toBe(name);
 });
-Then(/^its heydays belong to the (.+)$/, (s, ages: string) => {
+Then(/^its golden ages belong to the (.+)$/, (s, ages: string) => {
   expect(s.strengths.heritage.heydays.map((d: { ageName: string }) => d.ageName)).toEqual(ages.split(", "));
 });
 Then("it has no heritage and no assessments", (s) => {
@@ -1776,7 +1776,7 @@ Given("the map's realms", (s) => {
 When("their strengths are read", (s) => {
   s.all = s.realms.map((id: string) => realmStrengths(id));
 });
-Then("{int} realms have a birthright and every heyday names its age", (s, count: number) => {
+Then("{int} realms have a birthright and every golden age names its age", (s, count: number) => {
   const withHeritage = s.all.filter((r: ReturnType<typeof realmStrengths>) => r.heritage);
   expect(withHeritage).toHaveLength(count);
   for (const r of withHeritage) {
@@ -1805,7 +1805,7 @@ Then("{string} has {int} ambitions open, at least one of them historical", (s, n
   expect(open).toHaveLength(n);
   expect(open.some((a) => a.item.historical)).toBe(true);
 });
-Then("every awake heyday of {string} has served {int} months", (s, name: string, months: number) => {
+Then("every active golden age of {string} has served {int} months", (s, name: string, months: number) => {
   const awake = inPlay(s, name).heydays.filter((x) => x.state === "awake");
   expect(awake.length).toBeGreaterThan(0);
   for (const x of awake) expect(Math.round(x.yearsAwake * 12)).toBe(months);
@@ -1813,7 +1813,7 @@ Then("every awake heyday of {string} has served {int} months", (s, name: string,
 Then("no realm has an ambition fulfilled or lost", (s) => {
   for (const h of game(s).heritage!.realms) if (h) expect(h.ambitions.filter((a) => a.state === "done" || a.state === "lost").map((a) => a.item.id)).toEqual([]);
 });
-Then("no realm has shed its burden or earned a legacy", (s) => {
+Then("no realm has overcome its weakness or earned a legacy", (s) => {
   for (const h of game(s).heritage!.realms) {
     if (!h) continue;
     expect(h.burden?.state ?? "held").toBe("held");
@@ -1869,18 +1869,18 @@ Then("it shows {int} ambitions with their hints, never their plain goals", (s, n
   }
   expect(v.counsel!.gold).toBeGreaterThan(0);
 });
-Then("it shows each heyday's state", (s) => {
+Then("it shows each golden age's state", (s) => {
   const v = s.view as NonNullable<ReturnType<typeof heritageView>>;
   expect(v.heydays.length).toBeGreaterThan(0);
   for (const x of v.heydays) expect(["waiting", "awake", "asleep", "ended"]).toContain(x.state);
 });
-Then("it counts {int} sealed ambitions and shows none of them", (s, n: number) => {
+Then("it counts {int} hidden ambitions and shows none of them", (s, n: number) => {
   const v = s.view as NonNullable<ReturnType<typeof heritageView>>;
   expect(v.sealed).toBe(n);
   expect(v.ambitions).toBeUndefined();
   expect(v.counsel).toBeUndefined();
 });
-Given("a third heyday of {string} would wake", (s, name: string) => {
+Given("a third golden age of {string} would begin", (s, name: string) => {
   const h = inPlay(s, name);
   const [a, b, c] = h.heydays;
   a!.state = "awake";
@@ -1889,15 +1889,15 @@ Given("a third heyday of {string} would wake", (s, name: string) => {
   h.ask = { kind: "sleep_heyday", waking: c!.item.id, awake: [a!.item.id, b!.item.id] };
   s.waking = c!.item.id;
 });
-Then("it asks which heyday sleeps, with one button for each of the {int}", (s, n: number) => {
+Then("it asks which golden age becomes inactive, with one button for each of the {int}", (s, n: number) => {
   const v = s.view as NonNullable<ReturnType<typeof heritageView>>;
   expect(v.ask!.kind).toBe("sleep_heyday");
   expect(v.ask!.options).toHaveLength(n);
 });
-When("the player chooses the waking heyday", (s) => {
+When("the player chooses the golden age that would begin", (s) => {
   expect(heritageChoice(game(s), game(s).player, s.waking)).toBeNull();
 });
-Then("no choice waits and {int} heydays are awake", (s, n: number) => {
+Then("no choice waits and {int} golden ages are active", (s, n: number) => {
   const h = game(s).heritage!.realms[game(s).player]!;
   expect(h.ask).toBeNull();
   expect(h.heydays.filter((x) => x.state === "awake")).toHaveLength(n);

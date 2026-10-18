@@ -48,7 +48,7 @@ This wiki explains every system in the game and how it works. Each page is writt
 |---|---|
 | [Historical events](Historical-Events) | Ages, periods and events with choices |
 | [Revolutions](Revolutions) | Revolutions that change how a country plays |
-| [National strengths](National-Strengths) | Each realm's heritage: birthright, heydays, ambitions, legacies, burden |
+| [National strengths](National-Strengths) | Each realm's heritage: birthright, golden ages, ambitions, legacies, weakness |
 
 ## Around the game
 

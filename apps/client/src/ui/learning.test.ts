@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { outOfScope, tree } from "@ph/engine/domain/research";
 import { boughLayouts } from "./learning.ts";
 
-describe("the Learning tab's tree (RSCH-084)", () => {
+describe("the Research tab's tree (RSCH-084)", () => {
   const lays = boughLayouts();
 
-  it("draws every invention in play once, on its own bough, and none that is never studied", () => {
+  it("draws every invention in play once, on its own branch, and none that is never studied", () => {
     const placed = lays.flatMap((l) => [...l.at.keys()].filter((id) => tree().inventions.has(id)));
     const inPlay = [...tree().inventions.values()].filter((i) => !outOfScope(i));
     expect(new Set(placed).size).toBe(placed.length);

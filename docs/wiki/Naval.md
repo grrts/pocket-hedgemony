@@ -55,7 +55,7 @@ Sailors move by road to another of your ports at levy marching pace, eating on t
 
 ### Buying ships
 
-To order a ship you need, in the **same port**, enough sailors in port for its crew, a free slipway of the step the hull needs (or only the harbour for small hulls), and the gold and timber, paid when you order. The crew is assigned to the hull at once and helps build it alongside the shipyard's own seafolk. No crew in port, no ship. You can only buy types your realm has unlocked in the S bough (and the exploration unlock for exploration ships).
+To order a ship you need, in the **same port**, enough sailors in port for its crew, a free slipway of the step the hull needs (or only the harbour for small hulls), and the gold and timber, paid when you order. The crew is assigned to the hull at once and helps build it alongside the shipyard's own seafolk. No crew in port, no ship. You can only buy types your realm has unlocked among the S inventions (and the exploration unlock for exploration ships).
 
 At Lagos, with 60 sailors in port, a free slipway at shipyard step 2 and S4 known, Portugal orders a carrack: it pays 60 gold and 12 timber at once, the 60 sailors are assigned to the hull, and Lagos has 0 sailors in port. With only 20 sailors the order is refused, because a carrack needs a crew of 60.
 
@@ -212,7 +212,7 @@ Prices are the design's scaled to the game's treasury (ships ×0.1, wages ×0.01
 - [Recruiting](Recruiting): the levy's people, commissioning officials and the empty province.
 - [Provinces](Provinces): seafolk and classes, slots, fisheries, food stores, officials, plague; receives Pressed and Lost at sea.
 - [Your-Realm](Your-Realm): the Ships stat, lords, ruler and heirs.
-- [Research](Research): the S bough and T5 monsoon seas.
+- [Research](Research): the S inventions and T5 monsoon seas.
 - [Trade](Trade): trade ships, hold and purse, ports as route ends, pirates and blockades.
 - [Exploration-and-Colonies](Exploration-and-Colonies): exploration ships, the charted map and colonial governors carried aboard.
 - [Diplomacy](Diplomacy): war, peace, rivals and allies set docking rights; consent to sell hulls; privateers.

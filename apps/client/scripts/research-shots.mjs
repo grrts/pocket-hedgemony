@@ -1,5 +1,5 @@
-// Research as France: the "choose what to study" alert, the Learning tab (the overview, the tree with a
-// locked and an open invention tapped, studying, another bough, then Schools with seats and founding)
+// Research as France: the "choose what to study" alert, the Research tab (the overview, the tree with a
+// locked and an open invention tapped, studying, another branch, then Schools with seats and founding)
 // and the General tab's line, on a small and a large phone held sideways (the Short wide layout)
 // and a desktop window taller than wide (the Tall layout). Also checks that a
 // locked invention offers no Study button, that no tap target in the tab is under 44 px, and that the
@@ -27,7 +27,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.click("[data-nation=france]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(800);
-  // Nothing is studied at the start: the alert opens the Learning tab.
+  // Nothing is studied at the start: the alert opens the Research tab.
   await shot("alert");
   await page.click(".alert [data-realm-open=learning]");
   await page.waitForTimeout(300);

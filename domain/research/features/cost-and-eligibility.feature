@@ -67,7 +67,7 @@ Feature: What can be studied and what it costs
 
   @RSCH-035
   Scenario: Contact inventions need a contact event
-    Given the country "Castile" knows the bough "Tilling and building"
+    Given the country "Castile" knows the branch "Tilling and building"
     And it has made no Atlantic crossing
     When it tries to study "F9 Maize, potato and cassava"
     Then the study is refused

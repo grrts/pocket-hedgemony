@@ -9,11 +9,11 @@ Feature: Each realm's heritage
     Given the realm "<realm>" on the map
     When its strengths are read
     Then its birthright is "<birthright>"
-    And its burden is "<burden>"
-    And its heydays belong to the <ages>
+    And its weakness is "<weakness>"
+    And its golden ages belong to the <ages>
 
     Examples:
-      | realm    | birthright             | burden                | ages                                                                         |
+      | realm    | birthright             | weakness              | ages                                                                         |
       | France   | Taille without consent | Princes of the blood  | Age of Gunpowder Empires, Age of Crisis and Absolutism, Age of Revolutions |
       | Ottomans | Kapıkulu household     | Two sultans, one throne | Age of Gunpowder Empires, Age of Reformations, Age of Industrialization    |
 
@@ -27,4 +27,4 @@ Feature: Each realm's heritage
   Scenario: Most realms have heritage
     Given the map's realms
     When their strengths are read
-    Then 110 realms have a birthright and every heyday names its age
+    Then 110 realms have a birthright and every golden age names its age

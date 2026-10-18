@@ -30,7 +30,7 @@ battles.
 - The levy, commanders from officials, the empty province an official leaves: recruiting.
 - Seafolk class, food stores, officials, grievances, fisheries: province.
 - The *Ships* country stat and lords: realm.
-- The S bough of research: research.
+- The S inventions of research: research.
 - Docking rights between realms, selling hulls between realms, privateers dragging a realm into war: diplomacy.
 - Drawing ports, fleets and the Sea lens: map-presentation (this spec lists what the naval design asks it to show).
 
@@ -45,7 +45,7 @@ Newest decision first.
 - `naval/data/ports-1444.tsv`, `naval/data/ports-1444.json`, `naval/data/start-ports.json` (structure and counts only).
 - Read for seams and contradictions: `exploration/exploration-design.md` 2.1, 9; `buildings/buildings-design.md`
   7.9; `warfare/warfare-design.md` 11; `troop-movement/troop-movement-design.md` 11; `trade/trade-design.md`
-  (v2) 2, 3.2; `country-stats/research-tree.md` (S bough, T5); `province-stats/province-stats-design.md` 12.1,
+  (v2) 2, 3.2; `country-stats/research-tree.md` (S inventions, T5); `province-stats/province-stats-design.md` 12.1,
   13, 16; `country-stats/country-stats-design.md` 6; `subjects/subjects-design.md` 12, 16; `diplomacy/diplomacy-design.md`.
 
 ## 3. Ubiquitous language
@@ -261,7 +261,7 @@ Newest decision first.
 - NAVY-043: When a ship is ordered, the naval system shall assign the crew to the hull, and the crew shall help
   build it alongside the shipyard's own seafolk. [naval §3.1, §3.3]
 - NAVY-044: If a port lacks the sailors for a ship's crew, then the naval system shall refuse the order. [naval §3.1]
-- NAVY-045: The naval system shall sell only ship types the realm has unlocked in the S bough (and, for
+- NAVY-045: The naval system shall sell only ship types the realm has unlocked among the S inventions (and, for
   exploration ships, the exploration unlock). [naval §3.3, §3.2]
 - NAVY-046: The naval system shall put every ship type in one family, trade, military or exploration, carrying 15
   zones of supply (trade, military), 6 (galleys) or 60 plus a hold of colony stores (exploration). [naval §3.2]
@@ -527,7 +527,7 @@ Newest decision first.
 - When a harbour is built, raised or loses a step (buildings), then the naval system recomputes berths and
   whether the province is a port, and refreshes cached paths.
 - When a shipyard is built, raised or burned (buildings), then slipways are recomputed; hulls beyond them wait.
-- When the realm learns S1, S3, S4, S5, S9 or another S-bough ship invention (research), then sailable zones,
+- When the realm learns S1, S3, S4, S5, S9 or another S ship invention (research), then sailable zones,
   ship types and pressing unlock, and cached paths are recomputed.
 - When the exploration context opens the exploration unlock for a realm, then exploration ships can be bought.
 - When a war starts or a rivalry is made (warfare, diplomacy), then docking rights change; AI land powers fit out.
@@ -670,7 +670,7 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | recruiting | upstream | Shared Kernel | The levy's people (fighting-age share), commissioning officials (7.1), empty province (7.4), coming home (6.2), guns (4.2); NAVY asks the levy pool to count sailors |
 | province | upstream | Customer–Supplier | Seafolk and other classes, slots, fisheries, food store, officials and types, plague; NAVY emits *Pressed* and *Lost at sea* grievances, fish and trader effects, births |
 | realm | downstream | Customer–Supplier | *Ships* stat, proposed *Sailors* and *Admirals* rows; lords (country 5), ruler and heir (succession crisis) come from realm (upstream) |
-| research | upstream | Conformist | S bough (S1, S3, S4, S5, S6, S7, S8, S9, S13, S14–S18), T5 monsoon seas |
+| research | upstream | Conformist | S inventions (S1, S3, S4, S5, S6, S7, S8, S9, S13, S14–S18), T5 monsoon seas |
 | trade | downstream | Customer–Supplier | Trade ships bought and crewed here, hold and purse per type (trade supplies the numbers), ports as route ends, pirates as hunting fleets, blockades |
 | exploration | downstream | Customer–Supplier | Exploration ships (caravel, voyaging canoe), 60 supply, colony stores, docking; exploration supplies the unlock, the charted map (may-enter for uncharted zones) and carries governors aboard |
 | diplomacy | upstream | Customer–Supplier | War, peace, rivalry, alliance (docking rights), consent to sell hulls, privateers dragging into war |

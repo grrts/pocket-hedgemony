@@ -304,7 +304,7 @@ The 36 historical revolutions read ideologies, legitimacy and ages the game does
 - [Subjects](Subjects): settler colonies going independent through a Disloyal colony.
 - [Culture](Culture): nationalism thresholds read by liberal and national signs; regimes can set the court language.
 - [Religion](Religion): the faith wave, and church events that follow a revolutionary regime.
-- [National strengths](National-Strengths): a won revolution may shed a burden or grant a legacy (a hook only).
+- [National strengths](National-Strengths): a won revolution may overcome a weakness or grant a legacy (a hook only).
 - [Warfare](Warfare): generals growing too big, and a winning general switching the regime.
 - [Provinces](Provinces): grievances and class shares feed the signs; regimes end and add grievances.
 - [Your realm](Your-Realm): lords' loyalty and land, stability and debt; locks on fiefs and titles.

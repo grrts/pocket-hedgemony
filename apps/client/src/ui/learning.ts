@@ -4,10 +4,10 @@ import { eraIndex, outOfScope, tree, type Era, type Invention } from "@ph/engine
 import { icon } from "../art/ui.ts";
 
 /**
- * Research on screen (research RSCH-084 to RSCH-090). The Learning tab of the
+ * Research on screen (research RSCH-084 to RSCH-090). The Research tab of the
  * player's country card opens on an overview (the study, its progress and the
  * realm's pace) above two parts: the Tree, where the invention tree is drawn
- * bough by bough and only the inventions whose needs are known can be
+ * branch by branch and only the inventions whose needs are known can be
  * studied, and Schools, which holds the seats, the schools and founding one.
  * The General tab carries one line with the study that opens the tab.
  */
@@ -15,7 +15,7 @@ import { icon } from "../art/ui.ts";
 type Research = NonNullable<Snapshot["research"]>;
 type Option = Research["options"][number];
 
-/** What the player left open in the Learning tab, kept across redraws. */
+/** What the player left open in the Research tab, kept across redraws. */
 export interface LearningUi {
   part: "tree" | "schools";
   /** The bough shown in the tree (R1 to R4), or "" for the bough of the study. */
@@ -47,16 +47,16 @@ export function paceText(months: number | null): string {
 
 const pct = (r: Research) => (r.study ? Math.min(100, (r.study.progress / r.study.cost) * 100) : 0);
 
-/** The General tab's line: the study, how far along and the scholars, opening the Learning tab (RSCH-088). */
+/** The General tab's line: the study, how far along and the scholars, opening the Research tab (RSCH-088). */
 export function learningLine(r: Research): string {
   const what = r.study ? `Studying <b>${esc(nice(r.study.name))}</b> · ${Math.floor(pct(r))} % · scholars ${fmt(r.scholars)}` : `<b>Nothing studied</b> · choose what to study`;
-  return `<dt>Learning</dt><dd><button class="paper learning-line${r.study ? "" : " idle"}" data-realm-open-tab="learning" title="Open the Learning tab">${icon("scroll", 1)}<span>${what}</span></button></dd>`;
+  return `<dt>Research</dt><dd><button class="paper learning-line${r.study ? "" : " idle"}" data-realm-open-tab="learning" title="Open the Research tab">${icon("scroll", 1)}<span>${what}</span></button></dd>`;
 }
 
 /** Another realm's research on its country card: what it knows and studies (RSCH-088). */
 export function realmLearningLine(x: Snapshot["realmResearch"][number] | undefined): string {
   if (!x) return "";
-  return `<dt>Learning</dt><dd>${fmt(x.known)} inventions known${x.study ? ` · studying ${esc(nice(x.study))} (${x.pct} %)` : ""}</dd>`;
+  return `<dt>Research</dt><dd>${fmt(x.known)} inventions known${x.study ? ` · studying ${esc(nice(x.study))} (${x.pct} %)` : ""}</dd>`;
 }
 
 // ---------------------------------------------------------------- the tree's layout
@@ -224,7 +224,7 @@ function eraHeads(lay: BoughLayout, r: Research): string {
   const w = nodeX(lay.cols) + PAD;
   const span = (col: number, width: number) => `left:${nodeX(col) - 14}px;width:${width * COL_W}px`;
   const bands = lay.eras.map((e, k) => (k % 2 ? `<i class="era-band" style="${span(e.col, e.width)};height:${nodeY(lay.rows) + PAD}px"></i>` : "")).join("");
-  const heads = [`<b style="left:${nodeX(0)}px">Bough</b>`, ...lay.eras.map((e) => `<b style="${span(e.col, e.width)};padding-left:14px"${e.era === r.era ? ' class="now"' : ""}>Era ${e.era} · ${r.eraStarts[e.era]}${e.era === r.era ? " · now" : ""}</b>`)].join("");
+  const heads = [`<b style="left:${nodeX(0)}px">Branch</b>`, ...lay.eras.map((e) => `<b style="${span(e.col, e.width)};padding-left:14px"${e.era === r.era ? ' class="now"' : ""}>Era ${e.era} · ${r.eraStarts[e.era]}${e.era === r.era ? " · now" : ""}</b>`)].join("");
   return `${bands}<div class="tree-eras" style="width:${w}px">${heads}</div>`;
 }
 
@@ -233,7 +233,7 @@ function pickSheet(r: Research, st: Map<string, State>, id: string | null): stri
   if (!id) return `<div class="pick-sheet hint-sheet"><p>${icon("scroll", 1)} <b>Tap an invention</b> to see what it does and what it needs. You can study the ones marked ◆: everything they grow from is known.</p></div>`;
   const t = tree();
   const inv = t.inventions.get(id);
-  if (!inv) return `<div class="pick-sheet"><p class="pick-name"><b>${esc(nameOf(id))}</b></p><p class="hint">${id === t.root.id ? "The root of the tree, known by everyone." : "A bough of the tree, known by every realm from the start. Everything to its right grows from it."}</p></div>`;
+  if (!inv) return `<div class="pick-sheet"><p class="pick-name"><b>${esc(nameOf(id))}</b></p><p class="hint">${id === t.root.id ? "The root of the tree, known by everyone." : "A branch of the tree, known by every realm from the start. Everything to its right grows from it."}</p></div>`;
   const s = stateOf(st, id);
   const opt: Option | undefined = r.options.find((o) => o.id === id) ?? (r.study?.id === id ? r.study : undefined);
   const need = (x: string) => `<button class="paper need ${stateOf(st, x) === "known" ? "met" : "unmet"}" data-pick="${x}">${stateOf(st, x) === "known" ? "✓" : "✗"} ${esc(nameOf(x))}</button>`;
@@ -283,10 +283,10 @@ function treePart(r: Research, ui: LearningUi): string {
       return `<button class="tab${l.id === lay.id ? " on" : ""}" data-bough="${l.id}"><b>${esc(l.name)}</b><small>${c.known} of ${c.all} known${c.open ? ` · ${c.open} ◆` : ""}</small></button>`;
     })
     .join("");
-  return `<nav class="tabs small boughs" aria-label="Boughs of the tree">${boughTabs}</nav>
+  return `<nav class="tabs small boughs" aria-label="Branches of the tree">${boughTabs}</nav>
     <div class="tree-part"><div class="tree-wrap">
       ${pickSheet(r, st, focus)}
-      <div class="tree-view" data-tree="${lay.id}" tabindex="0" aria-label="${esc(lay.name)}: the inventions of this bough">
+      <div class="tree-view" data-tree="${lay.id}" tabindex="0" aria-label="${esc(lay.name)}: the inventions of this branch">
         <div class="tree-canvas" style="width:${nodeX(lay.cols) + PAD}px;height:${nodeY(lay.rows) + PAD}px">
           ${eraHeads(lay, r)}
           ${treeSvg(lay, st, focus)}
@@ -358,7 +358,7 @@ function overview(r: Research): string {
     </div>`;
 }
 
-/** The Learning tab: the overview, then the Tree or the Schools (RSCH-084 to RSCH-087). */
+/** The Research tab: the overview, then the Tree or the Schools (RSCH-084 to RSCH-087). */
 export function learningTab(rules: Ruleset, r: Research, gold: number, ui: LearningUi = newLearningUi()): string {
   const part = (key: LearningUi["part"], label: string) => `<button class="tab${ui.part === key ? " on" : ""}" data-learn-part="${key}">${label}</button>`;
   return `${overview(r)}

@@ -310,7 +310,7 @@ export interface Snapshot {
   };
   /** Arm names for armies.byArm. */
   arms: readonly string[];
-  /** The player's research for the Learning tab (null before a realm is chosen). */
+  /** The player's research for the Research tab (null before a realm is chosen). */
   research: ResearchView | null;
   /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%). */
   realmResearch: { known: number; study: string | null; pct: number }[];

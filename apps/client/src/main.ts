@@ -197,7 +197,7 @@ let realmView = -1;
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
 let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies" = "general";
-/** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
+/** What the player left open in the Research tab (Tree or Schools, the branch, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
 let askedStudy = -1;
@@ -2060,9 +2060,9 @@ function logNews(s: Snapshot): void {
     watching.result = news.find((x) => x.kind === "battle" && !x.begins && x.province === watching!.province)?.text ?? "The battle is over.";
   }
   renderBattleWatch();
-  // Learning: an invention learned, or nothing being studied, opens the Learning tab (RSCH-089).
+  // Research: an invention learned, or nothing being studied, opens the Research tab (RSCH-089).
   for (const x of news) if (x.kind === "invention" && x.nations.includes(me)) alertPlayer(x.text, "scroll", x.province === undefined ? { tab: "learning" } : { province: x.province });
-  // A seal cracks, an ambition is settled, a heyday wakes or a choice waits: one quiet line that opens the Heritage tab (HER-071).
+  // An ambition is revealed or settled, a golden age begins or a choice waits: one quiet line that opens the Heritage tab (HER-071).
   for (const x of news) if (x.kind === "heritage" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "heritage" });
   // A crown inherited, a claim gained or lapsed, crowns merged: one line that opens the Diplomacy tab, where Your house lists them (SUBJ-130).
   for (const x of news) if (x.kind === "crown" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "diplomacy" });
@@ -3640,7 +3640,7 @@ function renderArmy(id: number): void {
               const g = (cost.gold * trainMen * rules.defines.recruit.goldScale) / 1000;
               return `<button class="paper" data-train="${a}" ${g > s.nationTreasury[me]! ? "disabled" : ""}>${ARM_LABEL[a]} · ${cost.months} mo · ${g.toFixed(2)} gold</button>`;
             })
-            .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Learning</button></p>` : ""}`
+            .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Research</button></p>` : ""}`
         : `<p class="hint">No levy foot left to train.</p>`}`}
     ${(() => {
       const waiting = garrison.reduce((t, j) => t + s.armies.men[j]!, 0);
@@ -4102,7 +4102,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Research") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -4365,7 +4365,7 @@ routeBarEl.addEventListener("click", (e) => {
   } else if (b.dataset.routeConfirm !== undefined) void confirmRoute();
 });
 
-/** The Learning tab's buttons: Tree or Schools, the boughs, tapping an invention, study, seats, students to arms, found a school; its folds and the tree's scroll stay as the player left them. */
+/** The Research tab's buttons: Tree or Schools, the branches, tapping an invention, study, seats, students to arms, found a school; its folds and the tree's scroll stay as the player left them. */
 function bindLearning(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-learn-part]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -4386,7 +4386,7 @@ function bindLearning(): void {
       const fromSheet = !!b.closest(".pick-sheet");
       learningUi.pick = id;
       if (fromSheet) {
-        // A need tapped in the sheet: show it in its own bough, scrolled into view.
+        // A need tapped in the sheet: show it in its own branch, scrolled into view.
         const bough = learningBough(snapshot!.research!, { ...learningUi, bough: "" });
         learningUi.bough = bough;
         const at = scrollFor(bough, id);

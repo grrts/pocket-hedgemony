@@ -31,7 +31,7 @@ block, `revolution`; the struggle is a tagged rising in the rebellions system.
 - Settler colonies turning Disloyal, `release`, `change_subject_kind`: **subjects**.
 - Faith waves and the church events after a revolution: **religion**. Nationalism and court language: **culture**.
 - Generals growing too big (warfare 4.6): **warfare**.
-- Legacies and burdens: **national-strengths** (hook only).
+- Legacies and weaknesses: **national-strengths** (hook only).
 
 ## 2. Sources
 
@@ -607,7 +607,7 @@ What each decree does is the `does` line in data/decrees.yaml (REVO-054).
 | subjects | upstream | Customer–Supplier | Settler independence via a Disloyal Settled or Self-governing colony, `release`, `change_subject_kind`; requested condition "a colony of who is Disloyal" (D-REVO-5) |
 | culture | upstream | Customer–Supplier | Nationalism thresholds 0.3 / 0.5 read by liberal and national signs; creole languages; `set_court_tongue` used by regimes |
 | religion | downstream | Customer–Supplier | Faith family wave uses `faith_wave`; `revolution_and_the_church`, `separation_of_church_and_state` follow regimes and read `revolutionary_regime` |
-| national-strengths | downstream | Customer–Supplier | Hook only: a won revolution can shed a burden or grant a legacy (which ones: D-REVO-6) |
+| national-strengths | downstream | Customer–Supplier | Hook only: a won revolution can overcome a weakness or grant a legacy (which ones: D-REVO-6) |
 | warfare | downstream | Customer–Supplier | Generals too big ×2 in revolutionary republics; a winning general switches regime |
 | province | upstream | Customer–Supplier | Grievances and class shares read by signs; regimes end and add grievances; locks of crushing_taxes and revoke_charter |
 | realm | upstream / downstream | Customer–Supplier | Lords' loyalty and land read by signs; regimes change lords; locks of grant_fief, sell_title, seize_land; stability, debt |

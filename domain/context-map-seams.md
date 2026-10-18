@@ -837,7 +837,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| events | downstream (they extend this) | Customer–Supplier | Ages for heydays; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
+| events | downstream (they extend this) | Customer–Supplier | Ages for golden ages; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
 | national-strengths | upstream | Conformist | Ages (`ages.yaml`) and their start/end, the condition language, event ids for event_weight/event_option; the `stat` lever lands through the events mapping (D-EVT-4, D-HER-6); heritage runs right after the event tree each turn |
 | national-strengths | downstream | Published Language | Four effects (grant_legacy, wake_heyday, stir_ambition, shed_burden) and the `heritage` condition (adopted, D-EVT-11) |
 
@@ -1188,7 +1188,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | government | upstream | Customer–Supplier | Additions to caps (e.g. +2 officials for Venice) |
-| national-strengths | downstream | Published Language | official_capacity, lord_capacity; reforms that shed burdens |
+| national-strengths | downstream | Published Language | official_capacity, lord_capacity; reforms that overcome weaknesses |
 
 ## government ↔ naval (one-sided)
 
@@ -1485,8 +1485,8 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| national-strengths | upstream | Customer–Supplier | Reforms and revolutions shedding burdens or granting legacies through event effects |
-| revolutions | downstream | Customer–Supplier | Hook only: a won revolution can shed a burden or grant a legacy (which ones: D-REVO-6) |
+| national-strengths | upstream | Customer–Supplier | Reforms and revolutions overcoming weaknesses or granting legacies through event effects |
+| revolutions | downstream | Customer–Supplier | Hook only: a won revolution can overcome a weakness or grant a legacy (which ones: D-REVO-6) |
 
 ## national-strengths ↔ scenario-setup
 
@@ -1559,7 +1559,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| naval | upstream | Conformist | S bough (S1, S3, S4, S5, S6, S7, S8, S9, S13, S14–S18), T5 monsoon seas |
+| naval | upstream | Conformist | S inventions (S1, S3, S4, S5, S6, S7, S8, S9, S13, S14–S18), T5 monsoon seas |
 | research | downstream | Customer–Supplier | S inventions and ship types |
 
 ## naval ↔ scenario-setup

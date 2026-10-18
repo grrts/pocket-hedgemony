@@ -19,7 +19,7 @@ const near = (a: number, b: number, tol = 1e-9) => expect(Math.abs(a - b)).toBeL
 
 // ---------------------------------------------------------------- realms, ports, ships
 
-/** Inventions a country knows; unless a scenario says otherwise, every S-bough step in the ship table. */
+/** Inventions a country knows; unless a scenario says otherwise, every S invention step in the ship table. */
 const ALL = ["S1", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S13"];
 const knownOf = (s: Scenario, c: string): string[] => ((s.known ??= {})[c] ??= [...ALL]);
 const learn = (s: Scenario, c: string, id: string) => {
