@@ -38,6 +38,7 @@ import { refreshFreeFleets } from "./hiredFleets.ts";
 import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import type { AchievementLog } from "./achievements.ts";
+import { createInstitutionsState, seedInstitutions, type InstitutionsState } from "./institutions.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -45,7 +46,7 @@ import type { AchievementLog } from "./achievements.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -446,6 +447,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createRulerState(N, seed),
     ...createFallenState(N),
     ...createBeliefState(N),
+    ...createInstitutionsState(),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -473,6 +475,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedPeoples(world);
   // Rulers read the lords, for a child ruler's regent, and the government form, for the throne law.
   seedRulers(world);
+  // The Empire of 1444 reads the members' land and the Emperor's ruler (INST-010).
+  seedInstitutions(world);
   readBeliefShares(world);
   recount(world);
 

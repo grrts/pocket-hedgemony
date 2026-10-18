@@ -421,6 +421,8 @@ export function orderShape(order: Order): string {
       return "set a Faith policy";
     case "answerRevolution":
       return "answer the revolution";
+    case "empire":
+      return "act in the Empire";
   }
 }
 

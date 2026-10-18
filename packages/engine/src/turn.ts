@@ -23,6 +23,7 @@ import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { hireOfficial, settleLand, swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
+import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -167,7 +168,9 @@ export type Order =
   /** Hire a free or lent fleet, or dismiss one (hiredFleets.ts). */
   | HireOrder
   /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
-  | ExploreOrder;
+  | ExploreOrder
+  /** The Empire: stand for the crown, vote, seek a vote, grant a seat, admit a member (institutions.ts). */
+  | EmpireOrder;
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -261,6 +264,8 @@ function startDay(world: World, news: News[]): void {
     aiTreasury(world, news);
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
+    // Institutions read standing and forms and add war aims, so they come after diplomacy and before the wars (INST §9).
+    monthlyInstitutions(world, news);
     aiDeclarations(world, news);
     // A demand made before war may reach the player's court this month (DIPL-213).
     libraryEvents(world, news);
@@ -443,6 +448,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return answerRebels(world, actingNation, order.rising, order.answer, news);
     case "treatRebels":
       return verdictOrder(world, actingNation, order.rising, order.treatment, news);
+    case "empire":
+      return empireOrder(world, actingNation, order, news);
     case "answerRevolution":
       return answerRevolution(world, actingNation, order.stance, news);
     case "moveBuild":
