@@ -5,7 +5,7 @@
  */
 import type { GameDate } from "@ph/rules";
 import { agesRunning, formatMonthYear } from "../time-and-turns/index.ts";
-import { SHELL, campaignLabel, enterCampaign, hasQuit, isFreeTier, pop, push, replaceAll, top, topId, type Edition, type Frame, type Platform, type Shell } from "./stack.ts";
+import { SHELL, campaignLabel, enterCampaign, hasQuit, isFreeTier, openStartScreen, pop, push, replaceAll, top, topId, type Edition, type Frame, type Platform, type Shell } from "./stack.ts";
 
 // ---------------------------------------------------------------------------
 // Boot and first run (SHELL-008..015)
@@ -91,7 +91,7 @@ export function coldStart(sh: Shell, profile: Profile, device: Device, o: { load
     }
     p.firstRunDone = true;
   }
-  replaceAll(sh, { id: "title" });
+  openStartScreen(sh);
   out.path.push("title");
   return out;
 }
@@ -107,7 +107,7 @@ export function answerFirstRun(start: Start, answer: string): void {
     return;
   }
   start.profile.firstRunDone = true;
-  replaceAll(start.shell, { id: "title" });
+  openStartScreen(start.shell);
   start.path.push("title");
 }
 
@@ -117,7 +117,7 @@ export function needsSignIn(path: readonly string[]): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// Title and main menu (SHELL-016..029)
+// The start screen (SHELL-149..158; the title and main menu as one screen, SHELL-020..029 where they still hold)
 
 export interface CampaignSummary {
   realm: string;
@@ -126,21 +126,45 @@ export interface CampaignSummary {
   borders: string;
 }
 
-/** The title: the real map at world zoom drifting over a 1444 region, or over the player's realm from the save summary (SHELL-016, SHELL-018). */
-export function titleScreen(platform: Platform, summary: CampaignSummary | null): { background: { renderer: "map"; zoom: "World"; drift: "slow"; over: string; bordersFrom: string }; cog: "settings"; version: true; quit: boolean } {
-  const background = summary
-    ? { renderer: "map" as const, zoom: "World" as const, drift: "slow" as const, over: summary.realm, bordersFrom: "the latest save's summary" }
-    : { renderer: "map" as const, zoom: "World" as const, drift: "slow" as const, over: "a region of the 1444 world", bordersFrom: "1444" };
-  return { background, cog: "settings", version: true, quit: platform === "desktop" };
+export interface StartBackground {
+  renderer: "map";
+  zoom: string;
+  pan: "slow";
+  over: string;
+  bordersFrom: string;
+  input: false;
+  simulation: false;
 }
+
+/**
+ * The start screen around its column: the real map at region zoom panning over
+ * the realm of the latest save's summary, or one of the start regions; the icon
+ * row, the version and, in the free tier, the Full game ribbon (SHELL-150, SHELL-154, SHELL-156).
+ */
+export function startScreen(o: { platform: Platform; edition: Edition; summary: CampaignSummary | null; start?: number }): { background: StartBackground; icons: string[]; version: "lower right"; ribbon: boolean } {
+  const regions = SHELL.start.regions;
+  const over = o.summary ? o.summary.realm : regions[(o.start ?? 0) % regions.length]!;
+  const background: StartBackground = { renderer: "map", zoom: SHELL.start.zoom, pan: "slow", over, bordersFrom: o.summary ? "the latest save's summary" : "1444", input: false, simulation: false };
+  return { background, icons: startIcons(o.platform), version: "lower right", ribbon: isFreeTier(o.edition) };
+}
+
+/** The icon row under the column, each with its name; Quit only where an app can quit (SHELL-154). */
+export const startIcons = (platform: Platform): string[] => SHELL.start.icons.filter((e) => e !== "Quit" || hasQuit(platform));
+
+/** While Battery saver is on, the background keeps panning at its lower frame rate (SHELL-151). */
+export const startBackgroundMoves = (_batterySaver: boolean): true => true;
 
 export type StartInput = "touch" | "click" | "key press" | "controller button";
 
-/** TapToStart: any input folds the main menu open on the same screen; the title track starts (SHELL-017, SHELL-019). */
-export function tapToStart(sh: Shell, _input: StartInput): void {
-  if (topId(sh) !== "title") throw new Error("The title is not showing");
-  push(sh, { id: "main_menu" });
-  sh.events.push({ type: "TitleDismissed" });
+/**
+ * The first touch, click, key or button anywhere on the start screen: the
+ * title track may start, since browsers and phones allow sound only after one
+ * (SHELL-149). The menu is already shown, so nothing else changes.
+ */
+export function firstStartInput(sh: Shell, _input: StartInput): void {
+  if (topId(sh) === "title") push(sh, { id: "main_menu" });
+  if (topId(sh) !== "main_menu") throw new Error("The start screen is not showing");
+  if (!sh.events.some((e) => e.type === "TitleDismissed")) sh.events.push({ type: "TitleDismissed" });
 }
 
 export interface MenuContext {
@@ -156,18 +180,33 @@ export interface MenuEntry {
   target: string;
   style: "large wax-red" | "paper";
   detail?: string;
+  banner?: string;
 }
 
-/** The main menu's entries and their order (SHELL-020..025, SHELL-027). */
-export function mainMenu(m: MenuContext): MenuEntry[] {
-  const out: Omit<MenuEntry, "style">[] = [];
-  if (m.campaign) out.push({ label: "Continue", target: "loading", detail: campaignLabel(m.campaign.realm, m.campaign.date) });
-  out.push({ label: "New campaign", target: "new_campaign" });
-  if (m.saves > 0) out.push({ label: "Load", target: "load" });
-  if (!m.tutorialFinished) out.push({ label: "Tutorial", target: "tutorial" });
-  out.push({ label: "More", target: "more" });
-  if (hasQuit(m.platform)) out.push({ label: "Quit", target: "quit" });
-  return out.map((e, i) => ({ ...e, style: i === 0 ? "large wax-red" : "paper" }));
+/**
+ * The column of ways into a campaign: Play (large and wax-red, first focus,
+ * with the campaign's banner and "France · May 1503" while one is in
+ * progress), then New campaign, Load and Tutorial when they apply (SHELL-152, SHELL-153).
+ */
+export function startColumn(m: MenuContext): MenuEntry[] {
+  const play: MenuEntry = m.campaign
+    ? { label: "Play", target: "loading", style: "large wax-red", detail: campaignLabel(m.campaign.realm, m.campaign.date), banner: m.campaign.realm }
+    : { label: "Play", target: "new_campaign", style: "large wax-red" };
+  const out: MenuEntry[] = [play];
+  if (m.campaign) out.push({ label: "New campaign", target: "new_campaign", style: "paper" });
+  if (m.saves > 0) out.push({ label: "Load", target: "load", style: "paper" });
+  if (!m.tutorialFinished) out.push({ label: "Tutorial", target: "tutorial", style: "paper" });
+  return out;
+}
+
+/** Focus starts on Play, whatever the state (SHELL-152). */
+export const startFocus = (_m: MenuContext): string => "Play";
+
+/** Wiki opens the web wiki in the system browser; the game stays on the start screen as it was (SHELL-155). */
+export function openWiki(sh: Shell): { url: string } {
+  const url = SHELL.start.wikiUrl;
+  sh.events.push({ type: "WikiOpened", url });
+  return { url };
 }
 
 /** More: Settings, Achievements, Almanac, Unlock (Buy the full game in the Steam demo), Credits, then Tutorial once finished (SHELL-023, SHELL-024). */
@@ -176,9 +215,6 @@ export function moreMenu(edition: Edition, tutorialFinished: boolean): string[] 
   if (tutorialFinished) out.push("Tutorial");
   return out;
 }
-
-/** Where focus starts on the main menu: Continue when it exists, otherwise New campaign (SHELL-026, D-SHELL-3). */
-export const mainMenuFocus = (m: MenuContext): string => mainMenu(m)[0]!.label;
 
 /** No edition shows an ad, on any screen (SHELL-028, D-SHELL-16). */
 export function adCard(_o: { edition: Edition; screen: string }): null {

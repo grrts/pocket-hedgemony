@@ -2513,6 +2513,17 @@ Given("{string} has paid off the debt it started with", (s, realm: string) => {
   G.runLedger(s.game, false);
 });
 
+// ------------------------------------------------------------ titles by culture (REALM-242)
+
+Given("a realm whose court language is of the {string} family and whose form is of the {string} family", (s: S, family: string, form: string) => {
+  s.titles = M.titlesFor(family, form);
+});
+
+Then("it calls a lord a {string} and an official a {string}", (s: S, lord: string, official: string) => {
+  expect(s.titles.lord).toBe(lord);
+  expect(s.titles.official).toBe(official);
+});
+
 // ------------------------------------------------------------ rulers, the fallen and belief in play (REALM-233 to REALM-241)
 // These run against the game: a fresh 1444 world, then the yearly and monthly steps as the turn runs them.
 

@@ -17,8 +17,8 @@ Feature: Screen list
       | id            | kind        | first focus                         | back                                      | music                         |
       | boot          | Full        | none                                | none                                      | none                          |
       | first_run     | Full        | the only choice                     | none, it must be answered                 | none                          |
-      | title         | Full        | Tap to start                        | leaves the app on Android                 | title                         |
-      | main_menu     | Same screen | Continue                            | title                                     | title                         |
+      | title         | Full        | Play                                | leaves the app on Android                 | title                         |
+      | main_menu     | Same screen | Play                                | leaves the app on Android                 | title                         |
       | new_campaign  | Full        | first suggested realm               | previous step, then main_menu             | nation_select                 |
       | load          | Full        | newest save                         | where opened                              | unchanged                     |
       | loading       | Full        | tip arrows                          | none                                      | load_resume                   |

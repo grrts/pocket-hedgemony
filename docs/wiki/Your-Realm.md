@@ -197,6 +197,12 @@ The lord card is the same in every society; only the label changes: nobles, merc
 
 Paying for a building in a lord's province raises his loyalty one step. A famine in his land turns him disloyal; riots or a heavy demand on his province make him waver. At New Year, each lord over the government's cap drops one loyalty step (see [Government](Government)).
 
+### What your lords and officials are called
+
+Every realm names its lords and officials in its own words. A Russian prince has boyars and voivodes, the Ottomans beys and subashis, Japan daimyo and daikan, Ethiopia rases and shums, the Inca kurakas and tocricocs, and the peoples of the Americas and much of Africa chiefs and headmen. The word comes from the family of your court's language, and a realm ruled by kin calls them chiefs and headmen where its language has no word of its own. Everyone else keeps lords and officials.
+
+The words show on the country card's tabs, the Stability pillars, the Lords map mode, a lord's and an official's screen and a province's "Governed by" card. Another realm's card uses its own words. Only the words change: chiefs and daimyo follow exactly the same rules as lords, and post types such as Warden or Tax collector stay the same everywhere.
+
 ### Stability
 
 Stability tells you at a glance how well your realm holds together. It is not a hidden number: it reads four pillars, and your realm is only as steady as the weakest of them.
