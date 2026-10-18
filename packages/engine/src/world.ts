@@ -25,9 +25,11 @@ import { createGameEvents, type GameEvents } from "./events.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
+import { createRebelState, type RebelState } from "./rebels.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./campaignEnd.ts";
+import type { AchievementLog } from "./achievements.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -35,7 +37,7 @@ import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./c
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, PeoplesState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, PeoplesState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -140,6 +142,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   events?: GameEvents;
   /** Win scores, the end date and how the campaign ended (campaignEnd.ts). */
   campaign: CampaignEndState;
+  /** The player's campaign as achievements see it (achievements.ts). */
+  achievements?: AchievementLog;
 }
 
 export interface ArmyPool {
@@ -419,6 +423,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createConversionState(P),
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
+    ...createRebelState(P, N),
     navy: createNavyState(P),
     ...createPeoplesState(P, N),
   };

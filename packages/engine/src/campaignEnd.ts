@@ -5,6 +5,7 @@ import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { economyScore, powerScore, realmConfig, technologyScore } from "./domain/realm/index.ts";
 import { outcomeOf, type RealmScores } from "./domain/game-shell/ending.ts";
 import { eventsConfig } from "./domain/events/model.ts";
+import { switchCountry } from "./domain/achievements/index.ts";
 import * as nv from "./domain/naval/index.ts";
 
 /**
@@ -270,6 +271,7 @@ export function playOn(world: World, n: number): string | null {
   setPlayer(world, n);
   c.ending = null;
   c.playedOn = true;
+  if (world.achievements) switchCountry(world.achievements.campaign, world.nationIds[n]!);
   return null;
 }
 

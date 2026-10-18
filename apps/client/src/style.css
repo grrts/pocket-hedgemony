@@ -2786,6 +2786,78 @@ button.paper.over {
   gap: 6px;
 }
 
+/* Rebellions (REBL-063, REBL-065): the rebellion card and verdicts on the province card, the Risings block of the Provinces tab. */
+.rising {
+  padding: 6px 8px;
+  margin: 6px 0 8px;
+  border-left: 4px solid var(--cloth);
+}
+.rising .sub {
+  margin-top: 0;
+  color: var(--cloth);
+}
+.rising dl.facts dd small {
+  display: block;
+  color: var(--ink-soft);
+}
+.rising .progress {
+  width: 100%;
+  min-width: 120px;
+}
+.progress.danger i {
+  background: var(--cloth);
+}
+.rising .answers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+}
+.rising .answers button {
+  display: grid;
+  gap: 2px;
+  min-height: 44px;
+  text-align: left;
+  justify-content: stretch;
+}
+.rising .answers button small {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.rising .answers button.wax small {
+  color: inherit;
+  opacity: 0.85;
+}
+.rising .answers button b {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rising .answers .confirm-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 6px;
+}
+.risings {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.rising-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  text-align: left;
+  justify-content: flex-start;
+}
+.rising-row span {
+  display: grid;
+}
+.rising-row small {
+  font-weight: 400;
+}
+
 /* ---- Heritage: a realm's national strengths and its 1444 assessments (HER-080..083) ---- */
 
 .heritage-line small {
@@ -3111,4 +3183,352 @@ table.score-ledger tr.mine td {
 
 .fab.over .px-icon {
   animation: none;
+}
+
+/* ---- Achievements (domain/achievements "How the player uses it") ---- */
+
+.tools #trophy {
+  position: relative;
+}
+.tools #trophy .dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  background: var(--cloth);
+  border: 2px solid var(--outline);
+}
+
+.ach-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  background: #cfc3a4;
+  border: 3px solid #8d8778;
+  box-shadow: inset 0 0 0 2px var(--outline);
+  image-rendering: pixelated;
+}
+.ach-badge img {
+  filter: grayscale(1) opacity(0.55);
+}
+.ach-badge.earned {
+  background: var(--paper-light);
+}
+.ach-badge.earned img {
+  filter: none;
+}
+.ach-badge.earned.tier-copper { border-color: #b8693a; }
+.ach-badge.earned.tier-silver { border-color: #c6ccd8; }
+.ach-badge.earned.tier-gold { border-color: #e9b93a; }
+.ach-badge.earned.tier-crown { border-color: #8a4fb0; box-shadow: inset 0 0 0 2px #e9b93a; }
+.ach-badge.not-yet {
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+.ach-head {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font: 600 18px/1.2 var(--body);
+  color: var(--ink);
+}
+.ach-head b {
+  font-size: 22px;
+}
+.ach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.ach-grid .ach {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 48px;
+  padding: 2px;
+  background: none;
+  border: 0;
+  position: relative;
+}
+.ach-grid .ach.on .ach-badge {
+  outline: 3px solid var(--cloth);
+}
+.ach-grid .ach.new::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background: var(--cloth);
+  border: 2px solid var(--outline);
+}
+.panel .sub small {
+  font-weight: 400;
+  opacity: 0.8;
+}
+.ach-detail {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 8px;
+  margin: 0 0 10px;
+  color: var(--ink);
+}
+.ach-detail .ach-badge {
+  width: 52px;
+  height: 52px;
+}
+.ach-detail b {
+  display: block;
+  font: 600 19px/1.15 var(--body);
+}
+.ach-detail small {
+  display: block;
+  opacity: 0.8;
+}
+.ach-detail p {
+  margin: 4px 0;
+}
+.ach-status.earned {
+  color: #3d6b2a;
+  font-weight: 600;
+}
+.ach-bar {
+  display: block;
+  height: 10px;
+  background: #cfc3a4;
+  border: 2px solid var(--outline);
+}
+.ach-bar i {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.ach-toasts {
+  grid-template-columns: 1fr auto 64px;
+  margin-top: 8px;
+}
+.ach-open {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+}
+.ach-open small {
+  margin-left: auto;
+  opacity: 0.8;
+  font-weight: 400;
+}
+
+/* The unlock toast: top centre under the date bar, over the alerts (ACH-069, ACH-079). */
+.ach-toast {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 50px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(360px, calc(100vw - 2 * max(8px, env(safe-area-inset-left), env(safe-area-inset-right)) - 120px));
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  z-index: 9;
+  text-align: left;
+  color: var(--ink);
+  animation: ach-in 0.25s steps(5) both;
+  text-shadow: none;
+  font: 400 16px/1.2 var(--body);
+}
+.ach-toast[hidden] {
+  display: none;
+}
+.ach-toast span {
+  display: grid;
+  min-width: 0;
+}
+.ach-toast small {
+  font-size: 13px;
+  opacity: 0.8;
+}
+.ach-toast b {
+  font: 600 19px/1.1 var(--body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ach-toast em {
+  font-style: normal;
+  font-size: 14px;
+}
+@keyframes ach-in {
+  from { transform: translate(-50%, -80px); }
+  to { transform: translate(-50%, 0); }
+}
+
+.ach-filter .tab {
+  min-height: 44px;
+}
+/* While a toast shows, the alerts move down under it rather than sit beneath it. */
+.ach-toast:not([hidden]) ~ .alerts {
+  top: calc(env(safe-area-inset-top) + 116px);
+}
+
+/* ---- Settings card, under the side tools: Gameplay's Tutorial hints (onboarding TUT-128) ---- */
+
+.settings-menu .settings-group {
+  margin: 4px 0 0;
+  font: 600 15px/1.2 var(--body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.settings-row {
+  grid-template-columns: 1fr 64px;
+}
+
+.settings-row span small {
+  display: block;
+}
+
+.settings-row .toggle {
+  grid-column: 2;
+}
+
+.settings-menu .settings-action {
+  min-height: 44px;
+  margin-top: 6px;
+  font-size: 17px;
+}
+
+/* ---- First-campaign hints (onboarding TUT-127 … TUT-130) ----
+   One note along the bottom, between the overview button and End turn, and
+   under the top bar when what it points at is low; a brass ring that takes no
+   taps around the button to press. */
+
+.hint-note {
+  position: fixed;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 9;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  width: min(460px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
+  max-height: 33vh;
+  overflow: auto;
+  padding: 2px 4px 4px 6px;
+  border-width: 8px;
+  border-image-width: 8px;
+  font-size: 18px;
+  line-height: 1.15;
+  animation: hint-in 0.2s steps(4);
+}
+
+@keyframes hint-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.hint-note.top {
+  bottom: auto;
+  top: calc(env(safe-area-inset-top) + 50px);
+}
+
+.hint-note[hidden] {
+  display: none;
+}
+
+.hint-note .hint-count {
+  font: 600 15px/1 var(--body);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.hint-note p {
+  flex: 1 1 12em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.hint-note .hint-buttons {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.hint-note .hint-buttons button {
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 17px;
+}
+
+.hint-note .hint-buttons .dismiss {
+  width: 44px;
+  padding: 0;
+}
+
+.hint-ring {
+  position: fixed;
+  z-index: 9;
+  pointer-events: none;
+  border: 3px solid var(--brass-light);
+  box-shadow:
+    0 0 0 3px var(--outline),
+    inset 0 0 0 2px var(--outline);
+  animation: hint-pulse 1s steps(2) infinite;
+}
+
+.hint-ring[hidden] {
+  display: none;
+}
+
+@keyframes hint-pulse {
+  50% {
+    border-color: var(--brass);
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint-ring {
+    animation: none;
+  }
+}
+
+/* A phone narrower than the note's room keeps it above End turn, full width. */
+@media (max-width: 560px) {
+  .hint-note {
+    width: calc(100vw - 2 * max(8px, env(safe-area-inset-left), env(safe-area-inset-right)));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 72px);
+  }
+}
+
+/* A phone held upright shows only its turn-sideways notice (TUT-130). */
+@media (orientation: portrait) and (pointer: coarse) {
+  .hint-note,
+  .hint-ring {
+    display: none !important;
+  }
+}
+
+/* Six side tools do not fit above End turn on a short phone: the column wraps
+   into a second one to its left rather than run under the button. */
+.tools {
+  flex-wrap: wrap-reverse;
+  align-content: flex-start;
+  max-height: calc(100dvh - env(safe-area-inset-top) - 52px - max(10px, env(safe-area-inset-bottom)) - 76px);
 }

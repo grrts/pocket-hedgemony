@@ -62,8 +62,39 @@ const samePair = (r: { source: string; target: string }, a: string, b: string) =
 
 // ---------------------------------------------------------------- queries
 
+/**
+ * The records of each pair, in graph order, so pair queries don't scan every
+ * relation. Built per relations array: removals replace the array and
+ * newRecord appends, so a new array is indexed afresh and appended records
+ * are added from where the index left off.
+ */
+interface PairIndex {
+  rel: RelationRecord[];
+  seen: number;
+  pairs: Map<string, RelationRecord[]>;
+}
+const pairIndexes = new WeakMap<RelationGraph, PairIndex>();
+const pairOf = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+
+function recordsOf(g: RelationGraph, a: string, b: string): readonly RelationRecord[] {
+  let ix = pairIndexes.get(g);
+  if (!ix || ix.rel !== g.relations || ix.seen > g.relations.length) {
+    ix = { rel: g.relations, seen: 0, pairs: new Map() };
+    pairIndexes.set(g, ix);
+  }
+  for (; ix.seen < g.relations.length; ix.seen++) {
+    const r = g.relations[ix.seen]!;
+    const k = pairOf(r.source, r.target);
+    const list = ix.pairs.get(k);
+    if (list) list.push(r);
+    else ix.pairs.set(k, [r]);
+  }
+  return ix.pairs.get(pairOf(a, b)) ?? NONE;
+}
+const NONE: readonly RelationRecord[] = [];
+
 export function find(g: RelationGraph, type: string, a: string, b: string, ordered = false): RelationRecord[] {
-  return g.relations.filter((r) => r.type === type && (ordered ? r.source === a && r.target === b : samePair(r, a, b)));
+  return recordsOf(g, a, b).filter((r) => r.type === type && (ordered ? r.source === a && r.target === b : samePair(r, a, b)));
 }
 
 export function has(g: RelationGraph, type: string, a: string, b: string): boolean {
@@ -71,7 +102,7 @@ export function has(g: RelationGraph, type: string, a: string, b: string): boole
 }
 
 function stanceRecord(g: RelationGraph, a: string, b: string): RelationRecord | undefined {
-  return g.relations.find(
+  return recordsOf(g, a, b).find(
     (r) => layerOf(r.type) === "stance" && ((r.source === a && r.target === b) || (r.direction === "mutual" && r.source === b && r.target === a)),
   );
 }
@@ -108,7 +139,7 @@ export function stance(g: RelationGraph, a: string, b: string): string {
 
 /** The state relation of a pair (At War, Truce or Alliance), if any. */
 export function stateOf(g: RelationGraph, a: string, b: string): string | null {
-  return g.relations.find((r) => layerOf(r.type) === "state" && samePair(r, a, b))?.type ?? null;
+  return recordsOf(g, a, b).find((r) => layerOf(r.type) === "state" && samePair(r, a, b))?.type ?? null;
 }
 
 /** Overlord of a country, read from its Subject record; never stored (DIPL-001). */
@@ -121,7 +152,7 @@ export function subjectsOf(g: RelationGraph, c: string): string[] {
 }
 
 export function relationsBetween(g: RelationGraph, a: string, b: string): RelationRecord[] {
-  return g.relations.filter((r) => samePair(r, a, b));
+  return recordsOf(g, a, b).filter((r) => samePair(r, a, b));
 }
 
 export function factsBetween(g: RelationGraph, a: string, b: string): FactRecord[] {

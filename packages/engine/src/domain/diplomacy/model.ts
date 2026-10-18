@@ -297,7 +297,7 @@ export interface Diplomacy {
 }
 
 export const key = (a: string, b: string) => `${a}>${b}`;
-export const pairKey = (a: string, b: string) => [a, b].sort().join("|");
+export const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
 
 export function createDiplomacy(date: string, seed = 1): Diplomacy {
   return {

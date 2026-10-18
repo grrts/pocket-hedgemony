@@ -4,7 +4,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 
 | Context | Code | Requirements | Feature files | Scenarios | Decided | Still open |
 |---|---|---:|---:|---:|---:|---:|
-| [Achievements](achievements/spec.md) | ACH | 75 | 9 | 160 | 11 | 3 |
+| [Achievements](achievements/spec.md) | ACH | 83 | 9 | 160 | 12 | 3 |
 | [Audio](audio/spec.md) | AUD | 143 | 15 | 290 | 14 | 1 |
 | [Buildings](buildings/spec.md) | BLD | 175 | 20 | 344 | 23 | 0 |
 | [Culture](culture/spec.md) | CULT | 101 | 7 | 191 | 18 | 0 |
@@ -16,10 +16,10 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Map presentation](map-presentation/spec.md) | VIEW | 87 | 9 | 166 | 9 | 1 |
 | [National strengths](national-strengths/spec.md) | HER | 83 | 13 | 141 | 18 | 0 |
 | [Naval](naval/spec.md) | NAVY | 131 | 9 | 259 | 32 | 0 |
-| [Onboarding](onboarding/spec.md) | TUT | 120 | 15 | 179 | 15 | 0 |
+| [Onboarding](onboarding/spec.md) | TUT | 130 | 16 | 193 | 16 | 0 |
 | [Province](province/spec.md) | PROV | 216 | 26 | 612 | 29 | 0 |
 | [Realm](realm/spec.md) | REALM | 178 | 18 | 444 | 18 | 0 |
-| [Rebellions](rebellions/spec.md) | REBL | 64 | 9 | 165 | 15 | 0 |
+| [Rebellions](rebellions/spec.md) | REBL | 71 | 9 | 165 | 16 | 0 |
 | [Recruiting](recruiting/spec.md) | RECR | 120 | 11 | 234 | 24 | 0 |
 | [Religion](religion/spec.md) | RELG | 134 | 13 | 286 | 24 | 0 |
 | [Research](research/spec.md) | RSCH | 63 | 7 | 133 | 20 | 0 |
@@ -27,12 +27,12 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Saves](saves/spec.md) | SAVE | 104 | 11 | 212 | 15 | 1 |
 | [Scenario setup](scenario-setup/spec.md) | SETUP | 59 | 7 | 164 | 17 | 0 |
 | [Settings](settings/spec.md) | SET | 130 | 12 | 394 | 18 | 1 |
-| [Subjects and overlords](subjects/spec.md) | SUBJ | 122 | 17 | 298 | 27 | 0 |
+| [Subjects and overlords](subjects/spec.md) | SUBJ | 122 | 17 | 298 | 28 | 0 |
 | [Time and turns](time-and-turns/spec.md) | TIME | 76 | 7 | 181 | 15 | 0 |
 | [Trade](trade/spec.md) | TRADE | 128 | 14 | 266 | 19 | 0 |
 | [Troop movement](troop-movement/spec.md) | MOVE | 133 | 12 | 246 | 20 | 0 |
 | [Warfare](warfare/spec.md) | WAR | 218 | 17 | 654 | 21 | 0 |
 | [World map](world-map/spec.md) | MAP | 50 | 6 | 175 | 12 | 0 |
-| **All 29 contexts** | | 3366 | 358 | 7933 | 563 | 8 |
+| **All 29 contexts** | | 3391 | 359 | 7947 | 567 | 8 |
 
 Scenarios count each row of a Scenario Outline's examples.
