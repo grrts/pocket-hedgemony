@@ -1,4 +1,5 @@
 import { monthlyPeople } from "./living.ts";
+import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
@@ -232,6 +233,7 @@ function startDay(world: World, news: News[]): void {
     monthlyFood(world, news);
     monthlyGovernment(world, news);
     monthlyPeoples(world, news);
+    monthlyBelief(world, news);
     monthlyMoods(world, news);
     monthlyRebels(world, news);
     monthlyRevolutions(world, news);
