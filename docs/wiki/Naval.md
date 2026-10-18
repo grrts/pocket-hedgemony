@@ -188,6 +188,20 @@ Each day of the day loop (7 days a turn) fleets take their step and use supply, 
 - **The Sea lens**: ports shaded by sailors who can still be called, fleets at sea, the month's winds, and the zones a fleet can enter.
 - **The muster preview**: who is taken by class, the bounty, fish lost and when they are ready.
 
+### In the game now
+
+The first slice of ships is playable:
+
+- **Port tab.** Tap a coastal province of yours and open its Port tab: its harbour and shipyard, berths and slipways, sailors ready, on their way and still callable. *Muster 30, 100 or 300* calls sailors from the levy pool, ready in two weeks. *Order a ship* lists every ship the yard can build with its gold, crew, months, fights and carries, or why it can't yet (crew not in port, no slipway, an invention). A hull on the slipway is launched into the port's fleet when its months are up.
+- **Fleets on the map.** Every fleet shows as a ship in its realm's colours with its ship count, in its sea zone or just off its port. Tap one of yours to choose it, then tap a sea zone, a port or a shore: it sets sail at once along a dotted course. Tap it again to open its card.
+- **Fleet card.** Where it is, Sail, its admiral (a fleet needs one to sail: appoint a commander waiting at court), the army aboard, every ship with its crew, hull and supply, *Part off*, *Join another fleet here* and *Lay up*.
+- **Carrying armies.** An army standing in a port shows *Board ships*; aboard, it stands off the map and moves with its ships. Sail to a shore you may march into and it lands there; sail into a friend's port and it goes ashore.
+- **Sea battles.** Enemy fleets in one zone fight round by round, every four hours, until one side has lost half its strength; the loser's ships take a hull step and it runs for port. The battle is said over the map with Go there.
+- **Navy tab.** Your realm card's Navy tab is the overview: ships, sailors, the month's cost, battles, every fleet and every port. The cost is also the *Ships and sailors* line of the Treasury.
+- **The AI** keeps one ship for every two ports (at most four), puts a commander at their head, and at war hunts enemy fleets it outnumbers near by.
+
+Prices are the design's scaled to the game's treasury (ships ×0.1, wages ×0.01), and timber is bought in, so any shipyard can build. Winds, storms, blockades, trade and piracy come in later slices.
+
 ## How it connects
 
 - [Buildings](Buildings): harbour, shipyard, lighthouse and naval base; naval supplies their berths, slipways and the `start_ports` table.

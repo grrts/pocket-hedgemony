@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-561 decided and 8 still open across 29 contexts.
+566 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -288,6 +288,9 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-NAVY-27**: (was OQ-NAVY-27) One port per province; Melos and Malé stay unplaced until the map gains them. The map owns provinces; naval follows it.
 - **D-NAVY-28**: (was OQ-NAVY-28) Docking in a subject's or lord's port takes food from that province's store and nothing is owed. Simplest reading of "from that province".
 - **D-NAVY-29**: (was OQ-NAVY-29) Sailors are mustered by share of every callable class, never seafolk first (X-7): 830 callable (770 seafolk, 45 homeless, 15 others) give 300 sailors as 278 seafolk, 16 homeless and 6 others by largest remainder. X-7 rules out "first" orders.
+- **D-NAVY-30**: The game's gold and wages for ships are the design's numbers scaled to the treasury the game pays out (Portugal makes about 9 gold a month): ship prices and upkeep ×0.1, sailors' wages and bounties ×0.01 (`naval.json` `game`). Provisional, to tune with playtests.
+- **D-NAVY-31**: First slice of sea battles (NAVY-131) and fleets: the round numbers are provisional (`naval.json` `game`); a ship's fights and carries come from `warfare.json` `ships`, which warfare owns (warfare §11.2). The AI keeps one ship for every two ports, at most four, and hunts enemy fleets it outnumbers by 1.2 within 8 zones.
+- **D-NAVY-32**: Slipways do not need timber within reach: timber is bought in, as Venice and Lisbon did. Two thirds of the 1444 shipyards have no timber land in reach on the map, which would leave them unable to build.
 
 ### Onboarding (onboarding)
 
@@ -306,6 +309,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-TUT-13**: (was OQ-TUT-13) Detailed tooltips and Tutorial hints: "Detailed tooltips" (off by default) puts the "Why?" list inside the tooltip itself; "Why?" stays one tap away either way. "Tutorial hints" (on by default) shows or hides the guided first-turns goals list. Each switch gets one clear job.
 - **D-TUT-14**: (was OQ-TUT-14) Free tier reference: the source is gap list 1, item 2 (Ottomans and France). Only the citation was wrong.
 - **D-TUT-15**: (was OQ-TUT-15) Pastoral realms and lens marks: a pastoral realm gets the normal food goal "Choose how your castles share food"; the herds text is dropped. The tutorial's two lenses keep their non-colour marks (Food: hunger icon; Faith: hatching at 30 % or more). No herds rules exist, and both lenses already have marks.
+- **D-TUT-16**: First-campaign hints (Leroy, 18 October 2026): before the goals list and the tutorial are built, the first campaign carries six one-line hints that point at the card or button to tap: pick a realm, move an army, end the turn, recruit, build, send an envoy. They are the first slice of guided first turns (§4), not a tutorial chapter: real screens, no scenario, no vizier. "Tutorial hints" switches them with the goals list, so the switch still has one job: the first-campaign guidance. Which hints are done is the player's, not the save's, so a second campaign does not teach them again.
 
 ### Province (province)
 
@@ -561,6 +565,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SUBJ-25**: (was OQ-SUBJ-25) Reason names: "Official lent" (+1), "Hostage harmed" (−2) and "Force used" (−1). Kin and Hostage at court are separate ties and stack (+2). Each reason is named once.
 - **D-SUBJ-26**: First game slice of subjects (milestone 5, provisional): every realm has a subject reach of 5 (moderate) until the catalogue's administrative capacity is read; faith and *Far away* give no reasons yet (no faith data, no distance rule); grain tribute, residents, hostages, tightening, folding in, risings and the subjects lens wait for their slices. A subject's loyalty is counted only at season ends, so the turn stays cheap.
 - **D-SUBJ-27**: Second game slice of subjects (milestone 5, provisional): residents, tightening and folding in use an envoy that stays at the subject's court with the status of a resident, so it takes a seat like any envoy; folding in needs a shared land border (no sea routes yet); a folded-in subject's army disbands and its treasury is lost, since lords hold no retinue or wealth in the game yet; *Foreign rule* waits for culture and faith. Backers are judged, not bargained for: a rival or hostile realm of the overlord at peace, bordering the subject and at least as strong as the overlord, counts as willing, but does not join the war yet.
+- **D-SUBJ-28**: Reach and belief for subjects (provisional): each realm's subject reach comes from its catalogue administrative capacity by SUBJ-056 (very low 2 … very high 9), moderate (5) where the catalogue has no assessment, with no government-form change yet. *Same people* compares the two realms' court tongues and *Same faith* or *Different faith* their state faiths from the 1444 seed, falling back to the name books where a realm has no court tongue; *Far away* still waits for a distance rule.
 
 ### Time and turns (time-and-turns)
 

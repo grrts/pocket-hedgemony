@@ -3201,3 +3201,147 @@ button.belief-line {
   font-style: normal;
   color: var(--cloth);
 }
+
+/* ---- Settings card, under the side tools: Gameplay's Tutorial hints (onboarding TUT-128) ---- */
+
+.settings-menu .settings-group {
+  margin: 4px 0 0;
+  font: 600 15px/1.2 var(--body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.settings-row {
+  grid-template-columns: 1fr 64px;
+}
+
+.settings-row span small {
+  display: block;
+}
+
+.settings-row .toggle {
+  grid-column: 2;
+}
+
+.settings-menu .settings-action {
+  min-height: 44px;
+  margin-top: 6px;
+  font-size: 17px;
+}
+
+/* ---- First-campaign hints (onboarding TUT-127 … TUT-130) ----
+   One note along the bottom, between the overview button and End turn, and
+   under the top bar when what it points at is low; a brass ring that takes no
+   taps around the button to press. */
+
+.hint-note {
+  position: fixed;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 9;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  width: min(460px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
+  max-height: 33vh;
+  overflow: auto;
+  padding: 2px 4px 4px 6px;
+  border-width: 8px;
+  border-image-width: 8px;
+  font-size: 18px;
+  line-height: 1.15;
+  animation: hint-in 0.2s steps(4);
+}
+
+@keyframes hint-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.hint-note.top {
+  bottom: auto;
+  top: calc(env(safe-area-inset-top) + 50px);
+}
+
+.hint-note[hidden] {
+  display: none;
+}
+
+.hint-note .hint-count {
+  font: 600 15px/1 var(--body);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.hint-note p {
+  flex: 1 1 12em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.hint-note .hint-buttons {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.hint-note .hint-buttons button {
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 17px;
+}
+
+.hint-note .hint-buttons .dismiss {
+  width: 44px;
+  padding: 0;
+}
+
+.hint-ring {
+  position: fixed;
+  z-index: 9;
+  pointer-events: none;
+  border: 3px solid var(--brass-light);
+  box-shadow:
+    0 0 0 3px var(--outline),
+    inset 0 0 0 2px var(--outline);
+  animation: hint-pulse 1s steps(2) infinite;
+}
+
+.hint-ring[hidden] {
+  display: none;
+}
+
+@keyframes hint-pulse {
+  50% {
+    border-color: var(--brass);
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint-ring {
+    animation: none;
+  }
+}
+
+/* A phone narrower than the note's room keeps it above End turn, full width. */
+@media (max-width: 560px) {
+  .hint-note {
+    width: calc(100vw - 2 * max(8px, env(safe-area-inset-left), env(safe-area-inset-right)));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 72px);
+  }
+}
+
+/* A phone held upright shows only its turn-sideways notice (TUT-130). */
+@media (orientation: portrait) and (pointer: coarse) {
+  .hint-note,
+  .hint-ring {
+    display: none !important;
+  }
+}

@@ -11,6 +11,7 @@ import { monthlyMoods } from "./moods.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameRouteMode, type GameTraderKind } from "./trade.ts";
+import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
@@ -137,7 +138,9 @@ export type Order =
   | { type: "faithPolicy"; faith: string; policy: string }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
-  | { type: "foodPreset"; name: string };
+  | { type: "foodPreset"; name: string }
+  /** Ports, sailors and fleets: muster, buy a ship, sail, board, land, admiral, merge, split, disband (navy.ts). */
+  | NavyOrder;
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -172,6 +175,7 @@ export function advance(world: World, steps: number): News[] {
   for (let s = 0; s < steps; s++) {
     if (world.step === 0) startDay(world, news);
     stepMarches(world, HOURS_PER_STEP);
+    stepNavy(world, HOURS_PER_STEP, news);
     engage(world, news);
     fightRound(world, news);
     for (let i = 0; i < world.armies.count; i++) if (world.armies.alive[i] && world.armies.men[i]! < 1) world.armies.alive[i] = 0;
@@ -214,6 +218,7 @@ function startDay(world: World, news: News[]): void {
     monthlyResearch(world, news);
     monthlyTrade(world, news);
     runLedger(world, true);
+    monthlyNavy(world, news);
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
     monthlyWorks(world, news);
@@ -382,6 +387,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":
       return orderMarch(world, order, actingNation);
+    case "navy":
+      return navyOrder(world, order, actingNation, news);
   }
 }
 

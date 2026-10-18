@@ -8,3 +8,4 @@
 export * from "./tutorial.ts";
 export * from "./attention.ts";
 export * from "./almanac.ts";
+export * from "./hints.ts";

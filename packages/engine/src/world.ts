@@ -26,6 +26,7 @@ import { createGovernmentState, seedGovernment, type GovernmentState } from "./g
 import { createTradeState, seedTrade, type TradeState } from "./trade.ts";
 import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
+import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 
 /**
@@ -133,6 +134,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
   commanderSeed: number[];
+  /** Ports, sailors, ships and fleets (navy.ts). */
+  navy: NavyState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
 }
@@ -415,6 +418,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
     ...createTradeState(P, N),
+    navy: createNavyState(P),
     ...createPeoplesState(P, N),
   };
   world.diplomacy = createWarState(world);
@@ -458,6 +462,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   });
   seedResearch(world);
   if (opts.seedTrade !== false) seedTrade(world);
+  seedNavy(world);
   recount(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.

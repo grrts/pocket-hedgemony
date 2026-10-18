@@ -3,7 +3,7 @@ import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, processTurn, type World } from "../src/index.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
-import { aiRisings, bondOf, foldInRealm, independencePeace, monthlySubjectEnvoys, riseUp, seasonalSubjects, subjectAnswersCall, subjectByAgreement, subjectPayments, subjectTies, whyNotSubjectAction } from "../src/subjects.ts";
+import { aiRisings, reachOf, bondOf, foldInRealm, independencePeace, monthlySubjectEnvoys, riseUp, seasonalSubjects, subjectAnswersCall, subjectByAgreement, subjectPayments, subjectTies, whyNotSubjectAction } from "../src/subjects.ts";
 import { statecraftView, whyNotEnvoy } from "../src/statecraft.ts";
 import { LEDGER, LEDGER_LINES, runLedger } from "../src/treasury.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
@@ -74,7 +74,7 @@ describe("subjects (milestone 5)", () => {
     const view = statecraftView(w, me)!.subjects!;
     const row = view.subjects.find((s) => s.subject === g)!;
     expect(row.reasons.some((r) => r.label === "Gift")).toBe(true);
-    expect(view.reach).toBe(5);
+    expect(view.reach).toBe(reachOf(w, me));
     processTurn(w, [{ type: "subjectAction", subject: g, action: "release" }], me);
     expect(dip.relations.overlord(w.diplomacy.graph, "granada")).toBeNull();
     expect(dip.relations.stance(w.diplomacy.graph, "granada", "castile")).toBe("friendly");
@@ -164,5 +164,19 @@ describe("subjects (milestone 5)", () => {
     // At peace and with no backer next door, it waits.
     aiRisings(w, news as never);
     expect(dip.relations.overlord(w.diplomacy.graph, "granada")).toBe("castile");
+  });
+
+  it("reads reach from the realm's administrative capacity, and faith and tongue as reasons (SUBJ-056, SUBJ-032, D-SUBJ-28)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = nation(w, "castile");
+    const g = nation(w, "granada");
+    w.nationAdminCapacity[me] = 5;
+    expect(reachOf(w, me)).toBe(9);
+    w.nationAdminCapacity[me] = 0;
+    expect(reachOf(w, me)).toBe(5);
+    w.player = me;
+    const row = statecraftView(w, me)!.subjects!.subjects.find((s) => s.subject === g)!;
+    // Catholic Castile over Sunni Granada: a different faith pulls away.
+    expect(row.reasons.some((r) => r.label === "Different faith")).toBe(true);
   });
 });
