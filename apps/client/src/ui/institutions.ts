@@ -229,7 +229,7 @@ const hasOwnSeat = (v: EmpireView) => v.seats.some((s) => s.seekWhyNot === "your
 export function electionAnswerCard(v: EmpireView | null, ui: InstitutionsUi): string {
   if (!v?.election || !hasOwnSeat(v)) return "";
   return `<div class="call framed-soft empire-ask">
-    <p>${icon("crown", 2)} <b>The Empire elects its Emperor:</b> ${esc(v.election.why)}</p>
+    <p>${icon("crown", 2)}<span><b>The Empire elects its Emperor:</b> ${esc(v.election.why)}</span></p>
     ${voteButtons(v, ui)}
     <button class="paper" data-empire-open>Open the Empire card</button>
   </div>`;
@@ -240,7 +240,7 @@ export function dietAnswerCard(v: EmpireView | null, ui: InstitutionsUi): string
   const d = v?.reforms.diet;
   if (!v || !d || !v.role || d.playerVote) return "";
   return `<div class="call framed-soft empire-ask">
-    <p>${icon("scroll", 2)} <b>The Diet sits on the ${esc(d.name)}:</b> ${esc(v.reforms.ladder.find((x) => x.id === d.reform)?.effect ?? "")} The votes are counted in ${esc(ui.month(d.ends))}; today ${forecastText(d.yes, d.no, false)}.</p>
+    <p>${icon("scroll", 2)}<span><b>The Diet sits on the ${esc(d.name)}:</b> ${esc(v.reforms.ladder.find((x) => x.id === d.reform)?.effect ?? "")} The votes are counted in ${esc(ui.month(d.ends))}; today ${forecastText(d.yes, d.no, false)}.</span></p>
     ${dietButtons(v)}
     <button class="paper" data-empire-open>Open the Empire card</button>
   </div>`;
@@ -252,7 +252,7 @@ export function rulingAnswerCards(v: EmpireView | null, ui: InstitutionsUi): str
   return v.reforms.rulings
     .map(
       (r) => `<div class="call framed-soft empire-ask">
-    <p>${icon("crown", 2)} <b>The Imperial Court rules you hand ${esc(ui.province(r.province))} to ${esc(ui.name(r.plaintiff))}.</b> Answer by ${esc(ui.month(r.answerOn))}.</p>
+    <p>${icon("crown", 2)}<span><b>The Imperial Court rules you hand ${esc(ui.province(r.province))} to ${esc(ui.name(r.plaintiff))}.</b> Answer by ${esc(ui.month(r.answerOn))}.</span></p>
     <div class="choices two"><button class="wax" data-ruling="${esc(r.id)}" data-yes="1">Hand it over</button><button class="paper" data-ruling="${esc(r.id)}" data-yes="0">Refuse</button></div>
     <p class="hint">Refusing makes you a Breaker of the Peace: the Emperor and every member may make war on you. If you don't answer, it is handed over.</p>
   </div>`,

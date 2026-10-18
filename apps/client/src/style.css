@@ -4863,6 +4863,9 @@ small.why {
   margin: 6px 0 0;
   border-bottom: 1px solid var(--outline);
 }
+.empire-card {
+  container: empire / inline-size;
+}
 .empire-card .stand {
   width: 100%;
   margin-top: 8px;
@@ -4872,6 +4875,14 @@ small.why {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+}
+/* An answer card's line: the icon, then its words in one block beside it. */
+.empire-ask p {
+  align-items: flex-start;
+}
+.empire-ask p > span {
+  flex: 1 1 12em;
+  min-width: 0;
 }
 .empire-card h4 {
   margin: 10px 0 2px;
@@ -4897,6 +4908,15 @@ small.why {
 /* The ladder's rows are 44 points like every row of the card; a passed reform carries a tick and the word, not a colour alone. */
 .ladder li {
   min-height: 44px;
+}
+@container empire (min-width: 560px) {
+  .ladder {
+    columns: 2;
+    column-gap: 16px;
+  }
+  .ladder li {
+    break-inside: avoid;
+  }
 }
 .ladder .tick {
   flex: 0 0 1.2em;
