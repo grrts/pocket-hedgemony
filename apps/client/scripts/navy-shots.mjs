@@ -1,6 +1,6 @@
 // Ships and ports as Portugal (naval spec, How the player uses it): the Port tab of Lisbon, mustering sailors and
 // ordering a cog and a galley, the fleet on the map, its card with a leader and his three posts, the sighting ring
-// of the fleet chosen to sail, sailing by tapping the sea, and the Navy tab; then war on a neighbour and a blockade off
+// of the fleet chosen to sail, sailing by tapping the sea, and the Navy tab; then, as the Ottomans, war on a neighbour and a blockade off
 // its coast: the chain marks on the map, the fleet card's blockade line and the Navy tab's Blockades (NAVY-161..164);
 // on a small and a large phone held sideways, a phone held upright (asked to turn), and a desktop.
 // Usage: pnpm build && node scripts/navy-shots.mjs <outDir>
@@ -20,8 +20,8 @@ const check = (page, name, what) =>
     return { small, sideways: panel.scrollWidth > panel.clientWidth + 1, ...(posts.length ? { postsOneRow: new Set(posts).size === 1, posts: posts.length } : {}) };
   }).then((r) => console.log(name, what, JSON.stringify(r)));
 
-for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["landscape", devices["Pixel 7 landscape"]], ["portrait", devices["Pixel 7"]], ["desktop", { viewport: { width: 1280, height: 800 } }]]) {
-  const page = await browser.newPage({ ...device });
+for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["landscape", devices["Pixel 7 landscape"]], ["portrait", devices["Pixel 7"]], ["desktop", { viewport: { width: 1280, height: 800 } }]].filter(([n]) => !process.env.ONLY || process.env.ONLY.split(",").includes(n))) {
+  let page = await browser.newPage({ ...device });
   page.on("pageerror", (e) => console.log("pageerror:", e.message));
   const shot = (what) => page.screenshot({ path: `${out}/${name}-${what}.png`, timeout: 120000 });
   await page.goto("http://localhost:4183/");
@@ -96,7 +96,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     await endTurn();
   }
   console.log(name, "fleets", await page.evaluate(() => window.__phNavy().mine.map((m) => m.ships.map((s) => s.type))));
-  const flagship = await page.evaluate(() => window.__phNavy().mine.find((m) => m.ships.some((s) => s.type === "galley"))?.id ?? window.__phNavy().mine[0].id);
+  let flagship = await page.evaluate(() => window.__phNavy().mine.find((m) => m.ships.some((s) => s.type === "galley"))?.id ?? window.__phNavy().mine[0].id);
   for (const other of await page.evaluate((id) => window.__phNavy().mine.filter((m) => m.id !== id).map((m) => m.id), flagship))
     console.log(name, "merge", await page.evaluate(([fleet, into]) => window.__phNavyOrder({ do: "merge", fleet, into }), [other, flagship]));
   // The fleet off Lisbon on the map.
@@ -152,13 +152,32 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await shot("6-sailing");
   await endTurn();
   await shot("7-at-sea");
-  // War on the nearest realm whose coast these ships can reach (galleys keep to the coast), and the fleet sent to lie
-  // off that coast: a blockade (NAVY-155, NAVY-156).
+  // Portugal's galleys may not leave its ocean coast, so the blockade is played as the Ottomans, whose galleys hold the
+  // Aegean: war on the nearest realm whose coast they can reach, and the fleet sent to lie off it (NAVY-155, NAVY-156).
+  await page.close();
+  page = await browser.newPage({ ...device });
+  await page.goto("http://localhost:4183/");
+  await page.waitForSelector("[data-nation=ottomans]", { timeout: 60000 });
+  await page.click("[data-nation=ottomans]");
+  await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
+  await page.locator("[data-hint=stop]").first().click({ timeout: 3000 }).catch(() => {});
+  flagship = await page.evaluate(() => window.__phNavy().mine.find((m) => m.ships.some((s) => s.type === "galley"))?.id ?? -1);
+  const home = await page.evaluate((id) => window.__phNavy().fleets.find((f) => f.id === id)?.at ?? -1, flagship);
+  const leader = await page.evaluate(() => window.__phCommission());
+  console.log(name, "ottoman fleet", flagship, "commission", JSON.stringify(leader));
+  if (leader?.length) console.log(name, "free commander", await page.evaluate(() => window.__phFreeCommander()));
+  const idle = await page.evaluate(() => window.__phIdleCommander());
+  console.log(name, "admiral", idle, await page.evaluate(([fleet, commander]) => window.__phNavyOrder({ do: "admiral", fleet, commander }), [flagship, idle]));
   let off = -1;
-  for (const foe of await page.evaluate((p) => window.__phCoastRealms(p), lisbon)) {
-    for (const z of await page.evaluate(([id, p]) => window.__phSeaBy(id, p), [foe, lisbon])) {
+  const foes = await page.evaluate((p) => window.__phCoastRealms(p), home);
+  console.log(name, "coast realms", JSON.stringify(foes));
+  for (const foe of foes) {
+    for (const z of await page.evaluate(([id, p]) => window.__phSeaBy(id, p), [foe, home])) {
       const no = await page.evaluate(([fleet, to]) => window.__phNavyOrder({ do: "sail", fleet, to }), [flagship, z]);
-      if (no.length) continue;
+      if (no.length) {
+        console.log(name, "no way to", foe, z, JSON.stringify(no));
+        continue;
+      }
       console.log(name, "war on", foe, JSON.stringify(await page.evaluate((id) => window.__phWar(id), foe)), "sail to", z);
       off = z;
       break;
@@ -179,6 +198,8 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(300);
   await page.click("[data-realm-tab=navy]");
   await page.waitForTimeout(300);
+  await page.locator(".panel h3.sub", { hasText: "Blockades" }).scrollIntoViewIfNeeded().catch(() => {});
+  await page.waitForTimeout(200);
   await shot("9-navy-blockades");
   await check(page, name, "navy tab blockades");
   await page.click(`[data-fleet-open="${flagship}"]`);

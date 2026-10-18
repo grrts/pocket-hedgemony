@@ -5408,6 +5408,8 @@ Object.assign(globalThis, {
     await act({ type: "appoint", army: a.id[slot]!, commander: -1 });
     return snapshot.rejectedOrders.map((r) => r.reason);
   },
+  /** The first commander of the player's free to lead (scripts/navy-shots.mjs), or -1. */
+  __phIdleCommander: () => idleCommanders()[0] ?? -1,
   /** Declares war on a realm by id (scripts/navy-shots.mjs: a blockade). */
   __phWar: (id: string) => act({ type: "declareWar", target: nationIndex.get(id)! }).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
   /** The nearest sea zones (up to eight, nearest first), over the sea from port p, that lie beside a coastal province of a realm by id. */
