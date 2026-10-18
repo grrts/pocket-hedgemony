@@ -2,7 +2,7 @@ import { lordsLoseWar } from "./lords.ts";
 import { castleStep } from "./works.ts";
 import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
-import { subjectAnswersCall } from "./subjects.ts";
+import { independencePeace, subjectAnswersCall } from "./subjects.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { planRoute } from "./march.ts";
@@ -774,7 +774,8 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
   const truceMonths = dip.truceMonthsAfterPeace({ landOrSubject: ceded.length > 0, white: ceded.length === 0 });
   const involved = whole ? [...war.attackers, ...war.defenders].map((id) => world.nationIndex.get(id)!) : [a, b];
   // Realms that give up land lost the war in their lords' eyes.
-  for (const n of new Set(ceded.map((p) => world.provinceOwner[p]!))) lordsLoseWar(world, n, news);
+  const cededFrom = new Set(ceded.map((p) => world.provinceOwner[p]!));
+  for (const n of cededFrom) lordsLoseWar(world, n, news);
   for (const p of ceded) {
     world.provinceOwner[p] = world.provinceOccupier[p]!;
     world.provinceLord[p] = -1;
@@ -787,7 +788,11 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
     const st = world.sieges.get(p);
     if (st && set.has(st.by) && set.has(world.provinceOwner[p]!)) world.sieges.delete(p);
   }
-  if (whole) dip.endWar(d, war, { truceMonths });
+  if (whole) {
+    dip.endWar(d, war, { truceMonths });
+    // An independence war's peace decides whether the subject stays free (SUBJ-078, SUBJ-079).
+    independencePeace(world, war, cededFrom, news);
+  }
   else {
     rel.makePeace(d.graph, world.nationIds[a]!, world.nationIds[b]!, { truceMonths });
     // The one who is not a war leader leaves the war.
@@ -837,7 +842,7 @@ function addBorders(world: World, n: number): void {
 }
 
 /** A realm left with no land is gone: its armies disband and its wars end (DIPL country destroyed). */
-function checkDestroyed(world: World, news: News[]): void {
+export function checkDestroyed(world: World, news: News[]): void {
   const holds = new Uint8Array(world.nationCount);
   for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p]! >= 0) holds[world.provinceOwner[p]!] = 1;
   for (let n = 0; n < world.nationCount; n++) {

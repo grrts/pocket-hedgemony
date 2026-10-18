@@ -119,7 +119,8 @@ export function mySubjects(v: StatecraftView | null, realmButton: (n: number) =>
   const over = s.overlord
     ? `<h3 class="sub">Your overlord</h3>
       <p>${realmButton(s.overlord.overlord)} <small>You are its ${esc(s.overlord.kindName.toLowerCase())}, <b class="${loyaltyClass(s.overlord.loyalty)}">${esc(s.overlord.loyalty)}</b>; you send it ${Math.round(s.overlord.pays)} gold a month.</small></p>
-      ${reasonBadges(s.overlord)}`
+      ${reasonBadges(s.overlord)}
+      ${s.overlord.loyalty === "Disloyal" ? `<button class="wax" data-rise>${icon("swords", 2)}Rise for independence</button><p class="hint">You declare war on your overlord. Win, or end it without giving up land, and you are free; lose land in the peace and you are made its subject again, one kind tighter.</p>` : `<p class="hint">Only a Disloyal subject can rise against its overlord.</p>`}`
     : "";
   if (!s.subjects.length) return over;
   return `${over}<h3 class="sub">Subjects</h3>
@@ -147,6 +148,13 @@ export function subjectCard(v: StatecraftView | null, r: number): string {
       ${btn("gift", `${icon("coin", 2)}Send a gift`, row.why.gift, `${row.giftCost} gold, six months of their income: +1 loyalty for 5 years.`)}
       ${btn("loosen", "Loosen to tributary", row.why.loosen, "They become a tributary: they pay 15 in 100 of their income, stay out of your wars, and like it (+2 for 10 years).")}
       ${btn("release", "Release", row.why.release, "They go free as your friend.")}
+    </div>
+    <h3 class="sub">Your envoys at their court</h3>
+    ${row.work ? `<p>${icon("scroll", 1)} Your envoy is ${row.work.action === "fold_in" ? "folding them into your realm" : "tightening them to a vassal"}: ${row.work.monthsLeft} month${row.work.monthsLeft === 1 ? "" : "s"} to go${row.work.action === "fold_in" ? ", as long as they stay Loyal" : ""}.</p>` : ""}
+    <div class="missions">
+      ${row.resident ? btn("recall", "Recall your resident", row.why.recall, "Your envoy comes home; they lose the +1.") : btn("resident", `${icon("scroll", 2)}Station a resident`, row.why.resident, "One of your envoys stays at their court: +1 loyalty, and you see their true army.")}
+      ${row.kind === "tributary" ? btn("tighten", "Tighten to vassal", row.why.tighten, "One envoy for 6 months; they then pay 10 in 100 of their taxes and answer your calls. A Wavering tributary refuses and drops a step.") : ""}
+      ${row.kind !== "tributary" ? btn("fold_in", `${icon("crown", 2)}Fold into your realm`, row.why.fold_in, "One envoy for a month per province. Their land becomes yours, held by their ruler as one of your lords, and the country leaves the map.") : ""}
     </div>`;
 }
 
