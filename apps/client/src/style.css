@@ -4014,6 +4014,51 @@ small.why {
   border-style: dashed;
   opacity: 0.6;
 }
+/* A ladder's level, such as 3/5, in the badge's corner (ACH-086). */
+.ach-badge {
+  position: relative;
+}
+.ach-level {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  padding: 0 3px;
+  font: 600 12px/14px var(--body);
+  font-style: normal;
+  color: var(--paper-light);
+  background: var(--outline);
+  text-shadow: none;
+}
+.ach-levels {
+  grid-column: 1 / -1;
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.ach-levels li {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  gap: 6px;
+  align-items: center;
+  padding: 3px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  opacity: 0.7;
+}
+.ach-levels li.earned {
+  opacity: 1;
+}
+.ach-levels li > b {
+  font-size: 17px;
+  text-align: center;
+}
+.ach-levels li em {
+  font-style: normal;
+  white-space: nowrap;
+}
+.ach-levels li.earned em {
+  color: #3d6b2a;
+  font-weight: 600;
+}
 
 .ach-head {
   display: flex;

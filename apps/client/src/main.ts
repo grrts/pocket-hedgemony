@@ -68,7 +68,7 @@ import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
 import { fleetButton, fleetCard, navyTab, portTab } from "./ui/navy.ts";
 import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } from "./ui/explore.ts";
-import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
+import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, tileKey, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
 import { Hints, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
@@ -403,7 +403,7 @@ function openAchievements(at: string | null = null): void {
     return;
   }
   achView = true;
-  achChosen = at;
+  achChosen = at ? tileKey(at) : null;
   if (at) achFilter = "all";
   achNew = new Set(Object.keys(achProfile.unlocked).filter((id) => !achProfile.seen.includes(id)));
   achProfile.seen = Object.keys(achProfile.unlocked);
