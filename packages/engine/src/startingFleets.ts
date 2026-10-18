@@ -3,7 +3,7 @@ import type { World } from "./world.ts";
 import { Rng } from "./rng.ts";
 import { mix } from "./names.ts";
 import { realmStrengths } from "./realmStrengths.ts";
-import { aiShip, berthsOf, harbourStep, isPort, localTradeShip, newShip } from "./navy.ts";
+import { aiShip, berthsOf, harbourStep, isPort, localTradeShip, newShip, shipyardOf } from "./navy.ts";
 
 const lonOf = (world: World, p: number): number => {
   const m = world.rules.map;
@@ -37,7 +37,7 @@ export function seedStartingFleets(world: World): void {
     if (!war && !transports) continue;
     // The best yard, then the biggest harbour, then the nearest to the capital (the lower index on a tie).
     const capital = world.provinceIndex.get(world.rules.nations[n]!.capital) ?? -1;
-    const score = (p: number) => v.shipyard[p]! * 8 + harbourStep(world, p) * 2 + (p === capital ? 1 : 0);
+    const score = (p: number) => shipyardOf(world, p) * 8 + harbourStep(world, p) * 2 + (p === capital ? 1 : 0);
     const port = mine.reduce((b, p) => (score(p) > score(b) ? p : b), mine[0]!);
     const warship = aiShip(world, n, port);
     const trade = localTradeShip(world, port);

@@ -977,6 +977,45 @@ export function tradeSeen(world: World, n: number): Uint8Array {
   return seen;
 }
 
+/** A busy trade path for the living map: its loop province by province, how it goes and the traders on it (VIEW-132). */
+export interface TradePath {
+  /** Seeded from the loop, so its movers keep their places between snapshots. */
+  id: number;
+  medium: "land" | "river" | "sea";
+  path: number[];
+  traders: number;
+  /** The realm of its first trader, for the colours. */
+  owner: number;
+  /** One of the player's traders on it, whose card a tap opens; -1 if none. */
+  mine: number;
+}
+
+/**
+ * The busy trade paths realm n may see on the map: traders sharing a loop and
+ * a way of going are one path, kept where the loop enters a province the realm
+ * sees (D-TRADE-13), busiest first, at most `max`. With no realm, every path.
+ * Planned without keeping, so looking never changes the game.
+ */
+export function tradePaths(world: World, n: number, max: number, seen: Uint8Array | null = n >= 0 ? tradeSeen(world, n) : null): TradePath[] {
+  const byKey = new Map<string, TradePath>();
+  for (const t of world.traders) {
+    const path = peekPath(world, t);
+    if (path.length < 2) continue;
+    const medium = isShip(t.kind) ? "sea" : t.kind === "river_barge" ? "river" : "land";
+    const key = `${medium} ${path.join(",")}`;
+    let e = byKey.get(key);
+    if (!e) {
+      if (seen && !path.some((p) => seen[p])) continue;
+      let h = medium.length;
+      for (const p of path) h = Math.imul(h ^ p, 0x9e3779b1) >>> 0;
+      byKey.set(key, (e = { id: h, medium, path: path.slice(), traders: 0, owner: t.owner, mine: -1 }));
+    }
+    e.traders++;
+    if (t.owner === n && e.mine < 0) e.mine = t.id;
+  }
+  return [...byKey.values()].sort((a, b) => b.traders - a.traders || a.id - b.id).slice(0, max);
+}
+
 // ---------------------------------------------------------------- saves
 
 /** A trader as saved: its kind by number, so no build text reaches the save. */

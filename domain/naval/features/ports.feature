@@ -4,6 +4,12 @@ Feature: Ports
   I want ports to be provinces with a harbour, with berths and slipways by building step
   So that ships can only be bought, crewed and sheltered where a realm has built for the sea
 
+  @NAVY-147
+  Scenario: A port needs a shipyard to muster sailors and build ships
+    Given the port "Funchal" has a harbour and no shipyard
+    Then no sailors can be mustered in the port "Funchal"
+    And no ship can be ordered in the port "Funchal"
+
   @NAVY-001 @NAVY-002
   Scenario: A province with a harbour on a shore tile is a port
     Given the province "Lagos" has a harbour at step 2 on a shore tile

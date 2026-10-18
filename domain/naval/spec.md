@@ -62,6 +62,9 @@ Newest decision first.
 | Anchorage | Where ships ride beyond a port's berths: resupply but no refit, rot and storms as at sea | Berth |
 | Drawn up | Galleys, cogs and small craft pulled on the beach in a port: no berth taken, rot at the anchorage rate | Laid up |
 | Slipway | Room in a shipyard to build one hull at a time | Berth |
+| Muster queue | A port's sailors on their way, in batches that come in one after another | Sailors in port |
+| Ship queue | Ships ordered and paid for in a port, waiting their turn for a slipway and their crew | Hulls on slipways |
+| Upgrade path | The order in which a newer ship type replaces an older one in what a port offers | Ship family |
 | Sailor | A person mustered from a port province's people, counted one by one; their home slot stays empty while they serve | Seafolk (the class), crew |
 | Sailors in port | Mustered sailors waiting in a named port to board a ship | Crew |
 | Crew | Sailors aboard a ship; also the crew number a ship type needs | Sailors in port |
@@ -168,7 +171,7 @@ Newest decision first.
 
 - NAVY-001: The naval system shall treat a province as a port when it has a harbour on a shore tile. [naval §1.1]
 - NAVY-002: The naval system shall allow mustering sailors, buying ships (other than small craft) and berthing
-  ships only in a port. [naval §1.1]
+  ships only in a port. [naval §1.1] Mustering and buying need a shipyard too (NAVY-147, D-NAVY-33).
 - NAVY-003: If a coastal province has no harbour, then the naval system shall treat it as a plain shore where
   seafolk fish from the beach, small craft can be launched and armies can land, and where no ship can be bought
   (other than small craft), berthed or crewed. [naval §1.1]
@@ -224,7 +227,7 @@ Newest decision first.
 - NAVY-027: The naval system shall take sailors from the same people as the levy, so a man at sea cannot be
   levied and the province's levy pool shows the sailors already gone. [naval §2.2]
 - NAVY-028: When a muster is ordered, the naval system shall pay a bounty of 0.05 gold a sailor (rounded), lower the
-  province's fish by seafolk at sea ÷ a third of the province's seafolk, and have the sailors ready in that port after 14 days. [naval §2.2, §9] (D-NAVY-14)
+  province's fish by seafolk at sea ÷ a third of the province's seafolk, and have the sailors ready in that port after 14 days. [naval §2.2, §9] (D-NAVY-14) Since D-NAVY-33 the 14 days run for each batch of the muster queue in turn (NAVY-148).
 - NAVY-029: While sailors wait in port, the naval system shall feed each 1 ration a month from the province store
   and pay each 0.1 gold a month. [naval §2.2]
 - NAVY-030: While sailors have waited in port more than 6 months and no ship is being built for them, the naval
@@ -257,10 +260,12 @@ Newest decision first.
 
 - NAVY-042: When a ship is ordered, the naval system shall require in the same port enough sailors in port for its
   crew, a free slipway of the step the hull needs (or only the harbour for small hulls), and the gold and timber,
-  paid when the order is placed. [naval §3.1]
+  paid when the order is placed. [naval §3.1] Replaced by D-NAVY-33: the gold is paid when the ship is ordered,
+  and the crew and a free slipway are needed when the ship is laid down from the port's ship queue (NAVY-149).
 - NAVY-043: When a ship is ordered, the naval system shall assign the crew to the hull, and the crew shall help
   build it alongside the shipyard's own seafolk. [naval §3.1, §3.3]
 - NAVY-044: If a port lacks the sailors for a ship's crew, then the naval system shall refuse the order. [naval §3.1]
+  Replaced by D-NAVY-33: the order waits in the ship queue until its crew is in port (NAVY-149).
 - NAVY-045: The naval system shall sell only ship types the realm has unlocked in the S bough (and, for
   exploration ships, the exploration unlock). [naval §3.3, §3.2]
 - NAVY-046: The naval system shall put every ship type in one family, trade, military or exploration, carrying 15
@@ -269,7 +274,8 @@ Newest decision first.
   crew, gold, timber, months, upkeep, and trade's hold and purse. [naval §3.3]
 - NAVY-048: Where a port has no slipway, the naval system shall let its harbour build cogs, junks, dhows and
   caravels one at a time, taking half as many months again; with slipways, at the table's months, as many at once
-  as there are slipways. [naval §3.3]
+  as there are slipways. [naval §3.3] Replaced by D-NAVY-33 (Leroy): without a shipyard no ship is built; every
+  hull is built on a slipway at the table's months (NAVY-147).
 - NAVY-049: The naval system shall make the cog, junk or dhow type follow the sea: cog in Europe, junk in East and
   Southeast Asia, dhow in the Indian Ocean and Red Sea. [naval §3.3]
 - NAVY-050: Where a ship type shoots (armed carrack and later), the naval system shall require its guns, cast or
@@ -440,13 +446,32 @@ Newest decision first.
 - NAVY-124: When a fleet docks in a subject's or lord's port, the naval system shall take its food from that province's store and owe nothing. (D-NAVY-28)
 - NAVY-125: From December to March, the naval system shall close the northern sea zones that froze historically (Gulf of Bothnia, White Sea and the far north; provisional list in config until world-map has it) to fleets, and their ports shall neither launch nor take in ships. (X-17)
 
+### Shipyards, build queues and the upgrade path (Leroy, 18 Oct; D-NAVY-33)
+
+- NAVY-147: The naval system shall muster sailors and order ships only in a port with a shipyard; the shipyard is a
+  work of the buildings list (slipway yard, shipyard, naval dockyard) built on a province with a harbour, and,
+  being part of the harbour, takes no slot of its own. The 1444 shipyards (NAVY-014) stand as these works. [F-116, F-117]
+- NAVY-148: When sailors are mustered, the naval system shall put them in the port's muster queue in batches of
+  `naval.game.queues.musterBatch` (50, provisional), each ready `naval.muster.days` (14) after the batch before it,
+  at most `musterQueueMax` (10) batches waiting; the last batch can be taken off the queue for its bounty and men back. [F-108]
+- NAVY-149: When a ship is ordered, the naval system shall take its gold and put it in the port's ship queue, at most
+  `shipQueueMax` (5) waiting; the first ship waiting is laid down when a slipway is free and its whole crew waits in
+  port, and the ships behind it wait their turn; the last ship waiting can be taken off the queue for its gold back.
+  A ship waiting in a port its realm has lost is dropped and its gold given back. [F-109]
+- NAVY-150: The naval system shall offer in a port only the ship types the realm has unlocked and that port's shipyard
+  can build, and shall stop offering a type once the port can build a type further along its upgrade path
+  (`naval.upgrades`: the sea's cog, junk or dhow, then carrack, fluyt, steamer; galley or war canoe fleet, then armed
+  carrack, galleon, ship of the line; turtle ship, then ship of the line). [F-109]
+- NAVY-151: The naval AI shall build a shipyard first in its biggest harbour when it has none, before its other
+  works, and muster and build only in ports with a shipyard. [F-116, F-117]
+
 ### How the player uses it (first slice in the game)
 
-- NAVY-126 Where: the player taps a coastal province of theirs, then its **Port** tab (beside Overview, People, Garrison, Land and Build; it shows an hourglass while hulls are building). The tab gives the harbour and shipyard, berths taken of all and slipways, the sailors ready in port, on their way and still callable, then *Muster 30 / 100 / 300* with the bounty, the hulls on the slipways with their months left, and *Order a ship*: one row per ship the port can build with its gold, crew, months, fights and carries and an Order button, or why not (crew not in port, no slipway, an invention by its name, gold). [X-19; D-NAVY-30]
+- NAVY-126 Where: the player taps a coastal province of theirs, then its **Port** tab (beside Overview, People, Garrison, Land and Build; it shows an hourglass while hulls are building or ships wait in the queue). The tab gives the harbour and shipyard, berths taken of all and slipways, and the sailors ready in port and still callable. A port with no shipyard says that sailors and ships need one and shows *Build a shipyard*, which opens the Build tab. At a shipyard the tab has two queues, laid out as the Garrison tab's recruit queue: **Sailors**, with *Muster 50 sailors* and, while ships wait for crews, *Muster N for the waiting ships*, each with its bounty, then one row per batch on its way (gathering or waiting, and when it comes in) with a × on the last; and **Ships**, with the slipways busy and ships waiting of the most, one row per hull on a slipway with its months left, then one row per ship waiting with what it waits for (a slipway, so many more sailors, its turn) and a × on the last. *Order a ship* lists one row per ship the yard builds now, newest on each upgrade path only, with its gold, crew, months, fights and carries and an Order button, or why not (gold, a full queue); a line under it names the next types on the path and what they need (an invention by its name, a bigger shipyard here). [X-19; D-NAVY-30; D-NAVY-33; F-108; F-109]
 - NAVY-127 Grouping: one **fleet card** holds everything about a fleet: where it is and what it is doing, Sail, its admiral (appoint, hand over, send back to court), the army aboard (take aboard an army standing in its port, put it ashore), each ship with its crew, hull and supply and *Part off*, *Join another fleet here* and *Lay up*. It opens by tapping the fleet on the map twice, from the Port tab, from a sea zone's card or from the Navy tab. [X-19]
 - NAVY-128 Sailing: tapping one of the player's fleets on the map chooses it, as an army is picked, and folds the panel away; the next tap on a sea zone, a port or a shore sets sail at once, with the voyage drawn as a dotted course. With an army aboard, a shore of a realm the player may march into is a landing and a friend's port is put into. A fleet with no admiral says so on its card instead of a Sail button. An army aboard stands off the map; picking it from the commanders list opens its fleet. An army in a port shows *Board ships* on its card. [X-19; D-NAVY-31]
-- NAVY-129 Overview: the player's own realm card has a **Navy** tab (after Military): ships and fleets, sailors in port or on their way, the month's cost (also the "Ships and sailors" line of the Treasury ledger), sea battles under way, every fleet with where it is and its voyage, and every port with its shipyard, sailors and hulls, each opening its Port tab. A sea battle of the player's is said over the map with Go there and crossed swords mark its zone; launched ships are said over the map too. [X-19]
-- NAVY-130 Phone: the Port tab, fleet card and Navy tab are cards in the side panel in the Wide and Tall layouts, one column, every button at least 44 points high, nothing that needs hover; checked by apps/client/scripts/navy-shots.mjs on a small and a large phone held sideways and upright. [X-19]
+- NAVY-129 Overview: the player's own realm card has a **Navy** tab (after Military): ships and fleets with the ships building and waiting, sailors in port or on their way, the month's cost (also the "Ships and sailors" line of the Treasury ledger), sea battles under way, every fleet with where it is and its voyage, and every port with its shipyard, sailors, sailors coming, hulls building and ships waiting, each opening its Port tab. A sea battle of the player's is said over the map with Go there and crossed swords mark its zone; launched ships are said over the map too. [X-19]
+- NAVY-130 Phone: the Port tab, fleet card and Navy tab are cards in the side panel in the Wide and Tall layouts, one column, every button at least 44 points high (each queue row at least 48 points, its × 44 × 44), nothing that needs hover; checked by apps/client/scripts/navy-shots.mjs on a small and a large phone held sideways and upright. [X-19]
 - NAVY-131 The naval system shall, until the full rules land, fight a sea battle as rounds of 4 hours on one sector: each side's hits are its strength (fights, by crew share, halved out of supply or leaking, galleys halved on the ocean, ×1.5 shooting in the first round, +5 % per point of the admiral's might) × 0.08 × a spread of ±25 %, spent on the enemy's strongest ship first; a ship sinks at damage of its fights; a side breaks at half its starting strength or after 18 rounds, its ships lose a hull step and it runs for its nearest port. (D-NAVY-31)
 
 ### Starting fleets and hired fleets (F-115)
@@ -726,6 +751,7 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 - **D-NAVY-29** (was OQ-NAVY-29) Sailors are mustered by share of every callable class, never seafolk first (X-7): 830 callable (770 seafolk, 45 homeless, 15 others) give 300 sailors as 278 seafolk, 16 homeless and 6 others by largest remainder. X-7 rules out "first" orders.
 - **D-NAVY-30** The game's gold and wages for ships are the design's numbers scaled to the treasury the game pays out (Portugal makes about 9 gold a month): ship prices and upkeep ×0.1, sailors' wages and bounties ×0.01 (`naval.json` `game`). Provisional, to tune with playtests.
 - **D-NAVY-31** First slice of sea battles (NAVY-131) and fleets: the round numbers are provisional (`naval.json` `game`); a ship's fights and carries come from `warfare.json` `ships`, which warfare owns (warfare §11.2). The AI keeps one ship for every two ports, at most four, and hunts enemy fleets it outnumbers by 1.2 within 8 zones.
+- **D-NAVY-33** (Leroy, 18 Oct, feedback 108, 109, 116, 117) Build queues, the upgrade path and shipyards. Sailors are mustered through a queue like the recruit queue, a batch of 50 every two weeks, so a large crew takes time and a port cannot raise hundreds at once; ships are ordered into a queue and laid down when a slipway and their crew are there, so the player can order now and muster after. A port offers only ships the realm can build there, newest on each path: an older type disappears once a newer one on its path can be built in that port, and stays in a smaller yard that can't build the newer one. Without a shipyard no sailor is mustered and no ship built (replacing NAVY-048's beach-built hulls; war canoe fleets and voyaging canoes need a yard too, and only small craft, the fishery's boats, still launch from any shore). The shipyard becomes a work of the buildings list so it can be built; it stands with the harbour and takes no slot, as the granary does with the castle, so the 51 shipyards of 1444 fit; the AI builds one first when it has none. Batch size, queue lengths and the path are provisional (`naval.json` `game.queues`, `upgrades`).
 - **D-NAVY-32** Slipways do not need timber within reach: timber is bought in, as Venice and Lisbon did. Two thirds of the 1444 shipyards have no timber land in reach on the map, which would leave them unable to build.
 
 ## 14. Traceability
@@ -889,6 +915,11 @@ by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/pr
 | NAVY-125 | sailing.feature | Frozen northern seas from December to March |
 | NAVY-126 … NAVY-130 | — | Client screens; checked by apps/client/scripts/navy-shots.mjs |
 | NAVY-131 | — | packages/engine/test/navy.test.ts (sea battle) |
+| NAVY-147 | ports.feature | A port needs a shipyard to muster sailors and build ships |
+| NAVY-148 | sailors.feature | Sailors are mustered through the port's queue |
+| NAVY-149 | buying-ships.feature | A ship ordered waits in the queue for a slipway and its crew |
+| NAVY-150 | buying-ships.feature | A port offers only the newest ship on each upgrade path |
+| NAVY-151 | — | packages/engine/test/exploration.test.ts (the AI builds its shipyard and settles) |
 | NAVY-132 … NAVY-134 | features/starting-fleets.feature | Sea powers start with their ships; The starting fleet's port and ships; Starting crews come from the port |
 | NAVY-135 … NAVY-142 | features/hired-fleets.feature | Free fleets gather in their seas; A sea power lends its fleet; Reach; Pay; Hiring; Own captain; Leaving; The AI hires when outgunned |
 | NAVY-143 … NAVY-146 | — | Client screens; checked by apps/client/scripts/hired-fleet-shots.mjs; the rules by packages/engine/test/hiredFleets.test.ts |
