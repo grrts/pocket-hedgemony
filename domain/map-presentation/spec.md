@@ -258,7 +258,7 @@ Moving pieces
 - VIEW-119 (State-driven): While a battle runs, the two sides' figures shall face each other on the battle tile with their front ranks clashing, and each round take away figures as the side's men fall (VIEW-077). [living-map-design §4.1]
 - VIEW-120 (State-driven): While an army besieges a town, its figures shall stand in a ring round the walls among tents; rebels are the same figures in the rebel colour with no banner; and in the living band the commander's token is replaced by the banner-bearer, whose name shows on selection, or always at street level. [living-map-design §4.1]
 - VIEW-121 (State-driven): While a fleet is at sea in the living band, it shall be drawn as one hull per `shipsPerHull` ships (5 living, 1 street), at most 8 or 24 hulls, sailing in a loose formation round the fleet's point with wakes while it moves, in the ship types of the naval design once they exist and a generic sailing ship until then. [living-map-design §4.2]
-- VIEW-122 (State-driven): While a fleet is in port, its hulls shall lie at the docks' berths, as many as the harbour has berths (`harbourMarks`); a naval battle shows the hulls facing off on the zone with smoke. [living-map-design §4.2]
+- VIEW-122 (State-driven): While a fleet is in port, its hulls shall lie at the docks' berths, one berth for every `berthSpacing` (2) water pixels along the town's waterfront, from the docks out, with the rest waiting off the docks; a naval battle shows the hulls facing off on the zone with smoke. [living-map-design §4.2]
 - VIEW-123 (State-driven): While a trade path is busy, the living band shall show up to 3 movers on it (a caravan of mules and carts on land, a barge on a navigable river, a trading ship at sea), spaced evenly and moving with the game clock from a start seeded by the path, so they never jump between frames or turns. [living-map-design §4.3]
 - VIEW-124 (Ubiquitous): In the living band, envoys shall ride in the band's art pixels, explorers sail as a single ship along the voyage path, colonists' carts head for the colony site, and life (people in town streets and at the market at street level, chimney smoke, flags on keeps) shall be decoration only. [living-map-design §4.4]
 
@@ -345,7 +345,7 @@ re-renders only open panels.
 | `livingMap.growRadius`, `growth` | Town growth order | 8 pixels; jitter and river, coast, mountain and marsh weights | Yes | `map-presentation.json` |
 | `livingMap.hamlets` | Hamlets and tracks | 40 thousand rural per hamlet, at most 6, 4 apart, tracks within 8 | Yes | `map-presentation.json` |
 | `livingMap.figures` | Figures | 1,000 / 250 men a figure, 12 / 40 at most, 60 animated at 10 fps | Yes | `map-presentation.json` |
-| `livingMap.hulls` | Hulls | 5 / 1 ships a hull, 8 / 24 at most | Yes | `map-presentation.json` |
+| `livingMap.hulls` | Hulls | 5 / 1 ships a hull, 8 / 24 at most, a berth every 2 water pixels along the waterfront | Yes | `map-presentation.json` |
 | `livingMap.traders.maxMovers` | Movers per trade path | 3 | Yes | `map-presentation.json` |
 | `livingMap.traders.maxPaths` | Trade paths in the snapshot feed | 200 | Yes | `map-presentation.json` |
 | `livingMap.byDetail` | Bands and life by Map detail | Low off, Medium living, High living and street | Yes | `map-presentation.json` |

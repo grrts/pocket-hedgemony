@@ -86,6 +86,9 @@ import {
   figuresAnimate,
   figuresLeft,
   formation,
+  hullCount,
+  hullsAtSea,
+  hullsInPort,
   LIVING_MAP,
   nameOnMap,
   pieceLabels,
@@ -2029,9 +2032,20 @@ function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number,
     }
   }
   fleetHitBoxes = [];
+  // Close in, fleets are hulls on the water; between zoom 14 and 16 the ship tokens fade out as they fade in (VIEW-101).
+  const liv = livingView(o.zoom);
+  const berthsUsed = new Map<number, number>();
   const stack = new Map<number, number>();
   for (const f of s.navy.fleets) {
     if (!f.ships || !isKnown(f.at)) continue;
+    const mine = f.owner === s.playerNation;
+    const selected = fleetView === f.id || sailing === f.id;
+    moving ||= f.route.length > 0;
+    if (liv.living > 0) {
+      const box = drawHulls(o, f, liv, now, onScreen, selected, berthsUsed);
+      if (box && liv.living >= 0.5) fleetHitBoxes.push({ id: f.id, mine, ...box });
+    }
+    if (liv.icons <= 0) continue;
     // Fleets on one tile (or in one port) fan out behind the first.
     const key = tiled && f.tile >= 0 ? f.tile : -1 - f.at;
     const nth = stack.get(key) ?? 0;
@@ -2041,12 +2055,107 @@ function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number,
     sy -= nth * 3 * u;
     if (!onScreen(sx, sy)) continue;
     const realm = nations[f.owner]!;
-    const dir = fleetFacing(f);
-    const box = drawToken(ctx, { x: sx, y: sy, u: 2, color: realm.color, men: f.ships, naval: true, flag: flagCanvas(realm, 1), dir, moving: f.route.length > 0, selected: fleetView === f.id || sailing === f.id, t: now });
-    fleetHitBoxes.push({ id: f.id, mine: f.owner === s.playerNation, ...box.tap });
-    moving ||= f.route.length > 0;
+    ctx.globalAlpha = liv.icons;
+    const box = drawToken(ctx, { x: sx, y: sy, u: 2, color: realm.color, men: f.ships, naval: true, flag: flagCanvas(realm, 1), dir: fleetFacing(f), moving: f.route.length > 0, selected, t: now });
+    ctx.globalAlpha = 1;
+    if (liv.living < 0.5) fleetHitBoxes.push({ id: f.id, mine, ...box.tap });
   }
   return moving;
+}
+
+/**
+ * A fleet close in as hulls (VIEW-121, VIEW-122): one per `shipsPerHull` ships, in a loose
+ * formation round its point at sea with wakes while it sails, or at its port town's berths with
+ * the rest waiting off the waterfront; in a battle they face the enemy through powder smoke.
+ * Brackets round the chosen fleet, and its ship count with Markers (VIEW-126). Returns its tap
+ * box of at least 44 points (VIEW-125), or null when it is off screen.
+ */
+function drawHulls(o: OverlayContext, f: FleetView, liv: LivingView, now: number, onScreen: (x: number, y: number, pad?: number) => boolean, selected: boolean, berthsUsed: Map<number, number>): { x: number; y: number; w: number; h: number } | null {
+  const { ctx } = o;
+  const u = liv.u;
+  const s = snapshot!;
+  const n = hullCount(f.ships, "living");
+  const color = nations[f.owner]!.color;
+  const underway = f.route.length > 0;
+  let dir = fleetFacing(f);
+  if (f.battle) {
+    // Bows toward the nearest enemy fleet in the same waters.
+    const [mx] = fleetPosition(f);
+    const foe = s.navy.fleets.find((g) => g.battle && g.at === f.at && g.owner !== f.owner);
+    if (foe) {
+      let dx = fleetPosition(foe)[0] - mx;
+      if (Math.abs(dx) > rules.map!.width / 2) dx = -dx;
+      if (dx) dir = dx > 0 ? 1 : -1;
+    }
+  }
+  // Where each hull lies, on screen, and which way it faces.
+  const spots: { x: number; y: number; dir: 1 | -1 }[] = [];
+  const port = !isWater[f.at] && townLayer ? townLayer.berths(f.at) : [];
+  if (port.length) {
+    const used = berthsUsed.get(f.at) ?? 0;
+    const { atBerth, waiting } = hullsInPort(n, port.length - used);
+    berthsUsed.set(f.at, used + atBerth);
+    const town = provinces[f.at]!;
+    for (const t of port.slice(used, used + atBerth)) {
+      const [x, y] = tileXY(t);
+      const [sx, sy] = o.toScreen(x, y);
+      spots.push({ x: sx, y: sy, dir: x < town.x! ? -1 : 1 });
+    }
+    if (waiting) {
+      // Off the waterfront: a few map pixels out from the first berth, away from the town.
+      const [bx, by] = tileXY(port[0]!);
+      const dx = bx - town.x!, dy = by - town.y!;
+      const d = Math.hypot(dx, dy) || 1;
+      const [cx, cy] = o.toScreen(bx + (dx / d) * 3, by + (dy / d) * 3);
+      for (const h of hullsAtSea(f.id, waiting * LIVING_MAP.hulls.shipsPerHull.living, "living")) spots.push({ x: cx + h.x * u, y: cy + h.y * u, dir });
+    }
+  } else {
+    const [cx, cy] = o.toScreen(...fleetPosition(f));
+    for (const h of hullsAtSea(f.id, f.ships, "living")) spots.push({ x: cx + h.x * u, y: cy + h.y * u, dir });
+  }
+  if (!spots.some((p) => onScreen(p.x, p.y, 20 * u))) return null;
+  // Hulls rock and leave a broken wake only while they sail; at anchor they lie still.
+  const animate = underway && figuresAnimate(liv.animations, "marching");
+  const frame = animate ? Math.floor(now / (2000 / LIVING_MAP.figures.frameRate)) % 2 : 0;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  ctx.save();
+  ctx.globalAlpha = liv.living;
+  for (const p of spots.sort((a, b) => a.y - b.y)) {
+    const img = sprite(frame ? "hull1" : "hull0", color, u);
+    const x = Math.round(p.x - img.width / 2);
+    const y = Math.round(p.y - img.height + 3 * u);
+    // A wake astern while it sails, broken on alternate frames.
+    if (underway) {
+      ctx.fillStyle = PALETTE.paper;
+      const stern = p.dir > 0 ? x - u : x + img.width;
+      for (let i = 0; i < 3; i++) ctx.fillRect(stern - p.dir * (i * 2 + frame) * u, y + img.height - 2 * u + (i % 2) * u, u, u);
+    }
+    if (p.dir < 0) {
+      ctx.save();
+      ctx.translate(x + img.width, y);
+      ctx.scale(-1, 1);
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
+    } else ctx.drawImage(img, x, y);
+    // Powder smoke drifting off the guns in a battle.
+    if (f.battle) {
+      ctx.fillStyle = PALETTE.mist;
+      for (let i = 0; i < 4; i++) {
+        const k = (Math.floor(now / 250) + i * 3) % 6;
+        ctx.fillRect(Math.round(p.x + p.dir * (6 + k) * u), Math.round(y + img.height - (4 + i + k / 2) * u), 2 * u, 2 * u);
+      }
+    }
+    x0 = Math.min(x0, x);
+    y0 = Math.min(y0, y);
+    x1 = Math.max(x1, x + img.width);
+    y1 = Math.max(y1, y + img.height);
+  }
+  if (selected) brackets(ctx, x0, y0, x1 - x0, y1 - y0, u, 1 + (Math.floor(now / 260) % 2), PALETTE.gold);
+  let bottom = y1;
+  if (pieceLabels("living", { markers: markersOn, selected }).plate) bottom += drawPlate(ctx, String(f.ships), (x0 + x1) / 2, y1 + 2, 2) + 2;
+  ctx.restore();
+  const tap = tapBox((x1 - x0) / u, (bottom - y0) / u, u);
+  return { x: (x0 + x1) / 2 - tap.w / 2, y: (y0 + bottom) / 2 - tap.h / 2, w: tap.w, h: tap.h };
 }
 
 /** The way each fleet last faced (by id), so it keeps facing that way when it lies still. */
