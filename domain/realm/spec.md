@@ -63,6 +63,7 @@ Newest decision first.
 | Siege reserve | Months of food a castle keeps and never spreads | Army food reserve (warfare) |
 | Royal province | A province held directly, without a lord | Lord's province |
 | Official | A person who runs one royal province; also the source of envoys | Lord |
+| Titles | What a realm calls its lords and officials, by its culture (daimyo, boyar, chief); words only | Post type (Warden, Judge) |
 | Lord | A named holder of land with his own retinue, wealth, traits, want, loyalty and heir | Courtier; subject ruler |
 | Retinue | A lord's own soldiers raised from his lands | Levy |
 | Loyalty | Loyal, Wavering, Disloyal, In revolt | Opinion (diplomacy) |
@@ -373,6 +374,14 @@ The world builds each realm's purse, levies, officials and envoys from its catal
 
 #### How the player uses it: the starting numbers
 - REALM-232: The starting numbers show where the player already reads each of them, with no screen of their own: gold and debt on the Treasury tab and the gold plaque (REALM-198), levies on the Military tab, empty posts on the province card and the Provinces tab, envoy seats on the Diplomacy tab. The Heritage tab of the country card is the overview of why: each assessment that sets a starting number says which under its bar (Economy "starting gold", Finances "starting debt", Manpower "levies at the start", Reach of rule "officials at their posts", Standing abroad "envoys at court"), and a question mark marks an uncertain one, whose start varies more between campaigns. On a phone in landscape the Heritage tab is the side panel in the Wide and Tall layouts; the caption wraps under the label, and nothing needs hover. [X-19]
+
+### 5.23 Titles by culture (Leroy, 18 October)
+Lords and officials are called what their own culture called them, so a Mongol realm has noyans and a Haudenosaunee one has chiefs. The rules are the same everywhere; only the words change (REALM-240).
+
+- REALM-240: A realm's lords and officials shall carry its culture's titles, singular and plural, from `titles` in the realm data: by the family of its court language first (boyar and voivode for Slavic, bey and subashi for Turkic, daimyo and daikan for Japanese, ras and shum for Ethiopian, tlatoani and calpixqui for Nahua, kuraka and tocricoc for Andean, sachem for Algonquian, chief for Iroquoian, Bantu and Mande), then by its government form's family (a kin form calls them chiefs and headmen), then lord and official. A realm that changes its court language or its form takes the new words. Titles are words only: no rule reads them. [Leroy 18 October; provisional]
+
+#### How the player uses it: titles
+- REALM-241: The player reads the titles wherever lords and officials show, with no screen of their own: the country card's tabs (Lords and Officials become, for example, Daimyo and Daikan), the two Stability pillars on the General tab, the Lords map mode, the Lords tab and a lord's screen, the Officials tab and an official's screen, and the "Governed by" card of a province. Another realm's card uses that realm's words, so the player sees whose court it is. The post types (Warden, Tax collector, Judge and the rest) stay the same everywhere. On a phone in landscape the words take the place of the old labels in the Wide and Tall layouts; the longest plural tab label (Myothugyis, Tocricocs) is no longer than Mercenaries, and nothing needs hover. [X-19]
 
 ## 6. Commands
 
@@ -742,3 +751,5 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-230 | starting-values.feature | The world starts each realm from its assessments |
 | REALM-231 | starting-values.feature | AI realms call men only with someone to lead them |
 | REALM-232 | — | Presentation only: the Heritage tab captions (apps/client/src/ui/heritage.test.ts) |
+| REALM-240 | lords.feature | Lords and officials take their culture's titles |
+| REALM-241 | — | Presentation only: the labels that read the titles (packages/engine/test/titles.test.ts and phone screenshots) |

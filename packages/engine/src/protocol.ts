@@ -5,7 +5,8 @@ import { eventCards, type EventCard } from "./events.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
-import { governmentView, realmForms, type GovernmentView } from "./government.ts";
+import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
+import type { Titles } from "./domain/realm/index.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
@@ -204,6 +205,8 @@ export interface Snapshot {
   provinceRebels: Int32Array;
   /** Every realm's government form by name, for its card. */
   realmForms: string[];
+  /** What every realm calls its lords and officials (REALM-240). */
+  realmTitles: Titles[];
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
   peoples: PeoplesSnapshot;
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
@@ -434,6 +437,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       rebels: rebelsView(w),
       provinceRebels: w.provinceRebels.slice(),
       realmForms: realmForms(w),
+      realmTitles: realmTitles(w),
       peoples: peoplesSnapshot(w),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),

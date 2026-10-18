@@ -1,6 +1,7 @@
-import { STABILITY, type RevolutionView, type Stability, type StabilityPillar } from "@ph/engine";
+import { STABILITY, type RevolutionView, type Stability, type StabilityPillar, type Titles } from "@ph/engine";
 import { icon } from "../art/ui.ts";
 import { revolutionMark } from "./revolution.ts";
+import { DEFAULT_TITLES, cap } from "./titles.ts";
 
 /**
  * Stability on screen (realm REALM-203 to REALM-205, F-75): a plaque in the
@@ -36,19 +37,19 @@ function loyaltyLine(c: Record<string, number>, none: string): string {
 }
 
 /** What each pillar shows, and the tab that opens from it. */
-function pillarRow(p: StabilityPillar): string {
+function pillarRow(p: StabilityPillar, t: Titles): string {
   const c = p.counts;
   const [label, line, tab] =
-    p.key === "lords" ? ["Lords", loyaltyLine(c, "No lords: all royal land"), "lords"]
+    p.key === "lords" ? [cap(t.lords), loyaltyLine(c, `No ${t.lords}: all royal land`), "lords"]
     : p.key === "subjects" ? ["Subjects", loyaltyLine(c, "No subjects"), "diplomacy"]
-    : p.key === "officials" ? ["Officials", c.empty ? `${plural(c.empty!, "royal post")} of ${c.posts} standing empty` : `All ${plural(c.posts!, "royal post")} filled`, "officials"]
+    : p.key === "officials" ? [cap(t.officials), c.empty ? `${plural(c.empty!, "royal post")} of ${c.posts} standing empty` : `All ${plural(c.posts!, "royal post")} filled`, "officials"]
     : ["Provinces", c.rioting || c.plotting ? [c.plotting && `${c.plotting} plotting`, c.rioting && `${c.rioting} rioting`, c.grumbling && `${c.grumbling} grumbling`].filter(Boolean).join(", ") : c.grumbling ? `${c.grumbling} grumbling, the rest calm` : `All ${c.all} calm`, "provinces"];
   return `<button class="paper pillar step-${p.step}" data-realm-open-tab="${tab}"><b>${label}</b><span>${line}</span><em>${STABILITY[p.step]}</em></button>`;
 }
 
 /** The General tab's Stability section: the step, what it means and the four pillars. */
-export function stabilitySection(s: Stability): string {
+export function stabilitySection(s: Stability, t: Titles = DEFAULT_TITLES): string {
   return `<h3 class="sub">Stability: ${STABILITY[s.step]}</h3>
     <p class="hint">${NOTE[s.step]} Tap a pillar to see what to mend.</p>
-    <div class="pillars">${s.pillars.map(pillarRow).join("")}</div>`;
+    <div class="pillars">${s.pillars.map((p) => pillarRow(p, t)).join("")}</div>`;
 }

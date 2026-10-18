@@ -1,4 +1,5 @@
-import { officialEffect, type Snapshot } from "@ph/engine";
+import { officialEffect, type Snapshot, type Titles } from "@ph/engine";
+import { DEFAULT_TITLES, an, cap } from "./titles.ts";
 import type { Ruleset } from "@ph/rules";
 import { sprite } from "../art/sprites.ts";
 import { lookOfCulture, portrait, type Look } from "../art/portraits.ts";
@@ -73,15 +74,15 @@ export function effectText(o: Official): string {
 }
 
 /** The official as a card on the province's overview: portrait, name and post, his effect, and a button to their screen. */
-export function officialCard(rules: Ruleset, o: Official | null, nation: number, mine: boolean, servesLord = false): string {
+export function officialCard(rules: Ruleset, o: Official | null, nation: number, mine: boolean, servesLord = false, t: Titles = DEFAULT_TITLES): string {
   const place = rules.provinces[o?.province ?? 0]?.name ?? "";
   if (!o)
-    return `<div class="army person empty-post"><span class="portrait-slot"></span><span class="who"><b>No official</b><br><small>The post stands empty: half tax and recruits until it is filled again.${mine ? " Move an official here from his screen." : ""}</small></span></div>`;
+    return `<div class="army person empty-post"><span class="portrait-slot"></span><span class="who"><b>No ${esc(t.official)}</b><br><small>The post stands empty: half tax and recruits until it is filled again.${mine ? ` Move ${esc(an(t.official))} here from his screen.` : ""}</small></span></div>`;
   const e = officialEffect(o.post, o.years);
   return `<div class="army person">${officialPortrait(rules, o, nation)}
-    <span class="who"><b>${esc(o.name)}</b><br><small>${esc(o.post)} of ${esc(place)}${servesLord ? ". He serves the lord." : ""}</small><br>
+    <span class="who"><b>${esc(o.name)}</b><br><small>${esc(o.post)} of ${esc(place)}${servesLord ? `. He serves the ${esc(t.lord)}.` : ""}</small><br>
     <small class="effect">${esc(effectText(o))}</small> ${servicePips(o.years, e.share)}</span>
-    ${mine ? `<span class="army-buttons"><button class="paper small" data-official="${o.province}">Official</button></span>` : ""}</div>`;
+    ${mine ? `<span class="army-buttons"><button class="paper small" data-official="${o.province}">${esc(cap(t.official))}</button></span>` : ""}</div>`;
 }
 
 /**
@@ -89,15 +90,15 @@ export function officialCard(rules: Ruleset, o: Official | null, nation: number,
  * then every official as a row (portrait, name, post and province, his
  * effect there and his years), each opening his screen, and the empty posts.
  */
-export function officialsTab(rules: Ruleset, list: { province: number; official: Official | null }[], nation: number, lordPosts: number): string {
+export function officialsTab(rules: Ruleset, list: { province: number; official: Official | null }[], nation: number, lordPosts: number, t: Titles = DEFAULT_TITLES): string {
   const filled = list.filter((x) => x.official).map((x) => x.official!);
   const empty = list.filter((x) => !x.official);
   const types = new Map<string, number>();
   for (const o of filled) types.set(o.post, (types.get(o.post) ?? 0) + 1);
   filled.sort((a, b) => a.post.localeCompare(b.post) || b.years - a.years);
-  return `<p><b>${filled.length}</b> officials run your royal provinces: ${[...types].sort((a, b) => b[1] - a[1]).map(([t, c]) => `${c} ${esc(c === 1 ? t.toLowerCase() : plural(t.toLowerCase()))}`).join(", ")}.${lordPosts ? ` Your lords' own officials run their ${lordPosts} provinces.` : ""}</p>
-    <p class="hint">Each type helps the province it runs, at half in his first year and in full after 5 years there. Open an official to move him where his type helps most.</p>
-    ${empty.length ? `<h3 class="sub">Empty posts · ${empty.length}</h3><p class="hint">Half tax and recruits until an official is moved in.</p><p>${empty.map((x) => `<button class="paper small" data-show-province="${x.province}">${esc(rules.provinces[x.province]!.name)}</button>`).join(" ")}</p>` : ""}
+  return `<p><b>${filled.length}</b> ${esc(filled.length === 1 ? t.official : t.officials)} run your royal provinces: ${[...types].sort((a, b) => b[1] - a[1]).map(([k, c]) => `${c} ${esc(c === 1 ? k.toLowerCase() : plural(k.toLowerCase()))}`).join(", ")}.${lordPosts ? ` Your ${esc(t.lords)}' own ${esc(t.officials)} run their ${lordPosts} provinces.` : ""}</p>
+    <p class="hint">Each type helps the province it runs, at half in his first year and in full after 5 years there. Open ${esc(an(t.official))} to move him where his type helps most.</p>
+    ${empty.length ? `<h3 class="sub">Empty posts · ${empty.length}</h3><p class="hint">Half tax and recruits until ${esc(an(t.official))} is moved in.</p><p>${empty.map((x) => `<button class="paper small" data-show-province="${x.province}">${esc(rules.provinces[x.province]!.name)}</button>`).join(" ")}</p>` : ""}
     <h3 class="sub">In post · ${filled.length}</h3>
     <div class="lord-list">${filled
       .map((o) => {
@@ -121,7 +122,7 @@ export interface MoveOption {
 }
 
 /** An official's own screen: who they are, the post and what it does now, moving him to another province, and commissioning him. */
-export function officialScreen(rules: Ruleset, o: Official, nation: number, gold: number, treasury: number, moves: MoveOption[], allMoves: boolean): string {
+export function officialScreen(rules: Ruleset, o: Official, nation: number, gold: number, treasury: number, moves: MoveOption[], allMoves: boolean, t: Titles = DEFAULT_TITLES): string {
   const place = rules.provinces[o.province]!.name;
   const e = officialEffect(o.post, o.years);
   return `<div class="person-card">${officialPortrait(rules, o, nation, 5)}
@@ -134,7 +135,7 @@ export function officialScreen(rules: Ruleset, o: Official, nation: number, gold
       <dt>In post</dt><dd>The province pays its full tax and gives all its recruits.</dd>
     </dl>
     <h3 class="sub">Move to another province</h3>
-    <p class="hint">He swaps posts with the official there, or takes an empty post and leaves this one empty. Whoever moves starts again at half his effect. Best fit for a ${esc(o.post.toLowerCase())} first.</p>
+    <p class="hint">He swaps posts with the ${esc(t.official)} there, or takes an empty post and leaves this one empty. Whoever moves starts again at half his effect. Best fit for a ${esc(o.post.toLowerCase())} first.</p>
     <div class="place-list">${moves
       .map((m) => `<div class="place-row">
         <button class="place" data-show-province="${m.province}" title="Show ${esc(rules.provinces[m.province]!.name)} on the map">
