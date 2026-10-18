@@ -2,8 +2,6 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-575 decided and 8 still open across 29 contexts.
-
 ## Still open
 
 - **OQ-ACH-8** (achievements): (release task) Store figures (Google points and counts, Steam's check) are checked again in each console before upload; the rules adopt the strictest.
@@ -502,6 +500,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SAVE-14**: (was OQ-SAVE-14) "Send a report" sits on the failure screen X1 only, as screen flow says. Latest design wins.
 - **D-SAVE-15**: (was OQ-SAVE-15) Importing an ironman save needs a connection: offline, the import is refused with "Connect to import an ironman save", so the head check always runs. It closes the split with no new state.
 - **D-SAVE-16**: (was OQ-SAVE-16) Every way out of an ironman campaign is an exit: "Save and quit", "Exit to main menu" and the app being closed write the ironman save; a kill mid-turn resumes from the Resume save and journal like any campaign. One rule for all exits.
+- **D-SAVE-17**: The Load card lists each campaign's Resume save as its first line, "Where you left off", although SAVE-013 keeps Resume saves out of Load: with several campaigns and no manual saves, Continue alone reaches only the newest, and the player would have no way back to the others. One line per campaign, so the list stays short (X-19).
 
 ### Scenario setup (scenario-setup)
 
@@ -543,6 +542,9 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SET-16**: (was OQ-SET-16) Main hand Left: End turn moves to the left corner and the game menu button moves to the right, so they stay at opposite corners. It keeps screen flow's rule.
 - **D-SET-17**: (was OQ-SET-17) Place names: the setting stays as designed, and since no historical name list is added (D-MAP-6), both options show today's region names. Nothing new is added.
 - **D-SET-19**: (was OQ-SET-19) Hint switches and mutes: tutorial progress and Needs attention mutes go into the save, hint switches stay personal settings, and "Reset tutorial and hints" clears both. X-16 settles it.
+- **D-SET-20**: Turn playback speed is a Gameplay row of its own beside Battle playback speed: the week's playback after End turn is the speed players notice most, and like Battle playback speed it only changes how fast the week is shown (X-15). Leroy asked for a speed setting (17 October 2026 brief).
+- **D-SET-21**: On the web and on phones without a low-power signal the game can read, Auto counts a battery under the 20 % threshold and not charging as the device saving battery, as for the Steam Deck. Same threshold, one rule.
+- **D-SET-22**: The client builds the Settings screen from settings.json but lists only the rows whose effect it has built, so no row promises something the game does not do; rows join as their effects are built. A row that does nothing is a poor experience (X-19).
 
 ### Subjects and overlords (subjects)
 
@@ -575,6 +577,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SUBJ-27**: Second game slice of subjects (milestone 5, provisional): residents, tightening and folding in use an envoy that stays at the subject's court with the status of a resident, so it takes a seat like any envoy; folding in needs a shared land border (no sea routes yet); a folded-in subject's army disbands and its treasury is lost, since lords hold no retinue or wealth in the game yet; *Foreign rule* waits for culture and faith. Backers are judged, not bargained for: a rival or hostile realm of the overlord at peace, bordering the subject and at least as strong as the overlord, counts as willing, but does not join the war yet (D-SUBJ-29 brings it in).
 - **D-SUBJ-28**: Reach and belief for subjects (provisional): each realm's subject reach comes from its catalogue administrative capacity by SUBJ-056 (very low 2 … very high 9), moderate (5) where the catalogue has no assessment, with no government-form change yet. *Same people* compares the two realms' court tongues and *Same faith* or *Different faith* their state faiths from the 1444 seed, falling back to the name books where a realm has no court tongue; *Far away* still waits for a distance rule.
 - **D-SUBJ-29**: Hostages, backers and the lens (provisional): rulers don't age or die in the game yet, so a held heir goes home after 20 years (or when sent home), with no harm rule; the backer an AI subject is judged to have (D-SUBJ-27) joins its independence war at once, with no bargaining; the player as a subject rises alone. The *Subjects* lens draws no courting lines, since no realm courts another's subjects yet.
+- **D-SUBJ-30**: Personal unions in the game (provisional): rulers don't age or die yet, so each January a realm's ruler dies without a direct heir at 1 in 50, and one such death in 4 leaves no heir at all; the player's own ruler is spared until rulers and heirs are simulated, so the player inherits but is never inherited. A claim's pretender lives 20 years. The strongest claim is the house with most marriages into the dead ruler's (the first married on a tie), and the inheritance waits for peace on both sides. The Wavering and Disloyal lords' succession war and the charter for the merged laws wait for lords' risings and laws; merging is at once, with no envoy.
 
 ### Time and turns (time-and-turns)
 

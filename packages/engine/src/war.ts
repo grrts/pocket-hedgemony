@@ -27,7 +27,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "trade";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "trade";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
