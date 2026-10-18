@@ -2610,6 +2610,8 @@ button.paper.over {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
+}
+
 /* ---- Subjects on the Diplomacy tab (SUBJ-091, SUBJ-092) ---- */
 
 /* Loyalty steps tinted green, ochre, orange and red, as the subjects config names them. */
