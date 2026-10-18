@@ -1,7 +1,8 @@
 # Performance requirements
 
 Hard budgets for the game on a mid-range phone. They are not goals: a change
-that breaks one fails CI. Two scripts check them:
+that breaks one fails CI on main. Two scripts check them, on pushes to main
+(not on pull requests, where a busy runner made them fail on noise):
 
 - `pnpm bench` (packages/engine/bench/turn.bench.ts) times the engine itself.
 - `pnpm --filter @ph/client perf` (apps/client/scripts/perf.mjs) runs the
