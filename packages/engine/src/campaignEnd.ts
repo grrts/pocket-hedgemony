@@ -325,16 +325,29 @@ const CHOICES: Record<EndingKind, string[]> = {
   "world domination": ["Keep playing", "New game"],
 };
 
+/** The view changes only when the scores are worked out, the campaign ends or the player changes: snapshots reuse it in between. */
+const viewCache = new WeakMap<World, { key: string; view: CampaignView }>();
+
 export function campaignView(world: World): CampaignView {
+  const c = world.campaign;
+  const key = `${c.scoresDate}|${c.ending ? `${c.ending.kind}/${c.ending.date}/${c.ending.realm}` : ""}|${world.player}|${c.playedOn}|${c.endDate}`;
+  const hit = viewCache.get(world);
+  if (hit && hit.key === key) return hit.view;
+  const view = buildView(world);
+  viewCache.set(world, { key, view });
+  return view;
+}
+
+function buildView(world: World): CampaignView {
   const c = world.campaign;
   const N = world.nationCount;
   const scores = new Int32Array(N * 3);
+  const R = c.scoreRanks;
   let realms = 0;
   for (let n = 0; n < N; n++) {
     for (let k = 0; k < 3; k++) scores[n * 3 + k] = scoreOf(world, n, k);
-    if (!world.nationGone[n]) realms++;
+    if (R[n * 3]! > 0) realms++;
   }
-  const R = c.scoreRanks;
   const sum = (n: number) => R[n * 3]! + R[n * 3 + 1]! + R[n * 3 + 2]!;
   const alive: number[] = [];
   for (let n = 0; n < N; n++) if (R[n * 3]! > 0) alive.push(n);
