@@ -31,7 +31,7 @@ import { Rng } from "./rng.ts";
 import { explorationView, type ExplorationView } from "./colonies.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { officialAt, yearsServed } from "./officials.ts";
-import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
+import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
 export interface CompanyView {
@@ -220,8 +220,14 @@ export interface Snapshot {
   provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
   peoples: PeoplesSnapshot;
-  /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
-  musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
+  /** The player's men gathering in provinces: men still to come, days to the next thousand and to the last. */
+  musters: { province: number; men: number; daysLeft: number; daysAll: number }[];
+  /** Days each thousand of the player's levy takes to gather (RECR-106). */
+  gatherDays: number;
+  /** The Garrison tab of each province where the player has men gathering or troops without a commander (PROV-302). */
+  garrisons: GarrisonView[];
+  /** The player's provinces where an army can train now: a castle or drill yard of its own, not besieged (RECR-109). */
+  trainingGrounds: number[];
   /** The player's free companies on their way to the capital. */
   mercs: (CompanyView & { weeksLeft: number })[];
   /** Free companies the player can hire: their pay a month (paid at once on hiring) and weeks to reach the capital. */
@@ -461,7 +467,10 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         return { provinceTradeSeen: seen, provinceGoods: goods };
       })(),
       peoples: peoplesSnapshot(w),
-      musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
+      musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, daysLeft: m.daysLeft, daysAll: daysToGather(w, m) })),
+      gatherDays: player >= 0 ? gatherDays(w, player) : 14,
+      garrisons: player >= 0 ? garrisonViews(w, player) : [],
+      trainingGrounds: player >= 0 ? trainingGrounds(w, player) : [],
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c, player), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
