@@ -826,6 +826,12 @@ Then("it is reference data and not a realm", (s) => {
   expect(S.isRealm(s.owned)).toBe(false);
 });
 
+let startWorld: ReturnType<typeof createWorld> | undefined;
+Then("the realm's administrative capacity is {int}", (s, rank: number) => {
+  const w = (startWorld ??= createWorld(loadDefaultRuleset(), 1444));
+  expect(w.nationAdminCapacity[w.nationIndex.get(s.nation)!]).toBe(rank);
+});
+
 Given("an assessment at {string}", (s, level: string) => {
   s.level = level;
 });
