@@ -3,7 +3,7 @@ import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, processTurn, type World } from "../src/index.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
-import { bondOf, seasonalSubjects, subjectAnswersCall, subjectByAgreement, subjectPayments, subjectTies, whyNotSubjectAction } from "../src/subjects.ts";
+import { aiRisings, bondOf, foldInRealm, independencePeace, monthlySubjectEnvoys, riseUp, seasonalSubjects, subjectAnswersCall, subjectByAgreement, subjectPayments, subjectTies, whyNotSubjectAction } from "../src/subjects.ts";
 import { statecraftView, whyNotEnvoy } from "../src/statecraft.ts";
 import { LEDGER, LEDGER_LINES, runLedger } from "../src/treasury.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
@@ -101,5 +101,68 @@ describe("subjects (milestone 5)", () => {
     processTurn(w, [{ type: "subjectAction", subject: nation(w, "granada"), action: "tribute", level: "light" }], me);
     const back = restoreWorld(new Map(worldChunks(w, { playerNation: "castile", options: {} as never }).map((c) => [c.id, c])), rules, {}, tiles).world;
     expect(bondOf(back, back.nationIndex.get("granada")!)!.tribute).toBe("light");
+  });
+
+  it("tightens a Loyal tributary to a vassal over six months with an envoy at its court (SUBJ-044)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = nation(w, "castile");
+    const g = nation(w, "granada");
+    w.player = me;
+    const b = bondOf(w, g)!;
+    expect(whyNotSubjectAction(w, me, g, "tighten")).toMatch(/Wavering; tightening needs them Loyal/);
+    b.loyalty = "loyal";
+    const free = dip.freeSeats(w.diplomacy, "castile");
+    expect(processTurn(w, [{ type: "subjectAction", subject: g, action: "tighten" }], me).rejectedOrders).toEqual([]);
+    expect(dip.freeSeats(w.diplomacy, "castile")).toBe(free - 1);
+    const news: { kind: string; text: string }[] = [];
+    for (let m = 0; m < 6; m++) monthlySubjectEnvoys(w, news as never);
+    expect(bondOf(w, g)!.kind).toBe("vassal");
+    expect(dip.freeSeats(w.diplomacy, "castile")).toBe(free);
+    expect(news.some((x) => /Granada is now Castile's vassal/.test(x.text))).toBe(true);
+  });
+
+  it("folds a subject in: its land joins the realm under one lord and the country leaves the map (SUBJ-063, SUBJ-067)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = nation(w, "castile");
+    const g = nation(w, "granada");
+    const land = [...Array(w.provinceCount).keys()].filter((p) => w.provinceOwner[p] === g);
+    expect(whyNotSubjectAction(w, me, g, "fold_in")).toBe("tighten to vassal first");
+    const news: { kind: string; text: string }[] = [];
+    foldInRealm(w, g, me, news as never);
+    expect(land.every((p) => w.provinceOwner[p] === me)).toBe(true);
+    const lord = w.provinceLord[land[0]!]!;
+    expect(lord).toBeGreaterThanOrEqual(0);
+    expect(w.lords[lord]!.house).toBe("Granada");
+    expect(w.nationGone[g]).toBe(1);
+    expect(news.some((x) => /Granada is folded into Castile/.test(x.text))).toBe(true);
+  });
+
+  it("lets a Disloyal subject rise, and restores it one kind tighter when it loses its independence war (SUBJ-077, SUBJ-078)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = nation(w, "castile");
+    const g = nation(w, "granada");
+    const news: { kind: string; text: string }[] = [];
+    expect(riseUp(w, g, news as never)).toMatch(/only a Disloyal subject rises/);
+    bondOf(w, g)!.loyalty = "disloyal";
+    expect(riseUp(w, g, news as never)).toBeNull();
+    expect(dip.relations.overlord(w.diplomacy.graph, "granada")).toBeNull();
+    const war = w.diplomacy.wars.find((x) => x.declarer === "granada")!;
+    expect(war).toBeTruthy();
+    expect(news.some((x) => /Granada rises against Castile/.test(x.text))).toBe(true);
+    dip.endWar(w.diplomacy, war, { truceMonths: 60 });
+    independencePeace(w, war, new Set([g]), news as never);
+    expect(bondOf(w, g)!.kind).toBe("vassal");
+    expect(bondOf(w, g)!.loyalty).toBe("wavering");
+  });
+
+  it("AI subjects rise when Disloyal and their overlord loses a war elsewhere (SUBJ-076)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const g = nation(w, "granada");
+    bondOf(w, g)!.loyalty = "disloyal";
+    w.date.month = 6;
+    const news: { kind: string; text: string }[] = [];
+    // At peace and with no backer next door, it waits.
+    aiRisings(w, news as never);
+    expect(dip.relations.overlord(w.diplomacy.graph, "granada")).toBe("castile");
   });
 });

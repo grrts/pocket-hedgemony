@@ -127,7 +127,7 @@ describe("ports and fleets", () => {
     w.player = a;
     if (relationState(w, a, b).state !== "war") expect(act(w, { type: "declareWar", target: b }, a)).toEqual([]);
     // Both fleets meet in a zone beside Genoa's port.
-    const zone = w.adjList.subarray(w.adjStart[pb]!, w.adjStart[pb + 1]!).find((q) => w.provinceWater[q])!;
+    const zone = w.adjList.subarray(w.adjStart[pb]!, w.adjStart[pb + 1]!).find((q) => !!w.provinceWater[q])!;
     for (const f of [fa, fb]) {
       f.at = zone;
       f.route = [];

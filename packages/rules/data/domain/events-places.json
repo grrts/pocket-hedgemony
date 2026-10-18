@@ -1,0 +1,60 @@
+{
+  "$comment": "D-EVT-17: how the 1444 map meets the event tree. aliases: map realm id -> event-tree entity id where they differ (every other realm keeps its id). places: event-tree place -> map provinces (by id); a place not listed has no provinces yet, so conditions on it do not hold. start: the tree's own statistics before any event changes them (provisional); a realm's treasury, debt, army_strength, stability, legitimacy and integration_strain are read from the game instead.",
+  "aliases": {
+    "ottomans": "ottoman",
+    "mamluks": "mamluk",
+    "timurids": "timurid_empire",
+    "vijayanagar": "vijayanagara",
+    "kanem_bornu": "bornu",
+    "aztecs": "aztec_triple_alliance",
+    "creek": "muscogee",
+    "great_horde": "golden_horde",
+    "switzerland": "swiss_confederation",
+    "iroquois": "haudenosaunee",
+    "huron": "wendat",
+    "maya": "maya_states",
+    "kano": "hausa_states"
+  },
+  "places": {
+    "province:constantinople": ["p1662"],
+    "province:kazan": ["p658"],
+    "province:samarkand": ["p1748"],
+    "province:vienna": ["p1120"],
+    "province:iwami": ["p2105"],
+    "area:granada": ["p1883", "p1885", "p1887"],
+    "area:guyenne": ["p1338", "p1335", "p1343", "p1342"],
+    "area:central_hungary": ["p1133", "p1132", "p1137"],
+    "area:syria": ["p1943", "p1942", "p1946", "p2248", "p2245", "p1941", "p1938", "p2243"],
+    "area:morea": ["p1922"],
+    "area:moscow": ["p633"],
+    "area:delhi_doab": ["p2574", "p2575", "p2576", "p2577", "p2579", "p2580"],
+    "area:kabul": ["p2005"],
+    "area:punjab": ["p2313", "p2315", "p2316", "p2317", "p2318", "p2319", "p2320", "p2321"],
+    "area:holland": ["p811"],
+    "area:northern_morocco": ["p1882", "p1884"],
+    "area:bohemia": ["p839", "p840", "p1109", "p836", "p843", "p1113", "p1117"],
+    "area:transylvania": ["p1151", "p1150", "p1425", "p1431", "p1155", "p1156", "p1153", "p1418"],
+    "area:western_pomerania": ["p834"],
+    "area:naples": ["p1386", "p1626", "p1627", "p1628", "p1629", "p1630", "p1631", "p1632", "p1633"]
+  },
+  "start": {
+    "country": {
+      "prestige": 0,
+      "war_weariness": 0,
+      "admin_capacity": 50,
+      "tech_state": 6,
+      "tech_economy": 6,
+      "tech_military": 6,
+      "literacy": 5,
+      "military_quality": 40,
+      "naval_reach": 10,
+      "navy_strength": 0
+    },
+    "place": {
+      "control": 60,
+      "prosperity": 10,
+      "literacy": 5
+    },
+    "places": ["region:europe", "global"]
+  }
+}
