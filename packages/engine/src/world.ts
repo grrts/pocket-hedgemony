@@ -26,8 +26,10 @@ import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
+import { createRebelState, type RebelState } from "./rebels.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
+import type { AchievementLog } from "./achievements.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -35,7 +37,7 @@ import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, PeoplesState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, PeoplesState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -140,6 +142,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   events?: GameEvents;
   /** Every realm's heritage in play: birthright, heydays, ambitions, legacies and burden (HER-078). */
   heritage?: GameHeritage;
+  /** The player's campaign as achievements see it (achievements.ts). */
+  achievements?: AchievementLog;
 }
 
 export interface ArmyPool {
@@ -418,6 +422,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createConversionState(P),
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
+    ...createRebelState(P, N),
     navy: createNavyState(P),
     ...createPeoplesState(P, N),
   };
