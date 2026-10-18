@@ -1,5 +1,7 @@
 import type { World } from "./world.ts";
-import { cedeProvince, type News } from "./war.ts";
+import { cedeProvince, relationState, type News } from "./war.ts";
+import { grabbedLand, nameAbroadView, type NameAbroadView } from "./conquest.ts";
+import { priceContext, priceOfWar, type PriceOfWar } from "./priceOfWar.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { houseView, yearlyCrowns, type HouseView } from "./crowns.ts";
@@ -209,7 +211,11 @@ export function makeDemand(world: World, n: number, t: number, kind: string, p =
 function demandGivenIn(world: World, asker: number, asked: number, kind: string, province: string | undefined, news: News[]): void {
   if (kind === "hand_over_province" && province) {
     const p = world.provinceIndex.get(province);
-    if (p !== undefined && world.provinceOwner[p] === asked) cedeProvince(world, p, asker, news);
+    if (p !== undefined && world.provinceOwner[p] === asked) {
+      cedeProvince(world, p, asker, news);
+      // Neighbours remember land grabbed near them (DIPL-222).
+      if (world.provinceOwner[p] === asker) grabbedLand(world, [p], new Set([asked]), false);
+    }
   }
   if (kind === "pay_tribute" && !rel.overlord(world.diplomacy.graph, world.nationIds[asked]!)) {
     try {
@@ -412,7 +418,9 @@ function aiEnvoys(world: World): void {
       // An AI overlord takes no subject that would put it more than 1 over its reach (SUBJ-098).
       if (action === "offer_overlordship" && !aiMayTakeSubject(world, n)) continue;
       const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days);
-      if (!best || count.total > best.total) best = { t, action, total: count.total };
+      // The AI counts the other court's notoriety against binding itself to it (DIPL-223).
+      const total = count.total - (dip.NOTORIETY_ASKS.includes(action) ? dip.notorietyPoints(d, world.nationIds[t]!) : 0);
+      if (!best || total > best.total) best = { t, action, total };
     }
     if (!best) continue;
     const choice = dip.aiChoose(best.total);
@@ -452,7 +460,9 @@ export interface StatecraftView {
   /** Answers received in the last two years, newest first, with the reasons each court counted. */
   letters: { from: number; action: string; answer: "yes" | "no" | "done"; text: string; reasons: { name: string; number: number }[]; total?: number; month: string }[];
   /** For every other realm: what it thinks of the player, the ledger behind it, and why each mission can't be sent now (null when it can), in ENVOY_ACTIONS order. */
-  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView }>;
+  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView; notoriety: number; price: PriceOfWar | null }>;
+  /** The player's own name abroad: notoriety, Lands taken against the league threshold and the leagues against them (DIPL-225). */
+  nameAbroad: NameAbroadView;
   /** The player's subjects and its own overlord (SUBJ-091, SUBJ-102). */
   subjects: SubjectsView | null;
   /** The houses married into the player's and its claims to other thrones (SUBJ-130). */
@@ -494,6 +504,8 @@ export function statecraftView(world: World, player: number): StatecraftView | n
     .sort((a, b) => b.deliverOn.localeCompare(a.deliverOn))
     .map((l) => ({ from: world.nationIndex.get(l.from) ?? -1, action: l.action, answer: l.answer, text: letterText(world, l), reasons: l.reasons.map((r) => ({ name: r.name, number: Math.round(r.number) })), ...(l.total !== undefined ? { total: Math.round(l.total) } : {}), month: l.deliverOn }));
   const realms: StatecraftView["realms"] = {};
+  // The declare sheet's Price of war (WAR-229) for every realm the player could declare on, sharing the player's own reads.
+  const ctx = priceContext(world, player);
   for (let n = 0; n < world.nationCount; n++) {
     if (n === player || world.nationGone[n]) continue;
     const s = standingOf(world, n, player);
@@ -506,6 +518,8 @@ export function statecraftView(world: World, player: number): StatecraftView | n
       why: ENVOY_ACTIONS.map((a) => whyNotEnvoy(world, player, n, a)),
       married: dip.marriagesBetween(d, me, world.nationIds[n]!) > 0,
       demands,
+      notoriety: dip.notoriety(d, world.nationIds[n]!),
+      price: mayPrice(world, player, n, ctx.counts) ? priceOfWar(world, player, n, ctx) : null,
     };
   }
   const subjects = subjectsView(world, player, (n) => world.nationLedger[n * LEDGER_LINES + LEDGER.indexOf("tribute")]!);
@@ -522,5 +536,11 @@ export function statecraftView(world: World, player: number): StatecraftView | n
         until: p.until,
       };
     });
-  return { seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects, house: houseView(world, player), courting: courtingView(world, player), asks };
+  return { seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects, house: houseView(world, player), courting: courtingView(world, player), asks, nameAbroad: nameAbroadView(world, player) };
+}
+
+/** A realm the player could declare war on: no war, alliance or subject tie between them (a truce may be broken). */
+function mayPrice(world: World, player: number, n: number, counts: Int32Array): boolean {
+  const st = relationState(world, player, n).state;
+  return (st === null || st === "truce") && counts[n]! > 0;
 }

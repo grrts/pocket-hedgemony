@@ -1,5 +1,6 @@
 import type { World } from "./world.ts";
-import { checkDestroyed, declareWar, peaceShare, strength, type News } from "./war.ts";
+import { checkDestroyed, declareWar, strength, type News } from "./war.ts";
+import { peaceShare } from "./peace.ts";
 import { personName } from "./names.ts";
 import { capsOf } from "./government.ts";
 import { FAITH_IDS, FAITH_POLICIES, NO_FAITH, NO_TONGUE } from "./peoples.ts";
@@ -411,7 +412,8 @@ export function foldInRealm(world: World, s: number, o: number, news: News[]): v
     world.provinceLord[p] = lord;
   }
   news.push({ kind: "envoy", text: `${world.rules.nations[s]!.name} is folded into ${world.rules.nations[o]!.name}: its ruler holds its ${land.length} province${land.length === 1 ? "" : "s"} as a lord of the realm.`, nations: [s, o], province: capital });
-  dip.provincesTaken(world.diplomacy, oid, sid, land.map((p) => world.provinceIds[p]!));
+  // Land gained by diplomacy is not seized: no Took our land, no Lands taken (DIPL-224).
+  dip.provincesJoined(world.diplomacy, oid, sid, land.map((p) => world.provinceIds[p]!));
   checkDestroyed(world, news);
   bondsChanged(world);
 }
@@ -435,7 +437,8 @@ export function mergeCrownsRealm(world: World, s: number, o: number, news: News[
   }
   const capital = world.provinceIndex.get(world.rules.nations[s]!.capital) ?? land[0];
   news.push({ kind: "crown", text: `The crowns of ${world.rules.nations[o]!.name} and ${world.rules.nations[s]!.name} are merged: its ${land.length} province${land.length === 1 ? "" : "s"} join the realm, its lords keep their land.`, nations: [s, o], ...(capital === undefined ? {} : { province: capital }) });
-  dip.provincesTaken(world.diplomacy, oid, sid, land.map((p) => world.provinceIds[p]!));
+  // Land gained by diplomacy is not seized: no Took our land, no Lands taken (DIPL-224).
+  dip.provincesJoined(world.diplomacy, oid, sid, land.map((p) => world.provinceIds[p]!));
   checkDestroyed(world, news);
   bondsChanged(world);
 }
@@ -546,10 +549,8 @@ export function aiRisings(world: World, news: News[]): void {
     const war = dip.warOf(d, t.r.target);
     let losing = false;
     if (war) {
-      const idx = (ids: string[]) => ids.map((id) => world.nationIndex.get(id)!).filter((n) => n !== undefined);
-      const ours = war.attackers.includes(t.r.target) ? idx(war.attackers) : idx(war.defenders);
-      const theirs = war.attackers.includes(t.r.target) ? idx(war.defenders) : idx(war.attackers);
-      losing = peaceShare(world, ours, theirs) > config.rising.overlord_losing_peace_voice_share;
+      // The overlord's own peace voices in that war (WAR-180, WAR-221).
+      losing = peaceShare(world, world.nationIndex.get(t.r.target)!, war) > config.rising.overlord_losing_peace_voice_share;
     }
     const neighbours = near(t.s);
     const backer = [...neighbours].find((id) => {

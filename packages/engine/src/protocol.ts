@@ -20,7 +20,7 @@ import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
-import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
+import { canBorrow, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
 import { feverOf, FEVER_STEPS } from "./land.ts";
 import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
 import { badWeatherName } from "./domain/realm/index.ts";
@@ -44,6 +44,7 @@ import { explorationView, type ExplorationView } from "./colonies.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { newLands, officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
+import { warPeaceView, type WarPeaceView } from "./peace.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
 export interface CompanyView {
@@ -130,7 +131,14 @@ export interface Snapshot {
   /** Achievements: unlocks since the last snapshot (once), the campaign's earned list, progress values and eligibility; null before a realm is chosen. */
   achievements: ReturnType<typeof achievementsView>;
   /** Wars under way, by nation index. */
-  wars: { id: string; attackers: number[]; defenders: number[]; start: string }[];
+  wars: {
+    id: string;
+    attackers: number[];
+    defenders: number[];
+    start: string;
+    /** The war card's peace facts (WAR-221 to WAR-231): aim, months, the long-war mark, both leaders' peace voices and the most one peace may take from each; null for a war whose leaders are gone. */
+    peace: WarPeaceView | null;
+  }[];
   /** Peace offered to the player by an AI war leader, until the next month: terms as the AI sends them ("give": it gives up land the player holds). */
   peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" }[];
   /** Calls to arms waiting for the player's answer. */
@@ -379,7 +387,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
   function snapshot(id: number, started: number, rejectedOrders: Snapshot["rejectedOrders"], news: News[] = [], withHash = true): HostReply {
     const w = world!;
     const idx = (ids: string[]) => ids.map((x) => w.nationIndex.get(x)!).filter((n) => n !== undefined);
-    const wars = w.diplomacy.wars.map((x) => ({ id: x.id, attackers: idx(x.attackers), defenders: idx(x.defenders), start: x.start }));
+    const wars = w.diplomacy.wars.map((x) => ({ id: x.id, attackers: idx(x.attackers), defenders: idx(x.defenders), start: x.start, peace: warPeaceView(w, x) }));
     // The player hears of what involves them, their partners and their neighbours' wars.
     const close = new Set<number>([player]);
     for (const x of wars) if (x.attackers.includes(player) || x.defenders.includes(player)) for (const n of [...x.attackers, ...x.defenders]) close.add(n);
@@ -463,10 +471,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       classNames: CLASS_NAMES,
       taxRates: TAX_RATES,
       provinceTax: w.provinceTax.slice(),
-      provinceTaxGold: Float32Array.from({ length: w.provinceCount }, (_, p) => {
-        const holder = controller(w, p);
-        return holder >= 0 ? provinceTax(w, p, holder) : 0;
-      }),
+      provinceTaxGold: Float32Array.from({ length: w.provinceCount }, (_, p) => heldTax(w, p)),
       taxDefault: player >= 0 ? w.nationTaxDefault[player]! : NORMAL_TAX,
       ledger: player >= 0 ? LEDGER.map((line, k) => ({ line, gold: w.nationLedger[player * LEDGER_LINES + k]! })) : [],
       debt: player >= 0 ? w.nationDebt[player]! : 0,

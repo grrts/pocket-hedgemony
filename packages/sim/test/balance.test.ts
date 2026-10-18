@@ -207,7 +207,8 @@ describe("lever sweeps", () => {
     expect(sweepLevers("provisional")).toContain("warfare.troop_cap");
     expect(sweepLevers(["a.b"])).toEqual(["a.b"]);
     expect(leverExists("warfare.troop_cap")).toBe(true);
-    expect(leverExists("warfare.occupation.tax_share")).toBe(false);
+    expect(leverExists("warfare.occupation.tax_share")).toBe(true);
+    expect(leverExists("warfare.no_such_lever")).toBe(false);
     expect(targetOf("warfare.peace.long_war_years", config.balance.sweep.targets)).toBe("obliged_share");
     expect(targetOf("diplomacy.leagues.threshold_by_era", config.balance.sweep.targets)).toBe("league_share");
     expect(targetOf("realm.debt", config.balance.sweep.targets)).toBe("score_growth");

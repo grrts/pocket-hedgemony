@@ -1,3 +1,5 @@
+import { armyDead } from "./fallen.ts";
+import { W as WARFARE } from "./domain/warfare/index.ts";
 import { monthlyPeople } from "./living.ts";
 import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
@@ -6,6 +8,7 @@ import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, moveQueued as moveQueuedStudy, queuePath, queueStudy, setSeats, setStudy, unqueue } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
+import { monthlyConquest } from "./conquest.ts";
 import { riseUp, subjectAction } from "./subjects.ts";
 import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
@@ -75,11 +78,13 @@ import {
 export type Order =
   /** March to a province, to the given tile in it if any (else its centre). */
   | { type: "move"; army: number; to: number; tile?: number }
-  | { type: "declareWar"; target: number }
+  /** Declare war with an aim the realm holds (else the best it holds, else no aim, WAR-178); `breakTruce` breaks a truce first (WAR-179). */
+  | { type: "declareWar"; target: number; aim?: string; province?: number; breakTruce?: boolean }
   | { type: "conclaveGold"; gold: number }
   | { type: "claimCaliphate" }
   | { type: "raiseOwnPatriarch" }
-  | { type: "offerPeace"; target: number; terms: PeaceTerms }
+  /** Offer peace; with "take", `provinces` are the asker's picks of what to take, at most a third of the loser's land (WAR-227). */
+  | { type: "offerPeace"; target: number; terms: PeaceTerms; provinces?: number[] }
   | { type: "answerCall"; call: string; yes: boolean }
   /** Take or turn down a peace the AI offers (its id in the snapshot's peaceOffers). */
   | { type: "answerPeace"; offer: number; yes: boolean }
@@ -274,6 +279,8 @@ function startDay(world: World, news: News[]): void {
     aiTreasury(world, news);
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
+    // Lands taken over the last 20 years each month; the league check each January (DIPL-221).
+    monthlyConquest(world, news);
     // Institutions read standing and forms and add war aims, so they come after diplomacy and before the wars (INST §9).
     monthlyInstitutions(world, news);
     aiDeclarations(world, news);
@@ -316,12 +323,16 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
   if (locked) return locked;
   switch (order.type) {
     case "declareWar": {
-      const why = declareWar(world, actingNation, order.target, news);
+      const why = declareWar(world, actingNation, order.target, news, {
+        ...(order.aim ? { aim: order.aim } : {}),
+        ...(order.province !== undefined && world.provinceIds[order.province] ? { province: world.provinceIds[order.province] } : {}),
+        ...(order.breakTruce ? { breakTruce: true } : {}),
+      });
       if (!why) faithHeadsWars(world, news);
       return why;
     }
     case "offerPeace":
-      return offerPeace(world, actingNation, order.target, order.terms, news);
+      return offerPeace(world, actingNation, order.target, order.terms, news, false, order.provinces ?? []);
     case "answerPeace":
       return answerPeace(world, order.offer, order.yes, news);
     case "answerCall": {
@@ -747,6 +758,8 @@ function stepMarches(world: World, hours: number): void {
  * What the land can't make up is hunger: men desert and die, and horses are
  * eaten.
  */
+const HUNGER_DEAD_SHARE = WARFARE.hunger.die / (WARFARE.hunger.die + WARFARE.hunger.desert);
+
 function feedArmies(world: World): void {
   const d = world.rules.defines.march;
   const map = marchMap(world);
@@ -770,7 +783,10 @@ function feedArmies(world: World): void {
     if (a.food[i]! < 0) {
       const short = Math.min(1, -a.food[i]! / need);
       const loss = d.hungerLossPerMonth * day * short;
-      a.men[i] = Math.round(a.men[i]! * (1 - loss));
+      const before = a.men[i]!;
+      a.men[i] = Math.round(before * (1 - loss));
+      // Of the men hunger takes, those who die (warfare hunger: die against desert) are missed at home (WAR-226).
+      armyDead(world, i, (before - a.men[i]!) * HUNGER_DEAD_SHARE);
       a.horse[i] = Math.round(a.horse[i]! * (1 - loss));
       a.food[i] = 0;
     }

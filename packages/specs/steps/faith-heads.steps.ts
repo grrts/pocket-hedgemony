@@ -404,7 +404,10 @@ Given("{string} is the Pope's patron", (s, name: string) => {
 When(/^the war ends with a peace that (gives back every province taken in it|keeps one province taken in it)$/, (s, terms: string) => {
   const w = at(s);
   if (terms.startsWith("keeps")) {
-    const p = w.provinceOwner.findIndex((o) => o === s.fhTarget);
+    // Not the capital: one peace takes a capital only when it is the loser's last province (WAR-227).
+    const capital = w.provinceIndex.get(w.rules.nations[s.fhTarget]!.capital);
+    const owned = Array.from(w.provinceOwner.keys()).filter((q) => w.provinceOwner[q] === s.fhTarget);
+    const p = owned.find((q) => q !== capital) ?? owned[0]!;
     w.provinceOccupier[p] = s.fhMe;
     offerPeace(w, s.fhMe, s.fhTarget, "take", [], true);
   } else offerPeace(w, s.fhMe, s.fhTarget, "white", [], true);
