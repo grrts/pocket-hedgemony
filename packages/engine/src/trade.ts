@@ -8,7 +8,7 @@ import { roadHours, townSize, workIndex, worksAt } from "./works.ts";
 import { yearlyFood } from "./food.ts";
 import { officialBonus } from "./officials.ts";
 import { moodIndex } from "./moods.ts";
-import { knows } from "./research.ts";
+import { knows, withoutOf } from "./research.ts";
 import { realmAssessment } from "./realmStrengths.ts";
 
 /**
@@ -690,6 +690,8 @@ export function foundProblem(world: World, n: number, city: number, kind: GameTr
   if (isShip(kind)) {
     if (!isPort(world, city)) return "needs a harbour";
   } else if (marketStep(world, city) === 0) return "needs a market";
+  // Without F03 *Riding and pack animals* a realm sends no camel caravans (RSCH-094).
+  if (kind === "camel_caravan" && withoutOf(world, n).noCaravans) return "needs Riding and pack animals";
   if (kind === "camel_caravan" && !DESERT.includes(world.provinceGround[city] ?? "") && !knows(world, n, "T1")) return "needs desert or drylands, or Caravanserai networks";
   if (kind === "river_barge" && !world.provinceRiver[city]) return "needs a river";
   const cls = isShip(kind) ? SEAFOLK : MARKET_FOLK;
@@ -799,7 +801,7 @@ function aiTrade(world: World): void {
     if (n % 12 !== turn || n === world.player || world.nationGone[n] || start === 0 || count[n]! >= G.ai_max_traders_per_start * start + 1) continue;
     const home = homes(world, n)[0];
     if (home === undefined) continue;
-    const kind = kindFor(world, home, count[n]!);
+    const kind = kindFor(world, n, home, count[n]!);
     const row = kindRow(world, kind);
     if (world.nationTreasury[n]! < row.gold * G.ai_found_reserve || foundProblem(world, n, home, kind)) continue;
     const taken = new Set<number>();
@@ -826,10 +828,10 @@ function homes(world: World, n: number): number[] {
   return out.sort((a, b) => (b === cap ? 1 : 0) - (a === cap ? 1 : 0) || world.provinceGoodsValue[b]! - world.provinceGoodsValue[a]!);
 }
 
-/** The kind a realm's i-th trader from this home is: a ship from every other port, a camel caravan from the desert, a barge on a river (TRADE-111). */
-function kindFor(world: World, home: number, i: number): GameTraderKind {
+/** The kind realm n's i-th trader from this home is: a ship from every other port, a camel caravan from the desert (a pack caravan without F03, RSCH-094), a barge on a river (TRADE-111). */
+function kindFor(world: World, n: number, home: number, i: number): GameTraderKind {
   if (isPort(world, home) && (i % 2 === 1 || marketStep(world, home) === 0)) return "cog_junk_dhow";
-  if (DESERT.includes(world.provinceGround[home] ?? "")) return "camel_caravan";
+  if (DESERT.includes(world.provinceGround[home] ?? "") && !withoutOf(world, n).noCaravans) return "camel_caravan";
   if (world.provinceRiver[home] && i % 3 === 2) return "river_barge";
   return "pack_caravan";
 }
@@ -858,7 +860,8 @@ export function seedTrade(world: World): void {
     const stops = r.stops.map((s) => names.get(s.toLowerCase()) ?? -1);
     if (stops.some((s) => s < 0) || world.provinceOwner[stops[0]!] !== n) continue;
     const ship = "label" in r && /galley|dhow|junk|cog/.test(r.label ?? "") ? true : !("label" in r) || !/caravan/.test(r.label ?? "");
-    const kind: GameTraderKind = ship ? "cog_junk_dhow" : /camel/.test(r.label ?? "") ? "camel_caravan" : "pack_caravan";
+    // A realm without F03 walks a camel route with a pack caravan (RSCH-094).
+    const kind: GameTraderKind = ship ? "cog_junk_dhow" : /camel/.test(r.label ?? "") && !withoutOf(world, n).noCaravans ? "camel_caravan" : "pack_caravan";
     if (routeProblem(world, n, kind, stops) || !loopPath(world, n, kind, stops)) continue;
     addTrader(world, n, stops[0]!, kind, stops).chosen = true;
     used[n]!++;
@@ -871,7 +874,7 @@ export function seedTrade(world: World): void {
     let tries = 0;
     for (let i = used[n]!; i < startCount(world, n) && tries < h.length * 2; tries++) {
       const home = h[tries % Math.min(h.length, 4)]!;
-      const kind = kindFor(world, home, i);
+      const kind = kindFor(world, n, home, i);
       const stops = bestRoute(world, n, kind, home, taken);
       if (!stops) continue;
       stops.forEach((s) => taken.add(s));
