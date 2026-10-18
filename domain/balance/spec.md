@@ -13,13 +13,18 @@ The first thing it checks is Leroy's concern of 18 October: **war has too few do
 overpowered; it should be balanced through diplomacy** (X-21). The war-price rules themselves live in warfare
 (WAR-221 to WAR-232) and diplomacy (DIPL-221 to DIPL-226); this context measures whether they work.
 
+The model is built on the balance runs that already exist in `packages/sim` (feedback 130,
+`docs/balance-runs.md`): AI-only campaigns and the break-the-game bot, with their findings and report. This
+context adds probe strategies, the strategy comparison, the war-price checks, return on gold and lever sweeps to
+those tools rather than a second runner.
+
 In scope:
 - Headless runs of the 1444 scenario with every realm played by the AI, and probe realms played by a fixed
   strategy.
 - The metrics recorded each year, per realm and for the world.
 - The balance checks, their thresholds and their verdicts.
 - Lever sweeps over configuration keys.
-- The balance report, and the quick run used in continuous integration.
+- The balance report, and how the tools are tested in continuous integration.
 
 Not in scope:
 - The rules of any system (owned by each context; the model only reads the world and sends commands).
@@ -28,6 +33,9 @@ Not in scope:
 - Anything the player sees: the model never runs inside the game, and settings never reach it (X-15).
 
 ## 2. Sources
+
+- `docs/balance-runs.md` and `packages/sim` (feedback 130): AI-only campaigns, the break-the-game bot, the
+  findings (Broken, Balance, Note), `packages/sim/config.json`, and the rule that runs start only when Leroy asks.
 
 - Leroy, 18 October 2026 (project chat): "there should be a balancing model aimed to check how systems work
   together, and to check if we don't have overpowered mechanics. I feel war right now doesn't have enough
@@ -178,38 +186,41 @@ threshold) or fail.
 
 ### 5.6 Report
 
-- BAL-025 The balance model shall write each run set's report to `balance-reports/<date>-<config hash>/`:
-  `summary.md`, one page with every check's verdict, value and threshold, the flagged levers, and the three
-  largest gaps between strategies; `metrics.csv`, one row per realm, run and year; `world.csv`, one row per run
-  and year; and `runs.json`, the run set and every run's error if any. [X-21]
-- BAL-026 The summary shall start with the war-price checks (BAL-014 to BAL-017) and explain each failure in one
+- BAL-025 The balance model shall add to the run folder `packages/sim` already writes (`report.md`,
+  `summary.json`, one JSON file per campaign and per bot realm): a strategy comparison section in `report.md`
+  with every check's verdict, value and threshold, the flagged levers and the three largest gaps between
+  strategies; and `metrics.csv` and `world.csv`, one row per realm, run and year and one per run and year, for
+  questions the report leaves open. A failed check is a *Balance* finding; a run that breaks is *Broken*.
+  [X-21; feedback 130]
+- BAL-026 The report's *At a glance* shall list first the war-price checks (BAL-014 to BAL-017) and explain each failure in one
   sentence that names the lever most likely to fix it, from the sweep when one ran. [X-21]
 - BAL-027 The balance model shall exit with a failure code when any check fails, so it can guard a merge. [X-21]
 
-### 5.7 Quick run and the full run
+### 5.7 When it runs
 
-- BAL-028 The balance model shall offer a quick run (`balance.quick`: 2 seeds, 20 years, the Conqueror and the
-  Court on two probe realms, provisional) that finishes within `balance.quick.minutes` (10, provisional) on the CI
-  runner and runs on pull requests that change rules data, the turn or a context's rules; a quick run warns but
-  never fails a merge. [X-21]
-- BAL-029 The full run and lever sweeps shall run on demand (`pnpm balance`, `pnpm balance --sweep`), and their
-  summaries are kept with the milestone that tunes them. [X-21]
+- BAL-028 Continuous integration shall test the strategies, checks and sweeps on a few weeks of the small
+  made-up world (`--map synthetic`), as it tests the existing tools, and shall never start a campaign. [X-21;
+  feedback 130]
+- BAL-029 Strategy runs and lever sweeps shall start only when Leroy asks for one, through the `packages/sim`
+  command line (for example `pnpm --filter @ph/sim strategies --years 50 --seeds 1,2,3` and `--sweep`); Claude
+  copies the run folder to the project files under `balance-runs/<date>/` and links `report.md` in the thread.
+  [X-21; feedback 130]
 
 ### How the player uses it
 
-- BAL-030 The player never sees or runs the balance model: it is a developer's tool, outside the game, and it
-  changes no rule or setting. Its results reach the player only as tuned numbers in the rules data. The report's
-  `summary.md` is the developers' overview: one page that shows at a glance whether war, diplomacy and growth are
-  in balance. The player-facing side of the price of war (the declare sheet, the war card, *Your name abroad*)
+- BAL-030 The player of the game never sees the balance model: it is a tool for building the game, and it
+  changes no rule or setting; its results reach players only as tuned numbers in the rules data. Its user is
+  Leroy, as for the balance runs (`docs/balance-runs.md`): he asks for a run in the project, Claude runs it and
+  links `report.md`, whose *At a glance* opens with the war-price checks and shows whether war, diplomacy and
+  growth are in balance; the report keeps to short tables a phone shows in landscape without sideways scrolling. The player-facing side of the price of war (the declare sheet, the war card, *Your name abroad*)
   is specified in WAR-229 to WAR-232 and DIPL-225 to DIPL-226. [X-19; X-21]
 
 ## 6. Commands
 
 | Command | Who | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
-| RunBalance(seeds, years, probes, strategies) | developer | rules data load | run set played, report written | BalanceRunFinished, BalanceCheckFailed |
-| SweepLevers(levers, factors) | developer | a run set definition | one run set per lever and factor | LeverFlagged |
-| RunQuickBalance() | CI | a pull request changes rules or the turn | quick run set, warnings only | BalanceRunFinished |
+| RunStrategies(seeds, years, probes, strategies) | Claude, when Leroy asks | rules data load | run set played, report written | BalanceRunFinished, BalanceCheckFailed |
+| SweepLevers(levers, factors) | Claude, when Leroy asks | a run set definition | one run set per lever and factor | LeverFlagged |
 
 ## 7. Domain events
 
@@ -222,7 +233,6 @@ threshold) or fail.
 ## 8. Policies
 
 - When any context marks a number provisional, the lever becomes part of the default sweep.
-- When rules data, the turn or a context's rules change in a pull request, the quick run runs.
 
 ## 9. Each turn
 
@@ -234,27 +244,25 @@ turn, after the turn, it records the metrics.
 
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
-| balance.years | Years per run | 50 | yes | balance |
-| balance.seeds | Seeds per run set | 8 | yes | balance |
-| balance.probes | Probe realms by band | France, Ottomans; Castile, Mali; Brandenburg, Ayutthaya | yes | balance |
-| balance.checks.dominance_share | BAL-013 | 60 % | yes | balance |
-| balance.checks.war_edge | BAL-014 | 25 % | yes | balance |
-| balance.checks.diplomacy_floor | BAL-014 | 80 % | yes | balance |
-| balance.checks.war_return_edge | BAL-015 | 50 % | yes | balance |
-| balance.checks.league_share | BAL-016 | 75 % | yes | balance |
-| balance.checks.voices_share | BAL-017 | 20 % | yes | balance |
-| balance.checks.snowball_edge | BAL-018 | 1.5 × | yes | balance |
-| balance.checks.max_share_1544 | BAL-018 | 10 % | yes | balance |
-| balance.checks.alive_1544 | BAL-019 | 50 % to 90 % | yes | balance |
-| balance.checks.small_floor | BAL-020 | 70 % | yes | balance |
-| balance.checks.bankrupt_share | BAL-021 | 5 % | yes | balance |
-| balance.sweep.levers | Levers swept | every provisional key | yes | balance |
-| balance.sweep.factors | Sweep factors | 0.5, 2 | yes | balance |
-| balance.sweep.targets | Target metric per lever | per lever | yes | balance |
-| balance.sweep.dead | BAL-023 | 2 % | yes | balance |
-| balance.sweep.sensitive | BAL-024 | 25 % | yes | balance |
-| balance.quick | Quick run | 2 seeds, 20 years, Conqueror and Court, 2 probes | yes | balance |
-| balance.quick.minutes | Quick run budget | 10 | yes | balance |
+| balance.years | Years per run | 50 | yes | packages/sim/config.json |
+| balance.seeds | Seeds per run set | 8 | yes | packages/sim/config.json |
+| balance.probes | Probe realms by band | France, Ottomans; Castile, Mali; Brandenburg, Ayutthaya | yes | packages/sim/config.json |
+| balance.checks.dominance_share | BAL-013 | 60 % | yes | packages/sim/config.json |
+| balance.checks.war_edge | BAL-014 | 25 % | yes | packages/sim/config.json |
+| balance.checks.diplomacy_floor | BAL-014 | 80 % | yes | packages/sim/config.json |
+| balance.checks.war_return_edge | BAL-015 | 50 % | yes | packages/sim/config.json |
+| balance.checks.league_share | BAL-016 | 75 % | yes | packages/sim/config.json |
+| balance.checks.voices_share | BAL-017 | 20 % | yes | packages/sim/config.json |
+| balance.checks.snowball_edge | BAL-018 | 1.5 × | yes | packages/sim/config.json |
+| balance.checks.max_share_1544 | BAL-018 | 10 % | yes | packages/sim/config.json |
+| balance.checks.alive_1544 | BAL-019 | 50 % to 90 % | yes | packages/sim/config.json |
+| balance.checks.small_floor | BAL-020 | 70 % | yes | packages/sim/config.json |
+| balance.checks.bankrupt_share | BAL-021 | 5 % | yes | packages/sim/config.json |
+| balance.sweep.levers | Levers swept | every provisional key | yes | packages/sim/config.json |
+| balance.sweep.factors | Sweep factors | 0.5, 2 | yes | packages/sim/config.json |
+| balance.sweep.targets | Target metric per lever | per lever | yes | packages/sim/config.json |
+| balance.sweep.dead | BAL-023 | 2 % | yes | packages/sim/config.json |
+| balance.sweep.sensitive | BAL-024 | 25 % | yes | packages/sim/config.json |
 
 ## 11. Seams
 
@@ -279,6 +287,8 @@ strategies of BAL-008 with ordinary commands. The Court strategy is the AI itsel
 
 - **D-BAL-1** Scores as the yardstick: strategies are compared on the game's own Economy, Power and Technology
   scores (X-12), so balance means "balanced for winning", not a new number.
+- **D-BAL-3** One set of tools: the model extends `packages/sim` (feedback 130) and its config, report and run rule
+  instead of adding a second runner; strategy runs, like every balance run, start only when Leroy asks.
 - **D-BAL-2** First thresholds are provisional and chosen so today's engine fails BAL-014 to BAL-016: the audit
   found no league ever forms and occupation pays the occupier, which is the overpowered war Leroy felt. The
   first full run records the baseline before the war-price rules land.
@@ -292,5 +302,5 @@ strategies of BAL-008 with ordinary commands. The Court strategy is the AI itsel
 | BAL-010 … BAL-012 | features/metrics.feature | Realm metrics each January; World metrics each January; Return on gold per path |
 | BAL-013 … BAL-021 | features/balance-checks.feature | No strategy dominates; War is not the best path; War is paid for; Conquest is answered; Wars end; No snowball; Believable pace; Small realms are playable; No collapse without cause |
 | BAL-022 … BAL-024 | features/lever-sweeps.feature | A sweep scales one lever at a time; A dead lever; A sensitive lever |
-| BAL-025 … BAL-029 | features/balance-report.feature | The report's files; War-price checks come first; A failed check fails the command; The quick run warns only; Full runs and sweeps run on demand |
+| BAL-025 … BAL-029 | features/balance-report.feature | The report's files; War-price checks come first; A failed check fails the command; CI tests the tools without a campaign; Runs start when Leroy asks |
 | BAL-030 | — | Not player-facing; the player-facing price of war is WAR-229 to WAR-232 and DIPL-225 to DIPL-226 |

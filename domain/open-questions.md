@@ -55,6 +55,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 ### Balance model (balance)
 
 - **D-BAL-1**: Scores as the yardstick: strategies are compared on the game's own Economy, Power and Technology
+- **D-BAL-3**: One set of tools: the model extends `packages/sim` (feedback 130) and its config, report and run rule
 - **D-BAL-2**: First thresholds are provisional and chosen so today's engine fails BAL-014 to BAL-016: the audit
 
 ### Buildings (buildings)
