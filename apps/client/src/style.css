@@ -2866,6 +2866,12 @@ button.paper.over {
 .assessments .what {
   white-space: nowrap;
 }
+/* What the assessment sets the realm off with, under its label (REALM-232). */
+.assessments .what .sets {
+  display: block;
+  font-size: 0.8em;
+  line-height: 1.1;
+}
 .assessments .steps {
   display: inline-flex;
   gap: 2px;
