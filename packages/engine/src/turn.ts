@@ -3,7 +3,7 @@ import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
-import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
+import { callStudentsToArms, foundSchool, monthlyResearch, moveQueued as moveQueuedStudy, queuePath, queueStudy, setSeats, setStudy, unqueue } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
 import { riseUp, subjectAction } from "./subjects.ts";
@@ -115,6 +115,11 @@ export type Order =
   | { type: "settleLand"; province: number }
   /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
   | { type: "setStudy"; invention: string }
+  /** The study queue (RSCH-108 to RSCH-110): add one, queue the path to one, take one out, move one a place earlier (-1) or later (1). */
+  | { type: "queueStudy"; invention: string }
+  | { type: "queuePath"; invention: string }
+  | { type: "unqueueStudy"; invention: string }
+  | { type: "moveQueuedStudy"; invention: string; by: number }
   | { type: "setSeats"; n: number }
   | { type: "callStudentsToArms" }
   | { type: "foundSchool"; province: number }
@@ -361,6 +366,14 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "setStudy":
       return setStudy(world, actingNation, order.invention);
+    case "queueStudy":
+      return queueStudy(world, actingNation, order.invention);
+    case "queuePath":
+      return queuePath(world, actingNation, order.invention);
+    case "unqueueStudy":
+      return unqueue(world, actingNation, order.invention);
+    case "moveQueuedStudy":
+      return moveQueuedStudy(world, actingNation, order.invention, order.by < 0 ? -1 : 1);
     case "setSeats":
       return setSeats(world, actingNation, order.n);
     case "callStudentsToArms":

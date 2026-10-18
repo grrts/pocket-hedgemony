@@ -309,8 +309,8 @@ export interface Snapshot {
   arms: readonly string[];
   /** The player's research for the Learning tab (null before a realm is chosen). */
   research: ResearchView | null;
-  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%). */
-  realmResearch: { known: number; study: string | null; pct: number }[];
+  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%), its standing, eras behind the times, and how many inventions it knows that the player's realm does not (RSCH-104). */
+  realmResearch: { known: number; study: string | null; pct: number; standing: string; behind: number; ahead: number }[];
   /** Works (milestone 4): their names, each step's name and what it does, and the step built of each in each province (works.length per province, 0 = none). */
   works: readonly string[];
   workSteps: { name: string; effect: string }[][];
