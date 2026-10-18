@@ -17,7 +17,9 @@ import { advance, applyNow, campaigning, HOURS_PER_STEP, mayMarchInto, processTu
 import { createWorld, tileMarch, type World } from "./world.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { tileStepHours } from "./march.ts";
-import { tileGridFromImages } from "./tiles.ts";
+import { tileGridFromImages, type TileGrid } from "./tiles.ts";
+import { openSave, writeSave, memoryStorage, type Campaign, type SaveHeader, type SaveKind, type Platform as SavePlatform } from "./domain/saves/index.ts";
+import { Rng } from "./rng.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
@@ -48,7 +50,21 @@ export type EngineRequest =
   /** Plays the clock on by some 4-hour steps (six a day). */
   | { id: number; type: "advance"; steps: number }
   /** An order that acts at once (everything but moves: war and peace, recruiting, training, commanders). */
-  | { id: number; type: "act"; order: Order };
+  | { id: number; type: "act"; order: Order }
+  /**
+   * Writes a save of the world as it is now, at a turn boundary (domain/saves).
+   * `listing` holds the first bytes (the header) of the saves already kept, so
+   * the engine can rotate them out; the UI thread does the storing.
+   */
+  | { id: number; type: "save"; kind: SaveKind; campaign: Campaign; listing: readonly SaveListing[]; device: string; platform: SavePlatform; gameVersion: string; now: number; name?: string; replace?: string; keep?: number }
+  /** Opens a save in place of the game in progress; `map` as for newGame, needed once per engine. */
+  | { id: number; type: "load"; bytes: Uint8Array; map?: MapTiles; acceptModified?: boolean };
+
+/** A save already kept: its path and its header's bytes. */
+export interface SaveListing {
+  path: string;
+  head: Uint8Array;
+}
 
 /** The decoded map images: province id + 1 per pixel (0 = water), and the terrain image's RGB. */
 export interface MapTiles {
@@ -61,6 +77,10 @@ export interface MapTiles {
 /** Messages the engine worker sends back. */
 export type EngineResponse =
   | { id: number; type: "snapshot"; snapshot: Snapshot }
+  /** A save written: the file to keep, the files it replaces, and the campaign's ironman head. */
+  | { id: number; type: "saved"; path: string; header: SaveHeader; bytes: Uint8Array; removed: string[]; ironmanHead?: string }
+  /** A save that did not open, and why, in the player's words; `canAccept` when opening anyway is allowed. */
+  | { id: number; type: "refused"; message: string; canAccept: boolean }
   | { id: number; type: "error"; message: string };
 
 /**
@@ -267,6 +287,8 @@ export interface HostReply {
 export function createEngineHost(loadRules: () => Ruleset, now: () => number = () => performance.now()) {
   let world: World | null = null;
   let player = -1;
+  /** The map's tiles from the last newGame or load, for loading saves onto. */
+  let grid: TileGrid | undefined;
 
   function snapshot(id: number, started: number, rejectedOrders: Snapshot["rejectedOrders"], news: News[] = []): HostReply {
     const w = world!;
@@ -480,7 +502,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       switch (req.type) {
         case "newGame": {
           const rules = loadRules();
-          const grid = req.map ? tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain) : undefined;
+          grid = req.map ? tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain) : undefined;
           world = createWorld(rules, req.seed, grid);
           const idx = world.nationIndex.get(req.playerNation);
           if (idx === undefined) throw new Error(`unknown nation ${req.playerNation}`);
@@ -502,6 +524,28 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           if (!world) throw new Error("no game in progress");
           const report = applyNow(world, req.order, player);
           return snapshot(req.id, started, report.rejectedOrders, report.news);
+        }
+        case "save": {
+          if (!world) throw new Error("no game in progress");
+          const storage = memoryStorage();
+          for (const e of req.listing) storage.files.set(e.path, e.head);
+          const ctx = { storage, rules: world.rules, rng: new Rng(req.now >>> 0), device: req.device, platform: req.platform, gameVersion: req.gameVersion, now: req.now };
+          const campaign = { ...req.campaign };
+          const w = writeSave(ctx, campaign, world, req.kind, { ...(req.name ? { name: req.name } : {}), ...(req.replace ? { replace: req.replace } : {}), ...(req.keep ? { keep: req.keep } : {}) });
+          const reply: EngineResponse = { id: req.id, type: "saved", path: w.path, header: w.header, bytes: w.bytes, removed: w.removed, ...(campaign.ironmanHead ? { ironmanHead: campaign.ironmanHead } : {}) };
+          return { response: reply, transfer: [w.bytes.buffer as ArrayBuffer] };
+        }
+        case "load": {
+          const rules = loadRules();
+          if (req.map) grid = tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain);
+          const r = openSave(req.bytes, { rules, fullGame: true, ...(grid ? { tiles: grid } : {}), ...(req.acceptModified ? { acceptModified: true } : {}) });
+          if (r.kind !== "opened") return { response: { id: req.id, type: "refused", message: "message" in r ? r.message : "This ironman save does not match its check.", canAccept: r.kind === "hash warning" }, transfer: [] };
+          const idx = r.world.nationIndex.get(r.game.playerNation);
+          if (idx === undefined) throw new Error(`unknown nation ${r.game.playerNation}`);
+          world = r.world;
+          player = idx;
+          world.player = idx;
+          return snapshot(req.id, started, []);
         }
       }
     } catch (e) {

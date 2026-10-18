@@ -203,9 +203,39 @@ describe("engine host", () => {
     const start = handle({ id: 1, type: "newGame", seed: 1, playerNation: "castile" });
     expect(start.response.type).toBe("snapshot");
     const next = handle({ id: 2, type: "endTurn", orders: [] });
-    if (next.response.type !== "snapshot") throw new Error(next.response.message);
+    if (next.response.type !== "snapshot") throw new Error(next.response.type === "error" ? next.response.message : next.response.type);
     expect(next.response.snapshot.turn).toBe(1);
     expect(next.transfer.length).toBeGreaterThan(0);
+  });
+
+  it("saves the game in progress and loads it back to the same world", () => {
+    const handle = createEngineHost(() => rules);
+    handle({ id: 1, type: "newGame", seed: 7, playerNation: "castile" });
+    const played = handle({ id: 2, type: "endTurn", orders: [] });
+    if (played.response.type !== "snapshot") throw new Error("no snapshot");
+    const campaign = { campaignId: "c1", playerNation: "castile", nationName: "Castile", ironman: false, options: { difficulty: "normal", events: "historical", endDate: "1939-08-31" }, modified: false, playSeconds: 60 };
+    const ask = { type: "save", campaign, device: "test", platform: "web", gameVersion: "0", listing: [] } as const;
+    const first = handle({ id: 3, ...ask, kind: "autosave", now: 1000, keep: 1 }).response;
+    if (first.type !== "saved") throw new Error(first.type);
+    expect(first.header.kind).toBe("autosave");
+    expect(first.removed).toEqual([]);
+    // A second autosave with only one kept rotates the first out.
+    const head = first.bytes.slice(0, 4096);
+    const second = handle({ id: 4, ...ask, kind: "autosave", now: 2000, keep: 1, listing: [{ path: first.path, head }] }).response;
+    if (second.type !== "saved") throw new Error(second.type);
+    expect(second.removed).toEqual([first.path]);
+    handle({ id: 5, type: "endTurn", orders: [] });
+    const back = handle({ id: 6, type: "load", bytes: second.bytes }).response;
+    if (back.type !== "snapshot") throw new Error(back.type === "error" || back.type === "refused" ? back.message : back.type);
+    expect(back.snapshot.turn).toBe(played.response.snapshot.turn);
+    expect(back.snapshot.hash).toBe(played.response.snapshot.hash);
+    expect(back.snapshot.playerNation).toBe(played.response.snapshot.playerNation);
+  });
+
+  it("refuses a damaged save in the player's words", () => {
+    const handle = createEngineHost(() => rules);
+    const r = handle({ id: 1, type: "load", bytes: new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]) }).response;
+    expect(r.type).toBe("refused");
   });
 
   it("reports errors instead of throwing", () => {

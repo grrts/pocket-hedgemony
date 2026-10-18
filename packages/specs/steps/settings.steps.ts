@@ -950,13 +950,14 @@ Then("the map does not redraw at all", (s) => {
   expect(T.mapRedraws(st(s), false)).toBe(false);
   expect(T.mapRedraws(st(s), true)).toBe(true);
 });
-When(/^(iOS turns on Low Power Mode|Android turns on Battery Saver|a Steam Deck runs on battery under \d+ %|a Steam Deck runs on battery at \d+ %|a Steam Deck runs on its charger)$/, (s, what: string) => {
+When(/^(iOS turns on Low Power Mode|Android turns on Battery Saver|a Steam Deck runs on battery under \d+ %|a Steam Deck runs on battery at \d+ %|a Steam Deck runs on its charger|the browser reports its battery under \d+ % and not charging|the browser reports its battery under \d+ % while charging)$/, (s, what: string) => {
   act(s);
   const under = /under (\d+) %/.exec(what)?.[1];
   const at = / at (\d+) %/.exec(what)?.[1];
   let r: T.BatteryReport;
   if (what.startsWith("iOS")) r = { iosLowPowerMode: true };
   else if (what.startsWith("Android")) r = { androidBatterySaver: true };
+  else if (what.startsWith("the browser")) r = { battery: { charging: what.endsWith("while charging"), level: Number(under) / 100 - 0.01 } };
   else if (under) r = { steamDeck: { onBattery: true, level: Number(under) / 100 - 0.01 } };
   else if (at) r = { steamDeck: { onBattery: true, level: Number(at) / 100 } };
   else r = { steamDeck: { onBattery: false, level: 0.1 } };
@@ -1824,6 +1825,13 @@ When("a player battle runs", (s) => {
 });
 Then("the turn does not stop", (s) => {
   expect(T.resolve(CAT, "gameplay.battle_speed").options).not.toContain("stop");
+});
+When("the week plays out after End turn", (s) => {
+  act(s);
+  s.daySeconds = T.daySeconds(st(s));
+});
+Then(/^each day of the week plays back in ([\d.]+) seconds$/, (s, sec: string) => {
+  expect(s.daySeconds).toBeCloseTo(Number(sec), 6);
 });
 Then(/^each 4-hour step plays back in ([\d.]+) seconds$/, (s, sec: string) => {
   expect(s.stepSeconds).toBeCloseTo(Number(sec), 6);

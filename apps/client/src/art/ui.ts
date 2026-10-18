@@ -299,6 +299,8 @@ export const ICONS = {
     "...kbk....",
     "...kkk....",
   ],
+  menu: ["kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk", "..........", "kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk", "..........", "kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk"],
+  cog: ["....kk....", ".kk.kk.kk.", ".kwkwwkwk.", "..kwwwwk..", "kkwwkkwwkk", "kkwwkkwwkk", "..kwwwwk..", ".kwkwwkwk.", ".kk.kk.kk.", "....kk...."],
   anchor: [
     "...kkk...",
     "...kik...",

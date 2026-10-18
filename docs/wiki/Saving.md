@@ -2,6 +2,17 @@
 
 Saving in Pocket Hegemony is built so that you never lose more than the orders you gave since your last End turn, even if your phone kills the app without warning. Saves work the same on every platform, keep loading after updates, and can follow you between your phone, tablet, Steam Deck and the web through an optional account, or as a file you export yourself.
 
+## Where you find it
+
+Tap the three-line button at the top left of the map (or press `Esc`) to open the game menu: Return to the map, Save, Load, Settings and Exit to main menu.
+
+- **Save** shows the new save's name, already filled in with your realm and date, and a Save button. Under it are this campaign's saves; Save over asks "Replace?" right in the row. "Saved." shows over the map when it is done. While the week plays, Save waits until it has played.
+- **Load** lists every save on this device, newest first, with its map crop, banner, date and when it was saved. Each campaign's first line is "Where you left off". Tap a line to Load or Delete it; Delete asks first. Going back to an earlier save of the campaign you are playing asks "Leave … unsaved?" when weeks have passed since your last save.
+- **Where you left off** is kept after every week and when you leave, so Exit to main menu and Continue on the start screen bring you straight back.
+- **Autosaves** are set in Settings → Gameplay.
+
+On the web, saves are kept in your browser's storage on this device.
+
 ## How it works
 
 ### The principles

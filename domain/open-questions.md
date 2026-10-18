@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-556 decided and 8 still open across 29 contexts.
+560 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -487,6 +487,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SAVE-14**: (was OQ-SAVE-14) "Send a report" sits on the failure screen X1 only, as screen flow says. Latest design wins.
 - **D-SAVE-15**: (was OQ-SAVE-15) Importing an ironman save needs a connection: offline, the import is refused with "Connect to import an ironman save", so the head check always runs. It closes the split with no new state.
 - **D-SAVE-16**: (was OQ-SAVE-16) Every way out of an ironman campaign is an exit: "Save and quit", "Exit to main menu" and the app being closed write the ironman save; a kill mid-turn resumes from the Resume save and journal like any campaign. One rule for all exits.
+- **D-SAVE-17**: The Load card lists each campaign's Resume save as its first line, "Where you left off", although SAVE-013 keeps Resume saves out of Load: with several campaigns and no manual saves, Continue alone reaches only the newest, and the player would have no way back to the others. One line per campaign, so the list stays short (X-19).
 
 ### Scenario setup (scenario-setup)
 
@@ -528,6 +529,9 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SET-16**: (was OQ-SET-16) Main hand Left: End turn moves to the left corner and the game menu button moves to the right, so they stay at opposite corners. It keeps screen flow's rule.
 - **D-SET-17**: (was OQ-SET-17) Place names: the setting stays as designed, and since no historical name list is added (D-MAP-6), both options show today's region names. Nothing new is added.
 - **D-SET-19**: (was OQ-SET-19) Hint switches and mutes: tutorial progress and Needs attention mutes go into the save, hint switches stay personal settings, and "Reset tutorial and hints" clears both. X-16 settles it.
+- **D-SET-20**: Turn playback speed is a Gameplay row of its own beside Battle playback speed: the week's playback after End turn is the speed players notice most, and like Battle playback speed it only changes how fast the week is shown (X-15). Leroy asked for a speed setting (17 October 2026 brief).
+- **D-SET-21**: On the web and on phones without a low-power signal the game can read, Auto counts a battery under the 20 % threshold and not charging as the device saving battery, as for the Steam Deck. Same threshold, one rule.
+- **D-SET-22**: The client builds the Settings screen from settings.json but lists only the rows whose effect it has built, so no row promises something the game does not do; rows join as their effects are built. A row that does nothing is a poor experience (X-19).
 
 ### Subjects and overlords (subjects)
 

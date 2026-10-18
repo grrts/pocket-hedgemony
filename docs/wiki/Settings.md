@@ -2,6 +2,19 @@
 
 Settings let you shape how Pocket Hegemony looks, sounds and handles on your device, from interface scale and colour vision to controller buttons and battery use. They never change the rules, balance or the computer players: anything that would is a campaign rule, chosen when you start a new game. Most settings pick sensible defaults from the kind of device you play on, apply at once, and follow you between devices if you sign in.
 
+## Where you find it
+
+Open Settings from the game menu (the three-line button at the top left of the map, or `Esc`) or from the start screen. Sections are on the left and their rows on the right; in a tall window the sections come first. Each row says what it does under its name, a red dot marks a value you changed, and a long press on the name (or a right-click) puts it back. Reset this section is at the end of each section.
+
+What the game has built so far:
+
+- **Gameplay**: Autosave and Autosaves kept per campaign; Turn playback speed (1×, 2×, 4×: how fast the week plays out after End turn) and Battle playback speed.
+- **Graphics**: Battery saver (Off, Auto, On) and the knobs it moves: Frame rate cap, Sharpness and Animations. Rows it moves say "Set by Battery saver". Auto follows your device's battery where the browser reports it.
+- **Audio**: Master, Music on or off and its volume, Effects volume and Interface sounds. The speaker button's Sound card changes the same settings.
+- **Accessibility**: Text size (Normal, Large, Larger) for the cards, menus and alerts.
+
+Other rows join the screen as the game builds what they do.
+
 ## How it works
 
 ### The principles

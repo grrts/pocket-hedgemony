@@ -46,6 +46,11 @@ import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
+import { Rng } from "@ph/engine";
+import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
+import { SaveStore, type StoredSave } from "./saves/store.ts";
+import { autosaveEvery, autosavesKept, battleStepMs, dayMs, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
+import { openSettingsAt, renderSettings } from "./ui/settingsScreen.ts";
 
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
@@ -102,6 +107,16 @@ const marchGraph: MarchMap = (() => {
 
 // ---- state ----
 let snapshot: Snapshot | null = null;
+/** The campaign being played (domain/saves), or null on the start screen. */
+let campaign: Campaign | null = null;
+/** The engine has the map's tiles (sent with the first new game or load). */
+let mapSent = false;
+/** When play time was last counted (performance.now), for the campaign's play time. */
+let playClock = 0;
+/** An order acted since the Resume save was written. */
+let changedSinceResume = false;
+/** Every save on the device, newest first, as last read. */
+let savesList: StoredSave[] = [];
 let owners: Int16Array = Int16Array.from(provinces, (p) => (p.owner ? nationIndex.get(p.owner)! : -1));
 let occupiers: Int16Array = new Int16Array(provinces.length).fill(-1);
 /** The dispatches log: what concerned the player, newest first, kept from turn to turn (feedback 72). */
@@ -125,10 +140,13 @@ let stepStart = 0;
 let stepMs = 0;
 /** Where each army was drawn when the latest snapshot arrived, by army id, for walking on from there. */
 let drawnAt = new Map<number, [number, number]>();
-/** End turn plays the week a day at a time (TIME-076), and a 4-hour step at a time while the player fights. */
-const DAY_MS = 300;
+/**
+ * End turn plays the week a day at a time (TIME-076), and a 4-hour step at a
+ * time while the player fights, at the speeds set in Settings → Gameplay
+ * (SET-131, SET-065). A 4-hour step takes 500 ms at 1×, and 1200 ms while the
+ * player watches the battle, so its rounds can be followed (feedback 73).
+ */
 const BATTLE_STEP_MS = 500;
-/** How long each 4-hour step shows while the player watches a battle, so its rounds can be followed (feedback 73). */
 const WATCH_STEP_MS = 1200;
 let playing = false;
 let paused = false;
@@ -193,6 +211,8 @@ app.innerHTML = `
   <section class="panel framed" id="panel" hidden></section>
   <div class="alerts" id="alerts" aria-live="polite"></div>
   <div class="battle-watch framed" id="battle-watch" hidden></div>
+  <div class="overlay" id="overlay" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
   <button class="wax fab end-turn" id="fab" title="End turn" data-sfx="none" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
@@ -333,6 +353,9 @@ function renderSoundButton(): void {
   soundButton.innerHTML = icon(off ? "mute" : "speaker", 3, off ? "Sound (music off)" : "Sound");
 }
 
+/** The Sound card's controls are the Audio rows of Settings (SET-132). */
+const SOUND_PREF: Record<string, string> = { master: "audio.master", music: "audio.music_volume", effects: "audio.effects_volume", musicOn: "audio.music", uiSounds: "audio.interface_sounds" };
+
 /** The Sound menu (domain/audio "How the player uses it"): what plays and why, and the volumes, in one card. */
 function renderSoundMenu(): void {
   if (soundMenu.hidden) return;
@@ -348,11 +371,12 @@ function renderSoundMenu(): void {
     ${slider("master", "Volume")}
     <div class="sound-row${st.musicOn ? "" : " off"}"><span>Music</span><input type="range" min="0" max="100" step="5" value="${pct(st.music)}" data-vol="music" aria-label="Music volume"${st.musicOn ? "" : " disabled"}>${toggle("musicOn")}</div>
     ${slider("effects", "Effects")}
-    <div class="sound-row"><span>Buttons</span><small>A click on every tap</small>${toggle("uiSounds")}</div>`;
+    <div class="sound-row"><span>Buttons</span><small>A click on every tap</small>${toggle("uiSounds")}</div>
+    <button class="paper all-sound" data-shell="settings" data-settings-section="audio">${icon("cog", 1)} All sound settings</button>`;
   renderNowPlaying();
   soundMenu.querySelectorAll<HTMLInputElement>("[data-vol]").forEach((input) =>
     input.addEventListener("input", () => {
-      sound.set({ [input.dataset.vol!]: Number(input.value) / 100 });
+      setPref(SOUND_PREF[input.dataset.vol!]!, Number(input.value));
       const out = input.nextElementSibling;
       if (out?.tagName === "OUTPUT") out.textContent = `${input.value}%`;
     }),
@@ -362,7 +386,7 @@ function renderSoundMenu(): void {
     b.addEventListener("click", () => {
       const key = b.dataset.toggle as "musicOn" | "uiSounds";
       const on = !sound.settings[key];
-      sound.set({ [key]: on });
+      setPref(SOUND_PREF[key]!, on);
       sound.sfx(on ? "ui_toggle_on" : "ui_toggle_off");
       renderSoundMenu();
     }),
@@ -392,6 +416,7 @@ async function boot(): Promise<void> {
   loadingStage("Raising the realms…", 0.75);
   await painted();
   view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay });
+  view.setPower(mapPower());
   // Read by the performance checks (scripts/perf.mjs).
   (globalThis as { __phMap?: MapView }).__phMap = view;
   restyleProvinces();
@@ -1240,6 +1265,7 @@ function renderHud(): void {
   const n = nations[me]!;
   const inc = s.nationMonthlyIncome[me]!;
   hud.innerHTML = `
+    <button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}</button>
     <button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>
     <span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${s.battles.some((b) => b.player) ? ` <small>${String(s.hour).padStart(2, "0")}:00</small>` : ""}</span>
     <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
@@ -1271,6 +1297,7 @@ async function act(order: Order): Promise<void> {
   acting = true;
   takeSnapshot(await engine.send({ type: "act", order }), 0);
   acting = false;
+  changedSinceResume = true;
   applySnapshot();
   hearSnapshot();
   // War and peace change the music at once, not at the turn's end.
@@ -1577,6 +1604,7 @@ function renderPanel(): void {
   if (!snapshot && selectedProvince < 0) {
     panel.innerHTML = `
       <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button></span></header>
+      ${startActions()}
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
@@ -3053,10 +3081,33 @@ function bindNationButtons(): void {
 }
 
 async function startGame(nation: string): Promise<void> {
-  showLoading(`Gathering the court of ${nations[nationIndex.get(nation)!]!.name}…`, 0.15);
+  const name = nations[nationIndex.get(nation)!]!.name;
+  showLoading(`Gathering the court of ${name}…`, 0.15);
   await painted();
-  loadingStage(`Mustering the armies of ${nations[nationIndex.get(nation)!]!.name}…`, 0.6);
-  takeSnapshot(await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}) }), 0);
+  loadingStage(`Mustering the armies of ${name}…`, 0.6);
+  const snap = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}) });
+  mapSent = true;
+  // One new game is one campaign (SAVE-012).
+  campaign = newCampaign(new Rng(Date.now() >>> 0), { playerNation: nation, nationName: name });
+  enterGame(snap);
+}
+
+/** Puts a new or loaded game on screen, from a clean slate. */
+function enterGame(snap: Snapshot): void {
+  snapshot = null;
+  takeSnapshot(snap, 0);
+  const nation = nations[snap.playerNation]!.id;
+  playClock = performance.now();
+  changedSinceResume = false;
+  clearTimeout(afterTurnTimer);
+  savesOwedFrom = null;
+  realmView = -1;
+  officialView = -1;
+  lordView = -1;
+  armyView = -1;
+  newsView = false;
+  grantOpen = false;
+  selected.clear();
   weekStart = snapshot!.date;
   dispatches = [];
   unread = 0;
@@ -3171,6 +3222,8 @@ async function endTurn(): Promise<void> {
   }
   playing = true;
   paused = false;
+  // Saves still waiting for a quiet moment wait for the end of this week instead.
+  clearTimeout(afterTurnTimer);
   selected.clear();
   sound.sfx("turn_end");
   if (factMem) factMem.battleThisTurn = false;
@@ -3182,7 +3235,7 @@ async function endTurn(): Promise<void> {
       continue;
     }
     const battle = snapshot.battles.some((b) => b.player);
-    const ms = battle ? (watching && !watching.result ? WATCH_STEP_MS : BATTLE_STEP_MS) : DAY_MS;
+    const ms = battle ? (watching && !watching.result ? (WATCH_STEP_MS * battleStepMs()) / BATTLE_STEP_MS : battleStepMs()) : dayMs();
     const t0 = performance.now();
     // The steps run in the engine worker; the map stays live meanwhile.
     performance.mark("turn-sent");
@@ -3205,7 +3258,16 @@ async function endTurn(): Promise<void> {
   playing = false;
   paused = false;
   sound.sfx(weekStart && snapshot.date.year > weekStart.year ? "turn_month_new_year" : "turn_ready");
+  const began = weekStart;
   weekStart = snapshot.date;
+  // The saves wait for a quiet moment, so pressing End turn again never waits on them.
+  savesOwedFrom ??= began;
+  afterTurnTimer = window.setTimeout(() => {
+    afterTurnTimer = 0;
+    const from = savesOwedFrom;
+    savesOwedFrom = null;
+    void savesAfterTurn(from);
+  }, SAVE_DELAY_MS);
   musicDecides();
   restyleProvinces();
   renderHud();
@@ -3247,6 +3309,431 @@ async function selfTest(): Promise<void> {
   probe.terminate();
   renderDiagnostics();
 }
+
+
+// ---- saves, the game menu and Settings (domain/saves, domain/settings "How the player uses it") ----
+const saveStore = new SaveStore();
+const overlay = document.querySelector<HTMLElement>("#overlay")!;
+const toast = document.querySelector<HTMLElement>("#toast")!;
+const runtimeNow = detectRuntime();
+const savePlatform: SavePlatform = runtimeNow === "capacitor-ios" ? "ios" : runtimeNow === "capacitor-android" ? "android" : runtimeNow === "electron" ? "desktop" : "web";
+/** The device's name as saves carry it (Continue says "from …" for another device's save). */
+const DEVICE = { ios: "iPhone", android: "Android", desktop: "Desktop", web: "Browser" }[savePlatform];
+const GAME_VERSION = "0.1.0";
+const SM = savesConfig.messages;
+
+type ShellView = "menu" | "save" | "load" | "settings";
+/** What the overlay shows, where it was opened from, and the card's own open line or question. */
+const shell: { view: ShellView | null; fromStart: boolean; open: string; confirm: string; busy: boolean; note: string; name: string } = { view: null, fromStart: false, open: "", confirm: "", busy: false, note: "", name: "" };
+
+const nationNameOf = (id: string) => nations[nationIndex.get(id) ?? -1]?.name ?? id;
+const flagOfId = (id: string) => nations[nationIndex.get(id) ?? -1];
+
+/** Weeks played since the campaign's newest save or autosave, for "Leave … unsaved?" (SHELL-040). */
+function unsavedWeeks(): number {
+  if (!snapshot || !campaign) return 0;
+  const last = savesList.find((e) => e.header.campaignId === campaign!.campaignId && (e.header.kind === "manual" || e.header.kind === "autosave"));
+  return Math.max(0, snapshot.turn - (last?.header.turn ?? 0));
+}
+
+async function refreshSaves(): Promise<void> {
+  savesList = await saveStore.list();
+}
+
+/** The start screen's Continue, Load and Settings (SAVE-105, SAVE-014). */
+function startActions(): string {
+  const cont = continueTarget(savesList, DEVICE, nationNameOf);
+  return `<div class="start-actions">
+    ${cont ? `<button class="wax continue" data-continue="${esc(cont.entry.path)}">${icon("hourglass", 2)}<span>${esc(cont.label)}</span></button>` : ""}
+    <span class="start-row">
+      <button class="paper" data-shell="load"${savesList.length ? "" : " disabled"}>${icon("scroll", 1)} Load</button>
+      <button class="paper" data-shell="settings">${icon("cog", 1)} Settings</button>
+    </span>
+  </div>`;
+}
+
+/** Seconds played in this campaign so far, counted while the page is shown. */
+function playSeconds(): number {
+  if (!campaign) return 0;
+  const now = performance.now();
+  if (document.visibilityState === "visible") campaign.playSeconds += Math.round((now - playClock) / 1000);
+  playClock = now;
+  return campaign.playSeconds;
+}
+
+let saving: Promise<unknown> = Promise.resolve();
+
+/**
+ * Writes a save of the game as it stands (a turn boundary, SAVE-001): the
+ * engine worker makes the bytes and says what they replace, and the store
+ * keeps them in one transaction. Saves run one after another.
+ */
+function writeGameSave(kind: "manual" | "autosave" | "resume", opts: { name?: string; replace?: string } = {}): Promise<StoredSave | { error: string }> {
+  const run = async (): Promise<StoredSave | { error: string }> => {
+    if (!campaign || !snapshot) return { error: "No campaign is being played." };
+    const c = { ...campaign, playSeconds: playSeconds() };
+    const listing = (await saveStore.list()).filter((e) => e.header.campaignId === c.campaignId && e.header.kind === kind).map((e) => ({ path: e.path, head: e.head }));
+    const r = await engine.request({ type: "save", kind, campaign: c, listing, device: DEVICE, platform: savePlatform, gameVersion: GAME_VERSION, now: Date.now(), ...(kind === "autosave" ? { keep: autosavesKept() } : {}), ...opts });
+    if (r.type !== "saved") return { error: "The game could not be saved." };
+    try {
+      const entry = await saveStore.commit(r.path, r.bytes, r.removed);
+      await refreshSaves();
+      if (kind === "resume") changedSinceResume = false;
+      return entry;
+    } catch (e) {
+      // The old saves stay as they were (SAVE-023).
+      if (e instanceof DOMException && e.name === "QuotaExceededError") return { error: SM.no_space };
+      throw e;
+    }
+  };
+  const p = saving.then(run, run);
+  saving = p.catch(() => {});
+  return p;
+}
+
+/** How long after the week has played its saves are written, unless another week starts first. */
+const SAVE_DELAY_MS = 1500;
+let afterTurnTimer = 0;
+/** The start of the first week whose saves are still owed, so an autosave due in a skipped moment is still written. */
+let savesOwedFrom: GameDate | null = null;
+
+/** After End turn: the autosave when a month on the interval began (SAVE-008), then the Resume save (SAVE-007). */
+async function savesAfterTurn(began: GameDate | null): Promise<void> {
+  if (!snapshot || !campaign) return;
+  const d = snapshot.date;
+  const monthBegins = began && (began.month !== d.month || began.year !== d.year) ? d.month : null;
+  if (autosaveDue(autosaveEvery(), monthBegins, campaign.ironman)) await writeGameSave("autosave", { name: `Auto · ${longDate({ y: d.year, m: d.month })}` });
+  await writeGameSave("resume");
+}
+
+// The Resume save follows the app being put away, when orders were given since (SAVE-007).
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") playClock = performance.now();
+  // The time played up to now counts before the app is put away.
+  else if (campaign) campaign.playSeconds += Math.round((performance.now() - playClock) / 1000);
+  if (document.visibilityState !== "hidden" || !campaign || !snapshot || playing) return;
+  if (savesOwedFrom) {
+    clearTimeout(afterTurnTimer);
+    const from = savesOwedFrom;
+    savesOwedFrom = null;
+    void savesAfterTurn(from);
+  } else if (changedSinceResume) void writeGameSave("resume");
+});
+
+function showToast(text: string): void {
+  toast.textContent = text;
+  toast.hidden = false;
+  clearTimeout(Number(toast.dataset.timer));
+  toast.dataset.timer = String(setTimeout(() => (toast.hidden = true), 2000));
+}
+
+function openShell(view: ShellView, fromStart = !snapshot): void {
+  shell.view = view;
+  shell.fromStart = fromStart;
+  shell.open = "";
+  shell.confirm = "";
+  shell.note = "";
+  if (view === "save" && snapshot && campaign) shell.name = `${campaign.nationName}, ${longDate({ y: snapshot.date.year, m: snapshot.date.month })}`;
+  lensMenu.hidden = true;
+  soundMenu.hidden = true;
+  renderShell();
+}
+
+function closeShell(): void {
+  shell.view = null;
+  overlay.hidden = true;
+  overlay.replaceChildren();
+  if (!snapshot) renderPanel();
+}
+
+/** Back from a card goes to the game menu it was opened from, or closes (SHELL-067). */
+function backFromCard(): void {
+  if (shell.fromStart || !snapshot) closeShell();
+  else openShell("menu", false);
+}
+
+function renderShell(): void {
+  if (!shell.view) return;
+  overlay.hidden = false;
+  if (shell.view === "settings") {
+    renderSettings(overlay, backFromCard);
+    return;
+  }
+  overlay.innerHTML = shell.view === "menu" ? gameMenuHtml() : shell.view === "save" ? saveCardHtml() : loadCardHtml();
+  overlay.querySelector(".close")?.addEventListener("click", shell.view === "menu" ? closeShell : backFromCard);
+  if (shell.view === "save") bindSaveCard();
+  if (shell.view === "load") bindLoadCard();
+}
+
+const back = () => `<span class="panel-buttons"><button class="close" aria-label="${shell.fromStart || shell.view === "menu" ? "Close" : "Back to the game menu"}">${icon("close", 2)}</button></span>`;
+
+/** The game menu (SHELL-064, SHELL-065, SAVE-105). */
+function gameMenuHtml(): string {
+  const s = snapshot!;
+  const n = nations[s.playerNation]!;
+  return `<div class="shell-card game-menu framed" role="dialog" aria-label="Game menu">
+    <header><h2 class="ribbon">${pennant(n)} ${esc(n.name)}</h2>${back()}</header>
+    <p class="menu-date">${dateText(s.date)} · week ${s.turn + 1}${unsavedWeeks() ? ` · ${unsavedWeeks()} week${unsavedWeeks() > 1 ? "s" : ""} since your last save` : ""}</p>
+    <div class="menu-list">
+      <button class="wax" data-shell="map">${icon("map", 2)} Return to the map</button>
+      <button class="paper" data-shell="save">${icon("scroll", 2)} Save</button>
+      <button class="paper" data-shell="load">${icon("scroll", 2)} Load</button>
+      <button class="paper" data-shell="settings">${icon("cog", 2)} Settings</button>
+      <button class="paper" data-shell="exit">${icon("castle", 2)} Exit to main menu</button>
+    </div>
+  </div>`;
+}
+
+const savedAgo = (ms: number) => {
+  const min = Math.round((Date.now() - ms) / 60000);
+  if (min < 1) return "just now";
+  if (min < 60) return `${min} min ago`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `${h} h ago`;
+  return new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+};
+
+/** One save as a line: its map crop, banner, name, in-game date and when it was saved. */
+function saveLine(e: StoredSave, mark = ""): string {
+  const h = e.header;
+  const n = flagOfId(h.playerNation);
+  return `<span class="save-thumb"><img src="data:image/png;base64,${h.thumbnail}" alt=""></span>
+    <span class="save-text"><b>${n ? pennant(n, 1) : ""}${esc(h.name)}</b><small>${mark ? `<em class="mark">${esc(mark)}</em> · ` : ""}${esc(nationNameOf(h.playerNation))} · ${esc(longDate(h.date))} · saved ${esc(savedAgo(h.savedAt))}</small></span>`;
+}
+
+/** The Save card (SAVE-106). */
+function saveCardHtml(): string {
+  const mine = savesList.filter((e) => campaign && e.header.campaignId === campaign.campaignId && e.header.kind === "manual");
+  const answer = campaign && snapshot ? newManualSave(savesList, campaign, { y: snapshot.date.year, m: snapshot.date.month }) : { action: "not allowed" as const };
+  const full = answer.action === "choose a save to replace";
+  const max = savesConfig.kinds.manual.max_per_campaign;
+  return `<div class="shell-card saves framed" role="dialog" aria-label="Save">
+    <header><h2 class="ribbon">Save</h2>${back()}</header>
+    ${playing ? `<p class="hint">Saving waits until the week has played.</p>` : ""}
+    ${shell.note ? `<p class="note">${esc(shell.note)}</p>` : ""}
+    ${
+      full
+        ? `<p class="hint">Every save slot is used: pick a save below to replace.</p>`
+        : `<form class="new-save"><label><span>${esc(SM.new_save)}</span><input name="name" maxlength="60" value="${esc(shell.name)}" aria-label="Name of the save" autocomplete="off"></label><button class="wax" type="submit"${playing || shell.busy ? " disabled" : ""}>Save</button></form>`
+    }
+    <h3 class="sub">This campaign's saves · ${mine.length} of ${max}</h3>
+    ${mine.length ? "" : `<p class="hint">None yet. Autosaves and where you left off are kept too, under Load.</p>`}
+    <ul class="save-list">${mine
+      .map(
+        (e) => `<li class="save-row">${saveLine(e)}<span class="save-act">${
+          shell.confirm === e.path
+            ? `<b>${esc(SM.replace)}</b><button class="wax" data-replace="${esc(e.path)}"${playing || shell.busy ? " disabled" : ""}>Yes</button><button class="paper" data-cancel>No</button>`
+            : `<button class="paper" data-ask-replace="${esc(e.path)}"${playing || shell.busy ? " disabled" : ""}>Save over</button>`
+        }</span></li>`,
+      )
+      .join("")}</ul>
+  </div>`;
+}
+
+function bindSaveCard(): void {
+  const form = overlay.querySelector<HTMLFormElement>(".new-save");
+  const input = form?.querySelector<HTMLInputElement>("input");
+  input?.addEventListener("input", () => (shell.name = input.value));
+  const save = async (replace?: string) => {
+    shell.busy = true;
+    renderShell();
+    const name = shell.name.trim() || undefined;
+    const r = await writeGameSave("manual", { ...(name ? { name } : {}), ...(replace ? { replace } : {}) });
+    shell.busy = false;
+    shell.confirm = "";
+    if ("error" in r) {
+      shell.note = r.error;
+      renderShell();
+      return;
+    }
+    // "Saved." over the map, never a dialog (SAVE-022).
+    closeShell();
+    showToast(SM.saved);
+  };
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    void save();
+  });
+  overlay.querySelectorAll<HTMLButtonElement>("[data-ask-replace]").forEach((b) =>
+    b.addEventListener("click", () => {
+      shell.confirm = b.dataset.askReplace!;
+      renderShell();
+    }),
+  );
+  overlay.querySelectorAll<HTMLButtonElement>("[data-replace]").forEach((b) => b.addEventListener("click", () => void save(b.dataset.replace!)));
+  overlay.querySelector("[data-cancel]")?.addEventListener("click", () => {
+    shell.confirm = "";
+    renderShell();
+  });
+}
+
+/** The Load card's lines: each campaign's Resume save first, then every other save, newest first (SAVE-107, D-SAVE-17). */
+function loadLines(): { entry: StoredSave; mark: string }[] {
+  const seen = new Set<string>();
+  const resumes: StoredSave[] = [];
+  for (const e of savesList) {
+    if (e.header.kind !== "resume" || seen.has(e.header.campaignId)) continue;
+    seen.add(e.header.campaignId);
+    resumes.push(e);
+  }
+  return [...resumes.map((entry) => ({ entry, mark: "Where you left off" })), ...savesList.filter((e) => e.header.kind === "manual" || e.header.kind === "autosave").map((entry) => ({ entry, mark: entry.header.kind === "autosave" ? "Auto" : "" }))];
+}
+
+/** The Load card (SAVE-107). */
+function loadCardHtml(): string {
+  const lines = loadLines();
+  return `<div class="shell-card saves framed" role="dialog" aria-label="Load">
+    <header><h2 class="ribbon">Load</h2>${back()}</header>
+    ${shell.note ? `<p class="note">${esc(shell.note)}</p>` : ""}
+    ${lines.length ? "" : `<p class="hint">No saves yet. The game keeps where you left off after every week.</p>`}
+    <ul class="save-list">${lines
+      .map(({ entry: e, mark }) => {
+        const open = shell.open === e.path;
+        const acts = !open
+          ? ""
+          : shell.confirm === `delete ${e.path}`
+            ? `<span class="save-act"><b>Delete this save?</b><button class="wax" data-delete="${esc(e.path)}">Delete</button><button class="paper" data-cancel>Keep</button></span>`
+            : shell.confirm === `leave ${e.path}`
+              ? `<span class="save-act ask"><b>Leave ${esc(snapshot ? dateText(snapshot.date) : "")} unsaved?</b><button class="wax" data-save-first="${esc(e.path)}">Save first</button><button class="paper" data-leave="${esc(e.path)}">Leave</button><button class="paper" data-cancel>Cancel</button></span>`
+              : shell.confirm === `modified ${e.path}`
+                ? `<span class="save-act ask"><b>This save does not match its check and may have been edited.</b><button class="wax" data-accept="${esc(e.path)}">Open anyway</button><button class="paper" data-cancel>Cancel</button></span>`
+                : `<span class="save-act"><button class="wax" data-load="${esc(e.path)}"${shell.busy ? " disabled" : ""}>Load</button>${e.header.kind === "resume" ? "" : `<button class="paper" data-ask-delete="${esc(e.path)}">Delete</button>`}</span>`;
+        return `<li class="save-row${open ? " open" : ""}"><button class="save-pick" data-pick="${esc(e.path)}" aria-expanded="${open}">${saveLine(e, mark)}</button>${acts}</li>`;
+      })
+      .join("")}</ul>
+  </div>`;
+}
+
+function bindLoadCard(): void {
+  const on = (sel: string, fn: (path: string) => void) => overlay.querySelectorAll<HTMLButtonElement>(sel).forEach((b) => b.addEventListener("click", () => fn(Object.values(b.dataset)[0]!)));
+  on("[data-pick]", (path) => {
+    shell.open = shell.open === path ? "" : path;
+    shell.confirm = "";
+    renderShell();
+  });
+  on("[data-ask-delete]", (path) => {
+    shell.confirm = `delete ${path}`;
+    renderShell();
+  });
+  on("[data-delete]", (path) => {
+    void saveStore.remove(path).then(async () => {
+      await refreshSaves();
+      shell.open = "";
+      shell.confirm = "";
+      renderShell();
+    });
+  });
+  on("[data-load]", (path) => {
+    const e = savesList.find((x) => x.path === path);
+    // Going back within this campaign leaves the weeks since the last save behind (SHELL-040).
+    if (snapshot && campaign && e && e.header.campaignId === campaign.campaignId && unsavedWeeks() > 0 && e.header.kind !== "resume") {
+      shell.confirm = `leave ${path}`;
+      renderShell();
+      return;
+    }
+    void loadSave(path);
+  });
+  on("[data-leave]", (path) => void loadSave(path, false, false));
+  on("[data-save-first]", (path) =>
+    void writeGameSave("manual").then((r) => {
+      if ("error" in r) {
+        shell.note = r.error;
+        renderShell();
+      } else void loadSave(path, false, false);
+    }),
+  );
+  on("[data-accept]", (path) => void loadSave(path, true));
+  overlay.querySelector("[data-cancel]")?.addEventListener("click", () => {
+    shell.confirm = "";
+    renderShell();
+  });
+}
+
+/**
+ * Opens a save (SHELL-039): the campaign being played keeps where it was left
+ * first; the engine checks and opens the file and the map shows it.
+ */
+async function loadSave(path: string, acceptModified = false, keepCurrent = true): Promise<void> {
+  const bytes = await saveStore.read(path);
+  const e = savesList.find((x) => x.path === path);
+  if (!bytes || !e) {
+    shell.note = "This save is damaged.";
+    renderShell();
+    return;
+  }
+  if (keepCurrent && campaign && snapshot && changedSinceResume) await writeGameSave("resume");
+  shell.busy = true;
+  showLoading(`Opening ${e.header.name}…`, 0.2);
+  await painted();
+  loadingStage(`Waking the court of ${nationNameOf(e.header.playerNation)}…`, 0.6);
+  const r = await engine.request({ type: "load", bytes, ...(acceptModified ? { acceptModified: true } : {}), ...(!mapSent && mapImage ? { map: mapTiles(mapImage) } : {}) });
+  shell.busy = false;
+  if (r.type !== "snapshot") {
+    hideLoading();
+    shell.note = r.type === "refused" && r.canAccept ? "" : r.type === "refused" || r.type === "error" ? r.message : "The save did not open.";
+    shell.confirm = r.type === "refused" && r.canAccept ? `modified ${path}` : "";
+    renderShell();
+    return;
+  }
+  mapSent = true;
+  const h = e.header;
+  campaign = { campaignId: h.campaignId, playerNation: h.playerNation, nationName: nationNameOf(h.playerNation), ironman: h.ironman, options: h.options, modified: h.modified || acceptModified, playSeconds: h.playSeconds };
+  closeShell();
+  enterGame(r.snapshot);
+  // Loading an earlier point makes it where the player left off.
+  if (h.kind !== "resume") void writeGameSave("resume");
+}
+
+/** Exit to main menu: where the player left off is kept, and the start screen offers Continue (SAVE-109). */
+async function exitToMenu(): Promise<void> {
+  if (playing) return;
+  showLoading("Keeping your place…", 0.5);
+  await painted();
+  await writeGameSave("resume");
+  location.reload();
+}
+
+document.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-shell]");
+  if (!b || (b as HTMLButtonElement).disabled) return;
+  const v = b.dataset.shell!;
+  if (v === "map") closeShell();
+  else if (v === "exit") void exitToMenu();
+  else {
+    if (v === "settings" && b.dataset.settingsSection) openSettingsAt(b.dataset.settingsSection);
+    openShell(v as ShellView, shell.view === null ? !snapshot : shell.fromStart);
+  }
+});
+document.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-continue]");
+  if (!b) return;
+  void loadSave(b.dataset.continue!, false, false);
+});
+// Esc opens the game menu, and closes whatever the overlay shows (SHELL-064).
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape" || (e.target as HTMLElement).closest("input, textarea, select")) return;
+  if (shell.view) {
+    if (shell.view === "menu") closeShell();
+    else backFromCard();
+  } else if (snapshot) openShell("menu", false);
+});
+// Tapping the dimmed map beside a card closes it.
+overlay.addEventListener("click", (e) => {
+  if (e.target === overlay) (shell.view === "menu" ? closeShell : backFromCard)();
+});
+
+/** Settings apply at once (SET-003): text size, the map's battery knobs, and the cards that show them. */
+function applyPrefs(): void {
+  document.documentElement.style.setProperty("--text-zoom", String(textZoom()));
+  view?.setPower(mapPower());
+  if (!soundMenu.hidden) renderSoundMenu();
+  renderSoundButton();
+}
+onPrefs(applyPrefs);
+applyPrefs();
+void refreshSaves().then(() => {
+  if (!snapshot) renderPanel();
+});
 
 // Hooks for the scripted play-throughs (scripts/war-shots.mjs).
 Object.assign(globalThis, {
