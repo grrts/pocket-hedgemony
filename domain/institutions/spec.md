@@ -307,12 +307,15 @@ because they read standing and forms and add war aims.
   it to court when the forecast ruling is for it.
 - An AI member stands for the crown when it is among the three strongest members; the sitting Emperor's house always
   stands (built in slice 1: the holder is always a candidate).
+- An AI defendant hands a province over on a ruling unless it has more soldiers than the Emperor and the plaintiff together; the player's ruling waits a month on an answer card and silence hands it over (built in slice 2).
+- The imperial contingent is raised as a fresh army at the Emperor's capital, sized from each member's soldiers as others see them; the members' own levies are not drawn down (slice 2 default).
+- An AI realm accepts *Dissolve the Empire* on the white-peace rule: when over half its voices want peace.
 - An AI shogun summons the least loyal houses first while hold allows, and confirms Wavering houses.
 
 ## 13. Open questions and contradictions
 
 - OQ-INST-1: The X-13 match of catalogue imperial estates to map realms (Bavaria, Württemberg, Hamburg, Pomerania, Switzerland, Modena are split or renamed in the catalogue): the data list decides; it needs one pass of review.
-- OQ-INST-2: The ten circles on a 137-realm map: which map realms sit in which circle (data).
+- OQ-INST-2: The ten circles on a 137-realm map: which map realms sit in which circle (data). Slice 2 default: the historical circles matched to the map members (Austrian, Bavarian, Swabian, Upper Rhenish, Electoral Rhenish, Lower Saxon, Upper Saxon); Bohemia, Switzerland and the Italian members sit in none.
 - OQ-INST-3: Which great houses Japan starts with as lords depends on the realm data's great-house list (D-REALM-10); the shogunate needs at least the 22 shugo houses of the catalogue.
 - OQ-INST-4: The heads of faith design may give the Papacy powers over the Emperor (crowning); the church seats then read that design.
 
