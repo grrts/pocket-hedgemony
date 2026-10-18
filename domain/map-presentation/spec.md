@@ -278,6 +278,17 @@ How the player uses it
 3. Overview: army sizes, sieges, battles and building works keep their overviews (the army list, the battle bar, the Works and Garrison tabs); in the band each has a picture (town states, figures lost, breaches) so the map alone still tells the story, and the numbers stay in the cards.
 4. Phone: every formation, fleet and caravan has a tap box of at least 44 points even when its figures are smaller; Markers brings back the plates for players who want the numbers, and the selected piece always shows its plate and route; nothing needs hover; plates and tap boxes stay inside the safe areas in the Wide and Tall layouts; pinching across 14 to 16 cross-fades with no pop. At zoom 16 a phone held sideways shows about 53 × 22 map pixels, at 40 about 21 × 9 and at 96 about 9 × 4, one city.
 
+### Realm names that never overlap (18 October 2026)
+Leroy's playtest: zoomed out, Portugal's name lay over Castile's and the Livonian Order's over Pskov's.
+
+- VIEW-133 (Ubiquitous): Zoomed out, no two realm names shall overlap. The player's realm is named first, then the others largest first; a name that would cover one already placed moves to another of its realm's provinces nearest its middle (`LABEL_ANCHORS`, 6), then shrinks a step at a time (`LABEL_SHRINK`, 0.85) down to the smallest realm name (9 pixels), and a name with no room left waits for a closer zoom. [feedback, Leroy 18 October 2026]
+
+#### How the player uses it: realm names
+1. Where: on the map itself, zoomed out to World and Region; nothing new to tap. Pinching in brings back the names that had no room, larger.
+2. Grouping: a realm's name sits on its own land, on its middle province or one near it, never on a neighbour's name.
+3. Overview: the zoomed-out map is the overview of who holds what; every name on it can be read whole, and the player's own realm is always named.
+4. Phone: the same rule in the Wide and Tall layouts and at every zoom; names stay at least 9 pixels tall; nothing needs hover.
+
 ## 6. Commands
 
 Presentation commands, issued by the player; none reach the engine.
@@ -528,3 +539,4 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-130 | living-map.feature | At most 60 figures move at once |
 | VIEW-131 | — | presentation only: culture styles and landmarks are art |
 | VIEW-132 | living-map.feature | The snapshot feeds the busy trade paths |
+| VIEW-133 | zoom-content.feature | Realm names never overlap |
