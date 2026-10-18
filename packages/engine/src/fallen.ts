@@ -19,10 +19,12 @@ export interface FallenState {
   fallenMonths: Float64Array;
   /** The month (year * 12 + month - 1) the ring was last moved to. */
   fallenAt: number;
+  /** Each realm's sum over the ring, kept as months are added and dropped. */
+  fallenTotal: Float64Array;
 }
 
 export function createFallenState(N: number): FallenState {
-  return { fallenMonths: new Float64Array(N * FALLEN_MONTHS), fallenAt: 0 };
+  return { fallenMonths: new Float64Array(N * FALLEN_MONTHS), fallenAt: 0, fallenTotal: new Float64Array(N) };
 }
 
 const monthIndex = (world: World) => world.date.year * 12 + world.date.month - 1;
@@ -34,7 +36,10 @@ function moveTo(world: World): number {
     const steps = Math.min(FALLEN_MONTHS, Math.max(0, now - world.fallenAt));
     for (let k = 1; k <= steps; k++) {
       const slot = (world.fallenAt + k) % FALLEN_MONTHS;
-      for (let n = 0; n < world.nationCount; n++) world.fallenMonths[n * FALLEN_MONTHS + slot] = 0;
+      for (let n = 0; n < world.nationCount; n++) {
+        const i = n * FALLEN_MONTHS + slot;
+        if (world.fallenMonths[i]) (world.fallenTotal[n] = Math.max(0, world.fallenTotal[n]! - world.fallenMonths[i]!)), (world.fallenMonths[i] = 0);
+      }
     }
     world.fallenAt = now;
   }
@@ -46,19 +51,19 @@ export function addFallen(world: World, n: number, men: number): void {
   if (n < 0 || !(men > 0)) return;
   const slot = moveTo(world);
   world.fallenMonths[n * FALLEN_MONTHS + slot] = world.fallenMonths[n * FALLEN_MONTHS + slot]! + men;
+  world.fallenTotal[n] = world.fallenTotal[n]! + men;
 }
 
 /** Realm n's fallen in the last ten years. */
 export function fallenOf(world: World, n: number): number {
   if (n < 0) return 0;
   moveTo(world);
-  let t = 0;
-  for (let k = 0; k < FALLEN_MONTHS; k++) t += world.fallenMonths[n * FALLEN_MONTHS + k]!;
-  return t;
+  return world.fallenTotal[n]!;
 }
 
 /** The fallen against the realm's recruit ceiling: what both effects read. */
 function burden(world: World, n: number): number {
+  if (!(fallenOf(world, n) > 0)) return 0;
   let ceiling = 0;
   for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === n) ceiling += world.provinceRecruitCeiling[p]!;
   return ceiling > 0 ? fallenOf(world, n) / ceiling : 0;
@@ -78,12 +83,16 @@ export function fallenEffect(world: World, n: number): FallenEffect {
 
 /** The refill pace of every realm, worked out once for the monthly recruits step. */
 export function refillPaces(world: World): Float64Array {
+  moveTo(world);
+  const paces = new Float64Array(world.nationCount).fill(1);
+  if (!world.fallenTotal.some((t) => t > 0)) return paces;
   const ceiling = new Float64Array(world.nationCount);
   for (let p = 0; p < world.provinceCount; p++) {
     const o = world.provinceOwner[p]!;
     if (o >= 0) ceiling[o] = ceiling[o]! + world.provinceRecruitCeiling[p]!;
   }
-  return Float64Array.from(ceiling, (c, n) => (c > 0 ? Math.max(F.refill_floor, 1 - (fallenOf(world, n) / c) * F.refill_slow_per_ceiling) : 1));
+  for (let n = 0; n < world.nationCount; n++) if (ceiling[n]! > 0 && world.fallenTotal[n]! > 0) paces[n] = Math.max(F.refill_floor, 1 - (world.fallenTotal[n]! / ceiling[n]!) * F.refill_slow_per_ceiling);
+  return paces;
 }
 
 export interface SavedFallen {
@@ -106,9 +115,10 @@ export function saveFallen(world: World): SavedFallen {
 export function restoreFallen(world: World, saved: SavedFallen | undefined): void {
   if (!saved) return;
   world.fallenMonths.fill(0);
+  world.fallenTotal.fill(0);
   world.fallenAt = saved.at;
   for (const [id, rows] of Object.entries(saved.months)) {
     const n = world.nationIndex.get(id);
-    if (n !== undefined) for (const [k, men] of rows) world.fallenMonths[n * FALLEN_MONTHS + k] = men;
+    if (n !== undefined) for (const [k, men] of rows) (world.fallenMonths[n * FALLEN_MONTHS + k] = men), (world.fallenTotal[n] = world.fallenTotal[n]! + men);
   }
 }

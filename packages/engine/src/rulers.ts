@@ -101,14 +101,29 @@ function drawHeir(world: World, n: number, rulerAge: number): Heir | null {
 /** The most loyal lord of a realm (then the most provinces, then by name) rules for a child (REALM-170, D-REALM-17). */
 function regentOf(world: World, n: number): string | null {
   const rank = ["Loyal", "Wavering", "Disloyal", "In revolt"];
-  const lands = new Map<number, number>();
+  const lands = landsByLord(world);
+  // The most loyal lord with land, then the one with most provinces, then by name.
+  const better = (k: number, b: number) => {
+    const [l, o] = [world.lords[k]!, world.lords[b]!];
+    return rank.indexOf(l.loyalty) - rank.indexOf(o.loyalty) || lands[b]! - lands[k]! || l.name.localeCompare(o.name);
+  };
+  let best = -1;
+  for (let k = 0; k < world.lords.length; k++) if (world.lords[k]!.nation === n && lands[k]! > 0 && (best < 0 || better(k, best) < 0)) best = k;
+  return best < 0 ? null : world.lords[best]!.name;
+}
+
+/** Provinces held by each lord, counted once a day: a January of many deaths asks for many regents. */
+const landsCache = new WeakMap<World, { day: number; lords: number; counts: Int32Array }>();
+function landsByLord(world: World): Int32Array {
+  const c = landsCache.get(world);
+  if (c && c.day === world.day && c.lords === world.lords.length) return c.counts;
+  const counts = new Int32Array(world.lords.length);
   for (let p = 0; p < world.provinceCount; p++) {
     const l = world.provinceLord[p]!;
-    if (l >= 0 && world.provinceOwner[p] === n) lands.set(l, (lands.get(l) ?? 0) + 1);
+    if (l >= 0 && world.provinceOwner[p] === world.lords[l]?.nation) counts[l] = counts[l]! + 1;
   }
-  const lords = [...lands.keys()].map((k) => ({ k, l: world.lords[k]! }));
-  lords.sort((a, b) => rank.indexOf(a.l.loyalty) - rank.indexOf(b.l.loyalty) || lands.get(b.k)! - lands.get(a.k)! || a.l.name.localeCompare(b.l.name));
-  return lords[0]?.l.name ?? null;
+  landsCache.set(world, { day: world.day, lords: world.lords.length, counts });
+  return counts;
 }
 
 /** Every realm's ruler on 11 November 1444: the records' name, reign and age where they have them, the campaign's dice for the rest (REALM-233). */
