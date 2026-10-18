@@ -385,6 +385,12 @@ export function orderShape(order: Order): string {
       return "fill the food policy from a preset";
     case "reform":
       return "reform the government";
+    case "navy":
+      return `navy: ${order.do}`;
+    case "tonguePolicy":
+      return "set the Tongue policy";
+    case "faithPolicy":
+      return "set a Faith policy";
   }
 }
 

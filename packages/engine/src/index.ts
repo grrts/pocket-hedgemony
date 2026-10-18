@@ -12,6 +12,7 @@ export { officialEffect, OFFICIALS, type OfficialEffectView } from "./officials.
 export { aiRecruits, ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply } from "./protocol.ts";
+export type { FleetView, NavyOrder, NavyView } from "./navy.ts";
 export { generateSyntheticRuleset } from "./synthetic.ts";
 export { aiTreasury, canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, runLedger, TAX_RATES, taxRateOf } from "./treasury.ts";
 export { STABILITY, stabilityOf, subjectLoyalty, type Stability, type StabilityPillar, type StabilityStep } from "./stability.ts";
@@ -20,6 +21,7 @@ export { USES, type UseName } from "./land.ts";
 export { CHANGES, type ChangeName, type ChangeRow } from "./conversion.ts";
 export { castleCap, FOOD_SETTINGS, foodView, mapNetwork, reachOf, setFood, setFoodPreset, shareFood, SURPLUS_RULES, type CastleView, type FoodView } from "./castleFood.ts";
 export { capsOf, formOf, governmentView, type GovernmentView, type NextFormView } from "./government.ts";
+export { FAITH_FAMILY, FAITH_IDS, FAITH_POLICIES, faithLine, faithName, NO_FAITH, NO_TONGUE, peoplesDataOf, peoplesView, SLOTS, TONGUE_FAMILY, TONGUE_IDS, TONGUE_POLICIES, tongueLine, tongueName, type FaithRow, type PeoplesSnapshot, type PeoplesView, type TongueLine, type TongueRow } from "./peoples.ts";
 export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecraft.ts";
 export type { EventCard } from "./events.ts";
 export { adminCapacityRank, ASSESSMENT_DIMENSIONS, LEVEL_RANK, realmAssessment, realmStrengths, RISK_DIMENSIONS, type AssessmentConfidence, type AssessmentLevel, type HeritageLine, type RealmAssessment, type RealmHeritage, type RealmHeyday, type RealmStrengths } from "./realmStrengths.ts";

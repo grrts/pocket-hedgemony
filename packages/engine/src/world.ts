@@ -24,7 +24,9 @@ import { createCastleFoodState, seedCastleStores, type CastleFoodState } from ".
 import { createGameEvents, type GameEvents } from "./events.ts";
 import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
+import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
+import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 
 /**
@@ -33,7 +35,7 @@ import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, PeoplesState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -132,6 +134,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
   commanderSeed: number[];
+  /** Ports, sailors, ships and fleets (navy.ts). */
+  navy: NavyState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
   /** Every realm's heritage in play: birthright, heydays, ambitions, legacies and burden (HER-078). */
@@ -414,6 +418,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createConversionState(P),
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
+    navy: createNavyState(P),
+    ...createPeoplesState(P, N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -438,6 +444,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   world.commanderSeed = commanderIds.map(() => -1);
   seedOfficials(world);
   seedGovernment(world);
+  seedPeoples(world);
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where
@@ -454,6 +461,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     }
   });
   seedResearch(world);
+  seedNavy(world);
   recount(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
