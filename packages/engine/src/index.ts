@@ -5,6 +5,7 @@ export { planRoute, stepDays, forageLimit, forageRations, monthlyRations, refill
 export { tileGridFromImages, blockTileGrid, pointTileGrid, TILE_TERRAINS, GROUNDS, type TileGrid } from "./tiles.ts";
 export { placeClimate, provinceClimate, seasonName, dayOfYear, snowCover, type PlaceClimate, type ProvinceClimate } from "./climate.ts";
 export { processTurn, applyNow, advance, STEPS_PER_DAY, STEPS_PER_TURN, HOURS_PER_STEP, type Order, type MoveOrder, type TurnReport } from "./turn.ts";
+export { settlementTable, settlementsView, type SettlementView } from "./settlement.ts";
 export { atWar, cedeProvince, controller, engageRange, offerPeace, peaceShare, relationState, wallsOf, warBetween, SIEGE_MONTH_DAYS, type Battle, type News, type PeaceTerms } from "./war.ts";
 export { hashWorld } from "./hash.ts";
 export { cultureOf, officialName, personName, rankedName } from "./names.ts";

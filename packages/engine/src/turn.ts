@@ -78,7 +78,8 @@ export type Order =
   | { type: "conclaveGold"; gold: number }
   | { type: "claimCaliphate" }
   | { type: "raiseOwnPatriarch" }
-  | { type: "offerPeace"; target: number; terms: PeaceTerms }
+  /** Offer peace; `demand` names the provinces and gold asked ("take") or given ("give"), from the peace table (WAR-242). */
+  | { type: "offerPeace"; target: number; terms: PeaceTerms; demand?: { provinces: number[]; gold: number } }
   | { type: "answerCall"; call: string; yes: boolean }
   /** Take or turn down a peace the AI offers (its id in the snapshot's peaceOffers). */
   | { type: "answerPeace"; offer: number; yes: boolean }
@@ -311,7 +312,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return why;
     }
     case "offerPeace":
-      return offerPeace(world, actingNation, order.target, order.terms, news);
+      return offerPeace(world, actingNation, order.target, order.terms, news, false, order.demand);
     case "answerPeace":
       return answerPeace(world, order.offer, order.yes, news);
     case "answerCall": {

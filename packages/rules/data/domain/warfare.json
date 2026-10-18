@@ -272,7 +272,15 @@
   "open_roads_years": 10,
   "royal_grievances": ["Conscription", "Soldiers quartered", "Burned homes", "Hungry", "Heavy taxes"],
   "royal_grievances_needed": 2,
-  "refuse_desertion": 2
+  "refuse_desertion": 2,
+  "max_ceded_share": 0.3333333333333333
+ },
+ "settlement": {
+  "$comment": "Peace settlement scoring (WAR-240..WAR-251, Leroy X-22). Each province has a demand cost; the war's outcome gives the winner a capacity in the same points; demands that fit are signed, the AI counters or refuses the rest. All values provisional.",
+  "province_cost": { "base": 2, "per_sqrt_thousand_people": 0.5, "per_wealth": 1, "castle": 2, "coastal": 1, "river": 0.5, "capital_multiplier": 1.5, "not_bordering_multiplier": 1.25 },
+  "capacity_weights": { "land_held": 0.5, "capital_held": 0.15, "battles": 0.15, "armies": 0.1, "will_to_fight": 0.25 },
+  "gold_per_point": 25,
+  "surrender": { "peace_share": 0.75, "army_ratio": 0.25, "land_share": 0.5 }
  },
  "raid_war_months": 12,
  "notifications": {

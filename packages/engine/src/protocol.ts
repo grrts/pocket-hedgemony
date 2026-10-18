@@ -28,6 +28,7 @@ import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
 import { advance, applyNow, campaigning, HOURS_PER_STEP, mayMarchInto, processTurn, refillHere, type Order } from "./turn.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
+import { settlementsView, type SettlementView } from "./settlement.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { foodMonths } from "./domain/warfare/index.ts";
 import { battleSides } from "./domain/map-presentation/index.ts";
@@ -129,7 +130,9 @@ export interface Snapshot {
   /** Wars under way, by nation index. */
   wars: { id: string; attackers: number[]; defenders: number[]; start: string }[];
   /** Peace offered to the player by an AI war leader, until the next month: terms as the AI sends them ("give": it gives up land the player holds). */
-  peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" }[];
+  peaceOffers: { id: number; from: number; terms: "take" | "white" | "give"; provinces?: number[]; gold?: number; counter?: boolean; surrender?: boolean }[];
+  /** The peace table against each realm the player is at war with: what the war lets the player ask, and what each province costs (WAR-240 … WAR-248). */
+  settlements: SettlementView[];
   /** Calls to arms waiting for the player's answer. */
   calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
   /** The player's standing with every other nation that has one. */
@@ -403,6 +406,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed" || x.major),
       wars,
       peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
+      settlements: settlementsView(w),
       calls: w.diplomacy.calls
         .filter((c) => !c.answer && c.called === w.nationIds[player])
         .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),

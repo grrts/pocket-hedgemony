@@ -27,11 +27,13 @@ describe("war and conquest", () => {
     const r = applyNow(w, { type: "declareWar", target: foe }, me);
     expect(r.rejectedOrders).toEqual([]);
     expect(relationState(w, me, foe).state).toBe("war");
-    // A big army walks to Granada's capital and sits there.
+    // A big army walks to a Portuguese province on the border (one peace takes a capital only with the last province, WAR-227) and sits there.
     const army = armyOf(w, me);
     w.armies.men[army] = 40000;
     w.armies.horse[army] = 8000;
-    const target = w.provinceIndex.get(rules.nations[foe]!.capital)!;
+    const capital = w.provinceIndex.get(rules.nations[foe]!.capital)!;
+    const borders = (p: number) => Array.from(w.adjList.subarray(w.adjStart[p]!, w.adjStart[p + 1]!)).some((q) => w.provinceOwner[q] === me);
+    const target = Array.from({ length: w.provinceCount }, (_, p) => p).find((p) => w.provinceOwner[p] === foe && p !== capital && borders(p))!;
     const news = [];
     let peace = false;
     for (let t = 0; t < 120 && !peace; t++) {
@@ -64,9 +66,13 @@ describe("war and conquest", () => {
       offer = w.peaceOffers.find((o) => o.from === foe);
     }
     expect(offer?.terms).toBe("give");
+    expect(offer!.provinces!.length).toBeGreaterThan(0);
     expect(applyNow(w, { type: "answerPeace", offer: offer!.id, yes: true }, me).rejectedOrders).toEqual([]);
-    expect(w.nationGone[foe] || relationState(w, me, foe).state === "truce").toBeTruthy();
-    expect(w.provinceOwner[w.provinceIndex.get(rules.nations[foe]!.capital)!]).toBe(me);
+    expect(relationState(w, me, foe).state).toBe("truce");
+    // It gives what the peace table allows: at most a third of its land, never its capital while it has more (WAR-227).
+    for (const p of offer!.provinces!) expect(w.provinceOwner[p]).toBe(me);
+    expect(offer!.provinces!.length).toBeLessThanOrEqual(Math.ceil(14 / 3));
+    expect(w.provinceOwner[w.provinceIndex.get(rules.nations[foe]!.capital)!]).toBe(foe);
     expect(w.peaceOffers).toEqual([]);
   }, 60000);
 
