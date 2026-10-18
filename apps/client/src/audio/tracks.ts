@@ -152,6 +152,7 @@ const WAR_CHORDS = ["1-3-5", "6,-1-3", "7,-2-4", "5,-#7,-2"];
 const WAR_BASS = rep([["1", "5,"], ["6,", "3,"], ["7,", "4,"], ["5,", "2,"]].map(([r, f]) => `${rep(`${r}:.5`, 6)} ${f}:.5 ${r}:.5`).join(" "), 2);
 const WAR_BAR = "kick:1 snare:1 kick:.5 kick:.5 snare:1";
 const WAR_FILL = "kick:1 snare:1 kick:1 snare:.25 snare:.25 snare:.25 snare:.25";
+const SIEGE_CHORDS = ["1-3-5", "1-3-5", "4,-6,-1", "5,-#7,-2", "1-3-5", "6,-1-3", "4,-6,-1", "5,-#7,-2"];
 
 export const TRACKS: Record<string, TrackDef> = {
   title: {
@@ -269,6 +270,8 @@ export const TRACKS: Record<string, TrackDef> = {
     ],
   },
   war_siege: {
+    // Rewritten chord first (feedback 118): the old bass ground a minor second
+    // (1 against b2) under a horn drone, which beat like a vibrating noise.
     name: "Siege",
     bpm: 76,
     bar: 4,
@@ -277,11 +280,12 @@ export const TRACKS: Record<string, TrackDef> = {
     root: 62,
     layers: 2,
     parts: [
-      { v: "T", oct: -1, seq: rep("1:1 r:.5 1:.5 b2:1 1:1", 6) + " 6,:1 r:.5 6,:.5 5,:2 6,:1 r:.5 6,:.5 5,:2", gate: 0.85 },
-      { v: "P1", oct: 1, layer: 2, seq: "1:2 5:1 4:1 5:2 8:2 7:2 b6:2 5:4 3:3 4:1 5:2 b6:2 5:6 r:2", o: { duty: 0.25, vol: 0.7, vibrato: true, decay: 1, sustain: 0.7 } },
-      { v: "W", layer: 2, seq: "1:8 6,:8 4,:8 5,:8", o: { wave: "horn", vol: 0.35, decay: 2, sustain: 0.8 } },
+      { v: "T", oct: -1, seq: SIEGE_CHORDS.map((c) => `${c.split("-")[0]}:2 ${c.split("-")[0]}:2`).join(" "), gate: 0.6 },
+      { v: "S", seq: SIEGE_CHORDS.map((c) => `${c}:4`).join(" "), o: { vol: 0.26 } },
+      { v: "P1", oct: 1, layer: 2, seq: "1:2 5:1 4:1 5:2 8:2 6:2 4:1 1:1 5:2 2:2 3:3 1:1 1:2 3:1 6,:1 4:2 6:2 5:4", o: { duty: 0.25, vol: 0.6, vibrato: true, decay: 1, sustain: 0.6 } },
+      { v: "W", layer: 2, seq: SIEGE_CHORDS.map((c) => c.split("-")).map((t) => `${t[1]}:2 ${t[2]}:2`).join(" "), o: { wave: "horn", vol: 0.3, decay: 0.8, sustain: 0.5 } },
     ],
-    drums: [{ seq: rep("boom:2 boom:1 tick:1", 8) }],
+    drums: [{ seq: rep("boom:2 r:1 tick:1", 8) }],
   },
   war_losing: {
     name: "The war goes badly",

@@ -1,0 +1,34 @@
+{
+  "run": {
+    "years": 50,
+    "sample_months": 12,
+    "seeds": [1],
+    "map": "real"
+  },
+  "campaign_checks": {
+    "largest_realm_share": 0.25,
+    "realms_gone_share": 0.5,
+    "years_of_income_hoarded": 20,
+    "peace_years": 15,
+    "share_of_realms_at_war": 0.6,
+    "share_in_arms": 0.1
+  },
+  "breaker_checks": {
+    "provinces_vs_ai": 3,
+    "income_vs_ai": 4,
+    "years_of_income_hoarded": 20,
+    "largest_realm_share": 0.25,
+    "gold_from_round_trip": 0.01
+  },
+  "bot": {
+    "tax_rate": "heavy",
+    "reserve_months_of_income": 3,
+    "borrow_when_treasury_below": 0,
+    "war_odds": 1.5,
+    "peace_after_months": 18,
+    "hire_companies": true,
+    "events": "random",
+    "probe_every_months": 12,
+    "works_first": ["farm", "market", "granary", "mine", "harbour", "road"]
+  }
+}

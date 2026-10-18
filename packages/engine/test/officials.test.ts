@@ -76,11 +76,15 @@ describe("officials", () => {
     const collector = OFFICIALS.indexOf("Tax collector");
     w.provinceOfficial[a] = collector === 0 ? 1 : 0;
     const without = provinceTax(w, a, me);
+    w.nationTonguePercent[me] = 100;
     w.provinceOfficial[a] = collector;
     w.provinceOfficialSince[a] = w.day;
     expect(provinceTax(w, a, me)).toBeCloseTo(without * 1.1, 6);
     w.provinceOfficialSince[a] = w.day - 6 * 366;
     expect(provinceTax(w, a, me)).toBeCloseTo(without * 1.2, 6);
+    // In a realm of a low Tongue % his years count at half pace (REALM-238).
+    w.nationTonguePercent[me] = 30;
+    expect(provinceTax(w, a, me)).toBeLessThan(without * 1.2 - 1e-6);
   });
 
   it("gives half his effect in his first year and all of it after five", () => {

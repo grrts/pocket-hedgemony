@@ -41,7 +41,7 @@ Feature: Trade on screen
   Scenario: Copying a route
     Given five caravans of "Venice"
     When four of them copy the first one's route
-    Then all five run the same loop
+    Then all five run the same route there and back
 
   @TRADE-098
   Scenario: The Trade screen

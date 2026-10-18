@@ -17,16 +17,18 @@ systems.
   the Inquisition, the faith steps of lords' loyalty.
 - Preachers, the *Allow preachers* leave (as a fact; the action is diplomacy's), adopting a faith, cuius regio.
 - Holy places, faith-specific rules, faith waves, the ten new events and the patches, the 1444 starting mix.
+- Heads of the faith (§5.17): who leads each faith, how a realm becomes its patron or head, the conclave, censure.
 
 **Not in scope (owned by …)**
 - Faith buildings' list, costs, slots, jobs (buildings 7.5); clergy class, officials, charters and grievance
   storage (province); lords and loyalty mechanics (realm); risings and sparks (rebellions); war aims (warfare);
-  opinion and the *Allow preachers* action (diplomacy); theocratic forms (government); church heads such as the
-  Pope (the "big institutions" gap); events engine and vocabulary (events); culture (separate on purpose).
+  opinion and the *Allow preachers* action (diplomacy); theocratic forms (government); the Empire, the shogunate
+  and the Emperor in Kyoto (the institutions design); events engine and vocabulary (events); culture (separate on purpose).
 
 ## 2. Sources
 
 Newest decision first.
+0. `religion/faith-heads-design.md` version 1 (18 October, Leroy's list: "how you become ruler of the faith"): heads of the faith, patrons, the conclave, censure (§5.17).
 1. `religion/religion-design.md` §19 (16 October): four defaults kept — community 10 %, *Wrong faith* at a third unserved, faith tax +25 %, mix moves 3 % a year.
 2. `religion/religion-design.md` version 1, all sections 1–19 (including §18 "Changes needed in other files").
 3. `religion/config/religion.yaml` version 1.
@@ -64,6 +66,13 @@ Newest decision first.
 | Holy place | Named province in config with faiths | — |
 | Faith wave | Temporary source of pull from an event, carried by carriers and spreading by rings | `spread` (one-off shift) |
 | Carrier | What gives a wave pull in a province: presses, schools, towns, traders, rule, army, preachers | — |
+| Head of the faith | The one person who leads a faith: the Pope, the Ecumenical Patriarch, the Catholicos, the Caliph, the Dalai Lama | Church heads of crown-headed churches |
+| Seat | The holy place where a head sits | Capital |
+| Patron | The one realm whose word the head follows; the Caliph is his own patron | Overlord |
+| Conclave | The month after a Pope dies, in which realms win votes for the next Pope | — |
+| Cardinal | One conclave vote for each Catholic house of worship at step 3 or more | — |
+| Censure | A head's word against a fellow believer who attacks one of his flock for gain | A wrong in general |
+| Crown-headed church | A realm whose ruler leads its own church: anglican, protestant, an Orthodox realm with its own patriarch | — |
 | Cuius regio | After `peace_of_augsburg`, Empire rulers switch Catholic ↔ Protestant without the capital test | — |
 
 ## 4. Domain model
@@ -208,7 +217,7 @@ Newest decision first.
 - RELG-082 While a realm holds a holy place of a faith it does not share, the religion system shall let every ruler of that faith use *Defend the faith* against it with that province as the prize. [religion §8, §11]
 - RELG-083 Where a holder of another faith Tolerates the holy place's faith and has a house of that faith there, the religion system shall still bring the pilgrim traders. [religion §8; config holy_place_effects.pilgrims_still_come_if]
 - RELG-084 The religion system shall make Amritsar appear as a holy place only when `sikh_panth_founded` has fired, and not before 1577. [religion §8; config holy_places; D-RELG-16]
-- RELG-085 The religion system shall mark the holy place where each church head sits (Pope, Ecumenical Patriarch, a Caliph's claim, Dalai Lama from 1578) for the big-institutions design, and give church heads no rules here. [religion §8]
+- RELG-085 The religion system shall mark the holy place where each church head sits (Pope, Ecumenical Patriarch, a Caliph's claim, Dalai Lama from 1578) as that head's seat; the heads' rules are §5.17. [religion §8; faith heads §2]
 
 ### 5.10 What each faith does differently
 - RELG-086 Where the faith is Catholic, the religion system shall make clergy not marry, pay double gold for taking over Catholic monastic land, and offer the Inquisition. [religion §9]
@@ -279,6 +288,45 @@ Every province now holds its faiths and every realm its state faith and Faith po
 - RELG-133 Where: every province's overview has a **Faith** line under its Tongue line: each faith's share with ↑ or ↓ when it is rising or falling. Tapping it, a 44-point button, opens below it how fast and toward which faith the mix moves, and for each faith its policy, whether its community is served, any grievance, and its pulls with their sources. The player's **Peoples** tab (shared with tongues, CULT-101) lists below the tongues the state faith and Faith %, then one card per faith in the realm, largest first, with its share, people, provinces where it is most and how many are aggrieved; the state faith says Established; every other faith has three buttons, Tolerated, Restricted and Persecuted, and one sentence on what the chosen policy does. A change shows as "Tolerated until New Year, then Restricted", and tapping the current policy again keeps it. [X-19, RELG-116, RELG-117]
 - RELG-134 Grouping and overview: the General tab of every realm card has a **Faith** line (state faith, Faith %, number of other faiths), red on the player's card when any faith is aggrieved, opening the Peoples tab. The map has a **Faiths** lens colouring each province by its largest faith, hatched where a second faith holds 30 % or more, with a key. *Wrong faith* and *Persecuted* show in the province's grievances with what ends them, and a policy taking effect reaches the dispatches. Phone: as CULT-101, the faith cards stack in one column in the side panel, every button at least 44 points high, nothing needs hover and nothing scrolls sideways. [X-19, RELG-118, SHELL-108, SHELL-109, SHELL-114]
 
+### 5.17 Heads of the faith (design, 18 October)
+Leroy asked how a ruler becomes "ruler of the faith", for every faith that has one, and what it gives and costs. The research and the reasons are in `religion/faith-heads-design.md`. Nothing here is a meter: every effect is a tie, a wrong, a preacher, a lord's step, a war aim, a call to arms or an oath broken.
+
+#### How the player uses it
+- RELG-135 Where: the player's **Peoples** tab shows, under the faith cards, one **Head of the faith** card for the state faith: the head's title, the seat and who holds it, the patron, and two short lists, what the patron gets and what he owes. Under them sits the one action open now as a 44-point button (*Send gold to the conclave*, *Claim the caliphate*, *Raise our own patriarch*), or a disabled button saying why not. A faith with no head shows one line saying so and why. [X-19; faith heads §3]
+- RELG-136 Conclave: when a Pope dies, a dispatch says a conclave sits for a month, with a button that opens the Head of the faith card. The card lists the top three realms by votes, then the player's, one row each with cardinals and gold votes; gold is sent in steps of 100 with + and − buttons, and the result comes as a dispatch. [X-19; faith heads §3]
+- RELG-137 Before a war: the *Declare war* view on a realm's Diplomacy tab (SHELL-140) lists, before the player confirms, that the head will censure the war and what it costs: the wrong and how many realms hold it, the lords who will waver, and the *Punish* aim for every fellow believer. A censure shows in the ledger as a named wrong like any other. [X-19; faith heads §3]
+- RELG-138 Overview and phone: the Faith line on every realm card's General tab carries a badge, *Patron of the <head>*, *Caliph*, *Heads its church*, or a red *Censured*; the Faiths lens marks each seat with a seat icon whose tap opens that faith's head card, read-only for other faiths. The card sits in the Peoples tab's single column, conclave rows are at most four so a Tall screen shows them without scrolling, every button is 44 points, nothing needs hover and nothing scrolls sideways, in Wide and Tall alike. [X-19; SHELL-108, SHELL-109, SHELL-114; faith heads §3]
+
+#### Who leads each faith
+- RELG-139 The religion system shall give these faiths a head with a seat: catholic the Pope (Rome, chosen), orthodox the Ecumenical Patriarch (Constantinople, held), oriental_christian the Catholicos (Echmiadzin, held), sunni the Caliph (Mecca and Medina, held, the patron is the head), vajrayana the Dalai Lama (Lhasa, held, from 1578); anglican and protestant are crown-headed churches; every other faith has no head. [faith heads §1, §2; config faith_heads.heads]
+- RELG-140 While a held seat is owned by a realm, the religion system shall make that realm's overlord the head's patron if it has one, else the realm itself; a Caliph is the Sunni ruler who took *Claim the caliphate* and still holds Mecca and Medina, directly or as overlord. [faith heads §2]
+- RELG-141 The religion system shall offer *Claim the caliphate* to a Sunni realm that holds Mecca and Medina, directly or as overlord, while no other ruler is Caliph. [faith heads §2]
+- RELG-142 When the ruler of the Papal States dies, the religion system shall hold a conclave for one month: each Catholic realm casts one vote per cardinal (one per Catholic house of worship at step 3 or more), plus one per 100 gold it sends, at most as many gold votes as cardinals; Rome casts 10 votes for an Italian Pope; the realm with the most votes becomes the patron until that Pope dies, and Rome winning (or a tie with Rome) means no patron. [faith heads §2; config faith_heads.conclave.*] @placeholder
+- RELG-143 If Rome is owned by a realm other than the Papal States, then the religion system shall hold no conclave and make that realm (or its overlord) the Pope's patron, as for a held seat. [faith heads §2]
+- RELG-144 When a realm takes a seat by war from a realm of the head's faith, the religion system shall give it the wrong *Seized the seat* (−20, fading over 20 years) with every realm of that faith; taken from a realm of another faith, the tie *Freed the seat* (+20, fading over 20 years) instead. [faith heads §2; config faith_heads.seized, freed] @placeholder
+- RELG-145 Where the patron is of another faith than the head, the religion system shall give it no patron's tie or preacher, and count every community of the head's faith in its realm as served. [faith heads §2]
+
+#### What the patron gets and owes
+- RELG-146 While a realm is a head's patron (or is the Caliph) and shares his faith, the religion system shall give it the tie *The <head> favours us* (+15) with every realm of that faith and 1 more preacher of it. [faith heads §2.1; config faith_heads.patron.*] @placeholder
+- RELG-147 When a realm of another faith declares war on a realm of the head's faith that holds one of that faith's holy places, the religion system shall send the patron a defensive call to arms in that war; refusing counts as an oath broken. [faith heads §2.2]
+- RELG-148 When a patron's (or the Caliph's) state faith changes, the religion system shall end the patronage and give it the wrong *Betrayed the faith* (−30, fading over 30 years) with every realm of the old faith. [faith heads §2.2; config faith_heads.betrayed] @placeholder
+
+#### Censure
+- RELG-149 When a ruler of a faith with a head declares war on a ruler of the same faith with the war aim *Take land*, *Tribute* or *Raid*, the religion system shall have the head censure him; crown-headed churches and faiths with no head are never censured. [faith heads §2.3; config faith_heads.censure.aims]
+- RELG-150 While a realm is censured, the religion system shall give it the wrong *Censured by the <head>* (−25) with every realm of that faith, held during the war and fading over 10 years after the peace; make its lords of that faith waver one step when the censure starts; give every realm of that faith the *Punish* war aim against it; and let its allies of that faith refuse its calls without an oath broken. [faith heads §2.3; config faith_heads.censure.*] @placeholder
+- RELG-151 When a censured war ends with a peace that gives back every province taken in it, the religion system shall end the censure at once (its wrong still fades); the head censures his patron like anyone else, and the patron keeps the patronage. [faith heads §2.3]
+
+#### The Orthodox way out
+- RELG-152 The religion system shall offer *Raise our own patriarch*, once, to an Orthodox realm with a step-4 Orthodox house of worship in its capital while Constantinople is owned by a realm of another faith, for 200 gold; afterwards its church is crown-headed and it has 1 more preacher. [faith heads §2.4; config faith_heads.own_patriarch.*] @placeholder
+
+#### Start and dates
+- RELG-153 When a campaign starts in 1444, the religion system shall set the Pope without a patron (Savoy follows him: the Basel schism is not modelled), Byzantium as the Ecumenical Patriarch's patron, the Qara Qoyunlu as the Catholicos's, and the Mamluks holding the Caliph's claim as overlord of the Hejaz as if they had taken the decision. [faith heads §2.5; D-RELG-25]
+- RELG-154 The religion system shall create the Dalai Lama in 1578 with the chooser of `altan_khan_and_the_dalai_lama` as his patron until Lhasa's owner or its overlord changes, and provide the event tree the condition `faith_head_patron` and the effect `faith_head_patron` (set a head's patron). [faith heads §2.5; religion §10.3]
+- RELG-155 Every head's patron, the Caliph, a sitting conclave with its votes, censures and own patriarchs shall be kept in the save. [SAVE]
+
+#### AI
+- RELG-156 The religion system shall make a Catholic AI not at war send gold to a conclave when that gold could win it and it can spare the gold; claim the caliphate and raise its own patriarch whenever offered; and count a censure's wrong and aim among its reasons when it weighs a war. [faith heads §4]
+
 ## 6. Commands
 
 | Command | Who | Preconditions | Result | Events emitted |
@@ -293,6 +341,9 @@ Every province now holds its faiths and every realm its state faith and Faith po
 | `RecallPreacher` | player / AI | — | Preacher lost to the list | — |
 | `AdoptFaith(country, faith, keep|take_over, schools keep|close)` | player / AI / event | Offer conditions; cooldown | State faith changes | `StateFaithChanged` |
 | `ExpelForeignPreacher(country, preacher)` | player / AI | Foreign preacher without leave | Expelled or executed | `PreacherExpelled` |
+| `SendConclaveGold(country, gold)` | player / AI | Catholic; a conclave sits; gold votes not above cardinals; steps of 100 | Gold spent, votes added | — |
+| `ClaimCaliphate(country)` | player / AI | RELG-141 | Ruler is Caliph | `FaithHeadPatronChanged` |
+| `RaiseOwnPatriarch(country)` | player / AI | RELG-152; 200 gold | Crown-headed church, +1 preacher | `OwnPatriarchRaised` |
 
 ## 7. Domain events
 
@@ -308,6 +359,10 @@ Every province now holds its faiths and every realm its state faith and Faith po
 | `HolyPlaceChangedHands` | Owner change of a holy place | place, old, new holder | warfare, events, big institutions |
 | `FaithWaveStarted` / `Ended` | Event effect / end | wave | events, map-presentation |
 | `FlagSet` | §5.11 | flag id, country | events |
+| `ConclaveOpened` / `ConclaveClosed` | Pope dies / a month later | votes per realm, patron | shell (dispatch), diplomacy (ties) |
+| `FaithHeadPatronChanged` | Conclave, seat changes owner, caliph claimed or lost, faith changed | head, old, new patron | diplomacy (ties, wrongs), map-presentation (badge), events |
+| `Censured` / `CensureEnded` | Censured war declared / peace or fade | head, country, war | diplomacy (wrong, refusals), warfare (*Punish* aim), realm (lords waver) |
+| `OwnPatriarchRaised` | Decision | country | diplomacy, events |
 
 ## 8. Policies (reactions to other contexts)
 - When a province changes owner (warfare / diplomacy), then RELG recomputes holy places held and the ruler-faith pulls.
@@ -318,6 +373,9 @@ Every province now holds its faiths and every realm its state faith and Faith po
 - When `peace_of_augsburg` fires, then RELG enables cuius regio.
 - When a revolutionary regime seizes church land or ends the state faith (revolutions), then the religion events `revolution_and_the_church` and `separation_of_church_and_state` may follow (their requirements may read `revolutionary_regime`).
 - When diplomacy grants *Allow preachers*, then RELG marks the preacher's leave.
+- When diplomacy reports a war declared (aim, sides), then RELG censures it if RELG-149 holds and sends the patron's call if RELG-147 holds.
+- When realm reports the ruler of the Papal States dead, then RELG opens a conclave (RELG-142).
+- When a seat's province changes owner, or its owner's overlord changes, then RELG sets the patron (RELG-140, RELG-143) and gives *Seized the seat* or *Freed the seat* (RELG-144).
 
 ## 9. Monthly step
 - A turn is one week (X-18); the yearly, New Year and monthly steps below run once, in the turn in which a new year or month begins.
@@ -374,6 +432,7 @@ All numbers are first-pass placeholders (religion.yaml header) except the four d
 | `holy_place_effects` | same faith: preachers 1, pilgrims 200; other faith: war aim; pilgrims still come if tolerated + house | | yes | religion.yaml |
 | `waves` | carriers list; town_min_size market_town; max_active 8 | | yes | religion.yaml |
 | `ai` | build below 0.5; tolerate above 0.20; zealous restrict; persecute only after event or religious war; adopt above 0.60 | | yes | religion.yaml |
+| `faith_heads.*` | heads (Pope, Ecumenical Patriarch, Catholicos, Caliph, Dalai Lama from 1578), crown-headed anglican and protestant; conclave: 1 cardinal per step-3 house, 100 gold a vote, gold votes at most the cardinals, Rome 10 votes, 1 month; patron tie +15, preachers 1; betrayed −30 / 30 years; seized −20 / 20 years; freed +20 / 20 years; censure −25 / 10 years, aims take_land, tribute, raid; own patriarch 200 gold, preachers 1 | | yes | religion.json |
 | `start` | source catalogue-faiths.json; ruler faith share 0.15; community default 0.05; 8 region overrides; 4 record faith overrides (D-RELG-12) | | yes | religion.json |
 
 ## 11. Seams
@@ -397,13 +456,18 @@ All numbers are first-pass placeholders (religion.yaml header) except the four d
 | scenario-setup | downstream | Published Language | 1444 ruler faith and province mix; holy places bound to map provinces by name (D-RELG-20) |
 | map-presentation | downstream | Published Language | Faith lens, sprites, preachers, wave tint |
 | time-and-turns | upstream | Conformist | Yearly slot with traders and trade balance; New Year policy changes |
+| diplomacy (heads) | downstream | Customer–Supplier | Patron's tie, *Seized* / *Freed the seat*, *Betrayed the faith*, *Censured* as ledger entries; the patron's defensive call; allies' free refusal of a censured realm's call |
+| warfare (heads) | downstream | Customer–Supplier | Censured aims (*Take land*, *Tribute*, *Raid*); *Punish* held against a censured realm |
+| realm (heads) | upstream / downstream | Customer–Supplier | Papal States ruler's death opens a conclave; lords waver on censure |
+| institutions (Empire, shogunate) | partnership | Partnership | Shinto's Emperor in Kyoto and the Empire's crowning stay with the institutions design; heads of the faith stay here |
 
 ## 12. AI
 
 RELG-119 to RELG-122: houses where the state faith is below half (gold allowing) and a minority's house when it has
 *Wrong faith* and wavering lords; tolerate any faith above 20 % unless zealous (zealous restrict; persecute only
 after an event or a war of religion); preachers first to own provinces under half, then abroad with leave; adopt
-only when an event offers or above 60 % of the realm. Event options carry `ai: {base: n}` weights (event tree).
+only when an event offers or above 60 % of the realm. Heads of the faith: RELG-156 (conclave gold when it could win, claim the
+caliphate and raise its own patriarch when offered, censure counted among war reasons). Event options carry `ai: {base: n}` weights (event tree).
 
 ## 13. Decisions and open questions
 
@@ -435,6 +499,8 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 
 - **D-RELG-24** First game slice (provisional): faith buildings cannot be built yet, so each 1444 community of a tenth or more holds one step-1 house (the state faith a house of worship, the others a minority house); this keeps every 1444 community served and the mixes steady, so they move slowly from the capital and the policies. Lords carry no faith yet, so no lord's pull or loyalty step is counted, and the Restricted and Persecuted lords' steps, sparks, flight, war aims and purses wait on their contexts. Of the eight region overrides, the map can place only those named by area for their 1444 owner and the Ottoman Balkans (provinces west of 29° E). The smallest rule that runs the mix, the communities and the policies with their grievances and tax.
 
+- **D-RELG-25** Heads of the faith (18 October, Leroy's list): designed in `religion/faith-heads-design.md` with no meter, every effect on ties, wrongs, preachers, lords, war aims and calls. One patron per head; the Caliph is his own patron; crown-headed churches and faiths with no head are outside censure. The Basel schism of 1444–49 is not modelled (the simpler rule): Savoy follows the Pope, and its `religious_authority` fact stays reference data. All numbers are provisional for the balancing model.
+
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
@@ -460,3 +526,10 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 | RELG-126 | holy-places.feature | The Temple of the Tooth follows the relic |
 | RELG-127 … RELG-132 | — | Engine: packages/engine/test/peoples.test.ts (1444 faiths and the Bohemia override, Faith policies at New Year, faith tax, Persecuted counting two and closing houses, save) |
 | RELG-133, RELG-134 | — | Presentation: apps/client/src/ui/belief.ts, the Faith line, Peoples tab and Faiths lens; screenshots from apps/client/scripts/belief-shots.mjs |
+| RELG-135 … RELG-138 | faith-heads.feature | The Head of the faith card; the conclave on the card; the censure warning before a war; badges and seats |
+| RELG-139 … RELG-145 | faith-heads.feature | Who leads each faith; held seats; claiming the caliphate; the conclave; Rome held by another realm; seizing a seat; a patron of another faith |
+| RELG-146 … RELG-148 | faith-heads.feature | What the patron gets; the patron's call; betraying the faith |
+| RELG-149 … RELG-151 | faith-heads.feature | Censure: which wars, its costs, how it ends |
+| RELG-152 | faith-heads.feature | Raising our own patriarch |
+| RELG-153 … RELG-155 | faith-heads.feature | The heads in 1444; the Dalai Lama in 1578; the save |
+| RELG-156 | faith-heads.feature | AI and the heads |

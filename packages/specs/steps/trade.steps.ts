@@ -106,9 +106,9 @@ Then("the card shows kind, crew, route, loop days, position, purse, last collect
   const card: T.TraderCard = s.card;
   expect(card.kind).toBe("pack_caravan");
   expect(card.crew).toBe("50 market folk");
-  expect(card.route).toBe("Troyes ▸ Dijon ▸ Geneva ▸ Dijon ▸ Troyes");
+  expect(card.route).toBe("Troyes ▸ Geneva");
   expect(card.loopDays).toBe(38);
-  expect(card.position).toBe("Langres, day 12 of 15 to Dijon");
+  expect(card.position).toBe("Langres, day 12 of 19 to Geneva");
   expect(card.purse).toBe("6.1 / 10");
   expect(card.lastCollections).toEqual([]);
   expect(card.feesAndTolls).toBe(0);
@@ -795,11 +795,16 @@ When("the player sets a route with {int} stops", (s, n: number) => {
   s.route = T.makeRoute(W(s), names);
 });
 
+When("the player sets a route from {string} to {string}", (s, a: string, b: string) => {
+  for (const c of new Set([a, b])) T.addProvince(W(s), c, { owner: "France", size: "city" });
+  s.route = T.makeRoute(W(s), [a, b]);
+});
+
 Then(/^the route is (refused|accepted)$/, (s, r: string) => {
   expect(s.route.ok).toBe(r === "accepted");
 });
 
-Given(/^a caravan has the route "([^"]+)" in mode "(loop|there and back|once)"$/, (s, route: string, mode: string) => {
+Given(/^a caravan has the route "([^"]+)" in mode "(there and back|once)"$/, (s, route: string, mode: string) => {
   for (const c of stops(route)) city(s, c, "France");
   s.trader = caravan(s, "France");
   const r = T.setRoute(W(s), "France", s.trader.id, stops(route), mode.replace(/ /g, "_") as T.RouteMode);
@@ -811,11 +816,6 @@ When("it reaches {string}", (s, p: string) => {
     T.enterProvince(W(s), s.trader, stop);
     if (stop === p) break;
   }
-});
-
-Then(/^it goes back to "([^"]+)" and starts again$/, (s, p: string) => {
-  expect(T.destination(s.trader)).toBe(p);
-  expect(s.trader.route.next).toBe(0);
 });
 
 Then(/^it reverses toward "([^"]+)"$/, (s, p: string) => {
@@ -838,6 +838,16 @@ Given(/^two paths from "([^"]+)" to "([^"]+)" take (\d+) and (\d+) days$/, (s, _
 Given("the {int}-day path has a toll and the {int}-day path has none", (s, tolled: number) => {
   for (const p of s.paths) if (p.days === tolled) p.tolls = 1;
   later(s, () => (s.chosen = T.choosePath(s.paths)));
+});
+
+Given(/^the (\d+)-day path runs through land of average people and the (\d+)-day path through land with twice as many$/, (s, plain: string, busy: string) => {
+  for (const p of s.paths) p.busy = p.days === Number(busy) ? 2 : p.days === Number(plain) ? 1 : p.busy;
+  later(s, () => (s.chosen = T.choosePath(s.paths)));
+});
+
+Then("the planner takes the {int}-day path through the busier land", (s, days: number) => {
+  expect(s.chosen.days).toBe(days);
+  expect(s.chosen.busy).toBe(2);
 });
 
 Then("the planner takes the {int}-day path, a toll counting as {int} days", (s, days: number, tollDays: number) => {
@@ -873,10 +883,9 @@ Given(/^a caravan has the route "([^"]+)"$/, (s, route: string) => {
   s.trader = caravan(s, "France", { name: "Caravan of Troyes", purse: 3 });
   expect(T.setRoute(W(s), "France", s.trader.id, stops(route)).ok).toBe(true);
   s.pathOptions = {
-    "Troyes>Dijon": [{ provinces: ["Troyes", "Langres", "Dijon"], days: 10, tolls: 0 }],
-    "Dijon>Geneva": [
-      { provinces: ["Dijon", "Jura", "Geneva"], days: 15, tolls: 1 },
-      { provinces: ["Dijon", "Bresse", "Geneva"], days: 18, tolls: 0 },
+    "Troyes>Geneva": [
+      { provinces: ["Troyes", "Langres", "Jura", "Geneva"], days: 25, tolls: 1 },
+      { provinces: ["Troyes", "Langres", "Bresse", "Geneva"], days: 28, tolls: 0 },
     ],
   };
   for (const p of ["Langres", "Jura", "Bresse"]) city(s, p, p === "Langres" ? "France" : "Savoy", { size: "village", market: null });
@@ -1642,9 +1651,9 @@ Then(/^the lenses "Traders passing" and "Trade balance" do not$/, () => {
 });
 
 Given("five caravans of {string}", (s, c: string) => {
-  for (const p of ["Venice", "Padua", "Verona"]) city(s, p, c);
+  for (const p of ["Venice", "Verona"]) city(s, p, c);
   s.caravans = Array.from({ length: 5 }, () => caravan(s, c));
-  T.setRoute(W(s), c, s.caravans[0].id, ["Venice", "Padua", "Verona"]);
+  T.setRoute(W(s), c, s.caravans[0].id, ["Venice", "Verona"]);
   s.country = c;
 });
 
@@ -1652,10 +1661,10 @@ When("four of them copy the first one's route", (s) => {
   for (const t of s.caravans.slice(1)) expect(T.copyRoute(W(s), s.country, t.id, s.caravans[0].id).ok).toBe(true);
 });
 
-Then("all five run the same loop", (s) => {
+Then("all five run the same route there and back", (s) => {
   for (const t of s.caravans) {
-    expect(t.route.stops).toEqual(["Venice", "Padua", "Verona"]);
-    expect(t.route.mode).toBe("loop");
+    expect(t.route.stops).toEqual(["Venice", "Verona"]);
+    expect(t.route.mode).toBe("there_and_back");
   }
 });
 
@@ -1902,10 +1911,8 @@ function previewWorld(s: Scenario): T.PreviewLeg[] {
   T.province(w, "Geneva").visits = 6;
   const jura: T.TollPoint = { id: "Jura", owner: "Savoy", rate: "low" };
   return [
-    { from: "Troyes", to: "Dijon", days: 15, provinces: ["Bar-sur-Aube", "Langres", "Dijon"], tolls: [] },
-    { from: "Dijon", to: "Geneva", days: 4, provinces: ["Dole", "Jura", "Gex", "Geneva"], tolls: [jura] },
-    { from: "Geneva", to: "Dijon", days: 4, provinces: ["Gex", "Jura", "Dole", "Dijon"], tolls: [jura] },
-    { from: "Dijon", to: "Troyes", days: 15, provinces: ["Langres", "Bar-sur-Aube", "Troyes"], tolls: [] },
+    { from: "Troyes", to: "Geneva", days: 19, provinces: ["Bar-sur-Aube", "Langres", "Dijon", "Dole", "Jura", "Gex", "Geneva"], tolls: [jura] },
+    { from: "Geneva", to: "Troyes", days: 19, provinces: ["Gex", "Jura", "Dole", "Dijon", "Langres", "Bar-sur-Aube", "Troyes"], tolls: [jura] },
   ];
 }
 

@@ -124,6 +124,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | achievements | upstream | Published Language | Trade hub ownership |
 
+## achievements ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | downstream | Published Language | A colony on given land counts as founded with the consent of the local people |
+
 ## achievements ↔ warfare (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
@@ -569,6 +575,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | subjects | partnership | Customer–Supplier | Diplomacy maps relation kinds onto the six kinds through `mapping_1444` and reads `fights` / `own_diplomacy` from here (X-8); its counts decide asks by agreement and this context picks the kind (D-SUBJ-4); Break a subject targets the overlord (D-SUBJ-6) |
 
+## diplomacy (heads) ↔ religion (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| religion | downstream | Customer–Supplier | Patron's tie, *Seized* / *Freed the seat*, *Betrayed the faith*, *Censured* as ledger entries; the patron's defensive call; allies' free refusal of a censured realm's call |
+
 ## diplomacy ↔ events
 
 | Said by | Other side is | Pattern | What crosses |
@@ -595,6 +607,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | diplomacy | upstream | Customer–Supplier | Regency; envoys are officials already counted in the cap (D-DIPL-24) |
 | government | upstream | Conformist | "Allied with 2 neighbours of the same people"; subjects count for "3 or more subjects" |
+
+## diplomacy ↔ institutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Customer–Supplier | Reasons count, envoy missions (*Seek their vote*, admit), calls to arms, ties and wrongs |
 
 ## diplomacy ↔ map-presentation
 
@@ -700,6 +718,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | diplomacy | downstream | Published Language | Trade pact (no tolls), embargo (closed paths), war stops trade |
 | trade | upstream | Customer–Supplier | Trade pact, embargo, peace and war (no closed borders, D-TRADE-8) |
 
+## diplomacy ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | downstream | Customer–Supplier | Wrong *Settlers on our land*, war aim *Punish*; grounds count for neighbours; the ask for land through the reasons count |
+
 ## diplomacy ↔ troop-movement
 
 | Said by | Other side is | Pattern | What crosses |
@@ -748,6 +772,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | events | downstream | Customer–Supplier | 16 `government` values mapped to forms; admin_capacity → officials cap |
 | government | upstream | Anti-Corruption Layer | 16 event-tree `government` values mapped to forms; `admin_capacity` adds 1 official per point for good (D-GOV-11); events read the form's event-tree value |
+
+## events ↔ institutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Published Language | `peace_of_augsburg`, `peace_of_westphalia`, `onin_war`, `perry_expedition`, `meiji_restoration` |
 
 ## events ↔ national-strengths
 
@@ -951,6 +981,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | exploration | upstream | Conformist | Monthly colony update and the day loop |
 | time-and-turns | downstream | Customer–Supplier | Monthly colony progress |
 
+## exploration ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | partnership | Partnership | Colony founding starts and ends; aggression one step fiercer on a ground; a given ground rolls Peaceful; the Charts lens marks grounds |
+
 ## exploration ↔ troop-movement (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
@@ -963,6 +999,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | exploration | upstream | Conformist | Sea zones (~150 km coastal, ~300 km ocean), coastal provinces, adjacency, steps for the start charted reach |
 | world-map | downstream | Customer–Supplier | Graph steps for the charted start; coastal provinces |
+
+## game-shell ↔ institutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Customer–Supplier | Institutions row, cards, answer cards, Needs attention |
 
 ## game-shell ↔ map-presentation
 
@@ -1003,11 +1045,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | game-shell | upstream | Conformist | Levy and commission screens in the Army tab and from province cards |
 
-## game-shell ↔ research (one-sided)
+## game-shell ↔ research
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | game-shell | upstream | Conformist | Learning tab, empty research or school slots for Attention |
+| research | downstream | Customer–Supplier | Each realm's standing for the nation picker and country cards (RSCH-104, RSCH-105) |
 
 ## game-shell ↔ revolutions (one-sided)
 
@@ -1055,6 +1098,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | trade | downstream | Published Language | Trade screen, trader card, route preview, turn-report lines |
 
+## game-shell ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | downstream | Published Language | Hunting grounds tab, province card buttons, the settlers alert |
+
 ## game-shell ↔ troop-movement (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
@@ -1067,6 +1116,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | game-shell | upstream | Customer–Supplier | Battle view content (progress, standing orders, Retreat; no skip, X-1), result card, siege view, peace table, notifications for the turn report and Attention |
 | warfare | downstream | Published Language | Player battles watched in 4-hour steps with standing orders, retreat and switching between battles (X-1, D-WAR-2), battle reports and replay, notifications |
+
+## government ↔ institutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Partnership | Shogunate and warlord domain forms; GOV-038 break; the warlord domain → shogunate reform |
 
 ## government ↔ map-presentation (one-sided)
 
@@ -1125,7 +1180,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| government | upstream | Conformist | G1, G2, G3, G4, G6, G9, G11, G14, W12 as reform needs and building needs |
+| government | upstream | Conformist | G1, G2, G3, G4, G6, G9, G11, G14, W12 as reform needs and building needs; the steppe start group's start set (GOV-068) and the cheaper earlier-era inventions (GOV-070) are research data and rules, placed on the single tree's era levels |
 | research | downstream | Customer–Supplier | G9, G14 and other ids as reform requirements |
 
 ## government ↔ revolutions
@@ -1155,12 +1210,66 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | government | upstream | Conformist | "4 or more traders abroad", "trade in debt 3 years running" as reform needs |
 
+## government ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | upstream | Conformist | The form (tribal realm or not); self-run for a province taken in; officials cap |
+
 ## government ↔ warfare
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| government | upstream | Customer–Supplier | Army coup; loss of the shogun's capital |
+| government | upstream | Customer–Supplier | Army coup; loss of the shogun's capital; horse archers, *Feigned flight*, raids and tribute as the horde's strengths and the balance targets they are checked against (GOV-073, GOV-074) |
 | warfare | upstream | Conformist | Ruler warlike, regency, succession war |
+
+## institutions (Empire, shogunate) ↔ religion (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| religion | partnership | Partnership | Shinto's Emperor in Kyoto and the Empire's crowning stay with the institutions design; heads of the faith stay here |
+
+## institutions ↔ map-presentation (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Published Language | Institutions lens |
+
+## institutions ↔ realm (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Customer–Supplier | Rulers and heirs, lords as great houses, loyalty reasons, soldiers |
+
+## institutions ↔ religion (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Conformist | Faiths, the head of the Catholic faith, RELG-079 |
+
+## institutions ↔ revolutions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Customer–Supplier | The restoration for the Court |
+
+## institutions ↔ scenario-setup (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | upstream | Conformist | 1444 members, seats, houses, imperial land |
+
+## institutions ↔ trade (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Customer–Supplier | Closed country's one port |
+
+## institutions ↔ warfare (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| institutions | downstream | Customer–Supplier | War aims *Restore imperial land*, Breaker of the Peace, *Bring to heel*; peace term *Dissolve the Empire*; contingents; circle defence |
 
 ## map-presentation ↔ national-strengths
 
@@ -1243,6 +1352,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | map-presentation | upstream | Published Language | Trade lenses, traders, roads and lanes |
 | trade | downstream | Published Language | Trade lens, trader icons, road thickness |
+
+## map-presentation ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | downstream | Published Language | Ground hatch, claim bars, the amber coast in Charts |
 
 ## map-presentation ↔ troop-movement
 
@@ -1565,6 +1680,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | province | upstream | Published Language | Known inventions unlock buildings, tile changes, harvest steps, road and castle steps |
 | research | upstream | Customer–Supplier | Schools, students and scholars per province, Schoolmaster, graduates becoming officials by school type; research sends unlocks (buildings, tile changes, harvest steps, roads, castles) |
+| research | downstream | Customer–Supplier | Without F01 farmland harvests one step worse (RSCH-094) |
 
 ## province ↔ revolutions
 
@@ -1602,6 +1718,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | trade | upstream | Customer–Supplier | Wares made, food surplus, toll points and rates, customs officer, riots, rebels, homeless, quarantine, plague, town size |
 | trade | downstream | Published Language | Trade ratio (tax +1 % per 4 points), traders passing, trade value; replaces province §7 |
 
+## province ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | downstream | Customer–Supplier | A province taken in, with its people |
+
 ## province ↔ troop-movement
 
 | Said by | Other side is | Pattern | What crosses |
@@ -1622,6 +1744,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | province | upstream | Conformist | Ground (terrain), size on the map (tile count), coast, rivers, neighbours, population, wealth |
 | world-map | downstream | Published Language | Ground, size (tile count), coastal and river (shore tiles), road step |
+
+## realm (heads) ↔ religion (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| religion | upstream / downstream | Customer–Supplier | Papal States ruler's death opens a conclave; lords waver on censure |
 
 ## realm ↔ rebellions
 
@@ -1686,6 +1814,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | realm | upstream | Customer–Supplier | Trade income (deposits, fees, tolls); traders and trade ships replace merchants (REALM-157) |
 | trade | downstream | Customer–Supplier | Deposits, market fees, tolls as trade income; founding gold and upkeep; Traders and Trade ships replace Merchants |
 | trade | upstream | Customer–Supplier | Treasury, lords and their wealth, catalogue trade_access |
+
+## realm ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | downstream | Customer–Supplier | *Furs and hides* ledger line; refilling wagons in grounds |
 
 ## realm ↔ warfare
 
@@ -1839,6 +1973,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | religion | downstream | Customer–Supplier | *Defend the faith* openings (persecution on border, preacher killed, holy place held) |
 | warfare | upstream | Conformist | Persecution flag for *Defend the faith* |
 
+## religion ↔ warfare (heads) (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| religion | downstream | Customer–Supplier | Censured aims (*Take land*, *Tribute*, *Raid*); *Punish* held against a censured realm |
+
 ## research ↔ revolutions (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
@@ -1849,7 +1989,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| research | upstream | Customer–Supplier | Map nations; research data maps each start label to nations (D-RSCH-11) |
+| research | upstream | Customer–Supplier | Map nations; each belongs to one start group in the research data (RSCH-098, D-RSCH-21) |
 | scenario-setup | upstream | Customer–Supplier | Start inventions per country |
 
 ## research ↔ time-and-turns
@@ -1872,6 +2012,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | research | downstream | Customer–Supplier | B2, B9 and railways as road factors |
+| research | downstream | Customer–Supplier | Without B01 armies carry half the food (RSCH-094) |
 | troop-movement | upstream | Conformist | W14 Army divisions (split same day, fronts) |
 
 ## research ↔ warfare
@@ -1880,6 +2021,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | research | downstream | Customer–Supplier | W, B, S inventions and their numbers (warfare §12); battles roll the sack (RSCH-072); occupations steal progress (RSCH-071) |
 | warfare | upstream | Conformist | W, B (and S) inventions known |
+
+## research ↔ warfare, recruiting (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| research | downstream | Customer–Supplier | Without C01 regiments fight 20 % weaker; without F03 no horse regiments (RSCH-094) |
 
 ## revolutions ↔ subjects
 
@@ -1955,6 +2102,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | scenario-setup | downstream | Customer–Supplier | Starting traders by `trade_access`; starting routes; warm-up |
 | trade | upstream | Customer–Supplier | Starting traders and routes from the catalogue; warm-up |
 
+## scenario-setup ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | upstream | Customer–Supplier | The catalogue's `am_north` records, their tier, representation and dates; home points; 1444 owners; new tribes become realms (X-13) |
+
 ## scenario-setup ↔ warfare
 
 | Said by | Other side is | Pattern | What crosses |
@@ -2015,6 +2168,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | time-and-turns | downstream | Customer–Supplier | Traders' day step; monthly ratio update after the day loop; warm-up from the one `Rng` before turn 0 |
 | trade | upstream | Conformist | Day loop, month end, year |
+
+## time-and-turns ↔ tribes (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| tribes | upstream | Conformist | Monthly step place; yearly take-in |
 
 ## time-and-turns ↔ troop-movement
 

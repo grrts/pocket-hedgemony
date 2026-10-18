@@ -31,16 +31,13 @@ export const traderKindName = (k: GameTraderKind): string => KIND_NAME[k];
 const isShip = (k: GameTraderKind) => k === "cog_junk_dhow";
 const COG = navalConfig.ships.cog;
 
-export type GameRouteMode = "loop" | "there_and_back";
-
 export interface GameTrader {
   id: number;
   kind: GameTraderKind;
   owner: number;
   home: number;
-  /** 2 to 8 cities in order; empty while it has no route (it waits at home). */
+  /** Where its route starts and where it goes, walked there and back (D-TRADE-21); empty while it has no route (it waits at home). */
   stops: number[];
-  mode: GameRouteMode;
   purse: number;
   /** Index into its path of the province it stands in. */
   at: number;
@@ -80,7 +77,7 @@ export interface TradeState {
   /** Last month's deposits, market fees received and traders' upkeep, by realm: 3 per realm. */
   nationTrade: Float64Array;
   /** The player's route being drawn, with its preview; never saved. */
-  tradeDraft: { trader: number; stops: number[]; mode: GameRouteMode } | null;
+  tradeDraft: { trader: number; stops: number[] } | null;
 }
 
 export function createTradeState(P: number, N: number): TradeState {
@@ -156,7 +153,27 @@ function weights(world: World, p: number, ship: boolean): number {
 export function refreshTradeValues(world: World): void {
   for (let p = 0; p < world.provinceCount; p++) if (!world.provinceWater[p]) refreshProvince(world, p);
   laneCache.delete(world);
+  refreshBusy(world);
 }
+
+/**
+ * What a land province's days count for in the route planner: its days divided by 1 + busy weight × its
+ * people over the world's average, capped, so routes go through the most populated land (D-TRADE-21).
+ * Worked out each January with the values, and kept until the next.
+ */
+const busyCache = new WeakMap<World, Float32Array>();
+function refreshBusy(world: World): Float32Array {
+  const P = world.provinceCount;
+  let people = 0, land = 0;
+  for (let p = 0; p < P; p++) if (!world.provinceWater[p]) ((people += world.provincePopulation[p]!), land++);
+  const mean = land && people > 0 ? people / land : 1;
+  const f = new Float32Array(P);
+  for (let p = 0; p < P; p++) f[p] = world.provinceWater[p] ? 1 : 1 / (1 + config.route.busy_weight * Math.min(world.provincePopulation[p]! / mean, config.route.busy_cap));
+  busyCache.set(world, f);
+  legCache.delete(world);
+  return f;
+}
+const busyOf = (world: World) => busyCache.get(world) ?? refreshBusy(world);
 
 function refreshProvince(world: World, p: number): void {
   const goods = countGoods(world, p);
@@ -306,6 +323,7 @@ let seenAt = new Int32Array(0);
 let enterAt = new Int32Array(0);
 let search = 0;
 let ownerAt = new Int32Array(0);
+let daysAt = new Float64Array(0);
 
 interface Reach {
   /** Provinces reached, in the order they were settled. */
@@ -314,17 +332,20 @@ interface Reach {
 }
 
 /**
- * Fewest days from `from` for a trader of this kind and realm (the shared planner's rule, TRADE-052),
- * out to `maxDays`, stopping early once `to` is reached. Ships pass through sea zones only: a port is entered, never crossed.
+ * The way from `from` for a trader of this kind and realm by the shared planner's rule (TRADE-052): fewest
+ * days, a land province's days counting less the more people live there (D-TRADE-21), out to `maxDays`
+ * of walking, stopping early once `to` is reached. Ships pass through sea zones only: a port is entered, never crossed.
  */
 function plan(world: World, n: number, kind: GameTraderKind, from: number, maxDays: number, to = -1): Reach {
   const P = world.provinceCount;
-  if (dist.length < P) ((dist = new Float64Array(P)), (prev = new Int32Array(P)), (seenAt = new Int32Array(P)), (enterAt = new Int32Array(P)));
+  if (dist.length < P) ((dist = new Float64Array(P)), (prev = new Int32Array(P)), (seenAt = new Int32Array(P)), (enterAt = new Int32Array(P)), (daysAt = new Float64Array(P)));
+  const busy = busyOf(world);
   if (ownerAt.length < world.nationCount) ownerAt = new Int32Array(world.nationCount);
   const stamp = ++search;
   // enterAt: 2×stamp = may enter, 2×stamp+1 = may not, looked up once a search.
   const reached: number[] = [];
   dist[from] = 0;
+  daysAt[from] = 0;
   prev[from] = -1;
   seenAt[from] = stamp;
   const heap = new Heap();
@@ -339,12 +360,15 @@ function plan(world: World, n: number, kind: GameTraderKind, from: number, maxDa
     if (ship && p !== from && !world.provinceWater[p]) continue;
     for (let e = world.adjStart[p]!; e < world.adjStart[p + 1]!; e++) {
       const q = world.adjList[e]!;
-      const nd = d + stepDays(world, kind, q);
-      if (nd > maxDays || (seenAt[q] === stamp && nd >= dist[q]!)) continue;
+      const step = stepDays(world, kind, q);
+      const nd = d + step * busy[q]!;
+      const days = daysAt[p]! + step;
+      if (days > maxDays || (seenAt[q] === stamp && nd >= dist[q]!)) continue;
       if (enterAt[q] !== 2 * stamp && enterAt[q] !== 2 * stamp + 1) enterAt[q] = 2 * stamp + (mayEnterIn(world, n, q, stamp) ? 0 : 1);
       if (enterAt[q] !== 2 * stamp) continue;
       seenAt[q] = stamp;
       dist[q] = nd;
+      daysAt[q] = days;
       prev[q] = p;
       heap.push(nd, q);
     }
@@ -372,7 +396,7 @@ function pathTo(r: Reach, to: number): number[] | null {
   return out.reverse();
 }
 
-/** Legs planned this month, by realm, kind and stops: many traders share them (cleared each month, and when a war begins or ends). */
+/** Legs planned, by realm, kind and stops: many traders share them (cleared when a war begins or ends, and each January). */
 const legCache = new WeakMap<World, { wars: string; legs: Map<string, number[] | null> }>();
 function leg(world: World, n: number, kind: GameTraderKind, a: number, b: number): number[] | null {
   const g = world.diplomacy;
@@ -388,9 +412,9 @@ function leg(world: World, n: number, kind: GameTraderKind, a: number, b: number
 
 const LEG_DAYS = G.leg_max_days;
 
-/** The provinces a route walks in one loop, from its first stop round to just before it again; null if a leg can't be walked. */
-export function loopPath(world: World, n: number, kind: GameTraderKind, stops: readonly number[], mode: GameRouteMode = "loop", cached = true): number[] | null {
-  const order = mode === "there_and_back" ? [...stops, ...stops.slice(1, -1).reverse()] : stops;
+/** The provinces a route walks there and back, from its start round to just before it again; null if a leg can't be walked. */
+export function loopPath(world: World, n: number, kind: GameTraderKind, stops: readonly number[], cached = true): number[] | null {
+  const order = [...stops, ...stops.slice(1, -1).reverse()];
   const path: number[] = [];
   for (let i = 0; i < order.length; i++) {
     const a = order[i]!, b = order[(i + 1) % order.length]!;
@@ -424,7 +448,7 @@ function lanePorts(world: World, z: number): number[] {
 /** A trader's loop, planned when first needed and again when its route or the wars change; kept with it, and in the save. */
 function pathOf(world: World, t: GameTrader): number[] {
   if (!t.path.length) {
-    t.path = t.stops.length >= 2 ? (loopPath(world, t.owner, t.kind, t.stops, t.mode) ?? [t.home]) : [t.home];
+    t.path = t.stops.length >= 2 ? (loopPath(world, t.owner, t.kind, t.stops) ?? [t.home]) : [t.home];
     if (t.at >= t.path.length) t.at = 0;
   }
   return t.path;
@@ -432,7 +456,7 @@ function pathOf(world: World, t: GameTrader): number[] {
 
 /** A trader's loop for the screens, planned without keeping it, so looking never changes the game. */
 function peekPath(world: World, t: GameTrader): number[] {
-  return t.path.length ? t.path : t.stops.length >= 2 ? (loopPath(world, t.owner, t.kind, t.stops, t.mode, false) ?? [t.home]) : [t.home];
+  return t.path.length ? t.path : t.stops.length >= 2 ? (loopPath(world, t.owner, t.kind, t.stops, false) ?? [t.home]) : [t.home];
 }
 
 /** Whether the trader can deposit in q: a trade city of its own realm that its realm holds (TRADE-060, TRADE-063). */
@@ -619,10 +643,10 @@ export function estimateLoop(world: World, n: number, kind: GameTraderKind, path
   return { loopDays: Math.round(days), collectIn, best, expected: kept / months, fees: fees / months, deposits };
 }
 
-/** Why a route can't be set, or null (TRADE-049, TRADE-050). */
+/** Why a route can't be set, or null: a start and an end, two different trade stops (TRADE-049, TRADE-050, D-TRADE-21). */
 export function routeProblem(world: World, n: number, kind: GameTraderKind, stops: readonly number[]): string | null {
-  if (stops.length < config.route.min_stops) return `a route needs at least ${config.route.min_stops} stops`;
-  if (stops.length > config.route.max_stops) return `a route has at most ${config.route.max_stops} stops`;
+  if (stops.length < config.route.min_stops || stops.length > config.route.max_stops) return "a route has a start and an end";
+  if (new Set(stops).size !== stops.length) return "pick two different cities";
   for (const s of stops) {
     if (!Number.isInteger(s) || s < 0 || s >= world.provinceCount) return "no such province";
     const name = world.rules.provinces[s]!.name;
@@ -632,7 +656,10 @@ export function routeProblem(world: World, n: number, kind: GameTraderKind, stop
   return null;
 }
 
-/** The best loop the AI finds for a trader from `home`: one, two or three more stops within reach, by expected gold (TRADE-113). */
+/**
+ * The best route the AI finds for a trader from `home`: the city within reach whose way there and back, through the
+ * most populated land, brings the most gold; a city another of the realm's traders already runs to counts half (TRADE-113, D-TRADE-21).
+ */
 export function bestRoute(world: World, n: number, kind: GameTraderKind, home: number, taken: ReadonlySet<number> = new Set()): number[] | null {
   const ship = isShip(kind);
   // Reach is the land's in a pack caravan's days: a quicker kind goes no further in provinces.
@@ -644,36 +671,12 @@ export function bestRoute(world: World, n: number, kind: GameTraderKind, home: n
     .sort((a, b) => tradeValueAt(world, b, ship) - tradeValueAt(world, a, ship))
     .slice(0, G.ai_candidates * 3)
     .map((c) => ({ c, way: pathTo(around, c)! }));
-  if (!ways.length) return null;
-  const home2 = new Map(ways.map((w) => [w.c, w.way]));
-  const quick = ways
-    .map(({ c, way }) => {
-      // A city another of the realm's traders already runs to is worth less: they would crowd it (TRADE-048).
-      return { c, s: estimateLoop(world, n, kind, [...way, ...way.slice(1, -1).reverse()], G.ai_ratio_floor).expected * (taken.has(c) ? 0.5 : 1) };
-    })
-    .sort((a, b) => b.s - a.s)
-    .slice(0, G.ai_candidates);
-  let stops = [home, quick[0]!.c];
-  let best = quick[0]!.s;
-  if (best <= 0) return null;
-  // One more stop, twice: one search from the last stop gives the way on to every candidate; home is the way out, reversed.
-  let loop = [...home2.get(stops[1]!)!.slice(0, -1)];
-  for (let more = 0; more < 2; more++) {
-    const last = stops.at(-1)!;
-    const from = plan(world, n, kind, last, reach);
-    const onward = new Map(quick.filter(({ c }) => !stops.includes(c)).map(({ c }) => [c, pathTo(from, c)]));
-    let pick: { c: number; loop: number[] } | null = null;
-    for (const [c, way] of onward) {
-      if (!way) continue;
-      const tryLoop = [...loop, ...way.slice(0, -1)];
-      const s = estimateLoop(world, n, kind, [...tryLoop, ...home2.get(c)!.slice().reverse().slice(0, -1)], G.ai_ratio_floor).expected * (taken.has(c) ? 0.5 : 1);
-      if (s > best * 1.05) ((best = s), (pick = { c, loop: tryLoop }));
-    }
-    if (!pick) break;
-    stops = [...stops, pick.c];
-    loop = pick.loop;
+  let best: { c: number; s: number } | null = null;
+  for (const { c, way } of ways) {
+    const s = estimateLoop(world, n, kind, [...way, ...way.slice(1, -1).reverse()], G.ai_ratio_floor).expected * (taken.has(c) ? 0.5 : 1);
+    if (s > 0 && (!best || s > best.s)) best = { c, s };
   }
-  return stops;
+  return best ? [home, best.c] : null;
 }
 
 // ---------------------------------------------------------------- founding and orders
@@ -696,12 +699,12 @@ export function foundProblem(world: World, n: number, city: number, kind: GameTr
 }
 
 function addTrader(world: World, n: number, home: number, kind: GameTraderKind, stops: number[]): GameTrader {
-  const t: GameTrader = { id: ++world.traderSeq, kind, owner: n, home, stops, mode: "loop", purse: 0, at: 0, days: 0, lastMonth: 0, thisMonth: 0, lastDeposit: 0, lastDepositCity: -1, unpaid: 0, blocked: -1, chosen: false, path: [] };
+  const t: GameTrader = { id: ++world.traderSeq, kind, owner: n, home, stops, purse: 0, at: 0, days: 0, lastMonth: 0, thisMonth: 0, lastDeposit: 0, lastDepositCity: -1, unpaid: 0, blocked: -1, chosen: false, path: [] };
   world.traders.push(t);
   return t;
 }
 
-/** Founds a trader in an own city: its gold paid, its crew leaving the city, a loop chosen for it to start on (TRADE-003). */
+/** Founds a trader in an own city: its gold paid, its crew leaving the city, the best route chosen for it to start on (TRADE-003). */
 export function foundTrader(world: World, n: number, city: number, kind: GameTraderKind, stops?: number[]): string | null {
   const why = foundProblem(world, n, city, kind);
   if (why) return why;
@@ -716,18 +719,16 @@ export function foundTrader(world: World, n: number, city: number, kind: GameTra
   return null;
 }
 
-/** Sets a trader's route: 2 to 8 cities, walked as a loop or there and back (TRADE-050, TRADE-051). */
-export function setTradeRoute(world: World, n: number, id: number, stops: number[], mode: GameRouteMode = "loop"): string | null {
+/** Sets a trader's route: where it starts and where it goes, walked there and back along the planner's way (TRADE-050, TRADE-051, D-TRADE-21). */
+export function setTradeRoute(world: World, n: number, id: number, stops: number[]): string | null {
   const t = world.traders.find((x) => x.id === id);
   if (!t || t.owner !== n) return "not your trader";
-  if (mode !== "loop" && mode !== "there_and_back") return "no such route mode";
   const why = routeProblem(world, n, t.kind, stops);
   if (why) return why;
-  if (!loopPath(world, n, t.kind, stops, mode)) return "no way between those stops";
+  if (!loopPath(world, n, t.kind, stops)) return "no way between those cities";
   // It walks from wherever it stands to its first stop.
   const here = pathOf(world, t)[t.at] ?? t.home;
   t.stops = stops.slice();
-  t.mode = mode;
   t.chosen = true;
   t.blocked = -1;
   t.path = [];
@@ -740,11 +741,11 @@ export function setTradeRoute(world: World, n: number, id: number, stops: number
 }
 
 /** Keeps the player's route being drawn, for its preview (TRADE-054, TRADE-096); empty stops clear it. */
-export function draftTradeRoute(world: World, n: number, id: number, stops: number[], mode: GameRouteMode = "loop"): string | null {
+export function draftTradeRoute(world: World, n: number, id: number, stops: number[]): string | null {
   if (!stops.length) return ((world.tradeDraft = null), null);
   const t = world.traders.find((x) => x.id === id);
   if (!t || t.owner !== n) return "not your trader";
-  world.tradeDraft = { trader: id, stops: stops.slice(0, config.route.max_stops), mode: mode === "there_and_back" ? mode : "loop" };
+  world.tradeDraft = { trader: id, stops: stops.slice(0, config.route.max_stops) };
   return null;
 }
 
@@ -771,7 +772,7 @@ export function dismissTrader(world: World, n: number, id: number): string | nul
 // ---------------------------------------------------------------- the AI and the start
 
 /**
- * Once a year the AI sets each trader on its best loop, and founds one more where a loop beats upkeep by its
+ * Once a year the AI sets each trader on its best route, and founds one more where a route beats upkeep by its
  * margin (TRADE-113 to TRADE-115); a twelfth of the traders and realms each month, so no month carries it all.
  */
 function aiTrade(world: World): void {
@@ -788,7 +789,6 @@ function aiTrade(world: World): void {
     const stops = bestRoute(world, t.owner, t.kind, t.home, taken);
     if (stops && stops.join() !== t.stops.join()) {
       t.stops = stops;
-      t.mode = "loop";
       t.path = [];
       t.at = 0;
     }
@@ -844,7 +844,7 @@ const byName = (world: World) => {
 
 /**
  * The 1444 start: each realm's starting traders from its trade access, on the hand-made routes where their
- * cities are on the map and otherwise on the AI's best loops, then two years of their walking to set the
+ * cities are on the map and otherwise on the AI's best routes, then two years of their walking to set the
  * starting ratios (TRADE-110 to TRADE-112).
  */
 export function seedTrade(world: World): void {
@@ -894,7 +894,6 @@ export interface TraderView {
   name: string;
   home: number;
   stops: number[];
-  mode: GameRouteMode;
   purse: number;
   purseMax: number;
   /** The province it stands in, and its loop for the map (provinces in order). */
@@ -929,7 +928,7 @@ export interface TradeView {
   /** The realm's busiest trade cities: value, ratio and traders passing. */
   centres: { province: number; value: number; ratio: number; passing: number }[];
   /** The route being drawn: its stops, whether it can be set, and its preview. */
-  draft: ({ trader: number; stops: number[]; mode: GameRouteMode; why: string | null; path: number[] } & RouteEstimate) | null;
+  draft: ({ trader: number; stops: number[]; why: string | null; path: number[] } & RouteEstimate) | null;
 }
 
 export function tradeView(world: World, n: number): TradeView {
@@ -940,7 +939,7 @@ export function tradeView(world: World, n: number): TradeView {
       const row = kindRow(world, t.kind);
       const est = estimateLoop(world, n, t.kind, path);
       return {
-        id: t.id, kind: t.kind, name: row.name, home: t.home, stops: t.stops.slice(), mode: t.mode, purse: t.purse, purseMax: row.purse,
+        id: t.id, kind: t.kind, name: row.name, home: t.home, stops: t.stops.slice(), purse: t.purse, purseMax: row.purse,
         at: path[t.at] ?? t.home, path: path.slice(), pathAt: t.at, expected: est.expected, upkeep: row.upkeep, loopDays: est.loopDays,
         lastMonth: t.thisMonth, lastDeposit: t.lastDeposit, lastDepositCity: t.lastDepositCity,
         problem: t.blocked >= 0 ? `the way to ${world.rules.provinces[t.blocked]!.name} is closed` : (t.stops.length < 2 ? "no route: it waits at home" : est.deposits === 0 ? "no city of yours on its route to deposit in" : null),
@@ -962,9 +961,9 @@ export function tradeView(world: World, n: number): TradeView {
   const dt = d && world.traders.find((t) => t.id === d.trader && t.owner === n);
   if (d && dt) {
     const why = d.stops.length >= 2 ? routeProblem(world, n, dt.kind, d.stops) : null;
-    const path = !why && d.stops.length >= 2 ? loopPath(world, n, dt.kind, d.stops, d.mode, false) : null;
+    const path = !why && d.stops.length >= 2 ? loopPath(world, n, dt.kind, d.stops, false) : null;
     const est = path ? estimateLoop(world, n, dt.kind, path) : { loopDays: 0, collectIn: 0, best: [], expected: 0, fees: 0, deposits: 0 };
-    draft = { trader: d.trader, stops: d.stops.slice(), mode: d.mode, why: why ?? (d.stops.length >= 2 && !path ? "no way between those stops" : null), path: path ?? [], ...est };
+    draft = { trader: d.trader, stops: d.stops.slice(), why: why ?? (d.stops.length >= 2 && !path ? "no way between those cities" : null), path: path ?? [], ...est };
   }
   return { deposits: world.nationTrade[n * 3]!, fees: world.nationTrade[n * 3 + 1]!, upkeep: world.nationTrade[n * 3 + 2]!, net: tradeLine(world, n), traders, found, centres: centres.slice(0, 8), draft };
 }
