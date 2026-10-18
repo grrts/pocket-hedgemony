@@ -154,7 +154,7 @@ Newest decision first.
 ### 5.5 Campaign rules
 
 - SET-032: The settings system shall treat as campaign rules, chosen on the new game screen, saved in the campaign and shown read-only under Settings → Campaign rules: difficulty, AI aggression (shown as "AI temper", D-SET-12), fog of war, historical or free events, ironman (achievements only count in ironman), the campaign end date (default 31 August 1939), and whether music eras follow the calendar or technology if that stays a choice. [settings §4.3; gap-lists campaign span]
-- SET-033: The lens menu's "Parchment over unknown lands" toggle shall stay a display switch, since it only hides unknown lands visually; it would become a campaign rule only if fog ever hides information the AI uses. [settings §4.3, recommendation]
+- SET-033: The map mode menu's "Hide unexplored lands" toggle shall stay a display switch, since it only hides unknown lands visually; it would become a campaign rule only if fog ever hides information the AI uses. [settings §4.3, recommendation]
 
 ### 5.6 Graphics
 

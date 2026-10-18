@@ -516,7 +516,7 @@ function paceFor(p: rs.Programme, id: string | null): number {
   return id ? base * (1 + rs.researchBonusPct(p, id) / 100) : base;
 }
 
-/** The player's Learning tab. */
+/** The player's Research tab. */
 export function researchView(world: World, n: number, arms: readonly string[]): ResearchView | null {
   const p = world.research[n];
   if (!p) return null;

@@ -36,25 +36,25 @@ Feature: Event-tree province stats become concrete changes
     Then it reads <province_stats>
 
     Examples:
-      | event_stat                   | province_stats                                          |
-      | population                   | People                                                  |
-      | prosperity                   | buildings and their workers                             |
-      | devastation                  | burned tiles                                            |
-      | unrest                       | grievances and rebels                                   |
-      | control                      | governed by, days to capital and reaches you            |
-      | fort_level                   | castle and walls                                        |
-      | infrastructure               | road, harbour and bridge                                |
-      | industry                     | factories                                               |
-      | trade_good                   | wares made                                              |
-      | trade_access                 | trade ratio gain                                        |
-      | local_supply                 | food from tiles, local store and castle store           |
-      | food_security                | food from tiles, local store and castle store           |
-      | urbanization                 | townsfolk share                                         |
-      | manpower_yield               | recruits here                                           |
-      | disease_burden               | plague and fever land                                   |
-      | environmental_degradation    | worn tiles and smoke                                    |
-      | culture_share                | tongue mix                                              |
-      | religion_share               | faith mix                                               |
-      | colonial_status              | settlement and governed by                              |
-      | terrain                      | ground and tile mix                                     |
-      | innovation_presence          | schools and scholars here                               |
+      | event_stat                | province_stats                                |
+      | population                | People                                        |
+      | prosperity                | buildings and their workers                   |
+      | devastation               | burned tiles                                  |
+      | unrest                    | grievances and rebels                         |
+      | control                   | governed by, days to capital and reaches you  |
+      | fort_level                | castle and walls                              |
+      | infrastructure            | road, harbour and bridge                      |
+      | industry                  | factories                                     |
+      | trade_good                | wares made                                    |
+      | trade_access              | trade ratio gain                              |
+      | local_supply              | food from tiles, local store and castle store |
+      | food_security             | food from tiles, local store and castle store |
+      | urbanization              | townsfolk share                               |
+      | manpower_yield            | recruits here                                 |
+      | disease_burden            | plague and fever land                         |
+      | environmental_degradation | worn tiles and smoke                          |
+      | culture_share             | language mix                                  |
+      | religion_share            | faith mix                                     |
+      | colonial_status           | settlement and governed by                    |
+      | terrain                   | ground and tile mix                           |
+      | innovation_presence       | schools and scholars here                     |

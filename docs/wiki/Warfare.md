@@ -4,23 +4,23 @@ Warfare is everything that happens once your soldiers are under arms: how they a
 
 ## How it works
 
-### Companies, arms and kinds
+### Companies, troop types and kinds
 
-Every army is made of **companies** of usually 500 to 1,000 men. Each company has exactly one **arm** (how it fights, such as pikes or knights) and one **kind** (where its men come from). A company keeps its own men, drill, scars, loads of arms, pay owed and months out.
+Every army is made of **companies** of usually 500 to 1,000 men. Each company has exactly one **troop type** (how it fights, such as pikes or knights) and one **kind** (where its men come from). A company keeps its own men, drill, scars, loads of arms, pay owed and months out.
 
 - **Drill** is months spent training together, from 0 to 24. A company in camp, garrison or winter quarters and not marching gains 1 drill a month; standing regiments drill all year. A hungry month takes 1 drill away. When new men join, drill and scars are diluted: drill becomes drill × old men ÷ all men. Disbanding resets drill and scars.
 - **Scars** are battles stood through without breaking, from 0 to 5. A company gains 1 scar for standing through a battle and 1 more if its side won. Five years without a battle takes one away.
-- **Loads of arms** come from the store at raising and from won fields, and are lost with killed and fled men, on a lost field, or sold at disbanding. A company short of the loads its arm needs fights as the next arm down (armoured foot as levy foot).
+- **Loads of arms** come from the store at raising and from won fields, and are lost with killed and fled men, on a lost field, or sold at disbanding. A company short of the loads its troop type needs fights as the next troop type down (heavy infantry as levy infantry).
 - Men join by raising, refilling from recruits, wounded coming back and enlisted prisoners, and leave by being killed, wounded, fleeing, deserting, falling sick, going hungry or being disbanded.
 
 **Troop level** is read from drill and scars: 1 Raw, 2 Drilled, 3 Seasoned, 4 Veteran, 5 Elite. In eras I and II, Drilled comes at 3 months of drill, Seasoned at 6 months and 1 scar, Veteran at 3 scars, and Elite at 5 scars and 12 months of drill. Levels drop when new men dilute a company, after 5 years without a battle, when hungry, and all at once on disbanding. Standing regiments (W12) never drop below level 2.
 
-**The arms of eras I to IV:**
+**The troop types of eras I to IV:**
 
 | Arm | Strength per man | Needs per 100 men | Roles | Unlocked by |
 |---|---|---|---|---|
-| Levy foot | 1.0 | nothing | Line | start |
-| Armoured foot | 1.3 | 1 load of arms | Line, Heavy | start |
+| Levy infantry | 1.0 | nothing | Line | start |
+| Heavy infantry | 1.3 | 1 load of arms | Line, Heavy | start |
 | Archers | 1.1 | 1 load of arms | Shot | start |
 | Pikes | 1.2 | 1 load of arms | Brace | W6 Pike squares |
 | Hand gunners | 1.4 | 1 arms, 1 powder a battle | Shot | W5 Gunpowder infantry |
@@ -28,7 +28,7 @@ Every army is made of **companies** of usually 500 to 1,000 men. Each company ha
 | Musketeers | 2.0 | 2 arms, 2 powder | Shot | W9 Volley fire drill |
 | Line infantry | 2.6 | 2 arms, 2 powder | Line, Brace, Shot | W11 Flintlock and bayonet |
 | Riflemen | 3.5 rising to 5.0 | 3 arms, 3 powder | Shot, Light | W16, W17 |
-| Light horse | 2.0 | 100 horses | Shock, Light | start |
+| Light cavalry | 2.0 | 100 horses | Shock, Light | start |
 | Horse archers | 2.5 | 100 horses, 1 arms | Shot, Light (Shock against broken enemies) | W1 Composite-bow horse archery |
 | Knights and lancers | 3.5 | 100 horses (+50 remounts), 2 arms | Shock, Heavy | W2 Heavy armoured cavalry |
 | Camel riders | 2.0 | 100 camels | Shock, Light; no desert penalty | desert and Sahel realms at start |
@@ -37,7 +37,7 @@ Every army is made of **companies** of usually 500 to 1,000 men. Each company ha
 | Field guns | 25 per gun | 15 crew, 6 horses, 2 powder a battle | Guns | W8 Field artillery |
 | Light field guns | 25 per gun, no march penalty | 10 crew, 4 horses, 2 powder a battle | Guns | W13 Light field artillery |
 
-Later arms (machine guns, tanks, aircraft) follow the same shape in config. Elephants and camel riders are their own troop types. If the powder store is empty, guns and hand guns do not fire.
+Later troop types (machine guns, tanks, aircraft) follow the same shape in config. Elephants and camel riders are their own troop types. If the powder store is empty, guns and hand guns do not fire.
 
 **Kinds** set pay and base break point:
 
@@ -72,11 +72,11 @@ Lords' retinues don't count: each lord has his own cap by the same rule on his l
 
 ### Raising and keeping an army
 
-Levies come from [Recruiting](Recruiting) as levy-kind companies of levy foot, gathered a thousand at a time in their province, where they wait as its garrison until a commander picks them up. **No army exists without a commander**: soldiers without one are a province's garrison. An army that loses its commander with no captain to step up halts; in your own land it becomes that province's garrison, abroad it waits for a commander to join it.
+Levies come from [Recruiting](Recruiting) as levy-kind companies of levy infantry, gathered a thousand at a time in their province, where they wait as its garrison until a commander picks them up. **No army exists without a commander**: soldiers without one are a province's garrison. An army that loses its commander with no captain to step up halts; in your own land it becomes that province's garrison, abroad it waits for a commander to join it.
 
 **Calling the lords.** Each lord answers by his loyalty. A loyal lord brings his whole retinue in 3 weeks and may lead it as a captain. A wavering lord brings half, after 6 weeks, and goes home after 6 months unless the war aim is his Want. A disloyal lord refuses, and calling him again makes him angrier. A lord in revolt's retinue is a rebel army. When the war aim is his Want, a lord comes even when wavering and stays to the end, and a lord whose lands are occupied leaves to defend them.
 
-**Free companies.** Named companies with a captain are offered in the regions where they historically gathered (Swiss and German foot, Italian condottieri, Scottish and Irish gallowglass, Turkic and Afghan horse, Javanese and Japanese sword bands and others). Each shows men, arm, drill, scars and price. A contract brings the company for the agreed months for gold up front plus monthly pay, using no recruits. The company isn't there at once: it marches from where it gathers to your capital, and the hire screen shows how many days that takes. It always comes led by its own captain as its commander, and he leaves with it. It leaves when the contract ends, when pay is owed as above, or when an enemy outbids you.
+**Mercenary companies.** Named companies with a captain are offered in the regions where they historically gathered (Swiss and German foot, Italian condottieri, Scottish and Irish gallowglass, Turkic and Afghan horse, Javanese and Japanese sword bands and others). Each shows men, troop type, drill, scars and price. A contract brings the company for the agreed months for gold up front plus monthly pay, using no recruits. The company isn't there at once: it marches from where it gathers to your capital, and the hire screen shows how many days that takes. It always comes led by its own captain as its commander, and he leaves with it. It leaves when the contract ends, when pay is owed as above, or when an enemy outbids you.
 
 **Keeping.** Each month the treasury pays every company except retinues and levies in their first 3 months. An army eats 2 rations per soldier on campaign, 3 per horse and 1 per prisoner, from the province at home and from its reserve abroad. Disbanded men go back to their home province's recruit pool and their arms to the store; a disbanded standing regiment loses all its drill and scars; soldiers home from a long war with no free slot become homeless, a source of rebels.
 
@@ -121,7 +121,7 @@ An army has one commander and up to two **captains**, each standing in one secto
 
 ### Seeing the enemy and marching
 
-You see enemy armies in your own provinces, next to your armies and castles, and as far as your scouts ride: every 500 light horse, horse archers or camel riders see one province further. Armies further away show as rumours of size and place that can be wrong by up to a third. Scouting and rumours are only worked out near the player.
+You see enemy armies in your own provinces, next to your armies and castles, and as far as your scouts ride: every 500 light cavalry, horse archers or camel riders see one province further. Armies further away show as rumours of size and place that can be wrong by up to a third. Scouting and rumours are only worked out near the player.
 
 A **forced march** doubles sickness, makes levies desert 2 % a week, and gives −10 % strength for the first day of a battle the army arrives into. A **Careful** march can't be ambushed and its scouts see two provinces ahead. An army with guns heavier than light field guns marches ×1.25 slower into rough ground (once for the whole army), and an army too big for a province's forage limit takes one extra crossing (6 days) to enter it. The march itself belongs to [Troop-Movement](Troop-Movement).
 
@@ -204,7 +204,7 @@ War elephants whose sector loses a bell badly panic and trample their own side f
 
 **Night.** After 6 bells without a break, night falls. Either side may withdraw by its standing orders; the withdrawal is clean if its commander's Cunning is at least the enemy's, otherwise it counts as breaking with half the pursuit. Overnight, fled men who will come back return and ammunition refills.
 
-**Troyes, 1450.** Troyes' sectors are Fields, Fields, Fields, Pasture, Pasture, Woods, Town. Dunois defends for France in Three battles (Might 3, Cunning 4, Logistics 2) with 4,000 levy foot, 2,000 archers and 1,000 knights. The Bastard of Burgundy attacks in Charge en haie (Might 3, Cunning 2, Logistics 1) with 5,000 hired armoured foot and 2,000 knights. With 70 % of the French living in calm provinces, the French flee share is 29 %. In bell 2 the Burgundian knights charge the pastures and both pasture sectors break. In bell 3 Burgundy gives 2 orders first and France 3 after. After bell 6 neither army has broken; at night the Burgundian withdrawal counts as breaking with half the pursuit because his Cunning is lower, and France holds the field.
+**Troyes, 1450.** Troyes' sectors are Fields, Fields, Fields, Pasture, Pasture, Woods, Town. Dunois defends for France in Three battles (Might 3, Cunning 4, Logistics 2) with 4,000 levy infantry, 2,000 archers and 1,000 knights. The Bastard of Burgundy attacks in Charge en haie (Might 3, Cunning 2, Logistics 1) with 5,000 hired heavy infantry and 2,000 knights. With 70 % of the French living in calm provinces, the French flee share is 29 %. In bell 2 the Burgundian knights charge the pastures and both pasture sectors break. In bell 3 Burgundy gives 2 orders first and France 3 after. After bell 6 neither army has broken; at night the Burgundian withdrawal counts as breaking with half the pursuit because his Cunning is lower, and France holds the field.
 
 Battles play out over time, a round every 4 hours. On the map and in the battle viewer you see each side's men and a bar of men and morale left, updated every round, so you can follow the fight and decide when to retreat.
 
@@ -271,7 +271,7 @@ There is no national bonus card: how different peoples fight falls out of styles
 | W18 | troop cap +1 %; levies gather in days along railways |
 | W19 | shooting from dug-in sectors ×2; charges into them always fail |
 | W20 | Ambush companies shoot from woods unseen |
-| W21 | tanks, a Shock arm that ignores dug-in sectors and machine guns |
+| W21 | tanks, a Shock troop type that ignores dug-in sectors and machine guns |
 | W22 | every commander sees hidden companies; aircraft hit any sector or camp; scouts see 4 provinces; can bomb castles and wagons |
 | W23 | +1 order a bell; captains give orders in their own sector |
 
@@ -290,7 +290,7 @@ Each realm fights by the inventions it knows, with no world clock, so armies of 
 
 A battle of 10 or 30 days keeps its armies in place while it lasts and simply carries on into the next turn. An invention belongs to the era the research tree gives it. Styles first seen after 31 August 1939 are not in the game.
 
-**Obsolete arms.** When the enemy knows the invention that replaced an arm, that arm fights at half strength against him, and once your own realm learns it you can no longer raise that arm. Plate armour on foot falls to W5; knights and gendarmes, bows and crossbows to W9; pikes and horse archers to W11 (horse archers keep scouting and raiding); bombards in the field to W8; close-order line infantry to W17; cavalry as Shock and foot without cover to W19 (horse stays Light until W21); tanks without air cover to W22 on the enemy side. Re-arming costs loads of arms and powder and drops the company a level; an invention that changes a company's arm or role drops it a level until it has drilled the new era's Drilled months.
+**Obsolete troop types.** When the enemy knows the invention that replaced a troop type, that troop type fights at half strength against him, and once your own realm learns it you can no longer raise it. Plate armour on foot falls to W5; knights and gendarmes, bows and crossbows to W9; pikes and horse archers to W11 (horse archers keep scouting and raiding); bombards in the field to W8; close-order line infantry to W17; cavalry as Shock and foot without cover to W19 (horse stays Light until W21); tanks without air cover to W22 on the enemy side. Re-arming costs loads of arms and powder and drops the company a level; an invention that changes a company's troop type or role drops it a level until it has drilled the new era's Drilled months.
 
 **Levels by era** (drill months for Drilled / Seasoned / Elite; hits at levels 1 to 5; break point at levels 3 to 5):
 
@@ -304,7 +304,7 @@ A battle of 10 or 30 days keeps its armies in place while it lasts and simply ca
 | VI | 6 / 12 / 24 | −25 / 0 / +20 / +35 / +50 | +10 / +15 / +20 |
 | VII | 6 / 12 / 24 | −30 / 0 / +25 / +45 / +70 | +10 / +15 / +25 |
 
-Era notes: in era I knights and men-at-arms start at level 3 and levies can't pass level 3 without becoming standing troops; in era II pike and shot below level 2 fight as levy foot; in era III musketeers below level 2 shoot at half with W9; in era IV linear tactics need level 2 to change sector in a bell; in era VI a realm with W18 can call up former soldiers at level 2 as reservists; in era VII level 4 and 5 companies can infiltrate.
+Era notes: in era I knights and men-at-arms start at level 3 and levies can't pass level 3 without becoming standing troops; in era II pike and shot below level 2 fight as levy infantry; in era III musketeers below level 2 shoot at half with W9; in era IV linear tactics need level 2 to change sector in a bell; in era VI a realm with W18 can call up former soldiers at level 2 as reservists; in era VII level 4 and 5 companies can infiltrate.
 
 **Skills by era.** Might gives +8 % hits and +3 % break point per point in era I (with a 1 in 5 risk to the leader if his sector is lost), +7 % and +3 % in II, +5 % and +2 % in III and IV, +4 % and +2 % in V (1 in 10 risk); in era VI there is no sector and it gives +3 % hits and +1 % break point to the whole army, and in VII +2 % and +1 % plus +10 % per point to Drive orders. Orders at Cunning 0 to 1 / 2 to 3 / 4 to 5 are 1/2/2 in era I (orders to other sectors arrive next bell), 1/2/3 in II (orders 3+ sectors away arrive next bell), 1/2/3 in III and IV, 1/2/3 in V (+1 with W14), 2/2/3 in VI (captains give their own orders), and 2/3/4 in VII (+1 with W23). Logistics sets ammunition bells: bows 4 + Logistics in era I, Shot 3 + Logistics in II to IV, Shot and guns 2 + Logistics in V with guns needing powder wagons, 1 + Logistics in VI (a company without ammunition fights at half, rotation up to Logistics × 2 sectors), and in VII ammunition for tanks and aircraft, drawn from the powder store, with losses replaced from depth at 10 % per point per bell. From era III skills also grow from academy training and serving under a Cunning 4+ commander; in eras VI and VII the academy becomes the staff college (+1 Might, Cunning and Logistics on graduating), victories give +1 Might only every 4, Cunning can grow from wargames (a peacetime year of training, once per era), and each peacetime year commanding a standing army gives +1 Logistics, up to 3. In every era W14 and W23 each add an order per bell. Drill counts up to 24 months, enough for Elite in every era.
 
@@ -331,7 +331,7 @@ Each month of a siege:
 
 A siege ends by **honours of war** (the garrison marches out armed to the nearest friendly castle and the castle is taken whole; keeping terms builds trust, breaking them is an oath broken), **surrender** (the garrison become prisoners), **storm** (the garrison killed or taken; you choose Spare, Plunder or Raze), **relief** (an army from the castle's side beats the besiegers and the garrison joins as a reserve at +10 %) or **lifting** (the besiegers leave). Plunder gives gold equal to a year of the province's tax owed, burns 1 in 3 town buildings, kills or drives off 10 % of townsfolk and adds Burned homes; Raze destroys the castle.
 
-An AI garrison accepts honours when it has a breach or under a month of food and no relief army within 10 days, and never from a Cruel commander. A besieger can bribe the garrison's captain only when its pay is owed 2 months or more, the castle belongs to a disloyal or wavering lord, or the captain's tongue differs from his ruler's. A Greedy commander inside takes the bribe; a Greedy commander outside pockets a tenth. Taking a castle gives you its store and the province's food spread.
+An AI garrison accepts honours when it has a breach or under a month of food and no relief army within 10 days, and never from a Cruel commander. A besieger can bribe the garrison's captain only when its pay is owed 2 months or more, the castle belongs to a disloyal or wavering lord, or the captain's language differs from his ruler's. A Greedy commander inside takes the bribe; a Greedy commander outside pockets a tenth. Taking a castle gives you its store and the province's food spread.
 
 **The castle of Troyes.** A stone castle with a garrison of 300 and 6 months of store is besieged by Burgundy with 6,000 men and 4 bombards. It is closed, and the besiegers add 8 shot a month. After 3 months it has 1 breach and a walls bonus of about +67 %. Burgundy offers honours, no French relief army is within 10 days, so the garrison accepts and marches to Reims, and Burgundy takes the castle whole with its store and control of food spread in Champagne.
 
@@ -362,7 +362,7 @@ With over half saying peace, the ruler must accept a peace asking only for provi
 
 ### The computer players
 
-The AI's risk tolerance sets its standing orders: a careful realm waits and retreats when outnumbered at all, a middling one attacks and retreats at 3 to 2, and a bold one attacks and retreats only at 2 to 1. Only a bold realm sends horse-only armies raiding instead of besieging. Its commanders start with its country's styles from the style catalogue. Its personality also sets which kinds it raises (Castile noble retinues and frontier light horse, a city republic hired companies) and how many peace voices it needs before talking peace (a low-risk AI offers at a third, a hegemon seeker only when forced). It sees only the forage limits, food reserves and peace voices the player sees, and doesn't cheat on food.
+The AI's risk tolerance sets its standing orders: a careful realm waits and retreats when outnumbered at all, a middling one attacks and retreats at 3 to 2, and a bold one attacks and retreats only at 2 to 1. Only a bold realm sends horse-only armies raiding instead of besieging. Its commanders start with its country's styles from the style catalogue. Its personality also sets which kinds it raises (Castile noble retinues and frontier light cavalry, a city republic hired companies) and how many peace voices it needs before talking peace (a low-risk AI offers at a third, a hegemon seeker only when forced). It sees only the forage limits, food reserves and peace voices the player sees, and doesn't cheat on food.
 
 ### Each turn and each month
 
@@ -393,11 +393,11 @@ During the turn, inside the day loop: contacts, the withdraw check and battles; 
 - [Rebellions](Rebellions): rebel bands fight as the Rebel band kind.
 - [Government](Government): Warlike rulers, regencies and succession wars.
 - [Subjects](Subjects): subject armies and the Break a subject and Become a subject terms.
-- [Culture](Culture): homeland tongue, culture group for style fallback, a captain's tongue for bribes.
+- [Culture](Culture): homeland language, culture group for style fallback, a captain's language for bribes.
 - [Religion](Religion): persecution for the Defend the faith aim.
 - [Historical-Events](Historical-Events): prestige from victories, war weariness from Fallen and peace voices, throne offers to generals.
 - [The-1444-Start](The-1444-Start): starting styles, capture warfare realms, starting castles and inventions.
-- [Map-and-Lenses](Map-and-Lenses) and [Screens-and-Navigation](Screens-and-Navigation): army cards, battle playback, reports and notifications.
+- [Map and Map Modes](Map-and-Lenses) and [Screens-and-Navigation](Screens-and-Navigation): army cards, battle playback, reports and notifications.
 - [Trade](Trade): occupiers take trade; the Open the roads term.
 - [Time-and-Turns](Time-and-Turns): the weekly turn, the day loop and the order battles resolve in.
 

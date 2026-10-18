@@ -83,9 +83,9 @@ Feature: The Food policy screen
       | No refill in lords' lands  | it cannot refill in "Dijon"                            |
 
   @REALM-046 @placeholder
-  Scenario Outline: The famine rule
+  Scenario Outline: Famine relief
     Given the province "Sens" has <months> months of food in store
-    And the famine rule is "<rule>"
+    And famine relief is "<rule>"
     When the castle of "Troyes" spreads its food
     Then "Sens" <result>
 

@@ -153,7 +153,7 @@ export function fleetCard(
       )
       .join("")}</table>
     ${o.fleetsHere.length && !f.hired ? `<h3 class="sub">Join another fleet here</h3><div class="choices">${o.fleetsHere.map((x) => `<button class="paper" data-fleet-merge="${x.id}">Into ${x.admiral >= 0 ? `${esc(o.admiralName(x.admiral))}'s fleet` : "the fleet without an admiral"}</button>`).join("")}</div>` : ""}
-    ${o.inPort && f.army < 0 && !f.hired ? `<div class="choices"><button class="paper" data-fleet-disband>Lay up the ships and pay off the crews</button></div>` : ""}`;
+    ${o.inPort && f.army < 0 && !f.hired ? `<div class="choices"><button class="paper" data-fleet-disband>Disband the fleet</button></div>` : ""}`;
 }
 
 /** The realm's Navy tab: the overview of every fleet, port and sea battle, and what it all costs. */

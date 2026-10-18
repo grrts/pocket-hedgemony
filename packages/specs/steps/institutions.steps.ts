@@ -374,7 +374,7 @@ When("a call to defend the Empire concerns the player", (s) => {
   declare(s, "France", "Lorraine");
   s.call = w.diplomacy.calls.find((c) => c.via === "empire")!;
 });
-Then("an answer card with two 44-point buttons waits in the dispatches and on Needs attention", (s) => {
+Then("an answer card with two 44-point buttons waits in the News and on Needs attention", (s) => {
   const w = world(s);
   const waiting = w.diplomacy.calls.filter((c) => !c.answer && c.called === w.nationIds[w.player]);
   expect(waiting.map((c) => c.via)).toContain("empire");
@@ -385,7 +385,7 @@ Then("silence counts as {string}", (s, silence: string) => {
   monthStep(s, 1444, 12);
   expect(s.call.answer).toBe("no");
 });
-When("the player picks the Institutions lens", (s) => {
+When("the player picks the Institutions map mode", (s) => {
   s.lens = G.institutionsLens(world(s));
 });
 Then("the Emperor's land is gold and members' land light gold", (s) => {
@@ -399,7 +399,7 @@ Then("seats carry a mark and imperial land held by outsiders is hatched", (s) =>
   expect(I.INSTITUTIONS_KEY.find((k) => k.what.includes("seat"))?.pattern).toBe("seat mark");
   expect(I.INSTITUTIONS_KEY.find((k) => k.what.includes("outsider"))?.pattern).toBe("hatched");
 });
-Then("the lens reads with patterns as well as colours", () => {
+Then("the map mode reads with patterns as well as colours", () => {
   const seen = new Set(I.INSTITUTIONS_KEY.map((k) => `${k.colour}/${k.pattern}`));
   expect(seen.size).toBe(I.INSTITUTIONS_KEY.length);
 });

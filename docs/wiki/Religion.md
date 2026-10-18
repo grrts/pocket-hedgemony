@@ -57,7 +57,7 @@ Hold slows change but never stops it. A province where one faith has three house
 
 *Worked example: East Bengal, 1444 to 1700.* East Bengal is 70 % hindu, 25 % asian_traditional and 5 % sunni, with 2 hindu temples and a sunni lord, under a sunni ruler. The forest is cleared and a mosque is granted on each of 3 new field tiles. Now sunni has 3.5 pull (three mosques and the lord), hindu 2 (two temples) and asian_traditional 1 (its sacred places). The mix settles toward sunni 54 %, hindu 31 % and asian_traditional 15 %. Once asian_traditional falls below a quarter it loses its sacred-places pull, and by about 1700 East Bengal is mostly sunni.
 
-**Small and new faiths.** A faith under 1 % with no house of its own is removed. A fourth faith arriving gets in only if it is larger than the smallest of the three. Then the smallest of the four joins the province's majority faith, so nobody simply vanishes. Tongues work the same way.
+**Small and new faiths.** A faith under 1 % with no house of its own is removed. A fourth faith arriving gets in only if it is larger than the smallest of the three. Then the smallest of the four joins the province's majority faith, so nobody simply vanishes. Languages work the same way.
 
 **Hidden believers.** For 100 years after a Persecuted faith's houses in a province are closed, that faith stays at 2 % or more there, unless an Inquisition removes the floor. If catholic is Persecuted in Japan and its houses in Nagasaki were closed 40 years ago, it stays at 2 %; after 100 years, or with an Inquisition, it may fall lower.
 
@@ -268,7 +268,7 @@ Each country gets its ruler's faith from the catalogue, and each province the mi
 - *Defend the faith* also opens when a neighbour persecutes your faith in a province bordering yours, when your preacher is killed or expelled, and when a holy place of your faith is held by another faith.
 - Schools have a faith, and persecution drives scholars abroad.
 - Diplomacy gets the fact "same faith" (better starting opinion) and the *Allow preachers* leave.
-- Faith and tongue stay two separate mixes with two separate grievances.
+- Faith and language stay two separate mixes with two separate grievances.
 
 ### The computer players
 
@@ -286,7 +286,7 @@ Once a year, alongside traders and the trade balance: pulls, hold and the 3 % mo
 - **Province card, Faith line**: each faith's share and whether it is rising or falling. Tap it to see this year's pulls for each faith with their sources, each community's state, and how fast the mix is moving and toward which faith. For example, Rouen at catholic 61 % falling, protestant 37 % rising and jewish 2 % shows the protestant community served by its own church and Tolerated, and the jewish 2 % as below a community with no grievance.
 - **Country card, Faith row**: for example "Catholic · 78 % of people · 3 more faiths · 2 preachers · holds no holy place". Tap it to open the **Faith policy screen**, with one row per faith. Preachers are also listed under Abroad.
 - **Faith %** is the share of people of the state faith or a faith layered with it. Ming, with 10 % confucian_ritual, 50 % mahayana, 30 % daoist and 10 % asian_traditional not yet layered, has a Faith % of 90.
-- **The Faith lens**: at world zoom, provinces coloured by majority faith, hatched where another faith's community is 30 % or more, with holy-place icons. At region zoom, houses as town sprites, preachers as walking figures and waves as a spreading tint. At local zoom, the Faith line.
+- **The Faith map mode**: at world zoom, provinces coloured by majority faith, hatched where another faith's community is 30 % or more, with holy-place icons. At region zoom, houses as town sprites, preachers as walking figures and waves as a spreading tint. At local zoom, the Faith line.
 
 ### In the game now
 
@@ -297,7 +297,7 @@ Every province starts in 1444 with up to three faiths from its realm's start mix
   - Tolerated: houses stand, normal tax.
   - Restricted: a quarter more tax from its people, no new houses, your faith pulls harder; *Wrong faith* where it is the majority.
   - Persecuted: its houses close at New Year and its people pay no tax, your faith pulls twice as hard; *Persecuted*, which counts as two grievances, wherever it is a tenth or more.
-- **The Faiths lens**: provinces coloured by majority faith, hatched where a second faith holds 30 % or more.
+- **The Faiths map mode**: provinces coloured by majority faith, hatched where a second faith holds 30 % or more.
 - Faiths move each New Year, a fraction of a point at a time.
 
 - **Head of the faith card**, on the Peoples tab under the faith cards: the head, his seat and who holds it, the patron, what the patron gets and owes, and the one action open now (*Send gold to the conclave* with − and +, *Claim the caliphate*, *Raise our own patriarch*), or why it is not open. The Faith line on every realm's General tab carries a badge: *Patron of the Pope*, *Caliph*, *Heads its church* or a red *Censured*. Before you declare war, the Diplomacy tab warns you if the head will censure it and what it costs. The Faiths map mode marks each seat; tap one, or its button in the key, to open that head's card.
@@ -322,7 +322,7 @@ Not in yet: building or paying for houses, preachers, expulsion and the Inquisit
 - [Subjects](Subjects): preachers enter subjects without permission.
 - [Revolutions](Revolutions): faith revolutions use waves; regimes may lead to the church events.
 - [The-1444-Start](The-1444-Start): the ruler's faith and each province's starting mix.
-- [Map-and-Lenses](Map-and-Lenses): the Faith lens, house sprites, preachers and wave tint.
+- [Map and Map Modes](Map-and-Lenses): the Faith map mode, house sprites, preachers and wave tint.
 - [Time-and-Turns](Time-and-Turns): the yearly slot and New Year policy changes.
 
 ## Numbers

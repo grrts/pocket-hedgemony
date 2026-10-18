@@ -12,23 +12,23 @@ Feature: Grievances and rebels
     Then the "<grievance>" grievance is gone
 
     Examples:
-      | start                                                         | grievance           | end                                                    |
-      | has its tax rate at "heavy"                                   | Heavy taxes         | the rate drops to "normal"                             |
-      | has a local food store under 1 month                          | Hungry              | the store stays above 3 months for a full season       |
-      | has more than a tenth of its people homeless                  | Homeless            | new buildings take them in                             |
-      | has an army staying more than a season                        | Soldiers quartered  | the army leaves                                        |
-      | has a burned tile                                             | Burned homes        | all tiles are rebuilt                                  |
-      | has recruits below a quarter of the pool                      | Conscription        | recruits refill to half                                |
-      | is a homeland held by a ruler of another tongue               | Foreign rule        | a lord of the local tongue is granted it               |
-      | has most people not sharing the ruler's faith                 | Wrong faith         | a faith tolerance charter is granted                   |
-      | is royal with no official                                     | Ungoverned          | an official is assigned                                |
-      | has a lord who is Cruel                                       | Harsh lord          | the lord changes                                       |
-      | had a charter revoked                                         | Broken charter      | 20 years pass                                          |
-      | is 35 days from the capital                                   | Far from the throne | a seat is built nearby                                 |
-      | has a plague outbreak                                         | Plague              | the plague burns out                                   |
-      | saw a rising of its faith massacred                           | Bloodshed           | 20 years pass                                          |
-      | has food taken from its store by an army                      | Requisitioned       | a season passes after the last taking                  |
-      | borders a province whose rebels share one of its grievances   | Neighbour in revolt | those rebels are beaten                                |
+      | start                                                       | grievance           | end                                              |
+      | has its tax rate at "heavy"                                 | Heavy taxes         | the rate drops to "normal"                       |
+      | has a local food store under 1 month                        | Hungry              | the store stays above 3 months for a full season |
+      | has more than a tenth of its people homeless                | Homeless            | new buildings take them in                       |
+      | has an army staying more than a season                      | Soldiers quartered  | the army leaves                                  |
+      | has a burned tile                                           | Burned homes        | all tiles are rebuilt                            |
+      | has recruits below a quarter of the pool                    | Conscription        | recruits refill to half                          |
+      | is a homeland held by a ruler of another language           | Foreign rule        | a lord of the local language is granted it       |
+      | has most people not sharing the ruler's faith               | Wrong faith         | a faith tolerance charter is granted             |
+      | is royal with no official                                   | Ungoverned          | an official is assigned                          |
+      | has a lord who is Cruel                                     | Harsh lord          | the lord changes                                 |
+      | had a charter revoked                                       | Broken charter      | 20 years pass                                    |
+      | is 35 days from the capital                                 | Far from the throne | a seat is built nearby                           |
+      | has a plague outbreak                                       | Plague              | the plague burns out                             |
+      | saw a rising of its faith massacred                         | Bloodshed           | 20 years pass                                    |
+      | has food taken from its store by an army                    | Requisitioned       | a season passes after the last taking            |
+      | borders a province whose rebels share one of its grievances | Neighbour in revolt | those rebels are beaten                          |
 
   @PROV-230
   Scenario Outline: Harsh lord
@@ -37,11 +37,11 @@ Feature: Grievances and rebels
     Then the province "Dijon" has the "Harsh lord" grievance
 
     Examples:
-      | trait                              |
-      | Cruel                              |
-      | Greedy                             |
-      | hostile to the people's faith      |
-      | hostile to the people's tongue     |
+      | trait                            |
+      | Cruel                            |
+      | Greedy                           |
+      | hostile to the people's faith    |
+      | hostile to the people's language |
 
   @PROV-231 @placeholder
   Scenario Outline: The number of grievances sets the province's mood

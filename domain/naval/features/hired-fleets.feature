@@ -1,7 +1,7 @@
 @context-naval
 Feature: Hired fleets
   As a player or AI country
-  I want to hire fleets as I hire free companies, from free captains and from the sea powers
+  I want to hire fleets as I hire mercenary companies, from free captains and from the sea powers
   So that a realm without a navy can still fight or carry an army across the sea
 
   @NAVY-135 @placeholder

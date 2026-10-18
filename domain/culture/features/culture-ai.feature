@@ -1,15 +1,15 @@
 @context-culture
 Feature: Culture choices of the AI
   As an AI country
-  I want to set my Tongue policy and use culture levers by my personality
+  I want to set my Language policy and use culture levers by my personality
   So that computer realms behave like the history the catalogue describes
 
   @CULT-090
-  Scenario Outline: Tongue policy by personality
+  Scenario Outline: Language policy by personality
     Given the AI country "Testland" has the personality "<personality>"
     And the AI country "Testland" <printing> printing
-    When it chooses its Tongue policy
-    Then its Tongue policy is "<policy>"
+    When it chooses its Language policy
+    Then its Language policy is "<policy>"
 
     Examples:
       | personality     | printing      | policy |
@@ -30,7 +30,7 @@ Feature: Culture choices of the AI
       | personality    | lever                                                                         |
       | expansionist   | settlers into conquered border provinces                                     |
       | hegemon seeker | the war aim "Gather our kin" after 1789                                       |
-      | isolationist   | "Own tongue" charters to keep strangers calm                                  |
+      | isolationist   | "Own language" charters to keep foreign peoples calm                                  |
       | mercantile     | a welcome for trading peoples                                                 |
-      | opportunist    | "Free a people" against neighbours with stranger homelands in revolt         |
+      | opportunist    | "Free a people" against neighbours with foreign homelands in revolt         |
       | zealot         | expulsion of trading peoples of another faith                                 |

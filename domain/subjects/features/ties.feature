@@ -1,7 +1,7 @@
 @context-subjects
 Feature: Subject ties
   As an overlord
-  I want small labels that explain exceptions without adding kinds
+  I want small labels that explain exceptions without adding types
   So that fiefs, kin and hostages behave as history says
 
   @SUBJ-017
@@ -23,7 +23,7 @@ Feature: Subject ties
   Scenario: Held in fief
     # config: ties.held_in_fief
     Given the subject "Andorra" is a Vassal of "Foix" with the tie "Held in fief"
-    When "Foix" counts its reach
+    When "Foix" counts its subjects against its subject limit
     Then "Andorra" counts 0.5
     And "Andorra" pays only a token and is never called to war
 

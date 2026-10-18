@@ -32,6 +32,6 @@ Feature: Commanders named and ranked in their realm's language
       | ottomans | Mehmed Pasha        | a fleet | Kapudan Mehmed Pasha            |
 
   @RECR-123
-  Scenario: A free company's captain
-    Given the free companies for hire in 1444
+  Scenario: A mercenary company's captain
+    Given the mercenary companies for hire in 1444
     Then each captain is ranked in the language of the realm his company gathers in

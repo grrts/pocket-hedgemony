@@ -42,7 +42,7 @@ function capBlock(label: string, used: number, cap: GovernmentView["officials"][
 }
 
 const subjectsLaw = (r: number | null) =>
-  r === null ? "None: this form holds no subjects" : r === 0 ? "No more and no fewer than your reach" : r > 0 ? `${r} more than your reach` : `${-r} fewer than your reach`;
+  r === null ? "None: this form holds no subjects" : r === 0 ? "Leaves your subject limit as it is" : r > 0 ? `Raises your subject limit by ${r}` : `Lowers your subject limit by ${-r}`;
 
 /** One form the realm can become: what changes, what it needs and the button (or why not). */
 function nextCard(v: GovernmentView, x: NextFormView): string {

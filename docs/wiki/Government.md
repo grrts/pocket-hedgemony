@@ -39,9 +39,9 @@ The buildings themselves (cost, slot, jobs) belong to [Buildings](Buildings).
 
 ### The 27 forms
 
-Each form sets the officials and lords it supports, a change to subject reach, its colonial range in sea zones, its succession, and the forms it can reform into next.
+Each form sets the officials and lords it supports, a change to the subject limit, its colonial range in sea zones, its succession, and the forms it can reform into next.
 
-| Form | Family | Officials | Lords | Subject reach | Colonial range | Succession | Next forms |
+| Form | Family | Officials | Lords | Subject limit | Colonial range | Succession | Next forms |
 |---|---|---|---|---|---|---|---|
 | Feudal realm | house | 6 | 8 | 0 | 20 | eldest heir | diet, absolute, elective |
 | Diet monarchy | house | 8 | 10 | 0 | 20 | eldest heir | absolute, constitutional monarchy |
@@ -71,15 +71,15 @@ Each form sets the officials and lords it supports, a change to subject reach, i
 | Company rule | modern | 8 | 4 | +2 | 40 | owners appoint | colonial government |
 | Colonial government | modern | 6 | 4 | none | 15 | overlord appoints | |
 
-- **Subject reach** starts from the catalogue's administrative capacity (very low 2, low 3, moderate 5, high 7, very high 9) and the form adds or takes away. A colonial government has none and can't hold subjects. See [Subjects](Subjects).
+- **Subject limit** starts from the catalogue's administrative capacity (very low 2, low 3, moderate 5, high 7, very high 9) and the form adds or takes away. A colonial government has none and can't hold subjects. See [Subjects](Subjects).
 - **Colonial range** is how many sea zones from your nearest port or colony you may found a colony. See [Exploration-and-Colonies](Exploration-and-Colonies).
-- **Self-run forms**: under a clan council or chiefdom, provinces of your own people need no official, so *Ungoverned* never appears there; provinces of another people still need one. A province is of your own people when its largest tongue is your realm's tongue. A related tongue doesn't count: under Gowa (Makassarese), Buginese Bone still needs an official.
+- **Self-run forms**: under a clan council or chiefdom, provinces of your own people need no official, so *Ungoverned* never appears there; provinces of another people still need one. A province is of your own people when its largest language is your realm's language. A related language doesn't count: under Gowa (Makassarese), Buginese Bone still needs an official.
 - **Monarchies**: the forms that count as monarchies (for example for the Inquisition, see [Religion](Religion)) are every house form plus the chiefly and warrior monarchies: paramount chiefdom, tribute empire, warlord domain, shogunate and soldier emirs.
 - A colonial governor holding a governor slot doesn't count toward the officials cap; once his colony is founded he counts as its official.
 
 ### Reforms
 
-A reform changes your form to one of its next forms. It needs every listed item, costs gold from the treasury, and makes some lords lose a loyalty step: those with the lowest loyalty first, then the biggest, the same order as at New Year. If a need isn't met or the treasury is short, the reform is refused. Once it passes, both caps, subject reach, colonial range and succession follow the new form. The list below is complete: a feudal realm, for example, cannot jump straight to a constitutional monarchy, but goes through a diet or absolute monarchy first. A prince-bishopric or military order "takes a reformed faith" when its state faith is no longer the faith it was founded in.
+A reform changes your form to one of its next forms. It needs every listed item, costs gold from the treasury, and makes some lords lose a loyalty step: those with the lowest loyalty first, then the biggest, the same order as at New Year. If a need isn't met or the treasury is short, the reform is refused. Once it passes, both caps, the subject limit, colonial range and succession follow the new form. The list below is complete: a feudal realm, for example, cannot jump straight to a constitutional monarchy, but goes through a diet or absolute monarchy first. A prince-bishopric or military order "takes a reformed faith" when its state faith is no longer the faith it was founded in.
 
 These are the reforms you can order:
 
@@ -202,7 +202,7 @@ The General tab shows one line with your form and both caps, red when you are ov
 - [Buildings](Buildings): which cap buildings stand and at what step.
 - [Provinces](Provinces): officials hired, *Grasping officials*, self-run provinces and *Ungoverned*.
 - [Your-Realm](Your-Realm): lords, their provinces and loyalty, the treasury, and succession by form.
-- [Subjects](Subjects): subject reach and its change by form.
+- [Subjects](Subjects): the subject limit and its change by form.
 - [Exploration-and-Colonies](Exploration-and-Colonies): colonial range and colonial governors.
 - [Revolutions](Revolutions): regimes set forms, era ignored.
 - [Rebellions](Rebellions): a won *New ideas* rising sets a form.
@@ -210,12 +210,12 @@ The General tab shows one line with your form and both caps, red when you are ov
 - [Research](Research): G1, G2, G3, G4, G6, G9, G11, G14 and W12 as needs.
 - [National-Strengths](National-Strengths): additions to caps (for example +2 officials for Venice).
 - [Religion](Religion): a change of state faith opens the faith forms' reform; the Inquisition is open to monarchies.
-- [Culture](Culture): a province's largest tongue, which decides "own people" for self-run forms.
+- [Culture](Culture): a province's largest language, which decides "own people" for self-run forms.
 - [Warfare](Warfare): army coups and the shogun's capital.
 - [Trade](Trade): traders abroad and trade debt as reform needs.
 - [Diplomacy](Diplomacy): alliances with neighbours as a need.
 - [The-1444-Start](The-1444-Start): start forms and lords.
-- [Map-and-Lenses](Map-and-Lenses): the government card.
+- [Map and Map Modes](Map-and-Lenses): the government card.
 
 ## Numbers
 

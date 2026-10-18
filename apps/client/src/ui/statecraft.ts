@@ -150,7 +150,7 @@ type SubjectRow = NonNullable<StatecraftView["subjects"]>["subjects"][number];
 const TRIBUTE: { level: string; label: string; does: string }[] = [
   { level: "none", label: "None", does: "They pay nothing." },
   { level: "light", label: "Light", does: "Half the share; they like it (+1)." },
-  { level: "normal", label: "Normal", does: "The kind's share." },
+  { level: "normal", label: "Normal", does: "The type's share." },
   { level: "heavy", label: "Heavy", does: "One and a half times; they resent it (−1)." },
   { level: "crushing", label: "Crushing", does: "Twice the share; they hate it (−2)." },
 ];
@@ -179,8 +179,8 @@ export function mySubjects(v: StatecraftView | null, realmButton: (n: number) =>
     : "";
   if (!s.subjects.length) return over;
   return `${over}<h3 class="sub">Subjects</h3>
-    <p>${s.used} of ${s.reach} reach used · ${icon("coin", 1)} ${Math.round(s.gold)} gold a month in tribute</p>
-    ${s.used > s.reach ? `<p class="hint">Over your reach: every subject is Stretched thin (−1), the furthest more.</p>` : ""}
+    <p>Subject limit: ${s.used} of ${s.reach} used · ${icon("coin", 1)} ${Math.round(s.gold)} gold a month in tribute</p>
+    ${s.used > s.reach ? `<p class="hint">Over your subject limit: every subject is Stretched thin (−1), the furthest more.</p>` : ""}
     ${s.subjects
       .map((r) => `<div class="subject-row">${realmButton(r.subject)} <small>${esc(r.kindName)} · <b class="${loyaltyClass(r.loyalty)}">${esc(r.loyalty)}</b> · ▲${r.up} ▼${r.down} · pays ${Math.round(r.pays)}${r.worst ? ` · worst: ${esc(r.worst)}` : ""}</small></div>`)
       .join("")}

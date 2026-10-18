@@ -15,7 +15,7 @@ import { BELIEF_GRIEVANCES, hasBelief } from "./peoples.ts";
  */
 
 /** The grievances this game tracks so far, one bit each (province §5.22). */
-export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes", "Grasping officials", "Banned tongue", "Wrong faith", "Persecuted"] as const;
+export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes", "Grasping officials", "Banned language", "Wrong faith", "Persecuted"] as const;
 export type GrievanceName = (typeof GRIEVANCES)[number];
 const bit = (g: GrievanceName) => 1 << GRIEVANCES.indexOf(g);
 

@@ -14,7 +14,7 @@ Feature: Province basics, storage and cadence
   @PROV-002 @PROV-292
   Scenario: The province card explains every number
     Given the player opens the province "Troyes"
-    Then the card shows its owner, governance, official, pretender, ground, tile row, people, classes, food, town, trade, tax, recruits, castle, faith, tongue, grievances and rebels
+    Then the card shows its owner, governance, official, pretender, ground, tile row, people, classes, food, town, trade, tax, recruits, castle, faith, language, grievances and rebels
     When the player taps the "Tax" line
     Then its list of how it is gained and how it is lost is shown
 

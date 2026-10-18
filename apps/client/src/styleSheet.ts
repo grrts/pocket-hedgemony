@@ -72,7 +72,7 @@ root.innerHTML = `
     </div>
     <h3>Panel</h3>
     <section class="panel framed demo-panel">
-      <header><h2 class="ribbon">Île-de-France</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span></header>
+      <header><h2 class="ribbon">Île-de-France</h2><span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close wax" aria-label="Close">${icon("close", 2)}</button></span></header>
       <p class="owner">${pennant(france)}<b>France</b> · farmland</p>
       <dl class="facts"><dt>People</dt><dd>412,000</dd><dt>Wealth</dt><dd>${icon("coin", 1).repeat(6)}</dd></dl>
       <div class="army">

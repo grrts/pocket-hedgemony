@@ -25,7 +25,7 @@ export const POST_DUTIES: Record<string, string> = {
   "Tax collector": "gathers the taxes",
   "Customs officer": "takes the tolls on trade",
   Judge: "holds the courts",
-  Schoolmaster: "keeps the schools and the tongue",
+  Schoolmaster: "keeps the schools and the language",
 };
 
 export function lookOf(rules: Ruleset, nation: number): Look {
