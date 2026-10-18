@@ -8,6 +8,7 @@ import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft,
 import { subjectAction } from "./subjects.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
+import { answerEvent, monthlyEvents } from "./events.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
@@ -118,6 +119,8 @@ export type Order =
   /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
   | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release"; level?: string }
   | { type: "stopChange"; province: number }
+  /** Answer an event or take a decision waiting for the realm, with one of its options (AnswerEvent, EVT-044). */
+  | { type: "answerEvent"; event: string; option: string }
   /** Reform the government into one of its next forms (GOV-027). */
   | { type: "reform"; to: string }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
@@ -210,6 +213,8 @@ function startDay(world: World, news: News[]): void {
     // A demand made before war may reach the player's court this month (DIPL-213).
     libraryEvents(world, news);
     aiRaise(world, news);
+    // Events come last in the month, after every other system (X-2).
+    monthlyEvents(world, news);
   }
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
 }
@@ -330,6 +335,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "breakAlliance":
       return breakAlliance(world, actingNation, order.target);
+    case "answerEvent":
+      return answerEvent(world, actingNation, order.event, order.option, news);
     case "makeDemand":
       syncCountries(world);
       return makeDemand(world, actingNation, order.target, order.kind, order.province ?? -1);

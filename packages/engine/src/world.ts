@@ -21,6 +21,7 @@ import { createLandState, seedLand, type LandState } from "./land.ts";
 import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
+import { createGameEvents, type GameEvents } from "./events.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
@@ -130,6 +131,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
   commanderSeed: number[];
+  /** The event tree in play (milestone 6). */
+  events?: GameEvents;
 }
 
 export interface ArmyPool {
@@ -457,6 +460,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
   syncCountries(world);
 
+  // The event tree starts with the campaign, so its first month costs no more than any other.
+  world.events = createGameEvents(world);
   return world;
 }
 
