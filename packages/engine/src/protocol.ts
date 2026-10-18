@@ -14,6 +14,7 @@ import type { Titles } from "./domain/realm/index.ts";
 import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
+import { empireView, institutionsLens, type EmpireView } from "./institutions.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
@@ -131,7 +132,7 @@ export interface Snapshot {
   /** Peace offered to the player by an AI war leader, until the next month: terms as the AI sends them ("give": it gives up land the player holds). */
   peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" }[];
   /** Calls to arms waiting for the player's answer. */
-  calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
+  calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive"; via: "alliance" | "pledge" | "league" | "subject" | "empire" }[];
   /** The player's standing with every other nation that has one. */
   relations: { nation: number; state: "war" | "truce" | "alliance" | "subject" | "overlord"; until?: string }[];
   /** Events and decisions waiting for the player's answer, oldest first (milestone 6). */
@@ -214,6 +215,10 @@ export interface Snapshot {
   stability: Stability | null;
   /** The player's revolution card, its regime and ruler (REVO-090 to REVO-092); null before a realm is chosen. */
   revolution: RevolutionView | null;
+  /** The Empire card (INST-081): Emperor, hold, seats and votes, members, the hold record; null without an Empire. */
+  empire: EmpireView | null;
+  /** The Institutions map mode (INST-084): per realm 0 none, 1 member, 2 elector, 3 Emperor; imperial provinces held by outsiders. */
+  institutionsLens: { realm: Uint8Array; outsiderLand: Uint8Array };
   /** The player's Government tab: form, both caps, the form's laws and the next forms (GOV-064); null before a realm is chosen. */
   government: GovernmentView | null;
   /** Risings in every realm (the player's with their card and answers), the player's beaten risings waiting for a verdict, and each plotting province's monthly chance to rise (REBL-063). */
@@ -405,7 +410,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
       calls: w.diplomacy.calls
         .filter((c) => !c.answer && c.called === w.nationIds[player])
-        .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
+        .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive", via: c.via })),
       relations,
       statecraft: statecraftView(w, player),
       heritage: heritageViews(w),
@@ -486,6 +491,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       giftGold: giftGold(w),
       stability: player >= 0 ? stabilityOf(w, player) : null,
       revolution: player >= 0 ? revolutionView(w, player) : null,
+      empire: empireView(w, player),
+      institutionsLens: institutionsLens(w),
       government: player >= 0 ? governmentView(w, player) : null,
       rebels: rebelsView(w),
       provinceRebels: w.provinceRebels.slice(),
