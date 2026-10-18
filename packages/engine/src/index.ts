@@ -28,6 +28,7 @@ export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecra
 export { type RebelsView, type RisingView } from "./rebels.ts";
 export type { EventCard } from "./events.ts";
 export { adminCapacityRank, ASSESSMENT_DIMENSIONS, LEVEL_RANK, realmAssessment, realmStrengths, RISK_DIMENSIONS, type AssessmentConfidence, type AssessmentLevel, type HeritageLine, type RealmAssessment, type RealmHeritage, type RealmHeyday, type RealmStrengths } from "./realmStrengths.ts";
+export { effectInPlay, heritageChoice, heritageFactor, heritageTaxReach, heritageView, IN_PLAY, monthlyHeritage, type HeritageView } from "./heritage.ts";
 export { realmStartingCounts } from "./startingCounts.ts";
 export { byDistance } from "./lords.ts";
 export { LENS_RELATIONS, type LensRelation, type DiplomacyLensView } from "./diplomacyLens.ts";

@@ -1,4 +1,5 @@
 import data from "../../rules/data/domain/national-strengths-realms.json" with { type: "json" };
+import type { HeritageData } from "./domain/national-strengths/index.ts";
 
 /**
  * Each map realm's national strengths and catalogue assessments
@@ -38,6 +39,13 @@ export interface RealmHeritage {
   burden: HeritageLine | null;
 }
 
+/** The whole heritage as built: the parts above with their conditions, marks, turned legacy and the ambitions' pool (HER-078). */
+interface Row {
+  catalogue: string | null;
+  assessments?: string;
+  heritage?: RealmHeritage & Pick<HeritageData, "ambitions">;
+}
+
 export interface RealmStrengths {
   /** The matched catalogue record, or null where none matches (D-SETUP-1). */
   catalogue: string | null;
@@ -47,13 +55,7 @@ export interface RealmStrengths {
   heritage: RealmHeritage | null;
 }
 
-interface Row {
-  catalogue: string | null;
-  assessments?: string;
-  heritage?: RealmHeritage;
-}
-
-const ROWS = data.realms as Record<string, Row>;
+const ROWS = data.realms as unknown as Record<string, Row>;
 const LEVELS = data.level_codes as Record<string, AssessmentLevel>;
 const CONFIDENCES = data.confidence_codes as Record<string, AssessmentConfidence>;
 
@@ -77,6 +79,19 @@ export function realmStrengths(mapId: string): RealmStrengths {
     assessments: codes ? ASSESSMENT_DIMENSIONS.map((dimension, i) => ({ dimension, level: LEVELS[codes[i]!]!, confidence: CONFIDENCES[codes[n + i]!]! })) : [],
     heritage: row.heritage ?? null,
   };
+}
+
+/** A map realm's heritage as the national-strengths library reads it (conditions included), or null; its id is the catalogue record's. */
+export function realmHeritageData(mapId: string): HeritageData | null {
+  const row = ROWS[mapId];
+  if (!row?.heritage) return null;
+  const h = row.heritage as unknown as HeritageData;
+  return { id: row.catalogue ?? mapId, authored: row.heritage.authored, birthright: h.birthright, heydays: h.heydays, ambitions: h.ambitions ?? [], burden: h.burden ?? null };
+}
+
+/** The id heritage conditions use for a map realm: its catalogue record's, else its own (D-SETUP-1). */
+export function conditionId(mapId: string): string {
+  return ROWS[mapId]?.catalogue ?? mapId;
 }
 
 /** One assessment of a map realm; unknown where it has no record. */

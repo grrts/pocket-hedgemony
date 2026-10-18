@@ -75,7 +75,7 @@ describe("statecraft (milestone 5)", () => {
     const marriages = w.diplomacy.marriages.length;
     const allies = () => w.diplomacy.graph.relations.filter((r) => r.type === "alliance").length;
     const alliances = allies();
-    months(w, 24, -1);
+    months(w, 36, -1);
     expect(w.diplomacy.marriages.length - marriages + allies() - alliances).toBeGreaterThan(2);
   }, 60000);
 

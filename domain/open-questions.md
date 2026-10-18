@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-569 decided and 8 still open across 29 contexts.
+573 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -258,6 +258,10 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-HER-15**: (was OQ-HER-15) Archetype count: 27 archetypes are kept; one that no generated country scores best on is
 - **D-HER-16**: (was OQ-HER-16) Unbound ids: a place name binds to the land province nearest the scenario map's place of
 - **D-HER-18**: (18 Oct, Leroy: give each realm its strengths and assessments on the realm card) The map's realms take
+- **D-HER-19**: (18 Oct, heritage in play) Places, areas and seas: a place name the scenario map does not hold binds through
+- **D-HER-20**: (18 Oct) Day-one heritage: an ambition that could only be lost (deadline gone or fail holding, like a
+- **D-HER-21**: (18 Oct, the coordinator's brief) Heritage is evaluated monthly, in the month's block right after the
+- **D-HER-22**: (18 Oct) Levers in play: the nine of HER-088, the ones whose rule the game already has. A lever narrowed
 - **D-HER-17**: (was OQ-HER-17) Formed countries beyond the caps: the formed country keeps the forming country's own
 
 ### Naval (naval)
