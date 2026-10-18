@@ -26,12 +26,12 @@ for (const [name, device] of all.filter(([n]) => !process.env.ONLY || process.en
   // To the first January: the wearing year runs then.
   for (let k = 0; k < 9; k++) {
     const turn = await page.evaluate(() => window.__phTurn());
-    await page.click("#fab").catch(() => {});
+    await page.evaluate(() => document.querySelector("#fab")?.click());
     await page.waitForFunction((t) => window.__phTurn() > t, turn, { timeout: 60000 }).catch(() => {});
   }
   await page.evaluate(() => window.__phSelect(window.__phCapital()));
   await page.waitForTimeout(300);
-  await page.click("[data-tab=land]");
+  await page.evaluate(() => document.querySelector("[data-tab=land]")?.click());
   await page.waitForTimeout(300);
   await shot("fever");
   const fever = await page.$eval(".land-grid", (g) => g.previousElementSibling?.textContent ?? "").catch(() => "");
@@ -41,9 +41,9 @@ for (const [name, device] of all.filter(([n]) => !process.env.ONLY || process.en
   if (worn) {
     await page.evaluate((id) => window.__phSelect(id), worn);
     await page.waitForTimeout(300);
-    await page.click("[data-tab=land]");
+    await page.evaluate(() => document.querySelector("[data-tab=land]")?.click());
     await page.waitForTimeout(300);
-    await page.click(".land-tile.worn");
+    await page.evaluate(() => document.querySelector(".land-tile.worn")?.click());
     await page.waitForTimeout(300);
     await page.evaluate(() => document.querySelector(".land-sheet")?.scrollIntoView({ block: "end" }));
     await shot("worn");
