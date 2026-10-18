@@ -80,7 +80,7 @@ import { nameOnMap, playbackAdvance, playbackHour } from "@ph/engine/domain/map-
 import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
-import { SHELL as SHELL_RULES, startColumn, startIcons, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
+import { SHELL as SHELL_RULES, endTurnInAuto, endTurnLabel, newAutoTurns, startColumn, startIcons, stopAuto, switchAuto, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, dayMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
@@ -203,6 +203,10 @@ const BATTLE_STEP_MS = 500;
 const WATCH_STEP_MS = 1200;
 let playing = false;
 let paused = false;
+/** Auto turns (SHELL-159..161): weeks start by themselves until the player or something that needs them stops them; off after every load. */
+let auto = newAutoTurns();
+/** Auto turns are starting the next week themselves, not the player's tap. */
+let autoStarting = false;
 /** Resumes a paused playback. */
 let resume: (() => void) | null = null;
 /** An order is on its way to the engine. */
@@ -282,10 +286,12 @@ app.innerHTML = `
   <section class="event-card framed" id="event-card" role="dialog" aria-labelledby="event-title" hidden></section>
   <div class="revolution-sheet" id="revolution-card" hidden></div>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
+  <button class="paper auto-turns" id="auto-turns" aria-pressed="false" data-sfx="none" hidden>${icon("auto", 2)}<span>Auto</span></button>
   <button class="wax fab end-turn" id="fab" title="End turn" data-sfx="none" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const panel = document.querySelector<HTMLElement>("#panel")!;
 const fab = document.querySelector<HTMLButtonElement>("#fab")!;
+const autoButton = document.querySelector<HTMLButtonElement>("#auto-turns")!;
 const reopen = document.querySelector<HTMLButtonElement>("#reopen")!;
 const armyList = document.querySelector<HTMLElement>("#army-list")!;
 const armyButton = document.querySelector<HTMLButtonElement>("#armies")!;
@@ -328,11 +334,14 @@ armyButton.addEventListener("click", () => {
   renderArmyList();
 });
 fab.addEventListener("click", () => void endTurn());
-// Space ends the turn, and pauses or resumes it while it plays (feedback 27).
+autoButton.addEventListener("click", () => switchAutoTurns());
+// Space ends the turn, and pauses or resumes it while it plays (feedback 27); Shift+Space switches Auto turns (SHELL-159).
 document.addEventListener("keydown", (e) => {
   if (e.code !== "Space" || (e.target as HTMLElement).closest("input, textarea, select")) return;
   e.preventDefault();
-  if (!e.repeat) void endTurn();
+  if (e.repeat) return;
+  if (e.shiftKey) switchAutoTurns();
+  else void endTurn();
 });
 // A focused button would also take the Space as a click.
 document.addEventListener("keyup", (e) => {
@@ -2228,7 +2237,13 @@ function logNews(s: Snapshot): void {
   for (const x of news) {
     // A work of the player's finished: said over the map, with Go there.
     if (x.kind === "built" && x.nations.includes(me) && x.province !== undefined) alertPlayer(x.text, "castle", { province: x.province });
+    // A war of the player's realm stops Auto turns at the end of the week, and an alert says why (SHELL-161).
+    if (x.kind === "war" && x.nations.includes(me) && auto.state === "on") {
+      stopAuto(auto, "war");
+      alertPlayer(x.text, "swords");
+    }
     if (!x.begins || x.province === undefined || !x.nations.includes(me)) continue;
+    stopAuto(auto, x.kind === "battle" ? "battle" : "siege");
     if (x.kind !== "battle") {
       alertPlayer(x.text, "castle", { province: x.province });
       continue;
@@ -2268,26 +2283,31 @@ function logNews(s: Snapshot): void {
     if (alerted.has(`call ${c.id}`)) continue;
     alerted.add(`call ${c.id}`);
     alertPlayer(`${nations[c.caller]!.name} calls you to arms against ${nations[c.against]!.name}.`, "swords", { answer: true });
+    stopAuto(auto, "call");
   }
   for (const o of s.peaceOffers) {
     if (alerted.has(`peace ${o.id}`)) continue;
     alerted.add(`peace ${o.id}`);
     alertPlayer(`${nations[o.from]!.name} offers peace.`, "crown", { answer: true });
+    stopAuto(auto, "peace");
   }
   for (const v of s.rebels.verdicts) {
     if (alerted.has(`verdict ${v.id}`)) continue;
     alerted.add(`verdict ${v.id}`);
     alertPlayer(`The rebels of ${provinces[v.province]!.name} are beaten: choose their fate.`, "crown", { province: v.province });
+    stopAuto(auto, "rebels");
   }
   for (const a of asksOf(s)) {
     if (alerted.has(`ask ${a.id}`)) continue;
     alerted.add(`ask ${a.id}`);
     alertPlayer(`${nations[a.from]!.name}'s envoy waits for your answer.`, "scroll", { answer: true });
+    stopAuto(auto, "envoy");
   }
   // A new event for the player opens its card, and the week waits for the answer (EVT-044, EVT-076).
   const fresh = s.events.filter((c) => !eventsSeen.has(c.event));
   for (const c of fresh) eventsSeen.add(c.event);
   if (fresh.length) {
+    stopAuto(auto, "event");
     eventFolded = false;
     if (playing && !paused) {
       paused = true;
@@ -2296,6 +2316,7 @@ function logNews(s: Snapshot): void {
   }
   renderEventCard();
   // A revolution breaking out covers the map, and the week waits for the answer (REVO-091).
+  if (s.revolution?.outbreak) stopAuto(auto, "revolution");
   if (s.revolution?.outbreak && playing && !paused) {
     paused = true;
     pausedForEvent = true;
@@ -2363,6 +2384,7 @@ function askForStudy(s: Snapshot, told = false): void {
   // A queue carries on by itself: only an empty one asks (RSCH-089, RSCH-108).
   if (!r || r.study || r.queue.length || !r.options.length || askedStudy === r.known.length) return;
   askedStudy = r.known.length;
+  stopAuto(auto, "study");
   if (!told) alertPlayer("Choose what your scholars study.", "scroll", { tab: "learning" });
 }
 
@@ -2559,6 +2581,13 @@ function renderNews(): void {
 /** The End turn button in the corner; while the week plays, it pauses and resumes. */
 function renderActions(): void {
   fab.hidden = !snapshot;
+  autoButton.hidden = !snapshot;
+  autoButton.classList.toggle("on", auto.state === "on");
+  autoButton.classList.toggle("stopping", auto.state === "stopping");
+  autoButton.setAttribute("aria-pressed", String(auto.state === "on"));
+  const stopping = endTurnLabel(auto);
+  autoButton.querySelector("span")!.textContent = stopping ?? "Auto";
+  autoButton.title = stopping ? `${stopping}: tap to keep Auto turns on (Shift+Space)` : auto.state === "on" ? "Auto turns on: tap to stop at the end of this week (Shift+Space)" : "Auto turns: play week after week (Shift+Space)";
   fab.classList.toggle("playing", playing);
   fab.classList.toggle("paused", paused);
   const waiting = snapshot?.events.length ?? 0;
@@ -2578,7 +2607,7 @@ function renderActions(): void {
     : playing
       ? paused
         ? "Play on (Space)"
-        : "Pause (Space)"
+        : stopping ?? (auto.state === "on" ? "Stop Auto turns at the end of this week (Space)" : "Pause (Space)")
       : `End turn (Space): on to ${dateText(addDays(snapshot.date, DAYS_PER_TURN))}`;
   renderArmyList();
 }
@@ -5054,6 +5083,7 @@ async function startGame(nation: string): Promise<void> {
 /** Puts a new or loaded game on screen, from a clean slate. */
 function enterGame(snap: Snapshot): void {
   snapshot = null;
+  auto = newAutoTurns();
   takeSnapshot(snap, 0);
   const nation = nations[snap.playerNation]!.id;
   playClock = performance.now();
@@ -5198,7 +5228,18 @@ async function endTurn(): Promise<void> {
     renderPanel();
     return;
   }
+  // Between two weeks of Auto turns, while the saves are written, a tap stops them before the next week (SHELL-160).
+  if (!playing && auto.state === "on" && !autoStarting) {
+    auto.state = "off";
+    renderActions();
+    return;
+  }
   if (playing) {
+    // With Auto turns on, pausing finishes the current week (SHELL-160); a week waiting for the player still plays on.
+    if (!paused && endTurnInAuto(auto) !== "pause") {
+      renderActions();
+      return;
+    }
     paused = !paused;
     if (!paused) resume?.();
     renderActions();
@@ -5222,6 +5263,8 @@ async function endTurn(): Promise<void> {
     const battle = snapshot.battles.some((b) => b.player);
     const ms = battle ? (watching && !watching.result ? (WATCH_STEP_MS * battleStepMs()) / BATTLE_STEP_MS : battleStepMs()) : dayMs();
     const t0 = performance.now();
+    // Armies of the player's on the march, to tell when one arrives while Auto turns run (SHELL-161).
+    const marching = auto.state === "on" ? marchingArmies() : null;
     // The steps run in the engine worker; the map stays live meanwhile.
     performance.mark("turn-sent");
     // The date ticks a day at a time, and a 4-hour step at a time through the player's battle (VIEW-076).
@@ -5232,6 +5275,7 @@ async function endTurn(): Promise<void> {
     hearSnapshot();
     if (battle) sound.sfx(shotSound(next.date.year), 0.7);
     logNews(next);
+    if (marching) sayArrivals(marching);
     restyleProvinces();
     renderHud();
     if (!panel.hidden) renderPanel();
@@ -5260,6 +5304,80 @@ async function endTurn(): Promise<void> {
   renderPanel();
   renderActions();
   renderDiagnostics();
+  afterWeekInAuto();
+}
+
+/** The player's armies on the march, by id. */
+function marchingArmies(): Set<number> {
+  const a = snapshot!.armies;
+  const out = new Set<number>();
+  for (let i = 0; i < a.id.length; i++) if (a.owner[i] === snapshot!.playerNation && a.route[i]?.length) out.add(a.id[i]!);
+  return out;
+}
+
+/** An army that was marching and now stands at the end of its march, out of battle, stops Auto turns (SHELL-161). */
+function sayArrivals(marching: Set<number>): void {
+  const a = snapshot!.armies;
+  for (let i = 0; i < a.id.length; i++) {
+    if (!marching.has(a.id[i]!) || a.route[i]?.length || a.battle[i] !== -1) continue;
+    const at = a.location[i]!;
+    alertPlayer(`Your army has reached ${provinces[at]?.name ?? "its goal"}.`, "swords", { province: at });
+    stopAuto(auto, "arrived");
+  }
+}
+
+/** What keeps End turn from starting a week, as a reason for Auto turns to stop (SHELL-161). */
+function endTurnBlocked(): AutoStop | null {
+  if (!snapshot) return "player";
+  if (snapshot.events.length) return "event";
+  if (snapshot.revolution?.outbreak) return "revolution";
+  if (snapshot.newLands?.length) return "new lands";
+  return null;
+}
+
+/**
+ * A week has played: with Auto turns on, its saves are written now rather
+ * than at a quiet moment, then the next week starts (SHELL-159); otherwise
+ * Auto turns go off, and End turn opens whatever blocks it.
+ */
+function afterWeekInAuto(): void {
+  if (auto.state === "off") return;
+  const blocked = endTurnBlocked();
+  if (weekPlayed(auto, blocked) === "orders") {
+    renderActions();
+    if (blocked && blocked !== "player") void endTurn();
+    return;
+  }
+  clearTimeout(afterTurnTimer);
+  afterTurnTimer = 0;
+  const from = savesOwedFrom;
+  savesOwedFrom = null;
+  void savesAfterTurn(from).then(() => {
+    // The player may have switched Auto turns off, or started the week themselves, while the saves were written.
+    if (auto.state === "on" && !playing) startAutoWeek();
+    else if (auto.state !== "on" && !playing) {
+      auto.state = "off";
+      renderActions();
+    }
+  });
+}
+
+/** Auto turns start a week the way End turn does. */
+function startAutoWeek(): void {
+  autoStarting = true;
+  void endTurn();
+  autoStarting = false;
+}
+
+/** The Auto button and Shift+Space (SHELL-159, SHELL-160). */
+function switchAutoTurns(): void {
+  if (!snapshot) return;
+  if (switchAuto(auto, playing).startWeek) startAutoWeek();
+  if (auto.state === "on" && !playing) {
+    // End turn found something waiting for the player: Auto turns stay off.
+    auto.state = "off";
+  }
+  renderActions();
 }
 
 function renderDiagnostics(): void {
