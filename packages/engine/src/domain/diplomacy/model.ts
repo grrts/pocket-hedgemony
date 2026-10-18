@@ -1,7 +1,7 @@
 import { Rng } from "../../rng.ts";
 import { addMonths, monthOf, monthsBetween } from "./dates.ts";
 import { config, dataset1444, type EntryRule } from "./rules.ts";
-import { alliesOf, createGraph, enemiesOf, hasFact, overlord, stance, stateOf, storedStance, type FactRecord, type RelationGraph, type RelationRecord } from "./relations.ts";
+import { alliesOf, createGraph, enemiesOf, hasFact, overlord, stance, stateOf, storedStance, storedStancesOf, type FactRecord, type RelationGraph, type RelationRecord } from "./relations.ts";
 
 /** A lord of a realm, as far as diplomacy needs him (realm owns lords). */
 export interface Lord {
@@ -402,12 +402,29 @@ export function setBorder(d: Diplomacy, a: string, b: string): void {
   if (!d.borders.includes(k)) d.borders.push(k);
 }
 
+/** The border list as a set and by country, rebuilt when the list changes (borders are only added). */
+const borderIndex = new WeakMap<string[], { n: number; set: Set<string>; by: Map<string, string[]> }>();
+function bordersOf(d: Diplomacy): { set: Set<string>; by: Map<string, string[]> } {
+  let hit = borderIndex.get(d.borders);
+  if (!hit || hit.n !== d.borders.length) {
+    const by = new Map<string, string[]>();
+    for (const k of d.borders) {
+      const [a, b] = k.split("|") as [string, string];
+      (by.get(a) ?? by.set(a, []).get(a)!).push(b === undefined ? a : b);
+      if (b !== undefined && b !== a) (by.get(b) ?? by.set(b, []).get(b)!).push(a);
+    }
+    hit = { n: d.borders.length, set: new Set(d.borders), by };
+    borderIndex.set(d.borders, hit);
+  }
+  return hit;
+}
+
 export function borders(d: Diplomacy, a: string, b: string): boolean {
-  return d.borders.includes(pairKey(a, b));
+  return bordersOf(d).set.has(pairKey(a, b));
 }
 
 export function neighbours(d: Diplomacy, c: string): string[] {
-  return d.borders.filter((k) => k.split("|").includes(c)).map((k) => k.split("|").find((x) => x !== c) ?? c);
+  return [...(bordersOf(d).by.get(c) ?? [])];
 }
 
 /** Soldiers under arms with allies who would come at half (DIPL-085). */
@@ -527,10 +544,11 @@ export function conditionalEntries(d: Diplomacy, holder: string, other: string):
     const r = entryRule(d, "ties", "married_houses");
     out.push(tieWhile(d, "married_houses", Math.min(n * r.weight!, r.max!), "marriage"));
   }
-  const named = new Set([...Object.keys(d.countries), ...d.graph.relations.flatMap((r) => [r.source, r.target])]);
-  const shared = [...named].some(
-    (c) => c !== holder && c !== other && ["rival", "hostile"].includes(storedStance(d.graph, holder, c) ?? "") && ["rival", "hostile"].includes(storedStance(d.graph, other, c) ?? ""),
-  );
+  // A third country both hold a stored Rival or Hostile stance toward (one pass each, not one per country).
+  const foe = (s: string | undefined) => s === "rival" || s === "hostile";
+  const theirs = storedStancesOf(d.graph, other);
+  let shared = false;
+  for (const [c, s] of storedStancesOf(d.graph, holder)) if (c !== holder && c !== other && foe(s) && foe(theirs.get(c))) shared = true;
   if (shared) out.push(tieWhile(d, "share_a_rival", entryRule(d, "ties", "share_a_rival").weight!, "true"));
   if (h.faith && h.faith === o.faith) out.push(tieWhile(d, "same_faith", entryRule(d, "ties", "same_faith").weight!, "true"));
   if (h.cultureGroup && h.cultureGroup === o.cultureGroup) out.push(tieWhile(d, "same_culture_group", entryRule(d, "ties", "same_culture_group").weight!, "true"));

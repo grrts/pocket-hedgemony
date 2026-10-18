@@ -1,3 +1,4 @@
+import { statecraftView, type StatecraftView } from "./statecraft.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
@@ -90,6 +91,8 @@ export interface Snapshot {
   calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
   /** The player's standing with every other nation that has one. */
   relations: { nation: number; state: "war" | "truce" | "alliance" | "subject" | "overlord"; until?: string }[];
+  /** Envoys, answers and what other realms think of the player (milestone 5); null without a player. */
+  statecraft: StatecraftView | null;
   /** Sieges under way: months gone, how far into the next siege month (0..1), breaches and men inside. */
   sieges: { province: number; by: number; months: number; progress: number; breaches: number; garrison: number }[];
   /** Battles being fought: where, each side's leading realm with its men now and at the start, and rounds fought of all. */
@@ -299,6 +302,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         .filter((c) => !c.answer && c.called === w.nationIds[player])
         .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
       relations,
+      statecraft: statecraftView(w, player),
       sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
       battles: w.battles.map((b) => {
         const men = (slots: number[]) => slots.reduce((t, s) => t + (a.alive[s] ? a.men[s]! : 0), 0);

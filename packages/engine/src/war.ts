@@ -22,7 +22,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -70,6 +70,8 @@ export function createWarState(world: World): dip.Diplomacy {
     d.seq++;
     d.wars.push({ id: `war${d.seq}`, attackers: [r.source], defenders: [r.target], aim: "no_aim", declarer: r.source, target: r.target, start: dip.monthOf(d.date), startedBy: r.source });
   }
+  // Royal marriages of 1444 count as marriages between the houses (DIPL-106).
+  for (const f of d.graph.facts) if (f.fact === "royal_marriage" && !d.marriages.some((m) => dip.pairKey(m.a, m.b) === dip.pairKey(f.source, f.target))) d.marriages.push({ a: f.source, b: f.target });
   for (let p = 0; p < world.provinceCount; p++) {
     const a = world.provinceOwner[p]!;
     if (a < 0) continue;

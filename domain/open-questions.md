@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-550 decided and 8 still open across 29 contexts.
+551 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -130,6 +130,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-DIPL-32**: (was OQ-DIPL-32) Subject asks: diplomacy's counts decide *Offer overlordship* and *Ask for protection*; the subjects context then picks the kind (Tributary, or Vassal when the small country asked). Tighten, Fold in and Station a resident use an envoy's time; *Courted* is a foreign envoy stationed at the subject's court. One count for every ask.
 - **D-DIPL-33**: (was OQ-DIPL-33) The declaration sheet: Serbia is a tributary and does not join; the sheet shows it as "tributary, does not join". X-8 decides it.
 - **D-DIPL-34**: (was OQ-DIPL-34) Old AI weights: retired; the AI uses only the reasons count. Diplomacy 12 is the latest text.
+- **D-DIPL-35**: First game slice of envoys (milestone 5, provisional): an envoy is an unnamed "Envoy of" the realm, not a named official, so no province loses its official yet; routes are one land leg of the capitals' map distance ÷ 6; every realm has 2 unmarried children until families exist; the gift is 30 gold; AI courts weigh three neighbours each six months, so a large map's month stays cheap; the library's event log is not kept, letters are kept two years and envoys home a year. Quick defaults so the game can play statecraft now; each is replaced when its context lands.
 
 ### Events (events)
 

@@ -668,6 +668,18 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - DIPL-195 The AI shall offer peace to the player by the same rules it uses to make peace between AI realms (peace voices, exhaustion, WAR-196), sending the player an incoming peace offer to answer (game-shell SHELL-092). [F-10]
 - DIPL-196 The diplomacy context shall put a country's war and peace actions (declare war, offer or ask peace, open the peace table) on the Diplomacy tab of its country card. [F-11]
 
+### 5.25 Envoys in the game (milestone 5, first slice)
+The library's envoys, asks, answers and ledgers now run in the game's month for every realm (D-DIPL-35). This slice wires four missions: propose an alliance, arrange a marriage, a courtesy visit and a gift. Demands, subjects, passage and the rest follow in later slices.
+
+- DIPL-197 Each month the game shall give the diplomacy context each realm's soldiers, provinces, gold, gold to spare and capital, move every envoy, enforce seats, fade ledgers, and turn the letters arriving this month into news for the player (their own answers, and other realms' agreements). [DIPL-048, DIPL-055, DIPL-190; D-DIPL-35]
+- DIPL-198 A realm may send an envoy to propose an alliance, arrange a marriage, pay a courtesy visit or bring a gift (30 gold, the data's 150 at the game's gold scale) when it is not at war with the target, has no envoy already on the way there, and has a free seat; an alliance is refused at once to allies, to an overlord or subject, or where either side is Hostile, and a marriage to houses already married. The reason is shown in place of the button. [DIPL-048, DIPL-059, DIPL-081; D-DIPL-35]
+- DIPL-199 Each month a sixth of the AI realms with a free seat shall weigh an alliance and a marriage with three of their neighbours in turn, by exactly the section 5 count, and send the best ask whose count is over zero, or a gift first when it is a close no (DIPL-179). [DIPL-178, DIPL-179; D-DIPL-35]
+- DIPL-200 The 1444 royal marriages shall count as marriages from the start, and envoys, letters, ledgers and alliances shall be kept in the save. [DIPL-071; D-DIPL-35]
+- DIPL-201 A player may end an alliance from the ally's Diplomacy tab; it costs an Oath broken (DIPL-103). [DIPL-103]
+
+#### How the player uses it: envoys and answers
+- DIPL-202 Where: another realm's card, Diplomacy tab. It shows, top to bottom, what they think of you (the standing word and number, then each ledger line with its weight), your envoy on the way there and when he arrives, their last answer with a *Why?* that opens the reasons and the total on a tap, and *Send an envoy*: the free seats, then the four missions, each a 44-point button with one line on what it does, or a disabled button with why not. *End the alliance* sits under the missions while you are allied, with its cost. At war the missions give way to the war and peace actions (DIPL-196). Grouping and overview: your own card's Diplomacy tab is the overview, listing your envoys abroad (where, why, when they arrive or come home) and the last eight answers with their *Why?*; answers also arrive in the dispatches with a scroll icon. Phone: the tab fits the side panel in the Wide and Tall layouts, every button and *Why?* at least 44 points high, nothing that needs hover. This replaces the envoy picker of DIPL-186 until officials are sent by name. [X-19, DIPL-185, DIPL-188]
+
 ## 6. Commands
 
 All commands are data, the same for player and AI.
@@ -908,6 +920,7 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 - **D-DIPL-32** (was OQ-DIPL-32) Subject asks: diplomacy's counts decide *Offer overlordship* and *Ask for protection*; the subjects context then picks the kind (Tributary, or Vassal when the small country asked). Tighten, Fold in and Station a resident use an envoy's time; *Courted* is a foreign envoy stationed at the subject's court. One count for every ask.
 - **D-DIPL-33** (was OQ-DIPL-33) The declaration sheet: Serbia is a tributary and does not join; the sheet shows it as "tributary, does not join". X-8 decides it.
 - **D-DIPL-34** (was OQ-DIPL-34) Old AI weights: retired; the AI uses only the reasons count. Diplomacy 12 is the latest text.
+- **D-DIPL-35** First game slice of envoys (milestone 5, provisional): an envoy is an unnamed "Envoy of" the realm, not a named official, so no province loses its official yet; routes are one land leg of the capitals' map distance ÷ 6; every realm has 2 unmarried children until families exist; the gift is 30 gold; AI courts weigh three neighbours each six months, so a large map's month stays cheap; the library's event log is not kept, letters are kept two years and envoys home a year. Quick defaults so the game can play statecraft now; each is replaced when its context lands.
 
 ## 14. Traceability
 
@@ -1191,3 +1204,5 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-194 | funding-rebels.feature | A funded revolution that wins remembers its backer |
 | DIPL-195 | peace-and-truces.feature | The AI offers peace to the player |
 | DIPL-196 | diplomacy-screen.feature | War and peace live on the Diplomacy tab |
+| DIPL-197 … DIPL-201 | — | Engine: packages/engine/test/statecraft.test.ts (courtesy visit, alliance reasons, gift and refusals, AI marriages, save) |
+| DIPL-202 | — | Presentation: apps/client/src/ui/statecraft.ts, the Diplomacy tab |

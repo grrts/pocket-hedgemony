@@ -1119,6 +1119,13 @@ export function advanceMonth(d: Diplomacy, rng?: Rng): void {
   rel.decayHostility(d.graph);
 }
 
+/** The month's envoys and ledgers for a game that keeps the date itself: arrivals, answers, homecomings and fading entries. */
+export function envoysAndLedgers(d: Diplomacy): void {
+  moveEnvoys(d);
+  for (const c of Object.keys(d.countries)) enforceSeats(d, c);
+  fadeLedgers(d);
+}
+
 export function advanceTo(d: Diplomacy, date: string, rng?: Rng): void {
   while (monthOf(d.date) < monthOf(date)) advanceMonth(d, rng);
 }
