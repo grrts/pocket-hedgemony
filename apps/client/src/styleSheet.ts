@@ -1,7 +1,7 @@
 // Art test page: every visual building block of the game on one page, for review.
 import { loadDefaultRuleset } from "@ph/rules";
 import { DEPTH_COLORS, PALETTE, TERRAIN_CATEGORIES, TERRAIN_COLORS, TERRAINS } from "./art/palette.ts";
-import { sprite, SPRITES, type SpriteName } from "./art/sprites.ts";
+import { FIGURES, figureSprite, sprite, SPRITES, type FigureName, type SpriteName } from "./art/sprites.ts";
 import { BIG_ROWS, SEA_ROW, SHALLOW_ROW, tileCanvas, VARIANTS } from "./art/tiles.ts";
 import { apparentAge, commanderSprite } from "./art/commanders.ts";
 import { portrait, setPortraitYear, type Look } from "./art/portraits.ts";
@@ -130,6 +130,23 @@ section(
     row.className = "row";
     for (const scale of [2, 3, 4]) row.append(figure(sprite(name, colors[0]!.color, scale), `${name} ${scale}×`));
     for (const n of colors.slice(1)) row.append(figure(sprite(name, n.color, 3), n.name));
+    body.append(row);
+  }
+}
+
+// The living map's detailed figures (feedback 126)
+{
+  const body = section("Close-in figures", "The living map's soldiers, riders, guns, wagons, banner-bearers, tents, ships and traders, at twice the art density of the ground, so each ground pixel holds two by two of theirs. Further out the sprites above stand in for them.");
+  const colors = ["france", "england", "ottomans", "ming"].map(nation);
+  for (const name of Object.keys(FIGURES) as FigureName[]) {
+    const row = document.createElement("div");
+    row.className = "row";
+    for (const u of [2, 3, 4]) {
+      const art = figureSprite(name, colors[0]!.color, u, 1);
+      art.img.style.width = `${art.w}px`;
+      row.append(figure(art.img, `${name} u ${u}`));
+    }
+    for (const n of colors.slice(1)) row.append(figure(figureSprite(name, n.color, 4, 1).img, n.name));
     body.append(row);
   }
 }

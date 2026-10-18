@@ -6,7 +6,7 @@
  */
 import type { GameDate } from "@ph/rules";
 import { traderMovers } from "@ph/engine/domain/map-presentation";
-import type { SpriteName } from "../art/sprites.ts";
+import type { FigureName } from "../art/sprites.ts";
 
 export interface MoverPath {
   id: number;
@@ -26,10 +26,10 @@ export interface PlacedMover {
   /** The provinces of the leg it is on. */
   from: number;
   to: number;
-  sprite: SpriteName;
+  sprite: FigureName;
 }
 
-const SPRITE: Record<string, SpriteName> = { caravan: "caravanTrain", barge: "barge", "trading ship": "cog" };
+const SPRITE: Record<string, FigureName> = { caravan: "caravanTrain", barge: "barge", "trading ship": "cog" };
 
 /** Days since year 0 at a date and hour, so the movers' clock runs smoothly over months and years. */
 export function clockDays(date: GameDate, hour: number): number {

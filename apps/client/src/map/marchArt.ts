@@ -609,17 +609,18 @@ export function drawFormation(ctx: Ctx, f: FormationStyle): Box {
   for (const g of [...f.figures].sort((a, b) => a.y - b.y || a.x - b.x)) {
     const base = g.banner ? "banner0" : FIGURE_ART[g.arm];
     const name = (f.frame ? base.replace("0", "1") : base) as FigureName;
-    const img = figureSprite(name, f.color, u, dir);
+    const { img, w, h } = figureSprite(name, f.color, u, dir);
     const push = f.lunge && g.x * fx + g.y * fy >= front - 0.5 ? f.lunge : 0;
-    const px = Math.round(f.x + (g.x + push * fx) * u - img.width / 2);
-    const py = Math.round(f.y + (g.y + push * fy) * u - img.height + u);
+    const px = Math.round(f.x + (g.x + push * fx) * u - w / 2);
+    const py = Math.round(f.y + (g.y + push * fy) * u - h + u / 2);
+    const shadow = Math.ceil(u / 2);
     ctx.fillStyle = "rgb(26 28 44 / 0.35)";
-    ctx.fillRect(px, py + img.height, img.width, u);
-    ctx.drawImage(img, px, py);
+    ctx.fillRect(px, py + h, w, shadow);
+    ctx.drawImage(img, px, py, w, h);
     x0 = Math.min(x0, px);
     y0 = Math.min(y0, py);
-    x1 = Math.max(x1, px + img.width);
-    y1 = Math.max(y1, py + img.height + u);
+    x1 = Math.max(x1, px + w);
+    y1 = Math.max(y1, py + h + shadow);
   }
   return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
 }
@@ -628,8 +629,8 @@ export function drawFormation(ctx: Ctx, f: FormationStyle): Box {
 export function drawTents(ctx: Ctx, x: number, y: number, u: number, color: string, ring: number, seed: number): void {
   for (let i = 0; i < 3; i++) {
     const a = ((seed * 37 + i * 131) % 360) * (Math.PI / 180);
-    const img = figureSprite("tent", color, u, 1);
-    ctx.drawImage(img, Math.round(x + Math.cos(a) * ring * u - img.width / 2), Math.round(y + Math.sin(a) * ring * u - img.height));
+    const { img, w, h } = figureSprite("tent", color, u, 1);
+    ctx.drawImage(img, Math.round(x + Math.cos(a) * ring * u - w / 2), Math.round(y + Math.sin(a) * ring * u - h), w, h);
   }
 }
 
