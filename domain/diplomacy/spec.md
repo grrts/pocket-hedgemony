@@ -692,6 +692,14 @@ Demands now run in the game for two kinds of the Demand kinds table: *Hand over 
 #### How the player uses it: demands
 - DIPL-208 Where: another realm's card, Diplomacy tab, under the envoys, a *Make a demand* section (hidden at war). It says in one line what a demand costs and risks (*Threatened us*, the war aim on refusal, no calls for their allies), then shows *Demand tribute* with what tribute brings, and *Demand* followed by the province's name, one button for each of their provinces on your border (up to 8, their capital marked). When no demand can be made it shows why in place of the buttons (no envoy free, no reason, a subject tie). The answer comes as a letter with its *Why?*, like any envoy's. Grouping and overview: demands sit with the other envoys on the Diplomacy tab; a tributary's card says what it pays you, and the Treasury tab's *Tribute* line totals it. Phone: every button at least 44 points high in the Wide and Tall layouts, nothing that needs hover. [X-19, DIPL-185]
 
+### 5.27 The diplomacy lens in the game (milestone 5)
+The map's Diplomacy lens draws DIPL-183 and DIPL-184 from the game's own diplomacy state.
+
+- DIPL-209 The game shall offer a *Diplomacy* map lens that colours each realm by the library's lens colour for the player (DIPL-183), the player's subjects in the player's own colour, realms at war with the player hatched, and members of a league against the player with a red border. From regional zoom it shows each of the player's envoys on the road as a rider on a dotted line from the player's capital to the target's, as far along as the days ridden, with the days still to go over him, and a crossed sword over each realm the player holds a war aim on other than Raid and No aim (not over the player's own subjects). [DIPL-183, DIPL-184, DIPL-203]
+
+#### How the player uses it: the diplomacy lens
+- DIPL-210 Where: the map lens button in the top right opens the lens menu; *Diplomacy* (friend or foe, envoys on the road) sits with the other lenses, and choosing it shows its key under the buttons: a swatch for each relation, the league border, and that zooming in shows envoys and war aims. With the lens on, a tap on any realm opens its card on the Diplomacy tab (what they think of you, your envoy, the missions; DIPL-202), and a tap on your own land opens your own Diplomacy tab. Grouping and overview: the lens is the at-a-glance overview of every relation on one map; the detail lives on the Diplomacy tab, and your own Diplomacy tab lists your envoys abroad. Phone: the lens buttons are at least 44 points high in the Wide and Tall layouts and the menu scrolls on a short screen with the key brought into view; riders, routes and swords are drawn on the map and need no hover or tap of their own, and the realm under them is the tap target. Upright, the game asks the player to turn the phone (SHELL rules), so the lens is checked held sideways and on a desktop window. [X-19, DIPL-185, DIPL-188]
+
 ## 6. Commands
 
 All commands are data, the same for player and AI.
@@ -1221,3 +1229,5 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-202 | — | Presentation: apps/client/src/ui/statecraft.ts, the Diplomacy tab |
 | DIPL-203 … DIPL-207 | — | Engine: packages/engine/test/statecraft.test.ts (tribute demand, province handed over, AI demands before war) |
 | DIPL-208 | — | Presentation: apps/client/src/ui/statecraft.ts, Make a demand |
+| DIPL-209 | — | Engine: packages/engine/test/diplomacyLens.test.ts (colours, war, envoys on the road, war aims); presentation: apps/client/src/main.ts, the Diplomacy lens |
+| DIPL-210 | — | Presentation: apps/client/src/main.ts, the lens menu and its key; apps/client/scripts/diplomacy-shots.mjs |
