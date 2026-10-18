@@ -1287,7 +1287,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| institutions | downstream | Published Language | Institutions lens |
+| institutions | downstream | Published Language | Institutions map mode |
 
 ## institutions ↔ realm (one-sided)
 
