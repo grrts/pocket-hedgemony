@@ -15,7 +15,7 @@ import { heritageFactor, heritageTaxReach } from "./heritage.ts";
 import { navyCosts } from "./navy.ts";
 import { governorWages } from "./colonies.ts";
 import { W as WARFARE } from "./domain/warfare/index.ts";
-import { empireDues } from "./institutions.ts";
+import { empireDues, empireTax } from "./institutions.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -147,6 +147,13 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
   for (const [payer, receiver, share, taxOnly] of subjectPayments(world)) {
     if (only >= 0 && payer !== only && receiver !== only) continue;
     const gold = Math.max(0, L[payer * LEDGER_LINES + TAX]! + (taxOnly ? 0 : L[payer * LEDGER_LINES + TRADE]!)) * share;
+    if (only < 0 || payer === only) L[payer * LEDGER_LINES + TRIBUTE] = L[payer * LEDGER_LINES + TRIBUTE]! - gold;
+    if (only < 0 || receiver === only) L[receiver * LEDGER_LINES + TRIBUTE] = L[receiver * LEDGER_LINES + TRIBUTE]! + gold;
+  }
+  // After the Common Tax each member pays the Emperor its share of the month's tax, on the tribute line (INST-045).
+  for (const [payer, receiver, share] of empireTax(world)) {
+    if (only >= 0 && payer !== only && receiver !== only) continue;
+    const gold = Math.max(0, L[payer * LEDGER_LINES + TAX]!) * share;
     if (only < 0 || payer === only) L[payer * LEDGER_LINES + TRIBUTE] = L[payer * LEDGER_LINES + TRIBUTE]! - gold;
     if (only < 0 || receiver === only) L[receiver * LEDGER_LINES + TRIBUTE] = L[receiver * LEDGER_LINES + TRIBUTE]! + gold;
   }

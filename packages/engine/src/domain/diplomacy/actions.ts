@@ -442,7 +442,7 @@ export function freedBy(d: Diplomacy, freed: string, liberator: string): void {
 const AIM_NAMES: Record<string, string> = {
   take_land: "Take land", seat_pretender: "Seat a pretender", tribute: "Tribute", free_people: "Free a people", break_subject: "Break a subject",
   defend_faith: "Defend the faith", punish: "Punish", raid: "Raid", no_aim: "No aim",
-  restore_imperial_land: "Restore imperial land",
+  restore_imperial_land: "Restore imperial land", breaker_of_the_peace: "Breaker of the Peace",
 };
 export const aimName = (id: string) => AIM_NAMES[id] ?? id;
 export const aimId = (name: string) => Object.entries(AIM_NAMES).find(([, n]) => n === name)?.[0] ?? name;

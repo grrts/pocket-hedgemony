@@ -1,6 +1,7 @@
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
-import { answerCall, controller, strength } from "./war.ts";
+import { answerCall, cedeProvince, checkDestroyed, controller, strength, warBetween } from "./war.ts";
+import { spawnArmy } from "./world.ts";
 import { ensureRoute } from "./statecraft.ts";
 import { FAITH_IDS } from "./peoples.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -67,7 +68,7 @@ export function seedInstitutions(world: World): void {
   }
   const holder = idx(world, E.holder_1444);
   if (holder < 0) return;
-  world.empire = inst.startEmpire({ date: date(world), onMap: (id) => idx(world, id) >= 0, landOf: (id) => land.get(idx(world, id)) ?? [], rulerOf: rulerOf(world) });
+  world.empire = inst.withReforms(inst.startEmpire({ date: date(world), onMap: (id) => idx(world, id) >= 0, landOf: (id) => land.get(idx(world, id)) ?? [], rulerOf: rulerOf(world) }));
 }
 
 // ---------------------------------------------------------------- the monthly step
@@ -80,12 +81,18 @@ export function seedInstitutions(world: World): void {
  */
 export function monthlyInstitutions(world: World, news: News[]): void {
   const e = world.empire;
-  if (!e || e.ended) return;
+  if (!e) return;
+  const r = inst.withReforms(e);
+  contingentsHome(world, r);
+  if (e.ended) return;
   membership(world, e, news);
   election(world, e, news);
   defenceCalls(world, e, news);
   lapseDefence(world, e, news);
   restoreAims(world, e);
+  diet(world, r, news);
+  rulings(world, r, news);
+  westphalia(world, r, news);
   if (world.date.month === 1) yearCount(world, e, news);
 }
 
@@ -134,9 +141,21 @@ export function defenceCalls(world: World, e: inst.Empire, news: News[]): void {
     e.defence.push({ member, war: war.id, attacker, call: c.id });
     news.push({ kind: "call", text: `${nameOf(world, attacker)} attacks ${nameOf(world, member)}, a member of the Empire: the Emperor is called to defend it.`, nations: [idx(world, emperor), idx(world, member), idx(world, attacker)].filter((x) => x >= 0) });
   };
+  const r = inst.withReforms(e);
   for (const war of d.wars) {
     const member = inst.defenceNeeded(e, war);
-    if (member) call(war, member, war.declarer);
+    if (member) {
+      call(war, member, war.declarer);
+      circleDefence(world, r, war, member, news);
+    }
+    // After the Public Peace a member that makes war on another is a Breaker of the Peace (INST-042).
+    const breaker = inst.breakerOfPeace(r, war);
+    if (breaker && !r.breakers.some((b) => b.realm === breaker && b.since >= war.start)) {
+      inst.markBreaker(r, breaker, d.date);
+      breakerAims(world, r);
+      news.push({ kind: "crown", text: `${nameOf(world, breaker)} makes war on ${nameOf(world, war.target)} and breaks the Public Peace: every member of the Empire holds a war aim on it.`, nations: e.members.map((m) => idx(world, m)).filter((x) => x >= 0), major: true });
+    }
+    if (breaker && breaker !== emperor && war.target !== emperor) call(war, war.target, breaker);
   }
   // A non-member holding a member's imperial land in a war calls the Emperor too.
   for (const p of e.imperialLand) {
@@ -163,6 +182,7 @@ function answered(world: World, e: inst.Empire, news: News[]): void {
     }
     if (!c.answer) continue;
     inst.defenceAnswered(d, e, x.member, c.answer === "yes");
+    if (c.answer === "yes") raiseContingent(world, inst.withReforms(e), x.war, news);
     if (c.answer === "no") news.push({ kind: "crown", text: `The Emperor leaves ${nameOf(world, x.member)} to its fate: the Empire's hold falls by ${-E.defence.refuse}.`, nations: [idx(world, e.holder ?? ""), idx(world, x.member)].filter((y) => y >= 0) });
   }
 }
@@ -226,6 +246,8 @@ function yearCount(world: World, e: inst.Empire, news: News[]): void {
   };
   const was = e.hold;
   inst.countYear(e, inst.yearLines(e, facts));
+  // Hold at 0 five years in a row dissolves the Empire (INST-051).
+  if (inst.zeroCount(inst.withReforms(e), was)) return dissolveEmpire(world, "hollow", news);
   if (world.player >= 0 && inst.isMember(e, world.nationIds[world.player]!) && e.hold !== was) {
     news.push({ kind: "crown", text: `The Empire's hold ${e.hold > was ? "grows" : "falls"} to ${e.hold} (${inst.holdWord(e.hold)}) over the year.`, nations: [world.player] });
   }
@@ -234,7 +256,226 @@ function yearCount(world: World, e: inst.Empire, news: News[]): void {
 /** INST-032: the dues the Emperor collects this month, for the ledger's tribute line. */
 export function empireDues(world: World, n: number): number {
   const e = world.empire;
-  return e && e.holder === world.nationIds[n] ? inst.dues(e) : 0;
+  return e && e.holder === world.nationIds[n] && !inst.passed(e, "common_tax") ? inst.dues(e) : 0;
+}
+
+/** INST-045: after the Common Tax each member pays the Emperor its share of the month's tax: [payer, Emperor, share]. */
+export function empireTax(world: World): [number, number, number][] {
+  const e = world.empire;
+  if (!e || !e.holder || !inst.passed(e, "common_tax")) return [];
+  const emperor = idx(world, e.holder);
+  return e.members.filter((m) => m !== e.holder).map((m) => [idx(world, m), emperor, E.common_tax] as [number, number, number]).filter(([n]) => n >= 0);
+}
+
+// ---------------------------------------------------------------- the Diet and the reforms (INST-040 to INST-051)
+
+/** Members with a non-member holding imperial land on their border (a reason in the Diet, INST-041). */
+function outsiderNext(world: World, e: inst.Empire): (id: string) => boolean {
+  const near = new Set<string>();
+  for (const [, ps] of outsidersOf(world, e))
+    for (const p of ps) {
+      const k = world.provinceIndex.get(p)!;
+      for (let j = world.adjStart[k]!; j < world.adjStart[k + 1]!; j++) {
+        const o = world.provinceOwner[world.adjList[j]!]!;
+        if (o >= 0) near.add(world.nationIds[o]!);
+      }
+    }
+  return (id) => near.has(id);
+}
+
+/** Today's Diet forecast on a reform: the votes and the tally (INST-041, INST-081). */
+export function dietForecast(world: World, e: inst.ReformedEmpire, reform: inst.ReformId) {
+  const me = world.player >= 0 ? world.nationIds[world.player]! : "";
+  const own = me && inst.isMember(e, me) && e.diet ? { realm: me, vote: e.diet.playerVote } : undefined;
+  return inst.dietTally(world.diplomacy, e, reform, realmsOf(world), { outsiderNext: outsiderNext(world, e) }, own);
+}
+
+/** The sitting Diet ends after its month; an AI Emperor calls one when the forecast passes (INST-040, INST-041, spec §12). */
+function diet(world: World, e: inst.ReformedEmpire, news: News[]): void {
+  const d = world.diplomacy;
+  if (e.diet && dip.monthOf(d.date) >= e.diet.ends) {
+    const t = dietForecast(world, e, e.diet.reform);
+    const out = inst.endDiet(e, t, d.date);
+    if (!out) return;
+    const name = inst.reformName(out.reform);
+    news.push({ kind: "crown", text: out.passed ? `The Diet passes the ${name} (${t.yes} yes to ${t.no} no). The Empire's hold falls by ${E.diet.pass_cost}.` : `The Diet refuses the ${name} (${t.yes} yes to ${t.no} no). The Empire's hold falls by ${E.diet.fail_cost}.`, nations: e.members.map((m) => idx(world, m)).filter((x) => x >= 0), ...(out.passed ? { major: true as const } : {}) });
+    if (out.passed) reformPassed(world, e, out.reform, news);
+    return;
+  }
+  if (!e.holder || idx(world, e.holder) === world.player) return;
+  const next = inst.nextReform(e);
+  if (!next || inst.whyNotCallDiet(e, d.date)) return;
+  const t = dietForecast(world, e, next);
+  if (t.yes * 2 > t.yes + t.no) callTheDiet(world, e, news);
+}
+
+/** What a passed reform does at once: One Realm ends the Empire (INST-048); the rest bind from now on. */
+function reformPassed(world: World, e: inst.ReformedEmpire, reform: inst.ReformId, news: News[]): void {
+  if (reform === "one_realm") oneRealm(world, e, news);
+}
+
+/** A reform passes by the Diet's votes (the Diet's end, and scenarios that skip the vote). */
+export function passReform(world: World, reform: inst.ReformId, news: News[]): void {
+  const e = world.empire ? inst.withReforms(world.empire) : null;
+  if (!e || e.ended || e.reforms.includes(reform)) return;
+  e.reforms.push(reform);
+  reformPassed(world, e, reform, news);
+}
+
+export function callTheDiet(world: World, e: inst.ReformedEmpire, news: News[]): string | null {
+  const why = inst.whyNotCallDiet(e, world.diplomacy.date);
+  if (why) return why;
+  const sits = inst.callDiet(e, world.diplomacy.date)!;
+  news.push({ kind: "crown", text: `The Emperor calls the Diet on the ${inst.reformName(sits.reform)}: every member votes yes or no this month.`, nations: e.members.map((m) => idx(world, m)).filter((x) => x >= 0), begins: true });
+  return null;
+}
+
+/** INST-042: the Emperor and every member hold *Breaker of the Peace* on each breaker while it lasts. */
+function breakerAims(world: World, e: inst.ReformedEmpire): void {
+  const d = world.diplomacy;
+  d.aims = d.aims.filter((a) => a.aim !== "breaker_of_the_peace");
+  for (const b of e.breakers) {
+    if (dip.monthOf(d.date) >= b.until) continue;
+    for (const m of e.members) if (m !== b.realm) d.aims.push({ holder: m, target: b.realm, aim: "breaker_of_the_peace", until: b.until, source: "broke the Public Peace" });
+  }
+  e.breakers = e.breakers.filter((b) => dip.monthOf(d.date) < b.until);
+}
+
+/** INST-044: after the Circles, every member of the attacked member's circle joins the defence. */
+function circleDefence(world: World, e: inst.ReformedEmpire, war: dip.War, member: string, news: News[]): void {
+  const d = world.diplomacy;
+  for (const f of inst.circleFellows(e, member)) {
+    if (war.attackers.includes(f) || war.defenders.includes(f)) continue;
+    dip.joinWar(d, war, f, war.target, war.declarer);
+    news.push({ kind: "joined", text: `${nameOf(world, f)} joins the defence of ${nameOf(world, member)}, of the same imperial circle (${inst.circleOf(member)}).`, nations: [idx(world, f), idx(world, member), idx(world, war.declarer)].filter((x) => x >= 0) });
+  }
+}
+
+/** INST-046: after the Imperial Army, the Emperor who defends the Empire commands a tenth of every member's soldiers until the peace. */
+function raiseContingent(world: World, e: inst.ReformedEmpire, war: string, news: News[]): void {
+  if (!inst.passed(e, "imperial_army") || !e.holder || e.contingents.some((c) => c.war === war)) return;
+  const emperor = idx(world, e.holder);
+  const capital = world.provinceIndex.get(world.rules.nations[emperor]!.capital);
+  if (capital === undefined || world.provinceOwner[capital] !== emperor) return;
+  const men = e.members.filter((m) => m !== e.holder).reduce((t, m) => t + inst.contingentMen(strength(world, idx(world, m))), 0);
+  if (men < 1) return;
+  const army = spawnArmy(world, emperor, capital, men);
+  e.contingents.push({ war, army, men });
+  news.push({ kind: "crown", text: `The members send the Emperor the imperial contingent: ${men} men gather at ${world.rules.provinces[capital]?.name ?? "the capital"} for the war.`, nations: [emperor], province: capital });
+}
+
+/** The contingent goes home with the peace (INST-046). */
+function contingentsHome(world: World, e: inst.ReformedEmpire): void {
+  if (!e.contingents.length) return;
+  const a = world.armies;
+  e.contingents = e.contingents.filter((c) => {
+    if (world.diplomacy.wars.some((w) => w.id === c.war) && !e.ended) return true;
+    if (a.alive[c.army] && a.owner[c.army] === idx(world, e.holder ?? "")) a.alive[c.army] = 0;
+    return false;
+  });
+}
+
+/** INST-043: rulings the losing side has not answered hand the province over at their month's end; AI members take aims to court. */
+function rulings(world: World, e: inst.ReformedEmpire, news: News[]): void {
+  const now = dip.monthOf(world.diplomacy.date);
+  for (const x of e.rulings) if (!x.answer && x.answerOn <= now) answerRuling(world, e, x, true, news);
+  if (world.date.month !== 1 || !inst.passed(e, "imperial_court")) return;
+  for (const m of e.members) {
+    if (idx(world, m) === world.player) continue;
+    for (const t of e.members) {
+      if (t === m || inst.whyNotCourt(e, m, t)) continue;
+      const aim = dip.warAimsOf(world.diplomacy, m, t).find((a) => a.aim === "take_land" && a.province);
+      if (aim && courtCount(world, e, m, t, aim.source) > 0) takeToCourt(world, idx(world, m), idx(world, t), aim.province!, news);
+    }
+  }
+}
+
+const courtCount = (world: World, e: inst.ReformedEmpire, p: string, d: string, source: string) => inst.courtReasons(world.diplomacy, e, p, d, source).reduce((t, x) => t + x.number, 0);
+
+/** A member's land aims on another member, which it may take to the court (INST-043). */
+export function courtAims(world: World, n: number, t: number): dip.WarAim[] {
+  return dip.warAimsOf(world.diplomacy, world.nationIds[n]!, world.nationIds[t]!).filter((a) => a.aim === "take_land" && a.province);
+}
+
+/** INST-043: realm n takes its aim on province p of realm t to the Imperial Court. */
+export function takeToCourt(world: World, n: number, t: number, province: string, news: News[]): string | null {
+  const e = world.empire ? inst.withReforms(world.empire) : null;
+  if (!e || e.ended) return "there is no Empire";
+  const me = world.nationIds[n]!, them = world.nationIds[t];
+  if (!them) return "no such realm";
+  const why = inst.whyNotCourt(e, me, them);
+  if (why) return why;
+  const aim = courtAims(world, n, t).find((a) => a.province === province);
+  if (!aim) return "you hold no war aim on that province";
+  const forPlaintiff = courtCount(world, e, me, them, aim.source) > 0;
+  const ruling = inst.rule(e, { plaintiff: me, defendant: them, province, forPlaintiff, date: world.diplomacy.date });
+  const pname = world.rules.provinces[world.provinceIndex.get(province)!]?.name ?? province;
+  news.push({ kind: "crown", text: forPlaintiff ? `The Imperial Court rules that ${name(world, t)} hands ${pname} to ${name(world, n)}.` : `The Imperial Court rules for ${name(world, t)}: ${pname} stays where it is.`, nations: [n, t], ...(world.provinceIndex.has(province) ? { province: world.provinceIndex.get(province)! } : {}) });
+  if (forPlaintiff && t !== world.player) answerRuling(world, e, ruling, strength(world, t) <= strength(world, idx(world, e.holder ?? "")) + strength(world, n), news);
+  return null;
+}
+
+/** The losing side hands the province over, or refuses and is a Breaker of the Peace (INST-043). */
+export function answerRuling(world: World, e: inst.ReformedEmpire, x: inst.Ruling, yes: boolean, news: News[]): void {
+  if (x.answer) return;
+  x.answer = yes ? "yes" : "no";
+  const p = world.provinceIndex.get(x.province);
+  const from = idx(world, x.defendant), to = idx(world, x.plaintiff);
+  if (yes) {
+    if (p !== undefined && world.provinceOwner[p] === from && to >= 0) cedeProvince(world, p, to, news);
+    return;
+  }
+  inst.markBreaker(e, x.defendant, world.diplomacy.date);
+  breakerAims(world, e);
+  news.push({ kind: "crown", text: `${name(world, from)} refuses the Imperial Court's ruling and is a Breaker of the Peace.`, nations: e.members.map((m) => idx(world, m)).filter((k) => k >= 0), major: true });
+}
+
+/** INST-050: after `peace_of_westphalia` an eighth seat goes to the largest member without one. */
+function westphalia(world: World, e: inst.ReformedEmpire, news: News[]): void {
+  if (e.eighthSeat || !eventFired(world, "peace_of_westphalia")) return;
+  const provinces = new Map<string, number>();
+  for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p]! >= 0) provinces.set(world.nationIds[world.provinceOwner[p]!]!, (provinces.get(world.nationIds[world.provinceOwner[p]!]!) ?? 0) + 1);
+  const got = inst.westphaliaSeat(e, (id) => provinces.get(id) ?? 0, (id) => nameOf(world, id));
+  if (got) news.push({ kind: "crown", text: `The Peace of Westphalia gives the Empire an eighth seat: ${nameOf(world, got)} now chooses the Emperor too.`, nations: [idx(world, got)] });
+}
+
+/** INST-048: One Realm passes; every other member's ruler becomes a great lord of the Emperor with his land, Wavering. */
+function oneRealm(world: World, e: inst.ReformedEmpire, news: News[]): void {
+  const emperor = idx(world, e.holder!);
+  const quiet: News[] = [];
+  for (const m of e.members) {
+    const n = idx(world, m);
+    if (n < 0 || n === emperor) continue;
+    const ruler = world.rulers[n]?.name || `the ruler of ${name(world, n)}`;
+    const lord = world.lords.length;
+    world.lords.push({ name: ruler, house: name(world, n), nation: emperor, loyalty: "Wavering", upCredit: 0 });
+    for (let p = 0; p < world.provinceCount; p++) {
+      if (world.provinceOwner[p] !== n) continue;
+      cedeProvince(world, p, emperor, quiet);
+      world.provinceLord[p] = lord;
+    }
+  }
+  inst.dissolve(e, world.diplomacy.date, "one_realm");
+  checkDestroyed(world, quiet);
+  news.push({ kind: "crown", text: `One Realm: the Empire becomes the realm of ${name(world, emperor)}, and every former member's ruler is now its great lord.`, nations: [emperor], major: true });
+}
+
+/** INST-051: the Empire is dissolved; every member a free realm, every imperial war aim gone. */
+export function dissolveEmpire(world: World, how: "hollow" | "peace_term", news: News[]): void {
+  const e = world.empire;
+  if (!e || e.ended) return;
+  const members = [...e.members];
+  inst.dissolve(inst.withReforms(e), world.diplomacy.date, how);
+  world.diplomacy.aims = world.diplomacy.aims.filter((a) => a.aim !== "restore_imperial_land" && a.aim !== "breaker_of_the_peace");
+  news.push({ kind: "crown", text: how === "hollow" ? "The Empire is dissolved: its hold has stood at nothing for five years. Every member is a free realm." : "The Empire is dissolved by the terms of the peace. Every member is a free realm.", nations: members.map((m) => idx(world, m)).filter((x) => x >= 0), major: true });
+}
+
+/** INST-051: why realm a may not take *Dissolve the Empire* from b in a peace, or null. */
+export function whyNotDissolveTerm(world: World, a: number, b: number): string | null {
+  const e = world.empire;
+  if (!e) return "there is no Empire";
+  if (e.holder !== world.nationIds[b]) return "only a peace with the Emperor";
+  return inst.whyNotDissolveTerm(world.diplomacy, e, world.nationIds[a]!);
 }
 
 // ---------------------------------------------------------------- orders
@@ -249,7 +490,15 @@ export type EmpireOrder =
   /** The Emperor grants a vacant seat to a member (GrantSeat, INST-022). */
   | { type: "empire"; do: "grantSeat"; seat: string; realm: number }
   /** The Emperor asks a realm with its capital in imperial land to join (AdmitMember, INST-012). */
-  | { type: "empire"; do: "admit"; realm: number };
+  | { type: "empire"; do: "admit"; realm: number }
+  /** The Emperor calls the Diet on the next reform (CallDiet, INST-040). */
+  | { type: "empire"; do: "callDiet" }
+  /** The player's vote in a sitting Diet (VoteInDiet, INST-041). */
+  | { type: "empire"; do: "dietVote"; yes: boolean }
+  /** Take a war aim on another member's province to the Imperial Court (TakeToCourt, INST-043). */
+  | { type: "empire"; do: "court"; realm: number; province: string }
+  /** Hand over the province a ruling gave away, or refuse it (INST-043). */
+  | { type: "empire"; do: "ruling"; id: string; yes: boolean };
 
 export function empireOrder(world: World, n: number, o: EmpireOrder, news: News[]): string | null {
   const e = world.empire;
@@ -278,6 +527,25 @@ export function empireOrder(world: World, n: number, o: EmpireOrder, news: News[
     }
     case "admit":
       return admit(world, n, o.realm, news);
+    case "callDiet":
+      if (e.holder !== me) return "only the Emperor calls the Diet";
+      return callTheDiet(world, inst.withReforms(e), news);
+    case "dietVote": {
+      const r = inst.withReforms(e);
+      if (!r.diet) return "no Diet sits";
+      if (!inst.isMember(e, me)) return "not a member of the Empire";
+      r.diet.playerVote = o.yes ? "yes" : "no";
+      return null;
+    }
+    case "court":
+      return takeToCourt(world, n, o.realm, o.province, news);
+    case "ruling": {
+      const r = inst.withReforms(e);
+      const x = r.rulings.find((k) => k.id === o.id && k.defendant === me && !k.answer);
+      if (!x) return "no ruling waits on you";
+      answerRuling(world, r, x, o.yes, news);
+      return null;
+    }
   }
 }
 
@@ -350,6 +618,27 @@ export interface MemberView {
   atWarWithMember: boolean;
   /** Imperial provinces of this member held by outsiders. */
   landHeld: number;
+  /** A Breaker of the Peace (INST-042). */
+  breaker: boolean;
+  /** Its imperial circle, or null (INST-044). */
+  circle: string | null;
+}
+
+export interface ReformsView {
+  /** The ladder, in order, with passed ones ticked (INST-040). */
+  ladder: { id: string; name: string; effect: string; passed: boolean }[];
+  /** The next reform, its effect, the hold it costs, today's forecast tally and why the Diet can't be called, or null. */
+  next: { id: string; name: string; effect: string; passCost: number; failCost: number; yes: number; no: number; whyNot: string | null } | null;
+  /** A sitting Diet: the reform, when the votes are counted, the player's vote, today's tally. */
+  diet: { reform: string; name: string; ends: string; playerVote: "yes" | "no" | null; yes: number; no: number } | null;
+  /** Rulings of the court waiting on the player (INST-043). */
+  rulings: { id: string; plaintiff: number; province: number; answerOn: string }[];
+  /** The player's land aims on members it may take to the court. */
+  court: { realm: number; province: number; source: string }[];
+  /** Imperial contingents in the field (INST-046). */
+  contingents: { army: number; men: number }[];
+  /** Years in a row the hold has stood at 0 (INST-051). */
+  zeroYears: number;
 }
 
 export interface EmpireView {
@@ -376,6 +665,9 @@ export interface EmpireView {
   defence: { member: number; attacker: number; call: string }[];
   /** Realms whose capital lies in imperial land and that are not members (the Emperor may admit them). */
   admittable: number[];
+  reforms: ReformsView;
+  /** Why the player can't take *Dissolve the Empire* in a peace with the Emperor now, or null (INST-051). */
+  dissolveWhyNot: string | null;
   ended: { date: string; how: string } | null;
 }
 
@@ -429,14 +721,40 @@ export function empireView(world: World, player: number): EmpireView | null {
     election: e.election ? { why: e.election.why, ends: e.election.ends, playerVote: e.election.playerVote ? idx(world, e.election.playerVote) : -1 } : null,
     members: e.members.map((m) => {
       const n = idx(world, m);
-      return { realm: n, provinces: n >= 0 ? provinces[n]! : 0, faith: faithOf(world, m) ?? "", seat: inst.seatOf(e, m)?.name ?? null, atWarWithMember: wars.some(([a, b]) => a === m || b === m), landHeld: held.get(m) ?? 0 };
+      return { realm: n, provinces: n >= 0 ? provinces[n]! : 0, faith: faithOf(world, m) ?? "", seat: inst.seatOf(e, m)?.name ?? null, atWarWithMember: wars.some(([a, b]) => a === m || b === m), landHeld: held.get(m) ?? 0, breaker: inst.isBreaker(inst.withReforms(e), m, d.date), circle: inst.circleOf(m) };
     }),
     year: e.year.filter((l) => l.number),
     record: e.record,
     dues: inst.dues(e),
     defence: e.defence.map((x) => ({ member: idx(world, x.member), attacker: idx(world, x.attacker), call: x.call })),
     admittable,
+    reforms: reformsView(world, inst.withReforms(e), player),
+    dissolveWhyNot: player < 0 || !e.holder ? "there is no Emperor" : !warBetween(world, player, idx(world, e.holder)) ? "only in a war with the Emperor" : whyNotDissolveTerm(world, player, idx(world, e.holder)),
     ended: e.ended,
+  };
+}
+
+function reformsView(world: World, e: inst.ReformedEmpire, player: number): ReformsView {
+  const me = player >= 0 ? world.nationIds[player]! : "";
+  const next = inst.nextReform(e);
+  const R = (id: string) => inst.REFORMS.find((x) => x.id === id)!;
+  const pi = (p: string) => world.provinceIndex.get(p) ?? -1;
+  const court: ReformsView["court"] = [];
+  if (me && inst.passed(e, "imperial_court") && inst.isMember(e, me))
+    for (const t of e.members) {
+      if (t === me || inst.whyNotCourt(e, me, t)) continue;
+      for (const a of courtAims(world, player, idx(world, t))) if (!court.some((c) => c.province === pi(a.province!))) court.push({ realm: idx(world, t), province: pi(a.province!), source: a.source });
+    }
+  const forecast = next && !e.ended ? dietForecast(world, e, next) : null;
+  const sitting = e.diet ? dietForecast(world, e, e.diet.reform) : null;
+  return {
+    ladder: inst.REFORMS.map((x) => ({ id: x.id, name: x.name, effect: x.effect, passed: e.reforms.includes(x.id) })),
+    next: next && forecast ? { id: next, name: R(next).name, effect: R(next).effect, passCost: E.diet.pass_cost, failCost: E.diet.fail_cost, yes: forecast.yes, no: forecast.no, whyNot: e.holder === me ? inst.whyNotCallDiet(e, world.diplomacy.date) : "only the Emperor calls the Diet" } : null,
+    diet: e.diet && sitting ? { reform: e.diet.reform, name: inst.reformName(e.diet.reform), ends: e.diet.ends, playerVote: e.diet.playerVote ?? null, yes: sitting.yes, no: sitting.no } : null,
+    rulings: e.rulings.filter((x) => x.defendant === me && !x.answer).map((x) => ({ id: x.id, plaintiff: idx(world, x.plaintiff), province: pi(x.province), answerOn: x.answerOn })),
+    court,
+    contingents: e.contingents.map((c) => ({ army: c.army, men: c.men })),
+    zeroYears: e.zeroYears,
   };
 }
 
@@ -461,11 +779,12 @@ export function saveInstitutions(world: World): { empire: inst.Empire | null } {
 }
 
 export function restoreInstitutions(world: World, saved: { empire: inst.Empire | null } | undefined): void {
-  if (saved) world.empire = saved.empire ? structuredClone(saved.empire) : null;
+  if (saved) world.empire = saved.empire ? inst.withReforms(structuredClone(saved.empire)) : null;
 }
 
 export function institutionsHashData(world: World): Float64Array {
   const e = world.empire;
   if (!e) return new Float64Array(0);
-  return new Float64Array([e.hold, e.members.length, e.seats.filter((s) => s.realm).length, e.election ? 1 : 0, e.defence.length, e.holder ? idx(world, e.holder) : -1, e.left, e.year.length]);
+  const r = inst.withReforms(e);
+  return new Float64Array([e.hold, e.members.length, e.seats.filter((s) => s.realm).length, e.election ? 1 : 0, e.defence.length, e.holder ? idx(world, e.holder) : -1, e.left, e.year.length, r.reforms.length, r.diet ? 1 : 0, r.breakers.length, r.rulings.length, r.contingents.length, r.zeroYears]);
 }

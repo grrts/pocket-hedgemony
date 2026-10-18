@@ -297,7 +297,14 @@ export function endElection(d: dip.Diplomacy, e: Empire, r: Realms, headOfFaith:
 export function electionDue(e: Empire, date: string, rulerOf: (id: string) => string): string | null {
   if (e.ended || e.election) return null;
   if (!e.holder || !isMember(e, e.holder)) return "The Emperor's realm is no longer in the Empire.";
-  if (rulerOf(e.holder) && rulerOf(e.holder) !== e.holderRuler) return "The Emperor has died; the seats choose his successor.";
+  if (rulerOf(e.holder) && rulerOf(e.holder) !== e.holderRuler) {
+    // After the Hereditary Crown the heir takes the crown and no election is held (INST-047).
+    if ((e as { reforms?: string[] }).reforms?.includes("hereditary_crown")) {
+      e.holderRuler = rulerOf(e.holder);
+      return null;
+    }
+    return "The Emperor has died; the seats choose his successor.";
+  }
   if (!e.holderRuler && dip.monthsBetween(e.lastElection, dip.monthOf(date)) >= E.election_years_without_rulers * 12) return "Twenty-five years have passed since the last election.";
   return null;
 }
