@@ -199,6 +199,12 @@ The Marshal is an official type trained for war. You get one from an academy, by
 
 Other leaders: the ruler and heirs can lead, lords lead only their own retinues (as captains in a royal army), hired captains come with their mercenary companies, and exiles who ask to serve become officials of the type closest to their past.
 
+### Names and ranks
+
+Every commander is named the way his own people name someone: a Castilian is "Rodrigo Manrique", a Hungarian "Hunyadi János" and a Japanese "Hosokawa Katsumoto", family name first where the language puts it first. The great commanders of 1444 go by their own names too: Hunyadi János, Gjergj Kastrioti, Konstantinos Palaiologos. He also carries the rank of his post in that language: a Portuguese commander leading an army is "Marechal Fernão Coutinho" and the same man at the head of a fleet is "Almirante Fernão Coutinho"; an Ottoman admiral is "Kapudan Mehmed Pasha", a Japanese general "Hosokawa Katsumoto Taishō". The rank changes with the post, so an admiral sent back to court is a general again. A mercenary company's captain is named and ranked in the language of the land the company gathers in ("Hauptmann Ulrich von Hallwyl", "Condottiero Niccolò Piccinino") and keeps that name in your service. A people with no word for a post in the game's data shows the name alone.
+
+The ranked name is used on the army row of a province card, the commander screen, the Military tab's Commanders list, the army picker, fleet names on the Navy tab and in port, and the Mercenaries tab. Under it, the small line with his skills starts with his post in plain English (commander, admiral or hired captain), so you never need to know the word. Dispatches and short buttons use the plain name.
+
 ### The computer players
 
 The AI uses the same levy and training commands. Its catalogue personality sets how much of its pool it dares to levy and what it trains: a militarist levies deep and trains expensive troop types, a merchant republic levies little and hires companies instead, a steppe realm trains horse archers. It avoids levying in harvest months unless an enemy army is in its land, and it commissions stewards and wardens first, keeping tax collectors in their seats. It commissions an official only when at least 1,000 of its men have no commander and no free commander can go to them, so it never keeps more commanders than its armies need.

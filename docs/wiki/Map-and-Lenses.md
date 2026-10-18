@@ -57,6 +57,28 @@ Land provinces have no names on the map at any zoom, except each country's capit
 
 Every system added after the province and warfare designs has to state what it shows at each zoom, including its map mode.
 
+### Close in: the living map
+
+Pinch in past the Local icons and the map stops showing icons and shows the world itself. There are three bands inside Local zoom:
+
+| Camera zoom | What you see |
+|---|---|
+| 4 to under 16 | The Local icons: settlement sprites, commander tokens, number plates |
+| 16 to under 40 | **The living map**: towns, hamlets and roads on the land, armies as small figures, fleets as hulls, traders on their paths |
+| 40 to 96 | **Street level**: the same at double detail, with single houses, people and soldiers |
+
+Between zoom 14 and 16 the icons fade out as the living pieces fade in, so nothing pops.
+
+**Map scale, not true scale.** One map pixel is about 7 km, so at true scale a city would be smaller than a pixel. Close in, sizes show importance instead: a town covers more pixels the more town people it has (craftsmen, market folk, clergy, clerks and scholars), from 1 pixel for a village to 30 for the greatest cities. It grows from the province's land nearest its centre and only ever adds or loses pixels at its edge, once a month at most. The first 60 % of a town is its packed core, the rest its outskirts among fields.
+
+**What stands in a town.** A capital has a keep with its realm's flag; a fort rings the core with a palisade and a castle with stone walls and towers; a market shows its square; every town has its house of worship; a drill yard shows its yard; a coastal town or a harbour has docks with piers and ships at berth. Mines, quarries and lumber camps mark their own pixel, and the countryside has up to 6 hamlets (one per 40,000 country people). Roads join each town to its neighbours' towns, as tracks, roads or paved roads by both provinces' road step, and hamlets have tracks to the nearest town. Towns take their culture's building style, and some great cities have their own landmark.
+
+**Armies, fleets and traders.** An army is one figure per 1,000 men (one per 250 at street level), up to 12 (40), split between foot, horse, guns and wagons. It stands in ranks, marches in a column behind its banner along the roads, clashes front rank to front rank in battle and loses figures as it loses men, and rings a town it besieges. Rebels carry no banner. A fleet is one hull per 5 ships (one per ship at street level), sailing in a loose formation or lying at its harbour's berths. Each busy trade path carries up to three caravans, barges or trading ships.
+
+**Reading the numbers.** The living map is for seeing; the cards are for knowing. Every number stays in its card. Tap a town to open its province card, and a formation, fleet or caravan to open its own card; a tap goes to the piece first, then the province, and every piece has a tap box of at least 44 points. The **Markers** button with the map mode buttons brings back the number plates and names over every piece; the selected piece always shows its plate and route.
+
+**Map detail.** Low keeps the icons at every zoom (closest zoom 40). Medium, the phone default, has the living map but no street level. High has both. With Animations Off every figure stands still, and Reduced moves only marching and fighting armies.
+
 ### Map modes
 
 A **map mode** recolours the map by one stat. You pick it from the map mode picker, a small pop-over in the tool column. The map mode list brings together every system's map mode:

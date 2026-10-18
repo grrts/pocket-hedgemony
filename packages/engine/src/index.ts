@@ -7,7 +7,7 @@ export { placeClimate, provinceClimate, seasonName, dayOfYear, snowCover, type P
 export { processTurn, applyNow, advance, STEPS_PER_DAY, STEPS_PER_TURN, HOURS_PER_STEP, type Order, type MoveOrder, type TurnReport } from "./turn.ts";
 export { atWar, cedeProvince, controller, engageRange, offerPeace, peaceShare, relationState, wallsOf, warBetween, SIEGE_MONTH_DAYS, type Battle, type News, type PeaceTerms } from "./war.ts";
 export { hashWorld } from "./hash.ts";
-export { cultureOf, officialName, personName } from "./names.ts";
+export { cultureOf, officialName, personName, rankedName } from "./names.ts";
 export { hireGold, newLands, officialEffect, OFFICIALS, yearsServed, type OfficialEffectView } from "./officials.ts";
 export { aiCollect, aiRecruits, ARMS, COMMISSION_GOLD, commanderScreen, commissionOfficial, type CommanderScreen, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, LEVY_UNIT, garrisonTroops, garrisonView, gatherDays, idleCommanders, isHorseArm, menByArm, monthlyRecruits, recruit, recruitRefusal, trainingGround, type GarrisonView } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";

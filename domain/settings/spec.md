@@ -165,7 +165,7 @@ Newest decision first.
 - SET-038: Graphics shall offer Sharpness (Native, Balanced, Battery; per-profile default; applies on view): the map draws with up to the device ratio capped at 3 (Native), up to 2 (Balanced, today's code) or 1 (Battery) screen pixels per CSS pixel, the pixel art staying sharp at all three. [settings §5.1, §8]
 - SET-039: Graphics shall offer Frame rate cap (30, 60, 120, Display rate; per-profile default); when nothing moves the map shall not redraw at all, whatever the cap. [settings §5.1]
 - SET-040: Graphics shall offer Battery saver (Off, Auto, On; per-profile default): On sets a 30 fps cap, Battery sharpness, reduced animations, map redraws only on change, and fewer music voices, and never changes the AI or any result (X-15); Auto turns it on when the device reports battery saving (iOS Low Power Mode, Android Battery Saver, Steam Deck on battery under 20 %, or a browser that reports its battery under 20 % and not charging; D-SET-21). [settings §5.1, §6.1; yaml `sets_when_on`, `constants.battery_auto_threshold`; D-SET-1]
-- SET-041: Graphics shall offer Map detail (Low, Medium, High; per-profile default; applies on view): Low has no 8 × 8 close-in tiles (stays at 4 × 4), no surf and no forest blending; Medium has 8 × 8 tiles and still water; High has everything. [settings §5.1]
+- SET-041: Graphics shall offer Map detail (Low, Medium, High; per-profile default; applies on view): Low has no 8 × 8 close-in tiles (stays at 4 × 4), no surf and no forest blending; Medium has 8 × 8 tiles and still water; High has everything. Close in, Low draws icons at every zoom with the closest zoom 40; Medium adds the living map (VIEW-100) with reduced life and no street level; High adds the street level up to zoom 96 and full life (VIEW-104). [settings §5.1; living-map-design §6]
 - SET-042: Graphics shall offer Animations (Full, Reduced, Off; default Full) for water, marching columns, flags, smoke and battle playback motion; Off shows battle results as still frames; Accessibility's Reduced motion sets it to Reduced or lower. [settings §5.1]
 - SET-043: Where the game runs on mobile, Graphics shall offer Keep screen awake during the AI turn (On, Off; default On). [settings §5.1]
 - SET-044: Where the game runs on desktop or Steam, Graphics shall offer Screen margins (0–10 % in 1 % steps; default 0, Big screen 5 %) with a calibration screen of four corner marks pulled in with the stick, offered once on the Big screen profile. [settings §5.1, §3.1]
@@ -488,7 +488,7 @@ The settings design said "No open questions remain"; these were found against it
 | SET-039 | graphics.feature | Frame rate cap and still maps |
 | SET-040 | graphics.feature | Battery saver On |
 | SET-040 | graphics.feature | Battery saver Auto |
-| SET-041 | graphics.feature | Map detail |
+| SET-041 | graphics.feature | Map detail; Map detail sets the living map close in |
 | SET-042 | graphics.feature | Animations |
 | SET-043 | graphics.feature | Keep screen awake on mobile |
 | SET-044 | graphics.feature | Screen margins and calibration |

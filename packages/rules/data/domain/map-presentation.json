@@ -5,7 +5,8 @@
     "playback.battleStepSeconds",
     "seasonPalettes.snowFromLatitude",
     "battleMorale.winnerSpends",
-    "seaIce"
+    "seaIce",
+    "livingMap"
   ],
   "zoomLevels": [
     "World",
@@ -449,5 +450,149 @@
       1.0
     ],
     "closesWhenFrozenShare": 0.5
+  },
+  "livingMap": {
+    "$comment": "The living map close in (living-map-design.md, feedback 126). Every number is a starting value to tune in play (§9 defaults: OQ-VIEW-11..14).",
+    "livingFrom": 16,
+    "livingFade": 2,
+    "streetFrom": 40,
+    "streetTo": 96,
+    "unitDivisor": {
+      "living": 8,
+      "street": 16
+    },
+    "minUnit": 2,
+    "artPixels": {
+      "living": 8,
+      "street": 16
+    },
+    "byDetail": {
+      "Low": {
+        "living": false,
+        "street": false,
+        "life": "off",
+        "closestZoom": 40
+      },
+      "Medium": {
+        "living": true,
+        "street": false,
+        "life": "reduced",
+        "closestZoom": 40
+      },
+      "High": {
+        "living": true,
+        "street": true,
+        "life": "full",
+        "closestZoom": 96
+      }
+    },
+    "townClasses": [
+      "craftsmen",
+      "market folk",
+      "clergy",
+      "clerks",
+      "scholars"
+    ],
+    "cellsPerRootK": 1.0,
+    "maxCells": 30,
+    "coreShare": 0.6,
+    "growRadius": 8,
+    "growth": {
+      "jitter": 0.5,
+      "riverBonus": 1,
+      "coastBonus": 1,
+      "mountainPenalty": 2,
+      "marshPenalty": 2
+    },
+    "refreshEveryMonth": true,
+    "hamlets": {
+      "ruralThousandsPerHamlet": 40,
+      "max": 6,
+      "minSpacing": 4,
+      "trackReach": 8
+    },
+    "roads": {
+      "searchMargin": 4,
+      "cost": {
+        "default": 1,
+        "forest": 2,
+        "hills": 2,
+        "marsh": 3,
+        "mountains": 4
+      }
+    },
+    "worksSpots": {
+      "mine": [
+        "mountains",
+        "hills"
+      ],
+      "quarry": [
+        "hills",
+        "mountains"
+      ],
+      "lumber camp": [
+        "forest"
+      ]
+    },
+    "cellKinds": [
+      "none",
+      "hamlet",
+      "outskirts",
+      "core",
+      "keep",
+      "market",
+      "worship",
+      "docks",
+      "drill yard",
+      "works",
+      "ash",
+      "site",
+      "landmark"
+    ],
+    "figures": {
+      "menPerFigure": {
+        "living": 1000,
+        "street": 250
+      },
+      "maxFigures": {
+        "living": 12,
+        "street": 40
+      },
+      "spacing": [
+        3,
+        3
+      ],
+      "ranks": 4,
+      "siegeRing": 10,
+      "maxAnimated": 60,
+      "frameRate": 10
+    },
+    "hulls": {
+      "shipsPerHull": {
+        "living": 5,
+        "street": 1
+      },
+      "maxHulls": {
+        "living": 8,
+        "street": 24
+      },
+      "spread": 6
+    },
+    "traders": {
+      "maxMovers": 3,
+      "daysPerPath": 30,
+      "mover": {
+        "land": "caravan",
+        "river": "barge",
+        "sea": "trading ship"
+      }
+    },
+    "tapBoxPoints": 44,
+    "townStyles": {
+      "generic": {
+        "cultureGroups": []
+      }
+    },
+    "landmarks": {}
   }
 }
