@@ -1,3 +1,4 @@
+import { ROUTE_STROKE } from "@ph/engine/domain/map-presentation";
 import { PALETTE } from "../art/palette.ts";
 import { commanderSprite, type CommanderLook } from "../art/commanders.ts";
 import { sprite, type SpriteName } from "../art/sprites.ts";
@@ -144,37 +145,105 @@ export interface TokenStyle {
   t: number;
 }
 
-/** Draws an army token: the figure on its tile with its men on a plate below. Returns its tap box. */
-export function drawToken(ctx: Ctx, s: TokenStyle): { x: number; y: number; w: number; h: number } {
+/**
+ * CSS pixels per art pixel of an army's figure, its flag row and plate at a camera zoom: one size at
+ * every zoom from Local in, so the figure never grows to cover its province (VIEW-085, feedback 57).
+ */
+export function armyFigureUnit(_zoom: number): number {
+  return 2;
+}
+
+/** The commander's name shows under their army when it is selected, or once zoomed in close. */
+export function armyNameShown(selected: boolean, zoom: number): boolean {
+  return selected || zoom >= 8;
+}
+
+/** What stands for an army on the map: its commander on foot, a rider in the realm's colour without one, a ship at sea. */
+export function tokenFigure(s: { naval?: boolean; commander?: unknown }): "commander on foot" | "rider" | "ship" {
+  return s.naval ? "ship" : s.commander ? "commander on foot" : "rider";
+}
+
+export interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** Where each part of an army token goes, in CSS pixels. */
+export interface TokenLayout {
+  /** The figure's sprite. */
+  figure: Box;
+  /** The realm's flag, on the plate's row before it; null without a flag. */
+  flag: Box | null;
+  /** The men count's plate and its text. */
+  plate: Box & { text: string };
+  /** The tap box round figure, flag and plate. */
+  tap: Box;
+  /** The top centre of the commander's name, below everything else. */
+  name: { x: number; y: number };
+}
+
+/**
+ * Lays out an army token (VIEW-086): the figure's feet on the tile's centre (x, y), the men count on a
+ * plate below, and the realm's flag before the plate on the same row, centred on it; the pair is centred
+ * under the figure; the commander's name goes below them. Sizes are the sprites' in CSS pixels.
+ */
+export function tokenLayout(s: {
+  x: number;
+  y: number;
+  u: number;
+  men: number;
+  figure: { w: number; h: number };
+  flag?: { w: number; h: number } | undefined;
+  bob?: number;
+}): TokenLayout {
+  const { u } = s;
+  const img = s.figure;
+  const x = Math.round(s.x - img.w / 2);
+  // The sprite's last row is its feet (or keel): put them on the tile's centre.
+  const y = Math.round(s.y - img.h + u + (s.bob ?? 0));
+  const figure = { x, y, w: img.w, h: img.h };
+  const text = menShort(s.men);
+  const plateTop = Math.round(s.y + 2 * u);
+  const plateW = (digitsWidth(text) + 4) * u;
+  const plateH = 9 * u;
+  let flag: Box | null = null;
+  let plate: Box & { text: string };
+  let tap: Box;
+  if (!s.flag) {
+    plate = { x: Math.round(s.x - plateW / 2), y: plateTop, w: plateW, h: plateH, text };
+    tap = { x, y, w: img.w, h: img.h + plateH + 2 * u };
+  } else {
+    const gap = u;
+    const left = Math.round(s.x - (s.flag.w + gap + plateW) / 2);
+    plate = { x: Math.round(left + s.flag.w + gap), y: plateTop, w: plateW, h: plateH, text };
+    flag = { x: left, y: Math.round(s.y + 2 * u + (plateH - s.flag.h) / 2), w: s.flag.w, h: s.flag.h };
+    const bx = Math.min(x, left);
+    tap = { x: bx, y, w: Math.max(x + img.w, left + s.flag.w + gap + plateW) - bx, h: img.h + plateH + 2 * u };
+  }
+  return { figure, flag, plate, tap, name: { x: s.x, y: tap.y + tap.h + 2 } };
+}
+
+/** Draws an army token: the figure on its tile with its men on a plate below. Returns its layout; `tap` is its tap box. */
+export function drawToken(ctx: Ctx, s: TokenStyle): TokenLayout {
   const { u } = s;
   // Two frames: legs (or waves) step while marching, the standard flutters at rest.
   const frame = Math.floor(s.t / (s.moving ? 160 : 520)) % 2;
   const name: SpriteName = s.naval ? (frame ? "ship1" : "ship0") : frame ? "rider1" : "rider0";
-  const img = s.commander && !s.naval ? commanderSprite(s.commander, u, frame as 0 | 1, s.dir, s.moving) : facing(name, s.color, u, s.dir);
+  const img =
+    tokenFigure(s) === "commander on foot" ? commanderSprite(s.commander!, u, frame as 0 | 1, s.dir, s.moving) : facing(name, s.color, u, s.dir);
   const bob = s.moving && !s.naval ? (frame ? -u : 0) : s.naval && frame ? u : 0;
-  const x = Math.round(s.x - img.width / 2);
-  // The sprite's last row is its feet (or keel): put them on the tile's centre.
-  const y = Math.round(s.y - img.height + u + bob);
+  const L = tokenLayout({ x: s.x, y: s.y, u, men: s.men, figure: { w: img.width, h: img.height }, flag: s.flag && { w: s.flag.width, h: s.flag.height }, bob });
   groundShadow(ctx, s.x, s.y + u, u, 6);
   if (s.selected) {
     const pulse = Math.floor(s.t / 260) % 2;
-    brackets(ctx, x, y, img.width, img.height + 10 * u, u, 1 + pulse, PALETTE.gold);
+    brackets(ctx, L.figure.x, L.figure.y, img.width, img.height + 10 * u, u, 1 + pulse, PALETTE.gold);
   }
-  ctx.drawImage(img, x, y);
-  const text = menShort(s.men);
-  const plateTop = s.y + 2 * u;
-  if (!s.flag) {
-    const plateH = drawPlate(ctx, text, s.x, plateTop, u, s.color);
-    return { x, y, w: img.width, h: img.height + plateH + 2 * u };
-  }
-  // Flag and men count side by side, centred under the figure, the flag's middle on the plate's.
-  const gap = u;
-  const plateW = (digitsWidth(text) + 4) * u;
-  const left = Math.round(s.x - (s.flag.width + gap + plateW) / 2);
-  const plateH = drawPlate(ctx, text, left + s.flag.width + gap + plateW / 2, plateTop, u, s.color);
-  ctx.drawImage(s.flag, left, Math.round(plateTop + (plateH - s.flag.height) / 2));
-  const bx = Math.min(x, left);
-  return { x: bx, y, w: Math.max(x + img.width, left + s.flag.width + gap + plateW) - bx, h: img.height + plateH + 2 * u };
+  ctx.drawImage(img, L.figure.x, L.figure.y);
+  drawPlate(ctx, L.plate.text, L.plate.x + L.plate.w / 2, L.plate.y, u, s.color);
+  if (s.flag && L.flag) ctx.drawImage(s.flag, L.flag.x, L.flag.y);
+  return L;
 }
 
 export interface RouteStyle {
@@ -191,7 +260,8 @@ export interface RouteStyle {
 }
 
 /**
- * The march route: a trail of square stones, ink round paper, flowing toward
+ * The march route: a trail of square stones, a light dash over a dark outline so it reads on
+ * snow, desert, sea and white realms alike (VIEW-075), flowing toward
  * the end; a numbered marker where each week ends; and the target tile
  * framed by brackets with a small standard planted dead centre.
  */
@@ -210,10 +280,10 @@ export function drawRoute(ctx: Ctx, r: RouteStyle): void {
     for (; d < len; d += step) {
       const x = Math.round((ax + ((bx - ax) * d) / len) / u) * u;
       const y = Math.round((ay + ((by - ay) * d) / len) / u) * u;
-      ctx.fillStyle = PALETTE.ink;
+      ctx.fillStyle = ROUTE_STROKE.outline;
       ctx.fillRect(x - 2 * u, y - u, 4 * u, 2 * u);
       ctx.fillRect(x - u, y - 2 * u, 2 * u, 4 * u);
-      ctx.fillStyle = PALETTE.paper;
+      ctx.fillStyle = ROUTE_STROKE.dash;
       ctx.fillRect(x - u, y - u, 2 * u, 2 * u);
     }
     carry = d - len;
@@ -297,6 +367,9 @@ export interface BattleStyle {
   defMen: number;
   attStart: number;
   defStart: number;
+  /** Morale left per side, 0..1 (VIEW-077). */
+  attMorale: number;
+  defMorale: number;
   t: number;
 }
 
@@ -341,10 +414,10 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
     ctx.fillStyle = PALETTE.paper;
     ctx.fillRect(Math.round(x), Math.round(y - 10 * u), u, u);
   }
-  // Each side's men left, over a bar of what it brought.
-  const top = Math.round(y - att.height - 12 * u);
-  sideBar(ctx, x - 1 * u, top, u, b.attMen, b.attStart, b.attColor, -1);
-  sideBar(ctx, x + 1 * u, top, u, b.defMen, b.defStart, b.defColor, 1);
+  // Each side's men left, over a bar of what it brought and a bar of its morale (VIEW-077).
+  const top = Math.round(y - att.height - 15 * u);
+  sideBar(ctx, x - 1 * u, top, u, b.attMen, b.attStart, b.attMorale, b.attColor, -1);
+  sideBar(ctx, x + 1 * u, top, u, b.defMen, b.defStart, b.defMorale, b.defColor, 1);
   // Losses float up and fade.
   const alive = list.filter((f) => t - f.born < 1400);
   for (const f of alive) {
@@ -357,18 +430,24 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
   return true;
 }
 
-/** One side's strength: its men on a plate in its colour, the bar under it emptying as men fall. Grows away from x by `side`. */
-function sideBar(ctx: Ctx, x: number, top: number, u: number, men: number, start: number, color: string, side: -1 | 1): void {
+/**
+ * One side's strength: its men on a plate in its colour, a bar under it emptying as men fall, and
+ * a pale bar under that emptying as its morale goes. Grows away from x by `side`.
+ */
+function sideBar(ctx: Ctx, x: number, top: number, u: number, men: number, start: number, morale: number, color: string, side: -1 | 1): void {
   const w = 22 * u;
   const left = side < 0 ? Math.round(x - w) : Math.round(x);
   ctx.fillStyle = PALETTE.ink;
-  ctx.fillRect(left, top + 9 * u, w, 4 * u);
-  ctx.fillStyle = PALETTE.slate;
-  ctx.fillRect(left + u, top + 10 * u, w - 2 * u, 2 * u);
-  const share = Math.max(0, Math.min(1, men / Math.max(1, start)));
-  const fill = Math.round((w - 2 * u) * share);
-  ctx.fillStyle = color;
-  ctx.fillRect(side < 0 ? left + w - u - fill : left + u, top + 10 * u, fill, 2 * u);
+  ctx.fillRect(left, top + 9 * u, w, 7 * u);
+  const bar = (row: number, share: number, fillColor: string) => {
+    ctx.fillStyle = PALETTE.slate;
+    ctx.fillRect(left + u, top + row * u, w - 2 * u, 2 * u);
+    const fill = Math.round((w - 2 * u) * Math.max(0, Math.min(1, share)));
+    ctx.fillStyle = fillColor;
+    ctx.fillRect(side < 0 ? left + w - u - fill : left + u, top + row * u, fill, 2 * u);
+  };
+  bar(10, men / Math.max(1, start), color);
+  bar(13, morale, PALETTE.paper);
   drawPlate(ctx, menShort(men), left + w / 2, top, u, color);
 }
 
@@ -378,12 +457,33 @@ export function pruneBattles(live: Iterable<number>): void {
   for (const id of [...lastMen.keys()]) if (!keep.has(id)) (lastMen.delete(id), floaters.delete(id));
 }
 
+/** Small pictures for the siege plate's row, 5 × 5: a breach in the wall, a helmet for the garrison, a sack of food. */
+const SIEGE_ICONS = {
+  breach: ["##.##", "##.##", "#...#", "##.##", "#####"],
+  garrison: [".###.", "#####", "#.#.#", "#...#", "#...#"],
+  food: [".#.#.", "..#..", ".###.", "#####", ".###."],
+} as const;
+
+export interface SiegeMarkStyle {
+  x: number;
+  y: number;
+  u: number;
+  color: string;
+  months: number;
+  progress: number;
+  breaches: number;
+  garrison: number;
+  /** Months of food left in the castle, or null while nobody eats from it. */
+  foodMonths: number | null;
+}
+
 /**
- * A siege on the map: the besieger's standard planted before the walls with
- * the months held on a plate, and one pip per siege month under it, the last
- * filling as the month runs.
+ * A siege on the map (VIEW-078): the besieger's standard planted before the walls with one pip per
+ * siege month held, the last filling as the month runs (and the months on a plate past five), and
+ * a row under it of the breaches made, the garrison left and the months of food in the castle.
  */
-export function drawSiegeMark(ctx: Ctx, x: number, y: number, u: number, color: string, months: number, progress: number): void {
+export function drawSiegeMark(ctx: Ctx, s: SiegeMarkStyle): void {
+  const { x, y, u, color, months, progress } = s;
   drawStandard(ctx, x - 6 * u, y, u, color);
   const pips = Math.min(months, 5) + 1;
   const w = pips * 4 * u + u;
@@ -400,4 +500,26 @@ export function drawSiegeMark(ctx: Ctx, x: number, y: number, u: number, color: 
     ctx.fillRect(px, top + u, Math.round(3 * u * share), 3 * u);
   }
   if (months > 5) drawPlate(ctx, String(months), x + w / 2 + 6 * u, top - 2 * u, u, color);
+  // The row: each figure after its picture, on a paper strip rimmed in ink.
+  const food = s.foodMonths === null ? "-" : s.foodMonths >= 10 ? String(Math.floor(s.foodMonths)) : (Math.floor(s.foodMonths * 10) / 10).toFixed(1).replace(/\.0$/, "");
+  const items: [keyof typeof SIEGE_ICONS, string][] = [["breach", String(s.breaches)], ["garrison", menShort(s.garrison)], ["food", food]];
+  const itemW = (text: string) => 5 + 1 + digitsWidth(text);
+  const rowW = (items.reduce((t, [, text]) => t + itemW(text), 0) + 3 * (items.length - 1) + 4) * u;
+  const rowL = Math.round(x - rowW / 2);
+  const rowT = top + 6 * u;
+  ctx.fillStyle = PALETTE.ink;
+  ctx.fillRect(rowL + u, rowT, rowW - 2 * u, 9 * u);
+  ctx.fillRect(rowL, rowT + u, rowW, 7 * u);
+  ctx.fillStyle = PALETTE.paper;
+  ctx.fillRect(rowL + u, rowT + u, rowW - 2 * u, 7 * u);
+  let cx = rowL + 2 * u;
+  for (const [name, text] of items) {
+    const art = SIEGE_ICONS[name];
+    ctx.fillStyle = name === "breach" ? PALETTE.blood : name === "food" ? PALETTE.clay : PALETTE.steel;
+    art.forEach((row, ry) => {
+      for (let rx = 0; rx < 5; rx++) if (row[rx] === "#") ctx.fillRect(cx + rx * u, rowT + 2 * u + ry * u, u, u);
+    });
+    drawDigits(ctx, text, cx + 6 * u, rowT + 2 * u, u, PALETTE.ink);
+    cx += (itemW(text) + 3) * u;
+  }
 }

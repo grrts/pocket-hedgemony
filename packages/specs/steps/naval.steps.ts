@@ -1881,7 +1881,7 @@ Then(re('a port on the "([^"]+)" (can|cannot) launch or take in ships'), (s, z: 
   expect(N.portIceBound(z, s.month)).toBe(c === "cannot");
 });
 
-// ---------------------------------------------------------------- fleets at sea (NAVY-135..144, feedback 122..127)
+// ---------------------------------------------------------------- fleets at sea (NAVY-150..144, feedback 122..127)
 
 Given(re("a fleet whose leader has Cunning (\\d+)"), (s, c: string) => {
   s.seaCunning = num(c);

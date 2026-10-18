@@ -44,6 +44,8 @@ describe("ports and fleets", () => {
     const w = createWorld(rules, 1, tiles);
     const me = n(w, "portugal");
     w.player = me;
+    // Without the fleet Portugal starts with (F-115), so the new ship has a fleet of its own.
+    w.navy.fleets = w.navy.fleets.filter((f) => f.owner !== me);
     const lisbon = capital(w, "portugal");
     const before = w.provinceRecruits[lisbon]!;
     expect(act(w, { type: "navy", do: "buy", province: lisbon, ship: "cog" }, me)).toEqual(["needs 30 sailors in port"]);
@@ -69,6 +71,7 @@ describe("ports and fleets", () => {
     const w = createWorld(rules, 2, tiles);
     const me = n(w, "england");
     w.player = me;
+    w.navy.fleets = w.navy.fleets.filter((f) => f.owner !== me);
     const port = bestPort(w, me);
     buy(w, me, port, "cog", 2);
     for (let t = 0; t < 30 && w.navy.hulls.length; t++) processTurn(w, [], me);

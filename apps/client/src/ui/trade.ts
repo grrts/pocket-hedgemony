@@ -1,10 +1,10 @@
-import type { GameRouteMode, GameTraderKind, Snapshot, TradeView, TraderView } from "@ph/engine";
+import type { GameTraderKind, Snapshot, TradeView, TraderView } from "@ph/engine";
 import { icon } from "../art/ui.ts";
 
 /**
  * Trade on the realm card and the map (TRADE-141 to TRADE-145): the Trade tab
  * of the player's own card shows last month's Trade line, one card per trader
- * (its loop, purse, what it brings, what is wrong, and Route, Show and
+ * (its route, purse, what it brings, what is wrong, and Route, Show and
  * Dismiss, which asks once more), the cities that can found a trader with a
  * button per kind, and the busiest trade cities. The General tab carries one
  * line that opens the tab; the province card a Trade line; the map the route
@@ -28,10 +28,10 @@ export const tradeUi = { dismiss: -1, allCities: false };
 /** Cities shown under Found a trader before "More cities". */
 const FOUND_SHOWN = 4;
 
-/** A trader's stops in order: "Paris → Lyon → back", or there and back. */
-export function stopsText(stops: readonly number[], mode: GameRouteMode, name: (p: number) => string): string {
+/** A trader's route: "Paris → Lyon and back" (D-TRADE-21). */
+export function stopsText(stops: readonly number[], name: (p: number) => string): string {
   if (stops.length < 2) return "No route";
-  return `${stops.map((p) => esc(name(p))).join(" → ")} ${mode === "loop" ? "→ back" : "and back the same way"}`;
+  return `${stops.map((p) => esc(name(p))).join(" → ")} and back`;
 }
 
 /** One trader: kind and home, its stops, purse, what it brings and deposited, what is wrong, and its three buttons. */
@@ -48,7 +48,7 @@ function traderCard(t: TraderView, name: (p: number) => string): string {
       </div>`;
   return `<div class="trader framed-soft${t.problem ? " bad" : ""}">
       <p class="trader-head"><b>${esc(t.name)}</b> <small>of ${esc(name(t.home))}</small></p>
-      <p class="trader-stops">${stopsText(t.stops, t.mode, name)}${t.stops.length >= 2 ? ` <small>· ${t.loopDays} days a loop</small>` : ""}</p>
+      <p class="trader-stops">${stopsText(t.stops, name)}${t.stops.length >= 2 ? ` <small>· ${t.loopDays} days there and back</small>` : ""}</p>
       <span class="progress purse-bar" role="img" aria-label="Purse ${gold(t.purse)} of ${gold(t.purseMax)} gold"><i style="width:${full.toFixed(1)}%"></i></span>
       <p class="trader-gold"><small>Purse ${gold(t.purse)} of ${gold(t.purseMax)}</small><br>
         About <b>${signed(t.expected)}</b> a month, upkeep ${gold(t.upkeep)} · last month deposited <b>${gold(t.lastMonth)}</b></p>
@@ -67,7 +67,7 @@ export function tradeTab(v: TradeView, s: Snapshot, name: (p: number) => string)
     </dl>`;
   const traders = v.traders.length
     ? `<div class="traders">${v.traders.map((t) => traderCard(t, name)).join("")}</div>`
-    : `<p class="hint">You have no traders. Found one below: it walks a loop between trade cities and brings their gold home.</p>`;
+    : `<p class="hint">You have no traders. Found one below: it goes between two trade cities through the busiest land and brings their gold home.</p>`;
   const cities = tradeUi.allCities ? v.found : v.found.slice(0, FOUND_SHOWN);
   const found = v.found.length
     ? `${cities
@@ -101,7 +101,7 @@ export function tradeTab(v: TradeView, s: Snapshot, name: (p: number) => string)
   return `<h3 class="sub">Last month</h3>${last}
     <h3 class="sub">Traders</h3>${traders}
     <h3 class="sub">Found a trader</h3>
-    <p class="hint">Its crew leave the city; it starts on the best loop from there.</p>
+    <p class="hint">Its crew leave the city; it starts on the best route from there.</p>
     ${found}
     <h3 class="sub">Busiest cities</h3>
     <p class="hint">Value a month and trade ratio: traders passing raise the ratio, and the ratio raises tax.</p>
@@ -126,37 +126,33 @@ export function provinceTradeLine(s: Snapshot, p: number): string {
   }${goods.length ? `<br><small>${esc(goods.join(", "))}</small>` : ""}</dd>`;
 }
 
-/** The route being drawn on the map (TRADE-142): which trader, its stops so far, its mode and why a tap was not taken. */
+/** The route being drawn on the map (TRADE-142): which trader, where it starts and where it goes so far, and why a tap was not taken. */
 export interface Routing {
   trader: number;
   kind: GameTraderKind;
   stops: number[];
-  mode: GameRouteMode;
   note: string | null;
 }
 
-/** The bar along the bottom of the map while a route is drawn: what to do, the stops, the preview, the reason, and the buttons. */
+/** The bar along the bottom of the map while a route is drawn: what to tap, the two ends, the preview, the reason, and the buttons. */
 export function routeBar(r: Routing, v: TradeView | null, name: (p: number) => string): string {
   const t = v?.traders.find((x) => x.id === r.trader);
-  const d = v?.draft && v.draft.trader === r.trader && v.draft.stops.join() === r.stops.join() && v.draft.mode === r.mode ? v.draft : null;
-  const chips = r.stops.map((p, i) => `<span class="chip">${i + 1} ${esc(name(p))}</span>`).join("");
+  const d = v?.draft && v.draft.trader === r.trader && v.draft.stops.join() === r.stops.join() ? v.draft : null;
+  const place = isShipKind(r.kind) ? "port" : "city";
+  const chips = r.stops.map((p, i) => `<span class="chip">${i ? "To" : "From"} ${esc(name(p))}</span>`).join("");
   let preview = "";
-  if (r.stops.length < 2) preview = `<span class="soft">${r.stops.length ? "Tap the next city." : `Tap the first ${isShipKind(r.kind) ? "port" : "city"}.`}</span>`;
+  if (r.stops.length < 2) preview = `<span class="soft">${r.stops.length ? `Tap the ${place} it goes to.` : `Tap the ${place} it starts from.`}</span>`;
   else if (d && !d.why)
-    preview = `${d.loopDays} days a loop · collects in ${plural(d.collectIn, "province")} · about <b>${signed(d.expected)}</b> a month${d.fees > 0.005 ? ` after ${gold(d.fees)} fees` : ""}${
+    preview = `${d.loopDays} days there and back · collects in ${plural(d.collectIn, "province")} · about <b>${signed(d.expected)}</b> a month${d.fees > 0.005 ? ` after ${gold(d.fees)} fees` : ""}${
       d.best.length ? ` <small class="best">· best ${d.best.map((b) => `${esc(name(b.province))} ${gold(b.gold)}`).join(", ")}</small>` : ""
     }`;
   else if (!d) preview = `<span class="soft">Working it out…</span>`;
   const why = r.note ?? d?.why ?? null;
   const ok = r.stops.length >= 2 && !!d && !d.why;
-  return `<p class="route-what"><b>${t ? esc(t.name) : "Trader"}${t ? ` of ${esc(name(t.home))}` : ""}</b> · Tap ${isShipKind(r.kind) ? "ports" : "cities"} in order, 2 to 8</p>
+  return `<p class="route-what"><b>${t ? esc(t.name) : "Trader"}${t ? ` of ${esc(name(t.home))}` : ""}</b> · Tap where it starts, then where it goes; it finds the way through the busiest land</p>
     <div class="route-stops">${chips}<span class="route-preview">${preview}</span></div>
     ${why ? `<p class="route-why">${esc(cap1(why))}.</p>` : ""}
     <div class="route-buttons">
-      <span class="route-mode">
-        <button class="paper${r.mode === "loop" ? " on" : ""}" aria-pressed="${r.mode === "loop"}" data-route-mode="loop">Loop</button>
-        <button class="paper${r.mode === "there_and_back" ? " on" : ""}" aria-pressed="${r.mode === "there_and_back"}" data-route-mode="there_and_back">There and back</button>
-      </span>
       <button class="paper" data-route-undo${r.stops.length ? "" : " disabled"}>Undo</button>
       <button class="paper" data-route-cancel>Cancel</button>
       <button class="wax" data-route-confirm${ok ? "" : " disabled"}>Confirm</button>

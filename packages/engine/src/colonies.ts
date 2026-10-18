@@ -305,7 +305,7 @@ function foundColony(world: World, n: number, id: number, p: number, news: News[
   g.fleet = -1;
   g.colony = p;
   g.homeward = false;
-  // A colony a viceroy's fleet founds starts ahead (NAVY-139).
+  // A colony a viceroy's fleet founds starts ahead (NAVY-154).
   const ahead = f.admiral >= 0 ? (nv.postRow(f.post).colonyStart ?? 0) : 0;
   world.explore.colonies.push({ province: p, owner: n, governor: g.id, progress: CFG.progress_start + ahead, aggression, food: 0, lastChange: 0 });
   if (n === world.player) news.push({ kind: "colony", text: `${g.name} goes ashore at ${name(world, p)} and starts a colony. The locals are ${aggression.toLowerCase()}.`, nations: [n], province: p });
@@ -342,6 +342,7 @@ function founded(world: World, c: ColonyFounding, news: News[]): void {
   world.provinceOfficial[p] = OFFICIALS.indexOf("Warden");
   world.provinceOfficialSeed[p] = p;
   world.provinceOfficialSince[p] = world.day;
+  world.provinceOfficialFrom[p] = -1;
   e.founded[p] = n;
   chartAround(world, n, p);
   addBorders(world, n);

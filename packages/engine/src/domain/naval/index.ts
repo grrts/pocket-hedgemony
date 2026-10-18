@@ -1153,7 +1153,7 @@ export function portMonth(port: Port, o: { shipBuilding?: boolean; mkId?: (h: Hu
 /** A sea battle is fought on at most 3 sectors (NAVY-116). */
 export const seaBattleSectors = (wanted: number): number => Math.min(wanted, config.seaBattleMaxSectors);
 
-// ---------------------------------------------------------------- fleets at sea (NAVY-132..)
+// ---------------------------------------------------------------- fleets at sea (NAVY-147..)
 
 /** A fleet leader's post (feedback 124): admiral for war, commodore for trade, viceroy for exploration and colonies. */
 export type Post = "admiral" | "commodore" | "viceroy";
@@ -1170,34 +1170,34 @@ export interface PostRow {
 export const postRow = (post: Post): PostRow => (config.admiralPosts as unknown as Record<Post, PostRow>)[post];
 export const isPost = (x: unknown): x is Post => typeof x === "string" && (POSTS as readonly string[]).includes(x);
 
-/** The post that fits a fleet when a leader is appointed: trade ships only a commodore, exploration ships only a viceroy, else an admiral (NAVY-138). */
+/** The post that fits a fleet when a leader is appointed: trade ships only a commodore, exploration ships only a viceroy, else an admiral (NAVY-153). */
 export function fittingPost(types: readonly string[]): Post {
   if (types.length && types.every((t) => shipRow(t).family === "trade")) return "commodore";
   if (types.length && types.every((t) => shipRow(t).family === "exploration")) return "viceroy";
   return "admiral";
 }
 
-/** The Might a leader brings to a sea battle: in full as admiral, a share in other posts (NAVY-137). */
+/** The Might a leader brings to a sea battle: in full as admiral, a share in other posts (NAVY-152). */
 export const battleMight = (might: number, post: Post): number => might * postRow(post).mightShare;
 
-/** Tiles within which a fleet meets an enemy fleet in its own zone: base plus a tile per point of its leader's Cunning, at most max (NAVY-135). */
+/** Tiles within which a fleet meets an enemy fleet in its own zone: base plus a tile per point of its leader's Cunning, at most max (NAVY-150). */
 export function seaEngageTiles(cunning: number | null): number {
   const e = config.seaEngage;
   return Math.min(e.max, e.base + (cunning === null ? 0 : Math.max(0, cunning) * e.perCunning));
 }
 
-/** Whether a fleet blockades: its realm at war, a warship and a leader aboard, lying still at sea (NAVY-140). */
+/** Whether a fleet blockades: its realm at war, a warship and a leader aboard, lying still at sea (NAVY-155). */
 export function blockades(f: { atWar: boolean; atSea: boolean; types: readonly string[]; hasLeader: boolean; sailing: boolean; inBattle: boolean; fleeing: boolean; landing: boolean }): boolean {
   return f.atWar && f.atSea && f.hasLeader && !f.sailing && !f.inBattle && !f.fleeing && !f.landing && f.types.some(isWarship);
 }
 
-/** A month's prize money from a port a blockade closes: a share of its sea trade value at its trade ratio, more under a commodore (NAVY-143). */
+/** A month's prize money from a port a blockade closes: a share of its sea trade value at its trade ratio, more under a commodore (NAVY-158). */
 export function blockadePrize(seaValuePerMonth: number, tradeRatio: number, post: Post): number {
   return seaValuePerMonth * (Math.max(0, Math.min(100, tradeRatio)) / 100) * config.blockade.prizeShare * (postRow(post).prizeFactor ?? 1);
 }
 
-/** Whether a blocked realm's trade ship may pass a zone a blockade holds: only with a commodore of its own lying there (NAVY-142). */
+/** Whether a blocked realm's trade ship may pass a zone a blockade holds: only with a commodore of its own lying there (NAVY-157). */
 export const tradeShipPasses = (blockaded: boolean, ownCommodoreThere: boolean): boolean => !blockaded || ownCommodoreThere;
 
-/** People of a blockaded port that count toward its side's wish for peace, as a share of occupied land (NAVY-144). */
+/** People of a blockaded port that count toward its side's wish for peace, as a share of occupied land (NAVY-159). */
 export const blockadePeaceWeight = (): number => config.blockade.peaceWeight;

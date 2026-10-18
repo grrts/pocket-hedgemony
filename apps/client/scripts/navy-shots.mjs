@@ -1,7 +1,7 @@
 // Ships and ports as Portugal (naval spec, How the player uses it): the Port tab of Lisbon, mustering sailors and
 // ordering a cog and a galley, the fleet on the map, its card with a leader and his three posts, the sighting ring
 // of the fleet chosen to sail, sailing by tapping the sea, and the Navy tab; then war on a neighbour and a blockade off
-// its coast: the chain marks on the map, the fleet card's blockade line and the Navy tab's Blockades (NAVY-146..149);
+// its coast: the chain marks on the map, the fleet card's blockade line and the Navy tab's Blockades (NAVY-161..164);
 // on a small and a large phone held sideways, a phone held upright (asked to turn), and a desktop.
 // Usage: pnpm build && node scripts/navy-shots.mjs <outDir>
 import { chromium, devices } from "playwright-core";
@@ -15,7 +15,7 @@ const check = (page, name, what) =>
     const panel = document.querySelector(".panel");
     if (!panel || panel.hidden) return { panel: "hidden" };
     const small = [...panel.querySelectorAll("button:not([disabled])")].filter((b) => b.offsetParent && b.getBoundingClientRect().height < 44).map((b) => b.textContent.trim().slice(0, 30));
-    // The leader's posts sit on one row (NAVY-149).
+    // The leader's posts sit on one row (NAVY-164).
     const posts = [...panel.querySelectorAll(".fleet-posts button")].map((b) => Math.round(b.getBoundingClientRect().top));
     return { small, sideways: panel.scrollWidth > panel.clientWidth + 1, ...(posts.length ? { postsOneRow: new Set(posts).size === 1, posts: posts.length } : {}) };
   }).then((r) => console.log(name, what, JSON.stringify(r)));
@@ -153,7 +153,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await endTurn();
   await shot("7-at-sea");
   // War on the nearest realm whose coast these ships can reach (galleys keep to the coast), and the fleet sent to lie
-  // off that coast: a blockade (NAVY-140, NAVY-141).
+  // off that coast: a blockade (NAVY-155, NAVY-156).
   let off = -1;
   for (const foe of await page.evaluate((p) => window.__phCoastRealms(p), lisbon)) {
     for (const z of await page.evaluate(([id, p]) => window.__phSeaBy(id, p), [foe, lisbon])) {

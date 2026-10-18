@@ -157,6 +157,11 @@ export function flagGrid(id: string): string[][] | null {
   return g;
 }
 
+/** The size in CSS pixels of a flag drawn as a waving cloth at a scale: its rim, and a pixel of wave. */
+export function flagCanvasSize(scale = 1): { w: number; h: number } {
+  return { w: (FLAG_W + 2) * scale, h: (FLAG_H + 3) * scale };
+}
+
 /** The flag's two main colours (the most common cloth colours), for coats, plumes and standards. */
 export function flagColors(id: string, fallback: string): [string, string] {
   const g = flagGrid(id);

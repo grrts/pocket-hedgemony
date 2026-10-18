@@ -207,6 +207,12 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - VIEW-081 (Ubiquitous): Sea ice shall take its own colour, a grey-blue darker than land snow with faint cracks, so it can be told from snow on land in every colour vision mode. [F-25]
 - VIEW-082 (State-driven): While the sea freezes, the drawn ice shall grow from the coasts and from the pole as the water cools and shrink back as it warms, so its outline crosses sea zones in natural shapes instead of filling whole zones, with a soft, textured edge between open sea and ice; a sea zone closes to fleets (MAP-049) once it is drawn mostly frozen. [F-26; X-17]
 
+#### How the player uses it: armies, battles, sieges, the date and the ice on the map
+1. Where: everything here is on the map itself, with nothing new to tap. The player ends the turn and watches: armies step tile by tile along their routes under their commanders' banners, the top bar's date ticks a day at a time (with the hour while their battle runs), a battle shows two bars per side over its tile (men, then morale), a besieged castle shows a plate of how long it has held with its breaches, garrison and food beneath, and the ice creeps out from the coasts as winter comes. A tap on an army, battle or castle opens its own card as before.
+2. Grouping: each picture sits on the thing it shows, on its own tile; the battle viewer strip shows the same two bars as the map, and the siege's numbers are the same as on the castle's card.
+3. Overview: the map is the overview of the war: whose armies are where, which battles are being lost (the morale bar emptying), which castles are about to fall (breaches and food), and where the sea is closing. Only each realm's capital is named, so the map stays clear and a capital reads as a seat; every other name is on the province's name tab and card.
+4. Phone: the plates and bars are pixel art at one size from Region zoom in, sized so their digits stay at least 10 points tall; nothing needs hover; armies, battles and castles keep their 44-point tap boxes in the Wide and Tall layouts; route lines are a light dash over a dark outline, so they read on snow, desert, sea and a white realm alike, outdoors in bright light too.
+
 ### Milestone 3 playtest (17 October 2026)
 Leroy's playtest feedback, items 55 to 58, 65, 77 and 89 of the feedback log.
 

@@ -7,7 +7,7 @@ import { anchorage, closedBy, monthlyNavy, navyView, newFleet, refreshBlockades,
 import { WATER } from "../src/tiles.ts";
 import { STEPS_PER_DAY } from "../src/turn.ts";
 
-/** Fleets at sea (feedback 122, 123, 124, 127; NAVY-132..145). */
+/** Fleets at sea (feedback 122, 123, 124, 127; NAVY-147..145). */
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
@@ -42,7 +42,7 @@ function zoneTiles(w: World, z: number): [number, number, number][] {
   return out;
 }
 
-describe("fleets sail tile by tile (NAVY-132..134)", () => {
+describe("fleets sail tile by tile (NAVY-147..134)", () => {
   it("lies at its port's anchorage and sails over water, a little each step, into the zone of its tile", () => {
     const w = createWorld(rules, 11, tiles);
     const me = n(w, "portugal");
@@ -100,7 +100,7 @@ describe("fleets sail tile by tile (NAVY-132..134)", () => {
   });
 });
 
-describe("wider sea encounters (NAVY-135, NAVY-136)", () => {
+describe("wider sea encounters (NAVY-150, NAVY-151)", () => {
   it("meets an enemy fleet in its own zone only within sight: 20 tiles and a tile a point of Cunning, at most 30", () => {
     const w = createWorld(rules, 14, tiles);
     const a = n(w, "venice");
@@ -162,7 +162,7 @@ describe("wider sea encounters (NAVY-135, NAVY-136)", () => {
   });
 });
 
-describe("leader posts (NAVY-137..139)", () => {
+describe("leader posts (NAVY-152..139)", () => {
   it("appoints a commodore to trade ships, an admiral to warships, and lets the post be changed", () => {
     const w = createWorld(rules, 16, tiles);
     const me = n(w, "portugal");
@@ -184,7 +184,7 @@ describe("leader posts (NAVY-137..139)", () => {
   });
 });
 
-describe("blockades (NAVY-140..144)", () => {
+describe("blockades (NAVY-155..144)", () => {
   /** England and Brittany, an English war fleet lying off Brittany's coast. */
   function setUp(seed: number) {
     const w = createWorld(rules, seed, tiles);

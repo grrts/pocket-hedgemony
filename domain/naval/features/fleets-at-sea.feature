@@ -4,7 +4,7 @@ Feature: Fleets at sea
   I want fleets that sight each other at sea, leaders with a post that fits the fleet, and blockades that pay
   So that a fleet off an enemy's shore at war closes their trade and earns from the trade it stops
 
-  @NAVY-135 @placeholder
+  @NAVY-150 @placeholder
   Scenario Outline: Sighting range grows with the leader's Cunning
     # seaEngage base 20, perCunning 1, max 30
     Given a fleet whose leader has Cunning <cunning>
@@ -17,12 +17,12 @@ Feature: Fleets at sea
       | 10      | 30    |
       | 15      | 30    |
 
-  @NAVY-135 @placeholder
+  @NAVY-150 @placeholder
   Scenario: A fleet with no leader sights at the base range
     Given a fleet with no leader
     Then the fleet sights enemy fleets in its own sea zone within 20 tiles
 
-  @NAVY-137 @NAVY-138
+  @NAVY-152 @NAVY-153
   Scenario Outline: Appointing picks the post that fits the fleet
     Given a fleet made up of <ships>
     When a leader is appointed to the fleet
@@ -36,7 +36,7 @@ Feature: Fleets at sea
       | galley                 | admiral   |
       | caravel, cog           | admiral   |
 
-  @NAVY-137 @placeholder
+  @NAVY-152 @placeholder
   Scenario Outline: A leader's Might in a sea battle
     # admiralPosts.<post>.mightShare
     Given a fleet leader with Might 4 in the post "<post>"
@@ -48,7 +48,7 @@ Feature: Fleets at sea
       | commodore | 2     |
       | viceroy   | 2     |
 
-  @NAVY-140
+  @NAVY-155
   Scenario Outline: When a fleet blockades
     Given a <ships> fleet <leader>, its realm <war>, <where>
     Then the fleet <blockades>
@@ -65,7 +65,7 @@ Feature: Fleets at sea
       | galleon | with a leader     | at war        | landing an army             | does not blockade    |
       | galleon | with a leader     | at war        | lying in port               | does not blockade    |
 
-  @NAVY-142
+  @NAVY-157
   Scenario Outline: Blocked trade ships pass only with their own commodore
     Given a sea zone that <blockade>
     And <escort>
@@ -77,7 +77,7 @@ Feature: Fleets at sea
       | a blockade closes            | no commodore of its realm lies there     | may not pass   |
       | a blockade closes            | a commodore of its realm lies there      | passes         |
 
-  @NAVY-143 @placeholder
+  @NAVY-158 @placeholder
   Scenario Outline: Prize money from a closed port
     # blockade.prizeShare 0.5
     Given a closed port whose sea trade value is <value> gold a month at a trade ratio of <ratio>
@@ -90,14 +90,14 @@ Feature: Fleets at sea
       | 20    | 100   | 10    |
       | 10    | 0     | 0     |
 
-  @NAVY-139 @NAVY-143 @placeholder
+  @NAVY-154 @NAVY-158 @placeholder
   Scenario: A commodore takes more prize money
     # admiralPosts.commodore.prizeFactor 1.5
     Given a closed port whose sea trade value is 20 gold a month at a trade ratio of 40
     When the month's prize money is taken by a fleet under its "commodore"
     Then the blockading realm takes 6 gold
 
-  @NAVY-144 @placeholder
+  @NAVY-159 @placeholder
   Scenario: A closed port weighs half an occupied province
     # blockade.peaceWeight 0.5
     Given the blockade config of the design

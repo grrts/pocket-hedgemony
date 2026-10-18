@@ -131,7 +131,7 @@ export function chartFleets(world: World): void {
     if (e.lastAt.get(f.id) === f.at) continue;
     e.lastAt.set(f.id, f.at);
     let added = chartAround(world, f.owner, f.at);
-    // A viceroy's fleet charts a ring of zones further (NAVY-139).
+    // A viceroy's fleet charts a ring of zones further (NAVY-154).
     const rings = f.admiral >= 0 ? (nv.postRow(f.post).chartRings ?? 1) : 1;
     if (rings > 1) for (let k = world.adjStart[f.at]!; k < world.adjStart[f.at + 1]!; k++) if (world.provinceWater[world.adjList[k]!]) added += chartAround(world, f.owner, world.adjList[k]!);
     if (added) {
