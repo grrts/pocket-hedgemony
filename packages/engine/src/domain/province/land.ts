@@ -1,4 +1,4 @@
-import { knows, landBuilding, provinceConfig, tileSlots, workplaces, type Ground, type Province, type ProvinceConfig, type Tile, type Use } from "./model.ts";
+import { knows, landBuilding, provinceConfig, slotsByClass, tileSlots, workplaces, type Ground, type Province, type ProvinceConfig, type Tile, type Use } from "./model.ts";
 
 /** Land: tiles, tile states, ground effects and what the tiles produce (province stats §2–§5). */
 
@@ -13,6 +13,35 @@ export function tileCountForSize(size: "smallest" | "largest", cfg: ProvinceConf
 export function shoreTileCount(onWater: boolean, wanted: number = provinceConfig.shore_tiles.min, cfg: ProvinceConfig = provinceConfig): number {
   if (!onWater) return 0;
   return Math.max(cfg.shore_tiles.min, Math.min(cfg.shore_tiles.max, wanted));
+}
+
+/** Shares n tiles out by weight, largest remainder first; with no weights, all fields. `fieldsAt` is the index of fields. */
+export function shareOut(weights: ArrayLike<number>, n: number, fieldsAt = 0): number[] {
+  let total = 0;
+  for (let i = 0; i < weights.length; i++) total += weights[i]!;
+  if (total <= 0) return Array.from(weights, (_, i) => (i === fieldsAt ? n : 0));
+  const exact = Array.from(weights, (w) => (w / total) * n);
+  const out = exact.map(Math.floor);
+  let left = n - out.reduce((a, b) => a + b, 0);
+  const order = exact.map((x, i) => [x - Math.floor(x), i] as const).sort((a, b) => b[0] - a[0]);
+  for (const [, i] of order) {
+    if (left <= 0) break;
+    out[i]!++;
+    left--;
+  }
+  return out;
+}
+
+/** How a square of the ground is shared between the tile uses at the start, by lower-case use (PROV-024, D-PROV-25). */
+export function groundStartMix(g: Ground, cfg: ProvinceConfig = provinceConfig): Record<string, number> {
+  return (cfg.ground.start_mix as unknown as Record<string, Record<string, number>>)[g] ?? { fields: 1 };
+}
+
+/** The starting uses of a province's land tiles (not its Town and Shore), from its ground: grassland and savanna mostly pasture (PROV-024). */
+export function startingTileMix(g: Ground, landTiles: number, cfg: ProvinceConfig = provinceConfig): Use[] {
+  const mix = Object.entries(groundStartMix(g, cfg));
+  const counts = shareOut(mix.map(([, w]) => w), landTiles);
+  return mix.flatMap(([use], i) => Array.from({ length: counts[i]! }, () => (use[0]!.toUpperCase() + use.slice(1)) as Use));
 }
 
 // ---------------------------------------------------------------- tile uses
@@ -68,6 +97,27 @@ function setUse(t: Tile, use: Use): void {
   t.idleYears = 0;
 }
 
+/**
+ * Woods lost to fire or to cutting more timber than they regrow become waste, stumps and ash,
+ * and grow back to woods after ten years (PROV-023, D-PROV-30). A lumber camp goes with them.
+ */
+export function loseWoods(p: Province, i: number, cfg: ProvinceConfig = provinceConfig): boolean {
+  const t = p.tiles[i];
+  if (!t || t.use !== "Woods") return false;
+  setUse(t, "Waste");
+  t.change = { to: "Woods", monthsLeft: cfg.woods.regrow_years * 12 };
+  return true;
+}
+
+/** A year of timber: the woods regrow a load per tile; cutting more than that loses the last woods tile (PROV-023, D-PROV-30). */
+export function timberYear(p: Province, loadsCut: number, cfg: ProvinceConfig = provinceConfig): number | null {
+  const woods = p.tiles.flatMap((t, i) => (t.use === "Woods" && !t.change ? [i] : []));
+  if (loadsCut <= woods.length * cfg.woods.regrow_loads_per_tile || !woods.length) return null;
+  const last = woods[woods.length - 1]!;
+  loseWoods(p, last, cfg);
+  return last;
+}
+
 /** Advances use changes under way by some months; finished clearing gives one load of timber. */
 export function advanceTileChanges(p: Province, months: number, cfg: ProvinceConfig = provinceConfig): void {
   for (const t of p.tiles) {
@@ -88,16 +138,40 @@ export function tileWorkers(p: Province): number[] {
 }
 
 /**
+ * Years of overwork before fields wear: 30, stretched by half for each of *Three-field rotation*,
+ * *Fodder crops* and *Four-field rotation* the owner knows (PROV-034, PROV-035, D-PROV-31).
+ */
+export function wearYears(p: Province, cfg: ProvinceConfig = provinceConfig): number {
+  const w = cfg.worn;
+  return w.overwork_years * w.rotation_stretch ** w.rotation_inventions.filter((id) => knows(p, id)).length;
+}
+
+/** Farmers beyond the slots of the province's fields: the land is farmed with more people than it needs. */
+export function surplusFarmers(p: Province, cfg: ProvinceConfig = provinceConfig): number {
+  return Math.max(0, p.people.farmers - slotsByClass(p, cfg).farmers);
+}
+
+/**
  * Year-end land changes: unworked fields grow back to woods after 10 years (PROV-013),
+ * worked fields wear after years farmed with more farmers than their slots (PROV-034),
  * worn tiles recover after 5 years without use (PROV-035), and in peace one burned
  * tile is rebuilt (PROV-032; twice as fast under a master of works).
  */
 export function yearEndLand(p: Province, cfg: ProvinceConfig = provinceConfig, rebuildMultiplier = 1): void {
   const workers = tileWorkers(p);
+  const overworked = surplusFarmers(p, cfg) > 0;
+  const wearAt = wearYears(p, cfg);
   p.tiles.forEach((t, i) => {
     if (t.use === "Town" || t.use === "Castle" || t.change) return;
     t.idleYears = (workers[i] ?? 0) > 0 ? 0 : t.idleYears + 1;
     if (t.state === "Worn" && t.idleYears >= cfg.worn.recovery_years) t.state = null;
+    if (t.use === "Fields" && t.state === null && (workers[i] ?? 0) > 0) {
+      t.overworkedYears = overworked ? t.overworkedYears + 1 : 0;
+      if (t.overworkedYears >= wearAt) {
+        t.state = "Worn";
+        t.overworkedYears = 0;
+      }
+    }
     if (t.use === "Fields" && t.state !== "Burned" && t.idleYears >= cfg.fields_to_woods.years) setUse(t, "Woods");
   });
   const peopleHere = Object.values(p.people).some((n) => n > 0);
@@ -118,15 +192,17 @@ export function yearEndLand(p: Province, cfg: ProvinceConfig = provinceConfig, r
 /**
  * Burns a tile (PROV-031): its building is wrecked, it gives nothing, and its workers
  * lose their place. Returns how many were displaced; whether they become refugees or
- * die is the caller's (warfare's) to say. A tile carries one state, so Burned replaces any other.
+ * die is the caller's (warfare's) to say, or with `stay` they stay on as homeless (PROV-125).
+ * A tile carries one state, so Burned replaces any other.
  */
-export function burnTile(p: Province, i: number): number {
+export function burnTile(p: Province, i: number, opts: { stay?: boolean } = {}): number {
   const t = p.tiles[i];
   if (!t) return 0;
   const before = tileWorkers(p)[i] ?? 0;
   const cls = tileSlots(t)?.class;
   t.state = "Burned";
   if (cls) p.people[cls] -= before;
+  if (opts.stay) p.people.homeless += before;
   return before;
 }
 
@@ -251,6 +327,39 @@ export function defenderOnWalls(p: Province): boolean {
 /** A further +10 % to a defending army of the homeland tongue in rough ground (PROV-047). */
 export function localsBonus(g: Ground, homelandTongue: boolean, cfg: ProvinceConfig = provinceConfig): number {
   return homelandTongue && cfg.locals_rough_bonus.grounds.includes(g) ? cfg.locals_rough_bonus.bonus : 0;
+}
+
+// ---------------------------------------------------------------- fever land
+
+export type FeverStep = "none" | "mild" | "harsh" | "deadly";
+
+/** What sets a province's fever land, in steps: its ground, the tropics, its marsh tiles, and the inventions that lower it (PROV-243, D-PROV-32). */
+export function feverLandParts(p: Province, cfg: ProvinceConfig = provinceConfig): { ground: number; climate: number; marsh: number; inventions: number; step: FeverStep } {
+  const f = cfg.fever_land;
+  const ground = (f.by_ground as Record<string, number>)[p.ground] ?? 0;
+  const climate = p.tropical ? f.tropics_steps : 0;
+  const marsh = Math.floor(p.tiles.filter((t) => t.use === "Marsh").length / f.marsh_tiles_per_step);
+  const inventions = -f.lowered_by.filter((id) => knows(p, id)).length;
+  const steps = f.steps as FeverStep[];
+  const at = ground + climate + marsh;
+  // Inventions only lower fever land a province has.
+  const step = at > 0 ? steps[Math.max(0, Math.min(steps.length - 1, at) + inventions)]! : "none";
+  return { ground, climate, marsh, inventions, step };
+}
+
+export function feverLand(p: Province, cfg: ProvinceConfig = provinceConfig): FeverStep {
+  return feverLandParts(p, cfg).step;
+}
+
+/** Extra yearly death rate in fever land: in full for people born elsewhere, a tenth for locals (PROV-102, PROV-243). */
+export function feverDeathRate(step: FeverStep, bornHere: boolean, cfg: ProvinceConfig = provinceConfig): number {
+  const rate = (cfg.fever_land.deaths_born_elsewhere as Record<FeverStep, number>)[step] ?? 0;
+  return bornHere ? rate * cfg.fever_land.local_share : rate;
+}
+
+/** People of a group lost to fever land in some months. */
+export function feverDeaths(people: number, step: FeverStep, bornHere: boolean, months = 1, cfg: ProvinceConfig = provinceConfig): number {
+  return people * feverDeathRate(step, bornHere, cfg) * (months / 12);
 }
 
 // ---------------------------------------------------------------- ground and economy

@@ -11,7 +11,8 @@ import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
 import type { Titles } from "./domain/realm/index.ts";
-import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
+import { goodsOf, kindRow, TRADER_KINDS, tradePaths, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradePath, type TradeView } from "./trade.ts";
+import { LIVING_MAP } from "./domain/map-presentation/livingMap.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
 import { empireView, institutionsLens, type EmpireView } from "./institutions.ts";
@@ -20,6 +21,7 @@ import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
+import { feverOf, FEVER_STEPS } from "./land.ts";
 import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
 import { badWeatherName } from "./domain/realm/index.ts";
 import { foodView, mapNetwork, type FoodView } from "./castleFood.ts";
@@ -202,6 +204,9 @@ export interface Snapshot {
   provinceWeather: Int8Array;
   provinceClimate: Int8Array;
   provinceHarvestMonths: number[][];
+  /** Each province's fever land (index into feverSteps: none, mild, harsh, deadly), PROV-243. */
+  provinceFever: Int8Array;
+  feverSteps: readonly string[];
   climates: readonly string[];
   /** What bad weather is called in each climate (drought, floods, bad weather). */
   badWeather: readonly string[];
@@ -248,6 +253,8 @@ export interface Snapshot {
   provinceTradeCity: Uint8Array;
   /** Provinces whose trade the player sees: its own and those on its traders' loops (D-TRADE-13). */
   provinceTradeSeen: Uint8Array;
+  /** The busy trade paths the player may see, busiest first, for the traders drawn on the living map (VIEW-132). */
+  tradePaths: TradePath[];
   /** What each province the player sees trades: its goods, most gold first, with loads a year and gold a month. */
   provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
@@ -328,8 +335,8 @@ export interface Snapshot {
   arms: readonly string[];
   /** The player's research for the Learning tab (null before a realm is chosen). */
   research: ResearchView | null;
-  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%). */
-  realmResearch: { known: number; study: string | null; pct: number }[];
+  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%), its standing, eras behind the times, and how many inventions it knows that the player's realm does not (RSCH-104). */
+  realmResearch: { known: number; study: string | null; pct: number; standing: string; behind: number; ahead: number }[];
   /** Works (milestone 4): their names, each step's name and what it does, and the step built of each in each province (works.length per province, 0 = none). */
   works: readonly string[];
   workSteps: { name: string; effect: string }[][];
@@ -478,6 +485,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       harvests: HARVESTS,
       provinceWeather: w.provinceWeather.slice(),
       provinceClimate: provinceClimates(w).slice(),
+      provinceFever: Int8Array.from({ length: w.provinceCount }, (_, p) => feverOf(w, p)),
+      feverSteps: FEVER_STEPS,
       provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
       climates: CLIMATES,
       badWeather: CLIMATES.map(badWeatherName),
@@ -513,7 +522,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         const seen = tradeSeen(w, player);
         const goods: Snapshot["provinceGoods"] = {};
         for (let p = 0; p < w.provinceCount; p++) if (seen[p] && !w.provinceWater[p]) goods[p] = goodsOf(w, p).map((g) => ({ ware: g.ware, loads: g.loads, gold: g.gold }));
-        return { provinceTradeSeen: seen, provinceGoods: goods };
+        return { provinceTradeSeen: seen, provinceGoods: goods, tradePaths: tradePaths(w, player, LIVING_MAP.traders.maxPaths, player >= 0 ? seen : null) };
       })(),
       peoples: peoplesSnapshot(w),
       faithHeads: faithHeadsView(w, player),
@@ -606,6 +615,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceHarvest,
       snap.provinceWeather,
       snap.provinceClimate,
+      snap.provinceFever,
       snap.provinceStarved,
       snap.provinceCastle,
       snap.provinceRing,

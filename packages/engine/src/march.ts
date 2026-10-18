@@ -25,6 +25,8 @@ export interface MarchingArmy {
   logistics: number;
   /** On campaign (at war, or abroad) men eat double (REALM-054); left out, the army eats as it would at home. */
   campaigning?: boolean;
+  /** Percent of the food its wagons hold: 50 without B01 *Wheel and carts* (RSCH-094); left out, all of it. */
+  foodCarriedPct?: number;
 }
 
 export function groundOf(terrain: Terrain): Ground | null {
@@ -42,7 +44,7 @@ export function monthlyRations(d: MarchDefines, a: MarchingArmy): number {
 
 /** Rations an army's wagons hold: its months carried of eating on campaign. */
 export function wagonRations(d: MarchDefines, a: MarchingArmy): number {
-  return monthlyRations(d, { ...a, campaigning: true }) * d.monthsCarried;
+  return monthlyRations(d, { ...a, campaigning: true }) * d.monthsCarried * ((a.foodCarriedPct ?? 100) / 100);
 }
 
 /**

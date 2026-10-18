@@ -85,7 +85,7 @@ Each country's starting counts are set from its assessments:
 | Administrative capacity | Officials, and how many provinces start as royal land |
 | Political stability and unrest risk | Lords' starting loyalty, and provinces in revolt |
 | Territorial cohesion | Number of lords, the land they hold, and Tongue |
-| Institutional development | Schools, Scholars, starting inventions |
+| Institutional development | Schools and Scholars (starting inventions come from the realm's start group: see [Research](Research)) |
 | Trade access | Merchants and access to grain prices |
 | Diplomatic influence | Extra officials at court ready to go abroad |
 
