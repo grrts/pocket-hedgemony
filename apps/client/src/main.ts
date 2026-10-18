@@ -2756,7 +2756,7 @@ async function actInTreasury(order: Order): Promise<void> {
   renderPanel();
 }
 
-const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute" };
+const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute", navy: "Ships and sailors" };
 
 /**
  * The Treasury tab: the purse (gold, its change a month and how long it
