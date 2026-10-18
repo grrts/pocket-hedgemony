@@ -201,3 +201,10 @@ Feature: Officials and their types
     Then it is refused because no one at home knows the trade
     When the country "France" hires a foreign "customs officer" for "Rouen"
     Then the "customs officer" runs "Rouen" at half his effect
+
+  @PROV-340
+  Scenario: A province just taken waits for a decision
+    Given the player plays the country "Castile"
+    When a neighbour hands the country "Castile" one of its provinces
+    Then the province's post stands empty
+    And End turn waits until the player fills the post, grants it to a lord or keeps it royal

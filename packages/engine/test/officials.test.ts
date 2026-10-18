@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { applyNow, createEngineHost, createWorld, officialEffect, OFFICIALS, provinceTax, type Order, type World } from "../src/index.ts";
-import { hireGold, nativeTypes, officialAt, yearsServed } from "../src/officials.ts";
+import { hireGold, nativeTypes, newLands, officialAt, yearsServed } from "../src/officials.ts";
+import { cedeProvince } from "../src/war.ts";
 import { COMMISSION_GOLD } from "../src/recruit.ts";
 import { worldChunks, restoreWorld } from "../src/domain/saves/world-chunks.ts";
 
@@ -154,5 +155,33 @@ describe("officials", () => {
     ok(w, { type: "commission", province: a }, me);
     expect(COMMISSION_GOLD).toBe(50);
     expect(w.nationTreasury[me]).toBe(10);
+  });
+
+  it("land just taken loses its official and waits for the player's decision", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = w.nationIndex.get("castile")!;
+    w.player = me;
+    const p = Array.from({ length: w.provinceCount }, (_, q) => q).find((q) => w.provinceOwner[q]! >= 0 && w.provinceOwner[q] !== me && w.provinceOfficial[q]! >= 0)!;
+    cedeProvince(w, p, me, []);
+    expect(w.provinceOfficial[p]).toBe(-1);
+    expect(officialAt(w, p)).toBeNull();
+    expect(newLands(w, me)).toEqual([p]);
+    ok(w, { type: "settleLand", province: p }, me);
+    expect(newLands(w, me)).toEqual([]);
+    // Filling the post settles it too.
+    const q = Array.from({ length: w.provinceCount }, (_, x) => x).find((x) => w.provinceOwner[x]! >= 0 && w.provinceOwner[x] !== me && x !== p)!;
+    cedeProvince(w, q, me, []);
+    w.nationTreasury[me] = 1000;
+    ok(w, { type: "hireOfficial", province: q, official: 0, foreign: true }, me);
+    expect(newLands(w, me)).toEqual([]);
+  });
+
+  it("a lord's land: no levy for the crown, and a building paid for there is his gift", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = w.nationIndex.get("castile")!;
+    w.player = me;
+    w.nationTreasury[me] = 10_000;
+    const p = lordHeld(w, me)[0]!;
+    expect(refused(w, { type: "recruit", province: p, thousands: 1 }, me)).toMatch(/answer his call/);
   });
 });

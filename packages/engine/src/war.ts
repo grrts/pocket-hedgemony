@@ -10,7 +10,7 @@ import { GROUNDS } from "./tiles.ts";
 import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
-import { officialBonus } from "./officials.ts";
+import { officialBonus, provinceTaken } from "./officials.ts";
 import { noteBattle, notePeace, noteSiege } from "./achievements.ts";
 import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
 import { heritageFactor } from "./heritage.ts";
@@ -789,6 +789,7 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
   for (const p of ceded) {
     world.provinceOwner[p] = world.provinceOccupier[p]!;
     world.provinceLord[p] = -1;
+    provinceTaken(world, p);
   }
   // Every other occupation between the realms making peace ends.
   const set = new Set(involved);
@@ -831,6 +832,7 @@ export function cedeProvince(world: World, p: number, to: number, news: News[]):
   if (from < 0 || from === to) return;
   world.provinceOwner[p] = to;
   world.provinceLord[p] = -1;
+  provinceTaken(world, p);
   world.provinceOccupier[p] = -1;
   world.provinceHold[p] = 0;
   world.sieges.delete(p);

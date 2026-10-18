@@ -4602,3 +4602,19 @@ small.why {
   font-size: 0.7em;
   font-weight: 400;
 }
+
+/* New land waiting for a decision (PROV-340): its name, then fill, grant or keep royal, wrapping on a narrow panel. */
+.new-lands {
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+.new-land {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 0;
+}
+.new-land > b {
+  flex: 1 1 140px;
+}

@@ -1,5 +1,5 @@
 import { expect } from "vitest";
-import { createWorld, officialEffect as gameOfficialEffect, Rng, yearsServed } from "@ph/engine";
+import { applyNow, cedeProvince, createWorld, newLands, officialEffect as gameOfficialEffect, Rng, yearsServed } from "@ph/engine";
 import { loadDefaultRuleset } from "@ph/rules";
 import * as P from "@ph/engine/domain/province";
 import type { Ground, Province, ClassName, TaxRate, Use, Lord, Official } from "@ph/engine/domain/province";
@@ -3030,4 +3030,25 @@ Then(/^(at most 10 gold|nothing|less than with a free road) reaches the treasury
   if (what === "nothing") expect(got).toBe(0);
   else if (what === "at most 10 gold") expect(got).toBeLessThanOrEqual(10);
   else expect(got).toBeLessThan(P.reachesTreasury(20, { ...s.reach, blockedDays: 0 }));
+});
+
+// Land just taken (PROV-340).
+Given("the player plays the country {string}", (s, c: string) => {
+  s.game = createWorld(loadDefaultRuleset(), 1);
+  s.me = s.game.nationIndex.get(c.toLowerCase())!;
+  s.game.player = s.me;
+});
+When("a neighbour hands the country {string} one of its provinces", (s) => {
+  const w = s.game;
+  s.taken = Array.from({ length: w.provinceCount }, (_, p) => p).find((p) => w.provinceOwner[p] >= 0 && w.provinceOwner[p] !== s.me && w.provinceOfficial[p] >= 0)!;
+  cedeProvince(w, s.taken, s.me, []);
+});
+Then("the province's post stands empty", (s) => {
+  expect(s.game.provinceOfficial[s.taken]).toBe(-1);
+  expect(s.game.provinceLord[s.taken]).toBe(-1);
+});
+Then("End turn waits until the player fills the post, grants it to a lord or keeps it royal", (s) => {
+  expect(newLands(s.game, s.me)).toEqual([s.taken]);
+  expect(applyNow(s.game, { type: "settleLand", province: s.taken }, s.me).rejectedOrders).toEqual([]);
+  expect(newLands(s.game, s.me)).toEqual([]);
 });

@@ -92,17 +92,29 @@ export function officialCard(rules: Ruleset, o: Official | null, nation: number,
  * then every official as a row (portrait, name, post and province, his
  * effect there and his years), each opening his screen, and the empty posts.
  */
-export function officialsTab(rules: Ruleset, list: { province: number; official: Official | null }[], nation: number, lordPosts: number): string {
+export function officialsTab(rules: Ruleset, list: { province: number; official: Official | null }[], nation: number, lordPosts: number, newLands: number[] = []): string {
   const filled = list.filter((x) => x.official).map((x) => x.official!);
   const empty = list.filter((x) => !x.official);
   const types = new Map<string, number>();
   for (const o of filled) types.set(o.post, (types.get(o.post) ?? 0) + 1);
   const missing = OFFICIALS.filter((t) => !types.has(t));
   filled.sort((a, b) => a.post.localeCompare(b.post) || b.years - a.years);
-  return `<p><b>${filled.length}</b> officials run your royal provinces: ${[...types].sort((a, b) => b[1] - a[1]).map(([t, c]) => `${c} ${esc(c === 1 ? t.toLowerCase() : plural(t.toLowerCase()))}`).join(", ")}.${lordPosts ? ` Your lords' own officials run their ${lordPosts} provinces.` : ""}</p>
+  // Land just taken comes first: its official fled or fell with it, and End turn waits for a decision on each (PROV-340).
+  const fresh = newLands.length
+    ? `<section class="new-lands framed-soft"><h3 class="sub">New lands · ${newLands.length}</h3>
+      <p class="hint">Their officials fled or fell. Before the turn ends, fill each post, grant it to a lord, or keep it royal with the post empty.</p>
+      ${newLands
+        .map((p) => `<div class="new-land"><b>${esc(rules.provinces[p]!.name)}</b><span class="post-buttons">
+          <button class="paper small wax" data-official="${p}">Fill the post</button>
+          <button class="paper small" data-show-province="${p}" data-grant-here>Grant to a lord</button>
+          <button class="paper small" data-settle="${p}">Keep it royal</button></span></div>`)
+        .join("")}</section>`
+    : "";
+  const older = empty.filter((x) => !newLands.includes(x.province));
+  return `${fresh}<p><b>${filled.length}</b> officials run your royal provinces: ${[...types].sort((a, b) => b[1] - a[1]).map(([t, c]) => `${c} ${esc(c === 1 ? t.toLowerCase() : plural(t.toLowerCase()))}`).join(", ")}.${lordPosts ? ` Your lords' own officials run their ${lordPosts} provinces.` : ""}</p>
     ${missing.length ? `<p class="hint">No royal post has ${missing.map((t) => `a ${esc(t.toLowerCase())}`).join(", ")}: those come only as foreign specialists.</p>` : ""}
     <p class="hint">Each type helps the province it runs, at half in his first year and in full after 5 years there. Open an official to move him where his type helps most.</p>
-    ${empty.length ? `<h3 class="sub">Empty posts · ${empty.length}</h3><p class="hint">Half tax and recruits until an official is moved in or hired. Tap one to fill it.</p><p class="post-buttons">${empty.map((x) => `<button class="paper small" data-official="${x.province}">${esc(rules.provinces[x.province]!.name)}</button>`).join(" ")}</p>` : ""}
+    ${older.length ? `<h3 class="sub">Empty posts · ${older.length}</h3><p class="hint">Half tax and recruits until an official is moved in or hired. Tap one to fill it.</p><p class="post-buttons">${older.map((x) => `<button class="paper small" data-official="${x.province}">${esc(rules.provinces[x.province]!.name)}</button>`).join(" ")}</p>` : ""}
     <h3 class="sub">In post · ${filled.length}</h3>
     <div class="lord-list">${filled
       .map((o) => {

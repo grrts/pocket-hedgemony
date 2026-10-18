@@ -336,6 +336,10 @@ settlement, settlers, local people's tiles.
 - PROV-338: Overview: the Officials tab of the country card counts the realm's officials by type and the empty posts, so a realm missing a type or with posts standing empty sees it at a glance. [X-19; PROV-308]
 - PROV-339: Phone: the post's screen fits the side panel in landscape in the Wide and Tall layouts and the bottom sheet in portrait; each type row and button is at least 44 points tall and spells out its effect, so nothing needs hover. [X-19; PROV-309]
 
+#### Land just taken and a lord's land (feedback 120 and 121, 18 October 2026)
+- PROV-340: When a realm takes a province, by peace or handed over, the province's official shall be lost with it (fled or killed, PROV-194): its post stands empty and it is royal land. Until the player decides for each such province (fill the post, grant it to a lord, or keep it royal with the post empty), End turn shall open the Officials tab, which lists them first under "New lands" with those three buttons. [feedback 121; PROV-194, PROV-303]
+- PROV-341: In a lord's province the player shall not call levies (its men answer the lord's call for his retinue) nor change its tiles (he decides on his land); he may set its tax, at the loyalty cost of REALM-187, and pay for a building there, which becomes the lord's and wins him a step as a gift of gold (PROV-206). The governance card says so in one line. [feedback 120; PROV-202, PROV-206, REALM-187]
+
 ### Land in the game (feedback 80 and 87, 17 October 2026)
 - PROV-310: Until the land's tile changes are played, each province shall lay out its 4 to 16 tiles from the map: the count from its size (the smallest 4, the largest 16, on a log scale between the 5th and 95th percentile of province sizes), one Town tile, 1 to 3 Shore tiles on a coast (more with more seafolk), and the rest shared out by the share of each use in the ground of the map squares under it. [PROV-010, PROV-011, PROV-018, D-PROV-25]
 - PROV-311: A land building shall stand in the province, take one of its building slots like every other building, and work all the province's tiles of its use: a farm the fields, a ranch the pasture, a fishery the shore, a lumber camp the woods, a quarry rocky waste. Each such tile holds the building's job slots (times the slot scale), and the building needs at least one tile of its use. [Leroy 17 Oct; D-PROV-25]
@@ -837,6 +841,8 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-309 | — | Presentation only: checked on phone screenshots in landscape |
 | PROV-333, 335 | officials.feature | Hiring an official for an empty post; A type no one serves in comes only from abroad |
 | PROV-334 | officials.feature | A foreign specialist costs more |
+| PROV-340 | officials.feature | A province just taken waits for a decision |
+| PROV-341 | — | Engine: packages/engine/test/officials.test.ts (no levy in a lord's land); presentation: the governance card |
 | PROV-336–339 | — | Presentation: apps/client/src/ui/people.ts post screen, checked on phone screenshots in landscape and portrait |
 | PROV-310 … PROV-313 | — | Engine: packages/engine/test/works.test.ts (tiles, farms on fields, 1444 food) |
 | PROV-314 … PROV-316 | — | Presentation: apps/client/scripts/land-shots.mjs on phones in landscape |

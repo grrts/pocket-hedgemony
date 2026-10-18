@@ -355,6 +355,12 @@ document.addEventListener("click", (e) => {
     renderPanel();
   });
 });
+// New land kept as royal land with its post empty (PROV-340).
+document.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-settle]");
+  if (!b) return;
+  void act({ type: "settleLand", province: Number(b.dataset.settle) }).then(() => renderPanel());
+});
 // A province button in the people screens shows it on the map and opens its overview.
 document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLElement>("[data-show-province]");
@@ -362,7 +368,8 @@ document.addEventListener("click", (e) => {
   const i = Number(b.dataset.showProvince);
   officialView = -1;
   lordView = -1;
-  grantOpen = false;
+  // From new land's "Grant to a lord", the overview opens with the lords to grant it to.
+  grantOpen = b.hasAttribute("data-grant-here");
   panel.scrollTop = 0;
   realmView = -1;
   newsView = false;
@@ -3301,8 +3308,10 @@ function renderGarrison(pi: number): void {
   const queued = gather ? Math.ceil(gather.men / 1000) : 0;
   const max = rules.defines.recruit.queueMax;
   const gw = rules.defines.recruit.gatherWeeks;
+  const lordHere = s.provinceLord[pi]!;
   const why =
-    queued >= max ? `The queue is full: at most ${max} thousands wait here`
+    lordHere >= 0 ? `${s.lords[lordHere]!.name}'s land: its men answer his call, not yours`
+    : queued >= max ? `The queue is full: at most ${max} thousands wait here`
     : left < 1000 ? "Fewer than a thousand men left to call: the pool refills a quarter of the way each year"
     : capLeft < 1000 ? "Over your troop cap"
     : levyMoney > s.nationTreasury[me]! ? "Not enough gold"
@@ -3318,7 +3327,7 @@ function renderGarrison(pi: number): void {
     ${provinceTabs()}
     <h3 class="sub">Recruit</h3>
     <p>${fmt(left)} of ${fmt(ceiling)} men here can be called. Each thousand takes ${weeks(gw)} to gather, one after another.</p>
-    <div class="choices"><button class="paper" data-recruit="1" ${why ? "disabled" : ""} title="${why || `Gathered in ${weeks(queued ? gather!.weeksAll + gw : gw)}`}">Recruit ${fmt(1000)} men · ${levyMoney.toFixed(2)} gold</button></div>
+    <div class="choices"><button class="paper" data-recruit="1" ${why ? "disabled" : ""} title="${why || `Gathered in ${weeks(queued ? gather!.weeksAll + gw : gw)}`}">Recruit ${fmt(1000)} men · ${levyMoney.toFixed(2)} gold</button></div>${why ? `<p class="hint">${esc(why)}.</p>` : ""}
     ${why ? `<p class="hint">${why}.</p>` : ""}
     <div class="queue-head"><span>Queue</span><span>${queued} / ${max}</span></div>
     ${queued ? `<ol class="queue">${rows}</ol>` : `<p class="hint">Nobody is gathering here.</p>`}
@@ -4037,7 +4046,7 @@ function renderRealm(r: number): void {
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
-    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length)
+    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [])
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
@@ -4634,6 +4643,18 @@ async function endTurn(): Promise<void> {
   // So does a revolution waiting on the player's stance (REVO-091).
   if (snapshot.revolution?.outbreak) {
     renderRevolutionCard();
+    return;
+  }
+  // And land just taken, until each has a decision: its Officials tab lists it first (PROV-340).
+  if (!playing && snapshot.newLands?.length) {
+    officialView = -1;
+    lordView = -1;
+    newsView = false;
+    achView = false;
+    realmView = snapshot.playerNation;
+    realmTab = "officials";
+    panelCollapsed = false;
+    renderPanel();
     return;
   }
   if (playing) {

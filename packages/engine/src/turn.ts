@@ -18,8 +18,8 @@ import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRout
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
-import { hireOfficial, swapOfficials } from "./officials.ts";
-import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
+import { hireOfficial, settleLand, swapOfficials } from "./officials.ts";
+import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
@@ -109,6 +109,8 @@ export type Order =
   | { type: "swapOfficials"; a: number; b: number }
   /** Hire an official of a type (an OFFICIALS index) into an empty royal post; a foreign specialist costs more (HireOfficial). */
   | { type: "hireOfficial"; province: number; official: number; foreign: boolean }
+  /** Keep a province just taken as royal land with its post empty for now (SettleLand, PROV-340). */
+  | { type: "settleLand"; province: number }
   /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
   | { type: "setStudy"; invention: string }
   | { type: "setSeats"; n: number }
@@ -344,6 +346,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
+    case "settleLand":
+      return settleLand(world, actingNation, order.province);
     case "hireOfficial": {
       const reason = hireOfficial(world, actingNation, order.province, order.official, !!order.foreign, news);
       if (!reason) runLedger(world, false);
@@ -362,6 +366,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "build": {
       const reason = orderWork(world, actingNation, order.province, order.work, news);
+      if (!reason) lordGetsBuilding(world, order.province, news);
       if (!reason) runLedger(world, false);
       return reason;
     }

@@ -93,6 +93,8 @@ export function createRecruitState(P: number, N: number) {
     provinceOfficialSince: new Int32Array(P),
     /** Realm a foreign specialist came from, -1 = one of the realm's own (PROV-334). */
     provinceOfficialFrom: new Int16Array(P).fill(-1),
+    /** New land waiting for its owner's decision (officials.ts provinceTaken). */
+    provinceNewLand: new Uint8Array(P),
     /** Province each commander was commissioned from, -1 = none. */
     commanderHome: [] as number[],
     /** Name seed of each commander commissioned from an official (-1 = none), so he goes back to a post as himself. */
@@ -352,6 +354,8 @@ export function canCall(world: World, n: number): number {
 export function recruit(world: World, n: number, p: number, thousands: number, news: News[]): string | null {
   const where = callingPlace(world, n, p);
   if (where) return where;
+  // A lord's men answer his call for his retinue, not the crown's levy (RECR Levy: royal provinces).
+  if (world.provinceLord[p]! >= 0) return `${provinceName(world, p)} is ${world.lords[world.provinceLord[p]!]!.name}'s land: its men answer his call, not yours`;
   const men = Math.round(thousands) * 1000;
   if (men <= 0) return "no men asked for";
   const queued = world.musters.find((m) => m.nation === n && m.province === p);

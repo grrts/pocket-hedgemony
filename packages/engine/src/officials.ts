@@ -200,3 +200,32 @@ export function hireOfficial(world: World, n: number, p: number, type: number, f
   }
   return null;
 }
+
+/**
+ * A province a realm has just taken, by peace or handed over: its official
+ * fled or fell with it (PROV-194), so its post stands empty. The player's
+ * new land waits for him to fill the post, grant it as a fief, or keep it
+ * as royal land with the post empty before the turn ends (PROV-340).
+ */
+export function provinceTaken(world: World, p: number): void {
+  world.provinceOfficial[p] = -1;
+  world.provinceOfficialFrom[p] = -1;
+  world.provinceOfficialSince[p] = world.day;
+  world.provinceNewLand[p] = world.provinceOwner[p] === world.player ? 1 : 0;
+}
+
+/** The realm's new land still waiting for a decision (PROV-340): its post empty and no lord granted it. */
+export function newLands(world: World, n: number): number[] {
+  const out: number[] = [];
+  for (let p = 0; p < world.provinceCount; p++) {
+    if (world.provinceNewLand[p] && world.provinceOwner[p] === n && world.provinceOfficial[p]! < 0 && world.provinceLord[p]! < 0) out.push(p);
+  }
+  return out;
+}
+
+/** Keeps new land as royal land with its post empty for now (SettleLand, PROV-340). */
+export function settleLand(world: World, n: number, p: number): string | null {
+  if (!Number.isInteger(p) || p < 0 || p >= world.provinceCount || world.provinceOwner[p] !== n) return "not your province";
+  world.provinceNewLand[p] = 0;
+  return null;
+}
