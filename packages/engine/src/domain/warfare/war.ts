@@ -59,12 +59,14 @@ export interface LordVoiceState {
   warlike?: boolean;
   aimIsWant?: boolean;
   moreVictories?: boolean;
+  /** Tired of a long war: not Warlike, the aim not his Want, the war past `peace.long_war_years` (WAR-223). */
+  tired?: boolean;
 }
 
-/** A lord's voices: one per province; peace when hurt or unsure, war when Warlike, his Want, or loyal and winning (WAR-180). */
+/** A lord's voices: one per province; peace when hurt, unsure or tired of a long war, war when Warlike, his Want, or loyal and winning (WAR-180, WAR-223). */
 export function lordVoice(l: LordVoiceState): { voices: number; says: Voice } {
   let says: Voice = "none";
-  if (l.anyOccupied || l.retinueHalfLost || l.loyalty === "Wavering" || l.loyalty === "Disloyal" || l.landsHungry) says = "peace";
+  if (l.tired || l.anyOccupied || l.retinueHalfLost || l.loyalty === "Wavering" || l.loyalty === "Disloyal" || l.landsHungry) says = "peace";
   else if (l.warlike || l.aimIsWant || (l.loyalty === "Loyal" && l.moreVictories)) says = "war";
   return { voices: l.provinces, says };
 }
@@ -106,6 +108,17 @@ export function countVoices(o: { lords: LordVoiceState[]; regent?: LordVoiceStat
   const peace = tally.peace * (o.warlikeRuler ? 1 - W.peace.warlike_ignore : 1);
   return { ...tally, total, peaceShare: total > 0 ? peace / total : 0 };
 }
+
+/** A lord of a war leader tires of a war that has lasted `peace.long_war_years`, unless he is Warlike or the aim is his Want (WAR-223). */
+export const tiredOfWar = (months: number, l: { warlike?: boolean; aimIsWant?: boolean }): boolean => months >= W.peace.long_war_years * 12 && !l.warlike && !l.aimIsWant;
+
+/** The most provinces one peace may cede: `peace.max_ceded_share` of the loser's, rounded up (WAR-227). */
+export function maxCeded(provinces: number): { max: number; of: number } {
+  return { max: provinces <= 0 ? 0 : Math.max(1, Math.ceil(provinces * W.peace.max_ceded_share - 1e-9)), of: provinces };
+}
+
+/** A peace cedes the loser's capital only when it is the loser's last province (WAR-227). */
+export const capitalMayBeCeded = (provinces: number): boolean => provinces <= 1;
 
 /** A Warlike ruler ignores a quarter of the peace voices (WAR-180). */
 export const warlikeShare = (share: number): number => share * (1 - W.peace.warlike_ignore);

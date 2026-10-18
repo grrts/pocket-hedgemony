@@ -161,6 +161,10 @@ export interface DiplomacyConfig {
     gift_first_if_total_at_least: number;
     posture: Record<string, Record<string, number | boolean>>;
     negotiation: Record<string, number>;
+    /** Notoriety points per reason point in counts made with or against the notorious country (DIPL-223). */
+    notoriety_per_reason: number;
+    /** Notoriety from which an AI that is not Warlike or a hegemon seeker declares no war (WAR-228, provisional). */
+    notoriety_restraint: number;
   };
   event_tree_mapping: {
     opinion: { default_fade_years: number };
