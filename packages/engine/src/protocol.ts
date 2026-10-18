@@ -4,6 +4,7 @@ import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, type GovernmentView } from "./government.ts";
+import { rebelsView, type RebelsView } from "./rebels.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
@@ -166,6 +167,10 @@ export interface Snapshot {
   stability: Stability | null;
   /** The player's Government tab: form, both caps, the form's laws and the next forms (GOV-064); null before a realm is chosen. */
   government: GovernmentView | null;
+  /** Risings in every realm (the player's with their card and answers), the player's beaten risings waiting for a verdict, and each plotting province's monthly chance to rise (REBL-063). */
+  rebels: RebelsView;
+  /** Rising holding each province (its id), 0 = none. */
+  provinceRebels: Int32Array;
   /** Every realm's government form by name, for its card. */
   realmForms: string[];
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
@@ -388,6 +393,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       giftGold: giftGold(w),
       stability: player >= 0 ? stabilityOf(w, player) : null,
       government: player >= 0 ? governmentView(w, player) : null,
+      rebels: rebelsView(w),
+      provinceRebels: w.provinceRebels.slice(),
       realmForms: realmForms(w),
       peoples: peoplesSnapshot(w),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
@@ -477,6 +484,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceRing,
       snap.provinceGrievances,
       snap.provinceMood,
+      snap.provinceRebels,
+      snap.rebels.chance,
       snap.provinceLord,
       snap.provinceWorks,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
