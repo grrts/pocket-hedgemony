@@ -7,7 +7,8 @@ import { moodShare } from "./moods.ts";
 import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 import { officialBonus } from "./officials.ts";
 import { schoolUpkeepMonthly } from "./research.ts";
-import { provinceUpkeep, worksTrade } from "./works.ts";
+import { provinceUpkeep } from "./works.ts";
+import { tradeLine, tradeTaxFactor } from "./trade.ts";
 import { subjectPayments } from "./subjects.ts";
 
 /**
@@ -86,15 +87,8 @@ export function provinceTax(world: World, p: number, holder: number, share = cro
   const { economy } = world.rules.defines;
   // A tax collector brings more of it in (province officials table: +20 % reaching you).
   const collector = officialBonus(world, p, "Tax collector", "tax_reach");
-  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector;
-}
-
-/** Trade and market gold a province gives its holder in a month (not taxed by rate). */
-export function provinceTrade(world: World, p: number, share = crownTake(world, p)): number {
-  // A customs officer raises what trade brings (province officials table: +15 %).
-  const customs = officialBonus(world, p, "Customs officer", "trade_ratio_gain");
-  // Markets, harbours and roads bring more (works).
-  return world.provinceWealth[p]! * world.rules.defines.economy.goldPerWealthPerMonth * share * customs * worksTrade(world, p);
+  // A busy province owes more: 1 % for every 4 points of its trade ratio (TRADE-088).
+  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * tradeTaxFactor(world, p);
 }
 
 /** Monthly interest on a realm's debt (REALM-164: 10 % a year). */
@@ -126,8 +120,9 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
     if (holder < 0 || (only >= 0 && holder !== only)) continue;
     const share = crownTake(world, p);
     L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + provinceTax(world, p, holder, share);
-    L[holder * LEDGER_LINES + TRADE] = L[holder * LEDGER_LINES + TRADE]! + provinceTrade(world, p, share);
   }
+  // Trade is what each realm's traders deposited last month, with market fees paid to it, less their upkeep (TRADE-064).
+  for (let n = 0; n < world.nationCount; n++) if (only < 0 || n === only) L[n * LEDGER_LINES + TRADE] = tradeLine(world, n);
   // Each subject sends its overlord its kind's share, by tribute level and loyalty: a Vassal of its taxes, the rest of tax and trade (SUBJ-005).
   for (const [payer, receiver, share, taxOnly] of subjectPayments(world)) {
     if (only >= 0 && payer !== only && receiver !== only) continue;

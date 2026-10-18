@@ -3,6 +3,7 @@ import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, type GovernmentView } from "./government.ts";
+import { kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
@@ -163,6 +164,19 @@ export interface Snapshot {
   government: GovernmentView | null;
   /** Every realm's government form by name, for its card. */
   realmForms: string[];
+  /** The player's Trade tab: last month's trade, its traders, where it can found more, its busiest cities and the route being drawn (TRADE-130 to TRADE-140); null before a realm is chosen. */
+  trade: TradeView | null;
+  /** The kinds of trader, with their gold, upkeep, hold, purse and crew. */
+  traderKinds: KindRow[];
+  /** Every province's trade value (gold a month), trade ratio (0 to 100), traders passing last month, and whether it is a trade stop (bit 1 city, bit 2 port). */
+  provinceTradeValue: Float32Array;
+  provinceTradeRatio: Uint8Array;
+  provinceTradePassing: Uint8Array;
+  provinceTradeCity: Uint8Array;
+  /** Provinces whose trade the player sees: its own and those on its traders' loops (D-TRADE-13). */
+  provinceTradeSeen: Uint8Array;
+  /** What each province the player sees trades: its goods, most gold first, with loads a year and gold a month. */
+  provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
   musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
   /** The player's free companies on their way to the capital. */
@@ -379,6 +393,18 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       stability: player >= 0 ? stabilityOf(w, player) : null,
       government: player >= 0 ? governmentView(w, player) : null,
       realmForms: realmForms(w),
+      trade: player >= 0 ? tradeView(w, player) : null,
+      traderKinds: TRADER_KINDS.map((k) => kindRow(w, k)),
+      provinceTradeValue: Float32Array.from({ length: w.provinceCount }, (_, p) => tradeValueAt(w, p)),
+      provinceTradeRatio: Uint8Array.from(w.provinceTradeRatio, (r) => Math.round(r)),
+      provinceTradePassing: Uint8Array.from(w.provincePassed, (x) => Math.min(255, Math.round(x))),
+      provinceTradeCity: w.provinceTradeCity.slice(),
+      ...(() => {
+        const seen = tradeSeen(w, player);
+        const goods: Snapshot["provinceGoods"] = {};
+        for (let p = 0; p < w.provinceCount; p++) if (seen[p] && !w.provinceWater[p]) goods[p] = w.provinceGoods[p]!.map((g) => ({ ...g }));
+        return { provinceTradeSeen: seen, provinceGoods: goods };
+      })(),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
@@ -466,6 +492,11 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceMood,
       snap.provinceLord,
       snap.provinceWorks,
+      snap.provinceTradeValue,
+      snap.provinceTradeRatio,
+      snap.provinceTradePassing,
+      snap.provinceTradeCity,
+      snap.provinceTradeSeen,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
       ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);

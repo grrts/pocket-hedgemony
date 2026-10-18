@@ -9,6 +9,7 @@ import { subjectAction } from "./subjects.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { monthlyGovernment, reform } from "./government.ts";
+import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameRouteMode, type GameTraderKind } from "./trade.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
@@ -120,6 +121,11 @@ export type Order =
   | { type: "stopChange"; province: number }
   /** Reform the government into one of its next forms (GOV-027). */
   | { type: "reform"; to: string }
+  /** Found a trader in an own city (TRADE-003), set its route of 2 to 8 cities (TRADE-050), draw one for its preview (TRADE-054), or dismiss it (TRADE-006). */
+  | { type: "foundTrader"; city: number; kind: GameTraderKind }
+  | { type: "setTradeRoute"; trader: number; stops: number[]; mode?: GameRouteMode }
+  | { type: "draftTradeRoute"; trader: number; stops: number[] }
+  | { type: "dismissTrader"; trader: number }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
   | { type: "foodPreset"; name: string };
@@ -196,6 +202,7 @@ function startDay(world: World, news: News[]): void {
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
     monthlyResearch(world, news);
+    monthlyTrade(world, news);
     runLedger(world, true);
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
@@ -322,6 +329,14 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return stopChange(world, actingNation, order.province);
     case "reform":
       return reform(world, actingNation, order.to, news);
+    case "foundTrader":
+      return foundTrader(world, actingNation, order.city, order.kind);
+    case "setTradeRoute":
+      return setTradeRoute(world, actingNation, order.trader, order.stops, order.mode);
+    case "draftTradeRoute":
+      return draftTradeRoute(world, actingNation, order.trader, order.stops);
+    case "dismissTrader":
+      return dismissTrader(world, actingNation, order.trader);
     case "sendEnvoy": {
       syncCountries(world);
       const reason = sendEnvoy(world, actingNation, order.target, order.action);

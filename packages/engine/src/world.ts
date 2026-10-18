@@ -22,6 +22,7 @@ import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
+import { createTradeState, seedTrade, type TradeState } from "./trade.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 
 /**
@@ -30,7 +31,7 @@ import { adminCapacityRank } from "./realmStrengths.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, TradeState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -407,6 +408,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createConversionState(P),
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
+    ...createTradeState(P, N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -445,6 +447,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     }
   });
   seedResearch(world);
+  seedTrade(world);
   recount(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
