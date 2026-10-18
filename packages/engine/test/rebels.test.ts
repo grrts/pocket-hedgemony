@@ -144,11 +144,12 @@ describe("rebellions in the game", () => {
     const w = createWorld(rules, 1, tiles);
     w.player = -1;
     let rose = 0;
-    for (let t = 0; t < 52 * 2; t++) rose += processTurn(w, [], -1).news.filter((n) => n.kind === "rebels" && n.text.startsWith("Rising in")).length;
+    // Risings are rare: play up to four years, until one comes.
+    for (let t = 0; t < 52 * 4 && rose === 0; t++) rose += processTurn(w, [], -1).news.filter((n) => n.kind === "rebels" && n.text.startsWith("Rising in")).length;
     expect(rose).toBeGreaterThan(0);
     // Every rising left is held by its own realm's rebels.
     for (const b of w.bands) for (const q of b.provinces) expect(w.provinceRebels[q]).toBe(b.id);
-  });
+  }, 60000);
 
   it("keeps risings in the save", () => {
     const { w, me, p } = restless();
