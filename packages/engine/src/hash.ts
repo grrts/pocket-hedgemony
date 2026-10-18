@@ -25,6 +25,8 @@ export function hashWorld(world: World): string {
   feed(world.provinceOccupier);
   feed(world.provinceGarrison);
   feed(world.nationTreasury);
+  // Who sleeps (SETUP-082).
+  feed(world.nationAsleep);
   feed(world.nationLevies);
   feed(world.provinceRecruits);
   feed(world.provincePopulation);
