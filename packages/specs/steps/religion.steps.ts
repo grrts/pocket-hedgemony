@@ -1301,6 +1301,9 @@ Then("the rebels accept", (s) => {
 });
 Given(/^the country "([^"]+)" is (\w+)$/, (s, name: string, faith: string) => {
   realm(s, name, faith);
+  // The heads of the faith steps read it too (faith-heads.steps.ts); "censured" there is a state, not a faith.
+  (s.fhFaiths ??= {})[name] = faith;
+  s.fhMe ??= name;
 });
 When(
   /^(its neighbour persecutes protestants in a province bordering Brandenburg|its preacher is killed in a foreign realm|a protestant holy place is held by another faith)$/,

@@ -3,9 +3,13 @@
 //
 //   pnpm --filter @ph/sim campaign [--years 50] [--seeds 1,2,3] [--map real|synthetic] [--jobs 4] [--out DIR]
 //   pnpm --filter @ph/sim breaker  (--realms france,castile | --all) [--years 50] [--seed 1] [--map real] [--jobs 4] [--out DIR]
+//   pnpm --filter @ph/sim strategies [--years 50] [--seeds 1,2,3] [--probes france,mali] [--strategies conqueror,builder,diplomat,court]
+//                                    [--sweep [--levers a.b,c.d | provisional]] [--map real|synthetic] [--jobs 4] [--out DIR]
 //
 // Each run writes report.md (read this first), summary.json and one JSON
-// file per campaign or realm into DIR (default packages/sim/out/<time>-<command>).
+// file per campaign, realm or balance run into DIR (default packages/sim/out/<time>-<command>).
+// The strategy runs (the balance model, domain/balance) add metrics.csv and
+// world.csv and exit with code 1 when a check fails or a run broke (BAL-027).
 import { mkdirSync, writeFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 import { join } from "node:path";
@@ -13,7 +17,13 @@ import { parseArgs } from "node:util";
 import type { BreakerResult } from "./breaker.ts";
 import type { CampaignResult } from "./campaign.ts";
 import { simConfig } from "./config.ts";
-import { runJobs, type Job } from "./jobs.ts";
+import { assembleRunSet, checkFindings, flagLevers, leverHints, leverRun, pickProbes, planRunSet, runChecks, type ProbeRealm, type RunSetPlan } from "./balance.ts";
+import { metricsCsv, strategyReport, worldCsv, type SweepSummary } from "./balanceReport.ts";
+import type { Finding } from "./findings.ts";
+import { runJobs, type Job, type JobResult } from "./jobs.ts";
+import { leverExists, sweepLevers, type Lever } from "./levers.ts";
+import type { ProbeResult } from "./probe.ts";
+import { STRATEGIES, type StrategyName } from "./strategies.ts";
 import { markdownReport } from "./report.ts";
 import { rulesFor, type MapKind } from "./world.ts";
 
@@ -30,11 +40,15 @@ const { values: a } = parseArgs({
     realms: { type: "string" },
     all: { type: "boolean" },
     "no-baseline": { type: "boolean" },
+    probes: { type: "string" },
+    strategies: { type: "string" },
+    sweep: { type: "boolean" },
+    levers: { type: "string" },
   },
 });
 
 const config = simConfig();
-const years = Number(a.years ?? config.run.years);
+const years = Number(a.years ?? (command === "strategies" ? config.balance.years : config.run.years));
 const map = (a.map ?? config.run.map) as MapKind;
 const threads = Number(a.jobs ?? Math.max(1, Math.min(4, availableParallelism() - 1)));
 if (map !== "real" && map !== "synthetic") fail(`--map is real or synthetic, not ${map}`);
@@ -45,7 +59,8 @@ const out = a.out ?? join(new URL("..", import.meta.url).pathname, "out", `${sta
 
 if (command === "campaign") await campaigns();
 else if (command === "breaker") await breakers();
-else fail("usage: cli.ts campaign|breaker [options]; see the top of src/cli.ts");
+else if (command === "strategies") await strategies();
+else fail("usage: cli.ts campaign|breaker|strategies [options]; see the top of src/cli.ts");
 
 async function campaigns(): Promise<void> {
   const seeds = (a.seeds ?? config.run.seeds.join(",")).split(",").map(Number);
@@ -73,8 +88,63 @@ async function breakers(): Promise<void> {
   write(`The bot against the game, ${years} years`, baseline ? [baseline] : [], results);
 }
 
-function progress(r: CampaignResult | BreakerResult, left: number): void {
-  const what = r.kind === "campaign" ? `campaign seed ${r.seed}` : `bot as ${r.realm}`;
+async function strategies(): Promise<void> {
+  const bc = config.balance;
+  const seeds = (a.seeds ?? bc.seeds.join(",")).split(",").map(Number);
+  const names = (a.strategies ?? bc.strategies.join(",")).split(",").filter(Boolean) as StrategyName[];
+  for (const s of names) if (!STRATEGIES.includes(s)) fail(`unknown strategy ${s}; strategies are ${STRATEGIES.join(", ")}`);
+  const rules = rulesFor(map);
+  let probes: ProbeRealm[] = [];
+  try {
+    probes = pickProbes(rules, map, bc, a.probes ? a.probes.split(",").filter(Boolean) : undefined);
+  } catch (e) {
+    fail(e instanceof Error ? e.message : String(e));
+  }
+  const plan: RunSetPlan = { map, years, seeds, probes, strategies: names };
+  const jobs: Job[] = planRunSet(plan, config).map((options) => ({ kind: "probe", options }));
+  const levers: Lever[] = [];
+  const missing: string[] = [];
+  if (a.sweep) {
+    for (const path of sweepLevers(a.levers ?? (bc.sweep.levers as string | string[]))) {
+      if (!leverExists(path, rules)) missing.push(path);
+      else for (const factor of bc.sweep.factors) levers.push({ path, factor });
+    }
+    for (const lever of levers) jobs.push(...planRunSet(plan, config, lever).map((options): Job => ({ kind: "probe", options })));
+  }
+  console.log(`${jobs.length} balance run(s) of ${years} years on the ${map} map (probes ${probes.map((p) => `${p.realm} ${p.band}`).join(", ")}${levers.length ? `; ${levers.length / bc.sweep.factors.length} lever(s) swept` : ""}), ${threads} at a time → ${out}`);
+  const results = (await runJobs(jobs, threads, progress)) as ProbeResult[];
+  const base = assembleRunSet(plan, results);
+  const checks = runChecks(base, bc);
+  let sweep: SweepSummary | null = null;
+  if (a.sweep) {
+    const runs = levers.map((l) => leverRun(base, assembleRunSet(plan, results, l), bc));
+    sweep = { runs, flags: flagLevers(runs, bc.sweep), missing };
+  }
+  const hints = leverHints(checks, sweep?.runs ?? [], sweep?.flags ?? [], bc.check_levers as Record<string, string>);
+  const endYear = Math.max(...base.runs.map((r) => r.recording.world.at(-1)?.year ?? 0));
+  const findings: Finding[] = [...results.flatMap((r) => r.findings), ...checkFindings(checks, endYear, hints), ...(sweep?.flags ?? []).filter((f) => f.kind !== "missing").map((f): Finding => ({ severity: "note", kind: `lever_${f.kind}`, year: endYear, text: f.text }))];
+  mkdirSync(out, { recursive: true });
+  for (const r of base.runs) {
+    const { recording, ...rest } = r;
+    const probeIds = new Set(r.strategy === "court" ? probes.map((p) => p.realm) : [r.realm]);
+    writeFileSync(join(out, `run-${r.strategy}${r.realm ? `-${r.realm}` : ""}-seed-${r.seed}.json`), JSON.stringify({ ...rest, recording: { ...recording, realms: recording.realms.filter((x) => probeIds.has(x.realm)), returns: Object.fromEntries(Object.entries(recording.returns).filter(([k]) => probeIds.has(k))) } }));
+  }
+  writeFileSync(join(out, "metrics.csv"), metricsCsv([base]));
+  writeFileSync(join(out, "world.csv"), worldCsv([base]));
+  const title = `Strategy runs, ${years} years`;
+  writeFileSync(join(out, "summary.json"), JSON.stringify({ title, map, years, seeds, probes, strategies: names, checks, levers: sweep, hints, findings }, null, 2));
+  writeFileSync(join(out, "report.md"), strategyReport(title, base, checks, hints, findings, sweep));
+  console.log(`Report: ${join(out, "report.md")}`);
+  const failed = checks.filter((c) => c.verdict === "fail").map((c) => c.id);
+  const broken = findings.filter((f) => f.severity === "broken").length;
+  if (failed.length || broken) {
+    console.log(`${failed.length ? `Failed: ${failed.join(", ")}` : ""}${failed.length && broken ? "; " : ""}${broken ? `${broken} broken run finding(s)` : ""}.`);
+    process.exitCode = 1;
+  }
+}
+
+function progress(r: JobResult, left: number): void {
+  const what = r.kind === "campaign" ? `campaign seed ${r.seed}` : r.kind === "breaker" ? `bot as ${r.realm}` : `${r.strategy}${r.realm ? ` as ${r.realm}` : ""} seed ${r.seed}${r.lever ? ` (${r.lever.path} × ${r.lever.factor})` : ""}`;
   const broken = r.findings.filter((f) => f.severity === "broken").length;
   console.log(`  ${what}: ${r.weeks} weeks in ${Math.round(r.seconds)} s, ${r.findings.length} finding(s)${broken ? `, ${broken} broken` : ""}; ${left} left`);
 }
