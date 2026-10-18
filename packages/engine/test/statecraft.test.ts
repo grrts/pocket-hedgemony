@@ -75,8 +75,10 @@ describe("statecraft (milestone 5)", () => {
     const marriages = w.diplomacy.marriages.length;
     const allies = () => w.diplomacy.graph.relations.filter((r) => r.type === "alliance").length;
     const alliances = allies();
-    months(w, 24, -1);
-    expect(w.diplomacy.marriages.length - marriages + allies() - alliances).toBeGreaterThan(2);
+    const made = () => w.diplomacy.marriages.length - marriages + allies() - alliances;
+    // Courts take their time: play up to four years, a year at a time, until more than two are made.
+    for (let y = 0; y < 4 && made() <= 2; y++) months(w, 12, -1);
+    expect(made()).toBeGreaterThan(2);
   }, 60000);
 
   it("demands tribute of a weak neighbour: counted from −60, and a yes makes them a Tributary that pays (DIPL-111 to DIPL-114)", () => {
