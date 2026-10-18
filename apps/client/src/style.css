@@ -2701,7 +2701,7 @@ button.land-change small {
 
 /* ---- Statecraft on the Diplomacy tab (milestone 5) ---- */
 
-/* The Diplomacy tab, compact (DIPL-221):
+/* The Diplomacy tab, compact (DIPL-227):
  * Every action is a tile in a grid: a 44-point button sized to its words
  * and, under it, one short line on what it does or why not. Two or three
  * tiles sit side by side when the panel is wide, one when it is narrow;

@@ -30,7 +30,7 @@ const MISSIONS: { action: string; label: string; does: (v: StatecraftView) => st
 export const missionName = (action: string): string =>
   ({ propose_alliance: "propose an alliance", arrange_marriage: "arrange a marriage", courtesy_visit: "pay a courtesy visit", send_gift: "bring a gift", demand: "make a demand", offer_overlordship: "offer overlordship", ask_protection: "ask for protection" })[action] ?? action.replace(/_/g, " ");
 
-/** One action as a tile of the Diplomacy tab's grid (DIPL-221): the 44-point button, and under it what it does or why not. */
+/** One action as a tile of the Diplomacy tab's grid (DIPL-227): the 44-point button, and under it what it does or why not. */
 const tile = (button: string, hint: string) => `<div class="mission">${button}<p class="hint">${hint}</p></div>`;
 const why = (w: string) => `${esc(w.charAt(0).toUpperCase() + w.slice(1))}.`;
 

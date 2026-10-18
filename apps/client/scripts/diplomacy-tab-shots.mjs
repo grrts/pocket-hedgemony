@@ -1,4 +1,4 @@
-// The Diplomacy tab (DIPL-202, DIPL-221) as Castile: Portugal's card at peace (standing, envoys, demands), Morocco's at
+// The Diplomacy tab (DIPL-202, DIPL-227) as Castile: Portugal's card at peace (standing, envoys, demands), Morocco's at
 // war (peace terms), and Castile's own overview; on a small and a large phone held sideways and a desktop. Each tab is
 // shot top and scrolled to the bottom.
 // Usage: pnpm build && node scripts/diplomacy-tab-shots.mjs <outDir>
