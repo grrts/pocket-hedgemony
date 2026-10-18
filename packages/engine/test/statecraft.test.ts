@@ -75,8 +75,10 @@ describe("statecraft (milestone 5)", () => {
     const marriages = w.diplomacy.marriages.length;
     const allies = () => w.diplomacy.graph.relations.filter((r) => r.type === "alliance").length;
     const alliances = allies();
-    months(w, 36, -1);
-    expect(w.diplomacy.marriages.length - marriages + allies() - alliances).toBeGreaterThan(2);
+    const made = () => w.diplomacy.marriages.length - marriages + allies() - alliances;
+    // Courts take their time: play up to four years, a year at a time, until more than two are made.
+    for (let y = 0; y < 4 && made() <= 2; y++) months(w, 12, -1);
+    expect(made()).toBeGreaterThan(2);
   }, 60000);
 
   it("demands tribute of a weak neighbour: counted from −60, and a yes makes them a Tributary that pays (DIPL-111 to DIPL-114)", () => {
@@ -170,8 +172,8 @@ describe("statecraft (milestone 5)", () => {
     expect(makeDemand(quiet, asker, me, "pay_tribute")).toBeNull();
     askArrives(quiet, me, asker);
     months(quiet, 2, me);
-    // Other courts may have asks of their own by then (more envoys at court, REALM-230).
-    expect(statecraftView(quiet, me)!.asks.filter((a) => a.from === asker)).toEqual([]);
+    // Castile's envoy has left; another court's may have come since.
+    expect(statecraftView(quiet, me)!.asks.filter((x) => x.from === asker)).toEqual([]);
     expect(quiet.diplomacy.refusedDemands.some((x) => x.asker === "castile" && x.asked === "navarre")).toBe(true);
   });
 

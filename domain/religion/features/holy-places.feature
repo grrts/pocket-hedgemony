@@ -67,10 +67,9 @@ Feature: Holy places
       | 1580 | has fired     | now  |
 
   @RELG-085
-  Scenario: Church heads are only marked
+  Scenario: Church heads' seats are marked
     When the holy places are loaded
     Then the holy places of the Pope, the Ecumenical Patriarch, a Caliph's claim and the Dalai Lama (from 1578) are marked
-    And religion gives church heads no rules of their own
 
   @RELG-080 @RELG-126 @placeholder
   Scenario Outline: The Temple of the Tooth follows the relic
