@@ -537,7 +537,11 @@
     "a palace in a town"
    ],
    "gold": 150,
-   "lords_slip": 2
+   "lords_slip": 2,
+   "helped_by": [
+    "G3",
+    "L7"
+   ]
   },
   {
    "from": "horde",
@@ -1268,8 +1272,8 @@
     "why": "Giray khan with four clan beys"
    },
    "kazan": {
-    "form": "household_realm",
-    "why": "settled khanate with towns and farmland"
+    "form": "horde",
+    "why": "Chinggisid khan with clan beys over a settled Bulgar-Tatar base (GOV-067)"
    },
    "northern_yuan": {
     "form": "horde",
@@ -1330,6 +1334,10 @@
    "aq_qoyunlu": {
     "form": "horde",
     "why": "Turkmen tribal confederation under a ruling clan"
+   },
+   "nogai": {
+    "form": "horde",
+    "why": "Bey-led horde of the Nogai steppe (GOV-067)"
    }
   }
  },
@@ -1360,5 +1368,21 @@
  "ai": {
   "reform_month": 1,
   "reform_gold_reserve_factor": 2
+ },
+ "riders_line": {
+  "$comment": "GOV-077: the horde's edge and its end, on the Government tab of a realm in these forms",
+  "forms": [
+   "horde"
+  ],
+  "fades_against": [
+   {
+    "invention": "W8",
+    "label": "field guns"
+   },
+   {
+    "invention": "W11",
+    "label": "flintlocks"
+   }
+  ]
  }
 }
