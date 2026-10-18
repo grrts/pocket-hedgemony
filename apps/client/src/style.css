@@ -2136,11 +2136,13 @@ small.effect {
   color: #3f6a34;
 }
 
-/* ---- Learning (research RSCH-084 to RSCH-090) ----
- * One tab holds research and schools: an overview card, then the Tree or the
- * Schools. The tree is drawn bough by bough in its own scrolling frame (drag
- * with a finger); every node and button is at least 44 points tall and
- * nothing needs hover.
+/* ---- Research (research RSCH-084 to RSCH-090, RSCH-100 to RSCH-111) ----
+ * One screen: a header with the standing and the Schools button, the study
+ * queue as a strip that scrolls sideways inside itself, jump chips, and the
+ * one tree in its own frame (drag with a finger, pinch for the whole tree)
+ * with the picked invention's sheet beside it (500 px wide or more) or as a
+ * panel sliding up from the bottom (Tall). Every node, chip and button is at
+ * least 44 points; nothing needs hover; the page never scrolls sideways.
  */
 button.learning-line {
   justify-content: flex-start;
@@ -2152,27 +2154,69 @@ button.learning-line {
 button.learning-line.idle {
   color: var(--cloth);
 }
-.study-card {
-  margin: 4px 0 8px;
-  padding: 6px 8px;
-  border: 2px solid var(--outline);
-  background: var(--paper-light);
+.nations .nation-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+  min-width: 0;
 }
-.study-card.idle {
-  border-color: var(--cloth);
+.nations small.starts {
+  font-size: 15px;
+  color: var(--ink-soft);
 }
-.study-card p {
-  margin: 2px 0;
+/* A desktop window: the card widens for the tree, the map still in view at the right. */
+@media (min-width: 900px) and (min-height: 600px) {
+  .panel.research {
+    width: min(1180px, 72vw);
+  }
 }
-.study-card .study-name {
+.learn-screen {
+  container-type: inline-size;
+  /* The tree's pinned parts stack inside the tab, under the card's own pinned header. */
+  isolation: isolate;
+  --lw: 26px;
+  --b1: #5f7f3a;
+  --b2: #a4532a;
+  --b3: #3d5a80;
+  --b4: #2f7f7a;
+  min-width: 0;
+}
+.learn-head {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  margin: 2px 0 4px;
+}
+.learn-head > button {
+  flex: none;
+}
+.learn-standing {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  margin: 0;
+  line-height: 1.1;
+}
+.learn-standing .standing {
+  font-weight: 600;
+}
+.learn-standing button.standing {
+  white-space: normal;
+  text-align: left;
+  color: var(--cloth);
+}
+.learn-standing small {
+  font-size: 16px;
+  color: var(--ink-soft);
 }
 .study-meter {
-  height: 18px;
-  margin: 6px 0 2px;
+  display: block;
+  height: 14px;
+  margin: 4px 0 2px;
   border: 2px solid var(--outline);
   background: var(--paper);
 }
@@ -2185,89 +2229,153 @@ button.learning-line.idle {
   color: var(--cloth);
   font-weight: 600;
 }
-.tabs.boughs .tab {
-  flex: 1 0 120px;
-  max-width: none;
+/* The queue: the study, then the queued chips in order; it scrolls sideways in itself only. */
+.queue-strip {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 2px 0 6px;
+  scrollbar-width: thin;
+}
+.queue-strip > * {
+  flex: none;
+}
+button.q-study {
+  width: 230px;
+  min-height: 44px;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  padding: 0 6px;
+  text-align: left;
+  line-height: 1;
+}
+.q-study .q-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.q-study small {
+  font-size: 15px;
+}
+p.q-study.idle {
+  width: 220px;
+  margin: 0;
+  padding: 2px 8px;
+  border: 2px dashed var(--cloth);
+  line-height: 1.1;
+  font-size: 17px;
+}
+.q-item {
+  display: flex;
+  gap: 4px;
+  align-items: stretch;
+}
+.q-item.on {
+  padding: 2px;
+  margin: -2px 0;
+  background: rgb(168 50 62 / 0.12);
+  outline: 2px solid var(--cloth);
+}
+button.q-chip {
+  min-height: 44px;
+  max-width: 190px;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 2px 8px 2px 4px;
+  text-align: left;
+  line-height: 1;
+  white-space: normal;
+}
+.q-chip > span {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  padding: 4px 8px 2px;
-  line-height: 1;
-  text-align: left;
+  min-width: 0;
 }
-.tabs.boughs .tab b {
+.q-chip b {
   font-weight: 400;
+  overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
-.tabs.boughs .tab small {
+.q-chip small {
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+.q-chip.waiting {
+  outline: 2px dashed var(--cloth);
+  outline-offset: -6px;
+}
+.q-chip.waiting small {
+  color: var(--cloth);
+}
+i.qn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--outline);
+  background: var(--wood);
+  color: var(--paper-light);
+  font: 400 17px/1 var(--body);
+  font-style: normal;
+}
+.q-moves {
+  display: flex;
+  gap: 4px;
+}
+.q-moves button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 6px;
+}
+.q-free {
+  align-self: center;
+  padding: 0 4px;
   font-size: 16px;
-  opacity: 0.85;
+  color: var(--ink-soft);
   white-space: nowrap;
 }
-.tree-part {
-  container-type: inline-size;
+.tree-jumps {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding-bottom: 4px;
+}
+.tree-jumps button {
+  flex: none;
+  min-height: 44px;
+}
+.tree-jumps .zoom {
+  margin-left: auto;
+}
+.tree-jumps .open {
+  border-color: var(--brass);
+}
+.tree-jumps .catch {
+  color: var(--cloth);
 }
 .tree-wrap {
   display: grid;
   gap: 8px;
+  min-width: 0;
 }
-.pick-sheet {
-  padding: 6px 8px;
-  border: 2px solid var(--outline);
-  background: var(--paper-light);
-  line-height: 1.15;
+.tree-col {
+  min-width: 0;
 }
-.pick-sheet.open {
-  border-color: var(--brass);
-  box-shadow: inset 0 0 0 2px var(--brass-light);
-}
-.pick-sheet p {
-  margin: 3px 0;
-}
-.pick-sheet .pick-does {
-  color: var(--ink-soft);
-}
-.pick-sheet .state.known {
-  color: #3f6a34;
-  font-weight: 600;
-}
-.pick-sheet .state.locked {
-  color: var(--ink-soft);
-  font-weight: 600;
-}
-.pick-sheet .needs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 6px;
-  margin: 4px 0;
-}
-.pick-sheet .needs > span {
-  flex-basis: 100%;
-  font-size: 17px;
-  color: var(--ink-soft);
-}
-.pick-sheet .needs small {
-  font-size: 17px;
-}
-.pick-sheet button.need {
-  font-size: 18px;
-}
-.pick-sheet button.need.met {
-  color: #3f6a34;
-}
-.pick-sheet button.need.unmet {
-  color: var(--cloth);
-}
-.pick-sheet .wide-btn {
-  width: 100%;
-  margin-top: 4px;
-}
+/* ---- the tree frame ---- */
 .tree-view {
   position: relative;
   overflow: auto;
-  height: clamp(220px, 62dvh, 640px);
+  height: clamp(220px, calc(100dvh - 150px), 760px);
   border: 2px solid var(--outline);
   background: var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='2' height='2' fill='%2324150c' fill-opacity='.06'/%3E%3C/svg%3E");
   overscroll-behavior: contain;
@@ -2279,31 +2387,99 @@ button.learning-line.idle {
 .tree-eras {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 5;
   height: 30px;
   background: var(--wood-dark);
 }
-.era-band {
+.tree-eras .corner {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: block;
+  width: var(--lw);
+  height: 30px;
+  overflow: hidden;
+  background: var(--outline);
+  color: var(--paper);
+  font: 400 16px/30px var(--body);
+  text-indent: 6px;
+  /* Too narrow for the word in Tall: only the wide column names it. */
+  color: transparent;
+}
+.era-shade {
   position: absolute;
   top: 0;
-  background: rgb(58 36 20 / 0.06);
+  background: rgb(58 36 20 / 0.07);
   pointer-events: none;
 }
 .tree-eras b {
   position: absolute;
   top: 0;
-  min-width: 152px;
-  line-height: 30px;
+  height: 30px;
   font: 400 18px/30px var(--body);
   color: var(--paper);
   white-space: nowrap;
+  border-left: 2px solid rgb(248 236 200 / 0.25);
+}
+/* An era's name stays in view while its columns scroll under the branch column. */
+.tree-eras b span {
+  position: sticky;
+  left: calc(var(--lw) + 4px);
+  padding: 0 8px;
 }
 .tree-eras b.now {
-  color: var(--brass-light);
+  color: var(--outline);
+  background: var(--brass-light);
 }
-.tree-lines {
+/* The branch names pinned at the left edge: names in Wide, a strip of letters in Tall. */
+.tree-bands {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  width: var(--lw);
+}
+.band-name {
   position: absolute;
   left: 0;
+  width: 100%;
+  border-top: 2px solid var(--outline);
+  color: var(--paper-light);
+}
+.band-name span {
+  position: sticky;
+  top: 34px;
+  display: block;
+  padding: 4px;
+  line-height: 1;
+  font-size: 17px;
+}
+.band-name .full {
+  display: none;
+  font-weight: 400;
+}
+.band-name .letter {
+  display: block;
+  text-align: center;
+  font-size: 20px;
+}
+.band-name.b1 { background: var(--b1); }
+.band-name.b2 { background: var(--b2); }
+.band-name.b3 { background: var(--b3); }
+.band-name.b4 { background: var(--b4); }
+.band-tint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  opacity: 0.1;
+  border-top: 2px solid rgb(36 21 12 / 0.4);
+  pointer-events: none;
+}
+.band-tint.b1 { background: var(--b1); }
+.band-tint.b2 { background: var(--b2); }
+.band-tint.b3 { background: var(--b3); }
+.band-tint.b4 { background: var(--b4); }
+.tree-lines {
+  position: absolute;
   top: 0;
   pointer-events: none;
 }
@@ -2317,14 +2493,15 @@ button.learning-line.idle {
   stroke-width: 3;
 }
 .tree-lines path.also {
-  stroke-dasharray: 4 4;
+  stroke-dasharray: 5 4;
 }
-.tree-lines path.near {
+.tree-lines path.path {
   stroke: var(--cloth);
-  stroke-width: 3;
+  stroke-width: 4;
 }
 button.tnode {
   position: absolute;
+  z-index: 1;
   width: 152px;
   height: 44px;
   min-height: 44px;
@@ -2365,26 +2542,128 @@ button.tnode.studying {
   color: var(--outline);
   font-weight: 600;
 }
+button.tnode.queued {
+  border-color: var(--wood);
+  background: #ead39a;
+  box-shadow: inset 0 0 0 2px var(--wood);
+}
 button.tnode.locked {
   background: #d8cbb0;
-  color: rgb(58 36 20 / 0.55);
+  color: rgb(58 36 20 / 0.6);
   border-style: dashed;
 }
-button.tnode.bough {
+button.tnode.path {
+  border: 3px solid var(--cloth);
+  color: var(--ink);
+}
+button.tnode.bough,
+button.tnode.root {
   background: var(--wood);
   color: var(--paper-light);
 }
 button.tnode.focus {
   outline: 3px solid var(--cloth);
+  outline-offset: 2px;
+  z-index: 2;
+}
+/* Whole tree: everything fits the frame, a dot for each invention. */
+.tree-view.whole {
+  overflow: hidden;
+  cursor: zoom-in;
+}
+.whole-eras {
+  position: absolute;
+  top: 0;
+  left: var(--lw);
+  right: 6px;
+  height: 24px;
+  background: var(--wood-dark);
+}
+.whole-eras b {
+  position: absolute;
+  top: 0;
+  overflow: hidden;
+  padding-left: 3px;
+  border-left: 2px solid rgb(248 236 200 / 0.3);
+  font: 400 16px/24px var(--body);
+  color: var(--paper);
+  white-space: nowrap;
+}
+.whole-eras b.now {
+  color: var(--outline);
+  background: var(--brass-light);
+}
+.whole-bands {
+  position: absolute;
+  top: 24px;
+  bottom: 6px;
+  left: 0;
+  width: var(--lw);
+}
+.whole-bands .band-name span {
+  position: static;
+}
+.whole-plot {
+  position: absolute;
+  top: 24px;
+  bottom: 6px;
+  left: var(--lw);
+  right: 6px;
+}
+.whole-plot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.whole-plot path {
+  fill: none;
+  stroke: rgb(58 36 20 / 0.3);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.whole-plot path.path {
+  stroke: var(--cloth);
+  stroke-width: 3;
+}
+.whole-plot .dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border: 1px solid var(--outline);
+  background: #d8cbb0;
+  pointer-events: none;
+}
+.whole-plot .dot.known {
+  background: #7e9a52;
+}
+.whole-plot .dot.open {
+  background: var(--brass-light);
+  border-color: var(--brass);
+  box-shadow: 0 0 0 1px var(--brass);
+}
+.whole-plot .dot.studying {
+  background: var(--brass);
+  border: 2px solid var(--cloth);
+}
+.whole-plot .dot.queued {
+  background: var(--wood);
+}
+.whole-plot .dot.path {
+  border: 2px solid var(--cloth);
+}
+.whole-plot .dot.focus {
+  outline: 2px solid var(--cloth);
   outline-offset: 1px;
-  z-index: 1;
 }
 .tree-key {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 10px;
   margin: 4px 0;
-  font-size: 17px;
+  font-size: 16px;
 }
 .tree-key .k {
   padding: 0 4px;
@@ -2401,19 +2680,200 @@ button.tnode.focus {
   background: var(--brass);
   border-color: var(--cloth);
 }
+.tree-key .queued {
+  background: #ead39a;
+  border-color: var(--wood);
+}
 .tree-key .locked {
   background: #d8cbb0;
   border-style: dashed;
 }
-/* Wide enough (landscape phones, tablets): the sheet beside the tree. */
+.tree-key .path {
+  border: 3px solid var(--cloth);
+}
+/* ---- the sheet ---- */
+.pick-sheet {
+  position: relative;
+  padding: 6px 8px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+  line-height: 1.15;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.pick-sheet.open {
+  border-color: var(--brass);
+  box-shadow: inset 0 0 0 2px var(--brass-light);
+}
+.pick-sheet .sheet-close {
+  float: right;
+  width: 44px;
+  min-height: 44px;
+  margin: -2px -4px 4px 6px;
+  padding: 0;
+}
+.pick-sheet p {
+  margin: 3px 0;
+}
+.pick-sheet .pick-name small {
+  color: var(--ink-soft);
+  font-size: 16px;
+}
+.pick-sheet .pick-does {
+  color: var(--ink-soft);
+}
+.pick-sheet .pick-without {
+  padding: 2px 6px;
+  border-left: 4px solid var(--cloth);
+  background: rgb(168 50 62 / 0.08);
+}
+.pick-sheet .state.known {
+  color: #3f6a34;
+  font-weight: 600;
+}
+.pick-sheet .state.locked {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.pick-sheet .needs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  margin: 4px 0;
+}
+.pick-sheet .needs > span {
+  flex-basis: 100%;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+.pick-sheet .needs small {
+  font-size: 16px;
+}
+.pick-sheet button.need {
+  font-size: 18px;
+}
+.pick-sheet button.need.met {
+  color: #3f6a34;
+}
+.pick-sheet button.need.unmet {
+  color: var(--cloth);
+}
+.pick-sheet button.need.planned {
+  color: var(--wood);
+}
+.path-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.path-steps li {
+  counter-increment: step;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.path-steps li::before {
+  content: counter(step) ".";
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+.path-steps button {
+  gap: 6px;
+  border-color: var(--cloth);
+}
+.path-steps button.last {
+  font-weight: 600;
+}
+.path-steps small {
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+.pick-sheet .wide-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+.pick-sheet .q-moves {
+  margin-top: 4px;
+}
+.pick-sheet .q-moves button {
+  flex: 1;
+}
+.pick-sheet .switch {
+  margin-top: 8px;
+  padding-top: 4px;
+  border-top: 2px dashed rgb(58 36 20 / 0.3);
+}
+/* Tall (under 500 px): the sheet is a panel sliding up from the bottom when something is picked, closed by its ✕. */
+.pick-sheet:not(.picked) {
+  display: none;
+}
+.pick-sheet.picked {
+  position: sticky;
+  bottom: calc(env(safe-area-inset-bottom) + 76px);
+  z-index: 6;
+  max-height: 52dvh;
+  box-shadow: 0 -4px 0 rgb(0 0 0 / 0.25);
+}
+.pick-sheet.slide {
+  animation: sheet-up 0.18s steps(4);
+}
+/* The End turn button stands over the bottom right corner: the sheet's buttons keep clear of it. */
+.pick-sheet.picked .wide-btn,
+.pick-sheet.picked .q-moves {
+  width: calc(100% - 72px);
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(40%);
+    opacity: 0.4;
+  }
+}
+/* Wide enough (landscape phones, tablets, the desktop card): the branch names in a column, the sheet beside the tree. */
 @container (min-width: 500px) {
   .tree-wrap {
-    grid-template-columns: minmax(200px, 36%) 1fr;
+    --lw: 96px;
+  }
+  .band-name .full {
+    display: block;
+  }
+  .tree-eras .corner {
+    color: var(--paper);
+  }
+  .band-name .letter {
+    display: none;
+  }
+  .tree-wrap {
+    grid-template-columns: 1fr minmax(220px, 34%);
     align-items: start;
   }
-  .pick-sheet {
+  .pick-sheet,
+  .pick-sheet:not(.picked) {
+    display: block;
+  }
+  .pick-sheet,
+  .pick-sheet.picked {
     position: sticky;
-    top: 0;
+    top: 40px;
+    bottom: auto;
+    max-height: clamp(220px, calc(100dvh - 150px), 760px);
+    box-shadow: none;
+  }
+  .pick-sheet.slide {
+    animation: none;
+  }
+  .pick-sheet.picked .wide-btn,
+  .pick-sheet.picked .q-moves {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pick-sheet.slide {
+    animation: none;
   }
 }
 .stepper {

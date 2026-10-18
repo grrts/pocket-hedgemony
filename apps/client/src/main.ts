@@ -51,7 +51,7 @@ import { lockRevolutionButtons, revolutionCardHtml, revolutionSection } from "./
 import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
 import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeLine, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
-import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
+import { closeUpPoint, firstShown, jumpTarget, learningLine, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castlesOpen, foodLine, foodTab } from "./ui/food.ts";
@@ -196,7 +196,7 @@ let realmView = -1;
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
 let realmTab: "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies" = "general";
-/** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
+/** What the player left open in the Research tab (tree or Schools, the zoom, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
 let askedStudy = -1;
@@ -2157,10 +2157,11 @@ function openEventCard(): void {
   renderActions();
 }
 
-/** While nothing is studied, one alert asks the player to choose (once for each thing learned); `told` when a Learned alert already said so. */
+/** While nothing is studied and nothing is queued, one alert asks the player to choose (once for each thing learned); `told` when a Learned alert already said so. */
 function askForStudy(s: Snapshot, told = false): void {
   const r = s.research;
-  if (!r || r.study || !r.options.length || askedStudy === r.known.length) return;
+  // A queue carries on by itself: only an empty one asks (RSCH-089, RSCH-108).
+  if (!r || r.study || r.queue.length || !r.options.length || askedStudy === r.known.length) return;
   askedStudy = r.known.length;
   if (!told) alertPlayer("Choose what your scholars study.", "scroll", { tab: "learning" });
 }
@@ -2345,6 +2346,8 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
     armyList.hidden = true;
   }
   panel.classList.toggle("chooser", reopenIcon === "crown");
+  // The Research tab's one screen takes a wider card on a desktop (RSCH-107).
+  panel.classList.toggle("research", open && !!panel.querySelector(".learn-screen:not(.schools-part)"));
   panel.hidden = !open || panelCollapsed;
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
@@ -2417,7 +2420,8 @@ function renderPanelCard(): void {
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
-          return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}${esc(n.name)}</button>`;
+          // Each realm's standing at the start, so a realm that starts behind says so before it is chosen (RSCH-105).
+          return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}<span class="nation-name">${esc(n.name)}<small class="starts">${esc(startStanding(n.id))}</small></span></button>`;
         })
         .join("")}</div>
       <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
@@ -3636,7 +3640,7 @@ function renderArmy(id: number): void {
               const g = (cost.gold * trainMen * rules.defines.recruit.goldScale) / 1000;
               return `<button class="paper" data-train="${a}" ${g > s.nationTreasury[me]! ? "disabled" : ""}>${ARM_LABEL[a]} · ${cost.months} mo · ${g.toFixed(2)} gold</button>`;
             })
-            .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Learning</button></p>` : ""}`
+            .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Research</button></p>` : ""}`
         : `<p class="hint">No levy foot left to train.</p>`}`}
     ${(() => {
       const waiting = garrison.reduce((t, j) => t + s.armies.men[j]!, 0);
@@ -4046,7 +4050,7 @@ function renderRealm(r: number): void {
   const general = `
     <div class="realm-card">
       <img class="banner" src="${flagUrl(n, 6)}" alt="">
-      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}<br>
+      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"}${!s ? ` · <b class="starts">${esc(startStanding(n.id))}</b>` : ""}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
     ${mine && s?.stability ? stabilitySection(s.stability) : ""}
@@ -4098,7 +4102,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Research") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", "Officials") + tab("lords", "Lords") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -4361,65 +4365,128 @@ routeBarEl.addEventListener("click", (e) => {
   } else if (b.dataset.routeConfirm !== undefined) void confirmRoute();
 });
 
-/** The Learning tab's buttons: Tree or Schools, the boughs, tapping an invention, study, seats, students to arms, found a school; its folds and the tree's scroll stay as the player left them. */
+/**
+ * The Research tab's buttons (RSCH-100 to RSCH-111): Schools and back, tapping
+ * an invention (in the tree, the queue strip or a sheet), the jump chips, the
+ * zoom button and pinch, a place tapped in the whole tree, the sheet's action
+ * and ✕, the queue's ◀ ▶ ✕, seats, students to arms and founding a school.
+ * Its folds and the tree's scroll stay as the player left them.
+ */
 function bindLearning(): void {
-  panel.querySelectorAll<HTMLButtonElement>("[data-learn-part]").forEach((b) =>
-    b.addEventListener("click", () => {
-      learningUi.part = b.dataset.learnPart as typeof learningUi.part;
-      renderPanel();
-    }),
-  );
-  panel.querySelectorAll<HTMLButtonElement>("[data-bough]").forEach((b) =>
-    b.addEventListener("click", () => {
-      learningUi.bough = b.dataset.bough!;
-      learningUi.pick = null;
-      renderPanel();
-    }),
-  );
-  panel.querySelectorAll<HTMLButtonElement>("[data-pick]").forEach((b) =>
-    b.addEventListener("click", () => {
-      const id = b.dataset.pick!;
-      const fromSheet = !!b.closest(".pick-sheet");
-      learningUi.pick = id;
-      if (fromSheet) {
-        // A need tapped in the sheet: show it in its own bough, scrolled into view.
-        const bough = learningBough(snapshot!.research!, { ...learningUi, bough: "" });
-        learningUi.bough = bough;
-        const at = scrollFor(bough, id);
-        if (at) learningUi.scroll.set(bough, at);
+  const r = snapshot?.research;
+  const screen = panel.querySelector<HTMLElement>(".learn-screen");
+  if (!screen || !r) return;
+  const on = <T extends HTMLElement>(sel: string, run: (el: T, e: Event) => void) => screen.querySelectorAll<T>(sel).forEach((el) => el.addEventListener("click", (e) => run(el, e)));
+  /** Picks an invention: its sheet opens (sliding up in Tall) and, unless tapped in the tree itself, the tree brings it into view. */
+  const pick = (id: string, center: boolean) => {
+    if (learningUi.pick !== id) learningUi.slide = true;
+    learningUi.pick = id;
+    if (center) learningUi.center = id;
+    renderPanel();
+  };
+  on("[data-learn-part]", (b) => {
+    learningUi.part = b.dataset.learnPart as typeof learningUi.part;
+    renderPanel();
+  });
+  on("[data-inv]", (b) => pick(b.dataset.inv!, !b.closest(".tree-view")));
+  on("[data-jump]", (b) => {
+    const id = jumpTarget(r, b.dataset.jump!, learningUi.pick);
+    if (!id) return;
+    learningUi.zoom = "close";
+    pick(id, true);
+  });
+  on("[data-zoom]", () => {
+    learningUi.zoom = learningUi.zoom === "close" ? "whole" : "close";
+    if (learningUi.zoom === "close") learningUi.center = learningUi.pick ?? firstShown(r);
+    renderPanel();
+  });
+  /** Close up at a place of the whole tree, given in screen coordinates. */
+  const closeUpAt = (x: number, y: number) => {
+    const plot = screen.querySelector<HTMLElement>("[data-whole]");
+    if (!plot) return;
+    const box = plot.getBoundingClientRect();
+    learningUi.zoom = "close";
+    learningUi.center = { fx: Math.min(1, Math.max(0, (x - box.left) / box.width)), fy: Math.min(1, Math.max(0, (y - box.top) / box.height)) };
+    renderPanel();
+  };
+  on<HTMLElement>("[data-whole]", (_, e) => closeUpAt((e as MouseEvent).clientX, (e as MouseEvent).clientY));
+  on("[data-sheet-close]", () => {
+    learningUi.pick = null;
+    renderPanel();
+  });
+  on("[data-study]", (b) => {
+    learningUi.pick = null;
+    void actInTreasury({ type: "setStudy", invention: b.dataset.study! });
+  });
+  on("[data-queue-study]", (b) => void actInTreasury({ type: "queueStudy", invention: b.dataset.queueStudy! }));
+  on("[data-queue-path]", (b) => void actInTreasury({ type: "queuePath", invention: b.dataset.queuePath! }));
+  on("[data-move]", (b) => void actInTreasury({ type: "moveQueuedStudy", invention: b.dataset.move!, by: Number(b.dataset.by) as -1 | 1 }));
+  on("[data-unqueue]", (b) => {
+    if (learningUi.pick === b.dataset.unqueue) learningUi.pick = null;
+    void actInTreasury({ type: "unqueueStudy", invention: b.dataset.unqueue! });
+  });
+  // The tree frame: Close up keeps its scroll, or brings what was asked for into the middle.
+  const frame = screen.querySelector<HTMLElement>(".tree-view");
+  if (frame?.classList.contains("close")) {
+    const want = learningUi.center ?? (learningUi.scroll ? null : firstShown(r));
+    learningUi.center = null;
+    if (want) {
+      const lw = parseFloat(getComputedStyle(frame).getPropertyValue("--lw")) || 0;
+      const node = typeof want === "string" ? nodeAt(want) : null;
+      const p = node ? { x: node.x + node.w / 2, y: node.y + node.h / 2 } : typeof want === "string" ? null : closeUpPoint(want.fx, want.fy);
+      if (p) {
+        frame.scrollLeft = lw + p.x - frame.clientWidth / 2;
+        frame.scrollTop = p.y - frame.clientHeight / 2;
       }
-      renderPanel();
-      panel.querySelector(".pick-sheet")?.scrollIntoView({ block: "nearest" });
-    }),
-  );
-  const treeView = panel.querySelector<HTMLElement>(".tree-view");
-  if (treeView && snapshot?.research) {
-    const bough = treeView.dataset.tree!;
-    const at = learningUi.scroll.get(bough) ?? scrollFor(bough, learningUi.pick ?? firstOpen(snapshot.research, bough));
-    if (at) {
-      treeView.scrollLeft = at.left;
-      treeView.scrollTop = at.top;
+    } else if (learningUi.scroll) {
+      frame.scrollLeft = learningUi.scroll.left;
+      frame.scrollTop = learningUi.scroll.top;
     }
-    treeView.addEventListener("scroll", () => learningUi.scroll.set(bough, { left: treeView.scrollLeft, top: treeView.scrollTop }), { passive: true });
+    learningUi.scroll = { left: frame.scrollLeft, top: frame.scrollTop };
+    frame.addEventListener("scroll", () => (learningUi.scroll = { left: frame.scrollLeft, top: frame.scrollTop }), { passive: true });
   }
-  panel.querySelectorAll<HTMLButtonElement>("[data-study]").forEach((b) =>
-    b.addEventListener("click", () => {
-      learningUi.pick = null;
-      void actInTreasury({ type: "setStudy", invention: b.dataset.study! });
-    }),
-  );
-  panel.querySelectorAll<HTMLButtonElement>("[data-seats]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "setSeats", n: Number(b.dataset.seats) })));
-  panel.querySelector<HTMLButtonElement>("[data-call-students]")?.addEventListener("click", () => {
+  // Pinch inside the frame switches the zoom: fingers together for the whole tree, apart for Close up there (RSCH-101).
+  if (frame) {
+    let start = 0;
+    const spread = (e: TouchEvent) => Math.hypot(e.touches[0]!.clientX - e.touches[1]!.clientX, e.touches[0]!.clientY - e.touches[1]!.clientY);
+    frame.addEventListener("touchstart", (e) => (start = e.touches.length === 2 ? spread(e) : 0), { passive: true });
+    frame.addEventListener("touchend", () => (start = 0), { passive: true });
+    frame.addEventListener(
+      "touchmove",
+      (e) => {
+        if (e.touches.length !== 2 || !start) return;
+        const ratio = spread(e) / start;
+        if (learningUi.zoom === "close" && ratio < 0.75) {
+          start = 0;
+          learningUi.zoom = "whole";
+          renderPanel();
+        } else if (learningUi.zoom === "whole" && ratio > 1.33) {
+          start = 0;
+          closeUpAt((e.touches[0]!.clientX + e.touches[1]!.clientX) / 2, (e.touches[0]!.clientY + e.touches[1]!.clientY) / 2);
+        }
+      },
+      { passive: true },
+    );
+    // A trackpad's pinch comes as a wheel with Ctrl held.
+    frame.addEventListener("wheel", (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      if (e.deltaY > 0 && learningUi.zoom === "close") {
+        learningUi.zoom = "whole";
+        renderPanel();
+      } else if (e.deltaY < 0 && learningUi.zoom === "whole") closeUpAt(e.clientX, e.clientY);
+    });
+  }
+  on("[data-seats]", (b) => void actInTreasury({ type: "setSeats", n: Number(b.dataset.seats) }));
+  on("[data-call-students]", () => {
     learningUi.open.delete("arms");
     void actInTreasury({ type: "callStudentsToArms" });
   });
-  panel.querySelectorAll<HTMLButtonElement>("[data-found-school]").forEach((b) =>
-    b.addEventListener("click", () => {
-      learningUi.open.delete("found");
-      void actInTreasury({ type: "foundSchool", province: Number(b.dataset.foundSchool) });
-    }),
-  );
-  panel.querySelectorAll<HTMLDetailsElement>("details[data-keep]").forEach((d) =>
+  on("[data-found-school]", (b) => {
+    learningUi.open.delete("found");
+    void actInTreasury({ type: "foundSchool", province: Number(b.dataset.foundSchool) });
+  });
+  screen.querySelectorAll<HTMLDetailsElement>("details[data-keep]").forEach((d) =>
     d.addEventListener("toggle", () => (d.open ? learningUi.open.add(d.dataset.keep!) : learningUi.open.delete(d.dataset.keep!))),
   );
 }
