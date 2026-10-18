@@ -1,4 +1,5 @@
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
+import { eventCards, type EventCard } from "./events.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
@@ -91,6 +92,8 @@ export interface Snapshot {
   calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
   /** The player's standing with every other nation that has one. */
   relations: { nation: number; state: "war" | "truce" | "alliance" | "subject" | "overlord"; until?: string }[];
+  /** Events and decisions waiting for the player's answer, oldest first (milestone 6). */
+  events: EventCard[];
   /** Envoys, answers and what other realms think of the player (milestone 5); null without a player. */
   statecraft: StatecraftView | null;
   /** Sieges under way: months gone, how far into the next siege month (0..1), breaches and men inside. */
@@ -295,7 +298,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceOwner: w.provinceOwner.slice(),
       provinceOccupier: w.provinceOccupier.slice(),
       provinceClosed: closedTo(w, player),
-      news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed"),
+      news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed" || x.major),
       wars,
       peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
       calls: w.diplomacy.calls
@@ -303,6 +306,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
       relations,
       statecraft: statecraftView(w, player),
+      events: eventCards(w, player),
       sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
       battles: w.battles.map((b) => {
         const men = (slots: number[]) => slots.reduce((t, s) => t + (a.alive[s] ? a.men[s]! : 0), 0);

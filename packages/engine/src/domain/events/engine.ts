@@ -292,7 +292,8 @@ export function gate(s: EventState, ev: EventDef): Ineligible | null {
   if (s.ended) return "campaign over";
   if (ev.history && outOfScope(ev.history.date, s.rules.endDate)) return "out of scope";
   if (s.invalidated[ev.id]) return "invalidated";
-  if (w.year < ev.availability.earliest || w.year > ev.availability.latest) return "outside years";
+  // A window without a latest year (null in the data) stays open to the end date.
+  if (w.year < ev.availability.earliest || (ev.availability.latest != null && w.year > ev.availability.latest)) return "outside years";
   for (const x of ev.exclusive_with ?? []) if (w.history.some((o) => o.event === x)) return "exclusive";
   if (!holds(ev.requires, w, ctxOf(s, {}))) return "requires";
   return null;
@@ -394,7 +395,7 @@ export function addFollowUps(s: EventState, ev: EventDef, at = now(s.world)): vo
  */
 export function dateFactor(ev: EventDef, year: number): number {
   const a = ev.availability;
-  if (a.mode === "mandatory") return year >= a.latest ? Infinity : 1;
+  if (a.mode === "mandatory") return a.latest != null && year >= a.latest ? Infinity : 1;
   if (a.mode !== "approximate" || !ev.history) return 1;
   const b = balance.date_binding;
   const hist = Number(historyStart(ev.history.date).slice(0, 4));

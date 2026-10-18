@@ -7,6 +7,7 @@ import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion
 import { breakAlliance, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
+import { answerEvent, monthlyEvents } from "./events.ts";
 import { swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
@@ -112,6 +113,8 @@ export type Order =
   | { type: "breakAlliance"; target: number }
   | { type: "makeDemand"; target: number; kind: string; province?: number }
   | { type: "stopChange"; province: number }
+  /** Answer an event or take a decision waiting for the realm, with one of its options (AnswerEvent, EVT-044). */
+  | { type: "answerEvent"; event: string; option: string }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
   | { type: "foodPreset"; name: string };
@@ -199,6 +202,8 @@ function startDay(world: World, news: News[]): void {
     monthlyStatecraft(world, news);
     aiDeclarations(world, news);
     aiRaise(world, news);
+    // Events come last in the month, after every other system (X-2).
+    monthlyEvents(world, news);
   }
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
 }
@@ -317,6 +322,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "breakAlliance":
       return breakAlliance(world, actingNation, order.target);
+    case "answerEvent":
+      return answerEvent(world, actingNation, order.event, order.option, news);
     case "makeDemand":
       syncCountries(world);
       return makeDemand(world, actingNation, order.target, order.kind, order.province ?? -1);

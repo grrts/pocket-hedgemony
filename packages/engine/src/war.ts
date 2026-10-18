@@ -23,13 +23,15 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "event";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
   province?: number;
   /** A battle or siege that has just begun: the player is told at once, over the map. */
   begins?: true;
+  /** A major historical event: every realm hears of it. */
+  major?: true;
 }
 
 export interface SiegeState {
