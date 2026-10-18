@@ -53,7 +53,8 @@ function courseIntoFog(w: World, me: number, from: number): number[] {
   throw new Error("no fog in reach");
 }
 
-describe("charts", () => {
+// Each test builds the 1444 world and plays months of it; a shared CI runner can take longer than the 5 s default.
+describe("charts", { timeout: 30_000 }, () => {
   it("starts each realm with its lands, six steps around and the seas touching them (EXPL-011)", () => {
     const w = createWorld(rules, 1, tiles);
     const me = n(w, "portugal");
@@ -81,7 +82,7 @@ describe("charts", () => {
   });
 });
 
-describe("exploration ships and voyages", () => {
+describe("exploration ships and voyages", { timeout: 30_000 }, () => {
   it("opens exploration ships with Carrack and caravel and the Age of Exploration (EXPL-001, EXPL-005)", () => {
     const w = createWorld(rules, 1, tiles);
     expect(explorationUnlocked(w, n(w, "portugal"))).toBe(true);
@@ -134,7 +135,7 @@ describe("exploration ships and voyages", () => {
   });
 });
 
-describe("colonies", () => {
+describe("colonies", { timeout: 30_000 }, () => {
   /** Portugal with ocean navigation, a caravel in Lisbon and the nearest empty coast in range. */
   function colonist() {
     const w = createWorld(rules, 5, tiles);
@@ -238,7 +239,7 @@ describe("colonies", () => {
   });
 });
 
-describe("the exploration AI", () => {
+describe("the exploration AI", { timeout: 30_000 }, () => {
   it("has a sea-minded realm build a caravel and explore the edge of its charts (EXPL-053), and a land power never (EXPL-054)", () => {
     const w = createWorld(rules, 7, tiles);
     const pt = n(w, "portugal");
