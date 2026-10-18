@@ -257,20 +257,21 @@ Feature: The living map close in
     Given a fleet of 5 hulls is in a harbour with 3 berths
     Then 3 hulls lie at the berths and 2 wait off the docks
 
-  @VIEW-123 @placeholder
-  Scenario: Traders move steadily along their path
-    Given a river trade path with 9 traders
-    Then it carries 3 barges spaced evenly along it
-    And a moment later they have barely moved
+  @VIEW-123
+  Scenario: A trader stands on its leg as an army steps
+    Given a trader by land on a leg of 5 tiles
+    When it has walked 0.6 of the way to the next province
+    Then it stands 0.4 of the way from the 3rd tile to the 4th
+    And a trader by river is drawn as a barge and one by sea as a trading ship
 
   @VIEW-132 @placeholder
-  # livingMap.traders.maxPaths
-  Scenario: The snapshot feeds the busy trade paths
+  # livingMap.traders.maxTraders
+  Scenario: The snapshot carries each trader where it walks
     Given a new game as "France"
-    When the trade paths France may see are read
-    Then each is a loop of at least 2 provinces by land, river or sea with at least 1 trader
-    And each enters a province whose trade France sees
-    And they come busiest first, at most 200, and one shows on each France's trader with a route
+    When the traders France may see are read
+    Then each stands on a leg from the province it is in to the next of its loop, with the share walked
+    And each leg enters a province whose trade France sees, over land along tiles from one centre to the next
+    And France's own come first, at most 300
 
   @VIEW-125
   Scenario: A tap goes to the piece before the province
