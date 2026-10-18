@@ -68,6 +68,8 @@ export function moodIndex(world: World, p: number): number {
 
 /** Tax and recruits a rioting or plotting province still gives: half (province PROV-162, PROV-231). */
 export function moodShare(world: World, p: number): number {
+  // No grievances is calm: most provinces, most of the time.
+  if (!world.provinceGrievances[p]) return 1;
   return moodIndex(world, p) >= 2 ? provinceConfig.tax.riots_factor : 1;
 }
 
