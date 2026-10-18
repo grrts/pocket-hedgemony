@@ -399,6 +399,8 @@ export function orderShape(order: Order): string {
       return "answer a revolution";
     case "answerRebels":
       return "answer a rising";
+    case "answerRevolution":
+      return "answer the revolution";
     case "treatRebels":
       return "judge beaten rebels";
     case "navy":
