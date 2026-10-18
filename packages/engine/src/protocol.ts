@@ -21,6 +21,7 @@ import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
+import { feverOf, FEVER_STEPS } from "./land.ts";
 import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
 import { badWeatherName } from "./domain/realm/index.ts";
 import { foodView, mapNetwork, type FoodView } from "./castleFood.ts";
@@ -195,6 +196,9 @@ export interface Snapshot {
   provinceWeather: Int8Array;
   provinceClimate: Int8Array;
   provinceHarvestMonths: number[][];
+  /** Each province's fever land (index into feverSteps: none, mild, harsh, deadly), PROV-243. */
+  provinceFever: Int8Array;
+  feverSteps: readonly string[];
   climates: readonly string[];
   /** What bad weather is called in each climate (drought, floods, bad weather). */
   badWeather: readonly string[];
@@ -476,6 +480,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       harvests: HARVESTS,
       provinceWeather: w.provinceWeather.slice(),
       provinceClimate: provinceClimates(w).slice(),
+      provinceFever: Int8Array.from({ length: w.provinceCount }, (_, p) => feverOf(w, p)),
+      feverSteps: FEVER_STEPS,
       provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
       climates: CLIMATES,
       badWeather: CLIMATES.map(badWeatherName),
@@ -604,6 +610,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceHarvest,
       snap.provinceWeather,
       snap.provinceClimate,
+      snap.provinceFever,
       snap.provinceStarved,
       snap.provinceCastle,
       snap.provinceRing,
