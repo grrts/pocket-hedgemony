@@ -3216,7 +3216,7 @@ function provinceTabs(): string {
   const tab = (key: typeof provinceTab, label: string) => `<button class="tab${provinceTab === key ? " on" : ""}" data-tab="${key}">${label}</button>`;
   const building = snapshot?.sites.some((x) => x.province === selectedProvince) ? ` ${icon("hourglass", 1)}` : "";
   const port = snapshot?.navy.ports.find((x) => x.province === selectedProvince);
-  const hulls = port?.building.length ? ` ${icon("hourglass", 1)}` : "";
+  const hulls = port?.building.length || port?.queue.length ? ` ${icon("hourglass", 1)}` : "";
   return `<nav class="tabs">${tab("overview", "Overview")}${tab("people", "People")}${tab("garrison", "Garrison")}${tab("land", "Land")}${tab("build", `Build${building}`)}${port ? tab("port", `Port${hulls}`) : ""}</nav>`;
 }
 
@@ -3855,7 +3855,7 @@ function renderPort(pi: number): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
     ${provinceTabs()}
-    ${portTab(port, { gold: s.nationTreasury[s.playerNation]!, musterGoldEach: s.navy.musterGoldEach, fleetsHere: s.navy.fleets.filter((f) => f.owner === s.playerNation && f.at === pi), admiralName: titled })}`;
+    ${portTab(port, { gold: s.nationTreasury[s.playerNation]!, musterGoldEach: s.navy.musterGoldEach, queues: s.navy.queues, fleetsHere: s.navy.fleets.filter((f) => f.owner === s.playerNation && f.at === pi), admiralName: titled })}`;
   bindClose();
   showPanel(true);
   bindProvinceTabs();
@@ -3863,6 +3863,8 @@ function renderPort(pi: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-port-muster]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "navy", do: "muster", province: pi, sailors: Number(b.dataset.portMuster) })),
   );
+  panel.querySelector<HTMLButtonElement>("[data-port-unmuster]")?.addEventListener("click", () => void act({ type: "navy", do: "unmuster", province: pi }));
+  panel.querySelector<HTMLButtonElement>("[data-port-unorder]")?.addEventListener("click", () => void act({ type: "navy", do: "unorder", province: pi }));
   panel.querySelectorAll<HTMLButtonElement>("[data-port-buy]").forEach((b) =>
     b.addEventListener("click", async () => {
       await act({ type: "navy", do: "buy", province: pi, ship: b.dataset.portBuy! });

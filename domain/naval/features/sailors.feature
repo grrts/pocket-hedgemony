@@ -7,6 +7,14 @@ Feature: Sailors
   Background:
     Given the province "Lagos" is a port of the country "Portugal"
 
+  @NAVY-148 @placeholder
+  Scenario: Sailors are mustered through the port's queue
+    # config: naval.game.queues.musterBatch, musterQueueMax, naval.muster.days (D-NAVY-33)
+    Given no sailors are on their way to the port "Lagos"
+    When 120 sailors are mustered into the queue of the port "Lagos" on day 0
+    Then they come in as batches of 50, 50 and 20 on days 14, 28 and 42
+    And a muster of 400 more sailors is refused because the queue holds at most 10 batches
+
   @NAVY-022 @NAVY-023
   Scenario: Mustering changes people into sailors who leave their slots empty
     Given the province "Lagos" has 4600 seafolk
