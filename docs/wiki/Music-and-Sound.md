@@ -24,6 +24,8 @@ Chords are faked with arpeggios, never played on one voice. Each track stores a 
 
 **In the game now: the music's soft voices.** The first playtests found the strict chip harsh, "noise mostly" (Leroy, 17 Oct). So the music keeps the voices' roles, its tunes and the motif but plays them soft: the pulses and bass are rounded (their buzzing upper harmonics rolled off), volumes glide instead of stepping, a pad holds each bar's chord under the tune, the drums are tuned skins and a woodblock with only a breath of noise for the snare and cymbal, and a small hall gives the music some room. The effects below keep the chip's sound, which playtesters liked as it is.
 
+**The tunes, rewritten.** The tunes are written chord first: each bar has a chord, the tune lands on one of its notes on the beat, the bass walks the chord's root and fifth, and the regional instrument breaks the chord gently under it. Peace tunes use only chords that sound right in every region's tuning, so a nation's music changes colour, not into clashes. The early peace tune is a pastoral air followed by a dance, the late one a march, and every track still carries the Hegemony motif.
+
 **Effect voices** are a separate bank of three, so an effect never takes a music voice:
 
 | Voice | What it is |
