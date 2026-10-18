@@ -28,6 +28,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(300);
   await page.locator("[data-realm-open-tab=government]").scrollIntoViewIfNeeded();
   await shot("general");
+  await page.click("#panel [data-realm-section=Realm]").catch(() => {});
   await page.click("[data-realm-tab=government]");
   await page.waitForTimeout(300);
   await shot("government");

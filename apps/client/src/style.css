@@ -4947,10 +4947,10 @@ small.why {
 
 /* ---- Achievements (domain/achievements "How the player uses it") ---- */
 
-.tools #trophy {
+.hud .game-menu {
   position: relative;
 }
-.tools #trophy .dot {
+.hud .game-menu .dot {
   position: absolute;
   top: 4px;
   right: 4px;
@@ -6322,4 +6322,69 @@ details.pow-line > .hint {
 }
 .league-members button.realm-link {
   min-height: 44px;
+}
+
+/* ---- Your realm's six sections (SHELL-165..167, ui-review): one row of icons with names under the title, and the
+   open section's pages in a lower row. Neither row wraps or scrolls (F-111); six fit the 45 % sheet of a phone held
+   sideways, each a 44-point target or more. ---- */
+.panel .sections {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+  margin: 2px 0 4px;
+}
+.panel .sections .section {
+  position: relative;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 4px 0 2px;
+  border: 3px solid var(--wood-dark);
+  border-image: none;
+  background: var(--ui-parchment-dark) 0 0 / 64px;
+  color: var(--ink-soft);
+  font: 400 13px/1 var(--body);
+  letter-spacing: -0.02em;
+  text-shadow: none;
+  box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.18);
+}
+.panel .sections .section span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.panel .sections .section.on {
+  background: var(--ui-parchment) 0 0 / 64px;
+  color: var(--ink);
+  box-shadow: inset 0 4px 0 var(--brass), inset 0 6px 0 var(--brass-light);
+}
+.panel .sections .section:active:not(:disabled) {
+  transform: none;
+}
+/* Something waits for an answer in Diplomacy: the red seal of SHELL-141, in the section's corner. */
+.panel .sections .section.marked::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: var(--wax, #a8323e);
+  box-shadow: 0 0 0 2px var(--wood-dark);
+}
+.panel .tabs.pages {
+  flex-wrap: nowrap;
+  margin-top: 0;
+}
+.panel .tabs.pages .tab {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+  padding: 6px 4px 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 18px;
 }

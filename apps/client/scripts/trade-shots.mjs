@@ -84,6 +84,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   // Route mode: Route on the first trader card, then where it starts and where it goes tapped on the map.
   await page.click(".hud button.realm");
   await page.waitForTimeout(200);
+  await page.click("#panel [data-realm-section=Economy]").catch(() => {});
   await page.click("[data-realm-tab=trade]");
   await page.waitForTimeout(200);
   await page.click("[data-trader-route]");

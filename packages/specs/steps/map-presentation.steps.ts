@@ -465,11 +465,8 @@ Then(/^the card is (a side sheet on the left 45 %|a bottom sheet at 55 % height|
   else expect(c).toMatchObject({ kind: "side sheet", raisedScale: true });
 });
 
-Then(/^the Realm book's tabs are (a left icon rail|a bottom icon row|icons with names on a left rail)$/, (s, tabs: string) => {
-  const t = s.layout.bookTabs;
-  if (tabs === "a left icon rail") expect(t).toMatchObject({ place: "left rail", names: false });
-  else if (tabs === "a bottom icon row") expect(t).toMatchObject({ place: "bottom row", names: false });
-  else expect(t).toMatchObject({ place: "left rail", names: true });
+Then("the Realm book's sections are one row of icons with names", (s) => {
+  expect(s.layout.bookTabs).toMatchObject({ place: "top row", names: true });
 });
 
 When("any screen is shown", (s) => {

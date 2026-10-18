@@ -72,7 +72,7 @@ A modal accepts no input to the screens below until it is answered or put off.
 ### The map
 
 - **Top bar:** realm name and banner (opens the country card), the date, gold with its monthly change, and levies. On a phone it holds at most five plaques; the rest move into the country card.
-- **Tool column** on the right edge: map mode, go to capital, and Realm book.
+- **Tool column** on the right edge: map mode, go to capital, your commanders and sound, two buttons wide on a phone held sideways. Achievements and Settings are in the game menu, whose button carries a dot while an achievement waits to be looked at.
 - **End turn** (the hourglass, lower right) carries a badge counting the items on the Attention screen. Tapping the badge, or the controller's "next" button, opens the Attention screen.
 - **Auto** (just above End turn) lets the weeks play one after another in a single-player campaign; a tap stops it at the end of the current week. See [Time and Turns](Time-and-Turns#auto-turns).
 - **Attention bell** next to the date lights while the Attention screen holds a warning, and opens it. It is the only place the game warns you; there is no advisor.
@@ -95,18 +95,18 @@ A **country card** has the tabs General, Diplomacy, Trade and Army, and opens on
 
 ### The Realm book
 
-One full screen with up to six tabs. It opens on the tab you last used. A new system adds a section inside a tab, never a seventh tab.
+Your own realm's card is the Realm book. Tap your banner or a plaque in the top bar and it opens beside the map, on the page that holds what you tapped (the gold plaque opens Economy, Treasury). Its pages are grouped into six sections, each answering one question, so you never scan a long row of tabs. A new system adds a page inside a section, never a seventh section.
 
-| Tab | What it holds |
-|---|---|
-| Realm | Country card in full, ruler and family, lords, government |
-| Treasury | Treasury, Tax screen, Food policy screen, trade |
-| Army | All armies and fleets, commanders, levy, commission, troop cap |
-| Abroad | Diplomacy, relations, subjects, wars and peace voices |
-| Learning | Schools, research tree, religion and culture |
-| Chronicle | Past turn reports, event log, battle reports, ledger |
+| Section | Pages | The question it answers |
+|---|---|---|
+| Realm | Overview, Government, Heritage, Score | How is my realm doing? |
+| Economy | Treasury, Trade, Food | Where do my money and food come from? |
+| Lands | Provinces, Officials, Lords, Colonies | Who runs which land? |
+| Military | Army, Navy | What can fight? |
+| Diplomacy | Diplomacy | Who are my friends and foes? |
+| Research | Research, Peoples | What do we study and believe? |
 
-The tabs are a narrow left rail of icons in Short wide, a row of icons along the bottom in Tall, and icon and name on a left rail in Large. Show on map (on a screen that points at an army or province) closes the book, moves the camera and opens that card; Back returns to the book on the same tab and scroll position. A book screen opened from a card (Levy from a province card) stacks on the card, and Back returns to the card.
+The six sections are one row of icons with their names under the card's title, in every shape; a section with several pages shows them in a second, lower row. Tapping a section opens the page you last looked at there. A red seal on Diplomacy means an offer or an envoy waits for your answer. Turn reports and battle replays live in the News (the scroll button in the top bar), which took the place of the old Chronicle. Another realm's card keeps its own tabs: General, Diplomacy, Trade, Army and Heritage. Show on map (on a screen that points at an army or province) closes the book, moves the camera and opens that card; Back returns to the book on the same tab and scroll position. A book screen opened from a card (Levy from a province card) stacks on the card, and Back returns to the card.
 
 ### The game menu
 
@@ -138,13 +138,13 @@ Lines are listed most urgent first. Each has an icon, one sentence and a Show bu
 
 - **Battle view:** while your battles run, Back takes you to the map and the battles keep running; the switcher brings you back. In a replay, Back returns to where the replay was opened. With a controller: A is pause and play, then Carry on; B goes back to the map (or leaves a replay); X is Retreat; Y shows the commander's line; the bumpers switch battle; Menu does nothing.
 - **Siege view:** a full screen opened from a besieged castle at local zoom or from its card; Back returns to the map at the castle.
-- **Peace table:** a modal opened from the Abroad tab, an enemy's country card or an incoming offer, returning where it was opened. An incoming offer cannot be dismissed, only answered or put off one turn.
+- **Peace table:** a modal opened from the Diplomacy section, an enemy's country card or an incoming offer, returning where it was opened. An incoming offer cannot be dismissed, only answered or put off one turn.
 - **Map mode picker:** a small pop-over from the tool column.
 - **Confirmation:** a small modal for destructive actions only, returning to the screen below unchanged.
 
 ### How a campaign ends
 
-**Game over.** When your realm no longer exists (annexed, or every province lost), the map zooms out over the old borders while the game over music plays, and a card says how it ended in one line with the date ("Burgundy was divided between France and the Empire · 1477") and your realm's highs: largest size, years lasted, battles won. It offers Look back (the Chronicle, read only), Play on as another realm (any realm on the current map) and Main menu. Play on is allowed in every campaign, ironman included, but it ends achievements for that campaign, says so on the button before you press it ("Achievements end for this campaign"), and cannot be undone.
+**Game over.** When your realm no longer exists (annexed, or every province lost), the map zooms out over the old borders while the game over music plays, and a card says how it ended in one line with the date ("Burgundy was divided between France and the Empire · 1477") and your realm's highs: largest size, years lasted, battles won. It offers Look back (the News, read only), Play on as another realm (any realm on the current map) and Main menu. Play on is allowed in every campaign, ironman included, but it ends achievements for that campaign, says so on the button before you press it ("Achievements end for this campaign"), and cannot be undone.
 
 **Winning.** There are two ways to win.
 
@@ -170,8 +170,8 @@ Lines are listed most urgent first. Each has an icon, one sentence and a Show bu
 
 | Shape | When | Layout |
 |---|---|---|
-| Short wide | A window under 500 css px tall, such as a phone in landscape | Map first, cards as side sheets on the left, Realm book tabs as a left icon rail, top bar one thin row |
-| Tall | A tablet in portrait, or a desktop window taller than wide (never a phone) | Cards as bottom sheets, Realm book tabs as a bottom row, tool column on the right above End turn |
+| Short wide | A window under 500 css px tall, such as a phone in landscape | Map first, cards as side sheets on the left, the Realm book's six sections as one row of icons with names, top bar one thin row |
+| Tall | A tablet in portrait, or a desktop window taller than wide (never a phone) | Cards as bottom sheets, the same one row of sections, tool column on the right above End turn |
 | Large | A tablet in landscape, a desktop window, a Steam Deck (1280 × 800) | Side sheets with a fixed width, menus centred with a maximum width, nothing stretched edge to edge |
 | Far | A TV or Steam Machine (chosen in Settings or detected) | Large with UI scale raised so body text is about 1/30 of screen height, thicker focus frames, nothing in the outer 5 % |
 
@@ -213,7 +213,7 @@ The screen list is the single catalogue that code, music and sound key on:
 | credits | Full | Back | main menu or final result | credits |
 | map | Home | your capital or last army | opens the game menu | game music |
 | card | Sheet | first line | previous card or map | unchanged |
-| realm_book | Full | last tab's first item | map | unchanged; diplomacy mood on Abroad |
+| realm_book | Full | last tab's first item | map | unchanged; diplomacy mood on Diplomacy |
 | game_menu | Modal | Return to the map | map | unchanged |
 | turn | Overlay | none | none | unchanged |
 | battle | Full | Retreat while it runs, Carry on after | Back to the map while battles run (they keep running); where opened for a replay | war tracks |

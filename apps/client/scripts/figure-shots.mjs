@@ -41,7 +41,7 @@ await page.evaluate(() => {
   b.remove();
 });
 await page.waitForTimeout(300);
-await page.click("[data-realm-tab=diplomacy]").catch(() => {});
+await page.click("#panel [data-realm-section=Diplomacy]").catch(() => {});
 await page.waitForTimeout(200);
 await page.click("[data-declare]");
 await page.waitForTimeout(300);

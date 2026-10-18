@@ -48,8 +48,9 @@ export type CardSheet =
   | { kind: "bottom sheet"; heightShare: number; drag: readonly ["peek strip", "full height"] }
   | { kind: "side sheet"; widthPx: number; fixedWidth: true; raisedScale: boolean };
 
+/** Your realm's six sections show as one row of icons with names under the card's title, in every shape (SHELL-167). */
 export interface BookTabs {
-  place: "left rail" | "bottom row";
+  place: "top row";
   narrow: boolean;
   names: boolean;
 }
@@ -70,13 +71,13 @@ export interface ShapeLayout {
   bodyTextShare: number | null;
 }
 
-/** The layout rule of a shape (VIEW-040..043, SHELL-053..055, SHELL-061, SHELL-108..111). */
+/** The layout rule of a shape (VIEW-040..043, SHELL-053..055, SHELL-108..111, SHELL-167). */
 export function layoutFor(shape: Shape, uiScale = 1): ShapeLayout {
   const large: ShapeLayout = {
     shape,
     mapFirst: false,
     card: { kind: "side sheet", widthPx: LAYOUT.cardLargeWidth * uiScale, fixedWidth: true, raisedScale: false },
-    bookTabs: { place: "left rail", narrow: false, names: true },
+    bookTabs: { place: "top row", narrow: false, names: true },
     topBar: "full",
     toolColumn: "right edge",
     menus: "centred, maximum width",
@@ -91,7 +92,6 @@ export function layoutFor(shape: Shape, uiScale = 1): ShapeLayout {
         ...large,
         mapFirst: true,
         card: { kind: "side sheet", side: "left", widthShare: LAYOUT.cardPhoneWidthShare, fullHeight: true, mapLiveBeside: true },
-        bookTabs: { place: "left rail", narrow: true, names: false },
         topBar: "one thin row",
         menus: "full width",
       };
@@ -99,7 +99,6 @@ export function layoutFor(shape: Shape, uiScale = 1): ShapeLayout {
       return {
         ...large,
         card: { kind: "bottom sheet", heightShare: LAYOUT.cardTallHeightShare, drag: ["peek strip", "full height"] },
-        bookTabs: { place: "bottom row", narrow: false, names: false },
         toolColumn: "right edge above End turn",
       };
     case "Large":
@@ -178,12 +177,15 @@ export function mapHud(o: { width: number; height: number; shape: Shape; safe?: 
   const plaques = Math.min(o.plaques ?? 4, o.shape === "Short wide" ? topBarMaxPlaques() : Infinity);
   for (let i = 0; i < plaques; i++) out.push({ name: `plaque ${i + 1}`, x: left + (s + g) * (i + 2), y: top, w: s, h: s, frequent: true });
   out.push({ name: "End turn", x: right - s, y: bottom - s, w: s, h: s, risky: true });
-  const tools = ["map mode", "go to capital", "Realm book"];
-  // The column hangs from the top bar, or sits above End turn with one target of room (Tall).
-  const columnBottom = lay.toolColumn === "right edge above End turn" ? bottom - s - g - s - g : top + s + g + tools.length * (s + g);
+  const tools = ["map mode", "go to capital", "commanders", "sound"];
+  // The column hangs from the top bar, or sits above End turn with one target of room (Tall); on a phone held
+  // sideways it is two targets wide so it stays clear of End turn (SHELL-168).
+  const across = o.shape === "Short wide" ? 2 : 1;
+  const rows = Math.ceil(tools.length / across);
+  const columnBottom = lay.toolColumn === "right edge above End turn" ? bottom - s - g - s - g : top + s + g + rows * (s + g);
   tools.forEach((name, i) => {
-    const y = columnBottom - (tools.length - i) * (s + g) + g;
-    out.push({ name, x: right - s, y, w: s, h: s, frequent: true });
+    const y = columnBottom - (rows - Math.floor(i / across)) * (s + g) + g;
+    out.push({ name, x: right - s - (i % across) * (s + g), y, w: s, h: s, frequent: true });
   });
   out.push({ name: "name tab", x: left, y: bottom - s, w: s * 3, h: s, frequent: true });
   return out;

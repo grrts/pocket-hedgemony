@@ -28,7 +28,7 @@ Feature: Layout by window shape
     When a campaign is shown
     Then the map comes first
     And cards are side sheets on the left
-    And the Realm book's tabs are a left icon rail
+    And the Realm book's sections are one row of icons with names
     And the top bar is one thin row
 
   @SHELL-109
@@ -36,7 +36,7 @@ Feature: Layout by window shape
     Given the shape is "Tall"
     When a campaign is shown
     Then cards are bottom sheets
-    And the Realm book's tabs are a bottom icon row
+    And the Realm book's sections are one row of icons with names
     And the tool column is on the right edge above the End turn button
 
   @SHELL-110

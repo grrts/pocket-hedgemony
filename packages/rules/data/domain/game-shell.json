@@ -124,7 +124,7 @@
       "kind": "Full",
       "firstFocus": "last tab's first item",
       "back": "map",
-      "music": "unchanged; diplomacy mood on Abroad"
+      "music": "unchanged; diplomacy mood on Diplomacy"
     },
     "game_menu": {
       "name": "Game menu",
@@ -320,44 +320,37 @@
   "toolColumn": [
     "map mode",
     "go to capital",
-    "Realm book"
+    "commanders",
+    "sound"
   ],
   "realmBook": {
     "Realm": [
-      "country card in full",
-      "ruler and family",
-      "lords",
-      "government"
+      "Overview",
+      "Government",
+      "Heritage",
+      "Score"
     ],
-    "Treasury": [
-      "treasury",
-      "Tax screen",
-      "Food policy screen",
-      "trade"
+    "Economy": [
+      "Treasury",
+      "Trade",
+      "Food"
     ],
-    "Army": [
-      "all armies and fleets",
-      "commanders",
-      "levy",
-      "commission",
-      "troop cap"
+    "Lands": [
+      "Provinces",
+      "Officials",
+      "Lords",
+      "Colonies"
     ],
-    "Abroad": [
-      "diplomacy",
-      "relations",
-      "subjects",
-      "wars and peace voices"
+    "Military": [
+      "Army",
+      "Navy"
     ],
-    "Learning": [
-      "schools",
-      "research tree",
-      "religion and culture"
+    "Diplomacy": [
+      "Diplomacy"
     ],
-    "Chronicle": [
-      "past turn reports",
-      "event log",
-      "battle reports",
-      "ledger"
+    "Research": [
+      "Research",
+      "Peoples"
     ]
   },
   "attention": {

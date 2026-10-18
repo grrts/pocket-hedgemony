@@ -36,6 +36,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(300);
   await page.locator("[data-realm-open-tab=peoples]").first().scrollIntoViewIfNeeded();
   await shot("general");
+  await page.click("#panel [data-realm-section=Research]").catch(() => {});
   await page.click("[data-realm-tab=peoples]");
   await page.waitForTimeout(300);
   await shot("peoples");
@@ -45,6 +46,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.locator(".faith-rows").scrollIntoViewIfNeeded();
   await shot("peoples-faiths");
   // The capital's overview, from the General tab's Capital button.
+  await page.click("#panel [data-realm-section=Realm]").catch(() => {});
   await page.click("[data-realm-tab=general]");
   await page.waitForTimeout(300);
   await page.locator(".panel button.capital").first().scrollIntoViewIfNeeded();

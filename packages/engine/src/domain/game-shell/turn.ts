@@ -366,7 +366,7 @@ function showReport(sh: Shell): void {
   logDispatches(sh, t.report.map((text) => ({ day, text, mine: true })));
 }
 
-/** A battle from the turn report or the Chronicle replays; Back returns where it was opened (SHELL-078, SHELL-090). */
+/** A battle from the News replays; Back returns where it was opened (SHELL-078, SHELL-090). */
 export function replayBattle(sh: Shell, battle: string, from: string): Frame {
   const t = turnOf(sh);
   const b = t.fought.find((x) => x.place === battle || x.id === battle);

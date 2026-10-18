@@ -6,6 +6,7 @@ import { battleMarks, recolourUploads, tapTargetMin, visibleMapArea, recentreFor
 import {
   ACTIONS,
   REALM_BOOK_TABS,
+  sectionOf,
   SHELL,
   addBookSection,
   adCard,
@@ -978,7 +979,7 @@ Then("the map is at most {int} Back presses away", (s, n: number) => {
 Given("the screen of the layer {string} is open", (s, layer: string) => {
   const shell = ensureCampaign(s);
   if (layer === "card") openCard(shell, { kind: "province", name: "Champagne" });
-  else if (layer === "full screen") openRealmBook(shell, "Army");
+  else if (layer === "full screen") openRealmBook(shell, "Military");
   else if (layer === "modal") {
     raiseEvents(shell, [{ id: "the_maid_of_orleans", date: "1503-05-03", options: ["a", "b"] }]);
     push(shell, { id: "event", subject: "the_maid_of_orleans", decideLater: true });
@@ -1096,9 +1097,9 @@ When("the screen {string} is drawn", (s, id: string) => {
   s.hud = mapHud({ width: shell.window.width, height: shell.window.height, shape: shell.shape });
 });
 
-Then("the tool column at the right edge holds {string}, {string} and {string}", (s, a: string, b: string, c: string) => {
-  expect(toolColumn()).toEqual([a, b, c]);
-  for (const name of [a, b, c]) {
+Then("the tool column at the right edge holds {string}, {string}, {string} and {string}", (s, ...names: string[]) => {
+  expect(toolColumn()).toEqual(names);
+  for (const name of names) {
     const r = s.hud.find((x: { name: string }) => x.name === name);
     expect(cornerOf(r, sh(s).window.width, sh(s).window.height)).toMatch(/right$/);
   }
@@ -1274,12 +1275,12 @@ Given("a new system needs a place in the Realm book", (s) => {
 });
 
 When("the system is added", (s) => {
-  s.tabsAfter = addBookSection(s.tabs, "Learning", "a new system's screen");
+  s.tabsAfter = addBookSection(s.tabs, "Research", "a new system's screen");
   expect(() => addBookSection(s.tabs, "Seventh", "a new system's screen")).toThrow();
 });
 
 Then("it adds a section inside one of the six tabs", (s) => {
-  expect(s.tabsAfter.Learning).toContain("a new system's screen");
+  expect(s.tabsAfter.Research).toContain("a new system's screen");
 });
 
 Then("the Realm book has {int} tabs", (s, n: number) => {
@@ -1292,11 +1293,8 @@ When("the player opens the Realm book", (s) => {
   s.bookTabs = layoutFor(sh(s).shape).bookTabs;
 });
 
-Then(/^the tabs are shown as (a narrow left rail of icons|a row of icons along the bottom|icon and name on a left rail)$/, (s, tabs: string) => {
-  const t = s.bookTabs;
-  if (tabs === "a narrow left rail of icons") expect(t).toEqual({ place: "left rail", narrow: true, names: false });
-  else if (tabs === "a row of icons along the bottom") expect(t).toEqual({ place: "bottom row", narrow: false, names: false });
-  else expect(t).toEqual({ place: "left rail", narrow: false, names: true });
+Then("the sections are shown as one row of icons with names under the card's title", (s) => {
+  expect(s.bookTabs).toEqual({ place: "top row", narrow: false, names: true });
 });
 
 Given("the Realm book is open on the tab {string} scrolled to the army {string}", (s, tab: string, _army: string) => {
@@ -1645,11 +1643,10 @@ Given("the battle at {string} was fought last turn", (s, place: string) => {
   if (topId(sh(s)) === "turn_report") pop(sh(s));
 });
 
-When(/^the player opens it from (the turn report|the tab "Chronicle")$/, (s, place: string) => {
+When(/^the player opens it from (the turn report|the News)$/, (s) => {
   const shell = sh(s);
-  if (place === "the turn report") push(shell, { id: "turn_report" });
-  else openRealmBook(shell, "Chronicle");
-  replayBattle(shell, "Troyes", place === "the turn report" ? "turn_report" : "Chronicle");
+  push(shell, { id: "turn_report" });
+  replayBattle(shell, "Troyes", "turn_report");
 });
 
 Then("the screen {string} replays it", (s, id: string) => {
@@ -1909,15 +1906,14 @@ Then("the line gives no advice on what to do", (s) => {
 // ---------------------------------------------------------------------------
 // Other in-campaign screens
 
-Given(/^the screen "battle" was opened (by a running player battle|from the turn report as a replay|from the tab "Chronicle" as a replay)$/, (s, how: string) => {
+Given(/^the screen "battle" was opened (by a running player battle|from the turn report as a replay|from the News as a replay)$/, (s, how: string) => {
   if (how === "by a running player battle") return stopAtTroyes(s);
   stopAtTroyes(s, "result");
   carryOn(sh(s));
   const shell = sh(s);
   while (topId(shell) !== "map") pop(shell);
-  if (how.includes("turn report")) push(shell, { id: "turn_report" });
-  else openRealmBook(shell, "Chronicle");
-  replayBattle(shell, "Troyes", how.includes("turn report") ? "turn_report" : "Chronicle");
+  push(shell, { id: "turn_report" });
+  replayBattle(shell, "Troyes", "turn_report");
 });
 
 Then("the map is shown and the battle keeps running", (s) => {
@@ -1928,7 +1924,7 @@ Then("the map is shown and the battle keeps running", (s) => {
   expect(turnOf(sh(s)).running[0]!.step).toBe(1);
 });
 
-Then("the turn report is shown", (s) => expectTop(s, "turn_report"));
+Then(/^(the turn report|the News) is shown$/, (s) => expectTop(s, "turn_report"));
 
 
 Given("the castle of {string} is besieged", (s, castle: string) => {
@@ -1955,9 +1951,9 @@ Then("the map is shown at the castle of {string}", (s, castle: string) => {
   expect(shell.camera.on).toBe(`the castle of ${castle}`);
 });
 
-When(/^the player opens the peace table from (the tab "Abroad"|the country card of "England")$/, (s, from: string) => {
+When(/^the player opens the peace table from (the tab "Diplomacy"|the country card of "England")$/, (s, from: string) => {
   const shell = sh(s);
-  if (from === 'the tab "Abroad"') openRealmBook(shell, "Abroad");
+  if (from === 'the tab "Diplomacy"') openRealmBook(shell, "Diplomacy");
   else openCard(shell, { kind: "country", name: "England" });
   s.peaceFrom = top(shell)!;
   openPeace(shell, from);
@@ -1969,7 +1965,7 @@ Then("the screen {string} opens as a modal", (s, id: string) => {
   expect(layerOf(id as FrameId)).toBe("modal");
 });
 
-Then(/^Back returns to (the tab "Abroad"|the country card of "England")$/, (s) => {
+Then(/^Back returns to (the tab "Diplomacy"|the country card of "England")$/, (s) => {
   back(sh(s));
   expect(top(sh(s))).toBe(s.peaceFrom);
 });
@@ -2003,7 +1999,7 @@ Then("it is a small pop-over that returns to the map", (s) => {
 });
 
 When("the player starts a destructive action", (s) => {
-  openRealmBook(sh(s), "Army");
+  openRealmBook(sh(s), "Military");
   s.below = { ...top(sh(s))! };
   confirmDestructive(sh(s), "dismiss an army");
 });
@@ -2055,9 +2051,9 @@ Given("the screen {string} is shown for {string}", (s, id: string, realm: string
   s.over = gameOver(sh(s), { line: `${realm} was annexed`, year: 1477 }, HIGHS);
 });
 
-Then('the tab "Chronicle" opens read-only', (s) => {
-  expect(s.picked).toEqual({ chronicle: "read only" });
-  expect(top(sh(s))).toMatchObject({ id: "realm_book", tab: "Chronicle", subject: "read only" });
+Then("the News opens read-only", (s) => {
+  expect(s.picked).toEqual({ news: "read only" });
+  expect(top(sh(s))).toMatchObject({ id: "turn_report", subject: "read only" });
 });
 
 Then("the player can pick any realm on the current map", (s) => {
@@ -2346,10 +2342,9 @@ When("a campaign is shown", (s) => {
 
 Then("the map comes first", (s) => expect(s.layout.mapFirst).toBe(true));
 Then("cards are side sheets on the left", (s) => expect(s.layout.card).toMatchObject({ kind: "side sheet", side: "left" }));
-Then("the Realm book's tabs are a left icon rail", (s) => expect(s.layout.bookTabs).toMatchObject({ place: "left rail", names: false }));
+Then("the Realm book's sections are one row of icons with names", (s) => expect(s.layout.bookTabs).toMatchObject({ place: "top row", names: true }));
 Then("the top bar is one thin row", (s) => expect(s.layout.topBar).toBe("one thin row"));
 Then("cards are bottom sheets", (s) => expect(s.layout.card.kind).toBe("bottom sheet"));
-Then("the Realm book's tabs are a bottom icon row", (s) => expect(s.layout.bookTabs).toMatchObject({ place: "bottom row", names: false }));
 
 Then("the tool column is on the right edge above the End turn button", (s) => {
   expect(s.layout.toolColumn).toBe("right edge above End turn");
@@ -3647,4 +3642,14 @@ Then("the clock runs again as {string}", (s, realm: string) => {
   const day = w.day;
   advance(w, STEPS_PER_DAY);
   expect(w.day).toBe(day + 1);
+});
+
+Then("each page of the Realm book sits in exactly one section", () => {
+  const pages = REALM_BOOK_TABS.flatMap((t) => tabHolds(t));
+  expect(new Set(pages).size).toBe(pages.length);
+  for (const page of pages) expect(REALM_BOOK_TABS).toContain(sectionOf(page));
+});
+
+Then("the page {string} sits in the section {string}", (_s, page: string, section: string) => {
+  expect(sectionOf(page)).toBe(section);
 });

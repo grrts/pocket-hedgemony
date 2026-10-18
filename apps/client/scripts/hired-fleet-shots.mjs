@@ -33,6 +33,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(500);
   await page.click(".hud button.realm");
   await page.waitForTimeout(300);
+  await page.click("#panel [data-realm-section=Military]").catch(() => {});
   await page.click("[data-realm-tab=navy]");
   await page.waitForTimeout(300);
   await shot("1-navy-tab");
