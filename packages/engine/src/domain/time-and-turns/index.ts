@@ -435,6 +435,8 @@ export function orderShape(order: Order): string {
       return "raise our own patriarch";
     case "answerRevolution":
       return "answer the revolution";
+    case "empire":
+      return "act in the Empire";
   }
 }
 
