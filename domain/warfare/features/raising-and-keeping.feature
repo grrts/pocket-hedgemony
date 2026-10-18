@@ -154,8 +154,8 @@ Feature: Raising and keeping an army
     And it is led by the company's captain
 
   @WAR-214 @WAR-215 @WAR-216 @WAR-217 @feedback-52 @feedback-114
-  Scenario: The free companies page
-    When the player opens the free companies from the Military tab of their country card
+  Scenario: The mercenary companies page
+    When the player opens Mercenaries from the Military tab of their country card
     Then it shows the companies in service, their men and their pay a month
     And a card for each company on the way, with the weeks left
     And a card for each company for hire, with its arms, men, captain, weeks to the capital, pay and a Hire button
