@@ -71,7 +71,7 @@ describe("statecraft (milestone 5)", () => {
     const w = createWorld(rules, 1, tiles);
     const marriages = w.diplomacy.marriages.length;
     months(w, 24, -1);
-    expect(w.diplomacy.marriages.length).toBeGreaterThan(marriages + 5);
+    expect(w.diplomacy.marriages.length).toBeGreaterThan(marriages + 3);
   });
 
   it("keeps envoys, letters and alliances through a save", () => {

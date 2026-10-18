@@ -399,7 +399,16 @@ export function emit(d: Diplomacy, type: string, payload: Record<string, unknown
 
 export function setBorder(d: Diplomacy, a: string, b: string): void {
   const k = pairKey(a, b);
-  if (!d.borders.includes(k)) d.borders.push(k);
+  const index = bordersOf(d);
+  if (index.set.has(k)) return;
+  d.borders.push(k);
+  // Keep the index in step, so adding many borders stays linear.
+  const hit = borderIndex.get(d.borders)!;
+  hit.n = d.borders.length;
+  hit.set.add(k);
+  const [x, y] = k.split("|") as [string, string];
+  (hit.by.get(x) ?? hit.by.set(x, []).get(x)!).push(y === undefined ? x : y);
+  if (y !== undefined && y !== x) (hit.by.get(y) ?? hit.by.set(y, []).get(y)!).push(x);
 }
 
 /** The border list as a set and by country, rebuilt when the list changes (borders are only added). */

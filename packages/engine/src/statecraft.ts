@@ -50,15 +50,28 @@ export function syncCountries(world: World): void {
   }
 }
 
-/** The road between two courts, from their capitals on the map (DIPL-055); worked out once a pair. */
-function ensureRoute(world: World, a: number, b: number): void {
-  const d = world.diplomacy;
-  const key = dip.pairKey(world.nationIds[a]!, world.nationIds[b]!);
-  if (d.routes[key]) return;
+/** Crossing units between two courts' capitals on the map (DIPL-055). */
+function routeUnits(world: World, a: number, b: number): number {
   const pa = world.rules.provinces[capital(world, a)];
   const pb = world.rules.provinces[capital(world, b)];
   const px = pa && pb ? Math.hypot((pa.x ?? 0) - (pb.x ?? 0), (pa.y ?? 0) - (pb.y ?? 0)) : 60;
-  d.routes[key] = { land: [{ kind: "land", units: Math.max(1, Math.ceil(px / PIXELS_PER_UNIT)) }] };
+  return Math.max(1, Math.ceil(px / PIXELS_PER_UNIT));
+}
+
+/** The road between two courts, kept for a pair once an envoy is sent between them. */
+function ensureRoute(world: World, a: number, b: number): void {
+  const d = world.diplomacy;
+  const key = dip.pairKey(world.nationIds[a]!, world.nationIds[b]!);
+  if (!d.routes[key]) d.routes[key] = { land: [{ kind: "land", units: routeUnits(world, a, b) }] };
+}
+
+/** Days on the road between two courts for a count, without storing a route for every pair counted. */
+function countDays(world: World): (a: string, b: string) => number {
+  const d = world.diplomacy;
+  return (a, b) => {
+    if (d.routes[dip.pairKey(a, b)]) return dip.routeDays(dip.envoyRoute(d, a, b).legs);
+    return routeUnits(world, world.nationIndex.get(a) ?? -1, world.nationIndex.get(b) ?? -1) * dip.config.envoys.days_per_crossing_unit;
+  };
 }
 
 /** Envoy seats of a realm, and how many are free. */
@@ -204,13 +217,15 @@ function aiEnvoys(world: World): void {
     const list = [...near[n]!];
     let best: { t: number; action: string; total: number } | null = null;
     const from = Math.floor(turn / AI_EVERY_MONTHS) * AI_NEIGHBOURS;
+    const days = countDays(world);
     for (let k = 0; k < Math.min(AI_NEIGHBOURS, list.length); k++) {
       const t = list[(from + k) % list.length]!;
       if (world.nationGone[t]) continue;
-      for (const action of ["propose_alliance", "arrange_marriage"] as const) {
+      // One ask a neighbour each time, alliance and marriage in turn.
+      {
+        const action = (Math.floor(turn / AI_EVERY_MONTHS) + n + k) % 2 === 0 ? "propose_alliance" : "arrange_marriage";
         if (whyNotEnvoy(world, n, t, action)) continue;
-        ensureRoute(world, n, t);
-        const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, (a, b) => dip.routeDays(dip.envoyRoute(d, a, b).legs));
+        const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days);
         if (!best || count.total > best.total) best = { t, action, total: count.total };
       }
     }
