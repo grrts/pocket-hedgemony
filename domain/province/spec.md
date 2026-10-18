@@ -325,6 +325,21 @@ settlement, settlers, local people's tiles.
 - PROV-308: Overview: the Officials tab of the player's country card lists every official of the realm with his type, province, years served and effect, and the empty posts; tapping one opens his screen. [F-54; X-19]
 - PROV-309: Phone: in landscape the official's screen and the province list fit the side panel in the Wide and Tall layouts, every row and button is at least 44 points high, and nothing needs hover (each row spells out what the move changes). [F-54; X-19]
 
+#### Hiring an official (default chosen, 18 October 2026)
+- PROV-333: Hiring an official shall fill an empty royal post with an official of the chosen type for `province.officials.hire.gold` (25 gold, provisional) up front; he starts at half his effect (PROV-192). A type that serves nowhere else among the realm's royal posts has no one at home to learn it from, so it can only be hired from abroad. [PROV-194; default chosen]
+- PROV-334: A foreign specialist can be of any type and shall cost `province.officials.hire.foreign_multiplier` (2, provisional) times a native hire; he bears a name of the realm he comes from. [PROV-194; default chosen]
+- PROV-335: Neither kind of hire shall fill a lord's province: his own officials serve him (PROV-202). [PROV-303]
+
+#### How the player uses it: filling an empty post and commissioning
+- PROV-336: Where: the governance card at the top of a province's overview shows its official, or "No official" with a "Fill the post" button; the realm's Officials tab lists the empty posts as buttons to the same screen. The post's screen offers, first, the realm's officials who could move in (best fit for the province first, one tap each), then one row per type with what it does here, "Hire · 25 gold" and "Foreign · 50 gold"; a button that can't be pressed says why (not enough gold, no one at home of that type). [X-19; PROV-303, PROV-333]
+- PROV-337: Grouping: everything about one post sits on one screen: the official's screen when it is filled (move, commission), the post's screen when it is empty (move in, hire). Commissioning is on the official's screen, with its price (RECR-114) and what the province loses meanwhile. A lord's official has no screen: his card says he serves the lord. [X-19; PROV-307]
+- PROV-338: Overview: the Officials tab of the country card counts the realm's officials by type and the empty posts, so a realm missing a type or with posts standing empty sees it at a glance. [X-19; PROV-308]
+- PROV-339: Phone: the post's screen fits the side panel in landscape in the Wide and Tall layouts and the bottom sheet in portrait; each type row and button is at least 44 points tall and spells out its effect, so nothing needs hover. [X-19; PROV-309]
+
+#### Land just taken and a lord's land (feedback 120 and 121, 18 October 2026)
+- PROV-340: When a realm takes a province, by peace or handed over, the province's official shall be lost with it (fled or killed, PROV-194): its post stands empty and it is royal land. Until the player decides for each such province (fill the post, grant it to a lord, or keep it royal with the post empty), End turn shall open the Officials tab, which lists them first under "New lands" with those three buttons. [feedback 121; PROV-194, PROV-303]
+- PROV-341: In a lord's province the player shall not call levies (its men answer the lord's call for his retinue) nor change its tiles (he decides on his land); he may set its tax, at the loyalty cost of REALM-187, and pay for a building there, which becomes the lord's and wins him a step as a gift of gold (PROV-206). The governance card says so in one line. [feedback 120; PROV-202, PROV-206, REALM-187]
+
 ### Land in the game (feedback 80 and 87, 17 October 2026)
 - PROV-310: Until the land's tile changes are played, each province shall lay out its 4 to 16 tiles from the map: the count from its size (the smallest 4, the largest 16, on a log scale between the 5th and 95th percentile of province sizes), one Town tile, 1 to 3 Shore tiles on a coast (more with more seafolk), and the rest shared out by the share of each use in the ground of the map squares under it. [PROV-010, PROV-011, PROV-018, D-PROV-25]
 - PROV-311: A land building shall stand in the province, take one of its building slots like every other building, and work all the province's tiles of its use: a farm the fields, a ranch the pasture, a fishery the shore, a lumber camp the woods, a quarry rocky waste. Each such tile holds the building's job slots (times the slot scale), and the building needs at least one tile of its use. [Leroy 17 Oct; D-PROV-25]
@@ -455,6 +470,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 | BurnOwnFields(province) | player / AI | Owner | Tiles Burned (scorched earth) | TileBurned |
 | RebuildBurnedTile(tile, gold) | player / AI | Tile Burned | Faster rebuild | TileRebuilt |
 | AssignOfficial(official, province) | player / AI | Official free, or serving in another royal province of the realm; province royal or seat, not a lord's | Governed by official; years served 0; an official already there takes the mover's old post (both start at half), else the old post stands empty (PROV-303) | OfficialAssigned, GrievanceEnded |
+| HireOfficial(province, type, foreign) | player | Royal province of the realm, post empty, not a lord's; a native hire's type serves in another royal post of the realm; gold ≥ price | Official of that type in post, years served 0; price paid (PROV-333, PROV-334) | OfficialHired |
 | DismissOfficial(official) | player / AI | — | Province ungoverned | OfficialDismissed, GrievanceStarted |
 | HireOfficial(type) | player / AI | Gold; colonial governor needs a slot | New official | OfficialHired |
 | LendOfficialToLord(official, lord) / RecallLentOfficial | player / AI | Official free / lent | Works for the lord; loyalty up | OfficialLent / OfficialRecalled |
@@ -572,6 +588,8 @@ province config file but no file name or keys; keys below are proposed by this s
 | province.tax.free_travel_days | Days before travel losses | 5 | yes | province config |
 | province.far_from_throne.days | Days to capital limit | 30 (example) | yes | province config |
 | province.officials.full_effect_years | Years to full effect | 5 (half in first year) | yes | province config |
+| province.officials.hire.gold | Gold up front to hire a native official | 25 (PROV-333) | yes | province config |
+| province.officials.hire.foreign_multiplier | A foreign specialist's price against a native's | 2 (PROV-334) | yes | province config |
 | province.officials.effects | Type effects | tax collector +20 % reaches you; steward +10 % food, store rot ×½; judge riots +1 grievance, *Broken charter* ×2 fade; master of works −25 % cost, ×½ time, burned rebuild ×2; muster master refill +25 %; customs officer +15 % trade ratio gain (fees and tolls are collected in full with or without him, D-TRADE-10); chaplain faith ×2; schoolmaster tongue ×2, graduate 1 year sooner; warden garrison +25 %, walls repair ×2, castle store rot ×½; colonial governor none | yes | province config |
 | province.homeland.years | Years to gain or lose homeland | 100 | yes | province config |
 | province.pretender.years | Old ruler's right after losing a province | 50 | yes | province config |
@@ -827,6 +845,11 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-306, 307 | officials.feature | Moving an official from his screen |
 | PROV-308 | officials.feature | The Officials tab lists every official |
 | PROV-309 | — | Presentation only: checked on phone screenshots in landscape |
+| PROV-333, 335 | officials.feature | Hiring an official for an empty post; A type no one serves in comes only from abroad |
+| PROV-334 | officials.feature | A foreign specialist costs more |
+| PROV-340 | officials.feature | A province just taken waits for a decision |
+| PROV-341 | — | Engine: packages/engine/test/officials.test.ts (no levy in a lord's land); presentation: the governance card |
+| PROV-336–339 | — | Presentation: apps/client/src/ui/people.ts post screen, checked on phone screenshots in landscape and portrait |
 | PROV-310 … PROV-313 | — | Engine: packages/engine/test/works.test.ts (tiles, farms on fields, 1444 food) |
 | PROV-314 … PROV-316 | — | Presentation: apps/client/scripts/land-shots.mjs on phones in landscape |
 | PROV-317 … PROV-320 | — | Engine: packages/engine/test/works.test.ts (hunting: lodge, thinning, hard winter, save) |

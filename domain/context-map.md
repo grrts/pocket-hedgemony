@@ -48,6 +48,7 @@ flowchart TB
 | Statecraft | diplomacy, subjects, government, culture, religion, rebellions, tribes, institutions | How realms treat each other, how they are ruled, who lives in them, the offices they share (the Empire, the Shogunate), and what happens when people rise. |
 | History and identity | events, revolutions, national-strengths | The historical layer: events with choices, revolutions that change how a country plays, and each country's heritage. |
 | Shell and player experience | game-shell, saves, settings, onboarding, achievements, audio, map-presentation | Everything around and on top of the simulation. None of these may change the simulation's results. |
+| Tooling (outside the game) | balance | The balance model: extends the balance runs of `packages/sim` with probe strategies, reads every layer, and checks that no strategy or mechanic dominates (X-21). It never runs in the game and nothing depends on it. |
 
 ## 2. Shared kernels
 

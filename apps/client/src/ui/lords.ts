@@ -138,7 +138,8 @@ export function governanceCard(
     ? `<div class="army person">${lordPortrait(rules, o.lord, 3)}
         <span class="who"><b>${esc(o.lord.name)}</b><br><small>${esc(cap(t.lord))} · House ${esc(o.lord.house)}</small><br>${loyaltyBadge(o.lord.loyalty)}</span>
         <span class="army-buttons"><button class="paper small" data-lord-open="${o.lord.k}">${esc(cap(t.lord))}</button>${o.mine ? `<button class="paper small" data-seize="${o.province}" title="Take it back as royal land: he loses a step, and every other ${esc(t.lord)} notices">Seize</button>` : ""}</span>
-      </div>`
+      </div>
+      ${o.mine ? `<p class="hint">He runs his land: his own ${esc(t.official)}, his tiles and his men. You set its tax (heavy taxes cost his loyalty), and a building you pay for here becomes his, a gift that wins a step of loyalty. Seize it to run it yourself.</p>` : ""}`
     : `<div class="army person royal"><span class="crest">♛</span>
         <span class="who"><b>Royal land</b><br><small>Not granted to any ${esc(t.lord)}. ${o.isCapital ? "The capital stays royal." : o.mine ? "All its tax and recruits reach you." : "Its tax and recruits go to the crown."}</small></span>
         ${o.mine && !o.isCapital && o.takers.length ? `<span class="army-buttons"><button class="paper small" data-grant-open aria-expanded="${o.grantOpen}">Grant as fief</button></span>` : ""}

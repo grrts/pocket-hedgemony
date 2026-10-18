@@ -1029,6 +1029,20 @@ button.small {
   transition: width 0.4s steps(4);
 }
 
+/* Men left over morale left, as the map shows over the battle (VIEW-077). */
+.battle-watch .bars {
+  display: grid;
+  gap: 2px;
+}
+
+.battle-watch .bar.morale {
+  height: 6px;
+}
+
+.battle-watch .bar.morale i {
+  background: #f4f4f4;
+}
+
 .battle-watch p {
   margin: 4px 0 0;
 }
@@ -2006,6 +2020,46 @@ button.place:active:not(:disabled) {
 .province-row > button.small {
   min-height: 44px;
   align-self: center;
+}
+/* An empty post's types to hire: what each does here, then Hire and Foreign; the buttons wrap below on a narrow panel. */
+.hire-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 8px;
+}
+.hire-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 0;
+  border-bottom: 2px solid rgba(107, 74, 44, 0.25);
+}
+.hire-row > span:first-child {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 180px;
+  min-width: 0;
+  line-height: 1.1;
+}
+.hire-row small {
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+.hire-buttons {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.hire-buttons button.small,
+.post-buttons button.small {
+  min-height: 44px;
+}
+.post-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 img.thumb {
   flex: none;
@@ -4673,4 +4727,20 @@ small.why {
   display: block;
   font-size: 0.7em;
   font-weight: 400;
+}
+
+/* New land waiting for a decision (PROV-340): its name, then fill, grant or keep royal, wrapping on a narrow panel. */
+.new-lands {
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+.new-land {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 0;
+}
+.new-land > b {
+  flex: 1 1 140px;
 }

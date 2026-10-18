@@ -434,7 +434,7 @@
     ],
     "max": 5
   },
-  "commissionCost": 10,
+  "commissionCost": 50,
   "fieldWageMultiplier": {
     "commander": 3,
     "captain": 2
