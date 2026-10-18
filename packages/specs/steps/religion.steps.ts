@@ -1805,9 +1805,6 @@ Then(/^the holy places of the Pope, the Ecumenical Patriarch, a Caliph's claim a
   expect((s.heads1444 as { id: string }[]).map((h) => h.id)).not.toContain("dalai_lama");
   expect(G.churchHeads(Number(year)).map((h) => h.id)).toContain("dalai_lama");
 });
-Then("religion gives church heads no rules of their own", (s) => {
-  for (const h of s.heads1600 as Record<string, unknown>[]) expect(Object.keys(h).sort()).toEqual(["id", "name", "place"]);
-});
 
 Given(/^the people of "([^"]+)" convert to (\w+)$/, (s, name: string, faith: string) => {
   const p = prov(s, name, { orthodox: 0.6, catholic: 0.4 }, { people: 100000 });

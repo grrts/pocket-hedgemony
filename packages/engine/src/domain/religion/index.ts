@@ -1016,7 +1016,7 @@ export function holyPlaces(firedEvents: string[] = [], year = 1444): HolyPlace[]
     });
 }
 
-/** Church heads are only marked at their holy place, with no rules of their own (RELG-085). */
+/** Church heads are marked at their holy place, their seat (RELG-085); the heads of the faith rules are RELG-139 onward. */
 export function churchHeads(year = 1444): { id: string; name: string; place: string }[] {
   const heads = config.church_heads as unknown as Record<string, { name: string; place: string; from?: number } | string>;
   const out: { id: string; name: string; place: string }[] = [];

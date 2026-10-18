@@ -575,6 +575,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | subjects | partnership | Customer–Supplier | Diplomacy maps relation kinds onto the six kinds through `mapping_1444` and reads `fights` / `own_diplomacy` from here (X-8); its counts decide asks by agreement and this context picks the kind (D-SUBJ-4); Break a subject targets the overlord (D-SUBJ-6) |
 
+## diplomacy (heads) ↔ religion (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| religion | downstream | Customer–Supplier | Patron's tie, *Seized* / *Freed the seat*, *Betrayed the faith*, *Censured* as ledger entries; the patron's defensive call; allies' free refusal of a censured realm's call |
+
 ## diplomacy ↔ events
 
 | Said by | Other side is | Pattern | What crosses |
@@ -1192,6 +1198,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | government | upstream | Customer–Supplier | Army coup; loss of the shogun's capital |
 | warfare | upstream | Conformist | Ruler warlike, regency, succession war |
 
+## institutions (Empire, shogunate) ↔ religion (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| religion | partnership | Partnership | Shinto's Emperor in Kyoto and the Empire's crowning stay with the institutions design; heads of the faith stay here |
+
 ## map-presentation ↔ national-strengths
 
 | Said by | Other side is | Pattern | What crosses |
@@ -1665,6 +1677,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | province | upstream | Conformist | Ground (terrain), size on the map (tile count), coast, rivers, neighbours, population, wealth |
 | world-map | downstream | Published Language | Ground, size (tile count), coastal and river (shore tiles), road step |
 
+## realm (heads) ↔ religion (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| religion | upstream / downstream | Customer–Supplier | Papal States ruler's death opens a conclave; lords waver on censure |
+
 ## realm ↔ rebellions
 
 | Said by | Other side is | Pattern | What crosses |
@@ -1886,6 +1904,12 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | religion | downstream | Customer–Supplier | *Defend the faith* openings (persecution on border, preacher killed, holy place held) |
 | warfare | upstream | Conformist | Persecution flag for *Defend the faith* |
+
+## religion ↔ warfare (heads) (one-sided) (unknown context name)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| religion | downstream | Customer–Supplier | Censured aims (*Take land*, *Tribute*, *Raid*); *Punish* held against a censured realm |
 
 ## research ↔ revolutions (one-sided)
 
