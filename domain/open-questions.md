@@ -2,7 +2,7 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-558 decided and 8 still open across 29 contexts.
+560 decided and 8 still open across 29 contexts.
 
 ## Still open
 
@@ -92,6 +92,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-CULT-14**: (was OQ-CULT-14) Trading people and Tongue %: confirmed weight 0; they are neither kin nor stranger for grievances. They are not of the court's tongue, and the design only shields them from grievances.
 - **D-CULT-15**: (was OQ-CULT-15) Schools of a learned tongue: a school teaching Latin or Classical Arabic has no teaching tongue and speeds no drift; other schools carry a tongue id. Nobody's home tongue is Latin, so such a school can never be in the pull tongue.
 - **D-CULT-16**: (was OQ-CULT-16) Released country: it takes the catalogue record whose first culture is the tongue (X-13 keeps such records as reference data); if none fits, a generated country named after the tongue, with that tongue as court tongue and the form of the country it left. The fewest new parts.
+- **D-CULT-18**: First game slice (provisional): each map realm's 1444 tongues come from its catalogue culture strings, mapped once onto about 190 tongues by hand (merchant colonies, captives and peoples the catalogue says live in a separate record left out), up to three per realm, every province of the realm taking the realm's mix; per-province homelands wait on the homeland data. A province's homeland is its 1444 majority tongue. Lords and officials carry no tongue yet, so a lord counts as of the court tongue and any official governs for the court. A realm's own 1444 land counts as held long enough for the court's pull and is never under *Foreign rule*, as the game already did ("the people were not yours in 1444"): a court that ruled them for generations is not foreign there, and nobody starts with the grievance. Without this, 394 provinces of thirteen realms (the Timurids, Lithuania, the Mamluks …) would start under *Foreign rule*.
 - **D-CULT-17**: (was OQ-CULT-17) Court pull: any official of the country counts, whatever his tongue. The config's `own_official` says so, and the official's tongue already works through learning time.
 
 ### Diplomacy (diplomacy)
@@ -429,6 +430,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-RELG-21**: (was OQ-RELG-21) Tolerated lords waver once, when the faith is set to Tolerated while 10 % or more of the realm; a Tolerated faith growing past 10 % later moves no lord. The design says "when you tolerate".
 - **D-RELG-22**: (was OQ-RELG-22) No invention grants preachers; they come from houses, monasteries and religious schools, holy places and events. "Some inventions" names none, and no mechanic is added.
 - **D-RELG-23**: (was OQ-RELG-23) A holy place is held by the realm that owns its province: Mecca and Medina by the Sharifs (Hejaz, a map realm), not their Mamluk overlord. The domain model already derives the holder from the owner.
+- **D-RELG-24**: First game slice (provisional): faith buildings cannot be built yet, so each 1444 community of a tenth or more holds one step-1 house (the state faith a house of worship, the others a minority house); this keeps every 1444 community served and the mixes steady, so they move slowly from the capital and the policies. Lords carry no faith yet, so no lord's pull or loyalty step is counted, and the Restricted and Persecuted lords' steps, sparks, flight, war aims and purses wait on their contexts. Of the eight region overrides, the map can place only those named by area for their 1444 owner and the Ottoman Balkans (provinces west of 29° E). The smallest rule that runs the mix, the communities and the policies with their grievances and tax.
 
 ### Research (research)
 
