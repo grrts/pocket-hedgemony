@@ -2648,6 +2648,8 @@ details.why summary {
 }
 .assessments li.risk .steps i.on {
   background: #b13e53;
+}
+
 /* ---- Subjects on the Diplomacy tab (SUBJ-091, SUBJ-092) ---- */
 
 /* Loyalty steps tinted green, ochre, orange and red, as the subjects config names them. */
