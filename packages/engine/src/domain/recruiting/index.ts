@@ -147,6 +147,16 @@ export function levyPay(men: number, monthsServed: number, cfg: RecruitingConfig
   return monthsServed > cfg.freeMonths ? men * cfg.levyPay : 0;
 }
 
+/**
+ * The levy of one province (RECR-104, RECR-105): there is no region or country levy. Men are called
+ * in whole thousands (`levyUnit`), shown as a percent of the men who can be called there.
+ */
+export function provinceLevy(callable: number, thousands: number, cfg: RecruitingConfig = config): { men: number; thousands: number; percent: number } {
+  const k = Math.max(0, Math.round(thousands));
+  const men = k * cfg.levyUnit;
+  return { men, thousands: k, percent: callable > 0 ? Math.round((men / callable) * 100) : 100 };
+}
+
 /** Days until a levy has gathered: 2 weeks; 3 days with W18 Railway mobilization (RECR-013, RECR-014, D-RECR-12). */
 export function gatheringDays(known?: Known, cfg: RecruitingConfig = config): number {
   return knows(known, cfg.railwayMobilizationInvention) ? cfg.gathering.railwayDays : cfg.gathering.days;

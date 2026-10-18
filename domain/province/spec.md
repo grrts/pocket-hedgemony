@@ -452,6 +452,12 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 
 - PROV-302: The province card shall have a Garrison tab listing the troops in the province without a commander (by thousand, arm and drill), the levies still gathering with the days left, and the commanders present who can pick them up. [F-17; recruiting RECR-107]
 
+#### How the player uses it: the Garrison tab
+- PROV-333: Where: the player taps one of their provinces on the map and then Garrison, the third tab of the province card; each row of the Military tab's recruit list opens the same tab. [F-17; X-19]
+- PROV-334: Grouping: the tab holds, top to bottom, Recruit (the button and the queue with days left, RECR-116 to RECR-121), then Troops without a commander (men, their arms and drill, and per row the pick-up, Lead and Send home buttons), then a line naming the commanders standing there, or saying none is free. Only the realm that owns the troops sees them. [F-17; X-19]
+- PROV-335: Overview: the Military tab of the country card lists every province with men gathering and when all will be in, and opens its Garrison tab. [F-17; X-19]
+- PROV-336: Phone: in landscape the tab fits the side panel in the Wide and Tall layouts, each button is at least 44 points high and each queue row 48, and nothing needs hover. [F-17; X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -931,3 +937,4 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-300 | lords-in-province.feature | A lord's province without his official |
 | PROV-301 | health.feature | Sickness by land |
 | PROV-302 | defence.feature | The Garrison tab |
+| PROV-333–336 | — | Presentation only: checked on phone screenshots in landscape |

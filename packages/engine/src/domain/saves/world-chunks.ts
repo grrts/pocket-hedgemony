@@ -395,7 +395,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   if (worksMeta.workQueue) world.workQueue = worksMeta.workQueue.map((q) => mapWork<QueuedWork>(q)).filter(placed);
   refreshWorks(world);
   if (natMeta.lords) world.lords = natMeta.lords.map((l) => ({ ...l, nation: mapN(l.nation) }));
-  if (natMeta.musters) world.musters = natMeta.musters.map((m) => ({ ...m, nation: mapN(m.nation), province: mapP(m.province) })).filter((m) => m.nation >= 0 && m.province >= 0);
+  // Saves from before RECR-106 counted the next thousand in weeks.
+  if (natMeta.musters) world.musters = (natMeta.musters as (Muster & { weeksLeft?: number })[]).map(({ weeksLeft, ...m }) => ({ ...m, daysLeft: m.daysLeft ?? (weeksLeft ?? 2) * 7, nation: mapN(m.nation), province: mapP(m.province) })).filter((m) => m.nation >= 0 && m.province >= 0);
   const rec = nat.commanderRecord;
   if (rec) {
     commanderMap.forEach((now, old) => {
