@@ -74,6 +74,7 @@ import { nameOnMap, playbackAdvance, playbackHour } from "@ph/engine/domain/map-
 import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
+import { SHELL as SHELL_RULES, startColumn, startIcons, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { autosaveEvery, autosavesKept, battleStepMs, dayMs, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
@@ -2410,10 +2411,14 @@ function renderPanelCard(): void {
   }
   fleetView = -1;
   sailing = -1;
+  if (!snapshot && selectedProvince < 0 && startOn) {
+    showStart();
+    showPanel(false);
+    return;
+  }
   if (!snapshot && selectedProvince < 0) {
     panel.innerHTML = `
-      <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button></span></header>
-      ${startActions()}
+      <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Fold away">${icon("collapse", 2)}</button><button class="close" data-start-back aria-label="Back to the start screen">${icon("close", 2)}</button></span></header>
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
@@ -2425,6 +2430,10 @@ function renderPanelCard(): void {
       <p class="diag" id="diag">${diagnosticsLine()}</p>`;
     bindNationButtons();
     panel.querySelector("[data-ach-open]")!.addEventListener("click", () => openAchievements());
+    panel.querySelector("[data-start-back]")!.addEventListener("click", () => {
+      startOn = true;
+      renderPanel();
+    });
     showPanel(true, "crown");
     return;
   }
@@ -4831,17 +4840,125 @@ async function refreshSaves(): Promise<void> {
   savesList = await saveStore.list();
 }
 
-/** The start screen's Continue, Load and Settings (SAVE-105, SAVE-014). */
-function startActions(): string {
+// ---- the start screen (domain/game-shell "Start screen", SHELL-149..158) ----
+// The game opens on it with its menu shown. Scripted browsers skip it and land
+// on New campaign, as the scripts in scripts/ expect, unless they ask for ?start;
+// ?new skips it for anyone.
+const startParams = new URLSearchParams(location.search);
+let startOn = !startParams.has("new") && !(navigator.webdriver && !startParams.has("start"));
+const startEl = document.createElement("div");
+startEl.className = "start-screen";
+startEl.hidden = true;
+document.querySelector("#app")!.append(startEl);
+const SHELL_PLATFORM: ShellPlatform = runtimeNow === "capacitor-ios" ? "iOS" : runtimeNow === "capacitor-android" ? "Android" : runtimeNow === "electron" ? "desktop" : "web";
+const START_ICONS: Record<string, Parameters<typeof icon>[0]> = { Settings: "cog", Achievements: "trophy", Wiki: "scroll", More: "menu", Quit: "close" };
+let startMore = false;
+let startPan = 0;
+const tutorialFinished = () => hints.progress().done >= hints.progress().of;
+
+/** The start screen: Play with the waiting campaign, the ways into a campaign, the icon row, the map panning behind (SHELL-150..156). */
+function showStart(): void {
   const cont = continueTarget(savesList, DEVICE, nationNameOf);
-  return `<div class="start-actions">
-    ${cont ? `<button class="wax continue" data-continue="${esc(cont.entry.path)}">${icon("hourglass", 2)}<span>${esc(cont.label)}</span></button>` : ""}
-    <span class="start-row">
-      <button class="paper" data-shell="load"${savesList.length ? "" : " disabled"}>${icon("scroll", 1)} Load</button>
-      <button class="paper" data-shell="settings">${icon("cog", 1)} Settings</button>
-    </span>
+  const nation = cont ? flagOfId(cont.entry.header.playerNation) : undefined;
+  const d = cont?.entry.header.date;
+  const column = startColumn({
+    campaign: cont && d ? { realm: nationNameOf(cont.entry.header.playerNation), date: { year: d.y, month: d.m }, borders: "" } : null,
+    saves: savesList.length,
+    tutorialFinished: tutorialFinished(),
+    platform: SHELL_PLATFORM,
+    edition: "full game",
+  });
+  const entry = (e: (typeof column)[number]) =>
+    e.label === "Play"
+      ? `<button class="wax start-play" data-start="play">${nation ? pennant(nation, 3) : icon("crown", 3)}<span><b>Play</b>${e.detail ? `<small>${esc(e.detail)}</small>` : ""}</span></button>`
+      : `<button class="paper" data-start="${e.target}">${esc(e.label)}</button>`;
+  startEl.innerHTML = `
+    <div class="start-band framed">
+      <h1 class="start-logo">Pocket Hegemony</h1>
+      <nav class="start-column" aria-label="Start">${column.map(entry).join("")}</nav>
+      <div class="start-icons">${startIcons(SHELL_PLATFORM)
+        .map((name) => `<button class="paper" data-start-icon="${name}">${icon(START_ICONS[name]!, 2)}<small>${name}</small></button>`)
+        .join("")}</div>
+    </div>
+    ${startMore ? startMoreHtml() : ""}
+    <span class="start-version">v${GAME_VERSION}</span>`;
+  startEl.hidden = false;
+  document.body.classList.add("starting");
+  startEl.querySelector<HTMLButtonElement>(".start-play")!.focus({ preventScroll: true });
+  panStart(cont ? cont.entry.header.playerNation : SHELL_RULES.start.regions[Math.floor(Math.random() * SHELL_RULES.start.regions.length)]!);
+}
+
+/** More: Credits, the art test page, and Tutorial once it is finished (SHELL-154). */
+function startMoreHtml(): string {
+  return `<div class="start-more framed" role="dialog" aria-label="More">
+    <header><h2 class="ribbon">More</h2><span class="panel-buttons"><button class="close" data-start-icon="More" aria-label="Close">${icon("close", 2)}</button></span></header>
+    ${tutorialFinished() ? `<button class="paper" data-start="tutorial">Tutorial</button>` : ""}
+    <a class="paper-link" href="./style.html">Art test page</a>
+    <p class="start-credits"><b>Pocket Hegemony</b> ${esc(GAME_VERSION)}. Made by Leroy with Claude.</p>
   </div>`;
 }
+
+/** Leaves the start screen for the map: the panning stops and the map takes input again. */
+function hideStart(): void {
+  startOn = false;
+  startMore = false;
+  startEl.hidden = true;
+  document.body.classList.remove("starting");
+  cancelAnimationFrame(startPan);
+  startPan = 0;
+}
+
+/**
+ * The map behind the start screen pans slowly at region zoom back and forth
+ * across a realm, turning gently at the ends; it takes no input and runs no
+ * simulation (SHELL-150). Battery saver's frame cap slows the frames, not the pan (SHELL-151).
+ */
+function panStart(nationId: string): void {
+  if (startPan) return;
+  const n = nations[nationIndex.get(nationId) ?? nationIndex.get("france")!]!;
+  const cap = provinces[provinceIndex.get(n.capital)!]!;
+  const mine = provinces.filter((_, i) => owners[i] === nationIndex.get(n.id));
+  const xs = mine.map((p) => p.x!);
+  const reach = Math.max(40, Math.min(240, (Math.max(...xs, cap.x!) - Math.min(...xs, cap.x!)) / 2));
+  const t0 = performance.now();
+  const step = (now: number) => {
+    if (!startOn || startEl.hidden) return;
+    // A sine path: the pan eases to a stop at each end and turns back.
+    const phase = ((now - t0) / 1000) * (SHELL_RULES.start.panSpeed / reach);
+    view.lookAt(cap.x! + reach * Math.sin(phase), cap.y! + reach * 0.25 * Math.sin(phase * 0.5), SHELL_RULES.start.zoomLevel);
+    startPan = requestAnimationFrame(step);
+  };
+  startPan = requestAnimationFrame(step);
+}
+
+startEl.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-start], [data-start-icon]");
+  if (!b) return;
+  const what = b.dataset.start ?? b.dataset.startIcon!;
+  if (what === "play" || what === "loading" || what === "new_campaign") {
+    const cont = continueTarget(savesList, DEVICE, nationNameOf);
+    if (what !== "new_campaign" && cont) {
+      hideStart();
+      void loadSave(cont.entry.path, false, false);
+      return;
+    }
+    hideStart();
+    renderPanel();
+  } else if (what === "load") openShell("load", true);
+  else if (what === "tutorial") {
+    // The first-campaign hints are the tutorial for now: they start over and walk a new campaign.
+    hints.reset();
+    if (!hints.state.on) hints.setOn(true);
+    hideStart();
+    renderPanel();
+  } else if (what === "Settings") openShell("settings", true);
+  else if (what === "Achievements") openAchievements();
+  else if (what === "Wiki") window.open(SHELL_RULES.start.wikiUrl, "_blank", "noopener");
+  else if (what === "More") {
+    startMore = !startMore;
+    showStart();
+  } else if (what === "Quit") window.close();
+});
 
 /** Seconds played in this campaign so far, counted while the page is shown. */
 function playSeconds(): number {
