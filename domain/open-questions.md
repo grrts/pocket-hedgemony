@@ -2,8 +2,6 @@
 
 Every gap or contradiction the domain specs found in the designs, collected from section 13 of each `spec.md` by `pnpm --filter @ph/specs context-map`. A question answered is a decision (`D-<CODE>-n`, which replaces `OQ-<CODE>-n`); the cross-context decisions and the rules used to decide are in [DECISIONS.md](DECISIONS.md).
 
-574 decided and 8 still open across 29 contexts.
-
 ## Still open
 
 - **OQ-ACH-8** (achievements): (release task) Store figures (Google points and counts, Steam's check) are checked again in each console before upload; the rules adopt the strictest.
