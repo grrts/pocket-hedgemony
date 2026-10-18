@@ -123,6 +123,18 @@ Feature: Graphics settings
       | Medium | 8 × 8 tiles and still water                                   |
       | High   | everything                                                    |
 
+  @SET-041
+  Scenario Outline: Map detail sets the living map close in
+    Given a campaign is loaded
+    When "Map detail" is "<detail>" and the map redraws
+    Then close in the map shows <close>
+
+    Examples:
+      | detail | close                                         |
+      | Low    | icons at every zoom, with the closest zoom 40 |
+      | Medium | the living map but no street level            |
+      | High   | the living map and the street level up to 96  |
+
   @SET-042
   Scenario Outline: Animations
     Given a campaign is loaded
